@@ -7,7 +7,7 @@ from pandas.core.algorithms import isin
 
 def normalizeData(atom):
     """ 
-    Verify the atom to be a usable one
+    Verify the atom to be a "usable" one
 
     Arguments:
         - atom: the atom to check
