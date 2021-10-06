@@ -16,14 +16,15 @@ def calculateMeanBondLen(coordsDf: pd.DataFrame, boxLengths: list):
 
     Assumes the bonds are by the coordsDf's ids, sequentially
 
-    @deprecated This function is legacy compliant only
+    .. deprecated:: 0.0.1 
+        This function is legacy compliant only. Use `calculateBondLen(...).mean()` instead.
 
-    Args: 
-        coordsDf: a dataframe containing the coordinates
-        boxLenghts: a list containing the box lengths (x, y, z) 
+    Arguments:
+        - coordsDf: a dataframe containing the coordinates
+        - boxLenghts: a list containing the box lengths (x, y, z) 
 
-    Returns: 
-        meanDistance: the mean of all distances
+    Returns:
+        - meanDistance: the mean of all distances
     """
     lastX, lastY, lastZ = [0, 0, 0]
     newX, newY, newZ = [0, 0, 0]
@@ -62,6 +63,13 @@ def calculateBondLen(coordsDf: pd.DataFrame, bondsDf: pd.DataFrame, boxLengths: 
     given the coordinates of the atoms in a pd.DataFrame 
     and the bonds of the atoms in a pd.DataFrame 
     and the boxLengths in a list
+
+    Arguments:
+        - coordsDf: a dataframe containing the coordinates
+        - boxLenghts: a list containing the box lengths (x, y, z) 
+
+    Returns:
+        - a np.array of all bond lengths
     """
     Rs = []
     for bond in bondsDf.itertuples():
@@ -70,10 +78,10 @@ def calculateBondLen(coordsDf: pd.DataFrame, bondsDf: pd.DataFrame, boxLengths: 
         if (skipAtomType is not None):
             if (atomTo['type'] == skipAtomType or atomFrom['type'] == skipAtomType):
                 continue
-        Rdist = calculateNormalizedDistanceBetweenAtoms(atomTo, atomFrom, boxLengths)
+        Rdist = calculateNormalizedDistanceBetweenAtoms(
+            atomTo, atomFrom, boxLengths)
         if (Rdist > 5):
             warnings.warn("Probably unrealistically long bond detected.")
         Rs.append(Rdist)
 
     return np.array(Rs)
-

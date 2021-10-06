@@ -14,9 +14,9 @@ def readLammpDump(file: str, useCache: bool = True):
     """
     Read a lammpstrj / LAMMPS dump output file to a dictonary
 
-    Args:
-        file: the file path to read from
-        useCache: whether to use the cache or not. Cache does respect file modification time.
+    Arguments:
+        - file: the file path to read from
+        - useCache: whether to use the cache or not. Cache does respect file modification time.
     """
     if (useCache):
         cachedData = loadCache(file, "-lammp-dump-cache")

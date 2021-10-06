@@ -12,7 +12,7 @@ def reduce_mem_usage(df, obj_to_category=False, subset=None):
     """
     Iterate through all the columns of a dataframe and modify the data type to reduce memory usage.
 
-    Args:
+    Arguments:
         df (pd.DataFrame): dataframe to reduce
         obj_to_category (boolean): convert non-datetime related objects to category dtype
         subset (List): subset of columns to analyse
@@ -75,7 +75,7 @@ def optimize_floats(df: pd.DataFrame) -> pd.DataFrame:
     """
     Optimize the floating point type entries
 
-    Args:
+    Arguments:
         df (pd.DataFrame): dataframe to reduce
 
     Returns:
@@ -90,7 +90,7 @@ def optimize_ints(df: pd.DataFrame) -> pd.DataFrame:
     """
     Optimize the integer point type entries
 
-    Args:
+    Arguments:
         df (pd.DataFrame): dataframe to reduce
 
     Returns:
@@ -105,11 +105,11 @@ def optimize_objects(df: pd.DataFrame, datetime_features: List[str]) -> pd.DataF
     """
     Optimize object type entries
 
-    Args:
-        df (pd.DataFrame): dataframe to reduce
+    Arguments:
+        - df (pd.DataFrame): dataframe to reduce
 
     Returns:
-        df (pd.DataFrame): dataset with the column dtypes adjusted
+        - df (pd.DataFrame): dataset with the column dtypes adjusted
     """
     for col in df.select_dtypes(include=['object']):
         if col not in datetime_features:
@@ -126,10 +126,10 @@ def optimize(df: pd.DataFrame, datetime_features: List[str] = []):
     """
     Optimize all types of all columns in a dataframe
 
-    Args:
-        df (pd.DataFrame): dataframe to reduce
+    Arguments:
+        - df (pd.DataFrame): dataframe to reduce
 
     Returns:
-        df (pd.DataFrame): dataset with the column dtypes adjusted
+        - df (pd.DataFrame): dataset with the column dtypes adjusted
     """
     return optimize_floats(optimize_ints(optimize_objects(df, datetime_features)))
