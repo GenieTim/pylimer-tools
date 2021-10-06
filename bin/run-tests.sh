@@ -2,4 +2,6 @@
 
 cd "$(dirname "$0")/../src" || exit
 
-python -m unittest discover
+coverage run -m unittest discover -v
+
+coverage report --include="pylimer_tools/**/*.py"
