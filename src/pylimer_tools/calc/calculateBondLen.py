@@ -32,14 +32,21 @@ def calculateMeanBondLen(coordsDf: pd.DataFrame, boxLengths: list):
     maxId = coordsDf["id"].max()
     for fromId in range(minId, maxId):
         row = coordsDf.loc[coordsDf["id"] == fromId]
-        if (lastX == 0 and lastY == 0 and lastZ == 0):
-            lastX = row["xsu"].iloc[0]*boxLengths[0]
-            lastY = row["ysu"].iloc[0]*boxLengths[1]
-            lastZ = row["zsu"].iloc[0]*boxLengths[2]
+
+        def ilocIfNecessary(row, key):
+            if (type(row[key]) in (int, str, bool, float, np.float64, np.float32, np.float16, np.float128)):
+                return row[key]
+            else:
+                return row[key].iloc[0]
+
+        if (fromId == minId):
+            lastX = ilocIfNecessary(row, "xsu")*boxLengths[0]
+            lastY = ilocIfNecessary(row, "ysu")*boxLengths[1]
+            lastZ = ilocIfNecessary(row, "zsu")*boxLengths[2]
         else:
-            newX = row["xsu"].iloc[0]*boxLengths[0]
-            newY = row["ysu"].iloc[0]*boxLengths[1]
-            newZ = row["zsu"].iloc[0]*boxLengths[2]
+            lastX = ilocIfNecessary(row, "xsu")*boxLengths[0]
+            lastY = ilocIfNecessary(row, "ysu")*boxLengths[1]
+            lastZ = ilocIfNecessary(row, "zsu")*boxLengths[2]
             distance = np.linalg.norm([lastX-newX, lastY-newY, lastZ-newZ])
             distances.append(distance)
             lastX = newX
