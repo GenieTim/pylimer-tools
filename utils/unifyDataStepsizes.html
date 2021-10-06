@@ -51,7 +51,7 @@ def unifyDataStepsizes(data: pd.DataFrame, key: str, stepSize: int = None, maxEx
     if (stepSize &gt; maxExpectedStepSize):
         warnings.warn(&#34;Step size unexpectedly large&#34;)
     data = data[(data[key] % stepSize) == 0]
-    print(&#34;Reduced from {} to {} data-points using step size of {}&#34;.format(lenBefore, len(data), stepSize))
+    # print(&#34;Reduced from {} to {} data-points using step size of {}&#34;.format(lenBefore, len(data), stepSize))
     return data</code></pre>
 </details>
 </section>
@@ -105,7 +105,7 @@ NOTE: this function is rather unstable, as it has a few dirty assumptions, such 
     if (stepSize &gt; maxExpectedStepSize):
         warnings.warn(&#34;Step size unexpectedly large&#34;)
     data = data[(data[key] % stepSize) == 0]
-    print(&#34;Reduced from {} to {} data-points using step size of {}&#34;.format(lenBefore, len(data), stepSize))
+    # print(&#34;Reduced from {} to {} data-points using step size of {}&#34;.format(lenBefore, len(data), stepSize))
     return data</code></pre>
 </details>
 </dd>
