@@ -5,7 +5,7 @@ import pandas as pd
 
 from pylimer_tools.calc.calculateBondLen import calculateBondLen, calculateMeanBondLen
 
-class TestCalcFunctions(unittest.TestCase):
+class TestDistanceCalcFunctions(unittest.TestCase):
 
     def test_calculateMeanBondLen(self):
       baseAtom = {
@@ -25,7 +25,6 @@ class TestCalcFunctions(unittest.TestCase):
         thirdAtom["id"] = 3
 
         coordsDf = pd.DataFrame([thirdAtom, secondAtom, baseAtom])
-        print(coordsDf)
         self.assertEqual(1, calculateMeanBondLen(coordsDf, [1, 1, 1]))
 
     def test_calculateBondLen(self):
@@ -48,7 +47,6 @@ class TestCalcFunctions(unittest.TestCase):
 
         coordsDf = pd.DataFrame([baseAtom, secondAtom, thirdAtom])
         bondsDf = pd.DataFrame([{"to": 1, "bondFrom": 0}, {"to": 2, "bondFrom": 1}])
-        print(bondsDf)
         self.assertEqual(1, calculateBondLen(coordsDf, bondsDf, [10, 10, 10]).mean())
     
 
