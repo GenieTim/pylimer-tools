@@ -20,4 +20,4 @@ packaging>=21.0
 pandas>=1.2.4
 twine>=3.4.2
 coverage>=5.5.0
-pyrrow>=5.0.0
+pyarrow>=5.0.0
