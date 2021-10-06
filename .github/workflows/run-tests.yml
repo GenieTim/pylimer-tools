@@ -1,9 +1,10 @@
-name: Publish Documentation
+name: Run Tests
 
 on:
   push:
     branches:
       - master
+      - main
 
 jobs:
   build-deploy:
