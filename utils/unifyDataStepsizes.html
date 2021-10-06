@@ -45,7 +45,7 @@ def unifyDataStepsizes(data: pd.DataFrame, key: str, stepSize: int = None, maxEx
     Returns:
         - data: a DataFrame with a consistent step-size
     &#34;&#34;&#34;
-    lenBefore = len(data)
+    # lenBefore = len(data)
     if (stepSize is None):
         stepSize = data[key].sort_values().diff().max()
     if (stepSize &gt; maxExpectedStepSize):
@@ -99,7 +99,7 @@ NOTE: this function is rather unstable, as it has a few dirty assumptions, such 
     Returns:
         - data: a DataFrame with a consistent step-size
     &#34;&#34;&#34;
-    lenBefore = len(data)
+    # lenBefore = len(data)
     if (stepSize is None):
         stepSize = data[key].sort_values().diff().max()
     if (stepSize &gt; maxExpectedStepSize):

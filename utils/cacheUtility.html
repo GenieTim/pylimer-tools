@@ -31,6 +31,7 @@ import hashlib
 import os
 import pathlib
 import pickle
+import tempfile
 import warnings
 
 
@@ -95,8 +96,9 @@ def getCacheFileName(file: str, suffix: str):
     Returns:
         - cacheFileName: the path to the cache file
     &#34;&#34;&#34;
-    cacheFileName = os.path.dirname(
-        __file__) + &#34;/cache/&#34; + hashlib.md5(file.encode()).hexdigest() + suffix + &#34;.pickle&#34;
+    cacheFileName = &#34;{}/{}-{}.pickle&#34;.format(
+        tempfile.gettempdir(),
+        hashlib.md5(file.encode()).hexdigest(), suffix)
     return cacheFileName</code></pre>
 </details>
 </section>
@@ -165,8 +167,9 @@ def getCacheFileName(file: str, suffix: str):
     Returns:
         - cacheFileName: the path to the cache file
     &#34;&#34;&#34;
-    cacheFileName = os.path.dirname(
-        __file__) + &#34;/cache/&#34; + hashlib.md5(file.encode()).hexdigest() + suffix + &#34;.pickle&#34;
+    cacheFileName = &#34;{}/{}-{}.pickle&#34;.format(
+        tempfile.gettempdir(),
+        hashlib.md5(file.encode()).hexdigest(), suffix)
     return cacheFileName</code></pre>
 </details>
 </dd>

@@ -53,8 +53,8 @@ def getAndFilterMoleculesAndBonds(atom_data: pd.DataFrame, bond_data: pd.DataFra
     crosslinker_bonds = []
     assert(len(atom_data) &gt; 1)
     if (crosslinker_type is not None):
-        lenAtomsBefore = len(atom_data)
-        lenBondsBefore = len(bond_data)
+        # lenAtomsBefore = len(atom_data)
+        # lenBondsBefore = len(bond_data)
         # remove all crosslinkers from bond &amp; atoms
         crosslinkers = atom_data[atom_data.type == crosslinker_type]
         crosslinker_atoms = crosslinkers
@@ -66,8 +66,8 @@ def getAndFilterMoleculesAndBonds(atom_data: pd.DataFrame, bond_data: pd.DataFra
         bond_data = bond_data[~(
             bond_data[&#34;bondFrom&#34;].isin(crosslinkers[&#34;id&#34;]))]
         atom_data = atom_data[~(atom_data[&#34;id&#34;].isin(crosslinkers[&#39;id&#39;]))]
-        print(&#34;Removed crosslinkers. Got {} of {} atoms and {} of {} bonds left.&#34;.format(
-            len(atom_data), lenAtomsBefore, len(bond_data), lenBondsBefore))
+        # print(&#34;Removed crosslinkers. Got {} of {} atoms and {} of {} bonds left.&#34;.format(
+        #     len(atom_data), lenAtomsBefore, len(bond_data), lenBondsBefore))
 
     # start with first atom, loop all
     atom_data = atom_data.sort_values(
@@ -209,8 +209,8 @@ crosslinker_type: the type of the crosslinker atoms to distinguish different mol
     crosslinker_bonds = []
     assert(len(atom_data) &gt; 1)
     if (crosslinker_type is not None):
-        lenAtomsBefore = len(atom_data)
-        lenBondsBefore = len(bond_data)
+        # lenAtomsBefore = len(atom_data)
+        # lenBondsBefore = len(bond_data)
         # remove all crosslinkers from bond &amp; atoms
         crosslinkers = atom_data[atom_data.type == crosslinker_type]
         crosslinker_atoms = crosslinkers
@@ -222,8 +222,8 @@ crosslinker_type: the type of the crosslinker atoms to distinguish different mol
         bond_data = bond_data[~(
             bond_data[&#34;bondFrom&#34;].isin(crosslinkers[&#34;id&#34;]))]
         atom_data = atom_data[~(atom_data[&#34;id&#34;].isin(crosslinkers[&#39;id&#39;]))]
-        print(&#34;Removed crosslinkers. Got {} of {} atoms and {} of {} bonds left.&#34;.format(
-            len(atom_data), lenAtomsBefore, len(bond_data), lenBondsBefore))
+        # print(&#34;Removed crosslinkers. Got {} of {} atoms and {} of {} bonds left.&#34;.format(
+        #     len(atom_data), lenAtomsBefore, len(bond_data), lenBondsBefore))
 
     # start with first atom, loop all
     atom_data = atom_data.sort_values(
