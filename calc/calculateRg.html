@@ -43,12 +43,12 @@ def calculateRg(x, y, z):
     &#34;&#34;&#34;
     Calculate `&lt;R_g^2&gt;`
 
-    Args: 
+    Arguments:
         x (float): the x coordinate of the atom
         y (float): the y coordinate of the atom
         z (float): the z coordinate of the atom
 
-    Returns: 
+    Returns:
         retVal: `&lt;R_g^2&gt;`
     &#34;&#34;&#34;
     if (not isinstance(x, np.ndarray)):
@@ -63,14 +63,14 @@ def calculateRg2AvgForMolecules(molecules, atoms, bonds, boxLengths: list, expec
     &#34;&#34;&#34;
     Calculate `&lt;R_g^2&gt;`
 
-    Args: 
+    Arguments:
         molecules (list): list of molecules to calculate the R_g for
         atoms (pd.DataFrame): a collection of atom coordinates
         bonds (pd.DataFrame): a collection of bonds
         boxLengths: a list containing the box lengths (x, y, z) 
         expected_num_bonds: the expected number of bonds. Used for warnings.
 
-    Returns: 
+    Returns:
         retVal: `&lt;R_g^2&gt;`
     &#34;&#34;&#34;
     Rg = []
@@ -109,15 +109,15 @@ def calculateRg2Avg(atoms, bonds, boxDimensions: list, crosslinker_type: int = 2
     &#34;&#34;&#34;
     Calculate `&lt;R_g^2&gt;`
 
-    Args: 
-        atoms (pd.DataFrame): a collection of atom coordinates
-        bonds (pd.DataFrame): a collection of bonds
-        boxDimensions: a list containing the box lengths (x, y, z) 
-        crosslinker_type: the type id of the crosslinker (in order to detect chains, filter those)
-        expected_num_bonds: the expected number of bonds. Used for warnings.
+    Arguments:
+        - atoms (pd.DataFrame): a collection of atom coordinates
+        - bonds (pd.DataFrame): a collection of bonds
+        - boxDimensions: a list containing the box lengths (x, y, z) 
+        - crosslinker_type: the type id of the crosslinker (in order to detect chains, filter those)
+        - expected_num_bonds: the expected number of bonds. Used for warnings.
 
-    Returns: 
-        retVal: `&lt;R_g^2&gt;`
+    Returns:
+        - retVal: `&lt;R_g^2&gt;`
     &#34;&#34;&#34;
     molecules, atoms, bonds = getFilteredMoleculesAndBonds(
         atoms, bonds, boxDimensions, crosslinker_type)
@@ -130,13 +130,13 @@ def calculateRg2AvgForFile(file: str, fileType: str = &#34;data&#34;, useCache: 
     &#34;&#34;&#34;
     Calculate `&lt;Rg^2&gt;` for a specific file
 
-    Args: 
-        file: the path to the file to calculate Ree for
-        fileType: the type of file to read (data or dump)
-        useCache: wheter to use cache or not
+    Arguments:
+        - file: the path to the file to calculate Ree for
+        - fileType: the type of file to read (data or dump)
+        - useCache: wheter to use cache or not
 
-    Returns: 
-        retVal: `&lt;R_g^2&gt;`
+    Returns:
+        - retVal: `&lt;R_g^2&gt;`
     &#34;&#34;&#34;
     # Custom Cache Stuff: keep for legacy purposes
     cacheFileName = os.path.dirname(
@@ -166,13 +166,13 @@ def calculateRgForFile(file: str, fileType: str = &#34;data&#34;, useCache: bool
     &#34;&#34;&#34;
     Calculate R_g for a specific file
 
-    Args: 
-        file: the path to the file to calculate Ree for
-        fileType: the type of file to read (data or dump)
-        useCache: wheter to use cache or not
+    Arguments:
+        - file: the path to the file to calculate Ree for
+        - fileType: the type of file to read (data or dump)
+        - useCache: wheter to use cache or not
 
-    Returns: 
-        retVal (list): R_gs
+    Returns:
+        - retVal (list): R_gs
     &#34;&#34;&#34;
     # Custom Cache Stuff
     cacheFileName = os.path.dirname(
@@ -217,12 +217,15 @@ def calculateRgForFile(file: str, fileType: str = &#34;data&#34;, useCache: bool
 </code></dt>
 <dd>
 <div class="desc"><p>Calculate <code>&lt;R_g^2&gt;</code></p>
-<p>Args:
-x (float): the x coordinate of the atom
+<h2 id="arguments">Arguments</h2>
+<p>x (float): the x coordinate of the atom
 y (float): the y coordinate of the atom
 z (float): the z coordinate of the atom</p>
-<p>Returns:
-retVal: <code>&lt;R_g^2&gt;</code></p></div>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>retVal</code></dt>
+<dd><code>&lt;R_g^2&gt;</code></dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -231,12 +234,12 @@ retVal: <code>&lt;R_g^2&gt;</code></p></div>
     &#34;&#34;&#34;
     Calculate `&lt;R_g^2&gt;`
 
-    Args: 
+    Arguments:
         x (float): the x coordinate of the atom
         y (float): the y coordinate of the atom
         z (float): the z coordinate of the atom
 
-    Returns: 
+    Returns:
         retVal: `&lt;R_g^2&gt;`
     &#34;&#34;&#34;
     if (not isinstance(x, np.ndarray)):
@@ -252,14 +255,18 @@ retVal: <code>&lt;R_g^2&gt;</code></p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Calculate <code>&lt;R_g^2&gt;</code></p>
-<p>Args:
-atoms (pd.DataFrame): a collection of atom coordinates
-bonds (pd.DataFrame): a collection of bonds
-boxDimensions: a list containing the box lengths (x, y, z)
-crosslinker_type: the type id of the crosslinker (in order to detect chains, filter those)
-expected_num_bonds: the expected number of bonds. Used for warnings.</p>
-<p>Returns:
-retVal: <code>&lt;R_g^2&gt;</code></p></div>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>atoms (pd.DataFrame): a collection of atom coordinates</li>
+<li>bonds (pd.DataFrame): a collection of bonds</li>
+<li>boxDimensions: a list containing the box lengths (x, y, z) </li>
+<li>crosslinker_type: the type id of the crosslinker (in order to detect chains, filter those)</li>
+<li>expected_num_bonds: the expected number of bonds. Used for warnings.</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>retVal: <code>&lt;R_g^2&gt;</code></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -268,15 +275,15 @@ retVal: <code>&lt;R_g^2&gt;</code></p></div>
     &#34;&#34;&#34;
     Calculate `&lt;R_g^2&gt;`
 
-    Args: 
-        atoms (pd.DataFrame): a collection of atom coordinates
-        bonds (pd.DataFrame): a collection of bonds
-        boxDimensions: a list containing the box lengths (x, y, z) 
-        crosslinker_type: the type id of the crosslinker (in order to detect chains, filter those)
-        expected_num_bonds: the expected number of bonds. Used for warnings.
+    Arguments:
+        - atoms (pd.DataFrame): a collection of atom coordinates
+        - bonds (pd.DataFrame): a collection of bonds
+        - boxDimensions: a list containing the box lengths (x, y, z) 
+        - crosslinker_type: the type id of the crosslinker (in order to detect chains, filter those)
+        - expected_num_bonds: the expected number of bonds. Used for warnings.
 
-    Returns: 
-        retVal: `&lt;R_g^2&gt;`
+    Returns:
+        - retVal: `&lt;R_g^2&gt;`
     &#34;&#34;&#34;
     molecules, atoms, bonds = getFilteredMoleculesAndBonds(
         atoms, bonds, boxDimensions, crosslinker_type)
@@ -290,12 +297,16 @@ retVal: <code>&lt;R_g^2&gt;</code></p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Calculate <code>&lt;Rg^2&gt;</code> for a specific file</p>
-<p>Args:
-file: the path to the file to calculate Ree for
-fileType: the type of file to read (data or dump)
-useCache: wheter to use cache or not</p>
-<p>Returns:
-retVal: <code>&lt;R_g^2&gt;</code></p></div>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>file: the path to the file to calculate Ree for</li>
+<li>fileType: the type of file to read (data or dump)</li>
+<li>useCache: wheter to use cache or not</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>retVal: <code>&lt;R_g^2&gt;</code></li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -304,13 +315,13 @@ retVal: <code>&lt;R_g^2&gt;</code></p></div>
     &#34;&#34;&#34;
     Calculate `&lt;Rg^2&gt;` for a specific file
 
-    Args: 
-        file: the path to the file to calculate Ree for
-        fileType: the type of file to read (data or dump)
-        useCache: wheter to use cache or not
+    Arguments:
+        - file: the path to the file to calculate Ree for
+        - fileType: the type of file to read (data or dump)
+        - useCache: wheter to use cache or not
 
-    Returns: 
-        retVal: `&lt;R_g^2&gt;`
+    Returns:
+        - retVal: `&lt;R_g^2&gt;`
     &#34;&#34;&#34;
     # Custom Cache Stuff: keep for legacy purposes
     cacheFileName = os.path.dirname(
@@ -341,14 +352,17 @@ retVal: <code>&lt;R_g^2&gt;</code></p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Calculate <code>&lt;R_g^2&gt;</code></p>
-<p>Args:
-molecules (list): list of molecules to calculate the R_g for
+<h2 id="arguments">Arguments</h2>
+<p>molecules (list): list of molecules to calculate the R_g for
 atoms (pd.DataFrame): a collection of atom coordinates
 bonds (pd.DataFrame): a collection of bonds
 boxLengths: a list containing the box lengths (x, y, z)
 expected_num_bonds: the expected number of bonds. Used for warnings.</p>
-<p>Returns:
-retVal: <code>&lt;R_g^2&gt;</code></p></div>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>retVal</code></dt>
+<dd><code>&lt;R_g^2&gt;</code></dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -357,14 +371,14 @@ retVal: <code>&lt;R_g^2&gt;</code></p></div>
     &#34;&#34;&#34;
     Calculate `&lt;R_g^2&gt;`
 
-    Args: 
+    Arguments:
         molecules (list): list of molecules to calculate the R_g for
         atoms (pd.DataFrame): a collection of atom coordinates
         bonds (pd.DataFrame): a collection of bonds
         boxLengths: a list containing the box lengths (x, y, z) 
         expected_num_bonds: the expected number of bonds. Used for warnings.
 
-    Returns: 
+    Returns:
         retVal: `&lt;R_g^2&gt;`
     &#34;&#34;&#34;
     Rg = []
@@ -404,12 +418,16 @@ retVal: <code>&lt;R_g^2&gt;</code></p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Calculate R_g for a specific file</p>
-<p>Args:
-file: the path to the file to calculate Ree for
-fileType: the type of file to read (data or dump)
-useCache: wheter to use cache or not</p>
-<p>Returns:
-retVal (list): R_gs</p></div>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>file: the path to the file to calculate Ree for</li>
+<li>fileType: the type of file to read (data or dump)</li>
+<li>useCache: wheter to use cache or not</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>retVal (list): R_gs</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -418,13 +436,13 @@ retVal (list): R_gs</p></div>
     &#34;&#34;&#34;
     Calculate R_g for a specific file
 
-    Args: 
-        file: the path to the file to calculate Ree for
-        fileType: the type of file to read (data or dump)
-        useCache: wheter to use cache or not
+    Arguments:
+        - file: the path to the file to calculate Ree for
+        - fileType: the type of file to read (data or dump)
+        - useCache: wheter to use cache or not
 
-    Returns: 
-        retVal (list): R_gs
+    Returns:
+        - retVal (list): R_gs
     &#34;&#34;&#34;
     # Custom Cache Stuff
     cacheFileName = os.path.dirname(

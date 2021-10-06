@@ -37,11 +37,11 @@ def normalizeData(atom):
     &#34;&#34;&#34; 
     Verify the atom to be a usable one
 
-    Args:
-        atom: the atom to check
-    
-    Returns: 
-        atom (pd.Seroes): the resolved atom
+    Arguments:
+        - atom: the atom to check
+
+    Returns:
+        - atom (pd.Seroes): the resolved atom
     &#34;&#34;&#34;
     if (isinstance(atom, pd.DataFrame)):
         return atom
@@ -55,12 +55,12 @@ def row_converter(row: pd.DataFrame, listy=None):
     &#34;&#34;&#34; 
     convert pandas row to a dictionary
 
-    Args:
-        row (pd.DataFrame|pd.Series): row as a tuple
-        listy: a list of columns
-    
-    Returns: 
-        pictionary (dictionary): the row&#39;s values
+    Arguments:
+        - row (pd.DataFrame|pd.Series): row as a tuple
+        - listy: a list of columns
+
+    Returns:
+        - pictionary (dictionary): the row&#39;s values
     &#34;&#34;&#34;
     if (listy is None):
         if (isinstance(row, pd.Series)):
@@ -78,12 +78,12 @@ def calculateDistanceBetweenAtoms(atomA, atomB):
     Calculate the the distance between two atoms. 
     No translation between periodic images happens.
 
-    Args: 
-        atomA: the coordinates of atom 1
-        atomB: the coordinates of atom 2
+    Arguments:
+        - atomA: the coordinates of atom 1
+        - atomB: the coordinates of atom 2
 
-    Returns: 
-        meanDistance: the norm of the connecting vector between the two coordinates
+    Returns:
+        - meanDistance: the norm of the connecting vector between the two coordinates
     &#34;&#34;&#34;
     locaA = normalizeData(atomA)
     locaB = normalizeData(atomB)
@@ -94,13 +94,13 @@ def calculateNormalizedDistanceBetweenAtoms(atom1, atom2, boxLengths: list):
     &#34;&#34;&#34;
     Calculate the the distance between two atoms. 
 
-    Args: 
-        atom1: the coordinates of atom 1
-        atom2: the coordinates of atom 2
-        boxLenghts: a list containing the box lengths (x, y, z) 
+    Arguments:
+        - atom1: the coordinates of atom 1
+        - atom2: the coordinates of atom 2
+        - boxLenghts: a list containing the box lengths (x, y, z) 
 
-    Returns: 
-        meanDistance: the norm of the connecting vector between the two coordinates
+    Returns:
+        - meanDistance: the norm of the connecting vector between the two coordinates
     &#34;&#34;&#34;
     if (not isinstance(atom1, dict) and isinstance(atom1, pd.DataFrame)):
         atom1 = row_converter(atom1)
@@ -137,11 +137,15 @@ def calculateNormalizedDistanceBetweenAtoms(atom1, atom2, boxLengths: list):
 <dd>
 <div class="desc"><p>Calculate the the distance between two atoms.
 No translation between periodic images happens.</p>
-<p>Args:
-atomA: the coordinates of atom 1
-atomB: the coordinates of atom 2</p>
-<p>Returns:
-meanDistance: the norm of the connecting vector between the two coordinates</p></div>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>atomA: the coordinates of atom 1</li>
+<li>atomB: the coordinates of atom 2</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>meanDistance: the norm of the connecting vector between the two coordinates</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -151,12 +155,12 @@ meanDistance: the norm of the connecting vector between the two coordinates</p><
     Calculate the the distance between two atoms. 
     No translation between periodic images happens.
 
-    Args: 
-        atomA: the coordinates of atom 1
-        atomB: the coordinates of atom 2
+    Arguments:
+        - atomA: the coordinates of atom 1
+        - atomB: the coordinates of atom 2
 
-    Returns: 
-        meanDistance: the norm of the connecting vector between the two coordinates
+    Returns:
+        - meanDistance: the norm of the connecting vector between the two coordinates
     &#34;&#34;&#34;
     locaA = normalizeData(atomA)
     locaB = normalizeData(atomB)
@@ -168,12 +172,16 @@ meanDistance: the norm of the connecting vector between the two coordinates</p><
 </code></dt>
 <dd>
 <div class="desc"><p>Calculate the the distance between two atoms. </p>
-<p>Args:
-atom1: the coordinates of atom 1
-atom2: the coordinates of atom 2
-boxLenghts: a list containing the box lengths (x, y, z) </p>
-<p>Returns:
-meanDistance: the norm of the connecting vector between the two coordinates</p></div>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>atom1: the coordinates of atom 1</li>
+<li>atom2: the coordinates of atom 2</li>
+<li>boxLenghts: a list containing the box lengths (x, y, z) </li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>meanDistance: the norm of the connecting vector between the two coordinates</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -182,13 +190,13 @@ meanDistance: the norm of the connecting vector between the two coordinates</p><
     &#34;&#34;&#34;
     Calculate the the distance between two atoms. 
 
-    Args: 
-        atom1: the coordinates of atom 1
-        atom2: the coordinates of atom 2
-        boxLenghts: a list containing the box lengths (x, y, z) 
+    Arguments:
+        - atom1: the coordinates of atom 1
+        - atom2: the coordinates of atom 2
+        - boxLenghts: a list containing the box lengths (x, y, z) 
 
-    Returns: 
-        meanDistance: the norm of the connecting vector between the two coordinates
+    Returns:
+        - meanDistance: the norm of the connecting vector between the two coordinates
     &#34;&#34;&#34;
     if (not isinstance(atom1, dict) and isinstance(atom1, pd.DataFrame)):
         atom1 = row_converter(atom1)
@@ -217,13 +225,14 @@ meanDistance: the norm of the connecting vector between the two coordinates</p><
 </code></dt>
 <dd>
 <div class="desc"><p>Verify the atom to be a usable one</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>atom</code></strong></dt>
-<dd>the atom to check</dd>
-</dl>
-<p>Returns:
-atom (pd.Seroes): the resolved atom</p></div>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>atom: the atom to check</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>atom (pd.Seroes): the resolved atom</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -232,11 +241,11 @@ atom (pd.Seroes): the resolved atom</p></div>
     &#34;&#34;&#34; 
     Verify the atom to be a usable one
 
-    Args:
-        atom: the atom to check
-    
-    Returns: 
-        atom (pd.Seroes): the resolved atom
+    Arguments:
+        - atom: the atom to check
+
+    Returns:
+        - atom (pd.Seroes): the resolved atom
     &#34;&#34;&#34;
     if (isinstance(atom, pd.DataFrame)):
         return atom
@@ -251,14 +260,15 @@ atom (pd.Seroes): the resolved atom</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>convert pandas row to a dictionary</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt>row (pd.DataFrame|pd.Series): row as a tuple</dt>
-<dt><strong><code>listy</code></strong></dt>
-<dd>a list of columns</dd>
-</dl>
-<p>Returns:
-pictionary (dictionary): the row's values</p></div>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>row (pd.DataFrame|pd.Series): row as a tuple</li>
+<li>listy: a list of columns</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>pictionary (dictionary): the row's values</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -267,12 +277,12 @@ pictionary (dictionary): the row's values</p></div>
     &#34;&#34;&#34; 
     convert pandas row to a dictionary
 
-    Args:
-        row (pd.DataFrame|pd.Series): row as a tuple
-        listy: a list of columns
-    
-    Returns: 
-        pictionary (dictionary): the row&#39;s values
+    Arguments:
+        - row (pd.DataFrame|pd.Series): row as a tuple
+        - listy: a list of columns
+
+    Returns:
+        - pictionary (dictionary): the row&#39;s values
     &#34;&#34;&#34;
     if (listy is None):
         if (isinstance(row, pd.Series)):

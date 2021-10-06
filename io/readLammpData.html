@@ -31,6 +31,7 @@ import pandas as pd
 
 from pylimer_tools.utils.cacheUtility import doCache, loadCache
 
+
 def findFloatsInLine(line: str) -&gt; list:
     &#34;&#34;&#34;
     Find as many floats as possible in a string (line)
@@ -49,9 +50,9 @@ def readLammpData(file, useCache=True) -&gt; dict:
     &#34;&#34;&#34;
     Read a lammpstrj input data file
 
-    Args: 
-        file: the path to the file to read from
-        useCache: wheter to use cache or not (respects modified date of file)
+    Arguments:
+        - file: the path to the file to read from
+        - useCache: wheter to use cache or not (respects modified date of file)
     &#34;&#34;&#34;
     if (useCache):
         toReturn = loadCache(file, &#34;-lammp-data-cache&#34;)
@@ -187,9 +188,11 @@ def readLammpData(file, useCache=True) -&gt; dict:
 </code></dt>
 <dd>
 <div class="desc"><p>Read a lammpstrj input data file</p>
-<p>Args:
-file: the path to the file to read from
-useCache: wheter to use cache or not (respects modified date of file)</p></div>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>file: the path to the file to read from</li>
+<li>useCache: wheter to use cache or not (respects modified date of file)</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -198,9 +201,9 @@ useCache: wheter to use cache or not (respects modified date of file)</p></div>
     &#34;&#34;&#34;
     Read a lammpstrj input data file
 
-    Args: 
-        file: the path to the file to read from
-        useCache: wheter to use cache or not (respects modified date of file)
+    Arguments:
+        - file: the path to the file to read from
+        - useCache: wheter to use cache or not (respects modified date of file)
     &#34;&#34;&#34;
     if (useCache):
         toReturn = loadCache(file, &#34;-lammp-data-cache&#34;)

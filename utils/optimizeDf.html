@@ -40,7 +40,7 @@ def reduce_mem_usage(df, obj_to_category=False, subset=None):
     &#34;&#34;&#34;
     Iterate through all the columns of a dataframe and modify the data type to reduce memory usage.
 
-    Args:
+    Arguments:
         df (pd.DataFrame): dataframe to reduce
         obj_to_category (boolean): convert non-datetime related objects to category dtype
         subset (List): subset of columns to analyse
@@ -103,7 +103,7 @@ def optimize_floats(df: pd.DataFrame) -&gt; pd.DataFrame:
     &#34;&#34;&#34;
     Optimize the floating point type entries
 
-    Args:
+    Arguments:
         df (pd.DataFrame): dataframe to reduce
 
     Returns:
@@ -118,7 +118,7 @@ def optimize_ints(df: pd.DataFrame) -&gt; pd.DataFrame:
     &#34;&#34;&#34;
     Optimize the integer point type entries
 
-    Args:
+    Arguments:
         df (pd.DataFrame): dataframe to reduce
 
     Returns:
@@ -133,11 +133,11 @@ def optimize_objects(df: pd.DataFrame, datetime_features: List[str]) -&gt; pd.Da
     &#34;&#34;&#34;
     Optimize object type entries
 
-    Args:
-        df (pd.DataFrame): dataframe to reduce
+    Arguments:
+        - df (pd.DataFrame): dataframe to reduce
 
     Returns:
-        df (pd.DataFrame): dataset with the column dtypes adjusted
+        - df (pd.DataFrame): dataset with the column dtypes adjusted
     &#34;&#34;&#34;
     for col in df.select_dtypes(include=[&#39;object&#39;]):
         if col not in datetime_features:
@@ -154,11 +154,11 @@ def optimize(df: pd.DataFrame, datetime_features: List[str] = []):
     &#34;&#34;&#34;
     Optimize all types of all columns in a dataframe
 
-    Args:
-        df (pd.DataFrame): dataframe to reduce
+    Arguments:
+        - df (pd.DataFrame): dataframe to reduce
 
     Returns:
-        df (pd.DataFrame): dataset with the column dtypes adjusted
+        - df (pd.DataFrame): dataset with the column dtypes adjusted
     &#34;&#34;&#34;
     return optimize_floats(optimize_ints(optimize_objects(df, datetime_features)))</code></pre>
 </details>
@@ -175,13 +175,14 @@ def optimize(df: pd.DataFrame, datetime_features: List[str] = []):
 </code></dt>
 <dd>
 <div class="desc"><p>Optimize all types of all columns in a dataframe</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>df</code></strong> :&ensp;<code>pd.DataFrame</code></dt>
-<dd>dataframe to reduce</dd>
-</dl>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>df (pd.DataFrame): dataframe to reduce</li>
+</ul>
 <h2 id="returns">Returns</h2>
-<p>df (pd.DataFrame): dataset with the column dtypes adjusted</p></div>
+<ul>
+<li>df (pd.DataFrame): dataset with the column dtypes adjusted</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -190,11 +191,11 @@ def optimize(df: pd.DataFrame, datetime_features: List[str] = []):
     &#34;&#34;&#34;
     Optimize all types of all columns in a dataframe
 
-    Args:
-        df (pd.DataFrame): dataframe to reduce
+    Arguments:
+        - df (pd.DataFrame): dataframe to reduce
 
     Returns:
-        df (pd.DataFrame): dataset with the column dtypes adjusted
+        - df (pd.DataFrame): dataset with the column dtypes adjusted
     &#34;&#34;&#34;
     return optimize_floats(optimize_ints(optimize_objects(df, datetime_features)))</code></pre>
 </details>
@@ -204,11 +205,8 @@ def optimize(df: pd.DataFrame, datetime_features: List[str] = []):
 </code></dt>
 <dd>
 <div class="desc"><p>Optimize the floating point type entries</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>df</code></strong> :&ensp;<code>pd.DataFrame</code></dt>
-<dd>dataframe to reduce</dd>
-</dl>
+<h2 id="arguments">Arguments</h2>
+<p>df (pd.DataFrame): dataframe to reduce</p>
 <h2 id="returns">Returns</h2>
 <p>df (pd.DataFrame): dataset with the column dtypes adjusted</p></div>
 <details class="source">
@@ -219,7 +217,7 @@ def optimize(df: pd.DataFrame, datetime_features: List[str] = []):
     &#34;&#34;&#34;
     Optimize the floating point type entries
 
-    Args:
+    Arguments:
         df (pd.DataFrame): dataframe to reduce
 
     Returns:
@@ -235,11 +233,8 @@ def optimize(df: pd.DataFrame, datetime_features: List[str] = []):
 </code></dt>
 <dd>
 <div class="desc"><p>Optimize the integer point type entries</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>df</code></strong> :&ensp;<code>pd.DataFrame</code></dt>
-<dd>dataframe to reduce</dd>
-</dl>
+<h2 id="arguments">Arguments</h2>
+<p>df (pd.DataFrame): dataframe to reduce</p>
 <h2 id="returns">Returns</h2>
 <p>df (pd.DataFrame): dataset with the column dtypes adjusted</p></div>
 <details class="source">
@@ -250,7 +245,7 @@ def optimize(df: pd.DataFrame, datetime_features: List[str] = []):
     &#34;&#34;&#34;
     Optimize the integer point type entries
 
-    Args:
+    Arguments:
         df (pd.DataFrame): dataframe to reduce
 
     Returns:
@@ -266,13 +261,14 @@ def optimize(df: pd.DataFrame, datetime_features: List[str] = []):
 </code></dt>
 <dd>
 <div class="desc"><p>Optimize object type entries</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>df</code></strong> :&ensp;<code>pd.DataFrame</code></dt>
-<dd>dataframe to reduce</dd>
-</dl>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>df (pd.DataFrame): dataframe to reduce</li>
+</ul>
 <h2 id="returns">Returns</h2>
-<p>df (pd.DataFrame): dataset with the column dtypes adjusted</p></div>
+<ul>
+<li>df (pd.DataFrame): dataset with the column dtypes adjusted</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -281,11 +277,11 @@ def optimize(df: pd.DataFrame, datetime_features: List[str] = []):
     &#34;&#34;&#34;
     Optimize object type entries
 
-    Args:
-        df (pd.DataFrame): dataframe to reduce
+    Arguments:
+        - df (pd.DataFrame): dataframe to reduce
 
     Returns:
-        df (pd.DataFrame): dataset with the column dtypes adjusted
+        - df (pd.DataFrame): dataset with the column dtypes adjusted
     &#34;&#34;&#34;
     for col in df.select_dtypes(include=[&#39;object&#39;]):
         if col not in datetime_features:
@@ -303,15 +299,10 @@ def optimize(df: pd.DataFrame, datetime_features: List[str] = []):
 </code></dt>
 <dd>
 <div class="desc"><p>Iterate through all the columns of a dataframe and modify the data type to reduce memory usage.</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>df</code></strong> :&ensp;<code>pd.DataFrame</code></dt>
-<dd>dataframe to reduce</dd>
-<dt><strong><code>obj_to_category</code></strong> :&ensp;<code>boolean</code></dt>
-<dd>convert non-datetime related objects to category dtype</dd>
-<dt><strong><code>subset</code></strong> :&ensp;<code>List</code></dt>
-<dd>subset of columns to analyse</dd>
-</dl>
+<h2 id="arguments">Arguments</h2>
+<p>df (pd.DataFrame): dataframe to reduce
+obj_to_category (boolean): convert non-datetime related objects to category dtype
+subset (List): subset of columns to analyse</p>
 <h2 id="returns">Returns</h2>
 <p>df (pd.DataFrame): dataset with the column dtypes adjusted</p></div>
 <details class="source">
@@ -322,7 +313,7 @@ def optimize(df: pd.DataFrame, datetime_features: List[str] = []):
     &#34;&#34;&#34;
     Iterate through all the columns of a dataframe and modify the data type to reduce memory usage.
 
-    Args:
+    Arguments:
         df (pd.DataFrame): dataframe to reduce
         obj_to_category (boolean): convert non-datetime related objects to category dtype
         subset (List): subset of columns to analyse

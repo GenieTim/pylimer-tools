@@ -41,9 +41,9 @@ def readLammpDump(file: str, useCache: bool = True):
     &#34;&#34;&#34;
     Read a lammpstrj / LAMMPS dump output file to a dictonary
 
-    Args:
-        file: the file path to read from
-        useCache: whether to use the cache or not. Cache does respect file modification time.
+    Arguments:
+        - file: the file path to read from
+        - useCache: whether to use the cache or not. Cache does respect file modification time.
     &#34;&#34;&#34;
     if (useCache):
         cachedData = loadCache(file, &#34;-lammp-dump-cache&#34;)
@@ -106,13 +106,11 @@ def readLammpDump(file: str, useCache: bool = True):
 </code></dt>
 <dd>
 <div class="desc"><p>Read a lammpstrj / LAMMPS dump output file to a dictonary</p>
-<h2 id="args">Args</h2>
-<dl>
-<dt><strong><code>file</code></strong></dt>
-<dd>the file path to read from</dd>
-<dt><strong><code>useCache</code></strong></dt>
-<dd>whether to use the cache or not. Cache does respect file modification time.</dd>
-</dl></div>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>file: the file path to read from</li>
+<li>useCache: whether to use the cache or not. Cache does respect file modification time.</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -121,9 +119,9 @@ def readLammpDump(file: str, useCache: bool = True):
     &#34;&#34;&#34;
     Read a lammpstrj / LAMMPS dump output file to a dictonary
 
-    Args:
-        file: the file path to read from
-        useCache: whether to use the cache or not. Cache does respect file modification time.
+    Arguments:
+        - file: the file path to read from
+        - useCache: whether to use the cache or not. Cache does respect file modification time.
     &#34;&#34;&#34;
     if (useCache):
         cachedData = loadCache(file, &#34;-lammp-dump-cache&#34;)

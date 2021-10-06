@@ -33,11 +33,16 @@ def getTail(data, percentage=0.2, minN=25, maxPercentage=0.5):
     &#34;&#34;&#34;
     Extract the last few entries of a list
 
-    Args: 
-        data (list|pd.DataFrame|pd.Series): the list to extract the last few entries from
-        percentage: the percentage of entries to extract
-        minN: the minimum number of entries to extract
-        maxPercentage: the maximum percentage of entries to extract
+    Arguments:
+        - data (list|pd.DataFrame|pd.Series): the list to extract the last few entries from
+        - percentage: the percentage of entries to extract
+        - minN: the minimum number of entries to extract
+        - maxPercentage: the maximum percentage of entries to extract
+
+    Returns:
+        A (list|pd.DataFrame|pd.Series) with at maximum maxPercentage, 
+            at least minN entries (assuming the initial data is as large), 
+            but ideally `percentage` many percentage of the last entries.
     &#34;&#34;&#34;
     assert(percentage &lt;= 1)
     assert(maxPercentage &lt;= 1)
@@ -61,11 +66,17 @@ def getTail(data, percentage=0.2, minN=25, maxPercentage=0.5):
 </code></dt>
 <dd>
 <div class="desc"><p>Extract the last few entries of a list</p>
-<p>Args:
-data (list|pd.DataFrame|pd.Series): the list to extract the last few entries from
-percentage: the percentage of entries to extract
-minN: the minimum number of entries to extract
-maxPercentage: the maximum percentage of entries to extract</p></div>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>data (list|pd.DataFrame|pd.Series): the list to extract the last few entries from</li>
+<li>percentage: the percentage of entries to extract</li>
+<li>minN: the minimum number of entries to extract</li>
+<li>maxPercentage: the maximum percentage of entries to extract</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<p>A (list|pd.DataFrame|pd.Series) with at maximum maxPercentage,
+at least minN entries (assuming the initial data is as large),
+but ideally <code>percentage</code> many percentage of the last entries.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -74,11 +85,16 @@ maxPercentage: the maximum percentage of entries to extract</p></div>
     &#34;&#34;&#34;
     Extract the last few entries of a list
 
-    Args: 
-        data (list|pd.DataFrame|pd.Series): the list to extract the last few entries from
-        percentage: the percentage of entries to extract
-        minN: the minimum number of entries to extract
-        maxPercentage: the maximum percentage of entries to extract
+    Arguments:
+        - data (list|pd.DataFrame|pd.Series): the list to extract the last few entries from
+        - percentage: the percentage of entries to extract
+        - minN: the minimum number of entries to extract
+        - maxPercentage: the maximum percentage of entries to extract
+
+    Returns:
+        A (list|pd.DataFrame|pd.Series) with at maximum maxPercentage, 
+            at least minN entries (assuming the initial data is as large), 
+            but ideally `percentage` many percentage of the last entries.
     &#34;&#34;&#34;
     assert(percentage &lt;= 1)
     assert(maxPercentage &lt;= 1)

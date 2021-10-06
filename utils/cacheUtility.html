@@ -38,10 +38,10 @@ def doCache(obj, file: str, suffix: str):
     &#34;&#34;&#34;
     Store the object in the cache
 
-    Args: 
-        obj: the object to cache
-        file: the path to the file to save the object to
-        suffix: the file name&#39;s suffix
+    Arguments:
+        - obj: the object to cache
+        - file: the path to the file to save the object to
+        - suffix: the file name&#39;s suffix
     &#34;&#34;&#34;
     cacheFileName = getCacheFileName(file, suffix)
     with open(cacheFileName, &#39;wb&#39;) as cacheFile:
@@ -52,13 +52,13 @@ def loadCache(file: str, suffix: str, disableWarnings: bool = False):
     &#34;&#34;&#34;
     Load an object from cache.
 
-    Args: 
-        file: a cache name. Ideally the file that is read, such that the filemtime of `file` can be used to check whether cache must be generated anew
-        suffix: the file name&#39;s suffix
-        disableWarnings: whether to disable warnings about missing possibilities to check for filemtime
+    Arguments:
+        - file: a cache name. Ideally the file that is read, such that the filemtime of `file` can be used to check whether cache must be generated anew
+        - suffix: the file name&#39;s suffix
+        - disableWarnings: whether to disable warnings about missing possibilities to check for filemtime
 
-    Returns: 
-        cache: either the content of the cache, or None if the cache has to be loaded again / is non existant
+    Returns:
+        - cache: either the content of the cache, or None if the cache has to be loaded again / is non existant
     &#34;&#34;&#34;
     cacheFileName = getCacheFileName(file, suffix)
     if (os.path.isfile(cacheFileName)):
@@ -88,12 +88,12 @@ def getCacheFileName(file: str, suffix: str):
     &#34;&#34;&#34;
     Get the name and path of a cache file. Internal method.
 
-    Args: 
-        file: a cache name. Ideally the file that is read.
-        suffix: the file name&#39;s suffix
+    Arguments:
+        - file: a cache name. Ideally the file that is read.
+        - suffix: the file name&#39;s suffix
 
-    Returns: 
-        cacheFileName: the path to the cache file
+    Returns:
+        - cacheFileName: the path to the cache file
     &#34;&#34;&#34;
     cacheFileName = os.path.dirname(
         __file__) + &#34;/cache/&#34; + hashlib.md5(file.encode()).hexdigest() + suffix + &#34;.pickle&#34;
@@ -112,10 +112,12 @@ def getCacheFileName(file: str, suffix: str):
 </code></dt>
 <dd>
 <div class="desc"><p>Store the object in the cache</p>
-<p>Args:
-obj: the object to cache
-file: the path to the file to save the object to
-suffix: the file name's suffix</p></div>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>obj: the object to cache</li>
+<li>file: the path to the file to save the object to</li>
+<li>suffix: the file name's suffix</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -124,10 +126,10 @@ suffix: the file name's suffix</p></div>
     &#34;&#34;&#34;
     Store the object in the cache
 
-    Args: 
-        obj: the object to cache
-        file: the path to the file to save the object to
-        suffix: the file name&#39;s suffix
+    Arguments:
+        - obj: the object to cache
+        - file: the path to the file to save the object to
+        - suffix: the file name&#39;s suffix
     &#34;&#34;&#34;
     cacheFileName = getCacheFileName(file, suffix)
     with open(cacheFileName, &#39;wb&#39;) as cacheFile:
@@ -139,11 +141,15 @@ suffix: the file name's suffix</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Get the name and path of a cache file. Internal method.</p>
-<p>Args:
-file: a cache name. Ideally the file that is read.
-suffix: the file name's suffix</p>
-<p>Returns:
-cacheFileName: the path to the cache file</p></div>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>file: a cache name. Ideally the file that is read.</li>
+<li>suffix: the file name's suffix</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>cacheFileName: the path to the cache file</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -152,12 +158,12 @@ cacheFileName: the path to the cache file</p></div>
     &#34;&#34;&#34;
     Get the name and path of a cache file. Internal method.
 
-    Args: 
-        file: a cache name. Ideally the file that is read.
-        suffix: the file name&#39;s suffix
+    Arguments:
+        - file: a cache name. Ideally the file that is read.
+        - suffix: the file name&#39;s suffix
 
-    Returns: 
-        cacheFileName: the path to the cache file
+    Returns:
+        - cacheFileName: the path to the cache file
     &#34;&#34;&#34;
     cacheFileName = os.path.dirname(
         __file__) + &#34;/cache/&#34; + hashlib.md5(file.encode()).hexdigest() + suffix + &#34;.pickle&#34;
@@ -169,12 +175,16 @@ cacheFileName: the path to the cache file</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Load an object from cache.</p>
-<p>Args:
-file: a cache name. Ideally the file that is read, such that the filemtime of <code>file</code> can be used to check whether cache must be generated anew
-suffix: the file name's suffix
-disableWarnings: whether to disable warnings about missing possibilities to check for filemtime</p>
-<p>Returns:
-cache: either the content of the cache, or None if the cache has to be loaded again / is non existant</p></div>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>file: a cache name. Ideally the file that is read, such that the filemtime of <code>file</code> can be used to check whether cache must be generated anew</li>
+<li>suffix: the file name's suffix</li>
+<li>disableWarnings: whether to disable warnings about missing possibilities to check for filemtime</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>cache: either the content of the cache, or None if the cache has to be loaded again / is non existant</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -183,13 +193,13 @@ cache: either the content of the cache, or None if the cache has to be loaded ag
     &#34;&#34;&#34;
     Load an object from cache.
 
-    Args: 
-        file: a cache name. Ideally the file that is read, such that the filemtime of `file` can be used to check whether cache must be generated anew
-        suffix: the file name&#39;s suffix
-        disableWarnings: whether to disable warnings about missing possibilities to check for filemtime
+    Arguments:
+        - file: a cache name. Ideally the file that is read, such that the filemtime of `file` can be used to check whether cache must be generated anew
+        - suffix: the file name&#39;s suffix
+        - disableWarnings: whether to disable warnings about missing possibilities to check for filemtime
 
-    Returns: 
-        cache: either the content of the cache, or None if the cache has to be loaded again / is non existant
+    Returns:
+        - cache: either the content of the cache, or None if the cache has to be loaded again / is non existant
     &#34;&#34;&#34;
     cacheFileName = getCacheFileName(file, suffix)
     if (os.path.isfile(cacheFileName)):

@@ -45,15 +45,15 @@ def calculateRee2AvgForMolecules(molecules, atoms, bonds, boxLengths: list, expe
     &#34;&#34;&#34;
     Calculate `&lt;Ree^2&gt;`
 
-    Args: 
-        molecules (List): a list of molecules as produced by pylimer_tools.utils.getMolecules
-        atoms (pd.DataFrame): a collection of atom coordinates
-        bonds (pd.DataFrame): a collection of bonds
-        boxLenghts: a list containing the box lengths (x, y, z) 
+    Arguments:
+        - molecules (List): a list of molecules as produced by pylimer_tools.utils.getMolecules
+        - atoms (pd.DataFrame): a collection of atom coordinates
+        - bonds (pd.DataFrame): a collection of bonds
+        - boxLenghts: a list containing the box lengths (x, y, z) 
 
-    Returns: 
-        retVal: `&lt;Ree^2&gt;`
-        Ree: Ree for each molecule
+    Returns:
+        - retVal: `&lt;Ree^2&gt;`
+        - Ree: Ree for each molecule
     &#34;&#34;&#34;
     Ree = []
     chainLen = []
@@ -89,7 +89,7 @@ def calculateRee2AvgForMolecules(molecules, atoms, bonds, boxLengths: list, expe
 
     retVal = np.square(Ree).mean()
     # print(&#34;Calculated {} Ree = {} ± {} for mean chain length of {} monomers&#34;.format(
-        # len(Ree), retVal, np.square(Ree).std(), np.mean(chainLen)))
+    # len(Ree), retVal, np.square(Ree).std(), np.mean(chainLen)))
     if (np.mean(chainLen) &lt; np.mean(Ree)):
         warnings.warn(&#34;This result is probably wrong/not realistic&#34;)
     return retVal, Ree
@@ -99,14 +99,14 @@ def calculateRee2Avg(atoms, bonds, boxDimensions: list, crosslinker_type: int = 
     &#34;&#34;&#34;
     Calculate `&lt;Ree^2&gt;`
 
-    Args: 
+    Arguments:
         atoms (pd.DataFrame): a collection of atom coordinates
         bonds (pd.DataFrame): a collection of bonds
         boxDimensions: a list containing the box lengths (x, y, z) 
         crosslinker_type: the type id of the crosslinker (in order to detect chains, filter those)
         expected_num_bonds: the expected number of bonds. Used for warnings.
 
-    Returns: 
+    Returns:
         retVal: `&lt;Ree^2&gt;`
     &#34;&#34;&#34;
     molecules, atoms, bonds = getFilteredMoleculesAndBonds(
@@ -120,12 +120,12 @@ def calculateRee2AvgForFile(file: str, fileType: str = &#34;data&#34;, useCache:
     &#34;&#34;&#34;
     Calculate `&lt;Ree^2&gt;` for a specific file
 
-    Args: 
+    Arguments:
         file: the path to the file to calculate Ree for
         fileType: the type of file to read (data or dump)
         useCache: wheter to use cache or not
 
-    Returns: 
+    Returns:
         retVal: `&lt;Ree^2&gt;`
     &#34;&#34;&#34;
     # Custom Cache Stuff: keep for legacy purposes
@@ -156,12 +156,12 @@ def calculateReeForFile(file: str, fileType: str = &#34;data&#34;, useCache: boo
     &#34;&#34;&#34;
     Calculate Ree&#39;s for a specific file
 
-    Args: 
+    Arguments:
         file: the path to the file to calculate Ree for
         fileType: the type of file to read (data or dump)
         useCache: wheter to use cache or not
 
-    Returns: 
+    Returns:
         retVal: &lt;Ree^2&gt;
     &#34;&#34;&#34;
     # Custom Cache Stuff
@@ -207,14 +207,17 @@ def calculateReeForFile(file: str, fileType: str = &#34;data&#34;, useCache: boo
 </code></dt>
 <dd>
 <div class="desc"><p>Calculate <code>&lt;Ree^2&gt;</code></p>
-<p>Args:
-atoms (pd.DataFrame): a collection of atom coordinates
+<h2 id="arguments">Arguments</h2>
+<p>atoms (pd.DataFrame): a collection of atom coordinates
 bonds (pd.DataFrame): a collection of bonds
 boxDimensions: a list containing the box lengths (x, y, z)
 crosslinker_type: the type id of the crosslinker (in order to detect chains, filter those)
 expected_num_bonds: the expected number of bonds. Used for warnings.</p>
-<p>Returns:
-retVal: <code>&lt;Ree^2&gt;</code></p></div>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>retVal</code></dt>
+<dd><code>&lt;Ree^2&gt;</code></dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -223,14 +226,14 @@ retVal: <code>&lt;Ree^2&gt;</code></p></div>
     &#34;&#34;&#34;
     Calculate `&lt;Ree^2&gt;`
 
-    Args: 
+    Arguments:
         atoms (pd.DataFrame): a collection of atom coordinates
         bonds (pd.DataFrame): a collection of bonds
         boxDimensions: a list containing the box lengths (x, y, z) 
         crosslinker_type: the type id of the crosslinker (in order to detect chains, filter those)
         expected_num_bonds: the expected number of bonds. Used for warnings.
 
-    Returns: 
+    Returns:
         retVal: `&lt;Ree^2&gt;`
     &#34;&#34;&#34;
     molecules, atoms, bonds = getFilteredMoleculesAndBonds(
@@ -245,12 +248,15 @@ retVal: <code>&lt;Ree^2&gt;</code></p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Calculate <code>&lt;Ree^2&gt;</code> for a specific file</p>
-<p>Args:
-file: the path to the file to calculate Ree for
+<h2 id="arguments">Arguments</h2>
+<p>file: the path to the file to calculate Ree for
 fileType: the type of file to read (data or dump)
 useCache: wheter to use cache or not</p>
-<p>Returns:
-retVal: <code>&lt;Ree^2&gt;</code></p></div>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>retVal</code></dt>
+<dd><code>&lt;Ree^2&gt;</code></dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -259,12 +265,12 @@ retVal: <code>&lt;Ree^2&gt;</code></p></div>
     &#34;&#34;&#34;
     Calculate `&lt;Ree^2&gt;` for a specific file
 
-    Args: 
+    Arguments:
         file: the path to the file to calculate Ree for
         fileType: the type of file to read (data or dump)
         useCache: wheter to use cache or not
 
-    Returns: 
+    Returns:
         retVal: `&lt;Ree^2&gt;`
     &#34;&#34;&#34;
     # Custom Cache Stuff: keep for legacy purposes
@@ -296,14 +302,18 @@ retVal: <code>&lt;Ree^2&gt;</code></p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Calculate <code>&lt;Ree^2&gt;</code></p>
-<p>Args:
-molecules (List): a list of molecules as produced by pylimer_tools.utils.getMolecules
-atoms (pd.DataFrame): a collection of atom coordinates
-bonds (pd.DataFrame): a collection of bonds
-boxLenghts: a list containing the box lengths (x, y, z) </p>
-<p>Returns:
-retVal: <code>&lt;Ree^2&gt;</code>
-Ree: Ree for each molecule</p></div>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>molecules (List): a list of molecules as produced by pylimer_tools.utils.getMolecules</li>
+<li>atoms (pd.DataFrame): a collection of atom coordinates</li>
+<li>bonds (pd.DataFrame): a collection of bonds</li>
+<li>boxLenghts: a list containing the box lengths (x, y, z) </li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>retVal: <code>&lt;Ree^2&gt;</code></li>
+<li>Ree: Ree for each molecule</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -312,15 +322,15 @@ Ree: Ree for each molecule</p></div>
     &#34;&#34;&#34;
     Calculate `&lt;Ree^2&gt;`
 
-    Args: 
-        molecules (List): a list of molecules as produced by pylimer_tools.utils.getMolecules
-        atoms (pd.DataFrame): a collection of atom coordinates
-        bonds (pd.DataFrame): a collection of bonds
-        boxLenghts: a list containing the box lengths (x, y, z) 
+    Arguments:
+        - molecules (List): a list of molecules as produced by pylimer_tools.utils.getMolecules
+        - atoms (pd.DataFrame): a collection of atom coordinates
+        - bonds (pd.DataFrame): a collection of bonds
+        - boxLenghts: a list containing the box lengths (x, y, z) 
 
-    Returns: 
-        retVal: `&lt;Ree^2&gt;`
-        Ree: Ree for each molecule
+    Returns:
+        - retVal: `&lt;Ree^2&gt;`
+        - Ree: Ree for each molecule
     &#34;&#34;&#34;
     Ree = []
     chainLen = []
@@ -356,7 +366,7 @@ Ree: Ree for each molecule</p></div>
 
     retVal = np.square(Ree).mean()
     # print(&#34;Calculated {} Ree = {} ± {} for mean chain length of {} monomers&#34;.format(
-        # len(Ree), retVal, np.square(Ree).std(), np.mean(chainLen)))
+    # len(Ree), retVal, np.square(Ree).std(), np.mean(chainLen)))
     if (np.mean(chainLen) &lt; np.mean(Ree)):
         warnings.warn(&#34;This result is probably wrong/not realistic&#34;)
     return retVal, Ree</code></pre>
@@ -367,12 +377,15 @@ Ree: Ree for each molecule</p></div>
 </code></dt>
 <dd>
 <div class="desc"><p>Calculate Ree's for a specific file</p>
-<p>Args:
-file: the path to the file to calculate Ree for
+<h2 id="arguments">Arguments</h2>
+<p>file: the path to the file to calculate Ree for
 fileType: the type of file to read (data or dump)
 useCache: wheter to use cache or not</p>
-<p>Returns:
-retVal: <Ree^2></p></div>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>retVal</code></dt>
+<dd><Ree^2></dd>
+</dl></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -381,12 +394,12 @@ retVal: <Ree^2></p></div>
     &#34;&#34;&#34;
     Calculate Ree&#39;s for a specific file
 
-    Args: 
+    Arguments:
         file: the path to the file to calculate Ree for
         fileType: the type of file to read (data or dump)
         useCache: wheter to use cache or not
 
-    Returns: 
+    Returns:
         retVal: &lt;Ree^2&gt;
     &#34;&#34;&#34;
     # Custom Cache Stuff

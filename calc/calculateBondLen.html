@@ -44,14 +44,15 @@ def calculateMeanBondLen(coordsDf: pd.DataFrame, boxLengths: list):
 
     Assumes the bonds are by the coordsDf&#39;s ids, sequentially
 
-    @deprecated This function is legacy compliant only
+    .. deprecated:: 0.0.1 
+        This function is legacy compliant only. Use `calculateBondLen(...).mean()` instead.
 
-    Args: 
-        coordsDf: a dataframe containing the coordinates
-        boxLenghts: a list containing the box lengths (x, y, z) 
+    Arguments:
+        - coordsDf: a dataframe containing the coordinates
+        - boxLenghts: a list containing the box lengths (x, y, z) 
 
-    Returns: 
-        meanDistance: the mean of all distances
+    Returns:
+        - meanDistance: the mean of all distances
     &#34;&#34;&#34;
     lastX, lastY, lastZ = [0, 0, 0]
     newX, newY, newZ = [0, 0, 0]
@@ -90,6 +91,13 @@ def calculateBondLen(coordsDf: pd.DataFrame, bondsDf: pd.DataFrame, boxLengths: 
     given the coordinates of the atoms in a pd.DataFrame 
     and the bonds of the atoms in a pd.DataFrame 
     and the boxLengths in a list
+
+    Arguments:
+        - coordsDf: a dataframe containing the coordinates
+        - boxLenghts: a list containing the box lengths (x, y, z) 
+
+    Returns:
+        - a np.array of all bond lengths
     &#34;&#34;&#34;
     Rs = []
     for bond in bondsDf.itertuples():
@@ -98,7 +106,8 @@ def calculateBondLen(coordsDf: pd.DataFrame, bondsDf: pd.DataFrame, boxLengths: 
         if (skipAtomType is not None):
             if (atomTo[&#39;type&#39;] == skipAtomType or atomFrom[&#39;type&#39;] == skipAtomType):
                 continue
-        Rdist = calculateNormalizedDistanceBetweenAtoms(atomTo, atomFrom, boxLengths)
+        Rdist = calculateNormalizedDistanceBetweenAtoms(
+            atomTo, atomFrom, boxLengths)
         if (Rdist &gt; 5):
             warnings.warn(&#34;Probably unrealistically long bond detected.&#34;)
         Rs.append(Rdist)
@@ -120,7 +129,16 @@ def calculateBondLen(coordsDf: pd.DataFrame, bondsDf: pd.DataFrame, boxLengths: 
 <div class="desc"><p>Calculate the bond lengths
 given the coordinates of the atoms in a pd.DataFrame
 and the bonds of the atoms in a pd.DataFrame
-and the boxLengths in a list</p></div>
+and the boxLengths in a list</p>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>coordsDf: a dataframe containing the coordinates</li>
+<li>boxLenghts: a list containing the box lengths (x, y, z) </li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>a np.array of all bond lengths</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -131,6 +149,13 @@ and the boxLengths in a list</p></div>
     given the coordinates of the atoms in a pd.DataFrame 
     and the bonds of the atoms in a pd.DataFrame 
     and the boxLengths in a list
+
+    Arguments:
+        - coordsDf: a dataframe containing the coordinates
+        - boxLenghts: a list containing the box lengths (x, y, z) 
+
+    Returns:
+        - a np.array of all bond lengths
     &#34;&#34;&#34;
     Rs = []
     for bond in bondsDf.itertuples():
@@ -139,7 +164,8 @@ and the boxLengths in a list</p></div>
         if (skipAtomType is not None):
             if (atomTo[&#39;type&#39;] == skipAtomType or atomFrom[&#39;type&#39;] == skipAtomType):
                 continue
-        Rdist = calculateNormalizedDistanceBetweenAtoms(atomTo, atomFrom, boxLengths)
+        Rdist = calculateNormalizedDistanceBetweenAtoms(
+            atomTo, atomFrom, boxLengths)
         if (Rdist &gt; 5):
             warnings.warn(&#34;Probably unrealistically long bond detected.&#34;)
         Rs.append(Rdist)
@@ -155,12 +181,19 @@ and the boxLengths in a list</p></div>
 given the coordinates of the atoms in a pd.DataFrame
 and the boxLengths in a list</p>
 <p>Assumes the bonds are by the coordsDf's ids, sequentially</p>
-<p>@deprecated This function is legacy compliant only</p>
-<p>Args:
-coordsDf: a dataframe containing the coordinates
-boxLenghts: a list containing the box lengths (x, y, z) </p>
-<p>Returns:
-meanDistance: the mean of all distances</p></div>
+<div class="admonition deprecated">
+<p class="admonition-title">Deprecated since version:&ensp;0.0.1 </p>
+<p>This function is legacy compliant only. Use <code><a title="pylimer_tools.calc.calculateBondLen.calculateBondLen" href="#pylimer_tools.calc.calculateBondLen.calculateBondLen">calculateBondLen()</a>(&hellip;).mean()</code> instead.</p>
+</div>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>coordsDf: a dataframe containing the coordinates</li>
+<li>boxLenghts: a list containing the box lengths (x, y, z) </li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>meanDistance: the mean of all distances</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -173,14 +206,15 @@ meanDistance: the mean of all distances</p></div>
 
     Assumes the bonds are by the coordsDf&#39;s ids, sequentially
 
-    @deprecated This function is legacy compliant only
+    .. deprecated:: 0.0.1 
+        This function is legacy compliant only. Use `calculateBondLen(...).mean()` instead.
 
-    Args: 
-        coordsDf: a dataframe containing the coordinates
-        boxLenghts: a list containing the box lengths (x, y, z) 
+    Arguments:
+        - coordsDf: a dataframe containing the coordinates
+        - boxLenghts: a list containing the box lengths (x, y, z) 
 
-    Returns: 
-        meanDistance: the mean of all distances
+    Returns:
+        - meanDistance: the mean of all distances
     &#34;&#34;&#34;
     lastX, lastY, lastZ = [0, 0, 0]
     newX, newY, newZ = [0, 0, 0]
