@@ -3,6 +3,7 @@ import hashlib
 import os
 import pathlib
 import pickle
+import tempfile
 import warnings
 
 
@@ -67,6 +68,7 @@ def getCacheFileName(file: str, suffix: str):
     Returns:
         - cacheFileName: the path to the cache file
     """
-    cacheFileName = os.path.dirname(
-        __file__) + "/cache/" + hashlib.md5(file.encode()).hexdigest() + suffix + ".pickle"
+    cacheFileName = "{}/{}-{}.pickle".format(
+        tempfile.gettempdir(),
+        hashlib.md5(file.encode()).hexdigest(), suffix)
     return cacheFileName

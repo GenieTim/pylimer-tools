@@ -25,8 +25,8 @@ def getAndFilterMoleculesAndBonds(atom_data: pd.DataFrame, bond_data: pd.DataFra
     crosslinker_bonds = []
     assert(len(atom_data) > 1)
     if (crosslinker_type is not None):
-        lenAtomsBefore = len(atom_data)
-        lenBondsBefore = len(bond_data)
+        # lenAtomsBefore = len(atom_data)
+        # lenBondsBefore = len(bond_data)
         # remove all crosslinkers from bond & atoms
         crosslinkers = atom_data[atom_data.type == crosslinker_type]
         crosslinker_atoms = crosslinkers
@@ -38,8 +38,8 @@ def getAndFilterMoleculesAndBonds(atom_data: pd.DataFrame, bond_data: pd.DataFra
         bond_data = bond_data[~(
             bond_data["bondFrom"].isin(crosslinkers["id"]))]
         atom_data = atom_data[~(atom_data["id"].isin(crosslinkers['id']))]
-        print("Removed crosslinkers. Got {} of {} atoms and {} of {} bonds left.".format(
-            len(atom_data), lenAtomsBefore, len(bond_data), lenBondsBefore))
+        # print("Removed crosslinkers. Got {} of {} atoms and {} of {} bonds left.".format(
+        #     len(atom_data), lenAtomsBefore, len(bond_data), lenBondsBefore))
 
     # start with first atom, loop all
     atom_data = atom_data.sort_values(

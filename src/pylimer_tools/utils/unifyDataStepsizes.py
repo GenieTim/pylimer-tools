@@ -17,7 +17,7 @@ def unifyDataStepsizes(data: pd.DataFrame, key: str, stepSize: int = None, maxEx
     Returns:
         - data: a DataFrame with a consistent step-size
     """
-    lenBefore = len(data)
+    # lenBefore = len(data)
     if (stepSize is None):
         stepSize = data[key].sort_values().diff().max()
     if (stepSize > maxExpectedStepSize):
