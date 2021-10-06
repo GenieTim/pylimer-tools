@@ -9,10 +9,13 @@ def unifyDataStepsizes(data: pd.DataFrame, key: str, stepSize: int = None, maxEx
     - steps are modulo stepsize. Breaks e.g. with steps start with 1 and go up by stepSize.
     - ideal step-size is max step difference. Breaks e.g. if there is one big gap
 
-    Args: 
-        data: the DataFrame to unify the step-size for
-        key: the column name indicating the column containing the step-nr.
-        maxExpectedStepSize: use to get a warning if the computed step-size is larger
+    Arguments:
+        - data: the DataFrame to unify the step-size for
+        - key: the column name indicating the column containing the step-nr.
+        - maxExpectedStepSize: use to get a warning if the computed step-size is larger
+
+    Returns:
+        - data: a DataFrame with a consistent step-size
     """
     lenBefore = len(data)
     if (stepSize is None):

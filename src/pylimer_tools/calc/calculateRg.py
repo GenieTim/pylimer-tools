@@ -16,12 +16,12 @@ def calculateRg(x, y, z):
     """
     Calculate `<R_g^2>`
 
-    Args: 
+    Arguments:
         x (float): the x coordinate of the atom
         y (float): the y coordinate of the atom
         z (float): the z coordinate of the atom
 
-    Returns: 
+    Returns:
         retVal: `<R_g^2>`
     """
     if (not isinstance(x, np.ndarray)):
@@ -36,14 +36,14 @@ def calculateRg2AvgForMolecules(molecules, atoms, bonds, boxLengths: list, expec
     """
     Calculate `<R_g^2>`
 
-    Args: 
+    Arguments:
         molecules (list): list of molecules to calculate the R_g for
         atoms (pd.DataFrame): a collection of atom coordinates
         bonds (pd.DataFrame): a collection of bonds
         boxLengths: a list containing the box lengths (x, y, z) 
         expected_num_bonds: the expected number of bonds. Used for warnings.
 
-    Returns: 
+    Returns:
         retVal: `<R_g^2>`
     """
     Rg = []
@@ -82,15 +82,15 @@ def calculateRg2Avg(atoms, bonds, boxDimensions: list, crosslinker_type: int = 2
     """
     Calculate `<R_g^2>`
 
-    Args: 
-        atoms (pd.DataFrame): a collection of atom coordinates
-        bonds (pd.DataFrame): a collection of bonds
-        boxDimensions: a list containing the box lengths (x, y, z) 
-        crosslinker_type: the type id of the crosslinker (in order to detect chains, filter those)
-        expected_num_bonds: the expected number of bonds. Used for warnings.
+    Arguments:
+        - atoms (pd.DataFrame): a collection of atom coordinates
+        - bonds (pd.DataFrame): a collection of bonds
+        - boxDimensions: a list containing the box lengths (x, y, z) 
+        - crosslinker_type: the type id of the crosslinker (in order to detect chains, filter those)
+        - expected_num_bonds: the expected number of bonds. Used for warnings.
 
-    Returns: 
-        retVal: `<R_g^2>`
+    Returns:
+        - retVal: `<R_g^2>`
     """
     molecules, atoms, bonds = getFilteredMoleculesAndBonds(
         atoms, bonds, boxDimensions, crosslinker_type)
@@ -103,13 +103,13 @@ def calculateRg2AvgForFile(file: str, fileType: str = "data", useCache: bool = T
     """
     Calculate `<Rg^2>` for a specific file
 
-    Args: 
-        file: the path to the file to calculate Ree for
-        fileType: the type of file to read (data or dump)
-        useCache: wheter to use cache or not
+    Arguments:
+        - file: the path to the file to calculate Ree for
+        - fileType: the type of file to read (data or dump)
+        - useCache: wheter to use cache or not
 
-    Returns: 
-        retVal: `<R_g^2>`
+    Returns:
+        - retVal: `<R_g^2>`
     """
     # Custom Cache Stuff: keep for legacy purposes
     cacheFileName = os.path.dirname(
@@ -139,13 +139,13 @@ def calculateRgForFile(file: str, fileType: str = "data", useCache: bool = True)
     """
     Calculate R_g for a specific file
 
-    Args: 
-        file: the path to the file to calculate Ree for
-        fileType: the type of file to read (data or dump)
-        useCache: wheter to use cache or not
+    Arguments:
+        - file: the path to the file to calculate Ree for
+        - fileType: the type of file to read (data or dump)
+        - useCache: wheter to use cache or not
 
-    Returns: 
-        retVal (list): R_gs
+    Returns:
+        - retVal (list): R_gs
     """
     # Custom Cache Stuff
     cacheFileName = os.path.dirname(

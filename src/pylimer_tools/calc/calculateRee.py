@@ -18,15 +18,15 @@ def calculateRee2AvgForMolecules(molecules, atoms, bonds, boxLengths: list, expe
     """
     Calculate `<Ree^2>`
 
-    Args: 
-        molecules (List): a list of molecules as produced by pylimer_tools.utils.getMolecules
-        atoms (pd.DataFrame): a collection of atom coordinates
-        bonds (pd.DataFrame): a collection of bonds
-        boxLenghts: a list containing the box lengths (x, y, z) 
+    Arguments:
+        - molecules (List): a list of molecules as produced by pylimer_tools.utils.getMolecules
+        - atoms (pd.DataFrame): a collection of atom coordinates
+        - bonds (pd.DataFrame): a collection of bonds
+        - boxLenghts: a list containing the box lengths (x, y, z) 
 
-    Returns: 
-        retVal: `<Ree^2>`
-        Ree: Ree for each molecule
+    Returns:
+        - retVal: `<Ree^2>`
+        - Ree: Ree for each molecule
     """
     Ree = []
     chainLen = []
@@ -62,7 +62,7 @@ def calculateRee2AvgForMolecules(molecules, atoms, bonds, boxLengths: list, expe
 
     retVal = np.square(Ree).mean()
     # print("Calculated {} Ree = {} ± {} for mean chain length of {} monomers".format(
-        # len(Ree), retVal, np.square(Ree).std(), np.mean(chainLen)))
+    # len(Ree), retVal, np.square(Ree).std(), np.mean(chainLen)))
     if (np.mean(chainLen) < np.mean(Ree)):
         warnings.warn("This result is probably wrong/not realistic")
     return retVal, Ree
@@ -72,14 +72,14 @@ def calculateRee2Avg(atoms, bonds, boxDimensions: list, crosslinker_type: int = 
     """
     Calculate `<Ree^2>`
 
-    Args: 
+    Arguments:
         atoms (pd.DataFrame): a collection of atom coordinates
         bonds (pd.DataFrame): a collection of bonds
         boxDimensions: a list containing the box lengths (x, y, z) 
         crosslinker_type: the type id of the crosslinker (in order to detect chains, filter those)
         expected_num_bonds: the expected number of bonds. Used for warnings.
 
-    Returns: 
+    Returns:
         retVal: `<Ree^2>`
     """
     molecules, atoms, bonds = getFilteredMoleculesAndBonds(
@@ -93,12 +93,12 @@ def calculateRee2AvgForFile(file: str, fileType: str = "data", useCache: bool = 
     """
     Calculate `<Ree^2>` for a specific file
 
-    Args: 
+    Arguments:
         file: the path to the file to calculate Ree for
         fileType: the type of file to read (data or dump)
         useCache: wheter to use cache or not
 
-    Returns: 
+    Returns:
         retVal: `<Ree^2>`
     """
     # Custom Cache Stuff: keep for legacy purposes
@@ -129,12 +129,12 @@ def calculateReeForFile(file: str, fileType: str = "data", useCache: bool = True
     """
     Calculate Ree's for a specific file
 
-    Args: 
+    Arguments:
         file: the path to the file to calculate Ree for
         fileType: the type of file to read (data or dump)
         useCache: wheter to use cache or not
 
-    Returns: 
+    Returns:
         retVal: <Ree^2>
     """
     # Custom Cache Stuff

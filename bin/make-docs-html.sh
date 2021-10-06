@@ -2,8 +2,8 @@
 
 cd "$(dirname "$0")/.." || exit
 
-rm -rf ./docs
-mkdir -p ./docs
+rm -rf ./docs-html
+mkdir -p ./docs-html
 
 # make sure you have pdoc3 installed: 
 # pip3 install pdoc3

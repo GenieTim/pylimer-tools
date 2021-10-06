@@ -5,18 +5,18 @@ def getAndFilterMoleculesAndBonds(atom_data: pd.DataFrame, bond_data: pd.DataFra
     """
     Find molecules from atom & bond data. Crosslinkers are omitted.
 
-    Args:
+    Arguments:
         atom_data (pd.DataFrame): a collection of atom coordinates
         bond_data (pd.DataFrame): a collection of bonds
         boxDimensions: a list containing the box lengths (x, y, z) 
         crosslinker_type: the type of the crosslinker atoms to distinguish different molecules/chains
 
-    Returns: 
-        molecules (list): a list of lists of atoms representing molecules/chains
-        atom_data (pd.DataFrame): the atoms, excluding crosslinkers
-        bond_data: the bonds, excluding the ones of the crosslinker atoms
-        crosslinker_atoms: the atoms of the crosslinkers
-        crosslinker_bonds: the bonds of the crosslinker atoms
+    Returns:
+        - molecules (list): a list of lists of atoms representing molecules/chains
+        - atom_data (pd.DataFrame): the atoms, excluding crosslinkers
+        - bond_data: the bonds, excluding the ones of the crosslinker atoms
+        - crosslinker_atoms: the atoms of the crosslinkers
+        - crosslinker_bonds: the bonds of the crosslinker atoms
     """
     # first, need to split the data per molecule
     molecules = []
@@ -35,7 +35,8 @@ def getAndFilterMoleculesAndBonds(atom_data: pd.DataFrame, bond_data: pd.DataFra
         bond_data = bond_data[~(bond_data["to"].isin(crosslinkers["id"]))]
         crosslinker_bonds = crosslinker_bonds.merge(
             bond_data[(bond_data["bondFrom"].isin(crosslinkers["id"]))])
-        bond_data = bond_data[~(bond_data["bondFrom"].isin(crosslinkers["id"]))]
+        bond_data = bond_data[~(
+            bond_data["bondFrom"].isin(crosslinkers["id"]))]
         atom_data = atom_data[~(atom_data["id"].isin(crosslinkers['id']))]
         print("Removed crosslinkers. Got {} of {} atoms and {} of {} bonds left.".format(
             len(atom_data), lenAtomsBefore, len(bond_data), lenBondsBefore))
@@ -93,16 +94,16 @@ def getFilteredMoleculesAndBonds(atom_data: pd.DataFrame, bond_data: pd.DataFram
     """
     Find molecules from atom & bond data. Crosslinkers are omitted.
 
-    Args:
-        atom_data (pd.DataFrame): a collection of atom coordinates
-        bond_data (pd.DataFrame): a collection of bonds
-        boxDimensions: a list containing the box lengths (x, y, z) 
-        crosslinker_type: the type of the crosslinker atoms to distinguish different molecules/chains
+    Arguments:
+        - atom_data (pd.DataFrame): a collection of atom coordinates
+        - bond_data (pd.DataFrame): a collection of bonds
+        - boxDimensions: a list containing the box lengths (x, y, z) 
+        - crosslinker_type: the type of the crosslinker atoms to distinguish different molecules/chains
 
-    Returns: 
-        molecules (list): a list of lists of atoms representing molecules/chains
-        atom_data (pd.DataFrame): the atoms, excluding crosslinkers
-        bond_data: the bonds, excluding the ones of the crosslinker atoms
+    Returns:
+        - molecules (list): a list of lists of atoms representing molecules/chains
+        - atom_data (pd.DataFrame): the atoms, excluding crosslinkers
+        - bond_data: the bonds, excluding the ones of the crosslinker atoms
     """
     molecules, atom_data, bond_data, _, _ = getAndFilterMoleculesAndBonds(
         atom_data, bond_data, boxDimensions, crosslinker_type)
@@ -113,14 +114,14 @@ def getMolecules(atom_data: pd.DataFrame, bond_data: pd.DataFrame, boxDimensions
     """
     Find molecules from atom & bond data. Crosslinkers are omitted.
 
-    Args:
-        atom_data (pd.DataFrame): a collection of atom coordinates
-        bond_data (pd.DataFrame): a collection of bonds
-        boxDimensions: a list containing the box lengths (x, y, z) 
-        crosslinker_type: the type of the crosslinker atoms to distinguish different molecules/chains
+    Arguments:
+        - atom_data (pd.DataFrame): a collection of atom coordinates
+        - bond_data (pd.DataFrame): a collection of bonds
+        - boxDimensions: a list containing the box lengths (x, y, z) 
+        - crosslinker_type: the type of the crosslinker atoms to distinguish different molecules/chains
 
-    Returns: 
-        molecules (list): a list of lists of atoms representing molecules/chains
+    Returns:
+        - molecules (list): a list of lists of atoms representing molecules/chains
     """
     molecules, _, _ = getFilteredMoleculesAndBonds(
         atom_data, bond_data, boxDimensions, crosslinker_type)

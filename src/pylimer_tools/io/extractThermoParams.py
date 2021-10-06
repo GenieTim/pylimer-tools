@@ -8,7 +8,6 @@ import pickle
 from io import StringIO
 
 import pandas as pd
-
 from pylimer_tools.utils.optimizeDf import optimize, reduce_mem_usage
 
 
@@ -18,10 +17,15 @@ def readOneGroup(fp, header, minLineLen=4, additional_lines_skip=0) -> str:
     Read one group of csv lines from the file
 
     Arguments:
-        fp: the file pointer to the file to read from
-        header: the header of the CSV (where to start reading at)
-        minLineLen: the minimal length of a line to be accepted as data
-        additional_lines_skip: number of lines to skip after reading the header
+        - fp: the file pointer to the file to read from
+        - header: the header of the CSV (where to start reading at)
+        - minLineLen: the minimal length of a line to be accepted as data
+        - additional_lines_skip: number of lines to skip after reading the header
+
+    
+    Returns:
+      A long CSV string
+
     """
     text = ""
     line = fp.readline()
@@ -89,14 +93,15 @@ def extractThermoParams(file, header="Temp PotEng TotEng Press Volume c_3", text
     when reading a file with different header sections in them
 
     Arguments:
-        file: the file path to the file to read from
-        header: the header of the CSV (where to start reading at)
-        textsToRead: the number of times to expect the header
-        minLineLen: the minimal length of a line to be accepted as data
-        useCache: wheter to use cache or not
+        - file: the file path to the file to read from
+        - header: the header of the CSV (where to start reading at)
+        - textsToRead: the number of times to expect the header
+        - minLineLen: the minimal length of a line to be accepted as data
+        - useCache: wheter to use cache or not
 
-    Returns: 
-        data (pd.DataFrame): the thermodynamic parameters
+    Returns:
+        - data (pd.DataFrame): the thermodynamic parameters
+
     """
     df = None
 

@@ -3,6 +3,7 @@ import pandas as pd
 
 from pylimer_tools.utils.cacheUtility import doCache, loadCache
 
+
 def findFloatsInLine(line: str) -> list:
     """
     Find as many floats as possible in a string (line)
@@ -21,9 +22,9 @@ def readLammpData(file, useCache=True) -> dict:
     """
     Read a lammpstrj input data file
 
-    Args: 
-        file: the path to the file to read from
-        useCache: wheter to use cache or not (respects modified date of file)
+    Arguments:
+        - file: the path to the file to read from
+        - useCache: wheter to use cache or not (respects modified date of file)
     """
     if (useCache):
         toReturn = loadCache(file, "-lammp-data-cache")
