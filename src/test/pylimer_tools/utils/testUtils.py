@@ -63,7 +63,7 @@ class TestUtilFunctions(unittest.TestCase):
         with self.assertWarns(Warning):
             unifyDataStepsizes(testDf, key="a", maxExpectedStepSize=0.5)
 
-    def testCacheUtility(self):
+    def test_cacheUtility(self):
         testDf = pd.DataFrame([
             {"a": 1, "b": 0}, {"a": 2, "b": 0},
             {"a": 2.5, "b": 0}, {"a": 3, "b": 0}])
@@ -94,7 +94,7 @@ class TestUtilFunctions(unittest.TestCase):
         testFile.close()
         self.assertIsNone(loadCache(file, suffix))
 
-    def testGetMolecules(self):
+    def test_getMolecules(self):
         testAtoms = pd.DataFrame([
             {"id": 1, "nx": 1, "ny": 1, "nz": 1,
                 "type": 1, "x": 1, "y": 1, "z": 1},
