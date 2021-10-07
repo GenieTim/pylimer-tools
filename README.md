@@ -17,5 +17,7 @@ Use pip:
 
 ## Usage
 
+**NOTE**: currently, this release's API is _unstable_ and subject to change.
+
 See the [documentation](https://genietim.github.io/pylimer-tools/index.html) (or in [markdown format]([./docs](https://github.com/GenieTim/pylimer-tools/tree/main/docs/pylimer_tools))) for a current list of all available functions.
 

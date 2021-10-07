@@ -1,0 +1,91 @@
+
+from typing import Iterable
+
+import numpy as np
+from pylimer_tools.entities._graphDecorator import GraphDecorator
+from pylimer_tools.entities.atom import Atom
+
+
+class Molecule(GraphDecorator, Iterable):
+
+    def __init__(self, molecule_graph):
+        self.underlying_graph = molecule_graph
+
+    def decomposeFurther(self, splitAtomType):
+        """
+        Split this molecule into smaller molecules by ignoring all atoms with a given type.
+
+        Arguments:
+          - splitAtomType: the type of the atom to omit
+
+        Returns:
+          - subMolecules (list): a list of Molecule objects        
+        """
+        verticesToRemove = self.underlying_graph.vs.select(
+            type_eq=splitAtomType)
+        graphCopy = self.underlying_graph.copy()
+        verticesToRemoveIndices = [v.index for v in verticesToRemove]
+        graphCopy.delete_vertices(verticesToRemoveIndices)
+
+        subMolecules = []
+        subgraphs = self.underlying_graph.decompose()
+        for subgraph in subgraphs:
+            subMolecules.append(Molecule(subgraph))
+        return subMolecules
+
+    def computeEndToEndDistance(self):
+        """
+        Compute the end-to-end distance of this molecule/chain.
+
+        Returns:
+          - \(R_ee\) (float): the end-to-end distance, 
+              `None` if the molecule/chain does not have two distinct ends.
+        """
+        if (self.underlying_graph.vcount() < 2):
+            return None
+        endNodes = self.underlying_graph.vs.select(_degree_eq=1)
+        if (len(endNodes) != 2):
+            return None
+
+        atom1 = endNodes[0]["atom"]
+        atom2 = endNodes[1]["atom"]
+        assert(isinstance(atom1, Atom) and isinstance(atom2, Atom))
+        return atom1.computeDistanceTo(atom2)
+
+    def computeBondLengths(self):
+        """
+        Calculate the bond lengths
+
+        Returns:
+          - a np.array of all bond lengths
+        """
+        lastAtom = None
+        Rs = []
+        for atom in self:
+            if (lastAtom is not None):
+                Rs.append(atom.computeDistanceTo(lastAtom))
+            lastAtom = atom
+
+        return np.array(Rs)
+
+    def getLength(self):
+        """
+        Query the length of the molecule/chain (the nr. of atoms)
+
+        Returns:
+          - len (int): the nr. of nodes (atoms) in this molecule
+        """
+        return self.underlying_graph.vcount()
+
+    def __iter__(self):
+        """
+        Decorator of the depth-first iterator of the underlying graph.
+
+        Yields:
+          - atom (Atom): the atom of the current iteration.
+        """
+        endNodes = self.underlying_graph.vs.select(_degree_eq=1)
+        subIterator = self.underlying_graph.dfsiter(
+            endNodes[0], mode="all", advanced=False)
+        for node in subIterator:
+            yield node["atom"]

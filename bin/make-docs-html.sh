@@ -7,4 +7,4 @@ mkdir -p ./docs-html
 
 # make sure you have pdoc3 installed: 
 # pip3 install pdoc3
-pdoc ./src/pylimer_tools/ --html --output-dir ./docs-html
+pdoc ./src/pylimer_tools/ --config latex_math=True --html --output-dir ./docs-html

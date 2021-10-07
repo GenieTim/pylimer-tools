@@ -52,7 +52,8 @@ def loadCache(file: str, suffix: str, disableWarnings: bool = False):
                     toReturn = pickle.load(cacheFile)
                 return toReturn
             else:
-                print("Dump cache file is elder than dump. Reloading...")
+                # print("Dump cache file is elder than dump. Reloading...")
+                pass
 
     return None
 
