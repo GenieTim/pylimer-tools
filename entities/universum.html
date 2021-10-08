@@ -27,7 +27,9 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">import igraph
+<pre><code class="python">from __future__ import annotations
+
+import igraph
 import numpy as np
 import pandas as pd
 from pylimer_tools.entities._graphDecorator import GraphDecorator
@@ -52,7 +54,7 @@ class Universum(GraphDecorator):
         self.underlying_graph = igraph.Graph(directed=False)
         self.boxSizes = boxSizes
 
-    def addAtomBondData(self, atomData: pd.DataFrame, bondData: pd.DataFrame):
+    def addAtomBondData(self, atomData: pd.DataFrame, bondData: pd.DataFrame) -&gt; Universum:
         &#34;&#34;&#34;
         Add atoms and bonds to the underlying graph.
 
@@ -82,7 +84,7 @@ class Universum(GraphDecorator):
 
         return self
 
-    def getMolecules(self, ignoreAtomType=None):
+    def getMolecules(self, ignoreAtomType=None) -&gt; list[Molecule]:
         &#34;&#34;&#34;
         Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms.
 
@@ -94,6 +96,7 @@ class Universum(GraphDecorator):
         &#34;&#34;&#34;
         molecules = []
         subgraphs = self.underlying_graph.decompose()
+
         for subgraph in subgraphs:
             if (ignoreAtomType is None):
                 molecules.append(Molecule(subgraph))
@@ -123,18 +126,18 @@ class Universum(GraphDecorator):
             pass
         return None
 
-    def getAtomsWithType(self, type) -&gt; list:
+    def getAtomsWithType(self, atomType) -&gt; list[Atom]:
         &#34;&#34;&#34;
         Find an atom by its type
 
         Arguments:
-          - type: the type of the atom
+          - atomType: the type of the atom
 
         Returns:
           - atoms (list&lt;pylimer_tools.entities.Atom&gt;): the Atom objects or None if it is not found
         &#34;&#34;&#34;
         try:
-            vertices = self.underlying_graph.vs.select(type_eq=type)
+            vertices = self.underlying_graph.vs.select(type_eq=atomType)
             if (vertices is not None):
                 return [v[&#34;atom&#34;] for v in vertices]
         except (ValueError, KeyError):
@@ -159,7 +162,7 @@ class Universum(GraphDecorator):
         &#34;&#34;&#34;
         return self.underlying_graph.vcount()
 
-    def setBoxSizes(self, boxSizes: list):
+    def setBoxSizes(self, boxSizes: list) -&gt; Universum:
         &#34;&#34;&#34;
         Re-set this Universe&#39;s size.
 
@@ -172,7 +175,7 @@ class Universum(GraphDecorator):
         self.boxSizes = boxSizes
         return self
 
-    def reset(self):
+    def reset(self) -&gt; Universum:
         &#34;&#34;&#34;
         Reset this Universe to be empty again.
 
@@ -227,7 +230,7 @@ class Universum(GraphDecorator):
         self.underlying_graph = igraph.Graph(directed=False)
         self.boxSizes = boxSizes
 
-    def addAtomBondData(self, atomData: pd.DataFrame, bondData: pd.DataFrame):
+    def addAtomBondData(self, atomData: pd.DataFrame, bondData: pd.DataFrame) -&gt; Universum:
         &#34;&#34;&#34;
         Add atoms and bonds to the underlying graph.
 
@@ -257,7 +260,7 @@ class Universum(GraphDecorator):
 
         return self
 
-    def getMolecules(self, ignoreAtomType=None):
+    def getMolecules(self, ignoreAtomType=None) -&gt; list[Molecule]:
         &#34;&#34;&#34;
         Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms.
 
@@ -269,6 +272,7 @@ class Universum(GraphDecorator):
         &#34;&#34;&#34;
         molecules = []
         subgraphs = self.underlying_graph.decompose()
+
         for subgraph in subgraphs:
             if (ignoreAtomType is None):
                 molecules.append(Molecule(subgraph))
@@ -298,18 +302,18 @@ class Universum(GraphDecorator):
             pass
         return None
 
-    def getAtomsWithType(self, type) -&gt; list:
+    def getAtomsWithType(self, atomType) -&gt; list[Atom]:
         &#34;&#34;&#34;
         Find an atom by its type
 
         Arguments:
-          - type: the type of the atom
+          - atomType: the type of the atom
 
         Returns:
           - atoms (list&lt;pylimer_tools.entities.Atom&gt;): the Atom objects or None if it is not found
         &#34;&#34;&#34;
         try:
-            vertices = self.underlying_graph.vs.select(type_eq=type)
+            vertices = self.underlying_graph.vs.select(type_eq=atomType)
             if (vertices is not None):
                 return [v[&#34;atom&#34;] for v in vertices]
         except (ValueError, KeyError):
@@ -334,7 +338,7 @@ class Universum(GraphDecorator):
         &#34;&#34;&#34;
         return self.underlying_graph.vcount()
 
-    def setBoxSizes(self, boxSizes: list):
+    def setBoxSizes(self, boxSizes: list) -&gt; Universum:
         &#34;&#34;&#34;
         Re-set this Universe&#39;s size.
 
@@ -347,7 +351,7 @@ class Universum(GraphDecorator):
         self.boxSizes = boxSizes
         return self
 
-    def reset(self):
+    def reset(self) -&gt; Universum:
         &#34;&#34;&#34;
         Reset this Universe to be empty again.
 
@@ -371,7 +375,7 @@ class Universum(GraphDecorator):
 <h3>Methods</h3>
 <dl>
 <dt id="pylimer_tools.entities.universum.Universum.addAtomBondData"><code class="name flex">
-<span>def <span class="ident">addAtomBondData</span></span>(<span>self, atomData: pandas.core.frame.DataFrame, bondData: pandas.core.frame.DataFrame)</span>
+<span>def <span class="ident">addAtomBondData</span></span>(<span>self, atomData: pd.DataFrame, bondData: pd.DataFrame) ‑> <a title="pylimer_tools.entities.universum.Universum" href="#pylimer_tools.entities.universum.Universum">Universum</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Add atoms and bonds to the underlying graph.</p>
@@ -388,7 +392,7 @@ class Universum(GraphDecorator):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def addAtomBondData(self, atomData: pd.DataFrame, bondData: pd.DataFrame):
+<pre><code class="python">def addAtomBondData(self, atomData: pd.DataFrame, bondData: pd.DataFrame) -&gt; Universum:
     &#34;&#34;&#34;
     Add atoms and bonds to the underlying graph.
 
@@ -457,13 +461,13 @@ class Universum(GraphDecorator):
 </details>
 </dd>
 <dt id="pylimer_tools.entities.universum.Universum.getAtomsWithType"><code class="name flex">
-<span>def <span class="ident">getAtomsWithType</span></span>(<span>self, type) ‑> list</span>
+<span>def <span class="ident">getAtomsWithType</span></span>(<span>self, atomType) ‑> list</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Find an atom by its type</p>
 <h2 id="arguments">Arguments</h2>
 <ul>
-<li>type: the type of the atom</li>
+<li>atomType: the type of the atom</li>
 </ul>
 <h2 id="returns">Returns</h2>
 <ul>
@@ -473,18 +477,18 @@ class Universum(GraphDecorator):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def getAtomsWithType(self, type) -&gt; list:
+<pre><code class="python">def getAtomsWithType(self, atomType) -&gt; list[Atom]:
     &#34;&#34;&#34;
     Find an atom by its type
 
     Arguments:
-      - type: the type of the atom
+      - atomType: the type of the atom
 
     Returns:
       - atoms (list&lt;pylimer_tools.entities.Atom&gt;): the Atom objects or None if it is not found
     &#34;&#34;&#34;
     try:
-        vertices = self.underlying_graph.vs.select(type_eq=type)
+        vertices = self.underlying_graph.vs.select(type_eq=atomType)
         if (vertices is not None):
             return [v[&#34;atom&#34;] for v in vertices]
     except (ValueError, KeyError):
@@ -493,7 +497,7 @@ class Universum(GraphDecorator):
 </details>
 </dd>
 <dt id="pylimer_tools.entities.universum.Universum.getMolecules"><code class="name flex">
-<span>def <span class="ident">getMolecules</span></span>(<span>self, ignoreAtomType=None)</span>
+<span>def <span class="ident">getMolecules</span></span>(<span>self, ignoreAtomType=None) ‑> list</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms.</p>
@@ -509,7 +513,7 @@ class Universum(GraphDecorator):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def getMolecules(self, ignoreAtomType=None):
+<pre><code class="python">def getMolecules(self, ignoreAtomType=None) -&gt; list[Molecule]:
     &#34;&#34;&#34;
     Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms.
 
@@ -521,6 +525,7 @@ class Universum(GraphDecorator):
     &#34;&#34;&#34;
     molecules = []
     subgraphs = self.underlying_graph.decompose()
+
     for subgraph in subgraphs:
         if (ignoreAtomType is None):
             molecules.append(Molecule(subgraph))
@@ -579,7 +584,7 @@ class Universum(GraphDecorator):
 </details>
 </dd>
 <dt id="pylimer_tools.entities.universum.Universum.reset"><code class="name flex">
-<span>def <span class="ident">reset</span></span>(<span>self)</span>
+<span>def <span class="ident">reset</span></span>(<span>self) ‑> <a title="pylimer_tools.entities.universum.Universum" href="#pylimer_tools.entities.universum.Universum">Universum</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Reset this Universe to be empty again.</p>
@@ -591,7 +596,7 @@ class Universum(GraphDecorator):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def reset(self):
+<pre><code class="python">def reset(self) -&gt; Universum:
     &#34;&#34;&#34;
     Reset this Universe to be empty again.
 
@@ -603,7 +608,7 @@ class Universum(GraphDecorator):
 </details>
 </dd>
 <dt id="pylimer_tools.entities.universum.Universum.setBoxSizes"><code class="name flex">
-<span>def <span class="ident">setBoxSizes</span></span>(<span>self, boxSizes: list)</span>
+<span>def <span class="ident">setBoxSizes</span></span>(<span>self, boxSizes: list) ‑> <a title="pylimer_tools.entities.universum.Universum" href="#pylimer_tools.entities.universum.Universum">Universum</a></span>
 </code></dt>
 <dd>
 <div class="desc"><p>Re-set this Universe's size.</p>
@@ -619,7 +624,7 @@ class Universum(GraphDecorator):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def setBoxSizes(self, boxSizes: list):
+<pre><code class="python">def setBoxSizes(self, boxSizes: list) -&gt; Universum:
     &#34;&#34;&#34;
     Re-set this Universe&#39;s size.
 

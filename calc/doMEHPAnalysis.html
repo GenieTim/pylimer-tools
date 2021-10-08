@@ -33,7 +33,7 @@ import numpy as np
 from pylimer_tools.entities.universum import Universum
 
 
-def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1):
+def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None):
     &#34;&#34;&#34;
     Compute the cycle rank (\(\chi\)) 
 
@@ -41,16 +41,28 @@ def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTo
       - network: the network to calculate the cycle rank for
       - nu: number of elastically effective (active) strands per unit volume
       - mu: number density of the elastically effective crosslink
+      - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
+      - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
+      - junctionType: the atom type of the crosslinkers/junctions
+
+    No need to provide all the parameters — either/or: 
+    - nu &amp; mu
+    - network, absTol, relTol, junctionType
+
+    Returns:
+      - cycleRank: the cycle rank ((\chi = \nu_{eff} - \mu_{eff}\)) 
     &#34;&#34;&#34;
     if (nu is None):
-        nu = calculateEffectiveNrDensityOfNetwork(network, absTol, relTol)
+        nu = calculateEffectiveNrDensityOfNetwork(
+            network, absTol, relTol, junctionType)
     if (mu is None):
-        mu = calculateEffectiveNrDensityOfJunctions(network, absTol, relTol)
+        mu = calculateEffectiveNrDensityOfJunctions(
+            network, absTol, relTol, junctionType)
 
     return nu - mu
 
 
-def calculateEffectiveNrDensityOfNetwork(network: Universum, absTol: float = 1, relTol: float = 1):
+def calculateEffectiveNrDensityOfNetwork(network: Universum, absTol: float = 1, relTol: float = 1, junctionType=None):
     &#34;&#34;&#34;
     Compute the effective number density \(\nu_{eff}\) of a network
 
@@ -62,10 +74,14 @@ def calculateEffectiveNrDensityOfNetwork(network: Universum, absTol: float = 1, 
       - network (pylimer_tools.entities.Universum): the network to compute \(\nu_{eff}\) for
       - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
       - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
+      - junctionType: the atom type of the crosslinkers/junctions
+
+    Returns:
+      - \(\nu_{eff}\) (float): the effective number density of network strands
     &#34;&#34;&#34;
     R_taus = []
     chainLengths = []
-    for molecule in network.getMolecules():
+    for molecule in network.getMolecules(junctionType):
         R_tau = molecule.computeEndToEndDistance()
         R_taus.append(R_tau)
         chainLengths.append(molecule.getLength())
@@ -81,11 +97,66 @@ def calculateEffectiveNrDensityOfNetwork(network: Universum, absTol: float = 1, 
     return numEffective / network.getSize()
 
 
-def calculateEffectiveNrDensityOfJunctions(network: Universum, absTol: float = 0, relTol: float = 0):
+def calculateEffectiveNrDensityOfJunctions(network: Universum, absTol: float = 0, relTol: float = 0, junctionType=None, minNumEffectiveStrands=2):
     &#34;&#34;&#34;
-    
+    Compute the number density of the elastically effective crosslinks, 
+    defined as the ones that connect at least two elastically effective strands 
+
+    Arguments:
+      - network (pylimer_tools.entities.Universum): the network to compute \(\nu_{eff}\) for
+      - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
+      - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
+      - junctionType: the atom type of the crosslinkers/junctions
+      - minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such
+
+    Returns:
+      - \(\mu_{eff}\) (float): the effective number density of junctions
     &#34;&#34;&#34;
-    pass
+    if (junctionType is None):
+        return 0.0
+    numEffectiveJunctions = 0
+    numIneffectiveJunctions = 0
+
+    graph = network.getUnderlyingGraph()
+    subgraphs = graph.decompose()
+    for subgraph in subgraphs:
+        # 1. find junctions
+        junctions = subgraph.vs.select(type_eq=junctionType)
+        for junction in junctions:
+            # some junctions are easily ineffective
+            if (junction.degree() &lt; minNumEffectiveStrands):
+                numIneffectiveJunctions += 1
+            else:
+                # 2. follow junction&#39;s strands to find those
+                vertexNeighbors = junction.neighbors()
+                for neighbor in vertexNeighbors:
+                    # follow each neighbor
+                    lastNeighbor = junction
+                    currentNeighbor = neighbor
+                    while(True):
+                        # follow as long as we do not find a junction
+                        nextNeighbors = currentNeighbor.neighbors()
+                        # : this is an assumption that makes this function simpler. Assume: only junctions have more than 2 connections
+                        assert(len(nextNeighbors) == 2)
+                        nextKey = 1 if nextNeighbors[0] == lastNeighbor else 0
+                        lastNeighbor = currentNeighbor
+                        currentNeighbor = nextNeighbors[nextKey]
+                        # found &#34;end&#34; of strand
+                        if (currentNeighbor[&#34;type&#34;] == junctionType):
+                            # 3. decide if strand is elastically effective
+                            Ree = currentNeighbor[&#34;atom&#34;].computeDistanceTo(
+                                junction[&#34;atom&#34;])
+                            if ((currentNeighbor != junction) and (Ree &gt; absTol)):
+                                numEffectiveJunctions += 1
+                            else:
+                                numIneffectiveJunctions += 1
+                            break
+                        # dangling chains are non-effective.
+                        if (currentNeighbor.degree() &lt; 2):
+                            numIneffectiveJunctions += 1
+                            break
+
+    return numEffectiveJunctions/(numEffectiveJunctions+numIneffectiveJunctions)
 
 
 def calculateTopologicalFactor(network: Universum, foreignAtomType=None, totalMass=1):
@@ -121,21 +192,31 @@ def calculateTopologicalFactor(network: Universum, foreignAtomType=None, totalMa
 <h2 class="section-title" id="header-functions">Functions</h2>
 <dl>
 <dt id="pylimer_tools.calc.doMEHPAnalysis.calculateCycleRank"><code class="name flex">
-<span>def <span class="ident">calculateCycleRank</span></span>(<span>network: <a title="pylimer_tools.entities.universum.Universum" href="../entities/universum.html#pylimer_tools.entities.universum.Universum">Universum</a>, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1)</span>
+<span>def <span class="ident">calculateCycleRank</span></span>(<span>network: <a title="pylimer_tools.entities.universum.Universum" href="../entities/universum.html#pylimer_tools.entities.universum.Universum">Universum</a>, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Compute the cycle rank ((\chi)) </p>
-<h2 id="arguments">Arguments</h2>
-<ul>
-<li>network: the network to calculate the cycle rank for</li>
-<li>nu: number of elastically effective (active) strands per unit volume</li>
-<li>mu: number density of the elastically effective crosslink</li>
-</ul></div>
+<pre><code>Arguments:
+  - network: the network to calculate the cycle rank for
+  - nu: number of elastically effective (active) strands per unit volume
+  - mu: number density of the elastically effective crosslink
+  - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
+  - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
+  - junctionType: the atom type of the crosslinkers/junctions
+
+No need to provide all the parameters — either/or: 
+- nu &amp; mu
+- network, absTol, relTol, junctionType
+
+Returns:
+  - cycleRank: the cycle rank ((\chi =
+</code></pre>
+<p>u_{eff} - \mu_{eff}))</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1):
+<pre><code class="python">def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None):
     &#34;&#34;&#34;
     Compute the cycle rank (\(\chi\)) 
 
@@ -143,33 +224,112 @@ def calculateTopologicalFactor(network: Universum, foreignAtomType=None, totalMa
       - network: the network to calculate the cycle rank for
       - nu: number of elastically effective (active) strands per unit volume
       - mu: number density of the elastically effective crosslink
+      - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
+      - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
+      - junctionType: the atom type of the crosslinkers/junctions
+
+    No need to provide all the parameters — either/or: 
+    - nu &amp; mu
+    - network, absTol, relTol, junctionType
+
+    Returns:
+      - cycleRank: the cycle rank ((\chi = \nu_{eff} - \mu_{eff}\)) 
     &#34;&#34;&#34;
     if (nu is None):
-        nu = calculateEffectiveNrDensityOfNetwork(network, absTol, relTol)
+        nu = calculateEffectiveNrDensityOfNetwork(
+            network, absTol, relTol, junctionType)
     if (mu is None):
-        mu = calculateEffectiveNrDensityOfJunctions(network, absTol, relTol)
+        mu = calculateEffectiveNrDensityOfJunctions(
+            network, absTol, relTol, junctionType)
 
     return nu - mu</code></pre>
 </details>
 </dd>
 <dt id="pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveNrDensityOfJunctions"><code class="name flex">
-<span>def <span class="ident">calculateEffectiveNrDensityOfJunctions</span></span>(<span>network: <a title="pylimer_tools.entities.universum.Universum" href="../entities/universum.html#pylimer_tools.entities.universum.Universum">Universum</a>, absTol: float = 0, relTol: float = 0)</span>
+<span>def <span class="ident">calculateEffectiveNrDensityOfJunctions</span></span>(<span>network: <a title="pylimer_tools.entities.universum.Universum" href="../entities/universum.html#pylimer_tools.entities.universum.Universum">Universum</a>, absTol: float = 0, relTol: float = 0, junctionType=None, minNumEffectiveStrands=2)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Compute the number density of the elastically effective crosslinks,
+defined as the ones that connect at least two elastically effective strands </p>
+<pre><code>Arguments:
+  - network (pylimer_tools.entities.Universum): the network to compute \(
+</code></pre>
+<p>u_{eff}) for
+- absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
+- relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
+- junctionType: the atom type of the crosslinkers/junctions
+- minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such</p>
+<pre><code>Returns:
+  - \(\mu_{eff}\) (float): the effective number density of junctions
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def calculateEffectiveNrDensityOfJunctions(network: Universum, absTol: float = 0, relTol: float = 0):
+<pre><code class="python">def calculateEffectiveNrDensityOfJunctions(network: Universum, absTol: float = 0, relTol: float = 0, junctionType=None, minNumEffectiveStrands=2):
     &#34;&#34;&#34;
-    
+    Compute the number density of the elastically effective crosslinks, 
+    defined as the ones that connect at least two elastically effective strands 
+
+    Arguments:
+      - network (pylimer_tools.entities.Universum): the network to compute \(\nu_{eff}\) for
+      - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
+      - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
+      - junctionType: the atom type of the crosslinkers/junctions
+      - minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such
+
+    Returns:
+      - \(\mu_{eff}\) (float): the effective number density of junctions
     &#34;&#34;&#34;
-    pass</code></pre>
+    if (junctionType is None):
+        return 0.0
+    numEffectiveJunctions = 0
+    numIneffectiveJunctions = 0
+
+    graph = network.getUnderlyingGraph()
+    subgraphs = graph.decompose()
+    for subgraph in subgraphs:
+        # 1. find junctions
+        junctions = subgraph.vs.select(type_eq=junctionType)
+        for junction in junctions:
+            # some junctions are easily ineffective
+            if (junction.degree() &lt; minNumEffectiveStrands):
+                numIneffectiveJunctions += 1
+            else:
+                # 2. follow junction&#39;s strands to find those
+                vertexNeighbors = junction.neighbors()
+                for neighbor in vertexNeighbors:
+                    # follow each neighbor
+                    lastNeighbor = junction
+                    currentNeighbor = neighbor
+                    while(True):
+                        # follow as long as we do not find a junction
+                        nextNeighbors = currentNeighbor.neighbors()
+                        # : this is an assumption that makes this function simpler. Assume: only junctions have more than 2 connections
+                        assert(len(nextNeighbors) == 2)
+                        nextKey = 1 if nextNeighbors[0] == lastNeighbor else 0
+                        lastNeighbor = currentNeighbor
+                        currentNeighbor = nextNeighbors[nextKey]
+                        # found &#34;end&#34; of strand
+                        if (currentNeighbor[&#34;type&#34;] == junctionType):
+                            # 3. decide if strand is elastically effective
+                            Ree = currentNeighbor[&#34;atom&#34;].computeDistanceTo(
+                                junction[&#34;atom&#34;])
+                            if ((currentNeighbor != junction) and (Ree &gt; absTol)):
+                                numEffectiveJunctions += 1
+                            else:
+                                numIneffectiveJunctions += 1
+                            break
+                        # dangling chains are non-effective.
+                        if (currentNeighbor.degree() &lt; 2):
+                            numIneffectiveJunctions += 1
+                            break
+
+    return numEffectiveJunctions/(numEffectiveJunctions+numIneffectiveJunctions)</code></pre>
 </details>
 </dd>
 <dt id="pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveNrDensityOfNetwork"><code class="name flex">
-<span>def <span class="ident">calculateEffectiveNrDensityOfNetwork</span></span>(<span>network: <a title="pylimer_tools.entities.universum.Universum" href="../entities/universum.html#pylimer_tools.entities.universum.Universum">Universum</a>, absTol: float = 1, relTol: float = 1)</span>
+<span>def <span class="ident">calculateEffectiveNrDensityOfNetwork</span></span>(<span>network: <a title="pylimer_tools.entities.universum.Universum" href="../entities/universum.html#pylimer_tools.entities.universum.Universum">Universum</a>, absTol: float = 1, relTol: float = 1, junctionType=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Compute the effective number density <span><span class="MathJax_Preview">
@@ -185,12 +345,17 @@ upon network deformation, resp. the effective number density of network strands<
 </code></pre>
 <p>u_{eff}) for
 - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
-- relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</p></div>
+- relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
+- junctionType: the atom type of the crosslinkers/junctions</p>
+<pre><code>Returns:
+  - \(
+</code></pre>
+<p>u_{eff}) (float): the effective number density of network strands</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def calculateEffectiveNrDensityOfNetwork(network: Universum, absTol: float = 1, relTol: float = 1):
+<pre><code class="python">def calculateEffectiveNrDensityOfNetwork(network: Universum, absTol: float = 1, relTol: float = 1, junctionType=None):
     &#34;&#34;&#34;
     Compute the effective number density \(\nu_{eff}\) of a network
 
@@ -202,10 +367,14 @@ upon network deformation, resp. the effective number density of network strands<
       - network (pylimer_tools.entities.Universum): the network to compute \(\nu_{eff}\) for
       - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
       - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
+      - junctionType: the atom type of the crosslinkers/junctions
+
+    Returns:
+      - \(\nu_{eff}\) (float): the effective number density of network strands
     &#34;&#34;&#34;
     R_taus = []
     chainLengths = []
-    for molecule in network.getMolecules():
+    for molecule in network.getMolecules(junctionType):
         R_tau = molecule.computeEndToEndDistance()
         R_taus.append(R_tau)
         chainLengths.append(molecule.getLength())
