@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import igraph
 import numpy as np
 import pandas as pd
@@ -23,7 +25,7 @@ class Universum(GraphDecorator):
         self.underlying_graph = igraph.Graph(directed=False)
         self.boxSizes = boxSizes
 
-    def addAtomBondData(self, atomData: pd.DataFrame, bondData: pd.DataFrame):
+    def addAtomBondData(self, atomData: pd.DataFrame, bondData: pd.DataFrame) -> Universum:
         """
         Add atoms and bonds to the underlying graph.
 
@@ -53,7 +55,7 @@ class Universum(GraphDecorator):
 
         return self
 
-    def getMolecules(self, ignoreAtomType=None):
+    def getMolecules(self, ignoreAtomType=None) -> list[Molecule]:
         """
         Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms.
 
@@ -65,6 +67,7 @@ class Universum(GraphDecorator):
         """
         molecules = []
         subgraphs = self.underlying_graph.decompose()
+
         for subgraph in subgraphs:
             if (ignoreAtomType is None):
                 molecules.append(Molecule(subgraph))
@@ -94,18 +97,18 @@ class Universum(GraphDecorator):
             pass
         return None
 
-    def getAtomsWithType(self, type) -> list:
+    def getAtomsWithType(self, atomType) -> list[Atom]:
         """
         Find an atom by its type
 
         Arguments:
-          - type: the type of the atom
+          - atomType: the type of the atom
 
         Returns:
           - atoms (list<pylimer_tools.entities.Atom>): the Atom objects or None if it is not found
         """
         try:
-            vertices = self.underlying_graph.vs.select(type_eq=type)
+            vertices = self.underlying_graph.vs.select(type_eq=atomType)
             if (vertices is not None):
                 return [v["atom"] for v in vertices]
         except (ValueError, KeyError):
@@ -130,7 +133,7 @@ class Universum(GraphDecorator):
         """
         return self.underlying_graph.vcount()
 
-    def setBoxSizes(self, boxSizes: list):
+    def setBoxSizes(self, boxSizes: list) -> Universum:
         """
         Re-set this Universe's size.
 
@@ -143,7 +146,7 @@ class Universum(GraphDecorator):
         self.boxSizes = boxSizes
         return self
 
-    def reset(self):
+    def reset(self) -> Universum:
         """
         Reset this Universe to be empty again.
 
