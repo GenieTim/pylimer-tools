@@ -27,7 +27,8 @@
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">from typing import Iterable
+<pre><code class="python">from enum import Enum
+from typing import Iterable
 
 import numpy as np
 from pylimer_tools.entities._graphDecorator import GraphDecorator
@@ -36,8 +37,18 @@ from pylimer_tools.entities.atom import Atom
 
 class Molecule(GraphDecorator, Iterable):
 
-    def __init__(self, molecule_graph):
+    class MoleculeType(Enum):
+        UNDEFINED = 0
+        NETWORK_STRAND = 1
+        LOOP = 2
+        DANGLING_CHAIN = 3
+        FREE_CHAIN = 4
+
+    moleculeType = MoleculeType.UNDEFINED
+
+    def __init__(self, molecule_graph, chainType=MoleculeType.UNDEFINED):
         self.underlying_graph = molecule_graph
+        self.moleculeType = chainType
 
     def decomposeFurther(self, splitAtomType):
         &#34;&#34;&#34;
@@ -58,7 +69,8 @@ class Molecule(GraphDecorator, Iterable):
         subMolecules = []
         subgraphs = self.underlying_graph.decompose()
         for subgraph in subgraphs:
-            subMolecules.append(Molecule(subgraph))
+            subMolecules.append(
+                Molecule(subgraph, Molecule.MoleculeType.FREE_CHAIN))
         return subMolecules
 
     def computeEndToEndDistance(self):
@@ -104,6 +116,15 @@ class Molecule(GraphDecorator, Iterable):
           - len (int): the nr. of nodes (atoms) in this molecule
         &#34;&#34;&#34;
         return self.underlying_graph.vcount()
+
+    def getType(self) -&gt; MoleculeType:
+        &#34;&#34;&#34;
+        Query the type of the molecule/chain (loop, dangling, etc.)
+
+        Returns:
+          - moleculeType (MoleculeType): one of the enum&#39;s Molecule.MoleculeType...
+        &#34;&#34;&#34;
+        return self.moleculeType
 
     def __iter__(self):
         &#34;&#34;&#34;
@@ -130,7 +151,7 @@ class Molecule(GraphDecorator, Iterable):
 <dl>
 <dt id="pylimer_tools.entities.molecule.Molecule"><code class="flex name class">
 <span>class <span class="ident">Molecule</span></span>
-<span>(</span><span>molecule_graph)</span>
+<span>(</span><span>molecule_graph, chainType=MoleculeType.UNDEFINED)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Abstract base class for generic types.</p>
@@ -153,8 +174,18 @@ return default</p></div>
 </summary>
 <pre><code class="python">class Molecule(GraphDecorator, Iterable):
 
-    def __init__(self, molecule_graph):
+    class MoleculeType(Enum):
+        UNDEFINED = 0
+        NETWORK_STRAND = 1
+        LOOP = 2
+        DANGLING_CHAIN = 3
+        FREE_CHAIN = 4
+
+    moleculeType = MoleculeType.UNDEFINED
+
+    def __init__(self, molecule_graph, chainType=MoleculeType.UNDEFINED):
         self.underlying_graph = molecule_graph
+        self.moleculeType = chainType
 
     def decomposeFurther(self, splitAtomType):
         &#34;&#34;&#34;
@@ -175,7 +206,8 @@ return default</p></div>
         subMolecules = []
         subgraphs = self.underlying_graph.decompose()
         for subgraph in subgraphs:
-            subMolecules.append(Molecule(subgraph))
+            subMolecules.append(
+                Molecule(subgraph, Molecule.MoleculeType.FREE_CHAIN))
         return subMolecules
 
     def computeEndToEndDistance(self):
@@ -222,6 +254,15 @@ return default</p></div>
         &#34;&#34;&#34;
         return self.underlying_graph.vcount()
 
+    def getType(self) -&gt; MoleculeType:
+        &#34;&#34;&#34;
+        Query the type of the molecule/chain (loop, dangling, etc.)
+
+        Returns:
+          - moleculeType (MoleculeType): one of the enum&#39;s Molecule.MoleculeType...
+        &#34;&#34;&#34;
+        return self.moleculeType
+
     def __iter__(self):
         &#34;&#34;&#34;
         Decorator of the depth-first iterator of the underlying graph.
@@ -243,6 +284,14 @@ return default</p></div>
 </ul>
 <h3>Class variables</h3>
 <dl>
+<dt id="pylimer_tools.entities.molecule.Molecule.MoleculeType"><code class="name">var <span class="ident">MoleculeType</span></code></dt>
+<dd>
+<div class="desc"><p>An enumeration.</p></div>
+</dd>
+<dt id="pylimer_tools.entities.molecule.Molecule.moleculeType"><code class="name">var <span class="ident">moleculeType</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
 <dt id="pylimer_tools.entities.molecule.Molecule.underlying_graph"><code class="name">var <span class="ident">underlying_graph</span> : igraph.Graph</code></dt>
 <dd>
 <div class="desc"></div>
@@ -350,7 +399,8 @@ return default</p></div>
     subMolecules = []
     subgraphs = self.underlying_graph.decompose()
     for subgraph in subgraphs:
-        subMolecules.append(Molecule(subgraph))
+        subMolecules.append(
+            Molecule(subgraph, Molecule.MoleculeType.FREE_CHAIN))
     return subMolecules</code></pre>
 </details>
 </dd>
@@ -377,6 +427,29 @@ return default</p></div>
     return self.underlying_graph.vcount()</code></pre>
 </details>
 </dd>
+<dt id="pylimer_tools.entities.molecule.Molecule.getType"><code class="name flex">
+<span>def <span class="ident">getType</span></span>(<span>self) ‑> <a title="pylimer_tools.entities.molecule.Molecule.MoleculeType" href="#pylimer_tools.entities.molecule.Molecule.MoleculeType">Molecule.MoleculeType</a></span>
+</code></dt>
+<dd>
+<div class="desc"><p>Query the type of the molecule/chain (loop, dangling, etc.)</p>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>moleculeType (MoleculeType): one of the enum's Molecule.MoleculeType&hellip;</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def getType(self) -&gt; MoleculeType:
+    &#34;&#34;&#34;
+    Query the type of the molecule/chain (loop, dangling, etc.)
+
+    Returns:
+      - moleculeType (MoleculeType): one of the enum&#39;s Molecule.MoleculeType...
+    &#34;&#34;&#34;
+    return self.moleculeType</code></pre>
+</details>
+</dd>
 </dl>
 </dd>
 </dl>
@@ -398,10 +471,13 @@ return default</p></div>
 <li>
 <h4><code><a title="pylimer_tools.entities.molecule.Molecule" href="#pylimer_tools.entities.molecule.Molecule">Molecule</a></code></h4>
 <ul class="">
+<li><code><a title="pylimer_tools.entities.molecule.Molecule.MoleculeType" href="#pylimer_tools.entities.molecule.Molecule.MoleculeType">MoleculeType</a></code></li>
 <li><code><a title="pylimer_tools.entities.molecule.Molecule.computeBondLengths" href="#pylimer_tools.entities.molecule.Molecule.computeBondLengths">computeBondLengths</a></code></li>
 <li><code><a title="pylimer_tools.entities.molecule.Molecule.computeEndToEndDistance" href="#pylimer_tools.entities.molecule.Molecule.computeEndToEndDistance">computeEndToEndDistance</a></code></li>
 <li><code><a title="pylimer_tools.entities.molecule.Molecule.decomposeFurther" href="#pylimer_tools.entities.molecule.Molecule.decomposeFurther">decomposeFurther</a></code></li>
 <li><code><a title="pylimer_tools.entities.molecule.Molecule.getLength" href="#pylimer_tools.entities.molecule.Molecule.getLength">getLength</a></code></li>
+<li><code><a title="pylimer_tools.entities.molecule.Molecule.getType" href="#pylimer_tools.entities.molecule.Molecule.getType">getType</a></code></li>
+<li><code><a title="pylimer_tools.entities.molecule.Molecule.moleculeType" href="#pylimer_tools.entities.molecule.Molecule.moleculeType">moleculeType</a></code></li>
 <li><code><a title="pylimer_tools.entities.molecule.Molecule.underlying_graph" href="#pylimer_tools.entities.molecule.Molecule.underlying_graph">underlying_graph</a></code></li>
 </ul>
 </li>

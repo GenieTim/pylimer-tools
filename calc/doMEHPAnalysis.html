@@ -29,13 +29,17 @@
 </summary>
 <pre><code class="python"># source: https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262
 
+from collections import Counter
+
 import numpy as np
+from pylimer_tools.entities.molecule import Molecule
 from pylimer_tools.entities.universum import Universum
 
 
 def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None):
     &#34;&#34;&#34;
-    Compute the cycle rank (\(\chi\)) 
+    Compute the cycle rank (\(\chi\)).
+    Assumes the precursor-chains to be bifunctional.
 
     Arguments:
       - network: the network to calculate the cycle rank for
@@ -64,7 +68,8 @@ def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTo
 
 def calculateEffectiveNrDensityOfNetwork(network: Universum, absTol: float = 1, relTol: float = 1, junctionType=None):
     &#34;&#34;&#34;
-    Compute the effective number density \(\nu_{eff}\) of a network
+    Compute the effective number density \(\nu_{eff}\) of a network.
+    Assumes the precursor-chains to be bifunctional.
 
     \(\nu_{eff}\) is the number of elastically effective (active) strands per unit volume, 
     which are defined as the ones that can store elastic energy 
@@ -100,7 +105,8 @@ def calculateEffectiveNrDensityOfNetwork(network: Universum, absTol: float = 1, 
 def calculateEffectiveNrDensityOfJunctions(network: Universum, absTol: float = 0, relTol: float = 0, junctionType=None, minNumEffectiveStrands=2):
     &#34;&#34;&#34;
     Compute the number density of the elastically effective crosslinks, 
-    defined as the ones that connect at least two elastically effective strands 
+    defined as the ones that connect at least two elastically effective strands.
+    Assumes the precursor-chains to be bifunctional.
 
     Arguments:
       - network (pylimer_tools.entities.Universum): the network to compute \(\nu_{eff}\) for
@@ -159,15 +165,135 @@ def calculateEffectiveNrDensityOfJunctions(network: Universum, absTol: float = 0
     return numEffectiveJunctions/(numEffectiveJunctions+numIneffectiveJunctions)
 
 
+def calculateWeightFractionOfBackbone(network: Universum, crosslinkerType):
+    &#34;&#34;&#34;
+    Compute the weight fraction of network backbone in infinite network
+
+    Arguments:
+      - network: the network to compute the weight fraction for
+      - crosslinkerType: the atom type to use to split the molecules
+    &#34;&#34;&#34;
+    return 1 - calculateWeightFractionOfDanglingChains(network)
+
+
+def calculateWeightFractionOfDanglingChains(network: Universum, crosslinkerType, weights=1):
+    &#34;&#34;&#34;
+    Compute the weight fraction of dangling strands in infinite network
+
+    Arguments:
+      - network: the network to compute the weight fraction for
+      - crosslinkerType: the atom type to use to split the molecules
+      - weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight
+
+    Returns:
+      - weightFraction: weightDangling/weightTotal, 
+      - numFraction: numDangling/numTotal
+    &#34;&#34;&#34;
+    def getWeightOfGraph(graph):
+        counts = Counter(graph[&#34;type&#34;])
+        weightTotal = 0
+        for key in counts:
+            weightTotal += weights[key]*counts[key]
+        return weightTotal
+
+    allChains = network.getChainsWithCrosslinker(crosslinkerType)
+    numTotal = network.getSize()
+    weightTotal = numTotal
+    if (isinstance(weights, dict)):
+        weightTotal = getWeightOfGraph(network.getUnderlyingGraph())
+    if (type(weights) in (float, int)):
+        weightTotal = numTotal*weights
+
+    numDangling = 0
+    weightDangling = 0
+    for chain in allChains:
+        if (chain.getType() is Molecule.MoleculeType.DANGLING_CHAIN):
+            numDangling += chain.getLength()
+            weightDangling += getWeightOfGraph(chain.getUnderlyingGraph())
+
+    return weightDangling/weightTotal, numDangling/numTotal
+
+
+def predictGelationPoint(r: float, f: int, g: int = 2) -&gt; float:
+    &#34;&#34;&#34;
+    Compute the gelation point \(p_{gel}\) as theoretically predicted
+    (gelation point = critical extent of reaction for gelation)
+
+    Source:
+      - https://www.sciencedirect.com/science/article/pii/003238618990253X
+
+    Arguments:
+      - r: the stoichiometric inbalance of reactants
+      - f: functionality of the crosslinkers
+      - g: functionality of the precursor polymer
+
+    Returns:
+      - p_gel: critical extent of reaction for gelation
+    &#34;&#34;&#34;
+    # if (r is None):
+    #   r = calculateEffectiveCrosslinkerFunctionality(network, junctionType, f)
+    return 1/(r*(f-1)*(g-1))
+
+
+def computeCrosslinkerConversion(network: Universum, junctionType, f: int) -&gt; float:
+    &#34;&#34;&#34;
+    Compute the extent of reaction of the crosslinkers 
+    (actual functionality divided by target functionality)
+
+    Arguments:
+      - network: the poylmer network to do the computation for
+      - junctionType: the type of the junctions/crosslinkers to select them in the network
+      - f: the functionality of the crosslinkers
+
+    Returns:
+      - r (float): the (mean) crosslinker conversion
+    &#34;&#34;&#34;
+    return calculateEffectiveCrosslinkerFunctionality(network, junctionType) / f
+
+
+def calculateEffectiveCrosslinkerFunctionality(network: Universum, junctionType) -&gt; float:
+    &#34;&#34;&#34;
+    Compute the mean crosslinker functionality
+
+    Arguments:
+      - network: the poylmer network to do the computation for
+      - junctionType: the type of the junctions/crosslinkers to select them in the network
+
+    Returns:
+      - f (float): the (mean) effective crosslinker functionality
+    &#34;&#34;&#34;
+    junctionDegrees = calculateEffectiveCrosslinkerFunctionalities(
+        network, junctionType)
+    return np.mean(junctionDegrees)
+
+
+def calculateEffectiveCrosslinkerFunctionalities(network: Universum, junctionType):
+    &#34;&#34;&#34;
+    Compute the functionality of every crosslinker in the network
+
+    Arguments:
+      - network: the poylmer network to do the computation for
+      - junctionType: the type of the junctions/crosslinkers to select them in the network
+
+    Returns:
+      - junctionDegrees (list[int]): the functionality of every crosslinker
+    &#34;&#34;&#34;
+    junctions = network.vs.select(type_eq=junctionType)
+    junctionIds = [v.index for v in junctions]
+    junctionDegrees = network.degree(junctionIds, mode=&#34;all&#34;, loops=False)
+    return junctionDegrees
+
+
 def calculateTopologicalFactor(network: Universum, foreignAtomType=None, totalMass=1):
     &#34;&#34;&#34;
     Compute the topological factor of a polymer network.
+    Assumes the precursor-chains to be bifunctional.
 
     Source:
       - eq. 16 in https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262
 
     Arguments:
-      - network: the 
+      - network: the network to compute the topological factor for
       - foreignAtomType: the type of atoms to ignore
       - totalMass: the \(M\) in the respective formula
 
@@ -195,7 +321,8 @@ def calculateTopologicalFactor(network: Universum, foreignAtomType=None, totalMa
 <span>def <span class="ident">calculateCycleRank</span></span>(<span>network: <a title="pylimer_tools.entities.universum.Universum" href="../entities/universum.html#pylimer_tools.entities.universum.Universum">Universum</a>, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Compute the cycle rank ((\chi)) </p>
+<div class="desc"><p>Compute the cycle rank ((\chi)).
+Assumes the precursor-chains to be bifunctional.</p>
 <pre><code>Arguments:
   - network: the network to calculate the cycle rank for
   - nu: number of elastically effective (active) strands per unit volume
@@ -218,7 +345,8 @@ Returns:
 </summary>
 <pre><code class="python">def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None):
     &#34;&#34;&#34;
-    Compute the cycle rank (\(\chi\)) 
+    Compute the cycle rank (\(\chi\)).
+    Assumes the precursor-chains to be bifunctional.
 
     Arguments:
       - network: the network to calculate the cycle rank for
@@ -245,12 +373,82 @@ Returns:
     return nu - mu</code></pre>
 </details>
 </dd>
+<dt id="pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveCrosslinkerFunctionalities"><code class="name flex">
+<span>def <span class="ident">calculateEffectiveCrosslinkerFunctionalities</span></span>(<span>network: <a title="pylimer_tools.entities.universum.Universum" href="../entities/universum.html#pylimer_tools.entities.universum.Universum">Universum</a>, junctionType)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the functionality of every crosslinker in the network</p>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>network: the poylmer network to do the computation for</li>
+<li>junctionType: the type of the junctions/crosslinkers to select them in the network</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>junctionDegrees (list[int]): the functionality of every crosslinker</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calculateEffectiveCrosslinkerFunctionalities(network: Universum, junctionType):
+    &#34;&#34;&#34;
+    Compute the functionality of every crosslinker in the network
+
+    Arguments:
+      - network: the poylmer network to do the computation for
+      - junctionType: the type of the junctions/crosslinkers to select them in the network
+
+    Returns:
+      - junctionDegrees (list[int]): the functionality of every crosslinker
+    &#34;&#34;&#34;
+    junctions = network.vs.select(type_eq=junctionType)
+    junctionIds = [v.index for v in junctions]
+    junctionDegrees = network.degree(junctionIds, mode=&#34;all&#34;, loops=False)
+    return junctionDegrees</code></pre>
+</details>
+</dd>
+<dt id="pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveCrosslinkerFunctionality"><code class="name flex">
+<span>def <span class="ident">calculateEffectiveCrosslinkerFunctionality</span></span>(<span>network: <a title="pylimer_tools.entities.universum.Universum" href="../entities/universum.html#pylimer_tools.entities.universum.Universum">Universum</a>, junctionType) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the mean crosslinker functionality</p>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>network: the poylmer network to do the computation for</li>
+<li>junctionType: the type of the junctions/crosslinkers to select them in the network</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>f (float): the (mean) effective crosslinker functionality</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calculateEffectiveCrosslinkerFunctionality(network: Universum, junctionType) -&gt; float:
+    &#34;&#34;&#34;
+    Compute the mean crosslinker functionality
+
+    Arguments:
+      - network: the poylmer network to do the computation for
+      - junctionType: the type of the junctions/crosslinkers to select them in the network
+
+    Returns:
+      - f (float): the (mean) effective crosslinker functionality
+    &#34;&#34;&#34;
+    junctionDegrees = calculateEffectiveCrosslinkerFunctionalities(
+        network, junctionType)
+    return np.mean(junctionDegrees)</code></pre>
+</details>
+</dd>
 <dt id="pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveNrDensityOfJunctions"><code class="name flex">
 <span>def <span class="ident">calculateEffectiveNrDensityOfJunctions</span></span>(<span>network: <a title="pylimer_tools.entities.universum.Universum" href="../entities/universum.html#pylimer_tools.entities.universum.Universum">Universum</a>, absTol: float = 0, relTol: float = 0, junctionType=None, minNumEffectiveStrands=2)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Compute the number density of the elastically effective crosslinks,
-defined as the ones that connect at least two elastically effective strands </p>
+defined as the ones that connect at least two elastically effective strands.
+Assumes the precursor-chains to be bifunctional.</p>
 <pre><code>Arguments:
   - network (pylimer_tools.entities.Universum): the network to compute \(
 </code></pre>
@@ -269,7 +467,8 @@ defined as the ones that connect at least two elastically effective strands </p>
 <pre><code class="python">def calculateEffectiveNrDensityOfJunctions(network: Universum, absTol: float = 0, relTol: float = 0, junctionType=None, minNumEffectiveStrands=2):
     &#34;&#34;&#34;
     Compute the number density of the elastically effective crosslinks, 
-    defined as the ones that connect at least two elastically effective strands 
+    defined as the ones that connect at least two elastically effective strands.
+    Assumes the precursor-chains to be bifunctional.
 
     Arguments:
       - network (pylimer_tools.entities.Universum): the network to compute \(\nu_{eff}\) for
@@ -334,7 +533,8 @@ defined as the ones that connect at least two elastically effective strands </p>
 <dd>
 <div class="desc"><p>Compute the effective number density <span><span class="MathJax_Preview">
 u_{eff}</span><script type="math/tex">
-u_{eff}</script></span> of a network</p>
+u_{eff}</script></span> of a network.
+Assumes the precursor-chains to be bifunctional.</p>
 <pre><code>\(
 </code></pre>
 <p>u_{eff}) is the number of elastically effective (active) strands per unit volume,
@@ -357,7 +557,8 @@ upon network deformation, resp. the effective number density of network strands<
 </summary>
 <pre><code class="python">def calculateEffectiveNrDensityOfNetwork(network: Universum, absTol: float = 1, relTol: float = 1, junctionType=None):
     &#34;&#34;&#34;
-    Compute the effective number density \(\nu_{eff}\) of a network
+    Compute the effective number density \(\nu_{eff}\) of a network.
+    Assumes the precursor-chains to be bifunctional.
 
     \(\nu_{eff}\) is the number of elastically effective (active) strands per unit volume, 
     which are defined as the ones that can store elastic energy 
@@ -394,14 +595,15 @@ upon network deformation, resp. the effective number density of network strands<
 <span>def <span class="ident">calculateTopologicalFactor</span></span>(<span>network: <a title="pylimer_tools.entities.universum.Universum" href="../entities/universum.html#pylimer_tools.entities.universum.Universum">Universum</a>, foreignAtomType=None, totalMass=1)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Compute the topological factor of a polymer network.</p>
+<div class="desc"><p>Compute the topological factor of a polymer network.
+Assumes the precursor-chains to be bifunctional.</p>
 <h2 id="source">Source</h2>
 <ul>
 <li>eq. 16 in <a href="https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262">https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</a></li>
 </ul>
 <h2 id="arguments">Arguments</h2>
 <ul>
-<li>network: the </li>
+<li>network: the network to compute the topological factor for</li>
 <li>foreignAtomType: the type of atoms to ignore</li>
 <li>totalMass: the <span><span class="MathJax_Preview">M</span><script type="math/tex">M</script></span> in the respective formula</li>
 </ul>
@@ -416,12 +618,13 @@ upon network deformation, resp. the effective number density of network strands<
 <pre><code class="python">def calculateTopologicalFactor(network: Universum, foreignAtomType=None, totalMass=1):
     &#34;&#34;&#34;
     Compute the topological factor of a polymer network.
+    Assumes the precursor-chains to be bifunctional.
 
     Source:
       - eq. 16 in https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262
 
     Arguments:
-      - network: the 
+      - network: the network to compute the topological factor for
       - foreignAtomType: the type of atoms to ignore
       - totalMass: the \(M\) in the respective formula
 
@@ -436,6 +639,170 @@ upon network deformation, resp. the effective number density of network strands<
         Gamma_sum += R_tau*R_tau / (molecule.getLength() * b * b)
 
     return Gamma_sum / totalMass</code></pre>
+</details>
+</dd>
+<dt id="pylimer_tools.calc.doMEHPAnalysis.calculateWeightFractionOfBackbone"><code class="name flex">
+<span>def <span class="ident">calculateWeightFractionOfBackbone</span></span>(<span>network: <a title="pylimer_tools.entities.universum.Universum" href="../entities/universum.html#pylimer_tools.entities.universum.Universum">Universum</a>, crosslinkerType)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the weight fraction of network backbone in infinite network</p>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>network: the network to compute the weight fraction for</li>
+<li>crosslinkerType: the atom type to use to split the molecules</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calculateWeightFractionOfBackbone(network: Universum, crosslinkerType):
+    &#34;&#34;&#34;
+    Compute the weight fraction of network backbone in infinite network
+
+    Arguments:
+      - network: the network to compute the weight fraction for
+      - crosslinkerType: the atom type to use to split the molecules
+    &#34;&#34;&#34;
+    return 1 - calculateWeightFractionOfDanglingChains(network)</code></pre>
+</details>
+</dd>
+<dt id="pylimer_tools.calc.doMEHPAnalysis.calculateWeightFractionOfDanglingChains"><code class="name flex">
+<span>def <span class="ident">calculateWeightFractionOfDanglingChains</span></span>(<span>network: <a title="pylimer_tools.entities.universum.Universum" href="../entities/universum.html#pylimer_tools.entities.universum.Universum">Universum</a>, crosslinkerType, weights=1)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the weight fraction of dangling strands in infinite network</p>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>network: the network to compute the weight fraction for</li>
+<li>crosslinkerType: the atom type to use to split the molecules</li>
+<li>weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>weightFraction: weightDangling/weightTotal, </li>
+<li>numFraction: numDangling/numTotal</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def calculateWeightFractionOfDanglingChains(network: Universum, crosslinkerType, weights=1):
+    &#34;&#34;&#34;
+    Compute the weight fraction of dangling strands in infinite network
+
+    Arguments:
+      - network: the network to compute the weight fraction for
+      - crosslinkerType: the atom type to use to split the molecules
+      - weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight
+
+    Returns:
+      - weightFraction: weightDangling/weightTotal, 
+      - numFraction: numDangling/numTotal
+    &#34;&#34;&#34;
+    def getWeightOfGraph(graph):
+        counts = Counter(graph[&#34;type&#34;])
+        weightTotal = 0
+        for key in counts:
+            weightTotal += weights[key]*counts[key]
+        return weightTotal
+
+    allChains = network.getChainsWithCrosslinker(crosslinkerType)
+    numTotal = network.getSize()
+    weightTotal = numTotal
+    if (isinstance(weights, dict)):
+        weightTotal = getWeightOfGraph(network.getUnderlyingGraph())
+    if (type(weights) in (float, int)):
+        weightTotal = numTotal*weights
+
+    numDangling = 0
+    weightDangling = 0
+    for chain in allChains:
+        if (chain.getType() is Molecule.MoleculeType.DANGLING_CHAIN):
+            numDangling += chain.getLength()
+            weightDangling += getWeightOfGraph(chain.getUnderlyingGraph())
+
+    return weightDangling/weightTotal, numDangling/numTotal</code></pre>
+</details>
+</dd>
+<dt id="pylimer_tools.calc.doMEHPAnalysis.computeCrosslinkerConversion"><code class="name flex">
+<span>def <span class="ident">computeCrosslinkerConversion</span></span>(<span>network: <a title="pylimer_tools.entities.universum.Universum" href="../entities/universum.html#pylimer_tools.entities.universum.Universum">Universum</a>, junctionType, f: int) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the extent of reaction of the crosslinkers
+(actual functionality divided by target functionality)</p>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>network: the poylmer network to do the computation for</li>
+<li>junctionType: the type of the junctions/crosslinkers to select them in the network</li>
+<li>f: the functionality of the crosslinkers</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>r (float): the (mean) crosslinker conversion</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def computeCrosslinkerConversion(network: Universum, junctionType, f: int) -&gt; float:
+    &#34;&#34;&#34;
+    Compute the extent of reaction of the crosslinkers 
+    (actual functionality divided by target functionality)
+
+    Arguments:
+      - network: the poylmer network to do the computation for
+      - junctionType: the type of the junctions/crosslinkers to select them in the network
+      - f: the functionality of the crosslinkers
+
+    Returns:
+      - r (float): the (mean) crosslinker conversion
+    &#34;&#34;&#34;
+    return calculateEffectiveCrosslinkerFunctionality(network, junctionType) / f</code></pre>
+</details>
+</dd>
+<dt id="pylimer_tools.calc.doMEHPAnalysis.predictGelationPoint"><code class="name flex">
+<span>def <span class="ident">predictGelationPoint</span></span>(<span>r: float, f: int, g: int = 2) ‑> float</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Compute the gelation point <span><span class="MathJax_Preview">p_{gel}</span><script type="math/tex">p_{gel}</script></span> as theoretically predicted
+(gelation point = critical extent of reaction for gelation)</p>
+<h2 id="source">Source</h2>
+<ul>
+<li><a href="https://www.sciencedirect.com/science/article/pii/003238618990253X">https://www.sciencedirect.com/science/article/pii/003238618990253X</a></li>
+</ul>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>r: the stoichiometric inbalance of reactants</li>
+<li>f: functionality of the crosslinkers</li>
+<li>g: functionality of the precursor polymer</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>p_gel: critical extent of reaction for gelation</li>
+</ul></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def predictGelationPoint(r: float, f: int, g: int = 2) -&gt; float:
+    &#34;&#34;&#34;
+    Compute the gelation point \(p_{gel}\) as theoretically predicted
+    (gelation point = critical extent of reaction for gelation)
+
+    Source:
+      - https://www.sciencedirect.com/science/article/pii/003238618990253X
+
+    Arguments:
+      - r: the stoichiometric inbalance of reactants
+      - f: functionality of the crosslinkers
+      - g: functionality of the precursor polymer
+
+    Returns:
+      - p_gel: critical extent of reaction for gelation
+    &#34;&#34;&#34;
+    # if (r is None):
+    #   r = calculateEffectiveCrosslinkerFunctionality(network, junctionType, f)
+    return 1/(r*(f-1)*(g-1))</code></pre>
 </details>
 </dd>
 </dl>
@@ -457,9 +824,15 @@ upon network deformation, resp. the effective number density of network strands<
 <li><h3><a href="#header-functions">Functions</a></h3>
 <ul class="">
 <li><code><a title="pylimer_tools.calc.doMEHPAnalysis.calculateCycleRank" href="#pylimer_tools.calc.doMEHPAnalysis.calculateCycleRank">calculateCycleRank</a></code></li>
+<li><code><a title="pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveCrosslinkerFunctionalities" href="#pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveCrosslinkerFunctionalities">calculateEffectiveCrosslinkerFunctionalities</a></code></li>
+<li><code><a title="pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveCrosslinkerFunctionality" href="#pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveCrosslinkerFunctionality">calculateEffectiveCrosslinkerFunctionality</a></code></li>
 <li><code><a title="pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveNrDensityOfJunctions" href="#pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveNrDensityOfJunctions">calculateEffectiveNrDensityOfJunctions</a></code></li>
 <li><code><a title="pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveNrDensityOfNetwork" href="#pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveNrDensityOfNetwork">calculateEffectiveNrDensityOfNetwork</a></code></li>
 <li><code><a title="pylimer_tools.calc.doMEHPAnalysis.calculateTopologicalFactor" href="#pylimer_tools.calc.doMEHPAnalysis.calculateTopologicalFactor">calculateTopologicalFactor</a></code></li>
+<li><code><a title="pylimer_tools.calc.doMEHPAnalysis.calculateWeightFractionOfBackbone" href="#pylimer_tools.calc.doMEHPAnalysis.calculateWeightFractionOfBackbone">calculateWeightFractionOfBackbone</a></code></li>
+<li><code><a title="pylimer_tools.calc.doMEHPAnalysis.calculateWeightFractionOfDanglingChains" href="#pylimer_tools.calc.doMEHPAnalysis.calculateWeightFractionOfDanglingChains">calculateWeightFractionOfDanglingChains</a></code></li>
+<li><code><a title="pylimer_tools.calc.doMEHPAnalysis.computeCrosslinkerConversion" href="#pylimer_tools.calc.doMEHPAnalysis.computeCrosslinkerConversion">computeCrosslinkerConversion</a></code></li>
+<li><code><a title="pylimer_tools.calc.doMEHPAnalysis.predictGelationPoint" href="#pylimer_tools.calc.doMEHPAnalysis.predictGelationPoint">predictGelationPoint</a></code></li>
 </ul>
 </li>
 </ul>
