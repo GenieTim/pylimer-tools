@@ -1,4 +1,5 @@
 
+from enum import Enum
 from typing import Iterable
 
 import numpy as np
@@ -8,8 +9,18 @@ from pylimer_tools.entities.atom import Atom
 
 class Molecule(GraphDecorator, Iterable):
 
-    def __init__(self, molecule_graph):
+    class MoleculeType(Enum):
+        UNDEFINED = 0
+        NETWORK_STRAND = 1
+        LOOP = 2
+        DANGLING_CHAIN = 3
+        FREE_CHAIN = 4
+
+    moleculeType = MoleculeType.UNDEFINED
+
+    def __init__(self, molecule_graph, chainType=MoleculeType.UNDEFINED):
         self.underlying_graph = molecule_graph
+        self.moleculeType = chainType
 
     def decomposeFurther(self, splitAtomType):
         """
@@ -30,7 +41,8 @@ class Molecule(GraphDecorator, Iterable):
         subMolecules = []
         subgraphs = self.underlying_graph.decompose()
         for subgraph in subgraphs:
-            subMolecules.append(Molecule(subgraph))
+            subMolecules.append(
+                Molecule(subgraph, Molecule.MoleculeType.FREE_CHAIN))
         return subMolecules
 
     def computeEndToEndDistance(self):
@@ -76,6 +88,15 @@ class Molecule(GraphDecorator, Iterable):
           - len (int): the nr. of nodes (atoms) in this molecule
         """
         return self.underlying_graph.vcount()
+
+    def getType(self) -> MoleculeType:
+        """
+        Query the type of the molecule/chain (loop, dangling, etc.)
+
+        Returns:
+          - moleculeType (MoleculeType): one of the enum's Molecule.MoleculeType...
+        """
+        return self.moleculeType
 
     def __iter__(self):
         """

@@ -78,6 +78,65 @@ class Universum(GraphDecorator):
 
         return molecules
 
+    def getChainsWithCrosslinker(self, crosslinkerType) -> list[Molecule]:
+        """
+        Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms, without omitting the crosslinkers.
+        In turn, e.g. for a tetrafunctional crosslinker, it will be 4 times in the resulting molecules
+
+        Arguments:
+          - crosslinkerType: the atom type to use to split the molecules
+
+        Returns:
+          - molecules (list): a list of Molecule objects
+        """
+        graph_without_crosslinkers = self.underlying_graph.copy()
+        crosslinkerVertices = graph_without_crosslinkers.vs.select(
+            type_eq=crosslinkerType)
+        graph_without_crosslinkers.delete_vertices(
+            [v.index for v in crosslinkerVertices])
+
+        subgraphs = graph_without_crosslinkers.decompose()
+        chains = []
+        for chain in subgraphs:
+            # find ends of chain
+            endNodes = self.underlying_graph.vs.select(_degree_eq=1)
+            assert(len(endNodes) == 2)
+            moleculeLengthBefore = chain.vcount()
+            strandType = Molecule.MoleculeType.UNDEFINED
+            isLoop = False
+
+            for endNode in endNodes:
+                # find matching crosslinker
+                endNodeConnected = self.underlying_graph.vs.select(
+                    name_eq=endNode.name)
+                neighbors = endNodeConnected.neighbors()
+                for neighbor in neighbors:
+                    if (neighbor["type"] == crosslinkerType):
+                        # check for existance of this crosslinker in the chain to find loops
+                        if (chain.vs.select(name_eq=neighbor.name)):
+                            isLoop = True
+                            neighbor.name = neighbor.name + "_2"
+                        # add crosslinker to chain
+                        chain.add_vertices([neighbor.name],
+                                           {
+                            "type": neighbor["type"],
+                            "atom": neighbor["atom"]
+                        })
+                        chain.add_edges([(endNode.name, neighbor.name)])
+
+            if (chain.vcount() == moleculeLengthBefore):
+                strandType = Molecule.MoleculeType.FREE_CHAIN
+            if (chain.vcount() == moleculeLengthBefore+1):
+                strandType = Molecule.MoleculeType.DANGLING_CHAIN
+            if (chain.vcount() == moleculeLengthBefore+2):
+                strandType = Molecule.MoleculeType.NETWORK_STRAND
+            if (isLoop):
+                strandType = Molecule.MoleculeType.LOOP
+            # prepare for return
+            chains.append(Molecule(chain, chainType=strandType))
+
+        return chains
+
     def getAtom(self, atomId: int) -> Atom:
         """
         Find an atom by its ID
