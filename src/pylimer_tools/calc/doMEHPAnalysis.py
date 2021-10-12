@@ -9,7 +9,7 @@ from pylimer_tools.entities.universum import Universum
 
 def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None):
     """
-    Compute the cycle rank (\(\chi\)).
+    Compute the cycle rank ($\\chi$).
     Assumes the precursor-chains to be bifunctional.
 
     Arguments:
@@ -25,7 +25,7 @@ def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTo
     - network, absTol, relTol, junctionType
 
     Returns:
-      - cycleRank: the cycle rank ((\chi = \nu_{eff} - \mu_{eff}\)) 
+      - cycleRank: the cycle rank ($\\chi = \\nu_{eff} - \\mu_{eff}$) 
     """
     if (nu is None):
         nu = calculateEffectiveNrDensityOfNetwork(
@@ -39,21 +39,21 @@ def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTo
 
 def calculateEffectiveNrDensityOfNetwork(network: Universum, absTol: float = 1, relTol: float = 1, junctionType=None):
     """
-    Compute the effective number density \(\nu_{eff}\) of a network.
+    Compute the effective number density $\\nu_{eff}$ of a network.
     Assumes the precursor-chains to be bifunctional.
 
-    \(\nu_{eff}\) is the number of elastically effective (active) strands per unit volume, 
+    $\\nu_{eff}$ is the number of elastically effective (active) strands per unit volume, 
     which are defined as the ones that can store elastic energy 
     upon network deformation, resp. the effective number density of network strands
 
     Arguments:
-      - network (pylimer_tools.entities.Universum): the network to compute \(\nu_{eff}\) for
+      - network (pylimer_tools.entities.Universum): the network to compute $\\nu_{eff}$ for
       - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
       - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
       - junctionType: the atom type of the crosslinkers/junctions
 
     Returns:
-      - \(\nu_{eff}\) (float): the effective number density of network strands
+      - $\\nu_{eff}$ (float): the effective number density of network strands
     """
     R_taus = []
     chainLengths = []
@@ -80,14 +80,14 @@ def calculateEffectiveNrDensityOfJunctions(network: Universum, absTol: float = 0
     Assumes the precursor-chains to be bifunctional.
 
     Arguments:
-      - network (pylimer_tools.entities.Universum): the network to compute \(\nu_{eff}\) for
+      - network (pylimer_tools.entities.Universum): the network to compute $\\nu_{eff}$ for
       - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
       - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
       - junctionType: the atom type of the crosslinkers/junctions
       - minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such
 
     Returns:
-      - \(\mu_{eff}\) (float): the effective number density of junctions
+      - $\\mu_{eff}$ (float): the effective number density of junctions
     """
     if (junctionType is None):
         return 0.0
@@ -187,7 +187,7 @@ def calculateWeightFractionOfDanglingChains(network: Universum, crosslinkerType,
 
 def predictGelationPoint(r: float, f: int, g: int = 2) -> float:
     """
-    Compute the gelation point \(p_{gel}\) as theoretically predicted
+    Compute the gelation point $p_{gel}$ as theoretically predicted
     (gelation point = critical extent of reaction for gelation)
 
     Source:
@@ -266,10 +266,10 @@ def calculateTopologicalFactor(network: Universum, foreignAtomType=None, totalMa
     Arguments:
       - network: the network to compute the topological factor for
       - foreignAtomType: the type of atoms to ignore
-      - totalMass: the \(M\) in the respective formula
+      - totalMass: the $M$ in the respective formula
 
     Returns:
-      - the topological factor \(\Gamma\)
+      - the topological factor $\\Gamma$
     """
     molecules = network.getMolecules(ignoreAtomType=foreignAtomType)
     Gamma_sum = 0

@@ -50,7 +50,7 @@ class Molecule(GraphDecorator, Iterable):
         Compute the end-to-end distance of this molecule/chain.
 
         Returns:
-          - \(R_ee\) (float): the end-to-end distance, 
+          - $R_ee$ (float): the end-to-end distance, 
               `None` if the molecule/chain does not have two distinct ends.
         """
         if (self.underlying_graph.vcount() < 2):

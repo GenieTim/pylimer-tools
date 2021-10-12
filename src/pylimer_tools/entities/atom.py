@@ -89,5 +89,11 @@ class Atom:
             secondAtom), self.getDeltaZ(secondAtom)
         ])
 
-    def getUnderlyingData(self):
+    def getUnderlyingData(self) -> pd.Series:
+        """
+        Auxilary method to get the pd.Series data associated with this atom
+
+        Returns:
+          - data (pd.Series): the data as given to this atom upon instantiation
+        """
         return self.data
