@@ -118,7 +118,13 @@ class Atom:
             secondAtom), self.getDeltaZ(secondAtom)
         ])
 
-    def getUnderlyingData(self):
+    def getUnderlyingData(self) -&gt; pd.Series:
+        &#34;&#34;&#34;
+        Auxilary method to get the pd.Series data associated with this atom
+
+        Returns:
+          - data (pd.Series): the data as given to this atom upon instantiation
+        &#34;&#34;&#34;
         return self.data</code></pre>
 </details>
 </section>
@@ -231,7 +237,13 @@ class Atom:
             secondAtom), self.getDeltaZ(secondAtom)
         ])
 
-    def getUnderlyingData(self):
+    def getUnderlyingData(self) -&gt; pd.Series:
+        &#34;&#34;&#34;
+        Auxilary method to get the pd.Series data associated with this atom
+
+        Returns:
+          - data (pd.Series): the data as given to this atom upon instantiation
+        &#34;&#34;&#34;
         return self.data</code></pre>
 </details>
 <h3>Methods</h3>
@@ -365,15 +377,25 @@ accounting for periodic displacements.</p>
 </details>
 </dd>
 <dt id="pylimer_tools.entities.atom.Atom.getUnderlyingData"><code class="name flex">
-<span>def <span class="ident">getUnderlyingData</span></span>(<span>self)</span>
+<span>def <span class="ident">getUnderlyingData</span></span>(<span>self) ‑> pandas.core.series.Series</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Auxilary method to get the pd.Series data associated with this atom</p>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>data (pd.Series): the data as given to this atom upon instantiation</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def getUnderlyingData(self):
+<pre><code class="python">def getUnderlyingData(self) -&gt; pd.Series:
+    &#34;&#34;&#34;
+    Auxilary method to get the pd.Series data associated with this atom
+
+    Returns:
+      - data (pd.Series): the data as given to this atom upon instantiation
+    &#34;&#34;&#34;
     return self.data</code></pre>
 </details>
 </dd>

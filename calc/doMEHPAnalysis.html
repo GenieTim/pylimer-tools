@@ -38,7 +38,7 @@ from pylimer_tools.entities.universum import Universum
 
 def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None):
     &#34;&#34;&#34;
-    Compute the cycle rank (\(\chi\)).
+    Compute the cycle rank ($\\chi$).
     Assumes the precursor-chains to be bifunctional.
 
     Arguments:
@@ -54,7 +54,7 @@ def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTo
     - network, absTol, relTol, junctionType
 
     Returns:
-      - cycleRank: the cycle rank ((\chi = \nu_{eff} - \mu_{eff}\)) 
+      - cycleRank: the cycle rank ($\\chi = \\nu_{eff} - \\mu_{eff}$) 
     &#34;&#34;&#34;
     if (nu is None):
         nu = calculateEffectiveNrDensityOfNetwork(
@@ -68,21 +68,21 @@ def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTo
 
 def calculateEffectiveNrDensityOfNetwork(network: Universum, absTol: float = 1, relTol: float = 1, junctionType=None):
     &#34;&#34;&#34;
-    Compute the effective number density \(\nu_{eff}\) of a network.
+    Compute the effective number density $\\nu_{eff}$ of a network.
     Assumes the precursor-chains to be bifunctional.
 
-    \(\nu_{eff}\) is the number of elastically effective (active) strands per unit volume, 
+    $\\nu_{eff}$ is the number of elastically effective (active) strands per unit volume, 
     which are defined as the ones that can store elastic energy 
     upon network deformation, resp. the effective number density of network strands
 
     Arguments:
-      - network (pylimer_tools.entities.Universum): the network to compute \(\nu_{eff}\) for
+      - network (pylimer_tools.entities.Universum): the network to compute $\\nu_{eff}$ for
       - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
       - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
       - junctionType: the atom type of the crosslinkers/junctions
 
     Returns:
-      - \(\nu_{eff}\) (float): the effective number density of network strands
+      - $\\nu_{eff}$ (float): the effective number density of network strands
     &#34;&#34;&#34;
     R_taus = []
     chainLengths = []
@@ -109,14 +109,14 @@ def calculateEffectiveNrDensityOfJunctions(network: Universum, absTol: float = 0
     Assumes the precursor-chains to be bifunctional.
 
     Arguments:
-      - network (pylimer_tools.entities.Universum): the network to compute \(\nu_{eff}\) for
+      - network (pylimer_tools.entities.Universum): the network to compute $\\nu_{eff}$ for
       - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
       - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
       - junctionType: the atom type of the crosslinkers/junctions
       - minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such
 
     Returns:
-      - \(\mu_{eff}\) (float): the effective number density of junctions
+      - $\\mu_{eff}$ (float): the effective number density of junctions
     &#34;&#34;&#34;
     if (junctionType is None):
         return 0.0
@@ -216,7 +216,7 @@ def calculateWeightFractionOfDanglingChains(network: Universum, crosslinkerType,
 
 def predictGelationPoint(r: float, f: int, g: int = 2) -&gt; float:
     &#34;&#34;&#34;
-    Compute the gelation point \(p_{gel}\) as theoretically predicted
+    Compute the gelation point $p_{gel}$ as theoretically predicted
     (gelation point = critical extent of reaction for gelation)
 
     Source:
@@ -295,10 +295,10 @@ def calculateTopologicalFactor(network: Universum, foreignAtomType=None, totalMa
     Arguments:
       - network: the network to compute the topological factor for
       - foreignAtomType: the type of atoms to ignore
-      - totalMass: the \(M\) in the respective formula
+      - totalMass: the $M$ in the respective formula
 
     Returns:
-      - the topological factor \(\Gamma\)
+      - the topological factor $\\Gamma$
     &#34;&#34;&#34;
     molecules = network.getMolecules(ignoreAtomType=foreignAtomType)
     Gamma_sum = 0
@@ -321,31 +321,31 @@ def calculateTopologicalFactor(network: Universum, foreignAtomType=None, totalMa
 <span>def <span class="ident">calculateCycleRank</span></span>(<span>network: <a title="pylimer_tools.entities.universum.Universum" href="../entities/universum.html#pylimer_tools.entities.universum.Universum">Universum</a>, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Compute the cycle rank ((\chi)).
+<div class="desc"><p>Compute the cycle rank ($\chi$).
 Assumes the precursor-chains to be bifunctional.</p>
-<pre><code>Arguments:
-  - network: the network to calculate the cycle rank for
-  - nu: number of elastically effective (active) strands per unit volume
-  - mu: number density of the elastically effective crosslink
-  - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
-  - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
-  - junctionType: the atom type of the crosslinkers/junctions
-
-No need to provide all the parameters — either/or: 
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>network: the network to calculate the cycle rank for</li>
+<li>nu: number of elastically effective (active) strands per unit volume</li>
+<li>mu: number density of the elastically effective crosslink</li>
+<li>absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</li>
+<li>relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</li>
+<li>junctionType: the atom type of the crosslinkers/junctions</li>
+</ul>
+<p>No need to provide all the parameters — either/or:
 - nu &amp; mu
-- network, absTol, relTol, junctionType
-
-Returns:
-  - cycleRank: the cycle rank ((\chi =
-</code></pre>
-<p>u_{eff} - \mu_{eff}))</p></div>
+- network, absTol, relTol, junctionType</p>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>cycleRank: the cycle rank ($\chi = \nu_{eff} - \mu_{eff}$)</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None):
     &#34;&#34;&#34;
-    Compute the cycle rank (\(\chi\)).
+    Compute the cycle rank ($\\chi$).
     Assumes the precursor-chains to be bifunctional.
 
     Arguments:
@@ -361,7 +361,7 @@ Returns:
     - network, absTol, relTol, junctionType
 
     Returns:
-      - cycleRank: the cycle rank ((\chi = \nu_{eff} - \mu_{eff}\)) 
+      - cycleRank: the cycle rank ($\\chi = \\nu_{eff} - \\mu_{eff}$) 
     &#34;&#34;&#34;
     if (nu is None):
         nu = calculateEffectiveNrDensityOfNetwork(
@@ -449,17 +449,18 @@ Returns:
 <div class="desc"><p>Compute the number density of the elastically effective crosslinks,
 defined as the ones that connect at least two elastically effective strands.
 Assumes the precursor-chains to be bifunctional.</p>
-<pre><code>Arguments:
-  - network (pylimer_tools.entities.Universum): the network to compute \(
-</code></pre>
-<p>u_{eff}) for
-- absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
-- relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
-- junctionType: the atom type of the crosslinkers/junctions
-- minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such</p>
-<pre><code>Returns:
-  - \(\mu_{eff}\) (float): the effective number density of junctions
-</code></pre></div>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>network (pylimer_tools.entities.Universum): the network to compute $\nu_{eff}$ for</li>
+<li>absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</li>
+<li>relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</li>
+<li>junctionType: the atom type of the crosslinkers/junctions</li>
+<li>minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>$\mu_{eff}$ (float): the effective number density of junctions</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -471,14 +472,14 @@ Assumes the precursor-chains to be bifunctional.</p>
     Assumes the precursor-chains to be bifunctional.
 
     Arguments:
-      - network (pylimer_tools.entities.Universum): the network to compute \(\nu_{eff}\) for
+      - network (pylimer_tools.entities.Universum): the network to compute $\\nu_{eff}$ for
       - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
       - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
       - junctionType: the atom type of the crosslinkers/junctions
       - minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such
 
     Returns:
-      - \(\mu_{eff}\) (float): the effective number density of junctions
+      - $\\mu_{eff}$ (float): the effective number density of junctions
     &#34;&#34;&#34;
     if (junctionType is None):
         return 0.0
@@ -531,47 +532,43 @@ Assumes the precursor-chains to be bifunctional.</p>
 <span>def <span class="ident">calculateEffectiveNrDensityOfNetwork</span></span>(<span>network: <a title="pylimer_tools.entities.universum.Universum" href="../entities/universum.html#pylimer_tools.entities.universum.Universum">Universum</a>, absTol: float = 1, relTol: float = 1, junctionType=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Compute the effective number density <span><span class="MathJax_Preview">
-u_{eff}</span><script type="math/tex">
-u_{eff}</script></span> of a network.
+<div class="desc"><p>Compute the effective number density $\nu_{eff}$ of a network.
 Assumes the precursor-chains to be bifunctional.</p>
-<pre><code>\(
-</code></pre>
-<p>u_{eff}) is the number of elastically effective (active) strands per unit volume,
+<p>$\nu_{eff}$ is the number of elastically effective (active) strands per unit volume,
 which are defined as the ones that can store elastic energy
 upon network deformation, resp. the effective number density of network strands</p>
-<pre><code>Arguments:
-  - network (pylimer_tools.entities.Universum): the network to compute \(
-</code></pre>
-<p>u_{eff}) for
-- absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
-- relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
-- junctionType: the atom type of the crosslinkers/junctions</p>
-<pre><code>Returns:
-  - \(
-</code></pre>
-<p>u_{eff}) (float): the effective number density of network strands</p></div>
+<h2 id="arguments">Arguments</h2>
+<ul>
+<li>network (pylimer_tools.entities.Universum): the network to compute $\nu_{eff}$ for</li>
+<li>absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</li>
+<li>relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</li>
+<li>junctionType: the atom type of the crosslinkers/junctions</li>
+</ul>
+<h2 id="returns">Returns</h2>
+<ul>
+<li>$\nu_{eff}$ (float): the effective number density of network strands</li>
+</ul></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def calculateEffectiveNrDensityOfNetwork(network: Universum, absTol: float = 1, relTol: float = 1, junctionType=None):
     &#34;&#34;&#34;
-    Compute the effective number density \(\nu_{eff}\) of a network.
+    Compute the effective number density $\\nu_{eff}$ of a network.
     Assumes the precursor-chains to be bifunctional.
 
-    \(\nu_{eff}\) is the number of elastically effective (active) strands per unit volume, 
+    $\\nu_{eff}$ is the number of elastically effective (active) strands per unit volume, 
     which are defined as the ones that can store elastic energy 
     upon network deformation, resp. the effective number density of network strands
 
     Arguments:
-      - network (pylimer_tools.entities.Universum): the network to compute \(\nu_{eff}\) for
+      - network (pylimer_tools.entities.Universum): the network to compute $\\nu_{eff}$ for
       - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
       - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
       - junctionType: the atom type of the crosslinkers/junctions
 
     Returns:
-      - \(\nu_{eff}\) (float): the effective number density of network strands
+      - $\\nu_{eff}$ (float): the effective number density of network strands
     &#34;&#34;&#34;
     R_taus = []
     chainLengths = []
@@ -605,11 +602,11 @@ Assumes the precursor-chains to be bifunctional.</p>
 <ul>
 <li>network: the network to compute the topological factor for</li>
 <li>foreignAtomType: the type of atoms to ignore</li>
-<li>totalMass: the <span><span class="MathJax_Preview">M</span><script type="math/tex">M</script></span> in the respective formula</li>
+<li>totalMass: the $M$ in the respective formula</li>
 </ul>
 <h2 id="returns">Returns</h2>
 <ul>
-<li>the topological factor <span><span class="MathJax_Preview">\Gamma</span><script type="math/tex">\Gamma</script></span></li>
+<li>the topological factor $\Gamma$</li>
 </ul></div>
 <details class="source">
 <summary>
@@ -626,10 +623,10 @@ Assumes the precursor-chains to be bifunctional.</p>
     Arguments:
       - network: the network to compute the topological factor for
       - foreignAtomType: the type of atoms to ignore
-      - totalMass: the \(M\) in the respective formula
+      - totalMass: the $M$ in the respective formula
 
     Returns:
-      - the topological factor \(\Gamma\)
+      - the topological factor $\\Gamma$
     &#34;&#34;&#34;
     molecules = network.getMolecules(ignoreAtomType=foreignAtomType)
     Gamma_sum = 0
@@ -764,7 +761,7 @@ Assumes the precursor-chains to be bifunctional.</p>
 <span>def <span class="ident">predictGelationPoint</span></span>(<span>r: float, f: int, g: int = 2) ‑> float</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Compute the gelation point <span><span class="MathJax_Preview">p_{gel}</span><script type="math/tex">p_{gel}</script></span> as theoretically predicted
+<div class="desc"><p>Compute the gelation point $p_{gel}$ as theoretically predicted
 (gelation point = critical extent of reaction for gelation)</p>
 <h2 id="source">Source</h2>
 <ul>
@@ -786,7 +783,7 @@ Assumes the precursor-chains to be bifunctional.</p>
 </summary>
 <pre><code class="python">def predictGelationPoint(r: float, f: int, g: int = 2) -&gt; float:
     &#34;&#34;&#34;
-    Compute the gelation point \(p_{gel}\) as theoretically predicted
+    Compute the gelation point $p_{gel}$ as theoretically predicted
     (gelation point = critical extent of reaction for gelation)
 
     Source:
