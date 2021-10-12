@@ -6,10 +6,10 @@ def getAndFilterMoleculesAndBonds(atom_data: pd.DataFrame, bond_data: pd.DataFra
     Find molecules from atom & bond data. Crosslinkers are omitted.
 
     Arguments:
-        atom_data (pd.DataFrame): a collection of atom coordinates
-        bond_data (pd.DataFrame): a collection of bonds
-        boxDimensions: a list containing the box lengths (x, y, z) 
-        crosslinker_type: the type of the crosslinker atoms to distinguish different molecules/chains
+        - atom_data (pd.DataFrame): a collection of atom coordinates
+        - bond_data (pd.DataFrame): a collection of bonds
+        - boxDimensions (list): a list containing the box lengths (x, y, z) 
+        - crosslinker_type (int): the type of the crosslinker atoms to distinguish different molecules/chains
 
     Returns:
         - molecules (list): a list of lists of atoms representing molecules/chains

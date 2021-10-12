@@ -7,4 +7,4 @@ mkdir -p ./docs-html
 
 # make sure you have pdoc3 installed: 
 # pip3 install pdoc3
-pdoc ./src/pylimer_tools/ --math --template-directory ./docs-template --output-directory ./docs-html
+pdoc ./src/pylimer_tools/ --math --template-directory ./docs-template --output-directory ./docs-html --docformat "google"
