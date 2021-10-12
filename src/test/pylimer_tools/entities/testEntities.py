@@ -1,6 +1,8 @@
 
 import unittest
 
+import igraph
+import numpy as np
 import pandas as pd
 import pandas.testing as pd_testing
 from pylimer_tools.calc.calculateBondLen import (calculateBondLen,
@@ -49,7 +51,9 @@ class TestEntities(unittest.TestCase):
         self.assertEqual(atom.getUnderlyingData(), self.testAtoms.iloc[0])
         universe.reset()
         self.assertCountEqual([], universe.getMolecules())
+        self.assertCountEqual([], universe.getChainsWithCrosslinker(0))
         self.assertEqual(0, universe.getSize())
+        self.assertIsInstance(universe.getUnderlyingGraph(), igraph.Graph)
         # check that the except paths work too: non-existant atom ids & type
         self.assertEqual(None, universe.getAtomsWithType(1))
         self.assertEqual(None, universe.getAtom(1))
@@ -61,11 +65,26 @@ class TestEntities(unittest.TestCase):
         self.assertEqual(2, len(universe.getAtomsWithType(2)))
         molecules = universe.getMolecules()
         self.assertEqual(len(molecules), 2)
-        for molecule in molecules:
-            self.assertIsInstance(molecule, Molecule)
-
+        self.assertEqual(molecules[0].getLength(), 3)
+        self.assertEqual(np.sum([m.getLength() for m in molecules]), len(self.testAtoms))
         molecules = universe.getMolecules(ignoreAtomType=2)
         self.assertEqual(len(molecules), 2)
+        self.assertEqual(len(universe.getChainsWithCrosslinker(0)), 2)
+        for molecule in molecules:
+            self.assertIsInstance(molecule, Molecule)
+        for molecule in universe:
+            self.assertIsInstance(molecule, Molecule)
+        for molecule in universe.getChainsWithCrosslinker(0):
+            self.assertIsInstance(molecule, Molecule)
+            self.assertEqual(molecule.getType(),
+                             Molecule.MoleculeType.FREE_CHAIN)
+
+        chainsWithCrosslinker = universe.getChainsWithCrosslinker(2)
+        self.assertEqual(chainsWithCrosslinker[0].getType(
+        ), Molecule.MoleculeType.FREE_CHAIN)
+        self.assertEqual(
+            chainsWithCrosslinker[1].getType(), Molecule.MoleculeType.LOOP)
+
         # test iteration & return type
         for molecule in molecules:
             self.assertIsInstance(molecule, Molecule)
