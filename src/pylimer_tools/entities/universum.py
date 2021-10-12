@@ -8,7 +8,7 @@ from pylimer_tools.entities.atom import Atom
 from pylimer_tools.entities.molecule import Molecule
 
 
-class Universum(GraphDecorator):
+class Universum(GraphDecorator, Iterable):
 
     boxSizes: list
 
@@ -214,3 +214,14 @@ class Universum(GraphDecorator):
         """
         self.underlying_graph = igraph.Graph(directed=False)
         return self
+
+    def __iter__(self):
+        """
+        Decorator of the getMolecules() list iterator.
+
+        Yields:
+          - molecule (Molecule): the molecule of the current iteration.
+        """
+        molecules = self.getMolecules()
+        for molecule in molecules:
+            yield molecule
