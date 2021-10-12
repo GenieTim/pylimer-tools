@@ -139,16 +139,24 @@
 
             <div class="docstring"><p>Extract the last few entries of a list</p>
 
-<p>Arguments:
-    - data (list|pd.DataFrame|pd.Series): the list to extract the last few entries from
-    - percentage: the percentage of entries to extract
-    - minN: the minimum number of entries to extract
-    - maxPercentage: the maximum percentage of entries to extract</p>
+<h6 id="arguments">Arguments</h6>
 
-<p>Returns:
-    A (list|pd.DataFrame|pd.Series) with at maximum maxPercentage, 
-        at least minN entries (assuming the initial data is as large), 
-        but ideally <code>percentage</code> many percentage of the last entries.</p>
+<blockquote>
+  <ul>
+  <li>data (list|pd.DataFrame|pd.Series): the list to extract the last few entries from</li>
+  <li>percentage: the percentage of entries to extract</li>
+  <li>minN: the minimum number of entries to extract</li>
+  <li>maxPercentage: the maximum percentage of entries to extract</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <p>A (list|pd.DataFrame|pd.Series) with at maximum maxPercentage, 
+      at least minN entries (assuming the initial data is as large), 
+      but ideally <code>percentage</code> many percentage of the last entries.</p>
+</blockquote>
 </div>
 
 

@@ -83,10 +83,10 @@
 <span class="sd">    Find molecules from atom &amp; bond data. Crosslinkers are omitted.</span>
 
 <span class="sd">    Arguments:</span>
-<span class="sd">        atom_data (pd.DataFrame): a collection of atom coordinates</span>
-<span class="sd">        bond_data (pd.DataFrame): a collection of bonds</span>
-<span class="sd">        boxDimensions: a list containing the box lengths (x, y, z) </span>
-<span class="sd">        crosslinker_type: the type of the crosslinker atoms to distinguish different molecules/chains</span>
+<span class="sd">        - atom_data (pd.DataFrame): a collection of atom coordinates</span>
+<span class="sd">        - bond_data (pd.DataFrame): a collection of bonds</span>
+<span class="sd">        - boxDimensions (list): a list containing the box lengths (x, y, z) </span>
+<span class="sd">        - crosslinker_type (int): the type of the crosslinker atoms to distinguish different molecules/chains</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - molecules (list): a list of lists of atoms representing molecules/chains</span>
@@ -229,10 +229,10 @@
 <span class="sd">    Find molecules from atom &amp; bond data. Crosslinkers are omitted.</span>
 
 <span class="sd">    Arguments:</span>
-<span class="sd">        atom_data (pd.DataFrame): a collection of atom coordinates</span>
-<span class="sd">        bond_data (pd.DataFrame): a collection of bonds</span>
-<span class="sd">        boxDimensions: a list containing the box lengths (x, y, z) </span>
-<span class="sd">        crosslinker_type: the type of the crosslinker atoms to distinguish different molecules/chains</span>
+<span class="sd">        - atom_data (pd.DataFrame): a collection of atom coordinates</span>
+<span class="sd">        - bond_data (pd.DataFrame): a collection of bonds</span>
+<span class="sd">        - boxDimensions (list): a list containing the box lengths (x, y, z) </span>
+<span class="sd">        - crosslinker_type (int): the type of the crosslinker atoms to distinguish different molecules/chains</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - molecules (list): a list of lists of atoms representing molecules/chains</span>
@@ -317,18 +317,28 @@
 
             <div class="docstring"><p>Find molecules from atom &amp; bond data. Crosslinkers are omitted.</p>
 
-<p>Arguments:
-    atom_data (pd.DataFrame): a collection of atom coordinates
-    bond_data (pd.DataFrame): a collection of bonds
-    boxDimensions: a list containing the box lengths (x, y, z) 
-    crosslinker_type: the type of the crosslinker atoms to distinguish different molecules/chains</p>
+<h6 id="arguments">Arguments</h6>
 
-<p>Returns:
-    - molecules (list): a list of lists of atoms representing molecules/chains
-    - atom_data (pd.DataFrame): the atoms, excluding crosslinkers
-    - bond_data: the bonds, excluding the ones of the crosslinker atoms
-    - crosslinker_atoms: the atoms of the crosslinkers
-    - crosslinker_bonds: the bonds of the crosslinker atoms</p>
+<blockquote>
+  <ul>
+  <li>atom_data (pd.DataFrame): a collection of atom coordinates</li>
+  <li>bond_data (pd.DataFrame): a collection of bonds</li>
+  <li>boxDimensions (list): a list containing the box lengths (x, y, z) </li>
+  <li>crosslinker_type (int): the type of the crosslinker atoms to distinguish different molecules/chains</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>molecules (list): a list of lists of atoms representing molecules/chains</li>
+  <li>atom_data (pd.DataFrame): the atoms, excluding crosslinkers</li>
+  <li>bond_data: the bonds, excluding the ones of the crosslinker atoms</li>
+  <li>crosslinker_atoms: the atoms of the crosslinkers</li>
+  <li>crosslinker_bonds: the bonds of the crosslinker atoms</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -372,16 +382,26 @@
 
             <div class="docstring"><p>Find molecules from atom &amp; bond data. Crosslinkers are omitted.</p>
 
-<p>Arguments:
-    - atom_data (pd.DataFrame): a collection of atom coordinates
-    - bond_data (pd.DataFrame): a collection of bonds
-    - boxDimensions: a list containing the box lengths (x, y, z) 
-    - crosslinker_type: the type of the crosslinker atoms to distinguish different molecules/chains</p>
+<h6 id="arguments">Arguments</h6>
 
-<p>Returns:
-    - molecules (list): a list of lists of atoms representing molecules/chains
-    - atom_data (pd.DataFrame): the atoms, excluding crosslinkers
-    - bond_data: the bonds, excluding the ones of the crosslinker atoms</p>
+<blockquote>
+  <ul>
+  <li>atom_data (pd.DataFrame): a collection of atom coordinates</li>
+  <li>bond_data (pd.DataFrame): a collection of bonds</li>
+  <li>boxDimensions: a list containing the box lengths (x, y, z) </li>
+  <li>crosslinker_type: the type of the crosslinker atoms to distinguish different molecules/chains</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>molecules (list): a list of lists of atoms representing molecules/chains</li>
+  <li>atom_data (pd.DataFrame): the atoms, excluding crosslinkers</li>
+  <li>bond_data: the bonds, excluding the ones of the crosslinker atoms</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -423,14 +443,24 @@
 
             <div class="docstring"><p>Find molecules from atom &amp; bond data. Crosslinkers are omitted.</p>
 
-<p>Arguments:
-    - atom_data (pd.DataFrame): a collection of atom coordinates
-    - bond_data (pd.DataFrame): a collection of bonds
-    - boxDimensions: a list containing the box lengths (x, y, z) 
-    - crosslinker_type: the type of the crosslinker atoms to distinguish different molecules/chains</p>
+<h6 id="arguments">Arguments</h6>
 
-<p>Returns:
-    - molecules (list): a list of lists of atoms representing molecules/chains</p>
+<blockquote>
+  <ul>
+  <li>atom_data (pd.DataFrame): a collection of atom coordinates</li>
+  <li>bond_data (pd.DataFrame): a collection of bonds</li>
+  <li>boxDimensions: a list containing the box lengths (x, y, z) </li>
+  <li>crosslinker_type: the type of the crosslinker atoms to distinguish different molecules/chains</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>molecules (list): a list of lists of atoms representing molecules/chains</li>
+  </ul>
+</blockquote>
 </div>
 
 

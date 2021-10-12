@@ -231,15 +231,25 @@ and the boxLengths in a list</p>
 
 <p>Assumes the bonds are by the coordsDf's ids, sequentially</p>
 
-<p>.. deprecated:: 0.0.1 
-    This function is legacy compliant only. Use <code>calculateBondLen(...).mean()</code> instead.</p>
+<p><em>Deprecated since version 0.0.1:</em>
+This function is legacy compliant only. Use <code>calculateBondLen(...).mean()</code> instead.</p>
 
-<p>Arguments:
-    - coordsDf: a dataframe containing the coordinates
-    - boxLenghts: a list containing the box lengths (x, y, z) </p>
+<h6 id="arguments">Arguments</h6>
 
-<p>Returns:
-    - meanDistance: the mean of all distances</p>
+<blockquote>
+  <ul>
+  <li>coordsDf: a dataframe containing the coordinates</li>
+  <li>boxLenghts: a list containing the box lengths (x, y, z) </li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>meanDistance: the mean of all distances</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -296,12 +306,22 @@ given the coordinates of the atoms in a pd.DataFrame
 and the bonds of the atoms in a pd.DataFrame 
 and the boxLengths in a list</p>
 
-<p>Arguments:
-    - coordsDf: a dataframe containing the coordinates
-    - boxLenghts: a list containing the box lengths (x, y, z) </p>
+<h6 id="arguments">Arguments</h6>
 
-<p>Returns:
-    - a np.array of all bond lengths</p>
+<blockquote>
+  <ul>
+  <li>coordsDf: a dataframe containing the coordinates</li>
+  <li>boxLenghts: a list containing the box lengths (x, y, z) </li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>a np.array of all bond lengths</li>
+  </ul>
+</blockquote>
 </div>
 
 

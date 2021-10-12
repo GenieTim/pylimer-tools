@@ -434,16 +434,18 @@
             <div class="docstring"><p>Compute the cycle rank ($\chi$).
 Assumes the precursor-chains to be bifunctional.</p>
 
-<p>Arguments:</p>
+<h6 id="arguments">Arguments</h6>
 
-<ul>
-<li>network: the network to calculate the cycle rank for</li>
-<li>nu: number of elastically effective (active) strands per unit volume</li>
-<li>mu: number density of the elastically effective crosslink</li>
-<li>absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</li>
-<li>relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</li>
-<li>junctionType: the atom type of the crosslinkers/junctions</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>network: the network to calculate the cycle rank for</li>
+  <li>nu: number of elastically effective (active) strands per unit volume</li>
+  <li>mu: number density of the elastically effective crosslink</li>
+  <li>absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</li>
+  <li>relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</li>
+  <li>junctionType: the atom type of the crosslinkers/junctions</li>
+  </ul>
+</blockquote>
 
 <p>No need to provide all the parameters — either/or: </p>
 
@@ -452,11 +454,13 @@ Assumes the precursor-chains to be bifunctional.</p>
 <li>network, absTol, relTol, junctionType</li>
 </ul>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>cycleRank: the cycle rank ($\chi = \nu_{eff} - \mu_{eff}$)</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>cycleRank: the cycle rank ($\chi = \nu_{eff} - \mu_{eff}$)</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -521,20 +525,24 @@ Assumes the precursor-chains to be bifunctional.</p>
 which are defined as the ones that can store elastic energy 
 upon network deformation, resp. the effective number density of network strands</p>
 
-<p>Arguments:</p>
+<h6 id="arguments">Arguments</h6>
 
-<ul>
-<li>network (<a href="../entities.html#Universum">pylimer_tools.entities.Universum</a>): the network to compute $\nu_{eff}$ for</li>
-<li>absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</li>
-<li>relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</li>
-<li>junctionType: the atom type of the crosslinkers/junctions</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>network (<a href="../entities.html#Universum">pylimer_tools.entities.Universum</a>): the network to compute $\nu_{eff}$ for</li>
+  <li>absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</li>
+  <li>relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</li>
+  <li>junctionType: the atom type of the crosslinkers/junctions</li>
+  </ul>
+</blockquote>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>$\nu_{eff}$ (float): the effective number density of network strands</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>$\nu_{eff}$ (float): the effective number density of network strands</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -624,21 +632,25 @@ upon network deformation, resp. the effective number density of network strands<
 defined as the ones that connect at least two elastically effective strands.
 Assumes the precursor-chains to be bifunctional.</p>
 
-<p>Arguments:</p>
+<h6 id="arguments">Arguments</h6>
 
-<ul>
-<li>network (<a href="../entities.html#Universum">pylimer_tools.entities.Universum</a>): the network to compute $\nu_{eff}$ for</li>
-<li>absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</li>
-<li>relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</li>
-<li>junctionType: the atom type of the crosslinkers/junctions</li>
-<li>minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>network (<a href="../entities.html#Universum">pylimer_tools.entities.Universum</a>): the network to compute $\nu_{eff}$ for</li>
+  <li>absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</li>
+  <li>relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</li>
+  <li>junctionType: the atom type of the crosslinkers/junctions</li>
+  <li>minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such</li>
+  </ul>
+</blockquote>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>$\mu_{eff}$ (float): the effective number density of junctions</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>$\mu_{eff}$ (float): the effective number density of junctions</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -668,12 +680,14 @@ Assumes the precursor-chains to be bifunctional.</p>
 
             <div class="docstring"><p>Compute the weight fraction of network backbone in infinite network</p>
 
-<p>Arguments:</p>
+<h6 id="arguments">Arguments</h6>
 
-<ul>
-<li>network: the network to compute the weight fraction for</li>
-<li>crosslinkerType: the atom type to use to split the molecules</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>network: the network to compute the weight fraction for</li>
+  <li>crosslinkerType: the atom type to use to split the molecules</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -734,20 +748,24 @@ Assumes the precursor-chains to be bifunctional.</p>
 
             <div class="docstring"><p>Compute the weight fraction of dangling strands in infinite network</p>
 
-<p>Arguments:</p>
+<h6 id="arguments">Arguments</h6>
 
-<ul>
-<li>network: the network to compute the weight fraction for</li>
-<li>crosslinkerType: the atom type to use to split the molecules</li>
-<li>weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>network: the network to compute the weight fraction for</li>
+  <li>crosslinkerType: the atom type to use to split the molecules</li>
+  <li>weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight</li>
+  </ul>
+</blockquote>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>weightFraction: weightDangling/weightTotal, </li>
-<li>numFraction: numDangling/numTotal</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>weightFraction: weightDangling/weightTotal, </li>
+  <li>numFraction: numDangling/numTotal</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -788,25 +806,31 @@ Assumes the precursor-chains to be bifunctional.</p>
             <div class="docstring"><p>Compute the gelation point $p_{gel}$ as theoretically predicted
 (gelation point = critical extent of reaction for gelation)</p>
 
-<p>Source:</p>
+<h6 id="source">Source</h6>
 
-<ul>
-<li>https://www.sciencedirect.com/science/article/pii/003238618990253X</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>https://www.sciencedirect.com/science/article/pii/003238618990253X</li>
+  </ul>
+</blockquote>
 
-<p>Arguments:</p>
+<h6 id="arguments">Arguments</h6>
 
-<ul>
-<li>r: the stoichiometric inbalance of reactants</li>
-<li>f: functionality of the crosslinkers</li>
-<li>g: functionality of the precursor polymer</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>r: the stoichiometric inbalance of reactants</li>
+  <li>f: functionality of the crosslinkers</li>
+  <li>g: functionality of the precursor polymer</li>
+  </ul>
+</blockquote>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>p_gel: critical extent of reaction for gelation</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>p_gel: critical extent of reaction for gelation</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -846,19 +870,23 @@ Assumes the precursor-chains to be bifunctional.</p>
             <div class="docstring"><p>Compute the extent of reaction of the crosslinkers 
 (actual functionality divided by target functionality)</p>
 
-<p>Arguments:</p>
+<h6 id="arguments">Arguments</h6>
 
-<ul>
-<li>network: the poylmer network to do the computation for</li>
-<li>junctionType: the type of the junctions/crosslinkers to select them in the network</li>
-<li>f: the functionality of the crosslinkers</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>network: the poylmer network to do the computation for</li>
+  <li>junctionType: the type of the junctions/crosslinkers to select them in the network</li>
+  <li>f: the functionality of the crosslinkers</li>
+  </ul>
+</blockquote>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>r (float): the (mean) crosslinker conversion</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>r (float): the (mean) crosslinker conversion</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -896,18 +924,22 @@ Assumes the precursor-chains to be bifunctional.</p>
 
             <div class="docstring"><p>Compute the mean crosslinker functionality</p>
 
-<p>Arguments:</p>
+<h6 id="arguments">Arguments</h6>
 
-<ul>
-<li>network: the poylmer network to do the computation for</li>
-<li>junctionType: the type of the junctions/crosslinkers to select them in the network</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>network: the poylmer network to do the computation for</li>
+  <li>junctionType: the type of the junctions/crosslinkers to select them in the network</li>
+  </ul>
+</blockquote>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>f (float): the (mean) effective crosslinker functionality</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>f (float): the (mean) effective crosslinker functionality</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -943,18 +975,22 @@ Assumes the precursor-chains to be bifunctional.</p>
 
             <div class="docstring"><p>Compute the functionality of every crosslinker in the network</p>
 
-<p>Arguments:</p>
+<h6 id="arguments">Arguments</h6>
 
-<ul>
-<li>network: the poylmer network to do the computation for</li>
-<li>junctionType: the type of the junctions/crosslinkers to select them in the network</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>network: the poylmer network to do the computation for</li>
+  <li>junctionType: the type of the junctions/crosslinkers to select them in the network</li>
+  </ul>
+</blockquote>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>junctionDegrees (list[int]): the functionality of every crosslinker</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>junctionDegrees (list[int]): the functionality of every crosslinker</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -1004,25 +1040,31 @@ Assumes the precursor-chains to be bifunctional.</p>
             <div class="docstring"><p>Compute the topological factor of a polymer network.
 Assumes the precursor-chains to be bifunctional.</p>
 
-<p>Source:</p>
+<h6 id="source">Source</h6>
 
-<ul>
-<li>eq. 16 in https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>eq. 16 in https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</li>
+  </ul>
+</blockquote>
 
-<p>Arguments:</p>
+<h6 id="arguments">Arguments</h6>
 
-<ul>
-<li>network: the network to compute the topological factor for</li>
-<li>foreignAtomType: the type of atoms to ignore</li>
-<li>totalMass: the $M$ in the respective formula</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>network: the network to compute the topological factor for</li>
+  <li>foreignAtomType: the type of atoms to ignore</li>
+  <li>totalMass: the $M$ in the respective formula</li>
+  </ul>
+</blockquote>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>the topological factor $\Gamma$</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>the topological factor $\Gamma$</li>
+  </ul>
+</blockquote>
 </div>
 
 

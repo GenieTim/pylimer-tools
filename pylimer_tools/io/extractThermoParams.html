@@ -98,7 +98,6 @@
 <span class="sd">    </span>
 <span class="sd">    Returns:</span>
 <span class="sd">      A long CSV string</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">line</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
@@ -259,7 +258,6 @@
 <span class="sd">    </span>
 <span class="sd">    Returns:</span>
 <span class="sd">      A long CSV string</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">line</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
@@ -323,14 +321,22 @@
 
             <div class="docstring"><p>Read one group of csv lines from the file</p>
 
-<p>Arguments:
-    - fp: the file pointer to the file to read from
-    - header: the header of the CSV (where to start reading at)
-    - minLineLen: the minimal length of a line to be accepted as data
-    - additional_lines_skip: number of lines to skip after reading the header</p>
+<h6 id="arguments">Arguments</h6>
 
-<p>Returns:
-  A long CSV string</p>
+<blockquote>
+  <ul>
+  <li>fp: the file pointer to the file to read from</li>
+  <li>header: the header of the CSV (where to start reading at)</li>
+  <li>minLineLen: the minimal length of a line to be accepted as data</li>
+  <li>additional_lines_skip: number of lines to skip after reading the header</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <p>A long CSV string</p>
+</blockquote>
 </div>
 
 
@@ -433,15 +439,25 @@
 <p>Note: the header parameter can be an array — make sure to pay attention
 when reading a file with different header sections in them</p>
 
-<p>Arguments:
-    - file: the file path to the file to read from
-    - header: the header of the CSV (where to start reading at)
-    - textsToRead: the number of times to expect the header
-    - minLineLen: the minimal length of a line to be accepted as data
-    - useCache: wheter to use cache or not</p>
+<h6 id="arguments">Arguments</h6>
 
-<p>Returns:
-    - data (pd.DataFrame): the thermodynamic parameters</p>
+<blockquote>
+  <ul>
+  <li>file: the file path to the file to read from</li>
+  <li>header: the header of the CSV (where to start reading at)</li>
+  <li>textsToRead: the number of times to expect the header</li>
+  <li>minLineLen: the minimal length of a line to be accepted as data</li>
+  <li>useCache: wheter to use cache or not</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>data (pd.DataFrame): the thermodynamic parameters</li>
+  </ul>
+</blockquote>
 </div>
 
 

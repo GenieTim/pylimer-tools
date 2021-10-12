@@ -151,13 +151,23 @@ NOTE: this function is rather unstable, as it has a few dirty assumptions, such 
 <li>ideal step-size is max step difference. Breaks e.g. if there is one big gap</li>
 </ul>
 
-<p>Arguments:
-    - data: the DataFrame to unify the step-size for
-    - key: the column name indicating the column containing the step-nr.
-    - maxExpectedStepSize: use to get a warning if the computed step-size is larger</p>
+<h6 id="arguments">Arguments</h6>
 
-<p>Returns:
-    - data: a DataFrame with a consistent step-size</p>
+<blockquote>
+  <ul>
+  <li>data: the DataFrame to unify the step-size for</li>
+  <li>key: the column name indicating the column containing the step-nr.</li>
+  <li>maxExpectedStepSize: use to get a warning if the computed step-size is larger</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>data: a DataFrame with a consistent step-size</li>
+  </ul>
+</blockquote>
 </div>
 
 

@@ -616,17 +616,21 @@ For example, a generic mapping type might be defined as::</p>
 
             <div class="docstring"><p>Instantiate this Universe (Collection of Molecules)</p>
 
-<p>Arguments:</p>
+<h6 id="arguments">Arguments</h6>
 
-<ul>
-<li>boxSizes: a list containing the box lengths (x, y, z)</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>boxSizes: a list containing the box lengths (x, y, z)</li>
+  </ul>
+</blockquote>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>self (<a href="../entities.html#Universum">pylimer_tools.entities.Universum</a>): the new Universum object</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>self (<a href="../entities.html#Universum">pylimer_tools.entities.Universum</a>): the new Universum object</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -680,18 +684,22 @@ For example, a generic mapping type might be defined as::</p>
 
             <div class="docstring"><p>Add atoms and bonds to the underlying graph.</p>
 
-<p>Arguments:</p>
+<h6 id="arguments">Arguments</h6>
 
-<ul>
-<li>atomData: the dataframe containing atoms with their positions, id, type etc.</li>
-<li>bondData: the dataframe containing two columns: one indicating where the bond originates, one where it goes. Direction irrelevant.</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>atomData: the dataframe containing atoms with their positions, id, type etc.</li>
+  <li>bondData: the dataframe containing two columns: one indicating where the bond originates, one where it goes. Direction irrelevant.</li>
+  </ul>
+</blockquote>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>self: the Universum object for a fluent interface.</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>self: the Universum object for a fluent interface.</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -737,17 +745,21 @@ For example, a generic mapping type might be defined as::</p>
 
             <div class="docstring"><p>Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms.</p>
 
-<p>Arguments:</p>
+<h6 id="arguments">Arguments</h6>
 
-<ul>
-<li>ignoreAtomType: the atom type to ignore/omit from the molecules</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>ignoreAtomType: the atom type to ignore/omit from the molecules</li>
+  </ul>
+</blockquote>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>molecules (list): a list of Molecule objects</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>molecules (list): a list of Molecule objects</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -830,17 +842,21 @@ For example, a generic mapping type might be defined as::</p>
             <div class="docstring"><p>Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms, without omitting the crosslinkers.
 In turn, e.g. for a tetrafunctional crosslinker, it will be 4 times in the resulting molecules</p>
 
-<p>Arguments:</p>
+<h6 id="arguments">Arguments</h6>
 
-<ul>
-<li>crosslinkerType: the atom type to use to split the molecules</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>crosslinkerType: the atom type to use to split the molecules</li>
+  </ul>
+</blockquote>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>molecules (list): a list of Molecule objects</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>molecules (list): a list of Molecule objects</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -879,17 +895,21 @@ In turn, e.g. for a tetrafunctional crosslinker, it will be 4 times in the resul
 
             <div class="docstring"><p>Find an atom by its ID</p>
 
-<p>Arguments:</p>
+<h6 id="arguments">Arguments</h6>
 
-<ul>
-<li>atomId: the ID of the atom</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>atomId: the ID of the atom</li>
+  </ul>
+</blockquote>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>atom (<a href="../entities.html#Atom">pylimer_tools.entities.Atom</a>): the Atom object or None if it is not found</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>atom (<a href="../entities.html#Atom">pylimer_tools.entities.Atom</a>): the Atom object or None if it is not found</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -927,17 +947,21 @@ In turn, e.g. for a tetrafunctional crosslinker, it will be 4 times in the resul
 
             <div class="docstring"><p>Find an atom by its type</p>
 
-<p>Arguments:</p>
+<h6 id="arguments">Arguments</h6>
 
-<ul>
-<li>atomType: the type of the atom</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>atomType: the type of the atom</li>
+  </ul>
+</blockquote>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>atoms (list<<a href="../entities.html#Atom">pylimer_tools.entities.Atom</a>>): the Atom objects or None if it is not found</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>atoms (list<<a href="../entities.html#Atom">pylimer_tools.entities.Atom</a>>): the Atom objects or None if it is not found</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -966,11 +990,13 @@ In turn, e.g. for a tetrafunctional crosslinker, it will be 4 times in the resul
 
             <div class="docstring"><p>Get this object's volume</p>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>volume (float): the volume of the box</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>volume (float): the volume of the box</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -999,11 +1025,13 @@ In turn, e.g. for a tetrafunctional crosslinker, it will be 4 times in the resul
 
             <div class="docstring"><p>Get the number of atoms in this universe</p>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>nr (int): the number of atoms (nodes)</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>nr (int): the number of atoms (nodes)</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -1036,17 +1064,21 @@ In turn, e.g. for a tetrafunctional crosslinker, it will be 4 times in the resul
 
             <div class="docstring"><p>Re-set this Universe's size.</p>
 
-<p>Arguments:</p>
+<h6 id="arguments">Arguments</h6>
 
-<ul>
-<li>boxSizes: a list containing the box lengths (x, y, z)</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>boxSizes: a list containing the box lengths (x, y, z)</li>
+  </ul>
+</blockquote>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>self (<a href="../entities.html#Universum">pylimer_tools.entities.Universum</a>): the Universum object for a fluent interface.</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>self (<a href="../entities.html#Universum">pylimer_tools.entities.Universum</a>): the Universum object for a fluent interface.</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -1076,11 +1108,13 @@ In turn, e.g. for a tetrafunctional crosslinker, it will be 4 times in the resul
 
             <div class="docstring"><p>Reset this Universe to be empty again.</p>
 
-<p>Returns:</p>
+<h6 id="returns">Returns</h6>
 
-<ul>
-<li>self (<a href="../entities.html#Universum">pylimer_tools.entities.Universum</a>): the Universum object for a fluent interface.</li>
-</ul>
+<blockquote>
+  <ul>
+  <li>self (<a href="../entities.html#Universum">pylimer_tools.entities.Universum</a>): the Universum object for a fluent interface.</li>
+  </ul>
+</blockquote>
 </div>
 
 
