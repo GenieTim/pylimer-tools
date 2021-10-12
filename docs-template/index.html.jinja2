@@ -1,0 +1,17 @@
+{% extends "default/index.html.jinja2" %}
+<style>
+    {% block style_theme %}
+        {# Enable dark mode depending on the user's preferences: #}
+        {{ super() }}
+        @media (prefers-color-scheme: dark) {
+        :root {
+            --pdoc-background: #212529;
+        }
+        .pdoc {
+            --text: #f7f7f7;
+            --accent: #333;
+            --active: #9e7700;
+        }
+        }
+    {% endblock %}
+</style>
