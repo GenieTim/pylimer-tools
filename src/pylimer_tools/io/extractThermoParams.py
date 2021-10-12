@@ -25,7 +25,6 @@ def readOneGroup(fp, header, minLineLen=4, additional_lines_skip=0) -> str:
     
     Returns:
       A long CSV string
-
     """
     text = ""
     line = fp.readline()
