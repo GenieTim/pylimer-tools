@@ -1,5 +1,6 @@
 # source: https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262
 
+import warnings
 from collections import Counter
 
 import numpy as np
@@ -193,22 +194,21 @@ def calculateWeightFractionOfDanglingChains(network: Universum, crosslinkerType,
       - numFraction: numDangling/numTotal
     """
     if (network.getSize() < 1):
-        return 0.0
+        return 0.0, 0.0
 
     def getWeightOfGraph(graph):
-        counts = Counter(graph["type"])
+        counts = Counter(graph.vs["type"])
         weightTotal = 0
         for key in counts:
-            weightTotal += weights[key]*counts[key]
+            if (type(weights) in (float, int)):
+                weightTotal += weights*counts[key]
+            else:
+                weightTotal += weights[key]*counts[key]
         return weightTotal
 
     allChains = network.getChainsWithCrosslinker(crosslinkerType)
     numTotal = network.getSize()
-    weightTotal = numTotal
-    if (isinstance(weights, dict)):
-        weightTotal = getWeightOfGraph(network.getUnderlyingGraph())
-    if (type(weights) in (float, int)):
-        weightTotal = numTotal*weights
+    weightTotal = getWeightOfGraph(network.getUnderlyingGraph())
 
     numDangling = 0
     weightDangling = 0
@@ -218,7 +218,8 @@ def calculateWeightFractionOfDanglingChains(network: Universum, crosslinkerType,
             weightDangling += getWeightOfGraph(chain.getUnderlyingGraph())
 
     if (weightTotal == 0):
-      return 0, numDangling/numTotal
+        # warnings.warn("Weight total = 0")
+        return 0.0, numDangling/numTotal
 
     return weightDangling/weightTotal, numDangling/numTotal
 

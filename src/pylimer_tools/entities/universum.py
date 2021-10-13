@@ -91,9 +91,9 @@ class Universum(GraphDecorator, Iterable):
         Returns:
           - molecules (list): a list of Molecule objects
         """
-        graph_without_crosslinkers = self.underlying_graph.copy()
-        if (graph_without_crosslinkers.vcount() == 0):
+        if (self.underlying_graph.vcount() == 0):
             return []
+        graph_without_crosslinkers = self.underlying_graph.copy()
         crosslinkerVertices = graph_without_crosslinkers.vs.select(
             type_eq=crosslinkerType)
         graph_without_crosslinkers.delete_vertices(
@@ -103,12 +103,17 @@ class Universum(GraphDecorator, Iterable):
         chains = []
         for chain in subgraphs:
             chain.simplify()
+            moleculeLengthBefore = chain.vcount()
             # find ends of chain
             endNodes = chain.vs.select(_degree_eq=1)
             assert(len(endNodes) == 2 or len(endNodes) == 0)
-            moleculeLengthBefore = chain.vcount()
             strandType = Molecule.MoleculeType.UNDEFINED
             isLoop = False
+
+            if (moleculeLengthBefore == 1):
+              # single atom. degree 0. 
+              endNodes = chain.vs.select(_degree_eq=0)
+              assert(len(endNodes) == 1)
 
             for endNode in endNodes:
                 # find matching crosslinker
@@ -128,14 +133,14 @@ class Universum(GraphDecorator, Iterable):
                             "atom": neighbor["atom"]
                         })
                         chain.add_edges([(endNode["name"], neighbor["name"])])
-
+                    
             if (chain.vcount() == moleculeLengthBefore):
                 strandType = Molecule.MoleculeType.FREE_CHAIN
             if (chain.vcount() == moleculeLengthBefore+1):
                 strandType = Molecule.MoleculeType.DANGLING_CHAIN
             if (chain.vcount() == moleculeLengthBefore+2):
                 strandType = Molecule.MoleculeType.NETWORK_STRAND
-            if (isLoop or len(endNodes) == 0):
+            if (isLoop):
                 strandType = Molecule.MoleculeType.PRIMARY_LOOP
             # prepare for return
             chains.append(Molecule(chain, chainType=strandType))

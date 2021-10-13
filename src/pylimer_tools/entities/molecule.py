@@ -23,7 +23,6 @@ class Molecule(GraphDecorator, Iterable):
     def __init__(self, molecule_graph, chainType=MoleculeType.UNDEFINED):
         self.underlying_graph = molecule_graph
         self.underlying_graph.simplify()
-        # print(self.underlying_graph.vcount())
         self.moleculeType = chainType
 
     def decomposeFurther(self, splitAtomType):
