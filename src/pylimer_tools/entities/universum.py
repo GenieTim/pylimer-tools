@@ -93,7 +93,7 @@ class Universum(GraphDecorator, Iterable):
         """
         graph_without_crosslinkers = self.underlying_graph.copy()
         if (graph_without_crosslinkers.vcount() == 0):
-          return []
+            return []
         crosslinkerVertices = graph_without_crosslinkers.vs.select(
             type_eq=crosslinkerType)
         graph_without_crosslinkers.delete_vertices(
@@ -127,7 +127,7 @@ class Universum(GraphDecorator, Iterable):
                             "type": neighbor["type"],
                             "atom": neighbor["atom"]
                         })
-                        chain.add_edges([(endNode.name, neighbor["name"])])
+                        chain.add_edges([(endNode["name"], neighbor["name"])])
 
             if (chain.vcount() == moleculeLengthBefore):
                 strandType = Molecule.MoleculeType.FREE_CHAIN
@@ -136,7 +136,7 @@ class Universum(GraphDecorator, Iterable):
             if (chain.vcount() == moleculeLengthBefore+2):
                 strandType = Molecule.MoleculeType.NETWORK_STRAND
             if (isLoop or len(endNodes) == 0):
-                strandType = Molecule.MoleculeType.LOOP
+                strandType = Molecule.MoleculeType.PRIMARY_LOOP
             # prepare for return
             chains.append(Molecule(chain, chainType=strandType))
 

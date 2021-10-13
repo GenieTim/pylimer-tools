@@ -28,11 +28,17 @@ def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTo
       - cycleRank: the cycle rank ($\\chi = \\nu_{eff} - \\mu_{eff}$) 
     """
     if (nu is None):
+        if (junctionType is None or network is None):
+            raise ValueError(
+                "Argument missing: When not specifiying nu, network and junctionType need to be specified")
         nu = calculateEffectiveNrDensityOfNetwork(
             network, absTol, relTol, junctionType)
     if (mu is None):
+        if (junctionType is None or network is None):
+            raise ValueError(
+                "Argument missing: When not specifiying mu, network and junctionType need to be specified")
         mu = calculateEffectiveNrDensityOfJunctions(
-            network, absTol, relTol, junctionType)
+            network, absTol, junctionType)
 
     return nu - mu
 
@@ -55,15 +61,20 @@ def calculateEffectiveNrDensityOfNetwork(network: Universum, absTol: float = 1, 
     Returns:
       - $\\nu_{eff}$ (float): the effective number density of network strands
     """
+    if (network.getSize() < 1):
+        return None
     R_taus = []
     chainLengths = []
     for molecule in network.getMolecules(junctionType):
         R_tau = molecule.computeEndToEndDistance()
-        R_taus.append(R_tau)
-        chainLengths.append(molecule.getLength())
+        if (R_tau is not None):
+            R_taus.append(R_tau)
+            chainLengths.append(molecule.getLength())
 
-    chainLengths = np.asarray(chainLengths)
-    R_taus = np.asarray(R_taus)
+    if (len(R_taus) < 1):
+        return 0.0
+    chainLengths = np.array(chainLengths)
+    R_taus = np.array(R_taus)
     R_tau_max = R_taus.max()
     if (absTol is None):
         absTol = R_tau_max
@@ -73,7 +84,7 @@ def calculateEffectiveNrDensityOfNetwork(network: Universum, absTol: float = 1, 
     return numEffective / network.getSize()
 
 
-def calculateEffectiveNrDensityOfJunctions(network: Universum, absTol: float = 0, relTol: float = 0, junctionType=None, minNumEffectiveStrands=2):
+def calculateEffectiveNrDensityOfJunctions(network: Universum, absTol: float = 0, junctionType=None, minNumEffectiveStrands=2):
     """
     Compute the number density of the elastically effective crosslinks, 
     defined as the ones that connect at least two elastically effective strands.
@@ -81,24 +92,29 @@ def calculateEffectiveNrDensityOfJunctions(network: Universum, absTol: float = 0
 
     Arguments:
       - network (pylimer_tools.entities.Universum): the network to compute $\\nu_{eff}$ for
-      - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
-      - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
+      - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance)
       - junctionType: the atom type of the crosslinkers/junctions
       - minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such
 
     Returns:
       - $\\mu_{eff}$ (float): the effective number density of junctions
     """
+    if (network.getSize() < 1):
+        return None
     if (junctionType is None):
         return 0.0
+    if (absTol is None):
+        raise ValueError("absTol must be a valid number")
     numEffectiveJunctions = 0
     numIneffectiveJunctions = 0
+    numTotalJunctions = 0
 
     graph = network.getUnderlyingGraph()
     subgraphs = graph.decompose()
     for subgraph in subgraphs:
         # 1. find junctions
         junctions = subgraph.vs.select(type_eq=junctionType)
+        numTotalJunctions += len(junctions)
         for junction in junctions:
             # some junctions are easily ineffective
             if (junction.degree() < minNumEffectiveStrands):
@@ -106,45 +122,61 @@ def calculateEffectiveNrDensityOfJunctions(network: Universum, absTol: float = 0
             else:
                 # 2. follow junction's strands to find those
                 vertexNeighbors = junction.neighbors()
+                junctionHasActiveStrands = 0
+                junctionHasInActiveStrands = 0
                 for neighbor in vertexNeighbors:
                     # follow each neighbor
                     lastNeighbor = junction
                     currentNeighbor = neighbor
-                    while(True):
+                    while(currentNeighbor.degree() >= 2 and currentNeighbor["type"] != junctionType):
                         # follow as long as we do not find a junction
                         nextNeighbors = currentNeighbor.neighbors()
                         # : this is an assumption that makes this function simpler. Assume: only junctions have more than 2 connections
-                        assert(len(nextNeighbors) == 2)
+                        if (len(nextNeighbors) != 2):
+                            raise NotImplementedError(
+                                "Expected all monomers to have a maximal functionality of 2, got {}. Did you pass the wrong `junctionType`?".format(len(nextNeighbors)))
+                        # assert(len(nextNeighbors) == 2)
                         nextKey = 1 if nextNeighbors[0] == lastNeighbor else 0
                         lastNeighbor = currentNeighbor
                         currentNeighbor = nextNeighbors[nextKey]
-                        # found "end" of strand
-                        if (currentNeighbor["type"] == junctionType):
-                            # 3. decide if strand is elastically effective
-                            Ree = currentNeighbor["atom"].computeDistanceTo(
-                                junction["atom"])
-                            if ((currentNeighbor != junction) and (Ree > absTol)):
-                                numEffectiveJunctions += 1
-                            else:
-                                numIneffectiveJunctions += 1
-                            break
-                        # dangling chains are non-effective.
-                        if (currentNeighbor.degree() < 2):
-                            numIneffectiveJunctions += 1
-                            break
+                    # dangling chains are non-effective.
+                    if (currentNeighbor.degree() < 2):
+                        junctionHasInActiveStrands += 1
+                    # found "end" of strand
+                    elif (currentNeighbor["type"] == junctionType):
+                        # 3. decide if strand is elastically effective
+                        Ree = currentNeighbor["atom"].computeDistanceTo(
+                            junction["atom"])
+                        if ((currentNeighbor != junction) and (Ree > absTol)):
+                            junctionHasActiveStrands += 1
+                        else:
+                            junctionHasInActiveStrands += 1
+                if (junctionHasInActiveStrands >= junctionHasInActiveStrands and junctionHasActiveStrands >= minNumEffectiveStrands):
+                    numEffectiveJunctions += 1
+                else:
+                    numIneffectiveJunctions += 1
 
+    assert(numTotalJunctions == numIneffectiveJunctions + numEffectiveJunctions)
+    if (numTotalJunctions == 0):
+        return 0.0
     return numEffectiveJunctions/(numEffectiveJunctions+numIneffectiveJunctions)
 
 
-def calculateWeightFractionOfBackbone(network: Universum, crosslinkerType):
+def calculateWeightFractionOfBackbone(network: Universum, crosslinkerType, weights=1):
     """
     Compute the weight fraction of network backbone in infinite network
 
     Arguments:
       - network: the network to compute the weight fraction for
       - crosslinkerType: the atom type to use to split the molecules
+      - weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight
+
+    Returns:
+      - weightFraction (float): 1 - weightDangling/weightTotal, 
     """
-    return 1 - calculateWeightFractionOfDanglingChains(network)
+    weightFraction, _ = calculateWeightFractionOfDanglingChains(
+        network, crosslinkerType, weights)
+    return 1.0 - weightFraction
 
 
 def calculateWeightFractionOfDanglingChains(network: Universum, crosslinkerType, weights=1):
@@ -160,6 +192,9 @@ def calculateWeightFractionOfDanglingChains(network: Universum, crosslinkerType,
       - weightFraction: weightDangling/weightTotal, 
       - numFraction: numDangling/numTotal
     """
+    if (network.getSize() < 1):
+        return 0.0
+
     def getWeightOfGraph(graph):
         counts = Counter(graph["type"])
         weightTotal = 0
@@ -181,6 +216,9 @@ def calculateWeightFractionOfDanglingChains(network: Universum, crosslinkerType,
         if (chain.getType() is Molecule.MoleculeType.DANGLING_CHAIN):
             numDangling += chain.getLength()
             weightDangling += getWeightOfGraph(chain.getUnderlyingGraph())
+
+    if (weightTotal == 0):
+      return 0, numDangling/numTotal
 
     return weightDangling/weightTotal, numDangling/numTotal
 

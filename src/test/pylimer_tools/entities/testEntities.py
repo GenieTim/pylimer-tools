@@ -66,7 +66,8 @@ class TestEntities(unittest.TestCase):
         molecules = universe.getMolecules()
         self.assertEqual(len(molecules), 2)
         self.assertEqual(molecules[0].getLength(), 3)
-        self.assertEqual(np.sum([m.getLength() for m in molecules]), len(self.testAtoms))
+        self.assertEqual(np.sum([m.getLength()
+                                 for m in molecules]), len(self.testAtoms))
         molecules = universe.getMolecules(ignoreAtomType=2)
         self.assertEqual(len(molecules), 2)
         self.assertEqual(len(universe.getChainsWithCrosslinker(0)), 2)
@@ -83,7 +84,7 @@ class TestEntities(unittest.TestCase):
         self.assertEqual(chainsWithCrosslinker[0].getType(
         ), Molecule.MoleculeType.FREE_CHAIN)
         self.assertEqual(
-            chainsWithCrosslinker[1].getType(), Molecule.MoleculeType.LOOP)
+            chainsWithCrosslinker[1].getType(), Molecule.MoleculeType.PRIMARY_LOOP)
 
         # test iteration & return type
         for molecule in molecules:
