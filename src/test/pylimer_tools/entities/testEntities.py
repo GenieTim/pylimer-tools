@@ -22,6 +22,13 @@ class TestEntities(unittest.TestCase):
     def setUp(self):
         self.addTypeEqualityFunc(pd.Series, self.assertSeriesEqual)
 
+    """
+    This system looks like:
+
+    1-2-3
+
+    *7-*6-5
+    """
     testAtoms = pd.DataFrame([
         {"id": 1, "nx": 1, "ny": 1, "nz": 1,
             "type": 1, "x": 1, "y": 1, "z": 1},
@@ -80,11 +87,11 @@ class TestEntities(unittest.TestCase):
             self.assertEqual(molecule.getType(),
                              Molecule.MoleculeType.FREE_CHAIN)
 
-        chainsWithCrosslinker = universe.getChainsWithCrosslinker(2)
+        chainsWithCrosslinker = universe.getChainsWithCrosslinker(crosslinkerType=2)
         self.assertEqual(chainsWithCrosslinker[0].getType(
         ), Molecule.MoleculeType.FREE_CHAIN)
         self.assertEqual(
-            chainsWithCrosslinker[1].getType(), Molecule.MoleculeType.PRIMARY_LOOP)
+            chainsWithCrosslinker[1].getType(), Molecule.MoleculeType.DANGLING_CHAIN)
 
         # test iteration & return type
         for molecule in molecules:

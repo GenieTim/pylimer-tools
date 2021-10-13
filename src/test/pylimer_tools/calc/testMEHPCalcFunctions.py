@@ -7,10 +7,11 @@ from pylimer_tools.entities.universum import Universum
 
 class TestDistanceCalcFunctions(unittest.TestCase):
 
-    # The system looks like this:
+    # The system looks like this (in terms of bonds, not 3D placement):
     # 1-2-3-*6
     # |      |
     # *7-5---|
+    # 8  
     #
     # *4
     testAtoms = pd.DataFrame([
@@ -28,6 +29,8 @@ class TestDistanceCalcFunctions(unittest.TestCase):
          "type": 2, "x": 1, "y": 1, "z": 2},
         {"id": 7, "nx": 1, "ny": 1, "nz": 1,
          "type": 2, "x": 1, "y": 1, "z": 3},
+        {"id": 8, "nx": 1, "ny": 1, "nz": 1,
+         "type": 1, "x": 2, "y": 2, "z": 2},
     ])
     testBonds = pd.DataFrame([
         {"to": 1, "bondFrom": 2},
@@ -36,7 +39,8 @@ class TestDistanceCalcFunctions(unittest.TestCase):
         {"to": 6, "bondFrom": 7},
         {"to": 1, "bondFrom": 7},
         {"to": 5, "bondFrom": 7},
-        {"to": 3, "bondFrom": 6}
+        {"to": 3, "bondFrom": 6},
+        {"to": 7, "bondFrom": 8}
     ])
 
     def testCycleRankCalculation(self):
@@ -50,7 +54,7 @@ class TestDistanceCalcFunctions(unittest.TestCase):
         self.assertRaises(
             ValueError, lambda: calculateCycleRank(universe, nu=1))
         self.assertEqual(
-            3.0/7.0, calculateCycleRank(universe, None, None, 1, 1, 2))
+            3.0/8.0, calculateCycleRank(universe, None, None, 1, 1, 2))
 
     def testEffectiveNrDensityOfJunctionCalculation(self):
         universe = Universum([10, 10, 10])
@@ -74,7 +78,7 @@ class TestDistanceCalcFunctions(unittest.TestCase):
         universe = Universum([10, 10, 10])
         self.assertIsNone(calculateEffectiveNrDensityOfNetwork(universe))
         universe.addAtomBondData(self.testAtoms, self.testBonds)
-        self.assertEqual(2, len(universe.getMolecules(2)))
+        self.assertEqual(3, len(universe.getMolecules(2)))
         # Border cases
         self.assertEqual(0.0, calculateEffectiveNrDensityOfNetwork(
             universe, None, 10, junctionType=2))
@@ -84,13 +88,19 @@ class TestDistanceCalcFunctions(unittest.TestCase):
             0.0, calculateEffectiveNrDensityOfNetwork(universe, 1000, 1, junctionType=2))
         # actual calc
         self.assertEqual(
-            3.0/7.0, calculateEffectiveNrDensityOfNetwork(universe, 0, 2, junctionType=2))
-    
+            3.0/8.0, calculateEffectiveNrDensityOfNetwork(universe, 0, 2, junctionType=2))
+
     def testWeightFractionCalculations(self):
         universe = Universum([10, 10, 10])
-        self.assertEqual(0.0, calculateWeightFractionOfDanglingChains(universe, 2, 1))
+        self.assertEqual(
+            (0.0, 0.0), calculateWeightFractionOfDanglingChains(universe, 2, 1))
         universe.addAtomBondData(self.testAtoms, self.testBonds)
         # empty weight -> empty weight fraction
-        self.assertEqual(0.0, calculateWeightFractionOfDanglingChains(universe, 2, 0))
-        self.assertEqual(1.0, calculateWeightFractionOfBackbone(universe, 2, 0))
-
+        self.assertEqual(
+            (0.0, 0.25), calculateWeightFractionOfDanglingChains(universe, 2, 0))
+        self.assertEqual(
+            1.0, calculateWeightFractionOfBackbone(universe, 2, 0))
+        # non-empty weights
+        print("\nFinal test")
+        self.assertEqual(
+            (0.2, 0.25), calculateWeightFractionOfDanglingChains(universe, crosslinkerType=2, weights={1: 1, 2: 0}))
