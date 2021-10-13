@@ -197,7 +197,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">graph_without_crosslinkers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">underlying_graph</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">graph_without_crosslinkers</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-          <span class="k">return</span> <span class="p">[]</span>
+            <span class="k">return</span> <span class="p">[]</span>
         <span class="n">crosslinkerVertices</span> <span class="o">=</span> <span class="n">graph_without_crosslinkers</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span>
             <span class="n">type_eq</span><span class="o">=</span><span class="n">crosslinkerType</span><span class="p">)</span>
         <span class="n">graph_without_crosslinkers</span><span class="o">.</span><span class="n">delete_vertices</span><span class="p">(</span>
@@ -231,7 +231,7 @@
                             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span>
                             <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;atom&quot;</span><span class="p">]</span>
                         <span class="p">})</span>
-                        <span class="n">chain</span><span class="o">.</span><span class="n">add_edges</span><span class="p">([(</span><span class="n">endNode</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])])</span>
+                        <span class="n">chain</span><span class="o">.</span><span class="n">add_edges</span><span class="p">([(</span><span class="n">endNode</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])])</span>
 
             <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span> <span class="o">==</span> <span class="n">moleculeLengthBefore</span><span class="p">):</span>
                 <span class="n">strandType</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">FREE_CHAIN</span>
@@ -240,7 +240,7 @@
             <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span> <span class="o">==</span> <span class="n">moleculeLengthBefore</span><span class="o">+</span><span class="mi">2</span><span class="p">):</span>
                 <span class="n">strandType</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">NETWORK_STRAND</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">isLoop</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">endNodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-                <span class="n">strandType</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">LOOP</span>
+                <span class="n">strandType</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">PRIMARY_LOOP</span>
             <span class="c1"># prepare for return</span>
             <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Molecule</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">chainType</span><span class="o">=</span><span class="n">strandType</span><span class="p">))</span>
 
@@ -433,7 +433,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">graph_without_crosslinkers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">underlying_graph</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">graph_without_crosslinkers</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-          <span class="k">return</span> <span class="p">[]</span>
+            <span class="k">return</span> <span class="p">[]</span>
         <span class="n">crosslinkerVertices</span> <span class="o">=</span> <span class="n">graph_without_crosslinkers</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span>
             <span class="n">type_eq</span><span class="o">=</span><span class="n">crosslinkerType</span><span class="p">)</span>
         <span class="n">graph_without_crosslinkers</span><span class="o">.</span><span class="n">delete_vertices</span><span class="p">(</span>
@@ -467,7 +467,7 @@
                             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span>
                             <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;atom&quot;</span><span class="p">]</span>
                         <span class="p">})</span>
-                        <span class="n">chain</span><span class="o">.</span><span class="n">add_edges</span><span class="p">([(</span><span class="n">endNode</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])])</span>
+                        <span class="n">chain</span><span class="o">.</span><span class="n">add_edges</span><span class="p">([(</span><span class="n">endNode</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])])</span>
 
             <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span> <span class="o">==</span> <span class="n">moleculeLengthBefore</span><span class="p">):</span>
                 <span class="n">strandType</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">FREE_CHAIN</span>
@@ -476,7 +476,7 @@
             <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span> <span class="o">==</span> <span class="n">moleculeLengthBefore</span><span class="o">+</span><span class="mi">2</span><span class="p">):</span>
                 <span class="n">strandType</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">NETWORK_STRAND</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">isLoop</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">endNodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-                <span class="n">strandType</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">LOOP</span>
+                <span class="n">strandType</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">PRIMARY_LOOP</span>
             <span class="c1"># prepare for return</span>
             <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Molecule</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">chainType</span><span class="o">=</span><span class="n">strandType</span><span class="p">))</span>
 
@@ -796,7 +796,7 @@ For example, a generic mapping type might be defined as::</p>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">graph_without_crosslinkers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">underlying_graph</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">graph_without_crosslinkers</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-          <span class="k">return</span> <span class="p">[]</span>
+            <span class="k">return</span> <span class="p">[]</span>
         <span class="n">crosslinkerVertices</span> <span class="o">=</span> <span class="n">graph_without_crosslinkers</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span>
             <span class="n">type_eq</span><span class="o">=</span><span class="n">crosslinkerType</span><span class="p">)</span>
         <span class="n">graph_without_crosslinkers</span><span class="o">.</span><span class="n">delete_vertices</span><span class="p">(</span>
@@ -830,7 +830,7 @@ For example, a generic mapping type might be defined as::</p>
                             <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span>
                             <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;atom&quot;</span><span class="p">]</span>
                         <span class="p">})</span>
-                        <span class="n">chain</span><span class="o">.</span><span class="n">add_edges</span><span class="p">([(</span><span class="n">endNode</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])])</span>
+                        <span class="n">chain</span><span class="o">.</span><span class="n">add_edges</span><span class="p">([(</span><span class="n">endNode</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])])</span>
 
             <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span> <span class="o">==</span> <span class="n">moleculeLengthBefore</span><span class="p">):</span>
                 <span class="n">strandType</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">FREE_CHAIN</span>
@@ -839,7 +839,7 @@ For example, a generic mapping type might be defined as::</p>
             <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span> <span class="o">==</span> <span class="n">moleculeLengthBefore</span><span class="o">+</span><span class="mi">2</span><span class="p">):</span>
                 <span class="n">strandType</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">NETWORK_STRAND</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">isLoop</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">endNodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-                <span class="n">strandType</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">LOOP</span>
+                <span class="n">strandType</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">PRIMARY_LOOP</span>
             <span class="c1"># prepare for return</span>
             <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Molecule</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">chainType</span><span class="o">=</span><span class="n">strandType</span><span class="p">))</span>
 
