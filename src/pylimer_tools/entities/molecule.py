@@ -1,6 +1,8 @@
 
 from enum import Enum
 from typing import Iterable
+import warnings
+import igraph
 
 import numpy as np
 from pylimer_tools.entities._graphDecorator import GraphDecorator
@@ -12,7 +14,7 @@ class Molecule(GraphDecorator, Iterable):
     class MoleculeType(Enum):
         UNDEFINED = 0
         NETWORK_STRAND = 1
-        LOOP = 2
+        PRIMARY_LOOP = 2
         DANGLING_CHAIN = 3
         FREE_CHAIN = 4
 
@@ -20,6 +22,8 @@ class Molecule(GraphDecorator, Iterable):
 
     def __init__(self, molecule_graph, chainType=MoleculeType.UNDEFINED):
         self.underlying_graph = molecule_graph
+        self.underlying_graph.simplify()
+        # print(self.underlying_graph.vcount())
         self.moleculeType = chainType
 
     def decomposeFurther(self, splitAtomType):
@@ -39,7 +43,7 @@ class Molecule(GraphDecorator, Iterable):
         graphCopy.delete_vertices(verticesToRemoveIndices)
 
         subMolecules = []
-        subgraphs = self.underlying_graph.decompose()
+        subgraphs = graphCopy.decompose()
         for subgraph in subgraphs:
             subMolecules.append(
                 Molecule(subgraph, Molecule.MoleculeType.FREE_CHAIN))
@@ -54,9 +58,11 @@ class Molecule(GraphDecorator, Iterable):
               `None` if the molecule/chain does not have two distinct ends.
         """
         if (self.underlying_graph.vcount() < 2):
+            # warnings.warn("Underlying_graph too small for end-to-end distance")
             return None
         endNodes = self.underlying_graph.vs.select(_degree_eq=1)
         if (len(endNodes) != 2):
+            # warnings.warn("Underlying_graph has {} instead of 2 end nodes".format(len(endNodes)))
             return None
 
         atom1 = endNodes[0]["atom"]
