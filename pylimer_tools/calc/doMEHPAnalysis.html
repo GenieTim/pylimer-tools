@@ -63,6 +63,9 @@
                     <a class="function" href="#calculateWeightFractionOfDanglingChains">calculateWeightFractionOfDanglingChains</a>
             </li>
             <li>
+                    <a class="function" href="#predictShearModulus">predictShearModulus</a>
+            </li>
+            <li>
                     <a class="function" href="#predictGelationPoint">predictGelationPoint</a>
             </li>
             <li>
@@ -101,6 +104,7 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
 
+<span class="kn">import</span> <span class="nn">igraph</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">pylimer_tools.entities.molecule</span> <span class="kn">import</span> <span class="n">Molecule</span>
 <span class="kn">from</span> <span class="nn">pylimer_tools.entities.universum</span> <span class="kn">import</span> <span class="n">Universum</span>
@@ -124,7 +128,7 @@
 <span class="sd">    - network, absTol, relTol, junctionType</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">      - cycleRank: the cycle rank ($\\chi = \\nu_{eff} - \\mu_{eff}$) </span>
+<span class="sd">      - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$) </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">nu</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">junctionType</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">network</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
@@ -322,6 +326,26 @@
     <span class="k">return</span> <span class="n">weightDangling</span><span class="o">/</span><span class="n">weightTotal</span><span class="p">,</span> <span class="n">numDangling</span><span class="o">/</span><span class="n">numTotal</span>
 
 
+<span class="k">def</span> <span class="nf">predictShearModulus</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">T</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k_B</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">foreignAtomType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">totalMass</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Predict the shear modulus using ANT Analysis.</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">      - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - network: the polymer system to predict the shear modulus for</span>
+<span class="sd">      - T: the temperature in your unit system</span>
+<span class="sd">      - k_b: Boltzmann&#39;s constant in your unit system</span>
+<span class="sd">      - foreignAtomType: the type of atoms to ignore</span>
+<span class="sd">      - totalMass: the $M$ in the respective formula</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Gamma</span> <span class="o">=</span> <span class="n">calculateTopologicalFactor</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">foreignAtomType</span><span class="p">,</span> <span class="n">totalMass</span><span class="p">)</span>
+    <span class="n">nu</span> <span class="o">=</span> <span class="n">calculateEffectiveNrDensityOfNetwork</span><span class="p">(</span>
+        <span class="n">network</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="n">foreignAtomType</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Gamma</span><span class="o">*</span><span class="n">nu</span><span class="o">*</span><span class="n">k_B</span><span class="o">*</span><span class="n">T</span>
+
+
 <span class="k">def</span> <span class="nf">predictGelationPoint</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the gelation point $p_{gel}$ as theoretically predicted</span>
@@ -461,7 +485,7 @@
 <span class="sd">    - network, absTol, relTol, junctionType</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">      - cycleRank: the cycle rank ($\\chi = \\nu_{eff} - \\mu_{eff}$) </span>
+<span class="sd">      - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$) </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">nu</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">junctionType</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">network</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
@@ -508,7 +532,7 @@ Assumes the precursor-chains to be bifunctional.</p>
 
 <blockquote>
   <ul>
-  <li>cycleRank: the cycle rank ($\chi = \nu_{eff} - \mu_{eff}$)</li>
+  <li>cycleRank: the cycle rank ($\xi = \nu_{eff} - \mu_{eff}$)</li>
   </ul>
 </blockquote>
 </div>
@@ -857,6 +881,69 @@ Assumes the precursor-chains to be bifunctional.</p>
   <ul>
   <li>weightFraction: weightDangling/weightTotal, </li>
   <li>numFraction: numDangling/numTotal</li>
+  </ul>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="predictShearModulus">
+                            <div class="attr function"><a class="headerlink" href="#predictShearModulus">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">predictShearModulus</span><span class="signature">(
+    network: <a href="../entities/universum.html#Universum">pylimer_tools.entities.universum.Universum</a>,
+    T: float = 1,
+    k_B: float = 1,
+    foreignAtomType=None,
+    totalMass=1
+)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">predictShearModulus</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">T</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k_B</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">foreignAtomType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">totalMass</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Predict the shear modulus using ANT Analysis.</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">      - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - network: the polymer system to predict the shear modulus for</span>
+<span class="sd">      - T: the temperature in your unit system</span>
+<span class="sd">      - k_b: Boltzmann&#39;s constant in your unit system</span>
+<span class="sd">      - foreignAtomType: the type of atoms to ignore</span>
+<span class="sd">      - totalMass: the $M$ in the respective formula</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">Gamma</span> <span class="o">=</span> <span class="n">calculateTopologicalFactor</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">foreignAtomType</span><span class="p">,</span> <span class="n">totalMass</span><span class="p">)</span>
+    <span class="n">nu</span> <span class="o">=</span> <span class="n">calculateEffectiveNrDensityOfNetwork</span><span class="p">(</span>
+        <span class="n">network</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="n">foreignAtomType</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Gamma</span><span class="o">*</span><span class="n">nu</span><span class="o">*</span><span class="n">k_B</span><span class="o">*</span><span class="n">T</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Predict the shear modulus using ANT Analysis.</p>
+
+<h6 id="source">Source</h6>
+
+<blockquote>
+  <ul>
+  <li>https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</li>
+  </ul>
+</blockquote>
+
+<h6 id="arguments">Arguments</h6>
+
+<blockquote>
+  <ul>
+  <li>network: the polymer system to predict the shear modulus for</li>
+  <li>T: the temperature in your unit system</li>
+  <li>k_b: Boltzmann's constant in your unit system</li>
+  <li>foreignAtomType: the type of atoms to ignore</li>
+  <li>totalMass: the $M$ in the respective formula</li>
   </ul>
 </blockquote>
 </div>

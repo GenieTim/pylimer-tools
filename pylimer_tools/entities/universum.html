@@ -63,6 +63,9 @@
                                 <a class="function" href="#Universum.getChainsWithCrosslinker">getChainsWithCrosslinker</a>
                         </li>
                         <li>
+                                <a class="function" href="#Universum.determineFunctionalityPerType">determineFunctionalityPerType</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#Universum.getAtom">getAtom</a>
                         </li>
                         <li>
@@ -104,6 +107,7 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span>
 
 <span class="kn">import</span> <span class="nn">igraph</span>
@@ -112,6 +116,10 @@
 <span class="kn">from</span> <span class="nn">pylimer_tools.entities._graphDecorator</span> <span class="kn">import</span> <span class="n">GraphDecorator</span>
 <span class="kn">from</span> <span class="nn">pylimer_tools.entities.atom</span> <span class="kn">import</span> <span class="n">Atom</span>
 <span class="kn">from</span> <span class="nn">pylimer_tools.entities.molecule</span> <span class="kn">import</span> <span class="n">Molecule</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Universum Class: represents a full Polymer Network structure, a collection of molecules.</span>
+<span class="sd">&quot;&quot;&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">Universum</span><span class="p">(</span><span class="n">GraphDecorator</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">):</span>
@@ -215,9 +223,9 @@
             <span class="n">isLoop</span> <span class="o">=</span> <span class="kc">False</span>
 
             <span class="k">if</span> <span class="p">(</span><span class="n">moleculeLengthBefore</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
-              <span class="c1"># single atom. degree 0. </span>
-              <span class="n">endNodes</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">_degree_eq</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-              <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">endNodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="c1"># single atom. degree 0.</span>
+                <span class="n">endNodes</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">_degree_eq</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">endNodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">endNode</span> <span class="ow">in</span> <span class="n">endNodes</span><span class="p">:</span>
                 <span class="c1"># find matching crosslinker</span>
@@ -237,7 +245,7 @@
                             <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;atom&quot;</span><span class="p">]</span>
                         <span class="p">})</span>
                         <span class="n">chain</span><span class="o">.</span><span class="n">add_edges</span><span class="p">([(</span><span class="n">endNode</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])])</span>
-                    
+
             <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span> <span class="o">==</span> <span class="n">moleculeLengthBefore</span><span class="p">):</span>
                 <span class="n">strandType</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">FREE_CHAIN</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span> <span class="o">==</span> <span class="n">moleculeLengthBefore</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
@@ -250,6 +258,24 @@
             <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Molecule</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">chainType</span><span class="o">=</span><span class="n">strandType</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">chains</span>
+
+    <span class="k">def</span> <span class="nf">determineFunctionalityPerType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typeCounts</span><span class="p">:</span> <span class="n">Counter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the maximum functionality of each atom type in the network</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">          - typeCounts: the count of each type in the network. Optional to reduce duplicate counting costs.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          - functionalitites (dict): a dictionary with key: type, and value: functionality of this atom type. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">typeCounts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">typeCounts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">underlying_graph</span><span class="o">.</span><span class="n">vs</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">])</span>
+        <span class="n">functionalityPerType</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">typeCounts</span><span class="p">:</span>
+            <span class="n">functionalityPerType</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">underlying_graph</span><span class="o">.</span><span class="n">degree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">underlying_graph</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">type_eq</span><span class="o">=</span><span class="n">key</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">functionalityPerType</span>
 
     <span class="k">def</span> <span class="nf">getAtom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atomId</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Atom</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -456,9 +482,9 @@
             <span class="n">isLoop</span> <span class="o">=</span> <span class="kc">False</span>
 
             <span class="k">if</span> <span class="p">(</span><span class="n">moleculeLengthBefore</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
-              <span class="c1"># single atom. degree 0. </span>
-              <span class="n">endNodes</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">_degree_eq</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-              <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">endNodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="c1"># single atom. degree 0.</span>
+                <span class="n">endNodes</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">_degree_eq</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">endNodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">endNode</span> <span class="ow">in</span> <span class="n">endNodes</span><span class="p">:</span>
                 <span class="c1"># find matching crosslinker</span>
@@ -478,7 +504,7 @@
                             <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;atom&quot;</span><span class="p">]</span>
                         <span class="p">})</span>
                         <span class="n">chain</span><span class="o">.</span><span class="n">add_edges</span><span class="p">([(</span><span class="n">endNode</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])])</span>
-                    
+
             <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span> <span class="o">==</span> <span class="n">moleculeLengthBefore</span><span class="p">):</span>
                 <span class="n">strandType</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">FREE_CHAIN</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span> <span class="o">==</span> <span class="n">moleculeLengthBefore</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
@@ -491,6 +517,24 @@
             <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Molecule</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">chainType</span><span class="o">=</span><span class="n">strandType</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">chains</span>
+
+    <span class="k">def</span> <span class="nf">determineFunctionalityPerType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typeCounts</span><span class="p">:</span> <span class="n">Counter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the maximum functionality of each atom type in the network</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">          - typeCounts: the count of each type in the network. Optional to reduce duplicate counting costs.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          - functionalitites (dict): a dictionary with key: type, and value: functionality of this atom type. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">typeCounts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">typeCounts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">underlying_graph</span><span class="o">.</span><span class="n">vs</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">])</span>
+        <span class="n">functionalityPerType</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">typeCounts</span><span class="p">:</span>
+            <span class="n">functionalityPerType</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">underlying_graph</span><span class="o">.</span><span class="n">degree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">underlying_graph</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">type_eq</span><span class="o">=</span><span class="n">key</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">functionalityPerType</span>
 
     <span class="k">def</span> <span class="nf">getAtom</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atomId</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Atom</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -824,9 +868,9 @@ For example, a generic mapping type might be defined as::</p>
             <span class="n">isLoop</span> <span class="o">=</span> <span class="kc">False</span>
 
             <span class="k">if</span> <span class="p">(</span><span class="n">moleculeLengthBefore</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
-              <span class="c1"># single atom. degree 0. </span>
-              <span class="n">endNodes</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">_degree_eq</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-              <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">endNodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="c1"># single atom. degree 0.</span>
+                <span class="n">endNodes</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">_degree_eq</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">endNodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">endNode</span> <span class="ow">in</span> <span class="n">endNodes</span><span class="p">:</span>
                 <span class="c1"># find matching crosslinker</span>
@@ -846,7 +890,7 @@ For example, a generic mapping type might be defined as::</p>
                             <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;atom&quot;</span><span class="p">]</span>
                         <span class="p">})</span>
                         <span class="n">chain</span><span class="o">.</span><span class="n">add_edges</span><span class="p">([(</span><span class="n">endNode</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])])</span>
-                    
+
             <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span> <span class="o">==</span> <span class="n">moleculeLengthBefore</span><span class="p">):</span>
                 <span class="n">strandType</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">FREE_CHAIN</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span> <span class="o">==</span> <span class="n">moleculeLengthBefore</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
@@ -879,6 +923,58 @@ In turn, e.g. for a tetrafunctional crosslinker, it will be 4 times in the resul
 <blockquote>
   <ul>
   <li>molecules (list): a list of Molecule objects</li>
+  </ul>
+</blockquote>
+</div>
+
+
+                            </div>
+                            <div id="Universum.determineFunctionalityPerType" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Universum.determineFunctionalityPerType">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">determineFunctionalityPerType</span><span class="signature">(self, typeCounts: collections.Counter = None) -&gt; dict</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">determineFunctionalityPerType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">typeCounts</span><span class="p">:</span> <span class="n">Counter</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find the maximum functionality of each atom type in the network</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">          - typeCounts: the count of each type in the network. Optional to reduce duplicate counting costs.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          - functionalitites (dict): a dictionary with key: type, and value: functionality of this atom type. </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">typeCounts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">typeCounts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">underlying_graph</span><span class="o">.</span><span class="n">vs</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">])</span>
+        <span class="n">functionalityPerType</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">typeCounts</span><span class="p">:</span>
+            <span class="n">functionalityPerType</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">underlying_graph</span><span class="o">.</span><span class="n">degree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">underlying_graph</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">type_eq</span><span class="o">=</span><span class="n">key</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">functionalityPerType</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Find the maximum functionality of each atom type in the network</p>
+
+<h6 id="arguments">Arguments</h6>
+
+<blockquote>
+  <ul>
+  <li>typeCounts: the count of each type in the network. Optional to reduce duplicate counting costs.</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>functionalitites (dict): a dictionary with key: type, and value: functionality of this atom type.</li>
   </ul>
 </blockquote>
 </div>
