@@ -288,9 +288,12 @@ def calculateEffectiveCrosslinkerFunctionalities(network: Universum, junctionTyp
     Returns:
       - junctionDegrees (list[int]): the functionality of every crosslinker
     """
-    junctions = network.vs.select(type_eq=junctionType)
+    if (network.getSize() == 0):
+        return []
+    junctions = network.getUnderlyingGraph().vs.select(type_eq=junctionType)
     junctionIds = [v.index for v in junctions]
-    junctionDegrees = network.degree(junctionIds, mode="all", loops=False)
+    junctionDegrees = network.getUnderlyingGraph().degree(
+        junctionIds, mode="all", loops=False)
     return junctionDegrees
 
 
@@ -313,6 +316,8 @@ def calculateTopologicalFactor(network: Universum, foreignAtomType=None, totalMa
     molecules = network.getMolecules(ignoreAtomType=foreignAtomType)
     Gamma_sum = 0
     for molecule in molecules:
+        if (molecule.getLength() < 2):  # single beads result in b = None
+            continue
         R_tau = molecule.computeEndToEndDistance()
         b = molecule.computeBondLengths().mean()
         Gamma_sum += R_tau*R_tau / (molecule.getLength() * b * b)
