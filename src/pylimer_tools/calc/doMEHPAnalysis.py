@@ -3,6 +3,7 @@
 import warnings
 from collections import Counter
 
+import igraph
 import numpy as np
 from pylimer_tools.entities.molecule import Molecule
 from pylimer_tools.entities.universum import Universum
@@ -26,7 +27,7 @@ def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTo
     - network, absTol, relTol, junctionType
 
     Returns:
-      - cycleRank: the cycle rank ($\\chi = \\nu_{eff} - \\mu_{eff}$) 
+      - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$) 
     """
     if (nu is None):
         if (junctionType is None or network is None):
@@ -222,6 +223,26 @@ def calculateWeightFractionOfDanglingChains(network: Universum, crosslinkerType,
         return 0.0, numDangling/numTotal
 
     return weightDangling/weightTotal, numDangling/numTotal
+
+
+def predictShearModulus(network: Universum, T: float = 1, k_B: float = 1, foreignAtomType=None, totalMass=1):
+    """
+    Predict the shear modulus using ANT Analysis.
+
+    Source:
+      - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262
+
+    Arguments:
+      - network: the polymer system to predict the shear modulus for
+      - T: the temperature in your unit system
+      - k_b: Boltzmann's constant in your unit system
+      - foreignAtomType: the type of atoms to ignore
+      - totalMass: the $M$ in the respective formula
+    """
+    Gamma = calculateTopologicalFactor(network, foreignAtomType, totalMass)
+    nu = calculateEffectiveNrDensityOfNetwork(
+        network, junctionType=foreignAtomType)
+    return Gamma*nu*k_B*T
 
 
 def predictGelationPoint(r: float, f: int, g: int = 2) -> float:
