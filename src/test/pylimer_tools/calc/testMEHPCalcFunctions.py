@@ -11,7 +11,7 @@ class TestDistanceCalcFunctions(unittest.TestCase):
     # 1-2-3-*6
     # |      |
     # *7-5---|
-    # 8  
+    # 8
     #
     # *4
     testAtoms = pd.DataFrame([
@@ -36,7 +36,6 @@ class TestDistanceCalcFunctions(unittest.TestCase):
         {"to": 1, "bondFrom": 2},
         {"to": 3, "bondFrom": 2},
         {"to": 5, "bondFrom": 6},
-        {"to": 6, "bondFrom": 7},
         {"to": 1, "bondFrom": 7},
         {"to": 5, "bondFrom": 7},
         {"to": 3, "bondFrom": 6},
@@ -101,6 +100,28 @@ class TestDistanceCalcFunctions(unittest.TestCase):
         self.assertEqual(
             1.0, calculateWeightFractionOfBackbone(universe, 2, 0))
         # non-empty weights
-        print("\nFinal test")
         self.assertEqual(
             (0.2, 0.25), calculateWeightFractionOfDanglingChains(universe, crosslinkerType=2, weights={1: 1, 2: 0}))
+
+    def testGelationPointPrediction(self):
+        universe = Universum([10, 10, 10])
+        universe.addAtomBondData(self.testAtoms, self.testBonds)
+        self.assertEqual(1, predictGelationPoint(1, 2))
+        self.assertEqual(1, predictGelationPoint(1, 2, 2))
+
+    def testCrosslinkerFunctionalityCalculation(self):
+        universe = Universum([10, 10, 10])
+        self.assertCountEqual(
+            [], calculateEffectiveCrosslinkerFunctionalities(universe, 2))
+        universe.addAtomBondData(self.testAtoms, self.testBonds)
+        self.assertSequenceEqual(
+            [0, 2, 3], calculateEffectiveCrosslinkerFunctionalities(universe, 2))
+        self.assertEqual(
+            5.0/3.0, calculateEffectiveCrosslinkerFunctionality(universe, 2))
+        self.assertEqual(
+            5.0/3.0/3.0, computeCrosslinkerConversion(universe, 2, 3))
+
+    def testTopologicalFactorComputation(self):
+        universe = Universum([10, 10, 10])
+        universe.addAtomBondData(self.testAtoms, self.testBonds)
+        self.assertEqual(1 + 1.0/3.0, calculateTopologicalFactor(universe, 2))

@@ -1,9 +1,9 @@
 
+import warnings
 from enum import Enum
 from typing import Iterable
-import warnings
-import igraph
 
+import igraph
 import numpy as np
 from pylimer_tools.entities._graphDecorator import GraphDecorator
 from pylimer_tools.entities.atom import Atom
@@ -111,6 +111,10 @@ class Molecule(GraphDecorator, Iterable):
           - atom (Atom): the atom of the current iteration.
         """
         endNodes = self.underlying_graph.vs.select(_degree_eq=1)
+        if (self.getLength() < 1):
+            return
+        if (len(endNodes) < 1 and self.getLength() == 1):
+            endNodes = self.underlying_graph.vs.select(_degree_eq=0)
         subIterator = self.underlying_graph.dfsiter(
             endNodes[0], mode="all", advanced=False)
         for node in subIterator:
