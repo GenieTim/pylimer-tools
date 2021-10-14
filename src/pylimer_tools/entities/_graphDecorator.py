@@ -1,10 +1,11 @@
 import igraph
 
+
 class GraphDecorator(object):
 
     underlying_graph: igraph.Graph
 
-    def getUnderlyingGraph(self):
+    def getUnderlyingGraph(self) -> igraph.Graph:
         """
         Return the underlying graph
 

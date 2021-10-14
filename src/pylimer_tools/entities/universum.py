@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import Counter
 from typing import Iterable
 
 import igraph
@@ -8,6 +9,10 @@ import pandas as pd
 from pylimer_tools.entities._graphDecorator import GraphDecorator
 from pylimer_tools.entities.atom import Atom
 from pylimer_tools.entities.molecule import Molecule
+
+"""
+Universum Class: represents a full Polymer Network structure, a collection of molecules.
+"""
 
 
 class Universum(GraphDecorator, Iterable):
@@ -111,9 +116,9 @@ class Universum(GraphDecorator, Iterable):
             isLoop = False
 
             if (moleculeLengthBefore == 1):
-              # single atom. degree 0. 
-              endNodes = chain.vs.select(_degree_eq=0)
-              assert(len(endNodes) == 1)
+                # single atom. degree 0.
+                endNodes = chain.vs.select(_degree_eq=0)
+                assert(len(endNodes) == 1)
 
             for endNode in endNodes:
                 # find matching crosslinker
@@ -133,7 +138,7 @@ class Universum(GraphDecorator, Iterable):
                             "atom": neighbor["atom"]
                         })
                         chain.add_edges([(endNode["name"], neighbor["name"])])
-                    
+
             if (chain.vcount() == moleculeLengthBefore):
                 strandType = Molecule.MoleculeType.FREE_CHAIN
             if (chain.vcount() == moleculeLengthBefore+1):
@@ -146,6 +151,24 @@ class Universum(GraphDecorator, Iterable):
             chains.append(Molecule(chain, chainType=strandType))
 
         return chains
+
+    def determineFunctionalityPerType(self, typeCounts: Counter = None) -> dict:
+        """
+        Find the maximum functionality of each atom type in the network
+
+        Arguments:
+          - typeCounts: the count of each type in the network. Optional to reduce duplicate counting costs.
+
+        Returns:
+          - functionalitites (dict): a dictionary with key: type, and value: functionality of this atom type. 
+        """
+        if (typeCounts is None):
+            typeCounts = Counter(self.underlying_graph.vs["type"])
+        functionalityPerType = {}
+        for key in typeCounts:
+            functionalityPerType[key] = max(
+                self.underlying_graph.degree(self.underlying_graph.vs.select(type_eq=key)))
+        return functionalityPerType
 
     def getAtom(self, atomId: int) -> Atom:
         """

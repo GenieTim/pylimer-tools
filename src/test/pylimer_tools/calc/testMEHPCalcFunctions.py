@@ -5,7 +5,7 @@ from pylimer_tools.calc.doMEHPAnalysis import *
 from pylimer_tools.entities.universum import Universum
 
 
-class TestDistanceCalcFunctions(unittest.TestCase):
+class TestMEHPAnalysisFunctions(unittest.TestCase):
 
     # The system looks like this (in terms of bonds, not 3D placement):
     # 1-2-3-*6
@@ -125,3 +125,4 @@ class TestDistanceCalcFunctions(unittest.TestCase):
         universe = Universum([10, 10, 10])
         universe.addAtomBondData(self.testAtoms, self.testBonds)
         self.assertEqual(1 + 1.0/3.0, calculateTopologicalFactor(universe, 2))
+

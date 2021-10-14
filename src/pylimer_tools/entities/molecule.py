@@ -8,6 +8,10 @@ import numpy as np
 from pylimer_tools.entities._graphDecorator import GraphDecorator
 from pylimer_tools.entities.atom import Atom
 
+"""
+Molecule Class: represents a single chain, sequence of connected atoms.
+"""
+
 
 class Molecule(GraphDecorator, Iterable):
 
