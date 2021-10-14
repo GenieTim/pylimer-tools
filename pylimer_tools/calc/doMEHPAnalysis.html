@@ -386,9 +386,12 @@
 <span class="sd">    Returns:</span>
 <span class="sd">      - junctionDegrees (list[int]): the functionality of every crosslinker</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">junctions</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">type_eq</span><span class="o">=</span><span class="n">junctionType</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">junctions</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getUnderlyingGraph</span><span class="p">()</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">type_eq</span><span class="o">=</span><span class="n">junctionType</span><span class="p">)</span>
     <span class="n">junctionIds</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">junctions</span><span class="p">]</span>
-    <span class="n">junctionDegrees</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">degree</span><span class="p">(</span><span class="n">junctionIds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">junctionDegrees</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getUnderlyingGraph</span><span class="p">()</span><span class="o">.</span><span class="n">degree</span><span class="p">(</span>
+        <span class="n">junctionIds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">junctionDegrees</span>
 
 
@@ -411,6 +414,8 @@
     <span class="n">molecules</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getMolecules</span><span class="p">(</span><span class="n">ignoreAtomType</span><span class="o">=</span><span class="n">foreignAtomType</span><span class="p">)</span>
     <span class="n">Gamma_sum</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="n">molecules</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">getLength</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">):</span>  <span class="c1"># single beads result in b = None</span>
+            <span class="k">continue</span>
         <span class="n">R_tau</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">computeEndToEndDistance</span><span class="p">()</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">computeBondLengths</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
         <span class="n">Gamma_sum</span> <span class="o">+=</span> <span class="n">R_tau</span><span class="o">*</span><span class="n">R_tau</span> <span class="o">/</span> <span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">getLength</span><span class="p">()</span> <span class="o">*</span> <span class="n">b</span> <span class="o">*</span> <span class="n">b</span><span class="p">)</span>
@@ -1053,9 +1058,12 @@ Assumes the precursor-chains to be bifunctional.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">      - junctionDegrees (list[int]): the functionality of every crosslinker</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">junctions</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">type_eq</span><span class="o">=</span><span class="n">junctionType</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">junctions</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getUnderlyingGraph</span><span class="p">()</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">type_eq</span><span class="o">=</span><span class="n">junctionType</span><span class="p">)</span>
     <span class="n">junctionIds</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">junctions</span><span class="p">]</span>
-    <span class="n">junctionDegrees</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">degree</span><span class="p">(</span><span class="n">junctionIds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">junctionDegrees</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getUnderlyingGraph</span><span class="p">()</span><span class="o">.</span><span class="n">degree</span><span class="p">(</span>
+        <span class="n">junctionIds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">junctionDegrees</span>
 </pre></div>
 
@@ -1116,6 +1124,8 @@ Assumes the precursor-chains to be bifunctional.</p>
     <span class="n">molecules</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getMolecules</span><span class="p">(</span><span class="n">ignoreAtomType</span><span class="o">=</span><span class="n">foreignAtomType</span><span class="p">)</span>
     <span class="n">Gamma_sum</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="n">molecules</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">getLength</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">):</span>  <span class="c1"># single beads result in b = None</span>
+            <span class="k">continue</span>
         <span class="n">R_tau</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">computeEndToEndDistance</span><span class="p">()</span>
         <span class="n">b</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">computeBondLengths</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
         <span class="n">Gamma_sum</span> <span class="o">+=</span> <span class="n">R_tau</span><span class="o">*</span><span class="n">R_tau</span> <span class="o">/</span> <span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">getLength</span><span class="p">()</span> <span class="o">*</span> <span class="n">b</span> <span class="o">*</span> <span class="n">b</span><span class="p">)</span>
