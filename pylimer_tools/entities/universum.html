@@ -154,11 +154,12 @@
         <span class="k">assert</span><span class="p">(</span><span class="s2">&quot;type&quot;</span> <span class="ow">in</span> <span class="n">atomData</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="c1"># first, create atoms and add them to the graph</span>
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">atomData</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">atomName</span> <span class="o">=</span> <span class="s2">&quot;atom</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">underlying_graph</span><span class="o">.</span><span class="n">add_vertices</span><span class="p">(</span>
-                <span class="p">[</span><span class="s2">&quot;atom</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])],</span>
+                <span class="p">[</span><span class="n">atomName</span><span class="p">],</span>
                 <span class="p">{</span>
                     <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span>
-                    <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">Atom</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">boxSizes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">boxSizes</span><span class="p">)</span>
+                    <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">Atom</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">boxSizes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">boxSizes</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">atomName</span><span class="p">)</span>
                 <span class="p">})</span>
         <span class="c1"># then, follow up with the bonds.</span>
         <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bondData</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
@@ -218,6 +219,8 @@
             <span class="n">moleculeLengthBefore</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span>
             <span class="c1"># find ends of chain</span>
             <span class="n">endNodes</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">_degree_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># if (len(endNodes) != 2 and len(endNodes) != 0):</span>
+            <span class="c1">#     igraph.plot(chain)</span>
             <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">endNodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">endNodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
             <span class="n">strandType</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">UNDEFINED</span>
             <span class="n">isLoop</span> <span class="o">=</span> <span class="kc">False</span>
@@ -413,11 +416,12 @@
         <span class="k">assert</span><span class="p">(</span><span class="s2">&quot;type&quot;</span> <span class="ow">in</span> <span class="n">atomData</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="c1"># first, create atoms and add them to the graph</span>
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">atomData</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">atomName</span> <span class="o">=</span> <span class="s2">&quot;atom</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">underlying_graph</span><span class="o">.</span><span class="n">add_vertices</span><span class="p">(</span>
-                <span class="p">[</span><span class="s2">&quot;atom</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])],</span>
+                <span class="p">[</span><span class="n">atomName</span><span class="p">],</span>
                 <span class="p">{</span>
                     <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span>
-                    <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">Atom</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">boxSizes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">boxSizes</span><span class="p">)</span>
+                    <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">Atom</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">boxSizes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">boxSizes</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">atomName</span><span class="p">)</span>
                 <span class="p">})</span>
         <span class="c1"># then, follow up with the bonds.</span>
         <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bondData</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
@@ -477,6 +481,8 @@
             <span class="n">moleculeLengthBefore</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span>
             <span class="c1"># find ends of chain</span>
             <span class="n">endNodes</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">_degree_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># if (len(endNodes) != 2 and len(endNodes) != 0):</span>
+            <span class="c1">#     igraph.plot(chain)</span>
             <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">endNodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">endNodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
             <span class="n">strandType</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">UNDEFINED</span>
             <span class="n">isLoop</span> <span class="o">=</span> <span class="kc">False</span>
@@ -724,11 +730,12 @@ For example, a generic mapping type might be defined as::</p>
         <span class="k">assert</span><span class="p">(</span><span class="s2">&quot;type&quot;</span> <span class="ow">in</span> <span class="n">atomData</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
         <span class="c1"># first, create atoms and add them to the graph</span>
         <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">atomData</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">atomName</span> <span class="o">=</span> <span class="s2">&quot;atom</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">underlying_graph</span><span class="o">.</span><span class="n">add_vertices</span><span class="p">(</span>
-                <span class="p">[</span><span class="s2">&quot;atom</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])],</span>
+                <span class="p">[</span><span class="n">atomName</span><span class="p">],</span>
                 <span class="p">{</span>
                     <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span>
-                    <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">Atom</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">boxSizes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">boxSizes</span><span class="p">)</span>
+                    <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">Atom</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">boxSizes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">boxSizes</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">atomName</span><span class="p">)</span>
                 <span class="p">})</span>
         <span class="c1"># then, follow up with the bonds.</span>
         <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bondData</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
@@ -863,6 +870,8 @@ For example, a generic mapping type might be defined as::</p>
             <span class="n">moleculeLengthBefore</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span>
             <span class="c1"># find ends of chain</span>
             <span class="n">endNodes</span> <span class="o">=</span> <span class="n">chain</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">_degree_eq</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># if (len(endNodes) != 2 and len(endNodes) != 0):</span>
+            <span class="c1">#     igraph.plot(chain)</span>
             <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">endNodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">endNodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
             <span class="n">strandType</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">UNDEFINED</span>
             <span class="n">isLoop</span> <span class="o">=</span> <span class="kc">False</span>

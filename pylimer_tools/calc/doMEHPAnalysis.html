@@ -48,10 +48,16 @@
                     <h2>API Documentation</h2>
                         <ul class="memberlist">
             <li>
+                    <a class="function" href="#predictShearModulus">predictShearModulus</a>
+            </li>
+            <li>
                     <a class="function" href="#calculateCycleRank">calculateCycleRank</a>
             </li>
             <li>
                     <a class="function" href="#calculateEffectiveNrDensityOfNetwork">calculateEffectiveNrDensityOfNetwork</a>
+            </li>
+            <li>
+                    <a class="function" href="#calculateMeanUniverseVolume">calculateMeanUniverseVolume</a>
             </li>
             <li>
                     <a class="function" href="#calculateEffectiveNrDensityOfJunctions">calculateEffectiveNrDensityOfJunctions</a>
@@ -63,7 +69,13 @@
                     <a class="function" href="#calculateWeightFractionOfDanglingChains">calculateWeightFractionOfDanglingChains</a>
             </li>
             <li>
-                    <a class="function" href="#predictShearModulus">predictShearModulus</a>
+                    <a class="function" href="#computeMeanEndToEndDistances">computeMeanEndToEndDistances</a>
+            </li>
+            <li>
+                    <a class="function" href="#computeMeanEndToEndVectors">computeMeanEndToEndVectors</a>
+            </li>
+            <li>
+                    <a class="function" href="#computeEndToEndVectors">computeEndToEndVectors</a>
             </li>
             <li>
                     <a class="function" href="#computeCrosslinkerConversion">computeCrosslinkerConversion</a>
@@ -98,229 +110,16 @@
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="c1"># source: https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</span>
 
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
+
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">igraph</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">pylimer_tools.entities.molecule</span> <span class="kn">import</span> <span class="n">Molecule</span>
 <span class="kn">from</span> <span class="nn">pylimer_tools.entities.universum</span> <span class="kn">import</span> <span class="n">Universum</span>
-
-
-<span class="k">def</span> <span class="nf">calculateCycleRank</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">nu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">relTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the cycle rank ($\\chi$).</span>
-<span class="sd">    Assumes the precursor-chains to be bifunctional.</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">      - network: the network to calculate the cycle rank for</span>
-<span class="sd">      - nu: number of elastically effective (active) strands per unit volume</span>
-<span class="sd">      - mu: number density of the elastically effective crosslink</span>
-<span class="sd">      - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</span>
-<span class="sd">      - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</span>
-<span class="sd">      - junctionType: the atom type of the crosslinkers/junctions</span>
-
-<span class="sd">    No need to provide all the parameters — either/or: </span>
-<span class="sd">    - nu &amp; mu</span>
-<span class="sd">    - network, absTol, relTol, junctionType</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">      - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$) </span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">nu</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">junctionType</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">network</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Argument missing: When not specifiying nu, network and junctionType need to be specified&quot;</span><span class="p">)</span>
-        <span class="n">nu</span> <span class="o">=</span> <span class="n">calculateEffectiveNrDensityOfNetwork</span><span class="p">(</span>
-            <span class="n">network</span><span class="p">,</span> <span class="n">absTol</span><span class="p">,</span> <span class="n">relTol</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">mu</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">junctionType</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">network</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Argument missing: When not specifiying mu, network and junctionType need to be specified&quot;</span><span class="p">)</span>
-        <span class="n">mu</span> <span class="o">=</span> <span class="n">calculateEffectiveNrDensityOfJunctions</span><span class="p">(</span>
-            <span class="n">network</span><span class="p">,</span> <span class="n">absTol</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">nu</span> <span class="o">-</span> <span class="n">mu</span>
-
-
-<span class="k">def</span> <span class="nf">calculateEffectiveNrDensityOfNetwork</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">relTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the effective number density $\\nu_{eff}$ of a network.</span>
-<span class="sd">    Assumes the precursor-chains to be bifunctional.</span>
-
-<span class="sd">    $\\nu_{eff}$ is the number of elastically effective (active) strands per unit volume, </span>
-<span class="sd">    which are defined as the ones that can store elastic energy </span>
-<span class="sd">    upon network deformation, resp. the effective number density of network strands</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">      - network (pylimer_tools.entities.Universum): the network to compute $\\nu_{eff}$ for</span>
-<span class="sd">      - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</span>
-<span class="sd">      - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</span>
-<span class="sd">      - junctionType: the atom type of the crosslinkers/junctions</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">      - $\\nu_{eff}$ (float): the effective number density of network strands</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="k">return</span> <span class="kc">None</span>
-    <span class="n">R_taus</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">chainLengths</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="n">network</span><span class="o">.</span><span class="n">getMolecules</span><span class="p">(</span><span class="n">junctionType</span><span class="p">):</span>
-        <span class="n">R_tau</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">computeEndToEndDistance</span><span class="p">()</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">R_tau</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="n">R_taus</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">R_tau</span><span class="p">)</span>
-            <span class="n">chainLengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">getLength</span><span class="p">())</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">R_taus</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mf">0.0</span>
-    <span class="n">chainLengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">chainLengths</span><span class="p">)</span>
-    <span class="n">R_taus</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">R_taus</span><span class="p">)</span>
-    <span class="n">R_tau_max</span> <span class="o">=</span> <span class="n">R_taus</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">absTol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="n">absTol</span> <span class="o">=</span> <span class="n">R_tau_max</span>
-    <span class="n">numEffective</span> <span class="o">=</span> <span class="n">chainLengths</span><span class="p">[</span><span class="n">R_taus</span> <span class="o">&gt;</span>
-                                <span class="n">absTol</span> <span class="ow">or</span> <span class="n">R_taus</span> <span class="o">&gt;</span> <span class="n">relTol</span><span class="o">*</span><span class="n">R_tau_max</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="n">numEffective</span> <span class="o">/</span> <span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span>
-
-
-<span class="k">def</span> <span class="nf">calculateEffectiveNrDensityOfJunctions</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">minNumEffectiveStrands</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the number density of the elastically effective crosslinks, </span>
-<span class="sd">    defined as the ones that connect at least two elastically effective strands.</span>
-<span class="sd">    Assumes the precursor-chains to be bifunctional.</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">      - network (pylimer_tools.entities.Universum): the network to compute $\\nu_{eff}$ for</span>
-<span class="sd">      - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance)</span>
-<span class="sd">      - junctionType: the atom type of the crosslinkers/junctions</span>
-<span class="sd">      - minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">      - $\\mu_{eff}$ (float): the effective number density of junctions</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="k">return</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">junctionType</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mf">0.0</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">absTol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;absTol must be a valid number&quot;</span><span class="p">)</span>
-    <span class="n">numEffectiveJunctions</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">numIneffectiveJunctions</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">numTotalJunctions</span> <span class="o">=</span> <span class="mi">0</span>
-
-    <span class="n">graph</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getUnderlyingGraph</span><span class="p">()</span>
-    <span class="n">subgraphs</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">decompose</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">subgraph</span> <span class="ow">in</span> <span class="n">subgraphs</span><span class="p">:</span>
-        <span class="c1"># 1. find junctions</span>
-        <span class="n">junctions</span> <span class="o">=</span> <span class="n">subgraph</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">type_eq</span><span class="o">=</span><span class="n">junctionType</span><span class="p">)</span>
-        <span class="n">numTotalJunctions</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">junctions</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">junction</span> <span class="ow">in</span> <span class="n">junctions</span><span class="p">:</span>
-            <span class="c1"># some junctions are easily ineffective</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">junction</span><span class="o">.</span><span class="n">degree</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">minNumEffectiveStrands</span><span class="p">):</span>
-                <span class="n">numIneffectiveJunctions</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># 2. follow junction&#39;s strands to find those</span>
-                <span class="n">vertexNeighbors</span> <span class="o">=</span> <span class="n">junction</span><span class="o">.</span><span class="n">neighbors</span><span class="p">()</span>
-                <span class="n">junctionHasActiveStrands</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="n">junctionHasInActiveStrands</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="k">for</span> <span class="n">neighbor</span> <span class="ow">in</span> <span class="n">vertexNeighbors</span><span class="p">:</span>
-                    <span class="c1"># follow each neighbor</span>
-                    <span class="n">lastNeighbor</span> <span class="o">=</span> <span class="n">junction</span>
-                    <span class="n">currentNeighbor</span> <span class="o">=</span> <span class="n">neighbor</span>
-                    <span class="k">while</span><span class="p">(</span><span class="n">currentNeighbor</span><span class="o">.</span><span class="n">degree</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">currentNeighbor</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">junctionType</span><span class="p">):</span>
-                        <span class="c1"># follow as long as we do not find a junction</span>
-                        <span class="n">nextNeighbors</span> <span class="o">=</span> <span class="n">currentNeighbor</span><span class="o">.</span><span class="n">neighbors</span><span class="p">()</span>
-                        <span class="c1"># : this is an assumption that makes this function simpler. Assume: only junctions have more than 2 connections</span>
-                        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nextNeighbors</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">):</span>
-                            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                                <span class="s2">&quot;Expected all monomers to have a maximal functionality of 2, got </span><span class="si">{}</span><span class="s2">. Did you pass the wrong `junctionType`?&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nextNeighbors</span><span class="p">)))</span>
-                        <span class="c1"># assert(len(nextNeighbors) == 2)</span>
-                        <span class="n">nextKey</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">nextNeighbors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">lastNeighbor</span> <span class="k">else</span> <span class="mi">0</span>
-                        <span class="n">lastNeighbor</span> <span class="o">=</span> <span class="n">currentNeighbor</span>
-                        <span class="n">currentNeighbor</span> <span class="o">=</span> <span class="n">nextNeighbors</span><span class="p">[</span><span class="n">nextKey</span><span class="p">]</span>
-                    <span class="c1"># dangling chains are non-effective.</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">currentNeighbor</span><span class="o">.</span><span class="n">degree</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">):</span>
-                        <span class="n">junctionHasInActiveStrands</span> <span class="o">+=</span> <span class="mi">1</span>
-                    <span class="c1"># found &quot;end&quot; of strand</span>
-                    <span class="k">elif</span> <span class="p">(</span><span class="n">currentNeighbor</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">junctionType</span><span class="p">):</span>
-                        <span class="c1"># 3. decide if strand is elastically effective</span>
-                        <span class="n">Ree</span> <span class="o">=</span> <span class="n">currentNeighbor</span><span class="p">[</span><span class="s2">&quot;atom&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">computeDistanceTo</span><span class="p">(</span>
-                            <span class="n">junction</span><span class="p">[</span><span class="s2">&quot;atom&quot;</span><span class="p">])</span>
-                        <span class="k">if</span> <span class="p">((</span><span class="n">currentNeighbor</span> <span class="o">!=</span> <span class="n">junction</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">Ree</span> <span class="o">&gt;</span> <span class="n">absTol</span><span class="p">)):</span>
-                            <span class="n">junctionHasActiveStrands</span> <span class="o">+=</span> <span class="mi">1</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="n">junctionHasInActiveStrands</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">junctionHasInActiveStrands</span> <span class="o">&gt;=</span> <span class="n">junctionHasInActiveStrands</span> <span class="ow">and</span> <span class="n">junctionHasActiveStrands</span> <span class="o">&gt;=</span> <span class="n">minNumEffectiveStrands</span><span class="p">):</span>
-                    <span class="n">numEffectiveJunctions</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">numIneffectiveJunctions</span> <span class="o">+=</span> <span class="mi">1</span>
-
-    <span class="k">assert</span><span class="p">(</span><span class="n">numTotalJunctions</span> <span class="o">==</span> <span class="n">numIneffectiveJunctions</span> <span class="o">+</span> <span class="n">numEffectiveJunctions</span><span class="p">)</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">numTotalJunctions</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mf">0.0</span>
-    <span class="k">return</span> <span class="n">numEffectiveJunctions</span><span class="o">/</span><span class="p">(</span><span class="n">numEffectiveJunctions</span><span class="o">+</span><span class="n">numIneffectiveJunctions</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">calculateWeightFractionOfBackbone</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">crosslinkerType</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the weight fraction of network backbone in infinite network</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">      - network: the network to compute the weight fraction for</span>
-<span class="sd">      - crosslinkerType: the atom type to use to split the molecules</span>
-<span class="sd">      - weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">      - weightFraction (float): 1 - weightDangling/weightTotal, </span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">weightFraction</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">calculateWeightFractionOfDanglingChains</span><span class="p">(</span>
-        <span class="n">network</span><span class="p">,</span> <span class="n">crosslinkerType</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
-    <span class="k">return</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">weightFraction</span>
-
-
-<span class="k">def</span> <span class="nf">calculateWeightFractionOfDanglingChains</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">crosslinkerType</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the weight fraction of dangling strands in infinite network</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">      - network: the network to compute the weight fraction for</span>
-<span class="sd">      - crosslinkerType: the atom type to use to split the molecules</span>
-<span class="sd">      - weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">      - weightFraction: weightDangling/weightTotal, </span>
-<span class="sd">      - numFraction: numDangling/numTotal</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span>
-
-    <span class="k">def</span> <span class="nf">getWeightOfGraph</span><span class="p">(</span><span class="n">graph</span><span class="p">):</span>
-        <span class="n">counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">vs</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">])</span>
-        <span class="n">weightTotal</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">counts</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
-                <span class="n">weightTotal</span> <span class="o">+=</span> <span class="n">weights</span><span class="o">*</span><span class="n">counts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">weightTotal</span> <span class="o">+=</span> <span class="n">weights</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">*</span><span class="n">counts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">weightTotal</span>
-
-    <span class="n">allChains</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getChainsWithCrosslinker</span><span class="p">(</span><span class="n">crosslinkerType</span><span class="p">)</span>
-    <span class="n">numTotal</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span>
-    <span class="n">weightTotal</span> <span class="o">=</span> <span class="n">getWeightOfGraph</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getUnderlyingGraph</span><span class="p">())</span>
-
-    <span class="n">numDangling</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">weightDangling</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">allChains</span><span class="p">:</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">getType</span><span class="p">()</span> <span class="ow">is</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">DANGLING_CHAIN</span><span class="p">):</span>
-            <span class="n">numDangling</span> <span class="o">+=</span> <span class="n">chain</span><span class="o">.</span><span class="n">getLength</span><span class="p">()</span>
-            <span class="n">weightDangling</span> <span class="o">+=</span> <span class="n">getWeightOfGraph</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">getUnderlyingGraph</span><span class="p">())</span>
-
-    <span class="k">if</span> <span class="p">(</span><span class="n">weightTotal</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="c1"># warnings.warn(&quot;Weight total = 0&quot;)</span>
-        <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">numDangling</span><span class="o">/</span><span class="n">numTotal</span>
-
-    <span class="k">return</span> <span class="n">weightDangling</span><span class="o">/</span><span class="n">weightTotal</span><span class="p">,</span> <span class="n">numDangling</span><span class="o">/</span><span class="n">numTotal</span>
 
 
 <span class="k">def</span> <span class="nf">predictShearModulus</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">T</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k_B</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">foreignAtomType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">totalMass</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
@@ -343,107 +142,7 @@
     <span class="k">return</span> <span class="n">Gamma</span><span class="o">*</span><span class="n">nu</span><span class="o">*</span><span class="n">k_B</span><span class="o">*</span><span class="n">T</span>
 
 
-<span class="k">def</span> <span class="nf">computeCrosslinkerConversion</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the extent of reaction of the crosslinkers </span>
-<span class="sd">    (actual functionality divided by target functionality)</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">      - network: the poylmer network to do the computation for</span>
-<span class="sd">      - junctionType: the type of the junctions/crosslinkers to select them in the network</span>
-<span class="sd">      - f: the functionality of the crosslinkers</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">      - r (float): the (mean) crosslinker conversion</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">calculateEffectiveCrosslinkerFunctionality</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span> <span class="o">/</span> <span class="n">f</span>
-
-
-<span class="k">def</span> <span class="nf">calculateEffectiveCrosslinkerFunctionality</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the mean crosslinker functionality</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">      - network: the poylmer network to do the computation for</span>
-<span class="sd">      - junctionType: the type of the junctions/crosslinkers to select them in the network</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">      - f (float): the (mean) effective crosslinker functionality</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">junctionDegrees</span> <span class="o">=</span> <span class="n">calculateEffectiveCrosslinkerFunctionalities</span><span class="p">(</span>
-        <span class="n">network</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">junctionDegrees</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">calculateEffectiveCrosslinkerFunctionalities</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the functionality of every crosslinker in the network</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">      - network: the poylmer network to do the computation for</span>
-<span class="sd">      - junctionType: the type of the junctions/crosslinkers to select them in the network</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">      - junctionDegrees (list[int]): the functionality of every crosslinker</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[]</span>
-    <span class="n">junctions</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getUnderlyingGraph</span><span class="p">()</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">type_eq</span><span class="o">=</span><span class="n">junctionType</span><span class="p">)</span>
-    <span class="n">junctionIds</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">junctions</span><span class="p">]</span>
-    <span class="n">junctionDegrees</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getUnderlyingGraph</span><span class="p">()</span><span class="o">.</span><span class="n">degree</span><span class="p">(</span>
-        <span class="n">junctionIds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">junctionDegrees</span>
-
-
-<span class="k">def</span> <span class="nf">calculateTopologicalFactor</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">foreignAtomType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">totalMass</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the topological factor of a polymer network.</span>
-<span class="sd">    Assumes the precursor-chains to be bifunctional.</span>
-
-<span class="sd">    Source:</span>
-<span class="sd">      - eq. 16 in https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">      - network: the network to compute the topological factor for</span>
-<span class="sd">      - foreignAtomType: the type of atoms to ignore</span>
-<span class="sd">      - totalMass: the $M$ in the respective formula</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">      - the topological factor $\\Gamma$</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">molecules</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getMolecules</span><span class="p">(</span><span class="n">ignoreAtomType</span><span class="o">=</span><span class="n">foreignAtomType</span><span class="p">)</span>
-    <span class="n">Gamma_sum</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="n">molecules</span><span class="p">:</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">getLength</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">):</span>  <span class="c1"># single beads result in b = None</span>
-            <span class="k">continue</span>
-        <span class="n">R_tau</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">computeEndToEndDistance</span><span class="p">()</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">computeBondLengths</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-        <span class="n">Gamma_sum</span> <span class="o">+=</span> <span class="n">R_tau</span><span class="o">*</span><span class="n">R_tau</span> <span class="o">/</span> <span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">getLength</span><span class="p">()</span> <span class="o">*</span> <span class="n">b</span> <span class="o">*</span> <span class="n">b</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">Gamma_sum</span> <span class="o">/</span> <span class="n">totalMass</span>
-</pre></div>
-
-        </details>
-
-            </section>
-                <section id="calculateCycleRank">
-                            <div class="attr function"><a class="headerlink" href="#calculateCycleRank">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">calculateCycleRank</span><span class="signature">(
-    network: <a href="../entities/universum.html#Universum">pylimer_tools.entities.universum.Universum</a>,
-    nu: int = None,
-    mu: int = None,
-    absTol: float = 1,
-    relTol: float = 1,
-    junctionType=None
-)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateCycleRank</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">nu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">relTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">calculateCycleRank</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Universum</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">nu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">relTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the cycle rank ($\\chi$).</span>
 <span class="sd">    Assumes the precursor-chains to be bifunctional.</span>
@@ -456,88 +155,40 @@
 <span class="sd">      - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</span>
 <span class="sd">      - junctionType: the atom type of the crosslinkers/junctions</span>
 
-<span class="sd">    No need to provide all the parameters — either/or: </span>
+<span class="sd">    No need to provide all the parameters — either/or:</span>
 <span class="sd">    - nu &amp; mu</span>
 <span class="sd">    - network, absTol, relTol, junctionType</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">      - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$) </span>
+<span class="sd">      - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">nu</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">junctionType</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">network</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">junctionType</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">networks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;Argument missing: When not specifiying nu, network and junctionType need to be specified&quot;</span><span class="p">)</span>
         <span class="n">nu</span> <span class="o">=</span> <span class="n">calculateEffectiveNrDensityOfNetwork</span><span class="p">(</span>
-            <span class="n">network</span><span class="p">,</span> <span class="n">absTol</span><span class="p">,</span> <span class="n">relTol</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span>
+            <span class="n">networks</span><span class="p">,</span> <span class="n">absTol</span><span class="p">,</span> <span class="n">relTol</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">mu</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">junctionType</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">network</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">junctionType</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">networks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;Argument missing: When not specifiying mu, network and junctionType need to be specified&quot;</span><span class="p">)</span>
         <span class="n">mu</span> <span class="o">=</span> <span class="n">calculateEffectiveNrDensityOfJunctions</span><span class="p">(</span>
-            <span class="n">network</span><span class="p">,</span> <span class="n">absTol</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span>
+            <span class="n">networks</span><span class="p">,</span> <span class="n">absTol</span><span class="p">,</span> <span class="n">relTol</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">nu</span> <span class="o">-</span> <span class="n">mu</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Compute the cycle rank ($\chi$).
-Assumes the precursor-chains to be bifunctional.</p>
-
-<h6 id="arguments">Arguments</h6>
-
-<blockquote>
-  <ul>
-  <li>network: the network to calculate the cycle rank for</li>
-  <li>nu: number of elastically effective (active) strands per unit volume</li>
-  <li>mu: number density of the elastically effective crosslink</li>
-  <li>absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</li>
-  <li>relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</li>
-  <li>junctionType: the atom type of the crosslinkers/junctions</li>
-  </ul>
-</blockquote>
-
-<p>No need to provide all the parameters — either/or: </p>
-
-<ul>
-<li>nu &amp; mu</li>
-<li>network, absTol, relTol, junctionType</li>
-</ul>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <ul>
-  <li>cycleRank: the cycle rank ($\xi = \nu_{eff} - \mu_{eff}$)</li>
-  </ul>
-</blockquote>
-</div>
 
 
-                </section>
-                <section id="calculateEffectiveNrDensityOfNetwork">
-                            <div class="attr function"><a class="headerlink" href="#calculateEffectiveNrDensityOfNetwork">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">calculateEffectiveNrDensityOfNetwork</span><span class="signature">(
-    network: <a href="../entities/universum.html#Universum">pylimer_tools.entities.universum.Universum</a>,
-    absTol: float = 1,
-    relTol: float = 1,
-    junctionType=None
-)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateEffectiveNrDensityOfNetwork</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">relTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">calculateEffectiveNrDensityOfNetwork</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">relTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the effective number density $\\nu_{eff}$ of a network.</span>
 <span class="sd">    Assumes the precursor-chains to be bifunctional.</span>
 
-<span class="sd">    $\\nu_{eff}$ is the number of elastically effective (active) strands per unit volume, </span>
-<span class="sd">    which are defined as the ones that can store elastic energy </span>
+<span class="sd">    $\\nu_{eff}$ is the number of elastically effective (active) strands per unit volume,</span>
+<span class="sd">    which are defined as the ones that can store elastic energy</span>
 <span class="sd">    upon network deformation, resp. the effective number density of network strands</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">      - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</span>
 
 <span class="sd">    Arguments:</span>
 <span class="sd">      - network (pylimer_tools.entities.Universum): the network to compute $\\nu_{eff}$ for</span>
@@ -548,196 +199,111 @@ Assumes the precursor-chains to be bifunctional.</p>
 <span class="sd">    Returns:</span>
 <span class="sd">      - $\\nu_{eff}$ (float): the effective number density of network strands</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">None</span>
-    <span class="n">R_taus</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">chainLengths</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="n">network</span><span class="o">.</span><span class="n">getMolecules</span><span class="p">(</span><span class="n">junctionType</span><span class="p">):</span>
-        <span class="n">R_tau</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">computeEndToEndDistance</span><span class="p">()</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">R_tau</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="n">R_taus</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">R_tau</span><span class="p">)</span>
-            <span class="n">chainLengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">getLength</span><span class="p">())</span>
 
+    <span class="c1"># get the mean end to end distances</span>
+    <span class="n">R_taus</span> <span class="o">=</span> <span class="n">computeMeanEndToEndDistances</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">R_taus</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
         <span class="k">return</span> <span class="mf">0.0</span>
-    <span class="n">chainLengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">chainLengths</span><span class="p">)</span>
-    <span class="n">R_taus</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">R_taus</span><span class="p">)</span>
-    <span class="n">R_tau_max</span> <span class="o">=</span> <span class="n">R_taus</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="n">R_taus</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">R_taus</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="n">R_tau_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">R_taus</span><span class="p">)</span>
+
+    <span class="c1"># process additional input parameters</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">absTol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
         <span class="n">absTol</span> <span class="o">=</span> <span class="n">R_tau_max</span>
-    <span class="n">numEffective</span> <span class="o">=</span> <span class="n">chainLengths</span><span class="p">[</span><span class="n">R_taus</span> <span class="o">&gt;</span>
-                                <span class="n">absTol</span> <span class="ow">or</span> <span class="n">R_taus</span> <span class="o">&gt;</span> <span class="n">relTol</span><span class="o">*</span><span class="n">R_tau_max</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
 
-    <span class="k">return</span> <span class="n">numEffective</span> <span class="o">/</span> <span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span>
-</pre></div>
+    <span class="c1"># count how many effective strands there are</span>
+    <span class="n">numEffective</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">R_tau</span> <span class="o">&gt;</span> <span class="n">absTol</span> <span class="ow">or</span> <span class="n">R_tau</span> <span class="o">&gt;</span> <span class="n">relTol</span><span class="o">*</span><span class="n">R_tau_max</span>
+                             <span class="k">for</span> <span class="n">R_tau</span> <span class="ow">in</span> <span class="n">R_taus</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">meanVolume</span> <span class="o">=</span> <span class="n">calculateMeanUniverseVolume</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
 
-        </details>
-
-            <div class="docstring"><p>Compute the effective number density $\nu_{eff}$ of a network.
-Assumes the precursor-chains to be bifunctional.</p>
-
-<p>$\nu_{eff}$ is the number of elastically effective (active) strands per unit volume, 
-which are defined as the ones that can store elastic energy 
-upon network deformation, resp. the effective number density of network strands</p>
-
-<h6 id="arguments">Arguments</h6>
-
-<blockquote>
-  <ul>
-  <li>network (<a href="../entities.html#Universum">pylimer_tools.entities.Universum</a>): the network to compute $\nu_{eff}$ for</li>
-  <li>absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</li>
-  <li>relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</li>
-  <li>junctionType: the atom type of the crosslinkers/junctions</li>
-  </ul>
-</blockquote>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <ul>
-  <li>$\nu_{eff}$ (float): the effective number density of network strands</li>
-  </ul>
-</blockquote>
-</div>
+    <span class="k">return</span> <span class="n">numEffective</span> <span class="o">/</span> <span class="n">meanVolume</span>
 
 
-                </section>
-                <section id="calculateEffectiveNrDensityOfJunctions">
-                            <div class="attr function"><a class="headerlink" href="#calculateEffectiveNrDensityOfJunctions">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">calculateEffectiveNrDensityOfJunctions</span><span class="signature">(
-    network: <a href="../entities/universum.html#Universum">pylimer_tools.entities.universum.Universum</a>,
-    absTol: float = 0,
-    junctionType=None,
-    minNumEffectiveStrands=2
-)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateEffectiveNrDensityOfJunctions</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">minNumEffectiveStrands</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">calculateMeanUniverseVolume</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">acceptDifferentSizes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the number density of the elastically effective crosslinks, </span>
+<span class="sd">    Compute the mean volume of a list of universes.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - networks: a list of universes</span>
+<span class="sd">      - acceptDifferentSizes: toggle whether to throw an error when the Universe have different nr. of atoms</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - meanVolume: the mean volume of the universes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># compute the mean volume of the universes</span>
+    <span class="n">meanVolume</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">divisor</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
+    <span class="n">networkSize</span> <span class="o">=</span> <span class="n">networks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">networks</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">acceptDifferentSizes</span> <span class="ow">and</span> <span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span> <span class="o">!=</span> <span class="n">networkSize</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;Currently, only sequences of networks with the same size are supported (got one with </span><span class="si">{}</span><span class="s2"> instead of </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">network</span><span class="p">),</span> <span class="n">network_size</span><span class="p">))</span>
+        <span class="n">meanVolume</span> <span class="o">+=</span> <span class="n">network</span><span class="o">.</span><span class="n">getVolume</span><span class="p">()</span><span class="o">*</span><span class="n">divisor</span>
+    <span class="k">return</span> <span class="n">meanVolume</span>
+
+
+<span class="k">def</span> <span class="nf">calculateEffectiveNrDensityOfJunctions</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">relTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">minNumEffectiveStrands</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the number density of the elastically effective crosslinks,</span>
 <span class="sd">    defined as the ones that connect at least two elastically effective strands.</span>
 <span class="sd">    Assumes the precursor-chains to be bifunctional.</span>
 
+<span class="sd">    Source:</span>
+<span class="sd">      - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</span>
+
 <span class="sd">    Arguments:</span>
 <span class="sd">      - network (pylimer_tools.entities.Universum): the network to compute $\\nu_{eff}$ for</span>
-<span class="sd">      - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance)</span>
+<span class="sd">      - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</span>
+<span class="sd">      - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</span>
 <span class="sd">      - junctionType: the atom type of the crosslinkers/junctions</span>
 <span class="sd">      - minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">      - $\\mu_{eff}$ (float): the effective number density of junctions</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">junctionType</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">return</span> <span class="mf">0.0</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">absTol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;absTol must be a valid number&quot;</span><span class="p">)</span>
-    <span class="n">numEffectiveJunctions</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">numIneffectiveJunctions</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="n">numTotalJunctions</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="n">graph</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getUnderlyingGraph</span><span class="p">()</span>
-    <span class="n">subgraphs</span> <span class="o">=</span> <span class="n">graph</span><span class="o">.</span><span class="n">decompose</span><span class="p">()</span>
-    <span class="k">for</span> <span class="n">subgraph</span> <span class="ow">in</span> <span class="n">subgraphs</span><span class="p">:</span>
-        <span class="c1"># 1. find junctions</span>
-        <span class="n">junctions</span> <span class="o">=</span> <span class="n">subgraph</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">type_eq</span><span class="o">=</span><span class="n">junctionType</span><span class="p">)</span>
-        <span class="n">numTotalJunctions</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">junctions</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">junction</span> <span class="ow">in</span> <span class="n">junctions</span><span class="p">:</span>
-            <span class="c1"># some junctions are easily ineffective</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">junction</span><span class="o">.</span><span class="n">degree</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">minNumEffectiveStrands</span><span class="p">):</span>
-                <span class="n">numIneffectiveJunctions</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="c1"># 2. follow junction&#39;s strands to find those</span>
-                <span class="n">vertexNeighbors</span> <span class="o">=</span> <span class="n">junction</span><span class="o">.</span><span class="n">neighbors</span><span class="p">()</span>
-                <span class="n">junctionHasActiveStrands</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="n">junctionHasInActiveStrands</span> <span class="o">=</span> <span class="mi">0</span>
-                <span class="k">for</span> <span class="n">neighbor</span> <span class="ow">in</span> <span class="n">vertexNeighbors</span><span class="p">:</span>
-                    <span class="c1"># follow each neighbor</span>
-                    <span class="n">lastNeighbor</span> <span class="o">=</span> <span class="n">junction</span>
-                    <span class="n">currentNeighbor</span> <span class="o">=</span> <span class="n">neighbor</span>
-                    <span class="k">while</span><span class="p">(</span><span class="n">currentNeighbor</span><span class="o">.</span><span class="n">degree</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">currentNeighbor</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">junctionType</span><span class="p">):</span>
-                        <span class="c1"># follow as long as we do not find a junction</span>
-                        <span class="n">nextNeighbors</span> <span class="o">=</span> <span class="n">currentNeighbor</span><span class="o">.</span><span class="n">neighbors</span><span class="p">()</span>
-                        <span class="c1"># : this is an assumption that makes this function simpler. Assume: only junctions have more than 2 connections</span>
-                        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nextNeighbors</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">):</span>
-                            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                                <span class="s2">&quot;Expected all monomers to have a maximal functionality of 2, got </span><span class="si">{}</span><span class="s2">. Did you pass the wrong `junctionType`?&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nextNeighbors</span><span class="p">)))</span>
-                        <span class="c1"># assert(len(nextNeighbors) == 2)</span>
-                        <span class="n">nextKey</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">nextNeighbors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">lastNeighbor</span> <span class="k">else</span> <span class="mi">0</span>
-                        <span class="n">lastNeighbor</span> <span class="o">=</span> <span class="n">currentNeighbor</span>
-                        <span class="n">currentNeighbor</span> <span class="o">=</span> <span class="n">nextNeighbors</span><span class="p">[</span><span class="n">nextKey</span><span class="p">]</span>
-                    <span class="c1"># dangling chains are non-effective.</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">currentNeighbor</span><span class="o">.</span><span class="n">degree</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">):</span>
-                        <span class="n">junctionHasInActiveStrands</span> <span class="o">+=</span> <span class="mi">1</span>
-                    <span class="c1"># found &quot;end&quot; of strand</span>
-                    <span class="k">elif</span> <span class="p">(</span><span class="n">currentNeighbor</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">junctionType</span><span class="p">):</span>
-                        <span class="c1"># 3. decide if strand is elastically effective</span>
-                        <span class="n">Ree</span> <span class="o">=</span> <span class="n">currentNeighbor</span><span class="p">[</span><span class="s2">&quot;atom&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">computeDistanceTo</span><span class="p">(</span>
-                            <span class="n">junction</span><span class="p">[</span><span class="s2">&quot;atom&quot;</span><span class="p">])</span>
-                        <span class="k">if</span> <span class="p">((</span><span class="n">currentNeighbor</span> <span class="o">!=</span> <span class="n">junction</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">Ree</span> <span class="o">&gt;</span> <span class="n">absTol</span><span class="p">)):</span>
-                            <span class="n">junctionHasActiveStrands</span> <span class="o">+=</span> <span class="mi">1</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="n">junctionHasInActiveStrands</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">junctionHasInActiveStrands</span> <span class="o">&gt;=</span> <span class="n">junctionHasInActiveStrands</span> <span class="ow">and</span> <span class="n">junctionHasActiveStrands</span> <span class="o">&gt;=</span> <span class="n">minNumEffectiveStrands</span><span class="p">):</span>
-                    <span class="n">numEffectiveJunctions</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">numIneffectiveJunctions</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">meanVolume</span> <span class="o">=</span> <span class="n">calculateMeanUniverseVolume</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
 
-    <span class="k">assert</span><span class="p">(</span><span class="n">numTotalJunctions</span> <span class="o">==</span> <span class="n">numIneffectiveJunctions</span> <span class="o">+</span> <span class="n">numEffectiveJunctions</span><span class="p">)</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">numTotalJunctions</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">minNumEffectiveStrands</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">getAtomsWithType</span><span class="p">(</span><span class="n">junctionType</span><span class="p">))</span><span class="o">/</span><span class="n">meanVolume</span>
+
+    <span class="c1"># get the mean end to end distances</span>
+    <span class="n">R_taus</span> <span class="o">=</span> <span class="n">computeMeanEndToEndDistances</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">R_taus</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
         <span class="k">return</span> <span class="mf">0.0</span>
-    <span class="k">return</span> <span class="n">numEffectiveJunctions</span><span class="o">/</span><span class="p">(</span><span class="n">numEffectiveJunctions</span><span class="o">+</span><span class="n">numIneffectiveJunctions</span><span class="p">)</span>
-</pre></div>
+    <span class="n">R_tau_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">R_taus</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
-        </details>
+    <span class="c1"># process additional input parameters</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">absTol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">absTol</span> <span class="o">=</span> <span class="n">R_tau_max</span>
 
-            <div class="docstring"><p>Compute the number density of the elastically effective crosslinks, 
-defined as the ones that connect at least two elastically effective strands.
-Assumes the precursor-chains to be bifunctional.</p>
+    <span class="c1"># count how many active connections each junction has</span>
+    <span class="n">junctionActivity</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">R_taus</span><span class="p">:</span>
+        <span class="n">crosslinkerNames</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;+&quot;</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">crosslinkerNames</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">isActive</span> <span class="o">=</span> <span class="n">R_taus</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">absTol</span> <span class="ow">or</span> <span class="n">R_taus</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">relTol</span><span class="o">*</span><span class="n">R_tau_max</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span><span class="p">(</span><span class="n">isActive</span><span class="p">)):</span>
+            <span class="k">continue</span>
+        <span class="n">relevantNames</span> <span class="o">=</span> <span class="p">[</span><span class="n">crosslinkerNames</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">crosslinkerNames</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="k">for</span> <span class="n">crosslinkerName</span> <span class="ow">in</span> <span class="n">relevantNames</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">crosslinkerName</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">junctionActivity</span><span class="p">):</span>
+                <span class="n">junctionActivity</span><span class="p">[</span><span class="n">crosslinkerName</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">junctionActivity</span><span class="p">[</span><span class="n">crosslinkerName</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
 
-<h6 id="arguments">Arguments</h6>
-
-<blockquote>
-  <ul>
-  <li>network (<a href="../entities.html#Universum">pylimer_tools.entities.Universum</a>): the network to compute $\nu_{eff}$ for</li>
-  <li>absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance)</li>
-  <li>junctionType: the atom type of the crosslinkers/junctions</li>
-  <li>minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such</li>
-  </ul>
-</blockquote>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <ul>
-  <li>$\mu_{eff}$ (float): the effective number density of junctions</li>
-  </ul>
-</blockquote>
-</div>
+    <span class="n">effectiveJunctions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">junctionActivity</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">minNumEffectiveStrands</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">junctionActivity</span><span class="p">])</span>
+    <span class="n">numEffectiveJunctions</span> <span class="o">=</span> <span class="n">effectiveJunctions</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">numEffectiveJunctions</span><span class="o">/</span><span class="n">meanVolume</span>
 
 
-                </section>
-                <section id="calculateWeightFractionOfBackbone">
-                            <div class="attr function"><a class="headerlink" href="#calculateWeightFractionOfBackbone">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">calculateWeightFractionOfBackbone</span><span class="signature">(
-    network: <a href="../entities/universum.html#Universum">pylimer_tools.entities.universum.Universum</a>,
-    crosslinkerType,
-    weights=1
-)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateWeightFractionOfBackbone</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">crosslinkerType</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">calculateWeightFractionOfBackbone</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">crosslinkerType</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the weight fraction of network backbone in infinite network</span>
 
@@ -747,53 +313,14 @@ Assumes the precursor-chains to be bifunctional.</p>
 <span class="sd">      - weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">      - weightFraction (float): 1 - weightDangling/weightTotal, </span>
+<span class="sd">      - weightFraction (float): 1 - weightDangling/weightTotal,</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">weightFraction</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">calculateWeightFractionOfDanglingChains</span><span class="p">(</span>
         <span class="n">network</span><span class="p">,</span> <span class="n">crosslinkerType</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
     <span class="k">return</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">weightFraction</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Compute the weight fraction of network backbone in infinite network</p>
-
-<h6 id="arguments">Arguments</h6>
-
-<blockquote>
-  <ul>
-  <li>network: the network to compute the weight fraction for</li>
-  <li>crosslinkerType: the atom type to use to split the molecules</li>
-  <li>weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight</li>
-  </ul>
-</blockquote>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <ul>
-  <li>weightFraction (float): 1 - weightDangling/weightTotal,</li>
-  </ul>
-</blockquote>
-</div>
 
 
-                </section>
-                <section id="calculateWeightFractionOfDanglingChains">
-                            <div class="attr function"><a class="headerlink" href="#calculateWeightFractionOfDanglingChains">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">calculateWeightFractionOfDanglingChains</span><span class="signature">(
-    network: <a href="../entities/universum.html#Universum">pylimer_tools.entities.universum.Universum</a>,
-    crosslinkerType,
-    weights=1
-)</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateWeightFractionOfDanglingChains</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">crosslinkerType</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">calculateWeightFractionOfDanglingChains</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">crosslinkerType</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the weight fraction of dangling strands in infinite network</span>
 
@@ -803,7 +330,7 @@ Assumes the precursor-chains to be bifunctional.</p>
 <span class="sd">      - weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">      - weightFraction: weightDangling/weightTotal, </span>
+<span class="sd">      - weightFraction: weightDangling/weightTotal,</span>
 <span class="sd">      - numFraction: numDangling/numTotal</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
@@ -835,34 +362,213 @@ Assumes the precursor-chains to be bifunctional.</p>
         <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">numDangling</span><span class="o">/</span><span class="n">numTotal</span>
 
     <span class="k">return</span> <span class="n">weightDangling</span><span class="o">/</span><span class="n">weightTotal</span><span class="p">,</span> <span class="n">numDangling</span><span class="o">/</span><span class="n">numTotal</span>
+
+
+<span class="k">def</span> <span class="nf">computeMeanEndToEndDistances</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">crosslinkerType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the mean end to end distance between each pair of (indirectly) connected crosslinker</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - networks: the different configurations of the polymer network to do the computation for</span>
+<span class="sd">      - crosslinkerType: the atom type to compute the in-between vectors for</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - endToEndDistances (dict): a dictionary with key: &quot;{atom1.name}+{atom2.name}&quot;</span>
+<span class="sd">          and value: the norm of the mean difference vector</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">R_tau_vectors</span> <span class="o">=</span> <span class="n">computeMeanEndToEndVectors</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">crosslinkerType</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">R_tau_vectors</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{}</span>
+
+    <span class="n">R_tau_vectors_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">R_tau_vectors</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="c1"># print(R_tau_vectors_array)</span>
+    <span class="n">R_taus</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">R_tau_vectors_array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">R_tau_vectors</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">R_taus</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">computeMeanEndToEndVectors</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">crosslinkerType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the mean end to end vectors between each pair of (indirectly) connected crosslinker</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - networks: the different configurations of the polymer network to do the computation for</span>
+<span class="sd">      - crosslinkerType: the atom type to compute the in-between vectors for</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - endToEndVectors (dict): a dictionary with key: &quot;{atom1.name}+{atom2.name}&quot;</span>
+<span class="sd">          and value: their mean difference vector</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{}</span>
+    <span class="n">endToEndVectors</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">divider</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">networks</span><span class="p">:</span>
+        <span class="n">currentEndToEndVectors</span> <span class="o">=</span> <span class="n">computeEndToEndVectors</span><span class="p">(</span>
+            <span class="n">network</span><span class="p">,</span> <span class="n">crosslinkerType</span><span class="p">)</span>
+        <span class="c1"># the mean calculation in this for loop</span>
+        <span class="c1"># trades some memory for performance</span>
+        <span class="c1"># there are still many performance and memory</span>
+        <span class="c1"># improvements possible</span>
+        <span class="c1"># (e.g. computing connectivity only once, storing it only once, ....)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">currentEndToEndVectors</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">endToEndVectors</span><span class="p">):</span>
+                <span class="n">endToEndVectors</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">endToEndVectors</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+=</span> <span class="n">currentEndToEndVectors</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">*</span><span class="n">divider</span>
+    <span class="k">return</span> <span class="n">endToEndVectors</span>
+
+
+<span class="k">def</span> <span class="nf">computeEndToEndVectors</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">crosslinkerType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the end to end vectors between each pair of (indirectly) connected crosslinker</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - network: the polymer network to do the computation for</span>
+<span class="sd">      - crosslinkerType: the atom type to compute the in-between vectors for</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - endToEndVectors (dict): a dictionary with key: &quot;{atom1.name}+{atom2.name}&quot;</span>
+<span class="sd">          and value: their difference vector</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># while we could do the decomposition again with explicit removal of irrelevant strand atoms,</span>
+    <span class="c1"># this should not be any more expensive</span>
+    <span class="n">endToEndVectors</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">molecules</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getChainsWithCrosslinker</span><span class="p">(</span><span class="n">crosslinkerType</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="n">molecules</span><span class="p">:</span>
+        <span class="n">crosslinkers</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">getUnderlyingGraph</span><span class="p">()</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">type_eq</span><span class="o">=</span><span class="n">crosslinkerType</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">crosslinkers</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span>
+            <span class="n">molecule</span><span class="o">.</span><span class="n">getType</span><span class="p">()</span> <span class="o">==</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">PRIMARY_LOOP</span> <span class="ow">or</span>
+                <span class="n">molecule</span><span class="o">.</span><span class="n">getType</span><span class="p">()</span> <span class="o">==</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">DANGLING_CHAIN</span><span class="p">):</span>
+            <span class="c1"># dangling, free chains and loops are irrelevant for our purposes</span>
+            <span class="k">continue</span>
+        <span class="c1"># igraph.VertexSeq is not sortable -&gt; use a list</span>
+        <span class="n">crosslinkers</span> <span class="o">=</span> <span class="p">[</span><span class="n">crosslinkers</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">crosslinkers</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="c1"># sort crosslinkers by name as a way to keep the vector directions consistent between timesteps</span>
+        <span class="n">crosslinkers</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+        <span class="c1">#</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">_getKeyForMolecule</span><span class="p">(</span><span class="n">molecule</span><span class="p">,</span> <span class="n">crosslinkers</span><span class="p">)</span>
+        <span class="n">endToEndVectors</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">crosslinkers</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;atom&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">computeVectorTo</span><span class="p">(</span>
+            <span class="n">crosslinkers</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;atom&quot;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">endToEndVectors</span>
+
+
+<span class="k">def</span> <span class="nf">computeCrosslinkerConversion</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the extent of reaction of the crosslinkers</span>
+<span class="sd">    (actual functionality divided by target functionality)</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - network: the polymer network to do the computation for</span>
+<span class="sd">      - junctionType: the type of the junctions/crosslinkers to select them in the network</span>
+<span class="sd">      - f: the functionality of the crosslinkers</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - r (float): the (mean) crosslinker conversion</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">calculateEffectiveCrosslinkerFunctionality</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span> <span class="o">/</span> <span class="n">f</span>
+
+
+<span class="k">def</span> <span class="nf">calculateEffectiveCrosslinkerFunctionality</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the mean crosslinker functionality</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - network: the polymer network to do the computation for</span>
+<span class="sd">      - junctionType: the type of the junctions/crosslinkers to select them in the network</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - f (float): the (mean) effective crosslinker functionality</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">junctionDegrees</span> <span class="o">=</span> <span class="n">calculateEffectiveCrosslinkerFunctionalities</span><span class="p">(</span>
+        <span class="n">network</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">junctionDegrees</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">calculateEffectiveCrosslinkerFunctionalities</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the functionality of every crosslinker in the network</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - network: the polymer network to do the computation for</span>
+<span class="sd">      - junctionType: the type of the junctions/crosslinkers to select them in the network</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - junctionDegrees (list[int]): the functionality of every crosslinker</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">junctions</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getUnderlyingGraph</span><span class="p">()</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">type_eq</span><span class="o">=</span><span class="n">junctionType</span><span class="p">)</span>
+    <span class="n">junctionIds</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">junctions</span><span class="p">]</span>
+    <span class="n">junctionDegrees</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getUnderlyingGraph</span><span class="p">()</span><span class="o">.</span><span class="n">degree</span><span class="p">(</span>
+        <span class="n">junctionIds</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;all&quot;</span><span class="p">,</span> <span class="n">loops</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">junctionDegrees</span>
+
+
+<span class="k">def</span> <span class="nf">calculateTopologicalFactor</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">foreignAtomType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">totalMass</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the topological factor of a polymer network.</span>
+
+<span class="sd">    Assumptions: </span>
+<span class="sd">      - the precursor-chains to be bifunctional</span>
+<span class="sd">      - all Universes to have the same structure (with possibly differing positions)</span>
+<span class="sd">      - crosslinkers do not count to the nr. of monomers in a strand</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">      - eq. 16 in https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - network: the network to compute the topological factor for</span>
+<span class="sd">      - foreignAtomType: the type of atoms to ignore</span>
+<span class="sd">      - totalMass: the $M$ in the respective formula</span>
+<span class="sd">      - b: the mean bond length. </span>
+<span class="sd">          If `None`, it will be computed for each molecule in the first Universum (Network).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - the topological factor $\\Gamma$</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">R_taus</span> <span class="o">=</span> <span class="n">computeMeanEndToEndDistances</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">foreignAtomType</span><span class="p">)</span>
+
+    <span class="c1"># find the topological factor</span>
+    <span class="n">GammaSum</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">network</span> <span class="o">=</span> <span class="n">networks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># this is where the second assumption is made</span>
+    <span class="n">chainsToProcess</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getChainsWithCrosslinker</span><span class="p">(</span><span class="n">foreignAtomType</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="n">chainsToProcess</span><span class="p">:</span>
+        <span class="n">crosslinkers</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">getUnderlyingGraph</span><span class="p">()</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">type_eq</span><span class="o">=</span><span class="n">foreignAtomType</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">crosslinkers</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span>
+            <span class="n">molecule</span><span class="o">.</span><span class="n">getType</span><span class="p">()</span> <span class="o">==</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">PRIMARY_LOOP</span> <span class="ow">or</span>
+                <span class="n">molecule</span><span class="o">.</span><span class="n">getType</span><span class="p">()</span> <span class="o">==</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">DANGLING_CHAIN</span><span class="p">):</span>
+            <span class="c1"># dangling, free chains and loops are irrelevant for our purposes</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">b</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">computeBondLengths</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">crosslinkers</span> <span class="o">=</span> <span class="p">[</span><span class="n">crosslinkers</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">crosslinkers</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="c1"># sort crosslinkers by name as a way to keep the vector directions consistent between timesteps</span>
+        <span class="n">crosslinkers</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">_getKeyForMolecule</span><span class="p">(</span><span class="n">molecule</span><span class="p">,</span> <span class="n">crosslinkers</span><span class="p">)</span>
+        <span class="n">GammaSum</span> <span class="o">+=</span> <span class="n">R_taus</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">*</span><span class="n">R_taus</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">/</span> \
+            <span class="p">((</span><span class="n">molecule</span><span class="o">.</span><span class="n">getLength</span><span class="p">()</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">b</span> <span class="o">*</span>
+             <span class="n">b</span><span class="p">)</span>  <span class="c1"># -2: remove crosslinkers again (assumption 3)</span>
+
+    <span class="k">return</span> <span class="n">GammaSum</span> <span class="o">/</span> <span class="n">totalMass</span>
+
+
+<span class="k">def</span> <span class="nf">_getKeyForMolecule</span><span class="p">(</span><span class="n">molecule</span><span class="p">,</span> <span class="n">crosslinkers</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a key to identify a molecule.</span>
+<span class="sd">    The crosslinkers (ends of the molecule) are the first two components of the key, </span>
+<span class="sd">    whereas the names of all other atoms in the chain are used too to distinguish </span>
+<span class="sd">    e.g. two secondary loops</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">molecule</span><span class="p">]</span>
+    <span class="n">names</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">+</span><span class="si">{}</span><span class="s2">+</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">crosslinkers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                             <span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">crosslinkers</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">names</span><span class="p">))</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Compute the weight fraction of dangling strands in infinite network</p>
-
-<h6 id="arguments">Arguments</h6>
-
-<blockquote>
-  <ul>
-  <li>network: the network to compute the weight fraction for</li>
-  <li>crosslinkerType: the atom type to use to split the molecules</li>
-  <li>weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight</li>
-  </ul>
-</blockquote>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <ul>
-  <li>weightFraction: weightDangling/weightTotal, </li>
-  <li>numFraction: numDangling/numTotal</li>
-  </ul>
-</blockquote>
-</div>
-
-
-                </section>
+            </section>
                 <section id="predictShearModulus">
                             <div class="attr function"><a class="headerlink" href="#predictShearModulus">#&nbsp;&nbsp</a>
 
@@ -926,6 +632,698 @@ Assumes the precursor-chains to be bifunctional.</p>
 
 
                 </section>
+                <section id="calculateCycleRank">
+                            <div class="attr function"><a class="headerlink" href="#calculateCycleRank">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">calculateCycleRank</span><span class="signature">(
+    networks: list = None,
+    nu: int = None,
+    mu: int = None,
+    absTol: float = 1,
+    relTol: float = 1,
+    junctionType=None
+)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateCycleRank</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Universum</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">nu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">relTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the cycle rank ($\\chi$).</span>
+<span class="sd">    Assumes the precursor-chains to be bifunctional.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - network: the network to calculate the cycle rank for</span>
+<span class="sd">      - nu: number of elastically effective (active) strands per unit volume</span>
+<span class="sd">      - mu: number density of the elastically effective crosslink</span>
+<span class="sd">      - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</span>
+<span class="sd">      - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</span>
+<span class="sd">      - junctionType: the atom type of the crosslinkers/junctions</span>
+
+<span class="sd">    No need to provide all the parameters — either/or:</span>
+<span class="sd">    - nu &amp; mu</span>
+<span class="sd">    - network, absTol, relTol, junctionType</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">nu</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">junctionType</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">networks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Argument missing: When not specifiying nu, network and junctionType need to be specified&quot;</span><span class="p">)</span>
+        <span class="n">nu</span> <span class="o">=</span> <span class="n">calculateEffectiveNrDensityOfNetwork</span><span class="p">(</span>
+            <span class="n">networks</span><span class="p">,</span> <span class="n">absTol</span><span class="p">,</span> <span class="n">relTol</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">mu</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">junctionType</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">networks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Argument missing: When not specifiying mu, network and junctionType need to be specified&quot;</span><span class="p">)</span>
+        <span class="n">mu</span> <span class="o">=</span> <span class="n">calculateEffectiveNrDensityOfJunctions</span><span class="p">(</span>
+            <span class="n">networks</span><span class="p">,</span> <span class="n">absTol</span><span class="p">,</span> <span class="n">relTol</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">nu</span> <span class="o">-</span> <span class="n">mu</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Compute the cycle rank ($\chi$).
+Assumes the precursor-chains to be bifunctional.</p>
+
+<h6 id="arguments">Arguments</h6>
+
+<blockquote>
+  <ul>
+  <li>network: the network to calculate the cycle rank for</li>
+  <li>nu: number of elastically effective (active) strands per unit volume</li>
+  <li>mu: number density of the elastically effective crosslink</li>
+  <li>absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</li>
+  <li>relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</li>
+  <li>junctionType: the atom type of the crosslinkers/junctions</li>
+  </ul>
+</blockquote>
+
+<p>No need to provide all the parameters — either/or:</p>
+
+<ul>
+<li>nu &amp; mu</li>
+<li>network, absTol, relTol, junctionType</li>
+</ul>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>cycleRank: the cycle rank ($\xi = \nu_{eff} - \mu_{eff}$)</li>
+  </ul>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="calculateEffectiveNrDensityOfNetwork">
+                            <div class="attr function"><a class="headerlink" href="#calculateEffectiveNrDensityOfNetwork">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">calculateEffectiveNrDensityOfNetwork</span><span class="signature">(
+    networks: list,
+    absTol: float = 1,
+    relTol: float = 1,
+    junctionType=None
+)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateEffectiveNrDensityOfNetwork</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">relTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the effective number density $\\nu_{eff}$ of a network.</span>
+<span class="sd">    Assumes the precursor-chains to be bifunctional.</span>
+
+<span class="sd">    $\\nu_{eff}$ is the number of elastically effective (active) strands per unit volume,</span>
+<span class="sd">    which are defined as the ones that can store elastic energy</span>
+<span class="sd">    upon network deformation, resp. the effective number density of network strands</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">      - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - network (pylimer_tools.entities.Universum): the network to compute $\\nu_{eff}$ for</span>
+<span class="sd">      - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</span>
+<span class="sd">      - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</span>
+<span class="sd">      - junctionType: the atom type of the crosslinkers/junctions</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - $\\nu_{eff}$ (float): the effective number density of network strands</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="c1"># get the mean end to end distances</span>
+    <span class="n">R_taus</span> <span class="o">=</span> <span class="n">computeMeanEndToEndDistances</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">R_taus</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="n">R_taus</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">R_taus</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="n">R_tau_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">R_taus</span><span class="p">)</span>
+
+    <span class="c1"># process additional input parameters</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">absTol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">absTol</span> <span class="o">=</span> <span class="n">R_tau_max</span>
+
+    <span class="c1"># count how many effective strands there are</span>
+    <span class="n">numEffective</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">R_tau</span> <span class="o">&gt;</span> <span class="n">absTol</span> <span class="ow">or</span> <span class="n">R_tau</span> <span class="o">&gt;</span> <span class="n">relTol</span><span class="o">*</span><span class="n">R_tau_max</span>
+                             <span class="k">for</span> <span class="n">R_tau</span> <span class="ow">in</span> <span class="n">R_taus</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="n">meanVolume</span> <span class="o">=</span> <span class="n">calculateMeanUniverseVolume</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">numEffective</span> <span class="o">/</span> <span class="n">meanVolume</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Compute the effective number density $\nu_{eff}$ of a network.
+Assumes the precursor-chains to be bifunctional.</p>
+
+<p>$\nu_{eff}$ is the number of elastically effective (active) strands per unit volume,
+which are defined as the ones that can store elastic energy
+upon network deformation, resp. the effective number density of network strands</p>
+
+<h6 id="source">Source</h6>
+
+<blockquote>
+  <ul>
+  <li>https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</li>
+  </ul>
+</blockquote>
+
+<h6 id="arguments">Arguments</h6>
+
+<blockquote>
+  <ul>
+  <li>network (<a href="../entities.html#Universum">pylimer_tools.entities.Universum</a>): the network to compute $\nu_{eff}$ for</li>
+  <li>absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</li>
+  <li>relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</li>
+  <li>junctionType: the atom type of the crosslinkers/junctions</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>$\nu_{eff}$ (float): the effective number density of network strands</li>
+  </ul>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="calculateMeanUniverseVolume">
+                            <div class="attr function"><a class="headerlink" href="#calculateMeanUniverseVolume">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">calculateMeanUniverseVolume</span><span class="signature">(networks: list, acceptDifferentSizes: bool = False) -&gt; float</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateMeanUniverseVolume</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">acceptDifferentSizes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the mean volume of a list of universes.</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - networks: a list of universes</span>
+<span class="sd">      - acceptDifferentSizes: toggle whether to throw an error when the Universe have different nr. of atoms</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - meanVolume: the mean volume of the universes</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># compute the mean volume of the universes</span>
+    <span class="n">meanVolume</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">divisor</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
+    <span class="n">networkSize</span> <span class="o">=</span> <span class="n">networks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">networks</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">acceptDifferentSizes</span> <span class="ow">and</span> <span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span> <span class="o">!=</span> <span class="n">networkSize</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+                <span class="s2">&quot;Currently, only sequences of networks with the same size are supported (got one with </span><span class="si">{}</span><span class="s2"> instead of </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">network</span><span class="p">),</span> <span class="n">network_size</span><span class="p">))</span>
+        <span class="n">meanVolume</span> <span class="o">+=</span> <span class="n">network</span><span class="o">.</span><span class="n">getVolume</span><span class="p">()</span><span class="o">*</span><span class="n">divisor</span>
+    <span class="k">return</span> <span class="n">meanVolume</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Compute the mean volume of a list of universes.</p>
+
+<h6 id="arguments">Arguments</h6>
+
+<blockquote>
+  <ul>
+  <li>networks: a list of universes</li>
+  <li>acceptDifferentSizes: toggle whether to throw an error when the Universe have different nr. of atoms</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>meanVolume: the mean volume of the universes</li>
+  </ul>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="calculateEffectiveNrDensityOfJunctions">
+                            <div class="attr function"><a class="headerlink" href="#calculateEffectiveNrDensityOfJunctions">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">calculateEffectiveNrDensityOfJunctions</span><span class="signature">(
+    networks: list,
+    absTol: float = 0,
+    relTol: float = 1,
+    junctionType=None,
+    minNumEffectiveStrands=2
+) -&gt; float</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateEffectiveNrDensityOfJunctions</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">relTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">minNumEffectiveStrands</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the number density of the elastically effective crosslinks,</span>
+<span class="sd">    defined as the ones that connect at least two elastically effective strands.</span>
+<span class="sd">    Assumes the precursor-chains to be bifunctional.</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">      - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - network (pylimer_tools.entities.Universum): the network to compute $\\nu_{eff}$ for</span>
+<span class="sd">      - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</span>
+<span class="sd">      - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</span>
+<span class="sd">      - junctionType: the atom type of the crosslinkers/junctions</span>
+<span class="sd">      - minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - $\\mu_{eff}$ (float): the effective number density of junctions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">junctionType</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="n">meanVolume</span> <span class="o">=</span> <span class="n">calculateMeanUniverseVolume</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">minNumEffectiveStrands</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">getAtomsWithType</span><span class="p">(</span><span class="n">junctionType</span><span class="p">))</span><span class="o">/</span><span class="n">meanVolume</span>
+
+    <span class="c1"># get the mean end to end distances</span>
+    <span class="n">R_taus</span> <span class="o">=</span> <span class="n">computeMeanEndToEndDistances</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">R_taus</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="n">R_tau_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">R_taus</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+    <span class="c1"># process additional input parameters</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">absTol</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">absTol</span> <span class="o">=</span> <span class="n">R_tau_max</span>
+
+    <span class="c1"># count how many active connections each junction has</span>
+    <span class="n">junctionActivity</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">R_taus</span><span class="p">:</span>
+        <span class="n">crosslinkerNames</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;+&quot;</span><span class="p">)</span>
+        <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">crosslinkerNames</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">isActive</span> <span class="o">=</span> <span class="n">R_taus</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">absTol</span> <span class="ow">or</span> <span class="n">R_taus</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">relTol</span><span class="o">*</span><span class="n">R_tau_max</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span><span class="p">(</span><span class="n">isActive</span><span class="p">)):</span>
+            <span class="k">continue</span>
+        <span class="n">relevantNames</span> <span class="o">=</span> <span class="p">[</span><span class="n">crosslinkerNames</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">crosslinkerNames</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="k">for</span> <span class="n">crosslinkerName</span> <span class="ow">in</span> <span class="n">relevantNames</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">crosslinkerName</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">junctionActivity</span><span class="p">):</span>
+                <span class="n">junctionActivity</span><span class="p">[</span><span class="n">crosslinkerName</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">junctionActivity</span><span class="p">[</span><span class="n">crosslinkerName</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">effectiveJunctions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">junctionActivity</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">minNumEffectiveStrands</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">junctionActivity</span><span class="p">])</span>
+    <span class="n">numEffectiveJunctions</span> <span class="o">=</span> <span class="n">effectiveJunctions</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">numEffectiveJunctions</span><span class="o">/</span><span class="n">meanVolume</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Compute the number density of the elastically effective crosslinks,
+defined as the ones that connect at least two elastically effective strands.
+Assumes the precursor-chains to be bifunctional.</p>
+
+<h6 id="source">Source</h6>
+
+<blockquote>
+  <ul>
+  <li>https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</li>
+  </ul>
+</blockquote>
+
+<h6 id="arguments">Arguments</h6>
+
+<blockquote>
+  <ul>
+  <li>network (<a href="../entities.html#Universum">pylimer_tools.entities.Universum</a>): the network to compute $\nu_{eff}$ for</li>
+  <li>absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</li>
+  <li>relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</li>
+  <li>junctionType: the atom type of the crosslinkers/junctions</li>
+  <li>minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>$\mu_{eff}$ (float): the effective number density of junctions</li>
+  </ul>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="calculateWeightFractionOfBackbone">
+                            <div class="attr function"><a class="headerlink" href="#calculateWeightFractionOfBackbone">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">calculateWeightFractionOfBackbone</span><span class="signature">(
+    network: <a href="../entities/universum.html#Universum">pylimer_tools.entities.universum.Universum</a>,
+    crosslinkerType,
+    weights=1
+)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateWeightFractionOfBackbone</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">crosslinkerType</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the weight fraction of network backbone in infinite network</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - network: the network to compute the weight fraction for</span>
+<span class="sd">      - crosslinkerType: the atom type to use to split the molecules</span>
+<span class="sd">      - weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - weightFraction (float): 1 - weightDangling/weightTotal,</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">weightFraction</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">calculateWeightFractionOfDanglingChains</span><span class="p">(</span>
+        <span class="n">network</span><span class="p">,</span> <span class="n">crosslinkerType</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+    <span class="k">return</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">weightFraction</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Compute the weight fraction of network backbone in infinite network</p>
+
+<h6 id="arguments">Arguments</h6>
+
+<blockquote>
+  <ul>
+  <li>network: the network to compute the weight fraction for</li>
+  <li>crosslinkerType: the atom type to use to split the molecules</li>
+  <li>weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>weightFraction (float): 1 - weightDangling/weightTotal,</li>
+  </ul>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="calculateWeightFractionOfDanglingChains">
+                            <div class="attr function"><a class="headerlink" href="#calculateWeightFractionOfDanglingChains">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">calculateWeightFractionOfDanglingChains</span><span class="signature">(
+    network: <a href="../entities/universum.html#Universum">pylimer_tools.entities.universum.Universum</a>,
+    crosslinkerType,
+    weights=1
+) -&gt; Tuple[float, float]</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateWeightFractionOfDanglingChains</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">crosslinkerType</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the weight fraction of dangling strands in infinite network</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - network: the network to compute the weight fraction for</span>
+<span class="sd">      - crosslinkerType: the atom type to use to split the molecules</span>
+<span class="sd">      - weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - weightFraction: weightDangling/weightTotal,</span>
+<span class="sd">      - numFraction: numDangling/numTotal</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span>
+
+    <span class="k">def</span> <span class="nf">getWeightOfGraph</span><span class="p">(</span><span class="n">graph</span><span class="p">):</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">vs</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">])</span>
+        <span class="n">weightTotal</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">counts</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="ow">in</span> <span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">)):</span>
+                <span class="n">weightTotal</span> <span class="o">+=</span> <span class="n">weights</span><span class="o">*</span><span class="n">counts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">weightTotal</span> <span class="o">+=</span> <span class="n">weights</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">*</span><span class="n">counts</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">weightTotal</span>
+
+    <span class="n">allChains</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getChainsWithCrosslinker</span><span class="p">(</span><span class="n">crosslinkerType</span><span class="p">)</span>
+    <span class="n">numTotal</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span>
+    <span class="n">weightTotal</span> <span class="o">=</span> <span class="n">getWeightOfGraph</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getUnderlyingGraph</span><span class="p">())</span>
+
+    <span class="n">numDangling</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">weightDangling</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">allChains</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">getType</span><span class="p">()</span> <span class="ow">is</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">DANGLING_CHAIN</span><span class="p">):</span>
+            <span class="n">numDangling</span> <span class="o">+=</span> <span class="n">chain</span><span class="o">.</span><span class="n">getLength</span><span class="p">()</span>
+            <span class="n">weightDangling</span> <span class="o">+=</span> <span class="n">getWeightOfGraph</span><span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">getUnderlyingGraph</span><span class="p">())</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">weightTotal</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="c1"># warnings.warn(&quot;Weight total = 0&quot;)</span>
+        <span class="k">return</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">numDangling</span><span class="o">/</span><span class="n">numTotal</span>
+
+    <span class="k">return</span> <span class="n">weightDangling</span><span class="o">/</span><span class="n">weightTotal</span><span class="p">,</span> <span class="n">numDangling</span><span class="o">/</span><span class="n">numTotal</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Compute the weight fraction of dangling strands in infinite network</p>
+
+<h6 id="arguments">Arguments</h6>
+
+<blockquote>
+  <ul>
+  <li>network: the network to compute the weight fraction for</li>
+  <li>crosslinkerType: the atom type to use to split the molecules</li>
+  <li>weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>weightFraction: weightDangling/weightTotal,</li>
+  <li>numFraction: numDangling/numTotal</li>
+  </ul>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="computeMeanEndToEndDistances">
+                            <div class="attr function"><a class="headerlink" href="#computeMeanEndToEndDistances">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">computeMeanEndToEndDistances</span><span class="signature">(networks: list, crosslinkerType) -&gt; dict</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">computeMeanEndToEndDistances</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">crosslinkerType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the mean end to end distance between each pair of (indirectly) connected crosslinker</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - networks: the different configurations of the polymer network to do the computation for</span>
+<span class="sd">      - crosslinkerType: the atom type to compute the in-between vectors for</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - endToEndDistances (dict): a dictionary with key: &quot;{atom1.name}+{atom2.name}&quot;</span>
+<span class="sd">          and value: the norm of the mean difference vector</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">R_tau_vectors</span> <span class="o">=</span> <span class="n">computeMeanEndToEndVectors</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">crosslinkerType</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">R_tau_vectors</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{}</span>
+
+    <span class="n">R_tau_vectors_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">R_tau_vectors</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+    <span class="c1"># print(R_tau_vectors_array)</span>
+    <span class="n">R_taus</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">R_tau_vectors_array</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">R_tau_vectors</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">R_taus</span><span class="p">))</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Compute the mean end to end distance between each pair of (indirectly) connected crosslinker</p>
+
+<h6 id="arguments">Arguments</h6>
+
+<blockquote>
+  <ul>
+  <li>networks: the different configurations of the polymer network to do the computation for</li>
+  <li>crosslinkerType: the atom type to compute the in-between vectors for</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>endToEndDistances (dict): a dictionary with key: "{atom1.name}+{atom2.name}"
+  and value: the norm of the mean difference vector</li>
+  </ul>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="computeMeanEndToEndVectors">
+                            <div class="attr function"><a class="headerlink" href="#computeMeanEndToEndVectors">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">computeMeanEndToEndVectors</span><span class="signature">(networks: list, crosslinkerType) -&gt; dict</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">computeMeanEndToEndVectors</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">crosslinkerType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the mean end to end vectors between each pair of (indirectly) connected crosslinker</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - networks: the different configurations of the polymer network to do the computation for</span>
+<span class="sd">      - crosslinkerType: the atom type to compute the in-between vectors for</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - endToEndVectors (dict): a dictionary with key: &quot;{atom1.name}+{atom2.name}&quot;</span>
+<span class="sd">          and value: their mean difference vector</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{}</span>
+    <span class="n">endToEndVectors</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">divider</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">network</span> <span class="ow">in</span> <span class="n">networks</span><span class="p">:</span>
+        <span class="n">currentEndToEndVectors</span> <span class="o">=</span> <span class="n">computeEndToEndVectors</span><span class="p">(</span>
+            <span class="n">network</span><span class="p">,</span> <span class="n">crosslinkerType</span><span class="p">)</span>
+        <span class="c1"># the mean calculation in this for loop</span>
+        <span class="c1"># trades some memory for performance</span>
+        <span class="c1"># there are still many performance and memory</span>
+        <span class="c1"># improvements possible</span>
+        <span class="c1"># (e.g. computing connectivity only once, storing it only once, ....)</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">currentEndToEndVectors</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">endToEndVectors</span><span class="p">):</span>
+                <span class="n">endToEndVectors</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">endToEndVectors</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">+=</span> <span class="n">currentEndToEndVectors</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">*</span><span class="n">divider</span>
+    <span class="k">return</span> <span class="n">endToEndVectors</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Compute the mean end to end vectors between each pair of (indirectly) connected crosslinker</p>
+
+<h6 id="arguments">Arguments</h6>
+
+<blockquote>
+  <ul>
+  <li>networks: the different configurations of the polymer network to do the computation for</li>
+  <li>crosslinkerType: the atom type to compute the in-between vectors for</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>endToEndVectors (dict): a dictionary with key: "{atom1.name}+{atom2.name}"
+  and value: their mean difference vector</li>
+  </ul>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="computeEndToEndVectors">
+                            <div class="attr function"><a class="headerlink" href="#computeEndToEndVectors">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">computeEndToEndVectors</span><span class="signature">(
+    network: <a href="../entities/universum.html#Universum">pylimer_tools.entities.universum.Universum</a>,
+    crosslinkerType
+) -&gt; dict</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">computeEndToEndVectors</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">crosslinkerType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the end to end vectors between each pair of (indirectly) connected crosslinker</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - network: the polymer network to do the computation for</span>
+<span class="sd">      - crosslinkerType: the atom type to compute the in-between vectors for</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - endToEndVectors (dict): a dictionary with key: &quot;{atom1.name}+{atom2.name}&quot;</span>
+<span class="sd">          and value: their difference vector</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># while we could do the decomposition again with explicit removal of irrelevant strand atoms,</span>
+    <span class="c1"># this should not be any more expensive</span>
+    <span class="n">endToEndVectors</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">molecules</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getChainsWithCrosslinker</span><span class="p">(</span><span class="n">crosslinkerType</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="n">molecules</span><span class="p">:</span>
+        <span class="n">crosslinkers</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">getUnderlyingGraph</span><span class="p">()</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">type_eq</span><span class="o">=</span><span class="n">crosslinkerType</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">crosslinkers</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span>
+            <span class="n">molecule</span><span class="o">.</span><span class="n">getType</span><span class="p">()</span> <span class="o">==</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">PRIMARY_LOOP</span> <span class="ow">or</span>
+                <span class="n">molecule</span><span class="o">.</span><span class="n">getType</span><span class="p">()</span> <span class="o">==</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">DANGLING_CHAIN</span><span class="p">):</span>
+            <span class="c1"># dangling, free chains and loops are irrelevant for our purposes</span>
+            <span class="k">continue</span>
+        <span class="c1"># igraph.VertexSeq is not sortable -&gt; use a list</span>
+        <span class="n">crosslinkers</span> <span class="o">=</span> <span class="p">[</span><span class="n">crosslinkers</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">crosslinkers</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="c1"># sort crosslinkers by name as a way to keep the vector directions consistent between timesteps</span>
+        <span class="n">crosslinkers</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+        <span class="c1">#</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">_getKeyForMolecule</span><span class="p">(</span><span class="n">molecule</span><span class="p">,</span> <span class="n">crosslinkers</span><span class="p">)</span>
+        <span class="n">endToEndVectors</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">crosslinkers</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;atom&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">computeVectorTo</span><span class="p">(</span>
+            <span class="n">crosslinkers</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;atom&quot;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">endToEndVectors</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Compute the end to end vectors between each pair of (indirectly) connected crosslinker</p>
+
+<h6 id="arguments">Arguments</h6>
+
+<blockquote>
+  <ul>
+  <li>network: the polymer network to do the computation for</li>
+  <li>crosslinkerType: the atom type to compute the in-between vectors for</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>endToEndVectors (dict): a dictionary with key: "{atom1.name}+{atom2.name}"
+  and value: their difference vector</li>
+  </ul>
+</blockquote>
+</div>
+
+
+                </section>
                 <section id="computeCrosslinkerConversion">
                             <div class="attr function"><a class="headerlink" href="#computeCrosslinkerConversion">#&nbsp;&nbsp</a>
 
@@ -942,11 +1340,11 @@ Assumes the precursor-chains to be bifunctional.</p>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">computeCrosslinkerConversion</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the extent of reaction of the crosslinkers </span>
+<span class="sd">    Compute the extent of reaction of the crosslinkers</span>
 <span class="sd">    (actual functionality divided by target functionality)</span>
 
 <span class="sd">    Arguments:</span>
-<span class="sd">      - network: the poylmer network to do the computation for</span>
+<span class="sd">      - network: the polymer network to do the computation for</span>
 <span class="sd">      - junctionType: the type of the junctions/crosslinkers to select them in the network</span>
 <span class="sd">      - f: the functionality of the crosslinkers</span>
 
@@ -958,14 +1356,14 @@ Assumes the precursor-chains to be bifunctional.</p>
 
         </details>
 
-            <div class="docstring"><p>Compute the extent of reaction of the crosslinkers 
+            <div class="docstring"><p>Compute the extent of reaction of the crosslinkers
 (actual functionality divided by target functionality)</p>
 
 <h6 id="arguments">Arguments</h6>
 
 <blockquote>
   <ul>
-  <li>network: the poylmer network to do the computation for</li>
+  <li>network: the polymer network to do the computation for</li>
   <li>junctionType: the type of the junctions/crosslinkers to select them in the network</li>
   <li>f: the functionality of the crosslinkers</li>
   </ul>
@@ -1000,7 +1398,7 @@ Assumes the precursor-chains to be bifunctional.</p>
 <span class="sd">    Compute the mean crosslinker functionality</span>
 
 <span class="sd">    Arguments:</span>
-<span class="sd">      - network: the poylmer network to do the computation for</span>
+<span class="sd">      - network: the polymer network to do the computation for</span>
 <span class="sd">      - junctionType: the type of the junctions/crosslinkers to select them in the network</span>
 
 <span class="sd">    Returns:</span>
@@ -1019,7 +1417,7 @@ Assumes the precursor-chains to be bifunctional.</p>
 
 <blockquote>
   <ul>
-  <li>network: the poylmer network to do the computation for</li>
+  <li>network: the polymer network to do the computation for</li>
   <li>junctionType: the type of the junctions/crosslinkers to select them in the network</li>
   </ul>
 </blockquote>
@@ -1040,17 +1438,20 @@ Assumes the precursor-chains to be bifunctional.</p>
 
         
             <span class="def">def</span>
-            <span class="name">calculateEffectiveCrosslinkerFunctionalities</span><span class="signature">(network: <a href="../entities/universum.html#Universum">pylimer_tools.entities.universum.Universum</a>, junctionType)</span>:
+            <span class="name">calculateEffectiveCrosslinkerFunctionalities</span><span class="signature">(
+    network: <a href="../entities/universum.html#Universum">pylimer_tools.entities.universum.Universum</a>,
+    junctionType
+) -&gt; list[int]</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateEffectiveCrosslinkerFunctionalities</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateEffectiveCrosslinkerFunctionalities</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the functionality of every crosslinker in the network</span>
 
 <span class="sd">    Arguments:</span>
-<span class="sd">      - network: the poylmer network to do the computation for</span>
+<span class="sd">      - network: the polymer network to do the computation for</span>
 <span class="sd">      - junctionType: the type of the junctions/crosslinkers to select them in the network</span>
 
 <span class="sd">    Returns:</span>
@@ -1073,7 +1474,7 @@ Assumes the precursor-chains to be bifunctional.</p>
 
 <blockquote>
   <ul>
-  <li>network: the poylmer network to do the computation for</li>
+  <li>network: the polymer network to do the computation for</li>
   <li>junctionType: the type of the junctions/crosslinkers to select them in the network</li>
   </ul>
 </blockquote>
@@ -1094,19 +1495,19 @@ Assumes the precursor-chains to be bifunctional.</p>
 
         
             <span class="def">def</span>
-            <span class="name">calculateTopologicalFactor</span><span class="signature">(
-    network: <a href="../entities/universum.html#Universum">pylimer_tools.entities.universum.Universum</a>,
-    foreignAtomType=None,
-    totalMass=1
-)</span>:
+            <span class="name">calculateTopologicalFactor</span><span class="signature">(networks: list, foreignAtomType=None, totalMass=1, b=None) -&gt; float</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateTopologicalFactor</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">foreignAtomType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">totalMass</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateTopologicalFactor</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">foreignAtomType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">totalMass</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">b</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the topological factor of a polymer network.</span>
-<span class="sd">    Assumes the precursor-chains to be bifunctional.</span>
+
+<span class="sd">    Assumptions: </span>
+<span class="sd">      - the precursor-chains to be bifunctional</span>
+<span class="sd">      - all Universes to have the same structure (with possibly differing positions)</span>
+<span class="sd">      - crosslinkers do not count to the nr. of monomers in a strand</span>
 
 <span class="sd">    Source:</span>
 <span class="sd">      - eq. 16 in https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262</span>
@@ -1115,26 +1516,49 @@ Assumes the precursor-chains to be bifunctional.</p>
 <span class="sd">      - network: the network to compute the topological factor for</span>
 <span class="sd">      - foreignAtomType: the type of atoms to ignore</span>
 <span class="sd">      - totalMass: the $M$ in the respective formula</span>
+<span class="sd">      - b: the mean bond length. </span>
+<span class="sd">          If `None`, it will be computed for each molecule in the first Universum (Network).</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">      - the topological factor $\\Gamma$</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">molecules</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getMolecules</span><span class="p">(</span><span class="n">ignoreAtomType</span><span class="o">=</span><span class="n">foreignAtomType</span><span class="p">)</span>
-    <span class="n">Gamma_sum</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="n">molecules</span><span class="p">:</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">getLength</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">):</span>  <span class="c1"># single beads result in b = None</span>
-            <span class="k">continue</span>
-        <span class="n">R_tau</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">computeEndToEndDistance</span><span class="p">()</span>
-        <span class="n">b</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">computeBondLengths</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-        <span class="n">Gamma_sum</span> <span class="o">+=</span> <span class="n">R_tau</span><span class="o">*</span><span class="n">R_tau</span> <span class="o">/</span> <span class="p">(</span><span class="n">molecule</span><span class="o">.</span><span class="n">getLength</span><span class="p">()</span> <span class="o">*</span> <span class="n">b</span> <span class="o">*</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">R_taus</span> <span class="o">=</span> <span class="n">computeMeanEndToEndDistances</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">foreignAtomType</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">Gamma_sum</span> <span class="o">/</span> <span class="n">totalMass</span>
+    <span class="c1"># find the topological factor</span>
+    <span class="n">GammaSum</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">network</span> <span class="o">=</span> <span class="n">networks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># this is where the second assumption is made</span>
+    <span class="n">chainsToProcess</span> <span class="o">=</span> <span class="n">network</span><span class="o">.</span><span class="n">getChainsWithCrosslinker</span><span class="p">(</span><span class="n">foreignAtomType</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="n">chainsToProcess</span><span class="p">:</span>
+        <span class="n">crosslinkers</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">getUnderlyingGraph</span><span class="p">()</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">type_eq</span><span class="o">=</span><span class="n">foreignAtomType</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">crosslinkers</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span> <span class="ow">or</span>
+            <span class="n">molecule</span><span class="o">.</span><span class="n">getType</span><span class="p">()</span> <span class="o">==</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">PRIMARY_LOOP</span> <span class="ow">or</span>
+                <span class="n">molecule</span><span class="o">.</span><span class="n">getType</span><span class="p">()</span> <span class="o">==</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">MoleculeType</span><span class="o">.</span><span class="n">DANGLING_CHAIN</span><span class="p">):</span>
+            <span class="c1"># dangling, free chains and loops are irrelevant for our purposes</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">b</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">b</span> <span class="o">=</span> <span class="n">molecule</span><span class="o">.</span><span class="n">computeBondLengths</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="n">crosslinkers</span> <span class="o">=</span> <span class="p">[</span><span class="n">crosslinkers</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">crosslinkers</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="c1"># sort crosslinkers by name as a way to keep the vector directions consistent between timesteps</span>
+        <span class="n">crosslinkers</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="n">a</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">_getKeyForMolecule</span><span class="p">(</span><span class="n">molecule</span><span class="p">,</span> <span class="n">crosslinkers</span><span class="p">)</span>
+        <span class="n">GammaSum</span> <span class="o">+=</span> <span class="n">R_taus</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">*</span><span class="n">R_taus</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">/</span> \
+            <span class="p">((</span><span class="n">molecule</span><span class="o">.</span><span class="n">getLength</span><span class="p">()</span><span class="o">-</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">b</span> <span class="o">*</span>
+             <span class="n">b</span><span class="p">)</span>  <span class="c1"># -2: remove crosslinkers again (assumption 3)</span>
+
+    <span class="k">return</span> <span class="n">GammaSum</span> <span class="o">/</span> <span class="n">totalMass</span>
 </pre></div>
 
         </details>
 
-            <div class="docstring"><p>Compute the topological factor of a polymer network.
-Assumes the precursor-chains to be bifunctional.</p>
+            <div class="docstring"><p>Compute the topological factor of a polymer network.</p>
+
+<p>Assumptions: </p>
+
+<ul>
+<li>the precursor-chains to be bifunctional</li>
+<li>all Universes to have the same structure (with possibly differing positions)</li>
+<li>crosslinkers do not count to the nr. of monomers in a strand</li>
+</ul>
 
 <h6 id="source">Source</h6>
 
@@ -1151,6 +1575,8 @@ Assumes the precursor-chains to be bifunctional.</p>
   <li>network: the network to compute the topological factor for</li>
   <li>foreignAtomType: the type of atoms to ignore</li>
   <li>totalMass: the $M$ in the respective formula</li>
+  <li>b: the mean bond length. 
+  If <code>None</code>, it will be computed for each molecule in the first Universum (Network).</li>
   </ul>
 </blockquote>
 

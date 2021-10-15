@@ -63,6 +63,9 @@
                                 <a class="function" href="#Atom.getDeltaZ">getDeltaZ</a>
                         </li>
                         <li>
+                                <a class="function" href="#Atom.computeVectorTo">computeVectorTo</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#Atom.computeDistanceTo">computeDistanceTo</a>
                         </li>
                         <li>
@@ -97,7 +100,10 @@
 
 
 <span class="k">class</span> <span class="nc">Atom</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">boxSizes</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">boxSizes</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Instantiate the Atom.</span>
 
@@ -109,6 +115,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">boxDimensions</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">boxSizes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">boxSizes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">boxSizes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
         <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;atom</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
 
     <span class="k">def</span> <span class="nf">_getDeltaDistance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">distanceTo</span><span class="p">:</span> <span class="n">Atom</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -167,6 +177,21 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getDeltaDistance</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">secondAtom</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">computeVectorTo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secondAtom</span><span class="p">:</span> <span class="n">Atom</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the the vector between two atoms. </span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            - secondAtom: the atom to compute the distance to</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            - difference (np.array): the connecting vector between the two coordinates</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># using a numpy array is a bit too much overhead, possibly</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">getDeltaX</span><span class="p">(</span><span class="n">secondAtom</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDeltaY</span><span class="p">(</span>
+            <span class="n">secondAtom</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDeltaZ</span><span class="p">(</span><span class="n">secondAtom</span><span class="p">)</span>
+        <span class="p">])</span>
+
     <span class="k">def</span> <span class="nf">computeDistanceTo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secondAtom</span><span class="p">:</span> <span class="n">Atom</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the the distance between two atoms. </span>
@@ -177,9 +202,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            - meanDistance: the norm of the connecting vector between the two coordinates</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">getDeltaX</span><span class="p">(</span><span class="n">secondAtom</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDeltaY</span><span class="p">(</span>
-            <span class="n">secondAtom</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDeltaZ</span><span class="p">(</span><span class="n">secondAtom</span><span class="p">)</span>
-        <span class="p">])</span>
+        <span class="c1"># again, using numpy here is a bit overkill</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">computeVectorTo</span><span class="p">(</span><span class="n">secondAtom</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">getUnderlyingData</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -206,7 +230,10 @@
                 <details>
             <summary>View Source</summary>
             <div class="codehilite"><pre><span></span><span class="k">class</span> <span class="nc">Atom</span><span class="p">:</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">boxSizes</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">boxSizes</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Instantiate the Atom.</span>
 
@@ -218,6 +245,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">boxDimensions</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">boxSizes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">boxSizes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">boxSizes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
         <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;atom</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
 
     <span class="k">def</span> <span class="nf">_getDeltaDistance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">direction</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">distanceTo</span><span class="p">:</span> <span class="n">Atom</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -276,6 +307,21 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getDeltaDistance</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">secondAtom</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">computeVectorTo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secondAtom</span><span class="p">:</span> <span class="n">Atom</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the the vector between two atoms. </span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            - secondAtom: the atom to compute the distance to</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            - difference (np.array): the connecting vector between the two coordinates</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># using a numpy array is a bit too much overhead, possibly</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">getDeltaX</span><span class="p">(</span><span class="n">secondAtom</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDeltaY</span><span class="p">(</span>
+            <span class="n">secondAtom</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDeltaZ</span><span class="p">(</span><span class="n">secondAtom</span><span class="p">)</span>
+        <span class="p">])</span>
+
     <span class="k">def</span> <span class="nf">computeDistanceTo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secondAtom</span><span class="p">:</span> <span class="n">Atom</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate the the distance between two atoms. </span>
@@ -286,9 +332,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            - meanDistance: the norm of the connecting vector between the two coordinates</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">getDeltaX</span><span class="p">(</span><span class="n">secondAtom</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDeltaY</span><span class="p">(</span>
-            <span class="n">secondAtom</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDeltaZ</span><span class="p">(</span><span class="n">secondAtom</span><span class="p">)</span>
-        <span class="p">])</span>
+        <span class="c1"># again, using numpy here is a bit overkill</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">computeVectorTo</span><span class="p">(</span><span class="n">secondAtom</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">getUnderlyingData</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -308,12 +353,12 @@
                                         <div class="attr function"><a class="headerlink" href="#Atom.__init__">#&nbsp;&nbsp</a>
 
         
-            <span class="name">Atom</span><span class="signature">(data: pandas.core.series.Series, boxSizes: list)</span>
+            <span class="name">Atom</span><span class="signature">(data: pandas.core.series.Series, boxSizes: list, name: str = None)</span>
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">boxSizes</span><span class="p">:</span> <span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">boxSizes</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Instantiate the Atom.</span>
 
@@ -325,6 +370,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">boxDimensions</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="n">boxSizes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="n">boxSizes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="n">boxSizes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
         <span class="p">}</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;atom</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
 </pre></div>
 
         </details>
@@ -487,6 +536,55 @@ accounting for periodic displacements.</p>
 
 
                             </div>
+                            <div id="Atom.computeVectorTo" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#Atom.computeVectorTo">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">computeVectorTo</span><span class="signature">(self, secondAtom: <a href="#Atom">pylimer_tools.entities.atom.Atom</a>) -&gt; float</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">computeVectorTo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secondAtom</span><span class="p">:</span> <span class="n">Atom</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the the vector between two atoms. </span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            - secondAtom: the atom to compute the distance to</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            - difference (np.array): the connecting vector between the two coordinates</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># using a numpy array is a bit too much overhead, possibly</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">getDeltaX</span><span class="p">(</span><span class="n">secondAtom</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDeltaY</span><span class="p">(</span>
+            <span class="n">secondAtom</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDeltaZ</span><span class="p">(</span><span class="n">secondAtom</span><span class="p">)</span>
+        <span class="p">])</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Calculate the the vector between two atoms. </p>
+
+<h6 id="arguments">Arguments</h6>
+
+<blockquote>
+  <ul>
+  <li>secondAtom: the atom to compute the distance to</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>difference (np.array): the connecting vector between the two coordinates</li>
+  </ul>
+</blockquote>
+</div>
+
+
+                            </div>
                             <div id="Atom.computeDistanceTo" class="classattr">
                                         <div class="attr function"><a class="headerlink" href="#Atom.computeDistanceTo">#&nbsp;&nbsp</a>
 
@@ -507,9 +605,8 @@ accounting for periodic displacements.</p>
 <span class="sd">        Returns:</span>
 <span class="sd">            - meanDistance: the norm of the connecting vector between the two coordinates</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">getDeltaX</span><span class="p">(</span><span class="n">secondAtom</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDeltaY</span><span class="p">(</span>
-            <span class="n">secondAtom</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDeltaZ</span><span class="p">(</span><span class="n">secondAtom</span><span class="p">)</span>
-        <span class="p">])</span>
+        <span class="c1"># again, using numpy here is a bit overkill</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">computeVectorTo</span><span class="p">(</span><span class="n">secondAtom</span><span class="p">))</span>
 </pre></div>
 
         </details>
