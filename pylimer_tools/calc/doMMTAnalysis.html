@@ -71,6 +71,9 @@
             <li>
                     <a class="function" href="#computeExtentOfReaction">computeExtentOfReaction</a>
             </li>
+            <li>
+                    <a class="function" href="#predictGelationPoint">predictGelationPoint</a>
+            </li>
     </ul>
 
 
@@ -90,7 +93,8 @@
                 
                         <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+            <div class="codehilite"><pre><span></span><span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
 
 <span class="kn">import</span> <span class="nn">igraph</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -114,9 +118,14 @@
 <span class="sd">      - k_b: Boltzmann&#39;s constant in your unit system</span>
 <span class="sd">      - totalMass: the $M$ in the respective formula</span>
 
+<span class="sd">    Returns:</span>
+<span class="sd">      - G: the predicted shear modulus, or `None` if the universe is empty.</span>
+
 <span class="sd">    ToDo:</span>
 <span class="sd">      - Support more than one crosslinker type (as is supported by original formula)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
     <span class="n">nu</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getMolecules</span><span class="p">(</span><span class="n">junctionType</span><span class="p">))</span> <span class="o">/</span> \
         <span class="n">network</span><span class="o">.</span><span class="n">getVolume</span><span class="p">()</span>  <span class="c1"># number of chains (network strands) per unit volume</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">functionalityPerType</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
@@ -183,7 +192,8 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">functionalityPerType</span><span class="p">[</span><span class="n">junctionType</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span><span class="p">)</span>
         <span class="n">Phi_el</span> <span class="o">=</span> <span class="p">((</span><span class="n">W_x2</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">beta</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span>
-                  <span class="p">(</span><span class="n">W_xl</span><span class="o">*</span><span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">alpha</span><span class="p">)</span><span class="o">**</span><span class="mi">4</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">W_a</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">alpha</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">6</span><span class="o">*</span><span class="p">(</span><span class="n">alpha</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">W_a</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">alpha</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">W_sol</span><span class="p">)</span>
+                  <span class="p">(</span><span class="n">W_xl</span><span class="o">*</span><span class="p">(((</span><span class="mi">1</span><span class="o">-</span><span class="n">alpha</span><span class="p">)</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">W_a</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">alpha</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span>
+                         <span class="mi">6</span><span class="o">*</span><span class="p">(</span><span class="n">alpha</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">W_a</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">alpha</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">W_sol</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">Phi_el</span>
 
@@ -244,18 +254,32 @@
 <span class="sd">    Arguments:</span>
 <span class="sd">      - r: the stoichiometric inbalance</span>
 <span class="sd">      - p: the extent of reaction</span>
+<span class="sd">      - f: the functionality of the the crosslinker</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">      - alpha: $P(F_A)$</span>
 <span class="sd">      - beta: $P(F_B)$    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># first, check a few things required by the formulae</span>
+    <span class="c1"># since we want alpha, beta \in [0,1], given they are supposed to be probabilities</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;A stoichiometric inbalance ouside of [0, 1] is not (yet) supported. Got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="o">/</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The extent of reaction has to be inside [1/sqrt(2), 1] for the result to be realistic. Got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">p</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The stoichiometric inbalance must be &gt; 1/(2p^2) for the resulting alpha to be realisitic. Got p = </span><span class="si">{}</span><span class="s2">, r = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">r</span><span class="p">))</span>
+
+    <span class="c1"># actually do the calculations</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">f</span> <span class="o">==</span> <span class="mi">3</span><span class="p">):</span>
-        <span class="n">alpha</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">p</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">p</span> <span class="o">*</span> <span class="n">p</span><span class="p">))</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">p</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">p</span><span class="p">))</span>
         <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="n">alpha</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">f</span> <span class="o">==</span> <span class="mi">4</span><span class="p">)</span>
-        <span class="n">alpha</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">p</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
-        <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="p">(((</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">p</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.75</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">p</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="p">((</span><span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="p">((</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">p</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.75</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span>
 
 
@@ -370,6 +394,27 @@
     <span class="n">graph</span><span class="o">.</span><span class="n">simplify</span><span class="p">()</span>
     <span class="c1"># multiplication by 2 as each bond affects 2 possible bonds</span>
     <span class="k">return</span> <span class="n">graph</span><span class="o">.</span><span class="n">ecount</span><span class="p">()</span><span class="o">*</span><span class="mf">2.0</span><span class="o">/</span><span class="p">(</span><span class="n">maxFormableBonds</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">predictGelationPoint</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the gelation point $p_{gel}$ as theoretically predicted</span>
+<span class="sd">    (gelation point = critical extent of reaction for gelation)</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">      - https://www.sciencedirect.com/science/article/pii/003238618990253X</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - r (double): the stoichiometric inbalance of reactants (see: #computeStoichiometricInbalance)</span>
+<span class="sd">      - f (int): functionality of the crosslinkers</span>
+<span class="sd">      - g (int): functionality of the precursor polymer</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - p_gel: critical extent of reaction for gelation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># if (r is None):</span>
+    <span class="c1">#   r = calculateEffectiveCrosslinkerFunctionality(network, junctionType, f)</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="p">(</span><span class="n">f</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">g</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
 </pre></div>
 
         </details>
@@ -411,9 +456,14 @@
 <span class="sd">      - k_b: Boltzmann&#39;s constant in your unit system</span>
 <span class="sd">      - totalMass: the $M$ in the respective formula</span>
 
+<span class="sd">    Returns:</span>
+<span class="sd">      - G: the predicted shear modulus, or `None` if the universe is empty.</span>
+
 <span class="sd">    ToDo:</span>
 <span class="sd">      - Support more than one crosslinker type (as is supported by original formula)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getSize</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span>
     <span class="n">nu</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getMolecules</span><span class="p">(</span><span class="n">junctionType</span><span class="p">))</span> <span class="o">/</span> \
         <span class="n">network</span><span class="o">.</span><span class="n">getVolume</span><span class="p">()</span>  <span class="c1"># number of chains (network strands) per unit volume</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">functionalityPerType</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
@@ -451,6 +501,14 @@
   <li>T: the temperature in your unit system</li>
   <li>k_b: Boltzmann's constant in your unit system</li>
   <li>totalMass: the $M$ in the respective formula</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>G: the predicted shear modulus, or <code>None</code> if the universe is empty.</li>
   </ul>
 </blockquote>
 
@@ -576,7 +634,8 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">functionalityPerType</span><span class="p">[</span><span class="n">junctionType</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span><span class="p">)</span>
         <span class="n">Phi_el</span> <span class="o">=</span> <span class="p">((</span><span class="n">W_x2</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">beta</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span>
-                  <span class="p">(</span><span class="n">W_xl</span><span class="o">*</span><span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">alpha</span><span class="p">)</span><span class="o">**</span><span class="mi">4</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">W_a</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">alpha</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span> <span class="o">+</span> <span class="mi">6</span><span class="o">*</span><span class="p">(</span><span class="n">alpha</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">W_a</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">alpha</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">W_sol</span><span class="p">)</span>
+                  <span class="p">(</span><span class="n">W_xl</span><span class="o">*</span><span class="p">(((</span><span class="mi">1</span><span class="o">-</span><span class="n">alpha</span><span class="p">)</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">W_a</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="mi">1</span><span class="o">-</span><span class="n">alpha</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span>
+                         <span class="mi">6</span><span class="o">*</span><span class="p">(</span><span class="n">alpha</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">W_a</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">alpha</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">W_sol</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">Phi_el</span>
 </pre></div>
@@ -739,18 +798,32 @@
 <span class="sd">    Arguments:</span>
 <span class="sd">      - r: the stoichiometric inbalance</span>
 <span class="sd">      - p: the extent of reaction</span>
+<span class="sd">      - f: the functionality of the the crosslinker</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">      - alpha: $P(F_A)$</span>
 <span class="sd">      - beta: $P(F_B)$    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># first, check a few things required by the formulae</span>
+    <span class="c1"># since we want alpha, beta \in [0,1], given they are supposed to be probabilities</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;A stoichiometric inbalance ouside of [0, 1] is not (yet) supported. Got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="o">/</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The extent of reaction has to be inside [1/sqrt(2), 1] for the result to be realistic. Got </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">))</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">p</span><span class="p">)):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The stoichiometric inbalance must be &gt; 1/(2p^2) for the resulting alpha to be realisitic. Got p = </span><span class="si">{}</span><span class="s2">, r = </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">r</span><span class="p">))</span>
+
+    <span class="c1"># actually do the calculations</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">f</span> <span class="o">==</span> <span class="mi">3</span><span class="p">):</span>
-        <span class="n">alpha</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">p</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">p</span> <span class="o">*</span> <span class="n">p</span><span class="p">))</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">p</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">p</span><span class="p">))</span>
         <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">alpha</span><span class="o">*</span><span class="n">alpha</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">assert</span><span class="p">(</span><span class="n">f</span> <span class="o">==</span> <span class="mi">4</span><span class="p">)</span>
-        <span class="n">alpha</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">p</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
-        <span class="n">beta</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="p">(((</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">p</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.75</span><span class="p">)</span><span class="o">**</span><span class="mf">0.5</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">p</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">beta</span> <span class="o">=</span> <span class="p">((</span><span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="p">((</span><span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="o">*</span><span class="n">p</span><span class="p">))</span> <span class="o">-</span> <span class="mf">0.75</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">**</span><span class="mi">3</span><span class="p">))</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">r</span><span class="o">*</span><span class="n">p</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span>
 </pre></div>
 
@@ -764,6 +837,7 @@
   <ul>
   <li>r: the stoichiometric inbalance</li>
   <li>p: the extent of reaction</li>
+  <li>f: the functionality of the the crosslinker</li>
   </ul>
 </blockquote>
 
@@ -1016,6 +1090,71 @@ this will not be rounded/respected in any way. </p>
 <blockquote>
   <ul>
   <li>p (float): the extent of reaction</li>
+  </ul>
+</blockquote>
+</div>
+
+
+                </section>
+                <section id="predictGelationPoint">
+                            <div class="attr function"><a class="headerlink" href="#predictGelationPoint">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">predictGelationPoint</span><span class="signature">(r: float, f: int, g: int = 2) -&gt; float</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">predictGelationPoint</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the gelation point $p_{gel}$ as theoretically predicted</span>
+<span class="sd">    (gelation point = critical extent of reaction for gelation)</span>
+
+<span class="sd">    Source:</span>
+<span class="sd">      - https://www.sciencedirect.com/science/article/pii/003238618990253X</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">      - r (double): the stoichiometric inbalance of reactants (see: #computeStoichiometricInbalance)</span>
+<span class="sd">      - f (int): functionality of the crosslinkers</span>
+<span class="sd">      - g (int): functionality of the precursor polymer</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">      - p_gel: critical extent of reaction for gelation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># if (r is None):</span>
+    <span class="c1">#   r = calculateEffectiveCrosslinkerFunctionality(network, junctionType, f)</span>
+    <span class="k">return</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="p">(</span><span class="n">f</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">g</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Compute the gelation point $p_{gel}$ as theoretically predicted
+(gelation point = critical extent of reaction for gelation)</p>
+
+<h6 id="source">Source</h6>
+
+<blockquote>
+  <ul>
+  <li>https://www.sciencedirect.com/science/article/pii/003238618990253X</li>
+  </ul>
+</blockquote>
+
+<h6 id="arguments">Arguments</h6>
+
+<blockquote>
+  <ul>
+  <li>r (double): the stoichiometric inbalance of reactants (see: #computeStoichiometricInbalance)</li>
+  <li>f (int): functionality of the crosslinkers</li>
+  <li>g (int): functionality of the precursor polymer</li>
+  </ul>
+</blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>p_gel: critical extent of reaction for gelation</li>
   </ul>
 </blockquote>
 </div>

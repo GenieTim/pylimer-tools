@@ -66,9 +66,6 @@
                     <a class="function" href="#predictShearModulus">predictShearModulus</a>
             </li>
             <li>
-                    <a class="function" href="#predictGelationPoint">predictGelationPoint</a>
-            </li>
-            <li>
                     <a class="function" href="#computeCrosslinkerConversion">computeCrosslinkerConversion</a>
             </li>
             <li>
@@ -337,34 +334,13 @@
 <span class="sd">      - network: the polymer system to predict the shear modulus for</span>
 <span class="sd">      - T: the temperature in your unit system</span>
 <span class="sd">      - k_b: Boltzmann&#39;s constant in your unit system</span>
-<span class="sd">      - foreignAtomType: the type of atoms to ignore</span>
+<span class="sd">      - foreignAtomType: the type of atoms to ignore (junctions, crosslinkers)</span>
 <span class="sd">      - totalMass: the $M$ in the respective formula</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">Gamma</span> <span class="o">=</span> <span class="n">calculateTopologicalFactor</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">foreignAtomType</span><span class="p">,</span> <span class="n">totalMass</span><span class="p">)</span>
-    <span class="n">nu</span> <span class="o">=</span> <span class="n">calculateEffectiveNrDensityOfNetwork</span><span class="p">(</span>
-        <span class="n">network</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="n">foreignAtomType</span><span class="p">)</span>
+    <span class="n">nu</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getMolecules</span><span class="p">(</span><span class="n">foreignAtomType</span><span class="p">))</span> <span class="o">/</span> \
+        <span class="n">network</span><span class="o">.</span><span class="n">getVolume</span><span class="p">()</span>  <span class="c1"># number of chains (network strands) per unit volume</span>
     <span class="k">return</span> <span class="n">Gamma</span><span class="o">*</span><span class="n">nu</span><span class="o">*</span><span class="n">k_B</span><span class="o">*</span><span class="n">T</span>
-
-
-<span class="k">def</span> <span class="nf">predictGelationPoint</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the gelation point $p_{gel}$ as theoretically predicted</span>
-<span class="sd">    (gelation point = critical extent of reaction for gelation)</span>
-
-<span class="sd">    Source:</span>
-<span class="sd">      - https://www.sciencedirect.com/science/article/pii/003238618990253X</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">      - r: the stoichiometric inbalance of reactants</span>
-<span class="sd">      - f: functionality of the crosslinkers</span>
-<span class="sd">      - g: functionality of the precursor polymer</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">      - p_gel: critical extent of reaction for gelation</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># if (r is None):</span>
-    <span class="c1">#   r = calculateEffectiveCrosslinkerFunctionality(network, junctionType, f)</span>
-    <span class="k">return</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="p">(</span><span class="n">f</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">g</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
 
 
 <span class="k">def</span> <span class="nf">computeCrosslinkerConversion</span><span class="p">(</span><span class="n">network</span><span class="p">:</span> <span class="n">Universum</span><span class="p">,</span> <span class="n">junctionType</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
@@ -914,12 +890,12 @@ Assumes the precursor-chains to be bifunctional.</p>
 <span class="sd">      - network: the polymer system to predict the shear modulus for</span>
 <span class="sd">      - T: the temperature in your unit system</span>
 <span class="sd">      - k_b: Boltzmann&#39;s constant in your unit system</span>
-<span class="sd">      - foreignAtomType: the type of atoms to ignore</span>
+<span class="sd">      - foreignAtomType: the type of atoms to ignore (junctions, crosslinkers)</span>
 <span class="sd">      - totalMass: the $M$ in the respective formula</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">Gamma</span> <span class="o">=</span> <span class="n">calculateTopologicalFactor</span><span class="p">(</span><span class="n">network</span><span class="p">,</span> <span class="n">foreignAtomType</span><span class="p">,</span> <span class="n">totalMass</span><span class="p">)</span>
-    <span class="n">nu</span> <span class="o">=</span> <span class="n">calculateEffectiveNrDensityOfNetwork</span><span class="p">(</span>
-        <span class="n">network</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="n">foreignAtomType</span><span class="p">)</span>
+    <span class="n">nu</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">getMolecules</span><span class="p">(</span><span class="n">foreignAtomType</span><span class="p">))</span> <span class="o">/</span> \
+        <span class="n">network</span><span class="o">.</span><span class="n">getVolume</span><span class="p">()</span>  <span class="c1"># number of chains (network strands) per unit volume</span>
     <span class="k">return</span> <span class="n">Gamma</span><span class="o">*</span><span class="n">nu</span><span class="o">*</span><span class="n">k_B</span><span class="o">*</span><span class="n">T</span>
 </pre></div>
 
@@ -942,73 +918,8 @@ Assumes the precursor-chains to be bifunctional.</p>
   <li>network: the polymer system to predict the shear modulus for</li>
   <li>T: the temperature in your unit system</li>
   <li>k_b: Boltzmann's constant in your unit system</li>
-  <li>foreignAtomType: the type of atoms to ignore</li>
+  <li>foreignAtomType: the type of atoms to ignore (junctions, crosslinkers)</li>
   <li>totalMass: the $M$ in the respective formula</li>
-  </ul>
-</blockquote>
-</div>
-
-
-                </section>
-                <section id="predictGelationPoint">
-                            <div class="attr function"><a class="headerlink" href="#predictGelationPoint">#&nbsp;&nbsp</a>
-
-        
-            <span class="def">def</span>
-            <span class="name">predictGelationPoint</span><span class="signature">(r: float, f: int, g: int = 2) -&gt; float</span>:
-    </div>
-
-                <details>
-            <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">predictGelationPoint</span><span class="p">(</span><span class="n">r</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">g</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the gelation point $p_{gel}$ as theoretically predicted</span>
-<span class="sd">    (gelation point = critical extent of reaction for gelation)</span>
-
-<span class="sd">    Source:</span>
-<span class="sd">      - https://www.sciencedirect.com/science/article/pii/003238618990253X</span>
-
-<span class="sd">    Arguments:</span>
-<span class="sd">      - r: the stoichiometric inbalance of reactants</span>
-<span class="sd">      - f: functionality of the crosslinkers</span>
-<span class="sd">      - g: functionality of the precursor polymer</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">      - p_gel: critical extent of reaction for gelation</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># if (r is None):</span>
-    <span class="c1">#   r = calculateEffectiveCrosslinkerFunctionality(network, junctionType, f)</span>
-    <span class="k">return</span> <span class="mi">1</span><span class="o">/</span><span class="p">(</span><span class="n">r</span><span class="o">*</span><span class="p">(</span><span class="n">f</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">g</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-</pre></div>
-
-        </details>
-
-            <div class="docstring"><p>Compute the gelation point $p_{gel}$ as theoretically predicted
-(gelation point = critical extent of reaction for gelation)</p>
-
-<h6 id="source">Source</h6>
-
-<blockquote>
-  <ul>
-  <li>https://www.sciencedirect.com/science/article/pii/003238618990253X</li>
-  </ul>
-</blockquote>
-
-<h6 id="arguments">Arguments</h6>
-
-<blockquote>
-  <ul>
-  <li>r: the stoichiometric inbalance of reactants</li>
-  <li>f: functionality of the crosslinkers</li>
-  <li>g: functionality of the precursor polymer</li>
-  </ul>
-</blockquote>
-
-<h6 id="returns">Returns</h6>
-
-<blockquote>
-  <ul>
-  <li>p_gel: critical extent of reaction for gelation</li>
   </ul>
 </blockquote>
 </div>
