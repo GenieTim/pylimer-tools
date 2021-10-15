@@ -75,6 +75,21 @@ class Atom:
         """
         return self._getDeltaDistance("z", secondAtom)
 
+    def computeVectorTo(self, secondAtom: Atom) -> float:
+        """
+        Calculate the the vector between two atoms. 
+
+        Arguments:
+            - secondAtom: the atom to compute the distance to
+
+        Returns:
+            - difference (np.array): the connecting vector between the two coordinates
+        """
+        # using a numpy array is a bit too much overhead, possibly
+        return np.array([self.getDeltaX(secondAtom), self.getDeltaY(
+            secondAtom), self.getDeltaZ(secondAtom)
+        ])
+
     def computeDistanceTo(self, secondAtom: Atom) -> float:
         """
         Calculate the the distance between two atoms. 
@@ -85,9 +100,8 @@ class Atom:
         Returns:
             - meanDistance: the norm of the connecting vector between the two coordinates
         """
-        return np.linalg.norm([self.getDeltaX(secondAtom), self.getDeltaY(
-            secondAtom), self.getDeltaZ(secondAtom)
-        ])
+        # again, using numpy here is a bit overkill 
+        return np.linalg.norm(self.computeVectorTo(secondAtom))
 
     def getUnderlyingData(self) -> pd.Series:
         """
