@@ -1,4 +1,5 @@
 
+import math
 from collections import Counter
 
 import igraph
@@ -23,9 +24,14 @@ def predictShearModulus(network: Universum, junctionType, weightPerType, strandL
       - k_b: Boltzmann's constant in your unit system
       - totalMass: the $M$ in the respective formula
 
+    Returns:
+      - G: the predicted shear modulus, or `None` if the universe is empty.
+
     ToDo:
       - Support more than one crosslinker type (as is supported by original formula)
     """
+    if (network.getSize() == 0):
+        return None
     nu = len(network.getMolecules(junctionType)) / \
         network.getVolume()  # number of chains (network strands) per unit volume
     if (functionalityPerType is None):
@@ -92,7 +98,8 @@ def calculateWeightFractionOfBackbone(network: Universum, junctionType, weightPe
     else:
         assert(functionalityPerType[junctionType] == 4)
         Phi_el = ((W_x2*(1-beta)**2) +
-                  (W_xl*((1-alpha)**4 + 4*alpha*(1-W_a) * (1-alpha)**3 + 6*(alpha**2)*(1-2*W_a)*(1-alpha)**2)))/(1-W_sol)
+                  (W_xl*(((1-alpha)**4) + 4*alpha*(1-W_a) * ((1-alpha)**3) +
+                         6*(alpha**2)*(1-2*W_a)*(1-alpha)**2)))/(1-W_sol)
 
     return Phi_el
 
@@ -153,18 +160,32 @@ def computeMMsProbabilities(r, p, f):
     Arguments:
       - r: the stoichiometric inbalance
       - p: the extent of reaction
+      - f: the functionality of the the crosslinker
 
     Returns:
       - alpha: $P(F_A)$
       - beta: $P(F_B)$    
     """
+    # first, check a few things required by the formulae
+    # since we want alpha, beta \in [0,1], given they are supposed to be probabilities
+    if (r > 1 or r < 0):
+        raise ValueError(
+            "A stoichiometric inbalance ouside of [0, 1] is not (yet) supported. Got {}".format(r))
+    if (p < 1/math.sqrt(2) or p > 1):
+        raise ValueError(
+            "The extent of reaction has to be inside [1/sqrt(2), 1] for the result to be realistic. Got {}".format(p))
+    if (r <= 1/(2*p*p)):
+        raise ValueError(
+            "The stoichiometric inbalance must be > 1/(2p^2) for the resulting alpha to be realisitic. Got p = {}, r = {}".format(p, r))
+
+    # actually do the calculations
     if (f == 3):
-        alpha = ((1 - r*p*p)/(r*p * p))
+        alpha = ((1 - r*p*p)/(r*p*p))
         beta = (r*p*alpha*alpha)
     else:
         assert(f == 4)
-        alpha = ((1/(r*p*p) - 0.5)**0.5 - 0.5)
-        beta = (r*p*(((1/(r*p*p) - 0.75)**0.5 - 0.5)**3) + 1 - r*p)
+        alpha = (math.sqrt((1/(r*p*p)) - 0.5) - 0.5)
+        beta = ((r*p*((math.sqrt((1/(r*p*p)) - 0.75) - 0.5)**3)) + 1 - r*p)
     return alpha, beta
 
 
@@ -279,3 +300,24 @@ def computeExtentOfReaction(network: Universum, functionalityPerType: dict = Non
     graph.simplify()
     # multiplication by 2 as each bond affects 2 possible bonds
     return graph.ecount()*2.0/(maxFormableBonds)
+
+
+def predictGelationPoint(r: float, f: int, g: int = 2) -> float:
+    """
+    Compute the gelation point $p_{gel}$ as theoretically predicted
+    (gelation point = critical extent of reaction for gelation)
+
+    Source:
+      - https://www.sciencedirect.com/science/article/pii/003238618990253X
+
+    Arguments:
+      - r (double): the stoichiometric inbalance of reactants (see: #computeStoichiometricInbalance)
+      - f (int): functionality of the crosslinkers
+      - g (int): functionality of the precursor polymer
+
+    Returns:
+      - p_gel: critical extent of reaction for gelation
+    """
+    # if (r is None):
+    #   r = calculateEffectiveCrosslinkerFunctionality(network, junctionType, f)
+    return 1/(r*(f-1)*(g-1))

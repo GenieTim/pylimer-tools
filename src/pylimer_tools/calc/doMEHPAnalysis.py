@@ -236,34 +236,13 @@ def predictShearModulus(network: Universum, T: float = 1, k_B: float = 1, foreig
       - network: the polymer system to predict the shear modulus for
       - T: the temperature in your unit system
       - k_b: Boltzmann's constant in your unit system
-      - foreignAtomType: the type of atoms to ignore
+      - foreignAtomType: the type of atoms to ignore (junctions, crosslinkers)
       - totalMass: the $M$ in the respective formula
     """
     Gamma = calculateTopologicalFactor(network, foreignAtomType, totalMass)
-    nu = calculateEffectiveNrDensityOfNetwork(
-        network, junctionType=foreignAtomType)
+    nu = len(network.getMolecules(foreignAtomType)) / \
+        network.getVolume()  # number of chains (network strands) per unit volume
     return Gamma*nu*k_B*T
-
-
-def predictGelationPoint(r: float, f: int, g: int = 2) -> float:
-    """
-    Compute the gelation point $p_{gel}$ as theoretically predicted
-    (gelation point = critical extent of reaction for gelation)
-
-    Source:
-      - https://www.sciencedirect.com/science/article/pii/003238618990253X
-
-    Arguments:
-      - r: the stoichiometric inbalance of reactants
-      - f: functionality of the crosslinkers
-      - g: functionality of the precursor polymer
-
-    Returns:
-      - p_gel: critical extent of reaction for gelation
-    """
-    # if (r is None):
-    #   r = calculateEffectiveCrosslinkerFunctionality(network, junctionType, f)
-    return 1/(r*(f-1)*(g-1))
 
 
 def computeCrosslinkerConversion(network: Universum, junctionType, f: int) -> float:

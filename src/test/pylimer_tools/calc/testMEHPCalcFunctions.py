@@ -103,12 +103,6 @@ class TestMEHPAnalysisFunctions(unittest.TestCase):
         self.assertEqual(
             (0.2, 0.25), calculateWeightFractionOfDanglingChains(universe, crosslinkerType=2, weights={1: 1, 2: 0}))
 
-    def testGelationPointPrediction(self):
-        universe = Universum([10, 10, 10])
-        universe.addAtomBondData(self.testAtoms, self.testBonds)
-        self.assertEqual(1, predictGelationPoint(1, 2))
-        self.assertEqual(1, predictGelationPoint(1, 2, 2))
-
     def testCrosslinkerFunctionalityCalculation(self):
         universe = Universum([10, 10, 10])
         self.assertCountEqual(
