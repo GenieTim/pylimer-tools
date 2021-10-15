@@ -5,7 +5,10 @@ import pandas as pd
 
 
 class Atom:
-    def __init__(self, data: pd.Series, boxSizes: list) -> None:
+
+    name: str
+
+    def __init__(self, data: pd.Series, boxSizes: list, name: str = None):
         """
         Instantiate the Atom.
 
@@ -17,6 +20,10 @@ class Atom:
         self.boxDimensions = {
             "x": boxSizes[0], "y": boxSizes[1], "z": boxSizes[2]
         }
+        if (name is None):
+            self.name = "atom{}".format(data["id"])
+        else:
+            self.name = name
 
     def _getDeltaDistance(self, direction: str, distanceTo: Atom) -> float:
         """
@@ -100,7 +107,7 @@ class Atom:
         Returns:
             - meanDistance: the norm of the connecting vector between the two coordinates
         """
-        # again, using numpy here is a bit overkill 
+        # again, using numpy here is a bit overkill
         return np.linalg.norm(self.computeVectorTo(secondAtom))
 
     def getUnderlyingData(self) -> pd.Series:

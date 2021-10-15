@@ -47,11 +47,12 @@ class Universum(GraphDecorator, Iterable):
         assert("type" in atomData.columns)
         # first, create atoms and add them to the graph
         for index, row in atomData.iterrows():
+            atomName = "atom{}".format(row['id'])
             self.underlying_graph.add_vertices(
-                ["atom{}".format(row['id'])],
+                [atomName],
                 {
                     "type": row["type"],
-                    "atom": Atom(row, boxSizes=self.boxSizes)
+                    "atom": Atom(row, boxSizes=self.boxSizes, name=atomName)
                 })
         # then, follow up with the bonds.
         assert(len(bondData.columns) == 2)
@@ -111,6 +112,8 @@ class Universum(GraphDecorator, Iterable):
             moleculeLengthBefore = chain.vcount()
             # find ends of chain
             endNodes = chain.vs.select(_degree_eq=1)
+            # if (len(endNodes) != 2 and len(endNodes) != 0):
+            #     igraph.plot(chain)
             assert(len(endNodes) == 2 or len(endNodes) == 0)
             strandType = Molecule.MoleculeType.UNDEFINED
             isLoop = False
