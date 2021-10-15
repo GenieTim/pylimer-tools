@@ -32,7 +32,7 @@ def predictShearModulus(network: Universum, T: float = 1, k_B: float = 1, foreig
     return Gamma*nu*k_B*T
 
 
-def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None):
+def calculateCycleRank(networks: list[Universum] = None, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None):
     """
     Compute the cycle rank ($\\chi$).
     Assumes the precursor-chains to be bifunctional.
@@ -53,17 +53,17 @@ def calculateCycleRank(network: Universum, nu: int = None, mu: int = None, absTo
       - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$)
     """
     if (nu is None):
-        if (junctionType is None or network is None):
+        if (junctionType is None or networks is None):
             raise ValueError(
                 "Argument missing: When not specifiying nu, network and junctionType need to be specified")
         nu = calculateEffectiveNrDensityOfNetwork(
-            network, absTol, relTol, junctionType)
+            networks, absTol, relTol, junctionType)
     if (mu is None):
-        if (junctionType is None or network is None):
+        if (junctionType is None or networks is None):
             raise ValueError(
                 "Argument missing: When not specifiying mu, network and junctionType need to be specified")
         mu = calculateEffectiveNrDensityOfJunctions(
-            network, absTol, junctionType)
+            networks, absTol, relTol, junctionType)
 
     return nu - mu
 
@@ -96,15 +96,16 @@ def calculateEffectiveNrDensityOfNetwork(networks: list[Universum], absTol: floa
     R_taus = computeMeanEndToEndDistances(networks, junctionType)
     if (len(R_taus) < 1):
         return 0.0
-    R_tau_max = np.max(R_taus.values())
+    R_taus = np.array(list(R_taus.values()))
+    R_tau_max = np.max(R_taus)
 
     # process additional input parameters
     if (absTol is None):
         absTol = R_tau_max
 
     # count how many effective strands there are
-    numEffective = np.array([R_taus >
-                             absTol or R_taus > relTol*R_tau_max]).sum()
+    numEffective = np.array([R_tau > absTol or R_tau > relTol*R_tau_max
+                             for R_tau in R_taus]).sum()
     meanVolume = calculateMeanUniverseVolume(networks)
 
     return numEffective / meanVolume
@@ -157,11 +158,16 @@ def calculateEffectiveNrDensityOfJunctions(networks: list[Universum], absTol: fl
     if (junctionType is None):
         return 0.0
 
+    meanVolume = calculateMeanUniverseVolume(networks)
+
+    if (minNumEffectiveStrands == 0):
+        return len(networks[0].getAtomsWithType(junctionType))/meanVolume
+
     # get the mean end to end distances
     R_taus = computeMeanEndToEndDistances(networks, junctionType)
     if (len(R_taus) < 1):
         return 0.0
-    R_tau_max = np.max(R_taus.values())
+    R_tau_max = max(R_taus.values())
 
     # process additional input parameters
     if (absTol is None):
@@ -170,19 +176,20 @@ def calculateEffectiveNrDensityOfJunctions(networks: list[Universum], absTol: fl
     # count how many active connections each junction has
     junctionActivity = {}
     for key in R_taus:
-        crosslinkerNames = key.split("+", 1)
+        crosslinkerNames = key.split("+")
+        assert(len(crosslinkerNames) == 3)
         isActive = R_taus[key] > absTol or R_taus[key] > relTol*R_tau_max
         if (not(isActive)):
             continue
-        for crosslinkerName in crosslinkerNames:
+        relevantNames = [crosslinkerNames[0], crosslinkerNames[1]]
+        for crosslinkerName in relevantNames:
             if (crosslinkerName not in junctionActivity):
                 junctionActivity[crosslinkerName] = 0
             junctionActivity[crosslinkerName] += 1
 
-    meanVolume = calculateMeanUniverseVolume(networks)
-
-    numEffectiveJunctions = np.array(
-        [junctionActivity > minNumEffectiveStrands]).sum()
+    effectiveJunctions = np.array(
+        [junctionActivity[key] >= minNumEffectiveStrands for key in junctionActivity])
+    numEffectiveJunctions = effectiveJunctions.sum()
     return numEffectiveJunctions/meanVolume
 
 
@@ -263,7 +270,8 @@ def computeMeanEndToEndDistances(networks: list[Universum], crosslinkerType) -> 
     if (len(R_tau_vectors) < 1):
         return {}
 
-    R_tau_vectors_array = np.array(R_tau_vectors.values())
+    R_tau_vectors_array = np.array(list(R_tau_vectors.values()))
+    # print(R_tau_vectors_array)
     R_taus = np.linalg.norm(R_tau_vectors_array, axis=1)
 
     return dict(zip(R_tau_vectors.keys(), R_taus))
@@ -281,6 +289,8 @@ def computeMeanEndToEndVectors(networks: list[Universum], crosslinkerType) -> di
       - endToEndVectors (dict): a dictionary with key: "{atom1.name}+{atom2.name}"
           and value: their mean difference vector
     """
+    if (len(networks) == 0):
+        return {}
     endToEndVectors = {}
     divider = 1/len(networks)
     for network in networks:
@@ -321,12 +331,14 @@ def computeEndToEndVectors(network: Universum, crosslinkerType) -> dict:
                 molecule.getType() == Molecule.MoleculeType.DANGLING_CHAIN):
             # dangling, free chains and loops are irrelevant for our purposes
             continue
+        # igraph.VertexSeq is not sortable -> use a list
+        crosslinkers = [crosslinkers[0], crosslinkers[1]]
         # sort crosslinkers by name as a way to keep the vector directions consistent between timesteps
-        crosslinkersSorted = crosslinkers.sort(key=lambda a: a["name"])
-        key = "{}+{}".format(crosslinkersSorted[0]
-                             ["name"], crosslinkersSorted[1]["name"])
-        endToEndVectors[key] = crosslinkersSorted[0].computeVectorTo(
-            crosslinkersSorted[1])
+        crosslinkers.sort(key=lambda a: a["name"])
+        #
+        key = _getKeyForMolecule(molecule, crosslinkers)
+        endToEndVectors[key] = crosslinkers[0]["atom"].computeVectorTo(
+            crosslinkers[1]["atom"])
 
     return endToEndVectors
 
@@ -420,12 +432,25 @@ def calculateTopologicalFactor(networks: list[Universum], foreignAtomType=None, 
             continue
         if (b is None):
             b = molecule.computeBondLengths().mean()
+        crosslinkers = [crosslinkers[0], crosslinkers[1]]
         # sort crosslinkers by name as a way to keep the vector directions consistent between timesteps
-        crosslinkersSorted = crosslinkers.sort(key=lambda a: a["name"])
-        key = "{}+{}".format(crosslinkersSorted[0]
-                             ["name"], crosslinkersSorted[1]["name"])
+        crosslinkers.sort(key=lambda a: a["name"])
+        key = _getKeyForMolecule(molecule, crosslinkers)
         GammaSum += R_taus[key]*R_taus[key] / \
             ((molecule.getLength()-2) * b *
              b)  # -2: remove crosslinkers again (assumption 3)
 
     return GammaSum / totalMass
+
+
+def _getKeyForMolecule(molecule, crosslinkers):
+    """
+    Get a key to identify a molecule.
+    The crosslinkers (ends of the molecule) are the first two components of the key, 
+    whereas the names of all other atoms in the chain are used too to distinguish 
+    e.g. two secondary loops
+    """
+    names = [a.name for a in molecule]
+    names.sort()
+    return "{}+{}+{}".format(crosslinkers[0]
+                             ["name"], crosslinkers[1]["name"], "".join(names))
