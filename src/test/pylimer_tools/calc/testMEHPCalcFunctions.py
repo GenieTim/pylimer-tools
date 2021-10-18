@@ -3,49 +3,10 @@ import unittest
 import pandas as pd
 from pylimer_tools.calc.doMEHPAnalysis import *
 from pylimer_tools.entities.universum import Universum
+from test.pylimer_tools.universeUsingTestCase import UniverseUsingTestCase
 
 
-class TestMEHPAnalysisFunctions(unittest.TestCase):
-
-    # The system looks like this (in terms of bonds, not 3D placement):
-    # 1-2-3-*6
-    # |      |
-    # *7-5---|
-    # 8
-    #
-    # *4
-    testAtoms = pd.DataFrame([
-        {"id": 1, "nx": 1, "ny": 1, "nz": 1,
-         "type": 1, "x": 1, "y": 1, "z": 1},
-        {"id": 2, "nx": 1, "ny": 1, "nz": 1,
-         "type": 1, "x": 2, "y": 1, "z": 1},
-        {"id": 3, "nx": 1, "ny": 1, "nz": 1,
-         "type": 1, "x": 3, "y": 1, "z": 1},
-        {"id": 4, "nx": 1, "ny": 1, "nz": 1,
-         "type": 2, "x": 2, "y": 2, "z": 1},
-        {"id": 5, "nx": 1, "ny": 1, "nz": 1,
-         "type": 1, "x": 1, "y": 3, "z": 1},
-        {"id": 6, "nx": 1, "ny": 1, "nz": 1,
-         "type": 2, "x": 1, "y": 1, "z": 2},
-        {"id": 7, "nx": 1, "ny": 1, "nz": 1,
-         "type": 2, "x": 1, "y": 1, "z": 3},
-        {"id": 8, "nx": 1, "ny": 1, "nz": 1,
-         "type": 1, "x": 2, "y": 2, "z": 2},
-    ])
-    testBonds = pd.DataFrame([
-        {"to": 1, "bondFrom": 2},
-        {"to": 3, "bondFrom": 2},
-        {"to": 5, "bondFrom": 6},
-        {"to": 1, "bondFrom": 7},
-        {"to": 5, "bondFrom": 7},
-        {"to": 3, "bondFrom": 6},
-        {"to": 7, "bondFrom": 8}
-    ])
-
-    def setUp(self):
-        self.testUniverse = Universum([10, 10, 10])
-        self.testUniverse.addAtomBondData(self.testAtoms, self.testBonds)
-        self.emptyUniverse = Universum([10, 10, 10])
+class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
 
     def testWeightFractionCalculations(self):
         self.assertEqual(

@@ -35,7 +35,7 @@ def calculateMeanBondLen(coordsDf: pd.DataFrame, boxLengths: list):
         row = coordsDf.loc[coordsDf["id"] == fromId]
 
         def ilocIfNecessary(row, key):
-            if (type(row[key]) in (int, str, bool, float, np.float64, np.float32, np.float16, np.float128)):
+            if (type(row[key]) in (int, str, bool, float, np.float64, np.float32, np.float16)):
                 return row[key]
             else:
                 return row[key].iloc[0]
