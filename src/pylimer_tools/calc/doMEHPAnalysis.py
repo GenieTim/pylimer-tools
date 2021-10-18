@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import warnings
 from collections import Counter
-from typing import Tuple
+from typing import Iterable, Tuple
 
 import igraph
 import numpy as np
@@ -12,7 +12,7 @@ from pylimer_tools.entities.molecule import Molecule
 from pylimer_tools.entities.universum import Universum
 
 
-def predictShearModulus(network: Universum, T: float = 1, k_B: float = 1, foreignAtomType=None, totalMass=1):
+def predictShearModulus(networks: Iterable[Universum], T: float = 1, k_B: float = 1, foreignAtomType=None, totalMass=1):
     """
     Predict the shear modulus using ANT Analysis.
 
@@ -26,13 +26,14 @@ def predictShearModulus(network: Universum, T: float = 1, k_B: float = 1, foreig
       - foreignAtomType: the type of atoms to ignore (junctions, crosslinkers)
       - totalMass: the $M$ in the respective formula
     """
-    Gamma = calculateTopologicalFactor(network, foreignAtomType, totalMass)
-    nu = len(network.getMolecules(foreignAtomType)) / \
-        network.getVolume()  # number of chains (network strands) per unit volume
+    Gamma = calculateTopologicalFactor(networks, foreignAtomType, totalMass)
+    nu = 0
+    for network in networks:
+      nu += len(network.getMolecules(foreignAtomType)) / (network.getVolume()) / len(networks)
     return Gamma*nu*k_B*T
 
 
-def calculateCycleRank(networks: list[Universum] = None, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None):
+def calculateCycleRank(networks: Iterable[Universum] = None, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None):
     """
     Compute the cycle rank ($\\chi$).
     Assumes the precursor-chains to be bifunctional.
@@ -68,7 +69,7 @@ def calculateCycleRank(networks: list[Universum] = None, nu: int = None, mu: int
     return nu - mu
 
 
-def calculateEffectiveNrDensityOfNetwork(networks: list[Universum], absTol: float = 1, relTol: float = 1, junctionType=None):
+def calculateEffectiveNrDensityOfNetwork(networks: Iterable[Universum], absTol: float = 1, relTol: float = 1, junctionType=None):
     """
     Compute the effective number density $\\nu_{eff}$ of a network.
     Assumes the precursor-chains to be bifunctional.
@@ -111,7 +112,7 @@ def calculateEffectiveNrDensityOfNetwork(networks: list[Universum], absTol: floa
     return numEffective / meanVolume
 
 
-def calculateMeanUniverseVolume(networks: list[Universum], acceptDifferentSizes: bool = False) -> float:
+def calculateMeanUniverseVolume(networks: Iterable[Universum], acceptDifferentSizes: bool = False) -> float:
     """
     Compute the mean volume of a list of universes.
 
@@ -129,12 +130,12 @@ def calculateMeanUniverseVolume(networks: list[Universum], acceptDifferentSizes:
     for network in networks:
         if (not acceptDifferentSizes and network.getSize() != networkSize):
             raise NotImplementedError(
-                "Currently, only sequences of networks with the same size are supported (got one with {} instead of {})".format(len(network), network_size))
+                "Currently, only sequences of networks with the same size are supported (got one with {} instead of {})".format(network.getSize(), networkSize))
         meanVolume += network.getVolume()*divisor
     return meanVolume
 
 
-def calculateEffectiveNrDensityOfJunctions(networks: list[Universum], absTol: float = 0, relTol: float = 1, junctionType=None, minNumEffectiveStrands=2) -> float:
+def calculateEffectiveNrDensityOfJunctions(networks: Iterable[Universum], absTol: float = 0, relTol: float = 1, junctionType=None, minNumEffectiveStrands=2) -> float:
     """
     Compute the number density of the elastically effective crosslinks,
     defined as the ones that connect at least two elastically effective strands.
@@ -254,7 +255,7 @@ def calculateWeightFractionOfDanglingChains(network: Universum, crosslinkerType,
     return weightDangling/weightTotal, numDangling/numTotal
 
 
-def computeMeanEndToEndDistances(networks: list[Universum], crosslinkerType) -> dict:
+def computeMeanEndToEndDistances(networks: Iterable[Universum], crosslinkerType) -> dict:
     """
     Compute the mean end to end distance between each pair of (indirectly) connected crosslinker
 
@@ -277,7 +278,7 @@ def computeMeanEndToEndDistances(networks: list[Universum], crosslinkerType) -> 
     return dict(zip(R_tau_vectors.keys(), R_taus))
 
 
-def computeMeanEndToEndVectors(networks: list[Universum], crosslinkerType) -> dict:
+def computeMeanEndToEndVectors(networks: Iterable[Universum], crosslinkerType) -> dict:
     """
     Compute the mean end to end vectors between each pair of (indirectly) connected crosslinker
 
@@ -395,7 +396,7 @@ def calculateEffectiveCrosslinkerFunctionalities(network: Universum, junctionTyp
     return junctionDegrees
 
 
-def calculateTopologicalFactor(networks: list[Universum], foreignAtomType=None, totalMass=1, b=None) -> float:
+def calculateTopologicalFactor(networks: Iterable[Universum], foreignAtomType=None, totalMass=1, b=None) -> float:
     """
     Compute the topological factor of a polymer network.
 

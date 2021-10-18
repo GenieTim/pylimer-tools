@@ -134,12 +134,13 @@ class Universum(GraphDecorator, Iterable):
                         # check for existance of this crosslinker in the chain to find loops
                         if (chain.vs.select(name_eq=neighbor["name"])):
                             isLoop = True
-                            neighbor["name"] = neighbor["name"] + "_2"
-                        # add crosslinker to chain
-                        chain.add_vertices([neighbor["name"]], {
-                            "type": neighbor["type"],
-                            "atom": neighbor["atom"]
-                        })
+                            # neighbor["name"] = neighbor["name"] + "_2"
+                        else:
+                          # add crosslinker to chain
+                          chain.add_vertices([neighbor["name"]], {
+                              "type": neighbor["type"],
+                              "atom": neighbor["atom"]
+                          })
                         chain.add_edges([(endNode["name"], neighbor["name"])])
 
             if (chain.vcount() == moleculeLengthBefore):
