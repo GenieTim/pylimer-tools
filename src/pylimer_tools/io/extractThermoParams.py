@@ -6,8 +6,10 @@ import os
 import pathlib
 import pickle
 from io import StringIO
+from typing import Iterable
 
 import pandas as pd
+from pylimer_tools.utils.cacheUtility import doCache, loadCache
 from pylimer_tools.utils.optimizeDf import optimize, reduce_mem_usage
 
 
@@ -22,7 +24,7 @@ def readOneGroup(fp, header, minLineLen=4, additional_lines_skip=0) -> str:
         - minLineLen: the minimal length of a line to be accepted as data
         - additional_lines_skip: number of lines to skip after reading the header
 
-    
+
     Returns:
       A long CSV string
     """
@@ -32,9 +34,8 @@ def readOneGroup(fp, header, minLineLen=4, additional_lines_skip=0) -> str:
     headerLen = None
     if (isinstance(header, str)):
         minLineLen = max(minLineLen, len(header.split()))
-        headerLen = len(header.split())
     else:
-        minLineLen = max(minLineLen, min([len(header) for h in header]))
+        minLineLen = max(minLineLen, min([len(h.split()) for h in header]))
 
     def checkSkipLine(line, header):
         return line and not line.startswith(header)
@@ -53,8 +54,7 @@ def readOneGroup(fp, header, minLineLen=4, additional_lines_skip=0) -> str:
     while skipLineFun(line, header):
         line = fp.readline()
     # found header. Take next few lines:
-    if (headerLen is None):
-        headerLen = len(line.split())
+    headerLen = len(line.split())
     if (not line):
         return ""
     else:
@@ -84,7 +84,22 @@ def readOneGroup(fp, header, minLineLen=4, additional_lines_skip=0) -> str:
     return text
 
 
-def extractThermoParams(file, header="Temp PotEng TotEng Press Volume c_3", textsToRead=5, minLineLen=5, useCache=True) -> pd.DataFrame:
+def getThermoCacheNameSuffix(header="Step Temp E_pair E_mol TotEng Press", textsToRead=5, minLineLen=5) -> str:
+    """
+    Compose a cache file suffix in such a way, that it distinguishes different thermo reader parameters
+
+    Arguments:
+        - header: the header of the CSV (where to start reading at)
+        - textsToRead: the number of times to expect the header
+        - minLineLen: the minimal length of a line to be accepted as data
+    """
+    if (isinstance(header, Iterable)):
+        header = "{}{}".format("".join(header), len(header))
+
+    return "{}{}{}-thermo-param-cache.pickle".format(header, textsToRead, minLineLen)
+
+
+def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", textsToRead=5, minLineLen=5, useCache=True) -> pd.DataFrame:
     """
     Extract the thermodynamic outputs produced for this simulation.
 
@@ -96,7 +111,7 @@ def extractThermoParams(file, header="Temp PotEng TotEng Press Volume c_3", text
         - header: the header of the CSV (where to start reading at)
         - textsToRead: the number of times to expect the header
         - minLineLen: the minimal length of a line to be accepted as data
-        - useCache: wheter to use cache or not
+        - useCache: wheter to use cache or not (though it will be written anyway)
 
     Returns:
         - data (pd.DataFrame): the thermodynamic parameters
@@ -104,24 +119,12 @@ def extractThermoParams(file, header="Temp PotEng TotEng Press Volume c_3", text
     """
     df = None
 
-    cacheFileName = os.path.dirname(
-        __file__) + "/cache/" + hashlib.md5(file.encode()).hexdigest() + "-thermo-param-cache.pickle"
+    suffix = getThermoCacheNameSuffix(
+        header, textsToRead, minLineLen)
+    cacheContent = loadCache(file, suffix)
 
-    if (os.path.isfile(cacheFileName) and useCache):
-        mtimeCache = datetime.datetime.fromtimestamp(
-            pathlib.Path(cacheFileName).stat().st_mtime)
-        mtimeOrigin = datetime.datetime.fromtimestamp(
-            pathlib.Path(file).stat().st_mtime)
-        if (mtimeCache > mtimeOrigin):
-            toReturn = None
-            with open(cacheFileName, 'rb') as cacheFile:
-                toReturn = pickle.load(cacheFile)
-            if (toReturn is not None):
-                print("Read {} rows for file {} from cache".format(
-                    len(toReturn), file))
-                return toReturn
-        else:
-            print("Dump cache file is elder than dump. Reloading...")
+    if (cacheContent is not None and useCache):
+        return cacheContent
 
     def stringToDf(text) -> pd.DataFrame:
         try:
@@ -148,12 +151,7 @@ def extractThermoParams(file, header="Temp PotEng TotEng Press Volume c_3", text
     else:
         df = pd.DataFrame()
 
-    if (not os.path.exists(os.path.dirname(cacheFileName))):
-        os.makedirs(os.path.dirname(cacheFileName))
-
-    with open(cacheFileName, 'wb') as cacheFile:
-        pickle.dump(df, cacheFile)
-
-    print("Read {} rows for file {}".format(len(df), file))
+    doCache(df, file, suffix)
+    # print("Read {} rows for file {}".format(len(df), file))
 
     return df

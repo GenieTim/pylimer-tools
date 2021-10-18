@@ -22,7 +22,7 @@ def reduce_mem_usage(df, obj_to_category=False, subset=None):
     """
     start_mem = df.memory_usage().sum() / 1024 ** 2
     gc.collect()
-    print('Memory usage of dataframe is {:.2f} MB'.format(start_mem))
+    # print('Memory usage of dataframe is {:.2f} MB'.format(start_mem))
 
     cols = subset if subset is not None else df.columns.tolist()
 
@@ -64,9 +64,9 @@ def reduce_mem_usage(df, obj_to_category=False, subset=None):
             df[col] = df[col].astype('category')
     gc.collect()
     end_mem = df.memory_usage().sum() / 1024 ** 2
-    print('Memory usage after optimization is: {:.3f} MB'.format(end_mem))
-    print('Decreased by {:.1f}%'.format(
-        100 * (start_mem - end_mem) / start_mem))
+    # print('Memory usage after optimization is: {:.3f} MB'.format(end_mem))
+    # print('Decreased by {:.1f}%'.format(
+    #     100 * (start_mem - end_mem) / start_mem))
 
     return df
 

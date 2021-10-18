@@ -12,26 +12,12 @@ from pylimer_tools.utils.cacheUtility import (doCache, getCacheFileName,
 from pylimer_tools.utils.getMolecules import getMolecules
 from pylimer_tools.utils.getTail import getTail
 from pylimer_tools.utils.unifyDataStepsizes import unifyDataStepsizes
+from test.pdComparingTestCase import PandasComparingTestCase
 
 
-class TestUtilFunctions(unittest.TestCase):
+class TestUtilFunctions(PandasComparingTestCase):
 
-    def assertDataframeEqual(self, a, b, msg):
-        try:
-            pd_testing.assert_frame_equal(a, b, check_index_type=False)
-        except AssertionError as e:
-            raise self.failureException(msg) from e
-
-    def assertSeriesEqual(self, a, b, msg):
-        try:
-            pd_testing.assert_series_equal(a, b)
-        except AssertionError as e:
-            raise self.failureException(msg) from e
-
-    def setUp(self):
-        self.addTypeEqualityFunc(pd.DataFrame, self.assertDataframeEqual)
-        self.addTypeEqualityFunc(pd.Series, self.assertSeriesEqual)
-
+    
     def test_getTail(self):
         testDf = pd.DataFrame([
             {"a": 1, "b": 2, "c": 3},

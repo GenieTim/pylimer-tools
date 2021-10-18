@@ -121,7 +121,7 @@ def calculateMeanUniverseVolume(networks: Iterable[Universum], acceptDifferentSi
       - acceptDifferentSizes: toggle whether to throw an error when the Universe have different nr. of atoms
 
     Returns:
-      - meanVolume: the mean volume of the universes
+      - meanVolume (float): the mean volume of the universes
     """
     # compute the mean volume of the universes
     meanVolume = 0
