@@ -7,4 +7,4 @@ mkdir -p ./docs
 
 # make sure you have pdoc3 installed: 
 # pip3 install pdoc3
-python -m lazydocs --output-path="./docs" ./src/
+lazydocs --output-path="./docs" ./src/
