@@ -122,7 +122,7 @@
 <span class="kn">from</span> <span class="nn">pylimer_tools.entities.universum</span> <span class="kn">import</span> <span class="n">Universum</span>
 
 
-<span class="k">def</span> <span class="nf">predictShearModulus</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">T</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k_B</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">foreignAtomType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">totalMass</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">predictShearModulus</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">T</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k_B</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">foreignAtomType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">totalMass</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Predict the shear modulus using ANT Analysis.</span>
 
@@ -135,6 +135,9 @@
 <span class="sd">      - k_b: Boltzmann&#39;s constant in your unit system</span>
 <span class="sd">      - foreignAtomType: the type of atoms to ignore (junctions, crosslinkers)</span>
 <span class="sd">      - totalMass: the $M$ in the respective formula</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">      - shear modulus (float): the estimated shear modulus. Unit: [pressure]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">Gamma</span> <span class="o">=</span> <span class="n">calculateTopologicalFactor</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">foreignAtomType</span><span class="p">,</span> <span class="n">totalMass</span><span class="p">)</span>
     <span class="n">nu</span> <span class="o">=</span> <span class="mi">0</span>
@@ -143,7 +146,7 @@
     <span class="k">return</span> <span class="n">Gamma</span><span class="o">*</span><span class="n">nu</span><span class="o">*</span><span class="n">k_B</span><span class="o">*</span><span class="n">T</span>
 
 
-<span class="k">def</span> <span class="nf">calculateCycleRank</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Universum</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">nu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">relTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">calculateCycleRank</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Universum</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">nu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">relTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the cycle rank ($\\chi$).</span>
 <span class="sd">    Assumes the precursor-chains to be bifunctional.</span>
@@ -161,7 +164,7 @@
 <span class="sd">    - network, absTol, relTol, junctionType</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">      - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$)</span>
+<span class="sd">      - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$). Unit: [1/Volume]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">nu</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">junctionType</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">networks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
@@ -179,7 +182,7 @@
     <span class="k">return</span> <span class="n">nu</span> <span class="o">-</span> <span class="n">mu</span>
 
 
-<span class="k">def</span> <span class="nf">calculateEffectiveNrDensityOfNetwork</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">relTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">calculateEffectiveNrDensityOfNetwork</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">relTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the effective number density $\\nu_{eff}$ of a network.</span>
 <span class="sd">    Assumes the precursor-chains to be bifunctional.</span>
@@ -198,7 +201,7 @@
 <span class="sd">      - junctionType: the atom type of the crosslinkers/junctions</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">      - $\\nu_{eff}$ (float): the effective number density of network strands</span>
+<span class="sd">      - $\\nu_{eff}$ (float): the effective number density of network strands. Unit: [1/Volume]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">None</span>
@@ -262,7 +265,7 @@
 <span class="sd">      - minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">      - $\\mu_{eff}$ (float): the effective number density of junctions</span>
+<span class="sd">      - $\\mu_{eff}$ (float): the effective number density of junctions. Unit: [1/Volume]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">None</span>
@@ -581,12 +584,12 @@
     k_B: float = 1,
     foreignAtomType=None,
     totalMass=1
-)</span>:
+) -&gt; float</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">predictShearModulus</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">T</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k_B</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">foreignAtomType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">totalMass</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">predictShearModulus</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">T</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k_B</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">foreignAtomType</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">totalMass</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Predict the shear modulus using ANT Analysis.</span>
 
@@ -599,6 +602,9 @@
 <span class="sd">      - k_b: Boltzmann&#39;s constant in your unit system</span>
 <span class="sd">      - foreignAtomType: the type of atoms to ignore (junctions, crosslinkers)</span>
 <span class="sd">      - totalMass: the $M$ in the respective formula</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">      - shear modulus (float): the estimated shear modulus. Unit: [pressure]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">Gamma</span> <span class="o">=</span> <span class="n">calculateTopologicalFactor</span><span class="p">(</span><span class="n">networks</span><span class="p">,</span> <span class="n">foreignAtomType</span><span class="p">,</span> <span class="n">totalMass</span><span class="p">)</span>
     <span class="n">nu</span> <span class="o">=</span> <span class="mi">0</span>
@@ -630,6 +636,14 @@
   <li>totalMass: the $M$ in the respective formula</li>
   </ul>
 </blockquote>
+
+<h6 id="returns">Returns</h6>
+
+<blockquote>
+  <ul>
+  <li>shear modulus (float): the estimated shear modulus. Unit: [pressure]</li>
+  </ul>
+</blockquote>
 </div>
 
 
@@ -646,12 +660,12 @@
     absTol: float = 1,
     relTol: float = 1,
     junctionType=None
-)</span>:
+) -&gt; float</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateCycleRank</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Universum</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">nu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">relTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateCycleRank</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Universum</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">nu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">mu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">relTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the cycle rank ($\\chi$).</span>
 <span class="sd">    Assumes the precursor-chains to be bifunctional.</span>
@@ -669,7 +683,7 @@
 <span class="sd">    - network, absTol, relTol, junctionType</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">      - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$)</span>
+<span class="sd">      - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$). Unit: [1/Volume]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">nu</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">junctionType</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">networks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
@@ -716,7 +730,7 @@ Assumes the precursor-chains to be bifunctional.</p>
 
 <blockquote>
   <ul>
-  <li>cycleRank: the cycle rank ($\xi = \nu_{eff} - \mu_{eff}$)</li>
+  <li>cycleRank: the cycle rank ($\xi = \nu_{eff} - \mu_{eff}$). Unit: [1/Volume]</li>
   </ul>
 </blockquote>
 </div>
@@ -733,12 +747,12 @@ Assumes the precursor-chains to be bifunctional.</p>
     absTol: float = 1,
     relTol: float = 1,
     junctionType=None
-)</span>:
+) -&gt; float</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateEffectiveNrDensityOfNetwork</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">relTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">calculateEffectiveNrDensityOfNetwork</span><span class="p">(</span><span class="n">networks</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Universum</span><span class="p">],</span> <span class="n">absTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">relTol</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">junctionType</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Compute the effective number density $\\nu_{eff}$ of a network.</span>
 <span class="sd">    Assumes the precursor-chains to be bifunctional.</span>
@@ -757,7 +771,7 @@ Assumes the precursor-chains to be bifunctional.</p>
 <span class="sd">      - junctionType: the atom type of the crosslinkers/junctions</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">      - $\\nu_{eff}$ (float): the effective number density of network strands</span>
+<span class="sd">      - $\\nu_{eff}$ (float): the effective number density of network strands. Unit: [1/Volume]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">None</span>
@@ -813,7 +827,7 @@ upon network deformation, resp. the effective number density of network strands<
 
 <blockquote>
   <ul>
-  <li>$\nu_{eff}$ (float): the effective number density of network strands</li>
+  <li>$\nu_{eff}$ (float): the effective number density of network strands. Unit: [1/Volume]</li>
   </ul>
 </blockquote>
 </div>
@@ -913,7 +927,7 @@ upon network deformation, resp. the effective number density of network strands<
 <span class="sd">      - minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">      - $\\mu_{eff}$ (float): the effective number density of junctions</span>
+<span class="sd">      - $\\mu_{eff}$ (float): the effective number density of junctions. Unit: [1/Volume]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">networks</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">):</span>
         <span class="k">return</span> <span class="kc">None</span>
@@ -985,7 +999,7 @@ Assumes the precursor-chains to be bifunctional.</p>
 
 <blockquote>
   <ul>
-  <li>$\mu_{eff}$ (float): the effective number density of junctions</li>
+  <li>$\mu_{eff}$ (float): the effective number density of junctions. Unit: [1/Volume]</li>
   </ul>
 </blockquote>
 </div>
