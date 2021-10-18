@@ -6,6 +6,11 @@ from pylimer_tools.entities.universum import Universum
 
 
 class UniverseUsingTestCase(unittest.TestCase):
+
+    testUniverse: Universum
+    testUniverseSmall: Universum
+    saturatedTestUniverse: Universum
+
     # The system looks like this (in terms of bonds, not 3D placement):
     # 1-2-3-*6
     # |      |
@@ -41,15 +46,49 @@ class UniverseUsingTestCase(unittest.TestCase):
         {"to": 7, "bondFrom": 8}
     ])
 
+    """
+    This system looks like:
+
+    1-2-3
+
+    *7-*6-5
+    """
+    testAtomsSmall = pd.DataFrame([
+        {"id": 1, "nx": 1, "ny": 1, "nz": 1,
+            "type": 1, "x": 1, "y": 1, "z": 1},
+        {"id": 2, "nx": 1, "ny": 1, "nz": 1,
+            "type": 1, "x": 2, "y": 1, "z": 1},
+        {"id": 3, "nx": 1, "ny": 1, "nz": 1,
+            "type": 1, "x": 3, "y": 1, "z": 1},
+        {"id": 5, "nx": 1, "ny": 1, "nz": 1,
+            "type": 1, "x": 1, "y": 3, "z": 1},
+        {"id": 6, "nx": 1, "ny": 1, "nz": 1,
+            "type": 2, "x": 1, "y": 1, "z": 2},
+        {"id": 7, "nx": 1, "ny": 1, "nz": 1,
+            "type": 2, "x": 1, "y": 1, "z": 3},
+    ])
+    testBondsSmall = pd.DataFrame([
+        {"to": 1, "bondFrom": 2},
+        {"to": 3, "bondFrom": 2},
+        {"to": 5, "bondFrom": 6},
+        {"to": 6, "bondFrom": 7}
+    ])
+
     def setUp(self):
+        # Universe 1: empy
+        self.emptyUniverse = Universum([10, 10, 10])
+        # Universe 2: small (5 atoms), barely connected in two chains
+        self.testUniverseSmall = Universum([10, 10, 10])
+        self.testUniverseSmall.addAtomBondData(
+            self.testAtomsSmall, self.testBondsSmall)
+        # Universe 3: very unsaturated
         self.testUniverse = Universum([10, 10, 10])
         self.testUniverse.addAtomBondData(self.testAtoms, self.testBonds)
-        self.emptyUniverse = Universum([10, 10, 10])
         # an additional larget test universe where the stoichiometric inbalance is < 1
         # even when imposing a crosslinker functionality of 1
         # in essence, it is on loop around 4 plus a connction to 6.
-        self.largeTestUniverse = Universum([10, 10, 10])
-        self.largeTestUniverse.addAtomBondData(self.testAtoms.append([
+        self.saturatedTestUniverse = Universum([10, 10, 10])
+        self.saturatedTestUniverse.addAtomBondData(self.testAtoms.append([
             {"id": 9, "type": 1, "nx": 1, "ny": 1,
                 "nz": 1, "x": 1, "y": 1, "z": 1},
             {"id": 10, "type": 1, "nx": 1, "ny": 1,

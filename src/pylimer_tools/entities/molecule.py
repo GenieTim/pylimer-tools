@@ -1,3 +1,4 @@
+from __future__ import annotations
 
 import warnings
 from enum import Enum
@@ -29,7 +30,7 @@ class Molecule(GraphDecorator, Iterable):
         self.underlying_graph.simplify()
         self.moleculeType = chainType
 
-    def decomposeFurther(self, splitAtomType):
+    def decomposeFurther(self, splitAtomType) -> list[Molecule]:
         """
         Split this molecule into smaller molecules by ignoring all atoms with a given type.
 
@@ -52,7 +53,7 @@ class Molecule(GraphDecorator, Iterable):
                 Molecule(subgraph, Molecule.MoleculeType.FREE_CHAIN))
         return subMolecules
 
-    def computeEndToEndDistance(self):
+    def computeEndToEndDistance(self) -> float:
         """
         Compute the end-to-end distance of this molecule/chain.
 
@@ -73,7 +74,7 @@ class Molecule(GraphDecorator, Iterable):
         assert(isinstance(atom1, Atom) and isinstance(atom2, Atom))
         return atom1.computeDistanceTo(atom2)
 
-    def computeBondLengths(self):
+    def computeBondLengths(self) -> np.ndarray:
         """
         Calculate the bond lengths
 
@@ -89,7 +90,7 @@ class Molecule(GraphDecorator, Iterable):
 
         return np.array(Rs)
 
-    def getLength(self):
+    def getLength(self) -> int:
         """
         Query the length of the molecule/chain (the nr. of atoms)
 
