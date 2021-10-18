@@ -241,12 +241,13 @@
                         <span class="c1"># check for existance of this crosslinker in the chain to find loops</span>
                         <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">name_eq</span><span class="o">=</span><span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])):</span>
                             <span class="n">isLoop</span> <span class="o">=</span> <span class="kc">True</span>
-                            <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_2&quot;</span>
-                        <span class="c1"># add crosslinker to chain</span>
-                        <span class="n">chain</span><span class="o">.</span><span class="n">add_vertices</span><span class="p">([</span><span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]],</span> <span class="p">{</span>
-                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span>
-                            <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;atom&quot;</span><span class="p">]</span>
-                        <span class="p">})</span>
+                            <span class="c1"># neighbor[&quot;name&quot;] = neighbor[&quot;name&quot;] + &quot;_2&quot;</span>
+                        <span class="k">else</span><span class="p">:</span>
+                          <span class="c1"># add crosslinker to chain</span>
+                          <span class="n">chain</span><span class="o">.</span><span class="n">add_vertices</span><span class="p">([</span><span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]],</span> <span class="p">{</span>
+                              <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span>
+                              <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;atom&quot;</span><span class="p">]</span>
+                          <span class="p">})</span>
                         <span class="n">chain</span><span class="o">.</span><span class="n">add_edges</span><span class="p">([(</span><span class="n">endNode</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])])</span>
 
             <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span> <span class="o">==</span> <span class="n">moleculeLengthBefore</span><span class="p">):</span>
@@ -503,12 +504,13 @@
                         <span class="c1"># check for existance of this crosslinker in the chain to find loops</span>
                         <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">name_eq</span><span class="o">=</span><span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])):</span>
                             <span class="n">isLoop</span> <span class="o">=</span> <span class="kc">True</span>
-                            <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_2&quot;</span>
-                        <span class="c1"># add crosslinker to chain</span>
-                        <span class="n">chain</span><span class="o">.</span><span class="n">add_vertices</span><span class="p">([</span><span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]],</span> <span class="p">{</span>
-                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span>
-                            <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;atom&quot;</span><span class="p">]</span>
-                        <span class="p">})</span>
+                            <span class="c1"># neighbor[&quot;name&quot;] = neighbor[&quot;name&quot;] + &quot;_2&quot;</span>
+                        <span class="k">else</span><span class="p">:</span>
+                          <span class="c1"># add crosslinker to chain</span>
+                          <span class="n">chain</span><span class="o">.</span><span class="n">add_vertices</span><span class="p">([</span><span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]],</span> <span class="p">{</span>
+                              <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span>
+                              <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;atom&quot;</span><span class="p">]</span>
+                          <span class="p">})</span>
                         <span class="n">chain</span><span class="o">.</span><span class="n">add_edges</span><span class="p">([(</span><span class="n">endNode</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])])</span>
 
             <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span> <span class="o">==</span> <span class="n">moleculeLengthBefore</span><span class="p">):</span>
@@ -892,12 +894,13 @@ For example, a generic mapping type might be defined as::</p>
                         <span class="c1"># check for existance of this crosslinker in the chain to find loops</span>
                         <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">vs</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">name_eq</span><span class="o">=</span><span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])):</span>
                             <span class="n">isLoop</span> <span class="o">=</span> <span class="kc">True</span>
-                            <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_2&quot;</span>
-                        <span class="c1"># add crosslinker to chain</span>
-                        <span class="n">chain</span><span class="o">.</span><span class="n">add_vertices</span><span class="p">([</span><span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]],</span> <span class="p">{</span>
-                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span>
-                            <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;atom&quot;</span><span class="p">]</span>
-                        <span class="p">})</span>
+                            <span class="c1"># neighbor[&quot;name&quot;] = neighbor[&quot;name&quot;] + &quot;_2&quot;</span>
+                        <span class="k">else</span><span class="p">:</span>
+                          <span class="c1"># add crosslinker to chain</span>
+                          <span class="n">chain</span><span class="o">.</span><span class="n">add_vertices</span><span class="p">([</span><span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]],</span> <span class="p">{</span>
+                              <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">],</span>
+                              <span class="s2">&quot;atom&quot;</span><span class="p">:</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;atom&quot;</span><span class="p">]</span>
+                          <span class="p">})</span>
                         <span class="n">chain</span><span class="o">.</span><span class="n">add_edges</span><span class="p">([(</span><span class="n">endNode</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">neighbor</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])])</span>
 
             <span class="k">if</span> <span class="p">(</span><span class="n">chain</span><span class="o">.</span><span class="n">vcount</span><span class="p">()</span> <span class="o">==</span> <span class="n">moleculeLengthBefore</span><span class="p">):</span>
