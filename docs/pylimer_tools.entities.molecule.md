@@ -11,14 +11,14 @@
 
 ---
 
-<a href="../src/pylimer_tools/entities/molecule.py#L10"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/molecule.py#L17"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>class</kbd> `Molecule`
 
 
 
 
-<a href="../src/pylimer_tools/entities/molecule.py#L21"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/molecule.py#L28"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `__init__`
 
@@ -35,12 +35,12 @@ __init__(molecule_graph, chainType=<MoleculeType.UNDEFINED: 0>)
 
 ---
 
-<a href="../src/pylimer_tools/entities/molecule.py#L67"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/molecule.py#L77"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `computeBondLengths`
 
 ```python
-computeBondLengths()
+computeBondLengths() → ndarray
 ```
 
 Calculate the bond lengths 
@@ -53,12 +53,12 @@ Calculate the bond lengths
 
 ---
 
-<a href="../src/pylimer_tools/entities/molecule.py#L48"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/molecule.py#L56"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `computeEndToEndDistance`
 
 ```python
-computeEndToEndDistance()
+computeEndToEndDistance() → float
 ```
 
 Compute the end-to-end distance of this molecule/chain. 
@@ -67,16 +67,16 @@ Compute the end-to-end distance of this molecule/chain.
 
 **Returns:**
  
-  - $R_ee$ (float): the end-to-end distance,   `None` if the molecule/chain does not have two distinct ends. 
+  - $R_{ee}$ (float): the end-to-end distance,   `None` if the molecule/chain does not have two distinct ends. 
 
 ---
 
-<a href="../src/pylimer_tools/entities/molecule.py#L25"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/molecule.py#L33"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `decomposeFurther`
 
 ```python
-decomposeFurther(splitAtomType)
+decomposeFurther(splitAtomType) → list[Molecule]
 ```
 
 Split this molecule into smaller molecules by ignoring all atoms with a given type. 
@@ -95,12 +95,12 @@ Split this molecule into smaller molecules by ignoring all atoms with a given ty
 
 ---
 
-<a href="../src/pylimer_tools/entities/molecule.py#L83"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/molecule.py#L93"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `getLength`
 
 ```python
-getLength()
+getLength() → int
 ```
 
 Query the length of the molecule/chain (the nr. of atoms) 
@@ -113,12 +113,12 @@ Query the length of the molecule/chain (the nr. of atoms)
 
 ---
 
-<a href="../src/pylimer_tools/entities/molecule.py#L92"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/molecule.py#L102"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `getType`
 
 ```python
-getType() → <enum 'MoleculeType'>
+getType() → MoleculeType
 ```
 
 Query the type of the molecule/chain (loop, dangling, etc.) 

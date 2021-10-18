@@ -10,17 +10,49 @@
 
 ---
 
-<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L10"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L15"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+## <kbd>function</kbd> `predictShearModulus`
+
+```python
+predictShearModulus(
+    networks: 'Iterable[Universum]',
+    T: 'float' = 1,
+    k_B: 'float' = 1,
+    foreignAtomType=None,
+    totalMass=1
+)
+```
+
+Predict the shear modulus using ANT Analysis. 
+
+Source: 
+  - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262 
+
+
+
+**Arguments:**
+ 
+  - network: the polymer system to predict the shear modulus for 
+  - T: the temperature in your unit system 
+  - k_b: Boltzmann's constant in your unit system 
+  - foreignAtomType: the type of atoms to ignore (junctions, crosslinkers) 
+  - totalMass: the $M$ in the respective formula 
+
+
+---
+
+<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L36"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `calculateCycleRank`
 
 ```python
 calculateCycleRank(
-    network: Universum,
-    nu: int = None,
-    mu: int = None,
-    absTol: float = 1,
-    relTol: float = 1,
+    networks: 'Iterable[Universum]' = None,
+    nu: 'int' = None,
+    mu: 'int' = None,
+    absTol: 'float' = 1,
+    relTol: 'float' = 1,
     junctionType=None
 )
 ```
@@ -38,7 +70,7 @@ Compute the cycle rank ($\chi$). Assumes the precursor-chains to be bifunctional
   - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol)) 
   - junctionType: the atom type of the crosslinkers/junctions 
 
-No need to provide all the parameters — either/or:  
+No need to provide all the parameters — either/or: 
 - nu & mu 
 - network, absTol, relTol, junctionType 
 
@@ -46,27 +78,30 @@ No need to provide all the parameters — either/or:
 
 **Returns:**
  
-  - cycleRank: the cycle rank ($\chi = \nu_{eff} - \mu_{eff}$)  
+  - cycleRank: the cycle rank ($\xi = \nu_{eff} - \mu_{eff}$) 
 
 
 ---
 
-<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L40"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L72"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `calculateEffectiveNrDensityOfNetwork`
 
 ```python
 calculateEffectiveNrDensityOfNetwork(
-    network: Universum,
-    absTol: float = 1,
-    relTol: float = 1,
+    networks: 'Iterable[Universum]',
+    absTol: 'float' = 1,
+    relTol: 'float' = 1,
     junctionType=None
 )
 ```
 
 Compute the effective number density $\nu_{eff}$ of a network. Assumes the precursor-chains to be bifunctional. 
 
-$\nu_{eff}$ is the number of elastically effective (active) strands per unit volume,  which are defined as the ones that can store elastic energy  upon network deformation, resp. the effective number density of network strands 
+$\nu_{eff}$ is the number of elastically effective (active) strands per unit volume, which are defined as the ones that can store elastic energy upon network deformation, resp. the effective number density of network strands 
+
+Source: 
+  - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262 
 
 
 
@@ -86,21 +121,53 @@ $\nu_{eff}$ is the number of elastically effective (active) strands per unit vol
 
 ---
 
-<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L76"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L115"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+## <kbd>function</kbd> `calculateMeanUniverseVolume`
+
+```python
+calculateMeanUniverseVolume(
+    networks: 'Iterable[Universum]',
+    acceptDifferentSizes: 'bool' = False
+) → float
+```
+
+Compute the mean volume of a list of universes. 
+
+
+
+**Arguments:**
+ 
+  - networks: a list of universes 
+  - acceptDifferentSizes: toggle whether to throw an error when the Universe have different nr. of atoms 
+
+
+
+**Returns:**
+ 
+  - meanVolume (float): the mean volume of the universes 
+
+
+---
+
+<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L138"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `calculateEffectiveNrDensityOfJunctions`
 
 ```python
 calculateEffectiveNrDensityOfJunctions(
-    network: Universum,
-    absTol: float = 0,
-    relTol: float = 0,
+    networks: 'Iterable[Universum]',
+    absTol: 'float' = 0,
+    relTol: 'float' = 1,
     junctionType=None,
     minNumEffectiveStrands=2
-)
+) → float
 ```
 
-Compute the number density of the elastically effective crosslinks,  defined as the ones that connect at least two elastically effective strands. Assumes the precursor-chains to be bifunctional. 
+Compute the number density of the elastically effective crosslinks, defined as the ones that connect at least two elastically effective strands. Assumes the precursor-chains to be bifunctional. 
+
+Source: 
+  - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262 
 
 
 
@@ -121,12 +188,16 @@ Compute the number density of the elastically effective crosslinks,  defined as 
 
 ---
 
-<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L139"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L197"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `calculateWeightFractionOfBackbone`
 
 ```python
-calculateWeightFractionOfBackbone(network: Universum, crosslinkerType)
+calculateWeightFractionOfBackbone(
+    network: 'Universum',
+    crosslinkerType,
+    weights=1
+)
 ```
 
 Compute the weight fraction of network backbone in infinite network 
@@ -137,20 +208,27 @@ Compute the weight fraction of network backbone in infinite network
  
   - network: the network to compute the weight fraction for 
   - crosslinkerType: the atom type to use to split the molecules 
+  - weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight 
+
+
+
+**Returns:**
+ 
+  - weightFraction (float): 1 - weightDangling/weightTotal, 
 
 
 ---
 
-<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L150"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L214"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `calculateWeightFractionOfDanglingChains`
 
 ```python
 calculateWeightFractionOfDanglingChains(
-    network: Universum,
+    network: 'Universum',
     crosslinkerType,
     weights=1
-)
+) → Tuple[float, float]
 ```
 
 Compute the weight fraction of dangling strands in infinite network 
@@ -167,57 +245,118 @@ Compute the weight fraction of dangling strands in infinite network
 
 **Returns:**
  
-  - weightFraction: weightDangling/weightTotal,  
+  - weightFraction: weightDangling/weightTotal, 
   - numFraction: numDangling/numTotal 
 
 
 ---
 
-<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L188"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L258"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
-## <kbd>function</kbd> `predictGelationPoint`
+## <kbd>function</kbd> `computeMeanEndToEndDistances`
 
 ```python
-predictGelationPoint(r: float, f: int, g: int = 2) → float
+computeMeanEndToEndDistances(
+    networks: 'Iterable[Universum]',
+    crosslinkerType
+) → dict
 ```
 
-Compute the gelation point $p_{gel}$ as theoretically predicted (gelation point = critical extent of reaction for gelation) 
-
-Source: 
-  - https://www.sciencedirect.com/science/article/pii/003238618990253X 
+Compute the mean end to end distance between each pair of (indirectly) connected crosslinker 
 
 
 
 **Arguments:**
  
-  - r: the stoichiometric inbalance of reactants 
-  - f: functionality of the crosslinkers 
-  - g: functionality of the precursor polymer 
+  - networks: the different configurations of the polymer network to do the computation for 
+  - crosslinkerType: the atom type to compute the in-between vectors for 
 
 
 
 **Returns:**
  
-  - p_gel: critical extent of reaction for gelation 
+  - endToEndDistances (dict): a dictionary with key: "{atom1.name}+{atom2.name}" 
+ - <b>`and value`</b>:  the norm of the mean difference vector 
 
 
 ---
 
-<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L209"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L281"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
-## <kbd>function</kbd> `computeCrosslinkerConversion`
+## <kbd>function</kbd> `computeMeanEndToEndVectors`
 
 ```python
-computeCrosslinkerConversion(network: Universum, junctionType, f: int) → float
+computeMeanEndToEndVectors(
+    networks: 'Iterable[Universum]',
+    crosslinkerType
+) → dict
 ```
 
-Compute the extent of reaction of the crosslinkers  (actual functionality divided by target functionality) 
+Compute the mean end to end vectors between each pair of (indirectly) connected crosslinker 
 
 
 
 **Arguments:**
  
-  - network: the poylmer network to do the computation for 
+  - networks: the different configurations of the polymer network to do the computation for 
+  - crosslinkerType: the atom type to compute the in-between vectors for 
+
+
+
+**Returns:**
+ 
+  - endToEndVectors (dict): a dictionary with key: "{atom1.name}+{atom2.name}" 
+ - <b>`and value`</b>:  their mean difference vector 
+
+
+---
+
+<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L312"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+## <kbd>function</kbd> `computeEndToEndVectors`
+
+```python
+computeEndToEndVectors(network: 'Universum', crosslinkerType) → dict
+```
+
+Compute the end to end vectors between each pair of (indirectly) connected crosslinker 
+
+
+
+**Arguments:**
+ 
+  - network: the polymer network to do the computation for 
+  - crosslinkerType: the atom type to compute the in-between vectors for 
+
+
+
+**Returns:**
+ 
+  - endToEndVectors (dict): a dictionary with key: "{atom1.name}+{atom2.name}" 
+ - <b>`and value`</b>:  their difference vector 
+
+
+---
+
+<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L347"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+## <kbd>function</kbd> `computeCrosslinkerConversion`
+
+```python
+computeCrosslinkerConversion(
+    network: 'Universum',
+    junctionType,
+    f: 'int'
+) → float
+```
+
+Compute the extent of reaction of the crosslinkers (actual functionality divided by target functionality) 
+
+
+
+**Arguments:**
+ 
+  - network: the polymer network to do the computation for 
   - junctionType: the type of the junctions/crosslinkers to select them in the network 
   - f: the functionality of the crosslinkers 
 
@@ -230,13 +369,13 @@ Compute the extent of reaction of the crosslinkers  (actual functionality divide
 
 ---
 
-<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L225"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L363"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `calculateEffectiveCrosslinkerFunctionality`
 
 ```python
 calculateEffectiveCrosslinkerFunctionality(
-    network: Universum,
+    network: 'Universum',
     junctionType
 ) → float
 ```
@@ -247,7 +386,7 @@ Compute the mean crosslinker functionality
 
 **Arguments:**
  
-  - network: the poylmer network to do the computation for 
+  - network: the polymer network to do the computation for 
   - junctionType: the type of the junctions/crosslinkers to select them in the network 
 
 
@@ -259,12 +398,15 @@ Compute the mean crosslinker functionality
 
 ---
 
-<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L241"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L379"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `calculateEffectiveCrosslinkerFunctionalities`
 
 ```python
-calculateEffectiveCrosslinkerFunctionalities(network: Universum, junctionType)
+calculateEffectiveCrosslinkerFunctionalities(
+    network: 'Universum',
+    junctionType
+) → list[int]
 ```
 
 Compute the functionality of every crosslinker in the network 
@@ -273,7 +415,7 @@ Compute the functionality of every crosslinker in the network
 
 **Arguments:**
  
-  - network: the poylmer network to do the computation for 
+  - network: the polymer network to do the computation for 
   - junctionType: the type of the junctions/crosslinkers to select them in the network 
 
 
@@ -285,19 +427,25 @@ Compute the functionality of every crosslinker in the network
 
 ---
 
-<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L258"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/calc/doMEHPAnalysis.py#L399"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `calculateTopologicalFactor`
 
 ```python
 calculateTopologicalFactor(
-    network: Universum,
+    networks: 'Iterable[Universum]',
     foreignAtomType=None,
-    totalMass=1
-)
+    totalMass=1,
+    b=None
+) → float
 ```
 
-Compute the topological factor of a polymer network. Assumes the precursor-chains to be bifunctional. 
+Compute the topological factor of a polymer network. 
+
+Assumptions:  
+  - the precursor-chains to be bifunctional 
+  - all Universes to have the same structure (with possibly differing positions) 
+  - crosslinkers do not count to the nr. of monomers in a strand 
 
 Source: 
   - eq. 16 in https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262 
@@ -309,6 +457,7 @@ Source:
   - network: the network to compute the topological factor for 
   - foreignAtomType: the type of atoms to ignore 
   - totalMass: the $M$ in the respective formula 
+  - b: the mean bond length.   If `None`, it will be computed for each molecule in the first Universum (Network). 
 
 
 

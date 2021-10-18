@@ -11,14 +11,14 @@
 
 ---
 
-<a href="../src/pylimer_tools/entities/universum.py#L11"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/universum.py#L18"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>class</kbd> `Universum`
 
 
 
 
-<a href="../src/pylimer_tools/entities/universum.py#L15"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/universum.py#L22"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `__init__`
 
@@ -45,7 +45,7 @@ Instantiate this Universe (Collection of Molecules)
 
 ---
 
-<a href="../src/pylimer_tools/entities/universum.py#L28"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/universum.py#L35"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `addAtomBondData`
 
@@ -70,7 +70,31 @@ Add atoms and bonds to the underlying graph.
 
 ---
 
-<a href="../src/pylimer_tools/entities/universum.py#L140"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/universum.py#L159"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+### <kbd>method</kbd> `determineFunctionalityPerType`
+
+```python
+determineFunctionalityPerType(typeCounts: 'Counter' = None) → dict
+```
+
+Find the maximum functionality of each atom type in the network 
+
+
+
+**Arguments:**
+ 
+  - typeCounts: the count of each type in the network. Optional to reduce duplicate counting costs. 
+
+
+
+**Returns:**
+ 
+  - functionalitites (dict): a dictionary with key: type, and value: functionality of this atom type.  
+
+---
+
+<a href="../src/pylimer_tools/entities/universum.py#L177"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `getAtom`
 
@@ -94,7 +118,7 @@ Find an atom by its ID
 
 ---
 
-<a href="../src/pylimer_tools/entities/universum.py#L159"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/universum.py#L196"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `getAtomsWithType`
 
@@ -118,7 +142,7 @@ Find an atom by its type
 
 ---
 
-<a href="../src/pylimer_tools/entities/universum.py#L81"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/universum.py#L89"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `getChainsWithCrosslinker`
 
@@ -142,7 +166,7 @@ Decompose the Universe into molecules, which could be either chains, networks, o
 
 ---
 
-<a href="../src/pylimer_tools/entities/universum.py#L58"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/universum.py#L66"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `getMolecules`
 
@@ -166,7 +190,7 @@ Decompose the Universe into molecules, which could be either chains, networks, o
 
 ---
 
-<a href="../src/pylimer_tools/entities/universum.py#L186"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/universum.py#L223"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `getSize`
 
@@ -184,7 +208,7 @@ Get the number of atoms in this universe
 
 ---
 
-<a href="../src/pylimer_tools/entities/universum.py#L177"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/universum.py#L214"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `getVolume`
 
@@ -202,7 +226,7 @@ Get this object's volume
 
 ---
 
-<a href="../src/pylimer_tools/entities/universum.py#L208"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/universum.py#L245"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `reset`
 
@@ -220,7 +244,7 @@ Reset this Universe to be empty again.
 
 ---
 
-<a href="../src/pylimer_tools/entities/universum.py#L195"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/universum.py#L232"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `setBoxSizes`
 

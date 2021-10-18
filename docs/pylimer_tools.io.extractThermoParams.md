@@ -10,7 +10,7 @@
 
 ---
 
-<a href="../src/pylimer_tools/io/extractThermoParams.py#L15"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/io/extractThermoParams.py#L17"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `readOneGroup`
 
@@ -39,14 +39,39 @@ Read one group of csv lines from the file
 
 ---
 
-<a href="../src/pylimer_tools/io/extractThermoParams.py#L88"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/io/extractThermoParams.py#L87"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+## <kbd>function</kbd> `getThermoCacheNameSuffix`
+
+```python
+getThermoCacheNameSuffix(
+    header='Step Temp E_pair E_mol TotEng Press',
+    textsToRead=5,
+    minLineLen=5
+) → str
+```
+
+Compose a cache file suffix in such a way, that it distinguishes different thermo reader parameters 
+
+
+
+**Arguments:**
+ 
+    - header: the header of the CSV (where to start reading at) 
+    - textsToRead: the number of times to expect the header 
+    - minLineLen: the minimal length of a line to be accepted as data 
+
+
+---
+
+<a href="../src/pylimer_tools/io/extractThermoParams.py#L102"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>function</kbd> `extractThermoParams`
 
 ```python
 extractThermoParams(
     file,
-    header='Temp PotEng TotEng Press Volume c_3',
+    header='Step Temp E_pair E_mol TotEng Press',
     textsToRead=5,
     minLineLen=5,
     useCache=True
@@ -65,7 +90,7 @@ Note: the header parameter can be an array — make sure to pay attention when r
     - header: the header of the CSV (where to start reading at) 
     - textsToRead: the number of times to expect the header 
     - minLineLen: the minimal length of a line to be accepted as data 
-    - useCache: wheter to use cache or not 
+    - useCache: wheter to use cache or not (though it will be written anyway) 
 
 
 

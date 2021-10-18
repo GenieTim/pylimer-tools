@@ -23,6 +23,34 @@
 
 ---
 
+<a href="../src/test/pylimer_tools/entities/testEntityCalculations.py#L77"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+### <kbd>method</kbd> `test_calculateDistanceThroughPeriodicImage`
+
+```python
+test_calculateDistanceThroughPeriodicImage()
+```
+
+
+
+
+
+---
+
+<a href="../src/test/pylimer_tools/entities/testEntityCalculations.py#L48"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+### <kbd>method</kbd> `test_calculateEndToEndDistance`
+
+```python
+test_calculateEndToEndDistance()
+```
+
+
+
+
+
+---
+
 <a href="../src/test/pylimer_tools/entities/testEntityCalculations.py#L18"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `test_calculateMeanBondLen`
