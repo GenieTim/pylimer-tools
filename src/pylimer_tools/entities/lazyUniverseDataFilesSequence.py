@@ -2,12 +2,12 @@
 from pylimer_tools.io.readLammpData import readLammpData
 
 """
-This class represents a sequence of Universe's, 
+This class represents a sequence of Universes, 
 with the Universe's data files only being read on access.
 """
 
 
-class LazyUniverseSequence(object):
+class LazyUniverseDataFileSequence(object):
 
     def __init__(self, files):
         self.files = files

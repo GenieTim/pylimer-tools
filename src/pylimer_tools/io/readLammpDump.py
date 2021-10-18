@@ -35,6 +35,8 @@ def readLammpDump(file: str, useCache: bool = True):
             # new header
             if (line.startswith("ITEM:")):
                 currentKey = line.replace("ITEM: ", "", 1).strip()
+                currentKey = " ".join([s.strip()
+                                       for s in currentKey.split(" ") if s.isupper()])
             # elif (line[0].isalpha() and len(line.strip()) > 1):
             #     currentKey = line.strip()
             # new line
