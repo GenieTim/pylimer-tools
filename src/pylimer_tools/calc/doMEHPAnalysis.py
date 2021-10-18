@@ -12,7 +12,7 @@ from pylimer_tools.entities.molecule import Molecule
 from pylimer_tools.entities.universum import Universum
 
 
-def predictShearModulus(networks: Iterable[Universum], T: float = 1, k_B: float = 1, foreignAtomType=None, totalMass=1):
+def predictShearModulus(networks: Iterable[Universum], T: float = 1, k_B: float = 1, foreignAtomType=None, totalMass=1) -> float:
     """
     Predict the shear modulus using ANT Analysis.
 
@@ -25,6 +25,9 @@ def predictShearModulus(networks: Iterable[Universum], T: float = 1, k_B: float 
       - k_b: Boltzmann's constant in your unit system
       - foreignAtomType: the type of atoms to ignore (junctions, crosslinkers)
       - totalMass: the $M$ in the respective formula
+    
+    Returns:
+      - shear modulus (float): the estimated shear modulus. Unit: [pressure]
     """
     Gamma = calculateTopologicalFactor(networks, foreignAtomType, totalMass)
     nu = 0
@@ -33,7 +36,7 @@ def predictShearModulus(networks: Iterable[Universum], T: float = 1, k_B: float 
     return Gamma*nu*k_B*T
 
 
-def calculateCycleRank(networks: Iterable[Universum] = None, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None):
+def calculateCycleRank(networks: Iterable[Universum] = None, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None) -> float:
     """
     Compute the cycle rank ($\\chi$).
     Assumes the precursor-chains to be bifunctional.
@@ -51,7 +54,7 @@ def calculateCycleRank(networks: Iterable[Universum] = None, nu: int = None, mu:
     - network, absTol, relTol, junctionType
 
     Returns:
-      - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$)
+      - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$). Unit: [1/Volume]
     """
     if (nu is None):
         if (junctionType is None or networks is None):
@@ -69,7 +72,7 @@ def calculateCycleRank(networks: Iterable[Universum] = None, nu: int = None, mu:
     return nu - mu
 
 
-def calculateEffectiveNrDensityOfNetwork(networks: Iterable[Universum], absTol: float = 1, relTol: float = 1, junctionType=None):
+def calculateEffectiveNrDensityOfNetwork(networks: Iterable[Universum], absTol: float = 1, relTol: float = 1, junctionType=None) -> float:
     """
     Compute the effective number density $\\nu_{eff}$ of a network.
     Assumes the precursor-chains to be bifunctional.
@@ -88,7 +91,7 @@ def calculateEffectiveNrDensityOfNetwork(networks: Iterable[Universum], absTol: 
       - junctionType: the atom type of the crosslinkers/junctions
 
     Returns:
-      - $\\nu_{eff}$ (float): the effective number density of network strands
+      - $\\nu_{eff}$ (float): the effective number density of network strands. Unit: [1/Volume]
     """
     if (len(networks) == 0):
         return None
@@ -152,7 +155,7 @@ def calculateEffectiveNrDensityOfJunctions(networks: Iterable[Universum], absTol
       - minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such
 
     Returns:
-      - $\\mu_{eff}$ (float): the effective number density of junctions
+      - $\\mu_{eff}$ (float): the effective number density of junctions. Unit: [1/Volume]
     """
     if (len(networks) < 1):
         return None
