@@ -8,18 +8,22 @@ class TestOptimizeDf(PandasComparingTestCase):
   def testSeparateOptimizatios(self):
     class Object(object):
       pass
+      
+    testObject = Object()
     df = pd.DataFrame([{
       "testFloat": np.float64(1.01),
-      "testInt": np.int64(1e5),
-      "testObject": Object()
+      "testInt": np.int64(1e1),
+      "testObject": testObject
     }])
     optimizedDf = optimize(df)
     expectedOptimizedDf = pd.DataFrame([{
-      "testFloat": float(1.01),
-      "testInt": int(1e5),
-      "testObject": Object()
+      "testFloat": np.float32(1.01),
+      "testInt": np.int8(1e1),
+      "testObject": testObject
     }])
+    # contents are equal
     self.assertEqual(df, optimizedDf)
+    self.assertEqual(expectedOptimizedDf, optimizedDf)
 
   def testDeepIntOptimization(self):
     data = {}
