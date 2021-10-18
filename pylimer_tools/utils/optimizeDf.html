@@ -105,7 +105,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">start_mem</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">**</span> <span class="mi">2</span>
     <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Memory usage of dataframe is </span><span class="si">{:.2f}</span><span class="s1"> MB&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start_mem</span><span class="p">))</span>
+    <span class="c1"># print(&#39;Memory usage of dataframe is {:.2f} MB&#39;.format(start_mem))</span>
 
     <span class="n">cols</span> <span class="o">=</span> <span class="n">subset</span> <span class="k">if</span> <span class="n">subset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
@@ -147,9 +147,9 @@
             <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
     <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
     <span class="n">end_mem</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">**</span> <span class="mi">2</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Memory usage after optimization is: </span><span class="si">{:.3f}</span><span class="s1"> MB&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end_mem</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Decreased by </span><span class="si">{:.1f}</span><span class="s1">%&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-        <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">start_mem</span> <span class="o">-</span> <span class="n">end_mem</span><span class="p">)</span> <span class="o">/</span> <span class="n">start_mem</span><span class="p">))</span>
+    <span class="c1"># print(&#39;Memory usage after optimization is: {:.3f} MB&#39;.format(end_mem))</span>
+    <span class="c1"># print(&#39;Decreased by {:.1f}%&#39;.format(</span>
+    <span class="c1">#     100 * (start_mem - end_mem) / start_mem))</span>
 
     <span class="k">return</span> <span class="n">df</span>
 
@@ -245,7 +245,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">start_mem</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">**</span> <span class="mi">2</span>
     <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Memory usage of dataframe is </span><span class="si">{:.2f}</span><span class="s1"> MB&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">start_mem</span><span class="p">))</span>
+    <span class="c1"># print(&#39;Memory usage of dataframe is {:.2f} MB&#39;.format(start_mem))</span>
 
     <span class="n">cols</span> <span class="o">=</span> <span class="n">subset</span> <span class="k">if</span> <span class="n">subset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
@@ -287,9 +287,9 @@
             <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">&#39;category&#39;</span><span class="p">)</span>
     <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
     <span class="n">end_mem</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">memory_usage</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1024</span> <span class="o">**</span> <span class="mi">2</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Memory usage after optimization is: </span><span class="si">{:.3f}</span><span class="s1"> MB&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">end_mem</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Decreased by </span><span class="si">{:.1f}</span><span class="s1">%&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-        <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="n">start_mem</span> <span class="o">-</span> <span class="n">end_mem</span><span class="p">)</span> <span class="o">/</span> <span class="n">start_mem</span><span class="p">))</span>
+    <span class="c1"># print(&#39;Memory usage after optimization is: {:.3f} MB&#39;.format(end_mem))</span>
+    <span class="c1"># print(&#39;Decreased by {:.1f}%&#39;.format(</span>
+    <span class="c1">#     100 * (start_mem - end_mem) / start_mem))</span>
 
     <span class="k">return</span> <span class="n">df</span>
 </pre></div>

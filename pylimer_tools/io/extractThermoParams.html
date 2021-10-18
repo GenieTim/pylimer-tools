@@ -51,6 +51,9 @@
                     <a class="function" href="#readOneGroup">readOneGroup</a>
             </li>
             <li>
+                    <a class="function" href="#getThermoCacheNameSuffix">getThermoCacheNameSuffix</a>
+            </li>
+            <li>
                     <a class="function" href="#extractThermoParams">extractThermoParams</a>
             </li>
     </ul>
@@ -79,8 +82,10 @@
 <span class="kn">import</span> <span class="nn">pathlib</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">pylimer_tools.utils.cacheUtility</span> <span class="kn">import</span> <span class="n">doCache</span><span class="p">,</span> <span class="n">loadCache</span>
 <span class="kn">from</span> <span class="nn">pylimer_tools.utils.optimizeDf</span> <span class="kn">import</span> <span class="n">optimize</span><span class="p">,</span> <span class="n">reduce_mem_usage</span>
 
 
@@ -95,7 +100,7 @@
 <span class="sd">        - minLineLen: the minimal length of a line to be accepted as data</span>
 <span class="sd">        - additional_lines_skip: number of lines to skip after reading the header</span>
 
-<span class="sd">    </span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">      A long CSV string</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -105,9 +110,8 @@
     <span class="n">headerLen</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
         <span class="n">minLineLen</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">minLineLen</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
-        <span class="n">headerLen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">minLineLen</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">minLineLen</span><span class="p">,</span> <span class="nb">min</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">header</span><span class="p">]))</span>
+        <span class="n">minLineLen</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">minLineLen</span><span class="p">,</span> <span class="nb">min</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">header</span><span class="p">]))</span>
 
     <span class="k">def</span> <span class="nf">checkSkipLine</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">header</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">line</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
@@ -126,8 +130,7 @@
     <span class="k">while</span> <span class="n">skipLineFun</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">header</span><span class="p">):</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
     <span class="c1"># found header. Take next few lines:</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">headerLen</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="n">headerLen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+    <span class="n">headerLen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
     <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">line</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;&quot;</span>
     <span class="k">else</span><span class="p">:</span>
@@ -157,7 +160,22 @@
     <span class="k">return</span> <span class="n">text</span>
 
 
-<span class="k">def</span> <span class="nf">extractThermoParams</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;Temp PotEng TotEng Press Volume c_3&quot;</span><span class="p">,</span> <span class="n">textsToRead</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">minLineLen</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">useCache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">getThermoCacheNameSuffix</span><span class="p">(</span><span class="n">header</span><span class="o">=</span><span class="s2">&quot;Step Temp E_pair E_mol TotEng Press&quot;</span><span class="p">,</span> <span class="n">textsToRead</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">minLineLen</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compose a cache file suffix in such a way, that it distinguishes different thermo reader parameters</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        - header: the header of the CSV (where to start reading at)</span>
+<span class="sd">        - textsToRead: the number of times to expect the header</span>
+<span class="sd">        - minLineLen: the minimal length of a line to be accepted as data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)):</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">header</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}{}{}</span><span class="s2">-thermo-param-cache.pickle&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">textsToRead</span><span class="p">,</span> <span class="n">minLineLen</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">extractThermoParams</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;Step Temp E_pair E_mol TotEng Press&quot;</span><span class="p">,</span> <span class="n">textsToRead</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">minLineLen</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">useCache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract the thermodynamic outputs produced for this simulation.</span>
 
@@ -169,7 +187,7 @@
 <span class="sd">        - header: the header of the CSV (where to start reading at)</span>
 <span class="sd">        - textsToRead: the number of times to expect the header</span>
 <span class="sd">        - minLineLen: the minimal length of a line to be accepted as data</span>
-<span class="sd">        - useCache: wheter to use cache or not</span>
+<span class="sd">        - useCache: wheter to use cache or not (though it will be written anyway)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - data (pd.DataFrame): the thermodynamic parameters</span>
@@ -177,24 +195,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="n">cacheFileName</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span>
-        <span class="vm">__file__</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/cache/&quot;</span> <span class="o">+</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;-thermo-param-cache.pickle&quot;</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="n">getThermoCacheNameSuffix</span><span class="p">(</span>
+        <span class="n">header</span><span class="p">,</span> <span class="n">textsToRead</span><span class="p">,</span> <span class="n">minLineLen</span><span class="p">)</span>
+    <span class="n">cacheContent</span> <span class="o">=</span> <span class="n">loadCache</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">cacheFileName</span><span class="p">)</span> <span class="ow">and</span> <span class="n">useCache</span><span class="p">):</span>
-        <span class="n">mtimeCache</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span>
-            <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">cacheFileName</span><span class="p">)</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">)</span>
-        <span class="n">mtimeOrigin</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span>
-            <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">mtimeCache</span> <span class="o">&gt;</span> <span class="n">mtimeOrigin</span><span class="p">):</span>
-            <span class="n">toReturn</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cacheFileName</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cacheFile</span><span class="p">:</span>
-                <span class="n">toReturn</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cacheFile</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">toReturn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Read </span><span class="si">{}</span><span class="s2"> rows for file </span><span class="si">{}</span><span class="s2"> from cache&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="nb">len</span><span class="p">(</span><span class="n">toReturn</span><span class="p">),</span> <span class="n">file</span><span class="p">))</span>
-                <span class="k">return</span> <span class="n">toReturn</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dump cache file is elder than dump. Reloading...&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">cacheContent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">useCache</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cacheContent</span>
 
     <span class="k">def</span> <span class="nf">stringToDf</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
@@ -221,13 +227,8 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">cacheFileName</span><span class="p">))):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">cacheFileName</span><span class="p">))</span>
-
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cacheFileName</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cacheFile</span><span class="p">:</span>
-        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cacheFile</span><span class="p">)</span>
-
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Read </span><span class="si">{}</span><span class="s2"> rows for file </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">file</span><span class="p">))</span>
+    <span class="n">doCache</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
+    <span class="c1"># print(&quot;Read {} rows for file {}&quot;.format(len(df), file))</span>
 
     <span class="k">return</span> <span class="n">df</span>
 </pre></div>
@@ -255,7 +256,7 @@
 <span class="sd">        - minLineLen: the minimal length of a line to be accepted as data</span>
 <span class="sd">        - additional_lines_skip: number of lines to skip after reading the header</span>
 
-<span class="sd">    </span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">      A long CSV string</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -265,9 +266,8 @@
     <span class="n">headerLen</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="nb">str</span><span class="p">)):</span>
         <span class="n">minLineLen</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">minLineLen</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">split</span><span class="p">()))</span>
-        <span class="n">headerLen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">minLineLen</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">minLineLen</span><span class="p">,</span> <span class="nb">min</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">header</span><span class="p">]))</span>
+        <span class="n">minLineLen</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">minLineLen</span><span class="p">,</span> <span class="nb">min</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">split</span><span class="p">())</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">header</span><span class="p">]))</span>
 
     <span class="k">def</span> <span class="nf">checkSkipLine</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">header</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">line</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
@@ -286,8 +286,7 @@
     <span class="k">while</span> <span class="n">skipLineFun</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">header</span><span class="p">):</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">fp</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
     <span class="c1"># found header. Take next few lines:</span>
-    <span class="k">if</span> <span class="p">(</span><span class="n">headerLen</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-        <span class="n">headerLen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+    <span class="n">headerLen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
     <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">line</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;&quot;</span>
     <span class="k">else</span><span class="p">:</span>
@@ -341,6 +340,52 @@
 
 
                 </section>
+                <section id="getThermoCacheNameSuffix">
+                            <div class="attr function"><a class="headerlink" href="#getThermoCacheNameSuffix">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">getThermoCacheNameSuffix</span><span class="signature">(
+    header=&#39;Step Temp E_pair E_mol TotEng Press&#39;,
+    textsToRead=5,
+    minLineLen=5
+) -&gt; str</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">getThermoCacheNameSuffix</span><span class="p">(</span><span class="n">header</span><span class="o">=</span><span class="s2">&quot;Step Temp E_pair E_mol TotEng Press&quot;</span><span class="p">,</span> <span class="n">textsToRead</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">minLineLen</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compose a cache file suffix in such a way, that it distinguishes different thermo reader parameters</span>
+
+<span class="sd">    Arguments:</span>
+<span class="sd">        - header: the header of the CSV (where to start reading at)</span>
+<span class="sd">        - textsToRead: the number of times to expect the header</span>
+<span class="sd">        - minLineLen: the minimal length of a line to be accepted as data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">)):</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">header</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}{}{}</span><span class="s2">-thermo-param-cache.pickle&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="n">textsToRead</span><span class="p">,</span> <span class="n">minLineLen</span><span class="p">)</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Compose a cache file suffix in such a way, that it distinguishes different thermo reader parameters</p>
+
+<h6 id="arguments">Arguments</h6>
+
+<blockquote>
+  <ul>
+  <li>header: the header of the CSV (where to start reading at)</li>
+  <li>textsToRead: the number of times to expect the header</li>
+  <li>minLineLen: the minimal length of a line to be accepted as data</li>
+  </ul>
+</blockquote>
+</div>
+
+
+                </section>
                 <section id="extractThermoParams">
                             <div class="attr function"><a class="headerlink" href="#extractThermoParams">#&nbsp;&nbsp</a>
 
@@ -348,7 +393,7 @@
             <span class="def">def</span>
             <span class="name">extractThermoParams</span><span class="signature">(
     file,
-    header=&#39;Temp PotEng TotEng Press Volume c_3&#39;,
+    header=&#39;Step Temp E_pair E_mol TotEng Press&#39;,
     textsToRead=5,
     minLineLen=5,
     useCache=True
@@ -357,7 +402,7 @@
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">extractThermoParams</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;Temp PotEng TotEng Press Volume c_3&quot;</span><span class="p">,</span> <span class="n">textsToRead</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">minLineLen</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">useCache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+            <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">extractThermoParams</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;Step Temp E_pair E_mol TotEng Press&quot;</span><span class="p">,</span> <span class="n">textsToRead</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">minLineLen</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">useCache</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract the thermodynamic outputs produced for this simulation.</span>
 
@@ -369,7 +414,7 @@
 <span class="sd">        - header: the header of the CSV (where to start reading at)</span>
 <span class="sd">        - textsToRead: the number of times to expect the header</span>
 <span class="sd">        - minLineLen: the minimal length of a line to be accepted as data</span>
-<span class="sd">        - useCache: wheter to use cache or not</span>
+<span class="sd">        - useCache: wheter to use cache or not (though it will be written anyway)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        - data (pd.DataFrame): the thermodynamic parameters</span>
@@ -377,24 +422,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">df</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="n">cacheFileName</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span>
-        <span class="vm">__file__</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;/cache/&quot;</span> <span class="o">+</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">file</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;-thermo-param-cache.pickle&quot;</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="n">getThermoCacheNameSuffix</span><span class="p">(</span>
+        <span class="n">header</span><span class="p">,</span> <span class="n">textsToRead</span><span class="p">,</span> <span class="n">minLineLen</span><span class="p">)</span>
+    <span class="n">cacheContent</span> <span class="o">=</span> <span class="n">loadCache</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">cacheFileName</span><span class="p">)</span> <span class="ow">and</span> <span class="n">useCache</span><span class="p">):</span>
-        <span class="n">mtimeCache</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span>
-            <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">cacheFileName</span><span class="p">)</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">)</span>
-        <span class="n">mtimeOrigin</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span>
-            <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">mtimeCache</span> <span class="o">&gt;</span> <span class="n">mtimeOrigin</span><span class="p">):</span>
-            <span class="n">toReturn</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cacheFileName</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cacheFile</span><span class="p">:</span>
-                <span class="n">toReturn</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">cacheFile</span><span class="p">)</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">toReturn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Read </span><span class="si">{}</span><span class="s2"> rows for file </span><span class="si">{}</span><span class="s2"> from cache&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="nb">len</span><span class="p">(</span><span class="n">toReturn</span><span class="p">),</span> <span class="n">file</span><span class="p">))</span>
-                <span class="k">return</span> <span class="n">toReturn</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Dump cache file is elder than dump. Reloading...&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">cacheContent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">useCache</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">cacheContent</span>
 
     <span class="k">def</span> <span class="nf">stringToDf</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
@@ -421,13 +454,8 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
 
-    <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">cacheFileName</span><span class="p">))):</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">cacheFileName</span><span class="p">))</span>
-
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cacheFileName</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">cacheFile</span><span class="p">:</span>
-        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">cacheFile</span><span class="p">)</span>
-
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Read </span><span class="si">{}</span><span class="s2"> rows for file </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="p">),</span> <span class="n">file</span><span class="p">))</span>
+    <span class="n">doCache</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
+    <span class="c1"># print(&quot;Read {} rows for file {}&quot;.format(len(df), file))</span>
 
     <span class="k">return</span> <span class="n">df</span>
 </pre></div>
@@ -447,7 +475,7 @@ when reading a file with different header sections in them</p>
   <li>header: the header of the CSV (where to start reading at)</li>
   <li>textsToRead: the number of times to expect the header</li>
   <li>minLineLen: the minimal length of a line to be accepted as data</li>
-  <li>useCache: wheter to use cache or not</li>
+  <li>useCache: wheter to use cache or not (though it will be written anyway)</li>
   </ul>
 </blockquote>
 
