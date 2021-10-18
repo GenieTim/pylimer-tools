@@ -11,7 +11,7 @@
 
 ---
 
-<a href="../src/test/pylimer_tools/entities/testEntities.py#L12"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/test/pylimer_tools/entities/testEntities.py#L16"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ## <kbd>class</kbd> `TestEntities`
 
@@ -23,7 +23,7 @@
 
 ---
 
-<a href="../src/test/pylimer_tools/entities/testEntities.py#L14"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/test/pylimer_tools/entities/testEntities.py#L18"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `assertSeriesEqual`
 
@@ -37,7 +37,7 @@ assertSeriesEqual(a, b, msg)
 
 ---
 
-<a href="../src/test/pylimer_tools/entities/testEntities.py#L20"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/test/pylimer_tools/entities/testEntities.py#L24"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `setUp`
 
@@ -51,12 +51,12 @@ setUp()
 
 ---
 
-<a href="../src/test/pylimer_tools/entities/testEntities.py#L57"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/test/pylimer_tools/entities/testEntities.py#L101"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
-### <kbd>method</kbd> `test_molecule`
+### <kbd>method</kbd> `test_atomEntity`
 
 ```python
-test_molecule()
+test_atomEntity()
 ```
 
 
@@ -65,7 +65,35 @@ test_molecule()
 
 ---
 
-<a href="../src/test/pylimer_tools/entities/testEntities.py#L44"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/test/pylimer_tools/entities/testEntities.py#L43"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+### <kbd>method</kbd> `test_moleculeEntity`
+
+```python
+test_moleculeEntity()
+```
+
+
+
+
+
+---
+
+<a href="../src/test/pylimer_tools/entities/testEntities.py#L71"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+### <kbd>method</kbd> `test_moleculeEntityIterations`
+
+```python
+test_moleculeEntityIterations()
+```
+
+
+
+
+
+---
+
+<a href="../src/test/pylimer_tools/entities/testEntities.py#L28"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `test_universe`
 

@@ -18,12 +18,12 @@
 
 
 
-<a href="../src/pylimer_tools/entities/atom.py#L8"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/atom.py#L11"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `__init__`
 
 ```python
-__init__(data: 'Series', boxSizes: 'list') → None
+__init__(data: 'Series', boxSizes: 'list', name: 'str' = None)
 ```
 
 Instantiate the Atom. 
@@ -40,7 +40,7 @@ Instantiate the Atom.
 
 ---
 
-<a href="../src/pylimer_tools/entities/atom.py#L78"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/atom.py#L100"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `computeDistanceTo`
 
@@ -64,7 +64,31 @@ Calculate the the distance between two atoms.
 
 ---
 
-<a href="../src/pylimer_tools/entities/atom.py#L39"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/atom.py#L85"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+
+### <kbd>method</kbd> `computeVectorTo`
+
+```python
+computeVectorTo(secondAtom: 'Atom') → float
+```
+
+Calculate the the vector between two atoms.  
+
+
+
+**Arguments:**
+ 
+    - secondAtom: the atom to compute the distance to 
+
+
+
+**Returns:**
+ 
+    - difference (np.array): the connecting vector between the two coordinates 
+
+---
+
+<a href="../src/pylimer_tools/entities/atom.py#L46"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `getDeltaX`
 
@@ -88,7 +112,7 @@ Calculate the distance in the x dimension between this and another atom,  accoun
 
 ---
 
-<a href="../src/pylimer_tools/entities/atom.py#L52"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/atom.py#L59"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `getDeltaY`
 
@@ -112,7 +136,7 @@ Calculate the distance in the y dimension between this and another atom,  accoun
 
 ---
 
-<a href="../src/pylimer_tools/entities/atom.py#L65"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/atom.py#L72"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `getDeltaZ`
 
@@ -136,7 +160,7 @@ Calculate the distance in the z dimension between this and another atom,  accoun
 
 ---
 
-<a href="../src/pylimer_tools/entities/atom.py#L92"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
+<a href="../src/pylimer_tools/entities/atom.py#L113"><img align="right" style="float:right;" src="https://img.shields.io/badge/-source-cccccc?style=flat-square"></a>
 
 ### <kbd>method</kbd> `getUnderlyingData`
 

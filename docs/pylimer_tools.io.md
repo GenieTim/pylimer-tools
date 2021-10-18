@@ -10,6 +10,7 @@
 **Global Variables**
 ---------------
 - **readLammpData**
+- **readLammpDump**
 
 
 

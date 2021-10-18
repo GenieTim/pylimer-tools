@@ -30,10 +30,10 @@ Find molecules from atom & bond data. Crosslinkers are omitted.
 
 **Arguments:**
  
- - <b>`atom_data`</b> (pd.DataFrame):  a collection of atom coordinates 
- - <b>`bond_data`</b> (pd.DataFrame):  a collection of bonds 
- - <b>`boxDimensions`</b>:  a list containing the box lengths (x, y, z)  
- - <b>`crosslinker_type`</b>:  the type of the crosslinker atoms to distinguish different molecules/chains 
+    - atom_data (pd.DataFrame): a collection of atom coordinates 
+    - bond_data (pd.DataFrame): a collection of bonds 
+    - boxDimensions (list): a list containing the box lengths (x, y, z)  
+    - crosslinker_type (int): the type of the crosslinker atoms to distinguish different molecules/chains 
 
 
 
