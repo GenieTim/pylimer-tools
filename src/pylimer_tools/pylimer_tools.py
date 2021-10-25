@@ -25,10 +25,12 @@ def cli(files):
         universe.addAtomBondData(allData['atom_data'], allData['bond_data'])
         click.echo("Size: {}. Volume: {} u^3".format(
             universe.getSize(), universe.getVolume()))
+        bondLengths = [m.computeBondLengths().mean() for m in universe]
         click.echo("Mean bond length: {} u".format(
-            np.mean([m.computeBondLengths().mean() for m in universe])))
+            np.mean([l for l in bondLengths if l is not None])))
+        endToEndDistances = [m.computeEndToEndDistance() for m in universe]
         click.echo("Mean end to end distance: {} u".format(
-            np.mean([m.computeEndToEndDistance() for m in universe])))
+            np.mean([e for e in endToEndDistances if e is not None])))
     click.echo("Arbitrary units used. E.g.: Length: u")
 
 

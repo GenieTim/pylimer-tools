@@ -120,6 +120,8 @@ class Molecule(GraphDecorator, Iterable):
             return
         if (len(endNodes) < 1 and self.getLength() == 1):
             endNodes = self.underlying_graph.vs.select(_degree_eq=0)
+        if (len(endNodes) < 1):
+            endNodes = [self.underlying_graph.vs[0]]
         subIterator = self.underlying_graph.dfsiter(
             endNodes[0], mode="all", advanced=False)
         for node in subIterator:
