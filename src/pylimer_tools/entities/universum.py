@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import warnings
 from collections import Counter
 from typing import Iterable
 
@@ -47,7 +48,7 @@ class Universum(GraphDecorator, Iterable):
         assert("type" in atomData.columns)
         # first, create atoms and add them to the graph
         for index, row in atomData.iterrows():
-            atomName = "atom{}".format(row['id'])
+            atomName = "atom{}".format(int(row['id']))
             self.underlying_graph.add_vertices(
                 [atomName],
                 {
@@ -55,8 +56,13 @@ class Universum(GraphDecorator, Iterable):
                     "atom": Atom(row, boxSizes=self.boxSizes, name=atomName)
                 })
         # then, follow up with the bonds.
+        if (len(bondData.columns) != 2):
+            if ('to' in bondData.columns and 'bondFrom' in bondData.columns):
+              bondData = bondData.drop(bondData.columns.difference(['to', 'bondFrom']), 1)
+            else:
+              warnings.warn('Expecting two columns in bond data, got {}'.format(len(bondData.columns)))
         assert(len(bondData.columns) == 2)
-        bondNames = bondData.applymap(lambda x: "atom{}".format(x))
+        bondNames = bondData.applymap(lambda x: "atom{}".format(int(x)))
         bondsArray = bondNames.to_numpy()
         self.underlying_graph.add_edges(bondsArray)
         self.underlying_graph.simplify()

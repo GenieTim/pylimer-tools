@@ -20,8 +20,9 @@ def cli(files):
     for filePath in files:
         click.echo("Analysing File " + filePath)
         allData = readLammpData(filePath)
-        universe = Universum(allData['atom_data'], allData['bond_data'], boxSizes=[
+        universe = Universum(boxSizes=[
                              allData["Lx"], allData["Ly"], allData["Lz"]])
+        universe.addAtomBondData(allData['atom_data'], allData['bond_data'])
         click.echo("Size: {}. Volume: {} u^3".format(
             universe.getSize(), universe.getVolume()))
         click.echo("Mean bond length: {} u".format(

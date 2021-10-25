@@ -36,8 +36,9 @@ from pylimer_tools.entities.universum import Universum
 from pylimer_tools.io.readLammpData import readLammpData
 
 allData = readLammpData("some_lammps_output_file.dat")
-universe = Universum(allData['atom_data'], allData['bond_data'], boxSizes=[
+universe = Universum(boxSizes=[
                       allData["Lx"], allData["Ly"], allData["Lz"]])
+universe.addAtomBondData(allData['atom_data'], allData['bond_data'])
 print("Size: {}. Volume: {} u^3".format(
     universe.getSize(), universe.getVolume()))
 print("Mean bond length: {} u".format(
