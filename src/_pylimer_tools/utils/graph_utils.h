@@ -1,0 +1,50 @@
+#ifndef GRAPH_UTILS_H
+#define GRAPH_UTILS_H
+
+#include <iostream>
+#include <iterator>
+#include <algorithm>
+#include <vector>
+#include <igraph/igraph.h>
+
+namespace pylimer_tools
+{
+  namespace utils
+  {
+    igraph_vs_t getVerticesWithDegree(igraph_t *graph, int degree)
+    {
+      int graphSize = igraph_vcount(graph);
+      igraph_vector_t degrees;
+      if (igraph_vector_init(&degrees, 0))
+      {
+        throw std::runtime_error("Failed to instantiate result vector.");
+      }
+      igraph_vs_t allVertexIds;
+      igraph_vs_all(&allVertexIds);
+      // complexity: O(|v|*d)
+      if (igraph_degree(&this->graph, &degrees, allVertexIds, IGRAPH_ALL, false))
+      {
+        throw std::runtime_error("Failed to determine degree of vertices");
+      }
+
+      // NOTE: this is to omit the assumption, that the returned degree is sequential for vertex 0, ..., |V|
+      std::vector<long int> toSelect;
+      igraph_vit_t vit;
+      igraph_vit_create(&graph, allVertexIds, &vit);
+      while (!IGRAPH_VIT_END(vit))
+      {
+        long int vertexId = (long int)IGRAPH_VIT_GET(vit);
+        if (igraph_vector_e(degrees, vertexId) == degree)
+        {
+          toSelect.push_back(vertexId);
+        }
+        IGRAPH_VIT_NEXT(vit);
+      }
+      igraph_vit_destroy(&vit);
+      igraph_vs_destroy(&allVertexIds);
+      return pylimer_tools::utils::StdVectorToIgraphVectorT(toSelect);
+    }
+  }
+}
+
+#endif

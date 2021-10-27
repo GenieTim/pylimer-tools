@@ -1,0 +1,33 @@
+#ifndef UNIVERSE_H
+#define UNIVERSE_H
+
+#include <igraph/igraph.h>
+#include <vector>
+#include <map>
+#include "Molecule.h"
+#include "Atom.h"
+
+namespace pylimer_tools
+{
+  namespace entities
+  {
+
+    class Universe
+    {
+    public:
+      Universe(const double Lx, const double Ly, const double Lz);
+      void setBoxLengths(const double Lx, const double Ly, const double Lz);
+      void addAtoms(const int NNewAtoms, std::vector<int> ids, std::vector<int> types, std::vector<double> x, std::vector<double> y, std::vector<double> z, std::vector<double> nx, std::vector<double> ny, std::vector<double> nz);
+      void addBonds(const int NNewBonds, std::vector<int> from, std::vector<int> to);
+      std::vector<Molecule> getMolecules(const int atomTypeToOmit);
+      std::vector<Molecule> getChainsWithCrosslinker(const int crosslinkerType);
+      std::map<int, int> determineFunctionalityPerType();
+      Atom getAtom(const int atomId);
+      Atom *getAtomsWithType(const int atomType);
+      double getVolume();
+      int getNrOfAtoms();
+    };
+  }
+}
+
+#endif
