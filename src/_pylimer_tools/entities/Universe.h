@@ -24,6 +24,8 @@ namespace pylimer_tools
       std::map<int, int> determineFunctionalityPerType();
       Atom getAtom(const int atomId);
       Atom *getAtomsWithType(const int atomType);
+      void setBox(Box box);
+      Box getBox();
       double getVolume();
       int getNrOfAtoms();
     };

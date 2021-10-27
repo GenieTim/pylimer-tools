@@ -2,6 +2,9 @@
 #define MOLECULE_H
 
 #include <igraph/igraph.h>
+#include "Box.h"
+#include "Atom.h"
+#include "Universe.h"
 
 namespace pylimer_tools
 {
@@ -20,10 +23,10 @@ namespace pylimer_tools
     class Molecule
     {
     public:
-      Molecule(igraph_t *graph, MoleculeType type);
+      Molecule(Universe *parent, igraph_t *graph, MoleculeType type);
       Molecule *decomposeFurther(int atomTypeToOmit = 0);
       double computeEndToEndDistance();
-      void computeBondLengths(double *resultBuffer);
+      std::vector<double> computeBondLengths();
       int getLength();
       MoleculeType getType();
     };

@@ -43,6 +43,24 @@ namespace pylimer_tools
       return out; // both done
     }
 
+    template <typename IN>
+    inline IN copy(IN in)
+    {
+      // Declaring new vector and copying
+      // element of old vector
+      // constructor method, Deep copy
+      return newThing(in);
+    }
+
+    template <typename IN>
+    inline void eraseIndices(std::vector<IN> from, std::vector<long int> indices)
+    {
+      for (auto index : indices)
+      {
+        from.erase(index);
+      }
+    }
+
     template <typename IN1>
     inline void StdVectorToIgraphVectorT(IN1 &vectR, igraph_vector_t *v)
     {
@@ -52,10 +70,23 @@ namespace pylimer_tools
       igraph_vector_resize(v, n);
 
       /* Copy all the items */
-      for (size_t i = 0; i < n; i++)
+      for (size_t i = 0; i < n; ++i)
       {
         VECTOR(*v)
         [i] = vectR[i];
+      }
+    }
+
+    template <typename IN>
+    inline void igraphVectorTToStdVector(igraph_vector_t *v, IN &vectL)
+    {
+      long int n = igraph_vector_size(v);
+
+      vectL.reserve(n);
+
+      for (size_t i = 0; i < n; ++i)
+      {
+        vectL[i] = igraph_vector_e(v, i);
       }
     }
   }
