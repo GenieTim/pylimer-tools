@@ -32,12 +32,7 @@ int main(int argc, char **argv)
 
   igraph_vit_destroy(&vit);
   std::cout << "Assembling vertices to remove" << std::endl;
-  std::vector<long int> indices;
-  //{ 0, 2, 3, 5 };
-  indices.push_back(0);
-  indices.push_back(2);
-  indices.push_back(3);
-  indices.push_back(5);
+  std::vector<long int> indices{ 0, 2, 3, 5 };
   igraph_vector_t verticesToRemove;
   igraph_vector_init(&verticesToRemove, 3);
   pylimer_tools::utils::StdVectorToIgraphVectorT(indices, &verticesToRemove);
