@@ -6,40 +6,25 @@
 #include <algorithm>
 #include <vector>
 #include <igraph/igraph.h>
+#include <cassert>
 
 namespace pylimer_tools
 {
   namespace utils
   {
-    template <typename IN1,
-              typename IN2,
-              typename OUT>
-    inline OUT interleave(IN1 it1,
-                          IN1 end1,
-                          IN2 it2,
-                          IN2 end2,
-                          OUT out)
+    template <typename IN>
+    inline std::vector<IN> interleave(std::vector<IN> in1,
+                                      std::vector<IN> in2)
     {
+      assert(in1.size() == in2.size());
+      std::vector<IN> out(in1.size() + in2.size());
       // interleave until at least one container is done
-      while (it1 != end1 && it2 != end2)
+      for (size_t i = 0; i < in1.size(); ++i)
       {
-        // insert from container 1
-        *out = *it1;
-        out++;
-        it1++;
-        // insert from container 2
-        *out = *it2;
-        out++;
-        it2++;
+        out.push_back(in1[i]);
+        out.push_back(in2[i]);
       }
-      if (it1 != end1) // check and finish container 1
-      {
-        return std::copy(it1, end1, out);
-      }
-      else if (it2 != end2) // check and finish container 2
-      {
-        return std::copy(it2, end2, out);
-      }
+
       return out; // both done
     }
 

@@ -5,11 +5,10 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
-#include "Universe.h"
-#include "UniverseSequence.h"
-#include <boost/algorithm/string.hpp>
+#include "StringUtil.h"
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
+#include <boost/algorithm/string.hpp>
 #include <map>
 
 namespace pylimer_tools
@@ -52,8 +51,8 @@ namespace pylimer_tools
       bool shortenLineToSkip(std::string *line);
       void readNs(const std::string line);
       void readMass(const std::string line);
-      void readAtom(const char *line);
-      void readBond(const char *line);
+      void readAtom(std::string line);
+      void readBond(std::string line);
       void skipEmptyLines(char *cline, size_t *len, FILE *fp);
       void skipLinesTo(char *cline, size_t *len, FILE *fp, std::string upTo);
 
@@ -124,7 +123,7 @@ namespace pylimer_tools
           continue;
         }
         //
-        if (boost::algorithm::contains(line, "Masses"))
+        if (line.find("Masses") != std::string::npos)
         {
           break;
         }
@@ -160,7 +159,7 @@ namespace pylimer_tools
           continue;
         }
         // read masses until atoms
-        if (boost::algorithm::contains(line, "Atoms"))
+        if (line.find("Atoms") != std::string::npos)
         {
           break;
         }
@@ -178,7 +177,7 @@ namespace pylimer_tools
           throw std::runtime_error("Data file ended too early. Not enough atoms read.");
         }
 
-        this->readAtom(cline);
+        this->readAtom(std::string(cline));
       }
 
       // Then, read bonds
@@ -192,7 +191,7 @@ namespace pylimer_tools
           throw std::runtime_error("Data file ended too early. Not enough atoms read.");
         }
 
-        this->readBond(cline);
+        this->readBond(std::string(cline));
       }
 
       // we ignore angles etc. for now.
@@ -233,12 +232,12 @@ namespace pylimer_tools
 
     bool DataFileParser::shortenLineToSkip(std::string *line)
     {
-      boost::trim_left(line);
+      boost::trim_left(*line);
       // trim comments
-      if (boost::algorithm::contains(line, "#"))
+      if (contains(line, "#"))
       {
         std::vector<std::string> split;
-        boost::split(split, line, boost::is_any_of("#"));
+        boost::split(split, *line, boost::is_any_of("#"));
         line = &split[0];
       }
       return line->compare("");
@@ -246,33 +245,33 @@ namespace pylimer_tools
 
     void DataFileParser::readNs(const std::string line)
     {
-      if (boost::algorithm::contains(line, "atoms"))
+      if (contains(&line, "atoms"))
       {
         this->nAtoms = (this->parseTypeInLine<int>(line))[0];
       }
-      else if (boost::algorithm::contains(line, "bonds"))
+      else if (contains(&line, "bonds"))
       {
         this->nBonds = (this->parseTypeInLine<int>(line))[0];
       }
-      else if (boost::algorithm::contains(line, "atom types"))
+      else if (contains(&line, "atom_types"))
       {
         this->nAtomTypes = (this->parseTypeInLine<int>(line))[0];
       }
-      else if (boost::algorithm::contains(line, "bond types"))
+      else if (contains(&line, "bond types"))
       {
         this->nBondTypes = (this->parseTypeInLine<int>(line))[0];
       }
-      else if (boost::algorithm::contains(line, "xlo xhi"))
+      else if (contains(&line, "xlo xhi"))
       {
         std::vector<double> parsedL = this->parseTypeInLine<double>(line);
         this->Lx = parsedL[1] - parsedL[0];
       }
-      else if (boost::algorithm::contains(line, "ylo yhi"))
+      else if (contains(&line, "ylo yhi"))
       {
         std::vector<double> parsedL = this->parseTypeInLine<double>(line);
         this->Ly = parsedL[1] - parsedL[0];
       }
-      else if (boost::algorithm::contains(line, "zlo zhi"))
+      else if (contains(&line, "zlo zhi"))
       {
         std::vector<double> parsedL = this->parseTypeInLine<double>(line);
         this->Lz = parsedL[1] - parsedL[0];
@@ -288,12 +287,12 @@ namespace pylimer_tools
       {
         if (iteration == 0)
         {
-          key = boost::lexical_cast<int>(beg);
+          key = boost::lexical_cast<int>(*beg);
         }
         else if (iteration == 1)
         {
           // we just override duplicate keys
-          this->masses[key] = boost::lexical_cast<double>(beg);
+          this->masses[key] = boost::lexical_cast<double>(*beg);
         }
         else
         {
@@ -308,7 +307,7 @@ namespace pylimer_tools
       }
     }
 
-    void DataFileParser::readAtom(const char *line)
+    void DataFileParser::readAtom(std::string line)
     {
       boost::tokenizer<> tok(line);
       boost::tokenizer<>::iterator it1, it2 = tok.begin();
@@ -332,7 +331,7 @@ namespace pylimer_tools
       this->atomNz.push_back(boost::lexical_cast<double>(*it2));
     }
 
-    void DataFileParser::readBond(const char *line)
+    void DataFileParser::readBond(std::string line)
     {
       boost::tokenizer<> tok(line);
       boost::tokenizer<>::iterator it1, it2 = tok.begin();
@@ -348,4 +347,4 @@ namespace pylimer_tools
   }
 }
 
-#endif 
+#endif

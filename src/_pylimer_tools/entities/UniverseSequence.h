@@ -17,6 +17,17 @@ namespace pylimer_tools
       Universe next();
       Universe atIndex(int index);
       void resetIterator();
+      int getLength();
+
+    protected:
+      int index = 0; // current index of the iterator
+      int length = 0;
+      bool isInitialized = false;
+      std::map<int, Universe> universeCache;
+      std::vector<std::string> dataFiles;
+
+      void reset();
+      Universe readDataFile(const std::string filePath);
     };
   }
 }
