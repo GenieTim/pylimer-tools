@@ -34,14 +34,14 @@ namespace pylimer_tools
         return delta;
       }
 
-      void vectorTo(Atom b, Box box, double *result)
+      void vectorTo(Atom b, Box *box, double *result)
       {
-        result[0] = this->_getDeltaDistance(this->x, b.getX(), this->nx, b.getNX(), box.getLx());
-        result[1] = this->_getDeltaDistance(this->y, b.getY(), this->ny, b.getNY(), box.getLy());
-        result[2] = this->_getDeltaDistance(this->z, b.getZ(), this->nz, b.getNZ(), box.getLz());
+        result[0] = this->_getDeltaDistance(this->x, b.getX(), this->nx, b.getNX(), box->getLx());
+        result[1] = this->_getDeltaDistance(this->y, b.getY(), this->ny, b.getNY(), box->getLy());
+        result[2] = this->_getDeltaDistance(this->z, b.getZ(), this->nz, b.getNZ(), box->getLz());
       }
 
-      double distanceTo(Atom b, Box box)
+      double distanceTo(Atom b, Box *box)
       {
         double distanceVec[3];
         vectorTo(b, box, distanceVec);

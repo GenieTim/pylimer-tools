@@ -4,7 +4,7 @@
 #include <igraph/igraph.h>
 #include "Box.h"
 #include "Atom.h"
-#include "Universe.h"
+#include <vector>
 
 namespace pylimer_tools
 {
@@ -23,12 +23,21 @@ namespace pylimer_tools
     class Molecule
     {
     public:
-      Molecule(Universe *parent, igraph_t *graph, MoleculeType type);
+      Molecule(Box *parent, igraph_t *graph, MoleculeType type);
       Molecule *decomposeFurther(int atomTypeToOmit = 0);
       double computeEndToEndDistance();
       std::vector<double> computeBondLengths();
       int getLength();
       MoleculeType getType();
+      Atom getAtomForVertexId(long int vertexIdx);
+      int getNumBonds();
+      Box* getBox();
+
+    private:
+      Box *parent;
+      MoleculeType typeOfThisMolecule;
+      igraph_t *graph;
+      int size;
     };
   }
 }

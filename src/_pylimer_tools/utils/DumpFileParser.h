@@ -4,8 +4,9 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include "Universe.h"
-#include "UniverseSequence.h"
+#include "StringUtil.h"
+#include "../entities/Universe.h"
+#include "../entities/UniverseSequence.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -139,7 +140,7 @@ namespace pylimer_tools
 
     std::string DumpFileParser::cleanHeader(std::string headerToClean)
     {
-      boost::algorithm::replace_first("", headerToClean, "ITEM: ");
+      boost::algorithm::replace_first(headerToClean, "ITEM: ", "");
       boost::tokenizer<> tok(headerToClean);
       std::string newHeader = "";
       std::vector<std::string> columns;
@@ -164,34 +165,21 @@ namespace pylimer_tools
       return newHeader;
     }
 
-    bool isUpper(std::string str)
-    {
-      for (int i = 0; i < str.length(); ++i)
-      {
-        if (!std::isupper(str[i]))
-        {
-          return false;
-        }
-      }
-      return true;
-    }
-
     template <typename OUT>
     std::vector<OUT> DumpFileParser::getValuesForAt(int index, std::string headerKey, std::string column)
     {
-
       // detect index of column
       const auto colItIdx = std::find(this->headerColMap[headerKey].begin(), this->headerColMap[headerKey].end(), column);
-      if (this->headerColMap[headerKey].end() == colIdx)
+      if (this->headerColMap[headerKey].end() == colItIdx)
       {
         throw std::invalid_argument("Column '" + column + "' not found for header '" + headerKey + "'");
       }
       const int colIdx = colItIdx - this->headerColMap[headerKey].begin();
-      return this->getValuesForAt(index, headerKey, colIdx);
+      return this->getValuesForAt<OUT>(index, headerKey, colIdx);
     };
 
     template <typename OUT>
-    std::vector<OUT> DumpFileParser::getValuesForAt(int index, std::string headerKey, std::string column)
+    std::vector<OUT> DumpFileParser::getValuesForAt(int index, std::string headerKey, int colIdx)
     {
       // this is clearly not the fastest way to access more than one column,
       // as the tokenizing happens again for each column.
@@ -204,13 +192,6 @@ namespace pylimer_tools
       std::getline(f, line);
       boost::tokenizer<> tok(line);
       std::vector<OUT> result;
-      // detect index of column
-      const auto colItIdx = std::find(this->headerColMap[headerKey].begin(), this->headerColMap[headerKey].end(), column);
-      if (this->headerColMap[headerKey].end() == colItIdx)
-      {
-        throw std::invalid_argument("Column '" + column + "' not found for header '" + headerKey + "'");
-      }
-      const int colIdx = colItIdx - this->headerColMap[headerKey].begin();
 
       // all other lines
       while (std::getline(f, line))
@@ -219,8 +200,10 @@ namespace pylimer_tools
         boost::tokenizer<>::iterator it1, it2 = tok.begin();
         it1 = it2;
         std::advance(it2, colIdx);
-        results.push_back(boost::lexical_cast<OUT>(*it2));
+        result.push_back(boost::lexical_cast<OUT>(*it2));
       }
+
+      return result;
     };
   }
 }
