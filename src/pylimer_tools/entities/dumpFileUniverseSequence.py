@@ -42,11 +42,11 @@ class DumpFileUniverseSequence(object):
         if ("BOX BOUNDS" in currentTimestepsData):
             boxSizes = [
                 currentTimestepsData["BOX BOUNDS"][0][1] -
-                currentTimestepsData["BOX BOUNDS"][0][1],
+                currentTimestepsData["BOX BOUNDS"][0][0],
                 currentTimestepsData["BOX BOUNDS"][1][1] -
-                currentTimestepsData["BOX BOUNDS"][1][1],
+                currentTimestepsData["BOX BOUNDS"][1][0],
                 currentTimestepsData["BOX BOUNDS"][2][1] -
-                currentTimestepsData["BOX BOUNDS"][2][1],
+                currentTimestepsData["BOX BOUNDS"][2][0],
             ]
         else:
             boxSizes = [

@@ -1,6 +1,6 @@
 #include "Molecule.h"
 #include "Atom.h"
-#include "./utils/graph_utils.h"
+#include "GraphUtils.h"
 
 namespace pylimer_tools
 {

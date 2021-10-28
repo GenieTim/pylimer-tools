@@ -1,6 +1,6 @@
 #include "Universe.h"
-#include "vector_utils.h"
-#include "graph_utils.h"
+#include "VectorUtils.h"
+#include "GraphUtils.h"
 #include "Box.h"
 
 #include <vector>
@@ -39,7 +39,7 @@ namespace pylimer_tools
                                &enames, &etypes);
       }
 
-      void addAtoms(const int NNewAtoms, std::vector<int> newIds, std::vector<int> newTypes, std::vector<double> newX, std::vector<double> newY, std::vector<double> newZ, std::vector<double> newNx, std::vector<double> newNy, std::vector<double> newNz)
+      void addAtoms(const int NNewAtoms, std::vector<long int> newIds, std::vector<int> newTypes, std::vector<double> newX, std::vector<double> newY, std::vector<double> newZ, std::vector<int> newNx, std::vector<int> newNy, std::vector<int> newNz)
       {
         if (newTypes.size() != NNewAtoms || newIds.size() != newTypes.size() || newX.size() != newNx.size() || newY.size() != newNy.size() || newZ.size() != newNz.size() || newX.size() != newY.size() || NNewAtoms != newZ.size())
         {
@@ -67,7 +67,7 @@ namespace pylimer_tools
         this->NAtoms += NNewAtoms;
       }
 
-      void addBonds(const int NNewBonds, std::vector<int> from, std::vector<int> to)
+      void addBonds(const int NNewBonds, std::vector<long int> from, std::vector<long int> to)
       {
         if (from.size() != to.size() || from.size() != NNewBonds)
         {
