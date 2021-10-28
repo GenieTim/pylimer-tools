@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <vector>
 #include <igraph/igraph.h>
-#include "vector_utils.h"
+#include "VectorUtils.h"
 
 namespace pylimer_tools
 {

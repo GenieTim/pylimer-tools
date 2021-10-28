@@ -2,6 +2,7 @@
 #define ATOM_H
 
 #include "Box.h"
+#include "math.h"
 
 namespace pylimer_tools
 {
@@ -40,8 +41,12 @@ namespace pylimer_tools
         result[2] = this->_getDeltaDistance(this->z, b.getZ(), this->nz, b.getNZ(), box.getLz());
       }
 
-      double distanceTo(Atom b, Box box){
-
+      double distanceTo(Atom b, Box box)
+      {
+        double distanceVec[3];
+        vectorTo(b, box, distanceVec);
+        // norm
+        return sqrt(distanceVec[0] * distanceVec[0] + distanceVec[1] * distanceVec[1] + distanceVec[2] * distanceVec[2]);
       };
 
       inline double getX() { return this->x; }
