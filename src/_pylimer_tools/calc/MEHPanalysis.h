@@ -1,8 +1,123 @@
-namespace pylimer_tools {
-  namespace calc {
-    namespace mehp {
+#include <map>
+#include <string>
+#include "../entities/Universe.h"
+#include "../entities/UniverseSequence.h"
+#include "../entities/Molecule.h"
+#include "../entities/Atom.h"
 
-      std::map<int, 
+namespace pylimer_tools
+{
+  namespace calc
+  {
+    namespace mehp
+    {
+    /*
+    Compute the mean end to end distance between each pair of (indirectly) connected crosslinker
+
+    Arguments:
+      - networks: the different configurations of the polymer network to do the computation for
+      - crosslinkerType: the atom type to compute the in-between vectors for
+
+    Returns:
+      - endToEndDistances (dict): a dictionary with key: "{atom1.name}+{atom2.name}"
+          and value: the norm of the mean difference vector
+      */
+      std::map<std::string, double> computeMeanEndToEndDistances(pylimer_tools::entities::UniverseSequence networks, int crosslinkerType)
+      {
+        std::map<std::string, double[3]> distanceVectors = computeMeanEndToEndVectors(networks, crosslinkerType);
+        std::map<std::string, double> results;
+
+        for (auto const &[key, vec] : distanceVectors)
+        {
+          results.insert_or_assign(key, sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]));
+        }
+
+        return results;
+      }
+
+      /*
+      Compute the mean end to end vectors between each pair of (indirectly) connected crosslinker
+
+      Arguments:
+        - networks: the different configurations of the polymer network to do the computation for
+        - crosslinkerType: the atom type to compute the in-between vectors for
+
+      Returns:
+        - endToEndVectors (map): a dictionary with key: "{chain.key}"
+            and value: their mean distance difference vector
+      */
+      std::map<std::string, double[3]> computeMeanEndToEndVectors(pylimer_tools::entities::UniverseSequence networks, int crosslinkerType)
+      {
+        std::map<std::string, double[3]> result;
+
+        if (networks.getLength() == 0)
+        {
+          return result;
+        }
+
+        double multiplier = 1.0 / networks.getLength();
+
+        for (int i = 0; i < networks.getLength(); ++i)
+        {
+          pylimer_tools::entities::Universe network = networks.atIndex(i);
+          std::map<std::string, double[3]> currentEndToEndVectors = computeEndToEndVectors(network, crosslinkerType);
+
+          for (auto const &[key, vec] : currentEndToEndVectors)
+          {
+            if (!result.contains(key))
+            {
+              result.insert_or_assign(key, new double[3]{0.0, 0.0, 0.0});
+            }
+            for (int j = 0; j < 3; j++)
+            {
+              result[key][j] += vec[j] * multiplier;
+            }
+          }
+        }
+
+        return result;
+      }
+
+      /*
+        Compute the end to end vectors between each pair of (indirectly) connected crosslinker
+
+        Arguments:
+          - network: the polymer network to do the computation for
+          - crosslinkerType: the atom type to compute the in-between vectors for
+
+        Returns:
+          - endToEndVectors (map): a map with key: "{molecule.key}"
+              and value: their difference vector
+      */
+      std::map<std::string, double[3]> computeEndToEndVectors(pylimer_tools::entities::Universe network, int crosslinkerType)
+      {
+        std::map<std::string, double[3]> result;
+        std::vector<pylimer_tools::entities::Molecule> molecules = network.getChainsWithCrosslinker(crosslinkerType);
+
+        for (pylimer_tools::entities::Molecule chain : molecules)
+        {
+          std::vector<pylimer_tools::entities::Atom> crosslinkers = chain.getAtomsWithType(crosslinkerType);
+
+          if (crosslinkers.size() != 2 || chain.getType() == pylimer_tools::entities::MoleculeType::PRIMARY_LOOP || chain.getType() == pylimer_tools::entities::MoleculeType::DANGLING_CHAIN)
+          {
+            continue;
+          }
+
+          // use id to keep direction of the vector constant
+          double distanceVec[3];
+          if (crosslinkers[0].getId() > crosslinkers[1].getId())
+          {
+            crosslinkers[0].vectorTo(crosslinkers[1], &network.getBox(), distanceVec);
+          }
+          else
+          {
+            crosslinkers[1].vectorTo(crosslinkers[0], &network.getBox(), distanceVec);
+          }
+          result.insert_or_assign(chain.getKey(), distanceVec);
+        }
+
+        return result;
+      }
 
     }
   }

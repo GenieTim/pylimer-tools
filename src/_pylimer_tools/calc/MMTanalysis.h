@@ -27,15 +27,15 @@ namespace pylimer_tools
       Returns:
         - r (float): the stoichiometric inbalance
       */
-      double computeStoichiometricInbalance(Universe network, int junctionType, int strandLength, std::map<int, int> functionalityPerType)
+      double computeStoichiometricInbalance(pylimer_tools::entities::Universe network, int junctionType, int strandLength, std::map<int, int> functionalityPerType)
       {
 
-        if (network.getSize() == 0)
+        if (network.getNrOfAtoms() == 0)
         {
           return 0;
         }
 
-        std::vector<int> allTypes = network.getPropertyValues("type");
+        std::vector<int> allTypes = network.getPropertyValues<int>("type");
 
         int crosslinkerFormableBonds = 0;
         int otherFormableBonds = 0;
@@ -71,14 +71,14 @@ namespace pylimer_tools
       Returns:
         - p (float): the extent of reaction
       */
-      double computeExtentOfReaction(Universe network, std::map<int, int> functionalityPerType)
+      double computeExtentOfReaction(pylimer_tools::entities::Universe network, std::map<int, int> functionalityPerType)
       {
-        if (network.getSize() == 0)
+        if (network.getNrOfAtoms() == 0)
         {
           return 1;
         }
 
-        std::vector<int> allTypes = network.getPropertyValues("type");
+        std::vector<int> allTypes = network.getPropertyValues<int>("type");
 
         int maxFormableBonds = 0;
 
@@ -91,7 +91,7 @@ namespace pylimer_tools
         return network.getNrOfBonds() * 2.0 / (double)maxFormableBonds;
       }
 
-      double computeExtentOfReaction(Universe network)
+      double computeExtentOfReaction(pylimer_tools::entities::Universe network)
       {
         return computeExtentOfReaction(network, network.determineFunctionalityPerType());
       }

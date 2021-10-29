@@ -49,6 +49,7 @@ namespace pylimer_tools
         return sqrt(distanceVec[0] * distanceVec[0] + distanceVec[1] * distanceVec[1] + distanceVec[2] * distanceVec[2]);
       };
 
+      inline long int getId() { return this->id; }
       inline double getX() { return this->x; }
       inline double getY() { return this->y; }
       inline double getZ() { return this->z; }
