@@ -1,4 +1,4 @@
-add_library(pylimer_utils)
+add_library(pylimer_utils INTERFACE)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -20,6 +20,6 @@ target_sources(pylimer_utils
 set_target_properties(pylimer_utils PROPERTIES LINKER_LANGUAGE CXX)
 
 target_include_directories(pylimer_utils
-	PUBLIC
+	INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}
 )

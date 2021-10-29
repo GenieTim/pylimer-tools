@@ -1,7 +1,7 @@
 #ifndef MOLECULE_H
 #define MOLECULE_H
 
-#include <igraph/igraph.h>
+#include <igraph.h>
 #include "Box.h"
 #include "Atom.h"
 #include <vector>
@@ -24,7 +24,6 @@ namespace pylimer_tools
     {
     public:
       Molecule(Box *parent, igraph_t *graph, MoleculeType type);
-      Molecule *decomposeFurther(int atomTypeToOmit = 0);
       double computeEndToEndDistance();
       std::vector<double> computeBondLengths();
       int getLength();

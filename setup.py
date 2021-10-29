@@ -20,6 +20,9 @@ setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     cmake_install_dir="src/pylimer_tools",
+    cmake_args=[
+        
+    ],
     include_package_data=True,
     extras_require={"test": ["unittest"]},
     python_requires=">=3.7",

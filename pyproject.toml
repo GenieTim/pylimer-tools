@@ -2,8 +2,10 @@
 requires = [
     "setuptools", 
     "wheel", 
-    "scikit-build", 
+    "scikit-build",
+    "pybind11",
     "cmake", 
-    "ninja"
+    "ninja",
+    "python-igraph"
 ]
 build-backend = "setuptools.build_meta"

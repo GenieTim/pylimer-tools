@@ -12,7 +12,7 @@ namespace pylimer_tools
 {
   namespace utils
   {
-    igraph_vs_t getVerticesWithDegree(igraph_t *graph, int degree)
+    static igraph_vs_t getVerticesWithDegree(igraph_t *graph, int degree)
     {
       int graphSize = igraph_vcount(graph);
       igraph_vector_t degrees;

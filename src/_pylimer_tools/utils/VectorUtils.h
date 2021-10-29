@@ -13,7 +13,7 @@ namespace pylimer_tools
   namespace utils
   {
     template <typename IN>
-    inline std::vector<IN> interleave(std::vector<IN> in1,
+    static inline std::vector<IN> interleave(std::vector<IN> in1,
                                       std::vector<IN> in2)
     {
       assert(in1.size() == in2.size());
@@ -29,7 +29,7 @@ namespace pylimer_tools
     }
 
     template <typename IN>
-    inline IN copy(IN in)
+    static inline IN copy(IN in)
     {
       // Declaring new vector and copying
       // element of old vector
@@ -38,7 +38,7 @@ namespace pylimer_tools
     }
 
     template <typename IN>
-    inline void eraseIndices(std::vector<IN> from, std::vector<long int> indices)
+    static inline void eraseIndices(std::vector<IN> from, std::vector<long int> indices)
     {
       for (auto index : indices)
       {
@@ -47,7 +47,7 @@ namespace pylimer_tools
     }
 
     template <typename IN1>
-    inline void StdVectorToIgraphVectorT(IN1 &vectR, igraph_vector_t *v)
+    static inline void StdVectorToIgraphVectorT(IN1 &vectR, igraph_vector_t *v)
     {
       size_t n = vectR.size();
 
@@ -63,7 +63,7 @@ namespace pylimer_tools
     }
 
     template <typename IN>
-    inline void igraphVectorTToStdVector(igraph_vector_t *v, IN &vectL)
+    static inline void igraphVectorTToStdVector(igraph_vector_t *v, IN &vectL)
     {
       long int n = igraph_vector_size(v);
 

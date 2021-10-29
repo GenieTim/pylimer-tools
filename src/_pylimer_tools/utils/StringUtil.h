@@ -10,7 +10,7 @@ namespace pylimer_tools
   namespace utils
   {
 
-    bool isUpper(std::string str)
+    static bool isUpper(std::string str)
     {
       for (int i = 0; i < str.length(); ++i)
       {
@@ -22,7 +22,7 @@ namespace pylimer_tools
       return true;
     }
 
-    inline bool contains(const std::string *haystack, const std::string needle) {
+    static inline bool contains(const std::string *haystack, const std::string needle) {
       return haystack->find(needle) != std::string::npos;
     }
   }
