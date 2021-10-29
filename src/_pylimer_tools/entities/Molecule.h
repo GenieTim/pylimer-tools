@@ -1,7 +1,7 @@
 #ifndef MOLECULE_H
 #define MOLECULE_H
 
-#include <igraph.h>
+#include <igraph/igraph.h>
 #include "Box.h"
 #include "Atom.h"
 #include <vector>
