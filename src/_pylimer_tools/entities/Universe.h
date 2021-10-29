@@ -22,15 +22,19 @@ namespace pylimer_tools
       std::vector<Molecule> getMolecules(const int atomTypeToOmit);
       std::vector<Molecule> getChainsWithCrosslinker(const int crosslinkerType);
       std::map<int, int> determineFunctionalityPerType();
+      template <typename OUT> 
+      std::vector<OUT> getPropertyValues(const char *propertyName);
       template <typename IN>
       long int findVertexIdForProperty(const char *propertyName, IN propertyValue);
       Atom getAtom(const int atomId);
       std::vector<Atom> getAtomsWithType(const int atomType);
       Atom getAtomByIdx(const int vertexIdx);
+      double getMeanStrandLength(int junctionType);
       void setBox(Box box);
       Box getBox();
       double getVolume();
       int getNrOfAtoms();
+      int getNrOfBonds();
 
     protected:
       // properties of the box

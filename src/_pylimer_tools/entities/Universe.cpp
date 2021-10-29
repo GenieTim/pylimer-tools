@@ -299,12 +299,7 @@ namespace pylimer_tools
         throw std::runtime_error("Failed to determine degree of vertices");
       }
 
-      igraph_vector_t typesVec;
-      igraph_vector_init(&typesVec, this->getNrOfAtoms());
-      VANV(&this->graph, "type", &typesVec);
-      std::vector<long int> types;
-      pylimer_tools::utils::igraphVectorTToStdVector(&typesVec, types);
-      igraph_vector_destroy(&typesVec);
+      std::vector<long int> types = this->getPropertyValues("type");
       std::vector<long int> uniqueTypes;
       copy(std::begin(types), std::end(types), std::back_inserter(uniqueTypes));
       auto uniqueTypesIter = std::unique(std::begin(types), std::end(types));
@@ -328,6 +323,47 @@ namespace pylimer_tools
       igraph_vs_destroy(&allVertexIds);
 
       return result;
+    }
+
+    /*
+    Compute the weight fractions of each atom type in the network.
+
+    Arguments:
+      - network: the poylmer network to do the computation for
+      - weightPerType: a dictionary with key: type, and value: weight per atom of this atom type. 
+
+    Returns:
+      - $\\vec{W_i}$ (dict): using the type i as a key, this dict contains the weight fractions ($\\frac{W_i}{W_{tot}}$)
+    */
+    std::map<int, double> computeWeightFractions(std::map<int, double> weightPerType)
+    {
+      std::map<int, double> partialMasses;
+      if (this->getNrOfAtoms() == 0)
+      {
+        return partialMasses;
+      }
+
+      std::vector<int> types = this->getPropertyValues("type");
+      double totalMass = 0.0;
+      for (int type : types)
+      {
+        totalMass += weightPerType[type];
+        partialMasses.try_emplace(type, 0.0);
+        partialMasses[type] += weightPerType[type];
+      }
+
+      if (totalMass == 0.0)
+      {
+        return partialMasses;
+      }
+
+      //  loop to turn partial masses into weight fractions
+      for (const auto &partialMassPair : partialMasses)
+      {
+        partialMasses[partialMassPair.first] = partialMassPair.second / totalMass;
+      }
+
+      return partialMasses;
     }
 
     Atom Universe::getAtom(const int atomId)
@@ -371,6 +407,32 @@ namespace pylimer_tools
       return -1;
     }
 
+    template <typename OUT>
+    std::vector<OUT> Universe::getPropertyValues(const char *propertyName)
+    {
+      igraph_vector_t allValues;
+      igraph_vector_init(&allValues, this->getNrOfAtoms());
+      VANV(&this->graph, propertyName, &allValues);
+      std::vector<OUT> results;
+      pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
+      igraph_vector_destroy(&allValues);
+      return results;
+    }
+
+    double getMeanStrandLength(int junctionType)
+    {
+      std::vector<Molecule> molecules = this->getMolecules(junctionType);
+
+      double multiplier = 1.0 / molecules.size();
+      double meanStrandLength = 0;
+
+      for (Molecule molecule : molecules)
+      {
+        meanStrandLength += molecule.getLength() * multiplier;
+      }
+      return meanStrandLength;
+    }
+
     double Universe::getVolume()
     {
       return this->box.getVolume();
@@ -379,6 +441,11 @@ namespace pylimer_tools
     int Universe::getNrOfAtoms()
     {
       return this->NAtoms;
+    }
+
+    int Universe::getNrOfBonds()
+    {
+      return this->NBonds;
     }
 
     void Universe::setBox(Box box)
