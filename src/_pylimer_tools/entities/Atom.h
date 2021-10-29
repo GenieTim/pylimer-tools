@@ -12,7 +12,7 @@ namespace pylimer_tools
     class Atom
     {
     public:
-      Atom(int id, int type, double x, double y, double z, int nx, int ny, int nz)
+      Atom(const int id, const int type, const double x, const double y, const double z, const int nx = 0, const int ny = 0, const int nz = 0)
       {
         this->id = id;
         this->type = type;

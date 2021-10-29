@@ -20,9 +20,14 @@ find_package(pybind11 CONFIG REQUIRED)
 # and other needed packages
 find_package(igraph CONFIG REQUIRED)
 
-pybind11_add_module(_pylimer_tools MODULE src/_pylimer_tools/pylimer_tools.cpp)
+add_subdirectory(src/_pylimer_tools)
+pybind11_add_module(_pylimer_tools MODULE src/_pylimer_tools/pybind11/entities.cpp)
 
-target_link_libraries(_pylimer_tools PRIVATE igraph)
+target_link_libraries(_pylimer_tools 
+    PRIVATE 
+      igraph
+      pylimer_tools
+  )
 target_compile_definitions(_pylimer_tools PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
 install(TARGETS _pylimer_tools LIBRARY DESTINATION pylimer_tools)

@@ -12,25 +12,20 @@ add_subdirectory(utils)
 add_subdirectory(entities)
 
 # add libraries
-include_directories(/usr/local/Cellar/igraph/0.9.4/include/)
-link_directories(/usr/local/Cellar/igraph/0.9.4/lib)
-link_directories(/usr/local/opt/igraph/lib/)
+if (DEFINED ADDITIONAL_INCLUDES)
+	include_directories(ADDITIONAL_INCLUDES)
+endif()
+
+if (DEFINED ADDITIONAL_LIBS)
+	link_directories(ADDITIONAL_LIBS)
+endif()
 
 # add the executable
 add_library(pylimer_tools pylimer_tools.cpp)
 set_target_properties(pylimer_tools PROPERTIES VERSION ${PROJECT_VERSION})
 
 # add other needed packages
-find_library(igraph SHARED IMPORTED)
 target_link_libraries(pylimer_tools 
 	PRIVATE
 		pylimer_entities
-	PUBLIC 
-		igraph
 )
-
-find_package(Boost REQUIRED)
-if(Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS})
-  target_link_libraries(pylimer_tools ${Boost_LIBRARIES})
-endif()
