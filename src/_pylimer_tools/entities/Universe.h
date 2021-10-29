@@ -22,6 +22,7 @@ namespace pylimer_tools
       std::vector<Molecule> getMolecules(const int atomTypeToOmit);
       std::vector<Molecule> getChainsWithCrosslinker(const int crosslinkerType);
       std::map<int, int> determineFunctionalityPerType();
+      std::map<int, double> computeWeightFractions(std::map<int, double> weightPerType);
       template <typename OUT> 
       std::vector<OUT> getPropertyValues(const char *propertyName);
       template <typename IN>

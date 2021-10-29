@@ -5,6 +5,7 @@
 #include "Box.h"
 #include "Atom.h"
 #include <vector>
+#include <string>
 
 namespace pylimer_tools
 {
@@ -29,14 +30,20 @@ namespace pylimer_tools
       int getLength();
       MoleculeType getType();
       Atom getAtomForVertexId(long int vertexIdx);
-      int getNumBonds();
-      Box* getBox();
+      std::vector<Atom> getAtomsWithType(const int atomType);
+      int getNrOfBonds();
+      int getNrOfAtoms();
+      Box *getBox();
+      std::string getKey();
+      template <typename OUT>
+      std::vector<OUT> getPropertyValues(const char *propertyName);
 
     private:
       Box *parent;
       MoleculeType typeOfThisMolecule;
       igraph_t *graph;
       int size;
+      std::string key;
     };
   }
 }

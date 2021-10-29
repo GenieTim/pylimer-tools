@@ -1,6 +1,8 @@
 #include "Molecule.h"
 #include "Atom.h"
 #include "../utils/GraphUtils.h"
+#include "../utils/StringUtil.h"
+#include <igraph/igraph.h>
 
 namespace pylimer_tools
 {
@@ -12,6 +14,16 @@ namespace pylimer_tools
       this->graph = graph;
       this->size = igraph_vcount(graph);
       this->typeOfThisMolecule = type;
+
+      // construct a key for this molecule: a concatenation of all ids in this molecule
+      igraph_vector_t allIds;
+      igraph_vector_init(&allIds, this->size);
+      VANV(this->graph, "id", &allIds);
+      std::vector<int> ids;
+      pylimer_tools::utils::igraphVectorTToStdVector(&allIds, ids);
+      igraph_vector_destroy(&allIds);
+      std::sort(ids.begin(), ids.end());
+      this->key = pylimer_tools::utils::join(ids.begin(), ids.end(), std::string("-"));
     };
 
     double Molecule::computeEndToEndDistance()
@@ -46,9 +58,9 @@ namespace pylimer_tools
 
     std::vector<double> Molecule::computeBondLengths()
     {
-      Box* box = this->getBox();
+      Box *box = this->getBox();
       std::vector<double> lengths;
-      lengths.reserve(this->getNumBonds());
+      lengths.reserve(this->getNrOfBonds());
       // construct iterator
       igraph_eit_t bondIterator;
       if (igraph_eit_create(this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &bondIterator))
@@ -85,13 +97,45 @@ namespace pylimer_tools
       return this->size;
     };
 
-    int Molecule::getNumBonds() { return igraph_ecount(this->graph); }
+    int Molecule::getNrOfAtoms() { return this->size; }
+
+    int Molecule::getNrOfBonds() { return igraph_ecount(this->graph); }
 
     MoleculeType Molecule::getType()
     {
       return this->typeOfThisMolecule;
     };
 
-    Box* Molecule::getBox() { return this->parent; }
+    Box *Molecule::getBox() { return this->parent; }
+
+    template <typename OUT>
+    std::vector<OUT> Molecule::getPropertyValues(const char *propertyName)
+    {
+      igraph_vector_t allValues;
+      igraph_vector_init(&allValues, this->getNrOfAtoms());
+      VANV(this->graph, propertyName, &allValues);
+      std::vector<OUT> results;
+      pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
+      igraph_vector_destroy(&allValues);
+      return results;
+    }
+
+    std::string Molecule::getKey() { return this->key; }
+
+    std::vector<Atom> Molecule::getAtomsWithType(const int atomType)
+    {
+      std::vector<int> types = this->getPropertyValues<int>("type");
+      std::vector<Atom> results;
+
+      for (int i = 0; i < types.size(); ++i)
+      {
+        if (types[i] == atomType)
+        {
+          results.push_back(this->getAtomForVertexId(i));
+        }
+      }
+
+      return results;
+    };
   }
 }

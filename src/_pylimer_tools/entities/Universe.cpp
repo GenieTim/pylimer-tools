@@ -299,8 +299,8 @@ namespace pylimer_tools
         throw std::runtime_error("Failed to determine degree of vertices");
       }
 
-      std::vector<long int> types = this->getPropertyValues("type");
-      std::vector<long int> uniqueTypes;
+      std::vector<int> types = this->getPropertyValues<int>("type");
+      std::vector<int> uniqueTypes;
       copy(std::begin(types), std::end(types), std::back_inserter(uniqueTypes));
       auto uniqueTypesIter = std::unique(std::begin(types), std::end(types));
       uniqueTypes.erase(uniqueTypesIter, uniqueTypes.end());
@@ -335,7 +335,7 @@ namespace pylimer_tools
     Returns:
       - $\\vec{W_i}$ (dict): using the type i as a key, this dict contains the weight fractions ($\\frac{W_i}{W_{tot}}$)
     */
-    std::map<int, double> computeWeightFractions(std::map<int, double> weightPerType)
+    std::map<int, double> Universe::computeWeightFractions(std::map<int, double> weightPerType)
     {
       std::map<int, double> partialMasses;
       if (this->getNrOfAtoms() == 0)
@@ -343,7 +343,7 @@ namespace pylimer_tools
         return partialMasses;
       }
 
-      std::vector<int> types = this->getPropertyValues("type");
+      std::vector<int> types = this->getPropertyValues<int>("type");
       double totalMass = 0.0;
       for (int type : types)
       {
@@ -419,7 +419,7 @@ namespace pylimer_tools
       return results;
     }
 
-    double getMeanStrandLength(int junctionType)
+    double Universe::getMeanStrandLength(int junctionType)
     {
       std::vector<Molecule> molecules = this->getMolecules(junctionType);
 

@@ -291,7 +291,7 @@ def computeMeanEndToEndVectors(networks: Iterable[Universum], crosslinkerType) -
 
     Returns:
       - endToEndVectors (dict): a dictionary with key: "{atom1.name}+{atom2.name}"
-          and value: their mean difference vector
+          and value: their mean distance difference vector
     """
     if (len(networks) == 0):
         return {}
