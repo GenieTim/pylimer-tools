@@ -1,9 +1,10 @@
 import unittest
-from test.pylimer_tools.universeUsingTestCase import UniverseUsingTestCase
 
+from pylimer_tools.pdComparingTestCase import PandasComparingTestCase
 import pandas as pd
 from pylimer_tools.calc.doMEHPAnalysis import *
 from pylimer_tools.entities.universum import Universum
+from tests.pylimer_tools.universeUsingTestCase import UniverseUsingTestCase
 
 
 class TestMEHPAnalysisFunctions(UniverseUsingTestCase):

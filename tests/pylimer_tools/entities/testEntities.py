@@ -1,6 +1,5 @@
 
 import unittest
-from test.pylimer_tools.universeUsingTestCase import UniverseUsingTestCase
 
 import igraph
 import numpy as np
@@ -11,6 +10,7 @@ from pylimer_tools.calc.calculateBondLen import (calculateBondLen,
 from pylimer_tools.entities.atom import Atom
 from pylimer_tools.entities.molecule import Molecule
 from pylimer_tools.entities.universum import Universum
+from tests.pylimer_tools.universeUsingTestCase import UniverseUsingTestCase
 
 
 class TestEntities(UniverseUsingTestCase):

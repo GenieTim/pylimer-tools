@@ -6,6 +6,7 @@
 #include "../utils/DataFileParser.h"
 #include "../utils/DumpFileParser.h"
 #include <boost/algorithm/string.hpp>
+#include "../utils/VectorUtils.h"
 
 namespace pylimer_tools
 {
@@ -40,22 +41,39 @@ namespace pylimer_tools
         double xMultiplier = 1.0;
         double yMultiplier = 1.0;
         double zMultiplier = 1.0;
-        if (!dumpFileParser.keyHasDirectionalColumn("ATOMS", "", "") && dumpFileParser.keyHasDirectionalColumn("ATOMS", "", "su"))
+        bool isUnwrapped = false;
+        if (!dumpFileParser.keyHasDirectionalColumn("ATOMS", "", ""))
         {
-          positionSuffix = "su";
-          xMultiplier = newUniverse.getBox().getLx();
-          yMultiplier = newUniverse.getBox().getLy();
-          zMultiplier = newUniverse.getBox().getLz();
-        }
-        else
-        {
-          throw std::runtime_error("Did not find neighter 'x' nor 'xsu' fields in atom data of dump file");
+          if (dumpFileParser.keyHasDirectionalColumn("ATOMS", "", "u"))
+          {
+            isUnwrapped = true;
+            positionSuffix = "u";
+          }
+          else
+          {
+            xMultiplier = newUniverse.getBox().getLx();
+            yMultiplier = newUniverse.getBox().getLy();
+            zMultiplier = newUniverse.getBox().getLz();
+            if (dumpFileParser.keyHasDirectionalColumn("ATOMS", "", "su"))
+            {
+              positionSuffix = "su";
+              isUnwrapped = true;
+            }
+            else if (dumpFileParser.keyHasDirectionalColumn("ATOMS", "", "s"))
+            {
+              positionSuffix = "s";
+            }
+            else
+            {
+              throw std::runtime_error("Did not find neighter 'x' nor 'xsu' fields in atom data of dump file");
+            }
+          }
         }
 
         std::vector<double> positionsX = dumpFileParser.getValuesForAt<double>(i, "ATOMS", "x" + positionSuffix);
         std::vector<double> positionsY = dumpFileParser.getValuesForAt<double>(i, "ATOMS", "y" + positionSuffix);
         std::vector<double> positionsZ = dumpFileParser.getValuesForAt<double>(i, "ATOMS", "z" + positionSuffix);
-        if (xMultiplier != 1.0)
+        if (xMultiplier != 1.0 && yMultiplier != 1.0 && zMultiplier != 1.0)
         {
           for (size_t i = 0; i < positionsZ.size(); ++i)
           {
@@ -69,17 +87,17 @@ namespace pylimer_tools
         std::vector<int> ny;
         std::vector<int> nz;
 
-        if (dumpFileParser.keyHasDirectionalColumn("ATOMS", "n", ""))
+        if (dumpFileParser.keyHasDirectionalColumn("ATOMS", "i", ""))
         {
-          nx = dumpFileParser.getValuesForAt<int>(i, "ATOMS", "nx");
-          ny = dumpFileParser.getValuesForAt<int>(i, "ATOMS", "ny");
-          nz = dumpFileParser.getValuesForAt<int>(i, "ATOMS", "nz");
+          nx = dumpFileParser.getValuesForAt<int>(i, "ATOMS", "ix");
+          ny = dumpFileParser.getValuesForAt<int>(i, "ATOMS", "iy");
+          nz = dumpFileParser.getValuesForAt<int>(i, "ATOMS", "iz");
         }
         else
         {
-          nx = dataFileParser.getAtomNx();
-          ny = dataFileParser.getAtomNy();
-          nz = dataFileParser.getAtomNz();
+          nx = pylimer_tools::utils::initializeWithValue(dataFileParser.getNrOfAtoms(), 0); //dataFileParser.getAtomNx();
+          ny = pylimer_tools::utils::initializeWithValue(dataFileParser.getNrOfAtoms(), 0); //dataFileParser.getAtomNy();
+          nz = pylimer_tools::utils::initializeWithValue(dataFileParser.getNrOfAtoms(), 0); //dataFileParser.getAtomNz();
         }
 
         newUniverse.addAtoms(
