@@ -7,17 +7,16 @@ import unittest
 import numpy as np
 import pandas as pd
 import pandas.testing as pd_testing
+from pylimer_tools.pdComparingTestCase import PandasComparingTestCase
 from pylimer_tools.utils.cacheUtility import (doCache, getCacheFileName,
                                               loadCache)
 from pylimer_tools.utils.getMolecules import getMolecules
 from pylimer_tools.utils.getTail import getTail
 from pylimer_tools.utils.unifyDataStepsizes import unifyDataStepsizes
-from test.pdComparingTestCase import PandasComparingTestCase
 
 
 class TestUtilFunctions(PandasComparingTestCase):
 
-    
     def test_getTail(self):
         testDf = pd.DataFrame([
             {"a": 1, "b": 2, "c": 3},

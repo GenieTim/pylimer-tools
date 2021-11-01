@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 
-from test.pdComparingTestCase import PandasComparingTestCase
+from pylimer_tools.pdComparingTestCase import PandasComparingTestCase
 from pylimer_tools.utils.optimizeDf import *
 
 class TestOptimizeDf(PandasComparingTestCase):

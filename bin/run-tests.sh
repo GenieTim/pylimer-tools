@@ -2,11 +2,14 @@
 
 cd "$(dirname "$0")/.." || exit 2
 
+# build/install project
 python -m pip install --verbose . || exit 3
 
-python -m coverage run -m unittest discover -v || exit 4
+cd "$(dirname "$0")/../tests" || exit 4
 
-cd "$(dirname "$0")/../src" || exit 5
+# run tests
+python -m coverage run -m unittest discover -v || exit 5
 
-# python -m coverage report --include="pylimer_tools/**/*.py"
-python -m coverage html --include="pylimer_tools/**/*.py" -d ../coverage.html
+# generate coverage report
+python -m coverage report --include="pylimer_tools/**/*.py"
+# python -m coverage html --include="pylimer_tools/**/*.py" -d ../coverage.html

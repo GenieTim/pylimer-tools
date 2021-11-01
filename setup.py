@@ -19,7 +19,7 @@ setup(
     author="Tim Bernhard",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
-    cmake_install_dir="src/pylimer_tools",
+    cmake_install_dir="src/_pylimer_tools",
     cmake_args=[
         
     ],

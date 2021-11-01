@@ -11,10 +11,9 @@ using namespace pylimer_tools::entities;
 
 PYBIND11_MODULE(pylimer_tools, m)
 {
-  m.def("predictGelationPoint", &predictGelationPoint);
-  m.def("computeExtentOfReaction", &computeExtentOfReaction);
-  m.def("computeStoichiometricInbalance", &computeStoichiometricInbalance);
-  
+  m.def("mmt.predictGelationPoint", &predictGelationPoint);
+  m.def("mmt.computeExtentOfReaction", &computeExtentOfReaction);
+  m.def("mmt.computeStoichiometricInbalance", &computeStoichiometricInbalance);
 }
 
 #endif /* PYBIND_CALC_H */

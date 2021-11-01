@@ -1,6 +1,5 @@
 import os
 import unittest
-from test.pdComparingTestCase import PandasComparingTestCase
 
 import pandas as pd
 from pylimer_tools.io.extractThermoParams import (extractThermoParams,
@@ -9,6 +8,7 @@ from pylimer_tools.io.readLammpData import readLammpData
 from pylimer_tools.io.readLammpDump import readLammpDump
 from pylimer_tools.utils.cacheUtility import getCacheFileName
 from pylimer_tools.utils.optimizeDf import reduce_mem_usage
+from pylimer_tools.pdComparingTestCase import PandasComparingTestCase
 
 
 class TestFileReader(PandasComparingTestCase):

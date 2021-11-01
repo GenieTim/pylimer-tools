@@ -14,7 +14,7 @@ namespace pylimer_tools
   {
     template <typename IN>
     static inline std::vector<IN> interleave(std::vector<IN> in1,
-                                      std::vector<IN> in2)
+                                             std::vector<IN> in2)
     {
       assert(in1.size() == in2.size());
       std::vector<IN> out(in1.size() + in2.size());
@@ -73,6 +73,18 @@ namespace pylimer_tools
       {
         vectL[i] = igraph_vector_e(v, i);
       }
+    }
+
+    template <typename IN>
+    static inline std::vector<IN> initializeWithValue(int n, IN value)
+    {
+      std::vector<IN> result;
+      result.reserve(n);
+      for (int i = 0; i < n; ++i)
+      {
+        result.push_back(value);
+      }
+      return result;
     }
   }
 }

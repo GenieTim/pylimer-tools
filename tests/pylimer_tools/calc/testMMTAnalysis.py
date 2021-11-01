@@ -1,8 +1,8 @@
 
-from test.pylimer_tools.universeUsingTestCase import UniverseUsingTestCase
 
 from pylimer_tools.calc.doMMTAnalysis import *
 from pylimer_tools.entities.universum import Universum
+from tests.pylimer_tools.universeUsingTestCase import UniverseUsingTestCase
 
 
 class TestMMTAnalysisFunctions(UniverseUsingTestCase):
