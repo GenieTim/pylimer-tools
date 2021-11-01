@@ -1,3 +1,6 @@
+#ifndef MMT_ANALYSIS_H
+#define MMT_ANALYSIS_H
+
 #include "../entities/Universe.h"
 
 namespace pylimer_tools
@@ -118,3 +121,5 @@ namespace pylimer_tools
     }
   }
 }
+
+#endif

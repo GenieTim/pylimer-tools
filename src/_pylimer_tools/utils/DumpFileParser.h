@@ -76,7 +76,6 @@ namespace pylimer_tools
     void DumpFileParser::read(const std::string filePath)
     {
       char *cline = NULL;
-      char *eof;
 
       size_t len = 0;
 
@@ -144,8 +143,6 @@ namespace pylimer_tools
       boost::tokenizer<> tok(headerToClean);
       std::string newHeader = "";
       std::vector<std::string> columns;
-      int iteration = 0;
-      int key = 0;
       for (boost::tokenizer<>::iterator beg = tok.begin(); beg != tok.end(); ++beg)
       {
         if (isUpper(*beg))

@@ -65,7 +65,7 @@ namespace pylimer_tools
     template <typename IN>
     static inline void igraphVectorTToStdVector(igraph_vector_t *v, IN &vectL)
     {
-      long int n = igraph_vector_size(v);
+      size_t n = igraph_vector_size(v);
 
       vectL.reserve(n);
 
