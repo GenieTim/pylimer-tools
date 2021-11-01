@@ -19,8 +19,6 @@ namespace pylimer_tools
       igraph_set_attribute_table(&igraph_cattribute_table);
       igraph_vector_t gtypes, vtypes, etypes;
       igraph_strvector_t gnames, vnames, enames;
-      igraph_vector_t vec;
-      igraph_strvector_t svec;
 
       igraph_vector_init(&gtypes, 0);
       igraph_vector_init(&vtypes, 0);

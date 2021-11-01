@@ -12,8 +12,10 @@
 namespace py = pybind11;
 using namespace pylimer_tools::entities;
 
-PYBIND11_MODULE(_pylimer_tools, m)
+PYBIND11_MODULE(pylimer_entities, m)
 {
+    m.doc() = "A collection of utility python functions for handling LAMMPS output and polymers in Python.";
+    
     py::class_<Box>(m, "Box")
         .def(py::init<const double, const double, const double>())
         .def("getVolume", &Box::getVolume)

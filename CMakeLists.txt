@@ -1,5 +1,19 @@
 cmake_minimum_required(VERSION 3.15.0)
 project(pylimer_tools VERSION "0.1.0")
+
+# specify the C++ standard
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Ofast")
+
+# prepare python bindings
 find_package(PythonExtensions REQUIRED)
 
 if(SKBUILD)
@@ -31,14 +45,24 @@ if(Boost_FOUND)
   include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
+# add sources & targets
 add_subdirectory(src/_pylimer_tools)
-pybind11_add_module(_pylimer_tools MODULE src/_pylimer_tools/pybind11/entities.cpp)
+pybind11_add_module(pylimer_bound_entities MODULE src/_pylimer_tools/pybind11/entities.cpp)
+pybind11_add_module(pylimer_bound_calc MODULE src/_pylimer_tools/pybind11/calculations.cpp)
 
-target_link_libraries(_pylimer_tools 
+target_link_libraries(pylimer_bound_entities 
     PRIVATE 
       igraph
       pylimer_tools
   )
-target_compile_definitions(_pylimer_tools PRIVATE VERSION_INFO=${PROJECT_VERSION})
+target_compile_definitions(pylimer_bound_entities PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
-install(TARGETS _pylimer_tools LIBRARY DESTINATION pylimer_tools)
+target_link_libraries(pylimer_bound_calc 
+    PRIVATE 
+      igraph
+      pylimer_tools
+  )
+target_compile_definitions(pylimer_bound_calc PRIVATE VERSION_INFO=${PROJECT_VERSION})
+
+install(TARGETS pylimer_bound_entities LIBRARY DESTINATION .)
+install(TARGETS pylimer_bound_calc LIBRARY DESTINATION .)

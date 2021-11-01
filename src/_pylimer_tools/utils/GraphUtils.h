@@ -16,7 +16,7 @@ namespace pylimer_tools
     {
       int graphSize = igraph_vcount(graph);
       igraph_vector_t degrees;
-      if (igraph_vector_init(&degrees, 0))
+      if (igraph_vector_init(&degrees, graphSize))
       {
         throw std::runtime_error("Failed to instantiate result vector.");
       }

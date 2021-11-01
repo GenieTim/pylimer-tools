@@ -12,7 +12,7 @@ namespace pylimer_tools
 
     static bool isUpper(std::string str)
     {
-      for (int i = 0; i < str.length(); ++i)
+      for (size_t i = 0; i < str.length(); ++i)
       {
         if (!std::isupper(str[i]))
         {
