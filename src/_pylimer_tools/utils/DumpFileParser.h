@@ -202,6 +202,19 @@ namespace pylimer_tools
 
       return result;
     };
+
+    bool DumpFileParser::shortenLineToSkip(std::string *line)
+    {
+      boost::trim_left(*line);
+      // trim comments
+      if (contains(line, "#"))
+      {
+        std::vector<std::string> split;
+        boost::split(split, *line, boost::is_any_of("#"));
+        line = &split[0];
+      }
+      return line->compare("");
+    }
   }
 }
 

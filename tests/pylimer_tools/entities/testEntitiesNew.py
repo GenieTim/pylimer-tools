@@ -5,7 +5,7 @@ import igraph
 import numpy as np
 import pandas as pd
 import pandas.testing as pd_testing
-from pylimer_tools import Universe
+from _pylimer_tools import Universe
 
 class TestEntitiesNew(unittest.TestCase):
 

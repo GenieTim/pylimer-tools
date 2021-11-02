@@ -3,6 +3,8 @@
 
 #include <map>
 #include <string>
+#include <array>
+#include <algorithm>
 #include "../entities/Universe.h"
 #include "../entities/UniverseSequence.h"
 #include "../entities/Molecule.h"
@@ -54,7 +56,9 @@ namespace pylimer_tools
           {
             crosslinkers[1].vectorTo(crosslinkers[0], &box, distanceVec);
           }
-          result.insert_or_assign(chain.getKey(), distanceVec);
+          position_vec_t distanceVecT;
+          std::copy_n(std::begin(distanceVec), 3, std::begin(distanceVecT));
+          result.insert_or_assign(chain.getKey(), distanceVecT);
         }
 
         return result;
@@ -91,7 +95,9 @@ namespace pylimer_tools
           {
             if (!result.contains(key))
             {
-              result.insert_or_assign(key, position_vec_t{0.0, 0.0, 0.0});
+              position_vec_t zeroPosition;
+              zeroPosition.fill(0.0);
+              result.insert_or_assign(key, zeroPosition);
             }
             for (int j = 0; j < 3; j++)
             {

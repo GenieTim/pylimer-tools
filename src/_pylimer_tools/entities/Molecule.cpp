@@ -3,6 +3,7 @@
 #include "../utils/GraphUtils.h"
 #include "../utils/StringUtil.h"
 #include <igraph/igraph.h>
+#include <iostream>
 
 namespace pylimer_tools
 {
@@ -16,14 +17,25 @@ namespace pylimer_tools
       this->typeOfThisMolecule = type;
 
       // construct a key for this molecule: a concatenation of all ids in this molecule
+      if (!igraph_cattribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, "id"))
+      {
+        throw std::runtime_error("Molecule's graph does not have attribute id");
+      }
       igraph_vector_t allIds;
       igraph_vector_init(&allIds, this->size);
       VANV(this->graph, "id", &allIds);
+      if (igraph_cattribute_VANV(this->graph, "id", igraph_vss_all(), &allIds))
+      {
+        throw std::runtime_error("Molecule's graph's attribute id is not accessible.");
+      };
       std::vector<int> ids;
       pylimer_tools::utils::igraphVectorTToStdVector(&allIds, ids);
-      igraph_vector_destroy(&allIds);
+      if (ids.size() == 0 && this->size > 0) {
+        throw std::runtime_error("Molecule's graph's attribute id was not queried.");
+      }
       std::sort(ids.begin(), ids.end());
       this->key = pylimer_tools::utils::join(ids.begin(), ids.end(), std::string("-"));
+      igraph_vector_destroy(&allIds);
     };
 
     double Molecule::computeEndToEndDistance()
@@ -36,7 +48,7 @@ namespace pylimer_tools
       igraph_vit_t vit;
       igraph_vit_create(graph, endNodes, &vit);
 
-      double distance;
+      double distance = -1.0; // TODO: find a nice default for "no end to end"
       Box *box = this->getBox();
 
       // we only compute an end-to-end distance if we have exactly two ends.
@@ -127,7 +139,7 @@ namespace pylimer_tools
       std::vector<int> types = this->getPropertyValues<int>("type");
       std::vector<Atom> results;
 
-      for (int i = 0; i < types.size(); ++i)
+      for (size_t i = 0; i < types.size(); ++i)
       {
         if (types[i] == atomType)
         {

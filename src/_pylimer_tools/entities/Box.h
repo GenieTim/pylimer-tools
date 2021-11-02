@@ -5,6 +5,7 @@ namespace pylimer_tools
 {
   namespace entities
   {
+    // TODO: currently, this way, no tilt or more complicated boxes etc. is supported
     class Box
     {
     public:
