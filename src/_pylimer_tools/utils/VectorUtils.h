@@ -57,21 +57,21 @@ namespace pylimer_tools
       /* Copy all the items */
       for (size_t i = 0; i < n; ++i)
       {
-        VECTOR(*v)
-        [i] = vectR[i];
+        igraph_vector_set(v, i, vectR[i]);
       }
     }
 
     template <typename IN>
-    static inline void igraphVectorTToStdVector(igraph_vector_t *v, IN &vectL)
+    static inline void igraphVectorTToStdVector(igraph_vector_t *v, std::vector<IN> &vectL)
     {
       size_t n = igraph_vector_size(v);
 
+      vectL.clear();
       vectL.reserve(n);
 
       for (size_t i = 0; i < n; ++i)
       {
-        vectL[i] = igraph_vector_e(v, i);
+        vectL.push_back(igraph_vector_e(v, i));
       }
     }
 

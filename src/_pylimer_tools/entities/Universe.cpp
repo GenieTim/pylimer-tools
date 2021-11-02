@@ -2,10 +2,12 @@
 #include "../utils/VectorUtils.h"
 #include "../utils/GraphUtils.h"
 #include "Box.h"
+#include <igraph/igraph.h>
 
 #include <vector>
 #include <map>
 #include <iterator> // for back_inserter
+#include <algorithm>
 
 namespace pylimer_tools
 {
@@ -14,9 +16,11 @@ namespace pylimer_tools
 
     Universe::Universe(const double Lx, const double Ly, const double Lz)
     {
-      box = Box(Lx, Ly, Lz);
-      /* turn on attribute handling: TODO: move to some main() function  */
       igraph_set_attribute_table(&igraph_cattribute_table);
+      box = Box(Lx, Ly, Lz);
+
+      /* turn on attribute handling: TODO: move to some main() function  */
+      // igraph_set_attribute_table(&igraph_cattribute_table);
       igraph_vector_t gtypes, vtypes, etypes;
       igraph_strvector_t gnames, vnames, enames;
 
@@ -35,11 +39,11 @@ namespace pylimer_tools
                              &enames, &etypes);
     }
 
-    void Universe::addAtoms(const int NNewAtoms, std::vector<long int> newIds, std::vector<int> newTypes, std::vector<double> newX, std::vector<double> newY, std::vector<double> newZ, std::vector<int> newNx, std::vector<int> newNy, std::vector<int> newNz)
+    void Universe::addAtoms(const size_t NNewAtoms, std::vector<long int> newIds, std::vector<int> newTypes, std::vector<double> newX, std::vector<double> newY, std::vector<double> newZ, std::vector<int> newNx, std::vector<int> newNy, std::vector<int> newNz)
     {
       if (newTypes.size() != NNewAtoms || newIds.size() != newTypes.size() || newX.size() != newNx.size() || newY.size() != newNy.size() || newZ.size() != newNz.size() || newX.size() != newY.size() || NNewAtoms != newZ.size())
       {
-        throw std::invalid_argument("All inputs must have the same size.");
+        throw std::invalid_argument("All atom inputs must have the same size.");
       }
       // actually add the vertices
       if (igraph_add_vertices(&this->graph, NNewAtoms, 0))
@@ -47,7 +51,7 @@ namespace pylimer_tools
         throw std::runtime_error("Failed to add new atoms to graph.");
       }
       // do map for easy access afterwards
-      for (int i = 0; i < NNewAtoms; ++i)
+      for (size_t i = 0; i < NNewAtoms; ++i)
       {
         this->atomIdToVectorIdx[newIds[i]] = this->NAtoms + i;
         // append attributes
@@ -63,26 +67,32 @@ namespace pylimer_tools
       this->NAtoms += NNewAtoms;
     }
 
-    void Universe::addBonds(const int NNewBonds, std::vector<long int> from, std::vector<long int> to)
+    void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from, std::vector<long int> to)
     {
       if (from.size() != to.size() || from.size() != NNewBonds)
       {
-        throw std::invalid_argument("All inputs must have the same size");
+        throw std::invalid_argument("All bond inputs must have the same size.");
       }
       std::vector<long int> newEdgesVector = pylimer_tools::utils::interleave(from, to);
       // translate from atomId to VertexIdx
-      for (int i = 0; i < newEdgesVector.size(); ++i)
+      size_t edgesSize = newEdgesVector.size();
+      for (size_t i = 0; i < edgesSize; ++i)
       {
-        newEdgesVector[i] = this->atomIdToVectorIdx[i];
+        newEdgesVector[i] = this->atomIdToVectorIdx[newEdgesVector[i]];
       }
       // add the new edges
       igraph_vector_t newEdges;
+      igraph_vector_init(&newEdges, edgesSize);
       pylimer_tools::utils::StdVectorToIgraphVectorT(newEdgesVector, &newEdges);
       if (igraph_add_edges(&this->graph, &newEdges, 0))
       {
         throw std::runtime_error("Failed to add edges to graph.");
       }
       this->NBonds += NNewBonds;
+      igraph_attribute_combination_t comb;
+      igraph_attribute_combination_init(&comb);
+      igraph_simplify(&this->graph, /*multiple=*/1, /*loops=*/1, &comb);
+      igraph_attribute_combination_destroy(&comb);
     }
 
     std::vector<Molecule> Universe::getMolecules(const int atomTypeToOmit)
@@ -98,26 +108,49 @@ namespace pylimer_tools
       {
         throw std::runtime_error("Failed to copy graph.");
       }
+
+      if (this->getNrOfAtoms() > 0 && !igraph_cattribute_has_attr(&graphWithoutCrosslinkers, IGRAPH_ATTRIBUTE_VERTEX, "id"))
+      {
+        throw std::runtime_error("Need to implement custom copy routine for attributes");
+      }
+
       // select vertices of type
       std::vector<long int> indicesToRemove = this->getIndicesOfType(atomTypeToOmit);
-      igraph_vs_t verticesToRemove = this->getVerticesByIndices(indicesToRemove);
-      // remove elements of type
-      if (igraph_delete_vertices(&graphWithoutCrosslinkers, verticesToRemove))
+      std::sort(indicesToRemove.rbegin(), indicesToRemove.rend());
+      if (indicesToRemove.size() > 0)
       {
-        throw std::runtime_error("Failed to delete crosslinkers from graph.");
+        igraph_vs_t verticesToRemove = this->getVerticesByIndices(indicesToRemove);
+
+        // remove elements of type
+        if (igraph_delete_vertices(&graphWithoutCrosslinkers, verticesToRemove))
+        {
+          throw std::runtime_error("Failed to delete crosslinkers from graph.");
+        }
+
+        igraph_vs_destroy(&verticesToRemove);
       }
+
       // split the copy into the separate components
       igraph_vector_ptr_t components;
-      igraph_vector_ptr_init(&components, 3);
-      int NComponents = igraph_decompose(&graphWithoutCrosslinkers, &components, IGRAPH_STRONG, -1, 0);
+      igraph_vector_ptr_init(&components, this->getNrOfAtoms());
+      if (igraph_decompose(&graphWithoutCrosslinkers, &components, IGRAPH_WEAK, -1, 0))
+      {
+        throw std::runtime_error("Failed to decompose graph.");
+      }
+      size_t NComponents = igraph_vector_ptr_size(&components);
+      // std::cout << NComponents << " molecules found. Removed " << indicesToRemove.size()
+      //           << " vertices. Size now: " << igraph_vcount(&graphWithoutCrosslinkers) << std::endl;
       molecules.reserve(NComponents);
-      for (int i = 0; i < NComponents; ++i)
+      for (size_t i = 0; i < NComponents; ++i)
       {
         igraph_t *g = (igraph_t *)VECTOR(components)[i];
 
-        molecules.push_back(Molecule(&this->box, g, MoleculeType::UNDEFINED));
+        if (igraph_vcount(g))
+        {
+          molecules.push_back(Molecule(&this->box, g, MoleculeType::UNDEFINED));
+        }
       }
-      igraph_decompose_destroy(&components);
+      // igraph_decompose_destroy(&components);
       igraph_destroy(&graphWithoutCrosslinkers);
       return molecules;
     }
@@ -133,7 +166,12 @@ namespace pylimer_tools
       igraph_vector_t indicesToSelect;
       igraph_vector_init(&indicesToSelect, indices.size());
       pylimer_tools::utils::StdVectorToIgraphVectorT(indices, &indicesToSelect);
-      return igraph_vss_vector(&indicesToSelect);
+      igraph_vs_t result;
+      if (igraph_vs_vector_copy(&result, &indicesToSelect))
+      {
+        throw std::runtime_error("Failed to select vertices");
+      }
+      return result;
     }
 
     std::vector<long int> Universe::getIndicesOfType(const int type)
@@ -175,9 +213,13 @@ namespace pylimer_tools
       // split the copy into the separate
       igraph_vector_ptr_t components;
       igraph_vector_ptr_init(&components, 3);
-      int NComponents = igraph_decompose(&graphWithoutCrosslinkers, &components, IGRAPH_STRONG, -1, 0);
+      if (igraph_decompose(&graphWithoutCrosslinkers, &components, IGRAPH_STRONG, -1, 0))
+      {
+        throw std::runtime_error("Failed to decompose graph.");
+      }
+      size_t NComponents = igraph_vector_ptr_size(&components);
       molecules.reserve(NComponents);
-      for (int i = 0; i < NComponents; ++i)
+      for (size_t i = 0; i < NComponents; ++i)
       {
         // loop the chains to add the crosslinkers back
         igraph_t *chain = (igraph_t *)VECTOR(components)[i];
@@ -449,6 +491,11 @@ namespace pylimer_tools
     void Universe::setBox(Box box)
     {
       this->box = box;
+    }
+
+    void Universe::setBoxLengths(const double Lx, const double Ly, const double Lz)
+    {
+      this->setBox(Box(Lx, Ly, Lz));
     }
 
     Box Universe::getBox() { return this->box; }
