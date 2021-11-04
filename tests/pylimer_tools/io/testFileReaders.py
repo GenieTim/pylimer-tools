@@ -2,7 +2,7 @@ import os
 import unittest
 
 import pandas as pd
-from _pylimer_tools import Universe, UniverseSequence
+from pylimer_tools_cpp import Universe, UniverseSequence
 from pylimer_tools.io.extractThermoParams import (extractThermoParams,
                                                   getThermoCacheNameSuffix)
 from pylimer_tools.io.readLammpData import readLammpData

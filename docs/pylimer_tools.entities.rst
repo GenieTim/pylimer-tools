@@ -4,15 +4,6 @@ pylimer\_tools.entities package
 Submodules
 ----------
 
-pylimer\_tools.entities.\_graphDecorator module
------------------------------------------------
-
-.. automodule:: pylimer_tools.entities._graphDecorator
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :private-members:
-
 pylimer\_tools.entities.atom module
 -----------------------------------
 
@@ -20,7 +11,6 @@ pylimer\_tools.entities.atom module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 pylimer\_tools.entities.dumpFileUniverseSequence module
 -------------------------------------------------------
@@ -29,7 +19,6 @@ pylimer\_tools.entities.dumpFileUniverseSequence module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 pylimer\_tools.entities.lazyUniverseDataFilesSequence module
 ------------------------------------------------------------
@@ -38,7 +27,6 @@ pylimer\_tools.entities.lazyUniverseDataFilesSequence module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 pylimer\_tools.entities.molecule module
 ---------------------------------------
@@ -47,7 +35,6 @@ pylimer\_tools.entities.molecule module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 pylimer\_tools.entities.universum module
 ----------------------------------------
@@ -56,7 +43,6 @@ pylimer\_tools.entities.universum module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 Module contents
 ---------------
@@ -65,4 +51,3 @@ Module contents
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:

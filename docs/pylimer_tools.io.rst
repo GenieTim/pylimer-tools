@@ -11,7 +11,6 @@ pylimer\_tools.io.extractThermoParams module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 pylimer\_tools.io.readLammpData module
 --------------------------------------
@@ -20,7 +19,6 @@ pylimer\_tools.io.readLammpData module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 pylimer\_tools.io.readLammpDump module
 --------------------------------------
@@ -29,7 +27,6 @@ pylimer\_tools.io.readLammpDump module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 Module contents
 ---------------
@@ -38,4 +35,3 @@ Module contents
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:

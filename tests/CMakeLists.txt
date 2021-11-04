@@ -39,7 +39,7 @@ if(Boost_FOUND)
 endif()
 
 # add sources & targets
-add_subdirectory(../src/_pylimer_tools pylimer_tools.out)
+add_subdirectory(../src/pylimer_tools_cpp pylimer_tools.out)
 
 add_library(test_sources 
 	OBJECT 

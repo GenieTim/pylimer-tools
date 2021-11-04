@@ -1,9 +1,9 @@
 #include <catch2/catch_test_macros.hpp>
-#include "../../src/_pylimer_tools/entities/UniverseSequence.h"
-#include "../../src/_pylimer_tools/entities/Universe.h"
-#include "../../src/_pylimer_tools/entities/Molecule.h"
-#include "../../src/_pylimer_tools/entities/Atom.h"
-#include "../../src/_pylimer_tools/entities/Box.h"
+#include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
+#include "../../src/pylimer_tools_cpp/entities/Universe.h"
+#include "../../src/pylimer_tools_cpp/entities/Molecule.h"
+#include "../../src/pylimer_tools_cpp/entities/Atom.h"
+#include "../../src/pylimer_tools_cpp/entities/Box.h"
 #include <iostream>
 #include <string>
 #include <filesystem>
