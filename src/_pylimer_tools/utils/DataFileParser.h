@@ -10,6 +10,7 @@
 #include <boost/tokenizer.hpp>
 #include <boost/algorithm/string.hpp>
 #include <map>
+#include <filesystem>
 
 namespace pylimer_tools
 {
@@ -49,20 +50,33 @@ namespace pylimer_tools
 
     private:
       bool shortenLineToSkip(std::string *line);
+      bool shortenLineToSkip(char *line);
       void readNs(const std::string line);
       void readMass(const std::string line);
       void readAtom(std::string line);
       void readBond(std::string line);
       void skipEmptyLines(char *cline, size_t *len, FILE *fp);
-      void skipLinesTo(char *cline, size_t *len, FILE *fp, std::string upTo);
+      void skipLinesToContains(char *cline, size_t *len, FILE *fp, std::string upTo);
 
-      template <typename IN>
-      inline std::vector<IN> parseTypeInLine(std::string line)
+      template <typename OUT>
+      inline std::vector<OUT> parseTypeInLine(const std::string line, int nToRead)
       {
-        std::vector<IN> resultnumbers;
-        boost::tokenizer<> tok(line);
-        std::transform(tok.begin(), tok.end(), std::back_inserter(resultnumbers),
-                       &boost::lexical_cast<IN, std::string>);
+        typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+        boost::char_separator<char> sep{" ,;\t\n"};
+        std::vector<OUT> resultnumbers;
+        tokenizer tok{line, sep};
+        int iteration = 0;
+        for (tokenizer::iterator it = tok.begin(); it != tok.end(); ++it)
+        {
+          // we are only interested in the first value.
+          // also, we cannot cast the strings that follow
+          resultnumbers.push_back(boost::lexical_cast<OUT>(*it));
+          ++iteration;
+          if (iteration == nToRead)
+          {
+            break;
+          }
+        }
         return resultnumbers;
       }
 
@@ -97,20 +111,18 @@ namespace pylimer_tools
 
     void DataFileParser::read(const std::string filePath)
     {
+      if (!std::filesystem::exists(filePath))
+      {
+        throw std::invalid_argument("File to read (" + filePath + ") does not exist.");
+      }
       char *cline = NULL;
-      char *eof;
 
       size_t len = 0;
 
       FILE *fp = fopen(filePath.c_str(), "r");
       if (fp == NULL)
-        throw std::runtime_error("Failed to open data file to read.");
-
-      // skip 1st line of file
-      eof = fgets(cline, 256, fp);
-      if (eof == nullptr)
       {
-        throw std::runtime_error("Unexpected end of molecule file");
+        throw std::runtime_error("Failed to open data file to read.");
       }
 
       // read everything until "Masses"
@@ -122,7 +134,7 @@ namespace pylimer_tools
         {
           continue;
         }
-        //
+        // read up until the masses
         if (line.find("Masses") != std::string::npos)
         {
           break;
@@ -148,50 +160,75 @@ namespace pylimer_tools
       this->bondFrom.reserve(this->nBonds);
       this->bondTo.reserve(this->nBonds);
 
-      // Then, read masses, up until the next section ("atoms")
+      // skip empty lines plus the line with "Masses"
       while ((getline(&cline, &len, fp)) != -1)
       {
         std::string line(cline);
 
         // skip empty lines
+        if (!this->shortenLineToSkip(&line))
+        {
+          break;
+        }
+      }
+
+      // Then, read masses, up until the next section ("atoms")
+      do
+      {
+        std::string line(cline);
+
+        // break at empty lines
         if (this->shortenLineToSkip(&line))
         {
-          continue;
+          break;
         }
-        // read masses until atoms
+        // read masses until e.g. atoms section
         if (line.find("Atoms") != std::string::npos)
         {
           break;
         }
-        // read the nr of data points to read afterwards
+        // read the mass...
         this->readMass(line);
-      }
+      } while ((getline(&cline, &len, fp)) != -1);
 
+      this->skipLinesToContains(cline, &len, fp, "Atoms");
+      // skip this line too
+      if ((getline(&cline, &len, fp)) == -1)
+      {
+        throw std::runtime_error("Data file ended too early. Not able to read any atoms.");
+      }
+      // then, skip empty lines
       this->skipEmptyLines(cline, &len, fp);
 
       // Then, read atoms, up until the next section ("bonds")
       for (int i = 0; i < this->nAtoms; ++i)
       {
+        this->readAtom(std::string(cline));
+
         if ((getline(&cline, &len, fp)) == -1)
         {
           throw std::runtime_error("Data file ended too early. Not enough atoms read.");
         }
-
-        this->readAtom(std::string(cline));
       }
 
       // Then, read bonds
-      this->skipLinesTo(cline, &len, fp, "Bonds");
+      this->skipLinesToContains(cline, &len, fp, "Bonds");
+      // skip this line too
+      if ((getline(&cline, &len, fp)) == -1)
+      {
+        throw std::runtime_error("Data file ended too early. Not able to read any bonds.");
+      }
+      // then, skip empty lines
       this->skipEmptyLines(cline, &len, fp);
 
       for (int i = 0; i < this->nBonds; i++)
       {
-        if ((getline(&cline, &len, fp)) == -1)
-        {
-          throw std::runtime_error("Data file ended too early. Not enough atoms read.");
-        }
-
         this->readBond(std::string(cline));
+
+        if ((getline(&cline, &len, fp)) == -1 && i + 1 < this->nBonds)
+        {
+          throw std::runtime_error("Data file ended too early. Not enough bonds read.");
+        }
       }
 
       // we ignore angles etc. for now.
@@ -203,31 +240,37 @@ namespace pylimer_tools
       }
     }
 
-    void DataFileParser::skipLinesTo(char *cline, size_t *len, FILE *fp, std::string upTo)
+    void DataFileParser::skipLinesToContains(char *cline, size_t *len, FILE *fp, std::string upTo)
     {
-      while ((getline(&cline, len, fp)) != -1)
+      do
       {
         std::string line(cline);
 
-        if (upTo.compare(line))
+        if (contains(&line, upTo))
         {
           break;
         }
-      }
+      } while ((getline(&cline, len, fp)) != -1);
     }
 
     void DataFileParser::skipEmptyLines(char *cline, size_t *len, FILE *fp)
     {
-      while ((getline(&cline, len, fp)) != -1)
+      do
       {
         std::string line(cline);
 
-        // skip empty lines
+        // skip until empty lines
         if (!this->shortenLineToSkip(&line))
         {
           break;
         }
-      }
+      } while ((getline(&cline, len, fp)) != -1);
+    }
+
+    bool DataFileParser::shortenLineToSkip(char *line)
+    {
+      std::string tempString = std::string(line);
+      return this->shortenLineToSkip(&tempString);
     }
 
     bool DataFileParser::shortenLineToSkip(std::string *line)
@@ -240,50 +283,52 @@ namespace pylimer_tools
         boost::split(split, *line, boost::is_any_of("#"));
         line = &split[0];
       }
-      return line->compare("");
+      return line->empty();
     }
 
     void DataFileParser::readNs(const std::string line)
     {
       if (contains(&line, "atoms"))
       {
-        this->nAtoms = (this->parseTypeInLine<int>(line))[0];
+        this->nAtoms = (this->parseTypeInLine<int>(line, 1))[0];
       }
       else if (contains(&line, "bonds"))
       {
-        this->nBonds = (this->parseTypeInLine<int>(line))[0];
+        this->nBonds = (this->parseTypeInLine<int>(line, 1))[0];
       }
-      else if (contains(&line, "atom_types"))
+      else if (contains(&line, "atom types"))
       {
-        this->nAtomTypes = (this->parseTypeInLine<int>(line))[0];
+        this->nAtomTypes = (this->parseTypeInLine<int>(line, 1))[0];
       }
       else if (contains(&line, "bond types"))
       {
-        this->nBondTypes = (this->parseTypeInLine<int>(line))[0];
+        this->nBondTypes = (this->parseTypeInLine<int>(line, 1))[0];
       }
       else if (contains(&line, "xlo xhi"))
       {
-        std::vector<double> parsedL = this->parseTypeInLine<double>(line);
+        std::vector<double> parsedL = this->parseTypeInLine<double>(line, 2);
         this->Lx = parsedL[1] - parsedL[0];
       }
       else if (contains(&line, "ylo yhi"))
       {
-        std::vector<double> parsedL = this->parseTypeInLine<double>(line);
+        std::vector<double> parsedL = this->parseTypeInLine<double>(line, 2);
         this->Ly = parsedL[1] - parsedL[0];
       }
       else if (contains(&line, "zlo zhi"))
       {
-        std::vector<double> parsedL = this->parseTypeInLine<double>(line);
+        std::vector<double> parsedL = this->parseTypeInLine<double>(line, 2);
         this->Lz = parsedL[1] - parsedL[0];
       }
     }
 
     void DataFileParser::readMass(const std::string line)
     {
-      boost::tokenizer<> tok(line);
       int iteration = 0;
       int key = 0;
-      for (boost::tokenizer<>::iterator beg = tok.begin(); beg != tok.end(); ++beg)
+      typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+      boost::char_separator<char> sep{" ,;\t\n"};
+      tokenizer tok{line, sep};
+      for (tokenizer::iterator beg = tok.begin(); beg != tok.end(); ++beg)
       {
         if (iteration == 0)
         {
@@ -309,8 +354,10 @@ namespace pylimer_tools
 
     void DataFileParser::readAtom(std::string line)
     {
-      boost::tokenizer<> tok(line);
-      boost::tokenizer<>::iterator it1, it2 = tok.begin();
+      typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+      boost::char_separator<char> sep{" ,;\t\n"};
+      tokenizer tok{line, sep};
+      tokenizer::iterator it1, it2 = tok.begin();
       it1 = it2;
       this->atomIds.push_back(boost::lexical_cast<int>(*it2));
       std::advance(it2, 1);
@@ -324,17 +371,19 @@ namespace pylimer_tools
       std::advance(it2, 1);
       this->atomZ.push_back(boost::lexical_cast<double>(*it2));
       std::advance(it2, 1);
-      this->atomNx.push_back(boost::lexical_cast<double>(*it2));
+      this->atomNx.push_back(boost::lexical_cast<int>(*it2));
       std::advance(it2, 1);
-      this->atomNy.push_back(boost::lexical_cast<double>(*it2));
+      this->atomNy.push_back(boost::lexical_cast<int>(*it2));
       std::advance(it2, 1);
-      this->atomNz.push_back(boost::lexical_cast<double>(*it2));
+      this->atomNz.push_back(boost::lexical_cast<int>(*it2));
     }
 
     void DataFileParser::readBond(std::string line)
     {
-      boost::tokenizer<> tok(line);
-      boost::tokenizer<>::iterator it1, it2 = tok.begin();
+      typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+      boost::char_separator<char> sep{" ,;\t\n"};
+      tokenizer tok{line, sep};
+      tokenizer::iterator it1, it2 = tok.begin();
       it1 = it2;
       this->bondIds.push_back(boost::lexical_cast<long int>(*it2));
       std::advance(it2, 1);

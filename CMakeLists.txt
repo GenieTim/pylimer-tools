@@ -14,6 +14,8 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Ofast")
 
 # prepare python bindings
+# list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH /usr/local//anaconda3/lib/python3.7/site-packages/skbuild/resources/cmake/)
 find_package(PythonExtensions REQUIRED)
 
 if(SKBUILD)
@@ -47,22 +49,17 @@ endif()
 
 # add sources & targets
 add_subdirectory(src/_pylimer_tools)
-pybind11_add_module(pylimer_bound_entities MODULE src/_pylimer_tools/pybind11/entities.cpp)
-pybind11_add_module(pylimer_bound_calc MODULE src/_pylimer_tools/pybind11/calculations.cpp)
+pybind11_add_module(pylimer_tools_cpp MODULE 
+  src/_pylimer_tools/pybind11/entities.cpp
+  src/_pylimer_tools/pybind11/calculations.cpp
+  src/_pylimer_tools/pybind11/pylimer_tools_cpp.cpp
+)
 
-target_link_libraries(pylimer_bound_entities 
+target_link_libraries(pylimer_tools_cpp 
     PRIVATE 
       igraph
       pylimer_tools
   )
-target_compile_definitions(pylimer_bound_entities PRIVATE VERSION_INFO=${PROJECT_VERSION})
+target_compile_definitions(pylimer_tools_cpp PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
-target_link_libraries(pylimer_bound_calc 
-    PRIVATE 
-      igraph
-      pylimer_tools
-  )
-target_compile_definitions(pylimer_bound_calc PRIVATE VERSION_INFO=${PROJECT_VERSION})
-
-install(TARGETS pylimer_bound_entities LIBRARY DESTINATION .)
-install(TARGETS pylimer_bound_calc LIBRARY DESTINATION .)
+install(TARGETS pylimer_tools_cpp LIBRARY DESTINATION .)

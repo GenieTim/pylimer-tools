@@ -5,8 +5,6 @@ import igraph
 import numpy as np
 import pandas as pd
 import pandas.testing as pd_testing
-from pylimer_tools.calc.calculateBondLen import (calculateBondLen,
-                                                 calculateMeanBondLen)
 from pylimer_tools.entities.atom import Atom
 from pylimer_tools.entities.molecule import Molecule
 from pylimer_tools.entities.universum import Universum

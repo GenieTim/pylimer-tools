@@ -40,15 +40,29 @@ endif()
 
 # add sources & targets
 add_subdirectory(../src/_pylimer_tools pylimer_tools.out)
-add_executable(pylimer_tests pylimer_tools/test_all.cpp)
+
+add_library(test_sources 
+	OBJECT 
+		pylimer_tools/test_universe.cpp 
+		pylimer_tools/test_universesequence.cpp 
+)
+
+target_link_libraries(test_sources 
+PRIVATE
+	Catch2::Catch2
+	pylimer_tools
+)
+
+add_executable(pylimer_tests pylimer_tools/test.cpp)
 target_link_libraries(pylimer_tests 
 	PRIVATE 
 	Catch2::Catch2WithMain
 	pylimer_tools
 	igraph
+	test_sources
 )
 
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 include(CTest)
 include(Catch)
-# catch_discover_tests(pylimer_tests)
+catch_discover_tests(pylimer_tests)

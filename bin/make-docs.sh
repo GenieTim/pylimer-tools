@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-cd "$(dirname "$0")/.." || exit
+cd "$(dirname "$0")/.." || exit 10
+# ROOT_DIR=$(pwd)
 
-rm -rf ./docs
-mkdir -p ./docs
+pip install . || exit 7
 
-# make sure you have pdoc3 installed: 
-# pip3 install pdoc3
-lazydocs --output-path="./docs" ./src/
+# make sure you have sphinx installed:
+# pip3 install sphinx
+sphinx-apidoc -P -f -o ./docs _pylimer_tools || exit 2
+
+sphinx-build -b html ./docs ./docs-html

@@ -2,13 +2,14 @@ import os
 import unittest
 
 import pandas as pd
+from _pylimer_tools import Universe, UniverseSequence
 from pylimer_tools.io.extractThermoParams import (extractThermoParams,
                                                   getThermoCacheNameSuffix)
 from pylimer_tools.io.readLammpData import readLammpData
 from pylimer_tools.io.readLammpDump import readLammpDump
+from tests.pylimer_tools.pdComparingTestCase import PandasComparingTestCase
 from pylimer_tools.utils.cacheUtility import getCacheFileName
 from pylimer_tools.utils.optimizeDf import reduce_mem_usage
-from pylimer_tools.pdComparingTestCase import PandasComparingTestCase
 
 
 class TestFileReader(PandasComparingTestCase):
@@ -39,17 +40,20 @@ class TestFileReader(PandasComparingTestCase):
     def testLammpsDataReader(self):
         dataFile = os.path.join(os.path.dirname(
             __file__), "../fixtures/lammps_data_file.out")
-        data = readLammpData(dataFile, useCache=False)
-        self.assertIsInstance(data, dict)
-        expectedKeys = ["N_atoms", "N_Atypes", "N_Btypes", "masses", "Lx", "Ly",
-                        "Lz", "xlo", "xhi", "ylo", "yhi", "zlo", "zhi", "atom_data", "bond_data"]
-        for key in expectedKeys:
-            self.assertTrue(key in data)
-            self.assertIsNotNone(data[key])
-        # and with cache
-        data2 = readLammpData(dataFile, useCache=True)
-        for key in data:
-            self.assertEqual(data2[key], data[key])
+        universeSequence = UniverseSequence()
+        universeSequence.initializeFromDataSequence([dataFile])
+        self.assertIsInstance(universeSequence, UniverseSequence)
+        universe = universeSequence.atIndex(0)
+        self.assertIsInstance(universe, Universe)
+        # expectedKeys = ["N_atoms", "N_Atypes", "N_Btypes", "masses", "Lx", "Ly",
+        #                 "Lz", "xlo", "xhi", "ylo", "yhi", "zlo", "zhi", "atom_data", "bond_data"]
+        # for key in expectedKeys:
+        #     self.assertTrue(key in data)
+        #     self.assertIsNotNone(data[key])
+        # # and with cache
+        # data2 = readLammpData(dataFile, useCache=True)
+        # for key in data:
+        #     self.assertEqual(data2[key], data[key])
 
     def testLammpsDumpReader(self):
         dataFile = os.path.join(os.path.dirname(
