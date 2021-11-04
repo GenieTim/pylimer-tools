@@ -48,11 +48,11 @@ if(Boost_FOUND)
 endif()
 
 # add sources & targets
-add_subdirectory(src/_pylimer_tools)
+add_subdirectory(src/pylimer_tools_cpp)
 pybind11_add_module(pylimer_tools_cpp MODULE 
-  src/_pylimer_tools/pybind11/entities.cpp
-  src/_pylimer_tools/pybind11/calculations.cpp
-  src/_pylimer_tools/pybind11/pylimer_tools_cpp.cpp
+  src/pylimer_tools_cpp/pybind11/entities.cpp
+  src/pylimer_tools_cpp/pybind11/calculations.cpp
+  src/pylimer_tools_cpp/pybind11/pylimer_tools_cpp.cpp
 )
 
 target_link_libraries(pylimer_tools_cpp 

@@ -11,7 +11,6 @@ pylimer\_tools.utils.cacheUtility module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 pylimer\_tools.utils.getMolecules module
 ----------------------------------------
@@ -20,7 +19,6 @@ pylimer\_tools.utils.getMolecules module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 pylimer\_tools.utils.getTail module
 -----------------------------------
@@ -29,7 +27,6 @@ pylimer\_tools.utils.getTail module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 pylimer\_tools.utils.optimizeDf module
 --------------------------------------
@@ -38,7 +35,6 @@ pylimer\_tools.utils.optimizeDf module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 pylimer\_tools.utils.unifyDataStepsizes module
 ----------------------------------------------
@@ -47,7 +43,6 @@ pylimer\_tools.utils.unifyDataStepsizes module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 Module contents
 ---------------
@@ -56,4 +51,3 @@ Module contents
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:

@@ -7,6 +7,6 @@ pip install . || exit 7
 
 # make sure you have sphinx installed:
 # pip3 install sphinx
-sphinx-apidoc -P -f -o ./docs _pylimer_tools || exit 2
+sphinx-apidoc -f -o ./docs ./src || exit 2
 
 sphinx-build -b html ./docs ./docs-html

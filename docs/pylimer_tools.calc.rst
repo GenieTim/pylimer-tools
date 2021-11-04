@@ -11,7 +11,6 @@ pylimer\_tools.calc.calculateBondLen module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 pylimer\_tools.calc.calculateDistanceBetweenAtoms module
 --------------------------------------------------------
@@ -20,7 +19,6 @@ pylimer\_tools.calc.calculateDistanceBetweenAtoms module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 pylimer\_tools.calc.calculateRee module
 ---------------------------------------
@@ -29,7 +27,6 @@ pylimer\_tools.calc.calculateRee module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 pylimer\_tools.calc.calculateRg module
 --------------------------------------
@@ -38,7 +35,6 @@ pylimer\_tools.calc.calculateRg module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 pylimer\_tools.calc.doMEHPAnalysis module
 -----------------------------------------
@@ -47,7 +43,6 @@ pylimer\_tools.calc.doMEHPAnalysis module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 pylimer\_tools.calc.doMMTAnalysis module
 ----------------------------------------
@@ -56,7 +51,6 @@ pylimer\_tools.calc.doMMTAnalysis module
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:
 
 Module contents
 ---------------
@@ -65,4 +59,3 @@ Module contents
    :members:
    :undoc-members:
    :show-inheritance:
-   :private-members:

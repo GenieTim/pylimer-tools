@@ -12,8 +12,6 @@ using namespace pylimer_tools::calc;
 
 void init_pylimer_bound_calc(py::module_ &m)
 {
-  m.doc() = "Calculations ";
-
   m.def("predictGelationPoint", &mmt::predictGelationPoint, "Predict the gelation point of a Universe");
   // m.def("computeExtentOfReaction", &mmt::computeExtentOfReaction, "Compute extent of reaction");
   m.def("computeStoichiometricInbalance", &mmt::computeStoichiometricInbalance, "Compute stoichiometric inbalance");
