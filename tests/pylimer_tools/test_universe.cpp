@@ -8,7 +8,7 @@
 
 namespace pe = pylimer_tools::entities;
 
-TEST_CASE("Universe can be used", "[Universe]")
+TEST_CASE("Universe can be used", "[entity][Universe]")
 {
   REQUIRE(1 == 1);
 

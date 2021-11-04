@@ -1,6 +1,6 @@
 import unittest
 
-from pylimer_tools.pdComparingTestCase import PandasComparingTestCase
+from tests.pylimer_tools.pdComparingTestCase import PandasComparingTestCase
 import pandas as pd
 from pylimer_tools.calc.doMEHPAnalysis import *
 from pylimer_tools.entities.universum import Universum
@@ -39,7 +39,8 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         }, computeMeanEndToEndDistances([self.testUniverse], 2))
 
     def test_meanUniverseVolume(self):
-        self.assertRaises(NotImplementedError, lambda: calculateMeanUniverseVolume([self.testUniverse, self.testUniverseSmall]))
+        self.assertRaises(NotImplementedError, lambda: calculateMeanUniverseVolume(
+            [self.testUniverse, self.testUniverseSmall]))
 
     def test_effectiveNrDensityOfJunctionCalculation(self):
         universe = Universum([1, 1, 1])

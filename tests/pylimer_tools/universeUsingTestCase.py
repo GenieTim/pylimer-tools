@@ -84,7 +84,7 @@ class UniverseUsingTestCase(unittest.TestCase):
         self.testUniverseSmall.addBonds(len(
             self.testBondsSmall), self.testBondsSmall["bondFrom"], self.testBondsSmall["to"])
         # Universe 3: very unsaturated
-        self.testUniverse = Universe([10, 10, 10])
+        self.testUniverse = Universe(10, 10, 10)
         self.testUniverse.addAtoms(len(self.testAtoms), self.testAtoms["id"], self.testAtoms["type"],
                                    self.testAtoms["x"], self.testAtoms["y"], self.testAtoms["z"],
                                    self.testAtoms["nx"], self.testAtoms["ny"], self.testAtoms["nz"])
@@ -136,8 +136,9 @@ class UniverseUsingTestCase(unittest.TestCase):
             {"to": 20, "bondFrom": 19},
             {"to": 6, "bondFrom": 20},
         ])
-        self.saturatedTestUniverse.addAtoms(len(self.testAtomsSaturated), self.testAtomsSaturated["id"], self.testAtomsSaturated["type"],
-                                            self.testAtomsSaturated["x"], self.testAtomsSaturated["y"], self.testAtomsSaturated["z"],
-                                            self.testAtomsSaturated["nx"], self.testAtomsSaturated["ny"], self.testAtomsSaturated["nz"])
+        self.assertIsInstance(self.testAtomsSaturated, pd.DataFrame)
+        self.saturatedTestUniverse.addAtoms(len(self.testAtomsSaturated), self.testAtomsSaturated["id"].tolist(), self.testAtomsSaturated["type"].tolist(),
+                                            self.testAtomsSaturated["x"].tolist(), self.testAtomsSaturated["y"].tolist(), self.testAtomsSaturated["z"].tolist(),
+                                            self.testAtomsSaturated["nx"].tolist(), self.testAtomsSaturated["ny"].tolist(), self.testAtomsSaturated["nz"].tolist())
         self.saturatedTestUniverse.addBonds(len(
-            self.testBondsSaturated), self.testBondsSaturated["bondFrom"], self.testBondsSaturated["to"])
+            self.testBondsSaturated), self.testBondsSaturated["bondFrom"].tolist(), self.testBondsSaturated["to"].tolist())

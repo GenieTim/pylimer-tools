@@ -10,7 +10,7 @@
 namespace py = pybind11;
 using namespace pylimer_tools::calc;
 
-PYBIND11_MODULE(pylimer_bound_calc, m)
+void init_pylimer_bound_calc(py::module_ &m)
 {
   m.doc() = "Calculations ";
 

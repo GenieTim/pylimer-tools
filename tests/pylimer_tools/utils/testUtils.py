@@ -7,7 +7,7 @@ import unittest
 import numpy as np
 import pandas as pd
 import pandas.testing as pd_testing
-from pylimer_tools.pdComparingTestCase import PandasComparingTestCase
+from tests.pylimer_tools.pdComparingTestCase import PandasComparingTestCase
 from pylimer_tools.utils.cacheUtility import (doCache, getCacheFileName,
                                               loadCache)
 from pylimer_tools.utils.getMolecules import getMolecules

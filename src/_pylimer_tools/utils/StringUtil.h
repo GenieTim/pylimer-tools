@@ -2,8 +2,16 @@
 #define STRING_UTIL_H
 
 #include <string>
-
+#include <iostream>
 #include <cstring>
+
+namespace std
+{
+  static std::string to_string(std::string input)
+  {
+    return input;
+  }
+}
 
 namespace pylimer_tools
 {
@@ -39,6 +47,7 @@ namespace pylimer_tools
           result.append(t);
         result.append(std::to_string(*it));
       }
+      // std::cout << result << std::endl;
       return result;
     }
   }

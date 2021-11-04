@@ -65,7 +65,7 @@ namespace pylimer_tools
             }
             else
             {
-              throw std::runtime_error("Did not find neighter 'x' nor 'xsu' fields in atom data of dump file");
+              throw std::runtime_error("Did not find neither positional atom fields in atom data of dump file " + dumpFile + ".");
             }
           }
         }
@@ -87,6 +87,21 @@ namespace pylimer_tools
         std::vector<int> ny;
         std::vector<int> nz;
 
+        int nAtoms = 0;
+        if (dumpFileParser.hasKey("NUMBER OF ATOMS"))
+        {
+          std::vector<int> nAtomVec = dumpFileParser.getValuesForAt<int>(i, "NUMBER OF ATOMS", 0);
+          if (nAtomVec.size() > 0)
+          {
+            nAtoms = nAtomVec[0];
+          }
+        }
+
+        if (nAtoms == 0)
+        {
+          nAtoms = dataFileParser.getNrOfAtoms();
+        }
+
         if (dumpFileParser.keyHasDirectionalColumn("ATOMS", "i", ""))
         {
           nx = dumpFileParser.getValuesForAt<int>(i, "ATOMS", "ix");
@@ -95,13 +110,13 @@ namespace pylimer_tools
         }
         else
         {
-          nx = pylimer_tools::utils::initializeWithValue(dataFileParser.getNrOfAtoms(), 0); //dataFileParser.getAtomNx();
-          ny = pylimer_tools::utils::initializeWithValue(dataFileParser.getNrOfAtoms(), 0); //dataFileParser.getAtomNy();
-          nz = pylimer_tools::utils::initializeWithValue(dataFileParser.getNrOfAtoms(), 0); //dataFileParser.getAtomNz();
+          nx = pylimer_tools::utils::initializeWithValue(nAtoms, 0); //dataFileParser.getAtomNx();
+          ny = pylimer_tools::utils::initializeWithValue(nAtoms, 0); //dataFileParser.getAtomNy();
+          nz = pylimer_tools::utils::initializeWithValue(nAtoms, 0); //dataFileParser.getAtomNz();
         }
 
         newUniverse.addAtoms(
-            dataFileParser.getNrOfAtoms(),
+            nAtoms,
             dumpFileParser.getValuesForAt<long int>(i, "ATOMS", "id"),
             dumpFileParser.getValuesForAt<int>(i, "ATOMS", "type"),
             positionsX, positionsY, positionsZ,

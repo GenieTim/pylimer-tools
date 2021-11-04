@@ -2,8 +2,6 @@
 import unittest
 
 import pandas as pd
-from pylimer_tools.calc.calculateBondLen import (calculateBondLen,
-                                                 calculateMeanBondLen)
 from pylimer_tools.entities.universum import Universum
 
 

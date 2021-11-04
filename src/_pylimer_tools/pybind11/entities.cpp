@@ -13,9 +13,19 @@
 namespace py = pybind11;
 using namespace pylimer_tools::entities;
 
-PYBIND11_MODULE(pylimer_bound_entities, m)
+void init_pylimer_bound_entities(py::module_ &m)
 {
-    m.doc() = "A collection of utility python functions for handling LAMMPS output and polymers in Python.";
+    m.doc() = R"pbdoc(
+        PylimerTools Cpp Entities
+        -------------------------
+
+        A collection of utility python functions for handling LAMMPS output and polymers in Python.
+
+        .. currentmodule:: pylimer_bound_entities
+        .. autosummary::
+           :toctree: _generate
+
+        )pbdoc";
 
     py::class_<Box>(m, "Box")
         .def(py::init<const double, const double, const double>())
@@ -50,7 +60,8 @@ PYBIND11_MODULE(pylimer_bound_entities, m)
         .def("getType", &Molecule::getType)
         .def("getAtomForVertexId", &Molecule::getAtomForVertexId)
         .def("getNrOfBonds", &Molecule::getNrOfBonds)
-        .def("getNrOfAtoms", &Molecule::getNrOfAtoms);
+        .def("getNrOfAtoms", &Molecule::getNrOfAtoms)
+        .def("computeBondLengths", &Molecule::computeBondLengths);
 
     py::class_<Universe>(m, "Universe")
         .def(py::init<const double, const double, const double>())
@@ -68,6 +79,7 @@ PYBIND11_MODULE(pylimer_bound_entities, m)
         .def("getNrOfAtoms", &Universe::getNrOfAtoms);
 
     py::class_<UniverseSequence>(m, "UniverseSequence")
+        .def(py::init<>())
         .def("initializeFromDumpFile", &UniverseSequence::initializeFromDumpFile)
         .def("initializeFromDataSequence", &UniverseSequence::initializeFromDataSequence)
         .def("next", &UniverseSequence::next)

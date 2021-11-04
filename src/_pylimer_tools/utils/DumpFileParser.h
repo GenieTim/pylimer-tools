@@ -9,11 +9,13 @@
 #include "../entities/UniverseSequence.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string/trim.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 #include <map>
 #include <cctype>
 #include <cstring>
+#include <filesystem>
 
 namespace pylimer_tools
 {
@@ -25,9 +27,9 @@ namespace pylimer_tools
     public:
       void read(const std::string filePath);
       template <typename OUT>
-      std::vector<OUT> getValuesForAt(int index, std::string headerKey, std::string column);
+      std::vector<OUT> getValuesForAt(const int index, const std::string &headerKey, const std::string &column);
       template <typename OUT>
-      std::vector<OUT> getValuesForAt(int index, std::string headerKey, int column);
+      std::vector<OUT> getValuesForAt(const int index, const std::string &headerKey, const int column);
       int getLength() { return this->data.size(); }
       bool hasKey(std::string headerKey)
       {
@@ -70,11 +72,15 @@ namespace pylimer_tools
       //// data
       typedef std::map<std::string, std::string> data_item_t;
       std::vector<data_item_t> data;
-      std::map<std::string, std::vector<std::string>> headerColMap;
+      std::map<std::string, std::vector<std::string> > headerColMap;
     };
 
     void DumpFileParser::read(const std::string filePath)
     {
+      if (!std::filesystem::exists(filePath))
+      {
+        throw std::invalid_argument("File to read (" + filePath + ") does not exist.");
+      }
       char *cline = NULL;
 
       size_t len = 0;
@@ -87,7 +93,7 @@ namespace pylimer_tools
       while ((getline(&cline, &len, fp)) != -1)
       {
         std::string line(cline);
-        // skip empty lines
+        // skip empty lines: break when not empty
         if (!this->shortenLineToSkip(&line))
         {
           break;
@@ -116,19 +122,20 @@ namespace pylimer_tools
         {
           if (!dataItem.contains(currentKey))
           {
-            dataItem[currentKey] = "";
+            dataItem.insert_or_assign(currentKey, "");
           }
-          dataItem[currentKey].append(line);
-          dataItem[currentKey].append("\n");
+          dataItem.insert_or_assign(currentKey, dataItem.at(currentKey) + line);
         }
 
-        if (line.compare(newGroupKey))
+        if (line == newGroupKey)
         {
           // new timestep
           this->data.push_back(dataItem);
           dataItem = data_item_t();
         }
       }
+      // last timestep
+      this->data.push_back(dataItem);
 
       fclose(fp);
       if (cline)
@@ -155,15 +162,17 @@ namespace pylimer_tools
           columns.push_back(*beg);
         }
       }
-      if (!headerColMap.contains(newHeader))
+      boost::algorithm::trim_right(newHeader);
+      if (!this->headerColMap.contains(newHeader))
       {
-        headerColMap[newHeader] = columns;
+        this->headerColMap.insert_or_assign(newHeader, columns);
       }
+
       return newHeader;
     }
 
     template <typename OUT>
-    std::vector<OUT> DumpFileParser::getValuesForAt(int index, std::string headerKey, std::string column)
+    std::vector<OUT> DumpFileParser::getValuesForAt(const int index, const std::string &headerKey, const std::string &column)
     {
       // detect index of column
       const auto colItIdx = std::find(this->headerColMap[headerKey].begin(), this->headerColMap[headerKey].end(), column);
@@ -176,8 +185,9 @@ namespace pylimer_tools
     };
 
     template <typename OUT>
-    std::vector<OUT> DumpFileParser::getValuesForAt(int index, std::string headerKey, int colIdx)
+    std::vector<OUT> DumpFileParser::getValuesForAt(const int index, const std::string &headerKey, const int colIdx)
     {
+      typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
       // this is clearly not the fastest way to access more than one column,
       // as the tokenizing happens again for each column.
       data_item_t dataItem = this->data[index];
@@ -185,19 +195,34 @@ namespace pylimer_tools
       std::string relevantData = dataItem[headerKey];
       std::istringstream f(relevantData);
       std::string line;
-      // first line: header
-      std::getline(f, line);
-      boost::tokenizer<> tok(line);
       std::vector<OUT> result;
+      int lineNr = 0;
+
+      boost::char_separator<char> sep{" ,;\t\n"};
 
       // all other lines
       while (std::getline(f, line))
       {
-        boost::tokenizer<> tok(line);
-        boost::tokenizer<>::iterator it1, it2 = tok.begin();
-        it1 = it2;
-        std::advance(it2, colIdx);
-        result.push_back(boost::lexical_cast<OUT>(*it2));
+        tokenizer tok{line, sep};
+        // boost::tokenizer<>::iterator it1, it2 = tok.begin();it1 = it2;
+        // std::advance(it2, colIdx); cannot be used as boost gives segfault and I have not found a way to check bounds in another way
+        int iteration = 0;
+        bool found = false;
+        for (tokenizer::iterator it = tok.begin(); it != tok.end(); ++it)
+        {
+          if (iteration == colIdx)
+          {
+            found = true;
+            result.push_back(boost::lexical_cast<OUT>(*it));
+            break;
+          }
+          iteration++;
+        }
+        if (!found)
+        {
+          throw std::runtime_error("Column index " + std::to_string(colIdx) + " out of range to get values for key " + headerKey + " in line " + std::to_string(lineNr) + ". Values are '" + line + "'.");
+        }
+        ++lineNr;
       }
 
       return result;
@@ -213,7 +238,7 @@ namespace pylimer_tools
         boost::split(split, *line, boost::is_any_of("#"));
         line = &split[0];
       }
-      return line->compare("");
+      return line->empty();
     }
   }
 }
