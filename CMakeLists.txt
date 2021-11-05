@@ -1,4 +1,15 @@
 cmake_minimum_required(VERSION 3.15.0)
+
+# setup some windows specific helps
+IF(DEFINED ENV{VCPKG_ROOT})
+  set(VCPKG_ROOT $ENV{VCPKG_ROOT})
+  set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}\\scripts\\buildsystems\\vcpkg.cmake")
+  message("MESSAGE: Using vcpkg '${VCPKG_ROOT}\\scripts\\buildsystems\\vcpkg.cmake' as toolchain")
+else()
+  message("MESSAGE: VCPKG_ROOT not set")
+endif()
+
+# start project
 project(pylimer_tools VERSION "0.1.0")
 
 # specify the C++ standard
@@ -9,13 +20,15 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
+if(CMAKE_COMPILER_IS_GNUCXX)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -Ofast")
+endif()
 
 # prepare python bindings
 # list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-list(APPEND CMAKE_MODULE_PATH /usr/local//anaconda3/lib/python3.7/site-packages/skbuild/resources/cmake/)
+list(APPEND CMAKE_MODULE_PATH /usr/local/anaconda3/lib/python3.7/site-packages/skbuild/resources/cmake/)
 find_package(PythonExtensions REQUIRED)
 
 if(SKBUILD)
@@ -34,12 +47,13 @@ endif()
 find_package(pybind11 CONFIG REQUIRED)
 
 # and other needed packages
+
 find_package(igraph REQUIRED)
 if(igraph_FOUND)
   include_directories(${igraph_INCLUDE_DIRS})
 	message("Found igraph")
 else()
-	message(WARNING "DID NOT FIND igraph")
+	message(WARNING "DID NOT find igraph.")
 endif()
 
 find_package(Boost REQUIRED)
