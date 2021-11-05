@@ -16,21 +16,24 @@ import sysconfig
 import warnings
 
 try:
-    sys.path.insert(0, sysconfig.get_path('platlib'))
-    newPath = os.path.join(os.getenv("CONDA_PREFIX"), "lib", os.path.basename(
-        sysconfig.get_path('stdlib')), "site-packages")
+    # this fixes an issue where conda env's site-packages are not available to Sphinx
+    paths = sysconfig.get_path('platlib')
+    pythonV = "python3.9"
+    for key, path in enumerate(paths):
+        dirname = os.path.basename(path)
+        if "python" in dirname and "." in dirname:
+            pythonV = dirname
+            break
+
+    newPath = os.path.join(os.getenv("CONDA_PREFIX"),
+                           "lib", pythonV, "site-packages")
     sys.path.append(newPath)
-    print(newPath)
-    # sys.path.insert(
+    # vgl.: sys.path.insert(
     #     0, "/usr/local/anaconda3/envs/autowig/lib/python3.7/site-packages")
-    print(sysconfig.get_paths())
     import pylimer_tools_cpp
-    sys.path.insert(0, os.path.abspath(pylimer_tools_cpp.__file__))
 except ImportError:
     warnings.warn("Failed to import pylimer_tools_cpp")
 
-# sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../src'))
-# sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../src/pylimer_tools_cpp'))
 
 # -- Project information -----------------------------------------------------
 
