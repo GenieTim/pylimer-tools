@@ -12,7 +12,7 @@ namespace pylimer_tools
     class Atom
     {
     public:
-      Atom(const int id, const int type, const double x, const double y, const double z, const int nx = 0, const int ny = 0, const int nz = 0)
+      Atom(const long int id, const int type, const double x, const double y, const double z, const int nx = 0, const int ny = 0, const int nz = 0)
       {
         this->id = id;
         this->type = type;
@@ -50,6 +50,7 @@ namespace pylimer_tools
       };
 
       inline long int getId() { return this->id; }
+      inline int getType() { return this->type; }
       inline double getX() { return this->x; }
       inline double getY() { return this->y; }
       inline double getZ() { return this->z; }
@@ -58,7 +59,8 @@ namespace pylimer_tools
       int getNZ() { return this->nz; }
 
     private:
-      int id, type;
+      long int id;
+      int type;
       double x, y, z;
       int nx, ny, nz;
     };
