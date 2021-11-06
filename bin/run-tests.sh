@@ -10,7 +10,7 @@ mkdir -p build
 cd build || exit 5
 cmake ..
 cmake --build . || exit 9
-./pylimer_tests -s -d || exit 6
+./pylimer_tests || exit 6 # -s --durations yes 
 
 cd "$ROOT_DIR" || exit 8
 
