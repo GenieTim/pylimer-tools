@@ -11,6 +11,8 @@ Welcome to PylimerTools's documentation!
    :caption: Contents:
    :hidden:
 
+   modules
+
 Indices and tables
 ==================
 

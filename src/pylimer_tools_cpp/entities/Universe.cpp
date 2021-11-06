@@ -478,12 +478,12 @@ namespace pylimer_tools
       return this->box.getVolume();
     }
 
-    int Universe::getNrOfAtoms()
+    const int Universe::getNrOfAtoms()
     {
       return this->NAtoms;
     }
 
-    int Universe::getNrOfBonds()
+    const int Universe::getNrOfBonds()
     {
       return this->NBonds;
     }

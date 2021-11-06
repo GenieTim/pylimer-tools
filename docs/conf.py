@@ -17,9 +17,10 @@ import warnings
 
 try:
     # this fixes an issue where conda env's site-packages are not available to Sphinx
-    paths = sysconfig.get_path('platlib')
+    paths = sysconfig.get_paths()
     pythonV = "python3.9"
-    for key, path in enumerate(paths):
+    for key in paths:
+        path = paths[key]
         dirname = os.path.basename(path)
         if "python" in dirname and "." in dirname:
             pythonV = dirname
@@ -52,6 +53,8 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
+    # "sphinx.ext.jsmath",
+    "sphinx.ext.pngmath"
 ]
 
 autosummary_generate = True

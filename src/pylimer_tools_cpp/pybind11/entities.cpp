@@ -24,7 +24,7 @@ void init_pylimer_bound_entities(py::module_ &m)
         .def("getVolume", &Box::getVolume, R"pbdoc(
         Compute the volume of the box.
 
-        $V = L_x \cdot L_y \cdot L_z       
+        :math:`V = L_x \cdot L_y \cdot L_z`
         )pbdoc")
         .def("getLx", &Box::getLx, "Get the lenght of the box in x direction.")
         .def("getLy", &Box::getLy, "Get the lenght of the box in y direction.")
@@ -72,7 +72,9 @@ void init_pylimer_bound_entities(py::module_ &m)
                 /* Create a new C++ instance */
                 Atom a = Atom(t[0].cast<long int>(), t[1].cast<int>(),
                               t[2].cast<double>(), t[3].cast<double>(), t[4].cast<double>(),
-                              t[5].cast<int>(), t[6].cast<int>(), t[7].cast<int>())
+                              t[5].cast<int>(), t[6].cast<int>(), t[7].cast<int>());
+
+                return a;
             }));
 
     py::enum_<MoleculeType>(m, "MoleculeType")
@@ -88,6 +90,7 @@ void init_pylimer_bound_entities(py::module_ &m)
         .def("computeEndToEndDistance", &Molecule::computeEndToEndDistance, R"pbdoc(
         Compute the end-to-end distance of this molecule. 
         
+        **Caution**:
         Returns 0.0 if the molecule does not have two or more atoms.
         Returns -1.0 if not exactly 2 ends were found.
         )pbdoc")

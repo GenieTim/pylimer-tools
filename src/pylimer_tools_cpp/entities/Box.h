@@ -8,6 +8,9 @@ namespace pylimer_tools
     // TODO: currently, this way, no tilt or more complicated boxes etc. is supported
     class Box
     {
+    private:
+      double Lx, Ly, Lz;
+
     public:
       Box(const double Lx = 0.0, const double Ly = 0.0, const double Lz = 0.0)
       {
@@ -16,16 +19,14 @@ namespace pylimer_tools
         this->Lz = Lz;
       }
 
-      double getVolume()
+      const double getVolume()
       {
         return this->Lx * this->Ly * this->Lz;
       }
 
-      inline double getLx() { return this->Lx; }
-      inline double getLy() { return this->Ly; }
-      inline double getLz() { return this->Lz; }
-
-      double Lx, Ly, Lz;
+      const double getLx() const { return this->Lx; }
+      const double getLy() const { return this->Ly; }
+      const double getLz() const { return this->Lz; }
     };
   }
 }
