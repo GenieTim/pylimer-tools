@@ -26,10 +26,12 @@ namespace pylimer_tools
     public:
       Molecule(Box *parent, igraph_t *graph, MoleculeType type);
       double computeEndToEndDistance();
+      double computeRadiusOfGyration();
       std::vector<double> computeBondLengths();
       int getLength();
       MoleculeType getType();
       Atom getAtomForVertexId(long int vertexIdx);
+      std::vector<Atom> getAtoms();
       std::vector<Atom> getAtomsWithType(const int atomType);
       int getNrOfBonds();
       int getNrOfAtoms();

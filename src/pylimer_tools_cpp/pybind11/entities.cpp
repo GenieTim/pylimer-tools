@@ -87,19 +87,21 @@ void init_pylimer_bound_entities(py::module_ &m)
 
     py::class_<Molecule>(m, "Molecule")
         .def(py::init<Box *, igraph_t *, MoleculeType>())
+        .def("getLength", &Molecule::getLength, "Counts and returns the number of atoms associated with this molecule.")
+        .def("getType", &Molecule::getType, "Get the type of this molecule (see 'MoleculeType' enum).")
+        .def("getAtomForVertexId", &Molecule::getAtomForVertexId, "Get an atom for a specific vertex.")
+        .def("getAtoms", &Molecule::getAtoms, "Returns all atom objects enclosed in this molecule.")
+        .def("getNrOfBonds", &Molecule::getNrOfBonds, "Counts and returns the number of bonds associated with this molecule.")
+        .def("getNrOfAtoms", &Molecule::getNrOfAtoms, "Counts and returns the number of atoms associated with this molecule.")
+        .def("computeBondLengths", &Molecule::computeBondLengths, "Computes the length of each bond in the molecule.")
+        .def("computeRadiusOfGyration", &Molecule::computeRadiusOfGyration, "Computes the radius of gyration, :math:`R_g^2` of this molecule")
         .def("computeEndToEndDistance", &Molecule::computeEndToEndDistance, R"pbdoc(
         Compute the end-to-end distance of this molecule. 
         
         **Caution**:
         Returns 0.0 if the molecule does not have two or more atoms.
         Returns -1.0 if not exactly 2 ends were found.
-        )pbdoc")
-        .def("getLength", &Molecule::getLength, "Counts and returns the number of atoms associated with this molecule.")
-        .def("getType", &Molecule::getType, "Get the type of this molecule (see 'MoleculeType' enum).")
-        .def("getAtomForVertexId", &Molecule::getAtomForVertexId, "Get an atom for a specific vertex.")
-        .def("getNrOfBonds", &Molecule::getNrOfBonds, "Counts and returns the number of bonds associated with this molecule.")
-        .def("getNrOfAtoms", &Molecule::getNrOfAtoms, "Counts and returns the number of atoms associated with this molecule.")
-        .def("computeBondLengths", &Molecule::computeBondLengths, "Computes the length of each bond in the molecule.");
+        )pbdoc");
 
     py::class_<Universe>(m, "Universe")
         .def(py::init<const double, const double, const double>())
@@ -111,13 +113,13 @@ void init_pylimer_bound_entities(py::module_ &m)
         Specify the crosslinkerType to an existing type id, 
         then those atoms will be omitted, and this function returns chains instead.)pbdoc")
         .def("getChainsWithCrosslinker", &Universe::getChainsWithCrosslinker)
-        .def("determineFunctionalityPerType", &Universe::determineFunctionalityPerType)
         .def("getAtom", &Universe::getAtom)
         .def("getAtomsWithType", &Universe::getAtomsWithType)
         .def("getAtomByVertexIdx", &Universe::getAtomByIdx)
         .def("getBox", &Universe::getBox)
         .def("getVolume", &Universe::getVolume)
-        .def("getNrOfAtoms", &Universe::getNrOfAtoms);
+        .def("getNrOfAtoms", &Universe::getNrOfAtoms)
+        .def("determineFunctionalityPerType", &Universe::determineFunctionalityPerType);
 
     py::class_<UniverseSequence>(m, "UniverseSequence")
         .def(py::init<>())

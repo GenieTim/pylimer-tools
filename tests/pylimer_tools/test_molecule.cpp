@@ -41,7 +41,6 @@ TEST_CASE("Molecules work as intended", "[entity][Molecule]")
     int iteration = 0;
     for (pe::Molecule molecule : molecules)
     {
-      std::cout << "iteration: " << iteration << std::endl;
       REQUIRE(molecule.getLength() == expectedLengths[iteration]);
       REQUIRE(molecule.computeEndToEndDistance() == Catch::Approx(expectedEndToEndDistances[iteration]));
       ++iteration;

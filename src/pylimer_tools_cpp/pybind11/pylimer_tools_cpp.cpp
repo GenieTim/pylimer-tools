@@ -10,12 +10,12 @@ void init_pylimer_bound_calc(py::module_ &);
 PYBIND11_MODULE(pylimer_tools_cpp, m)
 {
   m.doc() = R"pbdoc(
-    PylimerTools Cpp Entities
-    -------------------------
+    PylimerTools Cpp
+    -----------------
 
     A collection of utility python functions for handling LAMMPS output and polymers in Python.
 
-    .. currentmodule:: pylimer_bound_entities
+    .. currentmodule:: pylimer_tools_cpp
     .. autosummary::
         :toctree: _generate
 
