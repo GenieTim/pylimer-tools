@@ -42,12 +42,16 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     {
       REQUIRE(universe.getNrOfAtoms() == 4);
       REQUIRE(universe.getMolecules(2).size() == 4);
+      // works twice: make sure there is no removal of anything happening
+      REQUIRE(universe.getMolecules(2).size() == 4);
       universe.addBonds(2, {{0, 3}}, {{3, 4}});
       REQUIRE(universe.getNrOfAtoms() == 4);
       REQUIRE(universe.getNrOfBonds() == 2);
       REQUIRE(universe.getMolecules(1).size() == 0);
       std::vector<pe::Molecule> molecules = universe.getMolecules(2);
       REQUIRE(molecules.size() == 2);
+      // works twice: make sure there is no removal of anything happening
+      REQUIRE(universe.getMolecules(2).size() == 2);
     }
   }
 }

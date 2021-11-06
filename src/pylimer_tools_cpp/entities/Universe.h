@@ -36,6 +36,7 @@ namespace pylimer_tools
       double getVolume();
       const int getNrOfAtoms();
       const int getNrOfBonds();
+      bool validate();
 
     protected:
       // properties of the box

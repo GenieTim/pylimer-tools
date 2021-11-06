@@ -64,7 +64,8 @@ namespace pylimer_tools
         igraph_cattribute_VAN_set(&this->graph, "ny", this->NAtoms + i, newNy[i]);
         igraph_cattribute_VAN_set(&this->graph, "nz", this->NAtoms + i, newNz[i]);
       }
-      this->NAtoms += NNewAtoms;
+      // this->NAtoms += NNewAtoms;
+      this->NAtoms = igraph_vcount(&this->graph);
     }
 
     void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from, std::vector<long int> to)
@@ -88,11 +89,12 @@ namespace pylimer_tools
       {
         throw std::runtime_error("Failed to add edges to graph.");
       }
-      this->NBonds += NNewBonds;
       igraph_attribute_combination_t comb;
       igraph_attribute_combination_init(&comb);
       igraph_simplify(&this->graph, /*multiple=*/1, /*loops=*/1, &comb);
       igraph_attribute_combination_destroy(&comb);
+      // this->NBonds += NNewBonds;
+      this->NBonds = igraph_ecount(&this->graph);
     }
 
     std::vector<Molecule> Universe::getMolecules(const int atomTypeToOmit)
@@ -107,11 +109,6 @@ namespace pylimer_tools
       if (igraph_copy(&graphWithoutCrosslinkers, &this->graph))
       {
         throw std::runtime_error("Failed to copy graph.");
-      }
-
-      if (this->getNrOfAtoms() > 0 && !igraph_cattribute_has_attr(&graphWithoutCrosslinkers, IGRAPH_ATTRIBUTE_VERTEX, "id"))
-      {
-        throw std::runtime_error("Need to implement custom copy routine for attributes");
       }
 
       // select vertices of type
@@ -138,8 +135,8 @@ namespace pylimer_tools
         throw std::runtime_error("Failed to decompose graph.");
       }
       size_t NComponents = igraph_vector_ptr_size(&components);
-      // std::cout << NComponents << " molecules found. Removed " << indicesToRemove.size()
-      //           << " vertices. Size now: " << igraph_vcount(&graphWithoutCrosslinkers) << std::endl;
+      std::cout << NComponents << " molecules found. Removed " << indicesToRemove.size()
+                << " vertices. Size now: " << igraph_vcount(&graphWithoutCrosslinkers) << " atoms with " << igraph_ecount(&graphWithoutCrosslinkers) << " bonds." << std::endl;
       molecules.reserve(NComponents);
       for (size_t i = 0; i < NComponents; ++i)
       {
@@ -471,6 +468,19 @@ namespace pylimer_tools
         meanStrandLength += molecule.getLength() * multiplier;
       }
       return meanStrandLength;
+    }
+
+    bool Universe::validate()
+    {
+      if (this->getNrOfAtoms() != igraph_vcount(&this->graph))
+      {
+        throw std::runtime_error("Validation failed: " + std::to_string(this->getNrOfAtoms()) + " atoms for " + std::to_string(igraph_vcount(&this->graph)) + " vertices.");
+      }
+      if (this->getNrOfBonds() != igraph_ecount(&this->graph))
+      {
+        throw std::runtime_error("Validation failed: " + std::to_string(this->getNrOfBonds()) + " bonds for " + std::to_string(igraph_ecount(&this->graph)) + " edges.");
+      }
+      return true;
     }
 
     double Universe::getVolume()

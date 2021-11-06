@@ -73,6 +73,9 @@ namespace pylimer_tools
       Box *box = this->getBox();
       std::vector<double> lengths;
       lengths.reserve(this->getNrOfBonds());
+      if (this->getNrOfBonds() == 0) {
+        return lengths;
+      }
       // construct iterator
       igraph_eit_t bondIterator;
       if (igraph_eit_create(this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &bondIterator))
