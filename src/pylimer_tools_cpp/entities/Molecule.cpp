@@ -30,7 +30,8 @@ namespace pylimer_tools
       };
       std::vector<int> ids;
       pylimer_tools::utils::igraphVectorTToStdVector(&allIds, ids);
-      if (ids.size() == 0 && this->size > 0) {
+      if (ids.size() == 0 && this->size > 0)
+      {
         throw std::runtime_error("Molecule's graph's attribute id was not queried.");
       }
       std::sort(ids.begin(), ids.end());
@@ -73,7 +74,8 @@ namespace pylimer_tools
       Box *box = this->getBox();
       std::vector<double> lengths;
       lengths.reserve(this->getNrOfBonds());
-      if (this->getNrOfBonds() == 0) {
+      if (this->getNrOfBonds() == 0)
+      {
         return lengths;
       }
       // construct iterator
@@ -135,7 +137,48 @@ namespace pylimer_tools
       return results;
     }
 
+    double Molecule::computeRadiusOfGyration()
+    {
+      double meanX, meanY, meanZ;
+      // would be faster to just query the attributes.
+      // But the OOP interface is just too tempting
+      // as long as there are no external additional performance demands
+      std::vector<Atom> allAtoms = this->getAtoms();
+      double multiplier = 1 / allAtoms.size();
+
+      for (Atom a : allAtoms)
+      {
+        meanX += multiplier * a.getUnwrappedX(this->parent);
+        meanY += multiplier * a.getUnwrappedY(this->parent);
+        meanZ += multiplier * a.getUnwrappedZ(this->parent);
+      }
+
+      Atom virtualCenterAtom = Atom(0, 0, meanX, meanY, meanZ, 0, 0, 0);
+
+      double Rg2 = 0.0;
+      for (Atom a : allAtoms)
+      {
+        double dist = a.distanceTo(virtualCenterAtom, this->parent);
+        Rg2 += dist * dist;
+      }
+
+      return Rg2 * multiplier;
+    }
+
     std::string Molecule::getKey() { return this->key; }
+
+    std::vector<Atom> Molecule::getAtoms()
+    {
+      std::vector<Atom> results;
+      results.reserve(this->getNrOfAtoms());
+
+      for (size_t i = 0; i < this->getNrOfAtoms(); ++i)
+      {
+        results.push_back(this->getAtomForVertexId(i));
+      }
+
+      return results;
+    };
 
     std::vector<Atom> Molecule::getAtomsWithType(const int atomType)
     {

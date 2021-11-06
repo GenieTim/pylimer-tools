@@ -24,3 +24,4 @@ python-igraph>=0.9.6
 lazydocs>=0.4.5
 click>=7.1.2
 coverage>=6.0.1
+furo>=2021.10.9

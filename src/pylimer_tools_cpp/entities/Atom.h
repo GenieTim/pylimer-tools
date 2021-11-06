@@ -54,6 +54,9 @@ namespace pylimer_tools
       const inline double getX() const { return this->x; }
       const inline double getY() const { return this->y; }
       const inline double getZ() const { return this->z; }
+      const inline double getUnwrappedX(Box *box) const { return this->x * this->nx * box->getLx(); }
+      const inline double getUnwrappedY(Box *box) const { return this->y * this->ny * box->getLy(); }
+      const inline double getUnwrappedZ(Box *box) const { return this->z * this->nz * box->getLz(); }
       const int getNX() const { return this->nx; }
       const int getNY() const { return this->ny; }
       const int getNZ() const { return this->nz; }

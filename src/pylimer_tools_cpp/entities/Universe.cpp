@@ -135,8 +135,8 @@ namespace pylimer_tools
         throw std::runtime_error("Failed to decompose graph.");
       }
       size_t NComponents = igraph_vector_ptr_size(&components);
-      std::cout << NComponents << " molecules found. Removed " << indicesToRemove.size()
-                << " vertices. Size now: " << igraph_vcount(&graphWithoutCrosslinkers) << " atoms with " << igraph_ecount(&graphWithoutCrosslinkers) << " bonds." << std::endl;
+      // std::cout << NComponents << " molecules found. Removed " << indicesToRemove.size()
+      //           << " vertices. Size now: " << igraph_vcount(&graphWithoutCrosslinkers) << " atoms with " << igraph_ecount(&graphWithoutCrosslinkers) << " bonds." << std::endl;
       molecules.reserve(NComponents);
       for (size_t i = 0; i < NComponents; ++i)
       {
