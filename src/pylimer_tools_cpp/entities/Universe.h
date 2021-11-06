@@ -34,8 +34,8 @@ namespace pylimer_tools
       void setBox(Box box);
       Box getBox();
       double getVolume();
-      int getNrOfAtoms();
-      int getNrOfBonds();
+      const int getNrOfAtoms();
+      const int getNrOfBonds();
 
     protected:
       // properties of the box
