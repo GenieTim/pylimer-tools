@@ -24,7 +24,7 @@ namespace pylimer_tools
         this->nz = nz;
       };
 
-      double _getDeltaDistance(double c1, double c2, int n1, int n2, double boxL)
+      double _getDeltaDistance(double c1, double c2, int n1, int n2, double boxL) const
       {
         double delta = abs(c1 - c2);
         if (n1 != n2)
@@ -34,14 +34,14 @@ namespace pylimer_tools
         return delta;
       }
 
-      const void vectorTo(Atom b, Box *box, double *result)
+      const void vectorTo(Atom b, Box *box, double *result) const
       {
         result[0] = this->_getDeltaDistance(this->x, b.getX(), this->nx, b.getNX(), box->getLx());
         result[1] = this->_getDeltaDistance(this->y, b.getY(), this->ny, b.getNY(), box->getLy());
         result[2] = this->_getDeltaDistance(this->z, b.getZ(), this->nz, b.getNZ(), box->getLz());
       }
 
-      const double distanceTo(Atom b, Box *box)
+      const double distanceTo(Atom b, Box *box) const
       {
         double distanceVec[3];
         vectorTo(b, box, distanceVec);
