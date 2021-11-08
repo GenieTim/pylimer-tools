@@ -1,3 +1,4 @@
+import os
 import sys
 
 try:
@@ -12,6 +13,16 @@ except ImportError:
 
 from setuptools import find_packages
 
+cmake_args = []
+
+if (os.getenv('VCPKG_ROOT')):
+    toolchainFile = os.path.join(
+        os.getenv('VCPKG_ROOT'), "scripts", "buildsystems", "vcpkg.cmake")
+    cmake_args.append(
+        "-DCMAKE_TOOLCHAIN_FILE={}".format(toolchainFile.replace("\\", "/")))
+    print("Using toolchain \"{}\"".format(toolchainFile))
+
+
 setup(
     name="pylimer_tools",
     version="0.1.0",
@@ -20,10 +31,8 @@ setup(
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     cmake_install_dir="src/pylimer_tools_cpp",
-    cmake_args=[
-
-    ],
+    cmake_args=cmake_args,
     include_package_data=True,
     extras_require={"test": ["unittest"]},
-    python_requires=">=3.7",
+    python_requires=">=3.7"
 )

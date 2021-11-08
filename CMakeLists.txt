@@ -1,14 +1,5 @@
 cmake_minimum_required(VERSION 3.15.0)
 
-# setup some windows specific helps
-IF(DEFINED ENV{VCPKG_ROOT})
-  set(VCPKG_ROOT $ENV{VCPKG_ROOT})
-  set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}\\scripts\\buildsystems\\vcpkg.cmake")
-  message("MESSAGE: Using vcpkg '${VCPKG_ROOT}\\scripts\\buildsystems\\vcpkg.cmake' as toolchain")
-else()
-  message("MESSAGE: VCPKG_ROOT not set")
-endif()
-
 # start project
 project(pylimer_tools VERSION "0.1.0")
 
@@ -69,11 +60,6 @@ pybind11_add_module(pylimer_tools_cpp MODULE
   src/pylimer_tools_cpp/pybind11/pylimer_tools_cpp.cpp
 )
 
-target_link_libraries(pylimer_tools_cpp 
-    PRIVATE 
-      igraph
-      pylimer_tools
-  )
 target_compile_definitions(pylimer_tools_cpp PRIVATE VERSION_INFO=${PROJECT_VERSION})
 
 install(TARGETS pylimer_tools_cpp LIBRARY DESTINATION .)

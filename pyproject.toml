@@ -6,6 +6,6 @@ requires = [
     "pybind11",
     "cmake", 
     "ninja",
-    "python-igraph"
+    "igraph"
 ]
 build-backend = "setuptools.build_meta"

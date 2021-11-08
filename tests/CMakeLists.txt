@@ -61,7 +61,7 @@ target_link_libraries(pylimer_tests
 	PRIVATE 
 	Catch2::Catch2WithMain
 	pylimer_tools
-	igraph
+	${igraph_LIBRARIES}
 	test_sources
 )
 
