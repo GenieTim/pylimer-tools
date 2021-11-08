@@ -3,11 +3,7 @@ add_library(pylimer_utils INTERFACE)
 set(CMAKE_CXX_STANDARD 20)
 
 # add libraries
-include_directories(/usr/local/Cellar/igraph/0.9.4/include/)
-link_directories(/usr/local/Cellar/igraph/0.9.4/lib)
-link_directories(/usr/local/opt/igraph/lib/)
 
-include_directories(/usr/local/Cellar/boost/1.76.0/include)
 
 target_sources(pylimer_utils
 	PUBLIC

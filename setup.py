@@ -20,6 +20,7 @@ if (os.getenv('VCPKG_ROOT')):
         os.getenv('VCPKG_ROOT'), "scripts", "buildsystems", "vcpkg.cmake")
     cmake_args.append(
         "-DCMAKE_TOOLCHAIN_FILE={}".format(toolchainFile.replace("\\", "/")))
+    # cmake_args.append("-DVCPKG_TARGET_TRIPLET=x86-windows-static")
     print("Using toolchain \"{}\"".format(toolchainFile))
 
 

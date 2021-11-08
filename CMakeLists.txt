@@ -37,21 +37,6 @@ endif()
 # Now we can find pybind11
 find_package(pybind11 CONFIG REQUIRED)
 
-# and other needed packages
-
-find_package(igraph REQUIRED)
-if(igraph_FOUND)
-  include_directories(${igraph_INCLUDE_DIRS})
-	message("Found igraph")
-else()
-	message(WARNING "DID NOT find igraph.")
-endif()
-
-find_package(Boost REQUIRED)
-if(Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS})
-endif()
-
 # add sources & targets
 add_subdirectory(src/pylimer_tools_cpp)
 pybind11_add_module(pylimer_tools_cpp MODULE 

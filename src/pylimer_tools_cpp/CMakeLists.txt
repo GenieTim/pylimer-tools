@@ -24,22 +24,6 @@ endif()
 add_library(pylimer_tools pylimer_tools.cpp)
 set_target_properties(pylimer_tools PROPERTIES VERSION ${PROJECT_VERSION})
 
-
-find_package(igraph REQUIRED)
-if(igraph_FOUND)
-  include_directories(${igraph_INCLUDE_DIRS})
-  target_link_libraries(pylimer_tools ${igraph_LIBRARIES})
-	message("Found igraph")
-else()
-	message(WARNING "DID NOT FIND igraph")
-endif()
-
-find_package(Boost REQUIRED)
-if(Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS})
-  target_link_libraries(pylimer_tools ${Boost_LIBRARIES})
-endif()
-
 # add other needed packages
 target_link_libraries(pylimer_tools 
 	PRIVATE
