@@ -24,12 +24,23 @@ namespace pylimer_tools
         this->nz = nz;
       };
 
-      double _getDeltaDistance(double c1, double c2, int n1, int n2, double boxL) const
+      double _getDeltaDistanceUnwrapped(double c1, double c2, int n1, int n2, double boxL) const
       {
         double delta = abs(c1 - c2);
         if (n1 != n2)
         {
           delta -= ((double)(n1 - n2)) * boxL;
+        }
+        return delta;
+      }
+
+      double _getDeltaDistance(double c1, double c2, int n1, int n2, double boxL) const
+      {
+        double delta = abs(c1 - c2);
+        if (delta >= boxL * 0.5)
+        {
+          delta -= floor(delta / boxL) * boxL;
+          delta = abs(delta);
         }
         return delta;
       }
