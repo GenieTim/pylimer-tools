@@ -54,15 +54,16 @@ target_link_libraries(test_sources
 PRIVATE
 	Catch2::Catch2
 	pylimer_tools
+	${igraph_LIBRARIES}
 )
 
 add_executable(pylimer_tests pylimer_tools/test.cpp)
 target_link_libraries(pylimer_tests 
 	PRIVATE 
 	Catch2::Catch2WithMain
-	pylimer_tools
-	${igraph_LIBRARIES}
 	test_sources
+	pylimer_tools
+	igraph #${igraph_LIBRARIES}
 )
 
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)

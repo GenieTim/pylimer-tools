@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 #include "Universe.h"
 #include "UniverseSequence.h"
 #include "../utils/DataFileParser.h"

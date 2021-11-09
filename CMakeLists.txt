@@ -50,10 +50,18 @@ endif()
 
 # add sources & targets
 add_subdirectory(src/pylimer_tools_cpp)
+
 pybind11_add_module(pylimer_tools_cpp MODULE 
   src/pylimer_tools_cpp/pybind11/entities.cpp
   src/pylimer_tools_cpp/pybind11/calculations.cpp
   src/pylimer_tools_cpp/pybind11/pylimer_tools_cpp.cpp
+)
+
+target_link_libraries(pylimer_tools_cpp 
+  PRIVATE 
+    pylimer_tools
+    ${igraph_LIBRARIES}
+    igraph
 )
 
 target_compile_definitions(pylimer_tools_cpp PRIVATE VERSION_INFO=${PROJECT_VERSION})

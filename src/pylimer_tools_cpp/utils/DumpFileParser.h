@@ -14,6 +14,7 @@
 #include <boost/tokenizer.hpp>
 #include <map>
 #include <cctype>
+#include <any>
 #include <cstring>
 #include <filesystem>
 
@@ -21,6 +22,9 @@ namespace pylimer_tools
 {
   namespace utils
   {
+    // types
+    typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
+    typedef std::map<std::string, std::vector<pylimer_tools::utils::CsvTokenizer>> data_item_t;
 
     class DumpFileParser
     {
@@ -30,6 +34,8 @@ namespace pylimer_tools
       std::vector<OUT> getValuesForAt(const int index, const std::string &headerKey, const std::string &column);
       template <typename OUT>
       std::vector<OUT> getValuesForAt(const int index, const std::string &headerKey, const int column);
+      template <typename... Ts>
+      std::vector<std::variant<Ts...>> parseRow(std::string row);
       int getLength() { return this->data.size(); }
       bool hasKey(std::string headerKey)
       {
@@ -55,6 +61,10 @@ namespace pylimer_tools
       }
 
     private:
+      template <typename T>
+      void pushBackParsedValue(tokenizer::iterator &it, std::vector<std::any> &target);
+      template <typename T, typename... restTs>
+      void pushBackParsedValues(tokenizer::iterator &it, std::vector<std::any> &target);
       bool shortenLineToSkip(std::string *line);
       void skipEmptyLines(char *cline, size_t *len, FILE *fp);
       std::string cleanHeader(std::string header);
@@ -70,9 +80,8 @@ namespace pylimer_tools
       }
 
       //// data
-      typedef std::map<std::string, std::string> data_item_t;
       std::vector<data_item_t> data;
-      std::map<std::string, std::vector<std::string> > headerColMap;
+      std::map<std::string, std::vector<std::string>> headerColMap;
     };
 
     void DumpFileParser::read(const std::string filePath)
@@ -87,7 +96,9 @@ namespace pylimer_tools
 
       FILE *fp = fopen(filePath.c_str(), "r");
       if (fp == NULL)
+      {
         throw std::runtime_error("Failed to open data file to read.");
+      }
 
       // read everything until the first key
       while ((getline(&cline, &len, fp)) != -1)
@@ -120,11 +131,7 @@ namespace pylimer_tools
         }
         else
         {
-          if (!dataItem.contains(currentKey))
-          {
-            dataItem.insert_or_assign(currentKey, "");
-          }
-          dataItem.insert_or_assign(currentKey, dataItem.at(currentKey) + line);
+          dataItem[currentKey].push_back(pylimer_tools::utils::CsvTokenizer(line));
         }
 
         if (line == newGroupKey)
@@ -187,45 +194,18 @@ namespace pylimer_tools
     template <typename OUT>
     std::vector<OUT> DumpFileParser::getValuesForAt(const int index, const std::string &headerKey, const int colIdx)
     {
-      typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-      // this is clearly not the fastest way to access more than one column,
-      // as the tokenizing happens again for each column.
       data_item_t dataItem = this->data[index];
       //
-      std::string relevantData = dataItem[headerKey];
-      std::istringstream f(relevantData);
-      std::string line;
-      std::vector<OUT> result;
-      int lineNr = 0;
+      std::vector<pylimer_tools::utils::CsvTokenizer> relevantData = dataItem[headerKey];
+      std::vector<OUT> results;
 
-      boost::char_separator<char> sep{" ,;\t\n"};
-
-      // all other lines
-      while (std::getline(f, line))
+      for (pylimer_tools::utils::CsvTokenizer lineTok : relevantData)
       {
-        tokenizer tok{line, sep};
-        // boost::tokenizer<>::iterator it1, it2 = tok.begin();it1 = it2;
-        // std::advance(it2, colIdx); cannot be used as boost gives segfault and I have not found a way to check bounds in another way
         int iteration = 0;
-        bool found = false;
-        for (tokenizer::iterator it = tok.begin(); it != tok.end(); ++it)
-        {
-          if (iteration == colIdx)
-          {
-            found = true;
-            result.push_back(boost::lexical_cast<OUT>(*it));
-            break;
-          }
-          iteration++;
-        }
-        if (!found)
-        {
-          throw std::runtime_error("Column index " + std::to_string(colIdx) + " out of range to get values for key " + headerKey + " in line " + std::to_string(lineNr) + ". Values are '" + line + "'.");
-        }
-        ++lineNr;
+        results.push_back(lineTok.get<OUT>(colIdx));
       }
 
-      return result;
+      return results;
     };
 
     bool DumpFileParser::shortenLineToSkip(std::string *line)
