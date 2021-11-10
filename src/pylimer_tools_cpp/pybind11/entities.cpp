@@ -107,6 +107,7 @@ void init_pylimer_bound_entities(py::module_ &m)
         .def(py::init<const double, const double, const double>())
         .def("addAtoms", &Universe::addAtoms)
         .def("addBonds", &Universe::addBonds)
+        .def("setMasses", &Universe::setMasses)
         .def("setBoxLengths", &Universe::setBoxLengths)
         .def("getMolecules", &Universe::getMolecules, R"pbdoc(
         Reduces the Universe to a list of molecules. 

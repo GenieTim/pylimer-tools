@@ -7,11 +7,6 @@
 #include "StringUtil.h"
 #include "../entities/Universe.h"
 #include "../entities/UniverseSequence.h"
-#include <boost/algorithm/string/replace.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/algorithm/string/trim.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/tokenizer.hpp>
 #include <map>
 #include <cctype>
 #include <any>
@@ -23,7 +18,6 @@ namespace pylimer_tools
   namespace utils
   {
     // types
-    typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
     typedef std::map<std::string, std::vector<pylimer_tools::utils::CsvTokenizer>> data_item_t;
 
     class DumpFileParser
@@ -35,7 +29,6 @@ namespace pylimer_tools
       template <typename OUT>
       std::vector<OUT> getValuesForAt(const int index, const std::string &headerKey, const int column);
       template <typename... Ts>
-      std::vector<std::variant<Ts...>> parseRow(std::string row);
       int getLength() { return this->data.size(); }
       bool hasKey(std::string headerKey)
       {
@@ -57,25 +50,25 @@ namespace pylimer_tools
       }
       bool keyHasDirectionalColumn(std::string headerKey, std::string dirPraefix, std::string dirSuffix)
       {
+        // std::cout << "Searching for " << headerKey << " " << dirPraefix << dirSuffix << " in " << pylimer_tools::utils::join(this->headerColMap[headerKey].begin(), this->headerColMap[headerKey].end(), std::string(" ")) << std::endl;
         return this->keyHasColumn(headerKey, dirPraefix + "x" + dirSuffix) && this->keyHasColumn(headerKey, dirPraefix + "y" + dirSuffix) && this->keyHasColumn(headerKey, dirPraefix + "z" + dirSuffix);
       }
 
     private:
-      template <typename T>
-      void pushBackParsedValue(tokenizer::iterator &it, std::vector<std::any> &target);
-      template <typename T, typename... restTs>
-      void pushBackParsedValues(tokenizer::iterator &it, std::vector<std::any> &target);
-      bool shortenLineToSkip(std::string *line);
+      std::string shortenLineToSkip(std::string line);
       void skipEmptyLines(char *cline, size_t *len, FILE *fp);
       std::string cleanHeader(std::string header);
 
-      template <typename IN>
-      inline std::vector<IN> parseTypesInLine(std::string line)
+      template <typename OUT>
+      inline std::vector<OUT> parseTypesInLine(std::string line)
       {
-        std::vector<IN> resultnumbers;
-        boost::tokenizer<> tok(line);
-        std::transform(tok.begin(), tok.end(), std::back_inserter(resultnumbers),
-                       &boost::lexical_cast<IN, std::string>);
+        std::vector<OUT> resultnumbers;
+        pylimer_tools::utils::CsvTokenizer tokenizer(line);
+        resultnumbers.reserve(tokenizer.getLength());
+        for (size_t i = 0; i < tokenizer.getLength(); ++i)
+        {
+          resultnumbers.push_back(tokenizer.get<OUT>(i));
+        }
         return resultnumbers;
       }
 
@@ -103,9 +96,9 @@ namespace pylimer_tools
       // read everything until the first key
       while ((getline(&cline, &len, fp)) != -1)
       {
-        std::string line(cline);
+        std::string line = pylimer_tools::utils::trimLineOmitComment(cline);
         // skip empty lines: break when not empty
-        if (!this->shortenLineToSkip(&line))
+        if (!line.empty())
         {
           break;
         }
@@ -118,14 +111,14 @@ namespace pylimer_tools
 
       while ((getline(&cline, &len, fp)) != -1)
       {
-        std::string line(cline);
+        std::string line = pylimer_tools::utils::trimLineOmitComment(cline);
         // skip empty lines
-        if (this->shortenLineToSkip(&line))
+        if (line.empty())
         {
           continue;
         }
         // new header
-        if (boost::algorithm::starts_with(line, "ITEM:"))
+        if (pylimer_tools::utils::startsWith(line, "ITEM:"))
         {
           currentKey = this->cleanHeader(line);
         }
@@ -153,23 +146,26 @@ namespace pylimer_tools
 
     std::string DumpFileParser::cleanHeader(std::string headerToClean)
     {
-      boost::algorithm::replace_first(headerToClean, "ITEM: ", "");
-      boost::tokenizer<> tok(headerToClean);
+      // "ITEM: ".size() = 6
+      headerToClean.erase(0, 6);
+      pylimer_tools::utils::CsvTokenizer tokenizer(headerToClean);
+
       std::string newHeader = "";
       std::vector<std::string> columns;
-      for (boost::tokenizer<>::iterator beg = tok.begin(); beg != tok.end(); ++beg)
+      for (size_t i = 0; i < tokenizer.getLength(); ++i)
       {
-        if (isUpper(*beg))
+        std::string beg = tokenizer.get<std::string>(i);
+        if (isUpper(beg))
         {
-          newHeader.append(*beg);
+          newHeader.append(beg);
           newHeader.append(" ");
         }
         else
         {
-          columns.push_back(*beg);
+          columns.push_back(beg);
         }
       }
-      boost::algorithm::trim_right(newHeader);
+      newHeader = pylimer_tools::utils::rtrim(newHeader);
       if (!this->headerColMap.contains(newHeader))
       {
         this->headerColMap.insert_or_assign(newHeader, columns);
@@ -201,25 +197,11 @@ namespace pylimer_tools
 
       for (pylimer_tools::utils::CsvTokenizer lineTok : relevantData)
       {
-        int iteration = 0;
         results.push_back(lineTok.get<OUT>(colIdx));
       }
 
       return results;
     };
-
-    bool DumpFileParser::shortenLineToSkip(std::string *line)
-    {
-      boost::trim_left(*line);
-      // trim comments
-      if (contains(line, "#"))
-      {
-        std::vector<std::string> split;
-        boost::split(split, *line, boost::is_any_of("#"));
-        line = &split[0];
-      }
-      return line->empty();
-    }
   }
 }
 

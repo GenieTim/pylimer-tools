@@ -97,6 +97,10 @@ namespace pylimer_tools
       this->NBonds = igraph_ecount(&this->graph);
     }
 
+    void Universe::setMasses(std::map<int, double> weightPerType) {
+      this->weightPerType = weightPerType;
+    }
+
     std::vector<Molecule> Universe::getMolecules(const int atomTypeToOmit)
     {
       std::vector<Molecule> molecules;
@@ -365,14 +369,10 @@ namespace pylimer_tools
     /*
     Compute the weight fractions of each atom type in the network.
 
-    Arguments:
-      - network: the poylmer network to do the computation for
-      - weightPerType: a dictionary with key: type, and value: weight per atom of this atom type. 
-
     Returns:
       - $\\vec{W_i}$ (dict): using the type i as a key, this dict contains the weight fractions ($\\frac{W_i}{W_{tot}}$)
     */
-    std::map<int, double> Universe::computeWeightFractions(std::map<int, double> weightPerType)
+    std::map<int, double> Universe::computeWeightFractions()
     {
       std::map<int, double> partialMasses;
       if (this->getNrOfAtoms() == 0)
@@ -384,7 +384,7 @@ namespace pylimer_tools
       double totalMass = 0.0;
       for (int type : types)
       {
-        totalMass += weightPerType[type];
+        totalMass += this->weightPerType[type];
         partialMasses.try_emplace(type, 0.0);
         partialMasses[type] += weightPerType[type];
       }

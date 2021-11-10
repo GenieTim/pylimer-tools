@@ -28,3 +28,14 @@ target_sources(pylimer_entities
 		${CMAKE_CURRENT_LIST_DIR}/Molecule.h
 		${CMAKE_CURRENT_LIST_DIR}/UniverseSequence.h
 )
+
+# optional additional dependencies
+find_package(OpenMP)
+if (OpenMP_FOUND)
+	add_definitions(-DOPENMP_FOUND=true)
+  include_directories(${OpenMP_INCLUDE_DIRS})
+	target_link_libraries(pylimer_entities PRIVATE ${OpenMP_LIBRARIES})
+	message(INFO "Found OpenMP")
+else()
+	message("Did not find OpenMP")
+endif()
