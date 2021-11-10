@@ -4,6 +4,9 @@
 #include "../utils/StringUtil.h"
 #include <igraph/igraph.h>
 #include <iostream>
+#ifdef OPENMP_FOUND
+#include <omp.h>
+#endif
 
 namespace pylimer_tools
 {
@@ -146,6 +149,7 @@ namespace pylimer_tools
       std::vector<Atom> allAtoms = this->getAtoms();
       double multiplier = 1 / allAtoms.size();
 
+      #pragma omp parallel for reduction (+:meanX,meanY,meanZ)
       for (Atom a : allAtoms)
       {
         meanX += multiplier * a.getUnwrappedX(this->parent);
@@ -170,9 +174,12 @@ namespace pylimer_tools
     std::vector<Atom> Molecule::getAtoms()
     {
       std::vector<Atom> results;
-      results.reserve(this->getNrOfAtoms());
+      size_t nrOfAtoms = this->getNrOfAtoms();
+      results.reserve(nrOfAtoms);
 
-      for (size_t i = 0; i < this->getNrOfAtoms(); ++i)
+      #pragma omp declare reduction (merge : std::vector<Atom> : omp_out.insert(omp_out.end(), omp_in.begin(), omp_in.end()))
+      #pragma omp parallel for reduction(merge: results)
+      for (size_t i = 0; i < nrOfAtoms; ++i)
       {
         results.push_back(this->getAtomForVertexId(i));
       }
@@ -182,10 +189,13 @@ namespace pylimer_tools
 
     std::vector<Atom> Molecule::getAtomsWithType(const int atomType)
     {
-      std::vector<int> types = this->getPropertyValues<int>("type");
+      const std::vector<int> types = this->getPropertyValues<int>("type");
       std::vector<Atom> results;
+      size_t nrOfTypes = types.size();
 
-      for (size_t i = 0; i < types.size(); ++i)
+      #pragma omp declare reduction (merge : std::vector<Atom> : omp_out.insert(omp_out.end(), omp_in.begin(), omp_in.end()))
+      #pragma omp parallel for reduction(merge: results)
+      for (size_t i = 0; i < nrOfTypes; ++i)
       {
         if (types[i] == atomType)
         {

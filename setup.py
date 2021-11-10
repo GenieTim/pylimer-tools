@@ -1,5 +1,6 @@
 import os
 import sys
+import warnings
 
 try:
     from skbuild import setup
@@ -18,10 +19,13 @@ cmake_args = []
 if (os.getenv('VCPKG_ROOT')):
     toolchainFile = os.path.join(
         os.getenv('VCPKG_ROOT'), "scripts", "buildsystems", "vcpkg.cmake")
-    cmake_args.append(
-        "-DCMAKE_TOOLCHAIN_FILE={}".format(toolchainFile.replace("\\", "/")))
-    # cmake_args.append("-DVCPKG_TARGET_TRIPLET=x86-windows-static")
-    print("Using toolchain \"{}\"".format(toolchainFile))
+    if (os.path.isfile(toolchainFile)):
+        cmake_args.append(
+            "-DCMAKE_TOOLCHAIN_FILE={}".format(toolchainFile.replace("\\", "/")))
+        # cmake_args.append("-DVCPKG_TARGET_TRIPLET=x86-windows-static")
+        print("Using toolchain \"{}\"".format(toolchainFile))
+    else:
+        warnings.warn("Detected VCPKG_ROOT. Did not find toolchain file {} though.".format(toolchainFile))
 
 
 setup(
