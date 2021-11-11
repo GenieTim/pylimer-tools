@@ -55,7 +55,7 @@ namespace pylimer_tools
       return result;
     }
 
-    const std::string WHITESPACE = " \n\r\t\f\v";
+    static const std::string WHITESPACE = " \n\r\t\f\v";
 
     static inline std::string ltrim(const std::string &s)
     {
@@ -89,7 +89,7 @@ namespace pylimer_tools
       return haystack.compare(0, needle.size(), needle) == 0;
     }
 
-    inline std::string trimLineOmitComment(std::string line)
+    static inline std::string trimLineOmitComment(std::string line)
     {
       line = pylimer_tools::utils::ltrim(line);
       // trim comments
@@ -97,7 +97,7 @@ namespace pylimer_tools
       return line;
     }
 
-    inline std::string trimLineOmitComment(char *line)
+    static inline std::string trimLineOmitComment(char *line)
     {
       std::string tempString = std::string(line);
       return pylimer_tools::utils::trimLineOmitComment(tempString);

@@ -32,6 +32,7 @@ namespace pylimer_tools
       for (size_t i = 0; i < nrOfTimesteps; ++i)
       {
         Universe newUniverse = Universe(0.0, 0.0, 0.0);
+        newUniverse.setTimestep(dumpFileParser.getValuesForAt<long int>(i, "TIMESTEP", 0)[0]);
         if (dumpFileParser.hasKey("BOX BOUNDS"))
         {
           std::vector<double> lo = dumpFileParser.getValuesForAt<double>(i, "BOX BOUNDS", 0);
@@ -170,6 +171,17 @@ namespace pylimer_tools
       universe.addBonds(fileParser.getNrOfBonds(), fileParser.getBondFrom(), fileParser.getBondTo());
       universe.setMasses(fileParser.getMasses());
       return universe;
+    }
+
+    std::vector<Universe> UniverseSequence::getAll()
+    {
+      std::vector<Universe> results;
+      results.reserve(this->getLength());
+      for (size_t i = 0; i < this->getLength(); ++i)
+      {
+        results.push_back(this->atIndex(i));
+      }
+      return results;
     }
 
     void UniverseSequence::resetIterator()

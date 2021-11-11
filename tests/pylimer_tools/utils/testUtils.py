@@ -10,7 +10,6 @@ import pandas.testing as pd_testing
 from tests.pylimer_tools.pdComparingTestCase import PandasComparingTestCase
 from pylimer_tools.utils.cacheUtility import (doCache, getCacheFileName,
                                               loadCache)
-from pylimer_tools.utils.getMolecules import getMolecules
 from pylimer_tools.utils.getTail import getTail
 from pylimer_tools.utils.unifyDataStepsizes import unifyDataStepsizes
 
@@ -78,66 +77,6 @@ class TestUtilFunctions(PandasComparingTestCase):
         testFile.write(datetime.datetime.now().strftime("%c"))
         testFile.close()
         self.assertIsNone(loadCache(file, suffix))
-
-    def test_getMolecules(self):
-        testAtoms = pd.DataFrame([
-            {"id": 1, "nx": 1, "ny": 1, "nz": 1,
-                "type": 1, "x": 1, "y": 1, "z": 1},
-            {"id": 2, "nx": 1, "ny": 1, "nz": 1,
-                "type": 1, "x": 2, "y": 1, "z": 1},
-            {"id": 3, "nx": 1, "ny": 1, "nz": 1,
-                "type": 1, "x": 3, "y": 1, "z": 1},
-            {"id": 5, "nx": 1, "ny": 1, "nz": 1,
-                "type": 1, "x": 1, "y": 3, "z": 1},
-            {"id": 6, "nx": 1, "ny": 1, "nz": 1,
-                "type": 2, "x": 1, "y": 1, "z": 2},
-            {"id": 7, "nx": 1, "ny": 1, "nz": 1,
-                "type": 2, "x": 1, "y": 1, "z": 3},
-        ])
-        testBonds = pd.DataFrame([
-            {"to": 1, "bondFrom": 2},
-            {"to": 3, "bondFrom": 2},
-            {"to": 5, "bondFrom": 6},
-            {"to": 6, "bondFrom": 7}
-        ])
-
-        expectedResult = [[
-            {'atom': testAtoms.loc[0, :],
-             'bonds_from': pd.DataFrame(columns=['to', 'bondFrom'], dtype=np.int64),
-             'bonds_to': pd.DataFrame([{'to': 1, 'bondFrom': 2}])},
-            {'atom': testAtoms.loc[1, :], 'bonds_from': pd.DataFrame([
-                {'to': 1, 'bondFrom': 2},
-                {'to': 3, 'bondFrom': 2}
-            ]), 'bonds_to': pd.DataFrame(columns=['to', 'bondFrom'], dtype=np.int64)},
-            {'atom': testAtoms.loc[2, :],
-             'bonds_from': pd.DataFrame(columns=['to', 'bondFrom'], dtype=np.int64),
-             'bonds_to': pd.DataFrame([{"to": 3, "bondFrom": 2}])}
-        ], [
-            {'atom': testAtoms.loc[3, :],
-             'bonds_from': pd.DataFrame(columns=['to', 'bondFrom'], dtype=np.int64),
-             'bonds_to': pd.DataFrame(columns=['to', 'bondFrom'], dtype=np.int64)}
-        ]]
-
-        resultingMolecules = getMolecules(
-            testAtoms, testBonds, [10, 10, 10], 2)
-
-        self.assertEqual(len(resultingMolecules), 2)
-        self.assertEqual(len(resultingMolecules[0]), 3)
-        self.assertEqual(len(resultingMolecules[1]), 1)
-        for moleculeIdx in range(len(expectedResult)):
-            self.assertEqual(len(expectedResult[moleculeIdx]), len(
-                resultingMolecules[moleculeIdx]))
-            for atomIdx in range(len(expectedResult[moleculeIdx])):
-                for atomKey in expectedResult[moleculeIdx][atomIdx]:
-                    self.assertTrue(
-                        atomKey in resultingMolecules[moleculeIdx][atomIdx])
-                    atomValueExpected = expectedResult[moleculeIdx][atomIdx][atomKey]
-                    atomValueActual = resultingMolecules[moleculeIdx][atomIdx][atomKey]
-                    if (isinstance(atomValueExpected, pd.DataFrame)):
-                        self.assertEqual(atomValueExpected.reset_index(
-                            drop=True), atomValueActual.reset_index(drop=True))
-                    else:
-                        self.assertEqual(atomValueExpected, atomValueActual)
 
 
 if __name__ == '__main__':

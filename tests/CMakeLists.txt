@@ -48,6 +48,7 @@ add_library(test_sources
 		pylimer_tools/test_universe.cpp 
 		pylimer_tools/test_universesequence.cpp 
 		pylimer_tools/test_molecule.cpp 
+		pylimer_tools/test_atom.cpp 
 )
 
 target_link_libraries(test_sources 
