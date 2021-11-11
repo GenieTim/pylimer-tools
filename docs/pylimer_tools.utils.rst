@@ -12,14 +12,6 @@ pylimer\_tools.utils.cacheUtility module
    :undoc-members:
    :show-inheritance:
 
-pylimer\_tools.utils.getMolecules module
-----------------------------------------
-
-.. automodule:: pylimer_tools.utils.getMolecules
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 pylimer\_tools.utils.getTail module
 -----------------------------------
 

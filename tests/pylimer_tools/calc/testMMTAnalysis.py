@@ -1,7 +1,11 @@
-
+import sys
+import os
+import unittest
 
 from pylimer_tools.calc.doMMTAnalysis import *
-from pylimer_tools.entities.universum import Universum
+
+if __name__ == '__main__':
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../"))
 from tests.pylimer_tools.universeUsingTestCase import UniverseUsingTestCase
 
 
@@ -68,3 +72,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertEqual(0.43094694702110886, calculateWeightFractionOfBackbone(self.saturatedTestUniverse, junctionType=2, strandLength=2, weightPerType={1: 1, 2: 1}, functionalityPerType={
             1: 2, 2: 4
         }))
+
+
+if __name__ == '__main__':
+    unittest.main()

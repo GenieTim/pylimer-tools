@@ -39,6 +39,7 @@ namespace pylimer_tools
       std::string getKey();
       template <typename OUT>
       std::vector<OUT> getPropertyValues(const char *propertyName);
+      std::vector<int> getAtomTypes() { return this->getPropertyValues<int>("type"); }
 
     private:
       Box *parent;

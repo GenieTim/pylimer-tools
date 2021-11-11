@@ -5,6 +5,7 @@
 #include <igraph/igraph.h>
 
 #include <vector>
+#include <set>
 #include <map>
 #include <iterator> // for back_inserter
 #include <algorithm>
@@ -97,9 +98,15 @@ namespace pylimer_tools
       this->NBonds = igraph_ecount(&this->graph);
     }
 
-    void Universe::setMasses(std::map<int, double> weightPerType) {
+    void Universe::setMasses(std::map<int, double> weightPerType)
+    {
       this->weightPerType = weightPerType;
     }
+
+    std::map<int, double> Universe::getMasses()
+    {
+      return this->weightPerType;
+    };
 
     std::vector<Molecule> Universe::getMolecules(const int atomTypeToOmit)
     {
@@ -177,10 +184,15 @@ namespace pylimer_tools
 
     std::vector<long int> Universe::getIndicesOfType(const int type)
     {
+      std::vector<long int> indices;
+      if (this->getNrOfAtoms() == 0)
+      {
+        return indices;
+      }
+
       igraph_vector_t types;
       igraph_vector_init(&types, this->getNrOfAtoms());
       VANV(&this->graph, "type", &types);
-      std::vector<long int> indices;
       for (int i = 0; i < this->NAtoms; ++i)
       {
         if (VECTOR(types)[i] == type)
@@ -205,12 +217,21 @@ namespace pylimer_tools
         throw std::runtime_error("Failed to copy graph.");
       }
       // select vertices of type
-      igraph_vs_t verticesToRemove = this->getVerticesOfType(crosslinkerType);
-      // remove elements of type
-      if (igraph_delete_vertices(&graphWithoutCrosslinkers, verticesToRemove))
+      std::vector<long int> indicesToRemove = this->getIndicesOfType(crosslinkerType);
+      std::sort(indicesToRemove.rbegin(), indicesToRemove.rend());
+      if (indicesToRemove.size() > 0)
       {
-        throw std::runtime_error("Failed to delete crosslinkers from graph.");
+        igraph_vs_t verticesToRemove = this->getVerticesByIndices(indicesToRemove);
+
+        // remove elements of type
+        if (igraph_delete_vertices(&graphWithoutCrosslinkers, verticesToRemove))
+        {
+          throw std::runtime_error("Failed to delete crosslinkers from graph.");
+        }
+
+        igraph_vs_destroy(&verticesToRemove);
       }
+
       // split the copy into the separate
       igraph_vector_ptr_t components;
       igraph_vector_ptr_init(&components, 3);
@@ -225,22 +246,28 @@ namespace pylimer_tools
         // loop the chains to add the crosslinkers back
         igraph_t *chain = (igraph_t *)VECTOR(components)[i];
         int moleculeLengthBefore = igraph_vcount(chain);
-        igraph_vs_t endNodes = pylimer_tools::utils::getVerticesWithDegree(chain, 1);
+        std::vector<long int> endNodeIndices = pylimer_tools::utils::getVerticesWithDegree(chain, 1);
+        igraph_vector_t endNodeSelectorVector;
+        igraph_vector_init(&endNodeSelectorVector, endNodeIndices.size());
+        pylimer_tools::utils::StdVectorToIgraphVectorT(endNodeIndices, &endNodeSelectorVector);
         MoleculeType molType = MoleculeType::UNDEFINED;
         bool isLoop = false;
 
-        if (moleculeLengthBefore > 1)
+        if (moleculeLengthBefore >= 1)
         {
           // no care about single atoms for now (though they are included)
           igraph_vit_t endNodeVit;
-          igraph_vit_create(chain, endNodes, &endNodeVit);
+          igraph_vit_create(chain, igraph_vss_vector(&endNodeSelectorVector), &endNodeVit);
+          // collect atoms to add, since adding them would invalidate the iterator
+          std::vector<long int> atomsToAdd;
+          std::vector<std::vector<long int>> bondsToAdd;
           // loop end nodes
           while (!IGRAPH_VIT_END(endNodeVit))
           {
-            long int newVertexId = (long int)IGRAPH_VIT_GET(endNodeVit);
-            long int originalVertexId = this->findVertexIdForProperty("id", VAN(&graph, "id", newVertexId));
+            long int newEndNodeVertexId = (long int)IGRAPH_VIT_GET(endNodeVit);
+            long int originalEndNodeVertexId = this->findVertexIdForProperty("id", VAN(&graph, "id", newEndNodeVertexId));
             igraph_vs_t neighbours;
-            if (igraph_vs_adj(&neighbours, originalVertexId, IGRAPH_ALL))
+            if (igraph_vs_adj(&neighbours, originalEndNodeVertexId, IGRAPH_ALL))
             {
               throw std::runtime_error("Failed to get neighbours in graph");
             }
@@ -251,51 +278,59 @@ namespace pylimer_tools
             // loop neighbours
             while (!IGRAPH_VIT_END(originalNeighbourVit))
             {
-              long int neighbourId = (long int)IGRAPH_VIT_GET(originalNeighbourVit);
-              if (igraph_cattribute_VAN(&graph, "type", neighbourId) == crosslinkerType)
+              long int originalNeighbourId = (long int)IGRAPH_VIT_GET(originalNeighbourVit);
+
+              if (igraph_cattribute_VAN(&graph, "type", originalNeighbourId) == crosslinkerType)
               {
-                // check if this crosslinker exists in the current chain to find loops
-                igraph_vs_t neighbourInChain;
-                if (igraph_vs_1(&neighbourInChain, neighbourId))
-                {
-                  isLoop = true;
-                }
-                else
-                {
-                  // check whether the neighbour has been found in the chain
-                  igraph_vit_t oneNeighbourVit;
-                  igraph_vit_create(chain, neighbourInChain, &oneNeighbourVit);
-                  if (IGRAPH_VIT_SIZE(oneNeighbourVit) == 1)
-                  {
-                    isLoop = true;
-                  }
-                  else
-                  {
-                    // add crosslinker back to chain
-                    igraph_add_vertices(chain, 1, 0);
-                    long int newCrosslinkerVertexIdx = igraph_vcount(chain) - 1;
-                    // including bond, of course
-                    igraph_add_edge(chain, newVertexId, newCrosslinkerVertexIdx);
-                    // copy all attributes
-                    for (auto property : {"id", "type", "x", "y", "z", "nx", "ny", "nz"})
-                    {
-                      SETVAN(chain, property, newCrosslinkerVertexIdx, VAN(&graph, property, neighbourId));
-                    }
-                  }
-                }
-                igraph_vs_destroy(&neighbourInChain);
+                // found a crosslinker neighbour
+                long int originalNeighbourAtomId = igraph_cattribute_VAN(&graph, "id", originalNeighbourId);
+                atomsToAdd.push_back(originalNeighbourId);
+                bondsToAdd.push_back({{newEndNodeVertexId, originalNeighbourId}});
               }
 
               IGRAPH_VIT_NEXT(originalNeighbourVit);
             }
 
+            if (atomsToAdd.size() == 2 && atomsToAdd[0] == atomsToAdd[1])
+            {
+              isLoop = true;
+              // we only want to add it once -> remove
+              atomsToAdd.pop_back();
+            }
+
+            IGRAPH_VIT_NEXT(endNodeVit);
             igraph_vit_destroy(&originalNeighbourVit);
             igraph_vs_destroy(&neighbours);
-            IGRAPH_VIT_NEXT(endNodeVit);
+          } // loop end nodes
+
+          std::map<long int, long int> newAtomsMap;
+          // actually add the atoms...
+          for (auto atomToAddOriginalId : atomsToAdd)
+          {
+            igraph_add_vertices(chain, 1, 0);
+            long int newCrosslinkerVertexIdx = igraph_vcount(chain) - 1;
+            newAtomsMap.insert_or_assign(atomToAddOriginalId, newCrosslinkerVertexIdx);
+            // additional loop check
+            long int originalNeighbourAtomId = igraph_cattribute_VAN(&graph, "id", atomToAddOriginalId);
+            if (pylimer_tools::utils::graphHasVertexWithProperty(chain, "id", originalNeighbourAtomId))
+            {
+              isLoop = true;
+            }
+
+            // including all attributes
+            for (auto property : {"id", "type", "x", "y", "z", "nx", "ny", "nz"})
+            {
+              SETVAN(chain, property, newCrosslinkerVertexIdx, VAN(&graph, property, atomToAddOriginalId));
+            }
+          }
+          // ...and bonds
+          for (auto bond : bondsToAdd)
+          {
+            igraph_add_edge(chain, bond[0], newAtomsMap[bond[2]]);
           }
           igraph_vit_destroy(&endNodeVit);
-        }
-        igraph_vs_destroy(&endNodes);
+        } // if molecule length
+        igraph_vector_destroy(&endNodeSelectorVector);
         // decide on molecule type
         int newMoleculeLength = igraph_vcount(chain);
         if (newMoleculeLength == moleculeLengthBefore)
@@ -318,7 +353,7 @@ namespace pylimer_tools
         // finally, create the molecule/chain
         molecules.push_back(Molecule(&this->box, chain, molType));
       }
-      igraph_decompose_destroy(&components);
+      // igraph_decompose_destroy(&components);
       igraph_destroy(&graphWithoutCrosslinkers);
 
       return molecules;
@@ -341,10 +376,7 @@ namespace pylimer_tools
       }
 
       std::vector<int> types = this->getPropertyValues<int>("type");
-      std::vector<int> uniqueTypes;
-      copy(std::begin(types), std::end(types), std::back_inserter(uniqueTypes));
-      auto uniqueTypesIter = std::unique(std::begin(types), std::end(types));
-      uniqueTypes.erase(uniqueTypesIter, uniqueTypes.end());
+      std::set<int> uniqueTypes(types.begin(), types.end());
       // make sure the keys are (re)set, for every type
       for (int type : uniqueTypes)
       {
@@ -405,12 +437,20 @@ namespace pylimer_tools
 
     Atom Universe::getAtom(const int atomId)
     {
+      if (!this->atomIdToVectorIdx.contains(atomId))
+      {
+        throw std::invalid_argument("Atom with this id (" + std::to_string(atomId) + ") does not exist");
+      }
       int atomIdx = this->atomIdToVectorIdx[atomId];
       return this->getAtomByIdx(atomIdx);
     }
 
     Atom Universe::getAtomByIdx(const int vertexIdx)
     {
+      if (vertexIdx > this->getNrOfAtoms())
+      {
+        throw std::invalid_argument("Atom with this vertex id (" + std::to_string(vertexIdx) + ") does not exist");
+      }
       return Atom(VAN(&this->graph, "id", vertexIdx), VAN(&this->graph, "type", vertexIdx), VAN(&this->graph, "x", vertexIdx), VAN(&this->graph, "y", vertexIdx), VAN(&this->graph, "z", vertexIdx),
                   VAN(&this->graph, "nx", vertexIdx), VAN(&this->graph, "ny", vertexIdx), VAN(&this->graph, "nz", vertexIdx));
     }
@@ -468,6 +508,22 @@ namespace pylimer_tools
         meanStrandLength += molecule.getLength() * multiplier;
       }
       return meanStrandLength;
+    }
+
+    int Universe::getNrOfBondsOfAtom(const long int atomId)
+    {
+      return this->getNrOfBondsOfVertex(this->atomIdToVectorIdx[atomId]);
+    }
+
+    int Universe::getNrOfBondsOfVertex(const long int vertexId)
+    {
+      igraph_vector_t results;
+      igraph_vector_init(&results, 1);
+      if (igraph_degree(&this->graph, &results, igraph_vss_1(vertexId), IGRAPH_ALL, false /** don't count loops */))
+      {
+        throw std::runtime_error("Failed to query degree.");
+      }
+      return VECTOR(results)[0];
     }
 
     bool Universe::validate()

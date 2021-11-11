@@ -18,6 +18,7 @@ namespace pylimer_tools
       Universe atIndex(int index);
       void resetIterator();
       int getLength();
+      std::vector<Universe> getAll();
 
     protected:
       int index = 0; // current index of the iterator

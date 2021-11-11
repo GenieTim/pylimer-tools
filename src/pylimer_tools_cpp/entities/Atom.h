@@ -40,7 +40,7 @@ namespace pylimer_tools
         if (delta >= boxL * 0.5)
         {
           delta -= floor(delta / boxL) * boxL;
-          delta = abs(delta);
+          // delta = abs(delta);
         }
         return delta;
       }
@@ -58,7 +58,22 @@ namespace pylimer_tools
         vectorTo(b, box, distanceVec);
         // norm
         return sqrt(distanceVec[0] * distanceVec[0] + distanceVec[1] * distanceVec[1] + distanceVec[2] * distanceVec[2]);
-      };
+      }
+
+      const void vectorToUnwrapped(Atom b, Box *box, double *result) const
+      {
+        result[0] = this->_getDeltaDistanceUnwrapped(this->x, b.getX(), this->nx, b.getNX(), box->getLx());
+        result[1] = this->_getDeltaDistanceUnwrapped(this->y, b.getY(), this->ny, b.getNY(), box->getLy());
+        result[2] = this->_getDeltaDistanceUnwrapped(this->z, b.getZ(), this->nz, b.getNZ(), box->getLz());
+      }
+
+      const double distanceToUnwrapped(Atom b, Box *box) const
+      {
+        double distanceVec[3];
+        vectorToUnwrapped(b, box, distanceVec);
+        // norm
+        return sqrt(distanceVec[0] * distanceVec[0] + distanceVec[1] * distanceVec[1] + distanceVec[2] * distanceVec[2]);
+      }
 
       const inline long int getId() const { return this->id; }
       const inline int getType() const { return this->type; }

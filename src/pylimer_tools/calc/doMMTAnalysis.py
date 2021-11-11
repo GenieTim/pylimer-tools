@@ -4,10 +4,10 @@ from collections import Counter
 
 import igraph
 import numpy as np
-from pylimer_tools.entities.universum import Universum
+from pylimer_tools_cpp import Universe
 
 
-def predictShearModulus(network: Universum, junctionType, weightPerType, strandLength: int = None, functionalityPerType=None, T: float = 1, k_B: float = 1, totalMass=1):
+def predictShearModulus(network: Universe, junctionType, weightPerType, strandLength: int = None, functionalityPerType=None, T: float = 1, k_B: float = 1, totalMass=1):
     """
     Predict the shear modulus using MMT Analysis.
 
@@ -45,7 +45,7 @@ def predictShearModulus(network: Universum, junctionType, weightPerType, strandL
     return nu * k_B * T * (2*r/f) * (f - 2)/2 * weightFractions[junctionType] * alpha * (1-alpha)**f
 
 
-def calculateWeightFractionOfDanglingChains(network: Universum, junctionType, weightPerType, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def calculateWeightFractionOfDanglingChains(network: Universe, junctionType, weightPerType, strandLength: int = None, functionalityPerType: dict = None) -> float:
     """
     Compute the weight fraction of dangling strands in infinite network
 
@@ -61,7 +61,7 @@ def calculateWeightFractionOfDanglingChains(network: Universum, junctionType, we
     return 1 - calculateWeightFractionOfBackbone(network, junctionType, weightPerType, strandLength, functionalityPerType)
 
 
-def calculateWeightFractionOfBackbone(network: Universum, junctionType, weightPerType, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def calculateWeightFractionOfBackbone(network: Universe, junctionType, weightPerType, strandLength: int = None, functionalityPerType: dict = None) -> float:
     """
     Compute the weight fraction of the backbone strands in an infinite network
 
@@ -104,7 +104,7 @@ def calculateWeightFractionOfBackbone(network: Universum, junctionType, weightPe
     return Phi_el
 
 
-def computeWeightFractionOfSolubleMaterial(network: Universum, junctionType, weightPerType, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, weightPerType, strandLength: int = None, functionalityPerType: dict = None) -> float:
     """
     Compute the weight fraction of soluble material.
 
@@ -127,6 +127,7 @@ def computeWeightFractionOfSolubleMaterial(network: Universum, junctionType, wei
       - $\\beta$ (float): Macosko & Miller's $P(F_B)$
     """
     if (functionalityPerType is None):
+        print("Computing functionality per type...")
         functionalityPerType = network.determineFunctionalityPerType()
 
     if (functionalityPerType[junctionType] not in [3, 4]):
@@ -138,12 +139,16 @@ def computeWeightFractionOfSolubleMaterial(network: Universum, junctionType, wei
             raise NotImplementedError(
                 "Currently, only strand functionality of 2 is supported. {} given for type {}".format(functionalityPerType[key], key))
 
+    print("Computing extent of reaction...")
     p = computeExtentOfReaction(network, functionalityPerType)
+    print("Computing stoichiometric inbalance...")
     r = computeStoichiometricInbalance(
         network, junctionType, strandLength, functionalityPerType)
 
+    print("Computing mms probabilities...")
     alpha, beta = computeMMsProbabilities(
         r, p, functionalityPerType[junctionType])
+    print("Computing weight fractions...")
     weightFractions = computeWeightFractions(network, weightPerType)
     W_sol = 0
     for key in weightFractions:
@@ -189,7 +194,7 @@ def computeMMsProbabilities(r, p, f):
     return alpha, beta
 
 
-def computeWeightFractions(network: Universum, weightPerType) -> dict:
+def computeWeightFractions(network: Universe, weightPerType) -> dict:
     """
     Compute the weight fractions of each atom type in the network.
 
@@ -203,8 +208,7 @@ def computeWeightFractions(network: Universum, weightPerType) -> dict:
     if (network.getSize() == 0):
         return {}
 
-    graph: igraph.Graph = network.getUnderlyingGraph()
-    counts = Counter(graph.vs["type"])
+    counts = Counter(network.getAtomTypes())
     totalMass = 0
     partialMasses = {}
     for key in counts:
@@ -221,7 +225,7 @@ def computeWeightFractions(network: Universum, weightPerType) -> dict:
     return weightFractions
 
 
-def computeStoichiometricInbalance(network: Universum, junctionType, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def computeStoichiometricInbalance(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None) -> float:
     """
     Compute the stoichiometric inbalance
     ( nr. of bonds formable of crosslinker / nr. of formable bonds of precursor )
@@ -245,8 +249,7 @@ def computeStoichiometricInbalance(network: Universum, junctionType, strandLengt
     if (network.getSize() == 0):
         return 0
 
-    graph: igraph.Graph = network.getUnderlyingGraph()
-    counts = Counter(graph.vs["type"])
+    counts = Counter(network.getAtomTypes())
 
     if (functionalityPerType is None):
         functionalityPerType = network.determineFunctionalityPerType(counts)
@@ -266,7 +269,7 @@ def computeStoichiometricInbalance(network: Universum, junctionType, strandLengt
     return crosslinkerFormableBonds/(otherFormableBonds/strandLength)
 
 
-def computeExtentOfReaction(network: Universum, functionalityPerType: dict = None) -> float:
+def computeExtentOfReaction(network: Universe, functionalityPerType: dict = None) -> float:
     """
     Compute the extent of reaction
     (nr. of formed bonds in reaction / max. nr. of bonds formable)
@@ -285,10 +288,9 @@ def computeExtentOfReaction(network: Universum, functionalityPerType: dict = Non
     if (network.getSize() == 0):
         return 1
 
-    graph: igraph.Graph = network.getUnderlyingGraph()
-    counts = Counter(graph.vs["type"])
+    counts = Counter(network.getAtomTypes())
     if (functionalityPerType is None):
-        functionalityPerType = network.determineFunctionalityPerType(counts)
+        functionalityPerType = network.determineFunctionalityPerType()
 
     maxFormableBonds = 0
     for key in counts:
@@ -297,9 +299,8 @@ def computeExtentOfReaction(network: Universum, functionalityPerType: dict = Non
     if (maxFormableBonds == 0):
         return 1
 
-    graph.simplify()
     # multiplication by 2 as each bond affects 2 possible bonds
-    return graph.ecount()*2.0/(maxFormableBonds)
+    return network.getNrOfBonds()*2.0/(maxFormableBonds)
 
 
 def predictGelationPoint(r: float, f: int, g: int = 2) -> float:

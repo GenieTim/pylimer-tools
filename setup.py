@@ -39,5 +39,5 @@ setup(
     cmake_args=cmake_args,
     include_package_data=True,
     extras_require={"test": ["unittest"]},
-    python_requires=">=3.8"
+    python_requires=">=3.7"
 )

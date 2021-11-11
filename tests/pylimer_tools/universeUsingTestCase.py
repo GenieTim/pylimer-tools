@@ -137,9 +137,14 @@ class UniverseUsingTestCase(unittest.TestCase):
             {"to": 6, "bondFrom": 20},
         ])
         self.assertIsInstance(self.testAtomsSaturated, pd.DataFrame)
-        self.saturatedTestUniverse.addAtoms(len(self.testAtomsSaturated), self.testAtomsSaturated["id"].tolist(), self.testAtomsSaturated["type"].tolist(),
-                                            self.testAtomsSaturated["x"].tolist(), self.testAtomsSaturated["y"].tolist(
-        ), self.testAtomsSaturated["z"].tolist(),
-            self.testAtomsSaturated["nx"].tolist(), self.testAtomsSaturated["ny"].tolist(), self.testAtomsSaturated["nz"].tolist())
-        self.saturatedTestUniverse.addBonds(len(
-            self.testBondsSaturated), self.testBondsSaturated["bondFrom"].tolist(), self.testBondsSaturated["to"].tolist())
+        self.saturatedTestUniverse = self.addAtomBondData(
+            self.saturatedTestUniverse, self.testAtomsSaturated, self.testBondsSaturated)
+
+    def addAtomBondData(self, universe: Universe, atomData: pd.DataFrame, bondData: pd.DataFrame) -> Universe:
+        universe.addAtoms(len(atomData), atomData["id"].tolist(), atomData["type"].tolist(),
+                          atomData["x"].tolist(), atomData["y"].tolist(
+        ), atomData["z"].tolist(),
+            atomData["nx"].tolist(), atomData["ny"].tolist(), atomData["nz"].tolist())
+        universe.addBonds(
+            len(bondData), bondData["bondFrom"].tolist(), bondData["to"].tolist())
+        return universe

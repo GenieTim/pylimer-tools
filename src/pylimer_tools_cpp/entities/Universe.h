@@ -22,21 +22,27 @@ namespace pylimer_tools
       void addBonds(const size_t NNewBonds, std::vector<long int> from, std::vector<long int> to);
       void setMasses(std::map<int, double> weightPerType);
       void setBox(Box box);
+      void setTimestep(long int timestep) { this->timestep = timestep; };
 
       // getters
       Atom getAtom(const int atomId);
       std::vector<Atom> getAtomsWithType(const int atomType);
       Atom getAtomByIdx(const int vertexIdx);
-      std::vector<Molecule> getMolecules(const int atomTypeToOmit);
+      std::vector<Molecule> getMolecules(const int atomTypeToOmit = -1);
       std::vector<Molecule> getChainsWithCrosslinker(const int crosslinkerType);
       template <typename OUT>
       std::vector<OUT> getPropertyValues(const char *propertyName);
+      std::vector<int> getAtomTypes() { return this->getPropertyValues<int>("type"); }
       template <typename IN>
       long int findVertexIdForProperty(const char *propertyName, IN propertyValue);
       Box getBox();
       double getVolume();
       const int getNrOfAtoms();
       const int getNrOfBonds();
+      std::map<int, double> getMasses();
+      long int getTimestep() { return this->timestep; };
+      int getNrOfBondsOfAtom(const long int atomId);
+      int getNrOfBondsOfVertex(const long int vertexId);
 
       // computations
       std::map<int, int> determineFunctionalityPerType();
@@ -45,6 +51,7 @@ namespace pylimer_tools
       bool validate();
 
     protected:
+      long int timestep;
       // properties of the box
       int NAtoms = 0;
       int NBonds = 0;
