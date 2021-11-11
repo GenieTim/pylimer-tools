@@ -8,7 +8,7 @@ from typing import Iterable, Tuple
 
 import igraph
 import numpy as np
-from pylimer_tools_cpp import Molecule, Universe
+from pylimer_tools_cpp import Molecule, Universe, MoleculeType
 
 
 def predictShearModulus(networks: Iterable[Universe], T: float = 1, k_B: float = 1, foreignAtomType=None, totalMass=1) -> float:
@@ -202,20 +202,19 @@ def calculateEffectiveNrDensityOfJunctions(networks: Iterable[Universe], absTol:
     return numEffectiveJunctions/meanVolume
 
 
-def calculateWeightFractionOfBackbone(network: Universe, crosslinkerType, weights=1):
+def calculateWeightFractionOfBackbone(network: Universe, crosslinkerType):
     """
     Compute the weight fraction of network backbone in infinite network
 
     Arguments:
       - network: the network to compute the weight fraction for
       - crosslinkerType: the atom type to use to split the molecules
-      - weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight
 
     Returns:
       - weightFraction (float): 1 - weightDangling/weightTotal,
     """
     weightFraction, _ = calculateWeightFractionOfDanglingChains(
-        network, crosslinkerType, weights)
+        network, crosslinkerType)
     return 1.0 - weightFraction
 
 
@@ -234,7 +233,7 @@ def calculateWeightFractionOfDanglingChains(network: Universe, crosslinkerType) 
     if (network.getNrOfAtoms() < 1):
         return 0.0, 0.0
 
-    weights = network.getMasses
+    weights = network.getMasses()
 
     def getWeightOfGraph(graph):
         counts = Counter(graph.getAtomTypes())
@@ -250,7 +249,7 @@ def calculateWeightFractionOfDanglingChains(network: Universe, crosslinkerType) 
     numDangling = 0
     weightDangling = 0
     for chain in allChains:
-        if (chain.getType() is Molecule.MoleculeType.DANGLING_CHAIN):
+        if (chain.getType() is MoleculeType.DANGLING_CHAIN):
             numDangling += chain.getLength()
             weightDangling += getWeightOfGraph(chain)
 
@@ -338,14 +337,14 @@ def computeEndToEndVectors(network: Universe, crosslinkerType) -> dict:
         crosslinkers = molecule.getAtomsWithType(crosslinkerType)
         print("Got crosslinkers")
         if (len(crosslinkers) != 2 or
-            molecule.getType() == Molecule.MoleculeType.PRIMARY_LOOP or
-                molecule.getType() == Molecule.MoleculeType.DANGLING_CHAIN):
+            molecule.getType() == MoleculeType.PRIMARY_LOOP or
+                molecule.getType() == MoleculeType.DANGLING_CHAIN):
             # dangling, free chains and loops are irrelevant for our purposes
             continue
         # igraph.VertexSeq is not sortable -> use a list
         crosslinkers = [crosslinkers[0], crosslinkers[1]]
         # sort crosslinkers by name as a way to keep the vector directions consistent between timesteps
-        crosslinkers.sort(key=lambda a: a["name"])
+        crosslinkers.sort(key=lambda a: a.getId())
         #
         print("Have sorted crosslinkers")
         key = _getKeyForMolecule(molecule, crosslinkers)
@@ -437,8 +436,8 @@ def calculateTopologicalFactor(networks: Iterable[Universe], foreignAtomType=Non
     for molecule in chainsToProcess:
         crosslinkers = molecule.getAtomsWithType(foreignAtomType)
         if (len(crosslinkers) != 2 or
-            molecule.getType() == Molecule.MoleculeType.PRIMARY_LOOP or
-                molecule.getType() == Molecule.MoleculeType.DANGLING_CHAIN):
+            molecule.getType() == MoleculeType.PRIMARY_LOOP or
+                molecule.getType() == MoleculeType.DANGLING_CHAIN):
             # dangling, free chains and loops are irrelevant for our purposes
             continue
         if (b is None):
@@ -461,7 +460,6 @@ def _getKeyForMolecule(molecule, crosslinkers):
     whereas the names of all other atoms in the chain are used too to distinguish 
     e.g. two secondary loops
     """
-    names = [a.name for a in molecule]
+    names = [a.getId() for a in molecule.getAtoms()]
     names.sort()
-    return "{}+{}+{}".format(crosslinkers[0]
-                             ["name"], crosslinkers[1]["name"], "".join(names))
+    return "{}+{}+{}".format(crosslinkers[0].getId(), crosslinkers[1].getId(), "".join(str(n) for n in names))

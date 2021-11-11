@@ -16,15 +16,17 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
 
     def test_weightFractionCalculations(self):
         self.assertEqual(
-            (0.0, 0.0), calculateWeightFractionOfDanglingChains(self.emptyUniverse, 2, 1))
+            (0.0, 0.0), calculateWeightFractionOfDanglingChains(self.emptyUniverse, 2))
         # empty weight -> empty weight fraction
+        self.testUniverse.setMasses({1: 0, 2: 0})
         self.assertEqual(
-            (0.0, 0.25), calculateWeightFractionOfDanglingChains(self.testUniverse, 2, 0))
+            (0.0, 0.0), calculateWeightFractionOfDanglingChains(self.testUniverse, 2))
         self.assertEqual(
             1.0, calculateWeightFractionOfBackbone(self.testUniverse, 2, 0))
         # non-empty weights
+        self.testUniverse.setMasses({1: 1, 2: 0})
         self.assertEqual(
-            (0.2, 0.25), calculateWeightFractionOfDanglingChains(self.testUniverse, crosslinkerType=2, weights={1: 1, 2: 0}))
+            (0.2, 0.25), calculateWeightFractionOfDanglingChains(self.testUniverse, crosslinkerType=2))
 
     def test_crosslinkerFunctionalityCalculation(self):
         self.assertCountEqual(

@@ -58,11 +58,13 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             self.emptyUniverse, 2, {}))
         self.assertEqual(1, calculateWeightFractionOfDanglingChains(
             self.emptyUniverse, 2, {}))
+        self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
         bb = calculateWeightFractionOfBackbone(
-            self.saturatedTestUniverse, 2, {1: 1, 2: 0}, strandLength=2)
+            self.saturatedTestUniverse, junctionType=2, strandLength=2)
         self.assertEqual(0.33642650971392124, bb)
+        self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
         self.assertEqual(1-bb, calculateWeightFractionOfDanglingChains(
-            self.saturatedTestUniverse, 2, {1: 1, 2: 0}, strandLength=2))
+            self.saturatedTestUniverse, 2, strandLength=2))
 
         # test also as if the functionality was 4
         self.assertRaises(ValueError, lambda: calculateWeightFractionOfBackbone(self.saturatedTestUniverse, junctionType=2, weightPerType={1: 1, 2: 1}, functionalityPerType={
