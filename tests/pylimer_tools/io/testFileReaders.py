@@ -68,4 +68,4 @@ class TestFileReader(PandasComparingTestCase):
         self.assertIsInstance(universe, Universe)
         self.assertEqual(universeSequence.getLength(), 1)
         universe = universeSequence.atIndex(0)
-        self.assertEqual(universe.getNrOfAtoms(), 22)
+        self.assertEqual(universe.getNrOfAtoms(), 12)
