@@ -10,6 +10,7 @@
 #include <any>
 #include <cstring>
 #include <filesystem>
+#include <fstream>      // std::ifstream
 
 namespace pylimer_tools
 {
@@ -24,20 +25,19 @@ namespace pylimer_tools
       {
         throw std::invalid_argument("File to read (" + filePath + ") does not exist.");
       }
-      char *cline = NULL;
 
-      size_t len = 0;
+      std::string line;
+      std::ifstream file;
+      file.open(filePath);
 
-      FILE *fp = fopen(filePath.c_str(), "r");
-      if (fp == NULL)
-      {
-        throw std::runtime_error("Failed to open data file to read.");
+      if (!file.is_open()) {
+        throw std::invalid_argument("File to read file (" + filePath + "): failed to open.")
       }
 
       // read everything until the first key
-      while ((getline(&cline, &len, fp)) != -1)
+      while (getline(file, line))
       {
-        std::string line = pylimer_tools::utils::trimLineOmitComment(cline);
+        line = pylimer_tools::utils::trimLineOmitComment(line);
         // skip empty lines: break when not empty
         if (!line.empty())
         {
@@ -46,13 +46,13 @@ namespace pylimer_tools
       }
 
       // Assemble CSV data for all keys
-      std::string newGroupKey(cline); // new group key: key for a new timestep (group)
-      std::string currentKey = this->cleanHeader(std::string(cline));
+      std::string newGroupKey(line); // new group key: key for a new timestep (group)
+      std::string currentKey = this->cleanHeader(line);
       data_item_t dataItem;
 
       while ((getline(&cline, &len, fp)) != -1)
       {
-        std::string line = pylimer_tools::utils::trimLineOmitComment(cline);
+        line = pylimer_tools::utils::trimLineOmitComment(line);
         // skip empty lines
         if (line.empty())
         {
@@ -78,11 +78,7 @@ namespace pylimer_tools
       // last timestep
       this->data.push_back(dataItem);
 
-      fclose(fp);
-      if (cline)
-      {
-        free(cline);
-      }
+      file.close();
     }
 
     std::string DumpFileParser::cleanHeader(std::string headerToClean)

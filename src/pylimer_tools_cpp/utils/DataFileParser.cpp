@@ -6,6 +6,7 @@
 #include <map>
 #include <filesystem>
 #include "DataFileParser.h"
+#include <fstream>      // std::ifstream
 
 namespace pylimer_tools
 {
@@ -18,20 +19,19 @@ namespace pylimer_tools
       {
         throw std::invalid_argument("File to read (" + filePath + ") does not exist.");
       }
-      char *cline = NULL;
 
-      size_t len = 0;
+      std::string line;
+      std::ifstream file;
+      file.open(filePath);
 
-      FILE *fp = fopen(filePath.c_str(), "r");
-      if (fp == NULL)
-      {
-        throw std::runtime_error("Failed to open data file to read.");
+      if (!file.is_open()) {
+        throw std::invalid_argument("File to read (" + filePath + "): failed to open.")
       }
 
       // read everything until "Masses"
-      while ((getline(&cline, &len, fp)) != -1)
+      while (getline(file, line))
       {
-        std::string line = pylimer_tools::utils::trimLineOmitComment(cline);
+        line = pylimer_tools::utils::trimLineOmitComment(cline);
         // skip empty lines
         if (line.empty())
         {
@@ -64,9 +64,9 @@ namespace pylimer_tools
       this->bondTo.reserve(this->nBonds);
 
       // skip empty lines plus the line with "Masses"
-      while ((getline(&cline, &len, fp)) != -1)
+      while (getline(file, line))
       {
-        std::string line = pylimer_tools::utils::trimLineOmitComment(cline);
+        line = pylimer_tools::utils::trimLineOmitComment(cline);
 
         // skip empty lines
         if (!line.empty())
@@ -78,7 +78,7 @@ namespace pylimer_tools
       // Then, read masses, up until the next section ("atoms")
       do
       {
-        std::string line = pylimer_tools::utils::trimLineOmitComment(cline);
+        line = pylimer_tools::utils::trimLineOmitComment(cline);
 
         // break at empty lines
         if (line.empty())
@@ -92,11 +92,11 @@ namespace pylimer_tools
         }
         // read the mass...
         this->readMass(line);
-      } while ((getline(&cline, &len, fp)) != -1);
+      } while (getline(file, line));
 
       this->skipLinesToContains(cline, &len, fp, "Atoms");
       // skip this line too
-      if ((getline(&cline, &len, fp)) == -1)
+      if (!getline(file, line))
       {
         throw std::runtime_error("Data file ended too early. Not able to read any atoms.");
       }
@@ -108,7 +108,7 @@ namespace pylimer_tools
       {
         this->readAtom(std::string(cline));
 
-        if ((getline(&cline, &len, fp)) == -1)
+        if (!getline(file, line))
         {
           throw std::runtime_error("Data file ended too early. Not enough atoms read.");
         }
@@ -117,7 +117,7 @@ namespace pylimer_tools
       // Then, read bonds
       this->skipLinesToContains(cline, &len, fp, "Bonds");
       // skip this line too
-      if ((getline(&cline, &len, fp)) == -1)
+      if (!getline(file, line))
       {
         throw std::runtime_error("Data file ended too early. Not able to read any bonds.");
       }
@@ -128,19 +128,14 @@ namespace pylimer_tools
       {
         this->readBond(std::string(cline));
 
-        if ((getline(&cline, &len, fp)) == -1 && i + 1 < this->nBonds)
+        if (!getline(file, line) && i + 1 < this->nBonds)
         {
           throw std::runtime_error("Data file ended too early. Not enough bonds read.");
         }
       }
 
       // we ignore angles etc. for now.
-
-      fclose(fp);
-      if (cline)
-      {
-        free(cline);
-      }
+file.close();
     }
 
     void DataFileParser::skipLinesToContains(char *cline, size_t *len, FILE *fp, std::string upTo)
