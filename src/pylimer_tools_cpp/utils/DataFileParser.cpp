@@ -6,7 +6,7 @@
 #include <map>
 #include <filesystem>
 #include "DataFileParser.h"
-#include <fstream>      // std::ifstream
+#include <fstream> // std::ifstream
 
 namespace pylimer_tools
 {
@@ -24,7 +24,8 @@ namespace pylimer_tools
       std::ifstream file;
       file.open(filePath);
 
-      if (!file.is_open()) {
+      if (!file.is_open())
+      {
         throw std::invalid_argument("File to read (" + filePath + "): failed to open.");
       }
 
@@ -106,7 +107,7 @@ namespace pylimer_tools
       // Then, read atoms, up until the next section ("bonds")
       for (int i = 0; i < this->nAtoms; ++i)
       {
-        this->readAtom(std::string(line));
+        this->readAtom(line);
 
         if (!getline(file, line))
         {
@@ -126,7 +127,7 @@ namespace pylimer_tools
 
       for (int i = 0; i < this->nBonds; i++)
       {
-        this->readBond(std::string(line));
+        this->readBond(line);
 
         if (!getline(file, line) && i + 1 < this->nBonds)
         {
@@ -135,21 +136,21 @@ namespace pylimer_tools
       }
 
       // we ignore angles etc. for now.
-file.close();
+      file.close();
     }
 
-    void DataFileParser::skipLinesToContains(std::string line, std::ifstream &file, std::string upTo)
+    void DataFileParser::skipLinesToContains(std::string &line, std::ifstream &file, std::string upTo)
     {
       do
       {
-        if (contains(&line, upTo))
+        if (contains(line, upTo))
         {
           break;
         }
       } while (getline(file, line));
     }
 
-    void DataFileParser::skipEmptyLines(std::string line, std::ifstream &file)
+    void DataFileParser::skipEmptyLines(std::string &line, std::ifstream &file)
     {
       do
       {
@@ -165,33 +166,33 @@ file.close();
 
     void DataFileParser::readNs(const std::string line)
     {
-      if (contains(&line, "atoms"))
+      if (contains(line, "atoms"))
       {
         this->nAtoms = (this->parseTypesInLine<int>(line, 1))[0];
       }
-      else if (contains(&line, "bonds"))
+      else if (contains(line, "bonds"))
       {
         this->nBonds = (this->parseTypesInLine<int>(line, 1))[0];
       }
-      else if (contains(&line, "atom types"))
+      else if (contains(line, "atom types"))
       {
         this->nAtomTypes = (this->parseTypesInLine<int>(line, 1))[0];
       }
-      else if (contains(&line, "bond types"))
+      else if (contains(line, "bond types"))
       {
         this->nBondTypes = (this->parseTypesInLine<int>(line, 1))[0];
       }
-      else if (contains(&line, "xlo xhi"))
+      else if (contains(line, "xlo xhi"))
       {
         std::vector<double> parsedL = this->parseTypesInLine<double>(line, 2);
         this->Lx = parsedL[1] - parsedL[0];
       }
-      else if (contains(&line, "ylo yhi"))
+      else if (contains(line, "ylo yhi"))
       {
         std::vector<double> parsedL = this->parseTypesInLine<double>(line, 2);
         this->Ly = parsedL[1] - parsedL[0];
       }
-      else if (contains(&line, "zlo zhi"))
+      else if (contains(line, "zlo zhi"))
       {
         std::vector<double> parsedL = this->parseTypesInLine<double>(line, 2);
         this->Lz = parsedL[1] - parsedL[0];

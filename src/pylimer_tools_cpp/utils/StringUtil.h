@@ -34,9 +34,9 @@ namespace pylimer_tools
       return true;
     }
 
-    static inline bool contains(const std::string *haystack, const std::string needle)
+    static inline bool contains(const std::string haystack, const std::string needle)
     {
-      return haystack->find(needle) != std::string::npos;
+      return haystack.find(needle) != std::string::npos;
     }
 
     template <class T, class A>
@@ -110,6 +110,7 @@ namespace pylimer_tools
     public:
       CsvTokenizer(std::string subject)
       {
+        this->source = subject;
         // Either use C++ 20 implementation, if <ranges> is available
         // std::vector<std::string> results;
         // constexpr std::string_view words{subject};
@@ -132,6 +133,7 @@ namespace pylimer_tools
 
       CsvTokenizer(std::string subject, size_t maxNrToRead)
       {
+        this->source = subject;
         // Either use C++ 20 implementation, if <ranges> is available
         // std::vector<std::string> results;
         // constexpr std::string_view words{subject};
@@ -169,18 +171,22 @@ namespace pylimer_tools
         return this->results[index];
       }
 
-#define MAKE_GET(TYPE, METHOD)                                                      \
-  template <>                                                                       \
-  TYPE get<TYPE>(size_t index) const                                                \
-  {                                                                                 \
-    try                                                                             \
-    {                                                                               \
-      return METHOD(this->results[index]);                                          \
-    }                                                                               \
-    catch (std::invalid_argument e)                                                 \
-    {                                                                               \
-      throw std::runtime_error("Failed to convert string " + this->results[index]); \
-    }                                                                               \
+#define MAKE_GET(TYPE, METHOD)                                                                    \
+  template <>                                                                                     \
+  TYPE get<TYPE>(size_t index) const                                                              \
+  {                                                                                               \
+    if (this->results.size() <= index)                                                            \
+    {                                                                                             \
+      throw std::runtime_error("Index out of bounds when parsing string '" + this->source + "'"); \
+    }                                                                                             \
+    try                                                                                           \
+    {                                                                                             \
+      return METHOD(this->results[index]);                                                        \
+    }                                                                                             \
+    catch (std::invalid_argument e)                                                               \
+    {                                                                                             \
+      throw std::runtime_error("Failed to convert string " + this->results[index]);               \
+    }                                                                                             \
   }
 
       MAKE_GET(double, std::stod)
@@ -192,6 +198,7 @@ namespace pylimer_tools
       MAKE_GET(unsigned long int, std::stoull)
 
     private:
+      std::string source;
       std::vector<std::string> results;
     };
   }
