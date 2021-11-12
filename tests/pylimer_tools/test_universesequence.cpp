@@ -31,7 +31,7 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
   {
     universeSeq.initializeFromDataSequence({{suspectedPath + "lammps_data_file.out"}});
     REQUIRE(universeSeq.getLength() == 1);
-    REQUIRE(universeSeq.atIndex(0).getNrOfAtoms() == 2594);
+    REQUIRE(universeSeq.atIndex(0).getNrOfAtoms() == 2595);
     REQUIRE(universeSeq.atIndex(0).getNrOfBonds() == 1050);
   }
 }

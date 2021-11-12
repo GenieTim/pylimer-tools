@@ -3,6 +3,9 @@
 
 #include "Box.h"
 #include "math.h"
+#include <iterator>
+#include <algorithm>
+#include <vector>
 
 namespace pylimer_tools
 {
@@ -50,6 +53,14 @@ namespace pylimer_tools
         result[0] = this->_getDeltaDistance(this->x, b.getX(), this->nx, b.getNX(), box->getLx());
         result[1] = this->_getDeltaDistance(this->y, b.getY(), this->ny, b.getNY(), box->getLy());
         result[2] = this->_getDeltaDistance(this->z, b.getZ(), this->nz, b.getNZ(), box->getLz());
+      }
+
+      const std::vector<double> computeVectorTo(Atom b, Box box) const {
+        double result[3];
+        vectorTo(b, &box, result);
+        std::vector<double> resultV;
+        std::copy(std::begin(result), std::end(result), std::back_inserter(resultV));
+        return resultV;
       }
 
       const double distanceTo(Atom b, Box *box) const

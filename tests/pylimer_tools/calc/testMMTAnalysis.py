@@ -1,5 +1,5 @@
-import sys
 import os
+import sys
 import unittest
 
 from pylimer_tools.calc.doMMTAnalysis import *
@@ -29,23 +29,27 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
 
     def testShearModulusPrediction(self):
         self.assertIsNone(predictShearModulus(self.emptyUniverse, 2, None))
+        self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
         self.assertEqual(1.0521245069791487e-09, predictShearModulus(
-            self.saturatedTestUniverse, 2, {1: 1, 2: 1}, strandLength=2))
+            self.saturatedTestUniverse, 2, strandLength=2))
 
     def testWeightFractionCalculations(self):
         self.assertDictEqual(
-            {}, computeWeightFractions(self.emptyUniverse, {}))
+            {}, computeWeightFractions(self.emptyUniverse))
+        self.testUniverse.setMasses({1: 1, 2: 1})
         weightFractions = computeWeightFractions(
-            self.testUniverse, {1: 1, 2: 1})
+            self.testUniverse)
         self.assertDictEqual(weightFractions, {1: 1-3./8., 2: 3./8.})
 
     def testSolubleMaterialWeightFractionCalculation(self):
+        self.testUniverse.setMasses({1: 1, 2: 1})
         self.assertRaises(NotImplementedError, lambda: computeWeightFractionOfSolubleMaterial(
-            self.testUniverse, 2, {1: 1, 2: 1}, None, {1: 2, 2: 2}))
+            self.testUniverse, 2, functionalityPerType={1: 2, 2: 2}))
         self.assertRaises(NotImplementedError, lambda: computeWeightFractionOfSolubleMaterial(
-            self.testUniverse, 2, {1: 1, 2: 1}, None, {1: 1, 2: 3}))
+            self.testUniverse, 2, functionalityPerType={1: 1, 2: 3}))
+        self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
         self.assertEqual((0.3506977562162289, {1: 0.85, 2: 0.15}, 0.9799067775258254, 0.49652823066801094), computeWeightFractionOfSolubleMaterial(
-            self.saturatedTestUniverse, 2, {1: 1, 2: 1}, strandLength=2))
+            self.saturatedTestUniverse, 2, strandLength=2))
 
     def testProbabilityCalculations(self):
         self.assertRaises(
@@ -66,12 +70,13 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertEqual(1-bb, calculateWeightFractionOfDanglingChains(
             self.saturatedTestUniverse, 2, strandLength=2))
 
+        self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
         # test also as if the functionality was 4
-        self.assertRaises(ValueError, lambda: calculateWeightFractionOfBackbone(self.saturatedTestUniverse, junctionType=2, weightPerType={1: 1, 2: 1}, functionalityPerType={
+        self.assertRaises(ValueError, lambda: calculateWeightFractionOfBackbone(self.saturatedTestUniverse, junctionType=2, functionalityPerType={
             1: 2, 2: 4
         }))
         # NOTE: requires a short strand length with these systems, as otherwise, r > 1 which is not supported by the formulas implemented
-        self.assertEqual(0.43094694702110886, calculateWeightFractionOfBackbone(self.saturatedTestUniverse, junctionType=2, strandLength=2, weightPerType={1: 1, 2: 1}, functionalityPerType={
+        self.assertEqual(0.43094694702110886, calculateWeightFractionOfBackbone(self.saturatedTestUniverse, junctionType=2, strandLength=2, functionalityPerType={
             1: 2, 2: 4
         }))
 

@@ -7,7 +7,7 @@ import numpy as np
 from pylimer_tools_cpp import Universe
 
 
-def predictShearModulus(network: Universe, junctionType, weightPerType, strandLength: int = None, functionalityPerType=None, T: float = 1, k_B: float = 1, totalMass=1):
+def predictShearModulus(network: Universe, junctionType, strandLength: int = None, functionalityPerType=None, T: float = 1, k_B: float = 1):
     """
     Predict the shear modulus using MMT Analysis.
 
@@ -18,7 +18,6 @@ def predictShearModulus(network: Universe, junctionType, weightPerType, strandLe
       - network: the polymer system to predict the shear modulus for
       - junctionType: the type of atoms making up the junctions/crosslinkers
       - junctionType: the type of the junctions/crosslinkers to select them in the network
-      - weightPerType: a dictionary with key: type, and value: weight per atom of this atom type. See: #computeWeightFractions
       - strandLength: the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
       - T: the temperature in your unit system
       - k_b: Boltzmann's constant in your unit system
@@ -41,7 +40,7 @@ def predictShearModulus(network: Universe, junctionType, weightPerType, strandLe
         network, junctionType, strandLength, functionalityPerType)
     f = functionalityPerType[junctionType]
     alpha, beta = computeMMsProbabilities(r, p, f)
-    weightFractions = computeWeightFractions(network, weightPerType)
+    weightFractions = computeWeightFractions(network)
     return nu * k_B * T * (2*r/f) * (f - 2)/2 * weightFractions[junctionType] * alpha * (1-alpha)**f
 
 
@@ -102,7 +101,7 @@ def calculateWeightFractionOfBackbone(network: Universe, junctionType, strandLen
     return Phi_el
 
 
-def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, weightPerType, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None) -> float:
     """
     Compute the weight fraction of soluble material.
 
@@ -113,7 +112,6 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, weig
     Arguments:
       - network: the poylmer network to do the computation for
       - junctionType: the type of the junctions/crosslinkers to select them in the network
-      - weightPerType: a dictionary with key: type, and value: weight per atom of this atom type. See: #computeWeightFractions
       - strandLength: the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
       - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. 
           See: #computeExtentOfReaction
@@ -141,13 +139,13 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, weig
     p = computeExtentOfReaction(network, functionalityPerType)
     print("Computing stoichiometric inbalance...")
     r = computeStoichiometricInbalance(
-        network, junctionType, strandLength, functionalityPerType)
+        network, junctionType, strandLength=strandLength, functionalityPerType=functionalityPerType)
 
     print("Computing mms probabilities...")
     alpha, beta = computeMMsProbabilities(
         r, p, functionalityPerType[junctionType])
     print("Computing weight fractions...")
-    weightFractions = computeWeightFractions(network, weightPerType)
+    weightFractions = computeWeightFractions(network)
     W_sol = 0
     for key in weightFractions:
         coeff = alpha if key == junctionType else beta
@@ -192,13 +190,12 @@ def computeMMsProbabilities(r, p, f):
     return alpha, beta
 
 
-def computeWeightFractions(network: Universe, weightPerType) -> dict:
+def computeWeightFractions(network: Universe) -> dict:
     """
     Compute the weight fractions of each atom type in the network.
 
     Arguments:
       - network: the poylmer network to do the computation for
-      - weightPerType: a dictionary with key: type, and value: weight per atom of this atom type. 
 
     Returns:
       - $\\vec{W_i}$ (dict): using the type i as a key, this dict contains the weight fractions ($\\frac{W_i}{W_{tot}}$)
@@ -206,6 +203,7 @@ def computeWeightFractions(network: Universe, weightPerType) -> dict:
     if (network.getNrOfAtoms() == 0):
         return {}
 
+    weightPerType = network.getMasses()
     counts = Counter(network.getAtomTypes())
     totalMass = 0
     partialMasses = {}
