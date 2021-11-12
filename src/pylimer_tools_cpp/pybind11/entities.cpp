@@ -48,7 +48,7 @@ void init_pylimer_bound_entities(py::module_ &m)
 
     py::class_<Atom>(m, "Atom")
         .def(py::init<const long int, const int, const double, const double, const double, const int, const int, const int>())
-        .def("vectorTo", &Atom::vectorTo, "Compute the vector to another atom.")
+        .def("computeVectorTo", &Atom::computeVectorTo, "Compute the vector to another atom.")
         .def("distanceTo", &Atom::distanceTo, "Compute the distance to another atom.")
         .def("vectorToUnwrapped", &Atom::vectorToUnwrapped, "Compute the vector to another atom respecting the periodic image flag.")
         .def("distanceToUnwrapped", &Atom::distanceToUnwrapped, "Compute the distance to another atom respecting the periodic image flag.")

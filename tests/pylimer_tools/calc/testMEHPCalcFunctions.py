@@ -22,7 +22,7 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         self.assertEqual(
             (0.0, 0.0), calculateWeightFractionOfDanglingChains(self.testUniverse, 2))
         self.assertEqual(
-            1.0, calculateWeightFractionOfBackbone(self.testUniverse, 2, 0))
+            1.0, calculateWeightFractionOfBackbone(self.testUniverse, 2))
         # non-empty weights
         self.testUniverse.setMasses({1: 1, 2: 0})
         self.assertEqual(
@@ -41,8 +41,8 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
     def test_meanEndToEndComputation(self):
         self.assertCountEqual([], computeMeanEndToEndVectors([], 2))
         self.assertDictEqual({
-            'atom6+atom7+atom1atom2atom3atom6atom7': 1.0,
-            'atom6+atom7+atom5atom6atom7': 1.0
+            '6+7+1-2-3-6-7': 1.0,
+            '6+7+5-6-7': 1.0
         }, computeMeanEndToEndDistances([self.testUniverse], 2))
 
     def test_meanUniverseVolume(self):

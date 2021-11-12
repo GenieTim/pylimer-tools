@@ -8,7 +8,7 @@ from typing import Iterable, Tuple
 
 import igraph
 import numpy as np
-from pylimer_tools_cpp import Molecule, Universe, MoleculeType
+from pylimer_tools_cpp import Molecule, MoleculeType, Universe
 
 
 def predictShearModulus(networks: Iterable[Universe], T: float = 1, k_B: float = 1, foreignAtomType=None, totalMass=1) -> float:
@@ -310,8 +310,9 @@ def computeMeanEndToEndVectors(networks: Iterable[Universe], crosslinkerType) ->
         # (e.g. computing connectivity only once, storing it only once, ....)
         for key in currentEndToEndVectors:
             if (key not in endToEndVectors):
-                endToEndVectors[key] = 0
-            endToEndVectors[key] += currentEndToEndVectors[key]*divider
+                endToEndVectors[key] = [0, 0, 0]
+            for i in range(3):
+                endToEndVectors[key][i] += currentEndToEndVectors[key][i]*divider
     return endToEndVectors
 
 
@@ -348,8 +349,8 @@ def computeEndToEndVectors(network: Universe, crosslinkerType) -> dict:
         #
         print("Have sorted crosslinkers")
         key = _getKeyForMolecule(molecule, crosslinkers)
-        endToEndVectors[key] = crosslinkers[0]["atom"].computeVectorTo(
-            crosslinkers[1]["atom"])
+        endToEndVectors[key] = crosslinkers[0].computeVectorTo(
+            crosslinkers[1], network.getBox())
 
     return endToEndVectors
 
@@ -441,10 +442,10 @@ def calculateTopologicalFactor(networks: Iterable[Universe], foreignAtomType=Non
             # dangling, free chains and loops are irrelevant for our purposes
             continue
         if (b is None):
-            b = molecule.computeBondLengths().mean()
+            b = np.mean(molecule.computeBondLengths())
         crosslinkers = [crosslinkers[0], crosslinkers[1]]
         # sort crosslinkers by name as a way to keep the vector directions consistent between timesteps
-        crosslinkers.sort(key=lambda a: a["name"])
+        crosslinkers.sort(key=lambda a: a.getId())
         key = _getKeyForMolecule(molecule, crosslinkers)
         GammaSum += R_taus[key]*R_taus[key] / \
             ((molecule.getLength()-2) * b *
@@ -462,4 +463,4 @@ def _getKeyForMolecule(molecule, crosslinkers):
     """
     names = [a.getId() for a in molecule.getAtoms()]
     names.sort()
-    return "{}+{}+{}".format(crosslinkers[0].getId(), crosslinkers[1].getId(), "".join(str(n) for n in names))
+    return "{}+{}+{}".format(crosslinkers[0].getId(), crosslinkers[1].getId(), "-".join(str(n) for n in names))
