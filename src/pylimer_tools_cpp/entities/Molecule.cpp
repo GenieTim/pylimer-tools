@@ -139,7 +139,7 @@ namespace pylimer_tools
 
     double Molecule::computeRadiusOfGyration()
     {
-      double meanX, meanY, meanZ;
+      double meanX = 0.0, meanY = 0.0, meanZ = 0.0;
       // would be faster to just query the attributes.
       // But the OOP interface is just too tempting
       // as long as there are no external additional performance demands

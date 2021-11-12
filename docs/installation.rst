@@ -87,6 +87,9 @@ An OS-independent installation of the igraph library can be done using `vcpkg`_ 
   vcpkg install boost
 
 For CMake to find the installed library, be sure to expose the root folder of `vcpkg` as the environment variable `VCPKG_ROOT`.
+Note that on Windows, vcpkg has multiple triplets that it chooses from when finding the packages. 
+It might be possible that you have igraph/boost installed for one triplet, but another one is searched for.
+Specify `./vcpkg.exe install igraph --triplet=x64-windows` or `./vcpkg.exe install igraph --triplet=x86-windows` to install the other one too.
 
 On MacOS, you can install the igraph library using brew:
 

@@ -2,7 +2,8 @@
 #define ATOM_H
 
 #include "Box.h"
-#include "math.h"
+#include <cmath>
+#include <cstdlib>
 
 namespace pylimer_tools
 {
@@ -26,7 +27,7 @@ namespace pylimer_tools
 
       double _getDeltaDistance(double c1, double c2, int n1, int n2, double boxL) const
       {
-        double delta = abs(c1 - c2);
+        double delta = std::fabs(c1 - c2);
         if (n1 != n2)
         {
           delta -= ((double)(n1 - n2)) * boxL;

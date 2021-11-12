@@ -14,6 +14,7 @@ except ImportError:
 from setuptools import find_packages
 
 cmake_args = []
+# cmake_args = ["-DBoost_DEBUG=ON", "-Digraph_DEBUG=ON", "-DCMAKE_FIND_DEBUG_MODE=ON"]
 
 if (os.getenv('VCPKG_ROOT')):
     toolchainFile = os.path.join(
