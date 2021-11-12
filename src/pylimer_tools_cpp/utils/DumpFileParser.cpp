@@ -31,7 +31,7 @@ namespace pylimer_tools
       file.open(filePath);
 
       if (!file.is_open()) {
-        throw std::invalid_argument("File to read file (" + filePath + "): failed to open.")
+        throw std::invalid_argument("File to read file (" + filePath + "): failed to open.");
       }
 
       // read everything until the first key
@@ -50,7 +50,7 @@ namespace pylimer_tools
       std::string currentKey = this->cleanHeader(line);
       data_item_t dataItem;
 
-      while ((getline(&cline, &len, fp)) != -1)
+      while (getline(file, line))
       {
         line = pylimer_tools::utils::trimLineOmitComment(line);
         // skip empty lines

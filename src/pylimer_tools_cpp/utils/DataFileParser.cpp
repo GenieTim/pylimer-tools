@@ -25,13 +25,13 @@ namespace pylimer_tools
       file.open(filePath);
 
       if (!file.is_open()) {
-        throw std::invalid_argument("File to read (" + filePath + "): failed to open.")
+        throw std::invalid_argument("File to read (" + filePath + "): failed to open.");
       }
 
       // read everything until "Masses"
       while (getline(file, line))
       {
-        line = pylimer_tools::utils::trimLineOmitComment(cline);
+        line = pylimer_tools::utils::trimLineOmitComment(line);
         // skip empty lines
         if (line.empty())
         {
@@ -66,7 +66,7 @@ namespace pylimer_tools
       // skip empty lines plus the line with "Masses"
       while (getline(file, line))
       {
-        line = pylimer_tools::utils::trimLineOmitComment(cline);
+        line = pylimer_tools::utils::trimLineOmitComment(line);
 
         // skip empty lines
         if (!line.empty())
@@ -78,7 +78,7 @@ namespace pylimer_tools
       // Then, read masses, up until the next section ("atoms")
       do
       {
-        line = pylimer_tools::utils::trimLineOmitComment(cline);
+        line = pylimer_tools::utils::trimLineOmitComment(line);
 
         // break at empty lines
         if (line.empty())
@@ -94,19 +94,19 @@ namespace pylimer_tools
         this->readMass(line);
       } while (getline(file, line));
 
-      this->skipLinesToContains(cline, &len, fp, "Atoms");
+      this->skipLinesToContains(line, file, "Atoms");
       // skip this line too
       if (!getline(file, line))
       {
         throw std::runtime_error("Data file ended too early. Not able to read any atoms.");
       }
       // then, skip empty lines
-      this->skipEmptyLines(cline, &len, fp);
+      this->skipEmptyLines(line, file);
 
       // Then, read atoms, up until the next section ("bonds")
       for (int i = 0; i < this->nAtoms; ++i)
       {
-        this->readAtom(std::string(cline));
+        this->readAtom(std::string(line));
 
         if (!getline(file, line))
         {
@@ -115,18 +115,18 @@ namespace pylimer_tools
       }
 
       // Then, read bonds
-      this->skipLinesToContains(cline, &len, fp, "Bonds");
+      this->skipLinesToContains(line, file, "Bonds");
       // skip this line too
       if (!getline(file, line))
       {
         throw std::runtime_error("Data file ended too early. Not able to read any bonds.");
       }
       // then, skip empty lines
-      this->skipEmptyLines(cline, &len, fp);
+      this->skipEmptyLines(line, file);
 
       for (int i = 0; i < this->nBonds; i++)
       {
-        this->readBond(std::string(cline));
+        this->readBond(std::string(line));
 
         if (!getline(file, line) && i + 1 < this->nBonds)
         {
@@ -138,31 +138,29 @@ namespace pylimer_tools
 file.close();
     }
 
-    void DataFileParser::skipLinesToContains(char *cline, size_t *len, FILE *fp, std::string upTo)
+    void DataFileParser::skipLinesToContains(std::string line, std::ifstream &file, std::string upTo)
     {
       do
       {
-        std::string line(cline);
-
         if (contains(&line, upTo))
         {
           break;
         }
-      } while ((getline(&cline, len, fp)) != -1);
+      } while (getline(file, line));
     }
 
-    void DataFileParser::skipEmptyLines(char *cline, size_t *len, FILE *fp)
+    void DataFileParser::skipEmptyLines(std::string line, std::ifstream &file)
     {
       do
       {
-        std::string line = pylimer_tools::utils::trimLineOmitComment(cline);
+        line = pylimer_tools::utils::trimLineOmitComment(line);
 
         // skip until empty lines
         if (!line.empty())
         {
           break;
         }
-      } while ((getline(&cline, len, fp)) != -1);
+      } while (getline(file, line));
     }
 
     void DataFileParser::readNs(const std::string line)
