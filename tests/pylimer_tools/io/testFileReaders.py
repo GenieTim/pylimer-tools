@@ -2,14 +2,13 @@ import os
 import unittest
 
 import pandas as pd
-from pylimer_tools_cpp import Universe, UniverseSequence
 from pylimer_tools.io.extractThermoParams import (extractThermoParams,
                                                   getThermoCacheNameSuffix)
-from pylimer_tools.io.readLammpData import readLammpData
-from pylimer_tools.io.readLammpDump import readLammpDump
-from tests.pylimer_tools.pdComparingTestCase import PandasComparingTestCase
 from pylimer_tools.utils.cacheUtility import getCacheFileName
 from pylimer_tools.utils.optimizeDf import reduce_mem_usage
+from pylimer_tools_cpp import (DataFileReader, DumpFileReader, Universe,
+                               UniverseSequence)
+from tests.pylimer_tools.pdComparingTestCase import PandasComparingTestCase
 
 
 class TestFileReader(PandasComparingTestCase):
@@ -43,8 +42,10 @@ class TestFileReader(PandasComparingTestCase):
         universeSequence = UniverseSequence()
         universeSequence.initializeFromDataSequence([dataFile])
         self.assertIsInstance(universeSequence, UniverseSequence)
+        self.assertEqual(universeSequence.getLength(), 1)
         universe = universeSequence.atIndex(0)
         self.assertIsInstance(universe, Universe)
+        self.assertEqual(universe.getNrOfAtoms(), 2595)
         # expectedKeys = ["N_atoms", "N_Atypes", "N_Btypes", "masses", "Lx", "Ly",
         #                 "Lz", "xlo", "xhi", "ylo", "yhi", "zlo", "zhi", "atom_data", "bond_data"]
         # for key in expectedKeys:
@@ -57,8 +58,14 @@ class TestFileReader(PandasComparingTestCase):
 
     def testLammpsDumpReader(self):
         dataFile = os.path.join(os.path.dirname(
-            __file__), "../fixtures/lammps_dump.lammpstrj")
-        data = readLammpDump(dataFile, useCache=False)
-        self.assertIsInstance(data, list)
-        data2 = readLammpDump(dataFile, useCache=True)
-        self.assertEqual(len(data), len(data2))
+            __file__), "../fixtures/lammps_data_file_small.out")
+        dumpFile = os.path.join(os.path.dirname(
+            __file__), "../fixtures/lammps_dump_small.lammpstrj")
+        universeSequence = UniverseSequence()
+        universeSequence.initializeFromDumpFile(dataFile, dumpFile)
+        self.assertIsInstance(universeSequence, UniverseSequence)
+        universe = universeSequence.atIndex(0)
+        self.assertIsInstance(universe, Universe)
+        self.assertEqual(universeSequence.getLength(), 1)
+        universe = universeSequence.atIndex(0)
+        self.assertEqual(universe.getNrOfAtoms(), 12)

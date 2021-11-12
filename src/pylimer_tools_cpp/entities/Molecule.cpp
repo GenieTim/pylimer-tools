@@ -4,6 +4,9 @@
 #include "../utils/StringUtil.h"
 #include <igraph/igraph.h>
 #include <iostream>
+#ifdef OPENMP_FOUND
+#include <omp.h>
+#endif
 
 namespace pylimer_tools
 {
@@ -45,9 +48,12 @@ namespace pylimer_tools
       {
         return 0.0;
       }
-      igraph_vs_t endNodes = pylimer_tools::utils::getVerticesWithDegree(this->graph, 1);
+      std::vector<long int> endNodeIndices = pylimer_tools::utils::getVerticesWithDegree(this->graph, 1);
+      igraph_vector_t endNodeSelectorVector;
+      igraph_vector_init(&endNodeSelectorVector, endNodeIndices.size());
+      pylimer_tools::utils::StdVectorToIgraphVectorT(endNodeIndices, &endNodeSelectorVector);
       igraph_vit_t vit;
-      igraph_vit_create(graph, endNodes, &vit);
+      igraph_vit_create(graph, igraph_vss_vector(&endNodeSelectorVector), &vit);
 
       double distance = -1.0; // TODO: find a nice default for "no end to end"
       Box *box = this->getBox();
@@ -128,10 +134,16 @@ namespace pylimer_tools
     template <typename OUT>
     std::vector<OUT> Molecule::getPropertyValues(const char *propertyName)
     {
+      std::vector<OUT> results;
+      if (this->getNrOfAtoms() == 0) {
+        return results;
+      }
       igraph_vector_t allValues;
       igraph_vector_init(&allValues, this->getNrOfAtoms());
-      VANV(this->graph, propertyName, &allValues);
-      std::vector<OUT> results;
+      if (igraph_cattribute_VANV(this->graph, propertyName, igraph_vss_all(), &allValues))
+      {
+        throw std::runtime_error("Failed to query properties of molecule.");
+      }
       pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
       igraph_vector_destroy(&allValues);
       return results;
@@ -146,6 +158,8 @@ namespace pylimer_tools
       std::vector<Atom> allAtoms = this->getAtoms();
       double multiplier = 1 / allAtoms.size();
 
+#pragma omp parallel for reduction(+ \
+                                   : meanX, meanY, meanZ)
       for (Atom a : allAtoms)
       {
         meanX += multiplier * a.getUnwrappedX(this->parent);
@@ -170,9 +184,12 @@ namespace pylimer_tools
     std::vector<Atom> Molecule::getAtoms()
     {
       std::vector<Atom> results;
-      results.reserve(this->getNrOfAtoms());
+      size_t nrOfAtoms = this->getNrOfAtoms();
+      results.reserve(nrOfAtoms);
 
-      for (size_t i = 0; i < this->getNrOfAtoms(); ++i)
+      // #pragma omp declare reduction (merge : std::vector<Atom> : omp_out.insert(omp_out.end(), omp_in.begin(), omp_in.end()))
+      // #pragma omp parallel for reduction(merge: results)
+      for (size_t i = 0; i < nrOfAtoms; ++i)
       {
         results.push_back(this->getAtomForVertexId(i));
       }
@@ -182,10 +199,13 @@ namespace pylimer_tools
 
     std::vector<Atom> Molecule::getAtomsWithType(const int atomType)
     {
-      std::vector<int> types = this->getPropertyValues<int>("type");
       std::vector<Atom> results;
+      const std::vector<int> types = this->getPropertyValues<int>("type");
+      size_t nrOfTypes = types.size();
 
-      for (size_t i = 0; i < types.size(); ++i)
+      // #pragma omp declare reduction (merge : std::vector<Atom> : omp_out.insert(omp_out.end(), omp_in.begin(), omp_in.end()))
+      // #pragma omp parallel for reduction(merge: results)
+      for (size_t i = 0; i < nrOfTypes; ++i)
       {
         if (types[i] == atomType)
         {

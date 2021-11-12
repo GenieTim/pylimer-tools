@@ -36,6 +36,7 @@ A complete script to install this library including all dependencies could look 
 To update the custom installation, follow the steps below:
 
 .. code:: bash
+  
   cd pylimer_tools
   git pull
   python -m pip install .
@@ -66,6 +67,7 @@ A complete PowerShell script to install this library including all dependencies 
 To update the custom installation, follow the steps below:
 
 .. code:: bash
+
   $env:VCPKG_ROOT="$(pwd)/vcpkg"
   cd pylimer_tools
   git pull

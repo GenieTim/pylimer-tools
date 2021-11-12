@@ -12,7 +12,7 @@ namespace pylimer_tools
 {
   namespace utils
   {
-    static igraph_vs_t getVerticesWithDegree(igraph_t *graph, int degree)
+    static std::vector<long int> getVerticesWithDegree(igraph_t *graph, int degree)
     {
       int graphSize = igraph_vcount(graph);
       igraph_vector_t degrees;
@@ -44,12 +44,42 @@ namespace pylimer_tools
       igraph_vit_destroy(&vit);
       igraph_vs_destroy(&allVertexIds);
 
+      return toSelect;
+    }
+
+    static igraph_vs_t getVerticesWithDegreeSelector(igraph_t *graph, int degree)
+    {
+      // NOTE: this is to omit the assumption, that the returned degree is sequential for vertex 0, ..., |V|
+      std::vector<long int> toSelect = getVerticesWithDegree(graph, degree);
+
       igraph_vs_t result;
       igraph_vector_t toSelectVec;
       igraph_vector_init(&toSelectVec, toSelect.size());
       pylimer_tools::utils::StdVectorToIgraphVectorT(toSelect, &toSelectVec);
       igraph_vs_vector(&result, &toSelectVec);
+
       return result;
+    }
+
+    template <typename IN>
+    static bool graphHasVertexWithProperty(igraph_t *graph, std::string propertyName, IN propertyValue)
+    {
+      igraph_vector_t results;
+      igraph_vector_init(&results, 1);
+      if (igraph_cattribute_VANV(graph, propertyName.c_str(), igraph_vss_all(), &results))
+      {
+        throw std::runtime_error("Failed to query property " + propertyName);
+      };
+      std::vector<IN> resultsV;
+      igraphVectorTToStdVector<IN>(&results, resultsV);
+      for (IN result : resultsV)
+      {
+        if (result == propertyValue)
+        {
+          return true;
+        }
+      }
+      return false;
     }
   }
 }

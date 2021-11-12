@@ -4,10 +4,10 @@ from collections import Counter
 
 import igraph
 import numpy as np
-from pylimer_tools.entities.universum import Universum
+from pylimer_tools_cpp import Universe
 
 
-def predictShearModulus(network: Universum, junctionType, weightPerType, strandLength: int = None, functionalityPerType=None, T: float = 1, k_B: float = 1, totalMass=1):
+def predictShearModulus(network: Universe, junctionType, strandLength: int = None, functionalityPerType=None, T: float = 1, k_B: float = 1):
     """
     Predict the shear modulus using MMT Analysis.
 
@@ -18,7 +18,6 @@ def predictShearModulus(network: Universum, junctionType, weightPerType, strandL
       - network: the polymer system to predict the shear modulus for
       - junctionType: the type of atoms making up the junctions/crosslinkers
       - junctionType: the type of the junctions/crosslinkers to select them in the network
-      - weightPerType: a dictionary with key: type, and value: weight per atom of this atom type. See: #computeWeightFractions
       - strandLength: the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
       - T: the temperature in your unit system
       - k_b: Boltzmann's constant in your unit system
@@ -30,7 +29,7 @@ def predictShearModulus(network: Universum, junctionType, weightPerType, strandL
     ToDo:
       - Support more than one crosslinker type (as is supported by original formula)
     """
-    if (network.getSize() == 0):
+    if (network.getNrOfAtoms() == 0):
         return None
     nu = len(network.getMolecules(junctionType)) / \
         network.getVolume()  # number of chains (network strands) per unit volume
@@ -41,11 +40,11 @@ def predictShearModulus(network: Universum, junctionType, weightPerType, strandL
         network, junctionType, strandLength, functionalityPerType)
     f = functionalityPerType[junctionType]
     alpha, beta = computeMMsProbabilities(r, p, f)
-    weightFractions = computeWeightFractions(network, weightPerType)
+    weightFractions = computeWeightFractions(network)
     return nu * k_B * T * (2*r/f) * (f - 2)/2 * weightFractions[junctionType] * alpha * (1-alpha)**f
 
 
-def calculateWeightFractionOfDanglingChains(network: Universum, junctionType, weightPerType, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def calculateWeightFractionOfDanglingChains(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None) -> float:
     """
     Compute the weight fraction of dangling strands in infinite network
 
@@ -53,15 +52,14 @@ def calculateWeightFractionOfDanglingChains(network: Universum, junctionType, we
       - network: the network to compute the weight fraction for
       - crosslinkerType: the atom type to use to split the molecules
       - strandLength: the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
-      - weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight
 
     Returns:
       - weightFraction $\\Phi_d = 1 - \\Phi_{el}$: weightDangling/weightTotal
     """
-    return 1 - calculateWeightFractionOfBackbone(network, junctionType, weightPerType, strandLength, functionalityPerType)
+    return 1 - calculateWeightFractionOfBackbone(network, junctionType, strandLength, functionalityPerType)
 
 
-def calculateWeightFractionOfBackbone(network: Universum, junctionType, weightPerType, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def calculateWeightFractionOfBackbone(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None) -> float:
     """
     Compute the weight fraction of the backbone strands in an infinite network
 
@@ -71,7 +69,6 @@ def calculateWeightFractionOfBackbone(network: Universum, junctionType, weightPe
     Arguments:
       - network: the poylmer network to do the computation for
       - junctionType: the type of the junctions/crosslinkers to select them in the network
-      - weightPerType: a dictionary with key: type, and value: weight per atom of this atom type. See: #computeWeightFractions
       - strandLength: the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
       - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. 
           See: #computeExtentOfReaction
@@ -79,14 +76,14 @@ def calculateWeightFractionOfBackbone(network: Universum, junctionType, weightPe
     Returns:
       - $\\Phi_{el}$: weight fraction of network backbone
     """
-    if (network.getSize() == 0):
+    if (network.getNrOfAtoms() == 0):
         return 0
 
     if (functionalityPerType is None):
         functionalityPerType = network.determineFunctionalityPerType()
 
     W_sol, weightFractions, alpha, beta = computeWeightFractionOfSolubleMaterial(
-        network, junctionType, weightPerType, strandLength, functionalityPerType)
+        network, junctionType, strandLength, functionalityPerType)
 
     Phi_el = 0
     W_a = weightFractions[junctionType]/functionalityPerType[junctionType]
@@ -104,7 +101,7 @@ def calculateWeightFractionOfBackbone(network: Universum, junctionType, weightPe
     return Phi_el
 
 
-def computeWeightFractionOfSolubleMaterial(network: Universum, junctionType, weightPerType, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None) -> float:
     """
     Compute the weight fraction of soluble material.
 
@@ -115,7 +112,6 @@ def computeWeightFractionOfSolubleMaterial(network: Universum, junctionType, wei
     Arguments:
       - network: the poylmer network to do the computation for
       - junctionType: the type of the junctions/crosslinkers to select them in the network
-      - weightPerType: a dictionary with key: type, and value: weight per atom of this atom type. See: #computeWeightFractions
       - strandLength: the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
       - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. 
           See: #computeExtentOfReaction
@@ -127,6 +123,7 @@ def computeWeightFractionOfSolubleMaterial(network: Universum, junctionType, wei
       - $\\beta$ (float): Macosko & Miller's $P(F_B)$
     """
     if (functionalityPerType is None):
+        print("Computing functionality per type...")
         functionalityPerType = network.determineFunctionalityPerType()
 
     if (functionalityPerType[junctionType] not in [3, 4]):
@@ -138,13 +135,17 @@ def computeWeightFractionOfSolubleMaterial(network: Universum, junctionType, wei
             raise NotImplementedError(
                 "Currently, only strand functionality of 2 is supported. {} given for type {}".format(functionalityPerType[key], key))
 
+    print("Computing extent of reaction...")
     p = computeExtentOfReaction(network, functionalityPerType)
+    print("Computing stoichiometric inbalance...")
     r = computeStoichiometricInbalance(
-        network, junctionType, strandLength, functionalityPerType)
+        network, junctionType, strandLength=strandLength, functionalityPerType=functionalityPerType)
 
+    print("Computing mms probabilities...")
     alpha, beta = computeMMsProbabilities(
         r, p, functionalityPerType[junctionType])
-    weightFractions = computeWeightFractions(network, weightPerType)
+    print("Computing weight fractions...")
+    weightFractions = computeWeightFractions(network)
     W_sol = 0
     for key in weightFractions:
         coeff = alpha if key == junctionType else beta
@@ -189,22 +190,21 @@ def computeMMsProbabilities(r, p, f):
     return alpha, beta
 
 
-def computeWeightFractions(network: Universum, weightPerType) -> dict:
+def computeWeightFractions(network: Universe) -> dict:
     """
     Compute the weight fractions of each atom type in the network.
 
     Arguments:
       - network: the poylmer network to do the computation for
-      - weightPerType: a dictionary with key: type, and value: weight per atom of this atom type. 
 
     Returns:
       - $\\vec{W_i}$ (dict): using the type i as a key, this dict contains the weight fractions ($\\frac{W_i}{W_{tot}}$)
     """
-    if (network.getSize() == 0):
+    if (network.getNrOfAtoms() == 0):
         return {}
 
-    graph: igraph.Graph = network.getUnderlyingGraph()
-    counts = Counter(graph.vs["type"])
+    weightPerType = network.getMasses()
+    counts = Counter(network.getAtomTypes())
     totalMass = 0
     partialMasses = {}
     for key in counts:
@@ -221,7 +221,7 @@ def computeWeightFractions(network: Universum, weightPerType) -> dict:
     return weightFractions
 
 
-def computeStoichiometricInbalance(network: Universum, junctionType, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def computeStoichiometricInbalance(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None) -> float:
     """
     Compute the stoichiometric inbalance
     ( nr. of bonds formable of crosslinker / nr. of formable bonds of precursor )
@@ -242,14 +242,13 @@ def computeStoichiometricInbalance(network: Universum, junctionType, strandLengt
     Returns:
       - r (float): the stoichiometric inbalance
     """
-    if (network.getSize() == 0):
+    if (network.getNrOfAtoms() == 0):
         return 0
 
-    graph: igraph.Graph = network.getUnderlyingGraph()
-    counts = Counter(graph.vs["type"])
+    counts = Counter(network.getAtomTypes())
 
     if (functionalityPerType is None):
-        functionalityPerType = network.determineFunctionalityPerType(counts)
+        functionalityPerType = network.determineFunctionalityPerType()
 
     if (strandLength is None):
         strands = network.getMolecules(junctionType)
@@ -263,10 +262,11 @@ def computeStoichiometricInbalance(network: Universum, junctionType, strandLengt
             otherFormableBonds += counts[key]*functionalityPerType[key]
 
     # division by 2 is implicit
+    print(crosslinkerFormableBonds, otherFormableBonds, strandLength)
     return crosslinkerFormableBonds/(otherFormableBonds/strandLength)
 
 
-def computeExtentOfReaction(network: Universum, functionalityPerType: dict = None) -> float:
+def computeExtentOfReaction(network: Universe, functionalityPerType: dict = None) -> float:
     """
     Compute the extent of reaction
     (nr. of formed bonds in reaction / max. nr. of bonds formable)
@@ -282,13 +282,12 @@ def computeExtentOfReaction(network: Universum, functionalityPerType: dict = Non
       - p (float): the extent of reaction
     """
 
-    if (network.getSize() == 0):
+    if (network.getNrOfAtoms() == 0):
         return 1
 
-    graph: igraph.Graph = network.getUnderlyingGraph()
-    counts = Counter(graph.vs["type"])
+    counts = Counter(network.getAtomTypes())
     if (functionalityPerType is None):
-        functionalityPerType = network.determineFunctionalityPerType(counts)
+        functionalityPerType = network.determineFunctionalityPerType()
 
     maxFormableBonds = 0
     for key in counts:
@@ -297,9 +296,8 @@ def computeExtentOfReaction(network: Universum, functionalityPerType: dict = Non
     if (maxFormableBonds == 0):
         return 1
 
-    graph.simplify()
     # multiplication by 2 as each bond affects 2 possible bonds
-    return graph.ecount()*2.0/(maxFormableBonds)
+    return network.getNrOfBonds()*2.0/(maxFormableBonds)
 
 
 def predictGelationPoint(r: float, f: int, g: int = 2) -> float:

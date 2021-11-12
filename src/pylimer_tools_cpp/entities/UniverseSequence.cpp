@@ -1,12 +1,15 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 #include "Universe.h"
 #include "UniverseSequence.h"
 #include "../utils/DataFileParser.h"
 #include "../utils/DumpFileParser.h"
-#include <boost/algorithm/string.hpp>
 #include "../utils/VectorUtils.h"
+#ifdef OPENMP_FOUND
+#include <omp.h>
+#endif
 
 namespace pylimer_tools
 {
@@ -23,9 +26,13 @@ namespace pylimer_tools
       pylimer_tools::utils::DumpFileParser dumpFileParser = pylimer_tools::utils::DumpFileParser();
       dumpFileParser.read(dumpFile);
 
-      for (int i = 0; i < dumpFileParser.getLength(); ++i)
+      size_t nrOfTimesteps = dumpFileParser.getLength();
+
+#pragma omp for
+      for (size_t i = 0; i < nrOfTimesteps; ++i)
       {
         Universe newUniverse = Universe(0.0, 0.0, 0.0);
+        newUniverse.setTimestep(dumpFileParser.getValuesForAt<long int>(i, "TIMESTEP", 0)[0]);
         if (dumpFileParser.hasKey("BOX BOUNDS"))
         {
           std::vector<double> lo = dumpFileParser.getValuesForAt<double>(i, "BOX BOUNDS", 0);
@@ -122,6 +129,7 @@ namespace pylimer_tools
             positionsX, positionsY, positionsZ,
             nx, ny, nz);
         newUniverse.addBonds(dataFileParser.getNrOfBonds(), dataFileParser.getBondFrom(), dataFileParser.getBondTo());
+        newUniverse.setMasses(dataFileParser.getMasses());
         this->universeCache.insert_or_assign(i, newUniverse);
       }
 
@@ -161,7 +169,19 @@ namespace pylimer_tools
       Universe universe = Universe(fileParser.getLx(), fileParser.getLy(), fileParser.getLz());
       universe.addAtoms(fileParser.getNrOfAtoms(), fileParser.getAtomIds(), fileParser.getAtomTypes(), fileParser.getAtomX(), fileParser.getAtomY(), fileParser.getAtomZ(), fileParser.getAtomNx(), fileParser.getAtomNy(), fileParser.getAtomNz());
       universe.addBonds(fileParser.getNrOfBonds(), fileParser.getBondFrom(), fileParser.getBondTo());
+      universe.setMasses(fileParser.getMasses());
       return universe;
+    }
+
+    std::vector<Universe> UniverseSequence::getAll()
+    {
+      std::vector<Universe> results;
+      results.reserve(this->getLength());
+      for (size_t i = 0; i < this->getLength(); ++i)
+      {
+        results.push_back(this->atIndex(i));
+      }
+      return results;
     }
 
     void UniverseSequence::resetIterator()

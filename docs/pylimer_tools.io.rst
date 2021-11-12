@@ -12,22 +12,6 @@ pylimer\_tools.io.extractThermoParams module
    :undoc-members:
    :show-inheritance:
 
-pylimer\_tools.io.readLammpData module
---------------------------------------
-
-.. automodule:: pylimer_tools.io.readLammpData
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pylimer\_tools.io.readLammpDump module
---------------------------------------
-
-.. automodule:: pylimer_tools.io.readLammpDump
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 
