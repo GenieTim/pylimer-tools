@@ -50,8 +50,8 @@ namespace pylimer_tools
       void readMass(const std::string line);
       void readAtom(std::string line);
       void readBond(std::string line);
-      static void skipEmptyLines(char *cline, size_t *len, FILE *fp);
-      static void skipLinesToContains(char *cline, size_t *len, FILE *fp, std::string upTo);
+      static void skipEmptyLines(std::string line, std::ifstream &file);
+      static void skipLinesToContains(std::string line, std::ifstream &file, std::string upTo);
 
       template <typename OUT>
       inline std::vector<OUT> parseTypesInLine(const std::string line, int nToRead)
