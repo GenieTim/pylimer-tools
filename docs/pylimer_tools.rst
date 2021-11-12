@@ -8,7 +8,6 @@ Subpackages
    :maxdepth: 4
 
    pylimer_tools.calc
-   pylimer_tools.entities
    pylimer_tools.io
    pylimer_tools.utils
 

@@ -16,29 +16,42 @@ namespace pylimer_tools
     {
     public:
       Universe(const double Lx, const double Ly, const double Lz);
+      // initilaization/setters
       void setBoxLengths(const double Lx, const double Ly, const double Lz);
       void addAtoms(const size_t NNewAtoms, std::vector<long int> ids, std::vector<int> types, std::vector<double> x, std::vector<double> y, std::vector<double> z, std::vector<int> nx, std::vector<int> ny, std::vector<int> nz);
       void addBonds(const size_t NNewBonds, std::vector<long int> from, std::vector<long int> to);
-      std::vector<Molecule> getMolecules(const int atomTypeToOmit);
-      std::vector<Molecule> getChainsWithCrosslinker(const int crosslinkerType);
-      std::map<int, int> determineFunctionalityPerType();
-      std::map<int, double> computeWeightFractions(std::map<int, double> weightPerType);
-      template <typename OUT> 
-      std::vector<OUT> getPropertyValues(const char *propertyName);
-      template <typename IN>
-      long int findVertexIdForProperty(const char *propertyName, IN propertyValue);
+      void setMasses(std::map<int, double> weightPerType);
+      void setBox(Box box);
+      void setTimestep(long int timestep) { this->timestep = timestep; };
+
+      // getters
       Atom getAtom(const int atomId);
       std::vector<Atom> getAtomsWithType(const int atomType);
       Atom getAtomByIdx(const int vertexIdx);
-      double getMeanStrandLength(int junctionType);
-      void setBox(Box box);
+      std::vector<Molecule> getMolecules(const int atomTypeToOmit = -1);
+      std::vector<Molecule> getChainsWithCrosslinker(const int crosslinkerType);
+      template <typename OUT>
+      std::vector<OUT> getPropertyValues(const char *propertyName);
+      std::vector<int> getAtomTypes() { return this->getPropertyValues<int>("type"); }
+      template <typename IN>
+      long int findVertexIdForProperty(const char *propertyName, IN propertyValue);
       Box getBox();
       double getVolume();
       const int getNrOfAtoms();
       const int getNrOfBonds();
+      std::map<int, double> getMasses();
+      long int getTimestep() { return this->timestep; };
+      int getNrOfBondsOfAtom(const long int atomId);
+      int getNrOfBondsOfVertex(const long int vertexId);
+
+      // computations
+      std::map<int, int> determineFunctionalityPerType();
+      std::map<int, double> computeWeightFractions();
+      double getMeanStrandLength(int junctionType);
       bool validate();
 
     protected:
+      long int timestep;
       // properties of the box
       int NAtoms = 0;
       int NBonds = 0;
@@ -47,7 +60,12 @@ namespace pylimer_tools
       igraph_t graph;
       std::map<int, int> atomIdToVectorIdx;
 
-      igraph_vs_t getVerticesOfType(const int type);
+      // type's properties
+      std::map<int, double> weightPerType; // a dictionary with key: type, and value: weight per atom of this atom type.
+
+      // internal functions
+      igraph_vs_t
+      getVerticesOfType(const int type);
       std::vector<long int> getIndicesOfType(const int type);
       igraph_vs_t getVerticesByIndices(std::vector<long int> indices);
     };

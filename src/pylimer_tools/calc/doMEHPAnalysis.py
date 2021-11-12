@@ -8,11 +8,10 @@ from typing import Iterable, Tuple
 
 import igraph
 import numpy as np
-from pylimer_tools.entities.molecule import Molecule
-from pylimer_tools.entities.universum import Universum
+from pylimer_tools_cpp import Molecule, MoleculeType, Universe
 
 
-def predictShearModulus(networks: Iterable[Universum], T: float = 1, k_B: float = 1, foreignAtomType=None, totalMass=1) -> float:
+def predictShearModulus(networks: Iterable[Universe], T: float = 1, k_B: float = 1, foreignAtomType=None, totalMass=1) -> float:
     """
     Predict the shear modulus using ANT Analysis.
 
@@ -25,18 +24,19 @@ def predictShearModulus(networks: Iterable[Universum], T: float = 1, k_B: float 
       - k_b: Boltzmann's constant in your unit system
       - foreignAtomType: the type of atoms to ignore (junctions, crosslinkers)
       - totalMass: the $M$ in the respective formula
-    
+
     Returns:
       - shear modulus (float): the estimated shear modulus. Unit: [pressure]
     """
     Gamma = calculateTopologicalFactor(networks, foreignAtomType, totalMass)
     nu = 0
     for network in networks:
-      nu += len(network.getMolecules(foreignAtomType)) / (network.getVolume()) / len(networks)
+        nu += len(network.getMolecules(foreignAtomType)) / \
+            (network.getVolume()) / len(networks)
     return Gamma*nu*k_B*T
 
 
-def calculateCycleRank(networks: Iterable[Universum] = None, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None) -> float:
+def calculateCycleRank(networks: Iterable[Universe] = None, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None) -> float:
     """
     Compute the cycle rank ($\\chi$).
     Assumes the precursor-chains to be bifunctional.
@@ -56,23 +56,26 @@ def calculateCycleRank(networks: Iterable[Universum] = None, nu: int = None, mu:
     Returns:
       - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$). Unit: [1/Volume]
     """
+    # print("Computing cycle rank")
     if (nu is None):
         if (junctionType is None or networks is None):
             raise ValueError(
                 "Argument missing: When not specifiying nu, network and junctionType need to be specified")
+        print("computing nu")
         nu = calculateEffectiveNrDensityOfNetwork(
             networks, absTol, relTol, junctionType)
     if (mu is None):
         if (junctionType is None or networks is None):
             raise ValueError(
                 "Argument missing: When not specifiying mu, network and junctionType need to be specified")
+        print("computing mu")
         mu = calculateEffectiveNrDensityOfJunctions(
             networks, absTol, relTol, junctionType)
 
     return nu - mu
 
 
-def calculateEffectiveNrDensityOfNetwork(networks: Iterable[Universum], absTol: float = 1, relTol: float = 1, junctionType=None) -> float:
+def calculateEffectiveNrDensityOfNetwork(networks: Iterable[Universe], absTol: float = 1, relTol: float = 1, junctionType=None) -> float:
     """
     Compute the effective number density $\\nu_{eff}$ of a network.
     Assumes the precursor-chains to be bifunctional.
@@ -85,7 +88,7 @@ def calculateEffectiveNrDensityOfNetwork(networks: Iterable[Universum], absTol: 
       - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262
 
     Arguments:
-      - network (pylimer_tools.entities.Universum): the network to compute $\\nu_{eff}$ for
+      - network (pylimer_tools.entities.Universe): the network to compute $\\nu_{eff}$ for
       - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
       - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
       - junctionType: the atom type of the crosslinkers/junctions
@@ -98,6 +101,7 @@ def calculateEffectiveNrDensityOfNetwork(networks: Iterable[Universum], absTol: 
 
     # get the mean end to end distances
     R_taus = computeMeanEndToEndDistances(networks, junctionType)
+    print("Computed end to end distances")
     if (len(R_taus) < 1):
         return 0.0
     R_taus = np.array(list(R_taus.values()))
@@ -111,11 +115,12 @@ def calculateEffectiveNrDensityOfNetwork(networks: Iterable[Universum], absTol: 
     numEffective = np.array([R_tau > absTol or R_tau > relTol*R_tau_max
                              for R_tau in R_taus]).sum()
     meanVolume = calculateMeanUniverseVolume(networks)
+    print("Computed mean volume")
 
     return numEffective / meanVolume
 
 
-def calculateMeanUniverseVolume(networks: Iterable[Universum], acceptDifferentSizes: bool = False) -> float:
+def calculateMeanUniverseVolume(networks: Iterable[Universe], acceptDifferentSizes: bool = False) -> float:
     """
     Compute the mean volume of a list of universes.
 
@@ -129,16 +134,16 @@ def calculateMeanUniverseVolume(networks: Iterable[Universum], acceptDifferentSi
     # compute the mean volume of the universes
     meanVolume = 0
     divisor = 1/len(networks)
-    networkSize = networks[0].getSize()
+    networkSize = networks[0].getNrOfAtoms()
     for network in networks:
-        if (not acceptDifferentSizes and network.getSize() != networkSize):
+        if (not acceptDifferentSizes and network.getNrOfAtoms() != networkSize):
             raise NotImplementedError(
-                "Currently, only sequences of networks with the same size are supported (got one with {} instead of {})".format(network.getSize(), networkSize))
+                "Currently, only sequences of networks with the same size are supported (got one with {} instead of {})".format(network.getNrOfAtoms(), networkSize))
         meanVolume += network.getVolume()*divisor
     return meanVolume
 
 
-def calculateEffectiveNrDensityOfJunctions(networks: Iterable[Universum], absTol: float = 0, relTol: float = 1, junctionType=None, minNumEffectiveStrands=2) -> float:
+def calculateEffectiveNrDensityOfJunctions(networks: Iterable[Universe], absTol: float = 0, relTol: float = 1, junctionType=None, minNumEffectiveStrands=2) -> float:
     """
     Compute the number density of the elastically effective crosslinks,
     defined as the ones that connect at least two elastically effective strands.
@@ -148,7 +153,7 @@ def calculateEffectiveNrDensityOfJunctions(networks: Iterable[Universum], absTol
       - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262
 
     Arguments:
-      - network (pylimer_tools.entities.Universum): the network to compute $\\nu_{eff}$ for
+      - network (pylimer_tools.entities.Universe): the network to compute $\\nu_{eff}$ for
       - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
       - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
       - junctionType: the atom type of the crosslinkers/junctions
@@ -197,59 +202,56 @@ def calculateEffectiveNrDensityOfJunctions(networks: Iterable[Universum], absTol
     return numEffectiveJunctions/meanVolume
 
 
-def calculateWeightFractionOfBackbone(network: Universum, crosslinkerType, weights=1):
+def calculateWeightFractionOfBackbone(network: Universe, crosslinkerType):
     """
     Compute the weight fraction of network backbone in infinite network
 
     Arguments:
       - network: the network to compute the weight fraction for
       - crosslinkerType: the atom type to use to split the molecules
-      - weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight
 
     Returns:
       - weightFraction (float): 1 - weightDangling/weightTotal,
     """
     weightFraction, _ = calculateWeightFractionOfDanglingChains(
-        network, crosslinkerType, weights)
+        network, crosslinkerType)
     return 1.0 - weightFraction
 
 
-def calculateWeightFractionOfDanglingChains(network: Universum, crosslinkerType, weights=1) -> Tuple[float, float]:
+def calculateWeightFractionOfDanglingChains(network: Universe, crosslinkerType) -> Tuple[float, float]:
     """
     Compute the weight fraction of dangling strands in infinite network
 
     Arguments:
       - network: the network to compute the weight fraction for
       - crosslinkerType: the atom type to use to split the molecules
-      - weights: either a dict with key: atomType and value: weight, or a scalar value if all atoms have the same weight
 
     Returns:
       - weightFraction: weightDangling/weightTotal,
       - numFraction: numDangling/numTotal
     """
-    if (network.getSize() < 1):
+    if (network.getNrOfAtoms() < 1):
         return 0.0, 0.0
 
+    weights = network.getMasses()
+
     def getWeightOfGraph(graph):
-        counts = Counter(graph.vs["type"])
+        counts = Counter(graph.getAtomTypes())
         weightTotal = 0
         for key in counts:
-            if (type(weights) in (float, int)):
-                weightTotal += weights*counts[key]
-            else:
-                weightTotal += weights[key]*counts[key]
+            weightTotal += weights[key]*counts[key]
         return weightTotal
 
     allChains = network.getChainsWithCrosslinker(crosslinkerType)
-    numTotal = network.getSize()
-    weightTotal = getWeightOfGraph(network.getUnderlyingGraph())
+    numTotal = network.getNrOfAtoms()
+    weightTotal = getWeightOfGraph(network)
 
     numDangling = 0
     weightDangling = 0
     for chain in allChains:
-        if (chain.getType() is Molecule.MoleculeType.DANGLING_CHAIN):
+        if (chain.getType() is MoleculeType.DANGLING_CHAIN):
             numDangling += chain.getLength()
-            weightDangling += getWeightOfGraph(chain.getUnderlyingGraph())
+            weightDangling += getWeightOfGraph(chain)
 
     if (weightTotal == 0):
         # warnings.warn("Weight total = 0")
@@ -258,7 +260,7 @@ def calculateWeightFractionOfDanglingChains(network: Universum, crosslinkerType,
     return weightDangling/weightTotal, numDangling/numTotal
 
 
-def computeMeanEndToEndDistances(networks: Iterable[Universum], crosslinkerType) -> dict:
+def computeMeanEndToEndDistances(networks: Iterable[Universe], crosslinkerType) -> dict:
     """
     Compute the mean end to end distance between each pair of (indirectly) connected crosslinker
 
@@ -271,6 +273,7 @@ def computeMeanEndToEndDistances(networks: Iterable[Universum], crosslinkerType)
           and value: the norm of the mean difference vector
     """
     R_tau_vectors = computeMeanEndToEndVectors(networks, crosslinkerType)
+    print("Computed mean end to end vectors")
     if (len(R_tau_vectors) < 1):
         return {}
 
@@ -281,7 +284,7 @@ def computeMeanEndToEndDistances(networks: Iterable[Universum], crosslinkerType)
     return dict(zip(R_tau_vectors.keys(), R_taus))
 
 
-def computeMeanEndToEndVectors(networks: Iterable[Universum], crosslinkerType) -> dict:
+def computeMeanEndToEndVectors(networks: Iterable[Universe], crosslinkerType) -> dict:
     """
     Compute the mean end to end vectors between each pair of (indirectly) connected crosslinker
 
@@ -307,12 +310,13 @@ def computeMeanEndToEndVectors(networks: Iterable[Universum], crosslinkerType) -
         # (e.g. computing connectivity only once, storing it only once, ....)
         for key in currentEndToEndVectors:
             if (key not in endToEndVectors):
-                endToEndVectors[key] = 0
-            endToEndVectors[key] += currentEndToEndVectors[key]*divider
+                endToEndVectors[key] = [0, 0, 0]
+            for i in range(3):
+                endToEndVectors[key][i] += currentEndToEndVectors[key][i]*divider
     return endToEndVectors
 
 
-def computeEndToEndVectors(network: Universum, crosslinkerType) -> dict:
+def computeEndToEndVectors(network: Universe, crosslinkerType) -> dict:
     """
     Compute the end to end vectors between each pair of (indirectly) connected crosslinker
 
@@ -327,27 +331,31 @@ def computeEndToEndVectors(network: Universum, crosslinkerType) -> dict:
     # while we could do the decomposition again with explicit removal of irrelevant strand atoms,
     # this should not be any more expensive
     endToEndVectors = {}
+    print("Compute endToEndVectors")
     molecules = network.getChainsWithCrosslinker(crosslinkerType)
+    print("Got chains with crosslinkers")
     for molecule in molecules:
-        crosslinkers = molecule.getUnderlyingGraph().vs.select(type_eq=crosslinkerType)
+        crosslinkers = molecule.getAtomsWithType(crosslinkerType)
+        print("Got crosslinkers")
         if (len(crosslinkers) != 2 or
-            molecule.getType() == Molecule.MoleculeType.PRIMARY_LOOP or
-                molecule.getType() == Molecule.MoleculeType.DANGLING_CHAIN):
+            molecule.getType() == MoleculeType.PRIMARY_LOOP or
+                molecule.getType() == MoleculeType.DANGLING_CHAIN):
             # dangling, free chains and loops are irrelevant for our purposes
             continue
         # igraph.VertexSeq is not sortable -> use a list
         crosslinkers = [crosslinkers[0], crosslinkers[1]]
         # sort crosslinkers by name as a way to keep the vector directions consistent between timesteps
-        crosslinkers.sort(key=lambda a: a["name"])
+        crosslinkers.sort(key=lambda a: a.getId())
         #
+        print("Have sorted crosslinkers")
         key = _getKeyForMolecule(molecule, crosslinkers)
-        endToEndVectors[key] = crosslinkers[0]["atom"].computeVectorTo(
-            crosslinkers[1]["atom"])
+        endToEndVectors[key] = crosslinkers[0].computeVectorTo(
+            crosslinkers[1], network.getBox())
 
     return endToEndVectors
 
 
-def computeCrosslinkerConversion(network: Universum, junctionType, f: int) -> float:
+def computeCrosslinkerConversion(network: Universe, junctionType, f: int) -> float:
     """
     Compute the extent of reaction of the crosslinkers
     (actual functionality divided by target functionality)
@@ -363,7 +371,7 @@ def computeCrosslinkerConversion(network: Universum, junctionType, f: int) -> fl
     return calculateEffectiveCrosslinkerFunctionality(network, junctionType) / f
 
 
-def calculateEffectiveCrosslinkerFunctionality(network: Universum, junctionType) -> float:
+def calculateEffectiveCrosslinkerFunctionality(network: Universe, junctionType) -> float:
     """
     Compute the mean crosslinker functionality
 
@@ -379,7 +387,7 @@ def calculateEffectiveCrosslinkerFunctionality(network: Universum, junctionType)
     return np.mean(junctionDegrees)
 
 
-def calculateEffectiveCrosslinkerFunctionalities(network: Universum, junctionType) -> list[int]:
+def calculateEffectiveCrosslinkerFunctionalities(network: Universe, junctionType) -> list[int]:
     """
     Compute the functionality of every crosslinker in the network
 
@@ -390,16 +398,15 @@ def calculateEffectiveCrosslinkerFunctionalities(network: Universum, junctionTyp
     Returns:
       - junctionDegrees (list[int]): the functionality of every crosslinker
     """
-    if (network.getSize() == 0):
+    if (network.getNrOfAtoms() == 0):
         return []
-    junctions = network.getUnderlyingGraph().vs.select(type_eq=junctionType)
-    junctionIds = [v.index for v in junctions]
-    junctionDegrees = network.getUnderlyingGraph().degree(
-        junctionIds, mode="all", loops=False)
+    junctions = network.getAtomsWithType(junctionType)
+    junctionIds = [v.getId() for v in junctions]
+    junctionDegrees = [network.getNrOfBondsOfAtom(id) for id in junctionIds]
     return junctionDegrees
 
 
-def calculateTopologicalFactor(networks: Iterable[Universum], foreignAtomType=None, totalMass=1, b=None) -> float:
+def calculateTopologicalFactor(networks: Iterable[Universe], foreignAtomType=None, totalMass=1, b=None) -> float:
     """
     Compute the topological factor of a polymer network.
 
@@ -416,7 +423,7 @@ def calculateTopologicalFactor(networks: Iterable[Universum], foreignAtomType=No
       - foreignAtomType: the type of atoms to ignore
       - totalMass: the $M$ in the respective formula
       - b: the mean bond length. 
-          If `None`, it will be computed for each molecule in the first Universum (Network).
+          If `None`, it will be computed for each molecule in the first Universe (Network).
 
     Returns:
       - the topological factor $\\Gamma$
@@ -428,17 +435,17 @@ def calculateTopologicalFactor(networks: Iterable[Universum], foreignAtomType=No
     network = networks[0]  # this is where the second assumption is made
     chainsToProcess = network.getChainsWithCrosslinker(foreignAtomType)
     for molecule in chainsToProcess:
-        crosslinkers = molecule.getUnderlyingGraph().vs.select(type_eq=foreignAtomType)
+        crosslinkers = molecule.getAtomsWithType(foreignAtomType)
         if (len(crosslinkers) != 2 or
-            molecule.getType() == Molecule.MoleculeType.PRIMARY_LOOP or
-                molecule.getType() == Molecule.MoleculeType.DANGLING_CHAIN):
+            molecule.getType() == MoleculeType.PRIMARY_LOOP or
+                molecule.getType() == MoleculeType.DANGLING_CHAIN):
             # dangling, free chains and loops are irrelevant for our purposes
             continue
         if (b is None):
-            b = molecule.computeBondLengths().mean()
+            b = np.mean(molecule.computeBondLengths())
         crosslinkers = [crosslinkers[0], crosslinkers[1]]
         # sort crosslinkers by name as a way to keep the vector directions consistent between timesteps
-        crosslinkers.sort(key=lambda a: a["name"])
+        crosslinkers.sort(key=lambda a: a.getId())
         key = _getKeyForMolecule(molecule, crosslinkers)
         GammaSum += R_taus[key]*R_taus[key] / \
             ((molecule.getLength()-2) * b *
@@ -454,7 +461,6 @@ def _getKeyForMolecule(molecule, crosslinkers):
     whereas the names of all other atoms in the chain are used too to distinguish 
     e.g. two secondary loops
     """
-    names = [a.name for a in molecule]
+    names = [a.getId() for a in molecule.getAtoms()]
     names.sort()
-    return "{}+{}+{}".format(crosslinkers[0]
-                             ["name"], crosslinkers[1]["name"], "".join(names))
+    return "{}+{}+{}".format(crosslinkers[0].getId(), crosslinkers[1].getId(), "-".join(str(n) for n in names))
