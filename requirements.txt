@@ -19,7 +19,6 @@ scipy>=1.6.0
 packaging>=21.0
 pandas>=1.2.4
 twine>=3.4.2
-coverage>=5.5.0
 igraph>=0.9.6
 lazydocs>=0.4.5
 click>=7.1.2

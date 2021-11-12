@@ -37,9 +37,10 @@ endif()
 # Now we can find pybind11
 find_package(pybind11 CONFIG REQUIRED)
 
-# add dependency headers
+message("Using toolchain file ${CMAKE_TOOLCHAIN_FILE}")
 find_package(igraph REQUIRED)
 if(igraph_FOUND)
+  message("Igraph found in main. ${CMAKE_TOOLCHAIN_FILE}")
   include_directories(${igraph_INCLUDE_DIRS})
 endif()
 
