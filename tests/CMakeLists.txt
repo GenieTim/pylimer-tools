@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.15.0)
 project(pylimer_tests VERSION "0.1.0")
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/CMakeLists.txt)
+
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
@@ -8,6 +10,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug)
 endif()
+
+# set(CMAKE_FIND_DEBUG_MODE ON)
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 set(CMAKE_CXX_FLAGS "-Wall -Wextra")
@@ -27,21 +31,19 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(Catch2)
 
 # and other needed packages
-find_package(igraph REQUIRED)
-if(igraph_FOUND)
-  include_directories(${igraph_INCLUDE_DIRS})
-	message("Found igraph")
-else()
-	message(WARNING "DID NOT FIND igraph")
-endif()
-
-find_package(Boost REQUIRED)
-if(Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS})
-endif()
+# setupIgraph()
+# find_package(igraph REQUIRED)
+# if(igraph_FOUND)
+# else()
+# 	message(WARNING "DID NOT FIND igraph")
+# endif()
 
 # add sources & targets
 add_subdirectory(../src/pylimer_tools_cpp pylimer_tools.out)
+
+add_dependencies(pylimer_tools igraphLib)
+include_directories(${igraph_INCLUDE_DIRS})
+message("Found igraph for tests. Including ${igraph_INCLUDE_DIRS}")
 
 add_library(test_sources 
 	OBJECT 
@@ -64,7 +66,7 @@ target_link_libraries(pylimer_tests
 	Catch2::Catch2WithMain
 	test_sources
 	pylimer_tools
-	igraph #${igraph_LIBRARIES}
+	${igraph_LIBRARIES}
 )
 
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)

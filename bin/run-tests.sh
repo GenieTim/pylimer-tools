@@ -6,6 +6,7 @@ ROOT_DIR=$(pwd)
 cd "$ROOT_DIR/tests" || exit 2
 
 # first, run cpp tests
+# rm -rf build
 mkdir -p build
 cd build || exit 5
 cmake ..

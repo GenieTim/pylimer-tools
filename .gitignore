@@ -128,6 +128,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# dependencies
+vendor/igraph
+
+# build targets
 coverage.html
 docs-html
 _skbuild

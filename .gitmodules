@@ -1,6 +1,3 @@
 [submodule "lib/igraph"]
 	path = lib/igraph
 	url = git@github.com:igraph/igraph.git
-[submodule "lib/boost"]
-	path = lib/boost
-	url = git@github.com:boostorg/boost.git
