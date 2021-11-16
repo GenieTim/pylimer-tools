@@ -7,7 +7,6 @@
 #include <algorithm>
 // #include <ranges>
 // #include <string_view>
-#include <boost/tokenizer.hpp>
 
 namespace std
 {
@@ -105,7 +104,6 @@ namespace pylimer_tools
 
     class CsvTokenizer
     {
-      typedef boost::tokenizer<boost::char_separator<char>> tokenizer;
 
     public:
       CsvTokenizer(std::string subject)
@@ -120,15 +118,27 @@ namespace pylimer_tools
         //   results.push_back(word);
         // }
 
-        // otherwise, use boost
-        boost::char_separator<char> sep{" ,;\t\n"};
-        tokenizer tok{subject, sep};
-        for (tokenizer::iterator it = tok.begin(); it != tok.end(); ++it)
+        // or the "manual" one below 
+        std::string separators = " ,;\t\n";
+        std::string text = subject;
+        size_t start = text.find_first_not_of(separators);
+        size_t end;
+        do
         {
-          // we are only interested in the first value.
-          // also, we cannot cast the strings that follow
-          this->results.push_back(*it);
-        }
+          end = text.find_first_of(separators, start);
+
+          if (end == std::string::npos)
+          {
+            std::string token = text.substr(start);
+            start = end;
+            this->results.push_back(token);
+            break;
+          }
+
+          std::string token = text.substr(start, end - start);
+          this->results.push_back(token);
+          start = text.find_first_not_of(separators, end + 1);
+        } while (start != std::string::npos);
       }
 
       CsvTokenizer(std::string subject, size_t maxNrToRead)
@@ -143,21 +153,33 @@ namespace pylimer_tools
         //   results.push_back(word);
         // }
 
-        // otherwise, use boost
-        boost::char_separator<char> sep{" ,;\t\n"};
-        tokenizer tok{subject, sep};
+        // or the "manual" one below 
+        std::string separators = " ,;\t\n";
+        std::string text = subject;
+        size_t start = text.find_first_not_of(separators);
+        size_t end;
         size_t iteration = 0;
-        for (tokenizer::iterator it = tok.begin(); it != tok.end(); ++it)
+        do
         {
-          // we are only interested in the first value.
-          // also, we cannot cast the strings that follow
-          this->results.push_back(*it);
+          end = text.find_first_of(separators, start);
+
+          if (end == std::string::npos)
+          {
+            std::string token = text.substr(start);
+            start = end;
+            this->results.push_back(token);
+            break;
+          }
+
+          std::string token = text.substr(start, end - start);
+          this->results.push_back(token);
           iteration++;
           if (iteration == maxNrToRead)
           {
             break;
           }
-        }
+          start = text.find_first_not_of(separators, end + 1);
+        } while (start != std::string::npos);
       }
 
       int getLength() const { return this->results.size(); }
@@ -171,22 +193,22 @@ namespace pylimer_tools
         return this->results[index];
       }
 
-#define MAKE_GET(TYPE, METHOD)                                                                    \
-  template <>                                                                                     \
-  TYPE get<TYPE>(size_t index) const                                                              \
-  {                                                                                               \
-    if (this->results.size() <= index)                                                            \
-    {                                                                                             \
-      throw std::runtime_error("Index out of bounds when parsing string '" + this->source + "'"); \
-    }                                                                                             \
-    try                                                                                           \
-    {                                                                                             \
-      return METHOD(this->results[index]);                                                        \
-    }                                                                                             \
-    catch (std::invalid_argument e)                                                               \
-    {                                                                                             \
-      throw std::runtime_error("Failed to convert string " + this->results[index]);               \
-    }                                                                                             \
+#define MAKE_GET(TYPE, METHOD)                                                                       \
+  template <>                                                                                        \
+  TYPE get<TYPE>(size_t index) const                                                                 \
+  {                                                                                                  \
+    if (this->results.size() <= index)                                                               \
+    {                                                                                                \
+      throw std::runtime_error("Index out of bounds when parsing string '" + this->source + "'");    \
+    }                                                                                                \
+    try                                                                                              \
+    {                                                                                                \
+      return METHOD(this->results[index]);                                                           \
+    }                                                                                                \
+    catch (std::invalid_argument e)                                                                  \
+    {                                                                                                \
+      throw std::runtime_error("Failed to convert string '" + this->results[index] + "' to " #TYPE); \
+    }                                                                                                \
   }
 
       MAKE_GET(double, std::stod)

@@ -1,6 +1,7 @@
 import os
 import sys
 import warnings
+import shutil
 
 try:
     from skbuild import setup
@@ -15,7 +16,7 @@ except ImportError:
 from setuptools import find_packages
 
 cmake_args = []
-# cmake_args = ["-DBoost_DEBUG=ON", "-Digraph_DEBUG=ON", "-DCMAKE_FIND_DEBUG_MODE=ON"]
+# cmake_args = ["-Digraph_DEBUG=ON", "-DCMAKE_FIND_DEBUG_MODE=ON"]
 
 if (os.getenv('VCPKG_ROOT')):
     toolchainFile = os.path.join(
@@ -28,6 +29,14 @@ if (os.getenv('VCPKG_ROOT')):
     else:
         warnings.warn("Detected VCPKG_ROOT. Did not find toolchain file {} though.".format(toolchainFile))
 
+# delete vendor caches — this is useful if you compile 
+# this project using CMakes as well as skbuild, 
+# as the two build directories of vendor would not interact well.
+igraphVendor = os.path.abspath(os.path.join(os.path.dirname(__file__), 'vendor/igraph'))
+if (os.path.exists(igraphVendor)):
+    shutil.rmtree(igraphVendor)
+else:
+    print("No need to delete {}".format(igraphVendor))
 
 setup(
     name="pylimer_tools",

@@ -44,11 +44,6 @@ if(igraph_FOUND)
   include_directories(${igraph_INCLUDE_DIRS})
 endif()
 
-find_package(Boost REQUIRED)
-if(Boost_FOUND)
-  include_directories(${Boost_INCLUDE_DIRS})
-endif()
-
 # add sources & targets
 add_subdirectory(src/pylimer_tools_cpp)
 
@@ -59,11 +54,22 @@ pybind11_add_module(pylimer_tools_cpp MODULE
   src/pylimer_tools_cpp/pybind11/pylimer_tools_cpp.cpp
 )
 
+# add other dependencies
+# if (DEFINED igraph_LOADED)
+include(${CMAKE_CURRENT_SOURCE_DIR}/vendor/CMakeLists.txt)
+add_dependencies(pylimer_tools igraphLib)
+include_directories(${igraph_INCLUDE_DIRS})
+
+message("pylimer_tools_cpp includes igraph from ${igraph_INCLUDE_DIRS}")
+# else()
+# message("plyimer_tools_cpp cannot find igraph")
+# endif()
+
+# link
 target_link_libraries(pylimer_tools_cpp 
-  PRIVATE 
+  PUBLIC 
     pylimer_tools
     ${igraph_LIBRARIES}
-    igraph
 )
 
 target_compile_definitions(pylimer_tools_cpp PRIVATE VERSION_INFO=${PROJECT_VERSION})
