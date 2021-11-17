@@ -6,10 +6,10 @@ ROOT_DIR=$(pwd)
 cd "$ROOT_DIR/tests" || exit 2
 
 # first, run cpp tests
-# rm -rf build
+rm -rf build
 mkdir -p build
 cd build || exit 5
-cmake ..
+cmake .. || exit 1
 cmake --build . || exit 9
 ./pylimer_tests || exit 6 # -s --durations yes 
 
