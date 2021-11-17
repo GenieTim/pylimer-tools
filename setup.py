@@ -34,7 +34,10 @@ if (os.getenv('VCPKG_ROOT')):
 # as the two build directories of vendor would not interact well.
 igraphVendor = os.path.abspath(os.path.join(os.path.dirname(__file__), 'vendor/igraph'))
 if (os.path.exists(igraphVendor)):
-    shutil.rmtree(igraphVendor)
+    try:
+        shutil.rmtree(igraphVendor)
+    except:
+        warnings.warn("Could not delete directory {}. Errors incoming.".format(igraphVendor))
 else:
     print("No need to delete {}".format(igraphVendor))
 
