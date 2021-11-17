@@ -2,7 +2,9 @@
 #include "Atom.h"
 #include "../utils/GraphUtils.h"
 #include "../utils/StringUtil.h"
+extern "C" {
 #include <igraph/igraph.h>
+}
 #include <iostream>
 #ifdef OPENMP_FOUND
 #include <omp.h>

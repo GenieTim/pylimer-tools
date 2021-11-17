@@ -1,5 +1,7 @@
 
+extern "C" {
 #include <igraph/igraph.h>
+}
 #include <vector>
 #include "utils/vector_utils.h"
 #include <iostream>

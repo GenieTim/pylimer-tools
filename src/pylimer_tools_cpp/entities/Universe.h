@@ -1,7 +1,9 @@
 #ifndef UNIVERSE_H
 #define UNIVERSE_H
 
+extern "C" {
 #include <igraph/igraph.h>
+}
 #include <vector>
 #include <map>
 #include "Molecule.h"

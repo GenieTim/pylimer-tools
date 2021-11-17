@@ -7,7 +7,9 @@
 #include <iostream>
 #include <string>
 #include <filesystem>
+extern "C" {
 #include <igraph/igraph.h>
+}
 
 namespace pe = pylimer_tools::entities;
 

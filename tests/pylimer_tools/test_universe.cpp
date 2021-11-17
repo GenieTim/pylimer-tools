@@ -4,7 +4,9 @@
 #include "../../src/pylimer_tools_cpp/entities/Atom.h"
 #include "../../src/pylimer_tools_cpp/entities/Box.h"
 #include <iostream>
+extern "C" {
 #include <igraph/igraph.h>
+}
 
 namespace pe = pylimer_tools::entities;
 
