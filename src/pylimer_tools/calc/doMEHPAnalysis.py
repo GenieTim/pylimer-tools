@@ -56,19 +56,16 @@ def calculateCycleRank(networks: Iterable[Universe] = None, nu: int = None, mu: 
     Returns:
       - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$). Unit: [1/Volume]
     """
-    # print("Computing cycle rank")
     if (nu is None):
         if (junctionType is None or networks is None):
             raise ValueError(
                 "Argument missing: When not specifiying nu, network and junctionType need to be specified")
-        print("computing nu")
         nu = calculateEffectiveNrDensityOfNetwork(
             networks, absTol, relTol, junctionType)
     if (mu is None):
         if (junctionType is None or networks is None):
             raise ValueError(
                 "Argument missing: When not specifiying mu, network and junctionType need to be specified")
-        print("computing mu")
         mu = calculateEffectiveNrDensityOfJunctions(
             networks, absTol, relTol, junctionType)
 
@@ -101,7 +98,6 @@ def calculateEffectiveNrDensityOfNetwork(networks: Iterable[Universe], absTol: f
 
     # get the mean end to end distances
     R_taus = computeMeanEndToEndDistances(networks, junctionType)
-    print("Computed end to end distances")
     if (len(R_taus) < 1):
         return 0.0
     R_taus = np.array(list(R_taus.values()))
@@ -115,7 +111,6 @@ def calculateEffectiveNrDensityOfNetwork(networks: Iterable[Universe], absTol: f
     numEffective = np.array([R_tau > absTol or R_tau > relTol*R_tau_max
                              for R_tau in R_taus]).sum()
     meanVolume = calculateMeanUniverseVolume(networks)
-    print("Computed mean volume")
 
     return numEffective / meanVolume
 
@@ -273,12 +268,10 @@ def computeMeanEndToEndDistances(networks: Iterable[Universe], crosslinkerType) 
           and value: the norm of the mean difference vector
     """
     R_tau_vectors = computeMeanEndToEndVectors(networks, crosslinkerType)
-    print("Computed mean end to end vectors")
     if (len(R_tau_vectors) < 1):
         return {}
 
     R_tau_vectors_array = np.array(list(R_tau_vectors.values()))
-    # print(R_tau_vectors_array)
     R_taus = np.linalg.norm(R_tau_vectors_array, axis=1)
 
     return dict(zip(R_tau_vectors.keys(), R_taus))
@@ -331,12 +324,9 @@ def computeEndToEndVectors(network: Universe, crosslinkerType) -> dict:
     # while we could do the decomposition again with explicit removal of irrelevant strand atoms,
     # this should not be any more expensive
     endToEndVectors = {}
-    print("Compute endToEndVectors")
     molecules = network.getChainsWithCrosslinker(crosslinkerType)
-    print("Got {} chains with crosslinkers".format(len(molecules)))
     for molecule in molecules:
         crosslinkers = molecule.getAtomsWithType(crosslinkerType)
-        print("Got crosslinkers")
         if (len(crosslinkers) != 2 or
             molecule.getType() == MoleculeType.PRIMARY_LOOP or
                 molecule.getType() == MoleculeType.DANGLING_CHAIN):
@@ -347,7 +337,6 @@ def computeEndToEndVectors(network: Universe, crosslinkerType) -> dict:
         # sort crosslinkers by name as a way to keep the vector directions consistent between timesteps
         crosslinkers.sort(key=lambda a: a.getId())
         #
-        print("Have sorted crosslinkers")
         key = _getKeyForMolecule(molecule, crosslinkers)
         endToEndVectors[key] = crosslinkers[0].computeVectorTo(
             crosslinkers[1], network.getBox())

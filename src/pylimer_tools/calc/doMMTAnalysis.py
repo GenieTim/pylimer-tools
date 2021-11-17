@@ -123,7 +123,6 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, stra
       - $\\beta$ (float): Macosko & Miller's $P(F_B)$
     """
     if (functionalityPerType is None):
-        print("Computing functionality per type...")
         functionalityPerType = network.determineFunctionalityPerType()
 
     if (functionalityPerType[junctionType] not in [3, 4]):
@@ -135,16 +134,12 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, stra
             raise NotImplementedError(
                 "Currently, only strand functionality of 2 is supported. {} given for type {}".format(functionalityPerType[key], key))
 
-    print("Computing extent of reaction...")
     p = computeExtentOfReaction(network, functionalityPerType)
-    print("Computing stoichiometric inbalance...")
     r = computeStoichiometricInbalance(
         network, junctionType, strandLength=strandLength, functionalityPerType=functionalityPerType)
 
-    print("Computing mms probabilities...")
     alpha, beta = computeMMsProbabilities(
         r, p, functionalityPerType[junctionType])
-    print("Computing weight fractions...")
     weightFractions = computeWeightFractions(network)
     W_sol = 0
     for key in weightFractions:
@@ -262,7 +257,6 @@ def computeStoichiometricInbalance(network: Universe, junctionType, strandLength
             otherFormableBonds += counts[key]*functionalityPerType[key]
 
     # division by 2 is implicit
-    print(crosslinkerFormableBonds, otherFormableBonds, strandLength)
     return crosslinkerFormableBonds/(otherFormableBonds/strandLength)
 
 

@@ -26,7 +26,6 @@ class TestEntities(UniverseUsingTestCase):
         super().setUp()
 
     def test_universe(self):
-        print("Testing universe")
         self.assertIsInstance(self.emptyUniverse, Universe)
         # self.assertIsInstance(universe.getUnderlyingGraph(), igraph.Graph)
         # check that the except paths work too: non-existant atom ids & type
@@ -43,7 +42,6 @@ class TestEntities(UniverseUsingTestCase):
         self.assertIsInstance(atom, Atom)
 
     def test_moleculeEntity(self):
-        print("Testing moleculeEntity")
         universe = self.testUniverseSmall
         self.assertEqual(4, len(universe.getAtomsWithType(1)))
         self.assertEqual(2, len(universe.getAtomsWithType(2)))
@@ -71,7 +69,6 @@ class TestEntities(UniverseUsingTestCase):
             chainsWithCrosslinker[1].getType(), MoleculeType.DANGLING_CHAIN)
 
     def test_moleculeEntityIterations(self):
-        print("testing molecule")
         molecules = self.testUniverseSmall.getMolecules(0)
         # test iteration & return type
         for molecule in molecules:
@@ -81,7 +78,6 @@ class TestEntities(UniverseUsingTestCase):
         self.assertEqual(np.mean(molecules[0].computeBondLengths()), 1.0)
 
     def test_atomEntity(self):
-        print("Testing atom")
         atom1 = Atom(1, 1, 0.0, 0.0, 0.0, 0, 0, 0)
         self.assertIsInstance(atom1, Atom)
         self.assertEqual(atom1.getType(), 1)
