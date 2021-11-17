@@ -22,6 +22,7 @@ if (NOT DEFINED igraph_LOADED)
 				PREFIX ${CMAKE_CURRENT_LIST_DIR}/igraph
 				INSTALL_DIR ${CMAKE_CURRENT_LIST_DIR}/igraph/igraphLib-install
 				CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_LIST_DIR}/igraph/igraphLib-install
+				BUILD_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_LIST_DIR}/igraph/src/igraphLib-build --config Release
 				BUILD_BYPRODUCTS ${CMAKE_CURRENT_LIST_DIR}/igraph/igraphLib-install/lib/${LIBRARY_PREFIX}igraph${LIBRARY_SUFFIX}
 		)
 		# FetchContent_MakeAvailable(igraphLib)
