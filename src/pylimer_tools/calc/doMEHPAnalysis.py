@@ -249,12 +249,12 @@ def calculateWeightFractionOfDanglingChains(network: Universe, crosslinkerType) 
     numDangling = 0
     weightDangling = 0
     for chain in allChains:
-        if (chain.getType() is MoleculeType.DANGLING_CHAIN):
-            numDangling += chain.getLength()
+        if (chain.getType() == MoleculeType.DANGLING_CHAIN):
+            numDangling += chain.getNrOfAtoms()
             weightDangling += getWeightOfGraph(chain)
 
     if (weightTotal == 0):
-        # warnings.warn("Weight total = 0")
+        # warnings.warn("Total weight of network is = 0.")
         return 0.0, numDangling/numTotal
 
     return weightDangling/weightTotal, numDangling/numTotal
@@ -333,7 +333,7 @@ def computeEndToEndVectors(network: Universe, crosslinkerType) -> dict:
     endToEndVectors = {}
     print("Compute endToEndVectors")
     molecules = network.getChainsWithCrosslinker(crosslinkerType)
-    print("Got chains with crosslinkers")
+    print("Got {} chains with crosslinkers".format(len(molecules)))
     for molecule in molecules:
         crosslinkers = molecule.getAtomsWithType(crosslinkerType)
         print("Got crosslinkers")

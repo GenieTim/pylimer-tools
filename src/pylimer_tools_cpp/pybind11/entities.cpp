@@ -127,7 +127,9 @@ void init_pylimer_bound_entities(py::module_ &m)
             then those atoms will be omitted, and this function returns chains instead.)pbdoc")
         .def("getChainsWithCrosslinker", &Universe::getChainsWithCrosslinker, R"pbdoc(
             Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms, without omitting the crosslinkers.
-            In turn, e.g. for a tetrafunctional crosslinker, it will be 4 times in the resulting molecules.)pbdoc")
+            In turn, e.g. for a tetrafunctional crosslinker, it will be 4 times in the resulting molecules.
+            
+            **NOTE**: Crosslinkers without bonds to non-crosslinkers are not returned.)pbdoc")
         .def("getAtomTypes", &Universe::getAtomTypes, "Get all types (each one for each atom) ordered by atom vertex id.")
         .def("getAtom", &Universe::getAtom, "Find an atom by its ID.")
         .def("getAtomsWithType", &Universe::getAtomsWithType, "Find many atom by their type.")
