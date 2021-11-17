@@ -20,7 +20,7 @@ if (NOT DEFINED igraph_LOADED)
 				GIT_REPOSITORY https://github.com/igraph/igraph.git
 				GIT_TAG 8bb3224ab3cfb71bacb0621412d3d43b61a5d676 # 0.9.5
 				PREFIX ${CMAKE_CURRENT_LIST_DIR}/igraph
-				INSTALL_DIR <PREFIX>/igraphLib-install
+				INSTALL_DIR ${CMAKE_CURRENT_LIST_DIR}/igraph/igraphLib-install
 				CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_LIST_DIR}/igraph/igraphLib-install
 				BUILD_BYPRODUCTS ${CMAKE_CURRENT_LIST_DIR}/igraph/igraphLib-install/lib/${LIBRARY_PREFIX}igraph${LIBRARY_SUFFIX}
 		)
