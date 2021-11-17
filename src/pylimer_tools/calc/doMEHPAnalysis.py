@@ -333,7 +333,7 @@ def computeEndToEndVectors(network: Universe, crosslinkerType) -> dict:
     endToEndVectors = {}
     print("Compute endToEndVectors")
     molecules = network.getChainsWithCrosslinker(crosslinkerType)
-    print("Got chains with crosslinkers")
+    print("Got {} chains with crosslinkers".format(len(molecules)))
     for molecule in molecules:
         crosslinkers = molecule.getAtomsWithType(crosslinkerType)
         print("Got crosslinkers")

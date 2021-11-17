@@ -99,4 +99,31 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     REQUIRE(functionalityPerType[2] == 3);
     REQUIRE(functionalityPerType.size() == 2);
   }
+
+  SECTION("Molecule Types are determined correctly")
+  {
+    /**
+    # The system looks like this (in terms of bonds, not 3D placement):
+    # 1-2-3
+    #
+    # *7-*6-5
+    */
+    universe.addAtoms(6, {{1, 2, 3, 5, 6, 7}}, // id
+                      {{1, 1, 1, 1, 2, 2}},    // type
+                      {{2, 2, 2, 2, 2, 2}},    // x
+                      {{1, 1, 1, 1, 1, 1}},    // y
+                      {{1, 1, 1, 1, 1, 1}},    // z
+                      {{1, 1, 1, 1, 1, 1}},    // nx
+                      {{1, 1, 1, 1, 1, 1}},    // ny
+                      {{1, 1, 1, 1, 1, 1}}     // nz
+    );
+    universe.addBonds(4, {{1, 2, 5, 6}}, {{2, 3, 6, 7}});
+    REQUIRE(universe.getNrOfBonds() == 4);
+    REQUIRE(universe.getMolecules(2).size() == 2);
+    REQUIRE(universe.getChainsWithCrosslinker(2).size() == 2);
+    auto chains = universe.getChainsWithCrosslinker(2);
+    REQUIRE(chains.size() == 2);
+    REQUIRE(chains[0].getNrOfAtoms() == 3);
+    REQUIRE(chains[1].getNrOfAtoms() == 2);
+  }
 }

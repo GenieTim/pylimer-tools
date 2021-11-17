@@ -12,7 +12,8 @@ namespace pylimer_tools
 {
   namespace utils
   {
-    static std::vector<long int> getVerticesWithDegree(igraph_t *graph, int degree)
+
+    static std::vector<long int> getVerticesWithDegree(igraph_t *graph, std::vector<int> ofDegrees)
     {
       int graphSize = igraph_vcount(graph);
       igraph_vector_t degrees;
@@ -35,9 +36,14 @@ namespace pylimer_tools
       while (!IGRAPH_VIT_END(vit))
       {
         long int vertexId = (long int)IGRAPH_VIT_GET(vit);
-        if (igraph_vector_e(&degrees, vertexId) == degree)
+        int currentDegree = igraph_vector_e(&degrees, vertexId);
+        for (int degree : ofDegrees)
         {
-          toSelect.push_back(vertexId);
+          if (currentDegree == degree)
+          {
+            toSelect.push_back(vertexId);
+            break;
+          }
         }
         IGRAPH_VIT_NEXT(vit);
       }
@@ -45,6 +51,11 @@ namespace pylimer_tools
       igraph_vs_destroy(&allVertexIds);
 
       return toSelect;
+    }
+
+    static std::vector<long int> getVerticesWithDegree(igraph_t *graph, int degree)
+    {
+      return getVerticesWithDegree(graph, {degree});
     }
 
     static igraph_vs_t getVerticesWithDegreeSelector(igraph_t *graph, int degree)
