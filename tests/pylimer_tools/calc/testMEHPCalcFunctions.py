@@ -4,10 +4,10 @@ import os
 
 import pandas as pd
 from pylimer_tools.calc.doMEHPAnalysis import *
-from pylimer_tools_cpp import Universe
+from pylimer_tools_cpp import Universe, MoleculeType, Molecule
 
 if __name__ == '__main__':
-    sys.path.append(os.path.join(os.path.dirname(__file__), "../../../"))
+    sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../"))
 
 from tests.pylimer_tools.universeUsingTestCase import UniverseUsingTestCase
 
@@ -20,11 +20,16 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         # empty weight -> empty weight fraction
         self.testUniverse.setMasses({1: 0, 2: 0})
         self.assertEqual(
-            (0.0, 0.0), calculateWeightFractionOfDanglingChains(self.testUniverse, 2))
+            (0.0, 0.25), calculateWeightFractionOfDanglingChains(self.testUniverse, 2))
         self.assertEqual(
             1.0, calculateWeightFractionOfBackbone(self.testUniverse, 2))
         # non-empty weights
         self.testUniverse.setMasses({1: 1, 2: 0})
+        self.assertTrue(self.testUniverse.getNrOfAtoms() > 0)
+        self.assertEqual(self.testUniverse.getMasses(), {1: 1, 2: 0})
+        allChains = self.testUniverse.getChainsWithCrosslinker(2)
+        self.assertEqual(allChains[2].getType(), MoleculeType.DANGLING_CHAIN)
+        print("Testing weight fraction")
         self.assertEqual(
             (0.2, 0.25), calculateWeightFractionOfDanglingChains(self.testUniverse, crosslinkerType=2))
 
@@ -80,7 +85,7 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
             0.0, calculateEffectiveNrDensityOfNetwork([self.testUniverse], 1000, 1, junctionType=2))
         # actual calc: we got 2 active strands in a Volume of 1
         self.assertEqual(
-            2.0, calculateEffectiveNrDensityOfNetwork([self.testUniverse], 0, 2, junctionType=2))
+            2.0/self.testUniverse.getVolume(), calculateEffectiveNrDensityOfNetwork([self.testUniverse], 0, 2, junctionType=2))
 
     def test_cycleRankCalculation(self):
         self.assertEqual(1, calculateCycleRank(None, 1, 0))
