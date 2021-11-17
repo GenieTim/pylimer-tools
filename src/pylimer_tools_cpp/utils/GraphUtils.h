@@ -55,7 +55,7 @@ namespace pylimer_tools
 
     static std::vector<long int> getVerticesWithDegree(igraph_t *graph, int degree)
     {
-      return getVerticesWithDegree(graph, {degree});
+      return getVerticesWithDegree(graph, std::vector<int>{degree});
     }
 
     static igraph_vs_t getVerticesWithDegreeSelector(igraph_t *graph, int degree)
