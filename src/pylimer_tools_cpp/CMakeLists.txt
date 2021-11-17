@@ -67,3 +67,4 @@ set_target_properties(pylimer_tools PROPERTIES VERSION ${PROJECT_VERSION})
 # target_link_libraries(pylimer_tools 
 # 	PRIVATE
 # )
+target_link_libraries(pylimer_tools ${igraph_LIBRARIES})

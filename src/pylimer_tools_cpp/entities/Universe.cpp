@@ -2,7 +2,9 @@
 #include "../utils/VectorUtils.h"
 #include "../utils/GraphUtils.h"
 #include "Box.h"
+extern "C" {
 #include <igraph/igraph.h>
+}
 
 #include <vector>
 #include <set>
