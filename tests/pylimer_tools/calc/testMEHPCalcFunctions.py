@@ -1,10 +1,10 @@
-import unittest
-import sys
 import os
+import sys
+import unittest
 
 import pandas as pd
 from pylimer_tools.calc.doMEHPAnalysis import *
-from pylimer_tools_cpp import Universe, MoleculeType, Molecule
+from pylimer_tools_cpp import Molecule, MoleculeType, Universe
 
 if __name__ == '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../"))
@@ -29,7 +29,6 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         self.assertEqual(self.testUniverse.getMasses(), {1: 1, 2: 0})
         allChains = self.testUniverse.getChainsWithCrosslinker(2)
         self.assertEqual(allChains[2].getType(), MoleculeType.DANGLING_CHAIN)
-        print("Testing weight fraction")
         self.assertEqual(
             (0.2, 0.25), calculateWeightFractionOfDanglingChains(self.testUniverse, crosslinkerType=2))
 
@@ -92,7 +91,8 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         self.assertEqual(0, calculateCycleRank(None, 1, 1))
         self.assertEqual(-1, calculateCycleRank(None, 0, 1))
         universe = Universe(10, 10, 10)
-        universe = self.addAtomBondData(universe, self.testAtoms, self.testBonds)
+        universe = self.addAtomBondData(
+            universe, self.testAtoms, self.testBonds)
         # test basic exception thrown when specifiying the wrong arguments
         self.assertRaises(ValueError, lambda: calculateCycleRank([universe]))
         self.assertRaises(
@@ -107,18 +107,22 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
     def test_topologicalFactorComputation(self):
         self.assertEqual(
             1 + 1.0/3.0, calculateTopologicalFactor([self.testUniverse], 2, b=1))
+        bondLengths = []
+        for m in self.testUniverse.getMolecules(2):
+            bondLengths.extend(m.computeBondLengths())
+        self.assertEqual(1, np.mean(bondLengths))
         self.assertEqual(
-            0.5485762961986437, calculateTopologicalFactor([self.testUniverse], 2))
+            1 + 1.0/3.0, calculateTopologicalFactor([self.testUniverse], 2))
         # larger system
         # g = self.saturatedTestUniverse.getUnderlyingGraph()
         # igraph.plot(g, vertex_label=g.vs["name"], vertex_color=["green" if n["type"] == 2 else "red" for n in g.vs], target="large_test.png", vertex_label_dist=1)
-        self.assertEqual(0.7249043914053506, calculateTopologicalFactor(
+        self.assertEqual(1.7619047619047619, calculateTopologicalFactor(
             [self.saturatedTestUniverse], 2))
 
     def test_shearModulusPrediction(self):
         self.assertEqual(0.0, predictShearModulus(
             [self.emptyUniverse], foreignAtomType=2))
-        self.assertEqual(0.003624521957026753, predictShearModulus(
+        self.assertEqual(0.008809523809523809, predictShearModulus(
             [self.saturatedTestUniverse], foreignAtomType=2))
 
 
