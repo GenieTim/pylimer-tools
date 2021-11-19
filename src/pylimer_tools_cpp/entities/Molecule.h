@@ -35,6 +35,7 @@ namespace pylimer_tools
       Atom getAtomForVertexId(long int vertexIdx);
       std::vector<Atom> getAtoms();
       std::vector<Atom> getAtomsWithType(const int atomType);
+      std::vector<Atom> getAtomsOfDegree(const int degree);
       int getNrOfBonds();
       int getNrOfAtoms();
       Box *getBox();
