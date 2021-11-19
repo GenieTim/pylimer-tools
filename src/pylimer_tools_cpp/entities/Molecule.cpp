@@ -2,7 +2,8 @@
 #include "Atom.h"
 #include "../utils/GraphUtils.h"
 #include "../utils/StringUtil.h"
-extern "C" {
+extern "C"
+{
 #include <igraph/igraph.h>
 }
 #include <iostream>
@@ -50,31 +51,46 @@ namespace pylimer_tools
       {
         return 0.0;
       }
-      std::vector<long int> endNodeIndices = pylimer_tools::utils::getVerticesWithDegree(this->graph, 1);
-      igraph_vector_t endNodeSelectorVector;
-      igraph_vector_init(&endNodeSelectorVector, endNodeIndices.size());
-      pylimer_tools::utils::StdVectorToIgraphVectorT(endNodeIndices, &endNodeSelectorVector);
-      igraph_vit_t vit;
-      igraph_vit_create(graph, igraph_vss_vector(&endNodeSelectorVector), &vit);
+
+      std::vector<Atom> endNodes = this->getAtomsOfDegree(1);
 
       double distance = -1.0; // TODO: find a nice default for "no end to end"
       Box *box = this->getBox();
 
       // we only compute an end-to-end distance if we have exactly two ends.
       // this is clearly not optimal, but at least unambiguous
-      if (IGRAPH_VIT_SIZE(vit) == 2)
+      if (endNodes.size() == 2)
       {
-        long int vertexId1 = (long int)IGRAPH_VIT_GET(vit);
-        IGRAPH_VIT_NEXT(vit);
-        long int vertexId2 = (long int)IGRAPH_VIT_GET(vit);
         // TODO: this is more intensive than needed
         // check whether the compiler optimizes this or not
-        Atom atom1 = this->getAtomForVertexId(vertexId1);
-        Atom atom2 = this->getAtomForVertexId(vertexId2);
+        Atom atom1 = endNodes[0];
+        Atom atom2 = endNodes[1];
         distance = atom1.distanceTo(atom2, box);
       }
-      igraph_vit_destroy(&vit);
       return distance;
+    }
+
+    std::vector<Atom> Molecule::getAtomsOfDegree(const int degree)
+    {
+      std::vector<long int> endNodeIndices = pylimer_tools::utils::getVerticesWithDegree(this->graph, degree);
+      igraph_vector_t endNodeSelectorVector;
+      igraph_vector_init(&endNodeSelectorVector, endNodeIndices.size());
+      pylimer_tools::utils::StdVectorToIgraphVectorT(endNodeIndices, &endNodeSelectorVector);
+      igraph_vit_t vit;
+      igraph_vit_create(graph, igraph_vss_vector(&endNodeSelectorVector), &vit);
+
+      std::vector<Atom> results;
+      results.reserve(IGRAPH_VIT_SIZE(vit));
+      while (!IGRAPH_VIT_END(vit))
+      {
+        long int vertexId1 = (long int)IGRAPH_VIT_GET(vit);
+        Atom atom = this->getAtomForVertexId(vertexId1);
+        results.push_back(atom);
+        IGRAPH_VIT_NEXT(vit);
+      }
+
+      igraph_vit_destroy(&vit);
+      return results;
     }
 
     std::vector<double> Molecule::computeBondLengths()
@@ -137,7 +153,8 @@ namespace pylimer_tools
     std::vector<OUT> Molecule::getPropertyValues(const char *propertyName)
     {
       std::vector<OUT> results;
-      if (this->getNrOfAtoms() == 0) {
+      if (this->getNrOfAtoms() == 0)
+      {
         return results;
       }
       igraph_vector_t allValues;

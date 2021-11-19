@@ -4,7 +4,8 @@
 #include "../../src/pylimer_tools_cpp/entities/Atom.h"
 #include "../../src/pylimer_tools_cpp/entities/Box.h"
 #include <iostream>
-extern "C" {
+extern "C"
+{
 #include <igraph/igraph.h>
 }
 
@@ -84,9 +85,14 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     REQUIRE(universe.getAtomsWithType(1).size() == 5);
     REQUIRE(universe.getAtomsWithType(0).size() == 0);
     // get atoms with type returns atoms with properties
-    REQUIRE(universe.getMolecules(2)[0].getAtomsWithType(1).size() == 3);
-    REQUIRE(universe.getMolecules(2)[1].getAtomsWithType(1)[0].getId() == 5);
-    REQUIRE(universe.getMolecules(2)[2].getAtomsWithType(1)[0].getType() == 1);
+    std::vector<pe::Molecule> molecules = universe.getMolecules(2);
+    REQUIRE(molecules[0].getAtomsWithType(1).size() == 3);
+    REQUIRE(molecules[1].getAtomsWithType(1)[0].getId() == 5);
+    REQUIRE(molecules[2].getAtomsWithType(1)[0].getType() == 1);
+    // get molecules allows to fetch atoms with degree
+    REQUIRE(molecules[0].getAtomsOfDegree(2).size() == 1);
+    REQUIRE(molecules[0].getAtomsOfDegree(1).size() == 2);
+    REQUIRE(molecules[0].getAtomsOfDegree(0).size() == 0);
     // get atoms with crosslinkers returns
     auto chains = universe.getChainsWithCrosslinker(2);
     REQUIRE(chains.size() == 3);
@@ -100,6 +106,10 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     REQUIRE(functionalityPerType[1] == 2);
     REQUIRE(functionalityPerType[2] == 3);
     REQUIRE(functionalityPerType.size() == 2);
+    //
+    REQUIRE(chains[0].getAtomsOfDegree(2).size() == 3);
+    REQUIRE(chains[0].getAtomsOfDegree(1).size() == 2);
+    REQUIRE(chains[0].getAtomsOfDegree(0).size() == 0);
   }
 
   SECTION("Molecule Types are determined correctly")

@@ -112,7 +112,7 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
             bondLengths.extend(m.computeBondLengths())
         self.assertEqual(1, np.mean(bondLengths))
         self.assertEqual(
-            1 + 1.0/3.0, calculateTopologicalFactor([self.testUniverse], 2))
+            0.5485762961986437, calculateTopologicalFactor([self.testUniverse], 2))
         # larger system
         # g = self.saturatedTestUniverse.getUnderlyingGraph()
         # igraph.plot(g, vertex_label=g.vs["name"], vertex_color=["green" if n["type"] == 2 else "red" for n in g.vs], target="large_test.png", vertex_label_dist=1)
@@ -122,7 +122,7 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
     def test_shearModulusPrediction(self):
         self.assertEqual(0.0, predictShearModulus(
             [self.emptyUniverse], foreignAtomType=2))
-        self.assertEqual(0.008809523809523809, predictShearModulus(
+        self.assertEqual(0.003624521957026753, predictShearModulus(
             [self.saturatedTestUniverse], foreignAtomType=2))
 
 

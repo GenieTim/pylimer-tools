@@ -329,7 +329,7 @@ namespace pylimer_tools
           // ...and bonds
           for (auto bond : bondsToAdd)
           {
-            igraph_add_edge(chain, bond[0], newAtomsMap[bond[2]]);
+            igraph_add_edge(chain, bond[0], newAtomsMap[bond[1]]);
           }
           igraph_vit_destroy(&endNodeVit);
         } // if molecule length
