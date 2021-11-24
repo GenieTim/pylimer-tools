@@ -127,20 +127,23 @@ namespace pylimer_tools
       return lengths;
     }
 
-    Atom Molecule::getAtomForVertexId(long int vertexIdx)
+    Atom Molecule::getAtomForVertexId(long int vertexIdx) const
     {
+      if (vertexIdx > this->getLength()) {
+        throw std::invalid_argument("Atom with this vertex id (" + std::to_string(vertexIdx) + ") does not exist");
+      }
       return Atom(VAN(this->graph, "id", vertexIdx), VAN(this->graph, "type", vertexIdx), VAN(this->graph, "x", vertexIdx), VAN(this->graph, "y", vertexIdx), VAN(this->graph, "z", vertexIdx),
                   VAN(this->graph, "nx", vertexIdx), VAN(this->graph, "ny", vertexIdx), VAN(this->graph, "nz", vertexIdx));
     }
 
-    int Molecule::getLength()
+    int Molecule::getLength() const
     {
       return this->size;
     };
 
-    int Molecule::getNrOfAtoms() { return this->size; }
+    int Molecule::getNrOfAtoms() const { return this->size; }
 
-    int Molecule::getNrOfBonds() { return igraph_ecount(this->graph); }
+    int Molecule::getNrOfBonds() const { return igraph_ecount(this->graph); }
 
     MoleculeType Molecule::getType()
     {

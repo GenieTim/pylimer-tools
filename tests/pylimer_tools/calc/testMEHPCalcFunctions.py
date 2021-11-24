@@ -116,7 +116,7 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         # larger system
         # g = self.saturatedTestUniverse.getUnderlyingGraph()
         # igraph.plot(g, vertex_label=g.vs["name"], vertex_color=["green" if n["type"] == 2 else "red" for n in g.vs], target="large_test.png", vertex_label_dist=1)
-        self.assertEqual(1.7619047619047619, calculateTopologicalFactor(
+        self.assertEqual(0.7249043914053506, calculateTopologicalFactor(
             [self.saturatedTestUniverse], 2))
 
     def test_shearModulusPrediction(self):

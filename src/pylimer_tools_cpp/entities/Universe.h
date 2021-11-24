@@ -27,9 +27,10 @@ namespace pylimer_tools
       void setTimestep(long int timestep) { this->timestep = timestep; };
 
       // getters
-      Atom getAtom(const int atomId);
+      Atom getAtom(const int atomId) const;
       std::vector<Atom> getAtomsWithType(const int atomType);
-      Atom getAtomByIdx(const int vertexIdx);
+      std::vector<Atom> getAtoms();
+      Atom getAtomByIdx(const int vertexIdx) const;
       std::vector<Molecule> getMolecules(const int atomTypeToOmit = -1);
       std::vector<Molecule> getChainsWithCrosslinker(const int crosslinkerType);
       template <typename OUT>
@@ -38,13 +39,17 @@ namespace pylimer_tools
       template <typename IN>
       long int findVertexIdForProperty(const char *propertyName, IN propertyValue);
       Box getBox();
+      std::map<std::string, std::vector<long int>> getBonds();
       double getVolume();
-      const int getNrOfAtoms();
-      const int getNrOfBonds();
+      const int getNrOfAtoms() const;
+      const int getNrOfBonds() const;
       std::map<int, double> getMasses();
       long int getTimestep() { return this->timestep; };
       int getNrOfBondsOfAtom(const long int atomId);
       int getNrOfBondsOfVertex(const long int vertexId);
+
+      // operators
+      Atom operator[](size_t index) const { return this->getAtom(index); }
 
       // computations
       std::map<int, int> determineFunctionalityPerType();

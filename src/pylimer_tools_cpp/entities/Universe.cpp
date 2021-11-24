@@ -2,7 +2,8 @@
 #include "../utils/VectorUtils.h"
 #include "../utils/GraphUtils.h"
 #include "Box.h"
-extern "C" {
+extern "C"
+{
 #include <igraph/igraph.h>
 }
 
@@ -438,17 +439,17 @@ namespace pylimer_tools
       return partialMasses;
     }
 
-    Atom Universe::getAtom(const int atomId)
+    Atom Universe::getAtom(const int atomId) const
     {
       if (!this->atomIdToVectorIdx.contains(atomId))
       {
         throw std::invalid_argument("Atom with this id (" + std::to_string(atomId) + ") does not exist");
       }
-      int atomIdx = this->atomIdToVectorIdx[atomId];
+      int atomIdx = this->atomIdToVectorIdx.at(atomId);
       return this->getAtomByIdx(atomIdx);
     }
 
-    Atom Universe::getAtomByIdx(const int vertexIdx)
+    Atom Universe::getAtomByIdx(const int vertexIdx) const
     {
       if (vertexIdx > this->getNrOfAtoms())
       {
@@ -470,6 +471,55 @@ namespace pylimer_tools
 
       return atoms;
     }
+
+    std::vector<Atom> Universe::getAtoms()
+    {
+      std::vector<Atom> atoms;
+      atoms.reserve(this->getNrOfAtoms());
+      igraph_vit_t vit;
+      igraph_vit_create(&graph, igraph_vss_all(), &vit);
+      while (!IGRAPH_VIT_END(vit))
+      {
+        long int vertexId = (long int)IGRAPH_VIT_GET(vit);
+        atoms.push_back(this->getAtomByIdx(vertexId));
+        IGRAPH_VIT_NEXT(vit);
+      }
+      igraph_vit_destroy(&vit);
+      return atoms;
+    }
+
+    std::map<std::string, std::vector<long int>> Universe::getBonds()
+    {
+      igraph_vector_t allEdges;
+      igraph_vector_init(&allEdges, this->getNrOfBonds());
+      if (igraph_edges(&this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &allEdges))
+      {
+        throw std::runtime_error("Failed to get all edges");
+      }
+
+      std::vector<long int> from;
+      from.reserve(this->getNrOfBonds());
+      std::vector<long int> to;
+      to.reserve(this->getNrOfBonds());
+
+      for (long int i = 0; i < igraph_vector_size(&allEdges); i++)
+      {
+        if (i % 2 == 0)
+        {
+          from.push_back(igraph_vector_e(&allEdges, i));
+        }
+        else
+        {
+          to.push_back(igraph_vector_e(&allEdges, i));
+        }
+      }
+
+      std::map<std::string, std::vector<long int>> results;
+      results.insert_or_assign("bond_from", from);
+      results.insert_or_assign("bond_to", to);
+
+      return results;
+    };
 
     template <typename IN>
     long int Universe::findVertexIdForProperty(const char *propertyName, IN propertyValue)
@@ -547,12 +597,12 @@ namespace pylimer_tools
       return this->box.getVolume();
     }
 
-    const int Universe::getNrOfAtoms()
+    const int Universe::getNrOfAtoms() const
     {
       return this->NAtoms;
     }
 
-    const int Universe::getNrOfBonds()
+    const int Universe::getNrOfBonds() const
     {
       return this->NBonds;
     }
