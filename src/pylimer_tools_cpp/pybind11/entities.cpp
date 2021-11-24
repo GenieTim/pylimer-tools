@@ -13,7 +13,26 @@
 namespace py = pybind11;
 using namespace pylimer_tools::entities;
 
-void init_pylimer_bound_entities(py::module_ &m)
+struct MoleculeIterator
+{
+    MoleculeIterator(const Molecule &molecule, py::object ref) : molecule(molecule), ref(ref) {}
+
+    Atom next()
+    {
+        if (index == molecule.getLength())
+        {
+            throw py::stop_iteration();
+        }
+        return molecule[index++];
+    }
+
+    const Molecule &molecule;
+    py::object ref; // keep a reference
+    size_t index;   // the index to access
+};
+
+void
+init_pylimer_bound_entities(py::module_ &m)
 {
     py::class_<Box>(m, "Box", R"pbdoc(
         The box that the simulation is run in.
@@ -79,6 +98,10 @@ void init_pylimer_bound_entities(py::module_ &m)
                 return a;
             }));
 
+    py::class_<MoleculeIterator>(m, "MoleculeIterator")
+        .def("__iter__", [](MoleculeIterator &it) -> MoleculeIterator & { return it; })
+        .def("__next__", &MoleculeIterator::next);
+
     py::enum_<MoleculeType>(m, "MoleculeType")
         .value("UNDEFINED", MoleculeType::UNDEFINED, "This value indicates that either the property was not set or not discovered.")
         .value("NETWORK_STRAND", MoleculeType::NETWORK_STRAND)
@@ -123,12 +146,14 @@ void init_pylimer_bound_entities(py::module_ &m)
                  return molecule[index];
              })
         .def("__len__", &Molecule::getLength)
+        .def("__iter__", [](py::object mol)
+             { return MoleculeIterator(mol.cast<const Molecule &>(), mol); })
         // .def(
         //     "__iter__", [](const Molecule &molecule)
         //     { return molecule; },
         //     py::keep_alive<0, 1>())
         // .def("__next__", )
-            ;
+        ;
 
     py::class_<Universe>(m, "Universe", "Represents a full Polymer Network structure, a collection of molecules.")
         .def(py::init<const double, const double, const double>(), "Instantiate this Universe (Collection of Molecules) providing the box lengths.")
