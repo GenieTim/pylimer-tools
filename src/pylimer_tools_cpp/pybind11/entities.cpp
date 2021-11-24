@@ -89,6 +89,7 @@ void init_pylimer_bound_entities(py::module_ &m)
 
     py::class_<Molecule>(m, "Molecule")
         .def(py::init<Box *, igraph_t *, MoleculeType>())
+        // getters
         .def("getLength", &Molecule::getLength, "Counts and returns the number of atoms associated with this molecule.")
         .def("getType", &Molecule::getType, "Get the type of this molecule (see 'MoleculeType' enum).")
         .def("getAtomsWithType", &Molecule::getAtomsWithType, "Get the atoms with the specified type.")
@@ -98,6 +99,7 @@ void init_pylimer_bound_entities(py::module_ &m)
         .def("getAtoms", &Molecule::getAtoms, "Returns all atom objects enclosed in this molecule.")
         .def("getNrOfBonds", &Molecule::getNrOfBonds, "Counts and returns the number of bonds associated with this molecule.")
         .def("getNrOfAtoms", &Molecule::getNrOfAtoms, "Counts and returns the number of atoms associated with this molecule.")
+        // computations
         .def("computeBondLengths", &Molecule::computeBondLengths, "Computes the length :math:`b` of each bond in the molecule.")
         .def("computeRadiusOfGyration", &Molecule::computeRadiusOfGyration, R"pbdoc(
             Computes the radius of gyration, :math:`R_g^2` of this molecule.
@@ -110,16 +112,34 @@ void init_pylimer_bound_entities(py::module_ &m)
             **Caution**:
             Returns 0.0 if the molecule does not have two or more atoms.
             Returns -1.0 if not exactly 2 ends were found.
-            )pbdoc");
+            )pbdoc")
+        // operators
+        .def("__getitem__", [](const Molecule &molecule, size_t index)
+             {
+                 if (index > molecule.getLength())
+                 {
+                     throw py::index_error();
+                 }
+                 return molecule[index];
+             })
+        .def("__len__", &Molecule::getLength)
+        // .def(
+        //     "__iter__", [](const Molecule &molecule)
+        //     { return molecule; },
+        //     py::keep_alive<0, 1>())
+        // .def("__next__", )
+            ;
 
     py::class_<Universe>(m, "Universe", "Represents a full Polymer Network structure, a collection of molecules.")
         .def(py::init<const double, const double, const double>(), "Instantiate this Universe (Collection of Molecules) providing the box lengths.")
+        // setters
         .def("addAtoms", &Universe::addAtoms, "Add atoms to the Universe, vertices to the underlying graph.")
         .def("addBonds", &Universe::addBonds, "Add bonds to the underlying atoms, edges to the underlying graph. If the connected atoms are not found, the bonds are silently skipped.")
         .def("setMasses", &Universe::setMasses, "Set the mass per type of atom.")
         .def("setTimestep", &Universe::setTimestep, "Set the timestep when this Universe was captured.")
         .def("setBoxLengths", &Universe::setBoxLengths, "Set the box side lengths.")
         .def("setBox", &Universe::setBox, "Override the currently assigned box with the one specified.")
+        // getters
         .def("getMolecules", &Universe::getMolecules, R"pbdoc(
             Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms.
             
@@ -133,8 +153,10 @@ void init_pylimer_bound_entities(py::module_ &m)
             **NOTE**: Crosslinkers without bonds to non-crosslinkers are not returned.)pbdoc")
         .def("getAtomTypes", &Universe::getAtomTypes, "Get all types (each one for each atom) ordered by atom vertex id.")
         .def("getAtom", &Universe::getAtom, "Find an atom by its ID.")
+        .def("getAtoms", &Universe::getAtoms, "Get al atoms.")
         .def("getAtomsWithType", &Universe::getAtomsWithType, "Find many atom by their type.")
         .def("getAtomByVertexIdx", &Universe::getAtomByIdx, "Find an atom by the ID of the vertex of the underlying graph.")
+        .def("getBonds", &Universe::getBonds, "Get all bonds.")
         .def("getBox", &Universe::getBox, "Get the underlying bounding box object.")
         .def("getMasses", &Universe::getMasses, "Get the mass of one atom per type")
         .def("getVolume", &Universe::getVolume, "Query the volume of the underlying bounding box.")
@@ -143,6 +165,7 @@ void init_pylimer_bound_entities(py::module_ &m)
         .def("getTimestep", &Universe::getTimestep, "Query the timestep when this universe was captured.")
         .def("getNrOfBondsOfAtom", &Universe::getNrOfBondsOfAtom, "Count the number of immediate neighbours of an atom, specified by its id.")
         .def("getNrOfBondsOfVertex", &Universe::getNrOfBondsOfVertex, "Count the number of immediate neighbours of an atom, specified by its vertex id.")
+        // computations
         .def("determineFunctionalityPerType", &Universe::determineFunctionalityPerType, "Find the maximum functionality of each atom type in the network.");
 
     py::class_<UniverseSequence>(m, "UniverseSequence", "This class represents a sequence of Universes, with the Universe's data files only being read on request. Dump files are read at once in order to know how many timesteps/universes are available in total.")

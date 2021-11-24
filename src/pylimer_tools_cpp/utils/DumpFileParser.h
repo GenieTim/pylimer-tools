@@ -28,6 +28,15 @@ namespace pylimer_tools
       std::vector<OUT> getValuesForAt(const int index, const std::string headerKey, const std::string &column);
       template <typename OUT>
       std::vector<OUT> getValuesForAt(const int index, const std::string headerKey, const int column);
+      // the next two methods are specializations for easier py binding
+      std::vector<std::string> getStringValuesForAt(const int index, const std::string headerKey, const std::string column)
+      {
+        return this->getValuesForAt<std::string>(index, headerKey, column);
+      };
+      std::vector<double> getNumericValuesForAt(const int index, const std::string headerKey, const std::string column)
+      {
+        return this->getValuesForAt<double>(index, headerKey, column);
+      };
       int getLength() { return this->data.size(); }
       bool hasKey(std::string headerKey)
       {
@@ -78,12 +87,16 @@ namespace pylimer_tools
     std::vector<OUT> DumpFileParser::getValuesForAt(const int index, const std::string headerKey, const std::string &column)
     {
       // detect index of column
-      const auto colItIdx = std::find(this->headerColMap[headerKey].begin(), this->headerColMap[headerKey].end(), column);
-      if (this->headerColMap[headerKey].end() == colItIdx)
+      int colIdx = 0;
+      if (this->headerColMap[headerKey].size() > 1)
       {
-        throw std::invalid_argument("Column '" + column + "' not found for header '" + headerKey + "'");
+        const auto colItIdx = std::find(this->headerColMap[headerKey].begin(), this->headerColMap[headerKey].end(), column);
+        if (this->headerColMap[headerKey].end() == colItIdx)
+        {
+          throw std::invalid_argument("Column '" + column + "' not found for header '" + headerKey + "'");
+        }
+        colIdx = colItIdx - this->headerColMap[headerKey].begin();
       }
-      const int colIdx = colItIdx - this->headerColMap[headerKey].begin();
       return this->getValuesForAt<OUT>(index, headerKey, colIdx);
     }
 
