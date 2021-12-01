@@ -43,6 +43,45 @@ namespace pylimer_tools
                              &enames, &etypes);
     }
 
+    // 1. destructor (to destroy the graph)
+    Universe::~Universe()
+    {
+      // in addition to basic fields being deleted, we need to clean up the graph
+      if (this->NAtoms > 0)
+      {
+        igraph_destroy(&this->graph);
+      }
+    };
+
+    // 2. copy constructor
+    Universe::Universe(const Universe &src)
+    {
+      igraph_copy(&this->graph, &src.graph);
+      this->timestep = src.timestep;
+      this->NAtoms = src.NAtoms;
+      this->NBonds = src.NBonds;
+      // using copy assignement operators ourselfes
+      this->box = src.box;
+      this->atomIdToVectorIdx = src.atomIdToVectorIdx;
+      this->weightPerType = src.weightPerType;
+    };
+
+    // 3. copy assignment operator
+    Universe &Universe::operator=(Universe src)
+    {
+      std::swap(this->timestep, src.timestep);
+      std::swap(this->NAtoms, src.NAtoms);
+      std::swap(this->NBonds, src.NBonds);
+      std::swap(this->box, src.box);
+      std::swap(this->graph, src.graph);
+      std::swap(this->atomIdToVectorIdx, src.atomIdToVectorIdx);
+      std::swap(this->weightPerType, src.weightPerType);
+
+      return *this;
+    };
+
+    // other functions
+
     void Universe::addAtoms(const size_t NNewAtoms, std::vector<long int> newIds, std::vector<int> newTypes, std::vector<double> newX, std::vector<double> newY, std::vector<double> newZ, std::vector<int> newNx, std::vector<int> newNy, std::vector<int> newNz)
     {
       if (newTypes.size() != NNewAtoms || newIds.size() != newTypes.size() || newX.size() != newNx.size() || newY.size() != newNy.size() || newZ.size() != newNz.size() || newX.size() != newY.size() || NNewAtoms != newZ.size())
@@ -93,6 +132,7 @@ namespace pylimer_tools
       {
         throw std::runtime_error("Failed to add edges to graph.");
       }
+      igraph_vector_destroy(&newEdges);
       igraph_attribute_combination_t comb;
       igraph_attribute_combination_init(&comb);
       igraph_simplify(&this->graph, /*multiple=*/1, /*loops=*/1, &comb);
@@ -154,6 +194,7 @@ namespace pylimer_tools
       molecules.reserve(NComponents);
       for (size_t i = 0; i < NComponents; ++i)
       {
+        // make the molecule the owner of the graph
         igraph_t *g = (igraph_t *)VECTOR(components)[i];
 
         if (igraph_vcount(g))
@@ -161,7 +202,8 @@ namespace pylimer_tools
           molecules.push_back(Molecule(&this->box, g, MoleculeType::UNDEFINED));
         }
       }
-      // igraph_decompose_destroy(&components);
+      igraph_decompose_destroy(&components);
+      igraph_vector_ptr_destroy(&components);
       igraph_destroy(&graphWithoutCrosslinkers);
       return molecules;
     }
@@ -182,6 +224,7 @@ namespace pylimer_tools
       {
         throw std::runtime_error("Failed to select vertices");
       }
+      igraph_vector_destroy(&indicesToSelect);
       return result;
     }
 
@@ -203,6 +246,7 @@ namespace pylimer_tools
           indices.push_back(i);
         }
       }
+      igraph_vector_destroy(&types);
       return indices;
     }
 
@@ -272,7 +316,7 @@ namespace pylimer_tools
             long int oldEndNodeId = (long int)VAN(chain, "id", newEndNodeVertexId);
             long int originalEndNodeVertexId = this->findVertexIdForProperty("id", oldEndNodeId);
             igraph_vector_t neighbours;
-            igraph_vector_init(&neighbours, 2);
+            igraph_vector_init(&neighbours, 0);
 
             if (igraph_neighbors(&graph, &neighbours, originalEndNodeVertexId, IGRAPH_ALL))
             {
@@ -357,7 +401,8 @@ namespace pylimer_tools
         // finally, create the molecule/chain
         molecules.push_back(Molecule(&this->box, chain, molType));
       }
-      // igraph_decompose_destroy(&components);
+      igraph_decompose_destroy(&components);
+      igraph_vector_ptr_destroy(&components);
       igraph_destroy(&graphWithoutCrosslinkers);
 
       return molecules;
@@ -398,6 +443,7 @@ namespace pylimer_tools
       }
       igraph_vit_destroy(&vit);
       igraph_vs_destroy(&allVertexIds);
+      igraph_vector_destroy(&degrees);
 
       return result;
     }
@@ -531,9 +577,11 @@ namespace pylimer_tools
       {
         if (VECTOR(allValues)[i] == propertyValue)
         {
+          igraph_vector_destroy(&allValues);
           return i;
         }
       }
+      igraph_vector_destroy(&allValues);
       return -1;
     }
 
@@ -576,7 +624,9 @@ namespace pylimer_tools
       {
         throw std::runtime_error("Failed to query degree.");
       }
-      return VECTOR(results)[0];
+      int result = VECTOR(results)[0];
+      igraph_vector_destroy(&results);
+      return result;
     }
 
     bool Universe::validate()

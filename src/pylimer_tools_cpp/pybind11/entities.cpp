@@ -31,8 +31,7 @@ struct MoleculeIterator
     size_t index;   // the index to access
 };
 
-void
-init_pylimer_bound_entities(py::module_ &m)
+void init_pylimer_bound_entities(py::module_ &m)
 {
     py::class_<Box>(m, "Box", R"pbdoc(
         The box that the simulation is run in.
@@ -195,7 +194,11 @@ init_pylimer_bound_entities(py::module_ &m)
 
     py::class_<UniverseSequence>(m, "UniverseSequence", "This class represents a sequence of Universes, with the Universe's data files only being read on request. Dump files are read at once in order to know how many timesteps/universes are available in total.")
         .def(py::init<>())
-        .def("initializeFromDumpFile", &UniverseSequence::initializeFromDumpFile, "Reset and initialize the Universes from a Lammps :code:`dump` output.")
+        .def("initializeFromDumpFile", &UniverseSequence::initializeFromDumpFile, R"pbdoc(Reset and initialize the Universes from a Lammps :code:`dump` output. 
+        
+        *NOTE*: If you have not output the id of the atoms in the dump file, they will be assigned sequentially. 
+        If you have not output the type of the atoms in the dump file, they will be set to -1 if they cannot be infered from the data file.
+        )pbdoc")
         .def("initializeFromDataSequence", &UniverseSequence::initializeFromDataSequence, "Reset and initialize the Universes from an ordered list of Lammps data (:code:`write_data`) files.")
         .def("next", &UniverseSequence::next, "Get the Universe that's next in the sequence.")
         .def("atIndex", &UniverseSequence::atIndex, "Get the Universe at the given index (as of in the sequence given by the dump file).")

@@ -11,7 +11,7 @@ mkdir -p build
 cd build || exit 5
 cmake .. || exit 1
 cmake --build . || exit 9
-./pylimer_tests || exit 6 # -s --durations yes 
+ASAN_OPTIONS=detect_leaks=1 ./pylimer_tests || exit 6 # -s --durations yes 
 
 cd "$ROOT_DIR" || exit 8
 
