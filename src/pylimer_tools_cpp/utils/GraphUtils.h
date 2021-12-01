@@ -5,7 +5,8 @@
 #include <iterator>
 #include <algorithm>
 #include <vector>
-extern "C" {
+extern "C"
+{
 #include <igraph/igraph.h>
 }
 #include "VectorUtils.h"
@@ -49,6 +50,7 @@ namespace pylimer_tools
         }
         IGRAPH_VIT_NEXT(vit);
       }
+      igraph_vector_destroy(&degrees);
       igraph_vit_destroy(&vit);
       igraph_vs_destroy(&allVertexIds);
 
@@ -89,9 +91,11 @@ namespace pylimer_tools
       {
         if (result == propertyValue)
         {
+          igraph_vector_destroy(&results);
           return true;
         }
       }
+      igraph_vector_destroy(&results);
       return false;
     }
   }

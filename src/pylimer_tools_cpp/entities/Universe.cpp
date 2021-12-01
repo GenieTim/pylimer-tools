@@ -20,37 +20,42 @@ namespace pylimer_tools
 
     Universe::Universe(const double Lx, const double Ly, const double Lz)
     {
+      /* turn on attribute handling: TODO: move to some main() function  */
       igraph_set_attribute_table(&igraph_cattribute_table);
       box = Box(Lx, Ly, Lz);
 
-      /* turn on attribute handling: TODO: move to some main() function  */
-      // igraph_set_attribute_table(&igraph_cattribute_table);
-      igraph_vector_t gtypes, vtypes, etypes;
-      igraph_strvector_t gnames, vnames, enames;
+      // igraph_vector_t gtypes, vtypes, etypes;
+      // igraph_strvector_t gnames, vnames, enames;
 
-      igraph_vector_init(&gtypes, 0);
-      igraph_vector_init(&vtypes, 0);
-      igraph_vector_init(&etypes, 0);
-      igraph_strvector_init(&gnames, 0);
-      igraph_strvector_init(&vnames, 0);
-      igraph_strvector_init(&enames, 0);
+      // igraph_vector_init(&gtypes, 0);
+      // igraph_vector_init(&vtypes, 0);
+      // igraph_vector_init(&etypes, 0);
+      // igraph_strvector_init(&gnames, 0);
+      // igraph_strvector_init(&vnames, 0);
+      // igraph_strvector_init(&enames, 0);
 
       // start setting properties
       igraph_empty(&this->graph, 0, IGRAPH_UNDIRECTED);
 
       //
-      igraph_cattribute_list(&this->graph, &gnames, &gtypes, &vnames, &vtypes,
-                             &enames, &etypes);
+      // igraph_cattribute_list(&this->graph, &gnames, &gtypes, &vnames, &vtypes,
+      //                        &enames, &etypes);
+
+      // // not sure if the above is really needed as we can destroy the vectors here already without problems
+      // /* Destroy */
+      // igraph_vector_destroy(&gtypes);
+      // igraph_vector_destroy(&vtypes);
+      // igraph_vector_destroy(&etypes);
+      // igraph_strvector_destroy(&gnames);
+      // igraph_strvector_destroy(&vnames);
+      // igraph_strvector_destroy(&enames);
     }
 
     // 1. destructor (to destroy the graph)
     Universe::~Universe()
     {
       // in addition to basic fields being deleted, we need to clean up the graph
-      if (this->NAtoms > 0)
-      {
-        igraph_destroy(&this->graph);
-      }
+      igraph_destroy(&this->graph);
     };
 
     // 2. copy constructor
