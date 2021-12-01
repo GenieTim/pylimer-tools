@@ -122,10 +122,55 @@ namespace pylimer_tools
           nz = pylimer_tools::utils::initializeWithValue(nAtoms, 0); //dataFileParser.getAtomNz();
         }
 
+        // read/parse/process atom ids
+        std::vector<long int> atomIds;
+        bool hasAtomIds = false;
+        if (dumpFileParser.keyHasColumn("ATOMS", "id"))
+        {
+          atomIds = dumpFileParser.getValuesForAt<long int>(i, "ATOMS", "id");
+          hasAtomIds = true;
+        }
+        else
+        {
+          atomIds.reserve(nAtoms);
+          for (long int j = 0; j < nAtoms; ++j)
+          {
+            atomIds.push_back(j);
+          }
+        }
+
+        // read/parse/process atom types
+        std::vector<int> atomTypes;
+        atomTypes.reserve(nAtoms);
+        if (dumpFileParser.keyHasColumn("ATOMS", "type"))
+        {
+          atomTypes = dumpFileParser.getValuesForAt<int>(i, "ATOMS", "type");
+        }
+        else
+        {
+          if (hasAtomIds)
+          {
+            // infer from data file
+            Universe dataFileUniverse = Universe(dataFileParser.getLx(), dataFileParser.getLy(), dataFileParser.getLz());
+            dataFileUniverse.addAtoms(dataFileParser.getNrOfAtoms(), dataFileParser.getAtomIds(), dataFileParser.getAtomTypes(), dataFileParser.getAtomX(), dataFileParser.getAtomY(), dataFileParser.getAtomZ(), dataFileParser.getAtomNx(), dataFileParser.getAtomNy(), dataFileParser.getAtomNz());
+            for (long int j = 0; j < nAtoms; ++j)
+            {
+              atomTypes.push_back(dataFileUniverse.getAtom(atomIds[j]).getType());
+            }
+          }
+          else
+          {
+            for (long int j = 0; j < nAtoms; ++j)
+            {
+              atomTypes.push_back(-1);
+            }
+          }
+        }
+
         newUniverse.addAtoms(
             nAtoms,
-            dumpFileParser.getValuesForAt<long int>(i, "ATOMS", "id"),
-            dumpFileParser.getValuesForAt<int>(i, "ATOMS", "type"),
+            atomIds,
+            atomTypes,
             positionsX, positionsY, positionsZ,
             nx, ny, nz);
         newUniverse.addBonds(dataFileParser.getNrOfBonds(), dataFileParser.getBondFrom(), dataFileParser.getBondTo());

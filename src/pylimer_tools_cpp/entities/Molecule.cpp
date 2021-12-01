@@ -15,22 +15,22 @@ namespace pylimer_tools
 {
   namespace entities
   {
-    Molecule::Molecule(Box *parent, igraph_t *graph, MoleculeType type)
+    Molecule::Molecule(Box *parent, const igraph_t *ingraph, MoleculeType type)
     {
       this->parent = parent;
-      this->graph = graph;
-      this->size = igraph_vcount(graph);
+      igraph_copy(&this->graph, ingraph);
+      this->size = igraph_vcount(&this->graph);
       this->typeOfThisMolecule = type;
 
       // construct a key for this molecule: a concatenation of all ids in this molecule
-      if (!igraph_cattribute_has_attr(graph, IGRAPH_ATTRIBUTE_VERTEX, "id"))
+      if (!igraph_cattribute_has_attr(&this->graph, IGRAPH_ATTRIBUTE_VERTEX, "id"))
       {
         throw std::runtime_error("Molecule's graph does not have attribute id");
       }
       igraph_vector_t allIds;
       igraph_vector_init(&allIds, this->size);
-      VANV(this->graph, "id", &allIds);
-      if (igraph_cattribute_VANV(this->graph, "id", igraph_vss_all(), &allIds))
+      VANV(&this->graph, "id", &allIds);
+      if (igraph_cattribute_VANV(&this->graph, "id", igraph_vss_all(), &allIds))
       {
         throw std::runtime_error("Molecule's graph's attribute id is not accessible.");
       };
@@ -43,6 +43,30 @@ namespace pylimer_tools
       std::sort(ids.begin(), ids.end());
       this->key = pylimer_tools::utils::join(ids.begin(), ids.end(), std::string("-"));
       igraph_vector_destroy(&allIds);
+    };
+
+    // rule of three:
+    // 1. destructor (to destroy the graph)
+    Molecule::~Molecule()
+    {
+      // in addition to basic fields being deleted, we need to clean up the graph
+      if (this->size > 0)
+      {
+        igraph_destroy(&this->graph);
+      }
+    };
+    // 2. copy constructor
+    Molecule::Molecule(const Molecule &src) : Molecule(src.parent, &src.graph, src.typeOfThisMolecule){};
+    // 3. copy assignment operator
+    Molecule &Molecule::operator=(Molecule src)
+    {
+      std::swap(this->parent, src.parent);
+      std::swap(this->typeOfThisMolecule, src.typeOfThisMolecule);
+      std::swap(this->graph, src.graph);
+      std::swap(this->size, src.size);
+      std::swap(this->key, src.key);
+
+      return *this;
     };
 
     double Molecule::computeEndToEndDistance()
@@ -72,12 +96,12 @@ namespace pylimer_tools
 
     std::vector<Atom> Molecule::getAtomsOfDegree(const int degree)
     {
-      std::vector<long int> endNodeIndices = pylimer_tools::utils::getVerticesWithDegree(this->graph, degree);
+      std::vector<long int> endNodeIndices = pylimer_tools::utils::getVerticesWithDegree(&this->graph, degree);
       igraph_vector_t endNodeSelectorVector;
       igraph_vector_init(&endNodeSelectorVector, endNodeIndices.size());
       pylimer_tools::utils::StdVectorToIgraphVectorT(endNodeIndices, &endNodeSelectorVector);
       igraph_vit_t vit;
-      igraph_vit_create(graph, igraph_vss_vector(&endNodeSelectorVector), &vit);
+      igraph_vit_create(&this->graph, igraph_vss_vector(&endNodeSelectorVector), &vit);
 
       std::vector<Atom> results;
       results.reserve(IGRAPH_VIT_SIZE(vit));
@@ -104,7 +128,7 @@ namespace pylimer_tools
       }
       // construct iterator
       igraph_eit_t bondIterator;
-      if (igraph_eit_create(this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &bondIterator))
+      if (igraph_eit_create(&this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &bondIterator))
       {
         throw std::runtime_error("Cannot create iterator to loop bonds");
       }
@@ -114,7 +138,7 @@ namespace pylimer_tools
         long int edgeId = (long int)IGRAPH_EIT_GET(bondIterator);
         int bondFrom;
         int bondTo;
-        igraph_edge(this->graph, edgeId, &bondFrom, &bondTo);
+        igraph_edge(&this->graph, edgeId, &bondFrom, &bondTo);
         // TODO: this is more intensive than needed
         // check whether the compiler optimizes this or not
         Atom atom1 = this->getAtomForVertexId(bondFrom);
@@ -129,11 +153,12 @@ namespace pylimer_tools
 
     Atom Molecule::getAtomForVertexId(long int vertexIdx) const
     {
-      if (vertexIdx > this->getLength()) {
+      if (vertexIdx > this->getLength())
+      {
         throw std::invalid_argument("Atom with this vertex id (" + std::to_string(vertexIdx) + ") does not exist");
       }
-      return Atom(VAN(this->graph, "id", vertexIdx), VAN(this->graph, "type", vertexIdx), VAN(this->graph, "x", vertexIdx), VAN(this->graph, "y", vertexIdx), VAN(this->graph, "z", vertexIdx),
-                  VAN(this->graph, "nx", vertexIdx), VAN(this->graph, "ny", vertexIdx), VAN(this->graph, "nz", vertexIdx));
+      return Atom(VAN(&this->graph, "id", vertexIdx), VAN(&this->graph, "type", vertexIdx), VAN(&this->graph, "x", vertexIdx), VAN(&this->graph, "y", vertexIdx), VAN(&this->graph, "z", vertexIdx),
+                  VAN(&this->graph, "nx", vertexIdx), VAN(&this->graph, "ny", vertexIdx), VAN(&this->graph, "nz", vertexIdx));
     }
 
     int Molecule::getLength() const
@@ -143,7 +168,7 @@ namespace pylimer_tools
 
     int Molecule::getNrOfAtoms() const { return this->size; }
 
-    int Molecule::getNrOfBonds() const { return igraph_ecount(this->graph); }
+    int Molecule::getNrOfBonds() const { return igraph_ecount(&this->graph); }
 
     MoleculeType Molecule::getType()
     {
@@ -162,7 +187,7 @@ namespace pylimer_tools
       }
       igraph_vector_t allValues;
       igraph_vector_init(&allValues, this->getNrOfAtoms());
-      if (igraph_cattribute_VANV(this->graph, propertyName, igraph_vss_all(), &allValues))
+      if (igraph_cattribute_VANV(&this->graph, propertyName, igraph_vss_all(), &allValues))
       {
         throw std::runtime_error("Failed to query properties of molecule.");
       }

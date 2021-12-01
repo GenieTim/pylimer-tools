@@ -27,7 +27,15 @@ namespace pylimer_tools
     class Molecule
     {
     public:
-      Molecule(Box *parent, igraph_t *graph, MoleculeType type);
+      Molecule(Box *parent, const igraph_t *graph, MoleculeType type);
+
+      // rule of three:
+      // 1. destructor (to destroy the graph)
+      ~Molecule();
+      // 2. copy constructor
+      Molecule(const Molecule &src);
+      // 3. copy assignment operator
+      Molecule &operator=(Molecule src);
       // getters
       int getLength() const;
       MoleculeType getType();
@@ -53,11 +61,11 @@ namespace pylimer_tools
       {
         return this->getAtomForVertexId(index);
       }
- 
+
     private:
       Box *parent;
       MoleculeType typeOfThisMolecule;
-      igraph_t *graph;
+      igraph_t graph;
       int size;
       std::string key;
     };

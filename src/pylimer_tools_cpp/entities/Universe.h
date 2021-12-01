@@ -1,7 +1,8 @@
 #ifndef UNIVERSE_H
 #define UNIVERSE_H
 
-extern "C" {
+extern "C"
+{
 #include <igraph/igraph.h>
 }
 #include <vector>
@@ -18,6 +19,14 @@ namespace pylimer_tools
     {
     public:
       Universe(const double Lx, const double Ly, const double Lz);
+      // rule of three:
+      // 1. destructor (to destroy the graph)
+      ~Universe();
+      // 2. copy constructor
+      Universe(const Universe &src);
+      // 3. copy assignment operator
+      Universe &operator=(Universe src);
+
       // initilaization/setters
       void setBoxLengths(const double Lx, const double Ly, const double Lz);
       void addAtoms(const size_t NNewAtoms, std::vector<long int> ids, std::vector<int> types, std::vector<double> x, std::vector<double> y, std::vector<double> z, std::vector<int> nx, std::vector<int> ny, std::vector<int> nz);
@@ -58,8 +67,8 @@ namespace pylimer_tools
       bool validate();
 
     protected:
+      // properties of the universe
       long int timestep;
-      // properties of the box
       int NAtoms = 0;
       int NBonds = 0;
       Box box;
