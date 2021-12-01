@@ -50,10 +50,7 @@ namespace pylimer_tools
     Molecule::~Molecule()
     {
       // in addition to basic fields being deleted, we need to clean up the graph
-      if (this->size > 0)
-      {
-        igraph_destroy(&this->graph);
-      }
+      igraph_destroy(&this->graph);
     };
     // 2. copy constructor
     Molecule::Molecule(const Molecule &src) : Molecule(src.parent, &src.graph, src.typeOfThisMolecule){};
@@ -113,6 +110,7 @@ namespace pylimer_tools
         IGRAPH_VIT_NEXT(vit);
       }
 
+      igraph_vector_destroy(&endNodeSelectorVector);
       igraph_vit_destroy(&vit);
       return results;
     }
