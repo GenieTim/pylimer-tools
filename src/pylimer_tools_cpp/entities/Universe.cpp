@@ -6,6 +6,7 @@ extern "C"
 {
 #include <igraph/igraph.h>
 }
+#include <cassert>
 
 #include <vector>
 #include <set>
@@ -118,6 +119,11 @@ namespace pylimer_tools
 
     void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from, std::vector<long int> to)
     {
+      this->addBonds(NNewBonds, from, to, std::vector<int>());
+    }
+
+    void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from, std::vector<long int> to, std::vector<int> bondTypes)
+    {
       if (from.size() != to.size() || from.size() != NNewBonds)
       {
         throw std::invalid_argument("All bond inputs must have the same size.");
@@ -138,13 +144,24 @@ namespace pylimer_tools
         throw std::runtime_error("Failed to add edges to graph.");
       }
       igraph_vector_destroy(&newEdges);
+      // add attributes
+      // if (bondTypes.size() == NNewBonds && this->NBonds == igraph_ecount(&this->graph) - NNewBonds)
+      // {
+      //   for (size_t i = 0; i < NNewBonds; ++i)
+      //   {
+      //     // append attributes
+      //     igraph_cattribute_EAN_set(&this->graph, "type", this->NBonds + i, bondTypes[i]);
+      //   }
+      // }
+      // else: too risky to add bond attributes
+      // simplify graph
       igraph_attribute_combination_t comb;
       igraph_attribute_combination_init(&comb);
       igraph_simplify(&this->graph, /*multiple=*/1, /*loops=*/1, &comb);
       igraph_attribute_combination_destroy(&comb);
       // this->NBonds += NNewBonds;
       this->NBonds = igraph_ecount(&this->graph);
-    }
+    };
 
     void Universe::setMasses(std::map<int, double> weightPerType)
     {
@@ -552,6 +569,8 @@ namespace pylimer_tools
       from.reserve(this->getNrOfBonds());
       std::vector<long int> to;
       to.reserve(this->getNrOfBonds());
+      std::vector<long int> type;
+      type.reserve(this->getNrOfBonds());
 
       for (long int i = 0; i < igraph_vector_size(&allEdges); i++)
       {
@@ -565,9 +584,28 @@ namespace pylimer_tools
         }
       }
 
+      igraph_vector_destroy(&allEdges);
+
+      // if (igraph_cattribute_has_attr(&this->graph, IGRAPH_ATTRIBUTE_EDGE, "type"))
+      // {
+      //   igraph_vector_t typesVec;
+      //   igraph_vector_init(&typesVec, 0);
+      //   igraph_cattribute_EANV(&this->graph, "type", igraph_ess_all(IGRAPH_EDGEORDER_ID), &typesVec);
+      //   pylimer_tools::utils::igraphVectorTToStdVector(&typesVec, type);
+      //   igraph_vector_destroy(&typesVec);
+      // }
+      // else
+      {
+        for (int i = 0; i < this->NBonds; ++i)
+        {
+          type.push_back(-1); // TODO: find a nice default
+        }
+      }
+
       std::map<std::string, std::vector<long int>> results;
       results.insert_or_assign("bond_from", from);
       results.insert_or_assign("bond_to", to);
+      results.insert_or_assign("bond_type", type);
 
       return results;
     };

@@ -79,7 +79,13 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                       {{1, 1, 1, 1, 1, 1, 1, 1}},    // ny
                       {{1, 1, 1, 1, 1, 1, 1, 1}}     // nz
     );
-    universe.addBonds(7, {{1, 3, 5, 1, 5, 3, 7}}, {{2, 2, 6, 7, 7, 6, 8}});
+    universe.addBonds(7, {{1, 3, 5, 1, 5, 3, 7}}, {{2, 2, 6, 7, 7, 6, 8}}, {{1, 1, 1, 1, 1, 1, 11}});
+    // get bonds returns
+    auto bonds = universe.getBonds();
+    REQUIRE(bonds["bond_from"][0] == 1-1);
+    REQUIRE(bonds["bond_to"][0] == 2-1);
+    // REQUIRE(bonds["bond_type"][5] == 1);
+    // REQUIRE(bonds["bond_type"][6] == 11);
     // get atoms with type returns
     REQUIRE(universe.getAtomsWithType(2).size() == 3);
     REQUIRE(universe.getAtomsWithType(1).size() == 5);
