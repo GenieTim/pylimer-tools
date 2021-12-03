@@ -173,7 +173,7 @@ namespace pylimer_tools
             atomTypes,
             positionsX, positionsY, positionsZ,
             nx, ny, nz);
-        newUniverse.addBonds(dataFileParser.getNrOfBonds(), dataFileParser.getBondFrom(), dataFileParser.getBondTo());
+        newUniverse.addBonds(dataFileParser.getNrOfBonds(), dataFileParser.getBondFrom(), dataFileParser.getBondTo(), dataFileParser.getBondTypes());
         newUniverse.setMasses(dataFileParser.getMasses());
         this->universeCache.insert_or_assign(i, newUniverse);
       }
@@ -213,7 +213,7 @@ namespace pylimer_tools
       fileParser.read(filePath);
       Universe universe = Universe(fileParser.getLx(), fileParser.getLy(), fileParser.getLz());
       universe.addAtoms(fileParser.getNrOfAtoms(), fileParser.getAtomIds(), fileParser.getAtomTypes(), fileParser.getAtomX(), fileParser.getAtomY(), fileParser.getAtomZ(), fileParser.getAtomNx(), fileParser.getAtomNy(), fileParser.getAtomNz());
-      universe.addBonds(fileParser.getNrOfBonds(), fileParser.getBondFrom(), fileParser.getBondTo());
+      universe.addBonds(fileParser.getNrOfBonds(), fileParser.getBondFrom(), fileParser.getBondTo(), fileParser.getBondTypes());
       universe.setMasses(fileParser.getMasses());
       return universe;
     }

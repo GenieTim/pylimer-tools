@@ -5,7 +5,8 @@
 #include <iterator>
 #include <algorithm>
 #include <vector>
-extern "C" {
+extern "C"
+{
 #include <igraph/igraph.h>
 }
 #include <cassert>
@@ -18,25 +19,18 @@ namespace pylimer_tools
     static inline std::vector<IN> interleave(std::vector<IN> in1,
                                              std::vector<IN> in2)
     {
-      assert(in1.size() == in2.size());
-      std::vector<IN> out(in1.size() + in2.size());
+      size_t size = in1.size();
+      assert(size == in2.size());
+      std::vector<IN> out;
+      out.reserve(2 * size);
       // interleave until at least one container is done
-      for (size_t i = 0; i < in1.size(); ++i)
+      for (size_t i = 0; i < size; ++i)
       {
         out.push_back(in1[i]);
         out.push_back(in2[i]);
       }
 
       return out; // both done
-    }
-
-    template <typename IN>
-    static inline IN copy(IN in)
-    {
-      // Declaring new vector and copying
-      // element of old vector
-      // constructor method, Deep copy
-      return newThing(in);
     }
 
     template <typename IN>

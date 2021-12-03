@@ -158,7 +158,7 @@ void init_pylimer_bound_entities(py::module_ &m)
         .def(py::init<const double, const double, const double>(), "Instantiate this Universe (Collection of Molecules) providing the box lengths.")
         // setters
         .def("addAtoms", &Universe::addAtoms, "Add atoms to the Universe, vertices to the underlying graph.")
-        .def("addBonds", &Universe::addBonds, "Add bonds to the underlying atoms, edges to the underlying graph. If the connected atoms are not found, the bonds are silently skipped.")
+        .def("addBonds", py::overload_cast<const size_t, std::vector<long int>, std::vector<long int>>(&Universe::addBonds), "Add bonds to the underlying atoms, edges to the underlying graph. If the connected atoms are not found, the bonds are silently skipped.")
         .def("setMasses", &Universe::setMasses, "Set the mass per type of atom.")
         .def("setTimestep", &Universe::setTimestep, "Set the timestep when this Universe was captured.")
         .def("setBoxLengths", &Universe::setBoxLengths, "Set the box side lengths.")

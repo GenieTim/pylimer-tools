@@ -31,6 +31,7 @@ namespace pylimer_tools
       void setBoxLengths(const double Lx, const double Ly, const double Lz);
       void addAtoms(const size_t NNewAtoms, std::vector<long int> ids, std::vector<int> types, std::vector<double> x, std::vector<double> y, std::vector<double> z, std::vector<int> nx, std::vector<int> ny, std::vector<int> nz);
       void addBonds(const size_t NNewBonds, std::vector<long int> from, std::vector<long int> to);
+      void addBonds(const size_t NNewBonds, std::vector<long int> from, std::vector<long int> to, std::vector<int> bondTypes);
       void setMasses(std::map<int, double> weightPerType);
       void setBox(Box box);
       void setTimestep(long int timestep) { this->timestep = timestep; };
