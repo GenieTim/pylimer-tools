@@ -1,9 +1,11 @@
+#include <iostream>
+#include <vector>
+#include <map>
 #include <catch2/catch_test_macros.hpp>
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
 #include "../../src/pylimer_tools_cpp/entities/Molecule.h"
 #include "../../src/pylimer_tools_cpp/entities/Atom.h"
 #include "../../src/pylimer_tools_cpp/entities/Box.h"
-#include <iostream>
 extern "C"
 {
 #include <igraph/igraph.h>
@@ -80,42 +82,56 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                       {{1, 1, 1, 1, 1, 1, 1, 1}}     // nz
     );
     universe.addBonds(7, {{1, 3, 5, 1, 5, 3, 7}}, {{2, 2, 6, 7, 7, 6, 8}}, {{1, 1, 1, 1, 1, 1, 11}});
-    // get bonds returns
-    auto bonds = universe.getBonds();
-    REQUIRE(bonds["bond_from"][0] == 1-1);
-    REQUIRE(bonds["bond_to"][0] == 2-1);
-    // REQUIRE(bonds["bond_type"][5] == 1);
-    // REQUIRE(bonds["bond_type"][6] == 11);
-    // get atoms with type returns
-    REQUIRE(universe.getAtomsWithType(2).size() == 3);
-    REQUIRE(universe.getAtomsWithType(1).size() == 5);
-    REQUIRE(universe.getAtomsWithType(0).size() == 0);
-    // get atoms with type returns atoms with properties
-    std::vector<pe::Molecule> molecules = universe.getMolecules(2);
-    REQUIRE(molecules[0].getAtomsWithType(1).size() == 3);
-    REQUIRE(molecules[1].getAtomsWithType(1)[0].getId() == 5);
-    REQUIRE(molecules[2].getAtomsWithType(1)[0].getType() == 1);
-    // get molecules allows to fetch atoms with degree
-    REQUIRE(molecules[0].getAtomsOfDegree(2).size() == 1);
-    REQUIRE(molecules[0].getAtomsOfDegree(1).size() == 2);
-    REQUIRE(molecules[0].getAtomsOfDegree(0).size() == 0);
-    // get atoms with crosslinkers returns
-    auto chains = universe.getChainsWithCrosslinker(2);
-    REQUIRE(chains.size() == 3);
-    REQUIRE(chains[0].getAtoms()[0].getId() == 1);
-    REQUIRE(chains[0].getAtoms()[0].getX() == 1.25);
-    REQUIRE(chains[0].getNrOfAtoms() == 5);
-    REQUIRE(chains[0].getKey() == "1-2-3-6-7");
-    REQUIRE(chains[0].getAtomsWithType(2).size() == 2);
-    //
-    auto functionalityPerType = universe.determineFunctionalityPerType();
-    REQUIRE(functionalityPerType[1] == 2);
-    REQUIRE(functionalityPerType[2] == 3);
-    REQUIRE(functionalityPerType.size() == 2);
-    //
-    REQUIRE(chains[0].getAtomsOfDegree(2).size() == 3);
-    REQUIRE(chains[0].getAtomsOfDegree(1).size() == 2);
-    REQUIRE(chains[0].getAtomsOfDegree(0).size() == 0);
+    SECTION("get bonds returns")
+    {
+      auto bonds = universe.getBonds();
+      REQUIRE(bonds["bond_from"][0] == 1 - 1);
+      REQUIRE(bonds["bond_to"][0] == 2 - 1);
+      // REQUIRE(bonds["bond_type"][5] == 1);
+      // REQUIRE(bonds["bond_type"][6] == 11);
+      // get atoms with type returns
+      REQUIRE(universe.getAtomsWithType(2).size() == 3);
+      REQUIRE(universe.getAtomsWithType(1).size() == 5);
+      REQUIRE(universe.getAtomsWithType(0).size() == 0);
+    }
+    SECTION("get atoms returns")
+    {
+      // get atoms with type returns atoms with properties
+      std::vector<pe::Molecule> molecules = universe.getMolecules(2);
+      REQUIRE(molecules[0].getAtomsWithType(1).size() == 3);
+      REQUIRE(molecules[1].getAtomsWithType(1)[0].getId() == 5);
+      REQUIRE(molecules[2].getAtomsWithType(1)[0].getType() == 1);
+      // get molecules allows to fetch atoms with degree
+      REQUIRE(molecules[0].getAtomsOfDegree(2).size() == 1);
+      REQUIRE(molecules[0].getAtomsOfDegree(1).size() == 2);
+      REQUIRE(molecules[0].getAtomsOfDegree(0).size() == 0);
+    }
+    SECTION("get atoms with crosslinkers returns")
+    {
+      // get atoms with crosslinkers returns
+      auto chains = universe.getChainsWithCrosslinker(2);
+      REQUIRE(chains.size() == 3);
+      REQUIRE(chains[0].getAtoms()[0].getId() == 1);
+      REQUIRE(chains[0].getAtoms()[0].getX() == 1.25);
+      REQUIRE(chains[0].getNrOfAtoms() == 5);
+      REQUIRE(chains[0].getKey() == "1-2-3-6-7");
+      REQUIRE(chains[0].getAtomsWithType(2).size() == 2);
+      //
+      auto functionalityPerType = universe.determineFunctionalityPerType();
+      REQUIRE(functionalityPerType[1] == 2);
+      REQUIRE(functionalityPerType[2] == 3);
+      REQUIRE(functionalityPerType.size() == 2);
+      //
+      REQUIRE(chains[0].getAtomsOfDegree(2).size() == 3);
+      REQUIRE(chains[0].getAtomsOfDegree(1).size() == 2);
+      REQUIRE(chains[0].getAtomsOfDegree(0).size() == 0);
+    }
+    SECTION("Loops are found")
+    {
+      std::map<int, std::vector<std::vector<pe::Atom>>> loops = universe.findLoops(2, -1);
+      REQUIRE(loops.size() == 1);
+      REQUIRE(loops.contains(2));
+    }
   }
 
   SECTION("Molecule Types are determined correctly")

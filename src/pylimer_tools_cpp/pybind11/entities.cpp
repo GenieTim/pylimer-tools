@@ -170,6 +170,15 @@ void init_pylimer_bound_entities(py::module_ &m)
             Reduces the Universe to a list of molecules. 
             Specify the crosslinkerType to an existing type id, 
             then those atoms will be omitted, and this function returns chains instead.)pbdoc")
+        .def("findLoops", &Universe::findLoops, R"pbdoc(
+            Decompose the Universe into loops.
+            The primary index specifies the degree of the loop.
+
+            **NOTE**: there are exponentially many paths between two crosslinkers of a network,
+            and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
+            You can use the maxLength parameter to restrict the algorithm to only search for loops up to a certain length.
+            Use a negative value to find all loops and paths.
+        )pbdoc")
         .def("getChainsWithCrosslinker", &Universe::getChainsWithCrosslinker, R"pbdoc(
             Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms, without omitting the crosslinkers.
             In turn, e.g. for a tetrafunctional crosslinker, it will be 4 times in the resulting molecules.

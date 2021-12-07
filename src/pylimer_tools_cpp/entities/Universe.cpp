@@ -1,7 +1,8 @@
 #include "Universe.h"
-#include "../utils/VectorUtils.h"
-#include "../utils/GraphUtils.h"
 #include "Box.h"
+#include "../utils/GraphUtils.h"
+#include "../utils/StringUtil.h"
+#include "../utils/VectorUtils.h"
 extern "C"
 {
 #include <igraph/igraph.h>
@@ -13,6 +14,7 @@ extern "C"
 #include <map>
 #include <iterator> // for back_inserter
 #include <algorithm>
+#include <unordered_set>
 
 namespace pylimer_tools
 {
@@ -429,6 +431,76 @@ namespace pylimer_tools
 
       return molecules;
     }
+
+    std::map<int, std::vector<std::vector<Atom>>> Universe::findLoops(const int crosslinkerType, const int maxLength)
+    {
+      // NOTE: there are exponentially many paths between two vertices of a graph,
+      // and you may run out of memory when using this function, if your graph is lattice-like.
+      std::map<int, std::vector<std::vector<Atom>>> results;
+
+      std::vector<long int> startingCrosslinkers = this->getIndicesOfType(crosslinkerType);
+      std::unordered_set<int> processedPathsKeys;
+
+      // note: this algorithm is not particularly efficient
+      // it is of the order of O(n*n!)
+      for (long int startingCrosslinkerVertexId : startingCrosslinkers)
+      {
+        // ideally, we would only select the neighbouring *crosslinkers* here to reduce the overhead.
+        // but well.
+        igraph_vector_t neighbours;
+        igraph_vector_init(&neighbours, 0);
+
+        if (igraph_neighbors(&graph, &neighbours, startingCrosslinkerVertexId, IGRAPH_ALL))
+        {
+          throw std::runtime_error("Failed to get neighbours in graph");
+        }
+
+        // loop neighbours
+        igraph_vector_int_t paths;
+        igraph_vector_int_init(&paths, 0);
+        // for each neighbour, we search the simple paths
+        if (igraph_get_all_simple_paths(&this->graph, &paths, startingCrosslinkerVertexId, igraph_vss_vector(&neighbours), maxLength, IGRAPH_ALL))
+        {
+          throw std::runtime_error("Failed to get simple paths in graph");
+        }
+
+        igraph_vector_destroy(&neighbours);
+        // translate the paths we found
+        std::vector<Atom> currentPath;
+        int currentFunctionality = 0;
+        int currentPathKey = 0;
+        size_t n = igraph_vector_int_size(&paths);
+        for (int i = 0; i < n; ++i)
+        {
+          const int currentVal = igraph_vector_int_e(&paths, i);
+          if (currentVal == -1)
+          {
+            // skip self-loops and duplicates
+            if (currentPath.size() > 3 && !processedPathsKeys.contains(currentPathKey))
+            {
+              results[currentFunctionality].push_back(currentPath);
+              processedPathsKeys.insert(currentPathKey);
+            }
+            currentPath.clear();
+            currentFunctionality = 0;
+            currentPathKey = 0;
+          }
+          else
+          {
+            Atom newAtom = this->getAtomByIdx(currentVal);
+            currentPathKey = currentPathKey xor currentVal;
+            currentPath.push_back(newAtom);
+            if (newAtom.getType() == crosslinkerType)
+            {
+              currentFunctionality += 1;
+            }
+          }
+        }
+        igraph_vector_int_destroy(&paths);
+      }
+
+      return results;
+    };
 
     std::map<int, int> Universe::determineFunctionalityPerType()
     {
