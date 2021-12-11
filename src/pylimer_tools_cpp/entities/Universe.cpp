@@ -468,11 +468,11 @@ namespace pylimer_tools
         // translate the paths we found
         std::vector<Atom> currentPath;
         int currentFunctionality = 0;
-        int currentPathKey = 0;
+        long int currentPathKey = 0;
         size_t n = igraph_vector_int_size(&paths);
         for (int i = 0; i < n; ++i)
         {
-          const int currentVal = igraph_vector_int_e(&paths, i);
+          const long int currentVal = igraph_vector_int_e(&paths, i);
           if (currentVal == -1)
           {
             // skip self-loops and duplicates
@@ -488,7 +488,7 @@ namespace pylimer_tools
           else
           {
             Atom newAtom = this->getAtomByIdx(currentVal);
-            currentPathKey = currentPathKey xor currentVal;
+            currentPathKey = currentPathKey xor currentVal; // compute hash
             currentPath.push_back(newAtom);
             if (newAtom.getType() == crosslinkerType)
             {
