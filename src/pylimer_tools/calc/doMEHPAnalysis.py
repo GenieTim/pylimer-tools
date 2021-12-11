@@ -344,7 +344,7 @@ def computeEndToEndVectors(network: Universe, crosslinkerType) -> dict:
     return endToEndVectors
 
 
-def computeCrosslinkerConversion(network: Universe, junctionType, f: int) -> float:
+def computeCrosslinkerConversion(network: Universe, junctionType, f: int = None) -> float:
     """
     Compute the extent of reaction of the crosslinkers
     (actual functionality divided by target functionality)
@@ -357,6 +357,8 @@ def computeCrosslinkerConversion(network: Universe, junctionType, f: int) -> flo
     Returns:
       - r (float): the (mean) crosslinker conversion
     """
+    if (f is None):
+      f = network.determineFunctionalityPerType()[junctionType]
     return calculateEffectiveCrosslinkerFunctionality(network, junctionType) / f
 
 
