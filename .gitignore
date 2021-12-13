@@ -135,3 +135,5 @@ vendor/igraph
 coverage.html
 docs-html
 _skbuild
+
+_cmake_test_compile

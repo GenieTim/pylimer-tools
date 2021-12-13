@@ -41,6 +41,7 @@ namespace pylimer_tools
       std::vector<Atom> getAtomsWithType(const int atomType);
       std::vector<Atom> getAtoms();
       Atom getAtomByIdx(const int vertexIdx) const;
+      std::vector<Molecule> getClusters();
       std::vector<Molecule> getMolecules(const int atomTypeToOmit = -1);
       std::vector<Molecule> getChainsWithCrosslinker(const int crosslinkerType);
       // TODO: find & implement a better return type, e.g. std::vector<Molecule> 

@@ -27,7 +27,7 @@ namespace pylimer_tools
     class Molecule
     {
     public:
-      Molecule(Box *parent, const igraph_t *graph, MoleculeType type);
+      Molecule(Box *parent, const igraph_t *graph, MoleculeType type, std::map<int, double> weightPerType);
 
       // rule of three:
       // 1. destructor (to destroy the graph)
@@ -54,6 +54,7 @@ namespace pylimer_tools
       // computations
       double computeEndToEndDistance();
       double computeRadiusOfGyration();
+      double computeWeight();
       std::vector<double> computeBondLengths();
 
       // operators
@@ -68,6 +69,7 @@ namespace pylimer_tools
       igraph_t graph;
       int size;
       std::string key;
+      std::map<int, double> weightPerType;
     };
   }
 }

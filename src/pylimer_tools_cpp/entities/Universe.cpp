@@ -175,6 +175,45 @@ namespace pylimer_tools
       return this->weightPerType;
     };
 
+    /**
+     * @brief Get the standalone components of the network
+     * 
+     * @return std::vector<Molecule> 
+     */
+    std::vector<Molecule> Universe::getClusters()
+    {
+      std::vector<Molecule> molecules;
+      if (this->getNrOfAtoms() == 0)
+      {
+        return molecules;
+      }
+
+      // split the copy into the separate components
+      igraph_vector_ptr_t components;
+      igraph_vector_ptr_init(&components, 0);
+      if (igraph_decompose(&graph, &components, IGRAPH_WEAK, -1, 0))
+      {
+        throw std::runtime_error("Failed to decompose graph.");
+      }
+      size_t NComponents = igraph_vector_ptr_size(&components);
+      // std::cout << NComponents << " clusters found." << std::endl;
+      molecules.reserve(NComponents);
+      for (size_t i = 0; i < NComponents; ++i)
+      {
+        // make the molecule the owner of the graph
+        igraph_t *g = (igraph_t *)VECTOR(components)[i];
+
+        if (igraph_vcount(g))
+        {
+          molecules.push_back(Molecule(&this->box, g, MoleculeType::UNDEFINED, this->weightPerType));
+        }
+      }
+      igraph_decompose_destroy(&components);
+      igraph_vector_ptr_destroy(&components);
+      return molecules;
+    }
+    
+
     std::vector<Molecule> Universe::getMolecules(const int atomTypeToOmit)
     {
       std::vector<Molecule> molecules;
@@ -223,7 +262,7 @@ namespace pylimer_tools
 
         if (igraph_vcount(g))
         {
-          molecules.push_back(Molecule(&this->box, g, MoleculeType::UNDEFINED));
+          molecules.push_back(Molecule(&this->box, g, MoleculeType::UNDEFINED, this->weightPerType));
         }
       }
       igraph_decompose_destroy(&components);
@@ -423,7 +462,7 @@ namespace pylimer_tools
         }
 
         // finally, create the molecule/chain
-        molecules.push_back(Molecule(&this->box, chain, molType));
+        molecules.push_back(Molecule(&this->box, chain, molType, this->weightPerType));
       }
       igraph_decompose_destroy(&components);
       igraph_vector_ptr_destroy(&components);
