@@ -24,6 +24,10 @@ namespace pylimer_tools
     {
     public:
       void read(const std::string filePath);
+      void startReading(const std::string filePath);
+      void finish();
+      void readNGroups(const int N);
+      void forgetAt(const int index);
       template <typename OUT>
       std::vector<OUT> getValuesForAt(const int index, const std::string headerKey, const std::string &column);
       template <typename OUT>
@@ -79,6 +83,9 @@ namespace pylimer_tools
       }
 
       //// data
+      std::string newGroupKey;
+      std::string currentLine;
+      std::ifstream file;
       std::vector<data_item_t> data;
       std::map<std::string, std::vector<std::string>> headerColMap;
     };
