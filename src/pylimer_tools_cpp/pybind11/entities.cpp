@@ -122,6 +122,7 @@ void init_pylimer_bound_entities(py::module_ &m)
         .def("getNrOfBonds", &Molecule::getNrOfBonds, "Counts and returns the number of bonds associated with this molecule.")
         .def("getNrOfAtoms", &Molecule::getNrOfAtoms, "Counts and returns the number of atoms associated with this molecule.")
         // computations
+        .def("computeWeigth", &Molecule::computeWeigth, "Computes the total weight of this molecule.")
         .def("computeBondLengths", &Molecule::computeBondLengths, "Computes the length :math:`b` of each bond in the molecule.")
         .def("computeRadiusOfGyration", &Molecule::computeRadiusOfGyration, R"pbdoc(
             Computes the radius of gyration, :math:`R_g^2` of this molecule.
@@ -164,6 +165,7 @@ void init_pylimer_bound_entities(py::module_ &m)
         .def("setBoxLengths", &Universe::setBoxLengths, "Set the box side lengths.")
         .def("setBox", &Universe::setBox, "Override the currently assigned box with the one specified.")
         // getters
+        .def("getClusters", &Universe::getClusters, "Get the otherwise unconnected components of the universe.")
         .def("getMolecules", &Universe::getMolecules, R"pbdoc(
             Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms.
             

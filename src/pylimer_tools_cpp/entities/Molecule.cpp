@@ -15,12 +15,13 @@ namespace pylimer_tools
 {
   namespace entities
   {
-    Molecule::Molecule(Box *parent, const igraph_t *ingraph, MoleculeType type)
+    Molecule::Molecule(Box *parent, const igraph_t *ingraph, MoleculeType type, std::map<int, double> weightPerType)
     {
       this->parent = parent;
       igraph_copy(&this->graph, ingraph);
       this->size = igraph_vcount(&this->graph);
       this->typeOfThisMolecule = type;
+      this->weightPerType = weightPerType;
 
       // construct a key for this molecule: a concatenation of all ids in this molecule
       if (!igraph_cattribute_has_attr(&this->graph, IGRAPH_ATTRIBUTE_VERTEX, "id"))
@@ -53,7 +54,7 @@ namespace pylimer_tools
       igraph_destroy(&this->graph);
     };
     // 2. copy constructor
-    Molecule::Molecule(const Molecule &src) : Molecule(src.parent, &src.graph, src.typeOfThisMolecule){};
+    Molecule::Molecule(const Molecule &src) : Molecule(src.parent, &src.graph, src.typeOfThisMolecule, src.weightPerType){};
     // 3. copy assignment operator
     Molecule &Molecule::operator=(Molecule src)
     {
@@ -62,6 +63,7 @@ namespace pylimer_tools
       std::swap(this->graph, src.graph);
       std::swap(this->size, src.size);
       std::swap(this->key, src.key);
+      std::swap(this->weightPerType, src.weightPerType);
 
       return *this;
     };
@@ -115,6 +117,25 @@ namespace pylimer_tools
       return results;
     }
 
+  /**
+   * @brief compute the weight of this molecule
+   * 
+   * @return double the total weight
+   */
+    double Molecule::computeWeight() {
+      std::vector<int> presentTypes = this->getPropertyValues<int>("type");
+      double totalWeight = 0.0;
+      for(int type : presentTypes) {
+        totalWeight += this->weightPerType[type];
+      }
+      return totalWeight;
+    }
+
+    /**
+     * @brief compute the lengths of all bonds
+     * 
+     * @return std::vector<double> 
+     */
     std::vector<double> Molecule::computeBondLengths()
     {
       Box *box = this->getBox();
@@ -149,6 +170,12 @@ namespace pylimer_tools
       return lengths;
     }
 
+  /**
+   * @brief Get an atom by its vertex id
+   * 
+   * @param vertexIdx the id of the vertex on the graph
+   * @return Atom 
+   */
     Atom Molecule::getAtomForVertexId(long int vertexIdx) const
     {
       if (vertexIdx > this->getLength())
@@ -159,15 +186,37 @@ namespace pylimer_tools
                   VAN(&this->graph, "nx", vertexIdx), VAN(&this->graph, "ny", vertexIdx), VAN(&this->graph, "nz", vertexIdx));
     }
 
+    /**
+     * @brief Get the nr of atoms in the molecule
+     * 
+     * @return int 
+     */
     int Molecule::getLength() const
     {
       return this->size;
     };
 
+
+    /**
+     * @brief Get the nr of atoms in the molecule
+     * 
+     * @return int 
+     */
     int Molecule::getNrOfAtoms() const { return this->size; }
 
+
+    /**
+     * @brief Get the nr of bonds in the molecule
+     * 
+     * @return int 
+     */
     int Molecule::getNrOfBonds() const { return igraph_ecount(&this->graph); }
 
+    /**
+     * @brief Get the type of the molecule
+     * 
+     * @return MoleculeType 
+     */
     MoleculeType Molecule::getType()
     {
       return this->typeOfThisMolecule;
@@ -175,6 +224,13 @@ namespace pylimer_tools
 
     Box *Molecule::getBox() { return this->parent; }
 
+    /**
+     * @brief Get the value of a property (attribute) of each and every vertex
+     * 
+     * @tparam OUT 
+     * @param propertyName the name of the property to get
+     * @return std::vector<OUT> 
+     */
     template <typename OUT>
     std::vector<OUT> Molecule::getPropertyValues(const char *propertyName)
     {
