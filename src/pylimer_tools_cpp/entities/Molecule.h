@@ -9,6 +9,7 @@ extern "C"
 #include "Atom.h"
 #include <vector>
 #include <string>
+#include <map>
 
 namespace pylimer_tools
 {
