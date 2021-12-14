@@ -12,6 +12,7 @@
 #include <any>
 #include <cstring>
 #include <filesystem>
+#include <fstream> // std::ifstream
 
 namespace pylimer_tools
 {

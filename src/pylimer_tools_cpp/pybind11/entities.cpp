@@ -122,7 +122,7 @@ void init_pylimer_bound_entities(py::module_ &m)
         .def("getNrOfBonds", &Molecule::getNrOfBonds, "Counts and returns the number of bonds associated with this molecule.")
         .def("getNrOfAtoms", &Molecule::getNrOfAtoms, "Counts and returns the number of atoms associated with this molecule.")
         // computations
-        .def("computeWeigth", &Molecule::computeWeigth, "Computes the total weight of this molecule.")
+        .def("computeWeigth", &Molecule::computeWeight, "Computes the total weight of this molecule.")
         .def("computeBondLengths", &Molecule::computeBondLengths, "Computes the length :math:`b` of each bond in the molecule.")
         .def("computeRadiusOfGyration", &Molecule::computeRadiusOfGyration, R"pbdoc(
             Computes the radius of gyration, :math:`R_g^2` of this molecule.
