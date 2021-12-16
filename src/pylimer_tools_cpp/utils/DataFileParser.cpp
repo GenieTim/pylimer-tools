@@ -216,7 +216,7 @@ namespace pylimer_tools
 
     void DataFileParser::readAtom(std::string line)
     {
-      pylimer_tools::utils::CsvTokenizer tokenizer(line);
+      pylimer_tools::utils::CsvTokenizer tokenizer(line, 9);
 
       this->atomIds.push_back(tokenizer.get<int>(0));
       this->moleculeIds.push_back(tokenizer.get<int>(1));
@@ -235,7 +235,7 @@ namespace pylimer_tools
 
     void DataFileParser::readBond(std::string line)
     {
-      pylimer_tools::utils::CsvTokenizer tokenizer(line);
+      pylimer_tools::utils::CsvTokenizer tokenizer(line, 4);
       this->bondIds.push_back(tokenizer.get<long int>(0));
       this->bondTypes.push_back(tokenizer.get<int>(1));
       this->bondFrom.push_back(tokenizer.get<long int>(2));

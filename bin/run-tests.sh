@@ -9,7 +9,7 @@ cd "$ROOT_DIR/tests" || exit 2
 # rm -rf build
 mkdir -p build
 cd build || exit 5
-cmake .. || exit 1
+cmake .. -DCMAKE_OSX_SYSROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk || exit 1
 cmake --build . || exit 9
 ASAN_OPTIONS=detect_leaks=1 ./pylimer_tests || exit 6 # -s --durations yes 
 

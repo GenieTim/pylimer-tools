@@ -12,6 +12,7 @@ extern "C"
 #include <vector>
 #include <set>
 #include <map>
+#include <unordered_map>
 #include <iterator> // for back_inserter
 #include <algorithm>
 #include <unordered_set>
@@ -101,19 +102,54 @@ namespace pylimer_tools
       {
         throw std::runtime_error("Failed to add new atoms to graph.");
       }
+      this->atomIdToVectorIdx.reserve(this->NAtoms + NNewAtoms);
       // do map for easy access afterwards
       for (size_t i = 0; i < NNewAtoms; ++i)
       {
-        this->atomIdToVectorIdx[newIds[i]] = this->NAtoms + i;
-        // append attributes
-        igraph_cattribute_VAN_set(&this->graph, "id", this->NAtoms + i, newIds[i]);
-        igraph_cattribute_VAN_set(&this->graph, "x", this->NAtoms + i, newX[i]);
-        igraph_cattribute_VAN_set(&this->graph, "y", this->NAtoms + i, newY[i]);
-        igraph_cattribute_VAN_set(&this->graph, "z", this->NAtoms + i, newZ[i]);
-        igraph_cattribute_VAN_set(&this->graph, "type", this->NAtoms + i, newTypes[i]);
-        igraph_cattribute_VAN_set(&this->graph, "nx", this->NAtoms + i, newNx[i]);
-        igraph_cattribute_VAN_set(&this->graph, "ny", this->NAtoms + i, newNy[i]);
-        igraph_cattribute_VAN_set(&this->graph, "nz", this->NAtoms + i, newNz[i]);
+        if (this->atomIdToVectorIdx.contains(newIds[i]))
+        {
+          throw std::invalid_argument("Atom with id " + std::to_string(newIds[i]) + " already exists");
+        }
+        this->atomIdToVectorIdx.emplace(newIds[i], this->NAtoms + i);
+      }
+      // append attributes
+      // it is empirically more efficient to do it this split up way
+      if (this->NAtoms == 0)
+      {
+        // NOTE: using the same vector over an over might be bad for performance?
+        igraph_vector_t valueVec;
+        igraph_vector_init(&valueVec, NNewAtoms);
+        pylimer_tools::utils::StdVectorToIgraphVectorT(newIds, &valueVec);
+        igraph_cattribute_VAN_setv(&this->graph, "id", &valueVec);
+        pylimer_tools::utils::StdVectorToIgraphVectorT(newX, &valueVec);
+        igraph_cattribute_VAN_setv(&this->graph, "x", &valueVec);
+        pylimer_tools::utils::StdVectorToIgraphVectorT(newY, &valueVec);
+        igraph_cattribute_VAN_setv(&this->graph, "y", &valueVec);
+        pylimer_tools::utils::StdVectorToIgraphVectorT(newZ, &valueVec);
+        igraph_cattribute_VAN_setv(&this->graph, "z", &valueVec);
+        pylimer_tools::utils::StdVectorToIgraphVectorT(newTypes, &valueVec);
+        igraph_cattribute_VAN_setv(&this->graph, "type", &valueVec);
+        pylimer_tools::utils::StdVectorToIgraphVectorT(newNx, &valueVec);
+        igraph_cattribute_VAN_setv(&this->graph, "nx", &valueVec);
+        pylimer_tools::utils::StdVectorToIgraphVectorT(newNy, &valueVec);
+        igraph_cattribute_VAN_setv(&this->graph, "ny", &valueVec);
+        pylimer_tools::utils::StdVectorToIgraphVectorT(newNz, &valueVec);
+        igraph_cattribute_VAN_setv(&this->graph, "nz", &valueVec);
+        igraph_vector_destroy(&valueVec);
+      }
+      else
+      {
+        for (size_t i = 0; i < NNewAtoms; ++i)
+        {
+          igraph_cattribute_VAN_set(&this->graph, "id", this->NAtoms + i, newIds[i]);
+          igraph_cattribute_VAN_set(&this->graph, "x", this->NAtoms + i, newX[i]);
+          igraph_cattribute_VAN_set(&this->graph, "y", this->NAtoms + i, newY[i]);
+          igraph_cattribute_VAN_set(&this->graph, "z", this->NAtoms + i, newZ[i]);
+          igraph_cattribute_VAN_set(&this->graph, "type", this->NAtoms + i, newTypes[i]);
+          igraph_cattribute_VAN_set(&this->graph, "nx", this->NAtoms + i, newNx[i]);
+          igraph_cattribute_VAN_set(&this->graph, "ny", this->NAtoms + i, newNy[i]);
+          igraph_cattribute_VAN_set(&this->graph, "nz", this->NAtoms + i, newNz[i]);
+        }
       }
       // this->NAtoms += NNewAtoms;
       this->NAtoms = igraph_vcount(&this->graph);
@@ -126,43 +162,61 @@ namespace pylimer_tools
 
     void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from, std::vector<long int> to, std::vector<int> bondTypes)
     {
+
+      this->addBonds(NNewBonds, from, to, bondTypes, false);
+    }
+
+    void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from, std::vector<long int> to, std::vector<int> bondTypes, const bool ignoreNonExistentAtoms)
+    {
       if (from.size() != to.size() || from.size() != NNewBonds)
       {
         throw std::invalid_argument("All bond inputs must have the same size.");
       }
       std::vector<long int> newEdgesVector = pylimer_tools::utils::interleave(from, to);
-      // translate from atomId to VertexIdx
       size_t edgesSize = newEdgesVector.size();
+      // translate from atomId to VertexIdx
+      igraph_vector_t newEdges;
+      size_t actualNrOfBondsAdded = 0;
+      igraph_vector_init(&newEdges, edgesSize);
       for (size_t i = 0; i < edgesSize; ++i)
       {
-        newEdgesVector[i] = this->atomIdToVectorIdx[newEdgesVector[i]];
+        if (this->atomIdToVectorIdx.contains(newEdgesVector[i]))
+        {
+          igraph_vector_set(&newEdges, i, this->atomIdToVectorIdx.at(newEdgesVector[i]));
+          actualNrOfBondsAdded += 1;
+        }
+        else if (!ignoreNonExistentAtoms)
+        {
+          throw std::invalid_argument("Bond with atom with id " + std::to_string(newEdgesVector[i]) + " impossible as atom is not added yet.");
+        }
       }
+      igraph_vector_resize(&newEdges, actualNrOfBondsAdded);
       // add the new edges
-      igraph_vector_t newEdges;
-      igraph_vector_init(&newEdges, edgesSize);
-      pylimer_tools::utils::StdVectorToIgraphVectorT(newEdgesVector, &newEdges);
       if (igraph_add_edges(&this->graph, &newEdges, 0))
       {
         throw std::runtime_error("Failed to add edges to graph.");
       }
       igraph_vector_destroy(&newEdges);
-      // add attributes
-      // if (bondTypes.size() == NNewBonds && this->NBonds == igraph_ecount(&this->graph) - NNewBonds)
-      // {
-      //   for (size_t i = 0; i < NNewBonds; ++i)
-      //   {
-      //     // append attributes
-      //     igraph_cattribute_EAN_set(&this->graph, "type", this->NBonds + i, bondTypes[i]);
-      //   }
-      // }
-      // else: too risky to add bond attributes
-      // simplify graph
-      igraph_attribute_combination_t comb;
-      igraph_attribute_combination_init(&comb);
-      igraph_simplify(&this->graph, /*multiple=*/1, /*loops=*/1, &comb);
-      igraph_attribute_combination_destroy(&comb);
-      // this->NBonds += NNewBonds;
-      this->NBonds = igraph_ecount(&this->graph);
+      if (actualNrOfBondsAdded > 0)
+      {
+        // add attributes
+        // if (bondTypes.size() == NNewBonds && this->NBonds == igraph_ecount(&this->graph) - NNewBonds)
+        // {
+        //   for (size_t i = 0; i < NNewBonds; ++i)
+        //   {
+        //     // append attributes
+        //     igraph_cattribute_EAN_set(&this->graph, "type", this->NBonds + i, bondTypes[i]);
+        //   }
+        // }
+        // else: too risky to add bond attributes
+        // simplify graph
+        igraph_attribute_combination_t comb;
+        igraph_attribute_combination_init(&comb);
+        igraph_simplify(&this->graph, /*multiple=*/1, /*loops=*/1, &comb);
+        igraph_attribute_combination_destroy(&comb);
+        // this->NBonds += NNewBonds;
+        this->NBonds = igraph_ecount(&this->graph);
+      }
     };
 
     void Universe::setMasses(std::map<int, double> weightPerType)
@@ -212,7 +266,6 @@ namespace pylimer_tools
       igraph_vector_ptr_destroy(&components);
       return molecules;
     }
-    
 
     std::vector<Molecule> Universe::getMolecules(const int atomTypeToOmit)
     {
@@ -414,7 +467,7 @@ namespace pylimer_tools
             igraph_vector_destroy(&neighbours);
           } // loop end nodes
 
-          std::map<long int, long int> newAtomsMap;
+          std::unordered_map<long int, long int> newAtomsMap;
           // actually add the atoms...
           for (auto atomToAddOriginalId : atomsToAdd)
           {
@@ -750,6 +803,79 @@ namespace pylimer_tools
       igraph_vector_destroy(&allValues);
       return results;
     }
+
+    std::vector<double> Universe::computeDxs(const std::vector<int> bondFrom, const std::vector<int> bondTo)
+    {
+      return this->computeDs(bondFrom, bondTo, "x", this->box.getLx());
+    };
+
+    std::vector<double> Universe::computeDys(const std::vector<int> bondFrom, const std::vector<int> bondTo)
+    {
+      return this->computeDs(bondFrom, bondTo, "y", this->box.getLy());
+    };
+
+    std::vector<double> Universe::computeDzs(const std::vector<int> bondFrom, const std::vector<int> bondTo)
+    {
+      return this->computeDs(bondFrom, bondTo, "z", this->box.getLz());
+    };
+
+    std::vector<double> Universe::computeDs(const std::vector<int> bondFrom, const std::vector<int> bondTo, std::string direction, double boxLimit)
+    {
+      if (bondFrom.size() != bondTo.size())
+      {
+        throw std::invalid_argument("bond from and bond to must have the same size");
+      }
+
+      int nBonds = bondFrom.size();
+
+      igraph_vector_t vertexIdFrom;
+      igraph_vector_init(&vertexIdFrom, nBonds);
+      igraph_vector_t vertexIdTo;
+      igraph_vector_init(&vertexIdTo, nBonds);
+
+      for (int i = 0; i < nBonds; ++i)
+      {
+        igraph_vector_set(&vertexIdFrom, i, this->atomIdToVectorIdx[bondFrom[i]]);
+        igraph_vector_set(&vertexIdTo, i, this->atomIdToVectorIdx[bondTo[i]]);
+      }
+
+      igraph_vector_t dValuesFrom;
+      igraph_vector_init(&dValuesFrom, nBonds);
+      igraph_vector_t dValuesTo;
+      igraph_vector_init(&dValuesTo, nBonds);
+
+      std::string property = direction;
+      igraph_cattribute_VANV(&this->graph, property.c_str(), igraph_vss_vector(&vertexIdFrom), &dValuesFrom);
+      igraph_cattribute_VANV(&this->graph, property.c_str(), igraph_vss_vector(&vertexIdTo), &dValuesTo);
+
+      igraph_vector_destroy(&vertexIdFrom);
+      igraph_vector_destroy(&vertexIdTo);
+
+      std::vector<double> results;
+      results.reserve(nBonds);
+
+      for (int i = 0; i < nBonds; ++i)
+      {
+        double currentD = (double)igraph_vector_e(&dValuesTo, i) - (double)igraph_vector_e(&dValuesFrom, i);
+        while (std::fabs(currentD) > 0.5 * boxLimit)
+        {
+          if (currentD < 0.0)
+          {
+            currentD += boxLimit;
+          }
+          else
+          {
+            currentD -= boxLimit;
+          }
+        }
+        results.push_back(currentD);
+      }
+
+      igraph_vector_destroy(&dValuesFrom);
+      igraph_vector_destroy(&dValuesTo);
+
+      return results;
+    };
 
     double Universe::getMeanStrandLength(int junctionType)
     {

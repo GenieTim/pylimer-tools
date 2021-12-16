@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "Universe.h"
+#include <unordered_map>
 
 namespace pylimer_tools
 {
@@ -24,7 +25,7 @@ namespace pylimer_tools
       int index = 0; // current index of the iterator
       int length = 0;
       bool isInitialized = false;
-      std::map<int, Universe> universeCache;
+      std::unordered_map<int, Universe> universeCache;
       std::vector<std::string> dataFiles;
 
       void reset();

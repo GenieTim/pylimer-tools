@@ -8,7 +8,25 @@
 #include <pybind11/stl.h>
 
 namespace py = pybind11;
+namespace pe = pylimer_tools::entities;
 using namespace pylimer_tools::utils;
+
+// struct LazyDumpFileIterator {
+//     LazyDumpFileIterator(const DumpFileParser &fileParser, py::object ref) : fileParser(fileParser), ref(ref) {}
+
+//     pe::Universe next()
+//     {
+//         if (fileParser.isFinishedReading())
+//         {
+//             throw py::stop_iteration();
+//         }
+//         return molecule[index++];
+//     }
+
+//     const DumpFileParser &fileParser;
+//     py::object ref;
+//     size_t index;
+// };
 
 void init_pylimer_bound_readers(py::module_ &m)
 {

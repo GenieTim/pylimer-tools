@@ -27,6 +27,7 @@ namespace pylimer_tools
       dumpFileParser.read(dumpFile);
 
       size_t nrOfTimesteps = dumpFileParser.getLength();
+      this->universeCache.reserve(nrOfTimesteps);
 
 #pragma omp for
       for (size_t i = 0; i < nrOfTimesteps; ++i)
@@ -167,15 +168,21 @@ namespace pylimer_tools
           }
         }
 
+        // some checking
+        if (atomTypes.size() != nAtoms || atomIds.size() != nAtoms || nx.size() != nAtoms || ny.size() != nAtoms || nz.size() != nAtoms || positionsX.size() != nAtoms || positionsY.size() != nAtoms || positionsZ.size() != nAtoms) {
+          throw std::runtime_error("Failed to read timestep " + std::to_string(newUniverse.getTimestep()) + " due to different nr of atom properties");
+        }
+
         newUniverse.addAtoms(
             nAtoms,
             atomIds,
             atomTypes,
             positionsX, positionsY, positionsZ,
             nx, ny, nz);
-        newUniverse.addBonds(dataFileParser.getNrOfBonds(), dataFileParser.getBondFrom(), dataFileParser.getBondTo(), dataFileParser.getBondTypes());
+        // ignore it if the bond atoms do not exist, as we want to be compatible for dumps of only certain atom groups
+        newUniverse.addBonds(dataFileParser.getNrOfBonds(), dataFileParser.getBondFrom(), dataFileParser.getBondTo(), dataFileParser.getBondTypes(), true);
         newUniverse.setMasses(dataFileParser.getMasses());
-        this->universeCache.insert_or_assign(i, newUniverse);
+        this->universeCache.emplace(i, newUniverse);
       }
 
       this->length = dumpFileParser.getLength();
@@ -186,6 +193,7 @@ namespace pylimer_tools
       this->reset();
       this->dataFiles = dataFiles;
       this->length = dataFiles.size();
+      this->universeCache.reserve(this->length);
     };
 
     Universe UniverseSequence::next()
@@ -203,7 +211,7 @@ namespace pylimer_tools
       {
         throw std::invalid_argument("Index larger than nr. of universes.");
       }
-      this->universeCache.insert_or_assign(index, this->readDataFile(this->dataFiles[index]));
+      this->universeCache.emplace(index, this->readDataFile(this->dataFiles[index]));
       return this->universeCache.at(index);
     }
 
