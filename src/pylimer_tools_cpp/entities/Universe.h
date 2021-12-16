@@ -7,6 +7,7 @@ extern "C"
 }
 #include <vector>
 #include <map>
+#include <unordered_map>
 #include "Molecule.h"
 #include "Atom.h"
 
@@ -32,6 +33,7 @@ namespace pylimer_tools
       void addAtoms(const size_t NNewAtoms, std::vector<long int> ids, std::vector<int> types, std::vector<double> x, std::vector<double> y, std::vector<double> z, std::vector<int> nx, std::vector<int> ny, std::vector<int> nz);
       void addBonds(const size_t NNewBonds, std::vector<long int> from, std::vector<long int> to);
       void addBonds(const size_t NNewBonds, std::vector<long int> from, std::vector<long int> to, std::vector<int> bondTypes);
+      void addBonds(const size_t NNewBonds, std::vector<long int> from, std::vector<long int> to, std::vector<int> bondTypes, const bool ignoreNonExistentAtoms);
       void setMasses(std::map<int, double> weightPerType);
       void setBox(Box box);
       void setTimestep(long int timestep) { this->timestep = timestep; };
@@ -67,6 +69,9 @@ namespace pylimer_tools
       // computations
       std::map<int, int> determineFunctionalityPerType();
       std::map<int, double> computeWeightFractions();
+      std::vector<double> computeDxs(const std::vector<int> bondFrom, const std::vector<int> bondTo);
+      std::vector<double> computeDys(const std::vector<int> bondFrom, const std::vector<int> bondTo);
+      std::vector<double> computeDzs(const std::vector<int> bondFrom, const std::vector<int> bondTo);
       double getMeanStrandLength(int junctionType);
       bool validate();
 
@@ -78,7 +83,7 @@ namespace pylimer_tools
       Box box;
       // connectivity
       igraph_t graph;
-      std::map<int, int> atomIdToVectorIdx;
+      std::unordered_map<int, int> atomIdToVectorIdx;
 
       // type's properties
       std::map<int, double> weightPerType; // a dictionary with key: type, and value: weight per atom of this atom type.
@@ -88,6 +93,7 @@ namespace pylimer_tools
       getVerticesOfType(const int type);
       std::vector<long int> getIndicesOfType(const int type);
       igraph_vs_t getVerticesByIndices(std::vector<long int> indices);
+      std::vector<double> computeDs(const std::vector<int> bondFrom, const std::vector<int> bondTo, std::string direction, double boxLimit);
     };
   }
 }

@@ -110,7 +110,7 @@ void init_pylimer_bound_entities(py::module_ &m)
         .export_values();
 
     py::class_<Molecule>(m, "Molecule")
-        .def(py::init<Box *, igraph_t *, MoleculeType>())
+        .def(py::init<Box *, igraph_t *, MoleculeType, std::map<int, double>>())
         // getters
         .def("getLength", &Molecule::getLength, "Counts and returns the number of atoms associated with this molecule.")
         .def("getType", &Molecule::getType, "Get the type of this molecule (see 'MoleculeType' enum).")
@@ -122,7 +122,7 @@ void init_pylimer_bound_entities(py::module_ &m)
         .def("getNrOfBonds", &Molecule::getNrOfBonds, "Counts and returns the number of bonds associated with this molecule.")
         .def("getNrOfAtoms", &Molecule::getNrOfAtoms, "Counts and returns the number of atoms associated with this molecule.")
         // computations
-        .def("computeWeigth", &Molecule::computeWeight, "Computes the total weight of this molecule.")
+        .def("computeWeight", &Molecule::computeWeight, "Computes the total weight of this molecule.")
         .def("computeBondLengths", &Molecule::computeBondLengths, "Computes the length :math:`b` of each bond in the molecule.")
         .def("computeRadiusOfGyration", &Molecule::computeRadiusOfGyration, R"pbdoc(
             Computes the radius of gyration, :math:`R_g^2` of this molecule.
@@ -201,7 +201,12 @@ void init_pylimer_bound_entities(py::module_ &m)
         .def("getNrOfBondsOfAtom", &Universe::getNrOfBondsOfAtom, "Count the number of immediate neighbours of an atom, specified by its id.")
         .def("getNrOfBondsOfVertex", &Universe::getNrOfBondsOfVertex, "Count the number of immediate neighbours of an atom, specified by its vertex id.")
         // computations
-        .def("determineFunctionalityPerType", &Universe::determineFunctionalityPerType, "Find the maximum functionality of each atom type in the network.");
+        .def("determineFunctionalityPerType", &Universe::determineFunctionalityPerType, "Find the maximum functionality of each atom type in the network.")
+        .def("computeMeanStrandLength", &Universe::getMeanStrandLength, "Compute the mean strand length.")
+        .def("computeWeightFractions", &Universe::computeWeightFractions, "Compute the weight fractions of each atom type in the network.")
+        .def("computeDxs", &Universe::computeDxs, "Compute the dx distance for certain bonds (length in x direction).")
+        .def("computeDys", &Universe::computeDys, "Compute the dy distance for certain bonds (length in y direction).")
+        .def("computeDzs", &Universe::computeDzs, "Compute the dz distance for certain bonds (length in z direction).");
 
     py::class_<UniverseSequence>(m, "UniverseSequence", "This class represents a sequence of Universes, with the Universe's data files only being read on request. Dump files are read at once in order to know how many timesteps/universes are available in total.")
         .def(py::init<>())

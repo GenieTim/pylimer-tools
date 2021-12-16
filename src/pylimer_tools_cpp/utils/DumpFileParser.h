@@ -29,6 +29,8 @@ namespace pylimer_tools
       void finish();
       void readNGroups(const int N);
       void forgetAt(const int index);
+
+      bool isFinishedReading() const { return this->finishedReading; }
       template <typename OUT>
       std::vector<OUT> getValuesForAt(const int index, const std::string headerKey, const std::string &column);
       template <typename OUT>
@@ -89,6 +91,7 @@ namespace pylimer_tools
       std::ifstream file;
       std::vector<data_item_t> data;
       std::map<std::string, std::vector<std::string>> headerColMap;
+      bool finishedReading = false;
     };
 
     template <typename OUT>
