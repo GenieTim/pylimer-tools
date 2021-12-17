@@ -101,6 +101,28 @@ def calculateWeightFractionOfBackbone(network: Universe, junctionType, strandLen
     return Phi_el
 
 
+def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.75, absTol: float = None) -> float:
+    """
+    Compute the weight fraction of soluble material by counting.
+
+    Arguments:
+      - network: the poylmer network to do the computation for
+      - relTol: the fraction of the maximum weight that counts as soluble. Ignored if absTol is specified
+      - absTol: the weight from which on a component is not soluble anymore
+
+
+    Returns:
+      - $W_{sol}$ (float): the weight fraction of soluble material as counted.
+
+    """
+    fractions = network.getClusters()
+    weights = np.array([f.computeWeight() for f in fractions])
+    totalWeight = weights.sum()
+    solubleWeight = weights[weights <
+                            absTol if absTol is not None else weights < relTol*weights.max()]
+    return solubleWeight/totalWeight
+
+
 def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None) -> float:
     """
     Compute the weight fraction of soluble material.
