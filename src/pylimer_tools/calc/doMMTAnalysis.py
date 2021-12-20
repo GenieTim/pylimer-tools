@@ -1,6 +1,7 @@
 
 import math
 from collections import Counter
+import warnings
 
 import igraph
 import numpy as np
@@ -35,7 +36,7 @@ def predictShearModulus(network: Universe, junctionType, strandLength: int = Non
         network.getVolume()  # number of chains (network strands) per unit volume
     if (functionalityPerType is None):
         functionalityPerType = network.determineFunctionalityPerType()
-    p = computeExtentOfReaction(network, functionalityPerType)
+    p = computeExtentOfReaction(network, junctionType, functionalityPerType)
     r = computeStoichiometricInbalance(
         network, junctionType, strandLength, functionalityPerType)
     f = functionalityPerType[junctionType]
@@ -156,7 +157,7 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, stra
             raise NotImplementedError(
                 "Currently, only strand functionality of 2 is supported. {} given for type {}".format(functionalityPerType[key], key))
 
-    p = computeExtentOfReaction(network, functionalityPerType)
+    p = computeExtentOfReaction(network, junctionType, functionalityPerType)
     r = computeStoichiometricInbalance(
         network, junctionType, strandLength=strandLength, functionalityPerType=functionalityPerType)
 
@@ -166,7 +167,8 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, stra
     W_sol = 0
     for key in weightFractions:
         coeff = alpha if key == junctionType else beta
-        W_sol += weightFractions[key]*coeff**functionalityPerType[key]
+        W_sol += weightFractions[key] * \
+            (math.pow(coeff, functionalityPerType[key]))
 
     return W_sol, weightFractions, alpha, beta
 
@@ -192,7 +194,7 @@ def computeMMsProbabilities(r, p, f):
     if (p < 1/math.sqrt(2) or p > 1):
         raise ValueError(
             "The extent of reaction has to be inside [1/sqrt(2), 1] for the result to be realistic. Got {}".format(p))
-    if (r <= 1/(2*p*p)):
+    if (r <= 1/(2*p*p) and f == 3):
         raise ValueError(
             "The stoichiometric inbalance must be > 1/(2p^2) for the resulting alpha to be realisitic. Got p = {}, r = {}".format(p, r))
 
@@ -282,17 +284,20 @@ def computeStoichiometricInbalance(network: Universe, junctionType, strandLength
     return crosslinkerFormableBonds/(otherFormableBonds/strandLength)
 
 
-def computeExtentOfReaction(network: Universe, functionalityPerType: dict = None) -> float:
+def computeExtentOfReaction(network: Universe, crosslinkerType, functionalityPerType: dict = None, strandLength: float = None) -> float:
     """
-    Compute the extent of reaction
+    Compute the extent of polymerization reaction
     (nr. of formed bonds in reaction / max. nr. of bonds formable)
     NOTE: if your system has a non-integer number of possible bonds (e.g. one site unbonded),
     this will not be rounded/respected in any way. 
 
     Arguments:
       - network: the poylmer network to do the computation for
+      - crosslinkerType: the atom type of crosslinker beads
       - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. 
           If None: will use max functionality per type.
+      - strandLength: the length of the network strands (in nr. of beads). 
+          If None: will compute from network structure
 
     Returns:
       - p (float): the extent of reaction
@@ -301,19 +306,27 @@ def computeExtentOfReaction(network: Universe, functionalityPerType: dict = None
     if (network.getNrOfAtoms() == 0):
         return 1
 
-    counts = Counter(network.getAtomTypes())
     if (functionalityPerType is None):
         functionalityPerType = network.determineFunctionalityPerType()
 
-    maxFormableBonds = 0
-    for key in counts:
-        maxFormableBonds += functionalityPerType[key]*counts[key]
+    numStrands = len(network.getMolecules(crosslinkerType))
+    numCrosslinkers = len(network.getAtomsWithType(crosslinkerType))
+
+    # assuming strand has functionality 2
+    maxFormableBonds = min(numStrands*2, numCrosslinkers *
+                           functionalityPerType[crosslinkerType])
 
     if (maxFormableBonds == 0):
         return 1
 
-    # multiplication by 2 as each bond affects 2 possible bonds
-    return network.getNrOfBonds()*2.0/(maxFormableBonds)
+    if (strandLength is None):
+        strands = network.getMolecules(crosslinkerType)
+        strandLength = np.mean([m.getLength() for m in strands])
+
+    actuallyFormedBonds = (network.getNrOfBonds() -
+                           (numStrands * (strandLength-1)))
+
+    return actuallyFormedBonds/(maxFormableBonds)
 
 
 def predictGelationPoint(r: float, f: int, g: int = 2) -> float:

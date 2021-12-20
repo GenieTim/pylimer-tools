@@ -45,7 +45,7 @@ class TestFileReader(PandasComparingTestCase):
         self.assertEqual(universeSequence.getLength(), 1)
         universe = universeSequence.atIndex(0)
         self.assertIsInstance(universe, Universe)
-        self.assertEqual(universe.getNrOfAtoms(), 2595)
+        self.assertEqual(universe.getNrOfAtoms(), 3000)
         # expectedKeys = ["N_atoms", "N_Atypes", "N_Btypes", "masses", "Lx", "Ly",
         #                 "Lz", "xlo", "xhi", "ylo", "yhi", "zlo", "zhi", "atom_data", "bond_data"]
         # for key in expectedKeys:

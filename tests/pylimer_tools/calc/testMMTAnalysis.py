@@ -20,8 +20,8 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             (3*3)/(2), computeStoichiometricInbalance(self.testUniverse, 2, strandLength=5))
 
     def testExtentOfReaction(self):
-        self.assertEqual(1.0, computeExtentOfReaction(self.emptyUniverse))
-        self.assertEqual(14.0/19.0, computeExtentOfReaction(self.testUniverse))
+        self.assertEqual(1.0, computeExtentOfReaction(self.emptyUniverse, 2))
+        self.assertEqual(5.0/6.0, computeExtentOfReaction(self.testUniverse, 2))
 
     def testGelationPointPrediction(self):
         self.assertEqual(1, predictGelationPoint(1, 2))
@@ -30,7 +30,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
     def testShearModulusPrediction(self):
         self.assertIsNone(predictShearModulus(self.emptyUniverse, 2, None))
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
-        self.assertEqual(1.0521245069791487e-09, predictShearModulus(
+        self.assertEqual(1.6138142499798294e-07, predictShearModulus(
             self.saturatedTestUniverse, 2, strandLength=2))
 
     def testWeightFractionCalculations(self):
@@ -48,14 +48,14 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertRaises(NotImplementedError, lambda: computeWeightFractionOfSolubleMaterial(
             self.testUniverse, 2, functionalityPerType={1: 1, 2: 3}))
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
-        self.assertEqual((0.3506977562162289, {1: 0.85, 2: 0.15}, 0.9799067775258254, 0.49652823066801094), computeWeightFractionOfSolubleMaterial(
+        self.assertEqual((0.25407891551682393, {1: 0.85, 2: 0.15}, 0.8888888888888888, 0.4183006535947712), computeWeightFractionOfSolubleMaterial(
             self.saturatedTestUniverse, 2, strandLength=2))
 
     def testProbabilityCalculations(self):
         self.assertRaises(
             ValueError, lambda: computeMMsProbabilities(0.9, 2, 2))
         self.assertRaises(
-            ValueError, lambda: computeMMsProbabilities(0.1, 0.9, 2))
+            ValueError, lambda: computeMMsProbabilities(0.1, 0.9, 3))
 
     def testBackboneWeightFractionCalculations(self):
         self.assertEqual(0, calculateWeightFractionOfBackbone(
@@ -65,7 +65,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
         bb = calculateWeightFractionOfBackbone(
             self.saturatedTestUniverse, junctionType=2, strandLength=2)
-        self.assertEqual(0.33642650971392124, bb)
+        self.assertEqual(0.41013824884792627, bb)
         self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
         self.assertEqual(1-bb, calculateWeightFractionOfDanglingChains(
             self.saturatedTestUniverse, 2, strandLength=2))
@@ -76,7 +76,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             1: 2, 2: 4
         }))
         # NOTE: requires a short strand length with these systems, as otherwise, r > 1 which is not supported by the formulas implemented
-        self.assertEqual(0.43094694702110886, calculateWeightFractionOfBackbone(self.saturatedTestUniverse, junctionType=2, strandLength=2, functionalityPerType={
+        self.assertEqual(0.4101065117216994, calculateWeightFractionOfBackbone(self.saturatedTestUniverse, junctionType=2, strandLength=2, functionalityPerType={
             1: 2, 2: 4
         }))
 
