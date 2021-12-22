@@ -40,12 +40,14 @@ namespace pylimer_tools
 
       double _getDeltaDistance(double c1, double c2, int n1, int n2, double boxL) const
       {
-        double delta = std::fabs(c1 - c2);
-        if (delta >= boxL * 0.5)
-        {
-          delta -= floor(delta / boxL) * boxL;
-          // delta = abs(delta);
+        double delta = c1 - c2;
+        while(delta > 0.5*boxL) {
+          delta -= boxL;
         }
+        while (delta < -0.5*boxL) {
+          delta += boxL;
+        }
+        
         return delta;
       }
 

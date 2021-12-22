@@ -28,6 +28,7 @@ namespace pylimer_tools
       void startReading(const std::string filePath);
       void finish();
       void readNGroups(const int N);
+      void readGroupByIdx(const int i);
       void forgetAt(const int index);
 
       bool isFinishedReading() const { return this->finishedReading; }
@@ -91,6 +92,7 @@ namespace pylimer_tools
       std::ifstream file;
       std::vector<data_item_t> data;
       std::map<std::string, std::vector<std::string>> headerColMap;
+      std::map<int, int> groupPosMap;
       bool finishedReading = false;
     };
 
