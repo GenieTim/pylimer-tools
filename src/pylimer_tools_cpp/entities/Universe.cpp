@@ -594,6 +594,86 @@ namespace pylimer_tools
       return results;
     };
 
+    bool Universe::hasInfiniteStrand(const int crosslinkerType, const int maxLength)
+    {
+      // NOTE: there are exponentially many paths between two vertices of a graph,
+      // and you may run out of memory when using this function, if your graph is lattice-like.
+      std::map<int, std::vector<std::vector<Atom>>> results;
+
+      std::vector<long int> startingCrosslinkers = this->getIndicesOfType(crosslinkerType);
+      std::unordered_set<int> processedPathsKeys;
+
+      // note: this algorithm is not particularly efficient
+      // it is of the order of O(n*n!)
+      for (long int startingCrosslinkerVertexId : startingCrosslinkers)
+      {
+        // select all neighbouring atoms as possible directions for the loop
+        igraph_vector_t neighbours;
+        igraph_vector_init(&neighbours, 0);
+
+        if (igraph_neighbors(&graph, &neighbours, startingCrosslinkerVertexId, IGRAPH_ALL))
+        {
+          throw std::runtime_error("Failed to get neighbours in graph");
+        }
+
+        // loop neighbours
+        igraph_vector_int_t paths;
+        igraph_vector_int_init(&paths, 0);
+        // for each neighbour, we search the simple paths
+        if (igraph_get_all_simple_paths(&this->graph, &paths, startingCrosslinkerVertexId, igraph_vss_vector(&neighbours), maxLength, IGRAPH_ALL))
+        {
+          throw std::runtime_error("Failed to get simple paths in graph");
+        }
+
+        igraph_vector_destroy(&neighbours);
+        // translate the paths we found
+        std::vector<Atom> currentPath;
+        int nrOfTraversalsX = 0;
+        int nrOfTraversalsY = 0;
+        int nrOfTraversalsZ = 0;
+        size_t n = igraph_vector_int_size(&paths);
+        for (int i = 0; i < n; ++i)
+        {
+          const long int currentVal = igraph_vector_int_e(&paths, i);
+          if (currentVal == -1)
+          {
+            // finished a loop. Check.
+            // we have an infinite loop if the box boundary was passed in one direction only
+            // NOTE: this neglects infinite networks (≠ infinite loops) such as ones caused by 
+            // entanglement between images
+            if (nrOfTraversalsX != 0 || nrOfTraversalsY != 0 || nrOfTraversalsZ != 0)
+            {
+              igraph_vector_int_destroy(&paths);
+              return true;
+            }
+            // then reset
+            currentPath.clear();
+            nrOfTraversalsX = 0;
+            nrOfTraversalsY = 0;
+            nrOfTraversalsZ = 0;
+          }
+          else
+          {
+            Atom newAtom = this->getAtomByIdx(currentVal);
+            if (!currentPath.empty())
+            {
+              Atom lastAtom = currentPath.back();
+              double dx = newAtom.getX() - lastAtom.getX();
+              nrOfTraversalsX += (dx) > 0.5 * (this->box.getLx()) ? 1 : (dx < -0.5 * (this->box.getLx()) ? -1 : 0);
+              double dy = newAtom.getY() - lastAtom.getY();
+              nrOfTraversalsY += (dx) > 0.5 * (this->box.getLy()) ? 1 : (dy < -0.5 * (this->box.getLy()) ? -1 : 0);
+              double dz = newAtom.getZ() - lastAtom.getZ();
+              nrOfTraversalsZ += (dz) > 0.5 * (this->box.getLz()) ? 1 : (dz < -0.5 * (this->box.getLz()) ? -1 : 0);
+            }
+            currentPath.push_back(newAtom);
+          }
+        }
+        igraph_vector_int_destroy(&paths);
+      }
+
+      return false;
+    }
+
     std::map<int, int> Universe::determineFunctionalityPerType()
     {
       std::map<int, int> result;

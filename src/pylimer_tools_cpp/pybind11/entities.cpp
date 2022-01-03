@@ -201,6 +201,7 @@ void init_pylimer_bound_entities(py::module_ &m)
         .def("getNrOfBondsOfAtom", &Universe::getNrOfBondsOfAtom, "Count the number of immediate neighbours of an atom, specified by its id.")
         .def("getNrOfBondsOfVertex", &Universe::getNrOfBondsOfVertex, "Count the number of immediate neighbours of an atom, specified by its vertex id.")
         // computations
+        .def("hasInfiniteStrand", &Universe::hasInfiniteStrand, "Checks whether there is a strand (with crosslinker) in the universe that loops through periodic images without coming back.")
         .def("determineFunctionalityPerType", &Universe::determineFunctionalityPerType, "Find the maximum functionality of each atom type in the network.")
         .def("computeMeanStrandLength", &Universe::getMeanStrandLength, "Compute the mean strand length.")
         .def("computeWeightFractions", &Universe::computeWeightFractions, "Compute the weight fractions of each atom type in the network.")

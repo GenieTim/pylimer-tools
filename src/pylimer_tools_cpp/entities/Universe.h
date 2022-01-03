@@ -48,6 +48,7 @@ namespace pylimer_tools
       std::vector<Molecule> getChainsWithCrosslinker(const int crosslinkerType);
       // TODO: find & implement a better return type, e.g. std::vector<Molecule> 
       std::map<int, std::vector<std::vector<Atom>>> findLoops(const int crosslinkerType, const int maxLength);
+      bool hasInfiniteStrand(const int crosslinkerType, const int maxLength);
       template <typename OUT>
       std::vector<OUT> getPropertyValues(const char *propertyName);
       std::vector<int> getAtomTypes() { return this->getPropertyValues<int>("type"); }

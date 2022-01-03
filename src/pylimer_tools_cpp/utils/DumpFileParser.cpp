@@ -57,7 +57,7 @@ void DumpFileParser::startReading(const std::string filePath) {
 // e.g. by tellg() (https://www.cplusplus.com/reference/istream/istream/tellg/)
 // together with seekg (https://www.cplusplus.com/reference/istream/istream/seekg/)
 void DumpFileParser::readGroupByIdx(const int i) {
-  if (this->)
+  // if (this->)
 }
 
 

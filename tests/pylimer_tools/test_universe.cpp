@@ -74,9 +74,9 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     universe.addAtoms(8,
                       {{1, 2, 3, 4, 5, 6, 7, 8}},    // id
                       {{1, 1, 1, 2, 1, 2, 2, 1}},    // type
-                      {{1.25, 2, 3, 2, 1, 1, 1, 2}}, // x
-                      {{1, 1, 1, 2, 3, 1, 1, 2}},    // y
-                      {{1, 1, 1, 1, 1, 2, 3, 2}},    // z
+                      {{1.25, 2, 3, 1, 2, 4, 1, 1}}, // x
+                      {{1, 1, 1, 4, 2, 1, 2, 3}},    // y
+                      {{1, 1, 1, 1, 1, 1, 1, 1}},    // z
                       {{1, 1, 1, 1, 1, 1, 1, 1}},    // nx
                       {{1, 1, 1, 1, 1, 1, 1, 1}},    // ny
                       {{1, 1, 1, 1, 1, 1, 1, 1}}     // nz
@@ -131,6 +131,14 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       std::map<int, std::vector<std::vector<pe::Atom>>> loops = universe.findLoops(2, -1);
       REQUIRE(loops.size() == 1);
       REQUIRE(loops.contains(2));
+    }
+    SECTION("Infinite Strands are found") {
+      universe.setBoxLengths(4.0, 4.0, 2.0);
+      REQUIRE(universe.hasInfiniteStrand(2, -1) == false);
+      universe.addBonds(2, {{8, 4}}, {{4, 1}});
+      std::map<int, std::vector<std::vector<pe::Atom>>> loops = universe.findLoops(2, -1);
+      REQUIRE(loops.size() == 2);
+      REQUIRE(universe.hasInfiniteStrand(2, -1) == true);
     }
   }
 
