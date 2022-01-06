@@ -52,6 +52,7 @@ namespace pylimer_tools
       template <typename OUT>
       std::vector<OUT> getPropertyValues(const char *propertyName);
       std::vector<int> getAtomTypes() { return this->getPropertyValues<int>("type"); }
+      std::map<int, int> countAtomTypes();
       template <typename IN>
       long int findVertexIdForProperty(const char *propertyName, IN propertyValue);
       Box getBox();

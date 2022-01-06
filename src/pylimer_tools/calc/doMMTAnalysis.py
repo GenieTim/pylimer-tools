@@ -124,7 +124,7 @@ def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.7
     return solubleWeight/totalWeight
 
 
-def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None) -> float:
     """
     Compute the weight fraction of soluble material.
 
@@ -135,8 +135,9 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, stra
     Arguments:
       - network: the poylmer network to do the computation for
       - junctionType: the type of the junctions/crosslinkers to select them in the network
-      - strandLength: the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
-      - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. 
+      - weightFractions (dict): a dictionary with key: type, and value: weight fraction of type. Pass if you want to omit the network.
+      - strandLength (int): the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
+      - functionalityPerType (dict): a dictionary with key: type, and value: functionality of this atom type. 
           See: #computeExtentOfReaction
 
     Returns:
@@ -157,13 +158,15 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, stra
             raise NotImplementedError(
                 "Currently, only strand functionality of 2 is supported. {} given for type {}".format(functionalityPerType[key], key))
 
+    if (weightFractions is None):
+        weightFractions = computeWeightFractions(network)
+    
     p = computeExtentOfReaction(network, junctionType, functionalityPerType)
     r = computeStoichiometricInbalance(
         network, junctionType, strandLength=strandLength, functionalityPerType=functionalityPerType)
 
     alpha, beta = computeMMsProbabilities(
         r, p, functionalityPerType[junctionType])
-    weightFractions = computeWeightFractions(network)
     W_sol = 0
     for key in weightFractions:
         coeff = alpha if key == junctionType else beta
