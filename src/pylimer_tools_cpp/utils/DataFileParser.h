@@ -1,100 +1,97 @@
 #ifndef DATA_FILE_PARSER_H
 #define DATA_FILE_PARSER_H
 
+#include "StringUtil.h"
+#include <algorithm>
+#include <filesystem>
+#include <iostream>
+#include <map>
 #include <string>
 #include <vector>
-#include <algorithm>
-#include <iostream>
-#include "StringUtil.h"
-#include <map>
-#include <filesystem>
 
-namespace pylimer_tools
-{
-  namespace utils
-  {
+namespace pylimer_tools {
+namespace utils {
 
-    class DataFileParser
-    {
-    public:
-      void read(const std::string filePath);
+class DataFileParser {
+public:
+  void read(const std::string filePath);
 
-      // access atom data
-      int getNrOfAtoms() { return this->nAtoms; }
-      int getNrOfAtomTypes() { return this->nAtomTypes; }
-      std::vector<long int> getAtomIds() { return this->atomIds; }
-      std::vector<int> getMoleculeIds() { return this->moleculeIds; }
-      std::vector<int> getAtomTypes() { return this->atomTypes; }
-      std::vector<double> getAtomX() { return this->atomX; }
-      std::vector<double> getAtomY() { return this->atomY; }
-      std::vector<double> getAtomZ() { return this->atomZ; }
-      std::vector<int> getAtomNx() { return this->atomNx; }
-      std::vector<int> getAtomNy() { return this->atomNy; }
-      std::vector<int> getAtomNz() { return this->atomNz; }
-      std::map<int, double> getMasses() { return this->masses; }
+  // access atom data
+  int getNrOfAtoms() { return this->nAtoms; }
+  int getNrOfAtomTypes() { return this->nAtomTypes; }
+  std::vector<long int> getAtomIds() { return this->atomIds; }
+  std::vector<int> getMoleculeIds() { return this->moleculeIds; }
+  std::vector<int> getAtomTypes() { return this->atomTypes; }
+  std::vector<double> getAtomX() { return this->atomX; }
+  std::vector<double> getAtomY() { return this->atomY; }
+  std::vector<double> getAtomZ() { return this->atomZ; }
+  std::vector<int> getAtomNx() { return this->atomNx; }
+  std::vector<int> getAtomNy() { return this->atomNy; }
+  std::vector<int> getAtomNz() { return this->atomNz; }
+  std::map<int, double> getMasses() { return this->masses; }
 
-      // access bond data
-      int getNrOfBonds() { return this->nBonds; }
-      int getNrOfBondTypes() { return this->nBondTypes; }
-      std::vector<int> getBondTypes() { return this->bondTypes; }
-      std::vector<long int> getBondFrom() { return this->bondFrom; }
-      std::vector<long int> getBondTo() { return this->bondTo; }
+  // access bond data
+  int getNrOfBonds() { return this->nBonds; }
+  int getNrOfBondTypes() { return this->nBondTypes; }
+  std::vector<int> getBondTypes() { return this->bondTypes; }
+  std::vector<long int> getBondFrom() { return this->bondFrom; }
+  std::vector<long int> getBondTo() { return this->bondTo; }
 
-      // get box info
-      double getLx() { return this->Lx; }
-      double getLy() { return this->Ly; }
-      double getLz() { return this->Lz; }
+  // get box info
+  double getLx() { return this->Lx; }
+  double getLy() { return this->Ly; }
+  double getLz() { return this->Lz; }
 
-    private:
-      void readNs(const std::string line);
-      void readMass(const std::string line);
-      void readAtom(std::string line);
-      void readBond(std::string line);
-      static void skipEmptyLines(std::string &line, std::ifstream &file);
-      static void skipLinesToContains(std::string &line, std::ifstream &file, std::string upTo);
+private:
+  void readNs(const std::string line);
+  void readMass(const std::string line);
+  void readAtom(std::string line);
+  void readBond(std::string line);
+  static void skipEmptyLines(std::string &line, std::ifstream &file);
+  static void skipLinesToContains(std::string &line, std::ifstream &file,
+                                  std::string upTo);
 
-      template <typename OUT>
-      inline std::vector<OUT> parseTypesInLine(const std::string line, int nToRead)
-      {
-        std::vector<OUT> resultnumbers;
-        pylimer_tools::utils::CsvTokenizer tokenizer(line, nToRead);
-        resultnumbers.reserve(tokenizer.getLength());
-        for (size_t i = 0; i < tokenizer.getLength(); ++i)
-        {
-          resultnumbers.push_back(tokenizer.get<OUT>(i));
-        }
-        return resultnumbers;
-      }
-
-      //// data
-      // nr of data points to read
-      int nAtoms; // number of atoms
-      int nBonds;
-      int nAtomTypes;
-      int nBondTypes;
-
-      // box sizes
-      double Lx;
-      double Ly;
-      double Lz;
-
-      // actual dimensional values
-      std::map<int, double> masses;
-      std::vector<long int> atomIds;
-      std::vector<int> moleculeIds;
-      std::vector<int> atomTypes;
-      std::vector<double> atomX;
-      std::vector<double> atomY;
-      std::vector<double> atomZ;
-      std::vector<int> atomNx;
-      std::vector<int> atomNy;
-      std::vector<int> atomNz;
-      std::vector<long int> bondIds;
-      std::vector<int> bondTypes;
-      std::vector<long int> bondFrom;
-      std::vector<long int> bondTo;
-    };
+  template <typename OUT>
+  inline std::vector<OUT> parseTypesInLine(const std::string line,
+                                           int nToRead) {
+    std::vector<OUT> resultnumbers;
+    pylimer_tools::utils::CsvTokenizer tokenizer(line, nToRead);
+    resultnumbers.reserve(tokenizer.getLength());
+    for (size_t i = 0; i < tokenizer.getLength(); ++i) {
+      resultnumbers.push_back(tokenizer.get<OUT>(i));
+    }
+    return resultnumbers;
   }
-}
+
+  //// data
+  // nr of data points to read
+  int nAtoms; // number of atoms
+  int nBonds;
+  int nAtomTypes;
+  int nBondTypes;
+
+  // box sizes
+  double Lx;
+  double Ly;
+  double Lz;
+
+  // actual dimensional values
+  std::map<int, double> masses;
+  std::vector<long int> atomIds;
+  std::vector<int> moleculeIds;
+  std::vector<int> atomTypes;
+  std::vector<double> atomX;
+  std::vector<double> atomY;
+  std::vector<double> atomZ;
+  std::vector<int> atomNx;
+  std::vector<int> atomNy;
+  std::vector<int> atomNz;
+  std::vector<long int> bondIds;
+  std::vector<int> bondTypes;
+  std::vector<long int> bondFrom;
+  std::vector<long int> bondTo;
+};
+} // namespace utils
+} // namespace pylimer_tools
 
 #endif
