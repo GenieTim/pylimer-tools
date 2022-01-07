@@ -43,8 +43,8 @@ public:
     file << "\t " << uniqueAtomTypes << " atom types\n";
     file << "\t " << 1 << " bond types\n";
     file << "\t " << 1 << " angle types\n";
-    file << "\t " << 1 << " dihedral types\n";
-    file << "\t " << 1 << " improper types\n";
+    file << "\t " << 0 << " dihedral types\n";
+    file << "\t " << 0 << " improper types\n";
     file << "\n";
     file << "\t " << 0 << " " << this->universe.getBox().getLx()
          << " xlo xhi\n";

@@ -28,7 +28,7 @@ struct MoleculeIterator
 
     const Molecule &molecule;
     py::object ref; // keep a reference
-    size_t index;   // the index to access
+    size_t index = 0;   // the index to access
 };
 
 void init_pylimer_bound_entities(py::module_ &m)

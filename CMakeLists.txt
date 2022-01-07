@@ -40,11 +40,6 @@ endif()
 find_package(pybind11 CONFIG REQUIRED)
 
 message("Using toolchain file ${CMAKE_TOOLCHAIN_FILE}")
-find_package(igraph REQUIRED)
-if(igraph_FOUND)
-  message("Igraph found in main. ${CMAKE_TOOLCHAIN_FILE}")
-  include_directories(${igraph_INCLUDE_DIRS})
-endif()
 
 # add sources & targets
 add_subdirectory(src/pylimer_tools_cpp)
@@ -58,13 +53,9 @@ pybind11_add_module(pylimer_tools_cpp MODULE
 )
 
 # add other dependencies
-# if (DEFINED igraph_LOADED)
 include_directories(${igraph_INCLUDE_DIRS})
 
 message("pylimer_tools_cpp includes igraph from ${igraph_INCLUDE_DIRS}")
-# else()
-# message("plyimer_tools_cpp cannot find igraph")
-# endif()
 
 # link
 target_link_libraries(pylimer_tools_cpp 
