@@ -17,6 +17,9 @@ namespace utils {
 
 class DataFileWriter {
 public:
+  DataFileWriter(const pylimer_tools::entities::Universe u) : universe(u) {
+    // this->universe = u;
+  }
   void setUniverseToWrite(const pylimer_tools::entities::Universe u) {
     this->universe = u;
   };
@@ -63,7 +66,7 @@ public:
     file << "\n";
 
     // write atoms
-    file << "Atoms\n";
+    file << "Atoms\n\n";
     // TODO: support molecule idxs
     int moleculeIdx = 0;
     for (int i = 0; i < this->universe.getNrOfAtoms(); ++i) {
@@ -76,6 +79,7 @@ public:
     file << "\n";
 
     // write bonds
+    file << "Bonds\n\n";
     std::map<std::string, std::vector<long int>> bonds =
         this->universe.getBonds();
     for (int i = 0; i < this->universe.getNrOfBonds(); ++i) {
@@ -98,4 +102,5 @@ private:
 };
 } // namespace utils
 } // namespace pylimer_tools
+
 #endif

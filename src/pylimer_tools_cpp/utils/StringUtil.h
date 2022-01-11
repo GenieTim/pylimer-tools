@@ -5,6 +5,7 @@
 #include <cstring>
 #include <iostream>
 #include <string>
+#include <vector>
 // #include <ranges>
 // #include <string_view>
 
