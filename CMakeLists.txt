@@ -48,6 +48,7 @@ add_dependencies(pylimer_tools igraphLib)
 pybind11_add_module(pylimer_tools_cpp MODULE 
   src/pylimer_tools_cpp/pybind11/entities.cpp
   src/pylimer_tools_cpp/pybind11/readers.cpp
+  src/pylimer_tools_cpp/pybind11/writers.cpp
   src/pylimer_tools_cpp/pybind11/calculations.cpp
   src/pylimer_tools_cpp/pybind11/pylimer_tools_cpp.cpp
 )

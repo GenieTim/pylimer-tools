@@ -81,13 +81,13 @@ namespace pylimer_tools
       {
         line = pylimer_tools::utils::trimLineOmitComment(line);
 
-        // break at empty lines
+        // skip empty lines
         if (line.empty())
         {
-          break;
+          continue;
         }
         // read masses until e.g. atoms section
-        if (line.find("Atoms") != std::string::npos)
+        if (line.find("Atoms") != std::string::npos || line.find("Coeffs") != std::string::npos)
         {
           break;
         }
