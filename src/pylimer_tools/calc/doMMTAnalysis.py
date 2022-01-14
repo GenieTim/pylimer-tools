@@ -102,7 +102,7 @@ def calculateWeightFractionOfBackbone(network: Universe, junctionType, strandLen
     return Phi_el
 
 
-def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.75, absTol: float = None) -> float:
+def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.9, absTol: float = None) -> float:
     """
     Compute the weight fraction of soluble material by counting.
 
@@ -121,12 +121,12 @@ def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.7
     totalWeight = weights.sum()
     solubleWeight = weights[weights <
                             absTol if absTol is not None else weights < relTol*weights.max()]
-    return solubleWeight/totalWeight
+    return np.sum(solubleWeight)/totalWeight
 
 
 def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None) -> float:
     """
-    Compute the weight fraction of soluble material.
+    Compute the weight fraction of soluble material by MMT.
 
     Source:
       - https://pubs.acs.org/doi/10.1021/ma00046a021
@@ -350,4 +350,4 @@ def predictGelationPoint(r: float, f: int, g: int = 2) -> float:
     """
     # if (r is None):
     #   r = calculateEffectiveCrosslinkerFunctionality(network, junctionType, f)
-    return 1/(r*(f-1)*(g-1))
+    return math.sqrt(1/(r*(f-1)*(g-1)))

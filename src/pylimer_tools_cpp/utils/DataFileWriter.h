@@ -87,8 +87,9 @@ public:
       if (bondType == -1) {
         bondType = 1;
       }
-      file << "\t" << i << "\t" << bondType << "\t" << bonds["bond_from"][i]
-           << "\t" << bonds["bond_to"][i] << "\n";
+      file << "\t" << i << "\t" << bondType << "\t"
+           << (this->universe.getAtomIdByIdx(bonds["bond_from"][i])) << "\t"
+           << (this->universe.getAtomIdByIdx(bonds["bond_to"][i])) << "\n";
     }
 
     file.close();

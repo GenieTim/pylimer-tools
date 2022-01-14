@@ -64,6 +64,8 @@ namespace pylimer_tools
       long int getTimestep() { return this->timestep; };
       int getNrOfBondsOfAtom(const long int atomId);
       int getNrOfBondsOfVertex(const long int vertexId);
+      long int getAtomIdByIdx(const int vertexId) const;
+      long int getIdxByAtomId(const int atomId) const;
 
       // operators
       Atom operator[](size_t index) const { return this->getAtom(index); }
