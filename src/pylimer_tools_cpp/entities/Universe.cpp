@@ -222,7 +222,7 @@ void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from,
   }
 };
 
-std::map<int, int> Universe::countAtomTypes(){
+std::map<int, int> Universe::countAtomTypes() {
   std::vector<int> atomTypes = this->getAtomTypes();
   std::map<int, int> result;
   for (int atomType : atomTypes) {
@@ -732,13 +732,20 @@ std::map<int, double> Universe::computeWeightFractions() {
   return partialMasses;
 }
 
-Atom Universe::getAtom(const int atomId) const {
+long int Universe::getAtomIdByIdx(const int vertexId) const {
+  return VAN(&this->graph, "id", vertexId);
+}
+
+long int Universe::getIdxByAtomId(const int atomId) const { 
   if (!this->atomIdToVectorIdx.contains(atomId)) {
     throw std::invalid_argument("Atom with this id (" + std::to_string(atomId) +
                                 ") does not exist");
   }
-  int atomIdx = this->atomIdToVectorIdx.at(atomId);
-  return this->getAtomByIdx(atomIdx);
+  return this->atomIdToVectorIdx.at(atomId);
+}
+
+Atom Universe::getAtom(const int atomId) const {
+  return this->getAtomByIdx(this->getIdxByAtomId(atomId));
 }
 
 Atom Universe::getAtomByIdx(const int vertexIdx) const {
