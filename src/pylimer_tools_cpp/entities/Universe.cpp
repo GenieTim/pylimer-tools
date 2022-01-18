@@ -170,7 +170,7 @@ void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from,
 }
 
 void Universe::addAngles(std::vector<long int> from, std::vector<long int> via,
-                         std::vector<int> to) {
+                         std::vector<long int> to) {
   if (from.size() != to.size() || from.size() != via.size()) {
     throw std::invalid_argument("All angle inputs must have the same size.");
   }
