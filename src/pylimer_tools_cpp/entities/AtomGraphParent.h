@@ -35,28 +35,46 @@ public:
   };
 
   /**
-   * @brief Get the Atoms Connected To an Atom specified by its vertex Id
+   * @brief Get the vertex ids connected to a specified vertex Id
    *
    * @param vertexIdx the index of the vertex in the graph for which to get the
    * connected atoms
-   * @return std::vector<Atom>
+   * @return std::vector<long int>
    */
-  std::vector<Atom> getAtomsConnectedTo(const long int vertexIdx) {
+  std::vector<long int>
+  getVertexIdxsConnectedTo(const long int vertexIdx) const {
     igraph_vs_t adjVs;
     if (igraph_vs_adj(&adjVs, vertexIdx, IGRAPH_ALL)) {
       throw std::runtime_error("Failed to find adjacent vertices of vertex.");
     }
     igraph_vit_t vit;
     igraph_vit_create(&this->graph, adjVs, &vit);
-    std::vector<Atom> results;
+    std::vector<long int> results;
     results.reserve(IGRAPH_VIT_SIZE(vit));
     while (!IGRAPH_VIT_END(vit)) {
-      long int vertexId = (long int)IGRAPH_VIT_GET(vit);
+      results.push_back((long int)IGRAPH_VIT_GET(vit));
       IGRAPH_VIT_NEXT(vit);
     }
     igraph_vs_destroy(&adjVs);
     igraph_vit_destroy(&vit);
 
+    return results;
+  }
+
+  /**
+   * @brief Get the Atoms Connected To an Atom specified by its vertex Id
+   *
+   * @param vertexIdx the index of the vertex in the graph for which to get the
+   * connected atoms
+   * @return std::vector<Atom>
+   */
+  std::vector<Atom> getAtomsConnectedTo(const long int vertexIdx) const {
+    std::vector<Atom> results;
+    std::vector<long int> vertexIds = this->getVertexIdxsConnectedTo(vertexIdx);
+    results.reserve(vertexIds.size());
+    for (long int vertexId : vertexIds) {
+      results.push_back(this->getAtomByVertexIdx(vertexId));
+    }
     return results;
   };
 

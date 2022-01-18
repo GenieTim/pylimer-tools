@@ -51,20 +51,36 @@ public:
     this->addAtomsWithType(nrOfCrosslinkers, crosslinkerAtomType);
   };
 
+  /**
+   * @brief Randomly distribute 
+   * 
+   * @param nrOfSolventChains 
+   * @param chainLength 
+   * @param solventAtomType 
+   */
   void addSolventChains(int nrOfSolventChains, int chainLength,
                         int solventAtomType = 3) {
     std::vector<long int> startAtoms =
         this->addAtomsWithType(nrOfSolventChains, solventAtomType);
 
-    for (int atomId : startAtoms) {
+    for (long int atomId : startAtoms) {
       pylimer_tools::entities::Atom startAtom =
           this->universe.getAtomByVertexIdx(
               this->universe.getIdxByAtomId(atomId));
       this->addRandomWalkChainFrom(startAtom, chainLength - 1, solventAtomType);
     }
   };
+
+  /**
+   * @brief Add strands in between the cross-linkers, link them as appropriate
+   * 
+   * @param nrOfStrands the nr. of Strands to add
+   * @param beadsPerChains the nr. of beads per strand (excl. cross-linkers)
+   * @param crosslinkerConversion "p", the target conversion of the cross-linkers
+   * @param crosslinkerFunctionality the functionality of the cross-linker beads to add
+   * @param strandAtomType the type of the strand atoms
+   */
   void addAndLinkStrands(int nrOfStrands, std::vector<int> beadsPerChains,
-                         double acceptableDistance,
                          double crosslinkerConversion,
                          int crosslinkerFunctionality = 4,
                          int strandAtomType = 1) {
@@ -117,7 +133,7 @@ public:
             currentDegreeOfConversion += conversionPerBond;
           } else {
             // decision is: connected / network
-            // TODO: find close enough crosslinker to do the chain to
+            // find close enough crosslinker to do the chain to
             int targetIdx = this->findAppropriateLink(
                 crosslinkers[i], crosslinkers, availableCrosslinkerSites,
                 std::sqrt(beadsPerChains[i]) * this->beadDistance);
@@ -145,7 +161,6 @@ public:
   };
 
   void addAndLinkStrands(int nrOfStrands, int chainLength,
-                         double acceptableDistance,
                          double crosslinkerConversion) {
     std::vector<int> chainLengths;
     chainLengths.reserve(nrOfStrands);
@@ -153,7 +168,7 @@ public:
       chainLengths.push_back(chainLength);
     }
     return this->addAndLinkStrands(nrOfStrands, chainLengths,
-                                   acceptableDistance, crosslinkerConversion);
+                                   crosslinkerConversion);
   };
 
 private:
@@ -247,16 +262,32 @@ private:
     double lastY = from.getY();
     double lastZ = from.getZ();
 
+    // support crossing of boundary conditions: find nearest image as target
+    // (accept image mismatches)
+    double targetX =
+        lastX - this->_getDeltaDistance(to.getX(), lastX,
+                                        this->universe.getBox().getLx());
+    double targetY =
+        lastY - this->_getDeltaDistance(to.getY(), lastY,
+                                        this->universe.getBox().getLy());
+    double targetZ =
+        lastZ - this->_getDeltaDistance(to.getZ(), lastZ,
+                                        this->universe.getBox().getLz());
+
     for (int i = 0; i < chainLen; ++i) {
-      double dx = to.getX() - lastX;
-      double dy = to.getY() - lastY;
-      double dz = to.getZ() - lastZ;
-      double idealAlpha = std::arccos(dz);
+      double dx = targetX - lastX;
+      double dy = targetY - lastY;
+      double dz = targetZ - lastZ;
+      double idealAlpha = std::acos(dz);
       double idealBeta =
-          dx > 0 ? (std::arctan((dy) / (dx)))
-                 : (dx < 0 ? (std::arctan((dy) / (dx)) + M_PI) : M_PI / 2);
+          dx > 0 ? (std::atan2((dy), (dx)))
+                 : (dx < 0 ? (std::atan2((dy), (dx)) + M_PI) : M_PI / 2);
       double idealWeight =
-          std::min(0.1 + ((double)i) / ((double)chainLen), 1.0);
+          std::min(((double)i) / ((double)chainLen) +
+                       (this->getDistance(lastX, lastY, lastZ, targetX, targetY,
+                                          targetZ) /
+                        (chainLen - i + 1)),
+                   1.0);
 
       // TODO: find some a bit more sophisticated probability adjustment
       const double alpha = (1 - idealWeight) * angleDistribution(this->rng) +
@@ -299,7 +330,7 @@ private:
    *
    * @param nrOfAtomsToAdd the nr. of atoms to add to the universe
    * @param atomType the type of the atoms to add
-   * @return std::vector<int> the ids of the inserted atoms
+   * @return std::vector<long int> the ids of the inserted atoms
    */
   std::vector<long int> addAtomsWithType(int nrOfAtomsToAdd, int atomType,
                                          Positions randomPos) {
@@ -326,7 +357,7 @@ private:
    *
    * @param nrOfAtomsToAdd the nr. of atoms to add to the universe
    * @param atomType the type of the atoms to add
-   * @return std::vector<int> the ids of the inserted atoms
+   * @return std::vector<long int> the ids of the inserted atoms
    */
   std::vector<long int> addAtomsWithType(int nrOfAtomsToAdd, int atomType) {
     Positions randomPos = this->generateRandomPositions(nrOfAtomsToAdd);
@@ -408,6 +439,7 @@ private:
       throw std::invalid_argument("Cannot find a partner in none.");
     }
     double bestDistance = std::numeric_limits<double>::max();
+    pylimer_tools::entities::Box box = this->universe.getBox();
     int bestMatch = 0;
     for (int i = 0; i < possiblePartners.size(); ++i) {
       if (availablePartnerSites[i] < 1) {
@@ -415,8 +447,7 @@ private:
       }
       pylimer_tools::entities::Atom partner = possiblePartners[i];
       double currDist =
-          std::abs(partner.distanceTo(from, &this->universe.getBox()) -
-                   acceptableDistance);
+          std::abs(partner.distanceTo(from, &box) - acceptableDistance);
       if (currDist < bestDistance) {
         bestDistance = currDist;
         bestMatch = i;
@@ -450,3 +481,5 @@ private:
 };
 } // namespace utils
 } // namespace pylimer_tools
+
+#endif
