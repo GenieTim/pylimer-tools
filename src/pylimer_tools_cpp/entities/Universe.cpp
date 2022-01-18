@@ -118,7 +118,8 @@ void Universe::addAtoms(const size_t NNewAtoms, std::vector<long int> newIds,
     this->atomIdToVectorIdx.emplace(newIds[i], this->NAtoms + i);
   }
   // append attributes
-  // it is empirically more efficient to do it this split up way
+  // it is empirically more efficient to do it this split up way,
+  // though there might be even more efficient intermediate splits
   if (this->NAtoms == 0) {
     // NOTE: using the same vector over an over might be bad for performance?
     igraph_vector_t valueVec;
@@ -177,9 +178,9 @@ void Universe::addAngles(std::vector<long int> from, std::vector<long int> via,
 
   this->angleFrom.insert(std::end(this->angleFrom), std::begin(from),
                          std::end(from));
-  this->angleTo.insert(std::end(this->angleTo), std::begin(to), std::end(to));
   this->angleVia.insert(std::end(this->angleVia), std::begin(via),
                         std::end(via));
+  this->angleTo.insert(std::end(this->angleTo), std::begin(to), std::end(to));
 }
 
 void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from,
@@ -242,6 +243,11 @@ void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from,
   }
 };
 
+/**
+ * @brief Count how many of each atom type there are in the universe
+ *
+ * @return std::map<int, int>
+ */
 std::map<int, int> Universe::countAtomTypes() {
   std::vector<int> atomTypes = this->getAtomTypes();
   std::map<int, int> result;
@@ -251,6 +257,11 @@ std::map<int, int> Universe::countAtomTypes() {
   return result;
 };
 
+/**
+ * @brief Set the masses of the atoms in this universe
+ *
+ * @param weightPerType the weight per type
+ */
 void Universe::setMasses(std::map<int, double> weightPerType) {
   this->weightPerType = weightPerType;
 }
@@ -291,6 +302,13 @@ std::vector<Molecule> Universe::getClusters() {
   return molecules;
 }
 
+/**
+ * @brief Decompose this universe into chains/molecules by splitting them into
+ * clusters
+ *
+ * @param atomTypeToOmit The atom type to remove to get more clusters
+ * @return std::vector<Molecule>
+ */
 std::vector<Molecule> Universe::getMolecules(const int atomTypeToOmit) {
   std::vector<Molecule> molecules;
   if (this->getNrOfAtoms() == 0) {
@@ -347,11 +365,23 @@ std::vector<Molecule> Universe::getMolecules(const int atomTypeToOmit) {
   return molecules;
 }
 
+/**
+ * @brief Get a vertex selector to find all vertices with a certain type
+ *
+ * @param type the type to select
+ * @return igraph_vs_t
+ */
 igraph_vs_t Universe::getVerticesOfType(const int type) {
   std::vector<long int> indices = this->getIndicesOfType(type);
   return this->getVerticesByIndices(indices);
 }
 
+/**
+ * @brief Get a vertex selector to find all vertices with a certain index
+ *
+ * @param indices the vertex indices to select
+ * @return igraph_vs_t
+ */
 igraph_vs_t Universe::getVerticesByIndices(std::vector<long int> indices) {
   igraph_vector_t indicesToSelect;
   igraph_vector_init(&indicesToSelect, indices.size());
@@ -364,6 +394,12 @@ igraph_vs_t Universe::getVerticesByIndices(std::vector<long int> indices) {
   return result;
 }
 
+/**
+ * @brief Get the vertex indices of atoms with a certain type
+ *
+ * @param type the type to select
+ * @return std::vector<long int>
+ */
 std::vector<long int> Universe::getIndicesOfType(const int type) {
   std::vector<long int> indices;
   if (this->getNrOfAtoms() == 0) {
@@ -382,6 +418,13 @@ std::vector<long int> Universe::getIndicesOfType(const int type) {
   return indices;
 }
 
+/**
+ * @brief Decompose the network into clusters, re-adding the atoms omitted to
+ * get more clusters
+ *
+ * @param crosslinkerType the type of the atoms to omit and re-add
+ * @return std::vector<Molecule>
+ */
 std::vector<Molecule>
 Universe::getChainsWithCrosslinker(const int crosslinkerType) {
   std::vector<Molecule> molecules;
@@ -533,6 +576,17 @@ Universe::getChainsWithCrosslinker(const int crosslinkerType) {
   return molecules;
 }
 
+/**
+ * @brief Find the loops in the network
+ *
+ * NOTE: there are exponentially many paths between two vertices of a graph,
+ * and you may run out of memory when using this function, if your graph is
+ * lattice-like.
+ *
+ * @param crosslinkerType
+ * @param maxLength
+ * @return std::map<int, std::vector<std::vector<Atom>>>
+ */
 std::map<int, std::vector<std::vector<Atom>>>
 Universe::findLoops(const int crosslinkerType, const int maxLength) {
   // NOTE: there are exponentially many paths between two vertices of a graph,
@@ -600,6 +654,19 @@ Universe::findLoops(const int crosslinkerType, const int maxLength) {
   return results;
 };
 
+/**
+ * @brief Check whether the universe contains a loop that crosses the periodic
+ * boundaries an odd times
+ *
+ * NOTE: there are exponentially many paths between two vertices of a graph,
+ * and you may run out of memory when using this function, if your graph is
+ * lattice-like.
+ *
+ * @param crosslinkerType
+ * @param maxLength the maximum length of the loop ()
+ * @return true
+ * @return false
+ */
 bool Universe::hasInfiniteStrand(const int crosslinkerType,
                                  const int maxLength) {
   // NOTE: there are exponentially many paths between two vertices of a graph,
@@ -683,6 +750,11 @@ bool Universe::hasInfiniteStrand(const int crosslinkerType,
   return false;
 }
 
+/**
+ * @brief Determine the maximum functionality per atom type
+ *
+ * @return std::map<int, int>
+ */
 std::map<int, int> Universe::determineFunctionalityPerType() {
   std::map<int, int> result;
   igraph_vector_t degrees;
@@ -719,6 +791,11 @@ std::map<int, int> Universe::determineFunctionalityPerType() {
   return result;
 }
 
+/**
+ * @brief determine the effective functionality of each atom type
+ *
+ * @return std::map<int, double>
+ */
 std::map<int, double> Universe::determineEffectiveFunctionalityPerType() {
   std::map<int, double> result;
   igraph_vector_t degrees;
@@ -759,13 +836,12 @@ std::map<int, double> Universe::determineEffectiveFunctionalityPerType() {
   return result;
 }
 
-/*
-Compute the weight fractions of each atom type in the network.
-
-Returns:
-  - $\\vec{W_i}$ (dict): using the type i as a key, this dict contains the
-weight fractions ($\\frac{W_i}{W_{tot}}$)
-*/
+/**
+ * @brief Compute the weight fractions of each atom type in the network.
+ *
+ * @return std::map<int, double> $\\vec{W_i}$ (dict): using the type i as a key,
+ * this dict contains the weight fractions ($\\frac{W_i}{W_{tot}}$)
+ */
 std::map<int, double> Universe::computeWeightFractions() {
   std::map<int, double> partialMasses;
   if (this->getNrOfAtoms() == 0) {
@@ -792,10 +868,22 @@ std::map<int, double> Universe::computeWeightFractions() {
   return partialMasses;
 }
 
+/**
+ * @brief Get an atom id by its vertex index
+ *
+ * @param vertexId
+ * @return long int
+ */
 long int Universe::getAtomIdByIdx(const int vertexId) const {
   return VAN(&this->graph, "id", vertexId);
 }
 
+/**
+ * @brief Get a vertex index by the atom id
+ *
+ * @param atomId
+ * @return long int
+ */
 long int Universe::getIdxByAtomId(const int atomId) const {
   if (!this->atomIdToVectorIdx.contains(atomId)) {
     throw std::invalid_argument("Atom with this id (" + std::to_string(atomId) +
@@ -804,10 +892,21 @@ long int Universe::getIdxByAtomId(const int atomId) const {
   return this->atomIdToVectorIdx.at(atomId);
 }
 
+/**
+ * @brief Get an atom by its id
+ *
+ * @param atomId
+ * @return Atom
+ */
 Atom Universe::getAtom(const int atomId) const {
   return this->getAtomByVertexIdx(this->getIdxByAtomId(atomId));
 }
 
+/**
+ * @brief Get all atoms in this universe
+ *
+ * @return std::vector<Atom>
+ */
 std::vector<Atom> Universe::getAtoms() {
   std::vector<Atom> atoms;
   atoms.reserve(this->getNrOfAtoms());
@@ -822,6 +921,11 @@ std::vector<Atom> Universe::getAtoms() {
   return atoms;
 }
 
+/**
+ * @brief Get all angles stored in this universe
+ *
+ * @return std::map<std::string, std::vector<long int>>
+ */
 std::map<std::string, std::vector<long int>> Universe::getAngles() const {
   std::map<std::string, std::vector<long int>> results;
   results.insert_or_assign("angle_from", this->angleFrom);
@@ -831,6 +935,11 @@ std::map<std::string, std::vector<long int>> Universe::getAngles() const {
   return results;
 }
 
+/**
+ * @brief Find all angles that appear in this universe
+ *
+ * @return std::map<std::string, std::vector<long int>>
+ */
 std::map<std::string, std::vector<long int>> Universe::detectAngles() const {
   std::set<int> anglesFound;
   std::vector<long int> angleFromFound;
@@ -877,12 +986,22 @@ std::map<std::string, std::vector<long int>> Universe::detectAngles() const {
   return results;
 }
 
+/**
+ * @brief Get the number of angles stored in this universe.
+ *
+ * @return const int
+ */
 const int Universe::getNrOfAngles() const {
   assert(this->angleFrom.size() == this->angleTo.size());
   assert(this->angleFrom.size() == this->angleVia.size());
   return this->angleFrom.size();
 }
 
+/**
+ * @brief Get all bonds (edges) associated with this universe (graph)
+ *
+ * @return std::map<std::string, std::vector<long int>>
+ */
 std::map<std::string, std::vector<long int>> Universe::getBonds() const {
   igraph_vector_t allEdges;
   igraph_vector_init(&allEdges, this->getNrOfBonds());
@@ -933,6 +1052,14 @@ std::map<std::string, std::vector<long int>> Universe::getBonds() const {
   return results;
 };
 
+/**
+ * @brief Find the vertex id where the vertex has a certain property
+ *
+ * @tparam IN the type of the property you want the vertex to have
+ * @param propertyName the name of the property
+ * @param propertyValue the objective value
+ * @return long int the vertex index, -1 if not found.
+ */
 template <typename IN>
 long int Universe::findVertexIdForProperty(const char *propertyName,
                                            IN propertyValue) {
@@ -949,21 +1076,51 @@ long int Universe::findVertexIdForProperty(const char *propertyName,
   return -1;
 }
 
+/**
+ * @brief Compute the x distance for all bonds passed in
+ *
+ * @param bondFrom
+ * @param bondTo
+ * @return std::vector<double>
+ */
 std::vector<double> Universe::computeDxs(const std::vector<int> bondFrom,
                                          const std::vector<int> bondTo) {
   return this->computeDs(bondFrom, bondTo, "x", this->box.getLx());
 };
 
+/**
+ * @brief Compute the y distance for all bonds passed in
+ *
+ * @param bondFrom
+ * @param bondTo
+ * @return std::vector<double>
+ */
 std::vector<double> Universe::computeDys(const std::vector<int> bondFrom,
                                          const std::vector<int> bondTo) {
   return this->computeDs(bondFrom, bondTo, "y", this->box.getLy());
 };
 
+/**
+ * @brief Compute the z distance for all bonds passed in
+ *
+ * @param bondFrom
+ * @param bondTo
+ * @return std::vector<double>
+ */
 std::vector<double> Universe::computeDzs(const std::vector<int> bondFrom,
                                          const std::vector<int> bondTo) {
   return this->computeDs(bondFrom, bondTo, "z", this->box.getLz());
 };
 
+/**
+ * @brief Compute the distance for all bonds passed in in a certain direction
+ *
+ * @param bondFrom
+ * @param bondTo
+ * @param direction
+ * @param boxLimit
+ * @return std::vector<double>
+ */
 std::vector<double> Universe::computeDs(const std::vector<int> bondFrom,
                                         const std::vector<int> bondTo,
                                         std::string direction,
@@ -1021,6 +1178,12 @@ std::vector<double> Universe::computeDs(const std::vector<int> bondFrom,
   return results;
 };
 
+/**
+ * @brief Get the mean number of beads between beads with the passed type
+ *
+ * @param junctionType
+ * @return double
+ */
 double Universe::getMeanStrandLength(int junctionType) {
   std::vector<Molecule> molecules = this->getMolecules(junctionType);
 
@@ -1033,10 +1196,24 @@ double Universe::getMeanStrandLength(int junctionType) {
   return meanStrandLength;
 }
 
+/**
+ * @brief Get the number of bonds (functionality, degree) associated with an
+ * atom
+ *
+ * @param atomId
+ * @return int
+ */
 int Universe::getNrOfBondsOfAtom(const long int atomId) {
-  return this->getNrOfBondsOfVertex(this->atomIdToVectorIdx[atomId]);
+  return this->getNrOfBondsOfVertex(this->getIdxByAtomId(atomId));
 }
 
+/**
+ * @brief Get the number of bonds (functionality, degree) associated with a
+ * certain vertex
+ *
+ * @param vertexId
+ * @return int
+ */
 int Universe::getNrOfBondsOfVertex(const long int vertexId) {
   igraph_vector_t results;
   igraph_vector_init(&results, 1);
@@ -1049,6 +1226,12 @@ int Universe::getNrOfBondsOfVertex(const long int vertexId) {
   return result;
 }
 
+/**
+ * @brief check whether the internal counts are equal to those of the graph
+ *
+ * @throws std::runtime_error if the validation fails
+ * @return true
+ */
 bool Universe::validate() {
   if (this->getNrOfAtoms() != igraph_vcount(&this->graph)) {
     throw std::runtime_error(
@@ -1065,6 +1248,11 @@ bool Universe::validate() {
   return true;
 }
 
+/**
+ * @brief Compute the volume of the underlying box
+ *
+ * @return double
+ */
 double Universe::getVolume() { return this->box.getVolume(); }
 
 const int Universe::getNrOfAtoms() const { return this->NAtoms; }
