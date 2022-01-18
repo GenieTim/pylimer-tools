@@ -1,6 +1,6 @@
 #include "Universe.h"
 #include "../utils/GraphUtils.h"
-#include "../utils/StringUtil.h"
+#include "../utils/StringUtils.h"
 #include "../utils/VectorUtils.h"
 #include "Box.h"
 
@@ -56,19 +56,23 @@ Universe::Universe(const double Lx, const double Ly, const double Lz) {
 // 1. destructor (to destroy the graph)
 Universe::~Universe() {
   // in addition to basic fields being deleted, we need to clean up the graph
+  // as is done in parent
   igraph_destroy(&this->graph);
 };
 
 // 2. copy constructor
 Universe::Universe(const Universe &src) {
-  igraph_copy(&this->graph, &src.graph);
   this->timestep = src.timestep;
   this->NAtoms = src.NAtoms;
   this->NBonds = src.NBonds;
+  this->angleFrom = src.angleFrom;
+  this->angleTo = src.angleTo;
+  this->angleVia = src.angleVia;
   // using copy assignement operators ourselfes
   this->box = src.box;
   this->atomIdToVectorIdx = src.atomIdToVectorIdx;
   this->weightPerType = src.weightPerType;
+  igraph_copy(&this->graph, &src.graph);
 };
 
 // 3. copy assignment operator
@@ -76,6 +80,9 @@ Universe &Universe::operator=(Universe src) {
   std::swap(this->timestep, src.timestep);
   std::swap(this->NAtoms, src.NAtoms);
   std::swap(this->NBonds, src.NBonds);
+  std::swap(this->angleFrom, src.angleFrom);
+  std::swap(this->angleTo, src.angleTo);
+  std::swap(this->angleVia, src.angleVia);
   std::swap(this->box, src.box);
   std::swap(this->graph, src.graph);
   std::swap(this->atomIdToVectorIdx, src.atomIdToVectorIdx);
@@ -160,6 +167,19 @@ void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from,
                         std::vector<long int> to, std::vector<int> bondTypes) {
 
   this->addBonds(NNewBonds, from, to, bondTypes, false);
+}
+
+void Universe::addAngles(std::vector<long int> from, std::vector<long int> to,
+                         std::vector<int> via) {
+  if (from.size() != to.size() || from.size() != via.size()) {
+    throw std::invalid_argument("All angle inputs must have the same size.");
+  }
+
+  this->angleFrom.insert(std::end(this->angleFrom), std::begin(from),
+                         std::end(from));
+  this->angleTo.insert(std::end(this->angleTo), std::begin(to), std::end(to));
+  this->angleVia.insert(std::end(this->angleVia), std::begin(via),
+                        std::end(via));
 }
 
 void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from,
@@ -566,7 +586,7 @@ Universe::findLoops(const int crosslinkerType, const int maxLength) {
         currentFunctionality = 0;
         currentPathKey = 0;
       } else {
-        Atom newAtom = this->getAtomByIdx(currentVal);
+        Atom newAtom = this->getAtomByVertexIdx(currentVal);
         currentPathKey = currentPathKey xor currentVal; // compute hash
         currentPath.push_back(newAtom);
         if (newAtom.getType() == crosslinkerType) {
@@ -638,7 +658,7 @@ bool Universe::hasInfiniteStrand(const int crosslinkerType,
         nrOfTraversalsY = 0;
         nrOfTraversalsZ = 0;
       } else {
-        Atom newAtom = this->getAtomByIdx(currentVal);
+        Atom newAtom = this->getAtomByVertexIdx(currentVal);
         if (!currentPath.empty()) {
           Atom lastAtom = currentPath.back();
           double dx = newAtom.getX() - lastAtom.getX();
@@ -699,6 +719,46 @@ std::map<int, int> Universe::determineFunctionalityPerType() {
   return result;
 }
 
+std::map<int, double> Universe::determineEffectiveFunctionalityPerType() {
+  std::map<int, double> result;
+  igraph_vector_t degrees;
+  if (igraph_vector_init(&degrees, 0)) {
+    throw std::runtime_error("Failed to instantiate result vector.");
+  }
+  igraph_vs_t allVertexIds;
+  igraph_vs_all(&allVertexIds);
+  // complexity: O(|v|*d)
+  if (igraph_degree(&this->graph, &degrees, allVertexIds, IGRAPH_ALL, false)) {
+    throw std::runtime_error("Failed to determine degree of vertices");
+  }
+
+  std::vector<int> types = this->getPropertyValues<int>("type");
+  std::set<int> uniqueTypes(types.begin(), types.end());
+  // make sure the keys are (re)set, for every type
+  for (int type : uniqueTypes) {
+    result[type] = 0;
+  }
+
+  // complexity: O(|V|)
+  igraph_vit_t vit;
+  igraph_vit_create(&graph, allVertexIds, &vit);
+  while (!IGRAPH_VIT_END(vit)) {
+    long int vertexId = (long int)IGRAPH_VIT_GET(vit);
+    result[types[vertexId]] += igraph_vector_e(&degrees, vertexId);
+    IGRAPH_VIT_NEXT(vit);
+  }
+  igraph_vit_destroy(&vit);
+  igraph_vs_destroy(&allVertexIds);
+  igraph_vector_destroy(&degrees);
+
+  std::map<int, int> typeCounts = this->countAtomTypes();
+  for (const std::pair<int, int> &typePair : typeCounts) {
+    result[typePair.first] /= typePair.second;
+  }
+
+  return result;
+}
+
 /*
 Compute the weight fractions of each atom type in the network.
 
@@ -736,7 +796,7 @@ long int Universe::getAtomIdByIdx(const int vertexId) const {
   return VAN(&this->graph, "id", vertexId);
 }
 
-long int Universe::getIdxByAtomId(const int atomId) const { 
+long int Universe::getIdxByAtomId(const int atomId) const {
   if (!this->atomIdToVectorIdx.contains(atomId)) {
     throw std::invalid_argument("Atom with this id (" + std::to_string(atomId) +
                                 ") does not exist");
@@ -745,30 +805,7 @@ long int Universe::getIdxByAtomId(const int atomId) const {
 }
 
 Atom Universe::getAtom(const int atomId) const {
-  return this->getAtomByIdx(this->getIdxByAtomId(atomId));
-}
-
-Atom Universe::getAtomByIdx(const int vertexIdx) const {
-  if (vertexIdx > this->getNrOfAtoms()) {
-    throw std::invalid_argument("Atom with this vertex id (" +
-                                std::to_string(vertexIdx) + ") does not exist");
-  }
-  return Atom(
-      VAN(&this->graph, "id", vertexIdx), VAN(&this->graph, "type", vertexIdx),
-      VAN(&this->graph, "x", vertexIdx), VAN(&this->graph, "y", vertexIdx),
-      VAN(&this->graph, "z", vertexIdx), VAN(&this->graph, "nx", vertexIdx),
-      VAN(&this->graph, "ny", vertexIdx), VAN(&this->graph, "nz", vertexIdx));
-}
-
-std::vector<Atom> Universe::getAtomsWithType(const int atomType) {
-  std::vector<Atom> atoms;
-  auto indicesWithType = this->getIndicesOfType(atomType);
-  atoms.reserve(indicesWithType.size());
-  for (auto idx : indicesWithType) {
-    atoms.push_back(this->getAtomByIdx(idx));
-  }
-
-  return atoms;
+  return this->getAtomByVertexIdx(this->getIdxByAtomId(atomId));
 }
 
 std::vector<Atom> Universe::getAtoms() {
@@ -778,14 +815,29 @@ std::vector<Atom> Universe::getAtoms() {
   igraph_vit_create(&graph, igraph_vss_all(), &vit);
   while (!IGRAPH_VIT_END(vit)) {
     long int vertexId = (long int)IGRAPH_VIT_GET(vit);
-    atoms.push_back(this->getAtomByIdx(vertexId));
+    atoms.push_back(this->getAtomByVertexIdx(vertexId));
     IGRAPH_VIT_NEXT(vit);
   }
   igraph_vit_destroy(&vit);
   return atoms;
 }
 
-std::map<std::string, std::vector<long int>> Universe::getBonds() {
+std::map<std::string, std::vector<long int>> Universe::getAngles() const {
+  std::map<std::string, std::vector<long int>> results;
+  results.insert_or_assign("angle_from", this->angleFrom);
+  results.insert_or_assign("angle_to", this->angleTo);
+  results.insert_or_assign("angle_via", this->angleVia);
+
+  return results;
+}
+
+const int Universe::getNrOfAngles() const {
+  assert(this->angleFrom.size() == this->angleTo.size());
+  assert(this->angleFrom.size() == this->angleVia.size());
+  return this->angleFrom.size();
+}
+
+std::map<std::string, std::vector<long int>> Universe::getBonds() const {
   igraph_vector_t allEdges;
   igraph_vector_init(&allEdges, this->getNrOfBonds());
   if (igraph_edges(&this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID),
@@ -849,17 +901,6 @@ long int Universe::findVertexIdForProperty(const char *propertyName,
   }
   igraph_vector_destroy(&allValues);
   return -1;
-}
-
-template <typename OUT>
-std::vector<OUT> Universe::getPropertyValues(const char *propertyName) {
-  igraph_vector_t allValues;
-  igraph_vector_init(&allValues, this->getNrOfAtoms());
-  VANV(&this->graph, propertyName, &allValues);
-  std::vector<OUT> results;
-  pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
-  igraph_vector_destroy(&allValues);
-  return results;
 }
 
 std::vector<double> Universe::computeDxs(const std::vector<int> bondFrom,

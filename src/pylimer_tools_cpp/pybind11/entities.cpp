@@ -140,7 +140,7 @@ void init_pylimer_bound_entities(py::module_ &m) {
       .def(
           "getAtomTypes", &Molecule::getAtomTypes,
           "Query all types (each one for each atom) ordered by atom vertex id.")
-      .def("getAtomForVertexId", &Molecule::getAtomForVertexId,
+      .def("getAtomForVertexId", &Molecule::getAtomByVertexIdx,
            "Get an atom for a specific vertex.")
       .def("getAtoms", &Molecule::getAtoms,
            "Returns all atom objects enclosed in this molecule.")
@@ -211,6 +211,9 @@ void init_pylimer_bound_entities(py::module_ &m) {
            "Add bonds to the underlying atoms, edges to the underlying graph. "
            "If the connected atoms are not found, the bonds are silently "
            "skipped.")
+      .def("addAngles", &Universe::addAngles,
+           "Add angles to the Universe. No relation to the underlying graph, "
+           "just a method to preserve read & write capabilities")
       .def("setMasses", &Universe::setMasses, "Set the mass per type of atom.")
       .def("setTimestep", &Universe::setTimestep,
            "Set the timestep when this Universe was captured.")
@@ -245,10 +248,12 @@ void init_pylimer_bound_entities(py::module_ &m) {
       .def("getAtomTypes", &Universe::getAtomTypes,
            "Get all types (each one for each atom) ordered by atom vertex id.")
       .def("getAtom", &Universe::getAtom, "Find an atom by its ID.")
+      .def("getAtomForVertexId", &Molecule::getAtomByVertexIdx,
+           "Get an atom for a specific vertex.")
       .def("getAtoms", &Universe::getAtoms, "Get all atoms.")
       .def("getAtomsWithType", &Universe::getAtomsWithType,
            "Find many atom by their type.")
-      .def("getAtomByVertexIdx", &Universe::getAtomByIdx,
+      .def("getAtomByVertexIdx", &Universe::getAtomByVertexIdx,
            "Find an atom by the ID of the vertex of the underlying graph.")
       .def("getAtomIdByIdx", &Universe::getAtomIdByIdx,
            "Get the id of the atom by the vertex id of the underlying graph.")
@@ -261,6 +266,14 @@ void init_pylimer_bound_entities(py::module_ &m) {
             **NOTE**: the integer values returned refer to the vertex ids, not the atom ids.
             Use `Universe::getAtomIdByIdx` to translate them to atom ids.
             )pbdoc")
+      .def("getAngles", &Universe::getAngles,
+           R"pbdoc(Get all angles added to this network.
+
+           Returns a dict with three properties: 'bond_from', 'bond_to' and 'bond_type'.
+
+           **NOTE**: the integer values returned refer to the the atom ids, not the vertex ids.
+            Use `Universe::getIdxByAtomId` to translate them to vertex ids.
+           )pbdoc")
       .def("getBox", &Universe::getBox,
            "Get the underlying bounding box object.")
       .def("getMasses", &Universe::getMasses,
@@ -271,6 +284,8 @@ void init_pylimer_bound_entities(py::module_ &m) {
            "Query the number of atoms in this universe.")
       .def("getNrOfBonds", &Universe::getNrOfBonds,
            "Query the number of bonds associated with this universe.")
+      .def("getNrOfAngles", &Universe::getNrOfAngles,
+           "Query the number of angles that have been added to this universe.")
       .def("getTimestep", &Universe::getTimestep,
            "Query the timestep when this universe was captured.")
       .def("getNrOfBondsOfAtom", &Universe::getNrOfBondsOfAtom,

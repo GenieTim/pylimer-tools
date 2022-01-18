@@ -135,7 +135,7 @@ def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", text
     def csvFileToDf(filePath) -> pd.DataFrame:
         try:
             tmpDf = pd.read_csv(filePath, low_memory=False,
-                              , on_bad_lines='skip', quoting=csv.QUOTE_NONE)
+                               on_bad_lines='skip', quoting=csv.QUOTE_NONE)
             try:
                 os.remove(filePath)
             except Exception as e:

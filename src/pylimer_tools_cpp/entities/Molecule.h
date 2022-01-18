@@ -4,6 +4,7 @@
 extern "C" {
 #include <igraph/igraph.h>
 }
+#include "AtomGraphParent.h"
 #include "Atom.h"
 #include "Box.h"
 #include <map>
@@ -22,7 +23,7 @@ enum MoleculeType {
   FREE_CHAIN
 };
 
-class Molecule {
+class Molecule : public AtomGraphParent {
 public:
   Molecule(Box *parent, const igraph_t *graph, MoleculeType type,
            std::map<int, double> weightPerType);
@@ -37,17 +38,11 @@ public:
   // getters
   int getLength() const;
   MoleculeType getType();
-  Atom getAtomForVertexId(long int vertexIdx) const;
   std::vector<Atom> getAtoms();
-  std::vector<Atom> getAtomsWithType(const int atomType);
-  std::vector<Atom> getAtomsOfDegree(const int degree);
-  std::vector<Atom> getAtomsConnectedTo(const long int vertexIdx);
   int getNrOfBonds() const;
   int getNrOfAtoms() const;
   Box *getBox();
   std::string getKey();
-  template <typename OUT>
-  std::vector<OUT> getPropertyValues(const char *propertyName);
   std::vector<int> getAtomTypes() {
     return this->getPropertyValues<int>("type");
   }
@@ -62,13 +57,12 @@ public:
 
   // operators
   Atom operator[](size_t index) const {
-    return this->getAtomForVertexId(index);
+    return this->getAtomByVertexIdx(index);
   }
 
 private:
   Box *parent;
   MoleculeType typeOfThisMolecule;
-  igraph_t graph;
   int size;
   std::string key;
   std::map<int, double> weightPerType;

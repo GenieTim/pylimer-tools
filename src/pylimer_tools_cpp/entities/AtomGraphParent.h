@@ -1,0 +1,182 @@
+#ifndef ATOMGRAPHPARENT_H
+#define ATOMGRAPHPARENT_H
+
+extern "C" {
+#include <igraph/igraph.h>
+}
+#include "../utils/GraphUtils.h"
+#include "../utils/StringUtils.h"
+#include "Atom.h"
+#include <algorithm>
+#include <map>
+#include <unordered_map>
+#include <vector>
+
+namespace pylimer_tools {
+namespace entities {
+// abstract
+class AtomGraphParent {
+public:
+  AtomGraphParent() {}
+  // rule of three:
+  // 1. destructor (to destroy the graph)
+  virtual ~AtomGraphParent() {
+    // in addition to basic fields being deleted, we need to clean up the graph
+    igraph_destroy(&this->graph);
+  }
+  // 2. copy constructor
+  // AtomGraphParent(const AtomGraphParent &src) {
+  //   igraph_copy(&this->graph, &src.graph);
+  // };
+  // 3. copy assignment operator
+  virtual AtomGraphParent &operator=(AtomGraphParent src) {
+    std::swap(this->graph, src.graph);
+    return *this;
+  };
+
+  /**
+   * @brief Get the Atoms Connected To an Atom specified by its vertex Id
+   *
+   * @param vertexIdx the index of the vertex in the graph for which to get the
+   * connected atoms
+   * @return std::vector<Atom>
+   */
+  std::vector<Atom> getAtomsConnectedTo(const long int vertexIdx) {
+    igraph_vs_t adjVs;
+    if (igraph_vs_adj(&adjVs, vertexIdx, IGRAPH_ALL)) {
+      throw std::runtime_error("Failed to find adjacent vertices of vertex.");
+    }
+    igraph_vit_t vit;
+    igraph_vit_create(&this->graph, adjVs, &vit);
+    std::vector<Atom> results;
+    results.reserve(IGRAPH_VIT_SIZE(vit));
+    while (!IGRAPH_VIT_END(vit)) {
+      long int vertexId = (long int)IGRAPH_VIT_GET(vit);
+      IGRAPH_VIT_NEXT(vit);
+    }
+    igraph_vs_destroy(&adjVs);
+    igraph_vit_destroy(&vit);
+
+    return results;
+  };
+
+  /**
+   * @brief Get the number Of Atoms
+   *
+   * @return int
+   */
+  int getNrOfAtoms() const { return igraph_vcount(&this->graph); }
+
+  /**
+   * @brief Get the Nr Of Bonds
+   *
+   * @return int
+   */
+  int getNrOfBonds() const { return igraph_ecount(&this->graph); }
+
+  /**
+   * @brief Get all atoms of a certain type
+   *
+   * @param atomType the type to query for
+   * @return std::vector<Atom>
+   */
+  std::vector<Atom> getAtomsWithType(const int atomType) {
+    std::vector<Atom> results;
+    const std::vector<int> types = this->getPropertyValues<int>("type");
+    size_t nrOfTypes = types.size();
+
+    // #pragma omp declare reduction (merge : std::vector<Atom> :
+    // omp_out.insert(omp_out.end(), omp_in.begin(), omp_in.end())) #pragma omp
+    // parallel for reduction(merge: results)
+    for (size_t i = 0; i < nrOfTypes; ++i) {
+      if (types[i] == atomType) {
+        results.push_back(this->getAtomByVertexIdx(i));
+      }
+    }
+
+    return results;
+  };
+
+  /**
+   * @brief Get an atom by its vertex id
+   *
+   * @param vertexIdx the id of the vertex on the graph
+   * @return Atom
+   */
+  Atom getAtomByVertexIdx(const long int vertexIdx) const {
+    if (vertexIdx > this->getNrOfAtoms()) {
+      throw std::invalid_argument("Atom with this vertex id (" +
+                                  std::to_string(vertexIdx) +
+                                  ") does not exist");
+    }
+    return Atom(
+        VAN(&this->graph, "id", vertexIdx),
+        VAN(&this->graph, "type", vertexIdx), VAN(&this->graph, "x", vertexIdx),
+        VAN(&this->graph, "y", vertexIdx), VAN(&this->graph, "z", vertexIdx),
+        VAN(&this->graph, "nx", vertexIdx), VAN(&this->graph, "ny", vertexIdx),
+        VAN(&this->graph, "nz", vertexIdx));
+  }
+
+  /**
+   * @brief Get the value of a property (attribute) of each and every vertex
+   *
+   * @tparam OUT
+   * @param propertyName the name of the property to get
+   * @return std::vector<OUT>
+   */
+  template <typename OUT>
+  std::vector<OUT> getPropertyValues(const char *propertyName) {
+    std::vector<OUT> results;
+    if (this->getNrOfAtoms() == 0) {
+      return results;
+    }
+    igraph_vector_t allValues;
+    igraph_vector_init(&allValues, this->getNrOfAtoms());
+    if (igraph_cattribute_VANV(&this->graph, propertyName, igraph_vss_all(),
+                               &allValues)) {
+      throw std::runtime_error("Failed to query properties of molecule.");
+    }
+    pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
+    igraph_vector_destroy(&allValues);
+    return results;
+  }
+
+  /**
+   * @brief Get all atoms with a certain number of bonds
+   *
+   * @param degree the number of bonds to search for
+   * @return std::vector<Atom>
+   */
+  std::vector<Atom> getAtomsOfDegree(const int degree) {
+    std::vector<long int> endNodeIndices =
+        pylimer_tools::utils::getVerticesWithDegree(&this->graph, degree);
+    igraph_vector_t endNodeSelectorVector;
+    igraph_vector_init(&endNodeSelectorVector, endNodeIndices.size());
+    pylimer_tools::utils::StdVectorToIgraphVectorT(endNodeIndices,
+                                                   &endNodeSelectorVector);
+    igraph_vit_t vit;
+    igraph_vit_create(&this->graph, igraph_vss_vector(&endNodeSelectorVector),
+                      &vit);
+
+    std::vector<Atom> results;
+    results.reserve(IGRAPH_VIT_SIZE(vit));
+    while (!IGRAPH_VIT_END(vit)) {
+      long int vertexId1 = (long int)IGRAPH_VIT_GET(vit);
+      Atom atom = this->getAtomByVertexIdx(vertexId1);
+      results.push_back(atom);
+      IGRAPH_VIT_NEXT(vit);
+    }
+
+    igraph_vector_destroy(&endNodeSelectorVector);
+    igraph_vit_destroy(&vit);
+    return results;
+  }
+
+protected:
+  igraph_t graph;
+};
+
+} // namespace entities
+} // namespace pylimer_tools
+
+#endif
