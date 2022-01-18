@@ -39,8 +39,8 @@ public:
   void addBonds(const size_t NNewBonds, std::vector<long int> from,
                 std::vector<long int> to, std::vector<int> bondTypes,
                 const bool ignoreNonExistentAtoms);
-  void addAngles(std::vector<long int> from, std::vector<long int> to,
-                 std::vector<int> via);
+  void addAngles(std::vector<long int> from,
+                 std::vector<int> via, std::vector<long int> to);
   void setMasses(std::map<int, double> weightPerType);
   void setBox(Box box);
   void setTimestep(long int timestep) { this->timestep = timestep; };
@@ -79,6 +79,7 @@ public:
   Atom operator[](size_t index) const { return this->getAtom(index); }
 
   // computations
+  std::map<std::string, std::vector<long int>> detectAngles() const;
   std::map<int, int> determineFunctionalityPerType();
   std::map<int, double> determineEffectiveFunctionalityPerType();
   std::map<int, double> computeWeightFractions();

@@ -169,8 +169,8 @@ void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from,
   this->addBonds(NNewBonds, from, to, bondTypes, false);
 }
 
-void Universe::addAngles(std::vector<long int> from, std::vector<long int> to,
-                         std::vector<int> via) {
+void Universe::addAngles(std::vector<long int> from, std::vector<long int> via,
+                         std::vector<int> to) {
   if (from.size() != to.size() || from.size() != via.size()) {
     throw std::invalid_argument("All angle inputs must have the same size.");
   }
@@ -827,6 +827,52 @@ std::map<std::string, std::vector<long int>> Universe::getAngles() const {
   results.insert_or_assign("angle_from", this->angleFrom);
   results.insert_or_assign("angle_to", this->angleTo);
   results.insert_or_assign("angle_via", this->angleVia);
+
+  return results;
+}
+
+std::map<std::string, std::vector<long int>> Universe::detectAngles() const {
+  std::set<int> anglesFound;
+  std::vector<long int> angleFromFound;
+  std::vector<long int> angleToFound;
+  std::vector<long int> angleViaFound;
+  // query all atoms
+  igraph_vit_t vit;
+  igraph_vit_create(&this->graph, igraph_vss_all(), &vit);
+  while (!IGRAPH_VIT_END(vit)) {
+    long int vertexIdx = (long int)IGRAPH_VIT_GET(vit);
+    // find the connected atoms
+    std::vector<long int> connections =
+        this->getVertexIdxsConnectedTo(vertexIdx);
+    // with 1 or 0 connections, there is no angle
+    if (connections.size() < 2) {
+      continue;
+    }
+    // loop the connections to find angles
+    for (size_t connectionI = 0; connectionI < connections.size();
+         ++connectionI) {
+      for (size_t connectionJ = connectionI + 1;
+           connectionJ < connections.size(); ++connectionJ) {
+        int angleKey =
+            vertexIdx xor connections[connectionI] xor connections[connectionJ];
+        if (!anglesFound.contains(angleKey)) {
+          angleFromFound.push_back(
+              this->getAtomIdByIdx(connections[connectionI]));
+          angleViaFound.push_back(this->getAtomIdByIdx(vertexIdx));
+          angleToFound.push_back(
+              this->getAtomIdByIdx(connections[connectionJ]));
+          anglesFound.insert(angleKey);
+        }
+      }
+    }
+    IGRAPH_VIT_NEXT(vit);
+  }
+  igraph_vit_destroy(&vit);
+
+  std::map<std::string, std::vector<long int>> results;
+  results.insert_or_assign("angle_from", angleFromFound);
+  results.insert_or_assign("angle_to", angleToFound);
+  results.insert_or_assign("angle_via", angleViaFound);
 
   return results;
 }

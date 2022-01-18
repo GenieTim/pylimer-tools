@@ -269,7 +269,7 @@ void init_pylimer_bound_entities(py::module_ &m) {
       .def("getAngles", &Universe::getAngles,
            R"pbdoc(Get all angles added to this network.
 
-           Returns a dict with three properties: 'bond_from', 'bond_to' and 'bond_type'.
+           Returns a dict with three properties: 'angle_from', 'angle_via' and 'angle_to'.
 
            **NOTE**: the integer values returned refer to the the atom ids, not the vertex ids.
             Use `Universe::getIdxByAtomId` to translate them to vertex ids.
@@ -295,9 +295,14 @@ void init_pylimer_bound_entities(py::module_ &m) {
            "Count the number of immediate neighbours of an atom, specified by "
            "its vertex id.")
       // computations
-      .def("hasInfiniteStrand", &Universe::hasInfiniteStrand,
-           "Checks whether there is a strand (with crosslinker) in the "
-           "universe that loops through periodic images without coming back.")
+      .def("detectAngles", &Universe::detectAngles, "Returns just as #getAngles, but all angles that are found in the network.")
+      .def(
+          "hasInfiniteStrand", &Universe::hasInfiniteStrand,
+          R"pbdoc(Checks whether there is a strand (with crosslinker) in the universe that loops through periodic images without coming back.
+           
+            **NOTE**: there are exponentially many paths between two crosslinkers of a network,
+            and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
+           )pbdoc")
       .def("determineFunctionalityPerType",
            &Universe::determineFunctionalityPerType,
            "Find the maximum functionality of each atom type in the network.")
