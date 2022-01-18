@@ -3,7 +3,7 @@
 
 #include "../entities/Atom.h"
 #include "../entities/Universe.h"
-#include "StringUtil.h"
+#include "StringUtils.h"
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
@@ -31,7 +31,8 @@ public:
   }
   void writeToFile(const std::string filePath) {
     std::ofstream file;
-    int uniqueAtomTypes = this->universe.countAtomTypes().size();
+    int uniqueAtomTypes = std::max(this->universe.countAtomTypes().size(),
+                                   this->universe.getMasses().size());
 
     file.open(filePath);
 
@@ -39,7 +40,8 @@ public:
     file << "LAMMPS file generated using pylimer_tools.\n\n";
     file << "\t " << this->universe.getNrOfAtoms() << " atoms\n";
     file << "\t " << this->universe.getNrOfBonds() << " bonds\n";
-    file << "\t " << 0 << " angles\n"; // TODO: support angles
+    file << "\t " << (this->includeAngles ? this->universe.getNrOfAngles() : 0)
+         << " angles\n";
     file << "\t " << 0 << " dihedrals\n";
     file << "\t " << 0 << " impropers\n";
     file << "\n";
@@ -70,7 +72,7 @@ public:
     // TODO: support molecule idxs
     int moleculeIdx = 0;
     for (int i = 0; i < this->universe.getNrOfAtoms(); ++i) {
-      pylimer_tools::entities::Atom atom = this->universe.getAtomByIdx(i);
+      pylimer_tools::entities::Atom atom = this->universe.getAtomByVertexIdx(i);
       file << "\t" << atom.getId() << "\t" << moleculeIdx << "\t"
            << atom.getType() << "\t" << atom.getX() << "\t" << atom.getY()
            << "\t" << atom.getZ() << "\t" << atom.getNX() << "\t"
@@ -90,6 +92,21 @@ public:
       file << "\t" << i << "\t" << bondType << "\t"
            << (this->universe.getAtomIdByIdx(bonds["bond_from"][i])) << "\t"
            << (this->universe.getAtomIdByIdx(bonds["bond_to"][i])) << "\n";
+    }
+    file << "\n";
+
+    // write angles
+    if (this->includeAngles && this->universe.getNrOfAngles() > 0) {
+      file << "Angles\n\n";
+      std::map<std::string, std::vector<long int>> angles =
+          this->universe.getAngles();
+      for (int i = 0; i < this->universe.getNrOfAngles(); ++i) {
+        int angleType = 1; // TODO: support angle types?
+        file << "\t" << i << "\t" << angleType << "\t"
+             << (angles["angle_from"][i]) << "\t" << (angles["angle_via"][i])
+             << "\t" << (angles["angle_to"][i]) << "\n";
+      }
+      file << "\n";
     }
 
     file.close();

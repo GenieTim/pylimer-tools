@@ -1,7 +1,7 @@
 #include "DumpFileParser.h"
 #include "../entities/Universe.h"
 #include "../entities/UniverseSequence.h"
-#include "StringUtil.h"
+#include "StringUtils.h"
 #include <algorithm>
 #include <any>
 #include <cctype>
@@ -50,16 +50,17 @@ void DumpFileParser::startReading(const std::string filePath) {
   // Assemble CSV data for all keys
   this->newGroupKey = line; // new group key: key for a new timestep (group)
   this->currentLine = line; // current line
-  this->groupPosMap[0] = this->file.tellg(); // record position of index to jump back at some point
+  this->groupPosMap[0] =
+      this->file.tellg(); // record position of index to jump back at some point
 };
 
 // TODO: implement routine to read a group at any position
 // e.g. by tellg() (https://www.cplusplus.com/reference/istream/istream/tellg/)
-// together with seekg (https://www.cplusplus.com/reference/istream/istream/seekg/)
+// together with seekg
+// (https://www.cplusplus.com/reference/istream/istream/seekg/)
 void DumpFileParser::readGroupByIdx(const int i) {
   // if (this->)
 }
-
 
 /**
  * @brief Read N timesteps

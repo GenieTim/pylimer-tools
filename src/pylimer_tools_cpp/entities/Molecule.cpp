@@ -1,6 +1,6 @@
 #include "Molecule.h"
 #include "../utils/GraphUtils.h"
-#include "../utils/StringUtil.h"
+#include "../utils/StringUtils.h"
 #include "Atom.h"
 extern "C" {
 #include <igraph/igraph.h>
@@ -53,6 +53,7 @@ Molecule::Molecule(Box *parent, const igraph_t *ingraph, MoleculeType type,
 // 1. destructor (to destroy the graph)
 Molecule::~Molecule() {
   // in addition to basic fields being deleted, we need to clean up the graph
+  // as is done in parent
   igraph_destroy(&this->graph);
 };
 // 2. copy constructor
@@ -63,10 +64,10 @@ Molecule::Molecule(const Molecule &src)
 Molecule &Molecule::operator=(Molecule src) {
   std::swap(this->parent, src.parent);
   std::swap(this->typeOfThisMolecule, src.typeOfThisMolecule);
-  std::swap(this->graph, src.graph);
   std::swap(this->size, src.size);
   std::swap(this->key, src.key);
   std::swap(this->weightPerType, src.weightPerType);
+  std::swap(this->graph, src.graph);
 
   return *this;
 };
@@ -92,32 +93,6 @@ double Molecule::computeEndToEndDistance() {
   }
   return distance;
 }
-
-std::vector<Atom> Molecule::getAtomsOfDegree(const int degree) {
-  std::vector<long int> endNodeIndices =
-      pylimer_tools::utils::getVerticesWithDegree(&this->graph, degree);
-  igraph_vector_t endNodeSelectorVector;
-  igraph_vector_init(&endNodeSelectorVector, endNodeIndices.size());
-  pylimer_tools::utils::StdVectorToIgraphVectorT(endNodeIndices,
-                                                 &endNodeSelectorVector);
-  igraph_vit_t vit;
-  igraph_vit_create(&this->graph, igraph_vss_vector(&endNodeSelectorVector),
-                    &vit);
-
-  std::vector<Atom> results;
-  results.reserve(IGRAPH_VIT_SIZE(vit));
-  while (!IGRAPH_VIT_END(vit)) {
-    long int vertexId1 = (long int)IGRAPH_VIT_GET(vit);
-    Atom atom = this->getAtomForVertexId(vertexId1);
-    results.push_back(atom);
-    IGRAPH_VIT_NEXT(vit);
-  }
-
-  igraph_vector_destroy(&endNodeSelectorVector);
-  igraph_vit_destroy(&vit);
-  return results;
-}
-
 /**
  * @brief compute the weight of this molecule
  *
@@ -158,8 +133,8 @@ std::vector<double> Molecule::computeBondLengths() {
     igraph_edge(&this->graph, edgeId, &bondFrom, &bondTo);
     // TODO: this is more intensive than needed
     // check whether the compiler optimizes this or not
-    Atom atom1 = this->getAtomForVertexId(bondFrom);
-    Atom atom2 = this->getAtomForVertexId(bondTo);
+    Atom atom1 = this->getAtomByVertexIdx(bondFrom);
+    Atom atom2 = this->getAtomByVertexIdx(bondTo);
     lengths.push_back(atom1.distanceTo(atom2, box));
     IGRAPH_EIT_NEXT(bondIterator);
   }
@@ -167,26 +142,6 @@ std::vector<double> Molecule::computeBondLengths() {
   igraph_eit_destroy(&bondIterator);
   return lengths;
 }
-
-std::vector<Atom> Molecule::getAtomsConnectedTo(const long int vertexIdx) {
-  igraph_vs_t adjVs;
-  if (igraph_vs_adj(&adjVs, vertexIdx, IGRAPH_ALL)) {
-    throw std::runtime_error("Failed to find adjacent vertices of vertex.");
-  }
-  igraph_vit_t vit;
-  igraph_vit_create(&this->graph, adjVs, &vit);
-  std::vector<Atom> results;
-  results.reserve(IGRAPH_VIT_SIZE(vit));
-  while (!IGRAPH_VIT_END(vit)) {
-    long int vertexId = (long int)IGRAPH_VIT_GET(vit);
-    results.push_back(this->getAtomForVertexId(vertexId));
-    IGRAPH_VIT_NEXT(vit);
-  }
-  igraph_vs_destroy(&adjVs);
-  igraph_vit_destroy(&vit);
-
-  return results;
-};
 
 long int Molecule::getAtomIdByIdx(const int vertexId) const {
   return VAN(&this->graph, "id", vertexId);
@@ -199,24 +154,6 @@ long int Molecule::getIdxByAtomId(const int atomId) const {
   }
   return this->atomIdToVectorIdx.at(atomId);
 };
-
-/**
- * @brief Get an atom by its vertex id
- *
- * @param vertexIdx the id of the vertex on the graph
- * @return Atom
- */
-Atom Molecule::getAtomForVertexId(long int vertexIdx) const {
-  if (vertexIdx > this->getLength()) {
-    throw std::invalid_argument("Atom with this vertex id (" +
-                                std::to_string(vertexIdx) + ") does not exist");
-  }
-  return Atom(
-      VAN(&this->graph, "id", vertexIdx), VAN(&this->graph, "type", vertexIdx),
-      VAN(&this->graph, "x", vertexIdx), VAN(&this->graph, "y", vertexIdx),
-      VAN(&this->graph, "z", vertexIdx), VAN(&this->graph, "nx", vertexIdx),
-      VAN(&this->graph, "ny", vertexIdx), VAN(&this->graph, "nz", vertexIdx));
-}
 
 /**
  * @brief Get the nr of atoms in the molecule
@@ -247,30 +184,6 @@ int Molecule::getNrOfBonds() const { return igraph_ecount(&this->graph); }
 MoleculeType Molecule::getType() { return this->typeOfThisMolecule; };
 
 Box *Molecule::getBox() { return this->parent; }
-
-/**
- * @brief Get the value of a property (attribute) of each and every vertex
- *
- * @tparam OUT
- * @param propertyName the name of the property to get
- * @return std::vector<OUT>
- */
-template <typename OUT>
-std::vector<OUT> Molecule::getPropertyValues(const char *propertyName) {
-  std::vector<OUT> results;
-  if (this->getNrOfAtoms() == 0) {
-    return results;
-  }
-  igraph_vector_t allValues;
-  igraph_vector_init(&allValues, this->getNrOfAtoms());
-  if (igraph_cattribute_VANV(&this->graph, propertyName, igraph_vss_all(),
-                             &allValues)) {
-    throw std::runtime_error("Failed to query properties of molecule.");
-  }
-  pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
-  igraph_vector_destroy(&allValues);
-  return results;
-}
 
 double Molecule::computeRadiusOfGyration() {
   double meanX = 0.0, meanY = 0.0, meanZ = 0.0;
@@ -309,24 +222,7 @@ std::vector<Atom> Molecule::getAtoms() {
   // omp_out.insert(omp_out.end(), omp_in.begin(), omp_in.end())) #pragma omp
   // parallel for reduction(merge: results)
   for (size_t i = 0; i < nrOfAtoms; ++i) {
-    results.push_back(this->getAtomForVertexId(i));
-  }
-
-  return results;
-};
-
-std::vector<Atom> Molecule::getAtomsWithType(const int atomType) {
-  std::vector<Atom> results;
-  const std::vector<int> types = this->getPropertyValues<int>("type");
-  size_t nrOfTypes = types.size();
-
-  // #pragma omp declare reduction (merge : std::vector<Atom> :
-  // omp_out.insert(omp_out.end(), omp_in.begin(), omp_in.end())) #pragma omp
-  // parallel for reduction(merge: results)
-  for (size_t i = 0; i < nrOfTypes; ++i) {
-    if (types[i] == atomType) {
-      results.push_back(this->getAtomForVertexId(i));
-    }
+    results.push_back(this->getAtomByVertexIdx(i));
   }
 
   return results;
