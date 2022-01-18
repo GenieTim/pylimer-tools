@@ -33,6 +33,7 @@ public:
     this->distX = std::uniform_real_distribution<double>(0.0, Lx);
     this->distY = std::uniform_real_distribution<double>(0.0, Ly);
     this->distZ = std::uniform_real_distribution<double>(0.0, Lz);
+    this->box = this->universe.getBox();
   }
   void setSeed(unsigned int seed) { this->rng.seed(seed); };
   void setBeadDistance(double beadDistance) {
@@ -180,6 +181,7 @@ private:
   std::uniform_real_distribution<double> distY;
   std::uniform_real_distribution<double> distZ;
   pylimer_tools::entities::Universe universe;
+  pylimer_tools::entities::Box box;
 
   /**
    * @brief Do a random walk of certain length to add a chain
@@ -266,13 +268,13 @@ private:
     // (accept image mismatches)
     double targetX =
         lastX - this->_getDeltaDistance(to.getX(), lastX,
-                                        this->universe.getBox().getLx());
+                                        this->box.getLx());
     double targetY =
         lastY - this->_getDeltaDistance(to.getY(), lastY,
-                                        this->universe.getBox().getLy());
+                                        this->box.getLy());
     double targetZ =
         lastZ - this->_getDeltaDistance(to.getZ(), lastZ,
-                                        this->universe.getBox().getLz());
+                                        this->box.getLz());
 
     for (int i = 0; i < chainLen; ++i) {
       double dx = targetX - lastX;
@@ -439,7 +441,6 @@ private:
       throw std::invalid_argument("Cannot find a partner in none.");
     }
     double bestDistance = std::numeric_limits<double>::max();
-    pylimer_tools::entities::Box box = this->universe.getBox();
     int bestMatch = 0;
     for (int i = 0; i < possiblePartners.size(); ++i) {
       if (availablePartnerSites[i] < 1) {
@@ -447,7 +448,7 @@ private:
       }
       pylimer_tools::entities::Atom partner = possiblePartners[i];
       double currDist =
-          std::abs(partner.distanceTo(from, &box) - acceptableDistance);
+          std::abs(partner.distanceTo(from, &this->box) - acceptableDistance);
       if (currDist < bestDistance) {
         bestDistance = currDist;
         bestMatch = i;
@@ -459,11 +460,11 @@ private:
   double getDistance(double x1, double y1, double z1, double x2, double y2,
                      double z2) {
     double dx =
-        this->_getDeltaDistance(x1, x2, this->universe.getBox().getLx());
+        this->_getDeltaDistance(x1, x2, this->box.getLx());
     double dy =
-        this->_getDeltaDistance(y1, y2, this->universe.getBox().getLy());
+        this->_getDeltaDistance(y1, y2, this->box.getLy());
     double dz =
-        this->_getDeltaDistance(z1, z2, this->universe.getBox().getLz());
+        this->_getDeltaDistance(z1, z2, this->box.getLz());
     return dx * dx + dy * dy + dz * dz;
   }
 

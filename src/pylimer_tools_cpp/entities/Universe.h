@@ -40,7 +40,7 @@ public:
                 std::vector<long int> to, std::vector<int> bondTypes,
                 const bool ignoreNonExistentAtoms);
   void addAngles(std::vector<long int> from,
-                 std::vector<int> via, std::vector<long int> to);
+                 std::vector<long int> via, std::vector<long int> to);
   void setMasses(std::map<int, double> weightPerType);
   void setBox(Box box);
   void setTimestep(long int timestep) { this->timestep = timestep; };
