@@ -52,6 +52,7 @@ message("Found igraph for tests. Including ${igraph_INCLUDE_DIRS}, linking to ${
 
 add_library(test_sources 
 	OBJECT 
+		pylimer_tools/test_generator.cpp 
 		pylimer_tools/test_universe.cpp 
 		pylimer_tools/test_universesequence.cpp 
 		pylimer_tools/test_molecule.cpp 
