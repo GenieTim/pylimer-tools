@@ -35,15 +35,14 @@ public:
   void addBonds(const size_t NNewBonds, std::vector<long int> from,
                 std::vector<long int> to);
   void addBonds(const size_t NNewBonds, std::vector<long int> from,
-                std::vector<long int> to, std::vector<int> bondTypes);
-  void addBonds(const size_t NNewBonds, std::vector<long int> from,
                 std::vector<long int> to, std::vector<int> bondTypes,
-                const bool ignoreNonExistentAtoms);
+                const bool ignoreNonExistentAtoms = false, const bool simplify = true);
   void addAngles(std::vector<long int> from,
                  std::vector<long int> via, std::vector<long int> to);
   void setMasses(std::map<int, double> weightPerType);
   void setBox(Box box);
   void setTimestep(long int timestep) { this->timestep = timestep; };
+  void simplify();
 
   // getters
   Atom getAtom(const int atomId) const;

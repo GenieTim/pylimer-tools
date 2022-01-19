@@ -164,12 +164,6 @@ void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from,
   this->addBonds(NNewBonds, from, to, std::vector<int>());
 }
 
-void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from,
-                        std::vector<long int> to, std::vector<int> bondTypes) {
-
-  this->addBonds(NNewBonds, from, to, bondTypes, false);
-}
-
 void Universe::addAngles(std::vector<long int> from, std::vector<long int> via,
                          std::vector<long int> to) {
   if (from.size() != to.size() || from.size() != via.size()) {
@@ -185,7 +179,7 @@ void Universe::addAngles(std::vector<long int> from, std::vector<long int> via,
 
 void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from,
                         std::vector<long int> to, std::vector<int> bondTypes,
-                        const bool ignoreNonExistentAtoms) {
+                        const bool ignoreNonExistentAtoms, const bool simplify) {
   if (from.size() != to.size() || from.size() != NNewBonds) {
     throw std::invalid_argument("All bond inputs must have the same size.");
   }
@@ -234,14 +228,22 @@ void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from,
     // }
     // else: too risky to add bond attributes
     // simplify graph
+    // this->NBonds += NNewBonds;
+    if (simplify) {
+      this->simplify();
+    } else {
+    this->NBonds = igraph_ecount(&this->graph);
+    }
+  }
+};
+
+void Universe::simplify() { 
     igraph_attribute_combination_t comb;
     igraph_attribute_combination_init(&comb);
     igraph_simplify(&this->graph, /*multiple=*/1, /*loops=*/1, &comb);
     igraph_attribute_combination_destroy(&comb);
-    // this->NBonds += NNewBonds;
     this->NBonds = igraph_ecount(&this->graph);
-  }
-};
+}
 
 /**
  * @brief Count how many of each atom type there are in the universe
@@ -949,12 +951,13 @@ std::map<std::string, std::vector<long int>> Universe::detectAngles() const {
   igraph_vit_t vit;
   igraph_vit_create(&this->graph, igraph_vss_all(), &vit);
   while (!IGRAPH_VIT_END(vit)) {
-    long int vertexIdx = (long int)IGRAPH_VIT_GET(vit);
+    const long int vertexIdx = (long int)IGRAPH_VIT_GET(vit);
     // find the connected atoms
     std::vector<long int> connections =
         this->getVertexIdxsConnectedTo(vertexIdx);
     // with 1 or 0 connections, there is no angle
     if (connections.size() < 2) {
+    IGRAPH_VIT_NEXT(vit);
       continue;
     }
     // loop the connections to find angles

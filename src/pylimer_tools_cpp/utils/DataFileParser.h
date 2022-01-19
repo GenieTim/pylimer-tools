@@ -37,6 +37,14 @@ public:
   std::vector<long int> getBondFrom() { return this->bondFrom; }
   std::vector<long int> getBondTo() { return this->bondTo; }
 
+  // access angle data
+  int getNrOfAngles() { return this->nAngles; }
+  int getNrOfAngleTypes() { return this->nAngleTypes; }
+  std::vector<int> getAngleTypes() { return this->angleTypes; }
+  std::vector<long int> getAngleFrom() { return this->angleFrom; }
+  std::vector<long int> getAngleVia() { return this->angleVia; }
+  std::vector<long int> getAngleTo() { return this->angleTo; }
+
   // get box info
   double getLx() { return this->Lx; }
   double getLy() { return this->Ly; }
@@ -47,6 +55,7 @@ private:
   void readMass(const std::string line);
   void readAtom(std::string line);
   void readBond(std::string line);
+  void readAngle(std::string line);
   static void skipEmptyLines(std::string &line, std::ifstream &file);
   static void skipLinesToContains(std::string &line, std::ifstream &file,
                                   std::string upTo);
@@ -67,8 +76,10 @@ private:
   // nr of data points to read
   int nAtoms; // number of atoms
   int nBonds;
+  int nAngles;
   int nAtomTypes;
   int nBondTypes;
+  int nAngleTypes;
 
   // box sizes
   double Lx;
@@ -90,6 +101,12 @@ private:
   std::vector<int> bondTypes;
   std::vector<long int> bondFrom;
   std::vector<long int> bondTo;
+
+  std::vector<long int> angleIds;
+  std::vector<int> angleTypes;
+  std::vector<long int> angleFrom;
+  std::vector<long int> angleVia;
+  std::vector<long int> angleTo;
 };
 } // namespace utils
 } // namespace pylimer_tools

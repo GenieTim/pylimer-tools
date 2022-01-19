@@ -39,7 +39,10 @@ public:
   void setBeadDistance(double beadDistance) {
     this->beadDistance = beadDistance;
   };
-  pylimer_tools::entities::Universe getUniverse() { return this->universe; };
+  pylimer_tools::entities::Universe getUniverse() {
+    this->universe.simplify();
+    return this->universe;
+  };
 
   void addCrosslinkers(int nrOfCrosslinkers, int crosslinkerAtomType = 2) {
     if (this->crosslinkerType != crosslinkerAtomType) {
@@ -53,18 +56,23 @@ public:
   };
 
   /**
-   * @brief Randomly distribute 
-   * 
-   * @param nrOfSolventChains 
-   * @param chainLength 
-   * @param solventAtomType 
+   * @brief Randomly distribute
+   *
+   * @param nrOfSolventChains
+   * @param chainLength
+   * @param solventAtomType
    */
   void addSolventChains(int nrOfSolventChains, int chainLength,
                         int solventAtomType = 3) {
+    // std::cout << "Adding " << nrOfSolventChains << " atoms for solvent
+    // chains."
+    //           << std::endl;
     std::vector<long int> startAtoms =
         this->addAtomsWithType(nrOfSolventChains, solventAtomType);
 
     for (long int atomId : startAtoms) {
+      // std::cout << "Adding solvent chain with length " << chainLength
+      //           << std::endl;
       pylimer_tools::entities::Atom startAtom =
           this->universe.getAtomByVertexIdx(
               this->universe.getIdxByAtomId(atomId));
@@ -74,11 +82,13 @@ public:
 
   /**
    * @brief Add strands in between the cross-linkers, link them as appropriate
-   * 
+   *
    * @param nrOfStrands the nr. of Strands to add
    * @param beadsPerChains the nr. of beads per strand (excl. cross-linkers)
-   * @param crosslinkerConversion "p", the target conversion of the cross-linkers
-   * @param crosslinkerFunctionality the functionality of the cross-linker beads to add
+   * @param crosslinkerConversion "p", the target conversion of the
+   * cross-linkers
+   * @param crosslinkerFunctionality the functionality of the cross-linker beads
+   * to add
    * @param strandAtomType the type of the strand atoms
    */
   void addAndLinkStrands(int nrOfStrands, std::vector<int> beadsPerChains,
@@ -125,7 +135,7 @@ public:
             linkerProbabilityDist(this->rng) < crosslinkerConversion;
         if (isActiveSite) {
           bool isDanglingStrand =
-              linkerProbabilityDist(this->rng) < crosslinkerConversion;
+              linkerProbabilityDist(this->rng) > crosslinkerConversion;
           if (isDanglingStrand) {
             // decision is: dangling
             this->addRandomWalkChainFrom(crosslinkers[i],
@@ -192,6 +202,7 @@ private:
    */
   void addRandomWalkChainFrom(pylimer_tools::entities::Atom from, int chainLen,
                               int atomType = 1) {
+    // std::cout << "Doing random walk from" << std::endl;
     std::vector<double> xs;
     xs.reserve(chainLen);
     std::vector<double> ys;
@@ -235,7 +246,9 @@ private:
     bondsFrom.insert(bondsFrom.begin(), from.getId());
     bondsFrom.pop_back();
     // finally, add the bonds
-    this->universe.addBonds(chainLen, bondsFrom, bondsTo, bondTypes);
+    this->universe.addBonds(chainLen, bondsFrom, bondsTo, bondTypes, false,
+                            false);
+    // std::cout << "Done random walk from" << std::endl;
   }
 
   /**
@@ -250,6 +263,7 @@ private:
   void addRandomWalkChainFromTo(pylimer_tools::entities::Atom from,
                                 pylimer_tools::entities::Atom to, int chainLen,
                                 int atomType = 1) {
+    // std::cout << "Doing random walk from/to" << std::endl;
     std::vector<double> xs;
     xs.reserve(chainLen);
     std::vector<double> ys;
@@ -267,14 +281,11 @@ private:
     // support crossing of boundary conditions: find nearest image as target
     // (accept image mismatches)
     double targetX =
-        lastX - this->_getDeltaDistance(to.getX(), lastX,
-                                        this->box.getLx());
+        lastX - this->_getDeltaDistance(to.getX(), lastX, this->box.getLx());
     double targetY =
-        lastY - this->_getDeltaDistance(to.getY(), lastY,
-                                        this->box.getLy());
+        lastY - this->_getDeltaDistance(to.getY(), lastY, this->box.getLy());
     double targetZ =
-        lastZ - this->_getDeltaDistance(to.getZ(), lastZ,
-                                        this->box.getLz());
+        lastZ - this->_getDeltaDistance(to.getZ(), lastZ, this->box.getLz());
 
     for (int i = 0; i < chainLen; ++i) {
       double dx = targetX - lastX;
@@ -324,7 +335,9 @@ private:
     // and the last bond further to the end of the chain
     bondsTo.insert(bondsTo.end(), to.getId());
     // finally, actually add the bonds
-    this->universe.addBonds(chainLen, bondsFrom, bondsTo, bondTypes);
+    this->universe.addBonds(chainLen + 1, bondsFrom, bondsTo, bondTypes, false,
+                            false);
+    // std::cout << "Done random walk from/to" << std::endl;
   }
 
   /**
@@ -373,6 +386,48 @@ private:
    * @return Positions
    */
   Positions generateRandomPositions(int nSamples) {
+    if (nSamples < 1000) {
+      return this->generateRandomBluePositions(nSamples);
+    } else {
+      return this->generateRandomWhitePositions(nSamples);
+    }
+  }
+
+  /**
+   * @brief Generate positions randomly (can lead to clustering)
+   *
+   * @param nSamples the number of positions to generate
+   * @return Positions
+   */
+  Positions generateRandomWhitePositions(int nSamples) {
+    std::vector<double> xs;
+    std::vector<double> ys;
+    std::vector<double> zs;
+
+    for (size_t i = 0; i < nSamples; ++i) {
+      double x = this->distX(this->rng);
+      double y = this->distY(this->rng);
+      double z = this->distZ(this->rng);
+
+      xs.push_back(x);
+      ys.push_back(y);
+      zs.push_back(z);
+    }
+
+    Positions result;
+    result.x = xs;
+    result.y = ys;
+    result.z = zs;
+    return result;
+  }
+
+  /**
+   * @brief Generate positions randomly according to blue noise type sampling
+   *
+   * @param nSamples the number of positions to generate
+   * @return Positions
+   */
+  Positions generateRandomBluePositions(int nSamples) {
 
     std::vector<double> xs;
     std::vector<double> ys;
@@ -383,7 +438,8 @@ private:
     // https://github.com/Atrix256/RandomCode/blob/master/Mitchell/Source.cpp
     for (size_t i = 0; i < nSamples; ++i) {
       size_t numCandidates =
-          i * 1 + 1; // decrease the multiplier to speed things up
+          std::min((size_t)(i * 1 + 1),
+                   (size_t)500); // decrease the multiplier to speed things up
       double bestDistance = 0.0;
       double bestCandidateX = 0.0;
       double bestCandidateY = 0.0;
@@ -394,7 +450,7 @@ private:
         double y = this->distY(this->rng);
         double z = this->distZ(this->rng);
 
-        double minDistance = this->universe.getVolume();
+        double minDistance = std::numeric_limits<double>::max();
         for (size_t k = 0; k < xs.size(); ++k) {
           double dist = this->getDistance(x, y, z, xs[k], ys[k], zs[k]);
           if (dist < minDistance) {
@@ -448,7 +504,7 @@ private:
       }
       pylimer_tools::entities::Atom partner = possiblePartners[i];
       double currDist =
-          std::abs(partner.distanceTo(from, &this->box) - acceptableDistance);
+          std::fabs(partner.distanceTo(from, &this->box) - acceptableDistance);
       if (currDist < bestDistance) {
         bestDistance = currDist;
         bestMatch = i;
@@ -459,12 +515,9 @@ private:
 
   double getDistance(double x1, double y1, double z1, double x2, double y2,
                      double z2) {
-    double dx =
-        this->_getDeltaDistance(x1, x2, this->box.getLx());
-    double dy =
-        this->_getDeltaDistance(y1, y2, this->box.getLy());
-    double dz =
-        this->_getDeltaDistance(z1, z2, this->box.getLz());
+    double dx = this->_getDeltaDistance(x1, x2, this->box.getLx());
+    double dy = this->_getDeltaDistance(y1, y2, this->box.getLy());
+    double dz = this->_getDeltaDistance(z1, z2, this->box.getLz());
     return dx * dx + dy * dy + dz * dz;
   }
 
