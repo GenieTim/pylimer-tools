@@ -1,11 +1,12 @@
 
 import math
-from collections import Counter
 import warnings
+from collections import Counter
 
 import igraph
 import numpy as np
 from pylimer_tools_cpp import Universe
+from scipy import optimize
 
 
 def predictShearModulus(network: Universe, junctionType, strandLength: int = None, functionalityPerType=None, T: float = 1, k_B: float = 1):
@@ -124,7 +125,7 @@ def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.9
     return np.sum(solubleWeight)/totalWeight
 
 
-def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None) -> float:
+def computeWeightFractionOfSolubleMaterial(network: Universe = None, junctionType=2, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None, r: float = None, p: float = None) -> float:
     """
     Compute the weight fraction of soluble material by MMT.
 
@@ -147,6 +148,7 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, stra
       - $\\beta$ (float): Macosko & Miller's $P(F_B)$
     """
     if (functionalityPerType is None):
+        assert(network is not None)
         functionalityPerType = network.determineFunctionalityPerType()
 
     if (functionalityPerType[junctionType] not in [3, 4]):
@@ -160,10 +162,15 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, junctionType, stra
 
     if (weightFractions is None):
         weightFractions = computeWeightFractions(network)
-    
-    p = computeExtentOfReaction(network, junctionType, functionalityPerType)
-    r = computeStoichiometricInbalance(
-        network, junctionType, strandLength=strandLength, functionalityPerType=functionalityPerType)
+
+    if (p is None):
+        assert(network is not None)
+        p = computeExtentOfReaction(
+            network, junctionType, functionalityPerType)
+    if (r is None):
+        assert(network is not None)
+        r = computeStoichiometricInbalance(
+            network, junctionType, strandLength=strandLength, functionalityPerType=functionalityPerType)
 
     alpha, beta = computeMMsProbabilities(
         r, p, functionalityPerType[junctionType])
@@ -180,6 +187,10 @@ def computeMMsProbabilities(r, p, f):
     """
     Compute Macosko and Miller's probabilities $P(F_A)$ and $P(F_B)$
 
+    Sources:
+      - https://pubs.acs.org/doi/10.1021/ma60050a004
+      - https://doi.org/10.1021/ma60050a003
+
     Arguments:
       - r: the stoichiometric inbalance
       - p: the extent of reaction
@@ -191,24 +202,30 @@ def computeMMsProbabilities(r, p, f):
     """
     # first, check a few things required by the formulae
     # since we want alpha, beta \in [0,1], given they are supposed to be probabilities
-    if (r > 1 or r < 0):
-        raise ValueError(
-            "A stoichiometric inbalance ouside of [0, 1] is not (yet) supported. Got {}".format(r))
-    if (p < 1/math.sqrt(2) or p > 1):
-        raise ValueError(
-            "The extent of reaction has to be inside [1/sqrt(2), 1] for the result to be realistic. Got {}".format(p))
-    if (r <= 1/(2*p*p) and f == 3):
-        raise ValueError(
-            "The stoichiometric inbalance must be > 1/(2p^2) for the resulting alpha to be realisitic. Got p = {}, r = {}".format(p, r))
+    # if (r > 1 or r < 0):
+    #     raise ValueError(
+    #         "A stoichiometric inbalance ouside of [0, 1] is not (yet) supported. Got {}".format(r))
+    # if (p < 1/math.sqrt(2) or p > 1):
+    #     raise ValueError(
+    #         "The extent of reaction has to be inside [1/sqrt(2), 1] for the result to be realistic. Got {}".format(p))
+    # if (r <= 1/(2*p*p) and f == 3):
+    #     raise ValueError(
+    #         "The stoichiometric inbalance must be > 1/(2p^2) for the resulting alpha to be realisitic. Got p = {}, r = {}".format(p, r))
 
     # actually do the calculations
     if (f == 3):
         alpha = ((1 - r*p*p)/(r*p*p))
-        beta = (r*p*alpha*alpha)
+        beta = (r*p*alpha**2)
+    elif(f == 4):
+        alpha = (math.sqrt((1/(r*p*p)) - 0.75) - 0.5)
+        beta = ((r*p*(alpha**3)) + 1 - r*p)
     else:
-        assert(f == 4)
-        alpha = (math.sqrt((1/(r*p*p)) - 0.5) - 0.5)
-        beta = ((r*p*((math.sqrt((1/(r*p*p)) - 0.75) - 0.5)**3)) + 1 - r*p)
+        def funToRootForAlpha(alpha):
+            return r*p**2*alpha**(f-1) - alpha - r*p ^ 2 + 1
+        alphaSol = optimize.root_scalar(
+            funToRootForAlpha, bracket=(0, 1), method='brentq')
+        alpha = alphaSol.root
+        beta = ((r*p*alpha**(f-1)) + 1 - r*p) # TODO: reconsider
     return alpha, beta
 
 

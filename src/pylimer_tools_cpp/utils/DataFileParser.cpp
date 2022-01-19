@@ -123,7 +123,28 @@ void DataFileParser::read(const std::string filePath) {
     }
   }
 
-  // we ignore angles etc. for now.
+  // Then, read angles
+  if (this->nAngles > 0) {
+    this->skipLinesToContains(line, file, "Angles");
+    // skip this line too
+    if (!getline(file, line)) {
+      throw std::runtime_error(
+          "Data file ended too early. Not able to read any angles.");
+    }
+    // then, skip empty lines
+    this->skipEmptyLines(line, file);
+
+    for (int i = 0; i < this->nAngles; i++) {
+      this->readAngle(line);
+
+      if (!getline(file, line) && i + 1 < this->nAngles) {
+        throw std::runtime_error(
+            "Data file ended too early. Not enough angles read.");
+      }
+    }
+  }
+
+  // we ignore dihedrals etc. for now.
   file.close();
 }
 
@@ -152,10 +173,14 @@ void DataFileParser::readNs(const std::string line) {
     this->nAtoms = (this->parseTypesInLine<int>(line, 1))[0];
   } else if (contains(line, "bonds")) {
     this->nBonds = (this->parseTypesInLine<int>(line, 1))[0];
+  } else if (contains(line, "angles")) {
+    this->nAngles = (this->parseTypesInLine<int>(line, 1))[0];
   } else if (contains(line, "atom types")) {
     this->nAtomTypes = (this->parseTypesInLine<int>(line, 1))[0];
   } else if (contains(line, "bond types")) {
     this->nBondTypes = (this->parseTypesInLine<int>(line, 1))[0];
+  } else if (contains(line, "angle types")) {
+    this->nAngleTypes = (this->parseTypesInLine<int>(line, 1))[0];
   } else if (contains(line, "xlo xhi")) {
     std::vector<double> parsedL = this->parseTypesInLine<double>(line, 2);
     this->Lx = parsedL[1] - parsedL[0];
@@ -205,6 +230,15 @@ void DataFileParser::readBond(std::string line) {
   this->bondTypes.push_back(tokenizer.get<int>(1));
   this->bondFrom.push_back(tokenizer.get<long int>(2));
   this->bondTo.push_back(tokenizer.get<long int>(3));
+}
+
+void DataFileParser::readAngle(std::string line) {
+  pylimer_tools::utils::CsvTokenizer tokenizer(line, 5);
+  this->angleIds.push_back(tokenizer.get<long int>(0));
+  this->angleTypes.push_back(tokenizer.get<int>(1));
+  this->angleFrom.push_back(tokenizer.get<long int>(2));
+  this->angleVia.push_back(tokenizer.get<long int>(3));
+  this->angleTo.push_back(tokenizer.get<long int>(4));
 }
 } // namespace utils
 } // namespace pylimer_tools

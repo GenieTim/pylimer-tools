@@ -215,6 +215,10 @@ Universe UniverseSequence::readDataFile(const std::string filePath) {
   universe.addBonds(fileParser.getNrOfBonds(), fileParser.getBondFrom(),
                     fileParser.getBondTo(), fileParser.getBondTypes());
   universe.setMasses(fileParser.getMasses());
+  if (fileParser.getNrOfAngles() > 0) {
+    universe.addAngles(fileParser.getAngleFrom(), fileParser.getAngleVia(),
+                       fileParser.getAngleTo());
+  }
   return universe;
 }
 
