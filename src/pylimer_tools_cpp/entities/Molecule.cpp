@@ -12,14 +12,18 @@ extern "C" {
 
 namespace pylimer_tools {
 namespace entities {
-Molecule::Molecule(Box *parent, const igraph_t *ingraph, MoleculeType type,
-                   std::map<int, double> weightPerType) {
+
+Molecule::Molecule(const Box *parent, const igraph_t *ingraph,
+                   MoleculeType type, std::map<int, double> weightPerType) {
   this->parent = parent;
-  igraph_copy(&this->graph, ingraph);
-  this->size = igraph_vcount(&this->graph);
+  this->initializeFromGraph(ingraph);
   this->typeOfThisMolecule = type;
   this->weightPerType = weightPerType;
+};
 
+void Molecule::initializeFromGraph(const igraph_t *ingraph) {
+  igraph_copy(&this->graph, ingraph);
+  this->size = igraph_vcount(&this->graph);
   // construct a key for this molecule: a concatenation of all ids in this
   // molecule
   if (!igraph_cattribute_has_attr(&this->graph, IGRAPH_ATTRIBUTE_VERTEX,
@@ -66,6 +70,7 @@ Molecule &Molecule::operator=(Molecule src) {
   std::swap(this->typeOfThisMolecule, src.typeOfThisMolecule);
   std::swap(this->size, src.size);
   std::swap(this->key, src.key);
+  std::swap(this->_boxNoUse, src._boxNoUse);
   std::swap(this->weightPerType, src.weightPerType);
   std::swap(this->graph, src.graph);
 
@@ -80,7 +85,6 @@ double Molecule::computeEndToEndDistance() {
   std::vector<Atom> endNodes = this->getAtomsOfDegree(1);
 
   double distance = -1.0; // TODO: find a nice default for "no end to end"
-  Box *box = this->getBox();
 
   // we only compute an end-to-end distance if we have exactly two ends.
   // this is clearly not optimal, but at least unambiguous
@@ -89,7 +93,7 @@ double Molecule::computeEndToEndDistance() {
     // check whether the compiler optimizes this or not
     Atom atom1 = endNodes[0];
     Atom atom2 = endNodes[1];
-    distance = atom1.distanceTo(atom2, box);
+    distance = atom1.distanceTo(atom2, this->parent);
   }
   return distance;
 }
@@ -113,7 +117,7 @@ double Molecule::computeWeight() {
  * @return std::vector<double>
  */
 std::vector<double> Molecule::computeBondLengths() {
-  Box *box = this->getBox();
+  const Box *box = this->getBox();
   std::vector<double> lengths;
   lengths.reserve(this->getNrOfBonds());
   if (this->getNrOfBonds() == 0) {
@@ -183,7 +187,7 @@ int Molecule::getNrOfBonds() const { return igraph_ecount(&this->graph); }
  */
 MoleculeType Molecule::getType() { return this->typeOfThisMolecule; };
 
-Box *Molecule::getBox() { return this->parent; }
+const Box *Molecule::getBox() const { return this->parent; }
 
 double Molecule::computeRadiusOfGyration() {
   double meanX = 0.0, meanY = 0.0, meanZ = 0.0;
@@ -211,7 +215,7 @@ double Molecule::computeRadiusOfGyration() {
   return Rg2 * multiplier;
 }
 
-std::string Molecule::getKey() { return this->key; }
+std::string Molecule::getKey() const { return this->key; }
 
 std::vector<Atom> Molecule::getAtoms() {
   std::vector<Atom> results;

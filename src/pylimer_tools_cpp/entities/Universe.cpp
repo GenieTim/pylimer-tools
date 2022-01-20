@@ -179,7 +179,8 @@ void Universe::addAngles(std::vector<long int> from, std::vector<long int> via,
 
 void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from,
                         std::vector<long int> to, std::vector<int> bondTypes,
-                        const bool ignoreNonExistentAtoms, const bool simplify) {
+                        const bool ignoreNonExistentAtoms,
+                        const bool simplify) {
   if (from.size() != to.size() || from.size() != NNewBonds) {
     throw std::invalid_argument("All bond inputs must have the same size.");
   }
@@ -232,17 +233,17 @@ void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from,
     if (simplify) {
       this->simplify();
     } else {
-    this->NBonds = igraph_ecount(&this->graph);
+      this->NBonds = igraph_ecount(&this->graph);
     }
   }
 };
 
-void Universe::simplify() { 
-    igraph_attribute_combination_t comb;
-    igraph_attribute_combination_init(&comb);
-    igraph_simplify(&this->graph, /*multiple=*/1, /*loops=*/1, &comb);
-    igraph_attribute_combination_destroy(&comb);
-    this->NBonds = igraph_ecount(&this->graph);
+void Universe::simplify() {
+  igraph_attribute_combination_t comb;
+  igraph_attribute_combination_init(&comb);
+  igraph_simplify(&this->graph, /*multiple=*/1, /*loops=*/1, &comb);
+  igraph_attribute_combination_destroy(&comb);
+  this->NBonds = igraph_ecount(&this->graph);
 }
 
 /**
@@ -250,7 +251,7 @@ void Universe::simplify() {
  *
  * @return std::map<int, int>
  */
-std::map<int, int> Universe::countAtomTypes() {
+std::map<int, int> Universe::countAtomTypes() const {
   std::vector<int> atomTypes = this->getAtomTypes();
   std::map<int, int> result;
   for (int atomType : atomTypes) {
@@ -275,7 +276,7 @@ std::map<int, double> Universe::getMasses() { return this->weightPerType; };
  *
  * @return std::vector<Molecule>
  */
-std::vector<Molecule> Universe::getClusters() {
+std::vector<Molecule> Universe::getClusters() const {
   std::vector<Molecule> molecules;
   if (this->getNrOfAtoms() == 0) {
     return molecules;
@@ -295,8 +296,8 @@ std::vector<Molecule> Universe::getClusters() {
     igraph_t *g = (igraph_t *)VECTOR(components)[i];
 
     if (igraph_vcount(g)) {
-      molecules.push_back(Molecule(&this->box, g, MoleculeType::UNDEFINED,
-                                   this->weightPerType));
+      molecules.push_back(
+          Molecule(&this->box, g, MoleculeType::UNDEFINED, this->weightPerType));
     }
   }
   igraph_decompose_destroy(&components);
@@ -311,7 +312,7 @@ std::vector<Molecule> Universe::getClusters() {
  * @param atomTypeToOmit The atom type to remove to get more clusters
  * @return std::vector<Molecule>
  */
-std::vector<Molecule> Universe::getMolecules(const int atomTypeToOmit) {
+std::vector<Molecule> Universe::getMolecules(const int atomTypeToOmit) const {
   std::vector<Molecule> molecules;
   if (this->getNrOfAtoms() == 0) {
     return molecules;
@@ -357,8 +358,8 @@ std::vector<Molecule> Universe::getMolecules(const int atomTypeToOmit) {
     igraph_t *g = (igraph_t *)VECTOR(components)[i];
 
     if (igraph_vcount(g)) {
-      molecules.push_back(Molecule(&this->box, g, MoleculeType::UNDEFINED,
-                                   this->weightPerType));
+      molecules.push_back(
+          Molecule(&this->box, g, MoleculeType::UNDEFINED, this->weightPerType));
     }
   }
   igraph_decompose_destroy(&components);
@@ -373,7 +374,7 @@ std::vector<Molecule> Universe::getMolecules(const int atomTypeToOmit) {
  * @param type the type to select
  * @return igraph_vs_t
  */
-igraph_vs_t Universe::getVerticesOfType(const int type) {
+igraph_vs_t Universe::getVerticesOfType(const int type) const {
   std::vector<long int> indices = this->getIndicesOfType(type);
   return this->getVerticesByIndices(indices);
 }
@@ -384,7 +385,8 @@ igraph_vs_t Universe::getVerticesOfType(const int type) {
  * @param indices the vertex indices to select
  * @return igraph_vs_t
  */
-igraph_vs_t Universe::getVerticesByIndices(std::vector<long int> indices) {
+igraph_vs_t
+Universe::getVerticesByIndices(std::vector<long int> indices) const {
   igraph_vector_t indicesToSelect;
   igraph_vector_init(&indicesToSelect, indices.size());
   pylimer_tools::utils::StdVectorToIgraphVectorT(indices, &indicesToSelect);
@@ -402,7 +404,7 @@ igraph_vs_t Universe::getVerticesByIndices(std::vector<long int> indices) {
  * @param type the type to select
  * @return std::vector<long int>
  */
-std::vector<long int> Universe::getIndicesOfType(const int type) {
+std::vector<long int> Universe::getIndicesOfType(const int type) const {
   std::vector<long int> indices;
   if (this->getNrOfAtoms() == 0) {
     return indices;
@@ -428,7 +430,7 @@ std::vector<long int> Universe::getIndicesOfType(const int type) {
  * @return std::vector<Molecule>
  */
 std::vector<Molecule>
-Universe::getChainsWithCrosslinker(const int crosslinkerType) {
+Universe::getChainsWithCrosslinker(const int crosslinkerType) const {
   std::vector<Molecule> molecules;
   if (this->getNrOfAtoms() == 0) {
     return molecules;
@@ -590,7 +592,7 @@ Universe::getChainsWithCrosslinker(const int crosslinkerType) {
  * @return std::map<int, std::vector<std::vector<Atom>>>
  */
 std::map<int, std::vector<std::vector<Atom>>>
-Universe::findLoops(const int crosslinkerType, const int maxLength) {
+Universe::findLoops(const int crosslinkerType, const int maxLength) const {
   // NOTE: there are exponentially many paths between two vertices of a graph,
   // and you may run out of memory when using this function, if your graph is
   // lattice-like.
@@ -670,7 +672,7 @@ Universe::findLoops(const int crosslinkerType, const int maxLength) {
  * @return false
  */
 bool Universe::hasInfiniteStrand(const int crosslinkerType,
-                                 const int maxLength) {
+                                 const int maxLength) const {
   // NOTE: there are exponentially many paths between two vertices of a graph,
   // and you may run out of memory when using this function, if your graph is
   // lattice-like.
@@ -757,7 +759,7 @@ bool Universe::hasInfiniteStrand(const int crosslinkerType,
  *
  * @return std::map<int, int>
  */
-std::map<int, int> Universe::determineFunctionalityPerType() {
+std::map<int, int> Universe::determineFunctionalityPerType() const {
   std::map<int, int> result;
   igraph_vector_t degrees;
   if (igraph_vector_init(&degrees, 0)) {
@@ -798,7 +800,7 @@ std::map<int, int> Universe::determineFunctionalityPerType() {
  *
  * @return std::map<int, double>
  */
-std::map<int, double> Universe::determineEffectiveFunctionalityPerType() {
+std::map<int, double> Universe::determineEffectiveFunctionalityPerType() const {
   std::map<int, double> result;
   igraph_vector_t degrees;
   if (igraph_vector_init(&degrees, 0)) {
@@ -844,7 +846,7 @@ std::map<int, double> Universe::determineEffectiveFunctionalityPerType() {
  * @return std::map<int, double> $\\vec{W_i}$ (dict): using the type i as a key,
  * this dict contains the weight fractions ($\\frac{W_i}{W_{tot}}$)
  */
-std::map<int, double> Universe::computeWeightFractions() {
+std::map<int, double> Universe::computeWeightFractions() const {
   std::map<int, double> partialMasses;
   if (this->getNrOfAtoms() == 0) {
     return partialMasses;
@@ -853,9 +855,9 @@ std::map<int, double> Universe::computeWeightFractions() {
   std::vector<int> types = this->getPropertyValues<int>("type");
   double totalMass = 0.0;
   for (int type : types) {
-    totalMass += this->weightPerType[type];
+    totalMass += this->weightPerType.at(type);
     partialMasses.try_emplace(type, 0.0);
-    partialMasses[type] += weightPerType[type];
+    partialMasses[type] += this->weightPerType.at(type);
   }
 
   if (totalMass == 0.0) {
@@ -957,7 +959,7 @@ std::map<std::string, std::vector<long int>> Universe::detectAngles() const {
         this->getVertexIdxsConnectedTo(vertexIdx);
     // with 1 or 0 connections, there is no angle
     if (connections.size() < 2) {
-    IGRAPH_VIT_NEXT(vit);
+      IGRAPH_VIT_NEXT(vit);
       continue;
     }
     // loop the connections to find angles
@@ -988,6 +990,80 @@ std::map<std::string, std::vector<long int>> Universe::detectAngles() const {
 
   return results;
 }
+
+/**
+ * @brief Reduce the network to cross-linkers only.
+ * Includes self-loops (from primary ones).
+ * You can remove them using #simplify
+ *
+ * @param crosslinkerType the atom type of the cross-linker beads
+ * @return Universe
+ */
+Universe Universe::getNetworkOfCrosslinker(const int crosslinkerType) const {
+  // How this works:
+  // 1. find all crosslinkers
+  // 2. from each crosslinker, walk in all directions
+  // 3. if the walk reaches another crosslinker, we found a
+  //    crosslinker-crosslinker connection.
+  //    To reduce duplicates, we only take the ones where we started from a
+  //    crosslinker with a smaller (or equal, for self-/primary-loops) vertex
+  //    index
+  Universe newUniverse =
+      Universe(this->box.getLx(), this->box.getLy(), this->box.getLz());
+  std::vector<long int> bondFrom;
+  std::vector<long int> bondTo;
+  std::vector<long int> crosslinkers = this->getIndicesOfType(crosslinkerType);
+  for (long int crosslinker : crosslinkers) {
+    std::vector<long int> connections =
+        this->getVertexIdxsConnectedTo(crosslinker);
+    for (long int connection : connections) {
+      long int currentCenter = connection;
+      long int lastCenter = crosslinker;
+      std::vector<long int> subConnections =
+          this->getVertexIdxsConnectedTo(currentCenter);
+      while (subConnections.size() > 0) {
+        if (this->getPropertyValue<int>("type", currentCenter) ==
+            crosslinkerType) {
+          // found cross-linker
+          if (currentCenter >= crosslinker) {
+            bondFrom.push_back(
+                this->getPropertyValue<int>("id", currentCenter));
+            bondTo.push_back(this->getPropertyValue<int>("id", crosslinker));
+          }
+          break;
+        }
+
+        if (subConnections.size() == 1) {
+          break;
+        }
+        // we assume a functionality of 2 for ordinary strands
+        assert(subConnections.size() == 2);
+        int subConnectionDirection = subConnections[0] == lastCenter ? 1 : 0;
+        lastCenter = currentCenter;
+        currentCenter = subConnections[subConnectionDirection];
+        std::vector<long int> subConnections =
+            this->getVertexIdxsConnectedTo(currentCenter);
+      }
+    }
+  }
+
+  std::vector<int> zeros =
+      pylimer_tools::utils::initializeWithValue(crosslinkers.size(), 0);
+
+  newUniverse.addAtoms(crosslinkers.size(),
+                       this->getPropertyValues<long int>("id", crosslinkers),
+                       this->getPropertyValues<int>("type", crosslinkers),
+                       this->getPropertyValues<double>("x", crosslinkers),
+                       this->getPropertyValues<double>("y", crosslinkers),
+                       this->getPropertyValues<double>("z", crosslinkers),
+                       zeros, zeros, zeros);
+  newUniverse.addBonds(
+      bondFrom.size(), bondFrom, bondTo,
+      pylimer_tools::utils::initializeWithValue(bondFrom.size(), 0), false,
+      false);
+
+  return newUniverse;
+};
 
 /**
  * @brief Get the number of angles stored in this universe.
@@ -1065,7 +1141,7 @@ std::map<std::string, std::vector<long int>> Universe::getBonds() const {
  */
 template <typename IN>
 long int Universe::findVertexIdForProperty(const char *propertyName,
-                                           IN propertyValue) {
+                                           IN propertyValue) const {
   igraph_vector_t allValues;
   igraph_vector_init(&allValues, this->getNrOfAtoms());
   VANV(&this->graph, propertyName, &allValues);
@@ -1127,7 +1203,7 @@ std::vector<double> Universe::computeDzs(const std::vector<int> bondFrom,
 std::vector<double> Universe::computeDs(const std::vector<int> bondFrom,
                                         const std::vector<int> bondTo,
                                         std::string direction,
-                                        double boxLimit) {
+                                        double boxLimit) const {
   if (bondFrom.size() != bondTo.size()) {
     throw std::invalid_argument(
         "bond from and bond to must have the same size");
@@ -1141,8 +1217,9 @@ std::vector<double> Universe::computeDs(const std::vector<int> bondFrom,
   igraph_vector_init(&vertexIdTo, nBonds);
 
   for (int i = 0; i < nBonds; ++i) {
-    igraph_vector_set(&vertexIdFrom, i, this->atomIdToVectorIdx[bondFrom[i]]);
-    igraph_vector_set(&vertexIdTo, i, this->atomIdToVectorIdx[bondTo[i]]);
+    igraph_vector_set(&vertexIdFrom, i,
+                      this->atomIdToVectorIdx.at(bondFrom[i]));
+    igraph_vector_set(&vertexIdTo, i, this->atomIdToVectorIdx.at(bondTo[i]));
   }
 
   igraph_vector_t dValuesFrom;
