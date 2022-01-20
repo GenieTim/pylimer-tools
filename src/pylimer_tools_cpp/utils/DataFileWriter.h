@@ -115,7 +115,7 @@ public:
 private:
   // properties
   pylimer_tools::entities::Universe universe;
-  bool includeAngles = false;
+  bool includeAngles = true;
   bool moleculeIdxSubsequent = false;
 };
 } // namespace utils

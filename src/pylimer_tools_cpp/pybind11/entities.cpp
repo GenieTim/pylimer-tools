@@ -306,6 +306,9 @@ void init_pylimer_bound_entities(py::module_ &m) {
       .def("determineFunctionalityPerType",
            &Universe::determineFunctionalityPerType,
            "Find the maximum functionality of each atom type in the network.")
+      .def("determineEffectiveFunctionalityPerType",
+           &Universe::determineEffectiveFunctionalityPerType,
+           "Find the average functionality of each atom type in the network.")
       .def("computeMeanStrandLength", &Universe::getMeanStrandLength,
            "Compute the mean strand length.")
       .def("computeWeightFractions", &Universe::computeWeightFractions,

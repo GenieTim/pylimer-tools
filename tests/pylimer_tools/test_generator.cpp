@@ -20,9 +20,9 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]") {
   pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(10.0, 10.0, 10.0);
   generator.setSeed(8804);
   generator.setBeadDistance(0.964);
-  generator.addCrosslinkers(1000, 2);
-  generator.addSolventChains(1000, 16, 3);
-  generator.addAndLinkStrands((4 / 2) * 1000, 16, 0.8);
+  generator.addCrosslinkers(100, 2);
+  generator.addSolventChains(100, 16, 3);
+  generator.addAndLinkStrands((4 / 2) * 100, 16, 0.8);
 
   pe::Universe universe = generator.getUniverse();
   std::map<int, double> weights;
@@ -38,9 +38,9 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]") {
   REQUIRE(universe.getNrOfAngles() > 0);
 
   SECTION("Nrs of chains is correct") {
-    REQUIRE(universe.getAtomsWithType(2).size() == 1000);
-    REQUIRE(universe.getAtomsWithType(1).size() == (4 / 2) * 1000 * 16);
-    REQUIRE(universe.getMolecules(2).size() == (4 / 2) * 1000 + 1000);
+    REQUIRE(universe.getAtomsWithType(2).size() == 100);
+    REQUIRE(universe.getAtomsWithType(1).size() == (4 / 2) * 100 * 16);
+    REQUIRE(universe.getMolecules(2).size() == (4 / 2) * 100 + 100);
   }
 
   SECTION("Universe can be written and read again") {

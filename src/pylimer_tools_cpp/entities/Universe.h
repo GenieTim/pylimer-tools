@@ -49,19 +49,20 @@ public:
   std::vector<Atom> getAtoms();
   std::map<std::string, std::vector<long int>> getBonds() const;
   std::map<std::string, std::vector<long int>> getAngles() const;
-  std::vector<Molecule> getClusters();
-  std::vector<Molecule> getMolecules(const int atomTypeToOmit = -1);
-  std::vector<Molecule> getChainsWithCrosslinker(const int crosslinkerType);
+  std::vector<Molecule> getClusters() const;
+  std::vector<Molecule> getMolecules(const int atomTypeToOmit = -1) const;
+  std::vector<Molecule> getChainsWithCrosslinker(const int crosslinkerType) const;
+  Universe getNetworkOfCrosslinker(const int crosslinkerType) const;
   // TODO: find & implement a better return type, e.g. std::vector<Molecule>
   std::map<int, std::vector<std::vector<Atom>>>
-  findLoops(const int crosslinkerType, const int maxLength);
-  bool hasInfiniteStrand(const int crosslinkerType, const int maxLength);
-  std::vector<int> getAtomTypes() {
+  findLoops(const int crosslinkerType, const int maxLength) const;
+  bool hasInfiniteStrand(const int crosslinkerType, const int maxLength) const;
+  std::vector<int> getAtomTypes() const {
     return this->getPropertyValues<int>("type");
   }
-  std::map<int, int> countAtomTypes();
+  std::map<int, int> countAtomTypes() const;
   template <typename IN>
-  long int findVertexIdForProperty(const char *propertyName, IN propertyValue);
+  long int findVertexIdForProperty(const char *propertyName, IN propertyValue) const;
   Box getBox();
   double getVolume();
   const int getNrOfAtoms() const;
@@ -79,9 +80,9 @@ public:
 
   // computations
   std::map<std::string, std::vector<long int>> detectAngles() const;
-  std::map<int, int> determineFunctionalityPerType();
-  std::map<int, double> determineEffectiveFunctionalityPerType();
-  std::map<int, double> computeWeightFractions();
+  std::map<int, int> determineFunctionalityPerType() const;
+  std::map<int, double> determineEffectiveFunctionalityPerType() const;
+  std::map<int, double> computeWeightFractions() const;
   std::vector<double> computeDxs(const std::vector<int> bondFrom,
                                  const std::vector<int> bondTo);
   std::vector<double> computeDys(const std::vector<int> bondFrom,
@@ -111,12 +112,12 @@ protected:
                      // of this atom type.
 
   // internal functions
-  igraph_vs_t getVerticesOfType(const int type);
-  std::vector<long int> getIndicesOfType(const int type);
-  igraph_vs_t getVerticesByIndices(std::vector<long int> indices);
+  igraph_vs_t getVerticesOfType(const int type) const;
+  std::vector<long int> getIndicesOfType(const int type) const;
+  igraph_vs_t getVerticesByIndices(std::vector<long int> indices) const;
   std::vector<double> computeDs(const std::vector<int> bondFrom,
                                 const std::vector<int> bondTo,
-                                std::string direction, double boxLimit);
+                                std::string direction, double boxLimit) const;
 };
 } // namespace entities
 } // namespace pylimer_tools

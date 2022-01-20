@@ -16,7 +16,7 @@ namespace pylimer_tools
   namespace utils
   {
 
-    static std::vector<long int> getVerticesWithDegree(igraph_t *graph, std::vector<int> ofDegrees)
+    static std::vector<long int> getVerticesWithDegree(const igraph_t *graph, std::vector<int> ofDegrees)
     {
       int graphSize = igraph_vcount(graph);
       igraph_vector_t degrees;
@@ -57,12 +57,12 @@ namespace pylimer_tools
       return toSelect;
     }
 
-    static std::vector<long int> getVerticesWithDegree(igraph_t *graph, int degree)
+    static std::vector<long int> getVerticesWithDegree(const igraph_t *graph, int degree)
     {
       return getVerticesWithDegree(graph, std::vector<int>{degree});
     }
 
-    static igraph_vs_t getVerticesWithDegreeSelector(igraph_t *graph, int degree)
+    static igraph_vs_t getVerticesWithDegreeSelector(const igraph_t *graph, int degree)
     {
       // NOTE: this is to omit the assumption, that the returned degree is sequential for vertex 0, ..., |V|
       std::vector<long int> toSelect = getVerticesWithDegree(graph, degree);

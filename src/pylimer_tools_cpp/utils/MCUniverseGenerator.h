@@ -9,7 +9,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
-#include <math.h>
+#include <math.h>/* isnan, sqrt */
 #include <string>
 #include <vector>
 
@@ -109,7 +109,7 @@ public:
         initializeWithValue(crosslinkers.size(), crosslinkerFunctionality);
     int nrOfStrandsAdded = 0;
     double conversionPerBond =
-        1 / (crosslinkerFunctionality * crosslinkers.size());
+        1.0 / ((double)crosslinkerFunctionality * (double)crosslinkers.size());
     double currentDegreeOfConversion =
         this->universe
             .determineEffectiveFunctionalityPerType()[this->crosslinkerType];
@@ -132,33 +132,39 @@ public:
         }
         // decide what type of site this is
         bool isActiveSite =
-            linkerProbabilityDist(this->rng) < crosslinkerConversion;
+            linkerProbabilityDist(this->rng) <= crosslinkerConversion;
         if (isActiveSite) {
           bool isDanglingStrand =
               linkerProbabilityDist(this->rng) > crosslinkerConversion;
+          int targetIdx = this->findAppropriateLink(
+              crosslinkers[i], crosslinkers, availableCrosslinkerSites,
+              std::sqrt(beadsPerChains[i]) * this->beadDistance);
           if (isDanglingStrand) {
             // decision is: dangling
             this->addRandomWalkChainFrom(crosslinkers[i],
                                          beadsPerChains[nrOfStrandsAdded]);
-            nrOfStrandsAdded += 1;
-            currentDegreeOfConversion += conversionPerBond;
           } else {
             // decision is: connected / network
             // find close enough crosslinker to do the chain to
-            int targetIdx = this->findAppropriateLink(
-                crosslinkers[i], crosslinkers, availableCrosslinkerSites,
-                std::sqrt(beadsPerChains[i]) * this->beadDistance);
+
             this->addRandomWalkChainFromTo(crosslinkers[i],
                                            crosslinkers[targetIdx],
                                            beadsPerChains[nrOfStrandsAdded]);
-            availableCrosslinkerSites[targetIdx] -= 1;
-            nrOfStrandsAdded += 1;
-            currentDegreeOfConversion += 2 * conversionPerBond;
+            currentDegreeOfConversion += conversionPerBond;
           }
+          availableCrosslinkerSites[targetIdx] -= 1;
+          nrOfStrandsAdded += 1;
+          currentDegreeOfConversion += conversionPerBond;
 
-          if (nrOfStrandsAdded > nrOfStrands) {
-            throw std::invalid_argument("Not enough strands to satisfy the "
-                                        "requested degree of convergence.");
+          if (nrOfStrandsAdded >= nrOfStrands &&
+              currentDegreeOfConversion < crosslinkerConversion &&
+              i < crosslinkers.size() - 1) {
+            throw std::invalid_argument(
+                "Not enough strands to satisfy the "
+                "requested degree of convergence. Current degree: " +
+                std::to_string(currentDegreeOfConversion) + " with " +
+                std::to_string(nrOfStrandsAdded) + " strands added. " +
+                "You could try a different seed.");
           }
         }
         availableCrosslinkerSites[i] -= 1;
@@ -291,7 +297,7 @@ private:
       double dx = targetX - lastX;
       double dy = targetY - lastY;
       double dz = targetZ - lastZ;
-      double idealAlpha = std::acos(dz);
+      double idealAlpha = std::acos(std::clamp(dz, -1.0, 1.0));
       double idealBeta =
           dx > 0 ? (std::atan2((dy), (dx)))
                  : (dx < 0 ? (std::atan2((dy), (dx)) + M_PI) : M_PI / 2);
@@ -303,10 +309,23 @@ private:
                    1.0);
 
       // TODO: find some a bit more sophisticated probability adjustment
-      const double alpha = (1 - idealWeight) * angleDistribution(this->rng) +
-                           idealWeight * idealAlpha;
-      const double beta = (1 - idealWeight) * angleDistribution(this->rng) +
-                          idealWeight * idealBeta;
+      double alpha = (1 - idealWeight) * angleDistribution(this->rng) +
+                     idealWeight * idealAlpha;
+      if (isnan(alpha)) {
+        std::cout << "Got nan for alpha with idealAlpha = " << idealAlpha
+                  << ", weight = " << idealWeight << ", dx = " << dx
+                  << ", dy = " << dy << ", dz = " << dz << std::endl;
+        alpha = isnan(idealAlpha) ? angleDistribution(this->rng) : idealAlpha;
+      };
+      double beta = (1 - idealWeight) * angleDistribution(this->rng) +
+                    idealWeight * idealBeta;
+      if (isnan(beta)) {
+        std::cout << "Got nan for beta with idealBeta = " << idealBeta
+                  << ", weight = " << idealWeight << ", dx = " << dx
+                  << ", dy = " << dy << ", dz = " << dz << std::endl;
+
+        beta = isnan(idealBeta) ? angleDistribution(this->rng) : idealBeta;
+      }
       // coordinate system conversion: confirmation e.g. in
       // https://math.stackexchange.com/a/1385150/738831 or
       // https://en.wikipedia.org/wiki/Spherical_coordinate_system
@@ -318,6 +337,7 @@ private:
       lastY = ys[i];
       zs.push_back(lastZ + this->beadDistance * std::sin(beta));
       lastZ = zs[i];
+      assert(!isnan(lastX) && !isnan(lastY) && !isnan(lastZ));
     }
 
     Positions positions;

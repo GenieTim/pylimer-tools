@@ -25,7 +25,7 @@ enum MoleculeType {
 
 class Molecule : public AtomGraphParent {
 public:
-  Molecule(Box *parent, const igraph_t *graph, MoleculeType type,
+  Molecule(const Box *parent, const igraph_t *graph, MoleculeType type,
            std::map<int, double> weightPerType);
 
   // rule of three:
@@ -41,8 +41,8 @@ public:
   std::vector<Atom> getAtoms();
   int getNrOfBonds() const;
   int getNrOfAtoms() const;
-  Box *getBox();
-  std::string getKey();
+  const Box *getBox() const;
+  std::string getKey() const;
   std::vector<int> getAtomTypes() {
     return this->getPropertyValues<int>("type");
   }
@@ -61,12 +61,15 @@ public:
   }
 
 private:
-  Box *parent;
+  Box _boxNoUse;
+  const Box *parent;
   MoleculeType typeOfThisMolecule;
   int size;
   std::string key;
   std::map<int, double> weightPerType;
   std::unordered_map<int, int> atomIdToVectorIdx;
+
+  void initializeFromGraph(const igraph_t *ingraph);
 };
 } // namespace entities
 } // namespace pylimer_tools
