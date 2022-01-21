@@ -296,8 +296,8 @@ std::vector<Molecule> Universe::getClusters() const {
     igraph_t *g = (igraph_t *)VECTOR(components)[i];
 
     if (igraph_vcount(g)) {
-      molecules.push_back(
-          Molecule(&this->box, g, MoleculeType::UNDEFINED, this->weightPerType));
+      molecules.push_back(Molecule(&this->box, g, MoleculeType::UNDEFINED,
+                                   this->weightPerType));
     }
   }
   igraph_decompose_destroy(&components);
@@ -358,8 +358,8 @@ std::vector<Molecule> Universe::getMolecules(const int atomTypeToOmit) const {
     igraph_t *g = (igraph_t *)VECTOR(components)[i];
 
     if (igraph_vcount(g)) {
-      molecules.push_back(
-          Molecule(&this->box, g, MoleculeType::UNDEFINED, this->weightPerType));
+      molecules.push_back(Molecule(&this->box, g, MoleculeType::UNDEFINED,
+                                   this->weightPerType));
     }
   }
   igraph_decompose_destroy(&components);
@@ -1038,11 +1038,10 @@ Universe Universe::getNetworkOfCrosslinker(const int crosslinkerType) const {
         }
         // we assume a functionality of 2 for ordinary strands
         assert(subConnections.size() == 2);
-        int subConnectionDirection = subConnections[0] == lastCenter ? 1 : 0;
+        int subConnectionDirection = (subConnections[0] == lastCenter) ? 1 : 0;
         lastCenter = currentCenter;
         currentCenter = subConnections[subConnectionDirection];
-        std::vector<long int> subConnections =
-            this->getVertexIdxsConnectedTo(currentCenter);
+        subConnections = this->getVertexIdxsConnectedTo(currentCenter);
       }
     }
   }
@@ -1274,6 +1273,66 @@ double Universe::getMeanStrandLength(int junctionType) {
     meanStrandLength += molecule.getLength() * multiplier;
   }
   return meanStrandLength;
+}
+
+/**
+ * @brief Get the mean end to end distance
+ *
+ * Does not take loops etc. into account.
+ *
+ * @param junctionType
+ * @return double
+ */
+double Universe::computeMeanEndToEndDistance(int junctionType) {
+  std::vector<Molecule> molecules =
+      this->getChainsWithCrosslinker(junctionType);
+
+  double meanEndToEndDistance = 0;
+  int validMolecules = 0;
+
+  for (Molecule molecule : molecules) {
+    double dist = molecule.computeEndToEndDistance();
+    if (dist > 0.0) {
+      meanEndToEndDistance += dist;
+      validMolecules += 1;
+    }
+  }
+
+  return meanEndToEndDistance / (double)validMolecules;
+}
+
+/**
+ * @brief Compute the mean of all bond lengths
+ *
+ * @return double
+ */
+double Universe::computeMeanBondLength() {
+  double length;
+  if (this->getNrOfBonds() == 0) {
+    return length;
+  }
+  // construct iterator
+  igraph_eit_t bondIterator;
+  if (igraph_eit_create(&this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID),
+                        &bondIterator)) {
+    throw std::runtime_error("Cannot create iterator to loop bonds");
+  }
+
+  while (!IGRAPH_EIT_END(bondIterator)) {
+    long int edgeId = (long int)IGRAPH_EIT_GET(bondIterator);
+    int bondFrom;
+    int bondTo;
+    igraph_edge(&this->graph, edgeId, &bondFrom, &bondTo);
+    // TODO: this is more intensive than needed
+    // check whether the compiler optimizes this or not
+    Atom atom1 = this->getAtomByVertexIdx(bondFrom);
+    Atom atom2 = this->getAtomByVertexIdx(bondTo);
+    length += atom1.distanceTo(atom2, &this->box);
+    IGRAPH_EIT_NEXT(bondIterator);
+  }
+
+  igraph_eit_destroy(&bondIterator);
+  return length / (double)this->getNrOfBonds();
 }
 
 /**
