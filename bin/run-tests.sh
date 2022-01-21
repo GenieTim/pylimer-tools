@@ -16,7 +16,7 @@ ASAN_OPTIONS=detect_leaks=1 ./pylimer_tests || exit 6 # -s --durations yes
 cd "$ROOT_DIR" || exit 8
 
 # then, build/install project for Python
-python -m pip install --verbose . || exit 3
+python -m pip install --verbose --use-feature=in-tree-build . || exit 3
 
 cd "$ROOT_DIR" || exit 4
 

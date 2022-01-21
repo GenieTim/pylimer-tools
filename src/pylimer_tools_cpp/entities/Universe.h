@@ -90,6 +90,8 @@ public:
   std::vector<double> computeDzs(const std::vector<int> bondFrom,
                                  const std::vector<int> bondTo);
   double getMeanStrandLength(int junctionType);
+  double computeMeanEndToEndDistance(int junctionType);
+  double computeMeanBondLength();
   bool validate();
 
 protected:
