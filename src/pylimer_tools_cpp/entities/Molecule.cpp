@@ -2,6 +2,7 @@
 #include "../utils/GraphUtils.h"
 #include "../utils/StringUtils.h"
 #include "Atom.h"
+#include <set>
 extern "C" {
 #include <igraph/igraph.h>
 }
@@ -223,13 +224,65 @@ std::vector<Atom> Molecule::getAtoms() {
   results.reserve(nrOfAtoms);
 
   // #pragma omp declare reduction (merge : std::vector<Atom> :
-  // omp_out.insert(omp_out.end(), omp_in.begin(), omp_in.end())) #pragma omp
-  // parallel for reduction(merge: results)
+  // omp_out.insert(omp_out.end(), omp_in.begin(), omp_in.end()))
+  // #pragma omp parallel for reduction(merge: results)
   for (size_t i = 0; i < nrOfAtoms; ++i) {
     results.push_back(this->getAtomByVertexIdx(i));
   }
 
   return results;
 };
+
+std::vector<Atom> Molecule::getAtomsLinedUp() {
+  std::vector<Atom> results;
+  size_t nrOfAtoms = this->getNrOfAtoms();
+  results.reserve(nrOfAtoms);
+
+  long int vertexIdToStartWith = 0;
+  std::vector<long int> ends =
+      pylimer_tools::utils::getVerticesWithDegree(&this->graph, 1);
+  if (ends.size() > 0) {
+    vertexIdToStartWith = ends[0];
+  }
+
+  std::vector<long int> connections =
+      this->getVertexIdxsConnectedTo(vertexIdToStartWith);
+  results.push_back(this->getAtomByVertexIdx(vertexIdToStartWith));
+  for (long int connection : connections) {
+    long int currentCenter = connection;
+    long int lastCenter = vertexIdToStartWith;
+    std::vector<long int> subConnections =
+        this->getVertexIdxsConnectedTo(currentCenter);
+    while (subConnections.size() > 0) {
+      if (subConnections.size() == 1) {
+        break;
+      }
+      // we assume a functionality of 2 for ordinary strands
+      if (subConnections.size() != 2) {
+        throw std::runtime_error(
+            "Failed to align all atoms on one strand, as a functionality of " +
+            std::to_string(subConnections.size()) +
+            " was found and 1 or 2 expected.");
+      }
+      int subConnectionDirection = (subConnections[0] == lastCenter) ? 1 : 0;
+      if (subConnectionDirection == vertexIdToStartWith) {
+        break;
+      }
+      lastCenter = currentCenter;
+      currentCenter = subConnections[subConnectionDirection];
+      results.push_back(this->getAtomByVertexIdx(currentCenter));
+      subConnections = this->getVertexIdxsConnectedTo(currentCenter);
+    }
+  }
+
+  if (results.size() != this->getNrOfAtoms()) {
+    throw std::runtime_error(
+        "Failed to align all atoms on one strand: Lined up " +
+        std::to_string(results.size()) + " instead of " +
+        std::to_string(this->getNrOfAtoms()) + " atoms.");
+  }
+  return results;
+};
+
 } // namespace entities
 } // namespace pylimer_tools
