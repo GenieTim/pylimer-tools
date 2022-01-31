@@ -16,6 +16,7 @@ namespace pylimer_tools {
 namespace utils {
 
 class DataFileWriter {
+
 public:
   DataFileWriter(const pylimer_tools::entities::Universe u) : universe(u) {
     // this->universe = u;
@@ -27,8 +28,12 @@ public:
     this->includeAngles = includeAngles;
   }
   void configMoleculeIdxForSwap(const bool includeSwap) {
-    this->moleculeIdxSubsequent = !includeSwap;
+    this->moleculeIdxSwappable = includeSwap;
   }
+  void configCrosslinkerType(const int crosslinkerType) {
+    this->crosslinkerType = crosslinkerType;
+  }
+  void configReindexAtoms(const bool reindex) { this->reindexAtoms = reindex; }
   void writeToFile(const std::string filePath) {
     std::ofstream file;
     int uniqueAtomTypes = std::max(this->universe.countAtomTypes().size(),
@@ -46,7 +51,7 @@ public:
     file << "\t " << 0 << " impropers\n";
     file << "\n";
     file << "\t " << uniqueAtomTypes << " atom types\n";
-    file << "\t " << 1 << " bond types\n";
+    file << "\t " << 1 << " bond types\n"; // TODO: fix bond types overall
     file << "\t " << 1 << " angle types\n";
     file << "\t " << 0 << " dihedral types\n";
     file << "\t " << 0 << " improper types\n";
@@ -68,17 +73,7 @@ public:
     file << "\n";
 
     // write atoms
-    file << "Atoms\n\n";
-    // TODO: support molecule idxs
-    int moleculeIdx = 0;
-    for (int i = 0; i < this->universe.getNrOfAtoms(); ++i) {
-      pylimer_tools::entities::Atom atom = this->universe.getAtomByVertexIdx(i);
-      file << "\t" << atom.getId() << "\t" << moleculeIdx << "\t"
-           << atom.getType() << "\t" << atom.getX() << "\t" << atom.getY()
-           << "\t" << atom.getZ() << "\t" << atom.getNX() << "\t"
-           << atom.getNY() << "\t" << atom.getNZ() << "\n";
-    }
-    file << "\n";
+    this->writeAtoms(file);
 
     // write bonds
     file << "Bonds\n\n";
@@ -115,8 +110,59 @@ public:
 private:
   // properties
   pylimer_tools::entities::Universe universe;
+  std::unordered_map<long int, int> oldNewAtomIdMap;
   bool includeAngles = true;
-  bool moleculeIdxSubsequent = false;
+  bool moleculeIdxSwappable = false;
+  int crosslinkerType = 2;
+  bool reindexAtoms = false;
+
+  // functions
+  void writeAtom(std::ofstream &file, pylimer_tools::entities::Atom atom,
+                 int moleculeIdx, int nAtomsOutput) {
+    long int atomId = this->reindexAtoms ? nAtomsOutput : atom.getId();
+    file << "\t" << atom.getId() << "\t" << moleculeIdx << "\t"
+         << atom.getType() << "\t" << atom.getX() << "\t" << atom.getY() << "\t"
+         << atom.getZ() << "\t" << atom.getNX() << "\t" << atom.getNY() << "\t"
+         << atom.getNZ() << "\n";
+  }
+  void writeAtoms(std::ofstream &file) {
+    file << "Atoms\n\n";
+
+    this->oldNewAtomIdMap.reserve(this->universe.getNrOfAtoms());
+    int nAtomsOutput = 0;
+
+    // to support molecule idxs, we need to adjust the order of atoms output
+    // first, we output the crosslinker beads
+    std::vector<pylimer_tools::entities::Atom> crosslinkers =
+        this->universe.getAtomsWithType(this->crosslinkerType);
+    for (pylimer_tools::entities::Atom crosslinker : crosslinkers) {
+      nAtomsOutput += 1;
+      this->writeAtom(file, crosslinker, 0, nAtomsOutput);
+    }
+
+    // then, we can output all others
+    int nMoleculesOutput = 0;
+    std::vector<pylimer_tools::entities::Molecule> molecules =
+        this->universe.getMolecules(this->crosslinkerType);
+    for (pylimer_tools::entities::Molecule molecule : molecules) {
+      std::vector<pylimer_tools::entities::Atom> atoms =
+          this->moleculeIdxSwappable ? molecule.getAtomsLinedUp()
+                                     : molecule.getAtoms();
+      nMoleculesOutput += 1;
+      for (int i = 0; i < atoms.size(); ++i) {
+        pylimer_tools::entities::Atom atom = atoms[i];
+        nAtomsOutput += 1;
+        int ip1 = i + 1;
+        int swappableMoleculeIdx =
+            (i >= (atoms.size() * 0.5)) ? (atoms.size() - i) : ip1;
+        int moleculeIdx = this->moleculeIdxSwappable ? swappableMoleculeIdx
+                                                     : nMoleculesOutput;
+        this->writeAtom(file, atom, moleculeIdx, nAtomsOutput);
+      }
+    }
+
+    file << "\n";
+  }
 };
 } // namespace utils
 } // namespace pylimer_tools

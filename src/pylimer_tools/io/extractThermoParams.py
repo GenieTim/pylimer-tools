@@ -142,7 +142,7 @@ def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", text
                 pass
             return tmpDf
         except Exception as e:
-            warnings.warn(e)
+            warnings.warn("Error reading CSV thermo file: {}".format(e), source=e)
             return pd.DataFrame()
 
     with open(file, 'r') as fp:

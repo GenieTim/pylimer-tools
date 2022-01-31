@@ -39,6 +39,7 @@ public:
   int getLength() const;
   MoleculeType getType();
   std::vector<Atom> getAtoms();
+  std::vector<Atom> getAtomsLinedUp();
   int getNrOfBonds() const;
   int getNrOfAtoms() const;
   const Box *getBox() const;

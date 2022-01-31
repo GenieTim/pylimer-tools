@@ -23,7 +23,7 @@ typedef std::map<std::string, std::vector<pylimer_tools::utils::CsvTokenizer>>
  *
  * @param filePath
  */
-void DumpFileParser::startReading(const std::string filePath) {
+DumpFileParser::DumpFileParser(const std::string filePath) {
 
   if (!std::filesystem::exists(filePath)) {
     throw std::invalid_argument("File to read (" + filePath +
@@ -52,25 +52,70 @@ void DumpFileParser::startReading(const std::string filePath) {
   this->currentLine = line; // current line
   this->groupPosMap[0] =
       this->file.tellg(); // record position of index to jump back at some point
-};
 
-// TODO: implement routine to read a group at any position
-// e.g. by tellg() (https://www.cplusplus.com/reference/istream/istream/tellg/)
-// together with seekg
-// (https://www.cplusplus.com/reference/istream/istream/seekg/)
-void DumpFileParser::readGroupByIdx(const int i) {
-  // if (this->)
+  // read the whole file, skipping all lines that are not the new group key
+  // to record the positions
+  int groupsFound = 0;
+
+  while (getline(this->file, line)) {
+    line = pylimer_tools::utils::trimLineOmitComment(line);
+    // skip empty lines
+    if (line.empty()) {
+      continue;
+    }
+
+    if (line == this->newGroupKey) {
+      // new timestep
+      groupsFound += 1;
+      this->groupPosMap[groupsFound] = this->file.tellg();
+    }
+  }
+
+  this->nrOfGroups = groupsFound + 1;
+  // reset position to start of first group
+  this->file.seekg(this->groupPosMap[0]);
+  this->file.clear();
+}
+
+/**
+ * @brief Read a group by its index
+ *
+ * Useful for not-having to read all universes at once if only interested in
+ * one. Position of groups is determined using tellg()
+ * (https://www.cplusplus.com/reference/istream/istream/tellg/), whereas the
+ * returned position is found again using seekg()
+ * (https://www.cplusplus.com/reference/istream/istream/seekg/)
+ *
+ * @param i the index of the group to read
+ */
+void DumpFileParser::readGroupByIdx(const INDEX_TYPE i) {
+  this->readNGroups(i, 1);
 }
 
 /**
  * @brief Read N timesteps
  *
+ * @param start the index to start at reading
  * @param N the nr of groups to read; a negative value results in all groups
  * being read.
  */
-void DumpFileParser::readNGroups(const int N) {
-  if (this->newGroupKey.empty()) {
-    throw std::runtime_error("Starting reading first, specify the file");
+void DumpFileParser::readNGroups(const INDEX_TYPE start, const int N) {
+  if (!this->file.is_open()) {
+    throw std::runtime_error("Cannot read from closed file.");
+  }
+
+  if (start > this->getLength() || ((int)start + N) > this->getLength()) {
+    throw std::invalid_argument("Cannot read from outside the length of the "
+                                "dump file. Tried to read from " +
+                                std::to_string(start) + " to " +
+                                std::to_string(N) + " for a file with " +
+                                std::to_string(this->getLength()) +
+                                " time-steps.");
+  }
+
+  this->file.seekg(this->groupPosMap[start]);
+  if (this->file.eof()) {
+    this->file.clear();
   }
 
   int groupsRead = 0;
@@ -78,10 +123,12 @@ void DumpFileParser::readNGroups(const int N) {
   int currentNrOfExpectedGroups = this->headerColMap[currentKey].size();
   data_item_t dataItem;
   std::string line = this->currentLine;
+  // std::cout << "Starting to read at " << start << " with " << line
+  //           << " and key " << currentKey << std::endl;
 
   while (getline(this->file, line)) {
+    // std::cout << "Read line: " << line << std::endl;
     line = pylimer_tools::utils::trimLineOmitComment(line);
-    // skip empty lines
     if (line.empty()) {
       continue;
     }
@@ -96,19 +143,21 @@ void DumpFileParser::readNGroups(const int N) {
 
     if (line == newGroupKey) {
       // new timestep
-      groupsRead += 1;
+      this->groupPosMap[this->data.size()] = this->file.tellg();
       if ((N > 0 && groupsRead >= N)) {
         break;
       }
-      this->data.push_back(dataItem);
-      this->groupPosMap[this->data.size()] = this->file.tellg();
+      this->data[start + groupsRead] = dataItem;
+      groupsRead += 1;
       dataItem = data_item_t();
     }
   }
 
   this->currentLine = line;
   // last timestep
-  this->data.push_back(dataItem);
+  this->data[start + groupsRead] = dataItem;
+  groupsRead += 1;
+  // std::cout << "Read " << groupsRead << " groups of " << this->getLength() << std::endl;
 };
 
 /**
@@ -116,8 +165,8 @@ void DumpFileParser::readNGroups(const int N) {
  *
  * @param index
  */
-void DumpFileParser::forgetAt(const int index) {
-  this->data.erase(this->data.begin() + index);
+void DumpFileParser::forgetAt(const INDEX_TYPE index) {
+  this->data.erase(index);
 };
 
 /**
@@ -125,14 +174,17 @@ void DumpFileParser::forgetAt(const int index) {
  *
  * @param filePath
  */
-void DumpFileParser::read(const std::string filePath) {
-  this->startReading(filePath);
-  this->readNGroups(-1);
-  this->finishedReading = true;
+void DumpFileParser::read() {
+  this->data.reserve(this->getLength());
+  this->readNGroups(0, -1);
   this->finish();
 }
 
-void DumpFileParser::finish() { this->file.close(); }
+void DumpFileParser::finish() {
+  if (this->file.is_open()) {
+    this->file.close();
+  }
+}
 
 std::string DumpFileParser::cleanHeader(std::string headerToClean) {
   // "ITEM: ".size() = 6

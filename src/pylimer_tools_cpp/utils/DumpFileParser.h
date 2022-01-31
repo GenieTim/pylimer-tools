@@ -2,8 +2,8 @@
 #define DUMP_FILE_PARSER_H
 
 #include "../entities/Universe.h"
-#include "../entities/UniverseSequence.h"
 #include "StringUtils.h"
+#include "TYPES.h"
 #include <algorithm>
 #include <any>
 #include <cctype>
@@ -22,32 +22,35 @@ typedef std::map<std::string, std::vector<pylimer_tools::utils::CsvTokenizer>>
 
 class DumpFileParser {
 public:
-  void read(const std::string filePath);
-  void startReading(const std::string filePath);
-  void finish();
-  void readNGroups(const int N);
-  void readGroupByIdx(const int i);
-  void forgetAt(const int index);
+  DumpFileParser(){};
+  DumpFileParser(const std::string filePath);
 
-  bool isFinishedReading() const { return this->finishedReading; }
+  void read();
+  void finish();
+  void readNGroups(const INDEX_TYPE start, const int N);
+  void readGroupByIdx(const INDEX_TYPE i);
+  void forgetAt(const INDEX_TYPE index);
+
   template <typename OUT>
-  std::vector<OUT> getValuesForAt(const int index, const std::string headerKey,
+  std::vector<OUT> getValuesForAt(const INDEX_TYPE index,
+                                  const std::string headerKey,
                                   const std::string &column);
   template <typename OUT>
-  std::vector<OUT> getValuesForAt(const int index, const std::string headerKey,
-                                  const int column);
+  std::vector<OUT> getValuesForAt(const INDEX_TYPE index,
+                                  const std::string headerKey,
+                                  const INDEX_TYPE column);
   // the next two methods are specializations for easier py binding
-  std::vector<std::string> getStringValuesForAt(const int index,
+  std::vector<std::string> getStringValuesForAt(const INDEX_TYPE index,
                                                 const std::string headerKey,
                                                 const std::string column) {
     return this->getValuesForAt<std::string>(index, headerKey, column);
   };
-  std::vector<double> getNumericValuesForAt(const int index,
+  std::vector<double> getNumericValuesForAt(const INDEX_TYPE index,
                                             const std::string headerKey,
                                             const std::string column) {
     return this->getValuesForAt<double>(index, headerKey, column);
   };
-  int getLength() { return this->data.size(); }
+  int getLength() { return this->nrOfGroups; }
   bool hasKey(std::string headerKey) {
     if (this->getLength() > 0) {
       // assumption: each step has the same keys
@@ -93,18 +96,18 @@ private:
   std::string newGroupKey;
   std::string currentLine;
   std::ifstream file;
-  std::vector<data_item_t> data;
+  int nrOfGroups;
+  std::unordered_map<INDEX_TYPE, data_item_t> data;
   std::map<std::string, std::vector<std::string>> headerColMap;
-  std::map<int, int> groupPosMap;
-  bool finishedReading = false;
+  std::map<INDEX_TYPE, int> groupPosMap;
 };
 
 template <typename OUT>
-std::vector<OUT> DumpFileParser::getValuesForAt(const int index,
+std::vector<OUT> DumpFileParser::getValuesForAt(const INDEX_TYPE index,
                                                 const std::string headerKey,
                                                 const std::string &column) {
   // detect index of column
-  int colIdx = 0;
+  INDEX_TYPE colIdx = 0;
   if (this->headerColMap[headerKey].size() > 1) {
     const auto colItIdx =
         std::find(this->headerColMap[headerKey].begin(),
@@ -119,9 +122,12 @@ std::vector<OUT> DumpFileParser::getValuesForAt(const int index,
 }
 
 template <typename OUT>
-std::vector<OUT> DumpFileParser::getValuesForAt(const int index,
+std::vector<OUT> DumpFileParser::getValuesForAt(const INDEX_TYPE index,
                                                 const std::string headerKey,
-                                                const int colIdx) {
+                                                const INDEX_TYPE colIdx) {
+  // if (!this->data.contains(index)) {
+  //   this->readGroupByIdx(index);
+  // }
   data_item_t dataItem = this->data[index];
   //
   std::vector<pylimer_tools::utils::CsvTokenizer> relevantData =

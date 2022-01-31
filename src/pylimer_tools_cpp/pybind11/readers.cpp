@@ -32,7 +32,7 @@ using namespace pylimer_tools::utils;
 void init_pylimer_bound_readers(py::module_ &m) {
 
   py::class_<DumpFileParser>(m, "DumpFileReader")
-      .def(py::init<>())
+      .def(py::init<const std::string>())
       .def("read", &DumpFileParser::read, "Read a file")
       .def("getLength", &DumpFileParser::getLength,
            "Get the number of sections in the file")
