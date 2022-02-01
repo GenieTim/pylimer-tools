@@ -18,13 +18,51 @@ namespace utils {
 typedef std::map<std::string, std::vector<pylimer_tools::utils::CsvTokenizer>>
     data_item_t;
 
+// rule of three:
+// 1. destructor (to destroy the graph)
+DumpFileParser::~DumpFileParser() { this->finish(); };
+// 2. copy constructor
+DumpFileParser::DumpFileParser(const DumpFileParser &src) {
+  this->currentLine = src.currentLine;
+  this->newGroupKey = src.newGroupKey;
+  this->nrOfGroups = src.nrOfGroups;
+  this->data = src.data;
+  this->headerColMap = src.headerColMap;
+  this->groupPosMap = src.groupPosMap;
+  this->filePath = src.filePath;
+  // cannot clone ifstream
+  this->file.clear();
+  this->file.open(src.filePath);
+};
+// 3. copy assignment operator
+DumpFileParser &DumpFileParser::operator=(DumpFileParser src) {
+  std::swap(this->currentLine, src.currentLine);
+  std::swap(this->newGroupKey, src.newGroupKey);
+  std::swap(this->nrOfGroups, src.nrOfGroups);
+  std::swap(this->data, src.data);
+  std::swap(this->headerColMap, src.headerColMap);
+  std::swap(this->groupPosMap, src.groupPosMap);
+  // cannot clone ifstream
+  if (src.file.is_open()) {
+    src.file.close();
+  }
+  if (this->file.is_open()) {
+    this->file.close();
+  }
+  this->file.clear();
+  this->file.open(src.filePath);
+  src.file.open(this->filePath);
+  std::swap(this->filePath, src.filePath);
+  return *this;
+};
+
 /**
  * @brief Initialize the parser to read from a certain file path
  *
  * @param filePath
  */
 DumpFileParser::DumpFileParser(const std::string filePath) {
-
+  this->filePath = filePath;
   if (!std::filesystem::exists(filePath)) {
     throw std::invalid_argument("File to read (" + filePath +
                                 ") does not exist.");
@@ -157,7 +195,8 @@ void DumpFileParser::readNGroups(const INDEX_TYPE start, const int N) {
   // last timestep
   this->data[start + groupsRead] = dataItem;
   groupsRead += 1;
-  // std::cout << "Read " << groupsRead << " groups of " << this->getLength() << std::endl;
+  // std::cout << "Read " << groupsRead << " groups of " << this->getLength() <<
+  // std::endl;
 };
 
 /**

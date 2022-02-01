@@ -343,6 +343,9 @@ void init_pylimer_bound_entities(py::module_ &m) {
       .def("atIndex", &UniverseSequence::atIndex,
            "Get the Universe at the given index (as of in the sequence given "
            "by the dump file).")
+      .def("forgetAtIndex", &UniverseSequence::forgetAtIndex,
+           "Clear the memory of the Universe at the given index (as of in the sequence given "
+           "by the dump file).")
       .def("resetIterator", &UniverseSequence::resetIterator,
            "Reset the internal iterator, such that a subsequent call to "
            ":code:`next()` returns the first one again.")
