@@ -3,6 +3,12 @@
 cd "$(dirname "$0")/.." || exit 10
 ROOT_DIR=$(pwd)
 
+# delete old stuff
+if [ -d "_skbuild" ]; then
+  rm -rf ./_skbuild
+  rm -rf ./vendor/igraph
+fi
+
 cd "$ROOT_DIR/tests" || exit 2
 
 # first, run cpp tests

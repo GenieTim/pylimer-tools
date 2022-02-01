@@ -16,8 +16,10 @@ void init_pylimer_bound_writers(py::module_ &m) {
       .def(py::init<pe::Universe>())
       .def("setUniverseToWrite", &DataFileWriter::setUniverseToWrite)
       .def("configIncludeAngles", &DataFileWriter::configIncludeAngles)
+      .def("configReindexAtoms", &DataFileWriter::configReindexAtoms)
+      .def("configCrosslinkerType", &DataFileWriter::configCrosslinkerType)
       .def("configMoleculeIdxForSwap",
-      &DataFileWriter::configMoleculeIdxForSwap)
+           &DataFileWriter::configMoleculeIdxForSwap)
       .def("writeToFile", &DataFileWriter::writeToFile);
 }
 

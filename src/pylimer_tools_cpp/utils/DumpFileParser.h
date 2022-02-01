@@ -25,6 +25,14 @@ public:
   DumpFileParser(){};
   DumpFileParser(const std::string filePath);
 
+  // rule of three:
+  // 1. destructor (to destroy the graph)
+  ~DumpFileParser();
+  // 2. copy constructor
+  DumpFileParser(const DumpFileParser &src);
+  // 3. copy assignment operator
+  DumpFileParser &operator=(DumpFileParser src);
+
   void read();
   void finish();
   void readNGroups(const INDEX_TYPE start, const int N);
@@ -93,6 +101,7 @@ private:
   }
 
   //// data
+  std::string filePath;
   std::string newGroupKey;
   std::string currentLine;
   std::ifstream file;

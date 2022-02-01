@@ -41,6 +41,14 @@ if (os.path.exists(igraphVendor)):
 else:
     print("No need to delete {}".format(igraphVendor))
 
+skbuildCaches = os.path.abspath(os.path.join(os.path.dirname(__file__), '_skbuild'))
+if (os.path.exists(skbuildCaches)):
+    try:
+        shutil.rmtree(skbuildCaches)
+    except:
+        warnings.warn("Could not delete directory {}. Errors incoming.".format(skbuildCaches))
+
+
 setup(
     name="pylimer_tools",
     version="0.1.0",

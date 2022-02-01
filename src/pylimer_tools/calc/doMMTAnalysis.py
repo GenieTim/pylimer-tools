@@ -221,7 +221,7 @@ def computeMMsProbabilities(r, p, f):
         beta = ((r*p*(alpha**3)) + 1 - r*p)
     else:
         def funToRootForAlpha(alpha):
-            return r*p**2*alpha**(f-1) - alpha - r*p ^ 2 + 1
+            return r*p**2*alpha**(f-1) - alpha - r*p ** 2 + 1
         alphaSol = optimize.root_scalar(
             funToRootForAlpha, bracket=(0, 1), method='brentq')
         alpha = alphaSol.root
