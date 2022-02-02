@@ -60,17 +60,21 @@ public:
   };
   int getLength() { return this->nrOfGroups; }
   bool hasKey(std::string headerKey) {
+    if (this->data.size() == 0) {
+      throw std::invalid_argument("Cannot check for header '" + headerKey + "' without reading a group first.");
+    }
     if (this->getLength() > 0) {
       // assumption: each step has the same keys
-      return this->data[0].contains(headerKey);
+      auto firstEl = this->data.begin();
+      return firstEl->second.contains(headerKey);
     }
     return false;
   }
   bool keyHasColumn(std::string headerKey, std::string column) {
     const auto colItIdx =
-        std::find(this->headerColMap[headerKey].begin(),
-                  this->headerColMap[headerKey].end(), column);
-    if (this->headerColMap[headerKey].end() == colItIdx) {
+        std::find(this->headerColMap.at(headerKey).begin(),
+                  this->headerColMap.at(headerKey).end(), column);
+    if (this->headerColMap.at(headerKey).end() == colItIdx) {
       return false;
     }
     return true;
@@ -79,8 +83,8 @@ public:
                                std::string dirSuffix) {
     // std::cout << "Searching for " << headerKey << " " << dirPraefix <<
     // dirSuffix << " in " <<
-    // pylimer_tools::utils::join(this->headerColMap[headerKey].begin(),
-    // this->headerColMap[headerKey].end(), std::string(" ")) << std::endl;
+    // pylimer_tools::utils::join(this->headerColMap.at(headerKey).begin(),
+    // this->headerColMap.at(headerKey).end(), std::string(" ")) << std::endl;
     return this->keyHasColumn(headerKey, dirPraefix + "x" + dirSuffix) &&
            this->keyHasColumn(headerKey, dirPraefix + "y" + dirSuffix) &&
            this->keyHasColumn(headerKey, dirPraefix + "z" + dirSuffix);
@@ -117,15 +121,15 @@ std::vector<OUT> DumpFileParser::getValuesForAt(const INDEX_TYPE index,
                                                 const std::string &column) {
   // detect index of column
   INDEX_TYPE colIdx = 0;
-  if (this->headerColMap[headerKey].size() > 1) {
+  if (this->headerColMap.at(headerKey).size() > 1) {
     const auto colItIdx =
-        std::find(this->headerColMap[headerKey].begin(),
-                  this->headerColMap[headerKey].end(), column);
-    if (this->headerColMap[headerKey].end() == colItIdx) {
+        std::find(this->headerColMap.at(headerKey).begin(),
+                  this->headerColMap.at(headerKey).end(), column);
+    if (this->headerColMap.at(headerKey).end() == colItIdx) {
       throw std::invalid_argument("Column '" + column +
                                   "' not found for header '" + headerKey + "'");
     }
-    colIdx = colItIdx - this->headerColMap[headerKey].begin();
+    colIdx = colItIdx - this->headerColMap.at(headerKey).begin();
   }
   return this->getValuesForAt<OUT>(index, headerKey, colIdx);
 }
@@ -134,10 +138,12 @@ template <typename OUT>
 std::vector<OUT> DumpFileParser::getValuesForAt(const INDEX_TYPE index,
                                                 const std::string headerKey,
                                                 const INDEX_TYPE colIdx) {
-  // if (!this->data.contains(index)) {
-  //   this->readGroupByIdx(index);
-  // }
-  data_item_t dataItem = this->data[index];
+  if (!this->data.contains(index)) {
+    // std::cout << "Could not find index " << index << "in data yet" << std::endl;
+    this->readGroupByIdx(index);
+  }
+  // std::cout << "Requested values for index " << index << ", key " << headerKey << " and column " << colIdx << std::endl; 
+  data_item_t dataItem = this->data.at(index);
   //
   std::vector<pylimer_tools::utils::CsvTokenizer> relevantData =
       dataItem[headerKey];

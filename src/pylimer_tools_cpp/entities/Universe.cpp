@@ -890,7 +890,7 @@ long int Universe::getAtomIdByIdx(const int vertexId) const {
  */
 long int Universe::getIdxByAtomId(const int atomId) const {
   if (!this->atomIdToVectorIdx.contains(atomId)) {
-    throw std::invalid_argument("Atom with this id (" + std::to_string(atomId) +
+    throw std::invalid_argument("Universe cannot return idx of atom id: atom with this id (" + std::to_string(atomId) +
                                 ") does not exist");
   }
   return this->atomIdToVectorIdx.at(atomId);

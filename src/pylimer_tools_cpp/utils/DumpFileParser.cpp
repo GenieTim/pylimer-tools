@@ -88,8 +88,9 @@ DumpFileParser::DumpFileParser(const std::string filePath) {
   // Assemble CSV data for all keys
   this->newGroupKey = line; // new group key: key for a new timestep (group)
   this->currentLine = line; // current line
-  this->groupPosMap[0] =
-      this->file.tellg(); // record position of index to jump back at some point
+  this->groupPosMap.emplace(
+      0, this->file
+             .tellg()); // record position of index to jump back at some point
 
   // read the whole file, skipping all lines that are not the new group key
   // to record the positions
@@ -105,13 +106,13 @@ DumpFileParser::DumpFileParser(const std::string filePath) {
     if (line == this->newGroupKey) {
       // new timestep
       groupsFound += 1;
-      this->groupPosMap[groupsFound] = this->file.tellg();
+      this->groupPosMap.emplace(groupsFound, this->file.tellg());
     }
   }
 
   this->nrOfGroups = groupsFound + 1;
   // reset position to start of first group
-  this->file.seekg(this->groupPosMap[0]);
+  this->file.seekg(this->groupPosMap.at(0));
   this->file.clear();
 }
 
@@ -142,7 +143,7 @@ void DumpFileParser::readNGroups(const INDEX_TYPE start, const int N) {
     throw std::runtime_error("Cannot read from closed file.");
   }
 
-  if (start > this->getLength() || ((int)start + N) > this->getLength()) {
+  if (start >= this->getLength() || ((int)start + N) > this->getLength()) {
     throw std::invalid_argument("Cannot read from outside the length of the "
                                 "dump file. Tried to read from " +
                                 std::to_string(start) + " to " +
@@ -151,7 +152,7 @@ void DumpFileParser::readNGroups(const INDEX_TYPE start, const int N) {
                                 " time-steps.");
   }
 
-  this->file.seekg(this->groupPosMap[start]);
+  this->file.seekg(this->groupPosMap.at(start));
   if (this->file.eof()) {
     this->file.clear();
   }
@@ -161,8 +162,8 @@ void DumpFileParser::readNGroups(const INDEX_TYPE start, const int N) {
   int currentNrOfExpectedGroups = this->headerColMap[currentKey].size();
   data_item_t dataItem;
   std::string line = this->currentLine;
-  // std::cout << "Starting to read at " << start << " with " << line
-  //           << " and key " << currentKey << std::endl;
+  // std::cout << "Starting to read at " << start << " for " << N << " with "
+  //           << line << " and key " << currentKey << std::endl;
 
   while (getline(this->file, line)) {
     // std::cout << "Read line: " << line << std::endl;
@@ -182,10 +183,10 @@ void DumpFileParser::readNGroups(const INDEX_TYPE start, const int N) {
     if (line == newGroupKey) {
       // new timestep
       this->groupPosMap[this->data.size()] = this->file.tellg();
-      if ((N > 0 && groupsRead >= N)) {
+      if ((N > 0 && (groupsRead + 1) >= N)) {
         break;
       }
-      this->data[start + groupsRead] = dataItem;
+      this->data.insert_or_assign(start + groupsRead, dataItem);
       groupsRead += 1;
       dataItem = data_item_t();
     }
@@ -193,10 +194,12 @@ void DumpFileParser::readNGroups(const INDEX_TYPE start, const int N) {
 
   this->currentLine = line;
   // last timestep
-  this->data[start + groupsRead] = dataItem;
+  this->data.insert_or_assign(start + groupsRead, dataItem);
   groupsRead += 1;
-  // std::cout << "Read " << groupsRead << " groups of " << this->getLength() <<
-  // std::endl;
+  // std::cout << "Read " << groupsRead << " groups "
+  //           << "(last " << start + groupsRead - 1 << ") of " <<
+  //           this->getLength()
+  //           << std::endl;
 };
 
 /**
@@ -205,7 +208,9 @@ void DumpFileParser::readNGroups(const INDEX_TYPE start, const int N) {
  * @param index
  */
 void DumpFileParser::forgetAt(const INDEX_TYPE index) {
-  this->data.erase(index);
+  if (this->data.contains(index)) {
+    this->data.erase(index);
+  }
 };
 
 /**

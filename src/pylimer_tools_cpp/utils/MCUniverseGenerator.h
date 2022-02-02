@@ -133,9 +133,17 @@ public:
         // decide what type of site this is
         bool isActiveSite =
             linkerProbabilityDist(this->rng) <= crosslinkerConversion;
+        bool isDanglingStrand =
+            linkerProbabilityDist(this->rng) > crosslinkerConversion;
+        // problem: with only the above approach,
+        // the desired crosslinker conversion is only reached "probably".
+        // that is why we introduce a slightly more sophisticated distinction:
+        int remainingStrands = nrOfStrands - nrOfStrandsAdded;
+        if (remainingStrands * conversionPerBond * 2 <= crosslinkerConversion) {
+          isActiveSite = true;
+          isDanglingStrand = false;
+        }
         if (isActiveSite) {
-          bool isDanglingStrand =
-              linkerProbabilityDist(this->rng) > crosslinkerConversion;
           int targetIdx = this->findAppropriateLink(
               crosslinkers[i], crosslinkers, availableCrosslinkerSites,
               std::sqrt(beadsPerChains[i]) * this->beadDistance);
@@ -158,13 +166,12 @@ public:
 
           if (nrOfStrandsAdded >= nrOfStrands &&
               currentDegreeOfConversion < crosslinkerConversion &&
-              i < crosslinkers.size() - 1) {
+              i + 1 < crosslinkers.size()) {
             throw std::invalid_argument(
                 "Not enough strands to satisfy the "
                 "requested degree of convergence. Current degree: " +
                 std::to_string(currentDegreeOfConversion) + " with " +
-                std::to_string(nrOfStrandsAdded) + " strands added. " +
-                "You could try a different seed.");
+                std::to_string(nrOfStrandsAdded) + " strands added. ");
           }
         }
         availableCrosslinkerSites[i] -= 1;
@@ -287,11 +294,17 @@ private:
     // support crossing of boundary conditions: find nearest image as target
     // (accept image mismatches)
     double targetX =
-        lastX - this->_getDeltaDistance(to.getX(), lastX, this->box.getLx());
+        lastX + this->_getDeltaDistance(to.getX(), lastX, this->box.getLx());
     double targetY =
-        lastY - this->_getDeltaDistance(to.getY(), lastY, this->box.getLy());
+        lastY + this->_getDeltaDistance(to.getY(), lastY, this->box.getLy());
     double targetZ =
-        lastZ - this->_getDeltaDistance(to.getZ(), lastZ, this->box.getLz());
+        lastZ + this->_getDeltaDistance(to.getZ(), lastZ, this->box.getLz());
+
+    // std::cout << "Target acquired: " << targetX << ", " << targetY << ", "
+    //           << targetZ << " for " << to.getX() << ", " << to.getY() << ", "
+    //           << to.getZ() << " to " << lastX << ", " << lastY << ", " <<
+    //           lastZ
+    //           << std::endl;
 
     for (int i = 0; i < chainLen; ++i) {
       double dx = targetX - lastX;
@@ -301,14 +314,20 @@ private:
       double idealBeta =
           dx > 0 ? (std::atan2((dy), (dx)))
                  : (dx < 0 ? (std::atan2((dy), (dx)) + M_PI) : M_PI / 2);
-      double idealWeight =
-          std::min(((double)i) / ((double)chainLen) +
-                       (this->getDistance(lastX, lastY, lastZ, targetX, targetY,
-                                          targetZ) /
-                        (chainLen - i + 1)),
-                   1.0);
 
-      // TODO: find some a bit more sophisticated probability adjustment
+      double remainingDistance = std::sqrt(dx * dx + dy * dy + dz * dz);
+      double idealWeight = 0.0;
+      if ((remainingDistance / std::max(1.0, (double)(chainLen - i - 1))) >
+          this->beadDistance) {
+        // need to constrain, cannot use random alpha & beta
+        // TODO: find some a bit more sophisticated probability adjustment (or
+        // simply use constraints for probability)
+        double idealWeight = 1.0;
+        // std::min(((double)i) / ((double)chainLen) +
+        //              (remainingDistance / (chainLen - i + 1)),
+        //          1.0);
+      }
+
       double alpha = (1 - idealWeight) * angleDistribution(this->rng) +
                      idealWeight * idealAlpha;
       if (isnan(alpha)) {
