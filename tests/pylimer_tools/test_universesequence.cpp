@@ -24,9 +24,12 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]") {
         suspectedPath + "lammps_data_file_small.out",
         suspectedPath + "lammps_dump_small.lammpstrj");
     REQUIRE(universeSeq.getLength() == 1);
+    REQUIRE_THROWS(universeSeq.atIndex(1));
     REQUIRE(universeSeq.atIndex(0).getNrOfAtoms() == 12);
     REQUIRE(universeSeq.atIndex(0).getNrOfBonds() == 5);
     REQUIRE(universeSeq.atIndex(0).getTimestep() == 70764);
+    auto universes = universeSeq.getAll();
+    REQUIRE(universes.size() == 1);
   }
 
   SECTION("Reading from data files works") {
@@ -37,10 +40,22 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]") {
     REQUIRE(universeSeq.atIndex(0).getNrOfBonds() == 2900);
   }
 
-  // SECTION("Reading large files is sensibly fast") {
-  //   universeSeq.initializeFromDumpFile(suspectedPath + "big_dump_file_data.out",
-  //                                      suspectedPath +
-  //                                          "big_dump_file.lammpstrj");
-  //   REQUIRE(universeSeq.getLength() == 292384);
-  // }
+  SECTION("Reading large files is sensibly fast") {
+    universeSeq.initializeFromDumpFile(suspectedPath + "big_dump_file_data.out",
+                                       suspectedPath +
+                                           "big_dump_file.lammpstrj");
+    // can be queried "randomly"
+    pe::Universe universe = universeSeq.atIndex(10);
+    REQUIRE(universe.getNrOfAtoms() == 32);
+    REQUIRE(universeSeq.getLength() == 292384);
+    // and can be queried again
+    universeSeq.forgetAtIndex(10);
+    pe::Universe universeAgain = universeSeq.atIndex(10);
+    REQUIRE(universeAgain.getNrOfAtoms() == 32);
+    // and
+    REQUIRE_THROWS(universeSeq.atIndex(292384));
+    pe::Universe thirdUniverse = universeSeq.atIndex(292384);
+    REQUIRE(thirdUniverse.getNrOfAtoms() == 32);
+
+  }
 }

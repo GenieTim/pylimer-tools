@@ -112,41 +112,6 @@ double Molecule::computeWeight() {
   return totalWeight;
 }
 
-/**
- * @brief compute the lengths of all bonds
- *
- * @return std::vector<double>
- */
-std::vector<double> Molecule::computeBondLengths() {
-  const Box *box = this->getBox();
-  std::vector<double> lengths;
-  lengths.reserve(this->getNrOfBonds());
-  if (this->getNrOfBonds() == 0) {
-    return lengths;
-  }
-  // construct iterator
-  igraph_eit_t bondIterator;
-  if (igraph_eit_create(&this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID),
-                        &bondIterator)) {
-    throw std::runtime_error("Cannot create iterator to loop bonds");
-  }
-
-  while (!IGRAPH_EIT_END(bondIterator)) {
-    long int edgeId = (long int)IGRAPH_EIT_GET(bondIterator);
-    int bondFrom;
-    int bondTo;
-    igraph_edge(&this->graph, edgeId, &bondFrom, &bondTo);
-    // TODO: this is more intensive than needed
-    // check whether the compiler optimizes this or not
-    Atom atom1 = this->getAtomByVertexIdx(bondFrom);
-    Atom atom2 = this->getAtomByVertexIdx(bondTo);
-    lengths.push_back(atom1.distanceTo(atom2, box));
-    IGRAPH_EIT_NEXT(bondIterator);
-  }
-
-  igraph_eit_destroy(&bondIterator);
-  return lengths;
-}
 
 long int Molecule::getAtomIdByIdx(const int vertexId) const {
   return VAN(&this->graph, "id", vertexId);
@@ -154,7 +119,7 @@ long int Molecule::getAtomIdByIdx(const int vertexId) const {
 
 long int Molecule::getIdxByAtomId(const int atomId) const {
   if (!this->atomIdToVectorIdx.contains(atomId)) {
-    throw std::invalid_argument("Atom with this id (" + std::to_string(atomId) +
+    throw std::invalid_argument("Molecule cannot return vertex idx of this atom: an atom with this id (" + std::to_string(atomId) +
                                 ") does not exist");
   }
   return this->atomIdToVectorIdx.at(atomId);
@@ -250,6 +215,7 @@ std::vector<Atom> Molecule::getAtomsLinedUp() {
   results.push_back(this->getAtomByVertexIdx(vertexIdToStartWith));
   for (long int connection : connections) {
     long int currentCenter = connection;
+      results.push_back(this->getAtomByVertexIdx(currentCenter));
     long int lastCenter = vertexIdToStartWith;
     std::vector<long int> subConnections =
         this->getVertexIdxsConnectedTo(currentCenter);

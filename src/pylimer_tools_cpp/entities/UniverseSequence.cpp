@@ -45,7 +45,9 @@ Universe UniverseSequence::next() { return this->atIndex(this->index++); }
 
 Universe UniverseSequence::atIndex(INDEX_TYPE index) {
   if (index >= this->length) {
-    throw std::invalid_argument("Index larger than nr. of universes.");
+    throw std::invalid_argument("Index (" + std::to_string(index) +
+                                ") larger than nr. of universes (" +
+                                std::to_string(this->length) + ").");
   }
   if (!this->universeCache.contains(index)) {
     this->universeCache.emplace(index, this->modeDataFiles
@@ -60,6 +62,7 @@ Universe UniverseSequence::readDataFileAtIndex(INDEX_TYPE index) {
 }
 
 Universe UniverseSequence::readDumpFileAtIndex(INDEX_TYPE index) {
+  // std::cout << "Reading dump file at idx " << index << std::endl;
   this->dumpFileParser.readGroupByIdx(index);
   Universe newUniverse = Universe(0.0, 0.0, 0.0);
   newUniverse.setTimestep(
@@ -127,9 +130,8 @@ Universe UniverseSequence::readDumpFileAtIndex(INDEX_TYPE index) {
     if (nAtomVec.size() > 0) {
       nAtoms = nAtomVec[0];
     }
-  }
-
-  if (nAtoms == 0) {
+  } else {
+    // std::cout << "Number of atoms not found in dumpfile" << std::endl;
     nAtoms = this->dataFileParser.getNrOfAtoms();
   }
 
@@ -180,6 +182,8 @@ Universe UniverseSequence::readDumpFileAtIndex(INDEX_TYPE index) {
           this->dataFileParser.getAtomNx(), this->dataFileParser.getAtomNy(),
           this->dataFileParser.getAtomNz());
       for (long int j = 0; j < nAtoms; ++j) {
+        // std::cout << "Infering type from data file for " << j << " atom id "
+        // << atomIds[j] << std::endl;
         atomTypes.push_back(dataFileUniverse.getAtom(atomIds[j]).getType());
       }
     } else {
@@ -245,7 +249,9 @@ void UniverseSequence::forgetAtIndex(INDEX_TYPE index) {
   if (!this->modeDataFiles) {
     this->dumpFileParser.forgetAt(index);
   }
-  this->universeCache.erase(index);
+  if (this->universeCache.contains(index)) {
+    this->universeCache.erase(index);
+  }
 }
 
 void UniverseSequence::resetIterator() { this->index = 0; }

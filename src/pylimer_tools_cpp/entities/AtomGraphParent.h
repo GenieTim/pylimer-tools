@@ -178,11 +178,9 @@ public:
     igraph_vector_init(&allValues, vertices.size());
     igraph_vector_t vertexIdxs;
     igraph_vector_init(&vertexIdxs, vertices.size());
-    pylimer_tools::utils::StdVectorToIgraphVectorT(
-        vertices,        &vertexIdxs);
-         if (igraph_cattribute_VANV(&this->graph, propertyName,
-                                                igraph_vss_vector(&vertexIdxs),
-                                                &allValues)) {
+    pylimer_tools::utils::StdVectorToIgraphVectorT(vertices, &vertexIdxs);
+    if (igraph_cattribute_VANV(&this->graph, propertyName,
+                               igraph_vss_vector(&vertexIdxs), &allValues)) {
       throw std::runtime_error("Failed to query properties of molecule.");
     }
     pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
@@ -234,6 +232,41 @@ public:
     igraph_vector_destroy(&endNodeSelectorVector);
     igraph_vit_destroy(&vit);
     return results;
+  }
+
+  /**
+   * @brief compute the lengths of all bonds
+   *
+   * @return std::vector<double>
+   */
+  std::vector<double> computeBondLengths(const Box *box) {
+    std::vector<double> lengths;
+    lengths.reserve(this->getNrOfBonds());
+    if (this->getNrOfBonds() == 0) {
+      return lengths;
+    }
+    // construct iterator
+    igraph_eit_t bondIterator;
+    if (igraph_eit_create(&this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID),
+                          &bondIterator)) {
+      throw std::runtime_error("Cannot create iterator to loop bonds");
+    }
+
+    while (!IGRAPH_EIT_END(bondIterator)) {
+      long int edgeId = (long int)IGRAPH_EIT_GET(bondIterator);
+      int bondFrom;
+      int bondTo;
+      igraph_edge(&this->graph, edgeId, &bondFrom, &bondTo);
+      // TODO: this is more intensive than needed
+      // check whether the compiler optimizes this or not
+      Atom atom1 = this->getAtomByVertexIdx(bondFrom);
+      Atom atom2 = this->getAtomByVertexIdx(bondTo);
+      lengths.push_back(atom1.distanceTo(atom2, box));
+      IGRAPH_EIT_NEXT(bondIterator);
+    }
+
+    igraph_eit_destroy(&bondIterator);
+    return lengths;
   }
 
 protected:

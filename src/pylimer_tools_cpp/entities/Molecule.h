@@ -4,8 +4,8 @@
 extern "C" {
 #include <igraph/igraph.h>
 }
-#include "AtomGraphParent.h"
 #include "Atom.h"
+#include "AtomGraphParent.h"
 #include "Box.h"
 #include <map>
 #include <string>
@@ -54,7 +54,9 @@ public:
   double computeEndToEndDistance();
   double computeRadiusOfGyration();
   double computeWeight();
-  std::vector<double> computeBondLengths();
+  std::vector<double> computeBondLengths() {
+    return AtomGraphParent::computeBondLengths(this->parent);
+  };
 
   // operators
   Atom operator[](size_t index) const {

@@ -85,8 +85,8 @@ public:
         bondType = 1;
       }
       file << "\t" << i << "\t" << bondType << "\t"
-           << (this->universe.getAtomIdByIdx(bonds["bond_from"][i])) << "\t"
-           << (this->universe.getAtomIdByIdx(bonds["bond_to"][i])) << "\n";
+           << (this->oldNewAtomIdMap[this->universe.getAtomIdByIdx(bonds["bond_from"][i])]) << "\t"
+           << (this->oldNewAtomIdMap[this->universe.getAtomIdByIdx(bonds["bond_to"][i])]) << "\n";
     }
     file << "\n";
 
@@ -98,8 +98,8 @@ public:
       for (int i = 0; i < this->universe.getNrOfAngles(); ++i) {
         int angleType = 1; // TODO: support angle types?
         file << "\t" << i << "\t" << angleType << "\t"
-             << (angles["angle_from"][i]) << "\t" << (angles["angle_via"][i])
-             << "\t" << (angles["angle_to"][i]) << "\n";
+             << (this->oldNewAtomIdMap[angles["angle_from"][i]]) << "\t" << (this->oldNewAtomIdMap[angles["angle_via"][i]])
+             << "\t" << (this->oldNewAtomIdMap[angles["angle_to"][i]]) << "\n";
       }
       file << "\n";
     }
@@ -120,7 +120,8 @@ private:
   void writeAtom(std::ofstream &file, pylimer_tools::entities::Atom atom,
                  int moleculeIdx, int nAtomsOutput) {
     long int atomId = this->reindexAtoms ? nAtomsOutput : atom.getId();
-    file << "\t" << atom.getId() << "\t" << moleculeIdx << "\t"
+    this->oldNewAtomIdMap[atom.getId()] = atomId;
+    file << "\t" << atomId << "\t" << moleculeIdx << "\t"
          << atom.getType() << "\t" << atom.getX() << "\t" << atom.getY() << "\t"
          << atom.getZ() << "\t" << atom.getNX() << "\t" << atom.getNY() << "\t"
          << atom.getNZ() << "\n";

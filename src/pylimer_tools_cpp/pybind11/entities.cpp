@@ -161,7 +161,7 @@ void init_pylimer_bound_entities(py::module_ &m) {
       .def("computeWeight", &Molecule::computeWeight,
            "Computes the total weight of this molecule.")
       .def("computeBondLengths", &Molecule::computeBondLengths,
-           "Computes the length :math:`b` of each bond in the molecule.")
+           "Computes the length :math:`b` of each bond in the molecule, respecting periodic boundaries.")
       .def("computeRadiusOfGyration", &Molecule::computeRadiusOfGyration,
            R"pbdoc(
             Computes the radius of gyration, :math:`R_g^2` of this molecule.
@@ -295,6 +295,8 @@ void init_pylimer_bound_entities(py::module_ &m) {
            "Count the number of immediate neighbours of an atom, specified by "
            "its vertex id.")
       // computations
+      .def("computeBondLengths", &Universe::computeBondLengths,
+           "Computes the length :math:`b` of each bond in the molecule, respecting periodic boundaries.")
       .def("detectAngles", &Universe::detectAngles, "Returns just as #getAngles, but all angles that are found in the network.")
       .def(
           "hasInfiniteStrand", &Universe::hasInfiniteStrand,

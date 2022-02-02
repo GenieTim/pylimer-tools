@@ -5,11 +5,11 @@ extern "C" {
 #include <igraph/igraph.h>
 }
 #include "Atom.h"
+#include "AtomGraphParent.h"
 #include "Molecule.h"
 #include <map>
 #include <unordered_map>
 #include <vector>
-#include "AtomGraphParent.h"
 
 namespace pylimer_tools {
 namespace entities {
@@ -17,7 +17,7 @@ namespace entities {
 class Universe : public AtomGraphParent {
 public:
   Universe(const double Lx, const double Ly, const double Lz);
-  
+
   // rule of three:
   // 1. destructor (to destroy the graph)
   ~Universe();
@@ -36,9 +36,10 @@ public:
                 std::vector<long int> to);
   void addBonds(const size_t NNewBonds, std::vector<long int> from,
                 std::vector<long int> to, std::vector<int> bondTypes,
-                const bool ignoreNonExistentAtoms = false, const bool simplify = true);
-  void addAngles(std::vector<long int> from,
-                 std::vector<long int> via, std::vector<long int> to);
+                const bool ignoreNonExistentAtoms = false,
+                const bool simplify = true);
+  void addAngles(std::vector<long int> from, std::vector<long int> via,
+                 std::vector<long int> to);
   void setMasses(std::map<int, double> weightPerType);
   void setBox(Box box);
   void setTimestep(long int timestep) { this->timestep = timestep; };
@@ -51,7 +52,8 @@ public:
   std::map<std::string, std::vector<long int>> getAngles() const;
   std::vector<Molecule> getClusters() const;
   std::vector<Molecule> getMolecules(const int atomTypeToOmit = -1) const;
-  std::vector<Molecule> getChainsWithCrosslinker(const int crosslinkerType) const;
+  std::vector<Molecule>
+  getChainsWithCrosslinker(const int crosslinkerType) const;
   Universe getNetworkOfCrosslinker(const int crosslinkerType) const;
   // TODO: find & implement a better return type, e.g. std::vector<Molecule>
   std::map<int, std::vector<std::vector<Atom>>>
@@ -62,7 +64,8 @@ public:
   }
   std::map<int, int> countAtomTypes() const;
   template <typename IN>
-  long int findVertexIdForProperty(const char *propertyName, IN propertyValue) const;
+  long int findVertexIdForProperty(const char *propertyName,
+                                   IN propertyValue) const;
   Box getBox();
   double getVolume();
   const int getNrOfAtoms() const;
@@ -89,6 +92,9 @@ public:
                                  const std::vector<int> bondTo);
   std::vector<double> computeDzs(const std::vector<int> bondFrom,
                                  const std::vector<int> bondTo);
+  std::vector<double> computeBondLengths() {
+    return AtomGraphParent::computeBondLengths(&this->box);
+  };
   double getMeanStrandLength(int junctionType);
   double computeMeanEndToEndDistance(int junctionType);
   double computeMeanBondLength();
