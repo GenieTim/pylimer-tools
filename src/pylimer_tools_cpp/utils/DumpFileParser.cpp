@@ -127,7 +127,7 @@ DumpFileParser::DumpFileParser(const std::string filePath) {
  *
  * @param i the index of the group to read
  */
-void DumpFileParser::readGroupByIdx(const INDEX_TYPE i) {
+void DumpFileParser::readGroupByIdx(const size_t i) {
   this->readNGroups(i, 1);
 }
 
@@ -138,7 +138,7 @@ void DumpFileParser::readGroupByIdx(const INDEX_TYPE i) {
  * @param N the nr of groups to read; a negative value results in all groups
  * being read.
  */
-void DumpFileParser::readNGroups(const INDEX_TYPE start, const int N) {
+void DumpFileParser::readNGroups(const size_t start, const int N) {
   if (!this->file.is_open()) {
     throw std::runtime_error("Cannot read from closed file.");
   }
@@ -157,7 +157,7 @@ void DumpFileParser::readNGroups(const INDEX_TYPE start, const int N) {
     this->file.clear();
   }
 
-  int groupsRead = 0;
+  size_t groupsRead = 0;
   std::string currentKey = this->cleanHeader(this->currentLine);
   int currentNrOfExpectedGroups = this->headerColMap[currentKey].size();
   data_item_t dataItem;
@@ -207,7 +207,7 @@ void DumpFileParser::readNGroups(const INDEX_TYPE start, const int N) {
  *
  * @param index
  */
-void DumpFileParser::forgetAt(const INDEX_TYPE index) {
+void DumpFileParser::forgetAt(const size_t index) {
   if (this->data.contains(index)) {
     this->data.erase(index);
   }

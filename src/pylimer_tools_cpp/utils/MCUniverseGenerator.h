@@ -300,64 +300,74 @@ private:
     double targetZ =
         lastZ + this->_getDeltaDistance(to.getZ(), lastZ, this->box.getLz());
 
-    // std::cout << "Target acquired: " << targetX << ", " << targetY << ", "
-    //           << targetZ << " for " << to.getX() << ", " << to.getY() << ", "
-    //           << to.getZ() << " to " << lastX << ", " << lastY << ", " <<
-    //           lastZ
-    //           << std::endl;
-
     for (int i = 0; i < chainLen; ++i) {
       double dx = targetX - lastX;
       double dy = targetY - lastY;
       double dz = targetZ - lastZ;
-      double idealAlpha = std::acos(std::clamp(dz, -1.0, 1.0));
-      double idealBeta =
-          dx > 0 ? (std::atan2((dy), (dx)))
-                 : (dx < 0 ? (std::atan2((dy), (dx)) + M_PI) : M_PI / 2);
-
+      // for primary loops, dx, dy & dz are zero, intially. 
+      // therewith, alpha will be NaN
       double remainingDistance = std::sqrt(dx * dx + dy * dy + dz * dz);
+      // alpha = theta in Wikipedia
+      double idealAlpha =
+          std::acos(std::clamp(dz / remainingDistance, -1.0, 1.0));
+      // beta = phi in Wikipedia
+      double idealBeta = dx == 0.0 ? (M_PI * 0.5) : (std::atan2(dy, dx));
+      double bondLenToUse = this->beadDistance;
       double idealWeight = 0.0;
-      if ((remainingDistance / std::max(1.0, (double)(chainLen - i - 1))) >
-          this->beadDistance) {
+      double bondsRemaining = (chainLen - i + 1);
+      if ((remainingDistance / (bondsRemaining)) > this->beadDistance) {
         // need to constrain, cannot use random alpha & beta
         // TODO: find some a bit more sophisticated probability adjustment (or
         // simply use constraints for probability)
-        double idealWeight = 1.0;
+        idealWeight = 1.0;
+        bondLenToUse = remainingDistance / (bondsRemaining);
         // std::min(((double)i) / ((double)chainLen) +
         //              (remainingDistance / (chainLen - i + 1)),
         //          1.0);
       }
 
-      double alpha = (1 - idealWeight) * angleDistribution(this->rng) +
+      double alpha = (1.0 - idealWeight) * angleDistribution(this->rng) +
                      idealWeight * idealAlpha;
       if (isnan(alpha)) {
         std::cout << "Got nan for alpha with idealAlpha = " << idealAlpha
                   << ", weight = " << idealWeight << ", dx = " << dx
-                  << ", dy = " << dy << ", dz = " << dz << std::endl;
+                  << ", dy = " << dy << ", dz = " << dz << " at i = " << i
+                  << std::endl;
         alpha = isnan(idealAlpha) ? angleDistribution(this->rng) : idealAlpha;
       };
-      double beta = (1 - idealWeight) * angleDistribution(this->rng) +
+      double beta = (1.0 - idealWeight) * angleDistribution(this->rng) +
                     idealWeight * idealBeta;
       if (isnan(beta)) {
         std::cout << "Got nan for beta with idealBeta = " << idealBeta
                   << ", weight = " << idealWeight << ", dx = " << dx
-                  << ", dy = " << dy << ", dz = " << dz << std::endl;
+                  << ", dy = " << dy << ", dz = " << dz << " at i = " << i
+                  << std::endl;
 
         beta = isnan(idealBeta) ? angleDistribution(this->rng) : idealBeta;
       }
+      // std::cout << "Using ideal weight " << idealWeight << " at " << i
+      //           << ", remaining d: " << remainingDistance << " with alpha "
+      //           << alpha << ", ideal " << idealAlpha << ", beta " << beta <<
+      //           ", ideal " << idealBeta << std::endl;
       // coordinate system conversion: confirmation e.g. in
       // https://math.stackexchange.com/a/1385150/738831 or
       // https://en.wikipedia.org/wiki/Spherical_coordinate_system
-      xs.push_back(lastX +
-                   this->beadDistance * std::cos(beta) * std::sin(alpha));
+      xs.push_back(lastX + bondLenToUse * std::cos(beta) * std::sin(alpha));
       lastX = xs[i];
-      ys.push_back(lastY +
-                   this->beadDistance * std::cos(beta) * std::cos(alpha));
+      ys.push_back(lastY + bondLenToUse * std::sin(beta) * std::sin(alpha));
       lastY = ys[i];
-      zs.push_back(lastZ + this->beadDistance * std::sin(beta));
+      zs.push_back(lastZ + bondLenToUse * std::cos(alpha));
       lastZ = zs[i];
       assert(!isnan(lastX) && !isnan(lastY) && !isnan(lastZ));
     }
+
+    // std::cout << "Made chain with final " << lastX << ", " << lastY << ", "
+    //           << lastZ << " to target: " << targetX << ", " << targetY << ",
+    //           "
+    //           << targetZ << " with length "
+    //           << this->getDistance(lastX, lastY, lastZ, targetX, targetY,
+    //                                targetZ)
+    //           << std::endl;
 
     Positions positions;
     positions.x = xs;
@@ -376,7 +386,6 @@ private:
     // finally, actually add the bonds
     this->universe.addBonds(chainLen + 1, bondsFrom, bondsTo, bondTypes, false,
                             false);
-    // std::cout << "Done random walk from/to" << std::endl;
   }
 
   /**
@@ -557,7 +566,7 @@ private:
     double dx = this->_getDeltaDistance(x1, x2, this->box.getLx());
     double dy = this->_getDeltaDistance(y1, y2, this->box.getLy());
     double dz = this->_getDeltaDistance(z1, z2, this->box.getLz());
-    return dx * dx + dy * dy + dz * dz;
+    return std::sqrt(dx * dx + dy * dy + dz * dz);
   }
 
   double _getDeltaDistance(double c1, double c2, double boxL) const {

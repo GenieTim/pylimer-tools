@@ -43,7 +43,7 @@ void UniverseSequence::initializeFromDataSequence(
 
 Universe UniverseSequence::next() { return this->atIndex(this->index++); }
 
-Universe UniverseSequence::atIndex(INDEX_TYPE index) {
+Universe UniverseSequence::atIndex(size_t index) {
   if (index >= this->length) {
     throw std::invalid_argument("Index (" + std::to_string(index) +
                                 ") larger than nr. of universes (" +
@@ -57,21 +57,24 @@ Universe UniverseSequence::atIndex(INDEX_TYPE index) {
   return this->universeCache.at(index);
 }
 
-Universe UniverseSequence::readDataFileAtIndex(INDEX_TYPE index) {
+Universe UniverseSequence::readDataFileAtIndex(size_t index) {
   return this->readDataFile(this->dataFiles[index]);
 }
 
-Universe UniverseSequence::readDumpFileAtIndex(INDEX_TYPE index) {
+Universe UniverseSequence::readDumpFileAtIndex(size_t index) {
   // std::cout << "Reading dump file at idx " << index << std::endl;
   this->dumpFileParser.readGroupByIdx(index);
   Universe newUniverse = Universe(0.0, 0.0, 0.0);
-  newUniverse.setTimestep(
-      this->dumpFileParser.getValuesForAt<long int>(index, "TIMESTEP", 0)[0]);
+  std::vector<long int> timeStepData =
+      this->dumpFileParser.getValuesForAt<long int>(index, "TIMESTEP", 0);
+  assert(timeStepData.size() > 0);
+  newUniverse.setTimestep(timeStepData[0]);
   if (this->dumpFileParser.hasKey("BOX BOUNDS")) {
     std::vector<double> lo =
         this->dumpFileParser.getValuesForAt<double>(index, "BOX BOUNDS", 0);
     std::vector<double> hi =
         this->dumpFileParser.getValuesForAt<double>(index, "BOX BOUNDS", 1);
+    assert(lo.size() == 3 && hi.size() == 3);
     newUniverse.setBoxLengths(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]);
   } else {
     newUniverse.setBoxLengths(this->dataFileParser.getLx(),
@@ -111,6 +114,7 @@ Universe UniverseSequence::readDumpFileAtIndex(INDEX_TYPE index) {
       index, "ATOMS", "y" + positionSuffix);
   std::vector<double> positionsZ = this->dumpFileParser.getValuesForAt<double>(
       index, "ATOMS", "z" + positionSuffix);
+  assert(positionsZ.size() == positionsY.size() && positionsY.size() == positionsX.size());
   if (xMultiplier != 1.0 && yMultiplier != 1.0 && zMultiplier != 1.0) {
     for (size_t i = 0; i < positionsZ.size(); ++i) {
       positionsX[i] *= xMultiplier;
@@ -245,7 +249,7 @@ std::vector<Universe> UniverseSequence::getAll() {
   return results;
 }
 
-void UniverseSequence::forgetAtIndex(INDEX_TYPE index) {
+void UniverseSequence::forgetAtIndex(size_t index) {
   if (!this->modeDataFiles) {
     this->dumpFileParser.forgetAt(index);
   }
@@ -256,7 +260,7 @@ void UniverseSequence::forgetAtIndex(INDEX_TYPE index) {
 
 void UniverseSequence::resetIterator() { this->index = 0; }
 
-int UniverseSequence::getLength() { return this->length; }
+size_t UniverseSequence::getLength() { return this->length; }
 
 void UniverseSequence::reset() {
   this->universeCache.clear();

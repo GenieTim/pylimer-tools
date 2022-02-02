@@ -3,7 +3,6 @@
 
 #include "../entities/Universe.h"
 #include "StringUtils.h"
-#include "TYPES.h"
 #include <algorithm>
 #include <any>
 #include <cctype>
@@ -35,30 +34,30 @@ public:
 
   void read();
   void finish();
-  void readNGroups(const INDEX_TYPE start, const int N);
-  void readGroupByIdx(const INDEX_TYPE i);
-  void forgetAt(const INDEX_TYPE index);
+  void readNGroups(const size_t start, const int N);
+  void readGroupByIdx(const size_t i);
+  void forgetAt(const size_t index);
 
   template <typename OUT>
-  std::vector<OUT> getValuesForAt(const INDEX_TYPE index,
+  std::vector<OUT> getValuesForAt(const size_t index,
                                   const std::string headerKey,
                                   const std::string &column);
   template <typename OUT>
-  std::vector<OUT> getValuesForAt(const INDEX_TYPE index,
+  std::vector<OUT> getValuesForAt(const size_t index,
                                   const std::string headerKey,
-                                  const INDEX_TYPE column);
+                                  const size_t column);
   // the next two methods are specializations for easier py binding
-  std::vector<std::string> getStringValuesForAt(const INDEX_TYPE index,
+  std::vector<std::string> getStringValuesForAt(const size_t index,
                                                 const std::string headerKey,
                                                 const std::string column) {
     return this->getValuesForAt<std::string>(index, headerKey, column);
   };
-  std::vector<double> getNumericValuesForAt(const INDEX_TYPE index,
+  std::vector<double> getNumericValuesForAt(const size_t index,
                                             const std::string headerKey,
                                             const std::string column) {
     return this->getValuesForAt<double>(index, headerKey, column);
   };
-  int getLength() { return this->nrOfGroups; }
+  size_t getLength() { return this->nrOfGroups; }
   bool hasKey(std::string headerKey) {
     if (this->data.size() == 0) {
       throw std::invalid_argument("Cannot check for header '" + headerKey + "' without reading a group first.");
@@ -109,18 +108,18 @@ private:
   std::string newGroupKey;
   std::string currentLine;
   std::ifstream file;
-  int nrOfGroups;
-  std::unordered_map<INDEX_TYPE, data_item_t> data;
+  size_t nrOfGroups;
+  std::unordered_map<size_t, data_item_t> data;
   std::map<std::string, std::vector<std::string>> headerColMap;
-  std::map<INDEX_TYPE, int> groupPosMap;
+  std::map<size_t, int> groupPosMap;
 };
 
 template <typename OUT>
-std::vector<OUT> DumpFileParser::getValuesForAt(const INDEX_TYPE index,
+std::vector<OUT> DumpFileParser::getValuesForAt(const size_t index,
                                                 const std::string headerKey,
                                                 const std::string &column) {
   // detect index of column
-  INDEX_TYPE colIdx = 0;
+  size_t colIdx = 0;
   if (this->headerColMap.at(headerKey).size() > 1) {
     const auto colItIdx =
         std::find(this->headerColMap.at(headerKey).begin(),
@@ -135,9 +134,9 @@ std::vector<OUT> DumpFileParser::getValuesForAt(const INDEX_TYPE index,
 }
 
 template <typename OUT>
-std::vector<OUT> DumpFileParser::getValuesForAt(const INDEX_TYPE index,
+std::vector<OUT> DumpFileParser::getValuesForAt(const size_t index,
                                                 const std::string headerKey,
-                                                const INDEX_TYPE colIdx) {
+                                                const size_t colIdx) {
   if (!this->data.contains(index)) {
     // std::cout << "Could not find index " << index << "in data yet" << std::endl;
     this->readGroupByIdx(index);

@@ -54,7 +54,7 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]") {
     REQUIRE(universeAgain.getNrOfAtoms() == 32);
     // and
     REQUIRE_THROWS(universeSeq.atIndex(292384));
-    pe::Universe thirdUniverse = universeSeq.atIndex(292384);
+    pe::Universe thirdUniverse = universeSeq.atIndex(292383);
     REQUIRE(thirdUniverse.getNrOfAtoms() == 32);
 
   }

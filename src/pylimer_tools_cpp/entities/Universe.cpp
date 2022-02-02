@@ -631,7 +631,7 @@ Universe::findLoops(const int crosslinkerType, const int maxLength) const {
     int currentFunctionality = 0;
     long int currentPathKey = 0;
     size_t n = igraph_vector_int_size(&paths);
-    for (int i = 0; i < n; ++i) {
+    for (size_t i = 0; i < n; ++i) {
       const long int currentVal = igraph_vector_int_e(&paths, i);
       if (currentVal == -1) {
         // skip self-loops and duplicates
@@ -783,7 +783,7 @@ std::map<int, int> Universe::determineFunctionalityPerType() const {
   igraph_vit_t vit;
   igraph_vit_create(&graph, allVertexIds, &vit);
   while (!IGRAPH_VIT_END(vit)) {
-    long int vertexId = (long int)IGRAPH_VIT_GET(vit);
+    long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
     result[types[vertexId]] = std::max((int)igraph_vector_e(&degrees, vertexId),
                                        result[types[vertexId]]);
     IGRAPH_VIT_NEXT(vit);
@@ -824,7 +824,7 @@ std::map<int, double> Universe::determineEffectiveFunctionalityPerType() const {
   igraph_vit_t vit;
   igraph_vit_create(&graph, allVertexIds, &vit);
   while (!IGRAPH_VIT_END(vit)) {
-    long int vertexId = (long int)IGRAPH_VIT_GET(vit);
+    long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
     result[types[vertexId]] += igraph_vector_e(&degrees, vertexId);
     IGRAPH_VIT_NEXT(vit);
   }
@@ -833,7 +833,7 @@ std::map<int, double> Universe::determineEffectiveFunctionalityPerType() const {
   igraph_vector_destroy(&degrees);
 
   std::map<int, int> typeCounts = this->countAtomTypes();
-  for (const std::pair<int, int> &typePair : typeCounts) {
+  for (const auto typePair : typeCounts) {
     result[typePair.first] /= typePair.second;
   }
 
@@ -890,8 +890,9 @@ long int Universe::getAtomIdByIdx(const int vertexId) const {
  */
 long int Universe::getIdxByAtomId(const int atomId) const {
   if (!this->atomIdToVectorIdx.contains(atomId)) {
-    throw std::invalid_argument("Universe cannot return idx of atom id: atom with this id (" + std::to_string(atomId) +
-                                ") does not exist");
+    throw std::invalid_argument(
+        "Universe cannot return idx of atom id: atom with this id (" +
+        std::to_string(atomId) + ") does not exist");
   }
   return this->atomIdToVectorIdx.at(atomId);
 }
@@ -917,7 +918,7 @@ std::vector<Atom> Universe::getAtoms() {
   igraph_vit_t vit;
   igraph_vit_create(&graph, igraph_vss_all(), &vit);
   while (!IGRAPH_VIT_END(vit)) {
-    long int vertexId = (long int)IGRAPH_VIT_GET(vit);
+    long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
     atoms.push_back(this->getAtomByVertexIdx(vertexId));
     IGRAPH_VIT_NEXT(vit);
   }
@@ -953,7 +954,7 @@ std::map<std::string, std::vector<long int>> Universe::detectAngles() const {
   igraph_vit_t vit;
   igraph_vit_create(&this->graph, igraph_vss_all(), &vit);
   while (!IGRAPH_VIT_END(vit)) {
-    const long int vertexIdx = (long int)IGRAPH_VIT_GET(vit);
+    const long int vertexIdx = static_cast<long int>(IGRAPH_VIT_GET(vit));
     // find the connected atoms
     std::vector<long int> connections =
         this->getVertexIdxsConnectedTo(vertexIdx);
@@ -1069,7 +1070,7 @@ Universe Universe::getNetworkOfCrosslinker(const int crosslinkerType) const {
  *
  * @return const int
  */
-const int Universe::getNrOfAngles() const {
+size_t Universe::getNrOfAngles() const {
   assert(this->angleFrom.size() == this->angleTo.size());
   assert(this->angleFrom.size() == this->angleVia.size());
   return this->angleFrom.size();
@@ -1117,7 +1118,7 @@ std::map<std::string, std::vector<long int>> Universe::getBonds() const {
   // }
   // else
   {
-    for (int i = 0; i < this->NBonds; ++i) {
+    for (size_t i = 0; i < this->NBonds; ++i) {
       type.push_back(-1); // TODO: find a nice default
     }
   }
@@ -1208,14 +1209,14 @@ std::vector<double> Universe::computeDs(const std::vector<int> bondFrom,
         "bond from and bond to must have the same size");
   }
 
-  int nBonds = bondFrom.size();
+  size_t nBonds = bondFrom.size();
 
   igraph_vector_t vertexIdFrom;
   igraph_vector_init(&vertexIdFrom, nBonds);
   igraph_vector_t vertexIdTo;
   igraph_vector_init(&vertexIdTo, nBonds);
 
-  for (int i = 0; i < nBonds; ++i) {
+  for (size_t i = 0; i < nBonds; ++i) {
     igraph_vector_set(&vertexIdFrom, i,
                       this->atomIdToVectorIdx.at(bondFrom[i]));
     igraph_vector_set(&vertexIdTo, i, this->atomIdToVectorIdx.at(bondTo[i]));
@@ -1307,7 +1308,7 @@ double Universe::computeMeanEndToEndDistance(int junctionType) {
  * @return double
  */
 double Universe::computeMeanBondLength() {
-  double length;
+  double length = 0.0;
   if (this->getNrOfBonds() == 0) {
     return length;
   }
@@ -1319,7 +1320,7 @@ double Universe::computeMeanBondLength() {
   }
 
   while (!IGRAPH_EIT_END(bondIterator)) {
-    long int edgeId = (long int)IGRAPH_EIT_GET(bondIterator);
+    long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
     int bondFrom;
     int bondTo;
     igraph_edge(&this->graph, edgeId, &bondFrom, &bondTo);
@@ -1394,11 +1395,11 @@ bool Universe::validate() {
  */
 double Universe::getVolume() { return this->box.getVolume(); }
 
-const int Universe::getNrOfAtoms() const { return this->NAtoms; }
+size_t Universe::getNrOfAtoms() const { return this->NAtoms; }
 
-const int Universe::getNrOfBonds() const { return this->NBonds; }
+size_t Universe::getNrOfBonds() const { return this->NBonds; }
 
-void Universe::setBox(Box box) { this->box = box; }
+void Universe::setBox(Box passedBox) { this->box = passedBox; }
 
 void Universe::setBoxLengths(const double Lx, const double Ly,
                              const double Lz) {

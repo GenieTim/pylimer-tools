@@ -50,7 +50,7 @@ public:
     return delta;
   }
 
-  const void vectorTo(Atom b, const Box *box, double *result) const {
+  void vectorTo(Atom b, const Box *box, double *result) const {
     result[0] = this->_getDeltaDistance(this->x, b.getX(), this->nx, b.getNX(),
                                         box->getLx());
     result[1] = this->_getDeltaDistance(this->y, b.getY(), this->ny, b.getNY(),
@@ -59,7 +59,7 @@ public:
                                         box->getLz());
   }
 
-  const std::vector<double> computeVectorTo(Atom b, const Box box) const {
+  std::vector<double> computeVectorTo(Atom b, const Box box) const {
     double result[3];
     vectorTo(b, &box, result);
     std::vector<double> resultV;
@@ -68,7 +68,7 @@ public:
     return resultV;
   }
 
-  const double distanceTo(Atom b, const Box *box) const {
+  double distanceTo(Atom b, const Box *box) const {
     double distanceVec[3];
     vectorTo(b, box, distanceVec);
     // norm
@@ -77,7 +77,7 @@ public:
                 distanceVec[2] * distanceVec[2]);
   }
 
-  const void vectorToUnwrapped(Atom b, const Box *box, double *result) const {
+  void vectorToUnwrapped(Atom b, const Box *box, double *result) const {
     result[0] = this->_getDeltaDistanceUnwrapped(this->x, b.getX(), this->nx,
                                                  b.getNX(), box->getLx());
     result[1] = this->_getDeltaDistanceUnwrapped(this->y, b.getY(), this->ny,
@@ -86,7 +86,7 @@ public:
                                                  b.getNZ(), box->getLz());
   }
 
-  const double distanceToUnwrapped(Atom b, const Box *box) const {
+  double distanceToUnwrapped(Atom b, const Box *box) const {
     double distanceVec[3];
     vectorToUnwrapped(b, box, distanceVec);
     // norm
@@ -95,23 +95,23 @@ public:
                 distanceVec[2] * distanceVec[2]);
   }
 
-  const inline long int getId() const { return this->id; }
-  const inline int getType() const { return this->type; }
-  const inline double getX() const { return this->x; }
-  const inline double getY() const { return this->y; }
-  const inline double getZ() const { return this->z; }
-  const inline double getUnwrappedX(const Box *box) const {
+  inline long int getId() const { return this->id; }
+  inline int getType() const { return this->type; }
+  inline double getX() const { return this->x; }
+  inline double getY() const { return this->y; }
+  inline double getZ() const { return this->z; }
+  inline double getUnwrappedX(const Box *box) const {
     return this->x * this->nx * box->getLx();
   }
-  const inline double getUnwrappedY(const Box *box) const {
+  inline double getUnwrappedY(const Box *box) const {
     return this->y * this->ny * box->getLy();
   }
-  const inline double getUnwrappedZ(const Box *box) const {
+  inline double getUnwrappedZ(const Box *box) const {
     return this->z * this->nz * box->getLz();
   }
-  const int getNX() const { return this->nx; }
-  const int getNY() const { return this->ny; }
-  const int getNZ() const { return this->nz; }
+  int getNX() const { return this->nx; }
+  int getNY() const { return this->ny; }
+  int getNZ() const { return this->nz; }
 
 private:
   long int id;

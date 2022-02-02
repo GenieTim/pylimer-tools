@@ -68,9 +68,9 @@ public:
                                    IN propertyValue) const;
   Box getBox();
   double getVolume();
-  const int getNrOfAtoms() const;
-  const int getNrOfBonds() const;
-  const int getNrOfAngles() const;
+  size_t getNrOfAtoms() const;
+  size_t getNrOfBonds() const;
+  size_t getNrOfAngles() const;
   std::map<int, double> getMasses();
   long int getTimestep() { return this->timestep; };
   int getNrOfBondsOfAtom(const long int atomId);
@@ -103,8 +103,8 @@ public:
 protected:
   // properties of the universe
   long int timestep;
-  int NAtoms = 0;
-  int NBonds = 0;
+  size_t NAtoms = 0;
+  size_t NBonds = 0;
   Box box;
   // connectivity
   // igraph_t graph;
