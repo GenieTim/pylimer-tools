@@ -19,14 +19,14 @@ namespace pylimer_tools
         this->Lz = Lz;
       }
 
-      const double getVolume()
+      double getVolume() const
       {
         return this->Lx * this->Ly * this->Lz;
       }
 
-      const double getLx() const { return this->Lx; }
-      const double getLy() const { return this->Ly; }
-      const double getLz() const { return this->Lz; }
+      double getLx() const { return this->Lx; }
+      double getLy() const { return this->Ly; }
+      double getLz() const { return this->Lz; }
     };
   }
 }

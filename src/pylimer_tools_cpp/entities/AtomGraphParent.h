@@ -52,7 +52,7 @@ public:
     std::vector<long int> results;
     results.reserve(IGRAPH_VIT_SIZE(vit));
     while (!IGRAPH_VIT_END(vit)) {
-      results.push_back((long int)IGRAPH_VIT_GET(vit));
+      results.push_back(static_cast<long int>(IGRAPH_VIT_GET(vit)));
       IGRAPH_VIT_NEXT(vit);
     }
     igraph_vs_destroy(&adjVs);
@@ -223,7 +223,7 @@ public:
     std::vector<Atom> results;
     results.reserve(IGRAPH_VIT_SIZE(vit));
     while (!IGRAPH_VIT_END(vit)) {
-      long int vertexId1 = (long int)IGRAPH_VIT_GET(vit);
+      long int vertexId1 = static_cast<long int>(IGRAPH_VIT_GET(vit));
       Atom atom = this->getAtomByVertexIdx(vertexId1);
       results.push_back(atom);
       IGRAPH_VIT_NEXT(vit);
@@ -253,7 +253,7 @@ public:
     }
 
     while (!IGRAPH_EIT_END(bondIterator)) {
-      long int edgeId = (long int)IGRAPH_EIT_GET(bondIterator);
+      long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
       int bondFrom;
       int bondTo;
       igraph_edge(&this->graph, edgeId, &bondFrom, &bondTo);

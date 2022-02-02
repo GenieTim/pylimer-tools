@@ -156,10 +156,10 @@ public:
     } while (start != std::string::npos);
   }
 
-  int getLength() const { return this->results.size(); }
+  size_t getLength() const { return this->results.size(); }
 
   template <typename OUT> OUT get(size_t index) const {
-    return (OUT)this->results[index];
+    return static_cast<OUT>(this->results[index]);
   }
 
   template <> std::string get<std::string>(size_t index) const {
