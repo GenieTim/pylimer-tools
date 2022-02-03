@@ -159,8 +159,8 @@ public:
   size_t getLength() const { return this->results.size(); }
 
   template <typename OUT> OUT get(size_t index) const {
-    return static_cast<OUT>(this->results[index]);
-  }
+    return dynamic_cast<OUT>(this->results[index]);
+  };
 
   template <> std::string get<std::string>(size_t index) const {
     return this->results[index];

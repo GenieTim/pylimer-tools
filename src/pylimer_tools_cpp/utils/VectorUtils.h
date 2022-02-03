@@ -45,7 +45,7 @@ namespace pylimer_tools
     template <typename IN1>
     static inline void StdVectorToIgraphVectorT(IN1 &vectR, igraph_vector_t *v)
     {
-      long n = vectR.size();
+      size_t n = vectR.size();
 
       /* Make sure that there is enough space for the items in v */
       igraph_vector_resize(v, n);
@@ -72,11 +72,11 @@ namespace pylimer_tools
     }
 
     template <typename IN>
-    static inline std::vector<IN> initializeWithValue(int n, IN value)
+    static inline std::vector<IN> initializeWithValue(size_t n, IN value)
     {
       std::vector<IN> result;
       result.reserve(n);
-      for (int i = 0; i < n; ++i)
+      for (size_t i = 0; i < n; ++i)
       {
         result.push_back(value);
       }

@@ -60,7 +60,8 @@ public:
   size_t getLength() { return this->nrOfGroups; }
   bool hasKey(std::string headerKey) {
     if (this->data.size() == 0) {
-      throw std::invalid_argument("Cannot check for header '" + headerKey + "' without reading a group first.");
+      throw std::invalid_argument("Cannot check for header '" + headerKey +
+                                  "' without reading a group first.");
     }
     if (this->getLength() > 0) {
       // assumption: each step has the same keys
@@ -138,15 +139,19 @@ std::vector<OUT> DumpFileParser::getValuesForAt(const size_t index,
                                                 const std::string headerKey,
                                                 const size_t colIdx) {
   if (!this->data.contains(index)) {
-    // std::cout << "Could not find index " << index << "in data yet" << std::endl;
+    // std::cout << "Could not find index " << index << "in data yet" <<
+    // std::endl;
     this->readGroupByIdx(index);
   }
-  // std::cout << "Requested values for index " << index << ", key " << headerKey << " and column " << colIdx << std::endl; 
+  // std::cout << "Requested values for index " << index << ", key " <<
+  // headerKey << " and column " << colIdx << std::endl;
+  
   data_item_t dataItem = this->data.at(index);
   //
   std::vector<pylimer_tools::utils::CsvTokenizer> relevantData =
-      dataItem[headerKey];
+      dataItem.at(headerKey);
   std::vector<OUT> results;
+  results.reserve(relevantData.size());
 
   for (pylimer_tools::utils::CsvTokenizer lineTok : relevantData) {
     results.push_back(lineTok.get<OUT>(colIdx));
