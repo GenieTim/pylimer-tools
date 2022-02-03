@@ -67,14 +67,24 @@ Universe UniverseSequence::readDumpFileAtIndex(size_t index) {
   Universe newUniverse = Universe(0.0, 0.0, 0.0);
   std::vector<long int> timeStepData =
       this->dumpFileParser.getValuesForAt<long int>(index, "TIMESTEP", 0);
-  assert(timeStepData.size() > 0);
+  if (timeStepData.size() == 0) {
+    throw std::runtime_error(
+        "Universe with index " + std::to_string(index) +
+        " does not have enough data on its timestep. Is the file defect?");
+  }
   newUniverse.setTimestep(timeStepData[0]);
   if (this->dumpFileParser.hasKey("BOX BOUNDS")) {
     std::vector<double> lo =
         this->dumpFileParser.getValuesForAt<double>(index, "BOX BOUNDS", 0);
     std::vector<double> hi =
         this->dumpFileParser.getValuesForAt<double>(index, "BOX BOUNDS", 1);
-    assert(lo.size() == 3 && hi.size() == 3);
+    if (lo.size() < 3 || hi.size() < 3) {
+      throw std::runtime_error(
+          "Universe with index " + std::to_string(index) +
+          " does not have enough data on its box size, " +
+          std::to_string(lo.size()) + " and " + std::to_string(hi.size()) +
+          " instead of at least 3 each. Is the file defect?");
+    }
     newUniverse.setBoxLengths(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]);
   } else {
     newUniverse.setBoxLengths(this->dataFileParser.getLx(),
@@ -114,7 +124,14 @@ Universe UniverseSequence::readDumpFileAtIndex(size_t index) {
       index, "ATOMS", "y" + positionSuffix);
   std::vector<double> positionsZ = this->dumpFileParser.getValuesForAt<double>(
       index, "ATOMS", "z" + positionSuffix);
-  assert(positionsZ.size() == positionsY.size() && positionsY.size() == positionsX.size());
+  if (positionsZ.size() != positionsY.size() ||
+      positionsY.size() != positionsX.size()) {
+    throw std::runtime_error(
+        "Atom coordinates for universe with index " + std::to_string(index) +
+        " do not have the same size (" + std::to_string(positionsX.size()) +
+        ", " + std::to_string(positionsY.size()) + ", " +
+        std::to_string(positionsZ.size()) + "). Is the file defect?");
+  };
   if (xMultiplier != 1.0 && yMultiplier != 1.0 && zMultiplier != 1.0) {
     for (size_t i = 0; i < positionsZ.size(); ++i) {
       positionsX[i] *= xMultiplier;

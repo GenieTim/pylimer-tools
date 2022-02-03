@@ -92,7 +92,13 @@ Universe &Universe::operator=(Universe src) {
 };
 
 // other functions
-
+void Universe::addAtoms(std::vector<long int> newIds, std::vector<int> newTypes,
+                        std::vector<double> newX, std::vector<double> newY,
+                        std::vector<double> newZ, std::vector<int> newNx,
+                        std::vector<int> newNy, std::vector<int> newNz) {
+  this->addAtoms(newIds.size(), newIds, newTypes, newX, newY, newZ, newNx,
+                 newNy, newNz);
+}
 void Universe::addAtoms(const size_t NNewAtoms, std::vector<long int> newIds,
                         std::vector<int> newTypes, std::vector<double> newX,
                         std::vector<double> newY, std::vector<double> newZ,
@@ -159,6 +165,9 @@ void Universe::addAtoms(const size_t NNewAtoms, std::vector<long int> newIds,
   this->NAtoms = igraph_vcount(&this->graph);
 }
 
+void Universe::addBonds(std::vector<long int> from, std::vector<long int> to) {
+  this->addBonds(from.size(), from, to);
+}
 void Universe::addBonds(const size_t NNewBonds, std::vector<long int> from,
                         std::vector<long int> to) {
   this->addBonds(NNewBonds, from, to, std::vector<int>());

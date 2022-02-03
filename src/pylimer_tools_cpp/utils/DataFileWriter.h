@@ -11,6 +11,8 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <iomanip>
+#include <ctime>
 
 namespace pylimer_tools {
 namespace utils {
@@ -36,13 +38,15 @@ public:
   void configReindexAtoms(const bool reindex) { this->reindexAtoms = reindex; }
   void writeToFile(const std::string filePath) {
     std::ofstream file;
+    auto t = std::time(nullptr);
+    auto tm = *std::localtime(&t);
     int uniqueAtomTypes = std::max(this->universe.countAtomTypes().size(),
                                    this->universe.getMasses().size());
 
     file.open(filePath);
 
     // write header
-    file << "LAMMPS file generated using pylimer_tools.\n\n";
+    file << "LAMMPS file generated using pylimer_tools at " << std::put_time(&tm, "%Y/%m/%d %H-%M-%S") << ".\n\n";
     file << "\t " << this->universe.getNrOfAtoms() << " atoms\n";
     file << "\t " << this->universe.getNrOfBonds() << " bonds\n";
     file << "\t " << (this->includeAngles ? this->universe.getNrOfAngles() : 0)
