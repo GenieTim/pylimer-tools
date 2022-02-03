@@ -32,28 +32,33 @@ using namespace pylimer_tools::utils;
 void init_pylimer_bound_readers(py::module_ &m) {
 
   py::class_<DumpFileParser>(m, "DumpFileReader")
-      .def(py::init<const std::string>())
-      .def("read", &DumpFileParser::read, "Read a file")
+      .def(py::init<const std::string>(), py::arg("pathOfFileToRead"))
+      .def("read", &DumpFileParser::read, "Read the whole file")
       .def("getLength", &DumpFileParser::getLength,
            "Get the number of sections in the file")
       .def("getStringValuesForAt", &DumpFileParser::getStringValuesForAt,
            "Get the values for the section `index`, the main header "
-           "`headerKey` and the column (in the header) `column`.")
+           "`headerKey` and the column (in the header) `column`.",
+           py::arg("rowIndex"), py::arg("headerKey"), py::arg("columnIndex"))
       .def("getNumericValuesForAt", &DumpFileParser::getNumericValuesForAt,
            "Get the values for the section `index`, the main header "
            "`headerKey` and the column (in the header) `column`.")
       .def("hasKey", &DumpFileParser::hasKey,
-           "Check whether the first section has the header specified")
+           "Check whether the first section has the header specified",
+           py::arg("headerKey"))
       .def("keyHasColumn", &DumpFileParser::keyHasColumn,
            "Check whether the header of the first section has the specified "
-           "column")
+           "column",
+           py::arg("headerKey"), py::arg("columnName"))
       .def("keyHasDirectionalColumn", &DumpFileParser::keyHasDirectionalColumn,
            "Check whether the header of the first section has all the three "
-           "columns `{dirPraefix}{x|y|z}{dirSuffix}`.");
+           "columns `{dirPraefix}{x|y|z}{dirSuffix}`.",
+           py::arg("headerKey"), py::arg("dirPraefix") = "",
+           py::arg("dirSuffix") = "");
 
   py::class_<DataFileParser>(m, "DataFileReader")
       .def(py::init<>())
-      .def("read", &DataFileParser::read)
+      .def("read", &DataFileParser::read, py::arg("pathOfFileToRead"))
       .def("getNrOfAtoms", &DataFileParser::getNrOfAtoms)
       .def("getNrOfAtomTypes", &DataFileParser::getNrOfAtomTypes)
       .def("getAtomIds", &DataFileParser::getAtomIds)

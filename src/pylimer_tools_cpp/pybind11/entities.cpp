@@ -161,7 +161,8 @@ void init_pylimer_bound_entities(py::module_ &m) {
       .def("computeWeight", &Molecule::computeWeight,
            "Computes the total weight of this molecule.")
       .def("computeBondLengths", &Molecule::computeBondLengths,
-           "Computes the length :math:`b` of each bond in the molecule, respecting periodic boundaries.")
+           "Computes the length :math:`b` of each bond in the molecule, "
+           "respecting periodic boundaries.")
       .def("computeRadiusOfGyration", &Molecule::computeRadiusOfGyration,
            R"pbdoc(
             Computes the radius of gyration, :math:`R_g^2` of this molecule.
@@ -201,24 +202,37 @@ void init_pylimer_bound_entities(py::module_ &m) {
       "Represents a full Polymer Network structure, a collection of molecules.")
       .def(py::init<const double, const double, const double>(),
            "Instantiate this Universe (Collection of Molecules) providing the "
-           "box lengths.")
+           "box lengths.",
+           py::arg("Lx"), py::arg("Ly"), py::arg("Lz"))
       // setters
-      .def("addAtoms", &Universe::addAtoms,
-           "Add atoms to the Universe, vertices to the underlying graph.")
+      .def("addAtoms",
+           py::overload_cast<std::vector<long int>, std::vector<int>,
+                             std::vector<double>, std::vector<double>,
+                             std::vector<double>, std::vector<int>,
+                             std::vector<int>, std::vector<int>>(
+               &Universe::addAtoms),
+           "Add atoms to the Universe, vertices to the underlying graph.",
+           py::arg("ids"), py::arg("types"), py::arg("x"), py::arg("y"),
+           py::arg("z"), py::arg("nx"), py::arg("ny"), py::arg("nz"))
       .def("addBonds",
-           py::overload_cast<const size_t, std::vector<long int>,
-                             std::vector<long int>>(&Universe::addBonds),
+           py::overload_cast<std::vector<long int>, std::vector<long int>>(
+               &Universe::addBonds),
            "Add bonds to the underlying atoms, edges to the underlying graph. "
            "If the connected atoms are not found, the bonds are silently "
-           "skipped.")
+           "skipped.",
+           py::arg("from"), py::arg("to"))
       .def("addAngles", &Universe::addAngles,
            "Add angles to the Universe. No relation to the underlying graph, "
-           "just a method to preserve read & write capabilities")
-      .def("setMasses", &Universe::setMasses, "Set the mass per type of atom.")
+           "just a method to preserve read & write capabilities",
+           py::arg("from"), py::arg("via"), py::arg("to"))
+      .def("setMasses", &Universe::setMasses, "Set the mass per type of atom.",
+           py::arg("massPerType"))
       .def("setTimestep", &Universe::setTimestep,
-           "Set the timestep when this Universe was captured.")
+           "Set the timestep when this Universe was captured.",
+           py::arg("timestep"))
       .def("setBoxLengths", &Universe::setBoxLengths,
-           "Set the box side lengths.")
+           "Set the box side lengths.", py::arg("Lx"), py::arg("Ly"),
+           py::arg("Lz"))
       .def("setBox", &Universe::setBox,
            "Override the currently assigned box with the one specified.")
       // getters
@@ -229,7 +243,8 @@ void init_pylimer_bound_entities(py::module_ &m) {
             
             Reduces the Universe to a list of molecules. 
             Specify the crosslinkerType to an existing type id, 
-            then those atoms will be omitted, and this function returns chains instead.)pbdoc")
+            then those atoms will be omitted, and this function returns chains instead.)pbdoc",
+           py::arg("atomTypeToOmit"))
       .def("findLoops", &Universe::findLoops, R"pbdoc(
             Decompose the Universe into loops.
             The primary index specifies the degree of the loop.
@@ -238,33 +253,49 @@ void init_pylimer_bound_entities(py::module_ &m) {
             and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
             You can use the maxLength parameter to restrict the algorithm to only search for loops up to a certain length.
             Use a negative value to find all loops and paths.
-            )pbdoc")
+            )pbdoc",
+           py::arg("crosslinkerType"), py::arg("maxLength"))
       .def("getChainsWithCrosslinker", &Universe::getChainsWithCrosslinker,
            R"pbdoc(
             Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms, without omitting the crosslinkers.
-            In turn, e.g. for a tetrafunctional crosslinker, it will be 4 times in the resulting molecules.
+            In turn, e.g. for a tetrafunctional cross-linker, it will be 4 times in the resulting molecules.
             
-            **NOTE**: Crosslinkers without bonds to non-crosslinkers are not returned.)pbdoc")
+            **NOTE**: Crosslinkers without bonds to non-crosslinkers are not returned.)pbdoc",
+           py::arg("crosslinkerType"))
+      .def("getNetworkOfCrosslinker", &Universe::getNetworkOfCrosslinker,
+           R"(pbdoc 
+            Reduce the network to contain only cross-linkers, replacing all the strands with a single bond.
+            Useful e.g. to reduce the memory useage and runtime of 
+            :func:`~pylimer_tools_cpp.Universe.findLoops()` or 
+            :func:`~pylimer_tools_cpp.Universe.hasInfiniteStrand()`.
+            
+            Further use :func:`~pylimer_tools_cpp.Universe.simplify()` to remove primary loops.
+          pbdoc)",
+           py::arg("crossLinkerType"))
       .def("getAtomTypes", &Universe::getAtomTypes,
            "Get all types (each one for each atom) ordered by atom vertex id.")
-      .def("getAtom", &Universe::getAtom, "Find an atom by its ID.")
+      .def("getAtom", &Universe::getAtom, "Find an atom by its ID.",
+           py::arg("atomId"))
       .def("getAtomForVertexId", &Molecule::getAtomByVertexIdx,
-           "Get an atom for a specific vertex.")
+           "Get an atom for a specific vertex.", py::arg("vertexId"))
       .def("getAtoms", &Universe::getAtoms, "Get all atoms.")
       .def("getAtomsWithType", &Universe::getAtomsWithType,
            "Find many atom by their type.")
       .def("getAtomByVertexIdx", &Universe::getAtomByVertexIdx,
-           "Find an atom by the ID of the vertex of the underlying graph.")
+           "Find an atom by the ID of the vertex of the underlying graph.",
+           py::arg("vertexId"))
       .def("getAtomIdByIdx", &Universe::getAtomIdByIdx,
-           "Get the id of the atom by the vertex id of the underlying graph.")
+           "Get the id of the atom by the vertex id of the underlying graph.",
+           py::arg("atomId"))
       .def("getIdxByAtomId", &Universe::getIdxByAtomId,
            "Get the vertex id of the underlying graph for an atom with a "
-           "specified id.")
+           "specified id.",
+           py::arg("atomId"))
       .def("getBonds", &Universe::getBonds, R"pbdoc(
             Get all bonds. Returns a dict with three properties: 'bond_from', 'bond_to' and 'bond_type'.
             
             **NOTE**: the integer values returned refer to the vertex ids, not the atom ids.
-            Use `Universe::getAtomIdByIdx` to translate them to atom ids.
+            Use :func:`~pylimer_tools_cpp.Universe.getAtomIdByIdx` to translate them to atom ids.
             )pbdoc")
       .def("getAngles", &Universe::getAngles,
            R"pbdoc(Get all angles added to this network.
@@ -272,7 +303,7 @@ void init_pylimer_bound_entities(py::module_ &m) {
            Returns a dict with three properties: 'angle_from', 'angle_via' and 'angle_to'.
 
            **NOTE**: the integer values returned refer to the the atom ids, not the vertex ids.
-            Use `Universe::getIdxByAtomId` to translate them to vertex ids.
+            Use :func:`~pylimer_tools_cpp.Universe.getIdxByAtomId` to translate them to vertex ids.
            )pbdoc")
       .def("getBox", &Universe::getBox,
            "Get the underlying bounding box object.")
@@ -296,8 +327,11 @@ void init_pylimer_bound_entities(py::module_ &m) {
            "its vertex id.")
       // computations
       .def("computeBondLengths", &Universe::computeBondLengths,
-           "Computes the length :math:`b` of each bond in the molecule, respecting periodic boundaries.")
-      .def("detectAngles", &Universe::detectAngles, "Returns just as #getAngles, but all angles that are found in the network.")
+           "Computes the length :math:`b` of each bond in the molecule, "
+           "respecting periodic boundaries.")
+      .def("detectAngles", &Universe::detectAngles,
+           "Returns just as :func:`~pylimer_tools_cpp.Universe.getAngles`, but all angles that are found in the "
+           "network.")
       .def(
           "hasInfiniteStrand", &Universe::hasInfiniteStrand,
           R"pbdoc(Checks whether there is a strand (with crosslinker) in the universe that loops through periodic images without coming back.
@@ -312,7 +346,7 @@ void init_pylimer_bound_entities(py::module_ &m) {
            &Universe::determineEffectiveFunctionalityPerType,
            "Find the average functionality of each atom type in the network.")
       .def("computeMeanStrandLength", &Universe::getMeanStrandLength,
-           "Compute the mean strand length.")
+           "Compute the mean strand length.", py::arg("crosslinkerType"))
       .def("computeWeightFractions", &Universe::computeWeightFractions,
            "Compute the weight fractions of each atom type in the network.")
       .def("computeDxs", &Universe::computeDxs,
@@ -346,7 +380,8 @@ void init_pylimer_bound_entities(py::module_ &m) {
            "Get the Universe at the given index (as of in the sequence given "
            "by the dump file).")
       .def("forgetAtIndex", &UniverseSequence::forgetAtIndex,
-           "Clear the memory of the Universe at the given index (as of in the sequence given "
+           "Clear the memory of the Universe at the given index (as of in the "
+           "sequence given "
            "by the dump file).")
       .def("resetIterator", &UniverseSequence::resetIterator,
            "Reset the internal iterator, such that a subsequent call to "

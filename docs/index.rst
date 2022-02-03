@@ -12,7 +12,11 @@ Welcome to PylimerTools's documentation!
    :hidden:
 
    installation
+   assumptions
+   nomenclature
    useage
+   network_generator
+   readers_writers
    modules
 
 
