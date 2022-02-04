@@ -33,6 +33,7 @@ public:
     this->distX = std::uniform_real_distribution<double>(0.0, Lx);
     this->distY = std::uniform_real_distribution<double>(0.0, Ly);
     this->distZ = std::uniform_real_distribution<double>(0.0, Lz);
+    this->distSelect = std::uniform_real_distribution<double>(0.0, 1.0);
     this->box = this->universe.getBox();
   }
   void setSeed(unsigned int seed) { this->rng.seed(seed); };
@@ -146,7 +147,8 @@ public:
         if (isActiveSite) {
           int targetIdx = this->findAppropriateLink(
               crosslinkers[i], crosslinkers, availableCrosslinkerSites,
-              std::sqrt(beadsPerChains[i]) * this->beadDistance);
+              std::sqrt(beadsPerChains[i]) * this->beadDistance,
+              beadsPerChains[i] * this->beadDistance);
           if (isDanglingStrand) {
             // decision is: dangling
             this->addRandomWalkChainFrom(crosslinkers[i],
@@ -203,6 +205,7 @@ private:
   std::uniform_real_distribution<double> distX;
   std::uniform_real_distribution<double> distY;
   std::uniform_real_distribution<double> distZ;
+  std::uniform_real_distribution<double> distSelect;
   pylimer_tools::entities::Universe universe;
   pylimer_tools::entities::Box box;
 
@@ -304,7 +307,7 @@ private:
       double dx = targetX - lastX;
       double dy = targetY - lastY;
       double dz = targetZ - lastZ;
-      // for primary loops, dx, dy & dz are zero, intially. 
+      // for primary loops, dx, dy & dz are zero, intially.
       // therewith, alpha will be NaN
       double remainingDistance = std::sqrt(dx * dx + dy * dy + dz * dz);
       // alpha = theta in Wikipedia
@@ -328,20 +331,21 @@ private:
 
       double alpha = (1.0 - idealWeight) * angleDistribution(this->rng) +
                      idealWeight * idealAlpha;
+      // happens e.g. for primary loops
       if (isnan(alpha)) {
-        std::cout << "Got nan for alpha with idealAlpha = " << idealAlpha
-                  << ", weight = " << idealWeight << ", dx = " << dx
-                  << ", dy = " << dy << ", dz = " << dz << " at i = " << i
-                  << std::endl;
+        // std::cout << "Got nan for alpha with idealAlpha = " << idealAlpha
+        //           << ", weight = " << idealWeight << ", dx = " << dx
+        //           << ", dy = " << dy << ", dz = " << dz << " at i = " << i
+        //           << std::endl;
         alpha = isnan(idealAlpha) ? angleDistribution(this->rng) : idealAlpha;
       };
       double beta = (1.0 - idealWeight) * angleDistribution(this->rng) +
                     idealWeight * idealBeta;
       if (isnan(beta)) {
-        std::cout << "Got nan for beta with idealBeta = " << idealBeta
-                  << ", weight = " << idealWeight << ", dx = " << dx
-                  << ", dy = " << dy << ", dz = " << dz << " at i = " << i
-                  << std::endl;
+        // std::cout << "Got nan for beta with idealBeta = " << idealBeta
+        //           << ", weight = " << idealWeight << ", dx = " << dx
+        //           << ", dy = " << dy << ", dz = " << dz << " at i = " << i
+        //           << std::endl;
 
         beta = isnan(idealBeta) ? angleDistribution(this->rng) : idealBeta;
       }
@@ -530,22 +534,25 @@ private:
   /**
    * @brief find an Atom in a collection with an objective distance
    *
-   * TODO: add some probability to not only select the very best.
+   * TODO: check probabilities to not only select the very best.
    *
    * @param from the Atom to start the distance from
    * @param possiblePartners the Atoms that could be the target
    * @param acceptableDistance the distance to target if possible
+   * @param maxDistance the maximum distance to accept random matches from
    * @return int the index in possiblePartners that matches best
    */
   int findAppropriateLink(
       pylimer_tools::entities::Atom from,
       std::vector<pylimer_tools::entities::Atom> possiblePartners,
-      std::vector<int> availablePartnerSites, double acceptableDistance) {
+      std::vector<int> availablePartnerSites, double acceptableDistance,
+      double maxDistance) {
     if (possiblePartners.size() == 0) {
       throw std::invalid_argument("Cannot find a partner in none.");
     }
     double bestDistance = std::numeric_limits<double>::max();
     int bestMatch = 0;
+    std::vector<int> suitableMatches;
     for (int i = 0; i < possiblePartners.size(); ++i) {
       if (availablePartnerSites[i] < 1) {
         continue;
@@ -557,8 +564,16 @@ private:
         bestDistance = currDist;
         bestMatch = i;
       }
+      if (currDist < maxDistance) {
+        suitableMatches.push_back(i);
+      }
     }
-    return bestMatch;
+
+    return suitableMatches.size() == 0
+               ? bestMatch
+               : suitableMatches[std::max(0, (int)round(suitableMatches.size() *
+                                                this->distSelect(this->rng) -
+                                            1.))];
   }
 
   double getDistance(double x1, double y1, double z1, double x2, double y2,

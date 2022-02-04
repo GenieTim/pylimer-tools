@@ -78,18 +78,16 @@ class UniverseUsingTestCase(unittest.TestCase):
         self.emptyUniverse = Universe(10, 10, 10)
         # Universe 2: small (5 atoms), barely connected in two chains
         self.testUniverseSmall = Universe(10, 10, 10)
-        self.testUniverseSmall.addAtoms(len(self.testAtomsSmall), self.testAtomsSmall["id"], self.testAtomsSmall["type"],
+        self.testUniverseSmall.addAtoms(self.testAtomsSmall["id"], self.testAtomsSmall["type"],
                                         self.testAtomsSmall["x"], self.testAtomsSmall["y"], self.testAtomsSmall["z"],
                                         self.testAtomsSmall["nx"], self.testAtomsSmall["ny"], self.testAtomsSmall["nz"])
-        self.testUniverseSmall.addBonds(len(
-            self.testBondsSmall), self.testBondsSmall["bondFrom"], self.testBondsSmall["to"])
+        self.testUniverseSmall.addBonds(self.testBondsSmall["bondFrom"], self.testBondsSmall["to"])
         # Universe 3: very unsaturated
         self.testUniverse = Universe(10, 10, 10)
-        self.testUniverse.addAtoms(len(self.testAtoms), self.testAtoms["id"], self.testAtoms["type"],
+        self.testUniverse.addAtoms(self.testAtoms["id"], self.testAtoms["type"],
                                    self.testAtoms["x"], self.testAtoms["y"], self.testAtoms["z"],
                                    self.testAtoms["nx"], self.testAtoms["ny"], self.testAtoms["nz"])
-        self.testUniverse.addBonds(
-            len(self.testBonds), self.testBonds["bondFrom"], self.testBonds["to"])
+        self.testUniverse.addBonds(self.testBonds["bondFrom"], self.testBonds["to"])
         # an additional larget test universe where the stoichiometric inbalance is < 1
         # even when imposing a crosslinker functionality of 1
         # in essence, it is on loop around 4 plus a connction to 6.
@@ -141,10 +139,9 @@ class UniverseUsingTestCase(unittest.TestCase):
             self.saturatedTestUniverse, self.testAtomsSaturated, self.testBondsSaturated)
 
     def addAtomBondData(self, universe: Universe, atomData: pd.DataFrame, bondData: pd.DataFrame) -> Universe:
-        universe.addAtoms(len(atomData), atomData["id"].tolist(), atomData["type"].tolist(),
+        universe.addAtoms(atomData["id"].tolist(), atomData["type"].tolist(),
                           atomData["x"].tolist(), atomData["y"].tolist(
         ), atomData["z"].tolist(),
             atomData["nx"].tolist(), atomData["ny"].tolist(), atomData["nz"].tolist())
-        universe.addBonds(
-            len(bondData), bondData["bondFrom"].tolist(), bondData["to"].tolist())
+        universe.addBonds(bondData["bondFrom"].tolist(), bondData["to"].tolist())
         return universe
