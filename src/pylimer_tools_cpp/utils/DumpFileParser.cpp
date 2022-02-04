@@ -112,8 +112,8 @@ DumpFileParser::DumpFileParser(const std::string filePath) {
 
   this->nrOfGroups = groupsFound + 1;
   // reset position to start of first group
-  this->file.seekg(this->groupPosMap.at(0));
   this->file.clear();
+  this->file.seekg(this->groupPosMap.at(0));
 }
 
 /**
@@ -127,9 +127,7 @@ DumpFileParser::DumpFileParser(const std::string filePath) {
  *
  * @param i the index of the group to read
  */
-void DumpFileParser::readGroupByIdx(const size_t i) {
-  this->readNGroups(i, 1);
-}
+void DumpFileParser::readGroupByIdx(const size_t i) { this->readNGroups(i, 1); }
 
 /**
  * @brief Read N timesteps
@@ -152,20 +150,22 @@ void DumpFileParser::readNGroups(const size_t start, const int N) {
                                 " time-steps.");
   }
 
-  this->file.seekg(this->groupPosMap.at(start));
   if (this->file.eof()) {
     this->file.clear();
   }
+  this->file.seekg(this->groupPosMap.at(start));
 
   size_t groupsRead = 0;
-  std::string currentKey = this->cleanHeader(this->currentLine);
-  int currentNrOfExpectedGroups = this->headerColMap[currentKey].size();
+  std::string currentKey = this->cleanHeader(this->newGroupKey);
+  int currentNrOfExpectedGroups = this->headerColMap.at(currentKey).size();
   data_item_t dataItem;
   std::string line = this->currentLine;
   // std::cout << "Starting to read at " << start << " for " << N << " with "
   //           << line << " and key " << currentKey << std::endl;
+  int linesRead = 0;
 
-  while (getline(this->file, line)) {
+  while (std::getline(this->file, line)) {
+    linesRead += 1;
     // std::cout << "Read line: " << line << std::endl;
     line = pylimer_tools::utils::trimLineOmitComment(line);
     if (line.empty()) {
@@ -174,15 +174,16 @@ void DumpFileParser::readNGroups(const size_t start, const int N) {
     // new header
     if (pylimer_tools::utils::startsWith(line, "ITEM:")) {
       currentKey = this->cleanHeader(line);
-      currentNrOfExpectedGroups = this->headerColMap[currentKey].size();
+      currentNrOfExpectedGroups = this->headerColMap.at(currentKey).size();
     } else {
+      // std::cout << "Appending data: " << currentNrOfExpectedGroups << " to "
+      // << currentKey << std::endl;
       dataItem[currentKey].push_back(
           pylimer_tools::utils::CsvTokenizer(line, currentNrOfExpectedGroups));
     }
 
-    if (line == newGroupKey) {
+    if (line == this->newGroupKey) {
       // new timestep
-      this->groupPosMap[this->data.size()] = this->file.tellg();
       if ((N > 0 && (groupsRead + 1) >= N)) {
         break;
       }
@@ -192,10 +193,18 @@ void DumpFileParser::readNGroups(const size_t start, const int N) {
     }
   }
 
-  this->currentLine = line;
-  // last timestep
-  this->data.insert_or_assign(start + groupsRead, dataItem);
-  groupsRead += 1;
+  if (linesRead > 1) {
+    // last timestep
+    this->data.insert_or_assign(start + groupsRead, dataItem);
+    groupsRead += 1;
+  }
+  if (groupsRead != N) {
+    throw std::runtime_error("Failed to read " + std::to_string(N) + ", read " +
+                             std::to_string(groupsRead) + " groups on " +
+                             std::to_string(linesRead) +
+                             " lines. Stream error: " + std::strerror(errno));
+    this->file.clear();
+  }
   // std::cout << "Read " << groupsRead << " groups "
   //           << "(last " << start + groupsRead - 1 << ") of " <<
   //           this->getLength()

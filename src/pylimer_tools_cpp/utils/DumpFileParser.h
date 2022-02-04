@@ -112,7 +112,7 @@ private:
   size_t nrOfGroups;
   std::unordered_map<size_t, data_item_t> data;
   std::map<std::string, std::vector<std::string>> headerColMap;
-  std::map<size_t, int> groupPosMap;
+  std::map<size_t, std::streampos> groupPosMap;
 };
 
 template <typename OUT>
@@ -148,6 +148,9 @@ std::vector<OUT> DumpFileParser::getValuesForAt(const size_t index,
   
   data_item_t dataItem = this->data.at(index);
   //
+  if (!dataItem.contains(headerKey)) {
+    throw std::invalid_argument(headerKey + " is not a key in dataItem.");
+  }
   std::vector<pylimer_tools::utils::CsvTokenizer> relevantData =
       dataItem.at(headerKey);
   std::vector<OUT> results;

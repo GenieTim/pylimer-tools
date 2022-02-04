@@ -41,12 +41,11 @@ class TestEntityCalculations(unittest.TestCase):
 
             coordsDf = pd.DataFrame([thirdAtom, secondAtom, baseAtom])
             universe = Universe(2, 2, 2)
-            universe.addAtoms(len(coordsDf), coordsDf["id"].tolist(), coordsDf["type"].tolist(),
+            universe.addAtoms(coordsDf["id"].tolist(), coordsDf["type"].tolist(),
                               coordsDf["x"].tolist(), coordsDf["y"].tolist(),
                               coordsDf["z"].tolist(),
                               coordsDf["nx"].tolist(), coordsDf["ny"].tolist(), coordsDf["nz"].tolist())
-            universe.addBonds(len(bondsDf),
-                              bondsDf["from"].tolist(), bondsDf["to"].tolist())
+            universe.addBonds(bondsDf["from"].tolist(), bondsDf["to"].tolist())
             self.assertEqual(len(universe.getMolecules(-1)), 1)
             molecule = universe.getMolecules(-1)[0]
             self.assertEqual(molecule.getLength(), 3)
@@ -67,12 +66,11 @@ class TestEntityCalculations(unittest.TestCase):
         universe = Universe(1, 1, 1)
         coordsDf = pd.DataFrame([baseAtom])
         bondsDf = pd.DataFrame([], columns=["to", "bondFrom"])
-        universe.addAtoms(len(coordsDf), coordsDf["id"].tolist(), coordsDf["type"].tolist(),
+        universe.addAtoms(coordsDf["id"].tolist(), coordsDf["type"].tolist(),
                           coordsDf["x"].tolist(), coordsDf["y"].tolist(),
                           coordsDf["z"].tolist(),
                           coordsDf["nx"].tolist(), coordsDf["ny"].tolist(), coordsDf["nz"].tolist())
-        universe.addBonds(len(bondsDf),
-                          bondsDf["bondFrom"].tolist(), bondsDf["to"].tolist())
+        universe.addBonds(bondsDf["bondFrom"].tolist(), bondsDf["to"].tolist())
         molecules = universe.getMolecules(-1)
         self.assertEqual(len(molecules), 1)
         self.assertEqual(molecules[0].computeEndToEndDistance(), 0)
@@ -85,12 +83,11 @@ class TestEntityCalculations(unittest.TestCase):
         coordsDf = pd.DataFrame(atoms)
         bondsDf = pd.DataFrame(
             [{"to": 1, "bondFrom": 0}, {"to": 2, "bondFrom": 1}, {"to": 0, "bondFrom": 2}])
-        universe.addAtoms(len(coordsDf), coordsDf["id"].tolist(), coordsDf["type"].tolist(),
+        universe.addAtoms(coordsDf["id"].tolist(), coordsDf["type"].tolist(),
                           coordsDf["x"].tolist(), coordsDf["y"].tolist(),
                           coordsDf["z"].tolist(),
                           coordsDf["nx"].tolist(), coordsDf["ny"].tolist(), coordsDf["nz"].tolist())
-        universe.addBonds(len(bondsDf),
-                          bondsDf["bondFrom"].tolist(), bondsDf["to"].tolist())
+        universe.addBonds(bondsDf["bondFrom"].tolist(), bondsDf["to"].tolist())
         molecules = universe.getMolecules(-1)
         self.assertEqual(len(molecules), 1)
         self.assertEqual(-1, molecules[0].computeEndToEndDistance())
@@ -116,12 +113,11 @@ class TestEntityCalculations(unittest.TestCase):
             bondsDf = pd.DataFrame([{
                 "to": 1, "bondFrom": 2
             }])
-            universe.addAtoms(len(coordsDf), coordsDf["id"].tolist(), coordsDf["type"].tolist(),
+            universe.addAtoms(coordsDf["id"].tolist(), coordsDf["type"].tolist(),
                               coordsDf["x"].tolist(), coordsDf["y"].tolist(),
                               coordsDf["z"].tolist(),
                               coordsDf["nx"].tolist(), coordsDf["ny"].tolist(), coordsDf["nz"].tolist())
-            universe.addBonds(len(bondsDf),
-                              bondsDf["bondFrom"].tolist(), bondsDf["to"].tolist())
+            universe.addBonds(bondsDf["bondFrom"].tolist(), bondsDf["to"].tolist())
             self.assertEqual(len(universe.getMolecules(-1)), 1)
             self.assertEqual(0.0, np.mean(universe.getMolecules(-1)[
                 0].computeBondLengths()))
