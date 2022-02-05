@@ -158,16 +158,21 @@ public:
 
   size_t getLength() const { return this->results.size(); }
 
-  template <typename OUT> OUT get(size_t index) const {
+  template <typename OUT> inline OUT get(size_t index) const {
     return dynamic_cast<OUT>(this->results[index]);
   };
 
-  template <> std::string get<std::string>(size_t index) const {
+private:
+  std::string source;
+  std::vector<std::string> results;
+};
+
+  template <> inline std::string CsvTokenizer::get<std::string>(size_t index) const {
     return this->results[index];
-  }
+  };
 
 #define MAKE_GET(TYPE, METHOD)                                                 \
-  template <> TYPE get<TYPE>(size_t index) const {                             \
+  template <> inline TYPE CsvTokenizer::get<TYPE>(size_t index) const {                             \
     if (this->results.size() <= index) {                                       \
       throw std::runtime_error("Index " + std::to_string(index) +              \
                                " out of bounds when parsing string '" +        \
@@ -188,11 +193,6 @@ public:
   MAKE_GET(long int, std::stol)
   MAKE_GET(unsigned int, std::stoul)
   MAKE_GET(unsigned long int, std::stoull)
-
-private:
-  std::string source;
-  std::vector<std::string> results;
-};
 } // namespace utils
 
 } // namespace pylimer_tools
