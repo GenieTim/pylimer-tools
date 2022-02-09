@@ -5,14 +5,14 @@
 #include "../entities/Universe.h"
 #include "StringUtils.h"
 #include <algorithm>
+#include <ctime>
 #include <filesystem>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
-#include <iomanip>
-#include <ctime>
 
 namespace pylimer_tools {
 namespace utils {
@@ -46,7 +46,8 @@ public:
     file.open(filePath);
 
     // write header
-    file << "LAMMPS file generated using pylimer_tools at " << std::put_time(&tm, "%Y/%m/%d %H-%M-%S") << ".\n\n";
+    file << "LAMMPS file generated using pylimer_tools at "
+         << std::put_time(&tm, "%Y/%m/%d %H-%M-%S") << ".\n\n";
     file << "\t " << this->universe.getNrOfAtoms() << " atoms\n";
     file << "\t " << this->universe.getNrOfBonds() << " bonds\n";
     file << "\t " << (this->includeAngles ? this->universe.getNrOfAngles() : 0)
@@ -60,12 +61,12 @@ public:
     file << "\t " << 0 << " dihedral types\n";
     file << "\t " << 0 << " improper types\n";
     file << "\n";
-    file << "\t " << 0 << " " << this->universe.getBox().getLx()
-         << " xlo xhi\n";
-    file << "\t " << 0 << " " << this->universe.getBox().getLy()
-         << " ylo yhi\n";
-    file << "\t " << 0 << " " << this->universe.getBox().getLz()
-         << " zlo zhi\n";
+    file << "\t " << this->universe.getBox().getLowX() << " "
+         << this->universe.getBox().getHighX() << " xlo xhi\n";
+    file << "\t " << this->universe.getBox().getLowY() << " "
+         << this->universe.getBox().getHighY() << " ylo yhi\n";
+    file << "\t " << this->universe.getBox().getLowZ() << " "
+         << this->universe.getBox().getHighZ() << " zlo zhi\n";
     file << "\n";
 
     // write masses
@@ -89,8 +90,12 @@ public:
         bondType = 1;
       }
       file << "\t" << i << "\t" << bondType << "\t"
-           << (this->oldNewAtomIdMap[this->universe.getAtomIdByIdx(bonds["bond_from"][i])]) << "\t"
-           << (this->oldNewAtomIdMap[this->universe.getAtomIdByIdx(bonds["bond_to"][i])]) << "\n";
+           << (this->oldNewAtomIdMap[this->universe.getAtomIdByIdx(
+                  bonds["bond_from"][i])])
+           << "\t"
+           << (this->oldNewAtomIdMap[this->universe.getAtomIdByIdx(
+                  bonds["bond_to"][i])])
+           << "\n";
     }
     file << "\n";
 
@@ -102,8 +107,9 @@ public:
       for (int i = 0; i < this->universe.getNrOfAngles(); ++i) {
         int angleType = 1; // TODO: support angle types?
         file << "\t" << i << "\t" << angleType << "\t"
-             << (this->oldNewAtomIdMap[angles["angle_from"][i]]) << "\t" << (this->oldNewAtomIdMap[angles["angle_via"][i]])
-             << "\t" << (this->oldNewAtomIdMap[angles["angle_to"][i]]) << "\n";
+             << (this->oldNewAtomIdMap[angles["angle_from"][i]]) << "\t"
+             << (this->oldNewAtomIdMap[angles["angle_via"][i]]) << "\t"
+             << (this->oldNewAtomIdMap[angles["angle_to"][i]]) << "\n";
       }
       file << "\n";
     }
@@ -119,16 +125,36 @@ private:
   bool moleculeIdxSwappable = false;
   int crosslinkerType = 2;
   bool reindexAtoms = false;
-
   // functions
+  double moveCoordinateIntoBox(double coord, double boxLo, double boxHi) const {
+    double boxL = (boxHi - boxLo);
+    while (coord > boxHi && coord > boxLo) {
+      coord -= boxL;
+    }
+    while (coord < boxLo && coord < boxHi) {
+      coord += boxL;
+    }
+    return coord;
+  }
   void writeAtom(std::ofstream &file, pylimer_tools::entities::Atom atom,
                  int moleculeIdx, int nAtomsOutput) {
     long int atomId = this->reindexAtoms ? nAtomsOutput : atom.getId();
     this->oldNewAtomIdMap[atom.getId()] = atomId;
-    file << "\t" << atomId << "\t" << moleculeIdx << "\t"
-         << atom.getType() << "\t" << atom.getX() << "\t" << atom.getY() << "\t"
-         << atom.getZ() << "\t" << atom.getNX() << "\t" << atom.getNY() << "\t"
-         << atom.getNZ() << "\n";
+    file << "\t" << atomId << "\t" << moleculeIdx << "\t" << atom.getType()
+         << "\t"
+         << this->moveCoordinateIntoBox(atom.getX(),
+                                        this->universe.getBox().getLowX(),
+                                        this->universe.getBox().getHighX())
+         << "\t"
+         << this->moveCoordinateIntoBox(atom.getY(),
+                                        this->universe.getBox().getLowY(),
+                                        this->universe.getBox().getHighY())
+         << "\t"
+         << this->moveCoordinateIntoBox(atom.getZ(),
+                                        this->universe.getBox().getLowZ(),
+                                        this->universe.getBox().getHighZ())
+         << "\t" << atom.getNX() << "\t" << atom.getNY() << "\t" << atom.getNZ()
+         << "\n";
   }
   void writeAtoms(std::ofstream &file) {
     file << "Atoms\n\n";
