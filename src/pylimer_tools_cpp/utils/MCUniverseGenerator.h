@@ -147,9 +147,20 @@ public:
         if (isActiveSite) {
           int targetIdx = this->findAppropriateLink(
               crosslinkers[i], crosslinkers, availableCrosslinkerSites,
-              std::sqrt(beadsPerChains[i]) * this->beadDistance,
-              beadsPerChains[i] * this->beadDistance);
-          if (isDanglingStrand) {
+              std::sqrt((double)beadsPerChains[nrOfStrandsAdded]) *
+                  this->beadDistance,
+              ((double)beadsPerChains[nrOfStrandsAdded]) * this->beadDistance);
+          if (targetIdx >= 0 && !isDanglingStrand) {
+            double dist = crosslinkers[i].distanceTo(crosslinkers[targetIdx], &this->box);
+            if (dist >= ((double)beadsPerChains[nrOfStrandsAdded]) *
+                            this->beadDistance) {
+              std::cout << "Got too far off link: " << targetIdx << " for " << i
+                        << " has dist " << dist << ""
+                        << "" << std::endl;
+            }
+          }
+          if (isDanglingStrand || targetIdx == -1 ||
+              (targetIdx == i && availableCrosslinkerSites[i] == 1)) {
             // decision is: dangling
             this->addRandomWalkChainFrom(crosslinkers[i],
                                          beadsPerChains[nrOfStrandsAdded]);
@@ -297,11 +308,20 @@ private:
     // support crossing of boundary conditions: find nearest image as target
     // (accept image mismatches)
     double targetX =
-        lastX + this->_getDeltaDistance(to.getX(), lastX, this->box.getLx());
+        this->box.getLx() < std::sqrt((double)chainLen) * this->beadDistance
+            ? to.getX()
+            : lastX +
+                  this->_getDeltaDistance(to.getX(), lastX, this->box.getLx());
     double targetY =
-        lastY + this->_getDeltaDistance(to.getY(), lastY, this->box.getLy());
+        this->box.getLy() < std::sqrt((double)chainLen) * this->beadDistance
+            ? to.getY()
+            : lastY +
+                  this->_getDeltaDistance(to.getY(), lastY, this->box.getLy());
     double targetZ =
-        lastZ + this->_getDeltaDistance(to.getZ(), lastZ, this->box.getLz());
+        this->box.getLz() < std::sqrt((double)chainLen) * this->beadDistance
+            ? to.getZ()
+            : lastZ +
+                  this->_getDeltaDistance(to.getZ(), lastZ, this->box.getLz());
 
     for (int i = 0; i < chainLen; ++i) {
       double dx = targetX - lastX;
@@ -317,13 +337,21 @@ private:
       double idealBeta = dx == 0.0 ? (M_PI * 0.5) : (std::atan2(dy, dx));
       double bondLenToUse = this->beadDistance;
       double idealWeight = 0.0;
-      double bondsRemaining = (chainLen - i + 1);
-      if ((remainingDistance / (bondsRemaining)) > this->beadDistance) {
+      double bondsRemaining = (chainLen - i);
+      if (((remainingDistance) / (bondsRemaining)) > this->beadDistance) {
         // need to constrain, cannot use random alpha & beta
         // TODO: find some a bit more sophisticated probability adjustment (or
         // simply use constraints for probability)
         idealWeight = 1.0;
         bondLenToUse = remainingDistance / (bondsRemaining);
+        if (bondLenToUse > 2 * this->beadDistance) {
+          std::cout << "Using bond length: " << bondLenToUse << " for "
+                    << bondsRemaining << " remaining bonds between " << lastX
+                    << ", " << lastY << ", " << lastZ
+                    << " to target: " << targetX << ", " << targetY << ", "
+                    << targetZ << " with length " << remainingDistance
+                    << " at i = " << i << " of " << chainLen << std::endl;
+        }
         // std::min(((double)i) / ((double)chainLen) +
         //              (remainingDistance / (chainLen - i + 1)),
         //          1.0);
@@ -538,42 +566,40 @@ private:
    *
    * @param from the Atom to start the distance from
    * @param possiblePartners the Atoms that could be the target
-   * @param acceptableDistance the distance to target if possible
+   * @param desiredDistance the distance to target if possible
    * @param maxDistance the maximum distance to accept random matches from
    * @return int the index in possiblePartners that matches best
    */
   int findAppropriateLink(
       pylimer_tools::entities::Atom from,
       std::vector<pylimer_tools::entities::Atom> possiblePartners,
-      std::vector<int> availablePartnerSites, double acceptableDistance,
-      double maxDistance) {
+      std::vector<int> availablePartnerSites, const double desiredDistance,
+      const double maxDistance) {
     if (possiblePartners.size() == 0) {
       throw std::invalid_argument("Cannot find a partner in none.");
     }
-    double bestDistance = std::numeric_limits<double>::max();
-    int bestMatch = 0;
+    // double bestDistance = std::numeric_limits<double>::max();
+    // int bestMatch = -1;
     std::vector<int> suitableMatches;
     for (int i = 0; i < possiblePartners.size(); ++i) {
       if (availablePartnerSites[i] < 1) {
         continue;
       }
       pylimer_tools::entities::Atom partner = possiblePartners[i];
-      double currDist =
-          std::fabs(partner.distanceTo(from, &this->box) - acceptableDistance);
-      if (currDist < bestDistance) {
-        bestDistance = currDist;
-        bestMatch = i;
-      }
-      if (currDist < maxDistance) {
+      double distBetween = partner.distanceTo(from, &this->box);
+      if (distBetween < maxDistance) {
         suitableMatches.push_back(i);
+        // double currDist = std::fabs(distBetween - desiredDistance);
+        // if (currDist < bestDistance) {
+        //   bestDistance = currDist;
+        //   bestMatch = i;
+        // }
       }
     }
 
-    return suitableMatches.size() == 0
-               ? bestMatch
-               : suitableMatches[std::max(0, (int)round(suitableMatches.size() *
-                                                this->distSelect(this->rng) -
-                                            1.))];
+    std::uniform_int_distribution<int> idxDist(0, suitableMatches.size()-1);
+    return suitableMatches.size() == 0 ? -1
+                                       : suitableMatches[idxDist(this->rng)];
   }
 
   double getDistance(double x1, double y1, double z1, double x2, double y2,
