@@ -269,6 +269,75 @@ public:
     return lengths;
   }
 
+  int computeFunctionalityForVertex(const long int vertexId) {
+    igraph_vector_t degrees;
+    if (igraph_vector_init(&degrees, 0)) {
+      throw std::runtime_error("Failed to instantiate result vector.");
+    }
+    if (igraph_degree(&this->graph, &degrees, igraph_vss_1(vertexId),
+                      IGRAPH_ALL, false)) {
+      throw std::runtime_error("Failed to determine degree of vertex");
+    }
+    int result = igraph_vector_e(&degrees, 0);
+    igraph_vector_destroy(&degrees);
+    return result;
+  }
+
+  /**
+   * @brief Get all edges associated with this graph
+   *
+   * @return std::map<std::string, std::vector<long int>>
+   */
+  std::map<std::string, std::vector<long int>> getEdges() const {
+    igraph_vector_t allEdges;
+    igraph_vector_init(&allEdges, this->getNrOfBonds());
+    if (igraph_edges(&this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID),
+                     &allEdges)) {
+      throw std::runtime_error("Failed to get all edges");
+    }
+
+    std::vector<long int> from;
+    from.reserve(this->getNrOfBonds());
+    std::vector<long int> to;
+    to.reserve(this->getNrOfBonds());
+    std::vector<long int> type;
+    type.reserve(this->getNrOfBonds());
+
+    for (long int i = 0; i < igraph_vector_size(&allEdges); i++) {
+      if (i % 2 == 0) {
+        from.push_back(igraph_vector_e(&allEdges, i));
+      } else {
+        to.push_back(igraph_vector_e(&allEdges, i));
+      }
+    }
+
+    igraph_vector_destroy(&allEdges);
+
+    // if (igraph_cattribute_has_attr(&this->graph, IGRAPH_ATTRIBUTE_EDGE,
+    // "type"))
+    // {
+    //   igraph_vector_t typesVec;
+    //   igraph_vector_init(&typesVec, 0);
+    //   igraph_cattribute_EANV(&this->graph, "type",
+    //   igraph_ess_all(IGRAPH_EDGEORDER_ID), &typesVec);
+    //   pylimer_tools::utils::igraphVectorTToStdVector(&typesVec, type);
+    //   igraph_vector_destroy(&typesVec);
+    // }
+    // else
+    {
+      for (size_t i = 0; i < this->getNrOfBonds(); ++i) {
+        type.push_back(-1); // TODO: find a nice default
+      }
+    }
+
+    std::map<std::string, std::vector<long int>> results;
+    results.insert_or_assign("bond_from", from);
+    results.insert_or_assign("bond_to", to);
+    results.insert_or_assign("bond_type", type);
+
+    return results;
+  };
+
 protected:
   igraph_t graph;
 };

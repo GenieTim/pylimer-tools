@@ -1091,51 +1091,30 @@ size_t Universe::getNrOfAngles() const {
  * @return std::map<std::string, std::vector<long int>>
  */
 std::map<std::string, std::vector<long int>> Universe::getBonds() const {
-  igraph_vector_t allEdges;
-  igraph_vector_init(&allEdges, this->getNrOfBonds());
-  if (igraph_edges(&this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID),
-                   &allEdges)) {
-    throw std::runtime_error("Failed to get all edges");
+  std::map<std::string, std::vector<long int>> vertexResults = this->getEdges();
+
+  std::vector<long int> newFrom;
+  std::vector<long int> newTo;
+  newFrom.reserve(this->getNrOfBonds());
+  newTo.reserve(this->getNrOfBonds());
+
+  std::vector<long int> oldFrom = vertexResults.at("bond_from");
+  assert(oldFrom.size() == this->getNrOfBonds());
+  std::vector<long int> oldTo = vertexResults.at("bond_to");
+  assert(oldTo.size() == this->getNrOfBonds());
+
+  for (size_t i = 0; i < this->getNrOfBonds(); ++i) {
+    newFrom.push_back(this->getAtomIdByIdx(oldFrom[i]));
+    newTo.push_back(this->getAtomIdByIdx(oldTo[i]));
   }
 
-  std::vector<long int> from;
-  from.reserve(this->getNrOfBonds());
-  std::vector<long int> to;
-  to.reserve(this->getNrOfBonds());
-  std::vector<long int> type;
-  type.reserve(this->getNrOfBonds());
-
-  for (long int i = 0; i < igraph_vector_size(&allEdges); i++) {
-    if (i % 2 == 0) {
-      from.push_back(igraph_vector_e(&allEdges, i));
-    } else {
-      to.push_back(igraph_vector_e(&allEdges, i));
-    }
-  }
-
-  igraph_vector_destroy(&allEdges);
-
-  // if (igraph_cattribute_has_attr(&this->graph, IGRAPH_ATTRIBUTE_EDGE,
-  // "type"))
-  // {
-  //   igraph_vector_t typesVec;
-  //   igraph_vector_init(&typesVec, 0);
-  //   igraph_cattribute_EANV(&this->graph, "type",
-  //   igraph_ess_all(IGRAPH_EDGEORDER_ID), &typesVec);
-  //   pylimer_tools::utils::igraphVectorTToStdVector(&typesVec, type);
-  //   igraph_vector_destroy(&typesVec);
-  // }
-  // else
-  {
-    for (size_t i = 0; i < this->NBonds; ++i) {
-      type.push_back(-1); // TODO: find a nice default
-    }
-  }
+  assert(newFrom.size() == this->getNrOfBonds());
+  assert(newTo.size() == this->getNrOfBonds());
 
   std::map<std::string, std::vector<long int>> results;
-  results.insert_or_assign("bond_from", from);
-  results.insert_or_assign("bond_to", to);
-  results.insert_or_assign("bond_type", type);
+  results.insert_or_assign("bond_from", newFrom);
+  results.insert_or_assign("bond_to", newTo);
+  results.insert_or_assign("bond_type", vertexResults.at("bond_type"));
 
   return results;
 };
