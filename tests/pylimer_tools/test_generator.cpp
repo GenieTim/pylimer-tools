@@ -43,17 +43,17 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]") {
     REQUIRE(universe.getMolecules(2).size() == (4 / 2) * 100 + 100);
   }
 
-  SECTION("Universe can be written and read again") {
-    pu::DataFileWriter writer = pu::DataFileWriter(universe);
-    writer.configIncludeAngles(true);
-    std::string file = "tmp_data_file_with_mc.structure.out";
-    writer.writeToFile(file);
-    pe::UniverseSequence seq = pe::UniverseSequence();
-    seq.initializeFromDataSequence({{file}});
-    pe::Universe readUniverse = seq.atIndex(0);
+  // SECTION("Universe can be written and read again") {
+  //   pu::DataFileWriter writer = pu::DataFileWriter(universe);
+  //   writer.configIncludeAngles(true);
+  //   std::string file = "tmp_data_file_with_mc.structure.out";
+  //   writer.writeToFile(file);
+  //   pe::UniverseSequence seq = pe::UniverseSequence();
+  //   seq.initializeFromDataSequence({{file}});
+  //   pe::Universe readUniverse = seq.atIndex(0);
 
-    REQUIRE(universe.getNrOfAtoms() == readUniverse.getNrOfAtoms());
-    REQUIRE(universe.getNrOfBonds() == readUniverse.getNrOfBonds());
-    REQUIRE(universe.getNrOfAngles() == readUniverse.getNrOfAngles());
-  }
+  //   REQUIRE(universe.getNrOfAtoms() == readUniverse.getNrOfAtoms());
+  //   REQUIRE(universe.getNrOfBonds() == readUniverse.getNrOfBonds());
+  //   REQUIRE(universe.getNrOfAngles() == readUniverse.getNrOfAngles());
+  // }
 }

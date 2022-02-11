@@ -300,9 +300,8 @@ protected:
         crosslinkerUniverse.getBonds();
     net->avlen = 0;
     for (int i = 0; i < net->springs; ++i) {
-      int atomIdFrom =
-          crosslinkerUniverse.getAtomIdByIdx(allBonds["bond_from"][i]);
-      int atomIdTo = crosslinkerUniverse.getAtomIdByIdx(allBonds["bond_to"][i]);
+      int atomIdFrom = allBonds["bond_from"][i];
+      int atomIdTo = allBonds["bond_to"][i];
       net->spr[i].a = atomIdToNode.at(atomIdFrom);
       net->spr[i].b = atomIdToNode.at(atomIdTo);
       net->spr[i].len = usualChainLen;

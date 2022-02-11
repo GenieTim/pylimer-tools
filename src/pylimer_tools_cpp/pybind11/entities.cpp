@@ -327,11 +327,14 @@ void init_pylimer_bound_entities(py::module_ &m) {
            "Get the vertex id of the underlying graph for an atom with a "
            "specified id.",
            py::arg("atomId"))
-      .def("getBonds", &Universe::getBonds, R"pbdoc(
+      .def("getEdges", &Universe::getEdges, R"pbdoc(
             Get all bonds. Returns a dict with three properties: 'bond_from', 'bond_to' and 'bond_type'.
             
                **NOTE**: the integer values returned refer to the vertex ids, not the atom ids.
                Use :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getAtomIdByIdx` to translate them to atom ids.
+            )pbdoc")
+      .def("getBonds", &Universe::getBonds, R"pbdoc(
+            Get all bonds. Returns a dict with three properties: 'bond_from', 'bond_to' and 'bond_type'.
             )pbdoc")
       .def("getAngles", &Universe::getAngles, R"pbdoc(
            Get all angles added to this network.

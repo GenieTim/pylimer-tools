@@ -85,17 +85,13 @@ public:
     std::map<std::string, std::vector<long int>> bonds =
         this->universe.getBonds();
     for (int i = 0; i < this->universe.getNrOfBonds(); ++i) {
-      long int bondType = bonds["bond_type"][i];
+      long int bondType = bonds.at("bond_type")[i];
       if (bondType == -1) {
         bondType = 1;
       }
       file << "\t" << i << "\t" << bondType << "\t"
-           << (this->oldNewAtomIdMap[this->universe.getAtomIdByIdx(
-                  bonds["bond_from"][i])])
-           << "\t"
-           << (this->oldNewAtomIdMap[this->universe.getAtomIdByIdx(
-                  bonds["bond_to"][i])])
-           << "\n";
+           << (this->oldNewAtomIdMap.at(bonds.at("bond_from")[i])) << "\t"
+           << (this->oldNewAtomIdMap.at(bonds.at("bond_to")[i])) << "\n";
     }
     file << "\n";
 

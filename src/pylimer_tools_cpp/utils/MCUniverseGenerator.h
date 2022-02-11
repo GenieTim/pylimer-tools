@@ -337,7 +337,7 @@ private:
       double idealBeta = dx == 0.0 ? (M_PI * 0.5) : (std::atan2(dy, dx));
       double bondLenToUse = this->beadDistance;
       double idealWeight = 0.0;
-      double bondsRemaining = (chainLen - i);
+      double bondsRemaining = ((chainLen - i)+1);
       if (((remainingDistance) / (bondsRemaining)) > this->beadDistance) {
         // need to constrain, cannot use random alpha & beta
         // TODO: find some a bit more sophisticated probability adjustment (or
