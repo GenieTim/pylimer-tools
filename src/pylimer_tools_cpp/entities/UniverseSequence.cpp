@@ -277,7 +277,7 @@ void UniverseSequence::forgetAtIndex(size_t index) {
 
 void UniverseSequence::resetIterator() { this->index = 0; }
 
-size_t UniverseSequence::getLength() { return this->length; }
+size_t UniverseSequence::getLength() const { return this->length; }
 
 void UniverseSequence::reset() {
   this->universeCache.clear();
