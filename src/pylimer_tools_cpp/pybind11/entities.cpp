@@ -50,19 +50,24 @@ void init_pylimer_bound_entities(py::module_ &m) {
       .def("getLz", &Box::getLz, R"pbdoc(
             Get the lenght of the box in z direction.
             )pbdoc")
+      .def("getLowX", &Box::getLowX)
+      .def("getLowY", &Box::getLowY)
+      .def("getLowZ", &Box::getLowZ)
       .def(py::pickle(
           [](const Box &b) { // __getstate__
             /* Return a tuple that fully encodes the state of the object */
-            return py::make_tuple(b.getLx(), b.getLy(), b.getLz());
+            return py::make_tuple(b.getLowX(), b.getLowY(), b.getLowZ(),
+                                  b.getHighX(), b.getHighY(), b.getHighZ());
           },
           [](py::tuple t) { // __setstate__
-            if (t.size() != 3) {
+            if (t.size() != 6) {
               throw std::runtime_error("Invalid state!.");
             }
 
             /* Create a new C++ instance */
             Box b = Box(t[0].cast<double>(), t[1].cast<double>(),
-                        t[2].cast<double>());
+                        t[2].cast<double>(), t[3].cast<double>(),
+                        t[4].cast<double>(), t[5].cast<double>());
 
             return b;
           }));
@@ -219,11 +224,12 @@ void init_pylimer_bound_entities(py::module_ &m) {
            [](py::object mol) {
              return MoleculeIterator(mol.cast<const Molecule &>(), mol);
            })
-      // .def(
-      //     "__iter__", [](const Molecule &molecule)
-      //     { return molecule; },
-      //     py::keep_alive<0, 1>())
-      // .def("__next__", )
+      // .def(py::pickle(
+      //      [](const Molecule &molecule) { // __getstate__
+      //        /* Return a tuple that fully encodes the state of the object */
+      //           return py::make_tuple(molecule.)
+      //      }
+      // ))
       ;
 
   py::class_<Universe>(
@@ -264,7 +270,8 @@ void init_pylimer_bound_entities(py::module_ &m) {
            py::arg("Lz"))
       .def("setBox", &Universe::setBox, R"pbdoc(
             Override the currently assigned box with the one specified.
-            )pbdoc", py::arg("box"))
+            )pbdoc",
+           py::arg("box"))
       // getters
       .def("getClusters", &Universe::getClusters, R"pbdoc(
             Get the otherwise unconnected components of the universe.
@@ -317,9 +324,10 @@ void init_pylimer_bound_entities(py::module_ &m) {
       .def("getAtomsWithType", &Universe::getAtomsWithType, R"pbdoc(
             Find many atom by their type.
             )pbdoc")
-      .def("getAtomByVertexIdx", &Universe::getAtomByVertexIdx,
-           R"pbdoc(Find an atom by the ID of the vertex of the underlying graph.)pbdoc",
-           py::arg("vertexId"))
+      .def(
+          "getAtomByVertexIdx", &Universe::getAtomByVertexIdx,
+          R"pbdoc(Find an atom by the ID of the vertex of the underlying graph.)pbdoc",
+          py::arg("vertexId"))
       .def("getAtomIdByIdx", &Universe::getAtomIdByIdx,
            "Get the id of the atom by the vertex id of the underlying graph.",
            py::arg("atomId"))
@@ -376,7 +384,9 @@ void init_pylimer_bound_entities(py::module_ &m) {
            "Computes the length :math:`b` of each bond in the molecule, "
            "respecting periodic boundaries.")
       .def("detectAngles", &Universe::detectAngles,
-           "Returns just as :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getAngles`, but "
+           "Returns just as "
+           ":func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getAngles`, "
+           "but "
            "all angles that are found in the "
            "network.")
       .def("hasInfiniteStrand", &Universe::hasInfiniteStrand,
@@ -408,6 +418,25 @@ void init_pylimer_bound_entities(py::module_ &m) {
       .def("simplify", &Universe::simplify,
            "Remove self links and double bonds. This function is called "
            "automatically after adding bonds.");
+
+  struct LazyUniverseSequenceIterator {
+    LazyUniverseSequenceIterator(UniverseSequence &us, py::object ref)
+        : us(us), ref(ref) {}
+
+    Universe next() {
+      if (index == us.getLength()) {
+        throw py::stop_iteration();
+      }
+      Universe toReturn = us.atIndex(index);
+      us.forgetAtIndex(index);
+      index += 1;
+      return toReturn;
+    }
+
+    UniverseSequence &us;
+    py::object ref;   // keep a reference
+    size_t index = 0; // the index to access
+  };
 
   py::class_<UniverseSequence>(
       m, "UniverseSequence",
@@ -443,7 +472,25 @@ void init_pylimer_bound_entities(py::module_ &m) {
             )pbdoc")
       .def("getAll", &UniverseSequence::getAll, R"pbdoc(
             Get all universes initialized back in a list
-            )pbdoc");
+            )pbdoc")
+      // operators
+      .def("__getitem__",
+           [](UniverseSequence &us, size_t index) {
+             if (index > us.getLength()) {
+               throw py::index_error();
+             }
+             return us.atIndex(index);
+           })
+      .def("__len__", &UniverseSequence::getLength)
+      .def(
+          "__iter__",
+          [](py::object us) {
+            return LazyUniverseSequenceIterator(
+                us.cast<UniverseSequence &>(), us);
+          },
+          R"pbdoc(
+           Lazily (memory efficiently) iterate through all the universes in this sequence.
+      )pbdoc");
 }
 
 #endif

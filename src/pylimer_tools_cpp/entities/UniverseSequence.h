@@ -20,7 +20,7 @@ namespace pylimer_tools
       Universe next();
       Universe atIndex(size_t index);
       void resetIterator();
-      size_t getLength();
+      size_t getLength() const;
       void forgetAtIndex(size_t index);
       std::vector<Universe> getAll();
 
