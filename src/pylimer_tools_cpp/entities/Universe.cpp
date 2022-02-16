@@ -99,6 +99,7 @@ void Universe::addAtoms(std::vector<long int> newIds, std::vector<int> newTypes,
   this->addAtoms(newIds.size(), newIds, newTypes, newX, newY, newZ, newNx,
                  newNy, newNz);
 }
+
 void Universe::addAtoms(const size_t NNewAtoms, std::vector<long int> newIds,
                         std::vector<int> newTypes, std::vector<double> newX,
                         std::vector<double> newY, std::vector<double> newZ,
@@ -615,7 +616,8 @@ Universe::findLoops(const int crosslinkerType, const int maxLength) const {
   // it is of the order of O(n*n!)
   for (long int startingCrosslinkerVertexId : startingCrosslinkers) {
     // ideally, we would only select the neighbouring *crosslinkers* here to
-    // reduce the overhead. but well.
+    // reduce the overhead. but well: let's leave that to the user with
+    // #getNetworkOfCrosslinker
     igraph_vector_t neighbours;
     igraph_vector_init(&neighbours, 0);
 

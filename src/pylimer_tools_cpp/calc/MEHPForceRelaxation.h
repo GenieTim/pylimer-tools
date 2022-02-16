@@ -19,7 +19,6 @@ namespace mehp {
 #define RED2 1.e-8    /* second residual norm reduction */
 #define OUTNODES 1    /* write output nodes_eq.dat file */
 #define EPS2 1.e-16   /* distance tolerance squared for the loop count */
-#define N0 100000     /* total number of strands as defined in pdms.m */
 
 typedef int Integer; /* large enough integer */
 
@@ -27,27 +26,27 @@ typedef struct _Spring {
   Integer a;   /* first node */
   Integer b;   /* second node */
   Integer len; /* length */
-  Integer act; /* 1/0; active or not */
+  Integer isActive; /* 1/0; active or not */
 } Spring;
 
 typedef struct _Node {
   double x;    /* x-coordinate */
   double y;    /* y-coordinate */
   double z;    /* z-coordinate */
-  Integer act; /* number of active springs connected to the node */
+  Integer nrOfActiveConnected; /* number of active springs connected to the node */
 } Node;
 
 typedef struct _Network {
   double L[3];     /* box sizes */
   double vol;      /* box volume */
-  Integer nodes;   /* number of nodes */
-  Integer springs; /* number of springs */
-  Node *nod;       /* nodes */
-  Spring *spr;     /* spings */
-  double *u;       /* nodal displacements */
-  double *force;   /* nodal forces */
-  double avlen;    /* average spring length */
-  Integer loops;   /* loops */
+  Integer nrOfNodes;   /* number of nodes */
+  Integer nrOfSprings; /* number of springs */
+  Node *nodes;       /* nodes */
+  Spring *springs;     /* spings */
+  double *nodalDisplacements;       /* nodal displacements */
+  double *nodalForces;   /* nodal forces */
+  double averageSpringLength;    /* average spring length */
+  Integer nrOfLoops;   /* loops */
 } Network;
 
 // heavily inspired by Prof. Dr. Andrei Gusev"s Code
@@ -74,22 +73,22 @@ public:
       return;
     };
 
-    for (int i = 0; i < net.springs; i++) {
+    for (int i = 0; i < net.nrOfSprings; i++) {
 
-      if (std::fabs(net.spr[i].len) < 1.0e-10) {
+      if (std::fabs(net.springs[i].len) < 1.0e-10) {
         std::cout << "WARNING: " << i << std::endl;
       }
-      assert(net.spr[i].len != 0.0);
+      assert(net.springs[i].len != 0.0);
     }
 
     /* array allocation */
 
-    u = (double *)calloc(3 * net.nodes, sizeof(double));
-    r = (double *)calloc(3 * net.nodes, sizeof(double));
+    u = (double *)calloc(3 * net.nrOfNodes, sizeof(double));
+    r = (double *)calloc(3 * net.nrOfNodes, sizeof(double));
 
     /* initial */
 
-    for (i = 0; i < 3 * net.nodes; i++) {
+    for (i = 0; i < 3 * net.nrOfNodes; i++) {
       u[i] = 0.0;
     }
     Stress(&net, u, stress);
@@ -98,7 +97,7 @@ public:
       printf("%.10f %.10f %.10f\n", stress[i][0], stress[i][1], stress[i][2]);
     }
     Residual(&net, u, r, &Fdef);
-    for (r20 = 0., i = 0; i < 3 * net.nodes; i++) {
+    for (r20 = 0., i = 0; i < 3 * net.nrOfNodes; i++) {
       r20 += r[i] * r[i];
     }
     G0 = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
@@ -124,11 +123,11 @@ public:
       Rx2_sum = 0.0;
       Ry2_sum = 0.0;
       Rz2_sum = 0.0;
-      for (i = 0; i < 3 * net.nodes; i++) {
+      for (i = 0; i < 3 * net.nrOfNodes; i++) {
         u[i] -= EPSILON * r[i];
       }
       Residual(&net, u, r, &Fdef);
-      for (r2 = 0., i = 0; i < 3 * net.nodes; i++) {
+      for (r2 = 0., i = 0; i < 3 * net.nrOfNodes; i++) {
         r2 += r[i] * r[i];
         if (i % 3 == 0) {
           Rx2_sum += r[i] * r[i];
@@ -144,7 +143,7 @@ public:
       if (r2 / r20 < RED2) {
         break;
       }
-      Gamma_eq = r2 / ((double)net.springs * Nb2);
+      Gamma_eq = r2 / ((double)net.nrOfSprings * Nb2);
       if (step <= 5 || OUTFREQ * (step / OUTFREQ) == step) {
         Stress(&net, u, stress);
         G = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
@@ -156,10 +155,10 @@ public:
       }
     }
     // TODO: this is incorrect.
-    double R2_mean = Gamma_eq / (double)net.springs;
-    double Gamma_x = 3 * Rx2_sum / ((double)net.springs * Nb2);
-    double Gamma_y = 3 * Ry2_sum / ((double)net.springs * Nb2);
-    double Gamma_z = 3 * Rz2_sum / ((double)net.springs * Nb2);
+    double R2_mean = Gamma_eq / (double)net.nrOfSprings;
+    double Gamma_x = 3 * Rx2_sum / ((double)net.nrOfSprings * Nb2);
+    double Gamma_y = 3 * Ry2_sum / ((double)net.nrOfSprings * Nb2);
+    double Gamma_z = 3 * Rz2_sum / ((double)net.nrOfSprings * Nb2);
 
     /* acquire equilibrium properties */
     Stress(&net, u, stress);
@@ -176,11 +175,11 @@ public:
     if (OUTNODES) {
       fp = fopen("nodes_eq.dat", "w");
       fprintf(fp, "%.10f %.10f %.10f\n", net.L[0], net.L[1], net.L[2]);
-      fprintf(fp, "%d #nodes\n", net.nodes);
-      fprintf(fp, "%d #springs\n", net.springs);
-      for (i = 0; i < net.nodes; i++) {
-        fprintf(fp, "%.16f %.16f %.16f\n", net.nod[i].x + u[3 * i],
-                net.nod[i].y + u[3 * i + 1], net.nod[i].z + u[3 * i + 2]);
+      fprintf(fp, "%d #nodes\n", net.nrOfNodes);
+      fprintf(fp, "%d #springs\n", net.nrOfSprings);
+      for (i = 0; i < net.nrOfNodes; i++) {
+        fprintf(fp, "%.16f %.16f %.16f\n", net.nodes[i].x + u[3 * i],
+                net.nodes[i].y + u[3 * i + 1], net.nodes[i].z + u[3 * i + 2]);
       }
       fclose(fp);
     }
@@ -189,37 +188,37 @@ public:
     s2len = S2len(&net, u);
 
     fp = fopen("out.dat", "w");
-    fprintf(fp, "%.10f %.10f %.10f %.10f   %.10f %.10f\n", N0 / net.vol,
-            net.avlen, G0, G, s20, s2);
+    fprintf(fp, "%.10f %.10f %.10f %.10f   %.10f %.10f\n",
+            net.nrOfSprings / net.vol, net.averageSpringLength, G0, G, s20, s2);
     fclose(fp);
 
     fp = fopen("s2len.dat", "w");
-    fprintf(fp, "%.10f  %.10f %.10f  %d\n", N0 / net.vol, s20len, s2len,
-            net.loops);
+    fprintf(fp, "%.10f  %.10f %.10f  %d\n", net.nrOfSprings / net.vol, s20len,
+            s2len, net.nrOfLoops);
     fclose(fp);
 
     /* active springs */
-    for (Nact = 0, i = 0; i < net.springs; i++) {
-      if (net.spr[i].act == 1) {
+    for (Nact = 0, i = 0; i < net.nrOfSprings; i++) {
+      if (net.springs[i].isActive == 1) {
         ++Nact;
       }
     }
     printf("\nactive springs: %d\n", Nact);
 
     /* active nodes */
-    for (i = 0; i < net.nodes; i++)
-      net.nod[i].act = 0; /* initial */
-    for (i = 0; i < net.springs; i++) {
-      if (net.spr[i].act == 1) /* active spring */
+    for (i = 0; i < net.nrOfNodes; i++)
+      net.nodes[i].nrOfActiveConnected = 0; /* initial */
+    for (i = 0; i < net.nrOfSprings; i++) {
+      if (net.springs[i].isActive == 1) /* active spring */
       {
-        a = net.spr[i].a;
-        b = net.spr[i].b;
-        ++(net.nod[a].act);
-        ++(net.nod[b].act);
+        a = net.springs[i].a;
+        b = net.springs[i].b;
+        ++(net.nodes[a].nrOfActiveConnected);
+        ++(net.nodes[b].nrOfActiveConnected);
       }
     }
-    for (Mact = 0, i = 0; i < net.nodes; i++) {
-      if (net.nod[i].act >= 2) {
+    for (Mact = 0, i = 0; i < net.nrOfNodes; i++) {
+      if (net.nodes[i].nrOfActiveConnected >= 2) {
         ++Mact;
       }
     }
@@ -239,29 +238,30 @@ public:
     /* exact and ANT shear moduli [MPa] as functions of the total strand number
      * density [nm^-3] */
     fp = fopen("ANT.dat", "w");
-    fprintf(fp, "%.10f   %.10f %.10f\n", N0 / net.vol, 4.14195 * G,
-            4.14195 * s2len * N0 / net.vol);
+    fprintf(fp, "%.10f   %.10f %.10f\n", net.nrOfSprings / net.vol, 4.14195 * G,
+            4.14195 * s2len * net.nrOfSprings / net.vol);
     fclose(fp);
 
     /* exact and ANM shear moduli [MPa] using total and active strand densities
      */
     fp = fopen("ANM.dat", "w");
-    fprintf(fp, "%.10f   %.10f %.10f %.10f\n", N0 / net.vol, 4.14195 * G,
-            4.14195 * N0 / net.vol, 4.14195 * Nact / net.vol);
+    fprintf(fp, "%.10f   %.10f %.10f %.10f\n", net.nrOfSprings / net.vol,
+            4.14195 * G, 4.14195 * net.nrOfSprings / net.vol,
+            4.14195 * Nact / net.vol);
     fclose(fp);
 
     /* exact and PNM shear moduli [MPa] using total and active strand and node
      * densities */
     fp = fopen("PNM.dat", "w");
-    fprintf(fp, "%.10f   %.10f %.10f %.10f\n", N0 / net.vol, 4.14195 * G,
-            4.14195 * (N0 - net.nodes) / net.vol,
+    fprintf(fp, "%.10f   %.10f %.10f %.10f\n", net.nrOfSprings / net.vol,
+            4.14195 * G, 4.14195 * (net.nrOfSprings - net.nrOfNodes) / net.vol,
             4.14195 * (Nact - Mact) / net.vol);
     fclose(fp);
 
     /* total and active node and strand number densities */
     fp = fopen("Densities.dat", "w");
-    fprintf(fp, "%.10f %.10f     %.10f %.10f\n", N0 / net.vol, Nact / net.vol,
-            net.nodes / net.vol, Mact / net.vol);
+    fprintf(fp, "%.10f %.10f     %.10f %.10f\n", net.nrOfSprings / net.vol,
+            Nact / net.vol, net.nrOfNodes / net.vol, Mact / net.vol);
     fclose(fp);
   };
 
@@ -274,14 +274,14 @@ protected:
     net->L[0] = box.getLx();
     net->L[1] = box.getLy();
     net->L[2] = box.getLz();
-    net->nodes = crosslinkerUniverse.getNrOfAtoms();
-    net->springs = crosslinkerUniverse.getNrOfBonds();
+    net->nrOfNodes = crosslinkerUniverse.getNrOfAtoms();
+    net->nrOfSprings = crosslinkerUniverse.getNrOfBonds();
 
     int usualChainLen =
         this->universe.getMolecules(crosslinkerType)[0].getNrOfAtoms();
 
-    net->nod = (Node *)calloc(net->nodes, sizeof(Node));
-    net->spr = (Spring *)calloc(net->springs, sizeof(Spring));
+    net->nodes = (Node *)calloc(net->nrOfNodes, sizeof(Node));
+    net->springs = (Spring *)calloc(net->nrOfSprings, sizeof(Spring));
 
     // convert beads
     std::vector<pylimer_tools::entities::Atom> allAtoms =
@@ -289,28 +289,28 @@ protected:
     std::map<int, int> atomIdToNode;
     for (int i = 0; i < allAtoms.size(); ++i) {
       pylimer_tools::entities::Atom atom = allAtoms[i];
-      net->nod[i].x = atom.getX();
-      net->nod[i].y = atom.getY();
-      net->nod[i].z = atom.getZ();
+      net->nodes[i].x = atom.getX();
+      net->nodes[i].y = atom.getY();
+      net->nodes[i].z = atom.getZ();
       atomIdToNode[atom.getId()] = i;
     }
 
     // convert springs
     std::map<std::string, std::vector<long int>> allBonds =
         crosslinkerUniverse.getBonds();
-    net->avlen = 0;
-    for (int i = 0; i < net->springs; ++i) {
+    net->averageSpringLength = 0;
+    for (int i = 0; i < net->nrOfSprings; ++i) {
       int atomIdFrom = allBonds["bond_from"][i];
       int atomIdTo = allBonds["bond_to"][i];
-      net->spr[i].a = atomIdToNode.at(atomIdFrom);
-      net->spr[i].b = atomIdToNode.at(atomIdTo);
-      net->spr[i].len = usualChainLen;
-      net->avlen += usualChainLen;
+      net->springs[i].a = atomIdToNode.at(atomIdFrom);
+      net->springs[i].b = atomIdToNode.at(atomIdTo);
+      net->springs[i].len = usualChainLen;
+      net->averageSpringLength += usualChainLen;
     }
 
-    assert(crosslinkerUniverse.getNrOfBonds() == net->springs);
+    assert(crosslinkerUniverse.getNrOfBonds() == net->nrOfSprings);
 
-    net->avlen /= net->springs;
+    net->averageSpringLength /= net->nrOfSprings;
 
     /* box volume */
     net->vol = net->L[0] * net->L[1] * net->L[2];
@@ -339,20 +339,20 @@ protected:
 
     /* initial */
     *Fdef = 0.;
-    for (i = 0; i < 3 * net->nodes; i++)
+    for (i = 0; i < 3 * net->nrOfNodes; i++)
       r[i] = 0.;
 
     /* assembly */
-    for (i = 0; i < net->springs; i++) {
-      a = net->spr[i].a;
-      b = net->spr[i].b;
-      len = net->spr[i].len;
+    for (i = 0; i < net->nrOfSprings; i++) {
+      a = net->springs[i].a;
+      b = net->springs[i].b;
+      len = net->springs[i].len;
       kappa = 3. / len;
 
       /* initial spring vector */
-      s[0] = net->nod[b].x - net->nod[a].x;
-      s[1] = net->nod[b].y - net->nod[a].y;
-      s[2] = net->nod[b].z - net->nod[a].z;
+      s[0] = net->nodes[b].x - net->nodes[a].x;
+      s[1] = net->nodes[b].y - net->nodes[a].y;
+      s[2] = net->nodes[b].z - net->nodes[a].z;
 
       /* spring displacement vectors */
       for (j = 0; j < 3; j++) {
@@ -401,10 +401,10 @@ protected:
         stress[j][k] = 0.;
 
     /* assembly */
-    for (i = 0; i < net->springs; i++) {
-      a = net->spr[i].a;
-      b = net->spr[i].b;
-      len = net->spr[i].len;
+    for (i = 0; i < net->nrOfSprings; i++) {
+      a = net->springs[i].a;
+      b = net->springs[i].b;
+      len = net->springs[i].len;
       if (isnan(a) || isnan(b) || isnan(len)) {
         std::cout << "ERROR: a or b or len is nan" << a << " " << b << " "
                   << len << std::endl;
@@ -417,9 +417,9 @@ protected:
       }
 
       /* initial spring vector */
-      s[0] = net->nod[b].x - net->nod[a].x;
-      s[1] = net->nod[b].y - net->nod[a].y;
-      s[2] = net->nod[b].z - net->nod[a].z;
+      s[0] = net->nodes[b].x - net->nodes[a].x;
+      s[1] = net->nodes[b].y - net->nodes[a].y;
+      s[2] = net->nodes[b].z - net->nodes[a].z;
 
       /* spring displacement vectors */
       for (j = 0; j < 3; j++) {
@@ -453,16 +453,16 @@ protected:
     double kappa, s[3], ua[3], ub[3], s2;
 
     /* assembly */
-    for (s2 = 0., i = 0; i < net->springs; i++) {
-      a = net->spr[i].a;
-      b = net->spr[i].b;
-      len = net->spr[i].len;
+    for (s2 = 0., i = 0; i < net->nrOfSprings; i++) {
+      a = net->springs[i].a;
+      b = net->springs[i].b;
+      len = net->springs[i].len;
       kappa = 3. / len;
 
       /* initial spring vector */
-      s[0] = net->nod[b].x - net->nod[a].x;
-      s[1] = net->nod[b].y - net->nod[a].y;
-      s[2] = net->nod[b].z - net->nod[a].z;
+      s[0] = net->nodes[b].x - net->nodes[a].x;
+      s[1] = net->nodes[b].y - net->nodes[a].y;
+      s[2] = net->nodes[b].z - net->nodes[a].z;
 
       /* spring displacement vectors */
       for (j = 0; j < 3; j++) {
@@ -481,7 +481,7 @@ protected:
       s2 += (s[0] * s[0] + s[1] * s[1] + s[2] * s[2]);
     };
 
-    return (s2 / net->springs);
+    return (s2 / net->nrOfSprings);
   }
 
   /* average ratio <s2/len> */
@@ -490,16 +490,16 @@ protected:
     double kappa, s[3], ua[3], ub[3], s2, s2len;
 
     /* assembly */
-    for (s2len = 0., net->loops = 0, i = 0; i < net->springs; i++) {
-      a = net->spr[i].a;
-      b = net->spr[i].b;
-      len = net->spr[i].len;
+    for (s2len = 0., net->nrOfLoops = 0, i = 0; i < net->nrOfSprings; i++) {
+      a = net->springs[i].a;
+      b = net->springs[i].b;
+      len = net->springs[i].len;
       kappa = 3. / len;
 
       /* initial spring vector */
-      s[0] = net->nod[b].x - net->nod[a].x;
-      s[1] = net->nod[b].y - net->nod[a].y;
-      s[2] = net->nod[b].z - net->nod[a].z;
+      s[0] = net->nodes[b].x - net->nodes[a].x;
+      s[1] = net->nodes[b].y - net->nodes[a].y;
+      s[2] = net->nodes[b].z - net->nodes[a].z;
 
       /* spring displacement vectors */
       for (j = 0; j < 3; j++) {
@@ -519,16 +519,13 @@ protected:
       s2len += s2 / len;
 
       /* loop count */
-      net->spr[i].act = 1;
+      net->springs[i].isActive = 1;
       if (s2 < EPS2) {
-        net->loops++;
-        net->spr[i].act = 0;
+        net->nrOfLoops++;
+        net->springs[i].isActive = 0;
       }
     };
-    /* For numerical efficiency, all dangling and free chains were discarded in
-    pdms.m. They all have s2 = 0 and hence, their presence can now simply be
-    exactly taken into account by normalizing by N0 instead of net->springs */
-    return (s2len / N0);
+    return (s2len / net->nrOfSprings);
   }
 
 private:
