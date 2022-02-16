@@ -9,51 +9,94 @@
 #include <cassert>
 #include <map>
 #include <string>
+#include <tuple>
 
 namespace pylimer_tools {
 namespace calc {
 namespace mehp {
-#define OUTFREQ 250   /* output frequency */
 #define MAX 250000    /* maximum number of relaxation steps */
 #define EPSILON 0.077 /* relaxation parameter, adjusted by trial and errors */
 #define RED2 1.e-8    /* second residual norm reduction */
-#define OUTNODES 1    /* write output nodes_eq.dat file */
 #define EPS2 1.e-16   /* distance tolerance squared for the loop count */
 
 typedef int Integer; /* large enough integer */
 
 typedef struct _Spring {
-  Integer a;   /* first node */
-  Integer b;   /* second node */
-  Integer len; /* length */
-  Integer isActive; /* 1/0; active or not */
+  Integer a;     /* first node */
+  Integer b;     /* second node */
+  Integer len;   /* length */
+  bool isActive; /* 1/0; active or not */
 } Spring;
 
 typedef struct _Node {
-  double x;    /* x-coordinate */
-  double y;    /* y-coordinate */
-  double z;    /* z-coordinate */
-  Integer nrOfActiveConnected; /* number of active springs connected to the node */
+  double x; /* x-coordinate */
+  double y; /* y-coordinate */
+  double z; /* z-coordinate */
+  Integer
+      nrOfActiveConnected; /* number of active springs connected to the node */
 } Node;
 
 typedef struct _Network {
-  double L[3];     /* box sizes */
-  double vol;      /* box volume */
-  Integer nrOfNodes;   /* number of nodes */
-  Integer nrOfSprings; /* number of springs */
-  Node *nodes;       /* nodes */
-  Spring *springs;     /* spings */
-  double *nodalDisplacements;       /* nodal displacements */
-  double *nodalForces;   /* nodal forces */
-  double averageSpringLength;    /* average spring length */
-  Integer nrOfLoops;   /* loops */
+  double L[3];                /* box sizes */
+  double vol;                 /* box volume */
+  Integer nrOfNodes;          /* number of nodes */
+  Integer nrOfSprings;        /* number of springs */
+  Node *nodes;                /* nodes */
+  Spring *springs;            /* spings */
+  double *nodalDisplacements; /* nodal displacements */
+  double *nodalForces;        /* nodal forces */
+  double averageSpringLength; /* average spring length */
+  Integer nrOfLoops;          /* loops */
 } Network;
 
 // heavily inspired by Prof. Dr. Andrei Gusev"s Code
 class MEHPForceRelaxation {
 public:
-  MEHPForceRelaxation(const pylimer_tools::entities::Universe u)
-      : universe(u){};
+  MEHPForceRelaxation(const pylimer_tools::entities::Universe u, int crosslinkerType = 2) : universe(u) {
+    // interpret network already to be able to give early results
+    Network net;
+    ConvertNetwork(&net, crosslinkerType);
+    this->finalConfig = net;
+  };
+
+  void configDoOutputSteps(const std::string outputFile, const int outputFreq) {
+    this->stepOutputFile = outputFile;
+    this->stepOutputFrequency = outputFreq;
+  }
+
+  void configDoOutputFinalCoordinas(const std::string outputFile) {
+    this->outputEndNodes = true;
+    this->endNodesFile = outputFile;
+  }
+
+  double getVolume() { return this->finalConfig.vol; }
+
+  int getNrOfNodes() { return this->finalConfig.nrOfNodes; }
+
+  int getNrOfSprings() { return this->finalConfig.nrOfSprings; }
+
+  int getNrOfActiveNodes() { return this->nrOfActiveNodes; }
+
+  int getNrOfActiveSprings() { return this->nrOfActiveSprings; }
+
+  double getAverageSpringLength() {
+    return this->finalConfig.averageSpringLength;
+  }
+
+  int getFinalNrOfLoops() { return this->finalConfig.nrOfLoops; }
+
+  double getInitialShearModulus() { return this->initialG; }
+
+  double getFinalShearModulus() { return this->finalG; }
+
+  double getInitialSquareDistance() { return this->initialS2; }
+
+  double getFinalSquareDistance() { return this->finalS2; }
+
+  double getInitialSquareRelativeDistance() { return this->initialS2len; }
+
+  double getFinalSquareRelativeDistance() { return this->finalS2len; }
+
   void runForceRelaxation(int crosslinkerType = 2) {
 
     Integer i, step, Nact, Mact, a, b;
@@ -91,27 +134,19 @@ public:
     for (i = 0; i < 3 * net.nrOfNodes; i++) {
       u[i] = 0.0;
     }
-    Stress(&net, u, stress);
-    printf("\nInitial stress tensor:\n");
-    for (i = 0; i < 3; i++) {
-      printf("%.10f %.10f %.10f\n", stress[i][0], stress[i][1], stress[i][2]);
-    }
+    std::tie(s20, s20len) = computeStressAndSquareDistances(&net, u, stress);
     Residual(&net, u, r, &Fdef);
     for (r20 = 0., i = 0; i < 3 * net.nrOfNodes; i++) {
       r20 += r[i] * r[i];
     }
     G0 = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
-    printf("\nForce relaxation:\n");
-    printf("%d %.10e %.16f %.16f\n", 0, Fdef, r20, G0);
 
-    fp = fopen("control.dat", "w");
-    fprintf(fp, "%d %.10e %.16f %.16f\n", 0, Fdef, r20, G0);
-    fclose(fp);
+    FILE *stepOutputFp;
 
-    s20 = S2(&net, u);
-    s20len = S2len(&net, u);
-
-    printf("%f\n", Fdef);
+    if (this->stepOutputFrequency > 0) {
+      stepOutputFp = fopen(this->stepOutputFile.c_str(), "w");
+      fprintf(stepOutputFp, "%d %.10e %.16f %.16f\n", 0, Fdef, r20, G0);
+    }
 
     /* force relaxation */
     double Gamma_eq = 0.0;
@@ -139,21 +174,25 @@ public:
         }
         // Gamma_eq +=
       }
+      Gamma_eq = r2 / ((double)net.nrOfSprings * Nb2);
+      if (this->stepOutputFrequency > 0 &&
+          (step <= 5 ||
+           this->stepOutputFrequency * (step / this->stepOutputFrequency) ==
+               step)) {
+        computeStressAndSquareDistances(&net, u, stress);
+        G = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
+
+        printf("%d %.10e %.16f %.16f\n", step, Fdef, r2 / r20, G);
+        fprintf(stepOutputFp, "%d %.10e %.16f %.16f\n", step, Fdef, r2 / r20,
+                G);
+      }
 
       if (r2 / r20 < RED2) {
         break;
       }
-      Gamma_eq = r2 / ((double)net.nrOfSprings * Nb2);
-      if (step <= 5 || OUTFREQ * (step / OUTFREQ) == step) {
-        Stress(&net, u, stress);
-        G = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
-
-        printf("%d %.10e %.16f %.16f\n", step, Fdef, r2 / r20, G);
-        fp = fopen("control.dat", "a");
-        fprintf(fp, "%d %.10e %.16f %.16f\n", step, Fdef, r2 / r20, G);
-        fclose(fp);
-      }
     }
+    fclose(stepOutputFp);
+
     // TODO: this is incorrect.
     double R2_mean = Gamma_eq / (double)net.nrOfSprings;
     double Gamma_x = 3 * Rx2_sum / ((double)net.nrOfSprings * Nb2);
@@ -161,19 +200,12 @@ public:
     double Gamma_z = 3 * Rz2_sum / ((double)net.nrOfSprings * Nb2);
 
     /* acquire equilibrium properties */
-    Stress(&net, u, stress);
+    std::tie(s2, s2len) = computeStressAndSquareDistances(&net, u, stress);
     G = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
-    printf("\n%d %.10e %.16f %.16f\n", --step, Fdef, r2, G);
-    fp = fopen("control.dat", "a");
-    fprintf(fp, "\n%d %.10e %.16f %.16f\n", step, Fdef, r2, G);
-    fclose(fp);
-    printf("\nStress tensor:\n");
-    for (i = 0; i < 3; i++) {
-      printf("%.10f %.10f %.10f\n", stress[i][0], stress[i][1], stress[i][2]);
-    }
+
     /* output */
-    if (OUTNODES) {
-      fp = fopen("nodes_eq.dat", "w");
+    if (this->outputEndNodes) {
+      fp = fopen(this->endNodesFile.c_str(), "w");
       fprintf(fp, "%.10f %.10f %.10f\n", net.L[0], net.L[1], net.L[2]);
       fprintf(fp, "%d #nodes\n", net.nrOfNodes);
       fprintf(fp, "%d #springs\n", net.nrOfSprings);
@@ -184,26 +216,12 @@ public:
       fclose(fp);
     }
 
-    s2 = S2(&net, u);
-    s2len = S2len(&net, u);
-
-    fp = fopen("out.dat", "w");
-    fprintf(fp, "%.10f %.10f %.10f %.10f   %.10f %.10f\n",
-            net.nrOfSprings / net.vol, net.averageSpringLength, G0, G, s20, s2);
-    fclose(fp);
-
-    fp = fopen("s2len.dat", "w");
-    fprintf(fp, "%.10f  %.10f %.10f  %d\n", net.nrOfSprings / net.vol, s20len,
-            s2len, net.nrOfLoops);
-    fclose(fp);
-
     /* active springs */
     for (Nact = 0, i = 0; i < net.nrOfSprings; i++) {
       if (net.springs[i].isActive == 1) {
         ++Nact;
       }
     }
-    printf("\nactive springs: %d\n", Nact);
 
     /* active nodes */
     for (i = 0; i < net.nrOfNodes; i++)
@@ -222,47 +240,17 @@ public:
         ++Mact;
       }
     }
-    printf("active nodes: %d\n", Mact);
 
-    /* OUTPUT FOR THE MAIN FIGURES */
-    /* data as in Fabian"s MATLAB, approx */
-    std::string filename = "force_relax_info_M" + std::to_string(M) + "_N" +
-                           std::to_string(N) + "_f" + std::to_string(f) +
-                           ".dat";
-    FILE *fileID = fopen(filename.c_str(), "w");
-    fprintf(fileID, "# Gamma x | Gamma y | Gamma z | Gamma_eq | R2_mean \n");
-    fprintf(fileID, "%10.8f %10.8f %10.8f %10.8f %10.8f\n", Gamma_x, Gamma_y,
-            Gamma_z, Gamma_eq, R2_mean);
-    fclose(fileID);
-
-    /* exact and ANT shear moduli [MPa] as functions of the total strand number
-     * density [nm^-3] */
-    fp = fopen("ANT.dat", "w");
-    fprintf(fp, "%.10f   %.10f %.10f\n", net.nrOfSprings / net.vol, 4.14195 * G,
-            4.14195 * s2len * net.nrOfSprings / net.vol);
-    fclose(fp);
-
-    /* exact and ANM shear moduli [MPa] using total and active strand densities
-     */
-    fp = fopen("ANM.dat", "w");
-    fprintf(fp, "%.10f   %.10f %.10f %.10f\n", net.nrOfSprings / net.vol,
-            4.14195 * G, 4.14195 * net.nrOfSprings / net.vol,
-            4.14195 * Nact / net.vol);
-    fclose(fp);
-
-    /* exact and PNM shear moduli [MPa] using total and active strand and node
-     * densities */
-    fp = fopen("PNM.dat", "w");
-    fprintf(fp, "%.10f   %.10f %.10f %.10f\n", net.nrOfSprings / net.vol,
-            4.14195 * G, 4.14195 * (net.nrOfSprings - net.nrOfNodes) / net.vol,
-            4.14195 * (Nact - Mact) / net.vol);
-    fclose(fp);
-
-    /* total and active node and strand number densities */
-    fp = fopen("Densities.dat", "w");
-    fprintf(fp, "%.10f %.10f     %.10f %.10f\n", net.nrOfSprings / net.vol,
-            Nact / net.vol, net.nrOfNodes / net.vol, Mact / net.vol);
-    fclose(fp);
+    /* save results */
+    this->initialG = G0;
+    this->initialS2 = s20;
+    this->finalS2 = s2;
+    this->finalS2len = s2len;
+    this->initialS2len = s20len;
+    this->finalG = G;
+    this->finalConfig = net;
+    this->nrOfActiveNodes = Mact;
+    this->nrOfActiveSprings = Nact;
   };
 
 protected:
@@ -392,13 +380,17 @@ protected:
     return;
   }
 
-  void Stress(Network *net, double *u, double stress[3][3]) {
+  std::pair<double, double>
+  computeStressAndSquareDistances(Network *net, double *u,
+                                  double stress[3][3]) {
     Integer i, a, b, len, j, k;
-    double kappa, s[3], ua[3], ub[3];
+    double kappa, s[3], ua[3], ub[3], s2 = 0, s2len = 0;
 
-    for (j = 0; j < 3; j++)
-      for (k = 0; k < 3; k++)
+    for (j = 0; j < 3; j++) {
+      for (k = 0; k < 3; k++) {
         stress[j][k] = 0.;
+      }
+    }
 
     /* assembly */
     for (i = 0; i < net->nrOfSprings; i++) {
@@ -409,12 +401,12 @@ protected:
         std::cout << "ERROR: a or b or len is nan" << a << " " << b << " "
                   << len << std::endl;
       }
-      kappa = 3. / len;
       if (len == 0) {
         std::cout << "ERROR: len is 0 " << len << " between a or b " << a << " "
                   << b << " " << std::endl;
         kappa = 100;
       }
+      kappa = 3. / len;
 
       /* initial spring vector */
       s[0] = net->nodes[b].x - net->nodes[a].x;
@@ -428,108 +420,59 @@ protected:
       }
 
       /* current spring vector */
-      for (j = 0; j < 3; j++)
+      for (j = 0; j < 3; j++) {
         s[j] += ub[j] - ua[j];
+      }
 
       /* periodic boundary conditions */
       ImposePBC(s, net->L);
+
+      double s2local = (s[0] * s[0] + s[1] * s[1] + s[2] * s[2]);
 
       /* spring contribution to the overall stress tensor */
-      for (j = 0; j < 3; j++)
-        for (k = 0; k < 3; k++)
+      for (j = 0; j < 3; j++) {
+        for (k = 0; k < 3; k++) {
           stress[j][k] += kappa * s[j] * s[k];
-    };
-
-    for (j = 0; j < 3; j++)
-      for (k = 0; k < 3; k++)
-        stress[j][k] /= net->vol;
-
-    return;
-  }
-
-  /* average ratio <s2> */
-  double S2(Network *net, double *u) {
-    Integer i, a, b, len, j;
-    double kappa, s[3], ua[3], ub[3], s2;
-
-    /* assembly */
-    for (s2 = 0., i = 0; i < net->nrOfSprings; i++) {
-      a = net->springs[i].a;
-      b = net->springs[i].b;
-      len = net->springs[i].len;
-      kappa = 3. / len;
-
-      /* initial spring vector */
-      s[0] = net->nodes[b].x - net->nodes[a].x;
-      s[1] = net->nodes[b].y - net->nodes[a].y;
-      s[2] = net->nodes[b].z - net->nodes[a].z;
-
-      /* spring displacement vectors */
-      for (j = 0; j < 3; j++) {
-        ua[j] = u[3 * a + j];
-        ub[j] = u[3 * b + j];
+        }
       }
 
-      /* current spring vector */
-      for (j = 0; j < 3; j++)
-        s[j] += ub[j] - ua[j];
-
-      /* periodic boundary conditions */
-      ImposePBC(s, net->L);
-
       /* update */
-      s2 += (s[0] * s[0] + s[1] * s[1] + s[2] * s[2]);
-    };
-
-    return (s2 / net->nrOfSprings);
-  }
-
-  /* average ratio <s2/len> */
-  double S2len(Network *net, double *u) {
-    Integer i, a, b, len, j;
-    double kappa, s[3], ua[3], ub[3], s2, s2len;
-
-    /* assembly */
-    for (s2len = 0., net->nrOfLoops = 0, i = 0; i < net->nrOfSprings; i++) {
-      a = net->springs[i].a;
-      b = net->springs[i].b;
-      len = net->springs[i].len;
-      kappa = 3. / len;
-
-      /* initial spring vector */
-      s[0] = net->nodes[b].x - net->nodes[a].x;
-      s[1] = net->nodes[b].y - net->nodes[a].y;
-      s[2] = net->nodes[b].z - net->nodes[a].z;
-
-      /* spring displacement vectors */
-      for (j = 0; j < 3; j++) {
-        ua[j] = u[3 * a + j];
-        ub[j] = u[3 * b + j];
-      }
-
-      /* current spring vector */
-      for (j = 0; j < 3; j++)
-        s[j] += ub[j] - ua[j];
-
-      /* periodic boundary conditions */
-      ImposePBC(s, net->L);
-
-      /* update */
-      s2 = s[0] * s[0] + s[1] * s[1] + s[2] * s[2];
-      s2len += s2 / len;
+      s2 += s2local;
+      s2len += s2local / len;
 
       /* loop count */
       net->springs[i].isActive = 1;
       if (s2 < EPS2) {
         net->nrOfLoops++;
-        net->springs[i].isActive = 0;
+        net->springs[i].isActive = false;
       }
     };
-    return (s2len / net->nrOfSprings);
+
+    for (j = 0; j < 3; j++) {
+      for (k = 0; k < 3; k++) {
+        stress[j][k] /= net->vol;
+      }
+    }
+
+    return std::make_pair(s2 / (double)net->nrOfSprings,
+                          s2len / (double)net->nrOfSprings);
   }
 
 private:
   pylimer_tools::entities::Universe universe;
+  int stepOutputFrequency = 0;
+  std::string stepOutputFile;
+  bool outputEndNodes = false;
+  std::string endNodesFile;
+  _Network finalConfig;
+  double finalG = 0.0;
+  double initialG = 0.0;
+  int nrOfActiveSprings = 0;
+  int nrOfActiveNodes = 0;
+  double initialS2 = 0.0;
+  double finalS2 = 0.0;
+  double finalS2len = 0.0;
+  double initialS2len = 0.0;
 };
 } // namespace mehp
 } // namespace calc
