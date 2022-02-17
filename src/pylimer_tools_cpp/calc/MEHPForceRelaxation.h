@@ -19,12 +19,10 @@ namespace mehp {
 #define RED2 1.e-8    /* second residual norm reduction */
 #define EPS2 1.e-16   /* distance tolerance squared for the loop count */
 
-typedef int Integer; /* large enough integer */
-
 typedef struct _Spring {
-  Integer a;     /* first node */
-  Integer b;     /* second node */
-  Integer len;   /* length */
+  long int a;    /* first node */
+  long int b;    /* second node */
+  long int len;  /* length */
   bool isActive; /* 1/0; active or not */
 } Spring;
 
@@ -32,30 +30,34 @@ typedef struct _Node {
   double x; /* x-coordinate */
   double y; /* y-coordinate */
   double z; /* z-coordinate */
-  Integer
+  long int
       nrOfActiveConnected; /* number of active springs connected to the node */
 } Node;
 
 typedef struct _Network {
   double L[3];                /* box sizes */
   double vol;                 /* box volume */
-  Integer nrOfNodes;          /* number of nodes */
-  Integer nrOfSprings;        /* number of springs */
+  long int nrOfNodes;         /* number of nodes */
+  long int nrOfSprings;       /* number of springs */
   Node *nodes;                /* nodes */
   Spring *springs;            /* spings */
   double *nodalDisplacements; /* nodal displacements */
   double *nodalForces;        /* nodal forces */
   double averageSpringLength; /* average spring length */
-  Integer nrOfLoops;          /* loops */
+  long int nrOfLoops;         /* loops */
 } Network;
 
-// heavily inspired by Prof. Dr. Andrei Gusev"s Code
+// heavily inspired by Prof. Dr. Andrei Gusev's Code
 class MEHPForceRelaxation {
 public:
-  MEHPForceRelaxation(const pylimer_tools::entities::Universe u, int crosslinkerType = 2) : universe(u) {
+  MEHPForceRelaxation(const pylimer_tools::entities::Universe u,
+                      int crosslinkerType = 2)
+      : universe(u) {
     // interpret network already to be able to give early results
     Network net;
     ConvertNetwork(&net, crosslinkerType);
+    free(net.nodes);
+    free(net.springs);
     this->finalConfig = net;
   };
 
@@ -64,7 +66,7 @@ public:
     this->stepOutputFrequency = outputFreq;
   }
 
-  void configDoOutputFinalCoordinas(const std::string outputFile) {
+  void configDoOutputFinalCoordinates(const std::string outputFile) {
     this->outputEndNodes = true;
     this->endNodesFile = outputFile;
   }
@@ -97,10 +99,13 @@ public:
 
   double getFinalSquareRelativeDistance() { return this->finalS2len; }
 
-  void runForceRelaxation(int crosslinkerType = 2) {
+  void runForceRelaxation(int crosslinkerType) {
 
-    Integer i, step, Nact, Mact, a, b;
+    long int i, step, Nact, Mact, a, b;
     Network net;
+    if (!ConvertNetwork(&net, crosslinkerType)) {
+      return;
+    }
     double *u, *r, Fdef;
     double stress[3][3], r20, G0, r2, G, s20, s2, s20len, s2len;
     FILE *fp;
@@ -111,17 +116,12 @@ public:
     const int f =
         this->universe.determineFunctionalityPerType()[crosslinkerType];
 
-    /* read network */
-    if (!ConvertNetwork(&net, crosslinkerType)) {
-      return;
-    };
-
     for (int i = 0; i < net.nrOfSprings; i++) {
 
       if (std::fabs(net.springs[i].len) < 1.0e-10) {
         std::cout << "WARNING: " << i << std::endl;
       }
-      assert(net.springs[i].len != 0.0);
+      // assert(net.springs[i].len != 0.0);
     }
 
     /* array allocation */
@@ -135,7 +135,7 @@ public:
       u[i] = 0.0;
     }
     std::tie(s20, s20len) = computeStressAndSquareDistances(&net, u, stress);
-    Residual(&net, u, r, &Fdef);
+    Fdef = Residual(&net, u, r);
     for (r20 = 0., i = 0; i < 3 * net.nrOfNodes; i++) {
       r20 += r[i] * r[i];
     }
@@ -145,6 +145,7 @@ public:
 
     if (this->stepOutputFrequency > 0) {
       stepOutputFp = fopen(this->stepOutputFile.c_str(), "w");
+      fprintf(stepOutputFp, "Step Fdef r2 G\n");
       fprintf(stepOutputFp, "%d %.10e %.16f %.16f\n", 0, Fdef, r20, G0);
     }
 
@@ -161,7 +162,7 @@ public:
       for (i = 0; i < 3 * net.nrOfNodes; i++) {
         u[i] -= EPSILON * r[i];
       }
-      Residual(&net, u, r, &Fdef);
+      Fdef = Residual(&net, u, r);
       for (r2 = 0., i = 0; i < 3 * net.nrOfNodes; i++) {
         r2 += r[i] * r[i];
         if (i % 3 == 0) {
@@ -182,8 +183,7 @@ public:
         computeStressAndSquareDistances(&net, u, stress);
         G = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
 
-        printf("%d %.10e %.16f %.16f\n", step, Fdef, r2 / r20, G);
-        fprintf(stepOutputFp, "%d %.10e %.16f %.16f\n", step, Fdef, r2 / r20,
+        fprintf(stepOutputFp, "%ld %.10e %.16f %.16f\n", step, Fdef, r2,
                 G);
       }
 
@@ -191,7 +191,10 @@ public:
         break;
       }
     }
-    fclose(stepOutputFp);
+
+    if (this->stepOutputFrequency > 0) {
+      fclose(stepOutputFp);
+    }
 
     // TODO: this is incorrect.
     double R2_mean = Gamma_eq / (double)net.nrOfSprings;
@@ -207,8 +210,8 @@ public:
     if (this->outputEndNodes) {
       fp = fopen(this->endNodesFile.c_str(), "w");
       fprintf(fp, "%.10f %.10f %.10f\n", net.L[0], net.L[1], net.L[2]);
-      fprintf(fp, "%d #nodes\n", net.nrOfNodes);
-      fprintf(fp, "%d #springs\n", net.nrOfSprings);
+      fprintf(fp, "%ld #nodes\n", net.nrOfNodes);
+      fprintf(fp, "%ld #springs\n", net.nrOfSprings);
       for (i = 0; i < net.nrOfNodes; i++) {
         fprintf(fp, "%.16f %.16f %.16f\n", net.nodes[i].x + u[3 * i],
                 net.nodes[i].y + u[3 * i + 1], net.nodes[i].z + u[3 * i + 2]);
@@ -251,9 +254,23 @@ public:
     this->finalConfig = net;
     this->nrOfActiveNodes = Mact;
     this->nrOfActiveSprings = Nact;
+
+    /** array deallocation */
+    free(u);
+    free(r);
+    free(net.nodes);
+    free(net.springs);
   };
 
 protected:
+  /**
+   * @brief Convert the universe to a network
+   *
+   * @param net the target network
+   * @param crosslinkerType the atom type of the crosslinker
+   * @return true
+   * @return false
+   */
   bool ConvertNetwork(Network *net, int crosslinkerType = 2) {
     pylimer_tools::entities::Universe crosslinkerUniverse =
         this->universe.getNetworkOfCrosslinker(crosslinkerType);
@@ -296,7 +313,9 @@ protected:
       net->averageSpringLength += usualChainLen;
     }
 
-    assert(crosslinkerUniverse.getNrOfBonds() == net->nrOfSprings);
+    if (crosslinkerUniverse.getNrOfBonds() != net->nrOfSprings) {
+      return false;
+    };
 
     net->averageSpringLength /= net->nrOfSprings;
 
@@ -305,30 +324,46 @@ protected:
     return true;
   };
 
+  /**
+   * @brief Adjust a vector of distances to lie within half the box
+   *
+   * @param s the distances
+   * @param box the box lengths
+   */
   void ImposePBC(double s[3], double box[3]) {
-    Integer i;
+    long int i;
     double half;
 
     for (i = 0; i < 3; i++) {
       half = 0.5 * box[i];
-      if (s[i] > half)
+      while (s[i] > half) {
         s[i] -= box[i];
-      if (s[i] < -half)
+      }
+      while (s[i] < -half) {
         s[i] += box[i];
+      }
     }
 
     return;
   }
 
-  /* the residual is minus the assembled force vector */
-  void Residual(Network *net, double *u, double *r, double *Fdef) {
-    Integer i, a, b, len, j, glob[6];
+  /**
+   * @brief the residual is minus the assembled force vector
+   *
+   * @param net the network to compute the residual for
+   * @param u the displacement vector
+   * @param r the residual
+   * @return the definitive force
+   */
+  double Residual(Network *net, double *u, double *r) {
+    long int i, a, b, len, j, glob[6];
     double kappa, s[3], ua[3], ub[3], s2, fele[6];
 
     /* initial */
-    *Fdef = 0.;
-    for (i = 0; i < 3 * net->nrOfNodes; i++)
+    double Fdef = 0.;
+    for (i = 0; i < 3 * net->nrOfNodes; i++) {
       r[i] = 0.;
+    }
 
     /* assembly */
     for (i = 0; i < net->nrOfSprings; i++) {
@@ -337,28 +372,13 @@ protected:
       len = net->springs[i].len;
       kappa = 3. / len;
 
-      /* initial spring vector */
-      s[0] = net->nodes[b].x - net->nodes[a].x;
-      s[1] = net->nodes[b].y - net->nodes[a].y;
-      s[2] = net->nodes[b].z - net->nodes[a].z;
-
-      /* spring displacement vectors */
-      for (j = 0; j < 3; j++) {
-        ua[j] = u[3 * a + j];
-        ub[j] = u[3 * b + j];
-      }
-
-      /* current spring vector */
-      for (j = 0; j < 3; j++)
-        s[j] += ub[j] - ua[j];
-
-      /* periodic boundary conditions */
-      ImposePBC(s, net->L);
+      actualSpringDistance(net->nodes[b], b, net->nodes[a], a, u, s, net->L);
 
       /* energy update */
-      for (s2 = 0., j = 0; j < 3; j++)
+      for (s2 = 0., j = 0; j < 3; j++) {
         s2 += s[j] * s[j];
-      *Fdef += 0.5 * kappa * s2;
+      }
+      Fdef += 0.5 * kappa * s2;
 
       /* element force vector */
       for (j = 0; j < 3; j++) {
@@ -373,17 +393,18 @@ protected:
       }
 
       /* residual update */
-      for (j = 0; j < 6; j++)
+      for (j = 0; j < 6; j++) {
         r[glob[j]] -= fele[j];
+      }
     };
 
-    return;
+    return Fdef;
   }
 
   std::pair<double, double>
   computeStressAndSquareDistances(Network *net, double *u,
                                   double stress[3][3]) {
-    Integer i, a, b, len, j, k;
+    long int i, a, b, len, j, k;
     double kappa, s[3], ua[3], ub[3], s2 = 0, s2len = 0;
 
     for (j = 0; j < 3; j++) {
@@ -401,33 +422,19 @@ protected:
         std::cout << "ERROR: a or b or len is nan" << a << " " << b << " "
                   << len << std::endl;
       }
-      if (len == 0) {
-        std::cout << "ERROR: len is 0 " << len << " between a or b " << a << " "
-                  << b << " " << std::endl;
-        kappa = 100;
-      }
-      kappa = 3. / len;
-
-      /* initial spring vector */
-      s[0] = net->nodes[b].x - net->nodes[a].x;
-      s[1] = net->nodes[b].y - net->nodes[a].y;
-      s[2] = net->nodes[b].z - net->nodes[a].z;
-
-      /* spring displacement vectors */
-      for (j = 0; j < 3; j++) {
-        ua[j] = u[3 * a + j];
-        ub[j] = u[3 * b + j];
+      // if (len == 0) {
+      //   std::cout << "ERROR: len is 0 " << len << " between a or b " << a <<
+      //   " "
+      //             << b << " " << std::endl;
+      //   kappa = 100;
+      // }
+      if (std::fabs(len) > 1e-10) {
+        kappa = 3. / len;
+      } else {
+        kappa = 3e5;
       }
 
-      /* current spring vector */
-      for (j = 0; j < 3; j++) {
-        s[j] += ub[j] - ua[j];
-      }
-
-      /* periodic boundary conditions */
-      ImposePBC(s, net->L);
-
-      double s2local = (s[0] * s[0] + s[1] * s[1] + s[2] * s[2]);
+      actualSpringDistance(net->nodes[b], b, net->nodes[a], a, u, s, net->L);
 
       /* spring contribution to the overall stress tensor */
       for (j = 0; j < 3; j++) {
@@ -435,6 +442,8 @@ protected:
           stress[j][k] += kappa * s[j] * s[k];
         }
       }
+
+      double s2local = (s[0] * s[0] + s[1] * s[1] + s[2] * s[2]);
 
       /* update */
       s2 += s2local;
@@ -456,6 +465,41 @@ protected:
 
     return std::make_pair(s2 / (double)net->nrOfSprings,
                           s2len / (double)net->nrOfSprings);
+  }
+
+  /**
+   * @brief Get the actual distance between two nodes
+   *
+   * @param a node a
+   * @param indexA the index of the first node (needed for indexing into u)
+   * @param b
+   * @param indexB the index of the second node (needed for indexing into u)
+   * @param u the displacement vector
+   * @param coords the vector to write the coordinates into
+   * @param boxL the box side lengths
+   */
+  void actualSpringDistance(_Node a, int indexA, _Node b, int indexB, double *u,
+                            double *coords, double *boxL) {
+    double s[3], ua[3], ub[3];
+
+    /* initial spring vector */
+    coords[0] = a.x - b.x;
+    coords[1] = a.y - b.y;
+    coords[2] = a.z - b.z;
+
+    /* spring displacement vectors */
+    for (size_t j = 0; j < 3; j++) {
+      ua[j] = u[3 * indexA + j];
+      ub[j] = u[3 * indexB + j];
+    }
+
+    /* current spring vector */
+    for (size_t j = 0; j < 3; j++) {
+      coords[j] += ub[j] - ua[j];
+    }
+
+    /* periodic boundary conditions */
+    ImposePBC(coords, boxL);
   }
 
 private:
