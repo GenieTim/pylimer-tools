@@ -8,7 +8,8 @@ Module contents
    :members:
    :undoc-members:
    :show-inheritance:
-
+   :special-members:
+   
 pylimer\_tools_cpp.pylimer\_tools_cpp module
 ---------------------------------------------
 
@@ -16,3 +17,4 @@ pylimer\_tools_cpp.pylimer\_tools_cpp module
    :members:
    :undoc-members:
    :show-inheritance:
+   :special-members:

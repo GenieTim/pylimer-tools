@@ -438,11 +438,17 @@ void init_pylimer_bound_entities(py::module_ &m) {
     size_t index = 0; // the index to access
   };
 
-  py::class_<UniverseSequence>(
-      m, "UniverseSequence",
-      "This class represents a sequence of Universes, with the Universe's data "
-      "files only being read on request. Dump files are read at once in order "
-      "to know how many timesteps/universes are available in total.")
+  py::class_<UniverseSequence>(m, "UniverseSequence", R"pbdoc(
+     This class represents a sequence of Universes, with the Universe's data
+     files only being read on request. Dump files are read at once in order
+     to know how many timesteps/universes are available in total 
+     (but the universes' data is not read on first look through the file).
+     This, while it can lead to two (or more) reads of the whole file, 
+     is a measure in order to enable low memory useage if needed (i.e. for large dump files).
+     Use Python's iterator to have this UniverseSequence only ever retain one universe in memory.
+     Alternatively, use :func:`~pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.forgetAtIndex`
+     to have the UniverseSequence forget about already read universes.
+     )pbdoc")
       .def(py::init<>())
       .def("initializeFromDumpFile", &UniverseSequence::initializeFromDumpFile,
            R"pbdoc(
@@ -456,40 +462,62 @@ void init_pylimer_bound_entities(py::module_ &m) {
            "Reset and initialize the Universes from an ordered list of Lammps "
            "data (:code:`write_data`) files.")
       .def("next", &UniverseSequence::next,
-           "Get the Universe that's next in the sequence.")
+           R"pbdoc(Get the Universe that's next in the sequence.)pbdoc")
       .def("atIndex", &UniverseSequence::atIndex,
            "Get the Universe at the given index (as of in the sequence given "
            "by the dump file).")
       .def("forgetAtIndex", &UniverseSequence::forgetAtIndex,
-           "Clear the memory of the Universe at the given index (as of in the "
-           "sequence given "
-           "by the dump file).")
+           R"pbdoc(Clear the memory of the Universe at the given index (as of in the 
+           sequence given by the dump file).)pbdoc")
       .def("resetIterator", &UniverseSequence::resetIterator,
-           "Reset the internal iterator, such that a subsequent call to "
-           ":code:`next()` returns the first one again.")
+           R"pbdoc(
+          Reset the internal iterator, such that a subsequent call to 
+          :func:`~pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.next` returns the first one again.
+          )pbdoc")
       .def("getLength", &UniverseSequence::getLength, R"pbdoc(
             Get the number of universes in this sequence.
             )pbdoc")
       .def("getAll", &UniverseSequence::getAll, R"pbdoc(
-            Get all universes initialized back in a list
+            Get all universes initialized back in a list.
+            For big dump files or lots of data files, this might lead to memory issues.
+            Use :func:`~pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.__iter__`
+            to have
+            or :func:`~pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.atIndex`
+            and :func:`~pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.forgetAtIndex`
+            to craft a more memory-efficient retrieval mechanism.
             )pbdoc")
       // operators
-      .def("__getitem__",
-           [](UniverseSequence &us, size_t index) {
-             if (index > us.getLength()) {
-               throw py::index_error();
-             }
-             return us.atIndex(index);
-           })
-      .def("__len__", &UniverseSequence::getLength)
+      .def(
+          "__getitem__",
+          [](UniverseSequence &us, size_t index) {
+            if (index > us.getLength()) {
+              throw py::index_error();
+            }
+            return us.atIndex(index);
+          },
+          "Get a universe by its index.")
+      .def("__len__", &UniverseSequence::getLength,
+           "Get the number of universes")
       .def(
           "__iter__",
           [](py::object us) {
-            return LazyUniverseSequenceIterator(
-                us.cast<UniverseSequence &>(), us);
+            return LazyUniverseSequenceIterator(us.cast<UniverseSequence &>(),
+                                                us);
           },
           R"pbdoc(
-           Lazily (memory efficiently) iterate through all the universes in this sequence.
+           Lazily (memory-efficiently) iterate through all the universes in this sequence.
+           This is the standard Python iteration way. Example:
+
+           .. code::
+           
+               for (universe in universeSequence):
+                    # do something with the universe
+                    pass
+           
+
+           **Note**: this iterator is supposed to be memory-efficient. Therefore, no cache is kept;
+           iterating twice will lead to the file(s) being read twice 
+           (plus, for dump files, a third time initially to determine the number of universes in the file).
       )pbdoc");
 }
 
