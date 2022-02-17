@@ -25,6 +25,8 @@ void init_pylimer_bound_calc(py::module_ &m) {
     A small simulation tool for quickly minimizing the force between the cross-linker beads.
   )pbdoc")
       .def(py::init<pe::Universe, int>())
+      .def("configDoOutputSteps", &mehp::MEHPForceRelaxation::configDoOutputSteps)
+      .def("configDoOutputFinalCoordinates", &mehp::MEHPForceRelaxation::configDoOutputFinalCoordinates)
       .def("runForceRelaxation", &mehp::MEHPForceRelaxation::runForceRelaxation,
            "Run the simulation")
       .def("getVolume", &mehp::MEHPForceRelaxation::getVolume)
