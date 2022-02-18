@@ -22,7 +22,7 @@ void init_pylimer_bound_generators(py::module_ &m) {
       .def("addCrosslinkers", &MCUniverseGenerator::addCrosslinkers, R"pbdoc(
             Add the cross-linkers.
             )pbdoc",
-           py::arg("nrOfCrosslinkers"), py::arg("crosslinkerAtomType"))
+           py::arg("nrOfCrosslinkers"), py::arg("crosslinkerAtomType") = 2)
       .def("addSolventChains", &MCUniverseGenerator::addSolventChains, R"pbdoc(
             Randomly distribute additional, free chains.
             )pbdoc",
@@ -36,7 +36,7 @@ void init_pylimer_bound_generators(py::module_ &m) {
             )pbdoc",
            py::arg("nrOfStrands"), py::arg("strandLengths"),
            py::arg("crosslinkerConversion"),
-           py::arg("crosslinkerFunctionality"), py::arg("strandAtomType"))
+           py::arg("crosslinkerFunctionality"), py::arg("strandAtomType") = 1)
       .def("getUniverse", &MCUniverseGenerator::getUniverse, R"pbdoc(
             Fetch the current (or final) state of the universe.
             )pbdoc");

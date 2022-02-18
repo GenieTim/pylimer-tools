@@ -14,7 +14,6 @@
 namespace pylimer_tools {
 namespace calc {
 namespace mehp {
-#define MAX 250000    /* maximum number of relaxation steps */
 #define EPSILON 0.077 /* relaxation parameter, adjusted by trial and errors */
 #define RED2 1.e-8    /* second residual norm reduction */
 #define EPS2 1.e-16   /* distance tolerance squared for the loop count */
@@ -99,7 +98,7 @@ public:
 
   double getFinalSquareRelativeDistance() { return this->finalS2len; }
 
-  void runForceRelaxation(int crosslinkerType) {
+  void runForceRelaxation(int crosslinkerType, long int maxNrOfSteps = 250000) {
 
     long int i, step, Nact, Mact, a, b;
     Network net;
@@ -145,8 +144,8 @@ public:
 
     if (this->stepOutputFrequency > 0) {
       stepOutputFp = fopen(this->stepOutputFile.c_str(), "w");
-      fprintf(stepOutputFp, "Step Fdef r2 G\n");
-      fprintf(stepOutputFp, "%d %.10e %.16f %.16f\n", 0, Fdef, r20, G0);
+      fprintf(stepOutputFp, "Step Fdef s2 s2len r2 G\n");
+      fprintf(stepOutputFp, "%d %.10e %.16f %.16f %.16f %.16f\n", 0, Fdef, s20, s20len, r20, G0);
     }
 
     /* force relaxation */
@@ -154,7 +153,7 @@ public:
     double Rx2_sum = 0.0;
     double Ry2_sum = 0.0;
     double Rz2_sum = 0.0;
-    for (step = 1; step <= MAX; step++) {
+    for (step = 1; step <= maxNrOfSteps; step++) {
       Gamma_eq = 0.0;
       Rx2_sum = 0.0;
       Ry2_sum = 0.0;
@@ -180,11 +179,10 @@ public:
           (step <= 5 ||
            this->stepOutputFrequency * (step / this->stepOutputFrequency) ==
                step)) {
-        computeStressAndSquareDistances(&net, u, stress);
+        std::tie(s2, s2len) = computeStressAndSquareDistances(&net, u, stress);
         G = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
 
-        fprintf(stepOutputFp, "%ld %.10e %.16f %.16f\n", step, Fdef, r2,
-                G);
+        fprintf(stepOutputFp, "%ld %.10e %.16f %.16f %.16f %.16f\n", step, Fdef, s2, s2len, r2, G);
       }
 
       if (r2 / r20 < RED2) {

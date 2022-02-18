@@ -62,8 +62,8 @@ public:
   Universe getNetworkOfCrosslinker(const int crosslinkerType) const;
   // TODO: find & implement a better return type, e.g. std::vector<Molecule>
   std::map<int, std::vector<std::vector<Atom>>>
-  findLoops(const int crosslinkerType, const int maxLength) const;
-  bool hasInfiniteStrand(const int crosslinkerType, const int maxLength) const;
+  findLoops(const int crosslinkerType, const int maxLength = -1, bool skipSelfLoops = false) const;
+  bool hasInfiniteStrand(const int crosslinkerType, const int maxLength = -1) const;
   std::vector<int> getAtomTypes() const {
     return this->getPropertyValues<int>("type");
   }

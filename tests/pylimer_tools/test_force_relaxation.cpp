@@ -24,7 +24,7 @@ TEST_CASE("MEHP Force Relaxation runs", "[analysis][MEHPForceRelaxation]") {
   REQUIRE(universeSeq.getLength() == 1);
   pe::Universe universe = universeSeq.atIndex(0);
   pcm::MEHPForceRelaxation forceRelaxer = pcm::MEHPForceRelaxation(universe, 2);
-  forceRelaxer.runForceRelaxation(2);
+  forceRelaxer.runForceRelaxation(2, 10);
   REQUIRE(forceRelaxer.getVolume() == Catch::Approx(universe.getVolume()));
-  REQUIRE(forceRelaxer.get)
+  // REQUIRE(forceRelaxer.get)
 }
