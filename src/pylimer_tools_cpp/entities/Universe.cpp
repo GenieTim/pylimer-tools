@@ -602,7 +602,8 @@ Universe::getChainsWithCrosslinker(const int crosslinkerType) const {
  * @return std::map<int, std::vector<std::vector<Atom>>>
  */
 std::map<int, std::vector<std::vector<Atom>>>
-Universe::findLoops(const int crosslinkerType, const int maxLength) const {
+Universe::findLoops(const int crosslinkerType, const int maxLength,
+                    bool skipSelfLoops) const {
   // NOTE: there are exponentially many paths between two vertices of a graph,
   // and you may run out of memory when using this function, if your graph is
   // lattice-like.
@@ -646,7 +647,7 @@ Universe::findLoops(const int crosslinkerType, const int maxLength) const {
       const long int currentVal = igraph_vector_int_e(&paths, i);
       if (currentVal == -1) {
         // skip self-loops and duplicates
-        if (currentPath.size() > 3 &&
+        if ((!skipSelfLoops || currentPath.size() > 3) &&
             !processedPathsKeys.contains(currentPathKey)) {
           results[currentFunctionality].push_back(currentPath);
           processedPathsKeys.insert(currentPathKey);
@@ -664,6 +665,22 @@ Universe::findLoops(const int crosslinkerType, const int maxLength) const {
       }
     }
     igraph_vector_int_destroy(&paths);
+
+    // additional check for self-loops
+    if (!skipSelfLoops &&
+        !processedPathsKeys.contains(0 xor startingCrosslinkerVertexId)) {
+      std::vector<long int> crosslinkersBonds =
+          this->getVertexIdxsConnectedTo(startingCrosslinkerVertexId);
+      if (std::find(crosslinkersBonds.begin(), crosslinkersBonds.end(),
+                    startingCrosslinkerVertexId) != crosslinkersBonds.end()) {
+
+        currentPath.clear();
+        currentPath.push_back(
+            this->getAtomByVertexIdx(startingCrosslinkerVertexId));
+        results[1].push_back(currentPath);
+        currentPath.clear();
+      }
+    }
   }
 
   return results;

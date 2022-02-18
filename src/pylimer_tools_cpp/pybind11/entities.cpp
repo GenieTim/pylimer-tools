@@ -283,7 +283,8 @@ void init_pylimer_bound_entities(py::module_ &m) {
             Specify the crosslinkerType to an existing type id, 
             then those atoms will be omitted, and this function returns chains instead.)pbdoc",
            py::arg("atomTypeToOmit"))
-      .def("findLoops", &Universe::findLoops, R"pbdoc(
+      .def("findLoops", &Universe::findLoops,
+           R"pbdoc(
             Decompose the Universe into loops.
             The primary index specifies the degree of the loop.
 
@@ -292,7 +293,8 @@ void init_pylimer_bound_entities(py::module_ &m) {
                You can use the maxLength parameter to restrict the algorithm to only search for loops up to a certain length.
                Use a negative value to find all loops and paths.
             )pbdoc",
-           py::arg("crosslinkerType"), py::arg("maxLength"))
+           py::arg("crosslinkerType"), py::arg("maxLength") = -1,
+           py::arg("skipSelfLoops") = false)
       .def("getChainsWithCrosslinker", &Universe::getChainsWithCrosslinker,
            R"pbdoc(
             Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms, without omitting the crosslinkers.
@@ -466,8 +468,9 @@ void init_pylimer_bound_entities(py::module_ &m) {
       .def("atIndex", &UniverseSequence::atIndex,
            "Get the Universe at the given index (as of in the sequence given "
            "by the dump file).")
-      .def("forgetAtIndex", &UniverseSequence::forgetAtIndex,
-           R"pbdoc(Clear the memory of the Universe at the given index (as of in the 
+      .def(
+          "forgetAtIndex", &UniverseSequence::forgetAtIndex,
+          R"pbdoc(Clear the memory of the Universe at the given index (as of in the 
            sequence given by the dump file).)pbdoc")
       .def("resetIterator", &UniverseSequence::resetIterator,
            R"pbdoc(

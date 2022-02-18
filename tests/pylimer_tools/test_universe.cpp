@@ -12,6 +12,17 @@ extern "C" {
 
 namespace pe = pylimer_tools::entities;
 
+void outputLoops(std::map<int, std::vector<std::vector<pe::Atom>>>  loops) {
+  for (const auto &myPair : loops) {
+    std::cout << myPair.first << std::endl;
+    for (const std::vector<pe::Atom> &as : myPair.second) {
+      for (const pe::Atom &a : as) {
+        std::cout << "\t" << a.getId() << std::endl;
+      }
+    }
+  }
+}
+
 TEST_CASE("Universe can be used", "[entity][Universe]") {
   REQUIRE(1 == 1);
 
@@ -75,7 +86,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]") {
                       {{1, 1, 1, 1, 1, 1, 1, 1}},       // ny
                       {{1, 1, 1, 1, 1, 1, 1, 1}}        // nz
     );
-    universe.addBonds(7, {{1, 3, 5, 1, 5, 3, 7}}, {{2, 2, 6, 7, 7, 6, 8}},
+    universe.addBonds(7, {{1, 2, 3, 6, 5, 7, 7}}, {{2, 3, 6, 5, 7, 1, 8}},
                       {{1, 1, 1, 1, 1, 1, 11}});
     SECTION("get bonds returns") {
       auto edges = universe.getEdges();
@@ -135,9 +146,18 @@ TEST_CASE("Universe can be used", "[entity][Universe]") {
     }
     SECTION("Loops are found") {
       std::map<int, std::vector<std::vector<pe::Atom>>> loops =
-          universe.findLoops(2, -1);
-      REQUIRE(loops.size() == 1);
+          universe.findLoops(2, -1, true);
       REQUIRE(loops.contains(2));
+      REQUIRE(loops.size() == 1);
+    }
+    SECTION("Loops are found in reduced universe") {
+      universe.addAtoms(2, {{9, 10}}, {{1, 1}}, {{0.0, 0.0}}, {{1.0, 0.0}},
+                        {{1.0, 0.0}}, {{0, 1}}, {{0, 1}}, {{0, 1}});
+      universe.addBonds(2, {{4, 9}}, {{9, 4}}, {{1, 1}}, false, false);
+      pe::Universe reducedUniverse = universe.getNetworkOfCrosslinker(2);
+      std::map<int, std::vector<std::vector<pe::Atom>>> loops =
+          reducedUniverse.findLoops(2, -1);
+      REQUIRE(loops.size() == 2);
     }
     SECTION("Infinite Strands are found") {
       universe.setBoxLengths(4.0, 4.0, 2.0);
@@ -145,7 +165,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]") {
       universe.addBonds(2, {{8, 4}}, {{4, 1}});
       std::map<int, std::vector<std::vector<pe::Atom>>> loops =
           universe.findLoops(2, -1);
-      REQUIRE(loops.size() == 2);
+      REQUIRE(loops.size() == 3);
       REQUIRE(universe.hasInfiniteStrand(2, -1) == true);
     }
     SECTION("Reduction to Cross-linker-verse works") {

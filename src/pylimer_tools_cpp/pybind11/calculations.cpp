@@ -25,10 +25,13 @@ void init_pylimer_bound_calc(py::module_ &m) {
     A small simulation tool for quickly minimizing the force between the cross-linker beads.
   )pbdoc")
       .def(py::init<pe::Universe, int>())
-      .def("configDoOutputSteps", &mehp::MEHPForceRelaxation::configDoOutputSteps)
-      .def("configDoOutputFinalCoordinates", &mehp::MEHPForceRelaxation::configDoOutputFinalCoordinates)
+      .def("configDoOutputSteps",
+           &mehp::MEHPForceRelaxation::configDoOutputSteps)
+      .def("configDoOutputFinalCoordinates",
+           &mehp::MEHPForceRelaxation::configDoOutputFinalCoordinates)
       .def("runForceRelaxation", &mehp::MEHPForceRelaxation::runForceRelaxation,
-           "Run the simulation")
+           "Run the simulation", py::arg("crosslinkerType") = 2,
+           py::arg("maxNrOfSteps") = 250000)
       .def("getVolume", &mehp::MEHPForceRelaxation::getVolume)
       .def("getNrOfNodes", &mehp::MEHPForceRelaxation::getNrOfNodes)
       .def("getNrOfSprings", &mehp::MEHPForceRelaxation::getNrOfSprings)
