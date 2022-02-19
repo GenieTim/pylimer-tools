@@ -80,182 +80,196 @@ public:
 
   int getNrOfActiveSprings() { return this->nrOfActiveSprings; }
 
-  double getAverageSpringLength() {
-    return this->finalConfig.averageSpringLength;
-  }
+  double getAverageSpringLength() { return sqrt(this->R2Mean); }
 
-  int getFinalNrOfLoops() { return this->finalConfig.nrOfLoops; }
+  double getGammaEq() { return this->gammaEq; }
 
-  double getInitialShearModulus() { return this->initialG; }
+  double getGammaX() { return this->gammaX; }
 
-  double getFinalShearModulus() { return this->finalG; }
+  double getGammaY() { return this->gammaY; }
 
-  double getInitialSquareDistance() { return this->initialS2; }
+  double getGammaZ() { return this->gammaZ; }
 
-  double getFinalSquareDistance() { return this->finalS2; }
+  double getNb2() { return this->Nb2; }
 
-  double getInitialSquareRelativeDistance() { return this->initialS2len; }
-
-  double getFinalSquareRelativeDistance() { return this->finalS2len; }
-
-  void runForceRelaxation(int crosslinkerType, long int maxNrOfSteps = 250000) {
-
-    long int i, step, Nact, Mact, a, b;
+  void runForceRelaxation(int crosslinkerType, long int maxNrOfSteps = 250000,
+                          double tol = 1e-8, double Nb2 = -1.0) {
     Network net;
     if (!ConvertNetwork(&net, crosslinkerType)) {
       return;
     }
-    double *u, *r, Fdef;
-    double stress[3][3], r20, G0, r2, G, s20, s2, s20len, s2len;
-    FILE *fp;
     const int M = this->universe.getMolecules(crosslinkerType).size();
     const int N = this->universe.getMeanStrandLength(crosslinkerType) + 1;
     const double bM = this->universe.computeMeanBondLength();
-    const double Nb2 = N * bM * bM;
+    if (Nb2 == -1.0) {
+      this->Nb2 = N * bM * bM;
+    } else {
+      this->Nb2 = Nb2;
+    }
     const int f =
         this->universe.determineFunctionalityPerType()[crosslinkerType];
 
-    for (int i = 0; i < net.nrOfSprings; i++) {
+    for (size_t i = 0; i < net.nrOfSprings; i++) {
 
       if (std::fabs(net.springs[i].len) < 1.0e-10) {
-        std::cout << "WARNING: " << i << std::endl;
+        std::cout << "WARNING: Spring " << i << " has negligible length."
+                  << std::endl;
       }
       // assert(net.springs[i].len != 0.0);
     }
 
     /* array allocation */
+    double *force;
+    force = (double *)calloc(3 * net.nrOfNodes, sizeof(double));
 
-    u = (double *)calloc(3 * net.nrOfNodes, sizeof(double));
-    r = (double *)calloc(3 * net.nrOfNodes, sizeof(double));
-
-    /* initial */
-
-    for (i = 0; i < 3 * net.nrOfNodes; i++) {
-      u[i] = 0.0;
+    // calculate initial absolute force
+    double kappa = 1.0;
+    for (size_t i = 0; i < net.nrOfSprings; ++i) {
+      _Spring spring = net.springs[i];
+      double distances[3];
+      actualSpringDistance(net.nodes[spring.a], net.nodes[spring.b], distances,
+                           net.L);
+      for (int j = 0; j < 3; ++j) {
+        force[spring.a * 3 + j] -= kappa * distances[j];
+        force[spring.b * 3 + j] += kappa * distances[j];
+      }
     }
-    std::tie(s20, s20len) = computeStressAndSquareDistances(&net, u, stress);
-    Fdef = Residual(&net, u, r);
-    for (r20 = 0., i = 0; i < 3 * net.nrOfNodes; i++) {
-      r20 += r[i] * r[i];
+
+    double absoluteForce = 0.0;
+    for (size_t i = 0; i < 3 * net.nrOfNodes; ++i) {
+      absoluteForce += force[i] * force[i];
     }
-    G0 = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
+    double initialForce = absoluteForce;
 
     FILE *stepOutputFp;
-
     if (this->stepOutputFrequency > 0) {
       stepOutputFp = fopen(this->stepOutputFile.c_str(), "w");
-      fprintf(stepOutputFp, "Step Fdef s2 s2len r2 G\n");
-      fprintf(stepOutputFp, "%d %.10e %.16f %.16f %.16f %.16f\n", 0, Fdef, s20, s20len, r20, G0);
+      fprintf(stepOutputFp, "Step Fabs GammaEq\n");
+      fprintf(stepOutputFp, "%d %.16f %.16f\n", 0, initialForce, 0.0);
     }
 
-    /* force relaxation */
+    // start of force relaxation
+    long int stepsDone = 0;
+    double eps = 0.025;
     double Gamma_eq = 0.0;
+    while (absoluteForce / initialForce > tol && stepsDone < maxNrOfSteps) {
+      stepsDone += 1;
+      // update coordinates
+      for (size_t i = 0; i < net.nrOfNodes; ++i) {
+        double coordinates[3];
+        coordinates[0] = net.nodes[i].x + eps * force[i * 3 + 0];
+        coordinates[1] = net.nodes[i].y + eps * force[i * 3 + 1];
+        coordinates[2] = net.nodes[i].z + eps * force[i * 3 + 2];
+        ImposePBC(coordinates, net.L);
+        net.nodes[i].x = coordinates[0];
+        net.nodes[i].y = coordinates[1];
+        net.nodes[i].z = coordinates[2];
+      }
+
+      // calculate new force
+      Gamma_eq = 0.0;
+      for (size_t i = 0; i < net.nrOfNodes; ++i) {
+        force[i] = 0.0;
+      }
+      for (size_t i = 0; i < net.nrOfSprings; ++i) {
+        _Spring spring = net.springs[i];
+        double distances[3];
+        actualSpringDistance(net.nodes[spring.a], net.nodes[spring.b],
+                             distances, net.L);
+        for (int j = 0; j < 3; ++j) {
+          force[spring.a * 3 + j] -= kappa * distances[j];
+          force[spring.b * 3 + j] += kappa * distances[j];
+          Gamma_eq += distances[j] * distances[j];
+        }
+      }
+      absoluteForce = 0.0;
+      for (int i = 0; i < 3 * net.nrOfNodes; ++i) {
+        absoluteForce += force[i] * force[i];
+      }
+
+      // potentially output
+      if (this->stepOutputFrequency > 0 &&
+          (stepsDone <= 5 || this->stepOutputFrequency *
+                                     (stepsDone / this->stepOutputFrequency) ==
+                                 stepsDone)) {
+
+        fprintf(stepOutputFp, "%ld %.16f %.16f\n", stepsDone, absoluteForce,
+                Gamma_eq);
+      }
+    }
+
+    // calculate equilibrium values
+    Gamma_eq = 0.0;
     double Rx2_sum = 0.0;
     double Ry2_sum = 0.0;
     double Rz2_sum = 0.0;
-    for (step = 1; step <= maxNrOfSteps; step++) {
-      Gamma_eq = 0.0;
-      Rx2_sum = 0.0;
-      Ry2_sum = 0.0;
-      Rz2_sum = 0.0;
-      for (i = 0; i < 3 * net.nrOfNodes; i++) {
-        u[i] -= EPSILON * r[i];
-      }
-      Fdef = Residual(&net, u, r);
-      for (r2 = 0., i = 0; i < 3 * net.nrOfNodes; i++) {
-        r2 += r[i] * r[i];
-        if (i % 3 == 0) {
-          Rx2_sum += r[i] * r[i];
-        } else if ((i + 1) % 3 == 0) {
-          Ry2_sum += r[i] * r[i];
-        } else {
-          assert((i + 2) % 3 == 0);
-          Rz2_sum += r[i] * r[i];
-        }
-        // Gamma_eq +=
-      }
-      Gamma_eq = r2 / ((double)net.nrOfSprings * Nb2);
-      if (this->stepOutputFrequency > 0 &&
-          (step <= 5 ||
-           this->stepOutputFrequency * (step / this->stepOutputFrequency) ==
-               step)) {
-        std::tie(s2, s2len) = computeStressAndSquareDistances(&net, u, stress);
-        G = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
+    int Nact = 0;
 
-        fprintf(stepOutputFp, "%ld %.10e %.16f %.16f %.16f %.16f\n", step, Fdef, s2, s2len, r2, G);
+    for (size_t i = 0; i < net.nrOfSprings; ++i) {
+      _Spring spring = net.springs[i];
+      double distances[3];
+      actualSpringDistance(net.nodes[spring.a], net.nodes[spring.b], distances,
+                           net.L);
+      double springLen = 0.0;
+      for (int j = 0; j < 3; ++j) {
+        springLen += distances[j] * distances[j];
       }
-
-      if (r2 / r20 < RED2) {
-        break;
+      Gamma_eq += springLen;
+      Rx2_sum += distances[0] * distances[0];
+      Ry2_sum += distances[1] * distances[1];
+      Rz2_sum += distances[2] * distances[2];
+      if (springLen / this->Nb2 > 0.001) {
+        Nact += 1;
+        net.springs[i].isActive = true;
       }
     }
 
-    if (this->stepOutputFrequency > 0) {
-      fclose(stepOutputFp);
-    }
-
-    // TODO: this is incorrect.
-    double R2_mean = Gamma_eq / (double)net.nrOfSprings;
-    double Gamma_x = 3 * Rx2_sum / ((double)net.nrOfSprings * Nb2);
-    double Gamma_y = 3 * Ry2_sum / ((double)net.nrOfSprings * Nb2);
-    double Gamma_z = 3 * Rz2_sum / ((double)net.nrOfSprings * Nb2);
-
-    /* acquire equilibrium properties */
-    std::tie(s2, s2len) = computeStressAndSquareDistances(&net, u, stress);
-    G = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
+    this->gammaEq = Gamma_eq / ((double)net.nrOfSprings * this->Nb2);
+    this->R2Mean = Gamma_eq / (double)net.nrOfSprings;
+    this->gammaX = 3 * Rx2_sum / ((double)net.nrOfSprings * this->Nb2);
+    this->gammaY = 3 * Ry2_sum / ((double)net.nrOfSprings * this->Nb2);
+    this->gammaZ = 3 * Rz2_sum / ((double)net.nrOfSprings * this->Nb2);
 
     /* output */
     if (this->outputEndNodes) {
-      fp = fopen(this->endNodesFile.c_str(), "w");
+      FILE *fp = fopen(this->endNodesFile.c_str(), "w");
       fprintf(fp, "%.10f %.10f %.10f\n", net.L[0], net.L[1], net.L[2]);
       fprintf(fp, "%ld #nodes\n", net.nrOfNodes);
       fprintf(fp, "%ld #springs\n", net.nrOfSprings);
-      for (i = 0; i < net.nrOfNodes; i++) {
-        fprintf(fp, "%.16f %.16f %.16f\n", net.nodes[i].x + u[3 * i],
-                net.nodes[i].y + u[3 * i + 1], net.nodes[i].z + u[3 * i + 2]);
+      for (size_t i = 0; i < net.nrOfNodes; i++) {
+        fprintf(fp, "%.16f %.16f %.16f\n", net.nodes[i].x, net.nodes[i].y,
+                net.nodes[i].z);
       }
       fclose(fp);
     }
 
-    /* active springs */
-    for (Nact = 0, i = 0; i < net.nrOfSprings; i++) {
-      if (net.springs[i].isActive == 1) {
-        ++Nact;
-      }
-    }
-
-    /* active nodes */
-    for (i = 0; i < net.nrOfNodes; i++)
+    /* count active nodes */
+    int Mact = 0;
+    for (size_t i = 0; i < net.nrOfNodes; i++) {
       net.nodes[i].nrOfActiveConnected = 0; /* initial */
-    for (i = 0; i < net.nrOfSprings; i++) {
-      if (net.springs[i].isActive == 1) /* active spring */
+    }
+    for (size_t i = 0; i < net.nrOfSprings; i++) {
+      if (net.springs[i].isActive == true) /* active spring */
       {
-        a = net.springs[i].a;
-        b = net.springs[i].b;
+        size_t a = net.springs[i].a;
+        size_t b = net.springs[i].b;
         ++(net.nodes[a].nrOfActiveConnected);
         ++(net.nodes[b].nrOfActiveConnected);
       }
     }
-    for (Mact = 0, i = 0; i < net.nrOfNodes; i++) {
+    for (size_t i = 0; i < net.nrOfNodes; i++) {
       if (net.nodes[i].nrOfActiveConnected >= 2) {
         ++Mact;
       }
     }
 
     /* save results */
-    this->initialG = G0;
-    this->initialS2 = s20;
-    this->finalS2 = s2;
-    this->finalS2len = s2len;
-    this->initialS2len = s20len;
-    this->finalG = G;
     this->finalConfig = net;
     this->nrOfActiveNodes = Mact;
     this->nrOfActiveSprings = Nact;
 
     /** array deallocation */
-    free(u);
-    free(r);
+    free(force);
     free(net.nodes);
     free(net.springs);
   };
@@ -345,156 +359,12 @@ protected:
     return;
   }
 
-  /**
-   * @brief the residual is minus the assembled force vector
-   *
-   * @param net the network to compute the residual for
-   * @param u the displacement vector
-   * @param r the residual
-   * @return the definitive force
-   */
-  double Residual(Network *net, double *u, double *r) {
-    long int i, a, b, len, j, glob[6];
-    double kappa, s[3], ua[3], ub[3], s2, fele[6];
-
-    /* initial */
-    double Fdef = 0.;
-    for (i = 0; i < 3 * net->nrOfNodes; i++) {
-      r[i] = 0.;
-    }
-
-    /* assembly */
-    for (i = 0; i < net->nrOfSprings; i++) {
-      a = net->springs[i].a;
-      b = net->springs[i].b;
-      len = net->springs[i].len;
-      kappa = 3. / len;
-
-      actualSpringDistance(net->nodes[b], b, net->nodes[a], a, u, s, net->L);
-
-      /* energy update */
-      for (s2 = 0., j = 0; j < 3; j++) {
-        s2 += s[j] * s[j];
-      }
-      Fdef += 0.5 * kappa * s2;
-
-      /* element force vector */
-      for (j = 0; j < 3; j++) {
-        fele[j] = kappa * s[j];
-        fele[j + 3] = -kappa * s[j];
-      }
-
-      /* global numbering scheme */
-      for (j = 0; j < 3; j++) {
-        glob[j] = 3 * a + j;
-        glob[j + 3] = 3 * b + j;
-      }
-
-      /* residual update */
-      for (j = 0; j < 6; j++) {
-        r[glob[j]] -= fele[j];
-      }
-    };
-
-    return Fdef;
-  }
-
-  std::pair<double, double>
-  computeStressAndSquareDistances(Network *net, double *u,
-                                  double stress[3][3]) {
-    long int i, a, b, len, j, k;
-    double kappa, s[3], ua[3], ub[3], s2 = 0, s2len = 0;
-
-    for (j = 0; j < 3; j++) {
-      for (k = 0; k < 3; k++) {
-        stress[j][k] = 0.;
-      }
-    }
-
-    /* assembly */
-    for (i = 0; i < net->nrOfSprings; i++) {
-      a = net->springs[i].a;
-      b = net->springs[i].b;
-      len = net->springs[i].len;
-      if (isnan(a) || isnan(b) || isnan(len)) {
-        std::cout << "ERROR: a or b or len is nan" << a << " " << b << " "
-                  << len << std::endl;
-      }
-      // if (len == 0) {
-      //   std::cout << "ERROR: len is 0 " << len << " between a or b " << a <<
-      //   " "
-      //             << b << " " << std::endl;
-      //   kappa = 100;
-      // }
-      if (std::fabs(len) > 1e-10) {
-        kappa = 3. / len;
-      } else {
-        kappa = 3e5;
-      }
-
-      actualSpringDistance(net->nodes[b], b, net->nodes[a], a, u, s, net->L);
-
-      /* spring contribution to the overall stress tensor */
-      for (j = 0; j < 3; j++) {
-        for (k = 0; k < 3; k++) {
-          stress[j][k] += kappa * s[j] * s[k];
-        }
-      }
-
-      double s2local = (s[0] * s[0] + s[1] * s[1] + s[2] * s[2]);
-
-      /* update */
-      s2 += s2local;
-      s2len += s2local / len;
-
-      /* loop count */
-      net->springs[i].isActive = 1;
-      if (s2 < EPS2) {
-        net->nrOfLoops++;
-        net->springs[i].isActive = false;
-      }
-    };
-
-    for (j = 0; j < 3; j++) {
-      for (k = 0; k < 3; k++) {
-        stress[j][k] /= net->vol;
-      }
-    }
-
-    return std::make_pair(s2 / (double)net->nrOfSprings,
-                          s2len / (double)net->nrOfSprings);
-  }
-
-  /**
-   * @brief Get the actual distance between two nodes
-   *
-   * @param a node a
-   * @param indexA the index of the first node (needed for indexing into u)
-   * @param b
-   * @param indexB the index of the second node (needed for indexing into u)
-   * @param u the displacement vector
-   * @param coords the vector to write the coordinates into
-   * @param boxL the box side lengths
-   */
-  void actualSpringDistance(_Node a, int indexA, _Node b, int indexB, double *u,
-                            double *coords, double *boxL) {
-    double s[3], ua[3], ub[3];
-
+  void actualSpringDistance(_Node a, _Node b, double (&coords)[3],
+                            double *boxL) {
     /* initial spring vector */
     coords[0] = a.x - b.x;
     coords[1] = a.y - b.y;
     coords[2] = a.z - b.z;
-
-    /* spring displacement vectors */
-    for (size_t j = 0; j < 3; j++) {
-      ua[j] = u[3 * indexA + j];
-      ub[j] = u[3 * indexB + j];
-    }
-
-    /* current spring vector */
-    for (size_t j = 0; j < 3; j++) {
-      coords[j] += ub[j] - ua[j];
-    }
 
     /* periodic boundary conditions */
     ImposePBC(coords, boxL);
@@ -507,14 +377,14 @@ private:
   bool outputEndNodes = false;
   std::string endNodesFile;
   _Network finalConfig;
-  double finalG = 0.0;
-  double initialG = 0.0;
   int nrOfActiveSprings = 0;
   int nrOfActiveNodes = 0;
-  double initialS2 = 0.0;
-  double finalS2 = 0.0;
-  double finalS2len = 0.0;
-  double initialS2len = 0.0;
+  double Nb2 = 0.0;
+  double gammaEq = 0.0;
+  double gammaX = 0.0;
+  double gammaY = 0.0;
+  double gammaZ = 0.0;
+  double R2Mean = 0.0;
 };
 } // namespace mehp
 } // namespace calc
