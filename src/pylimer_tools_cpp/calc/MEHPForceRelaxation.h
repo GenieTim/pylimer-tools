@@ -93,7 +93,14 @@ public:
   double getNb2() { return this->Nb2; }
 
   void runForceRelaxation(int crosslinkerType, long int maxNrOfSteps = 250000,
-                          double tol = 1e-8, double Nb2 = -1.0) {
+                          double tol = 1e-8, double Nb2 = -1.0,
+                          bool is2d = false, double eps = 0.025,
+                          double kappa = 1.0) {
+    this->is2d = is2d;
+    int dimensions = 3;
+    if (is2d) {
+      dimensions = 2;
+    }
     Network net;
     if (!ConvertNetwork(&net, crosslinkerType)) {
       return;
@@ -121,15 +128,17 @@ public:
     /* array allocation */
     double *force;
     force = (double *)calloc(3 * net.nrOfNodes, sizeof(double));
+    for (size_t i = 0; i < 3 * net.nrOfNodes; ++i) {
+      force[i] = 0.0;
+    }
 
     // calculate initial absolute force
-    double kappa = 1.0;
     for (size_t i = 0; i < net.nrOfSprings; ++i) {
       _Spring spring = net.springs[i];
       double distances[3];
       actualSpringDistance(net.nodes[spring.a], net.nodes[spring.b], distances,
                            net.L);
-      for (int j = 0; j < 3; ++j) {
+      for (int j = 0; j < dimensions; ++j) {
         force[spring.a * 3 + j] -= kappa * distances[j];
         force[spring.b * 3 + j] += kappa * distances[j];
       }
@@ -150,7 +159,6 @@ public:
 
     // start of force relaxation
     long int stepsDone = 0;
-    double eps = 0.025;
     double Gamma_eq = 0.0;
     while (absoluteForce / initialForce > tol && stepsDone < maxNrOfSteps) {
       stepsDone += 1;
@@ -176,7 +184,7 @@ public:
         double distances[3];
         actualSpringDistance(net.nodes[spring.a], net.nodes[spring.b],
                              distances, net.L);
-        for (int j = 0; j < 3; ++j) {
+        for (int j = 0; j < dimensions; ++j) {
           force[spring.a * 3 + j] -= kappa * distances[j];
           force[spring.b * 3 + j] += kappa * distances[j];
           Gamma_eq += distances[j] * distances[j];
@@ -211,7 +219,7 @@ public:
       actualSpringDistance(net.nodes[spring.a], net.nodes[spring.b], distances,
                            net.L);
       double springLen = 0.0;
-      for (int j = 0; j < 3; ++j) {
+      for (int j = 0; j < dimensions; ++j) {
         springLen += distances[j] * distances[j];
       }
       Gamma_eq += springLen;
@@ -359,12 +367,24 @@ protected:
     return;
   }
 
+  /**
+   * @brief Compute the distance between two nodes
+   *
+   * @param a the first node
+   * @param b the second node
+   * @param coords the array to write the distances in
+   * @param boxL the box sizes
+   */
   void actualSpringDistance(_Node a, _Node b, double (&coords)[3],
                             double *boxL) {
     /* initial spring vector */
     coords[0] = a.x - b.x;
     coords[1] = a.y - b.y;
-    coords[2] = a.z - b.z;
+    if (this->is2d) {
+      coords[2] = 0.0;
+    } else {
+      coords[2] = a.z - b.z;
+    }
 
     /* periodic boundary conditions */
     ImposePBC(coords, boxL);
@@ -372,6 +392,7 @@ protected:
 
 private:
   pylimer_tools::entities::Universe universe;
+  bool is2d = false;
   int stepOutputFrequency = 0;
   std::string stepOutputFile;
   bool outputEndNodes = false;
