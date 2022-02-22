@@ -37,9 +37,11 @@ void init_pylimer_bound_calc(py::module_ &m) {
           :param maxNrOfSteps: The maximum number of steps to do during the simulation.
           :param tolerance: The tolerance of the force as an exit condition.
           :param Nb2: The denominator in the equation of :math:`\Gamma` (see: :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq()`). If -1.0 (default), the network is used for determination.
+          :param 2d: Specify true if you want to evaluate the force relation only in x and y direction.
           )pbdoc",
            py::arg("crosslinkerType") = 2, py::arg("maxNrOfSteps") = 250000,
-           py::arg("tolerance") = 1e-8, py::arg("Nb2") = -1.0)
+           py::arg("tolerance") = 1e-8, py::arg("Nb2") = -1.0,
+           py::arg("is2d") = false, py::arg("dt") = 0.05, py::arg("kappa") = 1.0)
       .def("getVolume", &mehp::MEHPForceRelaxation::getVolume)
       .def("getNrOfNodes", &mehp::MEHPForceRelaxation::getNrOfNodes)
       .def("getNrOfSprings", &mehp::MEHPForceRelaxation::getNrOfSprings)
