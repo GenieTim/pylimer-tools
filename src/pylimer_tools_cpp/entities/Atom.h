@@ -39,7 +39,7 @@ public:
   double _getDeltaDistance(double c1, double c2, int n1, int n2,
                            double boxL) const {
     double delta = c1 - c2;
-    assert(!isnan(boxL) && !isnan(delta) && !isinf(delta) && !isinf(boxL));
+    assert(!std::isnan(boxL) && !std::isnan(delta) && !std::isinf(delta) && !std::isinf(boxL));
     while (delta > 0.5 * boxL) {
       delta -= boxL;
     }
