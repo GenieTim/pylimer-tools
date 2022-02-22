@@ -37,8 +37,8 @@ public:
     this->box = this->universe.getBox();
   }
   void setSeed(unsigned int seed) { this->rng.seed(seed); };
-  void setBeadDistance(double beadDistance) {
-    this->beadDistance = beadDistance;
+  void setBeadDistance(double newBeadDistance) {
+    this->beadDistance = newBeadDistance;
   };
   pylimer_tools::entities::Universe getUniverse() {
     this->universe.simplify();

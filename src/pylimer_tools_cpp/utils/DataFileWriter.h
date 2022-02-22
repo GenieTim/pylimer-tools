@@ -84,7 +84,7 @@ public:
     file << "Bonds\n\n";
     std::map<std::string, std::vector<long int>> bonds =
         this->universe.getBonds();
-    for (int i = 0; i < this->universe.getNrOfBonds(); ++i) {
+    for (size_t i = 0; i < this->universe.getNrOfBonds(); ++i) {
       long int bondType = bonds.at("bond_type")[i];
       if (bondType == -1) {
         bondType = 1;
@@ -100,7 +100,7 @@ public:
       file << "Angles\n\n";
       std::map<std::string, std::vector<long int>> angles =
           this->universe.getAngles();
-      for (int i = 0; i < this->universe.getNrOfAngles(); ++i) {
+      for (size_t i = 0; i < this->universe.getNrOfAngles(); ++i) {
         int angleType = 1; // TODO: support angle types?
         file << "\t" << i << "\t" << angleType << "\t"
              << (this->oldNewAtomIdMap[angles["angle_from"][i]]) << "\t"
@@ -176,7 +176,7 @@ private:
           this->moleculeIdxSwappable ? molecule.getAtomsLinedUp()
                                      : molecule.getAtoms();
       nMoleculesOutput += 1;
-      for (int i = 0; i < atoms.size(); ++i) {
+      for (size_t i = 0; i < atoms.size(); ++i) {
         pylimer_tools::entities::Atom atom = atoms[i];
         nAtomsOutput += 1;
         int ip1 = i + 1;
