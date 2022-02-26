@@ -8,7 +8,5 @@ cd "$(dirname "$0")/.." || exit
 
 rm -rf dist/
 
-python3 -m build
 pybind11-stubgen pylimer_tools_cpp -o src
-
-python3 -m twine upload dist/*
+python3 -m build
