@@ -20,8 +20,11 @@ jobs:
       - name: Install Dependencies
         run: pip install -r requirements.txt
       
+      - name: Install dev dependencies
+        run: pip install -r requirements.txt
+      
       - name: Generate Documentation
-        run: ./bin/make-docs-html.sh
+        run: ./bin/make-docs.sh
       
       - name: Publish Documentation
         uses: JamesIves/github-pages-deploy-action@4.0.0

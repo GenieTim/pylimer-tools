@@ -28,3 +28,4 @@ ninja>=1.10.2.2
 cmake>=3.21.4
 scikit-build>=0.12.0
 pybind11-stubgen>=0.8.8
+sphinx>=4.2.0

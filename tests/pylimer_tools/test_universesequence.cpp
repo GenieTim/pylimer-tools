@@ -47,7 +47,7 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]") {
     // can be queried "randomly"
     pe::Universe universe = universeSeq.atIndex(10);
     REQUIRE(universe.getNrOfAtoms() == 32);
-    REQUIRE(universeSeq.getLength() == 292384);
+    REQUIRE(universeSeq.getLength() == 74322);
     // and can be queried again
     universeSeq.forgetAtIndex(10);
     pe::Universe universeAgain = universeSeq.atIndex(10);
@@ -55,9 +55,9 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]") {
     REQUIRE(universeAgain.getAtom(1).getX() == universeAgain.getAtom(1).getX());
     // and the last one
     std::cout << "Requesting last index" << std::endl;
-    REQUIRE_THROWS(universeSeq.atIndex(292384));
+    REQUIRE_THROWS(universeSeq.atIndex(74322));
     std::cout << "Requesting last existing index" << std::endl;
-    pe::Universe thirdUniverse = universeSeq.atIndex(292383);
+    pe::Universe thirdUniverse = universeSeq.atIndex(74321);
     REQUIRE(thirdUniverse.getNrOfAtoms() == 32);
     REQUIRE(universeAgain.getAtom(1).getX() != thirdUniverse.getAtom(1).getX());
     // and back again
