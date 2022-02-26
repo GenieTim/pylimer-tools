@@ -30,7 +30,9 @@ jobs:
           args: install winflexbison
 
       - name: Build
-        run: ./bin/build.sh
+        run: |
+          pybind11-stubgen pylimer_tools_cpp -o src
+          python3 -m build
 
       - name: Store the build
         uses: actions/upload-artifact@v2

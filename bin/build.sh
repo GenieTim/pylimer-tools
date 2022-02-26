@@ -9,4 +9,4 @@ cd "$(dirname "$0")/.." || exit
 rm -rf dist/
 
 pybind11-stubgen pylimer_tools_cpp -o src
-python3 -m build
+python3 -m build --wheel
