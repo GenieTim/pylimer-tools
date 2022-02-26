@@ -1,0 +1,117 @@
+name: Publish Different Version to PyPi
+
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    name: Build Package for Windows
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.x"
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Install choco dependencies
+        uses: crazy-max/ghaction-chocolatey@v1
+        with:
+          args: install winflexbison
+
+      - name: Build
+        run: ./bin/build.sh
+
+      - name: Store the build
+        uses: actions/upload-artifact@v2
+        with:
+          name: python-package-distributions
+          path: dist
+          retention-days: 4
+
+  build-osx:
+    runs-on: macos-latest
+    name: Build Package for MacOS and 🐍 ${{ matrix.python-version }}
+    strategy:
+      matrix:
+        python-version:
+          # NOTE: https://github.com/MacPython/wiki/wiki/Spinning-wheels
+          - 3.9
+          - 3.8
+    
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install additional dependencies
+        run: brew install bison flex
+
+      - name: Build
+        run: ./bin/build.sh
+
+      - name: Store the build
+        uses: actions/upload-artifact@v2
+        with:
+          name: python-package-distributions
+          path: dist
+          retention-days: 4
+
+  build-linux:
+    runs-on: ubuntu-latest
+    name: Build Package for Ubuntu and 🐍 ${{ matrix.python-version }}
+    strategy:
+      matrix:
+        python-version:
+          # NOTE: https://github.com/MacPython/wiki/wiki/Spinning-wheels
+          - 3.9
+          - 3.8
+    
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install additional dependencies
+        run: sudo apt-get -y install bison flex
+        
+      - name: Build
+        run: ./bin/build.sh
+
+      - name: Store the build
+        uses: actions/upload-artifact@v2
+        with:
+          name: python-package-distributions
+          path: dist
+          retention-days: 4
+
+  deploy:
+    runs-on: ubuntu-latest
+    name: Publish 🐍📦 to TestPyPI
+    needs:
+      - build-windows
+      - build-osx
+      - build-linux
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v2
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish a Python distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
