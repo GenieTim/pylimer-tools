@@ -1,4 +1,5 @@
 name: Publish Different Version to PyPi
+# inspired partially by https://github.com/ansible/pylibssh/blob/206c222ee8ee2cdb2b5dc9b95125f7f3d27d32bc/.github/workflows/build-test-n-publish.yml
 
 on:
   push:
