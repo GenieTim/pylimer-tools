@@ -83,13 +83,7 @@ jobs:
 
   build-linux:
     runs-on: ubuntu-latest
-    name: Build Package for Ubuntu and 🐍 ${{ matrix.python-version }}
-    strategy:
-      matrix:
-        python-version:
-          - "3.10"
-          - 3.9
-          - 3.8
+    name: Build Package for Manylinux
 
     steps:
       - uses: actions/checkout@v2
@@ -97,16 +91,17 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.10"
 
       - name: Install Dependencies
         run: pip install -r requirements.txt
 
-      - name: Install additional dependencies
-        run: sudo apt-get -y install bison flex
-
-      - name: Build
-        run: ./bin/build-wheel.sh
+      - name: Build manylinux Python wheels
+        uses: RalfG/python-wheels-manylinux-build@v0.4.2-manylinux2014_x86_64
+        with:
+          python-versions: 'cp38-cp38m cp39-cp39m'
+          build-requirements: 'cython numpy scikit-build pybind11 cmake ninja wheel'
+          system-packages: 'bison flex'
 
       - name: Store the build
         uses: actions/upload-artifact@v2
