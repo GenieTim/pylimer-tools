@@ -64,6 +64,7 @@ setup(
     version="0.1.1",
     description="A collection of utility python functions for handling LAMMPS output and polymers in Python ",
     long_description=Path('README.md').read_text(),
+    long_description_content_type="text/markdown",
     keywords=["Polymer", "Chemistry", "Network", "LAMMPS", "Science"],
     author="Tim Bernhard",
     author_email="tim@bernhard.dev",
