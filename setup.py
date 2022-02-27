@@ -63,8 +63,8 @@ setup(
     name="pylimer_tools",
     version="0.1.1",
     description="A collection of utility python functions for handling LAMMPS output and polymers in Python ",
-    long_description=Path('README.md').read_text(),
     long_description_content_type="text/markdown",
+    long_description=Path('README.md').read_text(),
     keywords=["Polymer", "Chemistry", "Network", "LAMMPS", "Science"],
     author="Tim Bernhard",
     author_email="tim@bernhard.dev",
@@ -78,6 +78,7 @@ setup(
     python_requires=">=3.8",
     classifiers=[
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.9",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Operating System :: OS Independent"
     ]

@@ -10,4 +10,5 @@ rm -rf dist/
 
 pip install . --verbose
 pybind11-stubgen pylimer_tools_cpp -o src
+rm -rf dist/
 python -m build --sdist
