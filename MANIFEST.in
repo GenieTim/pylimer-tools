@@ -1,7 +1,8 @@
 include vendor/CMakeLists.txt
 include CMakeLists.txt
-global-include ./src/**/CMakeLists.txt
-global-include ./src/**/*.h
-global-include ./src/**/*.cpp
+global-include src/**/CMakeLists.txt
+global-include src/**/*.h
+global-include src/**/*.cpp
 exclude .github
 exclude src/test
+exclude tests
