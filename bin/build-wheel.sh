@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 
-cd "$(dirname "$0")/.." || exit 2
+cd "$(dirname "$0")/.." || exit
 
 # Make sure you have the latest version of PyPA’s build installed:
 # python3 -m pip install --upgrade build
 # python3 -m pip install --upgrade twine
 
-./bin/build-wheel.sh || exit 3
+rm -rf dist/
 
-python3 -m twine upload dist/*
+pybind11-stubgen pylimer_tools_cpp -o src
+python3 -m build --wheel

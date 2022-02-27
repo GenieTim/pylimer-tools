@@ -1,6 +1,5 @@
 name: Publish Different Version to PyPi
 
-
 on:
   push:
     tags:
@@ -11,12 +10,19 @@ jobs:
     runs-on: windows-latest
 
     name: Build Package for Windows
+    strategy:
+      matrix:
+        python-version:
+          - 3.9
+          - 3.8
+
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-python@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
         with:
-          python-version: "3.x"
+          python-version: ${{ matrix.python-version }}
 
       - name: Install Dependencies
         run: pip install -r requirements.txt
@@ -32,7 +38,7 @@ jobs:
       - name: Build
         run: |
           pybind11-stubgen pylimer_tools_cpp -o src
-          python3 -m build
+          python3 -m build --wheel
 
       - name: Store the build
         uses: actions/upload-artifact@v2
@@ -50,9 +56,14 @@ jobs:
           # NOTE: https://github.com/MacPython/wiki/wiki/Spinning-wheels
           - 3.9
           - 3.8
-    
+
     steps:
       - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
       - name: Install Dependencies
         run: pip install -r requirements.txt
@@ -61,7 +72,7 @@ jobs:
         run: brew install bison flex
 
       - name: Build
-        run: ./bin/build.sh
+        run: ./bin/build-wheel.sh
 
       - name: Store the build
         uses: actions/upload-artifact@v2
@@ -76,21 +87,25 @@ jobs:
     strategy:
       matrix:
         python-version:
-          # NOTE: https://github.com/MacPython/wiki/wiki/Spinning-wheels
           - 3.9
           - 3.8
-    
+
     steps:
       - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
 
       - name: Install Dependencies
         run: pip install -r requirements.txt
 
       - name: Install additional dependencies
         run: sudo apt-get -y install bison flex
-        
+
       - name: Build
-        run: ./bin/build.sh
+        run: ./bin/build-wheel.sh
 
       - name: Store the build
         uses: actions/upload-artifact@v2
