@@ -10,10 +10,11 @@
 #include <iostream>
 #include <map>
 #include <math.h>/* isnan, sqrt */
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
 #include <string>
 #include <vector>
-#define _USE_MATH_DEFINES
-#include <cmath>
 
 #include <random>
 
