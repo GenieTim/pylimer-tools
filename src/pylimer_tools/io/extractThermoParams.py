@@ -1,12 +1,14 @@
 
 import csv
-import datetime
+from datetime import datetime
 import hashlib
 import os
 import pathlib
 import pickle
 from io import StringIO
 from typing import Iterable
+import warnings
+import tempfile
 
 import pandas as pd
 from pylimer_tools.utils.cacheUtility import doCache, loadCache
@@ -26,62 +28,66 @@ def readOneGroup(fp, header, minLineLen=4, additional_lines_skip=0) -> str:
 
 
     Returns:
-      A long CSV string
+       The filename of a temporary CSV file
     """
-    text = ""
-    line = fp.readline()
-    separator = ", "
-    headerLen = None
-    if (isinstance(header, str)):
-        minLineLen = max(minLineLen, len(header.split()))
-    else:
-        minLineLen = max(minLineLen, min([len(h.split()) for h in header]))
-
-    def checkSkipLine(line, header):
-        return line and not line.startswith(header)
-
-    def checkSkipLineHeaderList(line, header):
-        if (not line):
-            return False
-        for headerL in header:
-            if (line.startswith(headerL)):
-                return False
-        return True
-
-    skipLineFun = checkSkipLineHeaderList if isinstance(
-        header, list) else checkSkipLine
-    # skip lines up until header (or file ending)
-    while skipLineFun(line, header):
-        line = fp.readline()
-    # found header. Take next few lines:
-    headerLen = len(line.split())
-    if (not line):
-        return ""
-    else:
-        text = (separator.join(line.split())).strip() + "\n"
-
+    csvFileToWrite = "{}/{}_{}".format(
+        tempfile.gettempdir(),
+        hashlib.md5(datetime.now().strftime("%m.%d.%Y, %H:%M:%S").encode()).hexdigest(), 'tmp_thermo_file.csv')
     n_lines = 0
-    while line and n_lines < additional_lines_skip:
-        # skip ${additional_lines_skip} further
+    with open(csvFileToWrite, 'w') as output_csv:
         line = fp.readline()
-        # text += (', '.join(line.split())).strip() + "\n"
-        n_lines += 1
-    while line and not line.startswith("Loop time of"):
-        line = fp.readline()
-        if (len(line) < minLineLen or (len(line.split()) != headerLen) or (len(line) > 0 and (
-                line.startswith("WARNING") or
-                line[0].isalpha() or
-                (line[0] == "-" and line[1] == "-") or
-                (line[2].isalpha() or line[3].isalpha()) or
-                (line[0] == "[") or
-                ("src" in line) or
-                ("fene" in line or ")" in line)  # from ":90)"
-        ))):
-            # skip line due to error, warning or similar
-            continue
-        text += (separator.join(line.split())).strip() + "\n"
-        n_lines += 1
-    return text
+        separator = ", "
+        headerLen = None
+        if (isinstance(header, str)):
+            minLineLen = max(minLineLen, len(header.split()))
+        else:
+            minLineLen = max(minLineLen, min([len(h.split()) for h in header]))
+
+        def checkSkipLine(line, header):
+            return line and not line.startswith(header)
+
+        def checkSkipLineHeaderList(line, header):
+            if (not line):
+                return False
+            for headerL in header:
+                if (line.startswith(headerL)):
+                    return False
+            return True
+
+        skipLineFun = checkSkipLineHeaderList if isinstance(
+            header, list) else checkSkipLine
+        # skip lines up until header (or file ending)
+        while skipLineFun(line, header):
+            line = fp.readline()
+        # found header. Take next few lines:
+        headerLen = len(line.split())
+        if (not line):
+            return ""
+        else:
+            output_csv.write((separator.join(line.split())).strip() + "\n")
+
+        n_lines = 0
+        while line and n_lines < additional_lines_skip:
+            # skip ${additional_lines_skip} further
+            line = fp.readline()
+            # text += (', '.join(line.split())).strip() + "\n"
+            n_lines += 1
+        while line and not line.startswith("Loop time of"):
+            line = fp.readline()
+            if (len(line) < minLineLen or (len(line.split()) != headerLen) or (len(line) > 0 and (
+                    line.startswith("WARNING") or
+                    line[0].isalpha() or
+                    (line[0] == "-" and line[1] == "-") or
+                    (line[2].isalpha() or line[3].isalpha()) or
+                    (line[0] == "[") or
+                    ("src" in line) or
+                    ("fene" in line or ")" in line)  # from ":90)"
+            ))):
+                # skip line due to error, warning or similar
+                continue
+            output_csv.write((separator.join(line.split())).strip() + "\n")
+            n_lines += 1
+    return csvFileToWrite if n_lines > 0 else ""
 
 
 def getThermoCacheNameSuffix(header="Step Temp E_pair E_mol TotEng Press", textsToRead=5, minLineLen=5) -> str:
@@ -126,22 +132,28 @@ def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", text
     if (cacheContent is not None and useCache):
         return cacheContent
 
-    def stringToDf(text) -> pd.DataFrame:
+    def csvFileToDf(filePath) -> pd.DataFrame:
         try:
-            return pd.read_csv(StringIO(text), low_memory=False,
-                               error_bad_lines=False, quoting=csv.QUOTE_NONE)
+            tmpDf = pd.read_csv(filePath, low_memory=False,
+                               on_bad_lines='skip', quoting=csv.QUOTE_NONE)
+            try:
+                os.remove(filePath)
+            except Exception as e:
+                pass
+            return tmpDf
         except Exception as e:
+            warnings.warn("Error reading CSV thermo file: {}".format(e), source=e)
             return pd.DataFrame()
 
     with open(file, 'r') as fp:
-        text = readOneGroup(fp, header, minLineLen=minLineLen)
+        tmpCsvFile = readOneGroup(fp, header, minLineLen=minLineLen)
         textsRead = 1
-        df = stringToDf(text)
+        df = csvFileToDf(tmpCsvFile)
         while(textsRead < textsToRead):
-            text = readOneGroup(fp, header, minLineLen=minLineLen)
+            tmpCsvFile = readOneGroup(fp, header, minLineLen=minLineLen)
             textsRead += 1
-            if (text != ""):
-                newDf = stringToDf(text)
+            if (tmpCsvFile != ""):
+                newDf = csvFileToDf(tmpCsvFile)
                 if (not newDf.empty):
                     df = df.append(newDf)
 

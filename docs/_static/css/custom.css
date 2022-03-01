@@ -1,0 +1,4 @@
+/** make math readable in dark mode */
+body:not([data-theme="light"]) img.math {
+  filter: invert(1);
+}
