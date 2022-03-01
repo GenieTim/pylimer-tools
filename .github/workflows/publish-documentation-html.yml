@@ -10,7 +10,7 @@ jobs:
   build-deploy:
     runs-on: ubuntu-latest
 
-    name: Publish Website to Staging Server
+    name: Build & Publish Documentation to GitHub Pages
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
@@ -21,7 +21,7 @@ jobs:
         run: pip install -r requirements.txt
       
       - name: Install dev dependencies
-        run: pip install -r requirements.txt
+        run: sudo apt-get install bison flex
       
       - name: Generate Documentation
         run: ./bin/make-docs.sh
