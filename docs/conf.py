@@ -29,7 +29,7 @@ try:
     if (os.getenv("CONDA_PREFIX") is not None):
         newPath = os.path.join(os.getenv("CONDA_PREFIX"),
                             "lib", pythonV, "site-packages")
-    sys.path.append(newPath)
+        sys.path.append(newPath)
     # vgl.: sys.path.insert(
     #     0, "/usr/local/anaconda3/envs/autowig/lib/python3.7/site-packages")
     import pylimer_tools_cpp
