@@ -12,3 +12,5 @@ pip install . || exit 7
 sphinx-apidoc -o ./docs ./src || exit 2 # -f -P
 
 sphinx-build -b html ./docs ./docs-html
+
+touch ./docs-html/.nojekyll
