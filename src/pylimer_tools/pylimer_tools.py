@@ -3,8 +3,7 @@
 import click
 import numpy as np
 
-from pylimer_tools.entities.universum import Universum
-from pylimer_tools.io.readLammpData import readLammpData
+from pylimer_tools_cpp import UniverseSequence
 
 
 @click.command()
@@ -18,19 +17,24 @@ def cli(files):
     """
     click.echo("Processing {} files".format(len(files)))
     for filePath in files:
-        click.echo("Analysing File " + filePath)
-        allData = readLammpData(filePath)
-        universe = Universum(boxSizes=[
-                             allData["Lx"], allData["Ly"], allData["Lz"]])
-        universe.addAtomBondData(allData['atom_data'], allData['bond_data'])
+        click.echo("\nAnalysing File " + filePath)
+
+        universeSequence = UniverseSequence()
+        universeSequence.initializeFromDataSequence([filePath])
+        universe = universeSequence.atIndex(0)
         click.echo("Size: {}. Volume: {} u^3".format(
-            universe.getSize(), universe.getVolume()))
-        bondLengths = [m.computeBondLengths().mean() for m in universe]
-        click.echo("Mean bond length: {} u".format(
-            np.mean([l for l in bondLengths if l is not None])))
-        endToEndDistances = [m.computeEndToEndDistance() for m in universe]
+            universe.getNrOfAtoms(), universe.getVolume()))
+        molecules = universe.getMolecules(2)
+        bondLengths = [np.mean(m.computeBondLengths()) for m in molecules]
+        nonNoneBondLenghts = [
+            l for l in bondLengths if l is not None and l > 0]
+        click.echo("Mean bond length: {} u, (min: {}, max: {}, median: {}) u".format(
+            np.mean(nonNoneBondLenghts), np.min(nonNoneBondLenghts), np.max(nonNoneBondLenghts), np.median(nonNoneBondLenghts)))
+        endToEndDistances = [m.computeEndToEndDistance() for m in molecules]
         click.echo("Mean end to end distance: {} u".format(
-            np.mean([e for e in endToEndDistances if e is not None])))
+            np.mean([e for e in endToEndDistances if e is not None and e > 0])))
+        click.echo("For {} molecules of mean length of {} atoms".format(
+            len(molecules), np.mean([m.getNrOfAtoms() for m in molecules])))
     click.echo("Arbitrary units used. E.g.: Length: u")
 
 

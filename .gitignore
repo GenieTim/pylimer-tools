@@ -26,6 +26,7 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+cmake-build-debug/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -70,6 +71,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs-html/
 
 # PyBuilder
 target/
@@ -128,4 +130,11 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# dependencies
+vendor/igraph
+
+# build targets
 coverage.html
+_skbuild
+
+_cmake_test_compile

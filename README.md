@@ -23,11 +23,12 @@ Use pip:
 
 **NOTE**: currently, this release's API is _unstable_ and subject to change.
 
-See the [documentation](https://genietim.github.io/pylimer-tools/index.html) (or in [markdown format](https://github.com/GenieTim/pylimer-tools/tree/main/docs/pylimer_tools)) for a current list of all available functions.
+See the [documentation](https://genietim.github.io/pylimer-tools/index.html) for a current list of all available functions.
 
 ### Example
 
-An example useage can be found in the [CLI application](./src/pylimer_tools/pylimer_tools.py) or in the following code snippet:
+An example useage can be found in the [documentation](https://genietim.github.io/pylimer-tools/index.html),
+the [CLI application](./src/pylimer_tools/pylimer_tools.py) or in the following code snippet:
 
 ```python
 import numpy as np

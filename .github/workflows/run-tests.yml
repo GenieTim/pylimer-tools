@@ -10,7 +10,7 @@ jobs:
   build-deploy:
     runs-on: ubuntu-latest
 
-    name: Publish Website to Staging Server
+    name: Run Python + C++ Tests
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2

@@ -1,0 +1,161 @@
+name: Publish Different Version to PyPi
+# inspired partially by https://github.com/ansible/pylibssh/blob/206c222ee8ee2cdb2b5dc9b95125f7f3d27d32bc/.github/workflows/build-test-n-publish.yml
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    name: Build 📦 for Windows and 🐍 ${{ matrix.python-version }}
+    strategy:
+      matrix:
+        python-version:
+          - "3.10"
+          - 3.9
+          - 3.8
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Install choco dependencies
+        uses: crazy-max/ghaction-chocolatey@v1
+        with:
+          args: install winflexbison
+
+      - name: Build
+        run: python -m build --wheel
+
+      - name: Store the build
+        uses: actions/upload-artifact@v2
+        with:
+          name: python-package-distributions
+          path: dist
+          retention-days: 3
+
+  build-osx:
+    runs-on: macos-latest
+    name: Build 📦 for MacOS and 🐍 ${{ matrix.python-version }}
+    strategy:
+      matrix:
+        python-version:
+          # NOTE: https://github.com/MacPython/wiki/wiki/Spinning-wheels
+          - "3.10"
+          - 3.9
+          - 3.8
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Install additional dependencies
+        run: brew install bison flex
+
+      - name: Build
+        run: ./bin/build-wheel.sh
+
+      - name: Store the build
+        uses: actions/upload-artifact@v2
+        with:
+          name: python-package-distributions
+          path: dist
+          retention-days: 3
+
+  build-linux:
+    runs-on: ubuntu-latest
+    name: Build 📦 for ManyLinux
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build manylinux Python wheels
+        uses: RalfG/python-wheels-manylinux-build@v0.4.2-manylinux2014_x86_64
+        with:
+          python-versions: "cp38-cp38 cp39-cp39 cp310-cp310"
+          build-requirements: "cython numpy scikit-build pybind11 cmake ninja wheel"
+          system-packages: "bison flex"
+
+      - name: Store the build
+        uses: actions/upload-artifact@v2
+        with:
+          name: python-package-distributions
+          path: dist
+          retention-days: 3
+
+  build-sdist:
+    runs-on: ubuntu-latest
+    name: Build SRC Package for Any
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.10"
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build Sdist
+        run: ./bin/build-sdist.sh
+
+      - name: Store the build
+        uses: actions/upload-artifact@v2
+        with:
+          name: python-package-distributions
+          path: dist
+          retention-days: 3
+
+  deploy:
+    runs-on: ubuntu-latest
+    name: Publish 🐍📦 to PyPI
+    needs:
+      - build-windows
+      - build-osx
+      - build-linux
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v2
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: List and delete invalid packages
+        run: |
+          ls dist/*-linux_*
+          rm dist/*-linux_*
+      - name: Publish a Python distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          skip_existing: true

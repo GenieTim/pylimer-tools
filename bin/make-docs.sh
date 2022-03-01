@@ -1,10 +1,14 @@
 #!/usr/bin/env bash
 
-cd "$(dirname "$0")/.." || exit
+cd "$(dirname "$0")/.." || exit 10
+# ROOT_DIR=$(pwd)
 
-rm -rf ./docs
-mkdir -p ./docs
+pip install . || exit 7
 
-# make sure you have pdoc3 installed: 
-# pip3 install pdoc3
-lazydocs --output-path="./docs" ./src/
+# make sure you have sphinx installed:
+# pip3 install sphinx
+# and the template:
+# pip install furo
+sphinx-apidoc -o ./docs ./src || exit 2 # -f -P
+
+sphinx-build -b html ./docs ./docs-html
