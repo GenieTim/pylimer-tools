@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Installation" href="installation.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Readers &amp; Writers" href="readers_writers.html" /><link rel="prev" title="Useage" href="useage.html" />
 
     <meta name="generator" content="sphinx-4.4.0, furo 2022.02.23"/>
-        <title>PylimerTools documentation</title>
+        <title>Network Generators - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=3c656993158f05539f962c5cea52a5e6c184bb8c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -120,7 +120,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="#"><div class="brand">PylimerTools  documentation</div></a>
+      <a href="index.html"><div class="brand">PylimerTools  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -131,7 +131,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -140,7 +140,7 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
   <span class="sidebar-brand-text">PylimerTools  documentation</span>
@@ -152,13 +152,13 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html#manual-compilation">Manual Compilation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="assumptions.html">Assumptions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nomenclature.html">Nomenclature</a></li>
 <li class="toctree-l1"><a class="reference internal" href="useage.html">Useage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="network_generator.html">Network Generators</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Network Generators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readers_writers.html">Readers &amp; Writers</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="modules.html">src</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
 <li class="toctree-l2 has-children"><a class="reference internal" href="pylimer_tools.html">pylimer_tools package</a><input class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -196,24 +196,58 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main">
-          <section id="welcome-to-pylimertools-s-documentation">
-<h1>Welcome to PylimerTools’s documentation!<a class="headerlink" href="#welcome-to-pylimertools-s-documentation" title="Permalink to this headline">#</a></h1>
-<div class="toctree-wrapper compound">
+          <section id="network-generators">
+<h1>Network Generators<a class="headerlink" href="#network-generators" title="Permalink to this headline">#</a></h1>
+<p>This package also provides a Monte-Carlo type network generator.</p>
+<p>It could be used e.g. like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">numpy.random</span> <span class="kn">import</span> <span class="n">default_rng</span>
+<span class="kn">from</span> <span class="nn">pylimer_tools.calc</span> <span class="kn">import</span> <span class="n">doMMTAnalysis</span>
+<span class="kn">from</span> <span class="nn">pylimer_tools_cpp</span> <span class="kn">import</span> <span class="p">(</span><span class="n">DataFileWriter</span><span class="p">,</span> <span class="n">MCUniverseGenerator</span><span class="p">,)</span>
+
+
+<span class="c1"># TODO: define the parameters you want to generate the network with</span>
+
+<span class="c1"># Start generating the network</span>
+<span class="n">generator</span> <span class="o">=</span> <span class="n">MCUniverseGenerator</span><span class="p">(</span><span class="n">sideLen</span><span class="p">,</span> <span class="n">sideLen</span><span class="p">,</span> <span class="n">sideLen</span><span class="p">)</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">setSeed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">setBeadDistance</span><span class="p">(</span><span class="n">beadDistance</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Starting MC Generator </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%H:%M:%S"</span><span class="p">)))</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">addCrosslinkers</span><span class="p">(</span><span class="n">nrOfCrosslinkers</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Added cross-linkers </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%H:%M:%S"</span><span class="p">)))</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">addSolventChains</span><span class="p">(</span><span class="n">numberOfSolventChains</span><span class="p">,</span> <span class="n">beadsPerSolventChain</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Added solvent chains </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%H:%M:%S"</span><span class="p">)))</span>
+<span class="n">generator</span><span class="o">.</span><span class="n">addAndLinkStrands</span><span class="p">(</span><span class="n">numberOfChains</span><span class="p">,</span> <span class="n">nrOfBeadsPerChain</span><span class="p">,</span>
+                            <span class="n">crosslinkerConversion</span><span class="p">,</span> <span class="n">crosslinkerFunctionality</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Added and linked strands </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+    <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%H:%M:%S"</span><span class="p">)))</span>
+<span class="n">universe</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">getUniverse</span><span class="p">()</span>
+<span class="n">universe</span><span class="o">.</span><span class="n">setMasses</span><span class="p">({</span><span class="mi">1</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+
+<span class="n">angles</span> <span class="o">=</span> <span class="n">universe</span><span class="o">.</span><span class="n">detectAngles</span><span class="p">()</span>
+<span class="n">universe</span><span class="o">.</span><span class="n">addAngles</span><span class="p">(</span><span class="n">angles</span><span class="p">[</span><span class="s2">"angle_from"</span><span class="p">],</span>
+                  <span class="n">angles</span><span class="p">[</span><span class="s2">"angle_via"</span><span class="p">],</span> <span class="n">angles</span><span class="p">[</span><span class="s2">"angle_to"</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Added angles </span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%H:%M:%S"</span><span class="p">)))</span>
+
+<span class="c1"># output new system</span>
+<span class="n">dataWriter</span> <span class="o">=</span> <span class="n">DataFileWriter</span><span class="p">(</span><span class="n">universe</span><span class="p">)</span>
+<span class="n">dataWriter</span><span class="o">.</span><span class="n">configIncludeAngles</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">dataWriter</span><span class="o">.</span><span class="n">configMoleculeIdxForSwap</span><span class="p">(</span><span class="n">mode_swappable</span><span class="p">)</span>
+<span class="n">dataWriter</span><span class="o">.</span><span class="n">writeToFile</span><span class="p">(</span><span class="n">fileToWrite</span><span class="p">)</span>
+</pre></div>
 </div>
-</section>
-<section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">#</a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
 </section>
 
         </article>
@@ -221,16 +255,26 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="installation.html">
+          <a class="next-page" href="readers_writers.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Installation</div>
+                <div class="title">Readers &amp; Writers</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          
+          <a class="prev-page" href="useage.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Useage</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -250,25 +294,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            Contents
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">Welcome to PylimerTools’s documentation!</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Installation" href="installation.html" />
+<link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Assumptions" href="assumptions.html" /><link rel="prev" title="Welcome to PylimerTools’s documentation!" href="index.html" />
 
     <meta name="generator" content="sphinx-4.4.0, furo 2022.02.23"/>
-        <title>PylimerTools documentation</title>
+        <title>Installation - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=3c656993158f05539f962c5cea52a5e6c184bb8c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=25ceb02ed1c46dc30f2321ff83e92799f69dfdb9" />
@@ -120,7 +120,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="#"><div class="brand">PylimerTools  documentation</div></a>
+      <a href="index.html"><div class="brand">PylimerTools  documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -140,7 +140,7 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="#">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
   <span class="sidebar-brand-text">PylimerTools  documentation</span>
@@ -152,9 +152,9 @@
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="installation.html#manual-compilation">Manual Compilation</a></li>
+<ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#manual-compilation">Manual Compilation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="assumptions.html">Assumptions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nomenclature.html">Nomenclature</a></li>
 <li class="toctree-l1"><a class="reference internal" href="useage.html">Useage</a></li>
@@ -202,18 +202,48 @@
           </label>
         </div>
         <article role="main">
-          <section id="welcome-to-pylimertools-s-documentation">
-<h1>Welcome to PylimerTools’s documentation!<a class="headerlink" href="#welcome-to-pylimertools-s-documentation" title="Permalink to this headline">#</a></h1>
-<div class="toctree-wrapper compound">
+          <section id="installation">
+<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">#</a></h1>
+<p>You can use PyPip to install this package:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python -m pip install pylimer_tools
+</pre></div>
+</div>
+<p><strong>Note</strong>: depending on your OS and Python environment, you may require an installation of some dependencies.
+In this case, a custom compilation could be a workaroud.
+Checkout the following sections for your system.</p>
+</section>
+<section id="manual-compilation">
+<h1>Manual Compilation<a class="headerlink" href="#manual-compilation" title="Permalink to this headline">#</a></h1>
+<section id="macos-unix-systems">
+<h2>MacOS / Unix systems<a class="headerlink" href="#macos-unix-systems" title="Permalink to this headline">#</a></h2>
+<p>Please make sure to have a current version of <a class="reference external" href="https://www.git-scm.com/">git</a> installed before following the next steps.
+A complete script to install this library including all dependencies could look like this:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/GenieTim/pylimer-tools pylimer_tools
+python -m pip install ./pylimer_tools
+</pre></div>
+</div>
+<p>To update the custom installation, follow the steps below:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> pylimer_tools
+git pull
+python -m pip install .
+</pre></div>
 </div>
 </section>
-<section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">#</a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
-</ul>
+<section id="windows">
+<h2>Windows<a class="headerlink" href="#windows" title="Permalink to this headline">#</a></h2>
+<p>Please make sure to have a current version of <a class="reference external" href="https://visualstudio.microsoft.com/">Visual Studio</a> as well as <a class="reference external" href="https://www.git-scm.com/">git</a> installed before following the next steps.
+A complete PowerShell script to install this library including all dependencies could look like this:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git clone https://github.com/GenieTim/pylimer-tools pylimer_tools
+python -m pip install .<span class="se">\p</span>ylimer_tools
+</pre></div>
+</div>
+<p>To update the custom installation, follow the steps below:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> pylimer_tools
+git pull
+python -m pip install .
+</pre></div>
+</div>
+</section>
 </section>
 
         </article>
@@ -221,16 +251,26 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="installation.html">
+          <a class="next-page" href="assumptions.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Installation</div>
+                <div class="title">Assumptions</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          
+          <a class="prev-page" href="index.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Home</div>
+                
+              </div>
+            </a>
         </div>
         <div class="bottom-of-page">
           <div class="left-details">
@@ -262,8 +302,12 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Welcome to PylimerTools’s documentation!</a></li>
-<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+<li><a class="reference internal" href="#">Installation</a></li>
+<li><a class="reference internal" href="#manual-compilation">Manual Compilation</a><ul>
+<li><a class="reference internal" href="#macos-unix-systems">MacOS / Unix systems</a></li>
+<li><a class="reference internal" href="#windows">Windows</a></li>
+</ul>
+</li>
 </ul>
 
           </div>
