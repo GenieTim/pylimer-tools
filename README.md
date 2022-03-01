@@ -22,23 +22,22 @@ Use pip:
 
 **NOTE**: currently, this release's API is _unstable_ and subject to change.
 
-See the [documentation](https://genietim.github.io/pylimer-tools/index.html) for a current list of all available functions.
+See the [documentation](https://genietim.github.io/pylimer-tools) for a current list of all available functions.
 
 ### Example
 
-An example useage can be found in the [documentation](https://genietim.github.io/pylimer-tools/index.html),
+An example useage can be found in the [documentation](https://genietim.github.io/pylimer-tools),
 the [CLI application](./src/pylimer_tools/pylimer_tools.py) or in the following code snippet:
 
 ```python
 import numpy as np
 
-from pylimer_tools.entities.universum import Universum
-from pylimer_tools.io.readLammpData import readLammpData
+from pylimer_tools_cpp import UniverseSequence
 
-allData = readLammpData("some_lammps_output_file.dat")
-universe = Universum(boxSizes=[
-                      allData["Lx"], allData["Ly"], allData["Lz"]])
-universe.addAtomBondData(allData['atom_data'], allData['bond_data'])
+filePath = "some_lammps_output_file.dat"
+universeSequence = UniverseSequence()
+universeSequence.initializeFromDataSequence([filePath])
+universe = universeSequence.atIndex(0)
 print("Size: {}. Volume: {} u^3".format(
     universe.getSize(), universe.getVolume()))
 print("Mean bond length: {} u".format(
