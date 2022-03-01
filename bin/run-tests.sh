@@ -32,3 +32,5 @@ python -m coverage run -m unittest discover -v || exit 7
 # generate coverage report
 python -m coverage report --include="src/**/*.py"
 # python -m coverage html --include="pylimer_tools/**/*.py" -d ../coverage.html
+
+exit 0
