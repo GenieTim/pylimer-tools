@@ -29,10 +29,10 @@ public:
   //   igraph_copy(&this->graph, &src.graph);
   // };
   // 3. copy assignment operator
-  virtual AtomGraphParent &operator=(AtomGraphParent src) {
-    std::swap(this->graph, src.graph);
-    return *this;
-  };
+  // virtual AtomGraphParent &operator=(AtomGraphParent src) {
+  //   std::swap(this->graph, src.graph);
+  //   return *this;
+  // };
 
   /**
    * @brief Get the vertex ids connected to a specified vertex Id
@@ -114,6 +114,14 @@ public:
 
     return results;
   };
+
+  /**
+   * @brief Get the Atom Id By Idx object
+   * 
+   * @param vertexId 
+   * @return long int 
+   */
+  virtual long int getAtomIdByIdx(const int vertexId) const = 0;
 
   /**
    * @brief Get an atom by its vertex id
@@ -331,9 +339,44 @@ public:
     }
 
     std::map<std::string, std::vector<long int>> results;
-    results.insert_or_assign("bond_from", from);
-    results.insert_or_assign("bond_to", to);
-    results.insert_or_assign("bond_type", type);
+    results.insert_or_assign("edge_from", from);
+    results.insert_or_assign("edge_to", to);
+    results.insert_or_assign("edge_type", type);
+
+    return results;
+  };
+
+  /**
+   * @brief Get all bonds (edges) associated with this graph
+   *
+   * @return std::map<std::string, std::vector<long int>>
+   */
+  std::map<std::string, std::vector<long int>> getBonds() const {
+    std::map<std::string, std::vector<long int>> vertexResults =
+        this->getEdges();
+
+    std::vector<long int> newFrom;
+    std::vector<long int> newTo;
+    newFrom.reserve(this->getNrOfBonds());
+    newTo.reserve(this->getNrOfBonds());
+
+    std::vector<long int> oldFrom = vertexResults.at("edge_from");
+    assert(oldFrom.size() == this->getNrOfBonds());
+    std::vector<long int> oldTo = vertexResults.at("edge_to");
+    assert(oldTo.size() == this->getNrOfBonds());
+
+    for (size_t i = 0; i < this->getNrOfBonds(); ++i) {
+      newFrom.push_back(this->getAtomIdByIdx(oldFrom[i]));
+      newTo.push_back(this->getAtomIdByIdx(oldTo[i]));
+    }
+
+    assert(newFrom.size() == this->getNrOfBonds());
+    assert(newTo.size() == this->getNrOfBonds());
+
+    std::map<std::string, std::vector<long int>> results;
+    results.insert_or_assign("bond_from", newFrom);
+    results.insert_or_assign("bond_to", newTo);
+    results.insert_or_assign("bond_type", vertexResults.at("edge_type"));
 
     return results;
   };

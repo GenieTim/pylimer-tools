@@ -35,7 +35,7 @@ void init_pylimer_bound_readers(py::module_ &m) {
       .def(py::init<const std::string>(), py::arg("pathOfFileToRead"))
       .def("read", &DumpFileParser::read, "Read the whole file")
       .def("getLength", &DumpFileParser::getLength,
-           "Get the number of sections in the file")
+           "Get the number of sections (time-steps) in the file")
       .def("getStringValuesForAt", &DumpFileParser::getStringValuesForAt,
            "Get the values for the section `index`, the main header "
            "`headerKey` and the column (in the header) `column`.",
@@ -77,8 +77,14 @@ void init_pylimer_bound_readers(py::module_ &m) {
       .def("getBondFrom", &DataFileParser::getBondFrom)
       .def("getBondTo", &DataFileParser::getBondTo)
       .def("getLx", &DataFileParser::getLx)
+      .def("getLowX", &DataFileParser::getLowX)
+      .def("getHighX", &DataFileParser::getHighX)
       .def("getLy", &DataFileParser::getLy)
-      .def("getLz", &DataFileParser::getLz);
+      .def("getLowY", &DataFileParser::getLowY)
+      .def("getHighY", &DataFileParser::getHighY)
+      .def("getLz", &DataFileParser::getLz)
+      .def("getLowZ", &DataFileParser::getLowZ)
+      .def("getHighZ", &DataFileParser::getHighZ);
 }
 
 #endif

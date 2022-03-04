@@ -12,7 +12,7 @@ extern "C" {
 
 namespace pe = pylimer_tools::entities;
 
-void outputLoops(std::map<int, std::vector<std::vector<pe::Atom>>>  loops) {
+void outputLoops(std::map<int, std::vector<std::vector<pe::Atom>>> loops) {
   for (const auto &myPair : loops) {
     std::cout << myPair.first << std::endl;
     for (const std::vector<pe::Atom> &as : myPair.second) {
@@ -90,23 +90,23 @@ TEST_CASE("Universe can be used", "[entity][Universe]") {
                       {{1, 1, 1, 1, 1, 1, 11}});
     SECTION("get bonds returns") {
       auto edges = universe.getEdges();
-      REQUIRE(edges["bond_from"][0] == 1 - 1);
-      REQUIRE(edges["bond_to"][0] == 2 - 1);
+      REQUIRE(edges["edge_from"][0] == 1 - 1);
+      REQUIRE(edges["edge_to"][0] == 2 - 1);
       auto bonds = universe.getBonds();
       REQUIRE(bonds.at("bond_from")[0] == 1);
       REQUIRE(bonds.at("bond_to")[0] == 2);
       REQUIRE(bonds["bond_from"].size() == bonds["bond_to"].size());
-      REQUIRE(bonds["bond_from"].size() == edges["bond_to"].size());
-      REQUIRE(bonds["bond_from"].size() == edges["bond_from"].size());
+      REQUIRE(bonds["bond_from"].size() == edges["edge_to"].size());
+      REQUIRE(bonds["bond_from"].size() == edges["edge_from"].size());
       REQUIRE(bonds["bond_from"].size() == 7);
       REQUIRE(bonds["bond_from"][3] ==
-              universe.getAtomIdByIdx(edges["bond_from"][3]));
+              universe.getAtomIdByIdx(edges["edge_from"][3]));
       REQUIRE(bonds["bond_to"][3] ==
-              universe.getAtomIdByIdx(edges["bond_to"][3]));
+              universe.getAtomIdByIdx(edges["edge_to"][3]));
       REQUIRE(universe.getIdxByAtomId(bonds["bond_from"][2]) ==
-              edges["bond_from"][2]);
+              edges["edge_from"][2]);
       REQUIRE(universe.getIdxByAtomId(bonds["bond_to"][2]) ==
-              edges["bond_to"][2]);
+              edges["edge_to"][2]);
       // REQUIRE(bonds["bond_type"][5] == 1);
       // REQUIRE(bonds["bond_type"][6] == 11);
       // get atoms with type returns
@@ -173,13 +173,15 @@ TEST_CASE("Universe can be used", "[entity][Universe]") {
       REQUIRE(reducedUniverse.getNrOfAtoms() == 3);
       REQUIRE(reducedUniverse.getAtomsWithType(2).size() == 3);
 
-      auto bonds = reducedUniverse.getEdges();
+      auto edges = reducedUniverse.getEdges();
 
       REQUIRE(reducedUniverse.getNrOfBonds() == 2);
-      REQUIRE(bonds["bond_from"][0] == 1);
-      REQUIRE(bonds["bond_to"][0] == 2);
-      REQUIRE(bonds["bond_from"][1] == 1);
-      REQUIRE(bonds["bond_to"][1] == 2);
+      REQUIRE(edges.at("edge_from").size() == 2);
+      REQUIRE(edges.at("edge_to").size() == 2);
+      REQUIRE(edges.at("edge_from")[0] == 1);
+      REQUIRE(edges.at("edge_to")[0] == 2);
+      REQUIRE(edges.at("edge_from")[1] == 1);
+      REQUIRE(edges.at("edge_to")[1] == 2);
 
       auto atom = reducedUniverse.getAtom(4);
       REQUIRE(atom.getX() == 1.01);

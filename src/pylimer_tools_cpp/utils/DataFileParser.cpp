@@ -183,13 +183,16 @@ void DataFileParser::readNs(const std::string line) {
     this->nAngleTypes = (this->parseTypesInLine<int>(line, 1))[0];
   } else if (contains(line, "xlo xhi")) {
     std::vector<double> parsedL = this->parseTypesInLine<double>(line, 2);
-    this->Lx = parsedL[1] - parsedL[0];
+    this->xHi = parsedL[1];
+    this->xLo = parsedL[0];
   } else if (contains(line, "ylo yhi")) {
     std::vector<double> parsedL = this->parseTypesInLine<double>(line, 2);
-    this->Ly = parsedL[1] - parsedL[0];
+    this->yHi = parsedL[1];
+    this->yLo = parsedL[0];
   } else if (contains(line, "zlo zhi")) {
     std::vector<double> parsedL = this->parseTypesInLine<double>(line, 2);
-    this->Lz = parsedL[1] - parsedL[0];
+    this->zHi = parsedL[1];
+    this->zLo = parsedL[0];
   }
 }
 

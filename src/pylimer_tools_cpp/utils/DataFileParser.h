@@ -46,9 +46,15 @@ public:
   std::vector<long int> getAngleTo() { return this->angleTo; }
 
   // get box info
-  double getLx() { return this->Lx; }
-  double getLy() { return this->Ly; }
-  double getLz() { return this->Lz; }
+  double getLowX() { return this->xLo; }
+  double getHighX() { return this->xHi; }
+  double getLx() { return this->xHi - this->xLo; }
+  double getLowY() { return this->yLo; }
+  double getHighY() { return this->yHi; }
+  double getLy() { return this->yHi - this->yLo; }
+  double getLowZ() { return this->zLo; }
+  double getHighZ() { return this->zHi; }
+  double getLz() { return this->zHi - this->zLo; }
 
 private:
   void readNs(const std::string line);
@@ -82,9 +88,12 @@ private:
   int nAngleTypes;
 
   // box sizes
-  double Lx;
-  double Ly;
-  double Lz;
+  double xLo;
+  double xHi;
+  double yLo;
+  double yHi;
+  double zLo;
+  double zHi;
 
   // actual dimensional values
   std::map<int, double> masses;
