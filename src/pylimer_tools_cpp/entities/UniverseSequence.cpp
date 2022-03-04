@@ -240,8 +240,9 @@ Universe UniverseSequence::readDataFile(const std::string filePath) {
   pylimer_tools::utils::DataFileParser fileParser =
       pylimer_tools::utils::DataFileParser();
   fileParser.read(filePath);
-  Universe universe =
-      Universe(fileParser.getLx(), fileParser.getLy(), fileParser.getLz());
+  Universe universe = Universe(
+      Box(fileParser.getLowX(), fileParser.getHighX(), fileParser.getLowY(),
+          fileParser.getHighY(), fileParser.getLowZ(), fileParser.getHighZ()));
   universe.addAtoms(fileParser.getNrOfAtoms(), fileParser.getAtomIds(),
                     fileParser.getAtomTypes(), fileParser.getAtomX(),
                     fileParser.getAtomY(), fileParser.getAtomZ(),

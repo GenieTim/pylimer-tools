@@ -166,6 +166,17 @@ void init_pylimer_bound_entities(py::module_ &m) {
       .def("getAtomsConnectedTo", &Molecule::getAtomsConnectedTo, R"pbdoc(
             Get the atoms connected to a specified vertex id.
             )pbdoc")
+      .def("getEdges", &Molecule::getEdges, R"pbdoc(
+            Get all bonds. Returns a dict with three properties: 'edge_from', 'edge_to' and 'edge_type'.
+            The order is not necessarily related to any structural property.
+            
+               **NOTE**: the integer values returned refer to the vertex ids, not the atom ids.
+               Use :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomIdByIdx` to translate them to atom ids, or 
+               :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getBonds` to have that done for you.
+            )pbdoc")
+      .def("getBonds", &Molecule::getBonds, R"pbdoc(
+            Get all bonds. Returns a dict with three properties: 'bond_from', 'bond_to' and 'bond_type'.
+            )pbdoc")
       .def(
           "getAtomTypes", &Molecule::getAtomTypes,
           "Query all types (each one for each atom) ordered by atom vertex id.")
@@ -274,7 +285,9 @@ void init_pylimer_bound_entities(py::module_ &m) {
            py::arg("box"))
       // getters
       .def("getClusters", &Universe::getClusters, R"pbdoc(
-            Get the otherwise unconnected components of the universe.
+            Get the components of the universe that are not connected to each other.
+            Returns a list of :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule`s.
+            Unconnected, free atoms/beads become their own :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule`.
             )pbdoc")
       .def("getMolecules", &Universe::getMolecules, R"pbdoc(
             Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms.
@@ -288,7 +301,7 @@ void init_pylimer_bound_entities(py::module_ &m) {
             Decompose the Universe into loops.
             The primary index specifies the degree of the loop.
 
-               **NOTE**: there are exponentially many paths between two crosslinkers of a network,
+               **NOTE**: there are exponentially many paths between two cross-linkers of a network,
                and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
                You can use the maxLength parameter to restrict the algorithm to only search for loops up to a certain length.
                Use a negative value to find all loops and paths.
@@ -297,10 +310,12 @@ void init_pylimer_bound_entities(py::module_ &m) {
            py::arg("skipSelfLoops") = false)
       .def("getChainsWithCrosslinker", &Universe::getChainsWithCrosslinker,
            R"pbdoc(
-            Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms, without omitting the crosslinkers.
+            Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms, without omitting the cross-linkers.
             In turn, e.g. for a tetrafunctional cross-linker, it will be 4 times in the resulting molecules.
             
-               **NOTE**: Crosslinkers without bonds to non-crosslinkers are not returned.)pbdoc",
+               **NOTE**: Cross-linkers without bonds to non-cross-linkers are not returned 
+               (i.e., cross-linker-cross-linker bonds, or single cross-linkers, are not counted as strands).
+           )pbdoc",
            py::arg("crosslinkerType"))
       .def("getNetworkOfCrosslinker", &Universe::getNetworkOfCrosslinker,
            R"pbdoc(
@@ -338,13 +353,16 @@ void init_pylimer_bound_entities(py::module_ &m) {
            "specified id.",
            py::arg("atomId"))
       .def("getEdges", &Universe::getEdges, R"pbdoc(
-            Get all bonds. Returns a dict with three properties: 'bond_from', 'bond_to' and 'bond_type'.
+            Get all edges. Returns a dict with three properties: 'edge_from', 'edge_to' and 'edge_type'.
+            The order is not necessarily related to any structural characteristic.
             
                **NOTE**: the integer values returned refer to the vertex ids, not the atom ids.
-               Use :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getAtomIdByIdx` to translate them to atom ids.
+               Use :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getAtomIdByIdx` to translate them to atom ids, or
+               :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getBonds` to have that done for you.
             )pbdoc")
       .def("getBonds", &Universe::getBonds, R"pbdoc(
             Get all bonds. Returns a dict with three properties: 'bond_from', 'bond_to' and 'bond_type'.
+            The order is not necessarily related to any structural characteristic.
             )pbdoc")
       .def("getAngles", &Universe::getAngles, R"pbdoc(
            Get all angles added to this network.
@@ -393,9 +411,9 @@ void init_pylimer_bound_entities(py::module_ &m) {
            "network.")
       .def("hasInfiniteStrand", &Universe::hasInfiniteStrand,
            R"pbdoc(
-           Checks whether there is a strand (with crosslinker) in the universe that loops through periodic images without coming back.
+           Checks whether there is a strand (with cross-linker) in the universe that loops through periodic images without coming back.
            
-               **NOTE**: there are exponentially many paths between two crosslinkers of a network,
+               **NOTE**: there are exponentially many paths between two cross-linkers of a network,
                and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
            )pbdoc")
       .def("determineFunctionalityPerType",

@@ -19,11 +19,10 @@ extern "C" {
 
 namespace pylimer_tools {
 namespace entities {
-
-Universe::Universe(const double Lx, const double Ly, const double Lz) {
+Universe::Universe(Box box) {
   /* turn on attribute handling: TODO: move to some main() function  */
   igraph_set_attribute_table(&igraph_cattribute_table);
-  box = Box(Lx, Ly, Lz);
+  this->box = box;
 
   // igraph_vector_t gtypes, vtypes, etypes;
   // igraph_strvector_t gnames, vnames, enames;
@@ -52,6 +51,9 @@ Universe::Universe(const double Lx, const double Ly, const double Lz) {
   // igraph_strvector_destroy(&vnames);
   // igraph_strvector_destroy(&enames);
 }
+
+Universe::Universe(const double Lx, const double Ly, const double Lz)
+    : Universe(Box(Lx, Ly, Lz)) {}
 
 // 1. destructor (to destroy the graph)
 Universe::~Universe() {
@@ -1103,40 +1105,6 @@ size_t Universe::getNrOfAngles() const {
   assert(this->angleFrom.size() == this->angleVia.size());
   return this->angleFrom.size();
 }
-
-/**
- * @brief Get all bonds (edges) associated with this universe (graph)
- *
- * @return std::map<std::string, std::vector<long int>>
- */
-std::map<std::string, std::vector<long int>> Universe::getBonds() const {
-  std::map<std::string, std::vector<long int>> vertexResults = this->getEdges();
-
-  std::vector<long int> newFrom;
-  std::vector<long int> newTo;
-  newFrom.reserve(this->getNrOfBonds());
-  newTo.reserve(this->getNrOfBonds());
-
-  std::vector<long int> oldFrom = vertexResults.at("bond_from");
-  assert(oldFrom.size() == this->getNrOfBonds());
-  std::vector<long int> oldTo = vertexResults.at("bond_to");
-  assert(oldTo.size() == this->getNrOfBonds());
-
-  for (size_t i = 0; i < this->getNrOfBonds(); ++i) {
-    newFrom.push_back(this->getAtomIdByIdx(oldFrom[i]));
-    newTo.push_back(this->getAtomIdByIdx(oldTo[i]));
-  }
-
-  assert(newFrom.size() == this->getNrOfBonds());
-  assert(newTo.size() == this->getNrOfBonds());
-
-  std::map<std::string, std::vector<long int>> results;
-  results.insert_or_assign("bond_from", newFrom);
-  results.insert_or_assign("bond_to", newTo);
-  results.insert_or_assign("bond_type", vertexResults.at("bond_type"));
-
-  return results;
-};
 
 /**
  * @brief Find the vertex id where the vertex has a certain property
