@@ -44,33 +44,38 @@ void init_pylimer_bound_entities(py::module_ &m) {
       .def("getLx", &Box::getLx, R"pbdoc(
             Get the lenght of the box in x direction.
             )pbdoc")
+      .def("getLowX", &Box::getLowX)
+      .def("getHighX", &Box::getHighX)
       .def("getLy", &Box::getLy, R"pbdoc(
             Get the lenght of the box in y direction.
             )pbdoc")
+      .def("getLowY", &Box::getLowY)
+      .def("getHighY", &Box::getHighY)
       .def("getLz", &Box::getLz, R"pbdoc(
             Get the lenght of the box in z direction.
             )pbdoc")
-      .def("getLowX", &Box::getLowX)
-      .def("getLowY", &Box::getLowY)
       .def("getLowZ", &Box::getLowZ)
+      .def("getHighZ", &Box::getHighZ)
       .def(py::pickle(
-          [](const Box &b) { // __getstate__
-            /* Return a tuple that fully encodes the state of the object */
-            return py::make_tuple(b.getLowX(), b.getLowY(), b.getLowZ(),
-                                  b.getHighX(), b.getHighY(), b.getHighZ());
-          },
-          [](py::tuple t) { // __setstate__
-            if (t.size() != 6) {
-              throw std::runtime_error("Invalid state!.");
-            }
+               [](const Box &b) { // __getstate__
+                 /* Return a tuple that fully encodes the state of the object */
+                 return py::make_tuple(b.getLowX(), b.getLowY(), b.getLowZ(),
+                                       b.getHighX(), b.getHighY(),
+                                       b.getHighZ());
+               },
+               [](py::tuple t) { // __setstate__
+                 if (t.size() != 6) {
+                   throw std::runtime_error("Invalid state!.");
+                 }
 
-            /* Create a new C++ instance */
-            Box b = Box(t[0].cast<double>(), t[1].cast<double>(),
-                        t[2].cast<double>(), t[3].cast<double>(),
-                        t[4].cast<double>(), t[5].cast<double>());
+                 /* Create a new C++ instance */
+                 Box b = Box(t[0].cast<double>(), t[1].cast<double>(),
+                             t[2].cast<double>(), t[3].cast<double>(),
+                             t[4].cast<double>(), t[5].cast<double>());
 
-            return b;
-          }));
+                 return b;
+               }),
+           "Provides support for pickling.");
 
   py::class_<Atom>(m, "Atom")
       .def(py::init<const long int, const int, const double, const double,
@@ -115,24 +120,26 @@ void init_pylimer_bound_entities(py::module_ &m) {
            "Get the box image that the atom is in in z direction (also known "
            "as `iz` or `nz`).")
       .def(py::pickle(
-          [](const Atom &b) { // __getstate__
-            /* Return a tuple that fully encodes the state of the object */
-            return py::make_tuple(b.getId(), b.getType(), b.getX(), b.getY(),
-                                  b.getZ(), b.getNX(), b.getNY(), b.getNZ());
-          },
-          [](py::tuple t) { // __setstate__
-            if (t.size() != 8) {
-              throw std::runtime_error("Invalid state!.");
-            }
+               [](const Atom &b) { // __getstate__
+                 /* Return a tuple that fully encodes the state of the object */
+                 return py::make_tuple(b.getId(), b.getType(), b.getX(),
+                                       b.getY(), b.getZ(), b.getNX(), b.getNY(),
+                                       b.getNZ());
+               },
+               [](py::tuple t) { // __setstate__
+                 if (t.size() != 8) {
+                   throw std::runtime_error("Invalid state!.");
+                 }
 
-            /* Create a new C++ instance */
-            Atom a = Atom(t[0].cast<long int>(), t[1].cast<int>(),
-                          t[2].cast<double>(), t[3].cast<double>(),
-                          t[4].cast<double>(), t[5].cast<int>(),
-                          t[6].cast<int>(), t[7].cast<int>());
+                 /* Create a new C++ instance */
+                 Atom a = Atom(t[0].cast<long int>(), t[1].cast<int>(),
+                               t[2].cast<double>(), t[3].cast<double>(),
+                               t[4].cast<double>(), t[5].cast<int>(),
+                               t[6].cast<int>(), t[7].cast<int>());
 
-            return a;
-          }));
+                 return a;
+               }),
+           "Provides support for pickling");
 
   py::class_<MoleculeIterator>(m, "MoleculeIterator")
       .def("__iter__",
@@ -143,20 +150,30 @@ void init_pylimer_bound_entities(py::module_ &m) {
       .value("UNDEFINED", MoleculeType::UNDEFINED,
              "This value indicates that either the property was not set or not "
              "discovered.")
-      .value("NETWORK_STRAND", MoleculeType::NETWORK_STRAND)
-      .value("PRIMARY_LOOP", MoleculeType::PRIMARY_LOOP)
-      .value("DANGLING_CHAIN", MoleculeType::DANGLING_CHAIN)
-      .value("FREE_CHAIN", MoleculeType::FREE_CHAIN)
+      .value("NETWORK_STRAND", MoleculeType::NETWORK_STRAND, R"pbdoc(
+           A network strand is a strand in a network.
+      )pbdoc")
+      .value("PRIMARY_LOOP", MoleculeType::PRIMARY_LOOP, R"pbdoc(
+           A primary loop is a network strand looping from and to the same cross-linker.
+      )pbdoc")
+      .value("DANGLING_CHAIN", MoleculeType::DANGLING_CHAIN, R"pbdoc(
+           A dangling chain is a network strand where only one end is attached to a cross-linker.
+      )pbdoc")
+      .value("FREE_CHAIN", MoleculeType::FREE_CHAIN, R"pbdoc(
+           A free chain is a strand not connected to any cross-linker.
+      )pbdoc")
       .export_values();
 
   py::class_<Molecule>(m, "Molecule")
       .def(py::init<Box *, igraph_t *, MoleculeType, std::map<int, double>>())
       // getters
-      .def("getLength", &Molecule::getLength,
-           "Counts and returns the number of atoms associated with this "
-           "molecule.")
-      .def("getType", &Molecule::getType,
-           "Get the type of this molecule (see 'MoleculeType' enum).")
+      .def("getLength", &Molecule::getLength, , R"pbdoc(
+           Counts and returns the number of atoms associated with this 
+           molecule.
+      )pbdoc")
+      .def("getType", &Molecule::getType, R"pbdoc(
+           Get the type of this molecule (see :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType` enum).
+      )pbdoc")
       .def("getAtomsWithType", &Molecule::getAtomsWithType, R"pbdoc(
             Get the atoms with the specified type.
             )pbdoc")
