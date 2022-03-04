@@ -103,7 +103,7 @@ def calculateWeightFractionOfBackbone(network: Universe, junctionType, strandLen
     return Phi_el
 
 
-def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.9, absTol: float = None) -> float:
+def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.75, absTol: float = None) -> float:
     """
     Compute the weight fraction of soluble material by counting.
 
@@ -112,7 +112,6 @@ def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.9
       - relTol: the fraction of the maximum weight that counts as soluble. Ignored if absTol is specified
       - absTol: the weight from which on a component is not soluble anymore
 
-
     Returns:
       - $W_{sol}$ (float): the weight fraction of soluble material as counted.
 
@@ -120,12 +119,19 @@ def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.9
     fractions = network.getClusters()
     weights = np.array([f.computeWeight() for f in fractions])
     totalWeight = weights.sum()
-    solubleWeight = weights[weights <
-                            absTol if absTol is not None else weights < relTol*weights.max()]
-    return np.sum(solubleWeight)/totalWeight
+    solubleWeight = 0
+    for w in weights:
+        if (absTol is not None):
+            if (w < absTol):
+                solubleWeight += w
+        else:
+            if (w < relTol*weights.max()):
+                solubleWeight += w
+
+    return solubleWeight/totalWeight
 
 
-def computeWeightFractionOfSolubleMaterial(network: Universe = None, junctionType=2, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None, r: float = None, p: float = None) -> float:
+def computeWeightFractionOfSolubleMaterial(network: Universe = None, junctionType: int=2, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None, r: float = None, p: float = None) -> float:
     """
     Compute the weight fraction of soluble material by MMT.
 
@@ -137,9 +143,10 @@ def computeWeightFractionOfSolubleMaterial(network: Universe = None, junctionTyp
       - network: the poylmer network to do the computation for
       - junctionType: the type of the junctions/crosslinkers to select them in the network
       - weightFractions (dict): a dictionary with key: type, and value: weight fraction of type. Pass if you want to omit the network.
-      - strandLength (int): the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
+      - strandLength (int): the length of the network strands (in nr. of beads). 
+          See: :func:`~pylimer_tools.calc.doMMTAnalysis.computeStoichiometricInbalance`.
       - functionalityPerType (dict): a dictionary with key: type, and value: functionality of this atom type. 
-          See: #computeExtentOfReaction
+          See: :func:`~pylimer_tools.calc.doMMTAnalysis.computeExtentOfReaction`.
 
     Returns:
       - $W_{sol}$ (float): the weight fraction of soluble material according to MMT.
@@ -225,7 +232,7 @@ def computeMMsProbabilities(r, p, f):
         alphaSol = optimize.root_scalar(
             funToRootForAlpha, bracket=(0, 1), method='brentq')
         alpha = alphaSol.root
-        beta = ((r*p*alpha**(f-1)) + 1 - r*p) # TODO: reconsider
+        beta = ((r*p*alpha**(f-1)) + 1 - r*p)  # TODO: reconsider
     return alpha, beta
 
 
@@ -266,8 +273,8 @@ def computeStoichiometricInbalance(network: Universe, junctionType, strandLength
     ( nr. of bonds formable of crosslinker / nr. of formable bonds of precursor )
 
     NOTE: 
-      - if your system has a non-integer number of possible bonds (e.g. one site unbonded),
-          this will not be rounded/respected in any way. 
+      if your system has a non-integer number of possible bonds (e.g. one site unbonded),
+      this will not be rounded/respected in any way. 
 
     Arguments:
       - network: the poylmer network to do the computation for

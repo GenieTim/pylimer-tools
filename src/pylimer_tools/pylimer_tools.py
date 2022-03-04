@@ -26,10 +26,10 @@ def cli(files):
             universe.getNrOfAtoms(), universe.getVolume()))
         molecules = universe.getMolecules(2)
         bondLengths = [np.mean(m.computeBondLengths()) for m in molecules]
-        nonNoneBondLenghts = [
+        nonNoneBondLengths = [
             l for l in bondLengths if l is not None and l > 0]
         click.echo("Mean bond length: {} u, (min: {}, max: {}, median: {}) u".format(
-            np.mean(nonNoneBondLenghts), np.min(nonNoneBondLenghts), np.max(nonNoneBondLenghts), np.median(nonNoneBondLenghts)))
+            np.mean(nonNoneBondLengths), np.min(nonNoneBondLengths), np.max(nonNoneBondLengths), np.median(nonNoneBondLengths)))
         endToEndDistances = [m.computeEndToEndDistance() for m in molecules]
         click.echo("Mean end to end distance: {} u".format(
             np.mean([e for e in endToEndDistances if e is not None and e > 0])))

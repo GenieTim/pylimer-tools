@@ -33,7 +33,8 @@ void init_pylimer_bound_entities(py::module_ &m) {
   py::class_<Box>(m, "Box", R"pbdoc(
         The box that the simulation is run in.
 
-        *NOTE*: currently, only rectangular boxes are supported.
+        NOTE: 
+          currently, only rectangular boxes are supported.
         )pbdoc")
       .def(py::init<const double, const double, const double>())
       .def("getVolume", &Box::getVolume, R"pbdoc(
@@ -42,17 +43,17 @@ void init_pylimer_bound_entities(py::module_ &m) {
             :math:`V = L_x \cdot L_y \cdot L_z`
             )pbdoc")
       .def("getLx", &Box::getLx, R"pbdoc(
-            Get the lenght of the box in x direction.
+            Get the length of the box in x direction.
             )pbdoc")
       .def("getLowX", &Box::getLowX)
       .def("getHighX", &Box::getHighX)
       .def("getLy", &Box::getLy, R"pbdoc(
-            Get the lenght of the box in y direction.
+            Get the length of the box in y direction.
             )pbdoc")
       .def("getLowY", &Box::getLowY)
       .def("getHighY", &Box::getHighY)
       .def("getLz", &Box::getLz, R"pbdoc(
-            Get the lenght of the box in z direction.
+            Get the length of the box in z direction.
             )pbdoc")
       .def("getLowZ", &Box::getLowZ)
       .def("getHighZ", &Box::getHighZ)
@@ -77,7 +78,9 @@ void init_pylimer_bound_entities(py::module_ &m) {
                }),
            "Provides support for pickling.");
 
-  py::class_<Atom>(m, "Atom")
+  py::class_<Atom>(m, "Atom", R"pbdoc(
+       A single bead or atom
+  )pbdoc")
       .def(py::init<const long int, const int, const double, const double,
                     const double, const int, const int, const int>(),
            "Construct this atom", py::arg("id"), py::arg("type"), py::arg("x"),
@@ -141,7 +144,9 @@ void init_pylimer_bound_entities(py::module_ &m) {
                }),
            "Provides support for pickling");
 
-  py::class_<MoleculeIterator>(m, "MoleculeIterator")
+  py::class_<MoleculeIterator>(m, "MoleculeIterator", R"pbdoc(
+       An iterator to iterate throught the atoms in :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule`.
+  )pbdoc")
       .def("__iter__",
            [](MoleculeIterator &it) -> MoleculeIterator & { return it; })
       .def("__next__", &MoleculeIterator::next);
@@ -164,7 +169,9 @@ void init_pylimer_bound_entities(py::module_ &m) {
       )pbdoc")
       .export_values();
 
-  py::class_<Molecule>(m, "Molecule")
+  py::class_<Molecule>(m, "Molecule", R"pbdoc(
+       An (ideally) connected series of atoms/beads.
+  )pbdoc")
       .def(py::init<Box *, igraph_t *, MoleculeType, std::map<int, double>>())
       // getters
       .def("getLength", &Molecule::getLength, R"pbdoc(
@@ -187,7 +194,8 @@ void init_pylimer_bound_entities(py::module_ &m) {
             Get all bonds. Returns a dict with three properties: 'edge_from', 'edge_to' and 'edge_type'.
             The order is not necessarily related to any structural property.
             
-               **NOTE**: the integer values returned refer to the vertex ids, not the atom ids.
+            NOTE:
+               The integer values returned refer to the vertex ids, not the atom ids.
                Use :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomIdByIdx` to translate them to atom ids, or 
                :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getBonds` to have that done for you.
             )pbdoc")
@@ -229,13 +237,14 @@ void init_pylimer_bound_entities(py::module_ &m) {
            R"pbdoc(
             Computes the radius of gyration, :math:`R_g^2` of this molecule.
 
-               **NOTE**: the mass of the atoms is not yet taken into account.
+            NOTE: 
+               the mass of the atoms is not yet taken into account.
             )pbdoc")
       .def("computeEndToEndDistance", &Molecule::computeEndToEndDistance,
            R"pbdoc(
             Compute the end-to-end distance (:math:`R_{ee}`) of this molecule. 
 
-               **Caution**:
+            CAUTION:
                Returns 0.0 if the molecule does not have two or more atoms.
                Returns -1.0 if not exactly 2 ends were found.
             )pbdoc")
@@ -246,12 +255,19 @@ void init_pylimer_bound_entities(py::module_ &m) {
                throw py::index_error();
              }
              return molecule[index];
-           })
-      .def("__len__", &Molecule::getLength)
+           }, R"pbdoc(
+       Access an atom by its vertex index.
+  )pbdoc")
+      .def("__len__", &Molecule::getLength, R"pbdoc(
+       Get the number of atoms in this molecule.
+  )pbdoc")
       .def("__iter__",
            [](py::object mol) {
              return MoleculeIterator(mol.cast<const Molecule &>(), mol);
-           })
+           }, R"pbdoc(
+       Iterate through the atoms in this molecule.
+       No specific order is guaranteed.
+  )pbdoc")
       // .def(py::pickle(
       //      [](const Molecule &molecule) { // __getstate__
       //        /* Return a tuple that fully encodes the state of the object */
@@ -318,7 +334,8 @@ void init_pylimer_bound_entities(py::module_ &m) {
             Decompose the Universe into loops.
             The primary index specifies the degree of the loop.
 
-               **NOTE**: there are exponentially many paths between two cross-linkers of a network,
+            NOTE:
+               There are exponentially many paths between two cross-linkers of a network,
                and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
                You can use the maxLength parameter to restrict the algorithm to only search for loops up to a certain length.
                Use a negative value to find all loops and paths.
@@ -330,7 +347,8 @@ void init_pylimer_bound_entities(py::module_ &m) {
             Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms, without omitting the cross-linkers.
             In turn, e.g. for a tetrafunctional cross-linker, it will be 4 times in the resulting molecules.
             
-               **NOTE**: Cross-linkers without bonds to non-cross-linkers are not returned 
+            NOTE:
+               Cross-linkers without bonds to non-cross-linkers are not returned 
                (i.e., cross-linker-cross-linker bonds, or single cross-linkers, are not counted as strands).
            )pbdoc",
            py::arg("crosslinkerType"))
@@ -373,7 +391,8 @@ void init_pylimer_bound_entities(py::module_ &m) {
             Get all edges. Returns a dict with three properties: 'edge_from', 'edge_to' and 'edge_type'.
             The order is not necessarily related to any structural characteristic.
             
-               **NOTE**: the integer values returned refer to the vertex ids, not the atom ids.
+            NOTE:
+               The integer values returned refer to the vertex ids, not the atom ids.
                Use :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getAtomIdByIdx` to translate them to atom ids, or
                :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getBonds` to have that done for you.
             )pbdoc")
@@ -386,7 +405,8 @@ void init_pylimer_bound_entities(py::module_ &m) {
 
            Returns a dict with three properties: 'angle_from', 'angle_via' and 'angle_to'.
 
-               **NOTE**: the integer values returned refer to the the atom ids, not the vertex ids.
+            NOTE:
+               The integer values returned refer to the the atom ids, not the vertex ids.
                Use :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getIdxByAtomId` to translate them to vertex ids.
            )pbdoc")
       .def("getBox", &Universe::getBox, R"pbdoc(
@@ -430,7 +450,8 @@ void init_pylimer_bound_entities(py::module_ &m) {
            R"pbdoc(
            Checks whether there is a strand (with cross-linker) in the universe that loops through periodic images without coming back.
            
-               **NOTE**: there are exponentially many paths between two cross-linkers of a network,
+            NOTE:
+               There are exponentially many paths between two cross-linkers of a network,
                and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
            )pbdoc")
       .def("determineFunctionalityPerType",
@@ -477,7 +498,7 @@ void init_pylimer_bound_entities(py::module_ &m) {
 
   py::class_<UniverseSequence>(m, "UniverseSequence", R"pbdoc(
      This class represents a sequence of Universes, with the Universe's data
-     files only being read on request. Dump files are read at once in order
+     only being read on request. Dump files are read at once in order
      to know how many timesteps/universes are available in total 
      (but the universes' data is not read on first look through the file).
      This, while it can lead to two (or more) reads of the whole file, 
@@ -491,7 +512,8 @@ void init_pylimer_bound_entities(py::module_ &m) {
            R"pbdoc(
           Reset and initialize the Universes from a Lammps :code:`dump` output. 
         
-               **NOTE**: If you have not output the id of the atoms in the dump file, they will be assigned sequentially. 
+          NOTE:
+               If you have not output the id of the atoms in the dump file, they will be assigned sequentially. 
                If you have not output the type of the atoms in the dump file, they will be set to -1 if they cannot be infered from the data file.
         )pbdoc")
       .def("initializeFromDataSequence",
@@ -544,7 +566,9 @@ void init_pylimer_bound_entities(py::module_ &m) {
           },
           R"pbdoc(
            Lazily (memory-efficiently) iterate through all the universes in this sequence.
-           This is the standard Python iteration way. Example:
+           This is the standard Python iteration way. 
+           
+           Example:
 
            .. code::
            
@@ -553,9 +577,10 @@ void init_pylimer_bound_entities(py::module_ &m) {
                     pass
            
 
-           **Note**: this iterator is supposed to be memory-efficient. Therefore, no cache is kept;
-           iterating twice will lead to the file(s) being read twice 
-           (plus, for dump files, a third time initially to determine the number of universes in the file).
+           Note: 
+               this iterator is supposed to be memory-efficient. Therefore, no cache is kept;
+               iterating twice will lead to the file(s) being read twice 
+               (plus, for dump files, a third time initially to determine the number of universes in the file).
       )pbdoc");
 }
 

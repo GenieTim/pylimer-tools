@@ -17,7 +17,6 @@ PYBIND11_MODULE(pylimer_tools_cpp, m) {
 
     A collection of utility python functions for handling LAMMPS output and polymers in Python.
 
-    .. currentmodule:: pylimer_tools_cpp
     .. autosummary::
         :toctree: _generate
 

@@ -31,7 +31,9 @@ using namespace pylimer_tools::utils;
 
 void init_pylimer_bound_readers(py::module_ &m) {
 
-  py::class_<DumpFileParser>(m, "DumpFileReader")
+  py::class_<DumpFileParser>(m, "DumpFileReader", R"pbdoc(
+       A reader for LAMMPS's `dump` files.
+  )pbdoc")
       .def(py::init<const std::string>(), py::arg("pathOfFileToRead"))
       .def("read", &DumpFileParser::read, "Read the whole file")
       .def("getLength", &DumpFileParser::getLength,
@@ -56,7 +58,9 @@ void init_pylimer_bound_readers(py::module_ &m) {
            py::arg("headerKey"), py::arg("dirPraefix") = "",
            py::arg("dirSuffix") = "");
 
-  py::class_<DataFileParser>(m, "DataFileReader")
+  py::class_<DataFileParser>(m, "DataFileReader", R"pbdoc(
+       A reader for LAMMPS's `write_data` files.
+  )pbdoc")
       .def(py::init<>())
       .def("read", &DataFileParser::read, py::arg("pathOfFileToRead"))
       .def("getNrOfAtoms", &DataFileParser::getNrOfAtoms)

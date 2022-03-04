@@ -12,7 +12,9 @@ using namespace pylimer_tools::utils;
 
 void init_pylimer_bound_generators(py::module_ &m) {
 
-  py::class_<MCUniverseGenerator>(m, "MCUniverseGenerator")
+  py::class_<MCUniverseGenerator>(m, "MCUniverseGenerator", R"pbdoc(
+       A :obj:`pylimer_tools_cpp.pylimer_tools_cpp.Universe` generator using a Monte-Carlo procedure.
+  )pbdoc")
       .def(py::init<const double, const double, const double>(), py::arg("Lx"),
            py::arg("Ly"), py::arg("Lz"))
       .def("setSeed", &MCUniverseGenerator::setSeed,
