@@ -167,7 +167,7 @@ void init_pylimer_bound_entities(py::module_ &m) {
   py::class_<Molecule>(m, "Molecule")
       .def(py::init<Box *, igraph_t *, MoleculeType, std::map<int, double>>())
       // getters
-      .def("getLength", &Molecule::getLength, , R"pbdoc(
+      .def("getLength", &Molecule::getLength, R"pbdoc(
            Counts and returns the number of atoms associated with this 
            molecule.
       )pbdoc")
