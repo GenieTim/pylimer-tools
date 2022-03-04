@@ -4,7 +4,7 @@ Readers & Writers
 Readers
 -------
 
-pylimer_tools provides an interface to write LAMMPS data and dump files.
+pylimer_tools provides an interface to read LAMMPS data and dump files.
 
 
 Writers
@@ -25,6 +25,7 @@ set in such a way that a `fix bond/swap` would not change the distribution of ch
 
   from pylimer_tools_cpp import Universe, UniverseSequence, DataFileWriter
 
+  # TODO: change the following parameters to your liking
   fileToRead = "yourLammpsDataFileToConvert.structure.out"
   filename, file_extension = os.path.splitext(fileToRead)
   fileToWrite = filename + "_converted" + file_extension

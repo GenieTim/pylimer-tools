@@ -19,7 +19,17 @@ It could be used e.g. like this:
   from pylimer_tools_cpp import (DataFileWriter, MCUniverseGenerator,)
 
 
-  # TODO: define the parameters you want to generate the network with
+  # BEGIN TODO: define the parameters you want to generate the network with
+  sideLen = 0
+  seed = 0
+  beadDistance = 0
+  nrOfCrosslinkers = 0
+  numberOfChains = 0
+  numberOfSolventChains = 0
+  beadsPerSolventChain = 0
+  crosslinkerConversion = 0
+  crosslinkerFunctionality = 0
+  # END TODO
 
   # Start generating the network
   generator = MCUniverseGenerator(sideLen, sideLen, sideLen)

@@ -206,7 +206,7 @@
 <h1>Readers &amp; Writers<a class="headerlink" href="#readers-writers" title="Permalink to this headline">#</a></h1>
 <section id="readers">
 <h2>Readers<a class="headerlink" href="#readers" title="Permalink to this headline">#</a></h2>
-<p>pylimer_tools provides an interface to write LAMMPS data and dump files.</p>
+<p>pylimer_tools provides an interface to read LAMMPS data and dump files.</p>
 </section>
 <section id="writers">
 <h2>Writers<a class="headerlink" href="#writers" title="Permalink to this headline">#</a></h2>
@@ -220,6 +220,7 @@ set in such a way that a <cite>fix bond/swap</cite> would not change the distrib
 
 <span class="kn">from</span> <span class="nn">pylimer_tools_cpp</span> <span class="kn">import</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">UniverseSequence</span><span class="p">,</span> <span class="n">DataFileWriter</span>
 
+<span class="c1"># TODO: change the following parameters to your liking</span>
 <span class="n">fileToRead</span> <span class="o">=</span> <span class="s2">"yourLammpsDataFileToConvert.structure.out"</span>
 <span class="n">filename</span><span class="p">,</span> <span class="n">file_extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fileToRead</span><span class="p">)</span>
 <span class="n">fileToWrite</span> <span class="o">=</span> <span class="n">filename</span> <span class="o">+</span> <span class="s2">"_converted"</span> <span class="o">+</span> <span class="n">file_extension</span>
