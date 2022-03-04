@@ -10,3 +10,12 @@ Module contents
    :show-inheritance:
    :special-members:
    
+Submodules
+----------
+
+.. autosummary::
+   :toctree: _autosummary
+   :template: custom-module-template.rst
+   :recursive:
+
+   pylimer_tools_cpp.pylimer_tools_cpp

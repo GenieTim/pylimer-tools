@@ -9,8 +9,9 @@
         :toctree: _generate
 
     """
-import pylimer_tools_cpp.pylimer_tools_cpp
 import typing
+
+import pylimer_tools_cpp.pylimer_tools_cpp
 
 __all__ = [
     "Atom",
@@ -97,15 +98,15 @@ class Box():
     def __setstate__(self, arg0: tuple) -> None: ...
     def getLx(self) -> float: 
         """
-        Get the lenght of the box in x direction.
+        Get the length of the box in x direction.
         """
     def getLy(self) -> float: 
         """
-        Get the lenght of the box in y direction.
+        Get the length of the box in y direction.
         """
     def getLz(self) -> float: 
         """
-        Get the lenght of the box in z direction.
+        Get the length of the box in z direction.
         """
     def getVolume(self) -> float: 
         """
@@ -179,19 +180,18 @@ class Molecule():
         """
     def computeEndToEndDistance(self) -> float: 
         """
-                    Compute the end-to-end distance (:math:`R_{ee}`) of this molecule. 
+        Compute the end-to-end distance (:math:`R_{ee}`) of this molecule. 
 
-                    **Caution**:
-                    Returns 0.0 if the molecule does not have two or more atoms.
-                    Returns -1.0 if not exactly 2 ends were found.
-                    
+        Caution:
+            Returns 0.0 if the molecule does not have two or more atoms.
+            Returns -1.0 if not exactly 2 ends were found.
         """
     def computeRadiusOfGyration(self) -> float: 
         """
-                    Computes the radius of gyration, :math:`R_g^2` of this molecule.
+        Computes the radius of gyration, :math:`R_g^2` of this molecule.
 
-                    **NOTE**: the mass of the atoms is not yet taken into account.
-                    
+        NOTE: 
+            the mass of the atoms is not yet taken into account.    
         """
     def getAtomForVertexId(self, arg0: int) -> Atom: 
         """

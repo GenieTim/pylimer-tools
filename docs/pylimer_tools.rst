@@ -11,21 +11,21 @@ Subpackages
    pylimer_tools.io
    pylimer_tools.utils
 
-Submodules
-----------
+.. Submodules
+.. ----------
 
-pylimer\_tools.pylimer\_tools module
-------------------------------------
+.. pylimer\_tools.pylimer\_tools module
+.. ------------------------------------
 
-.. automodule:: pylimer_tools.pylimer_tools
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. .. automodule:: pylimer_tools.pylimer_tools
+..    :members:
+..    :undoc-members:
+..    :show-inheritance:
 
-Module contents
----------------
+.. Module contents
+.. ---------------
 
-.. automodule:: pylimer_tools
-   :members:
-   :undoc-members:
-   :show-inheritance:
+.. .. automodule:: pylimer_tools
+..    :members:
+..    :undoc-members:
+..    :show-inheritance:

@@ -138,3 +138,5 @@ coverage.html
 _skbuild
 
 _cmake_test_compile
+
+docs/_autosummary

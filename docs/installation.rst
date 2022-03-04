@@ -7,9 +7,10 @@ You can use PyPip to install this package:
 
   python -m pip install pylimer_tools
 
-**Note**: depending on your OS and Python environment, you may require an installation of some dependencies.
-In this case, a custom compilation could be a workaroud.
-Checkout the following sections for your system. 
+NOTE: 
+  depending on your OS and Python environment, you may require an installation of some dependencies.
+  In this case, a custom compilation could be a workaroud.
+  Checkout the following sections for your system. 
 
 Manual Compilation
 ===================
