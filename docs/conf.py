@@ -6,14 +6,15 @@
 
 # -- Path setup --------------------------------------------------------------
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#
 import os
 import sys
 import sysconfig
 import warnings
+# If extensions (or modules to document with autodoc) are in another directory,
+# add these directories to sys.path here. If the directory is relative to the
+# documentation root, use os.path.abspath to make it absolute, like shown here.
+#
+from datetime import datetime
 
 try:
     # this fixes an issue where conda env's site-packages are not available to Sphinx
@@ -28,7 +29,7 @@ try:
 
     if (os.getenv("CONDA_PREFIX") is not None):
         newPath = os.path.join(os.getenv("CONDA_PREFIX"),
-                            "lib", pythonV, "site-packages")
+                               "lib", pythonV, "site-packages")
         sys.path.append(newPath)
     # vgl.: sys.path.insert(
     #     0, "/usr/local/anaconda3/envs/autowig/lib/python3.7/site-packages")
@@ -40,7 +41,7 @@ except ImportError:
 # -- Project information -----------------------------------------------------
 
 project = 'PylimerTools'
-copyright = '2021, Tim Bernhard'
+copyright = '2021-' + datetime.now().strftime('%Y') + ', Tim Bernhard'
 author = 'Tim Bernhard'
 
 
@@ -86,7 +87,7 @@ html_theme = 'furo'
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
-# add custom css files here, absolute URLS or 
+# add custom css files here, absolute URLS or
 # relative to the `html_static_path` directory
 html_css_files = [
     'css/custom.css',
