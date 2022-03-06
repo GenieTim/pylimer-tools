@@ -23,7 +23,7 @@ def predictShearModulus(network: Universe, junctionType, strandLength: int = Non
       - strandLength: the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
       - T: the temperature in your unit system
       - k_b: Boltzmann's constant in your unit system
-      - totalMass: the $M$ in the respective formula
+      - totalMass: the :math:`M` in the respective formula
 
     Returns:
       - G: the predicted shear modulus, or `None` if the universe is empty.
@@ -76,7 +76,7 @@ def calculateWeightFractionOfBackbone(network: Universe, junctionType, strandLen
           See: #computeExtentOfReaction
 
     Returns:
-      - $\\Phi_{el}$: weight fraction of network backbone
+      - :math:`\\Phi_{el}`: weight fraction of network backbone
     """
     if (network.getNrOfAtoms() == 0):
         return 0
@@ -113,7 +113,7 @@ def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.7
       - absTol: the weight from which on a component is not soluble anymore
 
     Returns:
-      - $W_{sol}$ (float): the weight fraction of soluble material as counted.
+      - :math:`W_{sol}` (float): the weight fraction of soluble material as counted.
 
     """
     fractions = network.getClusters()
@@ -131,7 +131,7 @@ def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.7
     return solubleWeight/totalWeight
 
 
-def computeWeightFractionOfSolubleMaterial(network: Universe = None, junctionType: int=2, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None, r: float = None, p: float = None) -> float:
+def computeWeightFractionOfSolubleMaterial(network: Universe = None, junctionType: int = 2, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None, r: float = None, p: float = None) -> float:
     """
     Compute the weight fraction of soluble material by MMT.
 
@@ -149,10 +149,10 @@ def computeWeightFractionOfSolubleMaterial(network: Universe = None, junctionTyp
           See: :func:`~pylimer_tools.calc.doMMTAnalysis.computeExtentOfReaction`.
 
     Returns:
-      - $W_{sol}$ (float): the weight fraction of soluble material according to MMT.
+      - :math:`W_{sol}` (float): the weight fraction of soluble material according to MMT.
       - weightFractions (dict): a dictionary with key: type, and value: weight fraction of type
-      - $\\alpha$ (float): Macosko & Miller's $P(F_A)$
-      - $\\beta$ (float): Macosko & Miller's $P(F_B)$
+      - :math:`\\alpha` (float): Macosko & Miller's :math:`P(F_A)`
+      - :math:`\\beta` (float): Macosko & Miller's :math:`P(F_B)`
     """
     if (functionalityPerType is None):
         assert(network is not None)
@@ -192,7 +192,7 @@ def computeWeightFractionOfSolubleMaterial(network: Universe = None, junctionTyp
 
 def computeMMsProbabilities(r, p, f):
     """
-    Compute Macosko and Miller's probabilities $P(F_A)$ and $P(F_B)$
+    Compute Macosko and Miller's probabilities :math:`P(F_A)` and :math:`P(F_B)`
 
     Sources:
       - https://pubs.acs.org/doi/10.1021/ma60050a004
@@ -204,8 +204,8 @@ def computeMMsProbabilities(r, p, f):
       - f: the functionality of the the crosslinker
 
     Returns:
-      - alpha: $P(F_A)$
-      - beta: $P(F_B)$    
+      - alpha: :math:`P(F_A)`
+      - beta: :math:`P(F_B)`    
     """
     # first, check a few things required by the formulae
     # since we want alpha, beta \in [0,1], given they are supposed to be probabilities
@@ -244,7 +244,7 @@ def computeWeightFractions(network: Universe) -> dict:
       - network: the poylmer network to do the computation for
 
     Returns:
-      - $\\vec{W_i}$ (dict): using the type i as a key, this dict contains the weight fractions ($\\frac{W_i}{W_{tot}}$)
+      - :math:`\\vec{W_i}` (dict): using the type i as a key, this dict contains the weight fractions (:math:`\\frac{W_i}{W_{tot}}`)
     """
     if (network.getNrOfAtoms() == 0):
         return {}
@@ -358,7 +358,7 @@ def computeExtentOfReaction(network: Universe, crosslinkerType, functionalityPer
 
 def predictGelationPoint(r: float, f: int, g: int = 2) -> float:
     """
-    Compute the gelation point $p_{gel}$ as theoretically predicted
+    Compute the gelation point :math:`p_{gel}` as theoretically predicted
     (gelation point = critical extent of reaction for gelation)
 
     Source:
