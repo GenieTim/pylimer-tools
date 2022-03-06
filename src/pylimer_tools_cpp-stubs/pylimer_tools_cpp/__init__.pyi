@@ -191,7 +191,7 @@ class Molecule():
         Computes the radius of gyration, :math:`R_g^2` of this molecule.
 
         NOTE: 
-            the mass of the atoms is not yet taken into account.    
+            The mass of the atoms is not yet taken into account.    
         """
     def getAtomForVertexId(self, arg0: int) -> Atom: 
         """

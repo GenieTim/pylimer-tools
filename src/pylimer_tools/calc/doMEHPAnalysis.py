@@ -23,7 +23,7 @@ def predictShearModulus(networks: Iterable[Universe], T: float = 1, k_B: float =
       - T: the temperature in your unit system
       - k_b: Boltzmann's constant in your unit system
       - foreignAtomType: the type of atoms to ignore (junctions, crosslinkers)
-      - totalMass: the $M$ in the respective formula
+      - totalMass: the :math:`M` in the respective formula
 
     Returns:
       - shear modulus (float): the estimated shear modulus. Unit: [pressure]
@@ -38,7 +38,7 @@ def predictShearModulus(networks: Iterable[Universe], T: float = 1, k_B: float =
 
 def calculateCycleRank(networks: Iterable[Universe] = None, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None) -> float:
     """
-    Compute the cycle rank ($\\chi$).
+    Compute the cycle rank (:math:`\\chi`).
     Assumes the precursor-chains to be bifunctional.
 
     Arguments:
@@ -74,10 +74,10 @@ def calculateCycleRank(networks: Iterable[Universe] = None, nu: int = None, mu: 
 
 def calculateEffectiveNrDensityOfNetwork(networks: Iterable[Universe], absTol: float = 1, relTol: float = 1, junctionType=None) -> float:
     """
-    Compute the effective number density $\\nu_{eff}$ of a network.
+    Compute the effective number density :math:`\\nu_{eff}` of a network.
     Assumes the precursor-chains to be bifunctional.
 
-    $\\nu_{eff}$ is the number of elastically effective (active) strands per unit volume,
+    :math:`\\nu_{eff}` is the number of elastically effective (active) strands per unit volume,
     which are defined as the ones that can store elastic energy
     upon network deformation, resp. the effective number density of network strands
 
@@ -85,13 +85,13 @@ def calculateEffectiveNrDensityOfNetwork(networks: Iterable[Universe], absTol: f
       - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262
 
     Arguments:
-      - network (pylimer_tools.entities.Universe): the network to compute $\\nu_{eff}$ for
+      - network (pylimer_tools.entities.Universe): the network to compute :math:`\\nu_{eff}` for
       - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
       - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
       - junctionType: the atom type of the crosslinkers/junctions
 
     Returns:
-      - $\\nu_{eff}$ (float): the effective number density of network strands. Unit: [1/Volume]
+      - :math:`\\nu_{eff}` (float): the effective number density of network strands. Unit: [1/Volume]
     """
     if (len(networks) == 0):
         return None
@@ -148,14 +148,14 @@ def calculateEffectiveNrDensityOfJunctions(networks: Iterable[Universe], absTol:
       - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262
 
     Arguments:
-      - network (pylimer_tools.entities.Universe): the network to compute $\\nu_{eff}$ for
+      - network (pylimer_tools.entities.Universe): the network to compute :math:`\\nu_{eff}` for
       - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
       - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
       - junctionType: the atom type of the crosslinkers/junctions
       - minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such
 
     Returns:
-      - $\\mu_{eff}$ (float): the effective number density of junctions. Unit: [1/Volume]
+      - :math:`\\mu_{eff}` (float): the effective number density of junctions. Unit: [1/Volume]
     """
     if (len(networks) < 1):
         return None
@@ -412,12 +412,12 @@ def calculateTopologicalFactor(networks: Iterable[Universe], foreignAtomType=Non
     Arguments:
       - network: the network to compute the topological factor for
       - foreignAtomType: the type of atoms to ignore
-      - totalMass: the $M$ in the respective formula
+      - totalMass: the :math:`M` in the respective formula
       - b: the mean bond length. 
           If `None`, it will be computed for each molecule in the first Universe (Network).
 
     Returns:
-      - the topological factor $\\Gamma$
+      - the topological factor :math:`\\Gamma`
     """
     R_taus = computeMeanEndToEndDistances(networks, foreignAtomType)
 

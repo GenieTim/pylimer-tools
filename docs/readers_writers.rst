@@ -4,14 +4,28 @@ Readers & Writers
 Readers
 -------
 
-pylimer_tools provides an interface to read LAMMPS data and dump files.
+pylimer_tools provides an interface to read LAMMPS data 
+(:obj:`~pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader`) 
+and dump 
+(:obj:`~pylimer_tools_cpp.pylimer_tools_cpp.DumpFileReader`) 
+files.
 
+Additionally, in :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence`,
+an additional level of abstraction is provided: the UniverseSequence automatically 
+translates the data from an (internal) :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader`
+or :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.DumpFileReader` to a 
+:obj:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe`, while also handling this whole operation 
+of reading the file into :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe`s memory-efficient
+(if used correctly).
 
 Writers
 -------
 
+In :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter`, 
 pylimer_tools provides an interface to write LAMMPS data files.
 
+Some numbering schemes in the written file can be configured as seen in the examples below,
+allowing for conversions from one numbering scheme to another.
 
 Examples
 --------
