@@ -79,8 +79,6 @@ public:
   size_t getNrOfAngles() const;
   std::map<int, double> getMasses();
   long int getTimestep() { return this->timestep; };
-  int getNrOfBondsOfAtom(const long int atomId);
-  int getNrOfBondsOfVertex(const long int vertexId);
   long int getAtomIdByIdx(const int vertexId) const;
   long int getIdxByAtomId(const int atomId) const;
 

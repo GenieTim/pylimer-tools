@@ -117,11 +117,19 @@ public:
 
   /**
    * @brief Get the Atom Id By Idx object
-   * 
-   * @param vertexId 
-   * @return long int 
+   *
+   * @param vertexId the index of the vertex
+   * @return long int the atom's id
    */
   virtual long int getAtomIdByIdx(const int vertexId) const = 0;
+
+  /**
+   * @brief Get the vertex index by the Atom id
+   * 
+   * @param atomId the id of the atom
+   * @return long int the vertex index
+   */
+  virtual long int getIdxByAtomId(const int atomId) const = 0;
 
   /**
    * @brief Get an atom by its vertex id
@@ -277,6 +285,12 @@ public:
     return lengths;
   }
 
+  /**
+   * @brief Count the number of edges leading to/from one vertex
+   *
+   * @param vertexId
+   * @return int
+   */
   int computeFunctionalityForVertex(const long int vertexId) {
     igraph_vector_t degrees;
     if (igraph_vector_init(&degrees, 0)) {
@@ -289,6 +303,10 @@ public:
     int result = igraph_vector_e(&degrees, 0);
     igraph_vector_destroy(&degrees);
     return result;
+  }
+
+  int computeFunctionalityForAtom(const long int atomId) {
+    return this->computeFunctionalityForVertex(this->getIdxByAtomId(atomId));
   }
 
   /**
