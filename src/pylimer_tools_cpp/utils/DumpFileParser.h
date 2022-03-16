@@ -145,7 +145,7 @@ std::vector<OUT> DumpFileParser::getValuesForAt(const size_t index,
   }
   // std::cout << "Requested values for index " << index << ", key " <<
   // headerKey << " and column " << colIdx << std::endl;
-  
+
   data_item_t dataItem = this->data.at(index);
   //
   if (!dataItem.contains(headerKey)) {

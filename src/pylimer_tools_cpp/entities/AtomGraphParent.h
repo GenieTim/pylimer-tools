@@ -125,7 +125,7 @@ public:
 
   /**
    * @brief Get the vertex index by the Atom id
-   * 
+   *
    * @param atomId the id of the atom
    * @return long int the vertex index
    */

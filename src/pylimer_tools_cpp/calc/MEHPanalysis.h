@@ -27,7 +27,7 @@ Arguments:
 
 Returns:
   - endToEndVectors (map): a map with key: "{molecule.key}"
-      and value: their difference vector
+          and value: their difference vector
 */
 std::map<std::string, position_vec_t>
 computeEndToEndVectors(pylimer_tools::entities::Universe network,
@@ -75,7 +75,7 @@ computation for
 
 Returns:
   - endToEndVectors (map): a dictionary with key: "{chain.key}"
-      and value: their mean distance difference vector
+          and value: their mean distance difference vector
 */
 std::map<std::string, position_vec_t>
 computeMeanEndToEndVectors(pylimer_tools::entities::UniverseSequence networks,
@@ -119,7 +119,7 @@ computation for
 
 Returns:
 - endToEndDistances (dict): a dictionary with key: "{atom1.name}+{atom2.name}"
-    and value: the norm of the mean difference vector
+        and value: the norm of the mean difference vector
 */
 std::map<std::string, double>
 computeMeanEndToEndDistances(pylimer_tools::entities::UniverseSequence networks,

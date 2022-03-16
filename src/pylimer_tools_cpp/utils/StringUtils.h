@@ -167,12 +167,13 @@ private:
   std::vector<std::string> results;
 };
 
-  template <> inline std::string CsvTokenizer::get<std::string>(size_t index) const {
-    return this->results[index];
-  };
+template <>
+inline std::string CsvTokenizer::get<std::string>(size_t index) const {
+  return this->results[index];
+};
 
 #define MAKE_GET(TYPE, METHOD)                                                 \
-  template <> inline TYPE CsvTokenizer::get<TYPE>(size_t index) const {                             \
+  template <> inline TYPE CsvTokenizer::get<TYPE>(size_t index) const {        \
     if (this->results.size() <= index) {                                       \
       throw std::runtime_error("Index " + std::to_string(index) +              \
                                " out of bounds when parsing string '" +        \
@@ -186,13 +187,13 @@ private:
     }                                                                          \
   }
 
-  MAKE_GET(double, std::stod)
-  MAKE_GET(long double, std::stold)
-  MAKE_GET(float, std::stof)
-  MAKE_GET(int, std::stoi)
-  MAKE_GET(long int, std::stol)
-  MAKE_GET(unsigned int, std::stoul)
-  MAKE_GET(unsigned long int, std::stoull)
+MAKE_GET(double, std::stod)
+MAKE_GET(long double, std::stold)
+MAKE_GET(float, std::stof)
+MAKE_GET(int, std::stoi)
+MAKE_GET(long int, std::stol)
+MAKE_GET(unsigned int, std::stoul)
+MAKE_GET(unsigned long int, std::stoull)
 } // namespace utils
 
 } // namespace pylimer_tools
