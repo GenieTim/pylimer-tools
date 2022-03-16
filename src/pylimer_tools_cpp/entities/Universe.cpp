@@ -618,7 +618,7 @@ Universe::findLoops(const int crosslinkerType, const int maxLength,
   // note: this algorithm is not particularly efficient
   // it is of the order of O(n*n!)
   for (long int startingCrosslinkerVertexId : startingCrosslinkers) {
-    // ideally, we would only select the neighbouring *crosslinkers* here to
+    // ideally, we would only select the neighbouring *cross-linkers* here to
     // reduce the overhead. but well: let's leave that to the user with
     // #getNetworkOfCrosslinker
     igraph_vector_t neighbours;
@@ -1309,36 +1309,6 @@ double Universe::computeMeanBondLength() {
 
   igraph_eit_destroy(&bondIterator);
   return length / (double)this->getNrOfBonds();
-}
-
-/**
- * @brief Get the number of bonds (functionality, degree) associated with an
- * atom
- *
- * @param atomId
- * @return int
- */
-int Universe::getNrOfBondsOfAtom(const long int atomId) {
-  return this->getNrOfBondsOfVertex(this->getIdxByAtomId(atomId));
-}
-
-/**
- * @brief Get the number of bonds (functionality, degree) associated with a
- * certain vertex
- *
- * @param vertexId
- * @return int
- */
-int Universe::getNrOfBondsOfVertex(const long int vertexId) {
-  igraph_vector_t results;
-  igraph_vector_init(&results, 1);
-  if (igraph_degree(&this->graph, &results, igraph_vss_1(vertexId), IGRAPH_ALL,
-                    false /** don't count loops */)) {
-    throw std::runtime_error("Failed to query degree.");
-  }
-  int result = VECTOR(results)[0];
-  igraph_vector_destroy(&results);
-  return result;
 }
 
 /**

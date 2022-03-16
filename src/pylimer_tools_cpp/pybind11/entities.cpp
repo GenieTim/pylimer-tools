@@ -249,22 +249,26 @@ void init_pylimer_bound_entities(py::module_ &m) {
                Returns -1.0 if not exactly 2 ends were found.
             )pbdoc")
       // operators
-      .def("__getitem__",
-           [](const Molecule &molecule, size_t index) {
-             if (index > molecule.getLength()) {
-               throw py::index_error();
-             }
-             return molecule[index];
-           }, R"pbdoc(
+      .def(
+          "__getitem__",
+          [](const Molecule &molecule, size_t index) {
+            if (index > molecule.getLength()) {
+              throw py::index_error();
+            }
+            return molecule[index];
+          },
+          R"pbdoc(
        Access an atom by its vertex index.
   )pbdoc")
       .def("__len__", &Molecule::getLength, R"pbdoc(
        Get the number of atoms in this molecule.
   )pbdoc")
-      .def("__iter__",
-           [](py::object mol) {
-             return MoleculeIterator(mol.cast<const Molecule &>(), mol);
-           }, R"pbdoc(
+      .def(
+          "__iter__",
+          [](py::object mol) {
+            return MoleculeIterator(mol.cast<const Molecule &>(), mol);
+          },
+          R"pbdoc(
        Iterate through the atoms in this molecule.
        No specific order is guaranteed.
   )pbdoc")
@@ -334,7 +338,7 @@ void init_pylimer_bound_entities(py::module_ &m) {
             Decompose the Universe into loops.
             The primary index specifies the degree of the loop.
 
-            NOTE:
+            CAUTION:
                There are exponentially many paths between two cross-linkers of a network,
                and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
                You can use the maxLength parameter to restrict the algorithm to only search for loops up to a certain length.
@@ -430,12 +434,12 @@ void init_pylimer_bound_entities(py::module_ &m) {
       .def("getTimestep", &Universe::getTimestep, R"pbdoc(
             Query the timestep when this universe was captured.
             )pbdoc")
-      .def("getNrOfBondsOfAtom", &Universe::getNrOfBondsOfAtom,
-           "Count the number of immediate neighbours of an atom, specified by "
-           "its id.")
-      .def("getNrOfBondsOfVertex", &Universe::getNrOfBondsOfVertex,
-           "Count the number of immediate neighbours of an atom, specified by "
-           "its vertex id.")
+      .def(
+          "getNrOfBondsOfAtom", &Universe::computeFunctionalityForAtom,
+          R"pbdoc(Count the number of immediate neighbours of an atom, specified by its id.)pbdoc")
+      .def(
+          "getNrOfBondsOfVertex", &Universe::computeFunctionalityForVertex,
+          R"pbdoc(Count the number of immediate neighbours of an atom, specified by its vertex id.)pbdoc")
       // computations
       .def("computeBondLengths", &Universe::computeBondLengths,
            "Computes the length :math:`b` of each bond in the molecule, "
@@ -450,7 +454,7 @@ void init_pylimer_bound_entities(py::module_ &m) {
            R"pbdoc(
            Checks whether there is a strand (with cross-linker) in the universe that loops through periodic images without coming back.
            
-            NOTE:
+            CAUTION:
                There are exponentially many paths between two cross-linkers of a network,
                and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
            )pbdoc")
