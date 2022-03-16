@@ -169,7 +169,26 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools.utils.html">pylimer_tools.utils package</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pylimer_tools_cpp.html">pylimer_tools_cpp package</a></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="pylimer_tools_cpp.html">pylimer_tools_cpp package</a><input class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.html">pylimer_tools_cpp.pylimer_tools_cpp</a><input class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance.html">pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint.html">pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Atom.html">pylimer_tools_cpp.pylimer_tools_cpp.Atom</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Box.html">pylimer_tools_cpp.pylimer_tools_cpp.Box</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.html">pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.html">pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.DumpFileReader.html">pylimer_tools_cpp.pylimer_tools_cpp.DumpFileReader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator.html">pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.html">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Molecule.html">pylimer_tools_cpp.pylimer_tools_cpp.Molecule</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator.html">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.html">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html">pylimer_tools_cpp.pylimer_tools_cpp.Universe</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.html">pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -208,11 +227,25 @@
 <h1>Readers &amp; Writers<a class="headerlink" href="#readers-writers" title="Permalink to this headline">#</a></h1>
 <section id="readers">
 <h2>Readers<a class="headerlink" href="#readers" title="Permalink to this headline">#</a></h2>
-<p>pylimer_tools provides an interface to read LAMMPS data and dump files.</p>
+<p>pylimer_tools provides an interface to read LAMMPS data
+(<a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.html#pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFileReader</span></code></a>)
+and dump
+(<a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.DumpFileReader.html#pylimer_tools_cpp.pylimer_tools_cpp.DumpFileReader" title="pylimer_tools_cpp.pylimer_tools_cpp.DumpFileReader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DumpFileReader</span></code></a>)
+files.</p>
+<p>Additionally, in <a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UniverseSequence</span></code></a>,
+an additional level of abstraction is provided: the UniverseSequence automatically
+translates the data from an (internal) <a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.html#pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFileReader</span></code></a>
+or <a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.DumpFileReader.html#pylimer_tools_cpp.pylimer_tools_cpp.DumpFileReader" title="pylimer_tools_cpp.pylimer_tools_cpp.DumpFileReader"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DumpFileReader</span></code></a> to a
+<a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Universe</span></code></a>, while also handling this whole operation
+of reading the file into :obj:<a href="#id1"><span class="problematic" id="id2">`</span></a>~pylimer_tools_cpp.pylimer_tools_cpp.Universe`s memory-efficient
+(if used correctly).</p>
 </section>
 <section id="writers">
 <h2>Writers<a class="headerlink" href="#writers" title="Permalink to this headline">#</a></h2>
-<p>pylimer_tools provides an interface to write LAMMPS data files.</p>
+<p>In <a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.html#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DataFileWriter</span></code></a>,
+pylimer_tools provides an interface to write LAMMPS data files.</p>
+<p>Some numbering schemes in the written file can be configured as seen in the examples below,
+allowing for conversions from one numbering scheme to another.</p>
 </section>
 <section id="examples">
 <h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">#</a></h2>
