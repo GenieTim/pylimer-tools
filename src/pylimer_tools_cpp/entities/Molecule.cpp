@@ -98,6 +98,7 @@ double Molecule::computeEndToEndDistance() {
   }
   return distance;
 }
+
 /**
  * @brief compute the weight of this molecule
  *
@@ -112,15 +113,15 @@ double Molecule::computeWeight() {
   return totalWeight;
 }
 
-
 long int Molecule::getAtomIdByIdx(const int vertexId) const {
   return VAN(&this->graph, "id", vertexId);
 };
 
 long int Molecule::getIdxByAtomId(const int atomId) const {
   if (!this->atomIdToVectorIdx.contains(atomId)) {
-    throw std::invalid_argument("Molecule cannot return vertex idx of this atom: an atom with this id (" + std::to_string(atomId) +
-                                ") does not exist");
+    throw std::invalid_argument("Molecule cannot return vertex idx of this "
+                                "atom: an atom with this id (" +
+                                std::to_string(atomId) + ") does not exist");
   }
   return this->atomIdToVectorIdx.at(atomId);
 };
@@ -215,7 +216,7 @@ std::vector<Atom> Molecule::getAtomsLinedUp() {
   results.push_back(this->getAtomByVertexIdx(vertexIdToStartWith));
   for (long int connection : connections) {
     long int currentCenter = connection;
-      results.push_back(this->getAtomByVertexIdx(currentCenter));
+    results.push_back(this->getAtomByVertexIdx(currentCenter));
     long int lastCenter = vertexIdToStartWith;
     std::vector<long int> subConnections =
         this->getVertexIdxsConnectedTo(currentCenter);

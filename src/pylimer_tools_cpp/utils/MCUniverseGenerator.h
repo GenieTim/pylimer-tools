@@ -9,11 +9,11 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <math.h>/* isnan, sqrt */
 #include <string>
 #include <vector>
-#include <math.h>/* isnan, sqrt */
 #ifndef M_PI
-    #define M_PI  3.1415926535897932384626433
+#define M_PI 3.1415926535897932384626433
 #endif
 
 #include <random>
@@ -154,7 +154,8 @@ public:
                   this->beadDistance,
               ((double)beadsPerChains[nrOfStrandsAdded]) * this->beadDistance);
           if (targetIdx >= 0 && !isDanglingStrand) {
-            double dist = crosslinkers[i].distanceTo(crosslinkers[targetIdx], &this->box);
+            double dist =
+                crosslinkers[i].distanceTo(crosslinkers[targetIdx], &this->box);
             if (dist >= ((double)beadsPerChains[nrOfStrandsAdded]) *
                             this->beadDistance) {
               std::cout << "Got too far off link: " << targetIdx << " for " << i
@@ -340,7 +341,7 @@ private:
       double idealBeta = dx == 0.0 ? (M_PI * 0.5) : (std::atan2(dy, dx));
       double bondLenToUse = this->beadDistance;
       double idealWeight = 0.0;
-      double bondsRemaining = ((chainLen - i)+1);
+      double bondsRemaining = ((chainLen - i) + 1);
       if (((remainingDistance) / (bondsRemaining)) > this->beadDistance) {
         // need to constrain, cannot use random alpha & beta
         // TODO: find some a bit more sophisticated probability adjustment (or
@@ -600,7 +601,7 @@ private:
       }
     }
 
-    std::uniform_int_distribution<int> idxDist(0, suitableMatches.size()-1);
+    std::uniform_int_distribution<int> idxDist(0, suitableMatches.size() - 1);
     return suitableMatches.size() == 0 ? -1
                                        : suitableMatches[idxDist(this->rng)];
   }

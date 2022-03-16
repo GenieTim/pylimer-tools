@@ -61,7 +61,7 @@ if (os.path.exists(skbuildCaches)):
 
 setup(
     name="pylimer_tools",
-    version="0.1.4",
+    version="0.1.5",
     description="A collection of utility python functions for handling LAMMPS output and polymers in Python ",
     long_description_content_type="text/markdown",
     long_description=Path('README.md').read_text(),
