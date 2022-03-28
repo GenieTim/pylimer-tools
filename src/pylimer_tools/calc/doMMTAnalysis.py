@@ -35,7 +35,7 @@ def predictShearModulus(network: Universe, junctionType, strandLength: int = Non
         return None
     nu = len(network.getMolecules(junctionType)) / \
         network.getVolume()  # number of chains (network strands) per unit volume
-    if (functionalityPerType is None):
+    if (functionalityPerType is None or junctionType not in functionalityPerType):
         functionalityPerType = network.determineFunctionalityPerType()
     p = computeExtentOfReaction(network, junctionType, functionalityPerType)
     r = computeStoichiometricInbalance(
@@ -81,7 +81,7 @@ def calculateWeightFractionOfBackbone(network: Universe, junctionType, strandLen
     if (network.getNrOfAtoms() == 0):
         return 0
 
-    if (functionalityPerType is None):
+    if (functionalityPerType is None or junctionType not in functionalityPerType):
         functionalityPerType = network.determineFunctionalityPerType()
 
     W_sol, weightFractions, alpha, beta = computeWeightFractionOfSolubleMaterial(
@@ -154,7 +154,7 @@ def computeWeightFractionOfSolubleMaterial(network: Universe = None, junctionTyp
       - :math:`\\alpha` (float): Macosko & Miller's :math:`P(F_A)`
       - :math:`\\beta` (float): Macosko & Miller's :math:`P(F_B)`
     """
-    if (functionalityPerType is None):
+    if (functionalityPerType is None or junctionType not in functionalityPerType):
         assert(network is not None)
         functionalityPerType = network.determineFunctionalityPerType()
 
@@ -293,8 +293,11 @@ def computeStoichiometricInbalance(network: Universe, junctionType, strandLength
 
     counts = Counter(network.getAtomTypes())
 
-    if (functionalityPerType is None):
-        functionalityPerType = network.determineFunctionalityPerType()
+    if (functionalityPerType is None or junctionType not in functionalityPerType):
+        functionalityPerType = network.determineEffectiveFunctionalityPerType()
+
+    if (junctionType not in counts):
+        raise ValueError("No junction with type {} seems to have been found in the network".format(junctionType))
 
     if (strandLength is None):
         strands = network.getMolecules(junctionType)
@@ -304,6 +307,8 @@ def computeStoichiometricInbalance(network: Universe, junctionType, strandLength
         functionalityPerType[junctionType]
     otherFormableBonds = 0
     for key in counts:
+        if (key not in functionalityPerType):
+            raise ValueError("Type {} must have an associated functionality".format(key))
         if (key != junctionType):
             otherFormableBonds += counts[key]*functionalityPerType[key]
 
@@ -333,7 +338,7 @@ def computeExtentOfReaction(network: Universe, crosslinkerType, functionalityPer
     if (network.getNrOfAtoms() == 0):
         return 1
 
-    if (functionalityPerType is None):
+    if (functionalityPerType is None or crosslinkerType not in functionalityPerType):
         functionalityPerType = network.determineFunctionalityPerType()
 
     numStrands = len(network.getMolecules(crosslinkerType))

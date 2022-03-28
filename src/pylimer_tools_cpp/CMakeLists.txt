@@ -66,6 +66,23 @@ target_sources(pylimer_tools
 
 set_target_properties(pylimer_tools PROPERTIES VERSION ${PROJECT_VERSION})
 
+option(CODE_COVERAGE "Collect coverage from test library" OFF)
+
+if(CODE_COVERAGE)
+	set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/CMake-codecov/cmake" ${CMAKE_MODULE_PATH})
+	set(ENABLE_COVERAGE ON)
+	find_package(codecov)
+
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fprofile-arcs -ftest-coverage")
+	set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -g -fprofile-arcs -ftest-coverage")
+	target_link_libraries(
+		pylimer_tools
+		PRIVATE
+		--coverage
+	)
+	add_coverage(pylimer_tools)
+endif()
+
 # add other needed packages
 # target_link_libraries(pylimer_tools 
 # 	PRIVATE

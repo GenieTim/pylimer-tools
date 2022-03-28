@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.15.0)
 
 # start project
-project(pylimer_tools VERSION "0.1.0")
+project(pylimer_tools VERSION "0.1.15")
 
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 20)
