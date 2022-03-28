@@ -267,7 +267,7 @@ def computeWeightFractions(network: Universe) -> dict:
     return weightFractions
 
 
-def computeStoichiometricInbalance(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def computeStoichiometricInbalance(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None, ignoreTypes: list = [], effective : bool = False) -> float:
     """
     Compute the stoichiometric inbalance
     ( nr. of bonds formable of crosslinker / nr. of formable bonds of precursor )
@@ -284,6 +284,8 @@ def computeStoichiometricInbalance(network: Universe, junctionType, strandLength
           If `None`: will use average length of each connected system when ignoring the crosslinkers.
       - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. 
           If `None`: will use max functionality per type.
+      - ignoreTypes: a list of integers, the types to ignore for the inbalance (e.g. solvent atom types)
+      - effective: whether to use the effective functionality (if functionalityPerType is not passed) or the maximum
 
     Returns:
       - r (float): the stoichiometric inbalance
@@ -294,10 +296,11 @@ def computeStoichiometricInbalance(network: Universe, junctionType, strandLength
     counts = Counter(network.getAtomTypes())
 
     if (functionalityPerType is None or junctionType not in functionalityPerType):
-        functionalityPerType = network.determineEffectiveFunctionalityPerType()
+        functionalityPerType = network.determineEffectiveFunctionalityPerType() if effective else network.determineFunctionalityPerType()
 
     if (junctionType not in counts):
-        raise ValueError("No junction with type {} seems to have been found in the network".format(junctionType))
+        raise ValueError(
+            "No junction with type {} seems to have been found in the network".format(junctionType))
 
     if (strandLength is None):
         strands = network.getMolecules(junctionType)
@@ -307,8 +310,11 @@ def computeStoichiometricInbalance(network: Universe, junctionType, strandLength
         functionalityPerType[junctionType]
     otherFormableBonds = 0
     for key in counts:
+        if (key in ignoreTypes):
+            continue
         if (key not in functionalityPerType):
-            raise ValueError("Type {} must have an associated functionality".format(key))
+            raise ValueError(
+                "Type {} must have an associated functionality".format(key))
         if (key != junctionType):
             otherFormableBonds += counts[key]*functionalityPerType[key]
 
