@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence" href="pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.html" /><link rel="prev" title="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType" href="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.html" />
 
-    <meta name="generator" content="sphinx-4.4.0, furo 2022.03.04"/>
+    <meta name="generator" content="sphinx-4.5.0, furo 2022.03.04"/>
         <title>pylimer_tools_cpp.pylimer_tools_cpp.Universe - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=935aa2abcc5c1da4283d1dc201fb1f0add16d23a" />
@@ -237,7 +237,7 @@
 <dd><p>Instantiate this Universe (Collection of Molecules) providing the box lengths.</p>
 </dd></dl>
 <p class="rubric">Methods</p>
-<div class="table-wrapper"><table class="longtable docutils align-default">
+<div class="table-wrapper"><table class="autosummary longtable docutils align-default">
 <colgroup>
 <col style="width: 10%"/>
 <col style="width: 90%"/>
@@ -455,13 +455,11 @@ Use a negative value to find all loops and paths.</p>
 <span class="sig-name descname"><span class="pre">getAngles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getAngles" title="Permalink to this definition">#</a></dt>
 <dd><p>Get all angles added to this network.</p>
 <p>Returns a dict with three properties: ‘angle_from’, ‘angle_via’ and ‘angle_to’.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>NOTE:</dt><dd><p>The integer values returned refer to the the atom ids, not the vertex ids.
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The integer values returned refer to the the atom ids, not the vertex ids.
 Use <a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getIdxByAtomId" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.getIdxByAtomId"><code class="xref py py-func docutils literal notranslate"><span class="pre">getIdxByAtomId()</span></code></a> to translate them to vertex ids.</p>
-</dd>
-</dl>
-</div></blockquote>
+</div>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.Universe.getAtom">
