@@ -15,13 +15,22 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertEqual(
             0, computeStoichiometricInbalance(self.emptyUniverse, 2))
         self.assertEqual(
+            (1*2 + 1*3 + 0)/(4*2 + 1*1), computeStoichiometricInbalance(self.testUniverse, 2, strandLength=1, effective=True))
+        self.assertEqual(
+            (3*3)/(5*2), computeStoichiometricInbalance(self.testUniverse, 2, strandLength=1, functionalityPerType={
+                1: 2, 2: 3
+            }))
+        self.assertEqual(
             (3*3)/(5*2), computeStoichiometricInbalance(self.testUniverse, 2, strandLength=1))
         self.assertEqual(
-            (3*3)/(2), computeStoichiometricInbalance(self.testUniverse, 2, strandLength=5))
+            (3*3)/(2), computeStoichiometricInbalance(self.testUniverse, 2, strandLength=5, functionalityPerType={
+                1: 2, 2: 3
+            }))
 
     def testExtentOfReaction(self):
         self.assertEqual(1.0, computeExtentOfReaction(self.emptyUniverse, 2))
-        self.assertEqual(5.0/6.0, computeExtentOfReaction(self.testUniverse, 2))
+        self.assertEqual(
+            5.0/6.0, computeExtentOfReaction(self.testUniverse, 2))
 
     def testGelationPointPrediction(self):
         self.assertEqual(1, predictGelationPoint(1, 2))

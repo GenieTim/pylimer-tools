@@ -27,10 +27,10 @@ make lcov-genhtml
 
 if command -v npx
 then
-  npx -y lcov-badge2 -l "C++ Test Coverage" -o "$ROOT_DIR/.github/cpp-coverage.svg" tests/build/lcov/data/capture/pylimer_tools.info
+  npx -y lcov-badge2 -l "C++ Code Coverage" -o "$ROOT_DIR/.github/cpp-coverage.svg" tests/build/lcov/data/capture/pylimer_tools.info
 fi
 
-exit
+# exit
 cd "$ROOT_DIR" || exit 8
 
 # then, build/install project for Python
