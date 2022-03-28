@@ -140,3 +140,4 @@ _skbuild
 _cmake_test_compile
 
 docs/_autosummary
+pylimer_tools_lcoverage.info
