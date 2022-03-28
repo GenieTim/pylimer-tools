@@ -409,7 +409,7 @@ void init_pylimer_bound_entities(py::module_ &m) {
 
            Returns a dict with three properties: 'angle_from', 'angle_via' and 'angle_to'.
 
-            NOTE:
+           NOTE:
                The integer values returned refer to the the atom ids, not the vertex ids.
                Use :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getIdxByAtomId` to translate them to vertex ids.
            )pbdoc")

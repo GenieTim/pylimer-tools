@@ -15,10 +15,22 @@ cd "$ROOT_DIR/tests" || exit 2
 # rm -rf build
 mkdir -p build
 cd build || exit 5
-cmake .. -DCMAKE_OSX_SYSROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX12.1.sdk || exit 1
+# force use of g++ if available for coverage
+CXXCOMPILER=$(which g++ || which clang)
+CCOMPILER=$(which gcc || which clang)
+cmake .. -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=ON -D CMAKE_C_COMPILER="$CCOMPILER" -D CMAKE_CXX_COMPILER="$CXXCOMPILER" || exit 1
+# cmake .. -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=ON || exit 1
 cmake --build . || exit 9
-ASAN_OPTIONS=detect_leaks=1 ./pylimer_tests || exit 6 # -s --durations yes 
+ASAN_OPTIONS=detect_leaks=1 ./pylimer_tests || exit 6 # -s --durations yes
+make pylimer_tools-geninfo 
+make lcov-genhtml
 
+if command -v npx
+then
+  npx -y lcov-badge2 -l "C++ Test Coverage" -o "$ROOT_DIR/.github/cpp-coverage.svg" tests/build/lcov/data/capture/pylimer_tools.info
+fi
+
+exit
 cd "$ROOT_DIR" || exit 8
 
 # then, build/install project for Python

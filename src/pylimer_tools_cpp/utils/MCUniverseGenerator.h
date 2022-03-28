@@ -126,6 +126,7 @@ public:
     // process all cross-linkers
     for (int i = 0; i < crosslinkers.size(); ++i) {
       const int availableSitesForThisCrosslinker = availableCrosslinkerSites[i];
+      // loop until this cross-linker is fully connected 
       for (int siteToHandle = availableSitesForThisCrosslinker;
            siteToHandle > 0; --siteToHandle) {
         if (availableCrosslinkerSites[i] == 0) {
