@@ -41,7 +41,7 @@ jobs:
       
       # Generate Coverage Badge
       - name: Install Badge Generator
-        run: pip install genbadge
+        run: pip install genbadge[coverage]
 
       - name: Coverage Badge
         run: genbadge coverage -i coverage.xml -o ".github/coverage.svg"
