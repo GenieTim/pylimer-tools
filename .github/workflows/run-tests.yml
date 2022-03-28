@@ -41,10 +41,18 @@ jobs:
       
       # Generate Coverage Badge
       - name: Install Badge Generator
-        run: pip install coverage-badge
+        run: pip install genbadge
 
       - name: Coverage Badge
-        run: coverage-badge -f -o ".github/coverage.svg"
+        run: genbadge -i coverage.xml -o ".github/coverage.svg"
+      
+      - name: Upload to CodeCov
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
+          files: ./coverage.xml,./tests/build/lcov/data/capture/pylimer_tools.info # optional
+          fail_ci_if_error: false # optional (default = false)
+          verbose: true # optional (default = false)
 
       # Commit Coverage Badge if applicable
       - name: Verify Changed files
