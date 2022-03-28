@@ -50,7 +50,7 @@ jobs:
         uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
-          files: ./coverage.xml,./tests/build/lcov/data/capture/pylimer_tools.info # optional
+          files: ./coverage.xml,./pylimer_tools_lcoverage.info # optional
           fail_ci_if_error: false # optional (default = false)
           verbose: true # optional (default = false)
 
