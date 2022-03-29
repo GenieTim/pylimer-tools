@@ -6,6 +6,10 @@
 Welcome to PylimerTools's documentation!
 ========================================
 
+.. image:: https://codecov.io/gh/GenieTim/pylimer-tools/branch/main/graph/badge.svg?token=5ZE1VSDXJQ
+:target: https://codecov.io/gh/GenieTim/pylimer-tools
+    
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
