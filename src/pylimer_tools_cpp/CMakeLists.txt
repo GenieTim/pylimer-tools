@@ -72,8 +72,8 @@ if(CODE_COVERAGE)
 	if (CMAKE_BUILD_TYPE EQUAL "RELEASE")
 		message(WARNING "Using coverage reduces build type to debug from release")
 	endif()
-	set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/CMake-codecov/cmake" ${CMAKE_MODULE_PATH})
 	set(ENABLE_COVERAGE ON)
+	set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/CMake-codecov/cmake" ${CMAKE_MODULE_PATH})
 	find_package(codecov)
 
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
@@ -85,6 +85,8 @@ if(CODE_COVERAGE)
 		--coverage
 	)
 	add_coverage(pylimer_tools)
+else()
+	message("Code Coverage is disabled.")
 endif()
 
 # add other needed packages
