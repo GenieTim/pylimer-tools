@@ -29,12 +29,12 @@ make pylimer_tests-gcov
 make pylimer_tests-geninfo 
 make pylimer_tools-gcov
 make pylimer_tools-geninfo 
-# make lcov-genhtml
+make lcov-genhtml
 
 cd "$ROOT_DIR" || exit 8
 
 # copy outside such that pip installation does not remove it
-cp tests/build/lcov/data/capture/pylimer_tools.info pylimer_tools_lcoverage.info
+# cp tests/build/lcov/data/capture/pylimer_tools.info pylimer_tools_lcoverage.info
 
 if command -v npx;
 then
