@@ -232,7 +232,7 @@ std::vector<Atom> Molecule::getAtomsLinedUp() {
             " was found and 1 or 2 expected.");
       }
       int subConnectionDirection = (subConnections[0] == lastCenter) ? 1 : 0;
-      if (subConnectionDirection == vertexIdToStartWith) {
+      if (subConnections[subConnectionDirection] == vertexIdToStartWith) {
         break;
       }
       lastCenter = currentCenter;
