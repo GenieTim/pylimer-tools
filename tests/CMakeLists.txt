@@ -100,8 +100,10 @@ include(Catch)
 catch_discover_tests(pylimer_tests)
 
 if(CODE_COVERAGE)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fprofile-arcs -ftest-coverage")
-	set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -g -fprofile-arcs -ftest-coverage")
+	
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
+	set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
+
 	target_link_libraries(
 		pylimer_tests
 		PRIVATE
@@ -110,5 +112,5 @@ if(CODE_COVERAGE)
 	
 	# add_coverage(pylimer_tools)
 	add_coverage(test_sources)
-	# add_coverage(pylimer_tests)
+	add_coverage(pylimer_tests)
 endif()

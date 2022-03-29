@@ -69,12 +69,16 @@ set_target_properties(pylimer_tools PROPERTIES VERSION ${PROJECT_VERSION})
 option(CODE_COVERAGE "Collect coverage from test library" OFF)
 
 if(CODE_COVERAGE)
+	if (CMAKE_BUILD_TYPE EQUAL "RELEASE")
+		message(WARNING "Using coverage reduces build type to debug from release")
+	endif()
 	set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/CMake-codecov/cmake" ${CMAKE_MODULE_PATH})
 	set(ENABLE_COVERAGE ON)
 	find_package(codecov)
 
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g -fprofile-arcs -ftest-coverage")
-	set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -g -fprofile-arcs -ftest-coverage")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
+	set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
+	
 	target_link_libraries(
 		pylimer_tools
 		PRIVATE

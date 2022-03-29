@@ -21,14 +21,18 @@ cd build || exit 5
 # cmake .. -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=ON -D CMAKE_C_COMPILER="$CCOMPILER" -D CMAKE_CXX_COMPILER="$CXXCOMPILER" || exit 1
 cmake .. -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=ON || exit 1
 cmake --build . || exit 9
+echo "======== Starting tests ========"
 ASAN_OPTIONS=detect_leaks=1 ./pylimer_tests || exit 6 # -s --durations yes
+make pylimer_tests-gcov
+# make pylimer_tests-geninfo 
 make pylimer_tools-gcov
-make pylimer_tools-geninfo 
+# make pylimer_tools-geninfo 
 # make lcov-genhtml
 # make lcov-genxml
 
 cd "$ROOT_DIR" || exit 8
 
+# copy outside such that pip installation does not remove it
 cp tests/build/lcov/data/capture/pylimer_tools.info pylimer_tools_lcoverage.info
 
 if command -v npx;
@@ -36,7 +40,7 @@ then
   npx -y lcov-badge2 -l "C++ Code Coverage" -o ".github/cpp-coverage.svg" pylimer_tools_lcoverage.info
 fi
 
-# exit
+exit
 # then, build/install project for Python
 python -m pip install --verbose --use-feature=in-tree-build . || exit 3
 

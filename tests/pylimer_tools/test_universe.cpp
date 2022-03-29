@@ -195,7 +195,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]") {
     # The system looks like this (in terms of bonds, not 3D placement):
     # 1-2-3
     #
-    # *7-*6-5
+    # *7-6-5
     */
     universe.addAtoms(6, {{1, 2, 3, 5, 6, 7}}, // id
                       {{1, 1, 1, 1, 2, 2}},    // type
@@ -213,6 +213,8 @@ TEST_CASE("Universe can be used", "[entity][Universe]") {
     auto chains = universe.getChainsWithCrosslinker(2);
     REQUIRE(chains.size() == 2);
     REQUIRE(chains[0].getNrOfAtoms() == 3);
+    REQUIRE(chains[0].getType() == pe::MoleculeType::FREE_CHAIN);
     REQUIRE(chains[1].getNrOfAtoms() == 2);
+    REQUIRE(chains[1].getType() == pe::MoleculeType::DANGLING_CHAIN);
   }
 }
