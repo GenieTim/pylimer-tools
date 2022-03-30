@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
+cmake_policy(SET CMP0077 NEW)
 
 # set the project name
 project(pylimer_tools VERSION 1.0)
@@ -66,7 +67,9 @@ target_sources(pylimer_tools
 
 set_target_properties(pylimer_tools PROPERTIES VERSION ${PROJECT_VERSION})
 
+if (NOT DEFINED CODE_COVERAGE)
 option(CODE_COVERAGE "Collect coverage from test library" OFF)
+endif()
 
 if(CODE_COVERAGE)
 	if (CMAKE_BUILD_TYPE EQUAL "RELEASE")
@@ -78,7 +81,8 @@ if(CODE_COVERAGE)
 
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-inline-functions -fno-default-inline")
 	set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-inline-functions -fno-default-inline")
-	
+	target_compile_options(pylimer_tools PRIVATE -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-inline-functions -fno-default-inline)
+
 	target_link_libraries(
 		pylimer_tools
 		PRIVATE

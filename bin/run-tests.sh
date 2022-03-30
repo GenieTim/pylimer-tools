@@ -19,10 +19,6 @@ cd build || exit 5
 # CXXCOMPILER=$(which g++ || which clang)
 # CCOMPILER=$(which gcc || which clang)
 # cmake .. -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=ON -D CMAKE_C_COMPILER="$CCOMPILER" -D CMAKE_CXX_COMPILER="$CXXCOMPILER" || exit 1
-
-# run cmake doubly to get the interlinking for coverage
-cmake .. -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=OFF || exit 1
-cmake --build . || exit 9
 cmake .. -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=OFF || exit 1
 cmake --build . || exit 9
 echo "======== Starting tests ========"

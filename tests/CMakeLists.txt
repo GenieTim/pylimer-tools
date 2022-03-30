@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.15.0)
+cmake_policy(SET CMP0077 NEW)
 project(pylimer_tests VERSION "0.1.15" LANGUAGES CXX)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/CMakeLists.txt)
