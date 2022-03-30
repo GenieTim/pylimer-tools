@@ -26,9 +26,17 @@ ASAN_OPTIONS=detect_leaks=1 ./pylimer_tests || exit 6 # -s --durations yes
 make pylimer_tests-gcov
 make test_sources-gcov
 make pylimer_tools-gcov
-make pylimer_tests-geninfo 
-make pylimer_tools-geninfo 
-make pylimer_tools-genhtml
+
+# TODO: the following is 
+# some sort of fix for header file coverage being assembled incorrectly
+rm ./*"#src#pylimer_tools_cpp#calc#^#entities#Atom.h.gcov"
+rm pylimer_tools.out/*"#entities#Atom.h.gcov"
+rm ./*"#pylimer_tools_cpp#entities#Atom.h.gcov"
+# ENDTODO
+
+# make pylimer_tests-geninfo 
+# make pylimer_tools-geninfo 
+# make pylimer_tools-genhtml
 
 cd "$ROOT_DIR" || exit 8
 
