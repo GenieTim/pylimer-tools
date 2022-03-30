@@ -79,7 +79,7 @@ Molecule &Molecule::operator=(Molecule src) {
 };
 
 double Molecule::computeEndToEndDistance() {
-  if (this->size < 2) {
+  if (this->getNrOfAtoms() < 2) {
     return 0.0;
   }
 

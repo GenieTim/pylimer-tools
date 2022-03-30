@@ -6,9 +6,9 @@
 Welcome to PylimerTools's documentation!
 ========================================
 
-.. image:: https://codecov.io/gh/GenieTim/pylimer-tools/branch/main/graph/badge.svg?token=5ZE1VSDXJQ
-:target: https://codecov.io/gh/GenieTim/pylimer-tools
-    
+.. image:: https://codecov.io/gh/GenieTim/pylimer-tools/branch/main/graph/badge.svg?token=5ZE1VSDXJQ 
+   :target: https://codecov.io/gh/GenieTim/pylimer-tools
+   :alt: Current State of the Test Coverage
 
 .. toctree::
    :maxdepth: 2

@@ -84,6 +84,8 @@ target_link_libraries(pylimer_tests
 )
 
 if (LEAK_ANALYSIS)
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address -fsanitize=leak")
+	set (CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=address -fsanitize=leak")
 	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 		target_link_libraries(pylimer_tests 
 		PRIVATE
@@ -101,8 +103,8 @@ catch_discover_tests(pylimer_tests)
 
 if(CODE_COVERAGE)
 	
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
-	set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-default-inline")
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-functions -fno-inline-small-functions -fno-default-inline")
+	set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-functions -fno-inline-small-functions -fno-default-inline")
 
 	target_link_libraries(
 		pylimer_tests
@@ -111,6 +113,19 @@ if(CODE_COVERAGE)
 	)
 	
 	# add_coverage(pylimer_tools)
-	# add_coverage(test_sources)
+	add_coverage(test_sources)
+
+	target_link_libraries(
+		test_sources
+		PRIVATE
+		--coverage
+	)
+
 	add_coverage(pylimer_tests)
+
+	target_link_libraries(
+		pylimer_tests
+		PRIVATE
+		--coverage
+	)
 endif()

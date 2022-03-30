@@ -19,17 +19,20 @@ cd build || exit 5
 # CXXCOMPILER=$(which g++ || which clang)
 # CCOMPILER=$(which gcc || which clang)
 # cmake .. -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=ON -D CMAKE_C_COMPILER="$CCOMPILER" -D CMAKE_CXX_COMPILER="$CXXCOMPILER" || exit 1
-cmake .. -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=ON || exit 1
+
+# run cmake doubly to get the interlinking for coverage
+cmake .. -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=OFF || exit 1
 cmake --build . || exit 9
-cmake .. -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=ON || exit 1
+cmake .. -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=OFF || exit 1
 cmake --build . || exit 9
 echo "======== Starting tests ========"
 ASAN_OPTIONS=detect_leaks=1 ./pylimer_tests || exit 6 # -s --durations yes
 make pylimer_tests-gcov
-make pylimer_tests-geninfo 
+make test_sources-gcov
 make pylimer_tools-gcov
+make pylimer_tests-geninfo 
 make pylimer_tools-geninfo 
-make lcov-genhtml
+make pylimer_tools-genhtml
 
 cd "$ROOT_DIR" || exit 8
 
