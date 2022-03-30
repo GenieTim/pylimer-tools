@@ -2,6 +2,7 @@
 #include "../../src/pylimer_tools_cpp/entities/Box.h"
 #include "../../src/pylimer_tools_cpp/entities/Molecule.h"
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
+#include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
 #include <map>
@@ -39,6 +40,8 @@ TEST_CASE("Universe can be used", "[entity][Universe]") {
     REQUIRE(universe.getVolume() == 1.0);
     universe.setBox(pe::Box(2.0, 1.0, 2.0));
     REQUIRE(universe.getVolume() == 4.0);
+    universe.setBox(pe::Box(-1.0, 1.0, 0.0, 1.0, 0.0, 2.0));
+    REQUIRE(universe.getVolume() == 4.0);
   }
 
   SECTION("atoms can be added") {
@@ -50,6 +53,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]") {
     REQUIRE(universe.getNrOfAtoms() == 4);
     CHECK(universe.getAtomsWithType(1).size() == 4);
     CHECK(universe.getNrOfBonds() == 0);
+    REQUIRE_THROWS(universe.getIdxByAtomId(1000));
 
     SECTION("molecules are found") {
       REQUIRE(universe.getNrOfAtoms() == 4);
@@ -88,6 +92,21 @@ TEST_CASE("Universe can be used", "[entity][Universe]") {
     );
     universe.addBonds(7, {{1, 2, 3, 6, 5, 7, 7}}, {{2, 3, 6, 5, 7, 1, 8}},
                       {{1, 1, 1, 1, 1, 1, 11}});
+
+    SECTION("masses are persisted in session") {
+      std::map<int, double> masses = universe.getMasses();
+      REQUIRE(masses.size() == 0);
+      masses[1] = 1.0;
+      masses[2] = 2.0;
+      universe.setMasses(masses);
+      std::map<int, double> newMasses = universe.getMasses();
+      REQUIRE(newMasses[1] == 1.0);
+      REQUIRE(newMasses[2] == 2.0);
+      std::map<int, double> weightFraction = universe.computeWeightFractions();
+      REQUIRE(weightFraction[1] == (5.0 * 1.0) / (3.0 * 2.0 + 5.0 * 1.0));
+      REQUIRE(weightFraction[2] == (2.0 * 3.0) / (3.0 * 2.0 + 5.0 * 1.0));
+    }
+
     SECTION("get bonds returns") {
       auto edges = universe.getEdges();
       REQUIRE(edges["edge_from"][0] == 1 - 1);
@@ -114,6 +133,35 @@ TEST_CASE("Universe can be used", "[entity][Universe]") {
       REQUIRE(universe.getAtomsWithType(1).size() == 5);
       REQUIRE(universe.getAtomsWithType(0).size() == 0);
     }
+
+    SECTION("internal lengths are computed correctly") {
+      universe.setBoxLengths(10.0, 10.0, 10.0);
+      REQUIRE(universe.computeMeanBondLength() == Catch::Approx(1.1452634834));
+      auto chains = universe.getChainsWithCrosslinker(2);
+      REQUIRE(chains.size() == 3);
+      REQUIRE(chains[0].computeEndToEndDistance() == Catch::Approx(sqrt(10.0)));
+      REQUIRE(universe.computeMeanEndToEndDistance(2) ==
+              Catch::Approx((2.0 / 3.0) * sqrt(9.0 + 1.0) + (1.0 / 3.0) * sqrt(1.0)));
+      REQUIRE(universe.computeDxs({{7, 6}}, {{6, 7}}).size() == 2);
+      std::vector<double> zeros;
+      zeros.push_back(0.0);
+      zeros.push_back(0.0);
+      REQUIRE(universe.computeDzs({{7, 6}}, {{6, 7}}) == zeros);
+      std::vector<double> dys;
+      dys.push_back(-1.0);
+      dys.push_back(1.0);
+      REQUIRE(universe.computeDys({{7, 6}}, {{6, 7}}) == dys);
+    }
+
+    SECTION("get angles returns") {
+      REQUIRE(universe.getAngles()["angle_from"].size() == 0);
+      auto detectedAngles = universe.detectAngles();
+      universe.addAngles(detectedAngles["angle_from"],
+                         detectedAngles["angle_to"],
+                         detectedAngles["angle_via"]);
+      REQUIRE(universe.getAngles()["angle_from"].size() == 6);
+    }
+
     SECTION("get atoms returns") {
       // get atoms with type returns atoms with properties
       std::vector<pe::Molecule> molecules = universe.getMolecules(2);
@@ -125,6 +173,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]") {
       REQUIRE(molecules[0].getAtomsOfDegree(1).size() == 2);
       REQUIRE(molecules[0].getAtomsOfDegree(0).size() == 0);
     }
+
     SECTION("get atoms with crosslinkers returns") {
       // get atoms with crosslinkers returns
       auto chains = universe.getChainsWithCrosslinker(2);
@@ -144,12 +193,20 @@ TEST_CASE("Universe can be used", "[entity][Universe]") {
       REQUIRE(chains[0].getAtomsOfDegree(1).size() == 2);
       REQUIRE(chains[0].getAtomsOfDegree(0).size() == 0);
     }
+
     SECTION("Loops are found") {
       std::map<int, std::vector<std::vector<pe::Atom>>> loops =
           universe.findLoops(2, -1, true);
       REQUIRE(loops.contains(2));
       REQUIRE(loops.size() == 1);
     }
+
+    SECTION("Clusters are found") {
+      std::vector<pe::Molecule> clusters = universe.getClusters();
+      REQUIRE(clusters.size() == 2);
+      REQUIRE(clusters[1].getAtoms()[0].getId() == 4);
+    }
+
     SECTION("Loops are found in reduced universe") {
       universe.addAtoms(2, {{9, 10}}, {{1, 1}}, {{0.0, 0.0}}, {{1.0, 0.0}},
                         {{1.0, 0.0}}, {{0, 1}}, {{0, 1}}, {{0, 1}});
@@ -159,6 +216,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]") {
           reducedUniverse.findLoops(2, -1);
       REQUIRE(loops.size() == 2);
     }
+
     SECTION("Infinite Strands are found") {
       universe.setBoxLengths(4.0, 4.0, 2.0);
       REQUIRE(universe.hasInfiniteStrand(2, -1) == false);
@@ -167,7 +225,10 @@ TEST_CASE("Universe can be used", "[entity][Universe]") {
           universe.findLoops(2, -1);
       REQUIRE(loops.size() == 3);
       REQUIRE(universe.hasInfiniteStrand(2, -1) == true);
+      REQUIRE(universe.getMeanStrandLength(2) ==
+              Catch::Approx(((double)(3 + 1 + 1)) / 3.0));
     }
+
     SECTION("Reduction to Cross-linker-verse works") {
       pe::Universe reducedUniverse = universe.getNetworkOfCrosslinker(2);
       REQUIRE(reducedUniverse.getNrOfAtoms() == 3);
@@ -195,11 +256,11 @@ TEST_CASE("Universe can be used", "[entity][Universe]") {
     # The system looks like this (in terms of bonds, not 3D placement):
     # 1-2-3
     #
-    # *7-6-5
+    # *7-*6-5
     */
     universe.addAtoms(6, {{1, 2, 3, 5, 6, 7}}, // id
                       {{1, 1, 1, 1, 2, 2}},    // type
-                      {{2, 2, 2, 2, 2, 2}},    // x
+                      {{3, 2, 2, 2, 2, 2}},    // x
                       {{1, 1, 1, 1, 1, 1}},    // y
                       {{1, 1, 1, 1, 1, 1}},    // z
                       {{1, 1, 1, 1, 1, 1}},    // nx
@@ -216,5 +277,10 @@ TEST_CASE("Universe can be used", "[entity][Universe]") {
     REQUIRE(chains[0].getType() == pe::MoleculeType::FREE_CHAIN);
     REQUIRE(chains[1].getNrOfAtoms() == 2);
     REQUIRE(chains[1].getType() == pe::MoleculeType::DANGLING_CHAIN);
+    // other checks
+    REQUIRE(chains[0].getKey() == "1-2-3");
+    REQUIRE(chains[1].getKey() == "5-6");
+    universe.setBoxLengths(3.0, 3.0, 3.0);
+    REQUIRE(chains[0].computeEndToEndDistance() == 1.0);
   }
 }

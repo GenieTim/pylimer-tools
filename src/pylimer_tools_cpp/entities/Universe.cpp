@@ -1254,7 +1254,8 @@ double Universe::getMeanStrandLength(int junctionType) {
 /**
  * @brief Get the mean end to end distance
  *
- * Does not take loops etc. into account.
+ * Does not take loops into account as a contributor to the mean.
+ * Returns 0 for systems without any qualifying strands.
  *
  * @param junctionType
  * @return double
@@ -1272,6 +1273,10 @@ double Universe::computeMeanEndToEndDistance(int junctionType) {
       meanEndToEndDistance += dist;
       validMolecules += 1;
     }
+  }
+
+  if (validMolecules == 0) {
+    return 0.0;
   }
 
   return meanEndToEndDistance / (double)validMolecules;
