@@ -66,6 +66,7 @@ add_library(test_sources
 		pylimer_tools/test_universesequence.cpp 
 		pylimer_tools/test_molecule.cpp 
 		pylimer_tools/test_atom.cpp 
+		pylimer_tools/test_readers_writers.cpp 
 )
 
 target_link_libraries(test_sources 
@@ -106,7 +107,9 @@ if(CODE_COVERAGE)
 	
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-functions -fno-inline-small-functions -fno-default-inline")
 	set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-functions -fno-inline-small-functions -fno-default-inline")
+	target_compile_options(pylimer_tests PRIVATE -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-inline-functions -fno-default-inline)
 
+	add_coverage(pylimer_tests)
 	target_link_libraries(
 		pylimer_tests
 		PRIVATE
@@ -118,14 +121,6 @@ if(CODE_COVERAGE)
 
 	target_link_libraries(
 		test_sources
-		PRIVATE
-		--coverage
-	)
-
-	add_coverage(pylimer_tests)
-
-	target_link_libraries(
-		pylimer_tests
 		PRIVATE
 		--coverage
 	)

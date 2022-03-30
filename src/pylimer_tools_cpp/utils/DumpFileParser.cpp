@@ -141,7 +141,7 @@ void DumpFileParser::readNGroups(const size_t start, const int N) {
     throw std::runtime_error("Cannot read from closed file.");
   }
 
-  if (start >= this->getLength() || ((int)start + N) > this->getLength()) {
+  if (start >= this->getLength() || (N != -1 && ((int)start + N) > this->getLength())) {
     throw std::invalid_argument("Cannot read from outside the length of the "
                                 "dump file. Tried to read from " +
                                 std::to_string(start) + " to " +
@@ -198,7 +198,7 @@ void DumpFileParser::readNGroups(const size_t start, const int N) {
     this->data.insert_or_assign(start + groupsRead, dataItem);
     groupsRead += 1;
   }
-  if (groupsRead != N) {
+  if (groupsRead != N && N != -1) {
     throw std::runtime_error("Failed to read " + std::to_string(N) + ", read " +
                              std::to_string(groupsRead) + " groups on " +
                              std::to_string(linesRead) +
