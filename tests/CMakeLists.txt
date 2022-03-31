@@ -65,7 +65,6 @@ add_library(test_sources
 		pylimer_tools/test_universe.cpp 
 		pylimer_tools/test_universesequence.cpp 
 		pylimer_tools/test_molecule.cpp 
-		pylimer_tools/test_atom.cpp 
 		pylimer_tools/test_readers_writers.cpp 
 )
 
@@ -85,6 +84,13 @@ target_link_libraries(pylimer_tests
 	${igraph_LIBRARIES}
 )
 
+# separate the header tests out, for the coverage generation
+add_executable(header_tests pylimer_tools/test_atom.cpp)
+target_link_libraries(header_tests 
+	PRIVATE 
+	Catch2::Catch2WithMain
+)
+
 if (LEAK_ANALYSIS)
 	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address -fsanitize=leak")
 	set (CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=address -fsanitize=leak")
@@ -102,6 +108,7 @@ list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 include(CTest)
 include(Catch)
 catch_discover_tests(pylimer_tests)
+catch_discover_tests(header_tests)
 
 if(CODE_COVERAGE)
 	
@@ -124,4 +131,7 @@ if(CODE_COVERAGE)
 		PRIVATE
 		--coverage
 	)
+
+	target_compile_options(header_tests PRIVATE -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-inline-functions -fno-default-inline)
+	add_coverage(header_tests)
 endif()

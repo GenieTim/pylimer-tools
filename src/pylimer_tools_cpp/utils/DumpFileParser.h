@@ -57,38 +57,11 @@ public:
                                             const std::string column) {
     return this->getValuesForAt<double>(index, headerKey, column);
   };
-  size_t getLength() { return this->nrOfGroups; }
-  bool hasKey(std::string headerKey) {
-    if (this->data.size() == 0) {
-      throw std::invalid_argument("Cannot check for header '" + headerKey +
-                                  "' without reading a group first.");
-    }
-    if (this->getLength() > 0) {
-      // assumption: each step has the same keys
-      auto firstEl = this->data.begin();
-      return firstEl->second.contains(headerKey);
-    }
-    return false;
-  }
-  bool keyHasColumn(std::string headerKey, std::string column) {
-    const auto colItIdx =
-        std::find(this->headerColMap.at(headerKey).begin(),
-                  this->headerColMap.at(headerKey).end(), column);
-    if (this->headerColMap.at(headerKey).end() == colItIdx) {
-      return false;
-    }
-    return true;
-  }
+  size_t getLength();
+  bool hasKey(std::string headerKey);
+  bool keyHasColumn(std::string headerKey, std::string column);
   bool keyHasDirectionalColumn(std::string headerKey, std::string dirPraefix,
-                               std::string dirSuffix) {
-    // std::cout << "Searching for " << headerKey << " " << dirPraefix <<
-    // dirSuffix << " in " <<
-    // pylimer_tools::utils::join(this->headerColMap.at(headerKey).begin(),
-    // this->headerColMap.at(headerKey).end(), std::string(" ")) << std::endl;
-    return this->keyHasColumn(headerKey, dirPraefix + "x" + dirSuffix) &&
-           this->keyHasColumn(headerKey, dirPraefix + "y" + dirSuffix) &&
-           this->keyHasColumn(headerKey, dirPraefix + "z" + dirSuffix);
-  }
+                               std::string dirSuffix);
 
 private:
   std::string cleanHeader(std::string header);
@@ -114,6 +87,7 @@ private:
   std::map<std::string, std::vector<std::string>> headerColMap;
   std::map<size_t, std::streampos> groupPosMap;
 };
+
 
 template <typename OUT>
 std::vector<OUT> DumpFileParser::getValuesForAt(const size_t index,
