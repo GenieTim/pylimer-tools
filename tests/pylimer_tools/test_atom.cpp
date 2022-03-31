@@ -1,8 +1,5 @@
 #include "../../src/pylimer_tools_cpp/entities/Atom.h"
 #include "../../src/pylimer_tools_cpp/entities/Box.h"
-#include "../../src/pylimer_tools_cpp/entities/Molecule.h"
-#include "../../src/pylimer_tools_cpp/entities/Universe.h"
-#include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <iostream>
