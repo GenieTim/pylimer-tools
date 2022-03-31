@@ -130,6 +130,69 @@ DumpFileParser::DumpFileParser(const std::string filePath) {
 void DumpFileParser::readGroupByIdx(const size_t i) { this->readNGroups(i, 1); }
 
 /**
+ * @brief Get the nr of groups
+ *
+ * @return size_t
+ */
+size_t DumpFileParser::getLength() { return this->nrOfGroups; }
+
+/**
+ * @brief Check whether a header key exists
+ *
+ * @param headerKey
+ * @return bool
+ */
+bool DumpFileParser::hasKey(std::string headerKey) {
+  if (this->data.size() == 0) {
+    throw std::invalid_argument("Cannot check for header '" + headerKey +
+                                "' without reading a group first.");
+  }
+  if (this->getLength() > 0) {
+    // assumption: each step has the same keys
+    auto firstEl = this->data.begin();
+    return firstEl->second.contains(headerKey);
+  }
+  return false;
+}
+
+/**
+ * @brief Check whether a header key has a certain column
+ *
+ * @param headerKey
+ * @param column
+ * @return bool
+ */
+bool DumpFileParser::keyHasColumn(std::string headerKey, std::string column) {
+  const auto colItIdx =
+      std::find(this->headerColMap.at(headerKey).begin(),
+                this->headerColMap.at(headerKey).end(), column);
+  if (this->headerColMap.at(headerKey).end() == colItIdx) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * @brief Check whether a header key has a certain column three times
+ *
+ * @param headerKey the key to check
+ * @param dirPraefix the praefix in front of the "x", "y" and "z" of the column
+ * @param dirSuffix the suffix behind the "x", "y" and "z" of the column
+ * @return bool
+ */
+bool DumpFileParser::keyHasDirectionalColumn(std::string headerKey,
+                                             std::string dirPraefix,
+                                             std::string dirSuffix) {
+  // std::cout << "Searching for " << headerKey << " " << dirPraefix <<
+  // dirSuffix << " in " <<
+  // pylimer_tools::utils::join(this->headerColMap.at(headerKey).begin(),
+  // this->headerColMap.at(headerKey).end(), std::string(" ")) << std::endl;
+  return this->keyHasColumn(headerKey, dirPraefix + "x" + dirSuffix) &&
+         this->keyHasColumn(headerKey, dirPraefix + "y" + dirSuffix) &&
+         this->keyHasColumn(headerKey, dirPraefix + "z" + dirSuffix);
+}
+
+/**
  * @brief Read N timesteps
  *
  * @param start the index to start at reading
@@ -141,7 +204,8 @@ void DumpFileParser::readNGroups(const size_t start, const int N) {
     throw std::runtime_error("Cannot read from closed file.");
   }
 
-  if (start >= this->getLength() || (N != -1 && ((int)start + N) > this->getLength())) {
+  if (start >= this->getLength() ||
+      (N != -1 && ((int)start + N) > this->getLength())) {
     throw std::invalid_argument("Cannot read from outside the length of the "
                                 "dump file. Tried to read from " +
                                 std::to_string(start) + " to " +

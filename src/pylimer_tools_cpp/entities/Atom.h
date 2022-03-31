@@ -96,18 +96,18 @@ public:
                 distanceVec[2] * distanceVec[2]);
   }
 
-  inline long int getId() const { return this->id; }
-  inline int getType() const { return this->type; }
-  inline double getX() const { return this->x; }
-  inline double getY() const { return this->y; }
-  inline double getZ() const { return this->z; }
-  inline double getUnwrappedX(const Box *box) const {
+  long int getId() const { return this->id; }
+  int getType() const { return this->type; }
+  double getX() const { return this->x; }
+  double getY() const { return this->y; }
+  double getZ() const { return this->z; }
+  double getUnwrappedX(const Box *box) const {
     return this->x * this->nx * box->getLx();
   }
-  inline double getUnwrappedY(const Box *box) const {
+  double getUnwrappedY(const Box *box) const {
     return this->y * this->ny * box->getLy();
   }
-  inline double getUnwrappedZ(const Box *box) const {
+  double getUnwrappedZ(const Box *box) const {
     return this->z * this->nz * box->getLz();
   }
   int getNX() const { return this->nx; }

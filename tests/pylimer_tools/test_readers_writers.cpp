@@ -18,12 +18,19 @@ TEST_CASE("DumpFileParser can be used", "[utils][DumpFileParser]") {
     pu::DumpFileParser parser =
         pu::DumpFileParser(suspectedPath + "lammps_dump_small.lammpstrj");
     REQUIRE(parser.getLength() == 1);
-    parser.read();
+    REQUIRE_NOTHROW(parser.read());
     REQUIRE(parser.getLength() == 1);
     REQUIRE_THROWS(parser.readNGroups(1, 10));
+    REQUIRE_THROWS(parser.getValuesForAt<int>(0, "BOX BOUNDS", "notexisting"));
     // call copy constructor
     pu::DumpFileParser parser2 = parser;
     REQUIRE(parser2.getLength() == 1);
+
+    // test other reading capabilities
+    pu::DumpFileParser parser3 =
+        pu::DumpFileParser(suspectedPath + "lammps_dump_small.lammpstrj");
+    REQUIRE(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1).size() == 3);
+    REQUIRE_THROWS(parser.getValuesForAt<double>(0, "NOT EXISTING", 9));
   }
 
   SECTION("Reading from data files works") {

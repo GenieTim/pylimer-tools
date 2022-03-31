@@ -11,6 +11,7 @@ extern "C" {
 #include <igraph/igraph.h>
 }
 
+#define CATCH_CONFIG_MAIN
 namespace pe = pylimer_tools::entities;
 
 TEST_CASE("Atoms can calculate distances", "[entity][Atom]") {
