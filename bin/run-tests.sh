@@ -30,6 +30,7 @@ make header_test-gcov
 
 # TODO: the following is 
 # some sort of fix for header file coverage being assembled incorrectly
+# but this fix does not really work
 rm ./*"#src#pylimer_tools_cpp#calc#^#entities#Atom.h.gcov"
 rm pylimer_tools.out/*"#entities#Atom.h.gcov"
 rm ./*"#pylimer_tools_cpp#entities#Atom.h.gcov"
