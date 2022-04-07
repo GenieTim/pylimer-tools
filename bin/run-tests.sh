@@ -42,21 +42,13 @@ ASAN_OPTIONS=detect_leaks=1 ./pylimer_tests || exit 6 # -s --durations yes
 "$GENERATOR_BIN" pylimer_tools-gcov
 "$GENERATOR_BIN" header_tests-gcov
 
-# TODO: the following is
-# some sort of fix for header file coverage being assembled incorrectly
-# but this fix does not really work
-rm ./*"#src#pylimer_tools_cpp#calc#^#entities#Atom.h.gcov"
-rm pylimer_tools.out/*"#entities#Atom.h.gcov"
-rm ./*"#pylimer_tools_cpp#entities#Atom.h.gcov"
-# ENDTODO
-
 "$GENERATOR_BIN" pylimer_tests-geninfo
 "$GENERATOR_BIN" pylimer_tools-geninfo
 "$GENERATOR_BIN" header_tests-geninfo
 "$GENERATOR_BIN" pylimer_tools-genhtml
 
 cd "$ROOT_DIR" || exit 8
-exit
+
 # copy outside such that pip installation does not remove it
 # cp tests/build/lcov/data/capture/pylimer_tools.info pylimer_tools_lcoverage.info
 
