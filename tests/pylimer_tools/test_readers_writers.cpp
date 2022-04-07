@@ -4,19 +4,22 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
-extern "C" {
+extern "C"
+{
 #include <igraph/igraph.h>
 }
 
 namespace pu = pylimer_tools::utils;
 
-TEST_CASE("DumpFileParser can be used", "[utils][DumpFileParser]") {
+TEST_CASE("DumpFileParser can be used", "[utils][DumpFileParser]")
+{
   std::string suspectedPath = "../pylimer_tools/fixtures/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
-  SECTION("Reading from dump file works") {
+  SECTION("Reading from dump file works")
+  {
     pu::DumpFileParser parser =
-        pu::DumpFileParser(suspectedPath + "lammps_dump_small.lammpstrj");
+      pu::DumpFileParser(suspectedPath + "lammps_dump_small.lammpstrj");
     REQUIRE(parser.getLength() == 1);
     REQUIRE_NOTHROW(parser.read());
     REQUIRE(parser.getLength() == 1);
@@ -28,12 +31,13 @@ TEST_CASE("DumpFileParser can be used", "[utils][DumpFileParser]") {
 
     // test other reading capabilities
     pu::DumpFileParser parser3 =
-        pu::DumpFileParser(suspectedPath + "lammps_dump_small.lammpstrj");
+      pu::DumpFileParser(suspectedPath + "lammps_dump_small.lammpstrj");
     REQUIRE(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1).size() == 3);
     REQUIRE_THROWS(parser.getValuesForAt<double>(0, "NOT EXISTING", 9));
   }
 
-  SECTION("Reading from data files works") {
+  SECTION("Reading from data files works")
+  {
     pu::DataFileParser parser = pu::DataFileParser();
     parser.read(suspectedPath + "lammps_data_file.out");
     REQUIRE(parser.getNrOfAtoms() == 3000);
