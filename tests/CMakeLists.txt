@@ -117,6 +117,12 @@ if(CODE_COVERAGE)
 	set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-functions -fno-inline-small-functions -fno-default-inline")
 	target_compile_options(pylimer_tests PRIVATE -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-inline-functions -fno-default-inline)
 
+	if(CMAKE_COMPILER_IS_GNUCXX)
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-abs-path")
+		set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fprofile-abs-path")
+		target_compile_options(pylimer_tests PRIVATE -fprofile-abs-path)
+	endif()
+
 	add_coverage(pylimer_tests)
 	target_link_libraries(
 		pylimer_tests

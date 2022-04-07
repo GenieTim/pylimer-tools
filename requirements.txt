@@ -26,7 +26,7 @@ coverage>=6.0.1
 furo>=2021.10.9
 ninja>=1.10.2.2
 cmake>=3.21.4
-scikit-build==0.13.0
+scikit-build==0.13.1
 pybind11-stubgen>=0.10.5
 sphinx>=4.2.0
 wheel>=0.37.0
