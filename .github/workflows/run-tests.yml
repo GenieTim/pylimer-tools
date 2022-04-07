@@ -34,7 +34,7 @@ jobs:
         run: pip install -r requirements.txt
       
       - name: Install dev dependencies
-        run: sudo apt-get install bison flex
+        run: sudo apt-get install bison flex lcov
       
       - name: Run Tests
         run: ./bin/run-tests.sh

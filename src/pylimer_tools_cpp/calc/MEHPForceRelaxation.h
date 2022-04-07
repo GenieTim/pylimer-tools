@@ -367,11 +367,8 @@ namespace calc {
        */
       void ImposePBC(double s[3], double box[3])
       {
-        long int i;
-        double half;
-
-        for (i = 0; i < 3; i++) {
-          half = 0.5 * box[i];
+        for (int i = 0; i < 3; i++) {
+          double half = 0.5 * box[i];
           while (s[i] > half) {
             s[i] -= box[i];
           }
@@ -399,11 +396,7 @@ namespace calc {
         /* initial spring vector */
         coords[0] = a.x - b.x;
         coords[1] = a.y - b.y;
-        if (this->is2d) {
-          coords[2] = 0.0;
-        } else {
-          coords[2] = a.z - b.z;
-        }
+        coords[2] = this->is2d ? 0.0 : a.z - b.z;
 
         /* periodic boundary conditions */
         ImposePBC(coords, boxL);

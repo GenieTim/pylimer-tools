@@ -86,7 +86,7 @@ if(CODE_COVERAGE)
 	if(CMAKE_COMPILER_IS_GNUCXX)
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-abs-path")
 		set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fprofile-abs-path")
-		target_compile_options(pylimer_tests PRIVATE -fprofile-abs-path)
+		target_compile_options(pylimer_tools PRIVATE -fprofile-abs-path)
 	endif()
 
 	target_link_libraries(
