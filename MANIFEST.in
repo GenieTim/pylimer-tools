@@ -1,8 +1,9 @@
-include vendor/CMakeLists.txt
 include CMakeLists.txt
+include vendor/CMakeLists.txt
+include README.md
 global-include src/**/CMakeLists.txt
-global-include src/**/*.h
-global-include src/**/*.cpp
+global-include src/pylimer_tools_cpp/**/*.h
+global-include src/pylimer_tools_cpp/**/*.cpp
 exclude .github
 exclude src/test
 exclude tests

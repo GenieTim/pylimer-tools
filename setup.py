@@ -36,8 +36,8 @@ if (os.getenv('VCPKG_ROOT')):
             "Detected VCPKG_ROOT. Did not find toolchain file {} though.".format(toolchainFile))
 
 # delete vendor caches — this is useful if you compile
-# this project using CMakes as well as skbuild,
-# as the two build directories of vendor would not interact well.
+# this project using CMake (e.g. for tests) as well as skbuild,
+# as the two build directories of vendor do not interact well.
 igraphVendor = os.path.abspath(os.path.join(
     os.path.dirname(__file__), 'vendor/igraph'))
 if (os.path.exists(igraphVendor)):
@@ -49,14 +49,14 @@ if (os.path.exists(igraphVendor)):
 else:
     print("No need to delete {}".format(igraphVendor))
 
-skbuildCaches = os.path.abspath(os.path.join(
-    os.path.dirname(__file__), '_skbuild'))
-if (os.path.exists(skbuildCaches)):
-    try:
-        shutil.rmtree(skbuildCaches)
-    except:
-        warnings.warn(
-            "Could not delete directory {}. Errors incoming.".format(skbuildCaches))
+# skbuildCaches = os.path.abspath(os.path.join(
+#     os.path.dirname(__file__), '_skbuild'))
+# if (os.path.exists(skbuildCaches)):
+#     try:
+#         shutil.rmtree(skbuildCaches)
+#     except:
+#         warnings.warn(
+#             "Could not delete directory {}. Errors incoming.".format(skbuildCaches))
 
 
 setup(
@@ -69,9 +69,9 @@ setup(
     author="Tim Bernhard",
     author_email="tim@bernhard.dev",
     url="https://github.com/GenieTim/pylimer-tools",
-    packages=find_packages(where="src"),
+    packages=find_packages(where="src", exclude=("tests",)),
     package_dir={"": "src"},
-    cmake_install_dir="src/pylimer_tools_cpp",
+    cmake_install_dir="",
     cmake_args=cmake_args,
     include_package_data=True,
     extras_require={"test": ["unittest"]},
@@ -79,6 +79,7 @@ setup(
     classifiers=[
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Operating System :: OS Independent"
     ]
