@@ -57,7 +57,7 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("tolerance") = 1e-8,
          py::arg("Nb2") = -1.0,
          py::arg("is2d") = false,
-         py::arg("dt") = 0.05,
+         py::arg("dt") = 0.077,
          py::arg("kappa") = 1.0)
     //  .def("getVolume", &mehp::MEHPForceRelaxation::getVolume)
     .def("getNrOfNodes", &mehp::MEHPForceRelaxation::getNrOfNodes, R"pbdoc(

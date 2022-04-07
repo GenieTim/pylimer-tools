@@ -14,10 +14,6 @@
 namespace pylimer_tools {
 namespace calc {
   namespace mehp {
-#define EPSILON 0.077 /* relaxation parameter, adjusted by trial and errors */
-#define RED2 1.e-8    /* second residual norm reduction */
-#define EPS2 1.e-16   /* distance tolerance squared for the loop count */
-
     typedef struct _Spring
     {
       long int a;    /* first node */
@@ -105,7 +101,7 @@ namespace calc {
                               double tol = 1e-8,
                               double Nb2 = -1.0,
                               bool is2d = false,
-                              double eps = 0.025,
+                              double eps = 0.077,
                               double kappa = 1.0)
       {
         this->is2d = is2d;

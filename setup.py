@@ -71,7 +71,7 @@ setup(
     url="https://github.com/GenieTim/pylimer-tools",
     packages=find_packages(where="src", exclude=("tests",)),
     package_dir={"": "src"},
-    cmake_install_dir="",
+    cmake_install_dir="src/pylimer_tools_cpp",
     cmake_args=cmake_args,
     include_package_data=True,
     extras_require={"test": ["unittest"]},
