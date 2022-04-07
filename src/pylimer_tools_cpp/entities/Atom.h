@@ -31,7 +31,7 @@ public:
                                     double boxL) const {
     double delta = std::fabs(c1 - c2);
     if (n1 != n2) {
-      delta -= ((double)(n1 - n2)) * boxL;
+      delta -= (static_cast<double>(n1 - n2)) * boxL;
     }
     return delta;
   }

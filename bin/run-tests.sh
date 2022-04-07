@@ -26,7 +26,7 @@ ASAN_OPTIONS=detect_leaks=1 ./pylimer_tests || exit 6 # -s --durations yes
 make pylimer_tests-gcov
 make test_sources-gcov
 make pylimer_tools-gcov
-make header_test-gcov
+make header_tests-gcov
 
 # TODO: the following is 
 # some sort of fix for header file coverage being assembled incorrectly
@@ -36,9 +36,11 @@ rm pylimer_tools.out/*"#entities#Atom.h.gcov"
 rm ./*"#pylimer_tools_cpp#entities#Atom.h.gcov"
 # ENDTODO
 
-# make pylimer_tests-geninfo 
-# make pylimer_tools-geninfo 
-# make pylimer_tools-genhtml
+make pylimer_tests-geninfo 
+make pylimer_tools-geninfo 
+make header_tests-geninfo 
+make pylimer_tools-genhtml
+make header_tests-genhtml
 
 cd "$ROOT_DIR" || exit 8
 
@@ -50,7 +52,7 @@ then
   npx -y lcov-badge2 -l "C++ Code Coverage" -o ".github/cpp-coverage.svg" pylimer_tools_lcoverage.info
 fi
 
-# exit
+exit
 # then, build/install project for Python
 python -m pip install --verbose --use-feature=in-tree-build . || exit 3
 
