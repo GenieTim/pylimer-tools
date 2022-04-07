@@ -28,7 +28,7 @@ make test_sources-gcov
 make pylimer_tools-gcov
 make header_tests-gcov
 
-# TODO: the following is 
+# TODO: the following is
 # some sort of fix for header file coverage being assembled incorrectly
 # but this fix does not really work
 rm ./*"#src#pylimer_tools_cpp#calc#^#entities#Atom.h.gcov"
@@ -36,23 +36,20 @@ rm pylimer_tools.out/*"#entities#Atom.h.gcov"
 rm ./*"#pylimer_tools_cpp#entities#Atom.h.gcov"
 # ENDTODO
 
-make pylimer_tests-geninfo 
-make pylimer_tools-geninfo 
-make header_tests-geninfo 
+make pylimer_tests-geninfo
+make pylimer_tools-geninfo
+make header_tests-geninfo
 make pylimer_tools-genhtml
-make header_tests-genhtml
 
 cd "$ROOT_DIR" || exit 8
 
 # copy outside such that pip installation does not remove it
 # cp tests/build/lcov/data/capture/pylimer_tools.info pylimer_tools_lcoverage.info
 
-if command -v npx;
-then
-  npx -y lcov-badge2 -l "C++ Code Coverage" -o ".github/cpp-coverage.svg" pylimer_tools_lcoverage.info
+if command -v npx; then
+  npx -y lcov-badge2 -l "C++ Code Coverage" -o ".github/cpp-coverage.svg" pylimer_tools_lcoverage.info || echo "Failed to generate coverage badge"
 fi
 
-exit
 # then, build/install project for Python
 python -m pip install --verbose --use-feature=in-tree-build . || exit 3
 
