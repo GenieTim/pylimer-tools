@@ -43,6 +43,7 @@ endif()
 
 target_sources(pylimer_tools
 	PRIVATE
+		${CMAKE_CURRENT_LIST_DIR}/entities/AtomGraphParent.cpp
 		${CMAKE_CURRENT_LIST_DIR}/entities/Molecule.cpp
 		${CMAKE_CURRENT_LIST_DIR}/entities/Universe.cpp
 		${CMAKE_CURRENT_LIST_DIR}/entities/UniverseSequence.cpp
