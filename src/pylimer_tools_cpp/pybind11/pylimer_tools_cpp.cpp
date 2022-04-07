@@ -4,13 +4,19 @@
 
 namespace py = pybind11;
 
-void init_pylimer_bound_entities(py::module_ &);
-void init_pylimer_bound_calc(py::module_ &);
-void init_pylimer_bound_readers(py::module_ &);
-void init_pylimer_bound_writers(py::module_ &);
-void init_pylimer_bound_generators(py::module_ &);
+void
+init_pylimer_bound_entities(py::module_&);
+void
+init_pylimer_bound_calc(py::module_&);
+void
+init_pylimer_bound_readers(py::module_&);
+void
+init_pylimer_bound_writers(py::module_&);
+void
+init_pylimer_bound_generators(py::module_&);
 
-PYBIND11_MODULE(pylimer_tools_cpp, m) {
+PYBIND11_MODULE(pylimer_tools_cpp, m)
+{
   m.doc() = R"pbdoc(
     PylimerTools Cpp
     -----------------

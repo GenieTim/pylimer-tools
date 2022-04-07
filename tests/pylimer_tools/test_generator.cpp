@@ -9,14 +9,16 @@
 #include <iostream>
 #include <map>
 #include <vector>
-extern "C" {
+extern "C"
+{
 #include <igraph/igraph.h>
 }
 
 namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
 
-TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]") {
+TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
+{
   pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(10.0, 10.0, 10.0);
   generator.setSeed(8804);
   generator.setBeadDistance(0.964);
@@ -33,11 +35,12 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]") {
   REQUIRE(universe.getVolume() == 10.0 * 10.0 * 10.0);
 
   auto angles = universe.detectAngles();
-  universe.addAngles(angles["angle_from"], angles["angle_via"],
-                     angles["angle_to"]);
+  universe.addAngles(
+    angles["angle_from"], angles["angle_via"], angles["angle_to"]);
   REQUIRE(universe.getNrOfAngles() > 0);
 
-  SECTION("Nrs of chains is correct") {
+  SECTION("Nrs of chains is correct")
+  {
     REQUIRE(universe.getAtomsWithType(2).size() == 100);
     REQUIRE(universe.getAtomsWithType(1).size() == (4 / 2) * 100 * 16);
     REQUIRE(universe.getMolecules(2).size() == (4 / 2) * 100 + 100);
