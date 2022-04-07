@@ -39,7 +39,7 @@ if (os.getenv('VCPKG_ROOT')):
 # this project using CMake (e.g. for tests) as well as skbuild,
 # as the two build directories of vendor do not interact well.
 igraphVendor = os.path.abspath(os.path.join(
-    os.path.dirname(__file__), 'vendor/igraph'))
+    os.path.dirname(__file__), 'vendor/igraph/src/igraphLib-build'))
 if (os.path.exists(igraphVendor)):
     try:
         shutil.rmtree(igraphVendor)

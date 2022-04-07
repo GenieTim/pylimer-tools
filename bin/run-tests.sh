@@ -3,10 +3,13 @@
 cd "$(dirname "$0")/.." || exit 10
 ROOT_DIR=$(pwd)
 
-# delete old stuff
+
+# pip/skbuild uses ninja as a generator, 
+# however, it uses a bundled one in a virtual env
+# therefore, we need to delete vendor caches
 if [ -d "_skbuild" ]; then
   rm -rf ./_skbuild
-  rm -rf ./vendor/igraph
+  rm -rf ./vendor/igraph/src/igraphLib-build
 fi
 
 cd "$ROOT_DIR/tests" || exit 2
@@ -16,10 +19,20 @@ cd "$ROOT_DIR/tests" || exit 2
 mkdir -p build
 cd build || exit 5
 # force use of g++ if available for coverage
-# CXXCOMPILER=$(which g++ || which clang)
-# CCOMPILER=$(which gcc || which clang)
-# cmake .. -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=ON -D CMAKE_C_COMPILER="$CCOMPILER" -D CMAKE_CXX_COMPILER="$CXXCOMPILER" || exit 1
-cmake .. -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=OFF || exit 1
+CXXCOMPILER=$(which g++ || which clang)
+CCOMPILER=$(which gcc || which clang)
+ADDITIONALFLAGS=()
+if command -v g++; then
+  ADDITIONALFLAGS=("${ADDITIONALFLAGS[@]}" -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=OFF -D CMAKE_C_COMPILER="$CCOMPILER" -D CMAKE_CXX_COMPILER="$CXXCOMPILER")
+elif command -v clang; then
+  ADDITIONALFLAGS=("${ADDITIONALFLAGS[@]}" -D CODE_COVERAGE=OFF -D LEAK_ANALYSIS=ON -D CMAKE_C_COMPILER="$CCOMPILER" -D CMAKE_CXX_COMPILER="$CXXCOMPILER")
+else
+  ADDITIONALFLAGS=("${ADDITIONALFLAGS[@]}" -D CODE_COVERAGE=OFF -D LEAK_ANALYSIS=OFF)
+fi
+if command -v ninja; then
+  ADDITIONALFLAGS=("${ADDITIONALFLAGS[@]}" "-GNinja")
+fi
+cmake .. -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=OFF "${ADDITIONALFLAGS[@]}" || exit 1
 cmake --build . || exit 9
 echo "======== Starting tests ========"
 ASAN_OPTIONS=detect_leaks=1 ./pylimer_tests || exit 6 # -s --durations yes
