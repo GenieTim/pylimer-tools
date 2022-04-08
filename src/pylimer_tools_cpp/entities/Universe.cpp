@@ -198,21 +198,6 @@ namespace entities {
     this->addBonds(NNewBonds, from, to, std::vector<int>());
   }
 
-  void Universe::addAngles(std::vector<long int> from,
-                           std::vector<long int> via,
-                           std::vector<long int> to)
-  {
-    if (from.size() != to.size() || from.size() != via.size()) {
-      throw std::invalid_argument("All angle inputs must have the same size.");
-    }
-
-    this->angleFrom.insert(
-      std::end(this->angleFrom), std::begin(from), std::end(from));
-    this->angleVia.insert(
-      std::end(this->angleVia), std::begin(via), std::end(via));
-    this->angleTo.insert(std::end(this->angleTo), std::begin(to), std::end(to));
-  }
-
   void Universe::addBonds(const size_t NNewBonds,
                           std::vector<long int> from,
                           std::vector<long int> to,
@@ -276,7 +261,22 @@ namespace entities {
         this->NBonds = igraph_ecount(&this->graph);
       }
     }
-  };
+  }
+
+  void Universe::addAngles(std::vector<long int> from,
+                           std::vector<long int> via,
+                           std::vector<long int> to)
+  {
+    if (from.size() != to.size() || from.size() != via.size()) {
+      throw std::invalid_argument("All angle inputs must have the same size.");
+    }
+
+    this->angleFrom.insert(
+      std::end(this->angleFrom), std::begin(from), std::end(from));
+    this->angleVia.insert(
+      std::end(this->angleVia), std::begin(via), std::end(via));
+    this->angleTo.insert(std::end(this->angleTo), std::begin(to), std::end(to));
+  }
 
   void Universe::simplify()
   {

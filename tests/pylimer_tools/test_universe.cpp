@@ -38,6 +38,9 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
   {
     universe.setBox(pe::Box(0.0, 1.0, 2.0));
     REQUIRE(universe.getVolume() == 0.0);
+    REQUIRE(universe.getClusters().size() == 0);
+    REQUIRE(universe.getMolecules(2).size() == 0);
+    REQUIRE(universe.getChainsWithCrosslinker(2).size() == 0);
   }
 
   SECTION("resizing bigger changes volume")
@@ -91,6 +94,60 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       // works twice: make sure there is no removal of anything happening
       REQUIRE(universe.getMolecules(2).size() == 2);
     }
+
+    SECTION("Special constructors work")
+    {
+      pe::Universe universe2 = universe;
+      REQUIRE(universe2.getNrOfAtoms() == 4);
+      REQUIRE(universe2.getMolecules(2).size() == 4);
+    }
+  }
+
+  SECTION("Disallowed mutations are detected")
+  {
+    std::vector<int> threeZeros = { { 0, 0, 0 } };
+    std::vector<long int> oneTwoThree = { { 1, 2, 3 } };
+    std::vector<long int> threeLongZeros = { { 0, 0, 0 } };
+    std::vector<double> threeDoubleZeros = { { 0, 0, 0 } };
+    // atom not yet added
+    REQUIRE_THROWS(universe.addBonds(
+      3, oneTwoThree, threeLongZeros, threeZeros, false, true));
+    // same, but ignore the error
+    REQUIRE_NOTHROW(universe.addBonds(
+      3, oneTwoThree, threeLongZeros, threeZeros, true, true));
+    // all fine
+    REQUIRE_NOTHROW(universe.addAtoms(oneTwoThree,
+                                      threeZeros,
+                                      threeDoubleZeros,
+                                      threeDoubleZeros,
+                                      threeDoubleZeros,
+                                      threeZeros,
+                                      threeZeros,
+                                      threeZeros));
+    // id already exists
+    REQUIRE_THROWS(universe.addAtoms(threeLongZeros,
+                                     threeZeros,
+                                     threeDoubleZeros,
+                                     threeDoubleZeros,
+                                     threeDoubleZeros,
+                                     threeZeros,
+                                     threeZeros,
+                                     threeZeros));
+    std::vector<long int> fourLongZeros = { { 0, 0, 0, 0 } };
+    // different lengths
+    REQUIRE_THROWS(universe.addAtoms(fourLongZeros,
+                                     threeZeros,
+                                     threeDoubleZeros,
+                                     threeDoubleZeros,
+                                     threeDoubleZeros,
+                                     threeZeros,
+                                     threeZeros,
+                                     threeZeros));
+    // different lengths
+    REQUIRE_THROWS(universe.addAngles(oneTwoThree, fourLongZeros, oneTwoThree));
+    // different lengths
+    REQUIRE_THROWS(
+      universe.addBonds(3, oneTwoThree, fourLongZeros, threeZeros));
   }
 
   SECTION("Molecules with crosslinkers are found")
@@ -118,6 +175,14 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                       { { 1, 2, 3, 6, 5, 7, 7 } },
                       { { 2, 3, 6, 5, 7, 1, 8 } },
                       { { 1, 1, 1, 1, 1, 1, 11 } });
+
+    SECTION("Atom types are counted")
+    {
+      std::map<int, int> atomCounts = universe.countAtomTypes();
+      REQUIRE(atomCounts.size() == 2);
+      REQUIRE(atomCounts[1] == 5);
+      REQUIRE(atomCounts[2] == 3);
+    }
 
     SECTION("masses are persisted in session")
     {
