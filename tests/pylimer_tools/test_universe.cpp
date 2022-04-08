@@ -38,9 +38,12 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
   {
     universe.setBox(pe::Box(0.0, 1.0, 2.0));
     REQUIRE(universe.getVolume() == 0.0);
+    // check empty stuff
     REQUIRE(universe.getClusters().size() == 0);
     REQUIRE(universe.getMolecules(2).size() == 0);
     REQUIRE(universe.getChainsWithCrosslinker(2).size() == 0);
+    REQUIRE(universe.determineEffectiveFunctionalityPerType().size() == 0);
+    REQUIRE(universe.computeWeightFractions().size() == 0);
   }
 
   SECTION("resizing bigger changes volume")
@@ -148,6 +151,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     // different lengths
     REQUIRE_THROWS(
       universe.addBonds(3, oneTwoThree, fourLongZeros, threeZeros));
+    REQUIRE_THROWS(universe.computeDxs(threeLongZeros, fourLongZeros));
   }
 
   SECTION("Molecules with crosslinkers are found")
@@ -395,5 +399,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     REQUIRE(chains[1].getKey() == "5-6");
     universe.setBoxLengths(3.0, 3.0, 3.0);
     REQUIRE(chains[0].computeEndToEndDistance() == 1.0);
+    REQUIRE(universe.determineEffectiveFunctionalityPerType()[2] ==
+            (1. + 2.) / 2.);
   }
 }

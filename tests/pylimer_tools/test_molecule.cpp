@@ -67,6 +67,7 @@ TEST_CASE("Molecules work as intended", "[entity][Molecule]")
     REQUIRE(molecule1.computeWeight() == Catch::Approx(3.0));
     REQUIRE(molecule1.getType() == pe::MoleculeType::UNDEFINED);
     REQUIRE(molecule1.computeRadiusOfGyration() == Catch::Approx(0.0));
+    REQUIRE_THROWS(molecule1.getIdxByAtomId(19234121));
 
     std::vector<pe::Atom> atomsInLine = molecule1.getAtomsLinedUp();
     REQUIRE(atomsInLine.size() == molecule1.getNrOfAtoms());

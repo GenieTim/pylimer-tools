@@ -109,12 +109,12 @@ namespace entities {
     std::map<int, int> determineFunctionalityPerType() const;
     std::map<int, double> determineEffectiveFunctionalityPerType() const;
     std::map<int, double> computeWeightFractions() const;
-    std::vector<double> computeDxs(const std::vector<int> bondFrom,
-                                   const std::vector<int> bondTo);
-    std::vector<double> computeDys(const std::vector<int> bondFrom,
-                                   const std::vector<int> bondTo);
-    std::vector<double> computeDzs(const std::vector<int> bondFrom,
-                                   const std::vector<int> bondTo);
+    std::vector<double> computeDxs(const std::vector<long int> bondFrom,
+                                   const std::vector<long int> bondTo);
+    std::vector<double> computeDys(const std::vector<long int> bondFrom,
+                                   const std::vector<long int> bondTo);
+    std::vector<double> computeDzs(const std::vector<long int> bondFrom,
+                                   const std::vector<long int> bondTo);
     std::vector<double> computeBondLengths()
     {
       return AtomGraphParent::computeBondLengths(&this->box);
@@ -147,8 +147,8 @@ namespace entities {
     igraph_vs_t getVerticesOfType(const int type) const;
     std::vector<long int> getIndicesOfType(const int type) const;
     igraph_vs_t getVerticesByIndices(std::vector<long int> indices) const;
-    std::vector<double> computeDs(const std::vector<int> bondFrom,
-                                  const std::vector<int> bondTo,
+    std::vector<double> computeDs(const std::vector<long int> bondFrom,
+                                  const std::vector<long int> bondTo,
                                   std::string direction,
                                   double boxLimit) const;
   };
