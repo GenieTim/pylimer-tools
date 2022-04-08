@@ -1213,8 +1213,8 @@ namespace entities {
    * @param bondTo
    * @return std::vector<double>
    */
-  std::vector<double> Universe::computeDxs(const std::vector<int> bondFrom,
-                                           const std::vector<int> bondTo)
+  std::vector<double> Universe::computeDxs(const std::vector<long int> bondFrom,
+                                           const std::vector<long int> bondTo)
   {
     return this->computeDs(bondFrom, bondTo, "x", this->box.getLx());
   };
@@ -1226,8 +1226,8 @@ namespace entities {
    * @param bondTo
    * @return std::vector<double>
    */
-  std::vector<double> Universe::computeDys(const std::vector<int> bondFrom,
-                                           const std::vector<int> bondTo)
+  std::vector<double> Universe::computeDys(const std::vector<long int> bondFrom,
+                                           const std::vector<long int> bondTo)
   {
     return this->computeDs(bondFrom, bondTo, "y", this->box.getLy());
   };
@@ -1239,8 +1239,8 @@ namespace entities {
    * @param bondTo
    * @return std::vector<double>
    */
-  std::vector<double> Universe::computeDzs(const std::vector<int> bondFrom,
-                                           const std::vector<int> bondTo)
+  std::vector<double> Universe::computeDzs(const std::vector<long int> bondFrom,
+                                           const std::vector<long int> bondTo)
   {
     return this->computeDs(bondFrom, bondTo, "z", this->box.getLz());
   };
@@ -1254,8 +1254,8 @@ namespace entities {
    * @param boxLimit
    * @return std::vector<double>
    */
-  std::vector<double> Universe::computeDs(const std::vector<int> bondFrom,
-                                          const std::vector<int> bondTo,
+  std::vector<double> Universe::computeDs(const std::vector<long int> bondFrom,
+                                          const std::vector<long int> bondTo,
                                           std::string direction,
                                           double boxLimit) const
   {
