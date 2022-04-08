@@ -309,6 +309,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       std::vector<pe::Molecule> clusters = universe.getClusters();
       REQUIRE(clusters.size() == 2);
       REQUIRE(clusters[1].getAtoms()[0].getId() == 4);
+      REQUIRE_THROWS(clusters[0].getAtomsLinedUp());
     }
 
     SECTION("Loops are found in reduced universe")
@@ -388,6 +389,10 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     REQUIRE(universe.getNrOfBonds() == 4);
     REQUIRE(universe.getMolecules(2).size() == 2);
     REQUIRE(universe.getChainsWithCrosslinker(2).size() == 2);
+    REQUIRE(
+      universe.computeFunctionalityForVertex(universe.getIdxByAtomId(1)) == 1);
+    REQUIRE(universe.getAtomsConnectedTo(universe.getIdxByAtomId(1)).size() ==
+            1);
     auto chains = universe.getChainsWithCrosslinker(2);
     REQUIRE(chains.size() == 2);
     REQUIRE(chains[0].getNrOfAtoms() == 3);

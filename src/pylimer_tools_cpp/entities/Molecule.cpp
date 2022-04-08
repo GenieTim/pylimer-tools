@@ -221,8 +221,7 @@ namespace entities {
     results.reserve(nrOfAtoms);
 
     long int vertexIdToStartWith = 0;
-    std::vector<long int> ends =
-      pylimer_tools::utils::getVerticesWithDegree(&this->graph, 1);
+    std::vector<long int> ends = this->getVerticesWithDegree(1);
     if (ends.size() > 0) {
       vertexIdToStartWith = ends[0];
     }
