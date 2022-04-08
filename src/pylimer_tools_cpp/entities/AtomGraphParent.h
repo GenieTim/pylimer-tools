@@ -98,81 +98,78 @@ namespace entities {
      */
     Atom getAtomByVertexIdx(const long int vertexIdx) const;
 
-
-  /**
-   * @brief Get the value of a property (attribute) of each and every vertex
-   *
-   * @tparam OUT
-   * @param propertyName the name of the property to get
-   * @return std::vector<OUT>
-   */
-  template<typename OUT>
-  std::vector<OUT> getPropertyValues(
-    const char* propertyName) const
-  {
-    std::vector<OUT> results;
-    if (this->getNrOfAtoms() == 0) {
+    /**
+     * @brief Get the value of a property (attribute) of each and every vertex
+     *
+     * @tparam OUT
+     * @param propertyName the name of the property to get
+     * @return std::vector<OUT>
+     */
+    template<typename OUT>
+    std::vector<OUT> getPropertyValues(const char* propertyName) const
+    {
+      std::vector<OUT> results;
+      if (this->getNrOfAtoms() == 0) {
+        return results;
+      }
+      igraph_vector_t allValues;
+      igraph_vector_init(&allValues, this->getNrOfAtoms());
+      if (igraph_cattribute_VANV(
+            &this->graph, propertyName, igraph_vss_all(), &allValues)) {
+        throw std::runtime_error("Failed to query properties of molecule.");
+      }
+      pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
+      igraph_vector_destroy(&allValues);
       return results;
     }
-    igraph_vector_t allValues;
-    igraph_vector_init(&allValues, this->getNrOfAtoms());
-    if (igraph_cattribute_VANV(
-          &this->graph, propertyName, igraph_vss_all(), &allValues)) {
-      throw std::runtime_error("Failed to query properties of molecule.");
-    }
-    pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
-    igraph_vector_destroy(&allValues);
-    return results;
-  }
 
-  /**
-   * @brief Get the value of a property (attribute) of certain vertices
-   *
-   * @tparam OUT
-   * @param propertyName the name of the property to get
-   * @param vertices the list of vertices to get the property for
-   * @return std::vector<OUT>
-   */
-  template<typename OUT>
-  std::vector<OUT> getPropertyValues(
-    const char* propertyName,
-    std::vector<long int> vertices) const
-  {
-    std::vector<OUT> results;
-    if (vertices.size() == 0) {
+    /**
+     * @brief Get the value of a property (attribute) of certain vertices
+     *
+     * @tparam OUT
+     * @param propertyName the name of the property to get
+     * @param vertices the list of vertices to get the property for
+     * @return std::vector<OUT>
+     */
+    template<typename OUT>
+    std::vector<OUT> getPropertyValues(const char* propertyName,
+                                       std::vector<long int> vertices) const
+    {
+      std::vector<OUT> results;
+      if (vertices.size() == 0) {
+        return results;
+      }
+      igraph_vector_t allValues;
+      igraph_vector_init(&allValues, vertices.size());
+      igraph_vector_t vertexIdxs;
+      igraph_vector_init(&vertexIdxs, vertices.size());
+      pylimer_tools::utils::StdVectorToIgraphVectorT(vertices, &vertexIdxs);
+      if (igraph_cattribute_VANV(&this->graph,
+                                 propertyName,
+                                 igraph_vss_vector(&vertexIdxs),
+                                 &allValues)) {
+        throw std::runtime_error("Failed to query properties of molecule.");
+      }
+      pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
+      igraph_vector_destroy(&allValues);
+      igraph_vector_destroy(&vertexIdxs);
       return results;
     }
-    igraph_vector_t allValues;
-    igraph_vector_init(&allValues, vertices.size());
-    igraph_vector_t vertexIdxs;
-    igraph_vector_init(&vertexIdxs, vertices.size());
-    pylimer_tools::utils::StdVectorToIgraphVectorT(vertices, &vertexIdxs);
-    if (igraph_cattribute_VANV(&this->graph,
-                               propertyName,
-                               igraph_vss_vector(&vertexIdxs),
-                               &allValues)) {
-      throw std::runtime_error("Failed to query properties of molecule.");
-    }
-    pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
-    igraph_vector_destroy(&allValues);
-    igraph_vector_destroy(&vertexIdxs);
-    return results;
-  }
 
-  /**
-   * @brief Get the Property (attribute) of one vertex
-   *
-   * @tparam OUT
-   * @param propertyName
-   * @param vertexIdx
-   * @return OUT
-   */
-  template<typename OUT>
-  OUT getPropertyValue(const char* propertyName,
-                                        const long int vertexIdx) const
-  {
-    return igraph_cattribute_VAN(&this->graph, propertyName, vertexIdx);
-  }
+    /**
+     * @brief Get the Property (attribute) of one vertex
+     *
+     * @tparam OUT
+     * @param propertyName
+     * @param vertexIdx
+     * @return OUT
+     */
+    template<typename OUT>
+    OUT getPropertyValue(const char* propertyName,
+                         const long int vertexIdx) const
+    {
+      return igraph_cattribute_VAN(&this->graph, propertyName, vertexIdx);
+    }
 
     /**
      * @brief Get all atoms with a certain number of bonds
@@ -215,6 +212,12 @@ namespace entities {
 
   protected:
     igraph_t graph;
+
+    igraph_vs_t getVerticesWithDegreeSelector(int degree) const;
+    std::vector<long int> getVerticesWithDegree(int degree) const;
+    std::vector<long int> getVerticesWithDegree(std::vector<int> ofDegrees) const;
+    std::vector<long int> getVerticesWithDegree(const igraph_t* someGraph,
+                                                std::vector<int> ofDegrees) const;
   };
 
 } // namespace entities

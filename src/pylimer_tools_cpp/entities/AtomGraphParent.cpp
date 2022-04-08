@@ -154,8 +154,7 @@ namespace entities {
    */
   std::vector<Atom> AtomGraphParent::getAtomsOfDegree(const int degree) const
   {
-    std::vector<long int> endNodeIndices =
-      pylimer_tools::utils::getVerticesWithDegree(&this->graph, degree);
+    std::vector<long int> endNodeIndices = this->getVerticesWithDegree(degree);
     igraph_vector_t endNodeSelectorVector;
     igraph_vector_init(&endNodeSelectorVector, endNodeIndices.size());
     pylimer_tools::utils::StdVectorToIgraphVectorT(endNodeIndices,
@@ -330,6 +329,71 @@ namespace entities {
     results.insert_or_assign("bond_type", vertexResults.at("edge_type"));
 
     return results;
+  }
+
+  std::vector<long int> AtomGraphParent::getVerticesWithDegree(
+    const igraph_t* someGraph,
+    std::vector<int> ofDegrees) const
+  {
+    int graphSize = igraph_vcount(someGraph);
+    igraph_vector_t degrees;
+    if (igraph_vector_init(&degrees, graphSize)) {
+      throw std::runtime_error("Failed to instantiate result vector.");
+    }
+    igraph_vs_t allVertexIds;
+    igraph_vs_all(&allVertexIds);
+    // complexity: O(|v|*d)
+    if (igraph_degree(someGraph, &degrees, allVertexIds, IGRAPH_ALL, false)) {
+      throw std::runtime_error("Failed to determine degree of vertices");
+    }
+
+    // NOTE: this is to omit the assumption, that the returned degree is
+    // sequential for vertex 0, ..., |V|
+    std::vector<long int> toSelect;
+    igraph_vit_t vit;
+    igraph_vit_create(someGraph, allVertexIds, &vit);
+    while (!IGRAPH_VIT_END(vit)) {
+      long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
+      int currentDegree = igraph_vector_e(&degrees, vertexId);
+      for (int degree : ofDegrees) {
+        if (currentDegree == degree) {
+          toSelect.push_back(vertexId);
+          break;
+        }
+      }
+      IGRAPH_VIT_NEXT(vit);
+    }
+    igraph_vector_destroy(&degrees);
+    igraph_vit_destroy(&vit);
+    igraph_vs_destroy(&allVertexIds);
+
+    return toSelect;
+  }
+
+  std::vector<long int> AtomGraphParent::getVerticesWithDegree(
+    std::vector<int> ofDegrees) const
+  {
+    return this->getVerticesWithDegree(&this->graph, ofDegrees);
+  }
+
+  std::vector<long int> AtomGraphParent::getVerticesWithDegree(int degree) const
+  {
+    return this->getVerticesWithDegree(std::vector<int>{ degree });
+  }
+
+  igraph_vs_t AtomGraphParent::getVerticesWithDegreeSelector(int degree) const
+  {
+    // NOTE: this is to omit the assumption, that the returned degree is
+    // sequential for vertex 0, ..., |V|
+    std::vector<long int> toSelect = this->getVerticesWithDegree(degree);
+
+    igraph_vs_t result;
+    igraph_vector_t toSelectVec;
+    igraph_vector_init(&toSelectVec, toSelect.size());
+    pylimer_tools::utils::StdVectorToIgraphVectorT(toSelect, &toSelectVec);
+    igraph_vs_vector(&result, &toSelectVec);
+
+    return result;
   }
 } // namespace entities
 } // namespace pylimer_tools

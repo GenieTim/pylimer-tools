@@ -521,7 +521,7 @@ namespace entities {
       int moleculeLengthBefore = igraph_vcount(chain);
       // also select ones of degree 0 for dangling atoms
       std::vector<long int> endNodeIndices =
-        pylimer_tools::utils::getVerticesWithDegree(chain, { { 0, 1 } });
+        this->getVerticesWithDegree(chain, { { 0, 1 } });
       igraph_vector_t endNodeSelectorVector;
       igraph_vector_init(&endNodeSelectorVector, endNodeIndices.size());
       pylimer_tools::utils::StdVectorToIgraphVectorT(endNodeIndices,
