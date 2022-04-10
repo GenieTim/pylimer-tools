@@ -44,6 +44,8 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     REQUIRE(universe.getChainsWithCrosslinker(2).size() == 0);
     REQUIRE(universe.determineEffectiveFunctionalityPerType().size() == 0);
     REQUIRE(universe.computeWeightFractions().size() == 0);
+    REQUIRE(universe.computeMeanBondLength() == 0.0);
+    REQUIRE(universe.computeBondLengths().size() == 0);
   }
 
   SECTION("resizing bigger changes volume")
@@ -273,6 +275,8 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(molecules[0].getAtomsOfDegree(2).size() == 1);
       REQUIRE(molecules[0].getAtomsOfDegree(1).size() == 2);
       REQUIRE(molecules[0].getAtomsOfDegree(0).size() == 0);
+      //
+      REQUIRE_THROWS(universe.getAtomByVertexIdx(999));
     }
 
     SECTION("get atoms with crosslinkers returns")
@@ -364,6 +368,15 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(atom.getX() == 1.01);
       REQUIRE(atom.getY() == 4.01);
       REQUIRE(atom.getZ() == 1.01);
+
+      SECTION("Copy constructors/assignment work")
+      {
+        pe::Universe newUniverse = pe::Universe(universe);
+        newUniverse = reducedUniverse;
+        REQUIRE(newUniverse.getNrOfBonds() == 2);
+        REQUIRE(reducedUniverse.getNrOfAtoms() == 3);
+        REQUIRE(newUniverse.getNrOfAtoms() == 3);
+      }
     }
   }
 
@@ -391,6 +404,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     REQUIRE(universe.getChainsWithCrosslinker(2).size() == 2);
     REQUIRE(
       universe.computeFunctionalityForVertex(universe.getIdxByAtomId(1)) == 1);
+    REQUIRE(universe.computeFunctionalityForAtom(1) == 1);
     REQUIRE(universe.getAtomsConnectedTo(universe.getIdxByAtomId(1)).size() ==
             1);
     auto chains = universe.getChainsWithCrosslinker(2);

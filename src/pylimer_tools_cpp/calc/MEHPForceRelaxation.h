@@ -136,6 +136,8 @@ namespace calc {
         /* array allocation */
         double* force;
         force = (double*)calloc(3 * net.nrOfNodes, sizeof(double));
+        double* forceGradient;
+        forceGradient = (double*)calloc(3 * net.nrOfNodes, sizeof(double));
         for (size_t i = 0; i < 3 * net.nrOfNodes; ++i) {
           force[i] = 0.0;
         }
@@ -152,11 +154,13 @@ namespace calc {
           }
         }
 
-        double absoluteForce = 0.0;
+        double force2Norm = 0.0;
         for (size_t i = 0; i < 3 * net.nrOfNodes; ++i) {
-          absoluteForce += force[i] * force[i];
+          force2Norm += force[i] * force[i];
+          forceGradient[i] = force[i];
         }
-        double initialForce = absoluteForce;
+        double initialForce = force2Norm;
+        double gradient2Norm = force2Norm;
 
         FILE* stepOutputFp;
         if (this->stepOutputFrequency > 0) {
@@ -168,7 +172,7 @@ namespace calc {
         // start of force relaxation
         long int stepsDone = 0;
         double Gamma_eq = 0.0;
-        while (absoluteForce / initialForce > tol && stepsDone < maxNrOfSteps) {
+        while (force2Norm / initialForce > tol && stepsDone < maxNrOfSteps) {
           stepsDone += 1;
           // update coordinates
           for (size_t i = 0; i < net.nrOfNodes; ++i) {
@@ -198,9 +202,9 @@ namespace calc {
               Gamma_eq += distances[j] * distances[j];
             }
           }
-          absoluteForce = 0.0;
+          force2Norm = 0.0;
           for (int i = 0; i < 3 * net.nrOfNodes; ++i) {
-            absoluteForce += force[i] * force[i];
+            force2Norm += force[i] * force[i];
           }
 
           // potentially output
@@ -212,7 +216,7 @@ namespace calc {
             fprintf(stepOutputFp,
                     "%ld %.16f %.16f\n",
                     stepsDone,
-                    absoluteForce,
+                    force2Norm,
                     Gamma_eq);
           }
         }
