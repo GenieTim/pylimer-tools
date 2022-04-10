@@ -44,5 +44,6 @@ TEST_CASE("DumpFileParser can be used", "[utils][DumpFileParser]")
     // call copy constructor
     pu::DataFileParser parser2 = parser;
     REQUIRE(parser2.getNrOfAtoms() == 3000);
+    REQUIRE_THROWS(parser.read("not-existing-file.out"));
   }
 }
