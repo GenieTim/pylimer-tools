@@ -34,6 +34,9 @@ TEST_CASE("DumpFileParser can be used", "[utils][DumpFileParser]")
       pu::DumpFileParser(suspectedPath + "lammps_dump_small.lammpstrj");
     REQUIRE(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1).size() == 3);
     REQUIRE_THROWS(parser.getValuesForAt<double>(0, "NOT EXISTING", 9));
+
+    // test throws
+    REQUIRE_THROWS(pu::DumpFileParser("not-existing-file.out"));
   }
 
   SECTION("Reading from data files works")
@@ -42,8 +45,15 @@ TEST_CASE("DumpFileParser can be used", "[utils][DumpFileParser]")
     parser.read(suspectedPath + "lammps_data_file.out");
     REQUIRE(parser.getNrOfAtoms() == 3000);
     // call copy constructor
-    pu::DataFileParser parser2 = parser;
+    pu::DataFileParser parser2 = pu::DataFileParser();
+    parser2 = parser;
     REQUIRE(parser2.getNrOfAtoms() == 3000);
+    // test throws
     REQUIRE_THROWS(parser.read("not-existing-file.out"));
+
+    // test angles reading
+    pu::DataFileParser parser3 = pu::DataFileParser();
+    parser3.read(suspectedPath + "lammps_data_file_small_wangles.out");
+    REQUIRE(parser3.getNrOfAngles() == 1);
   }
 }
