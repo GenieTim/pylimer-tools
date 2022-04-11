@@ -25,6 +25,11 @@ init_pylimer_bound_calc(py::module_& m)
         &mmt::computeStoichiometricInbalance,
         "Compute stoichiometric inbalance");
 
+  py::enum_<mehp::ExitReason>(m, "ExitReason")
+    .value("UNSET", mehp::ExitReason::UNSET)
+    .value("MAX_STEPS", mehp::ExitReason::MAX_STEPS)
+    .value("TOLERANCE", mehp::ExitReason::TOLERANCE);
+
   py::class_<mehp::MEHPForceRelaxation>(m, "MEHPForceRelaxation", R"pbdoc(
     A small simulation tool for quickly minimizing the force between the cross-linker beads.
   )pbdoc")
@@ -104,6 +109,9 @@ init_pylimer_bound_calc(py::module_& m)
       )pbdoc")
     .def("getNb2", &mehp::MEHPForceRelaxation::getNb2, R"pbdoc(
            Returns the value effectively used in :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq()` for :math:`N_{\eta} b^2`.
+      )pbdoc")
+    .def("getExitReason", &mehp::MEHPForceRelaxation::getExitReason, R"pbdoc(
+           Returns the reason for termination of the simulation
       )pbdoc");
 }
 

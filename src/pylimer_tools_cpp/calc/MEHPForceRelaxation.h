@@ -14,6 +14,13 @@
 namespace pylimer_tools {
 namespace calc {
   namespace mehp {
+    enum ExitReason
+    {
+      UNSET,
+      TOLERANCE,
+      MAX_STEPS
+    };
+
     typedef struct _Spring
     {
       long int a;    /* first node */
@@ -95,6 +102,8 @@ namespace calc {
       double getGammaZ() { return this->gammaZ; }
 
       double getNb2() { return this->Nb2; }
+
+      ExitReason getExitReason() { return this->exitReason; }
 
       void runForceRelaxation(int crosslinkerType,
                               long int maxNrOfSteps = 250000,
@@ -219,6 +228,13 @@ namespace calc {
                     force2Norm,
                     Gamma_eq);
           }
+        }
+
+        if (stepsDone >= maxNrOfSteps) {
+          this->exitReason = ExitReason::MAX_STEPS;
+        }
+        if (force2Norm / initialForce <= tol) {
+          this->exitReason = ExitReason::TOLERANCE;
         }
 
         // calculate equilibrium values
@@ -422,6 +438,7 @@ namespace calc {
       double gammaY = 0.0;
       double gammaZ = 0.0;
       double R2Mean = 0.0;
+      ExitReason exitReason = ExitReason::UNSET;
     };
   } // namespace mehp
 } // namespace calc
