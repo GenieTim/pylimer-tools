@@ -180,6 +180,7 @@
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.html">pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.html">pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.DumpFileReader.html">pylimer_tools_cpp.pylimer_tools_cpp.DumpFileReader</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.html">pylimer_tools_cpp.pylimer_tools_cpp.ExitReason</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator.html">pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator</a></li>
 <li class="toctree-l4 current current-page"><a class="current reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.html">pylimer_tools_cpp.pylimer_tools_cpp.Molecule</a></li>
@@ -255,34 +256,37 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getAverageSpringLength" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getAverageSpringLength"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAverageSpringLength</span></code></a>(self)</p></td>
 <td><p>Get the average length of the springs.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getGammaEq</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getExitReason" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getExitReason"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getExitReason</span></code></a>(self)</p></td>
+<td><p>Returns the reason for termination of the simulation</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getGammaEq</span></code></a>(self)</p></td>
 <td><p>Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaX" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getGammaX</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaX" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getGammaX</span></code></a>(self)</p></td>
 <td><p>Get three times the contribution of the x-direction to <a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq"><code class="xref py py-func docutils literal notranslate"><span class="pre">getGammaEq()</span></code></a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaY" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getGammaY</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaY" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getGammaY</span></code></a>(self)</p></td>
 <td><p>Get three times the contribution of the y-direction to <a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq"><code class="xref py py-func docutils literal notranslate"><span class="pre">getGammaEq()</span></code></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaZ" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaZ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getGammaZ</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaZ" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaZ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getGammaZ</span></code></a>(self)</p></td>
 <td><p>Get three times the contribution of the z-direction to <a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq"><code class="xref py py-func docutils literal notranslate"><span class="pre">getGammaEq()</span></code></a>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNb2" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNb2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNb2</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNb2" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNb2"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNb2</span></code></a>(self)</p></td>
 <td><p>Returns the value effectively used in <a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq"><code class="xref py py-func docutils literal notranslate"><span class="pre">getGammaEq()</span></code></a> for <span class="math">N_{\eta} b^2</span>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNrOfActiveNodes" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNrOfActiveNodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNrOfActiveNodes</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNrOfActiveNodes" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNrOfActiveNodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNrOfActiveNodes</span></code></a>(self)</p></td>
 <td><p>Get the number of active nodes remaining after running the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNrOfActiveSprings" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNrOfActiveSprings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNrOfActiveSprings</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNrOfActiveSprings" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNrOfActiveSprings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNrOfActiveSprings</span></code></a>(self)</p></td>
 <td><p>Get the number of active springs remaining after running the simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNrOfNodes" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNrOfNodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNrOfNodes</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNrOfNodes" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNrOfNodes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNrOfNodes</span></code></a>(self)</p></td>
 <td><p>Get the number of nodes considered in this simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNrOfSprings" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNrOfSprings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNrOfSprings</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNrOfSprings" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNrOfSprings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNrOfSprings</span></code></a>(self)</p></td>
 <td><p>Get the number of springs considered in this simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.runForceRelaxation" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.runForceRelaxation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">runForceRelaxation</span></code></a>(self[, crosslinkerType, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.runForceRelaxation" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.runForceRelaxation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">runForceRelaxation</span></code></a>(self[, crosslinkerType, ...])</p></td>
 <td><p>Run the simulation.</p></td>
 </tr>
 </tbody>
@@ -308,6 +312,11 @@
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getAverageSpringLength">
 <span class="sig-name descname"><span class="pre">getAverageSpringLength</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getAverageSpringLength" title="Permalink to this definition">#</a></dt>
 <dd><p>Get the average length of the springs.</p>
+</dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getExitReason">
+<span class="sig-name descname"><span class="pre">getExitReason</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.html#pylimer_tools_cpp.pylimer_tools_cpp.ExitReason" title="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.ExitReason</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getExitReason" title="Permalink to this definition">#</a></dt>
+<dd><p>Returns the reason for termination of the simulation</p>
 </dd></dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq">

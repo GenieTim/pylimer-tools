@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType" href="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.html" /><link rel="prev" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule" href="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator" href="pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator.html" /><link rel="prev" title="pylimer_tools_cpp.pylimer_tools_cpp.DumpFileReader" href="pylimer_tools_cpp.pylimer_tools_cpp.DumpFileReader.html" />
 
     <meta name="generator" content="sphinx-4.5.0, furo 2022.04.07"/>
-        <title>pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator - PylimerTools documentation</title>
+        <title>pylimer_tools_cpp.pylimer_tools_cpp.ExitReason - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=68f4518137b9aefe99b631505a2064c3c42c9852" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -180,11 +180,11 @@
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.html">pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.html">pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.DumpFileReader.html">pylimer_tools_cpp.pylimer_tools_cpp.DumpFileReader</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.html">pylimer_tools_cpp.pylimer_tools_cpp.ExitReason</a></li>
+<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.ExitReason</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator.html">pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.html">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.html">pylimer_tools_cpp.pylimer_tools_cpp.Molecule</a></li>
-<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator.html">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.html">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Universe.html">pylimer_tools_cpp.pylimer_tools_cpp.Universe</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.html">pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence</a></li>
@@ -226,16 +226,19 @@
           </label>
         </div>
         <article role="main">
-          <section id="pylimer-tools-cpp-pylimer-tools-cpp-moleculeiterator">
-<h1>pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator<a class="headerlink" href="#pylimer-tools-cpp-pylimer-tools-cpp-moleculeiterator" title="Permalink to this headline">#</a></h1>
+          <section id="pylimer-tools-cpp-pylimer-tools-cpp-exitreason">
+<h1>pylimer_tools_cpp.pylimer_tools_cpp.ExitReason<a class="headerlink" href="#pylimer-tools-cpp-pylimer-tools-cpp-exitreason" title="Permalink to this headline">#</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">MoleculeIterator</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">ExitReason</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.ExitReason" title="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.ExitReason</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.ExitReason" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_builtins.pybind11_object</span></code></p>
-<p>An iterator to iterate throught the atoms in <a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Molecule</span></code></a>.</p>
+<p>Members:</p>
+<p>UNSET</p>
+<p>MAX_STEPS</p>
+<p>TOLERANCE</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator.__init__" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.ExitReason" title="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.ExitReason</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.__init__" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 <p class="rubric">Methods</p>
 <div class="table-wrapper"><table class="autosummary longtable docutils align-default">
@@ -244,11 +247,55 @@
 <col style="width: 90%"/>
 </colgroup>
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator.__init__" title="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.__init__" title="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, value)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table></div>
+<p class="rubric">Attributes</p>
+<div class="table-wrapper"><table class="autosummary longtable docutils align-default">
+<colgroup>
+<col style="width: 10%"/>
+<col style="width: 90%"/>
+</colgroup>
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.MAX_STEPS" title="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.MAX_STEPS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MAX_STEPS</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.TOLERANCE" title="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.TOLERANCE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TOLERANCE</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.UNSET" title="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.UNSET"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UNSET</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.name" title="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.value" title="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">value</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table></div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.MAX_STEPS">
+<span class="sig-name descname"><span class="pre">MAX_STEPS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ExitReason.MAX_STEPS:</span> <span class="pre">2&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.MAX_STEPS" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.TOLERANCE">
+<span class="sig-name descname"><span class="pre">TOLERANCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ExitReason.TOLERANCE:</span> <span class="pre">1&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.TOLERANCE" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.UNSET">
+<span class="sig-name descname"><span class="pre">UNSET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ExitReason.UNSET:</span> <span class="pre">0&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.UNSET" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.name" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.ExitReason.value" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
 </dd></dl>
 </section>
 
@@ -257,23 +304,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.html">
+          <a class="next-page" href="pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType</div>
+                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator</div>
               </div>
               <svg><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.html">
+          <a class="prev-page" href="pylimer_tools_cpp.pylimer_tools_cpp.DumpFileReader.html">
               <svg><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.Molecule</div>
+                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.DumpFileReader</div>
                 
               </div>
             </a>

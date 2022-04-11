@@ -21,6 +21,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceRelaxation
       ~MEHPForceRelaxation.configDoOutputFinalCoordinates
       ~MEHPForceRelaxation.configDoOutputSteps
       ~MEHPForceRelaxation.getAverageSpringLength
+      ~MEHPForceRelaxation.getExitReason
       ~MEHPForceRelaxation.getGammaEq
       ~MEHPForceRelaxation.getGammaX
       ~MEHPForceRelaxation.getGammaY

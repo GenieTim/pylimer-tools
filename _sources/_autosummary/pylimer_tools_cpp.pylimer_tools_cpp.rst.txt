@@ -32,6 +32,7 @@
       DataFileReader
       DataFileWriter
       DumpFileReader
+      ExitReason
       MCUniverseGenerator
       MEHPForceRelaxation
       Molecule
