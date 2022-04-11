@@ -35,6 +35,13 @@ namespace entities {
       this->nz = nz;
     };
 
+    bool operator==(const Atom& ref) const
+    {
+      return this->id == ref.id && this->type == ref.type && this->x == ref.x &&
+             this->y == ref.y && this->z == ref.z && this->nx == ref.nx &&
+             this->ny == ref.ny && this->nz == ref.nz;
+    }
+
     double _getDeltaDistanceUnwrapped(double c1,
                                       double c2,
                                       int n1,
