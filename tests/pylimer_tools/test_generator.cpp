@@ -46,6 +46,23 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
     REQUIRE(universe.getMolecules(2).size() == (4 / 2) * 100 + 100);
   }
 
+  SECTION("Universe is generated deterministically")
+  {
+    pu::MCUniverseGenerator generator2 =
+      pu::MCUniverseGenerator(10.0, 10.0, 10.0);
+    generator2.setSeed(8804);
+    generator2.setBeadDistance(0.964);
+    generator2.addCrosslinkers(100, 2);
+    generator2.addSolventChains(100, 16, 3);
+    generator2.addAndLinkStrands((4 / 2) * 100, 16, 0.8);
+
+    pe::Universe universe2 = generator2.getUniverse();
+
+    REQUIRE(universe.getNrOfAtoms() == universe2.getNrOfAtoms());
+    REQUIRE(universe.getNrOfBonds() == universe2.getNrOfBonds());
+    REQUIRE(universe.getAtom(3) == universe2.getAtom(3));
+  }
+
   // SECTION("Universe can be written and read again") {
   //   pu::DataFileWriter writer = pu::DataFileWriter(universe);
   //   writer.configIncludeAngles(true);
