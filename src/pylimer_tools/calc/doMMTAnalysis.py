@@ -3,7 +3,6 @@ import math
 import warnings
 from collections import Counter
 
-import igraph
 import numpy as np
 from pylimer_tools_cpp import Universe
 from scipy import optimize
