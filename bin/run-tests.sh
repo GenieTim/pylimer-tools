@@ -25,6 +25,8 @@ ADDITIONALFLAGS=()
 if command -v g++; then
   ADDITIONALFLAGS=("${ADDITIONALFLAGS[@]}" -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=OFF -D CMAKE_C_COMPILER="$CCOMPILER" -D CMAKE_CXX_COMPILER="$CXXCOMPILER")
 elif command -v clang; then
+  CXXCOMPILER=clang
+  CCOMPILER=clang
   ADDITIONALFLAGS=("${ADDITIONALFLAGS[@]}" -D CODE_COVERAGE=OFF -D LEAK_ANALYSIS=ON -D CMAKE_C_COMPILER="$CCOMPILER" -D CMAKE_CXX_COMPILER="$CXXCOMPILER")
 else
   ADDITIONALFLAGS=("${ADDITIONALFLAGS[@]}" -D CODE_COVERAGE=OFF -D LEAK_ANALYSIS=OFF)
@@ -37,6 +39,7 @@ cmake .. -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=OFF "${ADDITIONALFLAGS[@]}" || exi
 cmake --build . || exit 9
 echo "======== Starting tests ========"
 ASAN_OPTIONS=detect_leaks=1 ./pylimer_tests || exit 6 # -s --durations yes
+./header_tests
 "$GENERATOR_BIN" pylimer_tests-gcov
 "$GENERATOR_BIN" test_sources-gcov
 "$GENERATOR_BIN" pylimer_tools-gcov
