@@ -4,10 +4,6 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
-extern "C"
-{
-#include <igraph/igraph.h>
-}
 
 #define CATCH_CONFIG_MAIN
 namespace pe = pylimer_tools::entities;
