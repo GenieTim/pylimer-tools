@@ -37,6 +37,14 @@ TEST_CASE("DumpFileParser can be used", "[utils][DumpFileParser]")
 
     // test throws
     REQUIRE_THROWS(pu::DumpFileParser("not-existing-file.out"));
+
+    // test without atoms
+    pu::DumpFileParser parser4 = pu::DumpFileParser(
+      suspectedPath + "lammps_dump_small_no_atoms.lammpstrj");
+    REQUIRE(parser4.getLength() == 1);
+    REQUIRE(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1).size() == 3);
+    REQUIRE(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1)[0] ==
+            4.8545999999999999e+01);
   }
 
   SECTION("Reading from data files works")
