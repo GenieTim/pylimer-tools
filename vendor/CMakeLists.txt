@@ -24,6 +24,7 @@ if (NOT DEFINED igraph_LOADED)
 				CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_LIST_DIR}/igraph/igraphLib-install -DCMAKE_INSTALL_LIBDIR=${CMAKE_CURRENT_LIST_DIR}/igraph/igraphLib-install/lib -DCMAKE_C_FLAGS="-fPIC"
 				BUILD_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_LIST_DIR}/igraph/src/igraphLib-build --config Release
 				BUILD_BYPRODUCTS ${CMAKE_CURRENT_LIST_DIR}/igraph/igraphLib-install/lib/${LIBRARY_PREFIX}igraph${LIBRARY_SUFFIX}
+				UPDATE_DISCONNECTED ON
 		)
 		# FetchContent_MakeAvailable(igraphLib)
 		add_library(igraph SHARED IMPORTED)
