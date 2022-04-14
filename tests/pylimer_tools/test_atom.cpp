@@ -4,18 +4,17 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
-extern "C" {
-#include <igraph/igraph.h>
-}
 
 #define CATCH_CONFIG_MAIN
 namespace pe = pylimer_tools::entities;
 
-TEST_CASE("Atoms can calculate distances", "[entity][Atom]") {
+TEST_CASE("Atoms can calculate distances", "[entity][Atom]")
+{
   pe::Atom atom1 = pe::Atom(0, 0, 0.0, 0.0, 0.0, 0, 0, 0);
   pe::Box unitBox = pe::Box(1.0, 1.0, 1.0);
 
-  SECTION("Box does not change internal state") {
+  SECTION("Box does not change internal state")
+  {
     REQUIRE(unitBox.getLowX() == 0.0);
     REQUIRE(unitBox.getLowY() == 0.0);
     REQUIRE(unitBox.getLowZ() == 0.0);
@@ -27,13 +26,15 @@ TEST_CASE("Atoms can calculate distances", "[entity][Atom]") {
     REQUIRE(unitBox.getLz() == 1.0);
   }
 
-  SECTION("Same box image distance") {
+  SECTION("Same box image distance")
+  {
     pe::Atom atom1_2 = pe::Atom(0, 0, 0.0, 0.0, 0.0, 0, 0, 0);
     REQUIRE(atom1.distanceTo(atom1_2, &unitBox) == 0.0);
     REQUIRE(atom1_2.distanceTo(atom1, &unitBox) == 0.0);
   }
 
-  SECTION("Different box image distance") {
+  SECTION("Different box image distance")
+  {
     pe::Atom atom1_right = pe::Atom(0, 0, -1.0, 0.0, 0.0, 1, 0, 0);
     REQUIRE(atom1.distanceTo(atom1_right, &unitBox) == 0.0);
     pe::Atom atom1_below = pe::Atom(0, 0, 0.0, -1.0, 0.0, 0, 1, 0);

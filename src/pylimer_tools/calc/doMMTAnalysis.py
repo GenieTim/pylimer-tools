@@ -3,7 +3,6 @@ import math
 import warnings
 from collections import Counter
 
-import igraph
 import numpy as np
 from pylimer_tools_cpp import Universe
 from scipy import optimize
@@ -267,7 +266,7 @@ def computeWeightFractions(network: Universe) -> dict:
     return weightFractions
 
 
-def computeStoichiometricInbalance(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None, ignoreTypes: list = [], effective : bool = False) -> float:
+def computeStoichiometricInbalance(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None, ignoreTypes: list = [], effective: bool = False) -> float:
     """
     Compute the stoichiometric inbalance
     ( nr. of bonds formable of crosslinker / nr. of formable bonds of precursor )
@@ -296,7 +295,8 @@ def computeStoichiometricInbalance(network: Universe, junctionType, strandLength
     counts = Counter(network.getAtomTypes())
 
     if (functionalityPerType is None or junctionType not in functionalityPerType):
-        functionalityPerType = network.determineEffectiveFunctionalityPerType() if effective else network.determineFunctionalityPerType()
+        functionalityPerType = network.determineEffectiveFunctionalityPerType(
+        ) if effective else network.determineFunctionalityPerType()
 
     if (junctionType not in counts):
         raise ValueError(
@@ -304,7 +304,8 @@ def computeStoichiometricInbalance(network: Universe, junctionType, strandLength
 
     if (strandLength is None):
         strands = network.getMolecules(junctionType)
-        strandLength = np.mean([m.getLength() for m in strands])
+        strandLength = np.mean([m.getLength() for m in strands if not np.all(
+            [a.getType() in ignoreTypes for a in m.getAtoms()])])
 
     crosslinkerFormableBonds = counts[junctionType] * \
         functionalityPerType[junctionType]

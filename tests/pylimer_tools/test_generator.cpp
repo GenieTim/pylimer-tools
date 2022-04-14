@@ -9,14 +9,16 @@
 #include <iostream>
 #include <map>
 #include <vector>
-extern "C" {
+extern "C"
+{
 #include <igraph/igraph.h>
 }
 
 namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
 
-TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]") {
+TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
+{
   pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(10.0, 10.0, 10.0);
   generator.setSeed(8804);
   generator.setBeadDistance(0.964);
@@ -33,14 +35,32 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]") {
   REQUIRE(universe.getVolume() == 10.0 * 10.0 * 10.0);
 
   auto angles = universe.detectAngles();
-  universe.addAngles(angles["angle_from"], angles["angle_via"],
-                     angles["angle_to"]);
+  universe.addAngles(
+    angles["angle_from"], angles["angle_via"], angles["angle_to"]);
   REQUIRE(universe.getNrOfAngles() > 0);
 
-  SECTION("Nrs of chains is correct") {
+  SECTION("Nrs of chains is correct")
+  {
     REQUIRE(universe.getAtomsWithType(2).size() == 100);
     REQUIRE(universe.getAtomsWithType(1).size() == (4 / 2) * 100 * 16);
     REQUIRE(universe.getMolecules(2).size() == (4 / 2) * 100 + 100);
+  }
+
+  SECTION("Universe is generated deterministically")
+  {
+    pu::MCUniverseGenerator generator2 =
+      pu::MCUniverseGenerator(10.0, 10.0, 10.0);
+    generator2.setSeed(8804);
+    generator2.setBeadDistance(0.964);
+    generator2.addCrosslinkers(100, 2);
+    generator2.addSolventChains(100, 16, 3);
+    generator2.addAndLinkStrands((4 / 2) * 100, 16, 0.8);
+
+    pe::Universe universe2 = generator2.getUniverse();
+
+    REQUIRE(universe.getNrOfAtoms() == universe2.getNrOfAtoms());
+    REQUIRE(universe.getNrOfBonds() == universe2.getNrOfBonds());
+    REQUIRE(universe.getAtom(3) == universe2.getAtom(3));
   }
 
   // SECTION("Universe can be written and read again") {

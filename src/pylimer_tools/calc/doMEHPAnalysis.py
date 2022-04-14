@@ -6,7 +6,6 @@ import warnings
 from collections import Counter
 from typing import Iterable, Tuple
 
-import igraph
 import numpy as np
 from pylimer_tools_cpp import Molecule, MoleculeType, Universe
 
