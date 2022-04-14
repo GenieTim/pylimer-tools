@@ -1,7 +1,6 @@
 
 import unittest
 
-import igraph
 import numpy as np
 import pandas as pd
 import pandas.testing as pd_testing

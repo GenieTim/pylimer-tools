@@ -43,6 +43,7 @@ endif()
 
 target_sources(pylimer_tools
 	PRIVATE
+		${CMAKE_CURRENT_LIST_DIR}/entities/AtomGraphParent.cpp
 		${CMAKE_CURRENT_LIST_DIR}/entities/Molecule.cpp
 		${CMAKE_CURRENT_LIST_DIR}/entities/Universe.cpp
 		${CMAKE_CURRENT_LIST_DIR}/entities/UniverseSequence.cpp
@@ -82,6 +83,12 @@ if(CODE_COVERAGE)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-inline-functions -fno-default-inline")
 	set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-inline-functions -fno-default-inline")
 	target_compile_options(pylimer_tools PRIVATE -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-inline-functions -fno-default-inline)
+
+	if(CMAKE_COMPILER_IS_GNUCXX)
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-abs-path")
+		set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fprofile-abs-path")
+		target_compile_options(pylimer_tools PRIVATE -fprofile-abs-path)
+	endif()
 
 	target_link_libraries(
 		pylimer_tools
