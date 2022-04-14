@@ -115,6 +115,8 @@ def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.7
       - :math:`W_{sol}` (float): the weight fraction of soluble material as counted.
 
     """
+    if (network.getNrOfAtoms() == 0):
+        return None
     fractions = network.getClusters()
     weights = np.array([f.computeWeight() for f in fractions])
     totalWeight = weights.sum()
