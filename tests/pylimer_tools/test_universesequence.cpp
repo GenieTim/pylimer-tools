@@ -44,6 +44,15 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
     REQUIRE(universeSeq.atIndex(0).getNrOfBonds() == 2900);
   }
 
+  SECTION("Angles are read, too")
+  {
+    universeSeq.initializeFromDataSequence(
+      { { suspectedPath + "lammps_data_file_small_wangles.out" } });
+    REQUIRE(universeSeq.getLength() == 1);
+    pe::Universe universe = universeSeq.next();
+    REQUIRE(universe.getNrOfAngles() == 1);
+  }
+
   SECTION("Reading large files is sensibly fast")
   {
     universeSeq.initializeFromDumpFile(suspectedPath + "big_dump_file_data.out",
