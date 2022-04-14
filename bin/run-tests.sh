@@ -56,7 +56,7 @@ cd "$ROOT_DIR" || exit 8
 # cp tests/build/lcov/data/capture/pylimer_tools.info pylimer_tools_lcoverage.info
 
 if command -v npx; then
-  npx -y lcov-badge2 -l "C++ Code Coverage" -o ".github/cpp-coverage.svg" pylimer_tools_lcoverage.info || echo "Failed to generate coverage badge"
+  npx -y lcov-badge2 -l "C++ Code Coverage" -o ".github/cpp-coverage.svg" tests/build/lcov/data/capture/pylimer_tools_lcoverage.info || echo "Failed to generate coverage badge"
 fi
 
 # then, build/install project for Python
