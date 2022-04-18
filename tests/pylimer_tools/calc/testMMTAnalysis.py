@@ -26,6 +26,12 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             (3*3)/(2), computeStoichiometricInbalance(self.testUniverse, 2, strandLength=5, functionalityPerType={
                 1: 2, 2: 3
             }))
+        self.assertRaises(
+            ValueError, computeStoichiometricInbalance, self.testUniverse, 7)
+        self.assertEqual(computeStoichiometricInbalance(
+            self.testUniverse, 2, functionalityPerType={
+                1: 2, 2: 3
+            }), ((3*3)/((5*2)/(5/3))))
 
     def testExtentOfReaction(self):
         self.assertEqual(1.0, computeExtentOfReaction(self.emptyUniverse, 2))
@@ -49,6 +55,19 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         weightFractions = computeWeightFractions(
             self.testUniverse)
         self.assertDictEqual(weightFractions, {1: 1-3./8., 2: 3./8.})
+
+    def testSolubleWeightFractionMeasurement(self):
+        self.testUniverse.setMasses({1: 1, 2: 1})
+        self.assertEqual(measureWeightFractioOfSolubleMaterial(
+            self.emptyUniverse), None)
+        self.assertEqual(measureWeightFractioOfSolubleMaterial(
+            self.testUniverse, relTol=0), 0.0)
+        self.assertEqual(measureWeightFractioOfSolubleMaterial(
+            self.testUniverse, absTol=0), 0.0)
+        self.assertEqual(measureWeightFractioOfSolubleMaterial(
+            self.testUniverse, absTol=10000), 1.0)
+        self.assertEqual(measureWeightFractioOfSolubleMaterial(
+            self.testUniverse), 1/8)
 
     def testSolubleMaterialWeightFractionCalculation(self):
         self.testUniverse.setMasses({1: 1, 2: 1})

@@ -44,6 +44,31 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
     REQUIRE(universeSeq.atIndex(0).getNrOfBonds() == 2900);
   }
 
+  SECTION("Empty dump files throw")
+  {
+    universeSeq.initializeFromDumpFile(suspectedPath +
+                                         "lammps_data_file_small.out",
+                                       suspectedPath + "empty_file.txt");
+    REQUIRE_THROWS(universeSeq.next());
+  }
+
+  SECTION("Broken box is detected")
+  {
+    universeSeq.initializeFromDumpFile(
+      suspectedPath + "lammps_data_file_small.out",
+      suspectedPath + "lammps_dump_small_broken_box.lammpstrj");
+    REQUIRE_THROWS(universeSeq.next());
+  }
+
+  SECTION("Angles are read, too")
+  {
+    universeSeq.initializeFromDataSequence(
+      { { suspectedPath + "lammps_data_file_small_wangles.out" } });
+    REQUIRE(universeSeq.getLength() == 1);
+    pe::Universe universe = universeSeq.next();
+    REQUIRE(universe.getNrOfAngles() == 1);
+  }
+
   SECTION("Reading large files is sensibly fast")
   {
     universeSeq.initializeFromDumpFile(suspectedPath + "big_dump_file_data.out",

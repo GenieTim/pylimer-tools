@@ -23,6 +23,7 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
   generator.setSeed(8804);
   generator.setBeadDistance(0.964);
   generator.addCrosslinkers(100, 2);
+  REQUIRE_THROWS(generator.addCrosslinkers(100, 3));
   generator.addSolventChains(100, 16, 3);
   generator.addAndLinkStrands((4 / 2) * 100, 16, 0.8);
 
@@ -63,6 +64,18 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
     REQUIRE(universe.getAtom(3) == universe2.getAtom(3));
   }
 
+  SECTION("Errors are thrown")
+  {
+    // only one type of cross-linker supported yet
+    REQUIRE_THROWS(generator.addCrosslinkers(100, 3));
+    // nr of strands and strand lengths must be same:
+    REQUIRE_THROWS(generator.addAndLinkStrands(3, { { 10, 100 } }, 0.1, 4, 1));
+    // strands may only be added once:
+    REQUIRE_THROWS(generator.addAndLinkStrands((4 / 2) * 100, 16, 0.8));
+    // not enough strands to reach conversion:
+    REQUIRE_THROWS(generator.addAndLinkStrands(2, 10, 1.0, 4, 1));
+  }
+
   // SECTION("Universe can be written and read again") {
   //   pu::DataFileWriter writer = pu::DataFileWriter(universe);
   //   writer.configIncludeAngles(true);
@@ -76,4 +89,17 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
   //   REQUIRE(universe.getNrOfBonds() == readUniverse.getNrOfBonds());
   //   REQUIRE(universe.getNrOfAngles() == readUniverse.getNrOfAngles());
   // }
+}
+
+TEST_CASE("Large Universe can be generated", "[generator][MCUniverseGenerator]")
+{
+
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(10.0, 10.0, 10.0);
+  generator.setSeed(8804);
+  generator.setBeadDistance(0.964);
+  generator.addCrosslinkers(1200, 2);
+
+  pe::Universe universe = generator.getUniverse();
+  REQUIRE(universe.getVolume() == 10.0 * 10.0 * 10.0);
+  REQUIRE(universe.getAtomsWithType(2).size() == 1200);
 }

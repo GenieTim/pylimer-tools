@@ -217,7 +217,7 @@ namespace utils {
     }
 
     if (start >= this->getLength() ||
-        (N != -1 && ((int)start + N) > this->getLength())) {
+        (N != -1 && ((static_cast<int>(start)) + N) > this->getLength())) {
       throw std::invalid_argument("Cannot read from outside the length of the "
                                   "dump file. Tried to read from " +
                                   std::to_string(start) + " to " +

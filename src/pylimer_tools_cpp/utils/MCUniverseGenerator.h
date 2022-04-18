@@ -272,15 +272,20 @@ namespace utils {
 
     void addAndLinkStrands(int nrOfStrands,
                            int chainLength,
-                           double crosslinkerConversion)
+                           double crosslinkerConversion,
+                           int crosslinkerFunctionality = 4,
+                           int strandAtomType = 1)
     {
       std::vector<int> chainLengths;
       chainLengths.reserve(nrOfStrands);
       for (int i = 0; i < nrOfStrands; ++i) {
         chainLengths.push_back(chainLength);
       }
-      return this->addAndLinkStrands(
-        nrOfStrands, chainLengths, crosslinkerConversion);
+      return this->addAndLinkStrands(nrOfStrands,
+                                     chainLengths,
+                                     crosslinkerConversion,
+                                     crosslinkerFunctionality,
+                                     strandAtomType);
     };
 
   private:
