@@ -190,3 +190,54 @@ jobs:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
           skip_existing: true
+
+  github_release:
+    runs-on: ubuntu-latest
+    name: Create GitHub Release
+    needs:
+      - build-windows
+      - build-osx
+      - build-linux
+      - build-sdist
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get tag
+        uses: actions-ecosystem/action-get-latest-tag@v1
+        id: get_version
+        with:
+          semver_only: true
+
+      - name: Determine Changelog
+        id: changelog_determiner
+        run: echo "##[set-output name=changelog;]$(./bin/extract-changelog.sh CHANGELOG.md ${{ steps.get_version.outputs.tag }})"
+
+      - name: Create Release
+        id: create_release
+        if: success()
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: ${{ steps.changelog_determiner.outputs.changelog }}
+          draft: false
+          prerelease: false
+
+      - name: Download all the dists
+        uses: actions/download-artifact@v2
+        with:
+          name: python-package-distributions
+          path: dist/
+
+      - name: Upload Release
+        id: upload_release
+        if: success()
+        uses: csexton/release-asset-action@v2
+        with:
+          pattern: "dist/*.*"
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          release-url: ${{ steps.create_release.outputs.upload_url }}
