@@ -114,10 +114,7 @@ namespace calc {
                               double kappa = 1.0)
       {
         this->is2d = is2d;
-        int dimensions = 3;
-        if (is2d) {
-          dimensions = 2;
-        }
+        int dimensions = is2d ? 2 : 3;
         Network net;
         if (!ConvertNetwork(&net, crosslinkerType)) {
           return;

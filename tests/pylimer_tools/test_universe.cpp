@@ -14,18 +14,18 @@ extern "C"
 
 namespace pe = pylimer_tools::entities;
 
-void
-outputLoops(std::map<int, std::vector<std::vector<pe::Atom>>> loops)
-{
-  for (const auto& myPair : loops) {
-    std::cout << myPair.first << std::endl;
-    for (const std::vector<pe::Atom>& as : myPair.second) {
-      for (const pe::Atom& a : as) {
-        std::cout << "\t" << a.getId() << std::endl;
-      }
-    }
-  }
-}
+// void
+// outputLoops(std::map<int, std::vector<std::vector<pe::Atom>>> loops)
+// {
+//   for (const auto& myPair : loops) {
+//     std::cout << myPair.first << std::endl;
+//     for (const std::vector<pe::Atom>& as : myPair.second) {
+//       for (const pe::Atom& a : as) {
+//         std::cout << "\t" << a.getId() << std::endl;
+//       }
+//     }
+//   }
+// }
 
 TEST_CASE("Universe can be used", "[entity][Universe]")
 {

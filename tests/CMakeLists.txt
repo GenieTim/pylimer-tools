@@ -85,7 +85,7 @@ target_link_libraries(pylimer_tests
 )
 
 # separate the header tests out, for the coverage generation
-add_executable(header_tests pylimer_tools/test_atom.cpp)
+add_executable(header_tests pylimer_tools/test_headers.cpp)
 target_link_libraries(header_tests 
 	PRIVATE 
 	Catch2::Catch2WithMain
