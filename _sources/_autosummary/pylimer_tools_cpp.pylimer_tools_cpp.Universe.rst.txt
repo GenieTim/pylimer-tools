@@ -25,6 +25,9 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Universe
       ~Universe.computeDxs
       ~Universe.computeDys
       ~Universe.computeDzs
+      ~Universe.computeEndToEndDistances
+      ~Universe.computeMeanEndToEndDistance
+      ~Universe.computeMeanSquareEndToEndDistance
       ~Universe.computeMeanStrandLength
       ~Universe.computeWeightFractions
       ~Universe.detectAngles
