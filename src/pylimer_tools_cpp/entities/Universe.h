@@ -120,7 +120,9 @@ namespace entities {
       return AtomGraphParent::computeBondLengths(&this->box);
     };
     double getMeanStrandLength(int junctionType);
+    std::vector<double> computeEndToEndDistances(int junctionType);
     double computeMeanEndToEndDistance(int junctionType);
+    double computeMeanSquareEndToEndDistance(int junctionType);
     double computeMeanBondLength();
     bool validate();
 

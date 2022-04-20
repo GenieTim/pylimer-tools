@@ -1345,12 +1345,39 @@ namespace entities {
    * @param junctionType
    * @return double
    */
-  double Universe::computeMeanEndToEndDistance(int junctionType)
+  std::vector<double> Universe::computeEndToEndDistances(int junctionType)
   {
     std::vector<Molecule> molecules =
       this->getChainsWithCrosslinker(junctionType);
 
     double meanEndToEndDistance = 0;
+    int validMolecules = 0;
+    std::vector<double> distances;
+    distances.reserve(molecules.size());
+
+    for (Molecule molecule : molecules) {
+      double dist = molecule.computeEndToEndDistance();
+      distances.push_back(dist);
+    }
+
+    return distances;
+  }
+
+  /**
+   * @brief Get the mean end to end distance
+   *
+   * Does not take loops into account as a contributor to the mean.
+   * Returns 0 for systems without any qualifying strands.
+   *
+   * @param junctionType
+   * @return double
+   */
+  double Universe::computeMeanEndToEndDistance(int junctionType)
+  {
+    std::vector<Molecule> molecules =
+      this->getChainsWithCrosslinker(junctionType);
+
+    double meanEndToEndDistance = 0.0;
     int validMolecules = 0;
 
     for (Molecule molecule : molecules) {
@@ -1365,7 +1392,39 @@ namespace entities {
       return 0.0;
     }
 
-    return meanEndToEndDistance / (double)validMolecules;
+    return meanEndToEndDistance / static_cast<double>(validMolecules);
+  }
+
+  /**
+   * @brief Get the mean end to end distance
+   *
+   * Does not take loops into account as a contributor to the mean.
+   * Returns 0 for systems without any qualifying strands.
+   *
+   * @param junctionType
+   * @return double
+   */
+  double Universe::computeMeanSquareEndToEndDistance(int junctionType)
+  {
+    std::vector<Molecule> molecules =
+      this->getChainsWithCrosslinker(junctionType);
+
+    double meanEndToEndDistance = 0.0;
+    int validMolecules = 0;
+
+    for (Molecule molecule : molecules) {
+      double dist = molecule.computeEndToEndDistance();
+      if (dist > 0.0) {
+        meanEndToEndDistance += dist * dist;
+        validMolecules += 1;
+      }
+    }
+
+    if (validMolecules == 0) {
+      return 0.0;
+    }
+
+    return meanEndToEndDistance / static_cast<double>(validMolecules);
   }
 
   /**

@@ -85,7 +85,7 @@ TEST_CASE("CsvTokenizer works", "[utils][StringUtil]")
   REQUIRE(tk2.get<int>(1) == 12);
   REQUIRE(tk2.get<unsigned long int>(1) == 12);
   REQUIRE(tk2.get<long int>(1) == 12);
-  REQUIRE(tk2.get<float>(2) == 0.001);
+  REQUIRE(tk2.get<float>(2) == 0.001f);
   REQUIRE(tk2.get<double>(2) == 0.001);
   REQUIRE(tk2.get<long double>(2) == 0.001);
 }
@@ -106,7 +106,7 @@ TEST_CASE("String utility functions work", "[utils][StringUtil]")
   REQUIRE(pu::startsWith("test", "te"));
   REQUIRE_FALSE(pu::startsWith("test", "es"));
   std::string testCommentString = "#  test  ";
-  REQUIRE(pu::trimLineOmitComment("  test  ") == "  test");
+  REQUIRE(pu::trimLineOmitComment("  test  ") == "test  ");
   REQUIRE(pu::trimLineOmitComment(testCommentString) == "");
   REQUIRE(pu::trimLineOmitComment(testCommentString.c_str()) == "");
 }

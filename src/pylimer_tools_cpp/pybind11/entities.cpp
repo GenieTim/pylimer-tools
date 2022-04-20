@@ -292,6 +292,8 @@ init_pylimer_bound_entities(py::module_& m)
             CAUTION:
                Returns 0.0 if the molecule does not have two or more atoms.
                Returns -1.0 if not exactly 2 ends were found.
+               Computes the distance between 2 atoms with functionality 1, 
+               ignoring whether they are cross-linkers or not.
             )pbdoc")
     // operators
     .def(
@@ -562,6 +564,34 @@ init_pylimer_bound_entities(py::module_& m)
     .def("computeWeightFractions", &Universe::computeWeightFractions, R"pbdoc(
             Compute the weight fractions of each atom type in the network.
             )pbdoc")
+    .def(
+      "computeEndToEndDistances", &Universe::computeEndToEndDistances, R"pbdoc(
+          Compute the end-to-end distance of each strand in the network.
+
+          NOTE:
+               Internally, this uses the :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeEndToEndDistance`.
+               All its cautionary facts apply.
+     )pbdoc")
+    .def("computeMeanEndToEndDistance",
+         &Universe::computeMeanEndToEndDistance,
+         R"pbdoc(
+          Computes the mean of the end-to-end distances of each strand in the network.
+
+          NOTE:
+               Internally, this uses the :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeEndToEndDistance`.
+               All its cautionary facts apply.
+               Invalid strands (where said function returns 0.0 or -1.0) are ignored.
+     )pbdoc")
+    .def("computeMeanSquareEndToEndDistance",
+         &Universe::computeMeanSquareEndToEndDistance,
+         R"pbdoc(
+          Computes the mean square of the end-to-end distances of each strand in the network.
+
+          NOTE:
+               Internally, this uses the :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeEndToEndDistance`.
+               All its cautionary facts apply.
+               Invalid strands (where said function returns 0.0 or -1.0) are ignored.
+     )pbdoc")
     .def("computeDxs",
          &Universe::computeDxs,
          "Compute the dx distance for certain bonds (length in x direction).")
