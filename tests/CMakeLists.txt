@@ -138,7 +138,10 @@ if(CODE_COVERAGE)
 		--coverage
 	)
 
-	target_compile_options(header_tests PRIVATE -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-inline-functions -fno-default-inline -fprofile-abs-path)
+	target_compile_options(header_tests PRIVATE -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-inline-functions -fno-default-inline)
+	if(CMAKE_COMPILER_IS_GNUCXX)
+		target_compile_options(header_tests PRIVATE -fprofile-abs-path)
+	endif()
 	add_coverage(header_tests)
 	target_link_libraries(header_tests 
 		PRIVATE 

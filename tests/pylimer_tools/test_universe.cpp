@@ -46,6 +46,9 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     REQUIRE(universe.computeWeightFractions().size() == 0);
     REQUIRE(universe.computeMeanBondLength() == 0.0);
     REQUIRE(universe.computeBondLengths().size() == 0);
+    REQUIRE(universe.computeMeanEndToEndDistance(2) == 0.0);
+    REQUIRE(universe.computeMeanSquareEndToEndDistance(2) == 0.0);
+    REQUIRE(universe.computeEndToEndDistances(2).size() == 0);
   }
 
   SECTION("resizing bigger changes volume")
@@ -378,6 +381,33 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
         REQUIRE(newUniverse.getNrOfAtoms() == 3);
       }
     }
+
+    SECTION("Computations work")
+    {
+      universe.setBoxLengths(10.0, 10.0, 10.0);
+
+      // To understand where the following computations are coming from
+      auto chains = universe.getChainsWithCrosslinker(2);
+      REQUIRE(chains.size() == 3);
+      REQUIRE(chains[0].getKey() == "1-2-3-6-7");
+      REQUIRE(chains[1].getKey() == "5-6-7");
+      REQUIRE(chains[2].getKey() == "7-8");
+
+      auto endToEndDistances = universe.computeEndToEndDistances(2);
+      REQUIRE(endToEndDistances.size() == 3);
+      REQUIRE(endToEndDistances[0] == chains[0].computeEndToEndDistance());
+      REQUIRE(endToEndDistances[0] ==
+              Catch::Approx(sqrt(3.0 * 3.0 + 1.0 * 1.0)));
+      REQUIRE(endToEndDistances[1] == chains[1].computeEndToEndDistance());
+      REQUIRE(endToEndDistances[1] ==
+              Catch::Approx(sqrt(3.0 * 3.0 + 1.0 * 1.0)));
+      REQUIRE(endToEndDistances[2] == chains[2].computeEndToEndDistance());
+      REQUIRE(endToEndDistances[2] == 1.0);
+      REQUIRE(universe.computeMeanEndToEndDistance(2) ==
+              Catch::Approx((2.0 * sqrt(3.0 * 3.0 + 1.0 * 1.0) + 1.0) / 3.0));
+      REQUIRE(universe.computeMeanSquareEndToEndDistance(2) ==
+              Catch::Approx((2.0 * (3.0 * 3.0 + 1.0 * 1.0) + 1.0) / 3.0));
+    }
   }
 
   SECTION("Molecule Types are determined correctly")
@@ -417,8 +447,11 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     REQUIRE(chains[0].getKey() == "1-2-3");
     REQUIRE(chains[1].getKey() == "5-6");
     universe.setBoxLengths(3.0, 3.0, 3.0);
-    REQUIRE(chains[0].computeEndToEndDistance() == 1.0);
     REQUIRE(universe.determineEffectiveFunctionalityPerType()[2] ==
             (1. + 2.) / 2.);
+    REQUIRE(chains[0].computeEndToEndDistance() == 1.0);
+    REQUIRE(chains[1].computeEndToEndDistance() == 0.0);
+    REQUIRE(universe.computeMeanEndToEndDistance(2) == 1.0);
+    REQUIRE(universe.computeMeanSquareEndToEndDistance(2) == 1.0);
   }
 }
