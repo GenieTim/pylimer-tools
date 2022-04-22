@@ -45,7 +45,7 @@ namespace utils {
   public:
     MCUniverseGenerator(const double Lx, const double Ly, const double Lz)
     {
-      std::random_device rd;
+      std::random_device rd {};
       this->rng = std::mt19937(rd());
       this->distX = std::uniform_real_distribution<double>(0.0, Lx);
       this->distY = std::uniform_real_distribution<double>(0.0, Ly);
@@ -53,7 +53,9 @@ namespace utils {
       this->distSelect = std::uniform_real_distribution<double>(0.0, 1.0);
       this->box = pylimer_tools::entities::Box(Lx, Ly, Lz);
     }
+    
     void setSeed(unsigned int seed) { this->rng.seed(seed); };
+
     void setBeadDistance(double newBeadDistance)
     {
       this->beadDistance = newBeadDistance;

@@ -154,13 +154,6 @@ namespace entities {
   int Molecule::getNrOfAtoms() const { return this->size; }
 
   /**
-   * @brief Get the nr of bonds in the molecule
-   *
-   * @return int
-   */
-  int Molecule::getNrOfBonds() const { return igraph_ecount(&this->graph); }
-
-  /**
    * @brief Get the type of the molecule
    *
    * @return MoleculeType

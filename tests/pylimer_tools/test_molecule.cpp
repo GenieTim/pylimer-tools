@@ -30,10 +30,20 @@ TEST_CASE("Molecules work as intended", "[entity][Molecule]")
   REQUIRE(universeSeq.atIndex(0).getNrOfBonds() == 5);
 
   pe::Universe universe = universeSeq.atIndex(0);
+  std::vector<pe::Molecule> molecules = universe.getMolecules(0);
+
+  SECTION("Special constructors work")
+  {
+    pe::Molecule molecule1 = molecules[0];
+    pe::Molecule molecule2 = molecules[1];
+    molecule2 = molecule1;
+    REQUIRE(molecule2.getNrOfAtoms() == molecule1.getNrOfAtoms());
+    REQUIRE(molecule2.getKey() == molecule1.getKey());
+    REQUIRE(molecule2.getNrOfBonds() == molecule1.getNrOfBonds());
+  }
 
   SECTION("Molecules can calculate")
   {
-    std::vector<pe::Molecule> molecules = universe.getMolecules(0);
     REQUIRE(universe.getNrOfBonds() == 5);
     REQUIRE(universe.validate());
     REQUIRE(universe.getVolume() == Catch::Approx(64.3659 * 64.3659 * 64.3659));

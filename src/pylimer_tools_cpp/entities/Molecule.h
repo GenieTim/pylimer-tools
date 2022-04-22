@@ -46,7 +46,6 @@ namespace entities {
     std::vector<Atom> getAtoms();
     // std::map<std::string, std::vector<long int>> getBonds() const;
     std::vector<Atom> getAtomsLinedUp();
-    int getNrOfBonds() const;
     int getNrOfAtoms() const;
     const Box* getBox() const;
     std::string getKey() const;

@@ -17,6 +17,17 @@ extern "C"
 namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
 
+TEST_CASE("Certain configurations do not lead to memory corruption")
+{
+  // the following parameters have led to a `double free or corruption` error?!?
+  int nrOfCrosslinkers = static_cast<int>(5e4 * 2 * 0.7 / 7);
+  double sideLength = std::cbrt((10 * 5e4 * nrOfCrosslinkers) / 0.85);
+  pu::MCUniverseGenerator generator =
+    pu::MCUniverseGenerator(sideLength, sideLength, sideLength);
+  REQUIRE_NOTHROW(generator.setSeed(68419));
+  REQUIRE_NOTHROW(generator.setBeadDistance(0.965));
+}
+
 TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
 {
   pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(10.0, 10.0, 10.0);

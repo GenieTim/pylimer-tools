@@ -116,7 +116,7 @@ namespace entities {
       igraph_vector_init(&allValues, this->getNrOfAtoms());
       if (igraph_cattribute_VANV(
             &this->graph, propertyName, igraph_vss_all(), &allValues)) {
-        throw std::runtime_error("Failed to query properties of molecule.");
+        throw std::runtime_error("Failed to query properties of graph.");
       }
       pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
       igraph_vector_destroy(&allValues);
@@ -148,7 +148,7 @@ namespace entities {
                                  propertyName,
                                  igraph_vss_vector(&vertexIdxs),
                                  &allValues)) {
-        throw std::runtime_error("Failed to query properties of molecule.");
+        throw std::runtime_error("Failed to query properties of graph.");
       }
       pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
       igraph_vector_destroy(&allValues);
