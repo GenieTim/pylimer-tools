@@ -38,7 +38,7 @@ Include(FetchContent)
 FetchContent_Declare(
   Catch2
   GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-  GIT_TAG        v3.0.0-preview4
+  GIT_TAG        v3.0.0-preview5
 )
 
 FetchContent_MakeAvailable(Catch2)
@@ -92,22 +92,27 @@ target_link_libraries(header_tests
 )
 
 if (LEAK_ANALYSIS)
-	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address -fsanitize=leak")
-	set (CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=address -fsanitize=leak")
-	if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-		target_link_libraries(pylimer_tests 
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
+	set (CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
+	target_link_libraries(test_sources 
 		PRIVATE
 		-fsanitize=address
-		)
-	else()
-		message(WARNING "Leak analysis only supported for Clang")
-	endif()
+	)
+	target_link_libraries(pylimer_tests 
+		PRIVATE
+		-fsanitize=address
+	)
+	target_link_libraries(header_tests 
+		PRIVATE
+		-fsanitize=address
+	)
 endif()
 
 list(APPEND CMAKE_MODULE_PATH ${catch2_SOURCE_DIR}/extras)
 include(CTest)
 include(Catch)
 catch_discover_tests(pylimer_tests)
+
 catch_discover_tests(header_tests)
 
 if(CODE_COVERAGE)
@@ -142,6 +147,7 @@ if(CODE_COVERAGE)
 	if(CMAKE_COMPILER_IS_GNUCXX)
 		target_compile_options(header_tests PRIVATE -fprofile-abs-path)
 	endif()
+
 	add_coverage(header_tests)
 	target_link_libraries(header_tests 
 		PRIVATE 
