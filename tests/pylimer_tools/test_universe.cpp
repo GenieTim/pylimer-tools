@@ -49,6 +49,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     REQUIRE(universe.computeMeanEndToEndDistance(2) == 0.0);
     REQUIRE(universe.computeMeanSquareEndToEndDistance(2) == 0.0);
     REQUIRE(universe.computeEndToEndDistances(2).size() == 0);
+    REQUIRE(universe.findLoops(2).size() == 0);
   }
 
   SECTION("resizing bigger changes volume")
@@ -333,9 +334,12 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       universe.addBonds(
         2, { { 4, 9 } }, { { 9, 4 } }, { { 1, 1 } }, false, false);
       pe::Universe reducedUniverse = universe.getNetworkOfCrosslinker(2);
+      REQUIRE(reducedUniverse.getNrOfAtoms() == 3);
       std::map<int, std::vector<std::vector<pe::Atom>>> loops =
         reducedUniverse.findLoops(2, -1);
       REQUIRE(loops.size() == 2);
+      REQUIRE(reducedUniverse.getPropertyValues<int>("id").size() == 3);
+      REQUIRE(reducedUniverse.getAtomTypes().size() == 3);
     }
 
     SECTION("Infinite Strands are found")
@@ -453,5 +457,34 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     REQUIRE(chains[1].computeEndToEndDistance() == 0.0);
     REQUIRE(universe.computeMeanEndToEndDistance(2) == 1.0);
     REQUIRE(universe.computeMeanSquareEndToEndDistance(2) == 1.0);
+
+    SECTION("Primary loops too")
+    {
+      // instead of rewriting above tests,
+      // let's just add new atoms & bonds.
+      // the resulting new structure will look like this (in terms of bonds, not
+      // 3D placement):
+      // 1-2-3
+      //
+      // 9-8
+      // | |
+      // ↳-*7-*6-5
+      universe.addAtoms(2,
+                        { { 8, 9 } }, // id
+                        { { 1, 1 } }, // type
+                        { { 0, 1 } }, // x
+                        { { 2, 3 } }, // y
+                        { { 0, 0 } }, // z
+                        { { 1, 1 } }, // nx
+                        { { 1, 1 } }, // ny
+                        { { 1, 1 } }  // nz
+      );
+      universe.addBonds(3, { { 7, 8, 9 } }, { { 8, 9, 7 } });
+      REQUIRE(universe.getNrOfBonds() == 7);
+      auto newChains = universe.getChainsWithCrosslinker(2);
+      REQUIRE(newChains.size() == 3);
+      REQUIRE(newChains[2].getType() == pe::MoleculeType::PRIMARY_LOOP);
+      REQUIRE(newChains[2].getKey() == "7-8-9");
+    }
   }
 }
