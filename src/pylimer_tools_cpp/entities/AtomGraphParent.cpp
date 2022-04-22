@@ -110,6 +110,7 @@ namespace entities {
     std::vector<Atom> results;
     const std::vector<int> types = this->getPropertyValues<int>("type");
     size_t nrOfTypes = types.size();
+    // results.reserve(this->getNrOfAtoms()); // TODO: check whether this is worth it or not
 
     // #pragma omp declare reduction (merge : std::vector<Atom> :
     // omp_out.insert(omp_out.end(), omp_in.begin(), omp_in.end())) #pragma
@@ -119,6 +120,7 @@ namespace entities {
         results.push_back(this->getAtomByVertexIdx(i));
       }
     }
+
 
     return results;
   };

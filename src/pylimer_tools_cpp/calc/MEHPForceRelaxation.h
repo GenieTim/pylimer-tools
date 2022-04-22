@@ -142,8 +142,6 @@ namespace calc {
         /* array allocation */
         double* force;
         force = (double*)calloc(3 * net.nrOfNodes, sizeof(double));
-        double* forceGradient;
-        forceGradient = (double*)calloc(3 * net.nrOfNodes, sizeof(double));
         for (size_t i = 0; i < 3 * net.nrOfNodes; ++i) {
           force[i] = 0.0;
         }
@@ -163,7 +161,6 @@ namespace calc {
         double force2Norm = 0.0;
         for (size_t i = 0; i < 3 * net.nrOfNodes; ++i) {
           force2Norm += force[i] * force[i];
-          forceGradient[i] = force[i];
         }
         double initialForce = force2Norm;
         double gradient2Norm = force2Norm;

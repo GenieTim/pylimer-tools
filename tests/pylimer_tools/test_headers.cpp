@@ -2,6 +2,7 @@
 #include "../../src/pylimer_tools_cpp/entities/Box.h"
 #include "../../src/pylimer_tools_cpp/utils/StringUtils.h"
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -86,8 +87,8 @@ TEST_CASE("CsvTokenizer works", "[utils][StringUtil]")
   REQUIRE(tk2.get<unsigned long int>(1) == 12);
   REQUIRE(tk2.get<long int>(1) == 12);
   REQUIRE(tk2.get<float>(2) == 0.001f);
-  REQUIRE(tk2.get<double>(2) == 0.001);
-  REQUIRE(tk2.get<long double>(2) == 0.001);
+  REQUIRE(tk2.get<double>(2) == static_cast<double>(0.001));
+  REQUIRE(tk2.get<long double>(2) == Catch::Approx(static_cast<long double>(0.001)));
 }
 
 TEST_CASE("String utility functions work", "[utils][StringUtil]")

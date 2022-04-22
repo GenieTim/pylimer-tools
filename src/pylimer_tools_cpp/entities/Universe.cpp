@@ -228,6 +228,7 @@ namespace entities {
         innerIndex += 1;
         actualNrOfBondsAdded += 1;
       } else if (!ignoreNonExistentAtoms) {
+        igraph_vector_destroy(&newEdges);
         throw std::invalid_argument("Bond with atom with id " +
                                     std::to_string(newEdgesVector[i]) +
                                     " impossible as atom is not added yet.");
