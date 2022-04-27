@@ -155,12 +155,7 @@ namespace utils {
       throw std::invalid_argument("Cannot check for header '" + headerKey +
                                   "' without reading a group first.");
     }
-    if (this->getLength() > 0) {
-      // assumption: each step has the same keys
-      auto firstEl = this->data.begin();
-      return firstEl->second.contains(headerKey);
-    }
-    return false;
+    return this->headerColMap.contains(headerKey);
   }
 
   /**

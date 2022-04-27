@@ -20,10 +20,12 @@ TEST_CASE("DumpFileParser can be used", "[utils][DumpFileParser]")
   {
     pu::DumpFileParser parser =
       pu::DumpFileParser(suspectedPath + "lammps_dump_small.lammpstrj");
+    REQUIRE_THROWS(parser.hasKey("BOX BOUNDS"));
     REQUIRE(parser.getLength() == 1);
     REQUIRE_NOTHROW(parser.read());
     REQUIRE(parser.getLength() == 1);
     REQUIRE_THROWS(parser.readNGroups(1, 10));
+    REQUIRE_THROWS(parser.readNGroups(10, 1));
     REQUIRE_THROWS(parser.getValuesForAt<int>(0, "BOX BOUNDS", "notexisting"));
     // call copy constructor
     pu::DumpFileParser parser2 = parser;
@@ -63,5 +65,15 @@ TEST_CASE("DumpFileParser can be used", "[utils][DumpFileParser]")
     pu::DataFileParser parser3 = pu::DataFileParser();
     parser3.read(suspectedPath + "lammps_data_file_small_wangles.out");
     REQUIRE(parser3.getNrOfAngles() == 1);
+  }
+  
+  SECTION("Reading large files is sensibly fast")
+  {
+    pu::DumpFileParser parser =
+      pu::DumpFileParser(suspectedPath + "big_dump_file.lammpstrj");
+    // pre-read multiple
+    REQUIRE_NOTHROW(parser.readNGroups(9, 12));
+    REQUIRE(parser.hasKey("BOX BOUNDS") == true);
+    REQUIRE(parser.hasKey("NO EXISTING") == false);
   }
 }

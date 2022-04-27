@@ -96,5 +96,6 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
     REQUIRE(fourthUniverse.getNrOfAtoms() == 32);
     REQUIRE(fourthUniverse.getAtom(1).getX() !=
             thirdUniverse.getAtom(1).getX());
+
   }
 }
