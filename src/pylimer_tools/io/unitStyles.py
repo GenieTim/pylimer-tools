@@ -61,6 +61,9 @@ class UnitStyleFactory(object):
     def __init__(self):
         self.ureg = UnitRegistry()
 
+    def getUnitRegistry(self):
+        return self.ureg
+
     def getUnitStyle(self, unitType: str, dimension: int = 3, **kwargs) -> UnitStyle:
         """
         Get a UnitStyle instance corresponding to the unit system requested.
