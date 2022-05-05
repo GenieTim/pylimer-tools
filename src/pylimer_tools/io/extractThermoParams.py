@@ -155,7 +155,7 @@ def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", text
             if (tmpCsvFile != ""):
                 newDf = csvFileToDf(tmpCsvFile)
                 if (not newDf.empty):
-                    df = df.append(newDf)
+                    df = pd.concat(df, newDf)
 
     if (df is not None):
         # df.columns = df.columns.str.replace(' ', '')

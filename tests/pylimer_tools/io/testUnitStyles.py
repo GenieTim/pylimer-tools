@@ -2,6 +2,8 @@
 import unittest
 import warnings
 
+from pint import UnitRegistry
+
 from pylimer_tools.io.unitStyles import UnitStyle, UnitStyleFactory
 
 
@@ -14,6 +16,7 @@ class UnitStyleTest(unittest.TestCase):
 
     def test_allStylesAreSensible(self):
         unitStyleFactory = UnitStyleFactory()
+        self.assertIsInstance(unitStyleFactory.getUnitRegistry(), UnitRegistry)
         baseStyle = unitStyleFactory.getUnitStyle("si")
         otherStyles = [unitStyleFactory.getUnitStyle(
             "nano"), unitStyleFactory.getUnitStyle("real")]
