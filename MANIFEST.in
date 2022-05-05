@@ -1,6 +1,7 @@
 include CMakeLists.txt
 include vendor/CMakeLists.txt
 include README.md
+include src/pylimer_tools/data/everaers_et_al_unit_properties.xlsx
 global-include src/**/CMakeLists.txt
 global-include src/pylimer_tools_cpp/**/*.h
 global-include src/pylimer_tools_cpp/**/*.cpp
