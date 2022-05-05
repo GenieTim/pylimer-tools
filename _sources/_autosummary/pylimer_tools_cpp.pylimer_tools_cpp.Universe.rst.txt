@@ -41,6 +41,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Universe
       ~Universe.getAtomIdByIdx
       ~Universe.getAtomTypes
       ~Universe.getAtoms
+      ~Universe.getAtomsConnectedTo
       ~Universe.getAtomsWithType
       ~Universe.getBonds
       ~Universe.getBox
