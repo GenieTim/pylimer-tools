@@ -280,9 +280,11 @@ init_pylimer_bound_entities(py::module_& m)
          &Molecule::computeRadiusOfGyration,
          R"pbdoc(
             Computes the radius of gyration, :math:`R_g^2` of this molecule.
-
-            NOTE: 
-               The mass of the atoms is not yet taken into account.
+            
+            :math:`{R_g}^2 = \frac{1}{M} \sum_i m_i (r_i - r_{cm})^2`,
+            where :math:`M` is the total mass of the molecule, :math:`r_{cm}`
+            are the coordinates of the center of mass of the molecule and the
+            sum is over all contained atoms.
             )pbdoc")
     .def("computeEndToEndDistance",
          &Molecule::computeEndToEndDistance,
