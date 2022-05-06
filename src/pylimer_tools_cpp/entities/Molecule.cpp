@@ -3,9 +3,7 @@
 #include "../utils/StringUtils.h"
 #include "Atom.h"
 #include <algorithm>
-#include <execution>
 #include <iostream>
-#include <numeric>
 #include <set>
 extern "C"
 {
