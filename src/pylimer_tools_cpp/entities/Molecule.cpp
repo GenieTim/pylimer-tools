@@ -2,12 +2,15 @@
 #include "../utils/GraphUtils.h"
 #include "../utils/StringUtils.h"
 #include "Atom.h"
+#include <algorithm>
+#include <execution>
+#include <iostream>
+#include <numeric>
 #include <set>
 extern "C"
 {
 #include <igraph/igraph.h>
 }
-#include <iostream>
 #ifdef OPENMP_FOUND
 #include <omp.h>
 #endif
@@ -170,23 +173,26 @@ namespace entities {
     // as long as there are no external additional performance demands
     std::vector<Atom> allAtoms = this->getAtoms();
     double multiplier = 1 / allAtoms.size();
+    double totalMass = 0.0;
 
+// TODO: might want to use the raw values, use std::accumulate or std::reduce
 #pragma omp parallel for reduction(+ : meanX, meanY, meanZ)
     for (Atom a : allAtoms) {
-      meanX += multiplier * a.getUnwrappedX(this->parent);
-      meanY += multiplier * a.getUnwrappedY(this->parent);
-      meanZ += multiplier * a.getUnwrappedZ(this->parent);
+      meanX += this->weightPerType.at(a.getType()) * a.getUnwrappedX(this->parent);
+      meanY += this->weightPerType.at(a.getType()) * a.getUnwrappedY(this->parent);
+      meanZ += this->weightPerType.at(a.getType()) * a.getUnwrappedZ(this->parent);
+      totalMass += this->weightPerType.at(a.getType());
     }
 
-    Atom virtualCenterAtom = Atom(0, 0, meanX, meanY, meanZ, 0, 0, 0);
+    Atom virtualCenterAtom = Atom(0, 0, meanX*multiplier, meanY*multiplier, meanZ*multiplier, 0, 0, 0);
 
     double Rg2 = 0.0;
     for (Atom a : allAtoms) {
       double dist = a.distanceTo(virtualCenterAtom, this->parent);
-      Rg2 += dist * dist;
+      Rg2 += this->weightPerType.at(a.getType()) * dist * dist;
     }
 
-    return Rg2 * multiplier;
+    return Rg2 * multiplier / totalMass;
   }
 
   std::string Molecule::getKey() const { return this->key; }
