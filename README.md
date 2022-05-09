@@ -28,8 +28,8 @@ See the [documentation](https://genietim.github.io/pylimer-tools) for a current 
 
 ### Example
 
-An example useage can be found in the [documentation](https://genietim.github.io/pylimer-tools),
-the [CLI application](./src/pylimer_tools/pylimer_tools.py) or in the following code snippet:
+Example useage can be found in the [documentation](https://genietim.github.io/pylimer-tools), the [tests](https://github.com/GenieTim/pylimer-tools/tree/main/tests),
+the [CLI application](https://github.com/GenieTim/pylimer-tools/tree/main//src/pylimer_tools/pylimer_tools.py) or in the following code snippet:
 
 ```python
 import numpy as np

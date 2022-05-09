@@ -280,9 +280,11 @@ init_pylimer_bound_entities(py::module_& m)
          &Molecule::computeRadiusOfGyration,
          R"pbdoc(
             Computes the radius of gyration, :math:`R_g^2` of this molecule.
-
-            NOTE: 
-               The mass of the atoms is not yet taken into account.
+            
+            :math:`{R_g}^2 = \frac{1}{M} \sum_i m_i (r_i - r_{cm})^2`,
+            where :math:`M` is the total mass of the molecule, :math:`r_{cm}`
+            are the coordinates of the center of mass of the molecule and the
+            sum is over all contained atoms.
             )pbdoc")
     .def("computeEndToEndDistance",
          &Molecule::computeEndToEndDistance,
@@ -406,6 +408,9 @@ init_pylimer_bound_entities(py::module_& m)
             Specify the crosslinkerType to an existing type id, 
             then those atoms will be omitted, and this function returns chains instead.)pbdoc",
          py::arg("atomTypeToOmit"))
+    .def("getAtomsConnectedTo", &Universe::getAtomsConnectedTo, R"pbdoc(
+            Get the atoms connected to a specified vertex id.
+            )pbdoc")
     .def("findLoops",
          &Universe::findLoops,
          R"pbdoc(
@@ -594,13 +599,19 @@ init_pylimer_bound_entities(py::module_& m)
      )pbdoc")
     .def("computeDxs",
          &Universe::computeDxs,
-         "Compute the dx distance for certain bonds (length in x direction).")
+         "Compute the dx distance for certain bonds (length in x direction).",
+         py::arg("atomIdsTo"),
+         py::arg("atomIdsFrom"))
     .def("computeDys",
          &Universe::computeDys,
-         "Compute the dy distance for certain bonds (length in y direction).")
+         "Compute the dy distance for certain bonds (length in y direction).",
+         py::arg("atomIdsTo"),
+         py::arg("atomIdsFrom"))
     .def("computeDzs",
          &Universe::computeDzs,
-         "Compute the dz distance for certain bonds (length in z direction).")
+         "Compute the dz distance for certain bonds (length in z direction).",
+         py::arg("atomIdsTo"),
+         py::arg("atomIdsFrom"))
     .def("simplify",
          &Universe::simplify,
          "Remove self links and double bonds. This function is called "
@@ -656,23 +667,28 @@ init_pylimer_bound_entities(py::module_& m)
           NOTE:
                If you have not output the id of the atoms in the dump file, they will be assigned sequentially. 
                If you have not output the type of the atoms in the dump file, they will be set to -1 if they cannot be infered from the data file.
-        )pbdoc")
+        )pbdoc",
+         py::arg("initialStructureDataFile"),
+         py::arg("dumpFile"))
     .def("initializeFromDataSequence",
          &UniverseSequence::initializeFromDataSequence,
          "Reset and initialize the Universes from an ordered list of Lammps "
-         "data (:code:`write_data`) files.")
+         "data (:code:`write_data`) files.",
+         py::arg("dataFiles"))
     .def("next",
          &UniverseSequence::next,
          R"pbdoc(Get the Universe that's next in the sequence.)pbdoc")
     .def("atIndex",
          &UniverseSequence::atIndex,
          "Get the Universe at the given index (as of in the sequence given "
-         "by the dump file).")
+         "by the dump file).",
+         py::arg("index"))
     .def(
       "forgetAtIndex",
       &UniverseSequence::forgetAtIndex,
       R"pbdoc(Clear the memory of the Universe at the given index (as of in the 
-           sequence given by the dump file).)pbdoc")
+           sequence given by the dump file).)pbdoc",
+      py::arg("index"))
     .def("resetIterator",
          &UniverseSequence::resetIterator,
          R"pbdoc(
