@@ -9,6 +9,7 @@ from io import StringIO
 from typing import Iterable
 import warnings
 import tempfile
+import hashlib
 
 import pandas as pd
 from pylimer_tools.utils.cacheUtility import doCache, loadCache
@@ -100,9 +101,10 @@ def getThermoCacheNameSuffix(header="Step Temp E_pair E_mol TotEng Press", texts
         - minLineLen: the minimal length of a line to be accepted as data
     """
     if (isinstance(header, Iterable)):
-        header = "{}{}".format("".join(header), len(header))
+        header = "{}{}".format("".join("".join(header).split()), len(header))
 
-    return "{}{}{}-thermo-param-cache.pickle".format(header, textsToRead, minLineLen)
+    # need to has header, as we could get a filename too long error otherwise. Addmittedly, still possible for certain inputs
+    return "{}{}{}-thermo-param-cache.pickle".format(hashlib.md5(header.encode()).hexdigest(), textsToRead, minLineLen)
 
 
 def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", textsToRead=5, minLineLen=5, useCache=True) -> pd.DataFrame:
@@ -142,7 +144,7 @@ def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", text
                 pass
             return tmpDf
         except Exception as e:
-            warnings.warn("Error reading CSV thermo file: {}".format(e), source=e)
+            warnings.warn("Error reading temporary CSV thermo file '{}': {}".format(filePath, e), source=e)
             return pd.DataFrame()
 
     with open(file, 'r') as fp:
@@ -155,7 +157,9 @@ def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", text
             if (tmpCsvFile != ""):
                 newDf = csvFileToDf(tmpCsvFile)
                 if (not newDf.empty):
-                    df = df.append(newDf)
+                    df = pd.concat([df, newDf])
+            else:
+                break
 
     if (df is not None):
         # df.columns = df.columns.str.replace(' ', '')

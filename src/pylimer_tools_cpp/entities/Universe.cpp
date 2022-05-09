@@ -1099,6 +1099,7 @@ namespace entities {
    */
   Universe Universe::getNetworkOfCrosslinker(const int crosslinkerType) const
   {
+    // TODO: prevent duplicate of self-loops
     // How this works:
     // 1. find all crosslinkers
     // 2. from each crosslinker, walk in all directions
