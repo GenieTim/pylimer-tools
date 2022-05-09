@@ -33,6 +33,7 @@
       DataFileWriter
       DumpFileReader
       ExitReason
+      LazyUniverseSequenceIterator
       MCUniverseGenerator
       MEHPForceRelaxation
       Molecule
