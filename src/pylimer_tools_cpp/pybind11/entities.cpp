@@ -629,6 +629,13 @@ init_pylimer_bound_entities(py::module_& m)
     size_t index = 0; // the index to access
   };
 
+  py::class_<LazyUniverseSequenceIterator>(m, "LazyUniverseSequenceIterator", R"pbdoc(
+       An iterator to iterate throught the universes in :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence`.
+  )pbdoc")
+    .def("__iter__",
+         [](LazyUniverseSequenceIterator& it) -> LazyUniverseSequenceIterator& { return it; })
+    .def("__next__", &LazyUniverseSequenceIterator::next);
+
   py::class_<UniverseSequence>(m, "UniverseSequence", R"pbdoc(
      This class represents a sequence of Universes, with the Universe's data
      only being read on request. Dump files are read at once in order
