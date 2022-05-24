@@ -3,6 +3,7 @@ import sys
 import unittest
 
 from pylimer_tools.calc.doMMTAnalysis import *
+from pylimer_tools.io.unitStyles import UnitStyleFactory
 
 if __name__ == '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../"))
@@ -43,10 +44,18 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertEqual(1, predictGelationPoint(1, 2, 2))
 
     def testShearModulusPrediction(self):
-        self.assertIsNone(predictShearModulus(self.emptyUniverse, 2, None))
+        self.assertRaises(ValueError, lambda: predictShearModulus(self.emptyUniverse, 2, None))
+        self.assertRaises(ValueError, lambda: predictShearModulus(self.emptyUniverse, None))
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
-        self.assertEqual(1.6138142499798294e-07, predictShearModulus(
-            self.saturatedTestUniverse, 2, strandLength=2))
+
+        unitStyleFactory = UnitStyleFactory()
+        unitStyle = unitStyleFactory.getUnitStyle("si")
+        self.assertAlmostEqual(0.17395433850345213, predictShearModulus(
+            self.saturatedTestUniverse, unitStyle, junctionType=2, strandLength=2).to('MPa').magnitude)
+        self.assertAlmostEqual(0.17395433850345213, predictShearModulus(
+            self.saturatedTestUniverse, unitStyle, junctionType=2, strandLength=2, functionalityPerType={2:4}).to('MPa').magnitude)
+        self.assertAlmostEqual(0.17395433850345213, predictShearModulus(
+            self.saturatedTestUniverse, unitStyle, junctionType=2).to('MPa').magnitude)
 
     def testWeightFractionCalculations(self):
         self.assertDictEqual(
@@ -107,6 +116,24 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertEqual(0.43792682962864016, calculateWeightFractionOfBackbone(self.saturatedTestUniverse, junctionType=2, strandLength=2, functionalityPerType={
             1: 2, 2: 4
         }))
+
+    def testModulusDecompositions(self):
+        unitStyleFactory = UnitStyleFactory()
+        unitStyle = unitStyleFactory.getUnitStyle("si")
+        self.assertAlmostEqual(unitStyle.kb.to('J/K').magnitude, 1.381e-23)
+
+        G_MMT_phantom, G_MMT_entanglement, G_ANM, G_PNM = computeModulusDecomposition(
+            network=None, unitStyle=unitStyle, junctionType=2, r=1., p=0.95, f=4, nu=4.63241e25*(unitStyle.getUnderlyingUnitRegistry()(
+                'meter')**-3), T=298*unitStyle.getUnderlyingUnitRegistry()('kelvin')
+        )
+
+        alpha, beta = computeMMsProbabilities(r=1., p=0.95, f=4.)
+        self.assertAlmostEqual(alpha, 0.0983588, places=5)
+
+        self.assertAlmostEqual(G_ANM.to('MPa').magnitude, 0.190641, places=5)
+        self.assertAlmostEqual(G_PNM.to('MPa').magnitude, 0.0953207, places=5)
+        self.assertAlmostEqual(G_MMT_entanglement.to('MPa').magnitude, 0.182437, places=5)
+        self.assertAlmostEqual(G_MMT_phantom.to('MPa').magnitude, 0.0767419, places=5)
 
 
 if __name__ == '__main__':

@@ -84,18 +84,23 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
     REQUIRE(universeAgain.getNrOfAtoms() == 32);
     REQUIRE(universeAgain.getAtom(1).getX() == universeAgain.getAtom(1).getX());
     // and the last one
-    std::cout << "Requesting last index" << std::endl;
     REQUIRE_THROWS(universeSeq.atIndex(74322));
-    std::cout << "Requesting last existing index" << std::endl;
     pe::Universe thirdUniverse = universeSeq.atIndex(74321);
     REQUIRE(thirdUniverse.getNrOfAtoms() == 32);
     REQUIRE(universeAgain.getAtom(1).getX() != thirdUniverse.getAtom(1).getX());
     // and back again
-    std::cout << "Requesting fourth existing index" << std::endl;
     pe::Universe fourthUniverse = universeSeq.atIndex(9);
     REQUIRE(fourthUniverse.getNrOfAtoms() == 32);
     REQUIRE(fourthUniverse.getAtom(1).getX() !=
             thirdUniverse.getAtom(1).getX());
-
   }
+
+  // SECTION("Some non-commited large file reading works")
+  // {
+  //   universeSeq.initializeFromDumpFile(
+  //     suspectedPath + "uncrosslinked_MD_melt_M10000_N79_equil_50M_bs_w_extra_"
+  //                     "chain_near_min.out",
+  //     suspectedPath + "melt_fene_N_78_rev.lammpstrj");
+  //   REQUIRE(universeSeq.getLength() > 8638005/10);
+  // }
 }

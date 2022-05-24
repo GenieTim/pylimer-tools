@@ -4,11 +4,14 @@ import warnings
 from collections import Counter
 
 import numpy as np
+import pint
+import scipy.special
+from pylimer_tools.io.unitStyles import UnitStyle
 from pylimer_tools_cpp import Universe
 from scipy import optimize
 
 
-def predictShearModulus(network: Universe, junctionType, strandLength: int = None, functionalityPerType=None, T: float = 1, k_B: float = 1):
+def predictShearModulus(network: Universe, unitStyle: UnitStyle, junctionType: int = None, r: float = None, p: float = None, f: int = None, nu: float = None, T: pint.Quantity = None, strandLength: int = None, functionalityPerType: dict = None):
     """
     Predict the shear modulus using MMT Analysis.
 
@@ -16,33 +19,26 @@ def predictShearModulus(network: Universe, junctionType, strandLength: int = Non
       - https://pubs.acs.org/doi/10.1021/acs.macromol.9b00262
 
     Arguments:
-      - network: the polymer system to predict the shear modulus for
-      - junctionType: the type of atoms making up the junctions/crosslinkers
+      - network: the poylmer network to do the computation for
+      - unitStyle: the unit style to use to have the results in appropriate units
       - junctionType: the type of the junctions/crosslinkers to select them in the network
-      - strandLength: the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
-      - T: the temperature in your unit system
-      - k_b: Boltzmann's constant in your unit system
-      - totalMass: the :math:`M` in the respective formula
-
+      - r: the stoichiometric inbalance. Optional if network is specified
+      - p: the extent of reaction. Optional if network is specified
+      - f: the functionality of the the crosslinker. Optional if network is specified
+      - nu: the strand number density (nr of strands per volume) (ideally with units). Optional if network is specified
+      - T: the temperature to compute the modulus at. Default: 273.15 K
+      - strandLength: the length of the network strands (in nr. of beads). Optional, can be passed to improve performance
+      - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. Optional, can be passed to improve performance
+    
     Returns:
       - G: the predicted shear modulus, or `None` if the universe is empty.
 
     ToDo:
       - Support more than one crosslinker type (as is supported by original formula)
     """
-    if (network.getNrOfAtoms() == 0):
-        return None
-    nu = len(network.getMolecules(junctionType)) / \
-        network.getVolume()  # number of chains (network strands) per unit volume
-    if (functionalityPerType is None or junctionType not in functionalityPerType):
-        functionalityPerType = network.determineFunctionalityPerType()
-    p = computeExtentOfReaction(network, junctionType, functionalityPerType)
-    r = computeStoichiometricInbalance(
-        network, junctionType, strandLength, functionalityPerType)
-    f = functionalityPerType[junctionType]
-    alpha, beta = computeMMsProbabilities(r, p, f)
-    weightFractions = computeWeightFractions(network)
-    return nu * k_B * T * (2*r/f) * (f - 2)/2 * weightFractions[junctionType] * alpha * (1-alpha)**f
+    G_MMT_phantom, G_MMT_entanglement, _, _ = computeModulusDecomposition(
+        network, unitStyle, junctionType, r, p, f, nu, T)
+    return G_MMT_phantom + G_MMT_entanglement
 
 
 def calculateWeightFractionOfDanglingChains(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None) -> float:
@@ -237,6 +233,68 @@ def computeMMsProbabilities(r, p, f):
     return alpha, beta
 
 
+def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, junctionType: int = None, r: float = None, p: float = None, f: int = None, nu: float = None, T: pint.Quantity = None, strandLength: int = None, functionalityPerType: dict = None):
+    """
+    Compute four different estimates of the plateau modulus, using MMT, ANM and PNM.
+
+    Arguments:
+      - network: the poylmer network to do the computation for
+      - unitStyle: the unit style to use to have the results in appropriate units
+      - junctionType: the type of the junctions/crosslinkers to select them in the network
+      - r: the stoichiometric inbalance. Optional if network is specified
+      - p: the extent of reaction. Optional if network is specified
+      - f: the functionality of the the crosslinker. Optional if network is specified
+      - nu: the strand number density (nr of strands per volume) (ideally with units). Optional if network is specified
+      - T: the temperature to compute the modulus at. Default: 273.15 K
+      - strandLength: the length of the network strands (in nr. of beads). Optional, can be passed to improve performance
+      - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. Optional, can be passed to improve performance
+    
+    Returns:
+      - G_MMT_phantom: the phantom contribution to the MMT modulus
+      - G_MMT_entanglement: the entanglement contribution to the MMT modulus
+      - G_ANM: the ANM estimate of the modulus
+      - G_PNM: the PNM estimate of the modulus
+
+    """
+    if (junctionType is None and (r is None or f is None or p is None or nu is None)):
+        raise ValueError(
+            "Either the junctionType or the required variables must be specified")
+    if (r is None):
+        r = computeStoichiometricInbalance(
+            network, junctionType=junctionType, strandLength=strandLength, functionalityPerType=functionalityPerType)
+    if (p is None):
+        p = computeExtentOfReaction(
+            network, junctionType, strandLength=strandLength)
+    if (f is None):
+        if (functionalityPerType is None):
+            f = network.determineFunctionalityPerType()[junctionType]
+        else:
+            f = functionalityPerType[junctionType]
+    if (nu is None):
+        nu = len(network.getMolecules(junctionType)) / \
+            (network.getVolume()*unitStyle.getBaseUnitOf('volume'))
+    if (T is None):
+        T = 273.15*unitStyle.getUnderlyingUnitRegistry()('kelvin')
+
+    # affine
+    G_ANM = nu*unitStyle.kB*T
+    # phantom
+    G_PNM = (1-2/f)*nu*unitStyle.kB*T
+    # MMT:
+    alpha, beta = computeMMsProbabilities(r, p, f)
+    GammaMMTSum = 0.0
+    for m in range(3, f+1):
+        GammaMMTSum += (((m-2.)/2.)*scipy.special.binom(f, m)
+                        * (alpha**(f-m))*((1.-alpha)**m))
+    GammaMMT = (2*r/f) * GammaMMTSum
+    G_MMT_phantom = GammaMMT*nu*unitStyle.kB*T
+    # fraction of elastically effective strands. TODO : check adjustment with r
+    pel = (1/(p*np.sqrt(r)) - alpha)**2
+    G_MMT_entanglement = 0.22*unitStyle.getUnderlyingUnitRegistry()('MPa')*(pel**2)
+    # entanglement part. TODO : check adjustment with r (and where the 0.22 is coming from? Fabian' s fit!)
+    return G_MMT_phantom, G_MMT_entanglement, G_ANM, G_PNM
+
+
 def computeWeightFractions(network: Universe) -> dict:
     """
     Compute the weight fractions of each atom type in the network.
@@ -268,7 +326,7 @@ def computeWeightFractions(network: Universe) -> dict:
     return weightFractions
 
 
-def computeStoichiometricInbalance(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None, ignoreTypes: list = [], effective: bool = False) -> float:
+def computeStoichiometricInbalance(network: Universe, junctionType: int, strandLength: int = None, functionalityPerType: dict = None, ignoreTypes: list = [], effective: bool = False) -> float:
     """
     Compute the stoichiometric inbalance
     ( nr. of bonds formable of crosslinker / nr. of formable bonds of precursor )

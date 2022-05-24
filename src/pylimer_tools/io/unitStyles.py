@@ -13,8 +13,16 @@ class UnitStyle(object):
     (i.e.: use this to convert your LAMMPS output data to SI units).
     """
 
-    def __init__(self, unitConfiguration: dict):
+    def __init__(self, unitConfiguration: dict, ureg: UnitRegistry):
         self.unitConfiguration = unitConfiguration
+        self.underlyingUnitRegistry = ureg
+        # add some auxiliary constants
+        self.unitConfiguration['kb'] = 1.381e-23*ureg('joule/kelvin')
+        if ('volume' not in self.unitConfiguration):
+            self.unitConfiguration['volume'] = self.unitConfiguration['distance']**3
+
+    def getUnderlyingUnitRegistry(self):
+        return self.underlyingUnitRegistry
 
     def getBaseUnitOf(self, property: str):
         """
@@ -48,7 +56,7 @@ class UnitStyle(object):
           siMass = ljMass * units.mass
         """
         if (property.lower() in self.unitConfiguration.keys()):
-            return self.unitConfiguration[property]
+            return self.unitConfiguration[property.lower()]
 
 
 class UnitStyleFactory(object):
@@ -102,10 +110,10 @@ class UnitStyleFactory(object):
             if (not isinstance(polymerData, dict) and not isinstance(polymerData, tuple)):
                 raise ValueError(
                     "No useable data for this polymer found to use for lj units. Check whether your useage is correct.")
+            ureg.define("sigma = {} * nanometer".format(polymerData.sigma))
+            ureg.define("eps = {}e-21 joule".format(polymerData.kB_Tref))
             # time is most difficult in lj — let's keep tau
             ureg.define('tau = 1 * tau')
-            ureg.define("sigma = {} * nanometer".format(polymerData.sigma))
-            ureg.define("eps = {} * joule".format(polymerData.kB_Tref))
             # NOTE: the formula in the LAMMPS documentaion contains \epsilon_0.
             # BUT: it does not add up in terms of units, so... the implementation here
             # *might* be wrong
@@ -119,7 +127,7 @@ class UnitStyleFactory(object):
                 'force': ureg.eps/(ureg.sigma),
                 'torque': ureg.eps,
                 'temperature': polymerData.T_ref*ureg.kelvin,
-                'pressure': ureg.eps/(ureg.sigma**(3)),
+                'pressure': polymerData.kB_Tref_over_sigma_to_3*ureg("MPa") if hasattr(polymerData, "kB_Tref_over_sigma_to_3") else ureg.eps/(ureg.sigma**(3)),
                 'viscosity': ureg.eps*ureg.tau/(ureg.sigma**(3)),
                 # TODO: the use of elementary charge might not be correct, see above
                 'charge': ELEMENTARY_CHARGE,
@@ -128,7 +136,7 @@ class UnitStyleFactory(object):
                 'density': polymerData.M_k*ureg('g/mol')/(ureg.sigma**(dimension)) if 'accept_mol' in kwargs else (polymerData.M_k/AVOGADRO_CONST)*ureg('g')/(ureg.sigma**(dimension)),
                 'dt': 0.005*ureg.tau,
                 'skin': 0.3*ureg.sigma
-            })
+            }, ureg)
         elif (unitType == "real"):
             return UnitStyle({
                 "mass": ureg('g/mol') if 'accept_mol' in kwargs else ureg('g')/AVOGADRO_CONST,
@@ -147,7 +155,7 @@ class UnitStyleFactory(object):
                 "density": ureg.gram/(ureg.meter**(dimension)),
                 "dt": 1.0*ureg.femtosecond,
                 "skin": 2.0*ureg.angstrom
-            })
+            }, ureg)
         elif(unitType == "si"):
             return UnitStyle({
                 "mass": ureg.kilogram,
@@ -166,7 +174,7 @@ class UnitStyleFactory(object):
                 "density": ureg.kilogram/(ureg.meter**(dimension)),
                 "dt": 1e-8*ureg.second,
                 "skin": 0.001*ureg.meter
-            })
+            }, ureg)
         elif (unitType == "nano"):
             return UnitStyle({
                 "mass": ureg.attogram,
@@ -185,7 +193,7 @@ class UnitStyleFactory(object):
                 "density": ureg.attogram/(ureg.nanometer**(dimension)),
                 "dt": 1e-8*ureg.second,
                 "skin": 0.001*ureg.meter
-            })
+            }, ureg)
         else:
             raise NotImplementedError(
                 "Unity type '{}' is not implemented".format(unitType))
