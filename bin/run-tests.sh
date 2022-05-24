@@ -62,7 +62,7 @@ if command -v npx; then
 fi
 
 # then, build/install project for Python
-python -m pip install --verbose --use-feature=in-tree-build . || exit 3
+python -m pip install --verbose . || exit 3
 
 cd "$ROOT_DIR" || exit 4
 
