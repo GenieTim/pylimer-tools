@@ -81,18 +81,20 @@ class UniverseUsingTestCase(unittest.TestCase):
         self.testUniverseSmall.addAtoms(self.testAtomsSmall["id"], self.testAtomsSmall["type"],
                                         self.testAtomsSmall["x"], self.testAtomsSmall["y"], self.testAtomsSmall["z"],
                                         self.testAtomsSmall["nx"], self.testAtomsSmall["ny"], self.testAtomsSmall["nz"])
-        self.testUniverseSmall.addBonds(self.testBondsSmall["bondFrom"], self.testBondsSmall["to"])
+        self.testUniverseSmall.addBonds(
+            self.testBondsSmall["bondFrom"], self.testBondsSmall["to"])
         # Universe 3: very unsaturated
         self.testUniverse = Universe(10, 10, 10)
         self.testUniverse.addAtoms(self.testAtoms["id"], self.testAtoms["type"],
                                    self.testAtoms["x"], self.testAtoms["y"], self.testAtoms["z"],
                                    self.testAtoms["nx"], self.testAtoms["ny"], self.testAtoms["nz"])
-        self.testUniverse.addBonds(self.testBonds["bondFrom"], self.testBonds["to"])
+        self.testUniverse.addBonds(
+            self.testBonds["bondFrom"], self.testBonds["to"])
         # an additional larget test universe where the stoichiometric inbalance is < 1
         # even when imposing a crosslinker functionality of 1
         # in essence, it is on loop around 4 plus a connction to 6.
         self.saturatedTestUniverse = Universe(10, 10, 10)
-        self.testAtomsSaturated = self.testAtoms.append([
+        self.testAtomsSaturated = pd.concat([self.testAtoms, pd.DataFrame([
             {"id": 9, "type": 1, "nx": 1, "ny": 1,
                 "nz": 1, "x": 1, "y": 1, "z": 1},
             {"id": 10, "type": 1, "nx": 1, "ny": 1,
@@ -117,8 +119,8 @@ class UniverseUsingTestCase(unittest.TestCase):
                 "nz": 1, "x": 1, "y": 1, "z": 1},
             {"id": 20, "type": 1, "nx": 1, "ny": 1,
                 "nz": 1, "x": 1, "y": 1, "z": 1},
-        ])
-        self.testBondsSaturated = self.testBonds.append([
+        ])])
+        self.testBondsSaturated = pd.concat([self.testBonds, pd.DataFrame([
             {"to": 9, "bondFrom": 4},
             {"to": 10, "bondFrom": 9},
             {"to": 11, "bondFrom": 10},
@@ -133,7 +135,7 @@ class UniverseUsingTestCase(unittest.TestCase):
             {"to": 19, "bondFrom": 18},
             {"to": 20, "bondFrom": 19},
             {"to": 6, "bondFrom": 20},
-        ])
+        ])])
         self.assertIsInstance(self.testAtomsSaturated, pd.DataFrame)
         self.saturatedTestUniverse = self.addAtomBondData(
             self.saturatedTestUniverse, self.testAtomsSaturated, self.testBondsSaturated)
@@ -143,5 +145,6 @@ class UniverseUsingTestCase(unittest.TestCase):
                           atomData["x"].tolist(), atomData["y"].tolist(
         ), atomData["z"].tolist(),
             atomData["nx"].tolist(), atomData["ny"].tolist(), atomData["nz"].tolist())
-        universe.addBonds(bondData["bondFrom"].tolist(), bondData["to"].tolist())
+        universe.addBonds(
+            bondData["bondFrom"].tolist(), bondData["to"].tolist())
         return universe

@@ -50,11 +50,11 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
 
         unitStyleFactory = UnitStyleFactory()
         unitStyle = unitStyleFactory.getUnitStyle("si")
-        self.assertAlmostEqual(0.17395433850345213, predictShearModulus(
+        self.assertAlmostEqual(0.13734491693339432, predictShearModulus(
             self.saturatedTestUniverse, unitStyle, junctionType=2, strandLength=2).to('MPa').magnitude)
-        self.assertAlmostEqual(0.17395433850345213, predictShearModulus(
+        self.assertAlmostEqual(0.13734491693339432, predictShearModulus(
             self.saturatedTestUniverse, unitStyle, junctionType=2, strandLength=2, functionalityPerType={2:4}).to('MPa').magnitude)
-        self.assertAlmostEqual(0.17395433850345213, predictShearModulus(
+        self.assertAlmostEqual(0.13734491693339432, predictShearModulus(
             self.saturatedTestUniverse, unitStyle, junctionType=2).to('MPa').magnitude)
 
     def testWeightFractionCalculations(self):
@@ -121,7 +121,8 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         unitStyleFactory = UnitStyleFactory()
         unitStyle = unitStyleFactory.getUnitStyle("si")
         self.assertAlmostEqual(unitStyle.kb.to('J/K').magnitude, 1.381e-23)
-
+        
+        # these results are pretty certain, align with experimental results, confirmed 
         G_MMT_phantom, G_MMT_entanglement, G_ANM, G_PNM = computeModulusDecomposition(
             network=None, unitStyle=unitStyle, junctionType=2, r=1., p=0.95, f=4, nu=4.63241e25*(unitStyle.getUnderlyingUnitRegistry()(
                 'meter')**-3), T=298*unitStyle.getUnderlyingUnitRegistry()('kelvin')
@@ -134,6 +135,18 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertAlmostEqual(G_PNM.to('MPa').magnitude, 0.0953207, places=5)
         self.assertAlmostEqual(G_MMT_entanglement.to('MPa').magnitude, 0.182437, places=5)
         self.assertAlmostEqual(G_MMT_phantom.to('MPa').magnitude, 0.0767419, places=5)
+
+        # these in turn require further investigation into the involvement of r
+        G_MMT_phantom, G_MMT_entanglement, G_ANM, G_PNM = computeModulusDecomposition(
+            network=None, unitStyle=unitStyle, junctionType=2, r=1.3, p=0.6465, f=4, nu=1.25981e25*(unitStyle.getUnderlyingUnitRegistry()(
+                'meter')**-3), T=298*unitStyle.getUnderlyingUnitRegistry()('kelvin')
+        )
+
+        self.assertAlmostEqual(G_ANM.to('MPa').magnitude, 0.051846, places=5)
+        self.assertAlmostEqual(G_PNM.to('MPa').magnitude, 0.025923, places=5)
+        self.assertAlmostEqual(G_MMT_entanglement.to('MPa').magnitude, 0.222255, places=5)
+        self.assertAlmostEqual(G_MMT_phantom.to('MPa').magnitude, 0.00492674, places=5)
+
 
 
 if __name__ == '__main__':
