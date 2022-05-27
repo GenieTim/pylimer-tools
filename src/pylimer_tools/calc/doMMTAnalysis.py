@@ -29,7 +29,7 @@ def predictShearModulus(network: Universe, unitStyle: UnitStyle, junctionType: i
       - T: the temperature to compute the modulus at. Default: 273.15 K
       - strandLength: the length of the network strands (in nr. of beads). Optional, can be passed to improve performance
       - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. Optional, can be passed to improve performance
-    
+
     Returns:
       - G: the predicted shear modulus, or `None` if the universe is empty.
 
@@ -221,7 +221,7 @@ def computeMMsProbabilities(r, p, f):
         alpha = ((1 - r*p*p)/(r*p*p))
         beta = (r*p*alpha**2)
     elif(f == 4):
-        alpha = (math.sqrt((1/(r*p*p)) - 0.75) - 0.5)
+        alpha = (((1./(r*p*p)) - 3./4.)**(1./2.) - (1./2.))
         beta = ((r*p*(alpha**3)) + 1 - r*p)
     else:
         def funToRootForAlpha(alpha):
@@ -248,7 +248,7 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, junctio
       - T: the temperature to compute the modulus at. Default: 273.15 K
       - strandLength: the length of the network strands (in nr. of beads). Optional, can be passed to improve performance
       - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. Optional, can be passed to improve performance
-    
+
     Returns:
       - G_MMT_phantom: the phantom contribution to the MMT modulus
       - G_MMT_entanglement: the entanglement contribution to the MMT modulus
@@ -289,7 +289,7 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, junctio
     GammaMMT = (2*r/f) * GammaMMTSum
     G_MMT_phantom = GammaMMT*nu*unitStyle.kB*T
     # fraction of elastically effective strands. TODO : check adjustment with r
-    pel = (1/(p*np.sqrt(r)) - alpha)**2
+    pel = ((1/(p)) - alpha)**2
     G_MMT_entanglement = 0.22*unitStyle.getUnderlyingUnitRegistry()('MPa')*(pel**2)
     # entanglement part. TODO : check adjustment with r (and where the 0.22 is coming from? Fabian' s fit!)
     return G_MMT_phantom, G_MMT_entanglement, G_ANM, G_PNM
