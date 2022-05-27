@@ -65,11 +65,11 @@ namespace utils {
    */
   DumpFileParser::DumpFileParser(const std::string filePath)
   {
-    this->filePath = filePath;
     if (!std::filesystem::exists(filePath)) {
       throw std::invalid_argument("File to read (" + filePath +
                                   ") does not exist.");
     }
+    this->filePath = filePath;
 
     std::string line;
     this->file.open(filePath);
