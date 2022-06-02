@@ -5,7 +5,6 @@ import unittest
 
 from pylimer_tools.calc.doMMTAnalysis import *
 from pylimer_tools.io.unitStyles import UnitStyleFactory
-from tables import test
 
 if __name__ == '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../"))
