@@ -616,11 +616,12 @@ If <cite>None</cite>, it will be computed for each molecule in the first Univers
 <span id="pylimer-tools-calc-dommtanalysis-module"></span><h2>pylimer_tools.calc.doMMTAnalysis module<a class="headerlink" href="#module-pylimer_tools.calc.doMMTAnalysis" title="Permalink to this headline">#</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.calculateWeightFractionOfBackbone">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">calculateWeightFractionOfBackbone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">junctionType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strandLength</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionalityPerType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.calculateWeightFractionOfBackbone" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">calculateWeightFractionOfBackbone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">junctionType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strandLength</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionalityPerType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.calculateWeightFractionOfBackbone" title="Permalink to this definition">#</a></dt>
 <dd><p>Compute the weight fraction of the backbone strands in an infinite network</p>
 <dl class="simple">
 <dt>Source:</dt><dd><ul class="simple">
 <li><p><a class="reference external" href="https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737">https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737</a> (see supporting information for formulae)</p></li>
+<li><p><a class="reference external" href="https://pubs.acs.org/doi/10.1021/ma00046a021">https://pubs.acs.org/doi/10.1021/ma00046a021</a> (see appendix)</p></li>
 </ul>
 </dd>
 </dl>
@@ -647,7 +648,7 @@ See: #computeExtentOfReaction</p></li>
 </dd></dl>
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.calculateWeightFractionOfDanglingChains">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">calculateWeightFractionOfDanglingChains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">junctionType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strandLength</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionalityPerType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.calculateWeightFractionOfDanglingChains" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">calculateWeightFractionOfDanglingChains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">junctionType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strandLength</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionalityPerType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.calculateWeightFractionOfDanglingChains" title="Permalink to this definition">#</a></dt>
 <dd><p>Compute the weight fraction of dangling strands in infinite network</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -655,6 +656,8 @@ See: #computeExtentOfReaction</p></li>
 <li><p><strong>network</strong> (<em>-</em>) – the network to compute the weight fraction for</p></li>
 <li><p><strong>crosslinkerType</strong> (<em>-</em>) – the atom type to use to split the molecules</p></li>
 <li><p><strong>strandLength</strong> (<em>-</em>) – the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance</p></li>
+<li><p><strong>functionalityPerType</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.
+See: #computeExtentOfReaction</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -900,6 +903,68 @@ See: <a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.compu
 <dt class="field-odd">Return type</dt>
 <dd class="field-odd"><p><ul class="simple">
 <li><p>p_gel</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.predictNumberDensityOfJunctionPoints">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">predictNumberDensityOfJunctionPoints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">junctionType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strandLength</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionalityPerType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.predictNumberDensityOfJunctionPoints" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute the number density of network strands using MMT</p>
+<dl class="simple">
+<dt>Source:</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737">https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737</a> (see supporting information for formulae)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> (<em>-</em>) – the network to compute the weight fraction for</p></li>
+<li><p><strong>crosslinkerType</strong> (<em>-</em>) – the atom type to use to split the molecules</p></li>
+<li><p><strong>strandLength</strong> (<em>-</em>) – the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance</p></li>
+<li><p><strong>functionalityPerType</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.
+See: #computeExtentOfReaction</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The predicted number density of junction points</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>mu</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.predictNumberDensityOfNetworkStrands">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">predictNumberDensityOfNetworkStrands</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">junctionType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strandLength</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionalityPerType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">→</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.predictNumberDensityOfNetworkStrands" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute the number density of network strands using MMT</p>
+<dl class="simple">
+<dt>Source:</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737">https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737</a> (see supporting information for formulae)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> (<em>-</em>) – the network to compute the weight fraction for</p></li>
+<li><p><strong>crosslinkerType</strong> (<em>-</em>) – the atom type to use to split the molecules</p></li>
+<li><p><strong>strandLength</strong> (<em>-</em>) – the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance</p></li>
+<li><p><strong>functionalityPerType</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.
+See: #computeExtentOfReaction</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The predicted number density of network strands</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>nu</p></li>
 </ul>
 </p>
 </dd>

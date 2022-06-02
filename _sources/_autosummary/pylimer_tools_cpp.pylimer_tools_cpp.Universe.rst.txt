@@ -60,6 +60,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Universe
       ~Universe.getTimestep
       ~Universe.getVolume
       ~Universe.hasInfiniteStrand
+      ~Universe.removeAtoms
       ~Universe.setBox
       ~Universe.setBoxLengths
       ~Universe.setMasses
