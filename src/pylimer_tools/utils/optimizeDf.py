@@ -34,7 +34,7 @@ def reduce_mem_usage(df, obj_to_category=False, subset=None):
             c_max = df[col].max()
 
             # test if column can be converted to an integer
-            treat_as_int = str(col_type)[:3] == 'int'
+            treat_as_int = str(col_type)[:3] == 'int' or str(col_type)[:4] == 'uint'
 
             if treat_as_int:
                 if c_min > np.iinfo(np.int8).min and c_max < np.iinfo(np.int8).max:

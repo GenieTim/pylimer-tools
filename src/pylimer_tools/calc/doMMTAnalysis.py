@@ -5,6 +5,7 @@ from collections import Counter
 
 import numpy as np
 import pint
+import pylimer_tools.calc.doMEHPAnalysis as mehp
 import scipy.special
 from pylimer_tools.io.unitStyles import UnitStyle
 from pylimer_tools_cpp import Universe
@@ -40,6 +41,7 @@ def predictShearModulus(network: Universe, unitStyle: UnitStyle, junctionType: i
         network, unitStyle, junctionType, r, p, f, nu, T)
     return G_MMT_phantom + G_MMT_entanglement
 
+
 def predictNumberDensityOfJunctionPoints(network: Universe, junctionType: int, strandLength: int = None, functionalityPerType: dict = None) -> float:
     """
     Compute the number density of network strands using MMT
@@ -68,7 +70,8 @@ def predictNumberDensityOfJunctionPoints(network: Universe, junctionType: int, s
     elif (functionalityPerType[junctionType] == 4):
         return weightFractions[junctionType]*(4*alpha*(1-alpha)**3 + (1-alpha)**4)
     else:
-        raise NotImplementedError("Currently, only cross-linker functionalities of 3 and 4 are supported") 
+        raise NotImplementedError(
+            "Currently, only cross-linker functionalities of 3 and 4 are supported")
 
 
 def predictNumberDensityOfNetworkStrands(network: Universe, junctionType: int, strandLength: int = None, functionalityPerType: dict = None) -> float:
@@ -146,6 +149,10 @@ def calculateWeightFractionOfBackbone(network: Universe, junctionType: int, stra
 
     W_sol, weightFractions, alpha, beta = computeWeightFractionOfSolubleMaterial(
         network, junctionType, strandLength, functionalityPerType)
+    if (W_sol < 0 or W_sol > 1):
+        warnings.warn(
+            "The weight fraction W_sol predicted by MMT ({}) is outside accepted range. Falling back to measurement.".format(W_sol))
+        W_sol = measureWeightFractioOfSolubleMaterial(network)
 
     Phi_el = 0
     W_a = weightFractions[junctionType]/functionalityPerType[junctionType]
@@ -240,6 +247,10 @@ def computeWeightFractionOfSolubleMaterial(network: Universe = None, junctionTyp
         assert(network is not None)
         p = computeExtentOfReaction(
             network, junctionType, functionalityPerType=functionalityPerType)
+        if (p < 0 or p >= 1):
+            warnings.warn("The p computed ({}) is outside the accepted range. Falling back to effective cross-linker functionality.".format(p))
+            p = mehp.calculateEffectiveCrosslinkerFunctionality(
+                network, junctionType)
     if (r is None):
         assert(network is not None)
         r = computeStoichiometricInbalance(
@@ -334,6 +345,10 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, junctio
     if (p is None):
         p = computeExtentOfReaction(
             network, junctionType, strandLength=strandLength)
+        if (p < 0 or p >= 1):
+            warnings.warn("The p computed ({}) is outside the accepted range. Falling back to effective cross-linker functionality.".format(p))
+            p = mehp.calculateEffectiveCrosslinkerFunctionality(
+                network, junctionType)
     if (f is None):
         if (functionalityPerType is None):
             f = network.determineFunctionalityPerType()[junctionType]
@@ -388,7 +403,8 @@ def computeWeightFractions(network: Universe) -> dict:
         partialMasses[key] = counts[key]*weightPerType[key]
 
     if (totalMass == 0):
-        warnings.warn("Zero mass found computing weight fractions. Returning partial masses.")
+        warnings.warn(
+            "Zero mass found computing weight fractions. Returning partial masses.")
         return partialMasses
 
     weightFractions = {}
