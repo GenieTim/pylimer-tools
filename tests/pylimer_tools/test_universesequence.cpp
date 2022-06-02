@@ -31,6 +31,7 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
     REQUIRE(universeSeq.atIndex(0).getNrOfAtoms() == 12);
     REQUIRE(universeSeq.atIndex(0).getNrOfBonds() == 5);
     REQUIRE(universeSeq.atIndex(0).getTimestep() == 70764);
+    REQUIRE(universeSeq.atIndex(0).getMasses()[1] == 1.0);
     auto universes = universeSeq.getAll();
     REQUIRE(universes.size() == 1);
   }

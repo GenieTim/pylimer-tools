@@ -40,8 +40,70 @@ def predictShearModulus(network: Universe, unitStyle: UnitStyle, junctionType: i
         network, unitStyle, junctionType, r, p, f, nu, T)
     return G_MMT_phantom + G_MMT_entanglement
 
+def predictNumberDensityOfJunctionPoints(network: Universe, junctionType: int, strandLength: int = None, functionalityPerType: dict = None) -> float:
+    """
+    Compute the number density of network strands using MMT
 
-def calculateWeightFractionOfDanglingChains(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None) -> float:
+    Source:
+      - https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737 (see supporting information for formulae)
+
+    Arguments:
+      - network: the network to compute the weight fraction for
+      - crosslinkerType: the atom type to use to split the molecules
+      - strandLength: the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
+      - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. 
+          See: #computeExtentOfReaction
+
+    Returns:
+      - mu: The predicted number density of junction points
+    """
+    if (functionalityPerType is None or junctionType not in functionalityPerType):
+        functionalityPerType = network.determineFunctionalityPerType()
+
+    _, weightFractions, alpha, _ = computeWeightFractionOfSolubleMaterial(
+        network, junctionType, strandLength, functionalityPerType)
+
+    if (functionalityPerType[junctionType] == 3):
+        return weightFractions[junctionType]*(1-alpha)**3
+    elif (functionalityPerType[junctionType] == 4):
+        return weightFractions[junctionType]*(4*alpha*(1-alpha)**3 + (1-alpha)**4)
+    else:
+        raise NotImplementedError("Currently, only cross-linker functionalities of 3 and 4 are supported") 
+
+
+def predictNumberDensityOfNetworkStrands(network: Universe, junctionType: int, strandLength: int = None, functionalityPerType: dict = None) -> float:
+    """
+    Compute the number density of network strands using MMT
+
+    Source:
+      - https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737 (see supporting information for formulae)
+
+    Arguments:
+      - network: the network to compute the weight fraction for
+      - crosslinkerType: the atom type to use to split the molecules
+      - strandLength: the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
+      - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. 
+          See: #computeExtentOfReaction
+
+    Returns:
+      - nu: The predicted number density of network strands
+    """
+    if (functionalityPerType is None or junctionType not in functionalityPerType):
+        functionalityPerType = network.determineFunctionalityPerType()
+
+    _, weightFractions, alpha, _ = computeWeightFractionOfSolubleMaterial(
+        network, junctionType, strandLength, functionalityPerType)
+
+    if (functionalityPerType[junctionType] == 3):
+        return (3/2)*weightFractions[junctionType]*(1-alpha)**3
+    elif (functionalityPerType[junctionType] == 4):
+        return weightFractions[junctionType]*(6*alpha*(1-alpha)**3 + 2*(1-alpha)**4)
+    else:
+        raise NotImplementedError(
+            "Currently, only junction functionalities of 3 and 4 are supported")
+
+
+def calculateWeightFractionOfDanglingChains(network: Universe, junctionType: int, strandLength: int = None, functionalityPerType: dict = None) -> float:
     """
     Compute the weight fraction of dangling strands in infinite network
 
@@ -49,6 +111,8 @@ def calculateWeightFractionOfDanglingChains(network: Universe, junctionType, str
       - network: the network to compute the weight fraction for
       - crosslinkerType: the atom type to use to split the molecules
       - strandLength: the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
+      - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. 
+          See: #computeExtentOfReaction
 
     Returns:
       - weightFraction $\\Phi_d = 1 - \\Phi_{el}$: weightDangling/weightTotal
@@ -56,12 +120,13 @@ def calculateWeightFractionOfDanglingChains(network: Universe, junctionType, str
     return 1 - calculateWeightFractionOfBackbone(network, junctionType, strandLength, functionalityPerType)
 
 
-def calculateWeightFractionOfBackbone(network: Universe, junctionType, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def calculateWeightFractionOfBackbone(network: Universe, junctionType: int, strandLength: int = None, functionalityPerType: dict = None) -> float:
     """
     Compute the weight fraction of the backbone strands in an infinite network
 
     Source:
       - https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737 (see supporting information for formulae)
+      - https://pubs.acs.org/doi/10.1021/ma00046a021 (see appendix)
 
     Arguments:
       - network: the poylmer network to do the computation for
@@ -86,6 +151,10 @@ def calculateWeightFractionOfBackbone(network: Universe, junctionType, strandLen
     W_a = weightFractions[junctionType]/functionalityPerType[junctionType]
     W_xl = weightFractions[junctionType]
     W_x2 = 1-W_xl
+    assert(W_a <= 1 and W_a >= 0)
+    assert(W_xl <= 1 and W_xl >= 0)
+    assert(W_x2 <= 1 and W_x2 >= 0)
+    assert(W_sol <= 1 and W_sol >= 0)
     if (functionalityPerType[junctionType] == 3):
         Phi_el = ((W_x2*(1-beta)**2) +
                   (W_xl*((1-alpha)**3 + 3*alpha*(1-W_a)*((1-alpha)**2))))/(1-W_sol)
@@ -170,7 +239,7 @@ def computeWeightFractionOfSolubleMaterial(network: Universe = None, junctionTyp
     if (p is None):
         assert(network is not None)
         p = computeExtentOfReaction(
-            network, junctionType, functionalityPerType)
+            network, junctionType, functionalityPerType=functionalityPerType)
     if (r is None):
         assert(network is not None)
         r = computeStoichiometricInbalance(
@@ -309,7 +378,9 @@ def computeWeightFractions(network: Universe) -> dict:
         return {}
 
     weightPerType = network.getMasses()
-    counts = Counter(network.getAtomTypes())
+    allAtomTypes = network.getAtomTypes()
+    counts = Counter(allAtomTypes)
+    assert(len(allAtomTypes) == network.getNrOfAtoms())
     totalMass = 0
     partialMasses = {}
     for key in counts:
@@ -317,6 +388,7 @@ def computeWeightFractions(network: Universe) -> dict:
         partialMasses[key] = counts[key]*weightPerType[key]
 
     if (totalMass == 0):
+        warnings.warn("Zero mass found computing weight fractions. Returning partial masses.")
         return partialMasses
 
     weightFractions = {}

@@ -327,7 +327,8 @@ init_pylimer_bound_entities(py::module_& m)
     //           return py::make_tuple(molecule.)
     //      }
     // ))
-    ;
+    .def("__copy__",
+         [](const Molecule& molecule) { return Molecule(molecule); });
 
   py::class_<Universe>(
     m,
@@ -358,6 +359,12 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("nx"),
          py::arg("ny"),
          py::arg("nz"))
+    .def("removeAtoms",
+         &Universe::removeAtoms,
+         R"pbdoc(
+          Remove atoms and all associated bonds by their atom ids. 
+          )pbdoc",
+         py::arg("atomIds"))
     .def("addBonds",
          py::overload_cast<std::vector<long int>, std::vector<long int>>(
            &Universe::addBonds),
@@ -615,7 +622,9 @@ init_pylimer_bound_entities(py::module_& m)
     .def("simplify",
          &Universe::simplify,
          "Remove self links and double bonds. This function is called "
-         "automatically after adding bonds.");
+         "automatically after adding bonds.")
+    .def("__copy__",
+         [](const Universe& universe) { return Universe(universe); });
 
   struct LazyUniverseSequenceIterator
   {
@@ -640,11 +649,14 @@ init_pylimer_bound_entities(py::module_& m)
     size_t index = 0; // the index to access
   };
 
-  py::class_<LazyUniverseSequenceIterator>(m, "LazyUniverseSequenceIterator", R"pbdoc(
+  py::class_<LazyUniverseSequenceIterator>(
+    m, "LazyUniverseSequenceIterator", R"pbdoc(
        An iterator to iterate throught the universes in :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence`.
   )pbdoc")
     .def("__iter__",
-         [](LazyUniverseSequenceIterator& it) -> LazyUniverseSequenceIterator& { return it; })
+         [](LazyUniverseSequenceIterator& it) -> LazyUniverseSequenceIterator& {
+           return it;
+         })
     .def("__next__", &LazyUniverseSequenceIterator::next);
 
   py::class_<UniverseSequence>(m, "UniverseSequence", R"pbdoc(

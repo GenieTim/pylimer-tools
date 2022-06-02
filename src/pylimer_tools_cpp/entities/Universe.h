@@ -48,6 +48,7 @@ namespace entities {
                   std::vector<int> nx,
                   std::vector<int> ny,
                   std::vector<int> nz);
+    void removeAtoms(std::vector<long int> ids);
     void addBonds(std::vector<long int> from, std::vector<long int> to);
     void addBonds(const size_t NNewBonds,
                   std::vector<long int> from,

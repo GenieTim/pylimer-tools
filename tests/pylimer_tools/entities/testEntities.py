@@ -1,4 +1,5 @@
 
+import copy
 import os
 import sys
 import unittest
@@ -67,6 +68,8 @@ class TestEntities(UniverseUsingTestCase):
         ), MoleculeType.FREE_CHAIN)
         self.assertEqual(
             chainsWithCrosslinker[1].getType(), MoleculeType.DANGLING_CHAIN)
+        universeClone = copy.copy(universe)
+        self.assertEqual(universe.getNrOfAtoms(), universeClone.getNrOfAtoms())
 
     def test_moleculeEntityIterations(self):
         molecules = self.testUniverseSmall.getMolecules(0)

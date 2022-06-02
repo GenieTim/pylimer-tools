@@ -187,6 +187,36 @@ namespace entities {
     this->NAtoms = igraph_vcount(&this->graph);
   }
 
+  void Universe::removeAtoms(std::vector<long int> ids)
+  {
+    igraph_vector_t vertexIds;
+    igraph_vector_init(&vertexIds, ids.size());
+    for (size_t i = 0; i < ids.size(); ++i) {
+      igraph_vector_set(&vertexIds, i, this->getIdxByAtomId(ids[i]));
+    }
+    igraph_delete_vertices(&this->graph, igraph_vss_vector(&vertexIds));
+    igraph_vector_destroy(&vertexIds);
+
+    // now, we need to update the id-atomId map
+    this->atomIdToVectorIdx.clear();
+
+    igraph_vs_t allVertexIds;
+    igraph_vs_all(&allVertexIds);
+    igraph_vit_t vit;
+    igraph_vit_create(&this->graph, allVertexIds, &vit);
+    while (!IGRAPH_VIT_END(vit)) {
+      long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
+      this->atomIdToVectorIdx.emplace(VAN(&this->graph, "id", vertexId),
+                                      vertexId);
+      IGRAPH_VIT_NEXT(vit);
+    }
+    igraph_vit_destroy(&vit);
+    igraph_vs_destroy(&allVertexIds);
+
+    this->NAtoms = igraph_vcount(&this->graph);
+    this->NBonds = igraph_ecount(&this->graph);
+  }
+
   void Universe::addBonds(std::vector<long int> from, std::vector<long int> to)
   {
     this->addBonds(from.size(), from, to);

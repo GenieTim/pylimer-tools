@@ -88,6 +88,20 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     CHECK(universe.getNrOfBonds() == 0);
     REQUIRE_THROWS(universe.getIdxByAtomId(1000));
 
+    SECTION("Atoms can be removed") {
+      universe.addBonds({{ 0, 1, 3, 4 }}, {{ 1, 3, 4, 0 }});
+      pe::Universe universeCopy = pe::Universe(universe);
+      REQUIRE_NOTHROW(universeCopy.getAtom(3));
+      REQUIRE(universeCopy.getNrOfAtoms() == 4);
+      REQUIRE(universeCopy.getNrOfBonds() == 4);
+      universeCopy.removeAtoms({{ 1, 3 }});
+      REQUIRE(universeCopy.getAtom(4) == universe.getAtom(4));
+      REQUIRE_THROWS(universeCopy.getAtom(3));
+      REQUIRE(universeCopy.validate());
+      REQUIRE(universeCopy.getNrOfAtoms() == 2);
+      REQUIRE(universeCopy.getNrOfBonds() == 1);
+    }
+
     SECTION("molecules are found")
     {
       REQUIRE(universe.getNrOfAtoms() == 4);
