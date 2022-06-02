@@ -15,6 +15,7 @@ class TestOptimizeDf(PandasComparingTestCase):
             "testInt": np.int64(1e1),
             "testObject": testObject,
             "testUint64": np.uint64(np.iinfo(np.uint64).max-1),
+            "testString": "strong"
         }])
         optimizedDf = optimize(df)
         
@@ -23,6 +24,7 @@ class TestOptimizeDf(PandasComparingTestCase):
             "testInt": np.int8(1e1),
             "testObject": testObject,
             "testUint64": np.uint64(np.iinfo(np.uint64).max-1),
+            "testString": "strong"
         }])
         
         # contents are equal
@@ -39,6 +41,7 @@ class TestOptimizeDf(PandasComparingTestCase):
             "testObject": testObject,
             "testUint64": np.uint64(np.iinfo(np.uint64).max-1),
             "testFloat64": np.float64(np.finfo(np.float32).max+10**20),
+            "testString": "strong"
         }])
 
         reducedMemDf = reduce_mem_usage(dfExtra)
@@ -48,6 +51,7 @@ class TestOptimizeDf(PandasComparingTestCase):
             "testObject": testObject,
             "testUint64": np.uint64(np.iinfo(np.uint64).max-1),
             "testFloat64": np.float64(np.finfo(np.float32).max+10**20),
+            "testString": "strong"
         }])
         self.assertEqual(expectedReducedMemDf, dfExtra)
         self.assertEqual(expectedReducedMemDf, reducedMemDf)
@@ -75,6 +79,8 @@ class TestOptimizeDf(PandasComparingTestCase):
         })
         optimizedDf = optimize(df)
         self.assertEqual(optimizedDf["categoryThingy"].dtype, "category")
+        reducedDf = reduce_mem_usage(df, obj_to_category=True)
+        self.assertEqual(reducedDf["categoryThingy"].dtype, "category")
 
     def testDatetimeFeatures(self):
         df = pd.DataFrame({

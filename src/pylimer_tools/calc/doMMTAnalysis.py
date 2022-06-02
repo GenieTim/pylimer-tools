@@ -399,13 +399,10 @@ def computeWeightFractions(network: Universe) -> dict:
     totalMass = 0
     partialMasses = {}
     for key in counts:
+        if (key not in weightPerType):
+            raise ValueError("Weight not set for atom type '{}'".format(key))
         totalMass += counts[key]*weightPerType[key]
         partialMasses[key] = counts[key]*weightPerType[key]
-
-    if (totalMass == 0):
-        warnings.warn(
-            "Zero mass found computing weight fractions. Returning partial masses.")
-        return partialMasses
 
     weightFractions = {}
     for key in partialMasses:

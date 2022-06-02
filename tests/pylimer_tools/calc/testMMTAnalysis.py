@@ -34,6 +34,9 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             self.testUniverse, 2, functionalityPerType={
                 1: 2, 2: 3
             }), ((3*3)/((5*2)/(5/3))))
+        self.testUniverse.addAtoms([100], [3], [0], [0], [0], [0], [0], [0])
+        self.assertEqual(computeStoichiometricInbalance(
+            self.testUniverse, 2, ignoreTypes=[3]), ((3*3)/((5*2)/(5/3))))
 
     def testExtentOfReaction(self):
         self.assertEqual(1.0, computeExtentOfReaction(self.emptyUniverse, 2))
@@ -91,6 +94,10 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
     def testWeightFractionCalculations(self):
         self.assertDictEqual(
             {}, computeWeightFractions(self.emptyUniverse))
+
+        self.assertRaises(ValueError, lambda: computeWeightFractions(
+            self.testUniverse))
+
         self.testUniverse.setMasses({1: 1, 2: 1})
         weightFractions = computeWeightFractions(
             self.testUniverse)
