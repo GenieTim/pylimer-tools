@@ -12,7 +12,7 @@ from pylimer_tools_cpp import Universe
 from scipy import optimize
 
 
-def predictShearModulus(network: Universe, unitStyle: UnitStyle, junctionType: int = None, r: float = None, p: float = None, f: int = None, nu: float = None, T: pint.Quantity = None, strandLength: int = None, functionalityPerType: dict = None):
+def predictShearModulus(network: Universe, unitStyle: UnitStyle, crosslinkerType: int = None, r: float = None, p: float = None, f: int = None, nu: float = None, T: pint.Quantity = None, strandLength: int = None, functionalityPerType: dict = None):
     """
     Predict the shear modulus using MMT Analysis.
 
@@ -22,7 +22,7 @@ def predictShearModulus(network: Universe, unitStyle: UnitStyle, junctionType: i
     Arguments:
       - network: the poylmer network to do the computation for
       - unitStyle: the unit style to use to have the results in appropriate units
-      - junctionType: the type of the junctions/crosslinkers to select them in the network
+      - crosslinkerType: the type of the junctions/crosslinkers to select them in the network
       - r: the stoichiometric inbalance. Optional if network is specified
       - p: the extent of reaction. Optional if network is specified
       - f: the functionality of the the crosslinker. Optional if network is specified
@@ -38,11 +38,11 @@ def predictShearModulus(network: Universe, unitStyle: UnitStyle, junctionType: i
       - Support more than one crosslinker type (as is supported by original formula)
     """
     G_MMT_phantom, G_MMT_entanglement, _, _ = computeModulusDecomposition(
-        network, unitStyle, junctionType, r, p, f, nu, T)
+        network, unitStyle, crosslinkerType, r, p, f, nu, T)
     return G_MMT_phantom + G_MMT_entanglement
 
 
-def predictNumberDensityOfJunctionPoints(network: Universe, junctionType: int, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def predictNumberDensityOfJunctionPoints(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None) -> float:
     """
     Compute the number density of network strands using MMT
 
@@ -59,22 +59,22 @@ def predictNumberDensityOfJunctionPoints(network: Universe, junctionType: int, s
     Returns:
       - mu: The predicted number density of junction points
     """
-    if (functionalityPerType is None or junctionType not in functionalityPerType):
+    if (functionalityPerType is None or crosslinkerType not in functionalityPerType):
         functionalityPerType = network.determineFunctionalityPerType()
 
     _, weightFractions, alpha, _ = computeWeightFractionOfSolubleMaterial(
-        network, junctionType, strandLength, functionalityPerType)
+        network, crosslinkerType, strandLength, functionalityPerType)
 
-    if (functionalityPerType[junctionType] == 3):
-        return weightFractions[junctionType]*(1-alpha)**3
-    elif (functionalityPerType[junctionType] == 4):
-        return weightFractions[junctionType]*(4*alpha*(1-alpha)**3 + (1-alpha)**4)
+    if (functionalityPerType[crosslinkerType] == 3):
+        return weightFractions[crosslinkerType]*(1-alpha)**3
+    elif (functionalityPerType[crosslinkerType] == 4):
+        return weightFractions[crosslinkerType]*(4*alpha*(1-alpha)**3 + (1-alpha)**4)
     else:
         raise NotImplementedError(
             "Currently, only cross-linker functionalities of 3 and 4 are supported")
 
 
-def predictNumberDensityOfNetworkStrands(network: Universe, junctionType: int, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def predictNumberDensityOfNetworkStrands(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None) -> float:
     """
     Compute the number density of network strands using MMT
 
@@ -91,22 +91,22 @@ def predictNumberDensityOfNetworkStrands(network: Universe, junctionType: int, s
     Returns:
       - nu: The predicted number density of network strands
     """
-    if (functionalityPerType is None or junctionType not in functionalityPerType):
+    if (functionalityPerType is None or crosslinkerType not in functionalityPerType):
         functionalityPerType = network.determineFunctionalityPerType()
 
     _, weightFractions, alpha, _ = computeWeightFractionOfSolubleMaterial(
-        network, junctionType, strandLength, functionalityPerType)
+        network, crosslinkerType, strandLength, functionalityPerType)
 
-    if (functionalityPerType[junctionType] == 3):
-        return (3/2)*weightFractions[junctionType]*(1-alpha)**3
-    elif (functionalityPerType[junctionType] == 4):
-        return weightFractions[junctionType]*(6*alpha*(1-alpha)**3 + 2*(1-alpha)**4)
+    if (functionalityPerType[crosslinkerType] == 3):
+        return (3/2)*weightFractions[crosslinkerType]*(1-alpha)**3
+    elif (functionalityPerType[crosslinkerType] == 4):
+        return weightFractions[crosslinkerType]*(6*alpha*(1-alpha)**3 + 2*(1-alpha)**4)
     else:
         raise NotImplementedError(
             "Currently, only junction functionalities of 3 and 4 are supported")
 
 
-def calculateWeightFractionOfDanglingChains(network: Universe, junctionType: int, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def calculateWeightFractionOfDanglingChains(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None) -> float:
     """
     Compute the weight fraction of dangling strands in infinite network
 
@@ -120,10 +120,10 @@ def calculateWeightFractionOfDanglingChains(network: Universe, junctionType: int
     Returns:
       - weightFraction $\\Phi_d = 1 - \\Phi_{el}$: weightDangling/weightTotal
     """
-    return 1 - calculateWeightFractionOfBackbone(network, junctionType, strandLength, functionalityPerType)
+    return 1 - calculateWeightFractionOfBackbone(network, crosslinkerType, strandLength, functionalityPerType)
 
 
-def calculateWeightFractionOfBackbone(network: Universe, junctionType: int, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def calculateWeightFractionOfBackbone(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None) -> float:
     """
     Compute the weight fraction of the backbone strands in an infinite network
 
@@ -133,7 +133,7 @@ def calculateWeightFractionOfBackbone(network: Universe, junctionType: int, stra
 
     Arguments:
       - network: the poylmer network to do the computation for
-      - junctionType: the type of the junctions/crosslinkers to select them in the network
+      - crosslinkerType: the type of the junctions/crosslinkers to select them in the network
       - strandLength: the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
       - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. 
           See: #computeExtentOfReaction
@@ -144,29 +144,29 @@ def calculateWeightFractionOfBackbone(network: Universe, junctionType: int, stra
     if (network.getNrOfAtoms() == 0):
         return 0
 
-    if (functionalityPerType is None or junctionType not in functionalityPerType):
+    if (functionalityPerType is None or crosslinkerType not in functionalityPerType):
         functionalityPerType = network.determineFunctionalityPerType()
 
     W_sol, weightFractions, alpha, beta = computeWeightFractionOfSolubleMaterial(
-        network, junctionType, strandLength, functionalityPerType)
+        network, crosslinkerType, strandLength, functionalityPerType)
     if (W_sol < 0 or W_sol > 1):
         warnings.warn(
             "The weight fraction W_sol predicted by MMT ({}) is outside accepted range. Falling back to measurement.".format(W_sol))
         W_sol = measureWeightFractioOfSolubleMaterial(network)
 
     Phi_el = 0
-    W_a = weightFractions[junctionType]/functionalityPerType[junctionType]
-    W_xl = weightFractions[junctionType]
+    W_a = weightFractions[crosslinkerType]/functionalityPerType[crosslinkerType]
+    W_xl = weightFractions[crosslinkerType]
     W_x2 = 1-W_xl
     assert(W_a <= 1 and W_a >= 0)
     assert(W_xl <= 1 and W_xl >= 0)
     assert(W_x2 <= 1 and W_x2 >= 0)
     assert(W_sol <= 1 and W_sol >= 0)
-    if (functionalityPerType[junctionType] == 3):
+    if (functionalityPerType[crosslinkerType] == 3):
         Phi_el = ((W_x2*(1-beta)**2) +
                   (W_xl*((1-alpha)**3 + 3*alpha*(1-W_a)*((1-alpha)**2))))/(1-W_sol)
     else:
-        assert(functionalityPerType[junctionType] == 4)
+        assert(functionalityPerType[crosslinkerType] == 4)
         Phi_el = ((W_x2*(1-beta)**2) +
                   (W_xl*(((1-alpha)**4) + 4*alpha*(1-W_a) * ((1-alpha)**3) +
                          6*(alpha**2)*(1-2*W_a)*(1-alpha)**2)))/(1-W_sol)
@@ -204,7 +204,7 @@ def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.7
     return solubleWeight/totalWeight
 
 
-def computeWeightFractionOfSolubleMaterial(network: Universe = None, junctionType: int = 2, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None, r: float = None, p: float = None) -> float:
+def computeWeightFractionOfSolubleMaterial(network: Universe = None, crosslinkerType: int = 2, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None, r: float = None, p: float = None) -> float:
     """
     Compute the weight fraction of soluble material by MMT.
 
@@ -214,7 +214,7 @@ def computeWeightFractionOfSolubleMaterial(network: Universe = None, junctionTyp
 
     Arguments:
       - network: the poylmer network to do the computation for
-      - junctionType: the type of the junctions/crosslinkers to select them in the network
+      - crosslinkerType: the type of the junctions/crosslinkers to select them in the network
       - weightFractions (dict): a dictionary with key: type, and value: weight fraction of type. Pass if you want to omit the network.
       - strandLength (int): the length of the network strands (in nr. of beads). 
           See: :func:`~pylimer_tools.calc.doMMTAnalysis.computeStoichiometricInbalance`.
@@ -227,16 +227,16 @@ def computeWeightFractionOfSolubleMaterial(network: Universe = None, junctionTyp
       - :math:`\\alpha` (float): Macosko & Miller's :math:`P(F_A)`
       - :math:`\\beta` (float): Macosko & Miller's :math:`P(F_B)`
     """
-    if (functionalityPerType is None or junctionType not in functionalityPerType):
+    if (functionalityPerType is None or crosslinkerType not in functionalityPerType):
         assert(network is not None)
         functionalityPerType = network.determineFunctionalityPerType()
 
-    if (functionalityPerType[junctionType] not in [3, 4]):
+    if (functionalityPerType[crosslinkerType] not in [3, 4]):
         raise NotImplementedError(
-            "Currently, only crosslinker functionality of 3 or 4 is supported. {} given.".format(functionalityPerType[junctionType]))
+            "Currently, only crosslinker functionality of 3 or 4 is supported. {} given.".format(functionalityPerType[crosslinkerType]))
 
     for key in functionalityPerType:
-        if (key != junctionType and functionalityPerType[key] != 2):
+        if (key != crosslinkerType and functionalityPerType[key] != 2):
             raise NotImplementedError(
                 "Currently, only strand functionality of 2 is supported. {} given for type {}".format(functionalityPerType[key], key))
 
@@ -246,21 +246,21 @@ def computeWeightFractionOfSolubleMaterial(network: Universe = None, junctionTyp
     if (p is None):
         assert(network is not None)
         p = computeExtentOfReaction(
-            network, junctionType, functionalityPerType=functionalityPerType)
+            network, crosslinkerType, functionalityPerType=functionalityPerType)
         if (p < 0 or p >= 1):
             warnings.warn("The p computed ({}) is outside the accepted range. Falling back to effective cross-linker functionality.".format(p))
             p = mehp.calculateEffectiveCrosslinkerFunctionality(
-                network, junctionType)
+                network, crosslinkerType)
     if (r is None):
         assert(network is not None)
         r = computeStoichiometricInbalance(
-            network, junctionType, strandLength=strandLength, functionalityPerType=functionalityPerType)
+            network, crosslinkerType, strandLength=strandLength, functionalityPerType=functionalityPerType)
 
     alpha, beta = computeMMsProbabilities(
-        r, p, functionalityPerType[junctionType])
+        r, p, functionalityPerType[crosslinkerType])
     W_sol = 0
     for key in weightFractions:
-        coeff = alpha if key == junctionType else beta
+        coeff = alpha if key == crosslinkerType else beta
         W_sol += weightFractions[key] * \
             (math.pow(coeff, functionalityPerType[key]))
 
@@ -313,14 +313,14 @@ def computeMMsProbabilities(r, p, f):
     return alpha, beta
 
 
-def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, junctionType: int = None, r: float = None, p: float = None, f: int = None, nu: float = None, T: pint.Quantity = None, strandLength: int = None, functionalityPerType: dict = None):
+def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crosslinkerType: int = None, r: float = None, p: float = None, f: int = None, nu: float = None, T: pint.Quantity = None, strandLength: int = None, functionalityPerType: dict = None):
     """
     Compute four different estimates of the plateau modulus, using MMT, ANM and PNM.
 
     Arguments:
       - network: the poylmer network to do the computation for
       - unitStyle: the unit style to use to have the results in appropriate units
-      - junctionType: the type of the junctions/crosslinkers to select them in the network
+      - crosslinkerType: the type of the junctions/crosslinkers to select them in the network
       - r: the stoichiometric inbalance. Optional if network is specified
       - p: the extent of reaction. Optional if network is specified
       - f: the functionality of the the crosslinker. Optional if network is specified
@@ -336,26 +336,26 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, junctio
       - G_PNM: the PNM estimate of the modulus
 
     """
-    if (junctionType is None and (r is None or f is None or p is None or nu is None)):
+    if (crosslinkerType is None and (r is None or f is None or p is None or nu is None)):
         raise ValueError(
-            "Either the junctionType or the required variables must be specified")
+            "Either the crosslinkerType or the required variables must be specified")
     if (r is None):
         r = computeStoichiometricInbalance(
-            network, junctionType=junctionType, strandLength=strandLength, functionalityPerType=functionalityPerType)
+            network, crosslinkerType=crosslinkerType, strandLength=strandLength, functionalityPerType=functionalityPerType)
     if (p is None):
         p = computeExtentOfReaction(
-            network, junctionType, strandLength=strandLength)
+            network, crosslinkerType, strandLength=strandLength)
         if (p < 0 or p >= 1):
             warnings.warn("The p computed ({}) is outside the accepted range. Falling back to effective cross-linker functionality.".format(p))
             p = mehp.calculateEffectiveCrosslinkerFunctionality(
-                network, junctionType)
+                network, crosslinkerType)
     if (f is None):
         if (functionalityPerType is None):
-            f = network.determineFunctionalityPerType()[junctionType]
+            f = network.determineFunctionalityPerType()[crosslinkerType]
         else:
-            f = functionalityPerType[junctionType]
+            f = functionalityPerType[crosslinkerType]
     if (nu is None):
-        nu = len(network.getMolecules(junctionType)) / \
+        nu = len(network.getMolecules(crosslinkerType)) / \
             (network.getVolume()*unitStyle.getBaseUnitOf('volume'))
     if (T is None):
         T = 273.15*unitStyle.getUnderlyingUnitRegistry()('kelvin')
@@ -411,7 +411,7 @@ def computeWeightFractions(network: Universe) -> dict:
     return weightFractions
 
 
-def computeStoichiometricInbalance(network: Universe, junctionType: int, strandLength: int = None, functionalityPerType: dict = None, ignoreTypes: list = [], effective: bool = False) -> float:
+def computeStoichiometricInbalance(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None, ignoreTypes: list = [], effective: bool = False) -> float:
     """
     Compute the stoichiometric inbalance
     ( nr. of bonds formable of crosslinker / nr. of formable bonds of precursor )
@@ -422,7 +422,7 @@ def computeStoichiometricInbalance(network: Universe, junctionType: int, strandL
 
     Arguments:
       - network: the poylmer network to do the computation for
-      - junctionType: the type of the junctions/crosslinkers to select them in the network
+      - crosslinkerType: the type of the junctions/crosslinkers to select them in the network
       - strandLength: the length of the network strands (in nr. of beads). 
           Used to infer the number of precursor strands. 
           If `None`: will use average length of each connected system when ignoring the crosslinkers.
@@ -439,21 +439,21 @@ def computeStoichiometricInbalance(network: Universe, junctionType: int, strandL
 
     counts = Counter(network.getAtomTypes())
 
-    if (functionalityPerType is None or junctionType not in functionalityPerType):
+    if (functionalityPerType is None or crosslinkerType not in functionalityPerType):
         functionalityPerType = network.determineEffectiveFunctionalityPerType(
         ) if effective else network.determineFunctionalityPerType()
 
-    if (junctionType not in counts):
+    if (crosslinkerType not in counts):
         raise ValueError(
-            "No junction with type {} seems to have been found in the network".format(junctionType))
+            "No junction with type {} seems to have been found in the network".format(crosslinkerType))
 
     if (strandLength is None):
-        strands = network.getMolecules(junctionType)
+        strands = network.getMolecules(crosslinkerType)
         strandLength = np.mean([m.getLength() for m in strands if not np.all(
             [a.getType() in ignoreTypes for a in m.getAtoms()])])
 
-    crosslinkerFormableBonds = counts[junctionType] * \
-        functionalityPerType[junctionType]
+    crosslinkerFormableBonds = counts[crosslinkerType] * \
+        functionalityPerType[crosslinkerType]
     otherFormableBonds = 0
     for key in counts:
         if (key in ignoreTypes):
@@ -461,7 +461,7 @@ def computeStoichiometricInbalance(network: Universe, junctionType: int, strandL
         if (key not in functionalityPerType):
             raise ValueError(
                 "Type {} must have an associated functionality".format(key))
-        if (key != junctionType):
+        if (key != crosslinkerType):
             otherFormableBonds += counts[key]*functionalityPerType[key]
 
     # division by 2 is implicit
@@ -530,5 +530,5 @@ def predictGelationPoint(r: float, f: int, g: int = 2) -> float:
       - p_gel: critical extent of reaction for gelation
     """
     # if (r is None):
-    #   r = calculateEffectiveCrosslinkerFunctionality(network, junctionType, f)
+    #   r = calculateEffectiveCrosslinkerFunctionality(network, crosslinkerType, f)
     return math.sqrt(1/(r*(f-1)*(g-1)))

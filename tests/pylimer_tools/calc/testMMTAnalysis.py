@@ -58,12 +58,12 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         unitStyle = unitStyleFactory.getUnitStyle("si")
         # TODO: find literature motiviation for results fo the functions
         self.assertAlmostEqual(0.47139710176763516, predictShearModulus(
-            self.saturatedTestUniverse, unitStyle, junctionType=2, strandLength=2).to('MPa').magnitude)
+            self.saturatedTestUniverse, unitStyle, crosslinkerType=2, strandLength=2).to('MPa').magnitude)
         self.assertAlmostEqual(0.47139710176763516, predictShearModulus(
-            self.saturatedTestUniverse, unitStyle, junctionType=2, strandLength=2, functionalityPerType={2: 4}).to('MPa').magnitude)
+            self.saturatedTestUniverse, unitStyle, crosslinkerType=2, strandLength=2, functionalityPerType={2: 4}).to('MPa').magnitude)
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
         self.assertAlmostEqual(0.47139710176763516, predictShearModulus(
-            self.saturatedTestUniverse, unitStyle, junctionType=2).to('MPa').magnitude)
+            self.saturatedTestUniverse, unitStyle, crosslinkerType=2).to('MPa').magnitude)
 
     def testPredictNumberDensityOfJunctionPoints(self):
         self.testUniverse.setMasses({1: 1, 2: 1})
@@ -144,7 +144,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             self.emptyUniverse, 2, {}))
         self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
         bb = calculateWeightFractionOfBackbone(
-            self.saturatedTestUniverse, junctionType=2, strandLength=2)
+            self.saturatedTestUniverse, crosslinkerType=2, strandLength=2)
         self.assertEqual(0.00425428467241992, bb)
         self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
         self.assertEqual(1-bb, calculateWeightFractionOfDanglingChains(
@@ -152,11 +152,11 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
 
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
         # test also as if the functionality was 4
-        # self.assertRaises(ValueError, lambda: calculateWeightFractionOfBackbone(self.saturatedTestUniverse, junctionType=2, functionalityPerType={
+        # self.assertRaises(ValueError, lambda: calculateWeightFractionOfBackbone(self.saturatedTestUniverse, crosslinkerType=2, functionalityPerType={
         #     1: 2, 2: 4
         # }))
         # NOTE: requires a short strand length with these systems, as otherwise, r > 1 which is not supported by the formulas implemented
-        self.assertEqual(0.43792682962864016, calculateWeightFractionOfBackbone(self.saturatedTestUniverse, junctionType=2, strandLength=2, functionalityPerType={
+        self.assertEqual(0.43792682962864016, calculateWeightFractionOfBackbone(self.saturatedTestUniverse, crosslinkerType=2, strandLength=2, functionalityPerType={
             1: 2, 2: 4
         }))
 
@@ -167,7 +167,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
 
         # these results are pretty certain, align with experimental results, confirmed
         G_MMT_phantom, G_MMT_entanglement, G_ANM, G_PNM = computeModulusDecomposition(
-            network=None, unitStyle=unitStyle, junctionType=2, r=1., p=0.95, f=4, nu=4.63241e25*(unitStyle.getUnderlyingUnitRegistry()(
+            network=None, unitStyle=unitStyle, crosslinkerType=2, r=1., p=0.95, f=4, nu=4.63241e25*(unitStyle.getUnderlyingUnitRegistry()(
                 'meter')**-3), T=298*unitStyle.getUnderlyingUnitRegistry()('kelvin')
         )
 
@@ -183,7 +183,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
 
         # these in turn require further investigation into the involvement of r
         G_MMT_phantom, G_MMT_entanglement, G_ANM, G_PNM = computeModulusDecomposition(
-            network=None, unitStyle=unitStyle, junctionType=2, r=1.3, p=0.6465, f=4, nu=1.25981e25*(unitStyle.getUnderlyingUnitRegistry()(
+            network=None, unitStyle=unitStyle, crosslinkerType=2, r=1.3, p=0.6465, f=4, nu=1.25981e25*(unitStyle.getUnderlyingUnitRegistry()(
                 'meter')**-3), T=298*unitStyle.getUnderlyingUnitRegistry()('kelvin')
         )
 

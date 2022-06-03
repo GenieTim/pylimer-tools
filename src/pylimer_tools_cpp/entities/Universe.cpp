@@ -1352,12 +1352,12 @@ namespace entities {
   /**
    * @brief Get the mean number of beads between beads with the passed type
    *
-   * @param junctionType
+   * @param crosslinkerType
    * @return double
    */
-  double Universe::getMeanStrandLength(int junctionType)
+  double Universe::getMeanStrandLength(int crosslinkerType)
   {
-    std::vector<Molecule> molecules = this->getMolecules(junctionType);
+    std::vector<Molecule> molecules = this->getMolecules(crosslinkerType);
 
     double multiplier = 1.0 / molecules.size();
     double meanStrandLength = 0;
@@ -1374,13 +1374,13 @@ namespace entities {
    * Does not take loops into account as a contributor to the mean.
    * Returns 0 for systems without any qualifying strands.
    *
-   * @param junctionType
+   * @param crosslinkerType
    * @return double
    */
-  std::vector<double> Universe::computeEndToEndDistances(int junctionType)
+  std::vector<double> Universe::computeEndToEndDistances(int crosslinkerType)
   {
     std::vector<Molecule> molecules =
-      this->getChainsWithCrosslinker(junctionType);
+      this->getChainsWithCrosslinker(crosslinkerType);
 
     double meanEndToEndDistance = 0;
     int validMolecules = 0;
@@ -1401,13 +1401,13 @@ namespace entities {
    * Does not take loops into account as a contributor to the mean.
    * Returns 0 for systems without any qualifying strands.
    *
-   * @param junctionType
+   * @param crosslinkerType
    * @return double
    */
-  double Universe::computeMeanEndToEndDistance(int junctionType)
+  double Universe::computeMeanEndToEndDistance(int crosslinkerType)
   {
     std::vector<Molecule> molecules =
-      this->getChainsWithCrosslinker(junctionType);
+      this->getChainsWithCrosslinker(crosslinkerType);
 
     double meanEndToEndDistance = 0.0;
     int validMolecules = 0;
@@ -1433,13 +1433,13 @@ namespace entities {
    * Does not take loops into account as a contributor to the mean.
    * Returns 0 for systems without any qualifying strands.
    *
-   * @param junctionType
+   * @param crosslinkerType
    * @return double
    */
-  double Universe::computeMeanSquareEndToEndDistance(int junctionType)
+  double Universe::computeMeanSquareEndToEndDistance(int crosslinkerType)
   {
     std::vector<Molecule> molecules =
-      this->getChainsWithCrosslinker(junctionType);
+      this->getChainsWithCrosslinker(crosslinkerType);
 
     double meanEndToEndDistance = 0.0;
     int validMolecules = 0;
@@ -1513,14 +1513,14 @@ namespace entities {
    *
    * @source https://www.pslc.ws/macrog/average.htm
    *
-   * @param junctionType
+   * @param crosslinkerType
    * @return double
    */
-  double Universe::computeWeightAverageMolecularWeight(int junctionType) const
+  double Universe::computeWeightAverageMolecularWeight(int crosslinkerType) const
   {
     double weightAverage = 0.0;
 
-    std::vector<Molecule> molecules = this->getMolecules(junctionType);
+    std::vector<Molecule> molecules = this->getMolecules(crosslinkerType);
     double totalMass = this->computeTotalMass();
     double massDivisor = 1.0 / totalMass;
     for (Molecule molecule : molecules) {
@@ -1536,14 +1536,14 @@ namespace entities {
    *
    * @source https://www.pslc.ws/macrog/average.htm
    *
-   * @param junctionType
+   * @param crosslinkerType
    * @return double
    */
-  double Universe::computeNumberAverageMolecularWeight(int junctionType) const
+  double Universe::computeNumberAverageMolecularWeight(int crosslinkerType) const
   {
     double weightAverage = 0.0;
 
-    std::vector<Molecule> molecules = this->getMolecules(junctionType);
+    std::vector<Molecule> molecules = this->getMolecules(crosslinkerType);
     double totalMass = this->computeTotalMass();
 
     return totalMass / static_cast<double>(molecules.size());
@@ -1555,15 +1555,15 @@ namespace entities {
    *
    * @source https://www.pslc.ws/macrog/average.htm
    *
-   * @param junctionType
+   * @param crosslinkerType
    * @return double
    */
-  double Universe::computePolydispersityIndex(int junctionType) const
+  double Universe::computePolydispersityIndex(int crosslinkerType) const
   {
     // TODO: check assembly whether the double getMolecules() and
     // computeTotalMass() is cancelled out or not
-    return this->computeWeightAverageMolecularWeight(junctionType) /
-           this->computeNumberAverageMolecularWeight(junctionType);
+    return this->computeWeightAverageMolecularWeight(crosslinkerType) /
+           this->computeNumberAverageMolecularWeight(crosslinkerType);
   }
 
   /**

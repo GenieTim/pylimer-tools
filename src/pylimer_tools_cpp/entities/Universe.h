@@ -120,15 +120,15 @@ namespace entities {
     {
       return AtomGraphParent::computeBondLengths(&this->box);
     };
-    double getMeanStrandLength(int junctionType);
-    std::vector<double> computeEndToEndDistances(int junctionType);
-    double computeMeanEndToEndDistance(int junctionType);
-    double computeMeanSquareEndToEndDistance(int junctionType);
+    double getMeanStrandLength(int crosslinkerType);
+    std::vector<double> computeEndToEndDistances(int crosslinkerType);
+    double computeMeanEndToEndDistance(int crosslinkerType);
+    double computeMeanSquareEndToEndDistance(int crosslinkerType);
     double computeMeanBondLength();
     double computeTotalMass() const;
-    double computeWeightAverageMolecularWeight(int junctionType) const;
-    double computeNumberAverageMolecularWeight(int junctionType) const;
-    double computePolydispersityIndex(int junctionType) const;
+    double computeWeightAverageMolecularWeight(int crosslinkerType) const;
+    double computeNumberAverageMolecularWeight(int crosslinkerType) const;
+    double computePolydispersityIndex(int crosslinkerType) const;
     bool validate();
 
   protected:
