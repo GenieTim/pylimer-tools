@@ -21,7 +21,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Molecule
       ~Molecule.computeBondLengths
       ~Molecule.computeEndToEndDistance
       ~Molecule.computeRadiusOfGyration
-      ~Molecule.computeWeight
+      ~Molecule.computeTotalMass
       ~Molecule.getAtomForVertexId
       ~Molecule.getAtomIdByIdx
       ~Molecule.getAtomTypes

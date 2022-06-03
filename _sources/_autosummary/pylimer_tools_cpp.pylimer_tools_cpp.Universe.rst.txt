@@ -30,7 +30,8 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Universe
       ~Universe.computeMeanSquareEndToEndDistance
       ~Universe.computeMeanStrandLength
       ~Universe.computeNumberAverageMolecularWeight
-      ~Universe.computeWeight
+      ~Universe.computePolydispersityIndex
+      ~Universe.computeTotalMass
       ~Universe.computeWeightAverageMolecularWeight
       ~Universe.computeWeightFractions
       ~Universe.detectAngles
