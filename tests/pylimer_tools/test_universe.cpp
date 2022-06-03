@@ -84,7 +84,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                       { { 0, 0 } },
                       { { 0, 0 } });
     REQUIRE(universe.getNrOfAtoms() == 4);
-    CHECK(universe.getAtomsWithType(1).size() == 4);
+    CHECK(universe.getAtomsOfType(1).size() == 4);
     CHECK(universe.getNrOfBonds() == 0);
     REQUIRE_THROWS(universe.getIdxByAtomId(1000));
 
@@ -247,9 +247,9 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       // REQUIRE(bonds["bond_type"][5] == 1);
       // REQUIRE(bonds["bond_type"][6] == 11);
       // get atoms with type returns
-      REQUIRE(universe.getAtomsWithType(2).size() == 3);
-      REQUIRE(universe.getAtomsWithType(1).size() == 5);
-      REQUIRE(universe.getAtomsWithType(0).size() == 0);
+      REQUIRE(universe.getAtomsOfType(2).size() == 3);
+      REQUIRE(universe.getAtomsOfType(1).size() == 5);
+      REQUIRE(universe.getAtomsOfType(0).size() == 0);
     }
 
     SECTION("internal lengths are computed correctly")
@@ -287,9 +287,9 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     {
       // get atoms with type returns atoms with properties
       std::vector<pe::Molecule> molecules = universe.getMolecules(2);
-      REQUIRE(molecules[0].getAtomsWithType(1).size() == 3);
-      REQUIRE(molecules[1].getAtomsWithType(1)[0].getId() == 5);
-      REQUIRE(molecules[2].getAtomsWithType(1)[0].getType() == 1);
+      REQUIRE(molecules[0].getAtomsOfType(1).size() == 3);
+      REQUIRE(molecules[1].getAtomsOfType(1)[0].getId() == 5);
+      REQUIRE(molecules[2].getAtomsOfType(1)[0].getType() == 1);
       // get molecules allows to fetch atoms with degree
       REQUIRE(molecules[0].getAtomsOfDegree(2).size() == 1);
       REQUIRE(molecules[0].getAtomsOfDegree(1).size() == 2);
@@ -307,7 +307,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(chains[0].getAtoms()[0].getX() == 1.25);
       REQUIRE(chains[0].getNrOfAtoms() == 5);
       REQUIRE(chains[0].getKey() == "1-2-3-6-7");
-      REQUIRE(chains[0].getAtomsWithType(2).size() == 2);
+      REQUIRE(chains[0].getAtomsOfType(2).size() == 2);
       //
       auto functionalityPerType = universe.determineFunctionalityPerType();
       REQUIRE(functionalityPerType[1] == 2);
@@ -374,7 +374,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     {
       pe::Universe reducedUniverse = universe.getNetworkOfCrosslinker(2);
       REQUIRE(reducedUniverse.getNrOfAtoms() == 3);
-      REQUIRE(reducedUniverse.getAtomsWithType(2).size() == 3);
+      REQUIRE(reducedUniverse.getAtomsOfType(2).size() == 3);
 
       auto edges = reducedUniverse.getEdges();
 

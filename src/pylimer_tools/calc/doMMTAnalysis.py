@@ -494,7 +494,7 @@ def computeExtentOfReaction(network: Universe, crosslinkerType, functionalityPer
         functionalityPerType = network.determineFunctionalityPerType()
 
     numStrands = len(network.getMolecules(crosslinkerType))
-    numCrosslinkers = len(network.getAtomsWithType(crosslinkerType))
+    numCrosslinkers = len(network.getAtomsOfType(crosslinkerType))
 
     # assuming strand has functionality 2
     maxFormableBonds = min(numStrands*2, numCrosslinkers *

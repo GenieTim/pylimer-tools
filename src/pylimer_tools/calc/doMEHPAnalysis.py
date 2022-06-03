@@ -164,7 +164,7 @@ def calculateEffectiveNrDensityOfJunctions(networks: Iterable[Universe], absTol:
     meanVolume = calculateMeanUniverseVolume(networks)
 
     if (minNumEffectiveStrands == 0):
-        return len(networks[0].getAtomsWithType(junctionType))/meanVolume
+        return len(networks[0].getAtomsOfType(junctionType))/meanVolume
 
     # get the mean end to end distances
     R_taus = computeMeanEndToEndDistances(networks, junctionType)
@@ -325,7 +325,7 @@ def computeEndToEndVectors(network: Universe, crosslinkerType) -> dict:
     endToEndVectors = {}
     molecules = network.getChainsWithCrosslinker(crosslinkerType)
     for molecule in molecules:
-        crosslinkers = molecule.getAtomsWithType(crosslinkerType)
+        crosslinkers = molecule.getAtomsOfType(crosslinkerType)
         if (len(crosslinkers) != 2 or
             molecule.getType() == MoleculeType.PRIMARY_LOOP or
                 molecule.getType() == MoleculeType.DANGLING_CHAIN):
@@ -390,7 +390,7 @@ def calculateEffectiveCrosslinkerFunctionalities(network: Universe, junctionType
     """
     if (network.getNrOfAtoms() == 0):
         return []
-    junctions = network.getAtomsWithType(junctionType)
+    junctions = network.getAtomsOfType(junctionType)
     junctionIds = [v.getId() for v in junctions]
     junctionDegrees = [network.getNrOfBondsOfAtom(id) for id in junctionIds]
     return junctionDegrees
@@ -425,7 +425,7 @@ def calculateTopologicalFactor(networks: Iterable[Universe], foreignAtomType=Non
     network = networks[0]  # this is where the second assumption is made
     chainsToProcess = network.getChainsWithCrosslinker(foreignAtomType)
     for molecule in chainsToProcess:
-        crosslinkers = molecule.getAtomsWithType(foreignAtomType)
+        crosslinkers = molecule.getAtomsOfType(foreignAtomType)
         if (len(crosslinkers) != 2 or
             molecule.getType() == MoleculeType.PRIMARY_LOOP or
                 molecule.getType() == MoleculeType.DANGLING_CHAIN):

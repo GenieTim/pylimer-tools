@@ -32,7 +32,7 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation2]")
   forceRelaxer.runForceRelaxation(2, 5, 1e-6, 15, true, 0.075);
   REQUIRE(forceRelaxer.getExitReason() == pcm::ExitReason::MAX_STEPS);
   REQUIRE(forceRelaxer.getNrOfNodes() != universe.getNrOfAtoms());
-  REQUIRE(universe.getAtomsWithType(2).size() == 7200);
+  REQUIRE(universe.getAtomsOfType(2).size() == 7200);
 
   pcm::MEHPForceRelaxation2 forceRelaxer2 =
     pcm::MEHPForceRelaxation2(universe, 2);

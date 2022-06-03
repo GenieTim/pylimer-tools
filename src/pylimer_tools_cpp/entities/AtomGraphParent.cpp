@@ -108,7 +108,7 @@ namespace entities {
    * @param atomType the type to query for
    * @return std::vector<Atom>
    */
-  std::vector<Atom> AtomGraphParent::getAtomsWithType(const int atomType) const
+  std::vector<Atom> AtomGraphParent::getAtomsOfType(const int atomType) const
   {
     std::vector<Atom> results;
     const std::vector<int> types = this->getPropertyValues<int>("type");

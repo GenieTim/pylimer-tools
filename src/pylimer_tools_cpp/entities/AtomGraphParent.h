@@ -72,7 +72,7 @@ namespace entities {
      * @param atomType the type to query for
      * @return std::vector<Atom>
      */
-    std::vector<Atom> getAtomsWithType(const int atomType) const;
+    std::vector<Atom> getAtomsOfType(const int atomType) const;
 
     /**
      * @brief Get the Atom Id By Idx object

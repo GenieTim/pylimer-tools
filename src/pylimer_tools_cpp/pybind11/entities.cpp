@@ -220,10 +220,10 @@ init_pylimer_bound_entities(py::module_& m)
     .def("getType", &Molecule::getType, R"pbdoc(
            Get the type of this molecule (see :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType` enum).
       )pbdoc")
-    .def("getAtomsWithType", &Molecule::getAtomsWithType, R"pbdoc(
+    .def("getAtomsOfType", &Molecule::getAtomsOfType, R"pbdoc(
             Get the atoms with the specified type.
             )pbdoc")
-    .def("getAtomsWithDegree", &Molecule::getAtomsOfDegree, R"pbdoc(
+    .def("getAtomsOfDegree", &Molecule::getAtomsOfDegree, R"pbdoc(
             Get the atoms that have the specified number of bonds.
             )pbdoc")
     .def("getAtomsConnectedTo", &Molecule::getAtomsConnectedTo, R"pbdoc(
@@ -470,7 +470,7 @@ init_pylimer_bound_entities(py::module_& m)
     .def("getAtoms", &Universe::getAtoms, R"pbdoc(
             Get all atoms.
             )pbdoc")
-    .def("getAtomsWithType", &Universe::getAtomsWithType, R"pbdoc(
+    .def("getAtomsOfType", &Universe::getAtomsOfType, R"pbdoc(
             Find many atom by their type.
             )pbdoc")
     .def(

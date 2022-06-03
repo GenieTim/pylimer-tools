@@ -30,7 +30,7 @@ class TestEntities(UniverseUsingTestCase):
         self.assertIsInstance(self.emptyUniverse, Universe)
         # self.assertIsInstance(universe.getUnderlyingGraph(), igraph.Graph)
         # check that the except paths work too: non-existant atom ids & type
-        self.assertEqual([], self.emptyUniverse.getAtomsWithType(1))
+        self.assertEqual([], self.emptyUniverse.getAtomsOfType(1))
         self.assertRaises(ValueError, lambda: self.emptyUniverse.getAtom(1))
 
         self.assertCountEqual([], self.emptyUniverse.getMolecules(0))
@@ -44,8 +44,8 @@ class TestEntities(UniverseUsingTestCase):
 
     def test_moleculeEntity(self):
         universe = self.testUniverseSmall
-        self.assertEqual(4, len(universe.getAtomsWithType(1)))
-        self.assertEqual(2, len(universe.getAtomsWithType(2)))
+        self.assertEqual(4, len(universe.getAtomsOfType(1)))
+        self.assertEqual(2, len(universe.getAtomsOfType(2)))
         molecules = universe.getMolecules(0)
         self.assertEqual(len(molecules), 2)
         self.assertEqual(molecules[0].getLength(), 3)
