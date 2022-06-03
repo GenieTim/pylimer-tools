@@ -269,8 +269,8 @@ init_pylimer_bound_entities(py::module_& m)
             Get a unique identifier for this molecule.
             )pbdoc")
     // computations
-    .def("computeWeight", &Molecule::computeWeight, R"pbdoc(
-            Computes the total weight of this molecule.
+    .def("computeTotalMass", &Molecule::computeTotalMass, R"pbdoc(
+            Computes the total mass of this molecule.
             )pbdoc")
     .def("computeBondLengths",
          &Molecule::computeBondLengths,
@@ -575,8 +575,9 @@ init_pylimer_bound_entities(py::module_& m)
               Compute the mean strand length.
               )pbdoc",
          py::arg("crosslinkerType"))
-    .def("computeWeight", &Universe::computeWeight, R"pbdoc(
-          Compute the total weight of this network/universe.
+    .def("computeTotalMass", &Universe::computeTotalMass, R"pbdoc(
+          Compute the total mass of this network/universe in whatever mass unit was used when 
+          :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.setMasses()` was called.
      )pbdoc")
     .def("computeNumberAverageMolecularWeight",
          &Universe::computeNumberAverageMolecularWeight,
@@ -588,6 +589,13 @@ init_pylimer_bound_entities(py::module_& m)
          &Universe::computeWeightAverageMolecularWeight,
          R"pbdoc(
               Compute the weight average molecular weight.
+              )pbdoc",
+         py::arg("crosslinkerType"))
+    .def("computePolydispersityIndex",
+         &Universe::computePolydispersityIndex,
+         R"pbdoc(
+              Compute the polydispersity indiex: 
+              the weight average molecular weight over the number average molecular weight.
               )pbdoc",
          py::arg("crosslinkerType"))
     .def("computeWeightFractions", &Universe::computeWeightFractions, R"pbdoc(

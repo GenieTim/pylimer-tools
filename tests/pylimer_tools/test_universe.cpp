@@ -547,7 +547,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     REQUIRE(universe.getMolecules(-1).size() == 100);
     REQUIRE(currentId == 100);
     // then, do the calculation
-    REQUIRE(universe.computeWeight() == Catch::Approx(50000000));
+    REQUIRE(universe.computeTotalMass() == Catch::Approx(50000000));
     REQUIRE(universe.computeNumberAverageMolecularWeight(-1) ==
             Catch::Approx(500000));
     REQUIRE(universe.computeWeightAverageMolecularWeight(-1) ==

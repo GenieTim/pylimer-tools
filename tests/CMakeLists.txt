@@ -62,6 +62,7 @@ add_library(test_sources
 	OBJECT 
 		pylimer_tools/test_generator.cpp 
 		pylimer_tools/test_force_relaxation.cpp
+		pylimer_tools/test_force_relaxation2.cpp
 		pylimer_tools/test_universe.cpp 
 		pylimer_tools/test_universesequence.cpp 
 		pylimer_tools/test_molecule.cpp 

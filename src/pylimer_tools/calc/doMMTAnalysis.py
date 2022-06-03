@@ -190,7 +190,7 @@ def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.7
     if (network.getNrOfAtoms() == 0):
         return None
     fractions = network.getClusters()
-    weights = np.array([f.computeWeight() for f in fractions])
+    weights = np.array([f.computeTotalMass() for f in fractions])
     totalWeight = weights.sum()
     solubleWeight = 0
     for w in weights:

@@ -78,7 +78,7 @@ namespace entities {
     // using copy assignement operators ourselfes
     this->box = src.box;
     this->atomIdToVectorIdx = src.atomIdToVectorIdx;
-    this->weightPerType = src.weightPerType;
+    this->massPerType = src.massPerType;
     igraph_copy(&this->graph, &src.graph);
   };
 
@@ -94,7 +94,7 @@ namespace entities {
     std::swap(this->box, src.box);
     std::swap(this->graph, src.graph);
     std::swap(this->atomIdToVectorIdx, src.atomIdToVectorIdx);
-    std::swap(this->weightPerType, src.weightPerType);
+    std::swap(this->massPerType, src.massPerType);
 
     return *this;
   };
@@ -336,14 +336,14 @@ namespace entities {
   /**
    * @brief Set the masses of the atoms in this universe
    *
-   * @param weightPerType the weight per type
+   * @param massPerType the weight per type
    */
-  void Universe::setMasses(std::map<int, double> weightPerType)
+  void Universe::setMasses(std::map<int, double> massPerType)
   {
-    this->weightPerType = weightPerType;
+    this->massPerType = massPerType;
   }
 
-  std::map<int, double> Universe::getMasses() { return this->weightPerType; };
+  std::map<int, double> Universe::getMasses() { return this->massPerType; };
 
   /**
    * @brief Get the standalone components of the network
@@ -372,7 +372,7 @@ namespace entities {
 
       if (igraph_vcount(g)) {
         molecules.push_back(Molecule(
-          &this->box, g, MoleculeType::UNDEFINED, this->weightPerType));
+          &this->box, g, MoleculeType::UNDEFINED, this->massPerType));
       }
     }
     igraph_decompose_destroy(&components);
@@ -436,7 +436,7 @@ namespace entities {
 
       if (igraph_vcount(g)) {
         molecules.push_back(Molecule(
-          &this->box, g, MoleculeType::UNDEFINED, this->weightPerType));
+          &this->box, g, MoleculeType::UNDEFINED, this->massPerType));
       }
     }
     igraph_decompose_destroy(&components);
@@ -658,7 +658,7 @@ namespace entities {
 
       // finally, create the molecule/chain
       molecules.push_back(
-        Molecule(&this->box, chain, molType, this->weightPerType));
+        Molecule(&this->box, chain, molType, this->massPerType));
     }
     igraph_decompose_destroy(&components);
     igraph_vector_ptr_destroy(&components);
@@ -975,9 +975,9 @@ namespace entities {
     std::vector<int> types = this->getPropertyValues<int>("type");
     double totalMass = 0.0;
     for (int type : types) {
-      totalMass += this->weightPerType.at(type);
+      totalMass += this->massPerType.at(type);
       partialMasses.try_emplace(type, 0.0);
-      partialMasses[type] += this->weightPerType.at(type);
+      partialMasses[type] += this->massPerType.at(type);
     }
 
     if (totalMass == 0.0) {
@@ -1464,12 +1464,12 @@ namespace entities {
    *
    * @return double
    */
-  double Universe::computeWeight() const
+  double Universe::computeTotalMass() const
   {
     std::vector<int> types = this->getAtomTypes();
     double weight = 0.0;
     for (int i = 0; i < types.size(); i++) {
-      weight += this->weightPerType.at(types[i]);
+      weight += this->massPerType.at(types[i]);
     }
     return weight;
   }
@@ -1521,16 +1521,16 @@ namespace entities {
     double weightAverage = 0.0;
 
     std::vector<Molecule> molecules = this->getMolecules(junctionType);
-    double totalMass = this->computeWeight();
+    double totalMass = this->computeTotalMass();
     double massDivisor = 1.0 / totalMass;
     for (Molecule molecule : molecules) {
-      double moleculeMass = molecule.computeWeight();
+      double moleculeMass = molecule.computeTotalMass();
       weightAverage += moleculeMass * moleculeMass * massDivisor;
     }
 
     return weightAverage;
   };
-  
+
   /**
    * @brief Compute the number average molecular weight
    *
@@ -1544,7 +1544,7 @@ namespace entities {
     double weightAverage = 0.0;
 
     std::vector<Molecule> molecules = this->getMolecules(junctionType);
-    double totalMass = this->computeWeight();
+    double totalMass = this->computeTotalMass();
 
     return totalMass / static_cast<double>(molecules.size());
   };
@@ -1560,6 +1560,8 @@ namespace entities {
    */
   double Universe::computePolydispersityIndex(int junctionType) const
   {
+    // TODO: check assembly whether the double getMolecules() and
+    // computeTotalMass() is cancelled out or not
     return this->computeWeightAverageMolecularWeight(junctionType) /
            this->computeNumberAverageMolecularWeight(junctionType);
   }

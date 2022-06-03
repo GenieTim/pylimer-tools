@@ -62,7 +62,7 @@ namespace entities {
     void addAngles(std::vector<long int> from,
                    std::vector<long int> via,
                    std::vector<long int> to);
-    void setMasses(std::map<int, double> weightPerType);
+    void setMasses(std::map<int, double> massPerType);
     void setBox(Box box);
     void setTimestep(long int timestep) { this->timestep = timestep; };
     void simplify();
@@ -125,7 +125,7 @@ namespace entities {
     double computeMeanEndToEndDistance(int junctionType);
     double computeMeanSquareEndToEndDistance(int junctionType);
     double computeMeanBondLength();
-    double computeWeight() const;
+    double computeTotalMass() const;
     double computeWeightAverageMolecularWeight(int junctionType) const;
     double computeNumberAverageMolecularWeight(int junctionType) const;
     double computePolydispersityIndex(int junctionType) const;
@@ -147,7 +147,7 @@ namespace entities {
 
     // type's properties
     std::map<int, double>
-      weightPerType; // a dictionary with key: type, and value: weight per atom
+      massPerType; // a dictionary with key: type, and value: weight per atom
                      // of this atom type.
 
     // internal functions
