@@ -125,6 +125,10 @@ namespace entities {
     double computeMeanEndToEndDistance(int junctionType);
     double computeMeanSquareEndToEndDistance(int junctionType);
     double computeMeanBondLength();
+    double computeWeight() const;
+    double computeWeightAverageMolecularWeight(int junctionType) const;
+    double computeNumberAverageMolecularWeight(int junctionType) const;
+    double computePolydispersityIndex(int junctionType) const;
     bool validate();
 
   protected:

@@ -1460,6 +1460,21 @@ namespace entities {
   }
 
   /**
+   * @brief Compute the total mass of this universe
+   *
+   * @return double
+   */
+  double Universe::computeWeight() const
+  {
+    std::vector<int> types = this->getAtomTypes();
+    double weight = 0.0;
+    for (int i = 0; i < types.size(); i++) {
+      weight += this->weightPerType.at(types[i]);
+    }
+    return weight;
+  }
+
+  /**
    * @brief Compute the mean of all bond lengths
    *
    * @return double
@@ -1492,6 +1507,61 @@ namespace entities {
 
     igraph_eit_destroy(&bondIterator);
     return length / (double)this->getNrOfBonds();
+  }
+  /**
+   * @brief Compute the weight average molecular weight
+   *
+   * @source https://www.pslc.ws/macrog/average.htm
+   *
+   * @param junctionType
+   * @return double
+   */
+  double Universe::computeWeightAverageMolecularWeight(int junctionType) const
+  {
+    double weightAverage = 0.0;
+
+    std::vector<Molecule> molecules = this->getMolecules(junctionType);
+    double totalMass = this->computeWeight();
+    double massDivisor = 1.0 / totalMass;
+    for (Molecule molecule : molecules) {
+      double moleculeMass = molecule.computeWeight();
+      weightAverage += moleculeMass * moleculeMass * massDivisor;
+    }
+
+    return weightAverage;
+  };
+  
+  /**
+   * @brief Compute the number average molecular weight
+   *
+   * @source https://www.pslc.ws/macrog/average.htm
+   *
+   * @param junctionType
+   * @return double
+   */
+  double Universe::computeNumberAverageMolecularWeight(int junctionType) const
+  {
+    double weightAverage = 0.0;
+
+    std::vector<Molecule> molecules = this->getMolecules(junctionType);
+    double totalMass = this->computeWeight();
+
+    return totalMass / static_cast<double>(molecules.size());
+  };
+
+  /**
+   * @brief Compute the polydispersity index (weight average molecular weight
+   * over number average molecular weight)
+   *
+   * @source https://www.pslc.ws/macrog/average.htm
+   *
+   * @param junctionType
+   * @return double
+   */
+  double Universe::computePolydispersityIndex(int junctionType) const
+  {
+    return this->computeWeightAverageMolecularWeight(junctionType) /
+           this->computeNumberAverageMolecularWeight(junctionType);
   }
 
   /**

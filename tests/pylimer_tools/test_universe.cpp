@@ -88,13 +88,14 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     CHECK(universe.getNrOfBonds() == 0);
     REQUIRE_THROWS(universe.getIdxByAtomId(1000));
 
-    SECTION("Atoms can be removed") {
-      universe.addBonds({{ 0, 1, 3, 4 }}, {{ 1, 3, 4, 0 }});
+    SECTION("Atoms can be removed")
+    {
+      universe.addBonds({ { 0, 1, 3, 4 } }, { { 1, 3, 4, 0 } });
       pe::Universe universeCopy = pe::Universe(universe);
       REQUIRE_NOTHROW(universeCopy.getAtom(3));
       REQUIRE(universeCopy.getNrOfAtoms() == 4);
       REQUIRE(universeCopy.getNrOfBonds() == 4);
-      universeCopy.removeAtoms({{ 1, 3 }});
+      universeCopy.removeAtoms({ { 1, 3 } });
       REQUIRE(universeCopy.getAtom(4) == universe.getAtom(4));
       REQUIRE_THROWS(universeCopy.getAtom(3));
       REQUIRE(universeCopy.validate());
@@ -500,5 +501,57 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(newChains[2].getType() == pe::MoleculeType::PRIMARY_LOOP);
       REQUIRE(newChains[2].getKey() == "7-8-9");
     }
+  }
+
+  SECTION("PolyDispersity Calculation")
+  {
+    // as taken from https://www.pslc.ws/macrog/average.htm
+    std::vector<int> nrOfMolecules = {
+      { 1, 3, 5, 8, 10, 13, 20, 13, 10, 8, 5, 3, 1 }
+    };
+    std::vector<double> massOfMolecules = {
+      { 8, 7.5, 7, 6.5, 6, 5.5, 5, 4.5, 4, 3.5, 3., 2.5, 2 }
+    };
+
+    std::map<int, double> weights;
+    int currentId = 0;
+
+    std::vector<double> oneZeroDouble;
+    oneZeroDouble.push_back(0.0);
+    std::vector<int> oneZeroInt;
+    oneZeroInt.push_back(0);
+
+    // first, add these molecules as single atoms to the universe
+    for (int i = 0; i < nrOfMolecules.size(); ++i) {
+      std::vector<int> type;
+      type.push_back(i);
+      // this is slow and could easily be optimized, but whatever
+      for (int j = 0; j < nrOfMolecules[i]; ++j) {
+        std::vector<long int> atomId;
+        atomId.push_back(currentId);
+        universe.addAtoms(1,
+                          atomId,
+                          type,
+                          oneZeroDouble,
+                          oneZeroDouble,
+                          oneZeroDouble,
+                          oneZeroInt,
+                          oneZeroInt,
+                          oneZeroInt);
+        currentId += 1;
+      }
+      weights.emplace(i, massOfMolecules[i] * 100000.);
+    }
+    universe.setMasses(weights);
+    // some asserts that everything has been correcly set by the test
+    REQUIRE(universe.getMolecules(-1).size() == 100);
+    REQUIRE(currentId == 100);
+    // then, do the calculation
+    REQUIRE(universe.computeWeight() == Catch::Approx(50000000));
+    REQUIRE(universe.computeNumberAverageMolecularWeight(-1) ==
+            Catch::Approx(500000));
+    REQUIRE(universe.computeWeightAverageMolecularWeight(-1) ==
+            Catch::Approx(531600));
+    REQUIRE(universe.computePolydispersityIndex(-1) == Catch::Approx(1.0632));
   }
 }

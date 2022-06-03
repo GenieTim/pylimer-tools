@@ -571,7 +571,24 @@ init_pylimer_bound_entities(py::module_& m)
             )pbdoc")
     .def("computeMeanStrandLength",
          &Universe::getMeanStrandLength,
-         "Compute the mean strand length.",
+         R"pbdoc(
+              Compute the mean strand length.
+              )pbdoc",
+         py::arg("crosslinkerType"))
+    .def("computeWeight", &Universe::computeWeight, R"pbdoc(
+          Compute the total weight of this network/universe.
+     )pbdoc")
+    .def("computeNumberAverageMolecularWeight",
+         &Universe::computeNumberAverageMolecularWeight,
+         R"pbdoc(
+              Compute the number average molecular weight.
+              )pbdoc",
+         py::arg("crosslinkerType"))
+    .def("computeWeightAverageMolecularWeight",
+         &Universe::computeWeightAverageMolecularWeight,
+         R"pbdoc(
+              Compute the weight average molecular weight.
+              )pbdoc",
          py::arg("crosslinkerType"))
     .def("computeWeightFractions", &Universe::computeWeightFractions, R"pbdoc(
             Compute the weight fractions of each atom type in the network.
