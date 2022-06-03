@@ -29,6 +29,9 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Universe
       ~Universe.computeMeanEndToEndDistance
       ~Universe.computeMeanSquareEndToEndDistance
       ~Universe.computeMeanStrandLength
+      ~Universe.computeNumberAverageMolecularWeight
+      ~Universe.computeWeight
+      ~Universe.computeWeightAverageMolecularWeight
       ~Universe.computeWeightFractions
       ~Universe.detectAngles
       ~Universe.determineEffectiveFunctionalityPerType
