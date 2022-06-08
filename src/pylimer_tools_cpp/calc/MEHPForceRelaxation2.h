@@ -163,7 +163,7 @@ namespace calc {
         double Ry2_sum = 0.0;
         double Rz2_sum = 0.0;
 
-        MEHPForce totalForce = MEHPForce(&net, kappa);
+        MEHPForce totalForce = MEHPForce(this->is2d, &net, kappa);
         auto state = totalForce.Eval(u);
 
         // set the exit conditions
@@ -321,6 +321,8 @@ namespace calc {
         net->nrOfNodes = crosslinkerUniverse.getNrOfAtoms();
         net->nrOfSprings = crosslinkerUniverse.getNrOfBonds();
         net->coordinates = Eigen::VectorXd::Zero(3 * net->nrOfNodes);
+        net->springIndexA = Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
+        net->springIndexB = Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
 
         int usualChainLen =
           this->universe.getMolecules(crosslinkerType)[0].getNrOfAtoms();
@@ -354,6 +356,8 @@ namespace calc {
           net->springs[i].b = atomIdToNode.at(atomIdTo);
           net->springs[i].len = usualChainLen;
           net->averageSpringLength += usualChainLen;
+          net->springIndexA[i] = atomIdToNode.at(atomIdFrom);
+          net->springIndexB[i] = atomIdToNode.at(atomIdTo);
         }
 
         if (crosslinkerUniverse.getNrOfBonds() != net->nrOfSprings) {
@@ -601,17 +605,15 @@ namespace calc {
       class MEHPForce : public FunctionXd
       {
       private:
-        // MEHPForceRelaxation2* parent;
+        bool is2D;
         Network* net;
         double kappa;
         double boxHalfs[3];
 
       public:
-        MEHPForce(//MEHPForceRelaxation2* parent, 
-        Network* net, double kappa)
-          : 
-          // parent(parent), 
-          net(net)
+        MEHPForce(bool is2D, Network* net, double kappa)
+          : is2D(is2D)
+          , net(net)
           , kappa(kappa)
         {
           boxHalfs[0] = 0.5 * net->L[0];
@@ -625,47 +627,25 @@ namespace calc {
           Eigen::VectorXd actualCoordinates = net->coordinates + u;
           Eigen::VectorXd coordinatesSpringEndA =
             actualCoordinates(net->springIndexA);
-          Eigen::VectorXd coordinatesSpringEndA =
+          Eigen::VectorXd coordinatesSpringEndB =
             actualCoordinates(net->springIndexB);
           Eigen::VectorXd springDistances =
             (coordinatesSpringEndA - coordinatesSpringEndB);
-          if (parent->is2D) {
-            springDistances(seq(0, Eigen::last, Eigen::fix<3>)) = 0.0;
+          if (this->is2D) {
+            springDistances(Eigen::seq(0, Eigen::last, Eigen::fix<3>)) =
+              Eigen::VectorXd::Zero(net->nrOfSprings / 3);
           }
           // Possibly improvable PBC
           for (size_t j = 0; j < 3 * net->nrOfSprings; j++) {
-            while (springDistances[j] > boxHalfs[j%3]) {
-              springDistances[j] -= boxHalfs[j%3];
+            while (springDistances[j] > boxHalfs[j % 3]) {
+              springDistances[j] -= boxHalfs[j % 3];
             }
-            while (springDistances[j] < boxHalfs[j%3]) {
-              springDistances[j] += boxHalfs[j%3];
+            while (springDistances[j] < boxHalfs[j % 3]) {
+              springDistances[j] += boxHalfs[j % 3];
             }
           }
           double s2 = springDistances.squaredNorm();
           return 0.5 * kappa * s2;
-          // end
-
-          // /* initial */
-          // double Fdef = 0.;
-
-          // /* assembly */
-          // for (size_t i = 0; i < net->nrOfSprings; i++) {
-          //   long int a = net->springs[i].a;
-          //   long int b = net->springs[i].b;
-          //   double distance[3];
-
-          //   parent->actualSpringDistance(
-          //     net->nodes[b], b, net->nodes[a], a, u, distance, net->L);
-
-          //   /* energy update */
-          //   double s2 = 0.;
-          //   for (size_t j = 0; j < 3; j++) {
-          //     s2 += distance[j] * distance[j];
-          //   }
-          //   Fdef += 0.5 * kappa * s2;
-          // };
-
-          // return Fdef;
         }
       };
     };
