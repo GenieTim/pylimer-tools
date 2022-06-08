@@ -371,8 +371,8 @@ namespace entities {
       igraph_t* g = (igraph_t*)VECTOR(components)[i];
 
       if (igraph_vcount(g)) {
-        molecules.push_back(Molecule(
-          &this->box, g, MoleculeType::UNDEFINED, this->massPerType));
+        molecules.push_back(
+          Molecule(&this->box, g, MoleculeType::UNDEFINED, this->massPerType));
       }
     }
     igraph_decompose_destroy(&components);
@@ -435,8 +435,8 @@ namespace entities {
       igraph_t* g = (igraph_t*)VECTOR(components)[i];
 
       if (igraph_vcount(g)) {
-        molecules.push_back(Molecule(
-          &this->box, g, MoleculeType::UNDEFINED, this->massPerType));
+        molecules.push_back(
+          Molecule(&this->box, g, MoleculeType::UNDEFINED, this->massPerType));
       }
     }
     igraph_decompose_destroy(&components);
@@ -1516,7 +1516,8 @@ namespace entities {
    * @param crosslinkerType
    * @return double
    */
-  double Universe::computeWeightAverageMolecularWeight(int crosslinkerType) const
+  double Universe::computeWeightAverageMolecularWeight(
+    int crosslinkerType) const
   {
     double weightAverage = 0.0;
 
@@ -1539,7 +1540,8 @@ namespace entities {
    * @param crosslinkerType
    * @return double
    */
-  double Universe::computeNumberAverageMolecularWeight(int crosslinkerType) const
+  double Universe::computeNumberAverageMolecularWeight(
+    int crosslinkerType) const
   {
     double weightAverage = 0.0;
 
@@ -1600,7 +1602,51 @@ namespace entities {
 
   size_t Universe::getNrOfBonds() const { return this->NBonds; }
 
-  void Universe::setBox(Box passedBox) { this->box = passedBox; }
+  void Universe::setBox(Box passedBox, bool rescaleAtomCoordinates)
+  {
+    if (rescaleAtomCoordinates) {
+      double scalingFactorX = passedBox.getLx() / this->box.getLx();
+      double offsetX =
+        passedBox.getLowX() - scalingFactorX * this->box.getLowX();
+      igraph_vector_t xValueVec;
+      igraph_vector_init(&xValueVec, this->getNrOfAtoms());
+      igraph_cattribute_VANV(&this->graph, "x", igraph_vss_all(), &xValueVec);
+
+      double scalingFactorY = passedBox.getLy() / this->box.getLy();
+      double offsetY =
+        passedBox.getLowY() - scalingFactorY * this->box.getLowY();
+      igraph_vector_t yValueVec;
+      igraph_vector_init(&yValueVec, this->getNrOfAtoms());
+      igraph_cattribute_VANV(&this->graph, "y", igraph_vss_all(), &yValueVec);
+
+      double scalingFactorZ = passedBox.getLz() / this->box.getLz();
+      double offsetZ =
+        passedBox.getLowZ() - scalingFactorZ * this->box.getLowZ();
+      igraph_vector_t zValueVec;
+      igraph_vector_init(&zValueVec, this->getNrOfAtoms());
+      igraph_cattribute_VANV(&this->graph, "z", igraph_vss_all(), &zValueVec);
+
+      for (size_t i = 0; i < this->getNrOfAtoms(); ++i) {
+        igraph_vector_set(&xValueVec,
+                          i,
+                          igraph_vector_e(&xValueVec, i) * scalingFactorX +
+                            offsetX);
+        igraph_vector_set(&yValueVec,
+                          i,
+                          igraph_vector_e(&yValueVec, i) * scalingFactorY +
+                            offsetY);
+        igraph_vector_set(&zValueVec,
+                          i,
+                          igraph_vector_e(&zValueVec, i) * scalingFactorZ +
+                            offsetZ);
+      }
+
+      igraph_cattribute_VAN_setv(&this->graph, "x", &xValueVec);
+      igraph_cattribute_VAN_setv(&this->graph, "y", &yValueVec);
+      igraph_cattribute_VAN_setv(&this->graph, "z", &zValueVec);
+    }
+    this->box = passedBox;
+  }
 
   void Universe::setBoxLengths(const double Lx,
                                const double Ly,

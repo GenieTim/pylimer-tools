@@ -63,7 +63,7 @@ namespace entities {
                    std::vector<long int> via,
                    std::vector<long int> to);
     void setMasses(std::map<int, double> massPerType);
-    void setBox(Box box);
+    void setBox(Box box, bool rescaleAtomCoordinates = false);
     void setTimestep(long int timestep) { this->timestep = timestep; };
     void simplify();
 

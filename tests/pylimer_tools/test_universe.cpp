@@ -88,6 +88,27 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     CHECK(universe.getNrOfBonds() == 0);
     REQUIRE_THROWS(universe.getIdxByAtomId(1000));
 
+    SECTION("Atom coordinates can be rescaled")
+    {
+      REQUIRE(universe.getVolume() == 1.0);
+      REQUIRE(universe.getAtom(0).getX() == 0.0);
+      REQUIRE(universe.getAtom(1).getX() == 1.0);
+      universe.setBox(pe::Box(2.0, 2.0, 2.0), true);
+      REQUIRE(universe.getAtom(0).getX() == 0.0);
+      REQUIRE(universe.getAtom(0).getY() == 0.0);
+      REQUIRE(universe.getAtom(0).getZ() == 0.0);
+      REQUIRE(universe.getAtom(1).getX() == 2.0);
+      REQUIRE(universe.getAtom(1).getY() == 2.0);
+      REQUIRE(universe.getAtom(1).getZ() == 2.0);
+      universe.setBox(pe::Box(1.0, 2.0, 1.0, 2.0, 1.0, 2.0), true);
+      REQUIRE(universe.getAtom(0).getX() == 1.0);
+      REQUIRE(universe.getAtom(0).getY() == 1.0);
+      REQUIRE(universe.getAtom(0).getZ() == 1.0);
+      REQUIRE(universe.getAtom(1).getX() == 2.0);
+      REQUIRE(universe.getAtom(1).getY() == 2.0);
+      REQUIRE(universe.getAtom(1).getZ() == 2.0);
+    }
+
     SECTION("Atoms can be removed")
     {
       universe.addBonds({ { 0, 1, 3, 4 } }, { { 1, 3, 4, 0 } });
