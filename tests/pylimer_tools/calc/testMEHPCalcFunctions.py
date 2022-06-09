@@ -59,32 +59,32 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         self.assertEqual(
             0.0, calculateEffectiveNrDensityOfJunctions([self.testUniverse], 0, 0))
         self.assertEqual(
-            0.0, calculateEffectiveNrDensityOfJunctions([self.testUniverse], 1000, junctionType=2))
+            0.0, calculateEffectiveNrDensityOfJunctions([self.testUniverse], 1000, crosslinkerType=2))
         self.assertEqual(
-            0.0, calculateEffectiveNrDensityOfJunctions([self.emptyUniverse], 1000, junctionType=2))
+            0.0, calculateEffectiveNrDensityOfJunctions([self.emptyUniverse], 1000, crosslinkerType=2))
         # Other border
         # 3 junctions, volume of 1
         self.assertEqual(
-            3.0/self.testUniverse.getVolume(), calculateEffectiveNrDensityOfJunctions([self.testUniverse], 0, junctionType=2, minNumEffectiveStrands=0))
+            3.0/self.testUniverse.getVolume(), calculateEffectiveNrDensityOfJunctions([self.testUniverse], 0, crosslinkerType=2, minNumEffectiveStrands=0))
         # actual calc: 6 & 7 are active, 4 not
         self.assertEqual(
-            2.0/self.testUniverse.getVolume(), calculateEffectiveNrDensityOfJunctions([self.testUniverse], absTol=None, relTol=0, junctionType=2, minNumEffectiveStrands=2))
+            2.0/self.testUniverse.getVolume(), calculateEffectiveNrDensityOfJunctions([self.testUniverse], absTol=None, relTol=0, crosslinkerType=2, minNumEffectiveStrands=2))
         self.assertEqual(
-            2.0/self.testUniverse.getVolume(), calculateEffectiveNrDensityOfJunctions([self.testUniverse], 0, junctionType=2, minNumEffectiveStrands=2))
+            2.0/self.testUniverse.getVolume(), calculateEffectiveNrDensityOfJunctions([self.testUniverse], 0, crosslinkerType=2, minNumEffectiveStrands=2))
 
     def test_effectiveNrDensityOfNetworkCalculation(self):
         self.assertIsNone(calculateEffectiveNrDensityOfNetwork([]))
         self.assertEqual(3, len(self.testUniverse.getMolecules(2)))
         # Border cases
         self.assertEqual(0.0, calculateEffectiveNrDensityOfNetwork(
-            [self.testUniverse], None, 10, junctionType=2))
+            [self.testUniverse], None, 10, crosslinkerType=2))
         self.assertEqual(
-            0.0, calculateEffectiveNrDensityOfNetwork([self.testUniverse], 100, 100, junctionType=2))
+            0.0, calculateEffectiveNrDensityOfNetwork([self.testUniverse], 100, 100, crosslinkerType=2))
         self.assertEqual(
-            0.0, calculateEffectiveNrDensityOfNetwork([self.testUniverse], 1000, 1, junctionType=2))
+            0.0, calculateEffectiveNrDensityOfNetwork([self.testUniverse], 1000, 1, crosslinkerType=2))
         # actual calc: we got 2 active strands in a Volume of 1
         self.assertEqual(
-            2.0/self.testUniverse.getVolume(), calculateEffectiveNrDensityOfNetwork([self.testUniverse], 0, 2, junctionType=2))
+            2.0/self.testUniverse.getVolume(), calculateEffectiveNrDensityOfNetwork([self.testUniverse], 0, 2, crosslinkerType=2))
 
     def test_cycleRankCalculation(self):
         self.assertEqual(1, calculateCycleRank(None, 1, 0))

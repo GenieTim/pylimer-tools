@@ -40,7 +40,7 @@ namespace calc {
 
       for (pylimer_tools::entities::Molecule chain : molecules) {
         std::vector<pylimer_tools::entities::Atom> crosslinkers =
-          chain.getAtomsWithType(crosslinkerType);
+          chain.getAtomsOfType(crosslinkerType);
 
         if (crosslinkers.size() != 2 ||
             chain.getType() ==

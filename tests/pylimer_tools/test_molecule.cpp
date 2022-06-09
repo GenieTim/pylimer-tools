@@ -74,7 +74,7 @@ TEST_CASE("Molecules work as intended", "[entity][Molecule]")
     REQUIRE(bondLengths[0] == Catch::Approx(0.021513));
     REQUIRE(bondLengths[1] == Catch::Approx(6.74369));
     REQUIRE(molecule1.getNrOfAtoms() == 3);
-    REQUIRE(molecule1.computeWeight() == Catch::Approx(3.0));
+    REQUIRE(molecule1.computeTotalMass() == Catch::Approx(3.0));
     REQUIRE(molecule1.getType() == pe::MoleculeType::UNDEFINED);
     REQUIRE(molecule1.computeRadiusOfGyration() == Catch::Approx(0.0));
     REQUIRE_THROWS(molecule1.getIdxByAtomId(19234121));

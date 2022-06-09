@@ -35,7 +35,7 @@ def predictShearModulus(networks: Iterable[Universe], T: float = 1, k_B: float =
     return Gamma*nu*k_B*T
 
 
-def calculateCycleRank(networks: Iterable[Universe] = None, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, junctionType=None) -> float:
+def calculateCycleRank(networks: Iterable[Universe] = None, nu: int = None, mu: int = None, absTol: float = 1, relTol: float = 1, crosslinkerType=None) -> float:
     """
     Compute the cycle rank (:math:`\\chi`).
     Assumes the precursor-chains to be bifunctional.
@@ -46,32 +46,32 @@ def calculateCycleRank(networks: Iterable[Universe] = None, nu: int = None, mu: 
       - mu: number density of the elastically effective crosslink
       - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
       - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
-      - junctionType: the atom type of the crosslinkers/junctions
+      - crosslinkerType: the atom type of the crosslinkers/junctions
 
     No need to provide all the parameters — either/or:
     - nu & mu
-    - network, absTol, relTol, junctionType
+    - network, absTol, relTol, crosslinkerType
 
     Returns:
       - cycleRank: the cycle rank ($\\xi = \\nu_{eff} - \\mu_{eff}$). Unit: [1/Volume]
     """
     if (nu is None):
-        if (junctionType is None or networks is None):
+        if (crosslinkerType is None or networks is None):
             raise ValueError(
-                "Argument missing: When not specifiying nu, network and junctionType need to be specified")
+                "Argument missing: When not specifiying nu, network and crosslinkerType need to be specified")
         nu = calculateEffectiveNrDensityOfNetwork(
-            networks, absTol, relTol, junctionType)
+            networks, absTol, relTol, crosslinkerType)
     if (mu is None):
-        if (junctionType is None or networks is None):
+        if (crosslinkerType is None or networks is None):
             raise ValueError(
-                "Argument missing: When not specifiying mu, network and junctionType need to be specified")
+                "Argument missing: When not specifiying mu, network and crosslinkerType need to be specified")
         mu = calculateEffectiveNrDensityOfJunctions(
-            networks, absTol, relTol, junctionType)
+            networks, absTol, relTol, crosslinkerType)
 
     return nu - mu
 
 
-def calculateEffectiveNrDensityOfNetwork(networks: Iterable[Universe], absTol: float = 1, relTol: float = 1, junctionType=None) -> float:
+def calculateEffectiveNrDensityOfNetwork(networks: Iterable[Universe], absTol: float = 1, relTol: float = 1, crosslinkerType=None) -> float:
     """
     Compute the effective number density :math:`\\nu_{eff}` of a network.
     Assumes the precursor-chains to be bifunctional.
@@ -87,7 +87,7 @@ def calculateEffectiveNrDensityOfNetwork(networks: Iterable[Universe], absTol: f
       - network (pylimer_tools.entities.Universe): the network to compute :math:`\\nu_{eff}` for
       - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
       - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
-      - junctionType: the atom type of the crosslinkers/junctions
+      - crosslinkerType: the atom type of the crosslinkers/junctions
 
     Returns:
       - :math:`\\nu_{eff}` (float): the effective number density of network strands. Unit: [1/Volume]
@@ -96,7 +96,7 @@ def calculateEffectiveNrDensityOfNetwork(networks: Iterable[Universe], absTol: f
         return None
 
     # get the mean end to end distances
-    R_taus = computeMeanEndToEndDistances(networks, junctionType)
+    R_taus = computeMeanEndToEndDistances(networks, crosslinkerType)
     if (len(R_taus) < 1):
         return 0.0
     R_taus = np.array(list(R_taus.values()))
@@ -137,7 +137,7 @@ def calculateMeanUniverseVolume(networks: Iterable[Universe], acceptDifferentSiz
     return meanVolume
 
 
-def calculateEffectiveNrDensityOfJunctions(networks: Iterable[Universe], absTol: float = 0, relTol: float = 1, junctionType=None, minNumEffectiveStrands=2) -> float:
+def calculateEffectiveNrDensityOfJunctions(networks: Iterable[Universe], absTol: float = 0, relTol: float = 1, crosslinkerType=None, minNumEffectiveStrands=2) -> float:
     """
     Compute the number density of the elastically effective crosslinks,
     defined as the ones that connect at least two elastically effective strands.
@@ -150,7 +150,7 @@ def calculateEffectiveNrDensityOfJunctions(networks: Iterable[Universe], absTol:
       - network (pylimer_tools.entities.Universe): the network to compute :math:`\\nu_{eff}` for
       - absTol (float): the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)
       - relTol (float): the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))
-      - junctionType: the atom type of the crosslinkers/junctions
+      - crosslinkerType: the atom type of the crosslinkers/junctions
       - minNumEffectiveStrands (int): the number of elastically effective strands to qualify a junction as such
 
     Returns:
@@ -158,16 +158,16 @@ def calculateEffectiveNrDensityOfJunctions(networks: Iterable[Universe], absTol:
     """
     if (len(networks) < 1):
         return None
-    if (junctionType is None):
+    if (crosslinkerType is None):
         return 0.0
 
     meanVolume = calculateMeanUniverseVolume(networks)
 
     if (minNumEffectiveStrands == 0):
-        return len(networks[0].getAtomsWithType(junctionType))/meanVolume
+        return len(networks[0].getAtomsOfType(crosslinkerType))/meanVolume
 
     # get the mean end to end distances
-    R_taus = computeMeanEndToEndDistances(networks, junctionType)
+    R_taus = computeMeanEndToEndDistances(networks, crosslinkerType)
     if (len(R_taus) < 1):
         return 0.0
     R_tau_max = max(R_taus.values())
@@ -325,7 +325,7 @@ def computeEndToEndVectors(network: Universe, crosslinkerType) -> dict:
     endToEndVectors = {}
     molecules = network.getChainsWithCrosslinker(crosslinkerType)
     for molecule in molecules:
-        crosslinkers = molecule.getAtomsWithType(crosslinkerType)
+        crosslinkers = molecule.getAtomsOfType(crosslinkerType)
         if (len(crosslinkers) != 2 or
             molecule.getType() == MoleculeType.PRIMARY_LOOP or
                 molecule.getType() == MoleculeType.DANGLING_CHAIN):
@@ -343,54 +343,54 @@ def computeEndToEndVectors(network: Universe, crosslinkerType) -> dict:
     return endToEndVectors
 
 
-def computeCrosslinkerConversion(network: Universe, junctionType, f: int = None) -> float:
+def computeCrosslinkerConversion(network: Universe, crosslinkerType, f: int = None) -> float:
     """
     Compute the extent of reaction of the crosslinkers
     (actual functionality divided by target functionality)
 
     Arguments:
       - network: the polymer network to do the computation for
-      - junctionType: the type of the junctions/crosslinkers to select them in the network
+      - crosslinkerType: the type of the junctions/crosslinkers to select them in the network
       - f: the functionality of the crosslinkers
 
     Returns:
       - r (float): the (mean) crosslinker conversion
     """
     if (f is None):
-      f = network.determineFunctionalityPerType()[junctionType]
-    return calculateEffectiveCrosslinkerFunctionality(network, junctionType) / f
+      f = network.determineFunctionalityPerType()[crosslinkerType]
+    return calculateEffectiveCrosslinkerFunctionality(network, crosslinkerType) / f
 
 
-def calculateEffectiveCrosslinkerFunctionality(network: Universe, junctionType) -> float:
+def calculateEffectiveCrosslinkerFunctionality(network: Universe, crosslinkerType) -> float:
     """
     Compute the mean crosslinker functionality
 
     Arguments:
       - network: the polymer network to do the computation for
-      - junctionType: the type of the junctions/crosslinkers to select them in the network
+      - crosslinkerType: the type of the junctions/crosslinkers to select them in the network
 
     Returns:
       - f (float): the (mean) effective crosslinker functionality
     """
     junctionDegrees = calculateEffectiveCrosslinkerFunctionalities(
-        network, junctionType)
+        network, crosslinkerType)
     return np.mean(junctionDegrees)
 
 
-def calculateEffectiveCrosslinkerFunctionalities(network: Universe, junctionType) -> list[int]:
+def calculateEffectiveCrosslinkerFunctionalities(network: Universe, crosslinkerType) -> list[int]:
     """
     Compute the functionality of every crosslinker in the network
 
     Arguments:
       - network: the polymer network to do the computation for
-      - junctionType: the type of the junctions/crosslinkers to select them in the network
+      - crosslinkerType: the type of the junctions/crosslinkers to select them in the network
 
     Returns:
       - junctionDegrees (list[int]): the functionality of every crosslinker
     """
     if (network.getNrOfAtoms() == 0):
         return []
-    junctions = network.getAtomsWithType(junctionType)
+    junctions = network.getAtomsOfType(crosslinkerType)
     junctionIds = [v.getId() for v in junctions]
     junctionDegrees = [network.getNrOfBondsOfAtom(id) for id in junctionIds]
     return junctionDegrees
@@ -425,7 +425,7 @@ def calculateTopologicalFactor(networks: Iterable[Universe], foreignAtomType=Non
     network = networks[0]  # this is where the second assumption is made
     chainsToProcess = network.getChainsWithCrosslinker(foreignAtomType)
     for molecule in chainsToProcess:
-        crosslinkers = molecule.getAtomsWithType(foreignAtomType)
+        crosslinkers = molecule.getAtomsOfType(foreignAtomType)
         if (len(crosslinkers) != 2 or
             molecule.getType() == MoleculeType.PRIMARY_LOOP or
                 molecule.getType() == MoleculeType.DANGLING_CHAIN):

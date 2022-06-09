@@ -1,6 +1,7 @@
 import os
 import unittest
 
+import mock
 import pandas as pd
 from pylimer_tools.io.extractThermoParams import (extractThermoParams,
                                                   getThermoCacheNameSuffix)
@@ -16,10 +17,12 @@ class TestFileReader(PandasComparingTestCase):
     def test_thermoDataReader(self):
         thermoFile = os.path.join(os.path.dirname(
             __file__), "../fixtures/thermo_file.dat")
+        # this header does not include "Volume"
         header = "Step Temp E_pair E_mol TotEng Press"
         readData = extractThermoParams(
             thermoFile, header=header, useCache=False)
         self.assertIsInstance(readData, pd.DataFrame)
+        self.assertTrue("Volume" in readData.columns)
         # read again. this time from cache
         readData2 = extractThermoParams(thermoFile, header=header)
         self.assertIsInstance(readData2, pd.DataFrame)
@@ -35,8 +38,37 @@ class TestFileReader(PandasComparingTestCase):
         # cleanup: delete cache file
         os.remove(getCacheFileName(
             thermoFile, getThermoCacheNameSuffix(header)))
+        # test: empty file
+        emptyData = extractThermoParams(os.path.join(
+            os.path.dirname(__file__), '../fixtures/empty_file.txt'))
+        self.assertTrue(emptyData.empty)
 
-    def testLammpsDataReader(self):
+    @mock.patch('pylimer_tools.io.extractThermoParams.os.remove')
+    def test_cacheDeleteFail(self, mockOsRemove):
+        mockOsRemove.side_effect = Exception
+        thermoFile = os.path.join(os.path.dirname(
+            __file__), "../fixtures/thermo_file.dat")
+        header = "Step Temp E_pair E_mol TotEng Press Volume"
+        readData = extractThermoParams(
+            thermoFile, header=header, useCache=False)
+        self.assertIsInstance(readData, pd.DataFrame)
+        self.assertEqual(" ".join(readData.columns), header)
+        self.assertTrue(mockOsRemove.called)
+
+    @mock.patch('pylimer_tools.io.extractThermoParams.pd.read_csv')
+    def test_pdCsvReadFail(self, mockCsvReader):
+        mockCsvReader.side_effect = Exception
+        thermoFile = os.path.join(os.path.dirname(
+            __file__), "../fixtures/thermo_file.dat")
+        header = "Step Temp E_pair E_mol TotEng Press Volume"
+        with self.assertWarns(Warning):
+            readData = extractThermoParams(
+                thermoFile, header=header, useCache=False)
+            self.assertIsInstance(readData, pd.DataFrame)
+            self.assertTrue(readData.empty)
+            self.assertTrue(mockCsvReader.called)
+
+    def test_LammpsDataReader(self):
         dataFile = os.path.join(os.path.dirname(
             __file__), "../fixtures/lammps_data_file.out")
         universeSequence = UniverseSequence()
@@ -56,7 +88,7 @@ class TestFileReader(PandasComparingTestCase):
         # for key in data:
         #     self.assertEqual(data2[key], data[key])
 
-    def testLammpsDumpReader(self):
+    def test_LammpsDumpReader(self):
         dataFile = os.path.join(os.path.dirname(
             __file__), "../fixtures/lammps_data_file_small.out")
         dumpFile = os.path.join(os.path.dirname(

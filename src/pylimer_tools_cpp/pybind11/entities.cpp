@@ -220,10 +220,10 @@ init_pylimer_bound_entities(py::module_& m)
     .def("getType", &Molecule::getType, R"pbdoc(
            Get the type of this molecule (see :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType` enum).
       )pbdoc")
-    .def("getAtomsWithType", &Molecule::getAtomsWithType, R"pbdoc(
+    .def("getAtomsOfType", &Molecule::getAtomsOfType, R"pbdoc(
             Get the atoms with the specified type.
             )pbdoc")
-    .def("getAtomsWithDegree", &Molecule::getAtomsOfDegree, R"pbdoc(
+    .def("getAtomsOfDegree", &Molecule::getAtomsOfDegree, R"pbdoc(
             Get the atoms that have the specified number of bonds.
             )pbdoc")
     .def("getAtomsConnectedTo", &Molecule::getAtomsConnectedTo, R"pbdoc(
@@ -269,8 +269,8 @@ init_pylimer_bound_entities(py::module_& m)
             Get a unique identifier for this molecule.
             )pbdoc")
     // computations
-    .def("computeWeight", &Molecule::computeWeight, R"pbdoc(
-            Computes the total weight of this molecule.
+    .def("computeTotalMass", &Molecule::computeTotalMass, R"pbdoc(
+            Computes the total mass of this molecule.
             )pbdoc")
     .def("computeBondLengths",
          &Molecule::computeBondLengths,
@@ -327,7 +327,8 @@ init_pylimer_bound_entities(py::module_& m)
     //           return py::make_tuple(molecule.)
     //      }
     // ))
-    ;
+    .def("__copy__",
+         [](const Molecule& molecule) { return Molecule(molecule); });
 
   py::class_<Universe>(
     m,
@@ -358,6 +359,12 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("nx"),
          py::arg("ny"),
          py::arg("nz"))
+    .def("removeAtoms",
+         &Universe::removeAtoms,
+         R"pbdoc(
+          Remove atoms and all associated bonds by their atom ids. 
+          )pbdoc",
+         py::arg("atomIds"))
     .def("addBonds",
          py::overload_cast<std::vector<long int>, std::vector<long int>>(
            &Universe::addBonds),
@@ -392,7 +399,8 @@ init_pylimer_bound_entities(py::module_& m)
          R"pbdoc(
             Override the currently assigned box with the one specified.
             )pbdoc",
-         py::arg("box"))
+         py::arg("box"),
+         py::arg("rescaleAtoms") = false)
     // getters
     .def("getClusters", &Universe::getClusters, R"pbdoc(
             Get the components of the universe that are not connected to each other.
@@ -463,7 +471,7 @@ init_pylimer_bound_entities(py::module_& m)
     .def("getAtoms", &Universe::getAtoms, R"pbdoc(
             Get all atoms.
             )pbdoc")
-    .def("getAtomsWithType", &Universe::getAtomsWithType, R"pbdoc(
+    .def("getAtomsOfType", &Universe::getAtomsOfType, R"pbdoc(
             Find many atom by their type.
             )pbdoc")
     .def(
@@ -564,7 +572,32 @@ init_pylimer_bound_entities(py::module_& m)
             )pbdoc")
     .def("computeMeanStrandLength",
          &Universe::getMeanStrandLength,
-         "Compute the mean strand length.",
+         R"pbdoc(
+              Compute the mean strand length.
+              )pbdoc",
+         py::arg("crosslinkerType"))
+    .def("computeTotalMass", &Universe::computeTotalMass, R"pbdoc(
+          Compute the total mass of this network/universe in whatever mass unit was used when 
+          :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.setMasses()` was called.
+     )pbdoc")
+    .def("computeNumberAverageMolecularWeight",
+         &Universe::computeNumberAverageMolecularWeight,
+         R"pbdoc(
+              Compute the number average molecular weight.
+              )pbdoc",
+         py::arg("crosslinkerType"))
+    .def("computeWeightAverageMolecularWeight",
+         &Universe::computeWeightAverageMolecularWeight,
+         R"pbdoc(
+              Compute the weight average molecular weight.
+              )pbdoc",
+         py::arg("crosslinkerType"))
+    .def("computePolydispersityIndex",
+         &Universe::computePolydispersityIndex,
+         R"pbdoc(
+              Compute the polydispersity indiex: 
+              the weight average molecular weight over the number average molecular weight.
+              )pbdoc",
          py::arg("crosslinkerType"))
     .def("computeWeightFractions", &Universe::computeWeightFractions, R"pbdoc(
             Compute the weight fractions of each atom type in the network.
@@ -615,7 +648,9 @@ init_pylimer_bound_entities(py::module_& m)
     .def("simplify",
          &Universe::simplify,
          "Remove self links and double bonds. This function is called "
-         "automatically after adding bonds.");
+         "automatically after adding bonds.")
+    .def("__copy__",
+         [](const Universe& universe) { return Universe(universe); });
 
   struct LazyUniverseSequenceIterator
   {
@@ -640,11 +675,14 @@ init_pylimer_bound_entities(py::module_& m)
     size_t index = 0; // the index to access
   };
 
-  py::class_<LazyUniverseSequenceIterator>(m, "LazyUniverseSequenceIterator", R"pbdoc(
+  py::class_<LazyUniverseSequenceIterator>(
+    m, "LazyUniverseSequenceIterator", R"pbdoc(
        An iterator to iterate throught the universes in :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence`.
   )pbdoc")
     .def("__iter__",
-         [](LazyUniverseSequenceIterator& it) -> LazyUniverseSequenceIterator& { return it; })
+         [](LazyUniverseSequenceIterator& it) -> LazyUniverseSequenceIterator& {
+           return it;
+         })
     .def("__next__", &LazyUniverseSequenceIterator::next);
 
   py::class_<UniverseSequence>(m, "UniverseSequence", R"pbdoc(

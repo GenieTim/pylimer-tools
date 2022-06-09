@@ -19,12 +19,12 @@ namespace entities {
   Molecule::Molecule(const Box* parent,
                      const igraph_t* ingraph,
                      MoleculeType type,
-                     std::map<int, double> weightPerType)
+                     std::map<int, double> massPerType)
   {
     this->parent = parent;
     this->initializeFromGraph(ingraph);
     this->typeOfThisMolecule = type;
-    this->weightPerType = weightPerType;
+    this->massPerType = massPerType;
   };
 
   void Molecule::initializeFromGraph(const igraph_t* ingraph)
@@ -73,7 +73,7 @@ namespace entities {
     : Molecule(src.parent,
                &src.graph,
                src.typeOfThisMolecule,
-               src.weightPerType){};
+               src.massPerType){};
   // 3. copy assignment operator
   Molecule& Molecule::operator=(Molecule src)
   {
@@ -82,7 +82,7 @@ namespace entities {
     std::swap(this->size, src.size);
     std::swap(this->key, src.key);
     std::swap(this->_boxNoUse, src._boxNoUse);
-    std::swap(this->weightPerType, src.weightPerType);
+    std::swap(this->massPerType, src.massPerType);
     std::swap(this->graph, src.graph);
 
     return *this;
@@ -115,12 +115,12 @@ namespace entities {
    *
    * @return double the total weight
    */
-  double Molecule::computeWeight()
+  double Molecule::computeTotalMass()
   {
     std::vector<int> presentTypes = this->getPropertyValues<int>("type");
     double totalWeight = 0.0;
     for (int type : presentTypes) {
-      totalWeight += this->weightPerType[type];
+      totalWeight += this->massPerType[type];
     }
     return totalWeight;
   }
@@ -176,10 +176,10 @@ namespace entities {
 // TODO: might want to use the raw values, use std::accumulate or std::reduce
 #pragma omp parallel for reduction(+ : meanX, meanY, meanZ)
     for (Atom a : allAtoms) {
-      meanX += this->weightPerType.at(a.getType()) * a.getUnwrappedX(this->parent);
-      meanY += this->weightPerType.at(a.getType()) * a.getUnwrappedY(this->parent);
-      meanZ += this->weightPerType.at(a.getType()) * a.getUnwrappedZ(this->parent);
-      totalMass += this->weightPerType.at(a.getType());
+      meanX += this->massPerType.at(a.getType()) * a.getUnwrappedX(this->parent);
+      meanY += this->massPerType.at(a.getType()) * a.getUnwrappedY(this->parent);
+      meanZ += this->massPerType.at(a.getType()) * a.getUnwrappedZ(this->parent);
+      totalMass += this->massPerType.at(a.getType());
     }
 
     Atom virtualCenterAtom = Atom(0, 0, meanX*multiplier, meanY*multiplier, meanZ*multiplier, 0, 0, 0);
@@ -187,7 +187,7 @@ namespace entities {
     double Rg2 = 0.0;
     for (Atom a : allAtoms) {
       double dist = a.distanceTo(virtualCenterAtom, this->parent);
-      Rg2 += this->weightPerType.at(a.getType()) * dist * dist;
+      Rg2 += this->massPerType.at(a.getType()) * dist * dist;
     }
 
     return Rg2 * multiplier / totalMass;

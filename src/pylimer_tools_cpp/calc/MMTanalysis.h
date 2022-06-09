@@ -18,7 +18,7 @@ namespace calc {
 
     Arguments:
       - network: the poylmer network to do the computation for
-      - junctionType: the type of the junctions/crosslinkers to select them in
+      - crosslinkerType: the type of the junctions/crosslinkers to select them in
     the network
       - strandLength: the length of the network strands (in nr. of beads).
               Used to infer the number of precursor strands.
@@ -33,7 +33,7 @@ namespace calc {
     */
     double computeStoichiometricInbalance(
       pylimer_tools::entities::Universe network,
-      int junctionType,
+      int crosslinkerType,
       int strandLength,
       std::map<int, int> functionalityPerType)
     {
@@ -49,8 +49,8 @@ namespace calc {
 
       // count how often every type occurs
       for (int type : allTypes) {
-        if (type == junctionType) {
-          crosslinkerFormableBonds += functionalityPerType[junctionType];
+        if (type == crosslinkerType) {
+          crosslinkerFormableBonds += functionalityPerType[crosslinkerType];
         } else {
           otherFormableBonds += functionalityPerType[type];
         }

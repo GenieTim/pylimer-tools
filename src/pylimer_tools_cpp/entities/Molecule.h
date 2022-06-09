@@ -31,7 +31,7 @@ namespace entities {
     Molecule(const Box* parent,
              const igraph_t* graph,
              MoleculeType type,
-             std::map<int, double> weightPerType);
+             std::map<int, double> massPerType);
 
     // rule of three:
     // 1. destructor (to destroy the graph)
@@ -59,7 +59,7 @@ namespace entities {
     // computations
     double computeEndToEndDistance();
     double computeRadiusOfGyration();
-    double computeWeight();
+    double computeTotalMass();
     std::vector<double> computeBondLengths()
     {
       return AtomGraphParent::computeBondLengths(this->parent);
@@ -77,7 +77,7 @@ namespace entities {
     MoleculeType typeOfThisMolecule;
     int size;
     std::string key;
-    std::map<int, double> weightPerType;
+    std::map<int, double> massPerType;
     std::unordered_map<int, int> atomIdToVectorIdx;
 
     void initializeFromGraph(const igraph_t* ingraph);

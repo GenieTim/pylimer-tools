@@ -48,6 +48,7 @@ namespace entities {
                   std::vector<int> nx,
                   std::vector<int> ny,
                   std::vector<int> nz);
+    void removeAtoms(std::vector<long int> ids);
     void addBonds(std::vector<long int> from, std::vector<long int> to);
     void addBonds(const size_t NNewBonds,
                   std::vector<long int> from,
@@ -61,8 +62,8 @@ namespace entities {
     void addAngles(std::vector<long int> from,
                    std::vector<long int> via,
                    std::vector<long int> to);
-    void setMasses(std::map<int, double> weightPerType);
-    void setBox(Box box);
+    void setMasses(std::map<int, double> massPerType);
+    void setBox(Box box, bool rescaleAtomCoordinates = false);
     void setTimestep(long int timestep) { this->timestep = timestep; };
     void simplify();
 
@@ -119,11 +120,15 @@ namespace entities {
     {
       return AtomGraphParent::computeBondLengths(&this->box);
     };
-    double getMeanStrandLength(int junctionType);
-    std::vector<double> computeEndToEndDistances(int junctionType);
-    double computeMeanEndToEndDistance(int junctionType);
-    double computeMeanSquareEndToEndDistance(int junctionType);
+    double getMeanStrandLength(int crosslinkerType);
+    std::vector<double> computeEndToEndDistances(int crosslinkerType);
+    double computeMeanEndToEndDistance(int crosslinkerType);
+    double computeMeanSquareEndToEndDistance(int crosslinkerType);
     double computeMeanBondLength();
+    double computeTotalMass() const;
+    double computeWeightAverageMolecularWeight(int crosslinkerType) const;
+    double computeNumberAverageMolecularWeight(int crosslinkerType) const;
+    double computePolydispersityIndex(int crosslinkerType) const;
     bool validate();
 
   protected:
@@ -142,7 +147,7 @@ namespace entities {
 
     // type's properties
     std::map<int, double>
-      weightPerType; // a dictionary with key: type, and value: weight per atom
+      massPerType; // a dictionary with key: type, and value: weight per atom
                      // of this atom type.
 
     // internal functions
