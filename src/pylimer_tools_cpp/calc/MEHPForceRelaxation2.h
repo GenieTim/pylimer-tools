@@ -126,7 +126,6 @@ namespace calc {
                               double tol = 1e-6,            // default: 1e-9
                               double Nb2spec = -1.0,
                               bool is2d = false,
-                              double eps = 0.077,
                               double kappa = 1.0,
                               int deltaViolations = 5,
                               double gradientNormTol = 1e-5)
