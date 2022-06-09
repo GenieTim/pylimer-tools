@@ -6,14 +6,18 @@
 #include "../entities/Universe.h"
 #include "cppoptlib/function.h"
 #include "cppoptlib/solver/bfgs.h"
+#include "cppoptlib/solver/conjugated_gradient_descent.h"
 #include "cppoptlib/solver/gradient_descent.h"
 #include "cppoptlib/solver/newton_descent.h"
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <iomanip>
+#include <iostream>
 #include <map>
 #include <string>
 #include <tuple>
+#include <vector>
 
 namespace pylimer_tools {
 namespace calc {
@@ -43,6 +47,8 @@ namespace calc {
       long int nrOfLoops;         /* loops */
       // coordinates & coonectivity
       Eigen::VectorXd coordinates;
+      Eigen::ArrayXi springCoordinateIndexA;
+      Eigen::ArrayXi springCoordinateIndexB;
       Eigen::ArrayXi springIndexA;
       Eigen::ArrayXi springIndexB;
       // interesting properties
@@ -117,8 +123,8 @@ namespace calc {
                               double gradientNormTol = 1e-5)
       {
         long int i, step, Nact, Mact, a, b;
-        double *r, Fdef;
-        double stress[3][3], r20, G0, r2, G, s20, s2, s20len, s2len;
+        std::vector<double> r;
+        double stress[3][3], G0, r2, G, s20, s2, s20len, s2len;
         Network net = this->finalConfig;
         FILE* fp;
         const int M = this->universe.getMolecules(crosslinkerType).size();
@@ -131,13 +137,14 @@ namespace calc {
 
         Eigen::VectorXd u = Eigen::VectorXd::Zero(3 * net.nrOfNodes);
         /* array allocation */
-        r = (double*)calloc(3 * net.nrOfNodes, sizeof(double));
+        r.reserve(3 * net.nrOfNodes);
 
         /* initial */
         std::tie(s20, s20len) =
           computeStressAndSquareDistances(&net, u, stress, tol);
-        Fdef = Residual(&net, u, r, kappa);
-        for (r20 = 0., i = 0; i < 3 * net.nrOfNodes; i++) {
+        double Fdef = Residual(&net, u, r, kappa);
+        double r20 = 0.;
+        for (size_t i = 0; i < 3 * net.nrOfNodes; i++) {
           r20 += r[i] * r[i];
         }
         G0 = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
@@ -150,13 +157,16 @@ namespace calc {
 
         MEHPForce totalForce = MEHPForce(this->is2D, &net, kappa);
         auto state = totalForce.Eval(u);
+        // assert(state.value == Fdef);
 
         // set the exit conditions
         cppoptlib::solver::State<MEHPForce::scalar_t> myStoppingSolverState;
         myStoppingSolverState.num_iterations = maxNrOfSteps;
-        myStoppingSolverState.x_delta = static_cast<MEHPForce::scalar_t>(tol);
+        myStoppingSolverState.x_delta =
+          static_cast<MEHPForce::scalar_t>(tol * state.value);
         myStoppingSolverState.x_delta_violations = deltaViolations;
-        myStoppingSolverState.f_delta = static_cast<MEHPForce::scalar_t>(tol);
+        myStoppingSolverState.f_delta =
+          static_cast<MEHPForce::scalar_t>(tol * state.value);
         myStoppingSolverState.f_delta_violations = deltaViolations;
         myStoppingSolverState.gradient_norm =
           static_cast<MEHPForce::scalar_t>(gradientNormTol);
@@ -164,6 +174,11 @@ namespace calc {
           static_cast<MEHPForce::scalar_t>(0);
         myStoppingSolverState.status = cppoptlib::solver::Status::NotStarted;
 
+        // cppoptlib::solver::ConjugatedGradientDescent<MEHPForce> solver =
+        //   cppoptlib::solver::ConjugatedGradientDescent<MEHPForce>(
+        //     myStoppingSolverState);
+        // cppoptlib::solver::GradientDescent<MEHPForce> solver =
+        //   cppoptlib::solver::GradientDescent<MEHPForce>(myStoppingSolverState);
         cppoptlib::solver::Bfgs<MEHPForce> solver =
           cppoptlib::solver::Bfgs<MEHPForce>(myStoppingSolverState);
         // cppoptlib::solver::NewtonDescent<MEHPForce> solver =
@@ -193,7 +208,8 @@ namespace calc {
 
         std::cout << "Ran " << solverState.num_iterations
                   << " iterations to a tolerance of " << solverState.x_delta
-                  << ", " << solverState.f_delta << std::endl;
+                  << ", " << solverState.f_delta << " to ourput status "
+                  << solverState.status << std::endl;
 
         // TODO: evaluate solution properties properly
 
@@ -251,7 +267,8 @@ namespace calc {
         }
 
         /* active nodes */
-        Eigen::VectorXi nrOfActiveNodesConnected = Eigen::VectorXi::Zero(net.nrOfNodes);
+        Eigen::VectorXi nrOfActiveNodesConnected =
+          Eigen::VectorXi::Zero(net.nrOfNodes);
         for (i = 0; i < net.nrOfSprings; i++) {
           if (net.springIsActive[i] == true) /* active spring */
           {
@@ -281,9 +298,6 @@ namespace calc {
         this->finalConfig = net;
         this->nrOfActiveNodes = Mact;
         this->nrOfActiveSprings = Nact;
-
-        /** array deallocation */
-        free(r);
       };
 
     protected:
@@ -309,6 +323,10 @@ namespace calc {
         net->coordinates = Eigen::VectorXd::Zero(3 * net->nrOfNodes);
         net->springIndexA = Eigen::ArrayXi::Zero(net->nrOfSprings);
         net->springIndexB = Eigen::ArrayXi::Zero(net->nrOfSprings);
+        net->springCoordinateIndexA =
+          Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
+        net->springCoordinateIndexB =
+          Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
         net->springIsActive = ArrayXb::Constant(net->nrOfSprings, false);
 
         int usualChainLen =
@@ -318,7 +336,7 @@ namespace calc {
         std::vector<pylimer_tools::entities::Atom> allAtoms =
           crosslinkerUniverse.getAtoms();
         std::map<int, int> atomIdToNode;
-        for (int i = 0; i < allAtoms.size(); ++i) {
+        for (size_t i = 0; i < allAtoms.size(); ++i) {
           pylimer_tools::entities::Atom atom = allAtoms[i];
           atomIdToNode[atom.getId()] = i;
           net->coordinates[3 * i + 0] = atom.getX();
@@ -330,12 +348,18 @@ namespace calc {
         std::map<std::string, std::vector<long int>> allBonds =
           crosslinkerUniverse.getBonds();
         net->averageSpringLength = 0;
-        for (int i = 0; i < net->nrOfSprings; ++i) {
+        for (size_t i = 0; i < net->nrOfSprings; ++i) {
           int atomIdFrom = allBonds["bond_from"][i];
           int atomIdTo = allBonds["bond_to"][i];
           net->averageSpringLength += usualChainLen;
           net->springIndexA[i] = atomIdToNode.at(atomIdFrom);
           net->springIndexB[i] = atomIdToNode.at(atomIdTo);
+          for (size_t j = 0; j < 3; j++) {
+            net->springCoordinateIndexA[3 * i + j] =
+              atomIdToNode.at(atomIdFrom) * 3 + j;
+            net->springCoordinateIndexB[3 * i + j] =
+              atomIdToNode.at(atomIdTo) * 3 + j;
+          }
         }
 
         if (crosslinkerUniverse.getNrOfBonds() != net->nrOfSprings) {
@@ -378,7 +402,10 @@ namespace calc {
        * @param r the residual
        * @return the definitive force
        */
-      double Residual(Network* net, const Eigen::VectorXd& u, double* r, double kappa)
+      double Residual(Network* net,
+                      const Eigen::VectorXd& u,
+                      std::vector<double>& r,
+                      double kappa)
       {
         long int glob[6];
         double s[3], ua[3], ub[3], s2, fele[6];
@@ -390,19 +417,23 @@ namespace calc {
         }
 
         /* assembly */
-
         // first, the distances
+        assert(u.size() == net->coordinates.size());
         Eigen::VectorXd actualCoordinates = net->coordinates + u;
         // It *could* be more efficient to index u instead of the coordinates
         Eigen::VectorXd coordinatesSpringEndA =
-          actualCoordinates(net->springIndexA);
+          actualCoordinates(net->springCoordinateIndexA);
         Eigen::VectorXd coordinatesSpringEndB =
-          actualCoordinates(net->springIndexB);
+          actualCoordinates(net->springCoordinateIndexB);
         Eigen::VectorXd springDistances =
           (coordinatesSpringEndA - coordinatesSpringEndB);
+
         if (this->is2D) {
-          springDistances(Eigen::seq(0, Eigen::last, Eigen::fix<3>)) =
-            Eigen::VectorXd::Zero(net->nrOfSprings / 3);
+          // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
+          //   Eigen::VectorXd::Zero(net->nrOfSprings / 3);
+          for (size_t i = 2; i < net->nrOfSprings; i += 3) {
+            springDistances[i] = 0.0;
+          }
         }
 
         // then, the residuals
@@ -457,19 +488,23 @@ namespace calc {
         }
 
         /* assembly */
-
         // first, the distances
+        assert(u.size() == net->coordinates.size());
         Eigen::VectorXd actualCoordinates = net->coordinates + u;
         // It *could* be more efficient to index u instead of the coordinates
         Eigen::VectorXd coordinatesSpringEndA =
-          actualCoordinates(net->springIndexA);
+          actualCoordinates(net->springCoordinateIndexA);
         Eigen::VectorXd coordinatesSpringEndB =
-          actualCoordinates(net->springIndexB);
+          actualCoordinates(net->springCoordinateIndexB);
         Eigen::VectorXd springDistances =
           (coordinatesSpringEndA - coordinatesSpringEndB);
+
         if (this->is2D) {
-          springDistances(Eigen::seq(0, Eigen::last, Eigen::fix<3>)) =
-            Eigen::VectorXd::Zero(net->nrOfSprings / 3);
+          // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
+          //   Eigen::VectorXd::Zero(net->nrOfSprings / 3);
+          for (size_t i = 2; i < net->nrOfSprings; i += 3) {
+            springDistances[i] = 0.0;
+          }
         }
 
         // then, the stresses
@@ -554,25 +589,29 @@ namespace calc {
           boxHalfs[2] = 0.5 * net->L[2];
 
           // actualCoordinates = net->coordinates;
-          // coordinatesSpringEndA = actualCoordinates(net->springIndexA);
-          // coordinatesSpringEndB = actualCoordinates(net->springIndexB);
-          // springDistances = (coordinatesSpringEndA - coordinatesSpringEndB);
+          // coordinatesSpringEndA =
+          // actualCoordinates(net->springCoordinateIndexA);
+          // coordinatesSpringEndB =
+          // actualCoordinates(net->springCoordinateIndexB); springDistances =
+          // (coordinatesSpringEndA - coordinatesSpringEndB);
         }
 
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-        double operator()(const Eigen::VectorXd& u) const
+        double evaluateDistanceSquareNorm(const Eigen::VectorXd& u) const
         {
           Eigen::VectorXd actualCoordinates = net->coordinates + u;
           // It *could* be more efficient to index u instead of the coordinates
           Eigen::VectorXd coordinatesSpringEndA =
-            actualCoordinates(net->springIndexA);
+            actualCoordinates(net->springCoordinateIndexA);
           Eigen::VectorXd coordinatesSpringEndB =
-            actualCoordinates(net->springIndexB);
+            actualCoordinates(net->springCoordinateIndexB);
           Eigen::VectorXd springDistances =
             (coordinatesSpringEndA - coordinatesSpringEndB);
           if (this->is2D) {
-            springDistances(Eigen::seq(0, Eigen::last, Eigen::fix<3>)) =
-              Eigen::VectorXd::Zero(net->nrOfSprings / 3);
+            // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
+            //   Eigen::VectorXd::Zero(net->nrOfSprings / 3);
+            for (size_t i = 2; i < net->nrOfSprings; i += 3) {
+              springDistances[i] = 0.0;
+            }
           }
           // Possibly improvable PBC
           for (size_t j = 0; j < 3 * net->nrOfSprings; j++) {
@@ -584,7 +623,41 @@ namespace calc {
             }
           }
           double s2 = springDistances.squaredNorm();
+          return s2;
+        }
+
+        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+        double operator()(const Eigen::VectorXd& u) const
+        {
+          double s2 = this->evaluateDistanceSquareNorm(u);
+          std::cout << "Evaluated force to " << std::setprecision(15)
+                    << 0.5 * kappa * s2 << std::endl;
           return 0.5 * kappa * s2;
+        }
+
+        void Gradient(const Eigen::VectorXd& u, Eigen::VectorXd* grad) const
+        {
+          Eigen::VectorXd actualCoordinates = net->coordinates + u;
+          // It *could* be more efficient to index u instead of the coordinates
+          Eigen::VectorXd coordinatesSpringEndA =
+            actualCoordinates(net->springCoordinateIndexA);
+          Eigen::VectorXd coordinatesSpringEndB =
+            actualCoordinates(net->springCoordinateIndexB);
+          Eigen::VectorXd springDistances =
+            (coordinatesSpringEndA - coordinatesSpringEndB);
+          for (size_t j = 0; j < 3 * net->nrOfNodes; ++j) {
+            (*grad)[j] = 0.0;
+          }
+          for (size_t j = 0; j < net->nrOfSprings; ++j) {
+            int a = net->springIndexA[j];
+            int b = net->springIndexB[j];
+            for (size_t dir = 0; dir < 3; ++dir) {
+              (*grad)[3 * a + dir] += springDistances[3 * j + dir];
+              (*grad)[3 * b + dir] -= springDistances[3 * j + dir];
+            }
+          }
+          // this implementation neglects the constant factor of
+          // 1/(this.evaluateDistanceSquareNorm(u))
         }
       };
     };
