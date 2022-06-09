@@ -399,7 +399,8 @@ init_pylimer_bound_entities(py::module_& m)
          R"pbdoc(
             Override the currently assigned box with the one specified.
             )pbdoc",
-         py::arg("box"))
+         py::arg("box"),
+         py::arg("rescaleAtoms") = false)
     // getters
     .def("getClusters", &Universe::getClusters, R"pbdoc(
             Get the components of the universe that are not connected to each other.

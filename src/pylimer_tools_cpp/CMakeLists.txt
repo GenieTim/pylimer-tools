@@ -24,7 +24,6 @@ endif()
 # add dependencies
 find_package(Eigen3 3.4 NO_MODULE)
 if(${Eigen3_FOUND})
-		set_package_properties(Eigen3 PROPERTIES TYPE REQUIRED PURPOSE "C++ vector data structures")
 		message(STATUS "Found Eigen3 Version: ${Eigen3_VERSION} Path: ${Eigen3_DIR}")
 else()
 		include(FetchContent)
