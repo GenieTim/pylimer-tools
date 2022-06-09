@@ -122,8 +122,8 @@ namespace calc {
 
       ExitReason getExitReason() { return this->exitReason; }
 
-      void runForceRelaxation(long int maxNrOfSteps = 10000,
-                              double tol = 1e-9,
+      void runForceRelaxation(long int maxNrOfSteps = 1000, // default: 10000
+                              double tol = 1e-6,            // default: 1e-9
                               double Nb2spec = -1.0,
                               bool is2d = false,
                               double eps = 0.077,
@@ -205,6 +205,10 @@ namespace calc {
         }
 
         u = solution.x;
+
+        std::cout << "Ran " << solverState.num_iterations
+                  << " iterations to a tolerance of " << solverState.x_delta
+                  << ", " << solverState.f_delta << std::endl;
 
         // TODO: evaluate solution properties properly
 
@@ -609,6 +613,10 @@ namespace calc {
         Network* net;
         double kappa;
         double boxHalfs[3];
+        // Eigen::VectorXd actualCoordinates;
+        // Eigen::VectorXd coordinatesSpringEndA;
+        // Eigen::VectorXd coordinatesSpringEndB;
+        // Eigen::VectorXd springDistances;
 
       public:
         MEHPForce(bool is2D, Network* net, double kappa)
@@ -619,12 +627,18 @@ namespace calc {
           boxHalfs[0] = 0.5 * net->L[0];
           boxHalfs[1] = 0.5 * net->L[1];
           boxHalfs[2] = 0.5 * net->L[2];
+
+          // actualCoordinates = net->coordinates;
+          // coordinatesSpringEndA = actualCoordinates(net->springIndexA);
+          // coordinatesSpringEndB = actualCoordinates(net->springIndexB);
+          // springDistances = (coordinatesSpringEndA - coordinatesSpringEndB);
         }
 
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
         double operator()(const Eigen::VectorXd& u) const
         {
           Eigen::VectorXd actualCoordinates = net->coordinates + u;
+          // It *could* be more efficient to index u instead of the coordinates
           Eigen::VectorXd coordinatesSpringEndA =
             actualCoordinates(net->springIndexA);
           Eigen::VectorXd coordinatesSpringEndB =
