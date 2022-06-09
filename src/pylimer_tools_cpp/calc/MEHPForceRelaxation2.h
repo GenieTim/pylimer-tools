@@ -136,7 +136,7 @@ namespace calc {
         /* initial */
         std::tie(s20, s20len) =
           computeStressAndSquareDistances(&net, u, stress, tol);
-        Fdef = Residual(&net, u, r);
+        Fdef = Residual(&net, u, r, kappa);
         for (r20 = 0., i = 0; i < 3 * net.nrOfNodes; i++) {
           r20 += r[i] * r[i];
         }
@@ -201,7 +201,7 @@ namespace calc {
         Rx2_sum = 0.0;
         Ry2_sum = 0.0;
         Rz2_sum = 0.0;
-        Fdef = Residual(&net, u, r);
+        Fdef = Residual(&net, u, r, kappa);
         for (r2 = 0., i = 0; i < 3 * net.nrOfNodes; i++) {
           r2 += r[i] * r[i];
           if (i % 3 == 0) {
@@ -378,10 +378,10 @@ namespace calc {
        * @param r the residual
        * @return the definitive force
        */
-      double Residual(Network* net, const Eigen::VectorXd& u, double* r)
+      double Residual(Network* net, const Eigen::VectorXd& u, double* r, double kappa)
       {
         long int glob[6];
-        double kappa, s[3], ua[3], ub[3], s2, fele[6];
+        double s[3], ua[3], ub[3], s2, fele[6];
 
         /* initial */
         double Fdef = 0.;
