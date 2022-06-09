@@ -22,7 +22,20 @@ if (DEFINED ADDITIONAL_LIBS)
 endif()
 
 # add dependencies
-find_package (Eigen3 3.3 REQUIRED NO_MODULE)
+find_package(Eigen3 3.4 NO_MODULE)
+if(${Eigen3_FOUND})
+		set_package_properties(Eigen3 PROPERTIES TYPE REQUIRED PURPOSE "C++ vector data structures")
+		message(STATUS "Found Eigen3 Version: ${Eigen3_VERSION} Path: ${Eigen3_DIR}")
+else()
+		include(FetchContent)
+		FetchContent_Declare(
+			eigen3 
+			GIT_REPOSITORY https://gitlab.com/libeigen/eigen
+			GIT_TAG 3.4.90
+		)
+		FetchContent_MakeAvailable(eigen3)
+endif()
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/CMakeLists.txt)
 
 add_dependencies(pylimer_tools igraph)
