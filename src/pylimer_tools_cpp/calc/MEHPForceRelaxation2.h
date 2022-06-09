@@ -28,39 +28,25 @@ namespace calc {
       OTHER
     };
 
-    // TODO: improve structures by using Eigen
-    typedef struct _Spring
-    {
-      long int a;    /* first node */
-      long int b;    /* second node */
-      long int len;  /* length */
-      bool isActive; /* 1/0; active or not */
-    } Spring;
+    typedef Eigen::Array<bool, Eigen::Dynamic, 1> ArrayXb;
 
-    typedef struct _Node
-    {
-      double x;                     /* x-coordinate */
-      double y;                     /* y-coordinate */
-      double z;                     /* z-coordinate */
-      long int nrOfActiveConnected; /* number of active springs connected to the
-                                       node */
-    } Node;
-
+    // improved structures using Eigen
     typedef struct _Network
     {
       double L[3];                /* box sizes */
       double vol;                 /* box volume */
       long int nrOfNodes;         /* number of nodes */
       long int nrOfSprings;       /* number of springs */
-      Node* nodes;                /* nodes */
-      Spring* springs;            /* spings */
       double* nodalDisplacements; /* nodal displacements */
       double* nodalForces;        /* nodal forces */
       double averageSpringLength; /* average spring length */
       long int nrOfLoops;         /* loops */
+      // coordinates & coonectivity
       Eigen::VectorXd coordinates;
       Eigen::ArrayXi springIndexA;
       Eigen::ArrayXi springIndexB;
+      // interesting properties
+      ArrayXb springIsActive;
     } Network;
 
     using FunctionXd = cppoptlib::function::Function<double>;
@@ -125,7 +111,7 @@ namespace calc {
       void runForceRelaxation(long int maxNrOfSteps = 1000, // default: 10000
                               double tol = 1e-6,            // default: 1e-9
                               double Nb2spec = -1.0,
-                              bool is2d = false,
+                              bool is2D = false,
                               double kappa = 1.0,
                               int deltaViolations = 5,
                               double gradientNormTol = 1e-5)
@@ -141,7 +127,7 @@ namespace calc {
         this->Nb2 = Nb2spec > 0 ? Nb2spec : N; // N * bM * bM;
         const int f =
           this->universe.determineFunctionalityPerType()[crosslinkerType];
-        this->is2d = is2d;
+        this->is2D = is2D;
 
         Eigen::VectorXd u = Eigen::VectorXd::Zero(3 * net.nrOfNodes);
         /* array allocation */
@@ -162,7 +148,7 @@ namespace calc {
         double Ry2_sum = 0.0;
         double Rz2_sum = 0.0;
 
-        MEHPForce totalForce = MEHPForce(this->is2d, &net, kappa);
+        MEHPForce totalForce = MEHPForce(this->is2D, &net, kappa);
         auto state = totalForce.Eval(u);
 
         // set the exit conditions
@@ -242,42 +228,41 @@ namespace calc {
         this->finalPressure = G;
 
         /* output */
-        if (this->outputEndNodes) {
-          fp = fopen(this->endNodesFile.c_str(), "w");
-          fprintf(fp, "%.10f %.10f %.10f\n", net.L[0], net.L[1], net.L[2]);
-          fprintf(fp, "%ld #nodes\n", net.nrOfNodes);
-          fprintf(fp, "%ld #springs\n", net.nrOfSprings);
-          for (i = 0; i < net.nrOfNodes; i++) {
-            fprintf(fp,
-                    "%.16f %.16f %.16f\n",
-                    net.nodes[i].x + u[3 * i],
-                    net.nodes[i].y + u[3 * i + 1],
-                    net.nodes[i].z + u[3 * i + 2]);
-          }
-          fclose(fp);
-        }
+        // if (this->outputEndNodes) {
+        //   fp = fopen(this->endNodesFile.c_str(), "w");
+        //   fprintf(fp, "%.10f %.10f %.10f\n", net.L[0], net.L[1], net.L[2]);
+        //   fprintf(fp, "%ld #nodes\n", net.nrOfNodes);
+        //   fprintf(fp, "%ld #springs\n", net.nrOfSprings);
+        //   for (i = 0; i < net.nrOfNodes; i++) {
+        //     fprintf(fp,
+        //             "%.16f %.16f %.16f\n",
+        //             net.nodes[i].x + u[3 * i],
+        //             net.nodes[i].y + u[3 * i + 1],
+        //             net.nodes[i].z + u[3 * i + 2]);
+        //   }
+        //   fclose(fp);
+        // }
 
         /* active springs */
         for (Nact = 0, i = 0; i < net.nrOfSprings; i++) {
-          if (net.springs[i].isActive == 1) {
+          if (net.springIsActive[i] == 1) {
             ++Nact;
           }
         }
 
         /* active nodes */
-        for (i = 0; i < net.nrOfNodes; i++)
-          net.nodes[i].nrOfActiveConnected = 0; /* initial */
+        Eigen::VectorXi nrOfActiveNodesConnected = Eigen::VectorXi::Zero(net.nrOfNodes);
         for (i = 0; i < net.nrOfSprings; i++) {
-          if (net.springs[i].isActive == 1) /* active spring */
+          if (net.springIsActive[i] == true) /* active spring */
           {
-            a = net.springs[i].a;
-            b = net.springs[i].b;
-            ++(net.nodes[a].nrOfActiveConnected);
-            ++(net.nodes[b].nrOfActiveConnected);
+            a = net.springIndexA[i];
+            b = net.springIndexB[i];
+            ++(nrOfActiveNodesConnected[a]);
+            ++(nrOfActiveNodesConnected[b]);
           }
         }
         for (Mact = 0, i = 0; i < net.nrOfNodes; i++) {
-          if (net.nodes[i].nrOfActiveConnected >= 2) {
+          if (nrOfActiveNodesConnected[i] >= 2) {
             ++Mact;
           }
         }
@@ -299,8 +284,6 @@ namespace calc {
 
         /** array deallocation */
         free(r);
-        free(net.nodes);
-        free(net.springs);
       };
 
     protected:
@@ -324,14 +307,12 @@ namespace calc {
         net->nrOfNodes = crosslinkerUniverse.getNrOfAtoms();
         net->nrOfSprings = crosslinkerUniverse.getNrOfBonds();
         net->coordinates = Eigen::VectorXd::Zero(3 * net->nrOfNodes);
-        net->springIndexA = Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
-        net->springIndexB = Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
+        net->springIndexA = Eigen::ArrayXi::Zero(net->nrOfSprings);
+        net->springIndexB = Eigen::ArrayXi::Zero(net->nrOfSprings);
+        net->springIsActive = ArrayXb::Constant(net->nrOfSprings, false);
 
         int usualChainLen =
           this->universe.getMolecules(crosslinkerType)[0].getNrOfAtoms();
-
-        net->nodes = (Node*)calloc(net->nrOfNodes, sizeof(Node));
-        net->springs = (Spring*)calloc(net->nrOfSprings, sizeof(Spring));
 
         // convert beads
         std::vector<pylimer_tools::entities::Atom> allAtoms =
@@ -339,9 +320,6 @@ namespace calc {
         std::map<int, int> atomIdToNode;
         for (int i = 0; i < allAtoms.size(); ++i) {
           pylimer_tools::entities::Atom atom = allAtoms[i];
-          net->nodes[i].x = atom.getX();
-          net->nodes[i].y = atom.getY();
-          net->nodes[i].z = atom.getZ();
           atomIdToNode[atom.getId()] = i;
           net->coordinates[3 * i + 0] = atom.getX();
           net->coordinates[3 * i + 1] = atom.getY();
@@ -355,9 +333,6 @@ namespace calc {
         for (int i = 0; i < net->nrOfSprings; ++i) {
           int atomIdFrom = allBonds["bond_from"][i];
           int atomIdTo = allBonds["bond_to"][i];
-          net->springs[i].a = atomIdToNode.at(atomIdFrom);
-          net->springs[i].b = atomIdToNode.at(atomIdTo);
-          net->springs[i].len = usualChainLen;
           net->averageSpringLength += usualChainLen;
           net->springIndexA[i] = atomIdToNode.at(atomIdFrom);
           net->springIndexB[i] = atomIdToNode.at(atomIdTo);
@@ -415,14 +390,29 @@ namespace calc {
         }
 
         /* assembly */
-        for (size_t i = 0; i < net->nrOfSprings; i++) {
-          long int a = net->springs[i].a;
-          long int b = net->springs[i].b;
-          long int len = net->springs[i].len;
-          kappa = 3. / len;
 
-          actualSpringDistance(
-            net->nodes[b], b, net->nodes[a], a, u, s, net->L);
+        // first, the distances
+        Eigen::VectorXd actualCoordinates = net->coordinates + u;
+        // It *could* be more efficient to index u instead of the coordinates
+        Eigen::VectorXd coordinatesSpringEndA =
+          actualCoordinates(net->springIndexA);
+        Eigen::VectorXd coordinatesSpringEndB =
+          actualCoordinates(net->springIndexB);
+        Eigen::VectorXd springDistances =
+          (coordinatesSpringEndA - coordinatesSpringEndB);
+        if (this->is2D) {
+          springDistances(Eigen::seq(0, Eigen::last, Eigen::fix<3>)) =
+            Eigen::VectorXd::Zero(net->nrOfSprings / 3);
+        }
+
+        // then, the residuals
+        for (size_t i = 0; i < net->nrOfSprings; i++) {
+          double s[3] = { springDistances[3 * i + 0],
+                          springDistances[3 * i + 1],
+                          springDistances[3 * i + 2] };
+          ImposePBC(s, net->L);
+          int a = net->springIndexA[i];
+          int b = net->springIndexB[i];
 
           /* energy update */
           s2 = 0.;
@@ -458,7 +448,7 @@ namespace calc {
         double stress[3][3],
         double tol)
       {
-        double kappa, s[3], ua[3], ub[3], s2 = 0, s2len = 0;
+        double kappa, s2 = 0, s2len = 0;
 
         for (size_t j = 0; j < 3; j++) {
           for (size_t k = 0; k < 3; k++) {
@@ -467,29 +457,27 @@ namespace calc {
         }
 
         /* assembly */
+
+        // first, the distances
+        Eigen::VectorXd actualCoordinates = net->coordinates + u;
+        // It *could* be more efficient to index u instead of the coordinates
+        Eigen::VectorXd coordinatesSpringEndA =
+          actualCoordinates(net->springIndexA);
+        Eigen::VectorXd coordinatesSpringEndB =
+          actualCoordinates(net->springIndexB);
+        Eigen::VectorXd springDistances =
+          (coordinatesSpringEndA - coordinatesSpringEndB);
+        if (this->is2D) {
+          springDistances(Eigen::seq(0, Eigen::last, Eigen::fix<3>)) =
+            Eigen::VectorXd::Zero(net->nrOfSprings / 3);
+        }
+
+        // then, the stresses
         for (size_t i = 0; i < net->nrOfSprings; i++) {
-          long int a = net->springs[i].a;
-          long int b = net->springs[i].b;
-          long int len = net->springs[i].len;
-          if (isnan(a) || isnan(b) || isnan(len)) {
-            std::cout << "ERROR: a or b or len is nan" << a << " " << b << " "
-                      << len << std::endl;
-          }
-          // if (len == 0) {
-          //   std::cout << "ERROR: len is 0 " << len << " between a or b " << a
-          //   << " "
-          //             << b << " " << std::endl;
-          //   kappa = 100;
-          // }
-          if (std::fabs(len) > 1e-10) {
-            kappa = 3. / len;
-          } else {
-            kappa = 3e5;
-          }
-
-          actualSpringDistance(
-            net->nodes[b], b, net->nodes[a], a, u, s, net->L);
-
+          double s[3] = { springDistances[3 * i + 0],
+                          springDistances[3 * i + 1],
+                          springDistances[3 * i + 2] };
+          ImposePBC(s, net->L);
           /* spring contribution to the overall stress tensor */
           for (size_t j = 0; j < 3; j++) {
             for (size_t k = 0; k < 3; k++) {
@@ -501,13 +489,14 @@ namespace calc {
 
           /* update */
           s2 += s2local;
-          s2len += s2local / len;
+          s2len += s2local / std::sqrt(s2local);
 
           /* loop count */
-          net->springs[i].isActive = 1;
           if (s2 < tol) {
             net->nrOfLoops++;
-            net->springs[i].isActive = false;
+            net->springIsActive[i] = false;
+          } else {
+            net->springIsActive[i] = true;
           }
         };
 
@@ -521,72 +510,9 @@ namespace calc {
                               s2len / (double)net->nrOfSprings);
       }
 
-      /**
-       * @brief Get the actual distance between two nodes
-       *
-       * @param a node a
-       * @param indexA the index of the first node (needed for indexing into u)
-       * @param b
-       * @param indexB the index of the second node (needed for indexing into u)
-       * @param u the displacement vector
-       * @param coords the vector to write the coordinates into
-       * @param boxL the box side lengths
-       */
-      void actualSpringDistance(const Node a,
-                                const int indexA,
-                                const Node b,
-                                const int indexB,
-                                const Eigen::VectorXd& u,
-                                double* coords,
-                                double* boxL)
-      {
-        double s[3], ua[3], ub[3];
-
-        /* initial spring vector */
-        coords[0] = a.x - b.x;
-        coords[1] = a.y - b.y;
-        coords[2] = a.z - b.z;
-
-        /* spring displacement vectors */
-        for (size_t j = 0; j < 3; j++) {
-          ua[j] = u[3 * indexA + j];
-          ub[j] = u[3 * indexB + j];
-        }
-
-        /* current spring vector */
-        for (size_t j = 0; j < 3; j++) {
-          coords[j] += ub[j] - ua[j];
-        }
-
-        /* periodic boundary conditions */
-        ImposePBC(coords, boxL);
-      }
-
-      /**
-       * @brief Compute the distance between two nodes
-       *
-       * @param a the first node
-       * @param b the second node
-       * @param coords the array to write the distances in
-       * @param boxL the box sizes
-       */
-      void actualSpringDistance(Node a,
-                                Node b,
-                                double (&coords)[3],
-                                double* boxL)
-      {
-        /* initial spring vector */
-        coords[0] = a.x - b.x;
-        coords[1] = a.y - b.y;
-        coords[2] = this->is2d ? 0.0 : a.z - b.z;
-
-        /* periodic boundary conditions */
-        ImposePBC(coords, boxL);
-      }
-
     private:
       pylimer_tools::entities::Universe universe;
-      bool is2d = false;
+      bool is2D = false;
       int stepOutputFrequency = 0;
       std::string stepOutputFile;
       bool outputEndNodes = false;
