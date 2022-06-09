@@ -141,3 +141,4 @@ _cmake_test_compile
 
 docs/_autosummary
 pylimer_tools_lcoverage.info
+tests/pylimer_tools/fixtures/xlinked_0.90015_pdms_1e4_a_78_bs_t_807536.structure.out
