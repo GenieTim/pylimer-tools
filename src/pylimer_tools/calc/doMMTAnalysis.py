@@ -155,7 +155,8 @@ def calculateWeightFractionOfBackbone(network: Universe, crosslinkerType: int, s
         W_sol = measureWeightFractioOfSolubleMaterial(network)
 
     Phi_el = 0
-    W_a = weightFractions[crosslinkerType]/functionalityPerType[crosslinkerType]
+    W_a = weightFractions[crosslinkerType] / \
+        functionalityPerType[crosslinkerType]
     W_xl = weightFractions[crosslinkerType]
     W_x2 = 1-W_xl
     assert(W_a <= 1 and W_a >= 0)
@@ -248,7 +249,8 @@ def computeWeightFractionOfSolubleMaterial(network: Universe = None, crosslinker
         p = computeExtentOfReaction(
             network, crosslinkerType, functionalityPerType=functionalityPerType)
         if (p < 0 or p >= 1):
-            warnings.warn("The p computed ({}) is outside the accepted range. Falling back to effective cross-linker functionality.".format(p))
+            warnings.warn(
+                "The p computed ({}) is outside the accepted range. Falling back to effective cross-linker functionality.".format(p))
             p = mehp.calculateEffectiveCrosslinkerFunctionality(
                 network, crosslinkerType)
     if (r is None):
@@ -313,7 +315,7 @@ def computeMMsProbabilities(r, p, f):
     return alpha, beta
 
 
-def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crosslinkerType: int = None, r: float = None, p: float = None, f: int = None, nu: float = None, T: pint.Quantity = None, strandLength: int = None, functionalityPerType: dict = None):
+def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crosslinkerType: int = None, r: float = None, p: float = None, f: int = None, nu: float = None, T: pint.Quantity = None, strandLength: int = None, functionalityPerType: dict = None, Ge1=0.22):
     """
     Compute four different estimates of the plateau modulus, using MMT, ANM and PNM.
 
@@ -346,7 +348,8 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crossli
         p = computeExtentOfReaction(
             network, crosslinkerType, strandLength=strandLength)
         if (p < 0 or p >= 1):
-            warnings.warn("The p computed ({}) is outside the accepted range. Falling back to effective cross-linker functionality.".format(p))
+            warnings.warn(
+                "The p computed ({}) is outside the accepted range. Falling back to effective cross-linker functionality.".format(p))
             p = mehp.calculateEffectiveCrosslinkerFunctionality(
                 network, crosslinkerType)
     if (f is None):
@@ -373,8 +376,8 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crossli
     GammaMMT = (2*r/f) * GammaMMTSum
     G_MMT_phantom = GammaMMT*nu*unitStyle.kB*T
     # fraction of elastically effective strands. TODO : check adjustment with r
-    pel = ((1/(p)) - alpha)**2
-    G_MMT_entanglement = 0.22*unitStyle.getUnderlyingUnitRegistry()('MPa')*(pel**2)
+    pel = ((1/(p)) - alpha/p)**2
+    G_MMT_entanglement = Ge1*unitStyle.getUnderlyingUnitRegistry()('MPa')*(pel**2)
     # entanglement part. TODO : check adjustment with r (and where the 0.22 is coming from? Fabian' s fit!)
     return G_MMT_phantom, G_MMT_entanglement, G_ANM, G_PNM
 

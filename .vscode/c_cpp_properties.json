@@ -3,7 +3,9 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/tests/build/_deps/**",
+                "/usr/local/include/eigen3/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

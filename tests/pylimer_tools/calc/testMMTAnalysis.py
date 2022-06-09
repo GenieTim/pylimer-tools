@@ -167,19 +167,19 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
 
         # these results are pretty certain, align with experimental results, confirmed
         G_MMT_phantom, G_MMT_entanglement, G_ANM, G_PNM = computeModulusDecomposition(
-            network=None, unitStyle=unitStyle, crosslinkerType=2, r=1., p=0.95, f=4, nu=4.63241e25*(unitStyle.getUnderlyingUnitRegistry()(
+            network=None, unitStyle=unitStyle, crosslinkerType=2, r=1., p=0.95, f=4, nu=4.69218e25*(unitStyle.getUnderlyingUnitRegistry()(
                 'meter')**-3), T=298*unitStyle.getUnderlyingUnitRegistry()('kelvin')
         )
 
         alpha, beta = computeMMsProbabilities(r=1., p=0.95, f=4.)
         self.assertAlmostEqual(alpha, 0.0983588, places=5)
 
-        self.assertAlmostEqual(G_ANM.to('MPa').magnitude, 0.190641, places=5)
-        self.assertAlmostEqual(G_PNM.to('MPa').magnitude, 0.0953207, places=5)
+        self.assertAlmostEqual(G_ANM.to('MPa').magnitude, 0.193101, places=5)
+        self.assertAlmostEqual(G_PNM.to('MPa').magnitude, 0.0965506, places=5)
         self.assertAlmostEqual(G_MMT_entanglement.to(
-            'MPa').magnitude, 0.182437, places=5)
+            'MPa').magnitude, 0.17851, places=5)
         self.assertAlmostEqual(G_MMT_phantom.to(
-            'MPa').magnitude, 0.0767419, places=5)
+            'MPa').magnitude, 0.0777321, places=5)
 
         # these in turn require further investigation into the involvement of r
         G_MMT_phantom, G_MMT_entanglement, G_ANM, G_PNM = computeModulusDecomposition(
