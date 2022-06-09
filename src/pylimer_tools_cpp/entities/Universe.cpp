@@ -1644,6 +1644,10 @@ namespace entities {
       igraph_cattribute_VAN_setv(&this->graph, "x", &xValueVec);
       igraph_cattribute_VAN_setv(&this->graph, "y", &yValueVec);
       igraph_cattribute_VAN_setv(&this->graph, "z", &zValueVec);
+
+      igraph_vector_destroy(&xValueVec);
+      igraph_vector_destroy(&yValueVec);
+      igraph_vector_destroy(&zValueVec);
     }
     this->box = passedBox;
   }
