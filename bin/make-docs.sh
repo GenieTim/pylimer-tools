@@ -3,7 +3,7 @@
 cd "$(dirname "$0")/.." || exit 10
 # ROOT_DIR=$(pwd)
 
-python -m pip install --verbose --use-feature=in-tree-build . || exit 7
+python -m pip install --verbose . || exit 7
 
 # make sure you have sphinx installed:
 # pip3 install sphinx

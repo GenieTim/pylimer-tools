@@ -31,6 +31,7 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
     REQUIRE(universeSeq.atIndex(0).getNrOfAtoms() == 12);
     REQUIRE(universeSeq.atIndex(0).getNrOfBonds() == 5);
     REQUIRE(universeSeq.atIndex(0).getTimestep() == 70764);
+    REQUIRE(universeSeq.atIndex(0).getMasses()[1] == 1.0);
     auto universes = universeSeq.getAll();
     REQUIRE(universes.size() == 1);
   }
@@ -60,6 +61,25 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
     REQUIRE_THROWS(universeSeq.next());
   }
 
+  SECTION("Missing box is augmented")
+  {
+    universeSeq.initializeFromDumpFile(
+      suspectedPath + "lammps_data_file_small.out",
+      suspectedPath + "lammps_dump_small_no_box.lammpstrj");
+    pe::Universe universe = universeSeq.atIndex(0);
+    REQUIRE(universe.getBox().getLx() ==
+            3.2182950030000001e+01 + 3.2182950030000001e+01);
+  }
+
+  SECTION("Unwrapped atoms are read too")
+  {
+    universeSeq.initializeFromDumpFile(
+      suspectedPath + "lammps_data_file_small.out",
+      suspectedPath + "lammps_dump_small_unwrapped.lammpstrj");
+    pe::Universe universe = universeSeq.atIndex(0);
+    REQUIRE(universe.getNrOfAtoms() == 12);
+  }
+
   SECTION("Angles are read, too")
   {
     universeSeq.initializeFromDataSequence(
@@ -84,18 +104,24 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
     REQUIRE(universeAgain.getNrOfAtoms() == 32);
     REQUIRE(universeAgain.getAtom(1).getX() == universeAgain.getAtom(1).getX());
     // and the last one
-    std::cout << "Requesting last index" << std::endl;
     REQUIRE_THROWS(universeSeq.atIndex(74322));
-    std::cout << "Requesting last existing index" << std::endl;
     pe::Universe thirdUniverse = universeSeq.atIndex(74321);
     REQUIRE(thirdUniverse.getNrOfAtoms() == 32);
     REQUIRE(universeAgain.getAtom(1).getX() != thirdUniverse.getAtom(1).getX());
     // and back again
-    std::cout << "Requesting fourth existing index" << std::endl;
     pe::Universe fourthUniverse = universeSeq.atIndex(9);
     REQUIRE(fourthUniverse.getNrOfAtoms() == 32);
     REQUIRE(fourthUniverse.getAtom(1).getX() !=
             thirdUniverse.getAtom(1).getX());
-
   }
+
+  // SECTION("Some non-commited large file reading works")
+  // {
+  //   universeSeq.initializeFromDumpFile(
+  //     suspectedPath +
+  //     "uncrosslinked_MD_melt_M10000_N79_equil_50M_bs_w_extra_"
+  //                     "chain_near_min.out",
+  //     suspectedPath + "melt_fene_N_78_rev.lammpstrj");
+  //   REQUIRE(universeSeq.getLength() > 8638005/10);
+  // }
 }

@@ -22,11 +22,25 @@ if (DEFINED ADDITIONAL_LIBS)
 endif()
 
 # add dependencies
+find_package(Eigen3 3.4 NO_MODULE)
+if(${Eigen3_FOUND})
+		message(STATUS "Found Eigen3 Version: ${Eigen3_VERSION} Path: ${Eigen3_DIR}")
+else()
+		include(FetchContent)
+		FetchContent_Declare(
+			eigen3 
+			GIT_REPOSITORY https://gitlab.com/libeigen/eigen
+			GIT_TAG 3.4.0
+		)
+		FetchContent_MakeAvailable(eigen3)
+endif()
+
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/CMakeLists.txt)
 
 add_dependencies(pylimer_tools igraph)
 include_directories(${igraph_INCLUDE_DIRS})
-target_link_libraries(pylimer_tools PUBLIC ${igraph_LIBRARIES})
+include_directories(${optim_INCLUDE_DIRS})
+target_link_libraries(pylimer_tools PUBLIC ${igraph_LIBRARIES} Eigen3::Eigen)
 
 message("pylimer_tools includes igraph from ${igraph_INCLUDE_DIRS}")
 

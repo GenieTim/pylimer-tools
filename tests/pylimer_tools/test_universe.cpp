@@ -84,9 +84,45 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                       { { 0, 0 } },
                       { { 0, 0 } });
     REQUIRE(universe.getNrOfAtoms() == 4);
-    CHECK(universe.getAtomsWithType(1).size() == 4);
+    CHECK(universe.getAtomsOfType(1).size() == 4);
     CHECK(universe.getNrOfBonds() == 0);
     REQUIRE_THROWS(universe.getIdxByAtomId(1000));
+
+    SECTION("Atom coordinates can be rescaled")
+    {
+      REQUIRE(universe.getVolume() == 1.0);
+      REQUIRE(universe.getAtom(0).getX() == 0.0);
+      REQUIRE(universe.getAtom(1).getX() == 1.0);
+      universe.setBox(pe::Box(2.0, 2.0, 2.0), true);
+      REQUIRE(universe.getAtom(0).getX() == 0.0);
+      REQUIRE(universe.getAtom(0).getY() == 0.0);
+      REQUIRE(universe.getAtom(0).getZ() == 0.0);
+      REQUIRE(universe.getAtom(1).getX() == 2.0);
+      REQUIRE(universe.getAtom(1).getY() == 2.0);
+      REQUIRE(universe.getAtom(1).getZ() == 2.0);
+      universe.setBox(pe::Box(1.0, 2.0, 1.0, 2.0, 1.0, 2.0), true);
+      REQUIRE(universe.getAtom(0).getX() == 1.0);
+      REQUIRE(universe.getAtom(0).getY() == 1.0);
+      REQUIRE(universe.getAtom(0).getZ() == 1.0);
+      REQUIRE(universe.getAtom(1).getX() == 2.0);
+      REQUIRE(universe.getAtom(1).getY() == 2.0);
+      REQUIRE(universe.getAtom(1).getZ() == 2.0);
+    }
+
+    SECTION("Atoms can be removed")
+    {
+      universe.addBonds({ { 0, 1, 3, 4 } }, { { 1, 3, 4, 0 } });
+      pe::Universe universeCopy = pe::Universe(universe);
+      REQUIRE_NOTHROW(universeCopy.getAtom(3));
+      REQUIRE(universeCopy.getNrOfAtoms() == 4);
+      REQUIRE(universeCopy.getNrOfBonds() == 4);
+      universeCopy.removeAtoms({ { 1, 3 } });
+      REQUIRE(universeCopy.getAtom(4) == universe.getAtom(4));
+      REQUIRE_THROWS(universeCopy.getAtom(3));
+      REQUIRE(universeCopy.validate());
+      REQUIRE(universeCopy.getNrOfAtoms() == 2);
+      REQUIRE(universeCopy.getNrOfBonds() == 1);
+    }
 
     SECTION("molecules are found")
     {
@@ -232,9 +268,9 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       // REQUIRE(bonds["bond_type"][5] == 1);
       // REQUIRE(bonds["bond_type"][6] == 11);
       // get atoms with type returns
-      REQUIRE(universe.getAtomsWithType(2).size() == 3);
-      REQUIRE(universe.getAtomsWithType(1).size() == 5);
-      REQUIRE(universe.getAtomsWithType(0).size() == 0);
+      REQUIRE(universe.getAtomsOfType(2).size() == 3);
+      REQUIRE(universe.getAtomsOfType(1).size() == 5);
+      REQUIRE(universe.getAtomsOfType(0).size() == 0);
     }
 
     SECTION("internal lengths are computed correctly")
@@ -272,9 +308,9 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     {
       // get atoms with type returns atoms with properties
       std::vector<pe::Molecule> molecules = universe.getMolecules(2);
-      REQUIRE(molecules[0].getAtomsWithType(1).size() == 3);
-      REQUIRE(molecules[1].getAtomsWithType(1)[0].getId() == 5);
-      REQUIRE(molecules[2].getAtomsWithType(1)[0].getType() == 1);
+      REQUIRE(molecules[0].getAtomsOfType(1).size() == 3);
+      REQUIRE(molecules[1].getAtomsOfType(1)[0].getId() == 5);
+      REQUIRE(molecules[2].getAtomsOfType(1)[0].getType() == 1);
       // get molecules allows to fetch atoms with degree
       REQUIRE(molecules[0].getAtomsOfDegree(2).size() == 1);
       REQUIRE(molecules[0].getAtomsOfDegree(1).size() == 2);
@@ -292,7 +328,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(chains[0].getAtoms()[0].getX() == 1.25);
       REQUIRE(chains[0].getNrOfAtoms() == 5);
       REQUIRE(chains[0].getKey() == "1-2-3-6-7");
-      REQUIRE(chains[0].getAtomsWithType(2).size() == 2);
+      REQUIRE(chains[0].getAtomsOfType(2).size() == 2);
       //
       auto functionalityPerType = universe.determineFunctionalityPerType();
       REQUIRE(functionalityPerType[1] == 2);
@@ -359,7 +395,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     {
       pe::Universe reducedUniverse = universe.getNetworkOfCrosslinker(2);
       REQUIRE(reducedUniverse.getNrOfAtoms() == 3);
-      REQUIRE(reducedUniverse.getAtomsWithType(2).size() == 3);
+      REQUIRE(reducedUniverse.getAtomsOfType(2).size() == 3);
 
       auto edges = reducedUniverse.getEdges();
 
@@ -486,5 +522,57 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(newChains[2].getType() == pe::MoleculeType::PRIMARY_LOOP);
       REQUIRE(newChains[2].getKey() == "7-8-9");
     }
+  }
+
+  SECTION("PolyDispersity Calculation")
+  {
+    // as taken from https://www.pslc.ws/macrog/average.htm
+    std::vector<int> nrOfMolecules = {
+      { 1, 3, 5, 8, 10, 13, 20, 13, 10, 8, 5, 3, 1 }
+    };
+    std::vector<double> massOfMolecules = {
+      { 8, 7.5, 7, 6.5, 6, 5.5, 5, 4.5, 4, 3.5, 3., 2.5, 2 }
+    };
+
+    std::map<int, double> weights;
+    int currentId = 0;
+
+    std::vector<double> oneZeroDouble;
+    oneZeroDouble.push_back(0.0);
+    std::vector<int> oneZeroInt;
+    oneZeroInt.push_back(0);
+
+    // first, add these molecules as single atoms to the universe
+    for (int i = 0; i < nrOfMolecules.size(); ++i) {
+      std::vector<int> type;
+      type.push_back(i);
+      // this is slow and could easily be optimized, but whatever
+      for (int j = 0; j < nrOfMolecules[i]; ++j) {
+        std::vector<long int> atomId;
+        atomId.push_back(currentId);
+        universe.addAtoms(1,
+                          atomId,
+                          type,
+                          oneZeroDouble,
+                          oneZeroDouble,
+                          oneZeroDouble,
+                          oneZeroInt,
+                          oneZeroInt,
+                          oneZeroInt);
+        currentId += 1;
+      }
+      weights.emplace(i, massOfMolecules[i] * 100000.);
+    }
+    universe.setMasses(weights);
+    // some asserts that everything has been correcly set by the test
+    REQUIRE(universe.getMolecules(-1).size() == 100);
+    REQUIRE(currentId == 100);
+    // then, do the calculation
+    REQUIRE(universe.computeTotalMass() == Catch::Approx(50000000));
+    REQUIRE(universe.computeNumberAverageMolecularWeight(-1) ==
+            Catch::Approx(500000));
+    REQUIRE(universe.computeWeightAverageMolecularWeight(-1) ==
+            Catch::Approx(531600));
+    REQUIRE(universe.computePolydispersityIndex(-1) == Catch::Approx(1.0632));
   }
 }

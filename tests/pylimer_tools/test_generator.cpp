@@ -53,8 +53,8 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
 
   SECTION("Nrs of chains is correct")
   {
-    REQUIRE(universe.getAtomsWithType(2).size() == 100);
-    REQUIRE(universe.getAtomsWithType(1).size() == (4 / 2) * 100 * 16);
+    REQUIRE(universe.getAtomsOfType(2).size() == 100);
+    REQUIRE(universe.getAtomsOfType(1).size() == (4 / 2) * 100 * 16);
     REQUIRE(universe.getMolecules(2).size() == (4 / 2) * 100 + 100);
   }
 
@@ -112,5 +112,5 @@ TEST_CASE("Large Universe can be generated", "[generator][MCUniverseGenerator]")
 
   pe::Universe universe = generator.getUniverse();
   REQUIRE(universe.getVolume() == 10.0 * 10.0 * 10.0);
-  REQUIRE(universe.getAtomsWithType(2).size() == 1200);
+  REQUIRE(universe.getAtomsOfType(2).size() == 1200);
 }

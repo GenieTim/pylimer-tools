@@ -78,7 +78,7 @@ namespace entities {
     // using copy assignement operators ourselfes
     this->box = src.box;
     this->atomIdToVectorIdx = src.atomIdToVectorIdx;
-    this->weightPerType = src.weightPerType;
+    this->massPerType = src.massPerType;
     igraph_copy(&this->graph, &src.graph);
   };
 
@@ -94,7 +94,7 @@ namespace entities {
     std::swap(this->box, src.box);
     std::swap(this->graph, src.graph);
     std::swap(this->atomIdToVectorIdx, src.atomIdToVectorIdx);
-    std::swap(this->weightPerType, src.weightPerType);
+    std::swap(this->massPerType, src.massPerType);
 
     return *this;
   };
@@ -185,6 +185,36 @@ namespace entities {
     }
     // this->NAtoms += NNewAtoms;
     this->NAtoms = igraph_vcount(&this->graph);
+  }
+
+  void Universe::removeAtoms(std::vector<long int> ids)
+  {
+    igraph_vector_t vertexIds;
+    igraph_vector_init(&vertexIds, ids.size());
+    for (size_t i = 0; i < ids.size(); ++i) {
+      igraph_vector_set(&vertexIds, i, this->getIdxByAtomId(ids[i]));
+    }
+    igraph_delete_vertices(&this->graph, igraph_vss_vector(&vertexIds));
+    igraph_vector_destroy(&vertexIds);
+
+    // now, we need to update the id-atomId map
+    this->atomIdToVectorIdx.clear();
+
+    igraph_vs_t allVertexIds;
+    igraph_vs_all(&allVertexIds);
+    igraph_vit_t vit;
+    igraph_vit_create(&this->graph, allVertexIds, &vit);
+    while (!IGRAPH_VIT_END(vit)) {
+      long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
+      this->atomIdToVectorIdx.emplace(VAN(&this->graph, "id", vertexId),
+                                      vertexId);
+      IGRAPH_VIT_NEXT(vit);
+    }
+    igraph_vit_destroy(&vit);
+    igraph_vs_destroy(&allVertexIds);
+
+    this->NAtoms = igraph_vcount(&this->graph);
+    this->NBonds = igraph_ecount(&this->graph);
   }
 
   void Universe::addBonds(std::vector<long int> from, std::vector<long int> to)
@@ -306,14 +336,14 @@ namespace entities {
   /**
    * @brief Set the masses of the atoms in this universe
    *
-   * @param weightPerType the weight per type
+   * @param massPerType the weight per type
    */
-  void Universe::setMasses(std::map<int, double> weightPerType)
+  void Universe::setMasses(std::map<int, double> massPerType)
   {
-    this->weightPerType = weightPerType;
+    this->massPerType = massPerType;
   }
 
-  std::map<int, double> Universe::getMasses() { return this->weightPerType; };
+  std::map<int, double> Universe::getMasses() { return this->massPerType; };
 
   /**
    * @brief Get the standalone components of the network
@@ -341,8 +371,8 @@ namespace entities {
       igraph_t* g = (igraph_t*)VECTOR(components)[i];
 
       if (igraph_vcount(g)) {
-        molecules.push_back(Molecule(
-          &this->box, g, MoleculeType::UNDEFINED, this->weightPerType));
+        molecules.push_back(
+          Molecule(&this->box, g, MoleculeType::UNDEFINED, this->massPerType));
       }
     }
     igraph_decompose_destroy(&components);
@@ -405,8 +435,8 @@ namespace entities {
       igraph_t* g = (igraph_t*)VECTOR(components)[i];
 
       if (igraph_vcount(g)) {
-        molecules.push_back(Molecule(
-          &this->box, g, MoleculeType::UNDEFINED, this->weightPerType));
+        molecules.push_back(
+          Molecule(&this->box, g, MoleculeType::UNDEFINED, this->massPerType));
       }
     }
     igraph_decompose_destroy(&components);
@@ -628,7 +658,7 @@ namespace entities {
 
       // finally, create the molecule/chain
       molecules.push_back(
-        Molecule(&this->box, chain, molType, this->weightPerType));
+        Molecule(&this->box, chain, molType, this->massPerType));
     }
     igraph_decompose_destroy(&components);
     igraph_vector_ptr_destroy(&components);
@@ -945,9 +975,9 @@ namespace entities {
     std::vector<int> types = this->getPropertyValues<int>("type");
     double totalMass = 0.0;
     for (int type : types) {
-      totalMass += this->weightPerType.at(type);
+      totalMass += this->massPerType.at(type);
       partialMasses.try_emplace(type, 0.0);
-      partialMasses[type] += this->weightPerType.at(type);
+      partialMasses[type] += this->massPerType.at(type);
     }
 
     if (totalMass == 0.0) {
@@ -1322,12 +1352,12 @@ namespace entities {
   /**
    * @brief Get the mean number of beads between beads with the passed type
    *
-   * @param junctionType
+   * @param crosslinkerType
    * @return double
    */
-  double Universe::getMeanStrandLength(int junctionType)
+  double Universe::getMeanStrandLength(int crosslinkerType)
   {
-    std::vector<Molecule> molecules = this->getMolecules(junctionType);
+    std::vector<Molecule> molecules = this->getMolecules(crosslinkerType);
 
     double multiplier = 1.0 / molecules.size();
     double meanStrandLength = 0;
@@ -1344,13 +1374,13 @@ namespace entities {
    * Does not take loops into account as a contributor to the mean.
    * Returns 0 for systems without any qualifying strands.
    *
-   * @param junctionType
+   * @param crosslinkerType
    * @return double
    */
-  std::vector<double> Universe::computeEndToEndDistances(int junctionType)
+  std::vector<double> Universe::computeEndToEndDistances(int crosslinkerType)
   {
     std::vector<Molecule> molecules =
-      this->getChainsWithCrosslinker(junctionType);
+      this->getChainsWithCrosslinker(crosslinkerType);
 
     double meanEndToEndDistance = 0;
     int validMolecules = 0;
@@ -1371,13 +1401,13 @@ namespace entities {
    * Does not take loops into account as a contributor to the mean.
    * Returns 0 for systems without any qualifying strands.
    *
-   * @param junctionType
+   * @param crosslinkerType
    * @return double
    */
-  double Universe::computeMeanEndToEndDistance(int junctionType)
+  double Universe::computeMeanEndToEndDistance(int crosslinkerType)
   {
     std::vector<Molecule> molecules =
-      this->getChainsWithCrosslinker(junctionType);
+      this->getChainsWithCrosslinker(crosslinkerType);
 
     double meanEndToEndDistance = 0.0;
     int validMolecules = 0;
@@ -1403,13 +1433,13 @@ namespace entities {
    * Does not take loops into account as a contributor to the mean.
    * Returns 0 for systems without any qualifying strands.
    *
-   * @param junctionType
+   * @param crosslinkerType
    * @return double
    */
-  double Universe::computeMeanSquareEndToEndDistance(int junctionType)
+  double Universe::computeMeanSquareEndToEndDistance(int crosslinkerType)
   {
     std::vector<Molecule> molecules =
-      this->getChainsWithCrosslinker(junctionType);
+      this->getChainsWithCrosslinker(crosslinkerType);
 
     double meanEndToEndDistance = 0.0;
     int validMolecules = 0;
@@ -1427,6 +1457,21 @@ namespace entities {
     }
 
     return meanEndToEndDistance / static_cast<double>(validMolecules);
+  }
+
+  /**
+   * @brief Compute the total mass of this universe
+   *
+   * @return double
+   */
+  double Universe::computeTotalMass() const
+  {
+    std::vector<int> types = this->getAtomTypes();
+    double weight = 0.0;
+    for (int i = 0; i < types.size(); i++) {
+      weight += this->massPerType.at(types[i]);
+    }
+    return weight;
   }
 
   /**
@@ -1463,6 +1508,65 @@ namespace entities {
     igraph_eit_destroy(&bondIterator);
     return length / (double)this->getNrOfBonds();
   }
+  /**
+   * @brief Compute the weight average molecular weight
+   *
+   * @source https://www.pslc.ws/macrog/average.htm
+   *
+   * @param crosslinkerType
+   * @return double
+   */
+  double Universe::computeWeightAverageMolecularWeight(
+    int crosslinkerType) const
+  {
+    double weightAverage = 0.0;
+
+    std::vector<Molecule> molecules = this->getMolecules(crosslinkerType);
+    double totalMass = this->computeTotalMass();
+    double massDivisor = 1.0 / totalMass;
+    for (Molecule molecule : molecules) {
+      double moleculeMass = molecule.computeTotalMass();
+      weightAverage += moleculeMass * moleculeMass * massDivisor;
+    }
+
+    return weightAverage;
+  };
+
+  /**
+   * @brief Compute the number average molecular weight
+   *
+   * @source https://www.pslc.ws/macrog/average.htm
+   *
+   * @param crosslinkerType
+   * @return double
+   */
+  double Universe::computeNumberAverageMolecularWeight(
+    int crosslinkerType) const
+  {
+    double weightAverage = 0.0;
+
+    std::vector<Molecule> molecules = this->getMolecules(crosslinkerType);
+    double totalMass = this->computeTotalMass();
+
+    return totalMass / static_cast<double>(molecules.size());
+  };
+
+  /**
+   * @brief Compute the polydispersity index (weight average molecular weight
+   * over number average molecular weight)
+   *
+   * @source https://www.pslc.ws/macrog/average.htm
+   *
+   * @param crosslinkerType
+   * @return double
+   */
+  double Universe::computePolydispersityIndex(int crosslinkerType) const
+  {
+    // TODO: check assembly whether the double getMolecules() and
+    // computeTotalMass() is cancelled out or not
+    return this->computeWeightAverageMolecularWeight(crosslinkerType) /
+           this->computeNumberAverageMolecularWeight(crosslinkerType);
+  }
 
   /**
    * @brief check whether the internal counts are equal to those of the graph
@@ -1498,7 +1602,51 @@ namespace entities {
 
   size_t Universe::getNrOfBonds() const { return this->NBonds; }
 
-  void Universe::setBox(Box passedBox) { this->box = passedBox; }
+  void Universe::setBox(Box passedBox, bool rescaleAtomCoordinates)
+  {
+    if (rescaleAtomCoordinates) {
+      double scalingFactorX = passedBox.getLx() / this->box.getLx();
+      double offsetX =
+        passedBox.getLowX() - scalingFactorX * this->box.getLowX();
+      igraph_vector_t xValueVec;
+      igraph_vector_init(&xValueVec, this->getNrOfAtoms());
+      igraph_cattribute_VANV(&this->graph, "x", igraph_vss_all(), &xValueVec);
+
+      double scalingFactorY = passedBox.getLy() / this->box.getLy();
+      double offsetY =
+        passedBox.getLowY() - scalingFactorY * this->box.getLowY();
+      igraph_vector_t yValueVec;
+      igraph_vector_init(&yValueVec, this->getNrOfAtoms());
+      igraph_cattribute_VANV(&this->graph, "y", igraph_vss_all(), &yValueVec);
+
+      double scalingFactorZ = passedBox.getLz() / this->box.getLz();
+      double offsetZ =
+        passedBox.getLowZ() - scalingFactorZ * this->box.getLowZ();
+      igraph_vector_t zValueVec;
+      igraph_vector_init(&zValueVec, this->getNrOfAtoms());
+      igraph_cattribute_VANV(&this->graph, "z", igraph_vss_all(), &zValueVec);
+
+      for (size_t i = 0; i < this->getNrOfAtoms(); ++i) {
+        igraph_vector_set(&xValueVec,
+                          i,
+                          igraph_vector_e(&xValueVec, i) * scalingFactorX +
+                            offsetX);
+        igraph_vector_set(&yValueVec,
+                          i,
+                          igraph_vector_e(&yValueVec, i) * scalingFactorY +
+                            offsetY);
+        igraph_vector_set(&zValueVec,
+                          i,
+                          igraph_vector_e(&zValueVec, i) * scalingFactorZ +
+                            offsetZ);
+      }
+
+      igraph_cattribute_VAN_setv(&this->graph, "x", &xValueVec);
+      igraph_cattribute_VAN_setv(&this->graph, "y", &yValueVec);
+      igraph_cattribute_VAN_setv(&this->graph, "z", &zValueVec);
+    }
+    this->box = passedBox;
+  }
 
   void Universe::setBoxLengths(const double Lx,
                                const double Ly,

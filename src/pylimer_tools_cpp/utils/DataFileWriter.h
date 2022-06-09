@@ -178,7 +178,7 @@ namespace utils {
       // to support molecule idxs, we need to adjust the order of atoms output
       // first, we output the crosslinker beads
       std::vector<pylimer_tools::entities::Atom> crosslinkers =
-        this->universe.getAtomsWithType(this->crosslinkerType);
+        this->universe.getAtomsOfType(this->crosslinkerType);
       for (pylimer_tools::entities::Atom crosslinker : crosslinkers) {
         nAtomsOutput += 1;
         this->writeAtom(file, crosslinker, 0, nAtomsOutput);

@@ -1,8 +1,10 @@
+import copy
 import os
 import sys
 import unittest
 
 from pylimer_tools.calc.doMMTAnalysis import *
+from pylimer_tools.io.unitStyles import UnitStyleFactory
 
 if __name__ == '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../"))
@@ -32,6 +34,9 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             self.testUniverse, 2, functionalityPerType={
                 1: 2, 2: 3
             }), ((3*3)/((5*2)/(5/3))))
+        self.testUniverse.addAtoms([100], [3], [0], [0], [0], [0], [0], [0])
+        self.assertEqual(computeStoichiometricInbalance(
+            self.testUniverse, 2, ignoreTypes=[3]), ((3*3)/((5*2)/(5/3))))
 
     def testExtentOfReaction(self):
         self.assertEqual(1.0, computeExtentOfReaction(self.emptyUniverse, 2))
@@ -43,18 +48,65 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertEqual(1, predictGelationPoint(1, 2, 2))
 
     def testShearModulusPrediction(self):
-        self.assertIsNone(predictShearModulus(self.emptyUniverse, 2, None))
+        self.assertRaises(ValueError, lambda: predictShearModulus(
+            self.emptyUniverse, 2, None))
+        self.assertRaises(ValueError, lambda: predictShearModulus(
+            self.emptyUniverse, None))
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
-        self.assertEqual(1.6138142499798294e-07, predictShearModulus(
-            self.saturatedTestUniverse, 2, strandLength=2))
+
+        unitStyleFactory = UnitStyleFactory()
+        unitStyle = unitStyleFactory.getUnitStyle("si")
+        # TODO: find literature motiviation for results fo the functions
+        self.assertAlmostEqual(0.47139710176763516, predictShearModulus(
+            self.saturatedTestUniverse, unitStyle, crosslinkerType=2, strandLength=2).to('MPa').magnitude)
+        self.assertAlmostEqual(0.47139710176763516, predictShearModulus(
+            self.saturatedTestUniverse, unitStyle, crosslinkerType=2, strandLength=2, functionalityPerType={2: 4}).to('MPa').magnitude)
+        self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
+        self.assertAlmostEqual(0.47139710176763516, predictShearModulus(
+            self.saturatedTestUniverse, unitStyle, crosslinkerType=2).to('MPa').magnitude)
+
+    def testPredictNumberDensityOfJunctionPoints(self):
+        self.testUniverse.setMasses({1: 1, 2: 1})
+        self.assertAlmostEqual(predictNumberDensityOfJunctionPoints(
+            self.testUniverse, 2), 0.421824)
+        self.assertRaises(NotImplementedError, lambda: predictNumberDensityOfJunctionPoints(
+            self.testUniverse, 2, functionalityPerType={1: 2, 2: 5}))
+        # TODO: find literature motiviation for results fo the functions
+        self.assertAlmostEqual(predictNumberDensityOfJunctionPoints(
+            self.testUniverse, 2, functionalityPerType={1: 2, 2: 3}), 0.421824)
+        self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
+        self.assertAlmostEqual(predictNumberDensityOfJunctionPoints(
+            self.saturatedTestUniverse, 2, functionalityPerType={1: 2, 2: 4}), 0.149319447)
+
+    def testPredictNumberDensityOfNetworkStrands(self):
+        self.testUniverse.setMasses({1: 1, 2: 1})
+        self.assertAlmostEqual(predictNumberDensityOfNetworkStrands(
+            self.testUniverse, 2), 0.632736)
+        self.assertRaises(NotImplementedError, lambda: predictNumberDensityOfNetworkStrands(
+            self.testUniverse, 2, functionalityPerType={1: 2, 2: 5}))
+        # TODO: find literature motiviation for results fo the functions
+        self.assertAlmostEqual(predictNumberDensityOfNetworkStrands(
+            self.testUniverse, 2, functionalityPerType={1: 2, 2: 3}), 0.632736)
+        self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
+        self.assertAlmostEqual(predictNumberDensityOfNetworkStrands(
+            self.saturatedTestUniverse, 2, functionalityPerType={1: 2, 2: 4}), 0.290919539)
 
     def testWeightFractionCalculations(self):
         self.assertDictEqual(
             {}, computeWeightFractions(self.emptyUniverse))
+
+        self.assertRaises(ValueError, lambda: computeWeightFractions(
+            self.testUniverse))
+
         self.testUniverse.setMasses({1: 1, 2: 1})
         weightFractions = computeWeightFractions(
             self.testUniverse)
         self.assertDictEqual(weightFractions, {1: 1-3./8., 2: 3./8.})
+        testUniverseCopy = copy.copy(self.testUniverse)
+        testUniverseCopy.removeAtoms([1, 2, 3, 4, 5, 6])
+        self.assertTrue(testUniverseCopy.getNrOfAtoms() == 2)
+        self.assertDictEqual(computeWeightFractions(
+            testUniverseCopy), {1: 1./2., 2: 1./2.})
 
     def testSolubleWeightFractionMeasurement(self):
         self.testUniverse.setMasses({1: 1, 2: 1})
@@ -76,7 +128,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertRaises(NotImplementedError, lambda: computeWeightFractionOfSolubleMaterial(
             self.testUniverse, 2, functionalityPerType={1: 1, 2: 3}))
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
-        self.assertEqual((0.25407891551682393, {1: 0.85, 2: 0.15}, 0.8888888888888888, 0.4183006535947712), computeWeightFractionOfSolubleMaterial(
+        self.assertEqual((0.7616671963032368, {1: 0.85, 2: 0.15}, -0.7901234567901235, 0.9915274751876062), computeWeightFractionOfSolubleMaterial(
             self.saturatedTestUniverse, 2, strandLength=2))
 
     # def testProbabilityCalculations(self):
@@ -92,21 +144,55 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             self.emptyUniverse, 2, {}))
         self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
         bb = calculateWeightFractionOfBackbone(
-            self.saturatedTestUniverse, junctionType=2, strandLength=2)
-        self.assertEqual(0.41013824884792627, bb)
+            self.saturatedTestUniverse, crosslinkerType=2, strandLength=2)
+        self.assertEqual(0.00425428467241992, bb)
         self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
         self.assertEqual(1-bb, calculateWeightFractionOfDanglingChains(
             self.saturatedTestUniverse, 2, strandLength=2))
 
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
         # test also as if the functionality was 4
-        # self.assertRaises(ValueError, lambda: calculateWeightFractionOfBackbone(self.saturatedTestUniverse, junctionType=2, functionalityPerType={
+        # self.assertRaises(ValueError, lambda: calculateWeightFractionOfBackbone(self.saturatedTestUniverse, crosslinkerType=2, functionalityPerType={
         #     1: 2, 2: 4
         # }))
         # NOTE: requires a short strand length with these systems, as otherwise, r > 1 which is not supported by the formulas implemented
-        self.assertEqual(0.43792682962864016, calculateWeightFractionOfBackbone(self.saturatedTestUniverse, junctionType=2, strandLength=2, functionalityPerType={
+        self.assertEqual(0.43792682962864016, calculateWeightFractionOfBackbone(self.saturatedTestUniverse, crosslinkerType=2, strandLength=2, functionalityPerType={
             1: 2, 2: 4
         }))
+
+    def testModulusDecompositions(self):
+        unitStyleFactory = UnitStyleFactory()
+        unitStyle = unitStyleFactory.getUnitStyle("si")
+        self.assertAlmostEqual(unitStyle.kb.to('J/K').magnitude, 1.381e-23)
+
+        # these results are pretty certain, align with experimental results, confirmed
+        G_MMT_phantom, G_MMT_entanglement, G_ANM, G_PNM = computeModulusDecomposition(
+            network=None, unitStyle=unitStyle, crosslinkerType=2, r=1., p=0.95, f=4, nu=4.63241e25*(unitStyle.getUnderlyingUnitRegistry()(
+                'meter')**-3), T=298*unitStyle.getUnderlyingUnitRegistry()('kelvin')
+        )
+
+        alpha, beta = computeMMsProbabilities(r=1., p=0.95, f=4.)
+        self.assertAlmostEqual(alpha, 0.0983588, places=5)
+
+        self.assertAlmostEqual(G_ANM.to('MPa').magnitude, 0.190641, places=5)
+        self.assertAlmostEqual(G_PNM.to('MPa').magnitude, 0.0953207, places=5)
+        self.assertAlmostEqual(G_MMT_entanglement.to(
+            'MPa').magnitude, 0.182437, places=5)
+        self.assertAlmostEqual(G_MMT_phantom.to(
+            'MPa').magnitude, 0.0767419, places=5)
+
+        # these in turn require further investigation into the involvement of r
+        G_MMT_phantom, G_MMT_entanglement, G_ANM, G_PNM = computeModulusDecomposition(
+            network=None, unitStyle=unitStyle, crosslinkerType=2, r=1.3, p=0.6465, f=4, nu=1.25981e25*(unitStyle.getUnderlyingUnitRegistry()(
+                'meter')**-3), T=298*unitStyle.getUnderlyingUnitRegistry()('kelvin')
+        )
+
+        self.assertAlmostEqual(G_ANM.to('MPa').magnitude, 0.051846, places=5)
+        self.assertAlmostEqual(G_PNM.to('MPa').magnitude, 0.025923, places=5)
+        self.assertAlmostEqual(G_MMT_entanglement.to(
+            'MPa').magnitude, 0.222255, places=5)
+        self.assertAlmostEqual(G_MMT_phantom.to(
+            'MPa').magnitude, 0.00492674, places=5)
 
 
 if __name__ == '__main__':
