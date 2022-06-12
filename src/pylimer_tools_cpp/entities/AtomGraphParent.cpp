@@ -42,20 +42,46 @@ namespace entities {
   std::vector<long int> AtomGraphParent::getVertexIdxsConnectedTo(
     const long int vertexIdx) const
   {
-    igraph_vs_t adjVs;
-    if (igraph_vs_adj(&adjVs, vertexIdx, IGRAPH_ALL)) {
-      throw std::runtime_error("Failed to find adjacent vertices of vertex.");
-    }
-    igraph_vit_t vit;
-    igraph_vit_create(&this->graph, adjVs, &vit);
+    igraph_es_t edgeSelector;
+    igraph_es_incident(&edgeSelector, vertexIdx, IGRAPH_ALL);
+    igraph_eit_t iterator;
+    igraph_eit_create(&this->graph, edgeSelector, &iterator);
     std::vector<long int> results;
-    results.reserve(IGRAPH_VIT_SIZE(vit));
-    while (!IGRAPH_VIT_END(vit)) {
-      results.push_back(static_cast<long int>(IGRAPH_VIT_GET(vit)));
-      IGRAPH_VIT_NEXT(vit);
+    results.reserve(IGRAPH_EIT_SIZE(iterator));
+    // std::cout << "Expecting " << IGRAPH_EIT_SIZE(iterator) << " edges"
+    //           << std::endl;
+    while (!IGRAPH_EIT_END(iterator)) {
+      long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(iterator));
+
+      int vertex1OfEdge;
+      int vertex2OfEdge;
+      igraph_edge(&this->graph, edgeId, &vertex1OfEdge, &vertex2OfEdge);
+
+      if (vertex1OfEdge == vertexIdx) {
+        results.push_back(vertex2OfEdge);
+      } else {
+        results.push_back(vertex1OfEdge);
+      }
+      IGRAPH_EIT_NEXT(iterator);
     }
-    igraph_vs_destroy(&adjVs);
-    igraph_vit_destroy(&vit);
+
+    igraph_eit_destroy(&iterator);
+    igraph_es_destroy(&edgeSelector);
+
+    // igraph_vs_t adjVs;
+    // if (igraph_vs_adj(&adjVs, vertexIdx, IGRAPH_ALL)) {
+    //   throw std::runtime_error("Failed to find adjacent vertices of vertex.");
+    // }
+    // igraph_vit_t vit;
+    // igraph_vit_create(&this->graph, adjVs, &vit);
+    // std::vector<long int> results;
+    // results.reserve(IGRAPH_VIT_SIZE(vit));
+    // while (!IGRAPH_VIT_END(vit)) {
+    //   results.push_back(static_cast<long int>(IGRAPH_VIT_GET(vit)));
+    //   IGRAPH_VIT_NEXT(vit);
+    // }
+    // igraph_vs_destroy(&adjVs);
+    // igraph_vit_destroy(&vit);
 
     return results;
   }
@@ -81,6 +107,53 @@ namespace entities {
                    });
     return results;
   };
+
+  /**
+   * @brief Get the edge ids of the edges between two vertices
+   *
+   * Main useage: check whether two vertices are connected twice
+   *
+   * @param vertexId1 id of the first vertex
+   * @param vertexId2 id of the second vertex
+   * @return std::vector<long int> the edge ids
+   */
+  std::vector<long int> AtomGraphParent::getEdgeIdsFromTo(
+    const long int vertexId1,
+    const long int vertexId2) const
+  {
+    igraph_es_t edgeSelector;
+    // igraph_es_pairs_small(
+    //   &edgeSelector, IGRAPH_UNDIRECTED, vertexId1, vertexId2, -1);
+    // // igraph_es_fromto(
+    // //   &edgeSelector, igraph_vss_1(vertexId1), igraph_vss_1(vertexId2));
+    // // igraph_es_pairs(
+    // //   &edgeSelector, igraph_vss_1(vertexId1), igraph_vss_1(vertexId2));
+    igraph_es_incident(&edgeSelector, vertexId1, IGRAPH_ALL);
+    igraph_eit_t iterator;
+    igraph_eit_create(&this->graph, edgeSelector, &iterator);
+    std::vector<long int> results;
+    results.reserve(IGRAPH_EIT_SIZE(iterator));
+    // std::cout << "Expecting " << IGRAPH_EIT_SIZE(iterator) << " edges"
+    //           << std::endl;
+    while (!IGRAPH_EIT_END(iterator)) {
+      long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(iterator));
+
+      int vertex1OfEdge;
+      int vertex2OfEdge;
+      igraph_edge(&this->graph, edgeId, &vertex1OfEdge, &vertex2OfEdge);
+
+      if ((vertex1OfEdge == vertexId1 && vertex2OfEdge == vertexId2) ||
+          (vertex1OfEdge == vertexId2 && vertex2OfEdge == vertexId1)) {
+        results.push_back(edgeId);
+      }
+      IGRAPH_EIT_NEXT(iterator);
+    }
+
+    igraph_eit_destroy(&iterator);
+    igraph_es_destroy(&edgeSelector);
+
+    return results;
+  }
 
   /**
    * @brief Get the number Of Atoms

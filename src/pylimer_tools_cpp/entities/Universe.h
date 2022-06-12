@@ -82,6 +82,11 @@ namespace entities {
       const int crosslinkerType,
       const int maxLength = -1,
       bool skipSelfLoops = false) const;
+    std::vector<Atom> findMinimalOrderLoopFrom(
+      const long int loopStart,
+      const long int loopStep1,
+      const int maxLength = -1,
+      bool skipSelfLoops = false) const;
     bool hasInfiniteStrand(const int crosslinkerType,
                            const int maxLength = -1) const;
     std::vector<int> getAtomTypes() const
@@ -148,7 +153,7 @@ namespace entities {
     // type's properties
     std::map<int, double>
       massPerType; // a dictionary with key: type, and value: weight per atom
-                     // of this atom type.
+                   // of this atom type.
 
     // internal functions
     igraph_vs_t getVerticesOfType(const int type) const;

@@ -434,6 +434,22 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("crosslinkerType"),
          py::arg("maxLength") = -1,
          py::arg("skipSelfLoops") = false)
+    .def("findMinimalOrderLoopFrom",
+         &Universe::findMinimalOrderLoopFrom,
+         R"pbdoc(
+            Decompose the Universe into loops.
+            The primary index specifies the degree of the loop.
+
+            CAUTION:
+               There are exponentially many paths between two cross-linkers of a network,
+               and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
+               You can use the maxLength parameter to restrict the algorithm to only search for loops up to a certain length.
+               Use a negative value to find all loops and paths.
+            )pbdoc",
+         py::arg("loopStart"),
+         py::arg("loopStep1"),
+         py::arg("maxLength") = -1,
+         py::arg("skipSelfLoops") = false)
     .def("getChainsWithCrosslinker",
          &Universe::getChainsWithCrosslinker,
          R"pbdoc(
