@@ -437,6 +437,9 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(loops[1][0][0].getId() == 4);
       REQUIRE(loops[1].size() == 1);
       REQUIRE(loops[2].size() == 1);
+      REQUIRE_THAT(loops[2][0],
+                   Catch::Matchers::UnorderedEquals(std::vector<pe::Atom>{
+                     reducedUniverse.getAtom(6), reducedUniverse.getAtom(7) }));
       std::map<std::string, std::vector<long int>> bonds =
         reducedUniverse.getBonds();
       REQUIRE_THAT(
@@ -468,10 +471,14 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                 .getEdgeIdsFromTo(universe.getIdxByAtomId(4),
                                   universe.getIdxByAtomId(9))
                 .size() == 2);
-      REQUIRE_THROWS(reducedUniverse.findMinimalOrderLoopFrom(4, 9, -1, false));
       std::vector<pe::Atom> minimalLoop1 =
         universe.findMinimalOrderLoopFrom(4, 9, -1, false);
       REQUIRE(minimalLoop1.size() == 2);
+      REQUIRE_THROWS(reducedUniverse.findMinimalOrderLoopFrom(4, 9, -1, false));
+
+      std::vector<pe::Atom> minimalLoop5 =
+        reducedUniverse.findMinimalOrderLoopFrom(6, 7, -1, false);
+      REQUIRE(minimalLoop5.size() == 2);
     }
 
     SECTION("Infinite Strands are found")

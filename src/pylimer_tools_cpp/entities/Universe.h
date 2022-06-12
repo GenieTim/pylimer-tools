@@ -70,7 +70,7 @@ namespace entities {
     // getters
     Atom getAtom(const int atomId) const;
     std::vector<Atom> getAtoms();
-    // std::map<std::string, std::vector<long int>> getBonds() const;
+    // std::map<std::st¨ring, std::vector<long int>> getBonds() const;
     std::map<std::string, std::vector<long int>> getAngles() const;
     std::vector<Molecule> getClusters() const;
     std::vector<Molecule> getMolecules(const int atomTypeToOmit = -1) const;

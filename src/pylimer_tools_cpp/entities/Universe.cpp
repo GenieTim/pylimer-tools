@@ -793,7 +793,7 @@ namespace entities {
 
     // First, check the two simplest cases
     // check for self-loops
-    if (!skipSelfLoops) {
+    if (!skipSelfLoops && loopStart == loopStep1) {
       std::vector<long int> crosslinkersBonds =
         this->getVertexIdxsConnectedTo(startingCrosslinkerVertexId);
       if (std::find(crosslinkersBonds.begin(),
