@@ -112,7 +112,13 @@ init_pylimer_bound_calc(py::module_& m)
       )pbdoc")
     .def("getExitReason", &mehp::MEHPForceRelaxation::getExitReason, R"pbdoc(
            Returns the reason for termination of the simulation
-      )pbdoc");
+      )pbdoc")
+    .def("getFinalCrosslinkerVerse",
+         &mehp::MEHPForceRelaxation::getFinalCrosslinkerVerse,
+         R"pbdoc(
+          Returns the universe [of cross-linkers] with the positions of the final configuration [if force relaxation was run]
+    )pbdoc",
+         py::arg("crosslinkerType") = 2);
 }
 
 #endif /* PYBIND_CALC_H */

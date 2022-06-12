@@ -770,6 +770,123 @@ namespace entities {
   };
 
   /**
+   * @brief Find the loops in the network starting with one connection
+   *
+   * NOTE: there are exponentially many paths between two vertices of a graph,
+   * and you may run out of memory when using this function, if your graph is
+   * lattice-like.
+   *
+   * @param loopStart
+   * @param loopStep1
+   * @param maxLength
+   * @return std::vector<Atom>
+   */
+  std::vector<Atom> Universe::findMinimalOrderLoopFrom(const long int loopStart,
+                                                       const long int loopStep1,
+                                                       const int maxLength,
+                                                       bool skipSelfLoops) const
+  {
+    long int startingCrosslinkerVertexId = this->getIdxByAtomId(loopStart);
+    long int nextStepVertexId = this->getIdxByAtomId(loopStep1);
+
+    std::vector<Atom> minimalPath;
+
+    // First, check the two simplest cases
+    // check for self-loops
+    if (!skipSelfLoops) {
+      std::vector<long int> crosslinkersBonds =
+        this->getVertexIdxsConnectedTo(startingCrosslinkerVertexId);
+      if (std::find(crosslinkersBonds.begin(),
+                    crosslinkersBonds.end(),
+                    startingCrosslinkerVertexId) != crosslinkersBonds.end()) {
+        minimalPath.push_back(
+          this->getAtomByVertexIdx(startingCrosslinkerVertexId));
+        return minimalPath;
+      }
+    }
+
+    // check for second order loops
+    if (this->getEdgeIdsFromTo(startingCrosslinkerVertexId, nextStepVertexId)
+          .size() > 1) {
+      minimalPath.push_back(
+        this->getAtomByVertexIdx(startingCrosslinkerVertexId));
+      minimalPath.push_back(this->getAtomByVertexIdx(nextStepVertexId));
+      return minimalPath;
+    }
+
+    // NOTE: there are exponentially many paths between two vertices of a graph,
+    // and you may run out of memory when using this function, if your graph is
+    // lattice-like.
+    // note: this algorithm is not particularly efficient
+    // it is of the order of O(n*n!)
+    std::unordered_set<int> processedPathsKeys;
+
+    // loop neighbours
+    int currentMaxLength = 4;
+    igraph_vector_int_t paths;
+    igraph_vector_int_init(&paths, 0);
+    while (igraph_vector_int_size(&paths) <= 4 &&
+           (maxLength < 0 || currentMaxLength <= maxLength)) {
+      // for this specified neighbour, we search the simple paths
+      // (multiple times as we, for memory issue prevention, increase the )
+      if (igraph_get_all_simple_paths(&this->graph,
+                                      &paths,
+                                      startingCrosslinkerVertexId,
+                                      igraph_vss_1(nextStepVertexId),
+                                      currentMaxLength,
+                                      IGRAPH_ALL)) {
+        throw std::runtime_error("Failed to get simple paths in graph");
+      }
+      if (currentMaxLength == maxLength || currentMaxLength < 1) {
+        break;
+      }
+      currentMaxLength *= 2;
+      if (maxLength > 0 && currentMaxLength > maxLength) {
+        currentMaxLength = maxLength;
+      }
+      if (maxLength < 0 && currentMaxLength > 64) {
+        currentMaxLength = -1;
+      }
+    }
+
+    // translate the paths we found
+    std::vector<Atom> currentPath;
+    long int currentPathKey = 0;
+    size_t n = igraph_vector_int_size(&paths);
+    for (size_t i = 0; i < n; ++i) {
+      const long int currentVal = igraph_vector_int_e(&paths, i);
+      if (currentVal == -1) {
+        // skip self-loops and duplicates
+        bool allowedSelfLoop = (!skipSelfLoops || currentPath.size() > 2);
+        bool secondOrderLoopValid =
+          (currentPath.size() != 2 ||
+           this->getEdgeIdsFromTo(startingCrosslinkerVertexId, nextStepVertexId)
+               .size() > 1);
+        bool alreadyExistingLoop = processedPathsKeys.contains(currentPathKey);
+        if (allowedSelfLoop && !alreadyExistingLoop && secondOrderLoopValid) {
+          bool pathIsNewMinimal = (currentPath.size() <= minimalPath.size() &&
+                                   currentPath.size() > 0) ||
+                                  minimalPath.size() <= 1;
+          if (pathIsNewMinimal) {
+            minimalPath = currentPath;
+          }
+          processedPathsKeys.insert(currentPathKey);
+        }
+        currentPath.clear();
+        currentPathKey = 0;
+      } else {
+        Atom newAtom = this->getAtomByVertexIdx(currentVal);
+        currentPathKey = currentPathKey xor currentVal; // compute hash
+        currentPath.push_back(newAtom);
+      }
+    }
+
+    igraph_vector_int_destroy(&paths);
+
+    return minimalPath;
+  };
+
+  /**
    * @brief Check whether the universe contains a loop that crosses the periodic
    * boundaries an odd times
    *
@@ -1175,6 +1292,33 @@ namespace entities {
           currentCenter = subConnections[subConnectionDirection];
           subConnections = this->getVertexIdxsConnectedTo(currentCenter);
         }
+      }
+    }
+
+    assert(bondTo.size() == bondFrom.size());
+    // with the algorithm above, self-loops are counted twice.
+    // let's just remove the second (and/or fourth) one where needed
+    // NOTE: some assumptions are made here that could be problematic;
+    // for example, that there are not more than 1 self-loops in the beginning
+    std::vector<size_t> indicesToRemove;
+    std::map<int, int> nrOfSelfLoops;
+    for (size_t i = 0; i < bondTo.size(); ++i) {
+      if (bondTo[i] == bondFrom[i]) {
+        if (!nrOfSelfLoops.contains(bondTo[i])) {
+          nrOfSelfLoops.emplace(bondTo[i], 0);
+        }
+        nrOfSelfLoops[bondTo[i]] += 1;
+        if (nrOfSelfLoops.at(bondTo[i]) % 2 == 0) {
+          indicesToRemove.push_back(i);
+        }
+      }
+    }
+    // actually remove them. Reverse in order to not mess with the indices
+    if (indicesToRemove.size() > 0) {
+      // CAUTION: do not use size_t here!
+      for (int i = indicesToRemove.size() - 1; i >= 0; --i) {
+        bondTo.erase(bondTo.begin() + indicesToRemove[i]);
+        bondFrom.erase(bondFrom.begin() + indicesToRemove[i]);
       }
     }
 

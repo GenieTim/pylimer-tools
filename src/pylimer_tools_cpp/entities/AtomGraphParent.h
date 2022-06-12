@@ -33,6 +33,8 @@ namespace entities {
     //   return *this;
     // };
 
+    std::vector<long int> getEdgeIdsFromTo(const long int vertexId1, const long int vertexId2) const;
+
     /**
      * @brief Get the vertex ids connected to a specified vertex Id
      *

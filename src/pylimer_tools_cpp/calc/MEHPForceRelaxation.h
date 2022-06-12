@@ -4,6 +4,7 @@
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
+#include "../utils/VectorUtils.h"
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -309,6 +310,43 @@ namespace calc {
         free(net.nodes);
         free(net.springs);
       };
+
+      pylimer_tools::entities::Universe getFinalCrosslinkerVerse(
+        int crosslinkerType = 2)
+      {
+        // convert nodes & springs back to a universe
+        pylimer_tools::entities::Universe xlinkUniverse =
+          pylimer_tools::entities::Universe(this->universe.getBox());
+        std::vector<long int> ids;
+        std::vector<int> types = pylimer_tools::utils::initializeWithValue(
+          this->finalConfig.nrOfNodes, crosslinkerType);
+        std::vector<double> x;
+        std::vector<double> y;
+        std::vector<double> z;
+        std::vector<int> zeros = pylimer_tools::utils::initializeWithValue(
+          this->finalConfig.nrOfNodes, 0);
+        ids.reserve(this->finalConfig.nrOfNodes);
+        x.reserve(this->finalConfig.nrOfNodes);
+        y.reserve(this->finalConfig.nrOfNodes);
+        z.reserve(this->finalConfig.nrOfNodes);
+        for (int i = 0; i < this->finalConfig.nrOfNodes; ++i) {
+          x.push_back(this->finalConfig.nodes[i].x);
+          y.push_back(this->finalConfig.nodes[i].y);
+          z.push_back(this->finalConfig.nodes[i].z);
+          ids.push_back(i + 1);
+        }
+        xlinkUniverse.addAtoms(ids, types, x, y, z, zeros, zeros, zeros);
+        std::vector<long int> bondFrom;
+        std::vector<long int> bondTo;
+        bondFrom.reserve(this->finalConfig.nrOfSprings);
+        bondTo.reserve(this->finalConfig.nrOfSprings);
+        for (int i = 0; i < this->finalConfig.nrOfSprings; ++i) {
+          bondFrom.push_back(this->finalConfig.springs[i].a + 1);
+          bondTo.push_back(this->finalConfig.springs[i].b + 1);
+        }
+        xlinkUniverse.addBonds(bondFrom, bondTo);
+        return xlinkUniverse;
+      }
 
     protected:
       /**

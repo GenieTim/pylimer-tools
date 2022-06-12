@@ -2,8 +2,10 @@
 #include "../../src/pylimer_tools_cpp/entities/Box.h"
 #include "../../src/pylimer_tools_cpp/entities/Molecule.h"
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
+#include <algorithm>
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 #include <iostream>
 #include <map>
 #include <vector>
@@ -346,6 +348,42 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
         universe.findLoops(2, -1, true);
       REQUIRE(loops.contains(2));
       REQUIRE(loops.size() == 1);
+
+      auto allBonds = universe.getBonds();
+      std::vector<long int> bondsOf1;
+      std::vector<long int> bondsOf2;
+      for (int i = 0; i < allBonds["bond_from"].size(); ++i) {
+        if (allBonds["bond_from"][i] == 1) {
+          bondsOf1.push_back(allBonds["bond_to"][i]);
+        }
+        if (allBonds["bond_from"][i] == 2) {
+          bondsOf2.push_back(allBonds["bond_to"][i]);
+        }
+      }
+      REQUIRE(bondsOf1.size() == 2);
+      REQUIRE_THAT(
+        bondsOf1,
+        Catch::Matchers::UnorderedEquals(std::vector<long int>{ 2, 7 }));
+      REQUIRE(bondsOf2.size() == 1);
+      REQUIRE(bondsOf2[0] == 3);
+      REQUIRE(universe
+                .getEdgeIdsFromTo(universe.getIdxByAtomId(1),
+                                  universe.getIdxByAtomId(2))
+                .size() == 1);
+      std::vector<pe::Atom> minimalLoop1 =
+        universe.findMinimalOrderLoopFrom(1, 2, -1, false);
+      REQUIRE(minimalLoop1.size() == 6);
+      // translate to ids for simpler matching
+      std::vector<int> minimalLoopIds;
+      minimalLoopIds.reserve(minimalLoop1.size());
+      for (pe::Atom a : minimalLoop1) {
+        minimalLoopIds.push_back(a.getId());
+      }
+      REQUIRE(*std::max_element(minimalLoopIds.begin(), minimalLoopIds.end()) ==
+              7);
+      REQUIRE(*std::min_element(minimalLoopIds.begin(), minimalLoopIds.end()) ==
+              1);
+      REQUIRE_THAT(minimalLoopIds, Catch::Matchers::VectorContains(2));
     }
 
     SECTION("Clusters are found")
@@ -358,6 +396,20 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
 
     SECTION("Loops are found in reduced universe")
     {
+      /**
+       * @brief increase system size, reduce to x-linkers, test
+       *
+       * The system looks like this (in terms of bonds, not 3D placement):
+       *
+       * 1-2-3-*6
+       * |      |
+       * *7-5---|
+       * 8
+       *
+       * *4=9
+       *
+       * 10
+       */
       universe.addAtoms(2,
                         { { 9, 10 } },
                         { { 1, 1 } },
@@ -369,6 +421,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                         { { 0, 1 } });
       universe.addBonds(
         2, { { 4, 9 } }, { { 9, 4 } }, { { 1, 1 } }, false, false);
+      REQUIRE(universe.getNrOfBonds() == 2 + 7);
       pe::Universe reducedUniverse = universe.getNetworkOfCrosslinker(2);
       REQUIRE(reducedUniverse.getNrOfAtoms() == 3);
       std::map<int, std::vector<std::vector<pe::Atom>>> loops =
@@ -376,6 +429,49 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(loops.size() == 2);
       REQUIRE(reducedUniverse.getPropertyValues<int>("id").size() == 3);
       REQUIRE(reducedUniverse.getAtomTypes().size() == 3);
+      for (const auto& myPair : loops) {
+        for (const std::vector<pe::Atom> loop : myPair.second) {
+          REQUIRE(loop.size() == myPair.first);
+        }
+      }
+      REQUIRE(loops[1][0][0].getId() == 4);
+      REQUIRE(loops[1].size() == 1);
+      REQUIRE(loops[2].size() == 1);
+      std::map<std::string, std::vector<long int>> bonds =
+        reducedUniverse.getBonds();
+      REQUIRE_THAT(
+        bonds["bond_from"],
+        Catch::Matchers::UnorderedEquals(std::vector<long int>{ 4, 6, 6 }));
+      REQUIRE_THAT(
+        bonds["bond_to"],
+        Catch::Matchers::UnorderedEquals(std::vector<long int>{ 4, 7, 7 }));
+      REQUIRE(reducedUniverse.getNrOfBonds() == 3);
+
+      // second-order loop (in reduced universe)
+      REQUIRE(reducedUniverse
+                .getEdgeIdsFromTo(reducedUniverse.getIdxByAtomId(6),
+                                  reducedUniverse.getIdxByAtomId(7))
+                .size() == 2);
+      std::vector<pe::Atom> minimalLoop2 =
+        reducedUniverse.findMinimalOrderLoopFrom(6, 7, -1, false);
+      REQUIRE(minimalLoop2.size() == 2);
+      std::vector<pe::Atom> minimalLoop4 =
+        universe.findMinimalOrderLoopFrom(6, 5, -1, false);
+      REQUIRE(minimalLoop4.size() == 6);
+      // self-loop
+      std::vector<pe::Atom> minimalLoop3 =
+        reducedUniverse.findMinimalOrderLoopFrom(4, 4, -1, false);
+      REQUIRE(minimalLoop3.size() == 1);
+
+      // second-order loop
+      REQUIRE(universe
+                .getEdgeIdsFromTo(universe.getIdxByAtomId(4),
+                                  universe.getIdxByAtomId(9))
+                .size() == 2);
+      REQUIRE_THROWS(reducedUniverse.findMinimalOrderLoopFrom(4, 9, -1, false));
+      std::vector<pe::Atom> minimalLoop1 =
+        universe.findMinimalOrderLoopFrom(4, 9, -1, false);
+      REQUIRE(minimalLoop1.size() == 2);
     }
 
     SECTION("Infinite Strands are found")
