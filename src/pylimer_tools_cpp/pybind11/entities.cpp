@@ -7,6 +7,7 @@
 #include "../entities/Universe.h"
 #include "../entities/UniverseSequence.h"
 
+#include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
@@ -151,6 +152,8 @@ init_pylimer_bound_entities(py::module_& m)
          &Atom::getNZ,
          "Get the box image that the atom is in in z direction (also known "
          "as `iz` or `nz`).")
+    .def(pybind11::self == pybind11::self)
+    .def(pybind11::self != pybind11::self)
     .def(py::pickle(
            [](const Atom& b) { // __getstate__
              /* Return a tuple that fully encodes the state of the object */

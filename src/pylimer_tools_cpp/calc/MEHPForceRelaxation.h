@@ -344,7 +344,13 @@ namespace calc {
           bondFrom.push_back(this->finalConfig.springs[i].a + 1);
           bondTo.push_back(this->finalConfig.springs[i].b + 1);
         }
-        xlinkUniverse.addBonds(bondFrom, bondTo);
+        xlinkUniverse.addBonds(
+          bondFrom.size(),
+          bondFrom,
+          bondTo,
+          pylimer_tools::utils::initializeWithValue(bondFrom.size(), 1),
+          false,
+          false); // disable simplify to keep the self-loops etc.
         return xlinkUniverse;
       }
 
