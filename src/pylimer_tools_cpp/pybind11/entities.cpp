@@ -153,7 +153,7 @@ init_pylimer_bound_entities(py::module_& m)
          "Get the box image that the atom is in in z direction (also known "
          "as `iz` or `nz`).")
     .def(pybind11::self == pybind11::self)
-    .def(pybind11::self != pybind11::self)
+//     .def(pybind11::self != pybind11::self)
     .def(py::pickle(
            [](const Atom& b) { // __getstate__
              /* Return a tuple that fully encodes the state of the object */
