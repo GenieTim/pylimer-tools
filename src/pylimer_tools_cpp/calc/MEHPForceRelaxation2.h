@@ -52,7 +52,12 @@ namespace calc {
       ArrayXb springIsActive;
     } Network;
 
-    using FunctionXd = cppoptlib::function::Function<double>;
+    typedef struct _AdditionalFunctionParameters
+    {
+      Network* net;
+      double kappa;
+      bool is2D;
+    } AdditionalFunctionParameters;
 
     // heavily inspired by Prof. Dr. Andrei Gusev's Code
     class MEHPForceRelaxation2
@@ -132,9 +137,11 @@ namespace calc {
           this->universe.determineFunctionalityPerType()[crosslinkerType];
         this->is2D = is2D;
 
-        Eigen::VectorXd u = Eigen::VectorXd::Zero(3 * net.nrOfNodes);
         /* array allocation */
         r.reserve(3 * net.nrOfNodes);
+        std::vector<double> u0 =
+          pylimer_tools::utils::initializeWithValue(3 * net.nrOfNodes, 0.0);
+        Eigen::VectorXd u = Eigen::VectorXd::Zeros(3 * net.nrOfNodes);
 
         /* initial */
         std::tie(s20, s20len) =
@@ -152,16 +159,22 @@ namespace calc {
         double Ry2_sum = 0.0;
         double Rz2_sum = 0.0;
 
-        nlopt::opt opt("LD_MMA", 3 * net->nrOfNodes);
-        double* u0 = (double*)calloc(3 * net->nrOfNodes, sizeof(double));
-        for (int i = 0; i < 3 * net->nrOfNodes; i++) {
-          u0[i] = 0.0;
-        }
-        opt.set_min_objective(
-          [this, net](unsigned n, const double* x, double* grad, void* f_data) {
-            return this->evaluateForceSetGradient(net, n, x, grad, f_data);
-          },
-          NULL);
+        nlopt::opt opt("LD_MMA", 3 * net.nrOfNodes);
+
+        AdditionalFunctionParameters params;
+        params.net = &net;
+        params.kappa = kappa;
+        params.is2D = this->is2D;
+        nlopt::func objectiveF = [](unsigned n,
+                                    const double* x,
+                                    double* grad,
+                                    void* f_data) -> double {
+          AdditionalFunctionParameters* fParams =
+            static_cast<AdditionalFunctionParameters*>(f_data);
+          return MEHPForceRelaxation2::evaluateForceSetGradient(
+            fParams->net, fParams->kappa, fParams->is2D, n, x, grad, f_data);
+        };
+        opt.set_min_objective(objectiveF, &params);
         // set exit conditions
         opt.set_xtol_rel(tol);
         opt.set_ftol_rel(tol);
@@ -170,12 +183,11 @@ namespace calc {
         double minf;
         opt.optimize(u0, minf);
         // TODO: query solution & exit reason
-        Eigen::Map<Eigen::VectorXd> u =
-          Eigen::Map<Eigen::VectorXd>(u0, 3 * net->nrOfNodes);
+        u = Eigen::VectorXd(u0.data());
 
         std::cout << "Ran " << opt.get_numevals()
-                  << " iterations to a tolerance of " << opt.get_xtol() << ", "
-                  << opt.get_ftol() << std::endl;
+                  << " iterations to a tolerance of " << opt.get_xtol_rel()
+                  << ", " << opt.get_ftol_rel() << std::endl;
 
         this->exitReason = opt.get_numevals() >= maxNrOfSteps - 1
                              ? ExitReason::MAX_STEPS
@@ -514,13 +526,16 @@ namespace calc {
                               s2len / (double)net->nrOfSprings);
       }
 
-      double evaluateForceSetGradient(Network* net,
-                                      unsigned n,
-                                      const double* x,
-                                      double* grad,
-                                      void* f_data)
+      static double evaluateForceSetGradient(const Network* net,
+                                             double kappa,
+                                             bool is2D,
+                                             unsigned n,
+                                             const double* x,
+                                             double* grad,
+                                             void* f_data)
       {
-        Eigen::Map<Eigen::VectorXd> u = Eigen::Map<Eigen::VectorXd>(x, n);
+        Eigen::Map<const Eigen::VectorXd> u =
+          Eigen::Map<const Eigen::VectorXd>(x, n);
 
         double boxHalfs[3];
         boxHalfs[0] = 0.5 * net->L[0];
@@ -535,7 +550,7 @@ namespace calc {
           actualCoordinates(net->springCoordinateIndexB);
         Eigen::VectorXd springDistances =
           (coordinatesSpringEndA - coordinatesSpringEndB);
-        if (this->is2D) {
+        if (is2D) {
           // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
           //   Eigen::VectorXd::Zero(net->nrOfSprings / 3);
           for (size_t i = 2; i < net->nrOfSprings; i += 3) {
@@ -552,6 +567,7 @@ namespace calc {
           }
         }
         double s2 = springDistances.squaredNorm();
+        double oneOverS2 = 1 / s2;
         if (grad != NULL) {
           for (size_t j = 0; j < 3 * net->nrOfNodes; ++j) {
             grad[j] = 0.0;
@@ -560,8 +576,8 @@ namespace calc {
             int a = net->springIndexA[j];
             int b = net->springIndexB[j];
             for (size_t dir = 0; dir < 3; ++dir) {
-              grad[3 * a + dir] += springDistances[3 * j + dir];
-              grad[3 * b + dir] -= springDistances[3 * j + dir];
+              grad[3 * a + dir] += springDistances[3 * j + dir] * oneOverS2;
+              grad[3 * b + dir] -= springDistances[3 * j + dir] * oneOverS2;
             }
           }
         }
@@ -590,101 +606,6 @@ namespace calc {
       double sigmaZ = 0.0;
       double R2Mean = 0.0;
       ExitReason exitReason = ExitReason::UNSET;
-
-      class MEHPForce : public FunctionXd
-      {
-      private:
-        bool is2D;
-        Network* net;
-        double kappa;
-        double boxHalfs[3];
-        // Eigen::VectorXd actualCoordinates;
-        // Eigen::VectorXd coordinatesSpringEndA;
-        // Eigen::VectorXd coordinatesSpringEndB;
-        // Eigen::VectorXd springDistances;
-
-      public:
-        MEHPForce(bool is2D, Network* net, double kappa)
-          : is2D(is2D)
-          , net(net)
-          , kappa(kappa)
-        {
-          boxHalfs[0] = 0.5 * net->L[0];
-          boxHalfs[1] = 0.5 * net->L[1];
-          boxHalfs[2] = 0.5 * net->L[2];
-
-          // actualCoordinates = net->coordinates;
-          // coordinatesSpringEndA =
-          // actualCoordinates(net->springCoordinateIndexA);
-          // coordinatesSpringEndB =
-          // actualCoordinates(net->springCoordinateIndexB); springDistances =
-          // (coordinatesSpringEndA - coordinatesSpringEndB);
-        }
-
-        double evaluateDistanceSquareNorm(const Eigen::VectorXd& u) const
-        {
-          Eigen::VectorXd actualCoordinates = net->coordinates + u;
-          // It *could* be more efficient to index u instead of the coordinates
-          Eigen::VectorXd coordinatesSpringEndA =
-            actualCoordinates(net->springCoordinateIndexA);
-          Eigen::VectorXd coordinatesSpringEndB =
-            actualCoordinates(net->springCoordinateIndexB);
-          Eigen::VectorXd springDistances =
-            (coordinatesSpringEndA - coordinatesSpringEndB);
-          if (this->is2D) {
-            // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
-            //   Eigen::VectorXd::Zero(net->nrOfSprings / 3);
-            for (size_t i = 2; i < net->nrOfSprings; i += 3) {
-              springDistances[i] = 0.0;
-            }
-          }
-          // Possibly improvable PBC
-          for (size_t j = 0; j < 3 * net->nrOfSprings; j++) {
-            while (springDistances[j] > boxHalfs[j % 3]) {
-              springDistances[j] -= boxHalfs[j % 3];
-            }
-            while (springDistances[j] < boxHalfs[j % 3]) {
-              springDistances[j] += boxHalfs[j % 3];
-            }
-          }
-          double s2 = springDistances.squaredNorm();
-          return s2;
-        }
-
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-        double operator()(const Eigen::VectorXd& u) const
-        {
-          double s2 = this->evaluateDistanceSquareNorm(u);
-          std::cout << "Evaluated force to " << std::setprecision(15)
-                    << 0.5 * kappa * s2 << std::endl;
-          return 0.5 * kappa * s2;
-        }
-
-        void Gradient(const Eigen::VectorXd& u, Eigen::VectorXd* grad) const
-        {
-          Eigen::VectorXd actualCoordinates = net->coordinates + u;
-          // It *could* be more efficient to index u instead of the coordinates
-          Eigen::VectorXd coordinatesSpringEndA =
-            actualCoordinates(net->springCoordinateIndexA);
-          Eigen::VectorXd coordinatesSpringEndB =
-            actualCoordinates(net->springCoordinateIndexB);
-          Eigen::VectorXd springDistances =
-            (coordinatesSpringEndA - coordinatesSpringEndB);
-          for (size_t j = 0; j < 3 * net->nrOfNodes; ++j) {
-            (*grad)[j] = 0.0;
-          }
-          for (size_t j = 0; j < net->nrOfSprings; ++j) {
-            int a = net->springIndexA[j];
-            int b = net->springIndexB[j];
-            for (size_t dir = 0; dir < 3; ++dir) {
-              (*grad)[3 * a + dir] += springDistances[3 * j + dir];
-              (*grad)[3 * b + dir] -= springDistances[3 * j + dir];
-            }
-          }
-          // this implementation neglects the constant factor of
-          // 1/(this.evaluateDistanceSquareNorm(u))
-        }
-      };
     };
   } // namespace mehp
 } // namespace calc
