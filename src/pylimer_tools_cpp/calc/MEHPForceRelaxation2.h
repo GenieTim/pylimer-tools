@@ -141,7 +141,7 @@ namespace calc {
         r.reserve(3 * net.nrOfNodes);
         std::vector<double> u0 =
           pylimer_tools::utils::initializeWithValue(3 * net.nrOfNodes, 0.0);
-        Eigen::VectorXd u = Eigen::VectorXd::Zeros(3 * net.nrOfNodes);
+        Eigen::VectorXd u = Eigen::VectorXd::Zero(3 * net.nrOfNodes);
 
         /* initial */
         std::tie(s20, s20len) =
@@ -183,7 +183,7 @@ namespace calc {
         double minf;
         opt.optimize(u0, minf);
         // TODO: query solution & exit reason
-        u = Eigen::VectorXd(u0.data());
+        u = Eigen::Map<Eigen::VectorXd>(u0.data(), u0.size());
 
         std::cout << "Ran " << opt.get_numevals()
                   << " iterations to a tolerance of " << opt.get_xtol_rel()
