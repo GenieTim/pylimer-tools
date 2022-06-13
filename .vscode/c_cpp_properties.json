@@ -3,9 +3,12 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**",
-                "${workspaceFolder}/tests/build/_deps/**",
-                "/usr/local/include/eigen3/"
+                "${workspaceFolder}/src/**",
+                "${workspaceFolder}/tests/build/_deps/catch2-src/src/**",
+                "${workspaceFolder}/tests/build/_deps/eigen3-src/Eigen/**",
+                "/usr/local/include/eigen3/",
+                "${workspaceFolder}/vendor/nlopt/nloptLib-install/include",
+                "${workspaceFolder}/vendor/igraph/igraphLib-install/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

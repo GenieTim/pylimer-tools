@@ -56,7 +56,7 @@ add_subdirectory(../src/pylimer_tools_cpp pylimer_tools.out)
 
 add_dependencies(pylimer_tools igraphLib)
 include_directories(${igraph_INCLUDE_DIRS})
-include_directories(${optim_INCLUDE_DIRS})
+include_directories(${nlopt_INCLUDE_DIRS})
 message("Found igraph for tests. Including ${igraph_INCLUDE_DIRS}, linking to ${igraph_LIBRARIES}")
 
 add_library(test_sources 
@@ -75,6 +75,7 @@ PRIVATE
 	Catch2::Catch2
 	pylimer_tools
 	${igraph_LIBRARIES}
+	${nlopt_LIBRARIES}
 )
 
 add_executable(pylimer_tests pylimer_tools/test.cpp)
@@ -84,6 +85,7 @@ target_link_libraries(pylimer_tests
 	test_sources
 	pylimer_tools
 	${igraph_LIBRARIES}
+	${nlopt_LIBRARIES}
 )
 
 # separate the header tests out, for the coverage generation
