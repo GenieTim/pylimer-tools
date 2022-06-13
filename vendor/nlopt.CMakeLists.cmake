@@ -1,0 +1,56 @@
+include(ExternalProject)
+# include(FetchContent)
+
+# download, compile & install nlopt
+# TODO: enable possibility of including externally installed nlopt library
+if (NOT DEFINED nlopt_LOADED)
+	if (NOT TARGET nloptLib)
+
+		if(WIN32)
+			set(LIBRARY_PREFIX "")
+			set(LIBRARY_SUFFIX ".lib")
+		else()
+			set(LIBRARY_PREFIX "lib")
+			set(LIBRARY_SUFFIX ".a")
+		endif()
+
+		ExternalProject_Add(
+				nloptLib
+				GIT_REPOSITORY https://github.com/stevengj/nlopt
+				GIT_TAG 09b3c2a6da71cabcb98d2c8facc6b83d2321ed71 # 2.7.1
+				PREFIX ${CMAKE_CURRENT_LIST_DIR}/nlopt
+				INSTALL_DIR ${CMAKE_CURRENT_LIST_DIR}/nlopt/nloptLib-install
+				CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_LIST_DIR}/nlopt/nloptLib-install -DCMAKE_INSTALL_LIBDIR=${CMAKE_CURRENT_LIST_DIR}/nlopt/nloptLib-install/lib -DCMAKE_C_FLAGS="-fPIC"
+				BUILD_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_LIST_DIR}/nlopt/src/nloptLib-build --config Release
+				BUILD_BYPRODUCTS ${CMAKE_CURRENT_LIST_DIR}/nlopt/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt${LIBRARY_SUFFIX}
+				UPDATE_DISCONNECTED ON
+		)
+		# FetchContent_MakeAvailable(nloptLib)
+		add_library(nlopt SHARED IMPORTED)
+		add_dependencies(nlopt nloptLib)
+		set(nlopt_PREFIX_PATH "${CMAKE_CURRENT_LIST_DIR}/nlopt")
+		if (MSVC)
+			set(nlopt_INCLUDE_DIRS "${nlopt_PREFIX_PATH}/nloptLib-install/include;${nlopt_PREFIX_PATH}/src/nloptLib/msvc/include")
+		else()
+			set(nlopt_INCLUDE_DIRS "${nlopt_PREFIX_PATH}/nloptLib-install/include")
+		endif()
+		file(GLOB nlopt_LIBRARIES "${nlopt_PREFIX_PATH}/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt.*")
+		if (NOT nlopt_LIBRARIES)
+			# message("WARNING: nlopt_LIBRARIES empty")
+			set(nlopt_LIBRARIES "${nlopt_PREFIX_PATH}/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt${LIBRARY_SUFFIX}")
+			# file(GLOB_RECURSE nlopt_LIBRARIES "${nlopt_PREFIX_PATH}/*.a")
+		endif()
+		message("Hoping nlopt_LIBRARIES will be compiled to: ${nlopt_LIBRARIES}")
+		set_target_properties(nlopt PROPERTIES IMPORTED_LOCATION ${nlopt_LIBRARIES})
+		set(nlopt_LOADED ON)
+	endif()
+endif()
+
+# find_package(nlopt REQUIRED)
+# if(nlopt_FOUND)
+#   include_directories(${nlopt_INCLUDE_DIRS})
+#   target_link_libraries(pylimer_tools nlopt)
+# 	message("Found nlopt for pylimer_tools_cpp")
+# else()
+# 	message(WARNING "DID NOT FIND nlopt")
+# endif()

@@ -4,17 +4,14 @@
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
-#include "cppoptlib/function.h"
-#include "cppoptlib/solver/bfgs.h"
-#include "cppoptlib/solver/conjugated_gradient_descent.h"
-#include "cppoptlib/solver/gradient_descent.h"
-#include "cppoptlib/solver/newton_descent.h"
+#include <Eigen/Dense>
 #include <algorithm>
 #include <array>
 #include <cassert>
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <nlopt.hpp>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -155,62 +152,34 @@ namespace calc {
         double Ry2_sum = 0.0;
         double Rz2_sum = 0.0;
 
-        MEHPForce totalForce = MEHPForce(this->is2D, &net, kappa);
-        auto state = totalForce.Eval(u);
-        // assert(state.value == Fdef);
-
-        // set the exit conditions
-        cppoptlib::solver::State<MEHPForce::scalar_t> myStoppingSolverState;
-        myStoppingSolverState.num_iterations = maxNrOfSteps;
-        myStoppingSolverState.x_delta =
-          static_cast<MEHPForce::scalar_t>(tol * state.value);
-        myStoppingSolverState.x_delta_violations = deltaViolations;
-        myStoppingSolverState.f_delta =
-          static_cast<MEHPForce::scalar_t>(tol * state.value);
-        myStoppingSolverState.f_delta_violations = deltaViolations;
-        myStoppingSolverState.gradient_norm =
-          static_cast<MEHPForce::scalar_t>(gradientNormTol);
-        myStoppingSolverState.condition_hessian =
-          static_cast<MEHPForce::scalar_t>(0);
-        myStoppingSolverState.status = cppoptlib::solver::Status::NotStarted;
-
-        // cppoptlib::solver::ConjugatedGradientDescent<MEHPForce> solver =
-        //   cppoptlib::solver::ConjugatedGradientDescent<MEHPForce>(
-        //     myStoppingSolverState);
-        // cppoptlib::solver::GradientDescent<MEHPForce> solver =
-        //   cppoptlib::solver::GradientDescent<MEHPForce>(myStoppingSolverState);
-        cppoptlib::solver::Bfgs<MEHPForce> solver =
-          cppoptlib::solver::Bfgs<MEHPForce>(myStoppingSolverState);
-        // cppoptlib::solver::NewtonDescent<MEHPForce> solver =
-        //   cppoptlib::solver::NewtonDescent<MEHPForce>(myStoppingSolverState);
-        // do run solver
-        auto [solution, solverState] = solver.Minimize(totalForce, u);
-        this->nrOfStepsDone = solverState.num_iterations;
-
-        if (solverState.status == cppoptlib::solver::Status::IterationLimit) {
-          this->exitReason = ExitReason::MAX_STEPS;
-        } else if (solverState.status ==
-                     cppoptlib::solver::Status::XDeltaViolation ||
-                   solverState.status ==
-                     cppoptlib::solver::Status::FDeltaViolation) {
-          this->exitReason = ExitReason::TOLERANCE;
-        } else if (solverState.status ==
-                   cppoptlib::solver::Status::GradientNormViolation) {
-          this->exitReason = ExitReason::GRADIENT_NORM;
-        } else if (solverState.status ==
-                   cppoptlib::solver::Status::HessianConditionViolation) {
-          this->exitReason = ExitReason::HESSIAN_CONDITION;
-        } else {
-          this->exitReason = ExitReason::OTHER;
+        nlopt::opt opt("LD_MMA", 3 * net->nrOfNodes);
+        double* u0 = (double*)calloc(3 * net->nrOfNodes, sizeof(double));
+        for (int i = 0; i < 3 * net->nrOfNodes; i++) {
+          u0[i] = 0.0;
         }
+        opt.set_min_objective(
+          [this, net](unsigned n, const double* x, double* grad, void* f_data) {
+            return this->evaluateForceSetGradient(net, n, x, grad, f_data);
+          },
+          NULL);
+        // set exit conditions
+        opt.set_xtol_rel(tol);
+        opt.set_ftol_rel(tol);
+        opt.set_maxeval(maxNrOfSteps);
+        // start/set/run minimization
+        double minf;
+        opt.optimize(u0, minf);
+        // TODO: query solution & exit reason
+        Eigen::Map<Eigen::VectorXd> u =
+          Eigen::Map<Eigen::VectorXd>(u0, 3 * net->nrOfNodes);
 
-        u = solution.x;
+        std::cout << "Ran " << opt.get_numevals()
+                  << " iterations to a tolerance of " << opt.get_xtol() << ", "
+                  << opt.get_ftol() << std::endl;
 
-        std::cout << "Ran " << solverState.num_iterations
-                  << " iterations to a tolerance of " << solverState.x_delta
-                  << ", " << solverState.f_delta << " to ourput status "
-                  << solverState.status << std::endl;
-
+        this->exitReason = opt.get_numevals() >= maxNrOfSteps - 1
+                             ? ExitReason::MAX_STEPS
+                             : ExitReason::TOLERANCE;
         // TODO: evaluate solution properties properly
 
         Gamma_eq = 0.0;
@@ -543,6 +512,62 @@ namespace calc {
 
         return std::make_pair(s2 / (double)net->nrOfSprings,
                               s2len / (double)net->nrOfSprings);
+      }
+
+      double evaluateForceSetGradient(Network* net,
+                                      unsigned n,
+                                      const double* x,
+                                      double* grad,
+                                      void* f_data)
+      {
+        Eigen::Map<Eigen::VectorXd> u = Eigen::Map<Eigen::VectorXd>(x, n);
+
+        double boxHalfs[3];
+        boxHalfs[0] = 0.5 * net->L[0];
+        boxHalfs[1] = 0.5 * net->L[1];
+        boxHalfs[2] = 0.5 * net->L[2];
+
+        Eigen::VectorXd actualCoordinates = net->coordinates + u;
+        // It *could* be more efficient to index u instead of the coordinates
+        Eigen::VectorXd coordinatesSpringEndA =
+          actualCoordinates(net->springCoordinateIndexA);
+        Eigen::VectorXd coordinatesSpringEndB =
+          actualCoordinates(net->springCoordinateIndexB);
+        Eigen::VectorXd springDistances =
+          (coordinatesSpringEndA - coordinatesSpringEndB);
+        if (this->is2D) {
+          // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
+          //   Eigen::VectorXd::Zero(net->nrOfSprings / 3);
+          for (size_t i = 2; i < net->nrOfSprings; i += 3) {
+            springDistances[i] = 0.0;
+          }
+        }
+        // Possibly improvable PBC
+        for (size_t j = 0; j < 3 * net->nrOfSprings; j++) {
+          while (springDistances[j] > boxHalfs[j % 3]) {
+            springDistances[j] -= boxHalfs[j % 3];
+          }
+          while (springDistances[j] < boxHalfs[j % 3]) {
+            springDistances[j] += boxHalfs[j % 3];
+          }
+        }
+        double s2 = springDistances.squaredNorm();
+        if (grad != NULL) {
+          for (size_t j = 0; j < 3 * net->nrOfNodes; ++j) {
+            grad[j] = 0.0;
+          }
+          for (size_t j = 0; j < net->nrOfSprings; ++j) {
+            int a = net->springIndexA[j];
+            int b = net->springIndexB[j];
+            for (size_t dir = 0; dir < 3; ++dir) {
+              grad[3 * a + dir] += springDistances[3 * j + dir];
+              grad[3 * b + dir] -= springDistances[3 * j + dir];
+            }
+          }
+        }
+        std::cout << "Evaluated force to " << std::setprecision(15)
+                  << 0.5 * kappa * s2 << std::endl;
+        return 0.5 * kappa * s2;
       }
 
     private:
