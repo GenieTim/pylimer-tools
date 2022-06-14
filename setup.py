@@ -38,16 +38,21 @@ if (os.getenv('VCPKG_ROOT')):
 # delete vendor caches — this is useful if you compile
 # this project using CMake (e.g. for tests) as well as skbuild,
 # as the two build directories of vendor do not interact well.
-igraphVendor = os.path.abspath(os.path.join(
-    os.path.dirname(__file__), 'vendor/igraph/src/igraphLib-build'))
-if (os.path.exists(igraphVendor)):
-    try:
-        shutil.rmtree(igraphVendor)
-    except:
-        warnings.warn(
-            "Could not delete directory {}. Errors incoming.".format(igraphVendor))
-else:
-    print("No need to delete {}".format(igraphVendor))
+vendorFilesToDelete = [
+    os.path.abspath(os.path.join(
+        os.path.dirname(__file__), 'vendor/igraph/src/igraphLib-build')),
+    os.path.abspath(os.path.join(
+        os.path.dirname(__file__), 'vendor/nlopt/src/nloptLib-build'))
+]
+for vendorFile in vendorFilesToDelete:
+    if (os.path.exists(vendorFile)):
+        try:
+            shutil.rmtree(vendorFile)
+        except:
+            warnings.warn(
+                "Could not delete directory {}. Errors incoming.".format(vendorFile))
+    else:
+        print("No need to delete {}".format(vendorFile))
 
 # skbuildCaches = os.path.abspath(os.path.join(
 #     os.path.dirname(__file__), '_skbuild'))

@@ -38,8 +38,6 @@ namespace calc {
       double vol;                 /* box volume */
       long int nrOfNodes;         /* number of nodes */
       long int nrOfSprings;       /* number of springs */
-      double* nodalDisplacements; /* nodal displacements */
-      double* nodalForces;        /* nodal forces */
       double averageSpringLength; /* average spring length */
       long int nrOfLoops;         /* loops */
       // coordinates & coonectivity
@@ -116,13 +114,15 @@ namespace calc {
 
       ExitReason getExitReason() { return this->exitReason; }
 
-      void runForceRelaxation(long int maxNrOfSteps = 1000, // default: 10000
-                              double tol = 1e-6,            // default: 1e-9
+      void runForceRelaxation(long int maxNrOfSteps = 10000, // default: 10000
+                              double tol = 1e-9,             // default: 1e-9
                               double Nb2spec = -1.0,
                               bool is2D = false,
                               double kappa = 1.0,
                               int deltaViolations = 5,
-                              double gradientNormTol = 1e-5)
+                              double gradientNormTol = 1e-5,
+                              double loopTol = 1e-2,
+                              const char * algorithm = "LD_LBFGS")
       {
         long int i, step, Nact, Mact, a, b;
         std::vector<double> r;
@@ -145,7 +145,7 @@ namespace calc {
 
         /* initial */
         std::tie(s20, s20len) =
-          computeStressAndSquareDistances(&net, u, stress, tol);
+          computeStressAndSquareDistances(&net, u, stress, kappa, loopTol);
         double Fdef = Residual(&net, u, r, kappa);
         double r20 = 0.;
         for (size_t i = 0; i < 3 * net.nrOfNodes; i++) {
@@ -159,7 +159,7 @@ namespace calc {
         double Ry2_sum = 0.0;
         double Rz2_sum = 0.0;
 
-        nlopt::opt opt("LD_MMA", 3 * net.nrOfNodes);
+        nlopt::opt opt(algorithm, 3 * net.nrOfNodes);
 
         AdditionalFunctionParameters params;
         params.net = &net;
@@ -183,11 +183,13 @@ namespace calc {
         double minf;
         opt.optimize(u0, minf);
         // TODO: query solution & exit reason
+        opt.get_stopval();
         u = Eigen::Map<Eigen::VectorXd>(u0.data(), u0.size());
 
         std::cout << "Ran " << opt.get_numevals()
                   << " iterations to a tolerance of " << opt.get_xtol_rel()
-                  << ", " << opt.get_ftol_rel() << std::endl;
+                  << ", " << opt.get_ftol_rel() << ". U has norm " << u.norm()
+                  << std::endl;
 
         this->exitReason = opt.get_numevals() >= maxNrOfSteps - 1
                              ? ExitReason::MAX_STEPS
@@ -220,7 +222,7 @@ namespace calc {
 
         /* acquire equilibrium properties */
         std::tie(s2, s2len) =
-          computeStressAndSquareDistances(&net, u, stress, tol);
+          computeStressAndSquareDistances(&net, u, stress, kappa, loopTol);
         G = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
         this->finalPressure = G;
 
@@ -281,6 +283,82 @@ namespace calc {
         this->nrOfActiveSprings = Nact;
       };
 
+      /**
+       * @brief This function does the step
+       *
+       * This function is public for testing purposes — TODO: find a better way
+       *
+       * @param net
+       * @param kappa
+       * @param is2D
+       * @param n
+       * @param x
+       * @param grad
+       * @param f_data
+       * @return double
+       */
+      static double evaluateForceSetGradient(const Network* net,
+                                             double kappa,
+                                             bool is2D,
+                                             unsigned n,
+                                             const double* x,
+                                             double* grad,
+                                             void* f_data)
+      {
+        Eigen::Map<const Eigen::VectorXd> u =
+          Eigen::Map<const Eigen::VectorXd>(x, n);
+
+        double boxHalfs[3];
+        boxHalfs[0] = 0.5 * net->L[0];
+        boxHalfs[1] = 0.5 * net->L[1];
+        boxHalfs[2] = 0.5 * net->L[2];
+
+        Eigen::VectorXd actualCoordinates = net->coordinates + u;
+        // It *could* be more efficient to index u instead of the coordinates
+        Eigen::VectorXd coordinatesSpringEndA =
+          actualCoordinates(net->springCoordinateIndexA);
+        Eigen::VectorXd coordinatesSpringEndB =
+          actualCoordinates(net->springCoordinateIndexB);
+        Eigen::VectorXd springDistances =
+          (coordinatesSpringEndA - coordinatesSpringEndB);
+        if (is2D) {
+          // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
+          //   Eigen::VectorXd::Zero(net->nrOfSprings / 3);
+          for (size_t i = 2; i < net->nrOfSprings; i += 3) {
+            springDistances[i] = 0.0;
+          }
+        }
+        // Possibly improvable PBC
+        for (size_t j = 0; j < 3 * net->nrOfSprings; ++j) {
+          while (springDistances[j] > boxHalfs[j % 3]) {
+            springDistances[j] -= boxHalfs[j % 3];
+          }
+          while (springDistances[j] < boxHalfs[j % 3]) {
+            springDistances[j] += boxHalfs[j % 3];
+          }
+        }
+        double s2 = springDistances.norm();
+        double constantMultiplier = 0.5 * kappa / (s2);
+        if (grad != NULL) {
+          for (size_t j = 0; j < net->nrOfSprings; ++j) {
+            grad[j] = 0.0;
+          }
+          for (size_t j = 0; j < net->nrOfSprings; ++j) {
+            int a = net->springIndexA[j];
+            int b = net->springIndexB[j];
+            for (size_t dir = 0; dir < is2D ? 2 : 3; ++dir) {
+              grad[3 * a + dir] +=
+                springDistances[3 * j + dir] * constantMultiplier;
+              grad[3 * b + dir] -=
+                springDistances[3 * j + dir] * constantMultiplier;
+            }
+          }
+        }
+        std::cout << "Evaluated force to " << std::setprecision(15)
+                  << 0.5 * kappa * s2 << std::endl;
+        return 0.5 * kappa * s2;
+      }
+
     protected:
       /**
        * @brief Convert the universe to a network
@@ -310,9 +388,6 @@ namespace calc {
           Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
         net->springIsActive = ArrayXb::Constant(net->nrOfSprings, false);
 
-        int usualChainLen =
-          this->universe.getMolecules(crosslinkerType)[0].getNrOfAtoms();
-
         // convert beads
         std::vector<pylimer_tools::entities::Atom> allAtoms =
           crosslinkerUniverse.getAtoms();
@@ -332,7 +407,9 @@ namespace calc {
         for (size_t i = 0; i < net->nrOfSprings; ++i) {
           int atomIdFrom = allBonds["bond_from"][i];
           int atomIdTo = allBonds["bond_to"][i];
-          net->averageSpringLength += usualChainLen;
+          net->averageSpringLength +=
+            universe.getAtom(atomIdFrom)
+              .distanceTo(universe.getAtom(atomIdTo), &box);
           net->springIndexA[i] = atomIdToNode.at(atomIdFrom);
           net->springIndexB[i] = atomIdToNode.at(atomIdTo);
           for (size_t j = 0; j < 3; j++) {
@@ -458,9 +535,10 @@ namespace calc {
         Network* net,
         const Eigen::VectorXd& u,
         double stress[3][3],
-        double tol)
+        double kappa,
+        double loopTol)
       {
-        double kappa, s2 = 0, s2len = 0;
+        double s2 = 0, s2len = 0;
 
         for (size_t j = 0; j < 3; j++) {
           for (size_t k = 0; k < 3; k++) {
@@ -508,7 +586,7 @@ namespace calc {
           s2len += s2local / std::sqrt(s2local);
 
           /* loop count */
-          if (s2 < tol) {
+          if (s2 < loopTol) {
             net->nrOfLoops++;
             net->springIsActive[i] = false;
           } else {
@@ -524,66 +602,6 @@ namespace calc {
 
         return std::make_pair(s2 / (double)net->nrOfSprings,
                               s2len / (double)net->nrOfSprings);
-      }
-
-      static double evaluateForceSetGradient(const Network* net,
-                                             double kappa,
-                                             bool is2D,
-                                             unsigned n,
-                                             const double* x,
-                                             double* grad,
-                                             void* f_data)
-      {
-        Eigen::Map<const Eigen::VectorXd> u =
-          Eigen::Map<const Eigen::VectorXd>(x, n);
-
-        double boxHalfs[3];
-        boxHalfs[0] = 0.5 * net->L[0];
-        boxHalfs[1] = 0.5 * net->L[1];
-        boxHalfs[2] = 0.5 * net->L[2];
-
-        Eigen::VectorXd actualCoordinates = net->coordinates + u;
-        // It *could* be more efficient to index u instead of the coordinates
-        Eigen::VectorXd coordinatesSpringEndA =
-          actualCoordinates(net->springCoordinateIndexA);
-        Eigen::VectorXd coordinatesSpringEndB =
-          actualCoordinates(net->springCoordinateIndexB);
-        Eigen::VectorXd springDistances =
-          (coordinatesSpringEndA - coordinatesSpringEndB);
-        if (is2D) {
-          // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
-          //   Eigen::VectorXd::Zero(net->nrOfSprings / 3);
-          for (size_t i = 2; i < net->nrOfSprings; i += 3) {
-            springDistances[i] = 0.0;
-          }
-        }
-        // Possibly improvable PBC
-        for (size_t j = 0; j < 3 * net->nrOfSprings; j++) {
-          while (springDistances[j] > boxHalfs[j % 3]) {
-            springDistances[j] -= boxHalfs[j % 3];
-          }
-          while (springDistances[j] < boxHalfs[j % 3]) {
-            springDistances[j] += boxHalfs[j % 3];
-          }
-        }
-        double s2 = springDistances.squaredNorm();
-        double oneOverS2 = 1 / s2;
-        if (grad != NULL) {
-          for (size_t j = 0; j < 3 * net->nrOfNodes; ++j) {
-            grad[j] = 0.0;
-          }
-          for (size_t j = 0; j < net->nrOfSprings; ++j) {
-            int a = net->springIndexA[j];
-            int b = net->springIndexB[j];
-            for (size_t dir = 0; dir < 3; ++dir) {
-              grad[3 * a + dir] += springDistances[3 * j + dir] * oneOverS2;
-              grad[3 * b + dir] -= springDistances[3 * j + dir] * oneOverS2;
-            }
-          }
-        }
-        std::cout << "Evaluated force to " << std::setprecision(15)
-                  << 0.5 * kappa * s2 << std::endl;
-        return 0.5 * kappa * s2;
       }
 
     private:
