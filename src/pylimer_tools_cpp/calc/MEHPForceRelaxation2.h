@@ -15,6 +15,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include <cassert>
 
 namespace pylimer_tools {
 namespace calc {
@@ -122,7 +123,7 @@ namespace calc {
                               int deltaViolations = 5,
                               double gradientNormTol = 1e-5,
                               double loopTol = 1e-2,
-                              const char * algorithm = "LD_LBFGS")
+                              const char* algorithm = "LD_MMA")
       {
         long int i, step, Nact, Mact, a, b;
         std::vector<double> r;
@@ -154,10 +155,6 @@ namespace calc {
         G0 = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
 
         /* force relaxation */
-        double Gamma_eq = 0.0;
-        double Rx2_sum = 0.0;
-        double Ry2_sum = 0.0;
-        double Rz2_sum = 0.0;
 
         nlopt::opt opt(algorithm, 3 * net.nrOfNodes);
 
@@ -182,8 +179,7 @@ namespace calc {
         // start/set/run minimization
         double minf;
         opt.optimize(u0, minf);
-        // TODO: query solution & exit reason
-        opt.get_stopval();
+        // query solution & exit reason
         u = Eigen::Map<Eigen::VectorXd>(u0.data(), u0.size());
 
         std::cout << "Ran " << opt.get_numevals()
@@ -195,52 +191,14 @@ namespace calc {
                              ? ExitReason::MAX_STEPS
                              : ExitReason::TOLERANCE;
         // TODO: evaluate solution properties properly
-
-        Gamma_eq = 0.0;
-        Rx2_sum = 0.0;
-        Ry2_sum = 0.0;
-        Rz2_sum = 0.0;
+        
         Fdef = Residual(&net, u, r, kappa);
-        for (r2 = 0., i = 0; i < 3 * net.nrOfNodes; i++) {
-          r2 += r[i] * r[i];
-          if (i % 3 == 0) {
-            Rx2_sum += r[i] * r[i];
-          } else if ((i + 1) % 3 == 0) {
-            Ry2_sum += r[i] * r[i];
-          } else {
-            assert((i + 2) % 3 == 0);
-            Rz2_sum += r[i] * r[i];
-          }
-        }
-        Gamma_eq = r2 / ((double)net.nrOfSprings * Nb2);
-
-        // TODO: this is incorrect.
-        double R2_mean = Gamma_eq / (double)net.nrOfSprings;
-        double Gamma_x = 3 * Rx2_sum / ((double)net.nrOfSprings * this->Nb2);
-        double Gamma_y = 3 * Ry2_sum / ((double)net.nrOfSprings * this->Nb2);
-        double Gamma_z = 3 * Rz2_sum / ((double)net.nrOfSprings * this->Nb2);
 
         /* acquire equilibrium properties */
         std::tie(s2, s2len) =
           computeStressAndSquareDistances(&net, u, stress, kappa, loopTol);
         G = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
         this->finalPressure = G;
-
-        /* output */
-        // if (this->outputEndNodes) {
-        //   fp = fopen(this->endNodesFile.c_str(), "w");
-        //   fprintf(fp, "%.10f %.10f %.10f\n", net.L[0], net.L[1], net.L[2]);
-        //   fprintf(fp, "%ld #nodes\n", net.nrOfNodes);
-        //   fprintf(fp, "%ld #springs\n", net.nrOfSprings);
-        //   for (i = 0; i < net.nrOfNodes; i++) {
-        //     fprintf(fp,
-        //             "%.16f %.16f %.16f\n",
-        //             net.nodes[i].x + u[3 * i],
-        //             net.nodes[i].y + u[3 * i + 1],
-        //             net.nodes[i].z + u[3 * i + 2]);
-        //   }
-        //   fclose(fp);
-        // }
 
         /* active springs */
         for (Nact = 0, i = 0; i < net.nrOfSprings; i++) {
@@ -313,6 +271,7 @@ namespace calc {
         boxHalfs[1] = 0.5 * net->L[1];
         boxHalfs[2] = 0.5 * net->L[2];
 
+        assert(u.size() == net->coordinates.size());
         Eigen::VectorXd actualCoordinates = net->coordinates + u;
         // It *could* be more efficient to index u instead of the coordinates
         Eigen::VectorXd coordinatesSpringEndA =
@@ -328,12 +287,13 @@ namespace calc {
             springDistances[i] = 0.0;
           }
         }
+        assert(springDistances.size() == net->nrOfSprings * 3);
         // Possibly improvable PBC
         for (size_t j = 0; j < 3 * net->nrOfSprings; ++j) {
           while (springDistances[j] > boxHalfs[j % 3]) {
             springDistances[j] -= boxHalfs[j % 3];
           }
-          while (springDistances[j] < boxHalfs[j % 3]) {
+          while (springDistances[j] < -boxHalfs[j % 3]) {
             springDistances[j] += boxHalfs[j % 3];
           }
         }
@@ -346,7 +306,8 @@ namespace calc {
           for (size_t j = 0; j < net->nrOfSprings; ++j) {
             int a = net->springIndexA[j];
             int b = net->springIndexB[j];
-            for (size_t dir = 0; dir < is2D ? 2 : 3; ++dir) {
+            int nrOfDim = is2D ? 2 : 3;
+            for (size_t dir = 0; dir < nrOfDim; ++dir) {
               grad[3 * a + dir] +=
                 springDistances[3 * j + dir] * constantMultiplier;
               grad[3 * b + dir] -=
@@ -567,7 +528,7 @@ namespace calc {
         }
 
         // then, the stresses
-        for (size_t i = 0; i < net->nrOfSprings; i++) {
+        for (size_t i = 0; i < net->nrOfSprings; ++i) {
           double s[3] = { springDistances[3 * i + 0],
                           springDistances[3 * i + 1],
                           springDistances[3 * i + 2] };
