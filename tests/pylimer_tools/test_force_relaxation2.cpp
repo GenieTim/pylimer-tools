@@ -22,7 +22,7 @@ TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
   // 3-4
   universe.addAtoms({ { 1, 2, 3, 4 } },
                     { { 2, 2, 2, 2 } },
-                    { { 0.0, 1.0 - 0.1, 2.0 + 0.2, 3.0 + 0.05 } }, // x
+                    { { 0.0, 1.0, 2.0, 3.0 } }, // x
                     { { 0.0, 0.0, 0.0, 0.0 } },                    // y
                     { { 0.0, 0.0, 0.0, 0.0 } },                    // z
                     { { 0, 0, 0, 0 } },
@@ -31,7 +31,7 @@ TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
   universe.addBonds({ { 1, 2, 3, 3, 3 } }, { { 2, 4, 2, 1, 4 } });
   pcm::MEHPForceRelaxation2 forceRelaxer2 =
     pcm::MEHPForceRelaxation2(universe, 2);
-  double h = 0.0001;
+  double h = 1.e-3;
   double grad[12];
   double x[12];
   for (int i = 0; i < 12; ++i) {
@@ -40,19 +40,25 @@ TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
   }
   pcm::Network net;
   Eigen::VectorXd coordinates = Eigen::VectorXd(12);
-  coordinates << 0.0, 0.0, 0.0, 1.0 - 0.1, 0.0, 0.0, 2.0 + 0.2, 0.0, 0.0,
-    3.0 + 0.05, 0.0, 0.0;
+  coordinates << 0.0, 0.0, 0.0, // 1
+    1.0, 0.0, 0.0,        // 2
+    2.0, 0.0, 0.0,        // 3
+    3.0, 0.0, 0.0;        // 4
   net.coordinates = coordinates;
-  Eigen::ArrayXi springCoordinateIndexA = Eigen::ArrayXi(15);
-  springCoordinateIndexA << 0, 1, 2, 3, 4, 5, 6, 7, 8, 6, 7, 8, 6, 7, 8;
+  Eigen::ArrayXi springCoordinateIndexA = Eigen::ArrayXi::Zero(15);
   net.springCoordinateIndexA = springCoordinateIndexA;
-  Eigen::ArrayXi springCoordinateIndexB = Eigen::ArrayXi(15);
-  springCoordinateIndexB << 3, 4, 5, 9, 10, 11, 3, 4, 5, 0, 1, 2, 9, 10, 11;
+  Eigen::ArrayXi springCoordinateIndexB = Eigen::ArrayXi::Zero(15);
   net.springCoordinateIndexB = springCoordinateIndexB;
   net.springIndexA = Eigen::ArrayXi(5);
-  net.springIndexA << 1 - 1, 2 - 1, 3 - 1, 3 - 1, 3 - 1;
+  net.springIndexA << 0, 1, 2, 2, 2;
   net.springIndexB = Eigen::ArrayXi(5);
-  net.springIndexB << 2 - 1, 4 - 1, 2 - 1, 1 - 1, 4 - 1;
+  net.springIndexB << 1, 3, 1, 0, 3;
+  for (int i = 0; i < 5; ++i) {
+    for (int dir = 0; dir < 3; ++dir) {
+      net.springCoordinateIndexA[i * 3 + dir] = net.springIndexA[i] * 3 + dir;
+      net.springCoordinateIndexB[i * 3 + dir] = net.springIndexB[i] * 3 + dir;
+    }
+  }
   net.nrOfNodes = 4;
   net.nrOfSprings = 5;
   net.vol = universe.getVolume();
@@ -62,22 +68,26 @@ TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
   net.nrOfLoops = 1;
   net.averageSpringLength = 1.0;
   // actual computation to test
-  for (int j = 0; j < 4; ++j) {
-    int i = 3*j;
+  for (int i = 0; i < 12; ++i) {
     std::cout << "MEHP Gradient Test coordinate " << i << std::endl;
-    x[i] = -h;
-    double fm = forceRelaxer2.evaluateForceSetGradient(
-      &net, 1.0, false, 12, x, NULL, NULL);
-    x[i] = h;
-    double fp = forceRelaxer2.evaluateForceSetGradient(
-      &net, 1.0, false, 12, x, NULL, NULL);
-    x[i] = 0.0;
-    std::cout << i << " " << fm << " " << fp << std::endl;
     // evaluate gradient
     double f = forceRelaxer2.evaluateForceSetGradient(
       &net, 1.0, false, 12, x, grad, NULL);
-    // require gradient to be similar to finite difference
-    REQUIRE(grad[i] == Catch::Approx((1.0 / (2.0 * h)) * (fp - fm)));
+    if (i % 3 != 0) {
+      // in x and y direction, we expect no spring distance -> 0 gradient
+      REQUIRE(grad[i] == Catch::Approx(0.0));
+    } else {
+      x[i] = -h;
+      double fm = forceRelaxer2.evaluateForceSetGradient(
+        &net, 1.0, false, 12, x, NULL, NULL);
+      x[i] = h;
+      double fp = forceRelaxer2.evaluateForceSetGradient(
+        &net, 1.0, false, 12, x, NULL, NULL);
+      x[i] = 0.0;
+      std::cout << i << " " << fm << " " << fp << std::endl;
+      // require gradient to be similar to finite difference
+      REQUIRE(grad[i] == Catch::Approx((1.0 / (2.0 * h)) * (fp - fm)));
+    }
   }
 }
 
@@ -144,7 +154,8 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation2]")
     // as the internal line-search steps are not counted
     // -> not a fast experiment anymore
     std::cout << "Starting force relaxation" << std::endl;
-    forceRelaxer.runForceRelaxation(5, 1e-10, 15, true, 1.0, 5, 1e-5, 1e-2, "LD_MMA");
+    forceRelaxer.runForceRelaxation(
+      5, 1e-10, 15, true, 1.0, 5, 1e-5, 1e-2, "LD_MMA");
     REQUIRE(forceRelaxer.getNrOfNodes() != universe.getNrOfAtoms());
     REQUIRE(forceRelaxer.getGammaEq() == Catch::Approx(1. / 3.).epsilon(0.01));
     REQUIRE(forceRelaxer.getNrOfIterations() <= 5);
