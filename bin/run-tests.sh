@@ -9,6 +9,7 @@ ROOT_DIR=$(pwd)
 if [ -d "_skbuild" ]; then
   rm -rf ./_skbuild
   rm -rf ./vendor/igraph/src/igraphLib-build
+  rm -rf ./vendor/nlopt/src/nloptLib-build
 fi
 
 cd "$ROOT_DIR/tests" || exit 2

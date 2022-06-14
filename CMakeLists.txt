@@ -48,6 +48,7 @@ message("Using toolchain file ${CMAKE_TOOLCHAIN_FILE}")
 # add sources & targets
 add_subdirectory(src/pylimer_tools_cpp)
 add_dependencies(pylimer_tools igraphLib)
+add_dependencies(pylimer_tools nlopt)
 
 pybind11_add_module(pylimer_tools_cpp MODULE 
   src/pylimer_tools_cpp/pybind11/entities.cpp

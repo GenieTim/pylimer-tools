@@ -55,6 +55,7 @@ FetchContent_MakeAvailable(Catch2)
 add_subdirectory(../src/pylimer_tools_cpp pylimer_tools.out)
 
 add_dependencies(pylimer_tools igraphLib)
+add_dependencies(pylimer_tools nlopt)
 include_directories(${igraph_INCLUDE_DIRS})
 include_directories(${nlopt_INCLUDE_DIRS})
 message("Found igraph for tests. Including ${igraph_INCLUDE_DIRS}, linking to ${igraph_LIBRARIES}")
