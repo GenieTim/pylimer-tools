@@ -15,7 +15,6 @@
 #include <string>
 #include <tuple>
 #include <vector>
-#include <cassert>
 
 namespace pylimer_tools {
 namespace calc {
@@ -23,9 +22,9 @@ namespace calc {
     enum ExitReason
     {
       UNSET,
-      TOLERANCE,
+      F_TOLERANCE,
+      X_TOLERANCE,
       MAX_STEPS,
-      GRADIENT_NORM,
       HESSIAN_CONDITION,
       OTHER
     };
@@ -115,15 +114,15 @@ namespace calc {
 
       ExitReason getExitReason() { return this->exitReason; }
 
-      void runForceRelaxation(long int maxNrOfSteps = 10000, // default: 10000
-                              double tol = 1e-9,             // default: 1e-9
+      void runForceRelaxation(bool is2D = false,
                               double Nb2spec = -1.0,
-                              bool is2D = false,
-                              double kappa = 1.0,
-                              int deltaViolations = 5,
+                              const char* algorithm = "LD_MMA",
+                              long int maxNrOfSteps = 50000, // default: 10000
+                              double xtol = 1e-12,
+                              double ftol = 1e-9,
                               double gradientNormTol = 1e-5,
                               double loopTol = 1e-2,
-                              const char* algorithm = "LD_MMA")
+                              double kappa = 1.0)
       {
         long int i, step, Nact, Mact, a, b;
         std::vector<double> r;
@@ -173,25 +172,30 @@ namespace calc {
         };
         opt.set_min_objective(objectiveF, &params);
         // set exit conditions
-        opt.set_xtol_rel(tol);
-        opt.set_ftol_rel(tol);
+        opt.set_xtol_rel(xtol);
+        opt.set_ftol_rel(ftol);
         opt.set_maxeval(maxNrOfSteps);
         // start/set/run minimization
         double minf;
-        opt.optimize(u0, minf);
+        nlopt::result res = opt.optimize(u0, minf);
         // query solution & exit reason
         u = Eigen::Map<Eigen::VectorXd>(u0.data(), u0.size());
 
         std::cout << "Ran " << opt.get_numevals()
                   << " iterations to a tolerance of " << opt.get_xtol_rel()
-                  << ", " << opt.get_ftol_rel() << ". U has norm " << u.norm()
-                  << std::endl;
+                  << ", " << opt.get_ftol_rel() << ", exit result " << res
+                  << ". U has norm " << u.norm() << std::endl;
 
-        this->exitReason = opt.get_numevals() >= maxNrOfSteps - 1
-                             ? ExitReason::MAX_STEPS
-                             : ExitReason::TOLERANCE;
+        this->exitReason = ExitReason::OTHER;
+        if (res == nlopt::result::FTOL_REACHED) {
+          this->exitReason = ExitReason::F_TOLERANCE;
+        } else if (res == nlopt::result::XTOL_REACHED) {
+          this->exitReason = ExitReason::X_TOLERANCE;
+        } else if (res == nlopt::result::MAXEVAL_REACHED) {
+          this->exitReason = ExitReason::MAX_STEPS;
+        }
         // TODO: evaluate solution properties properly
-        
+        this->nrOfStepsDone = opt.get_numevals();
         Fdef = Residual(&net, u, r, kappa);
 
         /* acquire equilibrium properties */
@@ -232,7 +236,7 @@ namespace calc {
         // this->finalS2len = s2len;
         // this->initialS2len = s20len;
         // this->finalG = G;
-        this->gammaEq = s2len; // G;
+        this->gammaEq = s2 / this->Nb2; // G;
         this->sigmaX = stress[0][0];
         this->sigmaY = stress[1][1];
         this->sigmaZ = stress[2][2];
@@ -256,15 +260,16 @@ namespace calc {
        * @return double
        */
       static double evaluateForceSetGradient(const Network* net,
-                                             double kappa,
-                                             bool is2D,
-                                             unsigned n,
+                                             const double kappa,
+                                             const bool is2D,
+                                             const unsigned n,
                                              const double* x,
                                              double* grad,
                                              void* f_data)
       {
         Eigen::Map<const Eigen::VectorXd> u =
           Eigen::Map<const Eigen::VectorXd>(x, n);
+        assert(n == net->nrOfNodes * 3);
 
         double boxHalfs[3];
         boxHalfs[0] = 0.5 * net->L[0];
@@ -283,7 +288,7 @@ namespace calc {
         if (is2D) {
           // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
           //   Eigen::VectorXd::Zero(net->nrOfSprings / 3);
-          for (size_t i = 2; i < net->nrOfSprings; i += 3) {
+          for (size_t i = 2; i < net->nrOfSprings * 3; i += 3) {
             springDistances[i] = 0.0;
           }
         }
@@ -297,10 +302,11 @@ namespace calc {
             springDistances[j] += boxHalfs[j % 3];
           }
         }
+
         double s2 = springDistances.norm();
-        double constantMultiplier = 0.5 * kappa / (s2);
+        double constantMultiplier = kappa * 0.5 / s2;
         if (grad != NULL) {
-          for (size_t j = 0; j < net->nrOfSprings; ++j) {
+          for (size_t j = 0; j < n; ++j) {
             grad[j] = 0.0;
           }
           for (size_t j = 0; j < net->nrOfSprings; ++j) {
@@ -315,8 +321,8 @@ namespace calc {
             }
           }
         }
-        std::cout << "Evaluated force to " << std::setprecision(15)
-                  << 0.5 * kappa * s2 << std::endl;
+        // std::cout << "Evaluated force to " << std::setprecision(15)
+        //           << 0.5 * kappa * s2 << std::endl;
         return 0.5 * kappa * s2;
       }
 
@@ -450,7 +456,7 @@ namespace calc {
         if (this->is2D) {
           // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
           //   Eigen::VectorXd::Zero(net->nrOfSprings / 3);
-          for (size_t i = 2; i < net->nrOfSprings; i += 3) {
+          for (size_t i = 2; i < 3 * net->nrOfSprings; i += 3) {
             springDistances[i] = 0.0;
           }
         }
@@ -522,7 +528,7 @@ namespace calc {
         if (this->is2D) {
           // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
           //   Eigen::VectorXd::Zero(net->nrOfSprings / 3);
-          for (size_t i = 2; i < net->nrOfSprings; i += 3) {
+          for (size_t i = 2; i < 3 * net->nrOfSprings; i += 3) {
             springDistances[i] = 0.0;
           }
         }
@@ -561,8 +567,8 @@ namespace calc {
           }
         }
 
-        return std::make_pair(s2 / (double)net->nrOfSprings,
-                              s2len / (double)net->nrOfSprings);
+        return std::make_pair(s2 / static_cast<double>(net->nrOfSprings),
+                              s2len / static_cast<double>(net->nrOfSprings));
       }
 
     private:
