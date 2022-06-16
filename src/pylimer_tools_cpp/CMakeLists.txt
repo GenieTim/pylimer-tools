@@ -39,10 +39,16 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/CMakeLists.txt)
 
 add_dependencies(pylimer_tools igraph)
 include_directories(${igraph_INCLUDE_DIRS})
+add_dependencies(pylimer_tools nlopt)
 include_directories(${nlopt_INCLUDE_DIRS})
-target_link_libraries(pylimer_tools PUBLIC ${igraph_LIBRARIES} Eigen3::Eigen ${nlopt_LIBRARIES})
 
-message("pylimer_tools includes igraph from ${igraph_INCLUDE_DIRS}")
+target_link_libraries(pylimer_tools PUBLIC 
+	${igraph_LIBRARIES} 
+	${nlopt_LIBRARIES}
+	Eigen3::Eigen 
+	)
+
+message("pylimer_tools includes igraph from ${igraph_INCLUDE_DIRS}, nlopt from ${nlopt_INCLUDE_DIRS}")
 
 # optional additional dependencies
 find_package(OpenMP)

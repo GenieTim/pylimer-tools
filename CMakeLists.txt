@@ -61,6 +61,7 @@ pybind11_add_module(pylimer_tools_cpp MODULE
 
 # add other dependencies
 include_directories(${igraph_INCLUDE_DIRS})
+include_directories(${nlopt_INCLUDE_DIRS})
 
 message("pylimer_tools_cpp includes igraph from ${igraph_INCLUDE_DIRS}")
 
@@ -69,6 +70,7 @@ target_link_libraries(pylimer_tools_cpp
   PUBLIC 
     pylimer_tools
     ${igraph_LIBRARIES}
+    ${nlopt_LIBRARIES}
 )
 
 target_compile_definitions(pylimer_tools_cpp PRIVATE VERSION_INFO=${PROJECT_VERSION})
