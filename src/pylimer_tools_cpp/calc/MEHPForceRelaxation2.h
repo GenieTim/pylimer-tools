@@ -172,14 +172,14 @@ namespace calc {
         double f0 = MEHPForceRelaxation2::evaluateForceSetGradient(
           &net, kappa, is2D, 3 * net.nrOfNodes, x0, r0, NULL);
         this->initialForce = f0;
-        free(x0);
+        delete[]x0;
 
         double r20 = 0.;
         for (size_t i = 0; i < 3 * net.nrOfNodes; i++) {
           r20 += r0[i] * r0[i];
         }
         this->initialResidualNorm = r20;
-        free(r0);
+        delete[](r0);
 
         /* force relaxation */
         nlopt::opt opt(algorithm, 3 * net.nrOfNodes);
@@ -231,7 +231,7 @@ namespace calc {
           r2 += residuals[i] * residuals[i];
         }
         this->finalResidualNorm = r2;
-        free(residuals);
+        delete[]residuals;
 
         std::cout << "Ran " << opt.get_numevals()
                   << " iterations to a tolerance of " << opt.get_xtol_rel()
@@ -256,7 +256,7 @@ namespace calc {
         double G = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
         std::cout << "Pressure is " << G << " from " << G0 << ", s2 is " << s2
                   << " from " << s20 << ", s2len is " << s2len << " from "
-                  << s20len << ", residual norm from " << r2 << " to " << r20
+                  << s20len << ", residual norm is " << r2 << " from " << r20
                   << std::endl;
         this->finalPressure = G;
 
@@ -375,14 +375,14 @@ namespace calc {
           }
         }
         assert(springDistances.size() == net->nrOfSprings * 3);
-        
+
         // Possibly improvable PBC
         for (size_t j = 0; j < 3 * net->nrOfSprings; ++j) {
           while (springDistances[j] > boxHalfs[j % 3]) {
-            springDistances[j] -= boxHalfs[j % 3];
+            springDistances[j] -= net->L[j % 3];
           }
           while (springDistances[j] < -boxHalfs[j % 3]) {
-            springDistances[j] += boxHalfs[j % 3];
+            springDistances[j] += net->L[j % 3];
           }
         }
 
@@ -404,8 +404,13 @@ namespace calc {
             }
           }
         }
+        double s2m = 0.0;
+        for (size_t i = 0; i < 3*net->nrOfSprings; ++i) {
+          s2m += springDistances[i] * springDistances[i];
+        }
         // std::cout << "Evaluated force to " << std::setprecision(15)
-        //           << 0.5 * kappa * s2 << std::endl;
+        //           << 0.5 * kappa * s2 << ", whereas manual gives "
+        //           << s2m * 0.5 * kappa << std::endl;
         return 0.5 * kappa * s2;
       }
 
@@ -511,6 +516,11 @@ namespace calc {
       {
         double s2 = 0., s2len = 0.;
 
+        double boxHalfs[3];
+        boxHalfs[0] = 0.5 * net->L[0];
+        boxHalfs[1] = 0.5 * net->L[1];
+        boxHalfs[2] = 0.5 * net->L[2];
+
         for (size_t j = 0; j < 3; j++) {
           for (size_t k = 0; k < 3; k++) {
             stress[j][k] = 0.;
@@ -537,6 +547,16 @@ namespace calc {
           }
         }
         assert(springDistances.size() == net->nrOfSprings * 3);
+
+        // Possibly improvable PBC
+        // for (size_t j = 0; j < 3 * net->nrOfSprings; ++j) {
+        //   while (springDistances[j] > boxHalfs[j % 3]) {
+        //     springDistances[j] -= boxHalfs[j % 3];
+        //   }
+        //   while (springDistances[j] < -boxHalfs[j % 3]) {
+        //     springDistances[j] += boxHalfs[j % 3];
+        //   }
+        // }
 
         // then, the stresses
         for (size_t i = 0; i < net->nrOfSprings; ++i) {
