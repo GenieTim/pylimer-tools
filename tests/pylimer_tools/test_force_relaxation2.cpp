@@ -3,6 +3,7 @@
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <chrono>
 #include <filesystem>
 #include <iostream>
 #include <map>
@@ -128,7 +129,7 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation2]")
   SECTION("3D case")
   {
     std::string largeInputFile =
-      suspectedPath + "xlinked_0.90015_pdms_1e4_a_78_bs_t_807536.structure.out";
+      suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
     if (std::filesystem::exists(largeInputFile)) {
       universeSeq.initializeFromDataSequence({ { largeInputFile } });
       pe::Universe universe2 = universeSeq.atIndex(0);
@@ -139,7 +140,20 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation2]")
       REQUIRE(forceRelaxer2.getVolume() ==
               Catch::Approx(universe2.getVolume()));
       REQUIRE_NOTHROW(forceRelaxer2.runForceRelaxation());
-      CHECK(forceRelaxer2.getFinalPressure() == Catch::Approx(2.49685e-1));
+      // initial system values
+      CHECK(forceRelaxer2.getInitialPressure() ==
+            Catch::Approx(0.39911682390778536));
+      CHECK(forceRelaxer2.getInitialForce() ==
+            Catch::Approx(552894.1903005145));
+      CHECK(forceRelaxer2.getInitialResidualNorm() ==
+            Catch::Approx(2.1242043665818353e6));
+      CHECK(forceRelaxer2.getNrOfSprings() == 8373);
+
+      // final values
+      CHECK(forceRelaxer2.getFinalResidualNorm() == Catch::Approx(0.1538));
+      CHECK(forceRelaxer2.getFinalPressure() == Catch::Approx(0.153806));
+      CHECK(forceRelaxer2.getGammaEq() == Catch::Approx(42.6132));
+      CHECK(forceRelaxer2.getFinalForce() == Catch::Approx(213066.14027440464));
       CHECK(forceRelaxer2.getNrOfIterations() > 1);
       double kb = 1.381e-23; // Boltzmann, J/K
       double T = 300.;       // Temperature, K
@@ -147,8 +161,8 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation2]")
       double sigmaToM = sigmaToNm * 1.e-9;
       double slope = sigmaToNm * sigmaToNm * 0.00393; // sigma^2/(g/mol)
       double beadMass = 161.;                         // g/mol
-      double Nb = 80;                                 // nr of beads per strand
-      double conversionFactor = 3 * kb * T / (1e-18 * slope * beadMass * Nb);
+      double Nb = 80.;                                // nr of beads per strand
+      double conversionFactor = 3. * kb * T / (1.e-18 * slope * beadMass * Nb);
       CHECK(conversionFactor ==
             Catch::Approx(0.000245543 / (sigmaToNm * sigmaToNm)));
       CHECK(forceRelaxer2.getGammaEq() * forceRelaxer2.getNrOfSprings() /
@@ -191,5 +205,25 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation2]")
     REQUIRE(forceRelaxer2.getNrOfIterations() > 5);
     CHECK(forceRelaxer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceRelaxer2.getGammaEq() == Catch::Approx(1. / 3.));
+    std::vector<std::string> algorithms = { "LD_LBFGS",
+                                            // "LD_TNEWTON_PRECOND_RESTART",
+                                            // "GD_STOGO",
+                                            "LD_SLSQP",
+                                            "GN_DIRECT" };
+
+    // for (std::string algorithm : algorithms) {
+    //   pcm::MEHPForceRelaxation2 forceRelaxerN =
+    //     pcm::MEHPForceRelaxation2(universe, 2);
+    //   std::cout << "Testing algorithm " << algorithm << std::endl;
+    //   auto start = std::chrono::high_resolution_clock::now();
+    //   forceRelaxerN.runForceRelaxation(true, 15, algorithm.c_str(), 10000);
+    //   auto stop = std::chrono::high_resolution_clock::now();
+    //   CHECK(forceRelaxerN.getGammaEq() ==
+    //         Catch::Approx(forceRelaxer2.getGammaEq()));
+    //   CHECK(forceRelaxerN.getFinalPressure() ==
+    //         Catch::Approx(forceRelaxer2.getFinalPressure()));
+    //   auto duration = duration_cast<std::chrono::microseconds>(stop - start);
+    //   std::cout << "Took: " << duration.count() << std::endl;
+    // }
   }
 }

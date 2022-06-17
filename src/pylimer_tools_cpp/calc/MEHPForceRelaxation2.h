@@ -98,7 +98,17 @@ namespace calc {
 
       double getAverageSpringLength() { return sqrt(this->R2Mean); }
 
+      double getInitialPressure() { return this->initialPressure; }
+
       double getFinalPressure() { return this->finalPressure; }
+
+      double getInitialResidualNorm() { return this->initialResidualNorm; }
+
+      double getFinalResidualNorm() { return this->finalResidualNorm; }
+
+      double getInitialForce() { return this->initialForce; }
+
+      double getFinalForce() { return this->finalForce; }
 
       double getGammaEq() { return this->gammaEq; }
 
@@ -125,8 +135,14 @@ namespace calc {
                               double kappa = 1.0)
       {
         long int i, step, Nact, Mact, a, b;
-        std::vector<double> r;
-        double stress[3][3], G0, r2, G, s20, s2, s20len, s2len;
+        double stress[3][3], s2, s20, s20len, s2len;
+
+        for (size_t j = 0; j < 3; j++) {
+          for (size_t k = 0; k < 3; k++) {
+            stress[j][k] = 0.;
+          }
+        }
+
         Network net = this->finalConfig;
         FILE* fp;
         const int M = this->universe.getMolecules(crosslinkerType).size();
@@ -138,23 +154,34 @@ namespace calc {
         this->is2D = is2D;
 
         /* array allocation */
-        r.reserve(3 * net.nrOfNodes);
         std::vector<double> u0 =
           pylimer_tools::utils::initializeWithValue(3 * net.nrOfNodes, 0.0);
         Eigen::VectorXd u = Eigen::VectorXd::Zero(3 * net.nrOfNodes);
 
-        /* initial */
+        /* initial evaluations */
+        double* x0 = new double[3 * net.nrOfNodes];
+        double* r0 = new double[3 * net.nrOfNodes];
+        for (size_t i = 0; i < net.nrOfNodes * 3; ++i) {
+          x0[i] = 0.0;
+          r0[i] = 0.0;
+        }
+
         std::tie(s20, s20len) =
           computeStressAndSquareDistances(&net, u, stress, kappa, loopTol);
-        double Fdef = Residual(&net, u, r, kappa);
+        double G0 = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
+        double f0 = MEHPForceRelaxation2::evaluateForceSetGradient(
+          &net, kappa, is2D, 3 * net.nrOfNodes, x0, r0, NULL);
+        this->initialForce = f0;
+        free(x0);
+
         double r20 = 0.;
         for (size_t i = 0; i < 3 * net.nrOfNodes; i++) {
-          r20 += r[i] * r[i];
+          r20 += r0[i] * r0[i];
         }
-        G0 = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
+        this->initialResidualNorm = r20;
+        free(r0);
 
         /* force relaxation */
-
         nlopt::opt opt(algorithm, 3 * net.nrOfNodes);
 
         AdditionalFunctionParameters params;
@@ -171,6 +198,19 @@ namespace calc {
             fParams->net, fParams->kappa, fParams->is2D, n, x, grad, f_data);
         };
         opt.set_min_objective(objectiveF, &params);
+        // set constraints to support more algorithms
+        // std::vector<double> upperBounds;
+        // upperBounds.reserve(3 * net.nrOfNodes);
+        // std::vector<double> lowerBounds;
+        // lowerBounds.reserve(3 * net.nrOfNodes);
+        // for (size_t i = 0; i < net.nrOfNodes; ++i) {
+        //   for (size_t dir = 0; dir < 3; ++dir) {
+        //     upperBounds.push_back(net.L[dir] * 0.5);
+        //     lowerBounds.push_back(-net.L[dir] * 0.5);
+        //   }
+        // }
+        // opt.set_upper_bounds(upperBounds);
+        // opt.set_lower_bounds(lowerBounds);
         // set exit conditions
         opt.set_xtol_rel(xtol);
         opt.set_ftol_rel(ftol);
@@ -178,13 +218,26 @@ namespace calc {
         // start/set/run minimization
         double minf;
         nlopt::result res = opt.optimize(u0, minf);
+
         // query solution & exit reason
+        assert(u0.size() == 3 * net.nrOfNodes);
         u = Eigen::Map<Eigen::VectorXd>(u0.data(), u0.size());
+        double* residuals = new double[3 * net.nrOfNodes];
+        double fFinal = MEHPForceRelaxation2::evaluateForceSetGradient(
+          &net, kappa, is2D, 3 * net.nrOfNodes, u, residuals, NULL);
+        this->finalForce = fFinal;
+        double r2 = 0.0;
+        for (int i = 0; i < net.nrOfNodes * 3; i++) {
+          r2 += residuals[i] * residuals[i];
+        }
+        this->finalResidualNorm = r2;
+        free(residuals);
 
         std::cout << "Ran " << opt.get_numevals()
                   << " iterations to a tolerance of " << opt.get_xtol_rel()
                   << ", " << opt.get_ftol_rel() << ", exit result " << res
-                  << ". U has norm " << u.norm() << std::endl;
+                  << ". U has norm " << u.squaredNorm() << ", minF is "
+                  << fFinal << " from " << f0 << std::endl;
 
         this->exitReason = ExitReason::OTHER;
         if (res == nlopt::result::FTOL_REACHED) {
@@ -196,12 +249,15 @@ namespace calc {
         }
         // TODO: evaluate solution properties properly
         this->nrOfStepsDone = opt.get_numevals();
-        Fdef = Residual(&net, u, r, kappa);
-
         /* acquire equilibrium properties */
         std::tie(s2, s2len) =
           computeStressAndSquareDistances(&net, u, stress, kappa, loopTol);
-        G = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
+
+        double G = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
+        std::cout << "Pressure is " << G << " from " << G0 << ", s2 is " << s2
+                  << " from " << s20 << ", s2len is " << s2len << " from "
+                  << s20len << ", residual norm from " << r2 << " to " << r20
+                  << std::endl;
         this->finalPressure = G;
 
         /* active springs */
@@ -230,7 +286,7 @@ namespace calc {
         }
 
         /* save results */
-        // this->initialG = G0;
+        this->initialPressure = G0;
         // this->initialS2 = s20;
         // this->finalS2 = s2;
         // this->finalS2len = s2len;
@@ -269,6 +325,31 @@ namespace calc {
       {
         Eigen::Map<const Eigen::VectorXd> u =
           Eigen::Map<const Eigen::VectorXd>(x, n);
+        return evaluateForceSetGradient(net, kappa, is2D, n, u, grad, f_data);
+      }
+
+      /**
+       * @brief This function does the step
+       *
+       * This function is public for testing purposes — TODO: find a better way
+       *
+       * @param net
+       * @param kappa
+       * @param is2D
+       * @param n
+       * @param u
+       * @param grad
+       * @param f_data
+       * @return double
+       */
+      static double evaluateForceSetGradient(const Network* net,
+                                             const double kappa,
+                                             const bool is2D,
+                                             const unsigned n,
+                                             const Eigen::VectorXd& u,
+                                             double* grad,
+                                             void* f_data)
+      {
         assert(n == net->nrOfNodes * 3);
 
         double boxHalfs[3];
@@ -285,6 +366,7 @@ namespace calc {
           actualCoordinates(net->springCoordinateIndexB);
         Eigen::VectorXd springDistances =
           (coordinatesSpringEndA - coordinatesSpringEndB);
+
         if (is2D) {
           // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
           //   Eigen::VectorXd::Zero(net->nrOfSprings / 3);
@@ -293,6 +375,7 @@ namespace calc {
           }
         }
         assert(springDistances.size() == net->nrOfSprings * 3);
+        
         // Possibly improvable PBC
         for (size_t j = 0; j < 3 * net->nrOfSprings; ++j) {
           while (springDistances[j] > boxHalfs[j % 3]) {
@@ -303,8 +386,8 @@ namespace calc {
           }
         }
 
-        double s2 = springDistances.norm();
-        double constantMultiplier = kappa * 0.5 / s2;
+        double s2 = springDistances.squaredNorm();
+        double constantMultiplier = kappa; // * 0.5 / s2;
         if (grad != NULL) {
           for (size_t j = 0; j < n; ++j) {
             grad[j] = 0.0;
@@ -404,7 +487,7 @@ namespace calc {
        * @param s the distances
        * @param box the box lengths
        */
-      void ImposePBC(double s[3], double box[3]) const
+      void ImposePBC(double (&s)[3], const double box[3]) const
       {
         for (int i = 0; i < 3; i++) {
           double half = 0.5 * box[i];
@@ -419,93 +502,14 @@ namespace calc {
         return;
       }
 
-      /**
-       * @brief the residual is minus the assembled force vector
-       *
-       * @param net the network to compute the residual for
-       * @param u the displacement vector
-       * @param r the residual
-       * @return the definitive force
-       */
-      double Residual(Network* net,
-                      const Eigen::VectorXd& u,
-                      std::vector<double>& r,
-                      double kappa)
-      {
-        long int glob[6];
-        double s[3], ua[3], ub[3], s2, fele[6];
-
-        /* initial */
-        double Fdef = 0.;
-        for (size_t i = 0; i < 3 * net->nrOfNodes; i++) {
-          r[i] = 0.;
-        }
-
-        /* assembly */
-        // first, the distances
-        assert(u.size() == net->coordinates.size());
-        Eigen::VectorXd actualCoordinates = net->coordinates + u;
-        // It *could* be more efficient to index u instead of the coordinates
-        Eigen::VectorXd coordinatesSpringEndA =
-          actualCoordinates(net->springCoordinateIndexA);
-        Eigen::VectorXd coordinatesSpringEndB =
-          actualCoordinates(net->springCoordinateIndexB);
-        Eigen::VectorXd springDistances =
-          (coordinatesSpringEndA - coordinatesSpringEndB);
-
-        if (this->is2D) {
-          // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
-          //   Eigen::VectorXd::Zero(net->nrOfSprings / 3);
-          for (size_t i = 2; i < 3 * net->nrOfSprings; i += 3) {
-            springDistances[i] = 0.0;
-          }
-        }
-
-        // then, the residuals
-        for (size_t i = 0; i < net->nrOfSprings; i++) {
-          double s[3] = { springDistances[3 * i + 0],
-                          springDistances[3 * i + 1],
-                          springDistances[3 * i + 2] };
-          ImposePBC(s, net->L);
-          int a = net->springIndexA[i];
-          int b = net->springIndexB[i];
-
-          /* energy update */
-          s2 = 0.;
-          for (size_t j = 0; j < 3; j++) {
-            s2 += s[j] * s[j];
-          }
-          Fdef += 0.5 * kappa * s2;
-
-          /* element force vector */
-          for (size_t j = 0; j < 3; j++) {
-            fele[j] = kappa * s[j];
-            fele[j + 3] = -kappa * s[j];
-          }
-
-          /* global numbering scheme */
-          for (size_t j = 0; j < 3; j++) {
-            glob[j] = 3 * a + j;
-            glob[j + 3] = 3 * b + j;
-          }
-
-          /* residual update */
-          for (size_t j = 0; j < 6; j++) {
-            r[glob[j]] -= fele[j];
-          }
-        };
-
-        return Fdef;
-      }
-
       std::pair<double, double> computeStressAndSquareDistances(
         Network* net,
         const Eigen::VectorXd& u,
-        double stress[3][3],
-        double kappa,
-        double loopTol)
+        double (&stress)[3][3],
+        const double kappa,
+        const double loopTol)
       {
-        double s2 = 0, s2len = 0;
+        double s2 = 0., s2len = 0.;
 
         for (size_t j = 0; j < 3; j++) {
           for (size_t k = 0; k < 3; k++) {
@@ -532,6 +536,7 @@ namespace calc {
             springDistances[i] = 0.0;
           }
         }
+        assert(springDistances.size() == net->nrOfSprings * 3);
 
         // then, the stresses
         for (size_t i = 0; i < net->nrOfSprings; ++i) {
@@ -585,7 +590,12 @@ namespace calc {
       int nrOfStepsDone = 0;
       double Nb2 = 0.0;
       double gammaEq = 0.0;
+      double initialPressure = 0.0;
       double finalPressure = 0.0;
+      double initialResidualNorm = 0.0;
+      double finalResidualNorm = 0.0;
+      double initialForce = 0.0;
+      double finalForce = 0.0;
       double sigmaX = 0.0;
       double sigmaY = 0.0;
       double sigmaZ = 0.0;
