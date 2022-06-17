@@ -130,7 +130,6 @@ namespace calc {
                               long int maxNrOfSteps = 50000, // default: 10000
                               double xtol = 1e-12,
                               double ftol = 1e-9,
-                              double gradientNormTol = 1e-5,
                               double loopTol = 1e-2,
                               double kappa = 1.0)
       {

@@ -201,7 +201,7 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation2]")
     // run again, this time fully
     pcm::MEHPForceRelaxation2 forceRelaxer2 =
       pcm::MEHPForceRelaxation2(universe, 2);
-    forceRelaxer2.runForceRelaxation(true, 15, "LD_MMA", 10000, 1e-7);
+    forceRelaxer2.runForceRelaxation(true, 15, "LD_MMA", 10000, 1e-7, 1e-12);
     REQUIRE(forceRelaxer2.getNrOfIterations() > 5);
     CHECK(forceRelaxer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceRelaxer2.getGammaEq() == Catch::Approx(1. / 3.));
