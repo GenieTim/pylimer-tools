@@ -1503,11 +1503,11 @@ namespace entities {
   {
     std::vector<Molecule> molecules = this->getMolecules(crosslinkerType);
 
-    double multiplier = 1.0 / molecules.size();
+    double multiplier = 1.0 / static_cast<double>(molecules.size());
     double meanStrandLength = 0;
 
     for (Molecule molecule : molecules) {
-      meanStrandLength += molecule.getLength() * multiplier;
+      meanStrandLength += static_cast<double>(molecule.getLength()) * multiplier;
     }
     return meanStrandLength;
   }

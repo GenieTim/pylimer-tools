@@ -26,6 +26,8 @@ if (NOT DEFINED nlopt_LOADED)
 				CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_LIST_DIR}/nlopt/nloptLib-install -DCMAKE_INSTALL_LIBDIR=${CMAKE_CURRENT_LIST_DIR}/nlopt/nloptLib-install/lib -DNLOPT_GUILE=OFF -DNLOPT_OCTAVE=OFF -DNLOPT_MATLAB=OFF -DNLOPT_SWIG=OFF
 				BUILD_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_LIST_DIR}/nlopt/src/nloptLib-build --config Release
 				BUILD_BYPRODUCTS ${CMAKE_CURRENT_LIST_DIR}/nlopt/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt${LIBRARY_SUFFIX}
+				BUILD_BYPRODUCTS ${CMAKE_CURRENT_LIST_DIR}/nlopt/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt.0${LIBRARY_SUFFIX}
+				BUILD_BYPRODUCTS ${CMAKE_CURRENT_LIST_DIR}/nlopt/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt.0.11.1${LIBRARY_SUFFIX}
 				UPDATE_DISCONNECTED ON
 		)
 		# FetchContent_MakeAvailable(nloptLib)
@@ -41,7 +43,7 @@ if (NOT DEFINED nlopt_LOADED)
 		if (NOT nlopt_LIBRARIES)
 			# message("WARNING: nlopt_LIBRARIES empty")
 			# TODO: this is somewhat unreliable
-			set(nlopt_LIBRARIES "${nlopt_PREFIX_PATH}/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt${LIBRARY_SUFFIX};${nlopt_PREFIX_PATH}/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt.0${LIBRARY_SUFFIX};${nlopt_PREFIX_PATH}/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt.0.11.1${LIBRARY_SUFFIX}")
+			set(nlopt_LIBRARIES "${nlopt_PREFIX_PATH}/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt${LIBRARY_SUFFIX}" "${nlopt_PREFIX_PATH}/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt.0${LIBRARY_SUFFIX}" "${nlopt_PREFIX_PATH}/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt.0.11.1${LIBRARY_SUFFIX}")
 			# file(GLOB_RECURSE nlopt_LIBRARIES "${nlopt_PREFIX_PATH}/*.a")
 		endif()
 		message("Hoping nlopt_LIBRARIES will be compiled to: ${nlopt_LIBRARIES}")

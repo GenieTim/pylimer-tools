@@ -18,7 +18,7 @@ cd "$ROOT_DIR/tests" || exit 2
 # rm -rf build; rm -rf vendor/igraph;
 mkdir -p build
 cd build || exit 5
-rm ./**/*.gcda
+# rm ./**/*.gcda
 GENERATOR_BIN="make"
 # force use of g++ if available for coverage
 # or clang on MacOS, as g++ leak analysis is not supported there
