@@ -8,6 +8,7 @@
 #include <iostream>
 #include <map>
 #include <vector>
+#include <cmath>
 
 namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
@@ -134,7 +135,8 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation2]")
       universeSeq.initializeFromDataSequence({ { largeInputFile } });
       pe::Universe universe2 = universeSeq.atIndex(0);
       double nrOfChains = 1.e4;
-      CHECK(static_cast<double>(universe2.getMolecules(2).size()) == Catch::Approx(nrOfChains));
+      CHECK(static_cast<double>(universe2.getMolecules(2).size()) ==
+            Catch::Approx(nrOfChains));
       pcm::MEHPForceRelaxation2 forceRelaxer2 =
         pcm::MEHPForceRelaxation2(universe2, 2);
       REQUIRE(forceRelaxer2.getExitReason() == pcm::ExitReason::UNSET);
@@ -145,6 +147,7 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation2]")
             Catch::Approx(97.383096 * 97.383096 * 97.383096));
       REQUIRE_NOTHROW(forceRelaxer2.runForceRelaxation());
       CHECK(forceRelaxer2.getNrOfSprings() == 8142);
+      CHECK(forceRelaxer2.getNrOfIterations() > 1);
       // initial system values
       CHECK(forceRelaxer2.getInitialPressure() ==
             Catch::Approx(0.39911682390778536));
@@ -153,15 +156,7 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation2]")
       CHECK(forceRelaxer2.getInitialResidualNorm() ==
             Catch::Approx(2.1242043665818353e6));
 
-      // final values
-      CHECK(forceRelaxer2.getFinalPressure() == Catch::Approx(0.153806)); // LJ Units
-      double ljPressureToMPa = 17.6;
-      CHECK(forceRelaxer2.getFinalPressure() * (ljPressureToMPa) ==
-            Catch::Approx(61308.3)); // shear modulus from the pressure, MPa
-      double gammaCorrectionFactor = forceRelaxer2.getNrOfSprings()/nrOfChains;
-      CHECK(forceRelaxer2.getGammaEq() * gammaCorrectionFactor ==
-            Catch::Approx(42.6132));
-      CHECK(forceRelaxer2.getNrOfIterations() > 1);
+      // conversion factors
       double kb = 1.381e-23; // Boltzmann, J/K
       double T = 300.;       // Temperature, K
       double sigmaToNm = 0.616;
@@ -173,14 +168,25 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation2]")
         3. * kb * T / (slope * beadMass * Nb); // J/sigma^2
       CHECK(conversionFactor / (sigmaToM * sigmaToM) ==
             Catch::Approx(0.000245543));
-      double nu = nrOfChains /
-                  (forceRelaxer2.getVolume() * sigmaToM * sigmaToM *
-                   sigmaToM); // chain number density, m^-3
+      double nu =
+        nrOfChains / (forceRelaxer2.getVolume() * sigmaToM * sigmaToM *
+                      sigmaToM); // chain number density, m^-3
       CHECK(nu == Catch::Approx(4.63241e25));
+
+      // final values
+      CHECK(forceRelaxer2.getFinalPressure() ==
+            Catch::Approx(0.153806)); // LJ Units [?]
+      CHECK(forceRelaxer2.getFinalPressure() * conversionFactor /
+              (sigmaToM * sigmaToM * sigmaToM) ==
+            Catch::Approx(61308.3)); // shear modulus from the pressure, MPa
+      double nrOfChainCorrection = (forceRelaxer2.getNrOfSprings() / nrOfChains);
+      double nb2Correction = (forceRelaxer2.getNb2() / (slope * Nb * beadMass));
+      double gammaCorrectionFactor = nrOfChainCorrection * nb2Correction;
+      CHECK(forceRelaxer2.getGammaEq() * nrOfChainCorrection * std::ceil(universe2.getMeanStrandLength(2)) ==
+            Catch::Approx(42.6132)); // as from conversion-less Mathematica script
       CHECK(forceRelaxer2.getGammaEq() * gammaCorrectionFactor * kb * T * nu ==
             Catch::Approx(61308.3)); // ANT shear modulus, Pa
-      CHECK(forceRelaxer2.getGammaEq() * gammaCorrectionFactor * forceRelaxer2.getNb2() /
-              (slope * Nb * beadMass) ==
+      CHECK(forceRelaxer2.getGammaEq() * gammaCorrectionFactor ==
             Catch::Approx(0.319446)); // "correct" gamma factor
       CHECK(forceRelaxer2.getExitReason() == pcm::ExitReason::F_TOLERANCE);
     } else {
