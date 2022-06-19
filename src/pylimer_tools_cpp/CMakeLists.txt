@@ -46,7 +46,7 @@ target_link_libraries(pylimer_tools PUBLIC
 	${igraph_LIBRARIES} 
 	${nlopt_LIBRARIES}
 	Eigen3::Eigen 
-	)
+)
 
 message("pylimer_tools includes igraph from ${igraph_INCLUDE_DIRS}, nlopt from ${nlopt_INCLUDE_DIRS}")
 
