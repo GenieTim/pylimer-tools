@@ -22,8 +22,8 @@ if (DEFINED ADDITIONAL_LIBS)
 endif()
 
 # add dependencies
-find_package(Eigen3 3.4 NO_MODULE)
-if(${Eigen3_FOUND})
+find_package(Eigen3 3.4 NO_MODULE) # 3.4
+if(${Eigen3_FOUND}) # AND (${Eigen3_VERSION} VERSION_GREATER_EQUAL 3.4)
 		message(STATUS "Found Eigen3 Version: ${Eigen3_VERSION} Path: ${Eigen3_DIR}")
 else()
 		include(FetchContent)

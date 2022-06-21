@@ -1,16 +1,20 @@
-#ifndef MEHP_FORCE_RELAX_H
-#define MEHP_FORCE_RELAX_H
+#ifndef MEHP_FORCE_RELAX2_H
+#define MEHP_FORCE_RELAX2_H
 
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
-#include "../utils/VectorUtils.h"
+#include <Eigen/Dense>
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <iomanip>
+#include <iostream>
 #include <map>
+#include <nlopt.hpp>
 #include <string>
 #include <tuple>
+#include <vector>
 
 namespace pylimer_tools {
 namespace calc {
@@ -18,44 +22,45 @@ namespace calc {
     enum ExitReason
     {
       UNSET,
-      TOLERANCE,
-      MAX_STEPS
+      F_TOLERANCE,
+      X_TOLERANCE,
+      MAX_STEPS,
+      HESSIAN_CONDITION,
+      OTHER
     };
 
-    typedef struct _Spring
-    {
-      long int a;    /* first node */
-      long int b;    /* second node */
-      long int len;  /* length */
-      bool isActive; /* 1/0; active or not */
-    } Spring;
+    typedef Eigen::Array<bool, Eigen::Dynamic, 1> ArrayXb;
 
-    typedef struct _Node
-    {
-      double x;                     /* x-coordinate */
-      double y;                     /* y-coordinate */
-      double z;                     /* z-coordinate */
-      long int nrOfActiveConnected; /* number of active springs connected to the
-                                       node */
-    } Node;
-
-    typedef struct _Network
+    // improved structures using Eigen
+    typedef struct Network
     {
       double L[3];                /* box sizes */
       double vol;                 /* box volume */
       long int nrOfNodes;         /* number of nodes */
       long int nrOfSprings;       /* number of springs */
-      Node* nodes;                /* nodes */
-      Spring* springs;            /* spings */
-      double* nodalDisplacements; /* nodal displacements */
-      double* nodalForces;        /* nodal forces */
       double averageSpringLength; /* average spring length */
       long int nrOfLoops;         /* loops */
-    } Network;
+      // coordinates & coonectivity
+      Eigen::VectorXd coordinates;
+      Eigen::ArrayXi springCoordinateIndexA;
+      Eigen::ArrayXi springCoordinateIndexB;
+      Eigen::ArrayXi springIndexA;
+      Eigen::ArrayXi springIndexB;
+      // interesting properties
+      ArrayXb springIsActive;
+    };
+
+    typedef struct AdditionalFunctionParameters
+    {
+      Network* net;
+      double kappa;
+      bool is2D;
+    };
 
     // heavily inspired by Prof. Dr. Andrei Gusev's Code
     class MEHPForceRelaxation
     {
+
     public:
       MEHPForceRelaxation(const pylimer_tools::entities::Universe u,
                           int crosslinkerType = 2)
@@ -64,9 +69,8 @@ namespace calc {
         // interpret network already to be able to give early results
         Network net;
         ConvertNetwork(&net, crosslinkerType);
-        free(net.nodes);
-        free(net.springs);
-        this->finalConfig = net;
+        this->initialConfig = net;
+        this->crosslinkerType = crosslinkerType;
       };
 
       void configDoOutputSteps(const std::string outputFile,
@@ -82,11 +86,11 @@ namespace calc {
         this->endNodesFile = outputFile;
       }
 
-      double getVolume() { return this->finalConfig.vol; }
+      double getVolume() { return this->initialConfig.vol; }
 
-      int getNrOfNodes() { return this->finalConfig.nrOfNodes; }
+      int getNrOfNodes() { return this->initialConfig.nrOfNodes; }
 
-      int getNrOfSprings() { return this->finalConfig.nrOfSprings; }
+      int getNrOfSprings() { return this->initialConfig.nrOfSprings; }
 
       int getNrOfActiveNodes() { return this->nrOfActiveNodes; }
 
@@ -94,264 +98,286 @@ namespace calc {
 
       double getAverageSpringLength() { return sqrt(this->R2Mean); }
 
+      double getInitialPressure() { return this->initialPressure; }
+
+      double getFinalPressure() { return this->finalPressure; }
+
+      double getInitialResidualNorm() { return this->initialResidualNorm; }
+
+      double getFinalResidualNorm() { return this->finalResidualNorm; }
+
+      double getInitialForce() { return this->initialForce; }
+
+      double getFinalForce() { return this->finalForce; }
+
       double getGammaEq() { return this->gammaEq; }
 
-      double getGammaX() { return this->gammaX; }
+      double getSigmaX() { return this->sigmaX; }
 
-      double getGammaY() { return this->gammaY; }
+      double getSigmaY() { return this->sigmaY; }
 
-      double getGammaZ() { return this->gammaZ; }
+      double getSigmaZ() { return this->sigmaZ; }
+
+      int getNrOfIterations() { return this->nrOfStepsDone; }
 
       double getNb2() { return this->Nb2; }
 
       ExitReason getExitReason() { return this->exitReason; }
 
-      void runForceRelaxation(int crosslinkerType,
-                              long int maxNrOfSteps = 250000,
-                              double tol = 1e-8,
-                              double Nb2 = -1.0,
-                              bool is2d = false,
-                              double eps = 0.077,
+      void runForceRelaxation(bool is2D = false,
+                              double Nb2spec = -1.0,
+                              const char* algorithm = "LD_MMA",
+                              long int maxNrOfSteps = 50000, // default: 10000
+                              double xtol = 1e-12,
+                              double ftol = 1e-9,
+                              double loopTol = 1e-2,
                               double kappa = 1.0)
       {
-        this->is2d = is2d;
-        int dimensions = is2d ? 2 : 3;
-        Network net;
-        if (!ConvertNetwork(&net, crosslinkerType)) {
-          return;
+        long int i, step, Nact, Mact, a, b;
+        double stress[3][3], s2, s20, s20len, s2len;
+
+        for (size_t j = 0; j < 3; j++) {
+          for (size_t k = 0; k < 3; k++) {
+            stress[j][k] = 0.;
+          }
         }
+
+        Network net = this->initialConfig;
         const int M = this->universe.getMolecules(crosslinkerType).size();
         const int N = this->universe.getMeanStrandLength(crosslinkerType) + 1;
         const double bM = this->universe.computeMeanBondLength();
-        if (Nb2 == -1.0) {
-          this->Nb2 = N * bM * bM;
-        } else {
-          this->Nb2 = Nb2;
-        }
+        this->Nb2 = Nb2spec > 0 ? Nb2spec : N; // N * bM * bM;
         const int f =
           this->universe.determineFunctionalityPerType()[crosslinkerType];
-
-        for (size_t i = 0; i < net.nrOfSprings; i++) {
-
-          if (std::fabs(net.springs[i].len) < 1.0e-10) {
-            std::cout << "WARNING: Spring " << i << " has negligible length."
-                      << std::endl;
-          }
-          // assert(net.springs[i].len != 0.0);
-        }
+        this->is2D = is2D;
 
         /* array allocation */
-        double* force;
-        force = (double*)calloc(3 * net.nrOfNodes, sizeof(double));
-        for (size_t i = 0; i < 3 * net.nrOfNodes; ++i) {
-          force[i] = 0.0;
+        std::vector<double> u0 =
+          pylimer_tools::utils::initializeWithValue(3 * net.nrOfNodes, 0.0);
+        Eigen::VectorXd u = Eigen::VectorXd::Zero(3 * net.nrOfNodes);
+
+        /* initial evaluations */
+        double* x0 = new double[3 * net.nrOfNodes];
+        double* r0 = new double[3 * net.nrOfNodes];
+        for (size_t i = 0; i < net.nrOfNodes * 3; ++i) {
+          x0[i] = 0.0;
+          r0[i] = 0.0;
         }
 
-        // calculate initial absolute force
-        for (size_t i = 0; i < net.nrOfSprings; ++i) {
-          _Spring spring = net.springs[i];
-          double distances[3];
-          actualSpringDistance(
-            net.nodes[spring.a], net.nodes[spring.b], distances, net.L);
-          for (int j = 0; j < dimensions; ++j) {
-            force[spring.a * 3 + j] -= kappa * distances[j];
-            force[spring.b * 3 + j] += kappa * distances[j];
-          }
+        std::tie(s20, s20len) =
+          computeStressAndSquareDistances(&net, u, stress, kappa, loopTol);
+        double G0 = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
+        double f0 = MEHPForceRelaxation::evaluateForceSetGradient(
+          &net, kappa, is2D, 3 * net.nrOfNodes, x0, r0, NULL);
+        this->initialForce = f0;
+        delete[] x0;
+
+        double r20 = 0.;
+        for (size_t i = 0; i < 3 * net.nrOfNodes; i++) {
+          r20 += r0[i] * r0[i];
         }
+        this->initialResidualNorm = r20;
+        delete[](r0);
 
-        double force2Norm = 0.0;
-        for (size_t i = 0; i < 3 * net.nrOfNodes; ++i) {
-          force2Norm += force[i] * force[i];
+        /* force relaxation */
+        nlopt::opt opt(algorithm, 3 * net.nrOfNodes);
+
+        AdditionalFunctionParameters params;
+        params.net = &net;
+        params.kappa = kappa;
+        params.is2D = this->is2D;
+        nlopt::func objectiveF = [](unsigned n,
+                                    const double* x,
+                                    double* grad,
+                                    void* f_data) -> double {
+          AdditionalFunctionParameters* fParams =
+            static_cast<AdditionalFunctionParameters*>(f_data);
+          return MEHPForceRelaxation::evaluateForceSetGradient(
+            fParams->net, fParams->kappa, fParams->is2D, n, x, grad, f_data);
+        };
+        opt.set_min_objective(objectiveF, &params);
+        // set constraints to support more algorithms
+        // std::vector<double> upperBounds;
+        // upperBounds.reserve(3 * net.nrOfNodes);
+        // std::vector<double> lowerBounds;
+        // lowerBounds.reserve(3 * net.nrOfNodes);
+        // for (size_t i = 0; i < net.nrOfNodes; ++i) {
+        //   for (size_t dir = 0; dir < 3; ++dir) {
+        //     upperBounds.push_back(net.L[dir] * 0.5);
+        //     lowerBounds.push_back(-net.L[dir] * 0.5);
+        //   }
+        // }
+        // opt.set_upper_bounds(upperBounds);
+        // opt.set_lower_bounds(lowerBounds);
+        // set exit conditions
+        opt.set_xtol_rel(xtol);
+        opt.set_ftol_rel(ftol);
+        opt.set_maxeval(maxNrOfSteps);
+        // start/set/run minimization
+        double minf;
+        nlopt::result res = opt.optimize(u0, minf);
+
+        // query solution & exit reason
+        assert(u0.size() == 3 * net.nrOfNodes);
+        u = Eigen::Map<Eigen::VectorXd>(u0.data(), u0.size());
+        this->finalDisplacement = u;
+        double* residuals = new double[3 * net.nrOfNodes];
+        double fFinal = MEHPForceRelaxation::evaluateForceSetGradient(
+          &net, kappa, is2D, 3 * net.nrOfNodes, u, residuals, NULL);
+        this->finalForce = fFinal;
+        double r2 = 0.0;
+        for (int i = 0; i < net.nrOfNodes * 3; i++) {
+          r2 += residuals[i] * residuals[i];
         }
-        double initialForce = force2Norm;
-        double gradient2Norm = force2Norm;
+        this->finalResidualNorm = r2;
+        delete[] residuals;
 
-        FILE* stepOutputFp;
-        if (this->stepOutputFrequency > 0) {
-          stepOutputFp = fopen(this->stepOutputFile.c_str(), "w");
-          fprintf(stepOutputFp, "Step Fabs GammaEq\n");
-          fprintf(stepOutputFp, "%d %.16f %.16f\n", 0, initialForce, 0.0);
-        }
+        std::cout << "Ran " << opt.get_numevals()
+                  << " iterations to a tolerance of " << opt.get_xtol_rel()
+                  << ", " << opt.get_ftol_rel() << ", exit result " << res
+                  << ". U has norm " << u.squaredNorm() << ", minF is "
+                  << fFinal << " from " << f0 << std::endl;
 
-        // start of force relaxation
-        long int stepsDone = 0;
-        double Gamma_eq = 0.0;
-        while (force2Norm / initialForce > tol && stepsDone < maxNrOfSteps) {
-          stepsDone += 1;
-          // update coordinates
-          for (size_t i = 0; i < net.nrOfNodes; ++i) {
-            double coordinates[3];
-            coordinates[0] = net.nodes[i].x + eps * force[i * 3 + 0];
-            coordinates[1] = net.nodes[i].y + eps * force[i * 3 + 1];
-            coordinates[2] = net.nodes[i].z + eps * force[i * 3 + 2];
-            ImposePBC(coordinates, net.L);
-            net.nodes[i].x = coordinates[0];
-            net.nodes[i].y = coordinates[1];
-            net.nodes[i].z = coordinates[2];
-          }
-
-          // calculate new force
-          Gamma_eq = 0.0;
-          for (size_t i = 0; i < net.nrOfNodes; ++i) {
-            force[i] = 0.0;
-          }
-          for (size_t i = 0; i < net.nrOfSprings; ++i) {
-            _Spring spring = net.springs[i];
-            double distances[3];
-            actualSpringDistance(
-              net.nodes[spring.a], net.nodes[spring.b], distances, net.L);
-            for (int j = 0; j < dimensions; ++j) {
-              force[spring.a * 3 + j] -= kappa * distances[j];
-              force[spring.b * 3 + j] += kappa * distances[j];
-              Gamma_eq += distances[j] * distances[j];
-            }
-          }
-          force2Norm = 0.0;
-          for (int i = 0; i < 3 * net.nrOfNodes; ++i) {
-            force2Norm += force[i] * force[i];
-          }
-
-          // potentially output
-          if (this->stepOutputFrequency > 0 &&
-              (stepsDone <= 5 || this->stepOutputFrequency *
-                                     (stepsDone / this->stepOutputFrequency) ==
-                                   stepsDone)) {
-
-            fprintf(stepOutputFp,
-                    "%ld %.16f %.16f\n",
-                    stepsDone,
-                    force2Norm,
-                    Gamma_eq);
-          }
-        }
-
-        if (stepsDone >= maxNrOfSteps) {
+        this->exitReason = ExitReason::OTHER;
+        if (res == nlopt::result::FTOL_REACHED) {
+          this->exitReason = ExitReason::F_TOLERANCE;
+        } else if (res == nlopt::result::XTOL_REACHED) {
+          this->exitReason = ExitReason::X_TOLERANCE;
+        } else if (res == nlopt::result::MAXEVAL_REACHED) {
           this->exitReason = ExitReason::MAX_STEPS;
         }
-        if (force2Norm / initialForce <= tol) {
-          this->exitReason = ExitReason::TOLERANCE;
-        }
+        // TODO: evaluate solution properties properly
+        this->nrOfStepsDone = opt.get_numevals();
+        /* acquire equilibrium properties */
+        std::tie(s2, s2len) =
+          computeStressAndSquareDistances(&net, u, stress, kappa, loopTol);
 
-        // calculate equilibrium values
-        Gamma_eq = 0.0;
-        double Rx2_sum = 0.0;
-        double Ry2_sum = 0.0;
-        double Rz2_sum = 0.0;
-        int Nact = 0;
+        double G = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
+        std::cout << "Pressure is " << G << " from " << G0 << ", s2 is " << s2
+                  << " from " << s20 << ", s2len is " << s2len << " from "
+                  << s20len << ", residual norm is " << r2 << " from " << r20
+                  << std::endl;
+        this->finalPressure = G;
 
-        for (size_t i = 0; i < net.nrOfSprings; ++i) {
-          _Spring spring = net.springs[i];
-          double distances[3];
-          actualSpringDistance(
-            net.nodes[spring.a], net.nodes[spring.b], distances, net.L);
-          double springLen = 0.0;
-          for (int j = 0; j < dimensions; ++j) {
-            springLen += distances[j] * distances[j];
-          }
-          Gamma_eq += springLen;
-          Rx2_sum += distances[0] * distances[0];
-          Ry2_sum += distances[1] * distances[1];
-          Rz2_sum += distances[2] * distances[2];
-          if (springLen / this->Nb2 > 0.001) {
-            Nact += 1;
-            net.springs[i].isActive = true;
+        /* active springs */
+        for (Nact = 0, i = 0; i < net.nrOfSprings; i++) {
+          if (net.springIsActive[i] == 1) {
+            ++Nact;
           }
         }
 
-        this->gammaEq = Gamma_eq / ((double)net.nrOfSprings * this->Nb2);
-        this->R2Mean = Gamma_eq / (double)net.nrOfSprings;
-        this->gammaX = 3 * Rx2_sum / ((double)net.nrOfSprings * this->Nb2);
-        this->gammaY = 3 * Ry2_sum / ((double)net.nrOfSprings * this->Nb2);
-        this->gammaZ = 3 * Rz2_sum / ((double)net.nrOfSprings * this->Nb2);
-
-        /* output */
-        if (this->outputEndNodes) {
-          FILE* fp = fopen(this->endNodesFile.c_str(), "w");
-          fprintf(fp, "%.10f %.10f %.10f\n", net.L[0], net.L[1], net.L[2]);
-          fprintf(fp, "%ld #nodes\n", net.nrOfNodes);
-          fprintf(fp, "%ld #springs\n", net.nrOfSprings);
-          for (size_t i = 0; i < net.nrOfNodes; i++) {
-            fprintf(fp,
-                    "%.16f %.16f %.16f\n",
-                    net.nodes[i].x,
-                    net.nodes[i].y,
-                    net.nodes[i].z);
-          }
-          fclose(fp);
-        }
-
-        /* count active nodes */
-        int Mact = 0;
-        for (size_t i = 0; i < net.nrOfNodes; i++) {
-          net.nodes[i].nrOfActiveConnected = 0; /* initial */
-        }
-        for (size_t i = 0; i < net.nrOfSprings; i++) {
-          if (net.springs[i].isActive == true) /* active spring */
+        /* active nodes */
+        Eigen::VectorXi nrOfActiveNodesConnected =
+          Eigen::VectorXi::Zero(net.nrOfNodes);
+        for (i = 0; i < net.nrOfSprings; i++) {
+          if (net.springIsActive[i] == true) /* active spring */
           {
-            size_t a = net.springs[i].a;
-            size_t b = net.springs[i].b;
-            ++(net.nodes[a].nrOfActiveConnected);
-            ++(net.nodes[b].nrOfActiveConnected);
+            a = net.springIndexA[i];
+            b = net.springIndexB[i];
+            ++(nrOfActiveNodesConnected[a]);
+            ++(nrOfActiveNodesConnected[b]);
           }
         }
-        for (size_t i = 0; i < net.nrOfNodes; i++) {
-          if (net.nodes[i].nrOfActiveConnected >= 2) {
+        for (Mact = 0, i = 0; i < net.nrOfNodes; i++) {
+          if (nrOfActiveNodesConnected[i] >= 2) {
             ++Mact;
           }
         }
 
         /* save results */
-        this->finalConfig = net;
+        this->initialPressure = G0;
+        // this->initialS2 = s20;
+        // this->finalS2 = s2;
+        // this->finalS2len = s2len;
+        // this->initialS2len = s20len;
+        // this->finalG = G;
+        this->gammaEq = s2 / this->Nb2; // G;
+        this->sigmaX = stress[0][0];
+        this->sigmaY = stress[1][1];
+        this->sigmaZ = stress[2][2];
         this->nrOfActiveNodes = Mact;
         this->nrOfActiveSprings = Nact;
-
-        /** array deallocation */
-        free(force);
-        free(net.nodes);
-        free(net.springs);
       };
 
-      pylimer_tools::entities::Universe getFinalCrosslinkerVerse(
-        int crosslinkerType = 2)
+      /**
+       * @brief This function does the step
+       *
+       * This function is public for testing purposes — TODO: find a better way
+       *
+       * @param net
+       * @param kappa
+       * @param is2D
+       * @param n
+       * @param x
+       * @param grad
+       * @param f_data
+       * @return double
+       */
+      static double evaluateForceSetGradient(const Network* net,
+                                             const double kappa,
+                                             const bool is2D,
+                                             const unsigned n,
+                                             const double* x,
+                                             double* grad,
+                                             void* f_data)
       {
-        // convert nodes & springs back to a universe
-        pylimer_tools::entities::Universe xlinkUniverse =
-          pylimer_tools::entities::Universe(this->universe.getBox());
-        std::vector<long int> ids;
-        std::vector<int> types = pylimer_tools::utils::initializeWithValue(
-          this->finalConfig.nrOfNodes, crosslinkerType);
-        std::vector<double> x;
-        std::vector<double> y;
-        std::vector<double> z;
-        std::vector<int> zeros = pylimer_tools::utils::initializeWithValue(
-          this->finalConfig.nrOfNodes, 0);
-        ids.reserve(this->finalConfig.nrOfNodes);
-        x.reserve(this->finalConfig.nrOfNodes);
-        y.reserve(this->finalConfig.nrOfNodes);
-        z.reserve(this->finalConfig.nrOfNodes);
-        for (int i = 0; i < this->finalConfig.nrOfNodes; ++i) {
-          x.push_back(this->finalConfig.nodes[i].x);
-          y.push_back(this->finalConfig.nodes[i].y);
-          z.push_back(this->finalConfig.nodes[i].z);
-          ids.push_back(i + 1);
+        Eigen::Map<const Eigen::VectorXd> u =
+          Eigen::Map<const Eigen::VectorXd>(x, n);
+        return evaluateForceSetGradient(net, kappa, is2D, n, u, grad, f_data);
+      }
+
+      /**
+       * @brief This function does the step
+       *
+       * This function is public for testing purposes — TODO: find a better way
+       *
+       * @param net
+       * @param kappa
+       * @param is2D
+       * @param n
+       * @param u
+       * @param grad
+       * @param f_data
+       * @return double
+       */
+      static double evaluateForceSetGradient(const Network* net,
+                                             const double kappa,
+                                             const bool is2D,
+                                             const unsigned n,
+                                             const Eigen::VectorXd& u,
+                                             double* grad,
+                                             void* f_data)
+      {
+        assert(n == net->nrOfNodes * 3);
+        assert(u.size() == net->coordinates.size());
+        Eigen::VectorXd springDistances = MEHPForceRelaxation::evaluateSpringDistances(net, u, is2D);
+
+        double s2 = springDistances.squaredNorm();
+        double constantMultiplier = kappa; // * 0.5 / s2;
+        if (grad != NULL) {
+          for (size_t j = 0; j < n; ++j) {
+            grad[j] = 0.0;
+          }
+          for (size_t j = 0; j < net->nrOfSprings; ++j) {
+            int a = net->springIndexA[j];
+            int b = net->springIndexB[j];
+            int nrOfDim = is2D ? 2 : 3;
+            for (size_t dir = 0; dir < nrOfDim; ++dir) {
+              grad[3 * a + dir] +=
+                springDistances[3 * j + dir] * constantMultiplier;
+              grad[3 * b + dir] -=
+                springDistances[3 * j + dir] * constantMultiplier;
+            }
+          }
         }
-        xlinkUniverse.addAtoms(ids, types, x, y, z, zeros, zeros, zeros);
-        std::vector<long int> bondFrom;
-        std::vector<long int> bondTo;
-        bondFrom.reserve(this->finalConfig.nrOfSprings);
-        bondTo.reserve(this->finalConfig.nrOfSprings);
-        for (int i = 0; i < this->finalConfig.nrOfSprings; ++i) {
-          bondFrom.push_back(this->finalConfig.springs[i].a + 1);
-          bondTo.push_back(this->finalConfig.springs[i].b + 1);
+        double s2m = 0.0;
+        for (size_t i = 0; i < 3 * net->nrOfSprings; ++i) {
+          s2m += springDistances[i] * springDistances[i];
         }
-        xlinkUniverse.addBonds(
-          bondFrom.size(),
-          bondFrom,
-          bondTo,
-          pylimer_tools::utils::initializeWithValue(bondFrom.size(), 1),
-          false,
-          false); // disable simplify to keep the self-loops etc.
-        return xlinkUniverse;
+        // std::cout << "Evaluated force to " << std::setprecision(15)
+        //           << 0.5 * kappa * s2 << ", whereas manual gives "
+        //           << s2m * 0.5 * kappa << std::endl;
+        return 0.5 * kappa * s2;
       }
 
     protected:
@@ -374,36 +400,45 @@ namespace calc {
         net->L[2] = box.getLz();
         net->nrOfNodes = crosslinkerUniverse.getNrOfAtoms();
         net->nrOfSprings = crosslinkerUniverse.getNrOfBonds();
-
-        int usualChainLen =
-          this->universe.getMolecules(crosslinkerType)[0].getNrOfAtoms();
-
-        net->nodes = (Node*)calloc(net->nrOfNodes, sizeof(Node));
-        net->springs = (Spring*)calloc(net->nrOfSprings, sizeof(Spring));
+        net->coordinates = Eigen::VectorXd::Zero(3 * net->nrOfNodes);
+        net->springIndexA = Eigen::ArrayXi::Zero(net->nrOfSprings);
+        net->springIndexB = Eigen::ArrayXi::Zero(net->nrOfSprings);
+        net->springCoordinateIndexA =
+          Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
+        net->springCoordinateIndexB =
+          Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
+        net->springIsActive = ArrayXb::Constant(net->nrOfSprings, false);
 
         // convert beads
         std::vector<pylimer_tools::entities::Atom> allAtoms =
           crosslinkerUniverse.getAtoms();
         std::map<int, int> atomIdToNode;
-        for (int i = 0; i < allAtoms.size(); ++i) {
+        for (size_t i = 0; i < allAtoms.size(); ++i) {
           pylimer_tools::entities::Atom atom = allAtoms[i];
-          net->nodes[i].x = atom.getX();
-          net->nodes[i].y = atom.getY();
-          net->nodes[i].z = atom.getZ();
           atomIdToNode[atom.getId()] = i;
+          net->coordinates[3 * i + 0] = atom.getX();
+          net->coordinates[3 * i + 1] = atom.getY();
+          net->coordinates[3 * i + 2] = atom.getZ();
         }
 
         // convert springs
         std::map<std::string, std::vector<long int>> allBonds =
           crosslinkerUniverse.getBonds();
         net->averageSpringLength = 0;
-        for (int i = 0; i < net->nrOfSprings; ++i) {
+        for (size_t i = 0; i < net->nrOfSprings; ++i) {
           int atomIdFrom = allBonds["bond_from"][i];
           int atomIdTo = allBonds["bond_to"][i];
-          net->springs[i].a = atomIdToNode.at(atomIdFrom);
-          net->springs[i].b = atomIdToNode.at(atomIdTo);
-          net->springs[i].len = usualChainLen;
-          net->averageSpringLength += usualChainLen;
+          net->averageSpringLength +=
+            universe.getAtom(atomIdFrom)
+              .distanceTo(universe.getAtom(atomIdTo), &box);
+          net->springIndexA[i] = atomIdToNode.at(atomIdFrom);
+          net->springIndexB[i] = atomIdToNode.at(atomIdTo);
+          for (size_t j = 0; j < 3; j++) {
+            net->springCoordinateIndexA[3 * i + j] =
+              atomIdToNode.at(atomIdFrom) * 3 + j;
+            net->springCoordinateIndexB[3 * i + j] =
+              atomIdToNode.at(atomIdTo) * 3 + j;
+          }
         }
 
         if (crosslinkerUniverse.getNrOfBonds() != net->nrOfSprings) {
@@ -417,64 +452,242 @@ namespace calc {
         return true;
       };
 
-      /**
-       * @brief Adjust a vector of distances to lie within half the box
-       *
-       * @param s the distances
-       * @param box the box lengths
-       */
-      void ImposePBC(double s[3], double box[3])
+      double evaluatePressure(Network* net,
+                              const Eigen::VectorXd& u,
+                              const double kappa)
       {
-        for (int i = 0; i < 3; i++) {
-          double half = 0.5 * box[i];
-          while (s[i] > half) {
-            s[i] -= box[i];
-          }
-          while (s[i] < -half) {
-            s[i] += box[i];
-          }
-        }
+        auto stressTensor = this->evaluateStressTensor(net, u, kappa, -1);
+        return this->evaluatePressure(stressTensor);
+      }
 
-        return;
+      double evaluatePressure(
+        const std::array<std::array<double, 3>, 3> stressTensor)
+      {
+        return (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) /
+               3;
       }
 
       /**
-       * @brief Compute the distance between two nodes
-       *
-       * @param a the first node
-       * @param b the second node
-       * @param coords the array to write the distances in
-       * @param boxL the box sizes
+       * @brief Compute the stress tensor (kappa * distance^2 in each direction combination)
+       * 
+       * @param net 
+       * @param u 
+       * @param kappa 
+       * @param loopTol 
+       * @return std::array<std::array<double, 3>, 3> 
        */
-      void actualSpringDistance(_Node a,
-                                _Node b,
-                                double (&coords)[3],
-                                double* boxL)
+      std::array<std::array<double, 3>, 3> evaluateStressTensor(
+        Eigen::VectorXd springDistances,
+        double kappa,
+        double volume)
       {
-        /* initial spring vector */
-        coords[0] = a.x - b.x;
-        coords[1] = a.y - b.y;
-        coords[2] = this->is2d ? 0.0 : a.z - b.z;
+        std::array<std::array<double, 3>, 3> stress;
 
-        /* periodic boundary conditions */
-        ImposePBC(coords, boxL);
+        for (size_t i = 0; i < springDistances.size() / 3; ++i) {
+          double s[3] = { springDistances[3 * i + 0],
+                          springDistances[3 * i + 1],
+                          springDistances[3 * i + 2] };
+          /* spring contribution to the overall stress tensor */
+          for (size_t j = 0; j < 3; j++) {
+            for (size_t k = 0; k < 3; k++) {
+              stress[j][k] += kappa * s[j] * s[k];
+            }
+          }
+        }
+
+        for (size_t j = 0; j < 3; j++) {
+          for (size_t k = 0; k < 3; k++) {
+            stress[j][k] /= volume;
+          }
+        }
+
+        return stress;
+      }
+
+      /**
+       * @brief Compute the stress tensor (kappa * distance^2 in each direction combination)
+       * 
+       * @param net 
+       * @param u 
+       * @param kappa 
+       * @param loopTol 
+       * @return std::array<std::array<double, 3>, 3> 
+       */
+      std::array<std::array<double, 3>, 3> evaluateStressTensor(
+        Network* net,
+        const Eigen::VectorXd& u,
+        const double kappa,
+        const double loopTol)
+      {
+        std::array<std::array<double, 3>, 3> stress;
+
+        for (size_t j = 0; j < 3; j++) {
+          for (size_t k = 0; k < 3; k++) {
+            stress[j][k] = 0.;
+          }
+        }
+
+        Eigen::VectorXd springDistances = this->evaluateSpringDistances(net, u, this->is2D);
+
+        return this->evaluateStressTensor(springDistances, kappa, net->vol);
+      }
+
+      /**
+       * @brief Count how many of the springs are active (length > tolerance)
+       * 
+       * @param springDistances 
+       * @param tolerance 
+       * @return int 
+       */
+      int countNrOfActiveSprings(const Eigen::VectorXd springDistances,
+                                 const double tolerance = 0.1) const
+      {
+        return (this->evaluateSpringActiveness(springDistances, tolerance) ==
+                true)
+          .count();
+      }
+
+      /**
+       * @brief Iterate all spring distances, mark active ones (length >
+       * tolerance)
+       *
+       * @param springDistances
+       * @param tolerance
+       * @return ArrayXb
+       */
+      ArrayXb evaluateSpringActiveness(const Eigen::VectorXd springDistances,
+                                       const double tolerance = 0.1) const
+      {
+        ArrayXb result = ArrayXb::Constant(springDistances.size() / 3, false);
+        for (size_t i = 0; i < springDistances.size() / 3; ++i) {
+          result[i] =
+            sqrt(springDistances[3 * i + 0] * springDistances[3 * i + 0] +
+                 springDistances[3 * i + 1] * springDistances[3 * i + 1] +
+                 springDistances[3 * i + 2] * springDistances[3 * i + 2]) >
+            tolerance;
+        }
+        return result;
+      }
+
+      /**
+       * @brief Compute the spring lenghts
+       *
+       * @param net the network to do the computation for
+       * @param u the displacements on top of the network
+       * @return Eigen::VectorXd
+       */
+      static Eigen::VectorXd evaluateSpringDistances(const Network* net,
+                                              const Eigen::VectorXd& u, const bool is2D)
+      {
+        double boxHalfs[3];
+        boxHalfs[0] = 0.5 * net->L[0];
+        boxHalfs[1] = 0.5 * net->L[1];
+        boxHalfs[2] = 0.5 * net->L[2];
+        // first, the distances
+        assert(u.size() == net->coordinates.size());
+        Eigen::VectorXd actualCoordinates = net->coordinates + u;
+        // It *could* be more efficient to index u instead of the coordinates
+        Eigen::VectorXd coordinatesSpringEndA =
+          actualCoordinates(net->springCoordinateIndexA);
+        Eigen::VectorXd coordinatesSpringEndB =
+          actualCoordinates(net->springCoordinateIndexB);
+        Eigen::VectorXd springDistances =
+          (coordinatesSpringEndA - coordinatesSpringEndB);
+
+        if (is2D) {
+          // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
+          //   Eigen::VectorXd::Zero(net->nrOfSprings / 3);
+          for (size_t i = 2; i < 3 * net->nrOfSprings; i += 3) {
+            springDistances[i] = 0.0;
+          }
+        }
+        assert(springDistances.size() == net->nrOfSprings * 3);
+
+        // Possibly improvable PBC
+        for (size_t j = 0; j < 3 * net->nrOfSprings; ++j) {
+          while (springDistances[j] > boxHalfs[j % 3]) {
+            springDistances[j] -= net->L[j % 3];
+          }
+          while (springDistances[j] < -boxHalfs[j % 3]) {
+            springDistances[j] += net->L[j % 3];
+          }
+        }
+
+        return springDistances;
+      }
+
+      std::pair<double, double> computeStressAndSquareDistances(
+        Network* net,
+        const Eigen::VectorXd& u,
+        double (&stress)[3][3],
+        const double kappa,
+        const double loopTol)
+      {
+        double s2 = 0., s2len = 0.;
+
+        Eigen::VectorXd springDistances = this->evaluateSpringDistances(net, u, this->is2D);
+
+        // then, the stresses
+        for (size_t i = 0; i < net->nrOfSprings; ++i) {
+          double s[3] = { springDistances[3 * i + 0],
+                          springDistances[3 * i + 1],
+                          springDistances[3 * i + 2] };
+          /* spring contribution to the overall stress tensor */
+          for (size_t j = 0; j < 3; j++) {
+            for (size_t k = 0; k < 3; k++) {
+              stress[j][k] += kappa * s[j] * s[k];
+            }
+          }
+
+          double s2local = (s[0] * s[0] + s[1] * s[1] + s[2] * s[2]);
+
+          /* update */
+          s2 += s2local;
+          s2len += s2local / std::sqrt(s2local);
+
+          /* loop count */
+          if (s2local < loopTol) {
+            net->nrOfLoops++;
+            net->springIsActive[i] = false;
+          } else {
+            net->springIsActive[i] = true;
+          }
+        };
+
+        for (size_t j = 0; j < 3; j++) {
+          for (size_t k = 0; k < 3; k++) {
+            stress[j][k] /= net->vol;
+          }
+        }
+
+        return std::make_pair(s2 / static_cast<double>(net->nrOfSprings),
+                              s2len / static_cast<double>(net->nrOfSprings));
       }
 
     private:
       pylimer_tools::entities::Universe universe;
-      bool is2d = false;
+      bool is2D = false;
       int stepOutputFrequency = 0;
       std::string stepOutputFile;
       bool outputEndNodes = false;
       std::string endNodesFile;
-      _Network finalConfig;
+      Network initialConfig;
+      Eigen::VectorXd finalDisplacement;
       int nrOfActiveSprings = 0;
       int nrOfActiveNodes = 0;
+      int crosslinkerType;
+      int nrOfStepsDone = 0;
       double Nb2 = 0.0;
       double gammaEq = 0.0;
-      double gammaX = 0.0;
-      double gammaY = 0.0;
-      double gammaZ = 0.0;
+      double initialPressure = 0.0;
+      double finalPressure = 0.0;
+      double initialResidualNorm = 0.0;
+      double finalResidualNorm = 0.0;
+      double initialForce = 0.0;
+      double finalForce = 0.0;
+      double sigmaX = 0.0;
+      double sigmaY = 0.0;
+      double sigmaZ = 0.0;
       double R2Mean = 0.0;
       ExitReason exitReason = ExitReason::UNSET;
     };
