@@ -28,9 +28,9 @@ init_pylimer_bound_calc(py::module_& m)
   py::enum_<mehp::ExitReason>(m, "ExitReason")
     .value("UNSET", mehp::ExitReason::UNSET)
     .value("MAX_STEPS", mehp::ExitReason::MAX_STEPS)
-    .value("TOLERANCE", mehp::ExitReason::F_TOLERANCE)
-    .value("TOLERANCE", mehp::ExitReason::X_TOLERANCE)
-    .value("TOLERANCE", mehp::ExitReason::OTHER);
+    .value("F_TOLERANCE", mehp::ExitReason::F_TOLERANCE)
+    .value("X_TOLERANCE", mehp::ExitReason::X_TOLERANCE)
+    .value("OTHER", mehp::ExitReason::OTHER);
 
   py::class_<mehp::MEHPForceRelaxation>(m, "MEHPForceRelaxation", R"pbdoc(
     A small simulation tool for quickly minimizing the force between the cross-linker beads.
