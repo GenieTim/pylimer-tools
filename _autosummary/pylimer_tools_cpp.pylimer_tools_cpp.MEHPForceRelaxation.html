@@ -364,17 +364,17 @@ this value is normalized by the number of springs rather than the number of chai
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor">
 <span class="sig-name descname"><span class="pre">getGammaFactor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">r0squared</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-</span> <span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrOfChains</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor" title="Permalink to this definition">#</a></dt>
 <dd><p>omputes the gamma factor as part of the ANT/MEHP formulism, i.e.:</p>
-<p><span class="math">\Gamma = \langle\gamma_{\eta}\rangle</span>, with <span class="math">\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}</span>,
-which you can use as <span class="math">G_{\mathrm{ANT}} = \Gamma \nu k_B T</span>,
-where <span class="math">\eta</span> is the index of a particular strand,
-<span class="math">R_{0}^2</span> is the melt mean square end to end distance, in phantom systems <span class="math">= N_{\eta}*b^2</span>
-<span class="math">N_{\eta}</span> is the number of atoms in this strand <span class="math">\eta</span>,
-<span class="math">b</span> its mean square bond length,
-<span class="math">T</span> the temperature and
-<span class="math">k_B</span> Boltzmann’s constant.</p>
+<p><span class="math">$\Gamma = \langle\gamma_{\eta}\rangle$</span>, with <span class="math">$\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}$</span>,
+which you can use as <span class="math">$G_{\mathrm{ANT}} = \Gamma \nu k_B T$</span>,
+where <span class="math">$\eta$</span> is the index of a particular strand,
+<span class="math">$R_{0}^2$</span> is the melt mean square end to end distance, in phantom systems <span class="math">$= N_{\eta}*b^2$</span>
+<span class="math">$N_{\eta}$</span> is the number of atoms in this strand <span class="math">$\eta$</span>,
+<span class="math">$b$</span> its mean square bond length,
+<span class="math">$T$</span> the temperature and
+<span class="math">$k_B$</span> Boltzmann’s constant.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>r0squared</strong> – The denominator in the equation of <span class="math">\Gamma</span>. If -1.0 (default), the network is used for determination (which is not accurate). For phantom systems, the correct value is <span class="math">Nb^2</span>.</p>
+<dd class="field-odd"><p><strong>r0squared</strong> – The denominator in the equation of <span class="math">$\Gamma$</span>. If $-1.0$ (default), the network is used for determination (which is not accurate). For phantom systems, the correct value is <span class="math">Nb^2</span>.</p>
 </dd>
 </dl>
 <p>For other systems, the value could be determined by <cite>~pylimer_tools_cpp.pylimer_tools_cpp.Universe.computeMeanEndToEndDistance()</cite> on the melt system.
