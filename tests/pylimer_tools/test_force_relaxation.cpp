@@ -145,16 +145,14 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation]")
               Catch::Approx(universe2.getVolume()));
       CHECK(forceRelaxer2.getVolume() ==
             Catch::Approx(97.383096 * 97.383096 * 97.383096));
+      // initial system values
+      CHECK(forceRelaxer2.getPressure() == Catch::Approx(0.39911682390778536));
+      CHECK(forceRelaxer2.getForce() == Catch::Approx(552894.1903005145));
+      CHECK(forceRelaxer2.getResidualNorm() ==
+            Catch::Approx(2.1242043665818353e6));
       REQUIRE_NOTHROW(forceRelaxer2.runForceRelaxation());
       CHECK(forceRelaxer2.getNrOfSprings() == 8142);
       CHECK(forceRelaxer2.getNrOfIterations() > 1);
-      // initial system values
-      CHECK(forceRelaxer2.getInitialPressure() ==
-            Catch::Approx(0.39911682390778536));
-      CHECK(forceRelaxer2.getInitialForce() ==
-            Catch::Approx(552894.1903005145));
-      CHECK(forceRelaxer2.getInitialResidualNorm() ==
-            Catch::Approx(2.1242043665818353e6));
 
       // conversion factors
       double kb = 1.381e-23; // Boltzmann, J/K
@@ -174,24 +172,35 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation]")
       CHECK(nu == Catch::Approx(4.63241e25));
 
       // final values
-      CHECK(forceRelaxer2.getFinalPressure() ==
+      auto stressTensor = forceRelaxer2.getStressTensor();
+      CHECK(forceRelaxer2.getPressure() ==
+            (stressTensor[0][0] + stressTensor[1][1] + stressTensor[0][0]) / 3.);
+      CHECK(forceRelaxer2.getPressure() ==
             Catch::Approx(0.153806)); // LJ Units [?]
-      CHECK(forceRelaxer2.getFinalPressure() * conversionFactor /
+      CHECK(forceRelaxer2.getPressure() * conversionFactor /
               (sigmaToM * sigmaToM * sigmaToM) ==
             Catch::Approx(61308.3)); // shear modulus from the pressure, MPa
       double nrOfChainCorrection =
-        (forceRelaxer2.getNrOfSprings() / nrOfChains);
-      double nb2Correction = (forceRelaxer2.getNb2() / (slope * Nb * beadMass));
+        (forceRelaxer2.getDefaultNrOfChains() / nrOfChains);
+      double expectedNb2 = slope * Nb * beadMass;
+      double nb2Correction =
+        (forceRelaxer2.getDefaultR0Square() / (expectedNb2));
       double gammaCorrectionFactor = nrOfChainCorrection * nb2Correction;
       CHECK(
-        forceRelaxer2.getGammaEq() * nrOfChainCorrection *
-          std::ceil(universe2.getMeanStrandLength(2)) ==
+        forceRelaxer2.getGammaFactor() * nrOfChainCorrection *
+          forceRelaxer2.getDefaultR0Square() ==
         Catch::Approx(42.6132)); // as from conversion-less Mathematica script
-      CHECK(forceRelaxer2.getGammaEq() * gammaCorrectionFactor * kb * T * nu ==
+      CHECK(forceRelaxer2.getGammaFactor() * gammaCorrectionFactor * kb * T *
+              nu ==
             Catch::Approx(61308.3)); // ANT shear modulus, Pa
-      CHECK(forceRelaxer2.getGammaEq() * gammaCorrectionFactor ==
+      CHECK(forceRelaxer2.getGammaFactor() * gammaCorrectionFactor ==
             Catch::Approx(0.319446)); // "correct" gamma factor
       CHECK(forceRelaxer2.getExitReason() == pcm::ExitReason::F_TOLERANCE);
+      // TODO: find better, more accurate tests here
+      CHECK(forceRelaxer2.getNrOfActiveNodes() > 1);
+      CHECK(forceRelaxer2.getNrOfActiveSprings() > 1);
+      CHECK(forceRelaxer2.getAverageSpringLength() > 1.0);
+
     } else {
       std::cout << "Skipping large file PDMS MEHP run" << std::endl;
       REQUIRE(true);
@@ -207,11 +216,11 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation]")
     REQUIRE(universeSeq.getLength() == 1);
     pe::Universe universe = universeSeq.atIndex(0);
     pcm::MEHPForceRelaxation forceRelaxer =
-      pcm::MEHPForceRelaxation(universe, 2);
+      pcm::MEHPForceRelaxation(universe, 2, true);
     REQUIRE(forceRelaxer.getExitReason() == pcm::ExitReason::UNSET);
     REQUIRE(forceRelaxer.getNrOfIterations() == 0);
     REQUIRE(forceRelaxer.getVolume() == Catch::Approx(universe.getVolume()));
-    forceRelaxer.runForceRelaxation(true, 25, "LD_MMA", 5);
+    forceRelaxer.runForceRelaxation("LD_MMA", 5);
     REQUIRE(forceRelaxer.getNrOfNodes() != universe.getNrOfAtoms());
     REQUIRE(forceRelaxer.getNrOfIterations() <= 5);
     REQUIRE(forceRelaxer.getNrOfIterations() >= 1);
@@ -219,11 +228,12 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation]")
     REQUIRE(forceRelaxer.getExitReason() == pcm::ExitReason::MAX_STEPS);
     // run again, this time fully
     pcm::MEHPForceRelaxation forceRelaxer2 =
-      pcm::MEHPForceRelaxation(universe, 2);
-    forceRelaxer2.runForceRelaxation(true, 25, "LD_MMA", 10000, 1e-5, 1e-18);
+      pcm::MEHPForceRelaxation(universe, 2, true);
+    forceRelaxer2.runForceRelaxation("LD_MMA", 10000, 1e-5, 1e-18);
     REQUIRE(forceRelaxer2.getNrOfIterations() > 5);
     CHECK(forceRelaxer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-    CHECK(forceRelaxer2.getGammaEq() == Catch::Approx(1. / 3.).epsilon(0.001));
+    CHECK(forceRelaxer2.getGammaFactor(25, forceRelaxer2.getNrOfSprings()) ==
+          Catch::Approx(1. / 3.).epsilon(0.001));
     std::vector<std::string> algorithms = { "LD_LBFGS",
                                             // "LD_TNEWTON_PRECOND_RESTART",
                                             // "GD_STOGO",

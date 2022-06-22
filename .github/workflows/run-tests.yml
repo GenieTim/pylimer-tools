@@ -26,6 +26,7 @@ jobs:
           path: |
             ./_skbuild
             ./vendor/igraph
+            ./vendor/nlopt
             ./tests/build
           key: ${{ runner.os }}-my-c-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |

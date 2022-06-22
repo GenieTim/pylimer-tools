@@ -25,14 +25,13 @@ namespace calc {
       F_TOLERANCE,
       X_TOLERANCE,
       MAX_STEPS,
-      HESSIAN_CONDITION,
       OTHER
     };
 
     typedef Eigen::Array<bool, Eigen::Dynamic, 1> ArrayXb;
 
     // improved structures using Eigen
-    typedef struct Network
+    struct Network
     {
       double L[3];                /* box sizes */
       double vol;                 /* box volume */
@@ -50,7 +49,7 @@ namespace calc {
       ArrayXb springIsActive;
     };
 
-    typedef struct AdditionalFunctionParameters
+    struct AdditionalFunctionParameters
     {
       Network* net;
       double kappa;
@@ -63,78 +62,45 @@ namespace calc {
 
     public:
       MEHPForceRelaxation(const pylimer_tools::entities::Universe u,
-                          int crosslinkerType = 2)
+                          int crosslinkerType = 2,
+                          bool is2D = false)
         : universe(u)
       {
         // interpret network already to be able to give early results
         Network net;
         ConvertNetwork(&net, crosslinkerType);
         this->initialConfig = net;
+        this->is2D = is2D;
         this->crosslinkerType = crosslinkerType;
+        this->currentDisplacements =
+          Eigen::VectorXd::Zero(net.coordinates.size());
+        this->currentSpringDistances =
+          this->evaluateSpringDistances(&net, this->currentDisplacements, is2D);
+        this->defaultR0Squared =
+          universe.computeMeanSquareEndToEndDistance(crosslinkerType);
+        this->defaultNrOfChains =
+          universe.getMolecules(this->crosslinkerType).size();
       };
 
-      void configDoOutputSteps(const std::string outputFile,
-                               const int outputFreq)
-      {
-        this->stepOutputFile = outputFile;
-        this->stepOutputFrequency = outputFreq;
-      }
-
-      void configDoOutputFinalCoordinates(const std::string outputFile)
-      {
-        this->outputEndNodes = true;
-        this->endNodesFile = outputFile;
-      }
-
-      double getVolume() { return this->initialConfig.vol; }
-
-      int getNrOfNodes() { return this->initialConfig.nrOfNodes; }
-
-      int getNrOfSprings() { return this->initialConfig.nrOfSprings; }
-
-      int getNrOfActiveNodes() { return this->nrOfActiveNodes; }
-
-      int getNrOfActiveSprings() { return this->nrOfActiveSprings; }
-
-      double getAverageSpringLength() { return sqrt(this->R2Mean); }
-
-      double getInitialPressure() { return this->initialPressure; }
-
-      double getFinalPressure() { return this->finalPressure; }
-
-      double getInitialResidualNorm() { return this->initialResidualNorm; }
-
-      double getFinalResidualNorm() { return this->finalResidualNorm; }
-
-      double getInitialForce() { return this->initialForce; }
-
-      double getFinalForce() { return this->finalForce; }
-
-      double getGammaEq() { return this->gammaEq; }
-
-      double getSigmaX() { return this->sigmaX; }
-
-      double getSigmaY() { return this->sigmaY; }
-
-      double getSigmaZ() { return this->sigmaZ; }
-
-      int getNrOfIterations() { return this->nrOfStepsDone; }
-
-      double getNb2() { return this->Nb2; }
-
-      ExitReason getExitReason() { return this->exitReason; }
-
-      void runForceRelaxation(bool is2D = false,
-                              double Nb2spec = -1.0,
-                              const char* algorithm = "LD_MMA",
+      /**
+       * @brief Actually do run the simulation
+       *
+       * @param algorithm
+       * @param maxNrOfSteps
+       * @param xtol
+       * @param ftol
+       * @param loopTol
+       * @param kappa
+       */
+      void runForceRelaxation(const char* algorithm = "LD_MMA",
                               long int maxNrOfSteps = 50000, // default: 10000
                               double xtol = 1e-12,
                               double ftol = 1e-9,
                               double loopTol = 1e-2,
                               double kappa = 1.0)
       {
-        long int i, step, Nact, Mact, a, b;
-        double stress[3][3], s2, s20, s20len, s2len;
+        this->simulationHasRun = true;
+        double stress[3][3];
 
         for (size_t j = 0; j < 3; j++) {
           for (size_t k = 0; k < 3; k++) {
@@ -146,38 +112,14 @@ namespace calc {
         const int M = this->universe.getMolecules(crosslinkerType).size();
         const int N = this->universe.getMeanStrandLength(crosslinkerType) + 1;
         const double bM = this->universe.computeMeanBondLength();
-        this->Nb2 = Nb2spec > 0 ? Nb2spec : N; // N * bM * bM;
         const int f =
           this->universe.determineFunctionalityPerType()[crosslinkerType];
-        this->is2D = is2D;
+        bool is2D = this->is2D;
 
         /* array allocation */
         std::vector<double> u0 =
           pylimer_tools::utils::initializeWithValue(3 * net.nrOfNodes, 0.0);
         Eigen::VectorXd u = Eigen::VectorXd::Zero(3 * net.nrOfNodes);
-
-        /* initial evaluations */
-        double* x0 = new double[3 * net.nrOfNodes];
-        double* r0 = new double[3 * net.nrOfNodes];
-        for (size_t i = 0; i < net.nrOfNodes * 3; ++i) {
-          x0[i] = 0.0;
-          r0[i] = 0.0;
-        }
-
-        std::tie(s20, s20len) =
-          computeStressAndSquareDistances(&net, u, stress, kappa, loopTol);
-        double G0 = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
-        double f0 = MEHPForceRelaxation::evaluateForceSetGradient(
-          &net, kappa, is2D, 3 * net.nrOfNodes, x0, r0, NULL);
-        this->initialForce = f0;
-        delete[] x0;
-
-        double r20 = 0.;
-        for (size_t i = 0; i < 3 * net.nrOfNodes; i++) {
-          r20 += r0[i] * r0[i];
-        }
-        this->initialResidualNorm = r20;
-        delete[](r0);
 
         /* force relaxation */
         nlopt::opt opt(algorithm, 3 * net.nrOfNodes);
@@ -220,23 +162,9 @@ namespace calc {
         // query solution & exit reason
         assert(u0.size() == 3 * net.nrOfNodes);
         u = Eigen::Map<Eigen::VectorXd>(u0.data(), u0.size());
-        this->finalDisplacement = u;
-        double* residuals = new double[3 * net.nrOfNodes];
-        double fFinal = MEHPForceRelaxation::evaluateForceSetGradient(
-          &net, kappa, is2D, 3 * net.nrOfNodes, u, residuals, NULL);
-        this->finalForce = fFinal;
-        double r2 = 0.0;
-        for (int i = 0; i < net.nrOfNodes * 3; i++) {
-          r2 += residuals[i] * residuals[i];
-        }
-        this->finalResidualNorm = r2;
-        delete[] residuals;
-
-        std::cout << "Ran " << opt.get_numevals()
-                  << " iterations to a tolerance of " << opt.get_xtol_rel()
-                  << ", " << opt.get_ftol_rel() << ", exit result " << res
-                  << ". U has norm " << u.squaredNorm() << ", minF is "
-                  << fFinal << " from " << f0 << std::endl;
+        this->currentDisplacements = u;
+        this->currentSpringDistances =
+          this->evaluateSpringDistances(&net, this->currentDisplacements, is2D);
 
         this->exitReason = ExitReason::OTHER;
         if (res == nlopt::result::FTOL_REACHED) {
@@ -246,57 +174,7 @@ namespace calc {
         } else if (res == nlopt::result::MAXEVAL_REACHED) {
           this->exitReason = ExitReason::MAX_STEPS;
         }
-        // TODO: evaluate solution properties properly
-        this->nrOfStepsDone = opt.get_numevals();
-        /* acquire equilibrium properties */
-        std::tie(s2, s2len) =
-          computeStressAndSquareDistances(&net, u, stress, kappa, loopTol);
-
-        double G = (stress[0][0] + stress[1][1] + stress[2][2]) / 3.;
-        std::cout << "Pressure is " << G << " from " << G0 << ", s2 is " << s2
-                  << " from " << s20 << ", s2len is " << s2len << " from "
-                  << s20len << ", residual norm is " << r2 << " from " << r20
-                  << std::endl;
-        this->finalPressure = G;
-
-        /* active springs */
-        for (Nact = 0, i = 0; i < net.nrOfSprings; i++) {
-          if (net.springIsActive[i] == 1) {
-            ++Nact;
-          }
-        }
-
-        /* active nodes */
-        Eigen::VectorXi nrOfActiveNodesConnected =
-          Eigen::VectorXi::Zero(net.nrOfNodes);
-        for (i = 0; i < net.nrOfSprings; i++) {
-          if (net.springIsActive[i] == true) /* active spring */
-          {
-            a = net.springIndexA[i];
-            b = net.springIndexB[i];
-            ++(nrOfActiveNodesConnected[a]);
-            ++(nrOfActiveNodesConnected[b]);
-          }
-        }
-        for (Mact = 0, i = 0; i < net.nrOfNodes; i++) {
-          if (nrOfActiveNodesConnected[i] >= 2) {
-            ++Mact;
-          }
-        }
-
-        /* save results */
-        this->initialPressure = G0;
-        // this->initialS2 = s20;
-        // this->finalS2 = s2;
-        // this->finalS2len = s2len;
-        // this->initialS2len = s20len;
-        // this->finalG = G;
-        this->gammaEq = s2 / this->Nb2; // G;
-        this->sigmaX = stress[0][0];
-        this->sigmaY = stress[1][1];
-        this->sigmaZ = stress[2][2];
-        this->nrOfActiveNodes = Mact;
-        this->nrOfActiveSprings = Nact;
+        this->nrOfStepsDone += opt.get_numevals();
       };
 
       /**
@@ -350,7 +228,8 @@ namespace calc {
       {
         assert(n == net->nrOfNodes * 3);
         assert(u.size() == net->coordinates.size());
-        Eigen::VectorXd springDistances = MEHPForceRelaxation::evaluateSpringDistances(net, u, is2D);
+        Eigen::VectorXd springDistances =
+          MEHPForceRelaxation::evaluateSpringDistances(net, u, is2D);
 
         double s2 = springDistances.squaredNorm();
         double constantMultiplier = kappa; // * 0.5 / s2;
@@ -379,6 +258,214 @@ namespace calc {
         //           << s2m * 0.5 * kappa << std::endl;
         return 0.5 * kappa * s2;
       }
+
+      pylimer_tools::entities::Universe getCrosslinkerVerse(
+        int newCrosslinkerType = 2)
+      {
+        // convert nodes & springs back to a universe
+        pylimer_tools::entities::Universe xlinkUniverse =
+          pylimer_tools::entities::Universe(this->universe.getBox());
+        std::vector<long int> ids;
+        std::vector<int> types = pylimer_tools::utils::initializeWithValue(
+          this->initialConfig.nrOfNodes, crosslinkerType);
+        std::vector<double> x;
+        std::vector<double> y;
+        std::vector<double> z;
+        std::vector<int> zeros = pylimer_tools::utils::initializeWithValue(
+          this->initialConfig.nrOfNodes, 0);
+        ids.reserve(this->initialConfig.nrOfNodes);
+        x.reserve(this->initialConfig.nrOfNodes);
+        y.reserve(this->initialConfig.nrOfNodes);
+        z.reserve(this->initialConfig.nrOfNodes);
+        for (int i = 0; i < this->initialConfig.nrOfNodes; ++i) {
+          x.push_back(this->initialConfig.coordinates[3 * i + 0] +
+                      this->currentDisplacements[3 * i + 0]);
+          y.push_back(this->initialConfig.coordinates[3 * i + 1] +
+                      this->currentDisplacements[3 * i + 1]);
+          z.push_back(this->initialConfig.coordinates[3 * i + 2] +
+                      this->currentDisplacements[3 * i + 2]);
+          ids.push_back(i + 1);
+        }
+        xlinkUniverse.addAtoms(ids, types, x, y, z, zeros, zeros, zeros);
+        std::vector<long int> bondFrom;
+        std::vector<long int> bondTo;
+        bondFrom.reserve(this->initialConfig.nrOfSprings);
+        bondTo.reserve(this->initialConfig.nrOfSprings);
+        for (int i = 0; i < this->initialConfig.nrOfSprings; ++i) {
+          bondFrom.push_back(this->initialConfig.springIndexA[i] + 1);
+          bondTo.push_back(this->initialConfig.springIndexB[i] + 1);
+        }
+        xlinkUniverse.addBonds(
+          bondFrom.size(),
+          bondFrom,
+          bondTo,
+          pylimer_tools::utils::initializeWithValue(bondFrom.size(), 1),
+          false,
+          false); // disable simplify to keep the self-loops etc.
+        return xlinkUniverse;
+      }
+
+      int getDefaultNrOfChains() { return this->defaultNrOfChains; }
+
+      double getDefaultR0Square() { return this->defaultR0Squared; }
+
+      double getVolume() { return this->initialConfig.vol; }
+
+      int getNrOfNodes() { return this->initialConfig.nrOfNodes; }
+
+      int getNrOfSprings() { return this->initialConfig.nrOfSprings; }
+
+      /**
+       * @brief Get the Nr Of Active Nodes
+       *
+       * @param tolerance  the tolerance: springs under a certain length are
+       * considered inactive
+       * @return int
+       */
+      int getNrOfActiveNodes(double tolerance = 0.1)
+      {
+        int Mact = 0;
+
+        /* active nodes */
+        Eigen::VectorXi nrOfActiveNodesConnected =
+          Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
+        ArrayXb springIsActive =
+          this->findActiveSprings(this->currentSpringDistances, tolerance);
+        for (size_t i = 0; i < this->initialConfig.nrOfSprings; i++) {
+          if (springIsActive[i] == true) /* active spring */
+          {
+            int a = this->initialConfig.springIndexA[i];
+            int b = this->initialConfig.springIndexB[i];
+            ++(nrOfActiveNodesConnected[a]);
+            ++(nrOfActiveNodesConnected[b]);
+          }
+        }
+        for (size_t i = 0; i < this->initialConfig.nrOfNodes; i++) {
+          if (nrOfActiveNodesConnected[i] >= 2) {
+            ++Mact;
+          }
+        }
+
+        return Mact;
+      }
+
+      /**
+       * @brief Get the Nr Of Active Springs object
+       *
+       * @param tol the tolerance: springs under a certain length are considered
+       * inactive
+       * @return int
+       */
+      int getNrOfActiveSprings(double tol = 0.1)
+      {
+        return this->countNrOfActiveSprings(this->currentSpringDistances, tol);
+      }
+
+      /**
+       * @brief Get the Average Spring Length at the current step
+       *
+       * @return double
+       */
+      double getAverageSpringLength()
+      {
+        double r2 = 0.0;
+        for (int i = 0; i < this->initialConfig.nrOfSprings; i++) {
+          double r2local = 0.0;
+          for (int j = 0; j < 3; ++j) {
+            r2local += this->currentSpringDistances[i * 3 + j] *
+                       this->currentSpringDistances[i * 3 + j];
+          }
+          r2 += sqrt(r2local);
+        }
+        return r2 / this->initialConfig.nrOfSprings;
+      }
+
+      std::array<std::array<double, 3>, 3> getStressTensor(double kappa = 1.0)
+      {
+        return this->evaluateStressTensor(
+          this->currentSpringDistances, kappa, this->initialConfig.vol);
+      }
+
+      /**
+       * @brief Get the Pressure
+       *
+       * @param kappa the spring constant to use for the force
+       * @return double
+       */
+      double getPressure(double kappa = 1.0)
+      {
+        return this->evaluatePressure(this->currentSpringDistances, kappa);
+      }
+
+      /**
+       * @brief Get the Residual Norm at the current step
+       *
+       * @param kappa the spring constant to use for the force
+       * @return double
+       */
+      double getResidualNorm(double kappa = 1.0)
+      {
+        double* r = new double[3 * this->initialConfig.nrOfNodes];
+        for (size_t i = 0; i < this->initialConfig.nrOfNodes * 3; ++i) {
+          r[i] = 0.0;
+        }
+        this->evaluateForceSetGradient(&this->initialConfig,
+                                       kappa,
+                                       this->is2D,
+                                       3 * this->initialConfig.nrOfNodes,
+                                       this->currentDisplacements,
+                                       r,
+                                       NULL);
+        double r2 = 0.;
+        for (size_t i = 0; i < 3 * this->initialConfig.nrOfNodes; i++) {
+          r2 += r[i] * r[i];
+        }
+
+        delete[](r);
+        return r2;
+      }
+
+      /**
+       * @brief Get the Force at the current step
+       *
+       * @param kappa
+       * @return double
+       */
+      double getForce(double kappa = 1.0)
+      {
+        return this->evaluateForceSetGradient(&this->initialConfig,
+                                              kappa,
+                                              this->is2D,
+                                              3 * this->initialConfig.nrOfNodes,
+                                              this->currentDisplacements,
+                                              NULL,
+                                              NULL);
+      }
+
+      /**
+       * @brief Get the Gamma Factor at the current step
+       *
+       * @param r02 the melt <R_0^2>, for phantom = Nb^2
+       * @param nrOfChains the nr of chains to average over (can be different
+       * from the nr of springs thanks to omitted free chains or primary loops)
+       * @return double
+       */
+      double getGammaFactor(double r02 = -1.0, int nrOfChains = -1)
+      {
+        if (r02 < 0) {
+          r02 = this->defaultR0Squared;
+        }
+        if (nrOfChains < 1) {
+          nrOfChains = this->defaultNrOfChains;
+        }
+
+        return this->evaluateGammaFactor(
+          this->currentSpringDistances, r02, nrOfChains);
+      }
+
+      int getNrOfIterations() { return this->nrOfStepsDone; }
+
+      ExitReason getExitReason() { return this->exitReason; }
 
     protected:
       /**
@@ -441,45 +528,90 @@ namespace calc {
           }
         }
 
-        if (crosslinkerUniverse.getNrOfBonds() != net->nrOfSprings) {
-          return false;
-        };
-
         net->averageSpringLength /= net->nrOfSprings;
 
-        /* box volume */
+        // box volume
         net->vol = net->L[0] * net->L[1] * net->L[2];
-        return true;
+
+        return crosslinkerUniverse.getNrOfBonds() == net->nrOfSprings;
       };
 
+      /**
+       * @brief Compute the gamma factor from certain spring distances
+       *
+       * @param springDistances
+       * @param r02 the melt <R_0^2>, for phantom = Nb^2
+       * @param nrOfChains the nr of chains to average over (can be different
+       * from the nr of springs thanks to omitted free chains or primary loops)
+       * @return double
+       */
+      double evaluateGammaFactor(Eigen::VectorXd& springDistances,
+                                 double r02,
+                                 int nrOfChains) const
+      {
+        return springDistances.squaredNorm() /
+               (static_cast<double>(nrOfChains) * r02);
+      }
+
+      /**
+       * @brief Evaluate the pressure of the network at specific spring
+       * distances
+       *
+       * @param springDistances the spring distances
+       * @param kappa the spring constant for the force factor
+       * @return double
+       */
+      double evaluatePressure(Eigen::VectorXd& springDistances,
+                              const double kappa) const
+      {
+        auto stressTensor = this->evaluateStressTensor(
+          springDistances, kappa, this->initialConfig.vol);
+        return this->evaluatePressure(stressTensor);
+      }
+
+      /**
+       * @brief Evaluate the pressure of the network at specific displacements
+       *
+       * @param net the network to evaluate the pressure for
+       * @param u the displacements
+       * @param kappa the spring constant for the force factor
+       * @return double
+       */
       double evaluatePressure(Network* net,
                               const Eigen::VectorXd& u,
-                              const double kappa)
+                              const double kappa) const
       {
         auto stressTensor = this->evaluateStressTensor(net, u, kappa, -1);
         return this->evaluatePressure(stressTensor);
       }
 
+      /**
+       * @brief Evaluate the pressure from the stress tensor
+       *
+       * @param stressTensor
+       * @return double
+       */
       double evaluatePressure(
-        const std::array<std::array<double, 3>, 3> stressTensor)
+        const std::array<std::array<double, 3>, 3> stressTensor) const
       {
         return (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) /
                3;
       }
 
       /**
-       * @brief Compute the stress tensor (kappa * distance^2 in each direction combination)
-       * 
-       * @param net 
-       * @param u 
-       * @param kappa 
-       * @param loopTol 
-       * @return std::array<std::array<double, 3>, 3> 
+       * @brief Compute the stress tensor (kappa * distance^2 in each direction
+       * combination)
+       *
+       * @param net
+       * @param u
+       * @param kappa
+       * @param loopTol
+       * @return std::array<std::array<double, 3>, 3>
        */
       std::array<std::array<double, 3>, 3> evaluateStressTensor(
-        Eigen::VectorXd springDistances,
+        Eigen::VectorXd& springDistances,
         double kappa,
-        double volume)
+        double volume) const
       {
         std::array<std::array<double, 3>, 3> stress;
 
@@ -505,45 +637,38 @@ namespace calc {
       }
 
       /**
-       * @brief Compute the stress tensor (kappa * distance^2 in each direction combination)
-       * 
-       * @param net 
-       * @param u 
-       * @param kappa 
-       * @param loopTol 
-       * @return std::array<std::array<double, 3>, 3> 
+       * @brief Compute the stress tensor (kappa * distance^2 in each direction
+       * combination)
+       *
+       * @param net
+       * @param u
+       * @param kappa
+       * @param loopTol
+       * @return std::array<std::array<double, 3>, 3>
        */
       std::array<std::array<double, 3>, 3> evaluateStressTensor(
         Network* net,
         const Eigen::VectorXd& u,
         const double kappa,
-        const double loopTol)
+        const double loopTol) const
       {
-        std::array<std::array<double, 3>, 3> stress;
-
-        for (size_t j = 0; j < 3; j++) {
-          for (size_t k = 0; k < 3; k++) {
-            stress[j][k] = 0.;
-          }
-        }
-
-        Eigen::VectorXd springDistances = this->evaluateSpringDistances(net, u, this->is2D);
+        Eigen::VectorXd springDistances =
+          this->evaluateSpringDistances(net, u, this->is2D);
 
         return this->evaluateStressTensor(springDistances, kappa, net->vol);
       }
 
       /**
        * @brief Count how many of the springs are active (length > tolerance)
-       * 
-       * @param springDistances 
-       * @param tolerance 
-       * @return int 
+       *
+       * @param springDistances
+       * @param tolerance
+       * @return int
        */
-      int countNrOfActiveSprings(const Eigen::VectorXd springDistances,
+      int countNrOfActiveSprings(const Eigen::VectorXd& springDistances,
                                  const double tolerance = 0.1) const
       {
-        return (this->evaluateSpringActiveness(springDistances, tolerance) ==
-                true)
+        return (this->findActiveSprings(springDistances, tolerance) == true)
           .count();
       }
 
@@ -555,8 +680,8 @@ namespace calc {
        * @param tolerance
        * @return ArrayXb
        */
-      ArrayXb evaluateSpringActiveness(const Eigen::VectorXd springDistances,
-                                       const double tolerance = 0.1) const
+      ArrayXb findActiveSprings(const Eigen::VectorXd& springDistances,
+                                const double tolerance = 0.1) const
       {
         ArrayXb result = ArrayXb::Constant(springDistances.size() / 3, false);
         for (size_t i = 0; i < springDistances.size() / 3; ++i) {
@@ -577,7 +702,8 @@ namespace calc {
        * @return Eigen::VectorXd
        */
       static Eigen::VectorXd evaluateSpringDistances(const Network* net,
-                                              const Eigen::VectorXd& u, const bool is2D)
+                                                     const Eigen::VectorXd& u,
+                                                     const bool is2D)
       {
         double boxHalfs[3];
         boxHalfs[0] = 0.5 * net->L[0];
@@ -616,79 +742,21 @@ namespace calc {
         return springDistances;
       }
 
-      std::pair<double, double> computeStressAndSquareDistances(
-        Network* net,
-        const Eigen::VectorXd& u,
-        double (&stress)[3][3],
-        const double kappa,
-        const double loopTol)
-      {
-        double s2 = 0., s2len = 0.;
-
-        Eigen::VectorXd springDistances = this->evaluateSpringDistances(net, u, this->is2D);
-
-        // then, the stresses
-        for (size_t i = 0; i < net->nrOfSprings; ++i) {
-          double s[3] = { springDistances[3 * i + 0],
-                          springDistances[3 * i + 1],
-                          springDistances[3 * i + 2] };
-          /* spring contribution to the overall stress tensor */
-          for (size_t j = 0; j < 3; j++) {
-            for (size_t k = 0; k < 3; k++) {
-              stress[j][k] += kappa * s[j] * s[k];
-            }
-          }
-
-          double s2local = (s[0] * s[0] + s[1] * s[1] + s[2] * s[2]);
-
-          /* update */
-          s2 += s2local;
-          s2len += s2local / std::sqrt(s2local);
-
-          /* loop count */
-          if (s2local < loopTol) {
-            net->nrOfLoops++;
-            net->springIsActive[i] = false;
-          } else {
-            net->springIsActive[i] = true;
-          }
-        };
-
-        for (size_t j = 0; j < 3; j++) {
-          for (size_t k = 0; k < 3; k++) {
-            stress[j][k] /= net->vol;
-          }
-        }
-
-        return std::make_pair(s2 / static_cast<double>(net->nrOfSprings),
-                              s2len / static_cast<double>(net->nrOfSprings));
-      }
-
     private:
       pylimer_tools::entities::Universe universe;
       bool is2D = false;
+      bool simulationHasRun = false;
       int stepOutputFrequency = 0;
+      int defaultNrOfChains = 0;
+      double defaultR0Squared = 0.0;
       std::string stepOutputFile;
       bool outputEndNodes = false;
       std::string endNodesFile;
       Network initialConfig;
-      Eigen::VectorXd finalDisplacement;
-      int nrOfActiveSprings = 0;
-      int nrOfActiveNodes = 0;
+      Eigen::VectorXd currentDisplacements;
+      Eigen::VectorXd currentSpringDistances;
       int crosslinkerType;
       int nrOfStepsDone = 0;
-      double Nb2 = 0.0;
-      double gammaEq = 0.0;
-      double initialPressure = 0.0;
-      double finalPressure = 0.0;
-      double initialResidualNorm = 0.0;
-      double finalResidualNorm = 0.0;
-      double initialForce = 0.0;
-      double finalForce = 0.0;
-      double sigmaX = 0.0;
-      double sigmaY = 0.0;
-      double sigmaZ = 0.0;
-      double R2Mean = 0.0;
       ExitReason exitReason = ExitReason::UNSET;
     };
   } // namespace mehp
