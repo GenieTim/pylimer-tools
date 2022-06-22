@@ -232,8 +232,10 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation]")
     CHECK(forceRelaxer2.getGammaFactor(25, forceRelaxer2.getNrOfSprings()) ==
           Catch::Approx(1. / 3.).epsilon(0.001));
     auto stressTensor = forceRelaxer2.getStressTensor();
-    CHECK(forceRelaxer2.getPressure() ==
-          (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) / 3.);
+    CHECK(
+      forceRelaxer2.getPressure() ==
+      Catch::Approx(
+        (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) / 3.).epsilon(0.001));
     CHECK(forceRelaxer2.getResidualNorm() > 0.0);
     CHECK(forceRelaxer2.getForce() > 0.0);
     // TODO: find better, more accurate tests here
