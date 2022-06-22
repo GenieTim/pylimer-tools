@@ -172,9 +172,6 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation]")
       CHECK(nu == Catch::Approx(4.63241e25));
 
       // final values
-      auto stressTensor = forceRelaxer2.getStressTensor();
-      CHECK(forceRelaxer2.getPressure() ==
-            (stressTensor[0][0] + stressTensor[1][1] + stressTensor[0][0]) / 3.);
       CHECK(forceRelaxer2.getPressure() ==
             Catch::Approx(0.153806)); // LJ Units [?]
       CHECK(forceRelaxer2.getPressure() * conversionFactor /
@@ -234,6 +231,15 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation]")
     CHECK(forceRelaxer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceRelaxer2.getGammaFactor(25, forceRelaxer2.getNrOfSprings()) ==
           Catch::Approx(1. / 3.).epsilon(0.001));
+    auto stressTensor = forceRelaxer2.getStressTensor();
+    CHECK(forceRelaxer2.getPressure() ==
+          (stressTensor[0][0] + stressTensor[1][1] + stressTensor[0][0]) / 3.);
+    CHECK(forceRelaxer2.getResidualNorm() > 0.0);
+    CHECK(forceRelaxer2.getForce() > 0.0);
+    // TODO: find better, more accurate tests here
+    CHECK(forceRelaxer2.getNrOfActiveNodes() > 1);
+    CHECK(forceRelaxer2.getNrOfActiveSprings() > 1);
+    CHECK(forceRelaxer2.getAverageSpringLength() > 1.0);
     std::vector<std::string> algorithms = { "LD_LBFGS",
                                             // "LD_TNEWTON_PRECOND_RESTART",
                                             // "GD_STOGO",
