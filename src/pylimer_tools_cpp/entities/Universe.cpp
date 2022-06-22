@@ -574,7 +574,8 @@ namespace entities {
           long int oldEndNodeId =
             (long int)VAN(chain, "id", newEndNodeVertexId);
           long int originalEndNodeVertexId =
-            this->findVertexIdForProperty("id", oldEndNodeId);
+            this->atomIdToVectorIdx.at(oldEndNodeId);
+          // this->findVertexIdForProperty("id", oldEndNodeId);
           igraph_vector_t neighbours;
           igraph_vector_init(&neighbours, 0);
 
@@ -1507,7 +1508,8 @@ namespace entities {
     double meanStrandLength = 0;
 
     for (Molecule molecule : molecules) {
-      meanStrandLength += static_cast<double>(molecule.getLength()) * multiplier;
+      meanStrandLength +=
+        static_cast<double>(molecule.getLength()) * multiplier;
     }
     return meanStrandLength;
   }

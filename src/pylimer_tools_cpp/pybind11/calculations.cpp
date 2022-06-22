@@ -28,43 +28,84 @@ init_pylimer_bound_calc(py::module_& m)
   py::enum_<mehp::ExitReason>(m, "ExitReason")
     .value("UNSET", mehp::ExitReason::UNSET)
     .value("MAX_STEPS", mehp::ExitReason::MAX_STEPS)
-    .value("TOLERANCE", mehp::ExitReason::TOLERANCE);
+    .value("TOLERANCE", mehp::ExitReason::F_TOLERANCE)
+    .value("TOLERANCE", mehp::ExitReason::X_TOLERANCE)
+    .value("TOLERANCE", mehp::ExitReason::OTHER);
 
   py::class_<mehp::MEHPForceRelaxation>(m, "MEHPForceRelaxation", R"pbdoc(
     A small simulation tool for quickly minimizing the force between the cross-linker beads.
   )pbdoc")
-    .def(py::init<pe::Universe, int>())
-    .def("configDoOutputSteps",
-         &mehp::MEHPForceRelaxation::configDoOutputSteps,
+    .def(py::init<pe::Universe, int>(),
          R"pbdoc(
-          Whether to output progress, where, and how often.
+          Instantiate the simulator for a certain universe.
 
-          :param outputFile: the file to write the time-steps to.
-          :param outputFrequency: how often to output the time-step. Set to 0 (default) to disable progress output.
+          :param universe: the universe to simulate with
+          :param crosslinkerType: The atom type of the cross-linkers. Needed to reduce the network.
+          :param is2D: Whether to ignore the z direction.
           )pbdoc",
-         py::arg("outputFile"),
-         py::arg("outputFrequency") = 0)
-    .def("configDoOutputFinalCoordinates",
-         &mehp::MEHPForceRelaxation::configDoOutputFinalCoordinates)
+         py::arg("universe"),
+         py::arg("crosslinkerType") = 2,
+         py::arg("is2D") = false)
     .def("runForceRelaxation",
          &mehp::MEHPForceRelaxation::runForceRelaxation,
          R"pbdoc(
           Run the simulation.
 
-          :param crosslinkerType: The atom type of the cross-linkers. Needed to reduce the network.
+          :param algorithm: The algorithm to use for the force relaxation. Choices: see `NLopt Algorithms <https://nlopt.readthedocs.io/en/latest/NLopt_Algorithms/>`_
           :param maxNrOfSteps: The maximum number of steps to do during the simulation.
-          :param tolerance: The tolerance of the force as an exit condition.
-          :param Nb2: The denominator in the equation of :math:`\Gamma` (see: :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq()`). If -1.0 (default), the network is used for determination.
+          :param xTolerance: The tolerance of the displacements as an exit condition.
+          :param fTolerance: The tolerance of the force as an exit condition.
+          :param loopTol: 
           :param is2d: Specify true if you want to evaluate the force relation only in x and y direction.
           )pbdoc",
-         py::arg("crosslinkerType") = 2,
+         py::arg("algorithm") = "LD_MMA",
          py::arg("maxNrOfSteps") = 250000,
-         py::arg("tolerance") = 1e-8,
-         py::arg("Nb2") = -1.0,
-         py::arg("is2d") = false,
-         py::arg("dt") = 0.077,
+         py::arg("xTolerance") = 1e-12,
+         py::arg("fTolerance") = 1e-9,
+         py::arg("loopTol") = 1e-2,
          py::arg("kappa") = 1.0)
-    //  .def("getVolume", &mehp::MEHPForceRelaxation::getVolume)
+    .def("getForce",
+         &mehp::MEHPForceRelaxation::getForce,
+         R"pbdoc(
+          Returns the force at the current state of the simulation.
+          
+          :param kappa: The spring constant to use for the force evaluation.
+     )pbdoc",
+         py::arg("kappa") = 1.0)
+    .def("getResidualNorm",
+         &mehp::MEHPForceRelaxation::getResidualNorm,
+         R"pbdoc(
+          Returns the residual norm at the current state of the simulation.
+          
+          :param kappa: The spring constant to use for the force evaluation.
+     )pbdoc",
+         py::arg("kappa") = 1.0)
+    .def("getPressure",
+         &mehp::MEHPForceRelaxation::getPressure,
+         R"pbdoc(
+          Returns the pressure at the current state of the simulation.
+          
+          :param kappa: The spring constant to use for the force evaluation.
+     )pbdoc",
+         py::arg("kappa") = 1.0)
+    .def("getStressTensor",
+         &mehp::MEHPForceRelaxation::getStressTensor,
+         R"pbdoc(
+          Returns the stress tensor at the current state of the simulation.
+          
+          :param kappa: The spring constant to use for the force evaluation.
+     )pbdoc",
+         py::arg("kappa") = 1.0)
+    .def("getGammaFactor",
+         &mehp::MEHPForceRelaxation::getGammaFactor,
+         R"pbdoc(
+          
+          :param r0squared: The denominator in the equation of :math:`\Gamma`. If -1.0 (default), the network is used for determination (which is not accurate). For phantom systems, the correct value is :math:`Nb^2`.
+          For other systems, the value could be determined by `~pylimer_tools_cpp.pylimer_tools_cpp.Universe.computeMeanEndToEndDistance()` on the melt system.
+          :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if < 0) the nr of chains. 
+          )pbdoc",
+         py::arg("r0squared") = -1.0,
+         py::arg("nrOfChains") = -1)
     .def("getNrOfNodes", &mehp::MEHPForceRelaxation::getNrOfNodes, R"pbdoc(
            Get the number of nodes considered in this simulation.
       )pbdoc")
@@ -86,30 +127,36 @@ init_pylimer_bound_calc(py::module_& m)
     .def("getAverageSpringLength",
          &mehp::MEHPForceRelaxation::getAverageSpringLength,
          R"pbdoc(
-           Get the average length of the springs.
+           Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()`,
+           this value is normalized by the number of springs rather than the number of chains.
       )pbdoc")
     .def("getGammaEq", &mehp::MEHPForceRelaxation::getGammaEq, R"pbdoc(
           Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
 
-          :math:`\Gamma = \langle\gamma_{\eta}\rangle`, with :math:`\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{N_{\eta} b^2}`,
+          :math:`\Gamma = \langle\gamma_{\eta}\rangle`, with :math:`\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}`,
           which you can use as :math:`G_{\mathrm{ANT}} = \Gamma \nu k_B T`,
           where :math:`\eta` is the index of a particular strand, 
+          :math:`R_{0}^2` is the melt mean square end to end distance, in phantom systems :math:`= N_{\eta}*b^2`
           :math:`N_{\eta}` is the number of atoms in this strand :math:`\eta`, 
           :math:`b` its mean square bond length,
-          :math:`T` the temperature and :math:`k_B` Boltzmann's constant.
+          :math:`T` the temperature and 
+          :math:`k_B` Boltzmann's constant.
       )pbdoc")
-    .def("getGammaX", &mehp::MEHPForceRelaxation::getGammaX, R"pbdoc(
-           Get three times the contribution of the x-direction to :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq()`.
+    .def("getDefaultR0Square",
+         &mehp::MEHPForceRelaxation::getDefaultR0Square,
+         R"pbdoc(
+           Returns the value effectively used in :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()` for :math:`\langle R_{0,\eta}^2\rangle`.
       )pbdoc")
-    .def("getGammaY", &mehp::MEHPForceRelaxation::getGammaY, R"pbdoc(
-           Get three times the contribution of the y-direction to :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq()`.
-      )pbdoc")
-    .def("getGammaZ", &mehp::MEHPForceRelaxation::getGammaZ, R"pbdoc(
-           Get three times the contribution of the z-direction to :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq()`.
-      )pbdoc")
-    .def("getNb2", &mehp::MEHPForceRelaxation::getNb2, R"pbdoc(
-           Returns the value effectively used in :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaEq()` for :math:`N_{\eta} b^2`.
-      )pbdoc")
+    .def("getDefaultNrOfChains",
+         &mehp::MEHPForceRelaxation::getDefaultNrOfChains,
+         R"pbdoc(
+          Returns the value effectively used in :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()` for normalizing the distances.`.
+          )pbdoc")
+    .def("getNrOfIterations",
+         &mehp::MEHPForceRelaxation::getNrOfIterations,
+         R"pbdoc(
+          Returns the number of iterations used for force relaxation.
+     )pbdoc")
     .def("getExitReason", &mehp::MEHPForceRelaxation::getExitReason, R"pbdoc(
            Returns the reason for termination of the simulation
       )pbdoc")
@@ -117,7 +164,7 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceRelaxation::getFinalCrosslinkerVerse,
          R"pbdoc(
           Returns the universe [of cross-linkers] with the positions of the final configuration [if force relaxation was run]
-    )pbdoc",
+          )pbdoc",
          py::arg("crosslinkerType") = 2);
 }
 
