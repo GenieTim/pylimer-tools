@@ -233,13 +233,20 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation]")
           Catch::Approx(1. / 3.).epsilon(0.001));
     auto stressTensor = forceRelaxer2.getStressTensor();
     CHECK(forceRelaxer2.getPressure() ==
-          (stressTensor[0][0] + stressTensor[1][1] + stressTensor[0][0]) / 3.);
+          (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) / 3.);
     CHECK(forceRelaxer2.getResidualNorm() > 0.0);
     CHECK(forceRelaxer2.getForce() > 0.0);
     // TODO: find better, more accurate tests here
     CHECK(forceRelaxer2.getNrOfActiveNodes() > 1);
     CHECK(forceRelaxer2.getNrOfActiveSprings() > 1);
     CHECK(forceRelaxer2.getAverageSpringLength() > 1.0);
+
+    pe::Universe universe3 = forceRelaxer2.getCrosslinkerVerse();
+    CHECK(universe3.getNrOfAtoms() == forceRelaxer2.getNrOfNodes());
+    CHECK(universe3.getNrOfBonds() == forceRelaxer2.getNrOfSprings());
+    CHECK(universe3.getAtomsOfType(2).size() == universe3.getNrOfAtoms());
+
+    // try out different algorithms
     std::vector<std::string> algorithms = { "LD_LBFGS",
                                             // "LD_TNEWTON_PRECOND_RESTART",
                                             // "GD_STOGO",
