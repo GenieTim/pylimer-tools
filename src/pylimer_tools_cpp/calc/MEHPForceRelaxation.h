@@ -139,18 +139,18 @@ namespace calc {
         };
         opt.set_min_objective(objectiveF, &params);
         // set constraints to support more algorithms
-        // std::vector<double> upperBounds;
-        // upperBounds.reserve(3 * net.nrOfNodes);
-        // std::vector<double> lowerBounds;
-        // lowerBounds.reserve(3 * net.nrOfNodes);
-        // for (size_t i = 0; i < net.nrOfNodes; ++i) {
-        //   for (size_t dir = 0; dir < 3; ++dir) {
-        //     upperBounds.push_back(net.L[dir] * 0.5);
-        //     lowerBounds.push_back(-net.L[dir] * 0.5);
-        //   }
-        // }
-        // opt.set_upper_bounds(upperBounds);
-        // opt.set_lower_bounds(lowerBounds);
+        std::vector<double> upperBounds;
+        upperBounds.reserve(3 * net.nrOfNodes);
+        std::vector<double> lowerBounds;
+        lowerBounds.reserve(3 * net.nrOfNodes);
+        for (size_t i = 0; i < net.nrOfNodes; ++i) {
+          for (size_t dir = 0; dir < 3; ++dir) {
+            upperBounds.push_back(net.L[dir] * 0.5);
+            lowerBounds.push_back(-net.L[dir] * 0.5);
+          }
+        }
+        opt.set_upper_bounds(upperBounds);
+        opt.set_lower_bounds(lowerBounds);
         // set exit conditions
         opt.set_xtol_rel(xtol);
         opt.set_ftol_rel(ftol);
@@ -592,10 +592,10 @@ namespace calc {
        * @return double
        */
       double evaluatePressure(
-        const std::array<std::array<double, 3>, 3> stressTensor) const
+        const std::array<std::array<double, 3>, 3> &stressTensor) const
       {
         return (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) /
-               3;
+               3.0;
       }
 
       /**
