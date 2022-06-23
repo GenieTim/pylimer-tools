@@ -238,7 +238,7 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.doMEHPAnalysis.calculateCycleRank">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMEHPAnalysis.</span></span><span class="sig-name descname"><span class="pre">calculateCycleRank</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">networks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mu</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absTol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relTol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinkerType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.doMEHPAnalysis.calculateCycleRank" title="Permalink to this definition">#</a></dt>
-<dd><p>Compute the cycle rank (<span class="math">\chi</span>).
+<dd><p>Compute the cycle rank (<span class="math notranslate nohighlight">\(\chi\)</span>).
 Assumes the precursor-chains to be bifunctional.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -329,7 +329,7 @@ Assumes the precursor-chains to be bifunctional.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the network to compute <span class="math">\nu_{eff}</span> for</p></li>
+<li><p><strong>network</strong> (<em>-</em>) – the network to compute <span class="math notranslate nohighlight">\(\nu_{eff}\)</span> for</p></li>
 <li><p><strong>absTol</strong> (<em>-</em>) – the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</p></li>
 <li><p><strong>relTol</strong> (<em>-</em>) – the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</p></li>
 <li><p><strong>crosslinkerType</strong> (<em>-</em>) – the atom type of the crosslinkers/junctions</p></li>
@@ -341,7 +341,7 @@ Assumes the precursor-chains to be bifunctional.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
-<li><p><span class="math">\mu_{eff}</span> (float)</p></li>
+<li><p><span class="math notranslate nohighlight">\(\mu_{eff}\)</span> (float)</p></li>
 </ul>
 </p>
 </dd>
@@ -351,9 +351,9 @@ Assumes the precursor-chains to be bifunctional.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveNrDensityOfNetwork">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMEHPAnalysis.</span></span><span class="sig-name descname"><span class="pre">calculateEffectiveNrDensityOfNetwork</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">networks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absTol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relTol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinkerType</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveNrDensityOfNetwork" title="Permalink to this definition">#</a></dt>
-<dd><p>Compute the effective number density <span class="math">\nu_{eff}</span> of a network.
+<dd><p>Compute the effective number density <span class="math notranslate nohighlight">\(\nu_{eff}\)</span> of a network.
 Assumes the precursor-chains to be bifunctional.</p>
-<p><span class="math">\nu_{eff}</span> is the number of elastically effective (active) strands per unit volume,
+<p><span class="math notranslate nohighlight">\(\nu_{eff}\)</span> is the number of elastically effective (active) strands per unit volume,
 which are defined as the ones that can store elastic energy
 upon network deformation, resp. the effective number density of network strands</p>
 <dl class="simple">
@@ -365,7 +365,7 @@ upon network deformation, resp. the effective number density of network strands<
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the network to compute <span class="math">\nu_{eff}</span> for</p></li>
+<li><p><strong>network</strong> (<em>-</em>) – the network to compute <span class="math notranslate nohighlight">\(\nu_{eff}\)</span> for</p></li>
 <li><p><strong>absTol</strong> (<em>-</em>) – the absolute tolerance to categorize a chain as active (min. end-to-end distance) (None to use only relTol)</p></li>
 <li><p><strong>relTol</strong> (<em>-</em>) – the relative tolerance to categorize a chain as active (0: all, 1: none (use only absTol))</p></li>
 <li><p><strong>crosslinkerType</strong> (<em>-</em>) – the atom type of the crosslinkers/junctions</p></li>
@@ -376,7 +376,7 @@ upon network deformation, resp. the effective number density of network strands<
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
-<li><p><span class="math">\nu_{eff}</span> (float)</p></li>
+<li><p><span class="math notranslate nohighlight">\(\nu_{eff}\)</span> (float)</p></li>
 </ul>
 </p>
 </dd>
@@ -427,14 +427,14 @@ upon network deformation, resp. the effective number density of network strands<
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>network</strong> (<em>-</em>) – the network to compute the topological factor for</p></li>
 <li><p><strong>foreignAtomType</strong> (<em>-</em>) – the type of atoms to ignore</p></li>
-<li><p><strong>totalMass</strong> (<em>-</em>) – the <span class="math">M</span> in the respective formula</p></li>
+<li><p><strong>totalMass</strong> (<em>-</em>) – the <span class="math notranslate nohighlight">\(M\)</span> in the respective formula</p></li>
 <li><p><strong>b</strong> (<em>-</em>) – the mean bond length.
 If <cite>None</cite>, it will be computed for each molecule in the first Universe (Network).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p>the topological factor <span class="math">\Gamma</span></p></li>
+<li><p>the topological factor <span class="math notranslate nohighlight">\(\Gamma\)</span></p></li>
 </ul>
 </p>
 </dd>
@@ -611,7 +611,7 @@ If <cite>None</cite>, it will be computed for each molecule in the first Univers
 <li><p><strong>T</strong> (<em>-</em>) – the temperature in your unit system</p></li>
 <li><p><strong>k_b</strong> (<em>-</em>) – Boltzmann’s constant in your unit system</p></li>
 <li><p><strong>foreignAtomType</strong> (<em>-</em>) – the type of atoms to ignore (junctions, crosslinkers)</p></li>
-<li><p><strong>totalMass</strong> (<em>-</em>) – the <span class="math">M</span> in the respective formula</p></li>
+<li><p><strong>totalMass</strong> (<em>-</em>) – the <span class="math notranslate nohighlight">\(M\)</span> in the respective formula</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -655,7 +655,7 @@ See: #computeExtentOfReaction</p></li>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
-<li><p><span class="math">\Phi_{el}</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(\Phi_{el}\)</span></p></li>
 </ul>
 </p>
 </dd>
@@ -721,7 +721,7 @@ If None: will compute from network structure</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.computeMMsProbabilities">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">computeMMsProbabilities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.computeMMsProbabilities" title="Permalink to this definition">#</a></dt>
-<dd><p>Compute Macosko and Miller’s probabilities <span class="math">P(F_A)</span> and <span class="math">P(F_B)</span></p>
+<dd><p>Compute Macosko and Miller’s probabilities <span class="math notranslate nohighlight">\(P(F_A)\)</span> and <span class="math notranslate nohighlight">\(P(F_B)\)</span></p>
 <dl class="simple">
 <dt>Sources:</dt><dd><ul class="simple">
 <li><p><a class="reference external" href="https://pubs.acs.org/doi/10.1021/ma60050a004">https://pubs.acs.org/doi/10.1021/ma60050a004</a></p></li>
@@ -738,8 +738,8 @@ If None: will compute from network structure</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="math">P(F_A)</span>
-- beta: <span class="math">P(F_B)</span></p>
+<dd class="field-even"><p><span class="math notranslate nohighlight">\(P(F_A)\)</span>
+- beta: <span class="math notranslate nohighlight">\(P(F_B)\)</span></p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
@@ -846,12 +846,12 @@ See: <a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.compu
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the weight fraction of soluble material according to MMT.
 - weightFractions (dict): a dictionary with key: type, and value: weight fraction of type
-- <span class="math">\alpha</span> (float): Macosko &amp; Miller’s <span class="math">P(F_A)</span>
-- <span class="math">\beta</span> (float): Macosko &amp; Miller’s <span class="math">P(F_B)</span></p>
+- <span class="math notranslate nohighlight">\(\alpha\)</span> (float): Macosko &amp; Miller’s <span class="math notranslate nohighlight">\(P(F_A)\)</span>
+- <span class="math notranslate nohighlight">\(\beta\)</span> (float): Macosko &amp; Miller’s <span class="math notranslate nohighlight">\(P(F_B)\)</span></p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
-<li><p><span class="math">W_{sol}</span> (float)</p></li>
+<li><p><span class="math notranslate nohighlight">\(W_{sol}\)</span> (float)</p></li>
 </ul>
 </p>
 </dd>
@@ -867,11 +867,11 @@ See: <a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.compu
 <dd class="field-odd"><p><strong>network</strong> (<em>-</em>) – the poylmer network to do the computation for</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>using the type i as a key, this dict contains the weight fractions (<span class="math">\frac{W_i}{W_{tot}}</span>)</p>
+<dd class="field-even"><p>using the type i as a key, this dict contains the weight fractions (<span class="math notranslate nohighlight">\(\frac{W_i}{W_{tot}}\)</span>)</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
-<li><p><span class="math">\vec{W_i}</span> (dict)</p></li>
+<li><p><span class="math notranslate nohighlight">\(\vec{W_i}\)</span> (dict)</p></li>
 </ul>
 </p>
 </dd>
@@ -895,7 +895,7 @@ See: <a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.compu
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
-<li><p><span class="math">W_{sol}</span> (float)</p></li>
+<li><p><span class="math notranslate nohighlight">\(W_{sol}\)</span> (float)</p></li>
 </ul>
 </p>
 </dd>
@@ -905,7 +905,7 @@ See: <a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.compu
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.predictGelationPoint">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">predictGelationPoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.predictGelationPoint" title="Permalink to this definition">#</a></dt>
-<dd><p>Compute the gelation point <span class="math">p_{gel}</span> as theoretically predicted
+<dd><p>Compute the gelation point <span class="math notranslate nohighlight">\(p_{gel}\)</span> as theoretically predicted
 (gelation point = critical extent of reaction for gelation)</p>
 <dl class="simple">
 <dt>Source:</dt><dd><ul class="simple">
@@ -1118,5 +1118,7 @@ See: #computeExtentOfReaction</p></li>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
     <script src="_static/scripts/furo.js"></script>
+    <script>window.MathJax = {"tex": {}, "extensions": ["jsMath2jax.js"], "jax": ["input/TeX"]}</script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     </body>
 </html>
