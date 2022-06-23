@@ -34,7 +34,7 @@ init_pylimer_bound_calc(py::module_& m)
 
   py::class_<mehp::MEHPForceRelaxation>(m, "MEHPForceRelaxation", R"pbdoc(
     A small simulation tool for quickly minimizing the force between the cross-linker beads.
-  )pbdoc")
+     )pbdoc")
     .def(py::init<pe::Universe, int, bool>(),
          R"pbdoc(
           Instantiate the simulator for a certain universe.
@@ -101,55 +101,55 @@ init_pylimer_bound_calc(py::module_& m)
          R"pbdoc(
           omputes the gamma factor as part of the ANT/MEHP formulism, i.e.:
 
-          :math:`$\Gamma = \langle\gamma_{\eta}\rangle$`, with :math:`$\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}$`,
-          which you can use as :math:`$G_{\mathrm{ANT}} = \Gamma \nu k_B T$`,
-          where :math:`$\eta$` is the index of a particular strand, 
-          :math:`$R_{0}^2$` is the melt mean square end to end distance, in phantom systems :math:`$= N_{\eta}*b^2$`
-          :math:`$N_{\eta}$` is the number of atoms in this strand :math:`$\eta$`, 
-          :math:`$b$` its mean square bond length,
-          :math:`$T$` the temperature and 
-          :math:`$k_B$` Boltzmann's constant.
+          :math:`\Gamma = \langle\gamma_{\eta}\rangle`, with :math:`\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}`,
+          which you can use as :math:`G_{\mathrm{ANT}} = \Gamma \nu k_B T`,
+          where :math:`\eta` is the index of a particular strand, 
+          :math:`R_{0}^2` is the melt mean square end to end distance, in phantom systems :math:`$= N_{\eta}*b^2$`
+          :math:`N_{\eta}` is the number of atoms in this strand :math:`\eta`, 
+          :math:`b` its mean square bond length,
+          :math:`T` the temperature and 
+          :math:`k_B` Boltzmann's constant.
           
-          :param r0squared: The denominator in the equation of :math:`$\Gamma$`. If $-1.0$ (default), the network is used for determination (which is not accurate). For phantom systems, the correct value is :math:`Nb^2`.
-          For other systems, the value could be determined by `~pylimer_tools_cpp.pylimer_tools_cpp.Universe.computeMeanEndToEndDistance()` on the melt system.
-          :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if < 0) the nr of chains. 
-          )pbdoc",
+          :param r0squared: The denominator in the equation of :math:`\Gamma`. If :math:`-1.0` (default), the network is used for determination (which is not accurate). For phantom systems, the correct value is :math:`Nb^2`.
+               For other systems, the value could be determined by `~pylimer_tools_cpp.pylimer_tools_cpp.Universe.computeMeanEndToEndDistance` on the melt system.
+          :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains. 
+     )pbdoc",
          py::arg("r0squared") = -1.0,
          py::arg("nrOfChains") = -1)
     .def("getNrOfNodes", &mehp::MEHPForceRelaxation::getNrOfNodes, R"pbdoc(
            Get the number of nodes considered in this simulation.
-      )pbdoc")
+     )pbdoc")
     .def("getNrOfSprings",
          &mehp::MEHPForceRelaxation::getNrOfSprings,
          R"pbdoc(
            Get the number of springs considered in this simulation.
-      )pbdoc")
+     )pbdoc")
     .def("getNrOfActiveNodes",
          &mehp::MEHPForceRelaxation::getNrOfActiveNodes,
          R"pbdoc(
            Get the number of active nodes remaining after running the simulation.
-      )pbdoc")
+     )pbdoc")
     .def("getNrOfActiveSprings",
          &mehp::MEHPForceRelaxation::getNrOfActiveSprings,
          R"pbdoc(
            Get the number of active springs remaining after running the simulation.
-      )pbdoc")
+     )pbdoc")
     .def("getAverageSpringLength",
          &mehp::MEHPForceRelaxation::getAverageSpringLength,
          R"pbdoc(
            Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()`,
            this value is normalized by the number of springs rather than the number of chains.
-      )pbdoc")
+     )pbdoc")
     .def("getDefaultR0Square",
          &mehp::MEHPForceRelaxation::getDefaultR0Square,
          R"pbdoc(
            Returns the value effectively used in :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()` for :math:`\langle R_{0,\eta}^2\rangle`.
-      )pbdoc")
+     )pbdoc")
     .def("getDefaultNrOfChains",
          &mehp::MEHPForceRelaxation::getDefaultNrOfChains,
          R"pbdoc(
           Returns the value effectively used in :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()` for normalizing the distances.`.
-          )pbdoc")
+     )pbdoc")
     .def("getNrOfIterations",
          &mehp::MEHPForceRelaxation::getNrOfIterations,
          R"pbdoc(
@@ -157,12 +157,12 @@ init_pylimer_bound_calc(py::module_& m)
      )pbdoc")
     .def("getExitReason", &mehp::MEHPForceRelaxation::getExitReason, R"pbdoc(
            Returns the reason for termination of the simulation
-      )pbdoc")
+     )pbdoc")
     .def("getCrosslinkerVerse",
          &mehp::MEHPForceRelaxation::getCrosslinkerVerse,
          R"pbdoc(
           Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
-          )pbdoc",
+     )pbdoc",
          py::arg("newCrosslinkerType") = 2);
 }
 
