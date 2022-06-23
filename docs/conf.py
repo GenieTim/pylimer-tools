@@ -56,7 +56,7 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     # "sphinx.ext.jsmath",
-    "sphinx.ext.imgmath"
+    "sphinx.ext.mathjax"
 ]
 
 autosummary_generate = True
@@ -74,6 +74,19 @@ source_suffix = ['.rst', '.md']
 
 # The master toctree document.
 master_doc = "index"
+
+# Mathjax options
+mathjax_path="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"
+mathjax3_config = {
+    "tex": {
+        #"inlineMath": [['$', '$'], ['\\(', '\\)']]
+    },
+    "extensions": ["jsMath2jax.js"],
+    "jax": ["input/TeX"]
+}
+mathjax_options = {
+    "async": "async"
+}
 
 # -- Options for HTML output -------------------------------------------------
 
