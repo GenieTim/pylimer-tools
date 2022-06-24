@@ -50,6 +50,9 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceRelaxation::runForceRelaxation,
          R"pbdoc(
           Run the simulation.
+          Note that the final state of the minimization is persisted and reused if you use this method again.
+          This is useful if you want to run a global optimization first and add a local one afterwards.
+          As a consequence though, you cannot simply benchmark only this method; you must include the setup.
 
           :param algorithm: The algorithm to use for the force relaxation. Choices: see `NLopt Algorithms <https://nlopt.readthedocs.io/en/latest/NLopt_Algorithms/>`_
           :param maxNrOfSteps: The maximum number of steps to do during the simulation.

@@ -1,6 +1,7 @@
 #include "../../src/pylimer_tools_cpp/calc/MEHPForceRelaxation.h"
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
+#include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <chrono>
@@ -134,6 +135,28 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation]")
     if (std::filesystem::exists(largeInputFile)) {
       universeSeq.initializeFromDataSequence({ { largeInputFile } });
       pe::Universe universe2 = universeSeq.atIndex(0);
+
+      // BENCHMARK_ADVANCED("MEHP LD_MMA " + largeInputFile)
+      // (Catch::Benchmark::Chronometer meter)
+      // {
+      //   pcm::MEHPForceRelaxation forceRelaxer3 =
+      //     pcm::MEHPForceRelaxation(universe2, 2);
+      //   meter.measure([&forceRelaxer3] {
+      //     forceRelaxer3.runForceRelaxation("LD_MMA");
+      //     return forceRelaxer3.getNrOfIterations();
+      //   });
+      // };
+      // BENCHMARK_ADVANCED("MEHP LD_LBFGS " + largeInputFile)
+      // (Catch::Benchmark::Chronometer meter)
+      // {
+      //   pcm::MEHPForceRelaxation forceRelaxer3 =
+      //     pcm::MEHPForceRelaxation(universe2, 2);
+      //   meter.measure([&forceRelaxer3] {
+      //     forceRelaxer3.runForceRelaxation("LD_LBFGS");
+      //     return forceRelaxer3.getNrOfIterations();
+      //   });
+      // };
+
       double nrOfChains = 1.e4;
       CHECK(static_cast<double>(universe2.getMolecules(2).size()) ==
             Catch::Approx(nrOfChains));
@@ -217,7 +240,7 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation]")
     REQUIRE(forceRelaxer.getExitReason() == pcm::ExitReason::UNSET);
     REQUIRE(forceRelaxer.getNrOfIterations() == 0);
     REQUIRE(forceRelaxer.getVolume() == Catch::Approx(universe.getVolume()));
-    forceRelaxer.runForceRelaxation("LD_MMA", 5);
+    forceRelaxer.runForceRelaxation("LD_LBFGS", 5);
     REQUIRE(forceRelaxer.getNrOfNodes() != universe.getNrOfAtoms());
     REQUIRE(forceRelaxer.getNrOfIterations() <= 5);
     REQUIRE(forceRelaxer.getNrOfIterations() >= 1);
@@ -226,16 +249,16 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation]")
     // run again, this time fully
     pcm::MEHPForceRelaxation forceRelaxer2 =
       pcm::MEHPForceRelaxation(universe, 2, true);
-    forceRelaxer2.runForceRelaxation("LD_MMA", 10000, 1e-5, 1e-18);
+    forceRelaxer2.runForceRelaxation("LD_LBFGS", 10000, 1e-5, 1e-18);
     REQUIRE(forceRelaxer2.getNrOfIterations() > 5);
     CHECK(forceRelaxer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceRelaxer2.getGammaFactor(25, forceRelaxer2.getNrOfSprings()) ==
           Catch::Approx(1. / 3.).epsilon(0.001));
     auto stressTensor = forceRelaxer2.getStressTensor();
-    CHECK(
-      forceRelaxer2.getPressure() ==
-      Catch::Approx(
-        (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) / 3.).epsilon(0.01));
+    CHECK(forceRelaxer2.getPressure() ==
+          Catch::Approx(
+            (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) / 3.)
+            .epsilon(0.01));
     CHECK(forceRelaxer2.getResidualNorm() > 0.0);
     CHECK(forceRelaxer2.getForce() > 0.0);
     // TODO: find better, more accurate tests here
@@ -249,7 +272,7 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation]")
     CHECK(universe3.getAtomsOfType(2).size() == universe3.getNrOfAtoms());
 
     // try out different algorithms
-    std::vector<std::string> algorithms = { "LD_LBFGS",
+    std::vector<std::string> algorithms = { "LD_MMA",
                                             // "LD_TNEWTON_PRECOND_RESTART",
                                             // "GD_STOGO",
                                             "LD_SLSQP",
