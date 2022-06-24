@@ -305,15 +305,15 @@ namespace calc {
         return xlinkUniverse;
       }
 
-      int getDefaultNrOfChains() { return this->defaultNrOfChains; }
+      int getDefaultNrOfChains() const { return this->defaultNrOfChains; }
 
-      double getDefaultR0Square() { return this->defaultR0Squared; }
+      double getDefaultR0Square() const { return this->defaultR0Squared; }
 
-      double getVolume() { return this->initialConfig.vol; }
+      double getVolume() const { return this->initialConfig.vol; }
 
-      int getNrOfNodes() { return this->initialConfig.nrOfNodes; }
+      int getNrOfNodes() const { return this->initialConfig.nrOfNodes; }
 
-      int getNrOfSprings() { return this->initialConfig.nrOfSprings; }
+      int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
 
       /**
        * @brief Get the Nr Of Active Nodes
@@ -322,7 +322,7 @@ namespace calc {
        * considered inactive
        * @return int
        */
-      int getNrOfActiveNodes(double tolerance = 0.1)
+      int getNrOfActiveNodes(double tolerance = 0.1) const
       {
         int Mact = 0;
 
@@ -356,7 +356,7 @@ namespace calc {
        * inactive
        * @return int
        */
-      int getNrOfActiveSprings(double tol = 0.1)
+      int getNrOfActiveSprings(double tol = 0.1) const
       {
         return this->countNrOfActiveSprings(this->currentSpringDistances, tol);
       }
@@ -366,7 +366,7 @@ namespace calc {
        *
        * @return double
        */
-      double getAverageSpringLength()
+      double getAverageSpringLength() const
       {
         double r2 = 0.0;
         for (int i = 0; i < this->initialConfig.nrOfSprings; i++) {
@@ -380,7 +380,7 @@ namespace calc {
         return r2 / this->initialConfig.nrOfSprings;
       }
 
-      std::array<std::array<double, 3>, 3> getStressTensor(double kappa = 1.0)
+      std::array<std::array<double, 3>, 3> getStressTensor( const double kappa = 1.0) const
       {
         return this->evaluateStressTensor(
           this->currentSpringDistances, kappa, this->initialConfig.vol);
@@ -392,7 +392,7 @@ namespace calc {
        * @param kappa the spring constant to use for the force
        * @return double
        */
-      double getPressure(double kappa = 1.0)
+      double getPressure(const double kappa = 1.0) const
       {
         return this->evaluatePressure(this->currentSpringDistances, kappa);
       }
@@ -403,7 +403,7 @@ namespace calc {
        * @param kappa the spring constant to use for the force
        * @return double
        */
-      double getResidualNorm(double kappa = 1.0)
+      double getResidualNorm(double kappa = 1.0) const
       {
         double* r = new double[3 * this->initialConfig.nrOfNodes];
         for (size_t i = 0; i < this->initialConfig.nrOfNodes * 3; ++i) {
@@ -431,7 +431,7 @@ namespace calc {
        * @param kappa
        * @return double
        */
-      double getForce(double kappa = 1.0)
+      double getForce(double kappa = 1.0) const
       {
         return this->evaluateForceSetGradient(&this->initialConfig,
                                               kappa,
@@ -450,7 +450,7 @@ namespace calc {
        * from the nr of springs thanks to omitted free chains or primary loops)
        * @return double
        */
-      double getGammaFactor(double r02 = -1.0, int nrOfChains = -1)
+      double getGammaFactor(double r02 = -1.0, int nrOfChains = -1) const
       {
         if (r02 < 0) {
           r02 = this->defaultR0Squared;
@@ -463,9 +463,9 @@ namespace calc {
           this->currentSpringDistances, r02, nrOfChains);
       }
 
-      int getNrOfIterations() { return this->nrOfStepsDone; }
+      int getNrOfIterations() const { return this->nrOfStepsDone; }
 
-      ExitReason getExitReason() { return this->exitReason; }
+      ExitReason getExitReason() const { return this->exitReason; }
 
     protected:
       /**
@@ -476,7 +476,7 @@ namespace calc {
        * @return true
        * @return false
        */
-      bool ConvertNetwork(Network* net, int crosslinkerType = 2)
+      bool ConvertNetwork(Network* net, const int crosslinkerType = 2)
       {
         pylimer_tools::entities::Universe crosslinkerUniverse =
           this->universe.getNetworkOfCrosslinker(crosslinkerType);
@@ -545,7 +545,7 @@ namespace calc {
        * from the nr of springs thanks to omitted free chains or primary loops)
        * @return double
        */
-      double evaluateGammaFactor(Eigen::VectorXd& springDistances,
+      double evaluateGammaFactor(const Eigen::VectorXd& springDistances,
                                  double r02,
                                  int nrOfChains) const
       {
@@ -561,7 +561,7 @@ namespace calc {
        * @param kappa the spring constant for the force factor
        * @return double
        */
-      double evaluatePressure(Eigen::VectorXd& springDistances,
+      double evaluatePressure(const Eigen::VectorXd& springDistances,
                               const double kappa) const
       {
         auto stressTensor = this->evaluateStressTensor(
@@ -609,9 +609,9 @@ namespace calc {
        * @return std::array<std::array<double, 3>, 3>
        */
       std::array<std::array<double, 3>, 3> evaluateStressTensor(
-        Eigen::VectorXd& springDistances,
-        double kappa,
-        double volume) const
+        const Eigen::VectorXd& springDistances,
+        const double kappa,
+        const double volume) const
       {
         std::array<std::array<double, 3>, 3> stress;
 
