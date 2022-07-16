@@ -47,6 +47,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Universe
       ~Universe.getAtomTypes
       ~Universe.getAtoms
       ~Universe.getAtomsConnectedTo
+      ~Universe.getAtomsOfDegree
       ~Universe.getAtomsOfType
       ~Universe.getBonds
       ~Universe.getBox
@@ -67,6 +68,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Universe
       ~Universe.hasInfiniteStrand
       ~Universe.removeAtoms
       ~Universe.removeBonds
+      ~Universe.replaceAtom
       ~Universe.setBox
       ~Universe.setBoxLengths
       ~Universe.setMasses
