@@ -50,6 +50,7 @@ namespace entities {
                   std::vector<int> ny,
                   std::vector<int> nz);
     void removeAtoms(std::vector<long int> ids);
+    void replaceAtom(const long int id, const Atom &replacement);
     // bonds
     void addBonds(std::vector<long int> from, std::vector<long int> to);
     void addBonds(const size_t NNewBonds,

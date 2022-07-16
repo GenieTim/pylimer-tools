@@ -224,6 +224,15 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                       { { 2, 3, 6, 5, 7, 1, 8 } },
                       { { 1, 1, 1, 1, 1, 1, 11 } });
 
+    SECTION("Atoms can be replaced")
+    {
+      REQUIRE_THROWS(universe.replaceAtom(2, universe.getAtom(3)));
+      pe::Atom replacementAtom = pe::Atom(2, 2, 1.23, 1.23, 1.23, 0, 0, 0);
+      universe.replaceAtom(2, replacementAtom);
+      pe::Atom replacedAtom = universe.getAtom(2);
+      REQUIRE(replacedAtom == replacementAtom);
+    }
+
     SECTION("Atom types are counted")
     {
       std::map<int, int> atomCounts = universe.countAtomTypes();
