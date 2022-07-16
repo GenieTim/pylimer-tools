@@ -50,9 +50,9 @@ namespace entities {
       throw std::runtime_error(
         "Molecule's graph's attribute id was not queried.");
     }
-    this->atomIdToVectorIdx.reserve(ids.size());
+    this->atomIdToVertexIdx.reserve(ids.size());
     for (int i = 0; i < ids.size(); ++i) {
-      this->atomIdToVectorIdx[ids[i]] = i;
+      this->atomIdToVertexIdx[ids[i]] = i;
     }
     std::sort(ids.begin(), ids.end());
     this->key =
@@ -132,12 +132,12 @@ namespace entities {
 
   long int Molecule::getIdxByAtomId(const int atomId) const
   {
-    if (!this->atomIdToVectorIdx.contains(atomId)) {
+    if (!this->atomIdToVertexIdx.contains(atomId)) {
       throw std::invalid_argument("Molecule cannot return vertex idx of this "
                                   "atom: an atom with this id (" +
                                   std::to_string(atomId) + ") does not exist");
     }
-    return this->atomIdToVectorIdx.at(atomId);
+    return this->atomIdToVertexIdx.at(atomId);
   };
 
   /**

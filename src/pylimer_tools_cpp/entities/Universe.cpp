@@ -56,7 +56,8 @@ namespace entities {
 
   Universe::Universe(const double Lx, const double Ly, const double Lz)
     : Universe(Box(Lx, Ly, Lz))
-  {}
+  {
+  }
 
   // 1. destructor (to destroy the graph)
   Universe::~Universe()
@@ -77,7 +78,7 @@ namespace entities {
     this->angleVia = src.angleVia;
     // using copy assignement operators ourselfes
     this->box = src.box;
-    this->atomIdToVectorIdx = src.atomIdToVectorIdx;
+    this->atomIdToVertexIdx = src.atomIdToVertexIdx;
     this->massPerType = src.massPerType;
     igraph_copy(&this->graph, &src.graph);
   };
@@ -93,11 +94,38 @@ namespace entities {
     std::swap(this->angleVia, src.angleVia);
     std::swap(this->box, src.box);
     std::swap(this->graph, src.graph);
-    std::swap(this->atomIdToVectorIdx, src.atomIdToVectorIdx);
+    std::swap(this->atomIdToVertexIdx, src.atomIdToVertexIdx);
     std::swap(this->massPerType, src.massPerType);
 
     return *this;
   };
+
+  void Universe::initializeFromGraph(const igraph_t* ingraph)
+  {
+    igraph_destroy(&this->graph);
+    igraph_copy(&this->graph, ingraph);
+    this->NAtoms = igraph_vcount(&this->graph);
+    this->NBonds = igraph_ecount(&this->graph);
+    // load the ids
+    igraph_vector_t allIds;
+    igraph_vector_init(&allIds, this->NAtoms);
+    VANV(&this->graph, "id", &allIds);
+    if (igraph_cattribute_VANV(&this->graph, "id", igraph_vss_all(), &allIds)) {
+      throw std::runtime_error(
+        "Universes's graph's attribute id is not accessible.");
+    };
+    std::vector<int> ids;
+    pylimer_tools::utils::igraphVectorTToStdVector(&allIds, ids);
+    igraph_vector_destroy(&allIds);
+    if (ids.size() == 0 && this->NAtoms > 0) {
+      throw std::runtime_error(
+        "Universes's graph's attribute id was not queried.");
+    }
+    this->atomIdToVertexIdx.reserve(ids.size());
+    for (int i = 0; i < ids.size(); ++i) {
+      this->atomIdToVertexIdx[ids[i]] = i;
+    }
+  }
 
   // other functions
   void Universe::addAtoms(std::vector<long int> newIds,
@@ -133,14 +161,14 @@ namespace entities {
     if (igraph_add_vertices(&this->graph, NNewAtoms, 0)) {
       throw std::runtime_error("Failed to add new atoms to graph.");
     }
-    this->atomIdToVectorIdx.reserve(this->NAtoms + NNewAtoms);
+    this->atomIdToVertexIdx.reserve(this->NAtoms + NNewAtoms);
     // do map for easy access afterwards
     for (size_t i = 0; i < NNewAtoms; ++i) {
-      if (this->atomIdToVectorIdx.contains(newIds[i])) {
+      if (this->atomIdToVertexIdx.contains(newIds[i])) {
         throw std::invalid_argument(
           "Atom with id " + std::to_string(newIds[i]) + " already exists");
       }
-      this->atomIdToVectorIdx.emplace(newIds[i], this->NAtoms + i);
+      this->atomIdToVertexIdx.emplace(newIds[i], this->NAtoms + i);
     }
     // append attributes
     // it is empirically more efficient to do it this split up way,
@@ -198,7 +226,7 @@ namespace entities {
     igraph_vector_destroy(&vertexIds);
 
     // now, we need to update the id-atomId map
-    this->atomIdToVectorIdx.clear();
+    this->atomIdToVertexIdx.clear();
 
     igraph_vs_t allVertexIds;
     igraph_vs_all(&allVertexIds);
@@ -206,7 +234,7 @@ namespace entities {
     igraph_vit_create(&this->graph, allVertexIds, &vit);
     while (!IGRAPH_VIT_END(vit)) {
       long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
-      this->atomIdToVectorIdx.emplace(VAN(&this->graph, "id", vertexId),
+      this->atomIdToVertexIdx.emplace(VAN(&this->graph, "id", vertexId),
                                       vertexId);
       IGRAPH_VIT_NEXT(vit);
     }
@@ -214,6 +242,27 @@ namespace entities {
     igraph_vs_destroy(&allVertexIds);
 
     this->NAtoms = igraph_vcount(&this->graph);
+    this->NBonds = igraph_ecount(&this->graph);
+  }
+
+  void Universe::removeBonds(const std::vector<long int> atomIdsFrom,
+                             const std::vector<long int> atomIdsTo)
+  {
+    if (atomIdsFrom.size() != atomIdsTo.size()) {
+      throw std::invalid_argument(
+        "Vertex ids from and to must have the same length.");
+    }
+    for (size_t i = 0; i < atomIdsFrom.size(); ++i) {
+      std::vector<long int> edgeIds =
+        this->getEdgeIdsFromTo(this->getIdxByAtomId(atomIdsFrom[i]),
+                               this->getIdxByAtomId(atomIdsTo[i]));
+      igraph_vector_t edgeIdsV;
+      igraph_vector_init(&edgeIdsV, edgeIds.size());
+      pylimer_tools::utils::StdVectorToIgraphVectorT(edgeIds, &edgeIdsV);
+      igraph_delete_edges(&this->graph, igraph_ess_vector(&edgeIdsV));
+      igraph_vector_destroy(&edgeIdsV);
+    }
+
     this->NBonds = igraph_ecount(&this->graph);
   }
 
@@ -247,14 +296,14 @@ namespace entities {
     igraph_vector_init(&newEdges, edgesSize);
     int innerIndex = 0;
     for (size_t i = 1; i < edgesSize; i += 2) {
-      if (this->atomIdToVectorIdx.contains(newEdgesVector[i - 1]) &&
-          this->atomIdToVectorIdx.contains(newEdgesVector[i])) {
+      if (this->atomIdToVertexIdx.contains(newEdgesVector[i - 1]) &&
+          this->atomIdToVertexIdx.contains(newEdgesVector[i])) {
         igraph_vector_set(&newEdges,
                           innerIndex,
-                          this->atomIdToVectorIdx.at(newEdgesVector[i - 1]));
+                          this->atomIdToVertexIdx.at(newEdgesVector[i - 1]));
         innerIndex += 1;
         igraph_vector_set(
-          &newEdges, innerIndex, this->atomIdToVectorIdx.at(newEdgesVector[i]));
+          &newEdges, innerIndex, this->atomIdToVertexIdx.at(newEdgesVector[i]));
         innerIndex += 1;
         actualNrOfBondsAdded += 1;
       } else if (!ignoreNonExistentAtoms) {
@@ -343,18 +392,21 @@ namespace entities {
     this->massPerType = massPerType;
   }
 
-  std::map<int, double> Universe::getMasses() { return this->massPerType; };
+  std::map<int, double> Universe::getMasses()
+  {
+    return this->massPerType;
+  };
 
   /**
    * @brief Get the standalone components of the network
    *
-   * @return std::vector<Molecule>
+   * @return std::vector<Universe>
    */
-  std::vector<Molecule> Universe::getClusters() const
+  std::vector<Universe> Universe::getClusters() const
   {
-    std::vector<Molecule> molecules;
+    std::vector<Universe> clusters;
     if (this->getNrOfAtoms() == 0) {
-      return molecules;
+      return clusters;
     }
 
     // split the copy into the separate components
@@ -365,19 +417,23 @@ namespace entities {
     }
     size_t NComponents = igraph_vector_ptr_size(&components);
     // std::cout << NComponents << " clusters found." << std::endl;
-    molecules.reserve(NComponents);
+    clusters.reserve(NComponents);
     for (size_t i = 0; i < NComponents; ++i) {
       // make the molecule the owner of the graph
       igraph_t* g = (igraph_t*)VECTOR(components)[i];
 
       if (igraph_vcount(g)) {
-        molecules.push_back(
-          Molecule(&this->box, g, MoleculeType::UNDEFINED, this->massPerType));
+        Universe newUniverse = Universe(this->box);
+        newUniverse.initializeFromGraph(g);
+        newUniverse.setMasses(this->massPerType);
+        clusters.push_back(newUniverse);
       }
+
+      igraph_destroy(g);
     }
     igraph_decompose_destroy(&components);
     igraph_vector_ptr_destroy(&components);
-    return molecules;
+    return clusters;
   }
 
   /**
@@ -574,7 +630,7 @@ namespace entities {
           long int oldEndNodeId =
             (long int)VAN(chain, "id", newEndNodeVertexId);
           long int originalEndNodeVertexId =
-            this->atomIdToVectorIdx.at(oldEndNodeId);
+            this->atomIdToVertexIdx.at(oldEndNodeId);
           // this->findVertexIdForProperty("id", oldEndNodeId);
           igraph_vector_t neighbours;
           igraph_vector_init(&neighbours, 0);
@@ -1129,12 +1185,12 @@ namespace entities {
    */
   long int Universe::getIdxByAtomId(const int atomId) const
   {
-    if (!this->atomIdToVectorIdx.contains(atomId)) {
+    if (!this->atomIdToVertexIdx.contains(atomId)) {
       throw std::invalid_argument(
         "Universe cannot return idx of atom id: atom with this id (" +
         std::to_string(atomId) + ") does not exist");
     }
-    return this->atomIdToVectorIdx.at(atomId);
+    return this->atomIdToVertexIdx.at(atomId);
   }
 
   /**
@@ -1450,8 +1506,8 @@ namespace entities {
 
     for (size_t i = 0; i < nBonds; ++i) {
       igraph_vector_set(
-        &vertexIdFrom, i, this->atomIdToVectorIdx.at(bondFrom[i]));
-      igraph_vector_set(&vertexIdTo, i, this->atomIdToVectorIdx.at(bondTo[i]));
+        &vertexIdFrom, i, this->atomIdToVertexIdx.at(bondFrom[i]));
+      igraph_vector_set(&vertexIdTo, i, this->atomIdToVertexIdx.at(bondTo[i]));
     }
 
     igraph_vector_t dValuesFrom;
@@ -1742,11 +1798,20 @@ namespace entities {
    *
    * @return double
    */
-  double Universe::getVolume() { return this->box.getVolume(); }
+  double Universe::getVolume()
+  {
+    return this->box.getVolume();
+  }
 
-  size_t Universe::getNrOfAtoms() const { return this->NAtoms; }
+  size_t Universe::getNrOfAtoms() const
+  {
+    return this->NAtoms;
+  }
 
-  size_t Universe::getNrOfBonds() const { return this->NBonds; }
+  size_t Universe::getNrOfBonds() const
+  {
+    return this->NBonds;
+  }
 
   void Universe::setBox(Box passedBox, bool rescaleAtomCoordinates)
   {
@@ -1805,6 +1870,9 @@ namespace entities {
     this->setBox(Box(Lx, Ly, Lz));
   }
 
-  Box Universe::getBox() { return this->box; }
+  Box Universe::getBox()
+  {
+    return this->box;
+  }
 } // namespace entities
 } // namespace pylimer_tools
