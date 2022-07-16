@@ -393,19 +393,22 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.removeAtoms" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.removeAtoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">removeAtoms</span></code></a>(self, atomIds)</p></td>
 <td><p>Remove atoms and all associated bonds by their atom ids.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setBox" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setBox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setBox</span></code></a>(self, box[, rescaleAtoms])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.removeBonds" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.removeBonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">removeBonds</span></code></a>(self, from, to)</p></td>
+<td><p>Remove bonds by their connected atom ids.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setBox" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setBox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setBox</span></code></a>(self, box[, rescaleAtoms])</p></td>
 <td><p>Override the currently assigned box with the one specified.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setBoxLengths" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setBoxLengths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setBoxLengths</span></code></a>(self, Lx, Ly, Lz)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setBoxLengths" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setBoxLengths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setBoxLengths</span></code></a>(self, Lx, Ly, Lz)</p></td>
 <td><p>Set the box side lengths.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setMasses" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setMasses"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMasses</span></code></a>(self, massPerType)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setMasses" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setMasses"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMasses</span></code></a>(self, massPerType)</p></td>
 <td><p>Set the mass per type of atom.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setTimestep" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setTimestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setTimestep</span></code></a>(self, timestep)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setTimestep" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setTimestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setTimestep</span></code></a>(self, timestep)</p></td>
 <td><p>Set the timestep when this Universe was captured.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.simplify" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.simplify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simplify</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.simplify" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.simplify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simplify</span></code></a>(self)</p></td>
 <td><p>Remove self links and double bonds.</p></td>
 </tr>
 </tbody>
@@ -659,9 +662,9 @@ In turn, e.g. for a tetrafunctional cross-linker, it will be 4 times in the resu
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.Universe.getClusters">
-<span class="sig-name descname"><span class="pre">getClusters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.html#pylimer_tools_cpp.pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Molecule</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getClusters" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">getClusters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getClusters" title="Permalink to this definition">#</a></dt>
 <dd><p>Get the components of the universe that are not connected to each other.
-Returns a list of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Molecule</span></code>.</p>
+Returns a list of <code class="xref py py-obj docutils literal notranslate"><span class="pre">Universe</span></code>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -767,6 +770,12 @@ and you may run out of memory when using this function, if your Universe/Network
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.Universe.removeAtoms">
 <span class="sig-name descname"><span class="pre">removeAtoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">atomIds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.removeAtoms" title="Permalink to this definition">#</a></dt>
 <dd><p>Remove atoms and all associated bonds by their atom ids.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.Universe.removeBonds">
+<span class="sig-name descname"><span class="pre">removeBonds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">self:</span> <span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe,</span> <span class="pre">from:</span> <span class="pre">List[int],</span> <span class="pre">to:</span> <span class="pre">List[int]</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.removeBonds" title="Permalink to this definition">#</a></dt>
+<dd><p>Remove bonds by their connected atom ids.</p>
 </dd></dl>
 
 <dl class="py method">

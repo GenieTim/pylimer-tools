@@ -27,6 +27,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Molecule
       ~Molecule.getAtomTypes
       ~Molecule.getAtoms
       ~Molecule.getAtomsConnectedTo
+      ~Molecule.getAtomsLinedUp
       ~Molecule.getAtomsOfDegree
       ~Molecule.getAtomsOfType
       ~Molecule.getBonds
