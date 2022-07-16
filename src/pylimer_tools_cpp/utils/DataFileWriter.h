@@ -55,6 +55,7 @@ namespace utils {
                                      this->universe.getMasses().size());
 
       file.open(filePath);
+      file << std::setprecision(std::numeric_limits<double>::digits10 + 1);
 
       // write header
       file << "LAMMPS file generated using pylimer_tools at "
