@@ -78,7 +78,7 @@ namespace entities {
     int size;
     std::string key;
     std::map<int, double> massPerType;
-    std::unordered_map<int, int> atomIdToVectorIdx;
+    std::unordered_map<int, int> atomIdToVertexIdx;
 
     void initializeFromGraph(const igraph_t* ingraph);
   };

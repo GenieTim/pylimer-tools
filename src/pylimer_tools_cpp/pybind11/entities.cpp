@@ -19,7 +19,8 @@ struct MoleculeIterator
   MoleculeIterator(const Molecule& molecule, py::object ref)
     : molecule(molecule)
     , ref(ref)
-  {}
+  {
+  }
 
   Atom next()
   {
@@ -153,7 +154,7 @@ init_pylimer_bound_entities(py::module_& m)
          "Get the box image that the atom is in in z direction (also known "
          "as `iz` or `nz`).")
     .def(pybind11::self == pybind11::self)
-//     .def(pybind11::self != pybind11::self)
+    //     .def(pybind11::self != pybind11::self)
     .def(py::pickle(
            [](const Atom& b) { // __getstate__
              /* Return a tuple that fully encodes the state of the object */
@@ -252,6 +253,13 @@ init_pylimer_bound_entities(py::module_& m)
             )pbdoc")
     .def("getAtoms", &Molecule::getAtoms, R"pbdoc(
             Returns all atom objects enclosed in this molecule.
+            )pbdoc")
+    .def("getAtomsLinedUp", &Molecule::getAtomsLinedUp, R"pbdoc(
+            Returns all atom objects enclosed in this molecule based on the connectivity.
+
+            This method works only for lone chains, atoms and loops, 
+            as it throws an error if the molecule does not allow such a "line-up", 
+            for example because of cross-links.
             )pbdoc")
     .def("getNrOfBonds",
          &Molecule::getNrOfBonds,
@@ -376,6 +384,13 @@ init_pylimer_bound_entities(py::module_& m)
          "skipped.",
          py::arg("from"),
          py::arg("to"))
+    .def("removeBonds",
+         &Universe::removeBonds,
+         R"pbdoc(
+          Remove bonds by their connected atom ids. 
+          )pbdoc",
+         py::arg("from"),
+         py::arg("to"))
     .def("addAngles",
          &Universe::addAngles,
          "Add angles to the Universe. No relation to the underlying graph, "
@@ -407,8 +422,8 @@ init_pylimer_bound_entities(py::module_& m)
     // getters
     .def("getClusters", &Universe::getClusters, R"pbdoc(
             Get the components of the universe that are not connected to each other.
-            Returns a list of :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule`s.
-            Unconnected, free atoms/beads become their own :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule`.
+            Returns a list of :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe`s.
+            Unconnected, free atoms/beads become their own :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe`.
             )pbdoc")
     .def("getMolecules",
          &Universe::getMolecules,
@@ -676,7 +691,8 @@ init_pylimer_bound_entities(py::module_& m)
     LazyUniverseSequenceIterator(UniverseSequence& us, py::object ref)
       : us(us)
       , ref(ref)
-    {}
+    {
+    }
 
     Universe next()
     {

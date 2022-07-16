@@ -29,8 +29,9 @@ namespace entities {
     // 3. copy assignment operator
     Universe& operator=(Universe src);
 
-    // initilaization/setters
+    // initilaization/setters (and removers)
     void setBoxLengths(const double Lx, const double Ly, const double Lz);
+    // atoms
     void addAtoms(std::vector<long int> ids,
                   std::vector<int> types,
                   std::vector<double> x,
@@ -49,6 +50,7 @@ namespace entities {
                   std::vector<int> ny,
                   std::vector<int> nz);
     void removeAtoms(std::vector<long int> ids);
+    // bonds
     void addBonds(std::vector<long int> from, std::vector<long int> to);
     void addBonds(const size_t NNewBonds,
                   std::vector<long int> from,
@@ -59,12 +61,16 @@ namespace entities {
                   std::vector<int> bondTypes,
                   const bool ignoreNonExistentAtoms = false,
                   const bool simplify = true);
+    void removeBonds(const std::vector<long int> atomIdsFrom,
+                     const std::vector<long int> atomIdsTo);
+    // others
     void addAngles(std::vector<long int> from,
                    std::vector<long int> via,
                    std::vector<long int> to);
     void setMasses(std::map<int, double> massPerType);
     void setBox(Box box, bool rescaleAtomCoordinates = false);
     void setTimestep(long int timestep) { this->timestep = timestep; };
+    void initializeFromGraph(const igraph_t* ingraph);
     void simplify();
 
     // getters
@@ -72,7 +78,7 @@ namespace entities {
     std::vector<Atom> getAtoms();
     // std::map<std::st¨ring, std::vector<long int>> getBonds() const;
     std::map<std::string, std::vector<long int>> getAngles() const;
-    std::vector<Molecule> getClusters() const;
+    std::vector<Universe> getClusters() const;
     std::vector<Molecule> getMolecules(const int atomTypeToOmit = -1) const;
     std::vector<Molecule> getChainsWithCrosslinker(
       const int crosslinkerType) const;
@@ -144,7 +150,7 @@ namespace entities {
     Box box;
     // connectivity
     // igraph_t graph;
-    std::unordered_map<int, int> atomIdToVectorIdx;
+    std::unordered_map<int, int> atomIdToVertexIdx;
     // extra info
     std::vector<long int> angleFrom;
     std::vector<long int> angleTo;

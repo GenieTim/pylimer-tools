@@ -232,7 +232,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(atomCounts[2] == 3);
     }
 
-    SECTION("masses are persisted in session")
+    SECTION("Masses are persisted in session")
     {
       std::map<int, double> masses = universe.getMasses();
       REQUIRE(masses.size() == 0);
@@ -247,7 +247,15 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(weightFraction[2] == (2.0 * 3.0) / (3.0 * 2.0 + 5.0 * 1.0));
     }
 
-    SECTION("get bonds returns")
+    SECTION("Bonds can be removed")
+    {
+      int bondsBefore = universe.getNrOfBonds();
+      REQUIRE_THROWS(universe.removeBonds({ {} }, { { 1, 2, 3 } }));
+      universe.removeBonds({ { 1, 2, 3 } }, { { 2, 3, 6 } });
+      REQUIRE(universe.getNrOfBonds() == bondsBefore - 3);
+    }
+
+    SECTION("Get bonds returns")
     {
       auto edges = universe.getEdges();
       REQUIRE(edges["edge_from"][0] == 1 - 1);
@@ -388,10 +396,10 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
 
     SECTION("Clusters are found")
     {
-      std::vector<pe::Molecule> clusters = universe.getClusters();
+      std::vector<pe::Universe> clusters = universe.getClusters();
       REQUIRE(clusters.size() == 2);
       REQUIRE(clusters[1].getAtoms()[0].getId() == 4);
-      REQUIRE_THROWS(clusters[0].getAtomsLinedUp());
+      REQUIRE_THROWS(clusters[0].getMolecules(-1)[0].getAtomsLinedUp());
     }
 
     SECTION("Loops are found in reduced universe")
