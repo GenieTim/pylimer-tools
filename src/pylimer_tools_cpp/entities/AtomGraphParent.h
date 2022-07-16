@@ -171,7 +171,7 @@ namespace entities {
                          const long int vertexIdx) const
     {
       return igraph_cattribute_VAN(&this->graph, propertyName, vertexIdx);
-    }
+    }    
 
     /**
      * @brief Get all atoms with a certain number of bonds

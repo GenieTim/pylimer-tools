@@ -376,6 +376,10 @@ init_pylimer_bound_entities(py::module_& m)
           Remove atoms and all associated bonds by their atom ids. 
           )pbdoc",
          py::arg("atomIds"))
+     .def("replaceAtom", &Universe::replaceAtom,  R"pbdoc(
+          Replace the properties of an atom with the properties of another given atom.
+          )pbdoc",
+         py::arg("atomId"), py::arg("replacementAtom"))
     .def("addBonds",
          py::overload_cast<std::vector<long int>, std::vector<long int>>(
            &Universe::addBonds),
@@ -436,6 +440,9 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("atomTypeToOmit"))
     .def("getAtomsConnectedTo", &Universe::getAtomsConnectedTo, R"pbdoc(
             Get the atoms connected to a specified vertex id.
+            )pbdoc")
+    .def("getAtomsOfDegree", &Universe::getAtomsOfDegree, R"pbdoc(
+            Get the atoms that have the specified number of bonds.
             )pbdoc")
     .def("findLoops",
          &Universe::findLoops,

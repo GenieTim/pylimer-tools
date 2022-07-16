@@ -215,6 +215,27 @@ namespace entities {
     this->NAtoms = igraph_vcount(&this->graph);
   }
 
+  void Universe::replaceAtom(const long int id, const Atom& replacement)
+  {
+    const long int vertexIdx = this->getIdxByAtomId(id);
+    if (replacement.getId() != id) {
+      throw std::invalid_argument("The replacement atom's id must be the same "
+                                  "as the one of the atom to be replaced.");
+    }
+    // this->atomIdToVertexIdx[replacement.getId()] = vertexIdx;
+    igraph_cattribute_VAN_set(&this->graph, "x", vertexIdx, replacement.getX());
+    igraph_cattribute_VAN_set(&this->graph, "y", vertexIdx, replacement.getY());
+    igraph_cattribute_VAN_set(&this->graph, "z", vertexIdx, replacement.getZ());
+    igraph_cattribute_VAN_set(
+      &this->graph, "nx", vertexIdx, replacement.getNX());
+    igraph_cattribute_VAN_set(
+      &this->graph, "ny", vertexIdx, replacement.getNY());
+    igraph_cattribute_VAN_set(
+      &this->graph, "nz", vertexIdx, replacement.getNZ());
+    igraph_cattribute_VAN_set(
+      &this->graph, "type", vertexIdx, replacement.getType());
+  }
+
   void Universe::removeAtoms(std::vector<long int> ids)
   {
     igraph_vector_t vertexIds;
