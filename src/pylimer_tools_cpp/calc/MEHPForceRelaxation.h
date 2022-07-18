@@ -41,6 +41,7 @@ namespace calc {
       long int nrOfLoops;         /* loops */
       // coordinates & coonectivity
       Eigen::VectorXd coordinates;
+      Eigen::ArrayXi oldAtomIds;
       Eigen::ArrayXi springCoordinateIndexA;
       Eigen::ArrayXi springCoordinateIndexB;
       Eigen::ArrayXi springIndexA;
@@ -284,7 +285,7 @@ namespace calc {
                       this->currentDisplacements[3 * i + 1]);
           z.push_back(this->initialConfig.coordinates[3 * i + 2] +
                       this->currentDisplacements[3 * i + 2]);
-          ids.push_back(i + 1);
+          ids.push_back(this->initialConfig.oldAtomIds[i]);
         }
         xlinkUniverse.addAtoms(ids, types, x, y, z, zeros, zeros, zeros);
         std::vector<long int> bondFrom;
@@ -292,8 +293,11 @@ namespace calc {
         bondFrom.reserve(this->initialConfig.nrOfSprings);
         bondTo.reserve(this->initialConfig.nrOfSprings);
         for (int i = 0; i < this->initialConfig.nrOfSprings; ++i) {
-          bondFrom.push_back(this->initialConfig.springIndexA[i] + 1);
-          bondTo.push_back(this->initialConfig.springIndexB[i] + 1);
+          bondFrom.push_back(
+            this->initialConfig
+              .oldAtomIds[this->initialConfig.springIndexA[i]]);
+          bondTo.push_back(this->initialConfig
+                             .oldAtomIds[this->initialConfig.springIndexB[i]]);
         }
         xlinkUniverse.addBonds(
           bondFrom.size(),
@@ -322,11 +326,30 @@ namespace calc {
        * considered inactive
        * @return int
        */
-      int getNrOfActiveNodes(double tolerance = 0.1) const
+      int getNrOfActiveNodes(double tolerance = 0.1,
+                             int minimumNrOfActiveConnections = 2) const
       {
-        int Mact = 0;
+        return this
+          ->getIdsOfActiveNodes(tolerance, minimumNrOfActiveConnections)
+          .size();
+      }
 
-        /* active nodes */
+      /**
+       * @brief Get the Ids Of active Nodes
+       *
+       * @param tolerance the tolerance: springs under a certain length are
+       * considered inactive
+       * @param minimumNrOfActiveConnections the number of active springs
+       * required for this node to qualify as active
+       * @return std::vector<long int> the atom ids
+       */
+      std::vector<long int> getIdsOfActiveNodes(
+        double tolerance = 0.1,
+        int minimumNrOfActiveConnections = 2) const
+      {
+        std::vector<long int> results;
+        results.reserve(this->initialConfig.nrOfNodes);
+
         Eigen::VectorXi nrOfActiveNodesConnected =
           Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
         ArrayXb springIsActive =
@@ -341,12 +364,12 @@ namespace calc {
           }
         }
         for (size_t i = 0; i < this->initialConfig.nrOfNodes; i++) {
-          if (nrOfActiveNodesConnected[i] >= 2) {
-            ++Mact;
+          if (nrOfActiveNodesConnected[i] >= minimumNrOfActiveConnections) {
+            results.push_back(this->initialConfig.oldAtomIds[i]);
           }
         }
 
-        return Mact;
+        return results;
       }
 
       /**
@@ -380,7 +403,8 @@ namespace calc {
         return r2 / this->initialConfig.nrOfSprings;
       }
 
-      std::array<std::array<double, 3>, 3> getStressTensor( const double kappa = 1.0) const
+      std::array<std::array<double, 3>, 3> getStressTensor(
+        const double kappa = 1.0) const
       {
         return this->evaluateStressTensor(
           this->currentSpringDistances, kappa, this->initialConfig.vol);
@@ -488,6 +512,7 @@ namespace calc {
         net->nrOfNodes = crosslinkerUniverse.getNrOfAtoms();
         net->nrOfSprings = crosslinkerUniverse.getNrOfBonds();
         net->coordinates = Eigen::VectorXd::Zero(3 * net->nrOfNodes);
+        net->oldAtomIds = Eigen::ArrayXi::Zero(net->nrOfNodes);
         net->springIndexA = Eigen::ArrayXi::Zero(net->nrOfSprings);
         net->springIndexB = Eigen::ArrayXi::Zero(net->nrOfSprings);
         net->springCoordinateIndexA =
@@ -503,6 +528,7 @@ namespace calc {
         for (size_t i = 0; i < allAtoms.size(); ++i) {
           pylimer_tools::entities::Atom atom = allAtoms[i];
           atomIdToNode[atom.getId()] = i;
+          net->oldAtomIds[i] = atom.getId();
           net->coordinates[3 * i + 0] = atom.getX();
           net->coordinates[3 * i + 1] = atom.getY();
           net->coordinates[3 * i + 2] = atom.getZ();
@@ -592,7 +618,7 @@ namespace calc {
        * @return double
        */
       double evaluatePressure(
-        const std::array<std::array<double, 3>, 3> &stressTensor) const
+        const std::array<std::array<double, 3>, 3>& stressTensor) const
       {
         return (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) /
                3.0;

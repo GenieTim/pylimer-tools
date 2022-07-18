@@ -102,7 +102,7 @@ init_pylimer_bound_calc(py::module_& m)
     .def("getGammaFactor",
          &mehp::MEHPForceRelaxation::getGammaFactor,
          R"pbdoc(
-          omputes the gamma factor as part of the ANT/MEHP formulism, i.e.:
+          Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
 
           :math:`\Gamma = \langle\gamma_{\eta}\rangle`, with :math:`\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}`,
           which you can use as :math:`G_{\mathrm{ANT}} = \Gamma \nu k_B T`,
@@ -125,18 +125,38 @@ init_pylimer_bound_calc(py::module_& m)
     .def("getNrOfSprings",
          &mehp::MEHPForceRelaxation::getNrOfSprings,
          R"pbdoc(
-           Get the number of springs considered in this simulation.
+          Get the number of springs considered in this simulation.
+
+          :param tolerance: springs under this length are considered inactive
      )pbdoc")
+    .def("getIdsOfActiveNodes",
+         &mehp::MEHPForceRelaxation::getIdsOfActiveNodes,
+         R"pbdoc(
+          Get the atom ids of the nodes that are considered active.
+
+          :param tolerance: springs under this length are considered inactive. A node is active if it has > 2 active springs.
+          :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
+     )pbdoc",
+         py::arg("tolerance") = 0.1,
+         py::arg("minimumNrOfActiveConnections") = 2)
     .def("getNrOfActiveNodes",
          &mehp::MEHPForceRelaxation::getNrOfActiveNodes,
          R"pbdoc(
            Get the number of active nodes remaining after running the simulation.
-     )pbdoc")
+
+          :param tolerance: springs under this length are considered inactive.
+          :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
+     )pbdoc",
+         py::arg("tolerance") = 0.1,
+         py::arg("minimumNrOfActiveConnections") = 2)
     .def("getNrOfActiveSprings",
          &mehp::MEHPForceRelaxation::getNrOfActiveSprings,
          R"pbdoc(
            Get the number of active springs remaining after running the simulation.
-     )pbdoc")
+
+          :param tolerance: springs under this length are considered inactive
+     )pbdoc",
+         py::arg("tolerance") = 0.1)
     .def("getAverageSpringLength",
          &mehp::MEHPForceRelaxation::getAverageSpringLength,
          R"pbdoc(
