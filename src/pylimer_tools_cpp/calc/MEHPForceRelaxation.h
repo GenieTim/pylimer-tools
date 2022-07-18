@@ -327,10 +327,13 @@ namespace calc {
        * @return int
        */
       int getNrOfActiveNodes(double tolerance = 0.1,
-                             int minimumNrOfActiveConnections = 2) const
+                             int minimumNrOfActiveConnections = 2,
+                             int maximumNrOfActiveConnections = -1) const
       {
         return this
-          ->getIdsOfActiveNodes(tolerance, minimumNrOfActiveConnections)
+          ->getIdsOfActiveNodes(tolerance,
+                                minimumNrOfActiveConnections,
+                                maximumNrOfActiveConnections)
           .size();
       }
 
@@ -345,7 +348,8 @@ namespace calc {
        */
       std::vector<long int> getIdsOfActiveNodes(
         double tolerance = 0.1,
-        int minimumNrOfActiveConnections = 2) const
+        int minimumNrOfActiveConnections = 2,
+        int maximumNrOfActiveConnections = -1) const
       {
         std::vector<long int> results;
         results.reserve(this->initialConfig.nrOfNodes);
@@ -364,7 +368,9 @@ namespace calc {
           }
         }
         for (size_t i = 0; i < this->initialConfig.nrOfNodes; i++) {
-          if (nrOfActiveNodesConnected[i] >= minimumNrOfActiveConnections) {
+          if (nrOfActiveNodesConnected[i] >= minimumNrOfActiveConnections &&
+              (maximumNrOfActiveConnections < 0 ||
+               maximumNrOfActiveConnections >= nrOfActiveNodesConnected[i])) {
             results.push_back(this->initialConfig.oldAtomIds[i]);
           }
         }

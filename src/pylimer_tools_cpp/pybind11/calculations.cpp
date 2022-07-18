@@ -136,9 +136,12 @@ init_pylimer_bound_calc(py::module_& m)
 
           :param tolerance: springs under this length are considered inactive. A node is active if it has > 2 active springs.
           :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
+          :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
+               Use a value < 0 to indicate that there is no maximum number of active connections.
      )pbdoc",
          py::arg("tolerance") = 0.1,
-         py::arg("minimumNrOfActiveConnections") = 2)
+         py::arg("minimumNrOfActiveConnections") = 2,
+         py::arg("maximumNrOfActiveConnections") = -1)
     .def("getNrOfActiveNodes",
          &mehp::MEHPForceRelaxation::getNrOfActiveNodes,
          R"pbdoc(
@@ -146,9 +149,12 @@ init_pylimer_bound_calc(py::module_& m)
 
           :param tolerance: springs under this length are considered inactive.
           :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
+          :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
+               Use a value < 0 to indicate that there is no maximum number of active connections.
      )pbdoc",
          py::arg("tolerance") = 0.1,
-         py::arg("minimumNrOfActiveConnections") = 2)
+         py::arg("minimumNrOfActiveConnections") = 2,
+         py::arg("maximumNrOfActiveConnections") = -1)
     .def("getNrOfActiveSprings",
          &mehp::MEHPForceRelaxation::getNrOfActiveSprings,
          R"pbdoc(
