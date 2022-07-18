@@ -371,8 +371,8 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crossli
     alpha, beta = computeMMsProbabilities(r, p, f)
     GammaMMTSum = 0.0
     for m in range(3, f+1):
-        GammaMMTSum += (((m-2.)/2.)*scipy.special.binom(f, m)
-                        * (alpha**(f-m))*((1.-alpha)**m))
+        GammaMMTSum += (((m-2.)/2.) *
+                        computeProbabilityThatMonomerIsEffective(f, m, alpha))
     GammaMMT = (2*r/f) * GammaMMTSum
     G_MMT_phantom = GammaMMT*nu*unitStyle.kB*T
     # fraction of elastically effective strands. TODO : check adjustment with r
@@ -380,6 +380,23 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crossli
     G_MMT_entanglement = Ge1*unitStyle.getUnderlyingUnitRegistry()('MPa')*(pel**2)
     # entanglement part. TODO : check adjustment with r (and where the 0.22 is coming from? Fabian' s fit!)
     return G_MMT_phantom, G_MMT_entanglement, G_ANM, G_PNM
+
+
+def computeProbabilityThatMonomerIsEffective(functionalityOfMonomer: int, expectedDegreeOfEffect: int, PFaout: float):
+    """
+    Compute the probability that an Af, monomer will be an effective cross-link of degree m 
+
+    Source:
+        - Eq. 45 in Miller, Macosko 1976, A New Derivation of Post Gel Properties of Network
+
+    Arguments:
+        - functionalityOfMonomer: f
+        - 
+    """
+    f = functionalityOfMonomer
+    m = expectedDegreeOfEffect
+    alpha = PFaout
+    return scipy.special.binom(f, m) * (alpha**(f-m))*((1.-alpha)**m)
 
 
 def computeWeightFractions(network: Universe) -> dict:
