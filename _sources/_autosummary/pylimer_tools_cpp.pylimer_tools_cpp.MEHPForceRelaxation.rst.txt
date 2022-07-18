@@ -25,6 +25,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceRelaxation
       ~MEHPForceRelaxation.getExitReason
       ~MEHPForceRelaxation.getForce
       ~MEHPForceRelaxation.getGammaFactor
+      ~MEHPForceRelaxation.getIdsOfActiveNodes
       ~MEHPForceRelaxation.getNrOfActiveNodes
       ~MEHPForceRelaxation.getNrOfActiveSprings
       ~MEHPForceRelaxation.getNrOfIterations

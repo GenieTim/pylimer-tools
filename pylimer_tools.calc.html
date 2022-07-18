@@ -785,6 +785,26 @@ If None: will compute from network structure</p></li>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.computeProbabilityThatMonomerIsEffective">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">computeProbabilityThatMonomerIsEffective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">functionalityOfMonomer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expectedDegreeOfEffect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PFaout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.computeProbabilityThatMonomerIsEffective" title="Permalink to this definition">#</a></dt>
+<dd><p>Compute the probability that an Af, monomer will be an effective cross-link of degree m</p>
+<dl class="simple">
+<dt>Source:</dt><dd><ul class="simple">
+<li><p>Eq. 45 in Miller, Macosko 1976, A New Derivation of Post Gel Properties of Network</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>functionalityOfMonomer</strong> (<em>-</em>) – f</p></li>
+<li><p><strong>-</strong> – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.computeStoichiometricInbalance">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">computeStoichiometricInbalance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinkerType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strandLength</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionalityPerType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignoreTypes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">effective</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.computeStoichiometricInbalance" title="Permalink to this definition">#</a></dt>
 <dd><p>Compute the stoichiometric inbalance
