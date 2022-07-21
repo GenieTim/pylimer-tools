@@ -135,7 +135,7 @@ namespace entities {
     double getMeanStrandLength(int crosslinkerType);
     std::vector<double> computeEndToEndDistances(int crosslinkerType);
     double computeMeanEndToEndDistance(int crosslinkerType);
-    double computeMeanSquareEndToEndDistance(int crosslinkerType);
+    double computeMeanSquareEndToEndDistance(int crosslinkerType, bool onlyThoseWithTwoCrosslinkers = false);
     double computeMeanBondLength();
     double computeTotalMass() const;
     double computeWeightAverageMolecularWeight(int crosslinkerType) const;

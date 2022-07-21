@@ -598,7 +598,7 @@ namespace entities {
     if (igraph_copy(&graphWithoutCrosslinkers, &this->graph)) {
       throw std::runtime_error("Failed to copy graph.");
     }
-    // select vertices of type
+    // select vertices of cross-linker type
     std::vector<long int> indicesToRemove =
       this->getIndicesOfType(crosslinkerType);
     std::sort(indicesToRemove.rbegin(), indicesToRemove.rend());
@@ -1659,7 +1659,9 @@ namespace entities {
    * @param crosslinkerType
    * @return double
    */
-  double Universe::computeMeanSquareEndToEndDistance(int crosslinkerType)
+  double Universe::computeMeanSquareEndToEndDistance(
+    int crosslinkerType,
+    bool onlyThoseWithTwoCrosslinkers)
   {
     std::vector<Molecule> molecules =
       this->getChainsWithCrosslinker(crosslinkerType);
@@ -1668,10 +1670,13 @@ namespace entities {
     int validMolecules = 0;
 
     for (Molecule molecule : molecules) {
-      double dist = molecule.computeEndToEndDistance();
-      if (dist > 0.0) {
-        meanEndToEndDistance += dist * dist;
-        validMolecules += 1;
+      if (!onlyThoseWithTwoCrosslinkers ||
+          molecule.getAtomsOfType(crosslinkerType).size() == 2) {
+        double dist = molecule.computeEndToEndDistance();
+        if (dist > 0.0) {
+          meanEndToEndDistance += dist * dist;
+          validMolecules += 1;
+        }
       }
     }
 

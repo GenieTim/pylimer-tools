@@ -57,23 +57,25 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         unitStyleFactory = UnitStyleFactory()
         unitStyle = unitStyleFactory.getUnitStyle("si")
         # TODO: find literature motiviation for results fo the functions
-        self.assertAlmostEqual(0.03367998878460051, predictShearModulus(
+        self.assertAlmostEqual(0.13734491693339432, predictShearModulus(
             self.saturatedTestUniverse, unitStyle, crosslinkerType=2, strandLength=2).to('MPa').magnitude)
-        self.assertAlmostEqual(0.03367998878460051, predictShearModulus(
+        self.assertAlmostEqual(0.13734491693339432, predictShearModulus(
             self.saturatedTestUniverse, unitStyle, crosslinkerType=2, strandLength=2, functionalityPerType={2: 4}).to('MPa').magnitude)
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
-        self.assertAlmostEqual(0.03367998878460051, predictShearModulus(
+        self.assertAlmostEqual(0.13734491693339432, predictShearModulus(
             self.saturatedTestUniverse, unitStyle, crosslinkerType=2).to('MPa').magnitude)
 
     def testPredictNumberDensityOfJunctionPoints(self):
         self.testUniverse.setMasses({1: 1, 2: 1})
+        self.assertAlmostEqual(
+            1.5, computeStoichiometricInbalance(self.testUniverse, 2))
         self.assertAlmostEqual(predictNumberDensityOfJunctionPoints(
-            self.testUniverse, 2), 0.421824)
+            self.testUniverse, 2), 0.375)
         self.assertRaises(NotImplementedError, lambda: predictNumberDensityOfJunctionPoints(
             self.testUniverse, 2, functionalityPerType={1: 2, 2: 5}))
         # TODO: find literature motiviation for results fo the functions
         self.assertAlmostEqual(predictNumberDensityOfJunctionPoints(
-            self.testUniverse, 2, functionalityPerType={1: 2, 2: 3}), 0.421824)
+            self.testUniverse, 2, functionalityPerType={1: 2, 2: 3}), 0.375)
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
         self.assertAlmostEqual(predictNumberDensityOfJunctionPoints(
             self.saturatedTestUniverse, 2, functionalityPerType={1: 2, 2: 4}), 0.149319447)
@@ -81,12 +83,12 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
     def testPredictNumberDensityOfNetworkStrands(self):
         self.testUniverse.setMasses({1: 1, 2: 1})
         self.assertAlmostEqual(predictNumberDensityOfNetworkStrands(
-            self.testUniverse, 2), 0.632736)
+            self.testUniverse, 2), 0.5625)
         self.assertRaises(NotImplementedError, lambda: predictNumberDensityOfNetworkStrands(
             self.testUniverse, 2, functionalityPerType={1: 2, 2: 5}))
         # TODO: find literature motiviation for results fo the functions
         self.assertAlmostEqual(predictNumberDensityOfNetworkStrands(
-            self.testUniverse, 2, functionalityPerType={1: 2, 2: 3}), 0.632736)
+            self.testUniverse, 2, functionalityPerType={1: 2, 2: 3}), 0.5625)
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
         self.assertAlmostEqual(predictNumberDensityOfNetworkStrands(
             self.saturatedTestUniverse, 2, functionalityPerType={1: 2, 2: 4}), 0.290919539)
@@ -95,7 +97,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertDictEqual(
             {}, computeWeightFractions(self.emptyUniverse))
 
-        self.assertRaises(ValueError, lambda: computeWeightFractions(
+        self.assertRaises(IndexError, lambda: computeWeightFractions(
             self.testUniverse))
 
         self.testUniverse.setMasses({1: 1, 2: 1})
@@ -128,8 +130,8 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertRaises(NotImplementedError, lambda: computeWeightFractionOfSolubleMaterial(
             self.testUniverse, 2, functionalityPerType={1: 1, 2: 3}))
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
-        self.assertEqual((0.7616671963032368, {1: 0.85, 2: 0.15}, -0.7901234567901235, 0.9915274751876062), computeWeightFractionOfSolubleMaterial(
-            self.saturatedTestUniverse, 2, strandLength=2))
+        self.assertEqual((0.00031069958847736596, {1: 0.85, 2: 0.15}, 0.11111111111111108, 0.011111111111111105), computeWeightFractionOfSolubleMaterial(
+            self.saturatedTestUniverse, 2))
 
     # def testProbabilityCalculations(self):
     #     self.assertRaises(
@@ -143,12 +145,14 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertEqual(1, calculateWeightFractionOfDanglingChains(
             self.emptyUniverse, 2, {}))
         self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
+        self.assertEqual(1.0, computeExtentOfReaction(
+            self.saturatedTestUniverse, 2))
         bb = calculateWeightFractionOfBackbone(
-            self.saturatedTestUniverse, crosslinkerType=2, strandLength=2)
-        self.assertEqual(0.00425428467241992, bb)
+            self.saturatedTestUniverse, crosslinkerType=2)
+        self.assertEqual(0.9780219780219782, bb)
         self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
         self.assertEqual(1-bb, calculateWeightFractionOfDanglingChains(
-            self.saturatedTestUniverse, 2, strandLength=2))
+            self.saturatedTestUniverse, 2))
 
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
         # test also as if the functionality was 4
