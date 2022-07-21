@@ -1,6 +1,7 @@
 
 import math
 import warnings
+from audioop import cross
 from collections import Counter
 
 import numpy as np
@@ -74,7 +75,7 @@ def predictNumberDensityOfJunctionPoints(network: Universe, crosslinkerType: int
             "Currently, only cross-linker functionalities of 3 and 4 are supported")
 
 
-def predictNumberDensityOfNetworkStrands(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def predictNumberDensityOfNetworkStrands(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None, r: float = None, p: float = None) -> float:
     """
     Compute the number density of network strands using MMT
 
@@ -94,8 +95,10 @@ def predictNumberDensityOfNetworkStrands(network: Universe, crosslinkerType: int
     if (functionalityPerType is None or crosslinkerType not in functionalityPerType):
         functionalityPerType = network.determineFunctionalityPerType()
 
-    _, weightFractions, alpha, _ = computeWeightFractionOfSolubleMaterial(
-        network, crosslinkerType, strandLength, functionalityPerType)
+    weightFractions = network.computeWeightFractions()
+    alpha, _ = computeMMsProbabilities(r=r if r is not None else computeStoichiometricInbalance(network, crosslinkerType, strandLength, functionalityPerType),
+                                       p=p if p is not None else computeExtentOfReaction(network, crosslinkerType, functionalityPerType, strandLength),
+                                       f=functionalityPerType[crosslinkerType])
 
     if (functionalityPerType[crosslinkerType] == 3):
         return (3/2)*weightFractions[crosslinkerType]*(1-alpha)**3
@@ -248,18 +251,22 @@ def computeWeightFractionOfSolubleMaterial(network: Universe = None, crosslinker
         assert(network is not None)
         p = computeExtentOfReaction(
             network, crosslinkerType, functionalityPerType=functionalityPerType)
-        if (p < 0 or p >= 1):
+        if (p < 0 or p > 1):
             warnings.warn(
                 "The p computed ({}) is outside the accepted range. Falling back to effective cross-linker functionality.".format(p))
             p = mehp.calculateEffectiveCrosslinkerFunctionality(
                 network, crosslinkerType)
+    assert(p <= 1 and p >= 0)
     if (r is None):
         assert(network is not None)
         r = computeStoichiometricInbalance(
             network, crosslinkerType, strandLength=strandLength, functionalityPerType=functionalityPerType)
+    assert(r >= 0)
 
     alpha, beta = computeMMsProbabilities(
         r, p, functionalityPerType[crosslinkerType])
+    assert(alpha <= 1 and alpha >= 0)
+    assert(beta <= 1 and beta >= 0)
     W_sol = 0
     for key in weightFractions:
         coeff = alpha if key == crosslinkerType else beta
@@ -312,7 +319,7 @@ def computeMMsProbabilities(r, p, f):
             funToRootForAlpha, bracket=(0, 1), method='brentq')
         alpha = alphaSol.root
         beta = ((r*p*alpha**(f-1)) + 1 - r*p)  # TODO: reconsider
-    return alpha, beta
+    return np.clip(alpha, 0, 1), np.clip(beta, 0, 1) # TODO: reconsider
 
 
 def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crosslinkerType: int = None, r: float = None, p: float = None, f: int = None, nu: float = None, T: pint.Quantity = None, strandLength: int = None, functionalityPerType: dict = None, Ge1=0.22):
@@ -320,14 +327,14 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crossli
     Compute four different estimates of the plateau modulus, using MMT, ANM and PNM.
 
     Arguments:
-      - network: the poylmer network to do the computation for
+      - network: the polymer network to do the computation for
       - unitStyle: the unit style to use to have the results in appropriate units
       - crosslinkerType: the type of the junctions/crosslinkers to select them in the network
       - r: the stoichiometric inbalance. Optional if network is specified
       - p: the extent of reaction. Optional if network is specified
       - f: the functionality of the the crosslinker. Optional if network is specified
       - nu: the strand number density (nr of strands per volume) (ideally with units). Optional if network is specified
-      - T: the temperature to compute the modulus at. Default: 273.15 K
+      - T: the temperature to compute the modulus at. Default: 298.15 K
       - strandLength: the length of the network strands (in nr. of beads). Optional, can be passed to improve performance
       - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. Optional, can be passed to improve performance
 
@@ -347,7 +354,7 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crossli
     if (p is None):
         p = computeExtentOfReaction(
             network, crosslinkerType, strandLength=strandLength)
-        if (p < 0 or p >= 1):
+        if (p < 0 or p > 1):
             warnings.warn(
                 "The p computed ({}) is outside the accepted range. Falling back to effective cross-linker functionality.".format(p))
             p = mehp.calculateEffectiveCrosslinkerFunctionality(
@@ -361,7 +368,7 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crossli
         nu = len(network.getMolecules(crosslinkerType)) / \
             (network.getVolume()*unitStyle.getBaseUnitOf('volume'))
     if (T is None):
-        T = 273.15*unitStyle.getUnderlyingUnitRegistry()('kelvin')
+        T = (273.15+25)*unitStyle.getUnderlyingUnitRegistry()('kelvin')
 
     # affine
     G_ANM = nu*unitStyle.kB*T
@@ -371,7 +378,7 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crossli
     alpha, beta = computeMMsProbabilities(r, p, f)
     GammaMMTSum = 0.0
     for m in range(3, f+1):
-        GammaMMTSum += (((m-2.)/2.) *
+        GammaMMTSum += (((m-2)/2) *
                         computeProbabilityThatMonomerIsEffective(f, m, alpha))
     GammaMMT = (2*r/f) * GammaMMTSum
     G_MMT_phantom = GammaMMT*nu*unitStyle.kB*T
@@ -409,26 +416,7 @@ def computeWeightFractions(network: Universe) -> dict:
     Returns:
       - :math:`\\vec{W_i}` (dict): using the type i as a key, this dict contains the weight fractions (:math:`\\frac{W_i}{W_{tot}}`)
     """
-    if (network.getNrOfAtoms() == 0):
-        return {}
-
-    weightPerType = network.getMasses()
-    allAtomTypes = network.getAtomTypes()
-    counts = Counter(allAtomTypes)
-    assert(len(allAtomTypes) == network.getNrOfAtoms())
-    totalMass = 0
-    partialMasses = {}
-    for key in counts:
-        if (key not in weightPerType):
-            raise ValueError("Weight not set for atom type '{}'".format(key))
-        totalMass += counts[key]*weightPerType[key]
-        partialMasses[key] = counts[key]*weightPerType[key]
-
-    weightFractions = {}
-    for key in partialMasses:
-        weightFractions[key] = partialMasses[key]/totalMass
-
-    return weightFractions
+    return network.computeWeightFractions()
 
 
 def computeStoichiometricInbalance(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None, ignoreTypes: list = [], effective: bool = False) -> float:
@@ -492,8 +480,11 @@ def computeExtentOfReaction(network: Universe, crosslinkerType, functionalityPer
     """
     Compute the extent of polymerization reaction
     (nr. of formed bonds in reaction / max. nr. of bonds formable)
-    NOTE: if your system has a non-integer number of possible bonds (e.g. one site unbonded),
-    this will not be rounded/respected in any way. 
+    NOTE: 
+        - if your system has a non-integer number of possible bonds (e.g. one site unbonded),
+            this will not be rounded/respected in any way. 
+        - if the system contains solvent or other molecules that should not be binding to 
+            cross-linkers, make sure to remove them before calling this function
 
     Arguments:
       - network: the poylmer network to do the computation for

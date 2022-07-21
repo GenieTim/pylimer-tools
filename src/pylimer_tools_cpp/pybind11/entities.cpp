@@ -670,7 +670,7 @@ init_pylimer_bound_entities(py::module_& m)
                Internally, this uses the :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeEndToEndDistance`.
                All its cautionary facts apply.
                Invalid strands (where said function returns 0.0 or -1.0) are ignored.
-     )pbdoc")
+     )pbdoc", py::arg("crosslinkerType"), py::arg("onlyThoseWithTwoCrosslinkers") = false)
     .def("computeDxs",
          &Universe::computeDxs,
          "Compute the dx distance for certain bonds (length in x direction).",

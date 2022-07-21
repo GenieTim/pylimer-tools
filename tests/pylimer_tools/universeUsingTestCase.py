@@ -90,9 +90,9 @@ class UniverseUsingTestCase(unittest.TestCase):
                                    self.testAtoms["nx"], self.testAtoms["ny"], self.testAtoms["nz"])
         self.testUniverse.addBonds(
             self.testBonds["bondFrom"], self.testBonds["to"])
-        # an additional larget test universe where the stoichiometric inbalance is < 1
+        # an additional larger test universe where the stoichiometric inbalance is < 1
         # even when imposing a crosslinker functionality of 1
-        # in essence, it is on loop around 4 plus a connction to 6.
+        # in essence, it is one loop around 4 plus a connection to 6.
         self.saturatedTestUniverse = Universe(10, 10, 10)
         self.testAtomsSaturated = pd.concat([self.testAtoms, pd.DataFrame([
             {"id": 9, "type": 1, "nx": 1, "ny": 1,

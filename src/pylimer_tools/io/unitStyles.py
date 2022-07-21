@@ -110,7 +110,10 @@ class UnitStyleFactory(object):
             if (not isinstance(polymerData, dict) and not isinstance(polymerData, tuple)):
                 raise ValueError(
                     "No useable data for this polymer found to use for lj units. Check whether your useage is correct.")
-            ureg.define("sigma = {} * nanometer".format(polymerData.sigma))
+            # follow derivation for more accurate results
+            # sigmaConversion = polymerData.sigma
+            sigmaConversion = 0.1 * polymerData.l_K / (0.965* polymerData.Cb)
+            ureg.define("sigma = {} * nanometer".format(sigmaConversion))
             ureg.define("eps = {}e-21 joule".format(polymerData.kB_Tref))
             # time is most difficult in lj — let's keep tau
             ureg.define('tau = 1 * tau')
