@@ -22,6 +22,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceRelaxation
       ~MEHPForceRelaxation.getCrosslinkerVerse
       ~MEHPForceRelaxation.getDefaultNrOfChains
       ~MEHPForceRelaxation.getDefaultR0Square
+      ~MEHPForceRelaxation.getEffectiveFunctionalityOfAtoms
       ~MEHPForceRelaxation.getExitReason
       ~MEHPForceRelaxation.getForce
       ~MEHPForceRelaxation.getGammaFactor
