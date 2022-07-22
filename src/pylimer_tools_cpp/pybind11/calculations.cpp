@@ -163,6 +163,14 @@ init_pylimer_bound_calc(py::module_& m)
           :param tolerance: springs under this length are considered inactive
      )pbdoc",
          py::arg("tolerance") = 0.1)
+    .def("getEffectiveFunctionalityOfAtoms",
+         &mehp::MEHPForceRelaxation::getEffectiveFunctionalityOfAtoms,
+         R"pbdoc(
+          Returns the number of active springs connected to each atom, atomId used as index
+
+          :param tolerance: springs under this length are considered inactive
+     )pbdoc",
+         py::arg("tolerance") = 0.1)
     .def("getAverageSpringLength",
          &mehp::MEHPForceRelaxation::getAverageSpringLength,
          R"pbdoc(
