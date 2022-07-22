@@ -220,6 +220,8 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation]")
       CHECK(forceRelaxer2.getNrOfActiveNodes() > 1);
       CHECK(forceRelaxer2.getNrOfActiveSprings() > 1);
       CHECK(forceRelaxer2.getAverageSpringLength() > 1.0);
+      CHECK(forceRelaxer2.getEffectiveFunctionalityOfAtoms().size() ==
+            forceRelaxer2.getNrOfNodes());
 
     } else {
       std::cout << "Skipping large file PDMS MEHP run" << std::endl;
@@ -265,6 +267,8 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation]")
     CHECK(forceRelaxer2.getNrOfActiveNodes() > 1);
     CHECK(forceRelaxer2.getNrOfActiveSprings() > 1);
     CHECK(forceRelaxer2.getAverageSpringLength() > 1.0);
+    CHECK(forceRelaxer2.getEffectiveFunctionalityOfAtoms().size() ==
+          forceRelaxer2.getNrOfNodes());
 
     pe::Universe universe3 = forceRelaxer2.getCrosslinkerVerse();
     CHECK(universe3.getNrOfAtoms() == forceRelaxer2.getNrOfNodes());

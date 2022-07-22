@@ -338,6 +338,30 @@ namespace calc {
       }
 
       /**
+       * @brief Get the Effective Functionality Of each node
+       * 
+       * Returns the number of active springs connected to each atom, atomId used as index
+       * 
+       * @param tolerance the tolerance: springs under a certain length are
+       * considered inactive
+       * @return std::unordered_map<long int, int> 
+       */
+      std::unordered_map<long int, int> getEffectiveFunctionalityOfAtoms(
+        double tolerance = 0.1) const
+      {
+        std::unordered_map<long int, int> results;
+        results.reserve(this->initialConfig.nrOfNodes);
+
+        Eigen::VectorXi nrOfActiveSpringsConnected =
+          this->getNrOfActiveSpringsConnected(tolerance);
+        for (size_t i = 0; i < this->initialConfig.nrOfNodes; i++) {
+          results.emplace(this->initialConfig.oldAtomIds[i],
+                          nrOfActiveSpringsConnected[i]);
+        }
+        return results;
+      }
+
+      /**
        * @brief Get the Ids Of active Nodes
        *
        * @param tolerance the tolerance: springs under a certain length are
@@ -354,7 +378,30 @@ namespace calc {
         std::vector<long int> results;
         results.reserve(this->initialConfig.nrOfNodes);
 
-        Eigen::VectorXi nrOfActiveNodesConnected =
+        Eigen::VectorXi nrOfActiveSpringsConnected =
+          this->getNrOfActiveSpringsConnected(tolerance);
+        for (size_t i = 0; i < this->initialConfig.nrOfNodes; i++) {
+          if (nrOfActiveSpringsConnected[i] >= minimumNrOfActiveConnections &&
+              (maximumNrOfActiveConnections < 0 ||
+               maximumNrOfActiveConnections >= nrOfActiveSpringsConnected[i])) {
+            results.push_back(this->initialConfig.oldAtomIds[i]);
+          }
+        }
+
+        return results;
+      }
+
+      /**
+       * @brief Get the Nr Of Active Springs connected to each node
+       *
+       * @param tolerance the tolerance: springs under a certain length are
+       * considered inactive
+       * @return Eigen::VectorXi
+       */
+      Eigen::VectorXi getNrOfActiveSpringsConnected(
+        double tolerance = 0.1) const
+      {
+        Eigen::VectorXi nrOfActiveSpringsConnected =
           Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
         ArrayXb springIsActive =
           this->findActiveSprings(this->currentSpringDistances, tolerance);
@@ -363,19 +410,11 @@ namespace calc {
           {
             int a = this->initialConfig.springIndexA[i];
             int b = this->initialConfig.springIndexB[i];
-            ++(nrOfActiveNodesConnected[a]);
-            ++(nrOfActiveNodesConnected[b]);
+            ++(nrOfActiveSpringsConnected[a]);
+            ++(nrOfActiveSpringsConnected[b]);
           }
         }
-        for (size_t i = 0; i < this->initialConfig.nrOfNodes; i++) {
-          if (nrOfActiveNodesConnected[i] >= minimumNrOfActiveConnections &&
-              (maximumNrOfActiveConnections < 0 ||
-               maximumNrOfActiveConnections >= nrOfActiveNodesConnected[i])) {
-            results.push_back(this->initialConfig.oldAtomIds[i]);
-          }
-        }
-
-        return results;
+        return nrOfActiveSpringsConnected;
       }
 
       /**
