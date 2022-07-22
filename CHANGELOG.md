@@ -1,5 +1,38 @@
 # Changelog
 
+## v0.1.10
+* [[`f223559338`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/f223559338)] - Add some more features to MEHP Relaxation (Tim Bernhard)
+* [[`c94249020f`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/c94249020f)] - Arbitrarily cut alpha and beta to 0, 1. TODO: find a better solution (Tim Bernhard)
+* [[`a10cfc7d89`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/a10cfc7d89)] - Allow to pass a maximum nr of active connections when getting the nr of active nodes in MEHP (Tim Bernhard)
+* [[`1ab5119480`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/1ab5119480)] - Expose more MMT and MEHP underlying results (Tim Bernhard)
+* [[`7c18820c41`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/7c18820c41)] - Implement possibility to replace atom (Tim Bernhard)
+* [[`eb904b82a2`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/eb904b82a2)] - Expose lined up atoms to Python, other minor improvements (Tim Bernhard)
+* [[`5049427676`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/5049427676)] - Set precision higher when writing data files (Tim Bernhard)
+* [[`7784611143`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/7784611143)] - Add (slow) benchmarks for MEHP refactor (Tim Bernhard)
+* [[`7f674f370d`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/7f674f370d)] - Finally get all (incl. MEHP2) tests working again, incl. Python compilation useage (Tim Bernhard)
+* [[`1fcdebaffa`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/1fcdebaffa)] - Remove comparison operator from Atom entity as not actually implemented (Tim Bernhard)
+* [[`784a56c0f3`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/784a56c0f3)] - Add more tests (Tim Bernhard)
+* [[`ba6f5fad4e`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/ba6f5fad4e)] - Implement minimal loop order detection + tests (Tim Bernhard)
+* [[`72925984d2`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/72925984d2)] - Adjust test values after adjusting MMT (Tim Bernhard)
+* [[`b716d9dcf5`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/b716d9dcf5)] - Resolve left over merge conflicts (Tim Bernhard)
+* [[`9b54b9d8e8`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/9b54b9d8e8)] - Close a memory leak (Tim Bernhard)
+* [[`8339505730`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/8339505730)] - Improve compilation support on WSL (Tim Bernhard)
+* [[`5aaf55e8a1`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/5aaf55e8a1)] - Open access to rescaling atoms method (Tim Bernhard)
+* [[`c1f002692e`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/c1f002692e)] - Adjust Eigen Tag to use (Tim Bernhard)
+* [[`ef674e5efc`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/ef674e5efc)] - Automatically download Eigen if not yet available (Tim Bernhard)
+* [[`07440953e0`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/07440953e0)] - (Yet tests failing) refactor of MEHP2 (Tim Bernhard)
+* [[`cf72ee3149`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/cf72ee3149)] - Use 'crosslinkerType' rather than 'junctionType' in function signature \[breaking\] (Tim Bernhard)
+* [[`5a7bc03f2c`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/5a7bc03f2c)] - Use 'of...' rather than 'with...' in function signature \[breaking\] (Tim Bernhard)
+* [[`65ba4dd634`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/65ba4dd634)] - (In)Consistently use mass instead of weight. Re-introduce alternative MEHP implementation. (Tim Bernhard)
+* [[`86efd2f833`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/86efd2f833)] - Implement weight and polydispersity calculation for universe (Tim Bernhard)
+* [[`99977fbee0`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/99977fbee0)] - Add even more tests (Tim Bernhard)
+* [[`fc818fa906`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/fc818fa906)] - Add more tests for df optimization (Tim Bernhard)
+* [[`39436cbb39`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/39436cbb39)] - Remove strange auto-import (Tim Bernhard)
+* [[`c55969db99`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/c55969db99)] - Add new/further tests for new functions (Tim Bernhard)
+* [[`e3357d33db`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/e3357d33db)] - Increase coverage further (Tim Bernhard)
+* [[`cd4cdf1abc`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/cd4cdf1abc)] - Update Changelog (Tim Bernhard)
+
+
 ## v0.1.9
 * [[`3bffee2ec9`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/3bffee2ec9)] - Additional test for modulus decomposition (Tim Bernhard)
 * [[`1ec3b2c2c9`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/1ec3b2c2c9)] - Add splitting of MMT modulus (CAUTION: breaking change) (Tim Bernhard)

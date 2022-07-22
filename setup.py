@@ -66,7 +66,7 @@ for vendorFile in vendorFilesToDelete:
 
 setup(
     name="pylimer_tools",
-    version="0.1.9",
+    version="0.1.10",
     description="A collection of utility python functions for handling LAMMPS output and polymers in Python ",
     long_description_content_type="text/markdown",
     long_description=Path('README.md').read_text(),
