@@ -14,38 +14,38 @@ from tests.pylimer_tools.universeUsingTestCase import UniverseUsingTestCase
 class TestMMTAnalysisFunctions(UniverseUsingTestCase):
 
     def testStoichiometricInbalance(self):
-        self.assertEqual(
+        self.assertAlmostEqual(
             0, computeStoichiometricInbalance(self.emptyUniverse, 2))
-        self.assertEqual(
+        self.assertAlmostEqual(
             (1*2 + 1*3 + 0)/(4*2 + 1*1), computeStoichiometricInbalance(self.testUniverse, 2, strandLength=1, effective=True))
-        self.assertEqual(
+        self.assertAlmostEqual(
             (3*3)/(5*2), computeStoichiometricInbalance(self.testUniverse, 2, strandLength=1, functionalityPerType={
                 1: 2, 2: 3
             }))
-        self.assertEqual(
+        self.assertAlmostEqual(
             (3*3)/(5*2), computeStoichiometricInbalance(self.testUniverse, 2, strandLength=1))
-        self.assertEqual(
+        self.assertAlmostEqual(
             (3*3)/(2), computeStoichiometricInbalance(self.testUniverse, 2, strandLength=5, functionalityPerType={
                 1: 2, 2: 3
             }))
         self.assertRaises(
             ValueError, computeStoichiometricInbalance, self.testUniverse, 7)
-        self.assertEqual(computeStoichiometricInbalance(
+        self.assertAlmostEqual(computeStoichiometricInbalance(
             self.testUniverse, 2, functionalityPerType={
                 1: 2, 2: 3
             }), ((3*3)/((5*2)/(5/3))))
         self.testUniverse.addAtoms([100], [3], [0], [0], [0], [0], [0], [0])
-        self.assertEqual(computeStoichiometricInbalance(
+        self.assertAlmostEqual(computeStoichiometricInbalance(
             self.testUniverse, 2, ignoreTypes=[3]), ((3*3)/((5*2)/(5/3))))
 
     def testExtentOfReaction(self):
-        self.assertEqual(1.0, computeExtentOfReaction(self.emptyUniverse, 2))
-        self.assertEqual(
+        self.assertAlmostEqual(1.0, computeExtentOfReaction(self.emptyUniverse, 2))
+        self.assertAlmostEqual(
             5.0/6.0, computeExtentOfReaction(self.testUniverse, 2))
 
     def testGelationPointPrediction(self):
-        self.assertEqual(1, predictGelationPoint(1, 2))
-        self.assertEqual(1, predictGelationPoint(1, 2, 2))
+        self.assertAlmostEqual(1, predictGelationPoint(1, 2))
+        self.assertAlmostEqual(1, predictGelationPoint(1, 2, 2))
 
     def testShearModulusPrediction(self):
         self.assertRaises(ValueError, lambda: predictShearModulus(
@@ -130,7 +130,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertRaises(NotImplementedError, lambda: computeWeightFractionOfSolubleMaterial(
             self.testUniverse, 2, functionalityPerType={1: 1, 2: 3}))
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
-        self.assertEqual((0.00031069958847736596, {1: 0.85, 2: 0.15}, 0.11111111111111108, 0.011111111111111105), computeWeightFractionOfSolubleMaterial(
+        self.assertAlmostEqual((0.00031069958847736596, {1: 0.85, 2: 0.15}, 0.11111111111111108, 0.011111111111111105), computeWeightFractionOfSolubleMaterial(
             self.saturatedTestUniverse, 2))
 
     # def testProbabilityCalculations(self):
@@ -145,11 +145,11 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertEqual(1, calculateWeightFractionOfDanglingChains(
             self.emptyUniverse, 2, {}))
         self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
-        self.assertEqual(1.0, computeExtentOfReaction(
+        self.assertAlmostEqual(1.0, computeExtentOfReaction(
             self.saturatedTestUniverse, 2))
         bb = calculateWeightFractionOfBackbone(
             self.saturatedTestUniverse, crosslinkerType=2)
-        self.assertEqual(0.9780219780219782, bb)
+        self.assertAlmostEqual(0.9780219780219782, bb)
         self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
         self.assertEqual(1-bb, calculateWeightFractionOfDanglingChains(
             self.saturatedTestUniverse, 2))
