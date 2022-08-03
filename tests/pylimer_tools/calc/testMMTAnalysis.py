@@ -39,7 +39,8 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             self.testUniverse, 2, ignoreTypes=[3]), ((3*3)/((5*2)/(5/3))))
 
     def testExtentOfReaction(self):
-        self.assertAlmostEqual(1.0, computeExtentOfReaction(self.emptyUniverse, 2))
+        self.assertAlmostEqual(
+            1.0, computeExtentOfReaction(self.emptyUniverse, 2))
         self.assertAlmostEqual(
             5.0/6.0, computeExtentOfReaction(self.testUniverse, 2))
 
@@ -130,8 +131,21 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertRaises(NotImplementedError, lambda: computeWeightFractionOfSolubleMaterial(
             self.testUniverse, 2, functionalityPerType={1: 1, 2: 3}))
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
-        self.assertAlmostEqual((0.00031069958847736596, {1: 0.85, 2: 0.15}, 0.11111111111111108, 0.011111111111111105), computeWeightFractionOfSolubleMaterial(
-            self.saturatedTestUniverse, 2))
+        resTuple = computeWeightFractionOfSolubleMaterial(
+            self.saturatedTestUniverse, 2)
+        expectedTuple = (0.010699588477366243, {
+                         1: 0.85, 2: 0.15}, 0.111111111111111, 0.111111111111111)
+        self.assertEqual(len(resTuple), len(expectedTuple))
+        for i in range(len(resTuple)):
+            if (isinstance(resTuple[i], int) or isinstance(resTuple[i], float)):
+                self.assertAlmostEqual(resTuple[i], expectedTuple[i])
+            elif (isinstance(resTuple[i], dict)):
+                for key in resTuple[i].keys():
+                    self.assertAlmostEqual(
+                        resTuple[i][key], expectedTuple[i][key])
+            else:
+                raise ValueError(
+                    "Expected integer, float or dict for comparison")
 
     # def testProbabilityCalculations(self):
     #     self.assertRaises(
@@ -147,9 +161,10 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
         self.assertAlmostEqual(1.0, computeExtentOfReaction(
             self.saturatedTestUniverse, 2))
+        # TODO: get some literature backed values to test for
         bb = calculateWeightFractionOfBackbone(
             self.saturatedTestUniverse, crosslinkerType=2)
-        self.assertAlmostEqual(0.9780219780219782, bb)
+        self.assertAlmostEqual(0.8, bb)
         self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
         self.assertEqual(1-bb, calculateWeightFractionOfDanglingChains(
             self.saturatedTestUniverse, 2))
@@ -197,6 +212,13 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             'MPa').magnitude, 0.05433807, places=5)
         self.assertAlmostEqual(G_MMT_phantom.to(
             'MPa').magnitude, 0.00492674, places=5)
+
+    def testProbabilityCalculations(self):
+        # most already in other tests
+        alpha, beta = computeMMsProbabilities(r=1.0, p=0.85, f=5)
+        self.assertAlmostEqual(0.282074, alpha, places=5)
+        alpha, beta = computeMMsProbabilities(r=1.0, p=0.85, f=6)
+        self.assertAlmostEqual(0.278715, alpha, places=5)
 
 
 if __name__ == '__main__':

@@ -1694,10 +1694,16 @@ namespace entities {
    */
   double Universe::computeTotalMass() const
   {
+    return this->computeTotalMassWithMasses(this->massPerType);
+  }
+
+  double Universe::computeTotalMassWithMasses(
+    std::map<int, double> massPerTypeToUse) const
+  {
     std::vector<int> types = this->getAtomTypes();
     double weight = 0.0;
     for (int i = 0; i < types.size(); i++) {
-      weight += this->massPerType.at(types[i]);
+      weight += massPerTypeToUse.at(types[i]);
     }
     return weight;
   }
@@ -1750,7 +1756,9 @@ namespace entities {
     double weightAverage = 0.0;
 
     std::vector<Molecule> molecules = this->getMolecules(crosslinkerType);
-    double totalMass = this->computeTotalMass();
+    std::map<int, double> massPerTypeToUse(this->massPerType);
+    massPerTypeToUse[crosslinkerType] = 0.0;
+    double totalMass = this->computeTotalMassWithMasses(massPerTypeToUse);
     double massDivisor = 1.0 / totalMass;
     for (Molecule molecule : molecules) {
       double moleculeMass = molecule.computeTotalMass();
@@ -1774,7 +1782,9 @@ namespace entities {
     double weightAverage = 0.0;
 
     std::vector<Molecule> molecules = this->getMolecules(crosslinkerType);
-    double totalMass = this->computeTotalMass();
+    std::map<int, double> massPerTypeToUse(this->massPerType);
+    massPerTypeToUse[crosslinkerType] = 0.0;
+    double totalMass = this->computeTotalMassWithMasses(massPerTypeToUse);
 
     return totalMass / static_cast<double>(molecules.size());
   };

@@ -50,7 +50,7 @@ namespace entities {
                   std::vector<int> ny,
                   std::vector<int> nz);
     void removeAtoms(std::vector<long int> ids);
-    void replaceAtom(const long int id, const Atom &replacement);
+    void replaceAtom(const long int id, const Atom& replacement);
     // bonds
     void addBonds(std::vector<long int> from, std::vector<long int> to);
     void addBonds(const size_t NNewBonds,
@@ -135,9 +135,12 @@ namespace entities {
     double getMeanStrandLength(int crosslinkerType);
     std::vector<double> computeEndToEndDistances(int crosslinkerType);
     double computeMeanEndToEndDistance(int crosslinkerType);
-    double computeMeanSquareEndToEndDistance(int crosslinkerType, bool onlyThoseWithTwoCrosslinkers = false);
+    double computeMeanSquareEndToEndDistance(
+      int crosslinkerType,
+      bool onlyThoseWithTwoCrosslinkers = false);
     double computeMeanBondLength();
     double computeTotalMass() const;
+    double computeTotalMassWithMasses(std::map<int, double> massPerTypeToUse) const;
     double computeWeightAverageMolecularWeight(int crosslinkerType) const;
     double computeNumberAverageMolecularWeight(int crosslinkerType) const;
     double computePolydispersityIndex(int crosslinkerType) const;

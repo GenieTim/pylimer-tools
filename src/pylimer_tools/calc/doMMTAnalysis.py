@@ -97,7 +97,8 @@ def predictNumberDensityOfNetworkStrands(network: Universe, crosslinkerType: int
 
     weightFractions = network.computeWeightFractions()
     alpha, _ = computeMMsProbabilities(r=r if r is not None else computeStoichiometricInbalance(network, crosslinkerType, strandLength, functionalityPerType),
-                                       p=p if p is not None else computeExtentOfReaction(network, crosslinkerType, functionalityPerType, strandLength),
+                                       p=p if p is not None else computeExtentOfReaction(
+                                           network, crosslinkerType, functionalityPerType, strandLength),
                                        f=functionalityPerType[crosslinkerType])
 
     if (functionalityPerType[crosslinkerType] == 3):
@@ -235,9 +236,9 @@ def computeWeightFractionOfSolubleMaterial(network: Universe = None, crosslinker
         assert(network is not None)
         functionalityPerType = network.determineFunctionalityPerType()
 
-    if (functionalityPerType[crosslinkerType] not in [3, 4]):
+    if (functionalityPerType[crosslinkerType] not in range(3, 7)):
         raise NotImplementedError(
-            "Currently, only crosslinker functionality of 3 or 4 is supported. {} given.".format(functionalityPerType[crosslinkerType]))
+            "Currently, a crosslinker functionality of {} is not supported.".format(functionalityPerType[crosslinkerType]))
 
     for key in functionalityPerType:
         if (key != crosslinkerType and functionalityPerType[key] != 2):
@@ -308,18 +309,26 @@ def computeMMsProbabilities(r, p, f):
     # actually do the calculations
     if (f == 3):
         alpha = ((1 - r*p*p)/(r*p*p))
-        beta = (r*p*alpha**2)
+        # beta = r*p*(alpha**2)
     elif(f == 4):
         alpha = (((1./(r*p*p)) - 3./4.)**(1./2.) - (1./2.))
-        beta = ((r*p*(alpha**3)) + 1 - r*p)
+        # beta = ((r*p*(alpha**3)) + 1 - r*p)
     else:
         def funToRootForAlpha(alpha):
-            return r*p**2*alpha**(f-1) - alpha - r*p ** 2 + 1
+            return r*p**2*alpha**(f-1) - alpha - r*(p ** 2) + 1
+
+        def funToRootForAlphaPrime(alpha):
+            return -1 + alpha**(f-2)*(-1+f)*(p**2)*r
+
+        def funToRootForAlphaPrime2(alpha):
+            return alpha**(f-3)*(-2+f)*(-1+f)*(p**2)*r
+
         alphaSol = optimize.root_scalar(
-            funToRootForAlpha, bracket=(0, 1), method='brentq')
+            funToRootForAlpha, bracket=(0, 1), method='halley', fprime=funToRootForAlphaPrime, fprime2=funToRootForAlphaPrime2, x0 = 0.5)
         alpha = alphaSol.root
-        beta = ((r*p*alpha**(f-1)) + 1 - r*p)  # TODO: reconsider
-    return np.clip(alpha, 0, 1), np.clip(beta, 0, 1) # TODO: reconsider
+        # beta = ((r*p*alpha**(f-1)) + 1 - r*p)  # TODO: reconsider
+    beta = r*p*alpha**(f-1) + 1 - r*p
+    return np.clip(alpha, 0, 1), np.clip(beta, 0, 1)  # TODO: reconsider
 
 
 def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crosslinkerType: int = None, r: float = None, p: float = None, f: int = None, nu: float = None, T: pint.Quantity = None, strandLength: int = None, functionalityPerType: dict = None, Ge1=0.22):
