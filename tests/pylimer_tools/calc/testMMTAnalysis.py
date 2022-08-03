@@ -70,29 +70,29 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.testUniverse.setMasses({1: 1, 2: 1})
         self.assertAlmostEqual(
             1.5, computeStoichiometricInbalance(self.testUniverse, 2))
-        self.assertAlmostEqual(predictNumberDensityOfJunctionPoints(
-            self.testUniverse, 2), 0.375)
-        self.assertRaises(NotImplementedError, lambda: predictNumberDensityOfJunctionPoints(
-            self.testUniverse, 2, functionalityPerType={1: 2, 2: 5}))
         # TODO: find literature motiviation for results fo the functions
         self.assertAlmostEqual(predictNumberDensityOfJunctionPoints(
-            self.testUniverse, 2, functionalityPerType={1: 2, 2: 3}), 0.375)
+            self.testUniverse, 2), 0.0)
+        self.assertRaises(NotImplementedError, lambda: predictNumberDensityOfJunctionPoints(
+            self.testUniverse, 2, functionalityPerType={1: 2, 2: 5}))
+        self.assertAlmostEqual(predictNumberDensityOfJunctionPoints(
+            self.testUniverse, 2, functionalityPerType={1: 2, 2: 3}), 0.0)
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
         self.assertAlmostEqual(predictNumberDensityOfJunctionPoints(
-            self.saturatedTestUniverse, 2, functionalityPerType={1: 2, 2: 4}), 0.149319447)
+            self.saturatedTestUniverse, 2, functionalityPerType={1: 2, 2: 4}), 0.08304616298035744)
 
     def testPredictNumberDensityOfNetworkStrands(self):
         self.testUniverse.setMasses({1: 1, 2: 1})
-        self.assertAlmostEqual(predictNumberDensityOfNetworkStrands(
-            self.testUniverse, 2), 0.5625)
-        self.assertRaises(NotImplementedError, lambda: predictNumberDensityOfNetworkStrands(
-            self.testUniverse, 2, functionalityPerType={1: 2, 2: 5}))
         # TODO: find literature motiviation for results fo the functions
         self.assertAlmostEqual(predictNumberDensityOfNetworkStrands(
-            self.testUniverse, 2, functionalityPerType={1: 2, 2: 3}), 0.5625)
+            self.testUniverse, 2), 0.0)
+        self.assertRaises(NotImplementedError, lambda: predictNumberDensityOfNetworkStrands(
+            self.testUniverse, 2, functionalityPerType={1: 2, 2: 5}))
+        self.assertAlmostEqual(predictNumberDensityOfNetworkStrands(
+            self.testUniverse, 2, functionalityPerType={1: 2, 2: 3}), 0.0)
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
         self.assertAlmostEqual(predictNumberDensityOfNetworkStrands(
-            self.saturatedTestUniverse, 2, functionalityPerType={1: 2, 2: 4}), 0.290919539)
+            self.saturatedTestUniverse, 2, functionalityPerType={1: 2, 2: 4}), 0.13752853164771697)
 
     def testWeightFractionCalculations(self):
         self.assertDictEqual(
@@ -175,7 +175,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         #     1: 2, 2: 4
         # }))
         # NOTE: requires a short strand length with these systems, as otherwise, r > 1 which is not supported by the formulas implemented
-        self.assertEqual(0.43792682962864016, calculateWeightFractionOfBackbone(self.saturatedTestUniverse, crosslinkerType=2, strandLength=2, functionalityPerType={
+        self.assertEqual(0.14931407018789813, calculateWeightFractionOfBackbone(self.saturatedTestUniverse, crosslinkerType=2, strandLength=2, functionalityPerType={
             1: 2, 2: 4
         }))
 
@@ -219,6 +219,8 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertAlmostEqual(0.282074, alpha, places=5)
         alpha, beta = computeMMsProbabilities(r=1.0, p=0.85, f=6)
         self.assertAlmostEqual(0.278715, alpha, places=5)
+        self.assertRaises(
+            ValueError, lambda: computeMMsProbabilities(r=1.0, p=2, f=7))
 
 
 if __name__ == '__main__':
