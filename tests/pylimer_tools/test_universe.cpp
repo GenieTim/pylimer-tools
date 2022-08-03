@@ -29,6 +29,15 @@ namespace pe = pylimer_tools::entities;
 //   }
 // }
 
+template<typename T>
+std::vector<T>
+getVectorWithOne(T val)
+{
+  std::vector<T> vec;
+  vec.push_back(val);
+  return vec;
+}
+
 TEST_CASE("Universe can be used", "[entity][Universe]")
 {
   REQUIRE(1 == 1);
@@ -254,6 +263,12 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       std::map<int, double> weightFraction = universe.computeWeightFractions();
       REQUIRE(weightFraction[1] == (5.0 * 1.0) / (3.0 * 2.0 + 5.0 * 1.0));
       REQUIRE(weightFraction[2] == (2.0 * 3.0) / (3.0 * 2.0 + 5.0 * 1.0));
+      REQUIRE(universe.computeTotalMass() == Catch::Approx(5 * 1.0 + 3 * 2.0));
+      std::map<int, double> otherMasses(masses);
+      otherMasses[2] =  0.0;
+      REQUIRE(otherMasses[2] == 0.0);
+      REQUIRE(universe.computeTotalMassWithMasses(otherMasses) ==
+              Catch::Approx(5 * 1.0));
     }
 
     SECTION("Bonds can be removed")
@@ -646,53 +661,107 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
 
   SECTION("PolyDispersity Calculation")
   {
-    // as taken from https://www.pslc.ws/macrog/average.htm
-    std::vector<int> nrOfMolecules = {
-      { 1, 3, 5, 8, 10, 13, 20, 13, 10, 8, 5, 3, 1 }
-    };
-    std::vector<double> massOfMolecules = {
-      { 8, 7.5, 7, 6.5, 6, 5.5, 5, 4.5, 4, 3.5, 3., 2.5, 2 }
-    };
+    SECTION("Literature system")
+    {
+      // as taken from https://www.pslc.ws/macrog/average.htm
+      std::vector<int> nrOfMolecules = {
+        { 1, 3, 5, 8, 10, 13, 20, 13, 10, 8, 5, 3, 1 }
+      };
+      std::vector<double> massOfMolecules = {
+        { 8, 7.5, 7, 6.5, 6, 5.5, 5, 4.5, 4, 3.5, 3., 2.5, 2 }
+      };
 
-    std::map<int, double> weights;
-    int currentId = 0;
+      std::map<int, double> weights;
+      int currentId = 0;
 
-    std::vector<double> oneZeroDouble;
-    oneZeroDouble.push_back(0.0);
-    std::vector<int> oneZeroInt;
-    oneZeroInt.push_back(0);
+      std::vector<double> oneZeroDouble = getVectorWithOne<double>(0.0);
+      std::vector<int> oneZeroInt = getVectorWithOne(0);
 
-    // first, add these molecules as single atoms to the universe
-    for (int i = 0; i < nrOfMolecules.size(); ++i) {
-      std::vector<int> type;
-      type.push_back(i);
-      // this is slow and could easily be optimized, but whatever
-      for (int j = 0; j < nrOfMolecules[i]; ++j) {
-        std::vector<long int> atomId;
-        atomId.push_back(currentId);
-        universe.addAtoms(1,
-                          atomId,
-                          type,
-                          oneZeroDouble,
-                          oneZeroDouble,
-                          oneZeroDouble,
-                          oneZeroInt,
-                          oneZeroInt,
-                          oneZeroInt);
-        currentId += 1;
+      // first, add these molecules as single atoms to the universe
+      for (size_t i = 0; i < nrOfMolecules.size(); ++i) {
+        std::vector<int> type;
+        type.push_back(i);
+        // this is slow and could easily be optimized, but whatever
+        for (size_t j = 0; j < nrOfMolecules[i]; ++j) {
+          std::vector<long int> atomId;
+          atomId.push_back(currentId);
+          universe.addAtoms(1,
+                            atomId,
+                            type,
+                            oneZeroDouble,
+                            oneZeroDouble,
+                            oneZeroDouble,
+                            oneZeroInt,
+                            oneZeroInt,
+                            oneZeroInt);
+          currentId += 1;
+        }
+        weights.emplace(i, massOfMolecules[i] * 100000.);
       }
-      weights.emplace(i, massOfMolecules[i] * 100000.);
+      universe.setMasses(weights);
+      // some asserts that everything has been correcly set by the test
+      REQUIRE(universe.getMolecules(-1).size() == 100);
+      REQUIRE(currentId == 100);
+      // then, do the calculation
+      REQUIRE(universe.computeTotalMass() == Catch::Approx(50000000));
+      REQUIRE(universe.computeNumberAverageMolecularWeight(-1) ==
+              Catch::Approx(500000));
+      REQUIRE(universe.computeWeightAverageMolecularWeight(-1) ==
+              Catch::Approx(531600));
+      REQUIRE(universe.computePolydispersityIndex(-1) == Catch::Approx(1.0632));
     }
-    universe.setMasses(weights);
-    // some asserts that everything has been correcly set by the test
-    REQUIRE(universe.getMolecules(-1).size() == 100);
-    REQUIRE(currentId == 100);
-    // then, do the calculation
-    REQUIRE(universe.computeTotalMass() == Catch::Approx(50000000));
-    REQUIRE(universe.computeNumberAverageMolecularWeight(-1) ==
-            Catch::Approx(500000));
-    REQUIRE(universe.computeWeightAverageMolecularWeight(-1) ==
-            Catch::Approx(531600));
-    REQUIRE(universe.computePolydispersityIndex(-1) == Catch::Approx(1.0632));
+
+    SECTION("System to zero out")
+    {
+      // other system
+      std::vector<double> oneZeroDouble = getVectorWithOne<double>(0.0);
+      std::vector<int> oneZeroInt = getVectorWithOne(0);
+
+      pe::Universe universe2 = pe::Universe(10., 10., 10.);
+      std::map<int, double> weights2;
+      weights2.emplace(1, 1.0);
+      weights2.emplace(2, 3.0);
+      universe2.setMasses(weights2);
+      std::vector<int> type;
+      type.push_back(1);
+      long int currentId = 0;
+      for (size_t i = 0; i < 10; ++i) {
+        for (size_t j = 0; j < 10; ++j) {
+          currentId += 1;
+          universe2.addAtoms(1,
+                             getVectorWithOne<long int>(currentId),
+                             type,
+                             oneZeroDouble,
+                             oneZeroDouble,
+                             oneZeroDouble,
+                             oneZeroInt,
+                             oneZeroInt,
+                             oneZeroInt);
+          if (j > 0) {
+            universe2.addBonds(getVectorWithOne<long int>(currentId),
+                               getVectorWithOne<long int>(currentId - 1));
+          }
+        }
+        REQUIRE(universe2.computePolydispersityIndex(-1) == Catch::Approx(1.0));
+      }
+      // add cross-linkers
+      SECTION("With cross-linkers")
+      {
+        std::vector<int> type2 = getVectorWithOne(2);
+        for (size_t i = 0; i < 10; ++i) {
+          currentId += 1;
+          universe2.addAtoms(1,
+                             getVectorWithOne<long int>(currentId),
+                             type2,
+                             oneZeroDouble,
+                             oneZeroDouble,
+                             oneZeroDouble,
+                             oneZeroInt,
+                             oneZeroInt,
+                             oneZeroInt);
+        }
+        REQUIRE(universe2.computePolydispersityIndex(2) == Catch::Approx(1.0));
+      }
+    }
   }
 }

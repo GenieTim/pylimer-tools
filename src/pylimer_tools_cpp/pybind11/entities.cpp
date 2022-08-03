@@ -376,10 +376,13 @@ init_pylimer_bound_entities(py::module_& m)
           Remove atoms and all associated bonds by their atom ids. 
           )pbdoc",
          py::arg("atomIds"))
-     .def("replaceAtom", &Universe::replaceAtom,  R"pbdoc(
+    .def("replaceAtom",
+         &Universe::replaceAtom,
+         R"pbdoc(
           Replace the properties of an atom with the properties of another given atom.
           )pbdoc",
-         py::arg("atomId"), py::arg("replacementAtom"))
+         py::arg("atomId"),
+         py::arg("replacementAtom"))
     .def("addBonds",
          py::overload_cast<std::vector<long int>, std::vector<long int>>(
            &Universe::addBonds),
@@ -625,12 +628,18 @@ init_pylimer_bound_entities(py::module_& m)
          &Universe::computeNumberAverageMolecularWeight,
          R"pbdoc(
               Compute the number average molecular weight.
+
+              NOTE: 
+                    Cross-linkers are ignored completely.
               )pbdoc",
          py::arg("crosslinkerType"))
     .def("computeWeightAverageMolecularWeight",
          &Universe::computeWeightAverageMolecularWeight,
          R"pbdoc(
               Compute the weight average molecular weight.
+
+              NOTE: 
+                    Cross-linkers are ignored completely.
               )pbdoc",
          py::arg("crosslinkerType"))
     .def("computePolydispersityIndex",
@@ -670,7 +679,9 @@ init_pylimer_bound_entities(py::module_& m)
                Internally, this uses the :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeEndToEndDistance`.
                All its cautionary facts apply.
                Invalid strands (where said function returns 0.0 or -1.0) are ignored.
-     )pbdoc", py::arg("crosslinkerType"), py::arg("onlyThoseWithTwoCrosslinkers") = false)
+     )pbdoc",
+         py::arg("crosslinkerType"),
+         py::arg("onlyThoseWithTwoCrosslinkers") = false)
     .def("computeDxs",
          &Universe::computeDxs,
          "Compute the dx distance for certain bonds (length in x direction).",

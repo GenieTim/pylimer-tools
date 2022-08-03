@@ -18,6 +18,7 @@ namespace pcm = pylimer_tools::calc::mehp;
 TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
           "[analysis][MEHPForceRelaxation]")
 {
+  // return;
   pe::Universe universe = pe::Universe(4.0, 4.0, 4.0);
   // how this looks like:
   // 1-2
@@ -124,6 +125,7 @@ TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
 
 TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation]")
 {
+  // return;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
