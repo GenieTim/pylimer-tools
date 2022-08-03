@@ -1,7 +1,6 @@
 
 import math
 import warnings
-from audioop import cross
 from collections import Counter
 
 import numpy as np
@@ -55,7 +54,6 @@ def predictNumberDensityOfJunctionPoints(network: Universe, crosslinkerType: int
       - crosslinkerType: the atom type to use to split the molecules
       - strandLength: the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
       - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. 
-          See: #computeExtentOfReaction
 
     Returns:
       - mu: The predicted number density of junction points
@@ -87,7 +85,6 @@ def predictNumberDensityOfNetworkStrands(network: Universe, crosslinkerType: int
       - crosslinkerType: the atom type to use to split the molecules
       - strandLength: the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
       - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. 
-          See: #computeExtentOfReaction
 
     Returns:
       - nu: The predicted number density of network strands
@@ -97,8 +94,8 @@ def predictNumberDensityOfNetworkStrands(network: Universe, crosslinkerType: int
 
     weightFractions = network.computeWeightFractions()
     alpha, _ = computeMMsProbabilities(r=r if r is not None else computeStoichiometricInbalance(network, crosslinkerType, strandLength, functionalityPerType),
-                                       p=p if p is not None else computeExtentOfReaction(
-                                           network, crosslinkerType, functionalityPerType, strandLength),
+                                       p=p if p is not None else mehp.computeCrosslinkerConversion(
+                                           network, crosslinkerType, functionalityPerType[crosslinkerType]),
                                        f=functionalityPerType[crosslinkerType])
 
     if (functionalityPerType[crosslinkerType] == 3):
@@ -119,7 +116,6 @@ def calculateWeightFractionOfDanglingChains(network: Universe, crosslinkerType: 
       - crosslinkerType: the atom type to use to split the molecules
       - strandLength: the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
       - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. 
-          See: #computeExtentOfReaction
 
     Returns:
       - weightFraction $\\Phi_d = 1 - \\Phi_{el}$: weightDangling/weightTotal
@@ -140,7 +136,6 @@ def calculateWeightFractionOfBackbone(network: Universe, crosslinkerType: int, s
       - crosslinkerType: the type of the junctions/crosslinkers to select them in the network
       - strandLength: the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance
       - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. 
-          See: #computeExtentOfReaction
 
     Returns:
       - :math:`\\Phi_{el}`: weight fraction of network backbone
@@ -224,7 +219,7 @@ def computeWeightFractionOfSolubleMaterial(network: Universe = None, crosslinker
       - strandLength (int): the length of the network strands (in nr. of beads). 
           See: :func:`~pylimer_tools.calc.doMMTAnalysis.computeStoichiometricInbalance`.
       - functionalityPerType (dict): a dictionary with key: type, and value: functionality of this atom type. 
-          See: :func:`~pylimer_tools.calc.doMMTAnalysis.computeExtentOfReaction`.
+          See: :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.determineFunctionalityPerType`.
 
     Returns:
       - :math:`W_{sol}` (float): the weight fraction of soluble material according to MMT.
@@ -250,8 +245,8 @@ def computeWeightFractionOfSolubleMaterial(network: Universe = None, crosslinker
 
     if (p is None):
         assert(network is not None)
-        p = computeExtentOfReaction(
-            network, crosslinkerType, functionalityPerType=functionalityPerType)
+        p = mehp.computeCrosslinkerConversion(
+            network, crosslinkerType, functionalityPerType[crosslinkerType])
         if (p < 0 or p > 1):
             warnings.warn(
                 "The p computed ({}) is outside the accepted range. Falling back to effective cross-linker functionality.".format(p))
@@ -296,9 +291,9 @@ def computeMMsProbabilities(r, p, f):
     """
     # first, check a few things required by the formulae
     # since we want alpha, beta \in [0,1], given they are supposed to be probabilities
-    # if (r > 1 or r < 0):
-    #     raise ValueError(
-    #         "A stoichiometric inbalance ouside of [0, 1] is not (yet) supported. Got {}".format(r))
+    if (p > 1 or p < 0):
+        raise ValueError(
+            "An extent of reaction ouside of [0, 1] is not supported. Got {}".format(p))
     # if (p < 1/math.sqrt(2) or p > 1):
     #     raise ValueError(
     #         "The extent of reaction has to be inside [1/sqrt(2), 1] for the result to be realistic. Got {}".format(p))
@@ -309,10 +304,14 @@ def computeMMsProbabilities(r, p, f):
     # actually do the calculations
     if (f == 3):
         alpha = ((1 - r*p*p)/(r*p*p))
-        # beta = r*p*(alpha**2)
+        if (not (1/(p**2) < 2*r and (1/(p**2) > r))):
+            warnings.warn(
+                "The resulting P(F_A) is probably unreliable, as the detected root does not fulfill the required conditions.")
     elif(f == 4):
         alpha = (((1./(r*p*p)) - 3./4.)**(1./2.) - (1./2.))
-        # beta = ((r*p*(alpha**3)) + 1 - r*p)
+        if (not (1/(p**2) < 3*r and (1/(p**2) > r))):
+            warnings.warn(
+                "The resulting P(F_A) is probably unreliable, as the detected root does not fulfill the required conditions.")
     else:
         def funToRootForAlpha(alpha):
             return r*p**2*alpha**(f-1) - alpha - r*(p ** 2) + 1
@@ -324,10 +323,15 @@ def computeMMsProbabilities(r, p, f):
             return alpha**(f-3)*(-2+f)*(-1+f)*(p**2)*r
 
         alphaSol = optimize.root_scalar(
-            funToRootForAlpha, bracket=(0, 1), method='halley', fprime=funToRootForAlphaPrime, fprime2=funToRootForAlphaPrime2, x0 = 0.5)
+            funToRootForAlpha, bracket=(0, 1), method='halley', fprime=funToRootForAlphaPrime, fprime2=funToRootForAlphaPrime2, x0=0.5)
         alpha = alphaSol.root
-        # beta = ((r*p*alpha**(f-1)) + 1 - r*p)  # TODO: reconsider
     beta = r*p*alpha**(f-1) + 1 - r*p
+    if (alpha > 1 or alpha < 0):
+        warnings.warn(
+            "The resulting P(F_A) is probably unreliable, as it will be clipped to [0,1] from {}".format(alpha))
+    if (beta > 1 or beta < 0):
+        warnings.warn(
+            "The resulting P(F_B) is probably unreliable, as it will be clipped to [0,1] from {}".format(beta))
     return np.clip(alpha, 0, 1), np.clip(beta, 0, 1)  # TODO: reconsider
 
 
@@ -354,15 +358,15 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crossli
       - G_PNM: the PNM estimate of the modulus
 
     """
-    if (crosslinkerType is None and (r is None or f is None or p is None or nu is None)):
+    if ((crosslinkerType is None or network is None) and (r is None or f is None or p is None or nu is None)):
         raise ValueError(
-            "Either the crosslinkerType or the required variables must be specified")
+            "Either the network and crosslinkerType or the required variables must be specified")
     if (r is None):
         r = computeStoichiometricInbalance(
             network, crosslinkerType=crosslinkerType, strandLength=strandLength, functionalityPerType=functionalityPerType)
     if (p is None):
-        p = computeExtentOfReaction(
-            network, crosslinkerType, strandLength=strandLength)
+        p = mehp.computeCrosslinkerConversion(
+            network, crosslinkerType, functionalityPerType=functionalityPerType)
         if (p < 0 or p > 1):
             warnings.warn(
                 "The p computed ({}) is outside the accepted range. Falling back to effective cross-linker functionality.".format(p))
@@ -491,9 +495,10 @@ def computeExtentOfReaction(network: Universe, crosslinkerType, functionalityPer
     (nr. of formed bonds in reaction / max. nr. of bonds formable)
     NOTE: 
         - if your system has a non-integer number of possible bonds (e.g. one site unbonded),
-            this will not be rounded/respected in any way. 
+            this will not be rounded/respected in any way
         - if the system contains solvent or other molecules that should not be binding to 
             cross-linkers, make sure to remove them before calling this function
+        - useage of mehp.computeCrosslinkerConversion is recommended instead for more consistent results (no dependency on strandLength)
 
     Arguments:
       - network: the poylmer network to do the computation for
