@@ -490,7 +490,7 @@ If <cite>None</cite>, it will be computed for each molecule in the first Univers
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.doMEHPAnalysis.computeCrosslinkerConversion">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMEHPAnalysis.</span></span><span class="sig-name descname"><span class="pre">computeCrosslinkerConversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinkerType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.doMEHPAnalysis.computeCrosslinkerConversion" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMEHPAnalysis.</span></span><span class="sig-name descname"><span class="pre">computeCrosslinkerConversion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinkerType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionalityPerType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.doMEHPAnalysis.computeCrosslinkerConversion" title="Permalink to this definition">#</a></dt>
 <dd><p>Compute the extent of reaction of the crosslinkers
 (actual functionality divided by target functionality)</p>
 <dl class="field-list simple">
@@ -646,8 +646,7 @@ If <cite>None</cite>, it will be computed for each molecule in the first Univers
 <li><p><strong>network</strong> (<em>-</em>) – the poylmer network to do the computation for</p></li>
 <li><p><strong>crosslinkerType</strong> (<em>-</em>) – the type of the junctions/crosslinkers to select them in the network</p></li>
 <li><p><strong>strandLength</strong> (<em>-</em>) – the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance</p></li>
-<li><p><strong>functionalityPerType</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.
-See: #computeExtentOfReaction</p></li>
+<li><p><strong>functionalityPerType</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -672,8 +671,7 @@ See: #computeExtentOfReaction</p></li>
 <li><p><strong>network</strong> (<em>-</em>) – the network to compute the weight fraction for</p></li>
 <li><p><strong>crosslinkerType</strong> (<em>-</em>) – the atom type to use to split the molecules</p></li>
 <li><p><strong>strandLength</strong> (<em>-</em>) – the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance</p></li>
-<li><p><strong>functionalityPerType</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.
-See: #computeExtentOfReaction</p></li>
+<li><p><strong>functionalityPerType</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -695,9 +693,10 @@ See: #computeExtentOfReaction</p></li>
 (nr. of formed bonds in reaction / max. nr. of bonds formable)
 .. note:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span> <span class="k">if</span> <span class="n">your</span> <span class="n">system</span> <span class="n">has</span> <span class="n">a</span> <span class="n">non</span><span class="o">-</span><span class="n">integer</span> <span class="n">number</span> <span class="n">of</span> <span class="n">possible</span> <span class="n">bonds</span> <span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="n">one</span> <span class="n">site</span> <span class="n">unbonded</span><span class="p">),</span>
-    <span class="n">this</span> <span class="n">will</span> <span class="ow">not</span> <span class="n">be</span> <span class="n">rounded</span><span class="o">/</span><span class="n">respected</span> <span class="ow">in</span> <span class="nb">any</span> <span class="n">way</span><span class="o">.</span>
+    <span class="n">this</span> <span class="n">will</span> <span class="ow">not</span> <span class="n">be</span> <span class="n">rounded</span><span class="o">/</span><span class="n">respected</span> <span class="ow">in</span> <span class="nb">any</span> <span class="n">way</span>
 <span class="o">-</span> <span class="k">if</span> <span class="n">the</span> <span class="n">system</span> <span class="n">contains</span> <span class="n">solvent</span> <span class="ow">or</span> <span class="n">other</span> <span class="n">molecules</span> <span class="n">that</span> <span class="n">should</span> <span class="ow">not</span> <span class="n">be</span> <span class="n">binding</span> <span class="n">to</span>
     <span class="n">cross</span><span class="o">-</span><span class="n">linkers</span><span class="p">,</span> <span class="n">make</span> <span class="n">sure</span> <span class="n">to</span> <span class="n">remove</span> <span class="n">them</span> <span class="n">before</span> <span class="n">calling</span> <span class="n">this</span> <span class="n">function</span>
+<span class="o">-</span> <span class="n">useage</span> <span class="n">of</span> <span class="n">mehp</span><span class="o">.</span><span class="n">computeCrosslinkerConversion</span> <span class="ow">is</span> <span class="n">recommended</span> <span class="n">instead</span> <span class="k">for</span> <span class="n">more</span> <span class="n">consistent</span> <span class="n">results</span> <span class="p">(</span><span class="n">no</span> <span class="n">dependency</span> <span class="n">on</span> <span class="n">strandLength</span><span class="p">)</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -865,7 +864,7 @@ If <cite>None</cite>: will use max functionality per type.</p></li>
 <li><p><strong>strandLength</strong> (<em>-</em>) – the length of the network strands (in nr. of beads).
 See: <a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeStoichiometricInbalance" title="pylimer_tools.calc.doMMTAnalysis.computeStoichiometricInbalance"><code class="xref py py-func docutils literal notranslate"><span class="pre">computeStoichiometricInbalance()</span></code></a>.</p></li>
 <li><p><strong>functionalityPerType</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.
-See: <a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeExtentOfReaction" title="pylimer_tools.calc.doMMTAnalysis.computeExtentOfReaction"><code class="xref py py-func docutils literal notranslate"><span class="pre">computeExtentOfReaction()</span></code></a>.</p></li>
+See: <a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe.determineFunctionalityPerType" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.determineFunctionalityPerType"><code class="xref py py-func docutils literal notranslate"><span class="pre">determineFunctionalityPerType()</span></code></a>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -974,8 +973,7 @@ See: <a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.compu
 <li><p><strong>network</strong> (<em>-</em>) – the network to compute the weight fraction for</p></li>
 <li><p><strong>crosslinkerType</strong> (<em>-</em>) – the atom type to use to split the molecules</p></li>
 <li><p><strong>strandLength</strong> (<em>-</em>) – the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance</p></li>
-<li><p><strong>functionalityPerType</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.
-See: #computeExtentOfReaction</p></li>
+<li><p><strong>functionalityPerType</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1006,8 +1004,7 @@ See: #computeExtentOfReaction</p></li>
 <li><p><strong>network</strong> (<em>-</em>) – the network to compute the weight fraction for</p></li>
 <li><p><strong>crosslinkerType</strong> (<em>-</em>) – the atom type to use to split the molecules</p></li>
 <li><p><strong>strandLength</strong> (<em>-</em>) – the length of the network strands (in nr. of beads). See: #computeStoichiometricInbalance</p></li>
-<li><p><strong>functionalityPerType</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.
-See: #computeExtentOfReaction</p></li>
+<li><p><strong>functionalityPerType</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
