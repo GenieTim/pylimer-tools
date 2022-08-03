@@ -175,7 +175,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         #     1: 2, 2: 4
         # }))
         # NOTE: requires a short strand length with these systems, as otherwise, r > 1 which is not supported by the formulas implemented
-        self.assertEqual(0.14931407018789813, calculateWeightFractionOfBackbone(self.saturatedTestUniverse, crosslinkerType=2, strandLength=2, functionalityPerType={
+        self.assertAlmostEqual(0.14931407018789813, calculateWeightFractionOfBackbone(self.saturatedTestUniverse, crosslinkerType=2, strandLength=2, functionalityPerType={
             1: 2, 2: 4
         }))
 
