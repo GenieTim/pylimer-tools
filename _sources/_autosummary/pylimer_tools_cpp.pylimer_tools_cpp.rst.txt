@@ -35,10 +35,13 @@
       ExitReason
       LazyUniverseSequenceIterator
       MCUniverseGenerator
+      MEHPForceEvaluator
       MEHPForceRelaxation
       Molecule
       MoleculeIterator
       MoleculeType
+      SimpleSpringMEHPForceEvaluator
+      SimplifiedNetwork
       Universe
       UniverseSequence
    
