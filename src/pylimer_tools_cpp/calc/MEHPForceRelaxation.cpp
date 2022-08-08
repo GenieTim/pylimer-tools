@@ -17,77 +17,6 @@
 namespace pylimer_tools {
 namespace calc {
   namespace mehp {
-    /**
-     * FORCE EVALUATORS
-     */
-    void MEHPForceEvaluator::setNetwork(Network& net)
-    {
-      this->net = net;
-    }
-    void MEHPForceEvaluator::setIs2D(bool is2D)
-    {
-      this->is2D = is2D;
-    }
-    double MEHPForceEvaluator::evaluateForceSetGradient(const size_t n,
-                                                        const double* x,
-                                                        double* grad,
-                                                        void* f_data) const
-    {
-      Eigen::Map<const Eigen::VectorXd> u =
-        Eigen::Map<const Eigen::VectorXd>(x, n);
-      return evaluateForceSetGradient(n, u, grad, f_data);
-    }
-
-    double MEHPForceEvaluator::evaluateForceSetGradient(
-      const size_t n,
-      const Eigen::VectorXd& u,
-      double* grad,
-      void* f_data) const
-    {
-      assert(n == this->net.nrOfNodes * 3);
-      assert(u.size() == this->net.coordinates.size());
-      Eigen::VectorXd springDistances =
-        MEHPForceRelaxation::evaluateSpringDistances(&this->net, u, this->is2D);
-      assert(n == this->net.nrOfNodes * 3);
-      assert(u.size() == this->net.coordinates.size());
-
-      return evaluateForceSetGradient(n, springDistances, u, grad);
-    }
-
-    double SimpleSpringMEHPForceEvaluator::evaluateForceSetGradient(
-      const size_t n,
-      const Eigen::VectorXd& springDistances,
-      const Eigen::VectorXd& u,
-      double* grad) const
-    {
-      assert(n == this->net.nrOfNodes * 3);
-      assert(u.size() == this->net.coordinates.size());
-      assert(n == this->net.nrOfNodes * 3);
-      assert(u.size() == this->net.coordinates.size());
-
-      double s2 = springDistances.squaredNorm();
-      if (grad != nullptr) {
-        double constantMultiplier = this->kappa; // * 0.5 / s2;
-        for (size_t j = 0; j < n; ++j) {
-          grad[j] = 0.0;
-        }
-        for (size_t j = 0; j < this->net.nrOfSprings; ++j) {
-          int a = this->net.springIndexA[j];
-          int b = this->net.springIndexB[j];
-          int nrOfDim = this->is2D ? 2 : 3;
-          for (size_t dir = 0; dir < nrOfDim; ++dir) {
-            grad[3 * a + dir] +=
-              springDistances[3 * j + dir] * constantMultiplier;
-            grad[3 * b + dir] -=
-              springDistances[3 * j + dir] * constantMultiplier;
-          }
-        }
-      }
-      // std::cout << "Evaluated force to " << std::setprecision(15)
-      //           << 0.5 * kappa * s2 << " with kappa " << this->kappa
-      //           << std::endl;
-      return 0.5 * this->kappa * s2;
-    };
 
     /**
      * FORCE RELAXATION
@@ -97,8 +26,7 @@ namespace calc {
       long int maxNrOfSteps, // default: 10000
       double xtol,
       double ftol,
-      double loopTol,
-      double kappa)
+      double loopTol)
     {
       this->simulationHasRun = true;
       double stress[3][3];
@@ -283,11 +211,10 @@ namespace calc {
       return r2 / this->initialConfig.nrOfSprings;
     }
 
-    std::array<std::array<double, 3>, 3> MEHPForceRelaxation::getStressTensor(
-      const double kappa) const
+    std::array<std::array<double, 3>, 3> MEHPForceRelaxation::getStressTensor() const
     {
       return this->evaluateStressTensor(
-        this->currentSpringDistances, kappa, this->initialConfig.vol);
+        this->currentSpringDistances, this->initialConfig.vol);
     }
 
     /**
@@ -375,7 +302,6 @@ namespace calc {
     /**
      * @brief Get the Residual Norm at the current step
      *
-     * @param kappa the spring constant to use for the force
      * @return double
      */
     double MEHPForceRelaxation::getResidualNorm() const
@@ -401,7 +327,6 @@ namespace calc {
     /**
      * @brief Get the Force at the current step
      *
-     * @param kappa
      * @return double
      */
     double MEHPForceRelaxation::getForce() const
@@ -421,8 +346,7 @@ namespace calc {
      * from the nr of springs thanks to omitted free chains or primary loops)
      * @return double
      */
-    double MEHPForceRelaxation::getGammaFactor(double r02,
-                                               int nrOfChains) const
+    double MEHPForceRelaxation::getGammaFactor(double r02, int nrOfChains) const
     {
       if (r02 < 0) {
         r02 = this->defaultR0Squared;

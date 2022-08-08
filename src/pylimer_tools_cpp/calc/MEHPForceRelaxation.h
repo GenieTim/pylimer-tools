@@ -4,6 +4,8 @@
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
+#include "MEHPForceEvaluator.h"
+#include "MEHPUtilityStructures.h"
 #include <Eigen/Dense>
 #include <algorithm>
 #include <array>
@@ -26,79 +28,6 @@ namespace calc {
       X_TOLERANCE,
       MAX_STEPS,
       OTHER
-    };
-
-    typedef Eigen::Array<bool, Eigen::Dynamic, 1> ArrayXb;
-
-    // improved structures using Eigen
-    struct Network
-    {
-      double L[3];                /* box sizes */
-      double vol;                 /* box volume */
-      long int nrOfNodes;         /* number of nodes */
-      long int nrOfSprings;       /* number of springs */
-      double averageSpringLength; /* average spring length */
-      long int nrOfLoops;         /* loops */
-      // coordinates & coonectivity
-      Eigen::VectorXd coordinates;
-      Eigen::ArrayXi oldAtomIds;
-      Eigen::ArrayXi springCoordinateIndexA;
-      Eigen::ArrayXi springCoordinateIndexB;
-      Eigen::ArrayXi springIndexA;
-      Eigen::ArrayXi springIndexB;
-      // interesting properties
-      ArrayXb springIsActive;
-    };
-
-    // abstract class for having different force evaluations
-    class MEHPForceEvaluator
-    {
-    protected:
-      Network net;
-      bool is2D;
-
-    public:
-      virtual ~MEHPForceEvaluator() = default;
-      void setNetwork(Network& net);
-      Network getNetwork() const { return this->net; }
-      void setIs2D(bool is2D);
-      bool getIs2D() { return this->is2D; };
-      double evaluateForceSetGradient(const size_t n,
-                                      const double* x,
-                                      double* grad,
-                                      void* f_data) const;
-
-      double evaluateForceSetGradient(const size_t n,
-                                      const Eigen::VectorXd& u,
-                                      double* grad,
-                                      void* f_data) const;
-
-      virtual double evaluateForceSetGradient(
-        const size_t n,
-        const Eigen::VectorXd& springDistances,
-        const Eigen::VectorXd& u,
-        double* grad) const = 0;
-    };
-
-    // example implementation of MEHPForceRelaxation for simple spring (phantom
-    // systems)
-    class SimpleSpringMEHPForceEvaluator : public MEHPForceEvaluator
-    {
-      double kappa = 1.0;
-
-    public:
-      using MEHPForceEvaluator::getNetwork;
-      using MEHPForceEvaluator::setIs2D;
-      using MEHPForceEvaluator::setNetwork;
-      SimpleSpringMEHPForceEvaluator(double kappa = 1.0)
-      {
-        this->kappa = kappa;
-      }
-
-      double evaluateForceSetGradient(const size_t n,
-                                      const Eigen::VectorXd& springDistances,
-                                      const Eigen::VectorXd& u,
-                                      double* grad) const;
     };
 
     // heavily inspired by Prof. Dr. Andrei Gusev's Code
@@ -144,14 +73,12 @@ namespace calc {
        * @param xtol
        * @param ftol
        * @param loopTol
-       * @param kappa
        */
       void runForceRelaxation(const char* algorithm = "LD_MMA",
                               long int maxNrOfSteps = 50000, // default: 10000
                               double xtol = 1e-12,
                               double ftol = 1e-9,
-                              double loopTol = 1e-2,
-                              double kappa = 1.0);
+                              double loopTol = 1e-2);
 
       /**
        * @brief Get the universe consisting of cross-linkers only
@@ -175,6 +102,11 @@ namespace calc {
       MEHPForceEvaluator* getForceEvaluator() const
       {
         return this->forceEvaluator;
+      }
+
+      void setForceEvaluator(MEHPForceEvaluator* forceEvaluator)
+      {
+        this->forceEvaluator = forceEvaluator;
       }
 
       /**
@@ -251,24 +183,21 @@ namespace calc {
        */
       double getAverageSpringLength() const;
 
-      std::array<std::array<double, 3>, 3> getStressTensor(
-        const double kappa = 1.0) const;
+      std::array<std::array<double, 3>, 3> getStressTensor() const;
 
       /**
        * @brief Get the Pressure
        *
-       * @param kappa the spring constant to use for the force
        * @return double
        */
-      double getPressure(const double kappa = 1.0) const
+      double getPressure() const
       {
-        return this->evaluatePressure(this->currentSpringDistances, kappa);
+        return this->evaluatePressure(this->currentSpringDistances);
       }
 
       /**
        * @brief Get the Residual Norm at the current step
        *
-       * @param kappa the spring constant to use for the force
        * @return double
        */
       double getResidualNorm() const;
@@ -276,7 +205,6 @@ namespace calc {
       /**
        * @brief Get the Force at the current step
        *
-       * @param kappa
        * @return double
        */
       double getForce() const;
@@ -399,14 +327,12 @@ namespace calc {
        * distances
        *
        * @param springDistances the spring distances
-       * @param kappa the spring constant for the force factor
        * @return double
        */
-      double evaluatePressure(const Eigen::VectorXd& springDistances,
-                              const double kappa) const
+      double evaluatePressure(const Eigen::VectorXd& springDistances) const
       {
-        auto stressTensor = this->evaluateStressTensor(
-          springDistances, kappa, this->initialConfig.vol);
+        auto stressTensor =
+          this->evaluateStressTensor(springDistances, this->initialConfig.vol);
         return this->evaluatePressure(stressTensor);
       }
 
@@ -415,14 +341,11 @@ namespace calc {
        *
        * @param net the network to evaluate the pressure for
        * @param u the displacements
-       * @param kappa the spring constant for the force factor
        * @return double
        */
-      double evaluatePressure(Network* net,
-                              const Eigen::VectorXd& u,
-                              const double kappa) const
+      double evaluatePressure(Network* net, const Eigen::VectorXd& u) const
       {
-        auto stressTensor = this->evaluateStressTensor(net, u, kappa, -1);
+        auto stressTensor = this->evaluateStressTensor(net, u, -1);
         return this->evaluatePressure(stressTensor);
       }
 
@@ -440,18 +363,15 @@ namespace calc {
       }
 
       /**
-       * @brief Compute the stress tensor (kappa * distance^2 in each direction
-       * combination)
+       * @brief Compute the stress tensor
        *
        * @param net
        * @param u
-       * @param kappa
        * @param loopTol
        * @return std::array<std::array<double, 3>, 3>
        */
       std::array<std::array<double, 3>, 3> evaluateStressTensor(
         const Eigen::VectorXd& springDistances,
-        const double kappa,
         const double volume) const
       {
         std::array<std::array<double, 3>, 3> stress;
@@ -463,7 +383,8 @@ namespace calc {
           /* spring contribution to the overall stress tensor */
           for (size_t j = 0; j < 3; j++) {
             for (size_t k = 0; k < 3; k++) {
-              stress[j][k] += kappa * s[j] * s[k];
+              stress[j][k] +=
+                this->forceEvaluator->evaluateStressContribution(s, j, k);
             }
           }
         }
@@ -478,25 +399,22 @@ namespace calc {
       }
 
       /**
-       * @brief Compute the stress tensor (kappa * distance^2 in each direction
-       * combination)
+       * @brief Compute the stress tensor
        *
        * @param net
        * @param u
-       * @param kappa
        * @param loopTol
        * @return std::array<std::array<double, 3>, 3>
        */
       std::array<std::array<double, 3>, 3> evaluateStressTensor(
         Network* net,
         const Eigen::VectorXd& u,
-        const double kappa,
         const double loopTol) const
       {
         Eigen::VectorXd springDistances =
           this->evaluateSpringDistances(net, u, this->is2D);
 
-        return this->evaluateStressTensor(springDistances, kappa, net->vol);
+        return this->evaluateStressTensor(springDistances, net->vol);
       }
 
       /**
