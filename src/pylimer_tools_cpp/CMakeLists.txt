@@ -70,6 +70,8 @@ target_sources(pylimer_tools
 
 		${CMAKE_CURRENT_LIST_DIR}/utils/DataFileParser.cpp
 		${CMAKE_CURRENT_LIST_DIR}/utils/DumpFileParser.cpp
+
+		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceRelaxation.cpp
 	PUBLIC
 		${CMAKE_CURRENT_LIST_DIR}/entities/Box.h
 		${CMAKE_CURRENT_LIST_DIR}/entities/Atom.h
@@ -84,6 +86,7 @@ target_sources(pylimer_tools
 
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPanalysis.h
 		${CMAKE_CURRENT_LIST_DIR}/calc/MMTanalysis.h
+		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceRelaxation.h
 )
 
 set_target_properties(pylimer_tools PROPERTIES VERSION ${PROJECT_VERSION})

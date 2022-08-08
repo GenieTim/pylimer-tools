@@ -6,12 +6,59 @@
 #include "../calc/MMTanalysis.h"
 #include "../entities/Universe.h"
 
+#include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 namespace py = pybind11;
-using namespace pylimer_tools::calc;
 namespace pe = pylimer_tools::entities;
+
+using namespace pylimer_tools::calc;
+
+namespace pylimer_tools::calc::mehp {
+class PyMEHPForceEvaluator : public MEHPForceEvaluator
+{
+public:
+  using MEHPForceEvaluator::getNetwork;
+
+  typedef std::pair<double, std::vector<double>> returntype;
+  /* Trampoline */
+  virtual returntype evaluateForceSetGradient(
+    const size_t n,
+    const Eigen::VectorXd& springDistances,
+    const Eigen::VectorXd& u,
+    bool requiresGradient) const
+  {
+    PYBIND11_OVERRIDE_PURE(
+      returntype,               /* Return type */
+      MEHPForceEvaluator,       /* Parent class */
+      evaluateForceSetGradient, /* Name of function in C++ (must match Python
+                                   name) */
+      n,
+      springDistances,
+      u,
+      requiresGradient /* Argument(s) */
+    );
+  }
+
+  // actually overriding function, but simplifying for python possibilities
+  double evaluateForceSetGradient(const size_t n,
+                                  const Eigen::VectorXd& springDistances,
+                                  const Eigen::VectorXd& u,
+                                  double* grad) const
+  {
+    std::pair<double, std::vector<double>> trampolineResult =
+      this->evaluateForceSetGradient(n, springDistances, u, grad != nullptr);
+    if (grad != nullptr) {
+      assert(trampolineResult.second.size() == n);
+      for (size_t i = 0; i < n; ++i) {
+        grad[i] = trampolineResult.second[i];
+      }
+    }
+    return trampolineResult.first;
+  }
+};
+}
 
 void
 init_pylimer_bound_calc(py::module_& m)
@@ -25,6 +72,9 @@ init_pylimer_bound_calc(py::module_& m)
         &mmt::computeStoichiometricInbalance,
         "Compute stoichiometric inbalance");
 
+  /**
+   * MEHP
+   */
   py::enum_<mehp::ExitReason>(m, "ExitReason")
     .value("UNSET", mehp::ExitReason::UNSET)
     .value("MAX_STEPS", mehp::ExitReason::MAX_STEPS)
@@ -32,20 +82,62 @@ init_pylimer_bound_calc(py::module_& m)
     .value("X_TOLERANCE", mehp::ExitReason::X_TOLERANCE)
     .value("OTHER", mehp::ExitReason::OTHER);
 
+  py::class_<mehp::Network>(m, "SimplifiedNetwork", R"pbdoc(
+     A more efficient structure of the network for use in MEHP.
+     Consists usually only of the cross-linkers.
+ )pbdoc")
+    .def_readonly("boxLengths", &mehp::Network::L)
+    .def_readonly("volume", &mehp::Network::vol)
+    .def_readonly("nrOfNodes", &mehp::Network::nrOfNodes)
+    .def_readonly("nrOfSprings", &mehp::Network::nrOfSprings)
+    // .def_readonly("averageSpringLength", &mehp::Network::averageSpringLength)
+    // .def_readonly("nrOfLoops", &mehp::Network::nrOfLoops)
+    .def_readonly("coordinates", &mehp::Network::coordinates)
+    .def_readonly("oldAtomIds", &mehp::Network::oldAtomIds)
+    .def_readonly("springCoordinateIndexA",
+                  &mehp::Network::springCoordinateIndexA)
+    .def_readonly("springCoordinateIndexB",
+                  &mehp::Network::springCoordinateIndexB)
+    .def_readonly("springIndexA", &mehp::Network::springIndexA)
+    .def_readonly("springIndexB", &mehp::Network::springIndexB)
+    // .def_readonly("springIsActive", &mehp::Network::springIsActive)
+    ;
+
+  py::class_<mehp::MEHPForceEvaluator, mehp::PyMEHPForceEvaluator>(
+    m, "MEHPForceEvaluator")
+    .def(py::init<>())
+    .def_property_readonly("network", &mehp::MEHPForceEvaluator::getNetwork)
+    .def_property("is2D",
+                  &mehp::MEHPForceEvaluator::getIs2D,
+                  &mehp::MEHPForceEvaluator::setIs2D)
+//     .def("evaluateForceSetGradient",
+//          py::overload_cast<const size_t,
+//                            const Eigen::VectorXd&,
+//                            const Eigen::VectorXd&,
+//                            bool>(
+//            &mehp::MEHPForceEvaluator::evaluateForceSetGradient))
+           ;
+
+  py::class_<mehp::SimpleSpringMEHPForceEvaluator, mehp::MEHPForceEvaluator>(
+    m, "SimpleSpringMEHPForceEvaluator")
+    .def(py::init<double>(), py::arg("kappa") = 1.0);
+
   py::class_<mehp::MEHPForceRelaxation>(m, "MEHPForceRelaxation", R"pbdoc(
     A small simulation tool for quickly minimizing the force between the cross-linker beads.
      )pbdoc")
-    .def(py::init<pe::Universe, int, bool>(),
+    .def(py::init<pe::Universe, int, bool, mehp::MEHPForceEvaluator*>(),
          R"pbdoc(
           Instantiate the simulator for a certain universe.
 
           :param universe: the universe to simulate with
           :param crosslinkerType: The atom type of the cross-linkers. Needed to reduce the network.
           :param is2D: Whether to ignore the z direction.
+          :param forceEvaluator: The force evaluator to use
           )pbdoc",
          py::arg("universe"),
          py::arg("crosslinkerType") = 2,
-         py::arg("is2D") = false)
+         py::arg("is2D") = false,
+         py::arg("forceEvaluator") = nullptr)
     .def("runForceRelaxation",
          &mehp::MEHPForceRelaxation::runForceRelaxation,
          R"pbdoc(
@@ -71,18 +163,12 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceRelaxation::getForce,
          R"pbdoc(
           Returns the force at the current state of the simulation.
-          
-          :param kappa: The spring constant to use for the force evaluation.
-     )pbdoc",
-         py::arg("kappa") = 1.0)
+     )pbdoc")
     .def("getResidualNorm",
          &mehp::MEHPForceRelaxation::getResidualNorm,
          R"pbdoc(
           Returns the residual norm at the current state of the simulation.
-          
-          :param kappa: The spring constant to use for the force evaluation.
-     )pbdoc",
-         py::arg("kappa") = 1.0)
+     )pbdoc")
     .def("getPressure",
          &mehp::MEHPForceRelaxation::getPressure,
          R"pbdoc(
