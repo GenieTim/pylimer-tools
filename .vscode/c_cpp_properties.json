@@ -9,7 +9,9 @@
                 "${workspaceFolder}/vendor/nlopt/nloptLib-install/include",
                 "${workspaceFolder}/vendor/igraph/igraphLib-install/include",
                 "/usr/local/include/eigen3/",
-                "/usr/include/eigen3/"
+                "/usr/include/eigen3/",
+                "/usr/local/include",
+                "/usr/local/var/vcpkg/installed/x64-osx/include/python3.9/"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

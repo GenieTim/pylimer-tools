@@ -1834,7 +1834,7 @@ namespace entities {
    *
    * @return double
    */
-  double Universe::getVolume()
+  double Universe::getVolume() const
   {
     return this->box.getVolume();
   }
@@ -1906,7 +1906,7 @@ namespace entities {
     this->setBox(Box(Lx, Ly, Lz));
   }
 
-  Box Universe::getBox()
+  Box Universe::getBox() const
   {
     return this->box;
   }

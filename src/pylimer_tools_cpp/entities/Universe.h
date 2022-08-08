@@ -104,8 +104,8 @@ namespace entities {
     template<typename IN>
     long int findVertexIdForProperty(const char* propertyName,
                                      IN propertyValue) const;
-    Box getBox();
-    double getVolume();
+    Box getBox() const;
+    double getVolume() const;
     size_t getNrOfAtoms() const;
     size_t getNrOfBonds() const;
     size_t getNrOfAngles() const;

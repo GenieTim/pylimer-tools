@@ -50,11 +50,55 @@ namespace calc {
       ArrayXb springIsActive;
     };
 
-    struct AdditionalFunctionParameters
+    // abstract class for having different force evaluations
+    class MEHPForceEvaluator
     {
-      Network* net;
-      double kappa;
+    protected:
+      Network net;
       bool is2D;
+
+    public:
+      virtual ~MEHPForceEvaluator() = default;
+      void setNetwork(Network& net);
+      Network getNetwork() const { return this->net; }
+      void setIs2D(bool is2D);
+      bool getIs2D() { return this->is2D; };
+      double evaluateForceSetGradient(const size_t n,
+                                      const double* x,
+                                      double* grad,
+                                      void* f_data) const;
+
+      double evaluateForceSetGradient(const size_t n,
+                                      const Eigen::VectorXd& u,
+                                      double* grad,
+                                      void* f_data) const;
+
+      virtual double evaluateForceSetGradient(
+        const size_t n,
+        const Eigen::VectorXd& springDistances,
+        const Eigen::VectorXd& u,
+        double* grad) const = 0;
+    };
+
+    // example implementation of MEHPForceRelaxation for simple spring (phantom
+    // systems)
+    class SimpleSpringMEHPForceEvaluator : public MEHPForceEvaluator
+    {
+      double kappa = 1.0;
+
+    public:
+      using MEHPForceEvaluator::getNetwork;
+      using MEHPForceEvaluator::setIs2D;
+      using MEHPForceEvaluator::setNetwork;
+      SimpleSpringMEHPForceEvaluator(double kappa = 1.0)
+      {
+        this->kappa = kappa;
+      }
+
+      double evaluateForceSetGradient(const size_t n,
+                                      const Eigen::VectorXd& springDistances,
+                                      const Eigen::VectorXd& u,
+                                      double* grad) const;
     };
 
     // heavily inspired by Prof. Dr. Andrei Gusev's Code
@@ -64,13 +108,22 @@ namespace calc {
     public:
       MEHPForceRelaxation(const pylimer_tools::entities::Universe u,
                           int crosslinkerType = 2,
-                          bool is2D = false)
+                          bool is2D = false,
+                          MEHPForceEvaluator* forceEvaluator = nullptr,
+                          double kappa = 1.0)
         : universe(u)
       {
+        if (forceEvaluator == nullptr) {
+          this->springForceEvaluator = SimpleSpringMEHPForceEvaluator(kappa);
+          forceEvaluator = &this->springForceEvaluator;
+        }
+        this->forceEvaluator = forceEvaluator;
         // interpret network already to be able to give early results
         Network net;
         ConvertNetwork(&net, crosslinkerType);
         this->initialConfig = net;
+        this->forceEvaluator->setNetwork(net);
+        this->forceEvaluator->setIs2D(is2D);
         this->is2D = is2D;
         this->crosslinkerType = crosslinkerType;
         this->currentDisplacements =
@@ -98,216 +151,16 @@ namespace calc {
                               double xtol = 1e-12,
                               double ftol = 1e-9,
                               double loopTol = 1e-2,
-                              double kappa = 1.0)
-      {
-        this->simulationHasRun = true;
-        double stress[3][3];
-
-        for (size_t j = 0; j < 3; j++) {
-          for (size_t k = 0; k < 3; k++) {
-            stress[j][k] = 0.;
-          }
-        }
-
-        Network net = this->initialConfig;
-        const int M = this->universe.getMolecules(crosslinkerType).size();
-        const int N = this->universe.getMeanStrandLength(crosslinkerType) + 1;
-        const double bM = this->universe.computeMeanBondLength();
-        const int f =
-          this->universe.determineFunctionalityPerType()[crosslinkerType];
-        bool is2D = this->is2D;
-
-        /* array allocation */
-        std::vector<double> u0 =
-          pylimer_tools::utils::initializeWithValue(3 * net.nrOfNodes, 0.0);
-        Eigen::VectorXd u = Eigen::VectorXd::Zero(3 * net.nrOfNodes);
-
-        /* force relaxation */
-        nlopt::opt opt(algorithm, 3 * net.nrOfNodes);
-
-        AdditionalFunctionParameters params;
-        params.net = &net;
-        params.kappa = kappa;
-        params.is2D = this->is2D;
-        nlopt::func objectiveF = [](unsigned n,
-                                    const double* x,
-                                    double* grad,
-                                    void* f_data) -> double {
-          AdditionalFunctionParameters* fParams =
-            static_cast<AdditionalFunctionParameters*>(f_data);
-          return MEHPForceRelaxation::evaluateForceSetGradient(
-            fParams->net, fParams->kappa, fParams->is2D, n, x, grad, f_data);
-        };
-        opt.set_min_objective(objectiveF, &params);
-        // set constraints to support more algorithms
-        std::vector<double> upperBounds;
-        upperBounds.reserve(3 * net.nrOfNodes);
-        std::vector<double> lowerBounds;
-        lowerBounds.reserve(3 * net.nrOfNodes);
-        for (size_t i = 0; i < net.nrOfNodes; ++i) {
-          for (size_t dir = 0; dir < 3; ++dir) {
-            upperBounds.push_back(net.L[dir] * 0.5);
-            lowerBounds.push_back(-net.L[dir] * 0.5);
-          }
-        }
-        opt.set_upper_bounds(upperBounds);
-        opt.set_lower_bounds(lowerBounds);
-        // set exit conditions
-        opt.set_xtol_rel(xtol);
-        opt.set_ftol_rel(ftol);
-        opt.set_maxeval(maxNrOfSteps);
-        // start/set/run minimization
-        double minf;
-        nlopt::result res = opt.optimize(u0, minf);
-
-        // query solution & exit reason
-        assert(u0.size() == 3 * net.nrOfNodes);
-        u = Eigen::Map<Eigen::VectorXd>(u0.data(), u0.size());
-        this->currentDisplacements = u;
-        this->currentSpringDistances =
-          this->evaluateSpringDistances(&net, this->currentDisplacements, is2D);
-
-        this->exitReason = ExitReason::OTHER;
-        if (res == nlopt::result::FTOL_REACHED) {
-          this->exitReason = ExitReason::F_TOLERANCE;
-        } else if (res == nlopt::result::XTOL_REACHED) {
-          this->exitReason = ExitReason::X_TOLERANCE;
-        } else if (res == nlopt::result::MAXEVAL_REACHED) {
-          this->exitReason = ExitReason::MAX_STEPS;
-        }
-        this->nrOfStepsDone += opt.get_numevals();
-      };
+                              double kappa = 1.0);
 
       /**
-       * @brief This function does the step
+       * @brief Get the universe consisting of cross-linkers only
        *
-       * This function is public for testing purposes — TODO: find a better way
-       *
-       * @param net
-       * @param kappa
-       * @param is2D
-       * @param n
-       * @param x
-       * @param grad
-       * @param f_data
-       * @return double
+       * @param newCrosslinkerType the type to give the cross-linkers
+       * @return pylimer_tools::entities::Universe
        */
-      static double evaluateForceSetGradient(const Network* net,
-                                             const double kappa,
-                                             const bool is2D,
-                                             const unsigned n,
-                                             const double* x,
-                                             double* grad,
-                                             void* f_data)
-      {
-        Eigen::Map<const Eigen::VectorXd> u =
-          Eigen::Map<const Eigen::VectorXd>(x, n);
-        return evaluateForceSetGradient(net, kappa, is2D, n, u, grad, f_data);
-      }
-
-      /**
-       * @brief This function does the step
-       *
-       * This function is public for testing purposes — TODO: find a better way
-       *
-       * @param net
-       * @param kappa
-       * @param is2D
-       * @param n
-       * @param u
-       * @param grad
-       * @param f_data
-       * @return double
-       */
-      static double evaluateForceSetGradient(const Network* net,
-                                             const double kappa,
-                                             const bool is2D,
-                                             const unsigned n,
-                                             const Eigen::VectorXd& u,
-                                             double* grad,
-                                             void* f_data)
-      {
-        assert(n == net->nrOfNodes * 3);
-        assert(u.size() == net->coordinates.size());
-        Eigen::VectorXd springDistances =
-          MEHPForceRelaxation::evaluateSpringDistances(net, u, is2D);
-
-        double s2 = springDistances.squaredNorm();
-        double constantMultiplier = kappa; // * 0.5 / s2;
-        if (grad != NULL) {
-          for (size_t j = 0; j < n; ++j) {
-            grad[j] = 0.0;
-          }
-          for (size_t j = 0; j < net->nrOfSprings; ++j) {
-            int a = net->springIndexA[j];
-            int b = net->springIndexB[j];
-            int nrOfDim = is2D ? 2 : 3;
-            for (size_t dir = 0; dir < nrOfDim; ++dir) {
-              grad[3 * a + dir] +=
-                springDistances[3 * j + dir] * constantMultiplier;
-              grad[3 * b + dir] -=
-                springDistances[3 * j + dir] * constantMultiplier;
-            }
-          }
-        }
-        double s2m = 0.0;
-        for (size_t i = 0; i < 3 * net->nrOfSprings; ++i) {
-          s2m += springDistances[i] * springDistances[i];
-        }
-        // std::cout << "Evaluated force to " << std::setprecision(15)
-        //           << 0.5 * kappa * s2 << ", whereas manual gives "
-        //           << s2m * 0.5 * kappa << std::endl;
-        return 0.5 * kappa * s2;
-      }
-
       pylimer_tools::entities::Universe getCrosslinkerVerse(
-        int newCrosslinkerType = 2)
-      {
-        // convert nodes & springs back to a universe
-        pylimer_tools::entities::Universe xlinkUniverse =
-          pylimer_tools::entities::Universe(this->universe.getBox());
-        std::vector<long int> ids;
-        std::vector<int> types = pylimer_tools::utils::initializeWithValue(
-          this->initialConfig.nrOfNodes, crosslinkerType);
-        std::vector<double> x;
-        std::vector<double> y;
-        std::vector<double> z;
-        std::vector<int> zeros = pylimer_tools::utils::initializeWithValue(
-          this->initialConfig.nrOfNodes, 0);
-        ids.reserve(this->initialConfig.nrOfNodes);
-        x.reserve(this->initialConfig.nrOfNodes);
-        y.reserve(this->initialConfig.nrOfNodes);
-        z.reserve(this->initialConfig.nrOfNodes);
-        for (int i = 0; i < this->initialConfig.nrOfNodes; ++i) {
-          x.push_back(this->initialConfig.coordinates[3 * i + 0] +
-                      this->currentDisplacements[3 * i + 0]);
-          y.push_back(this->initialConfig.coordinates[3 * i + 1] +
-                      this->currentDisplacements[3 * i + 1]);
-          z.push_back(this->initialConfig.coordinates[3 * i + 2] +
-                      this->currentDisplacements[3 * i + 2]);
-          ids.push_back(this->initialConfig.oldAtomIds[i]);
-        }
-        xlinkUniverse.addAtoms(ids, types, x, y, z, zeros, zeros, zeros);
-        std::vector<long int> bondFrom;
-        std::vector<long int> bondTo;
-        bondFrom.reserve(this->initialConfig.nrOfSprings);
-        bondTo.reserve(this->initialConfig.nrOfSprings);
-        for (int i = 0; i < this->initialConfig.nrOfSprings; ++i) {
-          bondFrom.push_back(
-            this->initialConfig
-              .oldAtomIds[this->initialConfig.springIndexA[i]]);
-          bondTo.push_back(this->initialConfig
-                             .oldAtomIds[this->initialConfig.springIndexB[i]]);
-        }
-        xlinkUniverse.addBonds(
-          bondFrom.size(),
-          bondFrom,
-          bondTo,
-          pylimer_tools::utils::initializeWithValue(bondFrom.size(), 1),
-          false,
-          false); // disable simplify to keep the self-loops etc.
-        return xlinkUniverse;
-      }
+        int newCrosslinkerType = 2) const;
 
       int getDefaultNrOfChains() const { return this->defaultNrOfChains; }
 
@@ -318,6 +171,11 @@ namespace calc {
       int getNrOfNodes() const { return this->initialConfig.nrOfNodes; }
 
       int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
+
+      MEHPForceEvaluator* getForceEvaluator() const
+      {
+        return this->forceEvaluator;
+      }
 
       /**
        * @brief Get the Nr Of Active Nodes
@@ -339,27 +197,16 @@ namespace calc {
 
       /**
        * @brief Get the Effective Functionality Of each node
-       * 
-       * Returns the number of active springs connected to each atom, atomId used as index
-       * 
+       *
+       * Returns the number of active springs connected to each atom, atomId
+       * used as index
+       *
        * @param tolerance the tolerance: springs under a certain length are
        * considered inactive
-       * @return std::unordered_map<long int, int> 
+       * @return std::unordered_map<long int, int>
        */
       std::unordered_map<long int, int> getEffectiveFunctionalityOfAtoms(
-        double tolerance = 0.1) const
-      {
-        std::unordered_map<long int, int> results;
-        results.reserve(this->initialConfig.nrOfNodes);
-
-        Eigen::VectorXi nrOfActiveSpringsConnected =
-          this->getNrOfActiveSpringsConnected(tolerance);
-        for (size_t i = 0; i < this->initialConfig.nrOfNodes; i++) {
-          results.emplace(this->initialConfig.oldAtomIds[i],
-                          nrOfActiveSpringsConnected[i]);
-        }
-        return results;
-      }
+        double tolerance = 0.1) const;
 
       /**
        * @brief Get the Ids Of active Nodes
@@ -373,23 +220,7 @@ namespace calc {
       std::vector<long int> getIdsOfActiveNodes(
         double tolerance = 0.1,
         int minimumNrOfActiveConnections = 2,
-        int maximumNrOfActiveConnections = -1) const
-      {
-        std::vector<long int> results;
-        results.reserve(this->initialConfig.nrOfNodes);
-
-        Eigen::VectorXi nrOfActiveSpringsConnected =
-          this->getNrOfActiveSpringsConnected(tolerance);
-        for (size_t i = 0; i < this->initialConfig.nrOfNodes; i++) {
-          if (nrOfActiveSpringsConnected[i] >= minimumNrOfActiveConnections &&
-              (maximumNrOfActiveConnections < 0 ||
-               maximumNrOfActiveConnections >= nrOfActiveSpringsConnected[i])) {
-            results.push_back(this->initialConfig.oldAtomIds[i]);
-          }
-        }
-
-        return results;
-      }
+        int maximumNrOfActiveConnections = -1) const;
 
       /**
        * @brief Get the Nr Of Active Springs connected to each node
@@ -399,23 +230,7 @@ namespace calc {
        * @return Eigen::VectorXi
        */
       Eigen::VectorXi getNrOfActiveSpringsConnected(
-        double tolerance = 0.1) const
-      {
-        Eigen::VectorXi nrOfActiveSpringsConnected =
-          Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
-        ArrayXb springIsActive =
-          this->findActiveSprings(this->currentSpringDistances, tolerance);
-        for (size_t i = 0; i < this->initialConfig.nrOfSprings; i++) {
-          if (springIsActive[i] == true) /* active spring */
-          {
-            int a = this->initialConfig.springIndexA[i];
-            int b = this->initialConfig.springIndexB[i];
-            ++(nrOfActiveSpringsConnected[a]);
-            ++(nrOfActiveSpringsConnected[b]);
-          }
-        }
-        return nrOfActiveSpringsConnected;
-      }
+        double tolerance = 0.1) const;
 
       /**
        * @brief Get the Nr Of Active Springs object
@@ -434,26 +249,10 @@ namespace calc {
        *
        * @return double
        */
-      double getAverageSpringLength() const
-      {
-        double r2 = 0.0;
-        for (int i = 0; i < this->initialConfig.nrOfSprings; i++) {
-          double r2local = 0.0;
-          for (int j = 0; j < 3; ++j) {
-            r2local += this->currentSpringDistances[i * 3 + j] *
-                       this->currentSpringDistances[i * 3 + j];
-          }
-          r2 += sqrt(r2local);
-        }
-        return r2 / this->initialConfig.nrOfSprings;
-      }
+      double getAverageSpringLength() const;
 
       std::array<std::array<double, 3>, 3> getStressTensor(
-        const double kappa = 1.0) const
-      {
-        return this->evaluateStressTensor(
-          this->currentSpringDistances, kappa, this->initialConfig.vol);
-      }
+        const double kappa = 1.0) const;
 
       /**
        * @brief Get the Pressure
@@ -472,27 +271,7 @@ namespace calc {
        * @param kappa the spring constant to use for the force
        * @return double
        */
-      double getResidualNorm(double kappa = 1.0) const
-      {
-        double* r = new double[3 * this->initialConfig.nrOfNodes];
-        for (size_t i = 0; i < this->initialConfig.nrOfNodes * 3; ++i) {
-          r[i] = 0.0;
-        }
-        this->evaluateForceSetGradient(&this->initialConfig,
-                                       kappa,
-                                       this->is2D,
-                                       3 * this->initialConfig.nrOfNodes,
-                                       this->currentDisplacements,
-                                       r,
-                                       NULL);
-        double r2 = 0.;
-        for (size_t i = 0; i < 3 * this->initialConfig.nrOfNodes; i++) {
-          r2 += r[i] * r[i];
-        }
-
-        delete[](r);
-        return r2;
-      }
+      double getResidualNorm() const;
 
       /**
        * @brief Get the Force at the current step
@@ -500,16 +279,7 @@ namespace calc {
        * @param kappa
        * @return double
        */
-      double getForce(double kappa = 1.0) const
-      {
-        return this->evaluateForceSetGradient(&this->initialConfig,
-                                              kappa,
-                                              this->is2D,
-                                              3 * this->initialConfig.nrOfNodes,
-                                              this->currentDisplacements,
-                                              NULL,
-                                              NULL);
-      }
+      double getForce() const;
 
       /**
        * @brief Get the Gamma Factor at the current step
@@ -519,22 +289,22 @@ namespace calc {
        * from the nr of springs thanks to omitted free chains or primary loops)
        * @return double
        */
-      double getGammaFactor(double r02 = -1.0, int nrOfChains = -1) const
-      {
-        if (r02 < 0) {
-          r02 = this->defaultR0Squared;
-        }
-        if (nrOfChains < 1) {
-          nrOfChains = this->defaultNrOfChains;
-        }
-
-        return this->evaluateGammaFactor(
-          this->currentSpringDistances, r02, nrOfChains);
-      }
+      double getGammaFactor(double r02 = -1.0, int nrOfChains = -1) const;
 
       int getNrOfIterations() const { return this->nrOfStepsDone; }
 
       ExitReason getExitReason() const { return this->exitReason; }
+
+      /**
+       * @brief Compute the spring lenghts
+       *
+       * @param net the network to do the computation for
+       * @param u the displacements on top of the network
+       * @return Eigen::VectorXd
+       */
+      static Eigen::VectorXd evaluateSpringDistances(const Network* net,
+                                                     const Eigen::VectorXd& u,
+                                                     const bool is2D);
 
     protected:
       /**
@@ -765,56 +535,12 @@ namespace calc {
         return result;
       }
 
-      /**
-       * @brief Compute the spring lenghts
-       *
-       * @param net the network to do the computation for
-       * @param u the displacements on top of the network
-       * @return Eigen::VectorXd
-       */
-      static Eigen::VectorXd evaluateSpringDistances(const Network* net,
-                                                     const Eigen::VectorXd& u,
-                                                     const bool is2D)
-      {
-        double boxHalfs[3];
-        boxHalfs[0] = 0.5 * net->L[0];
-        boxHalfs[1] = 0.5 * net->L[1];
-        boxHalfs[2] = 0.5 * net->L[2];
-        // first, the distances
-        assert(u.size() == net->coordinates.size());
-        Eigen::VectorXd actualCoordinates = net->coordinates + u;
-        // It *could* be more efficient to index u instead of the coordinates
-        Eigen::VectorXd coordinatesSpringEndA =
-          actualCoordinates(net->springCoordinateIndexA);
-        Eigen::VectorXd coordinatesSpringEndB =
-          actualCoordinates(net->springCoordinateIndexB);
-        Eigen::VectorXd springDistances =
-          (coordinatesSpringEndA - coordinatesSpringEndB);
-
-        if (is2D) {
-          // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
-          //   Eigen::VectorXd::Zero(net->nrOfSprings / 3);
-          for (size_t i = 2; i < 3 * net->nrOfSprings; i += 3) {
-            springDistances[i] = 0.0;
-          }
-        }
-        assert(springDistances.size() == net->nrOfSprings * 3);
-
-        // Possibly improvable PBC
-        for (size_t j = 0; j < 3 * net->nrOfSprings; ++j) {
-          while (springDistances[j] > boxHalfs[j % 3]) {
-            springDistances[j] -= net->L[j % 3];
-          }
-          while (springDistances[j] < -boxHalfs[j % 3]) {
-            springDistances[j] += net->L[j % 3];
-          }
-        }
-
-        return springDistances;
-      }
-
     private:
       pylimer_tools::entities::Universe universe;
+      MEHPForceEvaluator* forceEvaluator;
+
+      SimpleSpringMEHPForceEvaluator
+        springForceEvaluator; // helper for memory time
       bool is2D = false;
       bool simulationHasRun = false;
       int stepOutputFrequency = 0;

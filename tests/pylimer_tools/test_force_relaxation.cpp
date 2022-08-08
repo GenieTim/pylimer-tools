@@ -98,23 +98,27 @@ TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
     grad[i] = 0.0;
     x[i] = 0.0;
   }
+  pcm::SimpleSpringMEHPForceEvaluator forceEvaluatorInstance =
+    pcm::SimpleSpringMEHPForceEvaluator(1.0);
+  pcm::MEHPForceEvaluator* forceEvaluator = &forceEvaluatorInstance;
+  forceEvaluator->setIs2D(false);
+  forceEvaluator->setNetwork(net);
   // actual computation to test gradient
   for (size_t i = 0; i < 12; ++i) {
     // std::cout << "MEHP Gradient Test coordinate " << i << std::endl;
     // evaluate gradient
-    double f = forceRelaxer2.evaluateForceSetGradient(
-      &net, 1.0, false, 12, x, grad, NULL);
+    double f = forceEvaluator->evaluateForceSetGradient(12, x, grad, nullptr);
     if (i % 3 != 0) {
       // in x and y direction, we expect no spring distance -> 0 gradient
       REQUIRE(grad[i] == Catch::Approx(0.0));
     } else {
       // test finite difference vs. gradient
       x[i] = -h;
-      double fm = forceRelaxer2.evaluateForceSetGradient(
-        &net, 1.0, false, 12, x, NULL, NULL);
+      double fm =
+        forceEvaluator->evaluateForceSetGradient(12, x, nullptr, nullptr);
       x[i] = h;
-      double fp = forceRelaxer2.evaluateForceSetGradient(
-        &net, 1.0, false, 12, x, NULL, NULL);
+      double fp =
+        forceEvaluator->evaluateForceSetGradient(12, x, nullptr, nullptr);
       x[i] = 0.0; // reset
       // std::cout << i << " " << fm << " " << fp << " " << f << std::endl;
       // require gradient to be similar to finite difference

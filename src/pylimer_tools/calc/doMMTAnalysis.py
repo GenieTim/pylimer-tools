@@ -107,7 +107,7 @@ def predictNumberDensityOfNetworkStrands(network: Universe, crosslinkerType: int
             "Currently, only junction functionalities of 3 and 4 are supported")
 
 
-def calculateWeightFractionOfDanglingChains(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def calculateWeightFractionOfDanglingChains(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None, r: float = None, p: float = None) -> float:
     """
     Compute the weight fraction of dangling strands in infinite network
 
@@ -120,10 +120,10 @@ def calculateWeightFractionOfDanglingChains(network: Universe, crosslinkerType: 
     Returns:
       - weightFraction $\\Phi_d = 1 - \\Phi_{el}$: weightDangling/weightTotal
     """
-    return 1 - calculateWeightFractionOfBackbone(network, crosslinkerType, strandLength, functionalityPerType)
+    return 1 - calculateWeightFractionOfBackbone(network, crosslinkerType, strandLength, functionalityPerType, weightFractions, r, p)
 
 
-def calculateWeightFractionOfBackbone(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None) -> float:
+def calculateWeightFractionOfBackbone(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None, r: float = None, p: float = None) -> float:
     """
     Compute the weight fraction of the backbone strands in an infinite network
 
@@ -140,14 +140,14 @@ def calculateWeightFractionOfBackbone(network: Universe, crosslinkerType: int, s
     Returns:
       - :math:`\\Phi_{el}`: weight fraction of network backbone
     """
-    if (network.getNrOfAtoms() == 0):
+    if (network is not None and network.getNrOfAtoms() == 0):
         return 0
 
     if (functionalityPerType is None or crosslinkerType not in functionalityPerType):
         functionalityPerType = network.determineFunctionalityPerType()
 
     W_sol, weightFractions, alpha, beta = computeWeightFractionOfSolubleMaterial(
-        network, crosslinkerType, strandLength, functionalityPerType)
+        network, crosslinkerType, strandLength, functionalityPerType, weightFractions, r, p)
     if (W_sol < 0 or W_sol > 1):
         warnings.warn(
             "The weight fraction W_sol predicted by MMT ({}) is outside accepted range. Falling back to measurement.".format(W_sol))
@@ -204,7 +204,7 @@ def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.7
     return solubleWeight/totalWeight
 
 
-def computeWeightFractionOfSolubleMaterial(network: Universe = None, crosslinkerType: int = 2, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None, r: float = None, p: float = None) -> float:
+def computeWeightFractionOfSolubleMaterial(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None, r: float = None, p: float = None) -> float:
     """
     Compute the weight fraction of soluble material by MMT.
 
