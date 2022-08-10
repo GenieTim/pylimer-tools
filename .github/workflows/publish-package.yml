@@ -32,9 +32,9 @@ jobs:
             ~\AppData\Local\pip\Cache
             .\vendor\igraph
             .\_skbuild
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
       - name: Install Dependencies
         run: pip install -r requirements.txt
@@ -82,9 +82,9 @@ jobs:
             ~/Library/Caches/pip
             ./vendor/igraph
             ./_skbuild
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
       - name: Install Dependencies
         run: pip install -r requirements.txt
@@ -120,9 +120,9 @@ jobs:
             ~/.cache/pip
             ./vendor/igraph
             ./_skbuild
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-pip-
+            ${{ runner.os }}-pip-${{ matrix.python-version }}-
 
       - name: Install Dependencies
         run: pip install -r requirements.txt
