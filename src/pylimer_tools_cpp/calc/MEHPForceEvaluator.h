@@ -14,7 +14,7 @@ namespace calc {
     {
     protected:
       Network net;
-      bool is2D;
+      bool is2D = false;
 
     public:
       virtual ~MEHPForceEvaluator() = default;
