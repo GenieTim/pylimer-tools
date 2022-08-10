@@ -6,9 +6,11 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <math.h> // fabs, log, copysign, fma
 #include <nlopt.hpp>
 #include <string>
 #include <tuple>
@@ -47,14 +49,14 @@ namespace calc {
 
       double s2 = springDistances.squaredNorm();
       if (grad != nullptr) {
-        double constantMultiplier = this->kappa; // * 0.5 / s2;
+        const double constantMultiplier = this->kappa; // * 0.5 / s2;
+        const int nrOfDim = this->is2D ? 2 : 3;
         for (size_t j = 0; j < n; ++j) {
           grad[j] = 0.0;
         }
         for (size_t j = 0; j < this->net.nrOfSprings; ++j) {
-          int a = this->net.springIndexA[j];
-          int b = this->net.springIndexB[j];
-          int nrOfDim = this->is2D ? 2 : 3;
+          const int a = this->net.springIndexA[j];
+          const int b = this->net.springIndexB[j];
           for (size_t dir = 0; dir < nrOfDim; ++dir) {
             grad[3 * a + dir] +=
               springDistances[3 * j + dir] * constantMultiplier;
@@ -85,12 +87,19 @@ namespace calc {
      *
      *  USE_FMA == 0: max. ulp error < 4.27, max. relative error < 4.43e-7
      *  USE_FMA == 1: max. ulp error < 3.64, max. relative error < 3.84e-7
+     * @source: https://scicomp.stackexchange.com/a/30251
      */
-    float langevin_invf(float x)
+    float langevin_invf(const float x)
     {
       float p, r, t;
-      if ((fabsf(x) > 0.890625f) && (fabsf(x) <= 1.0f)) {
-        r = copysignf(1.0f / (fabsf(x) - 1.0f), x);
+      if (fabsf(x) > 0.99999) {
+        // TODO: do better.
+        // we have two problems: the value must be larger than whatever the
+        // langevin should return, and second, the value should be small enough
+        // to prevent overflow when summing them up.
+        return 1e5 * x * x;
+        //} else if ((fabsf(x) > 0.890625f) && (fabsf(x) <= 1.0f)) {
+        // r = copysignf(1.0f / (fabsf(x) - 1.0f), x);
       } else {
         t = MYFMAF(x, 0.0f - x, 1.0f); // compute 1-x*x accurately
         t = logf(t);
@@ -113,6 +122,11 @@ namespace calc {
       return r;
     }
 
+    double csch(double x)
+    {
+      return 1. / sinh(x);
+    };
+
     double NonGaussianSpringForceEvaluator::evaluateForceSetGradient(
       const size_t n,
       const Eigen::VectorXd& springDistances,
@@ -120,14 +134,57 @@ namespace calc {
       double* grad) const
     {
       if (grad != nullptr) {
-        throw std::runtime_error(
-          "NonGaussianSpringForceEvaluator::evaluateForceSetGradient does not "
-          "support setting the gradient.");
+        for (size_t j = 0; j < n; ++j) {
+          grad[j] = 0.0;
+        }
+        const int nrOfDim = this->is2D ? 2 : 3;
+        for (size_t i = 0; i < this->net.nrOfSprings; ++i) {
+          const int a = this->net.springIndexA[i];
+          const int b = this->net.springIndexB[i];
+          const double r =
+            sqrt(springDistances[3 * i] * springDistances[3 * i] +
+                 springDistances[3 * i + 1] * springDistances[3 * i + 1] +
+                 springDistances[3 * i + 2] * springDistances[3 * i + 2]);
+          const double linv = static_cast<double>(
+            langevin_invf(static_cast<float>(r * this->oneOverNl)));
+          if (std::isnan(linv) || std::isinf(linv)) {
+            std::cerr << "Got " << linv << " for spring " << i
+                     << " and distance " << r << std::endl;
+          }
+          for (size_t dir = 0; dir < nrOfDim; ++dir) {
+            double springDistance = springDistances[3 * i + dir];
+            double cschTerm = csch(linv);
+            double gradTerm =
+              -this->kappa * this->oneOverl * this->oneOverNl * springDistance;
+            gradTerm =
+              gradTerm / (r * (-cschTerm * cschTerm + 1. / (linv * linv)));
+            // fixes to prevent nans
+            if (std::isinf(cschTerm) || springDistance == 0.0) {
+              gradTerm = 0.0;
+            }
+            if (std::isnan(gradTerm) || std::isinf(gradTerm)) {
+              std::cerr << "Got " << gradTerm << " for gradTerm for spring " << i
+                       << ", dir " << dir << " and distance " << r
+                       << ", scsch term " << cschTerm << std::endl;
+            }
+            grad[3 * a + dir] += gradTerm;
+            grad[3 * b + dir] -= gradTerm;
+          }
+        }
       }
 
-      double s2 = springDistances.squaredNorm();
+      double force = 0.0;
+      for (size_t i = 0; i < this->net.nrOfSprings; ++i) {
+        double r =
+          sqrt(springDistances[3 * i] * springDistances[3 * i] +
+               springDistances[3 * i + 1] * springDistances[3 * i + 1] +
+               springDistances[3 * i + 2] * springDistances[3 * i + 2]);
+        double linv = static_cast<double>(
+          langevin_invf(static_cast<float>(r * this->oneOverNl)));
+        force += 0.5 * (this->kappa * this->oneOverl) * linv;
+      }
 
-      return 0.5 * (this->kappa / this->l) * langevin_invf(s2 / (N * l));
+      return force;
     }
   }
 }

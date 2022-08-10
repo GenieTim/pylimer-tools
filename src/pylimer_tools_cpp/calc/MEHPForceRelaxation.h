@@ -99,10 +99,10 @@ namespace calc {
 
       int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
 
-      MEHPForceEvaluator* getForceEvaluator() const
-      {
-        return this->forceEvaluator;
-      }
+      // MEHPForceEvaluator getForceEvaluator() const
+      // {
+      //   return *this->forceEvaluator;
+      // }
 
       void setForceEvaluator(MEHPForceEvaluator* forceEvaluator)
       {

@@ -146,3 +146,5 @@ tests/pylimer_tools/fixtures/xlinked_0.90015_pdms_1e4_a_78_bs_t_807536.structure
 
 tests/pylimer_tools/fixtures/xlinked_0.94995_pdms_1e4_a_78_bs_t_1711038.structure.out
 tests/pylimer_tools/fixtures/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out
+
+output*.txt

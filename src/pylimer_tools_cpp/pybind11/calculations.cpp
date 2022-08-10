@@ -98,6 +98,15 @@ init_pylimer_bound_calc(py::module_& m)
     .value("X_TOLERANCE", mehp::ExitReason::X_TOLERANCE)
     .value("OTHER", mehp::ExitReason::OTHER);
 
+  m.def("inverse_langevin",
+        &mehp::langevin_invf,
+        R"pbdoc(
+     A somewhat accurate (for :math:`x \in (-1, 1)`) implementation of the inverse Langevin.
+
+     Source: https://scicomp.stackexchange.com/a/30251
+  )pbdoc",
+        py::arg("x"));
+
   py::class_<mehp::Network>(m, "SimplifiedNetwork", R"pbdoc(
      A more efficient structure of the network for use in MEHP.
      Consists usually only of the cross-linkers.
@@ -138,33 +147,37 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceEvaluator::evaluateStressContribution,
          R"pbdoc(
           An evaluation of the stress-contribution.
-    )pbdoc");
 
-  py::class_<mehp::PyMEHPForceEvaluator, mehp::MEHPForceEvaluator>(
-    m, "PyMEHPForceEvaluator", R"pbdoc(
-     The Python access to implement a custom force to be evaluated during a MEHP run.
-    )pbdoc")
-    .def(py::init<>())
-    .def("evaluateForceAndGradient",
-         &mehp::PyMEHPForceEvaluator::evaluateForceAndGradient,
-         R"pbdoc(
-     One of the two functions to override.
+          :param springDistances: the three coordinate differences for one spring.
+          :param i: the row index of the stress tensor
+          :param j: the column index of the stress tensor
+    )pbdoc", py::arg("springDistances"), py::arg("i"), py::arg("j"));
 
-     :param n: the dimensionality of the problem (the nr. of spring coordinates)
-     :param springDistances: the sequential (x, y, z) spring distances
-     :param displacements: the displacements from the original coordinates 
-          (accessible by :func:`~pylimer_tools_cpp.pylimer_tools_cpp.PyMEHPForceEvaluator.getNetwork().coordinates`)
-     :param gradientNeeded: whether the gradient should be computed and returned
+//   py::class_<mehp::PyMEHPForceEvaluator, mehp::MEHPForceEvaluator>(
+//     m, "CustomMEHPForceEvaluator", R"pbdoc(
+//      The Python access to implement a custom force to be evaluated during a MEHP run.
+//     )pbdoc")
+//     .def(py::init<>())
+//     .def("evaluateForceAndGradient",
+//          &mehp::PyMEHPForceEvaluator::evaluateForceAndGradient,
+//          R"pbdoc(
+//      One of the two functions to override, the other being :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.evaluateStressContribution`.
 
-     Returns:
-          - force: the result of the force computation.
-          - gradient: the result of the gradient computation. 
-               Only needed if the parameter `gradientNeeded` is true, otherwise an empty list is sufficient.
-    )pbdoc",
-         py::arg("n"),
-         py::arg("springDistances"),
-         py::arg("displacements"),
-         py::arg("gradientNeeded"));
+//      :param n: the dimensionality of the problem (the nr. of spring coordinates)
+//      :param springDistances: the sequential (x, y, z) spring distances
+//      :param displacements: the displacements from the original coordinates 
+//           (accessible by :func:`~pylimer_tools_cpp.pylimer_tools_cpp.CustomMEHPForceEvaluator.getNetwork().coordinates`)
+//      :param gradientNeeded: whether the gradient should be computed and returned
+
+//      Returns:
+//           - force: the result of the force computation.
+//           - gradient: the result of the gradient computation. 
+//                Only needed if the parameter `gradientNeeded` is true, otherwise an empty list is sufficient.
+//     )pbdoc",
+//          py::arg("n"),
+//          py::arg("springDistances"),
+//          py::arg("displacements"),
+//          py::arg("gradientNeeded"));
 
   py::class_<mehp::SimpleSpringMEHPForceEvaluator, mehp::MEHPForceEvaluator>(
     m, "SimpleSpringMEHPForceEvaluator", R"pbdoc(
@@ -173,6 +186,8 @@ init_pylimer_bound_calc(py::module_& m)
      The force for a certain spring is given by:
      :math:`f = 0.5 \cdot \kappa r`, 
      where :math:`r` is the spring [between cross-linkers] length.
+
+     Recommended optimization algorithm: "LD_LBFGS"
 
      :param kappa: the spring constant :math:`\kappa`
     )pbdoc")
@@ -184,13 +199,19 @@ init_pylimer_bound_calc(py::module_& m)
 
      The force for a certain spring is given by:
      :math:`f = 0.5 \cdot \frac{\kappa}{l} \scriptL^{-1}(\frac{r}{N\cdot l})`, 
-     where :math:`r` is the spring [between cross-linkers] length.
+     where :math:`r` is the spring [between cross-linkers] length 
+     and :math:`\scriptL^{-1}` the inverse langevin function.
+
+     Please note that the inverse langevin is only approximated.
+
+     Recommended optimization algorithm: "LD_MMA"
 
      :param kappa: the spring constant :math:`\kappa`
      :param N: The number of links in a spring
      :param l: The  the length of a spring in the chain
     )pbdoc")
-    .def(py::init<double, double, double>(), "Initialize this ForceEvaluator",
+    .def(py::init<double, double, double>(),
+         "Initialize this ForceEvaluator",
          py::arg("kappa") = 1.0,
          py::arg("N") = 1.0,
          py::arg("l") = 1.0);
@@ -231,6 +252,12 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("xTolerance") = 1e-12,
          py::arg("fTolerance") = 1e-9,
          py::arg("loopTol") = 1e-2)
+     // .def("getForceEvaluator", &mehp::MEHPForceRelaxation::getForceEvaluator, R"pbdoc(
+     //      Query the currently used force evaluator.
+     // )pbdoc")
+     .def("setForceEvaluator", &mehp::MEHPForceRelaxation::setForceEvaluator, R"pbdoc(
+          Reset the currently used force evaluator.
+     )pbdoc")
     .def("getForce",
          &mehp::MEHPForceRelaxation::getForce,
          R"pbdoc(
