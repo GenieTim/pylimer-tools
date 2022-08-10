@@ -211,10 +211,11 @@ namespace calc {
       return r2 / this->initialConfig.nrOfSprings;
     }
 
-    std::array<std::array<double, 3>, 3> MEHPForceRelaxation::getStressTensor() const
+    std::array<std::array<double, 3>, 3> MEHPForceRelaxation::getStressTensor()
+      const
     {
-      return this->evaluateStressTensor(
-        this->currentSpringDistances, this->initialConfig.vol);
+      return this->evaluateStressTensor(this->currentSpringDistances,
+                                        this->initialConfig.vol);
     }
 
     /**
@@ -310,11 +311,16 @@ namespace calc {
       for (size_t i = 0; i < this->initialConfig.nrOfNodes * 3; ++i) {
         r[i] = 0.0;
       }
-      this->forceEvaluator->evaluateForceSetGradient(
-        3 * this->initialConfig.nrOfNodes,
-        this->currentSpringDistances,
-        this->currentDisplacements,
-        r);
+      try {
+        this->forceEvaluator->evaluateForceSetGradient(
+          3 * this->initialConfig.nrOfNodes,
+          this->currentSpringDistances,
+          this->currentDisplacements,
+          r);
+      } catch (const std::exception& e) {
+        delete[](r);
+        throw e;
+      }
       double r2 = 0.;
       for (size_t i = 0; i < 3 * this->initialConfig.nrOfNodes; i++) {
         r2 += r[i] * r[i];

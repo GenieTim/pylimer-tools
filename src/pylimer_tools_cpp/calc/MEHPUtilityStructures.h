@@ -3,7 +3,6 @@
 
 #include <Eigen/Dense>
 #include <array>
-#include <math.h> // fabs, log, copysign, fma
 
 namespace pylimer_tools {
 namespace calc {

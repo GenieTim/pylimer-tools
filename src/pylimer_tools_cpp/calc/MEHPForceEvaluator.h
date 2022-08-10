@@ -5,6 +5,9 @@
 namespace pylimer_tools {
 namespace calc {
   namespace mehp {
+    float langevin_invf(float x);
+
+    double csch (double x);
 
     // abstract class for having different force evaluations
     class MEHPForceEvaluator
@@ -78,8 +81,8 @@ namespace calc {
     {
     protected:
       double kappa = 1.0;
-      double N = 1.0;
-      double l = 1.0;
+      double oneOverNl = 1.0;
+      double oneOverl = 1.0;
 
     public:
       using MEHPForceEvaluator::getIs2D;
@@ -91,8 +94,10 @@ namespace calc {
                                       double l = 1.0)
       {
         this->kappa = kappa;
-        this->N = N;
-        this->l = l;
+        assert(l > 0);
+        assert(l * N > 0);
+        this->oneOverNl = 1.0 / (N * l);
+        this->oneOverl = 1.0 / l;
       }
 
       double evaluateForceSetGradient(const size_t n,

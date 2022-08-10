@@ -15,10 +15,9 @@ namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
 namespace pcm = pylimer_tools::calc::mehp;
 
-TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
-          "[analysis][MEHPForceRelaxation]")
+void
+testGradient(pcm::MEHPForceEvaluator* forceEvaluator)
 {
-  // return;
   pe::Universe universe = pe::Universe(4.0, 4.0, 4.0);
   // how this looks like:
   // 1-2
@@ -98,9 +97,6 @@ TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
     grad[i] = 0.0;
     x[i] = 0.0;
   }
-  pcm::SimpleSpringMEHPForceEvaluator forceEvaluatorInstance =
-    pcm::SimpleSpringMEHPForceEvaluator(1.0);
-  pcm::MEHPForceEvaluator* forceEvaluator = &forceEvaluatorInstance;
   forceEvaluator->setIs2D(false);
   forceEvaluator->setNetwork(net);
   // actual computation to test gradient
@@ -127,7 +123,26 @@ TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
   }
 }
 
-TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation]")
+TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
+          "[analysis][MEHPForceRelaxation][SimpleSpringMEHPForceEvaluator]")
+{
+  SECTION("Test SimpleSpringMEHPForceEvaluator force gradient")
+  {
+    pcm::SimpleSpringMEHPForceEvaluator forceEvaluatorInstance =
+      pcm::SimpleSpringMEHPForceEvaluator(1.0);
+    testGradient(&forceEvaluatorInstance);
+  }
+
+  SECTION("Test NonGaussianSpringForceEvaluator force gradient")
+  {
+    pcm::NonGaussianSpringForceEvaluator forceEvaluatorInstance =
+      pcm::NonGaussianSpringForceEvaluator(1.0);
+    testGradient(&forceEvaluatorInstance);
+  }
+}
+
+TEST_CASE("MEHP Force Relaxation2 runs",
+          "[analysis][MEHPForceRelaxation][SimpleSpringMEHPForceEvaluator]")
 {
   // return;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
@@ -302,5 +317,121 @@ TEST_CASE("MEHP Force Relaxation2 runs", "[analysis][MEHPForceRelaxation]")
     //   auto duration = duration_cast<std::chrono::microseconds>(stop - start);
     //   std::cout << "Took: " << duration.count() << std::endl;
     // }
+  }
+}
+
+TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
+          "[analysis][MEHPForceRelaxation][NonGaussianSpringForceEvaluator]")
+{
+  // return;
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  REQUIRE(universeSeq.getLength() == 0);
+  std::string suspectedPath = "../pylimer_tools/fixtures/";
+
+  SECTION("3D case")
+  {
+    // TODO: correct values (& forces?)
+    std::string largeInputFile =
+      suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
+    if (std::filesystem::exists(largeInputFile)) {
+      universeSeq.initializeFromDataSequence({ { largeInputFile } });
+      pe::Universe universe2 = universeSeq.atIndex(0);
+
+      // BENCHMARK_ADVANCED("MEHP LD_MMA " + largeInputFile)
+      // (Catch::Benchmark::Chronometer meter)
+      // {
+      //   pcm::MEHPForceRelaxation forceRelaxer3 =
+      //     pcm::MEHPForceRelaxation(universe2, 2);
+      //   meter.measure([&forceRelaxer3] {
+      //     forceRelaxer3.runForceRelaxation("LD_MMA");
+      //     return forceRelaxer3.getNrOfIterations();
+      //   });
+      // };
+      // BENCHMARK_ADVANCED("MEHP LD_LBFGS " + largeInputFile)
+      // (Catch::Benchmark::Chronometer meter)
+      // {
+      //   pcm::MEHPForceRelaxation forceRelaxer3 =
+      //     pcm::MEHPForceRelaxation(universe2, 2);
+      //   meter.measure([&forceRelaxer3] {
+      //     forceRelaxer3.runForceRelaxation("LD_LBFGS");
+      //     return forceRelaxer3.getNrOfIterations();
+      //   });
+      // };
+
+      double nrOfChains = 1.e4;
+      CHECK(static_cast<double>(universe2.getMolecules(2).size()) ==
+            Catch::Approx(nrOfChains));
+      pcm::NonGaussianSpringForceEvaluator nonGaussianForceEvaluator =
+        pcm::NonGaussianSpringForceEvaluator(1.0, 79, 0.98);
+      pcm::MEHPForceRelaxation forceRelaxer2 = pcm::MEHPForceRelaxation(
+        universe2, 2, false, &nonGaussianForceEvaluator);
+      REQUIRE(forceRelaxer2.getExitReason() == pcm::ExitReason::UNSET);
+      REQUIRE(forceRelaxer2.getNrOfIterations() == 0);
+      REQUIRE(forceRelaxer2.getVolume() ==
+              Catch::Approx(universe2.getVolume()));
+      CHECK(forceRelaxer2.getVolume() ==
+            Catch::Approx(97.383096 * 97.383096 * 97.383096));
+      // initial system values
+      CHECK(forceRelaxer2.getPressure() == Catch::Approx(0.39911682390778536));
+      CHECK(forceRelaxer2.getForce() == Catch::Approx(1935.3463762649));
+      CHECK(forceRelaxer2.getResidualNorm() ==
+                     Catch::Approx(26.0780010779));
+      REQUIRE_NOTHROW(forceRelaxer2.runForceRelaxation(
+        "LD_MMA")); 
+      // As long as gradient is unclear: gradient free methods, e.g.:
+      // "LN_SBPLX", "LN_BOBYQA", "LN_NELDERMEAD",
+                      // "LN_COBYLA", "LN_NEWUOA_BOUND"
+      CHECK(forceRelaxer2.getNrOfSprings() == 8142);
+      CHECK(forceRelaxer2.getNrOfIterations() > 1);
+
+      // conversion factors
+      double kb = 1.381e-23; // Boltzmann, J/K
+      double T = 300.;       // Temperature, K
+      double sigmaToNm = 0.616;
+      double sigmaToM = sigmaToNm * 1.e-9;
+      double slope = 0.00393 / (sigmaToNm * sigmaToNm); // sigma^2/(g/mol)
+      double beadMass = 161.;                           // g/mol
+      double Nb = 80.; // nr of beads per strand
+      double conversionFactor =
+        3. * kb * T / (slope * beadMass * Nb); // J/sigma^2
+      CHECK(conversionFactor / (sigmaToM * sigmaToM) ==
+            Catch::Approx(0.000245543));
+      double nu =
+        nrOfChains / (forceRelaxer2.getVolume() * sigmaToM * sigmaToM *
+                      sigmaToM); // chain number density, m^-3
+      CHECK(nu == Catch::Approx(4.63241e25));
+
+      // final values
+      CHECK(forceRelaxer2.getPressure() ==
+            Catch::Approx(0.3991168239)); // LJ Units [?]
+      CHECK(forceRelaxer2.getPressure() * conversionFactor /
+              (sigmaToM * sigmaToM * sigmaToM) ==
+            Catch::Approx(159091.5442338335)); // shear modulus from the pressure, MPa
+      double nrOfChainCorrection =
+        (forceRelaxer2.getDefaultNrOfChains() / nrOfChains);
+      double expectedNb2 = slope * Nb * beadMass;
+      double nb2Correction =
+        (forceRelaxer2.getDefaultR0Square() / (expectedNb2));
+      double gammaCorrectionFactor = nrOfChainCorrection * nb2Correction;
+      CHECK(
+        forceRelaxer2.getGammaFactor() * nrOfChainCorrection *
+          forceRelaxer2.getDefaultR0Square() ==
+        Catch::Approx(110.5788380601)); // as from conversion-less Mathematica script
+      CHECK(forceRelaxer2.getGammaFactor() * gammaCorrectionFactor * kb * T *
+              nu ==
+            Catch::Approx(159091.5442338335)); // ANT shear modulus, Pa
+      CHECK(forceRelaxer2.getGammaFactor() * gammaCorrectionFactor ==
+            Catch::Approx(0.8289436959)); // "correct" gamma factor
+      CHECK(forceRelaxer2.getExitReason() == pcm::ExitReason::F_TOLERANCE);
+      // TODO: find better, more accurate tests here
+      CHECK(forceRelaxer2.getNrOfActiveNodes() > 1);
+      CHECK(forceRelaxer2.getNrOfActiveSprings() > 1);
+      CHECK(forceRelaxer2.getAverageSpringLength() > 1.0);
+      CHECK(forceRelaxer2.getEffectiveFunctionalityOfAtoms().size() ==
+            forceRelaxer2.getNrOfNodes());
+    } else {
+      std::cout << "Skipping large file PDMS MEHP run" << std::endl;
+      REQUIRE(true);
+    }
   }
 }
