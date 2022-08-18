@@ -107,7 +107,7 @@ testGradient(pcm::MEHPForceEvaluator* forceEvaluator)
     double f = forceEvaluator->evaluateForceSetGradient(12, x, grad, nullptr);
     if (i % 3 != 0) {
       // in x and y direction, we expect no spring distance -> 0 gradient
-      REQUIRE(grad[i] == Catch::Approx(0.0));
+      CHECK(grad[i] == Catch::Approx(0.0));
     } else {
       // test finite difference vs. gradient
       x[i] = -h;
@@ -119,7 +119,12 @@ testGradient(pcm::MEHPForceEvaluator* forceEvaluator)
       x[i] = 0.0; // reset
       // std::cout << i << " " << fm << " " << fp << " " << f << std::endl;
       // require gradient to be similar to finite difference
-      REQUIRE(grad[i] == Catch::Approx((1.0 / (2.0 * h)) * (fp - fm)));
+      if (std::abs(grad[i]) == 0.0) {
+        CHECK(std::abs(grad[i]) ==
+              Catch::Approx(std::abs(fp - fm)).margin(0.000001));
+      } else {
+        CHECK(grad[i] == Catch::Approx((1.0 / (2.0 * h)) * (fp - fm)));
+      }
     }
   }
 }
@@ -145,7 +150,7 @@ TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
 TEST_CASE("MEHP Force Relaxation2 runs",
           "[analysis][MEHPForceRelaxation][SimpleSpringMEHPForceEvaluator]")
 {
-  return;
+  // return;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -324,7 +329,7 @@ TEST_CASE("MEHP Force Relaxation2 runs",
 TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
           "[analysis][MEHPForceRelaxation][NonGaussianSpringForceEvaluator]")
 {
-  return;
+  // return;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -440,7 +445,7 @@ TEST_CASE(
   "MEHP Force Relaxation2 runs with Langevin force evaluator and non-network",
   "[analysis][MEHPForceRelaxation][NonGaussianSpringForceEvaluator]")
 {
-  return;
+  // return;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -473,6 +478,8 @@ TEST_CASE("Inverse Langevin test",
   CHECK(pcm::langevin_inv(0.5) == Catch::Approx(1.79676).epsilon(0.02));
   CHECK(pcm::langevin_inv(0.9999) == Catch::Approx(10000).epsilon(0.02));
   CHECK(pcm::langevin_inv(1. / 3.) == Catch::Approx(1.07456).epsilon(0.02));
+  CHECK(pcm::langevin_inv(1.03078 / 3.) ==
+        Catch::Approx(1.11306).epsilon(0.02));
 }
 
 TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
@@ -507,20 +514,41 @@ TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
   springDistances[0] = 1.0;
   CHECK(forceEvaluatorInstance.evaluateForceSetGradient(
           net.nrOfNodes * 3, springDistances, u, r) ==
-        Catch::Approx(1.07456).epsilon(0.02));
-  CHECK(r[0] == Catch::Approx(-1.24155).epsilon(0.02));
+        Catch::Approx(0.517942).epsilon(0.02));
+  CHECK(r[0] == Catch::Approx(1.07456).epsilon(0.02));
   CHECK(r[1] == 0.0);
   CHECK(r[2] == 0.0);
+  CHECK(r[3] == Catch::Approx(-r[0]));
+  CHECK(r[4] == Catch::Approx(-r[1]));
+  CHECK(r[5] == Catch::Approx(-r[2]));
 
   // and again some others
   springDistances[1] = -1.0;
+  double rDist = std::sqrt(2.0);
   CHECK(forceEvaluatorInstance.evaluateForceSetGradient(
           net.nrOfNodes * 3, springDistances, u, r) ==
-        Catch::Approx(1.6542).epsilon(0.02));
-  CHECK(r[0] == Catch::Approx(-1.13411).epsilon(0.02));
-  CHECK(r[1] == Catch::Approx(1.13411).epsilon(0.02));
+        Catch::Approx(1.07797).epsilon(0.02));
+  CHECK(r[0] == Catch::Approx(1.6542 * 1.0 / rDist).epsilon(0.02));
+  CHECK(r[1] == Catch::Approx(-1.6542 * 1.0 / rDist).epsilon(0.02));
   CHECK(r[2] == 0.0);
+  CHECK(r[3] == Catch::Approx(-r[0]));
+  CHECK(r[4] == Catch::Approx(-r[1]));
+  CHECK(r[5] == Catch::Approx(-r[2]));
+  // and a final one
+  springDistances[2] = 0.25;
+  CHECK(forceEvaluatorInstance.evaluateForceSetGradient(
+          net.nrOfNodes * 3, springDistances, u, r) ==
+        Catch::Approx(1.11463).epsilon(0.02));
+  double OneOverRDist = 1.0 / std::sqrt(2.0 + 0.25 * 0.25);
+  CHECK(OneOverRDist == Catch::Approx(1 / 1.03078));
+  CHECK(r[0] == Catch::Approx(1.68968 * OneOverRDist).epsilon(0.02));
+  CHECK(r[1] == Catch::Approx(-1.68968 * OneOverRDist).epsilon(0.02));
+  CHECK(r[2] == Catch::Approx(1.68968 * 0.25 * OneOverRDist).epsilon(0.02));
+  CHECK(r[3] == Catch::Approx(-r[0]));
+  CHECK(r[4] == Catch::Approx(-r[1]));
+  CHECK(r[5] == Catch::Approx(-r[2]));
 
+  // cleanup
   delete[](r);
 }
 
@@ -603,7 +631,7 @@ TEST_CASE("Free chains collapse",
             << forceRelaxerLangevin.getResidualNorm() << std::endl;
 
   forceRelaxerLangevin.runForceRelaxation(
-    "LD_LBFGS", 500000, 1e-15, 1e-19); // "LD_SLSQP", "LD_MMA"
+    "LD_MMA", 500000, 1e-15, 1e-19); // "LD_SLSQP", "LD_MMA"
   CHECK(forceRelaxerLangevin.getNrOfActiveSprings() == 0);
   // CHECK(forceRelaxerLangevin.getAverageSpringLength() == Catch::Approx(0.0));
   CHECK(forceRelaxerLangevin.getAverageSpringLength() >= 0.0);
@@ -624,8 +652,8 @@ TEST_CASE("Free chains collapse",
   std::cout << forceRelaxerLangevin.getNrOfIterations() << ", "
             << forceRelaxerLangevin.getForce() << ", "
             << forceRelaxerLangevin.getResidualNorm() << std::endl;
-  REQUIRE(forceRelaxerLangevin.getForce() >
+  REQUIRE(forceRelaxerLangevin.getForce() >=
           forceRelaxerSimpleSpring.getForce());
-  REQUIRE(forceRelaxerLangevin.getResidualNorm() >
+  REQUIRE(forceRelaxerLangevin.getResidualNorm() >=
           forceRelaxerSimpleSpring.getResidualNorm());
 }

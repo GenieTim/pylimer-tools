@@ -132,17 +132,17 @@ namespace calc {
      * @param x
      * @return double
      */
-    // double langevin_inv(const double x)
-    // {
-    // if (x < 0.0) {
-    //   return langevin_inv(-x);
-    // }
-    // if (x > 0.99999) {
-    // return 1e5 * (1 + x * x);
-    // }
-    //   const double x2 = x * x;
-    //   return 3. * x / ((1. - x2) * (1. + 0.5 * x2));
-    // }
+    double langevin_inv(const double x)
+    {
+      if (x < 0.0) {
+        return langevin_inv(-x);
+      }
+      if (x > 0.99999) {
+        return 1e5 * (1 + x * x);
+      }
+      const double x2 = x * x;
+      return 3. * x / ((1. - x2) * (1. + 0.5 * x2));
+    }
 
     /**
      * @brief Compute inverse Langevin function approximation
@@ -153,19 +153,19 @@ namespace calc {
      * @param x
      * @return double
      */
-    double langevin_inv(const double x)
-    {
-      if (x < 0.0) {
-        return langevin_inv(-x);
-      }
-      if (x > 0.99999) {
-        return 1e5 * (1 + x * x);
-      }
-      const double x2 = x * x;
-      const double x4 = x2 * x2;
-      const double x6 = x4 * x2;
-      return ((3 * x - (x / 5.) * (6. * x2 + x4 + 2 * x6)) / (1. - x2));
-    }
+    // double langevin_inv(const double x)
+    // {
+    //   if (x < 0.0) {
+    //     return langevin_inv(-x);
+    //   }
+    //   if (x > 0.99999) {
+    //     return 1e5 * (1 + x * x);
+    //   }
+    //   const double x2 = x * x;
+    //   const double x4 = x2 * x2;
+    //   const double x6 = x4 * x2;
+    //   return ((3 * x - (x / 5.) * (6. * x2 + x4 + 2 * x6)) / (1. - x2));
+    // }
 
     double csch(double x)
     {
@@ -204,22 +204,22 @@ namespace calc {
             std::cerr << "Got " << linv << " for spring " << i
                       << " and distance " << r << std::endl;
           }
+          // dF/dr
+          const double fr = (this->oneOverl) * linv;
+
           for (size_t dir = 0; dir < nrOfDim; ++dir) {
-            double springDistance = springDistances[3 * i + dir];
-            double cschTerm = csch(linv);
-            double gradTerm =
-              -this->oneOverl * this->oneOverNl * springDistance;
-            gradTerm =
-              gradTerm / (r * (-cschTerm * cschTerm + 1. / (linv * linv)));
-            // fixes to prevent nans
-            if (std::isinf(cschTerm) || springDistance == 0.0) {
+            const double springDistance = springDistances[3 * i + dir];
+            // dr/dui
+            double gradTerm = (springDistance / r) * fr;
+            if (r == 0.0) {
               gradTerm = 0.0;
             }
-            if (std::isnan(gradTerm) || std::isinf(gradTerm)) {
-              std::cerr << "Got " << gradTerm << " for gradTerm for spring "
-                        << i << ", dir " << dir << " and distance " << r
-                        << ", csch term " << cschTerm << std::endl;
+            if (std::isnan(gradTerm)) {
+              std::cerr << "Got " << gradTerm << " grad term, with " << linv
+                        << " for spring " << i << " and distance " << r
+                        << std::endl;
             }
+
             grad[3 * a + dir] += gradTerm;
             grad[3 * b + dir] -= gradTerm;
           }
@@ -228,11 +228,19 @@ namespace calc {
 
       for (size_t i = 0; i < this->net.nrOfSprings; ++i) {
         double r =
-          sqrt(springDistances[3 * i] * springDistances[3 * i] +
-               springDistances[3 * i + 1] * springDistances[3 * i + 1] +
-               springDistances[3 * i + 2] * springDistances[3 * i + 2]);
-        double linv = langevin_inv(r * this->oneOverNl);
-        force += (this->oneOverl) * linv;
+          std::sqrt(springDistances[3 * i] * springDistances[3 * i] +
+                    springDistances[3 * i + 1] * springDistances[3 * i + 1] +
+                    springDistances[3 * i + 2] * springDistances[3 * i + 2]);
+        double rOverNl = r * this->oneOverNl;
+        double beta = langevin_inv(r * this->oneOverNl);
+        double cschTerm =
+          csch(beta) *
+          beta; // can be inf or 0. In case of zero, std::log() returns -inf.
+        if (beta > 0.0 && !std::isinf(cschTerm) && cschTerm > 0.0) {
+          force += this->N * (rOverNl * beta + std::log(cschTerm));
+        } else if (beta > 0.0 && (std::isinf(cschTerm) || cschTerm == 0.0)) {
+          force += this->N * rOverNl * beta;
+        }
       }
 
       return force;
