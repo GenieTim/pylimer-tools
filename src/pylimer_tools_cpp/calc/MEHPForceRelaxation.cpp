@@ -25,10 +25,12 @@ namespace calc {
       const char* algorithm,
       long int maxNrOfSteps, // default: 10000
       double xtol,
-      double ftol,
-      double loopTol)
+      double ftol)
     {
       this->simulationHasRun = true;
+      this->forceEvaluator->setNetwork(this->initialConfig);
+      this->forceEvaluator->setIs2D(this->is2D);
+      this->forceEvaluator->prepareForEvaluations();
       double stress[3][3];
 
       for (size_t j = 0; j < 3; j++) {
@@ -76,10 +78,18 @@ namespace calc {
       // set exit conditions
       opt.set_xtol_rel(xtol);
       opt.set_ftol_rel(ftol);
+      opt.set_ftol_abs(0.0);
       opt.set_maxeval(maxNrOfSteps);
+      // opt.set_param("verbosity", 1.0);
       // start/set/run minimization
       double minf;
-      nlopt::result res = opt.optimize(u0, minf);
+      nlopt::result res;
+      std::exception_ptr nloptException = nullptr;
+      try {
+        res = opt.optimize(u0, minf);
+      } catch (...) {
+        nloptException = std::current_exception();
+      }
 
       // query solution & exit reason
       assert(u0.size() == 3 * net.nrOfNodes);
@@ -89,7 +99,9 @@ namespace calc {
         this->evaluateSpringDistances(&net, this->currentDisplacements, is2D);
 
       this->exitReason = ExitReason::OTHER;
-      if (res == nlopt::result::FTOL_REACHED) {
+      if (nloptException != nullptr) {
+        this->exitReason = ExitReason::FAILURE;
+      } else if (res == nlopt::result::FTOL_REACHED) {
         this->exitReason = ExitReason::F_TOLERANCE;
       } else if (res == nlopt::result::XTOL_REACHED) {
         this->exitReason = ExitReason::X_TOLERANCE;
@@ -130,11 +142,29 @@ namespace calc {
 
       // Possibly improvable PBC
       for (size_t j = 0; j < 3 * net->nrOfSprings; ++j) {
+        int iterations = 0;
         while (springDistances[j] > boxHalfs[j % 3]) {
           springDistances[j] -= net->L[j % 3];
+          iterations++;
+          if (iterations > 10) {
+            throw std::runtime_error(
+              "Too many iterations in PBC from " +
+              std::to_string(coordinatesSpringEndA[j]) + " to " +
+              std::to_string(coordinatesSpringEndB[j]) + ", currently at " +
+              std::to_string(springDistances[j]));
+          }
         }
+        iterations = 0;
         while (springDistances[j] < -boxHalfs[j % 3]) {
           springDistances[j] += net->L[j % 3];
+          iterations++;
+          if (iterations > 10) {
+            throw std::runtime_error(
+              "Too many iterations in PBC from " +
+              std::to_string(coordinatesSpringEndA[j]) + " to " +
+              std::to_string(coordinatesSpringEndB[j]) + ", currently at " +
+              std::to_string(springDistances[j]));
+          }
         }
       }
 
@@ -301,11 +331,11 @@ namespace calc {
     }
 
     /**
-     * @brief Get the Residual Norm at the current step
+     * @brief Get the residuals (gradient) at the current step
      *
-     * @return double
+     * @return Eigen::VectorXd
      */
-    double MEHPForceRelaxation::getResidualNorm() const
+    Eigen::VectorXd MEHPForceRelaxation::getResiduals() const
     {
       double* r = new double[3 * this->initialConfig.nrOfNodes];
       for (size_t i = 0; i < this->initialConfig.nrOfNodes * 3; ++i) {
@@ -321,13 +351,24 @@ namespace calc {
         delete[](r);
         throw e;
       }
-      double r2 = 0.;
-      for (size_t i = 0; i < 3 * this->initialConfig.nrOfNodes; i++) {
-        r2 += r[i] * r[i];
-      }
 
+      Eigen::VectorXd results =
+        Eigen::VectorXd::Zero(this->initialConfig.nrOfNodes * 3);
+      for (size_t i = 0; i < this->initialConfig.nrOfNodes * 3; ++i) {
+        results[i] = r[i];
+      }
       delete[](r);
-      return r2;
+      return results;
+    }
+
+    /**
+     * @brief Get the Residual Norm at the current step
+     *
+     * @return double
+     */
+    double MEHPForceRelaxation::getResidualNorm() const
+    {
+      return this->getResiduals().norm();
     }
 
     /**

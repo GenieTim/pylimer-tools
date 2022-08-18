@@ -27,6 +27,7 @@ namespace calc {
       F_TOLERANCE,
       X_TOLERANCE,
       MAX_STEPS,
+      FAILURE,
       OTHER
     };
 
@@ -46,15 +47,13 @@ namespace calc {
           this->springForceEvaluator = SimpleSpringMEHPForceEvaluator(kappa);
           forceEvaluator = &this->springForceEvaluator;
         }
-        this->forceEvaluator = forceEvaluator;
+        this->crosslinkerType = crosslinkerType;
         // interpret network already to be able to give early results
         Network net;
         ConvertNetwork(&net, crosslinkerType);
         this->initialConfig = net;
-        this->forceEvaluator->setNetwork(net);
-        this->forceEvaluator->setIs2D(is2D);
         this->is2D = is2D;
-        this->crosslinkerType = crosslinkerType;
+        this->setForceEvaluator(forceEvaluator);
         this->currentDisplacements =
           Eigen::VectorXd::Zero(net.coordinates.size());
         this->currentSpringDistances =
@@ -72,13 +71,11 @@ namespace calc {
        * @param maxNrOfSteps
        * @param xtol
        * @param ftol
-       * @param loopTol
        */
       void runForceRelaxation(const char* algorithm = "LD_MMA",
                               long int maxNrOfSteps = 50000, // default: 10000
                               double xtol = 1e-12,
-                              double ftol = 1e-9,
-                              double loopTol = 1e-2);
+                              double ftol = 1e-9);
 
       /**
        * @brief Get the universe consisting of cross-linkers only
@@ -107,6 +104,9 @@ namespace calc {
       void setForceEvaluator(MEHPForceEvaluator* forceEvaluator)
       {
         this->forceEvaluator = forceEvaluator;
+        this->forceEvaluator->setNetwork(this->initialConfig);
+        this->forceEvaluator->setIs2D(this->is2D);
+        this->forceEvaluator->prepareForEvaluations();
       }
 
       /**
@@ -203,6 +203,13 @@ namespace calc {
       double getResidualNorm() const;
 
       /**
+       * @brief Get the residuals (gradient) at the current step
+       *
+       * @return Eigen::VectorXd
+       */
+      Eigen::VectorXd getResiduals() const;
+
+      /**
        * @brief Get the Force at the current step
        *
        * @return double
@@ -280,13 +287,9 @@ namespace calc {
         // convert springs
         std::map<std::string, std::vector<long int>> allBonds =
           crosslinkerUniverse.getBonds();
-        net->averageSpringLength = 0;
         for (size_t i = 0; i < net->nrOfSprings; ++i) {
           int atomIdFrom = allBonds["bond_from"][i];
           int atomIdTo = allBonds["bond_to"][i];
-          net->averageSpringLength +=
-            universe.getAtom(atomIdFrom)
-              .distanceTo(universe.getAtom(atomIdTo), &box);
           net->springIndexA[i] = atomIdToNode.at(atomIdFrom);
           net->springIndexB[i] = atomIdToNode.at(atomIdTo);
           for (size_t j = 0; j < 3; j++) {
@@ -296,8 +299,6 @@ namespace calc {
               atomIdToNode.at(atomIdTo) * 3 + j;
           }
         }
-
-        net->averageSpringLength /= net->nrOfSprings;
 
         // box volume
         net->vol = net->L[0] * net->L[1] * net->L[2];
@@ -367,7 +368,6 @@ namespace calc {
        *
        * @param net
        * @param u
-       * @param loopTol
        * @return std::array<std::array<double, 3>, 3>
        */
       std::array<std::array<double, 3>, 3> evaluateStressTensor(
