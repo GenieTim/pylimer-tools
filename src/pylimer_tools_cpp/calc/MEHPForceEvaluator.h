@@ -1,13 +1,14 @@
 #ifndef MEHP_FORCE_EVAL_H
 #define MEHP_FORCE_EVAL_H
 #include "MEHPUtilityStructures.h"
+#include <iostream>
 
 namespace pylimer_tools {
 namespace calc {
   namespace mehp {
-    float langevin_invf(float x);
+    double langevin_inv(double x);
 
-    double csch (double x);
+    double csch(double x);
 
     // abstract class for having different force evaluations
     class MEHPForceEvaluator
@@ -37,6 +38,7 @@ namespace calc {
                                       double* grad,
                                       void* f_data) const;
 
+      virtual void prepareForEvaluations() = 0;
       virtual double evaluateForceSetGradient(
         const size_t n,
         const Eigen::VectorXd& springDistances,
@@ -68,13 +70,15 @@ namespace calc {
       double evaluateForceSetGradient(const size_t n,
                                       const Eigen::VectorXd& springDistances,
                                       const Eigen::VectorXd& u,
-                                      double* grad) const;
+                                      double* grad) const override;
       double evaluateStressContribution(double springDistances[3],
                                         size_t i,
-                                        size_t j) const
+                                        size_t j) const override
       {
         return this->kappa * springDistances[i] * springDistances[j];
       }
+
+      void prepareForEvaluations() override{};
     };
 
     class NonGaussianSpringForceEvaluator : public MEHPForceEvaluator
@@ -83,6 +87,7 @@ namespace calc {
       double kappa = 1.0;
       double oneOverNl = 1.0;
       double oneOverl = 1.0;
+      SimpleSpringMEHPForceEvaluator springForceEvaluator;
 
     public:
       using MEHPForceEvaluator::getIs2D;
@@ -94,6 +99,7 @@ namespace calc {
                                       double l = 1.0)
       {
         this->kappa = kappa;
+        this->springForceEvaluator = SimpleSpringMEHPForceEvaluator(kappa);
         assert(l > 0);
         assert(l * N > 0);
         this->oneOverNl = 1.0 / (N * l);
@@ -103,12 +109,19 @@ namespace calc {
       double evaluateForceSetGradient(const size_t n,
                                       const Eigen::VectorXd& springDistances,
                                       const Eigen::VectorXd& u,
-                                      double* grad) const;
+                                      double* grad) const override;
       double evaluateStressContribution(double springDistances[3],
                                         size_t i,
-                                        size_t j) const
+                                        size_t j) const override
       {
         return this->kappa * springDistances[i] * springDistances[j];
+      }
+
+      void prepareForEvaluations() override
+      {
+        // propagate network and other config to decorated force evaluator
+        this->springForceEvaluator.setNetwork(this->net);
+        this->springForceEvaluator.setIs2D(this->is2D);
       }
     };
   }

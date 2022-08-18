@@ -17,7 +17,6 @@ namespace calc {
       double vol;                 /* box volume */
       long int nrOfNodes;         /* number of nodes */
       long int nrOfSprings;       /* number of springs */
-      double averageSpringLength; /* average spring length */
       long int nrOfLoops;         /* loops */
       // coordinates & coonectivity
       Eigen::VectorXd coordinates;
