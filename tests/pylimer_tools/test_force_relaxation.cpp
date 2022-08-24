@@ -666,8 +666,8 @@ TEST_CASE("Free chains collapse",
     forceRelaxerLangevin.getStressTensor();
   for (size_t i = 0; i < 3; ++i) {
     for (size_t j = 0; j < 3; ++j) {
-      CHECK(stressTensorLangevin[i][j] ==
-            Catch::Approx(stressTensorSimpleSpring[i][j]));
+      CHECK(stressTensorLangevin[i][j]+1e-5 ==
+            Catch::Approx(stressTensorSimpleSpring[i][j]+1e-5));
     }
   }
 }
