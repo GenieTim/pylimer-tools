@@ -241,6 +241,61 @@ namespace calc {
       return r2 / this->initialConfig.nrOfSprings;
     }
 
+    /**
+     * @brief Compute the stress tensor
+     *
+     * @param net
+     * @param u
+     * @return std::array<std::array<double, 3>, 3>
+     */
+    std::array<std::array<double, 3>, 3>
+    MEHPForceRelaxation::evaluateStressTensor(
+      const Eigen::VectorXd& springDistances,
+      const double volume) const
+    {
+      std::array<std::array<double, 3>, 3> stress;
+
+      for (size_t i = 0; i < springDistances.size() / 3; ++i) {
+        double s[3] = { springDistances[3 * i + 0],
+                        springDistances[3 * i + 1],
+                        springDistances[3 * i + 2] };
+        /* spring contribution to the overall stress tensor */
+        for (size_t j = 0; j < 3; j++) {
+          for (size_t k = 0; k < 3; k++) {
+            stress[j][k] +=
+              this->forceEvaluator->evaluateStressContribution(s, j, k);
+          }
+        }
+      }
+
+      for (size_t j = 0; j < 3; j++) {
+        for (size_t k = 0; k < 3; k++) {
+          stress[j][k] /= volume;
+        }
+      }
+
+      return stress;
+    }
+
+    /**
+     * @brief Compute the stress tensor
+     *
+     * @param net
+     * @param u
+     * @param loopTol
+     * @return std::array<std::array<double, 3>, 3>
+     */
+    std::array<std::array<double, 3>, 3>
+    MEHPForceRelaxation::evaluateStressTensor(Network* net,
+                                              const Eigen::VectorXd& u,
+                                              const double loopTol) const
+    {
+      Eigen::VectorXd springDistances =
+        this->evaluateSpringDistances(net, u, this->is2D);
+
+      return this->evaluateStressTensor(springDistances, net->vol);
+    }
+
     std::array<std::array<double, 3>, 3> MEHPForceRelaxation::getStressTensor()
       const
     {
