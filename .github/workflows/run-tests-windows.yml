@@ -1,0 +1,51 @@
+name: Run Tests
+
+on:
+  push:
+    branches:
+      - master
+      - main
+
+jobs:
+  build-deploy:
+    runs-on: windows-latest
+
+    name: Run Python + C++ Tests
+    steps:
+      - uses: actions/checkout@v3
+        with: 
+          submodules: "recursive"
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.6'
+          cache: 'pip'
+
+      - uses: actions/cache@v2
+        with:
+          path: |
+            .\vendor\nlopt
+            .\tests\build
+            ~\AppData\Local\pip\Cache
+            .\vendor\igraph
+            .\_skbuild
+          key: ${{ runner.os }}-py-3.10.6-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-py-3.10.6-
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+      
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Install choco dependencies
+        uses: crazy-max/ghaction-chocolatey@v1
+        with:
+          args: install winflexbison eigen lcov
+      
+      - name: Build
+        run: python -m build --wheel
+
+      - name: Run Tests
+        run: python -m coverage run -m unittest discover -v

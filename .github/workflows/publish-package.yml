@@ -19,11 +19,14 @@ jobs:
           - 3.8
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with: 
+          submodules: "recursive"
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses:  actions/setup-python@v4
         with:
+          cache: 'pip'
           python-version: ${{ matrix.python-version }}
 
       - uses: actions/cache@v2
@@ -31,6 +34,7 @@ jobs:
           path: |
             ~\AppData\Local\pip\Cache
             .\vendor\igraph
+            .\vendor\nlopt
             .\_skbuild
           key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
@@ -45,7 +49,7 @@ jobs:
       - name: Install choco dependencies
         uses: crazy-max/ghaction-chocolatey@v1
         with:
-          args: install winflexbison
+          args: install winflexbison eigen
 
       - name: Build
         run: python -m build --wheel
@@ -69,11 +73,14 @@ jobs:
           - 3.8
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with: 
+          submodules: "recursive"
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses:  actions/setup-python@v4
         with:
+          cache: 'pip'
           python-version: ${{ matrix.python-version }}
 
       - uses: actions/cache@v2
@@ -107,11 +114,14 @@ jobs:
     name: Build 📦 for ManyLinux
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with: 
+          submodules: "recursive"
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses:  actions/setup-python@v4
         with:
+          cache: 'pip'
           python-version: "3.10"
 
       - uses: actions/cache@v2
@@ -146,11 +156,14 @@ jobs:
     name: Build SRC Package for Any
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with: 
+          submodules: "recursive"
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses:  actions/setup-python@v4
         with:
+          cache: 'pip'
           python-version: "3.10"
 
       - name: Install Dependencies
