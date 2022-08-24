@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.1.11
+* [12cd735899] - Improve implementation of Langevin force evaluator (Tim Bernhard)
+* [6f08a4ac37] - Use default false for is2D on MEHPForceEvaluator (Tim Bernhard)
+* [03be3822f3] - Make GitHub Actions respect Python Version for loading cache (Tim Bernhard)
+* [b9f67690cc] - Add (random, to correct) tests for NonGaussianSpringForceEvaluator (Tim Bernhard)
+* [681857263c] - Implement Langevin-Type Spring Force Evaluator (Tim Bernhard)
+* [a0f7636627] - Move MEHPForceRelaxation to cpp, introduce interface to change force calculation (Tim Bernhard)
+* [d7359547c4] - Make tests less strict (Tim Bernhard)
+* [a0170783f0] - Further adjust mmt codes to improve accuracy (Tim Bernhard)
+* [c624e85b43] - Various improvments, incl. MMT fixes for certain f (Tim Bernhard)
+* [0d992d0fb8] - Use more assertAlmostEqual in test to fix failing in GitHub Action (Tim Bernhard)
+* [f487a84bac] - Increase version (Tim Bernhard)
+
+
 ## v0.1.10
 * [[`f223559338`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/f223559338)] - Add some more features to MEHP Relaxation (Tim Bernhard)
 * [[`c94249020f`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/c94249020f)] - Arbitrarily cut alpha and beta to 0, 1. TODO: find a better solution (Tim Bernhard)
