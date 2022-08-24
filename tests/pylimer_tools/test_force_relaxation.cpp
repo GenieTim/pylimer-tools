@@ -198,8 +198,7 @@ TEST_CASE("MEHP Force Relaxation2 runs",
       // initial system values
       CHECK(forceRelaxer2.getPressure() == Catch::Approx(0.39911682390778536));
       CHECK(forceRelaxer2.getForce() == Catch::Approx(552894.1903005145));
-      CHECK(forceRelaxer2.getResidualNorm() ==
-            Catch::Approx(2.1242043665818353e6));
+      CHECK(forceRelaxer2.getResidualNorm() == Catch::Approx(1457.465048151));
       REQUIRE_NOTHROW(forceRelaxer2.runForceRelaxation());
       CHECK(forceRelaxer2.getNrOfSprings() == 8142);
       CHECK(forceRelaxer2.getNrOfIterations() > 1);
@@ -378,9 +377,9 @@ TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
       CHECK(forceRelaxer2.getVolume() ==
             Catch::Approx(97.383096 * 97.383096 * 97.383096));
       // initial system values
+      CHECK(forceRelaxer2.getForce() == Catch::Approx(22103.6441026747));
+      CHECK(forceRelaxer2.getResidualNorm() == Catch::Approx(58.7568113327));
       CHECK(forceRelaxer2.getPressure() == Catch::Approx(0.39911682390778536));
-      CHECK(forceRelaxer2.getForce() == Catch::Approx(1935.3463762649));
-      CHECK(forceRelaxer2.getResidualNorm() == Catch::Approx(26.0780010779));
       REQUIRE_NOTHROW(forceRelaxer2.runForceRelaxation("LD_MMA"));
       // As long as gradient is unclear: gradient free methods, e.g.:
       // "LN_SBPLX", "LN_BOBYQA", "LN_NELDERMEAD",
@@ -406,6 +405,12 @@ TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
       CHECK(nu == Catch::Approx(4.63241e25));
 
       // final values
+      auto stressTensor = forceRelaxer2.getStressTensor();
+      CHECK(
+        forceRelaxer2.getPressure() ==
+        Catch::Approx(
+          (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) / 3.)
+          .epsilon(0.02));
       CHECK(forceRelaxer2.getPressure() ==
             Catch::Approx(0.3991168239)); // LJ Units [?]
       CHECK(forceRelaxer2.getPressure() * conversionFactor /
@@ -420,13 +425,12 @@ TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
       double gammaCorrectionFactor = nrOfChainCorrection * nb2Correction;
       CHECK(forceRelaxer2.getGammaFactor() * nrOfChainCorrection *
               forceRelaxer2.getDefaultR0Square() ==
-            Catch::Approx(
-              110.5788380601)); // as from conversion-less Mathematica script
+            Catch::Approx(42.613678259));
       CHECK(forceRelaxer2.getGammaFactor() * gammaCorrectionFactor * kb * T *
               nu ==
-            Catch::Approx(159091.5442338335)); // ANT shear modulus, Pa
+            Catch::Approx(61308.9809826224)); // ANT shear modulus, Pa
       CHECK(forceRelaxer2.getGammaFactor() * gammaCorrectionFactor ==
-            Catch::Approx(0.8289436959)); // "correct" gamma factor
+            Catch::Approx(0.3194493682)); // "correct" gamma factor
       CHECK(forceRelaxer2.getExitReason() == pcm::ExitReason::F_TOLERANCE);
       // TODO: find better, more accurate tests here
       CHECK(forceRelaxer2.getNrOfActiveNodes() > 1);
@@ -540,7 +544,6 @@ TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
           net.nrOfNodes * 3, springDistances, u, r) ==
         Catch::Approx(1.11463).epsilon(0.02));
   double OneOverRDist = 1.0 / std::sqrt(2.0 + 0.25 * 0.25);
-  CHECK(OneOverRDist == Catch::Approx(1 / 1.03078));
   CHECK(r[0] == Catch::Approx(1.68968 * OneOverRDist).epsilon(0.02));
   CHECK(r[1] == Catch::Approx(-1.68968 * OneOverRDist).epsilon(0.02));
   CHECK(r[2] == Catch::Approx(1.68968 * 0.25 * OneOverRDist).epsilon(0.02));
@@ -622,13 +625,13 @@ TEST_CASE("Free chains collapse",
   pcm::MEHPForceRelaxation forceRelaxerLangevin =
     pcm::MEHPForceRelaxation(universe, 2, false, &langevinForceEvaluator);
   pe::Universe resultingUniverse0 = forceRelaxerLangevin.getCrosslinkerVerse();
-  auto distances0 = resultingUniverse0.computeBondLengths();
-  for (auto i : distances0) {
-    std::cout << i << std::endl;
-  }
-  std::cout << forceRelaxerLangevin.getNrOfIterations() << ", "
-            << forceRelaxerLangevin.getForce() << ", "
-            << forceRelaxerLangevin.getResidualNorm() << std::endl;
+  // auto distances0 = resultingUniverse0.computeBondLengths();
+  // for (auto i : distances0) {
+  //   std::cout << i << std::endl;
+  // }
+  // std::cout << forceRelaxerLangevin.getNrOfIterations() << ", "
+  //           << forceRelaxerLangevin.getForce() << ", "
+  //           << forceRelaxerLangevin.getResidualNorm() << std::endl;
 
   forceRelaxerLangevin.runForceRelaxation(
     "LD_MMA", 500000, 1e-15, 1e-19); // "LD_SLSQP", "LD_MMA"
@@ -637,23 +640,34 @@ TEST_CASE("Free chains collapse",
   CHECK(forceRelaxerLangevin.getAverageSpringLength() >= 0.0);
   CHECK(forceRelaxerLangevin.getAverageSpringLength() <= 1e-6);
   REQUIRE(forceRelaxerLangevin.getNrOfIterations() > 0);
-  CHECK(forceRelaxerLangevin.getExitReason() == pcm::ExitReason::F_TOLERANCE);
+  CHECK(forceRelaxerLangevin.getExitReason() == pcm::ExitReason::X_TOLERANCE);
 
   pe::Universe resultingUniverse = forceRelaxerLangevin.getCrosslinkerVerse();
-  auto distances = resultingUniverse.computeBondLengths();
-  for (auto i : distances) {
-    std::cout << i << std::endl;
-  }
-  auto residuals = forceRelaxerLangevin.getResiduals();
-  for (auto i : residuals) {
-    std::cout << i << " ";
-  }
-  std::cout << std::endl;
-  std::cout << forceRelaxerLangevin.getNrOfIterations() << ", "
-            << forceRelaxerLangevin.getForce() << ", "
-            << forceRelaxerLangevin.getResidualNorm() << std::endl;
+  // auto distances = resultingUniverse.computeBondLengths();
+  // for (auto i : distances) {
+  //   std::cout << i << std::endl;
+  // }
+  // auto residuals = forceRelaxerLangevin.getResiduals();
+  // for (auto i : residuals) {
+  //   std::cout << i << " ";
+  // }
+  // std::cout << std::endl;
+  // std::cout << forceRelaxerLangevin.getNrOfIterations() << ", "
+  //           << forceRelaxerLangevin.getForce() << ", "
+  //           << forceRelaxerLangevin.getResidualNorm() << std::endl;
   REQUIRE(forceRelaxerLangevin.getForce() >=
           forceRelaxerSimpleSpring.getForce());
   REQUIRE(forceRelaxerLangevin.getResidualNorm() >=
           forceRelaxerSimpleSpring.getResidualNorm());
+
+  std::array<std::array<double, 3>, 3> stressTensorSimpleSpring =
+    forceRelaxerSimpleSpring.getStressTensor();
+  std::array<std::array<double, 3>, 3> stressTensorLangevin =
+    forceRelaxerLangevin.getStressTensor();
+  for (size_t i = 0; i < 3; ++i) {
+    for (size_t j = 0; j < 3; ++j) {
+      CHECK(stressTensorLangevin[i][j] ==
+            Catch::Approx(stressTensorSimpleSpring[i][j]));
+    }
+  }
 }
