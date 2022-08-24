@@ -27,6 +27,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.ExitReason
 
    .. autosummary::
    
+      ~ExitReason.FAILURE
       ~ExitReason.F_TOLERANCE
       ~ExitReason.MAX_STEPS
       ~ExitReason.OTHER
