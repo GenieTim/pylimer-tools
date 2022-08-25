@@ -47,9 +47,9 @@ jobs:
         uses: microsoft/setup-msbuild@v1.1
 
       - name: Install choco dependencies
-        uses: crazy-max/ghaction-chocolatey@v1
+        uses: crazy-max/ghaction-chocolatey@v2
         with:
-          args: install winflexbison eigen
+          args: install -y winflexbison eigen
 
       - name: Build
         run: python -m build --wheel

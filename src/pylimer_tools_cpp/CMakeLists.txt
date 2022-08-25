@@ -51,7 +51,8 @@ if (TARGET Eigen3::Eigen)
 	target_link_libraries(pylimer_tools PUBLIC Eigen3::Eigen)
 else()
 	include_directories(${EIGEN3_INCLUDE_DIRS})
-	message(STATUS "Eigen include directories: ${EIGEN3_INCLUDE_DIRS}")
+	target_link_libraries(pylimer_tools PUBLIC ${EIGEN3_LIBRARIES})
+	message(STATUS "Eigen include directories: ${EIGEN3_INCLUDE_DIRS}, libraries ${EIGEN3_LIBRARIES}")
 endif()
 # Eigen3::Eigen 
 
