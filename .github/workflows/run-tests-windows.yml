@@ -1,4 +1,4 @@
-name: Run Tests
+name: Run Tests on Windows
 
 on:
   push:
@@ -10,7 +10,7 @@ jobs:
   build-deploy:
     runs-on: windows-latest
 
-    name: Run Python + C++ Tests
+    name: Run Python + C++ Tests on Windows
     steps:
       - uses: actions/checkout@v3
         with: 
