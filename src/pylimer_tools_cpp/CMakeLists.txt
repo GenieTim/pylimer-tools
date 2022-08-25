@@ -47,10 +47,20 @@ target_link_libraries(pylimer_tools PUBLIC
 	${igraph_LIBRARIES} 
 	${nlopt_LIBRARIES}
 )
+
+# link Eigen libraries. Difficulty due to Windows GitHub Action, somehow.
 if (TARGET Eigen3::Eigen)
+	message(STATUS "target Eigen3::Eigen")
 	target_link_libraries(pylimer_tools PUBLIC Eigen3::Eigen)
-elseif (TARGET EigenEigen)
+elseif (TARGET Eigen::Eigen)
+	message(STATUS "target Eigen::Eigen")
 	target_link_libraries(pylimer_tools PUBLIC Eigen::Eigen)
+elseif (TARGET Eigen3)
+	message(STATUS "target Eigen3")
+	target_link_libraries(pylimer_tools PUBLIC Eigen3)
+elseif (TARGET Eigen)
+	message(STATUS "target Eigen")
+	target_link_libraries(pylimer_tools PUBLIC Eigen)
 else()
 	include_directories(${EIGEN3_INCLUDE_DIRS})
 	include_directories(${EIGEN3_INCLUDE_DIRS}/eigen3)
