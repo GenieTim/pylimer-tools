@@ -22,26 +22,12 @@ if (DEFINED ADDITIONAL_LIBS)
 endif()
 
 # add dependencies
-find_package(Eigen3 3.4 NO_MODULE) # 3.4
-if(${Eigen3_FOUND}) # AND (${Eigen3_VERSION} VERSION_GREATER_EQUAL 3.4)
-		message(STATUS "Found Eigen3 Version: ${Eigen3_VERSION} Path: ${Eigen3_DIR}")
-else()
-		include(FetchContent)
-		FetchContent_Declare(
-			eigen3 
-			GIT_REPOSITORY https://gitlab.com/libeigen/eigen
-			GIT_TAG 3.4.0
-		)
-		FetchContent_MakeAvailable(eigen3)
-endif()
-
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/CMakeLists.txt)
 
 add_dependencies(pylimer_tools igraph)
 include_directories(${igraph_INCLUDE_DIRS})
 add_dependencies(pylimer_tools nlopt)
 include_directories(${nlopt_INCLUDE_DIRS})
-
 
 target_link_libraries(pylimer_tools PUBLIC 
 	${igraph_LIBRARIES} 
@@ -50,17 +36,8 @@ target_link_libraries(pylimer_tools PUBLIC
 
 # link Eigen libraries. Difficulty due to Windows GitHub Action, somehow.
 if (TARGET Eigen3::Eigen)
-	message(STATUS "target Eigen3::Eigen")
+	message(STATUS "Target Eigen3::Eigen found")
 	target_link_libraries(pylimer_tools PUBLIC Eigen3::Eigen)
-elseif (TARGET Eigen::Eigen)
-	message(STATUS "target Eigen::Eigen")
-	target_link_libraries(pylimer_tools PUBLIC Eigen::Eigen)
-elseif (TARGET Eigen3)
-	message(STATUS "target Eigen3")
-	target_link_libraries(pylimer_tools PUBLIC Eigen3)
-elseif (TARGET Eigen)
-	message(STATUS "target Eigen")
-	target_link_libraries(pylimer_tools PUBLIC Eigen)
 else()
 	include_directories(${EIGEN3_INCLUDE_DIRS})
 	include_directories(${EIGEN3_INCLUDE_DIRS}/eigen3)
