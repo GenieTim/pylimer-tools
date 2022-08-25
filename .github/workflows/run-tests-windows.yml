@@ -27,6 +27,7 @@ jobs:
             .\vendor\nlopt
             .\tests\build
             ~\AppData\Local\pip\Cache
+            ~\AppData\Local\Temp\chocolatey
             .\vendor\igraph
             .\_skbuild
           key: ${{ runner.os }}-py-3.10.6-${{ hashFiles('**/requirements.txt') }}

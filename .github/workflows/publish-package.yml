@@ -33,6 +33,7 @@ jobs:
         with:
           path: |
             ~\AppData\Local\pip\Cache
+            ~\AppData\Local\Temp\chocolatey
             .\vendor\igraph
             .\vendor\nlopt
             .\_skbuild
