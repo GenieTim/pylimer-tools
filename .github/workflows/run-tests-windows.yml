@@ -42,7 +42,7 @@ jobs:
       - name: Install choco dependencies
         uses: crazy-max/ghaction-chocolatey@v2
         with:
-          args: install -y winflexbison eigen lcov
+          args: install -y winflexbison3 eigen lcov
       
       - name: Build
         run: pip install . --verbose
