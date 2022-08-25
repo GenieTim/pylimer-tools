@@ -3,8 +3,7 @@ name: Run Tests on Windows
 on:
   push:
     branches:
-      - master
-      - main
+      - workflow_dispatch
 
 jobs:
   build-deploy:
@@ -46,7 +45,7 @@ jobs:
           args: install -y winflexbison eigen lcov
       
       - name: Build
-        run: python -m build --wheel
+        run: pip install . --verbose
 
       - name: Run Tests
         run: python -m coverage run -m unittest discover -v
