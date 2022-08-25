@@ -262,8 +262,8 @@ namespace calc {
         /* spring contribution to the overall stress tensor */
         for (size_t j = 0; j < 3; j++) {
           for (size_t k = 0; k < 3; k++) {
-            stress[j][k] +=
-              this->forceEvaluator->evaluateStressContribution(s, j, k);
+            double contribution = this->forceEvaluator->evaluateStressContribution(s, j, k);
+            stress[j][k] += contribution;
           }
         }
       }
