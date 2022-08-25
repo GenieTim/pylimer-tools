@@ -23,7 +23,7 @@ endif()
 
 # add dependencies
 find_package(Eigen3 3.4 NO_MODULE) # 3.4
-if((${Eigen3_FOUND}) AND (TARGET Eigen3::Eigen)) # AND (${Eigen3_VERSION} VERSION_GREATER_EQUAL 3.4)
+if(${Eigen3_FOUND}) # AND (${Eigen3_VERSION} VERSION_GREATER_EQUAL 3.4)
 		message(STATUS "Found Eigen3 Version: ${Eigen3_VERSION} Path: ${Eigen3_DIR}")
 else()
 		include(FetchContent)
@@ -42,12 +42,17 @@ include_directories(${igraph_INCLUDE_DIRS})
 add_dependencies(pylimer_tools nlopt)
 include_directories(${nlopt_INCLUDE_DIRS})
 
-include_directories( ${EIGEN3_INCLUDE_DIR} )
 
 target_link_libraries(pylimer_tools PUBLIC 
 	${igraph_LIBRARIES} 
 	${nlopt_LIBRARIES}
 )
+if (TARGET Eigen3::Eigen)
+	target_link_libraries(pylimer_tools PUBLIC Eigen3::Eigen)
+else()
+	include_directories(${EIGEN3_INCLUDE_DIRS})
+	message(STATUS "Eigen include directories: ${EIGEN3_INCLUDE_DIRS}")
+endif()
 # Eigen3::Eigen 
 
 message("pylimer_tools includes igraph from ${igraph_INCLUDE_DIRS}, nlopt from ${nlopt_INCLUDE_DIRS}")

@@ -367,7 +367,7 @@ TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
       CHECK(static_cast<double>(universe2.getMolecules(2).size()) ==
             Catch::Approx(nrOfChains));
       pcm::NonGaussianSpringForceEvaluator nonGaussianForceEvaluator =
-        pcm::NonGaussianSpringForceEvaluator(0.0, 79, 0.98);
+        pcm::NonGaussianSpringForceEvaluator(1.0, 79, 0.98);
       pcm::MEHPForceRelaxation forceRelaxer2 = pcm::MEHPForceRelaxation(
         universe2, 2, false, &nonGaussianForceEvaluator);
       REQUIRE(forceRelaxer2.getExitReason() == pcm::ExitReason::UNSET);
@@ -412,11 +412,11 @@ TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
           (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) / 3.)
           .epsilon(0.02));
       CHECK(forceRelaxer2.getPressure() ==
-            Catch::Approx(0.3991168239)); // LJ Units [?]
+            Catch::Approx(0.1538073308)); // LJ Units [?]
       CHECK(forceRelaxer2.getPressure() * conversionFactor /
               (sigmaToM * sigmaToM * sigmaToM) ==
             Catch::Approx(
-              159091.5442338335)); // shear modulus from the pressure, MPa
+              61308.9809826224)); // shear modulus from the pressure, MPa
       double nrOfChainCorrection =
         (forceRelaxer2.getDefaultNrOfChains() / nrOfChains);
       double expectedNb2 = slope * Nb * beadMass;
