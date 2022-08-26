@@ -93,6 +93,7 @@ add_executable(header_tests pylimer_tools/test_headers.cpp)
 target_link_libraries(header_tests 
 	PRIVATE 
 	Catch2::Catch2WithMain
+	${igraph_LIBRARIES}
 )
 
 if (LEAK_ANALYSIS)

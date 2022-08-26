@@ -1,11 +1,16 @@
 #include "../../src/pylimer_tools_cpp/entities/Atom.h"
 #include "../../src/pylimer_tools_cpp/entities/Box.h"
+#include "../../src/pylimer_tools_cpp/utils/GraphUtils.h"
 #include "../../src/pylimer_tools_cpp/utils/StringUtils.h"
-#include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <iostream>
 #include <string>
+extern "C"
+{
+#include <igraph/igraph.h>
+}
 
 #define CATCH_CONFIG_MAIN
 namespace pe = pylimer_tools::entities;
@@ -88,7 +93,8 @@ TEST_CASE("CsvTokenizer works", "[utils][StringUtil]")
   REQUIRE(tk2.get<long int>(1) == 12);
   REQUIRE(tk2.get<float>(2) == 0.001f);
   REQUIRE(tk2.get<double>(2) == static_cast<double>(0.001));
-  REQUIRE(tk2.get<long double>(2) == Catch::Approx(static_cast<long double>(0.001)));
+  REQUIRE(tk2.get<long double>(2) ==
+          Catch::Approx(static_cast<long double>(0.001)));
 }
 
 TEST_CASE("String utility functions work", "[utils][StringUtil]")
@@ -110,4 +116,51 @@ TEST_CASE("String utility functions work", "[utils][StringUtil]")
   REQUIRE(pu::trimLineOmitComment("  test  ") == "test  ");
   REQUIRE(pu::trimLineOmitComment(testCommentString) == "");
   REQUIRE(pu::trimLineOmitComment(testCommentString.c_str()) == "");
+}
+
+TEST_CASE("Simple Cycles are found", "[utiles][GraphUtil][SimpleCycleFinder]")
+{
+  // turn on attribute handling
+  igraph_set_attribute_table(&igraph_cattribute_table);
+
+  SECTION("Star")
+  {
+    // setup simple test graph
+    std::cout << "Testing star" << std::endl;
+    igraph_t starGraph;
+    igraph_star(&starGraph, 7, IGRAPH_STAR_UNDIRECTED, 1);
+    pu::SimpleCycleFinder starCycleFinder = pu::SimpleCycleFinder(&starGraph);
+    REQUIRE(starCycleFinder.findNext().empty());
+    igraph_destroy(&starGraph);
+  }
+
+  SECTION("Lattice")
+  {
+    return;
+    std::cout << "Testing lattice" << std::endl;
+    igraph_t latticeGraph;
+    std::vector<int> dimvector = { 1, 1 };
+    igraph_vector_t dimvector_i;
+
+    igraph_vector_init(&dimvector_i, 2);
+    pu::StdVectorToIgraphVectorT(dimvector, &dimvector_i);
+    igraph_lattice(&latticeGraph, &dimvector_i, 3, false, true, false);
+
+    pu::SimpleCycleFinder latticeCycleFinder =
+      pu::SimpleCycleFinder(&latticeGraph);
+    CHECK(latticeCycleFinder.findAllSimpleCycles().size() == 1);
+    igraph_vector_destroy(&dimvector_i);
+    igraph_destroy(&latticeGraph);
+  }
+
+  SECTION("Ring")
+  {
+    std::cout << "Testing ring" << std::endl;
+    igraph_t ringGraph;
+    igraph_ring(&ringGraph, 10, false, true, true);
+    CHECK(igraph_vcount(&ringGraph) == 10);
+    pu::SimpleCycleFinder ringCycleFinder = pu::SimpleCycleFinder(&ringGraph);
+    REQUIRE(ringCycleFinder.findAllSimpleCycles().size() == 1);
+    igraph_destroy(&ringGraph);
+  }
 }
