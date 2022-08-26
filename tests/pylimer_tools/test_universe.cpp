@@ -207,6 +207,42 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     REQUIRE_THROWS(universe.computeDxs(threeLongZeros, fourLongZeros));
   }
 
+  SECTION("Loop Entanglements are detected")
+  {
+    /**
+     * The system looks like this (in terms of bonds, not 3D placement):
+     *
+     * 1-2
+     * | |
+     * 4-3
+     *
+     * 5-6
+     * | |
+     * 8-7
+     */
+    universe.setBox(pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0));
+    universe.addAtoms(8,
+                      { { 1, 2, 3, 4, 5, 6, 7, 8 } },   // id
+                      { { 1, 1, 1, 2, 1, 2, 2, 1 } },   // type
+                      { { -5, 5, 5, -5, 7, 1, 1, 7 } }, // x
+                      { { -5, -5, 5, 5, 0, 0, 0, 0 } }, // y
+                      { { 1, 1, 1, 1, -5, -5, 5, 5 } }, // z
+                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },   // nx
+                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },   // ny
+                      { { 1, 1, 1, 1, 1, 1, 1, 1 } }    // nz
+    );
+    universe.addBonds(8,
+                      { { 1, 2, 3, 4, 5, 6, 7, 8 } },
+                      { { 2, 3, 4, 1, 6, 7, 8, 5 } },
+                      { { 1, 1, 1, 1, 1, 1, 1, 1 } },
+                      false,
+                      false);
+    REQUIRE(universe.getNrOfBonds() == 8);
+    REQUIRE_FALSE(universe.areLoopsEntangled({ {} }, { {} }));
+    REQUIRE_FALSE(universe.areLoopsEntangled({ { 0, 1, 2 } }, { { 5, 7, 6 } }));
+    CHECK(universe.areLoopsEntangled({ { 1, 2, 3, 4 } }, { { 5, 6, 7, 8 } }));
+  }
+
   SECTION("Molecules with crosslinkers are found")
   {
     /**
@@ -265,7 +301,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(weightFraction[2] == (2.0 * 3.0) / (3.0 * 2.0 + 5.0 * 1.0));
       REQUIRE(universe.computeTotalMass() == Catch::Approx(5 * 1.0 + 3 * 2.0));
       std::map<int, double> otherMasses(masses);
-      otherMasses[2] =  0.0;
+      otherMasses[2] = 0.0;
       REQUIRE(otherMasses[2] == 0.0);
       REQUIRE(universe.computeTotalMassWithMasses(otherMasses) ==
               Catch::Approx(5 * 1.0));

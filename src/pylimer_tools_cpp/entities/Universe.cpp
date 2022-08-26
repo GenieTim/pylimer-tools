@@ -1513,6 +1513,7 @@ namespace entities {
     std::vector<long int> vertexIndicesLoop1,
     std::vector<long int> vertexIndicesLoop2) const
   {
+
     Eigen::Vector3d helperNode = Eigen::Vector3d::Zero();
     double sizeDenominator = 1.0 / vertexIndicesLoop1.size();
     for (long int i = 0; i < vertexIndicesLoop1.size(); ++i) {
@@ -1536,6 +1537,7 @@ namespace entities {
       Eigen::Vector3d vertex1 =
         this->getPositionVectorForVertex(vertexIndicesLoop1[vertex1Index]);
       // the triangle is now spawned by vertex0, vertex1 and the helperNode
+      // TODO: consider PBC
       for (size_t j = 0; j < vertexIndicesLoop2.size(); ++j) {
         Eigen::Vector3d rayOrigin =
           this->getPositionVectorForVertex(vertexIndicesLoop2[j]);
@@ -1556,7 +1558,7 @@ namespace entities {
     }
     // we have an entanglement, iff the triangle spawned is crossed an odd
     // number of times
-    return intersections % 2 == 0;
+    return intersections > 0 && intersections % 2 == 0;
   };
 
   Eigen::Vector3d Universe::getPositionVectorForVertex(const int vertexId) const
