@@ -10,6 +10,7 @@ extern "C"
 }
 #include <cassert>
 
+#include <Eigen/Dense>
 #include <algorithm>
 #include <iterator> // for back_inserter
 #include <map>
@@ -1458,6 +1459,113 @@ namespace entities {
     }
     igraph_vector_destroy(&allValues);
     return -1;
+  }
+
+  bool rayIntersectsTriangle(Eigen::Vector3d rayOrigin,
+                             Eigen::Vector3d rayDirection,
+                             Eigen::Vector3d vertex0,
+                             Eigen::Vector3d vertex1,
+                             Eigen::Vector3d vertex2,
+                             Eigen::Vector3d& outIntersectionPoint,
+                             const double EPSILON = 1e-8)
+  {
+    // Möller-Trumbore intersection algorithm, see
+    // https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
+    Eigen::Vector3d edge1 = vertex1 - vertex0;
+    Eigen::Vector3d edge2 = vertex2 - vertex0;
+    Eigen::Vector3d h = rayDirection.cross(edge2);
+    double a = edge1.dot(h);
+    if (a > -EPSILON && a < EPSILON) {
+      return false; // This ray is parallel to this triangle.
+    }
+    double f = 1.0 / a;
+    Eigen::Vector3d s = rayOrigin - vertex0;
+    double u = f * s.dot(h);
+    if (u < 0.0 || u > 1.0) {
+      return false;
+    }
+    Eigen::Vector3d q = s.cross(edge1);
+    double v = f * rayDirection.dot(h);
+    if (v < 0.0 || u + v > 1.0) {
+      return false;
+    }
+    // At this stage we can compute t to find out where the intersection point
+    // is on the line.
+    double t = f * edge2.dot(q);
+    if (t > EPSILON) {
+      outIntersectionPoint = rayOrigin + rayDirection * t;
+      return true;
+    }
+    // This means that there is a line intersection but not a ray
+    // intersection.
+    return false;
+  };
+
+  /**
+   * @brief An algorithm to determine whether two loops are entangled
+   * 
+   * @param vertexIndicesLoop1 
+   * @param vertexIndicesLoop2 
+   * @return true 
+   * @return false 
+   */
+  bool Universe::areLoopsEntangled(
+    std::vector<long int> vertexIndicesLoop1,
+    std::vector<long int> vertexIndicesLoop2) const
+  {
+    Eigen::Vector3d helperNode = Eigen::Vector3d::Zero();
+    double sizeDenominator = 1.0 / vertexIndicesLoop1.size();
+    for (long int i = 0; i < vertexIndicesLoop1.size(); ++i) {
+      helperNode[0] +=
+        igraph_cattribute_VAN(&this->graph, "x", vertexIndicesLoop1[i]) *
+        sizeDenominator;
+      helperNode[1] +=
+        igraph_cattribute_VAN(&this->graph, "y", vertexIndicesLoop1[i]) *
+        sizeDenominator;
+      helperNode[2] +=
+        igraph_cattribute_VAN(&this->graph, "z", vertexIndicesLoop1[i]) *
+        sizeDenominator;
+    }
+    int intersections = 0;
+    // now that we have the helper node, we can check all edges of loop2, how
+    // often they intersect the triangles
+    for (long int i = 0; i < vertexIndicesLoop1.size(); ++i) {
+      Eigen::Vector3d vertex0 =
+        this->getPositionVectorForVertex(vertexIndicesLoop1[i]);
+      long int vertex1Index = i == 0 ? vertexIndicesLoop1.size() : i - 1;
+      Eigen::Vector3d vertex1 =
+        this->getPositionVectorForVertex(vertexIndicesLoop1[vertex1Index]);
+      // the triangle is now spawned by vertex0, vertex1 and the helperNode
+      for (size_t j = 0; j < vertexIndicesLoop2.size(); ++j) {
+        Eigen::Vector3d rayOrigin =
+          this->getPositionVectorForVertex(vertexIndicesLoop2[j]);
+        long int directionIdx = j == 0 ? vertexIndicesLoop2.size() : j - 1;
+        Eigen::Vector3d rayDirection =
+          this->getPositionVectorForVertex(vertexIndicesLoop2[directionIdx]);
+        Eigen::Vector3d intersectionPoint;
+        if (rayIntersectsTriangle(rayOrigin,
+                                  rayDirection,
+                                  vertex0,
+                                  vertex1,
+                                  helperNode,
+                                  intersectionPoint)) {
+          intersections += 1;
+          // TODO: maybe do something with the intersection point?
+        }
+      }
+    }
+    // we have an entanglement, iff the triangle spawned is crossed an odd
+    // number of times
+    return intersections % 2 == 0;
+  };
+
+  Eigen::Vector3d Universe::getPositionVectorForVertex(const int vertexId) const
+  {
+    Eigen::Vector3d vertex = Eigen::Vector3d::Zero();
+    vertex[0] = igraph_cattribute_VAN(&this->graph, "x", vertexId);
+    vertex[1] = igraph_cattribute_VAN(&this->graph, "y", vertexId);
+    vertex[2] = igraph_cattribute_VAN(&this->graph, "z", vertexId);
+    return vertex;
   }
 
   /**
