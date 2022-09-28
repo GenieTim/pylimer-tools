@@ -143,8 +143,8 @@ namespace entities {
       }
       igraph_vector_t allValues;
       igraph_vector_init(&allValues, vertices.size());
-      igraph_vector_t vertexIdxs;
-      igraph_vector_init(&vertexIdxs, vertices.size());
+      igraph_vector_int_t vertexIdxs;
+      igraph_vector_int_init(&vertexIdxs, vertices.size());
       pylimer_tools::utils::StdVectorToIgraphVectorT(vertices, &vertexIdxs);
       if (igraph_cattribute_VANV(&this->graph,
                                  propertyName,
@@ -154,7 +154,7 @@ namespace entities {
       }
       pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
       igraph_vector_destroy(&allValues);
-      igraph_vector_destroy(&vertexIdxs);
+      igraph_vector_int_destroy(&vertexIdxs);
       return results;
     }
 

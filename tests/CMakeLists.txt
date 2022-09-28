@@ -122,9 +122,9 @@ catch_discover_tests(header_tests)
 
 if(CODE_COVERAGE)
 	
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-functions -fno-inline-small-functions -fno-default-inline")
-	set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-functions -fno-inline-small-functions -fno-default-inline")
-	target_compile_options(pylimer_tests PRIVATE -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-inline-functions -fno-default-inline)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage")
+	set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage")
+	target_compile_options(pylimer_tests PRIVATE -O0 -g -fprofile-arcs -ftest-coverage )
 
 	if(CMAKE_COMPILER_IS_GNUCXX)
 		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-abs-path")
@@ -148,7 +148,7 @@ if(CODE_COVERAGE)
 		--coverage
 	)
 
-	target_compile_options(header_tests PRIVATE -O0 -g -fprofile-arcs -ftest-coverage -fno-inline -fno-inline-small-functions -fno-inline-functions -fno-default-inline)
+	target_compile_options(header_tests PRIVATE -O0 -g -fprofile-arcs -ftest-coverage )
 	if(CMAKE_COMPILER_IS_GNUCXX)
 		target_compile_options(header_tests PRIVATE -fprofile-abs-path)
 	endif()

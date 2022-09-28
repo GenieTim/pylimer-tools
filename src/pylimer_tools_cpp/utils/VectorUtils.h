@@ -53,6 +53,21 @@ namespace utils {
     }
   }
 
+  template<typename IN1>
+  static inline void StdVectorToIgraphVectorT(IN1& vectR,
+                                              igraph_vector_int_t* v)
+  {
+    size_t n = vectR.size();
+
+    /* Make sure that there is enough space for the items in v */
+    igraph_vector_int_resize(v, n);
+
+    /* Copy all the items */
+    for (size_t i = 0; i < n; ++i) {
+      igraph_vector_int_set(v, i, vectR[i]);
+    }
+  }
+
   template<typename IN>
   static inline void igraphVectorTToStdVector(igraph_vector_t* v,
                                               std::vector<IN>& vectL)
@@ -63,7 +78,21 @@ namespace utils {
     vectL.reserve(n);
 
     for (long i = 0; i < n; ++i) {
-      vectL.push_back(igraph_vector_e(v, i));
+      vectL.push_back(igraph_vector_get(v, i));
+    }
+  }
+
+  template<typename IN>
+  static inline void igraphVectorTToStdVector(igraph_vector_int_t* v,
+                                              std::vector<IN>& vectL)
+  {
+    long n = igraph_vector_int_size(v);
+
+    vectL.clear();
+    vectL.reserve(n);
+
+    for (long i = 0; i < n; ++i) {
+      vectL.push_back(igraph_vector_int_get(v, i));
     }
   }
 

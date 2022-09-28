@@ -239,13 +239,13 @@ namespace entities {
 
   void Universe::removeAtoms(std::vector<long int> ids)
   {
-    igraph_vector_t vertexIds;
-    igraph_vector_init(&vertexIds, ids.size());
+    igraph_vector_int_t vertexIds;
+    igraph_vector_int_init(&vertexIds, ids.size());
     for (size_t i = 0; i < ids.size(); ++i) {
-      igraph_vector_set(&vertexIds, i, this->getIdxByAtomId(ids[i]));
+      igraph_vector_int_set(&vertexIds, i, this->getIdxByAtomId(ids[i]));
     }
     igraph_delete_vertices(&this->graph, igraph_vss_vector(&vertexIds));
-    igraph_vector_destroy(&vertexIds);
+    igraph_vector_int_destroy(&vertexIds);
 
     // now, we need to update the id-atomId map
     this->atomIdToVertexIdx.clear();
@@ -278,11 +278,11 @@ namespace entities {
       std::vector<long int> edgeIds =
         this->getEdgeIdsFromTo(this->getIdxByAtomId(atomIdsFrom[i]),
                                this->getIdxByAtomId(atomIdsTo[i]));
-      igraph_vector_t edgeIdsV;
-      igraph_vector_init(&edgeIdsV, edgeIds.size());
+      igraph_vector_int_t edgeIdsV;
+      igraph_vector_int_init(&edgeIdsV, edgeIds.size());
       pylimer_tools::utils::StdVectorToIgraphVectorT(edgeIds, &edgeIdsV);
       igraph_delete_edges(&this->graph, igraph_ess_vector(&edgeIdsV));
-      igraph_vector_destroy(&edgeIdsV);
+      igraph_vector_int_destroy(&edgeIdsV);
     }
 
     this->NBonds = igraph_ecount(&this->graph);
@@ -313,35 +313,35 @@ namespace entities {
       pylimer_tools::utils::interleave(from, to);
     size_t edgesSize = newEdgesVector.size();
     // translate from atomId to VertexIdx
-    igraph_vector_t newEdges;
+    igraph_vector_int_t newEdges;
     size_t actualNrOfBondsAdded = 0;
-    igraph_vector_init(&newEdges, edgesSize);
+    igraph_vector_int_init(&newEdges, edgesSize);
     int innerIndex = 0;
     for (size_t i = 1; i < edgesSize; i += 2) {
       if (this->atomIdToVertexIdx.contains(newEdgesVector[i - 1]) &&
           this->atomIdToVertexIdx.contains(newEdgesVector[i])) {
-        igraph_vector_set(&newEdges,
+        igraph_vector_int_set(&newEdges,
                           innerIndex,
                           this->atomIdToVertexIdx.at(newEdgesVector[i - 1]));
         innerIndex += 1;
-        igraph_vector_set(
+        igraph_vector_int_set(
           &newEdges, innerIndex, this->atomIdToVertexIdx.at(newEdgesVector[i]));
         innerIndex += 1;
         actualNrOfBondsAdded += 1;
       } else if (!ignoreNonExistentAtoms) {
-        igraph_vector_destroy(&newEdges);
+        igraph_vector_int_destroy(&newEdges);
         throw std::invalid_argument("Bond with atom with id " +
                                     std::to_string(newEdgesVector[i]) +
                                     " impossible as atom is not added yet.");
       }
     }
     assert(innerIndex == 2 * actualNrOfBondsAdded);
-    igraph_vector_resize(&newEdges, 2 * actualNrOfBondsAdded);
+    igraph_vector_int_resize(&newEdges, 2 * actualNrOfBondsAdded);
     // add the new edges
     if (igraph_add_edges(&this->graph, &newEdges, 0)) {
       throw std::runtime_error("Failed to add edges to graph.");
     }
-    igraph_vector_destroy(&newEdges);
+    igraph_vector_int_destroy(&newEdges);
     if (actualNrOfBondsAdded > 0) {
       // add attributes
       // if (bondTypes.size() == NNewBonds && this->NBonds ==
@@ -432,17 +432,17 @@ namespace entities {
     }
 
     // split the copy into the separate components
-    igraph_vector_ptr_t components;
-    igraph_vector_ptr_init(&components, 0);
+    igraph_graph_list_t components;
+    igraph_graph_list_init(&components, 0);
     if (igraph_decompose(&graph, &components, IGRAPH_WEAK, -1, 0)) {
       throw std::runtime_error("Failed to decompose graph.");
     }
-    size_t NComponents = igraph_vector_ptr_size(&components);
+    size_t NComponents = igraph_graph_list_size(&components);
     // std::cout << NComponents << " clusters found." << std::endl;
     clusters.reserve(NComponents);
     for (size_t i = 0; i < NComponents; ++i) {
       // make the molecule the owner of the graph
-      igraph_t* g = (igraph_t*)VECTOR(components)[i];
+      igraph_t* g = igraph_graph_list_get_ptr(&components, i);
 
       if (igraph_vcount(g)) {
         Universe newUniverse = Universe(this->box);
@@ -453,8 +453,7 @@ namespace entities {
 
       igraph_destroy(g);
     }
-    igraph_decompose_destroy(&components);
-    igraph_vector_ptr_destroy(&components);
+    igraph_graph_list_destroy(&components);
     return clusters;
   }
 
@@ -494,13 +493,13 @@ namespace entities {
     }
 
     // split the copy into the separate components
-    igraph_vector_ptr_t components;
-    igraph_vector_ptr_init(&components, this->getNrOfAtoms());
+    igraph_graph_list_t components;
+    igraph_graph_list_init(&components, this->getNrOfAtoms());
     if (igraph_decompose(
           &graphWithoutCrosslinkers, &components, IGRAPH_WEAK, -1, 0)) {
       throw std::runtime_error("Failed to decompose graph.");
     }
-    size_t NComponents = igraph_vector_ptr_size(&components);
+    size_t NComponents = igraph_graph_list_size(&components);
     // std::cout << NComponents << " molecules found. Removed " <<
     // indicesToRemove.size()
     //           << " vertices. Size now: " <<
@@ -510,15 +509,14 @@ namespace entities {
     molecules.reserve(NComponents);
     for (size_t i = 0; i < NComponents; ++i) {
       // make the molecule the owner of the graph
-      igraph_t* g = (igraph_t*)VECTOR(components)[i];
+      igraph_t* g = igraph_graph_list_get_ptr(&components, i);
 
       if (igraph_vcount(g)) {
         molecules.push_back(
           Molecule(&this->box, g, MoleculeType::UNDEFINED, this->massPerType));
       }
     }
-    igraph_decompose_destroy(&components);
-    igraph_vector_ptr_destroy(&components);
+    igraph_graph_list_destroy(&components);
     igraph_destroy(&graphWithoutCrosslinkers);
     return molecules;
   }
@@ -544,14 +542,14 @@ namespace entities {
   igraph_vs_t Universe::getVerticesByIndices(
     std::vector<long int> indices) const
   {
-    igraph_vector_t indicesToSelect;
-    igraph_vector_init(&indicesToSelect, indices.size());
+    igraph_vector_int_t indicesToSelect;
+    igraph_vector_int_init(&indicesToSelect, indices.size());
     pylimer_tools::utils::StdVectorToIgraphVectorT(indices, &indicesToSelect);
     igraph_vs_t result;
     if (igraph_vs_vector_copy(&result, &indicesToSelect)) {
       throw std::runtime_error("Failed to select vertices");
     }
-    igraph_vector_destroy(&indicesToSelect);
+    igraph_vector_int_destroy(&indicesToSelect);
     return result;
   }
 
@@ -616,23 +614,23 @@ namespace entities {
     }
 
     // split the copy into the separate
-    igraph_vector_ptr_t components;
-    igraph_vector_ptr_init(&components, 3);
+    igraph_graph_list_t components;
+    igraph_graph_list_init(&components, 3);
     if (igraph_decompose(
           &graphWithoutCrosslinkers, &components, IGRAPH_STRONG, -1, 0)) {
       throw std::runtime_error("Failed to decompose graph.");
     }
-    size_t NComponents = igraph_vector_ptr_size(&components);
+    size_t NComponents = igraph_graph_list_size(&components);
     molecules.reserve(NComponents);
     for (size_t i = 0; i < NComponents; ++i) {
       // loop the chains to add the crosslinkers back
-      igraph_t* chain = (igraph_t*)VECTOR(components)[i];
+      igraph_t* chain = igraph_graph_list_get_ptr(&components, i);
       int moleculeLengthBefore = igraph_vcount(chain);
       // also select ones of degree 0 for dangling atoms
       std::vector<long int> endNodeIndices =
         this->getVerticesWithDegree(chain, { { 0, 1 } });
-      igraph_vector_t endNodeSelectorVector;
-      igraph_vector_init(&endNodeSelectorVector, endNodeIndices.size());
+      igraph_vector_int_t endNodeSelectorVector;
+      igraph_vector_int_init(&endNodeSelectorVector, endNodeIndices.size());
       pylimer_tools::utils::StdVectorToIgraphVectorT(endNodeIndices,
                                                      &endNodeSelectorVector);
       MoleculeType molType = MoleculeType::UNDEFINED;
@@ -654,8 +652,8 @@ namespace entities {
           long int originalEndNodeVertexId =
             this->atomIdToVertexIdx.at(oldEndNodeId);
           // this->findVertexIdForProperty("id", oldEndNodeId);
-          igraph_vector_t neighbours;
-          igraph_vector_init(&neighbours, 0);
+          igraph_vector_int_t neighbours;
+          igraph_vector_int_init(&neighbours, 0);
 
           if (igraph_neighbors(
                 &graph, &neighbours, originalEndNodeVertexId, IGRAPH_ALL)) {
@@ -688,7 +686,7 @@ namespace entities {
           }
 
           IGRAPH_VIT_NEXT(endNodeVit);
-          igraph_vector_destroy(&neighbours);
+          igraph_vector_int_destroy(&neighbours);
         } // loop end nodes
 
         std::unordered_map<long int, long int> newAtomsMap;
@@ -721,7 +719,7 @@ namespace entities {
         }
         igraph_vit_destroy(&endNodeVit);
       } // if molecule length
-      igraph_vector_destroy(&endNodeSelectorVector);
+      igraph_vector_int_destroy(&endNodeSelectorVector);
       // decide on molecule type
       int newMoleculeLength = igraph_vcount(chain);
       if (newMoleculeLength == moleculeLengthBefore) {
@@ -739,8 +737,7 @@ namespace entities {
       molecules.push_back(
         Molecule(&this->box, chain, molType, this->massPerType));
     }
-    igraph_decompose_destroy(&components);
-    igraph_vector_ptr_destroy(&components);
+    igraph_graph_list_destroy(&components);
     igraph_destroy(&graphWithoutCrosslinkers);
 
     return molecules;
@@ -777,8 +774,8 @@ namespace entities {
       // ideally, we would only select the neighbouring *cross-linkers* here to
       // reduce the overhead. but well: let's leave that to the user with
       // #getNetworkOfCrosslinker
-      igraph_vector_t neighbours;
-      igraph_vector_init(&neighbours, 0);
+      igraph_vector_int_t neighbours;
+      igraph_vector_int_init(&neighbours, 0);
 
       if (igraph_neighbors(
             &graph, &neighbours, startingCrosslinkerVertexId, IGRAPH_ALL)) {
@@ -798,7 +795,7 @@ namespace entities {
         throw std::runtime_error("Failed to get simple paths in graph");
       }
 
-      igraph_vector_destroy(&neighbours);
+      igraph_vector_int_destroy(&neighbours);
       // translate the paths we found
       std::vector<Atom> currentPath;
       int currentFunctionality = 0;
@@ -994,8 +991,8 @@ namespace entities {
     // it is of the order of O(n*n!)
     for (long int startingCrosslinkerVertexId : startingCrosslinkers) {
       // select all neighbouring atoms as possible directions for the loop
-      igraph_vector_t neighbours;
-      igraph_vector_init(&neighbours, 0);
+      igraph_vector_int_t neighbours;
+      igraph_vector_int_init(&neighbours, 0);
 
       if (igraph_neighbors(
             &graph, &neighbours, startingCrosslinkerVertexId, IGRAPH_ALL)) {
@@ -1015,7 +1012,7 @@ namespace entities {
         throw std::runtime_error("Failed to get simple paths in graph");
       }
 
-      igraph_vector_destroy(&neighbours);
+      igraph_vector_int_destroy(&neighbours);
       // translate the paths we found
       std::vector<Atom> currentPath;
       int nrOfTraversalsX = 0;
@@ -1073,8 +1070,8 @@ namespace entities {
   std::map<int, int> Universe::determineFunctionalityPerType() const
   {
     std::map<int, int> result;
-    igraph_vector_t degrees;
-    if (igraph_vector_init(&degrees, 0)) {
+    igraph_vector_int_t degrees;
+    if (igraph_vector_int_init(&degrees, 0)) {
       throw std::runtime_error("Failed to instantiate result vector.");
     }
     igraph_vs_t allVertexIds;
@@ -1098,12 +1095,12 @@ namespace entities {
     while (!IGRAPH_VIT_END(vit)) {
       long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
       result[types[vertexId]] = std::max(
-        (int)igraph_vector_e(&degrees, vertexId), result[types[vertexId]]);
+        (int)igraph_vector_int_get(&degrees, vertexId), result[types[vertexId]]);
       IGRAPH_VIT_NEXT(vit);
     }
     igraph_vit_destroy(&vit);
     igraph_vs_destroy(&allVertexIds);
-    igraph_vector_destroy(&degrees);
+    igraph_vector_int_destroy(&degrees);
 
     return result;
   }
@@ -1116,8 +1113,8 @@ namespace entities {
   std::map<int, double> Universe::determineEffectiveFunctionalityPerType() const
   {
     std::map<int, double> result;
-    igraph_vector_t degrees;
-    if (igraph_vector_init(&degrees, 0)) {
+    igraph_vector_int_t degrees;
+    if (igraph_vector_int_init(&degrees, 0)) {
       throw std::runtime_error("Failed to instantiate result vector.");
     }
     igraph_vs_t allVertexIds;
@@ -1140,12 +1137,12 @@ namespace entities {
     igraph_vit_create(&graph, allVertexIds, &vit);
     while (!IGRAPH_VIT_END(vit)) {
       long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
-      result[types[vertexId]] += igraph_vector_e(&degrees, vertexId);
+      result[types[vertexId]] += igraph_vector_int_get(&degrees, vertexId);
       IGRAPH_VIT_NEXT(vit);
     }
     igraph_vit_destroy(&vit);
     igraph_vs_destroy(&allVertexIds);
-    igraph_vector_destroy(&degrees);
+    igraph_vector_int_destroy(&degrees);
 
     std::map<int, int> typeCounts = this->countAtomTypes();
     for (const auto typePair : typeCounts) {
@@ -1630,15 +1627,15 @@ namespace entities {
 
     size_t nBonds = bondFrom.size();
 
-    igraph_vector_t vertexIdFrom;
-    igraph_vector_init(&vertexIdFrom, nBonds);
-    igraph_vector_t vertexIdTo;
-    igraph_vector_init(&vertexIdTo, nBonds);
+    igraph_vector_int_t vertexIdFrom;
+    igraph_vector_int_init(&vertexIdFrom, nBonds);
+    igraph_vector_int_t vertexIdTo;
+    igraph_vector_int_init(&vertexIdTo, nBonds);
 
     for (size_t i = 0; i < nBonds; ++i) {
-      igraph_vector_set(
+      igraph_vector_int_set(
         &vertexIdFrom, i, this->atomIdToVertexIdx.at(bondFrom[i]));
-      igraph_vector_set(&vertexIdTo, i, this->atomIdToVertexIdx.at(bondTo[i]));
+      igraph_vector_int_set(&vertexIdTo, i, this->atomIdToVertexIdx.at(bondTo[i]));
     }
 
     igraph_vector_t dValuesFrom;
@@ -1656,8 +1653,8 @@ namespace entities {
                            igraph_vss_vector(&vertexIdTo),
                            &dValuesTo);
 
-    igraph_vector_destroy(&vertexIdFrom);
-    igraph_vector_destroy(&vertexIdTo);
+    igraph_vector_int_destroy(&vertexIdFrom);
+    igraph_vector_int_destroy(&vertexIdTo);
 
     std::vector<double> results;
     results.reserve(nBonds);
@@ -1838,8 +1835,8 @@ namespace entities {
 
     while (!IGRAPH_EIT_END(bondIterator)) {
       long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
-      int bondFrom;
-      int bondTo;
+      igraph_integer_t bondFrom;
+      igraph_integer_t bondTo;
       igraph_edge(&this->graph, edgeId, &bondFrom, &bondTo);
       // TODO: this is more intensive than needed
       // check whether the compiler optimizes this or not
@@ -1986,15 +1983,15 @@ namespace entities {
       for (size_t i = 0; i < this->getNrOfAtoms(); ++i) {
         igraph_vector_set(&xValueVec,
                           i,
-                          igraph_vector_e(&xValueVec, i) * scalingFactorX +
+                          igraph_vector_get(&xValueVec, i) * scalingFactorX +
                             offsetX);
         igraph_vector_set(&yValueVec,
                           i,
-                          igraph_vector_e(&yValueVec, i) * scalingFactorY +
+                          igraph_vector_get(&yValueVec, i) * scalingFactorY +
                             offsetY);
         igraph_vector_set(&zValueVec,
                           i,
-                          igraph_vector_e(&zValueVec, i) * scalingFactorZ +
+                          igraph_vector_get(&zValueVec, i) * scalingFactorZ +
                             offsetZ);
       }
 
