@@ -5,10 +5,10 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator" href="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator.html" /><link rel="prev" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.html" />
 
-    <meta name="generator" content="sphinx-5.1.1, furo 2022.06.21"/>
+    <meta name="generator" content="sphinx-5.2.2, furo 2022.09.15"/>
         <title>pylimer_tools_cpp.pylimer_tools_cpp.Molecule - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
+    <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=9ec31e2665bf879c1d47d93a8ec4893870ee1e45" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
     
@@ -135,7 +135,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -227,7 +227,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -473,10 +473,10 @@ molecule.</p>
                 </div>
                 <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator</div>
               </div>
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
           <a class="prev-page" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.html">
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
@@ -505,8 +505,50 @@ molecule.</p>
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.Molecule</a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule"><code class="docutils literal notranslate"><span class="pre">Molecule</span></code></a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.__init__"><code class="docutils literal notranslate"><span class="pre">Molecule.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeBondLengths"><code class="docutils literal notranslate"><span class="pre">Molecule.computeBondLengths()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeEndToEndDistance"><code class="docutils literal notranslate"><span class="pre">Molecule.computeEndToEndDistance()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeRadiusOfGyration"><code class="docutils literal notranslate"><span class="pre">Molecule.computeRadiusOfGyration()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeTotalMass"><code class="docutils literal notranslate"><span class="pre">Molecule.computeTotalMass()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomForVertexId"><code class="docutils literal notranslate"><span class="pre">Molecule.getAtomForVertexId()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomIdByIdx"><code class="docutils literal notranslate"><span class="pre">Molecule.getAtomIdByIdx()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomTypes"><code class="docutils literal notranslate"><span class="pre">Molecule.getAtomTypes()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtoms"><code class="docutils literal notranslate"><span class="pre">Molecule.getAtoms()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsConnectedTo"><code class="docutils literal notranslate"><span class="pre">Molecule.getAtomsConnectedTo()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsLinedUp"><code class="docutils literal notranslate"><span class="pre">Molecule.getAtomsLinedUp()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsOfDegree"><code class="docutils literal notranslate"><span class="pre">Molecule.getAtomsOfDegree()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsOfType"><code class="docutils literal notranslate"><span class="pre">Molecule.getAtomsOfType()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getBonds"><code class="docutils literal notranslate"><span class="pre">Molecule.getBonds()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getEdges"><code class="docutils literal notranslate"><span class="pre">Molecule.getEdges()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getIdxByAtomId"><code class="docutils literal notranslate"><span class="pre">Molecule.getIdxByAtomId()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getKey"><code class="docutils literal notranslate"><span class="pre">Molecule.getKey()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getLength"><code class="docutils literal notranslate"><span class="pre">Molecule.getLength()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getNrOfAtoms"><code class="docutils literal notranslate"><span class="pre">Molecule.getNrOfAtoms()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getNrOfBonds"><code class="docutils literal notranslate"><span class="pre">Molecule.getNrOfBonds()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getType"><code class="docutils literal notranslate"><span class="pre">Molecule.getType()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
@@ -516,6 +558,7 @@ molecule.</p>
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/scripts/furo.js"></script>
     <script>window.MathJax = {"tex": {}, "extensions": ["jsMath2jax.js"], "jax": ["input/TeX"]}</script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>

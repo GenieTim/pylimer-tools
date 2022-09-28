@@ -5,10 +5,10 @@
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="pylimer_tools.io package" href="pylimer_tools.io.html" /><link rel="prev" title="pylimer_tools package" href="pylimer_tools.html" />
 
-    <meta name="generator" content="sphinx-5.1.1, furo 2022.06.21"/>
+    <meta name="generator" content="sphinx-5.2.2, furo 2022.09.15"/>
         <title>pylimer_tools.calc package - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=40978830699223671f4072448e654b5958f38b89" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?digest=9ec31e2665bf879c1d47d93a8ec4893870ee1e45" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
     
@@ -1079,10 +1079,10 @@ See: <a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_
                 </div>
                 <div class="title">pylimer_tools.io package</div>
               </div>
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
           <a class="prev-page" href="pylimer_tools.html">
-              <svg><use href="#svg-arrow-right"></use></svg>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
@@ -1117,7 +1117,7 @@ See: <a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_
       <div class="toc-sticky toc-scroll">
         <div class="toc-title-container">
           <span class="toc-title">
-            Contents
+            On this page
           </span>
         </div>
         <div class="toc-tree-container">
@@ -1125,8 +1125,40 @@ See: <a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_
             <ul>
 <li><a class="reference internal" href="#">pylimer_tools.calc package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-pylimer_tools.calc.doMEHPAnalysis">pylimer_tools.calc.doMEHPAnalysis module</a></li>
-<li><a class="reference internal" href="#module-pylimer_tools.calc.doMMTAnalysis">pylimer_tools.calc.doMMTAnalysis module</a></li>
+<li><a class="reference internal" href="#module-pylimer_tools.calc.doMEHPAnalysis">pylimer_tools.calc.doMEHPAnalysis module</a><ul>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMEHPAnalysis.calculateCycleRank"><code class="docutils literal notranslate"><span class="pre">calculateCycleRank()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveCrosslinkerFunctionalities"><code class="docutils literal notranslate"><span class="pre">calculateEffectiveCrosslinkerFunctionalities()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveCrosslinkerFunctionality"><code class="docutils literal notranslate"><span class="pre">calculateEffectiveCrosslinkerFunctionality()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveNrDensityOfJunctions"><code class="docutils literal notranslate"><span class="pre">calculateEffectiveNrDensityOfJunctions()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMEHPAnalysis.calculateEffectiveNrDensityOfNetwork"><code class="docutils literal notranslate"><span class="pre">calculateEffectiveNrDensityOfNetwork()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMEHPAnalysis.calculateMeanUniverseVolume"><code class="docutils literal notranslate"><span class="pre">calculateMeanUniverseVolume()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMEHPAnalysis.calculateTopologicalFactor"><code class="docutils literal notranslate"><span class="pre">calculateTopologicalFactor()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMEHPAnalysis.calculateWeightFractionOfBackbone"><code class="docutils literal notranslate"><span class="pre">calculateWeightFractionOfBackbone()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMEHPAnalysis.calculateWeightFractionOfDanglingChains"><code class="docutils literal notranslate"><span class="pre">calculateWeightFractionOfDanglingChains()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMEHPAnalysis.computeCrosslinkerConversion"><code class="docutils literal notranslate"><span class="pre">computeCrosslinkerConversion()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMEHPAnalysis.computeEndToEndVectors"><code class="docutils literal notranslate"><span class="pre">computeEndToEndVectors()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMEHPAnalysis.computeMeanEndToEndDistances"><code class="docutils literal notranslate"><span class="pre">computeMeanEndToEndDistances()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMEHPAnalysis.computeMeanEndToEndVectors"><code class="docutils literal notranslate"><span class="pre">computeMeanEndToEndVectors()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMEHPAnalysis.predictShearModulus"><code class="docutils literal notranslate"><span class="pre">predictShearModulus()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-pylimer_tools.calc.doMMTAnalysis">pylimer_tools.calc.doMMTAnalysis module</a><ul>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.calculateWeightFractionOfBackbone"><code class="docutils literal notranslate"><span class="pre">calculateWeightFractionOfBackbone()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.calculateWeightFractionOfDanglingChains"><code class="docutils literal notranslate"><span class="pre">calculateWeightFractionOfDanglingChains()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeExtentOfReaction"><code class="docutils literal notranslate"><span class="pre">computeExtentOfReaction()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeMMsProbabilities"><code class="docutils literal notranslate"><span class="pre">computeMMsProbabilities()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeModulusDecomposition"><code class="docutils literal notranslate"><span class="pre">computeModulusDecomposition()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeProbabilityThatMonomerIsEffective"><code class="docutils literal notranslate"><span class="pre">computeProbabilityThatMonomerIsEffective()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeStoichiometricInbalance"><code class="docutils literal notranslate"><span class="pre">computeStoichiometricInbalance()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeWeightFractionOfSolubleMaterial"><code class="docutils literal notranslate"><span class="pre">computeWeightFractionOfSolubleMaterial()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeWeightFractions"><code class="docutils literal notranslate"><span class="pre">computeWeightFractions()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.measureWeightFractioOfSolubleMaterial"><code class="docutils literal notranslate"><span class="pre">measureWeightFractioOfSolubleMaterial()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.predictGelationPoint"><code class="docutils literal notranslate"><span class="pre">predictGelationPoint()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.predictNumberDensityOfJunctionPoints"><code class="docutils literal notranslate"><span class="pre">predictNumberDensityOfJunctionPoints()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.predictNumberDensityOfNetworkStrands"><code class="docutils literal notranslate"><span class="pre">predictNumberDensityOfNetworkStrands()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.predictShearModulus"><code class="docutils literal notranslate"><span class="pre">predictShearModulus()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-pylimer_tools.calc">Module contents</a></li>
 </ul>
 </li>
@@ -1144,6 +1176,7 @@ See: <a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script src="_static/scripts/furo.js"></script>
     <script>window.MathJax = {"tex": {}, "extensions": ["jsMath2jax.js"], "jax": ["input/TeX"]}</script>
     <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
