@@ -53,8 +53,8 @@ namespace entities {
     while (!IGRAPH_EIT_END(iterator)) {
       long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(iterator));
 
-      int vertex1OfEdge;
-      int vertex2OfEdge;
+      igraph_integer_t vertex1OfEdge;
+      igraph_integer_t vertex2OfEdge;
       igraph_edge(&this->graph, edgeId, &vertex1OfEdge, &vertex2OfEdge);
 
       if (vertex1OfEdge == vertexIdx) {
@@ -138,8 +138,8 @@ namespace entities {
     while (!IGRAPH_EIT_END(iterator)) {
       long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(iterator));
 
-      int vertex1OfEdge;
-      int vertex2OfEdge;
+      igraph_integer_t vertex1OfEdge;
+      igraph_integer_t vertex2OfEdge;
       igraph_edge(&this->graph, edgeId, &vertex1OfEdge, &vertex2OfEdge);
 
       if ((vertex1OfEdge == vertexId1 && vertex2OfEdge == vertexId2) ||
@@ -233,8 +233,8 @@ namespace entities {
   std::vector<Atom> AtomGraphParent::getAtomsOfDegree(const int degree) const
   {
     std::vector<long int> endNodeIndices = this->getVerticesWithDegree(degree);
-    igraph_vector_t endNodeSelectorVector;
-    igraph_vector_init(&endNodeSelectorVector, endNodeIndices.size());
+    igraph_vector_int_t endNodeSelectorVector;
+    igraph_vector_int_init(&endNodeSelectorVector, endNodeIndices.size());
     pylimer_tools::utils::StdVectorToIgraphVectorT(endNodeIndices,
                                                    &endNodeSelectorVector);
     igraph_vit_t vit;
@@ -250,7 +250,7 @@ namespace entities {
       IGRAPH_VIT_NEXT(vit);
     }
 
-    igraph_vector_destroy(&endNodeSelectorVector);
+    igraph_vector_int_destroy(&endNodeSelectorVector);
     igraph_vit_destroy(&vit);
     return results;
   }
@@ -276,8 +276,8 @@ namespace entities {
 
     while (!IGRAPH_EIT_END(bondIterator)) {
       long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
-      int bondFrom;
-      int bondTo;
+      igraph_integer_t bondFrom;
+      igraph_integer_t bondTo;
       igraph_edge(&this->graph, edgeId, &bondFrom, &bondTo);
       // TODO: this is more intensive than needed
       // check whether the compiler optimizes this or not
@@ -299,16 +299,16 @@ namespace entities {
    */
   int AtomGraphParent::computeFunctionalityForVertex(const long int vertexId)
   {
-    igraph_vector_t degrees;
-    if (igraph_vector_init(&degrees, 0)) {
+    igraph_vector_int_t degrees;
+    if (igraph_vector_int_init(&degrees, 0)) {
       throw std::runtime_error("Failed to instantiate result vector.");
     }
     if (igraph_degree(
           &this->graph, &degrees, igraph_vss_1(vertexId), IGRAPH_ALL, false)) {
       throw std::runtime_error("Failed to determine degree of vertex");
     }
-    int result = igraph_vector_e(&degrees, 0);
-    igraph_vector_destroy(&degrees);
+    int result = igraph_vector_int_get(&degrees, 0);
+    igraph_vector_int_destroy(&degrees);
     return result;
   }
 
@@ -324,8 +324,8 @@ namespace entities {
    */
   std::map<std::string, std::vector<long int>> AtomGraphParent::getEdges() const
   {
-    igraph_vector_t allEdges;
-    igraph_vector_init(&allEdges, this->getNrOfBonds());
+    igraph_vector_int_t allEdges;
+    igraph_vector_int_init(&allEdges, this->getNrOfBonds());
     if (igraph_edges(
           &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &allEdges)) {
       throw std::runtime_error("Failed to get all edges");
@@ -338,15 +338,15 @@ namespace entities {
     std::vector<long int> type;
     type.reserve(this->getNrOfBonds());
 
-    for (long int i = 0; i < igraph_vector_size(&allEdges); i++) {
+    for (long int i = 0; i < igraph_vector_int_size(&allEdges); i++) {
       if (i % 2 == 0) {
-        from.push_back(igraph_vector_e(&allEdges, i));
+        from.push_back(igraph_vector_int_get(&allEdges, i));
       } else {
-        to.push_back(igraph_vector_e(&allEdges, i));
+        to.push_back(igraph_vector_int_get(&allEdges, i));
       }
     }
 
-    igraph_vector_destroy(&allEdges);
+    igraph_vector_int_destroy(&allEdges);
 
     // if (igraph_cattribute_has_attr(&this->graph, IGRAPH_ATTRIBUTE_EDGE,
     // "type"))
@@ -414,8 +414,8 @@ namespace entities {
     std::vector<int> ofDegrees) const
   {
     int graphSize = igraph_vcount(someGraph);
-    igraph_vector_t degrees;
-    if (igraph_vector_init(&degrees, graphSize)) {
+    igraph_vector_int_t degrees;
+    if (igraph_vector_int_init(&degrees, graphSize)) {
       throw std::runtime_error("Failed to instantiate result vector.");
     }
     igraph_vs_t allVertexIds;
@@ -432,7 +432,7 @@ namespace entities {
     igraph_vit_create(someGraph, allVertexIds, &vit);
     while (!IGRAPH_VIT_END(vit)) {
       long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
-      int currentDegree = igraph_vector_e(&degrees, vertexId);
+      int currentDegree = igraph_vector_int_get(&degrees, vertexId);
       for (int degree : ofDegrees) {
         if (currentDegree == degree) {
           toSelect.push_back(vertexId);
@@ -441,7 +441,7 @@ namespace entities {
       }
       IGRAPH_VIT_NEXT(vit);
     }
-    igraph_vector_destroy(&degrees);
+    igraph_vector_int_destroy(&degrees);
     igraph_vit_destroy(&vit);
     igraph_vs_destroy(&allVertexIds);
 
@@ -466,10 +466,12 @@ namespace entities {
     std::vector<long int> toSelect = this->getVerticesWithDegree(degree);
 
     igraph_vs_t result;
-    igraph_vector_t toSelectVec;
-    igraph_vector_init(&toSelectVec, toSelect.size());
+    igraph_vector_int_t toSelectVec;
+    igraph_vector_int_init(&toSelectVec, toSelect.size());
     pylimer_tools::utils::StdVectorToIgraphVectorT(toSelect, &toSelectVec);
     igraph_vs_vector(&result, &toSelectVec);
+
+    // igraph_vector_int_destroy(&toSelectVec);
 
     return result;
   }

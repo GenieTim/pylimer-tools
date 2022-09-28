@@ -134,24 +134,24 @@ TEST_CASE("Simple Cycles are found", "[utiles][GraphUtil][SimpleCycleFinder]")
     igraph_destroy(&starGraph);
   }
 
-  SECTION("Lattice")
-  {
-    return;
-    std::cout << "Testing lattice" << std::endl;
-    igraph_t latticeGraph;
-    std::vector<int> dimvector = { 1, 1 };
-    igraph_vector_t dimvector_i;
+  // SECTION("Lattice")
+  // {
+  //   return;
+  //   std::cout << "Testing lattice" << std::endl;
+  //   igraph_t latticeGraph;
+  //   std::vector<int> dimvector = { 1, 1 };
+  //   igraph_vector_t dimvector_i;
 
-    igraph_vector_init(&dimvector_i, 2);
-    pu::StdVectorToIgraphVectorT(dimvector, &dimvector_i);
-    igraph_lattice(&latticeGraph, &dimvector_i, 3, false, true, false);
+  //   igraph_vector_init(&dimvector_i, 2);
+  //   pu::StdVectorToIgraphVectorT(dimvector, &dimvector_i);
+  //   igraph_lattice(&latticeGraph, &dimvector_i, 3, false, true, false);
 
-    pu::SimpleCycleFinder latticeCycleFinder =
-      pu::SimpleCycleFinder(&latticeGraph);
-    CHECK(latticeCycleFinder.findAllSimpleCycles().size() == 1);
-    igraph_vector_destroy(&dimvector_i);
-    igraph_destroy(&latticeGraph);
-  }
+  //   pu::SimpleCycleFinder latticeCycleFinder =
+  //     pu::SimpleCycleFinder(&latticeGraph);
+  //   CHECK(latticeCycleFinder.findAllSimpleCycles().size() == 1);
+  //   igraph_vector_destroy(&dimvector_i);
+  //   igraph_destroy(&latticeGraph);
+  // }
 
   SECTION("Ring")
   {
