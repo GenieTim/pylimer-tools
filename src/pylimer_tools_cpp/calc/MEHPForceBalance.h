@@ -304,6 +304,15 @@ namespace calc {
         return crosslinkerUniverse.getNrOfBonds() == net->nrOfSprings;
       };
 
+      /**
+       * @brief Displace one link to the mean of all connected neighbours
+       *
+       * @param net the force balance network
+       * @param u the current displacements, wherein the resulting coordinates
+       * shall be stored
+       * @param linkIdx the idx of the link to displace
+       * @return double, the distance (squared norm) displaced
+       */
       double enactDisplacementStep(ForceBalanceNetwork* net,
                                    Eigen::VectorXd& u,
                                    size_t linkIdx)
@@ -312,46 +321,36 @@ namespace calc {
         Eigen::Vector3d currentDisplacement;
         currentDisplacement << u[3 * linkIdx], u[3 * linkIdx + 1],
           u[3 * linkIdx + 2];
-        Eigen::Array3d objectiveDisplacement =
-          Eigen::Array3d::Zero(); // = remainingDisplacement.array();
+        Eigen::Vector3d objectiveDisplacement =
+          Eigen::Vector3d::Zero(); // = remainingDisplacement.array();
         double objectiveDisplacementContributors = 0.0;
         for (size_t spring_index = 0; spring_index < springIndices.size();
              ++spring_index) {
-          Eigen::Vector3d totalDistance = Eigen::Vector3d::Zero();
-          std::vector<Eigen::Vector3d> partialDistances;
           // compute partial distances & total distance of this spring
           std::vector<size_t> springsPartners =
             net->linkIndicesOfSprings[springIndices[spring_index]];
-          partialDistances.reserve(springsPartners.size());
-          for (size_t partner_idx = 0; partner_idx < springsPartners.size() - 1;
-               ++partner_idx) {
-            // add partial distance to the total distance
-            Eigen::Vector3d partialDistance =
-              MEHPForceBalance::evaluateDistanceBetween(
-                net,
-                u,
-                springsPartners[partner_idx],
-                springsPartners[partner_idx + 1],
-                is2D);
-            totalDistance += partialDistance;
-            partialDistances.push_back(partialDistance);
-          }
-          // find weighted [?] mean for displacement
           for (size_t partner_idx = 0; partner_idx < springsPartners.size() - 1;
                ++partner_idx) {
             if (springsPartners[partner_idx] == linkIdx ||
-                springsPartners[partner_idx + 1]) {
+                springsPartners[partner_idx + 1] == linkIdx) {
+              // add partial distance to the total distance
+              Eigen::Vector3d partialDistance =
+                MEHPForceBalance::evaluateDistanceBetween(
+                  net,
+                  u,
+                  springsPartners[partner_idx],
+                  springsPartners[partner_idx + 1],
+                  is2D);
               // add to displacement
               double prefix =
                 springsPartners[partner_idx] == linkIdx ? -1. : 1.;
               objectiveDisplacement +=
-                prefix * (partialDistances[partner_idx]
-                            .array()); // / totalDistance.array());
+                prefix * (partialDistance); // / totalDistance.array());
               objectiveDisplacementContributors += 1.0;
             }
           }
         }
-        // take weighted mean for displacement
+        // take mean for displacement
         u[3 * linkIdx] +=
           objectiveDisplacement[0] / objectiveDisplacementContributors;
         u[3 * linkIdx + 1] +=
@@ -359,13 +358,13 @@ namespace calc {
         u[3 * linkIdx + 2] +=
           objectiveDisplacement[2] / objectiveDisplacementContributors;
 
-        double dist = objectiveDisplacement[0] * objectiveDisplacement[0] +
-                      objectiveDisplacement[1] * objectiveDisplacement[1] +
-                      objectiveDisplacement[2] * objectiveDisplacement[2];
+        double dist = objectiveDisplacement.squaredNorm();
         // if (dist > 500) {
         //   std::cout << "Moving " << linkIdx << " for " << dist
-        //             << " with displacements " << currentDisplacement[0] << ", "
-        //             << currentDisplacement[1] << ", " << currentDisplacement[2]
+        //             << " with displacements " << currentDisplacement[0] << ",
+        //             "
+        //             << currentDisplacement[1] << ", " <<
+        //             currentDisplacement[2]
         //             << std::endl;
         //   std::cout << "For objective displacements "
         //             << objectiveDisplacement[0] << ", "
