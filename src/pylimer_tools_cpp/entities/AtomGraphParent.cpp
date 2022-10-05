@@ -70,7 +70,8 @@ namespace entities {
 
     // igraph_vs_t adjVs;
     // if (igraph_vs_adj(&adjVs, vertexIdx, IGRAPH_ALL)) {
-    //   throw std::runtime_error("Failed to find adjacent vertices of vertex.");
+    //   throw std::runtime_error("Failed to find adjacent vertices of
+    //   vertex.");
     // }
     // igraph_vit_t vit;
     // igraph_vit_create(&this->graph, adjVs, &vit);
@@ -106,6 +107,35 @@ namespace entities {
                      return this->getAtomByVertexIdx(vertexId);
                    });
     return results;
+  };
+
+  /**
+   * @brief Get the shortest sequence of atoms between two vertices
+   * 
+   * @param vertexIdxFrom 
+   * @param vertexIdxTo 
+   * @return std::vector<Atom> 
+   */
+  std::vector<Atom> AtomGraphParent::getShortestPath(
+    const long int vertexIdxFrom,
+    const long int vertexIdxTo) const
+  {
+    std::vector<Atom> result;
+
+    igraph_vector_int_t vertices;
+    igraph_vector_int_init(&vertices, 0);
+
+    igraph_get_shortest_path(
+      &this->graph, &vertices, nullptr, vertexIdxFrom, vertexIdxTo, IGRAPH_ALL);
+
+    result.reserve(igraph_vector_int_size(&vertices));
+    for (size_t i = 0; i < igraph_vector_int_size(&vertices); i++) {
+      result.push_back(
+        this->getAtomByVertexIdx(igraph_vector_int_get(&vertices, i)));
+    }
+
+    igraph_vector_int_destroy(&vertices);
+    return result;
   };
 
   /**

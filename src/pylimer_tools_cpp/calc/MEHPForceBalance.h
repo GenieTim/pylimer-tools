@@ -5,7 +5,6 @@
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
 #include "MEHPForceEvaluator.h"
-#include "MEHPForceRelaxation.h"
 #include "MEHPUtilityStructures.h"
 #include <Eigen/Dense>
 #include <algorithm>

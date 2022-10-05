@@ -802,7 +802,7 @@ namespace entities {
       long int currentPathKey = 0;
       size_t n = igraph_vector_int_size(&paths);
       for (size_t i = 0; i < n; ++i) {
-        const long int currentVal = igraph_vector_int_e(&paths, i);
+        const long int currentVal = igraph_vector_int_get(&paths, i);
         if (currentVal == -1) {
           // skip self-loops and duplicates
           if ((!skipSelfLoops || currentPath.size() > 3) &&
@@ -930,7 +930,7 @@ namespace entities {
     long int currentPathKey = 0;
     size_t n = igraph_vector_int_size(&paths);
     for (size_t i = 0; i < n; ++i) {
-      const long int currentVal = igraph_vector_int_e(&paths, i);
+      const long int currentVal = igraph_vector_int_get(&paths, i);
       if (currentVal == -1) {
         // skip self-loops and duplicates
         bool allowedSelfLoop = (!skipSelfLoops || currentPath.size() > 2);
@@ -1020,7 +1020,7 @@ namespace entities {
       int nrOfTraversalsZ = 0;
       size_t n = igraph_vector_int_size(&paths);
       for (int i = 0; i < n; ++i) {
-        const long int currentVal = igraph_vector_int_e(&paths, i);
+        const long int currentVal = igraph_vector_int_get(&paths, i);
         if (currentVal == -1) {
           // finished a loop. Check.
           // we have an infinite loop if the box boundary was passed in one
@@ -1660,8 +1660,8 @@ namespace entities {
     results.reserve(nBonds);
 
     for (int i = 0; i < nBonds; ++i) {
-      double currentD = (double)igraph_vector_e(&dValuesTo, i) -
-                        (double)igraph_vector_e(&dValuesFrom, i);
+      double currentD = (double)igraph_vector_get(&dValuesTo, i) -
+                        (double)igraph_vector_get(&dValuesFrom, i);
       while (std::fabs(currentD) > 0.5 * boxLimit) {
         if (currentD < 0.0) {
           currentD += boxLimit;

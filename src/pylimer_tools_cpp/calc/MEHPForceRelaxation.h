@@ -21,16 +21,6 @@
 namespace pylimer_tools {
 namespace calc {
   namespace mehp {
-    enum ExitReason
-    {
-      UNSET,
-      F_TOLERANCE,
-      X_TOLERANCE,
-      MAX_STEPS,
-      FAILURE,
-      OTHER
-    };
-
     // heavily inspired by Prof. Dr. Andrei Gusev's Code
     class MEHPForceRelaxation
     {
@@ -48,6 +38,10 @@ namespace calc {
           forceEvaluator = &this->springForceEvaluator;
         }
         this->crosslinkerType = crosslinkerType;
+        this->defaultR0Squared =
+          universe.computeMeanSquareEndToEndDistance(crosslinkerType);
+        this->defaultNrOfChains =
+          universe.getMolecules(this->crosslinkerType).size();
         // interpret network already to be able to give early results
         Network net;
         ConvertNetwork(&net, crosslinkerType);
@@ -57,10 +51,6 @@ namespace calc {
           Eigen::VectorXd::Zero(net.coordinates.size());
         this->currentSpringDistances =
           this->evaluateSpringDistances(&net, this->currentDisplacements, is2D);
-        this->defaultR0Squared =
-          universe.computeMeanSquareEndToEndDistance(crosslinkerType);
-        this->defaultNrOfChains =
-          universe.getMolecules(this->crosslinkerType).size();
         this->setForceEvaluator(forceEvaluator);
       };
 
@@ -164,7 +154,8 @@ namespace calc {
       Eigen::VectorXi getNrOfActiveSpringsConnected(
         double tolerance = 0.1) const;
 
-      Eigen::VectorXd getCurrentSpringDistances() const {
+      Eigen::VectorXd getCurrentSpringDistances() const
+      {
         return this->currentSpringDistances;
       }
 
@@ -178,6 +169,16 @@ namespace calc {
       int getNrOfActiveSprings(double tol = 0.1) const
       {
         return this->countNrOfActiveSprings(this->currentSpringDistances, tol);
+      }
+
+      double getAverageContourLength() const
+      {
+        return this->initialConfig.meanSpringContourLength;
+      }
+
+      Eigen::VectorXd getSpringContourLength() const
+      {
+        return this->initialConfig.springsContourLength;
       }
 
       /**
@@ -258,6 +259,7 @@ namespace calc {
       {
         pylimer_tools::entities::Universe crosslinkerUniverse =
           this->universe.getNetworkOfCrosslinker(crosslinkerType);
+
         // crosslinkerUniverse.simplify();
         pylimer_tools::entities::Box box = crosslinkerUniverse.getBox();
         net->L[0] = box.getLx();
@@ -274,6 +276,7 @@ namespace calc {
         net->springCoordinateIndexB =
           Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
         net->springIsActive = ArrayXb::Constant(net->nrOfSprings, false);
+        net->springsContourLength = Eigen::VectorXd::Zero(net->nrOfSprings);
 
         // convert beads
         std::vector<pylimer_tools::entities::Atom> allAtoms =
@@ -291,6 +294,9 @@ namespace calc {
         // convert springs
         std::map<std::string, std::vector<long int>> allBonds =
           crosslinkerUniverse.getBonds();
+        std::vector<size_t> contourLengthsToFix;
+        double usualContourLength = 0.0;
+        size_t nrOfUsualContourLenghts = 0;
         for (size_t i = 0; i < net->nrOfSprings; ++i) {
           int atomIdFrom = allBonds["bond_from"][i];
           int atomIdTo = allBonds["bond_to"][i];
@@ -302,10 +308,37 @@ namespace calc {
             net->springCoordinateIndexB[3 * i + j] =
               atomIdToNode.at(atomIdTo) * 3 + j;
           }
+          // also find contour length of this chain
+          int contourLength =
+            this->universe
+              .getShortestPath(this->universe.getIdxByAtomId(atomIdTo),
+                               this->universe.getIdxByAtomId(atomIdFrom))
+              .size();
+          // TODO: decide whether to -2
+          net->springsContourLength[i] = static_cast<double>(contourLength);
+          if (contourLength == 1) {
+            // fix.
+            assert(atomIdFrom == atomIdTo);
+            contourLengthsToFix.push_back(i);
+            // std::cout << "Found contour length 1: " << atomIdFrom << " " <<
+            // atomIdTo << std::endl;
+          } else {
+            usualContourLength += contourLength;
+            nrOfUsualContourLenghts += 1;
+          }
+        }
+
+        // TODO: this is clearly an ugly resultion of fixing this issue of
+        // finding the length of a primary loop
+        usualContourLength =
+          usualContourLength / static_cast<double>(nrOfUsualContourLenghts);
+        for (size_t idx : contourLengthsToFix) {
+          net->springsContourLength[idx] = usualContourLength;
         }
 
         // box volume
         net->vol = net->L[0] * net->L[1] * net->L[2];
+        net->meanSpringContourLength = net->springsContourLength.mean();
 
         return crosslinkerUniverse.getNrOfBonds() == net->nrOfSprings;
       };
