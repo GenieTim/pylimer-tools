@@ -4,6 +4,7 @@
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
 #include "../entities/Molecule.h"
+#include "../entities/NeighbourList.h"
 #include "../entities/Universe.h"
 #include "../entities/UniverseSequence.h"
 
@@ -340,6 +341,33 @@ init_pylimer_bound_entities(py::module_& m)
     // ))
     .def("__copy__",
          [](const Molecule& molecule) { return Molecule(molecule); });
+
+  py::class_<NeighbourList>(
+    m,
+    "NeighbourList",
+    "Gives access to somewhat fast queries on the neighbourhood of atoms")
+    .def(py::init<const std::vector<pylimer_tools::entities::Atom>,
+                  const pylimer_tools::entities::Box,
+                  double>(),
+         "Instantiates a new neighbour list",
+         py::arg("atoms"),
+         py::arg("box"),
+         py::arg("cutoff"))
+    .def("getAtomsCloseTo",
+         py::overload_cast<Atom, double>(&NeighbourList::getAtomsCloseTo),
+         R"pbdoc(
+          List all atoms that are close to a given one. 
+
+          It is possible to request it within a new cutoff, 
+          though the underlying neighbour list will not be regenerated.
+          For performance reasons, it is recommended to initialize a 
+          new NeighbourList if you require a differnt cutoff, depending on your use case.
+
+          You can use a negative value for the newCutoff to use the cutoff used for 
+          filling the neighbour list buckets.
+         )pbdoc",
+         py::arg("atom"),
+         py::arg("newCutoff") = -1.0);
 
   py::class_<Universe>(
     m,

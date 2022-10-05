@@ -57,11 +57,13 @@ namespace calc {
         for (size_t j = 0; j < this->net.nrOfSprings; ++j) {
           const int a = this->net.springIndexA[j];
           const int b = this->net.springIndexB[j];
+          const double Nterm = this->net.meanSpringContourLength /
+                               this->net.springsContourLength[j];
           for (size_t dir = 0; dir < nrOfDim; ++dir) {
             grad[3 * a + dir] +=
-              springDistances[3 * j + dir] * constantMultiplier;
+              springDistances[3 * j + dir] * constantMultiplier * Nterm;
             grad[3 * b + dir] -=
-              springDistances[3 * j + dir] * constantMultiplier;
+              springDistances[3 * j + dir] * constantMultiplier * Nterm;
           }
         }
       }
@@ -199,7 +201,8 @@ namespace calc {
             sqrt(springDistances[3 * i] * springDistances[3 * i] +
                  springDistances[3 * i + 1] * springDistances[3 * i + 1] +
                  springDistances[3 * i + 2] * springDistances[3 * i + 2]);
-          const double linv = langevin_inv(r * this->oneOverNl);
+          const double linv =
+            langevin_inv(r * this->oneOverl / (this->net.springsContourLength[i]));
           if (std::isnan(linv) || std::isinf(linv)) {
             std::cerr << "Got " << linv << " for spring " << i
                       << " and distance " << r << std::endl;
@@ -231,15 +234,16 @@ namespace calc {
           std::sqrt(springDistances[3 * i] * springDistances[3 * i] +
                     springDistances[3 * i + 1] * springDistances[3 * i + 1] +
                     springDistances[3 * i + 2] * springDistances[3 * i + 2]);
-        double rOverNl = r * this->oneOverNl;
-        double beta = langevin_inv(r * this->oneOverNl);
+        double rOverNl = r * this->oneOverl / (this->net.springsContourLength[i]);
+        double beta = langevin_inv(rOverNl);
         double cschTerm =
           csch(beta) *
           beta; // can be inf or 0. In case of zero, std::log() returns -inf.
         if (beta > 0.0 && !std::isinf(cschTerm) && cschTerm > 0.0) {
-          force += this->N * (rOverNl * beta + std::log(cschTerm));
+          force += this->net.springsContourLength[i] *
+                   (rOverNl * beta + std::log(cschTerm));
         } else if (beta > 0.0 && (std::isinf(cschTerm) || cschTerm == 0.0)) {
-          force += this->N * rOverNl * beta;
+          force += this->net.springsContourLength[i] * rOverNl * beta;
         }
       }
 

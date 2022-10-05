@@ -85,9 +85,8 @@ namespace calc {
     {
     protected:
       double kappa = 1.0;
-      double oneOverNl = 1.0;
       double oneOverl = 1.0;
-      double N = 1.0;
+      double l = 1.0;
       SimpleSpringMEHPForceEvaluator springForceEvaluator;
 
     public:
@@ -102,9 +101,7 @@ namespace calc {
         this->kappa = kappa;
         this->springForceEvaluator = SimpleSpringMEHPForceEvaluator(kappa);
         assert(l > 0);
-        assert(l * N > 0);
-        this->N = N;
-        this->oneOverNl = 1.0 / (N * l);
+        this->l = l;
         this->oneOverl = 1.0 / l;
       }
 

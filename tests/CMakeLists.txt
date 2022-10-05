@@ -68,6 +68,7 @@ add_library(test_sources
 		pylimer_tools/test_universe.cpp 
 		pylimer_tools/test_universesequence.cpp 
 		pylimer_tools/test_molecule.cpp 
+		pylimer_tools/test_neighbourlist.cpp 
 		pylimer_tools/test_readers_writers.cpp 
 )
 
@@ -91,6 +92,9 @@ target_link_libraries(pylimer_tests
 
 # separate the header tests out, for the coverage generation
 add_executable(header_tests pylimer_tools/test_headers.cpp)
+
+add_dependencies(pylimer_tools igraphLib)
+
 target_link_libraries(header_tests 
 	PRIVATE 
 	Catch2::Catch2WithMain

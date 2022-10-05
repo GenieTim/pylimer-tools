@@ -64,6 +64,8 @@ testGradient(pcm::MEHPForceEvaluator* forceEvaluator)
   net.L[1] = 4.0;
   net.L[2] = 4.0;
   net.nrOfLoops = 1;
+  net.springsContourLength = Eigen::VectorXd::Constant(4, 1.0);
+  net.meanSpringContourLength = 1.0;
   REQUIRE(net.coordinates.size() == 12);
   // test that Eigen does as expected
   Eigen::VectorXd coordinatesSpringEndA =
@@ -121,7 +123,7 @@ testGradient(pcm::MEHPForceEvaluator* forceEvaluator)
       // require gradient to be similar to finite difference
       if (std::abs(grad[i]) == 0.0) {
         CHECK(std::abs(grad[i]) ==
-              Catch::Approx(std::abs(fp - fm)).margin(0.000001));
+              Catch::Approx(std::abs(fp - fm)).margin(0.000002));
       } else {
         CHECK(grad[i] == Catch::Approx((1.0 / (2.0 * h)) * (fp - fm)));
       }
@@ -142,7 +144,7 @@ TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
   SECTION("Test NonGaussianSpringForceEvaluator force gradient")
   {
     pcm::NonGaussianSpringForceEvaluator forceEvaluatorInstance =
-      pcm::NonGaussianSpringForceEvaluator(1.0, 3.0, 1.0);
+      pcm::NonGaussianSpringForceEvaluator(1.0, 2.0, 1.0);
     testGradient(&forceEvaluatorInstance);
   }
 }
@@ -198,6 +200,11 @@ TEST_CASE("MEHP Force Relaxation2 runs",
       // initial system values
       CHECK(forceRelaxer2.getPressure() == Catch::Approx(0.39911682390778536));
       CHECK(forceRelaxer2.getForce() == Catch::Approx(552894.1903005145));
+      CHECK(forceRelaxer2.getAverageContourLength() == Catch::Approx(80.0));
+      Eigen::VectorXd contourLengths = forceRelaxer2.getSpringContourLength();
+      for (int i = 0; i < contourLengths.size(); ++i) {
+        CHECK(contourLengths[i] == Catch::Approx(forceRelaxer2.getAverageContourLength()));
+      }
       CHECK(forceRelaxer2.getResidualNorm() == Catch::Approx(1457.465048151));
       REQUIRE_NOTHROW(forceRelaxer2.runForceRelaxation());
       CHECK(forceRelaxer2.getNrOfSprings() == 8142);
@@ -367,7 +374,7 @@ TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
       CHECK(static_cast<double>(universe2.getMolecules(2).size()) ==
             Catch::Approx(nrOfChains));
       pcm::NonGaussianSpringForceEvaluator nonGaussianForceEvaluator =
-        pcm::NonGaussianSpringForceEvaluator(1.0, 79, 0.98);
+        pcm::NonGaussianSpringForceEvaluator(1.0, 78., 0.98);
       pcm::MEHPForceRelaxation forceRelaxer2 = pcm::MEHPForceRelaxation(
         universe2, 2, false, &nonGaussianForceEvaluator);
       REQUIRE(forceRelaxer2.getExitReason() == pcm::ExitReason::UNSET);
@@ -377,9 +384,14 @@ TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
       CHECK(forceRelaxer2.getVolume() ==
             Catch::Approx(97.383096 * 97.383096 * 97.383096));
       // initial system values
-      CHECK(forceRelaxer2.getForce() == Catch::Approx(22103.6441026747));
-      CHECK(forceRelaxer2.getResidualNorm() == Catch::Approx(58.7568113327));
+      CHECK(forceRelaxer2.getForce() == Catch::Approx(21821.2315950056));
+      CHECK(forceRelaxer2.getResidualNorm() == Catch::Approx(57.9925492668));
       CHECK(forceRelaxer2.getPressure() == Catch::Approx(0.39911682390778536));
+      CHECK(forceRelaxer2.getAverageContourLength() == Catch::Approx(80.0));
+      Eigen::VectorXd contourLengths = forceRelaxer2.getSpringContourLength();
+      for (int i = 0; i < contourLengths.size(); ++i) {
+        CHECK(contourLengths[i] == Catch::Approx(forceRelaxer2.getAverageContourLength()));
+      }
       REQUIRE_NOTHROW(forceRelaxer2.runForceRelaxation("LD_MMA"));
       // As long as gradient is unclear: gradient free methods, e.g.:
       // "LN_SBPLX", "LN_BOBYQA", "LN_NELDERMEAD",
@@ -497,6 +509,8 @@ TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
   net.springIndexA << 0;
   net.springIndexB = Eigen::VectorXi(1);
   net.springIndexB << 1;
+  net.springsContourLength = Eigen::VectorXd::Constant(1, 3.0);
+  net.meanSpringContourLength = 3.0;
   // setup evaluator
   pcm::NonGaussianSpringForceEvaluator forceEvaluatorInstance =
     pcm::NonGaussianSpringForceEvaluator(1.0, 3.0, 1.0);

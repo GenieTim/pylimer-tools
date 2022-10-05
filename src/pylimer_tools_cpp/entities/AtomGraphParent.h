@@ -54,6 +54,8 @@ namespace entities {
      */
     std::vector<Atom> getAtomsConnectedTo(const long int vertexIdx) const;
 
+    std::vector<Atom> getShortestPath(const long int vertexIdxFrom, const long int vertexIdxTo) const;
+
     /**
      * @brief Get the number Of Atoms
      *

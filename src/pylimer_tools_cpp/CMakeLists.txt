@@ -75,9 +75,10 @@ target_sources(pylimer_tools
 	PUBLIC
 		${CMAKE_CURRENT_LIST_DIR}/entities/Box.h
 		${CMAKE_CURRENT_LIST_DIR}/entities/Atom.h
-		${CMAKE_CURRENT_LIST_DIR}/entities/Universe.h
 		${CMAKE_CURRENT_LIST_DIR}/entities/Molecule.h
+		${CMAKE_CURRENT_LIST_DIR}/entities/Universe.h
 		${CMAKE_CURRENT_LIST_DIR}/entities/UniverseSequence.h
+		${CMAKE_CURRENT_LIST_DIR}/entities/NeighbourList.h
 
 		${CMAKE_CURRENT_LIST_DIR}/utils/DataFileParser.h
 		${CMAKE_CURRENT_LIST_DIR}/utils/DumpFileParser.h

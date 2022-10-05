@@ -8,6 +8,15 @@
 namespace pylimer_tools {
 namespace calc {
   namespace mehp {
+    enum ExitReason
+    {
+      UNSET,
+      F_TOLERANCE,
+      X_TOLERANCE,
+      MAX_STEPS,
+      FAILURE,
+      OTHER
+    };
 
     typedef Eigen::Array<bool, Eigen::Dynamic, 1> ArrayXb;
     // typedef Eigen::Array<Eigen::ArrayXi, Eigen::Dynamic, 1> ArrayXArrayXi;
@@ -16,13 +25,15 @@ namespace calc {
     // improved structures using Eigen
     struct Network
     {
-      double L[3];          /* box sizes */
-      double vol;           /* box volume */
-      long int nrOfNodes;   /* number of nodes */
-      long int nrOfSprings; /* number of springs */
-      long int nrOfLoops;   /* loops */
+      double L[3];                    /* box sizes */
+      double vol;                     /* box volume */
+      double meanSpringContourLength; /* mean N */
+      long int nrOfNodes;             /* number of nodes */
+      long int nrOfSprings;           /* number of springs */
+      long int nrOfLoops;             /* loops */
       // coordinates & connectivity
       Eigen::VectorXd coordinates;
+      Eigen::VectorXd springsContourLength; /* the N for each spring */
       Eigen::ArrayXi oldAtomIds;
       Eigen::ArrayXi springCoordinateIndexA;
       Eigen::ArrayXi springCoordinateIndexB;
@@ -34,16 +45,17 @@ namespace calc {
 
     struct ForceBalanceNetwork
     {
-      double L[3]; /* box sizes */
+      double L[3];        /* box sizes */
       double boxHalfs[3]; /* half box sizes */
       double vol;         /* box volume */
       long int nrOfLinks; /* number of links, = nrOfNodes + nrOfSlipLinks */
-      long int nrOfNodes; /* number of nodes */
+      long int nrOfNodes; /* number of cross-links */
       long int nrOfSprings;
       // coordinates & connectivity
       Eigen::VectorXd coordinates;
-      ArrayXArrayXi springIndicesOfLinks; // maps link -> springs
-      ArrayXArrayXi linkIndicesOfSprings; // maps spring -> links
+      Eigen::VectorXd springsContourLength; /* the N for each spring */
+      ArrayXArrayXi springIndicesOfLinks;   // maps link -> springs
+      ArrayXArrayXi linkIndicesOfSprings;   // maps spring -> links
       ArrayXb linkIsSpliplink;
       // old stuff used for conversion. Does not include slip-links
       Eigen::ArrayXi oldAtomIds;
