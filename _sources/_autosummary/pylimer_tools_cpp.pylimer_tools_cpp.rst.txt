@@ -41,6 +41,7 @@
       Molecule
       MoleculeIterator
       MoleculeType
+      NeighbourList
       NonGaussianSpringForceEvaluator
       SimpleSpringMEHPForceEvaluator
       SimplifiedNetwork

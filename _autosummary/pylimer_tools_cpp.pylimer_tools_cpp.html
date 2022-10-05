@@ -189,6 +189,7 @@
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.html">pylimer_tools_cpp.pylimer_tools_cpp.Molecule</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator.html">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.html">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList.html">pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">pylimer_tools_cpp.pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedNetwork.html">pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedNetwork</a></li>
@@ -305,19 +306,22 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.html#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType" title="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoleculeType</span></code></a>(self, value)</p></td>
 <td><p>Members:</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html#pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator" title="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NonGaussianSpringForceEvaluator</span></code></a>(self[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList.html#pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList" title="pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NeighbourList</span></code></a>(self, atoms, box, cutoff)</p></td>
+<td><p>Gives access to somewhat fast queries on the neighbourhood of atoms</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html#pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator" title="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NonGaussianSpringForceEvaluator</span></code></a>(self[, ...])</p></td>
 <td><p>This is equal to a spring evaluator for Langevin chains.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html#pylimer_tools_cpp.pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator" title="pylimer_tools_cpp.pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimpleSpringMEHPForceEvaluator</span></code></a>(self[, kappa])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html#pylimer_tools_cpp.pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator" title="pylimer_tools_cpp.pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimpleSpringMEHPForceEvaluator</span></code></a>(self[, kappa])</p></td>
 <td><p>This is equal to a spring evaluator for Gaussian chains.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedNetwork.html#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedNetwork" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedNetwork"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedNetwork</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedNetwork.html#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedNetwork" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedNetwork"><code class="xref py py-obj docutils literal notranslate"><span class="pre">SimplifiedNetwork</span></code></a></p></td>
 <td><p>A more efficient structure of the network for use in MEHP.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Universe</span></code></a>(self, Lx, Ly, Lz)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Universe</span></code></a>(self, Lx, Ly, Lz)</p></td>
 <td><p>Represents a full Polymer Network structure, a collection of molecules.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UniverseSequence</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.html#pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UniverseSequence</span></code></a>(self)</p></td>
 <td><p>This class represents a sequence of Universes, with the Universe's data only being read on request.</p></td>
 </tr>
 </tbody>
