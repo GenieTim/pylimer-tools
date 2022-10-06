@@ -45,9 +45,10 @@ namespace calc {
 
     struct ForceBalanceNetwork
     {
-      double L[3];        /* box sizes */
-      double boxHalfs[3]; /* half box sizes */
-      double vol;         /* box volume */
+      double L[3];                    /* box sizes */
+      double boxHalfs[3];             /* half box sizes */
+      double vol;                     /* box volume */
+      double meanSpringContourLength; /* mean N */
       long int nrOfLinks; /* number of links, = nrOfNodes + nrOfSlipLinks */
       long int nrOfNodes; /* number of cross-links */
       long int nrOfSprings;
