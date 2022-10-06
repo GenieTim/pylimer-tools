@@ -54,12 +54,6 @@ FetchContent_MakeAvailable(Catch2)
 # add sources & targets
 add_subdirectory(../src/pylimer_tools_cpp pylimer_tools.out)
 
-add_dependencies(pylimer_tools igraphLib)
-add_dependencies(pylimer_tools nlopt)
-include_directories(${igraph_INCLUDE_DIRS})
-include_directories(${nlopt_INCLUDE_DIRS})
-message("Found igraph for tests. Including ${igraph_INCLUDE_DIRS}, linking to ${igraph_LIBRARIES}")
-
 add_library(test_sources 
 	OBJECT 
 		pylimer_tools/test_generator.cpp 
@@ -72,6 +66,11 @@ add_library(test_sources
 		pylimer_tools/test_readers_writers.cpp 
 )
 
+add_dependencies(test_sources pylimer_tools)
+include_directories(${igraph_INCLUDE_DIRS})
+include_directories(${nlopt_INCLUDE_DIRS})
+message("Found igraph for tests. Including ${igraph_INCLUDE_DIRS}, linking to ${igraph_LIBRARIES}")
+
 target_link_libraries(test_sources 
 PRIVATE
 	Catch2::Catch2
@@ -81,6 +80,10 @@ PRIVATE
 )
 
 add_executable(pylimer_tests pylimer_tools/test.cpp)
+
+add_dependencies(pylimer_tests pylimer_tools)
+add_dependencies(pylimer_tests test_sources)
+
 target_link_libraries(pylimer_tests 
 	PRIVATE 
 	Catch2::Catch2WithMain
@@ -93,7 +96,7 @@ target_link_libraries(pylimer_tests
 # separate the header tests out, for the coverage generation
 add_executable(header_tests pylimer_tools/test_headers.cpp)
 
-add_dependencies(pylimer_tools igraphLib)
+add_dependencies(header_tests igraphLib)
 
 target_link_libraries(header_tests 
 	PRIVATE 
