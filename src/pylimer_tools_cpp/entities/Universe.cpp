@@ -1375,7 +1375,7 @@ namespace entities {
     // with the algorithm above, self-loops are counted twice.
     // let's just remove the second (and/or fourth) one where needed
     // NOTE: some assumptions are made here that could be problematic;
-    // for example, that there are not more than 1 self-loops in the beginning
+    // for example, that there are not more than 1 self-loops per cross-link in the beginning
     std::vector<size_t> indicesToRemove;
     std::map<int, int> nrOfSelfLoops;
     for (size_t i = 0; i < bondTo.size(); ++i) {

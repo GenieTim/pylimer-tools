@@ -229,19 +229,39 @@ namespace calc {
       bool ConvertNetwork(ForceBalanceNetwork* net,
                           const int crosslinkerType = 2)
       {
-        pylimer_tools::entities::Universe crosslinkerUniverse =
-          this->universe.getNetworkOfCrosslinker(crosslinkerType);
+        std::vector<pylimer_tools::entities::Atom> xlinkers =
+          this->universe.getAtomsOfType(crosslinkerType);
+
+        size_t nrOfXlinks = xlinkers.size();
+
+        std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
+          this->universe.getChainsWithCrosslinker(crosslinkerType);
+
+        // need to include all but dangling and free chains in order to
+        // model entanglement
+        size_t nrOfSprings = 0;
+        for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
+          std::vector<pylimer_tools::entities::Atom> endAtoms =
+            crosslinkerChains[i].getAtomsOfType(crosslinkerType);
+          if (crosslinkerChains[i].getType() ==
+                pylimer_tools::entities::MoleculeType::NETWORK_STRAND ||
+              crosslinkerChains[i].getType() ==
+                pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
+            nrOfSprings += 1;
+          }
+        }
+
         // crosslinkerUniverse.simplify();
-        pylimer_tools::entities::Box box = crosslinkerUniverse.getBox();
+        pylimer_tools::entities::Box box = this->universe.getBox();
         net->L[0] = box.getLx();
         net->L[1] = box.getLy();
         net->L[2] = box.getLz();
         net->boxHalfs[0] = 0.5 * net->L[0];
         net->boxHalfs[1] = 0.5 * net->L[1];
         net->boxHalfs[2] = 0.5 * net->L[2];
-        net->nrOfNodes = crosslinkerUniverse.getNrOfAtoms();
-        net->nrOfLinks = crosslinkerUniverse.getNrOfAtoms();
-        net->nrOfSprings = crosslinkerUniverse.getNrOfBonds();
+        net->nrOfNodes = nrOfXlinks;
+        net->nrOfLinks = nrOfXlinks;
+        net->nrOfSprings = nrOfSprings;
         net->coordinates = Eigen::VectorXd::Zero(3 * net->nrOfLinks);
         net->oldAtomIds = Eigen::ArrayXi::Zero(net->nrOfLinks);
         net->linkIsSpliplink = ArrayXb::Constant(net->nrOfLinks, false);
@@ -260,13 +280,12 @@ namespace calc {
         net->springCoordinateIndexB =
           Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
         net->springIsActive = ArrayXb::Constant(net->nrOfSprings, false);
+        net->springsContourLength = Eigen::VectorXd::Zero(net->nrOfSprings);
 
         // convert beads
-        std::vector<pylimer_tools::entities::Atom> allAtoms =
-          crosslinkerUniverse.getAtoms();
         std::map<int, int> atomIdToNode;
-        for (size_t i = 0; i < allAtoms.size(); ++i) {
-          pylimer_tools::entities::Atom atom = allAtoms[i];
+        for (size_t i = 0; i < xlinkers.size(); ++i) {
+          pylimer_tools::entities::Atom atom = xlinkers[i];
           atomIdToNode[atom.getId()] = i;
           net->oldAtomIds[i] = atom.getId();
           net->coordinates[3 * i + 0] = atom.getX();
@@ -275,32 +294,61 @@ namespace calc {
         }
 
         // convert springs
-        std::map<std::string, std::vector<long int>> allBonds =
-          crosslinkerUniverse.getBonds();
-        for (size_t i = 0; i < net->nrOfSprings; ++i) {
-          int atomIdFrom = allBonds["bond_from"][i];
-          int atomIdTo = allBonds["bond_to"][i];
+        size_t spring_idx = 0;
+        for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
+          std::vector<pylimer_tools::entities::Atom> xlinkersOfChain =
+            crosslinkerChains[i].getAtomsOfType(crosslinkerType);
+          long int nodeIdxFrom;
+          long int nodeIdxTo;
+          bool addChain = false;
+          if (crosslinkerChains[i].getType() ==
+              pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
+            assert(xlinkersOfChain.size() == 2);
+            nodeIdxFrom = atomIdToNode.at(xlinkersOfChain[0].getId());
+            nodeIdxTo = atomIdToNode.at(xlinkersOfChain[1].getId());
+            if (nodeIdxFrom > nodeIdxTo) {
+              std::swap(nodeIdxFrom, nodeIdxTo);
+            }
+            addChain = true;
+          } else if (crosslinkerChains[i].getType() ==
+                     pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
+            assert(xlinkersOfChain.size() == 1 ||
+                   (xlinkersOfChain.size() == 2 &&
+                    xlinkersOfChain[0].getId() == xlinkersOfChain[1].getId()));
 
-          net->springIndicesOfLinks[atomIdToNode.at(atomIdFrom)].push_back(i);
-          net->springIndicesOfLinks[atomIdToNode.at(atomIdTo)].push_back(i);
+            nodeIdxFrom = atomIdToNode.at(xlinkersOfChain[0].getId());
+            nodeIdxTo = nodeIdxFrom;
+            addChain = true;
+          }
 
-          net->linkIndicesOfSprings[i].push_back(atomIdToNode.at(atomIdFrom));
-          net->linkIndicesOfSprings[i].push_back(atomIdToNode.at(atomIdTo));
+          if (addChain) {
+            net->springIndicesOfLinks[nodeIdxFrom].push_back(spring_idx);
+            net->springIndicesOfLinks[nodeIdxTo].push_back(spring_idx);
 
-          net->springIndexA[i] = atomIdToNode.at(atomIdFrom);
-          net->springIndexB[i] = atomIdToNode.at(atomIdTo);
-          for (size_t j = 0; j < 3; j++) {
-            net->springCoordinateIndexA[3 * i + j] =
-              atomIdToNode.at(atomIdFrom) * 3 + j;
-            net->springCoordinateIndexB[3 * i + j] =
-              atomIdToNode.at(atomIdTo) * 3 + j;
+            net->linkIndicesOfSprings[spring_idx].push_back(nodeIdxFrom);
+            net->linkIndicesOfSprings[spring_idx].push_back(nodeIdxTo);
+
+            net->springIndexA[spring_idx] = nodeIdxFrom;
+            net->springIndexB[spring_idx] = nodeIdxTo;
+            for (size_t j = 0; j < 3; j++) {
+              net->springCoordinateIndexA[3 * spring_idx + j] =
+                nodeIdxFrom * 3 + j;
+              net->springCoordinateIndexB[3 * spring_idx + j] =
+                nodeIdxTo * 3 + j;
+            }
+
+            net->springsContourLength[spring_idx] =
+              crosslinkerChains[i].getNrOfAtoms(); // TODO: -2?
+            spring_idx += 1;
           }
         }
 
+
         // box volume
         net->vol = net->L[0] * net->L[1] * net->L[2];
+        net->meanSpringContourLength = net->springsContourLength.mean();
 
-        return crosslinkerUniverse.getNrOfBonds() == net->nrOfSprings;
+        return spring_idx == net->nrOfSprings;
       };
 
       /**
