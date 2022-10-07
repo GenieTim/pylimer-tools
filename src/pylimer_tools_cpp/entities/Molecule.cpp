@@ -145,23 +145,35 @@ namespace entities {
    *
    * @return int
    */
-  int Molecule::getLength() const { return this->size; };
+  int Molecule::getLength() const
+  {
+    return this->size;
+  };
 
   /**
    * @brief Get the nr of atoms in the molecule
    *
    * @return int
    */
-  int Molecule::getNrOfAtoms() const { return this->size; }
+  int Molecule::getNrOfAtoms() const
+  {
+    return this->size;
+  }
 
   /**
    * @brief Get the type of the molecule
    *
    * @return MoleculeType
    */
-  MoleculeType Molecule::getType() { return this->typeOfThisMolecule; };
+  MoleculeType Molecule::getType()
+  {
+    return this->typeOfThisMolecule;
+  };
 
-  const Box* Molecule::getBox() const { return this->parent; }
+  const Box* Molecule::getBox() const
+  {
+    return this->parent;
+  }
 
   double Molecule::computeRadiusOfGyration()
   {
@@ -176,13 +188,23 @@ namespace entities {
 // TODO: might want to use the raw values, use std::accumulate or std::reduce
 #pragma omp parallel for reduction(+ : meanX, meanY, meanZ)
     for (Atom a : allAtoms) {
-      meanX += this->massPerType.at(a.getType()) * a.getUnwrappedX(this->parent);
-      meanY += this->massPerType.at(a.getType()) * a.getUnwrappedY(this->parent);
-      meanZ += this->massPerType.at(a.getType()) * a.getUnwrappedZ(this->parent);
+      meanX +=
+        this->massPerType.at(a.getType()) * a.getUnwrappedX(this->parent);
+      meanY +=
+        this->massPerType.at(a.getType()) * a.getUnwrappedY(this->parent);
+      meanZ +=
+        this->massPerType.at(a.getType()) * a.getUnwrappedZ(this->parent);
       totalMass += this->massPerType.at(a.getType());
     }
 
-    Atom virtualCenterAtom = Atom(0, 0, meanX*multiplier, meanY*multiplier, meanZ*multiplier, 0, 0, 0);
+    Atom virtualCenterAtom = Atom(0,
+                                  0,
+                                  meanX * multiplier,
+                                  meanY * multiplier,
+                                  meanZ * multiplier,
+                                  0,
+                                  0,
+                                  0);
 
     double Rg2 = 0.0;
     for (Atom a : allAtoms) {
@@ -193,7 +215,10 @@ namespace entities {
     return Rg2 * multiplier / totalMass;
   }
 
-  std::string Molecule::getKey() const { return this->key; }
+  std::string Molecule::getKey() const
+  {
+    return this->key;
+  }
 
   std::vector<Atom> Molecule::getAtoms()
   {

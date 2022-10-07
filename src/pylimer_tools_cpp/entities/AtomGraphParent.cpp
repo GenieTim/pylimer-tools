@@ -111,10 +111,10 @@ namespace entities {
 
   /**
    * @brief Get the shortest sequence of atoms between two vertices
-   * 
-   * @param vertexIdxFrom 
-   * @param vertexIdxTo 
-   * @return std::vector<Atom> 
+   *
+   * @param vertexIdxFrom
+   * @param vertexIdxTo
+   * @return std::vector<Atom>
    */
   std::vector<Atom> AtomGraphParent::getShortestPath(
     const long int vertexIdxFrom,

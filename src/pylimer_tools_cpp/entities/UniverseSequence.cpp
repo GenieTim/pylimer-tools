@@ -44,7 +44,10 @@ namespace entities {
     this->universeCache.reserve(this->length);
   };
 
-  Universe UniverseSequence::next() { return this->atIndex(this->index++); }
+  Universe UniverseSequence::next()
+  {
+    return this->atIndex(this->index++);
+  }
 
   Universe UniverseSequence::atIndex(size_t index)
   {
@@ -310,9 +313,15 @@ namespace entities {
     }
   }
 
-  void UniverseSequence::resetIterator() { this->index = 0; }
+  void UniverseSequence::resetIterator()
+  {
+    this->index = 0;
+  }
 
-  size_t UniverseSequence::getLength() const { return this->length; }
+  size_t UniverseSequence::getLength() const
+  {
+    return this->length;
+  }
 
   void UniverseSequence::reset()
   {

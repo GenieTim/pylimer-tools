@@ -18,8 +18,8 @@ namespace calc {
 
     Arguments:
       - network: the poylmer network to do the computation for
-      - crosslinkerType: the type of the junctions/crosslinkers to select them in
-    the network
+      - crosslinkerType: the type of the junctions/crosslinkers to select them
+    in the network
       - strandLength: the length of the network strands (in nr. of beads).
               Used to infer the number of precursor strands.
               If `None`: will use average length of each connected system when

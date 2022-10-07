@@ -1,6 +1,7 @@
 #ifndef PYBIND_CALC_H
 #define PYBIND_CALC_H
 
+#include "../calc/MEHPForceBalance.h"
 #include "../calc/MEHPForceEvaluator.h"
 #include "../calc/MEHPForceRelaxation.h"
 #include "../calc/MEHPanalysis.h"
@@ -388,6 +389,184 @@ init_pylimer_bound_calc(py::module_& m)
      )pbdoc")
     .def("getCrosslinkerVerse",
          &mehp::MEHPForceRelaxation::getCrosslinkerVerse,
+         R"pbdoc(
+          Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
+     )pbdoc",
+         py::arg("newCrosslinkerType") = 2);
+
+  py::class_<mehp::MEHPForceBalance>(m, "MEHPForceBalance", R"pbdoc(
+    A small simulation tool for quickly minimizing the force between the cross-linker beads.
+     )pbdoc")
+    .def(py::init<pe::Universe, int, bool>(),
+         R"pbdoc(
+          Instantiate the simulator for a certain universe.
+
+          :param universe: the universe to simulate with
+          :param crosslinkerType: The atom type of the cross-linkers. Needed to reduce the network.
+          :param is2D: Whether to ignore the z direction.
+          :param forceEvaluator: The force evaluator to use
+          )pbdoc",
+         py::arg("universe"),
+         py::arg("crosslinkerType") = 2,
+         py::arg("is2D") = false)
+    .def("runForceRelaxation",
+         &mehp::MEHPForceBalance::runForceRelaxation,
+         R"pbdoc(
+          Run the simulation.
+          Note that the final state of the minimization is persisted and reused if you use this method again.
+          This is useful if you want to run a global optimization first and add a local one afterwards.
+          As a consequence though, you cannot simply benchmark only this method; you must include the setup.
+
+          :param maxNrOfSteps: The maximum number of steps to do during the simulation.
+          :param xTolerance: The tolerance of the displacements as an exit condition.
+          :param innerMaxNrOfSteps: The maximum number of steps to do per iteration during the slip-link displacements.
+          :param innerXTolerance: The tolerance of the displacements of the slip-link as an inner exit condition.
+          :param innerAlphaTolerance: The tolerance of the contour-length when slipping the slip-link as an inner exit condition.
+          )pbdoc",
+         py::arg("maxNrOfSteps") = 250000,
+         py::arg("xTolerance") = 1e-12,
+         py::arg("innerMaxNrOfSteps") = 100,
+         py::arg("innerXTolerance") = 1e-12,
+         py::arg("innerAlphaTolerance") = 1e-9)
+    // .def("getForceEvaluator", &mehp::MEHPForceBalance::getForceEvaluator,
+    // R"pbdoc(
+    //      Query the currently used force evaluator.
+    // )pbdoc")
+    //     .def("setForceEvaluator",
+    //          &mehp::MEHPForceBalance::setForceEvaluator,
+    //          R"pbdoc(
+    //           Reset the currently used force evaluator.
+    //      )pbdoc")
+    //     .def("getForce",
+    //          &mehp::MEHPForceBalance::getForce,
+    //          R"pbdoc(
+    //           Returns the force at the current state of the simulation.
+    //      )pbdoc")
+    //     .def("getResidualNorm",
+    //          &mehp::MEHPForceBalance::getResidualNorm,
+    //          R"pbdoc(
+    //           Returns the residual norm at the current state of the
+    //           simulation.
+    //      )pbdoc")
+    .def("getPressure",
+         &mehp::MEHPForceBalance::getPressure,
+         R"pbdoc(
+          Returns the pressure at the current state of the simulation.
+     )pbdoc")
+    .def("addSlipLinks",
+         py::overload_cast<const std::vector<size_t>,
+                           const std::vector<size_t>,
+                           const std::vector<double>,
+                           const std::vector<double>,
+                           const std::vector<double>,
+                           const std::vector<double>>(
+           &mehp::MEHPForceBalance::addSlipLinks),
+         R"pbdoc(
+          Add 
+     )pbdoc")
+    .def("getStressTensor",
+         &mehp::MEHPForceBalance::getStressTensor,
+         R"pbdoc(
+          Returns the stress tensor at the current state of the simulation.
+     )pbdoc")
+    .def("getGammaFactor",
+         &mehp::MEHPForceBalance::getGammaFactor,
+         R"pbdoc(
+          Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
+
+          :math:`\Gamma = \langle\gamma_{\eta}\rangle`, with :math:`\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}`,
+          which you can use as :math:`G_{\mathrm{ANT}} = \Gamma \nu k_B T`,
+          where :math:`\eta` is the index of a particular strand, 
+          :math:`R_{0}^2` is the melt mean square end to end distance, in phantom systems :math:`$= N_{\eta}*b^2$`
+          :math:`N_{\eta}` is the number of atoms in this strand :math:`\eta`, 
+          :math:`b` its mean square bond length,
+          :math:`T` the temperature and 
+          :math:`k_B` Boltzmann's constant.
+          
+          :param r0squared: The denominator in the equation of :math:`\Gamma`. If :math:`-1.0` (default), the network is used for determination (which is not accurate). For phantom systems, the correct value is :math:`Nb^2`.
+               For other systems, the value could be determined by `~pylimer_tools_cpp.pylimer_tools_cpp.Universe.computeMeanEndToEndDistance` on the melt system.
+          :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains. 
+     )pbdoc",
+         py::arg("r0squared") = -1.0,
+         py::arg("nrOfChains") = -1)
+    .def("getNrOfNodes", &mehp::MEHPForceBalance::getNrOfNodes, R"pbdoc(
+           Get the number of nodes considered in this simulation.
+     )pbdoc")
+    .def("getNrOfSprings",
+         &mehp::MEHPForceBalance::getNrOfSprings,
+         R"pbdoc(
+          Get the number of springs considered in this simulation.
+
+          :param tolerance: springs under this length are considered inactive
+     )pbdoc")
+    .def("getIdsOfActiveNodes",
+         &mehp::MEHPForceBalance::getIdsOfActiveNodes,
+         R"pbdoc(
+          Get the atom ids of the nodes that are considered active.
+
+          :param tolerance: springs under this length are considered inactive. A node is active if it has > 2 active springs.
+          :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
+          :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
+               Use a value < 0 to indicate that there is no maximum number of active connections.
+     )pbdoc",
+         py::arg("tolerance") = 0.1,
+         py::arg("minimumNrOfActiveConnections") = 2,
+         py::arg("maximumNrOfActiveConnections") = -1)
+    .def("getNrOfActiveNodes",
+         &mehp::MEHPForceBalance::getNrOfActiveNodes,
+         R"pbdoc(
+           Get the number of active nodes remaining after running the simulation.
+
+          :param tolerance: springs under this length are considered inactive.
+          :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
+          :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
+               Use a value < 0 to indicate that there is no maximum number of active connections.
+     )pbdoc",
+         py::arg("tolerance") = 0.1,
+         py::arg("minimumNrOfActiveConnections") = 2,
+         py::arg("maximumNrOfActiveConnections") = -1)
+    .def("getNrOfActiveSprings",
+         &mehp::MEHPForceBalance::getNrOfActiveSprings,
+         R"pbdoc(
+           Get the number of active springs remaining after running the simulation.
+
+          :param tolerance: springs under this length are considered inactive
+     )pbdoc",
+         py::arg("tolerance") = 0.1)
+    .def("getEffectiveFunctionalityOfAtoms",
+         &mehp::MEHPForceBalance::getEffectiveFunctionalityOfAtoms,
+         R"pbdoc(
+          Returns the number of active springs connected to each atom, atomId used as index
+
+          :param tolerance: springs under this length are considered inactive
+     )pbdoc",
+         py::arg("tolerance") = 0.1)
+    .def("getAverageSpringLength",
+         &mehp::MEHPForceBalance::getAverageSpringLength,
+         R"pbdoc(
+           Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()`,
+           this value is normalized by the number of springs rather than the number of chains.
+     )pbdoc")
+    .def("getDefaultR0Square",
+         &mehp::MEHPForceBalance::getDefaultR0Square,
+         R"pbdoc(
+           Returns the value effectively used in :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()` for :math:`\langle R_{0,\eta}^2\rangle`.
+     )pbdoc")
+    .def("getDefaultNrOfChains",
+         &mehp::MEHPForceBalance::getDefaultNrOfChains,
+         R"pbdoc(
+          Returns the value effectively used in :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()` for normalizing the distances.`.
+     )pbdoc")
+    .def("getNrOfIterations",
+         &mehp::MEHPForceBalance::getNrOfIterations,
+         R"pbdoc(
+          Returns the number of iterations used for force relaxation.
+     )pbdoc")
+    .def("getExitReason", &mehp::MEHPForceBalance::getExitReason, R"pbdoc(
+           Returns the reason for termination of the simulation
+     )pbdoc")
+    .def("getCrosslinkerVerse",
+         &mehp::MEHPForceBalance::getCrosslinkerVerse,
          R"pbdoc(
           Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
      )pbdoc",

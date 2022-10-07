@@ -8,10 +8,10 @@ extern "C"
 #include "Atom.h"
 #include "AtomGraphParent.h"
 #include "Molecule.h"
+#include <Eigen/Dense>
 #include <map>
 #include <unordered_map>
 #include <vector>
-#include <Eigen/Dense>
 
 namespace pylimer_tools {
 namespace entities {
@@ -134,7 +134,8 @@ namespace entities {
       return AtomGraphParent::computeBondLengths(&this->box);
     };
     Eigen::Vector3d getPositionVectorForVertex(const int vertexId) const;
-    bool areLoopsEntangled(std::vector<long int> vertexIndicesLoop1, std::vector<long int> vertexIndicesLoop2) const;
+    bool areLoopsEntangled(std::vector<long int> vertexIndicesLoop1,
+                           std::vector<long int> vertexIndicesLoop2) const;
     double getMeanStrandLength(int crosslinkerType);
     std::vector<double> computeEndToEndDistances(int crosslinkerType);
     double computeMeanEndToEndDistance(int crosslinkerType);
@@ -143,7 +144,8 @@ namespace entities {
       bool onlyThoseWithTwoCrosslinkers = false);
     double computeMeanBondLength();
     double computeTotalMass() const;
-    double computeTotalMassWithMasses(std::map<int, double> massPerTypeToUse) const;
+    double computeTotalMassWithMasses(
+      std::map<int, double> massPerTypeToUse) const;
     double computeWeightAverageMolecularWeight(int crosslinkerType) const;
     double computeNumberAverageMolecularWeight(int crosslinkerType) const;
     double computePolydispersityIndex(int crosslinkerType) const;

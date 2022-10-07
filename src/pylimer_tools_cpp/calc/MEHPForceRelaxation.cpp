@@ -262,7 +262,8 @@ namespace calc {
         /* spring contribution to the overall stress tensor */
         for (size_t j = 0; j < 3; j++) {
           for (size_t k = 0; k < 3; k++) {
-            double contribution = this->forceEvaluator->evaluateStressContribution(s, j, k);
+            double contribution =
+              this->forceEvaluator->evaluateStressContribution(s, j, k);
             stress[j][k] += contribution;
           }
         }
@@ -403,7 +404,7 @@ namespace calc {
           this->currentDisplacements,
           r);
       } catch (const std::exception& e) {
-        delete[](r);
+        delete[] (r);
         throw e;
       }
 
@@ -412,7 +413,7 @@ namespace calc {
       for (size_t i = 0; i < this->initialConfig.nrOfNodes * 3; ++i) {
         results[i] = r[i];
       }
-      delete[](r);
+      delete[] (r);
       return results;
     }
 

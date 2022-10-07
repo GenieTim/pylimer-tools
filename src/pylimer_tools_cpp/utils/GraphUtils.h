@@ -2,7 +2,7 @@
 #define GRAPH_UTILS_H
 
 #include <algorithm>
-#include <iostream>
+// #include <iostream>
 #include <iterator>
 #include <map>
 #include <set>
@@ -120,7 +120,8 @@ namespace utils {
           IGRAPH_ALL); // TODO: do we want this unidirectional instead?
         // O(d)
         // loop through neighbours
-        while (this->currentNeighbourIndex < igraph_vector_int_size(&neighbours)) {
+        while (this->currentNeighbourIndex <
+               igraph_vector_int_size(&neighbours)) {
           long int neighbourVertexId =
             igraph_vector_int_get(&neighbours, this->currentNeighbourIndex);
           this->currentNeighbourIndex += 1;
@@ -137,7 +138,7 @@ namespace utils {
           // all the others will be found from different starting points onwards
           igraph_get_shortest_path(&this->graph,
                                    &verticesOfLoop,
-                                   NULL, 
+                                   NULL,
                                    localStartingIndex,
                                    neighbourVertexId,
                                    IGRAPH_ALL); // O(|V|+|E|)
@@ -151,7 +152,8 @@ namespace utils {
             long int loopHash = 0;
             std::vector<long int> results;
             results.reserve(igraph_vector_int_size(&verticesOfLoop));
-            for (size_t i = 0; i < igraph_vector_int_size(&verticesOfLoop); ++i) {
+            for (size_t i = 0; i < igraph_vector_int_size(&verticesOfLoop);
+                 ++i) {
               long int loopVertexId = igraph_vector_int_get(&verticesOfLoop, i);
               loopHash =
                 loopHash xor loopVertexId; // TODO: check whether xor is an
@@ -255,7 +257,7 @@ namespace utils {
         igraph_vector_init(&ids, igraph_vcount(&this->graph));
         for (size_t i = 0; i < igraph_vcount(&this->graph); ++i) {
           igraph_vector_set(
-            &ids, i, i+1); // TODO: this assumes the vertices are 0...N
+            &ids, i, i + 1); // TODO: this assumes the vertices are 0...N
         }
         igraph_cattribute_VAN_setv(&this->graph, "id", &ids);
         // do the decomposition

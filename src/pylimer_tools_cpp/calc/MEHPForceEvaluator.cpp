@@ -201,8 +201,8 @@ namespace calc {
             sqrt(springDistances[3 * i] * springDistances[3 * i] +
                  springDistances[3 * i + 1] * springDistances[3 * i + 1] +
                  springDistances[3 * i + 2] * springDistances[3 * i + 2]);
-          const double linv =
-            langevin_inv(r * this->oneOverl / (this->net.springsContourLength[i]));
+          const double linv = langevin_inv(r * this->oneOverl /
+                                           (this->net.springsContourLength[i]));
           if (std::isnan(linv) || std::isinf(linv)) {
             std::cerr << "Got " << linv << " for spring " << i
                       << " and distance " << r << std::endl;
@@ -234,7 +234,8 @@ namespace calc {
           std::sqrt(springDistances[3 * i] * springDistances[3 * i] +
                     springDistances[3 * i + 1] * springDistances[3 * i + 1] +
                     springDistances[3 * i + 2] * springDistances[3 * i + 2]);
-        double rOverNl = r * this->oneOverl / (this->net.springsContourLength[i]);
+        double rOverNl =
+          r * this->oneOverl / (this->net.springsContourLength[i]);
         double beta = langevin_inv(rOverNl);
         double cschTerm =
           csch(beta) *

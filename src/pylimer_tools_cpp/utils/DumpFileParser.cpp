@@ -20,7 +20,10 @@ namespace utils {
 
   // rule of three:
   // 1. destructor (to destroy the graph)
-  DumpFileParser::~DumpFileParser() { this->finish(); };
+  DumpFileParser::~DumpFileParser()
+  {
+    this->finish();
+  };
   // 2. copy constructor
   DumpFileParser::DumpFileParser(const DumpFileParser& src)
   {
@@ -141,7 +144,10 @@ namespace utils {
    *
    * @return size_t
    */
-  size_t DumpFileParser::getLength() { return this->nrOfGroups; }
+  size_t DumpFileParser::getLength()
+  {
+    return this->nrOfGroups;
+  }
 
   /**
    * @brief Check whether a header key exists
