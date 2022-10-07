@@ -36,6 +36,7 @@
       ExitReason
       LazyUniverseSequenceIterator
       MCUniverseGenerator
+      MEHPForceBalance
       MEHPForceEvaluator
       MEHPForceRelaxation
       Molecule
