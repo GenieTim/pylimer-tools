@@ -2,7 +2,7 @@
 #define VECTOR_UTILS_H
 
 #include <algorithm>
-#include <iostream>
+// #include <iostream>
 #include <iterator>
 #include <vector>
 extern "C"

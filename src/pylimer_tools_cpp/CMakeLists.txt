@@ -34,6 +34,8 @@ target_link_libraries(pylimer_tools PUBLIC
 	${nlopt_LIBRARIES}
 )
 
+add_dependencies(pylimer_tools Eigen3::Eigen)
+
 # link Eigen libraries. Difficulty due to Windows GitHub Action, somehow.
 if (TARGET Eigen3::Eigen)
 	message(STATUS "Target Eigen3::Eigen found")

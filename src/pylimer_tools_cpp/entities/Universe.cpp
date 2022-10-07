@@ -320,9 +320,10 @@ namespace entities {
     for (size_t i = 1; i < edgesSize; i += 2) {
       if (this->atomIdToVertexIdx.contains(newEdgesVector[i - 1]) &&
           this->atomIdToVertexIdx.contains(newEdgesVector[i])) {
-        igraph_vector_int_set(&newEdges,
-                          innerIndex,
-                          this->atomIdToVertexIdx.at(newEdgesVector[i - 1]));
+        igraph_vector_int_set(
+          &newEdges,
+          innerIndex,
+          this->atomIdToVertexIdx.at(newEdgesVector[i - 1]));
         innerIndex += 1;
         igraph_vector_int_set(
           &newEdges, innerIndex, this->atomIdToVertexIdx.at(newEdgesVector[i]));
@@ -1094,8 +1095,9 @@ namespace entities {
     igraph_vit_create(&graph, allVertexIds, &vit);
     while (!IGRAPH_VIT_END(vit)) {
       long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
-      result[types[vertexId]] = std::max(
-        (int)igraph_vector_int_get(&degrees, vertexId), result[types[vertexId]]);
+      result[types[vertexId]] =
+        std::max((int)igraph_vector_int_get(&degrees, vertexId),
+                 result[types[vertexId]]);
       IGRAPH_VIT_NEXT(vit);
     }
     igraph_vit_destroy(&vit);
@@ -1375,7 +1377,8 @@ namespace entities {
     // with the algorithm above, self-loops are counted twice.
     // let's just remove the second (and/or fourth) one where needed
     // NOTE: some assumptions are made here that could be problematic;
-    // for example, that there are not more than 1 self-loops per cross-link in the beginning
+    // for example, that there are not more than 1 self-loops per cross-link in
+    // the beginning
     std::vector<size_t> indicesToRemove;
     std::map<int, int> nrOfSelfLoops;
     for (size_t i = 0; i < bondTo.size(); ++i) {
@@ -1500,11 +1503,11 @@ namespace entities {
 
   /**
    * @brief An algorithm to determine whether two loops are entangled
-   * 
-   * @param vertexIndicesLoop1 
-   * @param vertexIndicesLoop2 
-   * @return true 
-   * @return false 
+   *
+   * @param vertexIndicesLoop1
+   * @param vertexIndicesLoop2
+   * @return true
+   * @return false
    */
   bool Universe::areLoopsEntangled(
     std::vector<long int> vertexIndicesLoop1,
@@ -1512,7 +1515,8 @@ namespace entities {
   {
 
     Eigen::Vector3d helperNode = Eigen::Vector3d::Zero();
-    double sizeDenominator = 1.0 / vertexIndicesLoop1.size();
+    double sizeDenominator =
+      1.0 / static_cast<double>(vertexIndicesLoop1.size());
     for (long int i = 0; i < vertexIndicesLoop1.size(); ++i) {
       helperNode[0] +=
         igraph_cattribute_VAN(&this->graph, "x", vertexIndicesLoop1[i]) *
@@ -1530,7 +1534,7 @@ namespace entities {
     for (long int i = 0; i < vertexIndicesLoop1.size(); ++i) {
       Eigen::Vector3d vertex0 =
         this->getPositionVectorForVertex(vertexIndicesLoop1[i]);
-      long int vertex1Index = i == 0 ? vertexIndicesLoop1.size() : i - 1;
+      long int vertex1Index = i == 0 ? vertexIndicesLoop1.size() - 1 : i - 1;
       Eigen::Vector3d vertex1 =
         this->getPositionVectorForVertex(vertexIndicesLoop1[vertex1Index]);
       // the triangle is now spawned by vertex0, vertex1 and the helperNode
@@ -1538,9 +1542,10 @@ namespace entities {
       for (size_t j = 0; j < vertexIndicesLoop2.size(); ++j) {
         Eigen::Vector3d rayOrigin =
           this->getPositionVectorForVertex(vertexIndicesLoop2[j]);
-        long int directionIdx = j == 0 ? vertexIndicesLoop2.size() : j - 1;
+        long int directionIdx = j == 0 ? vertexIndicesLoop2.size() - 1 : j - 1;
         Eigen::Vector3d rayDirection =
-          this->getPositionVectorForVertex(vertexIndicesLoop2[directionIdx]);
+          this->getPositionVectorForVertex(vertexIndicesLoop2[directionIdx]) -
+          rayOrigin;
         Eigen::Vector3d intersectionPoint;
         if (rayIntersectsTriangle(rayOrigin,
                                   rayDirection,
@@ -1635,7 +1640,8 @@ namespace entities {
     for (size_t i = 0; i < nBonds; ++i) {
       igraph_vector_int_set(
         &vertexIdFrom, i, this->atomIdToVertexIdx.at(bondFrom[i]));
-      igraph_vector_int_set(&vertexIdTo, i, this->atomIdToVertexIdx.at(bondTo[i]));
+      igraph_vector_int_set(
+        &vertexIdTo, i, this->atomIdToVertexIdx.at(bondTo[i]));
     }
 
     igraph_vector_t dValuesFrom;

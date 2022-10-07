@@ -1,6 +1,6 @@
+#include "../../src/pylimer_tools_cpp/calc/MEHPForceBalance.h"
 #include "../../src/pylimer_tools_cpp/calc/MEHPForceEvaluator.h"
 #include "../../src/pylimer_tools_cpp/calc/MEHPForceRelaxation.h"
-#include "../../src/pylimer_tools_cpp/calc/MEHPForceBalance.h"
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include <catch2/benchmark/catch_benchmark_all.hpp>
@@ -59,8 +59,11 @@ TEST_CASE("MEHP Force Balance runs",
             Catch::Approx(nrOfChains));
       pcm::MEHPForceBalance forceBalancer2 =
         pcm::MEHPForceBalance(universe2, 2);
-      pcm::MEHPForceRelaxation forceRelaxer = pcm::MEHPForceRelaxation(universe2, 2);
-      REQUIRE((forceBalancer2.getCurrentSpringDistances() - forceRelaxer.getCurrentSpringDistances()).isMuchSmallerThan(1e-12));
+      pcm::MEHPForceRelaxation forceRelaxer =
+        pcm::MEHPForceRelaxation(universe2, 2);
+      // the strands are different -> cannot compare the distances anymore
+      // CHECK((forceBalancer2.getCurrentSpringDistances() -
+      // forceRelaxer.getCurrentSpringDistances()).isMuchSmallerThan(1e-12));
       REQUIRE(forceBalancer2.getExitReason() == pcm::ExitReason::UNSET);
       REQUIRE(forceBalancer2.getNrOfIterations() == 0);
       REQUIRE(forceBalancer2.getVolume() ==
@@ -68,7 +71,8 @@ TEST_CASE("MEHP Force Balance runs",
       CHECK(forceBalancer2.getVolume() ==
             Catch::Approx(97.383096 * 97.383096 * 97.383096));
       // initial system values
-      CHECK(forceBalancer2.getPressure() == Catch::Approx(forceRelaxer.getPressure()));
+      CHECK(forceBalancer2.getPressure() ==
+            Catch::Approx(forceRelaxer.getPressure()));
       CHECK(forceBalancer2.getPressure() == Catch::Approx(0.39911682390778536));
       REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
       CHECK(forceBalancer2.getNrOfSprings() == 8142);
@@ -139,7 +143,7 @@ TEST_CASE("MEHP Force Balance runs",
     REQUIRE(forceBalancer.getExitReason() == pcm::ExitReason::UNSET);
     REQUIRE(forceBalancer.getNrOfIterations() == 0);
     REQUIRE(forceBalancer.getVolume() == Catch::Approx(universe.getVolume()));
-    forceBalancer.runForceRelaxation("LD_LBFGS", 5);
+    forceBalancer.runForceRelaxation(5);
     REQUIRE(forceBalancer.getNrOfNodes() != universe.getNrOfAtoms());
     REQUIRE(forceBalancer.getNrOfIterations() <= 5);
     REQUIRE(forceBalancer.getNrOfIterations() >= 1);
@@ -148,7 +152,7 @@ TEST_CASE("MEHP Force Balance runs",
     // run again, this time fully
     pcm::MEHPForceBalance forceBalancer2 =
       pcm::MEHPForceBalance(universe, 2, true);
-    forceBalancer2.runForceRelaxation("LD_LBFGS", 10000, 1e-5, 1e-18);
+    forceBalancer2.runForceRelaxation(10000, 1e-10, 100, 1e-9);
     REQUIRE(forceBalancer2.getNrOfIterations() > 5);
     CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalancer2.getGammaFactor(25, forceBalancer2.getNrOfSprings()) ==
@@ -237,8 +241,8 @@ TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
             Catch::Approx(nrOfChains));
       pcm::NonGaussianSpringForceEvaluator nonGaussianForceEvaluator =
         pcm::NonGaussianSpringForceEvaluator(1.0, 79, 0.98);
-      pcm::MEHPForceBalance forceBalancer2 = pcm::MEHPForceBalance(
-        universe2, 2, false, &nonGaussianForceEvaluator);
+      pcm::MEHPForceBalance forceBalancer2 =
+        pcm::MEHPForceBalance(universe2, 2, false, &nonGaussianForceEvaluator);
       REQUIRE(forceBalancer2.getExitReason() == pcm::ExitReason::UNSET);
       REQUIRE(forceBalancer2.getNrOfIterations() == 0);
       REQUIRE(forceBalancer2.getVolume() ==
@@ -247,7 +251,7 @@ TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
             Catch::Approx(97.383096 * 97.383096 * 97.383096));
       // initial system values
       CHECK(forceBalancer2.getPressure() == Catch::Approx(0.39911682390778536));
-      REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation("LD_MMA"));
+      REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
       // As long as gradient is unclear: gradient free methods, e.g.:
       // "LN_SBPLX", "LN_BOBYQA", "LN_NELDERMEAD",
       // "LN_COBYLA", "LN_NEWUOA_BOUND"
@@ -282,8 +286,8 @@ TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
             Catch::Approx(0.1538073308).epsilon(0.0001)); // LJ Units [?]
       CHECK(forceBalancer2.getPressure() * conversionFactor /
               (sigmaToM * sigmaToM * sigmaToM) ==
-            Catch::Approx(
-              61308.9809826224).epsilon(0.0001)); // shear modulus from the pressure, MPa
+            Catch::Approx(61308.9809826224)
+              .epsilon(0.0001)); // shear modulus from the pressure, MPa
       double nrOfChainCorrection =
         (forceBalancer2.getDefaultNrOfChains() / nrOfChains);
       double expectedNb2 = slope * Nb * beadMass;
@@ -295,9 +299,11 @@ TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
             Catch::Approx(42.613678259).epsilon(0.0001));
       CHECK(forceBalancer2.getGammaFactor() * gammaCorrectionFactor * kb * T *
               nu ==
-            Catch::Approx(61308.9809826224).epsilon(0.0001)); // ANT shear modulus, Pa
-      CHECK(forceBalancer2.getGammaFactor() * gammaCorrectionFactor ==
-            Catch::Approx(0.3194493682).epsilon(0.0001)); // "correct" gamma factor
+            Catch::Approx(61308.9809826224)
+              .epsilon(0.0001)); // ANT shear modulus, Pa
+      CHECK(
+        forceBalancer2.getGammaFactor() * gammaCorrectionFactor ==
+        Catch::Approx(0.3194493682).epsilon(0.0001)); // "correct" gamma factor
       CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
       // TODO: find better, more accurate tests here
       CHECK(forceBalancer2.getNrOfActiveNodes() > 1);
@@ -330,10 +336,10 @@ TEST_CASE(
       pe::Universe universe2 = universeSeq.atIndex(0);
       pcm::NonGaussianSpringForceEvaluator nonGaussianForceEvaluator =
         pcm::NonGaussianSpringForceEvaluator(1.0, 79, 0.98);
-      pcm::MEHPForceBalance forceBalancer2 = pcm::MEHPForceBalance(
-        universe2, 2, false, &nonGaussianForceEvaluator);
+      pcm::MEHPForceBalance forceBalancer2 =
+        pcm::MEHPForceBalance(universe2, 2, false, &nonGaussianForceEvaluator);
       REQUIRE(forceBalancer2.getExitReason() == pcm::ExitReason::UNSET);
-      REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation("LD_MMA"));
+      REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
       CHECK(forceBalancer2.getNrOfIterations() > 1);
     }
   }
@@ -400,7 +406,8 @@ TEST_CASE("Free chains collapse",
   // CHECK(forceBalancerSimpleSpring.getAverageSpringLength() ==
   //       Catch::Approx(0.0));
   CHECK(forceBalancerSimpleSpring.getAverageSpringLength() >= 0.0);
-  CHECK(forceBalancerSimpleSpring.getAverageSpringLength() <= 1e-6);
+  CHECK(forceBalancerSimpleSpring.getAverageSpringLength() <= 3e-6);
+  REQUIRE_NOTHROW(forceBalancerSimpleSpring.validateNetwork());
 
   // then, the non-gaussian one
   pcm::NonGaussianSpringForceEvaluator langevinForceEvaluator =
@@ -416,10 +423,11 @@ TEST_CASE("Free chains collapse",
   //           << forceBalancerLangevin.getForce() << ", "
   //           << forceBalancerLangevin.getResidualNorm() << std::endl;
 
-  forceBalancerLangevin.runForceRelaxation(
-    "LD_MMA", 500000, 1e-15, 1e-19); // "LD_SLSQP", "LD_MMA"
+  forceBalancerLangevin.runForceRelaxation(500000,
+                                           1e-15); // "LD_SLSQP", "LD_MMA"
   CHECK(forceBalancerLangevin.getNrOfActiveSprings() == 0);
-  // CHECK(forceBalancerLangevin.getAverageSpringLength() == Catch::Approx(0.0));
+  // CHECK(forceBalancerLangevin.getAverageSpringLength() ==
+  // Catch::Approx(0.0));
   CHECK(forceBalancerLangevin.getAverageSpringLength() >= 0.0);
   CHECK(forceBalancerLangevin.getAverageSpringLength() <= 1e-6);
   REQUIRE(forceBalancerLangevin.getNrOfIterations() > 0);
@@ -445,8 +453,8 @@ TEST_CASE("Free chains collapse",
     forceBalancerLangevin.getStressTensor();
   for (size_t i = 0; i < 3; ++i) {
     for (size_t j = 0; j < 3; ++j) {
-      CHECK(stressTensorLangevin[i][j]+1e-5 ==
-            Catch::Approx(stressTensorSimpleSpring[i][j]+1e-5));
+      CHECK(stressTensorLangevin[i][j] + 1e-5 ==
+            Catch::Approx(stressTensorSimpleSpring[i][j] + 1e-5));
     }
   }
 }

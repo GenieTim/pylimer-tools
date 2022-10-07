@@ -2,7 +2,6 @@
 #define MEHP_UTILITY_STRUCT_H
 
 #include <Eigen/Dense>
-#include <array>
 #include <vector>
 
 namespace pylimer_tools {
@@ -21,6 +20,7 @@ namespace calc {
     typedef Eigen::Array<bool, Eigen::Dynamic, 1> ArrayXb;
     // typedef Eigen::Array<Eigen::ArrayXi, Eigen::Dynamic, 1> ArrayXArrayXi;
     typedef std::vector<std::vector<size_t>> ArrayXArrayXi;
+    typedef std::vector<std::vector<double>> ArrayXArrayXd;
 
     // improved structures using Eigen
     struct Network
@@ -57,7 +57,8 @@ namespace calc {
       Eigen::VectorXd springsContourLength; /* the N for each spring */
       ArrayXArrayXi springIndicesOfLinks;   // maps link -> springs
       ArrayXArrayXi linkIndicesOfSprings;   // maps spring -> links
-      ArrayXb linkIsSpliplink;
+      ArrayXArrayXd springPartitions;       /* gives the parametrisation of N */
+      ArrayXb linkIsSliplink;
       // old stuff used for conversion. Does not include slip-links
       Eigen::ArrayXi oldAtomIds;
       Eigen::ArrayXi springCoordinateIndexA;
@@ -66,8 +67,22 @@ namespace calc {
       Eigen::ArrayXi springIndexB;
       ArrayXb springIsActive;
     };
+    // to string, without macro expansion
+#define STRINGINFY(s) #s
+    // to string, with macro expansion
+#define XSTRINGINFY(s) STRINGINFY(s)
+
+#define INVALIDARG_EXP_IFN(condition, message)                                  \
+  if (!(condition)) {                                                          \
+    throw std::invalid_argument(message "\nFailed condition: " #condition);    \
   }
-}
-}
+
+#define RUNTIME_EXP_IFN(condition, message)                                     \
+  if (!(condition)) {                                                          \
+    throw std::runtime_error(message "\nFailed condition: " #condition);       \
+  }
+  } // mehp
+} // calc
+} // pylimer_tools
 
 #endif

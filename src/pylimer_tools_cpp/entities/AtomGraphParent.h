@@ -33,7 +33,8 @@ namespace entities {
     //   return *this;
     // };
 
-    std::vector<long int> getEdgeIdsFromTo(const long int vertexId1, const long int vertexId2) const;
+    std::vector<long int> getEdgeIdsFromTo(const long int vertexId1,
+                                           const long int vertexId2) const;
 
     /**
      * @brief Get the vertex ids connected to a specified vertex Id
@@ -54,7 +55,8 @@ namespace entities {
      */
     std::vector<Atom> getAtomsConnectedTo(const long int vertexIdx) const;
 
-    std::vector<Atom> getShortestPath(const long int vertexIdxFrom, const long int vertexIdxTo) const;
+    std::vector<Atom> getShortestPath(const long int vertexIdxFrom,
+                                      const long int vertexIdxTo) const;
 
     /**
      * @brief Get the number Of Atoms
@@ -173,7 +175,7 @@ namespace entities {
                          const long int vertexIdx) const
     {
       return igraph_cattribute_VAN(&this->graph, propertyName, vertexIdx);
-    }    
+    }
 
     /**
      * @brief Get all atoms with a certain number of bonds
@@ -219,9 +221,11 @@ namespace entities {
 
     igraph_vs_t getVerticesWithDegreeSelector(int degree) const;
     std::vector<long int> getVerticesWithDegree(int degree) const;
-    std::vector<long int> getVerticesWithDegree(std::vector<int> ofDegrees) const;
-    std::vector<long int> getVerticesWithDegree(const igraph_t* someGraph,
-                                                std::vector<int> ofDegrees) const;
+    std::vector<long int> getVerticesWithDegree(
+      std::vector<int> ofDegrees) const;
+    std::vector<long int> getVerticesWithDegree(
+      const igraph_t* someGraph,
+      std::vector<int> ofDegrees) const;
   };
 
 } // namespace entities

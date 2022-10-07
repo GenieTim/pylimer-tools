@@ -203,7 +203,8 @@ TEST_CASE("MEHP Force Relaxation2 runs",
       CHECK(forceRelaxer2.getAverageContourLength() == Catch::Approx(80.0));
       Eigen::VectorXd contourLengths = forceRelaxer2.getSpringContourLength();
       for (int i = 0; i < contourLengths.size(); ++i) {
-        CHECK(contourLengths[i] == Catch::Approx(forceRelaxer2.getAverageContourLength()));
+        CHECK(contourLengths[i] ==
+              Catch::Approx(forceRelaxer2.getAverageContourLength()));
       }
       CHECK(forceRelaxer2.getResidualNorm() == Catch::Approx(1457.465048151));
       REQUIRE_NOTHROW(forceRelaxer2.runForceRelaxation());
@@ -390,7 +391,8 @@ TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
       CHECK(forceRelaxer2.getAverageContourLength() == Catch::Approx(80.0));
       Eigen::VectorXd contourLengths = forceRelaxer2.getSpringContourLength();
       for (int i = 0; i < contourLengths.size(); ++i) {
-        CHECK(contourLengths[i] == Catch::Approx(forceRelaxer2.getAverageContourLength()));
+        CHECK(contourLengths[i] ==
+              Catch::Approx(forceRelaxer2.getAverageContourLength()));
       }
       REQUIRE_NOTHROW(forceRelaxer2.runForceRelaxation("LD_MMA"));
       // As long as gradient is unclear: gradient free methods, e.g.:
@@ -566,7 +568,7 @@ TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
   CHECK(r[5] == Catch::Approx(-r[2]));
 
   // cleanup
-  delete[](r);
+  delete[] (r);
 }
 
 TEST_CASE("Free chains collapse",
@@ -680,8 +682,8 @@ TEST_CASE("Free chains collapse",
     forceRelaxerLangevin.getStressTensor();
   for (size_t i = 0; i < 3; ++i) {
     for (size_t j = 0; j < 3; ++j) {
-      CHECK(stressTensorLangevin[i][j]+1e-5 ==
-            Catch::Approx(stressTensorSimpleSpring[i][j]+1e-5));
+      CHECK(stressTensorLangevin[i][j] + 1e-5 ==
+            Catch::Approx(stressTensorSimpleSpring[i][j] + 1e-5));
     }
   }
 }

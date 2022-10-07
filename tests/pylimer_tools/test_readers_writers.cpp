@@ -66,7 +66,7 @@ TEST_CASE("DumpFileParser can be used", "[utils][DumpFileParser]")
     parser3.read(suspectedPath + "lammps_data_file_small_wangles.out");
     REQUIRE(parser3.getNrOfAngles() == 1);
   }
-  
+
   SECTION("Reading large files is sensibly fast")
   {
     pu::DumpFileParser parser =
