@@ -140,8 +140,9 @@ namespace calc {
                   this->is2D))
                  .squaredNorm());
             double idealValue =
-              1. / (1. + sqrt(distanceForward / distanceBack)); // TODO: above, below?
-            if (distanceBack < 1e-12) {
+              1. / (1. + sqrt(distanceForward /
+                              distanceBack)); // TODO: above, below?
+            if (distanceBack < 1e-9) {
               idealValue = 0.0; // TODO: really?
             }
             double currentS = springPartitions[springIndex][partner_idx - 1];
@@ -151,9 +152,7 @@ namespace calc {
             double lastS = partner_idx == 1
                              ? 0.
                              : springPartitions[springIndex][partner_idx - 2];
-            maxDiff = std::max(currentS -
-                                 idealValue,
-                               maxDiff);
+            maxDiff = std::max(currentS - idealValue, maxDiff);
             springPartitions[springIndex][partner_idx - 1] =
               std::clamp(lastS + idealValue * (nextS - lastS), 0., 1.0);
           }
@@ -191,8 +190,43 @@ namespace calc {
           net->linkIndicesOfSprings[springIndices[spring_index]];
         for (size_t partner_idx = 0; partner_idx < springsPartners.size() - 1;
              ++partner_idx) {
-          if (springsPartners[partner_idx] == linkIdx ||
-              springsPartners[partner_idx + 1] == linkIdx) {
+          if (springsPartners[partner_idx] == linkIdx) {
+            // add partial distance to the total distance
+            Eigen::Vector3d partialDistance =
+              MEHPForceBalance::evaluateDistanceBetween(
+                net,
+                u,
+                springsPartners[partner_idx + 1],
+                springsPartners[partner_idx],
+                this->is2D);
+            // add to displacement
+            double contourLengthFraction = 1.0;
+            if (springsPartners.size() > 2) {
+              // find the relevant spring potential for this spring
+              double currentS = partner_idx == 0
+                               ? 0.
+                               : springPartitions[springIndices[spring_index]]
+                                                 [partner_idx-1];
+              double nextS = partner_idx == springsPartners.size() - 2
+                               ? 1.
+                               : springPartitions[springIndices[spring_index]]
+                                                 [partner_idx];
+              contourLengthFraction = nextS - currentS;
+            }
+            if (contourLengthFraction > 1e-12) {
+              double oneOverContourLengthFraction =
+                1.0 / (net->springsContourLength[springIndices[spring_index]] *
+                       contourLengthFraction);
+              objectiveDisplacement += (partialDistance)*oneOverContourLengthFraction; // /
+              // totalDistance.array());
+              objectiveDisplacementContributors += oneOverContourLengthFraction;
+            } else {
+              objectiveDisplacement = 1e12 * (partialDistance);
+              objectiveDisplacementContributors += 1e12;
+            }
+          }
+          // again, but the spring in the other direction
+          if (springsPartners[partner_idx+1] == linkIdx) {
             // add partial distance to the total distance
             Eigen::Vector3d partialDistance =
               MEHPForceBalance::evaluateDistanceBetween(
@@ -202,54 +236,32 @@ namespace calc {
                 springsPartners[partner_idx + 1],
                 this->is2D);
             // add to displacement
-            double prefix = springsPartners[partner_idx] == linkIdx ? -1. : 1.;
             double contourLengthFraction = 1.0;
             if (springsPartners.size() > 2) {
-              // TODO: this must be done more beautiful
-              if (partner_idx == 0) {
-                // only the case if linkIdx is the first cross-linker in the
-                // strand
-                contourLengthFraction =
-                  springPartitions[springIndices[spring_index]][0];
-              } else if (springsPartners[springsPartners.size() - 1] ==
-                         linkIdx) {
-                // only the case if linkIdx is the last cross-linker in the
-                // strand
-                assert(springsPartners[partner_idx + 1] == linkIdx);
-                contourLengthFraction =
-                  (1.0 -
-                   springPartitions[springIndices[spring_index]][partner_idx]);
-              } else {
-                if (springsPartners[partner_idx] == linkIdx) {
-                  // fraction towards the "lower" end
-                  contourLengthFraction =
-                    springPartitions[springIndices[spring_index]][partner_idx] -
-                    springPartitions[springIndices[spring_index]]
-                                    [partner_idx - 1];
-
-                } else {
-                  assert(springsPartners[partner_idx + 1] == linkIdx);
-                  // fraction towards the "higher" end
-                  contourLengthFraction =
-                    springPartitions[springIndices[spring_index]]
-                                    [partner_idx + 1] -
-                    springPartitions[springIndices[spring_index]][partner_idx];
-                }
-              }
+              // find the relevant spring potential for this spring
+              double lastS = partner_idx == 0
+                               ? 0.
+                               : springPartitions[springIndices[spring_index]]
+                                                 [partner_idx - 1];
+              double currentS = partner_idx == springsPartners.size() - 2
+                               ? 1.
+                               : springPartitions[springIndices[spring_index]]
+                                                 [partner_idx];
+              contourLengthFraction = currentS - lastS;
             }
             if (contourLengthFraction > 1e-12) {
               double oneOverContourLengthFraction =
                 1.0 / (net->springsContourLength[springIndices[spring_index]] *
                        contourLengthFraction);
-              objectiveDisplacement +=
-                prefix * (partialDistance)*oneOverContourLengthFraction; // /
+              objectiveDisplacement += (partialDistance)*oneOverContourLengthFraction; // /
               // totalDistance.array());
               objectiveDisplacementContributors += oneOverContourLengthFraction;
             } else {
-              objectiveDisplacement = 1e12 * prefix * (partialDistance);
+              objectiveDisplacement = 1e12 * (partialDistance);
               objectiveDisplacementContributors += 1e12;
             }
           }
+          
         }
       }
       // take mean for displacement
