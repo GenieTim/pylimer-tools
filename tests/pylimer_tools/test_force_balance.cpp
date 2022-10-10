@@ -17,15 +17,14 @@ namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
 namespace pcm = pylimer_tools::calc::mehp;
 
-TEST_CASE("MEHP Force Balance runs",
-          "[analysis][MEHPForceBalance][SimpleSpringMEHPForceEvaluator]")
+TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance]")
 {
   // return;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
 
-  SECTION("3D case")
+  SECTION("MEHP Force Balance 3D case")
   {
     std::string largeInputFile =
       suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
@@ -130,7 +129,7 @@ TEST_CASE("MEHP Force Balance runs",
     }
   }
 
-  SECTION("2D case")
+  SECTION("MEHP Force Balance 2D case")
   {
     REQUIRE(std::filesystem::exists(suspectedPath));
     universeSeq.initializeFromDataSequence(
@@ -198,7 +197,105 @@ TEST_CASE("MEHP Force Balance runs",
   }
 }
 
-TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
+TEST_CASE("MEHP Force Balance handles slip-links",
+          "[analysis][MEHPForceBalance]")
+{
+  // construct an example network
+  pe::Universe universe = pe::Universe(1.0, 1.0, 1.0);
+  /**
+   * The system looks like this (in terms of bonds, not 3D placement):
+   *
+   * 1-5-2
+   * |  /|
+   * 8 9 6
+   * |/  |
+   * 4-7-3
+   */
+  universe.setBox(pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0));
+  universe.addAtoms(9,
+                    { { 1, 2, 3, 4, 5, 6, 7, 8, 9 } },   // id
+                    { { 2, 2, 2, 2, 1, 1, 1, 1, 1 } },   // type
+                    { { -5, 5, 5, -5, 7, 2, 2, 7, 3 } }, // x
+                    { { -5, -5, 5, 5, 0, 0, 0, 0, 3 } }, // y
+                    { { 2, 2, 2, 2, -5, -5, 5, 5, 3 } }, // z
+                    { { 1, 1, 1, 1, 1, 1, 1, 1, 1 } },   // nx
+                    { { 1, 1, 1, 1, 1, 1, 1, 1, 1 } },   // ny
+                    { { 1, 1, 1, 1, 1, 1, 1, 1, 1 } }    // nz
+  );
+  universe.addBonds(10,
+                    { { 1, 2, 2, 2, 3, 3, 7, 8, 1, 9 } },
+                    { { 5, 5, 9, 6, 6, 7, 4, 4, 8, 4 } },
+                    { { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 } },
+                    false,
+                    false);
+  // now, construct the force balancer
+  pcm::MEHPForceBalance forceBalancer2 =
+    pcm::MEHPForceBalance(universe, 2, false);
+  REQUIRE(forceBalancer2.getNrOfNodes() == forceBalancer2.getNrOfLinks());
+  REQUIRE(forceBalancer2.getNrOfNodes() == 4);
+  REQUIRE(forceBalancer2.getNrOfSprings() == 5);
+  // and add slip-links
+  REQUIRE_THROWS(forceBalancer2.addSlipLinks({ { 1, 2, 3 } },
+                                             { { 1, 2, 3 } },
+                                             { { 1., 2., 3. } },
+                                             { { 1., 2., 3. } },
+                                             { { 1., 2. } }));
+  REQUIRE_THROWS(forceBalancer2.addSlipLinks({ { 1, 2, 3 } },
+                                             { { 1, 2 } },
+                                             { { 1., 2., 3. } },
+                                             { { 1., 2., 3. } },
+                                             { { 1., 2., 3.0 } }));
+  // and actually add slip-links
+  REQUIRE_NOTHROW(forceBalancer2.addSlipLinks({ { 0, 3 } },
+                                              { { 1, 3 } },
+                                              { { 1.1, 1.3 } },
+                                              { { 1.2, 1.2 } },
+                                              { { 1.3, 1.1 } }));
+  REQUIRE(forceBalancer2.getNrOfNodes() + 2 == forceBalancer2.getNrOfLinks());
+  // and run with them.
+  // Expect the slip-link of between two strands to converge to the central atom
+  // Expect the slip-link of two strands to stay at 0.5, 0.5.
+  pylimer_tools::calc::mehp::ArrayXArrayXd springPartitions =
+    forceBalancer2.getSpringPartitions();
+  Eigen::VectorXd displacements =
+    Eigen::VectorXd::Zero(forceBalancer2.getNrOfLinks() * 3);
+  pcm::ForceBalanceNetwork net = forceBalancer2.getNetwork();
+  REQUIRE(net.springIndicesOfLinks.size() == net.nrOfLinks);
+  for (int i = 0; i < 25; ++i) {
+    // do some random 25 steps with these two slip-links
+    // NOTE: difficulty: finding out which node and spring it is actually
+    // after the removal of strand atoms
+    forceBalancer2.updateSpringPartition(
+      &net, displacements, springPartitions, 5);
+    forceBalancer2.displaceToMeanPosition(
+      &net, displacements, springPartitions, 5);
+    forceBalancer2.updateSpringPartition(
+      &net, displacements, springPartitions, 4);
+    forceBalancer2.displaceToMeanPosition(
+      &net, displacements, springPartitions, 4);
+  }
+  // assert expectations are met.
+  // NOTE: difficulty: finding out which spring idx it actually is
+  // for (int i = 0; i < net.nrOfSprings; ++i) {
+  //   std::cout << "Spring " << i << " ";
+  //   for (int j = 0; j < net.linkIndicesOfSprings[i].size(); ++j) {
+  //     std::cout << net.linkIndicesOfSprings[i][j] << " ";
+  //   }
+  //   std::cout << std::endl;
+  // }
+  std::vector<double> springPartitionsE2 = springPartitions[3];
+  CHECK(springPartitionsE2.size() == 2);
+  CHECK(springPartitionsE2[0] == Catch::Approx(0.5).epsilon(1e-6));
+  CHECK(springPartitionsE2[1] == Catch::Approx(0.5).epsilon(1e-6));
+  std::vector<double> springPartitionsE10 = springPartitions[0];
+  std::vector<double> springPartitionsE11 = springPartitions[1];
+  CHECK(springPartitionsE10.size() == springPartitionsE11.size());
+  CHECK(springPartitionsE10[0] + 1e-5 ==
+        Catch::Approx(0.0 + 1e-5).epsilon(1e-6));
+  CHECK(springPartitionsE11[0] == Catch::Approx(1.0).epsilon(1e-6));
+}
+
+TEST_CASE("MEHP Force Balance runs with non-network",
           "[analysis][MEHPForceBalance][NonGaussianSpringForceEvaluator]")
 {
   // return;
@@ -206,138 +303,15 @@ TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
 
-  SECTION("3D case")
-  {
-    // TODO: correct values (& forces?)
-    std::string largeInputFile =
-      suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
-    if (std::filesystem::exists(largeInputFile)) {
-      universeSeq.initializeFromDataSequence({ { largeInputFile } });
-      pe::Universe universe2 = universeSeq.atIndex(0);
-
-      // BENCHMARK_ADVANCED("MEHP LD_MMA " + largeInputFile)
-      // (Catch::Benchmark::Chronometer meter)
-      // {
-      //   pcm::MEHPForceBalance forceBalancer3 =
-      //     pcm::MEHPForceBalance(universe2, 2);
-      //   meter.measure([&forceBalancer3] {
-      //     forceBalancer3.runForceRelaxation("LD_MMA");
-      //     return forceBalancer3.getNrOfIterations();
-      //   });
-      // };
-      // BENCHMARK_ADVANCED("MEHP LD_LBFGS " + largeInputFile)
-      // (Catch::Benchmark::Chronometer meter)
-      // {
-      //   pcm::MEHPForceBalance forceBalancer3 =
-      //     pcm::MEHPForceBalance(universe2, 2);
-      //   meter.measure([&forceBalancer3] {
-      //     forceBalancer3.runForceRelaxation("LD_LBFGS");
-      //     return forceBalancer3.getNrOfIterations();
-      //   });
-      // };
-
-      double nrOfChains = 1.e4;
-      CHECK(static_cast<double>(universe2.getMolecules(2).size()) ==
-            Catch::Approx(nrOfChains));
-      pcm::NonGaussianSpringForceEvaluator nonGaussianForceEvaluator =
-        pcm::NonGaussianSpringForceEvaluator(1.0, 79, 0.98);
-      pcm::MEHPForceBalance forceBalancer2 =
-        pcm::MEHPForceBalance(universe2, 2, false, &nonGaussianForceEvaluator);
-      REQUIRE(forceBalancer2.getExitReason() == pcm::ExitReason::UNSET);
-      REQUIRE(forceBalancer2.getNrOfIterations() == 0);
-      REQUIRE(forceBalancer2.getVolume() ==
-              Catch::Approx(universe2.getVolume()));
-      CHECK(forceBalancer2.getVolume() ==
-            Catch::Approx(97.383096 * 97.383096 * 97.383096));
-      // initial system values
-      CHECK(forceBalancer2.getPressure() == Catch::Approx(0.39911682390778536));
-      REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
-      // As long as gradient is unclear: gradient free methods, e.g.:
-      // "LN_SBPLX", "LN_BOBYQA", "LN_NELDERMEAD",
-      // "LN_COBYLA", "LN_NEWUOA_BOUND"
-      CHECK(forceBalancer2.getNrOfSprings() == 8142);
-      CHECK(forceBalancer2.getNrOfIterations() > 1);
-
-      // conversion factors
-      double kb = 1.381e-23; // Boltzmann, J/K
-      double T = 300.;       // Temperature, K
-      double sigmaToNm = 0.616;
-      double sigmaToM = sigmaToNm * 1.e-9;
-      double slope = 0.00393 / (sigmaToNm * sigmaToNm); // sigma^2/(g/mol)
-      double beadMass = 161.;                           // g/mol
-      double Nb = 80.; // nr of beads per strand
-      double conversionFactor =
-        3. * kb * T / (slope * beadMass * Nb); // J/sigma^2
-      CHECK(conversionFactor / (sigmaToM * sigmaToM) ==
-            Catch::Approx(0.000245543));
-      double nu =
-        nrOfChains / (forceBalancer2.getVolume() * sigmaToM * sigmaToM *
-                      sigmaToM); // chain number density, m^-3
-      CHECK(nu == Catch::Approx(4.63241e25));
-
-      // final values
-      auto stressTensor = forceBalancer2.getStressTensor();
-      CHECK(
-        forceBalancer2.getPressure() ==
-        Catch::Approx(
-          (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) / 3.)
-          .epsilon(0.02));
-      CHECK(forceBalancer2.getPressure() ==
-            Catch::Approx(0.1538073308).epsilon(0.0001)); // LJ Units [?]
-      CHECK(forceBalancer2.getPressure() * conversionFactor /
-              (sigmaToM * sigmaToM * sigmaToM) ==
-            Catch::Approx(61308.9809826224)
-              .epsilon(0.0001)); // shear modulus from the pressure, MPa
-      double nrOfChainCorrection =
-        (forceBalancer2.getDefaultNrOfChains() / nrOfChains);
-      double expectedNb2 = slope * Nb * beadMass;
-      double nb2Correction =
-        (forceBalancer2.getDefaultR0Square() / (expectedNb2));
-      double gammaCorrectionFactor = nrOfChainCorrection * nb2Correction;
-      CHECK(forceBalancer2.getGammaFactor() * nrOfChainCorrection *
-              forceBalancer2.getDefaultR0Square() ==
-            Catch::Approx(42.613678259).epsilon(0.0001));
-      CHECK(forceBalancer2.getGammaFactor() * gammaCorrectionFactor * kb * T *
-              nu ==
-            Catch::Approx(61308.9809826224)
-              .epsilon(0.0001)); // ANT shear modulus, Pa
-      CHECK(
-        forceBalancer2.getGammaFactor() * gammaCorrectionFactor ==
-        Catch::Approx(0.3194493682).epsilon(0.0001)); // "correct" gamma factor
-      CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-      // TODO: find better, more accurate tests here
-      CHECK(forceBalancer2.getNrOfActiveNodes() > 1);
-      CHECK(forceBalancer2.getNrOfActiveSprings() > 1);
-      CHECK(forceBalancer2.getAverageSpringLength() > 1.0);
-      CHECK(forceBalancer2.getEffectiveFunctionalityOfAtoms().size() ==
-            forceBalancer2.getNrOfNodes());
-    } else {
-      std::cout << "Skipping large file PDMS MEHP run" << std::endl;
-      REQUIRE(true);
-    }
-  }
-}
-
-TEST_CASE(
-  "MEHP Force Relaxation2 runs with Langevin force evaluator and non-network",
-  "[analysis][MEHPForceBalance][NonGaussianSpringForceEvaluator]")
-{
-  // return;
-  pe::UniverseSequence universeSeq = pe::UniverseSequence();
-  REQUIRE(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
-
-  SECTION("3D case")
+  SECTION("MEHP Force Balance 3D case")
   {
     std::string largeInputFile =
       suspectedPath + "xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out";
     if (std::filesystem::exists(largeInputFile)) {
       universeSeq.initializeFromDataSequence({ { largeInputFile } });
       pe::Universe universe2 = universeSeq.atIndex(0);
-      pcm::NonGaussianSpringForceEvaluator nonGaussianForceEvaluator =
-        pcm::NonGaussianSpringForceEvaluator(1.0, 79, 0.98);
       pcm::MEHPForceBalance forceBalancer2 =
-        pcm::MEHPForceBalance(universe2, 2, false, &nonGaussianForceEvaluator);
+        pcm::MEHPForceBalance(universe2, 2, false);
       REQUIRE(forceBalancer2.getExitReason() == pcm::ExitReason::UNSET);
       REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
       CHECK(forceBalancer2.getNrOfIterations() > 1);
@@ -396,61 +370,35 @@ TEST_CASE("Free chains collapse",
 
   // now, check for every force evaluator, that the maximum entropy is when all
   // these beads overlap first, the gaussian spring one
-  pcm::SimpleSpringMEHPForceEvaluator simpleSpringForceEvaluator =
-    pcm::SimpleSpringMEHPForceEvaluator();
-  pcm::MEHPForceBalance forceBalancerSimpleSpring =
-    pcm::MEHPForceBalance(universe, 2, false, &simpleSpringForceEvaluator);
-  REQUIRE_NOTHROW(forceBalancerSimpleSpring.runForceRelaxation());
-  REQUIRE(forceBalancerSimpleSpring.getNrOfIterations() > 0);
-  CHECK(forceBalancerSimpleSpring.getNrOfActiveSprings() == 0);
-  // CHECK(forceBalancerSimpleSpring.getAverageSpringLength() ==
+  pcm::MEHPForceBalance forceBalancer =
+    pcm::MEHPForceBalance(universe, 2, false);
+  REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(50000, 1e-12));
+  REQUIRE(forceBalancer.getNrOfIterations() > 0);
+  CHECK(forceBalancer.getNrOfActiveSprings() == 0);
+  // CHECK(forceBalancer.getAverageSpringLength() ==
   //       Catch::Approx(0.0));
-  CHECK(forceBalancerSimpleSpring.getAverageSpringLength() >= 0.0);
-  CHECK(forceBalancerSimpleSpring.getAverageSpringLength() <= 3e-6);
-  REQUIRE_NOTHROW(forceBalancerSimpleSpring.validateNetwork());
+  CHECK(forceBalancer.getAverageSpringLength() >= 0.0);
+  CHECK(forceBalancer.getAverageSpringLength() <= 3e-6);
+  REQUIRE_NOTHROW(forceBalancer.validateNetwork());
 
-  // then, the non-gaussian one
-  pcm::NonGaussianSpringForceEvaluator langevinForceEvaluator =
-    pcm::NonGaussianSpringForceEvaluator(1.0, nrOfBeadsPerChain * 2, 1.0);
-  pcm::MEHPForceBalance forceBalancerLangevin =
-    pcm::MEHPForceBalance(universe, 2, false, &langevinForceEvaluator);
-  pe::Universe resultingUniverse0 = forceBalancerLangevin.getCrosslinkerVerse();
-  // auto distances0 = resultingUniverse0.computeBondLengths();
-  // for (auto i : distances0) {
-  //   std::cout << i << std::endl;
-  // }
-  // std::cout << forceBalancerLangevin.getNrOfIterations() << ", "
-  //           << forceBalancerLangevin.getForce() << ", "
-  //           << forceBalancerLangevin.getResidualNorm() << std::endl;
-
-  forceBalancerLangevin.runForceRelaxation(500000,
-                                           1e-15); // "LD_SLSQP", "LD_MMA"
-  CHECK(forceBalancerLangevin.getNrOfActiveSprings() == 0);
-  // CHECK(forceBalancerLangevin.getAverageSpringLength() ==
-  // Catch::Approx(0.0));
-  CHECK(forceBalancerLangevin.getAverageSpringLength() >= 0.0);
-  CHECK(forceBalancerLangevin.getAverageSpringLength() <= 1e-6);
-  REQUIRE(forceBalancerLangevin.getNrOfIterations() > 0);
-  CHECK(forceBalancerLangevin.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-
-  pe::Universe resultingUniverse = forceBalancerLangevin.getCrosslinkerVerse();
+  pe::Universe resultingUniverse = forceBalancer.getCrosslinkerVerse();
   // auto distances = resultingUniverse.computeBondLengths();
   // for (auto i : distances) {
   //   std::cout << i << std::endl;
   // }
-  // auto residuals = forceBalancerLangevin.getResiduals();
+  // auto residuals = forceBalancer.getResiduals();
   // for (auto i : residuals) {
   //   std::cout << i << " ";
   // }
   // std::cout << std::endl;
-  // std::cout << forceBalancerLangevin.getNrOfIterations() << ", "
-  //           << forceBalancerLangevin.getForce() << ", "
-  //           << forceBalancerLangevin.getResidualNorm() << std::endl;
+  // std::cout << forceBalancer.getNrOfIterations() << ", "
+  //           << forceBalancer.getForce() << ", "
+  //           << forceBalancer.getResidualNorm() << std::endl;
 
   std::array<std::array<double, 3>, 3> stressTensorSimpleSpring =
-    forceBalancerSimpleSpring.getStressTensor();
+    forceBalancer.getStressTensor();
   std::array<std::array<double, 3>, 3> stressTensorLangevin =
-    forceBalancerLangevin.getStressTensor();
+    forceBalancer.getStressTensor();
   for (size_t i = 0; i < 3; ++i) {
     for (size_t j = 0; j < 3; ++j) {
       CHECK(stressTensorLangevin[i][j] + 1e-5 ==

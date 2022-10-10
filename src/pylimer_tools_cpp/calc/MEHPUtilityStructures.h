@@ -57,7 +57,7 @@ namespace calc {
       Eigen::VectorXd springsContourLength; /* the N for each spring */
       ArrayXArrayXi springIndicesOfLinks;   // maps link -> springs
       ArrayXArrayXi linkIndicesOfSprings;   // maps spring -> links
-      ArrayXArrayXd springPartitions;       /* gives the parametrisation of N */
+
       ArrayXb linkIsSliplink;
       // old stuff used for conversion. Does not include slip-links
       Eigen::ArrayXi oldAtomIds;
@@ -72,12 +72,12 @@ namespace calc {
     // to string, with macro expansion
 #define XSTRINGINFY(s) STRINGINFY(s)
 
-#define INVALIDARG_EXP_IFN(condition, message)                                  \
+#define INVALIDARG_EXP_IFN(condition, message)                                 \
   if (!(condition)) {                                                          \
     throw std::invalid_argument(message "\nFailed condition: " #condition);    \
   }
 
-#define RUNTIME_EXP_IFN(condition, message)                                     \
+#define RUNTIME_EXP_IFN(condition, message)                                    \
   if (!(condition)) {                                                          \
     throw std::runtime_error(message "\nFailed condition: " #condition);       \
   }
