@@ -152,12 +152,12 @@ TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
 TEST_CASE("MEHP Force Relaxation2 runs",
           "[analysis][MEHPForceRelaxation][SimpleSpringMEHPForceEvaluator]")
 {
-  // return;
+  return;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
 
-  SECTION("3D case")
+  SECTION("MEHP Force Relaxation2 3D case")
   {
     std::string largeInputFile =
       suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
@@ -336,7 +336,7 @@ TEST_CASE("MEHP Force Relaxation2 runs",
 TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
           "[analysis][MEHPForceRelaxation][NonGaussianSpringForceEvaluator]")
 {
-  // return;
+  return;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -463,7 +463,7 @@ TEST_CASE(
   "MEHP Force Relaxation2 runs with Langevin force evaluator and non-network",
   "[analysis][MEHPForceRelaxation][NonGaussianSpringForceEvaluator]")
 {
-  // return;
+  return;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -503,6 +503,7 @@ TEST_CASE("Inverse Langevin test",
 TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
           "[analysis][MEHPForceRelaxation][NonGaussianSpringForceEvaluator]")
 {
+  // return;
   // setup network
   pcm::Network net;
   net.nrOfSprings = 1;
@@ -683,7 +684,7 @@ TEST_CASE("Free chains collapse",
   for (size_t i = 0; i < 3; ++i) {
     for (size_t j = 0; j < 3; ++j) {
       CHECK(stressTensorLangevin[i][j] + 1e-5 ==
-            Catch::Approx(stressTensorSimpleSpring[i][j] + 1e-5));
+            Catch::Approx(stressTensorSimpleSpring[i][j] + 1e-5).margin(5e-7));
     }
   }
 }

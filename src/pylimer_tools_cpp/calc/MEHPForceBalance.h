@@ -58,9 +58,9 @@ namespace calc {
        * @param ftol
        */
       void runForceRelaxation(long int maxNrOfSteps = 50000, // default: 10000
-                              double xtol = 1e-12,
+                              double xtol = 1e-9,
                               long int innerMaxNrOfSteps = 100,
-                              double innerXtol = 1e-12,
+                              double innerXtol = 1e-9,
                               double innerAlphaTol = 1e-8);
 
       /**
@@ -200,7 +200,7 @@ namespace calc {
         for (size_t i = 0; i < x.size(); ++i) {
           alphas.push_back(0.5);
         }
-        return this->addSlipLinks(strandIdx1, strandIdx2, x, y, z, alphas);
+        return this->addSlipLinks(strandIdx1, strandIdx2, x, y, z, alphas, alphas);
       }
 
       void addSlipLinks(const std::vector<size_t> strandIdx1,
@@ -208,7 +208,8 @@ namespace calc {
                         const std::vector<double> x,
                         const std::vector<double> y,
                         const std::vector<double> z,
-                        const std::vector<double> alpha);
+                        const std::vector<double> alpha1,
+                        const std::vector<double> alpha2);
 
       /**
        * @brief Compute the spring lenghts
@@ -239,6 +240,38 @@ namespace calc {
         const bool is2D);
 
       bool validateNetwork(const ForceBalanceNetwork* net = nullptr);
+
+      ForceBalanceNetwork getNetwork() { return this->initialConfig; }
+
+      ArrayXArrayXd getSpringPartitions()
+      {
+        return this->currentSpringPartitions;
+      }
+
+      /**
+       * @brief Updates the partition/parametrisation of a spring around one
+       * link
+       *
+       */
+      double updateSpringPartition(
+        const ForceBalanceNetwork* net,
+        Eigen::VectorXd& u,
+        ArrayXArrayXd& springPartitions, /* gives the parametrisation of N */
+        const size_t linkIdx) const;
+
+      /**
+       * @brief Displace one link to the mean of all connected neighbours
+       *
+       * @param net the force balance network
+       * @param u the current displacements, wherein the resulting coordinates
+       * shall be stored
+       * @param linkIdx the idx of the link to displace
+       * @return double, the distance (squared norm) displaced
+       */
+      double displaceToMeanPosition(const ForceBalanceNetwork* net,
+                                    Eigen::VectorXd& u,
+                                    ArrayXArrayXd& springPartitions,
+                                    const size_t linkIdx) const;
 
     protected:
       /**
@@ -293,10 +326,10 @@ namespace calc {
           net->springIndicesOfLinks.push_back(std::vector<size_t>());
         }
         net->linkIndicesOfSprings.reserve(net->nrOfSprings);
-        net->springPartitions.reserve(net->nrOfSprings);
+        this->currentSpringPartitions.reserve(net->nrOfSprings);
         for (size_t i = 0; i < net->nrOfSprings; ++i) {
           net->linkIndicesOfSprings.push_back(std::vector<size_t>());
-          net->springPartitions.push_back(std::vector<double>());
+          this->currentSpringPartitions.push_back(std::vector<double>());
         }
         net->springIndexA = Eigen::ArrayXi::Zero(net->nrOfSprings);
         net->springIndexB = Eigen::ArrayXi::Zero(net->nrOfSprings);
@@ -370,168 +403,14 @@ namespace calc {
 
         // box volume
         net->vol = net->L[0] * net->L[1] * net->L[2];
-        net->meanSpringContourLength = net->springsContourLength.mean();
+        if (net->springsContourLength.size() > 0) {
+          net->meanSpringContourLength = net->springsContourLength.mean();
+        } else {
+          net->meanSpringContourLength = 0.0;
+        }
 
         return spring_idx == net->nrOfSprings;
       };
-
-      double updateSpringPartition(ForceBalanceNetwork* net,
-                                   Eigen::VectorXd& u,
-                                   const size_t linkIdx) const
-      {
-        std::vector<size_t> springIndices = net->springIndicesOfLinks[linkIdx];
-        double maxDiff = 0.0;
-        for (size_t springIndex : springIndices) {
-          std::vector<size_t> springsPartners =
-            net->linkIndicesOfSprings[springIndices[springIndex]];
-          for (size_t partner_idx = 1; partner_idx < springsPartners.size() - 1;
-               ++partner_idx) {
-            if (springsPartners[partner_idx] == linkIdx) {
-              // found position of this link in this spring
-              // want to find the ideal value for
-              // net->springPartitions[springIndex][partner_idx-1]
-              double distanceBack = ((MEHPForceBalance::evaluateDistanceBetween(
-                                        net,
-                                        u,
-                                        springsPartners[partner_idx - 1],
-                                        springsPartners[partner_idx],
-                                        this->is2D))
-                                       .squaredNorm());
-              double distanceForward =
-                ((MEHPForceBalance::evaluateDistanceBetween(
-                    net,
-                    u,
-                    springsPartners[partner_idx],
-                    springsPartners[partner_idx + 1],
-                    this->is2D))
-                   .squaredNorm());
-              double idealValue =
-                1. / (1. + sqrt(distanceBack / distanceForward));
-              maxDiff =
-                std::max(net->springPartitions[springIndex][partner_idx - 1] -
-                           idealValue,
-                         maxDiff);
-              net->springPartitions[springIndex][partner_idx - 1] =
-                partner_idx == 1
-                  ? idealValue
-                  : idealValue +
-                      net->springPartitions[springIndex][partner_idx - 2];
-            }
-          }
-        }
-        return maxDiff;
-      }
-
-      /**
-       * @brief Displace one link to the mean of all connected neighbours
-       *
-       * @param net the force balance network
-       * @param u the current displacements, wherein the resulting coordinates
-       * shall be stored
-       * @param linkIdx the idx of the link to displace
-       * @return double, the distance (squared norm) displaced
-       */
-      double displaceToMeanPosition(const ForceBalanceNetwork* net,
-                                    Eigen::VectorXd& u,
-                                    const size_t linkIdx) const
-      {
-        std::vector<size_t> springIndices = net->springIndicesOfLinks[linkIdx];
-        Eigen::Vector3d currentDisplacement;
-        currentDisplacement << u[3 * linkIdx], u[3 * linkIdx + 1],
-          u[3 * linkIdx + 2];
-        Eigen::Vector3d objectiveDisplacement =
-          Eigen::Vector3d::Zero(); // = remainingDisplacement.array();
-        double objectiveDisplacementContributors = 0.0;
-        for (size_t spring_index = 0; spring_index < springIndices.size();
-             ++spring_index) {
-          // compute partial distances & total distance of this spring
-          std::vector<size_t> springsPartners =
-            net->linkIndicesOfSprings[springIndices[spring_index]];
-          for (size_t partner_idx = 0; partner_idx < springsPartners.size() - 1;
-               ++partner_idx) {
-            if (springsPartners[partner_idx] == linkIdx ||
-                springsPartners[partner_idx + 1] == linkIdx) {
-              // add partial distance to the total distance
-              Eigen::Vector3d partialDistance =
-                MEHPForceBalance::evaluateDistanceBetween(
-                  net,
-                  u,
-                  springsPartners[partner_idx],
-                  springsPartners[partner_idx + 1],
-                  this->is2D);
-              // add to displacement
-              double prefix =
-                springsPartners[partner_idx] == linkIdx ? -1. : 1.;
-              double contourLengthFraction = 1.0;
-              if (springsPartners.size() > 2) {
-                // TODO: this must be done more beautiful
-                if (partner_idx == 0) {
-                  // only the case if linkIdx is the first cross-linker in the
-                  // strand
-                  contourLengthFraction =
-                    net->springPartitions[springIndices[spring_index]][0];
-                } else if (partner_idx == springsPartners.size() - 2) {
-                  // only the case if linkIdx is the last cross-linker in the
-                  // strand
-                  assert(springsPartners[partner_idx + 1] == linkIdx);
-                  contourLengthFraction =
-                    (1.0 - net->springPartitions[springIndices[spring_index]]
-                                                [partner_idx]);
-                } else {
-                  if (springsPartners[partner_idx] == linkIdx) {
-                    // fraction towards the "lower" end
-                    contourLengthFraction =
-                      net->springPartitions[springIndices[spring_index]]
-                                           [partner_idx] -
-                      net->springPartitions[springIndices[spring_index]]
-                                           [partner_idx - 1];
-
-                  } else {
-                    assert(springsPartners[partner_idx + 1] == linkIdx);
-                    // fraction towards the "higher" end
-                    contourLengthFraction =
-                      net->springPartitions[springIndices[spring_index]]
-                                           [partner_idx + 1] -
-                      net->springPartitions[springIndices[spring_index]]
-                                           [partner_idx];
-                  }
-                }
-              }
-              double oneOverContourLengthFraction =
-                1.0 / (net->springsContourLength[springIndices[spring_index]] *
-                       contourLengthFraction);
-              objectiveDisplacement +=
-                prefix *
-                (partialDistance)*oneOverContourLengthFraction; // /
-                                                                // totalDistance.array());
-              objectiveDisplacementContributors += oneOverContourLengthFraction;
-            }
-          }
-        }
-        // take mean for displacement
-        u[3 * linkIdx] +=
-          objectiveDisplacement[0] / objectiveDisplacementContributors;
-        u[3 * linkIdx + 1] +=
-          objectiveDisplacement[1] / objectiveDisplacementContributors;
-        u[3 * linkIdx + 2] +=
-          objectiveDisplacement[2] / objectiveDisplacementContributors;
-
-        double dist = objectiveDisplacement.squaredNorm();
-        // if (dist > 500) {
-        //   std::cout << "Moving " << linkIdx << " for " << dist
-        //             << " with displacements " << currentDisplacement[0] << ",
-        //             "
-        //             << currentDisplacement[1] << ", " <<
-        //             currentDisplacement[2]
-        //             << std::endl;
-        //   std::cout << "For objective displacements "
-        //             << objectiveDisplacement[0] << ", "
-        //             << objectiveDisplacement[1] << ", "
-        //             << objectiveDisplacement[2] << ", for "
-        //             << objectiveDisplacementContributors << "." << std::endl;
-        // }
-        return dist;
-      }
 
       /**
        * @brief Compute the gamma factor from certain spring distances
@@ -666,6 +545,8 @@ namespace calc {
       ForceBalanceNetwork finalConfig;
       Eigen::VectorXd currentDisplacements;
       Eigen::VectorXd currentSpringDistances;
+      ArrayXArrayXd
+        currentSpringPartitions; /* gives the parametrisation of N */
       int crosslinkerType;
       int nrOfStepsDone = 0;
       ExitReason exitReason = ExitReason::UNSET;
