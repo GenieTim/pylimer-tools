@@ -17,9 +17,21 @@ namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
 namespace pcm = pylimer_tools::calc::mehp;
 
+TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
+{
+  Eigen::VectorXd testVec = Eigen::VectorXd::Zero(10);
+  Eigen::ArrayXi testIdx = Eigen::ArrayXi::Zero(5);
+  testIdx << 0, 0, 5, 5, 1;
+  testVec(testIdx) += Eigen::VectorXd::Ones(5);
+  REQUIRE(testVec[5] == Catch::Approx(2.));
+  REQUIRE(testVec[0] == Catch::Approx(2.));
+  REQUIRE(testVec[1] == Catch::Approx(1.));
+  REQUIRE(testVec[2] == 0.0);
+}
+
 TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance]")
 {
-  return;
+  // return;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -76,6 +88,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance]")
       REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
       CHECK(forceBalancer2.getNrOfSprings() == 8142);
       CHECK(forceBalancer2.getNrOfIterations() > 1);
+      CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
 
       // conversion factors
       double kb = 1.381e-23; // Boltzmann, J/K
@@ -255,8 +268,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
   // and run with them.
   // Expect the slip-link of between two strands to converge to the central atom
   // Expect the slip-link of two strands to stay at 0.5, 0.5.
-  pylimer_tools::calc::mehp::ArrayXArrayXd springPartitions =
-    forceBalancer2.getSpringPartitions();
+  Eigen::VectorXd springPartitions = forceBalancer2.getSpringPartitions();
   Eigen::VectorXd displacements =
     Eigen::VectorXd::Zero(forceBalancer2.getNrOfLinks() * 3);
   pcm::ForceBalanceNetwork net = forceBalancer2.getNetwork();
@@ -285,42 +297,43 @@ TEST_CASE("MEHP Force Balance handles slip-links",
     // after the removal of strand atoms
     forceBalancer2.displaceToMeanPosition(
       &net, displacements, springPartitions, 4);
-    for (int dir = 0; dir < 3; ++dir) {
-      std::cout << (net.coordinates[3 * 4 + dir] + displacements[3 * 4 + dir])
-                << ", ";
-    }
+    // for (int dir = 0; dir < 3; ++dir) {
+    //   std::cout << (net.coordinates[3 * 4 + dir] + displacements[3 * 4 +
+    //   dir])
+    //             << ", ";
+    // }
     forceBalancer2.updateSpringPartition(
       &net, displacements, springPartitions, 4);
-    std::cout << std::endl;
-    std::cout << springPartitions[0][0] << ", " << springPartitions[1][0]
-              << std::endl;
+    // std::cout << std::endl;
+    // std::cout << springPartitions[0][0] << ", " << springPartitions[1][0]
+    //           << std::endl;
   }
   // assert expectations are met.
   // NOTE: difficulty: finding out which spring idx it actually is
-  for (int i = 0; i < net.nrOfSprings; ++i) {
-    std::cout << "Spring " << i << " " << std::endl;
-    for (int j = 0; j < net.linkIndicesOfSprings[i].size(); ++j) {
-      std::cout << net.linkIndicesOfSprings[i][j] << " :";
-      for (int dir = 0; dir < 3; ++dir) {
-        std::cout
-          << (net.coordinates[3 * net.linkIndicesOfSprings[i][j] + dir] +
-              displacements[3 * net.linkIndicesOfSprings[i][j] + dir])
-          << ", ";
-      }
-      std::cout << std::endl;
-    }
-    std::cout << std::endl;
+  // for (int i = 0; i < net.nrOfSprings; ++i) {
+  //   std::cout << "Spring " << i << " " << std::endl;
+  //   for (int j = 0; j < net.linkIndicesOfSprings[i].size(); ++j) {
+  //     std::cout << net.linkIndicesOfSprings[i][j] << " :";
+  //     for (int dir = 0; dir < 3; ++dir) {
+  //       std::cout
+  //         << (net.coordinates[3 * net.linkIndicesOfSprings[i][j] + dir] +
+  //             displacements[3 * net.linkIndicesOfSprings[i][j] + dir])
+  //         << ", ";
+  //     }
+  //     std::cout << std::endl;
+  //   }
+  //   std::cout << std::endl;
+  // }
+  for (int i = 0; i < net.nrOfPartialSprings; i++) {
+    std::cout << net.springPartIndexA[i] << ", " << net.springPartIndexB[i]
+              << ": ";
+    std::cout << springPartitions[i] << std::endl;
   }
-  std::vector<double> springPartitionsE2 = springPartitions[3];
-  CHECK(springPartitionsE2.size() == 2);
-  CHECK(springPartitionsE2[0] == Catch::Approx(0.5).epsilon(1e-6));
-  CHECK(springPartitionsE2[1] == Catch::Approx(0.5).epsilon(1e-6));
-  std::vector<double> springPartitionsE10 = springPartitions[0];
-  std::vector<double> springPartitionsE11 = springPartitions[1];
-  CHECK(springPartitionsE10.size() == springPartitionsE11.size());
-  CHECK(springPartitionsE10[0] == Catch::Approx(1.0).margin(1e-6));
-  CHECK(springPartitionsE11[0] + 1e-5 ==
-        Catch::Approx(0.0 + 1e-5).margin(1e-6));
+  std::cout << std::endl;
+  CHECK(springPartitions[0] == Catch::Approx(0.5).epsilon(1e-6));
+  CHECK(springPartitions[1] == Catch::Approx(0.5).epsilon(1e-6));
+  CHECK(springPartitions[0] == Catch::Approx(1.0).margin(1e-6));
+  CHECK(springPartitions[0] + 1e-5 == Catch::Approx(0.0 + 1e-5).margin(1e-6));
 }
 
 TEST_CASE("MEHP Force Balance runs with non-network",

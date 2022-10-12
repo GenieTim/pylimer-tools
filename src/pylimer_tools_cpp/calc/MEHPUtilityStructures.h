@@ -3,6 +3,9 @@
 
 #include <Eigen/Dense>
 #include <vector>
+#include <unordered_map>
+#include <map>
+#include <utility>
 
 namespace pylimer_tools {
 namespace calc {
@@ -52,20 +55,28 @@ namespace calc {
       long int nrOfLinks; /* number of links, = nrOfNodes + nrOfSlipLinks */
       long int nrOfNodes; /* number of cross-links */
       long int nrOfSprings;
+      long int nrOfPartialSprings;
       // coordinates & connectivity
       Eigen::VectorXd coordinates;
       Eigen::VectorXd springsContourLength; /* the N for each spring */
       ArrayXArrayXi springIndicesOfLinks;   // maps link -> springs
       ArrayXArrayXi linkIndicesOfSprings;   // maps spring -> links
+      // TODO: this will fail if we have two springs between the same links
+      std::map<std::pair<size_t, size_t>, size_t> connectivityToSpringIndex;
+      
 
       ArrayXb linkIsSliplink;
+      Eigen::ArrayXi springPartCoordinateIndexA;
+      Eigen::ArrayXi springPartCoordinateIndexB;
+      Eigen::ArrayXi springPartIndexA;
+      Eigen::ArrayXi springPartIndexB;
       // old stuff used for conversion. Does not include slip-links
-      Eigen::ArrayXi oldAtomIds;
       Eigen::ArrayXi springCoordinateIndexA;
       Eigen::ArrayXi springCoordinateIndexB;
+      Eigen::ArrayXi oldAtomIds;
+      ArrayXb springIsActive;
       Eigen::ArrayXi springIndexA;
       Eigen::ArrayXi springIndexB;
-      ArrayXb springIsActive;
     };
     // to string, without macro expansion
 #define STRINGINFY(s) #s
@@ -82,6 +93,9 @@ namespace calc {
     throw std::runtime_error(message "\nFailed condition: " #condition);       \
   }
   } // mehp
+
+#define APPROX_EQUAL(value1, value2, eps) \
+  value1 + eps >= value2 && value1 - eps <= value2
 } // calc
 } // pylimer_tools
 

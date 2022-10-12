@@ -52,15 +52,18 @@ namespace calc {
       double maxDistanceMoved = 0.0;
       size_t iterationsDone = 0;
       size_t totalInnerIterationsDone = 0;
-      ArrayXArrayXd springPartitions = this->currentSpringPartitions;
+      Eigen::VectorXd springPartitions = this->currentSpringPartitionsVec;
       do {
         maxDistanceMoved = 0.0;
         // first, place cross-links
-        for (size_t link_idx = 0; link_idx < net.nrOfNodes; ++link_idx) {
-          double distanceMoved =
-            this->displaceToMeanPosition(&net, u, springPartitions, link_idx);
-          maxDistanceMoved = std::max(maxDistanceMoved, distanceMoved);
-        }
+        maxDistanceMoved =
+          this->displaceLinkersToMeanPosition(&net, u, springPartitions);
+        // for (size_t link_idx = 0; link_idx < net.nrOfNodes; ++link_idx) {
+        //   double distanceMoved =
+        //     this->displaceToMeanPosition(&net, u, springPartitions,
+        //     link_idx);
+        //   maxDistanceMoved = std::max(maxDistanceMoved, distanceMoved);
+        // }
         // then, place slip-link
         for (size_t link_idx = net.nrOfNodes; link_idx < net.nrOfLinks;
              ++link_idx) {
@@ -86,7 +89,7 @@ namespace calc {
       // query solution & exit reason
       assert(u.size() == 3 * net.nrOfLinks);
       this->currentDisplacements = u;
-      this->currentSpringPartitions = springPartitions;
+      this->currentSpringPartitionsVec = springPartitions;
       this->currentSpringDistances =
         this->evaluateSpringDistances(&net, this->currentDisplacements, is2D);
 
@@ -106,7 +109,7 @@ namespace calc {
     double MEHPForceBalance::updateSpringPartition(
       const ForceBalanceNetwork* net,
       Eigen::VectorXd& u,
-      ArrayXArrayXd& springPartitions, /* gives the parametrisation of N */
+      Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
       const size_t linkIdx) const
     {
       INVALIDARG_EXP_IFN(linkIdx < net->springIndicesOfLinks.size(),
@@ -145,16 +148,28 @@ namespace calc {
             if (distanceBack < 1e-9) {
               idealValue = 0.0; // TODO: really?
             }
-            double currentS = springPartitions[springIndex][partner_idx - 1];
-            double nextS = partner_idx == springsPartners.size() - 2
-                             ? 1.
-                             : springPartitions[springIndex][partner_idx];
-            double lastS = partner_idx == 1
-                             ? 0.
-                             : springPartitions[springIndex][partner_idx - 2];
+            size_t currentSpringGlobalIdx = net->connectivityToSpringIndex.at(
+              MEHPForceBalance::makeConnectivityKey(
+                springsPartners[partner_idx],
+                springsPartners[partner_idx - 1]));
+            double currentS = springPartitions[currentSpringGlobalIdx];
+            double nextS =
+              partner_idx == springsPartners.size() - 2
+                ? 1.
+                : springPartitions[net->connectivityToSpringIndex.at(
+                    MEHPForceBalance::makeConnectivityKey(
+                      springsPartners[partner_idx],
+                      springsPartners[partner_idx + 1]))];
+            double lastS =
+              partner_idx == 1
+                ? 0.
+                : springPartitions[net->connectivityToSpringIndex.at(
+                    MEHPForceBalance::makeConnectivityKey(
+                      springsPartners[partner_idx - 2],
+                      springsPartners[partner_idx - 1]))];
             maxDiff = std::max(currentS - idealValue, maxDiff);
-            springPartitions[springIndex][partner_idx - 1] =
-              std::clamp(lastS + idealValue * (nextS - lastS), 0., 1.0);
+            springPartitions[currentSpringGlobalIdx] =
+              std::clamp(idealValue * (nextS - lastS), 0., 1.0);
           }
         }
       }
@@ -173,13 +188,11 @@ namespace calc {
     double MEHPForceBalance::displaceToMeanPosition(
       const ForceBalanceNetwork* net,
       Eigen::VectorXd& u,
-      ArrayXArrayXd& springPartitions,
+      Eigen::VectorXd& springPartitions,
       const size_t linkIdx) const
     {
       std::vector<size_t> springIndices = net->springIndicesOfLinks[linkIdx];
-      Eigen::Vector3d currentDisplacement;
-      currentDisplacement << u[3 * linkIdx], u[3 * linkIdx + 1],
-        u[3 * linkIdx + 2];
+      Eigen::Vector3d currentDisplacement = u.segment(3*linkIdx, 3);
       Eigen::Vector3d objectiveDisplacement =
         Eigen::Vector3d::Zero(); // = remainingDisplacement.array();
       double objectiveDisplacementContributors = 0.0;
@@ -200,24 +213,17 @@ namespace calc {
                 springsPartners[partner_idx],
                 this->is2D);
             // add to displacement
-            double contourLengthFraction = 1.0;
-            if (springsPartners.size() > 2) {
-              // find the relevant spring potential for this spring
-              double currentS = partner_idx == 0
-                               ? 0.
-                               : springPartitions[springIndices[spring_index]]
-                                                 [partner_idx-1];
-              double nextS = partner_idx == springsPartners.size() - 2
-                               ? 1.
-                               : springPartitions[springIndices[spring_index]]
-                                                 [partner_idx];
-              contourLengthFraction = nextS - currentS;
-            }
+            double contourLengthFraction =
+              springPartitions[net->connectivityToSpringIndex.at(
+                MEHPForceBalance::makeConnectivityKey(
+                  springsPartners[partner_idx + 1],
+                  springsPartners[partner_idx]))];
             if (contourLengthFraction > 1e-12) {
               double oneOverContourLengthFraction =
                 1.0 / (net->springsContourLength[springIndices[spring_index]] *
                        contourLengthFraction);
-              objectiveDisplacement += (partialDistance)*oneOverContourLengthFraction; // /
+              objectiveDisplacement +=
+                (partialDistance)*oneOverContourLengthFraction; // /
               // totalDistance.array());
               objectiveDisplacementContributors += oneOverContourLengthFraction;
             } else {
@@ -226,7 +232,7 @@ namespace calc {
             }
           }
           // again, but the spring in the other direction
-          if (springsPartners[partner_idx+1] == linkIdx) {
+          if (springsPartners[partner_idx + 1] == linkIdx) {
             // add partial distance to the total distance
             Eigen::Vector3d partialDistance =
               MEHPForceBalance::evaluateDistanceBetween(
@@ -236,24 +242,17 @@ namespace calc {
                 springsPartners[partner_idx + 1],
                 this->is2D);
             // add to displacement
-            double contourLengthFraction = 1.0;
-            if (springsPartners.size() > 2) {
-              // find the relevant spring potential for this spring
-              double lastS = partner_idx == 0
-                               ? 0.
-                               : springPartitions[springIndices[spring_index]]
-                                                 [partner_idx - 1];
-              double currentS = partner_idx == springsPartners.size() - 2
-                               ? 1.
-                               : springPartitions[springIndices[spring_index]]
-                                                 [partner_idx];
-              contourLengthFraction = currentS - lastS;
-            }
+            double contourLengthFraction =
+              springPartitions[net->connectivityToSpringIndex.at(
+                MEHPForceBalance::makeConnectivityKey(
+                  springsPartners[partner_idx + 1],
+                  springsPartners[partner_idx]))];
             if (contourLengthFraction > 1e-12) {
               double oneOverContourLengthFraction =
                 1.0 / (net->springsContourLength[springIndices[spring_index]] *
                        contourLengthFraction);
-              objectiveDisplacement += (partialDistance)*oneOverContourLengthFraction; // /
+              objectiveDisplacement +=
+                (partialDistance)*oneOverContourLengthFraction; // /
               // totalDistance.array());
               objectiveDisplacementContributors += oneOverContourLengthFraction;
             } else {
@@ -261,16 +260,11 @@ namespace calc {
               objectiveDisplacementContributors += 1e12;
             }
           }
-          
         }
       }
       // take mean for displacement
-      u[3 * linkIdx] +=
-        objectiveDisplacement[0] / objectiveDisplacementContributors;
-      u[3 * linkIdx + 1] +=
-        objectiveDisplacement[1] / objectiveDisplacementContributors;
-      u[3 * linkIdx + 2] +=
-        objectiveDisplacement[2] / objectiveDisplacementContributors;
+      u.segment(3 * linkIdx, 3) +=
+        objectiveDisplacement / objectiveDisplacementContributors;
 
       double dist = objectiveDisplacement.squaredNorm();
       // if (dist > 500) {
@@ -296,13 +290,10 @@ namespace calc {
       const size_t linkIndexB,
       const bool is2D)
     {
-      Eigen::Vector3d distances;
-      distances << net->coordinates[3 * linkIndexA] + u[3 * linkIndexA] -
-                     (net->coordinates[3 * linkIndexB] + u[3 * linkIndexB]),
-        net->coordinates[3 * linkIndexA + 1] + u[3 * linkIndexA + 1] -
-          (net->coordinates[3 * linkIndexB + 1] + u[3 * linkIndexB + 1]),
-        net->coordinates[3 * linkIndexA + 2] + u[3 * linkIndexA + 2] -
-          (net->coordinates[3 * linkIndexB + 2] + u[3 * linkIndexB + 2]);
+      Eigen::Vector3d distances = net->coordinates.segment(3 * linkIndexA, 3) +
+                                  u.segment(3 * linkIndexA, 3) -
+                                  (net->coordinates.segment(3 * linkIndexB, 3) +
+                                   u.segment(3 * linkIndexB, 3));
 
       // Possibly improvable PBC
       for (size_t j = 0; j < 3; ++j) {
@@ -442,6 +433,7 @@ namespace calc {
     {
       size_t additionalLen = strandIdx1.size();
       size_t currentNrOfLinks = this->initialConfig.nrOfLinks;
+      size_t currentNrOfPartialSprings = this->initialConfig.nrOfPartialSprings;
       if (additionalLen != x.size() || additionalLen != y.size() ||
           additionalLen != z.size()) {
         throw std::invalid_argument("x, y and z must have the same dimensions");
@@ -460,7 +452,20 @@ namespace calc {
         this->initialConfig.nrOfLinks);
       this->initialConfig.linkIsSliplink.conservativeResize(
         this->initialConfig.nrOfLinks);
+      this->initialConfig.springPartCoordinateIndexA.conservativeResize(
+        3 * (currentNrOfPartialSprings + 2*additionalLen));
+      this->initialConfig.springPartCoordinateIndexB.conservativeResize(
+        3 * (currentNrOfPartialSprings + 2*additionalLen));
+      this->initialConfig.springPartIndexA.conservativeResize(
+        currentNrOfPartialSprings + 2*additionalLen);
+      this->initialConfig.springPartIndexB.conservativeResize(
+        currentNrOfPartialSprings + 2*additionalLen);
+      this->currentSpringPartitionsVec.conservativeResize(
+        currentNrOfPartialSprings + 2*additionalLen);
+      size_t partialSpringsAdded = 0;
+      // then, loop the slip-links to add
       for (size_t i = 0; i < additionalLen; ++i) {
+        // add the info that is straight-forward to add
         this->initialConfig.coordinates[3 * currentNrOfLinks + 3 * i] = x[i];
         this->initialConfig.coordinates[3 * currentNrOfLinks + 3 * i + 1] =
           y[i];
@@ -471,36 +476,96 @@ namespace calc {
         this->initialConfig.springIndicesOfLinks.push_back(springIndices);
         // add to the springs
         for (size_t springIndex : springIndices) {
+          std::vector<size_t> springParticipants =
+            this->initialConfig.linkIndicesOfSprings[springIndex];
           double alpha = (springIndex == 0 ? alpha1[i] : alpha2[i]);
           // detect the position in the spring
-          std::vector<double> partitionsStrand =
-            this->currentSpringPartitions[springIndex];
+          std::vector<double> partitionsStrand;
+          partitionsStrand.reserve(springParticipants.size() - 1);
+          for (size_t i = 0; i < springParticipants.size() - 1; ++i) {
+            std::pair<size_t, size_t> connectivityKey =
+              MEHPForceBalance::makeConnectivityKey(springParticipants[i],
+                                                    springParticipants[i + 1]);
+            partitionsStrand.push_back(
+              this->currentSpringPartitionsVec[this->initialConfig
+                                                 .connectivityToSpringIndex.at(
+                                                   connectivityKey)]);
+          }
+
           bool wasAdded = false;
           size_t targetIndexInSpring = 0;
+          double cumulativePartition = 0.0;
           for (size_t p_idx = 0; p_idx < partitionsStrand.size(); ++p_idx) {
-            if (partitionsStrand[p_idx] > alpha) {
+            cumulativePartition += partitionsStrand[p_idx];
+            if (cumulativePartition > alpha) {
               targetIndexInSpring = p_idx;
+              if (p_idx > 0) {
+                alpha = alpha - partitionsStrand[p_idx - 1];
+              }
               wasAdded = true;
               break;
             }
           }
           if (!wasAdded) {
-            targetIndexInSpring =
-              this->currentSpringPartitions[springIndex].size();
+            targetIndexInSpring = springParticipants.size() - 1;
+            if (partitionsStrand.size() > 0) {
+              alpha = alpha * (1. - partitionsStrand[targetIndexInSpring - 1]);
+            }
           }
-          this->currentSpringPartitions[springIndex].insert(
-            this->currentSpringPartitions[springIndex].begin() +
-              targetIndexInSpring,
-            alpha);
+
+          // have to adjust the existing springs, too!
+          size_t springPartner1 = springParticipants[targetIndexInSpring];
+          size_t springPartner2 = springParticipants[targetIndexInSpring + 1];
+          size_t newNodeIdx = currentNrOfLinks + i;
+          std::pair<size_t, size_t> brokenConnection =
+            MEHPForceBalance::makeConnectivityKey(springPartner1,
+                                                  springPartner2);
+
+          // update connectivity
+          size_t lastSpringIndex =
+            this->initialConfig.connectivityToSpringIndex.at(brokenConnection);
+          size_t newSpringIndex =
+            currentNrOfPartialSprings + partialSpringsAdded;
+          this->initialConfig.connectivityToSpringIndex.erase(brokenConnection);
+          this->initialConfig
+            .connectivityToSpringIndex[MEHPForceBalance::makeConnectivityKey(
+              newNodeIdx, springPartner1)] = lastSpringIndex;
+          this->initialConfig
+            .connectivityToSpringIndex[MEHPForceBalance::makeConnectivityKey(
+              newNodeIdx, springPartner2)] = newSpringIndex;
+          // adjust also the coordinates
+          if (this->initialConfig.springPartIndexA[lastSpringIndex] ==
+              springPartner1) {
+            this->initialConfig.springPartIndexB[lastSpringIndex] = newNodeIdx;
+            for (size_t offset = 0; offset < 3; ++offset) {
+              this->initialConfig
+                .springPartCoordinateIndexB[3 * lastSpringIndex + offset] =
+                3 * newNodeIdx + offset;
+            }
+          } else {
+            this->initialConfig.springPartIndexA[lastSpringIndex] = newNodeIdx;
+            for (size_t offset = 0; offset < 3; ++offset) {
+              this->initialConfig
+                .springPartCoordinateIndexA[3 * lastSpringIndex + offset] =
+                3 * newNodeIdx + offset;
+            }
+          }
+
+          this->currentSpringPartitionsVec[lastSpringIndex] -= alpha;
+          this->currentSpringPartitionsVec[newSpringIndex] = alpha;
           this->initialConfig.linkIndicesOfSprings[springIndex].insert(
             this->initialConfig.linkIndicesOfSprings[springIndex].begin() +
               targetIndexInSpring +
               1, // + 1 to compensate for the first cross-link
-            currentNrOfLinks + i);
+            newNodeIdx);
+
+          partialSpringsAdded += 1;
         }
       }
+      this->initialConfig.nrOfPartialSprings += partialSpringsAdded;
       // do we really want to?
       this->validateNetwork();
+      assert(partialSpringsAdded == 2*additionalLen);
     };
 
     /**
@@ -698,6 +763,9 @@ namespace calc {
                       "Box direction z must be scalar");
       RUNTIME_EXP_IFN(net->coordinates.size() == net->nrOfLinks * 3,
                       "Invalid size of coordinates");
+      RUNTIME_EXP_IFN(net->connectivityToSpringIndex.size() ==
+                        net->nrOfPartialSprings,
+                      "Invalid size of connectivity map");
       RUNTIME_EXP_IFN(net->springsContourLength.size() == net->nrOfSprings,
                       "Invalid size of contour lengths");
       RUNTIME_EXP_IFN(net->springIndicesOfLinks.size() == net->nrOfLinks,
@@ -714,31 +782,37 @@ namespace calc {
       RUNTIME_EXP_IFN(net->springCoordinateIndexB.size() ==
                         net->nrOfSprings * 3,
                       "Invalid size of springCoordinateIndexB");
+      RUNTIME_EXP_IFN(net->springPartCoordinateIndexA.size() ==
+                        net->nrOfPartialSprings * 3,
+                      "Invalid size of springPartCoordinateIndexA");
+      RUNTIME_EXP_IFN(net->springPartCoordinateIndexB.size() ==
+                        net->nrOfPartialSprings * 3,
+                      "Invalid size of springPartCoordinateIndexB");
       RUNTIME_EXP_IFN(net->springIndexA.size() == net->nrOfSprings,
                       "Invalid size of springIndexA");
       RUNTIME_EXP_IFN(net->springIndexB.size() == net->nrOfSprings,
                       "Invalid size of springIndexB");
+      RUNTIME_EXP_IFN(net->springPartIndexA.size() == net->nrOfPartialSprings,
+                      "Invalid size of springPartIndexA");
+      RUNTIME_EXP_IFN(net->springPartIndexB.size() == net->nrOfPartialSprings,
+                      "Invalid size of springPartIndexB");
       RUNTIME_EXP_IFN(net->springIsActive.size() == net->nrOfSprings,
                       "Invalid size of springIsActive");
+      RUNTIME_EXP_IFN(this->currentSpringPartitionsVec.size() ==
+                        net->nrOfPartialSprings,
+                      "Invalid size of currentSpringPartitionsVec");
+      RUNTIME_EXP_IFN(APPROX_EQUAL(this->currentSpringPartitionsVec.sum(),
+                                   net->nrOfSprings,
+                                   1e-3),
+                      "Spring partitions should sum to 1 per spring");
+      for (size_t i = 0; i < this->currentSpringPartitionsVec.size(); i++) {
+        RUNTIME_EXP_IFN(this->currentSpringPartitionsVec[i] <= 1.0 &&
+                          this->currentSpringPartitionsVec[i] >= 0.0,
+                        "Spring partitions must be between 0 & 1");
+      }
       for (size_t i = 0; i < net->nrOfSprings; ++i) {
-        for (size_t j = 0; j < this->currentSpringPartitions[i].size(); ++j) {
-          RUNTIME_EXP_IFN(this->currentSpringPartitions[i][j] <= 1. &&
-                            this->currentSpringPartitions[i][j] >= 0.,
-                          "Spring partitions must be between 0 & 1");
-          if (this->currentSpringPartitions[i].size() >= 2 &&
-              j < this->currentSpringPartitions[i].size() - 1) {
-            RUNTIME_EXP_IFN(this->currentSpringPartitions[i][j] <=
-                              this->currentSpringPartitions[i][j + 1],
-                            "Spring partitions must be sequential");
-          }
-        }
-
         RUNTIME_EXP_IFN(net->linkIndicesOfSprings[i].size() >= 2,
                         "Each spring requires at least two links");
-        RUNTIME_EXP_IFN(
-          net->linkIndicesOfSprings[i].size() ==
-            this->currentSpringPartitions[i].size() + 2,
-          "Spring partitions must coincide with nr of participating links");
         RUNTIME_EXP_IFN(
           net->linkIndicesOfSprings[i][0] <
             net->linkIndicesOfSprings[i]

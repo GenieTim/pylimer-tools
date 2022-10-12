@@ -459,6 +459,7 @@ init_pylimer_bound_calc(py::module_& m)
                            const std::vector<double>,
                            const std::vector<double>,
                            const std::vector<double>,
+                           const std::vector<double>,
                            const std::vector<double>>(
            &mehp::MEHPForceBalance::addSlipLinks),
          R"pbdoc(
