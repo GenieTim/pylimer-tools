@@ -504,9 +504,11 @@ namespace calc {
 
             net->springsContourLength[spring_idx] =
               crosslinkerChains[i].getNrOfAtoms() - 1; // TODO: -2?
-            net->connectivityToSpringIndex.emplace(
-              MEHPForceBalance::makeConnectivityKey(nodeIdxFrom, nodeIdxTo),
-              spring_idx);
+            
+            std::vector<size_t> zeroMap;
+            zeroMap.push_back(spring_idx);
+            net->localToGlobalSpringIndex.emplace(spring_idx, zeroMap);
+
             spring_idx += 1;
           }
         }

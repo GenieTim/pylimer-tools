@@ -86,6 +86,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance]")
             Catch::Approx(forceRelaxer.getPressure()));
       CHECK(forceBalancer2.getPressure() == Catch::Approx(0.39911682390778536));
       REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
+      CHECK_NOTHROW(forceBalancer2.validateNetwork());
       CHECK(forceBalancer2.getNrOfSprings() == 8142);
       CHECK(forceBalancer2.getNrOfIterations() > 1);
       CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
@@ -161,6 +162,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance]")
     REQUIRE(forceBalancer.getNrOfIterations() >= 1);
     REQUIRE(universe.getAtomsOfType(2).size() == 7200);
     REQUIRE(forceBalancer.getExitReason() == pcm::ExitReason::MAX_STEPS);
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
     // run again, this time fully
     pcm::MEHPForceBalance forceBalancer2 =
       pcm::MEHPForceBalance(universe, 2, true);
@@ -174,6 +176,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance]")
           Catch::Approx(
             (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) / 3.)
             .epsilon(0.02));
+    CHECK_NOTHROW(forceBalancer2.validateNetwork());
     // TODO: find better, more accurate tests here
     CHECK(forceBalancer2.getNrOfActiveNodes() > 1);
     CHECK(forceBalancer2.getNrOfActiveSprings() > 1);
@@ -247,6 +250,14 @@ TEST_CASE("MEHP Force Balance handles slip-links",
   REQUIRE(forceBalancer2.getNrOfNodes() == forceBalancer2.getNrOfLinks());
   REQUIRE(forceBalancer2.getNrOfNodes() == 4);
   REQUIRE(forceBalancer2.getNrOfSprings() == 5);
+  Eigen::VectorXd springPartitions0 = forceBalancer2.getSpringPartitions();
+  pcm::ForceBalanceNetwork net0 = forceBalancer2.getNetwork();
+  for (int i = 0; i < net0.nrOfPartialSprings; i++) {
+    std::cout << net0.springPartIndexA[i] << ", " << net0.springPartIndexB[i]
+              << ": ";
+    std::cout << springPartitions0[i] << std::endl;
+  }
+  std::cout << std::endl;
   // and add slip-links
   REQUIRE_THROWS(forceBalancer2.addSlipLinks({ { 1, 2, 3 } },
                                              { { 1, 2, 3 } },
@@ -272,6 +283,12 @@ TEST_CASE("MEHP Force Balance handles slip-links",
   Eigen::VectorXd displacements =
     Eigen::VectorXd::Zero(forceBalancer2.getNrOfLinks() * 3);
   pcm::ForceBalanceNetwork net = forceBalancer2.getNetwork();
+  for (int i = 0; i < net.nrOfPartialSprings; i++) {
+    std::cout << net.springPartIndexA[i] << ", " << net.springPartIndexB[i]
+              << ": ";
+    std::cout << springPartitions[i] << std::endl;
+  }
+  std::cout << std::endl;
 
   forceBalancer2.displaceToMeanPosition(
     &net, displacements, springPartitions, 4);
@@ -290,6 +307,12 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       &net, displacements, springPartitions, 5);
     forceBalancer2.updateSpringPartition(
       &net, displacements, springPartitions, 5);
+  for (int i = 0; i < net.nrOfPartialSprings; i++) {
+    std::cout << net.springPartIndexA[i] << ", " << net.springPartIndexB[i]
+              << ": ";
+    std::cout << springPartitions[i] << std::endl;
+  }
+  std::cout << std::endl;
   }
   for (int i = 0; i < 125; ++i) {
     // do some random 125 steps with these two slip-links
@@ -330,10 +353,13 @@ TEST_CASE("MEHP Force Balance handles slip-links",
     std::cout << springPartitions[i] << std::endl;
   }
   std::cout << std::endl;
-  CHECK(springPartitions[0] == Catch::Approx(0.5).epsilon(1e-6));
-  CHECK(springPartitions[1] == Catch::Approx(0.5).epsilon(1e-6));
-  CHECK(springPartitions[0] == Catch::Approx(1.0).margin(1e-6));
-  CHECK(springPartitions[0] + 1e-5 == Catch::Approx(0.0 + 1e-5).margin(1e-6));
+  CHECK(springPartitions[5]+1e-5 == Catch::Approx(0.0+1e-5).epsilon(1e-6)); // 4-1
+  CHECK(springPartitions[6] == Catch::Approx(1.0).epsilon(1e-6)); // 4-2
+  CHECK(springPartitions[0] == Catch::Approx(1.0).epsilon(1e-6)); // 4-0
+  CHECK(springPartitions[1]+1e-5 == Catch::Approx(0.0+1e-5).epsilon(1e-6)); // 1-4
+  // CHECK(springPartitions[8] == Catch::Approx(1.0).margin(1e-6)); // 5-3
+  // CHECK(springPartitions[7] + 1e-5 == Catch::Approx(0.0 + 1e-5).margin(1e-6)); // 5-5
+  // CHECK(springPartitions[3] == Catch::Approx(1.0).margin(1e-6)); // 5-0
 }
 
 TEST_CASE("MEHP Force Balance runs with non-network",

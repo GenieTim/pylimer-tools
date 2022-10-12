@@ -56,14 +56,13 @@ namespace calc {
       do {
         maxDistanceMoved = 0.0;
         // first, place cross-links
-        maxDistanceMoved =
-          this->displaceLinkersToMeanPosition(&net, u, springPartitions);
-        // for (size_t link_idx = 0; link_idx < net.nrOfNodes; ++link_idx) {
-        //   double distanceMoved =
-        //     this->displaceToMeanPosition(&net, u, springPartitions,
-        //     link_idx);
-        //   maxDistanceMoved = std::max(maxDistanceMoved, distanceMoved);
-        // }
+        // maxDistanceMoved =
+        //   this->displaceLinkersToMeanPosition(&net, u, springPartitions);
+        for (size_t link_idx = 0; link_idx < net.nrOfNodes; ++link_idx) {
+          double distanceMoved =
+            this->displaceToMeanPosition(&net, u, springPartitions, link_idx);
+          maxDistanceMoved = std::max(maxDistanceMoved, distanceMoved);
+        }
         // then, place slip-link
         for (size_t link_idx = net.nrOfNodes; link_idx < net.nrOfLinks;
              ++link_idx) {
@@ -148,28 +147,17 @@ namespace calc {
             if (distanceBack < 1e-9) {
               idealValue = 0.0; // TODO: really?
             }
-            size_t currentSpringGlobalIdx = net->connectivityToSpringIndex.at(
-              MEHPForceBalance::makeConnectivityKey(
-                springsPartners[partner_idx],
-                springsPartners[partner_idx - 1]));
+            size_t currentSpringGlobalIdx =
+              net->localToGlobalSpringIndex.at(springIndex)[partner_idx-1];
+            size_t neighbourSpringGlobalIdx =
+              net->localToGlobalSpringIndex.at(springIndex)[partner_idx];
             double currentS = springPartitions[currentSpringGlobalIdx];
-            double nextS =
-              partner_idx == springsPartners.size() - 2
-                ? 1.
-                : springPartitions[net->connectivityToSpringIndex.at(
-                    MEHPForceBalance::makeConnectivityKey(
-                      springsPartners[partner_idx],
-                      springsPartners[partner_idx + 1]))];
-            double lastS =
-              partner_idx == 1
-                ? 0.
-                : springPartitions[net->connectivityToSpringIndex.at(
-                    MEHPForceBalance::makeConnectivityKey(
-                      springsPartners[partner_idx - 2],
-                      springsPartners[partner_idx - 1]))];
-            maxDiff = std::max(currentS - idealValue, maxDiff);
-            springPartitions[currentSpringGlobalIdx] =
-              std::clamp(idealValue * (nextS - lastS), 0., 1.0);
+            double nextS = springPartitions[neighbourSpringGlobalIdx];
+            double newS = idealValue * (nextS + currentS);
+            maxDiff = std::max(currentS - newS, maxDiff);
+            springPartitions[currentSpringGlobalIdx] = newS;
+            springPartitions[neighbourSpringGlobalIdx] =
+              (1. - idealValue) * (nextS + currentS);
           }
         }
       }
@@ -192,7 +180,7 @@ namespace calc {
       const size_t linkIdx) const
     {
       std::vector<size_t> springIndices = net->springIndicesOfLinks[linkIdx];
-      Eigen::Vector3d currentDisplacement = u.segment(3*linkIdx, 3);
+      Eigen::Vector3d currentDisplacement = u.segment(3 * linkIdx, 3);
       Eigen::Vector3d objectiveDisplacement =
         Eigen::Vector3d::Zero(); // = remainingDisplacement.array();
       double objectiveDisplacementContributors = 0.0;
@@ -214,10 +202,9 @@ namespace calc {
                 this->is2D);
             // add to displacement
             double contourLengthFraction =
-              springPartitions[net->connectivityToSpringIndex.at(
-                MEHPForceBalance::makeConnectivityKey(
-                  springsPartners[partner_idx + 1],
-                  springsPartners[partner_idx]))];
+              springPartitions[net->localToGlobalSpringIndex
+                                 .at(springIndices[spring_index])
+                                 .at(partner_idx)];
             if (contourLengthFraction > 1e-12) {
               double oneOverContourLengthFraction =
                 1.0 / (net->springsContourLength[springIndices[spring_index]] *
@@ -243,10 +230,9 @@ namespace calc {
                 this->is2D);
             // add to displacement
             double contourLengthFraction =
-              springPartitions[net->connectivityToSpringIndex.at(
-                MEHPForceBalance::makeConnectivityKey(
-                  springsPartners[partner_idx + 1],
-                  springsPartners[partner_idx]))];
+              springPartitions[net->localToGlobalSpringIndex
+                                 .at(springIndices[spring_index])
+                                 .at(partner_idx)];
             if (contourLengthFraction > 1e-12) {
               double oneOverContourLengthFraction =
                 1.0 / (net->springsContourLength[springIndices[spring_index]] *
@@ -453,15 +439,15 @@ namespace calc {
       this->initialConfig.linkIsSliplink.conservativeResize(
         this->initialConfig.nrOfLinks);
       this->initialConfig.springPartCoordinateIndexA.conservativeResize(
-        3 * (currentNrOfPartialSprings + 2*additionalLen));
+        3 * (currentNrOfPartialSprings + 2 * additionalLen));
       this->initialConfig.springPartCoordinateIndexB.conservativeResize(
-        3 * (currentNrOfPartialSprings + 2*additionalLen));
+        3 * (currentNrOfPartialSprings + 2 * additionalLen));
       this->initialConfig.springPartIndexA.conservativeResize(
-        currentNrOfPartialSprings + 2*additionalLen);
+        currentNrOfPartialSprings + 2 * additionalLen);
       this->initialConfig.springPartIndexB.conservativeResize(
-        currentNrOfPartialSprings + 2*additionalLen);
+        currentNrOfPartialSprings + 2 * additionalLen);
       this->currentSpringPartitionsVec.conservativeResize(
-        currentNrOfPartialSprings + 2*additionalLen);
+        currentNrOfPartialSprings + 2 * additionalLen);
       size_t partialSpringsAdded = 0;
       // then, loop the slip-links to add
       for (size_t i = 0; i < additionalLen; ++i) {
@@ -483,13 +469,10 @@ namespace calc {
           std::vector<double> partitionsStrand;
           partitionsStrand.reserve(springParticipants.size() - 1);
           for (size_t i = 0; i < springParticipants.size() - 1; ++i) {
-            std::pair<size_t, size_t> connectivityKey =
-              MEHPForceBalance::makeConnectivityKey(springParticipants[i],
-                                                    springParticipants[i + 1]);
             partitionsStrand.push_back(
-              this->currentSpringPartitionsVec[this->initialConfig
-                                                 .connectivityToSpringIndex.at(
-                                                   connectivityKey)]);
+              this->currentSpringPartitionsVec
+                [this->initialConfig.localToGlobalSpringIndex.at(springIndex)
+                   .at(i)]);
           }
 
           bool wasAdded = false;
@@ -517,22 +500,20 @@ namespace calc {
           size_t springPartner1 = springParticipants[targetIndexInSpring];
           size_t springPartner2 = springParticipants[targetIndexInSpring + 1];
           size_t newNodeIdx = currentNrOfLinks + i;
-          std::pair<size_t, size_t> brokenConnection =
-            MEHPForceBalance::makeConnectivityKey(springPartner1,
-                                                  springPartner2);
 
           // update connectivity
           size_t lastSpringIndex =
-            this->initialConfig.connectivityToSpringIndex.at(brokenConnection);
+            this->initialConfig.localToGlobalSpringIndex.at(springIndex)
+              .at(targetIndexInSpring);
           size_t newSpringIndex =
             currentNrOfPartialSprings + partialSpringsAdded;
-          this->initialConfig.connectivityToSpringIndex.erase(brokenConnection);
-          this->initialConfig
-            .connectivityToSpringIndex[MEHPForceBalance::makeConnectivityKey(
-              newNodeIdx, springPartner1)] = lastSpringIndex;
-          this->initialConfig
-            .connectivityToSpringIndex[MEHPForceBalance::makeConnectivityKey(
-              newNodeIdx, springPartner2)] = newSpringIndex;
+
+          this->initialConfig.localToGlobalSpringIndex.at(springIndex)
+            .insert(this->initialConfig.localToGlobalSpringIndex.at(springIndex)
+                        .begin() +
+                      targetIndexInSpring + 1,
+                    newSpringIndex);
+
           // adjust also the coordinates
           if (this->initialConfig.springPartIndexA[lastSpringIndex] ==
               springPartner1) {
@@ -543,12 +524,25 @@ namespace calc {
                 3 * newNodeIdx + offset;
             }
           } else {
+            assert(this->initialConfig.springPartIndexA[lastSpringIndex] ==
+                   springPartner2);
             this->initialConfig.springPartIndexA[lastSpringIndex] = newNodeIdx;
             for (size_t offset = 0; offset < 3; ++offset) {
               this->initialConfig
                 .springPartCoordinateIndexA[3 * lastSpringIndex + offset] =
                 3 * newNodeIdx + offset;
             }
+          }
+          // add the new one
+          this->initialConfig.springPartIndexA[newSpringIndex] = newNodeIdx;
+          this->initialConfig.springPartIndexB[newSpringIndex] = springPartner2;
+          for (size_t offset = 0; offset < 3; ++offset) {
+            this->initialConfig
+              .springPartCoordinateIndexA[3 * newSpringIndex + offset] =
+              3 * newNodeIdx + offset;
+            this->initialConfig
+              .springPartCoordinateIndexB[3 * newSpringIndex + offset] =
+              3 * springPartner2 + offset;
           }
 
           this->currentSpringPartitionsVec[lastSpringIndex] -= alpha;
@@ -565,7 +559,7 @@ namespace calc {
       this->initialConfig.nrOfPartialSprings += partialSpringsAdded;
       // do we really want to?
       this->validateNetwork();
-      assert(partialSpringsAdded == 2*additionalLen);
+      assert(partialSpringsAdded == 2 * additionalLen);
     };
 
     /**
@@ -763,8 +757,7 @@ namespace calc {
                       "Box direction z must be scalar");
       RUNTIME_EXP_IFN(net->coordinates.size() == net->nrOfLinks * 3,
                       "Invalid size of coordinates");
-      RUNTIME_EXP_IFN(net->connectivityToSpringIndex.size() ==
-                        net->nrOfPartialSprings,
+      RUNTIME_EXP_IFN(net->localToGlobalSpringIndex.size() == net->nrOfSprings,
                       "Invalid size of connectivity map");
       RUNTIME_EXP_IFN(net->springsContourLength.size() == net->nrOfSprings,
                       "Invalid size of contour lengths");
@@ -813,8 +806,11 @@ namespace calc {
       for (size_t i = 0; i < net->nrOfSprings; ++i) {
         RUNTIME_EXP_IFN(net->linkIndicesOfSprings[i].size() >= 2,
                         "Each spring requires at least two links");
+        RUNTIME_EXP_IFN(net->localToGlobalSpringIndex.at(i).size() ==
+                          net->linkIndicesOfSprings[i].size() - 1,
+                        "Require a global index for each local one");
         RUNTIME_EXP_IFN(
-          net->linkIndicesOfSprings[i][0] <
+          net->linkIndicesOfSprings[i][0] <=
             net->linkIndicesOfSprings[i]
                                      [net->linkIndicesOfSprings[i].size() - 1],
           "Springs must have increasing end-point indices");

@@ -61,9 +61,8 @@ namespace calc {
       Eigen::VectorXd springsContourLength; /* the N for each spring */
       ArrayXArrayXi springIndicesOfLinks;   // maps link -> springs
       ArrayXArrayXi linkIndicesOfSprings;   // maps spring -> links
-      // TODO: this will fail if we have two springs between the same links
-      std::map<std::pair<size_t, size_t>, size_t> connectivityToSpringIndex;
-      
+      // local to global: from the 2D structures to the 1D Eigen vector
+      std::map<size_t, std::vector<size_t>> localToGlobalSpringIndex;
 
       ArrayXb linkIsSliplink;
       Eigen::ArrayXi springPartCoordinateIndexA;
