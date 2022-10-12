@@ -200,7 +200,8 @@ namespace calc {
         for (size_t i = 0; i < x.size(); ++i) {
           alphas.push_back(0.5);
         }
-        return this->addSlipLinks(strandIdx1, strandIdx2, x, y, z, alphas, alphas);
+        return this->addSlipLinks(
+          strandIdx1, strandIdx2, x, y, z, alphas, alphas);
       }
 
       void addSlipLinks(const std::vector<size_t> strandIdx1,
@@ -243,9 +244,9 @@ namespace calc {
 
       ForceBalanceNetwork getNetwork() { return this->initialConfig; }
 
-      ArrayXArrayXd getSpringPartitions()
+      Eigen::VectorXd getSpringPartitions()
       {
-        return this->currentSpringPartitions;
+        return this->currentSpringPartitionsVec;
       }
 
       /**
@@ -256,7 +257,7 @@ namespace calc {
       double updateSpringPartition(
         const ForceBalanceNetwork* net,
         Eigen::VectorXd& u,
-        ArrayXArrayXd& springPartitions, /* gives the parametrisation of N */
+        Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
         const size_t linkIdx) const;
 
       /**
@@ -270,8 +271,112 @@ namespace calc {
        */
       double displaceToMeanPosition(const ForceBalanceNetwork* net,
                                     Eigen::VectorXd& u,
-                                    ArrayXArrayXd& springPartitions,
+                                    Eigen::VectorXd& springPartitions,
                                     const size_t linkIdx) const;
+
+      /**
+       * @brief Displace one link to the mean of all connected neighbours
+       *
+       * @param net the force balance network
+       * @param u the current displacements, wherein the resulting coordinates
+       * shall be stored
+       * @return double, the distance (squared norm) displaced
+       */
+      double displaceLinkersToMeanPosition(const ForceBalanceNetwork* net,
+                                           Eigen::VectorXd& u,
+                                           Eigen::VectorXd& springPartitions0,
+                                           double damping = 0.75) const
+      {
+        INVALIDARG_EXP_IFN(
+          springPartitions0.size() == net->nrOfPartialSprings,
+          "Spring partitions must have the size of the nr of springs");
+        Eigen::VectorXd springPartitions =
+          Eigen::VectorXd::Zero(3 * net->nrOfPartialSprings);
+
+        for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
+          for (size_t j = 0; j < 3; ++j) {
+            springPartitions[i * 3 + j] = springPartitions0[i];
+          }
+        }
+
+        INVALIDARG_EXP_IFN(
+          u.size() == net->coordinates.size(),
+          "Coordinates and displacements must have the same size");
+        INVALIDARG_EXP_IFN(
+          springPartitions.size() == net->springPartCoordinateIndexB.size(),
+          "Spring partitions must have the size of the nr of springs");
+
+        Eigen::VectorXd displacedCoords = net->coordinates + u;
+        Eigen::VectorXd allPartialDistancesA =
+          (displacedCoords(net->springPartCoordinateIndexB) -
+           displacedCoords(net->springPartCoordinateIndexA));
+        this->handlePBC(net, allPartialDistancesA);
+        Eigen::VectorXd allPartialDistancesB = -allPartialDistancesA;
+        //   (displacedCoords(net->springPartCoordinateIndexA) -
+        //    displacedCoords(net->springPartCoordinateIndexB));
+        // this->handlePBC(net, allPartialDistancesB);
+
+        Eigen::VectorXd sumOfSpringPartials =
+          Eigen::VectorXd::Zero(3 * net->nrOfLinks);
+        sumOfSpringPartials(net->springPartCoordinateIndexA) +=
+          springPartitions;
+        sumOfSpringPartials(net->springPartCoordinateIndexB) +=
+          springPartitions;
+
+        Eigen::VectorXd objectiveDisplacements =
+          Eigen::VectorXd::Zero(3 * net->nrOfLinks);
+        objectiveDisplacements(net->springPartCoordinateIndexA) +=
+          (allPartialDistancesA.array() / springPartitions.array()).matrix();
+        // TODO: the thing with the spring partitions is incorrect like that.
+        objectiveDisplacements(net->springPartCoordinateIndexB) +=
+          (allPartialDistancesB.array() / springPartitions.array()).matrix();
+        objectiveDisplacements =
+          (objectiveDisplacements.array() / sumOfSpringPartials.array())
+            .matrix();
+
+        if (this->is2D) {
+          for (int i = 0; i < net->nrOfLinks; ++i) {
+            objectiveDisplacements[3 * i + 2] = 0.;
+            u[3 * i + 2] = 0.;
+          }
+        }
+
+        double maxDiff = (objectiveDisplacements - u).cwiseAbs2().maxCoeff();
+        u = (damping * u) + (1 - damping) * objectiveDisplacements;
+
+        return maxDiff;
+      };
+
+      void handlePBC(const ForceBalanceNetwork* net,
+                     Eigen::VectorXd& distances) const
+      {
+        // possibly improveable PBC
+        for (size_t j = 0; j < distances.size(); ++j) {
+          int iterations = 0;
+          assert(!std::isinf(distances[j]) && !std::isnan(distances[j]));
+          while (distances[j] > net->boxHalfs[j % 3]) {
+            distances[j] -= net->L[j % 3];
+            iterations++;
+            if (iterations > 10) {
+              throw std::runtime_error(
+                "Too many iterations in PBC at distance index " +
+                std::to_string(j) + ", currently at " +
+                std::to_string(distances[j]));
+            }
+          }
+          iterations = 0;
+          while (distances[j] < -net->boxHalfs[j % 3]) {
+            distances[j] += net->L[j % 3];
+            iterations++;
+            if (iterations > 10) {
+              throw std::runtime_error(
+                "Too many iterations in PBC at distance index " +
+                std::to_string(j) + ", currently at " +
+                std::to_string(distances[j]));
+            }
+          }
+        }
+      }
 
     protected:
       /**
@@ -318,6 +423,7 @@ namespace calc {
         net->nrOfNodes = nrOfXlinks;
         net->nrOfLinks = nrOfXlinks;
         net->nrOfSprings = nrOfSprings;
+        net->nrOfPartialSprings = nrOfSprings;
         net->coordinates = Eigen::VectorXd::Zero(3 * net->nrOfLinks);
         net->oldAtomIds = Eigen::ArrayXi::Zero(net->nrOfLinks);
         net->linkIsSliplink = ArrayXb::Constant(net->nrOfLinks, false);
@@ -326,10 +432,10 @@ namespace calc {
           net->springIndicesOfLinks.push_back(std::vector<size_t>());
         }
         net->linkIndicesOfSprings.reserve(net->nrOfSprings);
-        this->currentSpringPartitions.reserve(net->nrOfSprings);
+        this->currentSpringPartitionsVec =
+          Eigen::VectorXd::Ones(net->nrOfSprings);
         for (size_t i = 0; i < net->nrOfSprings; ++i) {
           net->linkIndicesOfSprings.push_back(std::vector<size_t>());
-          this->currentSpringPartitions.push_back(std::vector<double>());
         }
         net->springIndexA = Eigen::ArrayXi::Zero(net->nrOfSprings);
         net->springIndexB = Eigen::ArrayXi::Zero(net->nrOfSprings);
@@ -353,6 +459,7 @@ namespace calc {
 
         // convert springs
         size_t spring_idx = 0;
+        // net->connectivityToSpringIndex.reserve(nrOfSprings);
         for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
           std::vector<pylimer_tools::entities::Atom> xlinkersOfChain =
             crosslinkerChains[i].getAtomsOfType(crosslinkerType);
@@ -396,10 +503,18 @@ namespace calc {
             }
 
             net->springsContourLength[spring_idx] =
-              crosslinkerChains[i].getNrOfAtoms(); // TODO: -2?
+              crosslinkerChains[i].getNrOfAtoms() - 1; // TODO: -2?
+            net->connectivityToSpringIndex.emplace(
+              MEHPForceBalance::makeConnectivityKey(nodeIdxFrom, nodeIdxTo),
+              spring_idx);
             spring_idx += 1;
           }
         }
+
+        net->springPartCoordinateIndexA = net->springCoordinateIndexA;
+        net->springPartCoordinateIndexB = net->springCoordinateIndexB;
+        net->springPartIndexA = net->springIndexA;
+        net->springPartIndexB = net->springIndexB;
 
         // box volume
         net->vol = net->L[0] * net->L[1] * net->L[2];
@@ -530,6 +645,11 @@ namespace calc {
         return result;
       }
 
+      static std::pair<size_t, size_t> makeConnectivityKey(size_t i1, size_t i2)
+      {
+        return i1 > i2 ? std::make_pair(i1, i2) : std::make_pair(i2, i1);
+      }
+
     private:
       pylimer_tools::entities::Universe universe;
       bool is2D = false;
@@ -545,8 +665,8 @@ namespace calc {
       ForceBalanceNetwork finalConfig;
       Eigen::VectorXd currentDisplacements;
       Eigen::VectorXd currentSpringDistances;
-      ArrayXArrayXd
-        currentSpringPartitions; /* gives the parametrisation of N */
+      Eigen::VectorXd
+        currentSpringPartitionsVec; /* gives the parametrisation of N */
       int crosslinkerType;
       int nrOfStepsDone = 0;
       ExitReason exitReason = ExitReason::UNSET;

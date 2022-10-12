@@ -251,6 +251,7 @@ namespace entities {
     std::vector<long int> connections =
       this->getVertexIdxsConnectedTo(vertexIdToStartWith);
     results.push_back(this->getAtomByVertexIdx(vertexIdToStartWith));
+    bool loopFound = false;
     for (long int connection : connections) {
       long int currentCenter = connection;
       results.push_back(this->getAtomByVertexIdx(currentCenter));
@@ -270,12 +271,16 @@ namespace entities {
         }
         int subConnectionDirection = (subConnections[0] == lastCenter) ? 1 : 0;
         if (subConnections[subConnectionDirection] == vertexIdToStartWith) {
+          loopFound = true;
           break;
         }
         lastCenter = currentCenter;
         currentCenter = subConnections[subConnectionDirection];
         results.push_back(this->getAtomByVertexIdx(currentCenter));
         subConnections = this->getVertexIdxsConnectedTo(currentCenter);
+      }
+      if (loopFound) {
+        break;
       }
     }
 
