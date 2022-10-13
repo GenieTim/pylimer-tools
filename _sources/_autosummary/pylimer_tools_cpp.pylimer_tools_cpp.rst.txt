@@ -45,6 +45,7 @@
       NeighbourList
       NonGaussianSpringForceEvaluator
       SimpleSpringMEHPForceEvaluator
+      SimplifiedBalanceNetwork
       SimplifiedNetwork
       Universe
       UniverseSequence

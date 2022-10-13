@@ -34,10 +34,19 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance
       ~MEHPForceBalance.getNrOfSprings
       ~MEHPForceBalance.getPressure
       ~MEHPForceBalance.getStressTensor
+      ~MEHPForceBalance.inspectDisplacementToMeanPositionUpdate
+      ~MEHPForceBalance.inspectSpringPartitionUpdate
       ~MEHPForceBalance.runForceRelaxation
+      ~MEHPForceBalance.validateNetwork
    
    
 
    
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MEHPForceBalance.network
    
    
