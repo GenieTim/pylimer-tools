@@ -57,10 +57,14 @@ namespace calc {
         maxDistanceMoved = 0.0;
         // first, place cross-links
         // maxDistanceMoved =
-        //   this->displaceLinkersToMeanPosition(&net, u, springPartitions);
+        //   this->displaceLinksToMeanPosition(&net, u, springPartitions, 1.0);
+        // maxDistanceMoved = std::max(
+        //   maxDistanceMoved,
+        //   this->displaceLinksToMeanPosition(&net, u, springPartitions, 0.5));
         for (size_t link_idx = 0; link_idx < net.nrOfNodes; ++link_idx) {
           double distanceMoved =
-            this->displaceToMeanPosition(&net, u, springPartitions, link_idx);
+            this->displaceToMeanPosition(&net, u, springPartitions,
+            link_idx);
           maxDistanceMoved = std::max(maxDistanceMoved, distanceMoved);
         }
         // then, place slip-link
@@ -70,14 +74,15 @@ namespace calc {
           double displacementDone = 0.0;
           double parametrisationChange = 0.0;
           do {
-            displacementDone =
-              this->displaceToMeanPosition(&net, u, springPartitions, link_idx);
             parametrisationChange =
               this->updateSpringPartition(&net, u, springPartitions, link_idx);
+            displacementDone =
+              this->displaceToMeanPosition(&net, u, springPartitions, link_idx);
             innerIterationsDone += 1;
           } while (displacementDone > innerXtol &&
                    innerIterationsDone < innerMaxNrOfSteps &&
                    parametrisationChange > innerAlphaTol);
+          totalInnerIterationsDone += innerIterationsDone;
         }
         iterationsDone += 1;
         // std::cout << "Iteration " << iterationsDone << " " <<
@@ -148,7 +153,7 @@ namespace calc {
               idealValue = 0.0; // TODO: really?
             }
             size_t currentSpringGlobalIdx =
-              net->localToGlobalSpringIndex.at(springIndex)[partner_idx-1];
+              net->localToGlobalSpringIndex.at(springIndex)[partner_idx - 1];
             size_t neighbourSpringGlobalIdx =
               net->localToGlobalSpringIndex.at(springIndex)[partner_idx];
             double currentS = springPartitions[currentSpringGlobalIdx];
@@ -180,7 +185,7 @@ namespace calc {
       const size_t linkIdx) const
     {
       std::vector<size_t> springIndices = net->springIndicesOfLinks[linkIdx];
-      Eigen::Vector3d currentDisplacement = u.segment(3 * linkIdx, 3);
+      // Eigen::Vector3d currentDisplacement = u.segment(3 * linkIdx, 3);
       Eigen::Vector3d objectiveDisplacement =
         Eigen::Vector3d::Zero(); // = remainingDisplacement.array();
       double objectiveDisplacementContributors = 0.0;
@@ -191,48 +196,31 @@ namespace calc {
           net->linkIndicesOfSprings[springIndices[spring_index]];
         for (size_t partner_idx = 0; partner_idx < springsPartners.size() - 1;
              ++partner_idx) {
-          if (springsPartners[partner_idx] == linkIdx) {
+          if (springsPartners[partner_idx] == linkIdx ||
+              springsPartners[partner_idx + 1] == linkIdx) {
+            Eigen::Vector3d partialDistance;
             // add partial distance to the total distance
-            Eigen::Vector3d partialDistance =
-              MEHPForceBalance::evaluateDistanceBetween(
+            if (springsPartners[partner_idx] == linkIdx) {
+              partialDistance = MEHPForceBalance::evaluateDistanceBetween(
                 net,
                 u,
                 springsPartners[partner_idx + 1],
                 springsPartners[partner_idx],
                 this->is2D);
-            // add to displacement
-            double contourLengthFraction =
-              springPartitions[net->localToGlobalSpringIndex
-                                 .at(springIndices[spring_index])
-                                 .at(partner_idx)];
-            if (contourLengthFraction > 1e-12) {
-              double oneOverContourLengthFraction =
-                1.0 / (net->springsContourLength[springIndices[spring_index]] *
-                       contourLengthFraction);
-              objectiveDisplacement +=
-                (partialDistance)*oneOverContourLengthFraction; // /
-              // totalDistance.array());
-              objectiveDisplacementContributors += oneOverContourLengthFraction;
             } else {
-              objectiveDisplacement = 1e12 * (partialDistance);
-              objectiveDisplacementContributors += 1e12;
-            }
-          }
-          // again, but the spring in the other direction
-          if (springsPartners[partner_idx + 1] == linkIdx) {
-            // add partial distance to the total distance
-            Eigen::Vector3d partialDistance =
-              MEHPForceBalance::evaluateDistanceBetween(
+              assert(springsPartners[partner_idx + 1] == linkIdx);
+              partialDistance = MEHPForceBalance::evaluateDistanceBetween(
                 net,
                 u,
                 springsPartners[partner_idx],
                 springsPartners[partner_idx + 1],
                 this->is2D);
+            }
             // add to displacement
             double contourLengthFraction =
               springPartitions[net->localToGlobalSpringIndex
                                  .at(springIndices[spring_index])
-                                 .at(partner_idx)];
+                                 [partner_idx]];
             if (contourLengthFraction > 1e-12) {
               double oneOverContourLengthFraction =
                 1.0 / (net->springsContourLength[springIndices[spring_index]] *

@@ -104,11 +104,13 @@ namespace utils {
     int groupsFound = 0;
 
     while (getline(this->file, line)) {
-      line = pylimer_tools::utils::trimLineOmitComment(line);
-      // skip empty lines
-      if (line.empty()) {
-        continue;
-      }
+      // performance improvement: not skipping.
+      // could be bad for certain files.
+      // line = pylimer_tools::utils::trimLineOmitComment(line);
+      // // skip empty lines
+      // if (line.empty()) {
+      //   continue;
+      // }
 
       if (line == this->newGroupKey) {
         // new timestep

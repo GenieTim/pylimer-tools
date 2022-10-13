@@ -282,28 +282,32 @@ namespace calc {
        * shall be stored
        * @return double, the distance (squared norm) displaced
        */
-      double displaceLinkersToMeanPosition(const ForceBalanceNetwork* net,
+      double displaceLinksToMeanPosition(const ForceBalanceNetwork* net,
                                            Eigen::VectorXd& u,
                                            Eigen::VectorXd& springPartitions0,
-                                           double damping = 0.75) const
+                                           double damping = 0.5) const
       {
         INVALIDARG_EXP_IFN(
           springPartitions0.size() == net->nrOfPartialSprings,
           "Spring partitions must have the size of the nr of springs");
-        Eigen::VectorXd springPartitions =
-          Eigen::VectorXd::Zero(3 * net->nrOfPartialSprings);
+        Eigen::VectorXd oneOverSpringPartitions =
+          Eigen::VectorXd(3 * net->nrOfPartialSprings);
 
         for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
-          for (size_t j = 0; j < 3; ++j) {
-            springPartitions[i * 3 + j] = springPartitions0[i];
-          }
+          double valueToSet =
+            springPartitions0[i] > 1e-9
+              ? 1. / (springPartitions0[i] * net->springsContourLength[i])
+              : 1e9;
+          oneOverSpringPartitions.segment(3 * i, 3) =
+            Eigen::Vector3d::Constant(valueToSet);
         }
 
         INVALIDARG_EXP_IFN(
           u.size() == net->coordinates.size(),
           "Coordinates and displacements must have the same size");
         INVALIDARG_EXP_IFN(
-          springPartitions.size() == net->springPartCoordinateIndexB.size(),
+          oneOverSpringPartitions.size() ==
+            net->springPartCoordinateIndexB.size(),
           "Spring partitions must have the size of the nr of springs");
 
         Eigen::VectorXd displacedCoords = net->coordinates + u;
@@ -316,35 +320,35 @@ namespace calc {
         //    displacedCoords(net->springPartCoordinateIndexB));
         // this->handlePBC(net, allPartialDistancesB);
 
-        Eigen::VectorXd sumOfSpringPartials =
+        Eigen::VectorXd oneOverSumOfSpringPartials =
           Eigen::VectorXd::Zero(3 * net->nrOfLinks);
-        sumOfSpringPartials(net->springPartCoordinateIndexA) +=
-          springPartitions;
-        sumOfSpringPartials(net->springPartCoordinateIndexB) +=
-          springPartitions;
+        oneOverSumOfSpringPartials(net->springPartCoordinateIndexA) +=
+          oneOverSpringPartitions;
+        oneOverSumOfSpringPartials(net->springPartCoordinateIndexB) +=
+          oneOverSpringPartitions;
 
         Eigen::VectorXd objectiveDisplacements =
           Eigen::VectorXd::Zero(3 * net->nrOfLinks);
         objectiveDisplacements(net->springPartCoordinateIndexA) +=
-          (allPartialDistancesA.array() / springPartitions.array()).matrix();
+          (allPartialDistancesA.array() * oneOverSpringPartitions.array())
+            .matrix();
         // TODO: the thing with the spring partitions is incorrect like that.
         objectiveDisplacements(net->springPartCoordinateIndexB) +=
-          (allPartialDistancesB.array() / springPartitions.array()).matrix();
+          (allPartialDistancesB.array() * oneOverSpringPartitions.array())
+            .matrix();
         objectiveDisplacements =
-          (objectiveDisplacements.array() / sumOfSpringPartials.array())
+          (objectiveDisplacements.array() * oneOverSumOfSpringPartials.array())
             .matrix();
 
         if (this->is2D) {
-          for (int i = 0; i < net->nrOfLinks; ++i) {
-            objectiveDisplacements[3 * i + 2] = 0.;
-            u[3 * i + 2] = 0.;
-          }
+          objectiveDisplacements(Eigen::seq(2, net->nrOfLinks, 3)) =
+            Eigen::VectorXd::Zero(net->nrOfLinks);
         }
 
-        double maxDiff = (objectiveDisplacements - u).cwiseAbs2().maxCoeff();
-        u = (damping * u) + (1 - damping) * objectiveDisplacements;
+        double maxDiff = (objectiveDisplacements).cwiseAbs2().maxCoeff();
+        u += damping * objectiveDisplacements;
 
-        return maxDiff;
+        return 3*maxDiff;
       };
 
       void handlePBC(const ForceBalanceNetwork* net,
@@ -361,7 +365,9 @@ namespace calc {
               throw std::runtime_error(
                 "Too many iterations in PBC at distance index " +
                 std::to_string(j) + ", currently at " +
-                std::to_string(distances[j]));
+                std::to_string(distances[j]) + " of " +
+                std::to_string(net->boxHalfs[j % 3]) + " after " +
+                std::to_string(iterations) + " iterations");
             }
           }
           iterations = 0;
@@ -372,7 +378,9 @@ namespace calc {
               throw std::runtime_error(
                 "Too many iterations in PBC at distance index " +
                 std::to_string(j) + ", currently at " +
-                std::to_string(distances[j]));
+                std::to_string(distances[j]) + " of " +
+                std::to_string(net->boxHalfs[j % 3]) + " after " +
+                std::to_string(iterations) + " iterations");
             }
           }
         }
@@ -504,7 +512,7 @@ namespace calc {
 
             net->springsContourLength[spring_idx] =
               crosslinkerChains[i].getNrOfAtoms() - 1; // TODO: -2?
-            
+
             std::vector<size_t> zeroMap;
             zeroMap.push_back(spring_idx);
             net->localToGlobalSpringIndex.emplace(spring_idx, zeroMap);

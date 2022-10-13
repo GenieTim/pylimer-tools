@@ -258,6 +258,33 @@ TEST_CASE("MEHP Force Balance handles slip-links",
     std::cout << springPartitions0[i] << std::endl;
   }
   std::cout << std::endl;
+
+  SECTION("displaceLinksToMeanPosition works")
+  {
+    // test the "displaceLinksToMeanPosition"
+    // see also: "Eigen behaves as expected"
+    Eigen::VectorXd displacements0 =
+      Eigen::VectorXd::Zero(forceBalancer2.getNrOfLinks() * 3);
+    forceBalancer2.displaceLinksToMeanPosition(
+      &net0, displacements0, springPartitions0, 0.);
+    for (int i = 0; i < 3 * net0.nrOfLinks; ++i) {
+      CHECK(displacements0[i] + 1e-5 == Catch::Approx(0.0 + 1e-5));
+    }
+    // repeat the displacement to reach the point where
+    // all beads are at 0.0
+    for (size_t it = 0; it < 20; ++it) {
+      forceBalancer2.displaceLinksToMeanPosition(
+        &net0, displacements0, springPartitions0, 0.5);
+    }
+    for (int i = 0; i < net0.nrOfLinks; ++i) {
+      CHECK(displacements0[3 * i] + 1e-5 ==
+            Catch::Approx(-net0.coordinates[3 * i] + 1e-5));
+      CHECK(displacements0[3 * i + 1] + 1e-5 ==
+            Catch::Approx(-net0.coordinates[3 * i + 1] + 1e-5));
+      CHECK(displacements0[3 * i + 2] + 1e-5 == Catch::Approx(0.0 + 1e-5));
+    }
+  }
+
   // and add slip-links
   REQUIRE_THROWS(forceBalancer2.addSlipLinks({ { 1, 2, 3 } },
                                              { { 1, 2, 3 } },
@@ -307,12 +334,12 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       &net, displacements, springPartitions, 5);
     forceBalancer2.updateSpringPartition(
       &net, displacements, springPartitions, 5);
-  for (int i = 0; i < net.nrOfPartialSprings; i++) {
-    std::cout << net.springPartIndexA[i] << ", " << net.springPartIndexB[i]
-              << ": ";
-    std::cout << springPartitions[i] << std::endl;
-  }
-  std::cout << std::endl;
+    for (int i = 0; i < net.nrOfPartialSprings; i++) {
+      std::cout << net.springPartIndexA[i] << ", " << net.springPartIndexB[i]
+                << ": ";
+      std::cout << springPartitions[i] << std::endl;
+    }
+    std::cout << std::endl;
   }
   for (int i = 0; i < 125; ++i) {
     // do some random 125 steps with these two slip-links
@@ -353,13 +380,16 @@ TEST_CASE("MEHP Force Balance handles slip-links",
     std::cout << springPartitions[i] << std::endl;
   }
   std::cout << std::endl;
-  CHECK(springPartitions[5]+1e-5 == Catch::Approx(0.0+1e-5).epsilon(1e-6)); // 4-1
+  CHECK(springPartitions[5] + 1e-5 ==
+        Catch::Approx(0.0 + 1e-5).epsilon(1e-6));                 // 4-1
   CHECK(springPartitions[6] == Catch::Approx(1.0).epsilon(1e-6)); // 4-2
   CHECK(springPartitions[0] == Catch::Approx(1.0).epsilon(1e-6)); // 4-0
-  CHECK(springPartitions[1]+1e-5 == Catch::Approx(0.0+1e-5).epsilon(1e-6)); // 1-4
+  CHECK(springPartitions[1] + 1e-5 ==
+        Catch::Approx(0.0 + 1e-5).epsilon(1e-6)); // 1-4
   // CHECK(springPartitions[8] == Catch::Approx(1.0).margin(1e-6)); // 5-3
-  // CHECK(springPartitions[7] + 1e-5 == Catch::Approx(0.0 + 1e-5).margin(1e-6)); // 5-5
-  // CHECK(springPartitions[3] == Catch::Approx(1.0).margin(1e-6)); // 5-0
+  // CHECK(springPartitions[7] + 1e-5 == Catch::Approx(0.0 +
+  // 1e-5).margin(1e-6)); // 5-5 CHECK(springPartitions[3] ==
+  // Catch::Approx(1.0).margin(1e-6)); // 5-0
 }
 
 TEST_CASE("MEHP Force Balance runs with non-network",
@@ -439,8 +469,9 @@ TEST_CASE("Free chains collapse",
   // these beads overlap first, the gaussian spring one
   pcm::MEHPForceBalance forceBalancer =
     pcm::MEHPForceBalance(universe, 2, false);
-  REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(50000, 1e-12));
+  REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(50000, 1e-18));
   REQUIRE(forceBalancer.getNrOfIterations() > 0);
+  CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
   CHECK(forceBalancer.getNrOfActiveSprings() == 0);
   // CHECK(forceBalancer.getAverageSpringLength() ==
   //       Catch::Approx(0.0));
