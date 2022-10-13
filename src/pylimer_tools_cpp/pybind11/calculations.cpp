@@ -113,7 +113,7 @@ init_pylimer_bound_calc(py::module_& m)
 
   py::class_<mehp::Network>(m, "SimplifiedNetwork", R"pbdoc(
      A more efficient structure of the network for use in MEHP.
-     Consists usually only of the cross-linkers.
+     Consists usually only of the cross-links.
  )pbdoc")
     .def_readonly("boxLengths", &mehp::Network::L)
     .def_readonly("volume", &mehp::Network::vol)
@@ -128,6 +128,41 @@ init_pylimer_bound_calc(py::module_& m)
                   &mehp::Network::springCoordinateIndexB)
     .def_readonly("springIndexA", &mehp::Network::springIndexA)
     .def_readonly("springIndexB", &mehp::Network::springIndexB)
+    // .def_readonly("springIsActive", &mehp::Network::springIsActive)
+    ;
+
+  py::class_<mehp::ForceBalanceNetwork>(m, "SimplifiedBalanceNetwork", R"pbdoc(
+     A more efficient structure of the network for use in MEHP force balance.
+     Consists usually only of the cross- and slip-links.
+ )pbdoc")
+    .def_readonly("boxLengths", &mehp::ForceBalanceNetwork::L)
+    .def_readonly("volume", &mehp::ForceBalanceNetwork::vol)
+    .def_readonly("nrOfCrossLinks", &mehp::ForceBalanceNetwork::nrOfNodes)
+    .def_readonly("nrOfLinks", &mehp::ForceBalanceNetwork::nrOfLinks)
+    .def_readonly("nrOfSprings", &mehp::ForceBalanceNetwork::nrOfSprings)
+    .def_readonly("nrOfPartialSprings",
+                  &mehp::ForceBalanceNetwork::nrOfPartialSprings)
+    // .def_readonly("nrOfLoops", &mehp::Network::nrOfLoops)
+    .def_readonly("coordinates", &mehp::ForceBalanceNetwork::coordinates)
+    .def_readonly("oldAtomIds", &mehp::ForceBalanceNetwork::oldAtomIds)
+    .def_readonly("springCoordinateIndexA",
+                  &mehp::ForceBalanceNetwork::springCoordinateIndexA)
+    .def_readonly("springCoordinateIndexB",
+                  &mehp::ForceBalanceNetwork::springCoordinateIndexB)
+    .def_readonly("springPartCoordinateIndexA",
+                  &mehp::ForceBalanceNetwork::springPartCoordinateIndexA)
+    .def_readonly("springPartCoordinateIndexB",
+                  &mehp::ForceBalanceNetwork::springPartCoordinateIndexB)
+    .def_readonly("springIndexA", &mehp::ForceBalanceNetwork::springIndexA)
+    .def_readonly("springIndexB", &mehp::ForceBalanceNetwork::springIndexB)
+    .def_readonly("springPartIndexA",
+                  &mehp::ForceBalanceNetwork::springPartIndexA)
+    .def_readonly("springPartIndexB",
+                  &mehp::ForceBalanceNetwork::springPartIndexB)
+    .def_readonly("linkIsSliplink", &mehp::ForceBalanceNetwork::linkIsSliplink)
+    .def_readonly("localToGlobalSpringIndex",
+                  &mehp::ForceBalanceNetwork::localToGlobalSpringIndex)
+
     // .def_readonly("springIsActive", &mehp::Network::springIsActive)
     ;
 
@@ -409,6 +444,10 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("universe"),
          py::arg("crosslinkerType") = 2,
          py::arg("is2D") = false)
+    .def_property_readonly("network", &mehp::MEHPForceBalance::getNetwork)
+    .def("validateNetwork", py::overload_cast<>(&mehp::MEHPForceBalance::validateNetwork), R"pbdoc(
+           Validates the internal structures.
+     )pbdoc")
     .def("runForceRelaxation",
          &mehp::MEHPForceBalance::runForceRelaxation,
          R"pbdoc(
@@ -428,6 +467,14 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("innerMaxNrOfSteps") = 100,
          py::arg("innerXTolerance") = 1e-12,
          py::arg("innerAlphaTolerance") = 1e-9)
+    .def("inspectDisplacementToMeanPositionUpdate",
+         &mehp::MEHPForceBalance::inspectDisplacementToMeanPositionUpdate,
+         R"pbdoc()pbdoc",
+         py::arg("linkIdx"))
+    .def("inspectSpringPartitionUpdate",
+         &mehp::MEHPForceBalance::inspectSpringPartitionUpdate,
+         R"pbdoc()pbdoc",
+         py::arg("linkIdx"))
     // .def("getForceEvaluator", &mehp::MEHPForceBalance::getForceEvaluator,
     // R"pbdoc(
     //      Query the currently used force evaluator.

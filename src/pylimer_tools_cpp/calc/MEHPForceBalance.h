@@ -10,10 +10,12 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cstdint>
 #include <iomanip>
 #include <iostream>
 #include <map>
 #include <nlopt.hpp>
+#include <random>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -47,6 +49,7 @@ namespace calc {
           universe.computeMeanSquareEndToEndDistance(crosslinkerType);
         this->defaultNrOfChains =
           universe.getMolecules(this->crosslinkerType).size();
+        this->validateNetwork();
       };
 
       /**
@@ -83,6 +86,15 @@ namespace calc {
       int getNrOfLinks() const { return this->initialConfig.nrOfLinks; }
 
       int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
+
+      std::vector<Eigen::ArrayXi> getIndependentCoordinateSets(
+        ForceBalanceNetwork* net) const;
+
+      std::vector<Eigen::ArrayXi> getHeuristicallyIndependentCoordinateSets(
+        ForceBalanceNetwork* net) const;
+
+      std::vector<Eigen::ArrayXi> getRandomCoordinateSets(
+        ForceBalanceNetwork* net) const;
 
       /**
        * @brief Get the Nr Of Active Nodes
@@ -240,7 +252,12 @@ namespace calc {
         const size_t linkIndexB,
         const bool is2D);
 
-      bool validateNetwork(const ForceBalanceNetwork* net = nullptr);
+      bool validateNetwork()
+      {
+        return this->validateNetwork(&this->initialConfig);
+      }
+
+      bool validateNetwork(const ForceBalanceNetwork* net);
 
       ForceBalanceNetwork getNetwork() { return this->initialConfig; }
 
@@ -254,11 +271,45 @@ namespace calc {
        * link
        *
        */
+      Eigen::VectorXd inspectSpringPartitionUpdate(const size_t linkIdx) const
+      {
+        Eigen::VectorXd springPartitions = this->currentSpringPartitionsVec;
+        this->updateSpringPartition(&this->initialConfig,
+                                    this->currentDisplacements,
+                                    springPartitions,
+                                    linkIdx);
+        return springPartitions;
+      };
+
+      /**
+       * @brief Updates the partition/parametrisation of a spring around one
+       * link
+       *
+       */
       double updateSpringPartition(
         const ForceBalanceNetwork* net,
-        Eigen::VectorXd& u,
+        const Eigen::VectorXd& u,
         Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
         const size_t linkIdx) const;
+
+      /**
+       * @brief Displace one link to the mean of all connected neighbours
+       *
+       * @param u the current displacements, wherein the resulting coordinates
+       * shall be stored
+       * @param linkIdx the idx of the link to displace
+       * @return double, the distance (squared norm) displaced
+       */
+      Eigen::VectorXd inspectDisplacementToMeanPositionUpdate(
+        const size_t linkIdx) const
+      {
+        Eigen::VectorXd displacements = this->currentDisplacements;
+        this->displaceToMeanPosition(&this->initialConfig,
+                                     displacements,
+                                     this->currentSpringPartitionsVec,
+                                     linkIdx);
+        return displacements;
+      };
 
       /**
        * @brief Displace one link to the mean of all connected neighbours
@@ -271,21 +322,19 @@ namespace calc {
        */
       double displaceToMeanPosition(const ForceBalanceNetwork* net,
                                     Eigen::VectorXd& u,
-                                    Eigen::VectorXd& springPartitions,
+                                    const Eigen::VectorXd& springPartitions,
                                     const size_t linkIdx) const;
 
       /**
-       * @brief Displace one link to the mean of all connected neighbours
+       * @brief Translate the spring partition vector to its 3*size
        *
-       * @param net the force balance network
-       * @param u the current displacements, wherein the resulting coordinates
-       * shall be stored
-       * @return double, the distance (squared norm) displaced
+       * @param net
+       * @param springPartitions0
+       * @return Eigen::VectorXd
        */
-      double displaceLinksToMeanPosition(const ForceBalanceNetwork* net,
-                                           Eigen::VectorXd& u,
-                                           Eigen::VectorXd& springPartitions0,
-                                           double damping = 0.5) const
+      Eigen::VectorXd assembleOneOverSpringPartition(
+        const ForceBalanceNetwork* net,
+        Eigen::VectorXd& springPartitions0) const
       {
         INVALIDARG_EXP_IFN(
           springPartitions0.size() == net->nrOfPartialSprings,
@@ -302,6 +351,39 @@ namespace calc {
             Eigen::Vector3d::Constant(valueToSet);
         }
 
+        return oneOverSpringPartitions;
+      }
+
+      double displaceLinksToMeanPosition(const ForceBalanceNetwork* net,
+                                         Eigen::VectorXd& u,
+                                         Eigen::VectorXd& springPartitions0,
+                                         double damping = 0.5) const
+      {
+
+        Eigen::ArrayXi mask = Eigen::ArrayXi::LinSpaced(
+          3 * net->nrOfLinks, 0, 3 * net->nrOfLinks - 1);
+        Eigen::VectorXd oneOverSpringPartitions =
+          this->assembleOneOverSpringPartition(net, springPartitions0);
+
+        return this->displaceLinksToMeanPosition(
+          net, u, oneOverSpringPartitions, mask, damping);
+      }
+
+      /**
+       * @brief Displace one link to the mean of all connected neighbours
+       *
+       * @param net the force balance network
+       * @param u the current displacements, wherein the resulting coordinates
+       * shall be stored
+       * @return double, the distance (squared norm) displaced
+       */
+      double displaceLinksToMeanPosition(
+        const ForceBalanceNetwork* net,
+        Eigen::VectorXd& u,
+        Eigen::VectorXd& oneOverSpringPartitions,
+        Eigen::ArrayXi mask,
+        double damping = 0.5) const
+      {
         INVALIDARG_EXP_IFN(
           u.size() == net->coordinates.size(),
           "Coordinates and displacements must have the same size");
@@ -345,10 +427,10 @@ namespace calc {
             Eigen::VectorXd::Zero(net->nrOfLinks);
         }
 
-        double maxDiff = (objectiveDisplacements).cwiseAbs2().maxCoeff();
-        u += damping * objectiveDisplacements;
+        double maxDiff = (objectiveDisplacements(mask)).cwiseAbs2().maxCoeff();
+        u(mask) += damping * objectiveDisplacements(mask);
 
-        return 3*maxDiff;
+        return 3 * maxDiff;
       };
 
       void handlePBC(const ForceBalanceNetwork* net,
@@ -672,7 +754,6 @@ namespace calc {
       bool outputEndNodes = false;
       std::string endNodesFile;
       ForceBalanceNetwork initialConfig;
-      ForceBalanceNetwork finalConfig;
       Eigen::VectorXd currentDisplacements;
       Eigen::VectorXd currentSpringDistances;
       Eigen::VectorXd
