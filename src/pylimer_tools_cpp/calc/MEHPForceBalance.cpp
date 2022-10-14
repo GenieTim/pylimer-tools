@@ -57,7 +57,9 @@ namespace calc {
       //   getHeuristicallyIndependentCoordinateSets(&net);
       // this->getIndependentCoordinateSets(&net);
       // { net.springPartCoordinateIndexA, net.springPartCoordinateIndexB };
-      std::cout << "Starting force balance procedure." << std::endl;
+      std::cout << "Starting force balance procedure "
+                // "with " << independentVertexSets.size() << "vertex sets."
+                << std::endl;
       do {
         // std::vector<Eigen::ArrayXi> independentVertexSets =
         //   getRandomCoordinateSets(&net);
@@ -69,7 +71,7 @@ namespace calc {
         //   maxDistanceMoved =
         //     std::max(maxDistanceMoved,
         //              this->displaceLinksToMeanPosition(
-        //                &net, u, oneOverSpringPartitions, vertexSet, 0.75));
+        //                &net, u, oneOverSpringPartitions, vertexSet, 1.0));
         // }
 
         // maxDistanceMoved =
@@ -166,9 +168,11 @@ namespace calc {
     /**
      * @brief Estimate some sets of independent vertices
      *
-     * This is particularly useful (used) for parallelising the displacements.
+     * This is useful (used) for parallelising the displacements.
      * Note that the returned Eigen::ArrayXi will contain the indices to the
      * coordinates rather than the actual vertex indices.
+     *
+     * Time complexity: ca. O(|v||e|)
      *
      * @param net
      * @return std::vector<Eigen::ArrayXi>
@@ -177,8 +181,65 @@ namespace calc {
     MEHPForceBalance::getHeuristicallyIndependentCoordinateSets(
       ForceBalanceNetwork* net) const
     {
-      std::vector<Eigen::ArrayXi> results = { net->springCoordinateIndexA,
-                                              net->springCoordinateIndexB };
+      // std::vector<Eigen::ArrayXi> results = { net->springCoordinateIndexA,
+      //                                         net->springCoordinateIndexB };
+      std::vector<Eigen::ArrayXi> results;
+      // global block list: block all indices that are added to a result already
+      ArrayXb globalBlocked = ArrayXb::Constant(net->nrOfLinks, false);
+      size_t remainingLinks = net->nrOfLinks;
+      size_t globalStartingIdx = 0;
+      while (remainingLinks > 0) {
+        ArrayXb localBlocked = globalBlocked;
+        std::vector<size_t> localIndexList;
+
+        size_t localStartingIndex = globalStartingIdx;
+        while (localStartingIndex < net->nrOfLinks) {
+          while (localBlocked[localStartingIndex]) {
+            localStartingIndex += 1;
+            if (!(localStartingIndex < net->nrOfLinks)) {
+              goto while2exit;
+            }
+          }
+          // add this link to the current results list
+          localIndexList.push_back(localStartingIndex);
+          remainingLinks -= 1;
+          localBlocked[localStartingIndex] = true;
+          globalBlocked[localStartingIndex] = true;
+          // block the neighbours
+          std::vector<size_t> connections =
+            net->springIndicesOfLinks[localStartingIndex];
+          for (size_t springIdx : connections) {
+            std::vector<size_t> springPartners =
+              net->linkIndicesOfSprings[springIdx];
+            for (size_t i = 0; i < springPartners.size(); i++) {
+              if (springPartners[i] == localStartingIndex) {
+                if (i > 0) {
+                  localBlocked[springPartners[i - 1]] = true;
+                }
+                if (i < springPartners.size() - 1) {
+                  localBlocked[springPartners[i + 1]] = true;
+                }
+                break;
+              }
+            }
+          }
+        }
+      while2exit:
+
+        while (globalStartingIdx < net->nrOfLinks &&
+               globalBlocked[globalStartingIdx]) {
+          globalStartingIdx += 1;
+        }
+
+        // translate the localIndexList to the results
+        Eigen::ArrayXi localRes =
+          Eigen::ArrayXi::Zero(3 * localIndexList.size());
+        for (int i = 0; i < localIndexList.size(); i++) {
+          localRes.segment(3 * i, 3) << 3 * localIndexList[i],
+            3 * localIndexList[i] + 1, 3 * localIndexList[i] + 2;
+        }
+        results.push_back(localRes);
+      }
       // TODO: implement something better
       return results;
     }
@@ -912,7 +973,8 @@ namespace calc {
                       "Invalid size of link indices of springs");
       RUNTIME_EXP_IFN(net->linkIsSliplink.size() == net->nrOfLinks,
                       "Invalid size of link is sliplink");
-      RUNTIME_EXP_IFN(net->linkIsSliplink.count() == net->nrOfLinks - net->nrOfNodes,
+      RUNTIME_EXP_IFN(
+        net->linkIsSliplink.count() == net->nrOfLinks - net->nrOfNodes,
         "Nr of nodes plus nr of slp-links should give the total nr of links");
       RUNTIME_EXP_IFN(net->oldAtomIds.size() == net->nrOfNodes,
                       "Invalid size of old atom ids");

@@ -329,6 +329,53 @@ TEST_CASE("MEHP Force Balance handles slip-links",
     }
     std::cout << std::endl;
 
+    SECTION("displaceLinksToMeanPosition = displaceToMeanPosition")
+    {
+      Eigen::VectorXd oneOverSpringPartitions0 =
+        forceBalancer2.assembleOneOverSpringPartition(&net0, springPartitions0);
+      Eigen::VectorXd displacements0 =
+        Eigen::VectorXd::Zero(forceBalancer2.getNrOfLinks() * 3);
+      Eigen::ArrayXi twoIndependentIndices = Eigen::ArrayXi::Zero(2);
+      twoIndependentIndices << 0, 2;
+
+      Eigen::ArrayXi coordinateIndicesOfTwoIndependentIndices =
+        Eigen::ArrayXi::Zero(3 * twoIndependentIndices.size());
+
+      for (int j = 0; j < twoIndependentIndices.size(); ++j) {
+        for (int i = 0; i < 3; ++i) {
+          coordinateIndicesOfTwoIndependentIndices[3 * j + i] =
+            3 * twoIndependentIndices[j] + i;
+        }
+      }
+
+      double maxDiff0 =
+        forceBalancer2.displaceLinksToMeanPosition(&net0,
+                                                   displacements0,
+                                                   oneOverSpringPartitions0,
+                                                   coordinateIndicesOfTwoIndependentIndices,
+                                                   1.0);
+
+      Eigen::VectorXd displacements1 =
+        Eigen::VectorXd::Zero(forceBalancer2.getNrOfLinks() * 3);
+      double maxDiff1 = 0.;
+      for (int i = 0; i < twoIndependentIndices.size(); ++i) {
+        maxDiff1 = std::max(
+          forceBalancer2.displaceToMeanPosition(
+            &net0, displacements1, springPartitions0, twoIndependentIndices[i]),
+          maxDiff1);
+      }
+
+      for (int i = 0; i < coordinateIndicesOfTwoIndependentIndices.size(); ++i) {
+        CHECK(displacements1[coordinateIndicesOfTwoIndependentIndices[i]] ==
+              Catch::Approx(displacements0[coordinateIndicesOfTwoIndependentIndices[i]]));
+      }
+
+      for (int i = 0; i < displacements1.size(); ++i) {
+        CHECK(displacements1[i] == Catch::Approx(displacements0[i]));
+      }
+      CHECK(maxDiff0 == Catch::Approx(maxDiff1));
+    }
+
     SECTION("displaceLinksToMeanPosition works")
     {
       // test the "displaceLinksToMeanPosition"

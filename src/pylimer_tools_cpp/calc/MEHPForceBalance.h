@@ -391,6 +391,8 @@ namespace calc {
           oneOverSpringPartitions.size() ==
             net->springPartCoordinateIndexB.size(),
           "Spring partitions must have the size of the nr of springs");
+        INVALIDARG_EXP_IFN(mask.size() % 3 == 0,
+                           "Mask is expected to mask the coordinates");
 
         Eigen::VectorXd displacedCoords = net->coordinates + u;
         Eigen::VectorXd allPartialDistancesA =
@@ -427,10 +429,17 @@ namespace calc {
             Eigen::VectorXd::Zero(net->nrOfLinks);
         }
 
-        double maxDiff = (objectiveDisplacements(mask)).cwiseAbs2().maxCoeff();
+        double maxDiff = 0;
+        for (int i = 0; i < mask.size() / 3; i++) {
+          maxDiff = std::max(
+            maxDiff,
+            objectiveDisplacements(mask).segment(3 * i, 3).squaredNorm());
+        }
+        // double maxDiff =
+        // (objectiveDisplacements(mask)).cwiseAbs2().maxCoeff();
         u(mask) += damping * objectiveDisplacements(mask);
 
-        return 3 * maxDiff;
+        return maxDiff;
       };
 
       void handlePBC(const ForceBalanceNetwork* net,
