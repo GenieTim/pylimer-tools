@@ -1,4 +1,4 @@
-#include "DataFileParser.h"
+#include "DataFileParser2.h"
 #include "StringUtils.h"
 #include <algorithm>
 #include <filesystem>
@@ -11,7 +11,7 @@
 namespace pylimer_tools {
 namespace utils {
 
-  void DataFileParser::read(const std::string filePath)
+  void DataFileParser2::read(const std::string filePath)
   {
     if (!std::filesystem::exists(filePath)) {
       throw std::invalid_argument("File to read (" + filePath +
@@ -149,7 +149,7 @@ namespace utils {
     file.close();
   }
 
-  void DataFileParser::skipLinesToContains(std::string& line,
+  void DataFileParser2::skipLinesToContains(std::string& line,
                                            std::ifstream& file,
                                            std::string upTo)
   {
@@ -160,7 +160,7 @@ namespace utils {
     } while (getline(file, line));
   }
 
-  void DataFileParser::skipEmptyLines(std::string& line, std::ifstream& file)
+  void DataFileParser2::skipEmptyLines(std::string& line, std::ifstream& file)
   {
     do {
       line = pylimer_tools::utils::trimLineOmitComment(line);
@@ -172,7 +172,7 @@ namespace utils {
     } while (getline(file, line));
   }
 
-  void DataFileParser::readNs(const std::string line)
+  void DataFileParser2::readNs(const std::string line)
   {
     if (contains(line, "atoms")) {
       this->nAtoms = (this->parseTypesInLine<int>(line, 1))[0];
@@ -201,7 +201,7 @@ namespace utils {
     }
   }
 
-  void DataFileParser::readMass(const std::string line)
+  void DataFileParser2::readMass(const std::string line)
   {
     int iteration = 0;
     int key = 0;
@@ -216,7 +216,7 @@ namespace utils {
     this->masses[key] = tokenizer.get<double>(1);
   }
 
-  void DataFileParser::readAtom(std::string line)
+  void DataFileParser2::readAtom(std::string line)
   {
     size_t atomId,nx, ny, nz;
     int  atomType, moleculeId;
@@ -232,6 +232,7 @@ namespace utils {
                           &nx,
                           &ny,
                           &nz);
+    // pylimer_tools::utils::CsvTokenizer tokenizer(line, 9);
 
     this->atomIds.push_back(atomId);
     this->moleculeIds.push_back(moleculeId);
@@ -245,20 +246,38 @@ namespace utils {
       this->atomNy.push_back(ny);
       this->atomNz.push_back(nz);
     }
+    // this->atomIds.push_back(tokenizer.get<int>(0));
+    // this->moleculeIds.push_back(tokenizer.get<int>(1));
+    // this->atomTypes.push_back(tokenizer.get<int>(2));
+    // this->atomX.push_back(tokenizer.get<double>(3));
+    // this->atomY.push_back(tokenizer.get<double>(4));
+    // this->atomZ.push_back(tokenizer.get<double>(5));
+    // // TODO: be more flexible towards
+    // if (tokenizer.getLength() > 5) {
+    //   this->atomNx.push_back(tokenizer.get<int>(6));
+    //   this->atomNy.push_back(tokenizer.get<int>(7));
+    //   this->atomNz.push_back(tokenizer.get<int>(8));
+    // }
   }
 
-  void DataFileParser::readBond(std::string line)
+  void DataFileParser2::readBond(std::string line)
   {
     size_t bondId, bondType, bondFrom, bondTo;
+    // pylimer_tools::utils::CsvTokenizer tokenizer(line, 4);
     sscanf(line.c_str(), "%zu %zu %zu %zu", &bondId, &bondType, &bondFrom, &bondTo);
     this->bondIds.push_back(bondId);
     this->bondTypes.push_back(bondType);
     this->bondFrom.push_back(bondFrom);
     this->bondTo.push_back(bondTo);
+    // this->bondIds.push_back(tokenizer.get<long int>(0));
+    // this->bondTypes.push_back(tokenizer.get<int>(1));
+    // this->bondFrom.push_back(tokenizer.get<long int>(2));
+    // this->bondTo.push_back(tokenizer.get<long int>(3));
   }
 
-  void DataFileParser::readAngle(std::string line)
+  void DataFileParser2::readAngle(std::string line)
   {
+    // pylimer_tools::utils::CsvTokenizer tokenizer(line, 5);
     size_t angleId, angleType, angleFrom, angleVia, angleTo;
     sscanf(line.c_str(),
            "%zu %zu %zu %zu %zu",
@@ -273,6 +292,11 @@ namespace utils {
     this->angleFrom.push_back(angleFrom);
     this->angleVia.push_back(angleVia);
     this->angleTo.push_back(angleTo);
+    // this->angleIds.push_back(tokenizer.get<long int>(0));
+    // this->angleTypes.push_back(tokenizer.get<int>(1));
+    // this->angleFrom.push_back(tokenizer.get<long int>(2));
+    // this->angleVia.push_back(tokenizer.get<long int>(3));
+    // this->angleTo.push_back(tokenizer.get<long int>(4));
   }
 } // namespace utils
 } // namespace pylimer_tools
