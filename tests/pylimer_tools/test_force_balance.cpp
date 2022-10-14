@@ -348,12 +348,12 @@ TEST_CASE("MEHP Force Balance handles slip-links",
         }
       }
 
-      double maxDiff0 =
-        forceBalancer2.displaceLinksToMeanPosition(&net0,
-                                                   displacements0,
-                                                   oneOverSpringPartitions0,
-                                                   coordinateIndicesOfTwoIndependentIndices,
-                                                   1.0);
+      double maxDiff0 = forceBalancer2.displaceLinksToMeanPosition(
+        &net0,
+        displacements0,
+        oneOverSpringPartitions0,
+        coordinateIndicesOfTwoIndependentIndices,
+        1.0);
 
       Eigen::VectorXd displacements1 =
         Eigen::VectorXd::Zero(forceBalancer2.getNrOfLinks() * 3);
@@ -365,9 +365,11 @@ TEST_CASE("MEHP Force Balance handles slip-links",
           maxDiff1);
       }
 
-      for (int i = 0; i < coordinateIndicesOfTwoIndependentIndices.size(); ++i) {
+      for (int i = 0; i < coordinateIndicesOfTwoIndependentIndices.size();
+           ++i) {
         CHECK(displacements1[coordinateIndicesOfTwoIndependentIndices[i]] ==
-              Catch::Approx(displacements0[coordinateIndicesOfTwoIndependentIndices[i]]));
+              Catch::Approx(
+                displacements0[coordinateIndicesOfTwoIndependentIndices[i]]));
       }
 
       for (int i = 0; i < displacements1.size(); ++i) {

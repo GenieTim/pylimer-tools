@@ -1,5 +1,8 @@
 #include "../../src/pylimer_tools_cpp/utils/DataFileParser.h"
+#include "../../src/pylimer_tools_cpp/utils/DataFileParser2.h"
 #include "../../src/pylimer_tools_cpp/utils/DumpFileParser.h"
+#include "../../src/pylimer_tools_cpp/utils/DumpFileParser2.h"
+#include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <iostream>
@@ -11,7 +14,7 @@ extern "C"
 
 namespace pu = pylimer_tools::utils;
 
-TEST_CASE("DumpFileParser can be used", "[utils][DumpFileParser]")
+TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
 {
   std::string suspectedPath = "../pylimer_tools/fixtures/";
   REQUIRE(std::filesystem::exists(suspectedPath));
@@ -65,6 +68,20 @@ TEST_CASE("DumpFileParser can be used", "[utils][DumpFileParser]")
     pu::DataFileParser parser3 = pu::DataFileParser();
     parser3.read(suspectedPath + "lammps_data_file_small_wangles.out");
     REQUIRE(parser3.getNrOfAngles() == 1);
+
+    // BENCHMARK("DataFileParserOld")
+    // {
+    //   pu::DataFileParser parser4 = pu::DataFileParser();
+    //   parser4.read(suspectedPath + "big_dump_file_data.out");
+    //   return parser4.getNrOfAngles();
+    // };
+
+    // BENCHMARK("DataFileParserNew")
+    // {
+    //   pu::DataFileParser2 parser5 = pu::DataFileParser2();
+    //   parser5.read(suspectedPath + "big_dump_file_data.out");
+    //   return parser5.getNrOfAngles();
+    // };
   }
 
   SECTION("Reading large files is sensibly fast")
@@ -75,5 +92,23 @@ TEST_CASE("DumpFileParser can be used", "[utils][DumpFileParser]")
     REQUIRE_NOTHROW(parser.readNGroups(9, 12));
     REQUIRE(parser.hasKey("BOX BOUNDS") == true);
     REQUIRE(parser.hasKey("NO EXISTING") == false);
+
+    pu::DumpFileParser2 parser5 =
+      pu::DumpFileParser2(suspectedPath + "big_dump_file.lammpstrj");
+    CHECK(parser5.getLength() == parser.getLength());
+
+    // BENCHMARK("DumpFileParserOld")
+    // {
+    //   pu::DumpFileParser parser4 =
+    //     pu::DumpFileParser(suspectedPath + "big_dump_file.lammpstrj");
+    //   return parser4.getLength();
+    // };
+
+    // BENCHMARK("DumpFileParserNew")
+    // {
+    //   pu::DumpFileParser2 parser5 =
+    //     pu::DumpFileParser2(suspectedPath + "big_dump_file.lammpstrj");
+    //   return parser5.getLength();
+    // };
   }
 }

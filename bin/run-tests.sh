@@ -42,8 +42,9 @@ fi
 cmake .. "${ADDITIONALFLAGS[@]}" || exit 1
 cmake --build . || exit 9
 echo "======== Starting tests ========"
-MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp ./pylimer_tests "[MEHPForceBalance]" || exit 5 # -s --durations yes
+# MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp ./pylimer_tests "[MEHPForceBalance]" || exit 5 # -s --durations yes
 MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp ./pylimer_tests --durations yes || exit 6 # -s --durations yes
+exit
 MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp ./header_tests || exit 7
 "$GENERATOR_BIN" pylimer_tests-gcov
 "$GENERATOR_BIN" test_sources-gcov

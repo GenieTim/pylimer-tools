@@ -1,4 +1,4 @@
-#include "DumpFileParser.h"
+#include "DumpFileParser2.h"
 #include "../entities/Universe.h"
 #include "../entities/UniverseSequence.h"
 #include "StringUtils.h"
@@ -20,12 +20,12 @@ namespace utils {
 
   // rule of three:
   // 1. destructor (to destroy the graph)
-  DumpFileParser::~DumpFileParser()
+  DumpFileParser2::~DumpFileParser2()
   {
     this->finish();
   };
   // 2. copy constructor
-  DumpFileParser::DumpFileParser(const DumpFileParser& src)
+  DumpFileParser2::DumpFileParser2(const DumpFileParser2& src)
   {
     this->currentLine = src.currentLine;
     this->newGroupKey = src.newGroupKey;
@@ -39,7 +39,7 @@ namespace utils {
     this->file.open(src.filePath);
   };
   // 3. copy assignment operator
-  DumpFileParser& DumpFileParser::operator=(DumpFileParser src)
+  DumpFileParser2& DumpFileParser2::operator=(DumpFileParser2 src)
   {
     std::swap(this->currentLine, src.currentLine);
     std::swap(this->newGroupKey, src.newGroupKey);
@@ -66,7 +66,7 @@ namespace utils {
    *
    * @param filePath
    */
-  DumpFileParser::DumpFileParser(const std::string filePath)
+  DumpFileParser2::DumpFileParser2(const std::string filePath, bool careful)
   {
     if (!std::filesystem::exists(filePath)) {
       throw std::invalid_argument("File to read (" + filePath +
@@ -107,10 +107,12 @@ namespace utils {
       linesSinceLastIgnore += 1;
       // performance improvement: not skipping.
       // could be bad for certain files.
-      line = pylimer_tools::utils::trimLineOmitComment(line);
-      // skip empty lines
-      if (line.empty()) {
-        continue;
+      if (careful) {
+        line = pylimer_tools::utils::trimLineOmitComment(line);
+        // skip empty lines
+        if (line.empty()) {
+          continue;
+        }
       }
 
       if (line == this->newGroupKey) {
@@ -120,7 +122,7 @@ namespace utils {
       }
 
       // skip forward. Could be too far, in principle.
-      if (linesSinceLastIgnore > 2) {
+      if (!careful && linesSinceLastIgnore > 2) {
         // jump to next occurrence of the first character of the desired line
         this->file.ignore(std::numeric_limits<std::streamsize>::max(),
                           this->file.widen(this->newGroupKey[0]));
@@ -146,7 +148,7 @@ namespace utils {
    *
    * @param i the index of the group to read
    */
-  void DumpFileParser::readGroupByIdx(const size_t i)
+  void DumpFileParser2::readGroupByIdx(const size_t i)
   {
     this->readNGroups(i, 1);
   }
@@ -156,7 +158,7 @@ namespace utils {
    *
    * @return size_t
    */
-  size_t DumpFileParser::getLength()
+  size_t DumpFileParser2::getLength()
   {
     return this->nrOfGroups;
   }
@@ -167,7 +169,7 @@ namespace utils {
    * @param headerKey
    * @return bool
    */
-  bool DumpFileParser::hasKey(std::string headerKey)
+  bool DumpFileParser2::hasKey(std::string headerKey)
   {
     if (this->data.size() == 0) {
       throw std::invalid_argument("Cannot check for header '" + headerKey +
@@ -183,7 +185,7 @@ namespace utils {
    * @param column
    * @return bool
    */
-  bool DumpFileParser::keyHasColumn(std::string headerKey, std::string column)
+  bool DumpFileParser2::keyHasColumn(std::string headerKey, std::string column)
   {
     const auto colItIdx = std::find(this->headerColMap.at(headerKey).begin(),
                                     this->headerColMap.at(headerKey).end(),
@@ -203,9 +205,9 @@ namespace utils {
    * @param dirSuffix the suffix behind the "x", "y" and "z" of the column
    * @return bool
    */
-  bool DumpFileParser::keyHasDirectionalColumn(std::string headerKey,
-                                               std::string dirPraefix,
-                                               std::string dirSuffix)
+  bool DumpFileParser2::keyHasDirectionalColumn(std::string headerKey,
+                                                std::string dirPraefix,
+                                                std::string dirSuffix)
   {
     // std::cout << "Searching for " << headerKey << " " << dirPraefix <<
     // dirSuffix << " in " <<
@@ -223,7 +225,7 @@ namespace utils {
    * @param N the nr of groups to read; a negative value results in all groups
    * being read.
    */
-  void DumpFileParser::readNGroups(const size_t start, const int N)
+  void DumpFileParser2::readNGroups(const size_t start, const int N)
   {
     if (!this->file.is_open()) {
       throw std::runtime_error("Cannot read from closed file.");
@@ -306,7 +308,7 @@ namespace utils {
    *
    * @param index
    */
-  void DumpFileParser::forgetAt(const size_t index)
+  void DumpFileParser2::forgetAt(const size_t index)
   {
     if (this->data.contains(index)) {
       this->data.erase(index);
@@ -318,21 +320,21 @@ namespace utils {
    *
    * @param filePath
    */
-  void DumpFileParser::read()
+  void DumpFileParser2::read()
   {
     this->data.reserve(this->getLength());
     this->readNGroups(0, -1);
     this->finish();
   }
 
-  void DumpFileParser::finish()
+  void DumpFileParser2::finish()
   {
     if (this->file.is_open()) {
       this->file.close();
     }
   }
 
-  std::string DumpFileParser::cleanHeader(std::string headerToClean)
+  std::string DumpFileParser2::cleanHeader(std::string headerToClean)
   {
     // "ITEM: ".size() = 6
     headerToClean.erase(0, 6);

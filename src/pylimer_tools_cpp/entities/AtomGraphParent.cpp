@@ -329,17 +329,11 @@ namespace entities {
    */
   int AtomGraphParent::computeFunctionalityForVertex(const long int vertexId)
   {
-    igraph_vector_int_t degrees;
-    if (igraph_vector_int_init(&degrees, 0)) {
-      throw std::runtime_error("Failed to instantiate result vector.");
-    }
-    if (igraph_degree(
-          &this->graph, &degrees, igraph_vss_1(vertexId), IGRAPH_ALL, false)) {
+    igraph_integer_t degree;
+    if (igraph_degree_1(&this->graph, &degree, vertexId, IGRAPH_ALL, false)) {
       throw std::runtime_error("Failed to determine degree of vertex");
     }
-    int result = igraph_vector_int_get(&degrees, 0);
-    igraph_vector_int_destroy(&degrees);
-    return result;
+    return degree;
   }
 
   int AtomGraphParent::computeFunctionalityForAtom(const long int atomId)
