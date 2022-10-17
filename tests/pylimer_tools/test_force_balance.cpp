@@ -50,7 +50,7 @@ TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
 
 TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance]")
 {
-  return;
+  // return;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -89,6 +89,51 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance]")
             Catch::Approx(nrOfChains));
       pcm::MEHPForceBalance forceBalancer2 =
         pcm::MEHPForceBalance(universe2, 2);
+
+      SECTION("Displacement computations are equivalent")
+      {
+        pcm::ForceBalanceNetwork net = forceBalancer2.getNetwork();
+        Eigen::VectorXd springPartitions0 =
+          Eigen::VectorXd::Ones(net.nrOfPartialSprings);
+        Eigen::VectorXd oneOverSpringPartitions =
+          forceBalancer2.assembleOneOverSpringPartition(&net,
+                                                        springPartitions0);
+        CHECK((oneOverSpringPartitions.array() < net.L[0]).all());
+        Eigen::VectorXd displacements0 =
+          Eigen::VectorXd::Zero(3 * net.nrOfLinks);
+        std::vector<Eigen::ArrayXi> vertexSets =
+          forceBalancer2.getHeuristicallyIndependentCoordinateSets(&net);
+        Eigen::VectorXd displacements1 =
+          Eigen::VectorXd::Zero(3 * net.nrOfLinks);
+        for (Eigen::ArrayXi vertexSet : vertexSets) {
+          std::cout << "Vertex set 1" << std::endl;
+          forceBalancer2.displaceLinksToMeanPosition(
+            &net, displacements0, oneOverSpringPartitions, vertexSet, 1.0);
+          for (size_t i = 0; i < vertexSet.size(); ++i) {
+            if (i % 3 == 0) {
+              forceBalancer2.displaceToMeanPosition(
+                &net, displacements1, springPartitions0, vertexSet[i] / 3);
+              // check that the two displacement vectors are equal, here already
+              for (size_t dir = 0; dir < 3; ++dir) {
+                CHECK(displacements0[vertexSet[i] + dir] + 1e-5 ==
+                      Catch::Approx(displacements1[vertexSet[i] + dir] + 1e-5));
+              }
+            }
+          }
+        }
+        Eigen::VectorXd displacements2 =
+          Eigen::VectorXd::Zero(3 * net.nrOfLinks);
+        for (size_t i = 0; i < net.nrOfLinks; ++i) {
+          forceBalancer2.displaceToMeanPosition(
+            &net, displacements2, springPartitions0, i);
+        }
+
+        // check that the two displacement vectors coincide
+        for (size_t i = 0; i < displacements0.size(); ++i) {
+          CHECK(displacements0[i] + 1e-5 == Catch::Approx(displacements2[i] + 1e-5));
+        }
+      }
+
       pcm::MEHPForceRelaxation forceRelaxer =
         pcm::MEHPForceRelaxation(universe2, 2);
       // the strands are different -> cannot compare the distances anymore

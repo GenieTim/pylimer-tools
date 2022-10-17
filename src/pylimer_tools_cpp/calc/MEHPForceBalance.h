@@ -344,9 +344,11 @@ namespace calc {
 
         for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
           double valueToSet =
-            springPartitions0[i] > 1e-9
-              ? 1. / (springPartitions0[i] * net->springsContourLength[i])
-              : 1e9;
+            springPartitions0[i] > 1e-12
+              ? 1. /
+                  (springPartitions0[i] *
+                   net->springsContourLength[net->partialToFullSpringIndex.at(i)])
+              : 1e12;
           oneOverSpringPartitions.segment(3 * i, 3) =
             Eigen::Vector3d::Constant(valueToSet);
         }
@@ -387,10 +389,10 @@ namespace calc {
         INVALIDARG_EXP_IFN(
           u.size() == net->coordinates.size(),
           "Coordinates and displacements must have the same size");
-        INVALIDARG_EXP_IFN(
-          oneOverSpringPartitions.size() ==
-            net->springPartCoordinateIndexB.size(),
-          "Spring partitions must have the size of the nr of springs");
+        INVALIDARG_EXP_IFN(oneOverSpringPartitions.size() ==
+                             net->springPartCoordinateIndexB.size(),
+                           "Spring partitions must have the size of the nr of "
+                           "spring coordinates");
         INVALIDARG_EXP_IFN(mask.size() % 3 == 0,
                            "Mask is expected to mask the coordinates");
 
@@ -399,29 +401,27 @@ namespace calc {
           (displacedCoords(net->springPartCoordinateIndexB) -
            displacedCoords(net->springPartCoordinateIndexA));
         this->handlePBC(net, allPartialDistancesA);
-        Eigen::VectorXd allPartialDistancesB = -allPartialDistancesA;
-        //   (displacedCoords(net->springPartCoordinateIndexA) -
-        //    displacedCoords(net->springPartCoordinateIndexB));
-        // this->handlePBC(net, allPartialDistancesB);
+        // Eigen::VectorXd allPartialDistancesB = -allPartialDistancesA;
+        Eigen::VectorXd allPartialDistancesB =
+          (displacedCoords(net->springPartCoordinateIndexA) -
+           displacedCoords(net->springPartCoordinateIndexB));
+        this->handlePBC(net, allPartialDistancesB);
 
         Eigen::VectorXd oneOverSumOfSpringPartials =
           Eigen::VectorXd::Zero(3 * net->nrOfLinks);
-        oneOverSumOfSpringPartials(net->springPartCoordinateIndexA) +=
-          oneOverSpringPartitions;
-        oneOverSumOfSpringPartials(net->springPartCoordinateIndexB) +=
-          oneOverSpringPartitions;
+        oneOverSumOfSpringPartials(net->springPartCoordinateIndexA) += oneOverSpringPartitions;
+        oneOverSumOfSpringPartials(net->springPartCoordinateIndexB) += oneOverSpringPartitions;
 
         Eigen::VectorXd objectiveDisplacements =
           Eigen::VectorXd::Zero(3 * net->nrOfLinks);
         objectiveDisplacements(net->springPartCoordinateIndexA) +=
           (allPartialDistancesA.array() * oneOverSpringPartitions.array())
             .matrix();
-        // TODO: the thing with the spring partitions is incorrect like that.
         objectiveDisplacements(net->springPartCoordinateIndexB) +=
           (allPartialDistancesB.array() * oneOverSpringPartitions.array())
             .matrix();
         objectiveDisplacements =
-          (objectiveDisplacements.array() * oneOverSumOfSpringPartials.array())
+          (objectiveDisplacements.array() / oneOverSumOfSpringPartials.array())
             .matrix();
 
         if (this->is2D) {
@@ -527,6 +527,7 @@ namespace calc {
         net->oldAtomIds = Eigen::ArrayXi::Zero(net->nrOfLinks);
         net->linkIsSliplink = ArrayXb::Constant(net->nrOfLinks, false);
         net->springIndicesOfLinks.reserve(net->nrOfLinks);
+        net->partialToFullSpringIndex.reserve(net->nrOfLinks);
         for (size_t i = 0; i < net->nrOfLinks; ++i) {
           net->springIndicesOfLinks.push_back(std::vector<size_t>());
         }
@@ -607,6 +608,7 @@ namespace calc {
             std::vector<size_t> zeroMap;
             zeroMap.push_back(spring_idx);
             net->localToGlobalSpringIndex.emplace(spring_idx, zeroMap);
+            net->partialToFullSpringIndex.emplace(spring_idx, spring_idx);
 
             spring_idx += 1;
           }
