@@ -106,19 +106,21 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance]")
         Eigen::VectorXd displacements1 =
           Eigen::VectorXd::Zero(3 * net.nrOfLinks);
         for (Eigen::ArrayXi vertexSet : vertexSets) {
-          std::cout << "Vertex set 1" << std::endl;
+          std::cout << "Next Vertex set" << std::endl;
           forceBalancer2.displaceLinksToMeanPosition(
             &net, displacements0, oneOverSpringPartitions, vertexSet, 1.0);
           for (size_t i = 0; i < vertexSet.size(); ++i) {
             if (i % 3 == 0) {
               forceBalancer2.displaceToMeanPosition(
                 &net, displacements1, springPartitions0, vertexSet[i] / 3);
-              // check that the two displacement vectors are equal, here already
-              for (size_t dir = 0; dir < 3; ++dir) {
-                CHECK(displacements0[vertexSet[i] + dir] + 1e-5 ==
-                      Catch::Approx(displacements1[vertexSet[i] + dir] + 1e-5));
-              }
             }
+            // check that the two displacement vectors are equal, here already
+            if (std::isnan(displacements0[vertexSet[i]])) {
+              std::cout << "NaN at " << i << " in " << vertexSet[i]
+                        << std::endl;
+            }
+            CHECK(displacements0[vertexSet[i]] + 1e-5 ==
+                  Catch::Approx(displacements1[vertexSet[i]] + 1e-5));
           }
         }
         Eigen::VectorXd displacements2 =
@@ -130,8 +132,11 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance]")
 
         // check that the two displacement vectors coincide
         for (size_t i = 0; i < displacements0.size(); ++i) {
-          CHECK(displacements0[i] + 1e-5 == Catch::Approx(displacements2[i] + 1e-5));
+          CHECK(displacements0[i] + 1e-5 ==
+                Catch::Approx(displacements2[i] + 1e-5));
         }
+
+        CHECK(forceBalancer2.validateNetwork(&net));
       }
 
       pcm::MEHPForceRelaxation forceRelaxer =

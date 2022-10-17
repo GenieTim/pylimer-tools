@@ -16,11 +16,6 @@ jobs:
         with: 
           submodules: "recursive"
 
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.10.6'
-          cache: 'pip'
-
       - uses: actions/cache@v2
         with:
           path: |
@@ -32,11 +27,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-py-3.10.6-
 
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10.6'
+          cache: 'pip'
+
       - name: Install Dependencies
         run: pip install -r requirements.txt
       
       - name: Install dev dependencies
-        run: sudo apt-get install bison flex lcov
+        run: sudo apt-get install bison flex lcov libeigen3-dev
       
       - name: Run Tests
         run: ./bin/run-tests.sh
