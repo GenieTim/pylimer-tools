@@ -97,6 +97,9 @@ namespace calc {
 
 #define APPROX_EQUAL(value1, value2, eps) \
   value1 + eps >= value2 && value1 - eps <= value2
+
+#define APPROX_WITHIN(value1, lo, hi, eps) \
+  value1 + eps >= lo && value1 - eps <= hi
 } // calc
 } // pylimer_tools
 
