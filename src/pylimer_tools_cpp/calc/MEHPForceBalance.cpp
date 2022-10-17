@@ -411,7 +411,7 @@ namespace calc {
             }
             // add to displacement
             double contourLengthFraction = springPartitions[globalSpringIndex];
-            if (contourLengthFraction > 1e-12) {
+            if (contourLengthFraction > 1e-9) {
               double oneOverContourLengthFraction =
                 1.0 / (net->springsContourLength[springIndices[spring_index]] *
                        contourLengthFraction);
@@ -420,15 +420,18 @@ namespace calc {
               // totalDistance.array());
               objectiveDisplacementContributors += oneOverContourLengthFraction;
             } else {
-              objectiveDisplacement = 1e12 * (partialDistance);
-              objectiveDisplacementContributors += 1e12;
+              objectiveDisplacement = 1e9 * (partialDistance);
+              objectiveDisplacementContributors += 1e9;
             }
           }
         }
       }
       // take mean for displacement
+      // prevent NaN from division by zero
       u.segment(3 * linkIdx, 3) +=
-        objectiveDisplacement / objectiveDisplacementContributors;
+        objectiveDisplacement / (objectiveDisplacementContributors == 0.0
+                                   ? 1.0
+                                   : objectiveDisplacementContributors);
 
       double dist = objectiveDisplacement.squaredNorm();
       // if (dist > 500) {
@@ -472,7 +475,11 @@ namespace calc {
               " to " + std::to_string(linkIndexB) + ", currently at " +
               std::to_string(distances[j]) + " of " +
               std::to_string(net->boxHalfs[j % 3]) + " after " +
-              std::to_string(iterations) + " iterations");
+              std::to_string(iterations) + " iterations. Coordinates: " +
+              std::to_string(net->coordinates[3 * linkIndexA + j]) + ", " +
+              std::to_string(net->coordinates[3 * linkIndexB + j]) +
+              " and displacements:" + std::to_string(u[3 * linkIndexA + j]) +
+              ", " + std::to_string(u[3 * linkIndexB + j]) + ".");
           }
         }
         iterations = 0;
@@ -485,7 +492,11 @@ namespace calc {
               " to " + std::to_string(linkIndexB) + ", currently at " +
               std::to_string(distances[j]) + " of " +
               std::to_string(net->boxHalfs[j % 3]) + " after " +
-              std::to_string(iterations) + " iterations");
+              std::to_string(iterations) + " iterations. Coordinates: " +
+              std::to_string(net->coordinates[3 * linkIndexA + j]) + ", " +
+              std::to_string(net->coordinates[3 * linkIndexB + j]) +
+              " and displacements:" + std::to_string(u[3 * linkIndexA + j]) +
+              ", " + std::to_string(u[3 * linkIndexB + j]) + ".");
           }
         }
       }
@@ -650,6 +661,9 @@ namespace calc {
           std::vector<size_t> springParticipants =
             this->initialConfig.linkIndicesOfSprings[springIndex];
           double alpha = (springIndexIndex == 0 ? alpha1[i] : alpha2[i]);
+          INVALIDARG_EXP_IFN(alpha >= 0.0 && alpha <= 1.0,
+                             "alpha must be between 0 and 1, got " +
+                               std::to_string(alpha) + ".");
           // detect the position in the spring
           std::vector<double> partitionsStrand;
           partitionsStrand.reserve(springParticipants.size() - 1);
@@ -675,18 +689,16 @@ namespace calc {
             }
           }
           if (!wasAdded) {
-            targetIndexInSpring = springParticipants.size() - 1;
+            targetIndexInSpring = springParticipants.size() - 2;
             if (partitionsStrand.size() > 0) {
               alpha = alpha - cumulativePartition;
             }
           }
 
-          // TODO: we should not need to be doing this.
-          if (alpha < 0. || alpha > 1.) {
-            std::cout << "WARNING: alpha = " << alpha << " for spring "
-                      << springIndex << std::endl;
-            alpha = std::clamp(alpha, 0., 1.);
-          }
+          RUNTIME_EXP_IFN(APPROX_WITHIN(alpha, 0.0, 1.0, 1e-12),
+                          "alpha must be between 0 and 1, got " +
+                            std::to_string(alpha) + ".");
+
           // have to adjust the existing springs, too!
           size_t springPartner1 = springParticipants[targetIndexInSpring];
           size_t springPartner2 = springParticipants[targetIndexInSpring + 1];
@@ -694,8 +706,8 @@ namespace calc {
 
           // update connectivity
           size_t lastSpringIndex =
-            this->initialConfig.localToGlobalSpringIndex.at(springIndex)
-              .at(targetIndexInSpring);
+            this->initialConfig.localToGlobalSpringIndex.at(
+              springIndex)[targetIndexInSpring];
           size_t newSpringIndex =
             currentNrOfPartialSprings + partialSpringsAdded;
 
@@ -739,18 +751,26 @@ namespace calc {
               3 * springPartner2 + offset;
           }
 
-          this->currentSpringPartitionsVec[lastSpringIndex] -= alpha;
-          // TODO: we should not need to be doing this.
-          if (this->currentSpringPartitionsVec[lastSpringIndex] < 0. ||
-              this->currentSpringPartitionsVec[lastSpringIndex] > 1.) {
-            std::cout << "WARNING: alpha = "
-                      << this->currentSpringPartitionsVec[lastSpringIndex]
-                      << " for spring " << lastSpringIndex
-                      << " after subtracting alpha = " << alpha << std::endl;
-            this->currentSpringPartitionsVec[lastSpringIndex] = std::clamp(
-              this->currentSpringPartitionsVec[lastSpringIndex], 0., 1.);
-          }
-          this->currentSpringPartitionsVec[newSpringIndex] = alpha;
+          this->currentSpringPartitionsVec[newSpringIndex] =
+            this->currentSpringPartitionsVec[lastSpringIndex] - alpha;
+          RUNTIME_EXP_IFN(
+            APPROX_WITHIN(this->currentSpringPartitionsVec[newSpringIndex],
+                          0.0,
+                          1.0,
+                          1e-12),
+            "Spring partition must be between 0 and 1, got " +
+              std::to_string(this->currentSpringPartitionsVec[newSpringIndex]) +
+              ".");
+          this->currentSpringPartitionsVec[lastSpringIndex] = alpha;
+          RUNTIME_EXP_IFN(
+            APPROX_WITHIN(this->currentSpringPartitionsVec[lastSpringIndex],
+                          0.0,
+                          1.0,
+                          1e-12),
+            "Spring partition must be between 0 and 1, got " +
+              std::to_string(this->currentSpringPartitionsVec[newSpringIndex]) +
+              ".");
+
           this->initialConfig.linkIndicesOfSprings[springIndex].insert(
             this->initialConfig.linkIndicesOfSprings[springIndex].begin() +
               targetIndexInSpring +
@@ -1012,11 +1032,11 @@ namespace calc {
         net->partialToFullSpringIndex.size() == net->nrOfPartialSprings,
         "Every partial spring must be able to map to the full spring.");
       for (size_t i = 0; i < this->currentSpringPartitionsVec.size(); i++) {
-        RUNTIME_EXP_IFN(this->currentSpringPartitionsVec[i] <= 1.0 &&
-                          this->currentSpringPartitionsVec[i] >= 0.0,
-                        "Spring partitions must be between 0 & 1, got " +
-                          std::to_string(this->currentSpringPartitionsVec[i]) +
-                          " at i = " + std::to_string(i) + ".");
+        RUNTIME_EXP_IFN(
+          APPROX_WITHIN(this->currentSpringPartitionsVec[i], 0.0, 1.0, 1e-12),
+          "Spring partitions must be between 0 & 1, got " +
+            std::to_string(this->currentSpringPartitionsVec[i]) +
+            " at i = " + std::to_string(i) + ".");
       }
       for (size_t i = 0; i < net->nrOfSprings; ++i) {
         RUNTIME_EXP_IFN(net->linkIndicesOfSprings[i].size() >= 2,

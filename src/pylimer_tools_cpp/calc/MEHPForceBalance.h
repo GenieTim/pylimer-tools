@@ -344,11 +344,11 @@ namespace calc {
 
         for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
           double valueToSet =
-            springPartitions0[i] > 1e-12
+            springPartitions0[i] > 1e-9
               ? 1. /
                   (springPartitions0[i] *
                    net->springsContourLength[net->partialToFullSpringIndex.at(i)])
-              : 1e12;
+              : 1e9;
           oneOverSpringPartitions.segment(3 * i, 3) =
             Eigen::Vector3d::Constant(valueToSet);
         }
@@ -407,10 +407,12 @@ namespace calc {
            displacedCoords(net->springPartCoordinateIndexB));
         this->handlePBC(net, allPartialDistancesB);
 
-        Eigen::VectorXd oneOverSumOfSpringPartials =
-          Eigen::VectorXd::Zero(3 * net->nrOfLinks);
-        oneOverSumOfSpringPartials(net->springPartCoordinateIndexA) += oneOverSpringPartitions;
-        oneOverSumOfSpringPartials(net->springPartCoordinateIndexB) += oneOverSpringPartitions;
+        Eigen::ArrayXd oneOverSumOfSpringPartials =
+          Eigen::ArrayXd::Zero(3 * net->nrOfLinks);
+        oneOverSumOfSpringPartials(net->springPartCoordinateIndexA) += oneOverSpringPartitions.array();
+        oneOverSumOfSpringPartials(net->springPartCoordinateIndexB) += oneOverSpringPartitions.array();
+        // prevent NaN values by dividing by zero afterwards
+        oneOverSumOfSpringPartials = (oneOverSumOfSpringPartials <= 1e-12).select(1.0, oneOverSumOfSpringPartials);
 
         Eigen::VectorXd objectiveDisplacements =
           Eigen::VectorXd::Zero(3 * net->nrOfLinks);
@@ -421,7 +423,7 @@ namespace calc {
           (allPartialDistancesB.array() * oneOverSpringPartitions.array())
             .matrix();
         objectiveDisplacements =
-          (objectiveDisplacements.array() / oneOverSumOfSpringPartials.array())
+          (objectiveDisplacements.array() / oneOverSumOfSpringPartials)
             .matrix();
 
         if (this->is2D) {
