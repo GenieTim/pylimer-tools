@@ -116,11 +116,13 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance]")
             }
             // check that the two displacement vectors are equal, here already
             if (std::isnan(displacements0[vertexSet[i]])) {
-              std::cout << "NaN at " << i << " in " << vertexSet[i]
-                        << std::endl;
+              // std::cout << "NaN at " << i << " in " << vertexSet[i]
+              //           << std::endl;
+              CHECK(std::isnan(displacements1[vertexSet[i]]));
+            } else {
+              CHECK(displacements0[vertexSet[i]] + 1e-5 ==
+                    Catch::Approx(displacements1[vertexSet[i]] + 1e-5));
             }
-            CHECK(displacements0[vertexSet[i]] + 1e-5 ==
-                  Catch::Approx(displacements1[vertexSet[i]] + 1e-5));
           }
         }
         Eigen::VectorXd displacements2 =
