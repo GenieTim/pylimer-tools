@@ -63,6 +63,8 @@ namespace calc {
       ArrayXArrayXi linkIndicesOfSprings;   // maps spring -> links
       // local to global: from the 2D structures to the 1D Eigen vector
       std::map<size_t, std::vector<size_t>> localToGlobalSpringIndex;
+      // map the "local", partial, spring indices to the full-length springs
+      std::unordered_map<size_t, size_t> partialToFullSpringIndex;
 
       ArrayXb linkIsSliplink;
       Eigen::ArrayXi springPartCoordinateIndexA;

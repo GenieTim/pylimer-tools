@@ -240,7 +240,6 @@ namespace calc {
         }
         results.push_back(localRes);
       }
-      // TODO: implement something better
       return results;
     }
 
@@ -390,6 +389,8 @@ namespace calc {
              ++partner_idx) {
           if (springsPartners[partner_idx] == linkIdx ||
               springsPartners[partner_idx + 1] == linkIdx) {
+            size_t globalSpringIndex = net->localToGlobalSpringIndex.at(
+              springIndices[spring_index])[partner_idx];
             Eigen::Vector3d partialDistance;
             // add partial distance to the total distance
             if (springsPartners[partner_idx] == linkIdx) {
@@ -409,9 +410,7 @@ namespace calc {
                 this->is2D);
             }
             // add to displacement
-            double contourLengthFraction =
-              springPartitions[net->localToGlobalSpringIndex.at(
-                springIndices[spring_index])[partner_idx]];
+            double contourLengthFraction = springPartitions[globalSpringIndex];
             if (contourLengthFraction > 1e-12) {
               double oneOverContourLengthFraction =
                 1.0 / (net->springsContourLength[springIndices[spring_index]] *
@@ -705,6 +704,8 @@ namespace calc {
                         .begin() +
                       targetIndexInSpring + 1,
                     newSpringIndex);
+          this->initialConfig.partialToFullSpringIndex.emplace(newSpringIndex,
+                                                               springIndex);
 
           // adjust also the coordinates
           this->currentDisplacements[newNodeIdx] = 0.0;
@@ -1007,6 +1008,9 @@ namespace calc {
                                    net->nrOfSprings,
                                    1e-3),
                       "Spring partitions should sum to 1 per spring");
+      RUNTIME_EXP_IFN(
+        net->partialToFullSpringIndex.size() == net->nrOfPartialSprings,
+        "Every partial spring must be able to map to the full spring.");
       for (size_t i = 0; i < this->currentSpringPartitionsVec.size(); i++) {
         RUNTIME_EXP_IFN(this->currentSpringPartitionsVec[i] <= 1.0 &&
                           this->currentSpringPartitionsVec[i] >= 0.0,
@@ -1027,6 +1031,21 @@ namespace calc {
             net->linkIndicesOfSprings[i]
                                      [net->linkIndicesOfSprings[i].size() - 1],
           "Springs must have increasing end-point indices");
+      }
+      for (size_t i = 0; i < net->nrOfPartialSprings; i++) {
+        size_t fullIdx = net->partialToFullSpringIndex.at(i);
+        size_t partialEndA = net->springPartIndexA[i];
+        size_t partialEndB = net->springPartIndexB[i];
+        if (!net->linkIsSliplink[partialEndA]) {
+          RUNTIME_EXP_IFN(net->springIndexA[fullIdx] == partialEndA ||
+                            net->springIndexB[fullIdx] == partialEndA,
+                          "Expect mapping of springs to work");
+        }
+        if (!net->linkIsSliplink[partialEndB]) {
+          RUNTIME_EXP_IFN(net->springIndexA[fullIdx] == partialEndB ||
+                            net->springIndexB[fullIdx] == partialEndB,
+                          "Expect mapping of springs to work");
+        }
       }
       return true;
     }
