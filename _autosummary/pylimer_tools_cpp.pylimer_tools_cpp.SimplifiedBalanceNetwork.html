@@ -177,6 +177,7 @@
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin.html">pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint.html">pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Atom.html">pylimer_tools_cpp.pylimer_tools_cpp.Atom</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.html">pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Box.html">pylimer_tools_cpp.pylimer_tools_cpp.Box</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.html">pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.html">pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter</a></li>
@@ -270,37 +271,43 @@ Consists usually only of the cross- and slip-links.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.coordinates" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.coordinates"><code class="xref py py-obj docutils literal notranslate"><span class="pre">coordinates</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.linkIsSliplink" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.linkIsSliplink"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linkIsSliplink</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.linkIndicesOfSprings" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.linkIndicesOfSprings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linkIndicesOfSprings</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.localToGlobalSpringIndex" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.localToGlobalSpringIndex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">localToGlobalSpringIndex</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.linkIsSliplink" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.linkIsSliplink"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linkIsSliplink</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.nrOfCrossLinks" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.nrOfCrossLinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nrOfCrossLinks</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.localToGlobalSpringIndex" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.localToGlobalSpringIndex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">localToGlobalSpringIndex</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.nrOfLinks" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.nrOfLinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nrOfLinks</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.nrOfCrossLinks" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.nrOfCrossLinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nrOfCrossLinks</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.nrOfPartialSprings" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.nrOfPartialSprings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nrOfPartialSprings</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.nrOfLinks" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.nrOfLinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nrOfLinks</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.nrOfSprings" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.nrOfSprings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nrOfSprings</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.nrOfPartialSprings" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.nrOfPartialSprings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nrOfPartialSprings</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.oldAtomIds" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.oldAtomIds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oldAtomIds</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.nrOfSprings" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.nrOfSprings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">nrOfSprings</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springCoordinateIndexA" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springCoordinateIndexA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">springCoordinateIndexA</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.oldAtomIds" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.oldAtomIds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">oldAtomIds</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springCoordinateIndexB" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springCoordinateIndexB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">springCoordinateIndexB</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springCoordinateIndexA" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springCoordinateIndexA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">springCoordinateIndexA</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springIndexA" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springIndexA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">springIndexA</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springCoordinateIndexB" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springCoordinateIndexB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">springCoordinateIndexB</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springIndexB" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springIndexB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">springIndexB</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springIndexA" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springIndexA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">springIndexA</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springIndexB" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springIndexB"><code class="xref py py-obj docutils literal notranslate"><span class="pre">springIndexB</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springIndicesOfLinks" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springIndicesOfLinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">springIndicesOfLinks</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springPartCoordinateIndexA" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springPartCoordinateIndexA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">springPartCoordinateIndexA</span></code></a></p></td>
@@ -329,6 +336,11 @@ Consists usually only of the cross- and slip-links.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.coordinates">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coordinates</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.coordinates" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.linkIndicesOfSprings">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">linkIndicesOfSprings</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.linkIndicesOfSprings" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
@@ -384,6 +396,11 @@ Consists usually only of the cross- and slip-links.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springIndexB">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">springIndexB</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springIndexB" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springIndicesOfLinks">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">springIndicesOfLinks</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springIndicesOfLinks" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
@@ -476,6 +493,7 @@ Consists usually only of the cross- and slip-links.</p>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.__init__"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.__init__()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.boxLengths"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.boxLengths</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.coordinates"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.coordinates</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.linkIndicesOfSprings"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.linkIndicesOfSprings</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.linkIsSliplink"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.linkIsSliplink</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.localToGlobalSpringIndex"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.localToGlobalSpringIndex</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.nrOfCrossLinks"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.nrOfCrossLinks</span></code></a></li>
@@ -487,6 +505,7 @@ Consists usually only of the cross- and slip-links.</p>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springCoordinateIndexB"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.springCoordinateIndexB</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springIndexA"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.springIndexA</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springIndexB"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.springIndexB</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springIndicesOfLinks"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.springIndicesOfLinks</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springPartCoordinateIndexA"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.springPartCoordinateIndexA</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springPartCoordinateIndexB"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.springPartCoordinateIndexB</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.springPartIndexA"><code class="docutils literal notranslate"><span class="pre">SimplifiedBalanceNetwork.springPartIndexA</span></code></a></li>

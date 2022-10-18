@@ -29,6 +29,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.SimplifiedBalanceNetwork
    
       ~SimplifiedBalanceNetwork.boxLengths
       ~SimplifiedBalanceNetwork.coordinates
+      ~SimplifiedBalanceNetwork.linkIndicesOfSprings
       ~SimplifiedBalanceNetwork.linkIsSliplink
       ~SimplifiedBalanceNetwork.localToGlobalSpringIndex
       ~SimplifiedBalanceNetwork.nrOfCrossLinks
@@ -40,6 +41,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.SimplifiedBalanceNetwork
       ~SimplifiedBalanceNetwork.springCoordinateIndexB
       ~SimplifiedBalanceNetwork.springIndexA
       ~SimplifiedBalanceNetwork.springIndexB
+      ~SimplifiedBalanceNetwork.springIndicesOfLinks
       ~SimplifiedBalanceNetwork.springPartCoordinateIndexA
       ~SimplifiedBalanceNetwork.springPartCoordinateIndexB
       ~SimplifiedBalanceNetwork.springPartIndexA

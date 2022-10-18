@@ -29,6 +29,7 @@
       :template: custom-class-template.rst
    
       Atom
+      BalanceRunMode
       Box
       DataFileReader
       DataFileWriter

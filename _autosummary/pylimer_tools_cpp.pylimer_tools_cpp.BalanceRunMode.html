@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint" href="pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint.html" /><link rel="prev" title="pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance" href="pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pylimer_tools_cpp.pylimer_tools_cpp.Box" href="pylimer_tools_cpp.pylimer_tools_cpp.Box.html" /><link rel="prev" title="pylimer_tools_cpp.pylimer_tools_cpp.Atom" href="pylimer_tools_cpp.pylimer_tools_cpp.Atom.html" />
 
     <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
-        <title>pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin - PylimerTools documentation</title>
+        <title>pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=d81277517bee4d6b0349d71bb2661d4890b5617c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -174,10 +174,10 @@
 <li class="toctree-l2 current has-children"><a class="reference internal" href="../pylimer_tools_cpp.html">pylimer_tools_cpp package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l3 current has-children"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.html">pylimer_tools_cpp.pylimer_tools_cpp</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle child pages in navigation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance.html">pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance</a></li>
-<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin.html">pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint.html">pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Atom.html">pylimer_tools_cpp.pylimer_tools_cpp.Atom</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.html">pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode</a></li>
+<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Box.html">pylimer_tools_cpp.pylimer_tools_cpp.Box</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.html">pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.html">pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter</a></li>
@@ -238,13 +238,96 @@
           </label>
         </div>
         <article role="main">
-          <section id="pylimer-tools-cpp-pylimer-tools-cpp-inverse-langevin">
-<h1>pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin<a class="headerlink" href="#pylimer-tools-cpp-pylimer-tools-cpp-inverse-langevin" title="Permalink to this heading">#</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">inverse_langevin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin" title="Permalink to this definition">#</a></dt>
-<dd><p>A somewhat accurate (for <span class="math notranslate nohighlight">\(x \in (-1, 1)\)</span>) implementation of the inverse Langevin.</p>
-<p>Source: <a class="reference external" href="https://scicomp.stackexchange.com/a/30251">https://scicomp.stackexchange.com/a/30251</a></p>
+          <section id="pylimer-tools-cpp-pylimer-tools-cpp-balancerunmode">
+<h1>pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode<a class="headerlink" href="#pylimer-tools-cpp-pylimer-tools-cpp-balancerunmode" title="Permalink to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">BalanceRunMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode" title="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Members:</p>
+<p>EIGEN_ALL</p>
+<p>EIGEN_RANDOM</p>
+<p>EIGEN_HEURISTIC</p>
+<p>EIGEN_STRANDS</p>
+<p>ITERATIVE</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode" title="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.__init__" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.__init__" title="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, value)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Attributes</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_ALL" title="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_ALL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EIGEN_ALL</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_HEURISTIC" title="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_HEURISTIC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EIGEN_HEURISTIC</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_RANDOM" title="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_RANDOM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EIGEN_RANDOM</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_STRANDS" title="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_STRANDS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EIGEN_STRANDS</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.ITERATIVE" title="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.ITERATIVE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ITERATIVE</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.name" title="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.value" title="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">value</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_ALL">
+<span class="sig-name descname"><span class="pre">EIGEN_ALL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;BalanceRunMode.EIGEN_ALL:</span> <span class="pre">3&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_ALL" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_HEURISTIC">
+<span class="sig-name descname"><span class="pre">EIGEN_HEURISTIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;BalanceRunMode.EIGEN_HEURISTIC:</span> <span class="pre">1&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_HEURISTIC" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_RANDOM">
+<span class="sig-name descname"><span class="pre">EIGEN_RANDOM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;BalanceRunMode.EIGEN_RANDOM:</span> <span class="pre">0&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_RANDOM" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_STRANDS">
+<span class="sig-name descname"><span class="pre">EIGEN_STRANDS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;BalanceRunMode.EIGEN_STRANDS:</span> <span class="pre">2&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_STRANDS" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.ITERATIVE">
+<span class="sig-name descname"><span class="pre">ITERATIVE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;BalanceRunMode.ITERATIVE:</span> <span class="pre">4&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.ITERATIVE" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.name" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.value" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </section>
@@ -254,23 +337,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint.html">
+          <a class="next-page" href="pylimer_tools_cpp.pylimer_tools_cpp.Box.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint</div>
+                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.Box</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance.html">
+          <a class="prev-page" href="pylimer_tools_cpp.pylimer_tools_cpp.Atom.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance</div>
+                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.Atom</div>
                 
               </div>
             </a>
@@ -305,8 +388,18 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin</a><ul>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin"><code class="docutils literal notranslate"><span class="pre">inverse_langevin()</span></code></a></li>
+<li><a class="reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode</a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode"><code class="docutils literal notranslate"><span class="pre">BalanceRunMode</span></code></a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.__init__"><code class="docutils literal notranslate"><span class="pre">BalanceRunMode.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_ALL"><code class="docutils literal notranslate"><span class="pre">BalanceRunMode.EIGEN_ALL</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_HEURISTIC"><code class="docutils literal notranslate"><span class="pre">BalanceRunMode.EIGEN_HEURISTIC</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_RANDOM"><code class="docutils literal notranslate"><span class="pre">BalanceRunMode.EIGEN_RANDOM</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.EIGEN_STRANDS"><code class="docutils literal notranslate"><span class="pre">BalanceRunMode.EIGEN_STRANDS</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.ITERATIVE"><code class="docutils literal notranslate"><span class="pre">BalanceRunMode.ITERATIVE</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.name"><code class="docutils literal notranslate"><span class="pre">BalanceRunMode.name</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.value"><code class="docutils literal notranslate"><span class="pre">BalanceRunMode.value</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -325,7 +418,5 @@
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/scripts/furo.js"></script>
-    <script>window.MathJax = {"tex": {}, "extensions": ["jsMath2jax.js"], "jax": ["input/TeX"]}</script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     </body>
 </html>
