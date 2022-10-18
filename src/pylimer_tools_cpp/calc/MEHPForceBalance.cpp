@@ -22,6 +22,8 @@ namespace calc {
      * FORCE RELAXATION
      */
     void MEHPForceBalance::runForceRelaxation(
+      BalanceRunMode mode,
+      double damping,
       long int maxNrOfSteps, // default: 10000
       double xtol,
       long int innerMaxNrOfSteps,
@@ -53,36 +55,44 @@ namespace calc {
       size_t iterationsDone = 0;
       size_t totalInnerIterationsDone = 0;
       Eigen::VectorXd springPartitions = this->currentSpringPartitionsVec;
-      // std::vector<Eigen::ArrayXi> independentVertexSets =
-      //   getHeuristicallyIndependentCoordinateSets(&net);
+      std::vector<Eigen::ArrayXi> independentVertexSets;
+      if (mode == BalanceRunMode::EIGEN_HEURISTIC) {
+        independentVertexSets = getHeuristicallyIndependentCoordinateSets(&net);
+      } else if (mode == BalanceRunMode::EIGEN_RANDOM) {
+        independentVertexSets = this->getRandomCoordinateSets(&net);
+      } else if (mode == BalanceRunMode::EIGEN_STRANDS) {
+        independentVertexSets = { net.springPartCoordinateIndexA,
+                                  net.springPartCoordinateIndexB };
+      } else if (mode == BalanceRunMode::EIGEN_ALL) {
+        independentVertexSets = { Eigen::ArrayXi::LinSpaced(
+          3 * net.nrOfLinks, 0, 3 * net.nrOfLinks - 1) };
+      }
       // this->getIndependentCoordinateSets(&net);
       // { net.springPartCoordinateIndexA, net.springPartCoordinateIndexB };
       std::cout << "Starting force balance procedure "
                 // "with " << independentVertexSets.size() << "vertex sets."
                 << std::endl;
       do {
-        // std::vector<Eigen::ArrayXi> independentVertexSets =
-        //   getRandomCoordinateSets(&net);
+        if (mode == BalanceRunMode::EIGEN_RANDOM) {
+          independentVertexSets = getRandomCoordinateSets(&net);
+        }
         maxDistanceMoved = 0.0;
         // first, place cross-links
-        // Eigen::VectorXd oneOverSpringPartitions =
-        //   this->assembleOneOverSpringPartition(&net, springPartitions);
-        // for (Eigen::ArrayXi vertexSet : independentVertexSets) {
-        //   maxDistanceMoved =
-        //     std::max(maxDistanceMoved,
-        //              this->displaceLinksToMeanPosition(
-        //                &net, u, oneOverSpringPartitions, vertexSet, 1.0));
-        // }
-
-        // maxDistanceMoved =
-        //   this->displaceLinksToMeanPosition(&net, u, springPartitions, 1.0);
-        // maxDistanceMoved = std::max(
-        //   maxDistanceMoved,
-        //   this->displaceLinksToMeanPosition(&net, u, springPartitions, 0.5));
-        for (size_t link_idx = 0; link_idx < net.nrOfNodes; ++link_idx) {
-          double distanceMoved =
-            this->displaceToMeanPosition(&net, u, springPartitions, link_idx);
-          maxDistanceMoved = std::max(maxDistanceMoved, distanceMoved);
+        if (mode == BalanceRunMode::ITERATIVE) {
+          for (size_t link_idx = 0; link_idx < net.nrOfNodes; ++link_idx) {
+            double distanceMoved =
+              this->displaceToMeanPosition(&net, u, springPartitions, link_idx);
+            maxDistanceMoved = std::max(maxDistanceMoved, distanceMoved);
+          }
+        } else {
+          Eigen::VectorXd oneOverSpringPartitions =
+            this->assembleOneOverSpringPartition(&net, springPartitions);
+          for (Eigen::ArrayXi vertexSet : independentVertexSets) {
+            maxDistanceMoved =
+              std::max(maxDistanceMoved,
+                       this->displaceLinksToMeanPosition(
+                         &net, u, oneOverSpringPartitions, vertexSet, damping));
+          }
         }
         // then, place slip-link
         for (size_t link_idx = net.nrOfNodes; link_idx < net.nrOfLinks;
@@ -121,7 +131,7 @@ namespace calc {
       this->nrOfStepsDone += iterationsDone;
       std::cout << iterationsDone << " steps done, " << totalInnerIterationsDone
                 << " inner iterations. Last max distance moved: "
-                << maxDistanceMoved;
+                << maxDistanceMoved << std::endl;
     }
 
     /**
@@ -380,11 +390,28 @@ namespace calc {
       Eigen::Vector3d objectiveDisplacement =
         Eigen::Vector3d::Zero(); // = remainingDisplacement.array();
       double objectiveDisplacementContributors = 0.0;
+      bool cautionPrimaryLoop = false;
+      std::vector<size_t> handledSprings;
       for (size_t spring_index = 0; spring_index < springIndices.size();
            ++spring_index) {
+        if (cautionPrimaryLoop) {
+          if (std::find(handledSprings.begin(),
+                        handledSprings.end(),
+                        springIndices[spring_index]) != handledSprings.end()) {
+            continue;
+          }
+        }
         // compute partial distances & total distance of this spring
         std::vector<size_t> springsPartners =
           net->linkIndicesOfSprings[springIndices[spring_index]];
+
+        if (springsPartners[0] == linkIdx &&
+            springsPartners[springsPartners.size() - 1] == linkIdx) {
+          // this is a primary loop of some kind. Make sure not to go over it
+          // twice.
+          cautionPrimaryLoop = true;
+        }
+
         for (size_t partner_idx = 0; partner_idx < springsPartners.size() - 1;
              ++partner_idx) {
           if (springsPartners[partner_idx] == linkIdx ||
@@ -411,6 +438,13 @@ namespace calc {
             }
             // add to displacement
             double contourLengthFraction = springPartitions[globalSpringIndex];
+            // std::cout << "Contribution from " << springsPartners[partner_idx]
+            //           << " to " << springsPartners[partner_idx + 1]
+            //           << " with l = " << contourLengthFraction << " and N = "
+            //           << net->springsContourLength[springIndices[spring_index]]
+            //           << ", partial distance " << partialDistance[0] << ", "
+            //           << partialDistance[1] << ", " << partialDistance[2]
+            //           << std::endl;
             if (contourLengthFraction > 1e-9) {
               double oneOverContourLengthFraction =
                 1.0 / (net->springsContourLength[springIndices[spring_index]] *
@@ -422,6 +456,10 @@ namespace calc {
             } else {
               objectiveDisplacement = 1e9 * (partialDistance);
               objectiveDisplacementContributors += 1e9;
+            }
+
+            if (cautionPrimaryLoop) {
+              handledSprings.push_back(springIndices[spring_index]);
             }
           }
         }

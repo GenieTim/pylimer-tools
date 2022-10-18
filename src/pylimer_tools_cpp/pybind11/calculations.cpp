@@ -162,6 +162,10 @@ init_pylimer_bound_calc(py::module_& m)
     .def_readonly("linkIsSliplink", &mehp::ForceBalanceNetwork::linkIsSliplink)
     .def_readonly("localToGlobalSpringIndex",
                   &mehp::ForceBalanceNetwork::localToGlobalSpringIndex)
+    .def_readonly("springIndicesOfLinks",
+                  &mehp::ForceBalanceNetwork::springIndicesOfLinks)
+    .def_readonly("linkIndicesOfSprings",
+                  &mehp::ForceBalanceNetwork::linkIndicesOfSprings)
 
     // .def_readonly("springIsActive", &mehp::Network::springIsActive)
     ;
@@ -429,6 +433,13 @@ init_pylimer_bound_calc(py::module_& m)
      )pbdoc",
          py::arg("newCrosslinkerType") = 2);
 
+  py::enum_<mehp::BalanceRunMode>(m, "BalanceRunMode")
+    .value("EIGEN_ALL", mehp::BalanceRunMode::EIGEN_ALL)
+    .value("EIGEN_RANDOM", mehp::BalanceRunMode::EIGEN_RANDOM)
+    .value("EIGEN_HEURISTIC", mehp::BalanceRunMode::EIGEN_HEURISTIC)
+    .value("EIGEN_STRANDS", mehp::BalanceRunMode::EIGEN_STRANDS)
+    .value("ITERATIVE", mehp::BalanceRunMode::ITERATIVE);
+
   py::class_<mehp::MEHPForceBalance>(m, "MEHPForceBalance", R"pbdoc(
     A small simulation tool for quickly minimizing the force between the cross-linker beads.
      )pbdoc")
@@ -445,7 +456,9 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("crosslinkerType") = 2,
          py::arg("is2D") = false)
     .def_property_readonly("network", &mehp::MEHPForceBalance::getNetwork)
-    .def("validateNetwork", py::overload_cast<>(&mehp::MEHPForceBalance::validateNetwork), R"pbdoc(
+    .def("validateNetwork",
+         py::overload_cast<>(&mehp::MEHPForceBalance::validateNetwork),
+         R"pbdoc(
            Validates the internal structures.
      )pbdoc")
     .def("runForceRelaxation",
@@ -456,17 +469,26 @@ init_pylimer_bound_calc(py::module_& m)
           This is useful if you want to run a global optimization first and add a local one afterwards.
           As a consequence though, you cannot simply benchmark only this method; you must include the setup.
 
+          :param runMode: Choice of the mode to run the simulation with.
+          :param damping: For certain run modes, a damping factor helps to improve performance.
           :param maxNrOfSteps: The maximum number of steps to do during the simulation.
           :param xTolerance: The tolerance of the displacements as an exit condition.
           :param innerMaxNrOfSteps: The maximum number of steps to do per iteration during the slip-link displacements.
           :param innerXTolerance: The tolerance of the displacements of the slip-link as an inner exit condition.
           :param innerAlphaTolerance: The tolerance of the contour-length when slipping the slip-link as an inner exit condition.
           )pbdoc",
+         py::arg("runMode") = mehp::BalanceRunMode::ITERATIVE,
+         py::arg("damping") = 1.0,
          py::arg("maxNrOfSteps") = 250000,
          py::arg("xTolerance") = 1e-12,
          py::arg("innerMaxNrOfSteps") = 100,
          py::arg("innerXTolerance") = 1e-12,
          py::arg("innerAlphaTolerance") = 1e-9)
+    .def("inspectLinkDisplacementToMeanPositionUpdate",
+         &mehp::MEHPForceBalance::inspectLinkDisplacementToMeanPositionUpdate,
+         R"pbdoc()pbdoc",
+         py::arg("linkIdx"),
+         py::arg("damping") = 1.0)
     .def("inspectDisplacementToMeanPositionUpdate",
          &mehp::MEHPForceBalance::inspectDisplacementToMeanPositionUpdate,
          R"pbdoc()pbdoc",
@@ -546,6 +568,11 @@ init_pylimer_bound_calc(py::module_& m)
           Get the number of springs considered in this simulation.
 
           :param tolerance: springs under this length are considered inactive
+     )pbdoc")
+    .def("getSpringPartitions",
+         &mehp::MEHPForceBalance::getSpringPartitions,
+         R"pbdoc(
+          Get the current spring partitions.
      )pbdoc")
     .def("getIdsOfActiveNodes",
          &mehp::MEHPForceBalance::getIdsOfActiveNodes,
