@@ -150,9 +150,8 @@ TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
 }
 
 TEST_CASE("MEHP Force Relaxation2 runs",
-          "[analysis][MEHPForceRelaxation][SimpleSpringMEHPForceEvaluator]")
+          "[analysis][MEHPForceRelaxation][SimpleSpringMEHPForceEvaluator][long]")
 {
-  return;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -334,9 +333,8 @@ TEST_CASE("MEHP Force Relaxation2 runs",
 }
 
 TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
-          "[analysis][MEHPForceRelaxation][NonGaussianSpringForceEvaluator]")
+          "[analysis][MEHPForceRelaxation][NonGaussianSpringForceEvaluator][long]")
 {
-  return;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";

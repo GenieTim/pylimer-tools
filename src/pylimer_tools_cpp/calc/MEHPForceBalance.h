@@ -24,6 +24,15 @@ namespace pylimer_tools {
 namespace calc {
   namespace mehp {
 
+    enum BalanceRunMode
+    {
+      EIGEN_RANDOM,
+      EIGEN_HEURISTIC,
+      EIGEN_STRANDS,
+      EIGEN_ALL,
+      ITERATIVE
+    };
+
     // heavily inspired by Prof. Dr. Andrei Gusev's Code
     class MEHPForceBalance
     {
@@ -60,7 +69,9 @@ namespace calc {
        * @param xtol
        * @param ftol
        */
-      void runForceRelaxation(long int maxNrOfSteps = 50000, // default: 10000
+      void runForceRelaxation(BalanceRunMode mode = BalanceRunMode::ITERATIVE,
+                              double damping = 1.0,
+                              long int maxNrOfSteps = 50000, // default: 10000
                               double xtol = 1e-9,
                               long int innerMaxNrOfSteps = 100,
                               double innerXtol = 1e-9,
@@ -314,6 +325,32 @@ namespace calc {
       /**
        * @brief Displace one link to the mean of all connected neighbours
        *
+       * @param u the current displacements, wherein the resulting coordinates
+       * shall be stored
+       * @param linkIdx the idx of the link to displace
+       * @return double, the distance (squared norm) displaced
+       */
+      Eigen::VectorXd inspectLinkDisplacementToMeanPositionUpdate(
+        const size_t linkIdx,
+        double damping = 1.0) const
+      {
+        Eigen::VectorXd displacements = this->currentDisplacements;
+        Eigen::VectorXd oneOverSpringPartitions =
+          this->assembleOneOverSpringPartition(
+            &this->initialConfig, this->currentSpringPartitionsVec);
+        Eigen::Array3i mask;
+        mask << 3 * linkIdx, 3 * linkIdx + 1, 3 * linkIdx + 2;
+        this->displaceLinksToMeanPosition(&this->initialConfig,
+                                          displacements,
+                                          oneOverSpringPartitions,
+                                          mask,
+                                          damping);
+        return displacements;
+      };
+
+      /**
+       * @brief Displace one link to the mean of all connected neighbours
+       *
        * @param net the force balance network
        * @param u the current displacements, wherein the resulting coordinates
        * shall be stored
@@ -334,7 +371,7 @@ namespace calc {
        */
       Eigen::VectorXd assembleOneOverSpringPartition(
         const ForceBalanceNetwork* net,
-        Eigen::VectorXd& springPartitions0) const
+        const Eigen::VectorXd& springPartitions0) const
       {
         INVALIDARG_EXP_IFN(
           springPartitions0.size() == net->nrOfPartialSprings,
@@ -347,7 +384,8 @@ namespace calc {
             springPartitions0[i] > 1e-9
               ? 1. /
                   (springPartitions0[i] *
-                   net->springsContourLength[net->partialToFullSpringIndex.at(i)])
+                   net->springsContourLength[net->partialToFullSpringIndex.at(
+                     i)])
               : 1e9;
           oneOverSpringPartitions.segment(3 * i, 3) =
             Eigen::Vector3d::Constant(valueToSet);
@@ -409,10 +447,13 @@ namespace calc {
 
         Eigen::ArrayXd oneOverSumOfSpringPartials =
           Eigen::ArrayXd::Zero(3 * net->nrOfLinks);
-        oneOverSumOfSpringPartials(net->springPartCoordinateIndexA) += oneOverSpringPartitions.array();
-        oneOverSumOfSpringPartials(net->springPartCoordinateIndexB) += oneOverSpringPartitions.array();
+        oneOverSumOfSpringPartials(net->springPartCoordinateIndexA) +=
+          oneOverSpringPartitions.array();
+        oneOverSumOfSpringPartials(net->springPartCoordinateIndexB) +=
+          oneOverSpringPartitions.array();
         // prevent NaN values by dividing by zero afterwards
-        oneOverSumOfSpringPartials = (oneOverSumOfSpringPartials <= 1e-12).select(1.0, oneOverSumOfSpringPartials);
+        oneOverSumOfSpringPartials = (oneOverSumOfSpringPartials <= 1e-12)
+                                       .select(1.0, oneOverSumOfSpringPartials);
 
         Eigen::VectorXd objectiveDisplacements =
           Eigen::VectorXd::Zero(3 * net->nrOfLinks);
@@ -577,6 +618,9 @@ namespace calc {
               std::swap(nodeIdxFrom, nodeIdxTo);
             }
             addChain = true;
+
+            net->springsContourLength[spring_idx] =
+              crosslinkerChains[i].getNrOfAtoms() - 1; // TODO: -2?
           } else if (crosslinkerChains[i].getType() ==
                      pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
             assert(xlinkersOfChain.size() == 1 ||
@@ -586,6 +630,9 @@ namespace calc {
             nodeIdxFrom = atomIdToNode.at(xlinkersOfChain[0].getId());
             nodeIdxTo = nodeIdxFrom;
             addChain = true;
+
+            net->springsContourLength[spring_idx] =
+              crosslinkerChains[i].getNrOfAtoms(); // TODO: -1?
           }
 
           if (addChain) {
@@ -603,9 +650,6 @@ namespace calc {
               net->springCoordinateIndexB[3 * spring_idx + j] =
                 nodeIdxTo * 3 + j;
             }
-
-            net->springsContourLength[spring_idx] =
-              crosslinkerChains[i].getNrOfAtoms() - 1; // TODO: -2?
 
             std::vector<size_t> zeroMap;
             zeroMap.push_back(spring_idx);
