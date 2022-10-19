@@ -497,6 +497,10 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceBalance::inspectSpringPartitionUpdate,
          R"pbdoc()pbdoc",
          py::arg("linkIdx"))
+    .def("getSpringpartitionIndicesOfSliplink",
+         &mehp::MEHPForceBalance::getSpringpartitionIndicesOfSliplink,
+         R"pbdoc()pbdoc",
+         py::arg("linkIdx"))
     // .def("getForceEvaluator", &mehp::MEHPForceBalance::getForceEvaluator,
     // R"pbdoc(
     //      Query the currently used force evaluator.

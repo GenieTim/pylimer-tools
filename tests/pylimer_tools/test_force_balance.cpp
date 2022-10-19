@@ -18,12 +18,15 @@ namespace pu = pylimer_tools::utils;
 namespace pcm = pylimer_tools::calc::mehp;
 
 void
-outputNetwork(pcm::ForceBalanceNetwork net, Eigen::VectorXd displacements)
+outputNetwork(pcm::ForceBalanceNetwork net,
+              Eigen::VectorXd displacements,
+              Eigen::VectorXd springPartitions)
 {
   for (int i = 0; i < net.nrOfSprings; ++i) {
-    std::cout << "Spring " << i << " " << std::endl;
+    std::cout << "Spring " << i << ", N: " << net.springsContourLength[i]
+              << std::endl;
     for (int j = 0; j < net.linkIndicesOfSprings[i].size(); ++j) {
-      std::cout << net.linkIndicesOfSprings[i][j] << " :";
+      std::cout << net.linkIndicesOfSprings[i][j] << ": ";
       for (int dir = 0; dir < 3; ++dir) {
         std::cout
           << (net.coordinates[3 * net.linkIndicesOfSprings[i][j] + dir] +
@@ -31,6 +34,10 @@ outputNetwork(pcm::ForceBalanceNetwork net, Eigen::VectorXd displacements)
           << ", ";
       }
       std::cout << std::endl;
+      if (j < net.linkIndicesOfSprings[i].size() - 1) {
+        std::cout << springPartitions[net.localToGlobalSpringIndex.at(i)[j]]
+                  << std::endl;
+      }
     }
     std::cout << std::endl;
   }
@@ -48,105 +55,210 @@ TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
   REQUIRE(testVec[2] == 0.0);
 }
 
-// TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
-// {
-//   pe::UniverseSequence universeSeq = pe::UniverseSequence();
-//   REQUIRE(universeSeq.getLength() == 0);
-//   std::string suspectedPath = "../pylimer_tools/fixtures/";
-//   std::string largeInputFile =
-//     suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
-//   if (std::filesystem::exists(largeInputFile)) {
-//     universeSeq.initializeFromDataSequence({ { largeInputFile } });
-//     pe::Universe universe2 = universeSeq.atIndex(0);
-//     BENCHMARK_ADVANCED("MEHP Balance Random 1.0 " + largeInputFile)
-//     (Catch::Benchmark::Chronometer meter)
-//     {
-//       pcm::MEHPForceBalance forceBalancer3 =
-//         pcm::MEHPForceBalance(universe2, 2);
-//       meter.measure([&forceBalancer3] {
-//         forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::EIGEN_RANDOM,
-//                                           1.0);
-//         return forceBalancer3.getNrOfIterations();
-//       });
-//     };
-//     BENCHMARK_ADVANCED("MEHP Balance Random 0.75 " + largeInputFile)
-//     (Catch::Benchmark::Chronometer meter)
-//     {
-//       pcm::MEHPForceBalance forceBalancer3 =
-//         pcm::MEHPForceBalance(universe2, 2);
-//       meter.measure([&forceBalancer3] {
-//         forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::EIGEN_RANDOM,
-//                                           0.75);
-//         return forceBalancer3.getNrOfIterations();
-//       });
-//     };
-//     BENCHMARK_ADVANCED("MEHP Balance Strand 1.0 " + largeInputFile)
-//     (Catch::Benchmark::Chronometer meter)
-//     {
-//       pcm::MEHPForceBalance forceBalancer3 =
-//         pcm::MEHPForceBalance(universe2, 2);
-//       meter.measure([&forceBalancer3] {
-//         forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::EIGEN_STRANDS,
-//                                           1.0);
-//         return forceBalancer3.getNrOfIterations();
-//       });
-//     };
-//     BENCHMARK_ADVANCED("MEHP Balance Strand 0.75 " + largeInputFile)
-//     (Catch::Benchmark::Chronometer meter)
-//     {
-//       pcm::MEHPForceBalance forceBalancer3 =
-//         pcm::MEHPForceBalance(universe2, 2);
-//       meter.measure([&forceBalancer3] {
-//         forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::EIGEN_STRANDS,
-//                                           0.75);
-//         return forceBalancer3.getNrOfIterations();
-//       });
-//     };
-//     BENCHMARK_ADVANCED("MEHP Balance All 0.5 " + largeInputFile)
-//     (Catch::Benchmark::Chronometer meter)
-//     {
-//       pcm::MEHPForceBalance forceBalancer3 =
-//         pcm::MEHPForceBalance(universe2, 2);
-//       meter.measure([&forceBalancer3] {
-//         forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::EIGEN_ALL,
-//                                           0.5);
-//         return forceBalancer3.getNrOfIterations();
-//       });
-//     };
-//     BENCHMARK_ADVANCED("MEHP Balance All 0.75 " + largeInputFile)
-//     (Catch::Benchmark::Chronometer meter)
-//     {
-//       pcm::MEHPForceBalance forceBalancer3 =
-//         pcm::MEHPForceBalance(universe2, 2);
-//       meter.measure([&forceBalancer3] {
-//         forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::EIGEN_ALL,
-//                                           0.75);
-//         return forceBalancer3.getNrOfIterations();
-//       });
-//     };
-//     BENCHMARK_ADVANCED("MEHP Balance Heuristic 1.0 " + largeInputFile)
-//     (Catch::Benchmark::Chronometer meter)
-//     {
-//       pcm::MEHPForceBalance forceBalancer3 =
-//         pcm::MEHPForceBalance(universe2, 2);
-//       meter.measure([&forceBalancer3] {
-//         forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::EIGEN_HEURISTIC,
-//                                           1.0);
-//         return forceBalancer3.getNrOfIterations();
-//       });
-//     };
-//     BENCHMARK_ADVANCED("MEHP Balance Iterative 1.0 " + largeInputFile)
-//     (Catch::Benchmark::Chronometer meter)
-//     {
-//       pcm::MEHPForceBalance forceBalancer3 =
-//         pcm::MEHPForceBalance(universe2, 2);
-//       meter.measure([&forceBalancer3] {
-//         forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::ITERATIVE, 1.0);
-//         return forceBalancer3.getNrOfIterations();
-//       });
-//     };
-//   }
-// }
+TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
+{
+  return;
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  REQUIRE(universeSeq.getLength() == 0);
+  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string largeInputFile =
+    suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
+  if (std::filesystem::exists(largeInputFile)) {
+    universeSeq.initializeFromDataSequence({ { largeInputFile } });
+    pe::Universe universe2 = universeSeq.atIndex(0);
+    //     BENCHMARK_ADVANCED("MEHP Balance Random 1.0 " + largeInputFile)
+    //     (Catch::Benchmark::Chronometer meter)
+    //     {
+    //       pcm::MEHPForceBalance forceBalancer3 =
+    //         pcm::MEHPForceBalance(universe2, 2);
+    //       meter.measure([&forceBalancer3] {
+    //         forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::EIGEN_RANDOM,
+    //                                           1.0);
+    //         return forceBalancer3.getNrOfIterations();
+    //       });
+    //     };
+    //     BENCHMARK_ADVANCED("MEHP Balance Random 0.75 " + largeInputFile)
+    //     (Catch::Benchmark::Chronometer meter)
+    //     {
+    //       pcm::MEHPForceBalance forceBalancer3 =
+    //         pcm::MEHPForceBalance(universe2, 2);
+    //       meter.measure([&forceBalancer3] {
+    //         forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::EIGEN_RANDOM,
+    //                                           0.75);
+    //         return forceBalancer3.getNrOfIterations();
+    //       });
+    //     };
+    //     BENCHMARK_ADVANCED("MEHP Balance Strand 1.0 " + largeInputFile)
+    //     (Catch::Benchmark::Chronometer meter)
+    //     {
+    //       pcm::MEHPForceBalance forceBalancer3 =
+    //         pcm::MEHPForceBalance(universe2, 2);
+    //       meter.measure([&forceBalancer3] {
+    //         forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::EIGEN_STRANDS,
+    //                                           1.0);
+    //         return forceBalancer3.getNrOfIterations();
+    //       });
+    //     };
+    //     BENCHMARK_ADVANCED("MEHP Balance Strand 0.75 " + largeInputFile)
+    //     (Catch::Benchmark::Chronometer meter)
+    //     {
+    //       pcm::MEHPForceBalance forceBalancer3 =
+    //         pcm::MEHPForceBalance(universe2, 2);
+    //       meter.measure([&forceBalancer3] {
+    //         forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::EIGEN_STRANDS,
+    //                                           0.75);
+    //         return forceBalancer3.getNrOfIterations();
+    //       });
+    //     };
+    //     BENCHMARK_ADVANCED("MEHP Balance All 0.5 " + largeInputFile)
+    //     (Catch::Benchmark::Chronometer meter)
+    //     {
+    //       pcm::MEHPForceBalance forceBalancer3 =
+    //         pcm::MEHPForceBalance(universe2, 2);
+    //       meter.measure([&forceBalancer3] {
+    //         forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::EIGEN_ALL,
+    //                                           0.5);
+    //         return forceBalancer3.getNrOfIterations();
+    //       });
+    //     };
+    //     BENCHMARK_ADVANCED("MEHP Balance All 0.75 " + largeInputFile)
+    //     (Catch::Benchmark::Chronometer meter)
+    //     {
+    //       pcm::MEHPForceBalance forceBalancer3 =
+    //         pcm::MEHPForceBalance(universe2, 2);
+    //       meter.measure([&forceBalancer3] {
+    //         forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::EIGEN_ALL,
+    //                                           0.75);
+    //         return forceBalancer3.getNrOfIterations();
+    //       });
+    //     };
+    // BENCHMARK_ADVANCED("MEHP Balance Heuristic 1.0 " + largeInputFile)
+    // (Catch::Benchmark::Chronometer meter)
+    // {
+    //   pcm::MEHPForceBalance forceBalancer3 =
+    //     pcm::MEHPForceBalance(universe2, 2);
+    //   meter.measure([&forceBalancer3] {
+    //     forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::EIGEN_HEURISTIC,
+    //                                       1.0);
+    //     return forceBalancer3.getNrOfIterations();
+    //   });
+    // };
+    // BENCHMARK_ADVANCED("MEHP Balance Iterative 1.0 " + largeInputFile)
+    // (Catch::Benchmark::Chronometer meter)
+    // {
+    //   pcm::MEHPForceBalance forceBalancer3 =
+    //     pcm::MEHPForceBalance(universe2, 2);
+    //   meter.measure([&forceBalancer3] {
+    //     forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::ITERATIVE, 1.0);
+    //     return forceBalancer3.getNrOfIterations();
+    //   });
+    // };
+  }
+}
+
+TEST_CASE("MEHP Force Balance handles slip-links on primary loops",
+          "[analysis][MEHPForceBalance]")
+{
+  pe::Universe universe =
+    pe::Universe(42.819955007276754, 42.819955007276754, 42.819955007276754);
+  /**
+   * Connectivity:
+   *          9
+   *         / |
+   * 4-14-12-3-13
+   *        |
+   *        11-15-5
+   *
+   * 6-16-10-7
+   */
+  universe.addAtoms({ 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 },
+                    { 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+                    { 1.6205800871994722,
+                      6.515162231365841,
+                      12.1,
+                      0.9,
+                      5.9,
+                      5,
+                      3,
+                      2,
+                      6,
+                      7,
+                      11,
+                      14,
+                      15,
+                      16 },
+                    { 7.1412289503058295,
+                      6.260972246279709,
+                      12.1,
+                      0.9,
+                      5.9,
+                      5,
+                      3,
+                      2,
+                      6,
+                      7,
+                      11,
+                      14,
+                      15,
+                      16 },
+                    { 0.5796829850477182,
+                      0.8320529182617298,
+                      12.1,
+                      0.9,
+                      5.9,
+                      5,
+                      3,
+                      2,
+                      6,
+                      7,
+                      11,
+                      14,
+                      15,
+                      16 },
+                    { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+                    { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+                    { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+  universe.addBonds({ 3, 3, 3, 3, 4, 5, 6, 7, 9, 10, 11, 12 },
+                    { 9, 11, 12, 13, 14, 15, 16, 10, 13, 16, 15, 14 });
+  pcm::MEHPForceBalance forceBalancer = pcm::MEHPForceBalance(universe, 2);
+  pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
+
+  SECTION("Unentangled primary loop")
+  {
+    // check unentangled primary loops
+    Eigen::VectorXd displacements = Eigen::VectorXd::Zero(net.nrOfLinks * 3);
+    Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
+    REQUIRE_NOTHROW(
+      forceBalancer.displaceToMeanPosition(&net, displacements, partitions, 0));
+    CHECK(displacements[0] == Catch::Approx(7.687).epsilon(1e-5));
+    CHECK(displacements[1] == Catch::Approx(2.03926).epsilon(1e-5));
+    CHECK(displacements[2] == Catch::Approx(5.88634).epsilon(1e-5));
+  }
+
+  SECTION("Entangled primary loop")
+  {
+    // entangle primary loop and check again
+    // outputNetwork(net, Eigen::VectorXd::Zero(net.nrOfLinks * 3));
+    forceBalancer.addSlipLinks({ 0, 2 },
+                               { 1, 1 },
+                               { 1.3263401618628183, 42.04664022316877 },
+                               { 6.670300217824844, 7.18272624553976 },
+                               { 41.85951429390015, 0.8578704100544575 },
+                               { 0.5333333333333333, 0.9310344827586207 },
+                               { 0.5, 0.5 });
+    pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
+    outputNetwork(net,
+                  Eigen::VectorXd::Zero(net.nrOfLinks * 3),
+                  forceBalancer.getSpringPartitions());
+    Eigen::VectorXd displacements = Eigen::VectorXd::Zero(net.nrOfLinks * 3);
+    Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
+    REQUIRE_NOTHROW(
+      forceBalancer.displaceToMeanPosition(&net, displacements, partitions, 0));
+    CHECK(displacements[0] == Catch::Approx(0.187321).epsilon(1e-5));
+    CHECK(displacements[1] == Catch::Approx(-0.447774).epsilon(1e-5));
+    CHECK(displacements[2] == Catch::Approx(-0.925295).epsilon(1e-5));
+  }
+}
 
 TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
 {
@@ -478,7 +590,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       Eigen::VectorXd::Zero(forceBalancer.getNrOfLinks() * 3);
     pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
 
-    outputNetwork(net, displacements);
+    outputNetwork(net, displacements, forceBalancer.getSpringPartitions());
     for (int i = 0; i < 5; ++i) {
       forceBalancer.displaceToMeanPosition(
         &net, displacements, springPartitions, 4);
@@ -668,7 +780,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       }
       // assert expectations are met.
       // NOTE: difficulty: finding out which spring idx it actually is
-      outputNetwork(net, displacements);
+      outputNetwork(net, displacements, forceBalancer2.getSpringPartitions());
       for (int i = 0; i < net.nrOfPartialSprings; i++) {
         std::cout << net.springPartIndexA[i] << ", " << net.springPartIndexB[i]
                   << ": ";

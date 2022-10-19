@@ -410,6 +410,10 @@ namespace calc {
           // this is a primary loop of some kind. Make sure not to go over it
           // twice.
           cautionPrimaryLoop = true;
+          // skip unentangled loop contribution
+          if (springsPartners.size() == 2) {
+            continue;
+          }
         }
 
         for (size_t partner_idx = 0; partner_idx < springsPartners.size() - 1;
@@ -438,13 +442,14 @@ namespace calc {
             }
             // add to displacement
             double contourLengthFraction = springPartitions[globalSpringIndex];
-            // std::cout << "Contribution from " << springsPartners[partner_idx]
-            //           << " to " << springsPartners[partner_idx + 1]
-            //           << " with l = " << contourLengthFraction << " and N = "
-            //           << net->springsContourLength[springIndices[spring_index]]
-            //           << ", partial distance " << partialDistance[0] << ", "
-            //           << partialDistance[1] << ", " << partialDistance[2]
-            //           << std::endl;
+            std::cout << "Contribution from " << springsPartners[partner_idx]
+                      << " to " << springsPartners[partner_idx + 1]
+                      << " with l = " << contourLengthFraction << " and N = "
+                      <<
+                      net->springsContourLength[springIndices[spring_index]]
+                      << ", partial distance " << partialDistance[0] << ", "
+                      << partialDistance[1] << ", " << partialDistance[2]
+                      << std::endl;
             if (contourLengthFraction > 1e-9) {
               double oneOverContourLengthFraction =
                 1.0 / (net->springsContourLength[springIndices[spring_index]] *
@@ -692,7 +697,8 @@ namespace calc {
           z[i];
         this->initialConfig.linkIsSliplink[currentNrOfLinks + i] = true;
         std::vector<size_t> springIndices{ strandIdx1[i], strandIdx2[i] };
-        this->initialConfig.springIndicesOfLinks.push_back(springIndices);
+        std::vector<size_t> springIndicesOfLink = strandIdx1[i] == strandIdx2[i] ? std::vector<size_t>{ strandIdx1[i] } : springIndices;
+        this->initialConfig.springIndicesOfLinks.push_back(springIndicesOfLink);
         // add to the springs
         int springIndexIndex = 0;
         for (size_t springIndex : springIndices) {
