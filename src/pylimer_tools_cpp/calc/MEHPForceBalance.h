@@ -277,6 +277,55 @@ namespace calc {
         return this->currentSpringPartitionsVec;
       }
 
+      std::vector<size_t> getSpringpartitionIndicesOfSliplink(
+        const size_t linkIdx) const
+      {
+        INVALIDARG_EXP_IFN(this->initialConfig.linkIsSliplink[linkIdx],
+                           "Link must be slip-link");
+        std::vector<size_t> springIndices =
+          this->initialConfig.springIndicesOfLinks[linkIdx];
+        std::vector<size_t> results;
+        results.reserve(4);
+        for (size_t springIndex : springIndices) {
+          std::vector<size_t> springsPartners =
+            this->initialConfig.linkIndicesOfSprings[springIndex];
+          for (size_t partner_idx = 1; partner_idx < springsPartners.size() - 1;
+               ++partner_idx) {
+            if (springsPartners[partner_idx] == linkIdx) {
+              size_t currentSpringGlobalIdx =
+                this->initialConfig.localToGlobalSpringIndex.at(
+                  springIndex)[partner_idx - 1];
+              size_t neighbourSpringGlobalIdx =
+                this->initialConfig.localToGlobalSpringIndex.at(
+                  springIndex)[partner_idx];
+              results.push_back(currentSpringGlobalIdx);
+              results.push_back(neighbourSpringGlobalIdx);
+            }
+          }
+        }
+        return results;
+      }
+
+      Eigen::ArrayXi getInvolvedSpringCoordinateIndices(
+        const Eigen::ArrayXi& linkCoordinateIndices)
+      {
+        std::vector<size_t> springPartCoordinateIndices;
+        springPartCoordinateIndices.reserve((linkCoordinateIndices.size()) * 4); // ca.
+        for (size_t i = 0; i < linkCoordinateIndices.size(); ++i) {
+          for (size_t j = 0; j < this->initialConfig.nrOfPartialSprings; ++j) {
+            if (this->initialConfig.springPartCoordinateIndexA[j] ==
+                  linkCoordinateIndices[i] ||
+                this->initialConfig.springPartCoordinateIndexB[j] ==
+                  linkCoordinateIndices[i]) {
+              springPartCoordinateIndices.push_back(j);
+              // TODO: continue
+            }
+          }
+        }
+        // TODO: fix
+        return Eigen::ArrayXi::Zero(2);
+      }
+
       /**
        * @brief Updates the partition/parametrisation of a spring around one
        * link
@@ -439,11 +488,11 @@ namespace calc {
           (displacedCoords(net->springPartCoordinateIndexB) -
            displacedCoords(net->springPartCoordinateIndexA));
         this->handlePBC(net, allPartialDistancesA);
-        // Eigen::VectorXd allPartialDistancesB = -allPartialDistancesA;
-        Eigen::VectorXd allPartialDistancesB =
-          (displacedCoords(net->springPartCoordinateIndexA) -
-           displacedCoords(net->springPartCoordinateIndexB));
-        this->handlePBC(net, allPartialDistancesB);
+        Eigen::VectorXd allPartialDistancesB = -allPartialDistancesA;
+        // Eigen::VectorXd allPartialDistancesB =
+        //   (displacedCoords(net->springPartCoordinateIndexA) -
+        //    displacedCoords(net->springPartCoordinateIndexB));
+        // this->handlePBC(net, allPartialDistancesB);
 
         Eigen::ArrayXd oneOverSumOfSpringPartials =
           Eigen::ArrayXd::Zero(3 * net->nrOfLinks);
@@ -637,7 +686,9 @@ namespace calc {
 
           if (addChain) {
             net->springIndicesOfLinks[nodeIdxFrom].push_back(spring_idx);
-            net->springIndicesOfLinks[nodeIdxTo].push_back(spring_idx);
+            if (nodeIdxFrom != nodeIdxTo) {
+              net->springIndicesOfLinks[nodeIdxTo].push_back(spring_idx);
+            }
 
             net->linkIndicesOfSprings[spring_idx].push_back(nodeIdxFrom);
             net->linkIndicesOfSprings[spring_idx].push_back(nodeIdxTo);
