@@ -80,7 +80,7 @@ TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
 
 TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
 {
-  // return;
+  return;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -155,25 +155,37 @@ TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
     //         return forceBalancer3.getNrOfIterations();
     //       });
     //     };
-    BENCHMARK_ADVANCED("MEHP Balance Heuristic 1.0 " + largeInputFile)
+    // BENCHMARK_ADVANCED("MEHP Balance Heuristic 1.0 " + largeInputFile)
+    // (Catch::Benchmark::Chronometer meter)
+    // {
+    //   pcm::MEHPForceBalance forceBalancer3 =
+    //     pcm::MEHPForceBalance(universe2, 2);
+    //   meter.measure([&forceBalancer3] {
+    //     forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::EIGEN_HEURISTIC,
+    //                                       1.0);
+    //     return forceBalancer3.getNrOfIterations();
+    //   });
+    // };
+    // BENCHMARK_ADVANCED("MEHP Balance Iterative 1.0 " + largeInputFile)
+    // (Catch::Benchmark::Chronometer meter)
+    // {
+    //   pcm::MEHPForceBalance forceBalancer3 =
+    //     pcm::MEHPForceBalance(universe2, 2);
+    //   meter.measure([&forceBalancer3] {
+    //     forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::ITERATIVE, 1.0);
+    //     return forceBalancer3.getNrOfIterations();
+    //   });
+    // };
+
+    BENCHMARK_ADVANCED("Detection of heuristic independent vertices " +
+                       largeInputFile)
     (Catch::Benchmark::Chronometer meter)
     {
       pcm::MEHPForceBalance forceBalancer3 =
         pcm::MEHPForceBalance(universe2, 2);
       meter.measure([&forceBalancer3] {
-        forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::EIGEN_HEURISTIC,
-                                          1.0);
-        return forceBalancer3.getNrOfIterations();
-      });
-    };
-    BENCHMARK_ADVANCED("MEHP Balance Iterative 1.0 " + largeInputFile)
-    (Catch::Benchmark::Chronometer meter)
-    {
-      pcm::MEHPForceBalance forceBalancer3 =
-        pcm::MEHPForceBalance(universe2, 2);
-      meter.measure([&forceBalancer3] {
-        forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::ITERATIVE, 1.0);
-        return forceBalancer3.getNrOfIterations();
+        pcm::ForceBalanceNetwork net = forceBalancer3.getNetwork();
+        return forceBalancer3.getHeuristicallyIndependentCoordinateSets(&net);
       });
     };
   }
@@ -337,7 +349,8 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
           Eigen::VectorXd::Zero(3 * net.nrOfLinks);
         std::vector<Eigen::ArrayXi> vertexSets;
         std::vector<Eigen::ArrayXi> springSets;
-        std::tie(vertexSets, springSets) = forceBalancer2.getHeuristicallyIndependentCoordinateSets(&net);
+        std::tie(vertexSets, springSets) =
+          forceBalancer2.getHeuristicallyIndependentCoordinateSets(&net);
 
         SECTION(
           "HeuristicallyIndependent coordiante sets are unique and complete")

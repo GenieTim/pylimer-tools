@@ -65,6 +65,7 @@ namespace calc {
       std::map<size_t, std::vector<size_t>> localToGlobalSpringIndex;
       // map the "local", partial, spring indices to the full-length springs
       std::unordered_map<size_t, size_t> partialToFullSpringIndex;
+      std::unordered_map<size_t, size_t> oldAtomIdToSpringIndex;
 
       ArrayXb linkIsSliplink;
       Eigen::ArrayXi springPartCoordinateIndexA;

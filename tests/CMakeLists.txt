@@ -69,6 +69,8 @@ add_library(test_sources
 add_dependencies(test_sources pylimer_tools)
 include_directories(${igraph_INCLUDE_DIRS})
 include_directories(${nlopt_INCLUDE_DIRS})
+include_directories(${EIGEN3_INCLUDE_DIRS})
+include_directories(${EIGEN3_INCLUDE_DIRS}/eigen3)
 message("Found igraph for tests. Including ${igraph_INCLUDE_DIRS}, linking to ${igraph_LIBRARIES}")
 
 target_link_libraries(test_sources 
@@ -93,15 +95,27 @@ target_link_libraries(pylimer_tests
 	${nlopt_LIBRARIES}
 )
 
+add_library(header_test_sources
+	OBJECT
+		pylimer_tools/test_calc.cpp
+)
+target_link_libraries(header_test_sources PUBLIC 
+	Catch2::Catch2
+	${EIGEN3_LIBRARIES}
+)
+
 # separate the header tests out, for the coverage generation
 add_executable(header_tests pylimer_tools/test_headers.cpp)
 
 add_dependencies(header_tests igraphLib)
+add_dependencies(header_tests header_test_sources)
 
 target_link_libraries(header_tests 
 	PRIVATE 
 	Catch2::Catch2WithMain
+	header_test_sources
 	${igraph_LIBRARIES}
+	${EIGEN3_LIBRARIES}
 )
 
 if (LEAK_ANALYSIS)

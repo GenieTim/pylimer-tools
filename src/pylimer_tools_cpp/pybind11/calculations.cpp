@@ -482,7 +482,6 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("maxNrOfSteps") = 250000,
          py::arg("xTolerance") = 1e-12,
          py::arg("innerMaxNrOfSteps") = 100,
-         py::arg("innerXTolerance") = 1e-12,
          py::arg("innerAlphaTolerance") = 1e-9)
     .def("inspectLinkDisplacementToMeanPositionUpdate",
          &mehp::MEHPForceBalance::inspectLinkDisplacementToMeanPositionUpdate,
@@ -497,6 +496,15 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceBalance::inspectSpringPartitionUpdate,
          R"pbdoc()pbdoc",
          py::arg("linkIdx"))
+    .def("inspectParametrisationOptimsationForLink",
+         &mehp::MEHPForceBalance::inspectParametrisationOptimsationForLink,
+         R"pbdoc()pbdoc",
+         py::arg("linkIdx"),
+         py::arg("displacements"),
+         py::arg("springPartitions"),
+         py::arg("maxNrOfSteps") = 100,
+         py::arg("xtol") = 1e-9,
+         py::arg("alpha_tol") = 1e-8)
     .def("getSpringpartitionIndicesOfSliplink",
          &mehp::MEHPForceBalance::getSpringpartitionIndicesOfSliplink,
          R"pbdoc()pbdoc",
@@ -577,6 +585,11 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceBalance::getSpringPartitions,
          R"pbdoc(
           Get the current spring partitions.
+     )pbdoc")
+    .def("getDisplacements",
+         &mehp::MEHPForceBalance::getCurrentDisplacements,
+         R"pbdoc(
+          Get the current link displacements.
      )pbdoc")
     .def("getIdsOfActiveNodes",
          &mehp::MEHPForceBalance::getIdsOfActiveNodes,
