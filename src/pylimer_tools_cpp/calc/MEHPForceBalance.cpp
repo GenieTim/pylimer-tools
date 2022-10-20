@@ -56,8 +56,11 @@ namespace calc {
       size_t totalInnerIterationsDone = 0;
       Eigen::VectorXd springPartitions = this->currentSpringPartitionsVec;
       std::vector<Eigen::ArrayXi> independentVertexSets;
+      // default = all
+      std::vector<Eigen::ArrayXi> independentVertexsSpringSets;
       if (mode == BalanceRunMode::EIGEN_HEURISTIC) {
-        independentVertexSets = getHeuristicallyIndependentCoordinateSets(&net);
+        std::tie(independentVertexSets, independentVertexsSpringSets) =
+          getHeuristicallyIndependentCoordinateSets(&net);
       } else if (mode == BalanceRunMode::EIGEN_RANDOM) {
         independentVertexSets = this->getRandomCoordinateSets(&net);
       } else if (mode == BalanceRunMode::EIGEN_STRANDS) {
@@ -87,11 +90,26 @@ namespace calc {
         } else {
           Eigen::VectorXd oneOverSpringPartitions =
             this->assembleOneOverSpringPartition(&net, springPartitions);
-          for (Eigen::ArrayXi vertexSet : independentVertexSets) {
-            maxDistanceMoved =
-              std::max(maxDistanceMoved,
-                       this->displaceLinksToMeanPosition(
-                         &net, u, oneOverSpringPartitions, vertexSet, damping));
+          for (size_t i = 0; i < independentVertexSets.size(); ++i) {
+            Eigen::ArrayXi vertexSet = independentVertexSets[i];
+            if (independentVertexsSpringSets.size() ==
+                independentVertexSets.size()) {
+              Eigen::ArrayXi independentVertexsSpringSet =
+                independentVertexsSpringSets[i];
+              maxDistanceMoved = std::max(
+                maxDistanceMoved,
+                this->displaceLinksToMeanPosition(&net,
+                                                  u,
+                                                  oneOverSpringPartitions,
+                                                  independentVertexsSpringSet,
+                                                  vertexSet,
+                                                  damping));
+            } else {
+              maxDistanceMoved = std::max(
+                maxDistanceMoved,
+                this->displaceLinksToMeanPosition(
+                  &net, u, oneOverSpringPartitions, vertexSet, damping));
+            }
           }
         }
         // then, place slip-link
@@ -187,13 +205,14 @@ namespace calc {
      * @param net
      * @return std::vector<Eigen::ArrayXi>
      */
-    std::vector<Eigen::ArrayXi>
+    std::pair<std::vector<Eigen::ArrayXi>, std::vector<Eigen::ArrayXi>>
     MEHPForceBalance::getHeuristicallyIndependentCoordinateSets(
       ForceBalanceNetwork* net) const
     {
       // std::vector<Eigen::ArrayXi> results = { net->springCoordinateIndexA,
       //                                         net->springCoordinateIndexB };
-      std::vector<Eigen::ArrayXi> results;
+      std::vector<Eigen::ArrayXi> resultingCoordinateIndexMask;
+      std::vector<Eigen::ArrayXi> involvedSpringPartCoordinateIndexMask;
       // global block list: block all indices that are added to a result already
       ArrayXb globalBlocked = ArrayXb::Constant(net->nrOfLinks, false);
       size_t remainingLinks = net->nrOfLinks;
@@ -201,6 +220,7 @@ namespace calc {
       while (remainingLinks > 0) {
         ArrayXb localBlocked = globalBlocked;
         std::vector<size_t> localIndexList;
+        std::vector<size_t> localSpringIndexList;
 
         size_t localStartingIndex = globalStartingIdx;
         while (localStartingIndex < net->nrOfLinks) {
@@ -219,6 +239,7 @@ namespace calc {
           std::vector<size_t> connections =
             net->springIndicesOfLinks[localStartingIndex];
           for (size_t springIdx : connections) {
+            localSpringIndexList.push_back(springIdx);
             std::vector<size_t> springPartners =
               net->linkIndicesOfSprings[springIdx];
             for (size_t i = 0; i < springPartners.size(); i++) {
@@ -248,9 +269,18 @@ namespace calc {
           localRes.segment(3 * i, 3) << 3 * localIndexList[i],
             3 * localIndexList[i] + 1, 3 * localIndexList[i] + 2;
         }
-        results.push_back(localRes);
+        resultingCoordinateIndexMask.push_back(localRes);
+        Eigen::ArrayXi localSpringRes =
+          Eigen::ArrayXi::Zero(3 * localSpringIndexList.size());
+        for (int i = 0; i < localSpringIndexList.size(); i++) {
+          localSpringRes.segment(3 * i, 3) << 3 * localSpringIndexList[i],
+            3 * localSpringIndexList[i] + 1, 3 * localSpringIndexList[i] + 2;
+        }
+        involvedSpringPartCoordinateIndexMask.push_back(localSpringRes);
       }
-      return results;
+
+      return std::make_pair(resultingCoordinateIndexMask,
+                            involvedSpringPartCoordinateIndexMask);
     }
 
     /**
@@ -442,14 +472,13 @@ namespace calc {
             }
             // add to displacement
             double contourLengthFraction = springPartitions[globalSpringIndex];
-            std::cout << "Contribution from " << springsPartners[partner_idx]
-                      << " to " << springsPartners[partner_idx + 1]
-                      << " with l = " << contourLengthFraction << " and N = "
-                      <<
-                      net->springsContourLength[springIndices[spring_index]]
-                      << ", partial distance " << partialDistance[0] << ", "
-                      << partialDistance[1] << ", " << partialDistance[2]
-                      << std::endl;
+            // std::cout << "Contribution from " << springsPartners[partner_idx]
+            //           << " to " << springsPartners[partner_idx + 1]
+            //           << " with l = " << contourLengthFraction << " and N = "
+            //           << net->springsContourLength[springIndices[spring_index]]
+            //           << ", partial distance " << partialDistance[0] << ", "
+            //           << partialDistance[1] << ", " << partialDistance[2]
+            //           << std::endl;
             if (contourLengthFraction > 1e-9) {
               double oneOverContourLengthFraction =
                 1.0 / (net->springsContourLength[springIndices[spring_index]] *
@@ -668,12 +697,12 @@ namespace calc {
       // actually start adding them
       this->initialConfig.nrOfLinks += additionalLen;
       // but first, indicate the resize
-      this->initialConfig.coordinates.conservativeResize(
-        3 * this->initialConfig.nrOfLinks);
       this->initialConfig.springIndicesOfLinks.reserve(
         this->initialConfig.nrOfLinks);
       this->initialConfig.linkIsSliplink.conservativeResize(
         this->initialConfig.nrOfLinks);
+      this->initialConfig.coordinates.conservativeResize(
+        3 * this->initialConfig.nrOfLinks);
       this->initialConfig.springPartCoordinateIndexA.conservativeResize(
         3 * (currentNrOfPartialSprings + 2 * additionalLen));
       this->initialConfig.springPartCoordinateIndexB.conservativeResize(
@@ -697,7 +726,9 @@ namespace calc {
           z[i];
         this->initialConfig.linkIsSliplink[currentNrOfLinks + i] = true;
         std::vector<size_t> springIndices{ strandIdx1[i], strandIdx2[i] };
-        std::vector<size_t> springIndicesOfLink = strandIdx1[i] == strandIdx2[i] ? std::vector<size_t>{ strandIdx1[i] } : springIndices;
+        std::vector<size_t> springIndicesOfLink =
+          strandIdx1[i] == strandIdx2[i] ? std::vector<size_t>{ strandIdx1[i] }
+                                         : springIndices;
         this->initialConfig.springIndicesOfLinks.push_back(springIndicesOfLink);
         // add to the springs
         int springIndexIndex = 0;

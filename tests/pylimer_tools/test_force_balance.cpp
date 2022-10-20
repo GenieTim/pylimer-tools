@@ -11,6 +11,7 @@
 #include <filesystem>
 #include <iostream>
 #include <map>
+#include <random>
 #include <vector>
 
 namespace pe = pylimer_tools::entities;
@@ -45,19 +46,41 @@ outputNetwork(pcm::ForceBalanceNetwork net,
 
 TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
 {
-  Eigen::VectorXd testVec = Eigen::VectorXd::Zero(10);
-  Eigen::ArrayXi testIdx = Eigen::ArrayXi::Zero(5);
-  testIdx << 0, 0, 5, 5, 1;
-  testVec(testIdx) += Eigen::VectorXd::Ones(5);
-  REQUIRE(testVec[5] == Catch::Approx(2.));
-  REQUIRE(testVec[0] == Catch::Approx(2.));
-  REQUIRE(testVec[1] == Catch::Approx(1.));
-  REQUIRE(testVec[2] == 0.0);
+  SECTION("Summation works with same indices")
+  {
+    Eigen::VectorXd testVec = Eigen::VectorXd::Zero(10);
+    Eigen::ArrayXi testIdx = Eigen::ArrayXi::Zero(5);
+    testIdx << 0, 0, 5, 5, 1;
+    testVec(testIdx) += Eigen::VectorXd::Ones(5);
+    REQUIRE(testVec[5] == Catch::Approx(2.));
+    REQUIRE(testVec[0] == Catch::Approx(2.));
+    REQUIRE(testVec[1] == Catch::Approx(1.));
+    REQUIRE(testVec[2] == 0.0);
+  }
+
+  SECTION("Casting bool to double results in 1.0/0.0")
+  {
+    auto gen = std::bind(std::uniform_int_distribution<>(0, 1),
+                         std::default_random_engine());
+    Eigen::Array<bool, 1, 100> boolArray;
+    for (int i = 0; i < 100; i++) {
+      bool b = gen();
+      boolArray[i] = b;
+    }
+    Eigen::ArrayXd castedBoolArray = boolArray.cast<double>();
+    for (int i = 0; i < 100; i++) {
+      if (boolArray[i]) {
+        CHECK(castedBoolArray[i] == 1.0);
+      } else {
+        CHECK(castedBoolArray[i] + 1e-5 == 1e-5);
+      }
+    }
+  }
 }
 
 TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
 {
-  return;
+  // return;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -132,27 +155,27 @@ TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
     //         return forceBalancer3.getNrOfIterations();
     //       });
     //     };
-    // BENCHMARK_ADVANCED("MEHP Balance Heuristic 1.0 " + largeInputFile)
-    // (Catch::Benchmark::Chronometer meter)
-    // {
-    //   pcm::MEHPForceBalance forceBalancer3 =
-    //     pcm::MEHPForceBalance(universe2, 2);
-    //   meter.measure([&forceBalancer3] {
-    //     forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::EIGEN_HEURISTIC,
-    //                                       1.0);
-    //     return forceBalancer3.getNrOfIterations();
-    //   });
-    // };
-    // BENCHMARK_ADVANCED("MEHP Balance Iterative 1.0 " + largeInputFile)
-    // (Catch::Benchmark::Chronometer meter)
-    // {
-    //   pcm::MEHPForceBalance forceBalancer3 =
-    //     pcm::MEHPForceBalance(universe2, 2);
-    //   meter.measure([&forceBalancer3] {
-    //     forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::ITERATIVE, 1.0);
-    //     return forceBalancer3.getNrOfIterations();
-    //   });
-    // };
+    BENCHMARK_ADVANCED("MEHP Balance Heuristic 1.0 " + largeInputFile)
+    (Catch::Benchmark::Chronometer meter)
+    {
+      pcm::MEHPForceBalance forceBalancer3 =
+        pcm::MEHPForceBalance(universe2, 2);
+      meter.measure([&forceBalancer3] {
+        forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::EIGEN_HEURISTIC,
+                                          1.0);
+        return forceBalancer3.getNrOfIterations();
+      });
+    };
+    BENCHMARK_ADVANCED("MEHP Balance Iterative 1.0 " + largeInputFile)
+    (Catch::Benchmark::Chronometer meter)
+    {
+      pcm::MEHPForceBalance forceBalancer3 =
+        pcm::MEHPForceBalance(universe2, 2);
+      meter.measure([&forceBalancer3] {
+        forceBalancer3.runForceRelaxation(pcm::BalanceRunMode::ITERATIVE, 1.0);
+        return forceBalancer3.getNrOfIterations();
+      });
+    };
   }
 }
 
@@ -312,8 +335,9 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         CHECK((oneOverSpringPartitions.array() < net.L[0]).all());
         Eigen::VectorXd displacements0 =
           Eigen::VectorXd::Zero(3 * net.nrOfLinks);
-        std::vector<Eigen::ArrayXi> vertexSets =
-          forceBalancer2.getHeuristicallyIndependentCoordinateSets(&net);
+        std::vector<Eigen::ArrayXi> vertexSets;
+        std::vector<Eigen::ArrayXi> springSets;
+        std::tie(vertexSets, springSets) = forceBalancer2.getHeuristicallyIndependentCoordinateSets(&net);
 
         SECTION(
           "HeuristicallyIndependent coordiante sets are unique and complete")

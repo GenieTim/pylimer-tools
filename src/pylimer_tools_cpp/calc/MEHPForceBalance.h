@@ -101,8 +101,8 @@ namespace calc {
       std::vector<Eigen::ArrayXi> getIndependentCoordinateSets(
         ForceBalanceNetwork* net) const;
 
-      std::vector<Eigen::ArrayXi> getHeuristicallyIndependentCoordinateSets(
-        ForceBalanceNetwork* net) const;
+      std::pair<std::vector<Eigen::ArrayXi>, std::vector<Eigen::ArrayXi>>
+      getHeuristicallyIndependentCoordinateSets(ForceBalanceNetwork* net) const;
 
       std::vector<Eigen::ArrayXi> getRandomCoordinateSets(
         ForceBalanceNetwork* net) const;
@@ -310,7 +310,8 @@ namespace calc {
         const Eigen::ArrayXi& linkCoordinateIndices)
       {
         std::vector<size_t> springPartCoordinateIndices;
-        springPartCoordinateIndices.reserve((linkCoordinateIndices.size()) * 4); // ca.
+        springPartCoordinateIndices.reserve((linkCoordinateIndices.size()) *
+                                            4); // ca.
         for (size_t i = 0; i < linkCoordinateIndices.size(); ++i) {
           for (size_t j = 0; j < this->initialConfig.nrOfPartialSprings; ++j) {
             if (this->initialConfig.springPartCoordinateIndexA[j] ==
@@ -428,6 +429,10 @@ namespace calc {
         Eigen::VectorXd oneOverSpringPartitions =
           Eigen::VectorXd(3 * net->nrOfPartialSprings);
 
+        Eigen::ArrayXd primaryLoopCorrectionMultiplier =
+          (net->springPartIndexA != net->springPartIndexB)
+            .cast<double>(); // 0.0 for equal = primary loop, 1.0 otherwise
+
         for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
           double valueToSet =
             springPartitions0[i] > 1e-9
@@ -436,8 +441,8 @@ namespace calc {
                    net->springsContourLength[net->partialToFullSpringIndex.at(
                      i)])
               : 1e9;
-          oneOverSpringPartitions.segment(3 * i, 3) =
-            Eigen::Vector3d::Constant(valueToSet);
+          oneOverSpringPartitions.segment(3 * i, 3) = Eigen::Vector3d::Constant(
+            valueToSet * primaryLoopCorrectionMultiplier[i]);
         }
 
         return oneOverSpringPartitions;
@@ -469,9 +474,37 @@ namespace calc {
       double displaceLinksToMeanPosition(
         const ForceBalanceNetwork* net,
         Eigen::VectorXd& u,
-        Eigen::VectorXd& oneOverSpringPartitions,
-        Eigen::ArrayXi mask,
-        double damping = 0.5) const
+        const Eigen::VectorXd& oneOverSpringPartitions,
+        const Eigen::ArrayXi& resultingCoordinateIndexMask,
+        const double damping = 0.5) const
+      {
+        Eigen::ArrayXi involvedSpringPartCoordinateIndexMask =
+          Eigen::ArrayXi::LinSpaced(
+            3 * net->nrOfPartialSprings, 0, 3 * net->nrOfPartialSprings - 1);
+        return this->displaceLinksToMeanPosition(
+          net,
+          u,
+          oneOverSpringPartitions,
+          involvedSpringPartCoordinateIndexMask,
+          resultingCoordinateIndexMask,
+          damping);
+      }
+
+      /**
+       * @brief Displace one link to the mean of all connected neighbours
+       *
+       * @param net the force balance network
+       * @param u the current displacements, wherein the resulting coordinates
+       * shall be stored
+       * @return double, the distance (squared norm) displaced
+       */
+      double displaceLinksToMeanPosition(
+        const ForceBalanceNetwork* net,
+        Eigen::VectorXd& u,
+        const Eigen::VectorXd& oneOverSpringPartitions,
+        const Eigen::ArrayXi& involvedSpringPartCoordinateIndexMask,
+        const Eigen::ArrayXi& resultingCoordinateIndexMask,
+        const double damping = 0.5) const
       {
         INVALIDARG_EXP_IFN(
           u.size() == net->coordinates.size(),
@@ -480,56 +513,85 @@ namespace calc {
                              net->springPartCoordinateIndexB.size(),
                            "Spring partitions must have the size of the nr of "
                            "spring coordinates");
-        INVALIDARG_EXP_IFN(mask.size() % 3 == 0,
+        INVALIDARG_EXP_IFN(resultingCoordinateIndexMask.size() % 3 == 0,
+                           "Mask is expected to mask the coordinates");
+        INVALIDARG_EXP_IFN(involvedSpringPartCoordinateIndexMask.size() % 3 ==
+                             0,
                            "Mask is expected to mask the coordinates");
 
-        Eigen::VectorXd displacedCoords = net->coordinates + u;
-        Eigen::VectorXd allPartialDistancesA =
-          (displacedCoords(net->springPartCoordinateIndexB) -
-           displacedCoords(net->springPartCoordinateIndexA));
-        this->handlePBC(net, allPartialDistancesA);
-        Eigen::VectorXd allPartialDistancesB = -allPartialDistancesA;
-        // Eigen::VectorXd allPartialDistancesB =
-        //   (displacedCoords(net->springPartCoordinateIndexA) -
-        //    displacedCoords(net->springPartCoordinateIndexB));
-        // this->handlePBC(net, allPartialDistancesB);
+        Eigen::ArrayXi relevantSpringPartCoordinateIndexA =
+          net->springPartCoordinateIndexA(
+            involvedSpringPartCoordinateIndexMask);
+        Eigen::ArrayXi relevantSpringPartCoordinateIndexB =
+          net->springPartCoordinateIndexB(
+            involvedSpringPartCoordinateIndexMask);
 
-        Eigen::ArrayXd oneOverSumOfSpringPartials =
-          Eigen::ArrayXd::Zero(3 * net->nrOfLinks);
-        oneOverSumOfSpringPartials(net->springPartCoordinateIndexA) +=
-          oneOverSpringPartitions.array();
-        oneOverSumOfSpringPartials(net->springPartCoordinateIndexB) +=
-          oneOverSpringPartitions.array();
+        // assert(relevantSpringPartCoordinateIndexB.size() ==
+        //        relevantSpringPartCoordinateIndexA.size());
+        // assert(relevantSpringPartCoordinateIndexA.size() ==
+        //        involvedSpringPartCoordinateIndexMask.size());
+        // assert(resultingCoordinateIndexMask.maxCoeff() <
+        //        net->coordinates.size());
+        // assert(involvedSpringPartCoordinateIndexMask.maxCoeff() <
+        //        net->springCoordinateIndexA.size());
+
+        // TODO: we could save some time and space by directly adjusting the
+        // coordinates
+        Eigen::VectorXd displacedCoords = net->coordinates + u;
+        Eigen::VectorXd relevantPartialDistancesA =
+          (displacedCoords(relevantSpringPartCoordinateIndexB) -
+           displacedCoords(relevantSpringPartCoordinateIndexA));
+        this->handlePBC(net, relevantPartialDistancesA);
+        Eigen::VectorXd relevantPartialDistancesB = -relevantPartialDistancesA;
+
+        Eigen::ArrayXd oneOverSumOfSpringPartials = Eigen::ArrayXd::Zero(
+          3 * net->nrOfLinks); // 0.0 for equal = primary loop, 1.0 otherwise
+        oneOverSumOfSpringPartials(relevantSpringPartCoordinateIndexA) +=
+          oneOverSpringPartitions(involvedSpringPartCoordinateIndexMask).array();
+        oneOverSumOfSpringPartials(relevantSpringPartCoordinateIndexB) +=
+          oneOverSpringPartitions(involvedSpringPartCoordinateIndexMask).array();
+        // oneOverSumOfSpringPartials(net->springPartCoordinateIndexA) +=
+        //   oneOverSpringPartitions.array();
+        // oneOverSumOfSpringPartials(net->springPartCoordinateIndexB) +=
+        //   oneOverSpringPartitions.array();
         // prevent NaN values by dividing by zero afterwards
         oneOverSumOfSpringPartials = (oneOverSumOfSpringPartials <= 1e-12)
                                        .select(1.0, oneOverSumOfSpringPartials);
 
         Eigen::VectorXd objectiveDisplacements =
           Eigen::VectorXd::Zero(3 * net->nrOfLinks);
-        objectiveDisplacements(net->springPartCoordinateIndexA) +=
-          (allPartialDistancesA.array() * oneOverSpringPartitions.array())
+        objectiveDisplacements(relevantSpringPartCoordinateIndexA) +=
+          (relevantPartialDistancesA.array() *
+           oneOverSpringPartitions(involvedSpringPartCoordinateIndexMask)
+             .array())
             .matrix();
-        objectiveDisplacements(net->springPartCoordinateIndexB) +=
-          (allPartialDistancesB.array() * oneOverSpringPartitions.array())
+        objectiveDisplacements(relevantSpringPartCoordinateIndexB) +=
+          (relevantPartialDistancesB.array() *
+           oneOverSpringPartitions(involvedSpringPartCoordinateIndexMask)
+             .array())
             .matrix();
-        objectiveDisplacements =
-          (objectiveDisplacements.array() / oneOverSumOfSpringPartials)
+        // ...and take the average
+        objectiveDisplacements(resultingCoordinateIndexMask) =
+          (objectiveDisplacements(resultingCoordinateIndexMask).array() / oneOverSumOfSpringPartials(resultingCoordinateIndexMask))
             .matrix();
 
+        // reset for 2D systems
         if (this->is2D) {
           objectiveDisplacements(Eigen::seq(2, net->nrOfLinks, 3)) =
             Eigen::VectorXd::Zero(net->nrOfLinks);
         }
 
+        // find the actual displacement we did
         double maxDiff = 0;
-        for (int i = 0; i < mask.size() / 3; i++) {
-          maxDiff = std::max(
-            maxDiff,
-            objectiveDisplacements(mask).segment(3 * i, 3).squaredNorm());
+        Eigen::VectorXd objectivesToSet =
+          objectiveDisplacements(resultingCoordinateIndexMask);
+        for (int i = 0; i < resultingCoordinateIndexMask.size() / 3; i++) {
+          maxDiff =
+            std::max(maxDiff, objectivesToSet.segment(3 * i, 3).squaredNorm());
         }
         // double maxDiff =
         // (objectiveDisplacements(mask)).cwiseAbs2().maxCoeff();
-        u(mask) += damping * objectiveDisplacements(mask);
+        u(resultingCoordinateIndexMask) += damping * objectivesToSet;
 
         return maxDiff;
       };
