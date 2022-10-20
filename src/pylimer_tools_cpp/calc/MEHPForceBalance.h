@@ -74,8 +74,42 @@ namespace calc {
                               long int maxNrOfSteps = 50000, // default: 10000
                               double xtol = 1e-9,
                               long int innerMaxNrOfSteps = 100,
-                              double innerXtol = 1e-9,
                               double innerAlphaTol = 1e-8);
+
+      std::
+        tuple<Eigen::VectorXd, Eigen::VectorXd, size_t, double, double, double>
+        inspectParametrisationOptimsationForLink(
+          size_t link_idx,
+          Eigen::VectorXd& displacements,
+          Eigen::VectorXd& springPartitions,
+          long int innerMaxNrOfSteps = 100,
+          double innerXtol = 1e-9,
+          double innerAlphaTol = 1e-8)
+      {
+        size_t innerIterationsDone = 0;
+        double displacementDone = 0.0;
+        double rOverr0 = 0.0;
+        double r2 = 0.0;
+        double r02 = 0.0;
+        do {
+          r2 = this->updateSpringPartition(
+            &this->initialConfig, displacements, springPartitions, link_idx);
+          if (innerIterationsDone == 0) {
+            r02 = r2;
+          }
+          rOverr0 = r2 / r02;
+          displacementDone = this->displaceToMeanPosition(
+            &this->initialConfig, displacements, springPartitions, link_idx);
+          innerIterationsDone += 1;
+        } while (innerIterationsDone < innerMaxNrOfSteps && r2 > 0.0 &&
+                 rOverr0 > innerAlphaTol && std::isfinite(rOverr0));
+        return std::make_tuple(displacements,
+                               springPartitions,
+                               innerIterationsDone,
+                               displacementDone,
+                               rOverr0,
+                               r02);
+      }
 
       /**
        * @brief Get the universe consisting of cross-linkers only
@@ -97,6 +131,11 @@ namespace calc {
       int getNrOfLinks() const { return this->initialConfig.nrOfLinks; }
 
       int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
+
+      Eigen::VectorXd getCurrentDisplacements() const
+      {
+        return this->currentDisplacements;
+      }
 
       std::vector<Eigen::ArrayXi> getIndependentCoordinateSets(
         ForceBalanceNetwork* net) const;
@@ -242,10 +281,9 @@ namespace calc {
        * @param u the displacements on top of the network
        * @return Eigen::VectorXd
        */
-      static Eigen::VectorXd evaluateSpringDistances(
-        const ForceBalanceNetwork* net,
-        const Eigen::VectorXd& u,
-        const bool is2D);
+      Eigen::VectorXd evaluateSpringDistances(const ForceBalanceNetwork* net,
+                                              const Eigen::VectorXd& u,
+                                              const bool is2D) const;
 
       /**
        * @brief Compute one spring length
@@ -256,12 +294,11 @@ namespace calc {
        * @param is2D
        * @return Eigen::Vector3d
        */
-      static Eigen::Vector3d evaluateDistanceBetween(
-        const ForceBalanceNetwork* net,
-        const Eigen::VectorXd& u,
-        const size_t linkIndexA,
-        const size_t linkIndexB,
-        const bool is2D);
+      Eigen::Vector3d evaluateDistanceBetween(const ForceBalanceNetwork* net,
+                                              const Eigen::VectorXd& u,
+                                              const size_t linkIndexA,
+                                              const size_t linkIndexB,
+                                              const bool is2D) const;
 
       bool validateNetwork()
       {
@@ -542,37 +579,36 @@ namespace calc {
           (displacedCoords(relevantSpringPartCoordinateIndexB) -
            displacedCoords(relevantSpringPartCoordinateIndexA));
         this->handlePBC(net, relevantPartialDistancesA);
-        Eigen::VectorXd relevantPartialDistancesB = -relevantPartialDistancesA;
 
+        // NOTE: we have many zeros too much, here, actually.
         Eigen::ArrayXd oneOverSumOfSpringPartials = Eigen::ArrayXd::Zero(
           3 * net->nrOfLinks); // 0.0 for equal = primary loop, 1.0 otherwise
         oneOverSumOfSpringPartials(relevantSpringPartCoordinateIndexA) +=
-          oneOverSpringPartitions(involvedSpringPartCoordinateIndexMask).array();
+          oneOverSpringPartitions(involvedSpringPartCoordinateIndexMask)
+            .array();
         oneOverSumOfSpringPartials(relevantSpringPartCoordinateIndexB) +=
-          oneOverSpringPartitions(involvedSpringPartCoordinateIndexMask).array();
-        // oneOverSumOfSpringPartials(net->springPartCoordinateIndexA) +=
-        //   oneOverSpringPartitions.array();
-        // oneOverSumOfSpringPartials(net->springPartCoordinateIndexB) +=
-        //   oneOverSpringPartitions.array();
-        // prevent NaN values by dividing by zero afterwards
+          oneOverSpringPartitions(involvedSpringPartCoordinateIndexMask)
+            .array();
+        // prevent NaN values from dividing by zero afterwards
         oneOverSumOfSpringPartials = (oneOverSumOfSpringPartials <= 1e-12)
                                        .select(1.0, oneOverSumOfSpringPartials);
 
-        Eigen::VectorXd objectiveDisplacements =
-          Eigen::VectorXd::Zero(3 * net->nrOfLinks);
-        objectiveDisplacements(relevantSpringPartCoordinateIndexA) +=
+        Eigen::VectorXd partialDistancesOverSpringPartitions =
           (relevantPartialDistancesA.array() *
            oneOverSpringPartitions(involvedSpringPartCoordinateIndexMask)
              .array())
             .matrix();
-        objectiveDisplacements(relevantSpringPartCoordinateIndexB) +=
-          (relevantPartialDistancesB.array() *
-           oneOverSpringPartitions(involvedSpringPartCoordinateIndexMask)
-             .array())
-            .matrix();
+        // NOTE: we have many zeros too much, here, actually.
+        Eigen::VectorXd objectiveDisplacements =
+          Eigen::VectorXd::Zero(3 * net->nrOfLinks);
+        objectiveDisplacements(relevantSpringPartCoordinateIndexA) +=
+          partialDistancesOverSpringPartitions;
+        objectiveDisplacements(relevantSpringPartCoordinateIndexB) -=
+          partialDistancesOverSpringPartitions;
         // ...and take the average
         objectiveDisplacements(resultingCoordinateIndexMask) =
-          (objectiveDisplacements(resultingCoordinateIndexMask).array() / oneOverSumOfSpringPartials(resultingCoordinateIndexMask))
+          (objectiveDisplacements(resultingCoordinateIndexMask).array() /
+           oneOverSumOfSpringPartials(resultingCoordinateIndexMask))
             .matrix();
 
         // reset for 2D systems
@@ -581,7 +617,7 @@ namespace calc {
             Eigen::VectorXd::Zero(net->nrOfLinks);
         }
 
-        // find the actual displacement we did
+        // find the actual (max) displacement we did
         double maxDiff = 0;
         Eigen::VectorXd objectivesToSet =
           objectiveDisplacements(resultingCoordinateIndexMask);
@@ -596,8 +632,9 @@ namespace calc {
         return maxDiff;
       };
 
+      template<typename VectorType>
       void handlePBC(const ForceBalanceNetwork* net,
-                     Eigen::VectorXd& distances) const
+                     VectorType& distances) const
       {
         // possibly improveable PBC
         for (size_t j = 0; j < distances.size(); ++j) {
@@ -606,7 +643,7 @@ namespace calc {
           while (distances[j] > net->boxHalfs[j % 3]) {
             distances[j] -= net->L[j % 3];
             iterations++;
-            if (iterations > 10) {
+            if (iterations > 50) {
               throw std::runtime_error(
                 "Too many iterations in PBC at distance index " +
                 std::to_string(j) + ", currently at " +
@@ -619,7 +656,7 @@ namespace calc {
           while (distances[j] < -net->boxHalfs[j % 3]) {
             distances[j] += net->L[j % 3];
             iterations++;
-            if (iterations > 10) {
+            if (iterations > 50) {
               throw std::runtime_error(
                 "Too many iterations in PBC at distance index " +
                 std::to_string(j) + ", currently at " +
@@ -699,6 +736,7 @@ namespace calc {
           Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
         net->springIsActive = ArrayXb::Constant(net->nrOfSprings, false);
         net->springsContourLength = Eigen::VectorXd::Zero(net->nrOfSprings);
+        net->oldAtomIdToSpringIndex.reserve(this->universe.getNrOfAtoms());
 
         // convert beads
         std::map<int, int> atomIdToNode;
@@ -747,6 +785,12 @@ namespace calc {
           }
 
           if (addChain) {
+            std::vector<pylimer_tools::entities::Atom> allChainAtoms =
+              crosslinkerChains[i].getAtoms();
+            for (pylimer_tools::entities::Atom a : allChainAtoms) {
+              net->oldAtomIdToSpringIndex[a.getId()] = spring_idx;
+            }
+
             net->springIndicesOfLinks[nodeIdxFrom].push_back(spring_idx);
             if (nodeIdxFrom != nodeIdxTo) {
               net->springIndicesOfLinks[nodeIdxTo].push_back(spring_idx);

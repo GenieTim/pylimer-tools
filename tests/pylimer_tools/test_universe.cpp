@@ -238,11 +238,17 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                       false,
                       false);
     REQUIRE(universe.getNrOfBonds() == 8);
-    REQUIRE_FALSE(universe.areLoopsEntangled({ {} }, { {} }));
-    REQUIRE_FALSE(universe.areLoopsEntangled({ { 0, 1, 2 } }, { { 5, 7, 6 } }));
-    // TODO: fix
-    CHECK(universe.areLoopsEntangled({ { 0, 1, 2, 3 } }, { { 4, 5, 6, 7 } }));
-    CHECK(universe.areLoopsEntangled({ { 4, 5, 6, 7 } }, { { 0, 1, 2, 3 } }));
+    CHECK(universe.findLoopEntanglements({ {} }, { {} }).size() == 0);
+    CHECK(
+      universe.findLoopEntanglements({ { 1, 2, 7 } }, { { 0, 3, 6 } }).size() ==
+      0);
+    CHECK(
+      universe.findLoopEntanglements({ { 0, 1, 2 } }, { { 5, 7, 6 } }).size() ==
+      2);
+    CHECK(universe.findLoopEntanglements({ { 0, 1, 2, 3 } }, { { 4, 5, 6, 7 } })
+            .size() > 0);
+    CHECK(universe.findLoopEntanglements({ { 4, 5, 6, 7 } }, { { 0, 1, 2, 3 } })
+            .size() > 0);
   }
 
   SECTION("Molecules with crosslinkers are found")

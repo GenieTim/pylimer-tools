@@ -27,17 +27,9 @@ namespace calc {
       long int maxNrOfSteps, // default: 10000
       double xtol,
       long int innerMaxNrOfSteps,
-      double innerXtol,
       double innerAlphaTol)
     {
       this->simulationHasRun = true;
-      double stress[3][3];
-
-      for (size_t j = 0; j < 3; j++) {
-        for (size_t k = 0; k < 3; k++) {
-          stress[j][k] = 0.;
-        }
-      }
 
       ForceBalanceNetwork net = this->initialConfig;
       const int M = this->universe.getMolecules(crosslinkerType).size();
@@ -117,16 +109,21 @@ namespace calc {
              ++link_idx) {
           size_t innerIterationsDone = 0;
           double displacementDone = 0.0;
-          double parametrisationChange = 0.0;
+          double rOverr0 = 0.0;
+          double r2 = 0.0;
+          double r02 = 0.0;
           do {
-            parametrisationChange =
+            r2 =
               this->updateSpringPartition(&net, u, springPartitions, link_idx);
+            if (innerIterationsDone == 0) {
+              r02 = r2;
+            }
+            rOverr0 = r2 / r02;
             displacementDone =
               this->displaceToMeanPosition(&net, u, springPartitions, link_idx);
             innerIterationsDone += 1;
-          } while (displacementDone > innerXtol &&
-                   innerIterationsDone < innerMaxNrOfSteps &&
-                   parametrisationChange > innerAlphaTol);
+          } while (innerIterationsDone < innerMaxNrOfSteps && r2 > 0.0 &&
+                   rOverr0 > innerAlphaTol && std::isfinite(rOverr0));
           totalInnerIterationsDone += innerIterationsDone;
         }
         iterationsDone += 1;
@@ -352,7 +349,7 @@ namespace calc {
       INVALIDARG_EXP_IFN(net->linkIsSliplink[linkIdx],
                          "Only slip-links may slip along a spring");
       std::vector<size_t> springIndices = net->springIndicesOfLinks[linkIdx];
-      double maxDiff = 0.0;
+      double residualNorm = 0.0;
       for (size_t springIndex : springIndices) {
         std::vector<size_t> springsPartners =
           net->linkIndicesOfSprings[springIndex];
@@ -390,14 +387,19 @@ namespace calc {
             double currentS = springPartitions[currentSpringGlobalIdx];
             double nextS = springPartitions[neighbourSpringGlobalIdx];
             double newS = idealValue * (nextS + currentS);
-            maxDiff = std::max(currentS - newS, maxDiff);
+            double complementaryS = (1. - idealValue) * (nextS + currentS);
+            double localResidualNorm =
+              (complementaryS > 1e-9 && newS > 1e-9)
+                ? (distanceForward / (complementaryS * complementaryS) -
+                   distanceBack / (newS * newS))
+                : 0.0;
+            residualNorm += localResidualNorm * localResidualNorm;
             springPartitions[currentSpringGlobalIdx] = newS;
-            springPartitions[neighbourSpringGlobalIdx] =
-              (1. - idealValue) * (nextS + currentS);
+            springPartitions[neighbourSpringGlobalIdx] = complementaryS;
           }
         }
       }
-      return maxDiff;
+      return residualNorm;
     }
 
     /**
@@ -475,7 +477,8 @@ namespace calc {
             // std::cout << "Contribution from " << springsPartners[partner_idx]
             //           << " to " << springsPartners[partner_idx + 1]
             //           << " with l = " << contourLengthFraction << " and N = "
-            //           << net->springsContourLength[springIndices[spring_index]]
+            //           <<
+            //           net->springsContourLength[springIndices[spring_index]]
             //           << ", partial distance " << partialDistance[0] << ", "
             //           << partialDistance[1] << ", " << partialDistance[2]
             //           << std::endl;
@@ -527,7 +530,7 @@ namespace calc {
       const Eigen::VectorXd& u,
       const size_t linkIndexA,
       const size_t linkIndexB,
-      const bool is2D)
+      const bool is2D) const
     {
       Eigen::Vector3d distances = net->coordinates.segment(3 * linkIndexA, 3) +
                                   u.segment(3 * linkIndexA, 3) -
@@ -535,43 +538,7 @@ namespace calc {
                                    u.segment(3 * linkIndexB, 3));
 
       // Possibly improvable PBC
-      for (size_t j = 0; j < 3; ++j) {
-        int iterations = 0;
-        assert(!std::isinf(distances[j]) && !std::isnan(distances[j]));
-        while (distances[j] > net->boxHalfs[j % 3]) {
-          distances[j] -= net->L[j % 3];
-          iterations++;
-          if (iterations > 10) {
-            throw std::runtime_error(
-              "Too many iterations in PBC from " + std::to_string(linkIndexA) +
-              " to " + std::to_string(linkIndexB) + ", currently at " +
-              std::to_string(distances[j]) + " of " +
-              std::to_string(net->boxHalfs[j % 3]) + " after " +
-              std::to_string(iterations) + " iterations. Coordinates: " +
-              std::to_string(net->coordinates[3 * linkIndexA + j]) + ", " +
-              std::to_string(net->coordinates[3 * linkIndexB + j]) +
-              " and displacements:" + std::to_string(u[3 * linkIndexA + j]) +
-              ", " + std::to_string(u[3 * linkIndexB + j]) + ".");
-          }
-        }
-        iterations = 0;
-        while (distances[j] < -net->boxHalfs[j % 3]) {
-          distances[j] += net->L[j % 3];
-          iterations++;
-          if (iterations > 10) {
-            throw std::runtime_error(
-              "Too many iterations in PBC from " + std::to_string(linkIndexA) +
-              " to " + std::to_string(linkIndexB) + ", currently at " +
-              std::to_string(distances[j]) + " of " +
-              std::to_string(net->boxHalfs[j % 3]) + " after " +
-              std::to_string(iterations) + " iterations. Coordinates: " +
-              std::to_string(net->coordinates[3 * linkIndexA + j]) + ", " +
-              std::to_string(net->coordinates[3 * linkIndexB + j]) +
-              " and displacements:" + std::to_string(u[3 * linkIndexA + j]) +
-              ", " + std::to_string(u[3 * linkIndexB + j]) + ".");
-          }
-        }
-      }
+      this->handlePBC<Eigen::Vector3d>(net, distances);
 
       if (is2D) {
         distances[2] = 0.0;
@@ -583,7 +550,7 @@ namespace calc {
     Eigen::VectorXd MEHPForceBalance::evaluateSpringDistances(
       const ForceBalanceNetwork* net,
       const Eigen::VectorXd& u,
-      const bool is2D)
+      const bool is2D) const
     {
       // first, the distances
       assert(u.size() == net->coordinates.size());
