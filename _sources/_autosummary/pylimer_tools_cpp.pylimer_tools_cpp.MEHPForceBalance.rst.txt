@@ -23,6 +23,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance
       ~MEHPForceBalance.getCrosslinkerVerse
       ~MEHPForceBalance.getDefaultNrOfChains
       ~MEHPForceBalance.getDefaultR0Square
+      ~MEHPForceBalance.getDisplacements
       ~MEHPForceBalance.getEffectiveFunctionalityOfAtoms
       ~MEHPForceBalance.getExitReason
       ~MEHPForceBalance.getGammaFactor
@@ -38,6 +39,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance
       ~MEHPForceBalance.getStressTensor
       ~MEHPForceBalance.inspectDisplacementToMeanPositionUpdate
       ~MEHPForceBalance.inspectLinkDisplacementToMeanPositionUpdate
+      ~MEHPForceBalance.inspectParametrisationOptimsationForLink
       ~MEHPForceBalance.inspectSpringPartitionUpdate
       ~MEHPForceBalance.runForceRelaxation
       ~MEHPForceBalance.validateNetwork
