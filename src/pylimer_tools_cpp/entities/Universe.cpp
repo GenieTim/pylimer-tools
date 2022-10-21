@@ -1532,6 +1532,10 @@ namespace entities {
             this->getAtomByVertexIdx(vertexIndicesLoop2[directionIdx]));
           result.involvedAtoms = involvedAtoms;
           result.intersectionPoint = intersectionPoint;
+          // TODO: check that these are always in the same direction
+          Eigen::Vector3d triangleNormal =
+            (helperNode - vertex0).cross(helperNode - vertex1);
+          result.direction = triangleNormal.dot(rayTarget - rayOrigin);
           results.push_back(result);
         }
       }

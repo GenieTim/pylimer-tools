@@ -19,6 +19,7 @@ namespace entities {
   struct LoopIntersectionInfo {
     std::vector<Atom> involvedAtoms;
     Eigen::Vector3d intersectionPoint;
+    double direction;
   };
 
   class Universe : public AtomGraphParent
