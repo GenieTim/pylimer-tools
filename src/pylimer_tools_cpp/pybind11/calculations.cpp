@@ -503,8 +503,9 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("displacements"),
          py::arg("springPartitions"),
          py::arg("maxNrOfSteps") = 100,
-         py::arg("xtol") = 1e-9,
-         py::arg("alpha_tol") = 1e-8)
+         py::arg("alpha_tol") = 1e-8,
+         py::arg("distanceBackTolerance") = 1e-9,
+         py::arg("residualNormSTolerance") = 1e-20)
     .def("getSpringpartitionIndicesOfSliplink",
          &mehp::MEHPForceBalance::getSpringpartitionIndicesOfSliplink,
          R"pbdoc()pbdoc",

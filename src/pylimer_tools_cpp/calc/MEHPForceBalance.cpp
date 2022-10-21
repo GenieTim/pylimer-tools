@@ -342,7 +342,9 @@ namespace calc {
       const ForceBalanceNetwork* net,
       const Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
-      const size_t linkIdx) const
+      const size_t linkIdx,
+      double distanceBackTolerance,
+      double residualNormSTolerance) const
     {
       INVALIDARG_EXP_IFN(linkIdx < net->springIndicesOfLinks.size(),
                          "Link to update needs to be in the list");
@@ -377,7 +379,7 @@ namespace calc {
             double idealValue =
               1. / (1. + sqrt(distanceForward /
                               distanceBack)); // TODO: above, below?
-            if (distanceBack < 1e-9) {
+            if (distanceBack < distanceBackTolerance) {
               idealValue = 0.0; // TODO: really?
             }
             size_t currentSpringGlobalIdx =
@@ -389,7 +391,8 @@ namespace calc {
             double newS = idealValue * (nextS + currentS);
             double complementaryS = (1. - idealValue) * (nextS + currentS);
             double localResidualNorm =
-              (complementaryS > 1e-9 && newS > 1e-9)
+              (complementaryS > residualNormSTolerance &&
+               newS > residualNormSTolerance)
                 ? (distanceForward / (complementaryS * complementaryS) -
                    distanceBack / (newS * newS))
                 : 0.0;
@@ -666,10 +669,6 @@ namespace calc {
       // but first, indicate the resize
       this->initialConfig.springIndicesOfLinks.reserve(
         this->initialConfig.nrOfLinks);
-      this->initialConfig.linkIsSliplink.conservativeResize(
-        this->initialConfig.nrOfLinks);
-      this->initialConfig.coordinates.conservativeResize(
-        3 * this->initialConfig.nrOfLinks);
       this->initialConfig.springPartCoordinateIndexA.conservativeResize(
         3 * (currentNrOfPartialSprings + 2 * additionalLen));
       this->initialConfig.springPartCoordinateIndexB.conservativeResize(
@@ -681,6 +680,10 @@ namespace calc {
       this->currentSpringPartitionsVec.conservativeResize(
         currentNrOfPartialSprings + 2 * additionalLen);
       this->currentDisplacements.conservativeResize(
+        3 * this->initialConfig.nrOfLinks);
+      this->initialConfig.linkIsSliplink.conservativeResize(
+        this->initialConfig.nrOfLinks);
+      this->initialConfig.coordinates.conservativeResize(
         3 * this->initialConfig.nrOfLinks);
       size_t partialSpringsAdded = 0;
       // then, loop the slip-links to add
