@@ -99,10 +99,21 @@ add_library(header_test_sources
 	OBJECT
 		pylimer_tools/test_calc.cpp
 )
+add_dependencies(header_test_sources pylimer_tools)
 target_link_libraries(header_test_sources PUBLIC 
 	Catch2::Catch2
-	${EIGEN3_LIBRARIES}
 )
+
+# link Eigen libraries. Difficulty due to Windows GitHub Action, somehow.
+if (TARGET Eigen3::Eigen)
+	message(STATUS "Target Eigen3::Eigen found")
+	target_link_libraries(header_test_sources PUBLIC Eigen3::Eigen)
+else()
+	include_directories(${EIGEN3_INCLUDE_DIRS})
+	include_directories(${EIGEN3_INCLUDE_DIRS}/eigen3)
+	target_link_libraries(header_test_sources PUBLIC ${EIGEN3_LIBRARIES})
+	message(STATUS "Eigen include directories: ${EIGEN3_INCLUDE_DIRS}, libraries ${EIGEN3_LIBRARIES}")
+endif()
 
 # separate the header tests out, for the coverage generation
 add_executable(header_tests pylimer_tools/test_headers.cpp)

@@ -83,8 +83,9 @@ namespace calc {
           Eigen::VectorXd& displacements,
           Eigen::VectorXd& springPartitions,
           long int innerMaxNrOfSteps = 100,
-          double innerXtol = 1e-9,
-          double innerAlphaTol = 1e-8)
+          double innerAlphaTol = 1e-8,
+          double distanceBackTolerance = 1e-9,
+          double residualNormSTolerance = 1e-20)
       {
         size_t innerIterationsDone = 0;
         double displacementDone = 0.0;
@@ -92,8 +93,12 @@ namespace calc {
         double r2 = 0.0;
         double r02 = 0.0;
         do {
-          r2 = this->updateSpringPartition(
-            &this->initialConfig, displacements, springPartitions, link_idx);
+          r2 = this->updateSpringPartition(&this->initialConfig,
+                                           displacements,
+                                           springPartitions,
+                                           link_idx,
+                                           distanceBackTolerance,
+                                           residualNormSTolerance);
           if (innerIterationsDone == 0) {
             r02 = r2;
           }
@@ -388,7 +393,9 @@ namespace calc {
         const ForceBalanceNetwork* net,
         const Eigen::VectorXd& u,
         Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
-        const size_t linkIdx) const;
+        const size_t linkIdx,
+        double distanceBackTolerance = 1e-9,
+        double residualNormSTolerance = 1e-20) const;
 
       /**
        * @brief Displace one link to the mean of all connected neighbours
