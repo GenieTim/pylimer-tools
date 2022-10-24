@@ -42,6 +42,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance
       ~MEHPForceBalance.inspectParametrisationOptimsationForLink
       ~MEHPForceBalance.inspectSpringPartitionUpdate
       ~MEHPForceBalance.runForceRelaxation
+      ~MEHPForceBalance.setSpringPartitions
       ~MEHPForceBalance.validateNetwork
    
    
