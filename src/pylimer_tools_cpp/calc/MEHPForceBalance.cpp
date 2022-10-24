@@ -664,6 +664,9 @@ namespace calc {
                                         const std::vector<double> alpha2)
     {
       size_t additionalLen = strandIdx1.size();
+      if (additionalLen == 0) {
+        return;
+      }
       size_t currentNrOfLinks = this->initialConfig.nrOfLinks;
       size_t currentNrOfPartialSprings = this->initialConfig.nrOfPartialSprings;
       if (additionalLen != x.size() || additionalLen != y.size() ||
@@ -680,6 +683,10 @@ namespace calc {
       // but first, indicate the resize
       this->initialConfig.springIndicesOfLinks.reserve(
         this->initialConfig.nrOfLinks);
+      this->currentDisplacements.conservativeResize(
+        3 * this->initialConfig.nrOfLinks);
+      this->currentSpringPartitionsVec.conservativeResize(
+        currentNrOfPartialSprings + 2 * additionalLen);
       this->initialConfig.springPartCoordinateIndexA.conservativeResize(
         3 * (currentNrOfPartialSprings + 2 * additionalLen));
       this->initialConfig.springPartCoordinateIndexB.conservativeResize(
@@ -688,10 +695,6 @@ namespace calc {
         currentNrOfPartialSprings + 2 * additionalLen);
       this->initialConfig.springPartIndexB.conservativeResize(
         currentNrOfPartialSprings + 2 * additionalLen);
-      this->currentSpringPartitionsVec.conservativeResize(
-        currentNrOfPartialSprings + 2 * additionalLen);
-      this->currentDisplacements.conservativeResize(
-        3 * this->initialConfig.nrOfLinks);
       this->initialConfig.linkIsSliplink.conservativeResize(
         this->initialConfig.nrOfLinks);
       this->initialConfig.coordinates.conservativeResize(

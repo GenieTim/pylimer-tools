@@ -133,6 +133,15 @@ else()
 	message("Code Coverage is disabled.")
 endif()
 
+if (LEAK_ANALYSIS)
+	set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
+	set (CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=address")
+	target_link_libraries(pylimer_tools 
+		PRIVATE
+		-fsanitize=address
+	)
+endif()
+
 # add other needed packages
 # target_link_libraries(pylimer_tools 
 # 	PRIVATE
