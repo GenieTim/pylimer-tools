@@ -255,13 +255,13 @@ TEST_CASE("MEHP Force Balance handles slip-links on primary loops",
                     { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 });
   universe.addBonds({ 3, 3, 3, 3, 4, 5, 6, 7, 9, 10, 11, 12 },
                     { 9, 11, 12, 13, 14, 15, 16, 10, 13, 16, 15, 14 });
-  pcm::MEHPForceBalance forceBalancer = pcm::MEHPForceBalance(universe, 2);
-  pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
 
   SECTION("Unentangled primary loop")
   {
+    pcm::MEHPForceBalance forceBalancer = pcm::MEHPForceBalance(universe, 2);
+    pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
     // check unentangled primary loops
-    Eigen::VectorXd displacements = Eigen::VectorXd::Zero(net.nrOfLinks * 3);
+    Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
     Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
     REQUIRE_NOTHROW(
       forceBalancer.displaceToMeanPosition(&net, displacements, partitions, 0));
@@ -272,6 +272,7 @@ TEST_CASE("MEHP Force Balance handles slip-links on primary loops",
 
   SECTION("Entangled primary loop")
   {
+    pcm::MEHPForceBalance forceBalancer = pcm::MEHPForceBalance(universe, 2);
     // entangle primary loop and check again
     // outputNetwork(net, Eigen::VectorXd::Zero(net.nrOfLinks * 3));
     forceBalancer.addSlipLinks({ 0, 2 },
