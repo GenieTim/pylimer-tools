@@ -828,8 +828,8 @@ TEST_CASE("MEHP Force Balance handles slip-links",
             Catch::Approx(0.0 + 1e-2).epsilon(1e-6));                 // 4-1
       CHECK(springPartitions[6] == Catch::Approx(1.0).epsilon(1e-6)); // 4-2
       CHECK(springPartitions[0] == Catch::Approx(1.0).epsilon(1e-6)); // 4-0
-      CHECK(springPartitions[1] + 1e-5 ==
-            Catch::Approx(0.0 + 1e-5).epsilon(1e-6)); // 1-4
+      CHECK(springPartitions[1] + 1e-2 ==
+            Catch::Approx(0.0 + 1e-2).epsilon(1e-6)); // 1-4
       // CHECK(springPartitions[8] == Catch::Approx(1.0).margin(1e-6)); // 5-3
       // CHECK(springPartitions[7] + 1e-5 == Catch::Approx(0.0 +
       // 1e-5).margin(1e-6)); // 5-5 CHECK(springPartitions[3] ==

@@ -111,13 +111,11 @@ namespace calc {
           double displacementDone = 0.0;
           double rOverr0 = 0.0;
           double r2 = 0.0;
-          double r02 = 0.0;
+          double r02 = this->computePartitionUpdateZeroResidual(
+            link_idx, u, springPartitions);
           do {
             r2 =
               this->updateSpringPartition(&net, u, springPartitions, link_idx);
-            if (innerIterationsDone == 0) {
-              r02 = r2;
-            }
             rOverr0 = r2 / r02;
             displacementDone =
               this->displaceToMeanPosition(&net, u, springPartitions, link_idx);
@@ -361,25 +359,26 @@ namespace calc {
             // found position of this link in this spring
             // want to find the ideal value for
             // net->springPartitions[springIndex][partner_idx-1]
-            double distanceBack = ((MEHPForceBalance::evaluateDistanceBetween(
-                                      net,
-                                      u,
-                                      springsPartners[partner_idx],
-                                      springsPartners[partner_idx - 1],
-                                      this->is2D))
-                                     .squaredNorm());
-            double distanceForward =
-              ((MEHPForceBalance::evaluateDistanceBetween(
-                  net,
-                  u,
-                  springsPartners[partner_idx + 1],
-                  springsPartners[partner_idx],
-                  this->is2D))
-                 .squaredNorm());
+            Eigen::Vector3d vecBack =
+              (MEHPForceBalance::evaluateDistanceBetween(
+                net,
+                u,
+                springsPartners[partner_idx],
+                springsPartners[partner_idx - 1],
+                this->is2D));
+            double distanceBack = (vecBack.squaredNorm());
+            Eigen::Vector3d vecForward =
+              (MEHPForceBalance::evaluateDistanceBetween(
+                net,
+                u,
+                springsPartners[partner_idx + 1],
+                springsPartners[partner_idx],
+                this->is2D));
+            double distanceForward = vecForward.squaredNorm();
             double idealValue =
               1. / (1. + sqrt(distanceForward /
                               distanceBack)); // TODO: above, below?
-            if (distanceBack < distanceBackTolerance) {
+            if (distanceBack <= distanceBackTolerance) {
               idealValue = 0.0; // TODO: really?
             }
             size_t currentSpringGlobalIdx =
@@ -396,6 +395,18 @@ namespace calc {
                 ? (distanceForward / (complementaryS * complementaryS) -
                    distanceBack / (newS * newS))
                 : 0.0;
+            // std::cout << "Contribution to " << linkIdx
+            //           << " from global springs " << currentSpringGlobalIdx
+            //           << " (" << springsPartners[partner_idx - 1] << ") "
+            //           << vecBack[0] << ", " << vecBack[1] << ", " << vecBack[2]
+            //           << " and " << neighbourSpringGlobalIdx << " ("
+            //           << springsPartners[partner_idx + 1] << ") "
+            //           << vecForward[0] << ", " << vecForward[1] << ", "
+            //           << vecForward[2] << "; "
+            //           << " with " << currentS << ", " << nextS << std::endl;
+            // std::cout << "Distances are " << distanceForward << ", "
+            //           << distanceBack << " to get ideal value " << idealValue
+            //           << " for " << (nextS) << " , " << currentS << std::endl;
             residualNorm += localResidualNorm * localResidualNorm;
             springPartitions[currentSpringGlobalIdx] = newS;
             springPartitions[neighbourSpringGlobalIdx] = complementaryS;
@@ -736,7 +747,8 @@ namespace calc {
           if (!wasAdded) {
             targetIndexInSpring = springParticipants.size() - 2;
             if (partitionsStrand.size() > 0) {
-              alpha = alpha - cumulativePartition;
+              alpha = alpha - (cumulativePartition -
+                               partitionsStrand[partitionsStrand.size() - 1]);
             }
           }
 
@@ -765,7 +777,8 @@ namespace calc {
                                                                springIndex);
 
           // adjust also the coordinates
-          this->currentDisplacements[newNodeIdx] = 0.0;
+          this->currentDisplacements.segment(3 * newNodeIdx, 3) =
+            Eigen::Vector3d::Zero();
           if (this->initialConfig.springPartIndexA[lastSpringIndex] ==
               springPartner1) {
             this->initialConfig.springPartIndexB[lastSpringIndex] = newNodeIdx;
