@@ -503,9 +503,10 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("displacements"),
          py::arg("springPartitions"),
          py::arg("maxNrOfSteps") = 100,
-         py::arg("alpha_tol") = 1e-8,
+         py::arg("alpha_tol") = 1e-9,
          py::arg("distanceBackTolerance") = 1e-9,
-         py::arg("residualNormSTolerance") = 1e-20)
+         py::arg("residualNormSTolerance") = 1e-20,
+         py::arg("minNrOfSteps") = 1)
     .def("getSpringpartitionIndicesOfSliplink",
          &mehp::MEHPForceBalance::getSpringpartitionIndicesOfSliplink,
          R"pbdoc()pbdoc",
@@ -581,6 +582,11 @@ init_pylimer_bound_calc(py::module_& m)
           Get the number of springs considered in this simulation.
 
           :param tolerance: springs under this length are considered inactive
+     )pbdoc")
+    .def("setSpringPartitions",
+         &mehp::MEHPForceBalance::setSpringPartitions,
+         R"pbdoc(
+          Set the current spring partitions.
      )pbdoc")
     .def("getSpringPartitions",
          &mehp::MEHPForceBalance::getSpringPartitions,

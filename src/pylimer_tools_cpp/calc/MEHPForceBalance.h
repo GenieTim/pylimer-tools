@@ -76,6 +76,58 @@ namespace calc {
                               long int innerMaxNrOfSteps = 100,
                               double innerAlphaTol = 1e-8);
 
+      /**
+       * @brief Compute the spring update residual
+       * 
+       * @param link_idx 
+       * @param displacements 
+       * @param springPartitions 
+       * @param distanceBackTolerance 
+       * @param residualNormSTolerance 
+       * @return double 
+       */
+      double computePartitionUpdateZeroResidual(size_t link_idx,
+                                 Eigen::VectorXd& displacements,
+                                 Eigen::VectorXd& springPartitions,
+                                 double distanceBackTolerance = 1e-15,
+                                 double residualNormSTolerance = 1e-15)
+      {
+        Eigen::VectorXd tempPartitions = springPartitions;
+        Eigen::VectorXd tempDisplacements = displacements;
+        std::vector<size_t> involvedPartitions =
+          this->getSpringpartitionIndicesOfSliplink(link_idx);
+        assert(involvedPartitions.size() == 4);
+        double firstMeanVal = 0.5 * (springPartitions[0] + springPartitions[1]);
+        double secondMeanVal =
+          0.5 * (springPartitions[2] + springPartitions[3]);
+        tempPartitions[0] = firstMeanVal;
+        tempPartitions[1] = firstMeanVal;
+        tempPartitions[2] = secondMeanVal;
+        tempPartitions[3] = secondMeanVal;
+        this->displaceToMeanPosition(
+          &this->initialConfig, tempDisplacements, tempPartitions, link_idx);
+        return this->updateSpringPartition(&this->initialConfig,
+                                           tempDisplacements,
+                                           tempPartitions,
+                                           link_idx,
+                                           distanceBackTolerance,
+                                           residualNormSTolerance);
+      }
+
+      /**
+       * @brief Investigate one parametrisation optimisation
+       *
+       * @param link_idx
+       * @param displacements
+       * @param springPartitions
+       * @param innerMaxNrOfSteps
+       * @param innerAlphaTol
+       * @param distanceBackTolerance
+       * @param residualNormSTolerance
+       * @param innerMinNrOfSteps
+       * @return std::tuple<Eigen::VectorXd, Eigen::VectorXd, size_t, double,
+       * double, double>
+       */
       std::
         tuple<Eigen::VectorXd, Eigen::VectorXd, size_t, double, double, double>
         inspectParametrisationOptimsationForLink(
@@ -83,15 +135,16 @@ namespace calc {
           Eigen::VectorXd& displacements,
           Eigen::VectorXd& springPartitions,
           long int innerMaxNrOfSteps = 100,
-          double innerAlphaTol = 1e-8,
-          double distanceBackTolerance = 1e-9,
-          double residualNormSTolerance = 1e-20)
+          double innerAlphaTol = 1e-9,
+          double distanceBackTolerance = 1e-15,
+          double residualNormSTolerance = 1e-15,
+          long int innerMinNrOfSteps = 1)
       {
         size_t innerIterationsDone = 0;
         double displacementDone = 0.0;
         double rOverr0 = 0.0;
         double r2 = 0.0;
-        double r02 = 0.0;
+        double r02 = this->computePartitionUpdateZeroResidual(link_idx, displacements, springPartitions, distanceBackTolerance, residualNormSTolerance);
         do {
           r2 = this->updateSpringPartition(&this->initialConfig,
                                            displacements,
@@ -99,15 +152,13 @@ namespace calc {
                                            link_idx,
                                            distanceBackTolerance,
                                            residualNormSTolerance);
-          if (innerIterationsDone == 0) {
-            r02 = r2;
-          }
           rOverr0 = r2 / r02;
           displacementDone = this->displaceToMeanPosition(
             &this->initialConfig, displacements, springPartitions, link_idx);
           innerIterationsDone += 1;
-        } while (innerIterationsDone < innerMaxNrOfSteps && r2 > 0.0 &&
-                 rOverr0 > innerAlphaTol && std::isfinite(rOverr0));
+        } while ((innerIterationsDone < innerMaxNrOfSteps && r2 > 0.0 &&
+                  rOverr0 > innerAlphaTol && std::isfinite(rOverr0)) ||
+                 innerIterationsDone < innerMinNrOfSteps);
         return std::make_tuple(displacements,
                                springPartitions,
                                innerIterationsDone,
@@ -319,6 +370,11 @@ namespace calc {
         return this->currentSpringPartitionsVec;
       }
 
+      void setSpringPartitions(const Eigen::VectorXd newSpringPartitionsVec)
+      {
+        this->currentSpringPartitionsVec = newSpringPartitionsVec;
+      }
+
       std::vector<size_t> getSpringpartitionIndicesOfSliplink(
         const size_t linkIdx) const
       {
@@ -394,7 +450,7 @@ namespace calc {
         const Eigen::VectorXd& u,
         Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
         const size_t linkIdx,
-        double distanceBackTolerance = 1e-9,
+        double distanceBackTolerance = 1e-20,
         double residualNormSTolerance = 1e-20) const;
 
       /**
