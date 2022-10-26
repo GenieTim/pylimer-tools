@@ -86,6 +86,8 @@ namespace calc {
 
       int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
 
+      Network getNetwork() const { return this->initialConfig; }
+
       // MEHPForceEvaluator getForceEvaluator() const
       // {
       //   return *this->forceEvaluator;
@@ -313,10 +315,10 @@ namespace calc {
             this->universe
               .getShortestPath(this->universe.getIdxByAtomId(atomIdTo),
                                this->universe.getIdxByAtomId(atomIdFrom))
-              .size();
+              .size()-1;
           // TODO: decide whether to -2
           net->springsContourLength[i] = static_cast<double>(contourLength);
-          if (contourLength == 1) {
+          if (contourLength == 0) {
             // fix.
             assert(atomIdFrom == atomIdTo);
             contourLengthsToFix.push_back(i);

@@ -26,7 +26,8 @@ public:
   /* Trampoline */
   virtual double evaluateStressContribution(double springDistances[3],
                                             size_t i,
-                                            size_t j) const override
+                                            size_t j,
+                                            size_t springIndex) const override
   {
     PYBIND11_OVERRIDE_PURE(
       double,                     /* Return type */
@@ -34,7 +35,8 @@ public:
       evaluateStressContribution, /* Name of function in C++ */
       springDistances,
       i,
-      j /* Arguments */
+      j,
+      springIndex /* Arguments */
     );
   }
 
@@ -196,7 +198,8 @@ init_pylimer_bound_calc(py::module_& m)
     )pbdoc",
          py::arg("springDistances"),
          py::arg("i"),
-         py::arg("j"));
+         py::arg("j"),
+         py::arg("spring_index"));
 
   //   py::class_<mehp::PyMEHPForceEvaluator, mehp::MEHPForceEvaluator>(
   //     m, "CustomMEHPForceEvaluator", R"pbdoc(
@@ -481,8 +484,8 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("damping") = 1.0,
          py::arg("maxNrOfSteps") = 250000,
          py::arg("xTolerance") = 1e-12,
-         py::arg("innerMaxNrOfSteps") = 100,
-         py::arg("innerAlphaTolerance") = 1e-9)
+         py::arg("innerMaxNrOfSteps") = 150,
+         py::arg("innerAlphaTolerance") = 1e-15)
     .def("inspectLinkDisplacementToMeanPositionUpdate",
          &mehp::MEHPForceBalance::inspectLinkDisplacementToMeanPositionUpdate,
          R"pbdoc()pbdoc",
