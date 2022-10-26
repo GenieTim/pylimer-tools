@@ -149,8 +149,9 @@ TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
   }
 }
 
-TEST_CASE("MEHP Force Relaxation2 runs",
-          "[analysis][MEHPForceRelaxation][SimpleSpringMEHPForceEvaluator][long]")
+TEST_CASE(
+  "MEHP Force Relaxation2 runs",
+  "[analysis][MEHPForceRelaxation][SimpleSpringMEHPForceEvaluator][long]")
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
@@ -197,9 +198,9 @@ TEST_CASE("MEHP Force Relaxation2 runs",
       CHECK(forceRelaxer2.getVolume() ==
             Catch::Approx(97.383096 * 97.383096 * 97.383096));
       // initial system values
-      CHECK(forceRelaxer2.getPressure() == Catch::Approx(0.39911682390778536));
+      CHECK(forceRelaxer2.getPressure() == Catch::Approx(0.39911682390778536/79.));
       CHECK(forceRelaxer2.getForce() == Catch::Approx(552894.1903005145));
-      CHECK(forceRelaxer2.getAverageContourLength() == Catch::Approx(80.0));
+      CHECK(forceRelaxer2.getAverageContourLength() == Catch::Approx(79.0));
       Eigen::VectorXd contourLengths = forceRelaxer2.getSpringContourLength();
       for (int i = 0; i < contourLengths.size(); ++i) {
         CHECK(contourLengths[i] ==
@@ -217,9 +218,9 @@ TEST_CASE("MEHP Force Relaxation2 runs",
       double sigmaToM = sigmaToNm * 1.e-9;
       double slope = 0.00393 / (sigmaToNm * sigmaToNm); // sigma^2/(g/mol)
       double beadMass = 161.;                           // g/mol
-      double Nb = 80.; // nr of beads per strand
+      double Nb = 80.; // nr of bonds per strand
       double conversionFactor =
-        3. * kb * T / (slope * beadMass * Nb); // J/sigma^2
+        3. * kb * T / (slope * beadMass * (Nb/79.)); // J/sigma^2
       CHECK(conversionFactor / (sigmaToM * sigmaToM) ==
             Catch::Approx(0.000245543));
       double nu =
@@ -229,7 +230,7 @@ TEST_CASE("MEHP Force Relaxation2 runs",
 
       // final values
       CHECK(forceRelaxer2.getPressure() ==
-            Catch::Approx(0.153806)); // LJ Units [?]
+            Catch::Approx(0.153806/79.)); // LJ Units [?]
       CHECK(forceRelaxer2.getPressure() * conversionFactor /
               (sigmaToM * sigmaToM * sigmaToM) ==
             Catch::Approx(61308.3)); // shear modulus from the pressure, MPa
@@ -332,8 +333,9 @@ TEST_CASE("MEHP Force Relaxation2 runs",
   }
 }
 
-TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
-          "[analysis][MEHPForceRelaxation][NonGaussianSpringForceEvaluator][long]")
+TEST_CASE(
+  "MEHP Force Relaxation2 runs with non-gaussian force evaluator",
+  "[analysis][MEHPForceRelaxation][NonGaussianSpringForceEvaluator][long]")
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
@@ -383,10 +385,12 @@ TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
       CHECK(forceRelaxer2.getVolume() ==
             Catch::Approx(97.383096 * 97.383096 * 97.383096));
       // initial system values
-      CHECK(forceRelaxer2.getForce() == Catch::Approx(21821.2315950056));
-      CHECK(forceRelaxer2.getResidualNorm() == Catch::Approx(57.9925492668));
-      CHECK(forceRelaxer2.getPressure() == Catch::Approx(0.39911682390778536));
-      CHECK(forceRelaxer2.getAverageContourLength() == Catch::Approx(80.0));
+      CHECK(forceRelaxer2.getForce() == Catch::Approx(21821.2315950056*80./79.));
+      CHECK(forceRelaxer2.getResidualNorm() == Catch::Approx(57.9925492668*80./79.));
+      CHECK(forceRelaxer2.getPressure() *
+              forceRelaxer2.getNetwork().meanSpringContourLength ==
+            Catch::Approx(0.39911682390778536));
+      CHECK(forceRelaxer2.getAverageContourLength() == Catch::Approx(79.0));
       Eigen::VectorXd contourLengths = forceRelaxer2.getSpringContourLength();
       for (int i = 0; i < contourLengths.size(); ++i) {
         CHECK(contourLengths[i] ==
@@ -408,7 +412,8 @@ TEST_CASE("MEHP Force Relaxation2 runs with non-gaussian force evaluator",
       double beadMass = 161.;                           // g/mol
       double Nb = 80.; // nr of beads per strand
       double conversionFactor =
-        3. * kb * T / (slope * beadMass * Nb); // J/sigma^2
+        (forceRelaxer2.getNetwork().meanSpringContourLength / (79./Nb)) * 3. * kb *
+        T / (slope * beadMass); // J/sigma^2
       CHECK(conversionFactor / (sigmaToM * sigmaToM) ==
             Catch::Approx(0.000245543));
       double nu =

@@ -47,7 +47,8 @@ namespace calc {
 
       virtual double evaluateStressContribution(double springDistances[3],
                                                 size_t i,
-                                                size_t j) const = 0;
+                                                size_t j,
+                                                size_t spring_index) const = 0;
     };
 
     // example implementation of MEHPForceRelaxation for simple spring (phantom
@@ -73,9 +74,11 @@ namespace calc {
                                       double* grad) const override;
       double evaluateStressContribution(double springDistances[3],
                                         size_t i,
-                                        size_t j) const override
+                                        size_t j,
+                                        size_t spring_index) const override
       {
-        return this->kappa * springDistances[i] * springDistances[j];
+        return this->kappa * springDistances[i] * springDistances[j] /
+               this->net.springsContourLength[spring_index];
       }
 
       void prepareForEvaluations() override{};
@@ -111,9 +114,11 @@ namespace calc {
                                       double* grad) const override;
       double evaluateStressContribution(double springDistances[3],
                                         size_t i,
-                                        size_t j) const override
+                                        size_t j,
+                                        size_t spring_index) const override
       {
-        return this->kappa * springDistances[i] * springDistances[j];
+        return this->kappa * springDistances[i] * springDistances[j] /
+               this->net.springsContourLength[spring_index];
       }
 
       void prepareForEvaluations() override

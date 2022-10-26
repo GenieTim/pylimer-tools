@@ -296,6 +296,59 @@ TEST_CASE("MEHP Force Balance handles slip-links on primary loops",
   }
 }
 
+TEST_CASE("MEHP Force Balance handles slip-link convergence correctly",
+          "[analysis][MEHPForceBalance]")
+{
+  pe::Universe universe =
+    pe::Universe(42.819955007276754, 42.819955007276754, 42.819955007276754);
+  /**
+   * Connectivity:
+   *
+   * 35-(11)-90
+   *
+   * 10-(12)-1654
+   */
+  universe.addAtoms(
+    { 35, 90, 1654, 10, 11, 12, 13, 14 },
+    { 2, 2, 2, 2, 1, 1, 1, 1 },
+    { 12.075848854154861,
+      10.644563425246883,
+      14.302483570484272,
+      10,
+      10,
+      10,
+      10, 10 },
+    { 3.574724359149917, 5.460837527830988, 3.718195811318871, 10, 10, 10, 10, 10 },
+    { 3.1018436428667284,
+      7.956714096296886,
+      4.4007749635446824,
+      10,
+      10,
+      10,
+      10, 10 },
+    { 1, 1, 1, 1, 1, 1, 1, 1 },
+    { 1, 1, 1, 1, 1, 1, 1, 1 },
+    { 1, 1, 1, 1, 1, 1, 1, 1 });
+  universe.addBonds({ 35, 11, 10, 12 }, { 11, 90, 12, 1654 });
+
+  pcm::MEHPForceBalance forceBalancer = pcm::MEHPForceBalance(universe, 2);
+  forceBalancer.addSlipLinks({ 1, 0 },
+                             { 1, 1 },
+                             { 12.650493316819828, 13.197029579176265 },
+                             { 2.8706102036538566, 3.4016980009809297 },
+                             { 8.475863644409664, 5.284899588057222 },
+                             { 0.13793103448275862, 0.3103448275862069 },
+                             { 0.13793103448275862, 0.7931034482758621 });
+  
+  // do update step
+  Eigen::VectorXd displacements = Eigen::VectorXd::Zero(6*3);
+  Eigen::VectorXd springPartitions = forceBalancer.getSpringPartitions();
+  auto results = forceBalancer.inspectParametrisationOptimsationForLink(3, displacements, springPartitions);
+  CHECK(displacements[5*3] == Catch::Approx(-0.592091));
+  CHECK(displacements[5*3+1] == Catch::Approx(0.441203));
+  CHECK(displacements[5*3+2] == Catch::Approx(0.44577));
+}
+
 TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
@@ -422,7 +475,8 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
       // initial system values
       CHECK(forceBalancer2.getPressure() ==
             Catch::Approx(forceRelaxer.getPressure()));
-      CHECK(forceBalancer2.getPressure() == Catch::Approx(0.39911682390778536));
+      CHECK(forceBalancer2.getPressure() ==
+            Catch::Approx(0.39911682390778536 / 79.));
       REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
       CHECK_NOTHROW(forceBalancer2.validateNetwork());
       CHECK(forceBalancer2.getNrOfSprings() == 8142);
@@ -438,7 +492,8 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
       double beadMass = 161.;                           // g/mol
       double Nb = 80.; // nr of beads per strand
       double conversionFactor =
-        3. * kb * T / (slope * beadMass * Nb); // J/sigma^2
+        (forceBalancer2.getNetwork().meanSpringContourLength / Nb) * 3. * kb *
+        T / (slope * beadMass); // J/sigma^2
       CHECK(conversionFactor / (sigmaToM * sigmaToM) ==
             Catch::Approx(0.000245543));
       double nu =
@@ -448,7 +503,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
 
       // final values
       CHECK(forceBalancer2.getPressure() ==
-            Catch::Approx(0.153806)); // LJ Units [?]
+            Catch::Approx(0.153806 / 79.)); // LJ Units [?]
       CHECK(forceBalancer2.getPressure() * conversionFactor /
               (sigmaToM * sigmaToM * sigmaToM) ==
             Catch::Approx(61308.3)); // shear modulus from the pressure, MPa

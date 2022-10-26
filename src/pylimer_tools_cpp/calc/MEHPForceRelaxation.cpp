@@ -263,7 +263,7 @@ namespace calc {
         for (size_t j = 0; j < 3; j++) {
           for (size_t k = 0; k < 3; k++) {
             double contribution =
-              this->forceEvaluator->evaluateStressContribution(s, j, k);
+              this->forceEvaluator->evaluateStressContribution(s, j, k, i);
             stress[j][k] += contribution;
           }
         }

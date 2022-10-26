@@ -74,23 +74,24 @@ namespace calc {
                               long int maxNrOfSteps = 50000, // default: 10000
                               double xtol = 1e-9,
                               long int innerMaxNrOfSteps = 100,
-                              double innerAlphaTol = 1e-8);
+                              double innerAlphaTol = 1e-15);
 
       /**
        * @brief Compute the spring update residual
-       * 
-       * @param link_idx 
-       * @param displacements 
-       * @param springPartitions 
-       * @param distanceBackTolerance 
-       * @param residualNormSTolerance 
-       * @return double 
+       *
+       * @param link_idx
+       * @param displacements
+       * @param springPartitions
+       * @param distanceBackTolerance
+       * @param residualNormSTolerance
+       * @return double
        */
-      double computePartitionUpdateZeroResidual(size_t link_idx,
-                                 Eigen::VectorXd& displacements,
-                                 Eigen::VectorXd& springPartitions,
-                                 double distanceBackTolerance = 1e-15,
-                                 double residualNormSTolerance = 1e-15)
+      double computePartitionUpdateZeroResidual(
+        size_t link_idx,
+        Eigen::VectorXd& displacements,
+        Eigen::VectorXd& springPartitions,
+        double distanceBackTolerance = 0.0,
+        double residualNormSTolerance = 0.0)
       {
         Eigen::VectorXd tempPartitions = springPartitions;
         Eigen::VectorXd tempDisplacements = displacements;
@@ -136,15 +137,20 @@ namespace calc {
           Eigen::VectorXd& springPartitions,
           long int innerMaxNrOfSteps = 100,
           double innerAlphaTol = 1e-9,
-          double distanceBackTolerance = 1e-15,
-          double residualNormSTolerance = 1e-15,
+          double distanceBackTolerance = 0.0,
+          double residualNormSTolerance = 0.0,
           long int innerMinNrOfSteps = 1)
       {
         size_t innerIterationsDone = 0;
         double displacementDone = 0.0;
         double rOverr0 = 0.0;
         double r2 = 0.0;
-        double r02 = this->computePartitionUpdateZeroResidual(link_idx, displacements, springPartitions, distanceBackTolerance, residualNormSTolerance);
+        double r02 =
+          this->computePartitionUpdateZeroResidual(link_idx,
+                                                   displacements,
+                                                   springPartitions,
+                                                   distanceBackTolerance,
+                                                   residualNormSTolerance);
         do {
           r2 = this->updateSpringPartition(&this->initialConfig,
                                            displacements,
@@ -290,7 +296,9 @@ namespace calc {
        */
       double getPressure() const
       {
-        return this->evaluatePressure(this->currentSpringDistances);
+        return this->evaluatePressure(&this->initialConfig,
+                                      this->currentDisplacements,
+                                      this->currentSpringPartitionsVec);
       }
 
       /**
@@ -417,12 +425,17 @@ namespace calc {
                 this->initialConfig.springPartCoordinateIndexB[j] ==
                   linkCoordinateIndices[i]) {
               springPartCoordinateIndices.push_back(j);
-              // TODO: continue
             }
           }
         }
-        // TODO: fix
-        return Eigen::ArrayXi::Zero(2);
+
+        Eigen::ArrayXi results =
+          Eigen::ArrayXi::Zero(springPartCoordinateIndices.size());
+        for (int i = 0; i < springPartCoordinateIndices.size(); ++i) {
+          results[i] = springPartCoordinateIndices[i];
+        }
+
+        return results;
       }
 
       /**
@@ -450,8 +463,8 @@ namespace calc {
         const Eigen::VectorXd& u,
         Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
         const size_t linkIdx,
-        double distanceBackTolerance = 1e-20,
-        double residualNormSTolerance = 1e-20) const;
+        double distanceBackTolerance = 0.0,
+        double residualNormSTolerance = 0.0) const;
 
       /**
        * @brief Displace one link to the mean of all connected neighbours
@@ -535,12 +548,12 @@ namespace calc {
 
         for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
           double valueToSet =
-            springPartitions0[i] > 1e-9
+            springPartitions0[i] > 0.0
               ? 1. /
                   (springPartitions0[i] *
                    net->springsContourLength[net->partialToFullSpringIndex.at(
                      i)])
-              : 1e9;
+              : 0.0;
           oneOverSpringPartitions.segment(3 * i, 3) = Eigen::Vector3d::Constant(
             valueToSet * primaryLoopCorrectionMultiplier[i]);
         }
@@ -694,6 +707,35 @@ namespace calc {
 
         return maxDiff;
       };
+
+      double getDisplacementResidualNorm(
+        const ForceBalanceNetwork* net,
+        Eigen::VectorXd& u,
+        const Eigen::VectorXd& oneOverSpringPartitions)
+      {
+        Eigen::VectorXd displacedCoords = net->coordinates + u;
+        Eigen::VectorXd relevantPartialDistancesA =
+          (displacedCoords(net->springPartCoordinateIndexB) -
+           displacedCoords(net->springPartCoordinateIndexA));
+        this->handlePBC(net, relevantPartialDistancesA);
+        Eigen::VectorXd partialDistancesOverSpringPartitions =
+          (relevantPartialDistancesA.array() * oneOverSpringPartitions.array())
+            .matrix();
+
+        // return partialDistancesOverSpringPartitions.squaredNorm();
+
+        Eigen::VectorXd overallForces = Eigen::VectorXd::Zero(net->coordinates.size());
+        overallForces(net->springPartCoordinateIndexB) += partialDistancesOverSpringPartitions;
+        overallForces(net->springPartCoordinateIndexA) -= partialDistancesOverSpringPartitions;
+        return overallForces.squaredNorm();
+
+        // Eigen::Vector3d sumOfResiduals = Eigen::Vector3d::Zero();
+        // for (int i = 0; i < net->nrOfPartialSprings; ++i) {
+        //   sumOfResiduals += partialDistancesOverSpringPartitions.segment(3 *
+        //   i, 3).cwiseAbs2();
+        // }
+        // return sumOfResiduals.squaredNorm();
+      }
 
       template<typename VectorType>
       void handlePBC(const ForceBalanceNetwork* net,
@@ -914,30 +956,18 @@ namespace calc {
       }
 
       /**
-       * @brief Evaluate the pressure of the network at specific spring
-       * distances
-       *
-       * @param springDistances the spring distances
-       * @return double
-       */
-      double evaluatePressure(const Eigen::VectorXd& springDistances) const
-      {
-        auto stressTensor =
-          this->evaluateStressTensor(springDistances, this->initialConfig.vol);
-        return this->evaluatePressure(stressTensor);
-      }
-
-      /**
        * @brief Evaluate the pressure of the network at specific displacements
        *
        * @param net the network to evaluate the pressure for
        * @param u the displacements
        * @return double
        */
-      double evaluatePressure(ForceBalanceNetwork* net,
-                              const Eigen::VectorXd& u) const
+      double evaluatePressure(const ForceBalanceNetwork* net,
+                              const Eigen::VectorXd& u,
+                              const Eigen::VectorXd& springPartitions) const
       {
-        auto stressTensor = this->evaluateStressTensor(net, u, -1);
+        auto stressTensor =
+          this->evaluateStressTensor(net, u, springPartitions);
         return this->evaluatePressure(stressTensor);
       }
 
@@ -959,24 +989,57 @@ namespace calc {
        *
        * @param net
        * @param u
-       * @return std::array<std::array<double, 3>, 3>
-       */
-      std::array<std::array<double, 3>, 3> evaluateStressTensor(
-        const Eigen::VectorXd& springDistances,
-        const double volume) const;
-
-      /**
-       * @brief Compute the stress tensor
-       *
-       * @param net
-       * @param u
        * @param loopTol
        * @return std::array<std::array<double, 3>, 3>
        */
       std::array<std::array<double, 3>, 3> evaluateStressTensor(
-        ForceBalanceNetwork* net,
+        const ForceBalanceNetwork* net,
         const Eigen::VectorXd& u,
-        const double loopTol) const;
+        const Eigen::VectorXd& springPartitions,
+        const double kappa0 = 1.0,
+        const double minCutoff = 1e-20) const;
+
+      /**
+       * @brief Compute the force acting on a slip-link
+       *
+       * TODO: use "global" partial distances
+       *
+       * @param linkIdx
+       * @param net
+       * @param u
+       * @param springPartitions
+       * @param kappa0
+       * @param minCutoff
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d evaluateForceOnSlipLink(
+        const size_t linkIdx,
+        const ForceBalanceNetwork* net,
+        const Eigen::VectorXd& u,
+        const Eigen::VectorXd& springPartitions,
+        const double kappa0 = 1.0,
+        const double minCutoff = 1e-20) const;
+
+      /**
+       * @brief Compute the force acting on a cross-link
+       *
+       * TODO: use "global" partial distances
+       *
+       * @param linkIdx
+       * @param net
+       * @param u
+       * @param springPartitions
+       * @param kappa0
+       * @param minCutoff
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d evaluateForceOnCrossLink(
+        const size_t linkIdx,
+        const ForceBalanceNetwork* net,
+        const Eigen::VectorXd& u,
+        const Eigen::VectorXd& springPartitions,
+        const double kappa0 = 1.0,
+        const double minCutoff = 1e-20) const;
 
       /**
        * @brief Count how many of the springs are active (length > tolerance)
