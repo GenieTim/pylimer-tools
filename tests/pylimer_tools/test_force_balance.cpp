@@ -337,13 +337,14 @@ TEST_CASE("MEHP Force Balance handles slip-link convergence correctly",
                              { 12.650493316819828, 13.197029579176265 },
                              { 2.8706102036538566, 3.4016980009809297 },
                              { 8.475863644409664, 5.284899588057222 },
-                             { 0.13793103448275862, 0.3103448275862069 },
-                             { 0.13793103448275862, 0.7931034482758621 });
+                             { 1.-0.13793103448275862, 1.-0.3103448275862069 },
+                             { 1.-0.13793103448275862, 1.-0.7931034482758621 });
   
   // do update step
   Eigen::VectorXd displacements = Eigen::VectorXd::Zero(6*3);
   Eigen::VectorXd springPartitions = forceBalancer.getSpringPartitions();
-  auto results = forceBalancer.inspectParametrisationOptimsationForLink(3, displacements, springPartitions);
+  outputNetwork(forceBalancer.getNetwork(), displacements, springPartitions);
+  auto results = forceBalancer.inspectParametrisationOptimsationForLink(5, displacements, springPartitions);
   CHECK(displacements[5*3] == Catch::Approx(-0.592091));
   CHECK(displacements[5*3+1] == Catch::Approx(0.441203));
   CHECK(displacements[5*3+2] == Catch::Approx(0.44577));

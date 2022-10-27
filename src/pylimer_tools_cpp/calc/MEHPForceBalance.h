@@ -162,7 +162,7 @@ namespace calc {
           displacementDone = this->displaceToMeanPosition(
             &this->initialConfig, displacements, springPartitions, link_idx);
           innerIterationsDone += 1;
-        } while ((innerIterationsDone < innerMaxNrOfSteps && r2 > 0.0 &&
+        } while ((innerIterationsDone < innerMaxNrOfSteps &&
                   rOverr0 > innerAlphaTol && std::isfinite(rOverr0)) ||
                  innerIterationsDone < innerMinNrOfSteps);
         return std::make_tuple(displacements,
@@ -525,6 +525,8 @@ namespace calc {
                                     const Eigen::VectorXd& springPartitions,
                                     const size_t linkIdx) const;
 
+      #define ONE_OVER_SPRING_PARTITION_CLAMP_MAX 1.0
+
       /**
        * @brief Translate the spring partition vector to its 3*size
        *
@@ -548,12 +550,16 @@ namespace calc {
 
         for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
           double valueToSet =
-            springPartitions0[i] > 0.0
+            springPartitions0[i] > 0.0 // 1e-18 // 
               ? 1. /
                   (springPartitions0[i] *
                    net->springsContourLength[net->partialToFullSpringIndex.at(
                      i)])
               : 0.0;
+          valueToSet = std::clamp(valueToSet, 0.0, ONE_OVER_SPRING_PARTITION_CLAMP_MAX);
+          // if (springPartitions0[i] < 1e-9) {
+          //   std::cout << "Got close call for partial spring " << i << std::endl;
+          // }
           oneOverSpringPartitions.segment(3 * i, 3) = Eigen::Vector3d::Constant(
             valueToSet * primaryLoopCorrectionMultiplier[i]);
         }
@@ -724,9 +730,24 @@ namespace calc {
 
         // return partialDistancesOverSpringPartitions.squaredNorm();
 
-        Eigen::VectorXd overallForces = Eigen::VectorXd::Zero(net->coordinates.size());
-        overallForces(net->springPartCoordinateIndexB) += partialDistancesOverSpringPartitions;
-        overallForces(net->springPartCoordinateIndexA) -= partialDistancesOverSpringPartitions;
+        Eigen::VectorXd overallForces =
+          Eigen::VectorXd::Zero(net->coordinates.size());
+        overallForces(net->springPartCoordinateIndexB) +=
+          partialDistancesOverSpringPartitions;
+        overallForces(net->springPartCoordinateIndexA) -=
+          partialDistancesOverSpringPartitions;
+
+        Eigen::Index maxRow, maxCol;
+        double max = overallForces.maxCoeff(&maxRow, &maxCol);
+        Eigen::Index minRow, minCol;
+        double min = overallForces.minCoeff(&minRow, &minCol);
+        // std::cout << "Got min = " << min << " at " << minRow << ", " <<
+        // minCol
+        //           << std::endl;
+        // std::cout << "Got max = " << max << " at " << maxRow << ", " <<
+        // maxCol
+        //           << std::endl;
+
         return overallForces.squaredNorm();
 
         // Eigen::Vector3d sumOfResiduals = Eigen::Vector3d::Zero();
