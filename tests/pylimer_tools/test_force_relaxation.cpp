@@ -221,7 +221,7 @@ TEST_CASE(
       double Nb = 80.; // nr of bonds per strand
       double conversionFactor =
         3. * kb * T / (slope * beadMass * (Nb/79.)); // J/sigma^2
-      CHECK(conversionFactor / (sigmaToM * sigmaToM) ==
+      CHECK(conversionFactor*79. / (sigmaToM * sigmaToM) ==
             Catch::Approx(0.000245543));
       double nu =
         nrOfChains / (forceRelaxer2.getVolume() * sigmaToM * sigmaToM *
@@ -385,8 +385,8 @@ TEST_CASE(
       CHECK(forceRelaxer2.getVolume() ==
             Catch::Approx(97.383096 * 97.383096 * 97.383096));
       // initial system values
-      CHECK(forceRelaxer2.getForce() == Catch::Approx(21821.2315950056*80./79.));
-      CHECK(forceRelaxer2.getResidualNorm() == Catch::Approx(57.9925492668*80./79.));
+      CHECK(forceRelaxer2.getForce() == Catch::Approx(21821.2315950056*(80./79.)).epsilon(1e-5));
+      CHECK(forceRelaxer2.getResidualNorm() == Catch::Approx(57.9925492668*(80./79.)).epsilon(1e-5));
       CHECK(forceRelaxer2.getPressure() *
               forceRelaxer2.getNetwork().meanSpringContourLength ==
             Catch::Approx(0.39911682390778536));
@@ -412,7 +412,7 @@ TEST_CASE(
       double beadMass = 161.;                           // g/mol
       double Nb = 80.; // nr of beads per strand
       double conversionFactor =
-        (forceRelaxer2.getNetwork().meanSpringContourLength / (79./Nb)) * 3. * kb *
+        (forceRelaxer2.getNetwork().meanSpringContourLength / (Nb)) * 3. * kb *
         T / (slope * beadMass); // J/sigma^2
       CHECK(conversionFactor / (sigmaToM * sigmaToM) ==
             Catch::Approx(0.000245543));
@@ -429,7 +429,7 @@ TEST_CASE(
           (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) / 3.)
           .epsilon(0.02));
       CHECK(forceRelaxer2.getPressure() ==
-            Catch::Approx(0.1538073308)); // LJ Units [?]
+            Catch::Approx(0.1538073308/79.)); // LJ Units [?]
       CHECK(forceRelaxer2.getPressure() * conversionFactor /
               (sigmaToM * sigmaToM * sigmaToM) ==
             Catch::Approx(

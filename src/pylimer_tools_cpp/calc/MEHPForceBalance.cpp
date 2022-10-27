@@ -73,6 +73,7 @@ namespace calc {
       double initialResidual =
         this->getDisplacementResidualNorm(&net, u, oneOverSpringPartitions);
       double currentResidual = 0.0;
+      double intermediateResidual = 0.0;
       do {
         maxDistanceMoved = 0.0;
         currentResidual = 0.0;
@@ -113,6 +114,8 @@ namespace calc {
             }
           }
         }
+        intermediateResidual =
+          this->getDisplacementResidualNorm(&net, u, oneOverSpringPartitions);
         // then, place slip-link
         for (size_t link_idx = net.nrOfNodes; link_idx < net.nrOfLinks;
              ++link_idx) {
@@ -142,7 +145,8 @@ namespace calc {
           std::cout << "Iteration " << iterationsDone << " " << maxDistanceMoved
                     << " by " << indexOfMaxDistanceMoved
                     << ". Residual: " << currentResidual
-                    << " from: " << initialResidual << "\n"
+                    << " from: " << initialResidual << " via "
+                    << intermediateResidual << "\n"
                     << "Total inner: " << totalInnerIterationsDone << "\n";
         }
       } while (currentResidual / initialResidual > xtol &&
@@ -412,6 +416,13 @@ namespace calc {
                 ? (distanceForward / (complementaryS * complementaryS) -
                    distanceBack / (newS * newS))
                 : 0.0;
+            // if (!(APPROX_EQUAL(newS, currentS, 0.2))) {
+            //   std::cout << "Updating " << linkIdx << " to " << newS << " and "
+            //             << complementaryS << " with global springs "
+            //             << currentSpringGlobalIdx << " and "
+            //             << neighbourSpringGlobalIdx << " from " << currentS
+            //             << ", " << nextS << std::endl;
+            // }
             // std::cout << "Contribution to " << linkIdx
             //           << " from global springs " << currentSpringGlobalIdx
             //           << " (" << springsPartners[partner_idx - 1] << ") "
@@ -518,16 +529,22 @@ namespace calc {
             double oneOverContourLengthFraction =
               1.0 / (net->springsContourLength[springIndices[spring_index]] *
                      contourLengthFraction);
-            // if (contourLengthFraction > 1e-9) {
-            if (std::isfinite(oneOverContourLengthFraction)) {
-              objectiveDisplacement +=
-                (partialDistance)*oneOverContourLengthFraction; // /
-              // totalDistance.array());
-              objectiveDisplacementContributors += oneOverContourLengthFraction;
-            } else {
-              // objectiveDisplacement = 1e9 * (partialDistance);
-              // objectiveDisplacementContributors += 1e9;
+            if (contourLengthFraction < 1e-12 &&
+                !std::isfinite(oneOverContourLengthFraction)) {
+              oneOverContourLengthFraction =
+                1.0 / (1e-12 *
+                       net->springsContourLength[springIndices[spring_index]]);
             }
+            oneOverContourLengthFraction = std::clamp(oneOverContourLengthFraction, 0.0, ONE_OVER_SPRING_PARTITION_CLAMP_MAX);
+            // if (std::isfinite(oneOverContourLengthFraction)) {
+            objectiveDisplacement +=
+              (partialDistance)*oneOverContourLengthFraction; // /
+            // totalDistance.array());
+            objectiveDisplacementContributors += oneOverContourLengthFraction;
+            // } else {
+            //   objectiveDisplacement = 1e9 * (partialDistance);
+            //   objectiveDisplacementContributors += 1e9;
+            // }
 
             if (cautionPrimaryLoop) {
               handledSprings.push_back(springIndices[spring_index]);
@@ -543,16 +560,13 @@ namespace calc {
                                    : objectiveDisplacementContributors);
 
       double dist = objectiveDisplacement.squaredNorm();
-      // if (dist > 500) {
+      // if (dist > 0.1) {
       //   std::cout << "Moving " << linkIdx << " for " << dist
-      //             << " with displacements " << currentDisplacement[0] << ",
-      //             "
-      //             << currentDisplacement[1] << ", " <<
-      //             currentDisplacement[2]
-      //             << std::endl;
-      //   std::cout << "For objective displacements "
-      //             << objectiveDisplacement[0] << ", "
-      //             << objectiveDisplacement[1] << ", "
+      //             << " with displacements " << u.segment(3 * linkIdx, 3)[0]
+      //             << ", " << u.segment(3 * linkIdx, 3)[1] << ", "
+      //             << u.segment(3 * linkIdx, 3)[2] << std::endl;
+      //   std::cout << "For objective displacements " << objectiveDisplacement[0]
+      //             << ", " << objectiveDisplacement[1] << ", "
       //             << objectiveDisplacement[2] << ", for "
       //             << objectiveDisplacementContributors << "." << std::endl;
       // }
