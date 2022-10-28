@@ -315,7 +315,8 @@ namespace calc {
             this->universe
               .getShortestPath(this->universe.getIdxByAtomId(atomIdTo),
                                this->universe.getIdxByAtomId(atomIdFrom))
-              .size()-1;
+              .size() -
+            1;
           // TODO: decide whether to -2
           net->springsContourLength[i] = static_cast<double>(contourLength);
           if (contourLength == 0) {

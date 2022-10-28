@@ -35,7 +35,8 @@ namespace calc {
       const int f =
         this->universe.determineFunctionalityPerType()[crosslinkerType];
       bool is2D = this->is2D;
-      size_t nrOfPartialSpringParameters = net.nrOfPartialSprings - net.nrOfSprings;
+      size_t nrOfPartialSpringParameters =
+        net.nrOfPartialSprings - net.nrOfSprings;
 
       /* array allocation */
       Eigen::VectorXd u = Eigen::VectorXd::Zero(3 * net.nrOfLinks);
@@ -58,26 +59,30 @@ namespace calc {
       double intermediateResidual = 0.0;
 
       /* array allocation */
-      std::vector<double> u0 =
-        pylimer_tools::utils::initializeWithValue(3 * net.nrOfLinks + nrOfPartialSpringParameters, 0.0);
-      Eigen::VectorXd u = Eigen::VectorXd::Zero(3 * net.nrOfLinks + nrOfPartialSpringParameters);
+      std::vector<double> u0 = pylimer_tools::utils::initializeWithValue(
+        3 * net.nrOfLinks + nrOfPartialSpringParameters, 0.0);
+      Eigen::VectorXd u =
+        Eigen::VectorXd::Zero(3 * net.nrOfLinks + nrOfPartialSpringParameters);
 
       /* force relaxation */
-      nlopt::opt opt(algorithm, 3 * net.nrOfLinks + nrOfPartialSpringParameters);
+      nlopt::opt opt(algorithm,
+                     3 * net.nrOfLinks + nrOfPartialSpringParameters);
 
       nlopt::func objectiveF =
         [](unsigned n, const double* x, double* grad, void* f_data) -> double {
         Eigen::Map<const Eigen::VectorXd> u =
           Eigen::Map<const Eigen::VectorXd>(x, n);
         ForceBalanceNetwork* net = static_cast<ForceBalanceNetwork*>(f_data);
-        assert(n == net->nrOfLinks + (net->nrOfPartialSprings - net->nrOfSprings));
+        assert(n ==
+               net->nrOfLinks + (net->nrOfPartialSprings - net->nrOfSprings));
         // assemble spring partitions from the parameters
-        Eigen::VectorXd springPartitions0 = MEHPForceBalance2::translatePartialParametersToAllPartitions(net, u.tail(net->nrOfPartialSprings - net->nrOfSprings));
+        Eigen::VectorXd springPartitions0 =
+          MEHPForceBalance2::translatePartialParametersToAllPartitions(
+            net, u.tail(net->nrOfPartialSprings - net->nrOfSprings));
         Eigen::VectorXd oneOverSpringPartitions =
           Eigen::VectorXd(3 * net->nrOfPartialSprings);
-          Eigen::ArrayXd primaryLoopCorrectionMultiplier =
-          (net->springPartIndexA != net->springPartIndexB)
-            .cast<double>();
+        Eigen::ArrayXd primaryLoopCorrectionMultiplier =
+          (net->springPartIndexA != net->springPartIndexB).cast<double>();
         for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
           double valueToSet =
             springPartitions0[i] > 1e-18 // 0.0
@@ -104,10 +109,10 @@ namespace calc {
         Eigen::VectorXd partialDistancesOverSpringPartitions =
           (relevantPartialDistancesA.array() * oneOverSpringPartitions.array())
             .matrix();
-        
+
         // evaluate the gradient when needed
         if (grad != NULL) {
-        // evaluate the gradient: ok for the forces on the links.
+          // evaluate the gradient: ok for the forces on the links.
           Eigen::VectorXd overallForces =
             Eigen::VectorXd::Zero(net->coordinates.size());
           overallForces(net->springPartCoordinateIndexB) +=
@@ -119,8 +124,8 @@ namespace calc {
             grad[i] = overallForces[i];
           }
 
-        // evaluate the gradient of the partition: harder.
-        // TODO: calculate
+          // evaluate the gradient of the partition: harder.
+          // TODO: calculate
         }
 
         return partialDistancesOverSpringPartitions.squaredNorm();
@@ -140,7 +145,7 @@ namespace calc {
 
       opt.set_upper_bounds(upperBounds);
       opt.set_lower_bounds(lowerBounds);
-      // TODO: set constraint to restrict 
+      // TODO: set constraint to restrict
 
       // set exit conditions
       opt.set_xtol_rel(xtol);
@@ -161,9 +166,11 @@ namespace calc {
       // query solution & exit reason
       assert(u0.size() == 3 * net.nrOfLinks);
       u = Eigen::Map<Eigen::VectorXd>(u0.data(), u0.size());
-      this->currentDisplacements = u.head(3*net.nrOfLinks);
+      this->currentDisplacements = u.head(3 * net.nrOfLinks);
 
-      this->currentSpringPartitionsVec = MEHPForceBalance2::translatePartialParametersToAllPartitions(&net, u.tail(nrOfPartialSpringParameters));
+      this->currentSpringPartitionsVec =
+        MEHPForceBalance2::translatePartialParametersToAllPartitions(
+          &net, u.tail(nrOfPartialSpringParameters));
       this->currentSpringDistances =
         this->evaluateSpringDistances(&net, this->currentDisplacements, is2D);
 

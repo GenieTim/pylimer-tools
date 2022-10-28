@@ -16,7 +16,8 @@ extern "C"
 namespace pylimer_tools {
 namespace entities {
 
-  struct LoopIntersectionInfo {
+  struct LoopIntersectionInfo
+  {
     std::vector<Atom> involvedAtoms;
     Eigen::Vector3d intersectionPoint;
     double direction;
@@ -140,8 +141,9 @@ namespace entities {
       return AtomGraphParent::computeBondLengths(&this->box);
     };
     Eigen::Vector3d getPositionVectorForVertex(const int vertexId) const;
-    std::vector<LoopIntersectionInfo> findLoopEntanglements(std::vector<long int> vertexIndicesLoop1,
-                           std::vector<long int> vertexIndicesLoop2) const;
+    std::vector<LoopIntersectionInfo> findLoopEntanglements(
+      std::vector<long int> vertexIndicesLoop1,
+      std::vector<long int> vertexIndicesLoop2) const;
     double getMeanStrandLength(int crosslinkerType);
     std::vector<double> computeEndToEndDistances(int crosslinkerType);
     double computeMeanEndToEndDistance(int crosslinkerType);

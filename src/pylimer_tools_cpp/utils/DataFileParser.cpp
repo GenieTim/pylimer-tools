@@ -218,8 +218,8 @@ namespace utils {
 
   void DataFileParser::readAtom(std::string line)
   {
-    size_t atomId,nx, ny, nz;
-    int  atomType, moleculeId;
+    size_t atomId, nx, ny, nz;
+    int atomType, moleculeId;
     double x, y, z;
     int resFound = sscanf(line.c_str(),
                           "%zd %d %d %le %le %le %zd %zd %zd",
@@ -250,7 +250,8 @@ namespace utils {
   void DataFileParser::readBond(std::string line)
   {
     size_t bondId, bondType, bondFrom, bondTo;
-    sscanf(line.c_str(), "%zu %zu %zu %zu", &bondId, &bondType, &bondFrom, &bondTo);
+    sscanf(
+      line.c_str(), "%zu %zu %zu %zu", &bondId, &bondType, &bondFrom, &bondTo);
     this->bondIds.push_back(bondId);
     this->bondTypes.push_back(bondType);
     this->bondFrom.push_back(bondFrom);

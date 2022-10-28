@@ -150,8 +150,8 @@ namespace utils {
   }
 
   void DataFileParser2::skipLinesToContains(std::string& line,
-                                           std::ifstream& file,
-                                           std::string upTo)
+                                            std::ifstream& file,
+                                            std::string upTo)
   {
     do {
       if (contains(line, upTo)) {
@@ -218,8 +218,8 @@ namespace utils {
 
   void DataFileParser2::readAtom(std::string line)
   {
-    size_t atomId,nx, ny, nz;
-    int  atomType, moleculeId;
+    size_t atomId, nx, ny, nz;
+    int atomType, moleculeId;
     double x, y, z;
     int resFound = sscanf(line.c_str(),
                           "%zd %d %d %le %le %le %zd %zd %zd",
@@ -264,7 +264,8 @@ namespace utils {
   {
     size_t bondId, bondType, bondFrom, bondTo;
     // pylimer_tools::utils::CsvTokenizer tokenizer(line, 4);
-    sscanf(line.c_str(), "%zu %zu %zu %zu", &bondId, &bondType, &bondFrom, &bondTo);
+    sscanf(
+      line.c_str(), "%zu %zu %zu %zu", &bondId, &bondType, &bondFrom, &bondTo);
     this->bondIds.push_back(bondId);
     this->bondTypes.push_back(bondType);
     this->bondFrom.push_back(bondFrom);

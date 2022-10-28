@@ -1059,12 +1059,19 @@ namespace calc {
             double denominator =
               1 / (springPartitions[i] *
                    net->springsContourLength[totalSpringIndex]);
+            denominator = std::clamp(denominator, 0.0, 1.0); // TODO: check
             double contribution =
               distance[j] * distance[k] * kappa0 * denominator;
             if (std::isfinite(denominator) && std::isfinite(contribution)) {
-              stress[j][k] += contribution * oneOverVolume;
+              stress[j][k] += contribution; // * oneOverVolume;
             }
           }
+        }
+      }
+
+      for (size_t i = 0; i < 3; ++i) {
+        for (size_t j = 0; i < 3; ++i) {
+          stress[i][j] *= oneOverVolume;
         }
       }
 

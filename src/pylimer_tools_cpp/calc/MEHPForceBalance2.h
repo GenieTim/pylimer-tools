@@ -553,12 +553,17 @@ namespace calc {
         return oneOverSpringPartitions;
       }
 
-      static Eigen::VectorXd translatePartialParametersToAllPartitions(ForceBalanceNetwork *net, const Eigen::VectorXd &params) {
-        Eigen::VectorXd results = Eigen::VectorXd::Ones(net->nrOfPartialSprings);
+      static Eigen::VectorXd translatePartialParametersToAllPartitions(
+        ForceBalanceNetwork* net,
+        const Eigen::VectorXd& params)
+      {
+        Eigen::VectorXd results =
+          Eigen::VectorXd::Ones(net->nrOfPartialSprings);
         // TODO: implement
         size_t parameterIdx = 0;
         for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
-          if (!net->linkIsSliplink[net->springPartIndexA[i]] && !net->linkIsSliplink[net->springPartIndexB[i]]) {
+          if (!net->linkIsSliplink[net->springPartIndexA[i]] &&
+              !net->linkIsSliplink[net->springPartIndexB[i]]) {
             results[i] = 1.;
           } else {
             // TODO: finish implementation
