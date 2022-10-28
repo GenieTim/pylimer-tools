@@ -417,7 +417,8 @@ namespace calc {
                    distanceBack / (newS * newS))
                 : 0.0;
             // if (!(APPROX_EQUAL(newS, currentS, 0.2))) {
-            //   std::cout << "Updating " << linkIdx << " to " << newS << " and "
+            //   std::cout << "Updating " << linkIdx << " to " << newS << " and
+            //   "
             //             << complementaryS << " with global springs "
             //             << currentSpringGlobalIdx << " and "
             //             << neighbourSpringGlobalIdx << " from " << currentS
@@ -535,7 +536,10 @@ namespace calc {
                 1.0 / (1e-12 *
                        net->springsContourLength[springIndices[spring_index]]);
             }
-            oneOverContourLengthFraction = std::clamp(oneOverContourLengthFraction, 0.0, ONE_OVER_SPRING_PARTITION_CLAMP_MAX);
+            oneOverContourLengthFraction =
+              std::clamp(oneOverContourLengthFraction,
+                         0.0,
+                         ONE_OVER_SPRING_PARTITION_CLAMP_MAX);
             // if (std::isfinite(oneOverContourLengthFraction)) {
             objectiveDisplacement +=
               (partialDistance)*oneOverContourLengthFraction; // /
@@ -565,7 +569,8 @@ namespace calc {
       //             << " with displacements " << u.segment(3 * linkIdx, 3)[0]
       //             << ", " << u.segment(3 * linkIdx, 3)[1] << ", "
       //             << u.segment(3 * linkIdx, 3)[2] << std::endl;
-      //   std::cout << "For objective displacements " << objectiveDisplacement[0]
+      //   std::cout << "For objective displacements " <<
+      //   objectiveDisplacement[0]
       //             << ", " << objectiveDisplacement[1] << ", "
       //             << objectiveDisplacement[2] << ", for "
       //             << objectiveDisplacementContributors << "." << std::endl;
@@ -1023,6 +1028,11 @@ namespace calc {
       const double minCutoff) const
     {
       std::array<std::array<double, 3>, 3> stress;
+      for (size_t i = 0; i < 3; ++i) {
+        for (size_t j = 0; i < 3; ++i) {
+          stress[i][j] = 0.0;
+        }
+      }
       INVALIDARG_EXP_IFN(
         springPartitions.size() == net->springPartIndexA.size(),
         "Spring partitions must have the size of partial springs.");

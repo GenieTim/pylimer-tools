@@ -254,6 +254,11 @@ namespace calc {
       const double volume) const
     {
       std::array<std::array<double, 3>, 3> stress;
+      for (size_t i = 0; i < 3; ++i) {
+        for (size_t j = 0; i < 3; ++i) {
+          stress[i][j] = 0.0;
+        }
+      }
 
       for (size_t i = 0; i < springDistances.size() / 3; ++i) {
         double s[3] = { springDistances[3 * i + 0],
