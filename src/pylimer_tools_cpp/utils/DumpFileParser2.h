@@ -95,8 +95,8 @@ namespace utils {
 
   template<typename OUT>
   std::vector<OUT> DumpFileParser2::getValuesForAt(const size_t index,
-                                                  const std::string headerKey,
-                                                  const std::string& column)
+                                                   const std::string headerKey,
+                                                   const std::string& column)
   {
     // detect index of column
     size_t colIdx = 0;
@@ -115,8 +115,8 @@ namespace utils {
 
   template<typename OUT>
   std::vector<OUT> DumpFileParser2::getValuesForAt(const size_t index,
-                                                  const std::string headerKey,
-                                                  const size_t colIdx)
+                                                   const std::string headerKey,
+                                                   const size_t colIdx)
   {
     if (!this->data.contains(index)) {
       // std::cout << "Could not find index " << index << "in data yet" <<

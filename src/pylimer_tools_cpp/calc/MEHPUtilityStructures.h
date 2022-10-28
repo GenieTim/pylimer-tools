@@ -2,10 +2,10 @@
 #define MEHP_UTILITY_STRUCT_H
 
 #include <Eigen/Dense>
-#include <vector>
-#include <unordered_map>
 #include <map>
+#include <unordered_map>
 #include <utility>
+#include <vector>
 
 namespace pylimer_tools {
 namespace calc {
@@ -96,11 +96,11 @@ namespace calc {
   }
   } // mehp
 
-#define APPROX_EQUAL(value1, value2, eps) \
-  value1 + eps >= value2 && value1 - eps <= value2
+#define APPROX_EQUAL(value1, value2, eps)                                      \
+  value1 + eps >= value2&& value1 - eps <= value2
 
-#define APPROX_WITHIN(value1, lo, hi, eps) \
-  value1 + eps >= lo && value1 - eps <= hi
+#define APPROX_WITHIN(value1, lo, hi, eps)                                     \
+  value1 + eps >= lo&& value1 - eps <= hi
 } // calc
 } // pylimer_tools
 

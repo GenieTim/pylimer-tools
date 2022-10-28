@@ -525,7 +525,7 @@ namespace calc {
                                     const Eigen::VectorXd& springPartitions,
                                     const size_t linkIdx) const;
 
-      #define ONE_OVER_SPRING_PARTITION_CLAMP_MAX 1.0
+#define ONE_OVER_SPRING_PARTITION_CLAMP_MAX 1.0
 
       /**
        * @brief Translate the spring partition vector to its 3*size
@@ -550,15 +550,17 @@ namespace calc {
 
         for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
           double valueToSet =
-            springPartitions0[i] > 0.0 // 1e-18 // 
+            springPartitions0[i] > 0.0 // 1e-18 //
               ? 1. /
                   (springPartitions0[i] *
                    net->springsContourLength[net->partialToFullSpringIndex.at(
                      i)])
               : 0.0;
-          valueToSet = std::clamp(valueToSet, 0.0, ONE_OVER_SPRING_PARTITION_CLAMP_MAX);
+          valueToSet =
+            std::clamp(valueToSet, 0.0, ONE_OVER_SPRING_PARTITION_CLAMP_MAX);
           // if (springPartitions0[i] < 1e-9) {
-          //   std::cout << "Got close call for partial spring " << i << std::endl;
+          //   std::cout << "Got close call for partial spring " << i <<
+          //   std::endl;
           // }
           oneOverSpringPartitions.segment(3 * i, 3) = Eigen::Vector3d::Constant(
             valueToSet * primaryLoopCorrectionMultiplier[i]);

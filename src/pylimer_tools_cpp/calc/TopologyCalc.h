@@ -28,7 +28,7 @@ namespace calc {
     if (a > -EPSILON && a < EPSILON) {
       return false; // This ray is parallel to this triangle.
     }
-    
+
     Eigen::Vector3d s = rayOrigin - vertex0;
     double f = 1.0 / a;
     double u = f * s.dot(h);
