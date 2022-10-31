@@ -27,7 +27,8 @@ namespace calc {
       long int maxNrOfSteps, // default: 10000
       double xtol,
       long int innerMaxNrOfSteps,
-      double innerAlphaTol)
+      double innerAlphaTol,
+      const double oneOverSpringPartitionUpperLimit)
     {
       this->simulationHasRun = true;
 
@@ -69,7 +70,8 @@ namespace calc {
                 // "with " << independentVertexSets.size() << "vertex sets."
                 << std::endl;
       Eigen::VectorXd oneOverSpringPartitions =
-        this->assembleOneOverSpringPartition(&net, springPartitions);
+        this->assembleOneOverSpringPartition(
+          &net, springPartitions, oneOverSpringPartitionUpperLimit);
       double initialResidual =
         this->getDisplacementResidualNorm(&net, u, oneOverSpringPartitions);
       double currentResidual = 0.0;
@@ -460,7 +462,8 @@ namespace calc {
       const ForceBalanceNetwork* net,
       Eigen::VectorXd& u,
       const Eigen::VectorXd& springPartitions,
-      const size_t linkIdx) const
+      const size_t linkIdx,
+      const double oneOverSpringPartitionUpperLimit) const
     {
       std::vector<size_t> springIndices = net->springIndicesOfLinks[linkIdx];
       // Eigen::Vector3d currentDisplacement = u.segment(3 * linkIdx, 3);
@@ -536,10 +539,12 @@ namespace calc {
                 1.0 / (1e-12 *
                        net->springsContourLength[springIndices[spring_index]]);
             }
-            oneOverContourLengthFraction =
-              std::clamp(oneOverContourLengthFraction,
-                         0.0,
-                         ONE_OVER_SPRING_PARTITION_CLAMP_MAX);
+            if (oneOverSpringPartitionUpperLimit > 0.0) {
+              oneOverContourLengthFraction =
+                std::clamp(oneOverContourLengthFraction,
+                           0.0,
+                           oneOverSpringPartitionUpperLimit);
+            }
             // if (std::isfinite(oneOverContourLengthFraction)) {
             objectiveDisplacement +=
               (partialDistance)*oneOverContourLengthFraction; // /
@@ -1025,11 +1030,11 @@ namespace calc {
       const Eigen::VectorXd& u,
       const Eigen::VectorXd& springPartitions,
       const double kappa0,
-      const double minCutoff) const
+      const double oneOverSpringPartitionUpperLimit) const
     {
       std::array<std::array<double, 3>, 3> stress;
       for (size_t i = 0; i < 3; ++i) {
-        for (size_t j = 0; i < 3; ++i) {
+        for (size_t j = 0; j < 3; ++j) {
           stress[i][j] = 0.0;
         }
       }
@@ -1059,31 +1064,37 @@ namespace calc {
             double denominator =
               1 / (springPartitions[i] *
                    net->springsContourLength[totalSpringIndex]);
-            denominator = std::clamp(denominator, 0.0, 1.0); // TODO: check
+            if (oneOverSpringPartitionUpperLimit > 0.) {
+              denominator =
+                std::clamp(denominator,
+                           0.0,
+                           oneOverSpringPartitionUpperLimit); // TODO: check
+            }
             double contribution =
               distance[j] * distance[k] * kappa0 * denominator;
             if (std::isfinite(denominator) && std::isfinite(contribution)) {
-              stress[j][k] += contribution; // * oneOverVolume;
+              stress[j][k] += contribution * oneOverVolume;
             }
           }
         }
       }
 
-      for (size_t i = 0; i < 3; ++i) {
-        for (size_t j = 0; i < 3; ++i) {
-          stress[i][j] *= oneOverVolume;
-        }
-      }
+      // for (size_t i = 0; i < 3; ++i) {
+      //   for (size_t j = 0; j < 3; ++j) {
+      //     stress[i][j] *= oneOverVolume;
+      //   }
+      // }
 
       return stress;
     }
 
-    std::array<std::array<double, 3>, 3> MEHPForceBalance::getStressTensor()
-      const
+    std::array<std::array<double, 3>, 3> MEHPForceBalance::getStressTensor(
+      const double oneOverSpringPartitionUpperLimit) const
     {
       return this->evaluateStressTensor(&this->initialConfig,
                                         this->currentDisplacements,
-                                        this->currentSpringPartitionsVec);
+                                        this->currentSpringPartitionsVec,
+                                        oneOverSpringPartitionUpperLimit);
     }
 
     /**

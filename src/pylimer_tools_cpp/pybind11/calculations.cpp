@@ -485,7 +485,8 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("maxNrOfSteps") = 250000,
          py::arg("xTolerance") = 1e-12,
          py::arg("innerMaxNrOfSteps") = 150,
-         py::arg("innerAlphaTolerance") = 1e-15)
+         py::arg("innerAlphaTolerance") = 1e-15,
+         py::arg("oneOverSpringPartitionUpperLimit") = 1.0)
     .def("inspectLinkDisplacementToMeanPositionUpdate",
          &mehp::MEHPForceBalance::inspectLinkDisplacementToMeanPositionUpdate,
          R"pbdoc()pbdoc",
@@ -494,7 +495,8 @@ init_pylimer_bound_calc(py::module_& m)
     .def("inspectDisplacementToMeanPositionUpdate",
          &mehp::MEHPForceBalance::inspectDisplacementToMeanPositionUpdate,
          R"pbdoc()pbdoc",
-         py::arg("linkIdx"))
+         py::arg("linkIdx"),
+         py::arg("oneOverSpringPartitionUpperLimit") = 1.0)
     .def("inspectSpringPartitionUpdate",
          &mehp::MEHPForceBalance::inspectSpringPartitionUpdate,
          R"pbdoc()pbdoc",
@@ -509,7 +511,8 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("alpha_tol") = 1e-9,
          py::arg("distanceBackTolerance") = 1e-9,
          py::arg("residualNormSTolerance") = 1e-20,
-         py::arg("minNrOfSteps") = 1)
+         py::arg("minNrOfSteps") = 1,
+         py::arg("oneOverSpringPartitionUpperLimit") = 1.0)
     .def("getSpringpartitionIndicesOfSliplink",
          &mehp::MEHPForceBalance::getSpringpartitionIndicesOfSliplink,
          R"pbdoc()pbdoc",
@@ -555,7 +558,8 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceBalance::getStressTensor,
          R"pbdoc(
           Returns the stress tensor at the current state of the simulation.
-     )pbdoc")
+     )pbdoc",
+         py::arg("oneOverSpringPartitionUpperLimit") = -1)
     .def("getGammaFactor",
          &mehp::MEHPForceBalance::getGammaFactor,
          R"pbdoc(
@@ -600,6 +604,11 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceBalance::getCurrentDisplacements,
          R"pbdoc(
           Get the current link displacements.
+     )pbdoc")
+    .def("setDisplacements",
+         &mehp::MEHPForceBalance::setCurrentDisplacements,
+         R"pbdoc(
+          Set the current link displacements.
      )pbdoc")
     .def("getIdsOfActiveNodes",
          &mehp::MEHPForceBalance::getIdsOfActiveNodes,

@@ -255,7 +255,7 @@ namespace calc {
     {
       std::array<std::array<double, 3>, 3> stress;
       for (size_t i = 0; i < 3; ++i) {
-        for (size_t j = 0; i < 3; ++i) {
+        for (size_t j = 0; j < 3; ++j) {
           stress[i][j] = 0.0;
         }
       }
