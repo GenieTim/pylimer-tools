@@ -1094,6 +1094,7 @@ namespace calc {
       return this->evaluateStressTensor(&this->initialConfig,
                                         this->currentDisplacements,
                                         this->currentSpringPartitionsVec,
+                                        1.0,
                                         oneOverSpringPartitionUpperLimit);
     }
 
