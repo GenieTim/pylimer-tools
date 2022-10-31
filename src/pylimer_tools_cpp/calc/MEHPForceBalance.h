@@ -74,7 +74,8 @@ namespace calc {
                               long int maxNrOfSteps = 50000, // default: 10000
                               double xtol = 1e-9,
                               long int innerMaxNrOfSteps = 100,
-                              double innerAlphaTol = 1e-15);
+                              double innerAlphaTol = 1e-15,
+        const double oneOverSpringPartitionUpperLimit = 1.0);
 
       /**
        * @brief Compute the spring update residual
@@ -139,7 +140,8 @@ namespace calc {
           double innerAlphaTol = 1e-9,
           double distanceBackTolerance = 0.0,
           double residualNormSTolerance = 0.0,
-          long int innerMinNrOfSteps = 1)
+          long int innerMinNrOfSteps = 1,
+        const double oneOverSpringPartitionUpperLimit = 1.0)
       {
         size_t innerIterationsDone = 0;
         double displacementDone = 0.0;
@@ -160,7 +162,7 @@ namespace calc {
                                            residualNormSTolerance);
           rOverr0 = r2 / r02;
           displacementDone = this->displaceToMeanPosition(
-            &this->initialConfig, displacements, springPartitions, link_idx);
+            &this->initialConfig, displacements, springPartitions, link_idx, oneOverSpringPartitionUpperLimit);
           innerIterationsDone += 1;
         } while ((innerIterationsDone < innerMaxNrOfSteps &&
                   rOverr0 > innerAlphaTol && std::isfinite(rOverr0)) ||
@@ -197,6 +199,10 @@ namespace calc {
       Eigen::VectorXd getCurrentDisplacements() const
       {
         return this->currentDisplacements;
+      }
+
+      void setCurrentDisplacements(const Eigen::VectorXd displacements) {
+        this->currentDisplacements = displacements;
       }
 
       std::vector<Eigen::ArrayXi> getIndependentCoordinateSets(
@@ -287,7 +293,8 @@ namespace calc {
        */
       double getAverageSpringLength() const;
 
-      std::array<std::array<double, 3>, 3> getStressTensor() const;
+      std::array<std::array<double, 3>, 3> getStressTensor(
+        const double oneOverSpringPartitionUpperLimit = -1.0) const;
 
       /**
        * @brief Get the Pressure
@@ -475,13 +482,14 @@ namespace calc {
        * @return double, the distance (squared norm) displaced
        */
       Eigen::VectorXd inspectDisplacementToMeanPositionUpdate(
-        const size_t linkIdx) const
+        const size_t linkIdx,
+        const double oneOverSpringPartitionUpperLimit = 1.0) const
       {
         Eigen::VectorXd displacements = this->currentDisplacements;
         this->displaceToMeanPosition(&this->initialConfig,
                                      displacements,
                                      this->currentSpringPartitionsVec,
-                                     linkIdx);
+                                     linkIdx, oneOverSpringPartitionUpperLimit);
         return displacements;
       };
 
@@ -523,9 +531,8 @@ namespace calc {
       double displaceToMeanPosition(const ForceBalanceNetwork* net,
                                     Eigen::VectorXd& u,
                                     const Eigen::VectorXd& springPartitions,
-                                    const size_t linkIdx) const;
-
-#define ONE_OVER_SPRING_PARTITION_CLAMP_MAX 1.0
+                                    const size_t linkIdx,
+        const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
       /**
        * @brief Translate the spring partition vector to its 3*size
@@ -536,7 +543,8 @@ namespace calc {
        */
       Eigen::VectorXd assembleOneOverSpringPartition(
         const ForceBalanceNetwork* net,
-        const Eigen::VectorXd& springPartitions0) const
+        const Eigen::VectorXd& springPartitions0,
+        const double oneOverSpringPartitionUpperLimit = 1.0) const
       {
         INVALIDARG_EXP_IFN(
           springPartitions0.size() == net->nrOfPartialSprings,
@@ -557,7 +565,7 @@ namespace calc {
                      i)])
               : 0.0;
           valueToSet =
-            std::clamp(valueToSet, 0.0, ONE_OVER_SPRING_PARTITION_CLAMP_MAX);
+            std::clamp(valueToSet, 0.0, oneOverSpringPartitionUpperLimit);
           // if (springPartitions0[i] < 1e-9) {
           //   std::cout << "Got close call for partial spring " << i <<
           //   std::endl;

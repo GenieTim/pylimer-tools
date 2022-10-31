@@ -236,7 +236,7 @@ namespace entities {
     return results;
   };
 
-  std::vector<Atom> Molecule::getAtomsLinedUp()
+  std::vector<Atom> Molecule::getAtomsLinedUp(int crossLinkerType)
   {
     std::vector<Atom> results;
     size_t nrOfAtoms = this->getNrOfAtoms();
@@ -246,6 +246,11 @@ namespace entities {
     std::vector<long int> ends = this->getVerticesWithDegree(1);
     if (ends.size() > 0) {
       vertexIdToStartWith = ends[0];
+    } else {
+      std::vector<Atom> xlinkers = this->getAtomsOfType(crossLinkerType);
+      if (xlinkers.size() > 0) {
+        vertexIdToStartWith = this->getIdxByAtomId(xlinkers[0].getId());
+      }
     }
 
     std::vector<long int> connections =
