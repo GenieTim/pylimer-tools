@@ -484,7 +484,7 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("damping") = 1.0,
          py::arg("maxNrOfSteps") = 250000,
          py::arg("xTolerance") = 1e-12,
-         py::arg("innerMaxNrOfSteps") = 150,
+         py::arg("innerMaxNrOfSteps") = 250,
          py::arg("innerAlphaTolerance") = 1e-15,
          py::arg("oneOverSpringPartitionUpperLimit") = 1.0)
     .def("inspectLinkDisplacementToMeanPositionUpdate",
@@ -492,6 +492,11 @@ init_pylimer_bound_calc(py::module_& m)
          R"pbdoc()pbdoc",
          py::arg("linkIdx"),
          py::arg("damping") = 1.0)
+    .def("getForceOn",
+         &mehp::MEHPForceBalance::getForceOn,
+         R"pbdoc()pbdoc",
+         py::arg("linkIdx"),
+         py::arg("oneOverSpringPartitionUpperLimit") = 1.0)
     .def("inspectDisplacementToMeanPositionUpdate",
          &mehp::MEHPForceBalance::inspectDisplacementToMeanPositionUpdate,
          R"pbdoc()pbdoc",
@@ -549,17 +554,25 @@ init_pylimer_bound_calc(py::module_& m)
                            const std::vector<double>,
                            const std::vector<double>,
                            const std::vector<double>,
-                           const std::vector<double>>(
+                           const std::vector<double>,
+                           const bool>(
            &mehp::MEHPForceBalance::addSlipLinks),
          R"pbdoc(
-          Add 
-     )pbdoc")
+          Add the slip-links
+     )pbdoc", py::arg("strandIdx1"), py::arg("strandIdx2"), py::arg("x"), py::arg("y"), py::arg("z"), py::arg("alpha1"), py::arg("alpha2"), py::arg("clampAlpha") = false)
     .def("getStressTensor",
          &mehp::MEHPForceBalance::getStressTensor,
          R"pbdoc(
           Returns the stress tensor at the current state of the simulation.
      )pbdoc",
          py::arg("oneOverSpringPartitionUpperLimit") = -1)
+    .def("getStressTensorLinkBased",
+         &mehp::MEHPForceBalance::getStressTensorLinkBased,
+         R"pbdoc(
+          Returns the stress tensor at the current state of the simulation.
+     )pbdoc",
+         py::arg("oneOverSpringPartitionUpperLimit") = -1,
+         py::arg("xlinksOnly") = false)
     .def("getGammaFactor",
          &mehp::MEHPForceBalance::getGammaFactor,
          R"pbdoc(
