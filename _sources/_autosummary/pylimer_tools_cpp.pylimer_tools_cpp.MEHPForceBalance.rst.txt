@@ -26,6 +26,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance
       ~MEHPForceBalance.getDisplacements
       ~MEHPForceBalance.getEffectiveFunctionalityOfAtoms
       ~MEHPForceBalance.getExitReason
+      ~MEHPForceBalance.getForceOn
       ~MEHPForceBalance.getGammaFactor
       ~MEHPForceBalance.getIdsOfActiveNodes
       ~MEHPForceBalance.getNrOfActiveNodes
@@ -37,6 +38,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance
       ~MEHPForceBalance.getSpringPartitions
       ~MEHPForceBalance.getSpringpartitionIndicesOfSliplink
       ~MEHPForceBalance.getStressTensor
+      ~MEHPForceBalance.getStressTensorLinkBased
       ~MEHPForceBalance.inspectDisplacementToMeanPositionUpdate
       ~MEHPForceBalance.inspectLinkDisplacementToMeanPositionUpdate
       ~MEHPForceBalance.inspectParametrisationOptimsationForLink
