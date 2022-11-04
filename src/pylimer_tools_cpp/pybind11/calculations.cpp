@@ -610,6 +610,17 @@ init_pylimer_bound_calc(py::module_& m)
          R"pbdoc(
           Set the current link displacements.
      )pbdoc")
+    .def("setSpringContourLengths",
+         &mehp::MEHPForceBalance::setSpringContourLengths,
+         R"pbdoc(
+          Set/overwrite the contour lengths.
+     )pbdoc")
+    .def(
+      "getDisplacementResidualNorm",
+      py::overload_cast<double>(&mehp::MEHPForceBalance::getDisplacementResidualNorm),
+      R"pbdoc(
+          Get the current link displacement residual norm.
+     )pbdoc")
     .def("getIdsOfActiveNodes",
          &mehp::MEHPForceBalance::getIdsOfActiveNodes,
          R"pbdoc(

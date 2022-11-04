@@ -69,12 +69,13 @@ namespace calc {
        * @param xtol
        * @param ftol
        */
-      void runForceRelaxation(BalanceRunMode mode = BalanceRunMode::ITERATIVE,
-                              double damping = 1.0,
-                              long int maxNrOfSteps = 50000, // default: 10000
-                              double xtol = 1e-9,
-                              long int innerMaxNrOfSteps = 100,
-                              double innerAlphaTol = 1e-15,
+      void runForceRelaxation(
+        BalanceRunMode mode = BalanceRunMode::ITERATIVE,
+        double damping = 1.0,
+        long int maxNrOfSteps = 50000, // default: 10000
+        double xtol = 1e-9,
+        long int innerMaxNrOfSteps = 100,
+        double innerAlphaTol = 1e-15,
         const double oneOverSpringPartitionUpperLimit = 1.0);
 
       /**
@@ -141,7 +142,7 @@ namespace calc {
           double distanceBackTolerance = 0.0,
           double residualNormSTolerance = 0.0,
           long int innerMinNrOfSteps = 1,
-        const double oneOverSpringPartitionUpperLimit = 1.0)
+          const double oneOverSpringPartitionUpperLimit = 1.0)
       {
         size_t innerIterationsDone = 0;
         double displacementDone = 0.0;
@@ -161,8 +162,12 @@ namespace calc {
                                            distanceBackTolerance,
                                            residualNormSTolerance);
           rOverr0 = r2 / r02;
-          displacementDone = this->displaceToMeanPosition(
-            &this->initialConfig, displacements, springPartitions, link_idx, oneOverSpringPartitionUpperLimit);
+          displacementDone =
+            this->displaceToMeanPosition(&this->initialConfig,
+                                         displacements,
+                                         springPartitions,
+                                         link_idx,
+                                         oneOverSpringPartitionUpperLimit);
           innerIterationsDone += 1;
         } while ((innerIterationsDone < innerMaxNrOfSteps &&
                   rOverr0 > innerAlphaTol && std::isfinite(rOverr0)) ||
@@ -201,8 +206,17 @@ namespace calc {
         return this->currentDisplacements;
       }
 
-      void setCurrentDisplacements(const Eigen::VectorXd displacements) {
+      void setCurrentDisplacements(const Eigen::VectorXd displacements)
+      {
         this->currentDisplacements = displacements;
+      }
+
+      void setSpringContourLengths(const Eigen::VectorXd springsContourLengths)
+      {
+        INVALIDARG_EXP_IFN(springsContourLengths.size() ==
+                             this->initialConfig.springsContourLength.size(),
+                           "Contour length must have the correct dimensions.");
+        this->initialConfig.springsContourLength = springsContourLengths;
       }
 
       std::vector<Eigen::ArrayXi> getIndependentCoordinateSets(
@@ -489,7 +503,8 @@ namespace calc {
         this->displaceToMeanPosition(&this->initialConfig,
                                      displacements,
                                      this->currentSpringPartitionsVec,
-                                     linkIdx, oneOverSpringPartitionUpperLimit);
+                                     linkIdx,
+                                     oneOverSpringPartitionUpperLimit);
         return displacements;
       };
 
@@ -528,10 +543,11 @@ namespace calc {
        * @param linkIdx the idx of the link to displace
        * @return double, the distance (squared norm) displaced
        */
-      double displaceToMeanPosition(const ForceBalanceNetwork* net,
-                                    Eigen::VectorXd& u,
-                                    const Eigen::VectorXd& springPartitions,
-                                    const size_t linkIdx,
+      double displaceToMeanPosition(
+        const ForceBalanceNetwork* net,
+        Eigen::VectorXd& u,
+        const Eigen::VectorXd& springPartitions,
+        const size_t linkIdx,
         const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
       /**
@@ -723,6 +739,15 @@ namespace calc {
 
         return maxDiff;
       };
+
+      double getDisplacementResidualNorm(double cutoff)
+      {
+        return this->getDisplacementResidualNorm(
+          &this->initialConfig,
+          this->currentDisplacements,
+          this->assembleOneOverSpringPartition(
+            &this->initialConfig, this->currentSpringPartitionsVec, cutoff));
+      }
 
       double getDisplacementResidualNorm(
         const ForceBalanceNetwork* net,
