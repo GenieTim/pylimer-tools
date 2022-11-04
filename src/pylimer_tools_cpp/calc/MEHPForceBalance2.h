@@ -646,7 +646,7 @@ namespace calc {
             parameterIdx += 1;
 
             size_t springIdx = net->partialToFullSpringIndex.at(i);
-            if (!springToParametersMap.contains(springIdx)) {
+            if (!pylimer_tools::utils::map_has_key(springToParametersMap, springIdx)) {
               springToParametersMap.emplace(
                 springIdx, std::vector<size_t>({ parameterIdx }));
             } else {
