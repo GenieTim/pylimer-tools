@@ -29,7 +29,7 @@ namespace utils {
     // C++20 (and later) code
     return map.contains(key);
 #else
-    return map.find(value) != map.end();
+    return map.find(key) != map.end();
 #endif
   }
 
