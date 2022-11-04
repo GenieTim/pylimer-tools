@@ -200,14 +200,14 @@ TEST_CASE(
       // initial system values
       CHECK(forceRelaxer2.getPressure() ==
             Catch::Approx(0.39911682390778536 / 79.));
-      CHECK(forceRelaxer2.getForce() == Catch::Approx(552894.1903005145));
+      CHECK(forceRelaxer2.getForce()*79 == Catch::Approx(552894.1903005145));
       CHECK(forceRelaxer2.getAverageContourLength() == Catch::Approx(79.0));
       Eigen::VectorXd contourLengths = forceRelaxer2.getSpringContourLength();
       for (int i = 0; i < contourLengths.size(); ++i) {
         CHECK(contourLengths[i] ==
               Catch::Approx(forceRelaxer2.getAverageContourLength()));
       }
-      CHECK(forceRelaxer2.getResidualNorm() == Catch::Approx(1457.465048151));
+      CHECK(forceRelaxer2.getResidualNorm()*79 == Catch::Approx(1457.465048151));
       REQUIRE_NOTHROW(forceRelaxer2.runForceRelaxation());
       CHECK(forceRelaxer2.getNrOfSprings() == 8142);
       CHECK(forceRelaxer2.getNrOfIterations() > 1);
@@ -222,7 +222,7 @@ TEST_CASE(
       double Nb = 80.; // nr of bonds per strand
       double conversionFactor =
         3. * kb * T / (slope * beadMass * (Nb / 79.)); // J/sigma^2
-      CHECK(conversionFactor * 79. / (sigmaToM * sigmaToM) ==
+      CHECK((conversionFactor / 79.) / (sigmaToM * sigmaToM) ==
             Catch::Approx(0.000245543));
       double nu =
         nrOfChains / (forceRelaxer2.getVolume() * sigmaToM * sigmaToM *
@@ -387,9 +387,9 @@ TEST_CASE(
             Catch::Approx(97.383096 * 97.383096 * 97.383096));
       // initial system values
       CHECK(forceRelaxer2.getForce() ==
-            Catch::Approx(21821.2315950056 * (80. / 79.)).epsilon(1e-5));
+            Catch::Approx(22103.6441026747).epsilon(1e-5));
       CHECK(forceRelaxer2.getResidualNorm() ==
-            Catch::Approx(57.9925492668 * (80. / 79.)).epsilon(1e-5));
+            Catch::Approx(58.7568113327).epsilon(1e-5));
       CHECK(forceRelaxer2.getPressure() *
               forceRelaxer2.getNetwork().meanSpringContourLength ==
             Catch::Approx(0.39911682390778536));
@@ -415,10 +415,10 @@ TEST_CASE(
       double beadMass = 161.;                           // g/mol
       double Nb = 80.; // nr of beads per strand
       double conversionFactor =
-        (forceRelaxer2.getNetwork().meanSpringContourLength / (Nb)) * 3. * kb *
+        (forceRelaxer2.getNetwork().meanSpringContourLength) * 3. * kb *
         T / (slope * beadMass); // J/sigma^2
-      CHECK(conversionFactor / (sigmaToM * sigmaToM) ==
-            Catch::Approx(0.000245543));
+      CHECK(conversionFactor / (sigmaToM * sigmaToM * 79. * 79.) ==
+            Catch::Approx(0.0002486513));
       double nu =
         nrOfChains / (forceRelaxer2.getVolume() * sigmaToM * sigmaToM *
                       sigmaToM); // chain number density, m^-3
@@ -431,12 +431,12 @@ TEST_CASE(
         Catch::Approx(
           (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) / 3.)
           .epsilon(0.02));
-      CHECK(forceRelaxer2.getPressure() ==
-            Catch::Approx(0.1538073308 / 79.)); // LJ Units [?]
+      CHECK(forceRelaxer2.getPressure()* 79. ==
+            Catch::Approx(0.1538073308)); // LJ Units [?]
       CHECK(forceRelaxer2.getPressure() * conversionFactor /
-              (sigmaToM * sigmaToM * sigmaToM) ==
+              (sigmaToM * sigmaToM * sigmaToM * 79.) ==
             Catch::Approx(
-              61308.9809826224)); // shear modulus from the pressure, MPa
+              61308.9809826224 * 80./79.)); // shear modulus from the pressure, MPa
       double nrOfChainCorrection =
         (forceRelaxer2.getDefaultNrOfChains() / nrOfChains);
       double expectedNb2 = slope * Nb * beadMass;

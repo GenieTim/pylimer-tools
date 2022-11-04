@@ -47,7 +47,11 @@ namespace calc {
       assert(n == this->net.nrOfNodes * 3);
       assert(u.size() == this->net.coordinates.size());
 
-      double s2 = springDistances.squaredNorm();
+      double s2 = 0.0;
+      for (size_t i = 0; i < this->net.nrOfSprings; ++i) {
+        s2 += springDistances.segment(3 * i, 3).squaredNorm() /
+              this->net.springsContourLength[i];
+      }
       if (grad != nullptr) {
         const double constantMultiplier = this->kappa; // * 0.5 / s2;
         const int nrOfDim = this->is2D ? 2 : 3;
@@ -57,8 +61,7 @@ namespace calc {
         for (size_t j = 0; j < this->net.nrOfSprings; ++j) {
           const int a = this->net.springIndexA[j];
           const int b = this->net.springIndexB[j];
-          const double Nterm = this->net.meanSpringContourLength /
-                               this->net.springsContourLength[j];
+          const double Nterm = 1.0 / this->net.springsContourLength[j];
           for (size_t dir = 0; dir < nrOfDim; ++dir) {
             grad[3 * a + dir] +=
               springDistances[3 * j + dir] * constantMultiplier * Nterm;

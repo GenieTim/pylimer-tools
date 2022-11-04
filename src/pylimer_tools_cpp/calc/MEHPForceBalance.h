@@ -310,6 +310,10 @@ namespace calc {
       std::array<std::array<double, 3>, 3> getStressTensor(
         const double oneOverSpringPartitionUpperLimit = -1.0) const;
 
+      std::array<std::array<double, 3>, 3> getStressTensorLinkBased(
+        const double oneOverSpringPartitionUpperLimit = -1.0,
+        const bool xlinksOnly = false) const;
+
       /**
        * @brief Get the Pressure
        *
@@ -357,7 +361,8 @@ namespace calc {
                         const std::vector<double> y,
                         const std::vector<double> z,
                         const std::vector<double> alpha1,
-                        const std::vector<double> alpha2);
+                        const std::vector<double> alpha2,
+                        bool clampAlpha = false);
 
       /**
        * @brief Compute the spring lenghts
@@ -402,6 +407,31 @@ namespace calc {
       void setSpringPartitions(const Eigen::VectorXd newSpringPartitionsVec)
       {
         this->currentSpringPartitionsVec = newSpringPartitionsVec;
+      }
+
+      Eigen::Matrix3d getForceOn(
+        const size_t index,
+        double oneOverSpringPartitionUpperLimit = 1.0) const
+      {
+        Eigen::VectorXi debugNrSpringsVisited =
+          Eigen::VectorXi::Zero(this->initialConfig.nrOfPartialSprings);
+        return this->initialConfig.linkIsSliplink[index]
+                 ? this->evaluateForceOnSlipLink(
+                     index,
+                     &this->initialConfig,
+                     this->currentDisplacements,
+                     this->currentSpringPartitionsVec,
+                     debugNrSpringsVisited,
+                     1.0,
+                     oneOverSpringPartitionUpperLimit)
+                 : this->evaluateForceOnCrossLink(
+                     index,
+                     &this->initialConfig,
+                     this->currentDisplacements,
+                     this->currentSpringPartitionsVec,
+                     debugNrSpringsVisited,
+                     1.0,
+                     oneOverSpringPartitionUpperLimit);
       }
 
       std::vector<size_t> getSpringpartitionIndicesOfSliplink(
@@ -575,7 +605,7 @@ namespace calc {
         for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
           double valueToSet =
             springPartitions0[i] > 0.0 // 1e-18 //
-              ? 1. /
+              ? 1.0 /
                   (springPartitions0[i] *
                    net->springsContourLength[net->partialToFullSpringIndex.at(
                      i)])
@@ -766,16 +796,16 @@ namespace calc {
         // return partialDistancesOverSpringPartitions.squaredNorm();
 
         Eigen::VectorXd overallForces =
-          Eigen::VectorXd::Zero(net->coordinates.size());
+          Eigen::VectorXd::Zero(3 * net->nrOfLinks);
         overallForces(net->springPartCoordinateIndexB) +=
           partialDistancesOverSpringPartitions;
         overallForces(net->springPartCoordinateIndexA) -=
           partialDistancesOverSpringPartitions;
 
-        Eigen::Index maxRow, maxCol;
-        double max = overallForces.maxCoeff(&maxRow, &maxCol);
-        Eigen::Index minRow, minCol;
-        double min = overallForces.minCoeff(&minRow, &minCol);
+        // Eigen::Index maxRow, maxCol;
+        // double max = overallForces.maxCoeff(&maxRow, &maxCol);
+        // Eigen::Index minRow, minCol;
+        // double min = overallForces.minCoeff(&minRow, &minCol);
         // std::cout << "Got min = " << min << " at " << minRow << ", " <<
         // minCol
         //           << std::endl;
@@ -1018,9 +1048,10 @@ namespace calc {
        * @param u the displacements
        * @return double
        */
-      double evaluatePressure(const ForceBalanceNetwork* net,
-                              const Eigen::VectorXd& u,
-                              const Eigen::VectorXd& springPartitions) const
+      double evaluatePressure(
+        const ForceBalanceNetwork* net,
+        const Eigen::VectorXd& u,
+        const Eigen::VectorXd& springPartitions) const
       {
         auto stressTensor =
           this->evaluateStressTensor(net, u, springPartitions);
@@ -1039,6 +1070,21 @@ namespace calc {
         return (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) /
                3.0;
       }
+      /**
+       * @brief Compute the stress tensor
+       *
+       * @param net
+       * @param u
+       * @param loopTol
+       * @return std::array<std::array<double, 3>, 3>
+       */
+      std::array<std::array<double, 3>, 3> evaluateStressTensorLinkBased(
+        const ForceBalanceNetwork* net,
+        const Eigen::VectorXd& u,
+        const Eigen::VectorXd& springPartitions,
+        const double kappa0 = 1.0,
+        const double oneOverSpringPartitionUpperLimit = -1.0,
+        const bool xlinksOnly = false) const;
 
       /**
        * @brief Compute the stress tensor
@@ -1053,7 +1099,7 @@ namespace calc {
         const Eigen::VectorXd& u,
         const Eigen::VectorXd& springPartitions,
         const double kappa0 = 1.0,
-        const double minCutoff = 1e-20) const;
+        const double oneOverSpringPartitionUpperLimit = -1.0) const;
 
       /**
        * @brief Compute the force acting on a slip-link
@@ -1068,13 +1114,14 @@ namespace calc {
        * @param minCutoff
        * @return Eigen::Vector3d
        */
-      Eigen::Vector3d evaluateForceOnSlipLink(
+      Eigen::Matrix3d evaluateForceOnSlipLink(
         const size_t linkIdx,
         const ForceBalanceNetwork* net,
         const Eigen::VectorXd& u,
         const Eigen::VectorXd& springPartitions,
+        Eigen::VectorXi& debugNrSpringsVisited,
         const double kappa0 = 1.0,
-        const double minCutoff = 1e-20) const;
+        const double oneOverSpringPartitionUpperLimit = 1) const;
 
       /**
        * @brief Compute the force acting on a cross-link
@@ -1089,13 +1136,14 @@ namespace calc {
        * @param minCutoff
        * @return Eigen::Vector3d
        */
-      Eigen::Vector3d evaluateForceOnCrossLink(
+      Eigen::Matrix3d evaluateForceOnCrossLink(
         const size_t linkIdx,
         const ForceBalanceNetwork* net,
         const Eigen::VectorXd& u,
         const Eigen::VectorXd& springPartitions,
+        Eigen::VectorXi& debugNrSpringsVisited,
         const double kappa0 = 1.0,
-        const double minCutoff = 1e-20) const;
+        const double oneOverSpringPartitionUpperLimit = 1) const;
 
       /**
        * @brief Count how many of the springs are active (length > tolerance)

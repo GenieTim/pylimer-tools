@@ -308,6 +308,7 @@ TEST_CASE("MEHP Force Balance handles slip-link convergence correctly",
    *
    * 10-(12)-1654
    */
+  // slip-link 3 in the test-system
   universe.addAtoms({ 35, 90, 1654, 10, 11, 12, 13, 14 },
                     { 2, 2, 2, 2, 1, 1, 1, 1 },
                     { 12.075848854154861,
@@ -353,11 +354,26 @@ TEST_CASE("MEHP Force Balance handles slip-link convergence correctly",
   Eigen::VectorXd displacements = Eigen::VectorXd::Zero(6 * 3);
   Eigen::VectorXd springPartitions = forceBalancer.getSpringPartitions();
   outputNetwork(forceBalancer.getNetwork(), displacements, springPartitions);
-  auto results = forceBalancer.inspectParametrisationOptimsationForLink(
-    5, displacements, springPartitions);
+  /*auto results = */
+  forceBalancer.inspectParametrisationOptimsationForLink(
+    5, displacements, springPartitions, 250, 1e-10, 0.0, 0.0, 100, 1e10); // cannot use 1.0 for oneOver... without setting higher contour length fraction
   CHECK(displacements[5 * 3] == Catch::Approx(-0.592091));
   CHECK(displacements[5 * 3 + 1] == Catch::Approx(0.441203));
   CHECK(displacements[5 * 3 + 2] == Catch::Approx(0.44577));
+  outputNetwork(forceBalancer.getNetwork(), displacements, springPartitions);
+
+  SECTION("Stress tensor computations are equivalent")
+  {
+    std::array<std::array<double, 3>, 3> stressTensor1 =
+      forceBalancer.getStressTensor();
+    std::array<std::array<double, 3>, 3> stressTensor2 =
+      forceBalancer.getStressTensorLinkBased();
+    for (size_t i = 0; i < 3; ++i) {
+      for (size_t j = 0; j < 3; ++j) {
+        CHECK(stressTensor1[i][j] == Catch::Approx(stressTensor2[i][j]));
+      }
+    }
+  }
 }
 
 TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
@@ -400,6 +416,19 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
             Catch::Approx(nrOfChains));
       pcm::MEHPForceBalance forceBalancer2 =
         pcm::MEHPForceBalance(universe2, 2);
+
+      SECTION("Stress tensor computations are equivalent")
+      {
+        std::array<std::array<double, 3>, 3> stressTensor1 =
+          forceBalancer2.getStressTensor();
+        std::array<std::array<double, 3>, 3> stressTensor2 =
+          forceBalancer2.getStressTensorLinkBased();
+        for (size_t i = 0; i < 3; ++i) {
+          for (size_t j = 0; j < 3; ++j) {
+            CHECK(stressTensor1[i][j] == Catch::Approx(stressTensor2[i][j]));
+          }
+        }
+      }
 
       SECTION("Displacement computations are equivalent")
       {
@@ -505,7 +534,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
       double conversionFactor =
         (forceBalancer2.getNetwork().meanSpringContourLength / Nb) * 3. * kb *
         T / (slope * beadMass); // J/sigma^2
-      CHECK(conversionFactor / (sigmaToM * sigmaToM) ==
+      CHECK(conversionFactor / (sigmaToM * sigmaToM * 79.) ==
             Catch::Approx(0.000245543));
       double nu =
         nrOfChains / (forceBalancer2.getVolume() * sigmaToM * sigmaToM *
@@ -853,11 +882,11 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       displacements.setZero();
 
       REQUIRE(net.springIndicesOfLinks.size() == net.nrOfLinks);
-      for (int i = 4; i < 5; ++i) {
+      for (int j = 0; j < 5; ++j) {
         forceBalancer2.displaceToMeanPosition(
-          &net, displacements, springPartitions, 5);
+          &net, displacements, springPartitions, 5, -1.);
         forceBalancer2.updateSpringPartition(
-          &net, displacements, springPartitions, 5);
+          &net, displacements, springPartitions, 5, -1.);
         for (int i = 0; i < net.nrOfPartialSprings; i++) {
           std::cout << net.springPartIndexA[i] << ", "
                     << net.springPartIndexB[i] << ": ";
@@ -870,14 +899,14 @@ TEST_CASE("MEHP Force Balance handles slip-links",
         // NOTE: difficulty: finding out which node and spring it is actually
         // after the removal of strand atoms
         forceBalancer2.displaceToMeanPosition(
-          &net, displacements, springPartitions, 4);
+          &net, displacements, springPartitions, 4, -1.);
         // for (int dir = 0; dir < 3; ++dir) {
         //   std::cout << (net.coordinates[3 * 4 + dir] + displacements[3 * 4 +
         //   dir])
         //             << ", ";
         // }
         forceBalancer2.updateSpringPartition(
-          &net, displacements, springPartitions, 4);
+          &net, displacements, springPartitions, 4, -1.);
         // std::cout << std::endl;
         // std::cout << springPartitions[0][0] << ", " << springPartitions[1][0]
         //           << std::endl;
