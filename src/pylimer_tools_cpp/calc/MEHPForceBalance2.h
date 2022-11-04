@@ -59,7 +59,6 @@ namespace calc {
        * @param ftol
        */
       void runForceRelaxation(const char* algorithm = "LD_MMA",
-
                               long int maxNrOfSteps = 50000, // default: 10000
                               double xtol = 1e-9,
                               double ftol = 1e-9);
@@ -553,23 +552,78 @@ namespace calc {
         return oneOverSpringPartitions;
       }
 
+      /**
+       * @brief Reduce the spring partitions to the actually free values
+       *
+       * @param net
+       * @param partitions
+       * @return Eigen::VectorXd
+       */
+      static Eigen::VectorXd translateAllPartitionsToPartialParameters(
+        ForceBalanceNetwork* net,
+        const Eigen::VectorXd& partitions)
+      {
+        size_t nrOfPartialSpringParameters =
+          net->nrOfPartialSprings - net->nrOfSprings;
+        Eigen::VectorXd parameters =
+          Eigen::VectorXd::Zero(nrOfPartialSpringParameters);
+        size_t parameterIdx = 0;
+        for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
+          if (net->linkIsSliplink[net->springPartIndexB[i]]) {
+            parameters[parameterIdx] = partitions[i];
+            parameterIdx += 1;
+          }
+        }
+        assert(parameterIdx == nrOfPartialSpringParameters);
+        return parameters;
+      }
+
+      /**
+       * @brief Un-reduce the spring partitions from the actually free values to
+       * all
+       *
+       * @param net
+       * @param params
+       * @return Eigen::VectorXd
+       */
       static Eigen::VectorXd translatePartialParametersToAllPartitions(
         ForceBalanceNetwork* net,
         const Eigen::VectorXd& params)
       {
-        Eigen::VectorXd results =
-          Eigen::VectorXd::Ones(net->nrOfPartialSprings);
-        // TODO: implement
+        Eigen::VectorXd partitions =
+          Eigen::VectorXd::Zero(net->nrOfPartialSprings);
         size_t parameterIdx = 0;
+        std::vector<size_t> indicesToSetLater;
+        indicesToSetLater.reserve(net->nrOfSprings);
+        // set the obvious ones
         for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
           if (!net->linkIsSliplink[net->springPartIndexA[i]] &&
               !net->linkIsSliplink[net->springPartIndexB[i]]) {
-            results[i] = 1.;
+            // an ordinary spring without partitions
+            partitions[i] = 1.0;
           } else {
-            // TODO: finish implementation
+
+            if (net->linkIsSliplink[net->springPartIndexB[i]]) {
+              // the normal case
+              partitions[i] = params[parameterIdx];
+              parameterIdx += 1;
+            } else {
+              // requires computation -> do later
+              indicesToSetLater.push_back(i);
+            }
           }
         }
-        return results;
+        for (size_t indexToSet : indicesToSetLater) {
+          size_t fullSpringIdx = net->partialToFullSpringIndex.at(indexToSet);
+          std::vector<size_t> springPartners =
+            net->linkIndicesOfSprings[fullSpringIdx];
+          // thanks to the initialization to 0, it does not matter if we add
+          // too many here
+          double sum =
+            partitions(net->localToGlobalSpringIndex.at(fullSpringIdx)).sum();
+          partitions[indexToSet] = 1.0 - sum;
+        }
+        return partitions;
       }
 
       double displaceLinksToMeanPosition(const ForceBalanceNetwork* net,

@@ -32,14 +32,9 @@ namespace calc {
       const int M = this->universe.getMolecules(crosslinkerType).size();
       const int N = this->universe.getMeanStrandLength(crosslinkerType) + 1;
       const double bM = this->universe.computeMeanBondLength();
-      const int f =
-        this->universe.determineFunctionalityPerType()[crosslinkerType];
       bool is2D = this->is2D;
       size_t nrOfPartialSpringParameters =
         net.nrOfPartialSprings - net.nrOfSprings;
-
-      /* array allocation */
-      Eigen::VectorXd u = Eigen::VectorXd::Zero(3 * net.nrOfLinks);
 
       /* force relaxation */
       Eigen::VectorXd springPartitions = this->currentSpringPartitionsVec;
@@ -53,14 +48,14 @@ namespace calc {
                 << std::endl;
       Eigen::VectorXd oneOverSpringPartitions =
         this->assembleOneOverSpringPartition(&net, springPartitions);
-      double initialResidual =
-        this->getDisplacementResidualNorm(&net, u, oneOverSpringPartitions);
-      double currentResidual = 0.0;
-      double intermediateResidual = 0.0;
 
       /* array allocation */
       std::vector<double> u0 = pylimer_tools::utils::initializeWithValue(
         3 * net.nrOfLinks + nrOfPartialSpringParameters, 0.0);
+      Eigen::VectorXd reducedPartitions = MEHPForceBalance2::translateAllPartitionsToPartialParameters(&net, springPartitions);
+      for (size_t i = 0; i < nrOfPartialSpringParameters; ++i) {
+        u0[3 * net.nrOfLinks + i] = reducedPartitions[i];
+      }
       Eigen::VectorXd u =
         Eigen::VectorXd::Zero(3 * net.nrOfLinks + nrOfPartialSpringParameters);
 
@@ -85,7 +80,7 @@ namespace calc {
           (net->springPartIndexA != net->springPartIndexB).cast<double>();
         for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
           double valueToSet =
-            springPartitions0[i] > 1e-18 // 0.0
+            springPartitions0[i] > 0.0
               ? 1. /
                   (springPartitions0[i] *
                    net->springsContourLength[net->partialToFullSpringIndex.at(
@@ -95,6 +90,7 @@ namespace calc {
           //   std::cout << "Got close call for partial spring " << i <<
           //   std::endl;
           // }
+          valueToSet = std::clamp(valueToSet, 0.0, 1.0); // TODO: parametrise
           oneOverSpringPartitions.segment(3 * i, 3) = Eigen::Vector3d::Constant(
             valueToSet * primaryLoopCorrectionMultiplier[i]);
         }
@@ -133,19 +129,26 @@ namespace calc {
       opt.set_min_objective(objectiveF, &net);
       // set constraints to support more algorithms
       std::vector<double> upperBounds;
-      upperBounds.reserve(3 * net.nrOfLinks);
+      upperBounds.reserve(3 * net.nrOfLinks + nrOfPartialSpringParameters);
       std::vector<double> lowerBounds;
-      lowerBounds.reserve(3 * net.nrOfLinks);
+      lowerBounds.reserve(3 * net.nrOfLinks + nrOfPartialSpringParameters);
       for (size_t i = 0; i < net.nrOfLinks; ++i) {
         for (size_t dir = 0; dir < 3; ++dir) {
           upperBounds.push_back(net.L[dir] * 0.5);
           lowerBounds.push_back(-net.L[dir] * 0.5);
         }
       }
+      for (size_t i = 0; i < nrOfPartialSpringParameters; ++i) {
+        upperBounds.push_back(1.0);
+        lowerBounds.push_back(0.0);
+      }
 
       opt.set_upper_bounds(upperBounds);
       opt.set_lower_bounds(lowerBounds);
       // TODO: set constraint to restrict
+      // we want a non-linear constraint, that
+      // requires the sum of the spring partitions = 1, 
+      // or, in our case, the sum of the spring partition parameters -1 <= 0.
 
       // set exit conditions
       opt.set_xtol_rel(xtol);
