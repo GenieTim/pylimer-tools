@@ -96,7 +96,7 @@ namespace calc {
           computeEndToEndVectors(network, crosslinkerType);
 
         for (auto const& [key, vec] : currentEndToEndVectors) {
-          if (!result.contains(key)) {
+          if (!pylimer_tools::utils::map_has_key(result, key)) {
             position_vec_t zeroPosition;
             zeroPosition.fill(0.0);
             result.insert_or_assign(key, zeroPosition);

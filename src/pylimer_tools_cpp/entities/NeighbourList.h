@@ -11,6 +11,7 @@ extern "C"
 #include <map>
 #include <unordered_map>
 #include <vector>
+#include "../utils/VectorUtils.h"
 
 namespace pylimer_tools {
 namespace entities {
@@ -47,7 +48,7 @@ namespace entities {
       for (size_t i = 0; i < atoms.size(); ++i) {
         size_t bucketIndex = this->getBucketIndexForTriplet(
           this->getBucketIndicesForAtom(atoms[i]));
-        if (!this->neighbourBuckets.contains(bucketIndex)) {
+        if (!pylimer_tools::utils::map_has_key(this->neighbourBuckets, bucketIndex)) {
           std::vector<size_t> vectorToPlace = std::vector<size_t>();
           // reserve a sensible capacity as estimated
           vectorToPlace.reserve(atoms.size() / this->totalNrOfBuckets);

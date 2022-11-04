@@ -161,7 +161,7 @@ namespace utils {
               results.push_back(loopVertexId);
             }
             // and return it if it is a new one
-            if (!this->loopsFound.contains(loopHash)) {
+            if (!pylimer_tools::utils::map_has_key(this->loopsFound,loopHash)) {
               igraph_vector_int_destroy(&neighbours);
               igraph_vector_int_destroy(&verticesOfLoop);
               this->loopsFound.insert(loopHash);

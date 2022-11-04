@@ -173,7 +173,7 @@ namespace utils {
       throw std::invalid_argument("Cannot check for header '" + headerKey +
                                   "' without reading a group first.");
     }
-    return this->headerColMap.contains(headerKey);
+    return pylimer_tools::utils::map_has_key(this->headerColMap,headerKey);
   }
 
   /**
@@ -308,7 +308,7 @@ namespace utils {
    */
   void DumpFileParser::forgetAt(const size_t index)
   {
-    if (this->data.contains(index)) {
+    if (pylimer_tools::utils::map_has_key(this->data,index)) {
       this->data.erase(index);
     }
   };
@@ -350,7 +350,7 @@ namespace utils {
       }
     }
     newHeader = pylimer_tools::utils::rtrim(newHeader);
-    if (!this->headerColMap.contains(newHeader)) {
+    if (!pylimer_tools::utils::map_has_key(this->headerColMap,newHeader)) {
       this->headerColMap.insert_or_assign(newHeader, columns);
     }
 

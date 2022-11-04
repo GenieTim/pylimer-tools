@@ -4,6 +4,8 @@
 #include <algorithm>
 // #include <iostream>
 #include <iterator>
+#include <map>
+#include <unordered_map>
 #include <vector>
 extern "C"
 {
@@ -13,6 +15,24 @@ extern "C"
 
 namespace pylimer_tools {
 namespace utils {
+  /**
+   * @brief Find whether a map contains a value
+   *
+   * @param map T0<T1, T2>
+   * @param value
+   * @return true|false
+   */
+  template<typename T0, typename T1>
+  static inline bool map_has_key(T0 map, T1 key)
+  {
+#if __cplusplus >= 202002L
+    // C++20 (and later) code
+    return map.contains(key);
+#else
+    return map.find(value) != map.end();
+#endif
+  }
+
   template<typename IN>
   static inline std::vector<IN> interleave(std::vector<IN> in1,
                                            std::vector<IN> in2)

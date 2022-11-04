@@ -118,7 +118,7 @@ namespace utils {
                                                   const std::string headerKey,
                                                   const size_t colIdx)
   {
-    if (!this->data.contains(index)) {
+    if (!pylimer_tools::utils::map_has_key(this->data,index)) {
       // std::cout << "Could not find index " << index << "in data yet" <<
       // std::endl;
       this->readGroupByIdx(index);
@@ -128,7 +128,7 @@ namespace utils {
 
     data_item_t dataItem = this->data.at(index);
     //
-    if (!dataItem.contains(headerKey)) {
+    if (!pylimer_tools::utils::map_has_key(dataItem,headerKey)) {
       throw std::invalid_argument(headerKey + " is not a key in dataItem.");
     }
     std::vector<pylimer_tools::utils::CsvTokenizer> relevantData =
