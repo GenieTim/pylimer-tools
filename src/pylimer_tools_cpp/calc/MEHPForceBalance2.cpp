@@ -52,7 +52,9 @@ namespace calc {
       /* array allocation */
       std::vector<double> u0 = pylimer_tools::utils::initializeWithValue(
         3 * net.nrOfLinks + nrOfPartialSpringParameters, 0.0);
-      Eigen::VectorXd reducedPartitions = MEHPForceBalance2::translateAllPartitionsToPartialParameters(&net, springPartitions);
+      Eigen::VectorXd reducedPartitions =
+        MEHPForceBalance2::translateAllPartitionsToPartialParameters(
+          &net, springPartitions);
       for (size_t i = 0; i < nrOfPartialSpringParameters; ++i) {
         u0[3 * net.nrOfLinks + i] = reducedPartitions[i];
       }
@@ -68,12 +70,13 @@ namespace calc {
         Eigen::Map<const Eigen::VectorXd> u =
           Eigen::Map<const Eigen::VectorXd>(x, n);
         ForceBalanceNetwork* net = static_cast<ForceBalanceNetwork*>(f_data);
-        assert(n ==
-               net->nrOfLinks + (net->nrOfPartialSprings - net->nrOfSprings));
+        size_t nrOfPartitionParameters =
+          net->nrOfPartialSprings - net->nrOfSprings;
+        assert(n == net->nrOfLinks + (nrOfPartitionParameters));
         // assemble spring partitions from the parameters
         Eigen::VectorXd springPartitions0 =
           MEHPForceBalance2::translatePartialParametersToAllPartitions(
-            net, u.tail(net->nrOfPartialSprings - net->nrOfSprings));
+            net, u.tail(nrOfPartitionParameters));
         Eigen::VectorXd oneOverSpringPartitions =
           Eigen::VectorXd(3 * net->nrOfPartialSprings);
         Eigen::ArrayXd primaryLoopCorrectionMultiplier =
@@ -116,12 +119,53 @@ namespace calc {
           overallForces(net->springPartCoordinateIndexA) -=
             partialDistancesOverSpringPartitions;
 
-          for (size_t i = 0; i < net->nrOfLinks; ++i) {
+          for (size_t i = 0; i < net->nrOfLinks * 3; ++i) {
             grad[i] = overallForces[i];
           }
 
           // evaluate the gradient of the partition: harder.
-          // TODO: calculate
+          // this is more or less df/dalpha.
+          // as alpha is in the denominator, it is mostly just it squared in the
+          // denominator. then, summed up all contributions. care must be taken
+          // for the remaining parition (1 - param1 - param2 ...), as it too
+          // contributes to all.
+          size_t parameterIdx = 0;
+          for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
+            // find which parameter this partial spring is associated with
+            if (!net->linkIsSliplink[net->springPartIndexA[i]] &&
+                !net->linkIsSliplink[net->springPartIndexB[i]]) {
+              // this spring has partition 1, irrelevant for us
+              continue;
+            }
+            if (net->linkIsSliplink[net->springPartIndexB[i]]) {
+              // this partial spring has its own parameter -> requires gradient
+              grad[parameterIdx + net->nrOfLinks * 3] =
+                relevantPartialDistancesA.segment(3 * i, 3).squaredNorm() *
+                oneOverSpringPartitions[3 * i] * oneOverSpringPartitions[3 * i];
+              // additionally, there is a contribution from the (1-alpha-...)
+              // term, which is the last in this spring
+              size_t fullSpringIdx = net->partialToFullSpringIndex.at(i);
+              std::vector<size_t> linksInSpring =
+                net->linkIndicesOfSprings[fullSpringIdx];
+              for (size_t partnerIdx = 0; i < linksInSpring.size();
+                   ++partnerIdx) {
+                size_t equivPartialSpringIdx =
+                  net->localToGlobalSpringIndex.at(fullSpringIdx)[partnerIdx];
+                if (!net->linkIsSliplink
+                       [net->springPartIndexB[equivPartialSpringIdx]]) {
+                  // found it, the spring which is the 1-...
+                  grad[parameterIdx + net->nrOfLinks * 3] =
+                    relevantPartialDistancesA
+                      .segment(3 * equivPartialSpringIdx, 3)
+                      .squaredNorm() *
+                    oneOverSpringPartitions[3 * equivPartialSpringIdx] *
+                    oneOverSpringPartitions[3 * equivPartialSpringIdx];
+                }
+              }
+              parameterIdx += 1;
+            }
+          }
+          assert(parameterIdx == nrOfPartitionParameters);
         }
 
         return partialDistancesOverSpringPartitions.squaredNorm();
@@ -147,7 +191,7 @@ namespace calc {
       opt.set_lower_bounds(lowerBounds);
       // TODO: set constraint to restrict
       // we want a non-linear constraint, that
-      // requires the sum of the spring partitions = 1, 
+      // requires the sum of the spring partitions = 1,
       // or, in our case, the sum of the spring partition parameters -1 <= 0.
 
       // set exit conditions
