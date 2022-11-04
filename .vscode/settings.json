@@ -127,6 +127,9 @@
     "typeindex": "cpp",
     "unordered_set": "cpp",
     "valarray": "cpp",
-    "filesystem": "cpp"
+    "filesystem": "cpp",
+    "hash_map": "cpp",
+    "shared_mutex": "cpp",
+    "cfenv": "cpp"
   }
 }
