@@ -132,7 +132,7 @@ namespace entities {
 
   long int Molecule::getIdxByAtomId(const int atomId) const
   {
-    if (!this->atomIdToVertexIdx.contains(atomId)) {
+    if (!pylimer_tools::utils::map_has_key(this->atomIdToVertexIdx, atomId)) {
       throw std::invalid_argument("Molecule cannot return vertex idx of this "
                                   "atom: an atom with this id (" +
                                   std::to_string(atomId) + ") does not exist");

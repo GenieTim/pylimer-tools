@@ -428,7 +428,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     {
       std::map<int, std::vector<std::vector<pe::Atom>>> loops =
         universe.findLoops(2, -1, true);
-      REQUIRE(loops.contains(2));
+      REQUIRE(pylimer_tools::utils::map_has_key(loops, 2));
       REQUIRE(loops.size() == 1);
 
       auto allBonds = universe.getBonds();

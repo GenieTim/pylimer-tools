@@ -1062,8 +1062,8 @@ namespace calc {
       this->initialConfig.nrOfPartialSprings += partialSpringsAdded;
       
       size_t nrOfPartitionedSprings = 0;
-      for (size_t i = 0; i < net.nrOfSprings; ++i) {
-        if (net.linkIndicesOfSprings[i].size() > 2) {
+      for (size_t i = 0; i < this->initialConfig.nrOfSprings; ++i) {
+        if (this->initialConfig.linkIndicesOfSprings[i].size() > 2) {
           nrOfPartitionedSprings += 1;
         }
       }

@@ -356,7 +356,16 @@ TEST_CASE("MEHP Force Balance handles slip-link convergence correctly",
   outputNetwork(forceBalancer.getNetwork(), displacements, springPartitions);
   /*auto results = */
   forceBalancer.inspectParametrisationOptimsationForLink(
-    5, displacements, springPartitions, 250, 1e-10, 0.0, 0.0, 100, 1e10); // cannot use 1.0 for oneOver... without setting higher contour length fraction
+    5,
+    displacements,
+    springPartitions,
+    250,
+    1e-10,
+    0.0,
+    0.0,
+    100,
+    1e10); // cannot use 1.0 for oneOver... without setting higher contour
+           // length fraction
   CHECK(displacements[5 * 3] == Catch::Approx(-0.592091));
   CHECK(displacements[5 * 3 + 1] == Catch::Approx(0.441203));
   CHECK(displacements[5 * 3 + 2] == Catch::Approx(0.44577));
@@ -501,75 +510,110 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         CHECK(forceBalancer2.validateNetwork(&net));
       }
 
-      pcm::MEHPForceRelaxation forceRelaxer =
-        pcm::MEHPForceRelaxation(universe2, 2);
-      // the strands are different -> cannot compare the distances anymore
-      // CHECK((forceBalancer2.getCurrentSpringDistances() -
-      // forceRelaxer.getCurrentSpringDistances()).isMuchSmallerThan(1e-12));
-      REQUIRE(forceBalancer2.getExitReason() == pcm::ExitReason::UNSET);
-      REQUIRE(forceBalancer2.getNrOfIterations() == 0);
-      REQUIRE(forceBalancer2.getVolume() ==
-              Catch::Approx(universe2.getVolume()));
-      CHECK(forceBalancer2.getVolume() ==
-            Catch::Approx(97.383096 * 97.383096 * 97.383096));
-      // initial system values
-      CHECK(forceBalancer2.getPressure() ==
-            Catch::Approx(forceRelaxer.getPressure()));
-      CHECK(forceBalancer2.getPressure() ==
-            Catch::Approx(0.39911682390778536 / 79.));
-      REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
-      CHECK_NOTHROW(forceBalancer2.validateNetwork());
-      CHECK(forceBalancer2.getNrOfSprings() == 8142);
-      CHECK(forceBalancer2.getNrOfIterations() > 1);
-      CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+      SECTION("Actual balance results in correct phantom results")
+      {
 
-      // conversion factors
-      double kb = 1.381e-23; // Boltzmann, J/K
-      double T = 300.;       // Temperature, K
-      double sigmaToNm = 0.616;
-      double sigmaToM = sigmaToNm * 1.e-9;
-      double slope = 0.00393 / (sigmaToNm * sigmaToNm); // sigma^2/(g/mol)
-      double beadMass = 161.;                           // g/mol
-      double Nb = 80.; // nr of beads per strand
-      double conversionFactor =
-        (forceBalancer2.getNetwork().meanSpringContourLength / Nb) * 3. * kb *
-        T / (slope * beadMass); // J/sigma^2
-      CHECK(conversionFactor / (sigmaToM * sigmaToM * 79.) ==
-            Catch::Approx(0.000245543));
-      double nu =
-        nrOfChains / (forceBalancer2.getVolume() * sigmaToM * sigmaToM *
-                      sigmaToM); // chain number density, m^-3
-      CHECK(nu == Catch::Approx(4.63241e25));
+        pcm::MEHPForceRelaxation forceRelaxer =
+          pcm::MEHPForceRelaxation(universe2, 2);
+        // the strands are different -> cannot compare the distances anymore
+        // CHECK((forceBalancer2.getCurrentSpringDistances() -
+        // forceRelaxer.getCurrentSpringDistances()).isMuchSmallerThan(1e-12));
+        REQUIRE(forceBalancer2.getExitReason() == pcm::ExitReason::UNSET);
+        REQUIRE(forceBalancer2.getNrOfIterations() == 0);
+        REQUIRE(forceBalancer2.getVolume() ==
+                Catch::Approx(universe2.getVolume()));
+        CHECK(forceBalancer2.getVolume() ==
+              Catch::Approx(97.383096 * 97.383096 * 97.383096));
+        // initial system values
+        CHECK(forceBalancer2.getPressure() ==
+              Catch::Approx(forceRelaxer.getPressure()));
+        CHECK(forceBalancer2.getPressure() ==
+              Catch::Approx(0.39911682390778536 / 79.));
+        REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
+        CHECK_NOTHROW(forceBalancer2.validateNetwork());
+        CHECK(forceBalancer2.getNrOfSprings() == 8142);
+        CHECK(forceBalancer2.getNrOfIterations() > 1);
+        CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
 
-      // final values
-      CHECK(forceBalancer2.getPressure() ==
-            Catch::Approx(0.153806 / 79.)); // LJ Units [?]
-      CHECK(forceBalancer2.getPressure() * conversionFactor /
-              (sigmaToM * sigmaToM * sigmaToM) ==
-            Catch::Approx(61308.3)); // shear modulus from the pressure, MPa
-      double nrOfChainCorrection =
-        (forceBalancer2.getDefaultNrOfChains() / nrOfChains);
-      double expectedNb2 = slope * Nb * beadMass;
-      double nb2Correction =
-        (forceBalancer2.getDefaultR0Square() / (expectedNb2));
-      double gammaCorrectionFactor = nrOfChainCorrection * nb2Correction;
-      CHECK(
-        forceBalancer2.getGammaFactor() * nrOfChainCorrection *
-          forceBalancer2.getDefaultR0Square() ==
-        Catch::Approx(42.6132)); // as from conversion-less Mathematica script
-      CHECK(forceBalancer2.getGammaFactor() * gammaCorrectionFactor * kb * T *
-              nu ==
-            Catch::Approx(61308.3)); // ANT shear modulus, Pa
-      CHECK(forceBalancer2.getGammaFactor() * gammaCorrectionFactor ==
-            Catch::Approx(0.319446)); // "correct" gamma factor
-      CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-      // TODO: find better, more accurate tests here
-      CHECK(forceBalancer2.getNrOfActiveNodes() > 1);
-      CHECK(forceBalancer2.getNrOfActiveSprings() > 1);
-      CHECK(forceBalancer2.getAverageSpringLength() > 1.0);
-      CHECK(forceBalancer2.getEffectiveFunctionalityOfAtoms().size() ==
-            forceBalancer2.getNrOfNodes());
+        // conversion factors
+        double kb = 1.381e-23; // Boltzmann, J/K
+        double T = 300.;       // Temperature, K
+        double sigmaToNm = 0.616;
+        double sigmaToM = sigmaToNm * 1.e-9;
+        double slope = 0.00393 / (sigmaToNm * sigmaToNm); // sigma^2/(g/mol)
+        double beadMass = 161.;                           // g/mol
+        double Nb = 80.; // nr of beads per strand
+        double conversionFactor =
+          (forceBalancer2.getNetwork().meanSpringContourLength / Nb) * 3. * kb *
+          T / (slope * beadMass); // J/sigma^2
+        CHECK(conversionFactor / (sigmaToM * sigmaToM * 79.) ==
+              Catch::Approx(0.000245543));
+        double nu =
+          nrOfChains / (forceBalancer2.getVolume() * sigmaToM * sigmaToM *
+                        sigmaToM); // chain number density, m^-3
+        CHECK(nu == Catch::Approx(4.63241e25));
 
+        // final values
+        CHECK(forceBalancer2.getPressure() ==
+              Catch::Approx(0.153806 / 79.)); // LJ Units [?]
+        CHECK(forceBalancer2.getPressure() * conversionFactor /
+                (sigmaToM * sigmaToM * sigmaToM) ==
+              Catch::Approx(61308.3)); // shear modulus from the pressure, MPa
+        double nrOfChainCorrection =
+          (forceBalancer2.getDefaultNrOfChains() / nrOfChains);
+        double expectedNb2 = slope * Nb * beadMass;
+        double nb2Correction =
+          (forceBalancer2.getDefaultR0Square() / (expectedNb2));
+        double gammaCorrectionFactor = nrOfChainCorrection * nb2Correction;
+        CHECK(
+          forceBalancer2.getGammaFactor() * nrOfChainCorrection *
+            forceBalancer2.getDefaultR0Square() ==
+          Catch::Approx(42.6132)); // as from conversion-less Mathematica script
+        CHECK(forceBalancer2.getGammaFactor() * gammaCorrectionFactor * kb * T *
+                nu ==
+              Catch::Approx(61308.3)); // ANT shear modulus, Pa
+        CHECK(forceBalancer2.getGammaFactor() * gammaCorrectionFactor ==
+              Catch::Approx(0.319446)); // "correct" gamma factor
+        CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+        // TODO: find better, more accurate tests here
+        CHECK(forceBalancer2.getNrOfActiveNodes() > 1);
+        CHECK(forceBalancer2.getNrOfActiveSprings() > 1);
+        CHECK(forceBalancer2.getAverageSpringLength() > 1.0);
+        CHECK(forceBalancer2.getEffectiveFunctionalityOfAtoms().size() ==
+              forceBalancer2.getNrOfNodes());
+      }
+      // also
+      SECTION("Actual balance results in correct slip-link results")
+      {
+        pcm::MEHPForceRelaxation forceRelaxer =
+          pcm::MEHPForceRelaxation(universe2, 2);
+        // the strands are different -> cannot compare the distances anymore
+        // CHECK((forceBalancer2.getCurrentSpringDistances() -
+        // forceRelaxer.getCurrentSpringDistances()).isMuchSmallerThan(1e-12));
+        REQUIRE(forceBalancer2.getExitReason() == pcm::ExitReason::UNSET);
+        REQUIRE(forceBalancer2.getNrOfIterations() == 0);
+        REQUIRE(forceBalancer2.getVolume() ==
+                Catch::Approx(universe2.getVolume()));
+        CHECK(forceBalancer2.getVolume() ==
+              Catch::Approx(97.383096 * 97.383096 * 97.383096));
+        // initial system values
+        CHECK(forceBalancer2.getPressure() ==
+              Catch::Approx(forceRelaxer.getPressure()));
+        CHECK(forceBalancer2.getPressure() ==
+              Catch::Approx(0.39911682390778536 / 79.));
+        // add entanglements
+        // TODO: these are random values, as are the results... :P
+        size_t nrOfSprings = forceRelaxer.getNetwork().nrOfSprings;
+        forceBalancer2.addSlipLinks(
+          { 10, 100, 50, 12, 76, 80, nrOfSprings - 1 },
+          { 99, 101, 13, 7, 5, 19, nrOfSprings - 7 },
+          { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+          { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
+          { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
+        REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
+        // TODO: replace this value
+        CHECK(forceBalancer2.getPressure() == Catch::Approx(12930491401414));
+      }
     } else {
       std::cout << "Skipping large file PDMS MEHP run" << std::endl;
       REQUIRE(true);
