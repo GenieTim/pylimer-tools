@@ -559,7 +559,7 @@ namespace calc {
        * @param partitions
        * @return Eigen::VectorXd
        */
-      static Eigen::VectorXd translateAllPartitionsToPartialParameters(
+      static std::pair<Eigen::VectorXd, std::unordered_map<size_t, std::vector<size_t>>> translateAllPartitionsToPartialParameters(
         ForceBalanceNetwork* net,
         const Eigen::VectorXd& partitions)
       {
@@ -568,14 +568,22 @@ namespace calc {
         Eigen::VectorXd parameters =
           Eigen::VectorXd::Zero(nrOfPartialSpringParameters);
         size_t parameterIdx = 0;
+        std::unordered_map<size_t, std::vector<size_t>> springToParametersMap;
         for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
           if (net->linkIsSliplink[net->springPartIndexB[i]]) {
             parameters[parameterIdx] = partitions[i];
             parameterIdx += 1;
+
+            size_t springIdx = net->partialToFullSpringIndex.at(i);
+            if (!springToParametersMap.contains(springIdx)) {
+              springToParametersMap.emplace(springIdx, {parameterIdx});
+            } else {
+              springToParametersMap[springIdx].push_back(parameterIdx);
+            }
           }
         }
         assert(parameterIdx == nrOfPartialSpringParameters);
-        return parameters;
+        return std::make_pair(parameters, springToParametersMap);
       }
 
       /**
@@ -899,6 +907,7 @@ namespace calc {
         net->nrOfLinks = nrOfXlinks;
         net->nrOfSprings = nrOfSprings;
         net->nrOfPartialSprings = nrOfSprings;
+        net->nrofSpringsWithPartition = 0;
         net->coordinates = Eigen::VectorXd::Zero(3 * net->nrOfLinks);
         net->oldAtomIds = Eigen::ArrayXi::Zero(net->nrOfLinks);
         net->linkIsSliplink = ArrayXb::Constant(net->nrOfLinks, false);

@@ -56,6 +56,7 @@ namespace calc {
       long int nrOfNodes; /* number of cross-links */
       long int nrOfSprings;
       long int nrOfPartialSprings;
+      long int nrOfSpringsWithPartition;
       // coordinates & connectivity
       Eigen::VectorXd coordinates;
       Eigen::VectorXd springsContourLength; /* the N for each spring */

@@ -905,6 +905,7 @@ namespace calc {
         net->nrOfLinks = nrOfXlinks;
         net->nrOfSprings = nrOfSprings;
         net->nrOfPartialSprings = nrOfSprings;
+        net->nrofSpringsWithPartition = 0;
         net->coordinates = Eigen::VectorXd::Zero(3 * net->nrOfLinks);
         net->oldAtomIds = Eigen::ArrayXi::Zero(net->nrOfLinks);
         net->linkIsSliplink = ArrayXb::Constant(net->nrOfLinks, false);

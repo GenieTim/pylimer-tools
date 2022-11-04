@@ -2,6 +2,7 @@
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
+#include "../utils/VectorUtils.h"
 #include <Eigen/Dense>
 #include <algorithm>
 #include <array>
@@ -35,6 +36,9 @@ namespace calc {
       bool is2D = this->is2D;
       size_t nrOfPartialSpringParameters =
         net.nrOfPartialSprings - net.nrOfSprings;
+
+      // count
+      size_t nrOfSpringsRequiringParameter = net.nrOfSpringsWithPartition;
 
       /* force relaxation */
       Eigen::VectorXd springPartitions = this->currentSpringPartitionsVec;
@@ -189,11 +193,66 @@ namespace calc {
 
       opt.set_upper_bounds(upperBounds);
       opt.set_lower_bounds(lowerBounds);
-      // TODO: set constraint to restrict
+      // set constraint to restrict
       // we want a non-linear constraint, that
       // requires the sum of the spring partitions = 1,
       // or, in our case, the sum of the spring partition parameters -1 <= 0.
+      if (nrOfSpringsRequiringParameter > 0) {
+        nlopt::mfunc nonlinearConstraintF = [](unsigned m,
+                                               double* result,
+                                               unsigned n,
+                                               const double* x,
+                                               double* grad,
+                                               void* f_data) -> double {
+          Eigen::Map<const Eigen::VectorXd> u =
+            Eigen::Map<const Eigen::VectorXd>(x, n);
+          ForceBalanceNetwork* net = static_cast<ForceBalanceNetwork*>(f_data);
+          size_t nrOfPartitionParameters =
+            net->nrOfPartialSprings - net->nrOfSprings;
+          assert(n == net->nrOfLinks + (nrOfPartitionParameters));
+          size_t nrOfConstraints = net->nrOfSpringsWithPartition;
+          assert(nrOfConstraints == m);
+          Eigen::VectorXd springPartitions0;
+          std::unordered_map<size_t, std::vector<size_t>> springToParametersMap;
 
+          std::tie(springPartitions0, springToParametersMap) =
+            MEHPForceBalance2::translatePartialParametersToAllPartitions(
+              net, u.tail(nrOfPartitionParameters));
+          size_t springIdx = 0;
+          for (size_t constraintIdx = 0; constraintIdx < m; ++constraintIdx) {
+            double sumOfThisConstraintsPartitions = 0.;
+            // first, find the spring we act against: skip all which are just
+            // cross-link-cross-link
+            while (!net->linkisSliplink[net->springPartIndexA[springIndex]] &&
+                   !net->linkisSliplink[net->springPartIndexB[springIndex]]) {
+              springIndex += 1;
+            }
+            // then, now that we know what spring this constraint is
+            // corresponding to, sum up the corresponding partition parameters
+            for (size_t parameterIdx : springToParametersMap.at(springIdx)) {
+              sumOfThisConstraintsPartitions +=
+                u(3 * net->nrOfLinks + parameterIdx);
+            }
+            result[constraintIdx] = -1. + sumOfThisConstraintsPartitions;
+            if (grad != NULL) {
+              for (size_t j = 0; j < m; ++j) {
+                grad[constraintIdx * n + j] = 0.0;
+              }
+              // set dc_i/dx_j in grad[i*n + j]
+              // for these (linear) constraints, it is simply = 1 for all
+              // associated parameters
+              for (size_t parameterIdx : springToParametersMap.at(springIdx)) {
+                grad[constraintIdx * n + parameterIdx] = 1.0;
+              }
+            }
+            springIndex += 1;
+          }
+        };
+        std::vector<double> tolerances =
+          pylimer_tools::utils::initializeWithValue(
+            nrOfSpringsRequiringParameter, 1e-12);
+        opt.add_inequality_mconstraint(nonlinearConstraintF, &net, tolerances);
+      }
       // set exit conditions
       opt.set_xtol_rel(xtol);
       opt.set_ftol_rel(ftol);
@@ -1040,6 +1099,15 @@ namespace calc {
           springIndexIndex += 1;
         }
       }
+
+      size_t nrOfPartitionedSprings = 0;
+      for (size_t i = 0; i < net.nrOfSprings; ++i) {
+        if (net.linkIndicesOfSprings[i].size() > 2) {
+          nrOfPartitionedSprings += 1;
+        }
+      }
+      this->initialConfig.nrOfSpringsWithPartition = nrOfPartitionedSprings;
+
       this->initialConfig.nrOfPartialSprings += partialSpringsAdded;
       // do we really want to?
       this->validateNetwork();
