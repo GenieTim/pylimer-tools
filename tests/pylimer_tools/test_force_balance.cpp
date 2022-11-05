@@ -396,8 +396,10 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
     std::string largeInputFile =
       suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
     if (std::filesystem::exists(largeInputFile)) {
+      std::cout << "Reading file " << largeInputFile << std::endl;
       universeSeq.initializeFromDataSequence({ { largeInputFile } });
       pe::Universe universe2 = universeSeq.atIndex(0);
+      std::cout << "Read file " << largeInputFile << std::endl;
 
       // BENCHMARK_ADVANCED("MEHP LD_MMA " + largeInputFile)
       // (Catch::Benchmark::Chronometer meter)
@@ -426,8 +428,8 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
       pcm::MEHPForceBalance forceBalancer2 =
         pcm::MEHPForceBalance(universe2, 2);
 
-      SECTION("Stress tensor computations are equivalent")
-      {
+      // SECTION("Stress tensor computations are equivalent")
+      // {
         std::array<std::array<double, 3>, 3> stressTensor1 =
           forceBalancer2.getStressTensor();
         std::array<std::array<double, 3>, 3> stressTensor2 =
@@ -437,7 +439,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
             CHECK(stressTensor1[i][j] == Catch::Approx(stressTensor2[i][j]));
           }
         }
-      }
+      // }
 
       SECTION("Displacement computations are equivalent")
       {
@@ -455,9 +457,9 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         std::tie(vertexSets, springSets) =
           forceBalancer2.getHeuristicallyIndependentCoordinateSets(&net);
 
-        SECTION(
-          "HeuristicallyIndependent coordiante sets are unique and complete")
-        {
+        // SECTION(
+        //   "HeuristicallyIndependent coordiante sets are unique and complete")
+        // {
           pcm::ArrayXb vertexSetTest =
             pcm::ArrayXb::Constant(3 * net.nrOfLinks, false);
           for (int i = 0; i < vertexSets.size(); ++i) {
@@ -469,7 +471,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
           for (int i = 0; i < vertexSetTest.size(); ++i) {
             CHECK(vertexSetTest[i] == true);
           }
-        }
+        // }
 
         Eigen::VectorXd displacements1 =
           Eigen::VectorXd::Zero(3 * net.nrOfLinks);
@@ -512,7 +514,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
 
       SECTION("Actual balance results in correct phantom results")
       {
-
+        std::cout << "Doing phantom force balance" << std::endl;
         pcm::MEHPForceRelaxation forceRelaxer =
           pcm::MEHPForceRelaxation(universe2, 2);
         // the strands are different -> cannot compare the distances anymore
@@ -585,6 +587,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
       // also
       SECTION("Actual balance results in correct slip-link results")
       {
+        std::cout << "Doing non-phantom force balance" << std::endl;
         pcm::MEHPForceRelaxation forceRelaxer =
           pcm::MEHPForceRelaxation(universe2, 2);
         // the strands are different -> cannot compare the distances anymore
@@ -612,7 +615,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
           { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
         REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
         // TODO: replace this value
-        CHECK(forceBalancer2.getPressure() == Catch::Approx(12930491401414));
+        CHECK(forceBalancer2.getPressure() == Catch::Approx(0.0019534759));
       }
     } else {
       std::cout << "Skipping large file PDMS MEHP run" << std::endl;

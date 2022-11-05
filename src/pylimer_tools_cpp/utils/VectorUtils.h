@@ -50,6 +50,15 @@ namespace utils {
     return out; // both done
   }
 
+  template <typename IN>
+  static inline bool vector_has_duplicates(std::vector<IN> vec) {
+    std::vector<IN> vecSorted;
+    vecSorted.reserve(vec.size());
+    std::copy(vec.begin(), vec.end(), std::back_inserter(vecSorted));
+    std::sort(vecSorted.begin(), vecSorted.end());
+    return std::adjacent_find(vecSorted.begin(), vecSorted.end()) != vecSorted.end();
+  }
+
   template<typename IN>
   static inline void eraseIndices(std::vector<IN> from,
                                   std::vector<long int> indices)

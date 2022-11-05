@@ -7,7 +7,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Dict, Iterator, List, Union
 
-from setuptools import find_packages
+from setuptools import find_namespace_packages, find_packages
 
 try:
     from skbuild import setup
@@ -74,7 +74,7 @@ setup(
     author="Tim Bernhard",
     author_email="tim@bernhard.dev",
     url="https://github.com/GenieTim/pylimer-tools",
-    packages=find_packages(where="src", exclude=("tests",)),
+    packages=find_namespace_packages(where="src", exclude=("tests",)),
     package_dir={"": "src"},
     cmake_install_dir="src/pylimer_tools_cpp",
     cmake_args=cmake_args,

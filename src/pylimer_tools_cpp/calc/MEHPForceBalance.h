@@ -54,6 +54,9 @@ namespace calc {
           Eigen::VectorXd::Zero(net.coordinates.size());
         this->currentSpringDistances =
           this->evaluateSpringDistances(&net, this->currentDisplacements, is2D);
+        this->currentPartialSpringDistances =
+          this->evaluatePartialSpringDistances(
+            &net, this->currentDisplacements, is2D);
         this->defaultR0Squared =
           universe.computeMeanSquareEndToEndDistance(crosslinkerType);
         this->defaultNrOfChains =
@@ -237,12 +240,14 @@ namespace calc {
        */
       int getNrOfActiveNodes(double tolerance = 0.1,
                              int minimumNrOfActiveConnections = 2,
-                             int maximumNrOfActiveConnections = -1) const
+                             int maximumNrOfActiveConnections = -1,
+                             bool usePartial = false) const
       {
         return this
           ->getIdsOfActiveNodes(tolerance,
                                 minimumNrOfActiveConnections,
-                                maximumNrOfActiveConnections)
+                                maximumNrOfActiveConnections,
+                                usePartial)
           .size();
       }
 
@@ -271,7 +276,19 @@ namespace calc {
       std::vector<long int> getIdsOfActiveNodes(
         double tolerance = 0.1,
         int minimumNrOfActiveConnections = 2,
-        int maximumNrOfActiveConnections = -1) const;
+        int maximumNrOfActiveConnections = -1,
+        bool usePartial = false) const;
+
+      Eigen::VectorXd getCurrentSpringDistances() const
+      {
+        return this->currentSpringDistances;
+      }
+
+      Eigen::VectorXd getCurrentPartialSpringDistances() const
+      {
+        return this->evaluatePartialSpringDistances(
+          &this->initialConfig, this->currentDisplacements, this->is2D);
+      }
 
       /**
        * @brief Get the Nr Of Active Springs connected to each node
@@ -283,10 +300,15 @@ namespace calc {
       Eigen::VectorXi getNrOfActiveSpringsConnected(
         double tolerance = 0.1) const;
 
-      Eigen::VectorXd getCurrentSpringDistances() const
-      {
-        return this->currentSpringDistances;
-      }
+      /**
+       * @brief Get the Nr Of Active Springs connected to each node
+       *
+       * @param tolerance the tolerance: springs under a certain length are
+       * considered inactive
+       * @return Eigen::VectorXi
+       */
+      Eigen::VectorXi getNrOfActivePartialSpringsConnected(
+        double tolerance = 0.1) const;
 
       /**
        * @brief Get the Nr Of Active Springs object
@@ -298,6 +320,19 @@ namespace calc {
       int getNrOfActiveSprings(double tol = 0.1) const
       {
         return this->countNrOfActiveSprings(this->currentSpringDistances, tol);
+      }
+
+      /**
+       * @brief Get the Nr Of Active Springs object
+       *
+       * @param tol the tolerance: springs under a certain length are considered
+       * inactive
+       * @return int
+       */
+      int getNrOfActivePartialSprings(double tol = 0.1) const
+      {
+        return this->countNrOfActiveSprings(this->currentPartialSpringDistances,
+                                            tol);
       }
 
       /**
@@ -374,6 +409,11 @@ namespace calc {
       Eigen::VectorXd evaluateSpringDistances(const ForceBalanceNetwork* net,
                                               const Eigen::VectorXd& u,
                                               const bool is2D) const;
+
+      Eigen::VectorXd evaluatePartialSpringDistances(
+        const ForceBalanceNetwork* net,
+        const Eigen::VectorXd& u,
+        const bool is2D) const;
 
       /**
        * @brief Compute one spring length
@@ -1049,10 +1089,9 @@ namespace calc {
        * @param u the displacements
        * @return double
        */
-      double evaluatePressure(
-        const ForceBalanceNetwork* net,
-        const Eigen::VectorXd& u,
-        const Eigen::VectorXd& springPartitions) const
+      double evaluatePressure(const ForceBalanceNetwork* net,
+                              const Eigen::VectorXd& u,
+                              const Eigen::VectorXd& springPartitions) const
       {
         auto stressTensor =
           this->evaluateStressTensor(net, u, springPartitions);
@@ -1174,10 +1213,7 @@ namespace calc {
         ArrayXb result = ArrayXb::Constant(springDistances.size() / 3, false);
         for (size_t i = 0; i < springDistances.size() / 3; ++i) {
           result[i] =
-            sqrt(springDistances[3 * i + 0] * springDistances[3 * i + 0] +
-                 springDistances[3 * i + 1] * springDistances[3 * i + 1] +
-                 springDistances[3 * i + 2] * springDistances[3 * i + 2]) >
-            tolerance;
+            springDistances.segment(3 * i, 3).squaredNorm() > tolerance;
         }
         return result;
       }
@@ -1201,6 +1237,7 @@ namespace calc {
       ForceBalanceNetwork initialConfig;
       Eigen::VectorXd currentDisplacements;
       Eigen::VectorXd currentSpringDistances;
+      Eigen::VectorXd currentPartialSpringDistances;
       Eigen::VectorXd
         currentSpringPartitionsVec; /* gives the parametrisation of N */
       int crosslinkerType;

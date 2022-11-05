@@ -171,6 +171,9 @@ namespace calc {
       this->currentSpringPartitionsVec = springPartitions;
       this->currentSpringDistances =
         this->evaluateSpringDistances(&net, this->currentDisplacements, is2D);
+      this->currentPartialSpringDistances =
+        this->evaluatePartialSpringDistances(
+          &net, this->currentDisplacements, is2D);
 
       this->exitReason = iterationsDone == maxNrOfSteps
                            ? ExitReason::MAX_STEPS
@@ -777,40 +780,44 @@ namespace calc {
     {
       // first, the distances
       assert(u.size() == net->coordinates.size());
+
+      Eigen::VectorXd displacedCoords = net->coordinates + u;
       Eigen::VectorXd springDistances =
-        Eigen::VectorXd::Zero(3 * net->nrOfSprings);
-      Eigen::VectorXd actualCoordinates = net->coordinates + u;
-
-      for (size_t i = 0; i < net->nrOfSprings; ++i) {
-        std::vector<size_t> springsPartners = net->linkIndicesOfSprings[i];
-        for (size_t partner_idx = 0; partner_idx < springsPartners.size() - 1;
-             ++partner_idx) {
-          // add partial distance to the total distance
-          Eigen::Vector3d partialDistance =
-            MEHPForceBalance::evaluateDistanceBetween(
-              net,
-              u,
-              springsPartners[partner_idx],
-              springsPartners[partner_idx + 1],
-              is2D);
-          for (size_t distance_idx = 0; distance_idx < 3; ++distance_idx) {
-            springDistances[i * 3 + distance_idx] +=
-              partialDistance[distance_idx];
-            assert(!isnan(partialDistance[distance_idx]));
-          }
-        }
-      }
-
-      if (is2D) {
-        // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
-        //   Eigen::VectorXd::Zero(net->nrOfSprings / 3);
-        for (size_t i = 2; i < 3 * net->nrOfSprings; i += 3) {
-          springDistances[i] = 0.0;
-        }
-      }
+        (displacedCoords(net->springCoordinateIndexB) -
+         displacedCoords(net->springCoordinateIndexA));
       assert(springDistances.size() == net->nrOfSprings * 3);
+      this->handlePBC(net, springDistances);
+
+      // reset for 2D systems
+      if (this->is2D && net->nrOfSprings > 0) {
+        springDistances(Eigen::seq(2, net->nrOfSprings, 3)) =
+          Eigen::VectorXd::Zero(net->nrOfSprings);
+      }
 
       return springDistances;
+    }
+
+    Eigen::VectorXd MEHPForceBalance::evaluatePartialSpringDistances(
+      const ForceBalanceNetwork* net,
+      const Eigen::VectorXd& u,
+      const bool is2D) const
+    {
+      // first, the distances
+      assert(u.size() == net->coordinates.size());
+
+      Eigen::VectorXd displacedCoords = net->coordinates + u;
+      Eigen::VectorXd partialDistances =
+        (displacedCoords(net->springPartCoordinateIndexB) -
+         displacedCoords(net->springPartCoordinateIndexA));
+      this->handlePBC(net, partialDistances);
+
+      // reset for 2D systems
+      if (this->is2D) {
+        partialDistances(Eigen::seq(2, net->nrOfPartialSprings, 3)) =
+          Eigen::VectorXd::Zero(net->nrOfPartialSprings);
+      }
+
+      return partialDistances;
     }
 
     /**
@@ -1060,7 +1067,7 @@ namespace calc {
         }
       }
       this->initialConfig.nrOfPartialSprings += partialSpringsAdded;
-      
+
       size_t nrOfPartitionedSprings = 0;
       for (size_t i = 0; i < this->initialConfig.nrOfSprings; ++i) {
         if (this->initialConfig.linkIndicesOfSprings[i].size() > 2) {
@@ -1302,13 +1309,15 @@ namespace calc {
     std::vector<long int> MEHPForceBalance::getIdsOfActiveNodes(
       double tolerance,
       int minimumNrOfActiveConnections,
-      int maximumNrOfActiveConnections) const
+      int maximumNrOfActiveConnections,
+      bool usePartial) const
     {
       std::vector<long int> results;
       results.reserve(this->initialConfig.nrOfNodes);
 
       Eigen::VectorXi nrOfActiveSpringsConnected =
-        this->getNrOfActiveSpringsConnected(tolerance);
+        usePartial ? this->getNrOfActiveSpringsConnected(tolerance)
+                   : this->getNrOfActivePartialSpringsConnected(tolerance);
       for (size_t i = 0; i < this->initialConfig.nrOfNodes; i++) {
         if (nrOfActiveSpringsConnected[i] >= minimumNrOfActiveConnections &&
             (maximumNrOfActiveConnections < 0 ||
@@ -1344,6 +1353,36 @@ namespace calc {
         }
       }
       return nrOfActiveSpringsConnected;
+    }
+    /**
+     * @brief Get the Nr Of Active Springs connected to each node
+     *
+     * @param tolerance the tolerance: springs under a certain length are
+     * considered inactive
+     * @return Eigen::VectorXi
+     */
+    Eigen::VectorXi MEHPForceBalance::getNrOfActivePartialSpringsConnected(
+      double tolerance) const
+    {
+      Eigen::VectorXi nrOfActivePartialSpringsConnected =
+        Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
+      ArrayXb springIsActive =
+        this->findActiveSprings(this->currentPartialSpringDistances, tolerance);
+      for (size_t i = 0; i < this->initialConfig.nrOfPartialSprings; i++) {
+        if (springIsActive[i] == true) /* active spring */
+        {
+          int a = this->initialConfig.springPartIndexA[i];
+          int b = this->initialConfig.springPartIndexB[i];
+          if (!this->initialConfig.linkIsSliplink[a]) {
+            ++(nrOfActivePartialSpringsConnected[a]);
+          }
+
+          if (!this->initialConfig.linkIsSliplink[b]) {
+            ++(nrOfActivePartialSpringsConnected[b]);
+          }
+        }
+      }
+      return nrOfActivePartialSpringsConnected;
     }
 
     /**

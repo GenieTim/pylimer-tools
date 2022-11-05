@@ -1,11 +1,16 @@
 cmake_minimum_required(VERSION 3.15.0)
 
-# start project
-project(pylimer_tools VERSION "0.1.11")
+# Fix behavior of CMAKE_CXX_STANDARD when targeting macOS.
+if (POLICY CMP0025)
+  cmake_policy(SET CMP0025 NEW)
+endif ()
 
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+# start project
+project(pylimer_tools VERSION "0.1.11")
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
@@ -72,6 +77,14 @@ target_link_libraries(pylimer_tools_cpp
     ${igraph_LIBRARIES}
     ${nlopt_LIBRARIES}
 )
+
+
+if(CMAKE_COMPILER_IS_GNUCXX)
+target_link_libraries(pylimer_tools_cpp 
+  PUBLIC 
+    stdc++fs
+)
+endif()
 
 # link Eigen libraries. Difficulty due to Windows GitHub Action, somehow.
 if (TARGET Eigen3::Eigen)
