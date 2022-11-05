@@ -555,11 +555,18 @@ init_pylimer_bound_calc(py::module_& m)
                            const std::vector<double>,
                            const std::vector<double>,
                            const std::vector<double>,
-                           const bool>(
-           &mehp::MEHPForceBalance::addSlipLinks),
+                           const bool>(&mehp::MEHPForceBalance::addSlipLinks),
          R"pbdoc(
           Add the slip-links
-     )pbdoc", py::arg("strandIdx1"), py::arg("strandIdx2"), py::arg("x"), py::arg("y"), py::arg("z"), py::arg("alpha1"), py::arg("alpha2"), py::arg("clampAlpha") = false)
+     )pbdoc",
+         py::arg("strandIdx1"),
+         py::arg("strandIdx2"),
+         py::arg("x"),
+         py::arg("y"),
+         py::arg("z"),
+         py::arg("alpha1"),
+         py::arg("alpha2"),
+         py::arg("clampAlpha") = false)
     .def("getStressTensor",
          &mehp::MEHPForceBalance::getStressTensor,
          R"pbdoc(
@@ -603,15 +610,15 @@ init_pylimer_bound_calc(py::module_& m)
 
           :param tolerance: springs under this length are considered inactive
      )pbdoc")
-    .def("setSpringPartitions",
-         &mehp::MEHPForceBalance::setSpringPartitions,
-         R"pbdoc(
-          Set the current spring partitions.
-     )pbdoc")
     .def("getSpringPartitions",
          &mehp::MEHPForceBalance::getSpringPartitions,
          R"pbdoc(
           Get the current spring partitions.
+     )pbdoc")
+    .def("setSpringPartitions",
+         &mehp::MEHPForceBalance::setSpringPartitions,
+         R"pbdoc(
+          Set the current spring partitions.
      )pbdoc")
     .def("getDisplacements",
          &mehp::MEHPForceBalance::getCurrentDisplacements,
@@ -628,10 +635,10 @@ init_pylimer_bound_calc(py::module_& m)
          R"pbdoc(
           Set/overwrite the contour lengths.
      )pbdoc")
-    .def(
-      "getDisplacementResidualNorm",
-      py::overload_cast<double>(&mehp::MEHPForceBalance::getDisplacementResidualNorm),
-      R"pbdoc(
+    .def("getDisplacementResidualNorm",
+         py::overload_cast<double>(
+           &mehp::MEHPForceBalance::getDisplacementResidualNorm),
+         R"pbdoc(
           Get the current link displacement residual norm.
      )pbdoc")
     .def("getIdsOfActiveNodes",
@@ -646,7 +653,8 @@ init_pylimer_bound_calc(py::module_& m)
      )pbdoc",
          py::arg("tolerance") = 0.1,
          py::arg("minimumNrOfActiveConnections") = 2,
-         py::arg("maximumNrOfActiveConnections") = -1)
+         py::arg("maximumNrOfActiveConnections") = -1,
+         py::arg("usePartial") = false)
     .def("getNrOfActiveNodes",
          &mehp::MEHPForceBalance::getNrOfActiveNodes,
          R"pbdoc(
@@ -656,14 +664,24 @@ init_pylimer_bound_calc(py::module_& m)
           :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
           :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
                Use a value < 0 to indicate that there is no maximum number of active connections.
+          :param usePartial: Whether to use the partial spring distances rather than the total (set to true if you want primary loop contributors)
      )pbdoc",
          py::arg("tolerance") = 0.1,
          py::arg("minimumNrOfActiveConnections") = 2,
-         py::arg("maximumNrOfActiveConnections") = -1)
+         py::arg("maximumNrOfActiveConnections") = -1,
+         py::arg("usePartial") = false)
     .def("getNrOfActiveSprings",
          &mehp::MEHPForceBalance::getNrOfActiveSprings,
          R"pbdoc(
            Get the number of active springs remaining after running the simulation.
+
+          :param tolerance: springs under this length are considered inactive
+     )pbdoc",
+         py::arg("tolerance") = 0.1)
+    .def("getNrOfActivePartialSprings",
+         &mehp::MEHPForceBalance::getNrOfActivePartialSprings,
+         R"pbdoc(
+           Get the number of active partial springs remaining after running the simulation.
 
           :param tolerance: springs under this length are considered inactive
      )pbdoc",

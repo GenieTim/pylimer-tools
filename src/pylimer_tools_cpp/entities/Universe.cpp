@@ -165,11 +165,22 @@ namespace entities {
     }
     this->atomIdToVertexIdx.reserve(this->NAtoms + NNewAtoms);
     // do map for easy access afterwards
-    for (size_t i = 0; i < NNewAtoms; ++i) {
-      if (pylimer_tools::utils::map_has_key(this->atomIdToVertexIdx, newIds[i])) {
-        throw std::invalid_argument(
-          "Atom with id " + std::to_string(newIds[i]) + " already exists");
+    // but first, validate the input of the ids
+    if (this->NAtoms > 0) {
+      // this path is less efficient on cpp < 20
+      for (size_t i = 0; i < NNewAtoms; ++i) {
+        if (pylimer_tools::utils::map_has_key(this->atomIdToVertexIdx,
+                                              newIds[i])) {
+          throw std::invalid_argument(
+            "Atom with id " + std::to_string(newIds[i]) + " already exists");
+        }
       }
+    } else {
+      if (pylimer_tools::utils::vector_has_duplicates(newIds)) {
+        throw std::invalid_argument("Atom ids must be unique");
+      }
+    }
+    for (size_t i = 0; i < NNewAtoms; ++i) {
       this->atomIdToVertexIdx.emplace(newIds[i], this->NAtoms + i);
     }
     // append attributes
@@ -319,8 +330,13 @@ namespace entities {
     igraph_vector_int_init(&newEdges, edgesSize);
     int innerIndex = 0;
     for (size_t i = 1; i < edgesSize; i += 2) {
-      if (pylimer_tools::utils::map_has_key(this->atomIdToVertexIdx, newEdgesVector[i - 1]) &&
-          pylimer_tools::utils::map_has_key(this->atomIdToVertexIdx, newEdgesVector[i])) {
+      // using .contains() is more efficient on CPP > 20,
+      // but otherwise less
+      // if (this->atomIdToVertexIdx.contains(newEdgesVector[i - 1]) &&
+      //     this->atomIdToVertexIdx.contains(newEdgesVector[i])) {
+      try {
+        size_t vertexFrom = this->atomIdToVertexIdx.at(newEdgesVector[i - 1]);
+        size_t vertexTo = this->atomIdToVertexIdx.at(newEdgesVector[i]);
         igraph_vector_int_set(
           &newEdges,
           innerIndex,
@@ -330,11 +346,14 @@ namespace entities {
           &newEdges, innerIndex, this->atomIdToVertexIdx.at(newEdgesVector[i]));
         innerIndex += 1;
         actualNrOfBondsAdded += 1;
-      } else if (!ignoreNonExistentAtoms) {
-        igraph_vector_int_destroy(&newEdges);
-        throw std::invalid_argument("Bond with atom with id " +
-                                    std::to_string(newEdgesVector[i]) +
-                                    " impossible as atom is not added yet.");
+      } catch (std::out_of_range ex) {
+        if (!ignoreNonExistentAtoms) {
+          throw std::invalid_argument(
+            "Bond with atom with id " + std::to_string(newEdgesVector[i]) +
+            " and " + std::to_string(newEdgesVector[i - 1]) +
+            " impossible as atom is not added yet.");
+          igraph_vector_int_destroy(&newEdges);
+        }
       }
     }
     assert(innerIndex == 2 * actualNrOfBondsAdded);
@@ -808,7 +827,8 @@ namespace entities {
         if (currentVal == -1) {
           // skip self-loops and duplicates
           if ((!skipSelfLoops || currentPath.size() > 3) &&
-              !pylimer_tools::utils::map_has_key(processedPathsKeys,currentPathKey)) {
+              !pylimer_tools::utils::map_has_key(processedPathsKeys,
+                                                 currentPathKey)) {
             results[currentFunctionality].push_back(currentPath);
             processedPathsKeys.insert(currentPathKey);
           }
@@ -828,7 +848,8 @@ namespace entities {
 
       // additional check for self-loops
       if (!skipSelfLoops &&
-          !pylimer_tools::utils::map_has_key(processedPathsKeys, 0 xor startingCrosslinkerVertexId)) {
+          !pylimer_tools::utils::map_has_key(
+            processedPathsKeys, 0 xor startingCrosslinkerVertexId)) {
         std::vector<long int> crosslinkersBonds =
           this->getVertexIdxsConnectedTo(startingCrosslinkerVertexId);
         if (std::find(crosslinkersBonds.begin(),
@@ -940,7 +961,8 @@ namespace entities {
           (currentPath.size() != 2 ||
            this->getEdgeIdsFromTo(startingCrosslinkerVertexId, nextStepVertexId)
                .size() > 1);
-        bool alreadyExistingLoop = pylimer_tools::utils::map_has_key(processedPathsKeys,currentPathKey);
+        bool alreadyExistingLoop =
+          pylimer_tools::utils::map_has_key(processedPathsKeys, currentPathKey);
         if (allowedSelfLoop && !alreadyExistingLoop && secondOrderLoopValid) {
           bool pathIsNewMinimal = (currentPath.size() <= minimalPath.size() &&
                                    currentPath.size() > 0) ||
@@ -1207,11 +1229,12 @@ namespace entities {
    */
   long int Universe::getIdxByAtomId(const int atomId) const
   {
-    if (!pylimer_tools::utils::map_has_key(this->atomIdToVertexIdx,atomId)) {
-      throw std::invalid_argument(
-        "Universe cannot return idx of atom id: atom with this id (" +
-        std::to_string(atomId) + ") does not exist");
-    }
+    // if (!pylimer_tools::utils::map_has_key(this->atomIdToVertexIdx, atomId))
+    // {
+    //   throw std::invalid_argument(
+    //     "Universe cannot return idx of atom id: atom with this id (" +
+    //     std::to_string(atomId) + ") does not exist");
+    // }
     return this->atomIdToVertexIdx.at(atomId);
   }
 
@@ -1293,7 +1316,7 @@ namespace entities {
              ++connectionJ) {
           int angleKey =
             vertexIdx xor connections[connectionI] xor connections[connectionJ];
-          if (!pylimer_tools::utils::map_has_key(anglesFound,angleKey)) {
+          if (!pylimer_tools::utils::map_has_key(anglesFound, angleKey)) {
             angleFromFound.push_back(
               this->getAtomIdByIdx(connections[connectionI]));
             angleViaFound.push_back(this->getAtomIdByIdx(vertexIdx));
@@ -1384,7 +1407,7 @@ namespace entities {
     std::map<int, int> nrOfSelfLoops;
     for (size_t i = 0; i < bondTo.size(); ++i) {
       if (bondTo[i] == bondFrom[i]) {
-        if (!pylimer_tools::utils::map_has_key(nrOfSelfLoops,bondTo[i])) {
+        if (!pylimer_tools::utils::map_has_key(nrOfSelfLoops, bondTo[i])) {
           nrOfSelfLoops.emplace(bondTo[i], 0);
         }
         nrOfSelfLoops[bondTo[i]] += 1;
