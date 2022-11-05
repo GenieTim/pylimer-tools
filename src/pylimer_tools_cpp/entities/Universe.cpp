@@ -165,23 +165,17 @@ namespace entities {
     }
     this->atomIdToVertexIdx.reserve(this->NAtoms + NNewAtoms);
     // do map for easy access afterwards
-    // but first, validate the input of the ids
-    if (this->NAtoms > 0) {
-      // this path is less efficient on cpp < 20
-      for (size_t i = 0; i < NNewAtoms; ++i) {
-        if (pylimer_tools::utils::map_has_key(this->atomIdToVertexIdx,
-                                              newIds[i])) {
-          throw std::invalid_argument(
-            "Atom with id " + std::to_string(newIds[i]) + " already exists");
+    // simultaneously, check that the input ids are unique
+    for (size_t i = 0; i < NNewAtoms; ++i) {
+      bool wasAdded =
+        (this->atomIdToVertexIdx.emplace(newIds[i], this->NAtoms + i)).second;
+      if (!wasAdded) {
+        // remove the added atoms again
+        for (size_t j = 0; j < i; ++j) {
+          this->atomIdToVertexIdx.erase(newIds[j]);
         }
-      }
-    } else {
-      if (pylimer_tools::utils::vector_has_duplicates(newIds)) {
         throw std::invalid_argument("Atom ids must be unique");
       }
-    }
-    for (size_t i = 0; i < NNewAtoms; ++i) {
-      this->atomIdToVertexIdx.emplace(newIds[i], this->NAtoms + i);
     }
     // append attributes
     // it is empirically more efficient to do it this split up way,
@@ -330,10 +324,6 @@ namespace entities {
     igraph_vector_int_init(&newEdges, edgesSize);
     int innerIndex = 0;
     for (size_t i = 1; i < edgesSize; i += 2) {
-      // using .contains() is more efficient on CPP > 20,
-      // but otherwise less
-      // if (this->atomIdToVertexIdx.contains(newEdgesVector[i - 1]) &&
-      //     this->atomIdToVertexIdx.contains(newEdgesVector[i])) {
       try {
         size_t vertexFrom = this->atomIdToVertexIdx.at(newEdgesVector[i - 1]);
         size_t vertexTo = this->atomIdToVertexIdx.at(newEdgesVector[i]);
@@ -348,11 +338,11 @@ namespace entities {
         actualNrOfBondsAdded += 1;
       } catch (std::out_of_range ex) {
         if (!ignoreNonExistentAtoms) {
+          igraph_vector_int_destroy(&newEdges);
           throw std::invalid_argument(
             "Bond with atom with id " + std::to_string(newEdgesVector[i]) +
             " and " + std::to_string(newEdgesVector[i - 1]) +
             " impossible as atom is not added yet.");
-          igraph_vector_int_destroy(&newEdges);
         }
       }
     }
