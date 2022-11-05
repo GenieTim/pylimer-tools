@@ -790,8 +790,11 @@ namespace calc {
 
       // reset for 2D systems
       if (this->is2D && net->nrOfSprings > 0) {
-        springDistances(Eigen::seq(2, net->nrOfSprings, 3)) =
-          Eigen::VectorXd::Zero(net->nrOfSprings);
+        // springDistances(Eigen::seq(2, net->nrOfSprings, 3)) =
+        //   Eigen::VectorXd::Zero(net->nrOfSprings);
+        for (size_t i = 2; i < 3 * net->nrOfSprings; i += 3) {
+          springDistances[i] = 0.0;
+        }
       }
 
       return springDistances;
@@ -813,8 +816,11 @@ namespace calc {
 
       // reset for 2D systems
       if (this->is2D) {
-        partialDistances(Eigen::seq(2, net->nrOfPartialSprings, 3)) =
-          Eigen::VectorXd::Zero(net->nrOfPartialSprings);
+        // partialDistances(Eigen::seq(2, net->nrOfPartialSprings, 3)) =
+        //   Eigen::VectorXd::Zero(net->nrOfPartialSprings);
+        for (size_t i = 2; i < 3 * net->nrOfPartialSprings; i += 3) {
+          partialDistances[i] = 0.0;
+        }
       }
 
       return partialDistances;
@@ -1516,8 +1522,10 @@ namespace calc {
         for (size_t globalIdx : globalSpringIndices) {
           sum += this->currentSpringPartitionsVec[globalIdx];
         }
-        RUNTIME_EXP_IFN(APPROX_EQUAL(sum, 1.0, 1e-12),
-                        "Spring partitions of one spring must sum to one");
+        RUNTIME_EXP_IFN(
+          APPROX_EQUAL(sum, 1.0, 1e-10),
+          "Spring partitions of one spring must sum to one, got " +
+            std::to_string(sum) + ".");
       }
       for (size_t i = 0; i < net->nrOfPartialSprings; i++) {
         size_t fullIdx = net->partialToFullSpringIndex.at(i);
