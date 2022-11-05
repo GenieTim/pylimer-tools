@@ -31,6 +31,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance
       ~MEHPForceBalance.getGammaFactor
       ~MEHPForceBalance.getIdsOfActiveNodes
       ~MEHPForceBalance.getNrOfActiveNodes
+      ~MEHPForceBalance.getNrOfActivePartialSprings
       ~MEHPForceBalance.getNrOfActiveSprings
       ~MEHPForceBalance.getNrOfIterations
       ~MEHPForceBalance.getNrOfNodes
