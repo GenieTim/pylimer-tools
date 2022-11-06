@@ -643,8 +643,6 @@ namespace calc {
         std::unordered_map<size_t, std::vector<size_t>> springToParametersMap;
         for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
           if (net->linkIsSliplink[net->springPartIndexB[i]]) {
-            parameterIdx += 1;
-
             size_t springIdx = net->partialToFullSpringIndex.at(i);
             if (!pylimer_tools::utils::map_has_key(springToParametersMap, springIdx)) {
               springToParametersMap.emplace(
@@ -652,6 +650,8 @@ namespace calc {
             } else {
               springToParametersMap[springIdx].push_back(parameterIdx);
             }
+            
+            parameterIdx += 1;
           }
         }
         assert(parameterIdx == nrOfPartialSpringParameters);

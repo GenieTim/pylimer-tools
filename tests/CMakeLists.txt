@@ -1,16 +1,12 @@
 cmake_minimum_required(VERSION 3.15.0)
 
 cmake_policy(SET CMP0077 NEW)
-# Fix behavior of CMAKE_CXX_STANDARD when targeting macOS.
-if (POLICY CMP0025)
-  cmake_policy(SET CMP0025 NEW)
-endif ()
+
+project(pylimer_tests VERSION "0.1.15" LANGUAGES CXX)
 
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-
-project(pylimer_tests VERSION "0.1.15" LANGUAGES CXX)
 
 include(${CMAKE_CURRENT_SOURCE_DIR}/../vendor/CMakeLists.txt)
 
@@ -65,6 +61,7 @@ add_library(test_sources
 		pylimer_tools/test_generator.cpp 
 		pylimer_tools/test_force_relaxation.cpp
 		pylimer_tools/test_force_balance.cpp
+		pylimer_tools/test_force_balance2.cpp
 		pylimer_tools/test_universe.cpp 
 		pylimer_tools/test_universesequence.cpp 
 		pylimer_tools/test_molecule.cpp 
