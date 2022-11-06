@@ -62,12 +62,12 @@ namespace calc {
       for (size_t i = 0; i < nrOfPartialSpringParameters; ++i) {
         u0[3 * net.nrOfLinks + i] = reducedPartitions[i];
       }
-      Eigen::VectorXd u =
-        Eigen::VectorXd::Zero(3 * net.nrOfLinks + nrOfPartialSpringParameters);
+      Eigen::VectorXd u = Eigen::VectorXd::Zero((3 * net.nrOfLinks) +
+                                                nrOfPartialSpringParameters);
 
       /* force relaxation */
       nlopt::opt opt(algorithm,
-                     3 * net.nrOfLinks + nrOfPartialSpringParameters);
+                     (3 * net.nrOfLinks) + nrOfPartialSpringParameters);
 
       nlopt::func objectiveF =
         [](unsigned n, const double* x, double* grad, void* f_data) -> double {
@@ -76,7 +76,7 @@ namespace calc {
         ForceBalanceNetwork* net = static_cast<ForceBalanceNetwork*>(f_data);
         size_t nrOfPartitionParameters =
           net->nrOfPartialSprings - net->nrOfSprings;
-        assert(n == net->nrOfLinks + (nrOfPartitionParameters));
+        assert(n == (3 * net->nrOfLinks) + (nrOfPartitionParameters));
         // assemble spring partitions from the parameters
         Eigen::VectorXd springPartitions0 =
           MEHPForceBalance2::translatePartialParametersToAllPartitions(
@@ -105,12 +105,12 @@ namespace calc {
         //  evaluate the overall energy
         Eigen::VectorXd displacedCoords =
           net->coordinates + u.head(net->nrOfLinks * 3);
-        Eigen::VectorXd relevantPartialDistancesA =
+        Eigen::VectorXd partialSpringDistances =
           (displacedCoords(net->springPartCoordinateIndexB) -
            displacedCoords(net->springPartCoordinateIndexA));
-        MEHPForceBalance2::handlePBC(net, relevantPartialDistancesA);
+        MEHPForceBalance2::handlePBC(net, partialSpringDistances);
         Eigen::VectorXd partialDistancesOverSpringPartitions =
-          (relevantPartialDistancesA.array() * oneOverSpringPartitions.array())
+          (partialSpringDistances.array() * oneOverSpringPartitions.array())
             .matrix();
 
         // evaluate the gradient when needed
@@ -124,7 +124,7 @@ namespace calc {
             partialDistancesOverSpringPartitions;
 
           for (size_t i = 0; i < net->nrOfLinks * 3; ++i) {
-            grad[i] = overallForces[i];
+            grad[i] = overallForces[i]; // * kappa
           }
 
           // evaluate the gradient of the partition: harder.
@@ -144,7 +144,7 @@ namespace calc {
             if (net->linkIsSliplink[net->springPartIndexB[i]]) {
               // this partial spring has its own parameter -> requires gradient
               grad[parameterIdx + net->nrOfLinks * 3] =
-                relevantPartialDistancesA.segment(3 * i, 3).squaredNorm() *
+                partialSpringDistances.segment(3 * i, 3).squaredNorm() *
                 oneOverSpringPartitions[3 * i] * oneOverSpringPartitions[3 * i];
               // additionally, there is a contribution from the (1-alpha-...)
               // term, which is the last in this spring
@@ -159,7 +159,7 @@ namespace calc {
                        [net->springPartIndexB[equivPartialSpringIdx]]) {
                   // found it, the spring which is the 1-...
                   grad[parameterIdx + net->nrOfLinks * 3] =
-                    relevantPartialDistancesA
+                    partialSpringDistances
                       .segment(3 * equivPartialSpringIdx, 3)
                       .squaredNorm() *
                     oneOverSpringPartitions[3 * equivPartialSpringIdx] *
@@ -172,7 +172,14 @@ namespace calc {
           assert(parameterIdx == nrOfPartitionParameters);
         }
 
-        return partialDistancesOverSpringPartitions.squaredNorm();
+        double s2 = 0.0;
+        for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
+          s2 += partialSpringDistances.segment(3 * i, 3).squaredNorm() *
+                oneOverSpringPartitions[3 * i];
+        }
+        return 0.5 *
+               s2; // * kappa
+                   // return partialDistancesOverSpringPartitions.squaredNorm();
       };
       opt.set_min_objective(objectiveF, &net);
       // set constraints to support more algorithms
@@ -190,7 +197,9 @@ namespace calc {
         upperBounds.push_back(1.0);
         lowerBounds.push_back(0.0);
       }
-
+      assert(lowerBounds.size() == upperBounds.size());
+      assert(lowerBounds.size() ==
+             (3 * net.nrOfLinks) + nrOfPartialSpringParameters);
       opt.set_upper_bounds(upperBounds);
       opt.set_lower_bounds(lowerBounds);
       // set constraint to restrict
@@ -209,13 +218,15 @@ namespace calc {
           ForceBalanceNetwork* net = static_cast<ForceBalanceNetwork*>(f_data);
           size_t nrOfPartitionParameters =
             net->nrOfPartialSprings - net->nrOfSprings;
-          assert(n == net->nrOfLinks + (nrOfPartitionParameters));
+          assert(n == (3 * net->nrOfLinks) + (nrOfPartitionParameters));
           size_t nrOfConstraints = net->nrOfSpringsWithPartition;
           assert(nrOfConstraints == m);
 
-          std::unordered_map<size_t, std::vector<size_t>> springToParametersMap = MEHPForceBalance2::getParametersForSpringsMap(net);
+          std::unordered_map<size_t, std::vector<size_t>>
+            springToParametersMap =
+              MEHPForceBalance2::getParametersForSpringsMap(net);
           size_t springIdx = 0;
-          
+
           for (size_t constraintIdx = 0; constraintIdx < m; ++constraintIdx) {
             double sumOfThisConstraintsPartitions = 0.;
             // first, find the spring we act against: skip all which are just
@@ -224,22 +235,25 @@ namespace calc {
                    !net->linkIsSliplink[net->springPartIndexB[springIdx]]) {
               springIdx += 1;
             }
-            // then, now that we know what spring this constraint is
-            // corresponding to, sum up the corresponding partition parameters
-            for (size_t parameterIdx : springToParametersMap.at(springIdx)) {
-              sumOfThisConstraintsPartitions +=
-                u(3 * net->nrOfLinks + parameterIdx);
-            }
-            result[constraintIdx] = -1. + sumOfThisConstraintsPartitions;
-            if (grad != NULL) {
-              for (size_t j = 0; j < m; ++j) {
-                grad[constraintIdx * n + j] = 0.0;
-              }
-              // set dc_i/dx_j in grad[i*n + j]
-              // for these (linear) constraints, it is simply = 1 for all
-              // associated parameters
+            if (springIdx < net->nrOfSprings) {
+              // then, now that we know what spring this constraint is
+              // corresponding to, sum up the corresponding partition parameters
               for (size_t parameterIdx : springToParametersMap.at(springIdx)) {
-                grad[constraintIdx * n + parameterIdx] = 1.0;
+                sumOfThisConstraintsPartitions +=
+                  u(3 * net->nrOfLinks + parameterIdx);
+              }
+              result[constraintIdx] = -1. + sumOfThisConstraintsPartitions;
+              if (grad != NULL) {
+                for (size_t j = 0; j < m; ++j) {
+                  grad[constraintIdx * n + j] = 0.0;
+                }
+                // set dc_i/dx_j in grad[i*n + j]
+                // for these (linear) constraints, it is simply = 1 for all
+                // associated parameters
+                for (size_t parameterIdx :
+                     springToParametersMap.at(springIdx)) {
+                  grad[constraintIdx * n + parameterIdx] = 1.0;
+                }
               }
             }
             springIdx += 1;
@@ -267,7 +281,7 @@ namespace calc {
       }
 
       // query solution & exit reason
-      assert(u0.size() == 3 * net.nrOfLinks);
+      assert(u0.size() == (3 * net.nrOfLinks) + nrOfPartialSpringParameters);
       u = Eigen::Map<Eigen::VectorXd>(u0.data(), u0.size());
       this->currentDisplacements = u.head(3 * net.nrOfLinks);
 
@@ -758,7 +772,7 @@ namespace calc {
 
             double denominatorBack =
               1. / (springPartitions[backSpringGlobalIdx] *
-                        net->springsContourLength[springIndex]);
+                    net->springsContourLength[springIndex]);
             if (oneOverSpringPartitionUpperLimit > 0 ||
                 !std::isfinite(denominatorBack)) {
               denominatorBack = std::clamp(denominatorBack,
@@ -770,7 +784,7 @@ namespace calc {
 
             double denominatorForward =
               1 / (springPartitions[forwardSpringGlobalIdx] *
-                        net->springsContourLength[springIndex]);
+                   net->springsContourLength[springIndex]);
             if (oneOverSpringPartitionUpperLimit > 0 ||
                 !std::isfinite(denominatorForward)) {
               denominatorForward =
@@ -816,28 +830,28 @@ namespace calc {
           if (springsPartners[partner_idx] != linkIdx) {
             continue;
           }
-        Eigen::Vector3d distance;
-        size_t springGlobalIdx;
+          Eigen::Vector3d distance;
+          size_t springGlobalIdx;
           if (partner_idx == 0) {
             distance = (MEHPForceBalance2::evaluateDistanceBetween(
-            net, u, springsPartners[1], springsPartners[0], this->is2D));
-          springGlobalIdx = net->localToGlobalSpringIndex.at(springIndex)[0];
-        } else {
-          RUNTIME_EXP_IFN(springsPartners[springsPartners.size() - 1] ==
-                            linkIdx,
-                          "Unexpected state. Cross-link must be either first "
-                          "or last in springs' contributors.");
+              net, u, springsPartners[1], springsPartners[0], this->is2D));
+            springGlobalIdx = net->localToGlobalSpringIndex.at(springIndex)[0];
+          } else {
+            RUNTIME_EXP_IFN(springsPartners[springsPartners.size() - 1] ==
+                              linkIdx,
+                            "Unexpected state. Cross-link must be either first "
+                            "or last in springs' contributors.");
 
             distance = (MEHPForceBalance2::evaluateDistanceBetween(
-            net,
-            u,
-            springsPartners[springsPartners.size() - 2],
-            springsPartners[springsPartners.size() - 1],
-            this->is2D));
+              net,
+              u,
+              springsPartners[springsPartners.size() - 2],
+              springsPartners[springsPartners.size() - 1],
+              this->is2D));
             springGlobalIdx =
               net->localToGlobalSpringIndex.at(springIndex)
                 [net->localToGlobalSpringIndex.at(springIndex).size() - 1];
-        }
+          }
           debugNrSpringsVisited[springGlobalIdx] += 1;
           double denominator = 1. / (springPartitions[springGlobalIdx] *
                                      net->springsContourLength[springIndex]);
@@ -979,8 +993,8 @@ namespace calc {
                                          const std::vector<double> y,
                                          const std::vector<double> z,
                                          const std::vector<double> alpha1,
-                                        const std::vector<double> alpha2,
-                                        bool clampAlpha)
+                                         const std::vector<double> alpha2,
+                                         bool clampAlpha)
     {
       size_t additionalLen = strandIdx1.size();
       if (additionalLen == 0) {
@@ -1282,7 +1296,8 @@ namespace calc {
      * @param u
      * @return std::array<std::array<double, 3>, 3>
      */
-    std::array<std::array<double, 3>, 3> MEHPForceBalance2::evaluateStressTensor(
+    std::array<std::array<double, 3>, 3>
+    MEHPForceBalance2::evaluateStressTensor(
       const ForceBalanceNetwork* net,
       const Eigen::VectorXd& u,
       const Eigen::VectorXd& springPartitions,
@@ -1337,8 +1352,8 @@ namespace calc {
             // if (std::isfinite(denominator) && std::isfinite(contribution)) {
             stress[j][k] += contribution;
             // }
-            }
           }
+        }
       }
 
       for (size_t i = 0; i < 3; ++i) {
