@@ -38,6 +38,7 @@
       LazyUniverseSequenceIterator
       MCUniverseGenerator
       MEHPForceBalance
+      MEHPForceBalance2
       MEHPForceEvaluator
       MEHPForceRelaxation
       Molecule

@@ -1,0 +1,64 @@
+pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance2
+=========================================================
+
+.. currentmodule:: pylimer_tools_cpp.pylimer_tools_cpp
+
+.. autoclass:: MEHPForceBalance2
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~MEHPForceBalance2.__init__
+      ~MEHPForceBalance2.addSlipLinks
+      ~MEHPForceBalance2.getAverageSpringLength
+      ~MEHPForceBalance2.getCrosslinkerVerse
+      ~MEHPForceBalance2.getDefaultNrOfChains
+      ~MEHPForceBalance2.getDefaultR0Square
+      ~MEHPForceBalance2.getDisplacementResidualNorm
+      ~MEHPForceBalance2.getDisplacements
+      ~MEHPForceBalance2.getEffectiveFunctionalityOfAtoms
+      ~MEHPForceBalance2.getExitReason
+      ~MEHPForceBalance2.getForceOn
+      ~MEHPForceBalance2.getGammaFactor
+      ~MEHPForceBalance2.getIdsOfActiveNodes
+      ~MEHPForceBalance2.getNrOfActiveNodes
+      ~MEHPForceBalance2.getNrOfActivePartialSprings
+      ~MEHPForceBalance2.getNrOfActiveSprings
+      ~MEHPForceBalance2.getNrOfIterations
+      ~MEHPForceBalance2.getNrOfNodes
+      ~MEHPForceBalance2.getNrOfSprings
+      ~MEHPForceBalance2.getPressure
+      ~MEHPForceBalance2.getSpringPartitions
+      ~MEHPForceBalance2.getSpringpartitionIndicesOfSliplink
+      ~MEHPForceBalance2.getStressTensor
+      ~MEHPForceBalance2.getStressTensorLinkBased
+      ~MEHPForceBalance2.inspectDisplacementToMeanPositionUpdate
+      ~MEHPForceBalance2.inspectLinkDisplacementToMeanPositionUpdate
+      ~MEHPForceBalance2.inspectParametrisationOptimsationForLink
+      ~MEHPForceBalance2.inspectSpringPartitionUpdate
+      ~MEHPForceBalance2.runForceRelaxation
+      ~MEHPForceBalance2.setDisplacements
+      ~MEHPForceBalance2.setSpringContourLengths
+      ~MEHPForceBalance2.setSpringPartitions
+      ~MEHPForceBalance2.validateNetwork
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~MEHPForceBalance2.network
+   
+   
