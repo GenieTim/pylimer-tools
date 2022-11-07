@@ -43,6 +43,9 @@ namespace calc {
           Eigen::VectorXd::Zero(net.coordinates.size());
         this->currentSpringDistances =
           this->evaluateSpringDistances(&net, this->currentDisplacements, is2D);
+        this->currentPartialSpringDistances =
+          this->evaluatePartialSpringDistances(
+            &net, this->currentDisplacements, is2D);
         this->defaultR0Squared =
           universe.computeMeanSquareEndToEndDistance(crosslinkerType);
         this->defaultNrOfChains =
@@ -198,10 +201,16 @@ namespace calc {
 
       void setSpringContourLengths(const Eigen::VectorXd springsContourLengths)
       {
-        INVALIDARG_EXP_IFN(springsContourLengths.size() ==
-                             this->initialConfig.springsContourLength.size(),
-                           "Contour length must have the correct dimensions.");
+        INVALIDARG_EXP_IFN(
+          springsContourLengths.size() ==
+            this->initialConfig.springsContourLength.size(),
+          "Contour length must have the correct dimensions, got " +
+            std::to_string(springsContourLengths.size()) + ", expected " +
+            std::to_string(this->initialConfig.springsContourLength.size()) +
+            ".");
         this->initialConfig.springsContourLength = springsContourLengths;
+        this->initialConfig.meanSpringContourLength =
+          springsContourLengths.mean();
       }
 
       std::vector<Eigen::ArrayXi> getIndependentCoordinateSets(
@@ -222,12 +231,14 @@ namespace calc {
        */
       int getNrOfActiveNodes(double tolerance = 0.1,
                              int minimumNrOfActiveConnections = 2,
-                             int maximumNrOfActiveConnections = -1) const
+                             int maximumNrOfActiveConnections = -1,
+                             bool usePartial = false) const
       {
         return this
           ->getIdsOfActiveNodes(tolerance,
                                 minimumNrOfActiveConnections,
-                                maximumNrOfActiveConnections)
+                                maximumNrOfActiveConnections,
+                                usePartial)
           .size();
       }
 
@@ -256,7 +267,8 @@ namespace calc {
       std::vector<long int> getIdsOfActiveNodes(
         double tolerance = 0.1,
         int minimumNrOfActiveConnections = 2,
-        int maximumNrOfActiveConnections = -1) const;
+        int maximumNrOfActiveConnections = -1,
+        bool usePartial = false) const;
 
       /**
        * @brief Get the Nr Of Active Springs connected to each node
@@ -268,10 +280,15 @@ namespace calc {
       Eigen::VectorXi getNrOfActiveSpringsConnected(
         double tolerance = 0.1) const;
 
-      Eigen::VectorXd getCurrentSpringDistances() const
-      {
-        return this->currentSpringDistances;
-      }
+      /**
+       * @brief Get the Nr Of Active Springs connected to each node
+       *
+       * @param tolerance the tolerance: springs under a certain length are
+       * considered inactive
+       * @return Eigen::VectorXi
+       */
+      Eigen::VectorXi getNrOfActivePartialSpringsConnected(
+        double tolerance = 0.1) const;
 
       /**
        * @brief Get the Nr Of Active Springs object
@@ -283,6 +300,30 @@ namespace calc {
       int getNrOfActiveSprings(double tol = 0.1) const
       {
         return this->countNrOfActiveSprings(this->currentSpringDistances, tol);
+      }
+
+      /**
+       * @brief Get the Nr Of Active Springs object
+       *
+       * @param tol the tolerance: springs under a certain length are considered
+       * inactive
+       * @return int
+       */
+      int getNrOfActivePartialSprings(double tol = 0.1) const
+      {
+        return this->countNrOfActiveSprings(this->currentPartialSpringDistances,
+                                            tol);
+      }
+
+      Eigen::VectorXd getCurrentSpringDistances() const
+      {
+        return this->currentSpringDistances;
+      }
+
+      Eigen::VectorXd getCurrentPartialSpringDistances() const
+      {
+        return this->evaluatePartialSpringDistances(
+          &this->initialConfig, this->currentDisplacements, this->is2D);
       }
 
       /**
@@ -360,6 +401,11 @@ namespace calc {
                                               const Eigen::VectorXd& u,
                                               const bool is2D) const;
 
+      Eigen::VectorXd evaluatePartialSpringDistances(
+        const ForceBalanceNetwork* net,
+        const Eigen::VectorXd& u,
+        const bool is2D) const;
+
       /**
        * @brief Compute one spring length
        *
@@ -392,6 +438,190 @@ namespace calc {
       void setSpringPartitions(const Eigen::VectorXd newSpringPartitionsVec)
       {
         this->currentSpringPartitionsVec = newSpringPartitionsVec;
+      }
+
+      static void evaluateSetConstraintsAndGradients(ForceBalanceNetwork* net,
+                                                     Eigen::VectorXd u,
+                                                     double* result,
+                                                     double* grad)
+      {
+        size_t nrOfPartitionParameters =
+          net->nrOfPartialSprings - net->nrOfSprings;
+        size_t nrOfConstraints = net->nrOfSpringsWithPartition;
+        for (size_t i = 0; i < nrOfConstraints; ++i) {
+          result[i] = 0.0;
+        }
+
+        std::unordered_map<size_t, std::vector<size_t>> springToParametersMap =
+          MEHPForceBalance2::getParametersForSpringsMap(net);
+        size_t springIdx = 0;
+        size_t n = (3 * net->nrOfLinks) + (nrOfPartitionParameters);
+        if (grad != nullptr) {
+          for (size_t i = 0; i < nrOfConstraints * n; ++i) {
+            grad[i] = 0.0;
+          }
+        }
+
+        for (size_t constraintIdx = 0; constraintIdx < nrOfConstraints;
+             ++constraintIdx) {
+          double sumOfThisConstraintsPartitions = 0.;
+          // first, find the spring we act against: skip all which are just
+          // cross-link-cross-link
+          while (!net->linkIsSliplink[net->springPartIndexA[springIdx]] &&
+                 !net->linkIsSliplink[net->springPartIndexB[springIdx]]) {
+            springIdx += 1;
+          }
+          if (springIdx < net->nrOfSprings) {
+            // then, now that we know what spring this constraint is
+            // corresponding to, sum up the corresponding partition parameters
+            for (size_t parameterIdx : springToParametersMap.at(springIdx)) {
+              sumOfThisConstraintsPartitions +=
+                u(3 * net->nrOfLinks + parameterIdx);
+            }
+            result[constraintIdx] = -1. + sumOfThisConstraintsPartitions;
+            if (grad != NULL) {
+              for (size_t j = 0; j < nrOfConstraints; ++j) {
+                grad[constraintIdx * n + j] = 0.0;
+              }
+              // set dc_i/dx_j in grad[i*n + j]
+              // for these (linear) constraints, it is simply = 1 for all
+              // associated parameters
+              for (size_t parameterIdx : springToParametersMap.at(springIdx)) {
+                grad[constraintIdx * n + 3 * net->nrOfLinks + parameterIdx] =
+                  1.0;
+              }
+            }
+          }
+          springIdx += 1;
+        }
+
+        RUNTIME_EXP_IFN(springIdx == net->nrOfSprings,
+                        "Expected to loop all springs to find constraints");
+      }
+
+      static double evaluateForceSetGradient(ForceBalanceNetwork* net,
+                                             Eigen::VectorXd u,
+                                             double* grad)
+      {
+        size_t nrOfPartitionParameters =
+          net->nrOfPartialSprings - net->nrOfSprings;
+        // assemble spring partitions from the parameters
+        Eigen::VectorXd springPartitions0 =
+          MEHPForceBalance2::translatePartialParametersToAllPartitions(
+            net, u.tail(nrOfPartitionParameters));
+        Eigen::VectorXd oneOverSpringPartitions =
+          Eigen::VectorXd(3 * net->nrOfPartialSprings);
+        Eigen::ArrayXd primaryLoopCorrectionMultiplier =
+          (net->springPartIndexA != net->springPartIndexB).cast<double>();
+        for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
+          double valueToSet =
+            springPartitions0[i] > 0.0
+              ? 1. /
+                  (springPartitions0[i] *
+                   net->springsContourLength[net->partialToFullSpringIndex.at(
+                     i)])
+              : 0.0;
+          // if (springPartitions0[i] < 1e-9) {
+          //   std::cout << "Got close call for partial spring " << i <<
+          //   std::endl;
+          // }
+          valueToSet = std::clamp(valueToSet, 0.0, 1.0); // TODO: parametrise
+          oneOverSpringPartitions.segment(3 * i, 3) = Eigen::Vector3d::Constant(
+            valueToSet * primaryLoopCorrectionMultiplier[i]);
+        }
+
+        //  evaluate the overall energy
+        Eigen::VectorXd displacedCoords =
+          net->coordinates + u.head(net->nrOfLinks * 3);
+        Eigen::VectorXd partialSpringDistances =
+          (displacedCoords(net->springPartCoordinateIndexB) -
+           displacedCoords(net->springPartCoordinateIndexA));
+        MEHPForceBalance2::handlePBC(net, partialSpringDistances);
+        Eigen::VectorXd partialDistancesOverSpringPartitions =
+          (partialSpringDistances.array() * oneOverSpringPartitions.array())
+            .matrix();
+
+        // evaluate the gradient when needed
+        if (grad != NULL) {
+          // evaluate the gradient: ok for the forces on the links.
+          Eigen::VectorXd overallForces =
+            Eigen::VectorXd::Zero(net->coordinates.size());
+          overallForces(net->springPartCoordinateIndexB) +=
+            partialDistancesOverSpringPartitions;
+          overallForces(net->springPartCoordinateIndexA) -=
+            partialDistancesOverSpringPartitions;
+
+          for (size_t i = 0; i < net->nrOfLinks * 3; ++i) {
+            grad[i] = overallForces[i]; // * kappa
+          }
+          for (size_t i = 0; i < nrOfPartitionParameters; ++i) {
+            grad[(3 * net->nrOfLinks) + i] = 0.0;
+          }
+
+          // evaluate the gradient of the partition: harder.
+          // this is more or less df/dalpha.
+          // as alpha is in the denominator, it is mostly just it squared in the
+          // denominator. then, summed up all contributions. care must be taken
+          // for the remaining parition (1 - param1 - param2 ...), as it too
+          // contributes to all.
+          size_t parameterIdx = 0;
+          for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
+            // find which parameter this partial spring is associated with
+            // if (!net->linkIsSliplink[net->springPartIndexA[i]] &&
+            //     !net->linkIsSliplink[net->springPartIndexB[i]]) {
+            //   // this spring has partition 1, irrelevant for us
+            //   continue;
+            // }
+            if (net->linkIsSliplink[net->springPartIndexB[i]]) {
+              RUNTIME_EXP_IFN(parameterIdx < nrOfPartitionParameters,
+                              "Parameter index " +
+                                std::to_string(parameterIdx) +
+                                " should not be used (only " +
+                                std::to_string(nrOfPartitionParameters) +
+                                " partition parameters exist).")
+              // this partial spring has its own parameter -> requires gradient
+              grad[parameterIdx + (net->nrOfLinks * 3)] -=
+                0.5 * partialSpringDistances.segment(3 * i, 3).squaredNorm() *
+                oneOverSpringPartitions[3 * i] *
+                oneOverSpringPartitions[3 * i] *
+                net->springsContourLength[net->partialToFullSpringIndex.at(
+                  i)]; // * kappa
+              // additionally, there is a contribution from the (1-alpha-...)
+              // term, which is the last in this spring
+              size_t fullSpringIdx = net->partialToFullSpringIndex.at(i);
+              std::vector<size_t> linksInSpring =
+                net->linkIndicesOfSprings[fullSpringIdx];
+              for (size_t equivPartialSpringIdx :
+                   net->localToGlobalSpringIndex.at(fullSpringIdx)) {
+                if (!net->linkIsSliplink
+                       [net->springPartIndexB[equivPartialSpringIdx]]) {
+                  // found it, the spring which is the 1-...
+                  grad[parameterIdx + (net->nrOfLinks * 3)] +=
+                    0.5 *
+                    partialSpringDistances.segment(3 * equivPartialSpringIdx, 3)
+                      .squaredNorm() *
+                    oneOverSpringPartitions[3 * equivPartialSpringIdx] *
+                    oneOverSpringPartitions[3 * equivPartialSpringIdx] *
+                    net->springsContourLength[net->partialToFullSpringIndex.at(
+                      equivPartialSpringIdx)]; // * kappa
+                }
+              }
+              parameterIdx += 1;
+            }
+          }
+          RUNTIME_EXP_IFN(
+            parameterIdx == nrOfPartitionParameters,
+            "Expected total parameters to match nr of partitions");
+        }
+
+        double s2 = 0.0;
+        for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
+          s2 += partialSpringDistances.segment(3 * i, 3).squaredNorm() *
+                oneOverSpringPartitions[3 * i];
+        }
+        return 0.5 *
+               s2; // * kappa
+                   // return partialDistancesOverSpringPartitions.squaredNorm();
       }
 
       Eigen::Matrix3d getForceOn(
@@ -644,13 +874,14 @@ namespace calc {
         for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
           if (net->linkIsSliplink[net->springPartIndexB[i]]) {
             size_t springIdx = net->partialToFullSpringIndex.at(i);
-            if (!pylimer_tools::utils::map_has_key(springToParametersMap, springIdx)) {
+            if (!pylimer_tools::utils::map_has_key(springToParametersMap,
+                                                   springIdx)) {
               springToParametersMap.emplace(
                 springIdx, std::vector<size_t>({ parameterIdx }));
             } else {
               springToParametersMap[springIdx].push_back(parameterIdx);
             }
-            
+
             parameterIdx += 1;
           }
         }
@@ -909,7 +1140,7 @@ namespace calc {
 
       template<typename VectorType>
       static void handlePBC(const ForceBalanceNetwork* net,
-                     VectorType& distances)
+                            VectorType& distances)
       {
         // possibly improveable PBC
         for (size_t j = 0; j < distances.size(); ++j) {
@@ -1284,6 +1515,7 @@ namespace calc {
       ForceBalanceNetwork initialConfig;
       Eigen::VectorXd currentDisplacements;
       Eigen::VectorXd currentSpringDistances;
+      Eigen::VectorXd currentPartialSpringDistances;
       Eigen::VectorXd
         currentSpringPartitionsVec; /* gives the parametrisation of N */
       int crosslinkerType;
