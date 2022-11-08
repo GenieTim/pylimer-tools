@@ -101,6 +101,7 @@ namespace calc {
       this->exitReason = ExitReason::OTHER;
       if (nloptException != nullptr) {
         this->exitReason = ExitReason::FAILURE;
+        std::cout << "Nlopt exception: " << opt.get_errmsg() << std::endl;
       } else if (res == nlopt::result::FTOL_REACHED) {
         this->exitReason = ExitReason::F_TOLERANCE;
       } else if (res == nlopt::result::XTOL_REACHED) {

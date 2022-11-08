@@ -760,7 +760,8 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("algorithm") = "LD_MMA",
          py::arg("maxNrOfSteps") = 250000,
          py::arg("xTolerance") = 1e-12,
-         py::arg("fTolerance") = 1e-9)
+         py::arg("fTolerance") = 1e-9,
+         py::arg("constraintTol") = 1e-9)
     .def("inspectLinkDisplacementToMeanPositionUpdate",
          &mehp::MEHPForceBalance2::inspectLinkDisplacementToMeanPositionUpdate,
          R"pbdoc()pbdoc",
