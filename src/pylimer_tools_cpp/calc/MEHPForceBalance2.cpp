@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <nlopt.h>
 #include <nlopt.hpp>
 #include <string>
 #include <tuple>
@@ -55,8 +56,10 @@ namespace calc {
     void MEHPForceBalance2::runForceRelaxation(const char* algorithm,
                                                long int maxNrOfSteps,
                                                double xtol,
-                                               double ftol)
+                                               double ftol,
+                                               double constraintTol)
     {
+      INVALIDARG_EXP_IFN(constraintTol < 1.0, "A constraint tolerance higher than 1.0 does not make sense.");
       this->simulationHasRun = true;
 
       ForceBalanceNetwork net = this->initialConfig;
@@ -72,9 +75,7 @@ namespace calc {
 
       /* force relaxation */
       Eigen::VectorXd springPartitions = this->currentSpringPartitionsVec;
-      std::vector<Eigen::ArrayXi> independentVertexSets;
       // default = all
-      std::vector<Eigen::ArrayXi> independentVertexsSpringSets;
       // this->getIndependentCoordinateSets(&net);
       // { net.springPartCoordinateIndexA, net.springPartCoordinateIndexB };
       std::cout << "Starting force balance procedure "
@@ -125,7 +126,8 @@ namespace calc {
       }
       for (size_t i = 0; i < nrOfPartialSpringParameters; ++i) {
         upperBounds.push_back(1.0);
-        lowerBounds.push_back(0.0);
+        // lowerBounds.push_back(0.0);
+        lowerBounds.push_back(1./net.meanSpringContourLength - 1e-8);
       }
       assert(lowerBounds.size() == upperBounds.size());
       assert(lowerBounds.size() ==
@@ -159,7 +161,7 @@ namespace calc {
         };
         std::vector<double> tolerances =
           pylimer_tools::utils::initializeWithValue(
-            nrOfSpringsRequiringParameter, 1e-12);
+            nrOfSpringsRequiringParameter, constraintTol);
         opt.add_inequality_mconstraint(nonlinearConstraintF, &net, tolerances);
       }
       // set exit conditions
@@ -170,7 +172,7 @@ namespace calc {
       // opt.set_param("verbosity", 1.0);
       // start/set/run minimization
       double minf;
-      nlopt::result res;
+      nlopt::result res = nlopt::result::SUCCESS;
       std::exception_ptr nloptException = nullptr;
       try {
         res = opt.optimize(u0, minf);
@@ -195,7 +197,14 @@ namespace calc {
       this->exitReason = ExitReason::OTHER;
       if (nloptException != nullptr) {
         this->exitReason = ExitReason::FAILURE;
-        std::cout << "Nlopt exception: " << what(nloptException) << std::endl;
+        auto errMsg = opt.get_errmsg();
+        if (errMsg != nullptr) {
+          std::cout << "Nlopt exception: " << what(nloptException) << ": "
+                    << opt.get_errmsg() << "." << std::endl;
+        } else {
+          std::cout << "Nlopt exception: " << what(nloptException)
+                    << ". Exit code: " << res << std::endl;
+        }
       } else if (res == nlopt::result::FTOL_REACHED) {
         this->exitReason = ExitReason::F_TOLERANCE;
       } else if (res == nlopt::result::XTOL_REACHED) {

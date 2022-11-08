@@ -614,7 +614,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
           { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
           { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
         REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
-        // TODO: replace this value
+        // TODO: replace this value thereafter
         CHECK(forceBalancer2.getPressure() == Catch::Approx(0.0019534759));
       }
     } else {

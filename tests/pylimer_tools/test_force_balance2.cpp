@@ -122,7 +122,8 @@ TEST_CASE("Force Balance 2 Gradients are correct",
       pcm::MEHPForceBalance2::translateAllPartitionsToPartialParameters(
         &net, forceRelaxer2.getSpringPartitions());
     for (int i = 0; i < 4; ++i) {
-      u2[net.nrOfLinks * 3 + i] = reducedPartitions[i]; // initial parameter value
+      u2[net.nrOfLinks * 3 + i] =
+        reducedPartitions[i]; // initial parameter value
     }
 
     Eigen::VectorXd springPartitions0 =
@@ -211,7 +212,110 @@ TEST_CASE("Force Balance 2 Gradients are correct",
       }
     }
   }
-  // TODO: also test the gradients of the constraints
+
+  SECTION("With wild slip-links")
+  {
+    // also test the gradients with slip-links
+    forceRelaxer2.addSlipLinks({ 0, 1, 0 },
+                               { 2, 3, 3 },
+                               { 0.5, 0.5, 0.5 },
+                               { 0.0, 0.0, 0.0 },
+                               { 0.0, 0.0, 0.0 });
+    net = forceRelaxer2.getNetwork();
+    CHECK(net.meanSpringContourLength > 5.0);
+
+    double grad2[27];
+    Eigen::VectorXd u2 = Eigen::VectorXd::Zero(27);
+    for (int i = 0; i < 27; ++i) {
+      grad2[i] = 0.0;
+    }
+    Eigen::VectorXd reducedPartitions =
+      pcm::MEHPForceBalance2::translateAllPartitionsToPartialParameters(
+        &net, forceRelaxer2.getSpringPartitions());
+    for (int i = 0; i < 6; ++i) {
+      u2[net.nrOfLinks * 3 + i] =
+        reducedPartitions[i]; // initial parameter value
+    }
+
+    CHECK(net.nrOfLinks == 4 + 3);
+    CHECK(net.nrOfPartialSprings == 10);
+    CHECK(net.nrOfSprings == 4);
+    REQUIRE(3 * net.nrOfLinks + (net.nrOfPartialSprings - net.nrOfSprings) ==
+            27);
+
+    SECTION("Force gradients")
+    {
+      // actual computation to test gradient
+      for (size_t i = 0; i < 27; ++i) {
+        // std::cout << "MEHP Gradient Test coordinate " << i << std::endl;
+        // evaluate gradient
+        double f =
+          pcm::MEHPForceBalance2::evaluateForceSetGradient(&net, u2, grad2);
+        if (i % 3 != 0 && i < 3 * net.nrOfLinks) {
+          // in x and y direction, we expect no spring distance -> 0 gradient
+          CHECK(grad2[i] == Catch::Approx(0.0));
+        } else {
+          double u20 = u2[i];
+          // test finite difference vs. gradient
+          u2[i] = u20 - h;
+          double fm =
+            pcm::MEHPForceBalance2::evaluateForceSetGradient(&net, u2, nullptr);
+          u2[i] = u20 + h;
+          double fp =
+            pcm::MEHPForceBalance2::evaluateForceSetGradient(&net, u2, nullptr);
+          u2[i] = u20; // reset
+          // std::cout << i << " " << fm << " " << fp << " " << f << std::endl;
+          // require gradient to be similar to finite difference
+          if (std::abs(grad2[i]) == 0.0) {
+            CHECK(std::abs(grad2[i]) ==
+                  Catch::Approx(std::abs(fp - fm)).margin(0.000002));
+          } else {
+            CHECK(grad2[i] == Catch::Approx((1.0 / (2.0 * h)) * (fp - fm)));
+          }
+        }
+      }
+    }
+
+    SECTION("Constraint gradients")
+    {
+      double constraints[6];
+      double constraintsp[6];
+      double constraintsm[6];
+      double constraintsGradient[6 * 27];
+      CHECK((3 * net.nrOfLinks) + (net.nrOfPartialSprings - net.nrOfSprings) ==
+            27);
+      CHECK(net.nrOfSpringsWithPartition == 4);
+
+      for (size_t i = 0; i < 27; ++i) {
+        // evaluate gradient
+        pcm::MEHPForceBalance2::evaluateSetConstraintsAndGradients(
+          &net, u2, constraints, constraintsGradient);
+        double u20 = u2[i];
+        // test finite difference vs. gradient
+        u2[i] = u20 - h;
+        pcm::MEHPForceBalance2::evaluateSetConstraintsAndGradients(
+          &net, u2, constraintsm, nullptr);
+        u2[i] = u20 + h;
+        pcm::MEHPForceBalance2::evaluateSetConstraintsAndGradients(
+          &net, u2, constraintsp, nullptr);
+        u2[i] = u20; // reset
+        for (size_t constraintIdx = 0; constraintIdx < 6; ++constraintIdx) {
+          size_t idxInGrad = constraintIdx * (u2.size()) + i;
+          if (std::abs(constraintsGradient[idxInGrad]) == 0.0) {
+            CHECK(std::abs(constraintsGradient[idxInGrad]) ==
+                  Catch::Approx(constraintsp[constraintIdx] -
+                                constraintsm[constraintIdx])
+                    .margin(0.000002));
+          } else {
+            CHECK(constraintsGradient[idxInGrad] + 1e-5 ==
+                  Catch::Approx(1e-5 + (1.0 / (2.0 * h)) *
+                                         (constraintsp[constraintIdx] -
+                                          constraintsm[constraintIdx])));
+          }
+        }
+      }
+    }
+  }
 }
 
 TEST_CASE("MEHP Force Balance 2 handles slip-links on primary loops",
@@ -554,7 +658,11 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
               Catch::Approx(forceRelaxer.getPressure()));
         CHECK(forceBalancer2.getPressure() ==
               Catch::Approx(0.39911682390778536 / 79.));
+
+        // run system
         REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
+
+        // check validity of result
         CHECK_NOTHROW(forceBalancer2.validateNetwork());
         CHECK(forceBalancer2.getNrOfSprings() == 8142);
         CHECK(forceBalancer2.getNrOfIterations() > 1);
@@ -637,7 +745,7 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
           { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 },
           { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
         REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
-        // TODO: replace this value
+        // TODO: replace this value thereafter
         CHECK(forceBalancer2.getPressure() == Catch::Approx(0.0019534759));
       }
     } else {
@@ -671,7 +779,7 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
       pcm::MEHPForceBalance2(universe, 2, true);
     forceBalancer2.runForceRelaxation();
     REQUIRE(forceBalancer2.getNrOfIterations() > 5);
-    CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+    CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::F_TOLERANCE);
     CHECK(forceBalancer2.getGammaFactor(25, forceBalancer2.getNrOfSprings()) ==
           Catch::Approx(1. / 3.).epsilon(0.001));
     auto stressTensor = forceBalancer2.getStressTensor();

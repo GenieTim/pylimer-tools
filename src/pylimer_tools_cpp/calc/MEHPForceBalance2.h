@@ -64,7 +64,8 @@ namespace calc {
       void runForceRelaxation(const char* algorithm = "LD_MMA",
                               long int maxNrOfSteps = 50000, // default: 10000
                               double xtol = 1e-9,
-                              double ftol = 1e-9);
+                              double ftol = 1e-9,
+                              double constraintTol = 1e-9);
 
       /**
        * @brief Compute the spring update residual
@@ -452,9 +453,6 @@ namespace calc {
           result[i] = 0.0;
         }
 
-        std::unordered_map<size_t, std::vector<size_t>> springToParametersMap =
-          MEHPForceBalance2::getParametersForSpringsMap(net);
-        size_t springIdx = 0;
         size_t n = (3 * net->nrOfLinks) + (nrOfPartitionParameters);
         if (grad != nullptr) {
           for (size_t i = 0; i < nrOfConstraints * n; ++i) {
@@ -462,6 +460,9 @@ namespace calc {
           }
         }
 
+        std::unordered_map<size_t, std::vector<size_t>> springToParametersMap =
+          MEHPForceBalance2::getParametersForSpringsMap(net);
+        size_t springIdx = 0;
         for (size_t constraintIdx = 0; constraintIdx < nrOfConstraints;
              ++constraintIdx) {
           double sumOfThisConstraintsPartitions = 0.;
@@ -495,8 +496,19 @@ namespace calc {
           springIdx += 1;
         }
 
-        RUNTIME_EXP_IFN(springIdx == net->nrOfSprings,
-                        "Expected to loop all springs to find constraints");
+        // some additional tests
+        for (; springIdx < net->nrOfSprings; ++springIdx) {
+          RUNTIME_EXP_IFN(
+            !net->linkIsSliplink[net->springPartIndexA[springIdx]] &&
+              !net->linkIsSliplink[net->springPartIndexB[springIdx]],
+            "Expected the rest of the springs to not have partitions.");
+        }
+
+        RUNTIME_EXP_IFN(
+          springIdx == net->nrOfSprings || springIdx + 1 == net->nrOfSprings,
+          "Expected to loop all springs to find constraints, only looped " +
+            std::to_string(springIdx) + " of " +
+            std::to_string(net->nrOfSprings) + ".");
       }
 
       static double evaluateForceSetGradient(ForceBalanceNetwork* net,
