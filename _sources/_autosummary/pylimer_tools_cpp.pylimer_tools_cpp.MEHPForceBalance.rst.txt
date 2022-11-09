@@ -45,6 +45,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance
       ~MEHPForceBalance.inspectLinkDisplacementToMeanPositionUpdate
       ~MEHPForceBalance.inspectParametrisationOptimsationForLink
       ~MEHPForceBalance.inspectSpringPartitionUpdate
+      ~MEHPForceBalance.randomlyAddSlipLinks
       ~MEHPForceBalance.runForceRelaxation
       ~MEHPForceBalance.setDisplacements
       ~MEHPForceBalance.setSpringContourLengths
