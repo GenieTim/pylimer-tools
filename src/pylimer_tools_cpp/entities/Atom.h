@@ -94,6 +94,17 @@ namespace entities {
       return resultV;
     }
 
+    std::array<double, 3> meanPositionWith(Atom b, const Box* box) const
+    {
+      double distanceVec[3];
+      vectorTo(b, box, distanceVec);
+      std::array<double, 3> result;
+      result[0] = this->getX() - 0.5*distanceVec[0];
+      result[1] = this->getY() - 0.5*distanceVec[1];
+      result[2] = this->getZ() - 0.5*distanceVec[2];
+      return box->placeInBox(result);
+    }
+
     double distanceTo(Atom b, const Box* box) const
     {
       double distanceVec[3];

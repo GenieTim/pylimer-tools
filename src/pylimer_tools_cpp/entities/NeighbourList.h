@@ -5,13 +5,15 @@ extern "C"
 {
 #include <igraph/igraph.h>
 }
+#include "../utils/VectorUtils.h"
 #include "Atom.h"
 #include "Box.h"
 #include <Eigen/Dense>
 #include <map>
 #include <unordered_map>
 #include <vector>
-#include "../utils/VectorUtils.h"
+
+#include <algorithm>
 
 namespace pylimer_tools {
 namespace entities {
@@ -48,7 +50,8 @@ namespace entities {
       for (size_t i = 0; i < atoms.size(); ++i) {
         size_t bucketIndex = this->getBucketIndexForTriplet(
           this->getBucketIndicesForAtom(atoms[i]));
-        if (!pylimer_tools::utils::map_has_key(this->neighbourBuckets, bucketIndex)) {
+        if (!pylimer_tools::utils::map_has_key(this->neighbourBuckets,
+                                               bucketIndex)) {
           std::vector<size_t> vectorToPlace = std::vector<size_t>();
           // reserve a sensible capacity as estimated
           vectorToPlace.reserve(atoms.size() / this->totalNrOfBuckets);
@@ -68,7 +71,7 @@ namespace entities {
       pylimer_tools::entities::Atom atom,
       double newCutoff)
     {
-      if (newCutoff < 0) {
+      if (newCutoff < 0.) {
         newCutoff = this->cutoff;
       }
 
@@ -93,6 +96,29 @@ namespace entities {
       }
       // return results
       return results;
+    }
+
+    void removeAtom(Atom atom)
+    {
+      size_t indexBasis =
+        this->getBucketIndexForTriplet(this->getBucketIndicesForAtom(atom));
+      // it is sufficient to remove this atom from this bucket
+      if (this->idToAtomIdx.size() == 0) {
+        this->idToAtomIdx.reserve(this->atoms.size());
+        for (size_t i = 0; i < this->atoms.size(); ++i) {
+          this->idToAtomIdx.emplace(this->atoms[i].getId(), i);
+        }
+      }
+      // have to remove the element with value
+      size_t valToRemove = this->idToAtomIdx.at(atom.getId());
+      std::vector<size_t> bucket = this->neighbourBuckets.at(indexBasis);
+      std::vector<size_t>::iterator position =
+        std::find(bucket.begin(), bucket.end(), valToRemove);
+      if (position != bucket.end()) {
+        this->neighbourBuckets.at(indexBasis).erase(position);
+      } else {
+        throw std::invalid_argument("This atom is not in a bucket anyway");
+      }
     }
 
   protected:
@@ -183,6 +209,7 @@ namespace entities {
     std::unordered_map<size_t, std::vector<size_t>> neighbourBuckets;
 
     std::vector<pylimer_tools::entities::Atom> atoms;
+    std::unordered_map<size_t, size_t> idToAtomIdx;
   };
 };
 }

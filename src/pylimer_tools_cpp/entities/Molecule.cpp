@@ -245,6 +245,10 @@ namespace entities {
     long int vertexIdToStartWith = 0;
     std::vector<long int> ends = this->getVerticesWithDegree(1);
     if (ends.size() > 0) {
+      // sort to start with the end with the lowest atom id
+      std::sort(ends.begin(), ends.end(), [&](long int v1, long int v2) {
+        return this->getAtomIdByIdx(v1) < this->getAtomIdByIdx(v2);
+      });
       vertexIdToStartWith = ends[0];
     } else {
       std::vector<Atom> xlinkers = this->getAtomsOfType(crossLinkerType);

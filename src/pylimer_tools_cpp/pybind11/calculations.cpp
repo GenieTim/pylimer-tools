@@ -568,6 +568,14 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("alpha1"),
          py::arg("alpha2"),
          py::arg("clampAlpha") = false)
+    .def("randomlyAddSlipLinks",
+         &mehp::MEHPForceBalance::randomlyAddSliplinks,
+         R"pbdoc()pbdoc",
+         py::arg("nrOfSlipLinksToSample"),
+         py::arg("cutoff") = 2.0,
+         py::arg("minimumNrOfSliplinks") = 0,
+         py::arg("sameStrandCutoff") = 2,
+         py::arg("excludeCrosslinks") = false)
     .def("getStressTensor",
          &mehp::MEHPForceBalance::getStressTensor,
          R"pbdoc(
