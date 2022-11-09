@@ -58,6 +58,21 @@ TEST_CASE("Atoms can calculate distances", "[entity][Atom]")
     pe::Atom atom1_lefttopback = pe::Atom(0, 0, 1.0, 1.0, 1.0, -1, -1, -1);
     REQUIRE(atom1_lefttopback.distanceTo(atom1, &unitBox) == 0.0);
   }
+
+  SECTION("Move to the mean position in box") {
+    pe::Atom atom1 = pe::Atom(0, 0, 0.0, 0.0, 0.0, 0, 0, 0);
+    pe::Atom atom2 = pe::Atom(0, 0, 1.0, 1.0, 1.0, 0, 0, 0);
+    auto meanPosition_12 = atom1.meanPositionWith(atom2, &unitBox);
+    REQUIRE(meanPosition_12[0] == 0.0);
+    REQUIRE(meanPosition_12[1] == 0.0);
+    REQUIRE(meanPosition_12[2] == 0.0);
+
+    pe::Atom atom3 = pe::Atom(0, 0, 0.5, 0.5, 0.5, 0, 0, 0);
+    auto meanPosition_13 = atom1.meanPositionWith(atom3, &unitBox);
+    REQUIRE(meanPosition_13[0] == 0.25);
+    REQUIRE(meanPosition_13[1] == 0.25);
+    REQUIRE(meanPosition_13[2] == 0.25);
+  }
 }
 
 TEST_CASE("Atoms persist state", "[entity][Atom]")

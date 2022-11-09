@@ -1,6 +1,8 @@
 #ifndef BOX_H
 #define BOX_H
 
+#include <array>
+
 namespace pylimer_tools {
 namespace entities {
   // TODO: currently, this way, no tilt or more complicated boxes etc. is
@@ -10,6 +12,19 @@ namespace entities {
   private:
     double Lx, Ly, Lz;
     double xLo, xHi, yLo, yHi, zLo, zHi;
+
+  protected:
+    double iterateForPlacementIn(double coord, double min, double max) const
+    {
+      // assert(max > min);
+      while (coord > max) {
+        coord -= (max - min) / 2;
+      }
+      while (coord < min) {
+        coord += (max - min) / 2;
+      }
+      return coord;
+    }
 
   public:
     Box(const double Lx = 0.0, const double Ly = 0.0, const double Lz = 0.0)
@@ -56,6 +71,17 @@ namespace entities {
     double getHighX() const { return this->xHi; }
     double getHighY() const { return this->yHi; }
     double getHighZ() const { return this->zHi; }
+
+    std::array<double, 3> placeInBox(std::array<double, 3> coords) const
+    {
+      coords[0] = this->iterateForPlacementIn(
+        coords[0], this->getLowX(), this->getHighX());
+      coords[1] = this->iterateForPlacementIn(
+        coords[1], this->getLowY(), this->getHighY());
+      coords[2] = this->iterateForPlacementIn(
+        coords[2], this->getLowZ(), this->getHighZ());
+      return coords;
+    }
   };
 } // namespace entities
 } // namespace pylimer_tools
