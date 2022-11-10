@@ -219,13 +219,16 @@ namespace calc {
         // this way is more performant than
         // sampling integers and checking whether they have been sampled already
         std::vector<size_t> toSampleFrom;
+        std::vector<bool> isMasked;
         toSampleFrom.reserve(this->universe.getNrOfAtoms());
+        isMasked.reserve(this->universe.getNrOfAtoms());
         for (size_t i = 0; i < this->universe.getNrOfAtoms(); ++i) {
           if (!excludeCrosslinks ||
               this->universe.getAtomByVertexIdx(i).getType() !=
                 this->crosslinkerType) {
             toSampleFrom.push_back(i);
           }
+          isMasked[i] = false;
         }
         std::shuffle(toSampleFrom.begin(), toSampleFrom.end(), rng);
 
@@ -249,13 +252,24 @@ namespace calc {
 
         size_t nrOfSlipLinksPlaced = 0;
         size_t nrOfAttempts = 0;
+        size_t sampleIdx = 0;
         // the actual sampling loop
         while (nrOfSlipLinksPlaced < minimumNrOfSliplinks ||
                nrOfAttempts < nrOfSliplinksToSample) {
-          nrOfAttempts += 1;
           // first, randomly sample an atom
+          while (isMasked[toSampleFrom[sampleIdx]] && sampleIdx < toSampleFrom.size()) {
+            sampleIdx += 1;
+          }
+          if (sampleIdx >= toSampleFrom.size()) {
+            // this is a path that should barely ever be reached
+            break;
+          }
+          size_t sampledVertexId = toSampleFrom[sampleIdx];
+          nrOfAttempts += 1;
+          sampleIdx += 1;
           pylimer_tools::entities::Atom a1 =
-            this->universe.getAtomByVertexIdx(toSampleFrom[nrOfAttempts - 1]);
+            this->universe.getAtomByVertexIdx(sampledVertexId);
+          isMasked[sampledVertexId] = true;
           // then, find neighbouring atoms (but not from the same strand?!)
           std::vector<pylimer_tools::entities::Atom> neighbours =
             neighbourList.getAtomsCloseTo(a1);
@@ -270,7 +284,7 @@ namespace calc {
                       std::abs(static_cast<double>(
                         atomIdxInStrand[a.getId()] -
                         atomIdxInStrand[a1.getId()])) > sameStrandCutoff);
-            }));
+            }), neighbours.end());
           if (neighbours.size() == 0) {
             continue;
           }
@@ -282,6 +296,7 @@ namespace calc {
           // finally, remove them from the neighbour lists so that they are not
           // sampled more than once
           neighbourList.removeAtom(a2);
+          isMasked[this->universe.getIdxByAtomId(a2.getId())] = true;
           // it is actually quite a lot of expensive stuff done until we get to
           // this check but only this way we have the balance of removing atoms
           // to sample them only once
@@ -832,7 +847,7 @@ namespace calc {
 
       double getDisplacementResidualNorm(double cutoff) const;
 
-      double getDisplacementResidualNorm(
+      double getDisplacementResidualNormFor(
         const ForceBalanceNetwork* net,
         Eigen::VectorXd& u,
         const Eigen::VectorXd& oneOverSpringPartitions) const;
@@ -882,8 +897,7 @@ namespace calc {
        * @return true
        * @return false
        */
-      bool ConvertNetwork(ForceBalanceNetwork* net,
-                          const int crosslinkerType);
+      bool ConvertNetwork(ForceBalanceNetwork* net, const int crosslinkerType);
 
       /**
        * @brief Compute the gamma factor from certain spring distances
