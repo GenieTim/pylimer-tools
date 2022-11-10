@@ -645,8 +645,7 @@ init_pylimer_bound_calc(py::module_& m)
           Set/overwrite the contour lengths.
      )pbdoc")
     .def("getDisplacementResidualNorm",
-         py::overload_cast<double>(
-           &mehp::MEHPForceBalance::getDisplacementResidualNorm),
+         &mehp::MEHPForceBalance::getDisplacementResidualNorm,
          R"pbdoc(
           Get the current link displacement residual norm.
      )pbdoc")
