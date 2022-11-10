@@ -7,7 +7,8 @@ import unittest
 import numpy as np
 import pandas as pd
 import pandas.testing as pd_testing
-from pylimer_tools_cpp import Atom, Molecule, Universe, MoleculeType
+
+from pylimer_tools_cpp import Atom, Molecule, MoleculeType, Universe
 
 if __name__ == '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../.."))
@@ -31,7 +32,7 @@ class TestEntities(UniverseUsingTestCase):
         # self.assertIsInstance(universe.getUnderlyingGraph(), igraph.Graph)
         # check that the except paths work too: non-existant atom ids & type
         self.assertEqual([], self.emptyUniverse.getAtomsOfType(1))
-        self.assertRaises(ValueError, lambda: self.emptyUniverse.getAtom(1))
+        self.assertRaises(IndexError, lambda: self.emptyUniverse.getAtom(1))
 
         self.assertCountEqual([], self.emptyUniverse.getMolecules(0))
         self.assertCountEqual(
