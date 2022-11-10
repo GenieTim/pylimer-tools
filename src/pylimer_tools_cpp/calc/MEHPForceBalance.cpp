@@ -73,7 +73,7 @@ namespace calc {
         this->assembleOneOverSpringPartition(
           &net, springPartitions, oneOverSpringPartitionUpperLimit);
       double initialResidual =
-        this->getDisplacementResidualNorm(&net, u, oneOverSpringPartitions);
+        this->getDisplacementResidualNormFor(&net, u, oneOverSpringPartitions);
       double currentResidual = 0.0;
       double intermediateResidual = 0.0;
       do {
@@ -100,7 +100,7 @@ namespace calc {
           totalInnerIterationsDone += innerIterationsDone;
         }
         intermediateResidual =
-          this->getDisplacementResidualNorm(&net, u, oneOverSpringPartitions);
+          this->getDisplacementResidualNormFor(&net, u, oneOverSpringPartitions);
 
         if (mode == BalanceRunMode::EIGEN_RANDOM) {
           independentVertexSets = getRandomCoordinateSets(&net);
@@ -146,7 +146,7 @@ namespace calc {
         oneOverSpringPartitions =
           this->assembleOneOverSpringPartition(&net, springPartitions);
         currentResidual =
-          this->getDisplacementResidualNorm(&net, u, oneOverSpringPartitions);
+          this->getDisplacementResidualNormFor(&net, u, oneOverSpringPartitions);
         iterationsDone += 1;
         if (iterationsDone % 50 == 0) {
           std::cout << "Iteration " << iterationsDone << " " << maxDistanceMoved
@@ -333,12 +333,12 @@ namespace calc {
         this->assembleOneOverSpringPartition(
           &this->initialConfig, this->currentSpringPartitionsVec, cutoff);
       Eigen::VectorXd displacements = this->currentDisplacements;
-      return this->getDisplacementResidualNorm(&this->initialConfig,
+      return this->getDisplacementResidualNormFor(&this->initialConfig,
                                                displacements,
                                                oneOverSpringPartitions);
     }
 
-    double MEHPForceBalance::getDisplacementResidualNorm(
+    double MEHPForceBalance::getDisplacementResidualNormFor(
       const ForceBalanceNetwork* net,
       Eigen::VectorXd& u,
       const Eigen::VectorXd& oneOverSpringPartitions) const

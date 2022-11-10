@@ -77,6 +77,18 @@ namespace entities {
         newCutoff = this->cutoff;
       }
 
+      size_t indexBasis =
+        this->getBucketIndexForTriplet(this->getBucketIndicesForAtom(atom));
+      bool foundSelf = false;
+      for (size_t atomIndex : this->neighbourBuckets[indexBasis]) {
+        if (this->atoms[atomIndex].getId() == atom.getId()) {
+          foundSelf = true;
+        }
+      }
+      if (!foundSelf) {
+        throw std::invalid_argument("The requested atom is not in the list");
+      }
+
       std::vector<size_t> bucketIndices =
         this->getCombineBucketIndicesForAtom(atom, newCutoff);
       std::vector<pylimer_tools::entities::Atom> results =
@@ -84,23 +96,15 @@ namespace entities {
       // good estimate for nr of atoms to return
       results.reserve(bucketIndices.size() * this->atoms.size() /
                       this->totalNrOfBuckets);
-      bool foundSelf = false;
       // actually loop the buckets, look for atoms that are close
-      for (size_t i = 0; i < bucketIndices.size(); ++i) {
-        std::vector<size_t> atomIndices =
-          this->neighbourBuckets[bucketIndices[i]];
-        for (size_t j = 0; j < atomIndices.size(); ++j) {
-          if (this->atoms[atomIndices[j]].distanceTo(atom, &this->box) <
-                newCutoff &&
-              this->atoms[atomIndices[j]].getId() != atom.getId()) {
-            results.push_back(this->atoms[atomIndices[j]]);
-          } else if (this->atoms[atomIndices[j]].getId() == atom.getId()) {
-            foundSelf = true;
+      for (size_t bucketIndex : bucketIndices) {
+        std::vector<size_t> atomIndices = this->neighbourBuckets[bucketIndex];
+        for (size_t atomIndex : atomIndices) {
+          if (this->atoms[atomIndex].distanceTo(atom, &this->box) < newCutoff &&
+              this->atoms[atomIndex].getId() != atom.getId()) {
+            results.push_back(this->atoms[atomIndex]);
           }
         }
-      }
-      if (!foundSelf) {
-        throw std::invalid_argument("The requested atom is not in the list");
       }
       // return results
       return results;
@@ -119,11 +123,17 @@ namespace entities {
       }
       // have to remove the element with value
       size_t valToRemove = this->idToAtomIdx.at(atom.getId());
-      std::vector<size_t> bucket = this->neighbourBuckets.at(indexBasis);
       std::vector<size_t>::iterator position =
-        std::find(bucket.begin(), bucket.end(), valToRemove);
-      if (position != bucket.end()) {
-        this->neighbourBuckets.at(indexBasis).erase(position);
+        std::find(this->neighbourBuckets.at(indexBasis).begin(),
+                  this->neighbourBuckets.at(indexBasis).end(),
+                  valToRemove);
+      if (position != this->neighbourBuckets.at(indexBasis).end()) {
+        this->neighbourBuckets.at(indexBasis)
+          .erase(position);
+          // std::remove(this->neighbourBuckets.at(indexBasis).begin(),
+          //                    this->neighbourBuckets.at(indexBasis).end(),
+          //                    valToRemove),
+          //        this->neighbourBuckets.at(indexBasis).end());
       } else {
         throw std::invalid_argument("This atom is not in a bucket anyway");
       }
