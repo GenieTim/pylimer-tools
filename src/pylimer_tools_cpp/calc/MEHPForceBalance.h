@@ -201,6 +201,7 @@ namespace calc {
         std::vector<pylimer_tools::entities::Atom> atomsForNeighbourList =
           this->universe.getAtoms();
         if (excludeCrosslinks) {
+          // TODO: check whether it is faster to just only query the other ones
           atomsForNeighbourList.erase(
             std::remove_if(atomsForNeighbourList.begin(),
                            atomsForNeighbourList.end(),

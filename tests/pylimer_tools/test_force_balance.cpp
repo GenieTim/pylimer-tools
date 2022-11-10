@@ -430,15 +430,15 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
 
       // SECTION("Stress tensor computations are equivalent")
       // {
-        std::array<std::array<double, 3>, 3> stressTensor1 =
-          forceBalancer2.getStressTensor();
-        std::array<std::array<double, 3>, 3> stressTensor2 =
-          forceBalancer2.getStressTensorLinkBased();
-        for (size_t i = 0; i < 3; ++i) {
-          for (size_t j = 0; j < 3; ++j) {
-            CHECK(stressTensor1[i][j] == Catch::Approx(stressTensor2[i][j]));
-          }
+      std::array<std::array<double, 3>, 3> stressTensor1 =
+        forceBalancer2.getStressTensor();
+      std::array<std::array<double, 3>, 3> stressTensor2 =
+        forceBalancer2.getStressTensorLinkBased();
+      for (size_t i = 0; i < 3; ++i) {
+        for (size_t j = 0; j < 3; ++j) {
+          CHECK(stressTensor1[i][j] == Catch::Approx(stressTensor2[i][j]));
         }
+      }
       // }
 
       SECTION("Displacement computations are equivalent")
@@ -460,17 +460,17 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         // SECTION(
         //   "HeuristicallyIndependent coordiante sets are unique and complete")
         // {
-          pcm::ArrayXb vertexSetTest =
-            pcm::ArrayXb::Constant(3 * net.nrOfLinks, false);
-          for (int i = 0; i < vertexSets.size(); ++i) {
-            for (int j = 0; j < vertexSets[i].size(); ++j) {
-              CHECK(vertexSetTest[vertexSets[i][j]] == false);
-              vertexSetTest[vertexSets[i][j]] = true;
-            }
+        pcm::ArrayXb vertexSetTest =
+          pcm::ArrayXb::Constant(3 * net.nrOfLinks, false);
+        for (int i = 0; i < vertexSets.size(); ++i) {
+          for (int j = 0; j < vertexSets[i].size(); ++j) {
+            CHECK(vertexSetTest[vertexSets[i][j]] == false);
+            vertexSetTest[vertexSets[i][j]] = true;
           }
-          for (int i = 0; i < vertexSetTest.size(); ++i) {
-            CHECK(vertexSetTest[i] == true);
-          }
+        }
+        for (int i = 0; i < vertexSetTest.size(); ++i) {
+          CHECK(vertexSetTest[i] == true);
+        }
         // }
 
         Eigen::VectorXd displacements1 =
@@ -691,6 +691,27 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
     //   auto duration = duration_cast<std::chrono::microseconds>(stop - start);
     //   std::cout << "Took: " << duration.count() << std::endl;
     // }
+  }
+}
+
+TEST_CASE("MEHP Force Balance can randomly add slip-links",
+          "[analysis][MEHPForceBalance]")
+{
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  REQUIRE(universeSeq.getLength() == 0);
+  std::string suspectedPath = "../pylimer_tools/fixtures/";
+
+  std::string largeInputFile =
+    suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
+  if (std::filesystem::exists(largeInputFile)) {
+    REQUIRE(std::filesystem::exists(suspectedPath));
+    universeSeq.initializeFromDataSequence(
+      { { largeInputFile } });
+    REQUIRE(universeSeq.getLength() == 1);
+    pe::Universe universe = universeSeq.atIndex(0);
+    pcm::MEHPForceBalance forceBalancer =
+      pcm::MEHPForceBalance(universe, 2, true);
+    REQUIRE_NOTHROW(forceBalancer.randomlyAddSliplinks(100));
   }
 }
 
