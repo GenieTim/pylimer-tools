@@ -46,17 +46,19 @@ namespace entities {
 
       this->neighbourBuckets.reserve(this->totalNrOfBuckets);
 
+      // prepare the buckets
+      for (size_t bucketIndex = 0; bucketIndex < this->totalNrOfBuckets;
+           ++bucketIndex) {
+        std::vector<size_t> vectorToPlace = std::vector<size_t>();
+        // reserve a sensible capacity as estimated
+        vectorToPlace.reserve(atoms.size() / this->totalNrOfBuckets);
+        this->neighbourBuckets.emplace(bucketIndex, vectorToPlace);
+      }
+
       // fill neighbour buckets
       for (size_t i = 0; i < atoms.size(); ++i) {
         size_t bucketIndex = this->getBucketIndexForTriplet(
           this->getBucketIndicesForAtom(atoms[i]));
-        if (!pylimer_tools::utils::map_has_key(this->neighbourBuckets,
-                                               bucketIndex)) {
-          std::vector<size_t> vectorToPlace = std::vector<size_t>();
-          // reserve a sensible capacity as estimated
-          vectorToPlace.reserve(atoms.size() / this->totalNrOfBuckets);
-          this->neighbourBuckets.emplace(bucketIndex, vectorToPlace);
-        }
         this->neighbourBuckets[bucketIndex].push_back(i);
       }
     };
