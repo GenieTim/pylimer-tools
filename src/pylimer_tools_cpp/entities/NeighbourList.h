@@ -82,6 +82,7 @@ namespace entities {
       // good estimate for nr of atoms to return
       results.reserve(bucketIndices.size() * this->atoms.size() /
                       this->totalNrOfBuckets);
+      bool foundSelf = false;
       // actually loop the buckets, look for atoms that are close
       for (size_t i = 0; i < bucketIndices.size(); ++i) {
         std::vector<size_t> atomIndices =
@@ -91,8 +92,13 @@ namespace entities {
                 newCutoff &&
               this->atoms[atomIndices[j]].getId() != atom.getId()) {
             results.push_back(this->atoms[atomIndices[j]]);
+          } else if (this->atoms[atomIndices[j]].getId() == atom.getId()) {
+            foundSelf = true;
           }
         }
+      }
+      if (!foundSelf) {
+        throw std::invalid_argument("The requested atom is not in the list");
       }
       // return results
       return results;

@@ -185,6 +185,200 @@ namespace calc {
       this->validateNetwork(&net);
     }
 
+    double MEHPForceBalance::displaceLinksToMeanPosition(
+      const ForceBalanceNetwork* net,
+      Eigen::VectorXd& u,
+      Eigen::VectorXd& springPartitions0,
+      double damping = 0.5) const
+    {
+
+      Eigen::ArrayXi mask = Eigen::ArrayXi::LinSpaced(
+        3 * net->nrOfLinks, 0, 3 * net->nrOfLinks - 1);
+      Eigen::VectorXd oneOverSpringPartitions =
+        this->assembleOneOverSpringPartition(net, springPartitions0);
+
+      return this->displaceLinksToMeanPosition(
+        net, u, oneOverSpringPartitions, mask, damping);
+    }
+
+    /**
+     * @brief Displace one link to the mean of all connected neighbours
+     *
+     * @param net the force balance network
+     * @param u the current displacements, wherein the resulting coordinates
+     * shall be stored
+     * @return double, the distance (squared norm) displaced
+     */
+    double MEHPForceBalance::displaceLinksToMeanPosition(
+      const ForceBalanceNetwork* net,
+      Eigen::VectorXd& u,
+      const Eigen::VectorXd& oneOverSpringPartitions,
+      const Eigen::ArrayXi& resultingCoordinateIndexMask,
+      const double damping = 0.5) const
+    {
+      Eigen::ArrayXi involvedSpringPartCoordinateIndexMask =
+        Eigen::ArrayXi::LinSpaced(
+          3 * net->nrOfPartialSprings, 0, 3 * net->nrOfPartialSprings - 1);
+      return this->displaceLinksToMeanPosition(
+        net,
+        u,
+        oneOverSpringPartitions,
+        involvedSpringPartCoordinateIndexMask,
+        resultingCoordinateIndexMask,
+        damping);
+    }
+
+    /**
+     * @brief Displace one link to the mean of all connected neighbours
+     *
+     * @param net the force balance network
+     * @param u the current displacements, wherein the resulting coordinates
+     * shall be stored
+     * @return double, the distance (squared norm) displaced
+     */
+    double MEHPForceBalance::displaceLinksToMeanPosition(
+      const ForceBalanceNetwork* net,
+      Eigen::VectorXd& u,
+      const Eigen::VectorXd& oneOverSpringPartitions,
+      const Eigen::ArrayXi& involvedSpringPartCoordinateIndexMask,
+      const Eigen::ArrayXi& resultingCoordinateIndexMask,
+      const double damping = 0.5) const
+    {
+      INVALIDARG_EXP_IFN(
+        u.size() == net->coordinates.size(),
+        "Coordinates and displacements must have the same size");
+      INVALIDARG_EXP_IFN(oneOverSpringPartitions.size() ==
+                           net->springPartCoordinateIndexB.size(),
+                         "Spring partitions must have the size of the nr of "
+                         "spring coordinates");
+      INVALIDARG_EXP_IFN(resultingCoordinateIndexMask.size() % 3 == 0,
+                         "Mask is expected to mask the coordinates");
+      INVALIDARG_EXP_IFN(involvedSpringPartCoordinateIndexMask.size() % 3 == 0,
+                         "Mask is expected to mask the coordinates");
+
+      Eigen::ArrayXi relevantSpringPartCoordinateIndexA =
+        net->springPartCoordinateIndexA(involvedSpringPartCoordinateIndexMask);
+      Eigen::ArrayXi relevantSpringPartCoordinateIndexB =
+        net->springPartCoordinateIndexB(involvedSpringPartCoordinateIndexMask);
+
+      // assert(relevantSpringPartCoordinateIndexB.size() ==
+      //        relevantSpringPartCoordinateIndexA.size());
+      // assert(relevantSpringPartCoordinateIndexA.size() ==
+      //        involvedSpringPartCoordinateIndexMask.size());
+      // assert(resultingCoordinateIndexMask.maxCoeff() <
+      //        net->coordinates.size());
+      // assert(involvedSpringPartCoordinateIndexMask.maxCoeff() <
+      //        net->springCoordinateIndexA.size());
+
+      // TODO: we could save some time and space by directly adjusting the
+      // coordinates
+      Eigen::VectorXd displacedCoords = net->coordinates + u;
+      Eigen::VectorXd relevantPartialDistancesA =
+        (displacedCoords(relevantSpringPartCoordinateIndexB) -
+         displacedCoords(relevantSpringPartCoordinateIndexA));
+      this->handlePBC(net, relevantPartialDistancesA);
+
+      // NOTE: we have many zeros too much, here, actually.
+      Eigen::ArrayXd oneOverSumOfSpringPartials = Eigen::ArrayXd::Zero(
+        3 * net->nrOfLinks); // 0.0 for equal = primary loop, 1.0 otherwise
+      oneOverSumOfSpringPartials(relevantSpringPartCoordinateIndexA) +=
+        oneOverSpringPartitions(involvedSpringPartCoordinateIndexMask).array();
+      oneOverSumOfSpringPartials(relevantSpringPartCoordinateIndexB) +=
+        oneOverSpringPartitions(involvedSpringPartCoordinateIndexMask).array();
+      // prevent NaN values from dividing by zero afterwards
+      oneOverSumOfSpringPartials = (oneOverSumOfSpringPartials <= 1e-12)
+                                     .select(1.0, oneOverSumOfSpringPartials);
+
+      Eigen::VectorXd partialDistancesOverSpringPartitions =
+        (relevantPartialDistancesA.array() *
+         oneOverSpringPartitions(involvedSpringPartCoordinateIndexMask).array())
+          .matrix();
+      // NOTE: we have many zeros too much, here, actually.
+      Eigen::VectorXd objectiveDisplacements =
+        Eigen::VectorXd::Zero(3 * net->nrOfLinks);
+      objectiveDisplacements(relevantSpringPartCoordinateIndexA) +=
+        partialDistancesOverSpringPartitions;
+      objectiveDisplacements(relevantSpringPartCoordinateIndexB) -=
+        partialDistancesOverSpringPartitions;
+      // ...and take the average
+      objectiveDisplacements(resultingCoordinateIndexMask) =
+        (objectiveDisplacements(resultingCoordinateIndexMask).array() /
+         oneOverSumOfSpringPartials(resultingCoordinateIndexMask))
+          .matrix();
+
+      // reset for 2D systems
+      if (this->is2D) {
+        objectiveDisplacements(Eigen::seq(2, net->nrOfLinks, 3)) =
+          Eigen::VectorXd::Zero(net->nrOfLinks);
+      }
+
+      // find the actual (max) displacement we did
+      double maxDiff = 0;
+      Eigen::VectorXd objectivesToSet =
+        objectiveDisplacements(resultingCoordinateIndexMask);
+      for (int i = 0; i < resultingCoordinateIndexMask.size() / 3; i++) {
+        maxDiff =
+          std::max(maxDiff, objectivesToSet.segment(3 * i, 3).squaredNorm());
+      }
+      // double maxDiff =
+      // (objectiveDisplacements(mask)).cwiseAbs2().maxCoeff();
+      u(resultingCoordinateIndexMask) += damping * objectivesToSet;
+
+      return maxDiff;
+    };
+
+    double MEHPForceBalance::getDisplacementResidualNorm(double cutoff) const
+    {
+      return this->getDisplacementResidualNorm(
+        &this->initialConfig,
+        this->currentDisplacements,
+        this->assembleOneOverSpringPartition(
+          &this->initialConfig, this->currentSpringPartitionsVec, cutoff));
+    }
+
+    double MEHPForceBalance::getDisplacementResidualNorm(
+      const ForceBalanceNetwork* net,
+      Eigen::VectorXd& u,
+      const Eigen::VectorXd& oneOverSpringPartitions) const
+    {
+      Eigen::VectorXd displacedCoords = net->coordinates + u;
+      Eigen::VectorXd relevantPartialDistancesA =
+        (displacedCoords(net->springPartCoordinateIndexB) -
+         displacedCoords(net->springPartCoordinateIndexA));
+      this->handlePBC(net, relevantPartialDistancesA);
+      Eigen::VectorXd partialDistancesOverSpringPartitions =
+        (relevantPartialDistancesA.array() * oneOverSpringPartitions.array())
+          .matrix();
+
+      // return partialDistancesOverSpringPartitions.squaredNorm();
+
+      Eigen::VectorXd overallForces = Eigen::VectorXd::Zero(3 * net->nrOfLinks);
+      overallForces(net->springPartCoordinateIndexB) +=
+        partialDistancesOverSpringPartitions;
+      overallForces(net->springPartCoordinateIndexA) -=
+        partialDistancesOverSpringPartitions;
+
+      // Eigen::Index maxRow, maxCol;
+      // double max = overallForces.maxCoeff(&maxRow, &maxCol);
+      // Eigen::Index minRow, minCol;
+      // double min = overallForces.minCoeff(&minRow, &minCol);
+      // std::cout << "Got min = " << min << " at " << minRow << ", " <<
+      // minCol
+      //           << std::endl;
+      // std::cout << "Got max = " << max << " at " << maxRow << ", " <<
+      // maxCol
+      //           << std::endl;
+
+      return overallForces.squaredNorm();
+
+      // Eigen::Vector3d sumOfResiduals = Eigen::Vector3d::Zero();
+      // for (int i = 0; i < net->nrOfPartialSprings; ++i) {
+      //   sumOfResiduals += partialDistancesOverSpringPartitions.segment(3 *
+      //   i, 3).cwiseAbs2();
+      // }
+      // return sumOfResiduals.squaredNorm();
+    }
+
     /**
      * @brief Estimate some sets of random vertices
      *
@@ -369,6 +563,85 @@ namespace calc {
 
       return results;
     };
+
+    /**
+     * @brief Translate the spring partition vector to its 3*size
+     *
+     * @param net
+     * @param springPartitions0
+     * @return Eigen::VectorXd
+     */
+    Eigen::VectorXd MEHPForceBalance::assembleOneOverSpringPartition(
+      const ForceBalanceNetwork* net,
+      const Eigen::VectorXd& springPartitions0,
+      const double oneOverSpringPartitionUpperLimit = 1.0) const
+    {
+      INVALIDARG_EXP_IFN(
+        springPartitions0.size() == net->nrOfPartialSprings,
+        "Spring partitions must have the size of the nr of springs");
+      Eigen::VectorXd oneOverSpringPartitions =
+        Eigen::VectorXd(3 * net->nrOfPartialSprings);
+
+      Eigen::ArrayXd primaryLoopCorrectionMultiplier =
+        (net->springPartIndexA != net->springPartIndexB)
+          .cast<double>(); // 0.0 for equal = primary loop, 1.0 otherwise
+
+      for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
+        double valueToSet =
+          springPartitions0[i] > 0.0 // 1e-18 //
+            ? 1.0 /
+                (springPartitions0[i] *
+                 net->springsContourLength[net->partialToFullSpringIndex.at(i)])
+            : 0.0;
+        valueToSet =
+          std::clamp(valueToSet, 0.0, oneOverSpringPartitionUpperLimit);
+        // if (springPartitions0[i] < 1e-9) {
+        //   std::cout << "Got close call for partial spring " << i <<
+        //   std::endl;
+        // }
+        oneOverSpringPartitions.segment(3 * i, 3) = Eigen::Vector3d::Constant(
+          valueToSet * primaryLoopCorrectionMultiplier[i]);
+      }
+
+      return oneOverSpringPartitions;
+    }
+
+    
+      /**
+       * @brief Assemble all indices of partial springs for a particular slip-link
+       * 
+       * @param linkIdx 
+       * @return std::vector<size_t> 
+       */
+      std::vector<size_t> MEHPForceBalance::getSpringpartitionIndicesOfSliplink(
+        const size_t linkIdx) const
+      {
+        INVALIDARG_EXP_IFN(this->initialConfig.linkIsSliplink[linkIdx],
+                           "Link must be slip-link");
+        std::vector<size_t> springIndices =
+          this->initialConfig.springIndicesOfLinks[linkIdx];
+        std::vector<size_t> results;
+        results.reserve(4);
+        for (size_t springIndex : springIndices) {
+          std::vector<size_t> springsPartners =
+            this->initialConfig.linkIndicesOfSprings[springIndex];
+          for (size_t partner_idx = 1; partner_idx < springsPartners.size() - 1;
+               ++partner_idx) {
+            if (springsPartners[partner_idx] == linkIdx) {
+              size_t currentSpringGlobalIdx =
+                this->initialConfig.localToGlobalSpringIndex.at(
+                  springIndex)[partner_idx - 1];
+              size_t neighbourSpringGlobalIdx =
+                this->initialConfig.localToGlobalSpringIndex.at(
+                  springIndex)[partner_idx];
+              results.push_back(currentSpringGlobalIdx);
+              results.push_back(neighbourSpringGlobalIdx);
+            }
+          }
+        }
+        return results;
+      }
+
 
     /**
      * @brief Updates the partition/parametrisation of a spring around one link
@@ -1411,6 +1684,170 @@ namespace calc {
       return this->evaluateGammaFactor(
         this->currentSpringDistances, r02, nrOfChains);
     }
+
+    /**
+     * @brief Convert the universe to a network
+     *
+     * @param net the target network
+     * @param crosslinkerType the atom type of the crosslinker
+     * @return true
+     * @return false
+     */
+    bool MEHPForceBalance::ConvertNetwork(ForceBalanceNetwork* net,
+                                          const int crosslinkerType = 2)
+    {
+      std::vector<pylimer_tools::entities::Atom> xlinkers =
+        this->universe.getAtomsOfType(crosslinkerType);
+
+      size_t nrOfXlinks = xlinkers.size();
+
+      std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
+        this->universe.getChainsWithCrosslinker(crosslinkerType);
+
+      // need to include all but dangling and free chains in order to
+      // model entanglement
+      size_t nrOfSprings = 0;
+      for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
+        std::vector<pylimer_tools::entities::Atom> endAtoms =
+          crosslinkerChains[i].getAtomsOfType(crosslinkerType);
+        if (crosslinkerChains[i].getType() ==
+              pylimer_tools::entities::MoleculeType::NETWORK_STRAND ||
+            crosslinkerChains[i].getType() ==
+              pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
+          nrOfSprings += 1;
+        }
+      }
+
+      // crosslinkerUniverse.simplify();
+      pylimer_tools::entities::Box box = this->universe.getBox();
+      net->L[0] = box.getLx();
+      net->L[1] = box.getLy();
+      net->L[2] = box.getLz();
+      net->boxHalfs[0] = 0.5 * net->L[0];
+      net->boxHalfs[1] = 0.5 * net->L[1];
+      net->boxHalfs[2] = 0.5 * net->L[2];
+      net->nrOfNodes = nrOfXlinks;
+      net->nrOfLinks = nrOfXlinks;
+      net->nrOfSprings = nrOfSprings;
+      net->nrOfPartialSprings = nrOfSprings;
+      net->nrOfSpringsWithPartition = 0;
+      net->coordinates = Eigen::VectorXd::Zero(3 * net->nrOfLinks);
+      net->oldAtomIds = Eigen::ArrayXi::Zero(net->nrOfLinks);
+      net->linkIsSliplink = ArrayXb::Constant(net->nrOfLinks, false);
+      net->springIndicesOfLinks.reserve(net->nrOfLinks);
+      net->partialToFullSpringIndex.reserve(net->nrOfLinks);
+      for (size_t i = 0; i < net->nrOfLinks; ++i) {
+        net->springIndicesOfLinks.push_back(std::vector<size_t>());
+      }
+      net->linkIndicesOfSprings.reserve(net->nrOfSprings);
+      this->currentSpringPartitionsVec =
+        Eigen::VectorXd::Ones(net->nrOfSprings);
+      for (size_t i = 0; i < net->nrOfSprings; ++i) {
+        net->linkIndicesOfSprings.push_back(std::vector<size_t>());
+      }
+      net->springIndexA = Eigen::ArrayXi::Zero(net->nrOfSprings);
+      net->springIndexB = Eigen::ArrayXi::Zero(net->nrOfSprings);
+      net->springCoordinateIndexA = Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
+      net->springCoordinateIndexB = Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
+      net->springIsActive = ArrayXb::Constant(net->nrOfSprings, false);
+      net->springsContourLength = Eigen::VectorXd::Zero(net->nrOfSprings);
+      net->oldAtomIdToSpringIndex.reserve(this->universe.getNrOfAtoms());
+      net->springToMoleculeIds.reserve(nrOfSprings);
+
+      // convert beads
+      std::map<int, int> atomIdToNode;
+      for (size_t i = 0; i < xlinkers.size(); ++i) {
+        pylimer_tools::entities::Atom atom = xlinkers[i];
+        atomIdToNode[atom.getId()] = i;
+        net->oldAtomIds[i] = atom.getId();
+        net->coordinates[3 * i + 0] = atom.getX();
+        net->coordinates[3 * i + 1] = atom.getY();
+        net->coordinates[3 * i + 2] = atom.getZ();
+      }
+
+      // convert springs
+      size_t spring_idx = 0;
+      // net->connectivityToSpringIndex.reserve(nrOfSprings);
+      for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
+        std::vector<pylimer_tools::entities::Atom> xlinkersOfChain =
+          crosslinkerChains[i].getAtomsOfType(crosslinkerType);
+        long int nodeIdxFrom;
+        long int nodeIdxTo;
+        bool addChain = false;
+        if (crosslinkerChains[i].getType() ==
+            pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
+          assert(xlinkersOfChain.size() == 2);
+          nodeIdxFrom = atomIdToNode.at(xlinkersOfChain[0].getId());
+          nodeIdxTo = atomIdToNode.at(xlinkersOfChain[1].getId());
+          if (nodeIdxFrom > nodeIdxTo) {
+            std::swap(nodeIdxFrom, nodeIdxTo);
+          }
+          addChain = true;
+
+          net->springsContourLength[spring_idx] =
+            crosslinkerChains[i].getNrOfAtoms() - 1; // TODO: -2?
+        } else if (crosslinkerChains[i].getType() ==
+                   pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
+          assert(xlinkersOfChain.size() == 1 ||
+                 (xlinkersOfChain.size() == 2 &&
+                  xlinkersOfChain[0].getId() == xlinkersOfChain[1].getId()));
+
+          nodeIdxFrom = atomIdToNode.at(xlinkersOfChain[0].getId());
+          nodeIdxTo = nodeIdxFrom;
+          addChain = true;
+
+          net->springsContourLength[spring_idx] =
+            crosslinkerChains[i].getNrOfAtoms(); // TODO: -1?
+        }
+
+        if (addChain) {
+          net->springToMoleculeIds.emplace(spring_idx, i);
+          std::vector<pylimer_tools::entities::Atom> allChainAtoms =
+            crosslinkerChains[i].getAtoms();
+          for (pylimer_tools::entities::Atom a : allChainAtoms) {
+            net->oldAtomIdToSpringIndex[a.getId()] = spring_idx;
+          }
+
+          net->springIndicesOfLinks[nodeIdxFrom].push_back(spring_idx);
+          if (nodeIdxFrom != nodeIdxTo) {
+            net->springIndicesOfLinks[nodeIdxTo].push_back(spring_idx);
+          }
+
+          net->linkIndicesOfSprings[spring_idx].push_back(nodeIdxFrom);
+          net->linkIndicesOfSprings[spring_idx].push_back(nodeIdxTo);
+
+          net->springIndexA[spring_idx] = nodeIdxFrom;
+          net->springIndexB[spring_idx] = nodeIdxTo;
+          for (size_t j = 0; j < 3; j++) {
+            net->springCoordinateIndexA[3 * spring_idx + j] =
+              nodeIdxFrom * 3 + j;
+            net->springCoordinateIndexB[3 * spring_idx + j] = nodeIdxTo * 3 + j;
+          }
+
+          std::vector<size_t> zeroMap;
+          zeroMap.push_back(spring_idx);
+          net->localToGlobalSpringIndex.emplace(spring_idx, zeroMap);
+          net->partialToFullSpringIndex.emplace(spring_idx, spring_idx);
+
+          spring_idx += 1;
+        }
+      }
+
+      net->springPartCoordinateIndexA = net->springCoordinateIndexA;
+      net->springPartCoordinateIndexB = net->springCoordinateIndexB;
+      net->springPartIndexA = net->springIndexA;
+      net->springPartIndexB = net->springIndexB;
+
+      // box volume
+      net->vol = net->L[0] * net->L[1] * net->L[2];
+      if (net->springsContourLength.size() > 0) {
+        net->meanSpringContourLength = net->springsContourLength.mean();
+      } else {
+        net->meanSpringContourLength = 0.0;
+      }
+
+      return spring_idx == net->nrOfSprings;
+    };
 
     bool MEHPForceBalance::validateNetwork(const ForceBalanceNetwork* net)
     {
