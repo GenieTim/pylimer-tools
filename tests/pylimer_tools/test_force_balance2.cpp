@@ -1,6 +1,5 @@
 #include "../../src/pylimer_tools_cpp/calc/MEHPForceBalance2.h"
 #include "../../src/pylimer_tools_cpp/calc/MEHPForceEvaluator.h"
-#include "../../src/pylimer_tools_cpp/calc/MEHPForceRelaxation.h"
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include <catch2/benchmark/catch_benchmark_all.hpp>
