@@ -641,8 +641,8 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
       SECTION("Actual balance results in correct phantom results")
       {
         std::cout << "Doing phantom force balance" << std::endl;
-        pcm::MEHPForceRelaxation forceRelaxer =
-          pcm::MEHPForceRelaxation(universe2, 2);
+        pcm::MEHPForceBalance2 forceRelaxer =
+          pcm::MEHPForceBalance2(universe2, 2);
         // the strands are different -> cannot compare the distances anymore
         // CHECK((forceBalancer2.getCurrentSpringDistances() -
         // forceRelaxer.getCurrentSpringDistances()).isMuchSmallerThan(1e-12));
@@ -718,8 +718,8 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
       SECTION("Actual balance results in correct slip-link results")
       {
         std::cout << "Doing non-phantom force balance" << std::endl;
-        pcm::MEHPForceRelaxation forceRelaxer =
-          pcm::MEHPForceRelaxation(universe2, 2);
+        pcm::MEHPForceBalance2 forceRelaxer =
+          pcm::MEHPForceBalance2(universe2, 2);
         // the strands are different -> cannot compare the distances anymore
         // CHECK((forceBalancer2.getCurrentSpringDistances() -
         // forceRelaxer.getCurrentSpringDistances()).isMuchSmallerThan(1e-12));

@@ -705,10 +705,12 @@ TEST_CASE("MEHP Force Balance can randomly add slip-links",
     suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
   if (std::filesystem::exists(largeInputFile)) {
     REQUIRE(std::filesystem::exists(suspectedPath));
+    std::cout << "Reading file " << largeInputFile << std::endl;
     universeSeq.initializeFromDataSequence(
       { { largeInputFile } });
     REQUIRE(universeSeq.getLength() == 1);
     pe::Universe universe = universeSeq.atIndex(0);
+    std::cout << "Read file. " << std::endl;
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance(universe, 2, true);
     REQUIRE_NOTHROW(forceBalancer.randomlyAddSliplinks(100));

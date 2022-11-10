@@ -812,7 +812,7 @@ namespace calc {
         Eigen::VectorXd& u,
         const Eigen::VectorXd& oneOverSpringPartitions,
         const Eigen::ArrayXi& resultingCoordinateIndexMask,
-        const double damping = 0.5) const;
+        const double damping) const;
 
       /**
        * @brief Displace one link to the mean of all connected neighbours
@@ -883,7 +883,7 @@ namespace calc {
        * @return false
        */
       bool ConvertNetwork(ForceBalanceNetwork* net,
-                          const int crosslinkerType = 2);
+                          const int crosslinkerType);
 
       /**
        * @brief Compute the gamma factor from certain spring distances
