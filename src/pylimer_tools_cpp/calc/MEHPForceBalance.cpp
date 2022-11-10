@@ -189,7 +189,7 @@ namespace calc {
       const ForceBalanceNetwork* net,
       Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions0,
-      double damping = 0.5) const
+      double damping) const
     {
 
       Eigen::ArrayXi mask = Eigen::ArrayXi::LinSpaced(
@@ -214,7 +214,7 @@ namespace calc {
       Eigen::VectorXd& u,
       const Eigen::VectorXd& oneOverSpringPartitions,
       const Eigen::ArrayXi& resultingCoordinateIndexMask,
-      const double damping = 0.5) const
+      const double damping) const
     {
       Eigen::ArrayXi involvedSpringPartCoordinateIndexMask =
         Eigen::ArrayXi::LinSpaced(
@@ -242,7 +242,7 @@ namespace calc {
       const Eigen::VectorXd& oneOverSpringPartitions,
       const Eigen::ArrayXi& involvedSpringPartCoordinateIndexMask,
       const Eigen::ArrayXi& resultingCoordinateIndexMask,
-      const double damping = 0.5) const
+      const double damping) const
     {
       INVALIDARG_EXP_IFN(
         u.size() == net->coordinates.size(),
@@ -329,11 +329,13 @@ namespace calc {
 
     double MEHPForceBalance::getDisplacementResidualNorm(double cutoff) const
     {
-      return this->getDisplacementResidualNorm(
-        &this->initialConfig,
-        this->currentDisplacements,
+      Eigen::VectorXd oneOverSpringPartitions =
         this->assembleOneOverSpringPartition(
-          &this->initialConfig, this->currentSpringPartitionsVec, cutoff));
+          &this->initialConfig, this->currentSpringPartitionsVec, cutoff);
+      Eigen::VectorXd displacements = this->currentDisplacements;
+      return this->getDisplacementResidualNorm(&this->initialConfig,
+                                               displacements,
+                                               oneOverSpringPartitions);
     }
 
     double MEHPForceBalance::getDisplacementResidualNorm(
@@ -574,7 +576,7 @@ namespace calc {
     Eigen::VectorXd MEHPForceBalance::assembleOneOverSpringPartition(
       const ForceBalanceNetwork* net,
       const Eigen::VectorXd& springPartitions0,
-      const double oneOverSpringPartitionUpperLimit = 1.0) const
+      const double oneOverSpringPartitionUpperLimit) const
     {
       INVALIDARG_EXP_IFN(
         springPartitions0.size() == net->nrOfPartialSprings,
@@ -606,42 +608,40 @@ namespace calc {
       return oneOverSpringPartitions;
     }
 
-    
-      /**
-       * @brief Assemble all indices of partial springs for a particular slip-link
-       * 
-       * @param linkIdx 
-       * @return std::vector<size_t> 
-       */
-      std::vector<size_t> MEHPForceBalance::getSpringpartitionIndicesOfSliplink(
-        const size_t linkIdx) const
-      {
-        INVALIDARG_EXP_IFN(this->initialConfig.linkIsSliplink[linkIdx],
-                           "Link must be slip-link");
-        std::vector<size_t> springIndices =
-          this->initialConfig.springIndicesOfLinks[linkIdx];
-        std::vector<size_t> results;
-        results.reserve(4);
-        for (size_t springIndex : springIndices) {
-          std::vector<size_t> springsPartners =
-            this->initialConfig.linkIndicesOfSprings[springIndex];
-          for (size_t partner_idx = 1; partner_idx < springsPartners.size() - 1;
-               ++partner_idx) {
-            if (springsPartners[partner_idx] == linkIdx) {
-              size_t currentSpringGlobalIdx =
-                this->initialConfig.localToGlobalSpringIndex.at(
-                  springIndex)[partner_idx - 1];
-              size_t neighbourSpringGlobalIdx =
-                this->initialConfig.localToGlobalSpringIndex.at(
-                  springIndex)[partner_idx];
-              results.push_back(currentSpringGlobalIdx);
-              results.push_back(neighbourSpringGlobalIdx);
-            }
+    /**
+     * @brief Assemble all indices of partial springs for a particular slip-link
+     *
+     * @param linkIdx
+     * @return std::vector<size_t>
+     */
+    std::vector<size_t> MEHPForceBalance::getSpringpartitionIndicesOfSliplink(
+      const size_t linkIdx) const
+    {
+      INVALIDARG_EXP_IFN(this->initialConfig.linkIsSliplink[linkIdx],
+                         "Link must be slip-link");
+      std::vector<size_t> springIndices =
+        this->initialConfig.springIndicesOfLinks[linkIdx];
+      std::vector<size_t> results;
+      results.reserve(4);
+      for (size_t springIndex : springIndices) {
+        std::vector<size_t> springsPartners =
+          this->initialConfig.linkIndicesOfSprings[springIndex];
+        for (size_t partner_idx = 1; partner_idx < springsPartners.size() - 1;
+             ++partner_idx) {
+          if (springsPartners[partner_idx] == linkIdx) {
+            size_t currentSpringGlobalIdx =
+              this->initialConfig.localToGlobalSpringIndex.at(
+                springIndex)[partner_idx - 1];
+            size_t neighbourSpringGlobalIdx =
+              this->initialConfig.localToGlobalSpringIndex.at(
+                springIndex)[partner_idx];
+            results.push_back(currentSpringGlobalIdx);
+            results.push_back(neighbourSpringGlobalIdx);
           }
         }
-        return results;
       }
-
+      return results;
+    }
 
     /**
      * @brief Updates the partition/parametrisation of a spring around one link
@@ -1694,7 +1694,7 @@ namespace calc {
      * @return false
      */
     bool MEHPForceBalance::ConvertNetwork(ForceBalanceNetwork* net,
-                                          const int crosslinkerType = 2)
+                                          const int crosslinkerType)
     {
       std::vector<pylimer_tools::entities::Atom> xlinkers =
         this->universe.getAtomsOfType(crosslinkerType);
