@@ -611,11 +611,11 @@ namespace calc {
 
       ExitReason getExitReason() const { return this->exitReason; }
 
-      void addSlipLinks(const std::vector<size_t> strandIdx1,
-                        const std::vector<size_t> strandIdx2,
-                        const std::vector<double> x,
-                        const std::vector<double> y,
-                        const std::vector<double> z)
+      void addSlipLinks(const std::vector<size_t> &strandIdx1,
+                        const std::vector<size_t> &strandIdx2,
+                        const std::vector<double> &x,
+                        const std::vector<double> &y,
+                        const std::vector<double> &z)
       {
         std::vector<double> alphas;
         alphas.reserve(x.size());
@@ -626,13 +626,13 @@ namespace calc {
           strandIdx1, strandIdx2, x, y, z, alphas, alphas);
       }
 
-      void addSlipLinks(const std::vector<size_t> strandIdx1,
-                        const std::vector<size_t> strandIdx2,
-                        const std::vector<double> x,
-                        const std::vector<double> y,
-                        const std::vector<double> z,
-                        const std::vector<double> alpha1,
-                        const std::vector<double> alpha2,
+      void addSlipLinks(const std::vector<size_t> &strandIdx1,
+                        const std::vector<size_t> &strandIdx2,
+                        const std::vector<double> &x,
+                        const std::vector<double> &y,
+                        const std::vector<double> &z,
+                        const std::vector<double> &alpha1,
+                        const std::vector<double> &alpha2,
                         bool clampAlpha = false);
 
       /**
