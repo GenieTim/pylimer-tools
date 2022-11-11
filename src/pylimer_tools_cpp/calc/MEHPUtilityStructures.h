@@ -77,7 +77,7 @@ namespace calc {
       Eigen::ArrayXi springCoordinateIndexA;
       Eigen::ArrayXi springCoordinateIndexB;
       Eigen::ArrayXi oldAtomIds;
-      std::unordered_map<size_t, size_t> springToMoleculeIds; // maps 
+      std::vector<size_t> springToMoleculeIds; // maps 
       ArrayXb springIsActive;
       Eigen::ArrayXi springIndexA;
       Eigen::ArrayXi springIndexB;

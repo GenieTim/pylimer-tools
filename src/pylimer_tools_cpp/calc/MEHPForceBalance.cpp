@@ -1819,7 +1819,7 @@ namespace calc {
         }
 
         if (addChain) {
-          net->springToMoleculeIds.emplace(spring_idx, i);
+          net->springToMoleculeIds.push_back(i);
           std::vector<pylimer_tools::entities::Atom> allChainAtoms =
             crosslinkerChains[i].getAtoms();
           for (pylimer_tools::entities::Atom a : allChainAtoms) {
