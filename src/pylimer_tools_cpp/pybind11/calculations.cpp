@@ -549,13 +549,13 @@ init_pylimer_bound_calc(py::module_& m)
           Returns the pressure at the current state of the simulation.
      )pbdoc")
     .def("addSlipLinks",
-         py::overload_cast<const std::vector<size_t>,
-                           const std::vector<size_t>,
-                           const std::vector<double>,
-                           const std::vector<double>,
-                           const std::vector<double>,
-                           const std::vector<double>,
-                           const std::vector<double>,
+         py::overload_cast<const std::vector<size_t>&,
+                           const std::vector<size_t>&,
+                           const std::vector<double>&,
+                           const std::vector<double>&,
+                           const std::vector<double>&,
+                           const std::vector<double>&,
+                           const std::vector<double>&,
                            const bool>(&mehp::MEHPForceBalance::addSlipLinks),
          R"pbdoc(
           Add the slip-links
@@ -830,15 +830,14 @@ init_pylimer_bound_calc(py::module_& m)
           Returns the pressure at the current state of the simulation.
      )pbdoc")
     .def("addSlipLinks",
-     //     py::overload_cast<const std::vector<size_t>&,
-     //                       const std::vector<size_t>&,
-     //                       const std::vector<double>&,
-     //                       const std::vector<double>&,
-     //                       const std::vector<double>&,
-     //                       const std::vector<double>&,
-     //                       const std::vector<double>&,
-     //                       const bool>(
-                              &mehp::MEHPForceBalance2::addSlipLinks, //),
+         py::overload_cast<const std::vector<size_t>,
+                           const std::vector<size_t>,
+                           const std::vector<double>,
+                           const std::vector<double>,
+                           const std::vector<double>,
+                           const std::vector<double>,
+                           const std::vector<double>,
+                           const bool>(&mehp::MEHPForceBalance2::addSlipLinks),
          R"pbdoc(
           Add the slip-links
      )pbdoc",
