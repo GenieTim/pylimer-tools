@@ -287,11 +287,15 @@ namespace calc {
               neighbours.begin(),
               neighbours.end(),
               [&](pylimer_tools::entities::Atom a) -> bool {
-                return (atomToStrand.at(a.getId()) == atomToStrand.at(a1.getId())
-                &&
-                        std::abs(static_cast<double>(
-                          atomIdxInStrand[a.getId()] -
-                          atomIdxInStrand[a1.getId()])) < sameStrandCutoff);
+                return (
+                  atomToStrand[a.getId()] ==
+                    atomToStrand[a1.getId()] // do not use "at", because not all
+                                             // atoms in the neighbours have
+                                             // been assigned a strand
+                  &&
+                  std::abs(static_cast<double>(atomIdxInStrand[a.getId()] -
+                                               atomIdxInStrand[a1.getId()])) <
+                    sameStrandCutoff);
               }),
             neighbours.end());
           if (neighbours.size() == 0) {
@@ -612,11 +616,11 @@ namespace calc {
 
       ExitReason getExitReason() const { return this->exitReason; }
 
-      void addSlipLinks(const std::vector<size_t> &strandIdx1,
-                        const std::vector<size_t> &strandIdx2,
-                        const std::vector<double> &x,
-                        const std::vector<double> &y,
-                        const std::vector<double> &z)
+      void addSlipLinks(const std::vector<size_t>& strandIdx1,
+                        const std::vector<size_t>& strandIdx2,
+                        const std::vector<double>& x,
+                        const std::vector<double>& y,
+                        const std::vector<double>& z)
       {
         std::vector<double> alphas;
         alphas.reserve(x.size());
@@ -627,13 +631,13 @@ namespace calc {
           strandIdx1, strandIdx2, x, y, z, alphas, alphas);
       }
 
-      void addSlipLinks(const std::vector<size_t> &strandIdx1,
-                        const std::vector<size_t> &strandIdx2,
-                        const std::vector<double> &x,
-                        const std::vector<double> &y,
-                        const std::vector<double> &z,
-                        const std::vector<double> &alpha1,
-                        const std::vector<double> &alpha2,
+      void addSlipLinks(const std::vector<size_t>& strandIdx1,
+                        const std::vector<size_t>& strandIdx2,
+                        const std::vector<double>& x,
+                        const std::vector<double>& y,
+                        const std::vector<double>& z,
+                        const std::vector<double>& alpha1,
+                        const std::vector<double>& alpha2,
                         bool clampAlpha = false);
 
       /**
