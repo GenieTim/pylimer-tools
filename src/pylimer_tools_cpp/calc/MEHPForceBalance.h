@@ -180,7 +180,6 @@ namespace calc {
                 pylimer_tools::entities::MoleculeType::PRIMARY_LOOP ||
               chain.getType() ==
                 pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
-            springId += 1;
             assert(i == this->initialConfig.springToMoleculeIds[springId]);
             // TODO: also check that this is not a higher order dangling strand
             usableSpringIdxs.push_back(i);
@@ -199,6 +198,7 @@ namespace calc {
                 atomIdxInStrand.emplace(atom.getId(), atomIdx);
               }
             }
+            springId += 1;
           }
         }
         // build neighbourlist
@@ -287,7 +287,7 @@ namespace calc {
               neighbours.begin(),
               neighbours.end(),
               [&](pylimer_tools::entities::Atom a) -> bool {
-                return (atomToStrand[a.getId()] == atomToStrand[a1.getId()]
+                return (atomToStrand.at(a.getId()) == atomToStrand.at(a1.getId())
                 &&
                         std::abs(static_cast<double>(
                           atomIdxInStrand[a.getId()] -
