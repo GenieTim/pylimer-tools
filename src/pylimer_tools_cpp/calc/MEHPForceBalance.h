@@ -181,6 +181,7 @@ namespace calc {
               chain.getType() ==
                 pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
             springId += 1;
+            assert(i == this->initialConfig.springToMoleculeIds[springId]);
             // TODO: also check that this is not a higher order dangling strand
             usableSpringIdxs.push_back(i);
             nrOfEligibleAtoms +=
@@ -281,18 +282,18 @@ namespace calc {
           neighbourList.removeAtom(a1);
           // filter the neighbours to include only those from other strands
           // NOTE: this skews the whole thing a bit
-          // neighbours.erase(
-          //   std::remove_if(
-          //     neighbours.begin(),
-          //     neighbours.end(),
-          //     [&](pylimer_tools::entities::Atom a) -> bool {
-          //       return (atomToStrand[a.getId()] == atomToStrand[a1.getId()]
-          //       &&
-          //               std::abs(static_cast<double>(
-          //                 atomIdxInStrand[a.getId()] -
-          //                 atomIdxInStrand[a1.getId()])) < sameStrandCutoff);
-          //     }),
-          //   neighbours.end());
+          neighbours.erase(
+            std::remove_if(
+              neighbours.begin(),
+              neighbours.end(),
+              [&](pylimer_tools::entities::Atom a) -> bool {
+                return (atomToStrand[a.getId()] == atomToStrand[a1.getId()]
+                &&
+                        std::abs(static_cast<double>(
+                          atomIdxInStrand[a.getId()] -
+                          atomIdxInStrand[a1.getId()])) < sameStrandCutoff);
+              }),
+            neighbours.end());
           if (neighbours.size() == 0) {
             std::cerr << "Not enough neighbours found." << std::endl;
             continue;
@@ -611,20 +612,20 @@ namespace calc {
 
       ExitReason getExitReason() const { return this->exitReason; }
 
-      // void addSlipLinks(const std::vector<size_t> &strandIdx1,
-      //                   const std::vector<size_t> &strandIdx2,
-      //                   const std::vector<double> &x,
-      //                   const std::vector<double> &y,
-      //                   const std::vector<double> &z)
-      // {
-      //   std::vector<double> alphas;
-      //   alphas.reserve(x.size());
-      //   for (size_t i = 0; i < x.size(); ++i) {
-      //     alphas.push_back(0.5);
-      //   }
-      //   return this->addSlipLinks(
-      //     strandIdx1, strandIdx2, x, y, z, alphas, alphas);
-      // }
+      void addSlipLinks(const std::vector<size_t> &strandIdx1,
+                        const std::vector<size_t> &strandIdx2,
+                        const std::vector<double> &x,
+                        const std::vector<double> &y,
+                        const std::vector<double> &z)
+      {
+        std::vector<double> alphas;
+        alphas.reserve(x.size());
+        for (size_t i = 0; i < x.size(); ++i) {
+          alphas.push_back(0.5);
+        }
+        return this->addSlipLinks(
+          strandIdx1, strandIdx2, x, y, z, alphas, alphas);
+      }
 
       void addSlipLinks(const std::vector<size_t> &strandIdx1,
                         const std::vector<size_t> &strandIdx2,

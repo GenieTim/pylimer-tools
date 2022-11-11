@@ -99,8 +99,8 @@ namespace calc {
                    rOverr0 > innerAlphaTol && std::isfinite(rOverr0));
           totalInnerIterationsDone += innerIterationsDone;
         }
-        intermediateResidual =
-          this->getDisplacementResidualNormFor(&net, u, oneOverSpringPartitions);
+        intermediateResidual = this->getDisplacementResidualNormFor(
+          &net, u, oneOverSpringPartitions);
 
         if (mode == BalanceRunMode::EIGEN_RANDOM) {
           independentVertexSets = getRandomCoordinateSets(&net);
@@ -145,8 +145,8 @@ namespace calc {
         }
         oneOverSpringPartitions =
           this->assembleOneOverSpringPartition(&net, springPartitions);
-        currentResidual =
-          this->getDisplacementResidualNormFor(&net, u, oneOverSpringPartitions);
+        currentResidual = this->getDisplacementResidualNormFor(
+          &net, u, oneOverSpringPartitions);
         iterationsDone += 1;
         if (iterationsDone % 50 == 0) {
           std::cout << "Iteration " << iterationsDone << " " << maxDistanceMoved
@@ -333,9 +333,8 @@ namespace calc {
         this->assembleOneOverSpringPartition(
           &this->initialConfig, this->currentSpringPartitionsVec, cutoff);
       Eigen::VectorXd displacements = this->currentDisplacements;
-      return this->getDisplacementResidualNormFor(&this->initialConfig,
-                                               displacements,
-                                               oneOverSpringPartitions);
+      return this->getDisplacementResidualNormFor(
+        &this->initialConfig, displacements, oneOverSpringPartitions);
     }
 
     double MEHPForceBalance::getDisplacementResidualNormFor(
@@ -1150,19 +1149,20 @@ namespace calc {
       return xlinkUniverse;
     }
 
-    void MEHPForceBalance::addSlipLinks(const std::vector<size_t> &strandIdx1,
-                                        const std::vector<size_t> &strandIdx2,
-                                        const std::vector<double> &x,
-                                        const std::vector<double> &y,
-                                        const std::vector<double> &z,
-                                        const std::vector<double> &alpha1,
-                                        const std::vector<double> &alpha2,
+    void MEHPForceBalance::addSlipLinks(const std::vector<size_t>& strandIdx1,
+                                        const std::vector<size_t>& strandIdx2,
+                                        const std::vector<double>& x,
+                                        const std::vector<double>& y,
+                                        const std::vector<double>& z,
+                                        const std::vector<double>& alpha1,
+                                        const std::vector<double>& alpha2,
                                         bool clampAlpha)
     {
       size_t additionalLen = strandIdx1.size();
       if (additionalLen == 0) {
         return;
       }
+      // validate inputs
       size_t currentNrOfLinks = this->initialConfig.nrOfLinks;
       size_t currentNrOfPartialSprings = this->initialConfig.nrOfPartialSprings;
       if (additionalLen != x.size() || additionalLen != y.size() ||
@@ -1173,6 +1173,24 @@ namespace calc {
           additionalLen != alpha1.size() || additionalLen != alpha2.size()) {
         throw std::invalid_argument(
           "Strand indices and alpha estimates must have the same length");
+      }
+      for (size_t i = 0; i < additionalLen; ++i) {
+        INVALIDARG_EXP_IFN(
+          strandIdx1[i] < this->initialConfig.nrOfSprings,
+          "Invalid spring index " + std::to_string(strandIdx1[i]) +
+            ", expected below " +
+            std::to_string(this->initialConfig.nrOfSprings) + ".");
+        INVALIDARG_EXP_IFN(
+          strandIdx2[i] < this->initialConfig.nrOfSprings,
+          "Invalid spring index " + std::to_string(strandIdx2[i]) +
+            ", expected below " +
+            std::to_string(this->initialConfig.nrOfSprings) + ".");
+        INVALIDARG_EXP_IFN(APPROX_WITHIN(alpha1[i], 0.0, 1.0, 1e-12),
+                           "Expected alpha within [0, 1], got " +
+                             std::to_string(alpha1[i]) + ".");
+        INVALIDARG_EXP_IFN(APPROX_WITHIN(alpha2[i], 0.0, 1.0, 1e-12),
+                           "Expected alpha within [0, 1], got " +
+                             std::to_string(alpha2[i]) + ".");
       }
       // actually start adding them
       this->initialConfig.nrOfLinks += additionalLen;
