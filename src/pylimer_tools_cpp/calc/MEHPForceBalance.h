@@ -286,7 +286,8 @@ namespace calc {
           //     neighbours.begin(),
           //     neighbours.end(),
           //     [&](pylimer_tools::entities::Atom a) -> bool {
-          //       return (atomToStrand[a.getId()] == atomToStrand[a1.getId()] &&
+          //       return (atomToStrand[a.getId()] == atomToStrand[a1.getId()]
+          //       &&
           //               std::abs(static_cast<double>(
           //                 atomIdxInStrand[a.getId()] -
           //                 atomIdxInStrand[a1.getId()])) < sameStrandCutoff);
@@ -297,19 +298,23 @@ namespace calc {
             continue;
           }
           // then, randomly select one of them
-          size_t randomA2Idx =
-            std::uniform_int_distribution<size_t>{ 0,
-                                                   neighbours.size() - 1 }(rng);
-          pylimer_tools::entities::Atom a2 = neighbours[randomA2Idx];
+          pylimer_tools::entities::Atom a2 = neighbours[0];
+          if (neighbours.size() > 1) {
+            size_t randomA2Idx =
+              std::uniform_int_distribution<size_t>{ 0, neighbours.size() - 1 }(
+                rng);
+            pylimer_tools::entities::Atom a2 = neighbours[randomA2Idx];
+          }
           // finally, remove them from the neighbour lists so that they are not
           // sampled more than once
+          size_t sampledVertexId2 = this->universe.getIdxByAtomId(a2.getId());
           neighbourList.removeAtom(a2);
-          isMasked[this->universe.getIdxByAtomId(a2.getId())] = true;
+          isMasked[sampledVertexId2] = true;
           // it is actually quite a lot of expensive stuff done until we get to
           // this check but only this way we have the balance of removing atoms
           // to sample them only once
           if (!vertexIdxIsEligible[sampledVertexId] ||
-              !vertexIdxIsEligible[this->universe.getIdxByAtomId(a2.getId())]) {
+              !vertexIdxIsEligible[sampledVertexId2]) {
             // std::cout << "Sampled vertices are not eligible" << std::endl;
             continue;
           }
