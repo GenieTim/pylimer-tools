@@ -713,7 +713,8 @@ TEST_CASE("MEHP Force Balance can randomly add slip-links",
     std::cout << "Read file. " << std::endl;
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance(universe, 2, true);
-    REQUIRE_NOTHROW(forceBalancer.randomlyAddSliplinks(100));
+    size_t nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(1000, 2.0, 100);
+    REQUIRE(nrOfAddedLinks >= 100);
   }
 }
 

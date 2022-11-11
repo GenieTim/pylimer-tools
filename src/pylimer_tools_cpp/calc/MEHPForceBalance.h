@@ -140,10 +140,10 @@ namespace calc {
         INVALIDARG_EXP_IFN(cutoff > 0.0,
                            "Expected a cutoff > 0.0, got " +
                              std::to_string(cutoff) + ".");
-        RUNTIME_EXP_IFN(this->initialConfig.nrOfLinks ==
-                          this->initialConfig.nrOfNodes,
-                        "Slip-links are only added randomly when no other "
-                        "slip-links are in place yet.");
+        // RUNTIME_EXP_IFN(this->initialConfig.nrOfLinks ==
+        //                   this->initialConfig.nrOfNodes,
+        //                 "Slip-links are only added randomly when no other "
+        //                 "slip-links are in place yet.");
         INVALIDARG_EXP_IFN(minimumNrOfSliplinks <
                              this->universe.getNrOfAtoms() / 2,
                            "Minimum number of slip-links must be less than the "
@@ -173,6 +173,9 @@ namespace calc {
         size_t springId = 0;
         for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
           pylimer_tools::entities::Molecule chain = crosslinkerChains[i];
+          RUNTIME_EXP_IFN(chain.getType() !=
+                            pylimer_tools::entities::MoleculeType::UNDEFINED,
+                          "Couldn't determine molecule type.");
           if (chain.getType() ==
                 pylimer_tools::entities::MoleculeType::PRIMARY_LOOP ||
               chain.getType() ==
@@ -257,11 +260,13 @@ namespace calc {
         while (nrOfSlipLinksPlaced < minimumNrOfSliplinks ||
                nrOfAttempts < nrOfSliplinksToSample) {
           // first, randomly sample an atom
-          while (isMasked[toSampleFrom[sampleIdx]] && sampleIdx < toSampleFrom.size()) {
+          while (isMasked[toSampleFrom[sampleIdx]] &&
+                 sampleIdx < toSampleFrom.size()) {
             sampleIdx += 1;
           }
           if (sampleIdx >= toSampleFrom.size()) {
             // this is a path that should barely ever be reached
+            std::cerr << "Sample index exceeds number of samples." << std::endl;
             break;
           }
           size_t sampledVertexId = toSampleFrom[sampleIdx];
@@ -276,16 +281,19 @@ namespace calc {
           neighbourList.removeAtom(a1);
           // filter the neighbours to include only those from other strands
           // NOTE: this skews the whole thing a bit
-          neighbours.erase(std::remove_if(
-            neighbours.begin(),
-            neighbours.end(),
-            [&](pylimer_tools::entities::Atom a) -> bool {
-              return (atomToStrand[a.getId()] == atomToStrand[a1.getId()] &&
-                      std::abs(static_cast<double>(
-                        atomIdxInStrand[a.getId()] -
-                        atomIdxInStrand[a1.getId()])) > sameStrandCutoff);
-            }), neighbours.end());
+          // neighbours.erase(
+          //   std::remove_if(
+          //     neighbours.begin(),
+          //     neighbours.end(),
+          //     [&](pylimer_tools::entities::Atom a) -> bool {
+          //       return (atomToStrand[a.getId()] == atomToStrand[a1.getId()] &&
+          //               std::abs(static_cast<double>(
+          //                 atomIdxInStrand[a.getId()] -
+          //                 atomIdxInStrand[a1.getId()])) < sameStrandCutoff);
+          //     }),
+          //   neighbours.end());
           if (neighbours.size() == 0) {
+            std::cerr << "Not enough neighbours found." << std::endl;
             continue;
           }
           // then, randomly select one of them
@@ -300,8 +308,9 @@ namespace calc {
           // it is actually quite a lot of expensive stuff done until we get to
           // this check but only this way we have the balance of removing atoms
           // to sample them only once
-          if (!vertexIdxIsEligible[toSampleFrom[nrOfAttempts - 1]] ||
+          if (!vertexIdxIsEligible[sampledVertexId] ||
               !vertexIdxIsEligible[this->universe.getIdxByAtomId(a2.getId())]) {
+            std::cout << "Sampled vertices are not eligible" << std::endl;
             continue;
           }
           // take the mean and their index etc. to add as slip-link

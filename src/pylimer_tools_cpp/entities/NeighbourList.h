@@ -33,13 +33,19 @@ namespace entities {
       this->atoms = atoms;
       this->box = box;
 
-      this->nrOfBucketsX = static_cast<size_t>(std::ceil(box.getLx() / cutoff));
-      this->nrOfBucketsY = static_cast<size_t>(std::ceil(box.getLy() / cutoff));
-      this->nrOfBucketsZ = static_cast<size_t>(std::ceil(box.getLz() / cutoff));
+      this->nrOfBucketsX =
+        static_cast<size_t>(std::floor(box.getLx() / cutoff));
+      this->nrOfBucketsY =
+        static_cast<size_t>(std::floor(box.getLy() / cutoff));
+      this->nrOfBucketsZ =
+        static_cast<size_t>(std::floor(box.getLz() / cutoff));
 
-      this->bucketWidthX = box.getLx() / this->nrOfBucketsX;
-      this->bucketWidthY = box.getLy() / this->nrOfBucketsY;
-      this->bucketWidthZ = box.getLz() / this->nrOfBucketsZ;
+      this->bucketWidthX =
+        box.getLx() / static_cast<double>(this->nrOfBucketsX);
+      this->bucketWidthY =
+        box.getLy() / static_cast<double>(this->nrOfBucketsY);
+      this->bucketWidthZ =
+        box.getLz() / static_cast<double>(this->nrOfBucketsZ);
 
       this->totalNrOfBuckets =
         this->nrOfBucketsX * this->nrOfBucketsY * this->nrOfBucketsZ;
@@ -90,14 +96,18 @@ namespace entities {
       }
 
       std::vector<size_t> bucketIndices =
-        this->getCombineBucketIndicesForAtom(atom, newCutoff);
+        this->getCombinedBucketIndicesForAtom(atom, newCutoff);
       std::vector<pylimer_tools::entities::Atom> results =
         std::vector<pylimer_tools::entities::Atom>();
       // good estimate for nr of atoms to return
       results.reserve(bucketIndices.size() * this->atoms.size() /
                       this->totalNrOfBuckets);
       // actually loop the buckets, look for atoms that are close
+      bool foundBasis = false;
       for (size_t bucketIndex : bucketIndices) {
+        if (bucketIndex == indexBasis) {
+          foundBasis = true;
+        }
         std::vector<size_t> atomIndices = this->neighbourBuckets[bucketIndex];
         for (size_t atomIndex : atomIndices) {
           if (this->atoms[atomIndex].distanceTo(atom, &this->box) < newCutoff &&
@@ -105,6 +115,10 @@ namespace entities {
             results.push_back(this->atoms[atomIndex]);
           }
         }
+      }
+      if (!foundBasis) {
+        throw std::runtime_error(
+          "Did not find basis bucket. Something is wrong.");
       }
       // return results
       return results;
@@ -128,12 +142,11 @@ namespace entities {
                   this->neighbourBuckets.at(indexBasis).end(),
                   valToRemove);
       if (position != this->neighbourBuckets.at(indexBasis).end()) {
-        this->neighbourBuckets.at(indexBasis)
-          .erase(position);
-          // std::remove(this->neighbourBuckets.at(indexBasis).begin(),
-          //                    this->neighbourBuckets.at(indexBasis).end(),
-          //                    valToRemove),
-          //        this->neighbourBuckets.at(indexBasis).end());
+        this->neighbourBuckets.at(indexBasis).erase(position);
+        // std::remove(this->neighbourBuckets.at(indexBasis).begin(),
+        //                    this->neighbourBuckets.at(indexBasis).end(),
+        //                    valToRemove),
+        //        this->neighbourBuckets.at(indexBasis).end());
       } else {
         throw std::invalid_argument("This atom is not in a bucket anyway");
       }
@@ -173,16 +186,15 @@ namespace entities {
         static_cast<size_t>(std::floor(atom.getZ() / this->bucketWidthZ)));
     }
 
-    std::vector<size_t> getCombineBucketIndicesForAtom(
+    std::vector<size_t> getCombinedBucketIndicesForAtom(
       const pylimer_tools::entities::Atom& atom,
       double newCutoff)
     {
       std::vector<size_t> result = std::vector<size_t>();
-      size_t indexBasis =
-        this->getBucketIndexForTriplet(this->getBucketIndicesForAtom(atom));
-
+      std::tuple<long int, long int, long int> indexBasis = this->getBucketIndicesForAtom(atom);
+      
       int nrOfBucketsPerSide =
-        newCutoff < this->cutoff ? 3 : std::ceil(3 * newCutoff / this->cutoff);
+        newCutoff <= this->cutoff ? 3 : std::ceil(3 * newCutoff / this->cutoff);
       if (nrOfBucketsPerSide % 2 == 0) {
         nrOfBucketsPerSide += 1;
       }
@@ -199,10 +211,14 @@ namespace entities {
           for (int offsetZ = -nrOfBucketsPerQuarter;
                offsetZ <= nrOfBucketsPerQuarter;
                offsetZ++) {
-            result.push_back(this->getBucketIndexForTriplet(
-              std::make_tuple(indexBasis + offsetX,
-                              indexBasis + offsetY,
-                              indexBasis + offsetZ)));
+            size_t newIndex = this->getBucketIndexForTriplet(
+              std::make_tuple(std::get<0>(indexBasis) + offsetX,
+                              std::get<1>(indexBasis) + offsetY,
+                              std::get<2>(indexBasis) + offsetZ));
+            result.push_back(newIndex);
+            if (offsetX == 0 && offsetY == 0 && offsetZ == 0) {
+              assert(newIndex == this->getBucketIndexForTriplet(indexBasis));
+            }
           }
         }
       }
