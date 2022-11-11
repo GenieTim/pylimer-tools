@@ -1150,13 +1150,13 @@ namespace calc {
       return xlinkUniverse;
     }
 
-    void MEHPForceBalance::addSlipLinks(const std::vector<size_t> strandIdx1,
-                                        const std::vector<size_t> strandIdx2,
-                                        const std::vector<double> x,
-                                        const std::vector<double> y,
-                                        const std::vector<double> z,
-                                        const std::vector<double> alpha1,
-                                        const std::vector<double> alpha2,
+    void MEHPForceBalance::addSlipLinks(const std::vector<size_t> &strandIdx1,
+                                        const std::vector<size_t> &strandIdx2,
+                                        const std::vector<double> &x,
+                                        const std::vector<double> &y,
+                                        const std::vector<double> &z,
+                                        const std::vector<double> &alpha1,
+                                        const std::vector<double> &alpha2,
                                         bool clampAlpha)
     {
       size_t additionalLen = strandIdx1.size();
