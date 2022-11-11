@@ -611,20 +611,20 @@ namespace calc {
 
       ExitReason getExitReason() const { return this->exitReason; }
 
-      void addSlipLinks(const std::vector<size_t> &strandIdx1,
-                        const std::vector<size_t> &strandIdx2,
-                        const std::vector<double> &x,
-                        const std::vector<double> &y,
-                        const std::vector<double> &z)
-      {
-        std::vector<double> alphas;
-        alphas.reserve(x.size());
-        for (size_t i = 0; i < x.size(); ++i) {
-          alphas.push_back(0.5);
-        }
-        return this->addSlipLinks(
-          strandIdx1, strandIdx2, x, y, z, alphas, alphas);
-      }
+      // void addSlipLinks(const std::vector<size_t> &strandIdx1,
+      //                   const std::vector<size_t> &strandIdx2,
+      //                   const std::vector<double> &x,
+      //                   const std::vector<double> &y,
+      //                   const std::vector<double> &z)
+      // {
+      //   std::vector<double> alphas;
+      //   alphas.reserve(x.size());
+      //   for (size_t i = 0; i < x.size(); ++i) {
+      //     alphas.push_back(0.5);
+      //   }
+      //   return this->addSlipLinks(
+      //     strandIdx1, strandIdx2, x, y, z, alphas, alphas);
+      // }
 
       void addSlipLinks(const std::vector<size_t> &strandIdx1,
                         const std::vector<size_t> &strandIdx2,
