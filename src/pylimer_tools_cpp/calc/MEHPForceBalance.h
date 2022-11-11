@@ -310,7 +310,7 @@ namespace calc {
           // to sample them only once
           if (!vertexIdxIsEligible[sampledVertexId] ||
               !vertexIdxIsEligible[this->universe.getIdxByAtomId(a2.getId())]) {
-            std::cout << "Sampled vertices are not eligible" << std::endl;
+            // std::cout << "Sampled vertices are not eligible" << std::endl;
             continue;
           }
           // take the mean and their index etc. to add as slip-link
