@@ -82,12 +82,16 @@ namespace calc {
         // place slip-link
         for (size_t link_idx = net.nrOfNodes; link_idx < net.nrOfLinks;
              ++link_idx) {
+          std::vector<size_t> relevantPartitionIndices = this->getSpringpartitionIndicesOfSliplink(link_idx);
           size_t innerIterationsDone = 0;
           double displacementDone = 0.0;
           double rOverr0 = 0.0;
           double r2 = 0.0;
           double r02 = this->computePartitionUpdateZeroResidual(
             link_idx, u, springPartitions);
+          
+          bool allAtEnd = false;
+          
           do {
             r2 =
               this->updateSpringPartition(&net, u, springPartitions, link_idx);
@@ -95,8 +99,9 @@ namespace calc {
             displacementDone =
               this->displaceToMeanPosition(&net, u, springPartitions, link_idx);
             innerIterationsDone += 1;
+            allAtEnd = (springPartitions(relevantPartitionIndices).array() < 1/net.meanSpringContourLength).count() >= 2;
           } while (innerIterationsDone < innerMaxNrOfSteps &&
-                   rOverr0 > innerAlphaTol && std::isfinite(rOverr0));
+                   rOverr0 > innerAlphaTol && std::isfinite(rOverr0) && !allAtEnd);
           totalInnerIterationsDone += innerIterationsDone;
         }
         intermediateResidual = this->getDisplacementResidualNormFor(
