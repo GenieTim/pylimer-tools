@@ -80,7 +80,9 @@ namespace calc {
         double xtol = 1e-9,
         long int innerMaxNrOfSteps = 100,
         double innerAlphaTol = 1e-15,
-        const double oneOverSpringPartitionUpperLimit = 1.0);
+        const double oneOverSpringPartitionUpperLimit = 1.0,
+        const bool allowRemovalOfSliplinks = false,
+        const bool allowMoveOfSliplinks = false);
 
       /**
        * @brief Compute the spring update residual
@@ -96,8 +98,7 @@ namespace calc {
         size_t link_idx,
         Eigen::VectorXd& displacements,
         Eigen::VectorXd& springPartitions,
-        double distanceBackTolerance = 0.0,
-        double residualNormSTolerance = 0.0)
+        double oneOverSpringPartitionUpperLimit = 1.0)
       {
         Eigen::VectorXd tempPartitions = springPartitions;
         Eigen::VectorXd tempDisplacements = displacements;
@@ -117,9 +118,26 @@ namespace calc {
                                            tempDisplacements,
                                            tempPartitions,
                                            link_idx,
-                                           distanceBackTolerance,
-                                           residualNormSTolerance);
+                                           oneOverSpringPartitionUpperLimit);
       }
+
+      /**
+       * @brief Do (re) move slip-links that are within tolerance of a
+       * cross-link
+       *
+       * @param move
+       * @param remove
+       * @param net
+       * @param displacements
+       * @param springPartitions
+       * @param tolerance
+       */
+      void moveRemoveSlipLinks(const bool move,
+                               const bool remove,
+                               ForceBalanceNetwork* net,
+                               Eigen::VectorXd& displacements,
+                               Eigen::VectorXd& springPartitions,
+                               double tolerance);
 
       /**
        * @brief Add slip-links to this system
@@ -356,8 +374,7 @@ namespace calc {
                            slipLinkYs,
                            slipLinkZs,
                            slipLinkStrandAlpha,
-                           slipLinkStrandBeta,
-                           false);
+                           slipLinkStrandBeta);
         return nrOfSlipLinksPlaced;
       }
 
@@ -383,8 +400,6 @@ namespace calc {
           Eigen::VectorXd& springPartitions,
           long int innerMaxNrOfSteps = 100,
           double innerAlphaTol = 1e-9,
-          double distanceBackTolerance = 0.0,
-          double residualNormSTolerance = 0.0,
           long int innerMinNrOfSteps = 1,
           const double oneOverSpringPartitionUpperLimit = 1.0)
       {
@@ -392,19 +407,17 @@ namespace calc {
         double displacementDone = 0.0;
         double rOverr0 = 0.0;
         double r2 = 0.0;
-        double r02 =
-          this->computePartitionUpdateZeroResidual(link_idx,
-                                                   displacements,
-                                                   springPartitions,
-                                                   distanceBackTolerance,
-                                                   residualNormSTolerance);
+        double r02 = this->computePartitionUpdateZeroResidual(
+          link_idx,
+          displacements,
+          springPartitions,
+          oneOverSpringPartitionUpperLimit);
         do {
           r2 = this->updateSpringPartition(&this->initialConfig,
                                            displacements,
                                            springPartitions,
                                            link_idx,
-                                           distanceBackTolerance,
-                                           residualNormSTolerance);
+                                           oneOverSpringPartitionUpperLimit);
           rOverr0 = r2 / r02;
           displacementDone =
             this->displaceToMeanPosition(&this->initialConfig,
@@ -637,8 +650,7 @@ namespace calc {
                         const std::vector<double>& y,
                         const std::vector<double>& z,
                         const std::vector<double>& alpha1,
-                        const std::vector<double>& alpha2,
-                        bool clampAlpha = false);
+                        const std::vector<double>& alpha2);
 
       /**
        * @brief Compute the spring lenghts
@@ -750,8 +762,7 @@ namespace calc {
         const Eigen::VectorXd& u,
         Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
         const size_t linkIdx,
-        double distanceBackTolerance = 0.0,
-        double residualNormSTolerance = 0.0) const;
+        double oneOverSpringPartitionUpperLimit = 1.0) const;
 
       /**
        * @brief Displace one link to the mean of all connected neighbours

@@ -28,7 +28,9 @@ namespace calc {
       double xtol,
       long int innerMaxNrOfSteps,
       double innerAlphaTol,
-      const double oneOverSpringPartitionUpperLimit)
+      const double oneOverSpringPartitionUpperLimit,
+      const bool allowRemovalOfSliplinks,
+      const bool allowMoveOfSliplinks)
     {
       this->simulationHasRun = true;
 
@@ -82,28 +84,50 @@ namespace calc {
         // place slip-link
         for (size_t link_idx = net.nrOfNodes; link_idx < net.nrOfLinks;
              ++link_idx) {
-          std::vector<size_t> relevantPartitionIndices = this->getSpringpartitionIndicesOfSliplink(link_idx);
+          std::vector<size_t> relevantPartitionIndices =
+            this->getSpringpartitionIndicesOfSliplink(link_idx);
+          assert(relevantPartitionIndices.size() == 4);
           size_t innerIterationsDone = 0;
           double displacementDone = 0.0;
           double rOverr0 = 0.0;
           double r2 = 0.0;
           double r02 = this->computePartitionUpdateZeroResidual(
-            link_idx, u, springPartitions);
-          
+            link_idx, u, springPartitions, oneOverSpringPartitionUpperLimit);
+
           bool allAtEnd = false;
-          
+
           do {
-            r2 =
-              this->updateSpringPartition(&net, u, springPartitions, link_idx);
+            r2 = this->updateSpringPartition(&net,
+                                             u,
+                                             springPartitions,
+                                             link_idx,
+                                             oneOverSpringPartitionUpperLimit);
             rOverr0 = r2 / r02;
             displacementDone =
-              this->displaceToMeanPosition(&net, u, springPartitions, link_idx);
+              this->displaceToMeanPosition(&net,
+                                           u,
+                                           springPartitions,
+                                           link_idx,
+                                           oneOverSpringPartitionUpperLimit);
             innerIterationsDone += 1;
-            allAtEnd = (springPartitions(relevantPartitionIndices).array() < 1/net.meanSpringContourLength).count() >= 2;
+            // NOTE: this was previously implemented using Eigen
+            int nrOfAtEnds = 0;
+            for (size_t partitionIndex : relevantPartitionIndices) {
+              nrOfAtEnds += (springPartitions[partitionIndex] <=
+                             (1. /
+                              (oneOverSpringPartitionUpperLimit * net.springsContourLength
+                                [net.partialToFullSpringIndex[partitionIndex]])))
+                              ? 1
+                              : 0;
+            }
+            allAtEnd = nrOfAtEnds >= 2;
           } while (innerIterationsDone < innerMaxNrOfSteps &&
-                   rOverr0 > innerAlphaTol && std::isfinite(rOverr0) && !allAtEnd);
+                   rOverr0 > innerAlphaTol && std::isfinite(rOverr0) &&
+                   !allAtEnd);
           totalInnerIterationsDone += innerIterationsDone;
         }
+        oneOverSpringPartitions = this->assembleOneOverSpringPartition(
+          &net, springPartitions, oneOverSpringPartitionUpperLimit);
         intermediateResidual = this->getDisplacementResidualNormFor(
           &net, u, oneOverSpringPartitions);
 
@@ -148,8 +172,8 @@ namespace calc {
             }
           }
         }
-        oneOverSpringPartitions =
-          this->assembleOneOverSpringPartition(&net, springPartitions);
+        oneOverSpringPartitions = this->assembleOneOverSpringPartition(
+          &net, springPartitions, oneOverSpringPartitionUpperLimit);
         currentResidual = this->getDisplacementResidualNormFor(
           &net, u, oneOverSpringPartitions);
         iterationsDone += 1;
@@ -599,8 +623,16 @@ namespace calc {
                 (springPartitions0[i] *
                  net->springsContourLength[net->partialToFullSpringIndex.at(i)])
             : 0.0;
-        valueToSet =
-          std::clamp(valueToSet, 0.0, oneOverSpringPartitionUpperLimit);
+        RUNTIME_EXP_IFN(std::isfinite(valueToSet),
+                        "Expected valueToSet to be finite, got " +
+                          std::to_string(valueToSet) + ".");
+        RUNTIME_EXP_IFN(
+          APPROX_WITHIN(
+            valueToSet, 0.0, oneOverSpringPartitionUpperLimit, 1e-10),
+          "Expected valueToSet to be within, got 0.0 <= " +
+            std::to_string(valueToSet) + " <= " +
+            std::to_string(oneOverSpringPartitionUpperLimit) + " to be false.");
+
         // if (springPartitions0[i] < 1e-9) {
         //   std::cout << "Got close call for partial spring " << i <<
         //   std::endl;
@@ -647,6 +679,40 @@ namespace calc {
       return results;
     }
 
+    void MEHPForceBalance::moveRemoveSlipLinks(
+      const bool move,
+      const bool remove,
+      ForceBalanceNetwork* net,
+      Eigen::VectorXd& displacements,
+      Eigen::VectorXd& springPartitions,
+      double tolerance)
+    {
+      std::vector<size_t> linksToRemove;
+      for (size_t linkIdx = net->nrOfNodes; linkIdx < net->nrOfLinks;
+           ++linkIdx) {
+        std::vector<size_t> relevantPartitionIndices =
+          this->getSpringpartitionIndicesOfSliplink(linkIdx);
+        for (size_t partitonIdx : relevantPartitionIndices) {
+          if (springPartitions[partitonIdx] < tolerance) {
+            // possible move/remove.
+            // decide!
+            // have to find out with what we coincide
+            size_t p1 = net->springPartIndexA[partitonIdx];
+            size_t p2 = net->springPartIndexB[partitonIdx];
+            assert(p1 == linkIdx || p2 == linkIdx);
+            size_t relevantPartner = p1 == linkIdx ? p2 : p1;
+            if (net->linkIsSliplink[relevantPartner]) {
+              // NOTE: you see here, we do not let slip-links pass each other
+              // yet
+              continue;
+            }
+            // check functionality of cross-link
+            // TODO: implement
+          }
+        }
+      }
+    }
+
     /**
      * @brief Updates the partition/parametrisation of a spring around one link
      *
@@ -656,8 +722,7 @@ namespace calc {
       const Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
       const size_t linkIdx,
-      double distanceBackTolerance,
-      double residualNormSTolerance) const
+      double oneOverSpringPartitionUpperLimit) const
     {
       INVALIDARG_EXP_IFN(linkIdx < net->springIndicesOfLinks.size(),
                          "Link to update needs to be in the list");
@@ -690,11 +755,18 @@ namespace calc {
                 springsPartners[partner_idx],
                 this->is2D));
             double distanceForward = vecForward.squaredNorm();
+            double limit = 1. / (net->springsContourLength[springIndex] *
+                                 oneOverSpringPartitionUpperLimit);
             double idealValue =
-              1. / (1. + sqrt(distanceForward /
-                              distanceBack)); // TODO: above, below?
-            if (distanceBack <= distanceBackTolerance) {
-              idealValue = 0.0; // TODO: really?
+              std::clamp(1. / (1. + sqrt(distanceForward / distanceBack)),
+                         limit,
+                         1. - limit);
+            RUNTIME_EXP_IFN(
+              APPROX_WITHIN(idealValue, limit, 1. - limit, 1e-12),
+              "Expected ideal value to be within the limits, got " +
+                std::to_string(idealValue) + ".");
+            if (distanceBack <= 0.0) {
+              idealValue = 0.0; // fix division by zero
             }
             size_t currentSpringGlobalIdx =
               net->localToGlobalSpringIndex.at(springIndex)[partner_idx - 1];
@@ -702,8 +774,22 @@ namespace calc {
               net->localToGlobalSpringIndex.at(springIndex)[partner_idx];
             double currentS = springPartitions[currentSpringGlobalIdx];
             double nextS = springPartitions[neighbourSpringGlobalIdx];
-            double newS = idealValue * (nextS + currentS);
-            double complementaryS = (1. - idealValue) * (nextS + currentS);
+            double newS =
+              std::clamp(idealValue * (nextS + currentS), limit, 1. - limit);
+            RUNTIME_EXP_IFN(APPROX_WITHIN(newS, limit, 1. - limit, 1e-12),
+                            "Expected inewS to be within the limits, got " +
+                              std::to_string(newS) + " for ideal value " +
+                              std::to_string(idealValue) +
+                              " and next + current = " +
+                              std::to_string(nextS + currentS) + ".");
+            double complementaryS = std::clamp(
+              (1. - idealValue) * (nextS + currentS), limit, 1. - limit);
+            RUNTIME_EXP_IFN(
+              APPROX_WITHIN(complementaryS, limit, 1. - limit, 1e-12),
+              "Expected complementaryS to be within the limits, got " +
+                std::to_string(complementaryS) + " for ideal value " +
+                std::to_string(idealValue) + " and next + current = " +
+                std::to_string(nextS + currentS) + ".");
             double localResidualNorm = 0.0;
             if (complementaryS > 0.) {
               localResidualNorm +=
@@ -837,12 +923,11 @@ namespace calc {
             //     1.0 / (1e-12 *
             //            net->springsContourLength[springIndices[spring_index]]);
             // }
-            if (oneOverSpringPartitionUpperLimit > 0.0) {
-              oneOverContourLengthFraction =
-                std::clamp(oneOverContourLengthFraction,
-                           0.0,
-                           oneOverSpringPartitionUpperLimit);
-            }
+            RUNTIME_EXP_IFN(
+              std::isfinite(oneOverContourLengthFraction),
+              "Expected oneOverContourLengthFraction to be finite, got " +
+                std::to_string(oneOverContourLengthFraction) + ".");
+
             if (std::isfinite(oneOverContourLengthFraction)) {
               objectiveDisplacement +=
                 (partialDistance)*oneOverContourLengthFraction; // /
@@ -930,27 +1015,17 @@ namespace calc {
             double denominatorBack =
               1. / (springPartitions[backSpringGlobalIdx] *
                     net->springsContourLength[springIndex]);
-            if (oneOverSpringPartitionUpperLimit > 0 ||
-                !std::isfinite(denominatorBack)) {
-              denominatorBack = std::clamp(denominatorBack,
-                                           0.0,
-                                           oneOverSpringPartitionUpperLimit > 0
-                                             ? oneOverSpringPartitionUpperLimit
-                                             : 1.0);
-            }
+            RUNTIME_EXP_IFN(std::isfinite(denominatorBack),
+                            "Expected denominatorBack to be finite, got " +
+                              std::to_string(denominatorBack) + ".");
 
             double denominatorForward =
               1 / (springPartitions[forwardSpringGlobalIdx] *
                    net->springsContourLength[springIndex]);
-            if (oneOverSpringPartitionUpperLimit > 0 ||
-                !std::isfinite(denominatorForward)) {
-              denominatorForward =
-                std::clamp(denominatorForward,
-                           0.0,
-                           oneOverSpringPartitionUpperLimit > 0
-                             ? oneOverSpringPartitionUpperLimit
-                             : 1.0);
-            }
+            RUNTIME_EXP_IFN(std::isfinite(denominatorForward),
+                            "Expected denominatorForward to be finite, got " +
+                              std::to_string(denominatorForward) + ".");
+
             for (size_t i = 0; i < 3; ++i) {
               for (size_t j = 0; j < 3; ++j) {
                 force(i, j) +=
@@ -1012,11 +1087,9 @@ namespace calc {
           debugNrSpringsVisited[springGlobalIdx] += 1;
           double denominator = 1. / (springPartitions[springGlobalIdx] *
                                      net->springsContourLength[springIndex]);
-          if (oneOverSpringPartitionUpperLimit > 0 ||
-              !std::isfinite(denominator)) {
-            denominator =
-              std::clamp(denominator, 0.0, oneOverSpringPartitionUpperLimit);
-          }
+          RUNTIME_EXP_IFN(std::isfinite(denominator),
+                          "Expected denominator to be finite, got " +
+                            std::to_string(denominator) + ".");
 
           for (size_t i = 0; i < 3; ++i) {
             for (size_t j = 0; j < 3; ++j) {
@@ -1160,8 +1233,7 @@ namespace calc {
                                         const std::vector<double>& y,
                                         const std::vector<double>& z,
                                         const std::vector<double>& alpha1,
-                                        const std::vector<double>& alpha2,
-                                        bool clampAlpha)
+                                        const std::vector<double>& alpha2)
     {
       size_t additionalLen = strandIdx1.size();
       if (additionalLen == 0) {
@@ -1242,13 +1314,11 @@ namespace calc {
           INVALIDARG_EXP_IFN(alpha >= 0.0 && alpha <= 1.0,
                              "alpha must be between 0 and 1, got " +
                                std::to_string(alpha) + ".");
-          if (clampAlpha) {
-            alpha = std::clamp(
-              alpha,
-              1 / (this->initialConfig.springsContourLength[springIndex]),
-              1 -
-                (1 / (this->initialConfig.springsContourLength[springIndex])));
-          }
+          alpha = std::clamp(
+            alpha,
+            1 / (this->initialConfig.springsContourLength[springIndex]),
+            1 - (1 / (this->initialConfig.springsContourLength[springIndex])));
+
           // detect the position in the spring
           std::vector<double> partitionsStrand;
           partitionsStrand.reserve(springParticipants.size() - 1);
@@ -1357,6 +1427,11 @@ namespace calc {
             "Spring partition must be between 0 and 1, got " +
               std::to_string(this->currentSpringPartitionsVec[newSpringIndex]) +
               ".");
+          // std::cout << "Inserted with alpha " << alpha << " to "
+          //           << this->currentSpringPartitionsVec[newSpringIndex] << ",
+          //           "
+          //           << this->currentSpringPartitionsVec[lastSpringIndex]
+          //           << std::endl;
 
           this->initialConfig.linkIndicesOfSprings[springIndex].insert(
             this->initialConfig.linkIndicesOfSprings[springIndex].begin() +
@@ -1522,13 +1597,9 @@ namespace calc {
           net->partialToFullSpringIndex.at(partialSpringIdx);
         double denominator = 1 / (springPartitions[partialSpringIdx] *
                                   net->springsContourLength[totalSpringIndex]);
-        if (oneOverSpringPartitionUpperLimit > 0. ||
-            !std::isfinite(denominator)) {
-          denominator =
-            std::clamp(denominator,
-                       0.0,
-                       oneOverSpringPartitionUpperLimit); // TODO: check
-        }
+        RUNTIME_EXP_IFN(std::isfinite(denominator),
+                        "Expected denominator to be finite, got " +
+                          std::to_string(denominator) + ".");
         /* spring contribution to the overall stress tensor */
         for (size_t j = 0; j < 3; j++) {
           for (size_t k = 0; k < 3; k++) {

@@ -486,8 +486,10 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("maxNrOfSteps") = 250000,
          py::arg("xTolerance") = 1e-12,
          py::arg("innerMaxNrOfSteps") = 250,
-         py::arg("innerAlphaTolerance") = 1e-15,
-         py::arg("oneOverSpringPartitionUpperLimit") = 1.0)
+         py::arg("innerAlphaTolerance") = 1e-7,
+         py::arg("oneOverSpringPartitionUpperLimit") = 1.0,
+         py::arg("allowRemovalOfSliplinks") = false,
+         py::arg("allowMoveOfSliplinks") = false)
     .def("inspectLinkDisplacementToMeanPositionUpdate",
          &mehp::MEHPForceBalance::inspectLinkDisplacementToMeanPositionUpdate,
          R"pbdoc()pbdoc",
@@ -515,8 +517,6 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("springPartitions"),
          py::arg("maxNrOfSteps") = 100,
          py::arg("alpha_tol") = 1e-9,
-         py::arg("distanceBackTolerance") = 1e-9,
-         py::arg("residualNormSTolerance") = 1e-20,
          py::arg("minNrOfSteps") = 1,
          py::arg("oneOverSpringPartitionUpperLimit") = 1.0)
     .def("getSpringpartitionIndicesOfSliplink",
@@ -555,8 +555,7 @@ init_pylimer_bound_calc(py::module_& m)
                            const std::vector<double>&,
                            const std::vector<double>&,
                            const std::vector<double>&,
-                           const std::vector<double>&,
-                           const bool>(&mehp::MEHPForceBalance::addSlipLinks),
+                           const std::vector<double>&>(&mehp::MEHPForceBalance::addSlipLinks),
          R"pbdoc(
           Add the slip-links
      )pbdoc",
@@ -566,8 +565,7 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("y"),
          py::arg("z"),
          py::arg("alpha1"),
-         py::arg("alpha2"),
-         py::arg("clampAlpha") = false)
+         py::arg("alpha2"))
     .def("randomlyAddSlipLinks",
          &mehp::MEHPForceBalance::randomlyAddSliplinks,
          R"pbdoc()pbdoc",
@@ -581,7 +579,7 @@ init_pylimer_bound_calc(py::module_& m)
          R"pbdoc(
           Returns the stress tensor at the current state of the simulation.
      )pbdoc",
-         py::arg("oneOverSpringPartitionUpperLimit") = -1)
+         py::arg("oneOverSpringPartitionUpperLimit") = 1)
     .def("getStressTensorLinkBased",
          &mehp::MEHPForceBalance::getStressTensorLinkBased,
          R"pbdoc(
