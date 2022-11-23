@@ -113,12 +113,13 @@ namespace calc {
             // NOTE: this was previously implemented using Eigen
             int nrOfAtEnds = 0;
             for (size_t partitionIndex : relevantPartitionIndices) {
-              nrOfAtEnds += (springPartitions[partitionIndex] <=
-                             (1. /
-                              (oneOverSpringPartitionUpperLimit * net.springsContourLength
-                                [net.partialToFullSpringIndex[partitionIndex]])))
-                              ? 1
-                              : 0;
+              nrOfAtEnds +=
+                (springPartitions[partitionIndex] <=
+                 (1. / (oneOverSpringPartitionUpperLimit *
+                        net.springsContourLength
+                          [net.partialToFullSpringIndex[partitionIndex]])))
+                  ? 1
+                  : 0;
             }
             allAtEnd = nrOfAtEnds >= 2;
           } while (innerIterationsDone < innerMaxNrOfSteps &&
@@ -617,12 +618,9 @@ namespace calc {
           .cast<double>(); // 0.0 for equal = primary loop, 1.0 otherwise
 
       for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
-        double valueToSet =
-          springPartitions0[i] > 0.0 // 1e-18 //
-            ? 1.0 /
+        double valueToSet = 1.0 /
                 (springPartitions0[i] *
-                 net->springsContourLength[net->partialToFullSpringIndex.at(i)])
-            : 0.0;
+                 net->springsContourLength[net->partialToFullSpringIndex.at(i)]);
         RUNTIME_EXP_IFN(std::isfinite(valueToSet),
                         "Expected valueToSet to be finite, got " +
                           std::to_string(valueToSet) + ".");
@@ -759,12 +757,13 @@ namespace calc {
                                  oneOverSpringPartitionUpperLimit);
             double idealValue =
               std::clamp(1. / (1. + sqrt(distanceForward / distanceBack)),
-                         limit,
-                         1. - limit);
-            RUNTIME_EXP_IFN(
-              APPROX_WITHIN(idealValue, limit, 1. - limit, 1e-12),
-              "Expected ideal value to be within the limits, got " +
-                std::to_string(idealValue) + ".");
+                         0.0,
+                         net->springsContourLength[springIndex] *
+                           oneOverSpringPartitionUpperLimit * 2.0);
+            // RUNTIME_EXP_IFN(
+            //   APPROX_WITHIN(idealValue, limit, 1. - limit, 1e-12),
+            //   "Expected ideal value to be within the limits, got " +
+            //     std::to_string(idealValue) + ".");
             if (distanceBack <= 0.0) {
               idealValue = 0.0; // fix division by zero
             }
@@ -775,17 +774,17 @@ namespace calc {
             double currentS = springPartitions[currentSpringGlobalIdx];
             double nextS = springPartitions[neighbourSpringGlobalIdx];
             double newS =
-              std::clamp(idealValue * (nextS + currentS), limit, 1. - limit);
-            RUNTIME_EXP_IFN(APPROX_WITHIN(newS, limit, 1. - limit, 1e-12),
+              std::clamp(idealValue * (nextS + currentS), limit, 1.);
+            RUNTIME_EXP_IFN(APPROX_WITHIN(newS, limit, 1., 1e-12),
                             "Expected inewS to be within the limits, got " +
                               std::to_string(newS) + " for ideal value " +
                               std::to_string(idealValue) +
                               " and next + current = " +
                               std::to_string(nextS + currentS) + ".");
             double complementaryS = std::clamp(
-              (1. - idealValue) * (nextS + currentS), limit, 1. - limit);
+              (1. - idealValue) * (nextS + currentS), limit, 1.);
             RUNTIME_EXP_IFN(
-              APPROX_WITHIN(complementaryS, limit, 1. - limit, 1e-12),
+              APPROX_WITHIN(complementaryS, limit, 1., 1e-12),
               "Expected complementaryS to be within the limits, got " +
                 std::to_string(complementaryS) + " for ideal value " +
                 std::to_string(idealValue) + " and next + current = " +
@@ -927,6 +926,16 @@ namespace calc {
               std::isfinite(oneOverContourLengthFraction),
               "Expected oneOverContourLengthFraction to be finite, got " +
                 std::to_string(oneOverContourLengthFraction) + ".");
+            RUNTIME_EXP_IFN(
+              APPROX_WITHIN(oneOverContourLengthFraction,
+                            0.0,
+                            oneOverSpringPartitionUpperLimit,
+                            1e-10),
+              "Expected oneOverContourLengthFraction to be within, got 0.0 "
+              "<= " +
+                std::to_string(oneOverContourLengthFraction) +
+                " <= " + std::to_string(oneOverSpringPartitionUpperLimit) +
+                " to be false.");
 
             if (std::isfinite(oneOverContourLengthFraction)) {
               objectiveDisplacement +=

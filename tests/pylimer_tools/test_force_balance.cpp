@@ -823,7 +823,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
     pcm::MEHPForceBalance forceBalancer2 =
       pcm::MEHPForceBalance(universe, 2, false);
     forceBalancer2.setSpringContourLengths(
-      Eigen::VectorXd::Constant(forceBalancer2.getNetwork().nrOfSprings, 20.));
+      Eigen::VectorXd::Constant(forceBalancer2.getNetwork().nrOfSprings, 23.));
     REQUIRE(forceBalancer2.getNrOfNodes() == forceBalancer2.getNrOfLinks());
     REQUIRE(forceBalancer2.getNrOfNodes() == 4);
     REQUIRE(forceBalancer2.getNrOfSprings() == 5);
@@ -875,7 +875,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       for (int i = 0; i < twoIndependentIndices.size(); ++i) {
         maxDiff1 = std::max(
           forceBalancer2.displaceToMeanPosition(
-            &net0, displacements1, springPartitions0, twoIndependentIndices[i]),
+            &net0, displacements1, springPartitions0, twoIndependentIndices[i], 1.0),
           maxDiff1);
       }
 
