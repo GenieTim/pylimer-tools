@@ -78,8 +78,8 @@ namespace calc {
         double damping = 1.0,
         long int maxNrOfSteps = 50000, // default: 10000
         double xtol = 1e-9,
-        long int innerMaxNrOfSteps = 100,
-        double innerAlphaTol = 1e-15,
+        long int innerMaxNrOfSteps = 50,
+        double innerAlphaTol = 1e-6,
         const double oneOverSpringPartitionUpperLimit = 1.0,
         const bool allowRemovalOfSliplinks = false,
         const bool allowMoveOfSliplinks = false);
@@ -95,9 +95,9 @@ namespace calc {
        * @return double
        */
       double computePartitionUpdateZeroResidual(
-        size_t link_idx,
-        Eigen::VectorXd& displacements,
-        Eigen::VectorXd& springPartitions,
+        const size_t link_idx,
+        const Eigen::VectorXd& displacements,
+        const Eigen::VectorXd& springPartitions,
         double oneOverSpringPartitionUpperLimit = 1.0)
       {
         Eigen::VectorXd tempPartitions = springPartitions;
@@ -105,13 +105,13 @@ namespace calc {
         std::vector<size_t> involvedPartitions =
           this->getSpringpartitionIndicesOfSliplink(link_idx);
         assert(involvedPartitions.size() == 4);
-        double firstMeanVal = 0.5 * (springPartitions[0] + springPartitions[1]);
+        double firstMeanVal = 0.5 * (springPartitions[involvedPartitions[0]] + springPartitions[involvedPartitions[1]]);
         double secondMeanVal =
-          0.5 * (springPartitions[2] + springPartitions[3]);
-        tempPartitions[0] = firstMeanVal;
-        tempPartitions[1] = firstMeanVal;
-        tempPartitions[2] = secondMeanVal;
-        tempPartitions[3] = secondMeanVal;
+          0.5 * (springPartitions[involvedPartitions[2]] + springPartitions[involvedPartitions[3]]);
+        tempPartitions[involvedPartitions[0]] = firstMeanVal;
+        tempPartitions[involvedPartitions[1]] = firstMeanVal;
+        tempPartitions[involvedPartitions[2]] = secondMeanVal;
+        tempPartitions[involvedPartitions[3]] = secondMeanVal;
         this->displaceToMeanPosition(
           &this->initialConfig, tempDisplacements, tempPartitions, link_idx);
         return this->updateSpringPartition(&this->initialConfig,

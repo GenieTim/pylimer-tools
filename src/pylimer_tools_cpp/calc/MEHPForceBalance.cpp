@@ -112,16 +112,16 @@ namespace calc {
             innerIterationsDone += 1;
             // NOTE: this was previously implemented using Eigen
             int nrOfAtEnds = 0;
-            for (size_t partitionIndex : relevantPartitionIndices) {
-              nrOfAtEnds +=
-                (springPartitions[partitionIndex] <=
-                 (1. / (oneOverSpringPartitionUpperLimit *
-                        net.springsContourLength
-                          [net.partialToFullSpringIndex[partitionIndex]])))
-                  ? 1
-                  : 0;
-            }
-            allAtEnd = nrOfAtEnds >= 2;
+            // for (size_t partitionIndex : relevantPartitionIndices) {
+            //   nrOfAtEnds +=
+            //     (springPartitions[partitionIndex] <=
+            //      (1. / (oneOverSpringPartitionUpperLimit *
+            //             net.springsContourLength
+            //               [net.partialToFullSpringIndex[partitionIndex]])))
+            //       ? 1
+            //       : 0;
+            // }
+            allAtEnd = false; // nrOfAtEnds >= 2;
           } while (innerIterationsDone < innerMaxNrOfSteps &&
                    rOverr0 > innerAlphaTol && std::isfinite(rOverr0) &&
                    !allAtEnd);
@@ -618,9 +618,12 @@ namespace calc {
           .cast<double>(); // 0.0 for equal = primary loop, 1.0 otherwise
 
       for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
-        double valueToSet = 1.0 /
-                (springPartitions0[i] *
-                 net->springsContourLength[net->partialToFullSpringIndex.at(i)]);
+        double N =
+          net->springsContourLength[net->partialToFullSpringIndex.at(i)];
+        double clampedPartition =
+          std::clamp(springPartitions0[i], 1. / N, (N - 1.) / N);
+        double valueToSet = std::clamp(
+          1.0 / (clampedPartition * N), 0., oneOverSpringPartitionUpperLimit);
         RUNTIME_EXP_IFN(std::isfinite(valueToSet),
                         "Expected valueToSet to be finite, got " +
                           std::to_string(valueToSet) + ".");
@@ -753,13 +756,8 @@ namespace calc {
                 springsPartners[partner_idx],
                 this->is2D));
             double distanceForward = vecForward.squaredNorm();
-            double limit = 1. / (net->springsContourLength[springIndex] *
-                                 oneOverSpringPartitionUpperLimit);
             double idealValue =
-              std::clamp(1. / (1. + sqrt(distanceForward / distanceBack)),
-                         0.0,
-                         net->springsContourLength[springIndex] *
-                           oneOverSpringPartitionUpperLimit * 2.0);
+              1. / (1. + sqrt(distanceForward / distanceBack));
             // RUNTIME_EXP_IFN(
             //   APPROX_WITHIN(idealValue, limit, 1. - limit, 1e-12),
             //   "Expected ideal value to be within the limits, got " +
@@ -767,28 +765,57 @@ namespace calc {
             if (distanceBack <= 0.0) {
               idealValue = 0.0; // fix division by zero
             }
+            const double N = net->springsContourLength[springIndex];
+            RUNTIME_EXP_IFN(N > 2,
+                            "N should be > 2, got " + std::to_string(N) + ".");
             size_t currentSpringGlobalIdx =
               net->localToGlobalSpringIndex.at(springIndex)[partner_idx - 1];
             size_t neighbourSpringGlobalIdx =
               net->localToGlobalSpringIndex.at(springIndex)[partner_idx];
-            double currentS = springPartitions[currentSpringGlobalIdx];
-            double nextS = springPartitions[neighbourSpringGlobalIdx];
-            double newS =
-              std::clamp(idealValue * (nextS + currentS), limit, 1.);
-            RUNTIME_EXP_IFN(APPROX_WITHIN(newS, limit, 1., 1e-12),
-                            "Expected inewS to be within the limits, got " +
-                              std::to_string(newS) + " for ideal value " +
-                              std::to_string(idealValue) +
-                              " and next + current = " +
-                              std::to_string(nextS + currentS) + ".");
-            double complementaryS = std::clamp(
-              (1. - idealValue) * (nextS + currentS), limit, 1.);
+            const double currentS =
+              springPartitions[currentSpringGlobalIdx]; //, 1. / N, (N - 1.) /
+                                                        // N);
+            const double nextS =
+              springPartitions[neighbourSpringGlobalIdx]; //, 1. / N, (N - 1.) /
+                                                          // N);
+            const double limit = (1. / (N)) / ((nextS + currentS) * (N));
+            idealValue = std::clamp(idealValue, limit, 1. - limit);
+            double newS = idealValue * (nextS + currentS);
+            // test clamp
+            // newS = newS < 1. / net->springsContourLength[springIndex]
+            //          ? 1. / net->springsContourLength[springIndex]
+            //          : newS;
+            double complementaryS = (1. - idealValue) * (nextS + currentS);
+
+            // newS = std::clamp(newS, limit, 1 - limit);
+            // complementaryS = std::clamp(complementaryS, limit, 1 - limit);
+
             RUNTIME_EXP_IFN(
-              APPROX_WITHIN(complementaryS, limit, 1., 1e-12),
-              "Expected complementaryS to be within the limits, got " +
-                std::to_string(complementaryS) + " for ideal value " +
-                std::to_string(idealValue) + " and next + current = " +
-                std::to_string(nextS + currentS) + ".");
+              APPROX_WITHIN(newS + complementaryS, 0., 1., 1e-10),
+              "Require newS + complementaryS to be within 0, 1, got " +
+                std::to_string(newS + complementaryS) + " from " +
+                std::to_string(newS) + " and " +
+                std::to_string(complementaryS) +
+                " with ideal = " + std::to_string(idealValue) + " of " +
+                std::to_string(nextS + currentS) + " for link " +
+                std::to_string(linkIdx) + ".");
+            RUNTIME_EXP_IFN(
+              APPROX_EQUAL(nextS + currentS, newS + complementaryS, 1e-10),
+              "Require nextS + currentS == newS + complementaryS, got " +
+                std::to_string(nextS + currentS) + " vs. " +
+                std::to_string(newS + complementaryS) + " from " +
+                std::to_string(nextS) + " and " + std::to_string(currentS) +
+                ", " + std::to_string(newS) + " and " +
+                std::to_string(complementaryS) + ".");
+            RUNTIME_EXP_IFN(APPROX_WITHIN(nextS + currentS, 0., 1., 1e-10),
+                            "Require nextS + currentS to be within 0, 1, got " +
+                              std::to_string(nextS + currentS) + " from " +
+                              std::to_string(nextS) + " and " +
+                              std::to_string(currentS) + ".");
+            // complementaryS =
+            //   complementaryS < 1. / net->springsContourLength[springIndex]
+            //     ? 1. / net->springsContourLength[springIndex]
+            //     : complementaryS;
             double localResidualNorm = 0.0;
             if (complementaryS > 0.) {
               localResidualNorm +=
@@ -905,7 +932,6 @@ namespace calc {
                 this->is2D);
             }
             // add to displacement
-            double contourLengthFraction = springPartitions[globalSpringIndex];
             // std::cout << "Contribution from " << springsPartners[partner_idx]
             //           << " to " << springsPartners[partner_idx + 1]
             //           << " with l = " << contourLengthFraction << " and N = "
@@ -914,9 +940,14 @@ namespace calc {
             //           << ", partial distance " << partialDistance[0] << ", "
             //           << partialDistance[1] << ", " << partialDistance[2]
             //           << std::endl;
+
+            double N = net->springsContourLength[springIndices[spring_index]];
+            double clampedPartition = std::clamp(
+              springPartitions[globalSpringIndex], 1. / N, (N - 1.) / N);
             double oneOverContourLengthFraction =
-              1.0 / (net->springsContourLength[springIndices[spring_index]] *
-                     contourLengthFraction);
+              std::clamp(1.0 / (clampedPartition * N),
+                         0.,
+                         oneOverSpringPartitionUpperLimit);
             // if (!std::isfinite(oneOverContourLengthFraction)) {
             //   oneOverContourLengthFraction =
             //     1.0 / (1e-12 *
@@ -1022,15 +1053,19 @@ namespace calc {
             debugNrSpringsVisited[forwardSpringGlobalIdx] += 1;
 
             double denominatorBack =
-              1. / (springPartitions[backSpringGlobalIdx] *
-                    net->springsContourLength[springIndex]);
+              std::clamp(1. / (springPartitions[backSpringGlobalIdx] *
+                               net->springsContourLength[springIndex]),
+                         0.0,
+                         oneOverSpringPartitionUpperLimit);
             RUNTIME_EXP_IFN(std::isfinite(denominatorBack),
                             "Expected denominatorBack to be finite, got " +
                               std::to_string(denominatorBack) + ".");
 
             double denominatorForward =
-              1 / (springPartitions[forwardSpringGlobalIdx] *
-                   net->springsContourLength[springIndex]);
+              std::clamp(1 / (springPartitions[forwardSpringGlobalIdx] *
+                              net->springsContourLength[springIndex]),
+                         0.0,
+                         oneOverSpringPartitionUpperLimit);
             RUNTIME_EXP_IFN(std::isfinite(denominatorForward),
                             "Expected denominatorForward to be finite, got " +
                               std::to_string(denominatorForward) + ".");
@@ -1094,8 +1129,11 @@ namespace calc {
                 [net->localToGlobalSpringIndex.at(springIndex).size() - 1];
           }
           debugNrSpringsVisited[springGlobalIdx] += 1;
-          double denominator = 1. / (springPartitions[springGlobalIdx] *
-                                     net->springsContourLength[springIndex]);
+          double denominator =
+            std::clamp(1. / (springPartitions[springGlobalIdx] *
+                             net->springsContourLength[springIndex]),
+                       0.0,
+                       oneOverSpringPartitionUpperLimit);
           RUNTIME_EXP_IFN(std::isfinite(denominator),
                           "Expected denominator to be finite, got " +
                             std::to_string(denominator) + ".");
@@ -1323,10 +1361,11 @@ namespace calc {
           INVALIDARG_EXP_IFN(alpha >= 0.0 && alpha <= 1.0,
                              "alpha must be between 0 and 1, got " +
                                std::to_string(alpha) + ".");
-          alpha = std::clamp(
-            alpha,
-            1 / (this->initialConfig.springsContourLength[springIndex]),
-            1 - (1 / (this->initialConfig.springsContourLength[springIndex])));
+          // alpha = std::clamp(
+          //   alpha,
+          //   1 / (this->initialConfig.springsContourLength[springIndex]),
+          //   1 - (1 /
+          //   (this->initialConfig.springsContourLength[springIndex])));
 
           // detect the position in the spring
           std::vector<double> partitionsStrand;
@@ -1604,8 +1643,11 @@ namespace calc {
           relevantPartialDistancesA.segment(3 * partialSpringIdx, 3);
         size_t totalSpringIndex =
           net->partialToFullSpringIndex.at(partialSpringIdx);
-        double denominator = 1 / (springPartitions[partialSpringIdx] *
-                                  net->springsContourLength[totalSpringIndex]);
+        double denominator =
+          std::clamp(1 / (springPartitions[partialSpringIdx] *
+                          net->springsContourLength[totalSpringIndex]),
+                     0.0,
+                     oneOverSpringPartitionUpperLimit);
         RUNTIME_EXP_IFN(std::isfinite(denominator),
                         "Expected denominator to be finite, got " +
                           std::to_string(denominator) + ".");
@@ -2007,10 +2049,12 @@ namespace calc {
       RUNTIME_EXP_IFN(this->currentSpringPartitionsVec.size() ==
                         net->nrOfPartialSprings,
                       "Invalid size of currentSpringPartitionsVec");
-      RUNTIME_EXP_IFN(APPROX_EQUAL(this->currentSpringPartitionsVec.sum(),
-                                   net->nrOfSprings,
-                                   1e-3),
-                      "Spring partitions should sum to 1 per spring");
+      RUNTIME_EXP_IFN(
+        APPROX_EQUAL(
+          this->currentSpringPartitionsVec.sum(), net->nrOfSprings, 1e-3),
+        "Spring partitions should sum to 1 per spring, got " +
+          std::to_string(this->currentSpringPartitionsVec.sum()) + " for " +
+          std::to_string(net->nrOfSprings) + " springs.");
       RUNTIME_EXP_IFN(
         net->partialToFullSpringIndex.size() == net->nrOfPartialSprings,
         "Every partial spring must be able to map to the full spring.");
