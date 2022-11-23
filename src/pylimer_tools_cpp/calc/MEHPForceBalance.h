@@ -42,13 +42,14 @@ namespace calc {
       MEHPForceBalance(const pylimer_tools::entities::Universe u,
                        int crosslinkerType = 2,
                        bool is2D = false,
-                       double kappa = 1.0)
+                       double kappa = 1.0,
+                       bool remove2functionalCrosslinkers = false)
         : universe(u)
       {
         this->crosslinkerType = crosslinkerType;
         // interpret network already to be able to give early results
         ForceBalanceNetwork net;
-        ConvertNetwork(&net, crosslinkerType);
+        ConvertNetwork(&net, crosslinkerType, remove2functionalCrosslinkers);
         this->initialConfig = net;
         this->is2D = is2D;
         this->currentDisplacements =
@@ -80,7 +81,10 @@ namespace calc {
         double xtol = 1e-9,
         long int innerMaxNrOfSteps = 100,
         double innerAlphaTol = 1e-15,
-        const double oneOverSpringPartitionUpperLimit = 1.0);
+        const double oneOverSpringPartitionUpperLimit = 1.0,   
+        const int maxFlag = 7,     
+        const bool allowRemovalOfSliplinks = false,
+        const bool allowMoveOfSliplinks = false);
 
       /**
        * @brief Compute the spring update residual
@@ -88,38 +92,53 @@ namespace calc {
        * @param link_idx
        * @param displacements
        * @param springPartitions
-       * @param distanceBackTolerance
-       * @param residualNormSTolerance
+       * @param oneOverSpringPartitionUpperLimit
        * @return double
        */
       double computePartitionUpdateZeroResidual(
         size_t link_idx,
         Eigen::VectorXd& displacements,
         Eigen::VectorXd& springPartitions,
-        double distanceBackTolerance = 0.0,
-        double residualNormSTolerance = 0.0)
+        double oneOverSpringPartitionUpperLimit = 1.0)
       {
         Eigen::VectorXd tempPartitions = springPartitions;
         Eigen::VectorXd tempDisplacements = displacements;
         std::vector<size_t> involvedPartitions =
           this->getSpringpartitionIndicesOfSliplink(link_idx);
         assert(involvedPartitions.size() == 4);
-        double firstMeanVal = 0.5 * (springPartitions[0] + springPartitions[1]);
+        double firstMeanVal = 0.5 * (springPartitions[involvedPartitions[0]] + springPartitions[involvedPartitions[1]]);
         double secondMeanVal =
-          0.5 * (springPartitions[2] + springPartitions[3]);
-        tempPartitions[0] = firstMeanVal;
-        tempPartitions[1] = firstMeanVal;
-        tempPartitions[2] = secondMeanVal;
-        tempPartitions[3] = secondMeanVal;
+          0.5 * (springPartitions[involvedPartitions[2]] + springPartitions[involvedPartitions[3]]);
+        tempPartitions[involvedPartitions[0]] = firstMeanVal;
+        tempPartitions[involvedPartitions[1]] = firstMeanVal;
+        tempPartitions[involvedPartitions[2]] = secondMeanVal;
+        tempPartitions[involvedPartitions[3]] = secondMeanVal;
         this->displaceToMeanPosition(
           &this->initialConfig, tempDisplacements, tempPartitions, link_idx);
         return this->updateSpringPartition(&this->initialConfig,
                                            tempDisplacements,
                                            tempPartitions,
                                            link_idx,
-                                           distanceBackTolerance,
-                                           residualNormSTolerance);
+                                           oneOverSpringPartitionUpperLimit);
       }
+
+      /**
+       * @brief Do (re) move slip-links that are within tolerance of a
+       * cross-link
+       *
+       * @param move
+       * @param remove
+       * @param net
+       * @param displacements
+       * @param springPartitions
+       * @param tolerance
+       */
+      void moveRemoveSlipLinks(const bool move,
+                               const bool remove,
+                               ForceBalanceNetwork* net,
+                               Eigen::VectorXd& displacements,
+                               Eigen::VectorXd& springPartitions,
+                               double tolerance);
 
       /**
        * @brief Add slip-links to this system
@@ -383,8 +402,6 @@ namespace calc {
           Eigen::VectorXd& springPartitions,
           long int innerMaxNrOfSteps = 100,
           double innerAlphaTol = 1e-9,
-          double distanceBackTolerance = 0.0,
-          double residualNormSTolerance = 0.0,
           long int innerMinNrOfSteps = 1,
           const double oneOverSpringPartitionUpperLimit = 1.0)
       {
@@ -396,15 +413,13 @@ namespace calc {
           this->computePartitionUpdateZeroResidual(link_idx,
                                                    displacements,
                                                    springPartitions,
-                                                   distanceBackTolerance,
-                                                   residualNormSTolerance);
+                                                   oneOverSpringPartitionUpperLimit);
         do {
           r2 = this->updateSpringPartition(&this->initialConfig,
                                            displacements,
                                            springPartitions,
                                            link_idx,
-                                           distanceBackTolerance,
-                                           residualNormSTolerance);
+                                           oneOverSpringPartitionUpperLimit);
           rOverr0 = r2 / r02;
           displacementDone =
             this->displaceToMeanPosition(&this->initialConfig,
@@ -750,8 +765,7 @@ namespace calc {
         const Eigen::VectorXd& u,
         Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
         const size_t linkIdx,
-        double distanceBackTolerance = 0.0,
-        double residualNormSTolerance = 0.0) const;
+        double oneOverSpringPartitionUpperLimit = 1.0) const;
 
       /**
        * @brief Displace one link to the mean of all connected neighbours
@@ -916,7 +930,7 @@ namespace calc {
        * @return true
        * @return false
        */
-      bool ConvertNetwork(ForceBalanceNetwork* net, const int crosslinkerType);
+      bool ConvertNetwork(ForceBalanceNetwork* net, const int crosslinkerType, bool remove2functionalCrosslinkers);
 
       /**
        * @brief Compute the gamma factor from certain spring distances
@@ -976,7 +990,7 @@ namespace calc {
         const Eigen::VectorXd& u,
         const Eigen::VectorXd& springPartitions,
         const double kappa0 = 1.0,
-        const double oneOverSpringPartitionUpperLimit = -1.0,
+        const double oneOverSpringPartitionUpperLimit = 1.0,
         const bool xlinksOnly = false) const;
 
       /**
@@ -992,7 +1006,7 @@ namespace calc {
         const Eigen::VectorXd& u,
         const Eigen::VectorXd& springPartitions,
         const double kappa0 = 1.0,
-        const double oneOverSpringPartitionUpperLimit = -1.0) const;
+        const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
       /**
        * @brief Compute the force acting on a slip-link
@@ -1014,7 +1028,7 @@ namespace calc {
         const Eigen::VectorXd& springPartitions,
         Eigen::VectorXi& debugNrSpringsVisited,
         const double kappa0 = 1.0,
-        const double oneOverSpringPartitionUpperLimit = 1) const;
+        const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
       /**
        * @brief Compute the force acting on a cross-link
@@ -1036,7 +1050,7 @@ namespace calc {
         const Eigen::VectorXd& springPartitions,
         Eigen::VectorXi& debugNrSpringsVisited,
         const double kappa0 = 1.0,
-        const double oneOverSpringPartitionUpperLimit = 1) const;
+        const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
       /**
        * @brief Count how many of the springs are active (length > tolerance)

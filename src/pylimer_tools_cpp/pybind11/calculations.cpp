@@ -458,7 +458,8 @@ init_pylimer_bound_calc(py::module_& m)
           )pbdoc",
          py::arg("universe"),
          py::arg("crosslinkerType") = 2,
-         py::arg("is2D") = false)
+         py::arg("is2D") = false,
+         py::arg("remove2functionalCrosslinkers") = false)
     .def_property_readonly("network", &mehp::MEHPForceBalance::getNetwork)
     .def("validateNetwork",
          py::overload_cast<>(&mehp::MEHPForceBalance::validateNetwork),
@@ -487,7 +488,10 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("xTolerance") = 1e-12,
          py::arg("innerMaxNrOfSteps") = 250,
          py::arg("innerAlphaTolerance") = 1e-15,
-         py::arg("oneOverSpringPartitionUpperLimit") = 1.0)
+         py::arg("oneOverSpringPartitionUpperLimit") = 1.0,
+         py::arg("maxFlag") = 7,
+         py::arg("allowRemovalOfSliplinks") = false,
+         py::arg("allowMoveOfSliplinks") = false)
     .def("inspectLinkDisplacementToMeanPositionUpdate",
          &mehp::MEHPForceBalance::inspectLinkDisplacementToMeanPositionUpdate,
          R"pbdoc()pbdoc",
@@ -515,8 +519,6 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("springPartitions"),
          py::arg("maxNrOfSteps") = 100,
          py::arg("alpha_tol") = 1e-9,
-         py::arg("distanceBackTolerance") = 1e-9,
-         py::arg("residualNormSTolerance") = 1e-20,
          py::arg("minNrOfSteps") = 1,
          py::arg("oneOverSpringPartitionUpperLimit") = 1.0)
     .def("getSpringpartitionIndicesOfSliplink",
@@ -581,13 +583,13 @@ init_pylimer_bound_calc(py::module_& m)
          R"pbdoc(
           Returns the stress tensor at the current state of the simulation.
      )pbdoc",
-         py::arg("oneOverSpringPartitionUpperLimit") = -1)
+         py::arg("oneOverSpringPartitionUpperLimit") = 1.)
     .def("getStressTensorLinkBased",
          &mehp::MEHPForceBalance::getStressTensorLinkBased,
          R"pbdoc(
           Returns the stress tensor at the current state of the simulation.
      )pbdoc",
-         py::arg("oneOverSpringPartitionUpperLimit") = -1,
+         py::arg("oneOverSpringPartitionUpperLimit") = 1.,
          py::arg("xlinksOnly") = false)
     .def("getGammaFactor",
          &mehp::MEHPForceBalance::getGammaFactor,

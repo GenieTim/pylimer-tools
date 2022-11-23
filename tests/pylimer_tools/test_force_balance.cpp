@@ -288,8 +288,8 @@ TEST_CASE("MEHP Force Balance handles slip-links on primary loops",
                   forceBalancer.getSpringPartitions());
     Eigen::VectorXd displacements = Eigen::VectorXd::Zero(net.nrOfLinks * 3);
     Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
-    REQUIRE_NOTHROW(
-      forceBalancer.displaceToMeanPosition(&net, displacements, partitions, 0));
+    REQUIRE_NOTHROW(forceBalancer.displaceToMeanPosition(
+      &net, displacements, partitions, 0, 1.));
     CHECK(displacements[0] == Catch::Approx(0.187321).epsilon(1e-5));
     CHECK(displacements[1] == Catch::Approx(-0.447774).epsilon(1e-5));
     CHECK(displacements[2] == Catch::Approx(-0.925295).epsilon(1e-5));
@@ -361,8 +361,6 @@ TEST_CASE("MEHP Force Balance handles slip-link convergence correctly",
     springPartitions,
     250,
     1e-10,
-    0.0,
-    0.0,
     100,
     1e10); // cannot use 1.0 for oneOver... without setting higher contour
            // length fraction
@@ -706,8 +704,7 @@ TEST_CASE("MEHP Force Balance can randomly add slip-links",
   if (std::filesystem::exists(largeInputFile)) {
     REQUIRE(std::filesystem::exists(suspectedPath));
     std::cout << "Reading file " << largeInputFile << std::endl;
-    universeSeq.initializeFromDataSequence(
-      { { largeInputFile } });
+    universeSeq.initializeFromDataSequence({ { largeInputFile } });
     REQUIRE(universeSeq.getLength() == 1);
     pe::Universe universe = universeSeq.atIndex(0);
     std::cout << "Read file. " << std::endl;
@@ -755,6 +752,9 @@ TEST_CASE("MEHP Force Balance handles slip-links",
 
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance(universe, 2, false);
+
+    forceBalancer.setSpringContourLengths(
+      Eigen::VectorXd::Constant(forceBalancer.getNetwork().nrOfSprings, 15.));
 
     forceBalancer.addSlipLinks(
       { 0 }, { 2 }, { 0.0 }, { 0.0 }, { 0.0 }, { 0.62 }, { 0.43 });
@@ -821,6 +821,8 @@ TEST_CASE("MEHP Force Balance handles slip-links",
     REQUIRE(forceBalancer2.getNrOfNodes() == forceBalancer2.getNrOfLinks());
     REQUIRE(forceBalancer2.getNrOfNodes() == 4);
     REQUIRE(forceBalancer2.getNrOfSprings() == 5);
+    forceBalancer2.setSpringContourLengths(
+      Eigen::VectorXd::Constant(forceBalancer2.getNetwork().nrOfSprings, 23.));
     Eigen::VectorXd springPartitions0 = forceBalancer2.getSpringPartitions();
     pcm::ForceBalanceNetwork net0 = forceBalancer2.getNetwork();
     for (int i = 0; i < net0.nrOfPartialSprings; i++) {
@@ -833,7 +835,15 @@ TEST_CASE("MEHP Force Balance handles slip-links",
     SECTION("displaceLinksToMeanPosition = displaceToMeanPosition")
     {
       Eigen::VectorXd oneOverSpringPartitions0 =
-        forceBalancer2.assembleOneOverSpringPartition(&net0, springPartitions0);
+        forceBalancer2.assembleOneOverSpringPartition(&net0, springPartitions0, 1.0);
+
+      for (size_t i = 0; i < net0.nrOfPartialSprings; ++i) {
+        for (size_t dir = 0; dir < 3; ++dir) {
+          CHECK(oneOverSpringPartitions0[3 * i + dir] ==
+                Catch::Approx(1. / (20. * springPartitions0[i])));
+        }
+      }
+
       Eigen::VectorXd displacements0 =
         Eigen::VectorXd::Zero(forceBalancer2.getNrOfLinks() * 3);
       Eigen::ArrayXi twoIndependentIndices = Eigen::ArrayXi::Zero(2);
@@ -862,7 +872,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       for (int i = 0; i < twoIndependentIndices.size(); ++i) {
         maxDiff1 = std::max(
           forceBalancer2.displaceToMeanPosition(
-            &net0, displacements1, springPartitions0, twoIndependentIndices[i]),
+            &net0, displacements1, springPartitions0, twoIndependentIndices[i], 1.0),
           maxDiff1);
       }
 
