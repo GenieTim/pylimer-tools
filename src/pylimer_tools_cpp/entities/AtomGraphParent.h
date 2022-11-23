@@ -129,6 +129,17 @@ namespace entities {
       return results;
     }
 
+    template<typename IN>
+    void setPropertyValue(const long int vertexId,
+                          const char* propertyName,
+                          IN value)
+    {
+      if (!igraph_cattribute_catrribute_VAN_set(
+            &this->graph, propertyName, vertexId, value)) {
+        throw std::runtime_error("Failed to set property value");
+      }
+    }
+
     /**
      * @brief Get the value of a property (attribute) of certain vertices
      *
