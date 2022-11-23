@@ -43,7 +43,7 @@ namespace calc {
       bool is2D = this->is2D;
 
       /* array allocation */
-      Eigen::VectorXd u = Eigen::VectorXd::Zero(3 * net.nrOfLinks);
+      Eigen::VectorXd u = this->currentDisplacements;//Eigen::VectorXd::Zero(3 * net.nrOfLinks);
 
       /* force relaxation */
       double maxDistanceMoved = 0.0;
@@ -112,16 +112,16 @@ namespace calc {
             innerIterationsDone += 1;
             // NOTE: this was previously implemented using Eigen
             int nrOfAtEnds = 0;
-            // for (size_t partitionIndex : relevantPartitionIndices) {
-            //   nrOfAtEnds +=
-            //     (springPartitions[partitionIndex] <=
-            //      (1. / (oneOverSpringPartitionUpperLimit *
-            //             net.springsContourLength
-            //               [net.partialToFullSpringIndex[partitionIndex]])))
-            //       ? 1
-            //       : 0;
-            // }
-            allAtEnd = false; // nrOfAtEnds >= 2;
+            for (size_t partitionIndex : relevantPartitionIndices) {
+              nrOfAtEnds +=
+                (springPartitions[partitionIndex] <=
+                 (1. / (oneOverSpringPartitionUpperLimit *
+                        net.springsContourLength
+                          [net.partialToFullSpringIndex[partitionIndex]])))
+                  ? 1
+                  : 0;
+            }
+            allAtEnd = nrOfAtEnds >= 2;
           } while (innerIterationsDone < innerMaxNrOfSteps &&
                    rOverr0 > innerAlphaTol && std::isfinite(rOverr0) &&
                    !allAtEnd);
@@ -620,19 +620,20 @@ namespace calc {
       for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
         double N =
           net->springsContourLength[net->partialToFullSpringIndex.at(i)];
-        double clampedPartition =
-          std::clamp(springPartitions0[i], 1. / N, (N - 1.) / N);
-        double valueToSet = std::clamp(
-          1.0 / (clampedPartition * N), 0., oneOverSpringPartitionUpperLimit);
+        // double clampedPartition =
+        //   std::clamp(springPartitions0[i], 1. / N, (N - 1.) / N);
+        // double valueToSet = std::clamp(
+        //   1.0 / (clampedPartition * N), 0., oneOverSpringPartitionUpperLimit);
+        double valueToSet = 1. / (springPartitions0[i] * N);
         RUNTIME_EXP_IFN(std::isfinite(valueToSet),
                         "Expected valueToSet to be finite, got " +
                           std::to_string(valueToSet) + ".");
-        RUNTIME_EXP_IFN(
-          APPROX_WITHIN(
-            valueToSet, 0.0, oneOverSpringPartitionUpperLimit, 1e-10),
-          "Expected valueToSet to be within, got 0.0 <= " +
-            std::to_string(valueToSet) + " <= " +
-            std::to_string(oneOverSpringPartitionUpperLimit) + " to be false.");
+        // RUNTIME_EXP_IFN(
+        //   APPROX_WITHIN(
+        //     valueToSet, 0.0, oneOverSpringPartitionUpperLimit, 1e-10),
+        //   "Expected valueToSet to be within, got 0.0 <= " +
+        //     std::to_string(valueToSet) + " <= " +
+        //     std::to_string(oneOverSpringPartitionUpperLimit) + " to be false.");
 
         // if (springPartitions0[i] < 1e-9) {
         //   std::cout << "Got close call for partial spring " << i <<
@@ -778,7 +779,7 @@ namespace calc {
             const double nextS =
               springPartitions[neighbourSpringGlobalIdx]; //, 1. / N, (N - 1.) /
                                                           // N);
-            const double limit = (1. / (N)) / ((nextS + currentS) * (N));
+            const double limit = 1. / ((nextS + currentS) * (N));
             idealValue = std::clamp(idealValue, limit, 1. - limit);
             double newS = idealValue * (nextS + currentS);
             // test clamp
@@ -942,12 +943,14 @@ namespace calc {
             //           << std::endl;
 
             double N = net->springsContourLength[springIndices[spring_index]];
-            double clampedPartition = std::clamp(
-              springPartitions[globalSpringIndex], 1. / N, (N - 1.) / N);
-            double oneOverContourLengthFraction =
-              std::clamp(1.0 / (clampedPartition * N),
-                         0.,
-                         oneOverSpringPartitionUpperLimit);
+            // double clampedPartition = std::clamp(
+            //   springPartitions[globalSpringIndex], 1. / N, (N - 1.) / N);
+            // double oneOverContourLengthFraction =
+            //   std::clamp(1.0 / (clampedPartition * N),
+            //              0.,
+            //              oneOverSpringPartitionUpperLimit);
+            double oneOverContourLengthFraction = 1. / (springPartitions[globalSpringIndex] * N);
+
             // if (!std::isfinite(oneOverContourLengthFraction)) {
             //   oneOverContourLengthFraction =
             //     1.0 / (1e-12 *
@@ -957,16 +960,16 @@ namespace calc {
               std::isfinite(oneOverContourLengthFraction),
               "Expected oneOverContourLengthFraction to be finite, got " +
                 std::to_string(oneOverContourLengthFraction) + ".");
-            RUNTIME_EXP_IFN(
-              APPROX_WITHIN(oneOverContourLengthFraction,
-                            0.0,
-                            oneOverSpringPartitionUpperLimit,
-                            1e-10),
-              "Expected oneOverContourLengthFraction to be within, got 0.0 "
-              "<= " +
-                std::to_string(oneOverContourLengthFraction) +
-                " <= " + std::to_string(oneOverSpringPartitionUpperLimit) +
-                " to be false.");
+            // RUNTIME_EXP_IFN(
+            //   APPROX_WITHIN(oneOverContourLengthFraction,
+            //                 0.0,
+            //                 oneOverSpringPartitionUpperLimit,
+            //                 1e-10),
+            //   "Expected oneOverContourLengthFraction to be within, got 0.0 "
+            //   "<= " +
+            //     std::to_string(oneOverContourLengthFraction) +
+            //     " <= " + std::to_string(oneOverSpringPartitionUpperLimit) +
+            //     " to be false.");
 
             if (std::isfinite(oneOverContourLengthFraction)) {
               objectiveDisplacement +=
