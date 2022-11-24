@@ -447,7 +447,7 @@ init_pylimer_bound_calc(py::module_& m)
   py::class_<mehp::MEHPForceBalance>(m, "MEHPForceBalance", R"pbdoc(
     A small simulation tool for quickly minimizing the force between the cross-linker beads.
      )pbdoc")
-    .def(py::init<pe::Universe, int, bool>(),
+    .def(py::init<pe::Universe, int, bool, double, bool>(),
          R"pbdoc(
           Instantiate the simulator for a certain universe.
 
@@ -459,6 +459,7 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("universe"),
          py::arg("crosslinkerType") = 2,
          py::arg("is2D") = false,
+         py::arg("kappa") = 1.0,
          py::arg("remove2functionalCrosslinkers") = false)
     .def_property_readonly("network", &mehp::MEHPForceBalance::getNetwork)
     .def("validateNetwork",
