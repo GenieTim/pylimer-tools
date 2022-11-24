@@ -17,6 +17,19 @@
 namespace pylimer_tools {
 namespace calc {
   namespace mehp {
+/**
+ * @brief a macro for doing the clamping in the routines using kappa,
+ * to prevent deivision by zero issues / multiplications by infinity
+ */
+#define CLAMP_ONE_OVER_SPRINGPARTITION(                                        \
+  val, N, oneOverSpringPartitionUpperLimit)                                    \
+  std::clamp(val,                                                              \
+             oneOverSpringPartitionUpperLimit > 0.                             \
+               ? 1. / (N - 1. / oneOverSpringPartitionUpperLimit)              \
+               : 0.0,                                                          \
+             oneOverSpringPartitionUpperLimit > 0.                             \
+               ? oneOverSpringPartitionUpperLimit                              \
+               : N);
 
     /**
      * FORCE RELAXATION
@@ -29,7 +42,7 @@ namespace calc {
       long int innerMaxNrOfSteps,
       double innerAlphaTol,
       const double oneOverSpringPartitionUpperLimit,
-      const int maxFlag = 7,
+      const int maxFlag,
       const bool allowRemovalOfSliplinks,
       const bool allowMoveOfSliplinks)
     {
@@ -613,10 +626,9 @@ namespace calc {
         double valueToSet = springPartitions0[i] > 0.0 // 1e-18 //
                               ? 1.0 / (springPartitions0[i] * N)
                               : 0.0;
-        valueToSet =
-          std::clamp(valueToSet,
-                     1. / (1. - N / oneOverSpringPartitionUpperLimit),
-                     oneOverSpringPartitionUpperLimit);
+        valueToSet = CLAMP_ONE_OVER_SPRINGPARTITION(
+          valueToSet, N, oneOverSpringPartitionUpperLimit);
+
         // if (springPartitions0[i] < 1e-9) {
         //   std::cout << "Got close call for partial spring " << i <<
         //   std::endl;
@@ -911,10 +923,10 @@ namespace calc {
             //            net->springsContourLength[springIndices[spring_index]]);
             // }
             if (oneOverSpringPartitionUpperLimit > 0.0) {
-              oneOverContourLengthFraction =
-                std::clamp(oneOverContourLengthFraction,
-                           1. / (N * oneOverSpringPartitionUpperLimit),
-                           oneOverSpringPartitionUpperLimit); // TODO
+              oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+                oneOverContourLengthFraction,
+                N,
+                oneOverSpringPartitionUpperLimit);
             }
             if (std::isfinite(oneOverContourLengthFraction)) {
               objectiveDisplacement +=
@@ -1000,16 +1012,13 @@ namespace calc {
             debugNrSpringsVisited[backSpringGlobalIdx] += 1;
             debugNrSpringsVisited[forwardSpringGlobalIdx] += 1;
 
+            const double N = net->springsContourLength[springIndex];
             double denominatorBack =
-              1. / (springPartitions[backSpringGlobalIdx] *
-                    net->springsContourLength[springIndex]);
+              1. / (springPartitions[backSpringGlobalIdx] * N);
             if (oneOverSpringPartitionUpperLimit > 0 ||
                 !std::isfinite(denominatorBack)) {
-              denominatorBack = std::clamp(denominatorBack,
-                                           0.0,
-                                           oneOverSpringPartitionUpperLimit > 0
-                                             ? oneOverSpringPartitionUpperLimit
-                                             : 1.0);
+              denominatorBack = CLAMP_ONE_OVER_SPRINGPARTITION(
+                denominatorBack, N, oneOverSpringPartitionUpperLimit);
             }
 
             double denominatorForward =
@@ -1017,12 +1026,8 @@ namespace calc {
                    net->springsContourLength[springIndex]);
             if (oneOverSpringPartitionUpperLimit > 0 ||
                 !std::isfinite(denominatorForward)) {
-              denominatorForward =
-                std::clamp(denominatorForward,
-                           0.0,
-                           oneOverSpringPartitionUpperLimit > 0
-                             ? oneOverSpringPartitionUpperLimit
-                             : 1.0);
+              denominatorForward = CLAMP_ONE_OVER_SPRINGPARTITION(
+                denominatorForward, N, oneOverSpringPartitionUpperLimit);
             }
             for (size_t i = 0; i < 3; ++i) {
               for (size_t j = 0; j < 3; ++j) {
@@ -1083,12 +1088,12 @@ namespace calc {
                 [net->localToGlobalSpringIndex.at(springIndex).size() - 1];
           }
           debugNrSpringsVisited[springGlobalIdx] += 1;
-          double denominator = 1. / (springPartitions[springGlobalIdx] *
-                                     net->springsContourLength[springIndex]);
+          const double N = net->springsContourLength[springIndex];
+          double denominator = 1. / (springPartitions[springGlobalIdx] * N);
           if (oneOverSpringPartitionUpperLimit > 0 ||
               !std::isfinite(denominator)) {
-            denominator =
-              std::clamp(denominator, 0.0, oneOverSpringPartitionUpperLimit);
+            denominator = CLAMP_ONE_OVER_SPRINGPARTITION(
+              denominator, N, oneOverSpringPartitionUpperLimit);
           }
 
           for (size_t i = 0; i < 3; ++i) {
@@ -1593,14 +1598,12 @@ namespace calc {
           relevantPartialDistancesA.segment(3 * partialSpringIdx, 3);
         size_t totalSpringIndex =
           net->partialToFullSpringIndex.at(partialSpringIdx);
-        double denominator = 1 / (springPartitions[partialSpringIdx] *
-                                  net->springsContourLength[totalSpringIndex]);
+          const double N = net->springsContourLength[totalSpringIndex];
+        double denominator = 1 / (springPartitions[partialSpringIdx] * N);
         if (oneOverSpringPartitionUpperLimit > 0. ||
             !std::isfinite(denominator)) {
-          denominator =
-            std::clamp(denominator,
-                       0.0,
-                       oneOverSpringPartitionUpperLimit); // TODO: check
+          denominator = CLAMP_ONE_OVER_SPRINGPARTITION(
+            denominator, N, oneOverSpringPartitionUpperLimit);
         }
         /* spring contribution to the overall stress tensor */
         for (size_t j = 0; j < 3; j++) {
@@ -1798,7 +1801,8 @@ namespace calc {
 
       if (remove2functionalCrosslinkers) {
         for (pylimer_tools::entities::Atom xlinker : xlinkers) {
-          // change type of cross-linkers with a degree <= 2 to "normal", non-cross-link beads
+          // change type of cross-linkers with a degree <= 2 to "normal",
+          // non-cross-link beads
           size_t vertexId = this->universe.getIdxByAtomId(xlinker.getId());
           if (this->universe.computeFunctionalityForVertex(vertexId) <= 2) {
             this->universe.setPropertyValue(
