@@ -134,7 +134,7 @@ namespace entities {
                           const char* propertyName,
                           IN value)
     {
-      if (!igraph_cattribute_VAN_set(
+      if (igraph_cattribute_VAN_set(
             &this->graph, propertyName, vertexId, value)) {
         throw std::runtime_error("Failed to set property value");
       }
