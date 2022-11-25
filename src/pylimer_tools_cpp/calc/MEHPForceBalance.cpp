@@ -99,7 +99,7 @@ namespace calc {
         // place slip-link
         for (size_t link_idx = net.nrOfNodes; link_idx < net.nrOfLinks;
              ++link_idx) {
-          this->getSpringpartitionIndicesOfSliplink(
+          this->setSpringpartitionIndicesOfSliplink(
             relevantPartitionIndices, net, link_idx);
           assert(relevantPartitionIndices.size() == 4);
           size_t innerIterationsDone = 0;
@@ -653,7 +653,7 @@ namespace calc {
      * @param linkIdx
      * @return void
      */
-    void MEHPForceBalance::getSpringpartitionIndicesOfSliplink(
+    void MEHPForceBalance::setSpringpartitionIndicesOfSliplink(
       std::vector<size_t>& results,
       const ForceBalanceNetwork& net,
       const size_t linkIdx) const
