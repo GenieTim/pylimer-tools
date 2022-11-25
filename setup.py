@@ -20,7 +20,7 @@ except ImportError:
     raise
 
 
-cmake_args = []
+cmake_args = ["-DCMAKE_BUILD_TYPE=RelWithDebInfo"]
 # cmake_args = ["-Digraph_DEBUG=ON", "-DCMAKE_FIND_DEBUG_MODE=ON"]
 
 if (os.getenv('VCPKG_ROOT')):
