@@ -90,8 +90,7 @@ namespace calc {
         this->getDisplacementResidualNormFor(net, u, oneOverSpringPartitions);
       double currentResidual = 0.0;
       double intermediateResidual = 0.0;
-      std::vector<size_t> relevantPartitionIndices;
-      relevantPartitionIndices.reserve(4);
+      std::vector<size_t> relevantPartitionIndices = pylimer_tools::utils::initializeWithValue<size_t>(4, 0);
       // actual loop
       do {
         maxDistanceMoved = 0.0;
