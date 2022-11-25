@@ -744,7 +744,7 @@ namespace calc {
         const size_t linkIdx) const {
           std::vector<size_t> indices;
           indices.reserve(4);
-          this->getSpringpartitionIndicesOfSliplink(indices, net, linkIdx);
+          this->setSpringpartitionIndicesOfSliplink(indices, net, linkIdx);
           return indices;
         };
 
@@ -755,7 +755,7 @@ namespace calc {
        * @param linkIdx
        * @return void
        */
-      void getSpringpartitionIndicesOfSliplink(
+      void setSpringpartitionIndicesOfSliplink(
         std::vector<size_t> &res_vec,
         const ForceBalanceNetwork& net,
         const size_t linkIdx) const;
