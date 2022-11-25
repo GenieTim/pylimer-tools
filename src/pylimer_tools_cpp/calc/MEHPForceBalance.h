@@ -49,16 +49,16 @@ namespace calc {
         this->crosslinkerType = crosslinkerType;
         // interpret network already to be able to give early results
         ForceBalanceNetwork net;
-        ConvertNetwork(&net, crosslinkerType, remove2functionalCrosslinkers);
+        ConvertNetwork(net, crosslinkerType, remove2functionalCrosslinkers);
         this->initialConfig = net;
         this->is2D = is2D;
         this->currentDisplacements =
           Eigen::VectorXd::Zero(net.coordinates.size());
         this->currentSpringDistances =
-          this->evaluateSpringDistances(&net, this->currentDisplacements, is2D);
+          this->evaluateSpringDistances(net, this->currentDisplacements, is2D);
         this->currentPartialSpringDistances =
           this->evaluatePartialSpringDistances(
-            &net, this->currentDisplacements, is2D);
+            net, this->currentDisplacements, is2D);
         this->defaultR0Squared =
           universe.computeMeanSquareEndToEndDistance(crosslinkerType);
         this->defaultNrOfChains =
@@ -81,8 +81,8 @@ namespace calc {
         double xtol = 1e-9,
         long int innerMaxNrOfSteps = 100,
         double innerAlphaTol = 1e-15,
-        const double oneOverSpringPartitionUpperLimit = 1.0,   
-        const int maxFlag = 7,     
+        const double oneOverSpringPartitionUpperLimit = 1.0,
+        const int maxFlag = 7,
         const bool allowRemovalOfSliplinks = false,
         const bool allowMoveOfSliplinks = false);
 
@@ -106,16 +106,17 @@ namespace calc {
         std::vector<size_t> involvedPartitions =
           this->getSpringpartitionIndicesOfSliplink(link_idx);
         assert(involvedPartitions.size() == 4);
-        double firstMeanVal = 0.5 * (springPartitions[involvedPartitions[0]] + springPartitions[involvedPartitions[1]]);
-        double secondMeanVal =
-          0.5 * (springPartitions[involvedPartitions[2]] + springPartitions[involvedPartitions[3]]);
+        double firstMeanVal = 0.5 * (springPartitions[involvedPartitions[0]] +
+                                     springPartitions[involvedPartitions[1]]);
+        double secondMeanVal = 0.5 * (springPartitions[involvedPartitions[2]] +
+                                      springPartitions[involvedPartitions[3]]);
         tempPartitions[involvedPartitions[0]] = firstMeanVal;
         tempPartitions[involvedPartitions[1]] = firstMeanVal;
         tempPartitions[involvedPartitions[2]] = secondMeanVal;
         tempPartitions[involvedPartitions[3]] = secondMeanVal;
         this->displaceToMeanPosition(
-          &this->initialConfig, tempDisplacements, tempPartitions, link_idx);
-        return this->updateSpringPartition(&this->initialConfig,
+          this->initialConfig, tempDisplacements, tempPartitions, link_idx);
+        return this->updateSpringPartition(this->initialConfig,
                                            tempDisplacements,
                                            tempPartitions,
                                            link_idx,
@@ -135,7 +136,7 @@ namespace calc {
        */
       void moveRemoveSlipLinks(const bool move,
                                const bool remove,
-                               ForceBalanceNetwork* net,
+                               ForceBalanceNetwork &net,
                                Eigen::VectorXd& displacements,
                                Eigen::VectorXd& springPartitions,
                                double tolerance);
@@ -409,20 +410,20 @@ namespace calc {
         double displacementDone = 0.0;
         double rOverr0 = 0.0;
         double r2 = 0.0;
-        double r02 =
-          this->computePartitionUpdateZeroResidual(link_idx,
-                                                   displacements,
-                                                   springPartitions,
-                                                   oneOverSpringPartitionUpperLimit);
+        double r02 = this->computePartitionUpdateZeroResidual(
+          link_idx,
+          displacements,
+          springPartitions,
+          oneOverSpringPartitionUpperLimit);
         do {
-          r2 = this->updateSpringPartition(&this->initialConfig,
+          r2 = this->updateSpringPartition(this->initialConfig,
                                            displacements,
                                            springPartitions,
                                            link_idx,
                                            oneOverSpringPartitionUpperLimit);
           rOverr0 = r2 / r02;
           displacementDone =
-            this->displaceToMeanPosition(&this->initialConfig,
+            this->displaceToMeanPosition(this->initialConfig,
                                          displacements,
                                          springPartitions,
                                          link_idx,
@@ -479,13 +480,13 @@ namespace calc {
       }
 
       std::vector<Eigen::ArrayXi> getIndependentCoordinateSets(
-        ForceBalanceNetwork* net) const;
+        const ForceBalanceNetwork &net) const;
 
       std::pair<std::vector<Eigen::ArrayXi>, std::vector<Eigen::ArrayXi>>
-      getHeuristicallyIndependentCoordinateSets(ForceBalanceNetwork* net) const;
+      getHeuristicallyIndependentCoordinateSets(const ForceBalanceNetwork &net) const;
 
       std::vector<Eigen::ArrayXi> getRandomCoordinateSets(
-        ForceBalanceNetwork* net) const;
+        const ForceBalanceNetwork &net) const;
 
       /**
        * @brief Get the Nr Of Active Nodes
@@ -543,7 +544,7 @@ namespace calc {
       Eigen::VectorXd getCurrentPartialSpringDistances() const
       {
         return this->evaluatePartialSpringDistances(
-          &this->initialConfig, this->currentDisplacements, this->is2D);
+          this->initialConfig, this->currentDisplacements, this->is2D);
       }
 
       /**
@@ -612,7 +613,7 @@ namespace calc {
        */
       double getPressure() const
       {
-        return this->evaluatePressure(&this->initialConfig,
+        return this->evaluatePressure(this->initialConfig,
                                       this->currentDisplacements,
                                       this->currentSpringPartitionsVec);
       }
@@ -662,12 +663,12 @@ namespace calc {
        * @param u the displacements on top of the network
        * @return Eigen::VectorXd
        */
-      Eigen::VectorXd evaluateSpringDistances(const ForceBalanceNetwork* net,
+      Eigen::VectorXd evaluateSpringDistances(const ForceBalanceNetwork& net,
                                               const Eigen::VectorXd& u,
                                               const bool is2D) const;
 
       Eigen::VectorXd evaluatePartialSpringDistances(
-        const ForceBalanceNetwork* net,
+        const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
         const bool is2D) const;
 
@@ -680,7 +681,7 @@ namespace calc {
        * @param is2D
        * @return Eigen::Vector3d
        */
-      Eigen::Vector3d evaluateDistanceBetween(const ForceBalanceNetwork* net,
+      Eigen::Vector3d evaluateDistanceBetween(const ForceBalanceNetwork& net,
                                               const Eigen::VectorXd& u,
                                               const size_t linkIndexA,
                                               const size_t linkIndexB,
@@ -688,10 +689,10 @@ namespace calc {
 
       bool validateNetwork()
       {
-        return this->validateNetwork(&this->initialConfig);
+        return this->validateNetwork(this->initialConfig);
       }
 
-      bool validateNetwork(const ForceBalanceNetwork* net);
+      bool validateNetwork(const ForceBalanceNetwork& net);
 
       ForceBalanceNetwork getNetwork() { return this->initialConfig; }
 
@@ -714,7 +715,7 @@ namespace calc {
         return this->initialConfig.linkIsSliplink[index]
                  ? this->evaluateForceOnSlipLink(
                      index,
-                     &this->initialConfig,
+                     this->initialConfig,
                      this->currentDisplacements,
                      this->currentSpringPartitionsVec,
                      debugNrSpringsVisited,
@@ -722,7 +723,7 @@ namespace calc {
                      oneOverSpringPartitionUpperLimit)
                  : this->evaluateForceOnCrossLink(
                      index,
-                     &this->initialConfig,
+                     this->initialConfig,
                      this->currentDisplacements,
                      this->currentSpringPartitionsVec,
                      debugNrSpringsVisited,
@@ -748,7 +749,7 @@ namespace calc {
       Eigen::VectorXd inspectSpringPartitionUpdate(const size_t linkIdx) const
       {
         Eigen::VectorXd springPartitions = this->currentSpringPartitionsVec;
-        this->updateSpringPartition(&this->initialConfig,
+        this->updateSpringPartition(this->initialConfig,
                                     this->currentDisplacements,
                                     springPartitions,
                                     linkIdx);
@@ -761,7 +762,7 @@ namespace calc {
        *
        */
       double updateSpringPartition(
-        const ForceBalanceNetwork* net,
+        const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
         Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
         const size_t linkIdx,
@@ -780,7 +781,7 @@ namespace calc {
         const double oneOverSpringPartitionUpperLimit = 1.0) const
       {
         Eigen::VectorXd displacements = this->currentDisplacements;
-        this->displaceToMeanPosition(&this->initialConfig,
+        this->displaceToMeanPosition(this->initialConfig,
                                      displacements,
                                      this->currentSpringPartitionsVec,
                                      linkIdx,
@@ -803,10 +804,10 @@ namespace calc {
         Eigen::VectorXd displacements = this->currentDisplacements;
         Eigen::VectorXd oneOverSpringPartitions =
           this->assembleOneOverSpringPartition(
-            &this->initialConfig, this->currentSpringPartitionsVec);
+            this->initialConfig, this->currentSpringPartitionsVec);
         Eigen::Array3i mask;
         mask << 3 * linkIdx, 3 * linkIdx + 1, 3 * linkIdx + 2;
-        this->displaceLinksToMeanPosition(&this->initialConfig,
+        this->displaceLinksToMeanPosition(this->initialConfig,
                                           displacements,
                                           oneOverSpringPartitions,
                                           mask,
@@ -824,7 +825,7 @@ namespace calc {
        * @return double, the distance (squared norm) displaced
        */
       double displaceToMeanPosition(
-        const ForceBalanceNetwork* net,
+        const ForceBalanceNetwork& net,
         Eigen::VectorXd& u,
         const Eigen::VectorXd& springPartitions,
         const size_t linkIdx,
@@ -838,11 +839,11 @@ namespace calc {
        * @return Eigen::VectorXd
        */
       Eigen::VectorXd assembleOneOverSpringPartition(
-        const ForceBalanceNetwork* net,
+        const ForceBalanceNetwork& net,
         const Eigen::VectorXd& springPartitions0,
         const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
-      double displaceLinksToMeanPosition(const ForceBalanceNetwork* net,
+      double displaceLinksToMeanPosition(const ForceBalanceNetwork& net,
                                          Eigen::VectorXd& u,
                                          Eigen::VectorXd& springPartitions0,
                                          double damping = 0.5) const;
@@ -856,7 +857,7 @@ namespace calc {
        * @return double, the distance (squared norm) displaced
        */
       double displaceLinksToMeanPosition(
-        const ForceBalanceNetwork* net,
+        const ForceBalanceNetwork& net,
         Eigen::VectorXd& u,
         const Eigen::VectorXd& oneOverSpringPartitions,
         const Eigen::ArrayXi& resultingCoordinateIndexMask,
@@ -871,7 +872,7 @@ namespace calc {
        * @return double, the distance (squared norm) displaced
        */
       double displaceLinksToMeanPosition(
-        const ForceBalanceNetwork* net,
+        const ForceBalanceNetwork& net,
         Eigen::VectorXd& u,
         const Eigen::VectorXd& oneOverSpringPartitions,
         const Eigen::ArrayXi& involvedSpringPartCoordinateIndexMask,
@@ -881,40 +882,40 @@ namespace calc {
       double getDisplacementResidualNorm(double cutoff) const;
 
       double getDisplacementResidualNormFor(
-        const ForceBalanceNetwork* net,
+        const ForceBalanceNetwork& net,
         Eigen::VectorXd& u,
         const Eigen::VectorXd& oneOverSpringPartitions) const;
 
       template<typename VectorType>
-      void handlePBC(const ForceBalanceNetwork* net,
+      void handlePBC(const ForceBalanceNetwork& net,
                      VectorType& distances) const
       {
         // possibly improveable PBC
         for (size_t j = 0; j < distances.size(); ++j) {
           int iterations = 0;
           assert(!std::isinf(distances[j]) && !std::isnan(distances[j]));
-          while (distances[j] > net->boxHalfs[j % 3]) {
-            distances[j] -= net->L[j % 3];
+          while (distances[j] > net.boxHalfs[j % 3]) {
+            distances[j] -= net.L[j % 3];
             iterations++;
             if (iterations > 50) {
               throw std::runtime_error(
                 "Too many iterations in PBC at distance index " +
                 std::to_string(j) + ", currently at " +
                 std::to_string(distances[j]) + " of " +
-                std::to_string(net->boxHalfs[j % 3]) + " after " +
+                std::to_string(net.boxHalfs[j % 3]) + " after " +
                 std::to_string(iterations) + " iterations");
             }
           }
           iterations = 0;
-          while (distances[j] < -net->boxHalfs[j % 3]) {
-            distances[j] += net->L[j % 3];
+          while (distances[j] < -net.boxHalfs[j % 3]) {
+            distances[j] += net.L[j % 3];
             iterations++;
             if (iterations > 50) {
               throw std::runtime_error(
                 "Too many iterations in PBC at distance index " +
                 std::to_string(j) + ", currently at " +
                 std::to_string(distances[j]) + " of " +
-                std::to_string(net->boxHalfs[j % 3]) + " after " +
+                std::to_string(net.boxHalfs[j % 3]) + " after " +
                 std::to_string(iterations) + " iterations");
             }
           }
@@ -930,7 +931,9 @@ namespace calc {
        * @return true
        * @return false
        */
-      bool ConvertNetwork(ForceBalanceNetwork* net, const int crosslinkerType, bool remove2functionalCrosslinkers);
+      bool ConvertNetwork(ForceBalanceNetwork &net,
+                          const int crosslinkerType,
+                          bool remove2functionalCrosslinkers);
 
       /**
        * @brief Compute the gamma factor from certain spring distances
@@ -956,7 +959,7 @@ namespace calc {
        * @param u the displacements
        * @return double
        */
-      double evaluatePressure(const ForceBalanceNetwork* net,
+      double evaluatePressure(const ForceBalanceNetwork& net,
                               const Eigen::VectorXd& u,
                               const Eigen::VectorXd& springPartitions) const
       {
@@ -986,7 +989,7 @@ namespace calc {
        * @return std::array<std::array<double, 3>, 3>
        */
       std::array<std::array<double, 3>, 3> evaluateStressTensorLinkBased(
-        const ForceBalanceNetwork* net,
+        const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
         const Eigen::VectorXd& springPartitions,
         const double kappa0 = 1.0,
@@ -1002,7 +1005,7 @@ namespace calc {
        * @return std::array<std::array<double, 3>, 3>
        */
       std::array<std::array<double, 3>, 3> evaluateStressTensor(
-        const ForceBalanceNetwork* net,
+        const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
         const Eigen::VectorXd& springPartitions,
         const double kappa0 = 1.0,
@@ -1023,7 +1026,7 @@ namespace calc {
        */
       Eigen::Matrix3d evaluateForceOnSlipLink(
         const size_t linkIdx,
-        const ForceBalanceNetwork* net,
+        const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
         const Eigen::VectorXd& springPartitions,
         Eigen::VectorXi& debugNrSpringsVisited,
@@ -1045,7 +1048,7 @@ namespace calc {
        */
       Eigen::Matrix3d evaluateForceOnCrossLink(
         const size_t linkIdx,
-        const ForceBalanceNetwork* net,
+        const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
         const Eigen::VectorXd& springPartitions,
         Eigen::VectorXi& debugNrSpringsVisited,
