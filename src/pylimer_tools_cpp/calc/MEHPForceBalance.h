@@ -96,6 +96,7 @@ namespace calc {
        * @return double
        */
       double computePartitionUpdateZeroResidual(
+        std::vector<size_t> involvedPartitions,
         size_t link_idx,
         Eigen::VectorXd& displacements,
         Eigen::VectorXd& springPartitions,
@@ -103,8 +104,6 @@ namespace calc {
       {
         Eigen::VectorXd tempPartitions = springPartitions;
         Eigen::VectorXd tempDisplacements = displacements;
-        std::vector<size_t> involvedPartitions =
-          this->getSpringpartitionIndicesOfSliplink(link_idx);
         assert(involvedPartitions.size() == 4);
         double firstMeanVal = 0.5 * (springPartitions[involvedPartitions[0]] +
                                      springPartitions[involvedPartitions[1]]);
@@ -136,7 +135,7 @@ namespace calc {
        */
       void moveRemoveSlipLinks(const bool move,
                                const bool remove,
-                               ForceBalanceNetwork &net,
+                               ForceBalanceNetwork& net,
                                Eigen::VectorXd& displacements,
                                Eigen::VectorXd& springPartitions,
                                double tolerance);
@@ -411,6 +410,7 @@ namespace calc {
         double rOverr0 = 0.0;
         double r2 = 0.0;
         double r02 = this->computePartitionUpdateZeroResidual(
+          this->getSpringpartitionIndicesOfSliplink(this->initialConfig, link_idx),
           link_idx,
           displacements,
           springPartitions,
@@ -480,13 +480,14 @@ namespace calc {
       }
 
       std::vector<Eigen::ArrayXi> getIndependentCoordinateSets(
-        const ForceBalanceNetwork &net) const;
+        const ForceBalanceNetwork& net) const;
 
       std::pair<std::vector<Eigen::ArrayXi>, std::vector<Eigen::ArrayXi>>
-      getHeuristicallyIndependentCoordinateSets(const ForceBalanceNetwork &net) const;
+      getHeuristicallyIndependentCoordinateSets(
+        const ForceBalanceNetwork& net) const;
 
       std::vector<Eigen::ArrayXi> getRandomCoordinateSets(
-        const ForceBalanceNetwork &net) const;
+        const ForceBalanceNetwork& net) const;
 
       /**
        * @brief Get the Nr Of Active Nodes
@@ -739,6 +740,24 @@ namespace calc {
        * @return std::vector<size_t>
        */
       std::vector<size_t> getSpringpartitionIndicesOfSliplink(
+        const ForceBalanceNetwork& net,
+        const size_t linkIdx) const {
+          std::vector<size_t> indices;
+          indices.reserve(4);
+          this->getSpringpartitionIndicesOfSliplink(indices, net, linkIdx);
+          return indices;
+        };
+
+      /**
+       * @brief Assemble all indices of partial springs for a particular
+       * slip-link
+       *
+       * @param linkIdx
+       * @return void
+       */
+      void getSpringpartitionIndicesOfSliplink(
+        std::vector<size_t> &res_vec,
+        const ForceBalanceNetwork& net,
         const size_t linkIdx) const;
 
       /**
@@ -931,7 +950,7 @@ namespace calc {
        * @return true
        * @return false
        */
-      bool ConvertNetwork(ForceBalanceNetwork &net,
+      bool ConvertNetwork(ForceBalanceNetwork& net,
                           const int crosslinkerType,
                           bool remove2functionalCrosslinkers);
 
