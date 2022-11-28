@@ -169,7 +169,7 @@ init_pylimer_bound_calc(py::module_& m)
                   &mehp::ForceBalanceNetwork::springIndicesOfLinks)
     .def_readonly("linkIndicesOfSprings",
                   &mehp::ForceBalanceNetwork::linkIndicesOfSprings)
-
+     .def_readonly("springContourLength", &mehp::ForceBalanceNetwork::springsContourLength)
     // .def_readonly("springIsActive", &mehp::Network::springIsActive)
     ;
 
