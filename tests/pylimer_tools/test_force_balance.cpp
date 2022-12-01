@@ -44,40 +44,6 @@ outputNetwork(pcm::ForceBalanceNetwork net,
   }
 }
 
-TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
-{
-  SECTION("Summation works with same indices")
-  {
-    Eigen::VectorXd testVec = Eigen::VectorXd::Zero(10);
-    Eigen::ArrayXi testIdx = Eigen::ArrayXi::Zero(5);
-    testIdx << 0, 0, 5, 5, 1;
-    testVec(testIdx) += Eigen::VectorXd::Ones(5);
-    REQUIRE(testVec[5] == Catch::Approx(2.));
-    REQUIRE(testVec[0] == Catch::Approx(2.));
-    REQUIRE(testVec[1] == Catch::Approx(1.));
-    REQUIRE(testVec[2] == 0.0);
-  }
-
-  SECTION("Casting bool to double results in 1.0/0.0")
-  {
-    auto gen = std::bind(std::uniform_int_distribution<>(0, 1),
-                         std::default_random_engine());
-    Eigen::Array<bool, 1, 100> boolArray;
-    for (int i = 0; i < 100; i++) {
-      bool b = gen();
-      boolArray[i] = b;
-    }
-    Eigen::ArrayXd castedBoolArray = boolArray.cast<double>();
-    for (int i = 0; i < 100; i++) {
-      if (boolArray[i]) {
-        CHECK(castedBoolArray[i] == 1.0);
-      } else {
-        CHECK(castedBoolArray[i] + 1e-5 == 1e-5);
-      }
-    }
-  }
-}
-
 TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
 {
   return;
@@ -273,7 +239,8 @@ TEST_CASE("MEHP Force Balance handles slip-links on primary loops",
   SECTION("Entangled primary loop")
   {
     pcm::MEHPForceBalance forceBalancer = pcm::MEHPForceBalance(universe, 2);
-    forceBalancer.setSpringContourLengths(Eigen::VectorXd::Constant(forceBalancer.getNetwork().nrOfSprings, 15.));
+    forceBalancer.setSpringContourLengths(
+      Eigen::VectorXd::Constant(forceBalancer.getNetwork().nrOfSprings, 15.));
     // entangle primary loop and check again
     // outputNetwork(net, Eigen::VectorXd::Zero(net.nrOfLinks * 3));
     forceBalancer.addSlipLinks({ 0, 2 },
@@ -446,8 +413,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         Eigen::VectorXd springPartitions0 =
           Eigen::VectorXd::Ones(net.nrOfPartialSprings);
         Eigen::VectorXd oneOverSpringPartitions =
-          forceBalancer2.assembleOneOverSpringPartition(net,
-                                                        springPartitions0);
+          forceBalancer2.assembleOneOverSpringPartition(net, springPartitions0);
         CHECK((oneOverSpringPartitions.array() < net.L[0]).all());
         Eigen::VectorXd displacements0 =
           Eigen::VectorXd::Zero(3 * net.nrOfLinks);
@@ -693,7 +659,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
   }
 }
 
-TEST_CASE("MEHP Force Balance can randomly add slip-links",
+TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
           "[analysis][MEHPForceBalance]")
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
@@ -713,6 +679,14 @@ TEST_CASE("MEHP Force Balance can randomly add slip-links",
       pcm::MEHPForceBalance(universe, 2, true);
     size_t nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(1000, 2.0, 100);
     REQUIRE(nrOfAddedLinks >= 100);
+
+    pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
+    Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
+    Eigen::VectorXd partitions =
+      forceBalancer.getCurrentPartialSpringDistances();
+    REQUIRE_NOTHROW(forceBalancer.removeTwofunctionalCrosslinks(
+      net, displacements, partitions));
+    REQUIRE_NOTHROW(forceBalancer.validateNetwork());
   }
 }
 
@@ -837,7 +811,8 @@ TEST_CASE("MEHP Force Balance handles slip-links",
     SECTION("displaceLinksToMeanPosition = displaceToMeanPosition")
     {
       Eigen::VectorXd oneOverSpringPartitions0 =
-        forceBalancer2.assembleOneOverSpringPartition(net0, springPartitions0, 1.0);
+        forceBalancer2.assembleOneOverSpringPartition(
+          net0, springPartitions0, 1.0);
 
       for (size_t i = 0; i < net0.nrOfPartialSprings; ++i) {
         for (size_t dir = 0; dir < 3; ++dir) {
@@ -873,8 +848,11 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       double maxDiff1 = 0.;
       for (int i = 0; i < twoIndependentIndices.size(); ++i) {
         maxDiff1 = std::max(
-          forceBalancer2.displaceToMeanPosition(
-            net0, displacements1, springPartitions0, twoIndependentIndices[i], 1.0),
+          forceBalancer2.displaceToMeanPosition(net0,
+                                                displacements1,
+                                                springPartitions0,
+                                                twoIndependentIndices[i],
+                                                1.0),
           maxDiff1);
       }
 

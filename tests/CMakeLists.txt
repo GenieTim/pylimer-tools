@@ -101,6 +101,7 @@ target_link_libraries(pylimer_tests
 add_library(header_test_sources
 	OBJECT
 		pylimer_tools/test_calc.cpp
+		pylimer_tools/test_vector_utils.cpp
 )
 add_dependencies(header_test_sources pylimer_tools)
 target_link_libraries(header_test_sources PUBLIC 

@@ -491,8 +491,8 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("innerAlphaTolerance") = 1e-15,
          py::arg("oneOverSpringPartitionUpperLimit") = 1.0,
          py::arg("maxFlag") = 7,
-         py::arg("allowRemovalOfSliplinks") = false,
-         py::arg("allowMoveOfSliplinks") = false)
+         py::arg("removeInactiveCrosslinks") = false,
+         py::arg("remove2functionalCrosslinkers") = false)
     .def("inspectLinkDisplacementToMeanPositionUpdate",
          &mehp::MEHPForceBalance::inspectLinkDisplacementToMeanPositionUpdate,
          R"pbdoc()pbdoc",

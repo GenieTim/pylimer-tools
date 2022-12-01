@@ -11,10 +11,103 @@ extern "C"
 {
 #include <igraph/igraph.h>
 }
+#include "utilityMacros.h"
+#include <Eigen/Dense>
 #include <cassert>
 
 namespace pylimer_tools {
 namespace utils {
+
+  /**
+   * @brief Remove a row from an Eigen vector
+   *
+   * @param vec
+   * @param rowToRemove
+   */
+  template<typename T>
+  static inline void removeRow(Eigen::Matrix<T, Eigen::Dynamic, 1>& vec,
+                 unsigned int rowToRemove)
+  {
+    INVALIDARG_EXP_IFN(vec.size() > rowToRemove,
+                       "Cannot remove row " + std::to_string(rowToRemove) +
+                         " from vector with size " +
+                         std::to_string(vec.size()) + "!");
+    unsigned int numRows = vec.size() - 1;
+    vec.segment(rowToRemove, numRows - rowToRemove) =
+      vec.segment(rowToRemove + 1, numRows - rowToRemove);
+    vec.conservativeResize(numRows);
+  }
+
+  /**
+   * @brief Remove sequential rows from an Eigen vector
+   *
+   * @param vec
+   * @param rowToRemove
+   */
+  template<typename T>
+  static inline void removeRows(Eigen::Matrix<T, Eigen::Dynamic, 1>& vec,
+                  unsigned int rowToStartRemove,
+                  unsigned int nrOfRowsToRemove)
+  {
+    INVALIDARG_EXP_IFN(
+      vec.size() > rowToStartRemove + nrOfRowsToRemove,
+      "Cannot remove rows " + std::to_string(nrOfRowsToRemove) + " from " +
+        std::to_string(rowToStartRemove) + " from vector with size " +
+        std::to_string(vec.size()) + "!");
+    unsigned int numRows = vec.size() - nrOfRowsToRemove;
+    vec.segment(rowToStartRemove, numRows - rowToStartRemove) =
+      vec.segment(rowToStartRemove + 1, numRows - rowToStartRemove);
+    vec.conservativeResize(numRows);
+  }
+
+  /**
+   * @brief Remove a row from an Eigen vector
+   *
+   * @param vec
+   * @param rowToRemove
+   */
+  template<typename T>
+  static inline void removeRow(Eigen::Array<T, Eigen::Dynamic, 1>& vec,
+                 unsigned int rowToRemove)
+  {
+    INVALIDARG_EXP_IFN(vec.size() > rowToRemove,
+                       "Cannot remove row " + std::to_string(rowToRemove) +
+                         " from vector with size " +
+                         std::to_string(vec.size()) + "!");
+    unsigned int numRows = vec.size() - 1;
+    vec.segment(rowToRemove, numRows - rowToRemove) =
+      vec.segment(rowToRemove + 1, numRows - rowToRemove);
+    vec.conservativeResize(numRows);
+  }
+
+  /**
+   * @brief Remove sequential rows from an Eigen vector
+   *
+   * @param vec
+   * @param rowToRemove
+   */
+  template<typename T>
+  static inline void removeRows(Eigen::Array<T, Eigen::Dynamic, 1>& vec,
+                  unsigned int rowToStartRemove,
+                  unsigned int nrOfRowsToRemove)
+  {
+    INVALIDARG_EXP_IFN(
+      vec.size() > rowToStartRemove + nrOfRowsToRemove,
+      "Cannot remove rows " + std::to_string(nrOfRowsToRemove) + " from " +
+        std::to_string(rowToStartRemove) + " from vector with size " +
+        std::to_string(vec.size()) + "!");
+    unsigned int numRows = vec.size() - nrOfRowsToRemove;
+    vec.segment(rowToStartRemove, numRows - rowToStartRemove) =
+      vec.segment(rowToStartRemove + 1, numRows - rowToStartRemove);
+    vec.conservativeResize(numRows);
+  }
+
+  template<typename T>
+  static inline T last(std::vector<T>& v)
+  {
+    return v[v.size() - 1];
+  }
+
   /**
    * @brief Find whether a map contains a value
    *
@@ -50,13 +143,15 @@ namespace utils {
     return out; // both done
   }
 
-  template <typename IN>
-  static inline bool vector_has_duplicates(std::vector<IN> vec) {
+  template<typename IN>
+  static inline bool vector_has_duplicates(std::vector<IN> vec)
+  {
     std::vector<IN> vecSorted;
     vecSorted.reserve(vec.size());
     std::copy(vec.begin(), vec.end(), std::back_inserter(vecSorted));
     std::sort(vecSorted.begin(), vecSorted.end());
-    return std::adjacent_find(vecSorted.begin(), vecSorted.end()) != vecSorted.end();
+    return std::adjacent_find(vecSorted.begin(), vecSorted.end()) !=
+           vecSorted.end();
   }
 
   template<typename IN>

@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include "../utils/utilityMacros.h"
 
 namespace pylimer_tools {
 namespace calc {
@@ -48,6 +49,8 @@ namespace calc {
 
     struct ForceBalanceNetwork
     {
+      // TODO: some info is redundant.
+      // adjust code to support one way of storing things only
       double L[3];                    /* box sizes */
       double boxHalfs[3];             /* half box sizes */
       double vol;                     /* box volume */
@@ -64,9 +67,9 @@ namespace calc {
       ArrayXArrayXi linkIndicesOfSprings;   // maps spring -> links
       ArrayXb partialSpringIsPartial; // indicates whether a spring involves a slip-link
       // local to global: from the 2D structures to the 1D Eigen vector
-      std::map<size_t, std::vector<size_t>> localToGlobalSpringIndex;
+      ArrayXArrayXi localToGlobalSpringIndex;
       // map the "local", partial, spring indices to the full-length springs
-      std::unordered_map<size_t, size_t> partialToFullSpringIndex;
+      std::vector<size_t> partialToFullSpringIndex;
       std::unordered_map<size_t, size_t> oldAtomIdToSpringIndex;
 
       ArrayXb linkIsSliplink;
@@ -84,27 +87,7 @@ namespace calc {
       Eigen::ArrayXi springIndexA;
       Eigen::ArrayXi springIndexB;
     };
-    // to string, without macro expansion
-#define STRINGINFY(s) #s
-    // to string, with macro expansion
-#define XSTRINGINFY(s) STRINGINFY(s)
-
-#define INVALIDARG_EXP_IFN(condition, message)                                 \
-  if (!(condition)) {                                                          \
-    throw std::invalid_argument(message "\nFailed condition: " #condition);    \
-  }
-
-#define RUNTIME_EXP_IFN(condition, message)                                    \
-  if (!(condition)) {                                                          \
-    throw std::runtime_error(message "\nFailed condition: " #condition);       \
-  }
   } // mehp
-
-#define APPROX_EQUAL(value1, value2, eps)                                      \
-  value1 + eps >= value2&& value1 - eps <= value2
-
-#define APPROX_WITHIN(value1, lo, hi, eps)                                     \
-  value1 + eps >= lo&& value1 - eps <= hi
 } // calc
 } // pylimer_tools
 
