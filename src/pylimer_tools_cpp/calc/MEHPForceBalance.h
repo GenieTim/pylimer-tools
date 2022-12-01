@@ -83,8 +83,8 @@ namespace calc {
         double innerAlphaTol = 1e-15,
         const double oneOverSpringPartitionUpperLimit = 1.0,
         const int maxFlag = 7,
-        const bool allowRemovalOfSliplinks = false,
-        const bool allowMoveOfSliplinks = false);
+        const bool removeInactiveCrosslinks = false,
+        const bool remove2functionalCrosslinkers = false);
 
       /**
        * @brief Compute the spring update residual
@@ -102,7 +102,7 @@ namespace calc {
         Eigen::VectorXd& springPartitions,
         double oneOverSpringPartitionUpperLimit = 1.0)
       {
-        //TODO: revise, hard!
+        // TODO: revise, hard!
         assert(involvedPartitions.size() == 4);
         double firstMeanVal = 0.5 * (springPartitions[involvedPartitions[0]] +
                                      springPartitions[involvedPartitions[1]]);
@@ -111,8 +111,9 @@ namespace calc {
         // Eigen::ArrayXi involvedCoordinateIndices = Eigen::ArrayXi(12);
         // for (size_t i = 0; i < 4; ++i) {
         //   involvedCoordinateIndices[3 * i] = 3 * involvedPartitions[i];
-        //   involvedCoordinateIndices[3 * i + 1] = 3 * involvedPartitions[i] + 1;
-        //   involvedCoordinateIndices[3 * i + 2] = 3 * involvedPartitions[i] + 2;
+        //   involvedCoordinateIndices[3 * i + 1] = 3 * involvedPartitions[i] +
+        //   1; involvedCoordinateIndices[3 * i + 2] = 3 * involvedPartitions[i]
+        //   + 2;
         // }
         // Eigen::VectorXd displacementsBefore =
         //   displacements(involvedCoordinateIndices);
@@ -137,22 +138,31 @@ namespace calc {
       }
 
       /**
-       * @brief Do (re) move slip-links that are within tolerance of a
-       * cross-link
+       * @brief Remove cross-links which do not have any springs with a certain
+       * minimum length
        *
-       * @param move
-       * @param remove
        * @param net
        * @param displacements
        * @param springPartitions
        * @param tolerance
        */
-      void moveRemoveSlipLinks(const bool move,
-                               const bool remove,
-                               ForceBalanceNetwork& net,
-                               Eigen::VectorXd& displacements,
-                               Eigen::VectorXd& springPartitions,
-                               double tolerance);
+      void removeInactiveCrosslinks(ForceBalanceNetwork& net,
+                                    Eigen::VectorXd& displacements,
+                                    Eigen::VectorXd& springPartitions,
+                                    double tolerance) const;
+
+      /**
+       * @brief Replace the two springs traversinga a two-functional cross-links
+       * with a single spring
+       *
+       * @param net
+       * @param displacements
+       * @param springPartitions
+       */
+      void removeTwofunctionalCrosslinks(
+        ForceBalanceNetwork& net,
+        Eigen::VectorXd& displacements,
+        Eigen::VectorXd& springPartitions) const;
 
       /**
        * @brief Add slip-links to this system
