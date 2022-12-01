@@ -22,14 +22,16 @@ namespace calc {
  * to prevent deivision by zero issues / multiplications by infinity
  */
 #define CLAMP_ONE_OVER_SPRINGPARTITION(                                        \
-  val, N, oneOverSpringPartitionUpperLimit)                                    \
-  std::clamp(val,                                                              \
-             oneOverSpringPartitionUpperLimit > 0.                             \
-               ? 1. / (N - 1. / oneOverSpringPartitionUpperLimit)              \
-               : 0.0,                                                          \
-             oneOverSpringPartitionUpperLimit > 0.                             \
-               ? oneOverSpringPartitionUpperLimit                              \
-               : N);
+  isPartialSpring, val, N, oneOverSpringPartitionUpperLimit)                   \
+  !isPartialSpring                                                             \
+    ? val                                                                      \
+    : std::clamp(val,                                                          \
+                 oneOverSpringPartitionUpperLimit > 0.                         \
+                   ? 1. / (N - 1. / oneOverSpringPartitionUpperLimit)          \
+                   : 0.0,                                                      \
+                 oneOverSpringPartitionUpperLimit > 0.                         \
+                   ? oneOverSpringPartitionUpperLimit                          \
+                   : N);
 
     /**
      * FORCE RELAXATION
@@ -90,7 +92,8 @@ namespace calc {
         this->getDisplacementResidualNormFor(net, u, oneOverSpringPartitions);
       double currentResidual = 0.0;
       double intermediateResidual = 0.0;
-      std::vector<size_t> relevantPartitionIndices = pylimer_tools::utils::initializeWithValue<size_t>(4, 0);
+      std::vector<size_t> relevantPartitionIndices =
+        pylimer_tools::utils::initializeWithValue<size_t>(4, 0);
       // actual loop
       do {
         maxDistanceMoved = 0.0;
@@ -352,10 +355,10 @@ namespace calc {
       }
 
       // find the actual (max) displacement we did
-      double maxDiff = 0;
+      double maxDiff = 0.;
       Eigen::VectorXd objectivesToSet =
         objectiveDisplacements(resultingCoordinateIndexMask);
-      for (int i = 0; i < resultingCoordinateIndexMask.size() / 3; i++) {
+      for (size_t i = 0; i < resultingCoordinateIndexMask.size() / 3; i++) {
         maxDiff =
           std::max(maxDiff, objectivesToSet.segment(3 * i, 3).squaredNorm());
       }
@@ -378,7 +381,7 @@ namespace calc {
 
     double MEHPForceBalance::getDisplacementResidualNormFor(
       const ForceBalanceNetwork& net,
-      Eigen::VectorXd& u,
+      const Eigen::VectorXd& u,
       const Eigen::VectorXd& oneOverSpringPartitions) const
     {
       Eigen::VectorXd displacedCoords = net.coordinates + u;
@@ -632,8 +635,11 @@ namespace calc {
         double valueToSet = springPartitions0[i] > 0.0 // 1e-18 //
                               ? 1.0 / (springPartitions0[i] * N)
                               : 0.0;
-        valueToSet = CLAMP_ONE_OVER_SPRINGPARTITION(
-          valueToSet, N, oneOverSpringPartitionUpperLimit);
+        valueToSet =
+          CLAMP_ONE_OVER_SPRINGPARTITION(net.partialSpringIsPartial[i],
+                                         valueToSet,
+                                         N,
+                                         oneOverSpringPartitionUpperLimit);
 
         // if (springPartitions0[i] < 1e-9) {
         //   std::cout << "Got close call for partial spring " << i <<
@@ -865,6 +871,7 @@ namespace calc {
           if (std::find(handledSprings.begin(),
                         handledSprings.end(),
                         springIndices[spring_index]) != handledSprings.end()) {
+            std::cout << "primary loop detection necessary" << std::endl;
             continue;
           }
         }
@@ -928,6 +935,7 @@ namespace calc {
             // }
             if (oneOverSpringPartitionUpperLimit > 0.0) {
               oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+                net.partialSpringIsPartial[globalSpringIndex],
                 oneOverContourLengthFraction,
                 N,
                 oneOverSpringPartitionUpperLimit);
@@ -956,7 +964,7 @@ namespace calc {
                                    ? 1.0
                                    : objectiveDisplacementContributors);
 
-      double dist = objectiveDisplacement.squaredNorm();
+      double dist = u.segment(3 * linkIdx, 3).squaredNorm();
       // if (dist > 0.1) {
       //   std::cout << "Moving " << linkIdx << " for " << dist
       //             << " with displacements " << u.segment(3 * linkIdx, 3)[0]
@@ -1022,7 +1030,7 @@ namespace calc {
             if (oneOverSpringPartitionUpperLimit > 0 ||
                 !std::isfinite(denominatorBack)) {
               denominatorBack = CLAMP_ONE_OVER_SPRINGPARTITION(
-                denominatorBack, N, oneOverSpringPartitionUpperLimit);
+                true, denominatorBack, N, oneOverSpringPartitionUpperLimit);
             }
 
             double denominatorForward =
@@ -1031,7 +1039,7 @@ namespace calc {
             if (oneOverSpringPartitionUpperLimit > 0 ||
                 !std::isfinite(denominatorForward)) {
               denominatorForward = CLAMP_ONE_OVER_SPRINGPARTITION(
-                denominatorForward, N, oneOverSpringPartitionUpperLimit);
+                true, denominatorForward, N, oneOverSpringPartitionUpperLimit);
             }
             for (size_t i = 0; i < 3; ++i) {
               for (size_t j = 0; j < 3; ++j) {
@@ -1097,7 +1105,10 @@ namespace calc {
           if (oneOverSpringPartitionUpperLimit > 0 ||
               !std::isfinite(denominator)) {
             denominator = CLAMP_ONE_OVER_SPRINGPARTITION(
-              denominator, N, oneOverSpringPartitionUpperLimit);
+              net.partialSpringIsPartial[springGlobalIdx],
+              denominator,
+              N,
+              oneOverSpringPartitionUpperLimit);
           }
 
           for (size_t i = 0; i < 3; ++i) {
@@ -1300,6 +1311,8 @@ namespace calc {
         this->initialConfig.nrOfLinks);
       this->initialConfig.coordinates.conservativeResize(
         3 * this->initialConfig.nrOfLinks);
+      this->initialConfig.partialSpringIsPartial.conservativeResize(
+        currentNrOfPartialSprings + 2 * additionalLen);
       size_t partialSpringsAdded = 0;
       // then, loop the slip-links to add
       for (size_t i = 0; i < additionalLen; ++i) {
@@ -1378,6 +1391,9 @@ namespace calc {
               springIndex)[targetIndexInSpring];
           size_t newSpringIndex =
             currentNrOfPartialSprings + partialSpringsAdded;
+
+          this->initialConfig.partialSpringIsPartial[lastSpringIndex] = true;
+          this->initialConfig.partialSpringIsPartial[newSpringIndex] = true;
 
           this->initialConfig.localToGlobalSpringIndex.at(springIndex)
             .insert(this->initialConfig.localToGlobalSpringIndex.at(springIndex)
@@ -1607,7 +1623,10 @@ namespace calc {
         if (oneOverSpringPartitionUpperLimit > 0. ||
             !std::isfinite(denominator)) {
           denominator = CLAMP_ONE_OVER_SPRINGPARTITION(
-            denominator, N, oneOverSpringPartitionUpperLimit);
+            net.partialSpringIsPartial[partialSpringIdx],
+            denominator,
+            N,
+            oneOverSpringPartitionUpperLimit);
         }
         /* spring contribution to the overall stress tensor */
         for (size_t j = 0; j < 3; j++) {
@@ -1869,6 +1888,7 @@ namespace calc {
       net.springsContourLength = Eigen::VectorXd::Zero(net.nrOfSprings);
       net.oldAtomIdToSpringIndex.reserve(this->universe.getNrOfAtoms());
       net.springToMoleculeIds.reserve(nrOfSprings);
+      net.partialSpringIsPartial = ArrayXb::Constant(net.nrOfSprings, false);
 
       // convert beads
       std::map<int, int> atomIdToNode;
@@ -2015,6 +2035,9 @@ namespace calc {
       RUNTIME_EXP_IFN(this->currentSpringPartitionsVec.size() ==
                         net.nrOfPartialSprings,
                       "Invalid size of currentSpringPartitionsVec");
+      RUNTIME_EXP_IFN(net.partialSpringIsPartial.size() ==
+                        net.nrOfPartialSprings,
+                      "Invalid size of partialSpringIsPartial");
       RUNTIME_EXP_IFN(
         APPROX_EQUAL(
           this->currentSpringPartitionsVec.sum(), net.nrOfSprings, 1e-3),
@@ -2080,6 +2103,10 @@ namespace calc {
         size_t fullIdx = net.partialToFullSpringIndex.at(i);
         size_t partialEndA = net.springPartIndexA[i];
         size_t partialEndB = net.springPartIndexB[i];
+        RUNTIME_EXP_IFN((net.linkIsSliplink[partialEndA] ||
+                         net.linkIsSliplink[partialEndB]) ==
+                          net.partialSpringIsPartial[i],
+                        "Springs involving slip-links must be marked partial.");
         if (!net.linkIsSliplink[partialEndA]) {
           RUNTIME_EXP_IFN(net.springIndexA[fullIdx] == partialEndA ||
                             net.springIndexB[fullIdx] == partialEndA,

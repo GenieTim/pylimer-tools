@@ -96,30 +96,44 @@ namespace calc {
        * @return double
        */
       double computePartitionUpdateZeroResidual(
-        std::vector<size_t> involvedPartitions,
-        size_t link_idx,
-        Eigen::VectorXd& displacements,
+        const std::vector<size_t> involvedPartitions,
+        const size_t link_idx,
+        const Eigen::VectorXd& displacements,
         Eigen::VectorXd& springPartitions,
         double oneOverSpringPartitionUpperLimit = 1.0)
       {
-        Eigen::VectorXd tempPartitions = springPartitions;
-        Eigen::VectorXd tempDisplacements = displacements;
+        //TODO: revise, hard!
         assert(involvedPartitions.size() == 4);
         double firstMeanVal = 0.5 * (springPartitions[involvedPartitions[0]] +
                                      springPartitions[involvedPartitions[1]]);
         double secondMeanVal = 0.5 * (springPartitions[involvedPartitions[2]] +
                                       springPartitions[involvedPartitions[3]]);
-        tempPartitions[involvedPartitions[0]] = firstMeanVal;
-        tempPartitions[involvedPartitions[1]] = firstMeanVal;
-        tempPartitions[involvedPartitions[2]] = secondMeanVal;
-        tempPartitions[involvedPartitions[3]] = secondMeanVal;
-        this->displaceToMeanPosition(
-          this->initialConfig, tempDisplacements, tempPartitions, link_idx);
-        return this->updateSpringPartition(this->initialConfig,
-                                           tempDisplacements,
-                                           tempPartitions,
-                                           link_idx,
-                                           oneOverSpringPartitionUpperLimit);
+        // Eigen::ArrayXi involvedCoordinateIndices = Eigen::ArrayXi(12);
+        // for (size_t i = 0; i < 4; ++i) {
+        //   involvedCoordinateIndices[3 * i] = 3 * involvedPartitions[i];
+        //   involvedCoordinateIndices[3 * i + 1] = 3 * involvedPartitions[i] + 1;
+        //   involvedCoordinateIndices[3 * i + 2] = 3 * involvedPartitions[i] + 2;
+        // }
+        // Eigen::VectorXd displacementsBefore =
+        //   displacements(involvedCoordinateIndices);
+        Eigen::Vector4d partitionsBefore = springPartitions(involvedPartitions);
+        springPartitions[involvedPartitions[0]] = firstMeanVal;
+        springPartitions[involvedPartitions[1]] = firstMeanVal;
+        springPartitions[involvedPartitions[2]] = secondMeanVal;
+        springPartitions[involvedPartitions[3]] = secondMeanVal;
+        // this->displaceToMeanPosition(
+        //   this->initialConfig, displacements, springPartitions, link_idx);
+        double retVal =
+          this->updateSpringPartition(this->initialConfig,
+                                      displacements,
+                                      springPartitions,
+                                      link_idx,
+                                      oneOverSpringPartitionUpperLimit);
+        // it seems to be faster to re-use memory rather than copying the whole
+        // vectors
+        springPartitions(involvedPartitions) = partitionsBefore;
+        // displacements(involvedCoordinateIndices) = displacementsBefore;
+        return retVal;
       }
 
       /**
@@ -410,7 +424,8 @@ namespace calc {
         double rOverr0 = 0.0;
         double r2 = 0.0;
         double r02 = this->computePartitionUpdateZeroResidual(
-          this->getSpringpartitionIndicesOfSliplink(this->initialConfig, link_idx),
+          this->getSpringpartitionIndicesOfSliplink(this->initialConfig,
+                                                    link_idx),
           link_idx,
           displacements,
           springPartitions,
@@ -741,12 +756,14 @@ namespace calc {
        */
       std::vector<size_t> getSpringpartitionIndicesOfSliplink(
         const ForceBalanceNetwork& net,
-        const size_t linkIdx) const {
-          std::vector<size_t> indices;
-          indices.reserve(4);
-          this->setSpringpartitionIndicesOfSliplink(indices, net, linkIdx);
-          return indices;
-        };
+        const size_t linkIdx) const
+      {
+        std::vector<size_t> indices =
+          pylimer_tools::utils::initializeWithValue<size_t>(4, 0);
+        assert(indices.size() == 4);
+        this->setSpringpartitionIndicesOfSliplink(indices, net, linkIdx);
+        return indices;
+      };
 
       /**
        * @brief Assemble all indices of partial springs for a particular
@@ -755,10 +772,9 @@ namespace calc {
        * @param linkIdx
        * @return void
        */
-      void setSpringpartitionIndicesOfSliplink(
-        std::vector<size_t> &res_vec,
-        const ForceBalanceNetwork& net,
-        const size_t linkIdx) const;
+      void setSpringpartitionIndicesOfSliplink(std::vector<size_t>& res_vec,
+                                               const ForceBalanceNetwork& net,
+                                               const size_t linkIdx) const;
 
       /**
        * @brief Updates the partition/parametrisation of a spring around one
@@ -902,7 +918,7 @@ namespace calc {
 
       double getDisplacementResidualNormFor(
         const ForceBalanceNetwork& net,
-        Eigen::VectorXd& u,
+        const Eigen::VectorXd& u,
         const Eigen::VectorXd& oneOverSpringPartitions) const;
 
       template<typename VectorType>

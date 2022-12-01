@@ -62,6 +62,7 @@ namespace calc {
       Eigen::VectorXd springsContourLength; /* the N for each spring */
       ArrayXArrayXi springIndicesOfLinks;   // maps link -> springs
       ArrayXArrayXi linkIndicesOfSprings;   // maps spring -> links
+      ArrayXb partialSpringIsPartial; // indicates whether a spring involves a slip-link
       // local to global: from the 2D structures to the 1D Eigen vector
       std::map<size_t, std::vector<size_t>> localToGlobalSpringIndex;
       // map the "local", partial, spring indices to the full-length springs
@@ -73,6 +74,7 @@ namespace calc {
       Eigen::ArrayXi springPartCoordinateIndexB;
       Eigen::ArrayXi springPartIndexA;
       Eigen::ArrayXi springPartIndexB;
+
       // old stuff used for conversion. Does not include slip-links
       Eigen::ArrayXi springCoordinateIndexA;
       Eigen::ArrayXi springCoordinateIndexB;

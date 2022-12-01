@@ -62,10 +62,10 @@ namespace calc {
        * @param ftol
        */
       void runForceRelaxation(const char* algorithm = "LD_MMA",
-                              long int maxNrOfSteps = 50000, // default: 10000
+                              long int maxNrOfSteps = 5000, // default: 10000
                               double xtol = 1e-9,
-                              double ftol = 1e-9,
-                              double constraintTol = 1e-9);
+                              double ftol = 1e-7,
+                              double constraintTol = 1e-15);
 
       /**
        * @brief Compute the spring update residual
