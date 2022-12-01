@@ -185,7 +185,7 @@ TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
         pcm::MEHPForceBalance(universe2, 2);
       meter.measure([&forceBalancer3] {
         pcm::ForceBalanceNetwork net = forceBalancer3.getNetwork();
-        return forceBalancer3.getHeuristicallyIndependentCoordinateSets(&net);
+        return forceBalancer3.getHeuristicallyIndependentCoordinateSets(net);
       });
     };
   }
@@ -264,7 +264,7 @@ TEST_CASE("MEHP Force Balance handles slip-links on primary loops",
     Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
     Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
     REQUIRE_NOTHROW(
-      forceBalancer.displaceToMeanPosition(&net, displacements, partitions, 0));
+      forceBalancer.displaceToMeanPosition(net, displacements, partitions, 0));
     CHECK(displacements[0] == Catch::Approx(7.687).epsilon(1e-5));
     CHECK(displacements[1] == Catch::Approx(2.03926).epsilon(1e-5));
     CHECK(displacements[2] == Catch::Approx(5.88634).epsilon(1e-5));
@@ -273,6 +273,7 @@ TEST_CASE("MEHP Force Balance handles slip-links on primary loops",
   SECTION("Entangled primary loop")
   {
     pcm::MEHPForceBalance forceBalancer = pcm::MEHPForceBalance(universe, 2);
+    forceBalancer.setSpringContourLengths(Eigen::VectorXd::Constant(forceBalancer.getNetwork().nrOfSprings, 15.));
     // entangle primary loop and check again
     // outputNetwork(net, Eigen::VectorXd::Zero(net.nrOfLinks * 3));
     forceBalancer.addSlipLinks({ 0, 2 },
@@ -289,7 +290,7 @@ TEST_CASE("MEHP Force Balance handles slip-links on primary loops",
     Eigen::VectorXd displacements = Eigen::VectorXd::Zero(net.nrOfLinks * 3);
     Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
     REQUIRE_NOTHROW(forceBalancer.displaceToMeanPosition(
-      &net, displacements, partitions, 0, 1.));
+      net, displacements, partitions, 0, 1.));
     CHECK(displacements[0] == Catch::Approx(0.187321).epsilon(1e-5));
     CHECK(displacements[1] == Catch::Approx(-0.447774).epsilon(1e-5));
     CHECK(displacements[2] == Catch::Approx(-0.925295).epsilon(1e-5));
@@ -445,7 +446,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         Eigen::VectorXd springPartitions0 =
           Eigen::VectorXd::Ones(net.nrOfPartialSprings);
         Eigen::VectorXd oneOverSpringPartitions =
-          forceBalancer2.assembleOneOverSpringPartition(&net,
+          forceBalancer2.assembleOneOverSpringPartition(net,
                                                         springPartitions0);
         CHECK((oneOverSpringPartitions.array() < net.L[0]).all());
         Eigen::VectorXd displacements0 =
@@ -453,7 +454,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         std::vector<Eigen::ArrayXi> vertexSets;
         std::vector<Eigen::ArrayXi> springSets;
         std::tie(vertexSets, springSets) =
-          forceBalancer2.getHeuristicallyIndependentCoordinateSets(&net);
+          forceBalancer2.getHeuristicallyIndependentCoordinateSets(net);
 
         // SECTION(
         //   "HeuristicallyIndependent coordiante sets are unique and complete")
@@ -475,14 +476,14 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
           Eigen::VectorXd::Zero(3 * net.nrOfLinks);
         for (Eigen::ArrayXi vertexSet : vertexSets) {
           forceBalancer2.displaceLinksToMeanPosition(
-            &net, displacements0, oneOverSpringPartitions, vertexSet, 1.0);
+            net, displacements0, oneOverSpringPartitions, vertexSet, 1.0);
           for (size_t i = 0; i < vertexSet.size(); ++i) {
             if (i % 3 == 0) {
               // NOTE: it is required, that we process the iterative updates
               // also in the order of the vertex sets, as otherwise, the results
               // will not be identical
               forceBalancer2.displaceToMeanPosition(
-                &net, displacements1, springPartitions0, vertexSet[i] / 3);
+                net, displacements1, springPartitions0, vertexSet[i] / 3);
             }
             // check that the two displacement vectors are equal, here already
             if (std::isnan(displacements0[vertexSet[i]])) {
@@ -507,7 +508,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
           }
         }
 
-        CHECK(forceBalancer2.validateNetwork(&net));
+        CHECK(forceBalancer2.validateNetwork(net));
       }
 
       SECTION("Actual balance results in correct phantom results")
@@ -797,9 +798,9 @@ TEST_CASE("MEHP Force Balance handles slip-links",
     outputNetwork(net, displacements, forceBalancer.getSpringPartitions());
     for (int i = 0; i < 5; ++i) {
       forceBalancer.displaceToMeanPosition(
-        &net, displacements, springPartitions, 4);
+        net, displacements, springPartitions, 4);
       forceBalancer.updateSpringPartition(
-        &net, displacements, springPartitions, 4);
+        net, displacements, springPartitions, 4);
       for (int i = 0; i < net.nrOfPartialSprings; i++) {
         std::cout << net.springPartIndexA[i] << ", " << net.springPartIndexB[i]
                   << ": ";
@@ -821,8 +822,9 @@ TEST_CASE("MEHP Force Balance handles slip-links",
     REQUIRE(forceBalancer2.getNrOfNodes() == forceBalancer2.getNrOfLinks());
     REQUIRE(forceBalancer2.getNrOfNodes() == 4);
     REQUIRE(forceBalancer2.getNrOfSprings() == 5);
+    double N = 23.;
     forceBalancer2.setSpringContourLengths(
-      Eigen::VectorXd::Constant(forceBalancer2.getNetwork().nrOfSprings, 23.));
+      Eigen::VectorXd::Constant(forceBalancer2.getNetwork().nrOfSprings, N));
     Eigen::VectorXd springPartitions0 = forceBalancer2.getSpringPartitions();
     pcm::ForceBalanceNetwork net0 = forceBalancer2.getNetwork();
     for (int i = 0; i < net0.nrOfPartialSprings; i++) {
@@ -835,12 +837,12 @@ TEST_CASE("MEHP Force Balance handles slip-links",
     SECTION("displaceLinksToMeanPosition = displaceToMeanPosition")
     {
       Eigen::VectorXd oneOverSpringPartitions0 =
-        forceBalancer2.assembleOneOverSpringPartition(&net0, springPartitions0, 1.0);
+        forceBalancer2.assembleOneOverSpringPartition(net0, springPartitions0, 1.0);
 
       for (size_t i = 0; i < net0.nrOfPartialSprings; ++i) {
         for (size_t dir = 0; dir < 3; ++dir) {
           CHECK(oneOverSpringPartitions0[3 * i + dir] ==
-                Catch::Approx(1. / (20. * springPartitions0[i])));
+                Catch::Approx(1. / (N * springPartitions0[i])));
         }
       }
 
@@ -860,7 +862,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       }
 
       double maxDiff0 = forceBalancer2.displaceLinksToMeanPosition(
-        &net0,
+        net0,
         displacements0,
         oneOverSpringPartitions0,
         coordinateIndicesOfTwoIndependentIndices,
@@ -872,7 +874,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       for (int i = 0; i < twoIndependentIndices.size(); ++i) {
         maxDiff1 = std::max(
           forceBalancer2.displaceToMeanPosition(
-            &net0, displacements1, springPartitions0, twoIndependentIndices[i], 1.0),
+            net0, displacements1, springPartitions0, twoIndependentIndices[i], 1.0),
           maxDiff1);
       }
 
@@ -896,7 +898,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       Eigen::VectorXd displacements0 =
         Eigen::VectorXd::Zero(forceBalancer2.getNrOfLinks() * 3);
       forceBalancer2.displaceLinksToMeanPosition(
-        &net0, displacements0, springPartitions0, 0.);
+        net0, displacements0, springPartitions0, 0.);
       for (int i = 0; i < 3 * net0.nrOfLinks; ++i) {
         CHECK(displacements0[i] + 1e-5 == Catch::Approx(0.0 + 1e-5));
       }
@@ -904,7 +906,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       // all beads are at 0.0
       for (size_t it = 0; it < 20; ++it) {
         forceBalancer2.displaceLinksToMeanPosition(
-          &net0, displacements0, springPartitions0, 0.5);
+          net0, displacements0, springPartitions0, 0.5);
       }
       for (int i = 0; i < net0.nrOfLinks; ++i) {
         CHECK(displacements0[3 * i] + 1e-5 ==
@@ -951,7 +953,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       std::cout << std::endl;
 
       forceBalancer2.displaceToMeanPosition(
-        &net, displacements, springPartitions, 4);
+        net, displacements, springPartitions, 4);
       CHECK(net.coordinates[4 * 3] + displacements[4 * 3] ==
             Catch::Approx(2.5));
       CHECK(net.coordinates[4 * 3 + 1] + displacements[4 * 3 + 1] ==
@@ -965,9 +967,9 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       REQUIRE(net.springIndicesOfLinks.size() == net.nrOfLinks);
       for (int j = 0; j < 5; ++j) {
         forceBalancer2.displaceToMeanPosition(
-          &net, displacements, springPartitions, 5, -1.);
+          net, displacements, springPartitions, 5, -1.);
         forceBalancer2.updateSpringPartition(
-          &net, displacements, springPartitions, 5, -1.);
+          net, displacements, springPartitions, 5, -1.);
         for (int i = 0; i < net.nrOfPartialSprings; i++) {
           std::cout << net.springPartIndexA[i] << ", "
                     << net.springPartIndexB[i] << ": ";
@@ -980,14 +982,14 @@ TEST_CASE("MEHP Force Balance handles slip-links",
         // NOTE: difficulty: finding out which node and spring it is actually
         // after the removal of strand atoms
         forceBalancer2.displaceToMeanPosition(
-          &net, displacements, springPartitions, 4, -1.);
+          net, displacements, springPartitions, 4, -1.);
         // for (int dir = 0; dir < 3; ++dir) {
         //   std::cout << (net.coordinates[3 * 4 + dir] + displacements[3 * 4 +
         //   dir])
         //             << ", ";
         // }
         forceBalancer2.updateSpringPartition(
-          &net, displacements, springPartitions, 4, -1.);
+          net, displacements, springPartitions, 4, -1.);
         // std::cout << std::endl;
         // std::cout << springPartitions[0][0] << ", " << springPartitions[1][0]
         //           << std::endl;
