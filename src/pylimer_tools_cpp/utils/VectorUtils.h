@@ -15,8 +15,10 @@ extern "C"
 #include <Eigen/Dense>
 #include <cassert>
 
+
 namespace pylimer_tools {
 namespace utils {
+  typedef Eigen::Array<bool, Eigen::Dynamic, 1> ArrayXb;
 
   /**
    * @brief Remove a row from an Eigen vector
@@ -24,19 +26,24 @@ namespace utils {
    * @param vec
    * @param rowToRemove
    */
-  template<typename T>
-  static inline void removeRow(Eigen::Matrix<T, Eigen::Dynamic, 1>& vec,
-                 unsigned int rowToRemove)
-  {
-    INVALIDARG_EXP_IFN(vec.size() > rowToRemove,
-                       "Cannot remove row " + std::to_string(rowToRemove) +
-                         " from vector with size " +
-                         std::to_string(vec.size()) + "!");
-    unsigned int numRows = vec.size() - 1;
-    vec.segment(rowToRemove, numRows - rowToRemove) =
-      vec.segment(rowToRemove + 1, numRows - rowToRemove);
-    vec.conservativeResize(numRows);
+#define MAKE_REMOVE_ROW(EIGEN_TYPE)                                            \
+  static inline void removeRow(EIGEN_TYPE& vec, unsigned int rowToRemove)      \
+  {                                                                            \
+    INVALIDARG_EXP_IFN(vec.size() > rowToRemove,                               \
+                       "Cannot remove row " + std::to_string(rowToRemove) +    \
+                         " from vector with size " +                           \
+                         std::to_string(vec.size()) + "!");                    \
+    unsigned int numRows = vec.size() - 1;                                     \
+    vec.segment(rowToRemove, numRows - rowToRemove) =                          \
+      vec.segment(rowToRemove + 1, numRows - rowToRemove);                     \
+    vec.conservativeResize(numRows);                                           \
   }
+
+  MAKE_REMOVE_ROW(Eigen::VectorXd);
+  MAKE_REMOVE_ROW(Eigen::VectorXi);
+  MAKE_REMOVE_ROW(Eigen::ArrayXi);
+  MAKE_REMOVE_ROW(Eigen::ArrayXd);
+  MAKE_REMOVE_ROW(ArrayXb);
 
   /**
    * @brief Remove sequential rows from an Eigen vector
@@ -44,66 +51,30 @@ namespace utils {
    * @param vec
    * @param rowToRemove
    */
-  template<typename T>
-  static inline void removeRows(Eigen::Matrix<T, Eigen::Dynamic, 1>& vec,
-                  unsigned int rowToStartRemove,
-                  unsigned int nrOfRowsToRemove)
-  {
-    INVALIDARG_EXP_IFN(
-      vec.size() > rowToStartRemove + nrOfRowsToRemove,
-      "Cannot remove rows " + std::to_string(nrOfRowsToRemove) + " from " +
-        std::to_string(rowToStartRemove) + " from vector with size " +
-        std::to_string(vec.size()) + "!");
-    unsigned int numRows = vec.size() - nrOfRowsToRemove;
-    vec.segment(rowToStartRemove, numRows - rowToStartRemove) =
-      vec.segment(rowToStartRemove + 1, numRows - rowToStartRemove);
-    vec.conservativeResize(numRows);
+#define MAKE_REMOVE_ROWS(EIGEN_TYPE)                                           \
+  static inline void removeRows(EIGEN_TYPE& vec,                               \
+                                unsigned int rowToStartRemove,                 \
+                                unsigned int nrOfRowsToRemove)                 \
+  {                                                                            \
+    INVALIDARG_EXP_IFN(                                                        \
+      vec.size() > rowToStartRemove + nrOfRowsToRemove,                        \
+      "Cannot remove rows " + std::to_string(nrOfRowsToRemove) + " from " +    \
+        std::to_string(rowToStartRemove) + " from vector with size " +         \
+        std::to_string(vec.size()) + "!");                                     \
+    unsigned int numRows = vec.size() - nrOfRowsToRemove;                      \
+    vec.segment(rowToStartRemove, numRows - rowToStartRemove) =                \
+      vec.segment(rowToStartRemove + nrOfRowsToRemove, numRows - rowToStartRemove);           \
+    vec.conservativeResize(numRows);                                           \
   }
 
-  /**
-   * @brief Remove a row from an Eigen vector
-   *
-   * @param vec
-   * @param rowToRemove
-   */
-  template<typename T>
-  static inline void removeRow(Eigen::Array<T, Eigen::Dynamic, 1>& vec,
-                 unsigned int rowToRemove)
-  {
-    INVALIDARG_EXP_IFN(vec.size() > rowToRemove,
-                       "Cannot remove row " + std::to_string(rowToRemove) +
-                         " from vector with size " +
-                         std::to_string(vec.size()) + "!");
-    unsigned int numRows = vec.size() - 1;
-    vec.segment(rowToRemove, numRows - rowToRemove) =
-      vec.segment(rowToRemove + 1, numRows - rowToRemove);
-    vec.conservativeResize(numRows);
-  }
-
-  /**
-   * @brief Remove sequential rows from an Eigen vector
-   *
-   * @param vec
-   * @param rowToRemove
-   */
-  template<typename T>
-  static inline void removeRows(Eigen::Array<T, Eigen::Dynamic, 1>& vec,
-                  unsigned int rowToStartRemove,
-                  unsigned int nrOfRowsToRemove)
-  {
-    INVALIDARG_EXP_IFN(
-      vec.size() > rowToStartRemove + nrOfRowsToRemove,
-      "Cannot remove rows " + std::to_string(nrOfRowsToRemove) + " from " +
-        std::to_string(rowToStartRemove) + " from vector with size " +
-        std::to_string(vec.size()) + "!");
-    unsigned int numRows = vec.size() - nrOfRowsToRemove;
-    vec.segment(rowToStartRemove, numRows - rowToStartRemove) =
-      vec.segment(rowToStartRemove + 1, numRows - rowToStartRemove);
-    vec.conservativeResize(numRows);
-  }
+  MAKE_REMOVE_ROWS(Eigen::VectorXd);
+  MAKE_REMOVE_ROWS(Eigen::VectorXi);
+  MAKE_REMOVE_ROWS(Eigen::ArrayXi);
+  MAKE_REMOVE_ROWS(Eigen::ArrayXd);
+  MAKE_REMOVE_ROWS(ArrayXb);
 
   template<typename T>
-  static inline T last(std::vector<T>& v)
+  static inline T last(const std::vector<T>& v)
   {
     return v[v.size() - 1];
   }
@@ -116,7 +87,7 @@ namespace utils {
    * @return true|false
    */
   template<typename T0, typename T1>
-  static inline bool map_has_key(T0 map, T1 key)
+  static inline bool map_has_key(const T0 map, const T1 key)
   {
 #if __cplusplus >= 202002L
     // C++20 (and later) code
@@ -127,8 +98,8 @@ namespace utils {
   }
 
   template<typename IN>
-  static inline std::vector<IN> interleave(std::vector<IN> in1,
-                                           std::vector<IN> in2)
+  static inline std::vector<IN> interleave(const std::vector<IN>& in1,
+                                           const std::vector<IN>& in2)
   {
     size_t size = in1.size();
     assert(size == in2.size());
@@ -144,7 +115,7 @@ namespace utils {
   }
 
   template<typename IN>
-  static inline bool vector_has_duplicates(std::vector<IN> vec)
+  static inline bool vector_has_duplicates(const std::vector<IN>& vec)
   {
     std::vector<IN> vecSorted;
     vecSorted.reserve(vec.size());

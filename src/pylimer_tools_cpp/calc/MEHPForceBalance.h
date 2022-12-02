@@ -713,12 +713,17 @@ namespace calc {
                                               const size_t linkIndexB,
                                               const bool is2D) const;
 
-      bool validateNetwork()
+      bool validateNetwork() const
       {
-        return this->validateNetwork(this->initialConfig);
+        return this->validateNetwork(this->initialConfig, this->currentDisplacements, this->currentSpringPartitionsVec);
       }
 
-      bool validateNetwork(const ForceBalanceNetwork& net);
+      bool validateNetwork(const ForceBalanceNetwork& net) const
+      {
+        return this->validateNetwork(net, this->currentDisplacements, this->currentSpringPartitionsVec);
+      }
+
+      bool validateNetwork(const ForceBalanceNetwork& net, const Eigen::VectorXd& u, const Eigen::VectorXd& springPartitions) const;
 
       ForceBalanceNetwork getNetwork() { return this->initialConfig; }
 

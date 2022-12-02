@@ -679,11 +679,12 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
       pcm::MEHPForceBalance(universe, 2, true);
     size_t nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(1000, 2.0, 100);
     REQUIRE(nrOfAddedLinks >= 100);
+    std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
 
     pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
     Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
     Eigen::VectorXd partitions =
-      forceBalancer.getCurrentPartialSpringDistances();
+      forceBalancer.getSpringPartitions();
     REQUIRE_NOTHROW(forceBalancer.removeTwofunctionalCrosslinks(
       net, displacements, partitions));
     REQUIRE_NOTHROW(forceBalancer.validateNetwork());
