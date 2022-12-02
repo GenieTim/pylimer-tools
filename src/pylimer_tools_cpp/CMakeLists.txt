@@ -76,7 +76,6 @@ target_sources(pylimer_tools
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceEvaluator.cpp
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceRelaxation.cpp
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance.cpp
-		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance2.cpp
 	PUBLIC
 		${CMAKE_CURRENT_LIST_DIR}/entities/Box.h
 		${CMAKE_CURRENT_LIST_DIR}/entities/Atom.h
@@ -98,8 +97,9 @@ target_sources(pylimer_tools
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceEvaluator.h
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceRelaxation.h
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance.h
-		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance2.h
 )
+# ${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance2.cpp
+# ${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance2.h
 
 set_target_properties(pylimer_tools PROPERTIES VERSION ${PROJECT_VERSION})
 

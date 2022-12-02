@@ -69,7 +69,7 @@ namespace calc {
       // local to global: from the 2D structures to the 1D Eigen vector
       ArrayXArrayXi localToGlobalSpringIndex;
       // map the "local", partial, spring indices to the full-length springs
-      std::vector<size_t> partialToFullSpringIndex;
+      Eigen::ArrayXi partialToFullSpringIndex;
       std::unordered_map<size_t, size_t> oldAtomIdToSpringIndex;
 
       ArrayXb linkIsSliplink;

@@ -60,7 +60,6 @@ add_library(test_sources
 	OBJECT 
 		pylimer_tools/test_generator.cpp 
 		pylimer_tools/test_force_balance.cpp
-		pylimer_tools/test_force_balance2.cpp
 		pylimer_tools/test_force_relaxation.cpp
 		pylimer_tools/test_universe.cpp 
 		pylimer_tools/test_universesequence.cpp 
@@ -68,6 +67,7 @@ add_library(test_sources
 		pylimer_tools/test_neighbourlist.cpp 
 		pylimer_tools/test_readers_writers.cpp 
 )
+# pylimer_tools/test_force_balance2.cpp
 
 add_dependencies(test_sources pylimer_tools)
 include_directories(${igraph_INCLUDE_DIRS})
