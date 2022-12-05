@@ -152,6 +152,29 @@ namespace calc {
                                     double tolerance) const;
 
       /**
+       * @brief Remove a certain link from the structures
+       *
+       * @param net
+       * @param displacements
+       * @param linkIdx
+       */
+      void removeLink(ForceBalanceNetwork& net,
+                      Eigen::VectorXd& displacements,
+                      const size_t linkIdx) const;
+
+      /**
+       * @brief Merge two springs around a given cross-link
+       *
+       * @param net
+       * @param springPartitions
+       */
+      void mergeSprings(ForceBalanceNetwork& net,
+                        Eigen::VectorXd& springPartitions,
+                        const size_t removedSpringIdx,
+                        const size_t keptSpringIdx,
+                        const size_t linkToReduce) const;
+
+      /**
        * @brief Replace the two springs traversinga a two-functional cross-links
        * with a single spring
        *
@@ -715,15 +738,20 @@ namespace calc {
 
       bool validateNetwork() const
       {
-        return this->validateNetwork(this->initialConfig, this->currentDisplacements, this->currentSpringPartitionsVec);
+        return this->validateNetwork(this->initialConfig,
+                                     this->currentDisplacements,
+                                     this->currentSpringPartitionsVec);
       }
 
       bool validateNetwork(const ForceBalanceNetwork& net) const
       {
-        return this->validateNetwork(net, this->currentDisplacements, this->currentSpringPartitionsVec);
+        return this->validateNetwork(
+          net, this->currentDisplacements, this->currentSpringPartitionsVec);
       }
 
-      bool validateNetwork(const ForceBalanceNetwork& net, const Eigen::VectorXd& u, const Eigen::VectorXd& springPartitions) const;
+      bool validateNetwork(const ForceBalanceNetwork& net,
+                           const Eigen::VectorXd& u,
+                           const Eigen::VectorXd& springPartitions) const;
 
       ForceBalanceNetwork getNetwork() { return this->initialConfig; }
 
