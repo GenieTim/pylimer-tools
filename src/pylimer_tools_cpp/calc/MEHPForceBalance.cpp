@@ -46,7 +46,8 @@ namespace calc {
       const double oneOverSpringPartitionUpperLimit,
       const int maxFlag,
       const bool removeInactiveCrosslinks,
-      const bool remove2functionalCrosslinkers)
+      const bool remove2functionalCrosslinkers,
+      const int outputFrequency)
     {
       INVALIDARG_EXP_IFN(
         remove2functionalCrosslinkers == false ||
@@ -99,6 +100,7 @@ namespace calc {
       double intermediateResidual = 0.0;
       std::vector<size_t> relevantPartitionIndices =
         pylimer_tools::utils::initializeWithValue<size_t>(4, 0);
+      double minN = net.springsContourLength.minCoeff();
       // actual loop
       do {
         maxDistanceMoved = 0.0;
@@ -195,19 +197,23 @@ namespace calc {
         currentResidual =
           this->getDisplacementResidualNormFor(net, u, oneOverSpringPartitions);
         iterationsDone += 1;
-        if (iterationsDone % 50 == 0) {
+        if (outputFrequency > 0 && iterationsDone % outputFrequency == 0) {
           std::cout << "Iteration " << iterationsDone << " " << maxDistanceMoved
                     << " by " << indexOfMaxDistanceMoved
-                    << ". Residual: " << currentResidual
-                    << " from: " << initialResidual << " via "
-                    << intermediateResidual << "\n";
+                    << ". Residual: " << currentResidual * minN * minN << " ("
+                    << (currentResidual / initialResidual) << ") "
+                    << " from: " << initialResidual * minN * minN << " via "
+                    << intermediateResidual * minN * minN << " ("
+                    << (intermediateResidual / initialResidual) << ") "
+                    << "\n";
+          if (iterationsDone % 50 == 0){
           std::array<std::array<double, 3>, 3> stressTensor =
             this->evaluateStressTensor(
               net, u, springPartitions, 1.0, oneOverSpringPartitionUpperLimit);
           std::cout << "To stress tensor diagonal: " << stressTensor[0][0]
                     << ", " << stressTensor[1][1] << ", " << stressTensor[2][2]
                     << " with ";
-          std::cout << "Total inner: " << totalInnerIterationsDone << "\n";
+          std::cout << "Total inner: " << totalInnerIterationsDone << "\n";}
         }
       } while (currentResidual / initialResidual > xtol &&
                iterationsDone < maxNrOfSteps);
@@ -1166,7 +1172,8 @@ namespace calc {
             const double l = (currentS + nextS);
             if (oneOverSpringPartitionUpperLimit > 0.) {
               // TODO: sketch theory why this should/not be necessary!!!
-              const double limit = 1. / (oneOverSpringPartitionUpperLimit * (nextS + currentS) * (N));
+              const double limit = 1. / (oneOverSpringPartitionUpperLimit *
+                                         (nextS + currentS) * (N));
               idealValue = std::clamp(idealValue, limit, 1. - limit);
               // double oneOverCurrent = 1. / (currentS * N);
               // double oneOverNext = 1. / (nextS * N);
@@ -1182,10 +1189,12 @@ namespace calc {
             double localResidualNorm = 0.0;
             if (complementaryS > 0.) {
               localResidualNorm -=
-                (distanceForward / ((1.-idealValue) * (1.-idealValue))) / (N * l);
+                (distanceForward / ((1. - idealValue) * (1. - idealValue))) /
+                (N * l);
             }
             if (newS > 0.) {
-              localResidualNorm += (distanceBack / (idealValue*idealValue)) / (N * l);
+              localResidualNorm +=
+                (distanceBack / (idealValue * idealValue)) / (N * l);
             }
 
             RUNTIME_EXP_IFN(

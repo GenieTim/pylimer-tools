@@ -171,6 +171,7 @@ init_pylimer_bound_calc(py::module_& m)
                   &mehp::ForceBalanceNetwork::linkIndicesOfSprings)
      .def_readonly("springContourLength", &mehp::ForceBalanceNetwork::springsContourLength)
      .def_readonly("oldAtomIds", &mehp::ForceBalanceNetwork::oldAtomIds)
+     .def_readonly("partialToFullSpringIndex", &mehp::ForceBalanceNetwork::partialToFullSpringIndex)
     // .def_readonly("springIsActive", &mehp::Network::springIsActive)
     ;
 
@@ -493,7 +494,8 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("oneOverSpringPartitionUpperLimit") = 1.0,
          py::arg("maxFlag") = 7,
          py::arg("removeInactiveCrosslinks") = false,
-         py::arg("remove2functionalCrosslinkers") = false)
+         py::arg("remove2functionalCrosslinkers") = false,
+         py::arg("outputFrequency") = 50)
     .def("inspectLinkDisplacementToMeanPositionUpdate",
          &mehp::MEHPForceBalance::inspectLinkDisplacementToMeanPositionUpdate,
          R"pbdoc()pbdoc",
