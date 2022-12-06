@@ -50,7 +50,6 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance
       ~MEHPForceBalance.setDisplacements
       ~MEHPForceBalance.setSpringContourLengths
       ~MEHPForceBalance.setSpringPartitions
-      ~MEHPForceBalance.validateNetwork
    
    
 

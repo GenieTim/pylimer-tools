@@ -37,6 +37,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.SimplifiedBalanceNetwork
       ~SimplifiedBalanceNetwork.nrOfPartialSprings
       ~SimplifiedBalanceNetwork.nrOfSprings
       ~SimplifiedBalanceNetwork.oldAtomIds
+      ~SimplifiedBalanceNetwork.partialToFullSpringIndex
       ~SimplifiedBalanceNetwork.springContourLength
       ~SimplifiedBalanceNetwork.springCoordinateIndexA
       ~SimplifiedBalanceNetwork.springCoordinateIndexB

@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance2" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance2.html" /><link rel="prev" title="pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator" href="pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.html" /><link rel="prev" title="pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator" href="pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator.html" />
 
     <meta name="generator" content="sphinx-5.3.0, furo 2022.09.29"/>
         <title>pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance - PylimerTools documentation</title>
@@ -186,7 +186,6 @@
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.LazyUniverseSequenceIterator.html">pylimer_tools_cpp.pylimer_tools_cpp.LazyUniverseSequenceIterator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator.html">pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator</a></li>
 <li class="toctree-l4 current current-page"><a class="current reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance2.html">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance2</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.html">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.html">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.html">pylimer_tools_cpp.pylimer_tools_cpp.Molecule</a></li>
@@ -375,9 +374,6 @@
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.setSpringPartitions" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.setSpringPartitions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setSpringPartitions</span></code></a>(self, arg0)</p></td>
 <td><p>Set the current spring partitions.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.validateNetwork" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.validateNetwork"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validateNetwork</span></code></a>(self)</p></td>
-<td><p>Validates the internal structures.</p></td>
 </tr>
 </tbody>
 </table>
@@ -625,7 +621,7 @@ Use a value &lt; 0 to indicate that there is no maximum number of active connect
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.runForceRelaxation">
-<span class="sig-name descname"><span class="pre">runForceRelaxation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self:</span> <span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runMode:</span> <span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode</span> <span class="pre">=</span> <span class="pre">&lt;BalanceRunMode.ITERATIVE:</span> <span class="pre">4&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">damping:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxNrOfSteps:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">250000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xTolerance:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">innerMaxNrOfSteps:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">250</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">innerAlphaTolerance:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1e-15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oneOverSpringPartitionUpperLimit:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxFlag:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowRemovalOfSliplinks:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowMoveOfSliplinks:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.runForceRelaxation" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">runForceRelaxation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self:</span> <span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runMode:</span> <span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode</span> <span class="pre">=</span> <span class="pre">&lt;BalanceRunMode.ITERATIVE:</span> <span class="pre">4&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">damping:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxNrOfSteps:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">250000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xTolerance:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">innerMaxNrOfSteps:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">250</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">innerAlphaTolerance:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1e-15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oneOverSpringPartitionUpperLimit:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxFlag:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">removeInactiveCrosslinks:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove2functionalCrosslinkers:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputFrequency:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">50</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.runForceRelaxation" title="Permalink to this definition">#</a></dt>
 <dd><p>Run the simulation.
 Note that the final state of the minimization is persisted and reused if you use this method again.
 This is useful if you want to run a global optimization first and add a local one afterwards.
@@ -663,12 +659,6 @@ As a consequence though, you cannot simply benchmark only this method; you must 
 <dd><p>Set the current spring partitions.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.validateNetwork">
-<span class="sig-name descname"><span class="pre">validateNetwork</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.validateNetwork" title="Permalink to this definition">#</a></dt>
-<dd><p>Validates the internal structures.</p>
-</dd></dl>
-
 </dd></dl>
 
 </section>
@@ -678,12 +668,12 @@ As a consequence though, you cannot simply benchmark only this method; you must 
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance2.html">
+          <a class="next-page" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance2</div>
+                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -765,7 +755,6 @@ As a consequence though, you cannot simply benchmark only this method; you must 
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.setDisplacements"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.setDisplacements()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.setSpringContourLengths"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.setSpringContourLengths()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.setSpringPartitions"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.setSpringPartitions()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.validateNetwork"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.validateNetwork()</span></code></a></li>
 </ul>
 </li>
 </ul>
