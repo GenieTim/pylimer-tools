@@ -84,7 +84,8 @@ namespace calc {
         const double oneOverSpringPartitionUpperLimit = 1.0,
         const int maxFlag = 7,
         const bool removeInactiveCrosslinks = false,
-        const bool remove2functionalCrosslinkers = false);
+        const bool remove2functionalCrosslinkers = false,
+      const int outputFrequency = 50);
 
       /**
        * @brief Compute the spring update residual
