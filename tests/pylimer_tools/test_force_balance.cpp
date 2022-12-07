@@ -44,6 +44,92 @@ outputNetwork(pcm::ForceBalanceNetwork net,
   }
 }
 
+TEST_CASE("Particular slip-link examples", "[analysis][MEHPForceBalance]")
+{
+  double L = 42.819955007276754;
+  double lmda = 1.2;
+  pe::Universe universe = pe::Universe(L, L, L);
+  /**
+   * Connectivity:
+   *
+   * 35-(11)-90
+   *
+   * 10-(12)-1654
+   */
+  // slip-link 3 in the test-system
+  universe.addAtoms({ 35, 90, 1654, 10, 11, 12, 13, 14 },
+                    { 2, 2, 2, 2, 1, 1, 1, 1 },
+                    { 19.706880857235795,
+                      19.288603889563976,
+                      22.156152142687819,
+                      10,
+                      10,
+                      10,
+                      10,
+                      10 },
+                    { 1.47224612942217,
+                      4.4207926048800461,
+                      2.821003235624608,
+                      10,
+                      10,
+                      10,
+                      10,
+                      10 },
+                    { 22.98584649043724,
+                      24.328555987207494,
+                      24.562956857368366,
+                      10,
+                      10,
+                      10,
+                      10,
+                      10 },
+                    { 1, 1, 1, 1, 1, 1, 1, 1 },
+                    { 1, 1, 1, 1, 1, 1, 1, 1 },
+                    { 1, 1, 1, 1, 1, 1, 1, 1 });
+  universe.addBonds({ 35, 11, 10, 12 }, { 11, 90, 12, 1654 });
+
+  universe.setBox(
+    pe::Box(lmda * L, L * (1. / sqrt(lmda)), L * (1. / sqrt(lmda))));
+
+  pcm::MEHPForceBalance forceBalancer = pcm::MEHPForceBalance(universe, 2);
+  forceBalancer.addSlipLinks({ 1, 0 },
+                             { 1, 1 },
+                             { 22.650980696700437, 15.67228278755659 },
+                             { 38.666887107085628, 3.172504627794056 },
+                             { 20.999752090751294, 27.126973321608833 },
+                             { 0.448276, 0.31034482758620685 },
+                             { 0.448276, 0.6896551724137931 * (0.448276) });
+
+  // do update step
+  Eigen::VectorXd displacements = Eigen::VectorXd::Zero(6 * 3);
+  Eigen::VectorXd springPartitions = forceBalancer.getSpringPartitions();
+  CHECK(springPartitions[0] == Catch::Approx(0.31034482758620685));
+  CHECK(springPartitions[2] == Catch::Approx(0.0));
+  CHECK(springPartitions[3] == Catch::Approx(1. - 0.448276));
+  CHECK(springPartitions[4] == Catch::Approx(1. - 0.31034482758620685));
+  outputNetwork(forceBalancer.getNetwork(), displacements, springPartitions);
+  /*auto results = */
+  forceBalancer.inspectParametrisationOptimsationForLink(
+    5,
+    displacements,
+    springPartitions,
+    250,
+    1e-10,
+    1,
+    1e10); // cannot use 1.0 for oneOver... without setting higher contour
+           // length fraction
+  outputNetwork(forceBalancer.getNetwork(), displacements, springPartitions);
+  CHECK(displacements[5 * 3] == Catch::Approx(5.89283));
+  CHECK(displacements[5 * 3 + 1] == Catch::Approx(-1.0033));
+  CHECK(displacements[5 * 3 + 2] == Catch::Approx(-3.49778));
+  CHECK(springPartitions[0] == Catch::Approx(0.388968));
+  CHECK(springPartitions[1] == Catch::Approx(0.112087));
+  CHECK(springPartitions[2] == Catch::Approx(0.0));
+  CHECK(springPartitions[3] == Catch::Approx(1. - 0.448276));
+  CHECK(springPartitions[4] == Catch::Approx(1. - 0.388968));
+  CHECK(springPartitions[5] == Catch::Approx((1. - 0.25004) * 0.448276));
+}
+
 TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
 {
   return;
@@ -683,11 +769,24 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
 
     pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
     Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
-    Eigen::VectorXd partitions =
-      forceBalancer.getSpringPartitions();
-    REQUIRE_NOTHROW(forceBalancer.removeTwofunctionalCrosslinks(
-      net, displacements, partitions));
+    Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
+    size_t numRemoved = forceBalancer.removeTwofunctionalCrosslinks(
+      net, displacements, partitions);
     REQUIRE_NOTHROW(forceBalancer.validateNetwork());
+    REQUIRE(numRemoved > 0);
+
+    // run a while to get inactive links
+    forceBalancer.runForceRelaxation(pcm::BalanceRunMode::ITERATIVE, 1.0, 100);
+    net = forceBalancer.getNetwork();
+    displacements = forceBalancer.getCurrentDisplacements();
+    partitions = forceBalancer.getSpringPartitions();
+    // due to the randomness, it _could_ be one day that actually all strands
+    // are active. unlikely, but I can imagine it to be possible.
+    size_t numInactiveRemoved = forceBalancer.removeInactiveCrosslinks(
+      net, displacements, partitions, 0.1);
+    CHECK(numInactiveRemoved > 0);
+    REQUIRE_NOTHROW(
+      forceBalancer.validateNetwork(net, displacements, partitions));
   }
 }
 
