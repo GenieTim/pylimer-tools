@@ -1,9 +1,9 @@
 #ifndef UTILITY_MACROS_H
 #define UTILITY_MACROS_H
 
-    // to string, without macro expansion
+// to string, without macro expansion
 #define STRINGINFY(s) #s
-    // to string, with macro expansion
+// to string, with macro expansion
 #define XSTRINGINFY(s) STRINGINFY(s)
 
 #define INVALIDARG_EXP_IFN(condition, message)                                 \
@@ -22,5 +22,6 @@
 #define APPROX_WITHIN(value1, lo, hi, eps)                                     \
   value1 + eps >= lo&& value1 - eps <= hi
 
+#define XOR(value1, value2) !(value1) != !(value2)
 
 #endif

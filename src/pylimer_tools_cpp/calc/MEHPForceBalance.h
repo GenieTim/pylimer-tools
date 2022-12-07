@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <map>
 #include <nlopt.hpp>
 #include <random>
@@ -85,7 +86,7 @@ namespace calc {
         const int maxFlag = 7,
         const bool removeInactiveCrosslinks = false,
         const bool remove2functionalCrosslinkers = false,
-      const int outputFrequency = 50);
+        const int outputFrequency = 50);
 
       /**
        * @brief Compute the spring update residual
@@ -147,10 +148,21 @@ namespace calc {
        * @param springPartitions
        * @param tolerance
        */
-      void removeInactiveCrosslinks(ForceBalanceNetwork& net,
-                                    Eigen::VectorXd& displacements,
-                                    Eigen::VectorXd& springPartitions,
-                                    double tolerance) const;
+      size_t removeInactiveCrosslinks(ForceBalanceNetwork& net,
+                                      Eigen::VectorXd& displacements,
+                                      Eigen::VectorXd& springPartitions,
+                                      double tolerance) const;
+
+      /**
+       * @brief Remove a spring (and all its parts, incl. slip-links) from the structures
+       * 
+       * @param net 
+       * @param springPartitions 
+       */
+      void removeSpring(ForceBalanceNetwork& net,
+                                      Eigen::VectorXd& displacements,
+                        Eigen::VectorXd& springPartitions,
+                        const size_t springIdx) const;
 
       /**
        * @brief Remove a certain link from the structures
@@ -183,7 +195,7 @@ namespace calc {
        * @param displacements
        * @param springPartitions
        */
-      void removeTwofunctionalCrosslinks(
+      size_t removeTwofunctionalCrosslinks(
         ForceBalanceNetwork& net,
         Eigen::VectorXd& displacements,
         Eigen::VectorXd& springPartitions) const;
@@ -442,16 +454,21 @@ namespace calc {
        * @return std::tuple<Eigen::VectorXd, Eigen::VectorXd, size_t, double,
        * double, double>
        */
-      std::
-        tuple<Eigen::VectorXd, Eigen::VectorXd, size_t, double, double, double>
-        inspectParametrisationOptimsationForLink(
-          size_t link_idx,
-          Eigen::VectorXd& displacements,
-          Eigen::VectorXd& springPartitions,
-          long int innerMaxNrOfSteps = 100,
-          double innerAlphaTol = 1e-9,
-          long int innerMinNrOfSteps = 1,
-          const double oneOverSpringPartitionUpperLimit = 1.0)
+      std::tuple<Eigen::VectorXd,
+                 Eigen::VectorXd,
+                 size_t,
+                 double,
+                 double,
+                 double,
+                 double>
+      inspectParametrisationOptimsationForLink(
+        size_t link_idx,
+        Eigen::VectorXd& displacements,
+        Eigen::VectorXd& springPartitions,
+        long int innerMaxNrOfSteps = 500,
+        double innerAlphaTol = 1e-9,
+        long int innerMinNrOfSteps = 1,
+        const double oneOverSpringPartitionUpperLimit = 1.0)
       {
         size_t innerIterationsDone = 0;
         double displacementDone = 0.0;
@@ -486,7 +503,8 @@ namespace calc {
                                innerIterationsDone,
                                displacementDone,
                                rOverr0,
-                               r02);
+                               r02,
+                               r2);
       }
 
       /**
