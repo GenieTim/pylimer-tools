@@ -932,6 +932,9 @@ namespace calc {
       // need to remove descending to remove need to renumber these as well
       std::sort(
         linksToRemove.begin(), linksToRemove.end(), std::greater<size_t>());
+      linksToRemove.erase(
+        std::unique(linksToRemove.begin(), linksToRemove.end()),
+        uniqueAffectedLinks.end());
 
       for (size_t outermostI = 0; outermostI < linksToRemove.size();
            ++outermostI) {
