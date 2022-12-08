@@ -859,6 +859,8 @@ namespace calc {
             net.partialToFullSpringIndex[partialSpringToKeep];
           size_t partialSpringToRemove = involvedPartialSprings[1];
           assert(partialSpringToKeep != partialSpringToRemove);
+          assert(net.partialToFullSpringIndex[partialSpringToKeep] ==
+                 net.partialToFullSpringIndex[partialSpringToRemove]);
 
           // update some values
           springPartitions[partialSpringToKeep] +=
@@ -1362,23 +1364,38 @@ namespace calc {
         net.springsContourLength[removedSpringIdx];
       pylimer_tools::utils::removeRow(net.springsContourLength,
                                       removedSpringIdx);
+      assert(net.springsContourLength.size() == net.nrOfSprings);
+      // and spring partitions
       springPartitions[remainingPartialSpringIdx] +=
         springPartitions[removedPartialSpringIdx];
+
       pylimer_tools::utils::removeRow(springPartitions,
                                       removedPartialSpringIdx);
+      assert(springPartitions.size() == net.nrOfPartialSprings);
+      size_t newKeptSpringIdx =
+        keptSpringIdx < removedSpringIdx ? keptSpringIdx : (keptSpringIdx - 1);
+      // addmittedly, this is possibly dangerous, as it could hide
+      // other mistakes
+      double newTotalForNormalization =
+        springPartitions(net.localToGlobalSpringIndex[newKeptSpringIdx]).sum();
       for (size_t globalPartSpringIndex :
-           net.localToGlobalSpringIndex[keptSpringIdx < removedSpringIdx
-                                          ? keptSpringIdx
-                                          : keptSpringIdx - 1]) {
+           net.localToGlobalSpringIndex[newKeptSpringIdx]) {
         springPartitions[globalPartSpringIndex] *=
-          contourLengthBefore /
-          net.springsContourLength[keptSpringIdx];
+          1. / newTotalForNormalization;
       }
+
       // std::cout << "Removed springs around " << linkToReduce << " with spring
       // "
       //           << removedSpringIdx << " and partial "
       //           << removedPartialSpringIdx << ", keeping " << keptSpringIdx
       //           << " and " << remainingPartialSpringIdx << std::endl;
+      // std::cout << "Spring partitions sum to " << springPartitions.sum()
+      //           << " for " << net.nrOfSprings
+      //           << " springs, contour length before was " <<
+      //           contourLengthBefore
+      //           << " and is now " <<
+      //           net.springsContourLength[newKeptSpringIdx]
+      //           << std::endl;
     }
 
     /**

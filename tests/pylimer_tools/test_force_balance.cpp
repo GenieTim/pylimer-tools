@@ -787,6 +787,28 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
     CHECK(numInactiveRemoved > 0);
     REQUIRE_NOTHROW(
       forceBalancer.validateNetwork(net, displacements, partitions));
+
+    ////////////////////////////////////////////////////////////////
+    forceBalancer = pcm::MEHPForceBalance(universe, 2, true, 1.0, true);
+    nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(1000, 2.0, 100);
+    REQUIRE(nrOfAddedLinks >= 100);
+    std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+
+    // run a while to get inactive links
+    forceBalancer.runForceRelaxation(pcm::BalanceRunMode::ITERATIVE, 1.0, 100);
+    net = forceBalancer.getNetwork();
+    displacements = forceBalancer.getCurrentDisplacements();
+    partitions = forceBalancer.getSpringPartitions();
+    // due to the randomness, it _could_ be one day that actually all strands
+    // are active. unlikely, but I can imagine it to be possible.
+    numInactiveRemoved = forceBalancer.removeInactiveCrosslinks(
+      net, displacements, partitions, 0.1);
+    CHECK(numInactiveRemoved > 0);
+    numInactiveRemoved = forceBalancer.removeTwofunctionalCrosslinks(
+      net, displacements, partitions);
+    CHECK(numInactiveRemoved > 0);
+    REQUIRE_NOTHROW(
+      forceBalancer.validateNetwork(net, displacements, partitions));
   }
 }
 
