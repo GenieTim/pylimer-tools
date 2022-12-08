@@ -826,6 +826,16 @@ namespace calc {
               net.springIndicesOfLinks[affectedLinkIdx].end(),
               std::string(", ")) +
             ".");
+        if (net.linkIsSliplink[affectedLinkIdx]) {
+          RUNTIME_EXP_IFN(
+            net.springIndicesOfLinks[affectedLinkIdx].size() <= 2,
+            "Expect slip-link to be associated with 2 springs only, got " +
+              pylimer_tools::utils::join(
+                net.linkIsSliplink[affectedLinkIdx].begin(),
+                net.linkIsSliplink[affectedLinkIdx].end(),
+                std::string(", ")) +
+              ".");
+        }
 
         for (int i = net.springIndicesOfLinks[affectedLinkIdx].size() - 1;
              i >= 0;
@@ -846,6 +856,16 @@ namespace calc {
                             net.springIndicesOfLinks[affectedLinkIdx].end(),
                             std::string(", ")) +
                           ".");
+        if (net.linkIsSliplink[affectedLinkIdx]) {
+          RUNTIME_EXP_IFN(
+            net.springIndicesOfLinks[affectedLinkIdx].size() <= 1,
+            "Expect slip-link to be associated with 1 springs only after removing one, got " +
+              pylimer_tools::utils::join(
+                net.linkIsSliplink[affectedLinkIdx].begin(),
+                net.linkIsSliplink[affectedLinkIdx].end(),
+                std::string(", ")) +
+              ".");
+        }
       }
 
       std::vector<size_t> affectedPartialSprings =
@@ -934,7 +954,7 @@ namespace calc {
         linksToRemove.begin(), linksToRemove.end(), std::greater<size_t>());
       linksToRemove.erase(
         std::unique(linksToRemove.begin(), linksToRemove.end()),
-        uniqueAffectedLinks.end());
+        linksToRemove.end());
 
       for (size_t outermostI = 0; outermostI < linksToRemove.size();
            ++outermostI) {
@@ -1015,18 +1035,20 @@ namespace calc {
               removedIsA ? net.springPartIndexB[partialSpringToRemove]
                          : net.springPartIndexA[partialSpringToRemove];
             net.springPartCoordinateIndexA.segment(3 * partialSpringToKeep, 3) =
-              removedIsA
-                ? net.springPartCoordinateIndexB.segment(3 * partialSpringToRemove, 3)
-                : net.springPartCoordinateIndexA.segment(3 * partialSpringToRemove, 3);
+              removedIsA ? net.springPartCoordinateIndexB.segment(
+                             3 * partialSpringToRemove, 3)
+                         : net.springPartCoordinateIndexA.segment(
+                             3 * partialSpringToRemove, 3);
           }
           if (net.springPartIndexB[partialSpringToKeep] == slipLinkIdx) {
             net.springPartIndexB[partialSpringToKeep] =
               removedIsA ? net.springPartIndexB[partialSpringToRemove]
                          : net.springPartIndexA[partialSpringToRemove];
             net.springPartCoordinateIndexB.segment(3 * partialSpringToKeep, 3) =
-              removedIsA
-                ? net.springPartCoordinateIndexB.segment(3 * partialSpringToRemove, 3)
-                : net.springPartCoordinateIndexA.segment(3 * partialSpringToRemove, 3);
+              removedIsA ? net.springPartCoordinateIndexB.segment(
+                             3 * partialSpringToRemove, 3)
+                         : net.springPartCoordinateIndexA.segment(
+                             3 * partialSpringToRemove, 3);
           }
 
           // remove stuff
