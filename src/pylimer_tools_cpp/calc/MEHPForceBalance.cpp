@@ -825,7 +825,7 @@ namespace calc {
              --springInLinkIdx) {
           assert(springsOfLink[springInLinkIdx] != springIdx);
           for (size_t partialSpringIdx :
-               net.localToGlobalSpringIndex[springInLinkIdx]) {
+               net.localToGlobalSpringIndex[springsOfLink[springInLinkIdx]]) {
             if (net.springPartIndexA[partialSpringIdx] == slipLinkIdx ||
                 net.springPartIndexB[partialSpringIdx] == slipLinkIdx) {
               involvedPartialSprings.push_back(partialSpringIdx);
