@@ -757,8 +757,8 @@ namespace calc {
         if (!isActive) {
           // remove this spring
           this->removeSpring(net, displacements, springPartitions, springIdx);
-          std::cout << "Removed spring " << springIdx << std::endl;
-          this->validateNetwork(net, displacements, springPartitions);
+          // std::cout << "Removed spring " << springIdx << std::endl;
+          // this->validateNetwork(net, displacements, springPartitions);
           numRemoved += 1;
         }
       }
@@ -768,11 +768,12 @@ namespace calc {
            --crosslinkIdx) {
         if (net.springIndicesOfLinks[crosslinkIdx].size() == 0) {
           this->removeLink(net, displacements, crosslinkIdx);
-          std::cout << "Removed link " << crosslinkIdx << std::endl;
-
-          this->validateNetwork(net, displacements, springPartitions);
+          // std::cout << "Removed link " << crosslinkIdx << std::endl;
+          // this->validateNetwork(net, displacements, springPartitions);
         }
       }
+
+      this->validateNetwork(net, displacements, springPartitions);
 
       return numRemoved;
     }
@@ -829,7 +830,17 @@ namespace calc {
             }
           }
         }
-        RUNTIME_EXP_IFN(involvedPartialSprings.size() >= springsOfLink.size(), "Expected more or equal number of partial springs ("+std::to_string(involvedPartialSprings.size())+") than springs ("+std::to_string()+").");
+        RUNTIME_EXP_IFN(
+          involvedPartialSprings.size() >= springsOfLink.size(),
+          "Expected more or equal number of partial springs (" +
+            std::to_string(involvedPartialSprings.size()) + "; " +
+            pylimer_tools::utils::join(involvedPartialSprings.begin(),
+                                       involvedPartialSprings.end(),
+                                       std::string(", ")) +
+            ") than springs (" + std::to_string(springsOfLink.size()) + "; " +
+            pylimer_tools::utils::join(
+              springsOfLink.begin(), springsOfLink.end(), std::string(", ")) +
+            ").");
         // RUNTIME_EXP_IFN(springsOfLink.size() % 2 == 0, "Expected link to have
         // an even number of components, got " +
         // std::to_string(springsOfLink.size()) + ".");
@@ -1402,18 +1413,19 @@ namespace calc {
                                springsToMerge[1],
                                crosslinkIdx);
 
-            this->validateNetwork(net, displacements, springPartitions);
+            // this->validateNetwork(net, displacements, springPartitions);
 
             this->removeLink(net, displacements, crosslinkIdx);
 
             // std::cout << "Removed cross-link " << crosslinkIdx << std::endl;
 
-            this->validateNetwork(net, displacements, springPartitions);
+            // this->validateNetwork(net, displacements, springPartitions);
             numRemoved += 1;
           }
           // else: TODO: decide
         }
       }
+            this->validateNetwork(net, displacements, springPartitions);
       return numRemoved;
     }
 
