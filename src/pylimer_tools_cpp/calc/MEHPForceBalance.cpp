@@ -212,13 +212,18 @@ namespace calc {
             // default tolerance: 0.25*atom's cube length
             double removalTolerance =
               0.25 * std::pow(net.vol / this->universe.getNrOfAtoms(), 1. / 3.);
-            this->removeInactiveCrosslinks(
+            size_t nRemoved = this->removeInactiveCrosslinks(
               net, u, springPartitions, removalTolerance);
             net.meanSpringContourLength = net.springsContourLength.mean();
+            std::cout << "Removed " << nRemoved << " inactive springs. "
+                      << std::endl;
           }
           if (remove2functionalCrosslinkers) {
-            this->removeTwofunctionalCrosslinks(net, u, springPartitions);
+            size_t nRemoved =
+              this->removeTwofunctionalCrosslinks(net, u, springPartitions);
             net.meanSpringContourLength = net.springsContourLength.mean();
+            std::cout << "Removed " << nRemoved << " cross-linkers with f = 2. "
+                      << std::endl;
           }
         }
         if (iterationsDone % 50 == 0) {
@@ -1352,6 +1357,7 @@ namespace calc {
       }
 
       // handle contour lengths
+      double contourLengthBefore = net.springsContourLength[keptSpringIdx];
       net.springsContourLength[keptSpringIdx] +=
         net.springsContourLength[removedSpringIdx];
       pylimer_tools::utils::removeRow(net.springsContourLength,
@@ -1365,7 +1371,8 @@ namespace calc {
                                           ? keptSpringIdx
                                           : keptSpringIdx - 1]) {
         springPartitions[globalPartSpringIndex] *=
-          0.5; // TODO: this may be inaccurate
+          contourLengthBefore /
+          net.springsContourLength[keptSpringIdx];
       }
       // std::cout << "Removed springs around " << linkToReduce << " with spring
       // "
@@ -1427,7 +1434,7 @@ namespace calc {
           // else: TODO: decide
         }
       }
-            this->validateNetwork(net, displacements, springPartitions);
+      this->validateNetwork(net, displacements, springPartitions);
       return numRemoved;
     }
 
