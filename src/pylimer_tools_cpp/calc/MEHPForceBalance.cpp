@@ -946,7 +946,7 @@ namespace calc {
                           std::to_string(springsOfLink.size()) + " due to " +
                           pylimer_tools::utils::join(springsOfLink.begin(),
                                                      springsOfLink.end(),
-                                                     std::string(",")) +
+                                                     std::string(", ")) +
                           ".");
         std::vector<size_t> involvedPartialSprings;
         involvedPartialSprings.reserve(2);
@@ -1013,8 +1013,8 @@ namespace calc {
                          : net.springPartIndexA[partialSpringToRemove];
             net.springPartCoordinateIndexA.segment(3 * partialSpringToKeep, 3) =
               removedIsA
-                ? net.springPartIndexB.segment(3 * partialSpringToRemove, 3)
-                : net.springPartIndexA.segment(3 * partialSpringToRemove, 3);
+                ? net.springPartCoordinateIndexB.segment(3 * partialSpringToRemove, 3)
+                : net.springPartCoordinateIndexA.segment(3 * partialSpringToRemove, 3);
           }
           if (net.springPartIndexB[partialSpringToKeep] == slipLinkIdx) {
             net.springPartIndexB[partialSpringToKeep] =
@@ -1022,8 +1022,8 @@ namespace calc {
                          : net.springPartIndexA[partialSpringToRemove];
             net.springPartCoordinateIndexB.segment(3 * partialSpringToKeep, 3) =
               removedIsA
-                ? net.springPartIndexB.segment(3 * partialSpringToRemove, 3)
-                : net.springPartIndexA.segment(3 * partialSpringToRemove, 3);
+                ? net.springPartCoordinateIndexB.segment(3 * partialSpringToRemove, 3)
+                : net.springPartCoordinateIndexA.segment(3 * partialSpringToRemove, 3);
           }
 
           // remove stuff
