@@ -206,7 +206,21 @@ namespace calc {
                     << intermediateResidual * minN * minN << " ("
                     << (intermediateResidual / initialResidual) << ") "
                     << "\n";
-          if (iterationsDone % 50 == 0) {
+        }
+        if (iterationsDone % 10) {
+          if (removeInactiveCrosslinks) {
+            // default tolerance: 0.25*atom's cube length
+            double removalTolerance =
+              0.25 * std::pow(net.vol / this->universe.getNrOfAtoms(), 1. / 3.);
+            this->removeInactiveCrosslinks(
+              net, u, springPartitions, removalTolerance);
+          }
+          if (remove2functionalCrosslinkers) {
+            this->removeTwofunctionalCrosslinks(net, u, springPartitions);
+          }
+        }
+        if (iterationsDone % 50 == 0) {
+          if (outputFrequency > 0) {
             std::array<std::array<double, 3>, 3> stressTensor =
               this->evaluateStressTensor(net,
                                          u,
@@ -745,6 +759,7 @@ namespace calc {
           this->removeSpring(net, displacements, springPartitions, springIdx);
           std::cout << "Removed spring " << springIdx << std::endl;
           this->validateNetwork(net, displacements, springPartitions);
+          numRemoved += 1;
         }
       }
 
@@ -814,6 +829,7 @@ namespace calc {
             }
           }
         }
+        RUNTIME_EXP_IFN(involvedPartialSprings.size() >= springsOfLink.size(), "Expected more or equal number of partial springs ("+std::to_string(involvedPartialSprings.size())+") than springs ("+std::to_string()+").");
         // RUNTIME_EXP_IFN(springsOfLink.size() % 2 == 0, "Expected link to have
         // an even number of components, got " +
         // std::to_string(springsOfLink.size()) + ".");
@@ -890,6 +906,8 @@ namespace calc {
             }
           }
         }
+
+        assert(net.springIndicesOfLinks[slipLinkIdx].empty());
 
         // then, actually remove the slip-link
         this->removeLink(net, displacements, slipLinkIdx);
