@@ -214,9 +214,11 @@ namespace calc {
               0.25 * std::pow(net.vol / this->universe.getNrOfAtoms(), 1. / 3.);
             this->removeInactiveCrosslinks(
               net, u, springPartitions, removalTolerance);
+            net.meanSpringContourLength = net.springsContourLength.mean();
           }
           if (remove2functionalCrosslinkers) {
             this->removeTwofunctionalCrosslinks(net, u, springPartitions);
+            net.meanSpringContourLength = net.springsContourLength.mean();
           }
         }
         if (iterationsDone % 50 == 0) {
