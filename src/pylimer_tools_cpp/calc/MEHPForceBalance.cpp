@@ -204,6 +204,7 @@ namespace calc {
           this->getDisplacementResidualNormFor(net, u, oneOverSpringPartitions);
         if (iterationsDone % 10 == 0) {
           if (removeInactiveCrosslinks) {
+            std::cout << "Removing inactive cross-links" << std::endl;
             // default tolerance: 0.25*atom's cube length
             double removalTolerance =
               0.25 * std::pow(net.vol / this->universe.getNrOfAtoms(), 1. / 3.);
@@ -214,6 +215,7 @@ namespace calc {
                       << std::endl;
           }
           if (remove2functionalCrosslinkers) {
+            std::cout << "Removing 2-f cross-links" << std::endl;
             size_t nRemoved =
               this->removeTwofunctionalCrosslinks(net, u, springPartitions);
             net.meanSpringContourLength = net.springsContourLength.mean();
@@ -1331,11 +1333,13 @@ namespace calc {
           assert(removedSpringsLinks[0] == linkToReduce);
           net.linkIndicesOfSprings[keptSpringIdx][0] = removedSpringsLinks[1];
           // have to insert it reverse order
+          // happens automatically if we always insert the next the start
           for (size_t i = 2; i < removedSpringsLinks.size(); ++i) {
             net.linkIndicesOfSprings[keptSpringIdx].insert(
               net.linkIndicesOfSprings[keptSpringIdx].begin(),
               removedSpringsLinks[i]);
           }
+          // skip the first (removed) partial spring
           for (size_t i = 1;
                i < net.localToGlobalSpringIndex[removedSpringIdx].size();
                ++i) {
@@ -3014,6 +3018,16 @@ namespace calc {
       RUNTIME_EXP_IFN(net.partialToFullSpringIndex.maxCoeff() < net.nrOfSprings,
                       "Partial spring must map to full spring, which must have "
                       "a lower index.")
+      /**
+       * Test maximum values
+       */
+      RUNTIME_EXP_IFN(net.partialToFullSpringIndex.maxCoeff() < net.nrOfSprings, "Partial must map to full springs, which are less.");
+      RUNTIME_EXP_IFN(net.springPartCoordinateIndexA.maxCoeff() < 3*net.nrOfLinks, "Part coordinates must map to coordinates.");
+      RUNTIME_EXP_IFN(net.springPartCoordinateIndexB.maxCoeff() < 3*net.nrOfLinks, "Part coordinates must map to coordinates.");
+      RUNTIME_EXP_IFN(net.springPartIndexA.maxCoeff() < net.nrOfLinks, "Part indices must map to links.");
+      RUNTIME_EXP_IFN(net.springPartIndexB.maxCoeff() < net.nrOfLinks, "Part indices must map to links.");
+      RUNTIME_EXP_IFN(net.springIndexA.maxCoeff() < net.nrOfNodes, "Full springs must consist of cross-links only.");
+      RUNTIME_EXP_IFN(net.springIndexB.maxCoeff() < net.nrOfNodes, "Full springs must consist of cross-links only.");
       /**
        * Test spring partition assumptions
        */
