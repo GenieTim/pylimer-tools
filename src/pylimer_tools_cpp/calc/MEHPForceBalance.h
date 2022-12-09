@@ -98,11 +98,12 @@ namespace calc {
        * @return double
        */
       double computePartitionUpdateZeroResidual(
+        const ForceBalanceNetwork& net,
         const std::vector<size_t> involvedPartitions,
         const size_t link_idx,
         const Eigen::VectorXd& displacements,
         Eigen::VectorXd& springPartitions,
-        double oneOverSpringPartitionUpperLimit = 1.0)
+        double oneOverSpringPartitionUpperLimit = 1.0) const
       {
         // TODO: revise, hard!
         assert(involvedPartitions.size() == 4);
@@ -127,7 +128,7 @@ namespace calc {
         // this->displaceToMeanPosition(
         //   this->initialConfig, displacements, springPartitions, link_idx);
         double retVal =
-          this->updateSpringPartition(this->initialConfig,
+          this->updateSpringPartition(net,
                                       displacements,
                                       springPartitions,
                                       link_idx,
@@ -475,6 +476,7 @@ namespace calc {
         double rOverr0 = 0.0;
         double r2 = 0.0;
         double r02 = this->computePartitionUpdateZeroResidual(
+          this->initialConfig,
           this->getSpringpartitionIndicesOfSliplink(this->initialConfig,
                                                     link_idx),
           link_idx,
