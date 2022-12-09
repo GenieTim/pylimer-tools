@@ -831,8 +831,8 @@ namespace calc {
             net.springIndicesOfLinks[affectedLinkIdx].size() <= 2,
             "Expect slip-link to be associated with 2 springs only, got " +
               pylimer_tools::utils::join(
-                net.linkIsSliplink[affectedLinkIdx].begin(),
-                net.linkIsSliplink[affectedLinkIdx].end(),
+                net.springIndicesOfLinks[affectedLinkIdx].begin(),
+                net.springIndicesOfLinks[affectedLinkIdx].end(),
                 std::string(", ")) +
               ".");
         }
@@ -857,14 +857,14 @@ namespace calc {
                             std::string(", ")) +
                           ".");
         if (net.linkIsSliplink[affectedLinkIdx]) {
-          RUNTIME_EXP_IFN(
-            net.springIndicesOfLinks[affectedLinkIdx].size() <= 1,
-            "Expect slip-link to be associated with 1 springs only after removing one, got " +
-              pylimer_tools::utils::join(
-                net.linkIsSliplink[affectedLinkIdx].begin(),
-                net.linkIsSliplink[affectedLinkIdx].end(),
-                std::string(", ")) +
-              ".");
+          RUNTIME_EXP_IFN(net.springIndicesOfLinks[affectedLinkIdx].size() <= 1,
+                          "Expect slip-link to be associated with 1 springs "
+                          "only after removing one, got " +
+                            pylimer_tools::utils::join(
+                              net.springIndicesOfLinks[affectedLinkIdx].begin(),
+                              net.springIndicesOfLinks[affectedLinkIdx].end(),
+                              std::string(", ")) +
+                            ".");
         }
       }
 
@@ -1597,7 +1597,8 @@ namespace calc {
       INVALIDARG_EXP_IFN(linkIdx < net.springIndicesOfLinks.size(),
                          "Link to update needs to be in the list");
       INVALIDARG_EXP_IFN(net.linkIsSliplink[linkIdx],
-                         "Only slip-links may slip along a spring");
+                         "Only slip-links may slip along a spring, link " +
+                           std::to_string(linkIdx) + " is not one.");
       std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
       double residualNorm = 0.0;
       int residualNormContributions = 0;
@@ -3006,6 +3007,9 @@ namespace calc {
        * Test reversibility of link <-> spring mapping
        */
       for (size_t link_idx = 0; link_idx < net.nrOfLinks; ++link_idx) {
+        RUNTIME_EXP_IFN(
+          net.linkIsSliplink[link_idx] == link_idx > net.nrOfNodes,
+          "Expected slip-links to come sequentially after cross-links.");
         std::vector<size_t> thisLinksSprings =
           net.springIndicesOfLinks[link_idx];
         for (size_t spring_idx : thisLinksSprings) {
