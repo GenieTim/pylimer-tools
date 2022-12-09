@@ -108,6 +108,7 @@ namespace calc {
         // place slip-link
         for (size_t link_idx = net.nrOfNodes; link_idx < net.nrOfLinks;
              ++link_idx) {
+          // std::cout << "Handling " << link_idx << " of " << net.nrOfNodes << " / " << net.nrOfLinks << std::endl;
           this->setSpringpartitionIndicesOfSliplink(
             relevantPartitionIndices, net, link_idx);
           assert(relevantPartitionIndices.size() == 4);
@@ -116,6 +117,7 @@ namespace calc {
           double rOverr0 = 0.0;
           double r2 = 0.0;
           double r02 = this->computePartitionUpdateZeroResidual(
+            net,
             relevantPartitionIndices,
             link_idx,
             u,
@@ -123,7 +125,9 @@ namespace calc {
             oneOverSpringPartitionUpperLimit);
 
           bool allAtEnd = false;
-          int flags = 0;
+          int flags = 0;          
+          // std::cout << "Still handling " << link_idx << " of " << net.nrOfNodes << " / " << net.nrOfLinks << std::endl;
+
           do {
             r2 = this->updateSpringPartition(net,
                                              u,
@@ -213,6 +217,7 @@ namespace calc {
             net.meanSpringContourLength = net.springsContourLength.mean();
             std::cout << "Removed " << nRemoved << " cross-linkers with f = 2. "
                       << std::endl;
+            this->validateNetwork(net, u, springPartitions);
           }
         }
         if (iterationsDone % 50 == 0) {
@@ -229,7 +234,6 @@ namespace calc {
             std::cout << "Total inner: " << totalInnerIterationsDone << "\n";
           }
         }
-        iterationsDone += 1;
         if (outputFrequency > 0 && iterationsDone % outputFrequency == 0) {
           std::cout << "Iteration " << iterationsDone << " " << maxDistanceMoved
                     << " by " << indexOfMaxDistanceMoved
@@ -240,6 +244,7 @@ namespace calc {
                     << (intermediateResidual / initialResidual) << ") "
                     << "\n";
         }
+        iterationsDone += 1;
       } while (currentResidual / initialResidual > xtol &&
                iterationsDone < maxNrOfSteps);
 
@@ -763,10 +768,10 @@ namespace calc {
         }
         if (!isActive) {
           // remove this spring
-          std::cout << "Removing spring " << springIdx << std::endl;
-          this->validateNetwork(net, displacements, springPartitions);
+          // std::cout << "Removing spring " << springIdx << std::endl;
+          // this->validateNetwork(net, displacements, springPartitions);
           this->removeSpring(net, displacements, springPartitions, springIdx);
-          this->validateNetwork(net, displacements, springPartitions);
+          // this->validateNetwork(net, displacements, springPartitions);
           numRemoved += 1;
         }
       }
@@ -775,9 +780,9 @@ namespace calc {
       for (long int crosslinkIdx = net.nrOfNodes - 1; crosslinkIdx >= 0;
            --crosslinkIdx) {
         if (net.springIndicesOfLinks[crosslinkIdx].size() == 0) {
-          std::cout << "Removing x-link " << crosslinkIdx << std::endl;
+          // std::cout << "Removing x-link " << crosslinkIdx << std::endl;
           this->removeLink(net, displacements, crosslinkIdx);
-          this->validateNetwork(net, displacements, springPartitions);
+          // this->validateNetwork(net, displacements, springPartitions);
         }
       }
 
@@ -798,7 +803,7 @@ namespace calc {
                                         Eigen::VectorXd& springPartitions,
                                         const size_t springIdx) const
     {
-      std::cout << "Starting to remove spring " << springIdx << std::endl;
+      // std::cout << "Starting to remove spring " << springIdx << std::endl;
       INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
                          "Can only remove springs, not partial springs.");
       std::vector<size_t> affectedLinks = net.linkIndicesOfSprings[springIdx];
@@ -1113,10 +1118,10 @@ namespace calc {
         assert(net.springIndicesOfLinks[slipLinkIdx].empty());
 
         // then, actually remove the slip-link
-        std::cout << "Removing link " << slipLinkIdx << std::endl;
+        // std::cout << "Removing link " << slipLinkIdx << std::endl;
         this->removeLink(net, displacements, slipLinkIdx);
       }
-      std::cout << "Removed spring " << springIdx << std::endl;
+      // std::cout << "Removed spring " << springIdx << std::endl;
     }
 
     void MEHPForceBalance::removeLink(ForceBalanceNetwork& net,
@@ -1594,13 +1599,16 @@ namespace calc {
       const size_t linkIdx,
       double oneOverSpringPartitionUpperLimit) const
     {
+      // std::cout << "Updating spring partition " << linkIdx << " of " << net.nrOfNodes << " / " << net.nrOfLinks << std::endl;
+
       INVALIDARG_EXP_IFN(linkIdx < net.springIndicesOfLinks.size(),
                          "Link to update needs to be in the list");
       INVALIDARG_EXP_IFN(net.linkIsSliplink[linkIdx],
                          "Only slip-links may slip along a spring, link " +
                            std::to_string(linkIdx) +
                            " is not one. Network has " +
-                           std::to_string(net.nrOfNodes) + " cross- of " + std::to_string(net.nrOfLinks) + " links.");
+                           std::to_string(net.nrOfNodes) + " cross- of " +
+                           std::to_string(net.nrOfLinks) + " links.");
       std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
       double residualNorm = 0.0;
       int residualNormContributions = 0;
@@ -2953,7 +2961,7 @@ namespace calc {
       RUNTIME_EXP_IFN(net.linkIsSliplink.size() == net.nrOfLinks,
                       "Invalid size of link is sliplink");
       RUNTIME_EXP_IFN(
-        net.linkIsSliplink.count() == net.nrOfLinks - net.nrOfNodes,
+        net.linkIsSliplink.count() == (net.nrOfLinks - net.nrOfNodes),
         "Nr of nodes plus nr of slp-links should give the total nr of links");
       RUNTIME_EXP_IFN(net.oldAtomIds.size() == net.nrOfNodes,
                       "Invalid size of old atom ids");
