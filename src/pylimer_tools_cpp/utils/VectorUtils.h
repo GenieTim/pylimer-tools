@@ -57,7 +57,7 @@ namespace utils {
                                 unsigned int nrOfRowsToRemove)                 \
   {                                                                            \
     INVALIDARG_EXP_IFN(                                                        \
-      vec.size() > rowToStartRemove + nrOfRowsToRemove,                        \
+      vec.size() >= rowToStartRemove + nrOfRowsToRemove,                        \
       "Cannot remove rows " + std::to_string(nrOfRowsToRemove) + " from " +    \
         std::to_string(rowToStartRemove) + " from vector with size " +         \
         std::to_string(vec.size()) + "!");                                     \
