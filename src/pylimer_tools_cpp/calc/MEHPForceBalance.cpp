@@ -196,17 +196,6 @@ namespace calc {
           net, springPartitions, oneOverSpringPartitionUpperLimit);
         currentResidual =
           this->getDisplacementResidualNormFor(net, u, oneOverSpringPartitions);
-        iterationsDone += 1;
-        if (outputFrequency > 0 && iterationsDone % outputFrequency == 0) {
-          std::cout << "Iteration " << iterationsDone << " " << maxDistanceMoved
-                    << " by " << indexOfMaxDistanceMoved
-                    << ". Residual: " << currentResidual * minN * minN << " ("
-                    << (currentResidual / initialResidual) << ") "
-                    << " from: " << initialResidual * minN * minN << " via "
-                    << intermediateResidual * minN * minN << " ("
-                    << (intermediateResidual / initialResidual) << ") "
-                    << "\n";
-        }
         if (iterationsDone % 10) {
           if (removeInactiveCrosslinks) {
             // default tolerance: 0.25*atom's cube length
@@ -239,6 +228,17 @@ namespace calc {
                       << stressTensor[2][2] << " with ";
             std::cout << "Total inner: " << totalInnerIterationsDone << "\n";
           }
+        }
+        iterationsDone += 1;
+        if (outputFrequency > 0 && iterationsDone % outputFrequency == 0) {
+          std::cout << "Iteration " << iterationsDone << " " << maxDistanceMoved
+                    << " by " << indexOfMaxDistanceMoved
+                    << ". Residual: " << currentResidual * minN * minN << " ("
+                    << (currentResidual / initialResidual) << ") "
+                    << " from: " << initialResidual * minN * minN << " via "
+                    << intermediateResidual * minN * minN << " ("
+                    << (intermediateResidual / initialResidual) << ") "
+                    << "\n";
         }
       } while (currentResidual / initialResidual > xtol &&
                iterationsDone < maxNrOfSteps);
@@ -1598,7 +1598,9 @@ namespace calc {
                          "Link to update needs to be in the list");
       INVALIDARG_EXP_IFN(net.linkIsSliplink[linkIdx],
                          "Only slip-links may slip along a spring, link " +
-                           std::to_string(linkIdx) + " is not one.");
+                           std::to_string(linkIdx) +
+                           " is not one. Network has " +
+                           std::to_string(net.nrOfNodes) + " cross- of " + std::to_string(net.nrOfLinks) + " links.");
       std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
       double residualNorm = 0.0;
       int residualNormContributions = 0;
@@ -3008,7 +3010,7 @@ namespace calc {
        */
       for (size_t link_idx = 0; link_idx < net.nrOfLinks; ++link_idx) {
         RUNTIME_EXP_IFN(
-          net.linkIsSliplink[link_idx] == link_idx > net.nrOfNodes,
+          net.linkIsSliplink[link_idx] == (link_idx >= net.nrOfNodes),
           "Expected slip-links to come sequentially after cross-links.");
         std::vector<size_t> thisLinksSprings =
           net.springIndicesOfLinks[link_idx];
