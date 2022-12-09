@@ -108,8 +108,8 @@ namespace calc {
         // place slip-link
         for (size_t link_idx = net.nrOfNodes; link_idx < net.nrOfLinks;
              ++link_idx) {
-          std::cout << "Handling " << link_idx << " of " << net.nrOfNodes
-                    << " / " << net.nrOfLinks << std::endl;
+          // std::cout << "Handling " << link_idx << " of " << net.nrOfNodes
+          //           << " / " << net.nrOfLinks << std::endl;
           this->setSpringpartitionIndicesOfSliplink(
             relevantPartitionIndices, net, link_idx);
           assert(relevantPartitionIndices.size() == 4);
@@ -127,8 +127,8 @@ namespace calc {
 
           bool allAtEnd = false;
           int flags = 0;
-          std::cout << "Still handling " << link_idx << " of " << net.nrOfNodes
-                    << " / " << net.nrOfLinks << std::endl;
+          // std::cout << "Still handling " << link_idx << " of " << net.nrOfNodes
+          //           << " / " << net.nrOfLinks << std::endl;
 
           do {
             r2 = this->updateSpringPartition(net,
@@ -770,7 +770,7 @@ namespace calc {
         }
         if (!isActive) {
           // remove this spring
-          std::cout << "Removing spring " << springIdx << std::endl;
+          // std::cout << "Removing spring " << springIdx << std::endl;
           // this->validateNetwork(net, displacements, springPartitions);
           this->removeSpring(net, displacements, springPartitions, springIdx);
           // this->validateNetwork(net, displacements, springPartitions);
@@ -782,7 +782,7 @@ namespace calc {
       for (long int crosslinkIdx = net.nrOfNodes - 1; crosslinkIdx >= 0;
            --crosslinkIdx) {
         if (net.springIndicesOfLinks[crosslinkIdx].size() == 0) {
-          std::cout << "Removing x-link " << crosslinkIdx << std::endl;
+          // std::cout << "Removing x-link " << crosslinkIdx << std::endl;
           this->removeLink(net, displacements, crosslinkIdx);
           // this->validateNetwork(net, displacements, springPartitions);
         }
@@ -805,7 +805,7 @@ namespace calc {
                                         Eigen::VectorXd& springPartitions,
                                         const size_t springIdx) const
     {
-      std::cout << "Starting to remove spring " << springIdx << std::endl;
+      // std::cout << "Starting to remove spring " << springIdx << std::endl;
       INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
                          "Can only remove springs, not partial springs.");
       std::vector<size_t> affectedLinks = net.linkIndicesOfSprings[springIdx];
@@ -1120,10 +1120,10 @@ namespace calc {
         assert(net.springIndicesOfLinks[slipLinkIdx].empty());
 
         // then, actually remove the slip-link
-        std::cout << "Removing link " << slipLinkIdx << std::endl;
+        // std::cout << "Removing link " << slipLinkIdx << std::endl;
         this->removeLink(net, displacements, slipLinkIdx);
       }
-      std::cout << "Removed spring " << springIdx << std::endl;
+      // std::cout << "Removed spring " << springIdx << std::endl;
     }
 
     void MEHPForceBalance::removeLink(ForceBalanceNetwork& net,
@@ -1261,11 +1261,11 @@ namespace calc {
            net.localToGlobalSpringIndex[removedSpringIdx]) {
         net.partialToFullSpringIndex[partialSpringIndex] = keptSpringIdx;
       }
-      std::cout << "Kept spring is "
-                << pylimer_tools::utils::join(keptSpringsLinks.begin(),
-                                              keptSpringsLinks.end(),
-                                              std::string(", "))
-                << std::endl;
+      // std::cout << "Kept spring is "
+      //           << pylimer_tools::utils::join(keptSpringsLinks.begin(),
+      //                                         keptSpringsLinks.end(),
+      //                                         std::string(", "))
+      //           << std::endl;
       // actually merge the springs
       if (keptSpringsLinks[keptSpringsLinks.size() - 1] == linkToReduce) {
         // add to end...
@@ -1330,10 +1330,12 @@ namespace calc {
           // from start
           assert(removedSpringsLinks[0] == linkToReduce);
           net.linkIndicesOfSprings[keptSpringIdx][0] = removedSpringsLinks[1];
-          net.linkIndicesOfSprings[keptSpringIdx].insert(
-            net.linkIndicesOfSprings[keptSpringIdx].begin(),
-            removedSpringsLinks.begin() + 2,
-            removedSpringsLinks.end());
+          // have to insert it reverse order
+          for (size_t i = 2; i < removedSpringsLinks.size(); ++i) {
+            net.linkIndicesOfSprings[keptSpringIdx].insert(
+              net.linkIndicesOfSprings[keptSpringIdx].begin(),
+              removedSpringsLinks[i]);
+          }
           for (size_t i = 1;
                i < net.localToGlobalSpringIndex[removedSpringIdx].size();
                ++i) {
@@ -1560,27 +1562,24 @@ namespace calc {
                    pylimer_tools::utils::last(
                      net.linkIndicesOfSprings[springsToMerge[1]]) ==
                      crosslinkIdx))) {
-            std::cout
-              << "Merging springs " << springsToMerge[0]
-              << " and "
-                           << springsToMerge[1] << std::endl;
-                 // let's remove this
-                 // TODO: this is inefficient shit, so much data being moved
-                 this->mergeSprings(net,
-                                    springPartitions,
-                                    springsToMerge[0],
-                                    springsToMerge[1],
-                                    crosslinkIdx);
+            // std::cout << "Merging springs " << springsToMerge[0] << " and "
+            //           << springsToMerge[1] << std::endl;
+            // let's remove this
+            // TODO: this is inefficient shit, so much data being moved
+            this->mergeSprings(net,
+                               springPartitions,
+                               springsToMerge[0],
+                               springsToMerge[1],
+                               crosslinkIdx);
 
             // this->validateNetwork(net, displacements, springPartitions);
-            std::cout << "Removing link " << crosslinkIdx << std::endl;
+            // std::cout << "Removing link " << crosslinkIdx << std::endl;
             this->removeLink(net, displacements, crosslinkIdx);
 
-            std::cout << "Removed cross-link " << crosslinkIdx <<
-              std::endl;
+            // std::cout << "Removed cross-link " << crosslinkIdx << std::endl;
 
-              // this->validateNetwork(net, displacements, springPartitions);
-              numRemoved += 1;
+            // this->validateNetwork(net, displacements, springPartitions);
+            numRemoved += 1;
           }
           // else: TODO: decide
         }
@@ -1600,11 +1599,11 @@ namespace calc {
       const size_t linkIdx,
       double oneOverSpringPartitionUpperLimit) const
     {
-      std::cout << "Updating spring partition " << linkIdx << " of " <<
-        net.nrOfNodes << " / " << net.nrOfLinks << std::endl;
+      // std::cout << "Updating spring partition " << linkIdx << " of "
+      //           << net.nrOfNodes << " / " << net.nrOfLinks << std::endl;
 
-        INVALIDARG_EXP_IFN(linkIdx < net.springIndicesOfLinks.size(),
-                           "Link to update needs to be in the list");
+      INVALIDARG_EXP_IFN(linkIdx < net.springIndicesOfLinks.size(),
+                         "Link to update needs to be in the list");
       INVALIDARG_EXP_IFN(net.linkIsSliplink[linkIdx],
                          "Only slip-links may slip along a spring, link " +
                            std::to_string(linkIdx) +
@@ -1712,15 +1711,15 @@ namespace calc {
             //   << localResidualNorm
             //                  << std::endl;
 
-                   RUNTIME_EXP_IFN(
-                     APPROX_WITHIN(newS + complementaryS, 0., 1., 1e-10),
-                     "Require newS + complementaryS to be within 0, 1, got " +
-                       std::to_string(newS + complementaryS) + " from " +
-                       std::to_string(newS) + " and " +
-                       std::to_string(complementaryS) +
-                       " with ideal = " + std::to_string(idealValue) + " of " +
-                       std::to_string(nextS + currentS) + " for link " +
-                       std::to_string(linkIdx) + ".");
+            RUNTIME_EXP_IFN(
+              APPROX_WITHIN(newS + complementaryS, 0., 1., 1e-10),
+              "Require newS + complementaryS to be within 0, 1, got " +
+                std::to_string(newS + complementaryS) + " from " +
+                std::to_string(newS) + " and " +
+                std::to_string(complementaryS) +
+                " with ideal = " + std::to_string(idealValue) + " of " +
+                std::to_string(nextS + currentS) + " for link " +
+                std::to_string(linkIdx) + ".");
             RUNTIME_EXP_IFN(
               APPROX_EQUAL(nextS + currentS, newS + complementaryS, 1e-10),
               "Require nextS + currentS == newS + complementaryS, got " +
@@ -1752,27 +1751,27 @@ namespace calc {
             // std::cout
             //   << "Contribution to "
             //   << linkIdx
-                   //           << " from global springs " <<
-                   //           currentSpringGlobalIdx
-                   //           << " (" << springsPartners[partner_idx - 1] <<
-                   //           ") "
-                   //           << vecBack[0] << ", " << vecBack[1] << ", " <<
-                   //           vecBack[2]
-                   //           << " and " << neighbourSpringGlobalIdx << " ("
-                   //           << springsPartners[partner_idx + 1] << ") "
-                   //           << vecForward[0] << ", " << vecForward[1] << ",
-                   //           "
-                   //           << vecForward[2] << "; "
-                   //           << " with " << currentS << ", " << nextS <<
-                   //           std::endl;
-              //        std::cout
-              // << "Distances are " << distanceForward
-              // << ", "
-              //           << distanceBack << " to get ideal value " <<
-              //           idealValue
-              //           << " for " << (nextS) << " , " << currentS <<
-              //           std::endl;
-              residualNorm += localResidualNorm * localResidualNorm;
+            //           << " from global springs " <<
+            //           currentSpringGlobalIdx
+            //           << " (" << springsPartners[partner_idx - 1] <<
+            //           ") "
+            //           << vecBack[0] << ", " << vecBack[1] << ", " <<
+            //           vecBack[2]
+            //           << " and " << neighbourSpringGlobalIdx << " ("
+            //           << springsPartners[partner_idx + 1] << ") "
+            //           << vecForward[0] << ", " << vecForward[1] << ",
+            //           "
+            //           << vecForward[2] << "; "
+            //           << " with " << currentS << ", " << nextS <<
+            //           std::endl;
+            //        std::cout
+            // << "Distances are " << distanceForward
+            // << ", "
+            //           << distanceBack << " to get ideal value " <<
+            //           idealValue
+            //           << " for " << (nextS) << " , " << currentS <<
+            //           std::endl;
+            residualNorm += localResidualNorm * localResidualNorm;
             springPartitions[currentSpringGlobalIdx] = newS;
             springPartitions[neighbourSpringGlobalIdx] = complementaryS;
           }
@@ -1858,17 +1857,17 @@ namespace calc {
             // add to displacement
             double contourLengthFraction = springPartitions[globalSpringIndex];
             // std::cout << "Contribution from " <<
-              // springsPartners[partner_idx]
-              //           << " to " << springsPartners[partner_idx + 1]
-              //           << " with l = " << contourLengthFraction << " and N =
-              //           "
-              //           <<
-              //           net.springsContourLength[springIndices[spring_index]]
-              //           << ", partial distance " << partialDistance[0] << ",
-              //           "
-              //           << partialDistance[1] << ", " << partialDistance[2]
-              //           << std::endl;
-              const double N =
+            // springsPartners[partner_idx]
+            //           << " to " << springsPartners[partner_idx + 1]
+            //           << " with l = " << contourLengthFraction << " and N =
+            //           "
+            //           <<
+            //           net.springsContourLength[springIndices[spring_index]]
+            //           << ", partial distance " << partialDistance[0] << ",
+            //           "
+            //           << partialDistance[1] << ", " << partialDistance[2]
+            //           << std::endl;
+            const double N =
               net.springsContourLength[springIndices[spring_index]];
             double oneOverContourLengthFraction =
               1.0 / (N * contourLengthFraction);
@@ -2935,7 +2934,7 @@ namespace calc {
       const Eigen::VectorXd& u,
       const Eigen::VectorXd& springPartitions) const
     {
-      std::cout << "Validating network..." << std::endl;
+      // std::cout << "Validating network..." << std::endl;
       /**
        * First, test dimensions
        */
@@ -3085,11 +3084,12 @@ namespace calc {
         for (size_t j = 0; j < links.size(); ++j) {
           size_t link_idx = links[j];
           RUNTIME_EXP_IFN(net.linkIsSliplink[link_idx] ==
-                            ((j != 0) && (j != links.size() - 1)),
+                            ((j != 0) && (j != (links.size() - 1))),
                           "Cross-links must be first and last in a spring, "
-                          "slip-links in-between. Found at discrepancy" +
+                          "slip-links in-between. Found discrepancy at " +
                             std::to_string(j) + "/" +
-                            std::to_string(links.size()) + ".")
+                            std::to_string(links.size()) + " in spring " +
+                            std::to_string(i) + ".")
           std::vector<size_t> thisLinksSprings =
             net.springIndicesOfLinks[link_idx];
           RUNTIME_EXP_IFN(
@@ -3177,7 +3177,7 @@ namespace calc {
               " with dir = " + std::to_string(dir) + ".");
         }
       }
-      std::cout << "Validation passed." << std::endl;
+      // std::cout << "Validation passed." << std::endl;
       return true;
     }
   }
