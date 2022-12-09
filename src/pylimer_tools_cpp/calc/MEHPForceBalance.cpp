@@ -200,7 +200,7 @@ namespace calc {
           net, springPartitions, oneOverSpringPartitionUpperLimit);
         currentResidual =
           this->getDisplacementResidualNormFor(net, u, oneOverSpringPartitions);
-        if (iterationsDone % 10) {
+        if (iterationsDone % 10 == 0) {
           if (removeInactiveCrosslinks) {
             // default tolerance: 0.25*atom's cube length
             double removalTolerance =
