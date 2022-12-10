@@ -127,7 +127,8 @@ namespace calc {
 
           bool allAtEnd = false;
           int flags = 0;
-          // std::cout << "Still handling " << link_idx << " of " << net.nrOfNodes
+          // std::cout << "Still handling " << link_idx << " of " <<
+          // net.nrOfNodes
           //           << " / " << net.nrOfLinks << std::endl;
 
           do {
@@ -262,15 +263,21 @@ namespace calc {
                 << maxDistanceMoved << std::endl;
 
       assert(u.size() == 3 * net.nrOfLinks);
+      std::cout << 1 << std::endl;
       this->initialConfig = net;
+      std::cout << 2 << std::endl;
       this->currentDisplacements = u;
+      std::cout << 3 << std::endl;
       this->currentSpringPartitionsVec = springPartitions;
+      std::cout << 4 << std::endl;
       this->validateNetwork();
       this->currentSpringDistances =
         this->evaluateSpringDistances(net, this->currentDisplacements, is2D);
+      std::cout << 5 << std::endl;
       this->currentPartialSpringDistances =
         this->evaluatePartialSpringDistances(
           net, this->currentDisplacements, is2D);
+      std::cout << 6 << std::endl;
     }
 
     double MEHPForceBalance::displaceLinksToMeanPosition(
@@ -3017,17 +3024,26 @@ namespace calc {
         "Every partial spring must be able to map to the full spring.");
       RUNTIME_EXP_IFN(net.partialToFullSpringIndex.maxCoeff() < net.nrOfSprings,
                       "Partial spring must map to full spring, which must have "
-                      "a lower index.")
+                      "a lower index.");
       /**
        * Test maximum values
        */
-      RUNTIME_EXP_IFN(net.partialToFullSpringIndex.maxCoeff() < net.nrOfSprings, "Partial must map to full springs, which are less.");
-      RUNTIME_EXP_IFN(net.springPartCoordinateIndexA.maxCoeff() < 3*net.nrOfLinks, "Part coordinates must map to coordinates.");
-      RUNTIME_EXP_IFN(net.springPartCoordinateIndexB.maxCoeff() < 3*net.nrOfLinks, "Part coordinates must map to coordinates.");
-      RUNTIME_EXP_IFN(net.springPartIndexA.maxCoeff() < net.nrOfLinks, "Part indices must map to links.");
-      RUNTIME_EXP_IFN(net.springPartIndexB.maxCoeff() < net.nrOfLinks, "Part indices must map to links.");
-      RUNTIME_EXP_IFN(net.springIndexA.maxCoeff() < net.nrOfNodes, "Full springs must consist of cross-links only.");
-      RUNTIME_EXP_IFN(net.springIndexB.maxCoeff() < net.nrOfNodes, "Full springs must consist of cross-links only.");
+      RUNTIME_EXP_IFN(net.partialToFullSpringIndex.maxCoeff() < net.nrOfSprings,
+                      "Partial must map to full springs, which are less.");
+      RUNTIME_EXP_IFN(net.springPartCoordinateIndexA.maxCoeff() <
+                        3 * net.nrOfLinks,
+                      "Part coordinates must map to coordinates.");
+      RUNTIME_EXP_IFN(net.springPartCoordinateIndexB.maxCoeff() <
+                        3 * net.nrOfLinks,
+                      "Part coordinates must map to coordinates.");
+      RUNTIME_EXP_IFN(net.springPartIndexA.maxCoeff() < net.nrOfLinks,
+                      "Part indices must map to links.");
+      RUNTIME_EXP_IFN(net.springPartIndexB.maxCoeff() < net.nrOfLinks,
+                      "Part indices must map to links.");
+      RUNTIME_EXP_IFN(net.springIndexA.maxCoeff() < net.nrOfNodes,
+                      "Full springs must consist of cross-links only.");
+      RUNTIME_EXP_IFN(net.springIndexB.maxCoeff() < net.nrOfNodes,
+                      "Full springs must consist of cross-links only.");
       /**
        * Test spring partition assumptions
        */
@@ -3123,7 +3139,7 @@ namespace calc {
         RUNTIME_EXP_IFN(
           APPROX_EQUAL(sum, 1.0, 1e-10),
           "Spring partitions of one spring must sum to one, got " +
-            std::to_string(sum) + ".");
+            std::to_string(sum) + " for spring " + std::to_string(i) + ".");
       }
       /**
        * Test the validity of partial springs and their mapping
