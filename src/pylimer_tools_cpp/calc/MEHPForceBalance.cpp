@@ -253,16 +253,6 @@ namespace calc {
                iterationsDone < maxNrOfSteps);
 
       // query solution & exit reason
-      assert(u.size() == 3 * net.nrOfLinks);
-      this->initialConfig = net;
-      this->currentDisplacements = u;
-      this->currentSpringPartitionsVec = springPartitions;
-      this->currentSpringDistances =
-        this->evaluateSpringDistances(net, this->currentDisplacements, is2D);
-      this->currentPartialSpringDistances =
-        this->evaluatePartialSpringDistances(
-          net, this->currentDisplacements, is2D);
-
       this->exitReason = iterationsDone == maxNrOfSteps
                            ? ExitReason::MAX_STEPS
                            : ExitReason::X_TOLERANCE;
@@ -270,7 +260,17 @@ namespace calc {
       std::cout << iterationsDone << " steps done, " << totalInnerIterationsDone
                 << " inner iterations. Last max distance moved: "
                 << maxDistanceMoved << std::endl;
+
+      assert(u.size() == 3 * net.nrOfLinks);
+      this->initialConfig = net;
+      this->currentDisplacements = u;
+      this->currentSpringPartitionsVec = springPartitions;
       this->validateNetwork();
+      this->currentSpringDistances =
+        this->evaluateSpringDistances(net, this->currentDisplacements, is2D);
+      this->currentPartialSpringDistances =
+        this->evaluatePartialSpringDistances(
+          net, this->currentDisplacements, is2D);
     }
 
     double MEHPForceBalance::displaceLinksToMeanPosition(
