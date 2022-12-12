@@ -41,10 +41,7 @@ namespace calc {
       double damping,
       long int maxNrOfSteps, // default: 10000
       double xtol,
-      long int innerMaxNrOfSteps,
-      double innerAlphaTol,
       const double oneOverSpringPartitionUpperLimit,
-      const int maxFlag,
       const bool shouldRemoveInactiveCrosslinks,
       const bool remove2functionalCrosslinkers,
       const int outputFrequency)
@@ -70,8 +67,6 @@ namespace calc {
       std::vector<Eigen::ArrayXi> independentVertexSets;
       double maxDistanceMoved = 0.0;
       size_t indexOfMaxDistanceMoved = 0;
-      size_t iterationsDone = 0;
-      size_t totalInnerIterationsDone = 0;
       // default = all
       std::vector<Eigen::ArrayXi> independentVertexsSpringSets;
       if (mode == BalanceRunMode::EIGEN_HEURISTIC) {
@@ -98,9 +93,8 @@ namespace calc {
         this->getDisplacementResidualNormFor(net, u, oneOverSpringPartitions);
       double currentResidual = 0.0;
       double intermediateResidual = 0.0;
-      std::vector<size_t> relevantPartitionIndices =
-        pylimer_tools::utils::initializeWithValue<size_t>(4, 0);
       double minN = net.springsContourLength.minCoeff();
+      size_t iterationsDone = 0;
       // actual loop
       do {
         maxDistanceMoved = 0.0;
@@ -110,48 +104,21 @@ namespace calc {
              ++link_idx) {
           // std::cout << "Handling " << link_idx << " of " << net.nrOfNodes
           //           << " / " << net.nrOfLinks << std::endl;
-          this->setSpringpartitionIndicesOfSliplink(
-            relevantPartitionIndices, net, link_idx);
-          assert(relevantPartitionIndices.size() == 4);
-          size_t innerIterationsDone = 0;
-          double displacementDone = 0.0;
-          double rOverr0 = 0.0;
-          double r2 = 0.0;
-          double r02 = this->computePartitionUpdateZeroResidual(
-            net,
-            relevantPartitionIndices,
-            link_idx,
-            u,
-            springPartitions,
-            oneOverSpringPartitionUpperLimit);
 
-          bool allAtEnd = false;
-          int flags = 0;
           // std::cout << "Still handling " << link_idx << " of " <<
           // net.nrOfNodes
           //           << " / " << net.nrOfLinks << std::endl;
-
-          do {
-            r2 = this->updateSpringPartition(net,
-                                             u,
-                                             springPartitions,
-                                             link_idx,
-                                             oneOverSpringPartitionUpperLimit);
-            rOverr0 = r2 / r02;
-            displacementDone =
-              this->displaceToMeanPosition(net,
+          double r2 = this->updateSpringPartition(net,
                                            u,
                                            springPartitions,
                                            link_idx,
                                            oneOverSpringPartitionUpperLimit);
-            innerIterationsDone += 1;
-            flags += (springPartitions(relevantPartitionIndices).array() <
-                      1 / net.meanSpringContourLength)
-                       .count();
-          } while (innerIterationsDone < innerMaxNrOfSteps &&
-                   rOverr0 > innerAlphaTol && std::isfinite(rOverr0) &&
-                   flags < maxFlag);
-          totalInnerIterationsDone += innerIterationsDone;
+          double displacementDone =
+            this->displaceToMeanPosition(net,
+                                         u,
+                                         springPartitions,
+                                         link_idx,
+                                         oneOverSpringPartitionUpperLimit);
         }
         oneOverSpringPartitions = this->assembleOneOverSpringPartition(
           net, springPartitions, oneOverSpringPartitionUpperLimit);
@@ -240,8 +207,7 @@ namespace calc {
                                          oneOverSpringPartitionUpperLimit);
             std::cout << "To stress tensor diagonal: " << stressTensor[0][0]
                       << ", " << stressTensor[1][1] << ", "
-                      << stressTensor[2][2] << " with ";
-            std::cout << "Total inner: " << totalInnerIterationsDone << "\n";
+                      << stressTensor[2][2] << std::endl;
           }
         }
         if (outputFrequency > 0 && iterationsDone % outputFrequency == 0) {
@@ -263,8 +229,8 @@ namespace calc {
                            ? ExitReason::MAX_STEPS
                            : ExitReason::X_TOLERANCE;
       this->nrOfStepsDone += iterationsDone;
-      std::cout << iterationsDone << " steps done, " << totalInnerIterationsDone
-                << " inner iterations. Last max distance moved: "
+      std::cout << iterationsDone << " steps done. "
+                << "Last max distance moved: "
                 << maxDistanceMoved << std::endl;
 
       assert(u.size() == 3 * net.nrOfLinks);
@@ -721,15 +687,20 @@ namespace calc {
       const ForceBalanceNetwork& net,
       const size_t linkIdx) const
     {
+      INVALIDARG_EXP_IFN(linkIdx < net.nrOfLinks, "Cannot set spring partition of index higher than nr. of links.");
       INVALIDARG_EXP_IFN(net.linkIsSliplink[linkIdx], "Link must be slip-link");
       std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
       size_t indexIndex = 0;
+      while (results.size() < 4) {
+        results.push_back(0);
+      }
       for (size_t springIndex : springIndices) {
         std::vector<size_t> springsPartners =
           net.linkIndicesOfSprings[springIndex];
         for (size_t partner_idx = 1; partner_idx < springsPartners.size() - 1;
              ++partner_idx) {
           if (springsPartners[partner_idx] == linkIdx) {
+            RUNTIME_EXP_IFN(indexIndex < 4, "Expect spring partitions indices of link not to exceed 4.");
             size_t currentSpringGlobalIdx =
               net.localToGlobalSpringIndex[springIndex][partner_idx - 1];
             size_t neighbourSpringGlobalIdx =

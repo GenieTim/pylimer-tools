@@ -489,10 +489,7 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("damping") = 1.0,
          py::arg("maxNrOfSteps") = 250000,
          py::arg("xTolerance") = 1e-12,
-         py::arg("innerMaxNrOfSteps") = 250,
-         py::arg("innerAlphaTolerance") = 1e-15,
          py::arg("oneOverSpringPartitionUpperLimit") = 1.0,
-         py::arg("maxFlag") = 7,
          py::arg("removeInactiveCrosslinks") = false,
          py::arg("remove2functionalCrosslinkers") = false,
          py::arg("outputFrequency") = 50)
