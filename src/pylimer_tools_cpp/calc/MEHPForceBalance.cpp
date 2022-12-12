@@ -749,7 +749,7 @@ namespace calc {
      *
      * @param net
      */
-    void cleanupPrimaryLoopsInStructure(ForceBalanceNetwork& net)
+    void MEHPForceBalance::cleanupPrimaryLoopsInStructure(ForceBalanceNetwork& net)
     {
       for (size_t linkIdx = 0; linkIdx < net.nrOfNodes; ++linkIdx) {
         if (net.springIndicesOfLinks[linkIdx].size() == 2 &&
