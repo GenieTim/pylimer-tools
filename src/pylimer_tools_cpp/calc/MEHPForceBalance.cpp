@@ -1263,8 +1263,8 @@ namespace calc {
         keptSpringsLinks.size() + removedSpringsLinks.size() - 2);
       net.localToGlobalSpringIndex[keptSpringIdx].reserve(
         keptSpringsLinks.size() + removedSpringsLinks.size() - 2);
-      assert(net.localToGlobalSpringIndex[keptSpringIdx].size() ==
-             net.linkIndicesOfSprings[keptSpringIdx].size() - 1);
+      RUNTIME_EXP_IFN(net.localToGlobalSpringIndex[keptSpringIdx].size() ==
+             net.linkIndicesOfSprings[keptSpringIdx].size() - 1, "Invalid sizes when merging springs");
       // tell the partial springs their new full spring
       for (size_t partialSpringIndex :
            net.localToGlobalSpringIndex[removedSpringIdx]) {
@@ -1298,7 +1298,7 @@ namespace calc {
         } else {
           // from start
           // std::cout << "End start" << std::endl;
-          assert(removedSpringsLinks[0] == linkToReduce);
+          RUNTIME_EXP_IFN(removedSpringsLinks[0] == linkToReduce, "Things don't make sense anymore.");
           net.linkIndicesOfSprings[keptSpringIdx][keptSpringsLinks.size() - 1] =
             removedSpringsLinks[1];
           for (size_t i = 2; i < removedSpringsLinks.size(); ++i) {
@@ -1313,7 +1313,7 @@ namespace calc {
           }
         }
       } else {
-        assert(keptSpringsLinks[0] == linkToReduce);
+        RUNTIME_EXP_IFN(keptSpringsLinks[0] == linkToReduce, "How could this be?");
         // add to start...
         if (removedSpringsLinks[removedSpringsLinks.size() - 1] ==
             linkToReduce) {
@@ -1337,7 +1337,7 @@ namespace calc {
         } else {
           // std::cout << "Start start" << std::endl;
           // from start
-          assert(removedSpringsLinks[0] == linkToReduce);
+          RUNTIME_EXP_IFN(removedSpringsLinks[0] == linkToReduce, "No way this expcetion is every shown, right?");
           net.linkIndicesOfSprings[keptSpringIdx][0] = removedSpringsLinks[1];
           // have to insert it reverse order
           // happens automatically if we always insert the next the start
@@ -1403,10 +1403,10 @@ namespace calc {
       pylimer_tools::utils::removeRow(net.partialSpringIsPartial,
                                       removedPartialSpringIdx);
 
-      assert(net.springPartIndexA[removedPartialSpringIdx] == linkToReduce ||
-             net.springPartIndexB[removedPartialSpringIdx] == linkToReduce);
-      assert(net.springPartIndexA[remainingPartialSpringIdx] == linkToReduce ||
-             net.springPartIndexB[remainingPartialSpringIdx] == linkToReduce);
+      RUNTIME_EXP_IFN(net.springPartIndexA[removedPartialSpringIdx] == linkToReduce ||
+             net.springPartIndexB[removedPartialSpringIdx] == linkToReduce, "");
+      RUNTIME_EXP_IFN(net.springPartIndexA[remainingPartialSpringIdx] == linkToReduce ||
+             net.springPartIndexB[remainingPartialSpringIdx] == linkToReduce, "");
       bool removedIsA =
         net.springPartIndexA[removedPartialSpringIdx] == linkToReduce;
       size_t otherEndOfRemovedSpring =
@@ -1420,7 +1420,7 @@ namespace calc {
             3 * otherEndOfRemovedSpring + dir;
         }
       } else {
-        assert(net.springPartIndexB[remainingPartialSpringIdx] == linkToReduce);
+        RUNTIME_EXP_IFN(net.springPartIndexB[remainingPartialSpringIdx] == linkToReduce, "");
         net.springPartIndexB[remainingPartialSpringIdx] =
           otherEndOfRemovedSpring;
         for (size_t dir = 0; dir < 3; ++dir) {
@@ -1480,7 +1480,7 @@ namespace calc {
       // renumber the remaining springs
       for (size_t i = 0; i < net.springIndicesOfLinks.size(); ++i) {
         for (size_t j = 0; j < net.springIndicesOfLinks[i].size(); ++j) {
-          assert(net.springIndicesOfLinks[i][j] != removedSpringIdx);
+          RUNTIME_EXP_IFN(net.springIndicesOfLinks[i][j] != removedSpringIdx, "");
           if (net.springIndicesOfLinks[i][j] > removedSpringIdx) {
             net.springIndicesOfLinks[i][j] -= 1;
           }
@@ -1488,7 +1488,7 @@ namespace calc {
       }
 
       for (size_t i = 0; i < net.partialToFullSpringIndex.size(); ++i) {
-        assert(net.partialToFullSpringIndex[i] != removedSpringIdx);
+        RUNTIME_EXP_IFN(net.partialToFullSpringIndex[i] != removedSpringIdx, "");
         if (net.partialToFullSpringIndex[i] > removedSpringIdx) {
           net.partialToFullSpringIndex[i] -= 1;
         }
@@ -1496,7 +1496,7 @@ namespace calc {
 
       for (size_t i = 0; i < net.localToGlobalSpringIndex.size(); ++i) {
         for (size_t j = 0; j < net.localToGlobalSpringIndex[i].size(); ++j) {
-          assert(net.localToGlobalSpringIndex[i][j] != removedPartialSpringIdx);
+          RUNTIME_EXP_IFN(net.localToGlobalSpringIndex[i][j] != removedPartialSpringIdx, "");
           if (net.localToGlobalSpringIndex[i][j] > removedPartialSpringIdx) {
             net.localToGlobalSpringIndex[i][j] -= 1;
           }
@@ -1509,14 +1509,14 @@ namespace calc {
         net.springsContourLength[removedSpringIdx];
       pylimer_tools::utils::removeRow(net.springsContourLength,
                                       removedSpringIdx);
-      assert(net.springsContourLength.size() == net.nrOfSprings);
+      RUNTIME_EXP_IFN(net.springsContourLength.size() == net.nrOfSprings, "");
       // and spring partitions
       springPartitions[remainingPartialSpringIdx] +=
         springPartitions[removedPartialSpringIdx];
 
       pylimer_tools::utils::removeRow(springPartitions,
                                       removedPartialSpringIdx);
-      assert(springPartitions.size() == net.nrOfPartialSprings);
+      RUNTIME_EXP_IFN(springPartitions.size() == net.nrOfPartialSprings, "");
       size_t newKeptSpringIdx =
         keptSpringIdx < removedSpringIdx ? keptSpringIdx : (keptSpringIdx - 1);
       // addmittedly, this is possibly dangerous, as it could hide
