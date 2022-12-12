@@ -84,7 +84,7 @@ namespace calc {
         double innerAlphaTol = 1e-15,
         const double oneOverSpringPartitionUpperLimit = 1.0,
         const int maxFlag = 7,
-        const bool removeInactiveCrosslinks = false,
+        const bool shouldRemoveInactiveCrosslinks = false,
         const bool remove2functionalCrosslinkers = false,
         const int outputFrequency = 50);
 
@@ -153,6 +153,13 @@ namespace calc {
                                       Eigen::VectorXd& displacements,
                                       Eigen::VectorXd& springPartitions,
                                       double tolerance) const;
+
+      /**
+       * @brief Remove double listed springs from cross-links
+       * 
+       * @param net 
+       */
+      void cleanupPrimaryLoopsInStructure(ForceBalanceNetwork& net);
 
       /**
        * @brief Remove a spring (and all its parts, incl. slip-links) from the structures
