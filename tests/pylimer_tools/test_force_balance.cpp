@@ -698,7 +698,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
     pcm::MEHPForceBalance forceBalancer2 =
       pcm::MEHPForceBalance(universe, 2, true);
     forceBalancer2.runForceRelaxation(
-      pcm::BalanceRunMode::ITERATIVE, 1.0, 10000, 1e-10, 100, 1e-9);
+      pcm::BalanceRunMode::ITERATIVE, 1.0, 10000, 1e-10, 100);
     REQUIRE(forceBalancer2.getNrOfIterations() > 5);
     CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalancer2.getGammaFactor(25, forceBalancer2.getNrOfSprings()) ==

@@ -80,10 +80,7 @@ namespace calc {
         double damping = 1.0,
         long int maxNrOfSteps = 50000, // default: 10000
         double xtol = 1e-9,
-        long int innerMaxNrOfSteps = 100,
-        double innerAlphaTol = 1e-15,
         const double oneOverSpringPartitionUpperLimit = 1.0,
-        const int maxFlag = 7,
         const bool shouldRemoveInactiveCrosslinks = false,
         const bool remove2functionalCrosslinkers = false,
         const int outputFrequency = 50);
