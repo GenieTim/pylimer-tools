@@ -749,14 +749,15 @@ namespace calc {
      *
      * @param net
      */
-    void MEHPForceBalance::cleanupPrimaryLoopsInStructure(ForceBalanceNetwork& net)
+    void MEHPForceBalance::cleanupPrimaryLoopsInStructure(
+      ForceBalanceNetwork& net)
     {
       for (size_t linkIdx = 0; linkIdx < net.nrOfNodes; ++linkIdx) {
         if (net.springIndicesOfLinks[linkIdx].size() == 2 &&
             net.springIndicesOfLinks[linkIdx][0] ==
               net.springIndicesOfLinks[linkIdx][1]) {
           net.springIndicesOfLinks[linkIdx].pop_back();
-          RUNTIME_EXP_IFN(net.springIndicesOfLinks[linkIdx].size() == 1, "");
+          RUNTIME_EXP_IFN(net.springIndicesOfLinks[linkIdx].size() == 1, "E");
         }
       }
     }
@@ -1422,8 +1423,7 @@ namespace calc {
       net.linkIndicesOfSprings.erase(net.linkIndicesOfSprings.begin() +
                                      removedSpringIdx);
       // partial springs
-      if (net.partialSpringIsPartial[removedPartialSpringIdx] &&
-          !net.partialSpringIsPartial[remainingPartialSpringIdx]) {
+      if (net.partialSpringIsPartial[removedPartialSpringIdx]) {
         net.partialSpringIsPartial[remainingPartialSpringIdx] = true;
       }
       pylimer_tools::utils::removeRow(net.partialSpringIsPartial,
@@ -2146,7 +2146,7 @@ namespace calc {
       this->handlePBC(net, springDistances);
 
       // reset for 2D systems
-      if (this->is2D && net.nrOfSprings > 0) {
+      if (is2D && net.nrOfSprings > 0) {
         // springDistances(Eigen::seq(2, net.nrOfSprings, 3)) =
         //   Eigen::VectorXd::Zero(net.nrOfSprings);
         for (size_t i = 2; i < 3 * net.nrOfSprings; i += 3) {
@@ -2336,10 +2336,10 @@ namespace calc {
           // detect the position in the spring
           std::vector<double> partitionsStrand;
           partitionsStrand.reserve(springParticipants.size() - 1);
-          for (size_t i = 0; i < springParticipants.size() - 1; ++i) {
+          for (size_t j = 0; j < springParticipants.size() - 1; ++j) {
             partitionsStrand.push_back(
               this->currentSpringPartitionsVec
-                [this->initialConfig.localToGlobalSpringIndex[springIndex][i]]);
+                [this->initialConfig.localToGlobalSpringIndex[springIndex][j]]);
           }
 
           bool wasAdded = false;
@@ -3192,10 +3192,12 @@ namespace calc {
                           ") part larger " + std::to_string(partialEndB) +
                           " than the nr of links (" +
                           std::to_string(net.nrOfLinks) + ").")
-        RUNTIME_EXP_IFN((net.linkIsSliplink[partialEndA] ||
-                         net.linkIsSliplink[partialEndB]) ==
-                          net.partialSpringIsPartial[i],
-                        "Springs involving slip-links must be marked partial.");
+        RUNTIME_EXP_IFN(
+          (net.linkIsSliplink[partialEndA] ||
+           net.linkIsSliplink[partialEndB]) == net.partialSpringIsPartial[i],
+          "Springs involving slip-links must be marked partial. Spring " +
+            std::to_string(i) + " is marked: " +
+            std::to_string(net.partialSpringIsPartial[i]) + ".");
         if (!net.linkIsSliplink[partialEndA]) {
           RUNTIME_EXP_IFN(
             net.springIndexA[fullIdx] == partialEndA ||

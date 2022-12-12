@@ -395,7 +395,7 @@ namespace calc {
             size_t randomA2Idx =
               std::uniform_int_distribution<size_t>{ 0, neighbours.size() - 1 }(
                 rng);
-            pylimer_tools::entities::Atom a2 = neighbours[randomA2Idx];
+            a2 = neighbours[randomA2Idx];
           }
           // finally, remove them from the neighbour lists so that they are not
           // sampled more than once
