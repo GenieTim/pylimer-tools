@@ -45,15 +45,15 @@ namespace calc {
       double innerAlphaTol,
       const double oneOverSpringPartitionUpperLimit,
       const int maxFlag,
-      const bool removeInactiveCrosslinks,
+      const bool shouldRemoveInactiveCrosslinks,
       const bool remove2functionalCrosslinkers,
       const int outputFrequency)
     {
-      INVALIDARG_EXP_IFN(
-        remove2functionalCrosslinkers == false ||
-          removeInactiveCrosslinks == true,
-        "Removing 2-functional cross-links only makes sense when inactive "
-        "cross-links may be removed too, during the procedure.");
+      // INVALIDARG_EXP_IFN(
+      //   shouldRemoveInactiveCrosslinks == false &&
+      //     remove2functionalCrosslinkers == true,
+      //   "Removing 2-functional cross-links only makes sense when inactive "
+      //   "cross-links may be removed too, during the procedure.");
       this->simulationHasRun = true;
 
       ForceBalanceNetwork net = this->initialConfig;
@@ -204,7 +204,7 @@ namespace calc {
         currentResidual =
           this->getDisplacementResidualNormFor(net, u, oneOverSpringPartitions);
         if (iterationsDone % 10 == 0) {
-          if (removeInactiveCrosslinks) {
+          if (shouldRemoveInactiveCrosslinks) {
             std::cout << "Removing inactive cross-links" << std::endl;
             // default tolerance: 0.25*atom's cube length
             double removalTolerance =
@@ -214,6 +214,7 @@ namespace calc {
             net.meanSpringContourLength = net.springsContourLength.mean();
             std::cout << "Removed " << nRemoved << " inactive springs. "
                       << std::endl;
+            // this->validateNetwork(net, u, springPartitions);
           }
           if (remove2functionalCrosslinkers) {
             std::cout << "Removing 2-f cross-links" << std::endl;
@@ -222,6 +223,10 @@ namespace calc {
             net.meanSpringContourLength = net.springsContourLength.mean();
             std::cout << "Removed " << nRemoved << " cross-linkers with f = 2. "
                       << std::endl;
+            // this->validateNetwork(net, u, springPartitions);
+          }
+          if (remove2functionalCrosslinkers || shouldRemoveInactiveCrosslinks) {
+            this->cleanupPrimaryLoopsInStructure(net);
             this->validateNetwork(net, u, springPartitions);
           }
         }
@@ -737,6 +742,23 @@ namespace calc {
         }
       }
       assert(indexIndex == 4);
+    }
+
+    /**
+     * @brief Remove double listed springs from cross-links
+     *
+     * @param net
+     */
+    void cleanupPrimaryLoopsInStructure(ForceBalanceNetwork& net)
+    {
+      for (size_t linkIdx = 0; linkIdx < net.nrOfNodes; ++linkIdx) {
+        if (net.springIndicesOfLinks[linkIdx].size() == 2 &&
+            net.springIndicesOfLinks[linkIdx][0] ==
+              net.springIndicesOfLinks[linkIdx][1]) {
+          net.springIndicesOfLinks[linkIdx].pop_back();
+          RUNTIME_EXP_IFN(net.springIndicesOfLinks[linkIdx].size() == 1, "");
+        }
+      }
     }
 
     /**
@@ -1264,7 +1286,8 @@ namespace calc {
       net.localToGlobalSpringIndex[keptSpringIdx].reserve(
         keptSpringsLinks.size() + removedSpringsLinks.size() - 2);
       RUNTIME_EXP_IFN(net.localToGlobalSpringIndex[keptSpringIdx].size() ==
-             net.linkIndicesOfSprings[keptSpringIdx].size() - 1, "Invalid sizes when merging springs");
+                        net.linkIndicesOfSprings[keptSpringIdx].size() - 1,
+                      "Invalid sizes when merging springs");
       // tell the partial springs their new full spring
       for (size_t partialSpringIndex :
            net.localToGlobalSpringIndex[removedSpringIdx]) {
@@ -1298,7 +1321,8 @@ namespace calc {
         } else {
           // from start
           // std::cout << "End start" << std::endl;
-          RUNTIME_EXP_IFN(removedSpringsLinks[0] == linkToReduce, "Things don't make sense anymore.");
+          RUNTIME_EXP_IFN(removedSpringsLinks[0] == linkToReduce,
+                          "Things don't make sense anymore.");
           net.linkIndicesOfSprings[keptSpringIdx][keptSpringsLinks.size() - 1] =
             removedSpringsLinks[1];
           for (size_t i = 2; i < removedSpringsLinks.size(); ++i) {
@@ -1313,7 +1337,8 @@ namespace calc {
           }
         }
       } else {
-        RUNTIME_EXP_IFN(keptSpringsLinks[0] == linkToReduce, "How could this be?");
+        RUNTIME_EXP_IFN(keptSpringsLinks[0] == linkToReduce,
+                        "How could this be?");
         // add to start...
         if (removedSpringsLinks[removedSpringsLinks.size() - 1] ==
             linkToReduce) {
@@ -1337,7 +1362,8 @@ namespace calc {
         } else {
           // std::cout << "Start start" << std::endl;
           // from start
-          RUNTIME_EXP_IFN(removedSpringsLinks[0] == linkToReduce, "No way this expcetion is every shown, right?");
+          RUNTIME_EXP_IFN(removedSpringsLinks[0] == linkToReduce,
+                          "No way this expcetion is every shown, right?");
           net.linkIndicesOfSprings[keptSpringIdx][0] = removedSpringsLinks[1];
           // have to insert it reverse order
           // happens automatically if we always insert the next the start
@@ -1403,10 +1429,14 @@ namespace calc {
       pylimer_tools::utils::removeRow(net.partialSpringIsPartial,
                                       removedPartialSpringIdx);
 
-      RUNTIME_EXP_IFN(net.springPartIndexA[removedPartialSpringIdx] == linkToReduce ||
-             net.springPartIndexB[removedPartialSpringIdx] == linkToReduce, "");
-      RUNTIME_EXP_IFN(net.springPartIndexA[remainingPartialSpringIdx] == linkToReduce ||
-             net.springPartIndexB[remainingPartialSpringIdx] == linkToReduce, "");
+      RUNTIME_EXP_IFN(
+        net.springPartIndexA[removedPartialSpringIdx] == linkToReduce ||
+          net.springPartIndexB[removedPartialSpringIdx] == linkToReduce,
+        "");
+      RUNTIME_EXP_IFN(
+        net.springPartIndexA[remainingPartialSpringIdx] == linkToReduce ||
+          net.springPartIndexB[remainingPartialSpringIdx] == linkToReduce,
+        "");
       bool removedIsA =
         net.springPartIndexA[removedPartialSpringIdx] == linkToReduce;
       size_t otherEndOfRemovedSpring =
@@ -1420,7 +1450,8 @@ namespace calc {
             3 * otherEndOfRemovedSpring + dir;
         }
       } else {
-        RUNTIME_EXP_IFN(net.springPartIndexB[remainingPartialSpringIdx] == linkToReduce, "");
+        RUNTIME_EXP_IFN(
+          net.springPartIndexB[remainingPartialSpringIdx] == linkToReduce, "");
         net.springPartIndexB[remainingPartialSpringIdx] =
           otherEndOfRemovedSpring;
         for (size_t dir = 0; dir < 3; ++dir) {
@@ -1480,7 +1511,8 @@ namespace calc {
       // renumber the remaining springs
       for (size_t i = 0; i < net.springIndicesOfLinks.size(); ++i) {
         for (size_t j = 0; j < net.springIndicesOfLinks[i].size(); ++j) {
-          RUNTIME_EXP_IFN(net.springIndicesOfLinks[i][j] != removedSpringIdx, "");
+          RUNTIME_EXP_IFN(net.springIndicesOfLinks[i][j] != removedSpringIdx,
+                          "");
           if (net.springIndicesOfLinks[i][j] > removedSpringIdx) {
             net.springIndicesOfLinks[i][j] -= 1;
           }
@@ -1488,7 +1520,8 @@ namespace calc {
       }
 
       for (size_t i = 0; i < net.partialToFullSpringIndex.size(); ++i) {
-        RUNTIME_EXP_IFN(net.partialToFullSpringIndex[i] != removedSpringIdx, "");
+        RUNTIME_EXP_IFN(net.partialToFullSpringIndex[i] != removedSpringIdx,
+                        "");
         if (net.partialToFullSpringIndex[i] > removedSpringIdx) {
           net.partialToFullSpringIndex[i] -= 1;
         }
@@ -1496,7 +1529,8 @@ namespace calc {
 
       for (size_t i = 0; i < net.localToGlobalSpringIndex.size(); ++i) {
         for (size_t j = 0; j < net.localToGlobalSpringIndex[i].size(); ++j) {
-          RUNTIME_EXP_IFN(net.localToGlobalSpringIndex[i][j] != removedPartialSpringIdx, "");
+          RUNTIME_EXP_IFN(
+            net.localToGlobalSpringIndex[i][j] != removedPartialSpringIdx, "");
           if (net.localToGlobalSpringIndex[i][j] > removedPartialSpringIdx) {
             net.localToGlobalSpringIndex[i][j] -= 1;
           }
