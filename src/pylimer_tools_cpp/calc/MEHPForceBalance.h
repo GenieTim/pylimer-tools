@@ -215,7 +215,8 @@ namespace calc {
                                   const double cutoff = 2.0,
                                   const size_t minimumNrOfSliplinks = 0,
                                   const double sameStrandCutoff = 2.0,
-                                  const bool excludeCrosslinks = false)
+                                  const bool excludeCrosslinks = false,
+                                  const int seed = -1)
       {
         INVALIDARG_EXP_IFN(nrOfSliplinksToSample > minimumNrOfSliplinks,
                            "Maximum nr. should be larger than minimum, got " +
@@ -303,6 +304,9 @@ namespace calc {
 
         std::random_device rd{};
         std::mt19937 rng = std::mt19937(rd());
+        if (seed > 0) {
+          rng.seed(seed);
+        }
         // build list of random samples
         // this way is more performant than
         // sampling integers and checking whether they have been sampled already

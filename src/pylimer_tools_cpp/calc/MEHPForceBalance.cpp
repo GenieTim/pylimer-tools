@@ -108,11 +108,12 @@ namespace calc {
           // std::cout << "Still handling " << link_idx << " of " <<
           // net.nrOfNodes
           //           << " / " << net.nrOfLinks << std::endl;
-          double r2 = this->updateSpringPartition(net,
-                                           u,
-                                           springPartitions,
-                                           link_idx,
-                                           oneOverSpringPartitionUpperLimit);
+          double r2 =
+            this->updateSpringPartition(net,
+                                        u,
+                                        springPartitions,
+                                        link_idx,
+                                        oneOverSpringPartitionUpperLimit);
           double displacementDone =
             this->displaceToMeanPosition(net,
                                          u,
@@ -230,8 +231,7 @@ namespace calc {
                            : ExitReason::X_TOLERANCE;
       this->nrOfStepsDone += iterationsDone;
       std::cout << iterationsDone << " steps done. "
-                << "Last max distance moved: "
-                << maxDistanceMoved << std::endl;
+                << "Last max distance moved: " << maxDistanceMoved << std::endl;
 
       assert(u.size() == 3 * net.nrOfLinks);
       std::cout << 1 << std::endl;
@@ -687,7 +687,9 @@ namespace calc {
       const ForceBalanceNetwork& net,
       const size_t linkIdx) const
     {
-      INVALIDARG_EXP_IFN(linkIdx < net.nrOfLinks, "Cannot set spring partition of index higher than nr. of links.");
+      INVALIDARG_EXP_IFN(
+        linkIdx < net.nrOfLinks,
+        "Cannot set spring partition of index higher than nr. of links.");
       INVALIDARG_EXP_IFN(net.linkIsSliplink[linkIdx], "Link must be slip-link");
       std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
       size_t indexIndex = 0;
@@ -700,7 +702,9 @@ namespace calc {
         for (size_t partner_idx = 1; partner_idx < springsPartners.size() - 1;
              ++partner_idx) {
           if (springsPartners[partner_idx] == linkIdx) {
-            RUNTIME_EXP_IFN(indexIndex < 4, "Expect spring partitions indices of link not to exceed 4.");
+            RUNTIME_EXP_IFN(
+              indexIndex < 4,
+              "Expect spring partitions indices of link not to exceed 4.");
             size_t currentSpringGlobalIdx =
               net.localToGlobalSpringIndex[springIndex][partner_idx - 1];
             size_t neighbourSpringGlobalIdx =
@@ -784,7 +788,16 @@ namespace calc {
       // then, we remove all cross-links that are 0-functional
       for (long int crosslinkIdx = net.nrOfNodes - 1; crosslinkIdx >= 0;
            --crosslinkIdx) {
-        if (net.springIndicesOfLinks[crosslinkIdx].size() == 0) {
+        if (net.springIndicesOfLinks[crosslinkIdx].size() == 0 // f = 0
+            || // or f = 1, NOT primary loop
+            (net.springIndicesOfLinks[crosslinkIdx].size() == 1 &&
+             XOR(net.linkIndicesOfSprings[net.springIndicesOfLinks[crosslinkIdx]
+                                                                  [0]][0] ==
+                   crosslinkIdx,
+                 pylimer_tools::utils::last(
+                   net.linkIndicesOfSprings
+                     [net.springIndicesOfLinks[crosslinkIdx][0]]) ==
+                   crosslinkIdx))) {
           // std::cout << "Removing x-link " << crosslinkIdx << std::endl;
           this->removeLink(net, displacements, crosslinkIdx);
           // this->validateNetwork(net, displacements, springPartitions);
