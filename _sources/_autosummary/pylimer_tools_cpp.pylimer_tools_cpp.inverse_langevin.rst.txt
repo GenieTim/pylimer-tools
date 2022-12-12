@@ -1,0 +1,6 @@
+pylimer\_tools\_cpp.pylimer\_tools\_cpp.inverse\_langevin
+=========================================================
+
+.. currentmodule:: pylimer_tools_cpp.pylimer_tools_cpp
+
+.. autofunction:: inverse_langevin
