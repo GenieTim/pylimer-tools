@@ -789,18 +789,28 @@ namespace calc {
       for (long int crosslinkIdx = net.nrOfNodes - 1; crosslinkIdx >= 0;
            --crosslinkIdx) {
         if (net.springIndicesOfLinks[crosslinkIdx].size() == 0 // f = 0
-            || // or f = 1, NOT primary loop
-            (net.springIndicesOfLinks[crosslinkIdx].size() == 1 &&
-             XOR(net.linkIndicesOfSprings[net.springIndicesOfLinks[crosslinkIdx]
-                                                                  [0]][0] ==
-                   crosslinkIdx,
-                 pylimer_tools::utils::last(
-                   net.linkIndicesOfSprings
-                     [net.springIndicesOfLinks[crosslinkIdx][0]]) ==
-                   crosslinkIdx))) {
+        ) {
           // std::cout << "Removing x-link " << crosslinkIdx << std::endl;
           this->removeLink(net, displacements, crosslinkIdx);
           // this->validateNetwork(net, displacements, springPartitions);
+        }
+
+        if ( // or f = 1, NOT primary loop
+          net.springIndicesOfLinks[crosslinkIdx].size() == 1 &&
+          XOR(
+            net.linkIndicesOfSprings[net.springIndicesOfLinks[crosslinkIdx][0]]
+                                    [0] == crosslinkIdx,
+            pylimer_tools::utils::last(
+              net.linkIndicesOfSprings[net.springIndicesOfLinks[crosslinkIdx]
+                                                               [0]]) ==
+              crosslinkIdx)) {
+          // need to first remove the spring
+          this->removeSpring(net,
+                             displacements,
+                             springPartitions,
+                             net.springIndicesOfLinks[crosslinkIdx][0]);
+          // to then remove the link
+          this->removeLink(net, displacements, crosslinkIdx);
         }
       }
 
