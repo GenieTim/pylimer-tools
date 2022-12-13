@@ -1105,7 +1105,14 @@ namespace calc {
                   net.localToGlobalSpringIndex[involvedSpringIdx].begin() + j);
               }
             }
-          }
+          }                                          
+
+          net.partialSpringIsPartial[partialSpringToKeep] =
+            net
+              .linkIndicesOfSprings
+                [net.partialToFullSpringIndex[partialSpringToKeep]]
+              .size() > 2;
+
           net.springIndicesOfLinks[slipLinkIdx].clear();
           pylimer_tools::utils::removeRow(net.springPartIndexA,
                                           partialSpringToRemove);
@@ -1121,12 +1128,6 @@ namespace calc {
                                           partialSpringToRemove);
           pylimer_tools::utils::removeRow(springPartitions,
                                           partialSpringToRemove);
-
-          net.partialSpringIsPartial[partialSpringToKeep] =
-            net
-              .linkIndicesOfSprings
-                [net.partialToFullSpringIndex[partialSpringToKeep]]
-              .size() > 2;
 
           // ... and renumber stuff
           for (size_t loopSpringIdx = 0;
@@ -3189,6 +3190,12 @@ namespace calc {
         RUNTIME_EXP_IFN(
           (net.linkIsSliplink[partialEndA] ||
            net.linkIsSliplink[partialEndB]) == net.partialSpringIsPartial[i],
+          "Springs involving slip-links must be marked partial. Spring " +
+            std::to_string(i) + " is marked: " +
+            std::to_string(net.partialSpringIsPartial[i]) + ".");
+        RUNTIME_EXP_IFN(
+          (net.linkIndicesOfSprings[net.partialToFullSpringIndex[i]].size() >
+           2) == net.partialSpringIsPartial[i],
           "Springs involving slip-links must be marked partial. Spring " +
             std::to_string(i) + " is marked: " +
             std::to_string(net.partialSpringIsPartial[i]) + ".");
