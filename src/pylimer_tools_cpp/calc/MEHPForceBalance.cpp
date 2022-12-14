@@ -23,13 +23,13 @@ namespace calc {
  */
 #define CLAMP_ONE_OVER_SPRINGPARTITION(                                        \
   isPartialSpring, val, N, oneOverSpringPartitionUpperLimit)                   \
-  !isPartialSpring                                                             \
+  (!isPartialSpring)                                                             \
     ? val                                                                      \
     : std::clamp(val,                                                          \
-                 oneOverSpringPartitionUpperLimit > 0.                         \
+                 (oneOverSpringPartitionUpperLimit > 0.)                         \
                    ? 1. / (N - 1. / oneOverSpringPartitionUpperLimit)          \
                    : 0.0,                                                      \
-                 oneOverSpringPartitionUpperLimit > 0.                         \
+                 (oneOverSpringPartitionUpperLimit > 0.)                         \
                    ? oneOverSpringPartitionUpperLimit                          \
                    : N);
 
@@ -41,10 +41,12 @@ namespace calc {
       double damping,
       long int maxNrOfSteps, // default: 10000
       double xtol,
+      const double initialResidualToUse,
       const double oneOverSpringPartitionUpperLimit,
-      const bool shouldRemoveInactiveCrosslinks,
-      const bool remove2functionalCrosslinkers,
-      const int outputFrequency)
+      const StructureSimplificationMode simplificationMode,
+      const double inactiveRemovalCutoff,
+      const int outputFrequency,
+      bool doInnerIterations)
     {
       // INVALIDARG_EXP_IFN(
       //   shouldRemoveInactiveCrosslinks == false &&
@@ -54,12 +56,10 @@ namespace calc {
       this->simulationHasRun = true;
 
       ForceBalanceNetwork net = this->initialConfig;
-      const int M = this->universe.getMolecules(crosslinkerType).size();
-      const int N = this->universe.getMeanStrandLength(crosslinkerType) + 1;
-      const double bM = this->universe.computeMeanBondLength();
-      const int f =
-        this->universe.determineFunctionalityPerType()[crosslinkerType];
-      bool is2D = this->is2D;
+      double removalTolerance =
+        (inactiveRemovalCutoff > 0.0)
+          ? inactiveRemovalCutoff
+          : (0.25 * std::pow(net.vol / this->universe.getNrOfAtoms(), 1. / 3.));
 
       /* array allocation */
       Eigen::VectorXd u = this->currentDisplacements;
@@ -83,22 +83,27 @@ namespace calc {
       }
       // this->getIndependentCoordinateSets(net);
       // { net.springPartCoordinateIndexA, net.springPartCoordinateIndexB };
-      std::cout << "Starting force balance procedure "
-                // "with " << independentVertexSets.size() << "vertex sets."
-                << std::endl;
       Eigen::VectorXd oneOverSpringPartitions =
         this->assembleOneOverSpringPartition(
           net, springPartitions, oneOverSpringPartitionUpperLimit);
-      double initialResidual =
-        this->getDisplacementResidualNormFor(net, u, oneOverSpringPartitions);
+      const double initialResidual = (initialResidualToUse > 0.)
+                                       ? initialResidualToUse
+                                       : this->getDisplacementResidualNormFor(
+                                           net, u, oneOverSpringPartitions);
+      const double minN = net.springsContourLength.minCoeff();
+      std::cout << "Starting force balance procedure "
+                << "with " << initialResidual
+                << " as initial residual, got requested " << initialResidualToUse
+                // "with " << independentVertexSets.size() << "vertex sets."
+                << std::endl;
       double currentResidual = 0.0;
       double intermediateResidual = 0.0;
-      double minN = net.springsContourLength.minCoeff();
       size_t iterationsDone = 0;
       // actual loop
       do {
         maxDistanceMoved = 0.0;
         currentResidual = 0.0;
+
         // place slip-link
         for (size_t link_idx = net.nrOfNodes; link_idx < net.nrOfLinks;
              ++link_idx) {
@@ -108,21 +113,27 @@ namespace calc {
           // std::cout << "Still handling " << link_idx << " of " <<
           // net.nrOfNodes
           //           << " / " << net.nrOfLinks << std::endl;
-          double r2 =
-            this->updateSpringPartition(net,
-                                        u,
-                                        springPartitions,
-                                        link_idx,
-                                        oneOverSpringPartitionUpperLimit);
-          double displacementDone =
-            this->displaceToMeanPosition(net,
-                                         u,
-                                         springPartitions,
-                                         link_idx,
-                                         oneOverSpringPartitionUpperLimit);
+          int innerIterationsDone = 0;
+          do {
+            double r2 =
+              this->updateSpringPartition(net,
+                                          u,
+                                          springPartitions,
+                                          link_idx,
+                                          oneOverSpringPartitionUpperLimit);
+            double displacementDone =
+              this->displaceToMeanPosition(net,
+                                           u,
+                                           springPartitions,
+                                           link_idx,
+                                           oneOverSpringPartitionUpperLimit);
+            innerIterationsDone += 1;
+          } while (doInnerIterations && innerIterationsDone < 50);
         }
+
         oneOverSpringPartitions = this->assembleOneOverSpringPartition(
           net, springPartitions, oneOverSpringPartitionUpperLimit);
+
         intermediateResidual =
           this->getDisplacementResidualNormFor(net, u, oneOverSpringPartitions);
 
@@ -167,16 +178,19 @@ namespace calc {
             }
           }
         }
+
         oneOverSpringPartitions = this->assembleOneOverSpringPartition(
           net, springPartitions, oneOverSpringPartitionUpperLimit);
+
         currentResidual =
           this->getDisplacementResidualNormFor(net, u, oneOverSpringPartitions);
+        iterationsDone += 1;
         if (iterationsDone % 10 == 0) {
-          if (shouldRemoveInactiveCrosslinks) {
+          if (simplificationMode ==
+                StructureSimplificationMode::INACTIVE_ONLY ||
+              simplificationMode == StructureSimplificationMode::ALL_TIM) {
             std::cout << "Removing inactive cross-links" << std::endl;
             // default tolerance: 0.25*atom's cube length
-            double removalTolerance =
-              0.25 * std::pow(net.vol / this->universe.getNrOfAtoms(), 1. / 3.);
             size_t nRemoved = this->removeInactiveCrosslinks(
               net, u, springPartitions, removalTolerance);
             net.meanSpringContourLength = net.springsContourLength.mean();
@@ -184,7 +198,8 @@ namespace calc {
                       << std::endl;
             // this->validateNetwork(net, u, springPartitions);
           }
-          if (remove2functionalCrosslinkers) {
+          if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
+              simplificationMode == StructureSimplificationMode::ALL_TIM) {
             std::cout << "Removing 2-f cross-links" << std::endl;
             size_t nRemoved =
               this->removeTwofunctionalCrosslinks(net, u, springPartitions);
@@ -193,7 +208,14 @@ namespace calc {
                       << std::endl;
             // this->validateNetwork(net, u, springPartitions);
           }
-          if (remove2functionalCrosslinkers || shouldRemoveInactiveCrosslinks) {
+          if (simplificationMode == StructureSimplificationMode::ALL_ANDREI) {
+            std::cout << "Removing cross-links and springs, Andrei's way"
+                      << std::endl;
+            this->doRemovalAndreisWay(
+              net, u, springPartitions, removalTolerance);
+          }
+          if (simplificationMode !=
+              StructureSimplificationMode::NO_SIMPLIFICATION) {
             this->cleanupPrimaryLoopsInStructure(net);
             this->validateNetwork(net, u, springPartitions);
           }
@@ -221,12 +243,11 @@ namespace calc {
                     << (intermediateResidual / initialResidual) << ") "
                     << "\n";
         }
-        iterationsDone += 1;
       } while (currentResidual / initialResidual > xtol &&
                iterationsDone < maxNrOfSteps);
 
       // query solution & exit reason
-      this->exitReason = iterationsDone == maxNrOfSteps
+      this->exitReason = (iterationsDone == maxNrOfSteps)
                            ? ExitReason::MAX_STEPS
                            : ExitReason::X_TOLERANCE;
       this->nrOfStepsDone += iterationsDone;
@@ -242,8 +263,8 @@ namespace calc {
       this->currentSpringPartitionsVec = springPartitions;
       std::cout << 4 << std::endl;
       this->validateNetwork();
-      this->currentSpringDistances =
-        this->evaluateSpringDistances(net, this->currentDisplacements, is2D);
+      this->currentSpringDistances = this->evaluateSpringDistances(
+        net, this->currentDisplacements, this->is2D);
       std::cout << 5 << std::endl;
       this->currentPartialSpringDistances =
         this->evaluatePartialSpringDistances(
@@ -393,11 +414,13 @@ namespace calc {
       return maxDiff;
     };
 
-    double MEHPForceBalance::getDisplacementResidualNorm(double cutoff) const
+    double MEHPForceBalance::getDisplacementResidualNorm(
+      double oneOverSpringPartitionUpperLimit) const
     {
       Eigen::VectorXd oneOverSpringPartitions =
-        this->assembleOneOverSpringPartition(
-          this->initialConfig, this->currentSpringPartitionsVec, cutoff);
+        this->assembleOneOverSpringPartition(this->initialConfig,
+                                             this->currentSpringPartitionsVec,
+                                             oneOverSpringPartitionUpperLimit);
       Eigen::VectorXd displacements = this->currentDisplacements;
       return this->getDisplacementResidualNormFor(
         this->initialConfig, displacements, oneOverSpringPartitions);
@@ -656,7 +679,7 @@ namespace calc {
       for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
         const double N =
           net.springsContourLength[net.partialToFullSpringIndex[i]];
-        double valueToSet = springPartitions0[i] > 0.0 // 1e-18 //
+        double valueToSet = (springPartitions0[i] > 0.0) // 1e-18 //
                               ? 1.0 / (springPartitions0[i] * N)
                               : 0.0;
         valueToSet =
@@ -785,7 +808,7 @@ namespace calc {
         }
       }
 
-      // then, we remove all cross-links that are 0-functional
+      // then, we remove all cross-links that are 0- or 1-functional
       for (long int crosslinkIdx = net.nrOfNodes - 1; crosslinkIdx >= 0;
            --crosslinkIdx) {
         if (net.springIndicesOfLinks[crosslinkIdx].size() == 0 // f = 0
@@ -1105,7 +1128,7 @@ namespace calc {
                   net.localToGlobalSpringIndex[involvedSpringIdx].begin() + j);
               }
             }
-          }                                          
+          }
 
           net.partialSpringIsPartial[partialSpringToKeep] =
             net
@@ -1267,12 +1290,12 @@ namespace calc {
         net.linkIndicesOfSprings[keptSpringIdx];
 
       size_t removedPartialSpringIdx =
-        removedSpringsLinks[removedSpringsLinks.size() - 1] == linkToReduce
+        (removedSpringsLinks[removedSpringsLinks.size() - 1] == linkToReduce)
           ? pylimer_tools::utils::last(
               net.localToGlobalSpringIndex[removedSpringIdx])
           : net.localToGlobalSpringIndex[removedSpringIdx][0];
       size_t remainingPartialSpringIdx =
-        keptSpringsLinks[keptSpringsLinks.size() - 1] == linkToReduce
+        (keptSpringsLinks[keptSpringsLinks.size() - 1] == linkToReduce)
           ? pylimer_tools::utils::last(
               net.localToGlobalSpringIndex[keptSpringIdx])
           : net.localToGlobalSpringIndex[keptSpringIdx][0];
@@ -1547,7 +1570,7 @@ namespace calc {
                                       removedPartialSpringIdx);
       RUNTIME_EXP_IFN(springPartitions.size() == net.nrOfPartialSprings, "");
       size_t newKeptSpringIdx =
-        keptSpringIdx < removedSpringIdx ? keptSpringIdx : (keptSpringIdx - 1);
+        (keptSpringIdx < removedSpringIdx) ? keptSpringIdx : (keptSpringIdx - 1);
       // addmittedly, this is possibly dangerous, as it could hide
       // other mistakes
       double newTotalForNormalization =
@@ -1568,6 +1591,88 @@ namespace calc {
                 << " and is now " << net.springsContourLength[newKeptSpringIdx]
                 << std::endl;
     }
+
+    /**
+     * @brief Remove cross-linkers, springs and associated slip-links with the
+     * scheme suggested by Andrei
+     *
+     * @param net
+     * @param displacements
+     * @param springPartitions
+     * @param tolerance
+     * @return size_t
+     */
+    size_t MEHPForceBalance::doRemovalAndreisWay(
+      ForceBalanceNetwork& net,
+      Eigen::VectorXd& displacements,
+      Eigen::VectorXd& springPartitions,
+      double tolerance) const
+    {
+      size_t numRemovedTotal = 0;
+      size_t numRemovedInIteration = 0;
+      do {
+        numRemovedInIteration = 0;
+        // do removal of f = 1
+        // remove all cross-links that are 0- or 1-functional
+        for (long int crosslinkIdx = net.nrOfNodes - 1; crosslinkIdx >= 0;
+             --crosslinkIdx) {
+          if (net.springIndicesOfLinks[crosslinkIdx].size() == 0 // f = 0
+          ) {
+            // std::cout << "Removing x-link " << crosslinkIdx << std::endl;
+            this->removeLink(net, displacements, crosslinkIdx);
+            numRemovedInIteration += 1;
+            // this->validateNetwork(net, displacements, springPartitions);
+          }
+
+          if ( // or f = 1, NOT primary loop
+            net.springIndicesOfLinks[crosslinkIdx].size() == 1 &&
+            XOR(
+              net.linkIndicesOfSprings[net.springIndicesOfLinks[crosslinkIdx]
+                                                               [0]][0] ==
+                crosslinkIdx,
+              pylimer_tools::utils::last(
+                net.linkIndicesOfSprings[net.springIndicesOfLinks[crosslinkIdx]
+                                                                 [0]]) ==
+                crosslinkIdx)) {
+            // need to first remove the spring
+            this->removeSpring(net,
+                               displacements,
+                               springPartitions,
+                               net.springIndicesOfLinks[crosslinkIdx][0]);
+            // to then remove the link
+            this->removeLink(net, displacements, crosslinkIdx);
+            numRemovedInIteration += 1;
+          }
+        }
+        numRemovedTotal += numRemovedInIteration;
+      } while (numRemovedInIteration > 0);
+      // then, replace f = 2
+      this->removeTwofunctionalCrosslinks(net, displacements, springPartitions);
+      // and remove all springs that are inactive
+      size_t numSpringsRemoved = 0;
+      for (long int springIdx = net.nrOfSprings - 1; springIdx >= 0;
+           --springIdx) {
+        Eigen::Vector3d distance =
+          (net.coordinates.segment(3 * net.springIndexA[springIdx], 3) +
+           displacements.segment(3 * net.springIndexA[springIdx], 3)) -
+          (net.coordinates.segment(3 * net.springIndexB[springIdx], 3) +
+           displacements.segment(3 * net.springIndexB[springIdx], 3));
+        MEHPForceBalance::handlePBC(net, distance);
+        if (distance.squaredNorm() < tolerance) {
+          // remove
+          this->removeSpring(net, displacements, springPartitions, springIdx);
+          numSpringsRemoved += 1;
+        }
+      }
+
+      this->validateNetwork(net, displacements, springPartitions);
+
+      if (numSpringsRemoved > 0) {
+        numRemovedTotal += this->doRemovalAndreisWay(
+          net, displacements, springPartitions, tolerance);
+      }
+      return numRemovedTotal;
+    };
 
     /**
      * @brief Replace the two springs traversinga a two-functional cross-links
@@ -2309,7 +2414,7 @@ namespace calc {
         this->initialConfig.linkIsSliplink[currentNrOfLinks + i] = true;
         std::vector<size_t> springIndices{ strandIdx1[i], strandIdx2[i] };
         std::vector<size_t> springIndicesOfLink =
-          strandIdx1[i] == strandIdx2[i] ? std::vector<size_t>{ strandIdx1[i] }
+          (strandIdx1[i] == strandIdx2[i]) ? std::vector<size_t>{ strandIdx1[i] }
                                          : springIndices;
         this->initialConfig.springIndicesOfLinks.push_back(springIndicesOfLink);
         // add to the springs
@@ -2317,7 +2422,7 @@ namespace calc {
         for (size_t springIndex : springIndices) {
           std::vector<size_t> springParticipants =
             this->initialConfig.linkIndicesOfSprings[springIndex];
-          double alpha = (springIndexIndex == 0 ? alpha1[i] : alpha2[i]);
+          double alpha = (springIndexIndex == 0) ? alpha1[i] : alpha2[i];
           INVALIDARG_EXP_IFN(alpha >= 0.0 && alpha <= 1.0,
                              "alpha must be between 0 and 1, got " +
                                std::to_string(alpha) + ".");

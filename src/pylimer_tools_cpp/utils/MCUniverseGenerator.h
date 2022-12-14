@@ -409,17 +409,17 @@ namespace utils {
       // support crossing of boundary conditions: find nearest image as target
       // (accept image mismatches)
       double targetX =
-        this->box.getLx() < std::sqrt((double)chainLen) * this->beadDistance
+        (this->box.getLx() < std::sqrt((double)chainLen) * this->beadDistance)
           ? this->simplifiedUniverse.x[to]
           : lastX + this->_getDeltaDistance(
                       this->simplifiedUniverse.x[to], lastX, this->box.getLx());
       double targetY =
-        this->box.getLy() < std::sqrt((double)chainLen) * this->beadDistance
+        (this->box.getLy() < std::sqrt((double)chainLen) * this->beadDistance)
           ? this->simplifiedUniverse.y[to]
           : lastY + this->_getDeltaDistance(
                       this->simplifiedUniverse.y[to], lastY, this->box.getLy());
       double targetZ =
-        this->box.getLz() < std::sqrt((double)chainLen) * this->beadDistance
+        (this->box.getLz() < std::sqrt((double)chainLen) * this->beadDistance)
           ? this->simplifiedUniverse.z[to]
           : lastZ + this->_getDeltaDistance(
                       this->simplifiedUniverse.z[to], lastZ, this->box.getLz());
@@ -435,7 +435,7 @@ namespace utils {
         double idealAlpha =
           std::acos(std::clamp(dz / remainingDistance, -1.0, 1.0));
         // beta = phi in Wikipedia
-        double idealBeta = dx == 0.0 ? (M_PI * 0.5) : (std::atan2(dy, dx));
+        double idealBeta = (dx == 0.0) ? (M_PI * 0.5) : (std::atan2(dy, dx));
         double bondLenToUse = this->beadDistance;
         double idealWeight = 0.0;
         double bondsRemaining = ((chainLen - i) + 1);

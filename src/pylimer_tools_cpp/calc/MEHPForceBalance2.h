@@ -527,7 +527,7 @@ namespace calc {
           (net->springPartIndexA != net->springPartIndexB).cast<double>();
         for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
           double valueToSet =
-            springPartitions0[i] > 0.0
+            (springPartitions0[i] > 0.0)
               ? 1. /
                   (springPartitions0[i] *
                    net->springsContourLength[net->partialToFullSpringIndex.at(
@@ -831,7 +831,7 @@ namespace calc {
 
         for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
           double valueToSet =
-            springPartitions0[i] > 0.0 // 1e-18 //
+            (springPartitions0[i] > 0.0) // 1e-18 //
               ? 1.0 /
                   (springPartitions0[i] *
                    net->springsContourLength[net->partialToFullSpringIndex.at(
@@ -1510,7 +1510,7 @@ namespace calc {
 
       static std::pair<size_t, size_t> makeConnectivityKey(size_t i1, size_t i2)
       {
-        return i1 > i2 ? std::make_pair(i1, i2) : std::make_pair(i2, i1);
+        return (i1 > i2) ? std::make_pair(i1, i2) : std::make_pair(i2, i1);
       }
 
     private:
