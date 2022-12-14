@@ -48,6 +48,7 @@
       SimpleSpringMEHPForceEvaluator
       SimplifiedBalanceNetwork
       SimplifiedNetwork
+      StructureSimplificationMode
       Universe
       UniverseSequence
    

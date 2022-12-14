@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList" href="pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList.html" /><link rel="prev" title="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator" href="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe" href="pylimer_tools_cpp.pylimer_tools_cpp.Universe.html" /><link rel="prev" title="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedNetwork" href="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedNetwork.html" />
 
     <!-- Generated with Sphinx 5.3.0 and Furo 2022.12.07 -->
-        <title>pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType - PylimerTools documentation</title>
+        <title>pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=91d0f0d1c444bdcb17a68e833c7a53903343c195" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -190,13 +190,13 @@
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.html">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.html">pylimer_tools_cpp.pylimer_tools_cpp.Molecule</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator.html">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator</a></li>
-<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.html">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList.html">pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">pylimer_tools_cpp.pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.html">pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedNetwork.html">pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedNetwork</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.html">pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode</a></li>
+<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Universe.html">pylimer_tools_cpp.pylimer_tools_cpp.Universe</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.html">pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence</a></li>
 </ul>
@@ -239,34 +239,28 @@
           </label>
         </div>
         <article role="main">
-          <section id="pylimer-tools-cpp-pylimer-tools-cpp-moleculetype">
-<h1>pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType<a class="headerlink" href="#pylimer-tools-cpp-pylimer-tools-cpp-moleculetype" title="Permalink to this heading">#</a></h1>
+          <section id="pylimer-tools-cpp-pylimer-tools-cpp-structuresimplificationmode">
+<h1>pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode<a class="headerlink" href="#pylimer-tools-cpp-pylimer-tools-cpp-structuresimplificationmode" title="Permalink to this heading">#</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">MoleculeType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType" title="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">StructureSimplificationMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode" title="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode" title="Permalink to this definition">#</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
 <p>Members:</p>
-<p>UNDEFINED : This value indicates that either the property was not set or not discovered.</p>
-<dl class="simple">
-<dt>NETWORK_STRAND :</dt><dd><p>A network strand is a strand in a network.</p>
-</dd>
-<dt>PRIMARY_LOOP :</dt><dd><p>A primary loop is a network strand looping from and to the same cross-linker.</p>
-</dd>
-<dt>DANGLING_CHAIN :</dt><dd><p>A dangling chain is a network strand where only one end is attached to a cross-linker.</p>
-</dd>
-<dt>FREE_CHAIN :</dt><dd><p>A free chain is a strand not connected to any cross-linker.</p>
-</dd>
-</dl>
+<p>NO_SIMPLIFICATION</p>
+<p>X2F_ONLY</p>
+<p>INACTIVE_ONLY</p>
+<p>ALL_TIM</p>
+<p>ALL_ANDREI</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType" title="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.__init__" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode" title="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.__init__" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <p class="rubric">Methods</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.__init__" title="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, value)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.__init__" title="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, value)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -276,63 +270,63 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.DANGLING_CHAIN" title="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.DANGLING_CHAIN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DANGLING_CHAIN</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.ALL_ANDREI" title="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.ALL_ANDREI"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ALL_ANDREI</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.FREE_CHAIN" title="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.FREE_CHAIN"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FREE_CHAIN</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.ALL_TIM" title="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.ALL_TIM"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ALL_TIM</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.NETWORK_STRAND" title="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.NETWORK_STRAND"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NETWORK_STRAND</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_ONLY" title="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_ONLY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">INACTIVE_ONLY</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.PRIMARY_LOOP" title="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.PRIMARY_LOOP"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PRIMARY_LOOP</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.NO_SIMPLIFICATION" title="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.NO_SIMPLIFICATION"><code class="xref py py-obj docutils literal notranslate"><span class="pre">NO_SIMPLIFICATION</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.UNDEFINED" title="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.UNDEFINED"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UNDEFINED</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.X2F_ONLY" title="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.X2F_ONLY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">X2F_ONLY</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.name" title="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.name" title="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.value" title="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">value</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.value" title="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">value</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
 </table>
 </div>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.DANGLING_CHAIN">
-<span class="sig-name descname"><span class="pre">DANGLING_CHAIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;MoleculeType.DANGLING_CHAIN:</span> <span class="pre">3&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.DANGLING_CHAIN" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.ALL_ANDREI">
+<span class="sig-name descname"><span class="pre">ALL_ANDREI</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;StructureSimplificationMode.ALL_ANDREI:</span> <span class="pre">4&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.ALL_ANDREI" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.FREE_CHAIN">
-<span class="sig-name descname"><span class="pre">FREE_CHAIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;MoleculeType.FREE_CHAIN:</span> <span class="pre">4&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.FREE_CHAIN" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.ALL_TIM">
+<span class="sig-name descname"><span class="pre">ALL_TIM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;StructureSimplificationMode.ALL_TIM:</span> <span class="pre">3&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.ALL_TIM" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.NETWORK_STRAND">
-<span class="sig-name descname"><span class="pre">NETWORK_STRAND</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;MoleculeType.NETWORK_STRAND:</span> <span class="pre">1&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.NETWORK_STRAND" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_ONLY">
+<span class="sig-name descname"><span class="pre">INACTIVE_ONLY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;StructureSimplificationMode.INACTIVE_ONLY:</span> <span class="pre">2&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_ONLY" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.PRIMARY_LOOP">
-<span class="sig-name descname"><span class="pre">PRIMARY_LOOP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;MoleculeType.PRIMARY_LOOP:</span> <span class="pre">2&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.PRIMARY_LOOP" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.NO_SIMPLIFICATION">
+<span class="sig-name descname"><span class="pre">NO_SIMPLIFICATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;StructureSimplificationMode.NO_SIMPLIFICATION:</span> <span class="pre">0&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.NO_SIMPLIFICATION" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.UNDEFINED">
-<span class="sig-name descname"><span class="pre">UNDEFINED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;MoleculeType.UNDEFINED:</span> <span class="pre">0&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.UNDEFINED" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.X2F_ONLY">
+<span class="sig-name descname"><span class="pre">X2F_ONLY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;StructureSimplificationMode.X2F_ONLY:</span> <span class="pre">1&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.X2F_ONLY" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.name">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.name" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.name" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.value">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.value" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.value">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.value" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -344,23 +338,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList.html">
+          <a class="next-page" href="pylimer_tools_cpp.pylimer_tools_cpp.Universe.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList</div>
+                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.Universe</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator.html">
+          <a class="prev-page" href="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedNetwork.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator</div>
+                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedNetwork</div>
                 
               </div>
             </a>
@@ -393,16 +387,16 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType</a><ul>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType"><code class="docutils literal notranslate"><span class="pre">MoleculeType</span></code></a><ul>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.__init__"><code class="docutils literal notranslate"><span class="pre">MoleculeType.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.DANGLING_CHAIN"><code class="docutils literal notranslate"><span class="pre">MoleculeType.DANGLING_CHAIN</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.FREE_CHAIN"><code class="docutils literal notranslate"><span class="pre">MoleculeType.FREE_CHAIN</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.NETWORK_STRAND"><code class="docutils literal notranslate"><span class="pre">MoleculeType.NETWORK_STRAND</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.PRIMARY_LOOP"><code class="docutils literal notranslate"><span class="pre">MoleculeType.PRIMARY_LOOP</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.UNDEFINED"><code class="docutils literal notranslate"><span class="pre">MoleculeType.UNDEFINED</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.name"><code class="docutils literal notranslate"><span class="pre">MoleculeType.name</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.value"><code class="docutils literal notranslate"><span class="pre">MoleculeType.value</span></code></a></li>
+<li><a class="reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode</a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode</span></code></a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.__init__"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.ALL_ANDREI"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.ALL_ANDREI</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.ALL_TIM"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.ALL_TIM</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.INACTIVE_ONLY"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.INACTIVE_ONLY</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.NO_SIMPLIFICATION"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.NO_SIMPLIFICATION</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.X2F_ONLY"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.X2F_ONLY</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.name"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.name</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.StructureSimplificationMode.value"><code class="docutils literal notranslate"><span class="pre">StructureSimplificationMode.value</span></code></a></li>
 </ul>
 </li>
 </ul>
