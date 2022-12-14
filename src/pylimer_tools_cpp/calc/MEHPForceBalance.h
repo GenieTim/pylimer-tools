@@ -35,6 +35,14 @@ namespace calc {
       ITERATIVE
     };
 
+    enum StructureSimplificationMode {
+      NO_SIMPLIFICATION,
+      X2F_ONLY,
+      INACTIVE_ONLY,
+      ALL_TIM,
+      ALL_ANDREI
+    };
+
     // heavily inspired by Prof. Dr. Andrei Gusev's Code
     class MEHPForceBalance
     {
@@ -80,10 +88,12 @@ namespace calc {
         double damping = 1.0,
         long int maxNrOfSteps = 50000, // default: 10000
         double xtol = 1e-9,
+        const double initialResidualToUse = -1.0,
         const double oneOverSpringPartitionUpperLimit = 1.0,
-        const bool shouldRemoveInactiveCrosslinks = false,
-        const bool remove2functionalCrosslinkers = false,
-        const int outputFrequency = 50);
+        const StructureSimplificationMode simplificationMode = StructureSimplificationMode::NO_SIMPLIFICATION,
+        const double inactiveRemovalCutoff = -1.0,
+        const int outputFrequency = 50,
+        bool doInnerIterations = false);
 
       /**
        * @brief Compute the spring update residual
@@ -136,6 +146,20 @@ namespace calc {
         // displacements(involvedCoordinateIndices) = displacementsBefore;
         return retVal;
       }
+
+      /**
+       * @brief Remove cross-linkers, springs and associated slip-links with the scheme suggested by Andrei
+       * 
+       * @param net 
+       * @param displacements 
+       * @param springPartitions 
+       * @param tolerance 
+       * @return size_t 
+       */
+      size_t doRemovalAndreisWay(ForceBalanceNetwork& net,
+                                      Eigen::VectorXd& displacements,
+                                      Eigen::VectorXd& springPartitions,
+                                      double tolerance) const;
 
       /**
        * @brief Remove cross-links which do not have any springs with a certain

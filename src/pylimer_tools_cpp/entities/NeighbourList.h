@@ -194,7 +194,7 @@ namespace entities {
       std::tuple<long int, long int, long int> indexBasis = this->getBucketIndicesForAtom(atom);
       
       int nrOfBucketsPerSide =
-        newCutoff <= this->cutoff ? 3 : std::ceil(3 * newCutoff / this->cutoff);
+        (newCutoff <= this->cutoff) ? 3 : std::ceil(3 * newCutoff / this->cutoff);
       if (nrOfBucketsPerSide % 2 == 0) {
         nrOfBucketsPerSide += 1;
       }

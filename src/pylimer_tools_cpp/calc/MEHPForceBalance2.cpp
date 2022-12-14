@@ -617,7 +617,7 @@ namespace calc {
       // take mean for displacement
       // prevent NaN from division by zero
       u.segment(3 * linkIdx, 3) +=
-        objectiveDisplacement / (objectiveDisplacementContributors == 0.0
+        objectiveDisplacement / ((objectiveDisplacementContributors == 0.0)
                                    ? 1.0
                                    : objectiveDisplacementContributors);
 

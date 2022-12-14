@@ -1055,15 +1055,15 @@ namespace entities {
           if (!currentPath.empty()) {
             Atom lastAtom = currentPath.back();
             double dx = newAtom.getX() - lastAtom.getX();
-            nrOfTraversalsX += (dx) > 0.5 * (this->box.getLx())
+            nrOfTraversalsX += ((dx) > 0.5 * (this->box.getLx()))
                                  ? 1
                                  : (dx < -0.5 * (this->box.getLx()) ? -1 : 0);
             double dy = newAtom.getY() - lastAtom.getY();
-            nrOfTraversalsY += (dx) > 0.5 * (this->box.getLy())
+            nrOfTraversalsY += ((dx) > 0.5 * (this->box.getLy()))
                                  ? 1
                                  : (dy < -0.5 * (this->box.getLy()) ? -1 : 0);
             double dz = newAtom.getZ() - lastAtom.getZ();
-            nrOfTraversalsZ += (dz) > 0.5 * (this->box.getLz())
+            nrOfTraversalsZ += ((dz) > 0.5 * (this->box.getLz()))
                                  ? 1
                                  : (dz < -0.5 * (this->box.getLz()) ? -1 : 0);
           }
@@ -1508,7 +1508,7 @@ namespace entities {
     for (long int i = 0; i < vertexIndicesLoop1.size(); ++i) {
       Eigen::Vector3d vertex0 =
         this->getPositionVectorForVertex(vertexIndicesLoop1[i]);
-      long int vertex1Index = i == 0 ? vertexIndicesLoop1.size() - 1 : i - 1;
+      long int vertex1Index = (i == 0) ? vertexIndicesLoop1.size() - 1 : i - 1;
       Eigen::Vector3d vertex1 =
         this->getPositionVectorForVertex(vertexIndicesLoop1[vertex1Index]);
       // the triangle is now spawned by vertex0, vertex1 and the helperNode
@@ -1516,7 +1516,7 @@ namespace entities {
       for (size_t j = 0; j < vertexIndicesLoop2.size(); ++j) {
         Eigen::Vector3d rayOrigin =
           this->getPositionVectorForVertex(vertexIndicesLoop2[j]);
-        long int directionIdx = j == 0 ? vertexIndicesLoop2.size() - 1 : j - 1;
+        long int directionIdx = (j == 0) ? vertexIndicesLoop2.size() - 1 : j - 1;
         Eigen::Vector3d rayTarget =
           this->getPositionVectorForVertex(vertexIndicesLoop2[directionIdx]);
         Eigen::Vector3d intersectionPoint;
