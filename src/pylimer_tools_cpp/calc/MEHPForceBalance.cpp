@@ -221,19 +221,6 @@ namespace calc {
             this->validateNetwork(net, u, springPartitions);
           }
         }
-        if (iterationsDone % 50 == 0) {
-          if (outputFrequency > 0) {
-            std::array<std::array<double, 3>, 3> stressTensor =
-              this->evaluateStressTensor(net,
-                                         u,
-                                         springPartitions,
-                                         1.0,
-                                         oneOverSpringPartitionUpperLimit);
-            std::cout << "To stress tensor diagonal: " << stressTensor[0][0]
-                      << ", " << stressTensor[1][1] << ", "
-                      << stressTensor[2][2] << std::endl;
-          }
-        }
         if (outputFrequency > 0 && iterationsDone % outputFrequency == 0) {
           std::cout << "Iteration " << iterationsDone << " " << maxDistanceMoved
                     << " by " << indexOfMaxDistanceMoved
@@ -243,6 +230,12 @@ namespace calc {
                     << intermediateResidual * minN * minN << " ("
                     << (intermediateResidual / initialResidual) << ") "
                     << "\n";
+          std::array<std::array<double, 3>, 3> stressTensor =
+            this->evaluateStressTensor(
+              net, u, springPartitions, 1.0, oneOverSpringPartitionUpperLimit);
+          std::cout << "To stress tensor diagonal: " << stressTensor[0][0]
+                    << ", " << stressTensor[1][1] << ", " << stressTensor[2][2]
+                    << std::endl;
         }
       } while (currentResidual / initialResidual > xtol &&
                iterationsDone < maxNrOfSteps);
@@ -956,8 +949,8 @@ namespace calc {
       for (size_t i = 0; i < this->universe.getNrOfAtoms(); ++i) {
         toSampleFrom.push_back(i);
         isMasked[i] = (excludeCrosslinks &&
-                      this->universe.getAtomByVertexIdx(i).getType() ==
-                        this->crosslinkerType);
+                       this->universe.getAtomByVertexIdx(i).getType() ==
+                         this->crosslinkerType);
       }
       std::shuffle(toSampleFrom.begin(), toSampleFrom.end(), rng);
 
@@ -2877,6 +2870,10 @@ namespace calc {
                                              kappa0,
                                              oneOverSpringPartitionUpperLimit);
         /* spring contribution to the overall stress tensor */
+        RUNTIME_EXP_IFN(std::isfinite(force.squaredNorm()),
+                        "Got non-finite force contribution to stress tensor: " +
+                          std::to_string(force.squaredNorm()) + " at link " +
+                          std::to_string(linkIdx) + "!");
         stress += force;
       }
 
@@ -2965,6 +2962,15 @@ namespace calc {
           for (size_t k = 0; k < 3; k++) {
             double contribution =
               distance[j] * distance[k] * kappa0 * denominator;
+            RUNTIME_EXP_IFN(
+              std::isfinite(contribution),
+              "Got non-finite contribution to stress tensor: " +
+                std::to_string(contribution) + " at coordinates " +
+                std::to_string(k) + ", " + std::to_string(j) +
+                " for partial spring " + std::to_string(partialSpringIdx) +
+                " from distances " + std::to_string(distance[j]) + ", " +
+                std::to_string(distance[k]) + " and denominator " +
+                std::to_string(denominator) + ".");
             // if (std::isfinite(denominator) && std::isfinite(contribution))
             // {
             stress[j][k] += contribution;
@@ -2976,6 +2982,12 @@ namespace calc {
       for (size_t i = 0; i < 3; ++i) {
         for (size_t j = 0; j < 3; ++j) {
           stress[i][j] *= oneOverVolume;
+          RUNTIME_EXP_IFN(std::isfinite(stress[i][j]),
+                          "Got non-finite stress tensor component: " +
+                            std::to_string(stress[i][j]) + " at coordinates " +
+                            std::to_string(i) + ", " + std::to_string(j) +
+                            " from denominator " +
+                            std::to_string(oneOverVolume) + ".");
         }
       }
 
@@ -3593,6 +3605,32 @@ namespace calc {
               " but expected " + std::to_string(3 * partialEndB + dir) +
               " with dir = " + std::to_string(dir) + ".");
         }
+      }
+      /**
+       * Check that we do not have any nan or inf values in our vectors
+       */
+      for (size_t coordI = 0; coordI < net.coordinates.size(); coordI++) {
+        RUNTIME_EXP_IFN(std::isfinite(net.coordinates[coordI]),
+                        "Coordinate component " + std::to_string(coordI) +
+                          " must be finite, got " +
+                          std::to_string(net.coordinates[coordI]) + ".");
+        RUNTIME_EXP_IFN(std::isfinite(u[coordI]),
+                        "Displacement component " + std::to_string(coordI) +
+                          " must be finite, got " + std::to_string(u[coordI]) +
+                          ".");
+      }
+      for (size_t dir = 0; dir < 3; ++dir) {
+        RUNTIME_EXP_IFN(std::isfinite(net.L[dir]),
+                        "Expected box size to be finite, got " +
+                          std::to_string(net.L[dir]) + " in dir " +
+                          std::to_string(dir) + ".");
+        RUNTIME_EXP_IFN(net.L[dir] > 0.0,
+                        "Expected box size to be positive, got " +
+                          std::to_string(net.L[dir]) + " in dir " +
+                          std::to_string(dir) + ".");
+        RUNTIME_EXP_IFN(
+          APPROX_EQUAL(net.boxHalfs[dir], 0.5 * net.L[dir], 1e-12),
+          "Expected box half to be half of box length");
       }
       // std::cout << "Validation passed." << std::endl;
       return true;
