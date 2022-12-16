@@ -473,6 +473,10 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("is2D") = false,
          py::arg("kappa") = 1.0,
          py::arg("remove2functionalCrosslinkers") = false)
+    .def("__copy__",
+         [](const mehp::MEHPForceBalance& self) {
+           return mehp::MEHPForceBalance(self);
+         })
     .def_property_readonly("network", &mehp::MEHPForceBalance::getNetwork)
     //     .def("validateNetwork",
     //          py::overload_cast<>(&mehp::MEHPForceBalance::validateNetwork),
@@ -506,6 +510,10 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("inactiveRemovalCutoff") = -1.0,
          py::arg("outputFrequency") = 50,
          py::arg("doInnerIterations") = false)
+    .def("deformTo",
+         &mehp::MEHPForceBalance::deformTo,
+         R"pbdoc()pbdoc",
+         py::arg("newBox"))
     .def("inspectLinkDisplacementToMeanPositionUpdate",
          &mehp::MEHPForceBalance::inspectLinkDisplacementToMeanPositionUpdate,
          R"pbdoc()pbdoc",
