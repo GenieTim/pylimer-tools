@@ -23,13 +23,13 @@ namespace calc {
  */
 #define CLAMP_ONE_OVER_SPRINGPARTITION(                                        \
   isPartialSpring, val, N, oneOverSpringPartitionUpperLimit)                   \
-  (!isPartialSpring)                                                             \
+  (!isPartialSpring)                                                           \
     ? val                                                                      \
     : std::clamp(val,                                                          \
-                 (oneOverSpringPartitionUpperLimit > 0.)                         \
+                 (oneOverSpringPartitionUpperLimit > 0.)                       \
                    ? 1. / (N - 1. / oneOverSpringPartitionUpperLimit)          \
                    : 0.0,                                                      \
-                 (oneOverSpringPartitionUpperLimit > 0.)                         \
+                 (oneOverSpringPartitionUpperLimit > 0.)                       \
                    ? oneOverSpringPartitionUpperLimit                          \
                    : N);
 
@@ -93,7 +93,8 @@ namespace calc {
       const double minN = net.springsContourLength.minCoeff();
       std::cout << "Starting force balance procedure "
                 << "with " << initialResidual
-                << " as initial residual, got requested " << initialResidualToUse
+                << " as initial residual, got requested "
+                << initialResidualToUse
                 // "with " << independentVertexSets.size() << "vertex sets."
                 << std::endl;
       double currentResidual = 0.0;
@@ -842,250 +843,246 @@ namespace calc {
       return numRemoved;
     }
 
-
-      /**
-       * @brief Add slip-links to this system
-       *
-       * @param sliplinkDensity
-       * @param cutoff
-       */
-      size_t MEHPForceBalance::randomlyAddSliplinks(const size_t nrOfSliplinksToSample,
-                                  const double cutoff,
-                                  const size_t minimumNrOfSliplinks,
-                                  const double sameStrandCutoff,
-                                  const bool excludeCrosslinks,
-                                  const int seed)
-      {
-        INVALIDARG_EXP_IFN(nrOfSliplinksToSample > minimumNrOfSliplinks,
-                           "Maximum nr. should be larger than minimum, got " +
-                             std::to_string(nrOfSliplinksToSample) + " and " +
-                             std::to_string(minimumNrOfSliplinks) + ".");
-        INVALIDARG_EXP_IFN(cutoff > 0.0,
-                           "Expected a cutoff > 0.0, got " +
-                             std::to_string(cutoff) + ".");
-        // RUNTIME_EXP_IFN(this->initialConfig.nrOfLinks ==
-        //                   this->initialConfig.nrOfNodes,
-        //                 "Slip-links are only added randomly when no other "
-        //                 "slip-links are in place yet.");
-        INVALIDARG_EXP_IFN(minimumNrOfSliplinks <
-                             this->universe.getNrOfAtoms() / 2,
-                           "Minimum number of slip-links must be less than the "
-                           "possible number of slip-links to place.");
-        INVALIDARG_EXP_IFN(nrOfSliplinksToSample <
-                             this->universe.getNrOfAtoms() / 2,
-                           "Number of slip-links to place must be less than "
-                           "the possible number of slip-links to place.");
-        // query all the cross-linker chains we actually use to place
-        // slip-links on
-        std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
-          this->universe.getChainsWithCrosslinker(crosslinkerType);
-        std::vector<size_t> usableSpringIdxs;
-        usableSpringIdxs.reserve(crosslinkerChains.size());
-        // and also query all the corresponding atoms we use to place slip-links
-        // on
-        size_t nrOfEligibleAtoms = 0;
-        std::vector<pylimer_tools::entities::Atom> eligibleAtoms;
-        eligibleAtoms.reserve(this->universe.getNrOfAtoms());
-        std::vector<bool> vertexIdxIsEligible =
-          pylimer_tools::utils::initializeWithValue<bool>(
-            this->universe.getNrOfAtoms(), false);
-        std::unordered_map<size_t, size_t> atomToStrand;
-        atomToStrand.reserve(this->universe.getNrOfAtoms());
-        std::unordered_map<size_t, size_t> atomIdxInStrand;
-        atomIdxInStrand.reserve(this->universe.getNrOfAtoms());
-        size_t springId = 0;
-        for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
-          pylimer_tools::entities::Molecule chain = crosslinkerChains[i];
-          RUNTIME_EXP_IFN(chain.getType() !=
-                            pylimer_tools::entities::MoleculeType::UNDEFINED,
-                          "Couldn't determine molecule type.");
-          if (chain.getType() ==
-                pylimer_tools::entities::MoleculeType::PRIMARY_LOOP ||
-              chain.getType() ==
-                pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
-            assert(i == this->initialConfig.springToMoleculeIds[springId]);
-            // TODO: also check that this is not a higher order dangling strand
-            usableSpringIdxs.push_back(i);
-            nrOfEligibleAtoms +=
-              crosslinkerChains[i].getNrOfAtoms() -
-              crosslinkerChains[i].getAtomsOfType(this->crosslinkerType).size();
-            std::vector<pylimer_tools::entities::Atom> atoms =
-              crosslinkerChains[i].getAtomsLinedUp(this->crosslinkerType);
-            for (size_t atomIdx = 0; atomIdx < atoms.size(); ++atomIdx) {
-              pylimer_tools::entities::Atom atom = atoms[atomIdx];
-              if (atom.getType() != this->crosslinkerType) {
-                eligibleAtoms.push_back(atom);
-                vertexIdxIsEligible[this->universe.getIdxByAtomId(
-                  atom.getId())] = true;
-                atomToStrand.emplace(atom.getId(), springId);
-                atomIdxInStrand.emplace(atom.getId(), atomIdx);
-              }
+    /**
+     * @brief Add slip-links to this system
+     *
+     * @param sliplinkDensity
+     * @param cutoff
+     */
+    size_t MEHPForceBalance::randomlyAddSliplinks(
+      const size_t nrOfSliplinksToSample,
+      const double cutoff,
+      const size_t minimumNrOfSliplinks,
+      const double sameStrandCutoff,
+      const bool excludeCrosslinks,
+      const int seed)
+    {
+      INVALIDARG_EXP_IFN(nrOfSliplinksToSample > minimumNrOfSliplinks,
+                         "Maximum nr. should be larger than minimum, got " +
+                           std::to_string(nrOfSliplinksToSample) + " and " +
+                           std::to_string(minimumNrOfSliplinks) + ".");
+      INVALIDARG_EXP_IFN(cutoff > 0.0,
+                         "Expected a cutoff > 0.0, got " +
+                           std::to_string(cutoff) + ".");
+      // RUNTIME_EXP_IFN(this->initialConfig.nrOfLinks ==
+      //                   this->initialConfig.nrOfNodes,
+      //                 "Slip-links are only added randomly when no other "
+      //                 "slip-links are in place yet.");
+      INVALIDARG_EXP_IFN(minimumNrOfSliplinks <
+                           this->universe.getNrOfAtoms() / 2,
+                         "Minimum number of slip-links must be less than the "
+                         "possible number of slip-links to place.");
+      INVALIDARG_EXP_IFN(nrOfSliplinksToSample <
+                           this->universe.getNrOfAtoms() / 2,
+                         "Number of slip-links to place must be less than "
+                         "the possible number of slip-links to place.");
+      // query all the cross-linker chains we actually use to place
+      // slip-links on
+      std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
+        this->universe.getChainsWithCrosslinker(crosslinkerType);
+      std::vector<size_t> usableSpringIdxs;
+      usableSpringIdxs.reserve(crosslinkerChains.size());
+      // and also query all the corresponding atoms we use to place slip-links
+      // on
+      size_t nrOfEligibleAtoms = 0;
+      std::vector<pylimer_tools::entities::Atom> eligibleAtoms;
+      eligibleAtoms.reserve(this->universe.getNrOfAtoms());
+      std::vector<bool> vertexIdxIsEligible =
+        pylimer_tools::utils::initializeWithValue<bool>(
+          this->universe.getNrOfAtoms(), false);
+      std::unordered_map<size_t, size_t> atomToStrand;
+      atomToStrand.reserve(this->universe.getNrOfAtoms());
+      std::unordered_map<size_t, size_t> atomIdxInStrand;
+      atomIdxInStrand.reserve(this->universe.getNrOfAtoms());
+      size_t springId = 0;
+      for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
+        pylimer_tools::entities::Molecule chain = crosslinkerChains[i];
+        RUNTIME_EXP_IFN(chain.getType() !=
+                          pylimer_tools::entities::MoleculeType::UNDEFINED,
+                        "Couldn't determine molecule type.");
+        if (chain.getType() ==
+              pylimer_tools::entities::MoleculeType::PRIMARY_LOOP ||
+            chain.getType() ==
+              pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
+          assert(i == this->initialConfig.springToMoleculeIds[springId]);
+          // TODO: also check that this is not a higher order dangling strand
+          usableSpringIdxs.push_back(i);
+          nrOfEligibleAtoms +=
+            crosslinkerChains[i].getNrOfAtoms() -
+            crosslinkerChains[i].getAtomsOfType(this->crosslinkerType).size();
+          std::vector<pylimer_tools::entities::Atom> atoms =
+            crosslinkerChains[i].getAtomsLinedUp(this->crosslinkerType);
+          for (size_t atomIdx = 0; atomIdx < atoms.size(); ++atomIdx) {
+            pylimer_tools::entities::Atom atom = atoms[atomIdx];
+            if (atom.getType() != this->crosslinkerType) {
+              eligibleAtoms.push_back(atom);
+              vertexIdxIsEligible[this->universe.getIdxByAtomId(atom.getId())] =
+                true;
+              atomToStrand.emplace(atom.getId(), springId);
+              atomIdxInStrand.emplace(atom.getId(), atomIdx);
             }
-            springId += 1;
           }
+          springId += 1;
         }
-        // build neighbourlist
-        std::vector<pylimer_tools::entities::Atom> atomsForNeighbourList =
-          this->universe.getAtoms();
-        if (excludeCrosslinks) {
-          // TODO: check whether it is faster to just only query the other ones
-          atomsForNeighbourList.erase(
-            std::remove_if(atomsForNeighbourList.begin(),
-                           atomsForNeighbourList.end(),
-                           [&](pylimer_tools::entities::Atom a) {
-                             return a.getType() == this->crosslinkerType;
-                           }));
-        }
-        pylimer_tools::entities::NeighbourList neighbourList =
-          pylimer_tools::entities::NeighbourList(
-            atomsForNeighbourList, this->universe.getBox(), cutoff);
-
-        std::random_device rd{};
-        std::mt19937 rng = std::mt19937(rd());
-        if (seed > 0) {
-          rng.seed(seed);
-        }
-        // build list of random samples
-        // this way is more performant than
-        // sampling integers and checking whether they have been sampled already
-        std::vector<size_t> toSampleFrom;
-        std::vector<bool> isMasked;
-        toSampleFrom.reserve(this->universe.getNrOfAtoms());
-        isMasked.reserve(this->universe.getNrOfAtoms());
-        for (size_t i = 0; i < this->universe.getNrOfAtoms(); ++i) {
-          if (!excludeCrosslinks ||
-              this->universe.getAtomByVertexIdx(i).getType() !=
-                this->crosslinkerType) {
-            toSampleFrom.push_back(i);
-          }
-          isMasked[i] = false;
-        }
-        std::shuffle(toSampleFrom.begin(), toSampleFrom.end(), rng);
-
-        // the resulting vectors to fill
-        std::vector<double> slipLinkXs;
-        slipLinkXs.reserve(nrOfSliplinksToSample);
-        std::vector<double> slipLinkYs;
-        slipLinkYs.reserve(nrOfSliplinksToSample);
-        std::vector<double> slipLinkZs;
-        slipLinkZs.reserve(nrOfSliplinksToSample);
-        std::vector<size_t> slipLinkStrandA;
-        slipLinkStrandA.reserve(nrOfSliplinksToSample);
-        std::vector<size_t> slipLinkStrandB;
-        slipLinkStrandB.reserve(nrOfSliplinksToSample);
-        std::vector<double> slipLinkStrandAlpha;
-        slipLinkStrandAlpha.reserve(nrOfSliplinksToSample);
-        std::vector<double> slipLinkStrandBeta;
-        slipLinkStrandBeta.reserve(nrOfSliplinksToSample);
-
-        pylimer_tools::entities::Box box = this->universe.getBox();
-
-        size_t nrOfSlipLinksPlaced = 0;
-        size_t nrOfAttempts = 0;
-        size_t sampleIdx = 0;
-        // the actual sampling loop
-        while (nrOfSlipLinksPlaced < minimumNrOfSliplinks ||
-               nrOfAttempts < nrOfSliplinksToSample) {
-          // first, randomly sample an atom
-          while (isMasked[toSampleFrom[sampleIdx]] &&
-                 sampleIdx < toSampleFrom.size()) {
-            sampleIdx += 1;
-          }
-          if (sampleIdx >= toSampleFrom.size()) {
-            // this is a path that should barely ever be reached
-            std::cerr << "Sample index exceeds number of samples." << std::endl;
-            break;
-          }
-          size_t sampledVertexId = toSampleFrom[sampleIdx];
-          nrOfAttempts += 1;
-          sampleIdx += 1;
-          pylimer_tools::entities::Atom a1 =
-            this->universe.getAtomByVertexIdx(sampledVertexId);
-          isMasked[sampledVertexId] = true;
-          // then, find neighbouring atoms (but not from the same strand?!)
-          std::vector<pylimer_tools::entities::Atom> neighbours =
-            neighbourList.getAtomsCloseTo(a1);
-          neighbourList.removeAtom(a1);
-          // filter the neighbours to include only those from other strands
-          // NOTE: this skews the whole thing a bit
-          neighbours.erase(
-            std::remove_if(
-              neighbours.begin(),
-              neighbours.end(),
-              [&](pylimer_tools::entities::Atom a) -> bool {
-                return (
-                  atomToStrand[a.getId()] ==
-                    atomToStrand[a1.getId()] // do not use "at", because not all
-                                             // atoms in the neighbours have
-                                             // been assigned a strand
-                  &&
-                  std::abs(static_cast<double>(atomIdxInStrand[a.getId()] -
-                                               atomIdxInStrand[a1.getId()])) <
-                    sameStrandCutoff);
-              }),
-            neighbours.end());
-          if (neighbours.size() == 0) {
-            std::cerr << "Not enough neighbours found." << std::endl;
-            continue;
-          }
-          // then, randomly select one of them
-          pylimer_tools::entities::Atom a2 = neighbours[0];
-          if (neighbours.size() > 1) {
-            size_t randomA2Idx =
-              std::uniform_int_distribution<size_t>{ 0, neighbours.size() - 1 }(
-                rng);
-            a2 = neighbours[randomA2Idx];
-          }
-          // finally, remove them from the neighbour lists so that they are not
-          // sampled more than once
-          size_t sampledVertexId2 = this->universe.getIdxByAtomId(a2.getId());
-          neighbourList.removeAtom(a2);
-          isMasked[sampledVertexId2] = true;
-          // it is actually quite a lot of expensive stuff done until we get to
-          // this check but only this way we have the balance of removing atoms
-          // to sample them only once
-          if (!vertexIdxIsEligible[sampledVertexId] ||
-              !vertexIdxIsEligible[sampledVertexId2]) {
-            // std::cout << "Sampled vertices are not eligible" << std::endl;
-            continue;
-          }
-          // take the mean and their index etc. to add as slip-link
-          std::array<double, 3> meanPositions = a1.meanPositionWith(a2, &box);
-          slipLinkXs.push_back(meanPositions[0]);
-          slipLinkYs.push_back(meanPositions[1]);
-          slipLinkZs.push_back(meanPositions[2]);
-          slipLinkStrandA.push_back(atomToStrand.at(a1.getId()));
-          slipLinkStrandB.push_back(atomToStrand.at(a2.getId()));
-          slipLinkStrandAlpha.push_back(
-            static_cast<double>(atomIdxInStrand.at(a1.getId())) /
-            (static_cast<double>(
-              this->initialConfig
-                .springsContourLength[atomToStrand.at(a1.getId())])));
-          slipLinkStrandBeta.push_back(
-            static_cast<double>(atomIdxInStrand.at(a2.getId())) /
-            (static_cast<double>(
-              this->initialConfig
-                .springsContourLength[atomToStrand.at(a2.getId())])));
-          nrOfSlipLinksPlaced += 1;
-        }
-
-        RUNTIME_EXP_IFN(
-          slipLinkStrandA.size() == slipLinkStrandB.size() &&
-            slipLinkXs.size() == slipLinkYs.size() &&
-            slipLinkZs.size() == slipLinkXs.size(),
-          "Expect all slip-link relevant properties to have the same length");
-        // with the data assembled, we can actually add them to the structure
-        // and stuff
-        this->addSlipLinks(slipLinkStrandA,
-                           slipLinkStrandB,
-                           slipLinkXs,
-                           slipLinkYs,
-                           slipLinkZs,
-                           slipLinkStrandAlpha,
-                           slipLinkStrandBeta,
-                           false);
-        return nrOfSlipLinksPlaced;
       }
+      // build neighbourlist
+      std::vector<pylimer_tools::entities::Atom> atomsForNeighbourList =
+        this->universe.getAtoms();
+      if (excludeCrosslinks) {
+        // TODO: check whether it is faster to just only query the other ones
+        atomsForNeighbourList.erase(
+          std::remove_if(atomsForNeighbourList.begin(),
+                         atomsForNeighbourList.end(),
+                         [&](pylimer_tools::entities::Atom a) -> bool {
+                           return a.getType() == this->crosslinkerType;
+                         }));
+      }
+      pylimer_tools::entities::NeighbourList neighbourList =
+        pylimer_tools::entities::NeighbourList(
+          atomsForNeighbourList, this->universe.getBox(), cutoff);
+
+      std::random_device rd{};
+      std::mt19937 rng = std::mt19937(rd());
+      if (seed > 0) {
+        rng.seed(seed);
+      }
+      // build list of random samples
+      // this way is more performant than
+      // sampling integers and checking whether they have been sampled already
+      std::vector<size_t> toSampleFrom;
+      std::vector<bool> isMasked;
+      toSampleFrom.reserve(this->universe.getNrOfAtoms());
+      isMasked.reserve(this->universe.getNrOfAtoms());
+      for (size_t i = 0; i < this->universe.getNrOfAtoms(); ++i) {
+        toSampleFrom.push_back(i);
+        isMasked[i] = (excludeCrosslinks &&
+                      this->universe.getAtomByVertexIdx(i).getType() ==
+                        this->crosslinkerType);
+      }
+      std::shuffle(toSampleFrom.begin(), toSampleFrom.end(), rng);
+
+      // the resulting vectors to fill
+      std::vector<double> slipLinkXs;
+      slipLinkXs.reserve(nrOfSliplinksToSample);
+      std::vector<double> slipLinkYs;
+      slipLinkYs.reserve(nrOfSliplinksToSample);
+      std::vector<double> slipLinkZs;
+      slipLinkZs.reserve(nrOfSliplinksToSample);
+      std::vector<size_t> slipLinkStrandA;
+      slipLinkStrandA.reserve(nrOfSliplinksToSample);
+      std::vector<size_t> slipLinkStrandB;
+      slipLinkStrandB.reserve(nrOfSliplinksToSample);
+      std::vector<double> slipLinkStrandAlpha;
+      slipLinkStrandAlpha.reserve(nrOfSliplinksToSample);
+      std::vector<double> slipLinkStrandBeta;
+      slipLinkStrandBeta.reserve(nrOfSliplinksToSample);
+
+      pylimer_tools::entities::Box box = this->universe.getBox();
+
+      size_t nrOfSlipLinksPlaced = 0;
+      size_t nrOfAttempts = 0;
+      size_t sampleIdx = 0;
+      // the actual sampling loop
+      while (nrOfSlipLinksPlaced < minimumNrOfSliplinks ||
+             nrOfAttempts < nrOfSliplinksToSample) {
+        // first, randomly sample an atom
+        while (isMasked[toSampleFrom[sampleIdx]] &&
+               sampleIdx < toSampleFrom.size()) {
+          sampleIdx += 1;
+        }
+        if (sampleIdx >= toSampleFrom.size()) {
+          // this is a path that should barely ever be reached
+          std::cerr << "Sample index exceeds number of samples." << std::endl;
+          break;
+        }
+        size_t sampledVertexId = toSampleFrom[sampleIdx];
+        nrOfAttempts += 1;
+        sampleIdx += 1;
+        pylimer_tools::entities::Atom a1 =
+          this->universe.getAtomByVertexIdx(sampledVertexId);
+        isMasked[sampledVertexId] = true;
+        // then, find neighbouring atoms (but not from the same strand?!)
+        std::vector<pylimer_tools::entities::Atom> neighbours =
+          neighbourList.getAtomsCloseTo(a1);
+        neighbourList.removeAtom(a1);
+        // filter the neighbours to include only those from other strands
+        // NOTE: this skews the whole thing a bit
+        neighbours.erase(
+          std::remove_if(
+            neighbours.begin(),
+            neighbours.end(),
+            [&](pylimer_tools::entities::Atom a) -> bool {
+              return (atomToStrand[a.getId()] ==
+                        atomToStrand[a1.getId()] // do not use "at", because not
+                                                 // all atoms in the neighbours
+                                                 // have been assigned a strand
+                      && std::abs(static_cast<double>(
+                           atomIdxInStrand[a.getId()] -
+                           atomIdxInStrand[a1.getId()])) < sameStrandCutoff);
+            }),
+          neighbours.end());
+        if (neighbours.size() == 0) {
+          std::cerr << "Not enough neighbours found." << std::endl;
+          continue;
+        }
+        // then, randomly select one of them
+        pylimer_tools::entities::Atom a2 = neighbours[0];
+        if (neighbours.size() > 1) {
+          size_t randomA2Idx =
+            std::uniform_int_distribution<size_t>{ 0,
+                                                   neighbours.size() - 1 }(rng);
+          a2 = neighbours[randomA2Idx];
+        }
+        // finally, remove them from the neighbour lists so that they are not
+        // sampled more than once
+        size_t sampledVertexId2 = this->universe.getIdxByAtomId(a2.getId());
+        neighbourList.removeAtom(a2);
+        isMasked[sampledVertexId2] = true;
+        // it is actually quite a lot of expensive stuff done until we get to
+        // this check but only this way we have the balance of removing atoms
+        // to sample them only once
+        if (!vertexIdxIsEligible[sampledVertexId] ||
+            !vertexIdxIsEligible[sampledVertexId2]) {
+          // std::cout << "Sampled vertices are not eligible" << std::endl;
+          continue;
+        }
+        // take the mean and their index etc. to add as slip-link
+        std::array<double, 3> meanPositions = a1.meanPositionWith(a2, &box);
+        slipLinkXs.push_back(meanPositions[0]);
+        slipLinkYs.push_back(meanPositions[1]);
+        slipLinkZs.push_back(meanPositions[2]);
+        slipLinkStrandA.push_back(atomToStrand.at(a1.getId()));
+        slipLinkStrandB.push_back(atomToStrand.at(a2.getId()));
+        slipLinkStrandAlpha.push_back(
+          static_cast<double>(atomIdxInStrand.at(a1.getId())) /
+          (static_cast<double>(
+            this->initialConfig
+              .springsContourLength[atomToStrand.at(a1.getId())])));
+        slipLinkStrandBeta.push_back(
+          static_cast<double>(atomIdxInStrand.at(a2.getId())) /
+          (static_cast<double>(
+            this->initialConfig
+              .springsContourLength[atomToStrand.at(a2.getId())])));
+        nrOfSlipLinksPlaced += 1;
+      }
+
+      RUNTIME_EXP_IFN(
+        slipLinkStrandA.size() == slipLinkStrandB.size() &&
+          slipLinkXs.size() == slipLinkYs.size() &&
+          slipLinkZs.size() == slipLinkXs.size(),
+        "Expect all slip-link relevant properties to have the same length");
+      // with the data assembled, we can actually add them to the structure
+      // and stuff
+      this->addSlipLinks(slipLinkStrandA,
+                         slipLinkStrandB,
+                         slipLinkXs,
+                         slipLinkYs,
+                         slipLinkZs,
+                         slipLinkStrandAlpha,
+                         slipLinkStrandBeta,
+                         false);
+      return nrOfSlipLinksPlaced;
+    }
 
     /**
      * @brief Remove a spring (and all its parts, incl. slip-links) from the
@@ -1814,8 +1811,9 @@ namespace calc {
       pylimer_tools::utils::removeRow(springPartitions,
                                       removedPartialSpringIdx);
       RUNTIME_EXP_IFN(springPartitions.size() == net.nrOfPartialSprings, "");
-      size_t newKeptSpringIdx =
-        (keptSpringIdx < removedSpringIdx) ? keptSpringIdx : (keptSpringIdx - 1);
+      size_t newKeptSpringIdx = (keptSpringIdx < removedSpringIdx)
+                                  ? keptSpringIdx
+                                  : (keptSpringIdx - 1);
       // addmittedly, this is possibly dangerous, as it could hide
       // other mistakes
       double newTotalForNormalization =
@@ -1903,7 +1901,8 @@ namespace calc {
           (net.coordinates.segment(3 * net.springIndexB[springIdx], 3) +
            displacements.segment(3 * net.springIndexB[springIdx], 3));
         MEHPForceBalance::handlePBC(net, distance);
-        if (distance.squaredNorm() < tolerance && net.linkIndicesOfSprings[springIdx].size() <= 2) {
+        if (distance.squaredNorm() < tolerance &&
+            net.linkIndicesOfSprings[springIdx].size() <= 2) {
           // remove
           this->removeSpring(net, displacements, springPartitions, springIdx);
           numSpringsRemoved += 1;
@@ -2266,13 +2265,13 @@ namespace calc {
             //     1.0 / (1e-12 *
             //            net.springsContourLength[springIndices[spring_index]]);
             // }
-            if (oneOverSpringPartitionUpperLimit > 0.0) {
-              oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
-                net.partialSpringIsPartial[globalSpringIndex],
-                oneOverContourLengthFraction,
-                N,
-                oneOverSpringPartitionUpperLimit);
-            }
+            // if (oneOverSpringPartitionUpperLimit > 0.0) {
+            //   oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+            //     net.partialSpringIsPartial[globalSpringIndex],
+            //     oneOverContourLengthFraction,
+            //     N,
+            //     oneOverSpringPartitionUpperLimit);
+            // }
             if (std::isfinite(oneOverContourLengthFraction)) {
               objectiveDisplacement +=
                 (partialDistance)*oneOverContourLengthFraction; // /
@@ -2659,8 +2658,9 @@ namespace calc {
         this->initialConfig.linkIsSliplink[currentNrOfLinks + i] = true;
         std::vector<size_t> springIndices{ strandIdx1[i], strandIdx2[i] };
         std::vector<size_t> springIndicesOfLink =
-          (strandIdx1[i] == strandIdx2[i]) ? std::vector<size_t>{ strandIdx1[i] }
-                                         : springIndices;
+          (strandIdx1[i] == strandIdx2[i])
+            ? std::vector<size_t>{ strandIdx1[i] }
+            : springIndices;
         this->initialConfig.springIndicesOfLinks.push_back(springIndicesOfLink);
         // add to the springs
         int springIndexIndex = 0;
