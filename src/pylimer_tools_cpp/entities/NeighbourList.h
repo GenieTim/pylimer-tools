@@ -148,7 +148,9 @@ namespace entities {
         //                    valToRemove),
         //        this->neighbourBuckets.at(indexBasis).end());
       } else {
-        throw std::invalid_argument("This atom is not in a bucket anyway");
+        throw std::invalid_argument("This atom with id " +
+                                    std::to_string(atom.getId()) +
+                                    " is not in a bucket, so that it cannot be removed.");
       }
     }
 
@@ -191,10 +193,12 @@ namespace entities {
       double newCutoff)
     {
       std::vector<size_t> result = std::vector<size_t>();
-      std::tuple<long int, long int, long int> indexBasis = this->getBucketIndicesForAtom(atom);
-      
-      int nrOfBucketsPerSide =
-        (newCutoff <= this->cutoff) ? 3 : std::ceil(3 * newCutoff / this->cutoff);
+      std::tuple<long int, long int, long int> indexBasis =
+        this->getBucketIndicesForAtom(atom);
+
+      int nrOfBucketsPerSide = (newCutoff <= this->cutoff)
+                                 ? 3
+                                 : std::ceil(3 * newCutoff / this->cutoff);
       if (nrOfBucketsPerSide % 2 == 0) {
         nrOfBucketsPerSide += 1;
       }
