@@ -429,6 +429,22 @@ namespace calc {
       Eigen::VectorXd relevantPartialDistancesA =
         (displacedCoords(net.springPartCoordinateIndexB) -
          displacedCoords(net.springPartCoordinateIndexA));
+      for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
+        for (size_t dir = 0; dir < 3; ++dir) {
+          if (std::abs(relevantPartialDistancesA[3 * i + dir]) >
+              50. * net.L[dir]) {
+            std::cerr
+              << "WARNING: Spring " << i << " between "
+              << net.springPartIndexA[i] << " and " << net.springPartIndexB[i]
+              << " has a length of " << relevantPartialDistancesA[3 * i + dir]
+              << " in dir " << dir << " from "
+              << displacedCoords[net.springPartCoordinateIndexB[3 * i + dir]]
+              << " minus "
+              << displacedCoords[net.springPartCoordinateIndexA[3 * i + dir]]
+              << " meaning it will probably fail in PBC." << std::endl;
+          }
+        }
+      }
       this->handlePBC(net, relevantPartialDistancesA);
       Eigen::VectorXd partialDistancesOverSpringPartitions =
         (relevantPartialDistancesA.array() * oneOverSpringPartitions.array())
