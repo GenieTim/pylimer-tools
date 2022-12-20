@@ -745,6 +745,38 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
   }
 }
 
+TEST_CASE("MEHP Force Balance can randomly add slip-links ignoring cross-links",
+          "[analysis][MEHPForceBalance]")
+{
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  REQUIRE(universeSeq.getLength() == 0);
+  std::string suspectedPath = "../pylimer_tools/fixtures/";
+
+  std::string largeInputFile =
+    suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
+  if (std::filesystem::exists(largeInputFile)) {
+    REQUIRE(std::filesystem::exists(suspectedPath));
+    std::cout << "Reading file " << largeInputFile << std::endl;
+    universeSeq.initializeFromDataSequence({ { largeInputFile } });
+    REQUIRE(universeSeq.getLength() == 1);
+    pe::Universe universe = universeSeq.atIndex(0);
+    std::cout << "Read file. " << std::endl;
+    pcm::MEHPForceBalance forceBalancer =
+      pcm::MEHPForceBalance(universe, 2, true);
+    size_t nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(1000, 2.0, 100, 2.0, true);
+    REQUIRE(nrOfAddedLinks >= 100);
+    std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+
+    pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
+    Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
+    Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
+    size_t numRemoved = forceBalancer.removeTwofunctionalCrosslinks(
+      net, displacements, partitions);
+    REQUIRE_NOTHROW(forceBalancer.validateNetwork());
+    REQUIRE(numRemoved > 0);
+  }
+}
+
 TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
           "[analysis][MEHPForceBalance]")
 {
@@ -795,7 +827,7 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
     REQUIRE(nrOfAddedLinks >= 100);
     std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
     // check that all f = 2 have already been removed
-    // they have not, since more f = 2 are produced by 
+    // they have not, since more f = 2 are produced by
     // numInactiveRemoved = forceBalancer.removeTwofunctionalCrosslinks(
     //       net, displacements, partitions);
     // CHECK(numInactiveRemoved == 0);
