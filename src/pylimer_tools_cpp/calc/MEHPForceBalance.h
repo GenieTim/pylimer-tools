@@ -256,6 +256,12 @@ namespace calc {
         double scalingFactorX = box.getLx() / this->initialConfig.L[0];
         double scalingFactorY = box.getLy() / this->initialConfig.L[1];
         double scalingFactorZ = box.getLz() / this->initialConfig.L[2];
+        RUNTIME_EXP_IFN(scalingFactorX > 0.,
+                        "Requiring scaling factor to be > 0.");
+        RUNTIME_EXP_IFN(scalingFactorY > 0.,
+                        "Requiring scaling factor to be > 0.");
+        RUNTIME_EXP_IFN(scalingFactorZ > 0.,
+                        "Requiring scaling factor to be > 0.");
         this->universe.setBox(box, true);
         this->initialConfig.L[0] = box.getLx();
         this->initialConfig.L[1] = box.getLy();
@@ -823,31 +829,35 @@ namespace calc {
       {
         // possibly improveable PBC
         for (size_t j = 0; j < distances.size(); ++j) {
-          int iterations = 0;
+          int min_iterations = 0;
           assert(!std::isinf(distances[j]) && !std::isnan(distances[j]));
+          const double distance0 = distances[j];
           while (distances[j] > net.boxHalfs[j % 3]) {
             distances[j] -= net.L[j % 3];
-            iterations++;
-            if (iterations > 50) {
+            min_iterations++;
+            if (min_iterations > 50) {
               throw std::runtime_error(
                 "Too many iterations in PBC at distance index " +
                 std::to_string(j) + ", currently at " +
-                std::to_string(distances[j]) + " of " +
+                std::to_string(distances[j]) + " from " +
+                std::to_string(distance0) + " in box with halfs " +
                 std::to_string(net.boxHalfs[j % 3]) + " after " +
-                std::to_string(iterations) + " iterations");
+                std::to_string(min_iterations) + " iterations");
             }
           }
-          iterations = 0;
+          int max_iterations = 0;
           while (distances[j] < -net.boxHalfs[j % 3]) {
             distances[j] += net.L[j % 3];
-            iterations++;
-            if (iterations > 50) {
+            max_iterations++;
+            if (max_iterations > 50) {
               throw std::runtime_error(
                 "Too many iterations in PBC at distance index " +
                 std::to_string(j) + ", currently at " +
-                std::to_string(distances[j]) + " of " +
+                std::to_string(distances[j]) + " from " +
+                std::to_string(distance0) + " in box with halfs " +
                 std::to_string(net.boxHalfs[j % 3]) + " after " +
-                std::to_string(iterations) + " iterations");
+                std::to_string(max_iterations) + " iterations (and " +
+                std::to_string(min_iterations) + " before that)");
             }
           }
         }
