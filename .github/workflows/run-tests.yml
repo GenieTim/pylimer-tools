@@ -49,11 +49,12 @@ jobs:
         run: genbadge coverage -i coverage.xml -o ".github/coverage.svg"
       
       - name: Upload to CodeCov
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
           fail_ci_if_error: false # optional (default = false)
           verbose: true # optional (default = false)
+          gcov: true
 
       # Commit Coverage Badge if applicable
       - name: Verify Changed files

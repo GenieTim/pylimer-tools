@@ -190,23 +190,27 @@ namespace calc {
           if (simplificationMode ==
                 StructureSimplificationMode::INACTIVE_ONLY ||
               simplificationMode == StructureSimplificationMode::ALL_TIM) {
-            std::cout << "Removing inactive cross-links" << std::endl;
+            // std::cout << "Removing inactive cross-links" << std::endl;
             // default tolerance: 0.25*atom's cube length
             size_t nRemoved = this->removeInactiveCrosslinks(
               net, u, springPartitions, removalTolerance);
             net.meanSpringContourLength = net.springsContourLength.mean();
-            std::cout << "Removed " << nRemoved << " inactive springs. "
-                      << std::endl;
+            if (nRemoved > 0) {
+              std::cout << "Removed " << nRemoved << " inactive springs. "
+                        << std::endl;
+            }
             // this->validateNetwork(net, u, springPartitions);
           }
           if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
               simplificationMode == StructureSimplificationMode::ALL_TIM) {
-            std::cout << "Removing 2-f cross-links" << std::endl;
+            // std::cout << "Removing 2-f cross-links" << std::endl;
             size_t nRemoved =
               this->removeTwofunctionalCrosslinks(net, u, springPartitions);
             net.meanSpringContourLength = net.springsContourLength.mean();
-            std::cout << "Removed " << nRemoved << " cross-linkers with f = 2. "
-                      << std::endl;
+            if (nRemoved > 0) {
+              std::cout << "Removed " << nRemoved
+                        << " cross-linkers with f = 2. " << std::endl;
+            }
             // this->validateNetwork(net, u, springPartitions);
           }
           if (simplificationMode == StructureSimplificationMode::ALL_ANDREI) {

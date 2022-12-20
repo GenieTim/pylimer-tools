@@ -762,8 +762,11 @@ TEST_CASE("MEHP Force Balance can randomly add slip-links ignoring cross-links",
     pe::Universe universe = universeSeq.atIndex(0);
     std::cout << "Read file. " << std::endl;
     pcm::MEHPForceBalance forceBalancer =
-      pcm::MEHPForceBalance(universe, 2, true);
+      pcm::MEHPForceBalance(universe, 2, false, 1.0, true);
     size_t nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(1000, 2.0, 100, 2.0, true);
+    REQUIRE(nrOfAddedLinks >= 100);
+    std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+    nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(1000, 2.0, 100, 2.0, false);
     REQUIRE(nrOfAddedLinks >= 100);
     std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
 
@@ -794,7 +797,7 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
     pe::Universe universe = universeSeq.atIndex(0);
     std::cout << "Read file. " << std::endl;
     pcm::MEHPForceBalance forceBalancer =
-      pcm::MEHPForceBalance(universe, 2, true);
+      pcm::MEHPForceBalance(universe, 2, false, 1.0, true);
     size_t nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(1000, 2.0, 100);
     REQUIRE(nrOfAddedLinks >= 100);
     std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
