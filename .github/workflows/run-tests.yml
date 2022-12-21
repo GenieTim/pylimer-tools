@@ -54,7 +54,7 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
           fail_ci_if_error: false # optional (default = false)
           verbose: true # optional (default = false)
-          gcov: true
+          # gcov: true
 
       # Commit Coverage Badge if applicable
       - name: Verify Changed files
