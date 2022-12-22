@@ -777,6 +777,11 @@ TEST_CASE("MEHP Force Balance can randomly add slip-links ignoring cross-links",
       net, displacements, partitions);
     REQUIRE_NOTHROW(forceBalancer.validateNetwork());
     REQUIRE(numRemoved > 0);
+    numRemoved = forceBalancer.removeInactiveCrosslinks(net, displacements, partitions, 1e-20);
+    REQUIRE(numRemoved == 0);
+    numRemoved = forceBalancer.removeInactiveCrosslinks(net, displacements, partitions, 100);
+    REQUIRE(numRemoved == net.nrOfSprings);
+
   }
 }
 

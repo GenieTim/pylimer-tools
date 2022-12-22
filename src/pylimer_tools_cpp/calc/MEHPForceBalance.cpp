@@ -46,7 +46,8 @@ namespace calc {
       const StructureSimplificationMode simplificationMode,
       const double inactiveRemovalCutoff,
       const int outputFrequency,
-      bool doInnerIterations)
+      bool doInnerIterations,
+      bool allowSlipLinksToPassEachOther = false)
     {
       // INVALIDARG_EXP_IFN(
       //   shouldRemoveInactiveCrosslinks == false &&
@@ -2182,6 +2183,20 @@ namespace calc {
       assert(residualNormContributions == 4);
       return residualNorm;
     }
+
+
+
+      void MEHPForceBalance::swapSlipLinks(ForceBalanceNetwork& net,
+        Eigen::VectorXd& springPartitions,
+        double swappableCutoff) {
+          for (size_t springIdx = 0; springIdx < net.nrOfSprings; ++springIdx) {
+            
+          }
+      }
+
+      void MEHPForceBalance::swapSlipLinks(ForceBalanceNetwork& net, const size_t linkIdx1, const size_t linkIdx2) {
+
+      }
 
     /**
      * @brief Displace one link to the mean of all connected neighbours
