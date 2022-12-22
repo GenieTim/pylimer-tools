@@ -95,7 +95,8 @@ namespace calc {
           StructureSimplificationMode::NO_SIMPLIFICATION,
         const double inactiveRemovalCutoff = -1.0,
         const int outputFrequency = 50,
-        bool doInnerIterations = false);
+        bool doInnerIterations = false,
+        bool allowSlipLinksToPassEachOther = false);
 
       /**
        * @brief Compute the spring update residual
@@ -704,6 +705,17 @@ namespace calc {
         Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
         const size_t linkIdx,
         double oneOverSpringPartitionUpperLimit = 1.0) const;
+
+      /**
+       * @brief Loop all springs, swap slip-links on them if they are close enough
+       * 
+       * @param net 
+       */
+      void swapSlipLinks(ForceBalanceNetwork& net,
+        Eigen::VectorXd& springPartitions,
+        double swappableCutoff);
+
+      void swapSlipLinks(ForceBalanceNetwork& net, const size_t linkIdx1, const size_t linkIdx2);
 
       /**
        * @brief Displace one link to the mean of all connected neighbours
