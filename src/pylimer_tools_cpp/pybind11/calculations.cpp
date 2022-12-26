@@ -509,7 +509,8 @@ init_pylimer_bound_calc(py::module_& m)
            mehp::StructureSimplificationMode::NO_SIMPLIFICATION,
          py::arg("inactiveRemovalCutoff") = -1.0,
          py::arg("outputFrequency") = 50,
-         py::arg("doInnerIterations") = false)
+         py::arg("doInnerIterations") = false,
+         py::arg("allowSlipLinksToPassEachOther") = false)
     .def("deformTo",
          &mehp::MEHPForceBalance::deformTo,
          R"pbdoc()pbdoc",
