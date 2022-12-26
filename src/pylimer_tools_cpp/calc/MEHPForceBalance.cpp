@@ -47,7 +47,7 @@ namespace calc {
       const double inactiveRemovalCutoff,
       const int outputFrequency,
       bool doInnerIterations,
-      bool allowSlipLinksToPassEachOther = false)
+      bool allowSlipLinksToPassEachOther)
     {
       // INVALIDARG_EXP_IFN(
       //   shouldRemoveInactiveCrosslinks == false &&
@@ -101,6 +101,10 @@ namespace calc {
       double currentResidual = 0.0;
       double intermediateResidual = 0.0;
       size_t iterationsDone = 0;
+      if (allowSlipLinksToPassEachOther) {
+        this->swapSlipLinks(
+          net, u, springPartitions, oneOverSpringPartitionUpperLimit);
+      }
       // actual loop
       do {
         maxDistanceMoved = 0.0;
@@ -122,7 +126,8 @@ namespace calc {
                                           u,
                                           springPartitions,
                                           link_idx,
-                                          oneOverSpringPartitionUpperLimit);
+                                          oneOverSpringPartitionUpperLimit,
+                                          allowSlipLinksToPassEachOther);
             double displacementDone =
               this->displaceToMeanPosition(net,
                                            u,
@@ -2000,7 +2005,8 @@ namespace calc {
       const Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
       const size_t linkIdx,
-      double oneOverSpringPartitionUpperLimit) const
+      double oneOverSpringPartitionUpperLimit,
+      bool allowSlipLinksToPassEachOther) const
     {
       // std::cout << "Updating spring partition " << linkIdx << " of "
       //           << net.nrOfNodes << " / " << net.nrOfLinks << std::endl;
@@ -2184,19 +2190,111 @@ namespace calc {
       return residualNorm;
     }
 
+    void MEHPForceBalance::swapSlipLinks(
+      ForceBalanceNetwork& net,
+      const Eigen::VectorXd& u,
+      Eigen::VectorXd& springPartitions,
+      double oneOverSpringPartitionUpperLimit)
+    {
+      for (size_t springIdx = 0; springIdx < net.nrOfSprings; ++springIdx) {
+        if (net.linkIndicesOfSprings[springIdx].size() <= 3) {
+          // no need to handle springs with 1 or less slip-links
+          continue;
+        }
 
+        const double N = net.springsContourLength[springIdx];
+        const double swappableCutoff =
+          (oneOverSpringPartitionUpperLimit > 0.)
+            ? 1. / (N - 1. / oneOverSpringPartitionUpperLimit)
+            : 1e-12;
 
-      void MEHPForceBalance::swapSlipLinks(ForceBalanceNetwork& net,
-        Eigen::VectorXd& springPartitions,
-        double swappableCutoff) {
-          for (size_t springIdx = 0; springIdx < net.nrOfSprings; ++springIdx) {
-            
+        // loop the remaining partial springs
+        for (size_t partialIdx = 1;
+             partialIdx < net.localToGlobalSpringIndex[springIdx].size() - 1;
+             ++partialIdx) {
+          // check if they qualify for swapping
+          if (springPartitions[net.localToGlobalSpringIndex[springIdx]
+                                                           [partialIdx]] <=
+              swappableCutoff) {
+            // do the swap
+            this->swapSlipLinks(
+              net, net.localToGlobalSpringIndex[springIdx][partialIdx]);
           }
+        }
+      }
+      this->validateNetwork(net, u, springPartitions);
+    }
+
+    void MEHPForceBalance::swapSlipLinks(ForceBalanceNetwork& net,
+                                         const size_t partialSpringIdx)
+    {
+      const size_t linkIdx1 = net.springPartIndexA[partialSpringIdx];
+      const size_t linkIdx2 = net.springPartIndexB[partialSpringIdx];
+      INVALIDARG_EXP_IFN(
+        net.linkIsSliplink[linkIdx1],
+        "Only partial springs with only slip-links allow swapping.");
+      INVALIDARG_EXP_IFN(
+        net.linkIsSliplink[linkIdx2],
+        "Only partial springs with only slip-links allow swapping.");
+      const size_t springIdx = net.partialToFullSpringIndex[partialSpringIdx];
+      // find the rest of the connectivity required for swapping
+      long int otherPartialOfLinkIdx1 = -1;
+      long int otherPartialOfLinkIdx2 = -1;
+      long int firstPositionInSpring = -1;
+      for (size_t inSpringIdx = 1;
+           inSpringIdx < net.linkIndicesOfSprings[springIdx].size() - 1;
+           ++inSpringIdx) {
+        if (net.linkIndicesOfSprings[springIdx][inSpringidx] == linkIdx1 &&
+            net.linkIndicesOfSprings[springIdx][inSpringidx + 1] == linkIdx2) {
+          RUNTIME_EXP_IFN(
+            net.localToGlobalSpringIndex[springIdx][inSpringIdx] ==
+            partialSpringIdx);
+          RUNTIME_EXP_IFN(otherPartialOfLinkIdx1 == -1,
+                          "Expect to find sequence of links only once.");
+          otherPartialOfLinkIdx1 =
+            net.localToGlobalSpringIndex[springIdx][inSpringIdx - 1];
+          otherPartialOfLinkIdx2 =
+            net.localToGlobalSpringIndex[springIdx][inSpringIdx + 1];
+          firstPositionInSpring = inSpringIdx;
+        }
+        // else
+        if (net.linkIndicesOfSprings[springIdx][inSpringidx] == linkIdx2 &&
+            net.linkIndicesOfSprings[springIdx][inSpringidx + 1] == linkId12) {
+          RUNTIME_EXP_IFN(
+            net.localToGlobalSpringIndex[springIdx][inSpringIdx] ==
+            partialSpringIdx);
+          RUNTIME_EXP_IFN(otherPartialOfLinkIdx1 == -1,
+                          "Expect to find sequence of links only once.");
+          otherPartialOfLinkIdx2 =
+            net.localToGlobalSpringIndex[springIdx][inSpringIdx - 1];
+          otherPartialOfLinkIdx1 =
+            net.localToGlobalSpringIndex[springIdx][inSpringIdx + 1];
+          firstPositionInSpring = inSpringIdx;
+        }
       }
 
-      void MEHPForceBalance::swapSlipLinks(ForceBalanceNetwork& net, const size_t linkIdx1, const size_t linkIdx2) {
-
+      RUNTIME_EXP_IFN(otherPartialOfLinkIdx1 >= 0,
+                      "Did not find partial spring in spring.");
+      RUNTIME_EXP_IFN(otherPartialOfLinkIdx2 >= 0,
+                      "Did not find partial spring in spring.");
+      RUNTIME_EXP_IFN(firstPositionInSpring >= 0,
+                      "Did not find partial spring in spring.");
+      // actually do the swapping
+      net.springPartIndexA[partialSpringIdx] = linkIdx2;
+      net.springPartIndexB[partialSpringIdx] = linkIdx2;
+      if (net.springPartIndexA[otherPartialOfLinkIdx1] == linkIdx1) {
+        net.springPartIndexA[otherPartialOfLinkIdx1] = linkIdx2;
+      } else {
+        net.springPartIndexB[otherPartialOfLinkIdx1] = linkIdx2;
       }
+      if (net.springPartIndexA[otherPartialOfLinkIdx2] == linkIdx2) {
+        net.springPartIndexA[otherPartialOfLinkIdx2] = linkIdx1;
+      } else {
+        net.springPartIndexB[otherPartialOfLinkIdx2] = linkIdx1;
+      }
+      std::swap(net.linkIndicesOfSprings[springIdx][firstPositionInSpring],
+                net.linkIndicesOfSprings[springIdx][firstPositionInSpring + 1]);
+    }
 
     /**
      * @brief Displace one link to the mean of all connected neighbours

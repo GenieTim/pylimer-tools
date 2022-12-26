@@ -704,7 +704,8 @@ namespace calc {
         const Eigen::VectorXd& u,
         Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
         const size_t linkIdx,
-        double oneOverSpringPartitionUpperLimit = 1.0) const;
+        double oneOverSpringPartitionUpperLimit = 1.0,
+        bool allowSlipLinksToPassEachOther = false) const;
 
       /**
        * @brief Loop all springs, swap slip-links on them if they are close enough
@@ -712,10 +713,11 @@ namespace calc {
        * @param net 
        */
       void swapSlipLinks(ForceBalanceNetwork& net,
+        const Eigen::VectorXd& u,
         Eigen::VectorXd& springPartitions,
         double swappableCutoff);
 
-      void swapSlipLinks(ForceBalanceNetwork& net, const size_t linkIdx1, const size_t linkIdx2);
+      void swapSlipLinks(ForceBalanceNetwork& net, const size_t partialSpringIdx);
 
       /**
        * @brief Displace one link to the mean of all connected neighbours
