@@ -2216,9 +2216,14 @@ namespace calc {
           if (springPartitions[net.localToGlobalSpringIndex[springIdx]
                                                            [partialIdx]] <=
               swappableCutoff) {
-            // do the swap
-            this->swapSlipLinks(
-              net, net.localToGlobalSpringIndex[springIdx][partialIdx]);
+            size_t partialSpringIdx =
+              net.localToGlobalSpringIndex[springIdx][partialIdx];
+            if (net.springPartIndexA[partialSpringIdx] !=
+                net.springPartIndexB[partialSpringIdx]) {
+              // do the swap
+              this->swapSlipLinks(
+                net, partialSpringIdx);
+            }
           }
         }
       }
@@ -2230,6 +2235,7 @@ namespace calc {
     {
       const size_t linkIdx1 = net.springPartIndexA[partialSpringIdx];
       const size_t linkIdx2 = net.springPartIndexB[partialSpringIdx];
+      INVALIDARG_EXP_IFN(linkIdx1 != linkIdx2, "Cannot swap link with itself.");
       std::cout << "Swapping link " << linkIdx1 << " and " << linkIdx2
                 << std::endl;
       INVALIDARG_EXP_IFN(
