@@ -2221,8 +2221,7 @@ namespace calc {
             if (net.springPartIndexA[partialSpringIdx] !=
                 net.springPartIndexB[partialSpringIdx]) {
               // do the swap
-              this->swapSlipLinks(
-                net, partialSpringIdx);
+              this->swapSlipLinks(net, partialSpringIdx);
             }
           }
         }
@@ -2252,43 +2251,42 @@ namespace calc {
       for (size_t inSpringIdx = 1;
            inSpringIdx < net.linkIndicesOfSprings[springIdx].size() - 1;
            ++inSpringIdx) {
-        if (net.linkIndicesOfSprings[springIdx][inSpringIdx] == linkIdx1 &&
-            net.linkIndicesOfSprings[springIdx][inSpringIdx + 1] == linkIdx2) {
-          RUNTIME_EXP_IFN(
-            net.localToGlobalSpringIndex[springIdx][inSpringIdx] ==
-              partialSpringIdx,
-            "Expected the found partial spring of the spring being the only "
-            "one with the links");
-          RUNTIME_EXP_IFN(otherPartialOfLinkIdx1 == -1,
-                          "Expect to find sequence of links only once.");
-          otherPartialOfLinkIdx1 =
-            net.localToGlobalSpringIndex[springIdx][inSpringIdx - 1];
-          otherPartialOfLinkIdx2 =
-            net.localToGlobalSpringIndex[springIdx][inSpringIdx + 1];
-          firstPositionInSpring = inSpringIdx;
-        }
-        // else
-        if (net.linkIndicesOfSprings[springIdx][inSpringIdx] == linkIdx2 &&
-            net.linkIndicesOfSprings[springIdx][inSpringIdx + 1] == linkIdx1) {
-          RUNTIME_EXP_IFN(
-            net.localToGlobalSpringIndex[springIdx][inSpringIdx] ==
-              partialSpringIdx,
-            "Expected the found partial spring of the spring being the only "
-            "one with the links");
-          RUNTIME_EXP_IFN(otherPartialOfLinkIdx1 == -1,
-                          "Expect to find sequence of links only once.");
-          otherPartialOfLinkIdx2 =
-            net.localToGlobalSpringIndex[springIdx][inSpringIdx - 1];
-          otherPartialOfLinkIdx1 =
-            net.localToGlobalSpringIndex[springIdx][inSpringIdx + 1];
-          firstPositionInSpring = inSpringIdx;
+        if (net.localToGlobalSpringIndex[springIdx][inSpringIdx] ==
+            partialSpringIdx) {
+          if (net.linkIndicesOfSprings[springIdx][inSpringIdx] == linkIdx1 &&
+              net.linkIndicesOfSprings[springIdx][inSpringIdx + 1] ==
+                linkIdx2) {
+            RUNTIME_EXP_IFN(otherPartialOfLinkIdx1 == -1,
+                            "Expect to find sequence of links only once.");
+            otherPartialOfLinkIdx1 =
+              net.localToGlobalSpringIndex[springIdx][inSpringIdx - 1];
+            otherPartialOfLinkIdx2 =
+              net.localToGlobalSpringIndex[springIdx][inSpringIdx + 1];
+            firstPositionInSpring = inSpringIdx;
+          }
+          // else
+          if (net.linkIndicesOfSprings[springIdx][inSpringIdx] == linkIdx2 &&
+              net.linkIndicesOfSprings[springIdx][inSpringIdx + 1] ==
+                linkIdx1) {
+            RUNTIME_EXP_IFN(otherPartialOfLinkIdx1 == -1,
+                            "Expect to find sequence of links only once.");
+            otherPartialOfLinkIdx2 =
+              net.localToGlobalSpringIndex[springIdx][inSpringIdx - 1];
+            otherPartialOfLinkIdx1 =
+              net.localToGlobalSpringIndex[springIdx][inSpringIdx + 1];
+            firstPositionInSpring = inSpringIdx;
+          }
         }
       }
 
       RUNTIME_EXP_IFN(otherPartialOfLinkIdx1 >= 0,
-                      "Did not find partial spring in spring.");
+                      "Did not find partial spring " +
+                        std::to_string(partialSpringIdx) + " in spring " +
+                        std::to_string(springIdx) + ".");
       RUNTIME_EXP_IFN(otherPartialOfLinkIdx2 >= 0,
-                      "Did not find partial spring in spring.");
+                      "Did not find partial spring " +
+                        std::to_string(partialSpringIdx) + " in spring " +
+                        std::to_string(springIdx) + ".");
       RUNTIME_EXP_IFN(firstPositionInSpring >= 0,
                       "Did not find partial spring in spring.");
       // actually do the swapping
