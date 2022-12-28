@@ -101,12 +101,12 @@ namespace calc {
       double currentResidual = 0.0;
       double intermediateResidual = 0.0;
       size_t iterationsDone = 0;
-      if (allowSlipLinksToPassEachOther) {
-        this->swapSlipLinks(
-          net, u, springPartitions, oneOverSpringPartitionUpperLimit);
-      }
       // actual loop
       do {
+        if (allowSlipLinksToPassEachOther) {
+          this->swapSlipLinks(
+            net, u, springPartitions, oneOverSpringPartitionUpperLimit);
+        }
         maxDistanceMoved = 0.0;
         currentResidual = 0.0;
 
@@ -2299,26 +2299,26 @@ namespace calc {
       // net.springPartIndexB[partialSpringIdx] = linkIdx1;
       if (net.springPartIndexA[otherPartialOfLinkIdx1] == linkIdx1) {
         net.springPartIndexA[otherPartialOfLinkIdx1] = linkIdx2;
-        net.springCoordinateIndexA.segment(3 * otherPartialOfLinkIdx1, 3) =
+        net.springPartCoordinateIndexA.segment(3 * otherPartialOfLinkIdx1, 3) =
           Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx2, 3 * linkIdx2 + 2);
       } else {
         RUNTIME_EXP_IFN(net.springPartIndexB[otherPartialOfLinkIdx1] ==
                           linkIdx1,
                         "Required assumption apparently not met.");
         net.springPartIndexB[otherPartialOfLinkIdx1] = linkIdx2;
-        net.springCoordinateIndexB.segment(3 * otherPartialOfLinkIdx1, 3) =
+        net.springPartCoordinateIndexB.segment(3 * otherPartialOfLinkIdx1, 3) =
           Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx2, 3 * linkIdx2 + 2);
       }
       if (net.springPartIndexA[otherPartialOfLinkIdx2] == linkIdx2) {
         net.springPartIndexA[otherPartialOfLinkIdx2] = linkIdx1;
-        net.springCoordinateIndexA.segment(3 * otherPartialOfLinkIdx2, 3) =
+        net.springPartCoordinateIndexA.segment(3 * otherPartialOfLinkIdx2, 3) =
           Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx1, 3 * linkIdx1 + 2);
       } else {
         RUNTIME_EXP_IFN(net.springPartIndexB[otherPartialOfLinkIdx2] ==
                           linkIdx2,
                         "Required assumption apparently not met.");
         net.springPartIndexB[otherPartialOfLinkIdx2] = linkIdx1;
-        net.springCoordinateIndexB.segment(3 * otherPartialOfLinkIdx2, 3) =
+        net.springPartCoordinateIndexB.segment(3 * otherPartialOfLinkIdx2, 3) =
           Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx1, 3 * linkIdx1 + 2);
       }
 
