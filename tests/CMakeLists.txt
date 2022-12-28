@@ -197,4 +197,6 @@ if(CODE_COVERAGE)
 		PRIVATE 
 		--coverage
 	)
+
+	coverage_evaluate()
 endif()
