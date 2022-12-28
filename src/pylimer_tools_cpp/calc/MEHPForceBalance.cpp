@@ -2289,6 +2289,11 @@ namespace calc {
                         std::to_string(springIdx) + ".");
       RUNTIME_EXP_IFN(firstPositionInSpring >= 0,
                       "Did not find partial spring in spring.");
+      RUNTIME_EXP_IFN(otherPartialOfLinkIdx1 != otherPartialOfLinkIdx2,
+                      "Required assumption not met.");
+      RUNTIME_EXP_IFN(firstPositionInSpring <
+                        net.linkIndicesOfSprings[springIdx].size() - 1,
+                      "Required assumption not met.");
       // actually do the swapping
       // net.springPartIndexA[partialSpringIdx] = linkIdx2;
       // net.springPartIndexB[partialSpringIdx] = linkIdx1;
@@ -2297,6 +2302,9 @@ namespace calc {
         net.springCoordinateIndexA.segment(3 * otherPartialOfLinkIdx1, 3) =
           Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx2, 3 * linkIdx2 + 2);
       } else {
+        RUNTIME_EXP_IFN(net.springPartIndexB[otherPartialOfLinkIdx1] ==
+                          linkIdx1,
+                        "Required assumption apparently not met.");
         net.springPartIndexB[otherPartialOfLinkIdx1] = linkIdx2;
         net.springCoordinateIndexB.segment(3 * otherPartialOfLinkIdx1, 3) =
           Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx2, 3 * linkIdx2 + 2);
@@ -2306,12 +2314,31 @@ namespace calc {
         net.springCoordinateIndexA.segment(3 * otherPartialOfLinkIdx2, 3) =
           Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx1, 3 * linkIdx1 + 2);
       } else {
+        RUNTIME_EXP_IFN(net.springPartIndexB[otherPartialOfLinkIdx2] ==
+                          linkIdx2,
+                        "Required assumption apparently not met.");
         net.springPartIndexB[otherPartialOfLinkIdx2] = linkIdx1;
         net.springCoordinateIndexB.segment(3 * otherPartialOfLinkIdx2, 3) =
           Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx1, 3 * linkIdx1 + 2);
       }
-      std::swap(net.linkIndicesOfSprings[springIdx][firstPositionInSpring],
-                net.linkIndicesOfSprings[springIdx][firstPositionInSpring + 1]);
+
+      // std::swap(net.linkIndicesOfSprings[springIdx][firstPositionInSpring],
+      //           net.linkIndicesOfSprings[springIdx][firstPositionInSpring +
+      //           1]);
+      if (net.linkIndicesOfSprings[springIdx][firstPositionInSpring] ==
+          linkIdx1) {
+        net.linkIndicesOfSprings[springIdx][firstPositionInSpring] = linkIdx2;
+        net.linkIndicesOfSprings[springIdx][firstPositionInSpring + 1] =
+          linkIdx1;
+      } else {
+        RUNTIME_EXP_IFN(
+          net.linkIndicesOfSprings[springIdx][firstPositionInSpring] ==
+            linkIdx2,
+          "Required assumption apparently not met.");
+        net.linkIndicesOfSprings[springIdx][firstPositionInSpring] = linkIdx1;
+        net.linkIndicesOfSprings[springIdx][firstPositionInSpring + 1] =
+          linkIdx2;
+      }
     }
 
     /**
