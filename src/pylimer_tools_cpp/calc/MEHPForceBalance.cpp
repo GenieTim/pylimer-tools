@@ -2230,6 +2230,8 @@ namespace calc {
     {
       const size_t linkIdx1 = net.springPartIndexA[partialSpringIdx];
       const size_t linkIdx2 = net.springPartIndexB[partialSpringIdx];
+      std::cout << "Swapping link " << linkIdx1 << " and " << linkIdx2
+                << std::endl;
       INVALIDARG_EXP_IFN(
         net.linkIsSliplink[linkIdx1],
         "Only partial springs with only slip-links allow swapping.");
@@ -2244,11 +2246,13 @@ namespace calc {
       for (size_t inSpringIdx = 1;
            inSpringIdx < net.linkIndicesOfSprings[springIdx].size() - 1;
            ++inSpringIdx) {
-        if (net.linkIndicesOfSprings[springIdx][inSpringidx] == linkIdx1 &&
-            net.linkIndicesOfSprings[springIdx][inSpringidx + 1] == linkIdx2) {
+        if (net.linkIndicesOfSprings[springIdx][inSpringIdx] == linkIdx1 &&
+            net.linkIndicesOfSprings[springIdx][inSpringIdx + 1] == linkIdx2) {
           RUNTIME_EXP_IFN(
             net.localToGlobalSpringIndex[springIdx][inSpringIdx] ==
-            partialSpringIdx);
+              partialSpringIdx,
+            "Expected the found partial spring of the spring being the only "
+            "one with the links");
           RUNTIME_EXP_IFN(otherPartialOfLinkIdx1 == -1,
                           "Expect to find sequence of links only once.");
           otherPartialOfLinkIdx1 =
@@ -2258,11 +2262,13 @@ namespace calc {
           firstPositionInSpring = inSpringIdx;
         }
         // else
-        if (net.linkIndicesOfSprings[springIdx][inSpringidx] == linkIdx2 &&
-            net.linkIndicesOfSprings[springIdx][inSpringidx + 1] == linkId12) {
+        if (net.linkIndicesOfSprings[springIdx][inSpringIdx] == linkIdx2 &&
+            net.linkIndicesOfSprings[springIdx][inSpringIdx + 1] == linkIdx1) {
           RUNTIME_EXP_IFN(
             net.localToGlobalSpringIndex[springIdx][inSpringIdx] ==
-            partialSpringIdx);
+              partialSpringIdx,
+            "Expected the found partial spring of the spring being the only "
+            "one with the links");
           RUNTIME_EXP_IFN(otherPartialOfLinkIdx1 == -1,
                           "Expect to find sequence of links only once.");
           otherPartialOfLinkIdx2 =
@@ -2280,17 +2286,25 @@ namespace calc {
       RUNTIME_EXP_IFN(firstPositionInSpring >= 0,
                       "Did not find partial spring in spring.");
       // actually do the swapping
-      net.springPartIndexA[partialSpringIdx] = linkIdx2;
-      net.springPartIndexB[partialSpringIdx] = linkIdx2;
+      // net.springPartIndexA[partialSpringIdx] = linkIdx2;
+      // net.springPartIndexB[partialSpringIdx] = linkIdx1;
       if (net.springPartIndexA[otherPartialOfLinkIdx1] == linkIdx1) {
         net.springPartIndexA[otherPartialOfLinkIdx1] = linkIdx2;
+        net.springCoordinateIndexA.segment(3 * otherPartialOfLinkIdx1, 3) =
+          Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx2, 3 * linkIdx2 + 2);
       } else {
         net.springPartIndexB[otherPartialOfLinkIdx1] = linkIdx2;
+        net.springCoordinateIndexB.segment(3 * otherPartialOfLinkIdx1, 3) =
+          Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx2, 3 * linkIdx2 + 2);
       }
       if (net.springPartIndexA[otherPartialOfLinkIdx2] == linkIdx2) {
         net.springPartIndexA[otherPartialOfLinkIdx2] = linkIdx1;
+        net.springCoordinateIndexA.segment(3 * otherPartialOfLinkIdx2, 3) =
+          Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx1, 3 * linkIdx1 + 2);
       } else {
         net.springPartIndexB[otherPartialOfLinkIdx2] = linkIdx1;
+        net.springCoordinateIndexB.segment(3 * otherPartialOfLinkIdx2, 3) =
+          Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx1, 3 * linkIdx1 + 2);
       }
       std::swap(net.linkIndicesOfSprings[springIdx][firstPositionInSpring],
                 net.linkIndicesOfSprings[springIdx][firstPositionInSpring + 1]);
