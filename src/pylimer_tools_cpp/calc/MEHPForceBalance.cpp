@@ -2235,8 +2235,8 @@ namespace calc {
       const size_t linkIdx1 = net.springPartIndexA[partialSpringIdx];
       const size_t linkIdx2 = net.springPartIndexB[partialSpringIdx];
       INVALIDARG_EXP_IFN(linkIdx1 != linkIdx2, "Cannot swap link with itself.");
-      std::cout << "Swapping link " << linkIdx1 << " and " << linkIdx2
-                << std::endl;
+      // std::cout << "Swapping link " << linkIdx1 << " and " << linkIdx2
+      //           << std::endl;
       INVALIDARG_EXP_IFN(
         net.linkIsSliplink[linkIdx1],
         "Only partial springs with only slip-links allow swapping.");
