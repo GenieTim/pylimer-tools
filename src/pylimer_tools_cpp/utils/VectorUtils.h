@@ -78,6 +78,23 @@ namespace utils {
   {
     return v[v.size() - 1];
   }
+  /**
+   * @brief Find whether a map contains a value
+   *
+   * @param map T0<T1, T2>
+   * @param value
+   * @return true|false
+   */
+  template<typename T0, typename T1>
+  static inline bool set_has_key(const T0 map, const T1 key)
+  {
+#if __cplusplus >= 202002L
+    // C++20 (and later) code
+    return map.contains(key);
+#else
+    return map.count(key) > 0;
+#endif
+  }
 
   /**
    * @brief Find whether a map contains a value

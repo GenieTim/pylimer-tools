@@ -58,8 +58,7 @@ namespace entities {
 
   Universe::Universe(const double Lx, const double Ly, const double Lz)
     : Universe(Box(Lx, Ly, Lz))
-  {
-  }
+  {}
 
   // 1. destructor (to destroy the graph)
   Universe::~Universe()
@@ -425,10 +424,7 @@ namespace entities {
     this->massPerType = massPerType;
   }
 
-  std::map<int, double> Universe::getMasses()
-  {
-    return this->massPerType;
-  };
+  std::map<int, double> Universe::getMasses() { return this->massPerType; };
 
   /**
    * @brief Get the standalone components of the network
@@ -777,7 +773,7 @@ namespace entities {
 
     std::vector<long int> startingCrosslinkers =
       this->getIndicesOfType(crosslinkerType);
-    std::unordered_set<int> processedPathsKeys;
+    std::unordered_set<std::string> processedPathsKeys;
 
     // note: this algorithm is not particularly efficient
     // it is of the order of O(n*n!)
@@ -810,24 +806,34 @@ namespace entities {
       // translate the paths we found
       std::vector<Atom> currentPath;
       int currentFunctionality = 0;
-      long int currentPathKey = 0;
+      unsigned long long int currentPathXor = 0;
+      unsigned long long int currentPathSum = 0;
+      unsigned long long int currentPathProduct = 0;
       size_t n = igraph_vector_int_size(&paths);
       for (size_t i = 0; i < n; ++i) {
         const long int currentVal = igraph_vector_int_get(&paths, i);
         if (currentVal == -1) {
           // skip self-loops and duplicates
+          // poor man's hash of three long ints
+          std::string currentPathKey = std::to_string(currentPathXor) + "/" +
+                                       std::to_string(currentPathSum) + "/" +
+                                       std::to_string(currentPathProduct);
           if ((!skipSelfLoops || currentPath.size() > 3) &&
-              !pylimer_tools::utils::map_has_key(processedPathsKeys,
+              !pylimer_tools::utils::set_has_key(processedPathsKeys,
                                                  currentPathKey)) {
             results[currentFunctionality].push_back(currentPath);
             processedPathsKeys.insert(currentPathKey);
           }
           currentPath.clear();
           currentFunctionality = 0;
-          currentPathKey = 0;
+          currentPathXor = 0;
+          currentPathSum = 0;
+          currentPathProduct = 0;
         } else {
           Atom newAtom = this->getAtomByVertexIdx(currentVal);
-          currentPathKey = currentPathKey xor currentVal; // compute hash
+          currentPathXor = currentPathXor xor currentVal; // compute hash
+          currentPathSum += currentVal;
+          currentPathProduct *= currentVal;
           currentPath.push_back(newAtom);
           if (newAtom.getType() == crosslinkerType) {
             currentFunctionality += 1;
@@ -1516,7 +1522,8 @@ namespace entities {
       for (size_t j = 0; j < vertexIndicesLoop2.size(); ++j) {
         Eigen::Vector3d rayOrigin =
           this->getPositionVectorForVertex(vertexIndicesLoop2[j]);
-        long int directionIdx = (j == 0) ? vertexIndicesLoop2.size() - 1 : j - 1;
+        long int directionIdx =
+          (j == 0) ? vertexIndicesLoop2.size() - 1 : j - 1;
         Eigen::Vector3d rayTarget =
           this->getPositionVectorForVertex(vertexIndicesLoop2[directionIdx]);
         Eigen::Vector3d intersectionPoint;
@@ -1943,20 +1950,11 @@ namespace entities {
    *
    * @return double
    */
-  double Universe::getVolume() const
-  {
-    return this->box.getVolume();
-  }
+  double Universe::getVolume() const { return this->box.getVolume(); }
 
-  size_t Universe::getNrOfAtoms() const
-  {
-    return this->NAtoms;
-  }
+  size_t Universe::getNrOfAtoms() const { return this->NAtoms; }
 
-  size_t Universe::getNrOfBonds() const
-  {
-    return this->NBonds;
-  }
+  size_t Universe::getNrOfBonds() const { return this->NBonds; }
 
   void Universe::setBox(Box passedBox, bool rescaleAtomCoordinates)
   {
@@ -2015,9 +2013,6 @@ namespace entities {
     this->setBox(Box(Lx, Ly, Lz));
   }
 
-  Box Universe::getBox() const
-  {
-    return this->box;
-  }
+  Box Universe::getBox() const { return this->box; }
 } // namespace entities
 } // namespace pylimer_tools
