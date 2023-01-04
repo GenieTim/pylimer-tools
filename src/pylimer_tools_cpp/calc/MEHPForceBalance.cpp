@@ -1103,6 +1103,102 @@ namespace calc {
       return nrOfSlipLinksPlaced;
     }
 
+    size_t MEHPForceBalance::addSliplinksBasedOnCycles(const int maxLoopLength)
+    {
+      std::vector<std::vector<long int>> loops =
+        this->universe.findLoops(this->crosslinkerType, maxLoopLength, false);
+
+      size_t estimateOfNrOfSliplinks =
+        loops.size() * loops.size() *
+        this->initialConfig.meanSpringContourLength;
+
+      // fetch some data to later estimate alpha & beta
+      std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
+        this->universe.getChainsWithCrosslinker(crosslinkerType);
+      std::unordered_map<size_t, size_t> atomToStrand;
+      atomToStrand.reserve(this->universe.getNrOfAtoms());
+      std::unordered_map<size_t, size_t> atomIdxInStrand;
+      atomIdxInStrand.reserve(this->universe.getNrOfAtoms());
+      size_t springId = 0;
+      for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
+        pylimer_tools::entities::Molecule chain = crosslinkerChains[i];
+        std::vector<pylimer_tools::entities::Atom> atoms =
+          crosslinkerChains[i].getAtomsLinedUp(this->crosslinkerType);
+        for (size_t atomIdx = 0; atomIdx < atoms.size(); ++atomIdx) {
+          pylimer_tools::entities::Atom atom = atoms[atomIdx];
+          if (atom.getType() != this->crosslinkerType) {
+            atomToStrand.emplace(atom.getId(), springId);
+            atomIdxInStrand.emplace(atom.getId(), atomIdx);
+          }
+        }
+      }
+
+      // the resulting vectors to fill
+      std::vector<double> slipLinkXs;
+      slipLinkXs.reserve(estimateOfNrOfSliplinks);
+      std::vector<double> slipLinkYs;
+      slipLinkYs.reserve(estimateOfNrOfSliplinks);
+      std::vector<double> slipLinkZs;
+      slipLinkZs.reserve(estimateOfNrOfSliplinks);
+      std::vector<size_t> slipLinkStrandA;
+      slipLinkStrandA.reserve(estimateOfNrOfSliplinks);
+      std::vector<size_t> slipLinkStrandB;
+      slipLinkStrandB.reserve(estimateOfNrOfSliplinks);
+      std::vector<double> slipLinkStrandAlpha;
+      slipLinkStrandAlpha.reserve(estimateOfNrOfSliplinks);
+      std::vector<double> slipLinkStrandBeta;
+      slipLinkStrandBeta.reserve(estimateOfNrOfSliplinks);
+
+      for (size_t i = 0; i < loops.size(); ++i) {
+        // TODO: instead of the N^2 loop, might want to try some filter at least
+        for (size_t j = i + 1; j < loops.size(); ++j) {
+          std::vector<pylimer_tools::entities::LoopIntersectionInfo>
+            intersections =
+              this->universe.findLoopEntanglements(loops[i], loops[j]);
+          for (pylimer_tools::entities::LoopIntersectionInfo intersection :
+               intersections) {
+            // TODO: this is yet the most naïve way to add these.
+            // ideally, we would also check the back-and-forth, etc.
+            // TODO: remember the loops these slip-links are allowed to move on
+            slipLinkXs.push_back(intersection.intersectionPoint[0]);
+            slipLinkYs.push_back(intersection.intersectionPoint[1]);
+            slipLinkZs.push_back(intersection.intersectionPoint[2]);
+            // TODO: decide on the atoms to use as a reference
+            slipLinkStrandA.push_back(
+              this->initialConfig
+                .oldAtomIdToSpringIndex[intersection.involvedAtoms[0].getId()]);
+            slipLinkStrandB.push_back(
+              this->initialConfig
+                .oldAtomIdToSpringIndex[intersection.involvedAtoms[3].getId()]);
+            slipLinkStrandAlpha.push_back(
+              static_cast<double>(
+                atomIdxInStrand[intersection.involvedAtoms[0].getId()]) /
+              this->initialConfig.meanSpringContourLength);
+            slipLinkStrandBeta.push_back(
+              static_cast<double>(
+                atomIdxInStrand[intersection.involvedAtoms[3].getId()]) /
+              this->initialConfig.meanSpringContourLength);
+          }
+        }
+      }
+      RUNTIME_EXP_IFN(
+        slipLinkStrandA.size() == slipLinkStrandB.size() &&
+          slipLinkXs.size() == slipLinkYs.size() &&
+          slipLinkZs.size() == slipLinkXs.size(),
+        "Expect all slip-link relevant properties to have the same length");
+      // with the data assembled, we can actually add them to the structure
+      // and stuff
+      this->addSlipLinks(slipLinkStrandA,
+                         slipLinkStrandB,
+                         slipLinkXs,
+                         slipLinkYs,
+                         slipLinkZs,
+                         slipLinkStrandAlpha,
+                         slipLinkStrandBeta,
+                         false);
+      return slipLinkStrandA.size();
+    }
+
     /**
      * @brief Remove a spring (and all its parts, incl. slip-links) from the
      * structures

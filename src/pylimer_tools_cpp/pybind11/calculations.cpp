@@ -603,6 +603,10 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("sameStrandCutoff") = 2,
          py::arg("excludeCrosslinks") = false,
          py::arg("seed") = -1)
+    .def("addSliplinksBasedOnCycles",
+         &mehp::MEHPForceBalance::addSliplinksBasedOnCycles,
+         R"pbdoc()pbdoc",
+         py::arg("maxLoopLength") = -1)
     .def("getStressTensor",
          &mehp::MEHPForceBalance::getStressTensor,
          R"pbdoc(

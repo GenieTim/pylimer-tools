@@ -239,6 +239,7 @@ namespace calc {
        *
        * @param sliplinkDensity
        * @param cutoff
+       * @return size_t the nr of actually added slip-links
        */
       size_t randomlyAddSliplinks(const size_t nrOfSliplinksToSample,
                                   const double cutoff = 2.0,
@@ -246,6 +247,13 @@ namespace calc {
                                   const double sameStrandCutoff = 2.0,
                                   const bool excludeCrosslinks = false,
                                   const int seed = -1);
+
+      /**
+       * @brief Add slip-links to this system based on entangled loops
+       * 
+       * @return size_t the nr of actually added slip-links
+       */
+      size_t addSliplinksBasedOnCycles(const int maxLoopLength = -1);
 
       /**
        * @brief Deform the system to match the specified box
