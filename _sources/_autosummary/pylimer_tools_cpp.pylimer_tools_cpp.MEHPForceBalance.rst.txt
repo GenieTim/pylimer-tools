@@ -19,6 +19,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance
    
       ~MEHPForceBalance.__init__
       ~MEHPForceBalance.addSlipLinks
+      ~MEHPForceBalance.addSliplinksBasedOnCycles
       ~MEHPForceBalance.deformTo
       ~MEHPForceBalance.getAverageSpringLength
       ~MEHPForceBalance.getCrosslinkerVerse
