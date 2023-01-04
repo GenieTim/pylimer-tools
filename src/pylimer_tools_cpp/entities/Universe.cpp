@@ -58,7 +58,8 @@ namespace entities {
 
   Universe::Universe(const double Lx, const double Ly, const double Lz)
     : Universe(Box(Lx, Ly, Lz))
-  {}
+  {
+  }
 
   // 1. destructor (to destroy the graph)
   Universe::~Universe()
@@ -424,7 +425,10 @@ namespace entities {
     this->massPerType = massPerType;
   }
 
-  std::map<int, double> Universe::getMasses() { return this->massPerType; };
+  std::map<int, double> Universe::getMasses()
+  {
+    return this->massPerType;
+  };
 
   /**
    * @brief Get the standalone components of the network
@@ -750,18 +754,7 @@ namespace entities {
     return molecules;
   }
 
-  /**
-   * @brief Find the loops in the network
-   *
-   * NOTE: there are exponentially many paths between two vertices of a graph,
-   * and you may run out of memory when using this function, if your graph is
-   * lattice-like.
-   *
-   * @param crosslinkerType
-   * @param maxLength
-   * @return std::map<int, std::vector<std::vector<Atom>>>
-   */
-  std::map<int, std::vector<std::vector<Atom>>> Universe::findLoops(
+  std::vector<std::vector<long int>> Universe::findLoops(
     const int crosslinkerType,
     const int maxLength,
     bool skipSelfLoops) const
@@ -769,7 +762,7 @@ namespace entities {
     // NOTE: there are exponentially many paths between two vertices of a graph,
     // and you may run out of memory when using this function, if your graph is
     // lattice-like.
-    std::map<int, std::vector<std::vector<Atom>>> results;
+    std::vector<std::vector<long int>> results;
 
     std::vector<long int> startingCrosslinkers =
       this->getIndicesOfType(crosslinkerType);
@@ -804,7 +797,7 @@ namespace entities {
 
       igraph_vector_int_destroy(&neighbours);
       // translate the paths we found
-      std::vector<Atom> currentPath;
+      std::vector<long int> currentPath;
       int currentFunctionality = 0;
       unsigned long long int currentPathXor = 0;
       unsigned long long int currentPathSum = 0;
@@ -821,7 +814,7 @@ namespace entities {
           if ((!skipSelfLoops || currentPath.size() > 3) &&
               !pylimer_tools::utils::set_has_key(processedPathsKeys,
                                                  currentPathKey)) {
-            results[currentFunctionality].push_back(currentPath);
+            results.push_back(currentPath);
             processedPathsKeys.insert(currentPathKey);
           }
           currentPath.clear();
@@ -830,22 +823,23 @@ namespace entities {
           currentPathSum = 0;
           currentPathProduct = 0;
         } else {
-          Atom newAtom = this->getAtomByVertexIdx(currentVal);
-          currentPathXor = currentPathXor xor currentVal; // compute hash
+          // compute hash
+          currentPathXor = (currentPathXor xor currentVal); 
           currentPathSum += currentVal;
           currentPathProduct *= currentVal;
-          currentPath.push_back(newAtom);
-          if (newAtom.getType() == crosslinkerType) {
-            currentFunctionality += 1;
-          }
+          // and remember the part of the path
+          currentPath.push_back(currentVal);
         }
       }
       igraph_vector_int_destroy(&paths);
 
       // additional check for self-loops
-      if (!skipSelfLoops &&
-          !pylimer_tools::utils::map_has_key(
-            processedPathsKeys, 0 xor startingCrosslinkerVertexId)) {
+      std::string selfLoopPathKey =
+        std::to_string(0 xor startingCrosslinkerVertexId) + "/" +
+        std::to_string(startingCrosslinkerVertexId) + "/" +
+        std::to_string(startingCrosslinkerVertexId);
+      if (!skipSelfLoops && !pylimer_tools::utils::set_has_key(
+                              processedPathsKeys, selfLoopPathKey)) {
         std::vector<long int> crosslinkersBonds =
           this->getVertexIdxsConnectedTo(startingCrosslinkerVertexId);
         if (std::find(crosslinkersBonds.begin(),
@@ -853,12 +847,53 @@ namespace entities {
                       startingCrosslinkerVertexId) != crosslinkersBonds.end()) {
 
           currentPath.clear();
-          currentPath.push_back(
-            this->getAtomByVertexIdx(startingCrosslinkerVertexId));
-          results[1].push_back(currentPath);
+          currentPath.push_back(startingCrosslinkerVertexId);
+          results.push_back(currentPath);
           currentPath.clear();
         }
       }
+    }
+
+    return results;
+  }
+
+  /**
+   * @brief Find the loops in the network
+   *
+   * NOTE: there are exponentially many paths between two vertices of a graph,
+   * and you may run out of memory when using this function, if your graph is
+   * lattice-like.
+   *
+   * @param crosslinkerType
+   * @param maxLength
+   * @return std::map<int, std::vector<std::vector<Atom>>>
+   */
+  std::map<int, std::vector<std::vector<Atom>>> Universe::findLoopsOfAtoms(
+    const int crosslinkerType,
+    const int maxLength,
+    bool skipSelfLoops) const
+  {
+    // NOTE: there are exponentially many paths between two vertices of a graph,
+    // and you may run out of memory when using this function, if your graph is
+    // lattice-like.
+    std::map<int, std::vector<std::vector<Atom>>> results;
+
+    std::vector<std::vector<long int>> loops =
+      this->findLoops(crosslinkerType, maxLength, skipSelfLoops);
+
+    for (size_t i = 0; i < loops.size(); ++i) {
+      std::vector<long int> loop = loops[i];
+      std::vector<Atom> currentPath;
+      currentPath.reserve(loop.size());
+      int currentFunctionality = 0;
+      for (size_t j = 0; j < loop.size(); ++j) {
+        Atom newAtom = this->getAtomByVertexIdx(loop[j]);
+        if (newAtom.getType() == crosslinkerType) {
+          currentFunctionality += 1;
+        }
+        currentPath.push_back(newAtom);
+      }
+      results[currentFunctionality].push_back(currentPath);
     }
 
     return results;
@@ -1950,11 +1985,20 @@ namespace entities {
    *
    * @return double
    */
-  double Universe::getVolume() const { return this->box.getVolume(); }
+  double Universe::getVolume() const
+  {
+    return this->box.getVolume();
+  }
 
-  size_t Universe::getNrOfAtoms() const { return this->NAtoms; }
+  size_t Universe::getNrOfAtoms() const
+  {
+    return this->NAtoms;
+  }
 
-  size_t Universe::getNrOfBonds() const { return this->NBonds; }
+  size_t Universe::getNrOfBonds() const
+  {
+    return this->NBonds;
+  }
 
   void Universe::setBox(Box passedBox, bool rescaleAtomCoordinates)
   {
@@ -2013,6 +2057,9 @@ namespace entities {
     this->setBox(Box(Lx, Ly, Lz));
   }
 
-  Box Universe::getBox() const { return this->box; }
+  Box Universe::getBox() const
+  {
+    return this->box;
+  }
 } // namespace entities
 } // namespace pylimer_tools

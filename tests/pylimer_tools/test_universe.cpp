@@ -427,7 +427,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     SECTION("Loops are found")
     {
       std::map<int, std::vector<std::vector<pe::Atom>>> loops =
-        universe.findLoops(2, -1, true);
+        universe.findLoopsOfAtoms(2, -1, true);
       REQUIRE(pylimer_tools::utils::map_has_key(loops, 2));
       REQUIRE(loops.size() == 1);
 
@@ -507,7 +507,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       pe::Universe reducedUniverse = universe.getNetworkOfCrosslinker(2);
       REQUIRE(reducedUniverse.getNrOfAtoms() == 3);
       std::map<int, std::vector<std::vector<pe::Atom>>> loops =
-        reducedUniverse.findLoops(2, -1);
+        reducedUniverse.findLoopsOfAtoms(2, -1);
       REQUIRE(loops.size() == 2);
       REQUIRE(reducedUniverse.getPropertyValues<int>("id").size() == 3);
       REQUIRE(reducedUniverse.getAtomTypes().size() == 3);
@@ -569,7 +569,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(universe.hasInfiniteStrand(2, -1) == false);
       universe.addBonds(2, { { 8, 4 } }, { { 4, 1 } });
       std::map<int, std::vector<std::vector<pe::Atom>>> loops =
-        universe.findLoops(2, -1);
+        universe.findLoopsOfAtoms(2, -1);
       REQUIRE(loops.size() == 3);
       REQUIRE(universe.hasInfiniteStrand(2, -1) == true);
       REQUIRE(universe.getMeanStrandLength(2) ==

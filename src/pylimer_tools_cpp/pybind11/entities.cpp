@@ -480,7 +480,7 @@ init_pylimer_bound_entities(py::module_& m)
             Get the atoms that have the specified number of bonds.
             )pbdoc")
     .def("findLoops",
-         &Universe::findLoops,
+         &Universe::findLoopsOfAtoms,
          R"pbdoc(
             Decompose the Universe into loops.
             The primary index specifies the degree of the loop.

@@ -93,7 +93,11 @@ namespace entities {
       const int crosslinkerType) const;
     Universe getNetworkOfCrosslinker(const int crosslinkerType) const;
     // TODO: find & implement a better return type, e.g. std::vector<Molecule>
-    std::map<int, std::vector<std::vector<Atom>>> findLoops(
+    std::vector<std::vector<long int>> findLoops(
+      const int crosslinkerType,
+      const int maxLength = -1,
+      bool skipSelfLoops = false) const;
+    std::map<int, std::vector<std::vector<Atom>>> findLoopsOfAtoms(
       const int crosslinkerType,
       const int maxLength = -1,
       bool skipSelfLoops = false) const;
