@@ -44,6 +44,14 @@ namespace calc {
       ALL_ANDREI
     };
 
+    enum LinkSwappingMode
+    {
+      NO_SWAPPING,
+      SLIPLINKS_ONLY,
+      ALL,
+      ALL_CYCLE
+    };
+
     // heavily inspired by Prof. Dr. Andrei Gusev's Code
     class MEHPForceBalance
     {
@@ -96,7 +104,9 @@ namespace calc {
         const double inactiveRemovalCutoff = -1.0,
         const int outputFrequency = 50,
         bool doInnerIterations = false,
-        bool allowSlipLinksToPassEachOther = false);
+        LinkSwappingMode allowSlipLinksToPassEachOther =
+          LinkSwappingMode::NO_SWAPPING,
+        const int swappingFrequency = 10);
 
       /**
        * @brief Compute the spring update residual
@@ -222,6 +232,36 @@ namespace calc {
                         const size_t linkToReduce) const;
 
       /**
+       * @brief Merge two springs around a given cross-link
+       * 
+       * This does not require the resulting network to be valid.
+       *
+       * @param net
+       * @param springPartitions
+       */
+      void mergePartialSprings(ForceBalanceNetwork& net,
+                               Eigen::VectorXd& springPartitions,
+                               const size_t removedSpringIdx,
+                               const size_t keptSpringIdx,
+                               const size_t linkToReduce) const;
+
+      /**
+       * @brief Add a slip-link to a given partial spring
+       * 
+       * This does not require the resulting network to be valid.
+       * 
+       * @param net 
+       * @param springPartitions 
+       * @param partialSpringIdx 
+       * @param slipLinkIdx 
+       */
+      void addSlipLinkToPartialSpring(ForceBalanceNetwork& net,
+                                      Eigen::VectorXd& springPartitions,
+                                      const size_t partialSpringIdx,
+                                      const size_t slipLinkIdx,
+                                      const double alpha) const;
+
+      /**
        * @brief Replace the two springs traversinga a two-functional cross-links
        * with a single spring
        *
@@ -250,7 +290,7 @@ namespace calc {
 
       /**
        * @brief Add slip-links to this system based on entangled loops
-       * 
+       *
        * @return size_t the nr of actually added slip-links
        */
       size_t addSliplinksBasedOnCycles(const int maxLoopLength = -1);
@@ -716,16 +756,35 @@ namespace calc {
         bool allowSlipLinksToPassEachOther = false) const;
 
       /**
-       * @brief Loop all springs, swap slip-links on them if they are close enough
-       * 
-       * @param net 
+       * @brief Loop all springs, swap slip-links on them if they are close
+       * enough
+       *
+       * @param net
+       */
+      void swapSlipLinksInclXlinks(ForceBalanceNetwork& net,
+                                   const Eigen::VectorXd& u,
+                                   Eigen::VectorXd& springPartitions,
+                                   double swappableCutoff);
+
+      /**
+       * @brief Loop all springs, swap slip-links on them if they are close
+       * enough
+       *
+       * @param net
        */
       void swapSlipLinks(ForceBalanceNetwork& net,
-        const Eigen::VectorXd& u,
-        Eigen::VectorXd& springPartitions,
-        double swappableCutoff);
+                         const Eigen::VectorXd& u,
+                         Eigen::VectorXd& springPartitions,
+                         double swappableCutoff);
 
-      void swapSlipLinks(ForceBalanceNetwork& net, const size_t partialSpringIdx);
+      void swapSlipLinks(ForceBalanceNetwork& net,
+                         const size_t partialSpringIdx);
+
+      void jumpSlipLinkOverCrosslink(ForceBalanceNetwork& net,
+                                     const size_t sliplinkIdx,
+                                     const size_t crosslinkIdx,
+                                     const size_t sourceSpringIdx,
+                                     const size_t targetSpringIdx);
 
       /**
        * @brief Displace one link to the mean of all connected neighbours

@@ -456,6 +456,12 @@ init_pylimer_bound_calc(py::module_& m)
     .value("ALL_TIM", mehp::StructureSimplificationMode::ALL_TIM)
     .value("ALL_ANDREI", mehp::StructureSimplificationMode::ALL_ANDREI);
 
+  py::enum_<mehp::LinkSwappingMode>(m, "LinkSwappingMode")
+    .value("NO_SWAPPING", mehp::LinkSwappingMode::NO_SWAPPING)
+    .value("SLIPLINKS_ONLY", mehp::LinkSwappingMode::SLIPLINKS_ONLY)
+    .value("ALL", mehp::LinkSwappingMode::ALL)
+    .value("ALL_CYCLE", mehp::LinkSwappingMode::ALL_CYCLE);
+
   py::class_<mehp::MEHPForceBalance>(m, "MEHPForceBalance", R"pbdoc(
     A small simulation tool for quickly minimizing the force between the cross-linker beads.
      )pbdoc")
@@ -510,7 +516,9 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("inactiveRemovalCutoff") = -1.0,
          py::arg("outputFrequency") = 50,
          py::arg("doInnerIterations") = false,
-         py::arg("allowSlipLinksToPassEachOther") = false)
+         py::arg("allowSlipLinksToPassEachOther") =
+           mehp::LinkSwappingMode::NO_SWAPPING,
+         py::arg("swappingFrequency") = 10)
     .def("deformTo",
          &mehp::MEHPForceBalance::deformTo,
          R"pbdoc()pbdoc",
