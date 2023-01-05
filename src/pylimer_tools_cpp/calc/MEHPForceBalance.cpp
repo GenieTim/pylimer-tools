@@ -2145,8 +2145,11 @@ namespace calc {
           !net.linkIsSliplink[net.springPartIndexB[partialSpringIdx]],
         "Require at least one part to be a cross-link.");
       net.nrOfPartialSprings += 1;
-      size_t newPartialSpringIdx = net.nrOfPartialSprings - 1;
-      size_t relevantSpring = net.partialToFullSpringIndex[partialSpringIdx];
+      const size_t newPartialSpringIdx = net.nrOfPartialSprings - 1;
+      const size_t relevantSpring = net.partialToFullSpringIndex[partialSpringIdx];
+      std::cout << "Adding slip-link " << slipLinkIdx << " to spring "
+                << relevantSpring << " (partial " << partialSpringIdx
+                << ") with alpha = " << alpha << std::endl;
       // resize the structures
       springPartitions.conservativeResize(springPartitions.size() + 1);
       assert(springPartitions.size() == net.nrOfPartialSprings);
@@ -2161,8 +2164,7 @@ namespace calc {
       // add the new info
       net.partialSpringIsPartial[partialSpringIdx] = true;
       net.partialSpringIsPartial[newPartialSpringIdx] = true;
-      net.partialToFullSpringIndex[newPartialSpringIdx] =
-        net.partialToFullSpringIndex[partialSpringIdx];
+      net.partialToFullSpringIndex[newPartialSpringIdx] = relevantSpring;
 
       pylimer_tools::utils::addIfNotContained(
         net.springIndicesOfLinks[slipLinkIdx], relevantSpring);
@@ -2532,11 +2534,10 @@ namespace calc {
             ? 1. / (N - 1. / oneOverSpringPartitionUpperLimit)
             : 1e-12;
 
-        // TODO: implement jumping over x-links
         // loop the remaining partial springs
-        for (size_t partialIdx = 0;
-             partialIdx < net.localToGlobalSpringIndex[springIdx].size();
-             ++partialIdx) {
+        for (int partialIdx = net.localToGlobalSpringIndex[springIdx].size()-1;
+             partialIdx >= 0;
+             --partialIdx) {
           // check if they qualify for swapping
           if (springPartitions[net.localToGlobalSpringIndex[springIdx]
                                                            [partialIdx]] <=
@@ -2612,6 +2613,7 @@ namespace calc {
                                           partialSpringIdx,
                                           otherInvolvedPartialSpring,
                                           involvedSlipLink);
+                this->validateNetwork(net, u, springPartitions);
                 // ... and add it to another
                 assert(currentPartialSpringTargetIdx >= 0);
                 size_t targetPartialSpringIdx =
@@ -2622,8 +2624,8 @@ namespace calc {
                   targetPartialSpringIdx -= 1;
                 }
                 std::cout << "Handling moving link " << involvedSlipLink
-                          << " around cross-link from partial "
-                          << partialSpringIdx << " to "
+                          << " around cross-link " << involvedCrosslink
+                          << " from partial " << partialSpringIdx << " to "
                           << targetPartialSpringIdx << std::endl;
                 assert(net.springPartIndexA[targetPartialSpringIdx] ==
                          involvedCrosslink ||
@@ -2636,8 +2638,8 @@ namespace calc {
                                                  swappableCutoff);
                 this->validateNetwork(net, u, springPartitions);
                 std::cout << "Finished moving link " << involvedSlipLink
-                          << " around cross-link from partial "
-                          << partialSpringIdx << " to "
+                          << " around cross-link " << involvedCrosslink
+                          << " from partial " << partialSpringIdx << " to "
                           << targetPartialSpringIdx << std::endl;
               } else {
                 this->swapSlipLinks(net, partialSpringIdx);
@@ -4174,10 +4176,11 @@ namespace calc {
             "Expect linkIndicesOfSprings and localToGlobalSpringIndex ordering "
             "to correspond. Got partner0 = " +
               std::to_string(partner0) + ", partner1 = " +
-              std::to_string(partner1) + " for springs part indices " +
+              std::to_string(partner1) + " vs. springs part indices " +
               std::to_string(net.springPartIndexA[partialSpringIdx]) + " and " +
               std::to_string(net.springPartIndexB[partialSpringIdx]) +
-              " in spring " + std::to_string(i) + " with global indices " +
+              " in spring " + std::to_string(i) + " (partial: " +
+              std::to_string(partialSpringIdx) + ") with global indices " +
               pylimer_tools::utils::join(
                 net.localToGlobalSpringIndex[i].begin(),
                 net.localToGlobalSpringIndex[i].end(),
