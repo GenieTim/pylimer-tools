@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <set>
 #include "../utils/utilityMacros.h"
 
 namespace pylimer_tools {
@@ -24,6 +25,7 @@ namespace calc {
     typedef Eigen::Array<bool, Eigen::Dynamic, 1> ArrayXb;
     // typedef Eigen::Array<Eigen::ArrayXi, Eigen::Dynamic, 1> ArrayXArrayXi;
     typedef std::vector<std::vector<size_t>> ArrayXArrayXi;
+    typedef std::vector<std::set<size_t>> ArrayXArrayXiUnique;
     typedef std::vector<std::vector<double>> ArrayXArrayXd;
 
     // improved structures using Eigen
