@@ -2146,7 +2146,8 @@ namespace calc {
         "Require at least one part to be a cross-link.");
       net.nrOfPartialSprings += 1;
       const size_t newPartialSpringIdx = net.nrOfPartialSprings - 1;
-      const size_t relevantSpring = net.partialToFullSpringIndex[partialSpringIdx];
+      const size_t relevantSpring =
+        net.partialToFullSpringIndex[partialSpringIdx];
       std::cout << "Adding slip-link " << slipLinkIdx << " to spring "
                 << relevantSpring << " (partial " << partialSpringIdx
                 << ") with alpha = " << alpha << std::endl;
@@ -2535,7 +2536,11 @@ namespace calc {
             : 1e-12;
 
         // loop the remaining partial springs
-        for (int partialIdx = net.localToGlobalSpringIndex[springIdx].size()-1;
+        // NOTE: it is slightly problematc, that e.g.
+        // net.localToGlobalSpringIndex changes /!\  no idea ye how to easily
+        // compensate that...
+        for (int partialIdx =
+               net.localToGlobalSpringIndex[springIdx].size() - 1;
              partialIdx >= 0;
              --partialIdx) {
           // check if they qualify for swapping
@@ -2573,6 +2578,13 @@ namespace calc {
                 // find possible target partial springs
                 std::vector<size_t> possibleTargetSprings =
                   net.springIndicesOfLinks[involvedCrosslink];
+                if (possibleTargetSprings.size() <= 1) {
+                  // e.g. in the case of many loops :P
+                  // std::cerr << "Spring " << springIdx << "'s cross-link " <<
+                  // involvedCrosslink << " has too few attached springs to
+                  // reasonably make swaps." << std::endl;
+                  continue;
+                }
                 std::vector<size_t> possibleTargetPartialSprings;
                 possibleTargetPartialSprings.reserve(
                   possibleTargetSprings.size());
