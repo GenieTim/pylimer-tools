@@ -15,9 +15,18 @@ extern "C"
 #include <Eigen/Dense>
 #include <cassert>
 
-
 namespace pylimer_tools {
 namespace utils {
+  template<typename T>
+  static inline bool addIfNotContained(std::vector<T>& vec, const T value)
+  {
+    if (std::find(vec.begin(), vec.end(), value) == vec.end()) {
+      vec.push_back(value);
+      return true;
+    }
+    return false;
+  }
+
   typedef Eigen::Array<bool, Eigen::Dynamic, 1> ArrayXb;
 
   /**
@@ -57,13 +66,13 @@ namespace utils {
                                 unsigned int nrOfRowsToRemove)                 \
   {                                                                            \
     INVALIDARG_EXP_IFN(                                                        \
-      vec.size() >= rowToStartRemove + nrOfRowsToRemove,                        \
+      vec.size() >= rowToStartRemove + nrOfRowsToRemove,                       \
       "Cannot remove rows " + std::to_string(nrOfRowsToRemove) + " from " +    \
         std::to_string(rowToStartRemove) + " from vector with size " +         \
         std::to_string(vec.size()) + "!");                                     \
     unsigned int numRows = vec.size() - nrOfRowsToRemove;                      \
-    vec.segment(rowToStartRemove, numRows - rowToStartRemove) =                \
-      vec.segment(rowToStartRemove + nrOfRowsToRemove, numRows - rowToStartRemove);           \
+    vec.segment(rowToStartRemove, numRows - rowToStartRemove) = vec.segment(   \
+      rowToStartRemove + nrOfRowsToRemove, numRows - rowToStartRemove);        \
     vec.conservativeResize(numRows);                                           \
   }
 

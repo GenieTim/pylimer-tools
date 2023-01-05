@@ -781,14 +781,13 @@ namespace calc {
       ForceBalanceNetwork& net)
     {
       for (size_t linkIdx = 0; linkIdx < net.nrOfLinks; ++linkIdx) {
-        if (net.springIndicesOfLinks[linkIdx].size() == 2 &&
-            net.springIndicesOfLinks[linkIdx][0] ==
-              net.springIndicesOfLinks[linkIdx][1]) {
-          net.springIndicesOfLinks[linkIdx].pop_back();
-          RUNTIME_EXP_IFN(
-            net.springIndicesOfLinks[linkIdx].size() == 1,
-            "After pop_back, expected to have only 1 entry remaining.");
-        }
+        // remove duplicate mentions of the same spring index
+        std::sort(net.springIndicesOfLinks[linkIdx].begin(),
+                  net.springIndicesOfLinks[linkIdx].end());
+        auto last = std::unique(net.springIndicesOfLinks[linkIdx].begin(),
+                                net.springIndicesOfLinks[linkIdx].end());
+        net.springIndicesOfLinks[linkIdx].erase(
+          last, net.springIndicesOfLinks[linkIdx].end());
       }
     }
 
@@ -839,10 +838,10 @@ namespace calc {
         }
         if (!isActive) {
           // remove this spring
-          // std::cout << "Removing spring " << springIdx << std::endl;
-          // this->validateNetwork(net, displacements, springPartitions);
+          std::cout << "Removing spring " << springIdx << std::endl;
+          this->validateNetwork(net, displacements, springPartitions);
           this->removeSpring(net, displacements, springPartitions, springIdx);
-          // this->validateNetwork(net, displacements, springPartitions);
+          this->validateNetwork(net, displacements, springPartitions);
           numRemoved += 1;
         }
       }
@@ -854,7 +853,7 @@ namespace calc {
         ) {
           // std::cout << "Removing x-link " << crosslinkIdx << std::endl;
           this->removeLink(net, displacements, crosslinkIdx);
-          // this->validateNetwork(net, displacements, springPartitions);
+          this->validateNetwork(net, displacements, springPartitions);
         }
 
         if ( // or f = 1, NOT primary loop
@@ -1301,6 +1300,7 @@ namespace calc {
 
       std::vector<size_t> affectedPartialSprings =
         net.localToGlobalSpringIndex[springIdx];
+      assert(affectedPartialSprings.size() > 0);
       net.nrOfSprings -= 1;
       net.nrOfPartialSprings -= affectedPartialSprings.size();
 
@@ -1337,6 +1337,7 @@ namespace calc {
                                         partialSpringIdx);
         pylimer_tools::utils::removeRow(springPartitions, partialSpringIdx);
       }
+      assert(springPartitions.size() == net.nrOfPartialSprings);
 
       // renumber the remaining stuff
       // first, renumber the springs
@@ -1580,10 +1581,19 @@ namespace calc {
       INVALIDARG_EXP_IFN(
         net.springPartIndexA[removedSpringIdx] == linkToReduce ||
           net.springPartIndexB[removedSpringIdx] == linkToReduce,
-        "Link to reduce must be part of the springs to merge");
+        "Link to reduce must be part of the springs to partial spring that is "
+        "removed, got " +
+          std::to_string(net.springPartIndexA[removedSpringIdx]) + " and " +
+          std::to_string(net.springPartIndexB[removedSpringIdx]) +
+          " instead of " + std::to_string(linkToReduce) + ".");
       INVALIDARG_EXP_IFN(net.springPartIndexA[keptSpringIdx] == linkToReduce ||
                            net.springPartIndexB[keptSpringIdx] == linkToReduce,
-                         "Link to reduce must be part of the springs to merge");
+                         "Link to reduce must be part of the partial spring "
+                         "that is to be kept, got " +
+                           std::to_string(net.springPartIndexA[keptSpringIdx]) +
+                           " and " +
+                           std::to_string(net.springPartIndexB[keptSpringIdx]) +
+                           " instead of " + std::to_string(linkToReduce) + ".");
       size_t fullSpringIdx = net.partialToFullSpringIndex[keptSpringIdx];
       // start with removal
       net.nrOfPartialSprings -= 1;
@@ -1609,38 +1619,72 @@ namespace calc {
       // as it might be removed earlier already
       // It is anyway the case, that this function does not necessarily
       // keep the network valid
+      int found = 0;
       for (int i = net.springIndicesOfLinks[linkToReduce].size() - 1; i >= 0;
            --i) {
-        if (net.springIndicesOfLinks[linkToReduce][i] == removedSpringIdx) {
+        if (net.springIndicesOfLinks[linkToReduce][i] == fullSpringIdx) {
           net.springIndicesOfLinks[linkToReduce].erase(
             net.springIndicesOfLinks[linkToReduce].begin() + i);
-          // found = true;
+          found += 1;
         }
       }
+      assert(found == 1 || found == 0);
+      RUNTIME_EXP_IFN(
+        net.localToGlobalSpringIndex[fullSpringIdx].size() ==
+          net.linkIndicesOfSprings[fullSpringIdx].size() - 1,
+        "Require a global index for each local one, got " +
+          std::to_string(net.localToGlobalSpringIndex[fullSpringIdx].size()) +
+          " != " +
+          std::to_string(net.linkIndicesOfSprings[fullSpringIdx].size() - 1) +
+          " for spring " + std::to_string(fullSpringIdx) + ".");
+      found = 0;
       // tell the spring of the removed link
       springPartitions[keptSpringIdx] += springPartitions[removedSpringIdx];
       for (int j = net.linkIndicesOfSprings[fullSpringIdx].size() - 1; j >= 0;
            --j) {
         if (net.linkIndicesOfSprings[fullSpringIdx][j] == linkToReduce) {
-          net.linkIndicesOfSprings[fullSpringIdx].erase(
-            net.linkIndicesOfSprings[fullSpringIdx].begin() + j);
+          if (found == 0) {
+            net.linkIndicesOfSprings[fullSpringIdx].erase(
+              net.linkIndicesOfSprings[fullSpringIdx].begin() + j);
+          } else if (found == 1) {
+            // we are dealing with a double -> re-add
+            net.springIndicesOfLinks[linkToReduce].push_back(fullSpringIdx);
+          } else {
+            break; // required for certain cases... dangerous, somewhat.
+          }
+          found += 1;
         }
       }
+      assert(found >= 1);
+      found = 0;
       for (int j = net.localToGlobalSpringIndex[fullSpringIdx].size() - 1;
-           j > 0;
+           j >= 0;
            --j) {
         if (net.localToGlobalSpringIndex[fullSpringIdx][j] ==
             removedSpringIdx) {
           net.localToGlobalSpringIndex[fullSpringIdx].erase(
             net.localToGlobalSpringIndex[fullSpringIdx].begin() + j);
+          found += 1;
         }
       }
+      assert(found == 1);
+      RUNTIME_EXP_IFN(
+        net.localToGlobalSpringIndex[fullSpringIdx].size() ==
+          net.linkIndicesOfSprings[fullSpringIdx].size() - 1,
+        "Require a global index for each local one, got " +
+          std::to_string(net.localToGlobalSpringIndex[fullSpringIdx].size()) +
+          " != " +
+          std::to_string(net.linkIndicesOfSprings[fullSpringIdx].size() - 1) +
+          " for spring " + std::to_string(fullSpringIdx) + ".");
       // recompute some values
       net.partialSpringIsPartial[keptSpringIdx] =
         net.linkIndicesOfSprings[fullSpringIdx].size() > 2;
       // actually remove the rows
       pylimer_tools::utils::removeRow(net.partialSpringIsPartial,
                                       removedSpringIdx);
+      pylimer_tools::utils::removeRow(net.partialToFullSpringIndex,
+                                      removedSpringIdx);
+      pylimer_tools::utils::removeRow(springPartitions, removedSpringIdx);
       pylimer_tools::utils::removeRow(net.springPartIndexA, removedSpringIdx);
       pylimer_tools::utils::removeRow(net.springPartIndexB, removedSpringIdx);
       pylimer_tools::utils::removeRows(
@@ -2096,6 +2140,10 @@ namespace calc {
       const size_t slipLinkIdx,
       const double alpha) const
     {
+      INVALIDARG_EXP_IFN(
+        !net.linkIsSliplink[net.springPartIndexA[partialSpringIdx]] ||
+          !net.linkIsSliplink[net.springPartIndexB[partialSpringIdx]],
+        "Require at least one part to be a cross-link.");
       net.nrOfPartialSprings += 1;
       size_t newPartialSpringIdx = net.nrOfPartialSprings - 1;
       size_t relevantSpring = net.partialToFullSpringIndex[partialSpringIdx];
@@ -2115,23 +2163,24 @@ namespace calc {
       net.partialSpringIsPartial[newPartialSpringIdx] = true;
       net.partialToFullSpringIndex[newPartialSpringIdx] =
         net.partialToFullSpringIndex[partialSpringIdx];
-      net.springIndicesOfLinks[slipLinkIdx].push_back(
-        net.partialToFullSpringIndex[newPartialSpringIdx]);
 
-      size_t oldPartner = net.springPartIndexB[partialSpringIdx];
-      // rewire the springs
-      net.springPartIndexB[partialSpringIdx] = slipLinkIdx;
-      net.springPartIndexB[newPartialSpringIdx] = oldPartner;
-      net.springPartIndexA[newPartialSpringIdx] = slipLinkIdx;
-      for (size_t dir = 0; dir < 3; ++dir) {
-        net.springPartCoordinateIndexB[3 * partialSpringIdx + dir] =
-          3 * slipLinkIdx + dir;
-        net.springPartCoordinateIndexA[3 * newPartialSpringIdx + dir] =
-          3 * slipLinkIdx + dir;
-        net.springPartCoordinateIndexB[3 * newPartialSpringIdx + dir] =
-          3 * oldPartner + dir;
-      }
+      pylimer_tools::utils::addIfNotContained(
+        net.springIndicesOfLinks[slipLinkIdx], relevantSpring);
+
+      size_t oldPartnerA = net.springPartIndexA[partialSpringIdx];
+      size_t oldPartnerB = net.springPartIndexB[partialSpringIdx];
+
+      // slightly change numbering to keep the numbering of
+      // localToGlobalSpringIndex constant. I.e., we want the
+      // `newPartialSpringIdx` to correspond to the spring with the cross-link
+      size_t springPartToReplace;
       if (net.localToGlobalSpringIndex[relevantSpring][0] == partialSpringIdx) {
+        if (net.linkIndicesOfSprings[relevantSpring][0] == oldPartnerA) {
+          springPartToReplace = oldPartnerA;
+        } else {
+          assert(net.linkIndicesOfSprings[relevantSpring][0] == oldPartnerB);
+          springPartToReplace = oldPartnerB;
+        }
         net.linkIndicesOfSprings[relevantSpring].insert(
           net.linkIndicesOfSprings[relevantSpring].begin() + 1, slipLinkIdx);
         net.localToGlobalSpringIndex[relevantSpring].insert(
@@ -2141,12 +2190,57 @@ namespace calc {
         assert(pylimer_tools::utils::last(
                  net.localToGlobalSpringIndex[relevantSpring]) ==
                partialSpringIdx);
+        if (pylimer_tools::utils::last(
+              net.linkIndicesOfSprings[relevantSpring]) == oldPartnerA) {
+          springPartToReplace = oldPartnerA;
+        } else {
+          assert(pylimer_tools::utils::last(
+                   net.linkIndicesOfSprings[relevantSpring]) == oldPartnerB);
+          springPartToReplace = oldPartnerB;
+        }
         net.linkIndicesOfSprings[relevantSpring].insert(
           net.linkIndicesOfSprings[relevantSpring].begin() +
-            net.linkIndicesOfSprings[relevantSpring].size() - 2,
+            (net.linkIndicesOfSprings[relevantSpring].size() - 1),
           slipLinkIdx);
         net.localToGlobalSpringIndex[relevantSpring].push_back(
           newPartialSpringIdx);
+      }
+
+      // rewire the springs
+      if (net.springPartIndexB[partialSpringIdx] == springPartToReplace) {
+        net.springPartIndexB[partialSpringIdx] = slipLinkIdx;
+      } else {
+        assert(net.springPartIndexA[partialSpringIdx] == springPartToReplace);
+        net.springPartIndexA[partialSpringIdx] = slipLinkIdx;
+      }
+      net.springPartIndexA[newPartialSpringIdx] = slipLinkIdx;
+      net.springPartIndexB[newPartialSpringIdx] = springPartToReplace;
+      for (size_t dir = 0; dir < 3; ++dir) {
+        net.springPartCoordinateIndexA[3 * partialSpringIdx + dir] =
+          3 * net.springPartIndexA[partialSpringIdx] + dir;
+        net.springPartCoordinateIndexB[3 * partialSpringIdx + dir] =
+          3 * net.springPartIndexB[partialSpringIdx] + dir;
+
+        net.springPartCoordinateIndexA[3 * newPartialSpringIdx + dir] =
+          3 * net.springPartIndexA[newPartialSpringIdx] + dir;
+        net.springPartCoordinateIndexB[3 * newPartialSpringIdx + dir] =
+          3 * net.springPartIndexB[newPartialSpringIdx] + dir;
+
+        net.springPartCoordinateIndexB[3 * newPartialSpringIdx + dir] =
+          3 * springPartToReplace + dir;
+      }
+
+      //
+      springPartitions[newPartialSpringIdx] = alpha;
+      // renormalize this spring
+      // addmittedly, this is possibly dangerous, as it could hide
+      // other mistakes
+      double newTotalForNormalization =
+        springPartitions(net.localToGlobalSpringIndex[relevantSpring]).sum();
+      for (size_t globalPartSpringIndex :
+           net.localToGlobalSpringIndex[relevantSpring]) {
+        springPartitions[globalPartSpringIndex] *=
+          1. / newTotalForNormalization;
       }
     }
 
@@ -2421,6 +2515,7 @@ namespace calc {
       Eigen::VectorXd& springPartitions,
       double oneOverSpringPartitionUpperLimit)
     {
+      this->validateNetwork(net, u, springPartitions);
       for (size_t springIdx = 0; springIdx < net.nrOfSprings; ++springIdx) {
         if (net.linkIndicesOfSprings[springIdx].size() <= 2) {
           // no need to handle springs without slip-links
@@ -2492,12 +2587,18 @@ namespace calc {
                       : pylimer_tools::utils::last(
                           net.localToGlobalSpringIndex
                             [possibleTargetSprings[i]]);
-                  possibleTargetPartialSprings.push_back(
-                    currentPossibleTargetPartialSpringIdx);
-                  if (currentPartialSpringTargetIdx == partialSpringIdx ||
-                      currentPartialSpringTargetIdx ==
+                  if (currentPossibleTargetPartialSpringIdx !=
+                      partialSpringIdx) { // let's not combine with the
+                                          // to-be-removed partial spring
+                    possibleTargetPartialSprings.push_back(
+                      currentPossibleTargetPartialSpringIdx);
+                  }
+                  if (currentPossibleTargetPartialSpringIdx ==
+                        partialSpringIdx ||
+                      currentPossibleTargetPartialSpringIdx ==
                         otherInvolvedPartialSpring) {
-                    assert(currentPartialSpringTargetIdx == -1);
+                    // we unfortunately cannot assert this due to primary loops
+                    // assert(currentPartialSpringTargetIdx == -1);
                     currentPartialSpringTargetIdx = i;
                   }
                 }
@@ -2510,18 +2611,32 @@ namespace calc {
                 // ... and add it to another
                 assert(currentPartialSpringTargetIdx >= 0);
                 size_t targetPartialSpringIdx = possibleTargetPartialSprings
-                  [(currentPartialSpringTargetIdx + 1) %
+                  [(currentPartialSpringTargetIdx) %
                    possibleTargetPartialSprings.size()];
                 if (targetPartialSpringIdx > partialSpringIdx) {
                   targetPartialSpringIdx -= 1;
                 }
+                // std::cout << "Handling moving link " << involvedSlipLink
+                //           << " around cross-link from partial "
+                //           << partialSpringIdx << " to "
+                //           << targetPartialSpringIdx << std::endl;
+                assert(net.springPartIndexA[targetPartialSpringIdx] ==
+                         involvedCrosslink ||
+                       net.springPartIndexB[targetPartialSpringIdx] ==
+                         involvedCrosslink);
                 this->addSlipLinkToPartialSpring(net,
                                                  springPartitions,
                                                  targetPartialSpringIdx,
                                                  involvedSlipLink,
                                                  swappableCutoff);
+                this->validateNetwork(net, u, springPartitions);
+                // std::cout << "Finished moving link " << involvedSlipLink
+                //           << " around cross-link from partial "
+                //           << partialSpringIdx << " to "
+                //           << targetPartialSpringIdx << std::endl;
               } else {
                 this->swapSlipLinks(net, partialSpringIdx);
+                this->validateNetwork(net, u, springPartitions);
               }
             }
           }
@@ -3829,9 +3944,11 @@ namespace calc {
             net.oldAtomIdToSpringIndex[a.getId()] = spring_idx;
           }
 
-          net.springIndicesOfLinks[nodeIdxFrom].push_back(spring_idx);
+          pylimer_tools::utils::addIfNotContained(
+            net.springIndicesOfLinks[nodeIdxFrom], spring_idx);
           if (nodeIdxFrom != nodeIdxTo) {
-            net.springIndicesOfLinks[nodeIdxTo].push_back(spring_idx);
+            pylimer_tools::utils::addIfNotContained(
+              net.springIndicesOfLinks[nodeIdxTo], spring_idx);
           }
 
           net.linkIndicesOfSprings[spring_idx].push_back(nodeIdxFrom);
@@ -4038,6 +4155,20 @@ namespace calc {
             std::to_string(net.localToGlobalSpringIndex[i].size()) +
             " != " + std::to_string(net.linkIndicesOfSprings[i].size() - 1) +
             " for spring " + std::to_string(i) + ".");
+        for (size_t partialIdx = 0;
+             partialIdx < net.localToGlobalSpringIndex[i].size();
+             ++partialIdx) {
+          size_t partialSpringIdx = net.localToGlobalSpringIndex[i][partialIdx];
+          size_t partner0 = net.linkIndicesOfSprings[i][partialIdx];
+          size_t partner1 = net.linkIndicesOfSprings[i][partialIdx + 1];
+          RUNTIME_EXP_IFN(
+            ((net.springPartIndexA[partialSpringIdx] == partner0 &&
+              net.springPartIndexB[partialSpringIdx] == partner1) ||
+             (net.springPartIndexB[partialSpringIdx] == partner0 &&
+              net.springPartIndexA[partialSpringIdx] == partner1)),
+            "Expect linkIndicesOfSprings and localToGlobalSpringIndex ordering "
+            "to correspond");
+        }
         // the following is not guraranteed anymore with the removal of links
         // while running RUNTIME_EXP_IFN(
         //   net.linkIndicesOfSprings[i][0] <=
