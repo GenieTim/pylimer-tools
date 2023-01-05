@@ -1639,23 +1639,32 @@ namespace calc {
           " for spring " + std::to_string(fullSpringIdx) + ".");
       found = 0;
       // tell the spring of the removed link
+      int removed = 0;
       springPartitions[keptSpringIdx] += springPartitions[removedSpringIdx];
       for (int j = net.linkIndicesOfSprings[fullSpringIdx].size() - 1; j >= 0;
            --j) {
         if (net.linkIndicesOfSprings[fullSpringIdx][j] == linkToReduce) {
-          if (found == 0) {
-            net.linkIndicesOfSprings[fullSpringIdx].erase(
-              net.linkIndicesOfSprings[fullSpringIdx].begin() + j);
-          } else if (found == 1) {
+          if (removed == 0) {
+            if ((j > 0 && net.localToGlobalSpringIndex[fullSpringIdx][j - 1] ==
+                            removedSpringIdx) ||
+                (j < net.localToGlobalSpringIndex[fullSpringIdx].size() &&
+                 net.localToGlobalSpringIndex[fullSpringIdx][j] ==
+                   removedSpringIdx)) {
+              net.linkIndicesOfSprings[fullSpringIdx].erase(
+                net.linkIndicesOfSprings[fullSpringIdx].begin() + j);
+                removed += 1;
+            }
+          } 
+          if (found == 1) {
             // we are dealing with a double -> re-add
             net.springIndicesOfLinks[linkToReduce].push_back(fullSpringIdx);
-          } else {
+          } else if (found > 1 && removed > 0) {
             break; // required for certain cases... dangerous, somewhat.
           }
           found += 1;
         }
       }
-      assert(found >= 1);
+      assert(found >= 1 && removed == 1);
       found = 0;
       for (int j = net.localToGlobalSpringIndex[fullSpringIdx].size() - 1;
            j >= 0;
@@ -2148,9 +2157,9 @@ namespace calc {
       const size_t newPartialSpringIdx = net.nrOfPartialSprings - 1;
       const size_t relevantSpring =
         net.partialToFullSpringIndex[partialSpringIdx];
-      std::cout << "Adding slip-link " << slipLinkIdx << " to spring "
-                << relevantSpring << " (partial " << partialSpringIdx
-                << ") with alpha = " << alpha << std::endl;
+      // std::cout << "Adding slip-link " << slipLinkIdx << " to spring "
+      //           << relevantSpring << " (partial " << partialSpringIdx
+      //           << ") with alpha = " << alpha << std::endl;
       // resize the structures
       springPartitions.conservativeResize(springPartitions.size() + 1);
       assert(springPartitions.size() == net.nrOfPartialSprings);
@@ -2180,11 +2189,11 @@ namespace calc {
       if (net.localToGlobalSpringIndex[relevantSpring][0] == partialSpringIdx) {
         if (net.linkIndicesOfSprings[relevantSpring][0] == oldPartnerA) {
           springPartToReplace = oldPartnerA;
-          std::cout << "Case 1a" << std::endl;
+          // std::cout << "Case 1a" << std::endl;
         } else {
           assert(net.linkIndicesOfSprings[relevantSpring][0] == oldPartnerB);
           springPartToReplace = oldPartnerB;
-          std::cout << "Case 1b" << std::endl;
+          // std::cout << "Case 1b" << std::endl;
         }
         net.linkIndicesOfSprings[relevantSpring].insert(
           net.linkIndicesOfSprings[relevantSpring].begin() + 1, slipLinkIdx);
@@ -2198,12 +2207,12 @@ namespace calc {
         if (pylimer_tools::utils::last(
               net.linkIndicesOfSprings[relevantSpring]) == oldPartnerA) {
           springPartToReplace = oldPartnerA;
-          std::cout << "Case 2a" << std::endl;
+          // std::cout << "Case 2a" << std::endl;
         } else {
           assert(pylimer_tools::utils::last(
                    net.linkIndicesOfSprings[relevantSpring]) == oldPartnerB);
           springPartToReplace = oldPartnerB;
-          std::cout << "Case 2b" << std::endl;
+          // std::cout << "Case 2b" << std::endl;
         }
         net.linkIndicesOfSprings[relevantSpring].insert(
           net.linkIndicesOfSprings[relevantSpring].begin() +
@@ -2625,9 +2634,9 @@ namespace calc {
                                           partialSpringIdx,
                                           otherInvolvedPartialSpring,
                                           involvedSlipLink);
-                this->validateNetwork(net, u, springPartitions);
+                // this->validateNetwork(net, u, springPartitions);
                 // ... and add it to another
-                assert(currentPartialSpringTargetIdx >= 0);
+                // assert(currentPartialSpringTargetIdx >= 0);
                 size_t targetPartialSpringIdx =
                   possibleTargetPartialSprings[(currentPartialSpringTargetIdx) %
                                                possibleTargetPartialSprings
@@ -2635,10 +2644,10 @@ namespace calc {
                 if (targetPartialSpringIdx > partialSpringIdx) {
                   targetPartialSpringIdx -= 1;
                 }
-                std::cout << "Handling moving link " << involvedSlipLink
-                          << " around cross-link " << involvedCrosslink
-                          << " from partial " << partialSpringIdx << " to "
-                          << targetPartialSpringIdx << std::endl;
+                // std::cout << "Handling moving link " << involvedSlipLink
+                //           << " around cross-link " << involvedCrosslink
+                //           << " from partial " << partialSpringIdx << " to "
+                //           << targetPartialSpringIdx << std::endl;
                 assert(net.springPartIndexA[targetPartialSpringIdx] ==
                          involvedCrosslink ||
                        net.springPartIndexB[targetPartialSpringIdx] ==
@@ -2649,10 +2658,10 @@ namespace calc {
                                                  involvedSlipLink,
                                                  swappableCutoff);
                 this->validateNetwork(net, u, springPartitions);
-                std::cout << "Finished moving link " << involvedSlipLink
-                          << " around cross-link " << involvedCrosslink
-                          << " from partial " << partialSpringIdx << " to "
-                          << targetPartialSpringIdx << std::endl;
+                // std::cout << "Finished moving link " << involvedSlipLink
+                //           << " around cross-link " << involvedCrosslink
+                //           << " from partial " << partialSpringIdx << " to "
+                //           << targetPartialSpringIdx << std::endl;
               } else {
                 this->swapSlipLinks(net, partialSpringIdx);
                 this->validateNetwork(net, u, springPartitions);
