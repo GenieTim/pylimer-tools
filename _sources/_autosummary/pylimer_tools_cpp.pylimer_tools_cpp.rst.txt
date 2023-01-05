@@ -36,6 +36,7 @@
       DumpFileReader
       ExitReason
       LazyUniverseSequenceIterator
+      LinkSwappingMode
       MCUniverseGenerator
       MEHPForceBalance
       MEHPForceEvaluator
