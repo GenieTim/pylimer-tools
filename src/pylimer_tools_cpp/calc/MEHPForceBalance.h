@@ -49,7 +49,8 @@ namespace calc {
       NO_SWAPPING,
       SLIPLINKS_ONLY,
       ALL,
-      ALL_CYCLE
+      ALL_CYCLE,
+      ALL_MC
     };
 
     // heavily inspired by Prof. Dr. Andrei Gusev's Code
@@ -233,7 +234,7 @@ namespace calc {
 
       /**
        * @brief Merge two springs around a given cross-link
-       * 
+       *
        * This does not require the resulting network to be valid.
        *
        * @param net
@@ -247,19 +248,25 @@ namespace calc {
 
       /**
        * @brief Add a slip-link to a given partial spring
-       * 
+       *
        * This does not require the resulting network to be valid.
-       * 
-       * @param net 
-       * @param springPartitions 
-       * @param partialSpringIdx 
-       * @param slipLinkIdx 
+       *
+       * @param net
+       * @param springPartitions
+       * @param partialSpringIdx
+       * @param slipLinkIdx
        */
-      void addSlipLinkToPartialSpring(ForceBalanceNetwork& net,
-                                      Eigen::VectorXd& springPartitions,
-                                      const size_t partialSpringIdx,
-                                      const size_t slipLinkIdx,
-                                      const double alpha) const;
+      size_t addSlipLinkToPartialSpring(ForceBalanceNetwork& net,
+                                        Eigen::VectorXd& springPartitions,
+                                        const size_t partialSpringIdx,
+                                        const size_t slipLinkIdx,
+                                        const double alpha) const;
+
+      void relaxationLight(ForceBalanceNetwork& net,
+                           Eigen::VectorXd& springPartitions,
+                           Eigen::VectorXd& displacements,
+                           const size_t linkIdx,
+                           const double oneOverSpringPartitionUpperLimit = 1.0);
 
       /**
        * @brief Replace the two springs traversinga a two-functional cross-links
@@ -756,6 +763,35 @@ namespace calc {
         bool allowSlipLinksToPassEachOther = false) const;
 
       /**
+       * @brief Loop all slip-links and move them if appropriate to other
+       * springs
+       *
+       * @param net
+       * @param u
+       * @param springPartitions
+       * @param oneOverSpringPartitionUpperLimit
+       */
+      void moveSlipLinksToTheirBestBranch(
+        ForceBalanceNetwork& net,
+        Eigen::VectorXd& u,
+        Eigen::VectorXd& springPartitions,
+        double oneOverSpringPartitionUpperLimit);
+
+      /**
+       * @brief Move a slip-link if appropriate to other springs
+       *
+       * @param net
+       * @param u
+       * @param springPartitions
+       * @param oneOverSpringPartitionUpperLimit
+       */
+      void moveSlipLinkToItsBestBranch(ForceBalanceNetwork& net,
+                                       Eigen::VectorXd& u,
+                                       Eigen::VectorXd& springPartitions,
+                                       size_t slipLinkIdx,
+                                       double oneOverSpringPartitionUpperLimit);
+
+      /**
        * @brief Loop all springs, swap slip-links on them if they are close
        * enough
        *
@@ -780,11 +816,19 @@ namespace calc {
       void swapSlipLinks(ForceBalanceNetwork& net,
                          const size_t partialSpringIdx);
 
-      void jumpSlipLinkOverCrosslink(ForceBalanceNetwork& net,
-                                     const size_t sliplinkIdx,
-                                     const size_t crosslinkIdx,
-                                     const size_t sourceSpringIdx,
-                                     const size_t targetSpringIdx);
+      bool swapSlipLinkReversibly(
+        ForceBalanceNetwork& net,
+        Eigen::VectorXd& u,
+        Eigen::VectorXd& springPartitions,
+        const size_t partialSpringIdx,
+        const double oneOverSpringPartitionUpperLimit = 1.0);
+
+      long int rotateSlipLinkAroundCrosslink(
+        ForceBalanceNetwork& net,
+        const Eigen::VectorXd& u,
+        Eigen::VectorXd& springPartitions,
+        const size_t partialSpringIdx,
+        double oneOverSpringPartitionUpperLimit = 1.0);
 
       /**
        * @brief Displace one link to the mean of all connected neighbours

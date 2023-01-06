@@ -821,18 +821,30 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
       forceBalancer.randomlyAddSliplinks(1500, 2.0, 100, 2.0, false);
     REQUIRE(nrOfAddedLinks >= 100);
     std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
-    // REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
-    //   pcm::BalanceRunMode::ITERATIVE,
-    //   1.0,
-    //   1000,
-    //   1e-9,
-    //   -1.0,
-    //   1.0,
-    //   pcm::StructureSimplificationMode::ALL_TIM,
-    //   -1.0,
-    //   50,
-    //   false,
-    //   pcm::LinkSwappingMode::SLIPLINKS_ONLY));
+    REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE,
+      1.0,
+      1000,
+      1e-9,
+      -1.0,
+      1.0,
+      pcm::StructureSimplificationMode::ALL_TIM,
+      -1.0,
+      50,
+      false,
+      pcm::LinkSwappingMode::ALL_MC));
+    REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE,
+      1.0,
+      1000,
+      1e-9,
+      -1.0,
+      1.0,
+      pcm::StructureSimplificationMode::ALL_TIM,
+      -1.0,
+      50,
+      false,
+      pcm::LinkSwappingMode::SLIPLINKS_ONLY));
     REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
       pcm::BalanceRunMode::ITERATIVE,
       1.0,

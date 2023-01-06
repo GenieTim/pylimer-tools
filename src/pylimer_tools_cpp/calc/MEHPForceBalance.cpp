@@ -112,6 +112,10 @@ namespace calc {
           } else if (allowSlipLinksToPassEachOther == LinkSwappingMode::ALL) {
             this->swapSlipLinksInclXlinks(
               net, u, springPartitions, oneOverSpringPartitionUpperLimit);
+          } else if (allowSlipLinksToPassEachOther ==
+                     LinkSwappingMode::ALL_MC) {
+            this->moveSlipLinksToTheirBestBranch(
+              net, u, springPartitions, oneOverSpringPartitionUpperLimit);
           } else {
             throw std::invalid_argument(
               "This swapping mode is currently not supported.");
@@ -2142,7 +2146,7 @@ namespace calc {
      * @param slipLinkIdx
      * @param alpha
      */
-    void MEHPForceBalance::addSlipLinkToPartialSpring(
+    size_t MEHPForceBalance::addSlipLinkToPartialSpring(
       ForceBalanceNetwork& net,
       Eigen::VectorXd& springPartitions,
       const size_t partialSpringIdx,
@@ -2260,6 +2264,8 @@ namespace calc {
         springPartitions[globalPartSpringIndex] *=
           1. / newTotalForNormalization;
       }
+
+      return newPartialSpringIdx;
     }
 
     /**
@@ -2533,7 +2539,243 @@ namespace calc {
     }
 
     /**
-     * @brief
+     * @brief Loop all slip-links and move them if appropriate to other springs
+     *
+     * @param net
+     * @param u
+     * @param springPartitions
+     * @param oneOverSpringPartitionUpperLimit
+     */
+    void MEHPForceBalance::moveSlipLinksToTheirBestBranch(
+      ForceBalanceNetwork& net,
+      Eigen::VectorXd& u,
+      Eigen::VectorXd& springPartitions,
+      double oneOverSpringPartitionUpperLimit)
+    {
+      for (size_t sliplinkIdx = net.nrOfNodes; sliplinkIdx < net.nrOfLinks;
+           ++sliplinkIdx) {
+        // check this slip-link
+        std::cout << "Moving slip-link " << sliplinkIdx << " to its best branch"
+                  << std::endl;
+        this->moveSlipLinkToItsBestBranch(net,
+                                          u,
+                                          springPartitions,
+                                          sliplinkIdx,
+                                          oneOverSpringPartitionUpperLimit);
+        this->validateNetwork(net, u, springPartitions);
+      }
+      this->validateNetwork(net, u, springPartitions);
+    }
+
+    /**
+     * @brief Move a slip-link if appropriate to other springs
+     *
+     * @param net
+     * @param u
+     * @param springPartitions
+     * @param oneOverSpringPartitionUpperLimit
+     */
+    void MEHPForceBalance::moveSlipLinkToItsBestBranch(
+      ForceBalanceNetwork& net,
+      Eigen::VectorXd& u,
+      Eigen::VectorXd& springPartitions,
+      size_t slipLinkIdx,
+      double oneOverSpringPartitionUpperLimit)
+    {
+      INVALIDARG_EXP_IFN(net.linkIsSliplink[slipLinkIdx],
+                         "Passed slip-link must be one.");
+      std::vector<size_t> associatedSprings =
+        net.springIndicesOfLinks[slipLinkIdx];
+      // skip slip-links that are with its own spring, for now.
+      if (associatedSprings.size() <= 1) {
+        return;
+      }
+
+      for (size_t springIdx : associatedSprings) {
+        const double N = net.springsContourLength[springIdx];
+        const double swappableCutoff =
+          (oneOverSpringPartitionUpperLimit > 0.)
+            ? 1. / (N - 1. / oneOverSpringPartitionUpperLimit)
+            : 1e-12;
+        std::vector<size_t> linksOnSpring = net.linkIndicesOfSprings[springIdx];
+        for (size_t linkI = 1; linkI < linksOnSpring.size() - 1; linkI++) {
+          if (linksOnSpring[linkI] == slipLinkIdx) {
+            // found index of this slip-link.
+            double partitionBeforeIdx =
+              net.localToGlobalSpringIndex[springIdx][linkI - 1];
+            double partitionAfterIdx =
+              net.localToGlobalSpringIndex[springIdx][linkI];
+            double didSwap = false;
+            // check whether swap is needed in either direction
+            // swap if yes
+            if (springPartitions[partitionBeforeIdx] <= swappableCutoff) {
+              didSwap =
+                this->swapSlipLinkReversibly(net,
+                                             u,
+                                             springPartitions,
+                                             partitionBeforeIdx,
+                                             oneOverSpringPartitionUpperLimit);
+            }
+            if (springPartitions[partitionAfterIdx] <= swappableCutoff &&
+                !didSwap) {
+              didSwap =
+                this->swapSlipLinkReversibly(net,
+                                             u,
+                                             springPartitions,
+                                             partitionAfterIdx,
+                                             oneOverSpringPartitionUpperLimit);
+            }
+          }
+        }
+      }
+    }
+
+    bool MEHPForceBalance::swapSlipLinkReversibly(
+      ForceBalanceNetwork& net,
+      Eigen::VectorXd& u,
+      Eigen::VectorXd& springPartitions,
+      const size_t partialSpringIdx,
+      const double oneOverSpringPartitionUpperLimit)
+    {
+      size_t partnerA = net.springPartIndexA[partialSpringIdx];
+      size_t partnerB = net.springPartIndexB[partialSpringIdx];
+      INVALIDARG_EXP_IFN(net.linkIsSliplink[partnerA] ||
+                           net.linkIsSliplink[partnerB],
+                         "Cannot swap cross-link with cross-link.");
+      if (partnerA == partnerB) {
+        return false;
+      }
+      size_t fullSpringIdx = net.partialToFullSpringIndex[partialSpringIdx];
+      // compute the residual
+      Eigen::VectorXi debugNrSpringsVisited =
+        Eigen::VectorXi::Zero(this->initialConfig.nrOfPartialSprings);
+      Eigen::VectorXd oneOverSpringPartitions =
+        this->assembleOneOverSpringPartition(
+          net, springPartitions, oneOverSpringPartitionUpperLimit);
+      // TODO: check if this is dangerous due to the differences being hidden in
+      // the truncated digits
+      const double residualBefore =
+        this->getDisplacementResidualNormFor(net, u, oneOverSpringPartitions);
+
+      // do swap
+      size_t crosslinkIdx = 0;
+      size_t slipLinkIdx = 0;
+      size_t newPartialSpringIdx = 0;
+      if (net.linkIsSliplink[partnerA] && net.linkIsSliplink[partnerB]) {
+        this->swapSlipLinks(net, partialSpringIdx);
+      } else {
+        // TODO: swap with some cross-link
+        crosslinkIdx = net.linkIsSliplink[partnerA] ? partnerB : partnerA;
+        slipLinkIdx = net.linkIsSliplink[partnerB] ? partnerB : partnerA;
+        std::vector<size_t> springsOfCrosslink =
+          net.springIndicesOfLinks[crosslinkIdx];
+        if (springsOfCrosslink.size() < 2) {
+          return false;
+        }
+        newPartialSpringIdx =
+          this->rotateSlipLinkAroundCrosslink(net,
+                                              u,
+                                              springPartitions,
+                                              partialSpringIdx,
+                                              oneOverSpringPartitionUpperLimit);
+      }
+
+      // relax the affected links
+      for (size_t relaxSteps = 0; relaxSteps < 2; ++relaxSteps) {
+        this->relaxationLight(
+          net, springPartitions, u, partnerA, oneOverSpringPartitionUpperLimit);
+        this->relaxationLight(
+          net, springPartitions, u, partnerB, oneOverSpringPartitionUpperLimit);
+      }
+
+      // compute if the residual is lower now
+      oneOverSpringPartitions = this->assembleOneOverSpringPartition(
+        net, springPartitions, oneOverSpringPartitionUpperLimit);
+      double residualAfter =
+        this->getDisplacementResidualNormFor(net, u, oneOverSpringPartitions);
+
+      if (residualAfter < residualBefore) {
+        return true;
+      }
+
+      // otherwise, swap back
+      if (net.linkIsSliplink[partnerA] && net.linkIsSliplink[partnerB]) {
+        this->swapSlipLinks(net, partialSpringIdx);
+      } else {
+        // rotate back to the first spring
+        size_t rotations = 0;
+        bool isBackToInitialSpring = false;
+        while (residualAfter > residualBefore && !isBackToInitialSpring &&
+               rotations < 5) {
+          newPartialSpringIdx = this->rotateSlipLinkAroundCrosslink(
+            net,
+            u,
+            springPartitions,
+            newPartialSpringIdx,
+            oneOverSpringPartitionUpperLimit);
+          isBackToInitialSpring = pylimer_tools::utils::contains(
+            net.springIndicesOfLinks[slipLinkIdx], fullSpringIdx);
+          for (size_t relaxSteps = 0; relaxSteps < 2; ++relaxSteps) {
+            this->relaxationLight(net,
+                                  springPartitions,
+                                  u,
+                                  partnerA,
+                                  oneOverSpringPartitionUpperLimit);
+            this->relaxationLight(net,
+                                  springPartitions,
+                                  u,
+                                  partnerB,
+                                  oneOverSpringPartitionUpperLimit);
+          }
+          // compute if the residual is lower now
+          oneOverSpringPartitions = this->assembleOneOverSpringPartition(
+            net, springPartitions, oneOverSpringPartitionUpperLimit);
+          residualAfter = this->getDisplacementResidualNormFor(
+            net, u, oneOverSpringPartitions);
+        }
+        if (rotations >= 5) {
+          std::cerr << "Could not rotate slip-link back to initial spring."
+                    << std::endl;
+        }
+      }
+
+      // relax the affected links back
+      for (size_t relaxSteps = 0; relaxSteps < 2; ++relaxSteps) {
+        this->relaxationLight(
+          net, springPartitions, u, partnerA, oneOverSpringPartitionUpperLimit);
+        this->relaxationLight(
+          net, springPartitions, u, partnerB, oneOverSpringPartitionUpperLimit);
+      }
+
+      return false;
+    }
+
+    /**
+     * @brief Do one displacement step
+     *
+     * @param net
+     * @param springPartitions
+     * @param linkIdx
+     * @param oneOverSpringPartitionUpperLimit
+     */
+    void MEHPForceBalance::relaxationLight(
+      ForceBalanceNetwork& net,
+      Eigen::VectorXd& springPartitions,
+      Eigen::VectorXd& u,
+      const size_t linkIdx,
+      const double oneOverSpringPartitionUpperLimit)
+    {
+      if (net.linkIsSliplink[linkIdx]) {
+        this->updateSpringPartition(
+          net, u, springPartitions, linkIdx, oneOverSpringPartitionUpperLimit);
+      }
+      this->displaceToMeanPosition(
+        net, u, springPartitions, linkIdx, oneOverSpringPartitionUpperLimit);
+    }
+
+    /**
+     * @brief Loop all springs, swap slip-links on them if they are close
+     * enough
      *
      * @param net
      * @param u
@@ -2580,98 +2822,12 @@ namespace calc {
                   partialIdx ==
                     net.localToGlobalSpringIndex[springIdx].size() - 1) {
                 // swap with x-link
-                // first, decide on the involved parties
-                size_t otherInvolvedPartialSpring =
-                  partialIdx == 0
-                    ? net.localToGlobalSpringIndex[springIdx][1]
-                    : net.localToGlobalSpringIndex
-                        [springIdx]
-                        [net.localToGlobalSpringIndex[springIdx].size() - 2];
-                size_t involvedSlipLink =
-                  net.linkIndicesOfSprings
-                    [springIdx]
-                    [partialIdx == 0
-                       ? 1
-                       : net.linkIndicesOfSprings[springIdx].size() - 2];
-                size_t involvedCrosslink =
-                  net.linkIndicesOfSprings
-                    [springIdx]
-                    [partialIdx == 0
-                       ? 0
-                       : net.linkIndicesOfSprings[springIdx].size() - 1];
-                // find possible target partial springs
-                std::vector<size_t> possibleTargetSprings =
-                  net.springIndicesOfLinks[involvedCrosslink];
-                if (possibleTargetSprings.size() <= 1) {
-                  // e.g. in the case of many loops :P
-                  // std::cerr << "Spring " << springIdx << "'s cross-link " <<
-                  // involvedCrosslink << " has too few attached springs to
-                  // reasonably make swaps." << std::endl;
-                  continue;
-                }
-                std::vector<size_t> possibleTargetPartialSprings;
-                possibleTargetPartialSprings.reserve(
-                  possibleTargetSprings.size());
-                int currentPartialSpringTargetIdx = -1;
-                for (size_t i = 0; i < possibleTargetSprings.size(); ++i) {
-                  assert(
-                    net.linkIndicesOfSprings[possibleTargetSprings[i]][0] ==
-                      involvedCrosslink ||
-                    pylimer_tools::utils::last(
-                      net.linkIndicesOfSprings[possibleTargetSprings[i]]) ==
-                      involvedCrosslink);
-                  size_t currentPossibleTargetPartialSpringIdx =
-                    net.linkIndicesOfSprings[possibleTargetSprings[i]][0] ==
-                        involvedCrosslink
-                      ? net
-                          .localToGlobalSpringIndex[possibleTargetSprings[i]][0]
-                      : pylimer_tools::utils::last(
-                          net.localToGlobalSpringIndex
-                            [possibleTargetSprings[i]]);
-                  if (currentPossibleTargetPartialSpringIdx !=
-                      partialSpringIdx) { // let's not combine with the
-                                          // to-be-removed partial spring
-                    possibleTargetPartialSprings.push_back(
-                      currentPossibleTargetPartialSpringIdx);
-                  }
-                  if (currentPossibleTargetPartialSpringIdx ==
-                        partialSpringIdx ||
-                      currentPossibleTargetPartialSpringIdx ==
-                        otherInvolvedPartialSpring) {
-                    // we unfortunately cannot assert this due to primary loops
-                    // assert(currentPartialSpringTargetIdx == -1);
-                    currentPartialSpringTargetIdx = i;
-                  }
-                }
-                // remove the slip-link from one branch of the x-link
-                this->mergePartialSprings(net,
-                                          springPartitions,
-                                          partialSpringIdx,
-                                          otherInvolvedPartialSpring,
-                                          involvedSlipLink);
-                // this->validateNetwork(net, u, springPartitions);
-                // ... and add it to another
-                // assert(currentPartialSpringTargetIdx >= 0);
-                size_t targetPartialSpringIdx =
-                  possibleTargetPartialSprings[(currentPartialSpringTargetIdx) %
-                                               possibleTargetPartialSprings
-                                                 .size()];
-                if (targetPartialSpringIdx > partialSpringIdx) {
-                  targetPartialSpringIdx -= 1;
-                }
-                // std::cout << "Handling moving link " << involvedSlipLink
-                //           << " around cross-link " << involvedCrosslink
-                //           << " from partial " << partialSpringIdx << " to "
-                //           << targetPartialSpringIdx << std::endl;
-                assert(net.springPartIndexA[targetPartialSpringIdx] ==
-                         involvedCrosslink ||
-                       net.springPartIndexB[targetPartialSpringIdx] ==
-                         involvedCrosslink);
-                this->addSlipLinkToPartialSpring(net,
-                                                 springPartitions,
-                                                 targetPartialSpringIdx,
-                                                 involvedSlipLink,
-                                                 swappableCutoff);
+                this->rotateSlipLinkAroundCrosslink(
+                  net,
+                  u,
+                  springPartitions,
+                  partialSpringIdx,
+                  oneOverSpringPartitionUpperLimit);
                 this->validateNetwork(net, u, springPartitions);
                 // std::cout << "Finished moving link " << involvedSlipLink
                 //           << " around cross-link " << involvedCrosslink
@@ -2735,19 +2891,149 @@ namespace calc {
       this->validateNetwork(net, u, springPartitions);
     }
 
-    void MEHPForceBalance::jumpSlipLinkOverCrosslink(
+    /**
+     * @brief Rotate
+     *
+     * @param net
+     * @param u
+     * @param springPartitions
+     * @param partialSpringIdx
+     */
+    long int MEHPForceBalance::rotateSlipLinkAroundCrosslink(
       ForceBalanceNetwork& net,
-      const size_t sliplinkIdx,
-      const size_t crosslinkIdx,
-      const size_t sourceSpringIdx,
-      const size_t targetSpringIdx)
+      const Eigen::VectorXd& u,
+      Eigen::VectorXd& springPartitions,
+      const size_t partialSpringIdx,
+      double oneOverSpringPartitionUpperLimit)
     {
-      INVALIDARG_EXP_IFN(net.linkIsSliplink[sliplinkIdx],
-                         "The passed slip-link must be one.");
-      INVALIDARG_EXP_IFN(!net.linkIsSliplink[crosslinkIdx],
-                         "The passed cross-link must be one.");
+      INVALIDARG_EXP_IFN(net.springPartIndexA[partialSpringIdx] !=
+                           net.springPartIndexB[partialSpringIdx],
+                         "One of the two ends of the partial spring must be a "
+                         "slip-link, one a cross-link");
+      INVALIDARG_EXP_IFN(net.springPartIndexA[partialSpringIdx] !=
+                           net.springPartIndexB[partialSpringIdx],
+                         "Cannot rotate");
+      // assemble required data
+      size_t springIdx = net.partialToFullSpringIndex[partialSpringIdx];
+      RUNTIME_EXP_IFN(
+        net.localToGlobalSpringIndex[springIdx][0] == partialSpringIdx ||
+          pylimer_tools::utils::last(net.localToGlobalSpringIndex[springIdx]) ==
+            partialSpringIdx,
+        "");
+      const double N = net.springsContourLength[springIdx];
+      const double swappableCutoff =
+        (oneOverSpringPartitionUpperLimit > 0.)
+          ? 1. / (N - 1. / oneOverSpringPartitionUpperLimit)
+          : 1e-12;
+      size_t partialIdx =
+        net.localToGlobalSpringIndex[springIdx][0] == partialSpringIdx
+          ? 0
+          : net.localToGlobalSpringIndex[springIdx].size() - 1;
+      // decide on the involved parties
+      size_t otherInvolvedPartialSpring =
+        partialIdx == 0
+          ? net.localToGlobalSpringIndex[springIdx][1]
+          : net.localToGlobalSpringIndex
+              [springIdx][net.localToGlobalSpringIndex[springIdx].size() - 2];
+      size_t involvedSlipLink =
+        net.linkIndicesOfSprings
+          [springIdx]
+          [partialIdx == 0 ? 1
+                           : net.linkIndicesOfSprings[springIdx].size() - 2];
+      size_t involvedCrosslink =
+        net.linkIndicesOfSprings
+          [springIdx]
+          [partialIdx == 0 ? 0
+                           : net.linkIndicesOfSprings[springIdx].size() - 1];
+      std::vector<size_t> possibleTargetPartialSprings;
+      // find possible target partial springs
+      std::vector<size_t> possibleTargetSprings =
+        net.springIndicesOfLinks[involvedCrosslink];
+      if (possibleTargetSprings.size() <= 1) {
+        // e.g. in the case of many loops :P
+        // std::cerr << "Spring " << springIdx << "'s cross-link " <<
+        // involvedCrosslink << " has too few attached springs to
+        // reasonably make swaps." << std::endl;
+        return -1;
+      }
+      possibleTargetPartialSprings.reserve(possibleTargetSprings.size());
+      int currentPartialSpringTargetIdx = -1;
+      for (size_t i = 0; i < possibleTargetSprings.size(); ++i) {
+        assert(net.linkIndicesOfSprings[possibleTargetSprings[i]][0] ==
+                 involvedCrosslink ||
+               pylimer_tools::utils::last(
+                 net.linkIndicesOfSprings[possibleTargetSprings[i]]) ==
+                 involvedCrosslink);
+        size_t currentPossibleTargetPartialSpringIdx =
+          net.linkIndicesOfSprings[possibleTargetSprings[i]][0] ==
+              involvedCrosslink
+            ? net.localToGlobalSpringIndex[possibleTargetSprings[i]][0]
+            : pylimer_tools::utils::last(
+                net.localToGlobalSpringIndex[possibleTargetSprings[i]]);
+        if (currentPossibleTargetPartialSpringIdx !=
+            partialSpringIdx) { // let's not combine with the
+                                // to-be-removed partial spring
+          possibleTargetPartialSprings.push_back(
+            currentPossibleTargetPartialSpringIdx);
+        }
+        if (currentPossibleTargetPartialSpringIdx == partialSpringIdx ||
+            currentPossibleTargetPartialSpringIdx ==
+              otherInvolvedPartialSpring) {
+          // we unfortunately cannot assert this due to primary loops
+          // assert(currentPartialSpringTargetIdx == -1);
+          currentPartialSpringTargetIdx = i;
+        }
+      }
+      // remove the slip-link from one branch of the x-link
+      this->mergePartialSprings(net,
+                                springPartitions,
+                                partialSpringIdx,
+                                otherInvolvedPartialSpring,
+                                involvedSlipLink);
+      // this->validateNetwork(net, u, springPartitions);
+      // ... and add it to another
+      // assert(currentPartialSpringTargetIdx >= 0);
+      size_t targetPartialSpringIdx =
+        possibleTargetPartialSprings[(currentPartialSpringTargetIdx) %
+                                     possibleTargetPartialSprings.size()];
+      if (targetPartialSpringIdx > partialSpringIdx) {
+        targetPartialSpringIdx -= 1;
+      }
+      // std::cout << "Handling moving link " << involvedSlipLink
+      //           << " around cross-link " << involvedCrosslink
+      //           << " from partial " << partialSpringIdx << " to "
+      //           << targetPartialSpringIdx << std::endl;
+      assert(net.springPartIndexA[targetPartialSpringIdx] ==
+               involvedCrosslink ||
+             net.springPartIndexB[targetPartialSpringIdx] == involvedCrosslink);
+      size_t newPartialSpringIdx =
+        this->addSlipLinkToPartialSpring(net,
+                                         springPartitions,
+                                         targetPartialSpringIdx,
+                                         involvedSlipLink,
+                                         swappableCutoff);
+
+      if ((net.springPartIndexA[targetPartialSpringIdx] == involvedCrosslink &&
+           net.springPartIndexB[targetPartialSpringIdx] == involvedSlipLink) ||
+          (net.springPartIndexB[targetPartialSpringIdx] == involvedCrosslink &&
+           net.springPartIndexA[targetPartialSpringIdx] == involvedSlipLink)) {
+        return targetPartialSpringIdx;
+      } else {
+        assert(
+          (net.springPartIndexA[newPartialSpringIdx] == involvedCrosslink &&
+           net.springPartIndexB[newPartialSpringIdx] == involvedSlipLink) ||
+          (net.springPartIndexB[newPartialSpringIdx] == involvedCrosslink &&
+           net.springPartIndexA[newPartialSpringIdx] == involvedSlipLink));
+        return newPartialSpringIdx;
+      }
     }
 
+    /**
+     * @brief
+     *
+     * @param net
+     * @param partialSpringIdx
+     */
     void MEHPForceBalance::swapSlipLinks(ForceBalanceNetwork& net,
                                          const size_t partialSpringIdx)
     {
