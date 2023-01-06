@@ -1652,9 +1652,9 @@ namespace calc {
                    removedSpringIdx)) {
               net.linkIndicesOfSprings[fullSpringIdx].erase(
                 net.linkIndicesOfSprings[fullSpringIdx].begin() + j);
-                removed += 1;
+              removed += 1;
             }
-          } 
+          }
           if (found == 1) {
             // we are dealing with a double -> re-add
             net.springIndicesOfLinks[linkToReduce].push_back(fullSpringIdx);
@@ -2153,6 +2153,8 @@ namespace calc {
         !net.linkIsSliplink[net.springPartIndexA[partialSpringIdx]] ||
           !net.linkIsSliplink[net.springPartIndexB[partialSpringIdx]],
         "Require at least one part to be a cross-link.");
+      INVALIDARG_EXP_IFN(APPROX_WITHIN(alpha, 0.0, 1.0, 1e-12),
+                         "alpha must be within 0. and 1.");
       net.nrOfPartialSprings += 1;
       const size_t newPartialSpringIdx = net.nrOfPartialSprings - 1;
       const size_t relevantSpring =
@@ -2448,7 +2450,7 @@ namespace calc {
             //                  << std::endl;
 
             RUNTIME_EXP_IFN(
-              APPROX_WITHIN(newS + complementaryS, 0., 1., 1e-10),
+              APPROX_WITHIN(newS + complementaryS, 0., 1., 1e-12),
               "Require newS + complementaryS to be within 0, 1, got " +
                 std::to_string(newS + complementaryS) + " from " +
                 std::to_string(newS) + " and " +
@@ -2457,18 +2459,31 @@ namespace calc {
                 std::to_string(nextS + currentS) + " for link " +
                 std::to_string(linkIdx) + ".");
             RUNTIME_EXP_IFN(
-              APPROX_EQUAL(nextS + currentS, newS + complementaryS, 1e-10),
+              APPROX_EQUAL(nextS + currentS, newS + complementaryS, 1e-12),
               "Require nextS + currentS == newS + complementaryS, got " +
                 std::to_string(nextS + currentS) + " vs. " +
                 std::to_string(newS + complementaryS) + " from " +
                 std::to_string(nextS) + " and " + std::to_string(currentS) +
                 ", " + std::to_string(newS) + " and " +
                 std::to_string(complementaryS) + ".");
-            RUNTIME_EXP_IFN(APPROX_WITHIN(nextS + currentS, 0., 1., 1e-10),
+            RUNTIME_EXP_IFN(APPROX_WITHIN(nextS + currentS, 0., 1., 1e-12),
                             "Require nextS + currentS to be within 0, 1, got " +
                               std::to_string(nextS + currentS) + " from " +
                               std::to_string(nextS) + " and " +
                               std::to_string(currentS) + ".");
+            RUNTIME_EXP_IFN(
+              nextS >= 0.0,
+              "nextS must be >= 0., got " + std::to_string(nextS) + " from " +
+                std::to_string(nextS) + " and " + std::to_string(currentS) +
+                ", " + std::to_string(newS) + " and " +
+                std::to_string(complementaryS) + ".");
+            RUNTIME_EXP_IFN(complementaryS >= 0.0,
+                            "complementaryS must be >= 0., got " +
+                              std::to_string(complementaryS) + " from " +
+                              std::to_string(nextS) + " and " +
+                              std::to_string(currentS) + ", " +
+                              std::to_string(newS) + " and " +
+                              std::to_string(complementaryS) + ".");
 
             // (complementaryS > residualNormSTolerance &&
             //  newS > residualNormSTolerance)
@@ -4128,7 +4143,7 @@ namespace calc {
        */
       for (size_t i = 0; i < springPartitions.size(); i++) {
         RUNTIME_EXP_IFN(APPROX_WITHIN(springPartitions[i], 0.0, 1.0, 1e-12),
-                        "Spring partitions must be between 0 & 1, got " +
+                        "Spring partitions must be between 0. & 1., got " +
                           std::to_string(springPartitions[i]) +
                           " at i = " + std::to_string(i) + ".");
       }
