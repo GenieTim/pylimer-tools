@@ -29,6 +29,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.LinkSwappingMode
    
       ~LinkSwappingMode.ALL
       ~LinkSwappingMode.ALL_CYCLE
+      ~LinkSwappingMode.ALL_MC
       ~LinkSwappingMode.NO_SWAPPING
       ~LinkSwappingMode.SLIPLINKS_ONLY
       ~LinkSwappingMode.name
