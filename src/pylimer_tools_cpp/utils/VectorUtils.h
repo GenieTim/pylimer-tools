@@ -18,6 +18,16 @@ extern "C"
 namespace pylimer_tools {
 namespace utils {
   template<typename T>
+  static inline bool contains(std::vector<T>& vec, const T value)
+  {
+    if (std::find(vec.begin(), vec.end(), value) == vec.end()) {
+      return false;
+    }
+    return true;
+  }
+
+
+  template<typename T>
   static inline bool addIfNotContained(std::vector<T>& vec, const T value)
   {
     if (std::find(vec.begin(), vec.end(), value) == vec.end()) {
