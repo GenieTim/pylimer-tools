@@ -2555,14 +2555,14 @@ namespace calc {
       for (size_t sliplinkIdx = net.nrOfNodes; sliplinkIdx < net.nrOfLinks;
            ++sliplinkIdx) {
         // check this slip-link
-        std::cout << "Moving slip-link " << sliplinkIdx << " to its best branch"
-                  << std::endl;
+        // std::cout << "Moving slip-link " << sliplinkIdx << " to its best branch"
+        //           << std::endl;
         this->moveSlipLinkToItsBestBranch(net,
                                           u,
                                           springPartitions,
                                           sliplinkIdx,
                                           oneOverSpringPartitionUpperLimit);
-        this->validateNetwork(net, u, springPartitions);
+        // this->validateNetwork(net, u, springPartitions);
       }
       this->validateNetwork(net, u, springPartitions);
     }
@@ -2788,7 +2788,7 @@ namespace calc {
       Eigen::VectorXd& springPartitions,
       double oneOverSpringPartitionUpperLimit)
     {
-      this->validateNetwork(net, u, springPartitions);
+      // this->validateNetwork(net, u, springPartitions);
       for (size_t springIdx = 0; springIdx < net.nrOfSprings; ++springIdx) {
         if (net.linkIndicesOfSprings[springIdx].size() <= 2) {
           // no need to handle springs without slip-links
@@ -2828,14 +2828,14 @@ namespace calc {
                   springPartitions,
                   partialSpringIdx,
                   oneOverSpringPartitionUpperLimit);
-                this->validateNetwork(net, u, springPartitions);
+                // this->validateNetwork(net, u, springPartitions);
                 // std::cout << "Finished moving link " << involvedSlipLink
                 //           << " around cross-link " << involvedCrosslink
                 //           << " from partial " << partialSpringIdx << " to "
                 //           << targetPartialSpringIdx << std::endl;
               } else {
                 this->swapSlipLinks(net, partialSpringIdx);
-                this->validateNetwork(net, u, springPartitions);
+                // this->validateNetwork(net, u, springPartitions);
               }
             }
           }
