@@ -2405,8 +2405,11 @@ namespace calc {
             const double l = (currentS + nextS);
             if (oneOverSpringPartitionUpperLimit > 0.) {
               // TODO: sketch theory why this should/not be necessary!!!
-              const double limit = 1. / (oneOverSpringPartitionUpperLimit *
-                                         (nextS + currentS) * (N));
+              const double limit =
+                std::clamp(1. / (oneOverSpringPartitionUpperLimit *
+                                 (nextS + currentS) * (N)),
+                           0.,
+                           1.);
               idealValue = std::clamp(idealValue, limit, 1. - limit);
               // double oneOverCurrent = 1. / (currentS * N);
               // double oneOverNext = 1. / (nextS * N);
@@ -3045,11 +3048,13 @@ namespace calc {
            net.springPartIndexA[targetPartialSpringIdx] == involvedSlipLink)) {
         return targetPartialSpringIdx;
       } else {
-        assert(
+        RUNTIME_EXP_IFN(
           (net.springPartIndexA[newPartialSpringIdx] == involvedCrosslink &&
            net.springPartIndexB[newPartialSpringIdx] == involvedSlipLink) ||
-          (net.springPartIndexB[newPartialSpringIdx] == involvedCrosslink &&
-           net.springPartIndexA[newPartialSpringIdx] == involvedSlipLink));
+            (net.springPartIndexB[newPartialSpringIdx] == involvedCrosslink &&
+             net.springPartIndexA[newPartialSpringIdx] == involvedSlipLink),
+          "Expected to find cross- and slip-link at either partial spring, but "
+          "did not.");
         return newPartialSpringIdx;
       }
     }
