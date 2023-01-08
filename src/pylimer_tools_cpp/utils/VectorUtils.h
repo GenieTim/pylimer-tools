@@ -26,7 +26,6 @@ namespace utils {
     return true;
   }
 
-
   template<typename T>
   static inline bool addIfNotContained(std::vector<T>& vec, const T value)
   {
@@ -46,7 +45,8 @@ namespace utils {
    * @param rowToRemove
    */
 #define MAKE_REMOVE_ROW(EIGEN_TYPE)                                            \
-  static inline void removeRow(EIGEN_TYPE& vec, unsigned int rowToRemove)      \
+  static inline void removeRow(                                                \
+    EIGEN_TYPE& vec, unsigned int rowToRemove, bool noResize = false)          \
   {                                                                            \
     INVALIDARG_EXP_IFN(vec.size() > rowToRemove,                               \
                        "Cannot remove row " + std::to_string(rowToRemove) +    \
@@ -55,7 +55,9 @@ namespace utils {
     unsigned int numRows = vec.size() - 1;                                     \
     vec.segment(rowToRemove, numRows - rowToRemove) =                          \
       vec.segment(rowToRemove + 1, numRows - rowToRemove);                     \
-    vec.conservativeResize(numRows);                                           \
+    if (!noResize) {                                                           \
+      vec.conservativeResize(numRows);                                         \
+    }                                                                          \
   }
 
   MAKE_REMOVE_ROW(Eigen::VectorXd);
@@ -73,7 +75,8 @@ namespace utils {
 #define MAKE_REMOVE_ROWS(EIGEN_TYPE)                                           \
   static inline void removeRows(EIGEN_TYPE& vec,                               \
                                 unsigned int rowToStartRemove,                 \
-                                unsigned int nrOfRowsToRemove)                 \
+                                unsigned int nrOfRowsToRemove,                 \
+                                bool noResize = false)                         \
   {                                                                            \
     INVALIDARG_EXP_IFN(                                                        \
       vec.size() >= rowToStartRemove + nrOfRowsToRemove,                       \
@@ -83,7 +86,9 @@ namespace utils {
     unsigned int numRows = vec.size() - nrOfRowsToRemove;                      \
     vec.segment(rowToStartRemove, numRows - rowToStartRemove) = vec.segment(   \
       rowToStartRemove + nrOfRowsToRemove, numRows - rowToStartRemove);        \
-    vec.conservativeResize(numRows);                                           \
+    if (!noResize) {                                                           \
+      vec.conservativeResize(numRows);                                         \
+    }                                                                          \
   }
 
   MAKE_REMOVE_ROWS(Eigen::VectorXd);
