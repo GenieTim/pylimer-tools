@@ -244,7 +244,8 @@ namespace calc {
                                Eigen::VectorXd& springPartitions,
                                const size_t removedSpringIdx,
                                const size_t keptSpringIdx,
-                               const size_t linkToReduce) const;
+                               const size_t linkToReduce,
+                               bool skipEigenResize = false) const;
 
       /**
        * @brief Add a slip-link to a given partial spring

@@ -1572,7 +1572,8 @@ namespace calc {
       Eigen::VectorXd& springPartitions,
       const size_t removedSpringIdx,
       const size_t keptSpringIdx,
-      const size_t linkToReduce) const
+      const size_t linkToReduce,
+      bool skipEigenResize) const
     {
       INVALIDARG_EXP_IFN(net.linkIsSliplink[linkToReduce],
                          "The link to reduce must be a slip-link");
@@ -1693,17 +1694,24 @@ namespace calc {
       net.partialSpringIsPartial[keptSpringIdx] =
         net.linkIndicesOfSprings[fullSpringIdx].size() > 2;
       // actually remove the rows
-      pylimer_tools::utils::removeRow(net.partialSpringIsPartial,
-                                      removedSpringIdx);
-      pylimer_tools::utils::removeRow(net.partialToFullSpringIndex,
-                                      removedSpringIdx);
-      pylimer_tools::utils::removeRow(springPartitions, removedSpringIdx);
-      pylimer_tools::utils::removeRow(net.springPartIndexA, removedSpringIdx);
-      pylimer_tools::utils::removeRow(net.springPartIndexB, removedSpringIdx);
-      pylimer_tools::utils::removeRows(
-        net.springPartCoordinateIndexA, 3 * removedSpringIdx, 3);
-      pylimer_tools::utils::removeRows(
-        net.springPartCoordinateIndexB, 3 * removedSpringIdx, 3);
+      pylimer_tools::utils::removeRow(
+        net.partialSpringIsPartial, removedSpringIdx, skipEigenResize);
+      pylimer_tools::utils::removeRow(
+        net.partialToFullSpringIndex, removedSpringIdx, skipEigenResize);
+      pylimer_tools::utils::removeRow(
+        springPartitions, removedSpringIdx, skipEigenResize);
+      pylimer_tools::utils::removeRow(
+        net.springPartIndexA, removedSpringIdx, skipEigenResize);
+      pylimer_tools::utils::removeRow(
+        net.springPartIndexB, removedSpringIdx, skipEigenResize);
+      pylimer_tools::utils::removeRows(net.springPartCoordinateIndexA,
+                                       3 * removedSpringIdx,
+                                       3,
+                                       skipEigenResize);
+      pylimer_tools::utils::removeRows(net.springPartCoordinateIndexB,
+                                       3 * removedSpringIdx,
+                                       3,
+                                       skipEigenResize);
       // renumber stuff
       for (size_t loopSpringIdx = 0;
            loopSpringIdx < net.localToGlobalSpringIndex.size();
@@ -2167,7 +2175,7 @@ namespace calc {
       //           << relevantSpring << " (partial " << partialSpringIdx
       //           << ") with alpha = " << alpha << std::endl;
       // resize the structures
-      springPartitions.conservativeResize(springPartitions.size() + 1);
+      springPartitions.conservativeResize(net.nrOfPartialSprings);
       assert(springPartitions.size() == net.nrOfPartialSprings);
       net.springPartIndexA.conservativeResize(net.nrOfPartialSprings);
       net.springPartIndexB.conservativeResize(net.nrOfPartialSprings);
@@ -2555,7 +2563,8 @@ namespace calc {
       for (size_t sliplinkIdx = net.nrOfNodes; sliplinkIdx < net.nrOfLinks;
            ++sliplinkIdx) {
         // check this slip-link
-        // std::cout << "Moving slip-link " << sliplinkIdx << " to its best branch"
+        // std::cout << "Moving slip-link " << sliplinkIdx << " to its best
+        // branch"
         //           << std::endl;
         this->moveSlipLinkToItsBestBranch(net,
                                           u,
@@ -2694,7 +2703,7 @@ namespace calc {
       double residualAfter =
         this->getDisplacementResidualNormFor(net, u, oneOverSpringPartitions);
 
-      if (residualAfter < residualBefore) {
+      if (residualAfter <= residualBefore) {
         return true;
       }
 
@@ -2732,9 +2741,23 @@ namespace calc {
             net, springPartitions, oneOverSpringPartitionUpperLimit);
           residualAfter = this->getDisplacementResidualNormFor(
             net, u, oneOverSpringPartitions);
+          rotations += 1;
         }
         if (rotations >= 5) {
-          std::cerr << "Could not rotate slip-link back to initial spring."
+          std::cerr << "Could not rotate slip-link " << slipLinkIdx
+                    << " back to initial spring. "
+                    << "Initial spring was " << fullSpringIdx
+                    << ", whereas current springs are "
+                    << pylimer_tools::utils::join(
+                         net.springIndicesOfLinks[slipLinkIdx].begin(),
+                         net.springIndicesOfLinks[slipLinkIdx].end(),
+                         std::string(", "))
+                    << ". Cross-link is " << crosslinkIdx
+                    << " which is associated with springs "
+                    << pylimer_tools::utils::join(
+                         net.springIndicesOfLinks[crosslinkIdx].begin(),
+                         net.springIndicesOfLinks[crosslinkIdx].end(),
+                         std::string(", "))
                     << std::endl;
         }
       }
@@ -2985,11 +3008,14 @@ namespace calc {
         }
       }
       // remove the slip-link from one branch of the x-link
+      // but skip resizing the Eigen structures, since the additional rows are
+      // still needed
       this->mergePartialSprings(net,
                                 springPartitions,
                                 partialSpringIdx,
                                 otherInvolvedPartialSpring,
-                                involvedSlipLink);
+                                involvedSlipLink,
+                                true);
       // this->validateNetwork(net, u, springPartitions);
       // ... and add it to another
       // assert(currentPartialSpringTargetIdx >= 0);
