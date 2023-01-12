@@ -105,20 +105,25 @@ namespace calc {
       // actual loop
       do {
         if (allowSlipLinksToPassEachOther != LinkSwappingMode::NO_SWAPPING) {
-          if (allowSlipLinksToPassEachOther ==
-              LinkSwappingMode::SLIPLINKS_ONLY) {
-            this->swapSlipLinks(
-              net, u, springPartitions, oneOverSpringPartitionUpperLimit);
-          } else if (allowSlipLinksToPassEachOther == LinkSwappingMode::ALL) {
-            this->swapSlipLinksInclXlinks(
-              net, u, springPartitions, oneOverSpringPartitionUpperLimit);
-          } else if (allowSlipLinksToPassEachOther ==
-                     LinkSwappingMode::ALL_MC) {
-            this->moveSlipLinksToTheirBestBranch(
-              net, u, springPartitions, oneOverSpringPartitionUpperLimit);
-          } else {
-            throw std::invalid_argument(
-              "This swapping mode is currently not supported.");
+          if (swappingFrequency > 0 &&
+              (iterationsDone % swappingFrequency) == 0) {
+            if (allowSlipLinksToPassEachOther ==
+                LinkSwappingMode::SLIPLINKS_ONLY) {
+              this->swapSlipLinks(
+                net, u, springPartitions, oneOverSpringPartitionUpperLimit);
+            } else if (allowSlipLinksToPassEachOther == LinkSwappingMode::ALL) {
+              this->swapSlipLinksInclXlinks(
+                net, u, springPartitions, oneOverSpringPartitionUpperLimit);
+            } else if (allowSlipLinksToPassEachOther ==
+                       LinkSwappingMode::ALL_MC) {
+              this->moveSlipLinksToTheirBestBranch(
+                net, u, springPartitions, oneOverSpringPartitionUpperLimit);
+            } else {
+              throw std::invalid_argument(
+                "This swapping mode is currently not supported.");
+            }
+            oneOverSpringPartitions = this->assembleOneOverSpringPartition(
+              net, springPartitions, oneOverSpringPartitionUpperLimit);
           }
         }
         maxDistanceMoved = 0.0;
@@ -139,6 +144,7 @@ namespace calc {
               this->updateSpringPartition(net,
                                           u,
                                           springPartitions,
+                                          oneOverSpringPartitions,
                                           link_idx,
                                           oneOverSpringPartitionUpperLimit,
                                           allowSlipLinksToPassEachOther);
@@ -151,9 +157,6 @@ namespace calc {
             innerIterationsDone += 1;
           } while (doInnerIterations && innerIterationsDone < 50);
         }
-
-        oneOverSpringPartitions = this->assembleOneOverSpringPartition(
-          net, springPartitions, oneOverSpringPartitionUpperLimit);
 
         intermediateResidual =
           this->getDisplacementResidualNormFor(net, u, oneOverSpringPartitions);
@@ -199,9 +202,6 @@ namespace calc {
             }
           }
         }
-
-        oneOverSpringPartitions = this->assembleOneOverSpringPartition(
-          net, springPartitions, oneOverSpringPartitionUpperLimit);
 
         currentResidual =
           this->getDisplacementResidualNormFor(net, u, oneOverSpringPartitions);
@@ -2343,6 +2343,8 @@ namespace calc {
       const ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
+      Eigen::VectorXd&
+        oneOverSpringPartitions, /* gives the parametrisation of N */
       const size_t linkIdx,
       double oneOverSpringPartitionUpperLimit,
       bool allowSlipLinksToPassEachOther) const
@@ -2542,6 +2544,32 @@ namespace calc {
             residualNorm += localResidualNorm * localResidualNorm;
             springPartitions[currentSpringGlobalIdx] = newS;
             springPartitions[neighbourSpringGlobalIdx] = complementaryS;
+            if (oneOverSpringPartitions.size() > 0) {
+              double primaryCorrectionMultiplierC = static_cast<double>(
+                net.springPartIndexA[currentSpringGlobalIdx] !=
+                net.springPartIndexB[currentSpringGlobalIdx]);
+              double oneOverCurrent =
+                primaryCorrectionMultiplierC *
+                CLAMP_ONE_OVER_SPRINGPARTITION(
+                  net.partialSpringIsPartial[currentSpringGlobalIdx],
+                  1.0 / (newS * N),
+                  N,
+                  oneOverSpringPartitionUpperLimit);
+              oneOverSpringPartitions.segment(3 * currentSpringGlobalIdx, 3) =
+                Eigen::Vector3d::Constant(oneOverCurrent);
+              double primaryCorrectionMultiplierN = static_cast<double>(
+                net.springPartIndexA[neighbourSpringGlobalIdx] !=
+                net.springPartIndexB[neighbourSpringGlobalIdx]);
+              double oneOverNeighbour =
+                primaryCorrectionMultiplierN *
+                CLAMP_ONE_OVER_SPRINGPARTITION(
+                  net.partialSpringIsPartial[neighbourSpringGlobalIdx],
+                  1.0 / (complementaryS * N),
+                  N,
+                  oneOverSpringPartitionUpperLimit);
+              oneOverSpringPartitions.segment(3 * neighbourSpringGlobalIdx, 3) =
+                Eigen::Vector3d::Constant(oneOverNeighbour);
+            }
           }
         }
       }
@@ -2572,6 +2600,7 @@ namespace calc {
         this->moveSlipLinkToItsBestBranch(net,
                                           u,
                                           springPartitions,
+
                                           sliplinkIdx,
                                           oneOverSpringPartitionUpperLimit);
         // this->validateNetwork(net, u, springPartitions);
@@ -2625,6 +2654,7 @@ namespace calc {
                 this->swapSlipLinkReversibly(net,
                                              u,
                                              springPartitions,
+
                                              partitionBeforeIdx,
                                              oneOverSpringPartitionUpperLimit);
             }
@@ -2661,13 +2691,34 @@ namespace calc {
       // compute the residual
       Eigen::VectorXi debugNrSpringsVisited =
         Eigen::VectorXi::Zero(this->initialConfig.nrOfPartialSprings);
-      Eigen::VectorXd oneOverSpringPartitions =
-        this->assembleOneOverSpringPartition(
-          net, springPartitions, oneOverSpringPartitionUpperLimit);
       // TODO: check if this is dangerous due to the differences being hidden in
       // the truncated digits
+      std::vector<size_t> relevantNeigboursA =
+        this->getNeighbourLinkIndices(net, partnerA);
+      std::vector<size_t> relevantNeigboursB =
+        this->getNeighbourLinkIndices(net, partnerB);
+      std::vector<size_t> relevantNeighbours;
+      relevantNeighbours.reserve(relevantNeigboursA.size() +
+                                 relevantNeigboursB.size() +
+                                 2); // preallocate memory
+      relevantNeighbours.insert(relevantNeighbours.end(),
+                                relevantNeigboursA.begin(),
+                                relevantNeigboursA.end());
+      relevantNeighbours.insert(relevantNeighbours.end(),
+                                relevantNeigboursB.begin(),
+                                relevantNeigboursB.end());
+      relevantNeighbours.push_back(partnerA);
+      relevantNeighbours.push_back(partnerB);
       const double residualBefore =
-        this->getDisplacementResidualNormFor(net, u, oneOverSpringPartitions);
+        this
+          ->evaluateStressTensorForLinks(relevantNeighbours,
+                                         net,
+                                         u,
+                                         springPartitions,
+                                         1.0,
+                                         oneOverSpringPartitionUpperLimit)
+          .diagonal()
+          .squaredNorm();
 
       // do swap
       size_t crosslinkIdx = 0;
@@ -2701,10 +2752,16 @@ namespace calc {
       }
 
       // compute if the residual is lower now
-      oneOverSpringPartitions = this->assembleOneOverSpringPartition(
-        net, springPartitions, oneOverSpringPartitionUpperLimit);
       double residualAfter =
-        this->getDisplacementResidualNormFor(net, u, oneOverSpringPartitions);
+        this
+          ->evaluateStressTensorForLinks(relevantNeighbours,
+                                         net,
+                                         u,
+                                         springPartitions,
+                                         1.0,
+                                         oneOverSpringPartitionUpperLimit)
+          .diagonal()
+          .squaredNorm();
 
       if (residualAfter <= residualBefore) {
         return true;
@@ -2740,10 +2797,16 @@ namespace calc {
                                   oneOverSpringPartitionUpperLimit);
           }
           // compute if the residual is lower now
-          oneOverSpringPartitions = this->assembleOneOverSpringPartition(
-            net, springPartitions, oneOverSpringPartitionUpperLimit);
-          residualAfter = this->getDisplacementResidualNormFor(
-            net, u, oneOverSpringPartitions);
+          residualAfter =
+            this
+              ->evaluateStressTensorForLinks(relevantNeighbours,
+                                             net,
+                                             u,
+                                             springPartitions,
+                                             1.0,
+                                             oneOverSpringPartitionUpperLimit)
+              .diagonal()
+              .squaredNorm();
           rotations += 1;
         }
         if (rotations >= 5) {
@@ -2787,13 +2850,18 @@ namespace calc {
     void MEHPForceBalance::relaxationLight(
       ForceBalanceNetwork& net,
       Eigen::VectorXd& springPartitions,
+      Eigen::VectorXd& oneOverSpringPartitions,
       Eigen::VectorXd& u,
       const size_t linkIdx,
       const double oneOverSpringPartitionUpperLimit)
     {
       if (net.linkIsSliplink[linkIdx]) {
-        this->updateSpringPartition(
-          net, u, springPartitions, linkIdx, oneOverSpringPartitionUpperLimit);
+        this->updateSpringPartition(net,
+                                    u,
+                                    springPartitions,
+                                    oneOverSpringPartitions,
+                                    linkIdx,
+                                    oneOverSpringPartitionUpperLimit);
       }
       this->displaceToMeanPosition(
         net, u, springPartitions, linkIdx, oneOverSpringPartitionUpperLimit);
@@ -3838,6 +3906,62 @@ namespace calc {
       }
       return r2 / this->initialConfig.nrOfSprings;
     }
+
+    /**
+     * @brief Compute the stress tensor
+     *
+     * @param net
+     * @param u
+     * @param loopTol
+     * @return std::array<std::array<double, 3>, 3>
+     */
+    Eigen::Matrix3d
+    MEHPForceBalance::evaluateStressTensorForLinks(
+      const std::vector<size_t> linkIndices,
+      const ForceBalanceNetwork& net,
+      const Eigen::VectorXd& u,
+      const Eigen::VectorXd& springPartitions,
+      const double kappa0,
+      const double oneOverSpringPartitionUpperLimit) const
+    {
+
+      Eigen::Matrix3d stress = Eigen::Matrix3d::Zero();
+      INVALIDARG_EXP_IFN(
+        springPartitions.size() == net.springPartIndexA.size(),
+        "Spring partitions must have the size of partial springs.");
+
+      double halfOverVolume = 0.5 / (net.L[0] * net.L[1] * net.L[2]);
+
+      Eigen::VectorXi debugNrSpringsVisited =
+        Eigen::VectorXi::Zero(net.nrOfPartialSprings);
+
+      for (size_t linkIdx : linkIndices) {
+        Eigen::Matrix3d force =
+          net.linkIsSliplink[linkIdx]
+            ? this->evaluateForceOnSlipLink(linkIdx,
+                                            net,
+                                            u,
+                                            springPartitions,
+                                            debugNrSpringsVisited,
+                                            kappa0,
+                                            oneOverSpringPartitionUpperLimit)
+            : this->evaluateForceOnCrossLink(linkIdx,
+                                             net,
+                                             u,
+                                             springPartitions,
+                                             debugNrSpringsVisited,
+                                             kappa0,
+                                             oneOverSpringPartitionUpperLimit);
+        /* spring contribution to the overall stress tensor */
+        RUNTIME_EXP_IFN(std::isfinite(force.squaredNorm()),
+                        "Got non-finite force contribution to stress tensor: " +
+                          std::to_string(force.squaredNorm()) + " at link " +
+                          std::to_string(linkIdx) + "!");
+        stress += force;
+      }
+
+      return halfOverVolume * stress;
+    };
 
     /**
      * @brief Compute the stress tensor
