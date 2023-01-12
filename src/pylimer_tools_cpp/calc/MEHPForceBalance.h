@@ -1055,6 +1055,7 @@ namespace calc {
             }
           }
         }
+        return results;
       }
 
     protected:
