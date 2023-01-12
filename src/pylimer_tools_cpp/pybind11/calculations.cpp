@@ -529,6 +529,8 @@ init_pylimer_bound_calc(py::module_& m)
          R"pbdoc()pbdoc",
          py::arg("linkIdx"),
          py::arg("damping") = 1.0)
+     .def("swapSlipLinksInclXlinks", &mehp::MEHPForceBalance::swapSlipLinksInclXlinks)
+    .def("moveSlipLinksToTheirBestBranch", &mehp::MEHPForceBalance::moveSlipLinksToTheirBestBranch)
     .def("getForceOn",
          &mehp::MEHPForceBalance::getForceOn,
          R"pbdoc()pbdoc",

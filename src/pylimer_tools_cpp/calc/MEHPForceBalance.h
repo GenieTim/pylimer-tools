@@ -267,6 +267,22 @@ namespace calc {
                            Eigen::VectorXd& springPartitions,
                            Eigen::VectorXd& displacements,
                            const size_t linkIdx,
+                           const double oneOverSpringPartitionUpperLimit = 1.0)
+      {
+        Eigen::VectorXd oneOverSpringPartitions = Eigen::VectorXd::Zero(0);
+        this->relaxationLight(net,
+                              springPartitions,
+                              oneOverSpringPartitions,
+                              displacements,
+                              linkIdx,
+                              oneOverSpringPartitionUpperLimit);
+      };
+
+      void relaxationLight(ForceBalanceNetwork& net,
+                           Eigen::VectorXd& springPartitions,
+                           Eigen::VectorXd& oneOverSpringPartitions,
+                           Eigen::VectorXd& displacements,
+                           const size_t linkIdx,
                            const double oneOverSpringPartitionUpperLimit = 1.0);
 
       /**
@@ -761,6 +777,31 @@ namespace calc {
         Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
         const size_t linkIdx,
         double oneOverSpringPartitionUpperLimit = 1.0,
+        bool allowSlipLinksToPassEachOther = false) const
+      {
+        Eigen::VectorXd oneOverSpringPartitions = Eigen::VectorXd::Zero(0);
+        return this->updateSpringPartition(net,
+                                           u,
+                                           springPartitions,
+                                           oneOverSpringPartitions,
+                                           linkIdx,
+                                           oneOverSpringPartitionUpperLimit,
+                                           allowSlipLinksToPassEachOther);
+      };
+
+      /**
+       * @brief Updates the partition/parametrisation of a spring around one
+       * link
+       *
+       */
+      double updateSpringPartition(
+        const ForceBalanceNetwork& net,
+        const Eigen::VectorXd& u,
+        Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
+        Eigen::VectorXd&
+          oneOverSpringPartitions, /* gives the parametrisation of N */
+        const size_t linkIdx,
+        double oneOverSpringPartitionUpperLimit = 1.0,
         bool allowSlipLinksToPassEachOther = false) const;
 
       /**
@@ -989,6 +1030,33 @@ namespace calc {
         }
       }
 
+      /**
+       * @brief Get the Link Indices of all neighbours of a specified link
+       *
+       * @param net
+       * @param linkIdx
+       * @return std::vector<size_t>
+       */
+      std::vector<size_t> getNeighbourLinkIndices(
+        const ForceBalanceNetwork& net,
+        const size_t linkIdx)
+      {
+        std::vector<size_t> results;
+        results.reserve(4);
+        for (size_t springIdx : net.springIndicesOfLinks[linkIdx]) {
+          for (size_t partialSpringIdx :
+               net.localToGlobalSpringIndex[springIdx]) {
+            if (net.springPartIndexA[partialSpringIdx] == linkIdx) {
+              results.push_back(net.springPartIndexB[partialSpringIdx]);
+            } // 
+            else
+            if (net.springPartIndexB[partialSpringIdx] == linkIdx) {
+              results.push_back(net.springPartIndexA[partialSpringIdx]);
+            }
+          }
+        }
+      }
+
     protected:
       /**
        * @brief Convert the universe to a network
@@ -1047,6 +1115,7 @@ namespace calc {
         return (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) /
                3.0;
       }
+
       /**
        * @brief Compute the stress tensor
        *
@@ -1062,6 +1131,23 @@ namespace calc {
         const double kappa0 = 1.0,
         const double oneOverSpringPartitionUpperLimit = 1.0,
         const bool xlinksOnly = false) const;
+        
+      /**
+       * @brief Compute the stress tensor
+       *
+       * @param net
+       * @param u
+       * @param loopTol
+       * @return std::array<std::array<double, 3>, 3>
+       */
+      
+    Eigen::Matrix3d evaluateStressTensorForLinks(
+        const std::vector<size_t> linkIndices,
+        const ForceBalanceNetwork& net,
+        const Eigen::VectorXd& u,
+        const Eigen::VectorXd& springPartitions,
+        const double kappa0 = 1.0,
+        const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
       /**
        * @brief Compute the stress tensor
