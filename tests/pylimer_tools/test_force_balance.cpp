@@ -821,6 +821,9 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
       forceBalancer.randomlyAddSliplinks(1500, 2.0, 100, 2.0, false);
     REQUIRE(nrOfAddedLinks >= 100);
     std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+    pe::Box oldBox = universe.getBox();
+    forceBalancer.deformTo(
+      pe::Box(4 * oldBox.getLx(), 0.5 * oldBox.getLy(), 0.5 * oldBox.getLz()));
     REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
       pcm::BalanceRunMode::ITERATIVE,
       1.0,

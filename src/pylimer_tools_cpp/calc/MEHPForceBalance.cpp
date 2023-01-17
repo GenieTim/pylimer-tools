@@ -2741,6 +2741,9 @@ namespace calc {
                                               springPartitions,
                                               partialSpringIdx,
                                               oneOverSpringPartitionUpperLimit);
+        if (newPartialSpringIdx < 0) {
+          return false;
+        }
       }
 
       // relax the affected links
@@ -2775,7 +2778,7 @@ namespace calc {
         size_t rotations = 0;
         bool isBackToInitialSpring = false;
         while (residualAfter > residualBefore && !isBackToInitialSpring &&
-               rotations < 5) {
+               rotations < 5 && newPartialSpringIdx >= 0) {
           newPartialSpringIdx = this->rotateSlipLinkAroundCrosslink(
             net,
             u,
@@ -3013,7 +3016,7 @@ namespace calc {
         net.localToGlobalSpringIndex[springIdx][0] == partialSpringIdx ||
           pylimer_tools::utils::last(net.localToGlobalSpringIndex[springIdx]) ==
             partialSpringIdx,
-        "");
+        "Partial spring assembly is not correct");
       const double N = net.springsContourLength[springIdx];
       const double swappableCutoff =
         (oneOverSpringPartitionUpperLimit > 0.)
@@ -3849,7 +3852,7 @@ namespace calc {
             APPROX_WITHIN(this->currentSpringPartitionsVec[newSpringIndex],
                           0.0,
                           1.0,
-                          1e-12),
+                          1e-9),
             "Spring partition must be between 0 and 1, got " +
               std::to_string(this->currentSpringPartitionsVec[newSpringIndex]) +
               ".");
@@ -3858,7 +3861,7 @@ namespace calc {
             APPROX_WITHIN(this->currentSpringPartitionsVec[lastSpringIndex],
                           0.0,
                           1.0,
-                          1e-12),
+                          1e-9),
             "Spring partition must be between 0 and 1, got " +
               std::to_string(this->currentSpringPartitionsVec[newSpringIndex]) +
               ".");
@@ -4583,7 +4586,7 @@ namespace calc {
        * Test spring partition assumptions
        */
       for (size_t i = 0; i < springPartitions.size(); i++) {
-        RUNTIME_EXP_IFN(APPROX_WITHIN(springPartitions[i], 0.0, 1.0, 1e-12),
+        RUNTIME_EXP_IFN(APPROX_WITHIN(springPartitions[i], 0.0, 1.0, 1e-9),
                         "Spring partitions must be between 0. & 1., got " +
                           std::to_string(springPartitions[i]) +
                           " at i = " + std::to_string(i) + ".");
