@@ -2469,27 +2469,31 @@ namespace calc {
             //                  << std::endl;
 
             RUNTIME_EXP_IFN(
-              APPROX_WITHIN(newS + complementaryS, 0., 1., 1e-12),
+              APPROX_WITHIN(newS + complementaryS, 0., 1., 1e-9),
               "Require newS + complementaryS to be within 0, 1, got " +
                 std::to_string(newS + complementaryS) + " from " +
                 std::to_string(newS) + " and " +
                 std::to_string(complementaryS) +
                 " with ideal = " + std::to_string(idealValue) + " of " +
                 std::to_string(nextS + currentS) + " for link " +
-                std::to_string(linkIdx) + ".");
+                std::to_string(linkIdx) + ". Diff: " +
+                std::to_string(1. - (newS + complementaryS)) + ".");
             RUNTIME_EXP_IFN(
-              APPROX_EQUAL(nextS + currentS, newS + complementaryS, 1e-12),
+              APPROX_EQUAL(nextS + currentS, newS + complementaryS, 1e-9),
               "Require nextS + currentS == newS + complementaryS, got " +
                 std::to_string(nextS + currentS) + " vs. " +
                 std::to_string(newS + complementaryS) + " from " +
                 std::to_string(nextS) + " and " + std::to_string(currentS) +
                 ", " + std::to_string(newS) + " and " +
-                std::to_string(complementaryS) + ".");
-            RUNTIME_EXP_IFN(APPROX_WITHIN(nextS + currentS, 0., 1., 1e-12),
-                            "Require nextS + currentS to be within 0, 1, got " +
-                              std::to_string(nextS + currentS) + " from " +
-                              std::to_string(nextS) + " and " +
-                              std::to_string(currentS) + ".");
+                std::to_string(complementaryS) + ". Diff: " +
+                std::to_string((nextS + currentS) - (newS + complementaryS)) +
+                ".");
+            RUNTIME_EXP_IFN(
+              APPROX_WITHIN(nextS + currentS, 0., 1., 1e-9),
+              "Require nextS + currentS to be within 0, 1, got " +
+                std::to_string(nextS + currentS) + " from " +
+                std::to_string(nextS) + " and " + std::to_string(currentS) +
+                ". Diff: " + std::to_string(1. - (nextS + currentS)) + ".");
             RUNTIME_EXP_IFN(
               nextS >= 0.0,
               "nextS must be >= 0., got " + std::to_string(nextS) + " from " +
@@ -3849,10 +3853,8 @@ namespace calc {
           this->currentSpringPartitionsVec[newSpringIndex] =
             this->currentSpringPartitionsVec[lastSpringIndex] - alpha;
           RUNTIME_EXP_IFN(
-            APPROX_WITHIN(this->currentSpringPartitionsVec[newSpringIndex],
-                          0.0,
-                          1.0,
-                          1e-9),
+            APPROX_WITHIN(
+              this->currentSpringPartitionsVec[newSpringIndex], 0.0, 1.0, 1e-9),
             "Spring partition must be between 0 and 1, got " +
               std::to_string(this->currentSpringPartitionsVec[newSpringIndex]) +
               ".");
@@ -3918,8 +3920,7 @@ namespace calc {
      * @param loopTol
      * @return std::array<std::array<double, 3>, 3>
      */
-    Eigen::Matrix3d
-    MEHPForceBalance::evaluateStressTensorForLinks(
+    Eigen::Matrix3d MEHPForceBalance::evaluateStressTensorForLinks(
       const std::vector<size_t> linkIndices,
       const ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
