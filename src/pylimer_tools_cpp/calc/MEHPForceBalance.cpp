@@ -42,13 +42,14 @@ namespace calc {
       long int maxNrOfSteps, // default: 10000
       double xtol,
       const double initialResidualToUse,
-      const double oneOverSpringPartitionUpperLimit,
       const StructureSimplificationMode simplificationMode,
       const double inactiveRemovalCutoff,
       const int outputFrequency,
       bool doInnerIterations,
       LinkSwappingMode allowSlipLinksToPassEachOther,
-      const int swappingFrequency)
+      const int swappingFrequency,
+      const double oneOverSpringPartitionUpperLimit,
+      const double oneOverSpringPartitionUpperLimit2)
     {
       // INVALIDARG_EXP_IFN(
       //   shouldRemoveInactiveCrosslinks == false &&
@@ -99,6 +100,9 @@ namespace calc {
                 << initialResidualToUse
                 // "with " << independentVertexSets.size() << "vertex sets."
                 << std::endl;
+      std::cout << "Swapping mode is " << allowSlipLinksToPassEachOther
+                << " while simplification mode is " << simplificationMode
+                << std::endl;
       double currentResidual = 0.0;
       double intermediateResidual = 0.0;
       size_t iterationsDone = 0;
@@ -146,7 +150,7 @@ namespace calc {
                                           springPartitions,
                                           oneOverSpringPartitions,
                                           link_idx,
-                                          oneOverSpringPartitionUpperLimit,
+                                          oneOverSpringPartitionUpperLimit2,
                                           allowSlipLinksToPassEachOther);
             double displacementDone =
               this->displaceToMeanPosition(net,
