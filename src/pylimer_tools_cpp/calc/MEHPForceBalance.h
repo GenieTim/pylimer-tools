@@ -99,7 +99,6 @@ namespace calc {
         long int maxNrOfSteps = 50000, // default: 10000
         double xtol = 1e-9,
         const double initialResidualToUse = -1.0,
-        const double oneOverSpringPartitionUpperLimit = 1.0,
         const StructureSimplificationMode simplificationMode =
           StructureSimplificationMode::NO_SIMPLIFICATION,
         const double inactiveRemovalCutoff = -1.0,
@@ -107,7 +106,9 @@ namespace calc {
         bool doInnerIterations = false,
         LinkSwappingMode allowSlipLinksToPassEachOther =
           LinkSwappingMode::NO_SWAPPING,
-        const int swappingFrequency = 10);
+        const int swappingFrequency = 10,
+        const double oneOverSpringPartitionUpperLimit = 1.0,
+        const double oneOverSpringPartitionUpperLimit2 = 1.0);
 
       /**
        * @brief Compute the spring update residual
@@ -1048,9 +1049,8 @@ namespace calc {
                net.localToGlobalSpringIndex[springIdx]) {
             if (net.springPartIndexA[partialSpringIdx] == linkIdx) {
               results.push_back(net.springPartIndexB[partialSpringIdx]);
-            } // 
-            else
-            if (net.springPartIndexB[partialSpringIdx] == linkIdx) {
+            } //
+            else if (net.springPartIndexB[partialSpringIdx] == linkIdx) {
               results.push_back(net.springPartIndexA[partialSpringIdx]);
             }
           }
@@ -1132,7 +1132,7 @@ namespace calc {
         const double kappa0 = 1.0,
         const double oneOverSpringPartitionUpperLimit = 1.0,
         const bool xlinksOnly = false) const;
-        
+
       /**
        * @brief Compute the stress tensor
        *
@@ -1141,8 +1141,8 @@ namespace calc {
        * @param loopTol
        * @return std::array<std::array<double, 3>, 3>
        */
-      
-    Eigen::Matrix3d evaluateStressTensorForLinks(
+
+      Eigen::Matrix3d evaluateStressTensorForLinks(
         const std::vector<size_t> linkIndices,
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
