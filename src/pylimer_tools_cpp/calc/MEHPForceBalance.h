@@ -1247,6 +1247,20 @@ namespace calc {
         return i1 > i2 ? std::make_pair(i1, i2) : std::make_pair(i2, i1);
       }
 
+      bool swapSlipLinksReversibly(
+        ForceBalanceNetwork& net,
+        Eigen::VectorXd& u,
+        Eigen::VectorXd& springPartitions,
+        const size_t partialSpringIdx,
+        const double oneOverSpringPartitionUpperLimit = 1.0);
+
+      bool swapSlipLinkWithXlinkReversibly(
+        ForceBalanceNetwork& net,
+        Eigen::VectorXd& u,
+        Eigen::VectorXd& springPartitions,
+        const size_t partialSpringIdx,
+        const double oneOverSpringPartitionUpperLimit = 1.0);
+
     private:
       pylimer_tools::entities::Universe universe;
       bool is2D = false;

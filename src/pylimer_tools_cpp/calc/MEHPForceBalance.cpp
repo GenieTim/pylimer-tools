@@ -103,6 +103,10 @@ namespace calc {
       std::cout << "Swapping mode is " << allowSlipLinksToPassEachOther
                 << " while simplification mode is " << simplificationMode
                 << std::endl;
+      std::cout << "Using oneOverSpringPartitionUpperLimit = "
+                << oneOverSpringPartitionUpperLimit
+                << " and oneOverSpringPartitionUpperLimit2 = "
+                << oneOverSpringPartitionUpperLimit2 << std::endl;
       double currentResidual = 0.0;
       double intermediateResidual = 0.0;
       size_t iterationsDone = 0;
@@ -2163,21 +2167,31 @@ namespace calc {
       Eigen::VectorXd& springPartitions,
       const size_t partialSpringIdx,
       const size_t slipLinkIdx,
-      const double alpha) const
+      const double oneOverSpringPartitionUpperLimit) const
     {
       INVALIDARG_EXP_IFN(
         !net.linkIsSliplink[net.springPartIndexA[partialSpringIdx]] ||
           !net.linkIsSliplink[net.springPartIndexB[partialSpringIdx]],
         "Require at least one part to be a cross-link.");
-      INVALIDARG_EXP_IFN(APPROX_WITHIN(alpha, 0.0, 1.0, 1e-12),
-                         "alpha must be within 0. and 1.");
       net.nrOfPartialSprings += 1;
       const size_t newPartialSpringIdx = net.nrOfPartialSprings - 1;
       const size_t relevantSpring =
         net.partialToFullSpringIndex[partialSpringIdx];
+      const double N = net.springsContourLength[relevantSpring];
+      const double minAlpha =
+        (oneOverSpringPartitionUpperLimit > 0.)
+          ? 1. / (N - 1. / oneOverSpringPartitionUpperLimit)
+          : 1e-9;
+      INVALIDARG_EXP_IFN(APPROX_WITHIN(minAlpha, 0.0, 1.0, 1e-12),
+                         "minAlpha must be within 0. and 1.");
+      RUNTIME_EXP_IFN(
+        minAlpha * (net.localToGlobalSpringIndex[relevantSpring].size() + 1.) <=
+          1.,
+        "With this minimum alpha, the slip-link cannot be placed on this "
+        "partial spring.");
       // std::cout << "Adding slip-link " << slipLinkIdx << " to spring "
       //           << relevantSpring << " (partial " << partialSpringIdx
-      //           << ") with alpha = " << alpha << std::endl;
+      //           << ") with minAlpha = " << minAlpha << std::endl;
       // resize the structures
       springPartitions.conservativeResize(net.nrOfPartialSprings);
       assert(springPartitions.size() == net.nrOfPartialSprings);
@@ -2204,7 +2218,9 @@ namespace calc {
       // localToGlobalSpringIndex constant. I.e., we want the
       // `newPartialSpringIdx` to correspond to the spring with the cross-link
       size_t springPartToReplace;
+      bool forward;
       if (net.localToGlobalSpringIndex[relevantSpring][0] == partialSpringIdx) {
+        forward = true;
         if (net.linkIndicesOfSprings[relevantSpring][0] == oldPartnerA) {
           springPartToReplace = oldPartnerA;
           // std::cout << "Case 1a" << std::endl;
@@ -2219,6 +2235,7 @@ namespace calc {
           net.localToGlobalSpringIndex[relevantSpring].begin(),
           newPartialSpringIdx);
       } else {
+        forward = false;
         assert(pylimer_tools::utils::last(
                  net.localToGlobalSpringIndex[relevantSpring]) ==
                partialSpringIdx);
@@ -2264,18 +2281,50 @@ namespace calc {
           3 * springPartToReplace + dir;
       }
 
-      //
-      springPartitions[newPartialSpringIdx] = alpha;
       // renormalize this spring
-      // addmittedly, this is possibly dangerous, as it could hide
-      // other mistakes
+      // mostly by moving the next slip-link further
+      springPartitions[newPartialSpringIdx] = minAlpha;
+      double remainingNormalisationOffset = minAlpha;
+      if (forward) {
+        for (size_t globalPartSpringIndex :
+             net.localToGlobalSpringIndex[relevantSpring]) {
+          double currAlpha = springPartitions[globalPartSpringIndex];
+          if (currAlpha > minAlpha) {
+            springPartitions[globalPartSpringIndex] -=
+              remainingNormalisationOffset;
+            springPartitions[globalPartSpringIndex] =
+              std::max(springPartitions[globalPartSpringIndex], minAlpha);
+            remainingNormalisationOffset -=
+              (currAlpha - springPartitions[globalPartSpringIndex]);
+          }
+          if (remainingNormalisationOffset <= 0.) {
+            break;
+          }
+        }
+      } else {
+        for (size_t i = net.localToGlobalSpringIndex[relevantSpring].size() - 1;
+             i >= 0;
+             --i) {
+          size_t globalPartSpringIndex =
+            net.localToGlobalSpringIndex[relevantSpring][i];
+          double currAlpha = springPartitions[globalPartSpringIndex];
+          if (currAlpha > minAlpha) {
+            springPartitions[globalPartSpringIndex] -=
+              remainingNormalisationOffset;
+            springPartitions[globalPartSpringIndex] =
+              std::max(springPartitions[globalPartSpringIndex], minAlpha);
+            remainingNormalisationOffset -=
+              (currAlpha - springPartitions[globalPartSpringIndex]);
+          }
+          if (remainingNormalisationOffset <= 0.) {
+            break;
+          }
+        }
+      }
+      // check that normalisation worked
       double newTotalForNormalization =
         springPartitions(net.localToGlobalSpringIndex[relevantSpring]).sum();
-      for (size_t globalPartSpringIndex :
-           net.localToGlobalSpringIndex[relevantSpring]) {
-        springPartitions[globalPartSpringIndex] *=
-          1. / newTotalForNormalization;
-      }
+      RUNTIME_EXP_IFN(APPROX_EQUAL(newTotalForNormalization, 1.0, 1e-9), "");
 
       return newPartialSpringIdx;
     }
@@ -2680,6 +2729,16 @@ namespace calc {
       }
     }
 
+    /**
+     * @brief
+     *
+     * @param net
+     * @param u
+     * @param springPartitions
+     * @param partialSpringIdx
+     * @param oneOverSpringPartitionUpperLimit
+     * @return bool
+     */
     bool MEHPForceBalance::swapSlipLinkReversibly(
       ForceBalanceNetwork& net,
       Eigen::VectorXd& u,
@@ -2696,27 +2755,103 @@ namespace calc {
         return false;
       }
       size_t fullSpringIdx = net.partialToFullSpringIndex[partialSpringIdx];
+      // analyse spring
+      bool involvesCrosslink =
+        !(net.linkIsSliplink[partnerA] && net.linkIsSliplink[partnerB]);
+      if (involvesCrosslink) {
+        return this->swapSlipLinkWithXlinkReversibly(
+          net,
+          u,
+          springPartitions,
+          partialSpringIdx,
+          oneOverSpringPartitionUpperLimit);
+      } else {
+        return this->swapSlipLinksReversibly(net,
+                                             u,
+                                             springPartitions,
+                                             partialSpringIdx,
+                                             oneOverSpringPartitionUpperLimit);
+      }
+    }
+
+    /**
+     * @brief
+     *
+     * @param net
+     * @param u
+     * @param springPartitions
+     * @param partialSpringIdx
+     * @param oneOverSpringPartitionUpperLimit
+     * @return bool
+     */
+    bool MEHPForceBalance::swapSlipLinkWithXlinkReversibly(
+      ForceBalanceNetwork& net,
+      Eigen::VectorXd& u,
+      Eigen::VectorXd& springPartitions,
+      const size_t partialSpringIdx,
+      const double oneOverSpringPartitionUpperLimit)
+    {
+      size_t partnerA = net.springPartIndexA[partialSpringIdx];
+      size_t partnerB = net.springPartIndexB[partialSpringIdx];
+      INVALIDARG_EXP_IFN(
+        XOR(net.linkIsSliplink[partnerA], net.linkIsSliplink[partnerB]),
+        "This method only swaps cross-link with slip-link.");
+      if (partnerA == partnerB) {
+        return false;
+      }
+      size_t fullSpringIdx = net.partialToFullSpringIndex[partialSpringIdx];
+      // analyse spring
+      size_t crosslinkIdx = net.linkIsSliplink[partnerA] ? partnerB : partnerA;
+      size_t slipLinkIdx = net.linkIsSliplink[partnerB] ? partnerB : partnerA;
       // compute the residual
-      Eigen::VectorXi debugNrSpringsVisited =
-        Eigen::VectorXi::Zero(this->initialConfig.nrOfPartialSprings);
       // TODO: check if this is dangerous due to the differences being hidden in
       // the truncated digits
-      std::vector<size_t> relevantNeigboursA =
+      std::vector<size_t> relevantNeighboursA =
         this->getNeighbourLinkIndices(net, partnerA);
-      std::vector<size_t> relevantNeigboursB =
+      std::vector<size_t> relevantNeighboursB =
         this->getNeighbourLinkIndices(net, partnerB);
+      // combine these
       std::vector<size_t> relevantNeighbours;
-      relevantNeighbours.reserve(relevantNeigboursA.size() +
-                                 relevantNeigboursB.size() +
+      relevantNeighbours.reserve(relevantNeighboursA.size() +
+                                 relevantNeighboursB.size() +
                                  2); // preallocate memory
+      std::vector<size_t> relevantPartialSprings;
+      relevantPartialSprings.reserve(
+        net.localToGlobalSpringIndex[fullSpringIdx].size());
       relevantNeighbours.insert(relevantNeighbours.end(),
-                                relevantNeigboursA.begin(),
-                                relevantNeigboursA.end());
+                                relevantNeighboursA.begin(),
+                                relevantNeighboursA.end());
       relevantNeighbours.insert(relevantNeighbours.end(),
-                                relevantNeigboursB.begin(),
-                                relevantNeigboursB.end());
+                                relevantNeighboursB.begin(),
+                                relevantNeighboursB.end());
       relevantNeighbours.push_back(partnerA);
       relevantNeighbours.push_back(partnerB);
+      relevantPartialSprings.insert(
+        relevantPartialSprings.end(),
+        net.localToGlobalSpringIndex[fullSpringIdx].begin(),
+        net.localToGlobalSpringIndex[fullSpringIdx].end());
+      // for cross-links, we need to take all partners of all springs into
+      // account
+      for (size_t crosslinksSpringIdx :
+           net.springIndicesOfLinks[crosslinkIdx]) {
+        relevantNeighbours.insert(
+          relevantNeighbours.end(),
+          net.linkIndicesOfSprings[crosslinksSpringIdx].begin(),
+          net.linkIndicesOfSprings[crosslinksSpringIdx].end());
+        relevantPartialSprings.insert(
+          relevantPartialSprings.end(),
+          net.localToGlobalSpringIndex[crosslinksSpringIdx].begin(),
+          net.localToGlobalSpringIndex[crosslinksSpringIdx].end());
+      }
+      std::vector<size_t> relevantNeighboursCoordIndices;
+      relevantNeighboursCoordIndices.reserve(3 * relevantNeighbours.size());
+      for (size_t relevantNeighbour : relevantNeighbours) {
+        relevantNeighboursCoordIndices.push_back(relevantNeighbour * 3 + 0);
+        relevantNeighboursCoordIndices.push_back(relevantNeighbour * 3 + 1);
+        relevantNeighboursCoordIndices.push_back(relevantNeighbour * 3 + 2);
+      }
+      // maybe remove duplicates – might be unnecessary?
+      // compute the residual before the deformation
       const double residualBefore =
         this
           ->evaluateStressTensorForLinks(relevantNeighbours,
@@ -2728,30 +2863,27 @@ namespace calc {
           .diagonal()
           .squaredNorm();
 
+      // remember the current positions and partitions
+      Eigen::VectorXd displacementsBefore = u(relevantNeighboursCoordIndices);
+      Eigen::VectorXd springPartitionsBefore =
+        springPartitions(relevantPartialSprings);
+
       // do swap
-      size_t crosslinkIdx = 0;
-      size_t slipLinkIdx = 0;
       size_t newPartialSpringIdx = 0;
-      if (net.linkIsSliplink[partnerA] && net.linkIsSliplink[partnerB]) {
-        this->swapSlipLinks(net, partialSpringIdx);
-      } else {
-        // TODO: swap with some cross-link
-        crosslinkIdx = net.linkIsSliplink[partnerA] ? partnerB : partnerA;
-        slipLinkIdx = net.linkIsSliplink[partnerB] ? partnerB : partnerA;
-        std::vector<size_t> springsOfCrosslink =
-          net.springIndicesOfLinks[crosslinkIdx];
-        if (springsOfCrosslink.size() < 2) {
-          return false;
-        }
-        newPartialSpringIdx =
-          this->rotateSlipLinkAroundCrosslink(net,
-                                              u,
-                                              springPartitions,
-                                              partialSpringIdx,
-                                              oneOverSpringPartitionUpperLimit);
-        if (newPartialSpringIdx < 0) {
-          return false;
-        }
+      // swap with cross-link
+      std::vector<size_t> springsOfCrosslink =
+        net.springIndicesOfLinks[crosslinkIdx];
+      if (springsOfCrosslink.size() < 2) {
+        return false;
+      }
+      newPartialSpringIdx =
+        this->rotateSlipLinkAroundCrosslink(net,
+                                            u,
+                                            springPartitions,
+                                            partialSpringIdx,
+                                            oneOverSpringPartitionUpperLimit);
+      if (newPartialSpringIdx < 0) {
+        return false;
       }
 
       // relax the affected links
@@ -2779,73 +2911,189 @@ namespace calc {
       }
 
       // otherwise, swap back
-      if (net.linkIsSliplink[partnerA] && net.linkIsSliplink[partnerB]) {
-        this->swapSlipLinks(net, partialSpringIdx);
-      } else {
-        // rotate back to the first spring
-        size_t rotations = 0;
-        bool isBackToInitialSpring = false;
-        while (residualAfter > residualBefore && !isBackToInitialSpring &&
-               rotations < 5 && newPartialSpringIdx >= 0) {
-          newPartialSpringIdx = this->rotateSlipLinkAroundCrosslink(
-            net,
-            u,
-            springPartitions,
-            newPartialSpringIdx,
-            oneOverSpringPartitionUpperLimit);
-          isBackToInitialSpring = pylimer_tools::utils::contains(
-            net.springIndicesOfLinks[slipLinkIdx], fullSpringIdx);
-          for (size_t relaxSteps = 0; relaxSteps < 2; ++relaxSteps) {
+      // rotate back to the first spring
+      size_t rotations = 0;
+      bool isBackToInitialSpring = false;
+      while (residualAfter > residualBefore && !isBackToInitialSpring &&
+             rotations < 5 && newPartialSpringIdx >= 0) {
+        newPartialSpringIdx =
+          this->rotateSlipLinkAroundCrosslink(net,
+                                              u,
+                                              springPartitions,
+                                              newPartialSpringIdx,
+                                              oneOverSpringPartitionUpperLimit);
+        isBackToInitialSpring = pylimer_tools::utils::contains(
+          net.springIndicesOfLinks[slipLinkIdx], fullSpringIdx);
+        for (size_t relaxSteps = 0; relaxSteps < 2; ++relaxSteps) {
+          // TODO: this is not good at all.
+          for (size_t linkIdx : relevantNeighbours) {
             this->relaxationLight(net,
                                   springPartitions,
                                   u,
-                                  partnerA,
-                                  oneOverSpringPartitionUpperLimit);
-            this->relaxationLight(net,
-                                  springPartitions,
-                                  u,
-                                  partnerB,
+                                  linkIdx,
                                   oneOverSpringPartitionUpperLimit);
           }
-          // compute if the residual is lower now
-          residualAfter =
-            this
-              ->evaluateStressTensorForLinks(relevantNeighbours,
-                                             net,
-                                             u,
-                                             springPartitions,
-                                             1.0,
-                                             oneOverSpringPartitionUpperLimit)
-              .diagonal()
-              .squaredNorm();
-          rotations += 1;
         }
-        if (rotations >= 5) {
-          std::cerr << "Could not rotate slip-link " << slipLinkIdx
-                    << " back to initial spring. "
-                    << "Initial spring was " << fullSpringIdx
-                    << ", whereas current springs are "
-                    << pylimer_tools::utils::join(
-                         net.springIndicesOfLinks[slipLinkIdx].begin(),
-                         net.springIndicesOfLinks[slipLinkIdx].end(),
-                         std::string(", "))
-                    << ". Cross-link is " << crosslinkIdx
-                    << " which is associated with springs "
-                    << pylimer_tools::utils::join(
-                         net.springIndicesOfLinks[crosslinkIdx].begin(),
-                         net.springIndicesOfLinks[crosslinkIdx].end(),
-                         std::string(", "))
-                    << std::endl;
-        }
+        // compute if the residual is lower now
+        residualAfter =
+          this
+            ->evaluateStressTensorForLinks(relevantNeighbours,
+                                           net,
+                                           u,
+                                           springPartitions,
+                                           1.0,
+                                           oneOverSpringPartitionUpperLimit)
+            .diagonal()
+            .squaredNorm();
+        rotations += 1;
+      }
+      if (rotations >= 5) {
+        std::cerr << "Could not rotate slip-link " << slipLinkIdx
+                  << " back to initial spring. "
+                  << "Initial spring was " << fullSpringIdx
+                  << ", whereas current springs are "
+                  << pylimer_tools::utils::join(
+                       net.springIndicesOfLinks[slipLinkIdx].begin(),
+                       net.springIndicesOfLinks[slipLinkIdx].end(),
+                       std::string(", "))
+                  << ". Cross-link is " << crosslinkIdx
+                  << " which is associated with springs "
+                  << pylimer_tools::utils::join(
+                       net.springIndicesOfLinks[crosslinkIdx].begin(),
+                       net.springIndicesOfLinks[crosslinkIdx].end(),
+                       std::string(", "))
+                  << std::endl;
       }
 
       // relax the affected links back
+      // TODO: this is not nice, but currently required because the numbers
+      // change
+      for (size_t relaxSteps = 0; relaxSteps < 2; ++relaxSteps) {
+        // TODO: this is not good at all.
+        for (size_t linkIdx : relevantNeighbours) {
+          this->relaxationLight(net,
+                                springPartitions,
+                                u,
+                                linkIdx,
+                                oneOverSpringPartitionUpperLimit);
+        }
+      }
+
+      return false;
+    }
+
+    /**
+     * @brief
+     *
+     * @param net
+     * @param u
+     * @param springPartitions
+     * @param partialSpringIdx
+     * @param oneOverSpringPartitionUpperLimit
+     * @return bool
+     */
+    bool MEHPForceBalance::swapSlipLinksReversibly(
+      ForceBalanceNetwork& net,
+      Eigen::VectorXd& u,
+      Eigen::VectorXd& springPartitions,
+      const size_t partialSpringIdx,
+      const double oneOverSpringPartitionUpperLimit)
+    {
+      size_t partnerA = net.springPartIndexA[partialSpringIdx];
+      size_t partnerB = net.springPartIndexB[partialSpringIdx];
+      INVALIDARG_EXP_IFN(net.linkIsSliplink[partnerA] &&
+                           net.linkIsSliplink[partnerB],
+                         "This method only swaps slip-links.");
+      if (partnerA == partnerB) {
+        return false;
+      }
+      size_t fullSpringIdx = net.partialToFullSpringIndex[partialSpringIdx];
+      // compute the residual
+      // TODO: check if this is dangerous due to the differences being hidden in
+      // the truncated digits
+      std::vector<size_t> relevantNeighboursA =
+        this->getNeighbourLinkIndices(net, partnerA);
+      std::vector<size_t> relevantNeighboursB =
+        this->getNeighbourLinkIndices(net, partnerB);
+      // combine these
+      std::vector<size_t> relevantNeighbours;
+      relevantNeighbours.reserve(relevantNeighboursA.size() +
+                                 relevantNeighboursB.size() +
+                                 2); // preallocate memory
+      std::vector<size_t> relevantPartialSprings;
+      relevantPartialSprings.reserve(
+        net.localToGlobalSpringIndex[fullSpringIdx].size());
+      relevantNeighbours.insert(relevantNeighbours.end(),
+                                relevantNeighboursA.begin(),
+                                relevantNeighboursA.end());
+      relevantNeighbours.insert(relevantNeighbours.end(),
+                                relevantNeighboursB.begin(),
+                                relevantNeighboursB.end());
+      relevantNeighbours.push_back(partnerA);
+      relevantNeighbours.push_back(partnerB);
+      relevantPartialSprings.insert(
+        relevantPartialSprings.end(),
+        net.localToGlobalSpringIndex[fullSpringIdx].begin(),
+        net.localToGlobalSpringIndex[fullSpringIdx].end());
+
+      std::vector<size_t> relevantNeighboursCoordIndices;
+      relevantNeighboursCoordIndices.reserve(3 * relevantNeighbours.size());
+      for (size_t relevantNeighbour : relevantNeighbours) {
+        relevantNeighboursCoordIndices.push_back(relevantNeighbour * 3 + 0);
+        relevantNeighboursCoordIndices.push_back(relevantNeighbour * 3 + 1);
+        relevantNeighboursCoordIndices.push_back(relevantNeighbour * 3 + 2);
+      }
+      // maybe remove duplicates – might be unnecessary?
+      // compute the residual before the deformation
+      const double residualBefore =
+        this
+          ->evaluateStressTensorForLinks(relevantNeighbours,
+                                         net,
+                                         u,
+                                         springPartitions,
+                                         1.0,
+                                         oneOverSpringPartitionUpperLimit)
+          .diagonal()
+          .squaredNorm();
+
+      // remember the current positions and partitions
+      Eigen::VectorXd displacementsBefore = u(relevantNeighboursCoordIndices);
+      Eigen::VectorXd springPartitionsBefore =
+        springPartitions(relevantPartialSprings);
+
+      // do swap
+      this->swapSlipLinks(net, partialSpringIdx);
+
+      // relax the affected links
       for (size_t relaxSteps = 0; relaxSteps < 2; ++relaxSteps) {
         this->relaxationLight(
           net, springPartitions, u, partnerA, oneOverSpringPartitionUpperLimit);
         this->relaxationLight(
           net, springPartitions, u, partnerB, oneOverSpringPartitionUpperLimit);
       }
+
+      // compute if the residual is lower now
+      double residualAfter =
+        this
+          ->evaluateStressTensorForLinks(relevantNeighbours,
+                                         net,
+                                         u,
+                                         springPartitions,
+                                         1.0,
+                                         oneOverSpringPartitionUpperLimit)
+          .diagonal()
+          .squaredNorm();
+
+      if (residualAfter <= residualBefore) {
+        return true;
+      }
+
+      // otherwise, swap back
+      this->swapSlipLinks(net, partialSpringIdx);
+
+      // relax the affected links back
+      u(relevantNeighboursCoordIndices) = displacementsBefore;
+      springPartitions(relevantPartialSprings) = springPartitionsBefore;
 
       return false;
     }
@@ -3029,7 +3277,8 @@ namespace calc {
       const double swappableCutoff =
         (oneOverSpringPartitionUpperLimit > 0.)
           ? 1. / (N - 1. / oneOverSpringPartitionUpperLimit)
-          : 1e-12;
+          : 1e-9;
+      const int maxNrOfSliplinksOnSpring = 1.0 / swappableCutoff;
       size_t partialIdx =
         net.localToGlobalSpringIndex[springIdx][0] == partialSpringIdx
           ? 0
@@ -3075,9 +3324,10 @@ namespace calc {
             ? net.localToGlobalSpringIndex[possibleTargetSprings[i]][0]
             : pylimer_tools::utils::last(
                 net.localToGlobalSpringIndex[possibleTargetSprings[i]]);
-        if (currentPossibleTargetPartialSpringIdx !=
-            partialSpringIdx) { // let's not combine with the
-                                // to-be-removed partial spring
+        if (currentPossibleTargetPartialSpringIdx != partialSpringIdx &&
+            net.localToGlobalSpringIndex[possibleTargetSprings[i]].size() <
+              maxNrOfSliplinksOnSpring) { // let's not combine with the
+                                          // to-be-removed partial spring
           possibleTargetPartialSprings.push_back(
             currentPossibleTargetPartialSpringIdx);
         }
@@ -3088,6 +3338,9 @@ namespace calc {
           // assert(currentPartialSpringTargetIdx == -1);
           currentPartialSpringTargetIdx = i;
         }
+      }
+      if (possibleTargetPartialSprings.size() == 0) {
+        return -1;
       }
       // remove the slip-link from one branch of the x-link
       // but skip resizing the Eigen structures, since the additional rows are
@@ -3119,7 +3372,7 @@ namespace calc {
                                          springPartitions,
                                          targetPartialSpringIdx,
                                          involvedSlipLink,
-                                         swappableCutoff);
+                                         oneOverSpringPartitionUpperLimit);
 
       if ((net.springPartIndexA[targetPartialSpringIdx] == involvedCrosslink &&
            net.springPartIndexB[targetPartialSpringIdx] == involvedSlipLink) ||

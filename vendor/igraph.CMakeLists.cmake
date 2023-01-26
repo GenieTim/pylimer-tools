@@ -17,7 +17,7 @@ if (NOT DEFINED igraph_LOADED)
 		ExternalProject_Add(
 				igraphLib
 				GIT_REPOSITORY https://github.com/igraph/igraph.git
-				GIT_TAG ae908007efae21623c16ff752780a14a78aa149d # 0.10.3
+				GIT_TAG c9426b5d9fa841d93a311f46ddef9ed1d97576ac # 0.10.4
 				PREFIX ${CMAKE_CURRENT_LIST_DIR}/igraph
 				INSTALL_DIR ${CMAKE_CURRENT_LIST_DIR}/igraph/igraphLib-install
 				CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_LIST_DIR}/igraph/igraphLib-install -DCMAKE_INSTALL_LIBDIR=${CMAKE_CURRENT_LIST_DIR}/igraph/igraphLib-install/lib -DCMAKE_C_FLAGS="-fPIC"
