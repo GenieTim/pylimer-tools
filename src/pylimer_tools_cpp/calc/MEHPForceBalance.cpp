@@ -2302,7 +2302,7 @@ namespace calc {
           }
         }
       } else {
-        for (size_t i = net.localToGlobalSpringIndex[relevantSpring].size() - 1;
+        for (int i = net.localToGlobalSpringIndex[relevantSpring].size() - 1;
              i >= 0;
              --i) {
           size_t globalPartSpringIndex =
