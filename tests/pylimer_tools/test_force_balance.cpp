@@ -36,7 +36,8 @@ outputNetwork(pcm::ForceBalanceNetwork net,
       }
       std::cout << std::endl;
       if (j < net.linkIndicesOfSprings[i].size() - 1) {
-        std::cout << springPartitions[net.localToGlobalSpringIndex.at(i)[j]]
+        std::cout << net.localToGlobalSpringIndex.at(i)[j] << ": "
+                  << springPartitions[net.localToGlobalSpringIndex.at(i)[j]]
                   << std::endl;
       }
     }
@@ -128,6 +129,80 @@ TEST_CASE("Particular slip-link examples", "[analysis][MEHPForceBalance]")
   CHECK(springPartitions[3] == Catch::Approx(1. - 0.448276));
   CHECK(springPartitions[4] == Catch::Approx(1. - 0.388968));
   CHECK(springPartitions[5] == Catch::Approx((1. - 0.25004) * 0.448276));
+}
+
+TEST_CASE("MC swap accept and reject work", "[analysis][MEHPForceBalance]")
+{
+  double L = 42.819955007276754;
+  pe::Universe universe = pe::Universe(L, L, L);
+  /**
+   * The universe looks something like this:
+   * Connectivity:
+   *
+   * 1-(7)-2
+   *
+   * 3-(8)-4
+   *
+   * 5-(9)-6
+   */
+  universe.addAtoms({ 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+                    { 2, 2, 2, 2, 2, 2, 1, 1, 1 },
+                    { 20., 24., 20., 24., 20., 24., 22., 22., 22. },
+                    { 20., 20., 16., 16., 12., 12., 20., 16., 12. },
+                    {
+                      0.,
+                      0.,
+                      0.,
+                      0.,
+                      0.,
+                      0.,
+                      0.,
+                      0.,
+                      0.,
+                    },
+                    { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    { 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+                    { 0, 0, 0, 0, 0, 0, 0, 0, 0 });
+  universe.addBonds({ 1, 7, 3, 8, 5, 9 }, { 7, 2, 8, 4, 9, 6 });
+  pcm::MEHPForceBalance forceBalancer = pcm::MEHPForceBalance(universe, 2);
+  REQUIRE_THROWS(
+    forceBalancer.setSpringContourLengths(Eigen::VectorXd::Constant(2, 30.)));
+  forceBalancer.setSpringContourLengths(Eigen::VectorXd::Constant(3, 30.));
+
+  SECTION("MC condition accepts as requested")
+  {
+    forceBalancer.addSlipLinks({ 0, 0 },
+                               { 1, 1 },
+                               { 21., 23. },
+                               { 18., 18. },
+                               { 0.0, 0.0 },
+                               { 0.6, 0.4 },
+                               { 0.4, 0.6 });
+    pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
+    Eigen::VectorXd u = forceBalancer.getCurrentDisplacements();
+    Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
+    // outputNetwork(net, u, partitions);
+    REQUIRE(forceBalancer.swapSlipLinkReversibly(net, u, partitions, 5, 1.));
+  }
+
+  SECTION("MC condition rejects as requested")
+  {
+    forceBalancer.addSlipLinks({ 0, 0 },
+                               { 1, 1 },
+                               { 21., 23. },
+                               { 18., 18. },
+                               { 0.0, 0.0 },
+                               { 0.4, 0.6 },
+                               { 0.4, 0.6 });
+    pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
+    Eigen::VectorXd u = forceBalancer.getCurrentDisplacements();
+    Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
+    // outputNetwork(net, u, partitions);
+    REQUIRE_FALSE(
+      forceBalancer.swapSlipLinkReversibly(net, u, partitions, 5, 1.));
+    REQUIRE(partitions.isApprox(forceBalancer.getSpringPartitions()));
+    REQUIRE(u.isApprox(forceBalancer.getCurrentDisplacements()));
+  }
 }
 
 TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
