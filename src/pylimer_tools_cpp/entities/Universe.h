@@ -38,7 +38,7 @@ namespace entities {
     Universe& operator=(Universe src);
 
     // initilaization/setters (and removers)
-    void setBoxLengths(const double Lx, const double Ly, const double Lz);
+    void setBoxLengths(const double Lx, const double Ly, const double Lz, bool rescaleAtomCoordinates = false);
     // atoms
     void addAtoms(std::vector<long int> ids,
                   std::vector<int> types,
