@@ -4,6 +4,7 @@
 #include <array>
 #include <cassert>
 #include <string>
+#include "../utils/utilityMacros.h"
 
 namespace pylimer_tools {
 namespace entities {
