@@ -183,6 +183,8 @@ TEST_CASE("MC swap accept and reject work", "[analysis][MEHPForceBalance]")
     Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
     // outputNetwork(net, u, partitions);
     REQUIRE(forceBalancer.swapSlipLinkReversibly(net, u, partitions, 5, 1.));
+    REQUIRE_FALSE(partitions.isApprox(forceBalancer.getSpringPartitions()));
+    REQUIRE_FALSE(u.isApprox(forceBalancer.getCurrentDisplacements()));
   }
 
   SECTION("MC condition rejects as requested")

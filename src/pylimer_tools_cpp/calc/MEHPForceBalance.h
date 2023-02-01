@@ -66,6 +66,7 @@ namespace calc {
         : universe(u)
       {
         this->crosslinkerType = crosslinkerType;
+        this->box = u.getBox();
         // interpret network already to be able to give early results
         ForceBalanceNetwork net;
         ConvertNetwork(net, crosslinkerType, remove2functionalCrosslinkers);
@@ -325,32 +326,18 @@ namespace calc {
        *
        * @param box
        */
-      void deformTo(pylimer_tools::entities::Box box)
+      void deformTo(pylimer_tools::entities::Box newBox)
       {
-        double scalingFactorX = box.getLx() / this->initialConfig.L[0];
-        double scalingFactorY = box.getLy() / this->initialConfig.L[1];
-        double scalingFactorZ = box.getLz() / this->initialConfig.L[2];
-        RUNTIME_EXP_IFN(scalingFactorX > 0.,
-                        "Requiring scaling factor to be > 0.");
-        RUNTIME_EXP_IFN(scalingFactorY > 0.,
-                        "Requiring scaling factor to be > 0.");
-        RUNTIME_EXP_IFN(scalingFactorZ > 0.,
-                        "Requiring scaling factor to be > 0.");
-        this->universe.setBox(box, true);
-        this->initialConfig.L[0] = box.getLx();
-        this->initialConfig.L[1] = box.getLy();
-        this->initialConfig.L[2] = box.getLz();
+        this->box.adjustCoordinatesTo(this->initialConfig.coordinates, newBox);
+        this->box.adjustCoordinatesTo(this->currentDisplacements, newBox);
+        this->box = newBox;
+        this->universe.setBox(newBox, true);
+        this->initialConfig.L[0] = this->box.getLx();
+        this->initialConfig.L[1] = this->box.getLy();
+        this->initialConfig.L[2] = this->box.getLz();
         this->initialConfig.boxHalfs[0] = 0.5 * this->initialConfig.L[0];
         this->initialConfig.boxHalfs[1] = 0.5 * this->initialConfig.L[1];
         this->initialConfig.boxHalfs[2] = 0.5 * this->initialConfig.L[2];
-        for (size_t i = 0; i < this->initialConfig.nrOfLinks; ++i) {
-          this->initialConfig.coordinates[3 * i] *= scalingFactorX;
-          this->initialConfig.coordinates[3 * i + 1] *= scalingFactorY;
-          this->initialConfig.coordinates[3 * i + 2] *= scalingFactorZ;
-          this->currentDisplacements[3 * i] *= scalingFactorX;
-          this->currentDisplacements[3 * i + 1] *= scalingFactorY;
-          this->currentDisplacements[3 * i + 2] *= scalingFactorZ;
-        }
       }
 
       /**
@@ -991,46 +978,6 @@ namespace calc {
         const Eigen::VectorXd& u,
         const Eigen::VectorXd& oneOverSpringPartitions) const;
 
-      template<typename VectorType>
-      void handlePBC(const ForceBalanceNetwork& net,
-                     VectorType& distances) const
-      {
-        // possibly improveable PBC
-        for (size_t j = 0; j < distances.size(); ++j) {
-          int min_iterations = 0;
-          assert(!std::isinf(distances[j]) && !std::isnan(distances[j]));
-          const double distance0 = distances[j];
-          while (distances[j] > net.boxHalfs[j % 3]) {
-            distances[j] -= net.L[j % 3];
-            min_iterations++;
-            if (min_iterations > 50) {
-              throw std::runtime_error(
-                "Too many iterations in PBC at distance index " +
-                std::to_string(j) + ", currently at " +
-                std::to_string(distances[j]) + " from " +
-                std::to_string(distance0) + " in box with halfs " +
-                std::to_string(net.boxHalfs[j % 3]) + " after " +
-                std::to_string(min_iterations) + " iterations");
-            }
-          }
-          int max_iterations = 0;
-          while (distances[j] < -net.boxHalfs[j % 3]) {
-            distances[j] += net.L[j % 3];
-            max_iterations++;
-            if (max_iterations > 50) {
-              throw std::runtime_error(
-                "Too many iterations in PBC at distance index " +
-                std::to_string(j) + ", currently at " +
-                std::to_string(distances[j]) + " from " +
-                std::to_string(distance0) + " in box with halfs " +
-                std::to_string(net.boxHalfs[j % 3]) + " after " +
-                std::to_string(max_iterations) + " iterations (and " +
-                std::to_string(min_iterations) + " before that)");
-            }
-          }
-        }
-      }
-
       /**
        * @brief Get the Link Indices of all neighbours of a specified link
        *
@@ -1263,6 +1210,7 @@ namespace calc {
 
     private:
       pylimer_tools::entities::Universe universe;
+      pylimer_tools::entities::Box box;
       bool is2D = false;
       double kappa = 1.0;
       bool simulationHasRun = false;

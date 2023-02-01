@@ -824,7 +824,7 @@ namespace entities {
           currentPathProduct = 0;
         } else {
           // compute hash
-          currentPathXor = (currentPathXor xor currentVal); 
+          currentPathXor = (currentPathXor xor currentVal);
           currentPathSum += currentVal;
           currentPathProduct *= currentVal;
           // and remember the part of the path
@@ -2052,7 +2052,8 @@ namespace entities {
 
   void Universe::setBoxLengths(const double Lx,
                                const double Ly,
-                               const double Lz)
+                               const double Lz,
+                               bool rescaleAtomCoordinates)
   {
     this->setBox(Box(Lx, Ly, Lz));
   }

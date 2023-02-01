@@ -46,6 +46,21 @@ init_pylimer_bound_entities(py::module_& m)
           currently, only rectangular boxes are supported.
         )pbdoc")
     .def(py::init<const double, const double, const double>())
+    .def("applySimpleShear",
+         &Box::applySimpleShear,
+         R"pbdoc(
+          Apply a simple shear to the box.
+
+          CAUTION:
+            currently, this is not supported for all operations.
+
+          For shear magnitude, you specify the angle :math:`\gamma`.
+
+          For the shearDirection parameter, you can specify `0` for x, `1` for y and `2` for z, respectively.
+          Specify another integer to disable the shear.
+         )pbdoc",
+         py::arg("shearMagnitude"),
+         py::arg("shearDirection") = 0)
     .def("getVolume", &Box::getVolume, R"pbdoc(
             Compute the volume of the box.
 
@@ -255,7 +270,9 @@ init_pylimer_bound_entities(py::module_& m)
     .def("getAtoms", &Molecule::getAtoms, R"pbdoc(
             Returns all atom objects enclosed in this molecule.
             )pbdoc")
-    .def("getAtomsLinedUp", &Molecule::getAtomsLinedUp, R"pbdoc(
+    .def("getAtomsLinedUp",
+         &Molecule::getAtomsLinedUp,
+         R"pbdoc(
             Returns all atom objects enclosed in this molecule based on the connectivity.
 
             This method works only for lone chains, atoms and loops, 
@@ -265,7 +282,7 @@ init_pylimer_bound_entities(py::module_& m)
             Use the `crosslinkType` parameter to force the atoms in a primary loop 
             to start with the cross-link.
             )pbdoc",
-            py::arg("crosslinkType") = 2)
+         py::arg("crosslinkType") = 2)
     .def("getNrOfBonds",
          &Molecule::getNrOfBonds,
          "Counts and returns the number of bonds associated with this "

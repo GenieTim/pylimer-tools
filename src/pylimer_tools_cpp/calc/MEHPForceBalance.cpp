@@ -389,7 +389,7 @@ namespace calc {
       Eigen::VectorXd relevantPartialDistancesA =
         (displacedCoords(relevantSpringPartCoordinateIndexB) -
          displacedCoords(relevantSpringPartCoordinateIndexA));
-      this->handlePBC(net, relevantPartialDistancesA);
+      this->box.handlePBC(relevantPartialDistancesA);
 
       // NOTE: we have many zeros too much, here, actually.
       Eigen::ArrayXd oneOverSumOfSpringPartials = Eigen::ArrayXd::Zero(
@@ -477,7 +477,7 @@ namespace calc {
           }
         }
       }
-      this->handlePBC(net, relevantPartialDistancesA);
+      this->box.handlePBC(relevantPartialDistancesA);
       Eigen::VectorXd partialDistancesOverSpringPartitions =
         (relevantPartialDistancesA.array() * oneOverSpringPartitions.array())
           .matrix();
@@ -842,7 +842,7 @@ namespace calc {
                                      3) +
              displacements.segment(3 * net.springPartIndexB[partialSpringIdx],
                                    3));
-          MEHPForceBalance::handlePBC(net, distance);
+          this->box.handlePBC(distance);
           if (distance.squaredNorm() > tolerance) {
             isActive = true;
             break;
@@ -2135,7 +2135,7 @@ namespace calc {
            displacements.segment(3 * net.springIndexA[springIdx], 3)) -
           (net.coordinates.segment(3 * net.springIndexB[springIdx], 3) +
            displacements.segment(3 * net.springIndexB[springIdx], 3));
-        MEHPForceBalance::handlePBC(net, distance);
+        this->box.handlePBC(distance);
         if (distance.squaredNorm() < tolerance &&
             net.linkIndicesOfSprings[springIdx].size() <= 2) {
           // remove
@@ -3804,7 +3804,7 @@ namespace calc {
                                    u.segment(3 * linkIndexB, 3));
 
       // Possibly improvable PBC
-      this->handlePBC<Eigen::Vector3d>(net, distances);
+      this->box.handlePBC<Eigen::Vector3d>(distances);
 
       if (is2D) {
         distances[2] = 0.0;
@@ -3826,7 +3826,7 @@ namespace calc {
         (displacedCoords(net.springCoordinateIndexB) -
          displacedCoords(net.springCoordinateIndexA));
       assert(springDistances.size() == net.nrOfSprings * 3);
-      this->handlePBC(net, springDistances);
+      this->box.handlePBC(springDistances);
 
       // reset for 2D systems
       if (is2D && net.nrOfSprings > 0) {
@@ -3852,7 +3852,7 @@ namespace calc {
       Eigen::VectorXd partialDistances =
         (displacedCoords(net.springPartCoordinateIndexB) -
          displacedCoords(net.springPartCoordinateIndexA));
-      this->handlePBC(net, partialDistances);
+      this->box.handlePBC(partialDistances);
 
       // reset for 2D systems
       if (this->is2D) {
@@ -4331,7 +4331,7 @@ namespace calc {
       Eigen::VectorXd relevantPartialDistancesA =
         (displacedCoords(net.springPartCoordinateIndexB) -
          displacedCoords(net.springPartCoordinateIndexA));
-      this->handlePBC(net, relevantPartialDistancesA);
+      this->box.handlePBC(relevantPartialDistancesA);
 
       for (size_t partialSpringIdx = 0;
            partialSpringIdx < net.nrOfPartialSprings;

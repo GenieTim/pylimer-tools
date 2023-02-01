@@ -2,6 +2,8 @@
 #define BOX_H
 
 #include <array>
+#include <cassert>
+#include <string>
 
 namespace pylimer_tools {
 namespace entities {
@@ -10,8 +12,11 @@ namespace entities {
   class Box
   {
   private:
-    double Lx, Ly, Lz;
+    double L[3];
+    double boxHalfs[3];
     double xLo, xHi, yLo, yHi, zLo, zHi;
+    double simpleShearMagnitude = 0.0;
+    int shearDirection = -1;
 
   protected:
     double iterateForPlacementIn(double coord, double min, double max) const
@@ -26,12 +31,20 @@ namespace entities {
       return coord;
     }
 
+    void recomputeBoxHalfs()
+    {
+      this->boxHalfs[0] = L[0] * 0.5;
+      this->boxHalfs[1] = L[1] * 0.5;
+      this->boxHalfs[2] = L[2] * 0.5;
+    }
+
   public:
     Box(const double Lx = 0.0, const double Ly = 0.0, const double Lz = 0.0)
     {
-      this->Lx = Lx;
-      this->Ly = Ly;
-      this->Lz = Lz;
+      this->L[0] = Lx;
+      this->L[1] = Ly;
+      this->L[2] = Lz;
+      this->recomputeBoxHalfs();
       this->xLo = 0.0;
       this->xHi = Lx;
       this->yLo = 0.0;
@@ -47,9 +60,10 @@ namespace entities {
         const double zLo,
         const double zHi)
     {
-      this->Lx = xHi - xLo;
-      this->Ly = yHi - yLo;
-      this->Lz = zHi - zLo;
+      this->L[0] = xHi - xLo;
+      this->L[1] = yHi - yLo;
+      this->L[2] = zHi - zLo;
+      this->recomputeBoxHalfs();
       this->xLo = xLo;
       this->xHi = xHi;
       this->yLo = yLo;
@@ -58,11 +72,21 @@ namespace entities {
       this->zHi = zHi;
     }
 
-    double getVolume() const { return this->Lx * this->Ly * this->Lz; }
+    void applySimpleShear(const double shearMagnitude,
+                          int newShearDirection = 0)
+    {
+      this->simpleShearMagnitude = shearMagnitude;
+      this->shearDirection = newShearDirection;
+    }
 
-    double getLx() const { return this->Lx; }
-    double getLy() const { return this->Ly; }
-    double getLz() const { return this->Lz; }
+    double getVolume() const
+    {
+      return this->getLx() * this->getLy() * this->getLz();
+    }
+
+    double getLx() const { return this->L[0]; }
+    double getLy() const { return this->L[1]; }
+    double getLz() const { return this->L[2]; }
 
     double getLowX() const { return this->xLo; }
     double getLowY() const { return this->yLo; }
@@ -71,6 +95,9 @@ namespace entities {
     double getHighX() const { return this->xHi; }
     double getHighY() const { return this->yHi; }
     double getHighZ() const { return this->zHi; }
+
+    double getShearMagnitude() const { return this->simpleShearMagnitude; }
+    int getShearDirection() const { return this->shearDirection; }
 
     std::array<double, 3> placeInBox(std::array<double, 3> coords) const
     {
@@ -81,6 +108,99 @@ namespace entities {
       coords[2] = this->iterateForPlacementIn(
         coords[2], this->getLowZ(), this->getHighZ());
       return coords;
+    }
+
+    template<typename VectorType>
+    void adjustCoordinatesTo(VectorType& coords, const Box& newBox) const
+    {
+      INVALIDARG_EXP_IFN(
+        coords.size() % 3 == 0,
+        "Expect coordinates to be in order x, y, z, repeatedly.");
+      INVALIDARG_EXP_IFN(
+        this->shearDirection < 0 || this->shearDirection > 3,
+        "Cannot yet adjust coordinates from a sheared system.");
+      double scalingFactorX = newBox.getLx() / this->L[0];
+      double scalingFactorY = newBox.getLy() / this->L[1];
+      double scalingFactorZ = newBox.getLz() / this->L[2];
+      RUNTIME_EXP_IFN(
+        scalingFactorX > 0.,
+        "Requiring scaling factor to be > 0, got in x-direction " +
+          std::to_string(scalingFactorX) + ".");
+      RUNTIME_EXP_IFN(
+        scalingFactorY > 0.,
+        "Requiring scaling factor to be > 0, got in y-direction " +
+          std::to_string(scalingFactorY) + ".");
+      RUNTIME_EXP_IFN(
+        scalingFactorZ > 0.,
+        "Requiring scaling factor to be > 0, got in z-direction " +
+          std::to_string(scalingFactorZ) + ".");
+      for (size_t i = 0; i < coords.size() / 3; ++i) {
+        coords[3 * i] *= scalingFactorX;
+        if (newBox.getShearDirection() == 0) {
+          coords[3 * i] +=
+            newBox.getShearMagnitude() * coords[3 * i + 1]; // x' = x + ɣ*y
+        }
+        coords[3 * i + 1] *= scalingFactorY;
+        if (newBox.getShearDirection() == 1) {
+          coords[3 * i + 1] +=
+            newBox.getShearMagnitude() * coords[3 * i + 2]; // y' = y + ɣ*z
+        }
+        coords[3 * i + 2] *= scalingFactorZ;
+        if (newBox.getShearDirection() == 2) {
+          coords[3 * i + 2] +=
+            newBox.getShearMagnitude() * coords[3 * i]; // z' = z + ɣ*x
+        }
+      }
+    }
+
+    template<typename VectorType>
+    void handlePBC(VectorType& distances) const
+    {
+      // possibly improveable PBC
+      for (size_t j = 0; j < distances.size(); ++j) {
+        int min_iterations = 0;
+        int j_mod_3 = j % 3;
+        // scaled coordinates in the initial cubic box
+        if (this->getShearDirection() == j_mod_3) {
+          long int partnerIdx = j + ((j_mod_3 == 2) ? -2 : 1);
+          distances[j] -= this->getShearMagnitude() * distances[partnerIdx];
+        }
+        assert(!std::isinf(distances[j]) && !std::isnan(distances[j]));
+        const double distance0 = distances[j];
+        while (distances[j] > this->boxHalfs[j_mod_3]) {
+          distances[j] -= this->L[j_mod_3];
+          min_iterations++;
+          if (min_iterations > 50) {
+            throw std::runtime_error(
+              "Too many iterations in PBC at distance index " +
+              std::to_string(j) + ", currently at " +
+              std::to_string(distances[j]) + " from " +
+              std::to_string(distance0) + " in box with halfs " +
+              std::to_string(this->boxHalfs[j_mod_3]) + " after " +
+              std::to_string(min_iterations) + " iterations");
+          }
+        }
+        int max_iterations = 0;
+        while (distances[j] < -this->boxHalfs[j_mod_3]) {
+          distances[j] += this->L[j_mod_3];
+          max_iterations++;
+          if (max_iterations > 50) {
+            throw std::runtime_error(
+              "Too many iterations in PBC at distance index " +
+              std::to_string(j) + ", currently at " +
+              std::to_string(distances[j]) + " from " +
+              std::to_string(distance0) + " in box with halfs " +
+              std::to_string(this->boxHalfs[j_mod_3]) + " after " +
+              std::to_string(max_iterations) + " iterations (and " +
+              std::to_string(min_iterations) + " before that)");
+          }
+        }
+        // back to the physical space
+        if (this->getShearDirection() == j_mod_3) {
+          long int partnerIdx = j + ((j_mod_3 == 2) ? -2 : 1);
+          distances[j] += this->getShearMagnitude() * distances[partnerIdx];
+        }
+      }
     }
   };
 } // namespace entities
