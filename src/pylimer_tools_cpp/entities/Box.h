@@ -4,6 +4,7 @@
 #include <array>
 #include <cassert>
 #include <string>
+#include <cmath>
 #include "../utils/utilityMacros.h"
 
 namespace pylimer_tools {

@@ -59,7 +59,8 @@ TEST_CASE("Atoms can calculate distances", "[entity][Atom]")
     REQUIRE(atom1_lefttopback.distanceTo(atom1, &unitBox) == 0.0);
   }
 
-  SECTION("Move to the mean position in box") {
+  SECTION("Move to the mean position in box")
+  {
     pe::Atom atom1 = pe::Atom(0, 0, 0.0, 0.0, 0.0, 0, 0, 0);
     pe::Atom atom2 = pe::Atom(0, 0, 1.0, 1.0, 1.0, 0, 0, 0);
     auto meanPosition_12 = atom1.meanPositionWith(atom2, &unitBox);
@@ -73,6 +74,70 @@ TEST_CASE("Atoms can calculate distances", "[entity][Atom]")
     REQUIRE(meanPosition_13[1] == 0.25);
     REQUIRE(meanPosition_13[2] == 0.25);
   }
+}
+
+TEST_CASE("Box can do PBC computations", "[entity][Box]")
+{
+  pe::Box testBox = pe::Box(0.0, 10.0, 0.0, 10.0, 0.0, 10.0);
+  REQUIRE(testBox.getVolume() == Catch::Approx(10. * 10. * 10.));
+
+  Eigen::Vector3d distances;
+  distances << 10.2, 10.2, 10.2;
+  REQUIRE_NOTHROW(testBox.handlePBC(distances));
+  REQUIRE(distances[0] == Catch::Approx(0.2 - 5.));
+  REQUIRE(distances[1] == Catch::Approx(0.2 - 5.));
+  REQUIRE(distances[2] == Catch::Approx(0.2 - 5.));
+
+  Eigen::VectorXd distances3(9);
+  distances3 << 10.2, 10.2, 10.2, -0.2, -0.2, -0.2, 1.0, 1.0, 1.0;
+  REQUIRE_NOTHROW(testBox.handlePBC(distances3));
+  for (size_t i = 0; i < 3; ++i) {
+    REQUIRE(distances3[i] == Catch::Approx(0.2 - 5.));
+    REQUIRE(distances3[3 + i] == Catch::Approx(-.2 + 5.));
+    REQUIRE(distances3[6 + i] == Catch::Approx(1.));
+  }
+
+  std::vector<double> distances2;
+  REQUIRE_NOTHROW(testBox.handlePBC(distances2));
+  distances2.reserve(3);
+  distances2.push_back(10.2);
+  distances2.push_back(10.2);
+  distances2.push_back(10.2);
+  REQUIRE_NOTHROW(testBox.handlePBC(distances2));
+  REQUIRE(distances2[0] == Catch::Approx(0.2 - 5.));
+  REQUIRE(distances2[1] == Catch::Approx(0.2 - 5.));
+  REQUIRE(distances2[2] == Catch::Approx(0.2 - 5.));
+
+  Eigen::Vector3d distances4;
+  distances4 << 1e100, 0., 0.;
+  REQUIRE_THROWS(testBox.handlePBC(distances4));
+
+  Eigen::Vector3d distances5;
+  distances5 << -1e100, 0., 0.;
+  REQUIRE_THROWS(testBox.handlePBC(distances5));
+}
+
+TEST_CASE("Box can adjust coordinates", "[entity][Box]")
+{
+  pe::Box testBox = pe::Box(10.0, 10.0, 10.0);
+  REQUIRE(testBox.getVolume() == Catch::Approx(10. * 10. * 10.));
+
+  pe::Box testBox2 = pe::Box(20., 5., 5.);
+
+  Eigen::Vector3d distances;
+  distances << 1., 1., 1.;
+
+  testBox.adjustCoordinatesTo(distances, testBox2);
+  REQUIRE(distances[0] == Catch::Approx(2.));
+  REQUIRE(distances[1] == Catch::Approx(0.5));
+  REQUIRE(distances[2] == Catch::Approx(0.5));
+}
+
+TEST_CASE("Box works also after simple shear", "[entity][Box]")
+{
+  pe::Box testBox = pe::Box(0.0, 10.0, 0.0, 10.0, 0.0, 10.0);
+  REQUIRE(testBox.getVolume() == Catch::Approx(10. * 10. * 10.));
+  testBox.applySimpleShear(0.1, 0);
 }
 
 TEST_CASE("Atoms persist state", "[entity][Atom]")
