@@ -1,11 +1,12 @@
 #ifndef BOX_H
 #define BOX_H
 
+#include "../utils/utilityMacros.h"
 #include <array>
 #include <cassert>
-#include <string>
 #include <cmath>
-#include "../utils/utilityMacros.h"
+#include <stdexcept>
+#include <string>
 
 namespace pylimer_tools {
 namespace entities {

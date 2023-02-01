@@ -140,6 +140,18 @@ TEST_CASE("Box works also after simple shear", "[entity][Box]")
   pe::Box testBox = pe::Box(0.0, 10.0, 0.0, 10.0, 0.0, 10.0);
   REQUIRE(testBox.getVolume() == Catch::Approx(10. * 10. * 10.));
   testBox.applySimpleShear(0.1, 0);
+  REQUIRE(testBox.getVolume() == Catch::Approx(10. * 10. * 10.));
+
+  pe::Box undeformedBox = pe::Box(10.0, 10.0, 10.0);
+
+  Eigen::VectorXd testCoords(12);
+  testCoords << 10.2, 10.2, 10.2, -10.2, -10.2, -10.2, 1.0, 1.0, 1.0, -4., -4.,
+    -4.;
+  undeformedBox.adjustCoordinatesTo(testCoords, testBox);
+
+  REQUIRE(testCoords[1] == Catch::Approx(10.2));
+  REQUIRE(testCoords[0] == Catch::Approx(10.2 + 0.1 * 10.2));
+  // TODO: test.
 }
 
 TEST_CASE("Atoms persist state", "[entity][Atom]")
