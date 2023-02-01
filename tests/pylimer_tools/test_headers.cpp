@@ -84,17 +84,19 @@ TEST_CASE("Box can do PBC computations", "[entity][Box]")
   Eigen::Vector3d distances;
   distances << 10.2, 10.2, 10.2;
   REQUIRE_NOTHROW(testBox.handlePBC(distances));
-  REQUIRE(distances[0] == Catch::Approx(0.2 - 5.));
-  REQUIRE(distances[1] == Catch::Approx(0.2 - 5.));
-  REQUIRE(distances[2] == Catch::Approx(0.2 - 5.));
+  REQUIRE(distances[0] == Catch::Approx(10.2 - 10.));
+  REQUIRE(distances[1] == Catch::Approx(10.2 - 10.));
+  REQUIRE(distances[2] == Catch::Approx(10.2 - 10.));
 
-  Eigen::VectorXd distances3(9);
-  distances3 << 10.2, 10.2, 10.2, -0.2, -0.2, -0.2, 1.0, 1.0, 1.0;
+  Eigen::VectorXd distances3(12);
+  distances3 << 10.2, 10.2, 10.2, -10.2, -10.2, -10.2, 1.0, 1.0, 1.0, -4., -4.,
+    -4.;
   REQUIRE_NOTHROW(testBox.handlePBC(distances3));
   for (size_t i = 0; i < 3; ++i) {
-    REQUIRE(distances3[i] == Catch::Approx(0.2 - 5.));
-    REQUIRE(distances3[3 + i] == Catch::Approx(-.2 + 5.));
+    REQUIRE(distances3[i] == Catch::Approx(10.2 - 10.));
+    REQUIRE(distances3[3 + i] == Catch::Approx(-10.2 + 10.));
     REQUIRE(distances3[6 + i] == Catch::Approx(1.));
+    REQUIRE(distances3[9 + i] == Catch::Approx(-4.));
   }
 
   std::vector<double> distances2;
@@ -104,9 +106,9 @@ TEST_CASE("Box can do PBC computations", "[entity][Box]")
   distances2.push_back(10.2);
   distances2.push_back(10.2);
   REQUIRE_NOTHROW(testBox.handlePBC(distances2));
-  REQUIRE(distances2[0] == Catch::Approx(0.2 - 5.));
-  REQUIRE(distances2[1] == Catch::Approx(0.2 - 5.));
-  REQUIRE(distances2[2] == Catch::Approx(0.2 - 5.));
+  REQUIRE(distances2[0] == Catch::Approx(10.2 - 10.));
+  REQUIRE(distances2[1] == Catch::Approx(10.2 - 10.));
+  REQUIRE(distances2[2] == Catch::Approx(10.2 - 10.));
 
   Eigen::Vector3d distances4;
   distances4 << 1e100, 0., 0.;
