@@ -18,6 +18,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Box
    .. autosummary::
    
       ~Box.__init__
+      ~Box.applySimpleShear
       ~Box.getHighX
       ~Box.getHighY
       ~Box.getHighZ
