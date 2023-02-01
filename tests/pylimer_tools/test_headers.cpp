@@ -151,7 +151,15 @@ TEST_CASE("Box works also after simple shear", "[entity][Box]")
 
   REQUIRE(testCoords[1] == Catch::Approx(10.2));
   REQUIRE(testCoords[0] == Catch::Approx(10.2 + 0.1 * 10.2));
-  // TODO: test.
+  
+
+  pe::Box deformedBox2 = pe::Box(10.0, 10.0, 10.0);
+  deformedBox2.applySimpleShear(0.2, 0);
+  testBox.adjustCoordinatesTo(testCoords, deformedBox2);
+  REQUIRE(testCoords[1] == Catch::Approx(10.2));
+  REQUIRE(testCoords[0] == Catch::Approx(10.2 + 0.2 * 10.2));
+
+  
 }
 
 TEST_CASE("Atoms persist state", "[entity][Atom]")

@@ -467,7 +467,8 @@ init_pylimer_bound_entities(py::module_& m)
          "Set the box side lengths.",
          py::arg("Lx"),
          py::arg("Ly"),
-         py::arg("Lz"))
+         py::arg("Lz"),
+         py::arg("rescaleAtoms") = false)
     .def("setBox",
          &Universe::setBox,
          R"pbdoc(
