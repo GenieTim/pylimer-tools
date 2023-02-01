@@ -119,9 +119,7 @@ namespace entities {
       INVALIDARG_EXP_IFN(
         coords.size() % 3 == 0,
         "Expect coordinates to be in order x, y, z, repeatedly.");
-      INVALIDARG_EXP_IFN(
-        this->shearDirection < 0 || this->shearDirection > 3,
-        "Cannot yet adjust coordinates from a sheared system.");
+
       double scalingFactorX = newBox.getLx() / this->L[0];
       double scalingFactorY = newBox.getLy() / this->L[1];
       double scalingFactorZ = newBox.getLz() / this->L[2];
@@ -137,6 +135,26 @@ namespace entities {
         scalingFactorZ > 0.,
         "Requiring scaling factor to be > 0, got in z-direction " +
           std::to_string(scalingFactorZ) + ".");
+
+      // first, scale back to non-sheared.
+      if (this->shearDirection >= 0 && this->shearDirection <= 3) {
+        for (size_t i = 0; i < coords.size() / 3; ++i) {
+          if (this->getShearDirection() == 0) {
+            coords[3 * i] -=
+              this->getShearMagnitude() * coords[3 * i + 1]; // x' = x + ɣ*y
+          }
+          if (this->getShearDirection() == 1) {
+            coords[3 * i + 1] -=
+              this->getShearMagnitude() * coords[3 * i + 2]; // y' = y + ɣ*z
+          }
+          if (this->getShearDirection() == 2) {
+            coords[3 * i + 2] -=
+              this->getShearMagnitude() * coords[3 * i]; // z' = z + ɣ*x
+          }
+        }
+      }
+
+      // actually do the deformation as appropriate
       for (size_t i = 0; i < coords.size() / 3; ++i) {
         coords[3 * i] *= scalingFactorX;
         if (newBox.getShearDirection() == 0) {
