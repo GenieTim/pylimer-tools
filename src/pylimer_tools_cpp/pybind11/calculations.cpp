@@ -169,6 +169,8 @@ init_pylimer_bound_calc(py::module_& m)
                   &mehp::ForceBalanceNetwork::springIndicesOfLinks)
     .def_readonly("linkIndicesOfSprings",
                   &mehp::ForceBalanceNetwork::linkIndicesOfSprings)
+    .def_readonly("nrOfCrosslinkSwapsEndured",
+                  &mehp::ForceBalanceNetwork::nrOfCrosslinkSwapsEndured)
     .def_readonly("springContourLength",
                   &mehp::ForceBalanceNetwork::springsContourLength)
     .def_readonly("oldAtomIds", &mehp::ForceBalanceNetwork::oldAtomIds)
@@ -520,7 +522,7 @@ init_pylimer_bound_calc(py::module_& m)
            mehp::LinkSwappingMode::NO_SWAPPING,
          py::arg("swappingFrequency") = 10,
          py::arg("oneOverSpringPartitionUpperLimit") = 1.0,
-         py::arg("oneOverSpringPartitionUpperLimit2") = 1.0)
+         py::arg("nrOfCrosslinkSwapsAllowedPerSliplink") = -1)
     .def("deformTo",
          &mehp::MEHPForceBalance::deformTo,
          R"pbdoc()pbdoc",
@@ -530,8 +532,10 @@ init_pylimer_bound_calc(py::module_& m)
          R"pbdoc()pbdoc",
          py::arg("linkIdx"),
          py::arg("damping") = 1.0)
-     .def("swapSlipLinksInclXlinks", &mehp::MEHPForceBalance::swapSlipLinksInclXlinks)
-    .def("moveSlipLinksToTheirBestBranch", &mehp::MEHPForceBalance::moveSlipLinksToTheirBestBranch)
+    .def("swapSlipLinksInclXlinks",
+         &mehp::MEHPForceBalance::swapSlipLinksInclXlinks)
+    .def("moveSlipLinksToTheirBestBranch",
+         &mehp::MEHPForceBalance::moveSlipLinksToTheirBestBranch)
     .def("getForceOn",
          &mehp::MEHPForceBalance::getForceOn,
          R"pbdoc()pbdoc",

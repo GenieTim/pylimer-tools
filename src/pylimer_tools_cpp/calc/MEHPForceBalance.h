@@ -109,7 +109,7 @@ namespace calc {
           LinkSwappingMode::NO_SWAPPING,
         const int swappingFrequency = 10,
         const double oneOverSpringPartitionUpperLimit = 1.0,
-        const double oneOverSpringPartitionUpperLimit2 = 1.0);
+        const int nrOfCrosslinkSwapsAllowedPerSliplink = - 1);
 
       /**
        * @brief Compute the spring update residual
@@ -805,7 +805,8 @@ namespace calc {
         ForceBalanceNetwork& net,
         Eigen::VectorXd& u,
         Eigen::VectorXd& springPartitions,
-        double oneOverSpringPartitionUpperLimit);
+        const double oneOverSpringPartitionUpperLimit,
+        const int nrOfCrosslinkSwapsAllowedPerSliplink = -1);
 
       /**
        * @brief Move a slip-link if appropriate to other springs
@@ -815,11 +816,13 @@ namespace calc {
        * @param springPartitions
        * @param oneOverSpringPartitionUpperLimit
        */
-      void moveSlipLinkToItsBestBranch(ForceBalanceNetwork& net,
-                                       Eigen::VectorXd& u,
-                                       Eigen::VectorXd& springPartitions,
-                                       size_t slipLinkIdx,
-                                       double oneOverSpringPartitionUpperLimit);
+      void moveSlipLinkToItsBestBranch(
+        ForceBalanceNetwork& net,
+        Eigen::VectorXd& u,
+        Eigen::VectorXd& springPartitions,
+        size_t slipLinkIdx,
+        const double oneOverSpringPartitionUpperLimit,
+        const int nrOfCrosslinkSwapsAllowedPerSliplink = -1);
 
       /**
        * @brief Loop all springs, swap slip-links on them if they are close
@@ -851,7 +854,8 @@ namespace calc {
         Eigen::VectorXd& u,
         Eigen::VectorXd& springPartitions,
         const size_t partialSpringIdx,
-        const double oneOverSpringPartitionUpperLimit = 1.0);
+        const double oneOverSpringPartitionUpperLimit = 1.0,
+        const int nrOfCrosslinkSwapsAllowedPerSliplink = -1);
 
       long int rotateSlipLinkAroundCrosslink(
         ForceBalanceNetwork& net,

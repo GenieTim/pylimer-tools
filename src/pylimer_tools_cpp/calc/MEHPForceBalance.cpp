@@ -49,7 +49,7 @@ namespace calc {
       LinkSwappingMode allowSlipLinksToPassEachOther,
       const int swappingFrequency,
       const double oneOverSpringPartitionUpperLimit,
-      const double oneOverSpringPartitionUpperLimit2)
+      const int nrOfCrosslinkSwapsAllowedPerSliplink)
     {
       // INVALIDARG_EXP_IFN(
       //   shouldRemoveInactiveCrosslinks == false &&
@@ -104,9 +104,7 @@ namespace calc {
                 << " while simplification mode is " << simplificationMode
                 << std::endl;
       std::cout << "Using oneOverSpringPartitionUpperLimit = "
-                << oneOverSpringPartitionUpperLimit
-                << " and oneOverSpringPartitionUpperLimit2 = "
-                << oneOverSpringPartitionUpperLimit2 << std::endl;
+                << oneOverSpringPartitionUpperLimit;
       double currentResidual = 0.0;
       double intermediateResidual = 0.0;
       size_t iterationsDone = 0;
@@ -125,7 +123,11 @@ namespace calc {
             } else if (allowSlipLinksToPassEachOther ==
                        LinkSwappingMode::ALL_MC) {
               this->moveSlipLinksToTheirBestBranch(
-                net, u, springPartitions, oneOverSpringPartitionUpperLimit);
+                net,
+                u,
+                springPartitions,
+                oneOverSpringPartitionUpperLimit,
+                nrOfCrosslinkSwapsAllowedPerSliplink);
             } else {
               throw std::invalid_argument(
                 "This swapping mode is currently not supported.");
@@ -154,7 +156,7 @@ namespace calc {
                                           springPartitions,
                                           oneOverSpringPartitions,
                                           link_idx,
-                                          oneOverSpringPartitionUpperLimit2,
+                                          oneOverSpringPartitionUpperLimit,
                                           allowSlipLinksToPassEachOther);
             double displacementDone =
               this->displaceToMeanPosition(net,
@@ -1501,6 +1503,9 @@ namespace calc {
         net.nrOfNodes -= 1;
         net.oldAtomIdToSpringIndex.erase(net.oldAtomIds[linkIdx]);
         pylimer_tools::utils::removeRow(net.oldAtomIds, linkIdx);
+      } else {
+        pylimer_tools::utils::removeRow(net.nrOfCrosslinkSwapsEndured,
+                                        linkIdx - net.nrOfNodes);
       }
       net.nrOfLinks -= 1;
       pylimer_tools::utils::removeRow(net.linkIsSliplink, linkIdx);
@@ -2646,7 +2651,8 @@ namespace calc {
       ForceBalanceNetwork& net,
       Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions,
-      double oneOverSpringPartitionUpperLimit)
+      const double oneOverSpringPartitionUpperLimit,
+      const int nrOfCrosslinkSwapsAllowedPerSliplink)
     {
       for (size_t sliplinkIdx = net.nrOfNodes; sliplinkIdx < net.nrOfLinks;
            ++sliplinkIdx) {
@@ -2657,7 +2663,6 @@ namespace calc {
         this->moveSlipLinkToItsBestBranch(net,
                                           u,
                                           springPartitions,
-
                                           sliplinkIdx,
                                           oneOverSpringPartitionUpperLimit);
         // this->validateNetwork(net, u, springPartitions);
@@ -2678,7 +2683,8 @@ namespace calc {
       Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions,
       size_t slipLinkIdx,
-      double oneOverSpringPartitionUpperLimit)
+      const double oneOverSpringPartitionUpperLimit,
+      const int nrOfCrosslinkSwapsAllowedPerSliplink)
     {
       INVALIDARG_EXP_IFN(net.linkIsSliplink[slipLinkIdx],
                          "Passed slip-link must be one.");
@@ -2707,22 +2713,23 @@ namespace calc {
             // check whether swap is needed in either direction
             // swap if yes
             if (springPartitions[partitionBeforeIdx] <= swappableCutoff) {
-              didSwap =
-                this->swapSlipLinkReversibly(net,
-                                             u,
-                                             springPartitions,
-
-                                             partitionBeforeIdx,
-                                             oneOverSpringPartitionUpperLimit);
+              didSwap = this->swapSlipLinkReversibly(
+                net,
+                u,
+                springPartitions,
+                partitionBeforeIdx,
+                oneOverSpringPartitionUpperLimit,
+                nrOfCrosslinkSwapsAllowedPerSliplink);
             }
             if (springPartitions[partitionAfterIdx] <= swappableCutoff &&
                 !didSwap) {
-              didSwap =
-                this->swapSlipLinkReversibly(net,
-                                             u,
-                                             springPartitions,
-                                             partitionAfterIdx,
-                                             oneOverSpringPartitionUpperLimit);
+              didSwap = this->swapSlipLinkReversibly(
+                net,
+                u,
+                springPartitions,
+                partitionAfterIdx,
+                oneOverSpringPartitionUpperLimit,
+                nrOfCrosslinkSwapsAllowedPerSliplink);
             }
           }
         }
@@ -2744,8 +2751,14 @@ namespace calc {
       Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions,
       const size_t partialSpringIdx,
-      const double oneOverSpringPartitionUpperLimit)
+      const double oneOverSpringPartitionUpperLimit,
+      const int nrOfCrosslinkSwapsAllowedPerSliplink)
     {
+      INVALIDARG_EXP_IFN(partialSpringIdx < net.nrOfPartialSprings,
+                         "Partial spring index out of range: got " +
+                           std::to_string(partialSpringIdx) + " for " +
+                           std::to_string(net.nrOfPartialSprings) +
+                           " partial springs.");
       size_t partnerA = net.springPartIndexA[partialSpringIdx];
       size_t partnerB = net.springPartIndexB[partialSpringIdx];
       INVALIDARG_EXP_IFN(net.linkIsSliplink[partnerA] ||
@@ -2759,12 +2772,24 @@ namespace calc {
       bool involvesCrosslink =
         !(net.linkIsSliplink[partnerA] && net.linkIsSliplink[partnerB]);
       if (involvesCrosslink) {
-        return this->swapSlipLinkWithXlinkReversibly(
-          net,
-          u,
-          springPartitions,
-          partialSpringIdx,
-          oneOverSpringPartitionUpperLimit);
+        // first check if allowed.
+        size_t indexOfSliplink =
+          net.linkIsSliplink[partnerA] ? partnerA : partnerB;
+        if ((nrOfCrosslinkSwapsAllowedPerSliplink < 0) ||
+            (net.nrOfCrosslinkSwapsEndured[indexOfSliplink - net.nrOfNodes] <
+             nrOfCrosslinkSwapsAllowedPerSliplink)) {
+          bool didSwap = this->swapSlipLinkWithXlinkReversibly(
+            net,
+            u,
+            springPartitions,
+            partialSpringIdx,
+            oneOverSpringPartitionUpperLimit);
+          if (didSwap) {
+            net.nrOfCrosslinkSwapsEndured[indexOfSliplink - net.nrOfNodes] += 1;
+          }
+          return didSwap;
+        }
+        return false;
       } else {
         return this->swapSlipLinksReversibly(net,
                                              u,
@@ -2979,7 +3004,7 @@ namespace calc {
         }
       }
 
-      return false;
+      return !isBackToInitialSpring; //(residualBefore < residualAfter);
     }
 
     /**
@@ -3965,6 +3990,8 @@ namespace calc {
       // but first, indicate the resize
       this->initialConfig.springIndicesOfLinks.reserve(
         this->initialConfig.nrOfLinks);
+      this->initialConfig.nrOfCrosslinkSwapsEndured.conservativeResize(
+        this->initialConfig.nrOfLinks - this->initialConfig.nrOfNodes);
       this->currentDisplacements.conservativeResize(
         3 * this->initialConfig.nrOfLinks);
       this->currentSpringPartitionsVec.conservativeResize(
@@ -3995,6 +4022,9 @@ namespace calc {
         this->initialConfig.coordinates[3 * currentNrOfLinks + 3 * i + 2] =
           z[i];
         this->initialConfig.linkIsSliplink[currentNrOfLinks + i] = true;
+        this->initialConfig
+          .nrOfCrosslinkSwapsEndured[currentNrOfLinks + i -
+                                     this->initialConfig.nrOfNodes] = 0;
         std::vector<size_t> springIndices{ strandIdx1[i], strandIdx2[i] };
         std::vector<size_t> springIndicesOfLink =
           (strandIdx1[i] == strandIdx2[i])
@@ -4613,6 +4643,7 @@ namespace calc {
       net.nrOfPartialSprings = nrOfSprings;
       net.nrOfSpringsWithPartition = 0;
       net.coordinates = Eigen::VectorXd::Zero(3 * net.nrOfLinks);
+      net.nrOfCrosslinkSwapsEndured = Eigen::ArrayXi::Zero(0);
       net.oldAtomIds = Eigen::ArrayXi::Zero(net.nrOfLinks);
       net.linkIsSliplink = ArrayXb::Constant(net.nrOfLinks, false);
       net.springIndicesOfLinks.reserve(net.nrOfLinks);
@@ -4774,6 +4805,9 @@ namespace calc {
                         " for " + std::to_string(net.nrOfSprings) +
                         " springs.");
       RUNTIME_EXP_IFN(net.linkIsSliplink.size() == net.nrOfLinks,
+                      "Invalid size of link is sliplink");
+      RUNTIME_EXP_IFN(net.nrOfCrosslinkSwapsEndured.size() ==
+                        net.nrOfLinks - net.nrOfNodes,
                       "Invalid size of link is sliplink");
       RUNTIME_EXP_IFN(
         net.linkIsSliplink.count() == (net.nrOfLinks - net.nrOfNodes),
