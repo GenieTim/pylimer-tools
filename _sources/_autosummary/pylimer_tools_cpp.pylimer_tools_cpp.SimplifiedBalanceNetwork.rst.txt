@@ -33,6 +33,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.SimplifiedBalanceNetwork
       ~SimplifiedBalanceNetwork.linkIsSliplink
       ~SimplifiedBalanceNetwork.localToGlobalSpringIndex
       ~SimplifiedBalanceNetwork.nrOfCrossLinks
+      ~SimplifiedBalanceNetwork.nrOfCrosslinkSwapsEndured
       ~SimplifiedBalanceNetwork.nrOfLinks
       ~SimplifiedBalanceNetwork.nrOfPartialSprings
       ~SimplifiedBalanceNetwork.nrOfSprings
