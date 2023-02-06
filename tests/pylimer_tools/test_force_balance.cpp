@@ -207,6 +207,77 @@ TEST_CASE("MC swap accept and reject work", "[analysis][MEHPForceBalance]")
   }
 }
 
+TEST_CASE("MC swap accept and reject work with cross-links",
+          "[analysis][MEHPForceBalance]")
+{
+  double L = 42.819955007276754;
+  pe::Universe universe = pe::Universe(L, L, L);
+  /**
+   * Connectivity:
+   *
+   * 1-(7)-2
+   *
+   * 3-(8)-4-(9)-5
+   *      (10)
+   *       6
+   */
+  universe.addAtoms({ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 },
+                    { 2, 2, 2, 2, 2, 2, 1, 1, 1, 1 },
+                    { 10., 20., 5., 10., 15., 20., 0., 0., 0., 0. },
+                    { 10., 20., 5., 5., 15., 5., 0., 0., 0., 0. },
+                    { 0., 0., 0., 0., 0., 0., 0., 0., 0., 0. },
+                    { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+                    { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 },
+                    { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 });
+  universe.addBonds({ 1, 7, 3, 8, 4, 9, 4, 10 }, { 7, 2, 8, 4, 9, 5, 10, 6 });
+
+  pcm::MEHPForceBalance forceBalancer = pcm::MEHPForceBalance(universe, 2);
+  forceBalancer.setSpringContourLengths(Eigen::VectorXd::Constant(4, 30.));
+  pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
+  CHECK(net.nrOfPartialSprings == net.nrOfSprings);
+  CHECK(net.nrOfSprings == 4);
+
+  SECTION("MC condition accepts as requested")
+  {
+    forceBalancer.addSlipLinks(
+      { 0 }, { 1 }, { 10. }, { 4.9 }, { 0. }, { 0.5 }, { 0.966667 });
+    net = forceBalancer.getNetwork();
+    CHECK(net.nrOfPartialSprings != net.nrOfSprings);
+    CHECK(net.nrOfSprings == 4);
+    CHECK(net.nrOfPartialSprings == 6);
+    CHECK(net.nrOfCrosslinkSwapsEndured[0] == 0);
+    Eigen::VectorXd u = forceBalancer.getCurrentDisplacements();
+    Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
+    CHECK(net.linkIndicesOfSprings[1].size() == 3);
+    outputNetwork(net, u, partitions);
+    CHECK_FALSE(forceBalancer.swapSlipLinkReversibly(net, u, partitions, 5, 1., 0));
+    CHECK(forceBalancer.swapSlipLinkReversibly(net, u, partitions, 5, 1., 5));
+    // check that the connectivity around the cross-link changed
+    outputNetwork(net, u, partitions);
+    CHECK(net.linkIndicesOfSprings[1].size() == 2);
+    CHECK(net.nrOfCrosslinkSwapsEndured[0] == 1);
+  }
+
+  SECTION("MC condition rejects as requested")
+  {
+    forceBalancer.addSlipLinks(
+      { 0 }, { 2 }, { 10. }, { 4.9 }, { 0. }, { 0.5 }, { 0.966667 });
+    net = forceBalancer.getNetwork();
+    CHECK(net.nrOfPartialSprings != net.nrOfSprings);
+    CHECK(net.nrOfSprings == 4);
+    CHECK(net.nrOfPartialSprings == 6);
+    Eigen::VectorXd u = forceBalancer.getCurrentDisplacements();
+    Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
+    outputNetwork(net, u, partitions);
+    REQUIRE_FALSE(
+      forceBalancer.swapSlipLinkReversibly(net, u, partitions, 4, 1.));
+    CHECK(net.nrOfCrosslinkSwapsEndured[0] == 0);
+    // ideally, we could check that the values stayed the same, but they
+    // probably did not as of the current implementation. at least we can check
+    // that the configuration stayed the same
+  }
+}
+
 TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
 {
   return;

@@ -79,6 +79,7 @@ namespace calc {
       Eigen::ArrayXi springPartCoordinateIndexB;
       Eigen::ArrayXi springPartIndexA;
       Eigen::ArrayXi springPartIndexB;
+      Eigen::ArrayXi nrOfCrosslinkSwapsEndured;
 
       // old stuff used for conversion. Does not include slip-links
       Eigen::ArrayXi springCoordinateIndexA;
