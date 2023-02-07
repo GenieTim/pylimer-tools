@@ -53,18 +53,83 @@ TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
 
 TEST_CASE("Vector Rows can be removed", "[Eigen]")
 {
-  Eigen::VectorXi testVec(11);
-  testVec = Eigen::VectorXi::LinSpaced(11, 0, 10);
-  CHECK(testVec[4] == 4);
-  pu::removeRow(testVec, 2);
-  CHECK(testVec[4] == 5);
-  CHECK(testVec.size() == 11 - 1);
-  pu::removeRow(testVec, 8);
-  CHECK(testVec.size() == 11 - 2);
-  CHECK(testVec[4] == 5);
-  CHECK_THROWS(pu::removeRow(testVec, 10));
+  SECTION("VectorXi")
+  {
+    Eigen::VectorXi testVec(11);
+    testVec = Eigen::VectorXi::LinSpaced(11, 0, 10);
+    CHECK(testVec[4] == 4);
+    pu::removeRow(testVec, 2);
+    CHECK(testVec[4] == 5);
+    CHECK(testVec.size() == 11 - 1);
+    pu::removeRow(testVec, 8);
+    CHECK(testVec.size() == 11 - 2);
+    CHECK(testVec[4] == 5);
+    CHECK_THROWS(pu::removeRow(testVec, 10));
 
-  pu::removeRows(testVec, 0, 2);
-  CHECK(testVec.size() == 11 - 2 - 2);
-  CHECK(testVec[4] == 7);
+    pu::removeRows(testVec, 0, 2);
+    CHECK(testVec.size() == 11 - 2 - 2);
+    CHECK(testVec[4] == 7);
+  }
+
+  // same for VectorXd
+  SECTION("VectorXd")
+  {
+    Eigen::VectorXd testVec(11);
+    testVec = Eigen::VectorXd::LinSpaced(11, 0, 10);
+    CHECK(testVec[4] == 4.);
+    pu::removeRow(testVec, 2);
+    CHECK(testVec[4] == 5.);
+    CHECK(testVec.size() == 11 - 1);
+    pu::removeRow(testVec, 8);
+    CHECK(testVec.size() == 11 - 2);
+    CHECK(testVec[4] == 5.);
+    CHECK_THROWS(pu::removeRow(testVec, 10));
+
+    pu::removeRows(testVec, 0, 2);
+    CHECK(testVec.size() == 11 - 2 - 2);
+    CHECK(testVec[4] == 7.);
+  }
+
+  // and for array xi
+  SECTION("ArrayXi")
+  {
+    Eigen::ArrayXi testVec(11);
+    testVec = Eigen::VectorXi::LinSpaced(11, 0, 10);
+    CHECK(testVec[4] == 4);
+    pu::removeRow(testVec, 2);
+    CHECK(testVec[4] == 5);
+    CHECK(testVec.size() == 11 - 1);
+    pu::removeRow(testVec, 8);
+    CHECK(testVec.size() == 11 - 2);
+    CHECK(testVec[4] == 5);
+    CHECK_THROWS(pu::removeRow(testVec, 10));
+
+    pu::removeRows(testVec, 0, 2);
+    CHECK(testVec.size() == 11 - 2 - 2);
+    CHECK(testVec[4] == 7);
+  }
+}
+
+TEST_CASE("Elements can be found and conditionally added", "[VectorUtils]")
+{
+  std::vector<int> testVec;
+  testVec.push_back(1);
+  testVec.push_back(10000);
+  testVec.push_back(99);
+  testVec.push_back(-6173800);
+
+  CHECK(pu::last(testVec) == -6173800);
+
+  for (int val : testVec) {
+    CHECK(pu::contains(testVec, val));
+  }
+  CHECK_FALSE(pu::contains(testVec, 100));
+
+  CHECK(testVec.size() == 4);
+  pu::addIfNotContained(testVec, 1);
+  CHECK(testVec.size() == 4);
+  pu::addIfNotContained(testVec, 100);
+  CHECK(testVec.size() == 5);
+  CHECK(pu::contains(testVec, 100));
+  CHECK(pu::last(testVec) == 100);
 }
