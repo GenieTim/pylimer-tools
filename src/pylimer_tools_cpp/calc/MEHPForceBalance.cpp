@@ -2664,7 +2664,8 @@ namespace calc {
                                           u,
                                           springPartitions,
                                           sliplinkIdx,
-                                          oneOverSpringPartitionUpperLimit);
+                                          oneOverSpringPartitionUpperLimit,
+                                          nrOfCrosslinkSwapsAllowedPerSliplink);
         // this->validateNetwork(net, u, springPartitions);
       }
       this->validateNetwork(net, u, springPartitions);
