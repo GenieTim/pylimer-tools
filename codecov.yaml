@@ -7,5 +7,5 @@ codecov:
   #   after_n_builds: 2
   #   wait_for_ci: yes
   
-fixes:
-  - "/home/runner/work/pylimer-tools/pylimer-tools/::/"
+# fixes:
+#   - "/home/runner/work/pylimer-tools/pylimer-tools/::/"
