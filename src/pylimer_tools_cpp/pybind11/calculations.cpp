@@ -565,6 +565,19 @@ init_pylimer_bound_calc(py::module_& m)
          R"pbdoc()pbdoc",
          py::arg("network"),
          py::arg("linkIdx"))
+    .def("getNeighbourLinkIndices",
+         &mehp::MEHPForceBalance::getNeighbourLinkIndices,
+         R"pbdoc()pbdoc",
+         py::arg("network"),
+         py::arg("linkIdx"))
+     .def("evaluateDistanceBetween",
+          &mehp::MEHPForceBalance::evaluateDistanceBetween,
+          R"pbdoc()pbdoc",
+         py::arg("network"),
+         py::arg("displacements"),
+         py::arg("linkIndexA"),
+         py::arg("linkIndexB"),
+         py::arg("is2D") = false)
     // .def("getForceEvaluator", &mehp::MEHPForceBalance::getForceEvaluator,
     // R"pbdoc(
     //      Query the currently used force evaluator.
