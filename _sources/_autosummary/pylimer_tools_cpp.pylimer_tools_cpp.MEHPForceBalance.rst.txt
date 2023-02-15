@@ -21,6 +21,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance
       ~MEHPForceBalance.addSlipLinks
       ~MEHPForceBalance.addSliplinksBasedOnCycles
       ~MEHPForceBalance.deformTo
+      ~MEHPForceBalance.evaluateDistanceBetween
       ~MEHPForceBalance.getAverageSpringLength
       ~MEHPForceBalance.getCrosslinkerVerse
       ~MEHPForceBalance.getDefaultNrOfChains
@@ -32,6 +33,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance
       ~MEHPForceBalance.getForceOn
       ~MEHPForceBalance.getGammaFactor
       ~MEHPForceBalance.getIdsOfActiveNodes
+      ~MEHPForceBalance.getNeighbourLinkIndices
       ~MEHPForceBalance.getNrOfActiveNodes
       ~MEHPForceBalance.getNrOfActivePartialSprings
       ~MEHPForceBalance.getNrOfActiveSprings
