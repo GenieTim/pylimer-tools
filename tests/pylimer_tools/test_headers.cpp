@@ -117,6 +117,23 @@ TEST_CASE("Box can do PBC computations", "[entity][Box]")
   Eigen::Vector3d distances5;
   distances5 << -1e100, 0., 0.;
   REQUIRE_THROWS(testBox.handlePBC(distances5));
+
+  Eigen::Vector3d distances6;
+  distances6 << 5.0, 5.0, 5.0;
+  testBox.applySimpleShear(0.1, 2);
+  REQUIRE_NOTHROW(testBox.handlePBC(distances6));
+  REQUIRE(distances6[0] == Catch::Approx(5.));
+  REQUIRE(distances6[1] == Catch::Approx(5.));
+  REQUIRE(distances6[2] == Catch::Approx(5.));
+
+  Eigen::Vector3d distances7;
+  distances7 << 73.7435, 0.0657623, -5.26946;
+  pe::Box testBox2 = pe::Box(75.8649, 75.8649, 75.8649);
+  testBox2.applySimpleShear(-0.1, 2);
+  REQUIRE_NOTHROW(testBox2.handlePBC(distances7));
+  REQUIRE(distances7[0] == Catch::Approx(-2.12143).epsilon(0.001));
+  REQUIRE(distances7[1] == Catch::Approx(0.0657623).epsilon(0.001));
+  REQUIRE(distances7[2] == Catch::Approx(2.31703).epsilon(0.001));
 }
 
 TEST_CASE("Box can adjust coordinates", "[entity][Box]")
@@ -151,7 +168,6 @@ TEST_CASE("Box works also after simple shear", "[entity][Box]")
 
   REQUIRE(testCoords[1] == Catch::Approx(10.2));
   REQUIRE(testCoords[0] == Catch::Approx(10.2 + 0.1 * 10.2));
-  
 
   pe::Box deformedBox2 = pe::Box(10.0, 10.0, 10.0);
   deformedBox2.applySimpleShear(0.2, 0);
