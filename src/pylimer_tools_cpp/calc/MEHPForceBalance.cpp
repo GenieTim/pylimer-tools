@@ -127,7 +127,17 @@ namespace calc {
                 u,
                 springPartitions,
                 oneOverSpringPartitionUpperLimit,
-                nrOfCrosslinkSwapsAllowedPerSliplink);
+                nrOfCrosslinkSwapsAllowedPerSliplink,
+                false);
+            } else if (allowSlipLinksToPassEachOther ==
+                       LinkSwappingMode::ALL_MC_CYCLE) {
+              this->moveSlipLinksToTheirBestBranch(
+                net,
+                u,
+                springPartitions,
+                oneOverSpringPartitionUpperLimit,
+                nrOfCrosslinkSwapsAllowedPerSliplink,
+                true);
             } else {
               throw std::invalid_argument(
                 "This swapping mode is currently not supported.");
@@ -1134,10 +1144,33 @@ namespace calc {
       return nrOfSlipLinksPlaced;
     }
 
+    /**
+     * @brief Find cycles (loops) and set slip-links based on those
+     *
+     * @param maxLoopLength
+     * @return size_t
+     */
     size_t MEHPForceBalance::addSliplinksBasedOnCycles(const int maxLoopLength)
     {
       std::vector<std::vector<long int>> loops =
         this->universe.findLoops(this->crosslinkerType, maxLoopLength, false);
+      std::vector<std::vector<size_t>> reducedLoops;
+      reducedLoops.reserve(loops.size());
+      for (std::vector<long int> loop : loops) {
+        std::set<size_t> reducedLoop;
+        for (size_t i = 0; i < loop.size(); ++i) {
+          if (this->universe.getPropertyValue<long int>("type", loop[i]) !=
+              this->crosslinkerType) {
+            // set takes care of duplicates, yet this is not efficient at all.
+            reducedLoop.insert(
+              this->initialConfig.oldAtomIdToSpringIndex
+                [this->universe.getPropertyValue<long int>("id", loop[i])]);
+          }
+        }
+        std::vector<size_t> reducedLoopVec(reducedLoop.begin(),
+                                           reducedLoop.end());
+        reducedLoops.push_back(reducedLoopVec);
+      }
 
       size_t estimateOfNrOfSliplinks =
         loops.size() * loops.size() *
@@ -1179,9 +1212,12 @@ namespace calc {
       slipLinkStrandAlpha.reserve(estimateOfNrOfSliplinks);
       std::vector<double> slipLinkStrandBeta;
       slipLinkStrandBeta.reserve(estimateOfNrOfSliplinks);
+      std::vector<std::vector<size_t>> slipLinksLoops;
+      slipLinksLoops.reserve(estimateOfNrOfSliplinks);
 
       for (size_t i = 0; i < loops.size(); ++i) {
         // TODO: instead of the N^2 loop, might want to try some filter at least
+        // also, we ignore all self-entanglements of one loop with itself.
         for (size_t j = i + 1; j < loops.size(); ++j) {
           std::vector<pylimer_tools::entities::LoopIntersectionInfo>
             intersections =
@@ -1190,7 +1226,6 @@ namespace calc {
                intersections) {
             // TODO: this is yet the most naïve way to add these.
             // ideally, we would also check the back-and-forth, etc.
-            // TODO: remember the loops these slip-links are allowed to move on
             slipLinkXs.push_back(intersection.intersectionPoint[0]);
             slipLinkYs.push_back(intersection.intersectionPoint[1]);
             slipLinkZs.push_back(intersection.intersectionPoint[2]);
@@ -1209,6 +1244,8 @@ namespace calc {
               static_cast<double>(
                 atomIdxInStrand[intersection.involvedAtoms[3].getId()]) /
               this->initialConfig.meanSpringContourLength);
+            std::vector<size_t> localLoops = { i, j };
+            slipLinksLoops.push_back(localLoops);
           }
         }
       }
@@ -1226,6 +1263,8 @@ namespace calc {
                          slipLinkZs,
                          slipLinkStrandAlpha,
                          slipLinkStrandBeta,
+                         reducedLoops,
+                         slipLinksLoops,
                          false);
       return slipLinkStrandA.size();
     }
@@ -1360,6 +1399,18 @@ namespace calc {
           assert(net.springIndicesOfLinks[linkIdx][i] != springIdx);
           if (net.springIndicesOfLinks[linkIdx][i] > springIdx) {
             net.springIndicesOfLinks[linkIdx][i] -= 1;
+          }
+        }
+      }
+
+      // then, renumber the loops
+      for (size_t loopIdx = 0; loopIdx < net.loops.size(); ++loopIdx) {
+        for (size_t i = 0; i < net.loops[loopIdx].size(); ++i) {
+          if (net.loops[loopIdx][i] == springIdx) {
+            net.loops[loopIdx].erase(net.loops[loopIdx].begin() + i);
+          }
+          if (net.loops[loopIdx][i] > springIdx) {
+            net.loops[loopIdx][i] -= 1;
           }
         }
       }
@@ -1506,6 +1557,7 @@ namespace calc {
       } else {
         pylimer_tools::utils::removeRow(net.nrOfCrosslinkSwapsEndured,
                                         linkIdx - net.nrOfNodes);
+        net.loopsOfSliplink.erase(net.loopsOfSliplink.begin() + linkIdx);
       }
       net.nrOfLinks -= 1;
       pylimer_tools::utils::removeRow(net.linkIsSliplink, linkIdx);
@@ -2019,6 +2071,19 @@ namespace calc {
         }
       }
 
+      // then, renumber the loops
+      for (size_t loopIdx = 0; loopIdx < net.loops.size(); ++loopIdx) {
+        for (size_t i = 0; i < net.loops[loopIdx].size(); ++i) {
+          if (net.loops[loopIdx][i] == removedSpringIdx) {
+            net.loops[loopIdx].erase(net.loops[loopIdx].begin() + i);
+          }
+          if (net.loops[loopIdx][i] > removedSpringIdx) {
+            net.loops[loopIdx][i] -= 1;
+          }
+        }
+      }
+
+      // and the partial springs
       for (size_t i = 0; i < net.partialToFullSpringIndex.size(); ++i) {
         RUNTIME_EXP_IFN(net.partialToFullSpringIndex[i] != removedSpringIdx,
                         "");
@@ -2652,7 +2717,8 @@ namespace calc {
       Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions,
       const double oneOverSpringPartitionUpperLimit,
-      const int nrOfCrosslinkSwapsAllowedPerSliplink)
+      const int nrOfCrosslinkSwapsAllowedPerSliplink,
+      const bool respectLoops)
     {
       for (size_t sliplinkIdx = net.nrOfNodes; sliplinkIdx < net.nrOfLinks;
            ++sliplinkIdx) {
@@ -2665,7 +2731,8 @@ namespace calc {
                                           springPartitions,
                                           sliplinkIdx,
                                           oneOverSpringPartitionUpperLimit,
-                                          nrOfCrosslinkSwapsAllowedPerSliplink);
+                                          nrOfCrosslinkSwapsAllowedPerSliplink,
+                                          respectLoops);
         // this->validateNetwork(net, u, springPartitions);
       }
       this->validateNetwork(net, u, springPartitions);
@@ -2685,7 +2752,8 @@ namespace calc {
       Eigen::VectorXd& springPartitions,
       size_t slipLinkIdx,
       const double oneOverSpringPartitionUpperLimit,
-      const int nrOfCrosslinkSwapsAllowedPerSliplink)
+      const int nrOfCrosslinkSwapsAllowedPerSliplink,
+      const bool respectLoops)
     {
       INVALIDARG_EXP_IFN(net.linkIsSliplink[slipLinkIdx],
                          "Passed slip-link must be one.");
@@ -2720,7 +2788,8 @@ namespace calc {
                 springPartitions,
                 partitionBeforeIdx,
                 oneOverSpringPartitionUpperLimit,
-                nrOfCrosslinkSwapsAllowedPerSliplink);
+                nrOfCrosslinkSwapsAllowedPerSliplink,
+                respectLoops);
             }
             if (springPartitions[partitionAfterIdx] <= swappableCutoff &&
                 !didSwap) {
@@ -2730,7 +2799,8 @@ namespace calc {
                 springPartitions,
                 partitionAfterIdx,
                 oneOverSpringPartitionUpperLimit,
-                nrOfCrosslinkSwapsAllowedPerSliplink);
+                nrOfCrosslinkSwapsAllowedPerSliplink,
+                respectLoops);
             }
           }
         }
@@ -2753,7 +2823,8 @@ namespace calc {
       Eigen::VectorXd& springPartitions,
       const size_t partialSpringIdx,
       const double oneOverSpringPartitionUpperLimit,
-      const int nrOfCrosslinkSwapsAllowedPerSliplink)
+      const int nrOfCrosslinkSwapsAllowedPerSliplink,
+      const bool respectLoops)
     {
       INVALIDARG_EXP_IFN(partialSpringIdx < net.nrOfPartialSprings,
                          "Partial spring index out of range: got " +
@@ -2784,7 +2855,8 @@ namespace calc {
             u,
             springPartitions,
             partialSpringIdx,
-            oneOverSpringPartitionUpperLimit);
+            oneOverSpringPartitionUpperLimit,
+            respectLoops);
           if (didSwap) {
             net.nrOfCrosslinkSwapsEndured[indexOfSliplink - net.nrOfNodes] += 1;
           }
@@ -2815,7 +2887,8 @@ namespace calc {
       Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions,
       const size_t partialSpringIdx,
-      const double oneOverSpringPartitionUpperLimit)
+      const double oneOverSpringPartitionUpperLimit,
+      const bool respectLoops)
     {
       size_t partnerA = net.springPartIndexA[partialSpringIdx];
       size_t partnerB = net.springPartIndexB[partialSpringIdx];
@@ -2907,7 +2980,8 @@ namespace calc {
                                             u,
                                             springPartitions,
                                             partialSpringIdx,
-                                            oneOverSpringPartitionUpperLimit);
+                                            oneOverSpringPartitionUpperLimit,
+                                            respectLoops);
       if (newPartialSpringIdx < 0) {
         return false;
       }
@@ -2947,7 +3021,8 @@ namespace calc {
                                               u,
                                               springPartitions,
                                               newPartialSpringIdx,
-                                              oneOverSpringPartitionUpperLimit);
+                                              oneOverSpringPartitionUpperLimit,
+                                              respectLoops);
         isBackToInitialSpring = pylimer_tools::utils::contains(
           net.springIndicesOfLinks[slipLinkIdx], fullSpringIdx);
         for (size_t relaxSteps = 0; relaxSteps < 2; ++relaxSteps) {
@@ -3165,7 +3240,8 @@ namespace calc {
       ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions,
-      double oneOverSpringPartitionUpperLimit)
+      double oneOverSpringPartitionUpperLimit,
+      bool respectLoops)
     {
       // this->validateNetwork(net, u, springPartitions);
       for (size_t springIdx = 0; springIdx < net.nrOfSprings; ++springIdx) {
@@ -3206,7 +3282,8 @@ namespace calc {
                   u,
                   springPartitions,
                   partialSpringIdx,
-                  oneOverSpringPartitionUpperLimit);
+                  oneOverSpringPartitionUpperLimit,
+                  respectLoops);
                 // this->validateNetwork(net, u, springPartitions);
                 // std::cout << "Finished moving link " << involvedSlipLink
                 //           << " around cross-link " << involvedCrosslink
@@ -3271,7 +3348,11 @@ namespace calc {
     }
 
     /**
-     * @brief Rotate
+     * @brief Move a slip-link from one spring attached to a cross-link to
+     * another spring attached to the same cross-link
+     *
+     * Returns the idx of the new partial spring that had to be introduced.
+     * Returns a negative idx if the move was illegal or impossible.
      *
      * @param net
      * @param u
@@ -3283,7 +3364,8 @@ namespace calc {
       const Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions,
       const size_t partialSpringIdx,
-      double oneOverSpringPartitionUpperLimit)
+      double oneOverSpringPartitionUpperLimit,
+      const bool respectLoops)
     {
       INVALIDARG_EXP_IFN(net.springPartIndexA[partialSpringIdx] !=
                            net.springPartIndexB[partialSpringIdx],
@@ -3329,6 +3411,26 @@ namespace calc {
       // find possible target partial springs
       std::vector<size_t> possibleTargetSprings =
         net.springIndicesOfLinks[involvedCrosslink];
+      if (respectLoops) {
+        // filter out the target springs that may not be a target based on the
+        // involved loops
+        possibleTargetPartialSprings.erase(
+          std::remove_if(possibleTargetPartialSprings.begin(),
+                         possibleTargetPartialSprings.end(),
+                         [&net, involvedSlipLink](size_t springIdxToCheck) {
+                           for (size_t loopIdx :
+                                net.loopsOfSliplink[involvedSlipLink]) {
+                             for (size_t springIdx : net.loops[loopIdx]) {
+                               if (springIdx == springIdxToCheck) {
+                                 return true;
+                               }
+                             }
+                           }
+
+                           return false;
+                         }),
+          possibleTargetPartialSprings.end());
+      }
       if (possibleTargetSprings.size() <= 1) {
         // e.g. in the case of many loops :P
         // std::cerr << "Spring " << springIdx << "'s cross-link " <<
@@ -3943,19 +4045,34 @@ namespace calc {
       return xlinkUniverse;
     }
 
-    void MEHPForceBalance::addSlipLinks(const std::vector<size_t>& strandIdx1,
-                                        const std::vector<size_t>& strandIdx2,
-                                        const std::vector<double>& x,
-                                        const std::vector<double>& y,
-                                        const std::vector<double>& z,
-                                        const std::vector<double>& alpha1,
-                                        const std::vector<double>& alpha2,
-                                        bool clampAlpha)
+    void MEHPForceBalance::addSlipLinks(
+      const std::vector<size_t>& strandIdx1,
+      const std::vector<size_t>& strandIdx2,
+      const std::vector<double>& x,
+      const std::vector<double>& y,
+      const std::vector<double>& z,
+      const std::vector<double>& alpha1,
+      const std::vector<double>& alpha2,
+      std::vector<std::vector<size_t>> loops,
+      std::vector<std::vector<size_t>> loopsOfSliplinks,
+      bool clampAlpha)
     {
       size_t additionalLen = strandIdx1.size();
       if (additionalLen == 0) {
         return;
       }
+      INVALIDARG_EXP_IFN(
+        loopsOfSliplinks.size() == 0 ||
+          loopsOfSliplinks.size() == additionalLen,
+        "You must provide either loops for all new slip-links, or non at all.");
+      INVALIDARG_EXP_IFN(
+        (loopsOfSliplinks.size() == 0 &&
+         this->initialConfig.loopsOfSliplink.size() == 0) ||
+          ((loopsOfSliplinks.size() > 0) &&
+           this->initialConfig.loopsOfSliplink.size() ==
+             (this->initialConfig.nrOfLinks - this->initialConfig.nrOfNodes)),
+        "Cannot add slip-links with loops to structure without, or vice "
+        "versa.");
       // validate inputs
       size_t currentNrOfLinks = this->initialConfig.nrOfLinks;
       size_t currentNrOfPartialSprings = this->initialConfig.nrOfPartialSprings;
@@ -4013,6 +4130,27 @@ namespace calc {
         currentNrOfPartialSprings + 2 * additionalLen);
       this->initialConfig.partialSpringIsPartial.conservativeResize(
         currentNrOfPartialSprings + 2 * additionalLen);
+      // handle loops if appropriate
+      size_t previousNrOfLoops = this->initialConfig.loops.size();
+      this->initialConfig.loops.reserve(previousNrOfLoops + loops.size());
+      this->initialConfig.loops.insert(
+        this->initialConfig.loops.end(), loops.begin(), loops.end());
+      if (loopsOfSliplinks.size() > 0) {
+        this->initialConfig.loopsOfSliplink.reserve(
+          this->initialConfig.nrOfLinks - this->initialConfig.nrOfNodes);
+        this->initialConfig.loopsOfSliplink.insert(
+          this->initialConfig.loopsOfSliplink.end(),
+          loopsOfSliplinks.begin(),
+          loopsOfSliplinks.end());
+        if (previousNrOfLoops > 0) {
+          // adjust the numbering
+          for (size_t i = 0; i < loopsOfSliplinks.size(); ++i) {
+            for (size_t j = 0; j < loopsOfSliplinks[i].size(); ++j) {
+              loopsOfSliplinks[i][j] += previousNrOfLoops;
+            }
+          }
+        }
+      }
       size_t partialSpringsAdded = 0;
       // then, loop the slip-links to add
       for (size_t i = 0; i < additionalLen; ++i) {
@@ -4851,6 +4989,7 @@ namespace calc {
       RUNTIME_EXP_IFN(
         net.partialToFullSpringIndex.size() == net.nrOfPartialSprings,
         "Every partial spring must be able to map to the full spring.");
+
       /**
        * Test maximum values
        */
@@ -4884,6 +5023,7 @@ namespace calc {
                           std::to_string(springPartitions[i]) +
                           " at i = " + std::to_string(i) + ".");
       }
+
       /**
        * Test reversibility of link <-> spring mapping
        */
@@ -4905,6 +5045,7 @@ namespace calc {
                             std::to_string(spring_idx) + ".");
         }
       }
+
       /**
        * Test the assumptions on slip-links
        */
@@ -4920,6 +5061,7 @@ namespace calc {
         RUNTIME_EXP_IFN(net.linkIsSliplink[slipLinkIdx],
                         "Expected slip-links to know what they are.");
       }
+
       /**
        * Test the validitiy of springs and their mapping
        */
@@ -5001,6 +5143,7 @@ namespace calc {
           "Spring partitions of one spring must sum to one, got " +
             std::to_string(sum) + " for spring " + std::to_string(i) + ".");
       }
+
       /**
        * Test the validity of partial springs and their mapping
        */
@@ -5075,6 +5218,7 @@ namespace calc {
               " with dir = " + std::to_string(dir) + ".");
         }
       }
+
       /**
        * Check that we do not have any nan or inf values in our vectors
        */
@@ -5101,6 +5245,32 @@ namespace calc {
           APPROX_EQUAL(net.boxHalfs[dir], 0.5 * net.L[dir], 1e-12),
           "Expected box half to be half of box length");
       }
+
+      /**
+       * Validate additional loop-specific data that might not apply
+       */
+      if (net.loopsOfSliplink.size() > 0) {
+        RUNTIME_EXP_IFN(net.loops.size() > 0, "Inconsistent use of loops.");
+        RUNTIME_EXP_IFN(
+          net.loopsOfSliplink.size() == (net.nrOfLinks - net.nrOfNodes),
+          "Each slip-link must have associated list of loops, or none.");
+        for (std::vector<size_t> loopsOfSliplink : net.loopsOfSliplink) {
+          RUNTIME_EXP_IFN(
+            loopsOfSliplink.size() <= 2,
+            "Cannot have a slip-link attributed to more than two loops.");
+          for (size_t loopIdx : loopsOfSliplink) {
+            RUNTIME_EXP_IFN(loopIdx < net.loops.size(),
+                            "Loop index out of range.");
+          }
+        }
+        for (std::vector<size_t> loop : net.loops) {
+          for (size_t i : loop) {
+            RUNTIME_EXP_IFN(i >= net.nrOfSprings,
+                            "Loop's spring index out of range.");
+          }
+        }
+      }
+
       // std::cout << "Validation passed." << std::endl;
       return true;
     }
