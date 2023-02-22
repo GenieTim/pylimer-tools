@@ -293,21 +293,15 @@ namespace calc {
                 << "Last max distance moved: " << maxDistanceMoved << std::endl;
 
       assert(u.size() == 3 * net.nrOfLinks);
-      std::cout << 1 << std::endl;
       this->initialConfig = net;
-      std::cout << 2 << std::endl;
       this->currentDisplacements = u;
-      std::cout << 3 << std::endl;
       this->currentSpringPartitionsVec = springPartitions;
-      std::cout << 4 << std::endl;
       this->validateNetwork();
       this->currentSpringDistances = this->evaluateSpringDistances(
         net, this->currentDisplacements, this->is2D);
-      std::cout << 5 << std::endl;
       this->currentPartialSpringDistances =
         this->evaluatePartialSpringDistances(
           net, this->currentDisplacements, is2D);
-      std::cout << 6 << std::endl;
     }
 
     double MEHPForceBalance::displaceLinksToMeanPosition(
@@ -1154,6 +1148,7 @@ namespace calc {
     {
       std::vector<std::vector<long int>> loops =
         this->universe.findLoops(this->crosslinkerType, maxLoopLength, false);
+      std::cout << "Detected " << loops.size() << " loops." << std::endl;
       std::vector<std::vector<size_t>> reducedLoops;
       reducedLoops.reserve(loops.size());
       for (std::vector<long int> loop : loops) {
@@ -1215,6 +1210,7 @@ namespace calc {
       std::vector<std::vector<size_t>> slipLinksLoops;
       slipLinksLoops.reserve(estimateOfNrOfSliplinks);
 
+      std::cout << "Searching for intersections..." << std::endl;
       for (size_t i = 0; i < loops.size(); ++i) {
         // TODO: instead of the N^2 loop, might want to try some filter at least
         // also, we ignore all self-entanglements of one loop with itself.
@@ -1249,6 +1245,7 @@ namespace calc {
           }
         }
       }
+      std::cout << "Found " << slipLinksLoops.size() << " intersections." << std::endl;
       RUNTIME_EXP_IFN(
         slipLinkStrandA.size() == slipLinkStrandB.size() &&
           slipLinkXs.size() == slipLinkYs.size() &&
