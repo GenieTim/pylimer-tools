@@ -1525,8 +1525,8 @@ namespace entities {
    * @return false
    */
   std::vector<LoopIntersectionInfo> Universe::findLoopEntanglements(
-    std::vector<long int> vertexIndicesLoop1,
-    std::vector<long int> vertexIndicesLoop2) const
+    const std::vector<long int>& vertexIndicesLoop1,
+    const std::vector<long int>& vertexIndicesLoop2) const
   {
     std::vector<LoopIntersectionInfo> results;
     Eigen::Vector3d helperNode = Eigen::Vector3d::Zero();
@@ -1547,6 +1547,15 @@ namespace entities {
     // now that we have the helper node, we can check all edges of loop2, how
     // often they intersect the triangles
     for (long int i = 0; i < vertexIndicesLoop1.size(); ++i) {
+      if (i == 0) {
+        // random estimate
+        results.reserve(
+          (vertexIndicesLoop1.size() + vertexIndicesLoop2.size()) / 3);
+      }
+      if (i == 1) {
+        // better estimate
+        results.reserve(results.size() * (results.size() - 1));
+      }
       Eigen::Vector3d vertex0 =
         this->getPositionVectorForVertex(vertexIndicesLoop1[i]);
       long int vertex1Index = (i == 0) ? vertexIndicesLoop1.size() - 1 : i - 1;
@@ -1568,9 +1577,9 @@ namespace entities {
                                                            vertex1,
                                                            helperNode,
                                                            intersectionPoint)) {
-          std::cout << "Intersection found at index " << i << " from to "
-                    << rayOrigin[0] << ", " << rayOrigin[1] << ", "
-                    << rayOrigin[2] << "; " << rayTarget[0] << ", "
+          std::cout << "Intersection found at indices " << i << ", " << j
+                    << " from to " << rayOrigin[0] << ", " << rayOrigin[1]
+                    << ", " << rayOrigin[2] << "; " << rayTarget[0] << ", "
                     << rayTarget[1] << ", " << rayTarget[2] << std::endl;
           intersections += 1;
           // TODO: maybe do something with the intersection point?
