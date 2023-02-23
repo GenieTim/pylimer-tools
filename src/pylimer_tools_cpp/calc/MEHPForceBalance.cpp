@@ -2,6 +2,7 @@
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
+#include "../utils/MemoryUtil.h"
 #include <Eigen/Dense>
 #include <algorithm>
 #include <array>
@@ -1146,6 +1147,8 @@ namespace calc {
      */
     size_t MEHPForceBalance::addSliplinksBasedOnCycles(const int maxLoopLength)
     {
+      std::cout << "Detecting slip-links based on cycles. Base memory useage: "
+                << getCurrentRSS() << ", peak " << getPeakRSS() << std::endl;
       std::vector<std::vector<long int>> loops =
         this->universe.findLoops(this->crosslinkerType, maxLoopLength, false);
       std::cout << "Detected " << loops.size() << " loops." << std::endl;
@@ -1166,10 +1169,8 @@ namespace calc {
                                            reducedLoop.end());
         reducedLoops.push_back(reducedLoopVec);
       }
-
-      size_t estimateOfNrOfSliplinks =
-        loops.size() * loops.size() *
-        this->initialConfig.meanSpringContourLength;
+      std::cout << "After finding loops, memory useage: " << getCurrentRSS()
+                << ", peak " << getPeakRSS() << std::endl;
 
       // fetch some data to later estimate alpha & beta
       std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
@@ -1192,26 +1193,41 @@ namespace calc {
         }
       }
 
+      std::cout << "After mapping chains again, memory useage: "
+                << getCurrentRSS() << ", peak " << getPeakRSS() << std::endl;
+
       // the resulting vectors to fill
       std::vector<double> slipLinkXs;
-      slipLinkXs.reserve(estimateOfNrOfSliplinks);
       std::vector<double> slipLinkYs;
-      slipLinkYs.reserve(estimateOfNrOfSliplinks);
       std::vector<double> slipLinkZs;
-      slipLinkZs.reserve(estimateOfNrOfSliplinks);
       std::vector<size_t> slipLinkStrandA;
-      slipLinkStrandA.reserve(estimateOfNrOfSliplinks);
       std::vector<size_t> slipLinkStrandB;
-      slipLinkStrandB.reserve(estimateOfNrOfSliplinks);
       std::vector<double> slipLinkStrandAlpha;
-      slipLinkStrandAlpha.reserve(estimateOfNrOfSliplinks);
       std::vector<double> slipLinkStrandBeta;
-      slipLinkStrandBeta.reserve(estimateOfNrOfSliplinks);
       std::vector<std::vector<size_t>> slipLinksLoops;
-      slipLinksLoops.reserve(estimateOfNrOfSliplinks);
-
       std::cout << "Searching for intersections..." << std::endl;
       for (size_t i = 0; i < loops.size(); ++i) {
+        // reserve enough space
+        size_t estimateOfNrOfSliplinks =
+          loops.size() * loops.size() *
+          this->initialConfig.meanSpringContourLength;
+        if (i == 0 || i == 1) {
+          if (i == 1) {
+            // after the first iteration, we have a better (still bad) estimate
+            estimateOfNrOfSliplinks =
+              std::max(estimateOfNrOfSliplinks,
+                       (slipLinkXs.size() - 1) * slipLinkXs.size());
+          }
+          slipLinkXs.reserve(estimateOfNrOfSliplinks);
+          slipLinkYs.reserve(estimateOfNrOfSliplinks);
+          slipLinkZs.reserve(estimateOfNrOfSliplinks);
+          slipLinkStrandA.reserve(estimateOfNrOfSliplinks);
+          slipLinkStrandB.reserve(estimateOfNrOfSliplinks);
+          slipLinkStrandAlpha.reserve(estimateOfNrOfSliplinks);
+          slipLinkStrandBeta.reserve(estimateOfNrOfSliplinks);
+          slipLinksLoops.reserve(estimateOfNrOfSliplinks);
+        }
+
         // TODO: instead of the N^2 loop, might want to try some filter at least
         // also, we ignore all self-entanglements of one loop with itself.
         for (size_t j = i + 1; j < loops.size(); ++j) {
@@ -1244,8 +1260,14 @@ namespace calc {
             slipLinksLoops.push_back(localLoops);
           }
         }
+        // make space: cleanup the loop i
+        loops[i] = std::vector<long int>();
+        std::cout << "After checking intersections of loop " << i
+                  << ", memory useage: " << getCurrentRSS() << ", peak "
+                  << getPeakRSS() << std::endl;
       }
-      std::cout << "Found " << slipLinksLoops.size() << " intersections." << std::endl;
+      std::cout << "Found " << slipLinksLoops.size() << " intersections."
+                << std::endl;
       RUNTIME_EXP_IFN(
         slipLinkStrandA.size() == slipLinkStrandB.size() &&
           slipLinkXs.size() == slipLinkYs.size() &&
