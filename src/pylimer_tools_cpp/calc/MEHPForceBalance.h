@@ -50,7 +50,8 @@ namespace calc {
       SLIPLINKS_ONLY,
       ALL,
       ALL_CYCLE,
-      ALL_MC
+      ALL_MC,
+      ALL_MC_CYCLE
     };
 
     // heavily inspired by Prof. Dr. Andrei Gusev's Code
@@ -109,7 +110,7 @@ namespace calc {
           LinkSwappingMode::NO_SWAPPING,
         const int swappingFrequency = 10,
         const double oneOverSpringPartitionUpperLimit = 1.0,
-        const int nrOfCrosslinkSwapsAllowedPerSliplink = - 1);
+        const int nrOfCrosslinkSwapsAllowedPerSliplink = -1);
 
       /**
        * @brief Compute the spring update residual
@@ -623,6 +624,31 @@ namespace calc {
                         const std::vector<double>& z,
                         const std::vector<double>& alpha1,
                         const std::vector<double>& alpha2,
+                        bool clampAlpha = false)
+      {
+        std::vector<std::vector<size_t>> loops;
+        std::vector<std::vector<size_t>> loopsOfSliplinks;
+        return this->addSlipLinks(strandIdx1,
+                                  strandIdx2,
+                                  x,
+                                  y,
+                                  z,
+                                  alpha1,
+                                  alpha2,
+                                  loops,
+                                  loopsOfSliplinks,
+                                  clampAlpha);
+      }
+
+      void addSlipLinks(const std::vector<size_t>& strandIdx1,
+                        const std::vector<size_t>& strandIdx2,
+                        const std::vector<double>& x,
+                        const std::vector<double>& y,
+                        const std::vector<double>& z,
+                        const std::vector<double>& alpha1,
+                        const std::vector<double>& alpha2,
+                        std::vector<std::vector<size_t>> loops,
+                        std::vector<std::vector<size_t>> loopsOfSliplinks,
                         bool clampAlpha = false);
 
       /**
@@ -806,7 +832,8 @@ namespace calc {
         Eigen::VectorXd& u,
         Eigen::VectorXd& springPartitions,
         const double oneOverSpringPartitionUpperLimit,
-        const int nrOfCrosslinkSwapsAllowedPerSliplink = -1);
+        const int nrOfCrosslinkSwapsAllowedPerSliplink = -1,
+        const bool respectLoops = true);
 
       /**
        * @brief Move a slip-link if appropriate to other springs
@@ -822,7 +849,8 @@ namespace calc {
         Eigen::VectorXd& springPartitions,
         size_t slipLinkIdx,
         const double oneOverSpringPartitionUpperLimit,
-        const int nrOfCrosslinkSwapsAllowedPerSliplink = -1);
+        const int nrOfCrosslinkSwapsAllowedPerSliplink = -1,
+        const bool respectLoops = true);
 
       /**
        * @brief Loop all springs, swap slip-links on them if they are close
@@ -833,7 +861,8 @@ namespace calc {
       void swapSlipLinksInclXlinks(ForceBalanceNetwork& net,
                                    const Eigen::VectorXd& u,
                                    Eigen::VectorXd& springPartitions,
-                                   double swappableCutoff);
+                                   double swappableCutoff,
+        const bool respectLoops = true);
 
       /**
        * @brief Loop all springs, swap slip-links on them if they are close
@@ -855,14 +884,16 @@ namespace calc {
         Eigen::VectorXd& springPartitions,
         const size_t partialSpringIdx,
         const double oneOverSpringPartitionUpperLimit = 1.0,
-        const int nrOfCrosslinkSwapsAllowedPerSliplink = -1);
+        const int nrOfCrosslinkSwapsAllowedPerSliplink = -1,
+        const bool respectLoops = true);
 
       long int rotateSlipLinkAroundCrosslink(
         ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
         Eigen::VectorXd& springPartitions,
         const size_t partialSpringIdx,
-        double oneOverSpringPartitionUpperLimit = 1.0);
+        double oneOverSpringPartitionUpperLimit = 1.0,
+        const bool respectLoops = true);
 
       /**
        * @brief Displace one link to the mean of all connected neighbours
@@ -1210,7 +1241,8 @@ namespace calc {
         Eigen::VectorXd& u,
         Eigen::VectorXd& springPartitions,
         const size_t partialSpringIdx,
-        const double oneOverSpringPartitionUpperLimit = 1.0);
+        const double oneOverSpringPartitionUpperLimit = 1.0,
+        const bool respectLoops = true);
 
     private:
       pylimer_tools::entities::Universe universe;
