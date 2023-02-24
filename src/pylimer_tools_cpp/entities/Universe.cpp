@@ -58,8 +58,7 @@ namespace entities {
 
   Universe::Universe(const double Lx, const double Ly, const double Lz)
     : Universe(Box(Lx, Ly, Lz))
-  {
-  }
+  {}
 
   // 1. destructor (to destroy the graph)
   Universe::~Universe()
@@ -425,10 +424,7 @@ namespace entities {
     this->massPerType = massPerType;
   }
 
-  std::map<int, double> Universe::getMasses()
-  {
-    return this->massPerType;
-  };
+  std::map<int, double> Universe::getMasses() { return this->massPerType; };
 
   /**
    * @brief Get the standalone components of the network
@@ -1580,7 +1576,12 @@ namespace entities {
           std::cout << "Intersection found at indices " << i << ", " << j
                     << " from to " << rayOrigin[0] << ", " << rayOrigin[1]
                     << ", " << rayOrigin[2] << "; " << rayTarget[0] << ", "
-                    << rayTarget[1] << ", " << rayTarget[2] << std::endl;
+                    << rayTarget[1] << ", " << rayTarget[2] << " in triangle "
+                    << vertex0[0] << ", " << vertex0[1] << ", " << vertex0[2]
+                    << "; " << vertex1[0] << ", " << vertex1[1] << ", "
+                    << vertex1[2] << "; " << helperNode[0] << ", "
+                    << helperNode[1] << ", " << helperNode[2] << "."
+                    << std::endl;
           intersections += 1;
           // TODO: maybe do something with the intersection point?
           LoopIntersectionInfo result;
@@ -1994,20 +1995,11 @@ namespace entities {
    *
    * @return double
    */
-  double Universe::getVolume() const
-  {
-    return this->box.getVolume();
-  }
+  double Universe::getVolume() const { return this->box.getVolume(); }
 
-  size_t Universe::getNrOfAtoms() const
-  {
-    return this->NAtoms;
-  }
+  size_t Universe::getNrOfAtoms() const { return this->NAtoms; }
 
-  size_t Universe::getNrOfBonds() const
-  {
-    return this->NBonds;
-  }
+  size_t Universe::getNrOfBonds() const { return this->NBonds; }
 
   void Universe::setBox(Box passedBox, bool rescaleAtomCoordinates)
   {
@@ -2067,9 +2059,6 @@ namespace entities {
     this->setBox(Box(Lx, Ly, Lz));
   }
 
-  Box Universe::getBox() const
-  {
-    return this->box;
-  }
+  Box Universe::getBox() const { return this->box; }
 } // namespace entities
 } // namespace pylimer_tools
