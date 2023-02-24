@@ -157,16 +157,16 @@ namespace entities {
       // actually do the deformation as appropriate
       for (size_t i = 0; i < coords.size() / 3; ++i) {
         coords[3 * i] *= scalingFactorX;
+        coords[3 * i + 1] *= scalingFactorY;
+        coords[3 * i + 2] *= scalingFactorZ;
         if (newBox.getShearDirection() == 0) {
           coords[3 * i] +=
             newBox.getShearMagnitude() * coords[3 * i + 1]; // x' = x + ɣ*y
         }
-        coords[3 * i + 1] *= scalingFactorY;
         if (newBox.getShearDirection() == 1) {
           coords[3 * i + 1] +=
             newBox.getShearMagnitude() * coords[3 * i + 2]; // y' = y + ɣ*z
         }
-        coords[3 * i + 2] *= scalingFactorZ;
         if (newBox.getShearDirection() == 2) {
           coords[3 * i + 2] +=
             newBox.getShearMagnitude() * coords[3 * i]; // z' = z + ɣ*x
@@ -177,15 +177,32 @@ namespace entities {
     template<typename VectorType>
     void handlePBC(VectorType& distances) const
     {
+      const bool isSheared =
+        (this->getShearDirection() >= 0 && this->getShearDirection() <= 2);
+      if (isSheared) {
+        INVALIDARG_EXP_IFN(distances.size() % 3 == 0,
+                           "Require distances to be a multiple of 3 to handle "
+                           "PBC for sheared box.");
+        // scaled coordinates in the initial cubic box
+        for (size_t j = 0; j < distances.size() / 3; ++j) {
+          if (this->getShearDirection() == 0) {
+            distances[3 * j] -=
+              this->getShearMagnitude() * distances[3 * j + 1];
+          }
+          if (this->getShearDirection() == 1) {
+            distances[3 * j + 1] -=
+              this->getShearMagnitude() * distances[3 * j + 2];
+          }
+          if (this->getShearDirection() == 2) {
+            distances[3 * j + 2] -=
+              this->getShearMagnitude() * distances[3 * j];
+          }
+        }
+      }
       // possibly improveable PBC
       for (size_t j = 0; j < distances.size(); ++j) {
         int min_iterations = 0;
         int j_mod_3 = j % 3;
-        // scaled coordinates in the initial cubic box
-        if (this->getShearDirection() == j_mod_3) {
-          long int partnerIdx = j + ((j_mod_3 == 2) ? -2 : 1);
-          distances[j] -= this->getShearMagnitude() * distances[partnerIdx];
-        }
         assert(!std::isinf(distances[j]) && !std::isnan(distances[j]));
         const double distance0 = distances[j];
         while (distances[j] > this->boxHalfs[j_mod_3]) {
@@ -216,10 +233,23 @@ namespace entities {
               std::to_string(min_iterations) + " before that)");
           }
         }
-        // back to the physical space
-        if (this->getShearDirection() == j_mod_3) {
-          long int partnerIdx = j + ((j_mod_3 == 2) ? -2 : 1);
-          distances[j] += this->getShearMagnitude() * distances[partnerIdx];
+      }
+      // back to the physical space
+      if (isSheared) {
+        // scaled coordinates in the initial cubic box
+        for (size_t j = 0; j < distances.size() / 3; ++j) {
+          if (this->getShearDirection() == 0) {
+            distances[3 * j] +=
+              this->getShearMagnitude() * distances[3 * j + 1];
+          }
+          if (this->getShearDirection() == 1) {
+            distances[3 * j + 1] +=
+              this->getShearMagnitude() * distances[3 * j + 2];
+          }
+          if (this->getShearDirection() == 2) {
+            distances[3 * j + 2] +=
+              this->getShearMagnitude() * distances[3 * j];
+          }
         }
       }
     }

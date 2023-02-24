@@ -81,6 +81,11 @@ namespace calc {
       Eigen::ArrayXi springPartIndexB;
       Eigen::ArrayXi nrOfCrosslinkSwapsEndured;
 
+      // these may be empty, or not, depending on the method used
+      // to determine the slip-links
+      ArrayXArrayXi loops; // each loop just records its spring idx
+      ArrayXArrayXi loopsOfSliplink; // each slip-link has two loops, ideally
+
       // old stuff used for conversion. Does not include slip-links
       Eigen::ArrayXi springCoordinateIndexA;
       Eigen::ArrayXi springCoordinateIndexB;
