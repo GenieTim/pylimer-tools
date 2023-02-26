@@ -550,7 +550,7 @@ namespace calc {
            displacedCoords(net->springPartCoordinateIndexA));
         MEHPForceBalance2::handlePBC(net, partialSpringDistances);
         Eigen::VectorXd partialDistancesOverSpringPartitions =
-          (partialSpringDistances.array() * oneOverSpringPartitions.array())
+          (partialSpringDistances.array() * oneOverSpringPartitions))
             .matrix();
 
         // evaluate the gradient when needed
