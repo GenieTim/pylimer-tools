@@ -1262,9 +1262,10 @@ namespace calc {
         }
         // make space: cleanup the loop i
         loops[i] = std::vector<long int>();
-        std::cout << "After checking intersections of loop " << i
-                  << ", memory useage: " << getCurrentRSS() << ", peak "
-                  << getPeakRSS() << std::endl;
+        std::cout << "After checking intersections of loop " << i << " ("
+                  << slipLinksLoops.size()
+                  << " slip-links found in total yet), memory useage: "
+                  << getCurrentRSS() << ", peak " << getPeakRSS() << std::endl;
       }
       std::cout << "Found " << slipLinksLoops.size() << " intersections."
                 << std::endl;
@@ -1576,7 +1577,9 @@ namespace calc {
       } else {
         pylimer_tools::utils::removeRow(net.nrOfCrosslinkSwapsEndured,
                                         linkIdx - net.nrOfNodes);
-        net.loopsOfSliplink.erase(net.loopsOfSliplink.begin() + linkIdx);
+        if (net.loopsOfSliplink.size() > 0) {
+          net.loopsOfSliplink.erase(net.loopsOfSliplink.begin() + linkIdx);
+        }
       }
       net.nrOfLinks -= 1;
       pylimer_tools::utils::removeRow(net.linkIsSliplink, linkIdx);
