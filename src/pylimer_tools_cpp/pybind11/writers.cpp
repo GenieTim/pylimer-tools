@@ -37,6 +37,25 @@ init_pylimer_bound_writers(py::module_& m)
            Re-indexing leads to atom ids being in the range of 1 to the number of atoms.
       )pbdoc",
          py::arg("reindexAtoms") = true)
+    .def("setCustomAtomFormat",
+         &DataFileWriter::setCustomAtomFormat,
+         R"pbdoc(
+           Specify a custom format for the atom section.
+           Placeholder options are:
+               - $atomId
+               - $moleculeId
+               - $atomType
+               - $x
+               - $y
+               - $z
+               - $nx
+               - $ny
+               - $nz
+
+          Specifically useful if you need a different (or hybrid) atom style in LAMMPS.
+      )pbdoc",
+         py::arg("atomFormat") =
+           "\t$atomId\t$moleculeId\t$atomType\t$x\t$y\t$z\t$nx\t$ny\t$nz")
     .def("configCrosslinkerType",
          &DataFileWriter::configCrosslinkerType,
          R"pbdoc(
