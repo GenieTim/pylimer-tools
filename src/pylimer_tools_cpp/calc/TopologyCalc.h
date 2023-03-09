@@ -6,13 +6,15 @@
 namespace pylimer_tools {
 namespace calc {
 
-  bool segmentIntersectsTriangle(Eigen::Vector3d rayOrigin,
-                                 Eigen::Vector3d rayTarget,
-                                 Eigen::Vector3d vertex0,
-                                 Eigen::Vector3d vertex1,
-                                 Eigen::Vector3d vertex2,
-                                 Eigen::Vector3d& outIntersectionPoint,
-                                 const double EPSILON = 1e-6)
+  bool segmentIntersectsTriangle(
+    const Eigen::Vector3d rayOrigin,
+    const Eigen::Vector3d rayTarget,
+    const Eigen::Vector3d vertex0,
+    const Eigen::Vector3d vertex1,
+    const Eigen::Vector3d vertex2,
+    Eigen::Vector3d& outIntersectionPoint,
+    const std::function<Eigen::Vector3d(Eigen::Vector3d)>& pbc,
+    const double EPSILON = 1e-6)
   {
     // Möller-Trumbore intersection algorithm, see
     // https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
@@ -59,6 +61,25 @@ namespace calc {
     // intersection.
     return false;
   };
+
+  bool segmentIntersectsTriangle(const Eigen::Vector3d rayOrigin,
+                                 const Eigen::Vector3d rayTarget,
+                                 const Eigen::Vector3d vertex0,
+                                 const Eigen::Vector3d vertex1,
+                                 const Eigen::Vector3d vertex2,
+                                 Eigen::Vector3d& outIntersectionPoint,
+                                 const double EPSILON = 1e-6)
+  {
+    return segmentIntersectsTriangle(
+      rayOrigin,
+      rayTarget,
+      vertex0,
+      vertex1,
+      vertex2,
+      outIntersectionPoint,
+      [](Eigen::Vector3d vec) { return vec; },
+      EPSILON);
+  }
 
 }
 }

@@ -1529,15 +1529,10 @@ namespace entities {
     double sizeDenominator =
       1.0 / static_cast<double>(vertexIndicesLoop1.size());
     for (long int i = 0; i < vertexIndicesLoop1.size(); ++i) {
-      helperNode[0] +=
-        igraph_cattribute_VAN(&this->graph, "x", vertexIndicesLoop1[i]) *
-        sizeDenominator;
-      helperNode[1] +=
-        igraph_cattribute_VAN(&this->graph, "y", vertexIndicesLoop1[i]) *
-        sizeDenominator;
-      helperNode[2] +=
-        igraph_cattribute_VAN(&this->graph, "z", vertexIndicesLoop1[i]) *
-        sizeDenominator;
+      // find PBC corrected mean position
+      Eigen::Vector3d vertexIdxPos = this->getPositionVectorForVertex(i);
+      Eigen::Vector3d distance = vertexIdxPos - helperNode;this->box.handlePBC(distance);
+      helperNode += ((distance).array()*sizeDenominator).matrix();
     }
     int intersections = 0;
     // now that we have the helper node, we can check all edges of loop2, how
@@ -1554,11 +1549,10 @@ namespace entities {
       }
       Eigen::Vector3d vertex0 =
         this->getPositionVectorForVertex(vertexIndicesLoop1[i]);
-      long int vertex1Index = (i == 0) ? vertexIndicesLoop1.size() - 1 : i - 1;
+      long int vertex1Index = (i == 0) ? (vertexIndicesLoop1.size() - 1) : (i - 1);
       Eigen::Vector3d vertex1 =
         this->getPositionVectorForVertex(vertexIndicesLoop1[vertex1Index]);
       // the triangle is now spawned by vertex0, vertex1 and the helperNode
-      // TODO: consider PBC
       for (size_t j = 0; j < vertexIndicesLoop2.size(); ++j) {
         Eigen::Vector3d rayOrigin =
           this->getPositionVectorForVertex(vertexIndicesLoop2[j]);
@@ -1567,12 +1561,17 @@ namespace entities {
         Eigen::Vector3d rayTarget =
           this->getPositionVectorForVertex(vertexIndicesLoop2[directionIdx]);
         Eigen::Vector3d intersectionPoint;
-        if (pylimer_tools::calc::segmentIntersectsTriangle(rayOrigin,
-                                                           rayTarget,
-                                                           vertex0,
-                                                           vertex1,
-                                                           helperNode,
-                                                           intersectionPoint)) {
+        if (pylimer_tools::calc::segmentIntersectsTriangle(
+              rayOrigin,
+              rayTarget,
+              vertex0,
+              vertex1,
+              helperNode,
+              intersectionPoint,
+              [&](Eigen::Vector3d vec) {
+                this->box.handlePBC<Eigen::Vector3d>(vec);
+                return vec;
+              })) {
           std::cout << "Intersection found at indices " << i << ", " << j
                     << " from to " << rayOrigin[0] << ", " << rayOrigin[1]
                     << ", " << rayOrigin[2] << "; " << rayTarget[0] << ", "
