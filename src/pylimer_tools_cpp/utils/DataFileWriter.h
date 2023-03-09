@@ -11,6 +11,7 @@
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <regex>
 #include <string>
 #include <vector>
 
@@ -33,6 +34,10 @@ namespace utils {
     void configIncludeAngles(const bool includeAngles)
     {
       this->includeAngles = includeAngles;
+    }
+    void setCustomAtomFormat(const std::string atomFormat)
+    {
+      this->customAtomFormat = atomFormat;
     }
     void configMoleculeIdxForSwap(const bool includeSwap)
     {
@@ -70,7 +75,7 @@ namespace utils {
       file << "\n";
       file << "\t " << uniqueAtomTypes << " atom types\n";
       file << "\t " << 1 << " bond types\n"; // TODO: fix bond types overall
-      file << "\t " << 1 << " angle types\n";
+      file << "\t " << (this->includeAngles ? 1 : 0) << " angle types\n";
       file << "\t " << 0 << " dihedral types\n";
       file << "\t " << 0 << " improper types\n";
       file << "\n";
@@ -134,6 +139,7 @@ namespace utils {
     bool moleculeIdxSwappable = false;
     int crosslinkerType = 2;
     bool reindexAtoms = false;
+    std::string customAtomFormat = "";
     // functions
     double moveCoordinateIntoBox(double coord, double boxLo, double boxHi) const
     {
@@ -153,21 +159,44 @@ namespace utils {
     {
       long int atomId = this->reindexAtoms ? nAtomsOutput : atom.getId();
       this->oldNewAtomIdMap[atom.getId()] = atomId;
-      file << "\t" << atomId << "\t" << moleculeIdx << "\t" << atom.getType()
-           << "\t"
-           << this->moveCoordinateIntoBox(atom.getX(),
-                                          this->universe.getBox().getLowX(),
-                                          this->universe.getBox().getHighX())
-           << "\t"
-           << this->moveCoordinateIntoBox(atom.getY(),
-                                          this->universe.getBox().getLowY(),
-                                          this->universe.getBox().getHighY())
-           << "\t"
-           << this->moveCoordinateIntoBox(atom.getZ(),
-                                          this->universe.getBox().getLowZ(),
-                                          this->universe.getBox().getHighZ())
-           << "\t" << atom.getNX() << "\t" << atom.getNY() << "\t"
-           << atom.getNZ() << "\n";
+      double x =
+        this->moveCoordinateIntoBox(atom.getX(),
+                                    this->universe.getBox().getLowX(),
+                                    this->universe.getBox().getHighX());
+      double y =
+        this->moveCoordinateIntoBox(atom.getY(),
+                                    this->universe.getBox().getLowY(),
+                                    this->universe.getBox().getHighY());
+      double z =
+        this->moveCoordinateIntoBox(atom.getZ(),
+                                    this->universe.getBox().getLowZ(),
+                                    this->universe.getBox().getHighZ());
+      if (this->customAtomFormat.size() < 2) {
+        file << "\t" << atomId << "\t" << moleculeIdx << "\t" << atom.getType()
+             << "\t" << x << "\t" << y << "\t" << z << "\t" << atom.getNX()
+             << "\t" << atom.getNY() << "\t" << atom.getNZ() << "\n";
+      } else {
+        std::string outputStr = this->customAtomFormat;
+        outputStr = std::regex_replace(
+          outputStr, std::regex("\\$atomId"), std::to_string(atomId));
+        outputStr = std::regex_replace(
+          outputStr, std::regex("\\$moleculeId"), std::to_string(moleculeIdx));
+        outputStr = std::regex_replace(
+          outputStr, std::regex("\\$atomType"), std::to_string(atom.getType()));
+        outputStr = std::regex_replace(
+          outputStr, std::regex("\\$nx"), std::to_string(atom.getNX()));
+        outputStr = std::regex_replace(
+          outputStr, std::regex("\\$ny"), std::to_string(atom.getNY()));
+        outputStr = std::regex_replace(
+          outputStr, std::regex("\\$nz"), std::to_string(atom.getNZ()));
+        outputStr =
+          std::regex_replace(outputStr, std::regex("\\$x"), std::to_string(x));
+        outputStr =
+          std::regex_replace(outputStr, std::regex("\\$y"), std::to_string(y));
+        outputStr =
+          std::regex_replace(outputStr, std::regex("\\$z"), std::to_string(z));
+        file << outputStr << "\n";
+      }
     }
     void writeAtoms(std::ofstream& file)
     {
