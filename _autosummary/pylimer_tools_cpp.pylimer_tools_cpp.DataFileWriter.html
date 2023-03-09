@@ -272,10 +272,13 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configReindexAtoms" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configReindexAtoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configReindexAtoms</span></code></a>(self[, reindexAtoms])</p></td>
 <td><p>Set whether to reindex the atoms or not.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.setUniverseToWrite" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.setUniverseToWrite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUniverseToWrite</span></code></a>(self, universe)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.setCustomAtomFormat" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.setCustomAtomFormat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setCustomAtomFormat</span></code></a>(self[, atomFormat])</p></td>
+<td><p>Specify a custom format for the atom section.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.setUniverseToWrite" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.setUniverseToWrite"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setUniverseToWrite</span></code></a>(self, universe)</p></td>
 <td><p>Re-set the universe to write.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.writeToFile" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.writeToFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">writeToFile</span></code></a>(self, arg0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.writeToFile" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.writeToFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">writeToFile</span></code></a>(self, arg0)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -308,6 +311,29 @@ That’s how you can have bond swapping with constant chain length distribution.
 <span class="sig-name descname"><span class="pre">configReindexAtoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">reindexAtoms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configReindexAtoms" title="Permalink to this definition">#</a></dt>
 <dd><p>Set whether to reindex the atoms or not.
 Re-indexing leads to atom ids being in the range of 1 to the number of atoms.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.setCustomAtomFormat">
+<span class="sig-name descname"><span class="pre">setCustomAtomFormat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">atomFormat</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'\t$atomId\t$moleculeId\t$atomType\t$x\t$y\t$z\t$nx\t$ny\t$nz'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.setCustomAtomFormat" title="Permalink to this definition">#</a></dt>
+<dd><blockquote>
+<div><p>Specify a custom format for the atom section.
+Placeholder options are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>$atomId</p></li>
+<li><p>$moleculeId</p></li>
+<li><p>$atomType</p></li>
+<li><p>$x</p></li>
+<li><p>$y</p></li>
+<li><p>$z</p></li>
+<li><p>$nx</p></li>
+<li><p>$ny</p></li>
+<li><p>$nz</p></li>
+</ul>
+</div></blockquote>
+</div></blockquote>
+<p>Specifically useful if you need a different (or hybrid) atom style in LAMMPS.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -386,6 +412,7 @@ Re-indexing leads to atom ids being in the range of 1 to the number of atoms.</p
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configIncludeAngles"><code class="docutils literal notranslate"><span class="pre">DataFileWriter.configIncludeAngles()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap"><code class="docutils literal notranslate"><span class="pre">DataFileWriter.configMoleculeIdxForSwap()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configReindexAtoms"><code class="docutils literal notranslate"><span class="pre">DataFileWriter.configReindexAtoms()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.setCustomAtomFormat"><code class="docutils literal notranslate"><span class="pre">DataFileWriter.setCustomAtomFormat()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.setUniverseToWrite"><code class="docutils literal notranslate"><span class="pre">DataFileWriter.setUniverseToWrite()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.writeToFile"><code class="docutils literal notranslate"><span class="pre">DataFileWriter.writeToFile()</span></code></a></li>
 </ul>
