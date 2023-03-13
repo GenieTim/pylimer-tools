@@ -18,9 +18,11 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.DataFileWriter
    .. autosummary::
    
       ~DataFileWriter.__init__
+      ~DataFileWriter.configAttemptImageReset
       ~DataFileWriter.configCrosslinkerType
       ~DataFileWriter.configIncludeAngles
       ~DataFileWriter.configMoleculeIdxForSwap
+      ~DataFileWriter.configMoveIntoBox
       ~DataFileWriter.configReindexAtoms
       ~DataFileWriter.setCustomAtomFormat
       ~DataFileWriter.setUniverseToWrite

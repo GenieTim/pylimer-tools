@@ -268,55 +268,58 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeRadiusOfGyration" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeRadiusOfGyration"><code class="xref py py-obj docutils literal notranslate"><span class="pre">computeRadiusOfGyration</span></code></a>(self)</p></td>
 <td><p>Computes the radius of gyration, <span class="math notranslate nohighlight">\(R_g^2\)</span> of this molecule.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeTotalMass" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeTotalMass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">computeTotalMass</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeRadiusOfGyrationWithDerivedImageFlags" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeRadiusOfGyrationWithDerivedImageFlags"><code class="xref py py-obj docutils literal notranslate"><span class="pre">computeRadiusOfGyrationWithDerivedImageFlags</span></code></a>(self)</p></td>
+<td><p>Computes the radius of gyration, <span class="math notranslate nohighlight">\(R_g^2\)</span> of this molecule, but ignoring the image flags attached to the atoms.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeTotalMass" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeTotalMass"><code class="xref py py-obj docutils literal notranslate"><span class="pre">computeTotalMass</span></code></a>(self)</p></td>
 <td><p>Computes the total mass of this molecule.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomForVertexId" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomForVertexId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAtomForVertexId</span></code></a>(self, arg0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomForVertexId" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomForVertexId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAtomForVertexId</span></code></a>(self, arg0)</p></td>
 <td><p>Get an atom for a specific vertex.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomIdByIdx" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomIdByIdx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAtomIdByIdx</span></code></a>(self, arg0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomIdByIdx" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomIdByIdx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAtomIdByIdx</span></code></a>(self, arg0)</p></td>
 <td><p>Get the id of the atom by the vertex id of the underlying graph.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomTypes" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomTypes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAtomTypes</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomTypes" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomTypes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAtomTypes</span></code></a>(self)</p></td>
 <td><p>Query all types (each one for each atom) ordered by atom vertex id.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtoms" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAtoms</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtoms" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAtoms</span></code></a>(self)</p></td>
 <td><p>Returns all atom objects enclosed in this molecule.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsConnectedTo" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsConnectedTo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAtomsConnectedTo</span></code></a>(self, arg0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsConnectedTo" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsConnectedTo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAtomsConnectedTo</span></code></a>(self, arg0)</p></td>
 <td><p>Get the atoms connected to a specified vertex id.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsLinedUp" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsLinedUp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAtomsLinedUp</span></code></a>(self[, crosslinkType])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsLinedUp" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsLinedUp"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAtomsLinedUp</span></code></a>(self[, crosslinkType])</p></td>
 <td><p>Returns all atom objects enclosed in this molecule based on the connectivity.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsOfDegree" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsOfDegree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAtomsOfDegree</span></code></a>(self, arg0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsOfDegree" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsOfDegree"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAtomsOfDegree</span></code></a>(self, arg0)</p></td>
 <td><p>Get the atoms that have the specified number of bonds.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsOfType" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsOfType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAtomsOfType</span></code></a>(self, arg0)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsOfType" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsOfType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAtomsOfType</span></code></a>(self, arg0)</p></td>
 <td><p>Get the atoms with the specified type.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getBonds" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getBonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getBonds</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getBonds" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getBonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getBonds</span></code></a>(self)</p></td>
 <td><p>Get all bonds.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getEdges" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getEdges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getEdges</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getEdges" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getEdges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getEdges</span></code></a>(self)</p></td>
 <td><p>Get all bonds.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getIdxByAtomId" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getIdxByAtomId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getIdxByAtomId</span></code></a>(self, arg0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getIdxByAtomId" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getIdxByAtomId"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getIdxByAtomId</span></code></a>(self, arg0)</p></td>
 <td><p>Get the vertex id of the underlying graph for an atom with a specified id.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getKey" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getKey"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getKey</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getKey" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getKey"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getKey</span></code></a>(self)</p></td>
 <td><p>Get a unique identifier for this molecule.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getLength" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getLength"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getLength</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getLength" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getLength"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getLength</span></code></a>(self)</p></td>
 <td><p>Counts and returns the number of atoms associated with this molecule.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getNrOfAtoms" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getNrOfAtoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNrOfAtoms</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getNrOfAtoms" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getNrOfAtoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNrOfAtoms</span></code></a>(self)</p></td>
 <td><p>Counts and returns the number of atoms associated with this molecule.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getNrOfBonds" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getNrOfBonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNrOfBonds</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getNrOfBonds" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getNrOfBonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNrOfBonds</span></code></a>(self)</p></td>
 <td><p>Counts and returns the number of bonds associated with this molecule.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getType" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getType</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getType" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getType</span></code></a>(self)</p></td>
 <td><p>Get the type of this molecule (see <a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.html#pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType" title="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MoleculeType</span></code></a> enum).</p></td>
 </tr>
 </tbody>
@@ -349,6 +352,19 @@ ignoring whether they are cross-linkers or not.</p>
 where <span class="math notranslate nohighlight">\(M\)</span> is the total mass of the molecule, <span class="math notranslate nohighlight">\(r_{cm}\)</span>
 are the coordinates of the center of mass of the molecule and the
 sum is over all contained atoms.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeRadiusOfGyrationWithDerivedImageFlags">
+<span class="sig-name descname"><span class="pre">computeRadiusOfGyrationWithDerivedImageFlags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crossLinkerType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeRadiusOfGyrationWithDerivedImageFlags" title="Permalink to this definition">#</a></dt>
+<dd><p>Computes the radius of gyration, <span class="math notranslate nohighlight">\(R_g^2\)</span> of this molecule,
+but ignoring the image flags attached to the atoms.
+This only works for Molecules that can be lined up with
+<a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsLinedUp" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsLinedUp"><code class="xref py py-func docutils literal notranslate"><span class="pre">getAtomsLinedUp()</span></code></a>,
+as it needs the atoms sorted such that the periodic box can still be respected somewhat.
+In other words, this function computes the radius of gyration
+assuming the distance between two lined-up beads is smaller than half the periodic box.</p>
+<p>See also: <a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeRadiusOfGyration" title="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeRadiusOfGyration"><code class="xref py py-func docutils literal notranslate"><span class="pre">computeRadiusOfGyration()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -530,6 +546,7 @@ molecule.</p>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeBondLengths"><code class="docutils literal notranslate"><span class="pre">Molecule.computeBondLengths()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeEndToEndDistance"><code class="docutils literal notranslate"><span class="pre">Molecule.computeEndToEndDistance()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeRadiusOfGyration"><code class="docutils literal notranslate"><span class="pre">Molecule.computeRadiusOfGyration()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeRadiusOfGyrationWithDerivedImageFlags"><code class="docutils literal notranslate"><span class="pre">Molecule.computeRadiusOfGyrationWithDerivedImageFlags()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeTotalMass"><code class="docutils literal notranslate"><span class="pre">Molecule.computeTotalMass()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomForVertexId"><code class="docutils literal notranslate"><span class="pre">Molecule.getAtomForVertexId()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomIdByIdx"><code class="docutils literal notranslate"><span class="pre">Molecule.getAtomIdByIdx()</span></code></a></li>

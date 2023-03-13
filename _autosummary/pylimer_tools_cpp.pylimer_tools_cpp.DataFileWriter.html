@@ -260,14 +260,20 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.__init__" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, universe)</p></td>
 <td><p>Initialize the writer with the universe to write.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configCrosslinkerType" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configCrosslinkerType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configCrosslinkerType</span></code></a>(self[, crosslinkerType])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configAttemptImageReset" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configAttemptImageReset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configAttemptImageReset</span></code></a>(self[, ...])</p></td>
+<td><p>Set whether to change the outuput coordinates to lie in the box or not.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configCrosslinkerType" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configCrosslinkerType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configCrosslinkerType</span></code></a>(self[, crosslinkerType])</p></td>
 <td><p>Set which atom type represents cross-linkers.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configIncludeAngles" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configIncludeAngles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configIncludeAngles</span></code></a>(self[, includeAngles])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configIncludeAngles" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configIncludeAngles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configIncludeAngles</span></code></a>(self[, includeAngles])</p></td>
 <td><p>Set whether to include the angles from the universe in the file or not.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configMoleculeIdxForSwap</span></code></a>(self[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configMoleculeIdxForSwap</span></code></a>(self[, ...])</p></td>
 <td><p>Swappable chains implies that their <cite>moleculeIdx</cite> in the LAMMPS data file is not identical per chain, but identical per position in the chain.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configMoveIntoBox" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configMoveIntoBox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configMoveIntoBox</span></code></a>(self[, moveIntoBox])</p></td>
+<td><p>Set whether to change the outuput coordinates to lie in the box or not.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configReindexAtoms" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configReindexAtoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configReindexAtoms</span></code></a>(self[, reindexAtoms])</p></td>
 <td><p>Set whether to reindex the atoms or not.</p></td>
@@ -285,25 +291,42 @@
 </table>
 </div>
 <dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configAttemptImageReset">
+<span class="sig-name descname"><span class="pre">configAttemptImageReset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">attemptImageReset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configAttemptImageReset" title="Permalink to this definition">#</a></dt>
+<dd><p>Set whether to change the outuput coordinates to lie in the box or not.</p>
+<p>Default: false.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configCrosslinkerType">
 <span class="sig-name descname"><span class="pre">configCrosslinkerType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinkerType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configCrosslinkerType" title="Permalink to this definition">#</a></dt>
 <dd><p>Set which atom type represents cross-linkers.
 Needed in case the moleculeIdx in the output file should have any meaning.
 (e.g. with <a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap"><code class="xref py py-func docutils literal notranslate"><span class="pre">configMoleculeIdxForSwap()</span></code></a>).</p>
+<p>Default: 2.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configIncludeAngles">
 <span class="sig-name descname"><span class="pre">configIncludeAngles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">includeAngles</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configIncludeAngles" title="Permalink to this definition">#</a></dt>
 <dd><p>Set whether to include the angles from the universe in the file or not.</p>
+<p>Default: true.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap">
-<span class="sig-name descname"><span class="pre">configMoleculeIdxForSwap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">enableSwappability</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap" title="Permalink to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">configMoleculeIdxForSwap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">enableSwappability</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap" title="Permalink to this definition">#</a></dt>
 <dd><p>Swappable chains implies that their <cite>moleculeIdx</cite> in the LAMMPS data file is not
 identical per chain, but identical per position in the chain.
 That’s how you can have bond swapping with constant chain length distribution.</p>
+<p>Default: false.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configMoveIntoBox">
+<span class="sig-name descname"><span class="pre">configMoveIntoBox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">moveIntoBox</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configMoveIntoBox" title="Permalink to this definition">#</a></dt>
+<dd><p>Set whether to change the outuput coordinates to lie in the box or not.</p>
+<p>Default: false (used to be true).</p>
 </dd></dl>
 
 <dl class="py method">
@@ -311,6 +334,7 @@ That’s how you can have bond swapping with constant chain length distribution.
 <span class="sig-name descname"><span class="pre">configReindexAtoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">reindexAtoms</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configReindexAtoms" title="Permalink to this definition">#</a></dt>
 <dd><p>Set whether to reindex the atoms or not.
 Re-indexing leads to atom ids being in the range of 1 to the number of atoms.</p>
+<p>Default: false.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -408,9 +432,11 @@ Placeholder options are:</p>
 <li><a class="reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter</a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter"><code class="docutils literal notranslate"><span class="pre">DataFileWriter</span></code></a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.__init__"><code class="docutils literal notranslate"><span class="pre">DataFileWriter.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configAttemptImageReset"><code class="docutils literal notranslate"><span class="pre">DataFileWriter.configAttemptImageReset()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configCrosslinkerType"><code class="docutils literal notranslate"><span class="pre">DataFileWriter.configCrosslinkerType()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configIncludeAngles"><code class="docutils literal notranslate"><span class="pre">DataFileWriter.configIncludeAngles()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap"><code class="docutils literal notranslate"><span class="pre">DataFileWriter.configMoleculeIdxForSwap()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configMoveIntoBox"><code class="docutils literal notranslate"><span class="pre">DataFileWriter.configMoveIntoBox()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configReindexAtoms"><code class="docutils literal notranslate"><span class="pre">DataFileWriter.configReindexAtoms()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.setCustomAtomFormat"><code class="docutils literal notranslate"><span class="pre">DataFileWriter.setCustomAtomFormat()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.setUniverseToWrite"><code class="docutils literal notranslate"><span class="pre">DataFileWriter.setUniverseToWrite()</span></code></a></li>
