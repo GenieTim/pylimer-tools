@@ -208,12 +208,67 @@ namespace entities {
 
     double Rg2 = 0.0;
     for (Atom a : allAtoms) {
-      double dist = a.distanceTo(virtualCenterAtom, this->parent);
+      double dist = a.distanceToUnwrapped(virtualCenterAtom, this->parent);
       Rg2 += this->massPerType.at(a.getType()) * dist * dist;
     }
 
     return Rg2 * multiplier / totalMass;
   }
+
+  double Molecule::computeRadiusOfGyrationWithDerivedImageFlags(
+    const int crossLinkerType) const
+  {
+    std::vector<Atom> atoms = this->getAtomsLinedUp();
+    if (atoms.size() == 0) {
+      return 0.0;
+    }
+
+    double multiplier = 1. / atoms.size();
+    double totalMass = 0.0;
+
+    // compute the mean position based on the
+    // image flags of the first atom
+    Atom lastAtom = atoms[0];
+    double meanX = lastAtom.getUnwrappedX(this->parent),
+           meanY = lastAtom.getUnwrappedY(this->parent),
+           meanZ = lastAtom.getUnwrappedZ(this->parent);
+    // find mean position
+    for (size_t i = 1; i < atoms.size(); ++i) {
+
+      totalMass += this->massPerType.at(atoms[i].getType());
+      double localMultiplier =
+        multiplier / this->massPerType.at(atoms[i].getType());
+      double distance[3];
+      // for each next atom, we can use the shortest distance to the previous
+      // in order to compensate/ignore the image flags while still enabling
+      // larger end-to-end distances than the
+      atoms[i].vectorTo(lastAtom, this->parent, distance);
+      meanX += localMultiplier * distance[0];
+      meanY += localMultiplier * distance[1];
+      meanZ += localMultiplier * distance[2];
+
+      lastAtom = atoms[i];
+    }
+
+    // use it to compute the r_g
+    lastAtom = atoms[0];
+    multiplier = 1. / (atoms.size() * totalMass);
+    double lastDx = (lastAtom.getUnwrappedX(this->parent) - meanX);
+    double lastDy = (lastAtom.getUnwrappedY(this->parent) - meanY);
+    double lastDz = (lastAtom.getUnwrappedZ(this->parent) - meanZ);
+    double Rg2 =
+      (lastDx * lastDx + lastDy * lastDy + lastDz * lastDz) * multiplier;
+    for (size_t i = 1; i < atoms.size(); ++i) {
+      Atom a = atoms[i];
+      double distance[3];
+      atoms[i].vectorTo(lastAtom, this->parent, distance);
+      lastDx += distance[0];
+      lastDy += distance[1];
+      lastDz += distance[2];
+      Rg2 += (lastDx * lastDx + lastDy * lastDy + lastDz * lastDz) * multiplier;
+    }
+    return Rg2;
+  };
 
   std::string Molecule::getKey() const
   {
@@ -236,7 +291,7 @@ namespace entities {
     return results;
   };
 
-  std::vector<Atom> Molecule::getAtomsLinedUp(int crossLinkerType)
+  std::vector<Atom> Molecule::getAtomsLinedUp(int crossLinkerType) const
   {
     std::vector<Atom> results;
     size_t nrOfAtoms = this->getNrOfAtoms();
