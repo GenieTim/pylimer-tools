@@ -30,10 +30,18 @@ namespace utils {
     void setUniverseToWrite(const pylimer_tools::entities::Universe u)
     {
       this->universe = u;
-    };
+    }
     void configIncludeAngles(const bool includeAngles)
     {
       this->includeAngles = includeAngles;
+    }
+    void configMoveIntoBox(const bool doMoveIntoBox = true)
+    {
+      this->moveIntoBox = doMoveIntoBox;
+    }
+    void configAttemptImageReset(const bool doImageReset = true)
+    {
+      this->attemptImageReset = doImageReset;
     }
     void setCustomAtomFormat(const std::string atomFormat)
     {
@@ -47,7 +55,7 @@ namespace utils {
     {
       this->crosslinkerType = crosslinkerType;
     }
-    void configReindexAtoms(const bool reindex)
+    void configReindexAtoms(const bool reindex = true)
     {
       this->reindexAtoms = reindex;
     }
@@ -139,10 +147,36 @@ namespace utils {
     bool moleculeIdxSwappable = false;
     int crosslinkerType = 2;
     bool reindexAtoms = false;
+    bool moveIntoBox = false;
+    bool attemptImageReset = false;
     std::string customAtomFormat = "";
     // functions
-    double moveCoordinateIntoBox(double coord, double boxLo, double boxHi) const
+    // TODO: move the following to the box
+    int getImageFlagForCoordinate(double coord,
+                                  double boxLo,
+                                  double boxHi) const
     {
+      assert(boxHi > boxLo);
+      int imageFlag = 0;
+      double L = (boxHi + boxLo);
+      while (coord > boxHi) {
+        coord -= L;
+        imageFlag += 1;
+      }
+      while (coord < boxLo) {
+        coord += L;
+        imageFlag -= 1;
+      }
+      return imageFlag;
+    }
+    double conditionallyMoveCoordinateIntoBox(double coord,
+                                              double boxLo,
+                                              double boxHi) const
+    {
+      assert(boxHi > boxLo);
+      if (this->moveIntoBox == false) {
+        return coord;
+      }
       double boxL = (boxHi - boxLo);
       while (coord > boxHi && coord > boxLo) {
         coord -= boxL;
@@ -159,22 +193,40 @@ namespace utils {
     {
       long int atomId = this->reindexAtoms ? nAtomsOutput : atom.getId();
       this->oldNewAtomIdMap[atom.getId()] = atomId;
-      double x =
-        this->moveCoordinateIntoBox(atom.getX(),
-                                    this->universe.getBox().getLowX(),
-                                    this->universe.getBox().getHighX());
-      double y =
-        this->moveCoordinateIntoBox(atom.getY(),
-                                    this->universe.getBox().getLowY(),
-                                    this->universe.getBox().getHighY());
-      double z =
-        this->moveCoordinateIntoBox(atom.getZ(),
-                                    this->universe.getBox().getLowZ(),
-                                    this->universe.getBox().getHighZ());
+      int nx =
+        this->attemptImageReset
+          ? this->getImageFlagForCoordinate(atom.getX(),
+                                            this->universe.getBox().getLowX(),
+                                            this->universe.getBox().getHighX())
+          : atom.getNX();
+      int ny =
+        this->attemptImageReset
+          ? this->getImageFlagForCoordinate(atom.getY(),
+                                            this->universe.getBox().getLowY(),
+                                            this->universe.getBox().getHighY())
+          : atom.getNY();
+      int nz =
+        this->attemptImageReset
+          ? this->getImageFlagForCoordinate(atom.getZ(),
+                                            this->universe.getBox().getLowZ(),
+                                            this->universe.getBox().getHighZ())
+          : atom.getNZ();
+      double x = this->conditionallyMoveCoordinateIntoBox(
+        atom.getX(),
+        this->universe.getBox().getLowX(),
+        this->universe.getBox().getHighX());
+      double y = this->conditionallyMoveCoordinateIntoBox(
+        atom.getY(),
+        this->universe.getBox().getLowY(),
+        this->universe.getBox().getHighY());
+      double z = this->conditionallyMoveCoordinateIntoBox(
+        atom.getZ(),
+        this->universe.getBox().getLowZ(),
+        this->universe.getBox().getHighZ());
       if (this->customAtomFormat.size() < 2) {
         file << "\t" << atomId << "\t" << moleculeIdx << "\t" << atom.getType()
-             << "\t" << x << "\t" << y << "\t" << z << "\t" << atom.getNX()
-             << "\t" << atom.getNY() << "\t" << atom.getNZ() << "\n";
+             << "\t" << x << "\t" << y << "\t" << z << "\t" << nx << "\t" << ny
+             << "\t" << nz << "\n";
       } else {
         std::string outputStr = this->customAtomFormat;
         outputStr = std::regex_replace(
@@ -184,11 +236,11 @@ namespace utils {
         outputStr = std::regex_replace(
           outputStr, std::regex("\\$atomType"), std::to_string(atom.getType()));
         outputStr = std::regex_replace(
-          outputStr, std::regex("\\$nx"), std::to_string(atom.getNX()));
+          outputStr, std::regex("\\$nx"), std::to_string(nx));
         outputStr = std::regex_replace(
-          outputStr, std::regex("\\$ny"), std::to_string(atom.getNY()));
+          outputStr, std::regex("\\$ny"), std::to_string(ny));
         outputStr = std::regex_replace(
-          outputStr, std::regex("\\$nz"), std::to_string(atom.getNZ()));
+          outputStr, std::regex("\\$nz"), std::to_string(nz));
         outputStr =
           std::regex_replace(outputStr, std::regex("\\$x"), std::to_string(x));
         outputStr =
@@ -220,9 +272,11 @@ namespace utils {
         this->universe.getMolecules(this->crosslinkerType);
       for (pylimer_tools::entities::Molecule molecule : molecules) {
         std::vector<pylimer_tools::entities::Atom> atoms =
-          this->moleculeIdxSwappable ? molecule.getAtomsLinedUp()
-                                     : molecule.getAtoms();
+          (this->moleculeIdxSwappable || this->attemptImageReset)
+            ? molecule.getAtomsLinedUp()
+            : molecule.getAtoms();
         nMoleculesOutput += 1;
+
         for (size_t i = 0; i < atoms.size(); ++i) {
           pylimer_tools::entities::Atom atom = atoms[i];
           nAtomsOutput += 1;
@@ -231,6 +285,7 @@ namespace utils {
             (i >= (atoms.size() * 0.5)) ? (atoms.size() - i) : ip1;
           int moleculeIdx = this->moleculeIdxSwappable ? swappableMoleculeIdx
                                                        : nMoleculesOutput;
+
           this->writeAtom(file, atom, moleculeIdx, nAtomsOutput);
         }
       }

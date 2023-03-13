@@ -28,6 +28,8 @@ init_pylimer_bound_writers(py::module_& m)
          &DataFileWriter::configIncludeAngles,
          R"pbdoc(
            Set whether to include the angles from the universe in the file or not.
+
+           Default: true.
       )pbdoc",
          py::arg("includeAngles") = true)
     .def("configReindexAtoms",
@@ -35,8 +37,26 @@ init_pylimer_bound_writers(py::module_& m)
          R"pbdoc(
            Set whether to reindex the atoms or not. 
            Re-indexing leads to atom ids being in the range of 1 to the number of atoms.
+
+           Default: false.
       )pbdoc",
          py::arg("reindexAtoms") = true)
+    .def("configMoveIntoBox",
+         &DataFileWriter::configMoveIntoBox,
+         R"pbdoc(
+           Set whether to change the outuput coordinates to lie in the box or not.
+
+           Default: false (used to be true).
+      )pbdoc",
+         py::arg("moveIntoBox") = true)
+    .def("configAttemptImageReset",
+         &DataFileWriter::configAttemptImageReset,
+         R"pbdoc(
+           Set whether to change the outuput coordinates to lie in the box or not.
+
+           Default: false.
+      )pbdoc",
+         py::arg("attemptImageReset") = true)
     .def("setCustomAtomFormat",
          &DataFileWriter::setCustomAtomFormat,
          R"pbdoc(
@@ -62,16 +82,20 @@ init_pylimer_bound_writers(py::module_& m)
            Set which atom type represents cross-linkers. 
            Needed in case the moleculeIdx in the output file should have any meaning.
            (e.g. with :func:`~pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap`).
+
+           Default: 2.
       )pbdoc",
          py::arg("crosslinkerType") = 2)
     .def("configMoleculeIdxForSwap",
          &DataFileWriter::configMoleculeIdxForSwap,
-         py::arg("enableSwappability") = false,
          R"pbdoc(
                 Swappable chains implies that their `moleculeIdx` in the LAMMPS data file is not 
                 identical per chain, but identical per position in the chain.
                 That's how you can have bond swapping with constant chain length distribution.
-           )pbdoc")
+
+                Default: false.
+           )pbdoc",
+         py::arg("enableSwappability") = true)
     .def("writeToFile", &DataFileWriter::writeToFile);
 }
 

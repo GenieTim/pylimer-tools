@@ -319,6 +319,20 @@ init_pylimer_bound_entities(py::module_& m)
             are the coordinates of the center of mass of the molecule and the
             sum is over all contained atoms.
             )pbdoc")
+    .def("computeRadiusOfGyrationWithDerivedImageFlags",
+         &Molecule::computeRadiusOfGyrationWithDerivedImageFlags,
+         R"pbdoc(
+            Computes the radius of gyration, :math:`R_g^2` of this molecule,
+            but ignoring the image flags attached to the atoms.
+            This only works for Molecules that can be lined up with 
+            :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsLinedUp()`,
+            as it needs the atoms sorted such that the periodic box can still be respected somewhat.
+            In other words, this function computes the radius of gyration 
+            assuming the distance between two lined-up beads is smaller than half the periodic box.
+            
+            See also: :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeRadiusOfGyration()`.
+            )pbdoc",
+         py::arg("crossLinkerType") = 2)
     .def("computeEndToEndDistance",
          &Molecule::computeEndToEndDistance,
          R"pbdoc(
@@ -488,7 +502,7 @@ init_pylimer_bound_entities(py::module_& m)
             Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms.
             
             Reduces the Universe to a list of molecules. 
-            Specify the crosslinkerType to an existing type id, 
+            Specify the crossLinkerType to an existing type id, 
             then those atoms will be omitted, and this function returns chains instead.)pbdoc",
          py::arg("atomTypeToOmit"))
     .def("getAtomsConnectedTo", &Universe::getAtomsConnectedTo, R"pbdoc(
@@ -509,7 +523,7 @@ init_pylimer_bound_entities(py::module_& m)
                You can use the maxLength parameter to restrict the algorithm to only search for loops up to a certain length.
                Use a negative value to find all loops and paths.
             )pbdoc",
-         py::arg("crosslinkerType"),
+         py::arg("crossLinkerType"),
          py::arg("maxLength") = -1,
          py::arg("skipSelfLoops") = false)
     .def("findMinimalOrderLoopFrom",
@@ -538,7 +552,7 @@ init_pylimer_bound_entities(py::module_& m)
                Cross-linkers without bonds to non-cross-linkers are not returned 
                (i.e., cross-linker-cross-linker bonds, or single cross-linkers, are not counted as strands).
            )pbdoc",
-         py::arg("crosslinkerType"))
+         py::arg("crossLinkerType"))
     .def("getNetworkOfCrosslinker",
          &Universe::getNetworkOfCrosslinker,
          R"pbdoc(
@@ -669,7 +683,7 @@ init_pylimer_bound_entities(py::module_& m)
          R"pbdoc(
               Compute the mean strand length.
               )pbdoc",
-         py::arg("crosslinkerType"))
+         py::arg("crossLinkerType"))
     .def("computeTotalMass", &Universe::computeTotalMass, R"pbdoc(
           Compute the total mass of this network/universe in whatever mass unit was used when 
           :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.setMasses()` was called.
@@ -682,7 +696,7 @@ init_pylimer_bound_entities(py::module_& m)
               NOTE: 
                     Cross-linkers are ignored completely.
               )pbdoc",
-         py::arg("crosslinkerType"))
+         py::arg("crossLinkerType"))
     .def("computeWeightAverageMolecularWeight",
          &Universe::computeWeightAverageMolecularWeight,
          R"pbdoc(
@@ -691,14 +705,14 @@ init_pylimer_bound_entities(py::module_& m)
               NOTE: 
                     Cross-linkers are ignored completely.
               )pbdoc",
-         py::arg("crosslinkerType"))
+         py::arg("crossLinkerType"))
     .def("computePolydispersityIndex",
          &Universe::computePolydispersityIndex,
          R"pbdoc(
               Compute the polydispersity indiex: 
               the weight average molecular weight over the number average molecular weight.
               )pbdoc",
-         py::arg("crosslinkerType"))
+         py::arg("crossLinkerType"))
     .def("computeWeightFractions", &Universe::computeWeightFractions, R"pbdoc(
             Compute the weight fractions of each atom type in the network.
             )pbdoc")
@@ -730,7 +744,7 @@ init_pylimer_bound_entities(py::module_& m)
                All its cautionary facts apply.
                Invalid strands (where said function returns 0.0 or -1.0) are ignored.
      )pbdoc",
-         py::arg("crosslinkerType"),
+         py::arg("crossLinkerType"),
          py::arg("onlyThoseWithTwoCrosslinkers") = false)
     .def("computeDxs",
          &Universe::computeDxs,
