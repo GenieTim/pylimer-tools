@@ -58,7 +58,8 @@ namespace entities {
 
   Universe::Universe(const double Lx, const double Ly, const double Lz)
     : Universe(Box(Lx, Ly, Lz))
-  {}
+  {
+  }
 
   // 1. destructor (to destroy the graph)
   Universe::~Universe()
@@ -424,7 +425,10 @@ namespace entities {
     this->massPerType = massPerType;
   }
 
-  std::map<int, double> Universe::getMasses() { return this->massPerType; };
+  std::map<int, double> Universe::getMasses()
+  {
+    return this->massPerType;
+  };
 
   /**
    * @brief Get the standalone components of the network
@@ -753,7 +757,8 @@ namespace entities {
   std::vector<std::vector<long int>> Universe::findLoops(
     const int crosslinkerType,
     const int maxLength,
-    bool skipSelfLoops) const
+    bool skipSelfLoops,
+    std::vector<std::vector<long int>>* edges) const
   {
     // NOTE: there are exponentially many paths between two vertices of a graph,
     // and you may run out of memory when using this function, if your graph is
@@ -794,10 +799,11 @@ namespace entities {
       igraph_vector_int_destroy(&neighbours);
       // translate the paths we found
       std::vector<long int> currentPath;
+      std::vector<long int> currentPathEdges;
       int currentFunctionality = 0;
       unsigned long long int currentPathXor = 0;
       unsigned long long int currentPathSum = 0;
-      unsigned long long int currentPathProduct = 0;
+      unsigned long long int currentPathProduct = 1;
       size_t n = igraph_vector_int_size(&paths);
       for (size_t i = 0; i < n; ++i) {
         const long int currentVal = igraph_vector_int_get(&paths, i);
@@ -811,19 +817,30 @@ namespace entities {
               !pylimer_tools::utils::set_has_key(processedPathsKeys,
                                                  currentPathKey)) {
             results.push_back(currentPath);
+            if (edges != nullptr) {
+              edges->push_back(currentPathEdges);
+            }
             processedPathsKeys.insert(currentPathKey);
           }
           currentPath.clear();
+          currentPathEdges.clear();
           currentFunctionality = 0;
           currentPathXor = 0;
           currentPathSum = 0;
-          currentPathProduct = 0;
+          currentPathProduct = 1;
         } else {
           // compute hash
           currentPathXor = (currentPathXor xor currentVal);
           currentPathSum += currentVal;
           currentPathProduct *= currentVal;
           // and remember the part of the path
+          if (currentPath.size() > 0 && edges != nullptr) {
+            // TODO: here, we should decide what we do if multile edges 
+            // between the two vertices are found
+            // also TODO: check if the looping edge is included
+            currentPathEdges.push_back(this->getEdgeIdsFromTo(
+              currentPath[currentPath.size() - 1], currentVal)[0]);
+          }
           currentPath.push_back(currentVal);
         }
       }
@@ -1522,7 +1539,9 @@ namespace entities {
    */
   std::vector<LoopIntersectionInfo> Universe::findLoopEntanglements(
     const std::vector<long int>& vertexIndicesLoop1,
-    const std::vector<long int>& vertexIndicesLoop2) const
+    const std::vector<long int>& vertexIndicesLoop2,
+      const std::vector<long int>& edgeIndicesLoop1,
+      const std::vector<long int>& edgeIndicesLoop2) const
   {
     std::vector<LoopIntersectionInfo> results;
     Eigen::Vector3d helperNode = Eigen::Vector3d::Zero();
@@ -1531,8 +1550,9 @@ namespace entities {
     for (long int i = 0; i < vertexIndicesLoop1.size(); ++i) {
       // find PBC corrected mean position
       Eigen::Vector3d vertexIdxPos = this->getPositionVectorForVertex(i);
-      Eigen::Vector3d distance = vertexIdxPos - helperNode;this->box.handlePBC(distance);
-      helperNode += ((distance).array()*sizeDenominator).matrix();
+      Eigen::Vector3d distance = vertexIdxPos - helperNode;
+      this->box.handlePBC(distance);
+      helperNode += ((distance).array() * sizeDenominator).matrix();
     }
     int intersections = 0;
     // now that we have the helper node, we can check all edges of loop2, how
@@ -1549,7 +1569,8 @@ namespace entities {
       }
       Eigen::Vector3d vertex0 =
         this->getPositionVectorForVertex(vertexIndicesLoop1[i]);
-      long int vertex1Index = (i == 0) ? (vertexIndicesLoop1.size() - 1) : (i - 1);
+      long int vertex1Index =
+        (i == 0) ? (vertexIndicesLoop1.size() - 1) : (i - 1);
       Eigen::Vector3d vertex1 =
         this->getPositionVectorForVertex(vertexIndicesLoop1[vertex1Index]);
       // the triangle is now spawned by vertex0, vertex1 and the helperNode
@@ -1994,11 +2015,20 @@ namespace entities {
    *
    * @return double
    */
-  double Universe::getVolume() const { return this->box.getVolume(); }
+  double Universe::getVolume() const
+  {
+    return this->box.getVolume();
+  }
 
-  size_t Universe::getNrOfAtoms() const { return this->NAtoms; }
+  size_t Universe::getNrOfAtoms() const
+  {
+    return this->NAtoms;
+  }
 
-  size_t Universe::getNrOfBonds() const { return this->NBonds; }
+  size_t Universe::getNrOfBonds() const
+  {
+    return this->NBonds;
+  }
 
   void Universe::setBox(Box passedBox, bool rescaleAtomCoordinates)
   {
@@ -2058,6 +2088,9 @@ namespace entities {
     this->setBox(Box(Lx, Ly, Lz));
   }
 
-  Box Universe::getBox() const { return this->box; }
+  Box Universe::getBox() const
+  {
+    return this->box;
+  }
 } // namespace entities
 } // namespace pylimer_tools

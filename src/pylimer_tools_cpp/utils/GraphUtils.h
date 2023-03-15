@@ -199,7 +199,8 @@ namespace utils {
     }
 
     /**
-     * @brief Find all simple cycles. NOTE: this might use more memory than you
+     * @brief Find all simple cycles. 
+     * NOTE: this might use more memory than you
      * might like.
      *
      * @return std::vector<std::vector<long int>>

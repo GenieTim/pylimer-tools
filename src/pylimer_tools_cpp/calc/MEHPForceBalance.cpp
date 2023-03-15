@@ -1149,8 +1149,9 @@ namespace calc {
     {
       std::cout << "Detecting slip-links based on cycles. Base memory useage: "
                 << getCurrentRSS() << ", peak " << getPeakRSS() << std::endl;
+      std::vector<std::vector<long int>> loopEdges;
       std::vector<std::vector<long int>> loops =
-        this->universe.findLoops(this->crosslinkerType, maxLoopLength, false);
+        this->universe.findLoops(this->crosslinkerType, maxLoopLength, false, &loopEdges);
       std::cout << "Detected " << loops.size() << " loops." << std::endl;
       std::vector<std::vector<size_t>> reducedLoops;
       reducedLoops.reserve(loops.size());
@@ -1233,7 +1234,7 @@ namespace calc {
         for (size_t j = i + 1; j < loops.size(); ++j) {
           std::vector<pylimer_tools::entities::LoopIntersectionInfo>
             intersections =
-              this->universe.findLoopEntanglements(loops[i], loops[j]);
+              this->universe.findLoopEntanglements(loops[i], loops[j], loopEdges[i], loopEdges[j]);
           for (pylimer_tools::entities::LoopIntersectionInfo intersection :
                intersections) {
             // TODO: this is yet the most naïve way to add these.
