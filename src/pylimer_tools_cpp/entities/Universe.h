@@ -38,7 +38,10 @@ namespace entities {
     Universe& operator=(Universe src);
 
     // initilaization/setters (and removers)
-    void setBoxLengths(const double Lx, const double Ly, const double Lz, bool rescaleAtomCoordinates = false);
+    void setBoxLengths(const double Lx,
+                       const double Ly,
+                       const double Lz,
+                       bool rescaleAtomCoordinates = false);
     // atoms
     void addAtoms(std::vector<long int> ids,
                   std::vector<int> types,
@@ -96,7 +99,8 @@ namespace entities {
     std::vector<std::vector<long int>> findLoops(
       const int crosslinkerType,
       const int maxLength = -1,
-      bool skipSelfLoops = false) const;
+      bool skipSelfLoops = false,
+      std::vector<std::vector<long int>>* edges = nullptr) const;
     std::map<int, std::vector<std::vector<Atom>>> findLoopsOfAtoms(
       const int crosslinkerType,
       const int maxLength = -1,
@@ -146,8 +150,10 @@ namespace entities {
     };
     Eigen::Vector3d getPositionVectorForVertex(const int vertexId) const;
     std::vector<LoopIntersectionInfo> findLoopEntanglements(
-      const std::vector<long int> &vertexIndicesLoop1,
-      const std::vector<long int> &vertexIndicesLoop2) const;
+      const std::vector<long int>& vertexIndicesLoop1,
+      const std::vector<long int>& vertexIndicesLoop2,
+      const std::vector<long int>& edgeIndicesLoop1,
+      const std::vector<long int>& edgeIndicesLoop2) const;
     double getMeanStrandLength(int crosslinkerType);
     std::vector<double> computeEndToEndDistances(int crosslinkerType);
     double computeMeanEndToEndDistance(int crosslinkerType);
