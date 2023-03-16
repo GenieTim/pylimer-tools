@@ -681,7 +681,7 @@ init_pylimer_bound_entities(py::module_& m)
     .def("computeMeanStrandLength",
          &Universe::getMeanStrandLength,
          R"pbdoc(
-              Compute the mean strand length.
+              Compute the mean number of beads per strand.
               )pbdoc",
          py::arg("crossLinkerType"))
     .def("computeTotalMass", &Universe::computeTotalMass, R"pbdoc(
