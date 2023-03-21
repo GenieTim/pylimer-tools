@@ -328,7 +328,8 @@ init_pylimer_bound_entities(py::module_& m)
             :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsLinedUp()`,
             as it needs the atoms sorted such that the periodic box can still be respected somewhat.
             In other words, this function computes the radius of gyration 
-            assuming the distance between two lined-up beads is smaller than half the periodic box.
+            assuming the distance between two lined-up beads 
+            is smaller than half the periodic box in each direction.
             
             See also: :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeRadiusOfGyration()`.
             )pbdoc",
@@ -341,6 +342,21 @@ init_pylimer_bound_entities(py::module_& m)
             CAUTION:
                Returns 0.0 if the molecule does not have two or more atoms.
                Returns -1.0 if not exactly 2 ends were found.
+               Computes the distance between 2 atoms with functionality 1, 
+               ignoring whether they are cross-linkers or not.
+            )pbdoc")
+    .def("computeEndToEndDistanceWithDerivedImageFlags",
+         &Molecule::computeEndToEndDistanceWithDerivedImageFlags,
+         R"pbdoc(
+            Compute the end-to-end distance (:math:`R_{ee}`) of this molecule,
+            but ignoring the image flags attached to the atoms. 
+            This only works for Molecules that can be lined up with 
+            :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsLinedUp()`,
+            as it needs the atoms sorted such that the periodic box can still be respected somewhat.
+
+            CAUTION:
+               Returns 0.0 if the molecule does not have two or more atoms.
+               Requires bonds to be shorter than half the box length.
                Computes the distance between 2 atoms with functionality 1, 
                ignoring whether they are cross-linkers or not.
             )pbdoc")
