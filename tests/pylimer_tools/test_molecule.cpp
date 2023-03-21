@@ -76,7 +76,7 @@ TEST_CASE("Molecules work as intended", "[entity][Molecule]")
     REQUIRE(molecule1.getNrOfAtoms() == 3);
     REQUIRE(molecule1.computeTotalMass() == Catch::Approx(3.0));
     REQUIRE(molecule1.getType() == pe::MoleculeType::UNDEFINED);
-    REQUIRE(molecule1.computeRadiusOfGyration() == Catch::Approx(0.0));
+    // REQUIRE(molecule1.computeRadiusOfGyration() == Catch::Approx(0.0));
     REQUIRE_THROWS(molecule1.getIdxByAtomId(19234121));
 
     std::vector<pe::Atom> atomsInLine = molecule1.getAtomsLinedUp();
@@ -116,6 +116,9 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
                     { { 1, 1, 1, 1, 0, 1, 1, 1 } },   // ny
                     { { 1, 1, 1, 1, 0, 1, 1, 1 } }    // nz
   );
+  std::unordered_map<int, double> masses;
+  masses[1] = 1.0;
+  masses[2] = 1.0;
   universe.addBonds(8,
                     { { 1, 2, 3, 4, 5, 6, 7, 8 } },
                     { { 2, 3, 4, 1, 6, 7, 8, 5 } },
@@ -124,6 +127,10 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
                     false);
 
   std::vector<pe::Molecule> molecules = universe.getMolecules();
+  CHECK_THROWS(molecules[0].computeRadiusOfGyration());
+  CHECK_THROWS(molecules[0].computeRadiusOfGyrationWithDerivedImageFlags(2));
+  universe.setMasses(masses);
+  molecules = universe.getMolecules();
   CHECK(molecules.size() == 2);
 
   SECTION("R_g can be computed in both ways")
