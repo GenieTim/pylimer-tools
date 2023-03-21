@@ -183,8 +183,16 @@ namespace entities {
     // But the OOP interface is just too tempting
     // as long as there are no external additional performance demands
     std::vector<Atom> allAtoms = this->getAtoms();
+    if (allAtoms.size() == 0) {
+      return 0.0;
+    }
     double multiplier = 1. / static_cast<double>(allAtoms.size());
     double totalMass = 0.0;
+
+    if (this->massPerType.empty()) {
+      throw std::runtime_error(
+        "Cannot compute radius of gyration without masses.");
+    }
 
 // TODO: might want to use the raw values, use std::accumulate or std::reduce
 #pragma omp parallel for reduction(+ : meanX, meanY, meanZ)
@@ -211,7 +219,7 @@ namespace entities {
                                   0);
 
     double Rg2 = 0.0;
-    double correctingFactor = (totalMass > 0. ? 1. / totalMass : multiplier);
+    double correctingFactor = 1. / totalMass;
     for (Atom a : allAtoms) {
       double dist = a.distanceToUnwrapped(virtualCenterAtom, this->parent);
       Rg2 += correctingFactor * this->massPerType.at(a.getType()) * dist * dist;
@@ -226,6 +234,11 @@ namespace entities {
     std::vector<Atom> atoms = this->getAtomsLinedUp();
     if (atoms.size() == 0) {
       return 0.0;
+    }
+
+    if (this->massPerType.empty()) {
+      throw std::runtime_error(
+        "Cannot compute radius of gyration without masses.");
     }
 
     double multiplier = 1. / (static_cast<double>(atoms.size()));
@@ -257,7 +270,7 @@ namespace entities {
 
     // use it to compute the r_g
     lastAtom = atoms[0];
-    multiplier = totalMass > 0. ? (1. / totalMass) : multiplier;
+    multiplier = 1. / totalMass;
     double lastDx = (lastAtom.getUnwrappedX(this->parent) - meanX);
     double lastDy = (lastAtom.getUnwrappedY(this->parent) - meanY);
     double lastDz = (lastAtom.getUnwrappedZ(this->parent) - meanZ);
@@ -272,7 +285,8 @@ namespace entities {
       lastDx += distance[0];
       lastDy += distance[1];
       lastDz += distance[2];
-      Rg2 += (lastDx * lastDx + lastDy * lastDy + lastDz * lastDz) * localMultiplier;
+      Rg2 +=
+        (lastDx * lastDx + lastDy * lastDy + lastDz * lastDz) * localMultiplier;
     }
     return Rg2;
   };
