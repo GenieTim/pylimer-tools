@@ -242,7 +242,7 @@ namespace entities {
 
       totalMass += this->massPerType.at(atoms[i].getType());
       double localMultiplier =
-        multiplier / this->massPerType.at(atoms[i].getType());
+        multiplier * this->massPerType.at(atoms[i].getType());
       double distance[3];
       // for each next atom, we can use the shortest distance to the previous
       // in order to compensate/ignore the image flags while still enabling
@@ -264,13 +264,15 @@ namespace entities {
     double Rg2 =
       (lastDx * lastDx + lastDy * lastDy + lastDz * lastDz) * multiplier;
     for (size_t i = 1; i < atoms.size(); ++i) {
+      double localMultiplier =
+        multiplier * this->massPerType.at(atoms[i].getType());
       Atom a = atoms[i];
       double distance[3];
       atoms[i].vectorTo(lastAtom, this->parent, distance);
       lastDx += distance[0];
       lastDy += distance[1];
       lastDz += distance[2];
-      Rg2 += (lastDx * lastDx + lastDy * lastDy + lastDz * lastDz) * multiplier;
+      Rg2 += (lastDx * lastDx + lastDy * lastDy + lastDz * lastDz) * localMultiplier;
     }
     return Rg2;
   };
