@@ -20,6 +20,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Molecule
       ~Molecule.__init__
       ~Molecule.computeBondLengths
       ~Molecule.computeEndToEndDistance
+      ~Molecule.computeEndToEndDistanceWithDerivedImageFlags
       ~Molecule.computeRadiusOfGyration
       ~Molecule.computeRadiusOfGyrationWithDerivedImageFlags
       ~Molecule.computeTotalMass
