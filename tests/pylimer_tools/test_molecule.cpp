@@ -138,7 +138,7 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
           Catch::Approx(29. + static_cast<double>(i)));
   }
   CHECK_THROWS(molecules[0].computeRadiusOfGyration());
-  CHECK_THROWS(molecules[0].computeRadiusOfGyrationWithDerivedImageFlags(2));
+  CHECK_THROWS(molecules[0].computeRadiusOfGyrationWithDerivedImageFlags());
   universe.setMasses(masses);
   molecules = universe.getMolecules();
   CHECK(molecules.size() == 2);
@@ -148,13 +148,13 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
     // first method
     CHECK(molecules[0].computeRadiusOfGyration() == Catch::Approx(15. / 4.));
     // second method
-    CHECK(molecules[0].computeRadiusOfGyrationWithDerivedImageFlags(2) ==
+    CHECK(molecules[0].computeRadiusOfGyrationWithDerivedImageFlags() ==
           Catch::Approx(15. / 4.));
 
     // first method
     CHECK(molecules[1].computeRadiusOfGyration() == Catch::Approx(15. / 4.));
     // second method
-    CHECK(molecules[1].computeRadiusOfGyrationWithDerivedImageFlags(2) ==
+    CHECK(molecules[1].computeRadiusOfGyrationWithDerivedImageFlags() ==
           Catch::Approx(15. / 4.));
   }
 }
