@@ -116,7 +116,7 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
                     { { 1, 1, 1, 1, 0, 1, 1, 1 } },   // ny
                     { { 1, 1, 1, 1, 0, 1, 1, 1 } }    // nz
   );
-  std::unordered_map<int, double> masses;
+  std::map<int, double> masses;
   masses[1] = 1.0;
   masses[2] = 1.0;
   universe.addBonds(8,
