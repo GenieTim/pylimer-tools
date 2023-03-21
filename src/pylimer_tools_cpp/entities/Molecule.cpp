@@ -178,11 +178,12 @@ namespace entities {
   double Molecule::computeRadiusOfGyration()
   {
     double meanX = 0.0, meanY = 0.0, meanZ = 0.0;
+    double meanNx = 0, meanNy = 0, meanNz = 0;
     // would be faster to just query the attributes.
     // But the OOP interface is just too tempting
     // as long as there are no external additional performance demands
     std::vector<Atom> allAtoms = this->getAtoms();
-    double multiplier = 1 / allAtoms.size();
+    double multiplier = 1. / static_cast<double>(allAtoms.size());
     double totalMass = 0.0;
 
 // TODO: might want to use the raw values, use std::accumulate or std::reduce
@@ -190,10 +191,13 @@ namespace entities {
     for (Atom a : allAtoms) {
       meanX +=
         this->massPerType.at(a.getType()) * a.getUnwrappedX(this->parent);
+      // meanNx += a.getNX();
       meanY +=
         this->massPerType.at(a.getType()) * a.getUnwrappedY(this->parent);
+      // meanNy += a.getNY();
       meanZ +=
         this->massPerType.at(a.getType()) * a.getUnwrappedZ(this->parent);
+      // meanNz += a.getNZ();
       totalMass += this->massPerType.at(a.getType());
     }
 
@@ -207,12 +211,13 @@ namespace entities {
                                   0);
 
     double Rg2 = 0.0;
+    double correctingFactor = (totalMass > 0. ? 1. / totalMass : multiplier);
     for (Atom a : allAtoms) {
       double dist = a.distanceToUnwrapped(virtualCenterAtom, this->parent);
-      Rg2 += this->massPerType.at(a.getType()) * dist * dist;
+      Rg2 += correctingFactor * this->massPerType.at(a.getType()) * dist * dist;
     }
 
-    return Rg2 * multiplier / totalMass;
+    return Rg2;
   }
 
   double Molecule::computeRadiusOfGyrationWithDerivedImageFlags(
@@ -223,7 +228,7 @@ namespace entities {
       return 0.0;
     }
 
-    double multiplier = 1. / atoms.size();
+    double multiplier = 1. / (static_cast<double>(atoms.size()));
     double totalMass = 0.0;
 
     // compute the mean position based on the
@@ -252,7 +257,7 @@ namespace entities {
 
     // use it to compute the r_g
     lastAtom = atoms[0];
-    multiplier = 1. / (atoms.size() * totalMass);
+    multiplier = totalMass > 0. ? (1. / totalMass) : multiplier;
     double lastDx = (lastAtom.getUnwrappedX(this->parent) - meanX);
     double lastDy = (lastAtom.getUnwrappedY(this->parent) - meanY);
     double lastDz = (lastAtom.getUnwrappedZ(this->parent) - meanZ);

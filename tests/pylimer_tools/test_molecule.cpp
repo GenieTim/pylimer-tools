@@ -89,3 +89,55 @@ TEST_CASE("Molecules work as intended", "[entity][Molecule]")
     REQUIRE(0 == molecule1.getIdxByAtomId(firstAtom.getId()));
   }
 }
+
+TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
+{
+
+  pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+  /**
+   * The system looks like this (in terms of bonds, not 3D placement):
+   *
+   * 1-2
+   * | |
+   * 4-3
+   *
+   * 5-6
+   * | |
+   * 8-7
+   */
+  universe.setBox(pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0));
+  universe.addAtoms(8,
+                    { { 1, 2, 3, 4, 5, 6, 7, 8 } },   // id
+                    { { 2, 1, 1, 1, 2, 1, 1, 1 } },   // type
+                    { { 1, 2, 3, 4, 9, -10, 9, 8 } }, // x
+                    { { 1, 2, 3, 4, 9, -10, 9, 8 } }, // y
+                    { { 1, 2, 3, 4, 9, -10, 9, 8 } }, // z
+                    { { 1, 1, 1, 1, 0, 1, 1, 1 } },   // nx
+                    { { 1, 1, 1, 1, 0, 1, 1, 1 } },   // ny
+                    { { 1, 1, 1, 1, 0, 1, 1, 1 } }    // nz
+  );
+  universe.addBonds(8,
+                    { { 1, 2, 3, 4, 5, 6, 7, 8 } },
+                    { { 2, 3, 4, 1, 6, 7, 8, 5 } },
+                    { { 1, 1, 1, 1, 1, 1, 1, 1 } },
+                    false,
+                    false);
+
+  std::vector<pe::Molecule> molecules = universe.getMolecules();
+  CHECK(molecules.size() == 2);
+
+  SECTION("R_g can be computed in both ways")
+  {
+    // first method
+    CHECK(molecules[0].computeRadiusOfGyration() == Catch::Approx(15. / 4.));
+    // second method
+    CHECK(molecules[0].computeRadiusOfGyrationWithDerivedImageFlags(2) ==
+          Catch::Approx(15. / 4.));
+
+    // first method
+    CHECK(molecules[1].computeRadiusOfGyration() == Catch::Approx(15. / 4.));
+    // second method
+    CHECK(molecules[1].computeRadiusOfGyrationWithDerivedImageFlags(2) ==
+          Catch::Approx(15. / 4.));
+  }
+}
