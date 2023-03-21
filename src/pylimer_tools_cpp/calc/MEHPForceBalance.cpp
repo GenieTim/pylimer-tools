@@ -28,11 +28,11 @@ namespace calc {
     ? val                                                                      \
     : std::clamp(val,                                                          \
                  (oneOverSpringPartitionUpperLimit > 0.)                       \
-                   ? 1. / (N - 1. / oneOverSpringPartitionUpperLimit)          \
-                   : 0.0,                                                      \
+                   ? (1. / (N - 1. / oneOverSpringPartitionUpperLimit))          \
+                   : (0.0),                                                      \
                  (oneOverSpringPartitionUpperLimit > 0.)                       \
-                   ? oneOverSpringPartitionUpperLimit                          \
-                   : N);
+                   ? (oneOverSpringPartitionUpperLimit)                          \
+                   : (N));
 
     /**
      * FORCE RELAXATION
@@ -2702,7 +2702,7 @@ namespace calc {
                 primaryCorrectionMultiplierC *
                 CLAMP_ONE_OVER_SPRINGPARTITION(
                   net.partialSpringIsPartial[currentSpringGlobalIdx],
-                  1.0 / (newS * N),
+                  (1.0 / (newS * N)),
                   N,
                   oneOverSpringPartitionUpperLimit);
               oneOverSpringPartitions.segment(3 * currentSpringGlobalIdx, 3) =

@@ -332,8 +332,7 @@ init_pylimer_bound_entities(py::module_& m)
             is smaller than half the periodic box in each direction.
             
             See also: :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeRadiusOfGyration()`.
-            )pbdoc",
-         py::arg("crossLinkerType") = 2)
+            )pbdoc")
     .def("computeEndToEndDistance",
          &Molecule::computeEndToEndDistance,
          R"pbdoc(
