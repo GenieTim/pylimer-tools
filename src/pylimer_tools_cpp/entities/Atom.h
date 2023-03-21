@@ -48,10 +48,10 @@ namespace entities {
                                       int n2,
                                       double boxL) const
     {
-      double delta = std::fabs(c1 - c2);
-      if (n1 != n2) {
-        delta -= (static_cast<double>(n1 - n2)) * boxL;
-      }
+      double delta = (c1 + n1 * boxL) - (c2 + n2 * boxL); // std::fabs(c1 - c2);
+      // if (n1 != n2) {
+      //   delta -= (static_cast<double>(n1 - n2)) * boxL;
+      // }
       return delta;
     }
 
@@ -99,9 +99,9 @@ namespace entities {
       double distanceVec[3];
       vectorTo(b, box, distanceVec);
       std::array<double, 3> result;
-      result[0] = this->getX() - 0.5*distanceVec[0];
-      result[1] = this->getY() - 0.5*distanceVec[1];
-      result[2] = this->getZ() - 0.5*distanceVec[2];
+      result[0] = this->getX() - 0.5 * distanceVec[0];
+      result[1] = this->getY() - 0.5 * distanceVec[1];
+      result[2] = this->getZ() - 0.5 * distanceVec[2];
       return box->placeInBox(result);
     }
 
@@ -117,18 +117,15 @@ namespace entities {
 
     void vectorToUnwrapped(Atom b, const Box* box, double* result) const
     {
-      result[0] = this->_getDeltaDistanceUnwrapped(
-        this->x, b.getX(), this->nx, b.getNX(), box->getLx());
-      result[1] = this->_getDeltaDistanceUnwrapped(
-        this->y, b.getY(), this->ny, b.getNY(), box->getLy());
-      result[2] = this->_getDeltaDistanceUnwrapped(
-        this->z, b.getZ(), this->nz, b.getNZ(), box->getLz());
+      result[0] = this->getUnwrappedX(box) - b.getUnwrappedX(box);
+      result[1] = this->getUnwrappedY(box) - b.getUnwrappedY(box);
+      result[2] = this->getUnwrappedZ(box) - b.getUnwrappedZ(box);
     }
 
     double distanceToUnwrapped(Atom b, const Box* box) const
     {
       double distanceVec[3];
-      vectorToUnwrapped(b, box, distanceVec);
+      this->vectorToUnwrapped(b, box, distanceVec);
       // norm
       return sqrt(distanceVec[0] * distanceVec[0] +
                   distanceVec[1] * distanceVec[1] +
@@ -142,15 +139,15 @@ namespace entities {
     double getZ() const { return this->z; }
     double getUnwrappedX(const Box* box) const
     {
-      return this->x * this->nx * box->getLx();
+      return this->x + (this->nx * box->getLx());
     }
     double getUnwrappedY(const Box* box) const
     {
-      return this->y * this->ny * box->getLy();
+      return this->y + (this->ny * box->getLy());
     }
     double getUnwrappedZ(const Box* box) const
     {
-      return this->z * this->nz * box->getLz();
+      return this->z + (this->nz * box->getLz());
     }
     int getNX() const { return this->nx; }
     int getNY() const { return this->ny; }
