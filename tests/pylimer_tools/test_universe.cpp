@@ -839,7 +839,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     );
 
     std::vector<double> distances = { 0., 1., 2., 3. };
-    std::vector<int> result = universe.countAtomsInSkinDistance(distances);
+    std::vector<size_t> result = universe.countAtomsInSkinDistance(distances);
     CHECK(result.size() == distances.size() - 1);
     CHECK(result.size() == 3);
     CHECK(result[0] == 0);

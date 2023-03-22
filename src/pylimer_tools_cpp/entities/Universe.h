@@ -117,7 +117,8 @@ namespace entities {
       return this->getPropertyValues<int>("type");
     }
     std::map<int, int> countAtomTypes() const;
-    std::vector<int> countAtomsInSkinDistance(std::vector<double>& distances) const;
+    std::vector<size_t> countAtomsInSkinDistance(std::vector<double> distances,
+                                                 bool unwrapped = false) const;
     template<typename IN>
     long int findVertexIdForProperty(const char* propertyName,
                                      IN propertyValue) const;
