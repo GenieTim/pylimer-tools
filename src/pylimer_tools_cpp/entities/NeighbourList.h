@@ -21,9 +21,7 @@ namespace entities {
   class NeighbourList
   {
   public:
-    NeighbourList(const std::vector<pylimer_tools::entities::Atom> atoms,
-                  const pylimer_tools::entities::Box box,
-                  double cutoff)
+    NeighbourList(const std::vector<Atom> atoms, const Box box, double cutoff)
     {
       if (cutoff <= 1e-3) {
         throw std::invalid_argument("Cutoff must be larger than zero");
@@ -77,10 +75,20 @@ namespace entities {
 
     std::vector<pylimer_tools::entities::Atom> getAtomsCloseTo(
       pylimer_tools::entities::Atom atom,
-      double newCutoff)
+      double upperCutoff,
+      double lowerCutoff = 0.0)
     {
-      if (newCutoff < 0.) {
-        newCutoff = this->cutoff;
+
+      if (lowerCutoff > upperCutoff) {
+        throw std::invalid_argument(
+          "Expected upper cutoff > lower cutoff, got " +
+          std::to_string(upperCutoff) + " and " + std::to_string(lowerCutoff) +
+          ".");
+      }
+      if (upperCutoff <= 0.) {
+        upperCutoff = this->cutoff;
+        // throw std::invalid_argument("Expected upper cutoff > 0, got " +
+        //                             std::to_string(upperCutoff) + ".");
       }
 
       size_t indexBasis =
@@ -96,7 +104,7 @@ namespace entities {
       }
 
       std::vector<size_t> bucketIndices =
-        this->getCombinedBucketIndicesForAtom(atom, newCutoff);
+        this->getCombinedBucketIndicesForAtom(atom, upperCutoff);
       std::vector<pylimer_tools::entities::Atom> results =
         std::vector<pylimer_tools::entities::Atom>();
       // good estimate for nr of atoms to return
@@ -110,7 +118,8 @@ namespace entities {
         }
         std::vector<size_t> atomIndices = this->neighbourBuckets[bucketIndex];
         for (size_t atomIndex : atomIndices) {
-          if (this->atoms[atomIndex].distanceTo(atom, &this->box) < newCutoff &&
+          double distance = this->atoms[atomIndex].distanceTo(atom, &this->box);
+          if (distance < upperCutoff && distance >= lowerCutoff &&
               this->atoms[atomIndex].getId() != atom.getId()) {
             results.push_back(this->atoms[atomIndex]);
           }
@@ -148,9 +157,9 @@ namespace entities {
         //                    valToRemove),
         //        this->neighbourBuckets.at(indexBasis).end());
       } else {
-        throw std::invalid_argument("This atom with id " +
-                                    std::to_string(atom.getId()) +
-                                    " is not in a bucket, so that it cannot be removed.");
+        throw std::invalid_argument(
+          "This atom with id " + std::to_string(atom.getId()) +
+          " is not in a bucket, so that it cannot be removed.");
       }
     }
 
