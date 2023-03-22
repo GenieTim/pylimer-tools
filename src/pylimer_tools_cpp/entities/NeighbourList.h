@@ -76,7 +76,8 @@ namespace entities {
     std::vector<pylimer_tools::entities::Atom> getAtomsCloseTo(
       pylimer_tools::entities::Atom atom,
       double upperCutoff,
-      double lowerCutoff = 0.0)
+      double lowerCutoff = 0.0,
+      bool unwrapped = false)
     {
 
       if (lowerCutoff > upperCutoff) {
@@ -118,7 +119,10 @@ namespace entities {
         }
         std::vector<size_t> atomIndices = this->neighbourBuckets[bucketIndex];
         for (size_t atomIndex : atomIndices) {
-          double distance = this->atoms[atomIndex].distanceTo(atom, &this->box);
+          double distance =
+            !unwrapped
+              ? this->atoms[atomIndex].distanceTo(atom, &this->box)
+              : this->atoms[atomIndex].distanceToUnwrapped(atom, &this->box);
           if (distance < upperCutoff && distance >= lowerCutoff &&
               this->atoms[atomIndex].getId() != atom.getId()) {
             results.push_back(this->atoms[atomIndex]);
@@ -129,6 +133,7 @@ namespace entities {
         throw std::runtime_error(
           "Did not find basis bucket. Something is wrong.");
       }
+      results.shrink_to_fit();
       // return results
       return results;
     }

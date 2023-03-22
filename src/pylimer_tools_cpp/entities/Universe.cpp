@@ -416,17 +416,20 @@ namespace entities {
     return result;
   };
 
-  std::vector<int> Universe::countAtomsInSkinDistance(
-    std::vector<double>& distances) const
+  std::vector<size_t> Universe::countAtomsInSkinDistance(
+    std::vector<double> distances, bool unwrapped ) const
   {
     if (distances.size() <= 1) {
-      return std::vector<int>();
+      return std::vector<size_t>();
     }
-    std::vector<int> result =
-      pylimer_tools::utils::initializeWithValue(distances.size() - 1, 0);
+    std::vector<size_t> result =
+      pylimer_tools::utils::initializeWithValue<size_t>(distances.size() - 1, 0);
 
     // first, validate the input distances
-    for (size_t i = 1; i < distances.size(); i++) {
+    if (distances[0] < 0.0) {
+      throw std::invalid_argument("Distances must be positive.");
+    }
+    for (size_t i = 1; i < distances.size(); ++i) {
       if (distances[i] <= distances[i - 1]) {
         throw std::invalid_argument(
           "Distances must be increasing and unique, got " +
@@ -439,11 +442,11 @@ namespace entities {
     // then, start processing using a neighbour list
     const std::vector<Atom> atoms = this->getAtoms();
     NeighbourList neighbourList = NeighbourList(
-      atoms, this->getBox(), pylimer_tools::utils::last(distances));
+      atoms, this->getBox(), pylimer_tools::utils::last<double>(distances));
 
     for (size_t i = 1; i < distances.size(); ++i) {
       for (Atom a : atoms) {
-        std::vector<Atom> closeAtoms = neighbourList.getAtomsCloseTo(a, distances[i], distances[i - 1]);
+        std::vector<Atom> closeAtoms = neighbourList.getAtomsCloseTo(a, distances[i], distances[i - 1], unwrapped);
         result[i] += closeAtoms.size();
       }
     }
