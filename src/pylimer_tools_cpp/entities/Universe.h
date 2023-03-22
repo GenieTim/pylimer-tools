@@ -87,7 +87,7 @@ namespace entities {
 
     // getters
     Atom getAtom(const int atomId) const;
-    std::vector<Atom> getAtoms();
+    std::vector<Atom> getAtoms() const;
     // std::map<std::st¨ring, std::vector<long int>> getBonds() const;
     std::map<std::string, std::vector<long int>> getAngles() const;
     std::vector<Universe> getClusters() const;
@@ -117,6 +117,7 @@ namespace entities {
       return this->getPropertyValues<int>("type");
     }
     std::map<int, int> countAtomTypes() const;
+    std::vector<int> countAtomsInSkinDistance(std::vector<double>& distances) const;
     template<typename IN>
     long int findVertexIdForProperty(const char* propertyName,
                                      IN propertyValue) const;

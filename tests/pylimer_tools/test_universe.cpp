@@ -238,16 +238,24 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                       false,
                       false);
     REQUIRE(universe.getNrOfBonds() == 8);
-    CHECK(universe.findLoopEntanglements({ {} }, { {} }, { {} }, { {} }).size() == 0);
     CHECK(
-      universe.findLoopEntanglements({ { 1, 2, 7 } }, { { 0, 3, 6 } }, { {} }, { {} }).size() ==
+      universe.findLoopEntanglements({ {} }, { {} }, { {} }, { {} }).size() ==
       0);
     CHECK(
-      universe.findLoopEntanglements({ { 0, 1, 2 } }, { { 5, 7, 6 } }, { {} }, { {} }).size() ==
-      2);
-    CHECK(universe.findLoopEntanglements({ { 0, 1, 2, 3 } }, { { 4, 5, 6, 7 } }, { {} }, { {} })
+      universe
+        .findLoopEntanglements({ { 1, 2, 7 } }, { { 0, 3, 6 } }, { {} }, { {} })
+        .size() == 0);
+    CHECK(
+      universe
+        .findLoopEntanglements({ { 0, 1, 2 } }, { { 5, 7, 6 } }, { {} }, { {} })
+        .size() == 2);
+    CHECK(universe
+            .findLoopEntanglements(
+              { { 0, 1, 2, 3 } }, { { 4, 5, 6, 7 } }, { {} }, { {} })
             .size() > 0);
-    CHECK(universe.findLoopEntanglements({ { 4, 5, 6, 7 } }, { { 0, 1, 2, 3 } }, { {} }, { {} })
+    CHECK(universe
+            .findLoopEntanglements(
+              { { 4, 5, 6, 7 } }, { { 0, 1, 2, 3 } }, { {} }, { {} })
             .size() > 0);
   }
 
@@ -813,5 +821,29 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
         REQUIRE(universe2.computePolydispersityIndex(2) == Catch::Approx(1.0));
       }
     }
+  }
+
+  SECTION("Local Denstity Computation")
+  {
+    const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
+    universe.setBox(box);
+    universe.addAtoms(8,
+                      { { 1, 2, 3, 4, 5, 6, 7, 8 } },     // id
+                      { { 2, 1, 1, 1, 2, 1, 1, 1 } },     // type
+                      { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // x
+                      { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // y
+                      { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // z
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },     // nx
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },     // ny
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } }      // nz
+    );
+
+    std::vector<double> distances = { 0., 1., 2., 3. };
+    std::vector<int> result = universe.countAtomsInSkinDistance(distances);
+    CHECK(result.size() == distances.size() - 1);
+    CHECK(result.size() == 3);
+    CHECK(result[0] == 0);
+    CHECK(result[1] == 12);
+    CHECK(result[3] == 0);
   }
 }

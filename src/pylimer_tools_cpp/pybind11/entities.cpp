@@ -404,7 +404,7 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("box"),
          py::arg("cutoff"))
     .def("getAtomsCloseTo",
-         py::overload_cast<Atom, double>(&NeighbourList::getAtomsCloseTo),
+         py::overload_cast<Atom, double, double>(&NeighbourList::getAtomsCloseTo),
          R"pbdoc(
           List all atoms that are close to a given one. 
 
@@ -417,7 +417,8 @@ init_pylimer_bound_entities(py::module_& m)
           filling the neighbour list buckets.
          )pbdoc",
          py::arg("atom"),
-         py::arg("newCutoff") = -1.0);
+         py::arg("upperCutoff") = 1.0,
+         py::arg("lowerCutoff") = 0.0);
 
   py::class_<Universe>(
     m,
@@ -557,6 +558,19 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("loopStep1"),
          py::arg("maxLength") = -1,
          py::arg("skipSelfLoops") = false)
+     .def("countAtomTypes", &Universe::countAtomTypes,
+     R"pbdoc(
+          Count how often each atom type is present.
+     )pbdoc")
+     .def("countAtomsInSkinDistance", &Universe::countAtomsInSkinDistance,
+     R"pbdoc(
+          This is a function that may help you to compute the radial distribution function.
+          It loops the 
+
+          Parameters:
+               - distances: the edges of the bins
+     )pbdoc",
+     py::arg("distances"))
     .def("getChainsWithCrosslinker",
          &Universe::getChainsWithCrosslinker,
          R"pbdoc(

@@ -139,7 +139,7 @@ namespace entities {
     double dy = firstAtom.getUnwrappedY(this->parent) - lastY;
     double dz = firstAtom.getUnwrappedZ(this->parent) - lastZ;
 
-    return dx * dx + dy * dy + dz * dz;
+    return sqrt(dx * dx + dy * dy + dz * dz);
   }
 
   /**

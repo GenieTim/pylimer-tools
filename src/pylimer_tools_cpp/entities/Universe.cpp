@@ -4,6 +4,7 @@
 #include "../utils/StringUtils.h"
 #include "../utils/VectorUtils.h"
 #include "Box.h"
+#include "NeighbourList.h"
 
 extern "C"
 {
@@ -412,6 +413,41 @@ namespace entities {
     for (int atomType : atomTypes) {
       result[atomType] += 1;
     }
+    return result;
+  };
+
+  std::vector<int> Universe::countAtomsInSkinDistance(
+    std::vector<double>& distances) const
+  {
+    if (distances.size() <= 1) {
+      return std::vector<int>();
+    }
+    std::vector<int> result =
+      pylimer_tools::utils::initializeWithValue(distances.size() - 1, 0);
+
+    // first, validate the input distances
+    for (size_t i = 1; i < distances.size(); i++) {
+      if (distances[i] <= distances[i - 1]) {
+        throw std::invalid_argument(
+          "Distances must be increasing and unique, got " +
+          std::to_string(distances[i]) + " and " +
+          std::to_string(distances[i - 1]) + " at i = " + std::to_string(i) +
+          " and i-1.");
+      }
+    }
+
+    // then, start processing using a neighbour list
+    const std::vector<Atom> atoms = this->getAtoms();
+    NeighbourList neighbourList = NeighbourList(
+      atoms, this->getBox(), pylimer_tools::utils::last(distances));
+
+    for (size_t i = 1; i < distances.size(); ++i) {
+      for (Atom a : atoms) {
+        std::vector<Atom> closeAtoms = neighbourList.getAtomsCloseTo(a, distances[i], distances[i - 1]);
+        result[i] += closeAtoms.size();
+      }
+    }
+
     return result;
   };
 
@@ -835,7 +871,7 @@ namespace entities {
           currentPathProduct *= currentVal;
           // and remember the part of the path
           if (currentPath.size() > 0 && edges != nullptr) {
-            // TODO: here, we should decide what we do if multile edges 
+            // TODO: here, we should decide what we do if multile edges
             // between the two vertices are found
             // also TODO: check if the looping edge is included
             currentPathEdges.push_back(this->getEdgeIdsFromTo(
@@ -1298,7 +1334,7 @@ namespace entities {
    *
    * @return std::vector<Atom>
    */
-  std::vector<Atom> Universe::getAtoms()
+  std::vector<Atom> Universe::getAtoms() const
   {
     std::vector<Atom> atoms;
     atoms.reserve(this->getNrOfAtoms());
@@ -1540,8 +1576,8 @@ namespace entities {
   std::vector<LoopIntersectionInfo> Universe::findLoopEntanglements(
     const std::vector<long int>& vertexIndicesLoop1,
     const std::vector<long int>& vertexIndicesLoop2,
-      const std::vector<long int>& edgeIndicesLoop1,
-      const std::vector<long int>& edgeIndicesLoop2) const
+    const std::vector<long int>& edgeIndicesLoop1,
+    const std::vector<long int>& edgeIndicesLoop2) const
   {
     std::vector<LoopIntersectionInfo> results;
     Eigen::Vector3d helperNode = Eigen::Vector3d::Zero();
