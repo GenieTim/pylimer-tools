@@ -83,9 +83,9 @@ namespace utils {
     }
 
     //// data
-    std::string filePath;
-    std::string newGroupKey;
-    std::string currentLine;
+    std::string filePath = "";
+    std::string newGroupKey = "";
+    std::string currentLine = "";
     std::ifstream file;
     size_t nrOfGroups;
     std::unordered_map<size_t, data_item_t> data;

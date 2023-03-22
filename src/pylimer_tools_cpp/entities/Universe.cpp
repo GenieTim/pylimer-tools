@@ -447,7 +447,7 @@ namespace entities {
     for (size_t i = 1; i < distances.size(); ++i) {
       for (Atom a : atoms) {
         std::vector<Atom> closeAtoms = neighbourList.getAtomsCloseTo(a, distances[i], distances[i - 1], unwrapped);
-        result[i] += closeAtoms.size();
+        result[i-1] += closeAtoms.size();
       }
     }
 
