@@ -34,6 +34,8 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Universe
       ~Universe.computeTotalMass
       ~Universe.computeWeightAverageMolecularWeight
       ~Universe.computeWeightFractions
+      ~Universe.countAtomTypes
+      ~Universe.countAtomsInSkinDistance
       ~Universe.detectAngles
       ~Universe.determineEffectiveFunctionalityPerType
       ~Universe.determineFunctionalityPerType

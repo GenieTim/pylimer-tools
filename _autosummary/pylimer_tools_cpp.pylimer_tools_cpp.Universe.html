@@ -309,6 +309,12 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.computeWeightFractions" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.computeWeightFractions"><code class="xref py py-obj docutils literal notranslate"><span class="pre">computeWeightFractions</span></code></a>(self)</p></td>
 <td><p>Compute the weight fractions of each atom type in the network.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.countAtomTypes" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.countAtomTypes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">countAtomTypes</span></code></a>(self)</p></td>
+<td><p>Count how often each atom type is present.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.countAtomsInSkinDistance" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.countAtomsInSkinDistance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">countAtomsInSkinDistance</span></code></a>(self, distances)</p></td>
+<td><p>This is a function that may help you to compute the radial distribution function.</p></td>
+</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.detectAngles" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.detectAngles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">detectAngles</span></code></a>(self)</p></td>
 <td><p>Returns just as <a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getAngles" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.getAngles"><code class="xref py py-func docutils literal notranslate"><span class="pre">getAngles()</span></code></a>, but all angles that are found in the network.</p></td>
 </tr>
@@ -553,6 +559,24 @@ the weight average molecular weight over the number average molecular weight.</p
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.Universe.computeWeightFractions">
 <span class="sig-name descname"><span class="pre">computeWeightFractions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.computeWeightFractions" title="Permalink to this definition">#</a></dt>
 <dd><p>Compute the weight fractions of each atom type in the network.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.Universe.countAtomTypes">
+<span class="sig-name descname"><span class="pre">countAtomTypes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.countAtomTypes" title="Permalink to this definition">#</a></dt>
+<dd><p>Count how often each atom type is present.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.Universe.countAtomsInSkinDistance">
+<span class="sig-name descname"><span class="pre">countAtomsInSkinDistance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">distances</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.countAtomsInSkinDistance" title="Permalink to this definition">#</a></dt>
+<dd><p>This is a function that may help you to compute the radial distribution function.
+It loops the</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>distances</strong> (<em>-</em>) – the edges of the bins</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -923,6 +947,8 @@ and you may run out of memory when using this function, if your Universe/Network
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.computeTotalMass"><code class="docutils literal notranslate"><span class="pre">Universe.computeTotalMass()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.computeWeightAverageMolecularWeight"><code class="docutils literal notranslate"><span class="pre">Universe.computeWeightAverageMolecularWeight()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.computeWeightFractions"><code class="docutils literal notranslate"><span class="pre">Universe.computeWeightFractions()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.countAtomTypes"><code class="docutils literal notranslate"><span class="pre">Universe.countAtomTypes()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.countAtomsInSkinDistance"><code class="docutils literal notranslate"><span class="pre">Universe.countAtomsInSkinDistance()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.detectAngles"><code class="docutils literal notranslate"><span class="pre">Universe.detectAngles()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.determineEffectiveFunctionalityPerType"><code class="docutils literal notranslate"><span class="pre">Universe.determineEffectiveFunctionalityPerType()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.determineFunctionalityPerType"><code class="docutils literal notranslate"><span class="pre">Universe.determineFunctionalityPerType()</span></code></a></li>
