@@ -844,6 +844,6 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     CHECK(result.size() == 3);
     CHECK(result[0] == 0);
     CHECK(result[1] == 12);
-    CHECK(result[3] == 0);
+    CHECK(result[2] == 0);
   }
 }
