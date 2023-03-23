@@ -328,11 +328,11 @@ init_pylimer_bound_entities(py::module_& m)
             :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsLinedUp()`,
             as it needs the atoms sorted such that the periodic box can still be respected somewhat.
             In other words, this function computes the radius of gyration 
-            assuming the distance between two lined-up beads is smaller than half the periodic box.
+            assuming the distance between two lined-up beads 
+            is smaller than half the periodic box in each direction.
             
             See also: :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeRadiusOfGyration()`.
-            )pbdoc",
-         py::arg("crossLinkerType") = 2)
+            )pbdoc")
     .def("computeEndToEndDistance",
          &Molecule::computeEndToEndDistance,
          R"pbdoc(
@@ -341,6 +341,21 @@ init_pylimer_bound_entities(py::module_& m)
             CAUTION:
                Returns 0.0 if the molecule does not have two or more atoms.
                Returns -1.0 if not exactly 2 ends were found.
+               Computes the distance between 2 atoms with functionality 1, 
+               ignoring whether they are cross-linkers or not.
+            )pbdoc")
+    .def("computeEndToEndDistanceWithDerivedImageFlags",
+         &Molecule::computeEndToEndDistanceWithDerivedImageFlags,
+         R"pbdoc(
+            Compute the end-to-end distance (:math:`R_{ee}`) of this molecule,
+            but ignoring the image flags attached to the atoms. 
+            This only works for Molecules that can be lined up with 
+            :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsLinedUp()`,
+            as it needs the atoms sorted such that the periodic box can still be respected somewhat.
+
+            CAUTION:
+               Returns 0.0 if the molecule does not have two or more atoms.
+               Requires bonds to be shorter than half the box length.
                Computes the distance between 2 atoms with functionality 1, 
                ignoring whether they are cross-linkers or not.
             )pbdoc")
@@ -389,7 +404,8 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("box"),
          py::arg("cutoff"))
     .def("getAtomsCloseTo",
-         py::overload_cast<Atom, double>(&NeighbourList::getAtomsCloseTo),
+         py::overload_cast<Atom, double, double, bool>(
+           &NeighbourList::getAtomsCloseTo),
          R"pbdoc(
           List all atoms that are close to a given one. 
 
@@ -402,7 +418,9 @@ init_pylimer_bound_entities(py::module_& m)
           filling the neighbour list buckets.
          )pbdoc",
          py::arg("atom"),
-         py::arg("newCutoff") = -1.0);
+         py::arg("upperCutoff") = 1.0,
+         py::arg("lowerCutoff") = 0.0,
+         py::arg("unwrapped") = true);
 
   py::class_<Universe>(
     m,
@@ -542,6 +560,23 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("loopStep1"),
          py::arg("maxLength") = -1,
          py::arg("skipSelfLoops") = false)
+    .def("countAtomTypes",
+         &Universe::countAtomTypes,
+         R"pbdoc(
+          Count how often each atom type is present.
+     )pbdoc")
+    .def("countAtomsInSkinDistance",
+         &Universe::countAtomsInSkinDistance,
+         R"pbdoc(
+          This is a function that may help you to compute the radial distribution function.
+          It loops the 
+
+          Parameters:
+               - distances: the edges of the bins
+               - unwrapped: whether to measure the distance in unwrapped coordinates or as PBC-corrected distance
+     )pbdoc",
+         py::arg("distances"),
+         py::arg("unwrapped") = false)
     .def("getChainsWithCrosslinker",
          &Universe::getChainsWithCrosslinker,
          R"pbdoc(

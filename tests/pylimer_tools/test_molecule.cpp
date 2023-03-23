@@ -105,16 +105,17 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
    * | |
    * 8-7
    */
-  universe.setBox(pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0));
+  const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
+  universe.setBox(box);
   universe.addAtoms(8,
-                    { { 1, 2, 3, 4, 5, 6, 7, 8 } },   // id
-                    { { 2, 1, 1, 1, 2, 1, 1, 1 } },   // type
-                    { { 1, 2, 3, 4, 9, -10, 9, 8 } }, // x
-                    { { 1, 2, 3, 4, 9, -10, 9, 8 } }, // y
-                    { { 1, 2, 3, 4, 9, -10, 9, 8 } }, // z
-                    { { 1, 1, 1, 1, 0, 1, 1, 1 } },   // nx
-                    { { 1, 1, 1, 1, 0, 1, 1, 1 } },   // ny
-                    { { 1, 1, 1, 1, 0, 1, 1, 1 } }    // nz
+                    { { 1, 2, 3, 4, 5, 6, 7, 8 } },     // id
+                    { { 2, 1, 1, 1, 2, 1, 1, 1 } },     // type
+                    { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // x
+                    { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // y
+                    { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // z
+                    { { 0, 0, 0, 0, 1, 2, 2, 2 } },     // nx
+                    { { 0, 0, 0, 0, 1, 2, 2, 2 } },     // ny
+                    { { 0, 0, 0, 0, 1, 2, 2, 2 } }      // nz
   );
   std:: map<int, double> masses;
   masses[1] = 1.0;
@@ -127,8 +128,17 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
                     false);
 
   std::vector<pe::Molecule> molecules = universe.getMolecules();
+  for (size_t i = 0; i < 4; ++i) {
+    pe::Atom atomI = universe.getAtom(5 + i);
+    CHECK(atomI.getUnwrappedX(&box) ==
+          Catch::Approx(29. + static_cast<double>(i)));
+    CHECK(atomI.getUnwrappedY(&box) ==
+          Catch::Approx(29. + static_cast<double>(i)));
+    CHECK(atomI.getUnwrappedZ(&box) ==
+          Catch::Approx(29. + static_cast<double>(i)));
+  }
   CHECK_THROWS(molecules[0].computeRadiusOfGyration());
-  CHECK_THROWS(molecules[0].computeRadiusOfGyrationWithDerivedImageFlags(2));
+  CHECK_THROWS(molecules[0].computeRadiusOfGyrationWithDerivedImageFlags());
   universe.setMasses(masses);
   molecules = universe.getMolecules();
   CHECK(molecules.size() == 2);
@@ -138,13 +148,13 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
     // first method
     CHECK(molecules[0].computeRadiusOfGyration() == Catch::Approx(15. / 4.));
     // second method
-    CHECK(molecules[0].computeRadiusOfGyrationWithDerivedImageFlags(2) ==
+    CHECK(molecules[0].computeRadiusOfGyrationWithDerivedImageFlags() ==
           Catch::Approx(15. / 4.));
 
     // first method
     CHECK(molecules[1].computeRadiusOfGyration() == Catch::Approx(15. / 4.));
     // second method
-    CHECK(molecules[1].computeRadiusOfGyrationWithDerivedImageFlags(2) ==
+    CHECK(molecules[1].computeRadiusOfGyrationWithDerivedImageFlags() ==
           Catch::Approx(15. / 4.));
   }
 }

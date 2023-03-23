@@ -105,9 +105,41 @@ namespace entities {
       // check whether the compiler optimizes this or not
       Atom atom1 = endNodes[0];
       Atom atom2 = endNodes[1];
-      distance = atom1.distanceTo(atom2, this->parent);
+      distance = atom1.distanceToUnwrapped(atom2, this->parent);
     }
     return distance;
+  }
+
+  double Molecule::computeEndToEndDistanceWithDerivedImageFlags() const
+  {
+    std::vector<Atom> atoms = this->getAtomsLinedUp();
+    if (atoms.size() == 0) {
+      return 0.0;
+    }
+
+    Atom firstAtom = atoms[0];
+    Atom lastAtom = atoms[0];
+    double lastX = lastAtom.getUnwrappedX(this->parent),
+           lastY = lastAtom.getUnwrappedY(this->parent),
+           lastZ = lastAtom.getUnwrappedZ(this->parent);
+    for (size_t i = 1; i < atoms.size(); ++i) {
+      double distance[3];
+      // for each next atom, we can use the shortest distance to the previous
+      // in order to compensate/ignore the image flags while still enabling
+      // larger end-to-end distances than the box size
+      atoms[i].vectorTo(lastAtom, this->parent, distance);
+      lastX += distance[0];
+      lastY += distance[1];
+      lastZ += distance[2];
+
+      lastAtom = atoms[i];
+    }
+
+    double dx = firstAtom.getUnwrappedX(this->parent) - lastX;
+    double dy = firstAtom.getUnwrappedY(this->parent) - lastY;
+    double dz = firstAtom.getUnwrappedZ(this->parent) - lastZ;
+
+    return sqrt(dx * dx + dy * dy + dz * dz);
   }
 
   /**
@@ -228,8 +260,7 @@ namespace entities {
     return Rg2;
   }
 
-  double Molecule::computeRadiusOfGyrationWithDerivedImageFlags(
-    const int crossLinkerType) const
+  double Molecule::computeRadiusOfGyrationWithDerivedImageFlags() const
   {
     std::vector<Atom> atoms = this->getAtomsLinedUp();
     if (atoms.size() == 0) {
@@ -242,51 +273,61 @@ namespace entities {
     }
 
     double multiplier = 1. / (static_cast<double>(atoms.size()));
-    double totalMass = 0.0;
 
     // compute the mean position based on the
     // image flags of the first atom
     Atom lastAtom = atoms[0];
-    double meanX = lastAtom.getUnwrappedX(this->parent),
-           meanY = lastAtom.getUnwrappedY(this->parent),
-           meanZ = lastAtom.getUnwrappedZ(this->parent);
+    double lastX = lastAtom.getUnwrappedX(this->parent),
+           lastY = lastAtom.getUnwrappedY(this->parent),
+           lastZ = lastAtom.getUnwrappedZ(this->parent);
+    double totalMass = this->massPerType.at(lastAtom.getType());
+    double meanX =
+             this->massPerType.at(lastAtom.getType()) * lastX * multiplier,
+           meanY =
+             this->massPerType.at(lastAtom.getType()) * lastY * multiplier,
+           meanZ =
+             this->massPerType.at(lastAtom.getType()) * lastZ * multiplier;
     // find mean position
     for (size_t i = 1; i < atoms.size(); ++i) {
-
       totalMass += this->massPerType.at(atoms[i].getType());
       double localMultiplier =
         multiplier * this->massPerType.at(atoms[i].getType());
       double distance[3];
       // for each next atom, we can use the shortest distance to the previous
       // in order to compensate/ignore the image flags while still enabling
-      // larger end-to-end distances than the
+      // larger end-to-end distances than the box size
       atoms[i].vectorTo(lastAtom, this->parent, distance);
-      meanX += localMultiplier * distance[0];
-      meanY += localMultiplier * distance[1];
-      meanZ += localMultiplier * distance[2];
+      lastX += distance[0];
+      lastY += distance[1];
+      lastZ += distance[2];
+      meanX += localMultiplier * lastX;
+      meanY += localMultiplier * lastY;
+      meanZ += localMultiplier * lastZ;
 
       lastAtom = atoms[i];
     }
 
     // use it to compute the r_g
     lastAtom = atoms[0];
+    lastX = lastAtom.getUnwrappedX(this->parent),
+    lastY = lastAtom.getUnwrappedY(this->parent),
+    lastZ = lastAtom.getUnwrappedZ(this->parent);
     multiplier = 1. / totalMass;
-    double lastDx = (lastAtom.getUnwrappedX(this->parent) - meanX);
-    double lastDy = (lastAtom.getUnwrappedY(this->parent) - meanY);
-    double lastDz = (lastAtom.getUnwrappedZ(this->parent) - meanZ);
-    double Rg2 =
-      (lastDx * lastDx + lastDy * lastDy + lastDz * lastDz) * multiplier;
+    double dx = (lastX - meanX), dy = (lastY - meanY), dz = (lastZ - meanZ);
+    double Rg2 = (dx * dx + dy * dy + dz * dz) *
+                 (this->massPerType.at(lastAtom.getType()) * multiplier);
     for (size_t i = 1; i < atoms.size(); ++i) {
       double localMultiplier =
         multiplier * this->massPerType.at(atoms[i].getType());
-      Atom a = atoms[i];
       double distance[3];
       atoms[i].vectorTo(lastAtom, this->parent, distance);
-      lastDx += distance[0];
-      lastDy += distance[1];
-      lastDz += distance[2];
-      Rg2 +=
-        (lastDx * lastDx + lastDy * lastDy + lastDz * lastDz) * localMultiplier;
+      lastX += distance[0];
+      lastY += distance[1];
+      lastZ += distance[2];
+      dx = (lastX - meanX), dy = (lastY - meanY), dz = (lastZ - meanZ);
+      Rg2 += (dx * dx + dy * dy + dz * dz) * localMultiplier;
+
+      lastAtom = atoms[i];
     }
     return Rg2;
   };
