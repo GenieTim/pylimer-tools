@@ -58,8 +58,9 @@ namespace entities {
 
     // computations
     double computeEndToEndDistance();
+    double computeEndToEndDistanceWithDerivedImageFlags() const;
     double computeRadiusOfGyration();
-    double computeRadiusOfGyrationWithDerivedImageFlags(const int crossLinkerType = 2) const;
+    double computeRadiusOfGyrationWithDerivedImageFlags() const;
     double computeTotalMass();
     std::vector<double> computeBondLengths()
     {
