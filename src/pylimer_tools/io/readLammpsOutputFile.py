@@ -12,12 +12,18 @@ def readLogFile(filepath) -> pd.DataFrame:
 
 
 def readDumpFile(filepath, structureFile) -> UniverseSequence:
+    """
+    Read a file with LAMMPS' dump of snapshots of structures into a Universe.
+    """
     uS = UniverseSequence()
-    uS.initializeFromDataSequence(filepath, structureFile)
+    uS.initializeFromDataSequence(structureFile, filepath)
     return uS
 
 
 def readDataFile(structureFile: str) -> Universe:
+    """
+    Read a file with LAMMPS' data type of structure into a Universe.
+    """
     uS = UniverseSequence()
     uS.initializeFromDataSequence([structureFile])
     universe = uS.atIndex(0)
