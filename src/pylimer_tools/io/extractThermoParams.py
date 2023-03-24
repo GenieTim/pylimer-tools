@@ -1,17 +1,18 @@
 
 import csv
-from datetime import datetime
 import hashlib
 import os
 import pathlib
 import pickle
+import tempfile
+import warnings
+from datetime import datetime
 from io import StringIO
 from typing import Iterable
-import warnings
-import tempfile
-import hashlib
 
+import numpy as np
 import pandas as pd
+
 from pylimer_tools.utils.cacheUtility import doCache, loadCache
 from pylimer_tools.utils.optimizeDf import optimize, reduce_mem_usage
 
@@ -35,17 +36,34 @@ def readOneGroup(fp, header, minLineLen=4, additional_lines_skip=0) -> str:
         tempfile.gettempdir(),
         hashlib.md5(datetime.now().strftime("%m.%d.%Y, %H:%M:%S").encode()).hexdigest(), 'tmp_thermo_file.csv')
     n_lines = 0
+    previous_line = None
+    before_previous_line = None
     with open(csvFileToWrite, 'w') as output_csv:
         line = fp.readline()
         separator = ", "
         headerLen = None
-        if (isinstance(header, str)):
+        if (header is None):
+            pass
+        elif (isinstance(header, str)):
             minLineLen = max(minLineLen, len(header.split()))
         else:
             minLineLen = max(minLineLen, min([len(h.split()) for h in header]))
 
         def checkSkipLine(line, header):
-            return line and not line.startswith(header)
+            if (header is not None):
+                return line and not line.startswith(header)
+            else:
+                # need to detect what the header could be...
+                if (previous_line is not None and len(line.split()) == len(previous_line.split()) and np.all([
+                    w[0].isalpha() for w in previous_line.split()
+                ]) and np.some([
+                    np.all([c.isnumeric() for c in w]) for w in line.split()
+                ])):
+                    header = previous_line
+                    return False
+                else:
+                    previous_line = line
+                    return True
 
         def checkSkipLineHeaderList(line, header):
             if (not line):
@@ -104,7 +122,7 @@ def getThermoCacheNameSuffix(header="Step Temp E_pair E_mol TotEng Press", texts
         header = "{}{}".format("".join("".join(header).split()), len(header))
 
     # need to has header, as we could get a filename too long error otherwise. Addmittedly, still possible for certain inputs
-    return "{}{}{}-thermo-param-cache.pickle".format(hashlib.md5(header.encode()).hexdigest(), textsToRead, minLineLen)
+    return "{}{}{}-thermo-param-cache.pickle".format(hashlib.md5(header.encode()).hexdigest() if header is not None else "", textsToRead, minLineLen)
 
 
 def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", textsToRead=5, minLineLen=5, useCache=True) -> pd.DataFrame:
@@ -137,14 +155,15 @@ def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", text
     def csvFileToDf(filePath) -> pd.DataFrame:
         try:
             tmpDf = pd.read_csv(filePath, low_memory=False,
-                               on_bad_lines='skip', quoting=csv.QUOTE_NONE)
+                                on_bad_lines='skip', quoting=csv.QUOTE_NONE)
             try:
                 os.remove(filePath)
             except Exception as e:
                 pass
             return tmpDf
         except Exception as e:
-            warnings.warn("Error reading temporary CSV thermo file '{}': {}".format(filePath, e), source=e)
+            warnings.warn("Error reading temporary CSV thermo file '{}': {}".format(
+                filePath, e), source=e)
             return pd.DataFrame()
 
     with open(file, 'r') as fp:
