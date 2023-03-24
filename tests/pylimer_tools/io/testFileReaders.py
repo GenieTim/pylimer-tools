@@ -3,8 +3,14 @@ import unittest
 
 import mock
 import pandas as pd
+
 from pylimer_tools.io.extractThermoParams import (extractThermoParams,
                                                   getThermoCacheNameSuffix)
+from pylimer_tools.io.readLammpsOutputFile import (readAveragesFile,
+                                                   readCorrelationFile,
+                                                   readDataFile, readDumpFile,
+                                                   readHistogramFile,
+                                                   readLogFile)
 from pylimer_tools.utils.cacheUtility import getCacheFileName
 from pylimer_tools.utils.optimizeDf import reduce_mem_usage
 from pylimer_tools_cpp import (DataFileReader, DumpFileReader, Universe,
@@ -43,6 +49,10 @@ class TestFileReader(PandasComparingTestCase):
             os.path.dirname(__file__), '../fixtures/empty_file.txt'))
         self.assertTrue(emptyData.empty)
 
+        # test: check if we can deduce the header
+        readData4 = readLogFile(thermoFile)
+        self.assertDataframeEqual(readData, readData4)
+
     @mock.patch('pylimer_tools.io.extractThermoParams.os.remove')
     def test_cacheDeleteFail(self, mockOsRemove):
         mockOsRemove.side_effect = Exception
@@ -71,13 +81,10 @@ class TestFileReader(PandasComparingTestCase):
     def test_LammpsDataReader(self):
         dataFile = os.path.join(os.path.dirname(
             __file__), "../fixtures/lammps_data_file.out")
-        universeSequence = UniverseSequence()
-        universeSequence.initializeFromDataSequence([dataFile])
-        self.assertIsInstance(universeSequence, UniverseSequence)
-        self.assertEqual(universeSequence.getLength(), 1)
-        universe = universeSequence.atIndex(0)
+        universe = readDataFile(dataFile)
         self.assertIsInstance(universe, Universe)
         self.assertEqual(universe.getNrOfAtoms(), 3000)
+
         # expectedKeys = ["N_atoms", "N_Atypes", "N_Btypes", "masses", "Lx", "Ly",
         #                 "Lz", "xlo", "xhi", "ylo", "yhi", "zlo", "zhi", "atom_data", "bond_data"]
         # for key in expectedKeys:
@@ -93,11 +100,41 @@ class TestFileReader(PandasComparingTestCase):
             __file__), "../fixtures/lammps_data_file_small.out")
         dumpFile = os.path.join(os.path.dirname(
             __file__), "../fixtures/lammps_dump_small.lammpstrj")
-        universeSequence = UniverseSequence()
-        universeSequence.initializeFromDumpFile(dataFile, dumpFile)
+        universeSequence = readDumpFile(dataFile, dumpFile)
         self.assertIsInstance(universeSequence, UniverseSequence)
         universe = universeSequence.atIndex(0)
         self.assertIsInstance(universe, Universe)
         self.assertEqual(universeSequence.getLength(), 1)
         universe = universeSequence.atIndex(0)
         self.assertEqual(universe.getNrOfAtoms(), 12)
+
+    def test_avgReader(self):
+        dataFile = os.path.join(os.path.dirname(
+            __file__), "../fixtures/example_avg_file.out.avg.txt")
+        data = readAveragesFile(dataFile)
+        self.assertEqual(len(data), 5)
+        self.assertEqual(data["TimeStep"].iloc[0], 100)
+        self.assertEqual(data["TimeStep"].iloc[4], 500)
+        self.assertEqual(data["else"].iloc[4], 9000)
+
+    def test_vecAvgReader(self):
+        dataFile = os.path.join(os.path.dirname(
+            __file__), "../fixtures/example_vec_avg_file.out.vec-avg.txt")
+        data = readAveragesFile(dataFile)
+        self.assertIsInstance(data, pd.DataFrame)
+        self.assertEqual(len(data), 9)
+        self.assertEqual(data["TimeStep"].iloc[0], 100)
+        self.assertEqual(data["TimeStep"].iloc[4], 200)
+        self.assertEqual(data["TimeStep"].unique(), 3)
+        self.assertEqual(data["value2"].iloc[4], 4000)
+        self.assertEqual(data["value1"].iloc[4], 4.5)
+        data2 = readHistogramFile(dataFile)
+        self.assertDataframeEqual(data, data2)
+
+    def test_correlationReader(self):
+        dataFile = os.path.join(os.path.dirname(
+            __file__), "../fixtures/example_correlation_file.out.corr.txt")
+        data = readCorrelationFile(dataFile)
+        self.assertIsInstance(data, pd.DataFrame)
+        self.assertEqual(len(data["TimeStep"].unique()), 2)
+        self.assertEqual(len(data), 2*55)
