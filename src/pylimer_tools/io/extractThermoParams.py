@@ -8,7 +8,7 @@ import tempfile
 import warnings
 from datetime import datetime
 from io import StringIO
-from typing import Iterable
+from typing import Iterable, List
 
 import numpy as np
 import pandas as pd
@@ -17,8 +17,29 @@ from pylimer_tools.utils.cacheUtility import doCache, loadCache
 from pylimer_tools.utils.optimizeDf import optimize, reduce_mem_usage
 
 
-# Helper functions
-def readOneGroup(fp, header, minLineLen=4, additional_lines_skip=0) -> str:
+def detectHeaders(file: str, max_nr_of_lines_to_read: int = 1500) -> List[str]:
+    """
+    Read `max_nr_of_lines_to_read` lines from the given file and return all possible header lines
+    """
+    lines_read = 0
+    previous_line = None
+    results = []
+    with open(file, 'r') as f:
+        for line in f:
+            if (previous_line is not None and len(line.strip().split()) == len(previous_line.removeprefix("#").strip().split()) and np.all([
+                w[0].isalpha() for w in previous_line.split()
+            ]) and np.any([
+                np.all([c.isnumeric() or c == "." or c == "-" or c == "e" for c in w]) for w in line.split()
+            ])):
+                results.append(previous_line)
+            previous_line = line
+            lines_read += 1
+            if (lines_read > max_nr_of_lines_to_read):
+                break
+    return results
+
+
+def readOneGroup(fp, header, minLineLen=4, additional_lines_skip=0, lines_to_read_till_header=1e3) -> str:
     """
     Read one group of csv lines from the file
 
@@ -32,38 +53,24 @@ def readOneGroup(fp, header, minLineLen=4, additional_lines_skip=0) -> str:
     Returns:
        The filename of a temporary CSV file
     """
+    assert(isinstance(header, str) or (
+        isinstance(header, list) and len(header) > 0))
     csvFileToWrite = "{}/{}_{}".format(
         tempfile.gettempdir(),
         hashlib.md5(datetime.now().strftime("%m.%d.%Y, %H:%M:%S").encode()).hexdigest(), 'tmp_thermo_file.csv')
     n_lines = 0
     previous_line = None
-    before_previous_line = None
     with open(csvFileToWrite, 'w') as output_csv:
         line = fp.readline()
         separator = ", "
         headerLen = None
-        if (header is None):
-            pass
-        elif (isinstance(header, str)):
+        if (isinstance(header, str)):
             minLineLen = max(minLineLen, len(header.split()))
         else:
             minLineLen = max(minLineLen, min([len(h.split()) for h in header]))
 
         def checkSkipLine(line, header):
-            if (header is not None):
-                return line and not line.startswith(header)
-            else:
-                # need to detect what the header could be...
-                if (previous_line is not None and len(line.split()) == len(previous_line.split()) and np.all([
-                    w[0].isalpha() for w in previous_line.split()
-                ]) and np.some([
-                    np.all([c.isnumeric() for c in w]) for w in line.split()
-                ])):
-                    header = previous_line
-                    return False
-                else:
-                    previous_line = line
-                    return True
+            return line and not line.startswith(header)
 
         def checkSkipLineHeaderList(line, header):
             if (not line):
@@ -76,8 +83,13 @@ def readOneGroup(fp, header, minLineLen=4, additional_lines_skip=0) -> str:
         skipLineFun = checkSkipLineHeaderList if isinstance(
             header, list) else checkSkipLine
         # skip lines up until header (or file ending)
-        while skipLineFun(line, header):
+        linesSkipped = 0
+        while skipLineFun(line, header) and line.endswith("\n"):
             line = fp.readline()
+            linesSkipped += 1
+            if (linesSkipped > lines_to_read_till_header and lines_to_read_till_header > 0):
+                raise RuntimeError(
+                    "Skipped {} lines, not encountered any header yet.".format(linesSkipped))
         # found header. Take next few lines:
         headerLen = len(line.split())
         if (not line):
@@ -125,7 +137,7 @@ def getThermoCacheNameSuffix(header="Step Temp E_pair E_mol TotEng Press", texts
     return "{}{}{}-thermo-param-cache.pickle".format(hashlib.md5(header.encode()).hexdigest() if header is not None else "", textsToRead, minLineLen)
 
 
-def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", textsToRead=5, minLineLen=5, useCache=True) -> pd.DataFrame:
+def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", textsToRead=5, minLineLen=5, useCache=True, lines_to_read_till_header=-1) -> pd.DataFrame:
     """
     Extract the thermodynamic outputs produced for this simulation.
 
@@ -134,16 +146,22 @@ def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", text
 
     Arguments:
         - file: the file path to the file to read from
-        - header: the header of the CSV (where to start reading at)
+        - header: the header of the CSV (where to start reading at). 
+            Can be a string, a list of strings, or None if you want to try the detection.
         - textsToRead: the number of times to expect the header
         - minLineLen: the minimal length of a line to be accepted as data
         - useCache: wheter to use cache or not (though it will be written anyway)
+        - lines_to_read_till_header: the number of lines that are acceptable to skip until a header should have been found.
+            This is useful for (a) finding the header, and (b) exit early if you are unsure about the header(s)
 
     Returns:
         - data (pd.DataFrame): the thermodynamic parameters
 
     """
     df = None
+
+    if (header is None):
+        header = detectHeaders(file, max_nr_of_lines_to_read=lines_to_read_till_header if lines_to_read_till_header > 0 else 1500)
 
     suffix = getThermoCacheNameSuffix(
         header, textsToRead, minLineLen)
@@ -167,11 +185,11 @@ def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", text
             return pd.DataFrame()
 
     with open(file, 'r') as fp:
-        tmpCsvFile = readOneGroup(fp, header, minLineLen=minLineLen)
+        tmpCsvFile = readOneGroup(fp, header, minLineLen=minLineLen, lines_to_read_till_header=lines_to_read_till_header)
         textsRead = 1
         df = csvFileToDf(tmpCsvFile)
         while(textsRead < textsToRead):
-            tmpCsvFile = readOneGroup(fp, header, minLineLen=minLineLen)
+            tmpCsvFile = readOneGroup(fp, header, minLineLen=minLineLen, lines_to_read_till_header=lines_to_read_till_header)
             textsRead += 1
             if (tmpCsvFile != ""):
                 newDf = csvFileToDf(tmpCsvFile)
