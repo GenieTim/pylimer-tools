@@ -1,5 +1,6 @@
 import os
 import re
+import warnings
 
 import pandas as pd
 
@@ -7,8 +8,8 @@ from pylimer_tools.io.extractThermoParams import extractThermoParams
 from pylimer_tools_cpp import Universe, UniverseSequence
 
 
-def readLogFile(filepath) -> pd.DataFrame:
-    return extractThermoParams(filepath, header=None, textsToRead=1e5)
+def readLogFile(filepath, lines_to_read_till_header=500000) -> pd.DataFrame:
+    return extractThermoParams(filepath, header=None, textsToRead=500000, lines_to_read_till_header=lines_to_read_till_header)
 
 
 def readDumpFile(dataFile, dumpFile) -> UniverseSequence:
@@ -65,7 +66,7 @@ def readSectionedAveragesFile(filepath) -> pd.DataFrame:
     """
     Read a file written by a `fix ave/time` command.
 
-    Use the section delimeter columns together with pandas' groupby() 
+    Use the section delimeter columns together with pandas' groupby()
     to restore the original sections.
     """
     assert(os.path.isfile(filepath))
@@ -109,6 +110,10 @@ def readSectionedAveragesFile(filepath) -> pd.DataFrame:
 
     # convert all the data to a dataframe
     df = pd.DataFrame()
+
+    if (header_line1_split is None):
+        raise ValueError("Did not find a useable header line.")
+
     for key in data.keys():
         split_key = key.split()
         local_dataframe = pd.DataFrame(data[key], columns=header_line2_split)
@@ -142,7 +147,7 @@ def readCorrelationFile(filepath, group_key="Timestep") -> pd.DataFrame:
 
     Returns:
         - correlatedData: a DataFrame containing all the data of the file.
-            Use the group_key with the DataFrame's groupby() to restore the original sections.    
+            Use the group_key with the DataFrame's groupby() to restore the original sections.
     """
     assert(os.path.isfile(filepath))
     data = {}
@@ -151,7 +156,7 @@ def readCorrelationFile(filepath, group_key="Timestep") -> pd.DataFrame:
         currentData = []
         currentKey = None
         normalLineLen = None
-        line0 = f.readline()
+        title_line = f.readline()
         header_line = f.readline()
         lines_interpreted = 0
         for line in f:
@@ -168,19 +173,21 @@ def readCorrelationFile(filepath, group_key="Timestep") -> pd.DataFrame:
                 currentKey = line
             elif (len(split) == normalLineLen or normalLineLen is None):
                 normalLineLen = len(split)
-                currentData.append([int(val) if (
-                    "." not in val and "e" not in val) else float(val) for val in split])
+                currentData.append(split)
             else:
                 raise ValueError(
                     "Did not expect {} splited values on line with content {} in rdf file {}".format(len(split), line, filepath))
             lines_interpreted += 1
-        data[currentKey] = currentData
+        if (currentKey is not None):
+            data[currentKey] = currentData
 
     correlatedDataAssembled = []
     for key in data.keys():
-        assert (group_key in key)
+        assert (group_key in str(key))
         compiledRegex = re.compile(r"{}: ([\d]+)".format(group_key))
         results = compiledRegex.search(key)
+        if (results is None):
+            warnings.warn("Did not find {} with number in {}".format(group_key, key))
         assert(results is not None)
         timestep = int(results.group(1))
         for row in data[key]:
@@ -191,4 +198,6 @@ def readCorrelationFile(filepath, group_key="Timestep") -> pd.DataFrame:
     cols.append(group_key)
     correlatedData = pd.DataFrame(
         correlatedDataAssembled, columns=cols)
+    # convert all columns of DataFrame
+    correlatedData = correlatedData.apply(pd.to_numeric, errors='ignore')
     return correlatedData
