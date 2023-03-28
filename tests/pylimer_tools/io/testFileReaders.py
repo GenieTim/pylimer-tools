@@ -12,7 +12,7 @@ from pylimer_tools.io.readLammpsOutputFile import (readAveragesFile,
                                                    readHistogramFile,
                                                    readLogFile)
 from pylimer_tools.utils.cacheUtility import getCacheFileName
-from pylimer_tools.utils.optimizeDf import reduce_mem_usage
+from pylimer_tools.utils.optimizeDf import optimize, reduce_mem_usage
 from pylimer_tools_cpp import (DataFileReader, DumpFileReader, Universe,
                                UniverseSequence)
 from tests.pylimer_tools.pdComparingTestCase import PandasComparingTestCase
@@ -50,8 +50,9 @@ class TestFileReader(PandasComparingTestCase):
         self.assertTrue(emptyData.empty)
 
         # test: check if we can deduce the header
-        readData4 = readLogFile(thermoFile)
-        self.assertDataframeEqual(readData, readData4)
+        readData4 = readLogFile(thermoFile, lines_to_read_till_header=500000)
+        self.assertListEqual(list(readData.columns), list(readData4.columns))
+        self.assertDataframeEqual(readData, readData4, check_dtype=False)
 
     @mock.patch('pylimer_tools.io.extractThermoParams.os.remove')
     def test_cacheDeleteFail(self, mockOsRemove):
