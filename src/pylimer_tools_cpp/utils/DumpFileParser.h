@@ -23,13 +23,13 @@ namespace utils {
   {
   public:
     DumpFileParser(){};
-    DumpFileParser(const std::string filePath);
+    DumpFileParser(const std::string filePath, const bool careful = false);
 
     // rule of three:
     // 1. destructor (to destroy the graph)
     ~DumpFileParser();
     // 2. copy constructor
-    DumpFileParser(const DumpFileParser& src, const bool careful = false);
+    DumpFileParser(const DumpFileParser& src);
     // 3. copy assignment operator
     DumpFileParser& operator=(DumpFileParser src);
 
@@ -118,7 +118,7 @@ namespace utils {
                                                   const std::string headerKey,
                                                   const size_t colIdx)
   {
-    if (!pylimer_tools::utils::map_has_key(this->data,index)) {
+    if (!pylimer_tools::utils::map_has_key(this->data, index)) {
       // std::cout << "Could not find index " << index << "in data yet" <<
       // std::endl;
       this->readGroupByIdx(index);
@@ -128,7 +128,7 @@ namespace utils {
 
     data_item_t dataItem = this->data.at(index);
     //
-    if (!pylimer_tools::utils::map_has_key(dataItem,headerKey)) {
+    if (!pylimer_tools::utils::map_has_key(dataItem, headerKey)) {
       throw std::invalid_argument(headerKey + " is not a key in dataItem.");
     }
     std::vector<pylimer_tools::utils::CsvTokenizer> relevantData =
