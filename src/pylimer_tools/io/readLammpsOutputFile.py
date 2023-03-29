@@ -5,6 +5,7 @@ import warnings
 import pandas as pd
 
 from pylimer_tools.io.extractThermoParams import extractThermoParams
+from pylimer_tools.utils.cacheUtility import doCache, loadCache
 from pylimer_tools_cpp import Universe, UniverseSequence
 
 
@@ -137,7 +138,7 @@ def readHistogramFile(filepath) -> pd.DataFrame:
     return readSectionedAveragesFile(filepath)
 
 
-def readCorrelationFile(filepath, group_key="Timestep") -> pd.DataFrame:
+def readCorrelationFile(filepath, group_key="Timestep", use_cache=True) -> pd.DataFrame:
     """
     Read a file written by a `fix ave/correlate{/long}` command.
 
@@ -150,6 +151,14 @@ def readCorrelationFile(filepath, group_key="Timestep") -> pd.DataFrame:
             Use the group_key with the DataFrame's groupby() to restore the original sections.
     """
     assert(os.path.isfile(filepath))
+
+    cache_suffix = "{}-correlation-cache.pickle".format(
+        group_key if isinstance(group_key, str) else "g")
+    cacheContent = loadCache(filepath, cache_suffix)
+
+    if (cacheContent is not None and use_cache):
+        return cacheContent
+
     data = {}
     header_line = None
     with open(filepath, 'r') as f:
@@ -181,6 +190,8 @@ def readCorrelationFile(filepath, group_key="Timestep") -> pd.DataFrame:
         if (currentKey is not None):
             data[currentKey] = currentData
 
+    cols = header_line.removeprefix("#").strip().split()
+    cols.append(group_key)
     correlatedDataAssembled = []
     for key in data.keys():
         assert (group_key in str(key))
@@ -193,12 +204,13 @@ def readCorrelationFile(filepath, group_key="Timestep") -> pd.DataFrame:
         timestep = int(results.group(1))
         for row in data[key]:
             row.append(timestep)
+            assert(len(row) == len(cols))
             correlatedDataAssembled.append(row)
 
-    cols = header_line.removeprefix("#").strip().split()
-    cols.append(group_key)
     correlatedData = pd.DataFrame(
         correlatedDataAssembled, columns=cols)
     # convert all columns of DataFrame
     correlatedData = correlatedData.apply(pd.to_numeric, errors='ignore')
+    doCache(correlatedData, filepath, cache_suffix)
+
     return correlatedData
