@@ -4,7 +4,8 @@ import unittest
 import mock
 import pandas as pd
 
-from pylimer_tools.io.extractThermoParams import (extractThermoParams,
+from pylimer_tools.io.extractThermoParams import (detectHeaders,
+                                                  extractThermoParams,
                                                   getThermoCacheNameSuffix)
 from pylimer_tools.io.readLammpsOutputFile import (readAveragesFile,
                                                    readCorrelationFile,
@@ -50,9 +51,27 @@ class TestFileReader(PandasComparingTestCase):
         self.assertTrue(emptyData.empty)
 
         # test: check if we can deduce the header
-        readData4 = readLogFile(thermoFile, lines_to_read_till_header=500000)
+        print("Testing header detection")
+        detectedHeaders = detectHeaders(
+            thermoFile, max_nr_of_lines_to_read=150)
+        self.assertListEqual(detectedHeaders, [
+            "Step Temp E_pair E_mol TotEng Press"
+        ])
+        readData5 = extractThermoParams(thermoFile, header=detectedHeaders)
+        detectedHeaders = detectHeaders(
+            thermoFile, max_nr_of_lines_to_read=1500000)
+        self.assertListEqual(detectedHeaders, [
+            "Step Temp E_pair E_mol TotEng Press",
+            "Step Temp E_pair E_mol TotEng Press Volume",
+            "Step Temp E_pair E_mol TotEng Press",
+            "Step Temp PotEng 2",
+            "Step Temp PotEng 2",
+        ])
+        readData4 = readLogFile(thermoFile, lines_to_read_to_detect_header=500)
+        self.assertListEqual(list(readData4.columns), list(readData5.columns))
         self.assertListEqual(list(readData.columns), list(readData4.columns))
-        self.assertDataframeEqual(readData, readData4, check_dtype=False)
+        self.assertDataframeEqual(readData4, readData5, check_dtype=False)
+        self.assertDataframeEqual(readData, reduce_mem_usage(readData4), check_dtype=False)
 
     @mock.patch('pylimer_tools.io.extractThermoParams.os.remove')
     def test_cacheDeleteFail(self, mockOsRemove):

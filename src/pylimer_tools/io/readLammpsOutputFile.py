@@ -8,8 +8,8 @@ from pylimer_tools.io.extractThermoParams import extractThermoParams
 from pylimer_tools_cpp import Universe, UniverseSequence
 
 
-def readLogFile(filepath, lines_to_read_till_header=500000) -> pd.DataFrame:
-    return extractThermoParams(filepath, header=None, textsToRead=500000, lines_to_read_till_header=lines_to_read_till_header)
+def readLogFile(filepath, lines_to_read_to_detect_header=500000) -> pd.DataFrame:
+    return extractThermoParams(filepath, header=None, textsToRead=500000, lines_to_read_to_detect_header=lines_to_read_to_detect_header)
 
 
 def readDumpFile(dataFile, dumpFile) -> UniverseSequence:
@@ -187,7 +187,8 @@ def readCorrelationFile(filepath, group_key="Timestep") -> pd.DataFrame:
         compiledRegex = re.compile(r"{}: ([\d]+)".format(group_key))
         results = compiledRegex.search(key)
         if (results is None):
-            warnings.warn("Did not find {} with number in {}".format(group_key, key))
+            warnings.warn("Did not find {} with number in {} when reading {}".format(
+                group_key, key, filepath))
         assert(results is not None)
         timestep = int(results.group(1))
         for row in data[key]:
