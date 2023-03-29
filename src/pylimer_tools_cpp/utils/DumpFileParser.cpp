@@ -66,7 +66,7 @@ namespace utils {
    *
    * @param filePath
    */
-  DumpFileParser::DumpFileParser(const std::string filePath, const bool careful)
+  DumpFileParser::DumpFileParser(const std::string filePath)
   {
     if (!std::filesystem::exists(filePath)) {
       throw std::invalid_argument("File to read (" + filePath +
@@ -107,12 +107,10 @@ namespace utils {
       linesSinceLastIgnore += 1;
       // performance improvement: not skipping.
       // could be bad for certain files.
-      if (careful) {
-        line = pylimer_tools::utils::trimLineOmitComment(line);
-        // skip empty lines
-        if (line.empty()) {
-          continue;
-        }
+      line = pylimer_tools::utils::trimLineOmitComment(line);
+      // skip empty lines
+      if (line.empty()) {
+        continue;
       }
 
       if (line == this->newGroupKey) {
@@ -122,7 +120,7 @@ namespace utils {
       }
 
       // skip forward. Could be too far, in principle.
-      if (!careful && linesSinceLastIgnore > 2) {
+      if (linesSinceLastIgnore > 2) {
         // jump to next occurrence of the first character of the desired line
         this->file.ignore(std::numeric_limits<std::streamsize>::max(),
                           this->file.widen(this->newGroupKey[0]));
@@ -175,7 +173,7 @@ namespace utils {
       throw std::invalid_argument("Cannot check for header '" + headerKey +
                                   "' without reading a group first.");
     }
-    return pylimer_tools::utils::map_has_key(this->headerColMap, headerKey);
+    return pylimer_tools::utils::map_has_key(this->headerColMap,headerKey);
   }
 
   /**
@@ -310,7 +308,7 @@ namespace utils {
    */
   void DumpFileParser::forgetAt(const size_t index)
   {
-    if (pylimer_tools::utils::map_has_key(this->data, index)) {
+    if (pylimer_tools::utils::map_has_key(this->data,index)) {
       this->data.erase(index);
     }
   };
@@ -352,7 +350,7 @@ namespace utils {
       }
     }
     newHeader = pylimer_tools::utils::rtrim(newHeader);
-    if (!pylimer_tools::utils::map_has_key(this->headerColMap, newHeader)) {
+    if (!pylimer_tools::utils::map_has_key(this->headerColMap,newHeader)) {
       this->headerColMap.insert_or_assign(newHeader, columns);
     }
 

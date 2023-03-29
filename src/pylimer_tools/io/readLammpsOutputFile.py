@@ -79,7 +79,7 @@ def readSectionedAveragesFile(filepath) -> pd.DataFrame:
 
         if (not line2.startswith("#")):
             raise ValueError(
-                "This file was not detected to be a proper sectioned averages file.")
+                "The file '{}' was not detected to be a proper sectioned averages file.".format(filepath))
             # return readSectionedAveragesFile(filepath)
 
         header_line1 = line1.removeprefix("#").strip()

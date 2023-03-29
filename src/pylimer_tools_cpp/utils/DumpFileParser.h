@@ -23,7 +23,7 @@ namespace utils {
   {
   public:
     DumpFileParser(){};
-    DumpFileParser(const std::string filePath, const bool careful = false);
+    DumpFileParser(const std::string filePath);
 
     // rule of three:
     // 1. destructor (to destroy the graph)
