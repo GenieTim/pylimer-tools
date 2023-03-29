@@ -1,7 +1,5 @@
 #include "../../src/pylimer_tools_cpp/utils/DataFileParser.h"
-#include "../../src/pylimer_tools_cpp/utils/DataFileParser2.h"
 #include "../../src/pylimer_tools_cpp/utils/DumpFileParser.h"
-#include "../../src/pylimer_tools_cpp/utils/DumpFileParser2.h"
 #include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
@@ -93,9 +91,9 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
     REQUIRE(parser.hasKey("BOX BOUNDS") == true);
     REQUIRE(parser.hasKey("NO EXISTING") == false);
 
-    pu::DumpFileParser2 parser5 =
-      pu::DumpFileParser2(suspectedPath + "big_dump_file.lammpstrj");
-    CHECK(parser5.getLength() == parser.getLength());
+    // pu::DumpFileParser2 parser5 =
+    //   pu::DumpFileParser2(suspectedPath + "big_dump_file.lammpstrj");
+    // CHECK(parser5.getLength() == parser.getLength());
 
     // BENCHMARK("DumpFileParserOld")
     // {

@@ -69,9 +69,7 @@ target_sources(pylimer_tools
 		${CMAKE_CURRENT_LIST_DIR}/entities/UniverseSequence.cpp
 
 		${CMAKE_CURRENT_LIST_DIR}/utils/DataFileParser.cpp
-		${CMAKE_CURRENT_LIST_DIR}/utils/DataFileParser2.cpp
 		${CMAKE_CURRENT_LIST_DIR}/utils/DumpFileParser.cpp
-		${CMAKE_CURRENT_LIST_DIR}/utils/DumpFileParser2.cpp
 
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceEvaluator.cpp
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceRelaxation.cpp
@@ -85,9 +83,7 @@ target_sources(pylimer_tools
 		${CMAKE_CURRENT_LIST_DIR}/entities/NeighbourList.h
 
 		${CMAKE_CURRENT_LIST_DIR}/utils/DataFileParser.h
-		${CMAKE_CURRENT_LIST_DIR}/utils/DataFileParser2.h
 		${CMAKE_CURRENT_LIST_DIR}/utils/DumpFileParser.h
-		${CMAKE_CURRENT_LIST_DIR}/utils/DumpFileParser2.h
 		${CMAKE_CURRENT_LIST_DIR}/utils/GraphUtils.h
 		${CMAKE_CURRENT_LIST_DIR}/utils/VectorUtils.h
 
