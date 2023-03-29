@@ -29,7 +29,7 @@ namespace utils {
     // 1. destructor (to destroy the graph)
     ~DumpFileParser();
     // 2. copy constructor
-    DumpFileParser(const DumpFileParser& src);
+    DumpFileParser(const DumpFileParser& src, const bool careful = false);
     // 3. copy assignment operator
     DumpFileParser& operator=(DumpFileParser src);
 
