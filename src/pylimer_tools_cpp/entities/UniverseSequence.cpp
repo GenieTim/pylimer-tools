@@ -56,7 +56,7 @@ namespace entities {
                                   ") larger than nr. of universes (" +
                                   std::to_string(this->length) + ").");
     }
-    if (!pylimer_tools::utils::map_has_key(this->universeCache,index)) {
+    if (!pylimer_tools::utils::map_has_key(this->universeCache, index)) {
       this->universeCache.emplace(index,
                                   this->modeDataFiles
                                     ? this->readDataFileAtIndex(index)
@@ -308,7 +308,7 @@ namespace entities {
     if (!this->modeDataFiles) {
       this->dumpFileParser.forgetAt(index);
     }
-    if (pylimer_tools::utils::map_has_key(this->universeCache,index)) {
+    if (pylimer_tools::utils::map_has_key(this->universeCache, index)) {
       this->universeCache.erase(index);
     }
   }

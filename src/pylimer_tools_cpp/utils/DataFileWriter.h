@@ -195,32 +195,32 @@ namespace utils {
       this->oldNewAtomIdMap[atom.getId()] = atomId;
       int nx =
         this->attemptImageReset
-          ? this->getImageFlagForCoordinate(atom.getX(),
+          ? this->getImageFlagForCoordinate(atom.getUnwrappedX(&this->universe.getBox()),
                                             this->universe.getBox().getLowX(),
                                             this->universe.getBox().getHighX())
           : atom.getNX();
       int ny =
         this->attemptImageReset
-          ? this->getImageFlagForCoordinate(atom.getY(),
+          ? this->getImageFlagForCoordinate(atom.getUnwrappedY(&this->universe.getBox()),
                                             this->universe.getBox().getLowY(),
                                             this->universe.getBox().getHighY())
           : atom.getNY();
       int nz =
         this->attemptImageReset
-          ? this->getImageFlagForCoordinate(atom.getZ(),
+          ? this->getImageFlagForCoordinate(atom.getUnwrappedZ(&this->universe.getBox()),
                                             this->universe.getBox().getLowZ(),
                                             this->universe.getBox().getHighZ())
           : atom.getNZ();
       double x = this->conditionallyMoveCoordinateIntoBox(
-        atom.getX(),
+        atom.getUnwrappedX(&this->universe.getBox()),
         this->universe.getBox().getLowX(),
         this->universe.getBox().getHighX());
       double y = this->conditionallyMoveCoordinateIntoBox(
-        atom.getY(),
+        atom.getUnwrappedY(&this->universe.getBox()),
         this->universe.getBox().getLowY(),
         this->universe.getBox().getHighY());
       double z = this->conditionallyMoveCoordinateIntoBox(
-        atom.getZ(),
+        atom.getUnwrappedZ(&this->universe.getBox()),
         this->universe.getBox().getLowZ(),
         this->universe.getBox().getHighZ());
       if (this->customAtomFormat.size() < 2) {
