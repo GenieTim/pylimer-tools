@@ -19,19 +19,32 @@ from pylimer_tools.utils.optimizeDf import optimize, reduce_mem_usage
 
 def detectHeaders(file: str, max_nr_of_lines_to_read: int = 1500) -> List[str]:
     """
-    Read `max_nr_of_lines_to_read` lines from the given file and return all possible header lines
+    Read `max_nr_of_lines_to_read` lines from the given file and return all possible header lines.
+
+    Some assumptions are made regarding the columns, e.g., that 75% of them start with a character.
     """
     lines_read = 0
     previous_line = None
     results = []
     with open(file, 'r') as f:
         for line in f:
-            if (previous_line is not None and len(line.strip().split()) == len(previous_line.removeprefix("#").strip().split()) and np.all([
+            if (previous_line is not None and len(line.strip().split()) == len(previous_line.removeprefix("#").strip().split()) and np.sum([
                 w[0].isalpha() for w in previous_line.split()
-            ]) and np.any([
-                np.all([c.isnumeric() or c == "." or c == "-" or c == "e" for c in w]) for w in line.split()
+            ]) > 0.74*len(previous_line.split()) and np.sum([
+                np.all([c.isnumeric() or c == "." or c == "+" or c == "-" or c == "e" for c in w.strip()]) for w in line.split()
+            ]) > 0.5*len(line.split()) and "..." not in previous_line and len(previous_line.split()) > 2 and not np.any([
+                previous_line.startswith(val) for val in [
+                    "Memory usage per processor",
+                    "Setting up Verlet run",
+                    "Dangerous builds",
+                    "<",
+                    "Started at",
+                    "Terminated at",
+                    "Results reported at",
+                    "WARNING"
+                ]
             ])):
-                results.append(previous_line)
+                results.append(previous_line.rstrip())
             previous_line = line
             lines_read += 1
             if (lines_read > max_nr_of_lines_to_read):
@@ -57,9 +70,8 @@ def readOneGroup(fp, header, minLineLen=4, additional_lines_skip=0, lines_to_rea
         isinstance(header, list) and len(header) > 0))
     csvFileToWrite = "{}/{}_{}".format(
         tempfile.gettempdir(),
-        hashlib.md5(datetime.now().strftime("%m.%d.%Y, %H:%M:%S").encode()).hexdigest(), 'tmp_thermo_file.csv')
+        hashlib.md5(datetime.now().strftime("%m.%d.%Y, %H:%M:%S.%f").encode()).hexdigest(), 'tmp_thermo_file.csv')
     n_lines = 0
-    previous_line = None
     with open(csvFileToWrite, 'w') as output_csv:
         line = fp.readline()
         separator = ", "
@@ -121,7 +133,7 @@ def readOneGroup(fp, header, minLineLen=4, additional_lines_skip=0, lines_to_rea
     return csvFileToWrite if n_lines > 0 else ""
 
 
-def getThermoCacheNameSuffix(header="Step Temp E_pair E_mol TotEng Press", textsToRead=5, minLineLen=5) -> str:
+def getThermoCacheNameSuffix(header="Step Temp E_pair E_mol TotEng Press", textsToRead=50, minLineLen=5) -> str:
     """
     Compose a cache file suffix in such a way, that it distinguishes different thermo reader parameters
 
@@ -137,7 +149,7 @@ def getThermoCacheNameSuffix(header="Step Temp E_pair E_mol TotEng Press", texts
     return "{}{}{}-thermo-param-cache.pickle".format(hashlib.md5(header.encode()).hexdigest() if header is not None else "", textsToRead, minLineLen)
 
 
-def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", textsToRead=5, minLineLen=5, useCache=True, lines_to_read_till_header=-1) -> pd.DataFrame:
+def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", textsToRead=50, minLineLen=5, useCache=True, lines_to_read_to_detect_header=1e5, lines_to_read_till_header=-1) -> pd.DataFrame:
     """
     Extract the thermodynamic outputs produced for this simulation.
 
@@ -161,7 +173,8 @@ def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", text
     df = None
 
     if (header is None):
-        header = detectHeaders(file, max_nr_of_lines_to_read=lines_to_read_till_header if lines_to_read_till_header > 0 else 1500)
+        header = detectHeaders(
+            file, max_nr_of_lines_to_read=lines_to_read_to_detect_header if lines_to_read_to_detect_header > 0 else 1500)
 
     suffix = getThermoCacheNameSuffix(
         header, textsToRead, minLineLen)
@@ -185,16 +198,21 @@ def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", text
             return pd.DataFrame()
 
     with open(file, 'r') as fp:
-        tmpCsvFile = readOneGroup(fp, header, minLineLen=minLineLen, lines_to_read_till_header=lines_to_read_till_header)
+        tmpCsvFile = readOneGroup(
+            fp, header, minLineLen=minLineLen, lines_to_read_till_header=lines_to_read_till_header)
         textsRead = 1
-        df = csvFileToDf(tmpCsvFile)
+        if (tmpCsvFile == ""):
+            df = pd.DataFrame()
+        else:
+            df = csvFileToDf(tmpCsvFile)
         while(textsRead < textsToRead):
-            tmpCsvFile = readOneGroup(fp, header, minLineLen=minLineLen, lines_to_read_till_header=lines_to_read_till_header)
+            tmpCsvFile = readOneGroup(
+                fp, header, minLineLen=minLineLen, lines_to_read_till_header=lines_to_read_till_header)
             textsRead += 1
             if (tmpCsvFile != ""):
                 newDf = csvFileToDf(tmpCsvFile)
                 if (not newDf.empty):
-                    df = pd.concat([df, newDf])
+                    df = pd.concat([df, newDf], ignore_index=True)
             else:
                 break
 
