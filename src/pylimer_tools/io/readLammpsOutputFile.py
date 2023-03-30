@@ -10,7 +10,7 @@ from pylimer_tools_cpp import Universe, UniverseSequence
 
 
 def readLogFile(filepath, lines_to_read_to_detect_header=500000) -> pd.DataFrame:
-    return extractThermoParams(filepath, header=None, textsToRead=500000, lines_to_read_to_detect_header=lines_to_read_to_detect_header)
+    return extractThermoParams(filepath, header=None, texts_to_read=500000, lines_to_read_to_detect_header=lines_to_read_to_detect_header)
 
 
 def readDumpFile(dataFile, dumpFile) -> UniverseSequence:
@@ -33,7 +33,7 @@ def readDataFile(structureFile: str) -> Universe:
     return universe
 
 
-def readAveragesFile(filepath) -> pd.DataFrame:
+def readAveragesFile(filepath, use_cache: bool = True) -> pd.DataFrame:
     """
     Read a file written by a `fix ave/time` command.
 
@@ -52,7 +52,7 @@ def readAveragesFile(filepath) -> pd.DataFrame:
         line2 = f.readline()
 
         if (line2.startswith("#")):
-            return readSectionedAveragesFile(filepath)
+            return readSectionedAveragesFile(filepath, use_cache=use_cache)
 
         header_line = line1
     header_line = header_line.removeprefix("#").strip()
@@ -63,7 +63,7 @@ def readAveragesFile(filepath) -> pd.DataFrame:
     return data
 
 
-def readSectionedAveragesFile(filepath) -> pd.DataFrame:
+def readSectionedAveragesFile(filepath, use_cache: bool = True) -> pd.DataFrame:
     """
     Read a file written by a `fix ave/time` command.
 
@@ -71,6 +71,13 @@ def readSectionedAveragesFile(filepath) -> pd.DataFrame:
     to restore the original sections.
     """
     assert(os.path.isfile(filepath))
+
+    cache_suffix = "sectionedavg-cache.pickle"
+    cacheContent = loadCache(filepath, cache_suffix)
+
+    if (cacheContent is not None and use_cache):
+        return cacheContent
+
     data = {}
     with open(filepath, 'r') as f:
         f.readline()  # discard line 0
@@ -124,21 +131,22 @@ def readSectionedAveragesFile(filepath) -> pd.DataFrame:
 
     # convert all columns of DataFrame
     df = df.apply(pd.to_numeric, errors='ignore')
+    doCache(df, filepath, cache_suffix)
 
     return df
 
 
-def readHistogramFile(filepath) -> pd.DataFrame:
+def readHistogramFile(filepath, use_cache: bool = True) -> pd.DataFrame:
     """
     Read a file written by `fix ave/hist` or similar.
 
     See also:
         - `func:readSectionedAveragesFile`
     """
-    return readSectionedAveragesFile(filepath)
+    return readSectionedAveragesFile(filepath, use_cache)
 
 
-def readCorrelationFile(filepath, group_key="Timestep", use_cache=True) -> pd.DataFrame:
+def readCorrelationFile(filepath, group_key="Timestep", use_cache: bool = True) -> pd.DataFrame:
     """
     Read a file written by a `fix ave/correlate{/long}` command.
 

@@ -8,7 +8,7 @@ import tempfile
 import warnings
 from datetime import datetime
 from io import StringIO
-from typing import Iterable, List
+from typing import Iterable, List, Union
 
 import numpy as np
 import pandas as pd
@@ -52,14 +52,14 @@ def detectHeaders(file: str, max_nr_of_lines_to_read: int = 1500) -> List[str]:
     return results
 
 
-def readOneGroup(fp, header, minLineLen=4, additional_lines_skip=0, lines_to_read_till_header=1e3) -> str:
+def readOneGroup(fp, header, min_line_len=4, additional_lines_skip=0, lines_to_read_till_header=1e3) -> str:
     """
     Read one group of csv lines from the file
 
     Arguments:
         - fp: the file pointer to the file to read from
         - header: the header of the CSV (where to start reading at)
-        - minLineLen: the minimal length of a line to be accepted as data
+        - min_line_len: the minimal length of a line to be accepted as data
         - additional_lines_skip: number of lines to skip after reading the header
 
 
@@ -77,9 +77,9 @@ def readOneGroup(fp, header, minLineLen=4, additional_lines_skip=0, lines_to_rea
         separator = ", "
         headerLen = None
         if (isinstance(header, str)):
-            minLineLen = max(minLineLen, len(header.split()))
+            min_line_len = max(min_line_len, len(header.split()))
         else:
-            minLineLen = max(minLineLen, min([len(h.split()) for h in header]))
+            min_line_len = max(min_line_len, min([len(h.split()) for h in header]))
 
         def checkSkipLine(line, header):
             return line and not line.startswith(header)
@@ -117,7 +117,7 @@ def readOneGroup(fp, header, minLineLen=4, additional_lines_skip=0, lines_to_rea
             n_lines += 1
         while line and not line.startswith("Loop time of"):
             line = fp.readline()
-            if (len(line) < minLineLen or (len(line.split()) != headerLen) or (len(line) > 0 and (
+            if (len(line) < min_line_len or (len(line.split()) != headerLen) or (len(line) > 0 and (
                     line.startswith("WARNING") or
                     line[0].isalpha() or
                     (line[0] == "-" and line[1] == "-") or
@@ -133,23 +133,23 @@ def readOneGroup(fp, header, minLineLen=4, additional_lines_skip=0, lines_to_rea
     return csvFileToWrite if n_lines > 0 else ""
 
 
-def getThermoCacheNameSuffix(header="Step Temp E_pair E_mol TotEng Press", textsToRead=50, minLineLen=5) -> str:
+def getThermoCacheNameSuffix(header: Union[str, List[str], None] = "Step Temp E_pair E_mol TotEng Press", texts_to_read:float=50, min_line_len:float=5) -> str:
     """
     Compose a cache file suffix in such a way, that it distinguishes different thermo reader parameters
 
     Arguments:
         - header: the header of the CSV (where to start reading at)
-        - textsToRead: the number of times to expect the header
-        - minLineLen: the minimal length of a line to be accepted as data
+        - texts_to_read: the number of times to expect the header
+        - min_line_len: the minimal length of a line to be accepted as data
     """
     if (isinstance(header, Iterable)):
         header = "{}{}".format("".join("".join(header).split()), len(header))
 
     # need to has header, as we could get a filename too long error otherwise. Addmittedly, still possible for certain inputs
-    return "{}{}{}-thermo-param-cache.pickle".format(hashlib.md5(header.encode()).hexdigest() if header is not None else "", textsToRead, minLineLen)
+    return "{}{}{}-thermo-param-cache.pickle".format(hashlib.md5(header.encode()).hexdigest() if header is not None else "", texts_to_read, min_line_len)
 
 
-def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", textsToRead=50, minLineLen=5, useCache=True, lines_to_read_to_detect_header=1e5, lines_to_read_till_header=-1) -> pd.DataFrame:
+def extractThermoParams(file, header: Union[str, List[str], None] = "Step Temp E_pair E_mol TotEng Press", texts_to_read:float=50, min_line_len:float=5, use_cache:bool=True, lines_to_read_to_detect_header:float=1e5, lines_to_read_till_header:float=-1) -> pd.DataFrame:
     """
     Extract the thermodynamic outputs produced for this simulation.
 
@@ -160,9 +160,9 @@ def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", text
         - file: the file path to the file to read from
         - header: the header of the CSV (where to start reading at). 
             Can be a string, a list of strings, or None if you want to try the detection.
-        - textsToRead: the number of times to expect the header
-        - minLineLen: the minimal length of a line to be accepted as data
-        - useCache: wheter to use cache or not (though it will be written anyway)
+        - texts_to_read: the number of times to expect the header
+        - min_line_len: the minimal length of a line to be accepted as data
+        - use_cache: wheter to use cache or not (though it will be written anyway)
         - lines_to_read_till_header: the number of lines that are acceptable to skip until a header should have been found.
             This is useful for (a) finding the header, and (b) exit early if you are unsure about the header(s)
 
@@ -177,10 +177,10 @@ def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", text
             file, max_nr_of_lines_to_read=lines_to_read_to_detect_header if lines_to_read_to_detect_header > 0 else 1500)
 
     suffix = getThermoCacheNameSuffix(
-        header, textsToRead, minLineLen)
+        header, texts_to_read, min_line_len)
     cacheContent = loadCache(file, suffix)
 
-    if (cacheContent is not None and useCache):
+    if (cacheContent is not None and use_cache):
         return cacheContent
 
     def csvFileToDf(filePath) -> pd.DataFrame:
@@ -199,15 +199,15 @@ def extractThermoParams(file, header="Step Temp E_pair E_mol TotEng Press", text
 
     with open(file, 'r') as fp:
         tmpCsvFile = readOneGroup(
-            fp, header, minLineLen=minLineLen, lines_to_read_till_header=lines_to_read_till_header)
+            fp, header, min_line_len=min_line_len, lines_to_read_till_header=lines_to_read_till_header)
         textsRead = 1
         if (tmpCsvFile == ""):
             df = pd.DataFrame()
         else:
             df = csvFileToDf(tmpCsvFile)
-        while(textsRead < textsToRead):
+        while(textsRead < texts_to_read):
             tmpCsvFile = readOneGroup(
-                fp, header, minLineLen=minLineLen, lines_to_read_till_header=lines_to_read_till_header)
+                fp, header, min_line_len=min_line_len, lines_to_read_till_header=lines_to_read_till_header)
             textsRead += 1
             if (tmpCsvFile != ""):
                 newDf = csvFileToDf(tmpCsvFile)

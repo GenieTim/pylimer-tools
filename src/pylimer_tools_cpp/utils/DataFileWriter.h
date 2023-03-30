@@ -192,37 +192,38 @@ namespace utils {
                    int nAtomsOutput)
     {
       long int atomId = this->reindexAtoms ? nAtomsOutput : atom.getId();
+      const pylimer_tools::entities::Box box = this->universe.getBox();
       this->oldNewAtomIdMap[atom.getId()] = atomId;
       int nx =
         this->attemptImageReset
-          ? this->getImageFlagForCoordinate(atom.getUnwrappedX(&this->universe.getBox()),
-                                            this->universe.getBox().getLowX(),
-                                            this->universe.getBox().getHighX())
+          ? this->getImageFlagForCoordinate(atom.getUnwrappedX(&box),
+                                            box.getLowX(),
+                                            box.getHighX())
           : atom.getNX();
       int ny =
         this->attemptImageReset
-          ? this->getImageFlagForCoordinate(atom.getUnwrappedY(&this->universe.getBox()),
-                                            this->universe.getBox().getLowY(),
-                                            this->universe.getBox().getHighY())
+          ? this->getImageFlagForCoordinate(atom.getUnwrappedY(&box),
+                                            box.getLowY(),
+                                            box.getHighY())
           : atom.getNY();
       int nz =
         this->attemptImageReset
-          ? this->getImageFlagForCoordinate(atom.getUnwrappedZ(&this->universe.getBox()),
-                                            this->universe.getBox().getLowZ(),
-                                            this->universe.getBox().getHighZ())
+          ? this->getImageFlagForCoordinate(atom.getUnwrappedZ(&box),
+                                            box.getLowZ(),
+                                            box.getHighZ())
           : atom.getNZ();
       double x = this->conditionallyMoveCoordinateIntoBox(
-        atom.getUnwrappedX(&this->universe.getBox()),
-        this->universe.getBox().getLowX(),
-        this->universe.getBox().getHighX());
+        atom.getUnwrappedX(&box),
+        box.getLowX(),
+        box.getHighX());
       double y = this->conditionallyMoveCoordinateIntoBox(
-        atom.getUnwrappedY(&this->universe.getBox()),
-        this->universe.getBox().getLowY(),
-        this->universe.getBox().getHighY());
+        atom.getUnwrappedY(&box),
+        box.getLowY(),
+        box.getHighY());
       double z = this->conditionallyMoveCoordinateIntoBox(
-        atom.getUnwrappedZ(&this->universe.getBox()),
-        this->universe.getBox().getLowZ(),
-        this->universe.getBox().getHighZ());
+        atom.getUnwrappedZ(&box),
+        box.getLowZ(),
+        box.getHighZ());
       if (this->customAtomFormat.size() < 2) {
         file << "\t" << atomId << "\t" << moleculeIdx << "\t" << atom.getType()
              << "\t" << x << "\t" << y << "\t" << z << "\t" << nx << "\t" << ny
