@@ -27,7 +27,7 @@ class TestFileReader(PandasComparingTestCase):
         # this header does not include "Volume"
         header = "Step Temp E_pair E_mol TotEng Press"
         readData = extractThermoParams(
-            thermoFile, header=header, useCache=False)
+            thermoFile, header=header, use_cache=False)
         self.assertIsInstance(readData, pd.DataFrame)
         self.assertTrue("Volume" in readData.columns)
         # read again. this time from cache
@@ -36,7 +36,7 @@ class TestFileReader(PandasComparingTestCase):
         self.assertCountEqual(readData, readData2)
         # read again. this time with a header list (whatever)
         readData3 = extractThermoParams(
-            thermoFile, header=[header], useCache=False)
+            thermoFile, header=[header], use_cache=False)
         self.assertIsInstance(readData3, pd.DataFrame)
         self.assertCountEqual(readData3, readData2)
         reducedDf = reduce_mem_usage(readData)
@@ -51,7 +51,6 @@ class TestFileReader(PandasComparingTestCase):
         self.assertTrue(emptyData.empty)
 
         # test: check if we can deduce the header
-        print("Testing header detection")
         detectedHeaders = detectHeaders(
             thermoFile, max_nr_of_lines_to_read=150)
         self.assertListEqual(detectedHeaders, [
@@ -80,7 +79,7 @@ class TestFileReader(PandasComparingTestCase):
             __file__), "../fixtures/thermo_file.dat")
         header = "Step Temp E_pair E_mol TotEng Press Volume"
         readData = extractThermoParams(
-            thermoFile, header=header, useCache=False)
+            thermoFile, header=header, use_cache=False)
         self.assertIsInstance(readData, pd.DataFrame)
         self.assertEqual(" ".join(readData.columns), header)
         self.assertTrue(mockOsRemove.called)
@@ -93,7 +92,7 @@ class TestFileReader(PandasComparingTestCase):
         header = "Step Temp E_pair E_mol TotEng Press Volume"
         with self.assertWarns(Warning):
             readData = extractThermoParams(
-                thermoFile, header=header, useCache=False)
+                thermoFile, header=header, use_cache=False)
             self.assertIsInstance(readData, pd.DataFrame)
             self.assertTrue(readData.empty)
             self.assertTrue(mockCsvReader.called)
@@ -111,7 +110,7 @@ class TestFileReader(PandasComparingTestCase):
         #     self.assertTrue(key in data)
         #     self.assertIsNotNone(data[key])
         # # and with cache
-        # data2 = readLammpData(dataFile, useCache=True)
+        # data2 = readLammpData(dataFile, use_cache=True)
         # for key in data:
         #     self.assertEqual(data2[key], data[key])
 
