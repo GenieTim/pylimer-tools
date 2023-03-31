@@ -28,10 +28,10 @@ namespace calc {
     ? val                                                                      \
     : std::clamp(val,                                                          \
                  (oneOverSpringPartitionUpperLimit > 0.)                       \
-                   ? (1. / (N - 1. / oneOverSpringPartitionUpperLimit))          \
-                   : (0.0),                                                      \
+                   ? (1. / (N - 1. / oneOverSpringPartitionUpperLimit))        \
+                   : (0.0),                                                    \
                  (oneOverSpringPartitionUpperLimit > 0.)                       \
-                   ? (oneOverSpringPartitionUpperLimit)                          \
+                   ? (oneOverSpringPartitionUpperLimit)                        \
                    : (N));
 
     /**
@@ -1150,9 +1150,10 @@ namespace calc {
       std::cout << "Detecting slip-links based on cycles. Base memory useage: "
                 << getCurrentRSS() << ", peak " << getPeakRSS() << std::endl;
       std::vector<std::vector<long int>> loopEdges;
-      std::vector<std::vector<long int>> loops =
-        this->universe.findLoops(this->crosslinkerType, maxLoopLength, false, &loopEdges);
+      std::vector<std::vector<long int>> loops = this->universe.findLoops(
+        this->crosslinkerType, maxLoopLength, false, &loopEdges);
       std::cout << "Detected " << loops.size() << " loops." << std::endl;
+      // reduced loops = loops, but only the (new) spring indices
       std::vector<std::vector<size_t>> reducedLoops;
       reducedLoops.reserve(loops.size());
       for (std::vector<long int> loop : loops) {
@@ -1198,6 +1199,11 @@ namespace calc {
                 << getCurrentRSS() << ", peak " << getPeakRSS() << std::endl;
 
       // the resulting vectors to fill
+      // std::vector<std::vector<long int>> intersectionsOfEdge =
+      // pylimer_tools::utils::initializeWithValue(this->universe.getNrOfBonds(),
+      // std::vector<long int>());
+      // std::vector<std::tuple<pylimer_tools::entities::LoopIntersectionInfo,
+      // std::vector<size_t> associatedLoops> relevantIntersections;
       std::vector<double> slipLinkXs;
       std::vector<double> slipLinkYs;
       std::vector<double> slipLinkZs;
@@ -1233,8 +1239,8 @@ namespace calc {
         // also, we ignore all self-entanglements of one loop with itself.
         for (size_t j = i + 1; j < loops.size(); ++j) {
           std::vector<pylimer_tools::entities::LoopIntersectionInfo>
-            intersections =
-              this->universe.findLoopEntanglements(loops[i], loops[j], loopEdges[i], loopEdges[j]);
+            intersections = this->universe.findLoopEntanglements(
+              loops[i], loops[j], loopEdges[i], loopEdges[j]);
           for (pylimer_tools::entities::LoopIntersectionInfo intersection :
                intersections) {
             // TODO: this is yet the most naïve way to add these.
@@ -3437,22 +3443,37 @@ namespace calc {
       if (respectLoops) {
         // filter out the target springs that may not be a target based on the
         // involved loops
-        possibleTargetPartialSprings.erase(
-          std::remove_if(possibleTargetPartialSprings.begin(),
-                         possibleTargetPartialSprings.end(),
-                         [&net, involvedSlipLink](size_t springIdxToCheck) {
-                           for (size_t loopIdx :
-                                net.loopsOfSliplink[involvedSlipLink]) {
-                             for (size_t springIdx : net.loops[loopIdx]) {
-                               if (springIdx == springIdxToCheck) {
-                                 return true;
-                               }
-                             }
-                           }
-
-                           return false;
-                         }),
-          possibleTargetPartialSprings.end());
+        possibleTargetSprings.erase(
+          std::remove_if(
+            possibleTargetSprings.begin(),
+            possibleTargetSprings.end(),
+            [&net, springIdx, involvedSlipLink](size_t springIdxToCheck) {
+              // we want to be able to distinguish all associated loops
+              // into being (a) the ones the slip-link is slipping on, or
+              // (b) the one the second, currently non-slipping part is
+              // associated with only the cases of (a) are allowed as possible
+              // target springs
+              bool allLoopsWithSpringIdxToCheckIncludespringIdx = false;
+              for (size_t loopIdx : net.loopsOfSliplink[involvedSlipLink]) {
+                bool loopContainsCheck = false;
+                bool loopContainsOriginal = false;
+                for (size_t lspringIdx : net.loops[loopIdx]) {
+                  if (lspringIdx == springIdxToCheck) {
+                    loopContainsCheck = true;
+                  }
+                  if (lspringIdx == springIdx) {
+                    loopContainsOriginal = true;
+                  }
+                }
+                if (loopContainsOriginal && !loopContainsCheck) {
+                  // YES, this is not allowed -> remove
+                  return true;
+                }
+              }
+              // return allLoopsWithSpringIdxToCheckIncludespringIdx;
+              return false;
+            }),
+          possibleTargetSprings.end());
       }
       if (possibleTargetSprings.size() <= 1) {
         // e.g. in the case of many loops :P

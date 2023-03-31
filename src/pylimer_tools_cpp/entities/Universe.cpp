@@ -417,13 +417,15 @@ namespace entities {
   };
 
   std::vector<size_t> Universe::countAtomsInSkinDistance(
-    std::vector<double> distances, bool unwrapped ) const
+    std::vector<double> distances,
+    bool unwrapped) const
   {
     if (distances.size() <= 1) {
       return std::vector<size_t>();
     }
     std::vector<size_t> result =
-      pylimer_tools::utils::initializeWithValue<size_t>(distances.size() - 1, 0);
+      pylimer_tools::utils::initializeWithValue<size_t>(distances.size() - 1,
+                                                        0);
 
     // first, validate the input distances
     if (distances[0] < 0.0) {
@@ -446,8 +448,9 @@ namespace entities {
 
     for (size_t i = 1; i < distances.size(); ++i) {
       for (Atom a : atoms) {
-        std::vector<Atom> closeAtoms = neighbourList.getAtomsCloseTo(a, distances[i], distances[i - 1], unwrapped);
-        result[i-1] += closeAtoms.size();
+        std::vector<Atom> closeAtoms = neighbourList.getAtomsCloseTo(
+          a, distances[i], distances[i - 1], unwrapped);
+        result[i - 1] += closeAtoms.size();
       }
     }
 
@@ -857,6 +860,13 @@ namespace entities {
                                                  currentPathKey)) {
             results.push_back(currentPath);
             if (edges != nullptr) {
+              // TODO: here, too, we should decide what we do if multile edges
+              // between the two vertices are found
+              currentPathEdges.push_back(this->getEdgeIdsFromTo(
+                currentPath[0], pylimer_tools::utils::last(currentPath))[0]);
+              RUNTIME_EXP_IFN(currentPath.size() == currentPathEdges.size(),
+                              "Every loop must consist of equal number of "
+                              "edges and vertices");
               edges->push_back(currentPathEdges);
             }
             processedPathsKeys.insert(currentPathKey);
@@ -874,9 +884,8 @@ namespace entities {
           currentPathProduct *= currentVal;
           // and remember the part of the path
           if (currentPath.size() > 0 && edges != nullptr) {
-            // TODO: here, we should decide what we do if multile edges
+            // TODO: here, too, we should decide what we do if multile edges
             // between the two vertices are found
-            // also TODO: check if the looping edge is included
             currentPathEdges.push_back(this->getEdgeIdsFromTo(
               currentPath[currentPath.size() - 1], currentVal)[0]);
           }
@@ -1586,6 +1595,12 @@ namespace entities {
     Eigen::Vector3d helperNode = Eigen::Vector3d::Zero();
     double sizeDenominator =
       1.0 / static_cast<double>(vertexIndicesLoop1.size());
+    INVALIDARG_EXP_IFN(
+      edgeIndicesLoop1.size() == vertexIndicesLoop1.size(),
+      "Every loop must consist of equal number of edges and vertices");
+    INVALIDARG_EXP_IFN(
+      edgeIndicesLoop2.size() == vertexIndicesLoop2.size(),
+      "Every loop must consist of equal number of edges and vertices");
     for (long int i = 0; i < vertexIndicesLoop1.size(); ++i) {
       // find PBC corrected mean position
       Eigen::Vector3d vertexIdxPos = this->getPositionVectorForVertex(i);
@@ -1655,7 +1670,10 @@ namespace entities {
           involvedAtoms.push_back(
             this->getAtomByVertexIdx(vertexIndicesLoop2[directionIdx]));
           result.involvedAtoms = involvedAtoms;
-          result.intersectionPoint = intersectionPoint;
+          result.edge1 = edgeIndicesLoop1[vertex1Index];
+          result.edge2 = edgeIndicesLoop2[directionIdx];
+          result.intersectionPoint =
+            intersectionPoint;
           // TODO: check that these are always in the same direction
           Eigen::Vector3d triangleNormal =
             (helperNode - vertex0).cross(helperNode - vertex1);
