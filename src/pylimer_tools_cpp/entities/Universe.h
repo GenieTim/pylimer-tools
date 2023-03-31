@@ -19,6 +19,8 @@ namespace entities {
   struct LoopIntersectionInfo
   {
     std::vector<Atom> involvedAtoms;
+    long int edge1;
+    long int edge2;
     Eigen::Vector3d intersectionPoint;
     double direction;
   };
