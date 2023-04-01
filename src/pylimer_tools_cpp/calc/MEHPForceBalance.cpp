@@ -3440,7 +3440,7 @@ namespace calc {
       // find possible target partial springs
       std::vector<size_t> possibleTargetSprings =
         net.springIndicesOfLinks[involvedCrosslink];
-      if (respectLoops) {
+      if (respectLoops && net.loopsOfSliplink.size() > 0) {
         // filter out the target springs that may not be a target based on the
         // involved loops
         possibleTargetSprings.erase(

@@ -175,6 +175,8 @@ def extractThermoParams(file, header: Union[str, List[str], None] = "Step Temp E
     if (header is None):
         header = detectHeaders(
             file, max_nr_of_lines_to_read=lines_to_read_to_detect_header if lines_to_read_to_detect_header > 0 else 1500)
+        if (len(header) == 0):
+            raise RuntimeError("Failed to find suitable header. Set a higher value of `lines_to_read_to_detect_header` if you insist that the file '{}' is appropriate.".format(file))
 
     suffix = getThermoCacheNameSuffix(
         header, texts_to_read, min_line_len)
