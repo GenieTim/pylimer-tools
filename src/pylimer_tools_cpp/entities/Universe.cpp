@@ -1596,10 +1596,12 @@ namespace entities {
     double sizeDenominator =
       1.0 / static_cast<double>(vertexIndicesLoop1.size());
     INVALIDARG_EXP_IFN(
-      edgeIndicesLoop1.size() == vertexIndicesLoop1.size(),
+      (edgeIndicesLoop1.size() == vertexIndicesLoop1.size()) ||
+        (edgeIndicesLoop1.size() == 0),
       "Every loop must consist of equal number of edges and vertices");
     INVALIDARG_EXP_IFN(
-      edgeIndicesLoop2.size() == vertexIndicesLoop2.size(),
+      (edgeIndicesLoop2.size() == vertexIndicesLoop2.size()) ||
+        (edgeIndicesLoop2.size() == 0),
       "Every loop must consist of equal number of edges and vertices");
     for (long int i = 0; i < vertexIndicesLoop1.size(); ++i) {
       // find PBC corrected mean position
@@ -1670,10 +1672,17 @@ namespace entities {
           involvedAtoms.push_back(
             this->getAtomByVertexIdx(vertexIndicesLoop2[directionIdx]));
           result.involvedAtoms = involvedAtoms;
-          result.edge1 = edgeIndicesLoop1[vertex1Index];
-          result.edge2 = edgeIndicesLoop2[directionIdx];
-          result.intersectionPoint =
-            intersectionPoint;
+          if (edgeIndicesLoop1.size() > 0) {
+            result.edge1 = edgeIndicesLoop1[vertex1Index];
+          } else {
+            result.edge1 = -1;
+          }
+          if (edgeIndicesLoop2.size() > 0) {
+            result.edge2 = edgeIndicesLoop2[directionIdx];
+          } else {
+            result.edge2 = -1;
+          }
+          result.intersectionPoint = intersectionPoint;
           // TODO: check that these are always in the same direction
           Eigen::Vector3d triangleNormal =
             (helperNode - vertex0).cross(helperNode - vertex1);
