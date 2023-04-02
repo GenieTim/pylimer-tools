@@ -238,24 +238,25 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                       false,
                       false);
     REQUIRE(universe.getNrOfBonds() == 8);
+    const std::vector<long int> empty;
     CHECK(
-      universe.findLoopEntanglements({ {} }, { {} }, { {} }, { {} }).size() ==
+      universe.findLoopEntanglements(empty, empty, empty, empty).size() ==
       0);
     CHECK(
       universe
-        .findLoopEntanglements({ { 1, 2, 7 } }, { { 0, 3, 6 } }, { {} }, { {} })
+        .findLoopEntanglements({ { 1, 2, 7 } }, { { 0, 3, 6 } }, empty, empty)
         .size() == 0);
     CHECK(
       universe
-        .findLoopEntanglements({ { 0, 1, 2 } }, { { 5, 7, 6 } }, { {} }, { {} })
+        .findLoopEntanglements({ { 0, 1, 2 } }, { { 5, 7, 6 } }, empty, empty)
         .size() == 2);
     CHECK(universe
             .findLoopEntanglements(
-              { { 0, 1, 2, 3 } }, { { 4, 5, 6, 7 } }, { {} }, { {} })
+              { { 0, 1, 2, 3 } }, { { 4, 5, 6, 7 } }, empty, empty)
             .size() > 0);
     CHECK(universe
             .findLoopEntanglements(
-              { { 4, 5, 6, 7 } }, { { 0, 1, 2, 3 } }, { {} }, { {} })
+              { { 4, 5, 6, 7 } }, { { 0, 1, 2, 3 } }, empty, empty)
             .size() > 0);
   }
 
