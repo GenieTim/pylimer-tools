@@ -9,10 +9,10 @@
 #include <cassert>
 #include <iomanip>
 #include <iostream>
-#include <map>
-#include <nlopt.hpp>
+#include <set>
 #include <string>
 #include <tuple>
+#include <unordered_map>
 #include <vector>
 
 namespace pylimer_tools {
@@ -1199,41 +1199,30 @@ namespace calc {
                 << getCurrentRSS() << ", peak " << getPeakRSS() << std::endl;
 
       // the resulting vectors to fill
-      // std::vector<std::vector<long int>> intersectionsOfEdge =
-      // pylimer_tools::utils::initializeWithValue(this->universe.getNrOfBonds(),
-      // std::vector<long int>());
-      // std::vector<std::tuple<pylimer_tools::entities::LoopIntersectionInfo,
-      // std::vector<size_t> associatedLoops> relevantIntersections;
-      std::vector<double> slipLinkXs;
-      std::vector<double> slipLinkYs;
-      std::vector<double> slipLinkZs;
-      std::vector<size_t> slipLinkStrandA;
-      std::vector<size_t> slipLinkStrandB;
-      std::vector<double> slipLinkStrandAlpha;
-      std::vector<double> slipLinkStrandBeta;
-      std::vector<std::vector<size_t>> slipLinksLoops;
+      std::unordered_map<long int, long int> intersectionsOfEdges;
+      typedef std::tuple<pylimer_tools::entities::LoopIntersectionInfo,
+                         std::set<size_t>>
+        intersection_loops_tuple;
+      std::vector<intersection_loops_tuple> relevantIntersections;
+
+      // as of
+      // https://stackoverflow.com/questions/919612/mapping-two-integers-to-one-in-a-unique-and-deterministic-way
+      auto hash_integer_pair = [](long int a, long int b) -> long int {
+        return a >= b ? a * a + a + b : a + b * b; // where a, b >= 0
+      };
       std::cout << "Searching for intersections..." << std::endl;
+
       for (size_t i = 0; i < loops.size(); ++i) {
         // reserve enough space
-        size_t estimateOfNrOfSliplinks =
+        size_t estimateNrOfSliplinks =
           loops.size() * loops.size() *
           this->initialConfig.meanSpringContourLength;
-        if (i == 0 || i == 1) {
-          if (i == 1) {
-            // after the first iteration, we have a better (still bad) estimate
-            estimateOfNrOfSliplinks =
-              std::max(estimateOfNrOfSliplinks,
-                       (slipLinkXs.size() - 1) * slipLinkXs.size());
-          }
-          slipLinkXs.reserve(estimateOfNrOfSliplinks);
-          slipLinkYs.reserve(estimateOfNrOfSliplinks);
-          slipLinkZs.reserve(estimateOfNrOfSliplinks);
-          slipLinkStrandA.reserve(estimateOfNrOfSliplinks);
-          slipLinkStrandB.reserve(estimateOfNrOfSliplinks);
-          slipLinkStrandAlpha.reserve(estimateOfNrOfSliplinks);
-          slipLinkStrandBeta.reserve(estimateOfNrOfSliplinks);
-          slipLinksLoops.reserve(estimateOfNrOfSliplinks);
+        if (i > 0) {
+          estimateNrOfSliplinks =
+            std::max(estimateNrOfSliplinks,
+                     (loops.size() / i) * relevantIntersections.size());
         }
+        relevantIntersections.reserve(estimateNrOfSliplinks);
 
         // TODO: instead of the N^2 loop, might want to try some filter at least
         // also, we ignore all self-entanglements of one loop with itself.
@@ -1243,37 +1232,97 @@ namespace calc {
               loops[i], loops[j], loopEdges[i], loopEdges[j]);
           for (pylimer_tools::entities::LoopIntersectionInfo intersection :
                intersections) {
-            // TODO: this is yet the most naïve way to add these.
-            // ideally, we would also check the back-and-forth, etc.
-            slipLinkXs.push_back(intersection.intersectionPoint[0]);
-            slipLinkYs.push_back(intersection.intersectionPoint[1]);
-            slipLinkZs.push_back(intersection.intersectionPoint[2]);
-            // TODO: decide on the atoms to use as a reference
-            slipLinkStrandA.push_back(
-              this->initialConfig
-                .oldAtomIdToSpringIndex[intersection.involvedAtoms[0].getId()]);
-            slipLinkStrandB.push_back(
-              this->initialConfig
-                .oldAtomIdToSpringIndex[intersection.involvedAtoms[3].getId()]);
-            slipLinkStrandAlpha.push_back(
-              static_cast<double>(
-                atomIdxInStrand[intersection.involvedAtoms[0].getId()]) /
-              this->initialConfig.meanSpringContourLength);
-            slipLinkStrandBeta.push_back(
-              static_cast<double>(
-                atomIdxInStrand[intersection.involvedAtoms[3].getId()]) /
-              this->initialConfig.meanSpringContourLength);
-            std::vector<size_t> localLoops = { i, j };
-            slipLinksLoops.push_back(localLoops);
+            bool keepIntersection = true;
+
+            // check if we want to keep it
+            // TODO: check if we want to keep it based on the direction /
+            // distance of the intersection
+
+            // check if we want to keep it, based on the edges involved
+            long int edgePairHash =
+              hash_integer_pair(intersection.edge1, intersection.edge2);
+            if (pylimer_tools::utils::map_has_key(intersectionsOfEdges,
+                                                  edgePairHash)) {
+              keepIntersection = false;
+              long int involvedIntersection =
+                intersectionsOfEdges.at(edgePairHash);
+              std::get<1>(relevantIntersections[involvedIntersection])
+                .insert(i);
+              std::get<1>(relevantIntersections[involvedIntersection])
+                .insert(j);
+            }
+
+            if (keepIntersection) {
+              std::set<size_t> localSet;
+              localSet.insert(i);
+              localSet.insert(j);
+              intersection_loops_tuple relevantIntersection =
+                std::make_tuple(intersection, localSet);
+              relevantIntersections.push_back(relevantIntersection);
+              intersectionsOfEdges.insert_or_assign(
+                edgePairHash,
+                static_cast<long int>(relevantIntersections.size()) - 1);
+            }
           }
         }
+
         // make space: cleanup the loop i
         loops[i] = std::vector<long int>();
-        std::cout << "After checking intersections of loop " << i << " ("
-                  << slipLinksLoops.size()
-                  << " slip-links found in total yet), memory useage: "
-                  << getCurrentRSS() << ", peak " << getPeakRSS() << std::endl;
+        std::cout
+          << "After checking intersections of loop " << i << " ("
+          << relevantIntersections.size()
+          << " relevant intersections found in total yet), memory useage: "
+          << getCurrentRSS() << ", peak " << getPeakRSS() << std::endl;
       }
+
+      // Actually make them into slip-links...
+      std::vector<double> slipLinkXs;
+      slipLinkXs.reserve(relevantIntersections.size());
+      std::vector<double> slipLinkYs;
+      slipLinkYs.reserve(relevantIntersections.size());
+      std::vector<double> slipLinkZs;
+      slipLinkZs.reserve(relevantIntersections.size());
+      std::vector<size_t> slipLinkStrandA;
+      slipLinkStrandA.reserve(relevantIntersections.size());
+      std::vector<size_t> slipLinkStrandB;
+      slipLinkStrandB.reserve(relevantIntersections.size());
+      std::vector<double> slipLinkStrandAlpha;
+      slipLinkStrandAlpha.reserve(relevantIntersections.size());
+      std::vector<double> slipLinkStrandBeta;
+      slipLinkStrandBeta.reserve(relevantIntersections.size());
+      std::vector<std::vector<size_t>> slipLinksLoops;
+      slipLinksLoops.reserve(relevantIntersections.size());
+
+      for (intersection_loops_tuple intersectionAndLoops :
+           relevantIntersections) {
+        pylimer_tools::entities::LoopIntersectionInfo intersection =
+          std::get<0>(intersectionAndLoops);
+        // TODO: this is yet the most naïve way to add these.
+        // ideally, we would also check the back-and-forth, etc.
+        slipLinkXs.push_back(intersection.intersectionPoint[0]);
+        slipLinkYs.push_back(intersection.intersectionPoint[1]);
+        slipLinkZs.push_back(intersection.intersectionPoint[2]);
+        // TODO: decide on the atoms to use as a reference
+        slipLinkStrandA.push_back(
+          this->initialConfig
+            .oldAtomIdToSpringIndex[intersection.involvedAtoms[0].getId()]);
+        slipLinkStrandB.push_back(
+          this->initialConfig
+            .oldAtomIdToSpringIndex[intersection.involvedAtoms[3].getId()]);
+        slipLinkStrandAlpha.push_back(
+          static_cast<double>(
+            atomIdxInStrand[intersection.involvedAtoms[0].getId()]) /
+          this->initialConfig.meanSpringContourLength);
+        slipLinkStrandBeta.push_back(
+          static_cast<double>(
+            atomIdxInStrand[intersection.involvedAtoms[3].getId()]) /
+          this->initialConfig.meanSpringContourLength);
+        std::vector<size_t> localLoops(
+          std::get<1>(intersectionAndLoops).begin(),
+          std::get<1>(intersectionAndLoops).end());
+        slipLinksLoops.push_back(localLoops);
+      }
+
       std::cout << "Found " << slipLinksLoops.size() << " intersections."
                 << std::endl;
       RUNTIME_EXP_IFN(
