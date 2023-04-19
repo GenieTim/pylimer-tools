@@ -103,7 +103,7 @@ namespace entities {
     int getShearDirection() const { return this->shearDirection; }
 
     template<typename VectorType>
-    VectorType placeInBox(VectorType coords) const
+    VectorType placeInBox(VectorType& coords) const
     {
       INVALIDARG_EXP_IFN(
         coords.size() % 3 == 0,
@@ -117,6 +117,7 @@ namespace entities {
         coords[i + 2] = this->iterateForPlacementIn(
           coords[i + 2], this->getLowZ(), this->getHighZ());
       }
+
       return coords;
     }
 
