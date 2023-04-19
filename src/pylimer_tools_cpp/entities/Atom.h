@@ -42,19 +42,6 @@ namespace entities {
              this->ny == ref.ny && this->nz == ref.nz;
     }
 
-    double _getDeltaDistanceUnwrapped(double c1,
-                                      double c2,
-                                      int n1,
-                                      int n2,
-                                      double boxL) const
-    {
-      double delta = (c1 + n1 * boxL) - (c2 + n2 * boxL); // std::fabs(c1 - c2);
-      // if (n1 != n2) {
-      //   delta -= (static_cast<double>(n1 - n2)) * boxL;
-      // }
-      return delta;
-    }
-
     double _getDeltaDistance(double c1,
                              double c2,
                              int n1,
@@ -74,7 +61,7 @@ namespace entities {
       return delta;
     }
 
-    void vectorTo(Atom b, const Box* box, double* result) const
+    void vectorTo(const Atom b, const Box* box, double *result) const
     {
       result[0] = this->_getDeltaDistance(
         this->x, b.getX(), this->nx, b.getNX(), box->getLx());
