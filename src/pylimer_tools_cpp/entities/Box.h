@@ -102,14 +102,21 @@ namespace entities {
     double getShearMagnitude() const { return this->simpleShearMagnitude; }
     int getShearDirection() const { return this->shearDirection; }
 
-    std::array<double, 3> placeInBox(std::array<double, 3> coords) const
+    template<typename VectorType>
+    void placeInBox(VectorType& coords) const
     {
-      coords[0] = this->iterateForPlacementIn(
-        coords[0], this->getLowX(), this->getHighX());
-      coords[1] = this->iterateForPlacementIn(
-        coords[1], this->getLowY(), this->getHighY());
-      coords[2] = this->iterateForPlacementIn(
-        coords[2], this->getLowZ(), this->getHighZ());
+      INVALIDARG_EXP_IFN(
+        coords.size() % 3 == 0,
+        "Expect coordinates to be in order x, y, z, repeatedly.");
+
+      for (size_t i = 0; i < coords.size() / 3; ++i) {
+        coords[3 * i + 0] = this->iterateForPlacementIn(
+          coords[3 * i + 0], this->getLowX(), this->getHighX());
+        coords[3 * i + 1] = this->iterateForPlacementIn(
+          coords[3 * i + 1], this->getLowY(), this->getHighY());
+        coords[3 * i + 2] = this->iterateForPlacementIn(
+          coords[3 * i + 2], this->getLowZ(), this->getHighZ());
+      }
       return coords;
     }
 
