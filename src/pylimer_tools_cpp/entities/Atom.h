@@ -153,6 +153,27 @@ namespace entities {
     int getNY() const { return this->ny; }
     int getNZ() const { return this->nz; }
 
+    template<typename VectorType>
+    void getCoordinates(VectorType& vec) const
+    {
+      INVALIDARG_EXP_IFN(coords.size() == 3,
+                         "Expect coordinates to be in order x, y, z, i.e., a "
+                         "vector or array of size 3.");
+      vec[0] = this->getX();
+      vec[1] = this->getY();
+      vec[2] = this->getZ();
+    }
+    template<typename VectorType>
+    void getUnwrappedCoordinates(VectorType& vec, const Box* box) const
+    {
+      INVALIDARG_EXP_IFN(coords.size() == 3,
+                         "Expect coordinates to be in order x, y, z, i.e., a "
+                         "vector or array of size 3.");
+      vec[0] = this->getUnwrappedX(box);
+      vec[1] = this->getUnwrappedY(box);
+      vec[2] = this->getUnwrappedZ(box);
+    }
+
   private:
     long int id;
     int type;
