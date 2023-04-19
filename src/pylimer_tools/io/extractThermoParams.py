@@ -17,12 +17,18 @@ from pylimer_tools.utils.cacheUtility import doCache, loadCache
 from pylimer_tools.utils.optimizeDf import optimize, reduce_mem_usage
 
 
-def detectHeaders(file: str, max_nr_of_lines_to_read: int = 1500) -> List[str]:
+def detectHeaders(file: str, max_nr_of_lines_to_read: int = 1500, use_cache: bool = True) -> List[str]:
     """
     Read `max_nr_of_lines_to_read` lines from the given file and return all possible header lines.
 
     Some assumptions are made regarding the columns, e.g., that 75% of them start with a character.
     """
+    suffix = str(max_nr_of_lines_to_read)
+    cacheContent = loadCache(file, suffix)
+
+    if (cacheContent is not None and use_cache):
+        return cacheContent
+
     lines_read = 0
     previous_line = None
     results = []
@@ -47,8 +53,10 @@ def detectHeaders(file: str, max_nr_of_lines_to_read: int = 1500) -> List[str]:
                 results.append(previous_line.rstrip())
             previous_line = line
             lines_read += 1
-            if (lines_read > max_nr_of_lines_to_read):
+            if (lines_read > max_nr_of_lines_to_read and max_nr_of_lines_to_read > 0):
                 break
+
+    doCache(results, file, suffix)
     return results
 
 
@@ -79,7 +87,8 @@ def readOneGroup(fp, header, min_line_len=4, additional_lines_skip=0, lines_to_r
         if (isinstance(header, str)):
             min_line_len = max(min_line_len, len(header.split()))
         else:
-            min_line_len = max(min_line_len, min([len(h.split()) for h in header]))
+            min_line_len = max(min_line_len, min(
+                [len(h.split()) for h in header]))
 
         def checkSkipLine(line, header):
             return line and not line.startswith(header)
@@ -133,7 +142,7 @@ def readOneGroup(fp, header, min_line_len=4, additional_lines_skip=0, lines_to_r
     return csvFileToWrite if n_lines > 0 else ""
 
 
-def getThermoCacheNameSuffix(header: Union[str, List[str], None] = "Step Temp E_pair E_mol TotEng Press", texts_to_read:float=50, min_line_len:float=5) -> str:
+def getThermoCacheNameSuffix(header: Union[str, List[str], None] = "Step Temp E_pair E_mol TotEng Press", texts_to_read: float = 50, min_line_len: float = 5) -> str:
     """
     Compose a cache file suffix in such a way, that it distinguishes different thermo reader parameters
 
@@ -149,7 +158,7 @@ def getThermoCacheNameSuffix(header: Union[str, List[str], None] = "Step Temp E_
     return "{}{}{}-thermo-param-cache.pickle".format(hashlib.md5(header.encode()).hexdigest() if header is not None else "", texts_to_read, min_line_len)
 
 
-def extractThermoParams(file, header: Union[str, List[str], None] = "Step Temp E_pair E_mol TotEng Press", texts_to_read:float=50, min_line_len:float=5, use_cache:bool=True, lines_to_read_to_detect_header:float=1e5, lines_to_read_till_header:float=-1) -> pd.DataFrame:
+def extractThermoParams(file, header: Union[str, List[str], None] = "Step Temp E_pair E_mol TotEng Press", texts_to_read: float = 50, min_line_len: float = 5, use_cache: bool = True, lines_to_read_to_detect_header: float = 1e5, lines_to_read_till_header: float = -1) -> pd.DataFrame:
     """
     Extract the thermodynamic outputs produced for this simulation.
 
@@ -176,7 +185,8 @@ def extractThermoParams(file, header: Union[str, List[str], None] = "Step Temp E
         header = detectHeaders(
             file, max_nr_of_lines_to_read=lines_to_read_to_detect_header if lines_to_read_to_detect_header > 0 else 1500)
         if (len(header) == 0):
-            raise RuntimeError("Failed to find suitable header. Set a higher value of `lines_to_read_to_detect_header` if you insist that the file '{}' is appropriate.".format(file))
+            raise RuntimeError(
+                "Failed to find suitable header. Set a higher value of `lines_to_read_to_detect_header` if you insist that the file '{}' is appropriate.".format(file))
 
     suffix = getThermoCacheNameSuffix(
         header, texts_to_read, min_line_len)
