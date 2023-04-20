@@ -71,6 +71,13 @@ namespace entities {
         this->z, b.getZ(), this->nz, b.getNZ(), box->getLz());
     }
 
+    void vectorToUnwrapped(Atom b, const Box* box, double* result) const
+    {
+      result[0] = this->getUnwrappedX(box) - b.getUnwrappedX(box);
+      result[1] = this->getUnwrappedY(box) - b.getUnwrappedY(box);
+      result[2] = this->getUnwrappedZ(box) - b.getUnwrappedZ(box);
+    }
+
     std::vector<double> computeVectorTo(Atom b, const Box box) const
     {
       double result[3];
@@ -100,13 +107,6 @@ namespace entities {
       return sqrt(distanceVec[0] * distanceVec[0] +
                   distanceVec[1] * distanceVec[1] +
                   distanceVec[2] * distanceVec[2]);
-    }
-
-    void vectorToUnwrapped(Atom b, const Box* box, double* result) const
-    {
-      result[0] = this->getUnwrappedX(box) - b.getUnwrappedX(box);
-      result[1] = this->getUnwrappedY(box) - b.getUnwrappedY(box);
-      result[2] = this->getUnwrappedZ(box) - b.getUnwrappedZ(box);
     }
 
     double distanceToUnwrapped(Atom b, const Box* box) const
@@ -143,7 +143,7 @@ namespace entities {
     template<typename VectorType>
     void getCoordinates(VectorType& vec) const
     {
-      INVALIDARG_EXP_IFN(coords.size() == 3,
+      INVALIDARG_EXP_IFN(vec.size() == 3,
                          "Expect coordinates to be in order x, y, z, i.e., a "
                          "vector or array of size 3.");
       vec[0] = this->getX();
@@ -153,7 +153,7 @@ namespace entities {
     template<typename VectorType>
     void getUnwrappedCoordinates(VectorType& vec, const Box* box) const
     {
-      INVALIDARG_EXP_IFN(coords.size() == 3,
+      INVALIDARG_EXP_IFN(vec.size() == 3,
                          "Expect coordinates to be in order x, y, z, i.e., a "
                          "vector or array of size 3.");
       vec[0] = this->getUnwrappedX(box);

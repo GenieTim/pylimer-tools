@@ -17,43 +17,78 @@ namespace entities {
   private:
     double L[3];
     double boxHalfs[3];
-    double xLo, xHi, yLo, yHi, zLo, zHi;
+    double oneOverL[3];
+    double loCoords[3];
+    double hiCoords[3];
     double simpleShearMagnitude = 0.0;
     int shearDirection = -1;
 
   protected:
+    double minImageDistance(double dcoord, const int coord) const
+    {
+      return dcoord -
+             (this->L[coord] * std::nearbyint(dcoord * this->oneOverL[coord]));
+    }
+
+    double placeIn(double dcoord, const int coord) const
+    {
+      return this->minImageDistance(dcoord, coord) + this->loCoords[coord];
+    }
+
     double iterateForPlacementIn(double coord, double min, double max) const
     {
+      int min_iterations = 0;
+      assert(!std::isinf(coord) && !std::isnan(coord));
+      double coord0 = coord;
       // assert(max > min);
       while (coord > max) {
         coord -= (max - min) / 2;
+        min_iterations++;
+        if (min_iterations > 50) {
+          throw std::runtime_error(
+            "Too many iterations in PBC, currently at " +
+            std::to_string(coord) + " from " + std::to_string(coord0) +
+            " in box with min/max " + std::to_string(min) + "/" +
+            std::to_string(max) + " after " + std::to_string(min_iterations) +
+            " iterations");
+        }
       }
+      int max_iterations = 0;
       while (coord < min) {
         coord += (max - min) / 2;
+        max_iterations++;
+        if (max_iterations > 50) {
+          throw std::runtime_error(
+            "Too many iterations in PBC, currently at " +
+            std::to_string(coord) + " from " + std::to_string(coord0) +
+            " in box with min/max " + std::to_string(min) + "/" +
+            std::to_string(max) + " after " + std::to_string(max_iterations) +
+            " iterations (and " + std::to_string(min_iterations) +
+            " before that)");
+        }
       }
       return coord;
     }
 
-    void recomputeBoxHalfs()
+    void recomputeBoxProperties()
     {
-      this->boxHalfs[0] = L[0] * 0.5;
-      this->boxHalfs[1] = L[1] * 0.5;
-      this->boxHalfs[2] = L[2] * 0.5;
+      for (unsigned int i = 0; i < 3; ++i) {
+        this->L[i] = this->hiCoords[i] - this->loCoords[i];
+        this->boxHalfs[i] = L[i] * 0.5;
+        this->oneOverL[i] = 1.0 / L[i];
+      }
     }
 
   public:
     Box(const double Lx = 0.0, const double Ly = 0.0, const double Lz = 0.0)
     {
-      this->L[0] = Lx;
-      this->L[1] = Ly;
-      this->L[2] = Lz;
-      this->recomputeBoxHalfs();
-      this->xLo = 0.0;
-      this->xHi = Lx;
-      this->yLo = 0.0;
-      this->yHi = Ly;
-      this->zLo = 0.0;
-      this->zHi = Lz;
+      this->loCoords[0] = 0.0;
+      this->hiCoords[0] = Lx;
+      this->loCoords[1] = 0.0;
+      this->hiCoords[1] = Ly;
+      this->loCoords[2] = 0.0;
+      this->hiCoords[2] = Lz;
+      this->recomputeBoxProperties();
     }
 
     Box(const double xLo,
@@ -63,16 +98,13 @@ namespace entities {
         const double zLo,
         const double zHi)
     {
-      this->L[0] = xHi - xLo;
-      this->L[1] = yHi - yLo;
-      this->L[2] = zHi - zLo;
-      this->recomputeBoxHalfs();
-      this->xLo = xLo;
-      this->xHi = xHi;
-      this->yLo = yLo;
-      this->yHi = yHi;
-      this->zLo = zLo;
-      this->zHi = zHi;
+      this->loCoords[0] = xLo;
+      this->hiCoords[0] = xHi;
+      this->loCoords[1] = yLo;
+      this->hiCoords[1] = yHi;
+      this->loCoords[2] = zLo;
+      this->hiCoords[2] = zHi;
+      this->recomputeBoxProperties();
     }
 
     void applySimpleShear(const double shearMagnitude,
@@ -91,13 +123,13 @@ namespace entities {
     double getLy() const { return this->L[1]; }
     double getLz() const { return this->L[2]; }
 
-    double getLowX() const { return this->xLo; }
-    double getLowY() const { return this->yLo; }
-    double getLowZ() const { return this->zLo; }
+    double getLowX() const { return this->loCoords[0]; }
+    double getLowY() const { return this->loCoords[1]; }
+    double getLowZ() const { return this->loCoords[2]; }
 
-    double getHighX() const { return this->xHi; }
-    double getHighY() const { return this->yHi; }
-    double getHighZ() const { return this->zHi; }
+    double getHighX() const { return this->hiCoords[0]; }
+    double getHighY() const { return this->hiCoords[1]; }
+    double getHighZ() const { return this->hiCoords[2]; }
 
     double getShearMagnitude() const { return this->simpleShearMagnitude; }
     int getShearDirection() const { return this->shearDirection; }
@@ -109,13 +141,8 @@ namespace entities {
         coords.size() % 3 == 0,
         "Expect coordinates to be in order x, y, z, repeatedly.");
 
-      for (size_t i = 0; i < coords.size(); i += 3) {
-        coords[i + 0] = this->iterateForPlacementIn(
-          coords[i + 0], this->getLowX(), this->getHighX());
-        coords[i + 1] = this->iterateForPlacementIn(
-          coords[i + 1], this->getLowY(), this->getHighY());
-        coords[i + 2] = this->iterateForPlacementIn(
-          coords[i + 2], this->getLowZ(), this->getHighZ());
+      for (size_t i = 0; i < coords.size(); ++i) {
+        coords[i] = this->placeIn(coords[i], i % 3);
       }
 
       return coords;
@@ -207,41 +234,8 @@ namespace entities {
           }
         }
       }
-      // possibly improveable PBC
-      for (size_t j = 0; j < distances.size(); ++j) {
-        int min_iterations = 0;
-        int j_mod_3 = j % 3;
-        assert(!std::isinf(distances[j]) && !std::isnan(distances[j]));
-        const double distance0 = distances[j];
-        while (distances[j] > this->boxHalfs[j_mod_3]) {
-          distances[j] -= this->L[j_mod_3];
-          min_iterations++;
-          if (min_iterations > 50) {
-            throw std::runtime_error(
-              "Too many iterations in PBC at distance index " +
-              std::to_string(j) + ", currently at " +
-              std::to_string(distances[j]) + " from " +
-              std::to_string(distance0) + " in box with halfs " +
-              std::to_string(this->boxHalfs[j_mod_3]) + " after " +
-              std::to_string(min_iterations) + " iterations");
-          }
-        }
-        int max_iterations = 0;
-        while (distances[j] < -this->boxHalfs[j_mod_3]) {
-          distances[j] += this->L[j_mod_3];
-          max_iterations++;
-          if (max_iterations > 50) {
-            throw std::runtime_error(
-              "Too many iterations in PBC at distance index " +
-              std::to_string(j) + ", currently at " +
-              std::to_string(distances[j]) + " from " +
-              std::to_string(distance0) + " in box with halfs " +
-              std::to_string(this->boxHalfs[j_mod_3]) + " after " +
-              std::to_string(max_iterations) + " iterations (and " +
-              std::to_string(min_iterations) + " before that)");
-          }
-        }
-      }
+      // actually do PBC
+      this->placeInBox(distances);
       // back to the physical space
       if (isSheared) {
         // scaled coordinates in the initial cubic box
@@ -260,6 +254,18 @@ namespace entities {
           }
         }
       }
+    }
+
+    inline bool operator==(const Box& rhs)
+    {
+      const Box& lhs = *this;
+      return lhs.getLowX() == rhs.getLowX() && lhs.getLowY() == rhs.getLowY() &&
+             lhs.getLowZ() == rhs.getLowZ() &&
+             lhs.getHighX() == rhs.getHighX() &&
+             lhs.getHighY() == rhs.getHighY() &&
+             lhs.getHighZ() == rhs.getHighZ() &&
+             lhs.getShearDirection() == rhs.getShearDirection() &&
+             lhs.getShearMagnitude() == rhs.getShearMagnitude();
     }
   };
 } // namespace entities
