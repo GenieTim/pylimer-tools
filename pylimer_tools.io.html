@@ -252,6 +252,17 @@
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.extractThermoParams.</span></span><span class="sig-name descname"><span class="pre">detectHeaders</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_nr_of_lines_to_read</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_cache</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools.io.extractThermoParams.detectHeaders" title="Permalink to this definition">#</a></dt>
 <dd><p>Read <cite>max_nr_of_lines_to_read</cite> lines from the given file and return all possible header lines.</p>
 <p>Some assumptions are made regarding the columns, e.g., that 75% of them start with a character.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>file</strong> (<em>-</em>) – The file to search for header lines</p></li>
+<li><p><strong>max_nr_of_lines_to_read</strong> (<em>-</em>) – The number of lines to read in search for header lines.
+Use a negative number to read the whole file.</p></li>
+<li><p><strong>use_cache</strong> (<em>-</em>) – Whether to read the result from cache or not.
+The cache is not read if the file changed meanwhile.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -268,7 +279,8 @@ when reading a file with different header sections in them</p>
 Can be a string, a list of strings, or None if you want to try the detection.</p></li>
 <li><p><strong>texts_to_read</strong> (<em>-</em>) – the number of times to expect the header</p></li>
 <li><p><strong>min_line_len</strong> (<em>-</em>) – the minimal length of a line to be accepted as data</p></li>
-<li><p><strong>use_cache</strong> (<em>-</em>) – wheter to use cache or not (though it will be written anyway)</p></li>
+<li><p><strong>use_cache</strong> (<em>-</em>) – wheter to use cache or not (though it will be written anyway)
+The cache is not read if the file changed meanwhile.</p></li>
 <li><p><strong>lines_to_read_till_header</strong> (<em>-</em>) – the number of lines that are acceptable to skip until a header should have been found.
 This is useful for (a) finding the header, and (b) exit early if you are unsure about the header(s)</p></li>
 </ul>
