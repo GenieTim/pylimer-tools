@@ -189,18 +189,19 @@ namespace entities {
       const pylimer_tools::entities::Box *box) const
     {
       size_t size = igraph_vector_int_size(&vertices);
+
       igraph_vector_t xvalues;
-      igraph_vector_init(&xvalues, size);
+      igraph_vector_init(&xvalues, 0);
       igraph_vector_t yvalues;
-      igraph_vector_init(&yvalues, size);
+      igraph_vector_init(&yvalues, 0);
       igraph_vector_t zvalues;
-      igraph_vector_init(&zvalues, size);
+      igraph_vector_init(&zvalues, 0);
       igraph_vector_t nxvalues;
-      igraph_vector_init(&nxvalues, size);
+      igraph_vector_init(&nxvalues, 0);
       igraph_vector_t nyvalues;
-      igraph_vector_init(&nyvalues, size);
+      igraph_vector_init(&nyvalues, 0);
       igraph_vector_t nzvalues;
-      igraph_vector_init(&nzvalues, size);
+      igraph_vector_init(&nzvalues, 0);
 
       if (igraph_cattribute_VANV(
             &this->graph, "x", igraph_vss_vector(&vertices), &xvalues)) {
@@ -227,7 +228,7 @@ namespace entities {
         throw std::runtime_error("Failed to query property nz of graph.");
       }
 
-      Eigen::VectorXd results = Eigen::VectorXd(size * 3);
+      Eigen::VectorXd results = Eigen::VectorXd::Zero(size * 3);
       for (size_t i = 0; i < size; i++) {
         results[3 * i] = igraph_vector_get(&xvalues, i) +
                          (box->getLx() * igraph_vector_get(&nxvalues, i));
@@ -236,6 +237,13 @@ namespace entities {
         results[3 * i + 2] = igraph_vector_get(&zvalues, i) +
                              (box->getLz() * igraph_vector_get(&nzvalues, i));
       }
+
+      igraph_vector_destroy(&xvalues);
+      igraph_vector_destroy(&yvalues);
+      igraph_vector_destroy(&zvalues);
+      igraph_vector_destroy(&nxvalues);
+      igraph_vector_destroy(&nyvalues);
+      igraph_vector_destroy(&nzvalues);
 
       return results;
     }
@@ -307,7 +315,7 @@ namespace entities {
      */
 
     template<typename OutVectorType>
-    void getAssumedVertexCoordinates(
+    OutVectorType getAssumedVertexCoordinates(
       OutVectorType& results,
       const Box* box,
       const std::vector<long int>& vertexIds) const
@@ -318,10 +326,13 @@ namespace entities {
       }
 
       igraph_vector_int_t vertex_ids;
-      igraph_vector_int_init(&vertex_ids, vertexIds.size());
+      igraph_vector_int_init(&vertex_ids, 0);
       pylimer_tools::utils::StdVectorToIgraphVectorT(vertexIds, &vertex_ids);
 
       Eigen::VectorXd coordinates = this->getUnwrappedVertexCoordinates(vertex_ids, box);
+      for (size_t i = 0; i< coordinates.size(); ++i) {
+        
+      }
 
       igraph_vector_int_destroy(&vertex_ids);
 
@@ -347,6 +358,8 @@ namespace entities {
         results[i + 4] = lastCoords[1];
         results[i + 5] = lastCoords[2];
       }
+
+      return results;
     }
 
   protected:

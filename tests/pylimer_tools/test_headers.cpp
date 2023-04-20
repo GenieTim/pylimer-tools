@@ -37,19 +37,19 @@ TEST_CASE("Atoms can calculate distances", "[entity][Atom]")
   SECTION("Same box image distance")
   {
     pe::Atom atom1_2 = pe::Atom(0, 0, 0.0, 0.0, 0.0, 0, 0, 0);
-    REQUIRE(atom1.distanceTo(atom1_2, &unitBox) == 0.0);
-    REQUIRE(atom1_2.distanceTo(atom1, &unitBox) == 0.0);
+    CHECK(atom1.distanceTo(atom1_2, &unitBox) == 0.0);
+    CHECK(atom1_2.distanceTo(atom1, &unitBox) == 0.0);
   }
 
   SECTION("Different box image distance")
   {
     pe::Atom atom1_right = pe::Atom(0, 0, -1.0, 0.0, 0.0, 1, 0, 0);
-    REQUIRE(atom1.distanceTo(atom1_right, &unitBox) == 0.0);
-    REQUIRE(atom1_right.distanceTo(atom1, &unitBox) == 0.0);
+    CHECK(atom1.distanceTo(atom1_right, &unitBox) == 0.0);
+    CHECK(atom1_right.distanceTo(atom1, &unitBox) == 0.0);
 
     pe::Atom atom1_below = pe::Atom(0, 0, 0.0, -1.0, 0.0, 0, 1, 0);
-    REQUIRE(atom1.distanceTo(atom1_below, &unitBox) == 0.0);
-    REQUIRE(atom1_below.distanceTo(atom1, &unitBox) == 0.0);
+    CHECK(atom1.distanceTo(atom1_below, &unitBox) == 0.0);
+    CHECK(atom1_below.distanceTo(atom1, &unitBox) == 0.0);
 
     pe::Atom atom1_front = pe::Atom(0, 0, 0.0, 0.0, -1.0, 0, 0, 1);
     REQUIRE(atom1.distanceTo(atom1_front, &unitBox) == 0.0);
@@ -64,76 +64,157 @@ TEST_CASE("Atoms can calculate distances", "[entity][Atom]")
     pe::Atom atom1 = pe::Atom(0, 0, 0.0, 0.0, 0.0, 0, 0, 0);
     pe::Atom atom2 = pe::Atom(0, 0, 1.0, 1.0, 1.0, 0, 0, 0);
     auto meanPosition_12 = atom1.meanPositionWith(atom2, &unitBox);
-    REQUIRE(meanPosition_12[0] == 0.0);
-    REQUIRE(meanPosition_12[1] == 0.0);
-    REQUIRE(meanPosition_12[2] == 0.0);
+    CHECK(meanPosition_12[0] == 0.0);
+    CHECK(meanPosition_12[1] == 0.0);
+    CHECK(meanPosition_12[2] == 0.0);
 
     pe::Atom atom3 = pe::Atom(0, 0, 0.5, 0.5, 0.5, 0, 0, 0);
     auto meanPosition_13 = atom1.meanPositionWith(atom3, &unitBox);
-    REQUIRE(meanPosition_13[0] == 0.25);
-    REQUIRE(meanPosition_13[1] == 0.25);
-    REQUIRE(meanPosition_13[2] == 0.25);
+    CHECK(meanPosition_13[0] == 0.25);
+    CHECK(meanPosition_13[1] == 0.25);
+    CHECK(meanPosition_13[2] == 0.25);
+
+    pe::Box unitNegBox = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
+    auto meanPosition_13n = atom1.meanPositionWith(atom3, &unitNegBox);
+    CHECK(meanPosition_13n[0] == 0.25);
+    CHECK(meanPosition_13n[1] == 0.25);
+    CHECK(meanPosition_13n[2] == 0.25);
+
+    pe::Atom negAtom4 = pe::Atom(0, 0, -2.0, 0.0, 0.0, 0, 0, 0);
+    auto meanPosition_24 = atom2.meanPositionWith(negAtom4, &unitNegBox);
+    CHECK(meanPosition_24[0] == -0.5);
+    CHECK(meanPosition_24[1] == 0.5);
+    CHECK(meanPosition_24[2] == 0.5);
+
+    pe::Atom negAtom5 = pe::Atom(0, 0, -2.0, -5.0, 1.0, 1, 1, 1);
+    auto meanPosition_25 =
+      atom2.meanPositionWithUnwrapped(negAtom5, &unitNegBox);
+    CHECK(meanPosition_25[0] == ((20. - 2.) + 1.) / 2.);
+    CHECK(meanPosition_25[1] == ((20. - 5.) + 1.) / 2.);
+    CHECK(meanPosition_25[2] == (((20. + 1.) + 1.) / 2.) - 20.);
+
+    meanPosition_25 = atom2.meanPositionWithUnwrapped(negAtom5, &unitNegBox);
+    CHECK(meanPosition_25[0] == ((20. - 2.) + 1.) / 2.);
+    CHECK(meanPosition_25[1] == ((20. - 5.) + 1.) / 2.);
+    CHECK(meanPosition_25[2] == (((20. + 1.) + 1.) / 2.) - 20.);
   }
 }
 
 TEST_CASE("Box can do PBC computations", "[entity][Box]")
 {
-  pe::Box testBox = pe::Box(0.0, 10.0, 0.0, 10.0, 0.0, 10.0);
-  REQUIRE(testBox.getVolume() == Catch::Approx(10. * 10. * 10.));
+  SECTION("Positive Box")
+  {
+    pe::Box testBox = pe::Box(0.0, 10.0, 0.0, 10.0, 0.0, 10.0);
+    REQUIRE(testBox.getVolume() == Catch::Approx(10. * 10. * 10.));
 
-  Eigen::Vector3d distances;
-  distances << 10.2, 10.2, 10.2;
-  REQUIRE_NOTHROW(testBox.handlePBC(distances));
-  REQUIRE(distances[0] == Catch::Approx(10.2 - 10.));
-  REQUIRE(distances[1] == Catch::Approx(10.2 - 10.));
-  REQUIRE(distances[2] == Catch::Approx(10.2 - 10.));
+    Eigen::Vector3d distances;
+    distances << 10.2, 10.2, 10.2;
+    REQUIRE_NOTHROW(testBox.handlePBC(distances));
+    CHECK(distances[0] == Catch::Approx(10.2 - 10.));
+    CHECK(distances[1] == Catch::Approx(10.2 - 10.));
+    CHECK(distances[2] == Catch::Approx(10.2 - 10.));
 
-  Eigen::VectorXd distances3(12);
-  distances3 << 10.2, 10.2, 10.2, -10.2, -10.2, -10.2, 1.0, 1.0, 1.0, -4., -4.,
-    -4.;
-  REQUIRE_NOTHROW(testBox.handlePBC(distances3));
-  for (size_t i = 0; i < 3; ++i) {
-    REQUIRE(distances3[i] == Catch::Approx(10.2 - 10.));
-    REQUIRE(distances3[3 + i] == Catch::Approx(-10.2 + 10.));
-    REQUIRE(distances3[6 + i] == Catch::Approx(1.));
-    REQUIRE(distances3[9 + i] == Catch::Approx(-4.));
+    Eigen::VectorXd distances3(12);
+    distances3 << 10.2, 10.2, 10.2, -10.2, -10.2, -10.2, 1.0, 1.0, 1.0, -4.,
+      -4., -4.;
+    REQUIRE_NOTHROW(testBox.handlePBC(distances3));
+    for (size_t i = 0; i < 3; ++i) {
+      CHECK(distances3[i] == Catch::Approx(10.2 - 10.));
+      CHECK(distances3[3 + i] == Catch::Approx(-10.2 + 10.));
+      CHECK(distances3[6 + i] == Catch::Approx(1.));
+      CHECK(distances3[9 + i] == Catch::Approx(-4.));
+    }
+
+    std::vector<double> distances2;
+    REQUIRE_NOTHROW(testBox.handlePBC(distances2));
+    distances2.reserve(3);
+    distances2.push_back(10.2);
+    distances2.push_back(10.2);
+    distances2.push_back(10.2);
+    REQUIRE_NOTHROW(testBox.handlePBC(distances2));
+    CHECK(distances2[0] == Catch::Approx(10.2 - 10.));
+    CHECK(distances2[1] == Catch::Approx(10.2 - 10.));
+    CHECK(distances2[2] == Catch::Approx(10.2 - 10.));
+
+    // Eigen::Vector3d distances4;
+    // distances4 << 1e100, 0., 0.;
+    // REQUIRE_THROWS(testBox.handlePBC(distances4));
+
+    // Eigen::Vector3d distances5;
+    // distances5 << -1e100, 0., 0.;
+    // REQUIRE_THROWS(testBox.handlePBC(distances5));
+
+    Eigen::Vector3d distances6;
+    distances6 << 5.0, 5.0, 5.0;
+    testBox.applySimpleShear(0.1, 2);
+    REQUIRE_NOTHROW(testBox.handlePBC(distances6));
+    CHECK(distances6[0] == Catch::Approx(5.));
+    CHECK(distances6[1] == Catch::Approx(5.));
+    CHECK(distances6[2] == Catch::Approx(5.));
+
+    Eigen::Vector3d distances7;
+    distances7 << 73.7435, 0.0657623, -5.26946;
+    pe::Box testBox2 = pe::Box(75.8649, 75.8649, 75.8649);
+    testBox2.applySimpleShear(-0.1, 2);
+    REQUIRE_NOTHROW(testBox2.handlePBC(distances7));
+    CHECK(distances7[0] == Catch::Approx(-2.12143).epsilon(0.001));
+    CHECK(distances7[1] == Catch::Approx(0.0657623).epsilon(0.001));
+    CHECK(distances7[2] == Catch::Approx(2.31703).epsilon(0.001));
   }
 
-  std::vector<double> distances2;
-  REQUIRE_NOTHROW(testBox.handlePBC(distances2));
-  distances2.reserve(3);
-  distances2.push_back(10.2);
-  distances2.push_back(10.2);
-  distances2.push_back(10.2);
-  REQUIRE_NOTHROW(testBox.handlePBC(distances2));
-  REQUIRE(distances2[0] == Catch::Approx(10.2 - 10.));
-  REQUIRE(distances2[1] == Catch::Approx(10.2 - 10.));
-  REQUIRE(distances2[2] == Catch::Approx(10.2 - 10.));
+  SECTION("Mixed Box")
+  {
+    pe::Box testBox = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
+    REQUIRE(testBox.getVolume() == Catch::Approx(20. * 20. * 20.));
 
-  // Eigen::Vector3d distances4;
-  // distances4 << 1e100, 0., 0.;
-  // REQUIRE_THROWS(testBox.handlePBC(distances4));
+    Eigen::Vector3d distances;
+    distances << 10.2, 10.2, 10.2;
+    REQUIRE_NOTHROW(testBox.handlePBC(distances));
+    CHECK(distances[0] == Catch::Approx(10.2 - 20.));
+    CHECK(distances[1] == Catch::Approx(10.2 - 20.));
+    CHECK(distances[2] == Catch::Approx(10.2 - 20.));
+    REQUIRE_NOTHROW(testBox.minImageDistances(distances));
+    CHECK(distances[0] == Catch::Approx(10.2 - 20.));
+    CHECK(distances[1] == Catch::Approx(10.2 - 20.));
+    CHECK(distances[2] == Catch::Approx(10.2 - 20.));
 
-  // Eigen::Vector3d distances5;
-  // distances5 << -1e100, 0., 0.;
-  // REQUIRE_THROWS(testBox.handlePBC(distances5));
+    Eigen::VectorXd distances3(12);
+    distances3 << 10.2, 10.2, 10.2, -10.2, -10.2, -10.2, 1.0, 1.0, 1.0, -4.,
+      -4., -4.;
+    SECTION("PBC")
+    {
+      REQUIRE_NOTHROW(testBox.handlePBC(distances3));
+      for (size_t i = 0; i < 3; ++i) {
+        CHECK(distances3[i] == Catch::Approx(10.2 - 20.));
+        CHECK(distances3[3 + i] == Catch::Approx(-10.2 + 20.));
+        CHECK(distances3[6 + i] == Catch::Approx(1.));
+        CHECK(distances3[9 + i] == Catch::Approx(-4.));
+      }
+    }
 
-  Eigen::Vector3d distances6;
-  distances6 << 5.0, 5.0, 5.0;
-  testBox.applySimpleShear(0.1, 2);
-  REQUIRE_NOTHROW(testBox.handlePBC(distances6));
-  REQUIRE(distances6[0] == Catch::Approx(5.));
-  REQUIRE(distances6[1] == Catch::Approx(5.));
-  REQUIRE(distances6[2] == Catch::Approx(5.));
+    SECTION("Box placement")
+    {
+      REQUIRE_NOTHROW(testBox.minImageDistances(distances3));
+      for (size_t i = 0; i < 3; ++i) {
+        CHECK(distances3[i] == Catch::Approx(10.2 - 20.));
+        CHECK(distances3[3 + i] == Catch::Approx(-10.2 + 20.));
+        CHECK(distances3[6 + i] == Catch::Approx(1.));
+        CHECK(distances3[9 + i] == Catch::Approx(-4.));
+      }
+    }
 
-  Eigen::Vector3d distances7;
-  distances7 << 73.7435, 0.0657623, -5.26946;
-  pe::Box testBox2 = pe::Box(75.8649, 75.8649, 75.8649);
-  testBox2.applySimpleShear(-0.1, 2);
-  REQUIRE_NOTHROW(testBox2.handlePBC(distances7));
-  REQUIRE(distances7[0] == Catch::Approx(-2.12143).epsilon(0.001));
-  REQUIRE(distances7[1] == Catch::Approx(0.0657623).epsilon(0.001));
-  REQUIRE(distances7[2] == Catch::Approx(2.31703).epsilon(0.001));
+    SECTION("PBC, smaller box")
+    {
+      pe::Box testBox2 = pe::Box(-5.0, 5.0, -5.0, 5.0, -5.0, 5.0);
+      REQUIRE_NOTHROW(testBox2.handlePBC(distances3));
+      for (size_t i = 0; i < 3; ++i) {
+        CHECK(distances3[i] == Catch::Approx(10.2 - 10.));
+        CHECK(distances3[3 + i] == Catch::Approx(-10.2 + 10.));
+        CHECK(distances3[6 + i] == Catch::Approx(1.));
+        CHECK(distances3[9 + i] == Catch::Approx(-4.));
+      }
+    }
+  }
 }
 
 TEST_CASE("Box can adjust coordinates", "[entity][Box]")
