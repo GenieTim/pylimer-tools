@@ -30,11 +30,6 @@ namespace entities {
              (this->L[coord] * std::nearbyint(dcoord * this->oneOverL[coord]));
     }
 
-    double placeIn(double dcoord, const int coord) const
-    {
-      return this->minImageDistance(dcoord, coord) + this->loCoords[coord];
-    }
-
     double iterateForPlacementIn(double coord, double min, double max) const
     {
       int min_iterations = 0;
@@ -135,14 +130,14 @@ namespace entities {
     int getShearDirection() const { return this->shearDirection; }
 
     template<typename VectorType>
-    VectorType placeInBox(VectorType& coords) const
+    VectorType minImageDistances(VectorType& coords) const
     {
       INVALIDARG_EXP_IFN(
         coords.size() % 3 == 0,
         "Expect coordinates to be in order x, y, z, repeatedly.");
 
       for (size_t i = 0; i < coords.size(); ++i) {
-        coords[i] = this->placeIn(coords[i], i % 3);
+        coords[i] = this->minImageDistance(coords[i], i % 3);
       }
 
       return coords;
@@ -235,7 +230,7 @@ namespace entities {
         }
       }
       // actually do PBC
-      this->placeInBox(distances);
+      this->minImageDistances(distances);
       // back to the physical space
       if (isSheared) {
         // scaled coordinates in the initial cubic box
@@ -256,7 +251,7 @@ namespace entities {
       }
     }
 
-    inline bool operator==(const Box& rhs)
+    inline bool operator==(const Box& rhs) const
     {
       const Box& lhs = *this;
       return lhs.getLowX() == rhs.getLowX() && lhs.getLowY() == rhs.getLowY() &&
