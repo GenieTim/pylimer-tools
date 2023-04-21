@@ -1,6 +1,10 @@
 include(ExternalProject)
 # include(FetchContent)
 
+if (NOT DEFINED vendor_suffix)
+	set(vendor_suffix "")
+endif()
+
 # download, compile & install nlopt
 # TODO: enable possibility of including externally installed nlopt library
 if (NOT DEFINED nlopt_LOADED)
@@ -18,17 +22,17 @@ if (NOT DEFINED nlopt_LOADED)
 				nloptLib
 				GIT_REPOSITORY https://github.com/stevengj/nlopt
 				GIT_TAG 09b3c2a6da71cabcb98d2c8facc6b83d2321ed71 # 2.7.1
-				PREFIX ${CMAKE_CURRENT_LIST_DIR}/nlopt
-				INSTALL_DIR ${CMAKE_CURRENT_LIST_DIR}/nlopt/nloptLib-install
-				CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_LIST_DIR}/nlopt/nloptLib-install -DINSTALL_LIBDIR=${CMAKE_CURRENT_LIST_DIR}/nlopt/nloptLib-install/lib -DCMAKE_INSTALL_LIBDIR=${CMAKE_CURRENT_LIST_DIR}/nlopt/nloptLib-install/lib -DNLOPT_GUILE=OFF -DNLOPT_OCTAVE=OFF -DNLOPT_MATLAB=OFF -DNLOPT_SWIG=OFF -DNLOPT_PYTHON=OFF -DBUILD_SHARED_LIBS=OFF
-				BUILD_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_LIST_DIR}/nlopt/src/nloptLib-build --config Release
-				BUILD_BYPRODUCTS ${CMAKE_CURRENT_LIST_DIR}/nlopt/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt${LIBRARY_SUFFIX}
+				PREFIX ${CMAKE_CURRENT_LIST_DIR}/nlopt${vendor_suffix}
+				INSTALL_DIR ${CMAKE_CURRENT_LIST_DIR}/nlopt${vendor_suffix}/nloptLib-install
+				CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_LIST_DIR}/nlopt${vendor_suffix}/nloptLib-install -DINSTALL_LIBDIR=${CMAKE_CURRENT_LIST_DIR}/nlopt/nloptLib-install/lib -DCMAKE_INSTALL_LIBDIR=${CMAKE_CURRENT_LIST_DIR}/nlopt/nloptLib-install/lib -DNLOPT_GUILE=OFF -DNLOPT_OCTAVE=OFF -DNLOPT_MATLAB=OFF -DNLOPT_SWIG=OFF -DNLOPT_PYTHON=OFF -DBUILD_SHARED_LIBS=OFF
+				BUILD_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_LIST_DIR}/nlopt${vendor_suffix}/src/nloptLib-build --config Release
+				BUILD_BYPRODUCTS ${CMAKE_CURRENT_LIST_DIR}/nlopt${vendor_suffix}/nloptLib-install/lib/${LIBRARY_PREFIX}nlopt${LIBRARY_SUFFIX}
 				UPDATE_DISCONNECTED ON
 		)
 		# FetchContent_MakeAvailable(nloptLib)
 		add_library(nlopt STATIC IMPORTED)
 		add_dependencies(nlopt nloptLib)
-		set(nlopt_PREFIX_PATH "${CMAKE_CURRENT_LIST_DIR}/nlopt")
+		set(nlopt_PREFIX_PATH "${CMAKE_CURRENT_LIST_DIR}/nlopt${vendor_suffix}")
 		if (MSVC)
 			set(nlopt_INCLUDE_DIRS "${nlopt_PREFIX_PATH}/nloptLib-install/include" "${nlopt_PREFIX_PATH}/src/nloptLib/msvc/include")
 		else()
