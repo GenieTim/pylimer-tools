@@ -2,6 +2,7 @@
 #include "../utils/GraphUtils.h"
 #include "../utils/StringUtils.h"
 #include "Atom.h"
+#include <Eigen/Dense>
 #include <algorithm>
 #include <iostream>
 #include <set>
@@ -112,34 +113,19 @@ namespace entities {
 
   double Molecule::computeEndToEndDistanceWithDerivedImageFlags() const
   {
-    std::vector<Atom> atoms = this->getAtomsLinedUp();
-    if (atoms.size() == 0) {
+    const std::vector<long int> vertices = this->getVerticesLinedUp();
+    if (vertices.size() == 0 || vertices.size() == 1) {
       return 0.0;
     }
 
-    Atom firstAtom = atoms[0];
-    Atom lastAtom = atoms[0];
-    double lastX = lastAtom.getUnwrappedX(this->parent),
-           lastY = lastAtom.getUnwrappedY(this->parent),
-           lastZ = lastAtom.getUnwrappedZ(this->parent);
-    for (size_t i = 1; i < atoms.size(); ++i) {
-      double distance[3];
-      // for each next atom, we can use the shortest distance to the previous
-      // in order to compensate/ignore the image flags while still enabling
-      // larger end-to-end distances than the box size
-      atoms[i].vectorTo(lastAtom, this->parent, distance);
-      lastX += distance[0];
-      lastY += distance[1];
-      lastZ += distance[2];
+    Eigen::VectorXd coordinates = Eigen::VectorXd(vertices.size() * 3);
+    this->getAssumedVertexCoordinates(coordinates, this->parent, vertices);
 
-      lastAtom = atoms[i];
-    }
+    Eigen::Vector3d distance =
+      coordinates.segment(0, 3) -
+      coordinates.segment(3 * (vertices.size() - 1), 3);
 
-    double dx = firstAtom.getUnwrappedX(this->parent) - lastX;
-    double dy = firstAtom.getUnwrappedY(this->parent) - lastY;
-    double dz = firstAtom.getUnwrappedZ(this->parent) - lastZ;
-
-    return sqrt(dx * dx + dy * dy + dz * dz);
+    return distance.norm();
   }
 
   /**
@@ -262,8 +248,8 @@ namespace entities {
 
   double Molecule::computeRadiusOfGyrationWithDerivedImageFlags() const
   {
-    std::vector<Atom> atoms = this->getAtomsLinedUp();
-    if (atoms.size() == 0) {
+    const std::vector<long int> vertices = this->getVerticesLinedUp();
+    if (vertices.size() == 0 || vertices.size() == 1) {
       return 0.0;
     }
 
@@ -272,63 +258,37 @@ namespace entities {
         "Cannot compute radius of gyration without masses.");
     }
 
-    double multiplier = 1. / (static_cast<double>(atoms.size()));
+    double multiplier = 1. / (static_cast<double>(vertices.size()));
 
     // compute the mean position based on the
     // image flags of the first atom
-    Atom lastAtom = atoms[0];
-    double lastX = lastAtom.getUnwrappedX(this->parent),
-           lastY = lastAtom.getUnwrappedY(this->parent),
-           lastZ = lastAtom.getUnwrappedZ(this->parent);
-    double totalMass = this->massPerType.at(lastAtom.getType());
-    double meanX =
-             this->massPerType.at(lastAtom.getType()) * lastX * multiplier,
-           meanY =
-             this->massPerType.at(lastAtom.getType()) * lastY * multiplier,
-           meanZ =
-             this->massPerType.at(lastAtom.getType()) * lastZ * multiplier;
+    // Atom lastAtom = this->getAtomByVertexIdx(vertices[0]);
+    std::vector<int> atomTypes = this->getPropertyValues<int>("type", vertices);
+    Eigen::VectorXd assumedCoordinates =
+      Eigen::VectorXd::Zero(vertices.size() * 3);
+    this->getAssumedVertexCoordinates<Eigen::VectorXd>(
+      assumedCoordinates, this->parent, vertices);
+    double totalMass = 0.0;
+    Eigen::Vector3d meanCoords = Eigen::Vector3d::Zero();
     // find mean position
-    for (size_t i = 1; i < atoms.size(); ++i) {
-      totalMass += this->massPerType.at(atoms[i].getType());
-      double localMultiplier =
-        multiplier * this->massPerType.at(atoms[i].getType());
-      double distance[3];
-      // for each next atom, we can use the shortest distance to the previous
-      // in order to compensate/ignore the image flags while still enabling
-      // larger end-to-end distances than the box size
-      atoms[i].vectorTo(lastAtom, this->parent, distance);
-      lastX += distance[0];
-      lastY += distance[1];
-      lastZ += distance[2];
-      meanX += localMultiplier * lastX;
-      meanY += localMultiplier * lastY;
-      meanZ += localMultiplier * lastZ;
+    for (size_t i = 0; i < vertices.size(); ++i) {
+      double localMultiplier = multiplier * this->massPerType.at(atomTypes[i]);
 
-      lastAtom = atoms[i];
+      totalMass += this->massPerType.at(atomTypes[i]);
+      meanCoords += localMultiplier * assumedCoordinates.segment(3 * i, 3);
     }
 
     // use it to compute the r_g
-    lastAtom = atoms[0];
-    lastX = lastAtom.getUnwrappedX(this->parent),
-    lastY = lastAtom.getUnwrappedY(this->parent),
-    lastZ = lastAtom.getUnwrappedZ(this->parent);
-    multiplier = 1. / totalMass;
-    double dx = (lastX - meanX), dy = (lastY - meanY), dz = (lastZ - meanZ);
-    double Rg2 = (dx * dx + dy * dy + dz * dz) *
-                 (this->massPerType.at(lastAtom.getType()) * multiplier);
-    for (size_t i = 1; i < atoms.size(); ++i) {
-      double localMultiplier =
-        multiplier * this->massPerType.at(atoms[i].getType());
-      double distance[3];
-      atoms[i].vectorTo(lastAtom, this->parent, distance);
-      lastX += distance[0];
-      lastY += distance[1];
-      lastZ += distance[2];
-      dx = (lastX - meanX), dy = (lastY - meanY), dz = (lastZ - meanZ);
-      Rg2 += (dx * dx + dy * dy + dz * dz) * localMultiplier;
+    double Rg2 = 0.0;
 
-      lastAtom = atoms[i];
+    multiplier = 1. / totalMass;
+    for (size_t i = 0; i < vertices.size(); ++i) {
+      double localMultiplier = multiplier * this->massPerType.at(atomTypes[i]);
+      Eigen::Vector3d distanceFromMean =
+        assumedCoordinates.segment(3 * i, 3) - meanCoords;
+      Rg2 += localMultiplier * distanceFromMean.squaredNorm();
     }
+
     return Rg2;
   };
 
@@ -353,9 +313,10 @@ namespace entities {
     return results;
   };
 
-  std::vector<Atom> Molecule::getAtomsLinedUp(int crossLinkerType) const
+  std::vector<long int> Molecule::getVerticesLinedUp(int crossLinkerType) const
   {
-    std::vector<Atom> results;
+
+    std::vector<long int> results;
     size_t nrOfAtoms = this->getNrOfAtoms();
     results.reserve(nrOfAtoms);
 
@@ -376,11 +337,11 @@ namespace entities {
 
     std::vector<long int> connections =
       this->getVertexIdxsConnectedTo(vertexIdToStartWith);
-    results.push_back(this->getAtomByVertexIdx(vertexIdToStartWith));
+    results.push_back(vertexIdToStartWith);
     bool loopFound = false;
     for (long int connection : connections) {
       long int currentCenter = connection;
-      results.push_back(this->getAtomByVertexIdx(currentCenter));
+      results.push_back(currentCenter);
       long int lastCenter = vertexIdToStartWith;
       std::vector<long int> subConnections =
         this->getVertexIdxsConnectedTo(currentCenter);
@@ -402,7 +363,7 @@ namespace entities {
         }
         lastCenter = currentCenter;
         currentCenter = subConnections[subConnectionDirection];
-        results.push_back(this->getAtomByVertexIdx(currentCenter));
+        results.push_back(currentCenter);
         subConnections = this->getVertexIdxsConnectedTo(currentCenter);
       }
       if (loopFound) {
@@ -417,6 +378,11 @@ namespace entities {
         std::to_string(this->getNrOfAtoms()) + " atoms.");
     }
     return results;
+  }
+
+  std::vector<Atom> Molecule::getAtomsLinedUp(int crossLinkerType) const
+  {
+    return this->verticesToAtoms(this->getVerticesLinedUp(crossLinkerType));
   };
 
 } // namespace entities

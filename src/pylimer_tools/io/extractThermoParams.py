@@ -22,6 +22,13 @@ def detectHeaders(file: str, max_nr_of_lines_to_read: int = 1500, use_cache: boo
     Read `max_nr_of_lines_to_read` lines from the given file and return all possible header lines.
 
     Some assumptions are made regarding the columns, e.g., that 75% of them start with a character.
+
+    Arguments:
+        - file: The file to search for header lines
+        - max_nr_of_lines_to_read: The number of lines to read in search for header lines. 
+            Use a negative number to read the whole file.
+        - use_cache: Whether to read the result from cache or not. 
+            The cache is not read if the file changed meanwhile.
     """
     suffix = str(max_nr_of_lines_to_read)
     cacheContent = loadCache(file, suffix)
@@ -74,6 +81,8 @@ def readOneGroup(fp, header, min_line_len=4, additional_lines_skip=0, lines_to_r
     Returns:
        The filename of a temporary CSV file
     """
+    if (len(header) == 0):
+        raise ValueError("header must have more than zero characters")
     assert(isinstance(header, str) or (
         isinstance(header, list) and len(header) > 0))
     csvFileToWrite = "{}/{}_{}".format(
@@ -172,6 +181,7 @@ def extractThermoParams(file, header: Union[str, List[str], None] = "Step Temp E
         - texts_to_read: the number of times to expect the header
         - min_line_len: the minimal length of a line to be accepted as data
         - use_cache: wheter to use cache or not (though it will be written anyway)
+            The cache is not read if the file changed meanwhile.
         - lines_to_read_till_header: the number of lines that are acceptable to skip until a header should have been found.
             This is useful for (a) finding the header, and (b) exit early if you are unsure about the header(s)
 
@@ -213,20 +223,22 @@ def extractThermoParams(file, header: Union[str, List[str], None] = "Step Temp E
         tmpCsvFile = readOneGroup(
             fp, header, min_line_len=min_line_len, lines_to_read_till_header=lines_to_read_till_header)
         textsRead = 1
-        if (tmpCsvFile == ""):
-            df = pd.DataFrame()
-        else:
-            df = csvFileToDf(tmpCsvFile)
+        tmpCsvFiles = []
+        if (tmpCsvFile != ""):
+            tmpCsvFiles.append(tmpCsvFile)
         while(textsRead < texts_to_read):
             tmpCsvFile = readOneGroup(
                 fp, header, min_line_len=min_line_len, lines_to_read_till_header=lines_to_read_till_header)
             textsRead += 1
             if (tmpCsvFile != ""):
-                newDf = csvFileToDf(tmpCsvFile)
-                if (not newDf.empty):
-                    df = pd.concat([df, newDf], ignore_index=True)
+                tmpCsvFiles.append(tmpCsvFile)
             else:
                 break
+        if (len(tmpCsvFiles) == 1):
+            df = csvFileToDf(tmpCsvFiles[0])
+        elif (len(tmpCsvFiles) > 0):
+            df = pd.concat([df for df in [csvFileToDf(f)
+                           for f in tmpCsvFiles] if not df.empty], ignore_index=True)
 
     if (df is not None):
         # df.columns = df.columns.str.replace(' ', '')

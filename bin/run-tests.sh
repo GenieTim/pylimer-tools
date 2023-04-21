@@ -22,12 +22,17 @@ cd build || exit 5
 GENERATOR_BIN="make"
 # force use of g++ if available for coverage
 # or clang on MacOS, as g++ leak analysis is not supported there
-if [[ $OSTYPE == 'darwin'* ]]; then
-  CXXCOMPILER=$(which clang++ || which g++)
-  CCOMPILER=$(which clang || which gcc)
+if [ -z "$CC" ] || [ -z "$CXX" ]; then
+  if [[ $OSTYPE == 'darwin'* ]]; then
+    CXXCOMPILER=$(which clang++ || which g++)
+    CCOMPILER=$(which clang || which gcc)
+  else
+    CXXCOMPILER=$(which g++ || which clang++)
+    CCOMPILER=$(which gcc || which clang)
+  fi
 else
-  CXXCOMPILER=$(which g++ || which clang++)
-  CCOMPILER=$(which gcc || which clang)
+  CXXCOMPILER=$CXX
+  CCOMPILER=$CC
 fi
 ADDITIONALFLAGS=()
 if command -v clang++ || command -v g++; then

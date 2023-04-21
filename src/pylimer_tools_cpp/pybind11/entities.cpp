@@ -267,6 +267,14 @@ init_pylimer_bound_entities(py::module_& m)
     .def("getAtomForVertexId", &Molecule::getAtomByVertexIdx, R"pbdoc(
             Get an atom for a specific vertex.
             )pbdoc")
+    .def(
+      "getAtomById",
+      [](const Molecule& molecule, size_t id) {
+        return molecule.getAtomByVertexIdx(molecule.getIdxByAtomId(id));
+      },
+      R"pbdoc(
+            Get an atom by its id.
+            )pbdoc")
     .def("getAtoms", &Molecule::getAtoms, R"pbdoc(
             Returns all atom objects enclosed in this molecule.
             )pbdoc")
@@ -897,6 +905,15 @@ init_pylimer_bound_entities(py::module_& m)
             and :func:`~pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.forgetAtIndex`
             to craft a more memory-efficient retrieval mechanism.
             )pbdoc")
+    // computations
+    .def("computeMsdForAtoms",
+         &UniverseSequence::computeMsdForAtoms,
+         R"pbdoc(
+          Compute the mean square displacement for atoms with the specified ids
+     )pbdoc",
+         py::arg("atom_ids"), 
+         py::arg("nr_of_origins") = 25,
+         py::arg("reduce_memory") = false)
     // operators
     .def(
       "__getitem__",

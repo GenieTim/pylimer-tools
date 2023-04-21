@@ -117,7 +117,8 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
                     { { 0, 0, 0, 0, 1, 2, 2, 2 } },     // ny
                     { { 0, 0, 0, 0, 1, 2, 2, 2 } }      // nz
   );
-  std:: map<int, double> masses;
+
+  std::map<int, double> masses;
   masses[1] = 1.0;
   masses[2] = 1.0;
   universe.addBonds(8,
@@ -128,20 +129,61 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
                     false);
 
   std::vector<pe::Molecule> molecules = universe.getMolecules();
-  for (size_t i = 0; i < 4; ++i) {
-    pe::Atom atomI = universe.getAtom(5 + i);
-    CHECK(atomI.getUnwrappedX(&box) ==
-          Catch::Approx(29. + static_cast<double>(i)));
-    CHECK(atomI.getUnwrappedY(&box) ==
-          Catch::Approx(29. + static_cast<double>(i)));
-    CHECK(atomI.getUnwrappedZ(&box) ==
-          Catch::Approx(29. + static_cast<double>(i)));
+  SECTION("Coordinates are computed appropriately")
+  {
+    igraph_vector_int_t all_vertices;
+    igraph_vector_int_init(&all_vertices, universe.getNrOfAtoms());
+    for (int i = 1; i <= universe.getNrOfAtoms(); ++i) {
+      igraph_vector_int_set(&all_vertices, i - 1, universe.getIdxByAtomId(i));
+    }
+    CHECK(igraph_vector_int_size(&all_vertices) == universe.getNrOfAtoms());
+    Eigen::VectorXd coordinates =
+      universe.getUnwrappedVertexCoordinates(all_vertices, &box);
+    CHECK(coordinates.size() == universe.getNrOfAtoms() * 3);
+    igraph_vector_int_destroy(&all_vertices);
+
+    for (size_t i = 0; i < 4; ++i) {
+      pe::Atom atomI = universe.getAtom(5 + i);
+      CHECK(atomI.getUnwrappedX(&box) ==
+            Catch::Approx(29. + static_cast<double>(i)));
+      CHECK(atomI.getUnwrappedY(&box) ==
+            Catch::Approx(29. + static_cast<double>(i)));
+      CHECK(atomI.getUnwrappedZ(&box) ==
+            Catch::Approx(29. + static_cast<double>(i)));
+      CHECK(coordinates[(4 + i) * 3] ==
+            Catch::Approx(29. + static_cast<double>(i)));
+      CHECK(coordinates[(4 + i) * 3 + 1] ==
+            Catch::Approx(29. + static_cast<double>(i)));
+      CHECK(coordinates[(4 + i) * 3 + 2] ==
+            Catch::Approx(29. + static_cast<double>(i)));
+    }
   }
   CHECK_THROWS(molecules[0].computeRadiusOfGyration());
   CHECK_THROWS(molecules[0].computeRadiusOfGyrationWithDerivedImageFlags());
   universe.setMasses(masses);
   molecules = universe.getMolecules();
   CHECK(molecules.size() == 2);
+
+  SECTION("Coordinates are derived correctly")
+  {
+    std::vector<long int> vertices;
+    for (int i = 0; i < molecules[1].getNrOfAtoms(); i++) {
+      vertices.push_back(i);
+    }
+    Eigen::VectorXd assumedCoordinates =
+      Eigen::VectorXd::Zero(molecules[1].getNrOfAtoms() * 3);
+    assumedCoordinates =
+      molecules[1].getAssumedVertexCoordinates<Eigen::VectorXd>(
+        assumedCoordinates, &box, vertices);
+    for (int i = 0; i < 4; ++i) {
+      CHECK(assumedCoordinates[(i)*3] ==
+            Catch::Approx(29. + static_cast<double>(i)));
+      CHECK(assumedCoordinates[(i)*3 + 1] ==
+            Catch::Approx(29. + static_cast<double>(i)));
+      CHECK(assumedCoordinates[(i)*3 + 2] ==
+            Catch::Approx(29. + static_cast<double>(i)));
+    }
+  }
 
   SECTION("R_g can be computed in both ways")
   {

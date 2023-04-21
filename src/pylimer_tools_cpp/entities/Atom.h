@@ -42,19 +42,6 @@ namespace entities {
              this->ny == ref.ny && this->nz == ref.nz;
     }
 
-    double _getDeltaDistanceUnwrapped(double c1,
-                                      double c2,
-                                      int n1,
-                                      int n2,
-                                      double boxL) const
-    {
-      double delta = (c1 + n1 * boxL) - (c2 + n2 * boxL); // std::fabs(c1 - c2);
-      // if (n1 != n2) {
-      //   delta -= (static_cast<double>(n1 - n2)) * boxL;
-      // }
-      return delta;
-    }
-
     double _getDeltaDistance(double c1,
                              double c2,
                              int n1,
@@ -74,7 +61,7 @@ namespace entities {
       return delta;
     }
 
-    void vectorTo(Atom b, const Box* box, double* result) const
+    void vectorTo(const Atom b, const Box* box, double *result) const
     {
       result[0] = this->_getDeltaDistance(
         this->x, b.getX(), this->nx, b.getNX(), box->getLx());
@@ -82,6 +69,13 @@ namespace entities {
         this->y, b.getY(), this->ny, b.getNY(), box->getLy());
       result[2] = this->_getDeltaDistance(
         this->z, b.getZ(), this->nz, b.getNZ(), box->getLz());
+    }
+
+    void vectorToUnwrapped(Atom b, const Box* box, double* result) const
+    {
+      result[0] = this->getUnwrappedX(box) - b.getUnwrappedX(box);
+      result[1] = this->getUnwrappedY(box) - b.getUnwrappedY(box);
+      result[2] = this->getUnwrappedZ(box) - b.getUnwrappedZ(box);
     }
 
     std::vector<double> computeVectorTo(Atom b, const Box box) const
@@ -102,7 +96,18 @@ namespace entities {
       result[0] = this->getX() - 0.5 * distanceVec[0];
       result[1] = this->getY() - 0.5 * distanceVec[1];
       result[2] = this->getZ() - 0.5 * distanceVec[2];
-      return box->placeInBox(result);
+      return box->minImageDistances(result);
+    }
+
+    std::array<double, 3> meanPositionWithUnwrapped(Atom b, const Box* box) const
+    {
+      double distanceVec[3];
+      vectorToUnwrapped(b, box, distanceVec);
+      std::array<double, 3> result;
+      result[0] = this->getX() - 0.5 * distanceVec[0];
+      result[1] = this->getY() - 0.5 * distanceVec[1];
+      result[2] = this->getZ() - 0.5 * distanceVec[2];
+      return box->minImageDistances(result);
     }
 
     double distanceTo(Atom b, const Box* box) const
@@ -113,13 +118,6 @@ namespace entities {
       return sqrt(distanceVec[0] * distanceVec[0] +
                   distanceVec[1] * distanceVec[1] +
                   distanceVec[2] * distanceVec[2]);
-    }
-
-    void vectorToUnwrapped(Atom b, const Box* box, double* result) const
-    {
-      result[0] = this->getUnwrappedX(box) - b.getUnwrappedX(box);
-      result[1] = this->getUnwrappedY(box) - b.getUnwrappedY(box);
-      result[2] = this->getUnwrappedZ(box) - b.getUnwrappedZ(box);
     }
 
     double distanceToUnwrapped(Atom b, const Box* box) const
@@ -156,7 +154,7 @@ namespace entities {
     template<typename VectorType>
     void getCoordinates(VectorType& vec) const
     {
-      INVALIDARG_EXP_IFN(coords.size() == 3,
+      INVALIDARG_EXP_IFN(vec.size() == 3,
                          "Expect coordinates to be in order x, y, z, i.e., a "
                          "vector or array of size 3.");
       vec[0] = this->getX();
@@ -166,7 +164,7 @@ namespace entities {
     template<typename VectorType>
     void getUnwrappedCoordinates(VectorType& vec, const Box* box) const
     {
-      INVALIDARG_EXP_IFN(coords.size() == 3,
+      INVALIDARG_EXP_IFN(vec.size() == 3,
                          "Expect coordinates to be in order x, y, z, i.e., a "
                          "vector or array of size 3.");
       vec[0] = this->getUnwrappedX(box);
