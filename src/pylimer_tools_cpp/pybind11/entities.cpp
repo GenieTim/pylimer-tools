@@ -911,7 +911,9 @@ init_pylimer_bound_entities(py::module_& m)
          R"pbdoc(
           Compute the mean square displacement for atoms with the specified ids
      )pbdoc",
-         py::arg("atom_ids"), py::arg("reduce_memory") = false)
+         py::arg("atom_ids"), 
+         py::arg("nr_of_origins") = 25,
+         py::arg("reduce_memory") = false)
     // operators
     .def(
       "__getitem__",

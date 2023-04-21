@@ -24,7 +24,7 @@ namespace entities {
     std::vector<Universe> getAll();
 
     // computations
-    std::unordered_map<int, double> computeMsdForAtoms(const std::vector<long int> atomIds,  bool reduceMemory = false); 
+    std::unordered_map<int, double> computeMsdForAtoms(const std::vector<long int> atomIds, int nrOfOrigins = 10, bool reduceMemory = false); 
 
   protected:
     size_t index = 0; // current index of the iterator
