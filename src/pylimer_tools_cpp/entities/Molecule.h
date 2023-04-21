@@ -46,6 +46,7 @@ namespace entities {
     std::vector<Atom> getAtoms();
     // std::map<std::string, std::vector<long int>> getBonds() const;
     std::vector<Atom> getAtomsLinedUp(int crossLinkerType = 2) const;
+    std::vector<long int> getVerticesLinedUp(int crossLinkerType = 2) const;
     int getNrOfAtoms() const;
     const Box* getBox() const;
     std::string getKey() const;
@@ -80,7 +81,7 @@ namespace entities {
     int size;
     std::string key;
     std::map<int, double> massPerType;
-    std::unordered_map<int, int> atomIdToVertexIdx;
+    std::unordered_map<long int, long int> atomIdToVertexIdx;
 
     void initializeFromGraph(const igraph_t* ingraph);
   };

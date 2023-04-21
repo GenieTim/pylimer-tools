@@ -130,6 +130,7 @@
     "filesystem": "cpp",
     "hash_map": "cpp",
     "shared_mutex": "cpp",
-    "cfenv": "cpp"
+    "cfenv": "cpp",
+    "__verbose_abort": "cpp"
   }
 }

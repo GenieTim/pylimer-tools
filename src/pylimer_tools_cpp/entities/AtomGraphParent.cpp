@@ -10,6 +10,7 @@ extern "C"
 #include <map>
 #include <unordered_map>
 #include <vector>
+#include <Eigen/Dense>
 
 namespace pylimer_tools {
 namespace entities {
@@ -253,6 +254,17 @@ namespace entities {
                 VAN(&this->graph, "ny", vertexIdx),
                 VAN(&this->graph, "nz", vertexIdx));
   }
+
+  std::vector<Atom> AtomGraphParent::verticesToAtoms(
+    const std::vector<long int>& vertexIds) const
+  {
+    std::vector<Atom> results;
+    results.reserve(vertexIds.size());
+    for (long int vertexId : vertexIds) {
+      results.push_back(this->getAtomByVertexIdx(vertexId));
+    }
+    return results;
+  };
 
   /**
    * @brief Get all atoms with a certain number of bonds

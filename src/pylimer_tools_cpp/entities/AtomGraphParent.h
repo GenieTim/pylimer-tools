@@ -8,6 +8,7 @@ extern "C"
 #include "../utils/GraphUtils.h"
 #include "../utils/StringUtils.h"
 #include "Atom.h"
+#include <Eigen/Dense>
 #include <algorithm>
 #include <map>
 #include <unordered_map>
@@ -105,6 +106,15 @@ namespace entities {
     Atom getAtomByVertexIdx(const long int vertexIdx) const;
 
     /**
+     * @brief Convert a list of vertex ids to a list of Atom instances
+     *
+     * @param vertexIds the list of vertex ids
+     * @return std::vector<Atom>
+     */
+    std::vector<Atom> verticesToAtoms(
+      const std::vector<long int>& vertexIds) const;
+
+    /**
      * @brief Get the value of a property (attribute) of each and every vertex
      *
      * @tparam OUT
@@ -149,8 +159,9 @@ namespace entities {
      * @return std::vector<OUT>
      */
     template<typename OUT>
-    std::vector<OUT> getPropertyValues(const char* propertyName,
-                                       std::vector<long int> vertices) const
+    std::vector<OUT> getPropertyValues(
+      const char* propertyName,
+      const std::vector<long int>& vertices) const
     {
       std::vector<OUT> results;
       if (vertices.size() == 0) {
@@ -170,6 +181,70 @@ namespace entities {
       pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
       igraph_vector_destroy(&allValues);
       igraph_vector_int_destroy(&vertexIdxs);
+      return results;
+    }
+
+    Eigen::VectorXd getUnwrappedVertexCoordinates(
+      igraph_vector_int_t& vertices,
+      const pylimer_tools::entities::Box *box) const
+    {
+      size_t size = igraph_vector_int_size(&vertices);
+
+      igraph_vector_t xvalues;
+      igraph_vector_init(&xvalues, 0);
+      igraph_vector_t yvalues;
+      igraph_vector_init(&yvalues, 0);
+      igraph_vector_t zvalues;
+      igraph_vector_init(&zvalues, 0);
+      igraph_vector_t nxvalues;
+      igraph_vector_init(&nxvalues, 0);
+      igraph_vector_t nyvalues;
+      igraph_vector_init(&nyvalues, 0);
+      igraph_vector_t nzvalues;
+      igraph_vector_init(&nzvalues, 0);
+
+      if (igraph_cattribute_VANV(
+            &this->graph, "x", igraph_vss_vector(&vertices), &xvalues)) {
+        throw std::runtime_error("Failed to query property x of graph.");
+      }
+      if (igraph_cattribute_VANV(
+            &this->graph, "y", igraph_vss_vector(&vertices), &yvalues)) {
+        throw std::runtime_error("Failed to query property y of graph.");
+      }
+      if (igraph_cattribute_VANV(
+            &this->graph, "z", igraph_vss_vector(&vertices), &zvalues)) {
+        throw std::runtime_error("Failed to query property z of graph.");
+      }
+      if (igraph_cattribute_VANV(
+            &this->graph, "nx", igraph_vss_vector(&vertices), &nxvalues)) {
+        throw std::runtime_error("Failed to query property nx of graph.");
+      }
+      if (igraph_cattribute_VANV(
+            &this->graph, "ny", igraph_vss_vector(&vertices), &nyvalues)) {
+        throw std::runtime_error("Failed to query property ny of graph.");
+      }
+      if (igraph_cattribute_VANV(
+            &this->graph, "nz", igraph_vss_vector(&vertices), &nzvalues)) {
+        throw std::runtime_error("Failed to query property nz of graph.");
+      }
+
+      Eigen::VectorXd results = Eigen::VectorXd::Zero(size * 3);
+      for (size_t i = 0; i < size; i++) {
+        results[3 * i] = igraph_vector_get(&xvalues, i) +
+                         (box->getLx() * igraph_vector_get(&nxvalues, i));
+        results[3 * i + 1] = igraph_vector_get(&yvalues, i) +
+                             (box->getLy() * igraph_vector_get(&nyvalues, i));
+        results[3 * i + 2] = igraph_vector_get(&zvalues, i) +
+                             (box->getLz() * igraph_vector_get(&nzvalues, i));
+      }
+
+      igraph_vector_destroy(&xvalues);
+      igraph_vector_destroy(&yvalues);
+      igraph_vector_destroy(&zvalues);
+      igraph_vector_destroy(&nxvalues);
+      igraph_vector_destroy(&nyvalues);
+      igraph_vector_destroy(&nzvalues);
+
       return results;
     }
 
@@ -227,9 +302,68 @@ namespace entities {
      */
     std::map<std::string, std::vector<long int>> getBonds() const;
 
+    /**
+     * @brief Get the Assumed Vertex Coordinates
+     * This means, the coordinates are derived ignoring the image flags,
+     * assuming bonds between subsequent vertices,
+     * which are assumed to be shorter than half the periodic box.
+     *
+     * @tparam OutVectorType
+     * @param results
+     * @param box
+     * @param vertexIds
+     */
+
+    template<typename OutVectorType>
+    OutVectorType getAssumedVertexCoordinates(
+      OutVectorType& results,
+      const Box* box,
+      const std::vector<long int>& vertexIds) const
+    {
+      if (vertexIds.size() * 3 != results.size()) {
+        throw std::invalid_argument(
+          "The results must have size 3*the number of atoms to query.");
+      }
+
+      igraph_vector_int_t vertex_ids;
+      igraph_vector_int_init(&vertex_ids, 0);
+      pylimer_tools::utils::StdVectorToIgraphVectorT(vertexIds, &vertex_ids);
+
+      Eigen::VectorXd coordinates = this->getUnwrappedVertexCoordinates(vertex_ids, box);
+      for (size_t i = 0; i< coordinates.size(); ++i) {
+        
+      }
+
+      igraph_vector_int_destroy(&vertex_ids);
+
+      // take the distances
+      Eigen::VectorXd distances =
+        coordinates.segment(3, coordinates.size() - 3) -
+        coordinates.segment(0, coordinates.size() - 3);
+
+      // adjust them for the box
+      box->handlePBC(distances);
+
+      // and now:
+      Eigen::Vector3d lastCoords = coordinates.segment(0, 3);
+      results[0] = lastCoords[0];
+      results[1] = lastCoords[1];
+      results[2] = lastCoords[2];
+      for (int i = 0; i < distances.size(); i += 3) {
+        // for each next atom, we can use the shortest distance to the previous
+        // in order to compensate/ignore the image flags while still enabling
+        // larger end-to-end distances than the box size
+        lastCoords += distances.segment(i, 3);
+        results[i + 3] = lastCoords[0];
+        results[i + 4] = lastCoords[1];
+        results[i + 5] = lastCoords[2];
+      }
+
+      return results;
+    }
+
   protected:
     igraph_t graph;
-
     igraph_vs_t getVerticesWithDegreeSelector(int degree) const;
     std::vector<long int> getVerticesWithDegree(int degree) const;
     std::vector<long int> getVerticesWithDegree(
