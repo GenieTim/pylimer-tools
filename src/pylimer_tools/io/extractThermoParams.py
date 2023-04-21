@@ -234,7 +234,11 @@ def extractThermoParams(file, header: Union[str, List[str], None] = "Step Temp E
                 tmpCsvFiles.append(tmpCsvFile)
             else:
                 break
-        df = pd.concat([df for df in [csvFileToDf(f) for f in tmpCsvFiles] if not df.empty], ignore_index=True)
+        if (len(tmpCsvFiles) == 1):
+            df = csvFileToDf(tmpCsvFiles[0])
+        elif (len(tmpCsvFiles) > 0):
+            df = pd.concat([df for df in [csvFileToDf(f)
+                           for f in tmpCsvFiles] if not df.empty], ignore_index=True)
 
     if (df is not None):
         # df.columns = df.columns.str.replace(' ', '')
