@@ -186,7 +186,7 @@ namespace entities {
 
     Eigen::VectorXd getUnwrappedVertexCoordinates(
       igraph_vector_int_t& vertices,
-      const pylimer_tools::entities::Box *box) const
+      const pylimer_tools::entities::Box* box) const
     {
       size_t size = igraph_vector_int_size(&vertices);
 
@@ -246,6 +246,19 @@ namespace entities {
       igraph_vector_destroy(&nzvalues);
 
       return results;
+    }
+
+    Eigen::VectorXd getUnwrappedVertexCoordinates(
+      std::vector<long int>& vertices,
+      const pylimer_tools::entities::Box* box) const
+    {
+      igraph_vector_int_t vertices_v;
+      igraph_vector_int_init(&vertices_v, vertices.size());
+      pylimer_tools::utils::StdVectorToIgraphVectorT(vertices, &vertices_v);
+      Eigen::VectorXd result =
+        this->getUnwrappedVertexCoordinates(vertices_v, box);
+      igraph_vector_int_destroy(&vertices_v);
+      return result;
     }
 
     /**
@@ -329,9 +342,9 @@ namespace entities {
       igraph_vector_int_init(&vertex_ids, 0);
       pylimer_tools::utils::StdVectorToIgraphVectorT(vertexIds, &vertex_ids);
 
-      Eigen::VectorXd coordinates = this->getUnwrappedVertexCoordinates(vertex_ids, box);
-      for (size_t i = 0; i< coordinates.size(); ++i) {
-        
+      Eigen::VectorXd coordinates =
+        this->getUnwrappedVertexCoordinates(vertex_ids, box);
+      for (size_t i = 0; i < coordinates.size(); ++i) {
       }
 
       igraph_vector_int_destroy(&vertex_ids);

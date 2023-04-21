@@ -114,6 +114,10 @@ namespace entities {
       return this->getLx() * this->getLy() * this->getLz();
     }
 
+    double getL(const int i) const { return this->L[i % 3]; }
+    double getLowL(const int i) const { return this->loCoords[i % 3]; }
+    double getHighL(const int i) const { return this->hiCoords[i % 3]; }
+
     double getLx() const { return this->L[0]; }
     double getLy() const { return this->L[1]; }
     double getLz() const { return this->L[2]; }

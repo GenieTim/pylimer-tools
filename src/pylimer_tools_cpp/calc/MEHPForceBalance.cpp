@@ -1156,25 +1156,66 @@ namespace calc {
       // reduced loops = loops, but only the (new) spring indices
       std::vector<std::vector<size_t>> reducedLoops;
       reducedLoops.reserve(loops.size());
-      // min & max coordinates of the loops in order to easily know 
+      // min & max coordinates of the loops in order to easily know
       // a priori whether it makes sense to compare two loops or not
       std::vector<std::array<double, 3>> loopMinCoords;
       loopMinCoords.reserve(loops.size());
       std::vector<std::array<double, 3>> loopMaxCoords;
       loopMaxCoords.reserve(loops.size());
+      pylimer_tools::entities::Box box = this->universe.getBox();
       for (std::vector<long int> loop : loops) {
-        std::set<size_t> reducedLoop;
-        std::array<double, 3> minCoords;
-        this->universe.getAtom(loop[0]).getCoordinates(&minCoords);
-        std::array<double, 3> maxCoords;
-        this->universe.getAtom(loop[0]).getCoordinates(&maxCoords);
-        for (size_t i = 0; i < loop.size(); ++i) {
-          // max & min coordinates
-          // TODO: implement, such that the max & min work also with infinite
-          // loops 
-          // assume each subsequent atom is bonded with a bond shorter
-          // than half the bond
+        // max & min coordinates
+        // TODO: implement, such that the max & min work also with infinite
+        // loops
+        // assume each subsequent atom is bonded with a bond shorter
+        // than half the bond
+        Eigen::VectorXd alignedLoopCoordinates =
+          this->universe.getUnwrappedVertexCoordinates(loop, &box);
 
+        std::array<double, 3> minCoords;
+        std::array<double, 3> maxCoords;
+
+        for (int i = 0; i < 3; ++i) {
+          minCoords[i] =
+            alignedLoopCoordinates(Eigen::seq(i, Eigen::last - 2 + i, 3))
+              .minCoeff();
+          maxCoords[i] =
+            alignedLoopCoordinates(Eigen::seq(i, Eigen::last - 2 + i, 3))
+              .maxCoeff();
+          // want to see later that this direction is spanned fully
+          // that's why we just push it so far that it is within the box
+          if (maxCoords[i] - minCoords[i] > box.getL(i) ||
+              (std::fabs(alignedLoopCoordinates[i] -
+                         alignedLoopCoordinates[3 * (loop.size() - 1) + i]) >
+               0.5 * box.getL(i))) {
+            // special case in case the loop is periodic
+            minCoords[i] = box.getLowL(i);
+            maxCoords[i] = box.getHighL(i);
+          } else {
+            // adjust for box
+            while (minCoords[i] > box.getHighL(i)) {
+              minCoords[i] -= box.getL(i);
+            }
+            while (minCoords[i] < box.getLowL(i)) {
+              minCoords[i] += box.getL(i);
+            }
+            while (maxCoords[i] > box.getHighL(i)) {
+              maxCoords[i] -= box.getL(i);
+            }
+            while (maxCoords[i] < box.getLowL(i)) {
+              maxCoords[i] += box.getL(i);
+            }
+            // at this point, it is not given anymore that minCoords[i] <
+            // maxCoords[i], instead, we know that both are within the box
+          }
+        }
+
+        loopMinCoords.push_back(minCoords);
+        loopMaxCoords.push_back(maxCoords);
+
+        // loop reduction
+        std::set<size_t> reducedLoop;
+        for (size_t i = 0; i < loop.size(); ++i) {
           // reduced loop
           if (this->universe.getPropertyValue<long int>("type", loop[i]) !=
               this->crosslinkerType) {
@@ -1241,46 +1282,86 @@ namespace calc {
         }
         relevantIntersections.reserve(estimateNrOfSliplinks);
 
+        const std::array<double, 3> loop_i_min = loopMinCoords[i];
+        const std::array<double, 3> loop_i_max = loopMaxCoords[i];
+
         // TODO: instead of the N^2 loop, might want to try some filter at least
         // also, we ignore all self-entanglements of one loop with itself.
         for (size_t j = i + 1; j < loops.size(); ++j) {
-          std::vector<pylimer_tools::entities::LoopIntersectionInfo>
-            intersections = this->universe.findLoopEntanglements(
-              loops[i], loops[j], loopEdges[i], loopEdges[j]);
-          for (pylimer_tools::entities::LoopIntersectionInfo intersection :
-               intersections) {
-            bool keepIntersection = true;
+          // first check if the loops have any overlap in 3D, otherwise, we can
+          // skip them anyway.
 
-            // check if we want to keep it
-            // TODO: check if we want to keep it based on the direction /
-            // distance of the intersection
+          std::array<double, 3> loop_j_min = loopMinCoords[j];
+          std::array<double, 3> loop_j_max = loopMaxCoords[j];
 
-            // check if we want to keep it, based on the edges involved
-            long int edgePairHash =
-              hash_integer_pair(intersection.edge1, intersection.edge2);
-            if (pylimer_tools::utils::map_has_key(intersectionsOfEdges,
-                                                  edgePairHash)) {
-              keepIntersection = false;
-              long int involvedIntersection =
-                intersectionsOfEdges.at(edgePairHash);
-              std::get<1>(relevantIntersections[involvedIntersection])
-                .insert(i);
-              std::get<1>(relevantIntersections[involvedIntersection])
-                .insert(j);
-            }
-
-            if (keepIntersection) {
-              std::set<size_t> localSet;
-              localSet.insert(i);
-              localSet.insert(j);
-              intersection_loops_tuple relevantIntersection =
-                std::make_tuple(intersection, localSet);
-              relevantIntersections.push_back(relevantIntersection);
-              intersectionsOfEdges.insert_or_assign(
-                edgePairHash,
-                static_cast<long int>(relevantIntersections.size()) - 1);
+          for (int dir = 0; dir < 3; ++dir) {
+            if (
+              // "normal" case
+              ((loop_i_min[dir] <= loop_i_max[dir] &&
+                loop_j_min[dir] <= loop_j_max[dir]) &&
+               !(loop_j_min[dir] <= loop_i_max[dir] &&
+                 loop_j_max[dir] >= loop_i_min[dir])) ||
+              // periodic case in j
+              ((loop_i_min[dir] <= loop_i_max[dir] &&
+                loop_j_min[dir] > loop_j_max[dir]) &&
+               (loop_i_min[dir] >= loop_j_max[dir] &&
+                loop_i_max[dir] <= loop_j_min[dir])) ||
+              // periodic case in i
+              ((loop_i_min[dir] > loop_i_max[dir] &&
+                loop_j_min[dir] <= loop_j_max[dir]) &&
+               (loop_j_min[dir] >= loop_i_max[dir] &&
+                loop_j_max[dir] <= loop_i_min[dir])) ||
+              // both periodic -> both pass the boundary -> overlap anyway
+              ((loop_i_min[dir] > loop_i_max[dir] &&
+                loop_j_min[dir] > loop_j_max[dir]) &&
+               false)) {
+              //  -> no overlap in dir, skip this comparison
+              goto loop_j_checked;
             }
           }
+
+          // then, if we did not goto, we can actually find the entanglements
+          {
+            std::vector<pylimer_tools::entities::LoopIntersectionInfo>
+              intersections = this->universe.findLoopEntanglements(
+                loops[i], loops[j], loopEdges[i], loopEdges[j]);
+            for (pylimer_tools::entities::LoopIntersectionInfo intersection :
+                 intersections) {
+              bool keepIntersection = true;
+
+              // check if we want to keep it
+              // TODO: check if we want to keep it based on the direction /
+              // distance of the intersection
+
+              // check if we want to keep it, based on the edges involved
+              long int edgePairHash =
+                hash_integer_pair(intersection.edge1, intersection.edge2);
+              if (pylimer_tools::utils::map_has_key(intersectionsOfEdges,
+                                                    edgePairHash)) {
+                keepIntersection = false;
+                long int involvedIntersection =
+                  intersectionsOfEdges.at(edgePairHash);
+                std::get<1>(relevantIntersections[involvedIntersection])
+                  .insert(i);
+                std::get<1>(relevantIntersections[involvedIntersection])
+                  .insert(j);
+              }
+
+              if (keepIntersection) {
+                std::set<size_t> localSet;
+                localSet.insert(i);
+                localSet.insert(j);
+                intersection_loops_tuple relevantIntersection =
+                  std::make_tuple(intersection, localSet);
+                relevantIntersections.push_back(relevantIntersection);
+                intersectionsOfEdges.insert_or_assign(
+                  edgePairHash,
+                  static_cast<long int>(relevantIntersections.size()) - 1);
+              }
+            }
+          }
+
+        loop_j_checked:;
         }
 
         // make space: cleanup the loop i

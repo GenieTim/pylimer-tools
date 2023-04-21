@@ -1,6 +1,10 @@
 include(ExternalProject)
 # include(FetchContent)
 
+if (NOT DEFINED vendor_suffix)
+	set(vendor_suffix "")
+endif()
+
 # download, compile & install igraph
 # TODO: enable possibility of including externally installed igraph library
 if (NOT DEFINED igraph_LOADED)
@@ -18,17 +22,17 @@ if (NOT DEFINED igraph_LOADED)
 				igraphLib
 				GIT_REPOSITORY https://github.com/igraph/igraph.git
 				GIT_TAG c9426b5d9fa841d93a311f46ddef9ed1d97576ac # 0.10.4
-				PREFIX ${CMAKE_CURRENT_LIST_DIR}/igraph
-				INSTALL_DIR ${CMAKE_CURRENT_LIST_DIR}/igraph/igraphLib-install
-				CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_LIST_DIR}/igraph/igraphLib-install -DCMAKE_INSTALL_LIBDIR=${CMAKE_CURRENT_LIST_DIR}/igraph/igraphLib-install/lib -DCMAKE_C_FLAGS="-fPIC"
-				BUILD_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_LIST_DIR}/igraph/src/igraphLib-build --config Release
-				BUILD_BYPRODUCTS ${CMAKE_CURRENT_LIST_DIR}/igraph/igraphLib-install/lib/${LIBRARY_PREFIX}igraph${LIBRARY_SUFFIX}
+				PREFIX ${CMAKE_CURRENT_LIST_DIR}/igraph${vendor_suffix}
+				INSTALL_DIR ${CMAKE_CURRENT_LIST_DIR}/igraph${vendor_suffix}/igraphLib-install
+				CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_LIST_DIR}/igraph${vendor_suffix}/igraphLib-install -DCMAKE_INSTALL_LIBDIR=${CMAKE_CURRENT_LIST_DIR}/igraph/igraphLib-install/lib -DCMAKE_C_FLAGS="-fPIC"
+				BUILD_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_LIST_DIR}/igraph${vendor_suffix}/src/igraphLib-build --config Release
+				BUILD_BYPRODUCTS ${CMAKE_CURRENT_LIST_DIR}/igraph${vendor_suffix}/igraphLib-install/lib/${LIBRARY_PREFIX}igraph${LIBRARY_SUFFIX}
 				UPDATE_DISCONNECTED ON
 		)
 		# FetchContent_MakeAvailable(igraphLib)
 		add_library(igraph SHARED IMPORTED)
 		add_dependencies(igraph igraphLib)
-		set(igraph_PREFIX_PATH "${CMAKE_CURRENT_LIST_DIR}/igraph")
+		set(igraph_PREFIX_PATH "${CMAKE_CURRENT_LIST_DIR}/igraph${vendor_suffix}")
 		if (MSVC)
 			set(igraph_INCLUDE_DIRS "${igraph_PREFIX_PATH}/igraphLib-install/include" "${igraph_PREFIX_PATH}/src/igraphLib/msvc/include")
 		else()
