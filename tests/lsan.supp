@@ -1,3 +1,2 @@
 # This is a known leak.
 leak:realizeClassWithoutSwift
-GCDAProfiling.c:395
