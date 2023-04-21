@@ -1156,9 +1156,26 @@ namespace calc {
       // reduced loops = loops, but only the (new) spring indices
       std::vector<std::vector<size_t>> reducedLoops;
       reducedLoops.reserve(loops.size());
+      // min & max coordinates of the loops in order to easily know 
+      // a priori whether it makes sense to compare two loops or not
+      std::vector<std::array<double, 3>> loopMinCoords;
+      loopMinCoords.reserve(loops.size());
+      std::vector<std::array<double, 3>> loopMaxCoords;
+      loopMaxCoords.reserve(loops.size());
       for (std::vector<long int> loop : loops) {
         std::set<size_t> reducedLoop;
+        std::array<double, 3> minCoords;
+        this->universe.getAtom(loop[0]).getCoordinates(&minCoords);
+        std::array<double, 3> maxCoords;
+        this->universe.getAtom(loop[0]).getCoordinates(&maxCoords);
         for (size_t i = 0; i < loop.size(); ++i) {
+          // max & min coordinates
+          // TODO: implement, such that the max & min work also with infinite
+          // loops 
+          // assume each subsequent atom is bonded with a bond shorter
+          // than half the bond
+
+          // reduced loop
           if (this->universe.getPropertyValue<long int>("type", loop[i]) !=
               this->crosslinkerType) {
             // set takes care of duplicates, yet this is not efficient at all.
