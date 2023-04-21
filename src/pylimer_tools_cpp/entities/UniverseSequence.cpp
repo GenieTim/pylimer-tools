@@ -323,6 +323,7 @@ namespace entities {
    */
   std::unordered_map<int, double> UniverseSequence::computeMsdForAtoms(
     const std::vector<long int> atomIds,
+    int nrOfOrigins,
     bool reduceMemory)
   {
     igraph_vector_int_t vertex_ids;
@@ -332,13 +333,23 @@ namespace entities {
       igraph_vector_int_push_back(&vertex_ids,
                                   initialUniverse.getIdxByAtomId(atomId));
     }
+    pylimer_tools::entities::Box box = initialUniverse.getBox();
     std::unordered_map<int, std::vector<double>> results;
     results.reserve(this->getLength());
+    std::vector<Eigen::VectorXd> coordinates;
+    coordinates.reserve(this->getLength());
+    std::vector<int> timesteps;
+    timesteps.reserve(this->getLength());
+
     // initial loop to reserve everything
-    for (size_t universe_idx = 1; universe_idx < this->getLength();
+    for (size_t universe_idx = 0; universe_idx < this->getLength();
          ++universe_idx) {
       pylimer_tools::entities::Universe current_universe =
         this->atIndex(universe_idx);
+      Eigen::VectorXd current_coordinates =
+        current_universe.getUnwrappedVertexCoordinates(vertex_ids, &box);
+      coordinates.push_back(current_coordinates);
+      timesteps.push_back(current_universe.getTimestep());
       int delta_t =
         (current_universe.getTimestep() - initialUniverse.getTimestep());
       std::vector<double> resultsVec;
@@ -352,44 +363,33 @@ namespace entities {
         this->forgetAtIndex(universe_idx);
       }
     }
+
     // next, we actually start computations
     // this is a highly inefficient algorithm, but no idea how to do better
     // (except for omitting some data, skipping the graph, or other minor
     // optimizations)
-    pylimer_tools::entities::Box box = initialUniverse.getBox();
+    const int stepSize = std::max(
+      1, static_cast<int>(std::floor(this->getLength() / nrOfOrigins)));
+    Eigen::VectorXd distance = Eigen::VectorXd::Zero(3 * atomIds.size());
     for (size_t parent_universe_idx = 0;
          parent_universe_idx < this->getLength();
-         parent_universe_idx++) {
-      pylimer_tools::entities::Universe parent_universe =
-        this->atIndex(parent_universe_idx);
-
-      Eigen::VectorXd parent_coordinates =
-        parent_universe.getUnwrappedVertexCoordinates(vertex_ids, &box);
+         parent_universe_idx += stepSize) {
 
       for (size_t universe_idx = parent_universe_idx + 1;
            universe_idx < this->getLength();
            ++universe_idx) {
-        pylimer_tools::entities::Universe current_universe =
-          this->atIndex(universe_idx);
+
         int delta_t =
-          (current_universe.getTimestep() - parent_universe.getTimestep());
+          (timesteps[universe_idx] - timesteps[parent_universe_idx]);
 
-        Eigen::VectorXd current_coordinates =
-          current_universe.getUnwrappedVertexCoordinates(vertex_ids, &box);
-
-        Eigen::VectorXd distance = parent_coordinates - current_coordinates;
+        distance = coordinates[parent_universe_idx] - coordinates[universe_idx];
         for (size_t atom_id = 0; atom_id < atomIds.size(); ++atom_id) {
           results[delta_t].push_back(
             distance.segment(3 * atom_id, 3).squaredNorm());
         }
-
-        if (reduceMemory) {
-          this->forgetAtIndex(universe_idx);
-        }
       }
-      if (reduceMemory) {
-        this->forgetAtIndex(parent_universe_idx);
-      }
+      std::cout << "Universe " << parent_universe_idx
+                << " as basis has been handled." << std::endl;
     }
 
     igraph_vector_int_destroy(&vertex_ids);

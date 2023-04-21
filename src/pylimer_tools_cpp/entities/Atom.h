@@ -96,9 +96,9 @@ namespace entities {
       result[0] = this->getX() - 0.5 * distanceVec[0];
       result[1] = this->getY() - 0.5 * distanceVec[1];
       result[2] = this->getZ() - 0.5 * distanceVec[2];
-      return box->placeInBox(result);
+      return box->minImageDistances(result);
     }
-    
+
     std::array<double, 3> meanPositionWithUnwrapped(Atom b, const Box* box) const
     {
       double distanceVec[3];
@@ -107,7 +107,7 @@ namespace entities {
       result[0] = this->getX() - 0.5 * distanceVec[0];
       result[1] = this->getY() - 0.5 * distanceVec[1];
       result[2] = this->getZ() - 0.5 * distanceVec[2];
-      return box->placeInBox(result);
+      return box->minImageDistances(result);
     }
 
     double distanceTo(Atom b, const Box* box) const
