@@ -239,9 +239,8 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                       false);
     REQUIRE(universe.getNrOfBonds() == 8);
     const std::vector<long int> empty;
-    CHECK(
-      universe.findLoopEntanglements(empty, empty, empty, empty).size() ==
-      0);
+    CHECK(universe.findLoopEntanglements(empty, empty, empty, empty).size() ==
+          0);
     CHECK(
       universe
         .findLoopEntanglements({ { 1, 2, 7 } }, { { 0, 3, 6 } }, empty, empty)
@@ -317,53 +316,55 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       masses[2] = 2.0;
       universe.setMasses(masses);
       std::map<int, double> newMasses = universe.getMasses();
-      REQUIRE(newMasses[1] == 1.0);
-      REQUIRE(newMasses[2] == 2.0);
+      CHECK(newMasses[1] == 1.0);
+      CHECK(newMasses[2] == 2.0);
       std::map<int, double> weightFraction = universe.computeWeightFractions();
-      REQUIRE(weightFraction[1] == (5.0 * 1.0) / (3.0 * 2.0 + 5.0 * 1.0));
-      REQUIRE(weightFraction[2] == (2.0 * 3.0) / (3.0 * 2.0 + 5.0 * 1.0));
-      REQUIRE(universe.computeTotalMass() == Catch::Approx(5 * 1.0 + 3 * 2.0));
+      CHECK(weightFraction[1] == (5.0 * 1.0) / (3.0 * 2.0 + 5.0 * 1.0));
+      CHECK(weightFraction[2] == (2.0 * 3.0) / (3.0 * 2.0 + 5.0 * 1.0));
+      CHECK(universe.computeTotalMass() == Catch::Approx(5 * 1.0 + 3 * 2.0));
       std::map<int, double> otherMasses(masses);
       otherMasses[2] = 0.0;
-      REQUIRE(otherMasses[2] == 0.0);
-      REQUIRE(universe.computeTotalMassWithMasses(otherMasses) ==
-              Catch::Approx(5 * 1.0));
+      CHECK(otherMasses[2] == 0.0);
+      CHECK(universe.computeTotalMassWithMasses(otherMasses) ==
+            Catch::Approx(5 * 1.0));
     }
 
     SECTION("Bonds can be removed")
     {
       int bondsBefore = universe.getNrOfBonds();
+      REQUIRE(bondsBefore == 7);
+      universe.writeGraphToFile("test-graph.gml");
       REQUIRE_THROWS(universe.removeBonds({ {} }, { { 1, 2, 3 } }));
       universe.removeBonds({ { 1, 2, 3 } }, { { 2, 3, 6 } });
-      REQUIRE(universe.getNrOfBonds() == bondsBefore - 3);
+      CHECK(universe.getNrOfBonds() == bondsBefore - 3);
     }
 
     SECTION("Get bonds returns")
     {
       auto edges = universe.getEdges();
-      REQUIRE(edges["edge_from"][0] == 1 - 1);
-      REQUIRE(edges["edge_to"][0] == 2 - 1);
+      CHECK(edges["edge_from"][0] == 1 - 1);
+      CHECK(edges["edge_to"][0] == 2 - 1);
       auto bonds = universe.getBonds();
-      REQUIRE(bonds.at("bond_from")[0] == 1);
-      REQUIRE(bonds.at("bond_to")[0] == 2);
-      REQUIRE(bonds["bond_from"].size() == bonds["bond_to"].size());
-      REQUIRE(bonds["bond_from"].size() == edges["edge_to"].size());
-      REQUIRE(bonds["bond_from"].size() == edges["edge_from"].size());
-      REQUIRE(bonds["bond_from"].size() == 7);
-      REQUIRE(bonds["bond_from"][3] ==
-              universe.getAtomIdByIdx(edges["edge_from"][3]));
-      REQUIRE(bonds["bond_to"][3] ==
-              universe.getAtomIdByIdx(edges["edge_to"][3]));
-      REQUIRE(universe.getIdxByAtomId(bonds["bond_from"][2]) ==
-              edges["edge_from"][2]);
-      REQUIRE(universe.getIdxByAtomId(bonds["bond_to"][2]) ==
-              edges["edge_to"][2]);
-      // REQUIRE(bonds["bond_type"][5] == 1);
-      // REQUIRE(bonds["bond_type"][6] == 11);
+      CHECK(bonds.at("bond_from")[0] == 1);
+      CHECK(bonds.at("bond_to")[0] == 2);
+      CHECK(bonds["bond_from"].size() == bonds["bond_to"].size());
+      CHECK(bonds["bond_from"].size() == edges["edge_to"].size());
+      CHECK(bonds["bond_from"].size() == edges["edge_from"].size());
+      CHECK(bonds["bond_from"].size() == 7);
+      CHECK(bonds["bond_from"][3] ==
+            universe.getAtomIdByIdx(edges["edge_from"][3]));
+      CHECK(bonds["bond_to"][3] ==
+            universe.getAtomIdByIdx(edges["edge_to"][3]));
+      CHECK(universe.getIdxByAtomId(bonds["bond_from"][2]) ==
+            edges["edge_from"][2]);
+      CHECK(universe.getIdxByAtomId(bonds["bond_to"][2]) ==
+            edges["edge_to"][2]);
+      CHECK(bonds["bond_type"][5] == 1);
+      CHECK(bonds["bond_type"][6] == 11);
       // get atoms with type returns
-      REQUIRE(universe.getAtomsOfType(2).size() == 3);
-      REQUIRE(universe.getAtomsOfType(1).size() == 5);
-      REQUIRE(universe.getAtomsOfType(0).size() == 0);
+      CHECK(universe.getAtomsOfType(2).size() == 3);
+      CHECK(universe.getAtomsOfType(1).size() == 5);
+      CHECK(universe.getAtomsOfType(0).size() == 0);
     }
 
     SECTION("internal lengths are computed correctly")

@@ -74,7 +74,7 @@ namespace entities {
                   std::vector<long int> to,
                   std::vector<int> bondTypes,
                   const bool ignoreNonExistentAtoms = false,
-                  const bool simplify = true);
+                  const bool simplify = false);
     void removeBonds(const std::vector<long int> atomIdsFrom,
                      const std::vector<long int> atomIdsTo);
     // others

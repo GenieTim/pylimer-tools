@@ -131,6 +131,7 @@
     "hash_map": "cpp",
     "shared_mutex": "cpp",
     "cfenv": "cpp",
-    "__verbose_abort": "cpp"
+    "__verbose_abort": "cpp",
+    "globals.h": "c"
   }
 }

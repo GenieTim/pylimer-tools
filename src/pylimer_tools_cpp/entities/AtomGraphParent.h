@@ -375,6 +375,8 @@ namespace entities {
       return results;
     }
 
+    void writeGraphToFile(const std::string& filename) const;
+
   protected:
     igraph_t graph;
     igraph_vs_t getVerticesWithDegreeSelector(int degree) const;

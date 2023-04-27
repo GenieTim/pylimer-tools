@@ -16,6 +16,11 @@
     throw std::runtime_error(message "\nFailed condition: " #condition);       \
   }
 
+#define REQUIRE_IGRAPH_SUCCESS(igraph_call)                                    \
+  if (igraph_call) {                                                           \
+    throw std::runtime_error("Failure when calling igraph: " #igraph_call);    \
+  }
+
 #define APPROX_EQUAL(value1, value2, eps)                                      \
   value1 + eps >= value2&& value1 - eps <= value2
 

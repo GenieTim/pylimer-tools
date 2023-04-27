@@ -26,7 +26,9 @@ namespace entities {
   Universe::Universe(Box box)
   {
     /* turn on attribute handling: TODO: move to some main() function  */
-    igraph_set_attribute_table(&igraph_cattribute_table);
+    if (!igraph_has_attribute_table()) {
+      igraph_set_attribute_table(&igraph_cattribute_table);
+    }
     this->box = box;
 
     // igraph_vector_t gtypes, vtypes, etypes;
@@ -285,11 +287,16 @@ namespace entities {
       std::vector<long int> edgeIds =
         this->getEdgeIdsFromTo(this->getIdxByAtomId(atomIdsFrom[i]),
                                this->getIdxByAtomId(atomIdsTo[i]));
-      igraph_vector_int_t edgeIdsV;
-      igraph_vector_int_init(&edgeIdsV, edgeIds.size());
-      pylimer_tools::utils::StdVectorToIgraphVectorT(edgeIds, &edgeIdsV);
-      igraph_delete_edges(&this->graph, igraph_ess_vector(&edgeIdsV));
-      igraph_vector_int_destroy(&edgeIdsV);
+      if (edgeIds.size() > 1) {
+        igraph_vector_int_t edgeIdsV;
+        igraph_vector_int_init(&edgeIdsV, edgeIds.size());
+        pylimer_tools::utils::StdVectorToIgraphVectorT(edgeIds, &edgeIdsV);
+        igraph_delete_edges(&this->graph, igraph_ess_vector(&edgeIdsV));
+        igraph_vector_int_destroy(&edgeIdsV);
+      } else if (edgeIds.size() == 1) {
+        assert(edgeIds[0] < this->getNrOfBonds());
+        igraph_delete_edges(&this->graph, igraph_ess_1(edgeIds[0]));
+      }
     }
 
     this->NBonds = igraph_ecount(&this->graph);
@@ -313,12 +320,14 @@ namespace entities {
                           const bool ignoreNonExistentAtoms,
                           const bool simplify)
   {
-    if (from.size() != to.size() || from.size() != NNewBonds) {
+    if (from.size() != to.size() || from.size() != NNewBonds ||
+        (bondTypes.size() != NNewBonds && bondTypes.size() != 0)) {
       throw std::invalid_argument("All bond inputs must have the same size.");
     }
     std::vector<long int> newEdgesVector =
       pylimer_tools::utils::interleave(from, to);
     size_t edgesSize = newEdgesVector.size();
+    assert(edgesSize == NNewBonds * 2);
     // translate from atomId to VertexIdx
     igraph_vector_int_t newEdges;
     size_t actualNrOfBondsAdded = 0;
@@ -326,6 +335,7 @@ namespace entities {
     int innerIndex = 0;
     for (size_t i = 1; i < edgesSize; i += 2) {
       try {
+        // two at once to throw in case one end cannot be resolved
         size_t vertexFrom = this->atomIdToVertexIdx.at(newEdgesVector[i - 1]);
         size_t vertexTo = this->atomIdToVertexIdx.at(newEdgesVector[i]);
         igraph_vector_int_set(
@@ -348,6 +358,9 @@ namespace entities {
       }
     }
     assert(innerIndex == 2 * actualNrOfBondsAdded);
+    if (!ignoreNonExistentAtoms) {
+      assert(actualNrOfBondsAdded == NNewBonds);
+    }
     igraph_vector_int_resize(&newEdges, 2 * actualNrOfBondsAdded);
     // add the new edges
     if (igraph_add_edges(&this->graph, &newEdges, 0)) {
@@ -356,16 +369,25 @@ namespace entities {
     igraph_vector_int_destroy(&newEdges);
     if (actualNrOfBondsAdded > 0) {
       // add attributes
-      // if (bondTypes.size() == NNewBonds && this->NBonds ==
-      // igraph_ecount(&this->graph) - NNewBonds)
-      // {
-      //   for (size_t i = 0; i < NNewBonds; ++i)
-      //   {
-      //     // append attributes
-      //     igraph_cattribute_EAN_set(&this->graph, "type", this->NBonds + i,
-      //     bondTypes[i]);
-      //   }
-      // }
+      if (bondTypes.size() == NNewBonds &&
+          this->NBonds == (igraph_ecount(&this->graph) - NNewBonds)) {
+        if (this->NBonds == 0) {
+          // fast track
+          igraph_vector_t types_igraph_vec;
+          igraph_vector_init(&types_igraph_vec, NNewBonds);
+          pylimer_tools::utils::StdVectorToIgraphVectorT(bondTypes,
+                                                         &types_igraph_vec);
+          REQUIRE_IGRAPH_SUCCESS(igraph_cattribute_EAN_setv(
+            &this->graph, "type", &types_igraph_vec));
+          igraph_vector_destroy(&types_igraph_vec);
+        } else {
+          for (size_t i = 0; i < NNewBonds; ++i) {
+            // append attributes
+            REQUIRE_IGRAPH_SUCCESS(igraph_cattribute_EAN_set(
+              &this->graph, "type", this->NBonds + i, bondTypes[i]));
+          }
+        }
+      }
       // else: too risky to add bond attributes
       // simplify graph
       // this->NBonds += NNewBonds;
@@ -396,6 +418,11 @@ namespace entities {
   {
     igraph_attribute_combination_t comb;
     igraph_attribute_combination_init(&comb);
+    // how to combine two edges and their attributes
+    // currently, only the type attribute exists.
+    // let's take the mean.
+    igraph_attribute_combination_add(
+      &comb, NULL, IGRAPH_ATTRIBUTE_COMBINE_MEAN, NULL);
     igraph_simplify(&this->graph, /*multiple=*/1, /*loops=*/1, &comb);
     igraph_attribute_combination_destroy(&comb);
     this->NBonds = igraph_ecount(&this->graph);
