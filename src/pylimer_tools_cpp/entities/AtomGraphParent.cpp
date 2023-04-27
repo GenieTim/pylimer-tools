@@ -6,11 +6,11 @@ extern "C"
 #include "../utils/StringUtils.h"
 #include "Atom.h"
 #include "AtomGraphParent.h"
+#include <Eigen/Dense>
 #include <algorithm>
 #include <map>
 #include <unordered_map>
 #include <vector>
-#include <Eigen/Dense>
 
 namespace pylimer_tools {
 namespace entities {
@@ -384,18 +384,19 @@ namespace entities {
 
     igraph_vector_int_destroy(&allEdges);
 
-    // if (igraph_cattribute_has_attr(&this->graph, IGRAPH_ATTRIBUTE_EDGE,
-    // "type"))
-    // {
-    //   igraph_vector_t typesVec;
-    //   igraph_vector_init(&typesVec, 0);
-    //   igraph_cattribute_EANV(&this->graph, "type",
-    //   igraph_ess_all(IGRAPH_EDGEORDER_ID), &typesVec);
-    //   pylimer_tools::utils::igraphVectorTToStdVector(&typesVec, type);
-    //   igraph_vector_destroy(&typesVec);
-    // }
-    // else
-    {
+    if (igraph_cattribute_has_attr(
+          &this->graph, IGRAPH_ATTRIBUTE_EDGE, "type")) {
+      igraph_vector_t typesVec;
+      igraph_vector_init(&typesVec, 0);
+      if (igraph_cattribute_EANV(&this->graph,
+                                 "type",
+                                 igraph_ess_all(IGRAPH_EDGEORDER_ID),
+                                 &typesVec)) {
+        throw std::runtime_error("Failed to fetch type attribute");
+      }
+      pylimer_tools::utils::igraphVectorTToStdVector(&typesVec, type);
+      igraph_vector_destroy(&typesVec);
+    } else {
       for (size_t i = 0; i < this->getNrOfBonds(); ++i) {
         type.push_back(-1); // TODO: find a nice default
       }
@@ -511,5 +512,11 @@ namespace entities {
 
     return result;
   }
+
+    void AtomGraphParent::writeGraphToFile(const std::string& filename) const {
+      FILE* fp = fopen(filename.c_str(), "w");
+      igraph_write_graph_gml(&this->graph, fp, 0, NULL, "PylimerTools");
+      fclose(fp);
+    };
 } // namespace entities
 } // namespace pylimer_tools
