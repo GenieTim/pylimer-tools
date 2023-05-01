@@ -256,7 +256,7 @@ namespace entities {
                          this->dataFileParser.getBondFrom(),
                          this->dataFileParser.getBondTo(),
                          this->dataFileParser.getBondTypes(),
-                         true);
+                         true, false);
     newUniverse.setMasses(this->dataFileParser.getMasses());
     return newUniverse;
   };
@@ -284,7 +284,7 @@ namespace entities {
     universe.addBonds(fileParser.getNrOfBonds(),
                       fileParser.getBondFrom(),
                       fileParser.getBondTo(),
-                      fileParser.getBondTypes());
+                      fileParser.getBondTypes(), false, false);
     universe.setMasses(fileParser.getMasses());
     if (fileParser.getNrOfAngles() > 0) {
       universe.addAngles(fileParser.getAngleFrom(),
