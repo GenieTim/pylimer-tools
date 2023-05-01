@@ -185,11 +185,9 @@ namespace entities {
     }
 
     Eigen::VectorXd getUnwrappedVertexCoordinates(
-      igraph_vector_int_t& vertices,
+      const igraph_vs_t selector,
       const pylimer_tools::entities::Box* box) const
     {
-      size_t size = igraph_vector_int_size(&vertices);
-
       igraph_vector_t xvalues;
       igraph_vector_init(&xvalues, 0);
       igraph_vector_t yvalues;
@@ -204,30 +202,31 @@ namespace entities {
       igraph_vector_init(&nzvalues, 0);
 
       if (igraph_cattribute_VANV(
-            &this->graph, "x", igraph_vss_vector(&vertices), &xvalues)) {
+            &this->graph, "x", igraph_vss_all(), &xvalues)) {
         throw std::runtime_error("Failed to query property x of graph.");
       }
       if (igraph_cattribute_VANV(
-            &this->graph, "y", igraph_vss_vector(&vertices), &yvalues)) {
+            &this->graph, "y", igraph_vss_all(), &yvalues)) {
         throw std::runtime_error("Failed to query property y of graph.");
       }
       if (igraph_cattribute_VANV(
-            &this->graph, "z", igraph_vss_vector(&vertices), &zvalues)) {
+            &this->graph, "z", igraph_vss_all(), &zvalues)) {
         throw std::runtime_error("Failed to query property z of graph.");
       }
       if (igraph_cattribute_VANV(
-            &this->graph, "nx", igraph_vss_vector(&vertices), &nxvalues)) {
+            &this->graph, "nx", igraph_vss_all(), &nxvalues)) {
         throw std::runtime_error("Failed to query property nx of graph.");
       }
       if (igraph_cattribute_VANV(
-            &this->graph, "ny", igraph_vss_vector(&vertices), &nyvalues)) {
+            &this->graph, "ny", igraph_vss_all(), &nyvalues)) {
         throw std::runtime_error("Failed to query property ny of graph.");
       }
       if (igraph_cattribute_VANV(
-            &this->graph, "nz", igraph_vss_vector(&vertices), &nzvalues)) {
+            &this->graph, "nz", igraph_vss_all(), &nzvalues)) {
         throw std::runtime_error("Failed to query property nz of graph.");
       }
 
+      const size_t size = igraph_vector_size(&xvalues);
       Eigen::VectorXd results = Eigen::VectorXd::Zero(size * 3);
       for (size_t i = 0; i < size; i++) {
         results[3 * i] = igraph_vector_get(&xvalues, i) +
@@ -246,6 +245,20 @@ namespace entities {
       igraph_vector_destroy(&nzvalues);
 
       return results;
+    }
+
+    Eigen::VectorXd getUnwrappedVertexCoordinates(
+      const pylimer_tools::entities::Box* box) const
+    {
+      return this->getUnwrappedVertexCoordinates(igraph_vss_all(), box);
+    }
+
+    Eigen::VectorXd getUnwrappedVertexCoordinates(
+      igraph_vector_int_t& vertices,
+      const pylimer_tools::entities::Box* box) const
+    {
+      return this->getUnwrappedVertexCoordinates(igraph_vss_vector(&vertices),
+                                                 box);
     }
 
     Eigen::VectorXd getUnwrappedVertexCoordinates(
