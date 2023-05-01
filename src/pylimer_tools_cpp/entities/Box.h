@@ -16,6 +16,7 @@ namespace entities {
   {
   private:
     double L[3];
+    double volume;
     double boxHalfs[3];
     double oneOverL[3];
     double loCoords[3];
@@ -72,11 +73,15 @@ namespace entities {
         this->boxHalfs[i] = L[i] * 0.5;
         this->oneOverL[i] = 1.0 / L[i];
       }
+      this->volume = this->getLx() * this->getLy() * this->getLz();
     }
 
   public:
-    Box(const double Lx = 0.0, const double Ly = 0.0, const double Lz = 0.0)
+    Box(const double Lx = 1.0, const double Ly = 1.0, const double Lz = 1.0)
     {
+      INVALIDARG_EXP_IFN(
+        Lx > 0 && Ly > 0 && Lz > 0,
+        "The box must be instantiated with positive lengths.");
       this->loCoords[0] = 0.0;
       this->hiCoords[0] = Lx;
       this->loCoords[1] = 0.0;
@@ -93,6 +98,9 @@ namespace entities {
         const double zLo,
         const double zHi)
     {
+      INVALIDARG_EXP_IFN(
+        xHi > xLo && yHi > yLo && zHi > zLo,
+        "The box must be instantiated with positive lengths.");
       this->loCoords[0] = xLo;
       this->hiCoords[0] = xHi;
       this->loCoords[1] = yLo;
@@ -109,10 +117,7 @@ namespace entities {
       this->shearDirection = newShearDirection;
     }
 
-    double getVolume() const
-    {
-      return this->getLx() * this->getLy() * this->getLz();
-    }
+    double getVolume() const { return this->volume; }
 
     double getL(const int i) const { return this->L[i % 3]; }
     double getLowL(const int i) const { return this->loCoords[i % 3]; }

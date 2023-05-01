@@ -1,6 +1,7 @@
 #ifndef PYBIND_CALC_H
 #define PYBIND_CALC_H
 
+#include "../calc/DPDSimulator.h"
 #include "../calc/MEHPForceBalance.h"
 // #include "../calc/MEHPForceBalance2.h"
 #include "../calc/MEHPForceEvaluator.h"
@@ -1104,6 +1105,75 @@ init_pylimer_bound_calc(py::module_& m)
   //           current state of the simulation.
   //      )pbdoc",
   //          py::arg("newCrosslinkerType") = 2);
+
+  /**
+   * DPD Simulations
+   */
+  py::class_<dpd::DPDSimulator>(m,
+                                "DPDSimulator",
+                                R"pbdoc(
+          A quick-and-dirty implementation of the DPD simulation
+          with slip-springs as presented by Langeloth et al.
+     )pbdoc")
+    .def(
+      py::init<const pe::Universe, const int, const bool, const std::string>(),
+      "Get an instance of this class",
+      py::arg("universe"),
+      py::arg("crosslinker_type") = 2,
+      py::arg("is_2D") = false,
+      py::arg("seed") = "")
+    .def("runSimulation",
+         &dpd::DPDSimulator::runSimulation,
+         R"pbdoc(
+          Actually do some simulation steps.
+     )pbdoc",
+         py::arg("n_steps"),
+         py::arg("dt") = 0.06,
+         py::arg("lambda") = 0.65,
+         py::arg("with_MC") = false)
+    .def("createSlipSprings",
+         &dpd::DPDSimulator::createSlipSprings,
+         R"pbdoc(
+          Randomly add the specified number of slip-springs to neighbours within the specified cut-offs.
+     )pbdoc",
+         py::arg("num"))
+    .def("configA",
+         &dpd::DPDSimulator::configA,
+         R"pbdoc(
+          Configure the force-field (pair-style) parameter `A`.
+     )pbdoc",
+         py::arg("A") = 25.)
+    .def("configSigma",
+         &dpd::DPDSimulator::configSigma,
+         R"pbdoc(
+          Configure the force-field (pair-style) parameter `\sigma`.
+     )pbdoc",
+         py::arg("sigma") = 3.)
+    .def("configSpringConstant",
+         &dpd::DPDSimulator::configSpringConstant,
+         R"pbdoc(
+          Configure the force-field (bond-style) parameter `k`, the spring constant.
+     )pbdoc",
+         py::arg("k") = 2.)
+    .def("configLambda",
+         &dpd::DPDSimulator::configLambda,
+         R"pbdoc(
+          Configure the modified velocity verlet integration parameter `\lambda`.
+     )pbdoc",
+         py::arg("l") = 0.65)
+    .def("configSlipspringHighCutoff",
+         &dpd::DPDSimulator::configSlipspringHighCutoff,
+         R"pbdoc(
+          Configure the lower cut-off of how far a pair may be distanced for a slip-spring to be created.
+     )pbdoc",
+         py::arg("cutoff") = 2.)
+    .def("configSlipspringLowCutoff",
+         &dpd::DPDSimulator::configSlipspringLowCutoff,
+         R"pbdoc(
+          Configure the higher cut-off of how far a pair may be distanced for a slip-spring to be created.
+     )pbdoc",
+         py::arg("cutoff") = 0.5)
+    .def("validateState", &dpd::DPDSimulator::validateState);
 }
 
 #endif /* PYBIND_CALC_H */
