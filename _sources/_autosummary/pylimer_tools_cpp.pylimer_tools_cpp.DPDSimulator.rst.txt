@@ -25,7 +25,9 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.DPDSimulator
       ~DPDSimulator.configSlipspringLowCutoff
       ~DPDSimulator.configSpringConstant
       ~DPDSimulator.createSlipSprings
+      ~DPDSimulator.getUniverse
       ~DPDSimulator.runSimulation
+      ~DPDSimulator.startMeasuringMSDForAtoms
       ~DPDSimulator.validateState
    
    

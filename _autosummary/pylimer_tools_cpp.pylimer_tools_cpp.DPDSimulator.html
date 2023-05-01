@@ -284,8 +284,14 @@ with slip-springs as presented by Langeloth et al.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.createSlipSprings" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.createSlipSprings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">createSlipSprings</span></code></a>(self, num)</p></td>
 <td><p>Randomly add the specified number of slip-springs to neighbours within the specified cut-offs.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.runSimulation" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.runSimulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">runSimulation</span></code></a>(self, n_steps, dt, lambda, with_MC)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.getUniverse" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.getUniverse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getUniverse</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.runSimulation" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.runSimulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">runSimulation</span></code></a>(self, n_steps, dt, lambda, with_MC)</p></td>
 <td><p>Actually do some simulation steps.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.startMeasuringMSDForAtoms" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.startMeasuringMSDForAtoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">startMeasuringMSDForAtoms</span></code></a>(self, atom_ids)</p></td>
+<td><p>Set a new origin for measuing the mean square displacement for a specified set of atoms</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.validateState" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.validateState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validateState</span></code></a>(self)</p></td>
 <td><p></p></td>
@@ -336,9 +342,20 @@ with slip-springs as presented by Langeloth et al.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.getUniverse">
+<span class="sig-name descname"><span class="pre">getUniverse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.getUniverse" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.runSimulation">
 <span class="sig-name descname"><span class="pre">runSimulation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self:</span> <span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_steps:</span> <span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.06</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lambda:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">0.65</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_MC:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.runSimulation" title="Permalink to this definition">#</a></dt>
 <dd><p>Actually do some simulation steps.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.startMeasuringMSDForAtoms">
+<span class="sig-name descname"><span class="pre">startMeasuringMSDForAtoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.startMeasuringMSDForAtoms" title="Permalink to this definition">#</a></dt>
+<dd><p>Set a new origin for measuing the mean square displacement for a specified set of atoms</p>
 </dd></dl>
 
 <dl class="py method">
@@ -414,7 +431,9 @@ with slip-springs as presented by Langeloth et al.</p>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configSlipspringLowCutoff"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configSlipspringLowCutoff()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configSpringConstant"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configSpringConstant()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.createSlipSprings"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.createSlipSprings()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.getUniverse"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.getUniverse()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.runSimulation"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.runSimulation()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.startMeasuringMSDForAtoms"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.startMeasuringMSDForAtoms()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.validateState"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.validateState()</span></code></a></li>
 </ul>
 </li>
