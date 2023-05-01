@@ -1173,6 +1173,13 @@ init_pylimer_bound_calc(py::module_& m)
           Configure the higher cut-off of how far a pair may be distanced for a slip-spring to be created.
      )pbdoc",
          py::arg("cutoff") = 0.5)
+    .def("startMeasuringMSDForAtoms",
+         &dpd::DPDSimulator::startMeasuringMSDForAtoms,
+         R"pbdoc(
+          Set a new origin for measuing the mean square displacement for a specified set of atoms
+         )pbdoc",
+         py::arg("atom_ids"))
+    .def("getUniverse", &dpd::DPDSimulator::getUniverse)
     .def("validateState", &dpd::DPDSimulator::validateState);
 }
 

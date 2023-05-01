@@ -75,7 +75,7 @@ namespace entities {
   {
     // std::cout << "Reading dump file at idx " << index << std::endl;
     this->dumpFileParser.readGroupByIdx(index);
-    Universe newUniverse = Universe(0.0, 0.0, 0.0);
+    Universe newUniverse = Universe(1.0, 1.0, 1.0);
     std::vector<long int> timeStepData =
       this->dumpFileParser.getValuesForAt<long int>(index, "TIMESTEP", 0);
     if (timeStepData.size() == 0) {
@@ -96,7 +96,9 @@ namespace entities {
           std::to_string(lo.size()) + " and " + std::to_string(hi.size()) +
           " instead of at least 3 each. Is the file defect?");
       }
-      newUniverse.setBoxLengths(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]);
+      pylimer_tools::entities::Box box =
+        Box(lo[0], hi[0], lo[1], hi[1], lo[2], hi[2]);
+      newUniverse.setBox(box);
     } else {
       newUniverse.setBoxLengths(this->dataFileParser.getLx(),
                                 this->dataFileParser.getLy(),
@@ -256,7 +258,8 @@ namespace entities {
                          this->dataFileParser.getBondFrom(),
                          this->dataFileParser.getBondTo(),
                          this->dataFileParser.getBondTypes(),
-                         true, false);
+                         true,
+                         false);
     newUniverse.setMasses(this->dataFileParser.getMasses());
     return newUniverse;
   };
@@ -284,7 +287,9 @@ namespace entities {
     universe.addBonds(fileParser.getNrOfBonds(),
                       fileParser.getBondFrom(),
                       fileParser.getBondTo(),
-                      fileParser.getBondTypes(), false, false);
+                      fileParser.getBondTypes(),
+                      false,
+                      false);
     universe.setMasses(fileParser.getMasses());
     if (fileParser.getNrOfAngles() > 0) {
       universe.addAngles(fileParser.getAngleFrom(),
