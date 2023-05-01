@@ -67,13 +67,15 @@ namespace calc {
        */
       double computeTemperature(const Eigen::VectorXd& velocities) const;
 
-    /**
-     * @brief Get access to the current stress-tensor
-     * 
-     * @return Eigen::Matrix3d 
-     */
+      /**
+       * @brief Get access to the current stress-tensor
+       *
+       * @return Eigen::Matrix3d
+       */
       Eigen::Matrix3d getStressTensor() const;
 
+      ////////////////////////////////////////////////////////////////
+      // MC Procedures
       /**
        * @brief Randomly add new slip-springs
        */
@@ -83,6 +85,8 @@ namespace calc {
 
       int relocateSlipSprings(const double kbT = 1.);
 
+      ////////////////////////////////////////////////////////////////
+      // configuration
       void configLambda(const double l) { this->lambda = l; }
 
       void configSpringConstant(const double nk) { this->k = nk; }
@@ -111,7 +115,13 @@ namespace calc {
 
       void configA(const double newA) { this->A = newA; }
 
+      void startMeasuringMSDForAtoms(const std::vector<size_t> atomIds);
+
+      ////////////////////////////////////////////////////////////////
+      // validation & export
       void validateState();
+
+      pylimer_tools::entities::Universe getUniverse() const;
 
     protected:
       void addSlipSprings(std::vector<size_t>& partnerA,
@@ -127,9 +137,9 @@ namespace calc {
                                     const size_t partnerAfter);
 
     private:
-      bool is2D;
-
+      ////////////////////////////////////////////////////////////////
       // configuration
+      bool is2D = false;
       double lambda = 0.65;
       double k = 2.;
       double lowCutoff = 0.5;
@@ -138,6 +148,7 @@ namespace calc {
       double sigma = 3;
       double gamma = 0.5 * 3 * 3;
 
+      ////////////////////////////////////////////////////////////////
       // simulation state
       long int currentStep = 0;
       Eigen::VectorXd currentVelocitiesPlus;
@@ -145,16 +156,20 @@ namespace calc {
       Eigen::VectorXd currentForces;
       Eigen::Matrix3d currentStressTensor;
 
+      ////////////////////////////////////////////////////////////////
       // randomness
       std::mt19937 e2;
       std::uniform_real_distribution<double> uniform_rand_mean0std1;
       std::uniform_real_distribution<double> uniform_rand_between_0_1;
 
+      ////////////////////////////////////////////////////////////////
       // universe structure
       int numAtoms = 0;
       int numBonds = 0;
       int numSlipSprings = 0;
       pylimer_tools::entities::Box box;
+      pylimer_tools::entities::Universe universe;
+
       // atoms
       Eigen::VectorXd coordinates;
       Eigen::ArrayXi idxFunctionalities;
@@ -169,6 +184,12 @@ namespace calc {
       std::vector<std::vector<size_t>> bondsOfIndex;
 
       pylimer_tools::entities::EigenNeighbourList neighbourlist;
+
+      ////////////////////////////////////////////////////////////////
+      // computation state
+      std::vector<Eigen::ArrayXi> msdMeasuredIndices;
+      std::vector<Eigen::VectorXd> msdOrigins;
+      std::vector<size_t> msdOriginTimesteps;
     };
   }
 

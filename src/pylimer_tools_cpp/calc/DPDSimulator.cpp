@@ -9,6 +9,7 @@ namespace calc {
                                const bool is2D,
                                const std::string seed)
       : box(u.getBox())
+      , universe(u)
       , neighbourlist(
           pylimer_tools::entities::EigenNeighbourList(Eigen::VectorXd(0),
                                                       this->box,
@@ -101,9 +102,13 @@ namespace calc {
       std::ios::sync_with_stdio(false);
       std::string outputBuffer = "";
       outputBuffer.reserve(80 * 20);
-      std::cout << "Step\tTemperature\tPressure\t#Shift\t#Relocation\tStress[1,"
-                   "1]\tStress[2,2]\tStress[3,3]\tStress[1,2]\tStress[1,3]"
-                   "\tStress[2,3]\n";
+      std::cout << "Step\tTemperature\tPressure\t#Shift\t#Relocation\t"
+                   "Stress[1,1]\tStress[2,2]\tStress[3,3]\tStress[1,2]\t"
+                   "Stress[1,3]\tStress[2,3]";
+      for (size_t i = 0; i < this->msdOrigins.size(); ++i) {
+        std::cout << "\tMSD" << i << "_" << this->msdOrigins[i];
+      }
+      std::cout << std::endl;
 
       int numShifts = 0;
       int numRelocations = 0;
@@ -129,7 +134,7 @@ namespace calc {
         temperature = this->computeTemperature(velocities);
 
         // output
-        outputBuffer = "";
+        outputBuffer.clear();
         outputBuffer += std::to_string(step + this->currentStep) + "\t";
         outputBuffer += std::to_string(temperature) + "\t";
         outputBuffer += std::to_string(pressure) + "\t";
@@ -140,12 +145,23 @@ namespace calc {
         outputBuffer += std::to_string(stressTensor(2, 2)) + "\t";
         outputBuffer += std::to_string(stressTensor(0, 1)) + "\t";
         outputBuffer += std::to_string(stressTensor(0, 2)) + "\t";
-        outputBuffer += std::to_string(stressTensor(1, 2)) + "\t";
+        outputBuffer += std::to_string(stressTensor(1, 2));
+        // compute MSD
+        for (size_t msdIdx = 0; msdIdx < msdMeasuredIndices.size(); ++msdIdx) {
+          double result =
+            (this->msdOrigins[msdIdx] -
+             coordinates(this->msdMeasuredIndices[msdIdx]))
+              .squaredNorm() /
+            (static_cast<double>(this->msdMeasuredIndices[msdIdx].size() / 3.));
+          outputBuffer += "\t" + std::to_string(result);
+        }
         outputBuffer += "\n";
         std::cout << outputBuffer;
         if (step % 25 == 0) {
           std::flush(std::cout);
         }
+
+        this->neighbourlist.resetCoordinates(coordinates);
       }
 
       // finish up
@@ -280,7 +296,31 @@ namespace calc {
     Eigen::Matrix3d DPDSimulator::getStressTensor() const
     {
       return this->currentStressTensor;
-    };
+    }
+
+    /**
+     * @brief Register a set of atoms and time for being measured for msd
+     *
+     * @param atomIds
+     */
+    void DPDSimulator::startMeasuringMSDForAtoms(
+      const std::vector<size_t> atomIds)
+    {
+      // Translate atom IDS to indices of the local structure
+      Eigen::ArrayXi coordinateIndices = Eigen::ArrayXi(3 * atomIds.size());
+      for (size_t i = 0; i < atomIds.size(); ++i) {
+        size_t atomId = atomIds[i];
+        size_t index = this->universe.getIdxByAtomId(atomId);
+        coordinateIndices[3 * i] = 3 * index;
+        coordinateIndices[3 * i + 1] = 3 * index + 1;
+        coordinateIndices[3 * i + 2] = 3 * index + 2;
+      }
+
+      // Remember to measure these relative to the current time-step
+      msdMeasuredIndices.push_back(coordinateIndices);
+      msdOrigins.push_back(this->coordinates(coordinateIndices));
+      msdOriginTimesteps.push_back(this->currentStep);
+    }
 
     /**
      * @brief Randomly add new slip-springs
@@ -559,6 +599,49 @@ namespace calc {
         }
       }
       throw std::runtime_error("Invalid internal state.");
+    }
+
+    pylimer_tools::entities::Universe DPDSimulator::getUniverse() const
+    {
+      pylimer_tools::entities::Universe result =
+        pylimer_tools::entities::Universe(this->box);
+
+      std::vector<double> xs;
+      xs.reserve(this->numAtoms);
+      std::vector<double> ys;
+      ys.reserve(this->numAtoms);
+      std::vector<double> zs;
+      zs.reserve(this->numAtoms);
+      std::vector<int> zeros;
+      zeros.reserve(this->numAtoms);
+
+      for (size_t i = 0; i < this->numAtoms * 3; i += 3) {
+        xs.push_back(this->coordinates[i]);
+        ys.push_back(this->coordinates[i + 1]);
+        zs.push_back(this->coordinates[i + 2]);
+        zeros.push_back(0);
+      }
+
+      result.addAtoms(
+        this->atomIds, this->atomTypes, xs, ys, zs, zeros, zeros, zeros);
+
+      std::vector<long int> bondFrom(this->bondPartnersA.data(),
+                                     this->bondPartnersA.data() +
+                                       this->bondPartnersA.size());
+      std::vector<long int> bondTo(this->bondPartnersB.data(),
+                                   this->bondPartnersB.data() +
+                                     this->bondPartnersB.size());
+      std::vector<int> bondTypes(this->bondTypes.data(),
+                                 this->bondTypes.data() +
+                                   this->bondTypes.size());
+      result.addBonds(this->numBonds + this->numSlipSprings,
+                      bondFrom,
+                      bondTo,
+                      bondTypes,
+                      false,
+                      false);
+
+      return result;
     }
 
     /**
