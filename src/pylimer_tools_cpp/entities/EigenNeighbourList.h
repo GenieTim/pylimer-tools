@@ -1,5 +1,5 @@
-#ifndef NEIGHBOURLIST_H
-#define NEIGHBOURLIST_H
+#ifndef EIGENNEIGHBOURLIST_H
+#define EIGENNEIGHBOURLIST_H
 
 extern "C"
 {
