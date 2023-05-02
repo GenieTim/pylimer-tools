@@ -152,7 +152,7 @@ namespace entities {
     double getShearMagnitude() const { return this->simpleShearMagnitude; }
     int getShearDirection() const { return this->shearDirection; }
 
-    std::array<double> minImageDistances(std::array<double>& coords) const
+    std::array<double, 3> minImageDistances(std::array<double, 3>& coords) const
     {
       INVALIDARG_EXP_IFN(
         coords.size() % 3 == 0,
