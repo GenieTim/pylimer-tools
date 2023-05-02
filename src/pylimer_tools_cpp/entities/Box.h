@@ -152,8 +152,7 @@ namespace entities {
     double getShearMagnitude() const { return this->simpleShearMagnitude; }
     int getShearDirection() const { return this->shearDirection; }
 
-    template<typename VectorType>
-    VectorType minImageDistances(VectorType& coords) const
+    std::array<double> minImageDistances(std::array<double>& coords) const
     {
       INVALIDARG_EXP_IFN(
         coords.size() % 3 == 0,
@@ -166,7 +165,19 @@ namespace entities {
       return coords;
     }
 
-    template<>
+    std::vector<double> minImageDistances(std::vector<double>& coords) const
+    {
+      INVALIDARG_EXP_IFN(
+        coords.size() % 3 == 0,
+        "Expect coordinates to be in order x, y, z, repeatedly.");
+
+      for (size_t i = 0; i < coords.size(); ++i) {
+        coords[i] = this->minImageDistance(coords[i], i % 3);
+      }
+
+      return coords;
+    }
+
     Eigen::VectorXd minImageDistances(Eigen::VectorXd& coords) const
     {
       INVALIDARG_EXP_IFN(
