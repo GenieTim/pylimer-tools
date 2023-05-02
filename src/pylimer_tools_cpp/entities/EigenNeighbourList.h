@@ -225,7 +225,7 @@ namespace entities {
              indexInBucket < this->neighbourBucketSizes[bucketIndex];
              indexInBucket++) {
           size_t atomIndex = this->neighbourBuckets[bucketIndex][indexInBucket];
-          results[results_idx++] = atomIndex;
+          result[results_idx++] = atomIndex;
           // difference = this->coordinates.segment(3 * idx, 3) -
           //                this->coordinates.segment(3 * atomIndex, 3)
           // this->box.handlePBC(difference);
