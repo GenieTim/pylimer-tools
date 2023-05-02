@@ -91,8 +91,14 @@ namespace entities {
       }
     };
 
+    /**
+     * @brief Re-bin with a new set of coordinates
+     * 
+     * @param newCoordinates 
+     */
     void resetCoordinates(Eigen::VectorXd& newCoordinates)
     {
+      // just override all the buckets.
       this->neighbourBucketSizes = Eigen::ArrayXi::Zero(this->totalNrOfBuckets);
       for (size_t i = 0; i < (newCoordinates.size() / 3); ++i) {
         size_t bucketIndex =
@@ -109,6 +115,12 @@ namespace entities {
       }
     }
 
+    /**
+     * @brief Get the Indices Close To Coordinates with the Default Cut-Off
+     * 
+     * @param coordinates 
+     * @return Eigen::ArrayXi 
+     */
     Eigen::ArrayXi getIndicesCloseToCoordinates(
       Eigen::Vector3d coordinates) const
     {
@@ -241,6 +253,13 @@ namespace entities {
     }
 
   protected:
+    /**
+     * @brief Do "PBC" with a bucket index in one direction
+     * 
+     * @param bucketIndex 
+     * @param nrOfBuckets 
+     * @return size_t 
+     */
     size_t normalizeBucketIndex(long int bucketIndex, size_t nrOfBuckets) const
     {
       while (bucketIndex < 0) {
