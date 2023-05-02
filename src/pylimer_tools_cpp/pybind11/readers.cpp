@@ -33,6 +33,35 @@ void
 init_pylimer_bound_readers(py::module_& m)
 {
 
+  py::enum_<AtomStyle>(m, "AtomStyle")
+    .value("NONE", AtomStyle::NONE)
+    .value("ANGLE", AtomStyle::ANGLE)
+    .value("ATOMIC", AtomStyle::ATOMIC)
+    .value("BODY", AtomStyle::BODY)
+    .value("BOND", AtomStyle::BOND)
+    .value("CHARGE", AtomStyle::CHARGE)
+    .value("DIELECTRIC", AtomStyle::DIELECTRIC)
+    .value("DIPOLE", AtomStyle::DIPOLE)
+    .value("DPD", AtomStyle::DPD)
+    .value("EDPD", AtomStyle::EDPD)
+    .value("ELECTRON", AtomStyle::ELECTRON)
+    .value("ELLIPSOID", AtomStyle::ELLIPSOID)
+    .value("FULL", AtomStyle::FULL)
+    .value("LINE", AtomStyle::LINE)
+    .value("MDPD", AtomStyle::MDPD)
+    .value("MOLECULAR", AtomStyle::MOLECULAR)
+    .value("PERI", AtomStyle::PERI)
+    .value("SMD", AtomStyle::SMD)
+    .value("SPH", AtomStyle::SPH)
+    .value("SPHERE", AtomStyle::SPHERE)
+    .value("BPM_SPHERE", AtomStyle::BPM_SPHERE)
+    .value("SPIN", AtomStyle::SPIN)
+    .value("TDPD", AtomStyle::TDPD)
+    .value("TEMPLATE", AtomStyle::TEMPLATE)
+    .value("TRI", AtomStyle::TRI)
+    .value("WAVEPACKET", AtomStyle::WAVEPACKET)
+    .value("HYBRID", AtomStyle::HYBRID);
+
   py::class_<DumpFileParser>(m, "DumpFileReader", R"pbdoc(
        A reader for LAMMPS's `dump` files.
   )pbdoc")
@@ -74,7 +103,21 @@ init_pylimer_bound_readers(py::module_& m)
        A reader for LAMMPS's `write_data` files.
   )pbdoc")
     .def(py::init<>())
-    .def("read", &DataFileParser::read, py::arg("pathOfFileToRead"))
+    .def("read",
+         &DataFileParser::read,
+         R"pbdoc(
+       Actually read a LAMMPS's `write_data` file.
+
+       Arguments:
+          - `path_of_file_to_read`: The path to the file to read
+          - `atom_style`: The format of the "Atoms" section, see https://docs.lammps.org/read_data.html
+          - `atom_style2`: The format of the "Atoms" section if the previous parameter is equal to AtomStyle::HYBRID
+          - `atom_style3`: The format of the "Atoms" section if the second to last parameter is equal to AtomStyle::HYBRID
+  )pbdoc",
+         py::arg("path_of_file_to_read"),
+         py::arg("atom_style") = AtomStyle::ANGLE,
+         py::arg("atom_style2") = AtomStyle::NONE,
+         py::arg("atom_style_3") = AtomStyle::NONE)
     .def("getNrOfAtoms", &DataFileParser::getNrOfAtoms)
     .def("getNrOfAtomTypes", &DataFileParser::getNrOfAtomTypes)
     .def("getAtomIds", &DataFileParser::getAtomIds)

@@ -1129,7 +1129,6 @@ init_pylimer_bound_calc(py::module_& m)
      )pbdoc",
          py::arg("n_steps"),
          py::arg("dt") = 0.06,
-         py::arg("lambda") = 0.65,
          py::arg("with_MC") = false)
     .def("createSlipSprings",
          &dpd::DPDSimulator::createSlipSprings,

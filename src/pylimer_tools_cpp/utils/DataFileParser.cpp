@@ -11,7 +11,10 @@
 namespace pylimer_tools {
 namespace utils {
 
-  void DataFileParser::read(const std::string filePath)
+  void DataFileParser::read(const std::string filePath,
+                            const AtomStyle atomStyle,
+                            const AtomStyle atomStyle2,
+                            const AtomStyle atomStyle3)
   {
     if (!std::filesystem::exists(filePath)) {
       throw std::invalid_argument("File to read (" + filePath +
@@ -97,7 +100,19 @@ namespace utils {
 
     // Then, read atoms, up until the next section ("bonds")
     for (int i = 0; i < this->nAtoms; ++i) {
-      this->readAtom(line);
+      switch (atomStyle) {
+        case AtomStyle::ANGLE:
+        case AtomStyle::BOND:
+        case AtomStyle::MOLECULAR:
+          this->readAtom(line);
+          break;
+        case AtomStyle::HYBRID:
+          this->readAtomHybrid(line, atomStyle2, atomStyle3);
+          break;
+        default:
+          throw std::invalid_argument("This atom style is not supported yet.");
+          break;
+      }
 
       if (!getline(file, line)) {
         throw std::runtime_error(
@@ -240,7 +255,49 @@ namespace utils {
     this->atomY.push_back(y);
     this->atomZ.push_back(z);
 
-    if (resFound > 5) {
+    if (resFound > 6) {
+      this->atomNx.push_back(nx);
+      this->atomNy.push_back(ny);
+      this->atomNz.push_back(nz);
+    }
+  }
+
+  void DataFileParser::readAtomHybrid(std::string line,
+                                      AtomStyle style1,
+                                      AtomStyle style2)
+  {
+    if (style1 != AtomStyle::BOND && style2 != AtomStyle::EDPD) {
+      throw std::runtime_error(
+        "This combination is not implemented for hybrid atom style");
+    }
+    size_t atomId, nx, ny, nz;
+    int atomType, moleculeId;
+    double x, y, z;
+    double edpdTemp, edpd;
+    int resFound = sscanf(line.c_str(),
+                          "%zd %d %le %le %le %d %le %le %zd %zd %zd",
+                          &atomId,
+                          &atomType,
+                          &x,
+                          &y,
+                          &z,
+                          &moleculeId,
+                          &edpdTemp,
+                          &edpd,
+                          &nx,
+                          &ny,
+                          &nz);
+
+    this->atomIds.push_back(atomId);
+    this->moleculeIds.push_back(moleculeId);
+    this->atomTypes.push_back(atomType);
+    this->atomX.push_back(x);
+    this->atomY.push_back(y);
+    this->atomZ.push_back(z);
+    this->additionalAtomData["edpd_temp"].push_back(edpdTemp);
+    this->additionalAtomData["edpd"].push_back(edpd);
+
+    if (resFound > 8) {
       this->atomNx.push_back(nx);
       this->atomNy.push_back(ny);
       this->atomNz.push_back(nz);

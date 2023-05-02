@@ -25,7 +25,7 @@ namespace calc {
         std::seed_seq seed2(seed.begin(), seed.end());
         this->e2 = std::mt19937(seed2);
       }
-      double mean = 0.;
+      double mean = 0.0;
       double std = 1.0;
       double a = mean - std::sqrt(3.) * std;
       double b = mean + std::sqrt(3.) * std;
@@ -57,14 +57,23 @@ namespace calc {
       this->atomTypes = u.getPropertyValues<int>("type");
       this->atomIds = u.getPropertyValues<long int>("id");
 
-      for (size_t i = 0; i < this->numBonds; ++i) {
+      this->bondsOfIndex.reserve(this->numAtoms);
+      for (size_t i = 0; i < this->numAtoms; ++i) {
         std::vector<size_t> bonds;
         bonds.reserve(4);
         this->bondsOfIndex.push_back(bonds);
       }
+      this->bondPartnerCoordinatesA = Eigen::ArrayXi(3 * this->numBonds);
+      this->bondPartnerCoordinatesB = Eigen::ArrayXi(3 * this->numBonds);
       for (size_t i = 0; i < this->numBonds; ++i) {
         this->bondsOfIndex[this->bondPartnersA[i]].push_back(i);
         this->bondsOfIndex[this->bondPartnersB[i]].push_back(i);
+        for (int dir = 0; dir < 3; ++dir) {
+          this->bondPartnerCoordinatesA[i * 3 + dir] =
+            this->bondPartnersA[i] * 3 + dir;
+          this->bondPartnerCoordinatesB[i * 3 + dir] =
+            this->bondPartnersB[i] * 3 + dir;
+        }
       }
       for (size_t i = 0; i < this->numAtoms; ++i) {
         this->idxFunctionalities[i] = this->bondsOfIndex[i].size();
@@ -91,7 +100,6 @@ namespace calc {
      */
     void DPDSimulator::runSimulation(const long int nSteps,
                                      double dt,
-                                     double lambda,
                                      bool withMC)
     {
       Eigen::VectorXd velocitiesPlus = this->currentVelocitiesPlus;
@@ -102,9 +110,11 @@ namespace calc {
       std::ios::sync_with_stdio(false);
       std::string outputBuffer = "";
       outputBuffer.reserve(80 * 20);
-      std::cout << "Step\tTemperature\tPressure\t#Shift\t#Relocation\t"
-                   "Stress[1,1]\tStress[2,2]\tStress[3,3]\tStress[1,2]\t"
-                   "Stress[1,3]\tStress[2,3]";
+      std::cout
+        << "Step\tTemperature\tPressure\t<b>\tmax(b)\tmax(d)\tmax(f)\tmax(v)\t#"
+           "Shift\t#Relocation\t"
+           "Stress[1,1]\tStress[2,2]\tStress[3,3]\tStress[1,2]\t"
+           "Stress[1,3]\tStress[2,3]";
       for (size_t i = 0; i < this->msdOrigins.size(); ++i) {
         std::cout << "\tMSD" << i << "_" << this->msdOrigins[i];
       }
@@ -133,11 +143,30 @@ namespace calc {
         velocities = velocitiesPlus + halfDt * forces;
         temperature = this->computeTemperature(velocities);
 
+        // compute bond properties
+        Eigen::VectorXd bondDistances =
+          coordinates(this->bondPartnerCoordinatesA) -
+          coordinates(this->bondPartnerCoordinatesB);
+        this->box.handlePBC(bondDistances);
+        double meanB = 0.0;
+        double maxB = 0.0;
+        for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
+          double b = bondDistances.segment(3 * i, 3).norm();
+          meanB += b / (this->bondPartnersA.size());
+          maxB = std::max(maxB, b);
+        }
+
         // output
         outputBuffer.clear();
         outputBuffer += std::to_string(step + this->currentStep) + "\t";
         outputBuffer += std::to_string(temperature) + "\t";
         outputBuffer += std::to_string(pressure) + "\t";
+        outputBuffer += std::to_string(meanB) + "\t";
+        outputBuffer += std::to_string(maxB) + "\t";
+        outputBuffer +=
+          std::to_string((dt * velocitiesPlus).cwiseAbs().maxCoeff()) + "\t";
+        outputBuffer += std::to_string(forces.maxCoeff()) + "\t";
+        outputBuffer += std::to_string(velocities.maxCoeff()) + "\t";
         outputBuffer += std::to_string(numShifts) + "\t";
         outputBuffer += std::to_string(numRelocations) + "\t";
         outputBuffer += std::to_string(stressTensor(0, 0)) + "\t";
@@ -222,33 +251,48 @@ namespace calc {
       // actual computation
       // (attractive) bond forces
       Eigen::VectorXd bondDistances =
-        coordinates(this->bondPartnersA) - coordinates(this->bondPartnersB);
+        coordinates(this->bondPartnerCoordinatesA) -
+        coordinates(this->bondPartnerCoordinatesB);
       this->box.handlePBC(bondDistances);
-      forces(this->bondPartnersA) -= this->k * bondDistances;
-      forces(this->bondPartnersB) += this->k * bondDistances;
+      assert(bondDistances.minCoeff() > this->box.getLowX());
+      assert(bondDistances.maxCoeff() > this->box.getHighX());
+      forces(this->bondPartnerCoordinatesA) -= this->k * bondDistances;
+      forces(this->bondPartnerCoordinatesB) += this->k * bondDistances;
+      for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
+        // TODO: check sign
+        pressure -= this->k * bondDistances.segment(3 * i, 3).squaredNorm();
+        stressTensor -= this->k * bondDistances.segment(3 * i, 3) *
+                        bondDistances.segment(3 * i, 3).transpose();
+      }
 
       Eigen::Vector3d pairdistance;
       Eigen::Vector3d pairdistanceNormed;
       Eigen::Vector3d velocitydiff;
       Eigen::Vector3d pairForce;
 
-      for (size_t i = 0; i < coordinates.size() / 3; ++i) {
-        Eigen::ArrayXi neighbors =
-          this->neighbourlist.getIndicesCloseToCoordinates(
-            coordinates.segment(3 * i, 3));
+      // pre-allocate the neighbor indices array
+      Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
+        this->numAtoms *
+        (std::ceil((3.1 * cutoff) * (3.1 * cutoff) * (3.1 * cutoff)) /
+         this->box.getVolume())));
+
+      // actually loop the atoms
+      for (size_t i = 0; i < this->numAtoms; ++i) {
+        int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
+          neighbors, coordinates.segment(3 * i, 3), cutoff);
 
         // pair forces
-        for (size_t neigh_idx = 0; neigh_idx < neighbors.size(); ++neigh_idx) {
+        // for (size_t j = i + 1; j < this->numAtoms; ++j) {
+        for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
           const size_t j = neighbors[neigh_idx];
           if (j <= i) {
             continue;
           }
           pairdistance =
             coordinates.segment(3 * i, 3) - coordinates.segment(3 * j, 3);
+          this->box.handlePBC(pairdistance);
           const double rNorm = pairdistance.norm();
           if (rNorm >= cutoff || rNorm < 1e-12) {
-            // this is a performance bottleneck, commonly solved by using
-            // neighbour lists
             continue;
           }
 
@@ -257,7 +301,8 @@ namespace calc {
           pairdistanceNormed = pairdistance / rNorm;
 
           // conservative repulsion force
-          pairForce = this->A * one_minus_rnorm * pairdistanceNormed;
+          double pairForceConst = this->A * one_minus_rnorm;
+          // pairForce = this->A * one_minus_rnorm * pairdistanceNormed;
 
           // dissipative/drag force
           velocitydiff =
@@ -266,22 +311,25 @@ namespace calc {
           const double gamma_weighted_rij_dot_vij =
             this->gamma * one_minus_rnorm2 * rij_dot_vij;
 
-          pairForce += -gamma_weighted_rij_dot_vij * pairdistanceNormed;
+          pairForceConst -= gamma_weighted_rij_dot_vij;
+          // pairForce += -gamma_weighted_rij_dot_vij * pairdistanceNormed;
 
           // random force
           const double constant_rnd_prefix =
             this->sigma * one_minus_rnorm / sqrt(dt);
           const double random_val = this->uniform_rand_mean0std1(this->e2);
 
-          pairForce += constant_rnd_prefix * random_val * pairdistanceNormed;
+          // pairForce += constant_rnd_prefix * random_val * pairdistanceNormed;
+          pairForceConst += constant_rnd_prefix * random_val;
+          pairForce = pairForceConst * pairdistanceNormed;
 
           // actually assign the new forces
           forces.segment(3 * i, 3) += pairForce;
           forces.segment(3 * j, 3) -= pairForce;
 
           // pressure update
-          pressure += forces.segment(3 * i, 3).dot(pairdistance);
-          stressTensor += forces.segment(3 * i, 3) * pairdistance.transpose();
+          pressure += pairForce.dot(pairdistance);
+          stressTensor += pairForce * pairdistance.transpose();
         }
       }
 
@@ -397,6 +445,10 @@ namespace calc {
       size_t sizeBefore = this->numBonds + this->numSlipSprings;
       this->bondPartnersA.conservativeResize(sizeBefore + partnerA.size());
       this->bondPartnersB.conservativeResize(sizeBefore + partnerB.size());
+      this->bondPartnerCoordinatesA.conservativeResize(
+        3 * (sizeBefore + partnerA.size()));
+      this->bondPartnerCoordinatesB.conservativeResize(
+        3 * (sizeBefore + partnerB.size()));
       this->bondTypes.conservativeResize(sizeBefore + partnerB.size());
 
       this->bondPartnersA.segment(sizeBefore, partnerA.size()) =
@@ -411,6 +463,15 @@ namespace calc {
           sizeBefore + i);
         this->bondsOfIndex[this->bondPartnersB[sizeBefore + i]].push_back(
           sizeBefore + i);
+      }
+
+      for (size_t i = sizeBefore; i < sizeBefore + partnerA.size(); ++i) {
+        for (int dir = 0; dir < 3; ++dir) {
+          this->bondPartnerCoordinatesA[i * 3 + dir] =
+            this->bondPartnersA[i] * 3 + dir;
+          this->bondPartnerCoordinatesB[i * 3 + dir] =
+            this->bondPartnersB[i] * 3 + dir;
+        }
       }
 
       this->numSlipSprings += partnerA.size();
@@ -453,7 +514,11 @@ namespace calc {
             this->coordinates.segment(3 * pairs[j], 3);
           if (distance.norm() > this->lowCutoff &&
               distance.norm() <= this->highCutoff) {
-            candidates[numCandidates++] = j;
+            if (numCandidates >= candidates.size()) {
+              candidates.push_back(j);
+            } else {
+              candidates[numCandidates++] = j;
+            }
           }
         }
         if (numCandidates == 0) {
@@ -501,6 +566,7 @@ namespace calc {
     int DPDSimulator::shiftSlipSprings(const double kbT)
     {
       int n_accept = 0;
+      std::vector<size_t> candidates;
       for (size_t springIdx = this->numBonds;
            springIdx < (this->numBonds + this->numSlipSprings);
            ++springIdx) {
@@ -510,7 +576,38 @@ namespace calc {
         n_accept += this->attemptSlipSpringShift(springIdx, partnerA);
         n_accept += this->attemptSlipSpringShift(springIdx, partnerB);
         if (this->bondPartnersA[springIdx] == this->bondPartnersB[springIdx]) {
-          // TODO:
+          // complete relocation of this bond
+          std::uniform_int_distribution<int> firstChoice(0, this->numAtoms);
+          int firstPartner = firstChoice(this->e2);
+          // search for neighbours
+          int numCandidates = 0;
+          // for this first chosen atom, search for possible partners
+          Eigen::ArrayXi pairs =
+            this->neighbourlist.getIndicesCloseToCoordinates(
+              this->coordinates.segment(3 * firstPartner, 3), this->highCutoff);
+          for (size_t j = 0; j < pairs.size(); ++j) {
+            Eigen::Vector3d distance =
+              this->coordinates.segment(3 * firstPartner, 3) -
+              this->coordinates.segment(3 * pairs[j], 3);
+            if (distance.norm() > this->lowCutoff &&
+                distance.norm() <= this->highCutoff) {
+              if (numCandidates >= candidates.size()) {
+                candidates.push_back(j);
+              } else {
+                candidates[numCandidates++] = j;
+              }
+            }
+          }
+          if (numCandidates == 0) {
+            // not sure what to do in this case here...
+            continue;
+          }
+          std::uniform_int_distribution<int> candidateDist(0,
+                                                           numCandidates - 1);
+          int secondPartner = candidates[candidateDist(this->e2)];
+          // actually relocate both ends
+          this->replaceSlipSpringPartner(springIdx, partnerA, firstPartner);
+          this->replaceSlipSpringPartner(springIdx, partnerB, secondPartner);
         }
       }
       return n_accept;
@@ -584,10 +681,20 @@ namespace calc {
              this->bondPartnersB[springIdx] == partnerBefore);
       if (this->bondPartnersA[springIdx] == partnerBefore) {
         this->bondPartnersA[springIdx] = partnerAfter;
+        for (int dir = 0; dir < 3; ++dir) {
+          this->bondPartnerCoordinatesA[3 * springIdx + dir] =
+            3 * partnerAfter + dir;
+        }
       } else {
         this->bondPartnersB[springIdx] = partnerAfter;
+        for (int dir = 0; dir < 3; ++dir) {
+          this->bondPartnerCoordinatesA[3 * springIdx + dir] =
+            3 * partnerAfter + dir;
+        }
       }
+      // add to the bonds of the new bond partner
       this->bondsOfIndex[partnerAfter].push_back(springIdx);
+      // remove from the bonds of the previous bond partner
       for (size_t i = this->idxFunctionalities[partnerBefore];
            i < this->bondsOfIndex[partnerBefore].size();
            ++i) {
@@ -662,6 +769,12 @@ namespace calc {
                       "State violation");
 
       RUNTIME_EXP_IFN(this->bondPartnersA.size() == this->bondPartnersB.size(),
+                      "State violation");
+      RUNTIME_EXP_IFN(this->bondPartnerCoordinatesA.size() ==
+                        3 * this->bondPartnersA.size(),
+                      "State violation");
+      RUNTIME_EXP_IFN(this->bondPartnerCoordinatesB.size() ==
+                        3 * this->bondPartnersB.size(),
                       "State violation");
       RUNTIME_EXP_IFN(this->bondTypes.size() == this->bondPartnersA.size(),
                       "State violation");
