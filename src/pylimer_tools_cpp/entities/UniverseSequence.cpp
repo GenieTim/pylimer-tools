@@ -66,6 +66,13 @@ namespace entities {
     return this->universeCache.at(index);
   }
 
+  void UniverseSequence::setDataFileAtomStyle(
+    std::vector<pylimer_tools::utils::AtomStyle> newDataFileAtomStyle)
+  {
+    INVALIDARG_EXP_IFN(newDataFileAtomStyle.size() <= 3, "Expect at most 3 atom styles");
+    this->dataFileAtomStyle = newDataFileAtomStyle;
+  }
+
   Universe UniverseSequence::readDataFileAtIndex(size_t index)
   {
     return this->readDataFile(this->dataFiles[index]);
@@ -266,9 +273,21 @@ namespace entities {
 
   Universe UniverseSequence::readDataFile(const std::string filePath)
   {
+    pylimer_tools::utils::AtomStyle style1 =
+      this->dataFileAtomStyle.size() > 0
+        ? this->dataFileAtomStyle[0]
+        : pylimer_tools::utils::AtomStyle::ANGLE;
+    pylimer_tools::utils::AtomStyle style2 =
+      this->dataFileAtomStyle.size() > 1
+        ? this->dataFileAtomStyle[1]
+        : pylimer_tools::utils::AtomStyle::ANGLE;
+    pylimer_tools::utils::AtomStyle style3 =
+      this->dataFileAtomStyle.size() > 2
+        ? this->dataFileAtomStyle[2]
+        : pylimer_tools::utils::AtomStyle::ANGLE;
     pylimer_tools::utils::DataFileParser fileParser =
       pylimer_tools::utils::DataFileParser();
-    fileParser.read(filePath);
+    fileParser.read(filePath, style1, style2, style3);
     Universe universe = Universe(Box(fileParser.getLowX(),
                                      fileParser.getHighX(),
                                      fileParser.getLowY(),

@@ -43,7 +43,6 @@ namespace calc {
        */
       void runSimulation(const long int nSteps,
                          double dt = 0.06,
-                         double lambda = 0.65,
                          bool withMC = false);
 
       /**
@@ -145,8 +144,8 @@ namespace calc {
       double lowCutoff = 0.5;
       double highCutoff = 2.0;
       double A = 25.;
-      double sigma = 3;
-      double gamma = 0.5 * 3 * 3;
+      double sigma = 3.;
+      double gamma = 0.5 * 3. * 3.;
 
       ////////////////////////////////////////////////////////////////
       // simulation state
@@ -177,7 +176,9 @@ namespace calc {
       std::vector<long int> atomIds;
       std::vector<size_t> chainEndIndices;
       // bonds
+      Eigen::ArrayXi bondPartnerCoordinatesA;
       Eigen::ArrayXi bondPartnersA;
+      Eigen::ArrayXi bondPartnerCoordinatesB;
       Eigen::ArrayXi bondPartnersB;
       Eigen::ArrayXi bondTypes;
       // mapping between atoms and bonds

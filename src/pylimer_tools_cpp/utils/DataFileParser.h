@@ -12,10 +12,44 @@
 namespace pylimer_tools {
 namespace utils {
 
+  enum AtomStyle
+  {
+    NONE,
+    ANGLE,
+    ATOMIC,
+    BODY,
+    BOND,
+    CHARGE,
+    DIELECTRIC,
+    DIPOLE,
+    DPD,
+    EDPD,
+    ELECTRON,
+    ELLIPSOID,
+    FULL,
+    LINE,
+    MDPD,
+    MOLECULAR,
+    PERI,
+    SMD,
+    SPH,
+    SPHERE,
+    BPM_SPHERE,
+    SPIN,
+    TDPD,
+    TEMPLATE,
+    TRI,
+    WAVEPACKET,
+    HYBRID
+  };
+
   class DataFileParser
   {
   public:
-    void read(const std::string filePath);
+    void read(const std::string filePath,
+              const AtomStyle atomStyle = AtomStyle::ANGLE,
+              const AtomStyle atomStyle2 = AtomStyle::NONE,
+              const AtomStyle atomStyle3 = AtomStyle::NONE);
 
     // access atom data
     int getNrOfAtoms() { return this->nAtoms; }
@@ -61,6 +95,7 @@ namespace utils {
     void readNs(const std::string line);
     void readMass(const std::string line);
     void readAtom(std::string line);
+    void readAtomHybrid(std::string line, AtomStyle style1, AtomStyle style2);
     void readBond(std::string line);
     void readAngle(std::string line);
     static void skipEmptyLines(std::string& line, std::ifstream& file);
@@ -100,6 +135,7 @@ namespace utils {
 
     // actual dimensional values
     std::map<int, double> masses;
+    std::unordered_map<std::string, std::vector<double>> additionalAtomData;
     std::vector<long int> atomIds;
     std::vector<int> moleculeIds;
     std::vector<int> atomTypes;

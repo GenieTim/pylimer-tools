@@ -23,6 +23,8 @@ namespace entities {
     void forgetAtIndex(size_t index);
     std::vector<Universe> getAll();
 
+    void setDataFileAtomStyle(std::vector<pylimer_tools::utils::AtomStyle> dataFileAtomStyle);
+
     // computations
     std::unordered_map<int, double> computeMsdForAtoms(const std::vector<long int> atomIds, int nrOfOrigins = 10, bool reduceMemory = false); 
 
@@ -35,6 +37,7 @@ namespace entities {
     std::vector<std::string> dataFiles;
     pylimer_tools::utils::DataFileParser dataFileParser;
     pylimer_tools::utils::DumpFileParser dumpFileParser;
+    std::vector<pylimer_tools::utils::AtomStyle> dataFileAtomStyle;
 
     void reset();
     Universe readDataFile(const std::string filePath);

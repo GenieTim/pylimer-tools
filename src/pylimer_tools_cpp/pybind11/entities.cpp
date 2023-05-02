@@ -866,13 +866,16 @@ init_pylimer_bound_entities(py::module_& m)
                If you have not output the id of the atoms in the dump file, they will be assigned sequentially. 
                If you have not output the type of the atoms in the dump file, they will be set to -1 if they cannot be infered from the data file.
         )pbdoc",
-         py::arg("initialStructureDataFile"),
-         py::arg("dumpFile"))
+         py::arg("initial_data_file"),
+         py::arg("dump_file"))
     .def("initializeFromDataSequence",
          &UniverseSequence::initializeFromDataSequence,
          "Reset and initialize the Universes from an ordered list of Lammps "
          "data (:code:`write_data`) files.",
-         py::arg("dataFiles"))
+         py::arg("data_files"))
+     .def("setDataFileAtomStyle", &UniverseSequence::setDataFileAtomStyle, R"pbdoc(
+          Set the format of the data files to be read. See :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle`.
+     )pbdoc", py::arg("atom_styles"))
     .def("next",
          &UniverseSequence::next,
          R"pbdoc(Get the Universe that's next in the sequence.)pbdoc")

@@ -130,8 +130,9 @@ namespace entities {
      * @param upperCutoff
      * @return Eigen::ArrayXi
      */
-    Eigen::ArrayXi getIndicesCloseToCoordinates(Eigen::Vector3d coordinates,
-                                                double upperCutoff) const
+    Eigen::ArrayXi getIndicesCloseToCoordinates(
+      const Eigen::Vector3d& coordinates,
+      const double upperCutoff) const
     {
 #ifndef NDEBUG
       INVALIDARG_EXP_IFN(upperCutoff > 0.0,
@@ -173,6 +174,70 @@ namespace entities {
 
       // return results
       return results;
+    }
+
+    /**
+     * @brief Get the Indices of Coordinates Close To the Coordinates of another
+     * Index
+     *
+     * This function must be O(1), otherwise, this whole neighbor list will be
+     * useless
+     *
+     * NOTE: the resulting list will not be reduced, i.e., it will contain
+     * indices that have a distance > upperCutoff. Additionally,
+     * the requested coordinates will also be included!
+     * 
+     * The results will be written to the argument `result`, which will be resized if needed.
+     * It will not be downsized, only upsized; the returned int is the actual remaining size.
+     */
+    int getIndicesCloseToCoordinates(Eigen::ArrayXi& result,
+                                     const Eigen::Vector3d coordinates,
+                                     const double upperCutoff)
+    {
+
+#ifndef NDEBUG
+      INVALIDARG_EXP_IFN(upperCutoff > 0.0,
+                         "Expected upper cutoff > 0., got " +
+                           std::to_string(upperCutoff) + ".");
+#endif
+
+      std::vector<size_t> bucketIndices;
+      if (upperCutoff == this->cutoff) {
+        bucketIndices = this->neighbourBucketNeighboursDefaultCutoff
+                          [this->getBucketIndexForTriplet(
+                            this->getBucketTripletForCoordinates(coordinates))];
+      } else {
+        bucketIndices = this->getCombinedBucketIndicesForCoordinates(
+          coordinates, upperCutoff);
+      }
+
+      // first, count the number of results we will get
+      int nResults = this->neighbourBucketSizes(bucketIndices).sum();
+
+      if (nResults >= result.size()) {
+        result.conservativeResize(nResults);
+      }
+
+      Eigen::Vector3d difference;
+      int results_idx = 0;
+      for (size_t bucketIndex : bucketIndices) {
+        for (size_t indexInBucket = 0;
+             indexInBucket < this->neighbourBucketSizes[bucketIndex];
+             indexInBucket++) {
+          size_t atomIndex = this->neighbourBuckets[bucketIndex][indexInBucket];
+          results[results_idx++] = atomIndex;
+          // difference = this->coordinates.segment(3 * idx, 3) -
+          //                this->coordinates.segment(3 * atomIndex, 3)
+          // this->box.handlePBC(difference);
+          // double distance = difference.squaredNorm();
+          // if (distance < upperCutoff2 && distance >= lowerCutoff2) {
+          //   results.push_back(this->atoms[atomIndex]);
+          // }
+        }
+      }
+
+      // return results
+      return results_idx;
     }
 
   protected:
