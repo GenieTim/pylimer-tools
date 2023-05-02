@@ -2,6 +2,7 @@
 #define BOX_H
 
 #include "../utils/utilityMacros.h"
+#include <Eigen/Dense>
 #include <array>
 #include <cassert>
 #include <cmath>
@@ -15,12 +16,12 @@ namespace entities {
   class Box
   {
   private:
-    double L[3];
+    Eigen::Array3d L = Eigen::Array3d::Zero();
     double volume;
-    double boxHalfs[3];
-    double oneOverL[3];
-    double loCoords[3];
-    double hiCoords[3];
+    Eigen::Array3d boxHalfs = Eigen::Array3d::Zero();
+    Eigen::Array3d oneOverL = Eigen::Array3d::Zero();
+    Eigen::Array3d loCoords = Eigen::Array3d::Zero();
+    Eigen::Array3d hiCoords = Eigen::Array3d::Zero();
     double simpleShearMagnitude = 0.0;
     int shearDirection = -1;
 
@@ -29,6 +30,21 @@ namespace entities {
     {
       return dcoord -
              (this->L[coord] * std::nearbyint(dcoord * this->oneOverL[coord]));
+    }
+
+    Eigen::Vector3d minImageDistance(Eigen::Vector3d coords) const
+    {
+      return coords -
+             (this->L * (coords.array() * this->oneOverL).round()).matrix();
+    }
+
+    Eigen::VectorXd minImageDistance(Eigen::VectorXd coords) const
+    {
+      return coords -
+             (this->L.replicate(coords.size() / 3, 1) *
+              (coords.array() * this->oneOverL.replicate(coords.size() / 3, 1))
+                .round())
+               .matrix();
     }
 
     double iterateForPlacementIn(double coord, double min, double max) const
@@ -79,9 +95,8 @@ namespace entities {
   public:
     Box(const double Lx = 1.0, const double Ly = 1.0, const double Lz = 1.0)
     {
-      INVALIDARG_EXP_IFN(
-        Lx > 0 && Ly > 0 && Lz > 0,
-        "The box must be instantiated with positive lengths.");
+      INVALIDARG_EXP_IFN(Lx > 0 && Ly > 0 && Lz > 0,
+                         "The box must be instantiated with positive lengths.");
       this->loCoords[0] = 0.0;
       this->hiCoords[0] = Lx;
       this->loCoords[1] = 0.0;
@@ -98,9 +113,8 @@ namespace entities {
         const double zLo,
         const double zHi)
     {
-      INVALIDARG_EXP_IFN(
-        xHi > xLo && yHi > yLo && zHi > zLo,
-        "The box must be instantiated with positive lengths.");
+      INVALIDARG_EXP_IFN(xHi > xLo && yHi > yLo && zHi > zLo,
+                         "The box must be instantiated with positive lengths.");
       this->loCoords[0] = xLo;
       this->hiCoords[0] = xHi;
       this->loCoords[1] = yLo;
@@ -138,8 +152,7 @@ namespace entities {
     double getShearMagnitude() const { return this->simpleShearMagnitude; }
     int getShearDirection() const { return this->shearDirection; }
 
-    template<typename VectorType>
-    VectorType minImageDistances(VectorType& coords) const
+    std::array<double, 3> minImageDistances(std::array<double, 3>& coords) const
     {
       INVALIDARG_EXP_IFN(
         coords.size() % 3 == 0,
@@ -149,6 +162,29 @@ namespace entities {
         coords[i] = this->minImageDistance(coords[i], i % 3);
       }
 
+      return coords;
+    }
+
+    std::vector<double> minImageDistances(std::vector<double>& coords) const
+    {
+      INVALIDARG_EXP_IFN(
+        coords.size() % 3 == 0,
+        "Expect coordinates to be in order x, y, z, repeatedly.");
+
+      for (size_t i = 0; i < coords.size(); ++i) {
+        coords[i] = this->minImageDistance(coords[i], i % 3);
+      }
+
+      return coords;
+    }
+
+    Eigen::VectorXd minImageDistances(Eigen::VectorXd& coords) const
+    {
+      INVALIDARG_EXP_IFN(
+        coords.size() % 3 == 0,
+        "Expect coordinates to be in order x, y, z, repeatedly.");
+
+      coords = this->minImageDistance(coords);
       return coords;
     }
 
