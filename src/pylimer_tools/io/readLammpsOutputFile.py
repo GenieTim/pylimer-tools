@@ -1,32 +1,37 @@
 import os
 import re
 import warnings
+from typing import Iterable, List, Union
 
 import pandas as pd
 
 from pylimer_tools.io.extractThermoParams import extractThermoParams
 from pylimer_tools.utils.cacheUtility import doCache, loadCache
-from pylimer_tools_cpp import Universe, UniverseSequence
+from pylimer_tools_cpp import AtomStyle, Universe, UniverseSequence
 
 
 def readLogFile(filepath, lines_to_read_to_detect_header=500000) -> pd.DataFrame:
     return extractThermoParams(filepath, header=None, texts_to_read=500000, lines_to_read_to_detect_header=lines_to_read_to_detect_header)
 
 
-def readDumpFile(dataFile, dumpFile) -> UniverseSequence:
+def readDumpFile(dataFile, dumpFile, atom_style: Union[List[AtomStyle], None] = None) -> UniverseSequence:
     """
     Read a file with LAMMPS' dump of snapshots of structures into a Universe.
     """
     uS = UniverseSequence()
+    if (atom_style is not None):
+        uS.setDataFileAtomStyle(atom_style)
     uS.initializeFromDumpFile(dataFile, dumpFile)
     return uS
 
 
-def readDataFile(structureFile: str) -> Universe:
+def readDataFile(structureFile: str, atom_style: Union[List[AtomStyle], None] = None) -> Universe:
     """
     Read a file with LAMMPS' data type of structure into a Universe.
     """
     uS = UniverseSequence()
+    if (atom_style is not None):
+        uS.setDataFileAtomStyle(atom_style)
     uS.initializeFromDataSequence([structureFile])
     universe = uS.atIndex(0)
     del uS
