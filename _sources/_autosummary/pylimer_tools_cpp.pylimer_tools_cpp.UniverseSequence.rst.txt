@@ -27,6 +27,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.UniverseSequence
       ~UniverseSequence.initializeFromDumpFile
       ~UniverseSequence.next
       ~UniverseSequence.resetIterator
+      ~UniverseSequence.setDataFileAtomStyle
    
    
 

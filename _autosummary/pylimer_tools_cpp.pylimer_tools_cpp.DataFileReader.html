@@ -177,6 +177,7 @@
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin.html">pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint.html">pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Atom.html">pylimer_tools_cpp.pylimer_tools_cpp.Atom</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle.html">pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.html">pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Box.html">pylimer_tools_cpp.pylimer_tools_cpp.Box</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.html">pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator</a></li>
@@ -338,8 +339,8 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.getNrOfBonds" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.getNrOfBonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNrOfBonds</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.read" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code></a>(self, pathOfFileToRead)</p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.read" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.read"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read</span></code></a>(self, path_of_file_to_read, atom_style, ...)</p></td>
+<td><p>Actually read a LAMMPS's <cite>write_data</cite> file.</p></td>
 </tr>
 </tbody>
 </table>
@@ -476,8 +477,19 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.read">
-<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">pathOfFileToRead</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.read" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
+<span class="sig-name descname"><span class="pre">read</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self:</span> <span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_of_file_to_read:</span> <span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_style:</span> <span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle</span> <span class="pre">=</span> <span class="pre">&lt;AtomStyle.ANGLE:</span> <span class="pre">1&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_style2:</span> <span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle</span> <span class="pre">=</span> <span class="pre">&lt;AtomStyle.NONE:</span> <span class="pre">0&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_style_3:</span> <span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle</span> <span class="pre">=</span> <span class="pre">&lt;AtomStyle.NONE:</span> <span class="pre">0&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.read" title="Permalink to this definition">#</a></dt>
+<dd><p>Actually read a LAMMPS’s <cite>write_data</cite> file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path_of_file_to_read</strong> (<em>-</em>) – The path to the file to read</p></li>
+<li><p><strong>atom_style</strong> (<em>-</em>) – The format of the “Atoms” section, see <a class="reference external" href="https://docs.lammps.org/read_data.html">https://docs.lammps.org/read_data.html</a></p></li>
+<li><p><strong>atom_style2</strong> (<em>-</em>) – The format of the “Atoms” section if the previous parameter is equal to AtomStyle::HYBRID</p></li>
+<li><p><strong>atom_style3</strong> (<em>-</em>) – The format of the “Atoms” section if the second to last parameter is equal to AtomStyle::HYBRID</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
