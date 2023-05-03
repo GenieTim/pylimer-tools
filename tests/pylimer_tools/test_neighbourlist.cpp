@@ -108,18 +108,62 @@ TEST_CASE("Manually accurate EigenNeighbourList",
 
   Eigen::VectorXd coordinates = universe.getUnwrappedVertexCoordinates(&box);
   pe::EigenNeighbourList neighbourList =
-    pe::EigenNeighbourList(coordinates, universe.getBox(), 3.0);
+    pe::EigenNeighbourList(coordinates, universe.getBox(), 2.0);
 
   Eigen::ArrayXi neighbours = neighbourList.getIndicesCloseToCoordinates(
     coordinates.segment(3 * universe.getIdxByAtomId(2), 3), 1.0);
-  REQUIRE(neighbours.size() == 0);
+  CHECK(neighbours.size() == 3);
   neighbours = neighbourList.getIndicesCloseToCoordinates(
     coordinates.segment(3 * universe.getIdxByAtomId(2), 3), 2.0);
-  REQUIRE(neighbours.size() == 2);
+  CHECK(neighbours.size() == 4);
   // neighbours = neighbourList.getIndicesCloseToCoordinates(
   //   coordinates.segment(3 * universe.getIdxByAtomId(2), 3), 2.0, 1.8);
   // REQUIRE(neighbours.size() == 0);
   neighbours = neighbourList.getIndicesCloseToCoordinates(
     coordinates.segment(3 * universe.getIdxByAtomId(1), 3), 2.0);
-  REQUIRE(neighbours.size() == 1);
+  CHECK(neighbours.size() == 3);
+
+  std::vector<std::vector<pe::bucket_idx_t>> buckets =
+    neighbourList.getNeighbourBuckets();
+  Eigen::ArrayXi resizableResults = Eigen::ArrayXi(10);
+  std::vector<pe::coordinate_idx_t> indices;
+  Eigen::VectorXi bucketSizes = neighbourList.getNeighbourBucketSizes();
+  for (size_t bucketIndex = 0; bucketIndex < buckets.size(); ++bucketIndex) {
+    CHECK(buckets[bucketIndex].size() == bucketSizes[bucketIndex]);
+    Eigen::Vector3d centralCoordinates =
+      neighbourList.getCentralCoordinatesOfBucket(bucketIndex);
+    indices =
+      neighbourList.getCombinedBucketIndicesForCoordinates(centralCoordinates,
+                                                           0.01);
+    CHECK(indices.size() == 1);
+    CHECK(indices[0] == bucketIndex);
+    // small enough cut-off to only query this one bucket
+    Eigen::ArrayXi atomsInThisBucket =
+      neighbourList.getIndicesCloseToCoordinates(centralCoordinates, 0.01);
+    CHECK(atomsInThisBucket.size() == bucketSizes[bucketIndex]);
+    int numA = neighbourList.getIndicesCloseToCoordinates(
+      resizableResults, centralCoordinates, 0.01);
+    CHECK(numA == bucketSizes[bucketIndex]);
+    for (size_t i = 0; i < numA; ++i) {
+      CHECK(atomsInThisBucket[i] == resizableResults[i]);
+    }
+  }
+  CHECK(buckets.size() == 10 * 10 * 10);
+  indices =
+    neighbourList.getCombinedBucketIndicesForCoordinates(
+      Eigen::Vector3d(0., 0., 0.), 1.9);
+  CHECK(indices.size() == 8);
+  indices =
+    neighbourList.getCombinedBucketIndicesForCoordinates(
+      Eigen::Vector3d(0., 0., 0.), 0.2);
+  CHECK(indices.size() == 8);
+  indices =
+    neighbourList.getCombinedBucketIndicesForCoordinates(
+      Eigen::Vector3d(1., 1., 1.), 2.0);
+  CHECK(indices.size() == 9 * 3);
+  indices =
+    neighbourList.getCombinedBucketIndicesForCoordinates(
+      Eigen::Vector3d(1., 1., 1.), 0.2);
+  CHECK(indices.size() == 1);
+  CHECK(true);
 }

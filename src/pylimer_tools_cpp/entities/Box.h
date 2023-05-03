@@ -84,12 +84,10 @@ namespace entities {
 
     void recomputeBoxProperties()
     {
-      for (unsigned int i = 0; i < 3; ++i) {
-        this->L[i] = this->hiCoords[i] - this->loCoords[i];
-        this->boxHalfs[i] = L[i] * 0.5;
-        this->oneOverL[i] = 1.0 / L[i];
-      }
-      this->volume = this->getLx() * this->getLy() * this->getLz();
+      this->L = this->hiCoords - this->loCoords;
+      this->boxHalfs = 0.5 * this->L;
+      this->oneOverL = 1.0 / this->L;
+      this->volume = this->L.prod();
     }
 
   public:
@@ -134,8 +132,11 @@ namespace entities {
     double getVolume() const { return this->volume; }
 
     double getL(const int i) const { return this->L[i % 3]; }
+    Eigen::Array3d getL() const { return this->L; }
     double getLowL(const int i) const { return this->loCoords[i % 3]; }
+    Eigen::Array3d getLowL() const { return this->loCoords; }
     double getHighL(const int i) const { return this->hiCoords[i % 3]; }
+    Eigen::Array3d getHighL() const { return this->hiCoords; }
 
     double getLx() const { return this->L[0]; }
     double getLy() const { return this->L[1]; }
@@ -167,7 +168,8 @@ namespace entities {
     }
 
     template<typename Derived>
-    Eigen::MatrixBase<Derived> minImageDistances(Eigen::MatrixBase<Derived>& coords) const
+    Eigen::MatrixBase<Derived> minImageDistances(
+      Eigen::MatrixBase<Derived>& coords) const
     {
       INVALIDARG_EXP_IFN(
         coords.size() % 3 == 0,

@@ -49,6 +49,13 @@ TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
       }
     }
   }
+
+  SECTION("Empty vectors are empty") {
+    Eigen::VectorXd v = Eigen::VectorXd::Zero(0);
+    CHECK(v.size() == 0);
+    Eigen::ArrayXi a = Eigen::ArrayXi::Zero(0);
+    CHECK(a.size() == 0);
+  }
 }
 
 TEST_CASE("Vector Rows can be removed", "[Eigen]")

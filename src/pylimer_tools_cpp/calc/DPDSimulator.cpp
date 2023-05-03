@@ -110,13 +110,13 @@ namespace calc {
       std::ios::sync_with_stdio(false);
       std::string outputBuffer = "";
       outputBuffer.reserve(80 * 20);
-      std::cout
-        << "Step\tTemperature\tPressure\t<b>\tmax(b)\tmax(d)\tmax(f)\tmax(v)\t#"
-           "Shift\t#Relocation\t"
-           "Stress[1,1]\tStress[2,2]\tStress[3,3]\tStress[1,2]\t"
-           "Stress[1,3]\tStress[2,3]";
+      std::cout << "Step\tTemperature\tPressure\tPressure2\t<b>\tmax(b)\tmax(d)"
+                   "\tmax(f)\tmax(v)\t#"
+                   "Shift\t#Relocation\t"
+                   "Stress[1,1]\tStress[2,2]\tStress[3,3]\tStress[1,2]\t"
+                   "Stress[1,3]\tStress[2,3]";
       for (size_t i = 0; i < this->msdOrigins.size(); ++i) {
-        std::cout << "\tMSD" << i << "_" << this->msdOrigins[i];
+        std::cout << "\tMSD" << i << "_" << this->msdOriginTimesteps[i];
       }
       std::cout << std::endl;
 
@@ -135,6 +135,10 @@ namespace calc {
         this->coordinates += dt * velocitiesPlus;
         velocities += lambda * dt * forces;
 
+        // TODO: figure out, what the issue is, how the velocities
+        // should be synchronized for the pressure
+        // temperature = this->computeTemperature(velocities);
+
         // re-compute the forces with these updated coordinates & velocities
         double pressure =
           computeForces(forces, stressTensor, coordinates, velocities, dt, 1.0);
@@ -142,6 +146,15 @@ namespace calc {
         // correct the velocities
         velocities = velocitiesPlus + halfDt * forces;
         temperature = this->computeTemperature(velocities);
+
+        // kinetic term of the stress/pressure
+        double kineticPressureTerm =
+          ((this->numAtoms * temperature) / this->box.getVolume());
+        const double m = 1.;
+        for (size_t i = 0; i < this->numAtoms; ++i) {
+          stressTensor -= m * velocities.segment(3 * i, 3) *
+                          velocities.segment(3 * i, 3).transpose();
+        }
 
         // compute bond properties
         Eigen::VectorXd bondDistances =
@@ -158,9 +171,12 @@ namespace calc {
 
         // output
         outputBuffer.clear();
-        outputBuffer += std::to_string(step + this->currentStep) + "\t";
+        outputBuffer += std::to_string(step + this->currentStep + 1) + "\t";
         outputBuffer += std::to_string(temperature) + "\t";
-        outputBuffer += std::to_string(pressure) + "\t";
+        outputBuffer += std::to_string(pressure + kineticPressureTerm) + "\t";
+        outputBuffer +=
+          std::to_string(-stressTensor.trace() / (3 * this->box.getVolume())) +
+          "\t";
         outputBuffer += std::to_string(meanB) + "\t";
         outputBuffer += std::to_string(maxB) + "\t";
         outputBuffer +=
@@ -255,13 +271,17 @@ namespace calc {
         coordinates(this->bondPartnerCoordinatesB);
       this->box.handlePBC(bondDistances);
       assert(bondDistances.minCoeff() > this->box.getLowX());
-      assert(bondDistances.maxCoeff() > this->box.getHighX());
+      assert(bondDistances.maxCoeff() < this->box.getHighX());
       forces(this->bondPartnerCoordinatesA) -= this->k * bondDistances;
       forces(this->bondPartnerCoordinatesB) += this->k * bondDistances;
       for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
         // TODO: check sign
         pressure -= this->k * bondDistances.segment(3 * i, 3).squaredNorm();
-        stressTensor -= this->k * bondDistances.segment(3 * i, 3) *
+        // pressure -= 0.5 * this->k * bondDistances.segment(3 * i,
+        // 3).squaredNorm();
+        // pressure += 0.5 * this->k * bondDistances.segment(3
+        // * i, 3).squaredNorm();
+        stressTensor += this->k * bondDistances.segment(3 * i, 3) *
                         bondDistances.segment(3 * i, 3).transpose();
       }
 
@@ -329,7 +349,7 @@ namespace calc {
 
           // pressure update
           pressure += pairForce.dot(pairdistance);
-          stressTensor += pairForce * pairdistance.transpose();
+          stressTensor -= pairForce * pairdistance.transpose();
         }
       }
 
@@ -378,14 +398,17 @@ namespace calc {
      * @param hiCutoff
      * @return int
      */
-    int DPDSimulator::createSlipSprings(const int num)
+    int DPDSimulator::createSlipSprings(const int num, const int bondType)
     {
       int createdLastIteration = 100;
       int totalCreated = 0;
       std::vector<size_t> candidates;
+      candidates.reserve(5);
 
       std::vector<size_t> slipSpringFrom;
+      slipSpringFrom.reserve(num);
       std::vector<size_t> slipSpringTo;
+      splipSpringTo.reserve(num);
 
       // randomly permute the atoms to start the search with
       std::vector<size_t> sourceIds;
@@ -397,6 +420,7 @@ namespace calc {
 
       // search for neighbours that are elibile
       while (createdLastIteration > 0 && totalCreated < num) {
+        createdLastIteration = 0;
         for (size_t i : sourceIds) {
           int numCandidates = 0;
           // for each atom, search for possible partners
@@ -409,7 +433,12 @@ namespace calc {
               this->coordinates.segment(3 * pairs[j], 3);
             if (distance.norm() > this->lowCutoff &&
                 distance.norm() <= this->highCutoff) {
-              candidates[numCandidates++] = j;
+              if (numCandidates < candidates.size()) {
+                candidates[numCandidates] = j;
+              } else {
+                candidates.push_back(j);
+              }
+              numCandidates += 1;
             }
           }
           if (numCandidates == 0) {
@@ -421,11 +450,14 @@ namespace calc {
           slipSpringFrom.push_back(i);
           slipSpringTo.push_back(candidates[candidateIndex]);
           totalCreated += 1;
+          createdLastIteration += 1;
           if (totalCreated >= num) {
             break;
           }
         }
       }
+
+      this->addSlipSprings(slipSpringFrom, slipSpringTo, bondType);
       return totalCreated;
     }
 
@@ -749,6 +781,66 @@ namespace calc {
                       false);
 
       return result;
+    }
+
+    long int DPDSimulator::getTimestep() const
+    {
+      return this->currentStep;
+    };
+
+    void DPDSimulator::validateNeighbourlist(double cutoff)
+    {
+      // pre-allocate the neighbor indices array
+      Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
+        this->numAtoms *
+        (std::ceil((3.1 * cutoff) * (3.1 * cutoff) * (3.1 * cutoff)) /
+         this->box.getVolume())));
+
+      // actually loop the atoms
+      for (size_t i = 0; i < this->numAtoms; ++i) {
+        int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
+          neighbors, coordinates.segment(3 * i, 3), cutoff);
+
+        std::vector<size_t> relevantNeighbors;
+        std::vector<size_t> relevantPairs;
+        for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
+          const size_t j = neighbors[neigh_idx];
+          if (j <= i) {
+            continue;
+          }
+          Eigen::Vector3d pairdistance =
+            coordinates.segment(3 * i, 3) - coordinates.segment(3 * j, 3);
+          this->box.handlePBC(pairdistance);
+          const double rNorm = pairdistance.norm();
+          if (rNorm >= cutoff || rNorm < 1e-12) {
+            continue;
+          }
+
+          relevantNeighbors.push_back(j);
+        }
+        for (size_t j = i + 1; j < this->numAtoms; ++j) {
+          Eigen::Vector3d pairdistance =
+            coordinates.segment(3 * i, 3) - coordinates.segment(3 * j, 3);
+          this->box.handlePBC(pairdistance);
+          const double rNorm = pairdistance.norm();
+          if (rNorm >= cutoff || rNorm < 1e-12) {
+            continue;
+          }
+
+          relevantPairs.push_back(j);
+        }
+
+        RUNTIME_EXP_IFN(
+          relevantPairs.size() == relevantNeighbors.size(),
+          "Pairs and neighbours resulted in different sized partners: " +
+            std::to_string(relevantPairs.size()) + " vs. " +
+            std::to_string(relevantNeighbors.size()) + ".");
+        std::sort(relevantPairs.begin(), relevantPairs.end());
+        std::sort(relevantNeighbors.begin(), relevantNeighbors.end());
+
+        RUNTIME_EXP_IFN(relevantNeighbors == relevantPairs,
+                        "Pairs and neighbours are not equal.");
+      }
     }
 
     /**
