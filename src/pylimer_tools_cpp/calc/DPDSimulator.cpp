@@ -408,7 +408,7 @@ namespace calc {
       std::vector<size_t> slipSpringFrom;
       slipSpringFrom.reserve(num);
       std::vector<size_t> slipSpringTo;
-      splipSpringTo.reserve(num);
+      slipSpringTo.reserve(num);
 
       // randomly permute the atoms to start the search with
       std::vector<size_t> sourceIds;
