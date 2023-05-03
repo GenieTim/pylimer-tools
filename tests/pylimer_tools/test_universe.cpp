@@ -47,8 +47,9 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
 
   SECTION("resizing smaller changes volume")
   {
-    universe.setBox(pe::Box(0.0, 1.0, 2.0));
-    REQUIRE(universe.getVolume() == 0.0);
+    REQUIRE_THROWS(pe::Box(0.0, 1.0, 2.0));
+    universe.setBox(pe::Box(0.25, 1.0, 2.0));
+    REQUIRE(universe.getVolume() == 0.5);
     // check empty stuff
     REQUIRE(universe.getClusters().size() == 0);
     REQUIRE(universe.getMolecules(2).size() == 0);
