@@ -73,12 +73,14 @@ namespace calc {
        */
       Eigen::Matrix3d getStressTensor() const;
 
+      long int getTimestep() const;
+
       ////////////////////////////////////////////////////////////////
       // MC Procedures
       /**
        * @brief Randomly add new slip-springs
        */
-      int createSlipSprings(const int num);
+      int createSlipSprings(const int num, const int bondType);
 
       int shiftSlipSprings(const double kbT = 1.);
 
@@ -119,7 +121,7 @@ namespace calc {
       ////////////////////////////////////////////////////////////////
       // validation & export
       void validateState();
-
+      void validateNeighbourlist(double cutoff);
       pylimer_tools::entities::Universe getUniverse() const;
 
     protected:

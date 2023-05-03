@@ -1135,7 +1135,8 @@ init_pylimer_bound_calc(py::module_& m)
          R"pbdoc(
           Randomly add the specified number of slip-springs to neighbours within the specified cut-offs.
      )pbdoc",
-         py::arg("num"))
+         py::arg("num"),
+         py::arg("bond_type") = 9)
     .def("configA",
          &dpd::DPDSimulator::configA,
          R"pbdoc(
@@ -1179,6 +1180,8 @@ init_pylimer_bound_calc(py::module_& m)
          )pbdoc",
          py::arg("atom_ids"))
     .def("getUniverse", &dpd::DPDSimulator::getUniverse)
+    .def("getTimestep", &dpd::DPDSimulator::getTimestep)
+    .def("validateNeighbourList", &dpd::DPDSimulator::validateNeighbourlist)
     .def("validateState", &dpd::DPDSimulator::validateState);
 }
 
