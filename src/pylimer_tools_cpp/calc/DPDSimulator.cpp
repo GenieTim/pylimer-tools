@@ -770,6 +770,10 @@ namespace calc {
       std::vector<long int> bondTo(this->bondPartnersB.data(),
                                    this->bondPartnersB.data() +
                                      this->bondPartnersB.size());
+      for (size_t i = 0; i< this->bondPartnersB.size(); ++i) {
+        bondTo[i] = this->universe.getAtomIdByIdx(bondTo[i]);
+        bondFrom[i] = this->universe.getAtomIdByIdx(bondFrom[i]);
+      }
       std::vector<int> bondTypes(this->bondTypes.data(),
                                  this->bondTypes.data() +
                                    this->bondTypes.size());
