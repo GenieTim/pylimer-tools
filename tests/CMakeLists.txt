@@ -67,6 +67,7 @@ add_library(test_sources
 		pylimer_tools/test_universesequence.cpp 
 		pylimer_tools/test_molecule.cpp 
 		pylimer_tools/test_neighbourlist.cpp 
+		pylimer_tools/test_eigen_neighbourlist_benchmark.cpp 
 		pylimer_tools/test_readers_writers.cpp 
 )
 # pylimer_tools/test_force_balance2.cpp
