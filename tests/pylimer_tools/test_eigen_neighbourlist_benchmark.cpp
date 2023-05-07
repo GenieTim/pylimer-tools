@@ -29,9 +29,9 @@ runBenchmarkWithConfig(double neighbourBinSize = 1.0,
   std::mt19937 gen = std::mt19937(rd());
   // setup the neighbour list
   Eigen::VectorXd coordinates =
-    Eigen::VectorXd::Random(numAtoms) * boxLen * scatter;
+    Eigen::VectorXd::Random(3*numAtoms) * boxLen * scatter;
   // random [?] access atom list
-  std::vector<size_t> ids;
+  std::vector<size_t> ids; ids.reserve(numAtoms);
   for (size_t i = 0; i < numAtoms; ++i) {
     ids.push_back(i);
   }
@@ -75,7 +75,7 @@ runBenchmarkWithConfig(double neighbourBinSize = 1.0,
         meanNrOfNeighs +=
           static_cast<double>(actualNumNeighs) / static_cast<double>(numAtoms);
       }
-      coordinates = Eigen::VectorXd::Random(numAtoms) * boxLen * scatter;
+      coordinates = Eigen::VectorXd::Random(numAtoms*3) * boxLen * scatter;
       neighbourlist.resetCoordinates(coordinates);
     }
     return meanNrOfNeighs;
