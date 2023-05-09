@@ -9,6 +9,7 @@ extern "C"
 #include "../utils/utilityMacros.h"
 #include "Box.h"
 #include <Eigen/Dense>
+#include <iostream>
 #include <map>
 #include <set>
 #include <unordered_map>
@@ -45,6 +46,8 @@ namespace entities {
       this->neighbourBuckets.reserve(this->totalNrOfBuckets);
       this->neighbourBucketNeighboursDefaultCutoff.reserve(
         this->totalNrOfBuckets);
+      // std::cout << "Preparing " << this->totalNrOfBuckets << " bins"
+      //           << std::endl;
 
       // prepare the buckets
       for (bucket_idx_t bucketIndex = 0; bucketIndex < this->totalNrOfBuckets;
@@ -63,6 +66,7 @@ namespace entities {
 
       assert(this->neighbourBucketNeighboursDefaultCutoff.size() ==
              this->totalNrOfBuckets);
+      // std::cout << "Filling buckets" << std::endl;
 
       // fill neighbour buckets
       this->neighbourBucketSizes = Eigen::ArrayXi::Zero(this->totalNrOfBuckets);
