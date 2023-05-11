@@ -272,8 +272,8 @@ TEST_CASE("Box works also after simple shear", "[entity][Box]")
     }
     largeBox.applySimpleShear(0.0, dir);
     largeBox.handlePBC(testCoordCopy2);
-    for (size_t i = 0; i < testCoordsCopy.size(); ++i) {
-      CHECK(testCoordsCopy[i] == testCoordCopy2[i]);
+    for (size_t i = 0; i < testCoordCopy.size(); ++i) {
+      CHECK(testCoordCopy[i] == testCoordCopy2[i]);
     }
   }
 }
