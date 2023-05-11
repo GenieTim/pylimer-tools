@@ -31,6 +31,64 @@ namespace calc {
 
     class DPDSimulator
     {
+
+    private:
+      ////////////////////////////////////////////////////////////////
+      // configuration
+      bool is2D = false;
+      double lambda = 0.65;
+      double k = 2.;
+      double lowCutoff = 0.5;
+      double highCutoff = 2.0;
+      double A = 25.;
+      double sigma = 3.;
+      double gamma = 0.5 * 3. * 3.;
+
+      ////////////////////////////////////////////////////////////////
+      // simulation state
+      long int currentStep = 0;
+      Eigen::VectorXd currentVelocitiesPlus;
+      Eigen::VectorXd currentVelocities;
+      Eigen::VectorXd currentForces;
+      Eigen::Matrix3d currentStressTensor;
+
+      ////////////////////////////////////////////////////////////////
+      // randomness
+      std::mt19937 e2;
+      std::uniform_real_distribution<double> uniform_rand_mean0std1;
+      std::uniform_real_distribution<double> uniform_rand_between_0_1;
+
+      ////////////////////////////////////////////////////////////////
+      // universe structure
+      int numAtoms = 0;
+      int numBonds = 0;
+      int numSlipSprings = 0;
+      pylimer_tools::entities::Box box;
+      pylimer_tools::entities::Universe universe;
+
+      // atoms
+      Eigen::VectorXd coordinates;
+      Eigen::ArrayXi idxFunctionalities;
+      std::vector<int> atomTypes;
+      std::vector<long int> atomIds;
+      std::vector<size_t> chainEndIndices;
+      // bonds
+      Eigen::ArrayXi bondPartnerCoordinatesA;
+      Eigen::ArrayXi bondPartnersA;
+      Eigen::ArrayXi bondPartnerCoordinatesB;
+      Eigen::ArrayXi bondPartnersB;
+      Eigen::ArrayXi bondTypes;
+      // mapping between atoms and bonds
+      std::vector<std::vector<size_t>> bondsOfIndex;
+
+      pylimer_tools::entities::EigenNeighbourList neighbourlist;
+
+      ////////////////////////////////////////////////////////////////
+      // computation state
+      std::vector<Eigen::ArrayXi> msdMeasuredIndices;
+      std::vector<Eigen::VectorXd> msdOrigins;
+      std::vector<size_t> msdOriginTimesteps;
+      
     public:
       DPDSimulator(const pylimer_tools::entities::Universe u,
                    const int crosslinkerType = 2,
@@ -119,10 +177,14 @@ namespace calc {
       void startMeasuringMSDForAtoms(const std::vector<size_t> atomIds);
 
       ////////////////////////////////////////////////////////////////
-      // validation & export
+      // results access & export
+      pylimer_tools::entities::Universe getUniverse() const;
+      double getTemperature() const { return this->computeTemperature(this->currentVelocities); }
+
+      ////////////////////////////////////////////////////////////////
+      // validation
       void validateState();
       void validateNeighbourlist(double cutoff);
-      pylimer_tools::entities::Universe getUniverse() const;
 
     protected:
       void addSlipSprings(std::vector<size_t>& partnerA,
@@ -136,63 +198,6 @@ namespace calc {
       void replaceSlipSpringPartner(const size_t springIdx,
                                     const size_t partnerBefore,
                                     const size_t partnerAfter);
-
-    private:
-      ////////////////////////////////////////////////////////////////
-      // configuration
-      bool is2D = false;
-      double lambda = 0.65;
-      double k = 2.;
-      double lowCutoff = 0.5;
-      double highCutoff = 2.0;
-      double A = 25.;
-      double sigma = 3.;
-      double gamma = 0.5 * 3. * 3.;
-
-      ////////////////////////////////////////////////////////////////
-      // simulation state
-      long int currentStep = 0;
-      Eigen::VectorXd currentVelocitiesPlus;
-      Eigen::VectorXd currentVelocities;
-      Eigen::VectorXd currentForces;
-      Eigen::Matrix3d currentStressTensor;
-
-      ////////////////////////////////////////////////////////////////
-      // randomness
-      std::mt19937 e2;
-      std::uniform_real_distribution<double> uniform_rand_mean0std1;
-      std::uniform_real_distribution<double> uniform_rand_between_0_1;
-
-      ////////////////////////////////////////////////////////////////
-      // universe structure
-      int numAtoms = 0;
-      int numBonds = 0;
-      int numSlipSprings = 0;
-      pylimer_tools::entities::Box box;
-      pylimer_tools::entities::Universe universe;
-
-      // atoms
-      Eigen::VectorXd coordinates;
-      Eigen::ArrayXi idxFunctionalities;
-      std::vector<int> atomTypes;
-      std::vector<long int> atomIds;
-      std::vector<size_t> chainEndIndices;
-      // bonds
-      Eigen::ArrayXi bondPartnerCoordinatesA;
-      Eigen::ArrayXi bondPartnersA;
-      Eigen::ArrayXi bondPartnerCoordinatesB;
-      Eigen::ArrayXi bondPartnersB;
-      Eigen::ArrayXi bondTypes;
-      // mapping between atoms and bonds
-      std::vector<std::vector<size_t>> bondsOfIndex;
-
-      pylimer_tools::entities::EigenNeighbourList neighbourlist;
-
-      ////////////////////////////////////////////////////////////////
-      // computation state
-      std::vector<Eigen::ArrayXi> msdMeasuredIndices;
-      std::vector<Eigen::VectorXd> msdOrigins;
-      std::vector<size_t> msdOriginTimesteps;
     };
   }
 

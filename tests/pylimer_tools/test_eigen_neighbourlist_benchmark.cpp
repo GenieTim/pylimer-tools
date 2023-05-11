@@ -7,7 +7,6 @@
 #include <chrono>
 #include <cmath>
 #include <filesystem>
-#include <format>
 #include <iostream>
 #include <map>
 #include <random>
@@ -15,6 +14,22 @@
 
 namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
+
+template<typename... Args>
+std::string
+string_format(const std::string& format, Args... args)
+{
+  int size_s = std::snprintf(nullptr, 0, format.c_str(), args...) +
+               1; // Extra space for '\0'
+  if (size_s <= 0) {
+    throw std::runtime_error("Error during formatting.");
+  }
+  auto size = static_cast<size_t>(size_s);
+  std::unique_ptr<char[]> buf(new char[size]);
+  std::snprintf(buf.get(), size, format.c_str(), args...);
+  return std::string(buf.get(),
+                     buf.get() + size - 1); // We don't want the '\0' inside
+}
 
 void
 runBenchmarkWithConfig(double neighbourBinSize = 1.0,
@@ -32,7 +47,7 @@ runBenchmarkWithConfig(double neighbourBinSize = 1.0,
   Eigen::VectorXd coordinates =
     Eigen::VectorXd::Random(3 * numAtoms) * boxLen * scatter;
   // random [?] access atom list
-  std::cout << "Coordinates set up" << std::endl;
+  // std::cout << "Coordinates set up" << std::endl;
   std::vector<size_t> ids;
   ids.reserve(numAtoms);
   for (size_t i = 0; i < numAtoms; ++i) {
@@ -40,7 +55,7 @@ runBenchmarkWithConfig(double neighbourBinSize = 1.0,
   }
   // std::cout << "Ids set up" << std::endl;
   std::shuffle(ids.begin(), ids.end(), gen);
-  std::cout << "Ids shuffled" << std::endl;
+  // std::cout << "Ids shuffled" << std::endl;
 
   // actually benchmark
   // char benchmarkName[75];
@@ -51,12 +66,12 @@ runBenchmarkWithConfig(double neighbourBinSize = 1.0,
   //                     density,
   //                     scatter);
   std::string benchmarkName =
-    std::format("EigenNeighList_con_{}_query_{}_rho_{}_s_{}",
-                neighbourBinSize,
-                cutoff,
-                density,
-                scatter);
-  BENCHMARK(benchmarkName)
+    string_format("EigenNeighList_con_%lf_query_%lf_rho_%lf_s_%lf",
+                  neighbourBinSize,
+                  cutoff,
+                  density,
+                  scatter);
+  BENCHMARK(benchmarkName.c_str())
   {
     // std::cout << "Setting up Neighlist" << std::endl;
     pe::EigenNeighbourList neighbourlist =
@@ -105,8 +120,9 @@ TEST_CASE("Eigen Neighbourlist Benchmark",
           "[benchmark][EigenNeighbourList][long]")
 {
   for (double outerCutoff = 0.5; outerCutoff <= 2.5; outerCutoff += 0.5) {
-    for (double innerCutoff = 0.2; innerCutoff <= 2 * outerCutoff;
-         innerCutoff += 0.2) {
+    for (double innerCutoff = 0.5 * outerCutoff; innerCutoff <= 2 * outerCutoff;
+         innerCutoff +=
+         0.2 * 1.5 * outerCutoff) { // 5 iterations per outer cut-off
       runBenchmarkWithConfig(innerCutoff, outerCutoff, 3., 5.);
     }
   }
