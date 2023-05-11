@@ -1,4 +1,5 @@
 
+import base64
 import csv
 import hashlib
 import os
@@ -247,6 +248,81 @@ def extractThermoParams(file, header: Union[str, List[str], None] = "Step Temp E
         df = pd.DataFrame()
 
     doCache(df, file, suffix)
+    # print("Read {} rows for file {}".format(len(df), file))
+
+    return df
+
+
+def readMultiSectionSeparatedValueFile(file: str, separator: str = None, use_cache: bool = True, comment: str = None):
+    """
+    Reads a tsv-like file (could also be e.g. space separated, or csv if you use separator = ",")
+    which contains multiple headers throughout the file.
+
+    Particularly useful to read e.g. a file of output from the DPDSimulator.
+
+    Parameters:
+        - file: the path to the file to read
+        - separator: the separator if not one of the defaults used/recognized by pandas' read_csv
+        - use_cache: use to disable reading from cached results
+        - comment: a character such as "#" to indicate the separator for where a comment starts
+    """
+    suffix = (base64.urlsafe_b64encode(comment.encode("utf-8")).decode('utf-8') if comment is not None else "") + \
+        "mssv-" + \
+        base64.urlsafe_b64encode(
+            separator.encode("utf-8")).decode('utf-8') if separator is not None else "-any"
+    cacheContent = loadCache(file, suffix)
+
+    if (cacheContent is not None and use_cache):
+        return cacheContent
+
+    def csv_section_generator(file_pointer, sep):
+        first_line = file_pointer.readline()
+        first_line_split = first_line.split(sep)
+        line = first_line
+        while line:
+            yield line
+            prev_point = file_pointer.tell()
+            line = file_pointer.readline()
+            line_split = line.split(sep)
+            if (len(line_split) != len(first_line_split)):
+                file_pointer.seek(prev_point)
+                return
+            # potentially, here, you would want to introduce a check that
+            # the line is not another header line somehow
+            is_header = np.sum([
+                w[0].isalpha() for w in line_split if len(w) > 0
+            ]) > 0.74*len(line_split)
+            if is_header:
+                break
+
+    tmp_csv_files = []
+    with open(file, 'r') as fp:
+        while True:
+            csvFileToWrite = "{}/{}_{}".format(
+                tempfile.gettempdir(),
+                hashlib.md5(datetime.now().strftime("%m.%d.%Y, %H:%M:%S.%f").encode()).hexdigest(), 'tmp_thermo_file.csv')
+            n_lines = 0
+            with open(csvFileToWrite, 'w') as output_csv:
+                for line in csv_section_generator(fp, sep=separator):
+                    output_csv.write(line + "\n")
+                    n_lines += 1
+            if (n_lines > 1):
+                tmp_csv_files.append(csvFileToWrite)
+
+            if (n_lines <= 1):
+                break
+
+    if (len(tmp_csv_files) == 0):
+        return pd.DataFrame()
+    # read the csv files again
+    df = pd.concat([pd.read_csv(
+        f, sep=separator, comment=comment) for f in tmp_csv_files], ignore_index=True)
+    doCache(df, file, suffix)
+    for f in tmp_csv_files:
+        try:
+            os.remove(f)
+        except Exception as e:
+            pass
     # print("Read {} rows for file {}".format(len(df), file))
 
     return df

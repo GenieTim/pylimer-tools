@@ -236,6 +236,7 @@ TEST_CASE("Box can adjust coordinates", "[entity][Box]")
 TEST_CASE("Box works also after simple shear", "[entity][Box]")
 {
   pe::Box testBox = pe::Box(0.0, 10.0, 0.0, 10.0, 0.0, 10.0);
+  REQUIRE(testBox == testBox);
   REQUIRE(testBox.getVolume() == Catch::Approx(10. * 10. * 10.));
   testBox.applySimpleShear(0.1, 0);
   REQUIRE(testBox.getVolume() == Catch::Approx(10. * 10. * 10.));
@@ -245,16 +246,41 @@ TEST_CASE("Box works also after simple shear", "[entity][Box]")
   Eigen::VectorXd testCoords(12);
   testCoords << 10.2, 10.2, 10.2, -10.2, -10.2, -10.2, 1.0, 1.0, 1.0, -4., -4.,
     -4.;
+  Eigen::VectorXd testCoordCopy = testCoords;
+  Eigen::VectorXd testCoordCopy2 = testCoords;
+
   undeformedBox.adjustCoordinatesTo(testCoords, testBox);
 
   REQUIRE(testCoords[1] == Catch::Approx(10.2));
   REQUIRE(testCoords[0] == Catch::Approx(10.2 + 0.1 * 10.2));
 
+  // deform back
+  testBox.adjustCoordinatesTo(testCoords, undeformedBox);
+
   pe::Box deformedBox2 = pe::Box(10.0, 10.0, 10.0);
-  deformedBox2.applySimpleShear(0.2, 0);
-  testBox.adjustCoordinatesTo(testCoords, deformedBox2);
-  REQUIRE(testCoords[1] == Catch::Approx(10.2));
-  REQUIRE(testCoords[0] == Catch::Approx(10.2 + 0.2 * 10.2));
+  pe::Box largeBox = pe::Box(40., 40., 40.);
+  for (int dir = 0; dir < 3; ++dir) {
+    deformedBox2.applySimpleShear(0.2, dir);
+    // deform
+    testBox.adjustCoordinatesTo(testCoords, deformedBox2);
+    CHECK(testCoords[dir == 0 ? 1 : 0] == Catch::Approx(10.2));
+    CHECK(testCoords[dir] == Catch::Approx(10.2 + 0.2 * 10.2));
+    // deform back
+    deformedBox2.adjustCoordinatesTo(testCoords, testBox);
+    for (size_t i = 0; i < testCoords.size(); ++i) {
+      CHECK(testCoords[i] == testCoordCopy[i]);
+    }
+    largeBox.applySimpleShear(0.0, dir);
+    largeBox.handlePBC(testCoordCopy2);
+    for (size_t i = 0; i < testCoordsCopy.size(); ++i) {
+      CHECK(testCoordsCopy[i] == testCoordCopy2[i]);
+    }
+  }
+}
+
+TEST_CASE("Box throws", "[entity][Box]")
+{
+  REQUIRE_THROWS(pe::Box(0.0, -1.0, 0.0, -1.0, 0.0, -1.0));
 }
 
 TEST_CASE("Atoms persist state", "[entity][Atom]")

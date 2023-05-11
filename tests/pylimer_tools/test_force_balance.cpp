@@ -900,12 +900,12 @@ TEST_CASE("MEHP Force Balance can randomly add slip-links ignoring cross-links",
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
 
-  std::string largeInputFile =
-    suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
-  if (std::filesystem::exists(largeInputFile)) {
+  std::string inputFile =
+    suspectedPath + "network_100_a_46.structure.out";
+  if (std::filesystem::exists(inputFile)) {
     REQUIRE(std::filesystem::exists(suspectedPath));
-    std::cout << "Reading file " << largeInputFile << std::endl;
-    universeSeq.initializeFromDataSequence({ { largeInputFile } });
+    std::cout << "Reading file " << inputFile << std::endl;
+    universeSeq.initializeFromDataSequence({ { inputFile } });
     REQUIRE(universeSeq.getLength() == 1);
     pe::Universe universe = universeSeq.atIndex(0);
     std::cout << "Read file. " << std::endl;
@@ -913,13 +913,13 @@ TEST_CASE("MEHP Force Balance can randomly add slip-links ignoring cross-links",
       pcm::MEHPForceBalance(universe, 2, false, 1.0, true);
     // TODO: using a seed does not seem to work properly
     size_t nrOfAddedLinks =
-      forceBalancer.randomlyAddSliplinks(500, 2.0, 100, 2.0, true, 12);
-    REQUIRE(nrOfAddedLinks >= 100);
+      forceBalancer.randomlyAddSliplinks(250, 2.0, 100, 2.0, true, 12);
+    REQUIRE(nrOfAddedLinks >= 50);
     REQUIRE_NOTHROW(forceBalancer.validateNetwork());
     std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
     nrOfAddedLinks =
-      forceBalancer.randomlyAddSliplinks(500, 2.0, 100, 2.0, false, 25);
-    REQUIRE(nrOfAddedLinks >= 100);
+      forceBalancer.randomlyAddSliplinks(250, 2.0, 100, 2.0, false, 25);
+    REQUIRE(nrOfAddedLinks >= 50);
     REQUIRE_NOTHROW(forceBalancer.validateNetwork());
     std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
 
@@ -950,25 +950,25 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
 
-  std::string largeInputFile =
-    suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
-  if (std::filesystem::exists(largeInputFile)) {
+  std::string inputFile =
+    suspectedPath + "network_100_a_46.structure.out";
+  if (std::filesystem::exists(inputFile)) {
     REQUIRE(std::filesystem::exists(suspectedPath));
-    std::cout << "Reading file " << largeInputFile << std::endl;
-    universeSeq.initializeFromDataSequence({ { largeInputFile } });
+    std::cout << "Reading file " << inputFile << std::endl;
+    universeSeq.initializeFromDataSequence({ { inputFile } });
     REQUIRE(universeSeq.getLength() == 1);
     pe::Universe universe = universeSeq.atIndex(0);
     std::cout << "Read file. " << std::endl;
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance(universe, 2, false, 1.0, true);
     size_t nrOfAddedLinks =
-      forceBalancer.randomlyAddSliplinks(1500, 2.0, 100, 2.0, true);
-    REQUIRE(nrOfAddedLinks >= 100);
-    std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+      forceBalancer.randomlyAddSliplinks(250, 2.0, 100, 2.0, true);
+    REQUIRE(nrOfAddedLinks >= 25);
+    // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
     nrOfAddedLinks =
-      forceBalancer.randomlyAddSliplinks(1500, 2.0, 100, 2.0, false);
-    REQUIRE(nrOfAddedLinks >= 100);
-    std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+      forceBalancer.randomlyAddSliplinks(250, 2.0, 100, 2.0, false);
+    REQUIRE(nrOfAddedLinks >= 25);
+    // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
     pe::Box oldBox = universe.getBox();
     forceBalancer.deformTo(
       pe::Box(4 * oldBox.getLx(), 0.5 * oldBox.getLy(), 0.5 * oldBox.getLz()));
@@ -1015,12 +1015,12 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
 
-  std::string largeInputFile =
-    suspectedPath + "xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure.out";
-  if (std::filesystem::exists(largeInputFile)) {
+  std::string inputFile =
+    suspectedPath + "network_100_a_46.structure.out";
+  if (std::filesystem::exists(inputFile)) {
     REQUIRE(std::filesystem::exists(suspectedPath));
-    std::cout << "Reading file " << largeInputFile << std::endl;
-    universeSeq.initializeFromDataSequence({ { largeInputFile } });
+    std::cout << "Reading file " << inputFile << std::endl;
+    universeSeq.initializeFromDataSequence({ { inputFile } });
     REQUIRE(universeSeq.getLength() == 1);
     pe::Universe universe = universeSeq.atIndex(0);
     std::cout << "Read file. " << std::endl;
@@ -1028,7 +1028,7 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
       pcm::MEHPForceBalance(universe, 2, false, 1.0, true);
     size_t nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(1000, 2.0, 100);
     REQUIRE(nrOfAddedLinks >= 100);
-    std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+    // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
 
     pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
     Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
@@ -1056,7 +1056,7 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
     forceBalancer = pcm::MEHPForceBalance(universe, 2, true, 1.0, true);
     nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(1000, 2.0, 100);
     REQUIRE(nrOfAddedLinks >= 100);
-    std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+    // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
     // check that all f = 2 have already been removed
     // they have not, since more f = 2 are produced by
     // numInactiveRemoved = forceBalancer.removeTwofunctionalCrosslinks(

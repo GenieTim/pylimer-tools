@@ -198,40 +198,75 @@ namespace entities {
                            std::to_string(upperCutoff) + ".");
 #endif
 
-      std::vector<bucket_idx_t> bucketIndices;
-      if (upperCutoff == this->cutoff) {
-        bucketIndices = this->neighbourBucketNeighboursDefaultCutoff
-                          [this->getBucketIndexForTriplet(
-                            this->getBucketTripletForCoordinates(coordinates))];
-      } else {
-        bucketIndices = this->getCombinedBucketIndicesForCoordinates(
-          coordinates, upperCutoff);
-      }
-
-      // first, count the number of results we will get
-      int nResults = this->neighbourBucketSizes(bucketIndices).sum();
-
-      if (nResults >= result.size()) {
-        result.conservativeResize(nResults);
-      }
-
-      Eigen::Vector3d difference;
       int results_idx = 0;
-      for (bucket_idx_t bucketIndex : bucketIndices) {
-        for (int indexInBucket = 0;
-             indexInBucket < this->neighbourBucketSizes[bucketIndex];
-             indexInBucket++) {
-          coordinate_idx_t atomIndex =
-            this->neighbourBuckets[bucketIndex][indexInBucket];
-          result[results_idx] = atomIndex;
-          results_idx += 1;
-          // difference = this->coordinates.segment(3 * idx, 3) -
-          //                this->coordinates.segment(3 * atomIndex, 3)
-          // this->box.handlePBC(difference);
-          // double distance = difference.squaredNorm();
-          // if (distance < upperCutoff2 && distance >= lowerCutoff2) {
-          //   results.push_back(this->atoms[atomIndex]);
-          // }
+      if (upperCutoff == this->cutoff) {
+        // first, count the number of results we will get
+        int nResults =
+          this
+            ->neighbourBucketSizes(
+              this->neighbourBucketNeighboursDefaultCutoff
+                [this->getBucketIndexForTriplet(
+                  this->getBucketTripletForCoordinates(coordinates))])
+            .sum();
+        for (bucket_idx_t bucketIndex :
+             this->neighbourBucketNeighboursDefaultCutoff
+               [this->getBucketIndexForTriplet(
+                 this->getBucketTripletForCoordinates(coordinates))]) {
+          for (int indexInBucket = 0;
+               indexInBucket < this->neighbourBucketSizes[bucketIndex];
+               indexInBucket++) {
+            coordinate_idx_t atomIndex =
+              this->neighbourBuckets[bucketIndex][indexInBucket];
+            result[results_idx] = atomIndex;
+            results_idx += 1;
+          }
+        }
+      } else {
+        // TODO: this is more or less identical to
+        // EigenNeighbourList::getCombinedIndicesForCoordinates
+        // with some minor additions here and there
+        Eigen::Array3i indexBasis =
+          this->getBucketTripletForCoordinates(coordinates);
+        Eigen::Array3i maxIndices = this->getBucketTripletForCoordinates(
+          coordinates + Eigen::Vector3d::Constant(upperCutoff));
+        Eigen::Array3i minIndices = this->getBucketTripletForCoordinates(
+          coordinates - Eigen::Vector3d::Constant(upperCutoff));
+
+        if (result.size() < 12) {
+          // heuristic minimum
+          result.conservativeResize(12);
+        }
+
+        // use a set to avoid returning duplicates
+        std::set<bucket_idx_t> buckets;
+        Eigen::Array3i indexTriplet;
+        // now, do permutations of all these
+        for (int i = minIndices[0]; i <= maxIndices[0]; ++i) {
+          indexTriplet[0] = i;
+          for (int j = minIndices[1]; j <= maxIndices[1]; ++j) {
+            indexTriplet[1] = j;
+            for (int k = minIndices[2]; k <= maxIndices[2]; ++k) {
+              indexTriplet[2] = k;
+              bucket_idx_t bucketIndex =
+                this->getBucketIndexForTriplet(indexTriplet);
+              // found the bucket, insert its contents into the results if
+              // desired
+              if (buckets.insert(bucketIndex).second) {
+                for (int indexInBucket = 0;
+                     indexInBucket < this->neighbourBucketSizes[bucketIndex];
+                     indexInBucket++) {
+                  coordinate_idx_t atomIndex =
+                    this->neighbourBuckets[bucketIndex][indexInBucket];
+                  result[results_idx] = atomIndex;
+                  results_idx += 1;
+
+                  if (results_idx >= result.size()) {
+                    result.conservativeResize(result.size() * 2);
+                  }
+                }
+              }
+            }
+          }
         }
       }
 
