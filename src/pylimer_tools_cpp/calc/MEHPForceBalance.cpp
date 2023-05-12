@@ -2794,12 +2794,12 @@ namespace calc {
                 std::to_string(nextS) + " and " + std::to_string(currentS) +
                 ". Diff: " + std::to_string(1. - (nextS + currentS)) + ".");
             RUNTIME_EXP_IFN(
-              nextS >= 0.0,
+              nextS >= -0.0,
               "nextS must be >= 0., got " + std::to_string(nextS) + " from " +
                 std::to_string(nextS) + " and " + std::to_string(currentS) +
                 ", " + std::to_string(newS) + " and " +
                 std::to_string(complementaryS) + ".");
-            RUNTIME_EXP_IFN(complementaryS >= 0.0,
+            RUNTIME_EXP_IFN(complementaryS >= -0.0,
                             "complementaryS must be >= 0., got " +
                               std::to_string(complementaryS) + " from " +
                               std::to_string(nextS) + " and " +
