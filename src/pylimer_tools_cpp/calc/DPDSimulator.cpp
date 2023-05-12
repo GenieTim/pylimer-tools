@@ -98,9 +98,12 @@ namespace calc {
      * @param lambda
      * @param withMC
      */
-    void DPDSimulator::runSimulation(const long int nSteps,
-                                     double dt,
-                                     bool withMC)
+    void DPDSimulator::runSimulation(
+      const long int nSteps,
+      double dt,
+      bool withMC,
+      const std::function<bool()>& shouldInterrupt,
+      const std::function<void()>& cleanupInterrupt)
     {
       Eigen::VectorXd velocitiesPlus = this->currentVelocitiesPlus;
       Eigen::VectorXd velocities = this->currentVelocities;
@@ -119,6 +122,7 @@ namespace calc {
         std::cout << "\tMSD" << i << "_" << this->msdOriginTimesteps[i];
       }
       std::cout << std::endl;
+      bool wasInterruped = false;
 
       int numShifts = 0;
       int numRelocations = 0;
@@ -207,6 +211,11 @@ namespace calc {
         }
 
         this->neighbourlist.resetCoordinates(coordinates);
+
+        if (shouldInterrupt()) {
+          wasInterrupted = true;
+          break;
+        }
       }
 
       // finish up
@@ -216,6 +225,10 @@ namespace calc {
       this->currentVelocitiesPlus = velocitiesPlus;
       this->currentStep += nSteps;
       this->currentStressTensor = stressTensor;
+
+      if (wasInterrupted) {
+        cleanupInterrup();
+      }
     }
 
     /**
@@ -770,7 +783,7 @@ namespace calc {
       std::vector<long int> bondTo(this->bondPartnersB.data(),
                                    this->bondPartnersB.data() +
                                      this->bondPartnersB.size());
-      for (size_t i = 0; i< this->bondPartnersB.size(); ++i) {
+      for (size_t i = 0; i < this->bondPartnersB.size(); ++i) {
         bondTo[i] = this->universe.getAtomIdByIdx(bondTo[i]);
         bondFrom[i] = this->universe.getAtomIdByIdx(bondFrom[i]);
       }
@@ -787,10 +800,7 @@ namespace calc {
       return result;
     }
 
-    long int DPDSimulator::getTimestep() const
-    {
-      return this->currentStep;
-    };
+    long int DPDSimulator::getTimestep() const { return this->currentStep; };
 
     void DPDSimulator::validateNeighbourlist(double cutoff)
     {

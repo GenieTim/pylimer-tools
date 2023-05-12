@@ -1122,14 +1122,27 @@ init_pylimer_bound_calc(py::module_& m)
       py::arg("crosslinker_type") = 2,
       py::arg("is_2D") = false,
       py::arg("seed") = "")
-    .def("runSimulation",
-         &dpd::DPDSimulator::runSimulation,
-         R"pbdoc(
-          Actually do some simulation steps.
-     )pbdoc",
-         py::arg("n_steps"),
-         py::arg("dt") = 0.06,
-         py::arg("with_MC") = false)
+    //     .def("runSimulation",
+    //          &dpd::DPDSimulator::runSimulation,
+    //          R"pbdoc(
+    //           Actually do some simulation steps.
+    //      )pbdoc",
+    //          py::arg("n_steps"),
+    //          py::arg("dt") = 0.06,
+    //          py::arg("with_MC") = false)
+    .def(
+      "runSimulation",
+      [](const dpd::DPDSimulator& sim, int nSteps, double dt, bool withMC) {
+        return sim.runSimulation(
+          nSteps,
+          dt,
+          withMC,
+          []() { return PyErr_CheckSignals() != 0; },
+          []() { throw py::error_already_set(); });
+      },
+      py::arg("n_steps"),
+      py::arg("dt") = 0.06,
+      py::arg("with_MC") = false)
     .def("createSlipSprings",
          &dpd::DPDSimulator::createSlipSprings,
          R"pbdoc(
