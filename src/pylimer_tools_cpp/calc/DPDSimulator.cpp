@@ -122,7 +122,7 @@ namespace calc {
         std::cout << "\tMSD" << i << "_" << this->msdOriginTimesteps[i];
       }
       std::cout << std::endl;
-      bool wasInterruped = false;
+      bool wasInterrupted = false;
 
       int numShifts = 0;
       int numRelocations = 0;
@@ -227,7 +227,7 @@ namespace calc {
       this->currentStressTensor = stressTensor;
 
       if (wasInterrupted) {
-        cleanupInterrup();
+        cleanupInterrupt();
       }
     }
 
