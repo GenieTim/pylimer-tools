@@ -315,14 +315,20 @@ def readMultiSectionSeparatedValueFile(file: str, separator: str = None, use_cac
     if (len(tmp_csv_files) == 0):
         return pd.DataFrame()
     # read the csv files again
-    df = pd.concat([pd.read_csv(
-        f, sep=separator, comment=comment) for f in tmp_csv_files], ignore_index=True)
-    doCache(df, file, suffix)
+    data_frames = []
     for f in tmp_csv_files:
         try:
-            os.remove(f)
+            data_frames.append(pd.read_csv(
+                f, sep=separator, comment=comment))
+            try:
+                os.remove(f)
+            except Exception as e:
+                pass
         except Exception as e:
-            pass
+            warnings.warn("Failed to read csv file {}".format(tmp_csv_files))
+            raise e
+    df = pd.concat(data_frames, ignore_index=True)
+    doCache(df, file, suffix)
     # print("Read {} rows for file {}".format(len(df), file))
 
     return df
