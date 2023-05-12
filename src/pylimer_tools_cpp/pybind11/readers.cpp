@@ -1,8 +1,9 @@
 #ifndef PYBIND_READERS_H
 #define PYBIND_READERS_H
 
-#include "../utils/DataFileParser.h"
-#include "../utils/DumpFileParser.h"
+#include "../io/DataFileParser.h"
+#include "../io/DumpFileParser.h"
+#include "../io/CSVSplitter.h"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -144,6 +145,8 @@ init_pylimer_bound_readers(py::module_& m)
     .def("getLz", &DataFileParser::getLz)
     .def("getLowZ", &DataFileParser::getLowZ)
     .def("getHighZ", &DataFileParser::getHighZ);
+
+     m.def("splitCSV", &splitCSV, "Read a file containing a number of CSVs. Returns them split up.");
 }
 
 #endif

@@ -1,5 +1,5 @@
-#include "../../src/pylimer_tools_cpp/utils/DataFileParser.h"
-#include "../../src/pylimer_tools_cpp/utils/DumpFileParser.h"
+#include "../../src/pylimer_tools_cpp/io/DataFileParser.h"
+#include "../../src/pylimer_tools_cpp/io/DumpFileParser.h"
 #include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>

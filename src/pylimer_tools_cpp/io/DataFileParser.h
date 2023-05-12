@@ -1,7 +1,7 @@
 #ifndef DATA_FILE_PARSER_H
 #define DATA_FILE_PARSER_H
 
-#include "StringUtils.h"
+#include "../utils/StringUtils.h"
 #include <algorithm>
 #include <filesystem>
 #include <iostream>

@@ -3,7 +3,7 @@
 #include "../../src/pylimer_tools_cpp/entities/Molecule.h"
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
-#include "../../src/pylimer_tools_cpp/utils/DataFileWriter.h"
+#include "../../src/pylimer_tools_cpp/io/DataFileWriter.h"
 #include "../../src/pylimer_tools_cpp/utils/MCUniverseGenerator.h"
 #include <catch2/catch_test_macros.hpp>
 #include <iostream>
