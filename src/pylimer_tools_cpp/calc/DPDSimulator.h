@@ -44,9 +44,11 @@ namespace calc {
       double sigma = 3.;
       double gamma = 0.5 * 3. * 3.;
 
+
       ////////////////////////////////////////////////////////////////
       // simulation state
       long int currentStep = 0;
+      double currentTime = 0.;
       Eigen::VectorXd currentVelocitiesPlus;
       Eigen::VectorXd currentVelocities;
       Eigen::VectorXd currentForces;
