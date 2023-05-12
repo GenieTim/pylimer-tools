@@ -1,6 +1,4 @@
 #include "../../src/pylimer_tools_cpp/entities/EigenNeighbourList.h"
-#include "../../src/pylimer_tools_cpp/entities/Universe.h"
-#include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
