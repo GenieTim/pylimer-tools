@@ -26,6 +26,35 @@ namespace pylimer_tools {
 namespace calc {
 
   namespace dpd {
+
+    enum ComputedValues
+    {
+      STEP = 0,
+      TIMESTEP = 1,
+      TIME = 2,
+      VOLUME = 3,
+      PRESSURE = 4,
+      TEMPERATURE = 5,
+      STRESS_XX = 6,
+      STRESS_YY = 7,
+      STRESS_ZZ = 8,
+      STRESS_XY = 9,
+      STRESS_XZ = 10,
+      STRESS_YZ = 11,
+      MEAN_B = 12,
+      MAX_B = 13,
+      NUM_SHIFT = 14,
+      NUM_RELOC = 15,
+      MSD = 16
+    };
+
+    const std::array<std::string, 17> ComputedValuesNames = {
+      "Step",        "TimeStep",    "Time",        "Volume",      "Pressure",
+      "Temperature", "Stress[0,0]", "Stress[1,1]", "Stress[2,2]", "Stress[0,1]",
+      "Stress[0,2]", "Stress[1,2]", "<b>",         "max(b)",      "numShift",
+      "numReloc",    "MSD"
+    };
+
     typedef Eigen::Array<size_t, Eigen::Dynamic, 1> ArrayXst;
     typedef Eigen::Array<long int, Eigen::Dynamic, 1> ArrayXli;
 
@@ -43,7 +72,11 @@ namespace calc {
       double A = 25.;
       double sigma = 3.;
       double gamma = 0.5 * 3. * 3.;
-
+      std::string averagesFile = "";
+      std::vector<ComputedValues> valuesToAverage;
+      std::vector<ComputedValues> valuesToOutput;
+      int outputAveragesEvery = 1;
+      int outputValuesEvery = 1;
 
       ////////////////////////////////////////////////////////////////
       // simulation state
@@ -187,6 +220,27 @@ namespace calc {
       void configA(const double newA) { this->A = newA; }
 
       void startMeasuringMSDForAtoms(const std::vector<size_t> atomIds);
+
+      void configAveragesFile(std::string newFile)
+      {
+        this->averagesFile = newFile;
+      };
+
+      void configValuesToAverage(std::vector<ComputedValues> vals)
+      {
+        this->valuesToAverage = vals;
+      }
+
+      void configWhenToOutputAverages(int then = 50)
+      {
+        this->outputAveragesEvery = then;
+      }
+      void configValuesToOutput(std::vector<ComputedValues> vals)
+      {
+        this->valuesToOutput = vals;
+      }
+
+      void configWhenToOutput(int then = 50) { this->outputValuesEvery = then; }
 
       ////////////////////////////////////////////////////////////////
       // results access & export
