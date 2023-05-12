@@ -1,7 +1,7 @@
 #include "DumpFileParser.h"
 #include "../entities/Universe.h"
 #include "../entities/UniverseSequence.h"
-#include "StringUtils.h"
+#include "../utils/StringUtils.h"
 #include <algorithm>
 #include <any>
 #include <cctype>

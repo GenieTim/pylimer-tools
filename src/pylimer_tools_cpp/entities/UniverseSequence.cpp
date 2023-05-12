@@ -1,6 +1,6 @@
 #include "UniverseSequence.h"
-#include "../utils/DataFileParser.h"
-#include "../utils/DumpFileParser.h"
+#include "../io/DataFileParser.h"
+#include "../io/DumpFileParser.h"
 #include "../utils/VectorUtils.h"
 #include "Universe.h"
 #include <Eigen/Dense>

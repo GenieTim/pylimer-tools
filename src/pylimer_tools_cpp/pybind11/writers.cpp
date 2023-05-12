@@ -2,7 +2,7 @@
 #ifndef PYBIND_WRITERS_H
 #define PYBIND_WRITERS_H
 
-#include "../utils/DataFileWriter.h"
+#include "../io/DataFileWriter.h"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>

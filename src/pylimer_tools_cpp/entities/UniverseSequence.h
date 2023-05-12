@@ -1,8 +1,8 @@
 #ifndef UNIVERSE_SEQ_H
 #define UNIVERSE_SEQ_H
 
-#include "../utils/DataFileParser.h"
-#include "../utils/DumpFileParser.h"
+#include "../io/DataFileParser.h"
+#include "../io/DumpFileParser.h"
 #include "Universe.h"
 #include <string>
 #include <unordered_map>

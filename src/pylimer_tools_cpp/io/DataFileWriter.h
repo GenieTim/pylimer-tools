@@ -3,7 +3,7 @@
 
 #include "../entities/Atom.h"
 #include "../entities/Universe.h"
-#include "StringUtils.h"
+#include "../utils/StringUtils.h"
 #include <algorithm>
 #include <ctime>
 #include <filesystem>

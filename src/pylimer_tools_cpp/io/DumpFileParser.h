@@ -2,7 +2,7 @@
 #define DUMP_FILE_PARSER_H
 
 #include "../entities/Universe.h"
-#include "StringUtils.h"
+#include "../utils/StringUtils.h"
 #include <algorithm>
 #include <any>
 #include <cctype>
