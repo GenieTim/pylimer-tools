@@ -1,20 +1,11 @@
 #include "./DPDSimulator.h"
 
+#include <fstream>
+#include <iostream>
+
 namespace pylimer_tools {
 namespace calc {
   namespace dpd {
-
-    enum ComputedValues
-    {
-      TEMPERATURE,
-      PRESSURE,
-      STEP,
-      VOLUME, 
-      TIMESTEP,
-      TIME,
-      MSD,
-      STRESS
-    };
 
     DPDSimulator::DPDSimulator(const pylimer_tools::entities::Universe u,
                                const int crosslinkerType,
@@ -121,20 +112,58 @@ namespace calc {
       Eigen::VectorXd velocities = this->currentVelocities;
       Eigen::VectorXd forces = this->currentForces;
       Eigen::Matrix3d stressTensor = Eigen::Matrix3d::Zero();
+      bool wasInterrupted = false;
 
+      // output headers
       std::ios::sync_with_stdio(false);
       std::string outputBuffer = "";
       outputBuffer.reserve(80 * 20);
-      std::cout << "Step\tTemperature\tPressure\tPressure2\t<b>\tmax(b)\tmax(d)"
-                   "\tmax(f)\tmax(v)\t#"
-                   "Shift\t#Relocation\t"
-                   "Stress[1,1]\tStress[2,2]\tStress[3,3]\tStress[1,2]\t"
-                   "Stress[1,3]\tStress[2,3]";
-      for (size_t i = 0; i < this->msdOrigins.size(); ++i) {
-        std::cout << "\tMSD" << i << "_" << this->msdOriginTimesteps[i];
+      for (ComputedValues val : this->valuesToOutput) {
+        switch (val) {
+          case ComputedValues::MSD:
+            for (size_t i = 0; i < this->msdOrigins.size(); ++i) {
+              outputBuffer += "MSD" + std::to_string(i) + "_" +
+                              std::to_string(this->msdOriginTimesteps[i]) +
+                              "\t";
+            }
+            break;
+          default:
+            outputBuffer += ComputedValuesNames[val] + "\t";
+        }
       }
-      std::cout << std::endl;
-      bool wasInterrupted = false;
+      if (outputBuffer.length() > 0) {
+        outputBuffer.pop_back();
+      }
+      std::cout << outputBuffer << std::endl;
+      bool doAverage = this->averagesFile != "";
+
+      // prepare averages
+      std::ofstream averagesOutput;
+      int numAverages = 0;
+      std::string averagesOutputBuffer = "OutputStep";
+      if (doAverage) {
+        averagesOutput.open(this->averagesFile, std::ios::out | std::ios::app);
+        averagesOutputBuffer.reserve(80 * 20);
+        for (ComputedValues val : this->valuesToAverage) {
+          switch (val) {
+            case ComputedValues::MSD:
+              numAverages += this->msdOrigins.size();
+              for (size_t i = 0; i < this->msdOrigins.size(); ++i) {
+                averagesOutputBuffer +=
+                  "\tMSD" + std::to_string(i) + "_" +
+                  std::to_string(this->msdOriginTimesteps[i]);
+              }
+              break;
+              break;
+            default:
+              numAverages += 1;
+              averagesOutputBuffer += "\t" + ComputedValuesNames[val];
+          }
+        }
+        averagesOutput << averagesOutputBuffer << std::endl;
+      }
+      std::vector<double> runningAverages =
+        pylimer_tools::utils::initializeWithValue<double>(numAverages, 0.);
 
       int numShifts = 0;
       int numRelocations = 0;
@@ -187,43 +216,93 @@ namespace calc {
         }
 
         // output
-        outputBuffer.clear();
-        outputBuffer += std::to_string(step + this->currentStep + 1) + "\t";
-        outputBuffer += std::to_string(temperature) + "\t";
-        outputBuffer += std::to_string(pressure + kineticPressureTerm) + "\t";
-        outputBuffer +=
-          std::to_string(-stressTensor.trace() / (3 * this->box.getVolume())) +
-          "\t";
-        outputBuffer += std::to_string(meanB) + "\t";
-        outputBuffer += std::to_string(maxB) + "\t";
-        outputBuffer +=
-          std::to_string((dt * velocitiesPlus).cwiseAbs().maxCoeff()) + "\t";
-        outputBuffer += std::to_string(forces.maxCoeff()) + "\t";
-        outputBuffer += std::to_string(velocities.maxCoeff()) + "\t";
-        outputBuffer += std::to_string(numShifts) + "\t";
-        outputBuffer += std::to_string(numRelocations) + "\t";
-        outputBuffer += std::to_string(stressTensor(0, 0)) + "\t";
-        outputBuffer += std::to_string(stressTensor(1, 1)) + "\t";
-        outputBuffer += std::to_string(stressTensor(2, 2)) + "\t";
-        outputBuffer += std::to_string(stressTensor(0, 1)) + "\t";
-        outputBuffer += std::to_string(stressTensor(0, 2)) + "\t";
-        outputBuffer += std::to_string(stressTensor(1, 2));
-        // compute MSD
-        for (size_t msdIdx = 0; msdIdx < msdMeasuredIndices.size(); ++msdIdx) {
-          double result =
-            (this->msdOrigins[msdIdx] -
-             coordinates(this->msdMeasuredIndices[msdIdx]))
-              .squaredNorm() /
-            (static_cast<double>(this->msdMeasuredIndices[msdIdx].size() / 3.));
-          outputBuffer += "\t" + std::to_string(result);
+        std::array<double, 12> values = { step + this->currentStep + 1,
+                                          dt,
+                                          this->currentTime + (step + 1) * dt,
+                                          this->box.getVolume(),
+                                          pressure +
+                                            kineticPressureTerm temperature,
+                                          stressTensor(0, 0),
+                                          stressTensor(1, 1),
+                                          stressTensor(2, 2),
+                                          stressTensor(0, 1),
+                                          stressTensor(0, 2),
+                                          stressTensor(1, 2),
+                                          meanB,
+                                          maxB,
+                                          numShifts,
+                                          numRelocations };
+        if ((step + 1) % this->outputValuesEvery == 0) {
+          outputBuffer.clear();
+          for (ComputedValues val : this->valuesToOutput) {
+            switch (val) {
+              case ComputedValues::MSD:
+                // compute MSD
+                for (size_t msdIdx = 0; msdIdx < msdMeasuredIndices.size();
+                     ++msdIdx) {
+                  double result =
+                    (this->msdOrigins[msdIdx] -
+                     coordinates(this->msdMeasuredIndices[msdIdx]))
+                      .squaredNorm() /
+                    (static_cast<double>(
+                      this->msdMeasuredIndices[msdIdx].size() / 3.));
+                  outputBuffer += "\t" + std::to_string(result);
+                }
+                break;
+              default:
+                outputBuffer += std::to_string(values[val]) + "\t";
+            }
+          }
+          if (!outputBuffer.empty()) {
+            outputBuffer.pop_back(); // remove last "\t"
+          }
+          outputBuffer += "\n";
+          std::cout << outputBuffer;
         }
-        outputBuffer += "\n";
-        std::cout << outputBuffer;
-        if (step % 25 == 0) {
-          std::flush(std::cout);
+
+        // compute averages
+        int averagesIdx = 0;
+        for (ComputedValues val : this->valuesToAverage) {
+          switch (val) {
+            case ComputedValues::MSD:
+              // compute MSD
+              size_t msdIdx = 0;
+              for (; msdIdx < msdMeasuredIndices.size(); ++msdIdx) {
+                double result =
+                  (this->msdOrigins[msdIdx] -
+                   coordinates(this->msdMeasuredIndices[msdIdx]))
+                    .squaredNorm() /
+                  (static_cast<double>(this->msdMeasuredIndices[msdIdx].size() /
+                                       3.));
+                runningAverages[averagesIdx + msdIdx] +=
+                  result / static_cast<double>(this->outputAveragesEvery);
+              }
+              averagesIds += msdIdx;
+              break;
+            default:
+              runningAverages[averagesIdx] +=
+                values[val] / static_cast<double>(this->outputAveragesEvery);
+              averagesIdx += 1;
+          }
+        }
+
+        // check (and if, output) averages
+        if ((step + 1) % this->outputAveragesEvery == 0 && doAverage) {
+          // output & start again
+          averagesOutputBuffer.clear();
+          averagesOutputBuffer += std::to_string(step);
+          for (size_t i = 0; i < runningAverages.size(); ++i) {
+            averagesOutputBuffer += "\t" + std::to_string(runningAverages[i]);
+            runningAverages[i] = 0.;
+          }
+          averagesOutput << averagesOutputBuffer << std::endl;
         }
 
         this->neighbourlist.resetCoordinates(coordinates);
+
+        if (step % 50 == 0) {
+          std::flush(std::cout);
+        }
 
         if (shouldInterrupt()) {
           wasInterrupted = true;
@@ -233,6 +312,7 @@ namespace calc {
 
       // finish up
       std::ios::sync_with_stdio(true);
+      averagesOutput.close();
       this->currentForces = forces;
       this->currentVelocities = velocities;
       this->currentVelocitiesPlus = velocitiesPlus;

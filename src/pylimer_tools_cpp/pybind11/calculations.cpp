@@ -1106,6 +1106,25 @@ init_pylimer_bound_calc(py::module_& m)
   //      )pbdoc",
   //          py::arg("newCrosslinkerType") = 2);
 
+  py::enum_<dpd::ComputedValues>(m, "ComputedValues")
+    .value("STEP", dpd::ComputedValues::STEP)
+    .value("TIMESTEP", dpd::ComputedValues::TIMESTEP)
+    .value("TIME", dpd::ComputedValues::TIME)
+    .value("VOLUME", dpd::ComputedValues::VOLUME)
+    .value("PRESSURE", dpd::ComputedValues::PRESSURE)
+    .value("TEMPERATURE", dpd::ComputedValues::TEMPERATURE)
+    .value("STRESS_XX", dpd::ComputedValues::STRESS_XX)
+    .value("STRESS_YY", dpd::ComputedValues::STRESS_YY)
+    .value("STRESS_ZZ", dpd::ComputedValues::STRESS_ZZ)
+    .value("STRESS_XY", dpd::ComputedValues::STRESS_XY)
+    .value("STRESS_XZ", dpd::ComputedValues::STRESS_XZ)
+    .value("STRESS_YZ", dpd::ComputedValues::STRESS_YZ)
+    .value("MEAN_B", dpd::ComputedValues::MEAN_B)
+    .value("MAX_B", dpd::ComputedValues::MAX_B)
+    .value("NUM_SHIFT", dpd::ComputedValues::NUM_SHIFT)
+    .value("NUM_RELOC", dpd::ComputedValues::NUM_RELOC)
+    .value("MSD", dpd::ComputedValues::MSD);
+
   /**
    * DPD Simulations
    */
@@ -1186,6 +1205,40 @@ init_pylimer_bound_calc(py::module_& m)
           Configure the higher cut-off of how far a pair may be distanced for a slip-spring to be created.
      )pbdoc",
          py::arg("cutoff") = 0.5)
+    .def("configAveragesFile",
+         &dpd::DPDSimulator::configAveragesFile,
+         R"pbdoc(
+          Set the file to which to write the averages.
+     )pbdoc",
+         py::arg("averages_file"))
+    .def("configWhenToOutputAverages",
+         &dpd::DPDSimulator::configWhenToOutputAverages,
+         R"pbdoc(
+          Set at which multiple of a time-step the averages shall be written.
+     )pbdoc",
+         py::arg("each") = 50)
+    .def("configWhenToOutput",
+         &dpd::DPDSimulator::configWhenToOutput,
+         R"pbdoc(
+          Set at which multiple of a time-step the log shall be output.
+     )pbdoc",
+         py::arg("each") = 50)
+    .def("configValuesToAverage",
+         &dpd::DPDSimulator::configValuesToAverage,
+         R"pbdoc(
+          Set which values to compute averages for.
+
+          Arguments:
+               - values: a list of ComputeValues enum values
+     )pbdoc")
+    .def("configValuesToOutput",
+         &dpd::DPDSimulator::configValuesToOutput,
+         R"pbdoc(
+          Set which values to log.
+          
+          Arguments:
+               - values: a list of ComputeValues enum values
+     )pbdoc")
     .def("startMeasuringMSDForAtoms",
          &dpd::DPDSimulator::startMeasuringMSDForAtoms,
          R"pbdoc(
