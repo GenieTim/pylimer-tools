@@ -100,10 +100,11 @@ namespace calc {
        *
        */
       void runSimulation(const long int nSteps,
-                         double dt = 0.06,
-                         bool withMC = false,
+                         double dt,
+                         bool withMC,
                          const std::function<bool()>& shouldInterrupt,
                          const std::function<void()>& cleanupInterrupt);
+
       void runSimulation(const long int nSteps,
                          double dt = 0.06,
                          bool withMC = false)
