@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pylimer_tools_cpp.pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator" href="pylimer_tools_cpp.pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html" /><link rel="prev" title="pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList" href="pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pylimer_tools_cpp.pylimer_tools_cpp.Atom" href="pylimer_tools_cpp.pylimer_tools_cpp.Atom.html" /><link rel="prev" title="pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint" href="pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint.html" />
 
     <!-- Generated with Sphinx 6.2.1 and Furo 2023.03.27 -->
-        <title>pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator - PylimerTools documentation</title>
+        <title>pylimer_tools_cpp.pylimer_tools_cpp.splitCSV - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?digest=fad236701ea90a88636c2a8c73b44ae642ed2a53" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?digest=30d1aed668e5c3a91c3e3bf6a60b675221979f0e" />
@@ -176,7 +176,7 @@
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance.html">pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin.html">pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint.html">pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.splitCSV.html">pylimer_tools_cpp.pylimer_tools_cpp.splitCSV</a></li>
+<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.splitCSV</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Atom.html">pylimer_tools_cpp.pylimer_tools_cpp.Atom</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle.html">pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.html">pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode</a></li>
@@ -197,7 +197,7 @@
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator.html">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.html">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList.html">pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList</a></li>
-<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">pylimer_tools_cpp.pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.html">pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedNetwork.html">pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedNetwork</a></li>
@@ -244,86 +244,12 @@
           </label>
         </div>
         <article role="main">
-          <section id="pylimer-tools-cpp-pylimer-tools-cpp-nongaussianspringforceevaluator">
-<h1>pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator<a class="headerlink" href="#pylimer-tools-cpp-pylimer-tools-cpp-nongaussianspringforceevaluator" title="Permalink to this heading">#</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">NonGaussianSpringForceEvaluator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator" title="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator" title="Permalink to this definition">#</a></dt>
-<dd><p>Bases: <a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.html#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator"><code class="xref py py-class docutils literal notranslate"><span class="pre">MEHPForceEvaluator</span></code></a></p>
-<p>This is equal to a spring evaluator for Langevin chains.</p>
-<p>The force for a certain spring is given by:
-<span class="math notranslate nohighlight">\(f = 0.5 \cdot \frac{1}{l} \scriptL^{-1}(\frac{r}{N\cdot l})\)</span>,
-where <span class="math notranslate nohighlight">\(r\)</span> is the spring [between cross-linkers] length
-and <span class="math notranslate nohighlight">\(\scriptL^{-1}\)</span> the inverse langevin function.</p>
-<p>Please note that the inverse langevin is only approximated.</p>
-<p>Recommended optimization algorithm: “LD_MMA”</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>kappa</strong> – the spring constant <span class="math notranslate nohighlight">\(\kappa\)</span></p></li>
-<li><p><strong>N</strong> – The number of links in a spring</p></li>
-<li><p><strong>l</strong> – The  the length of a spring in the chain</p></li>
-</ul>
-</dd>
-</dl>
-<p>Initialize this ForceEvaluator</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator" title="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">kappa</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.__init__" title="Permalink to this definition">#</a></dt>
-<dd><p>Initialize this ForceEvaluator</p>
-</dd></dl>
-
-<p class="rubric">Methods</p>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.__init__" title="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self[, kappa, N, l])</p></td>
-<td><p>Initialize this ForceEvaluator</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluateStressContribution" title="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluateStressContribution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluateStressContribution</span></code></a>(self, ...)</p></td>
-<td><p>An evaluation of the stress-contribution.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p class="rubric">Attributes</p>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.is2D" title="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.is2D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is2D</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.network" title="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">network</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluateStressContribution">
-<span class="sig-name descname"><span class="pre">evaluateStressContribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.html#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">springDistances</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spring_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluateStressContribution" title="Permalink to this definition">#</a></dt>
-<dd><p>An evaluation of the stress-contribution.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>springDistances</strong> – the three coordinate differences for one spring.</p></li>
-<li><p><strong>i</strong> – the row index of the stress tensor</p></li>
-<li><p><strong>j</strong> – the column index of the stress tensor</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.is2D">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is2D</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.is2D" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.network">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">network</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.network" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
+          <section id="pylimer-tools-cpp-pylimer-tools-cpp-splitcsv">
+<h1>pylimer_tools_cpp.pylimer_tools_cpp.splitCSV<a class="headerlink" href="#pylimer-tools-cpp-pylimer-tools-cpp-splitcsv" title="Permalink to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.splitCSV">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">splitCSV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.splitCSV" title="Permalink to this definition">#</a></dt>
+<dd><p>Read a file containing a number of CSVs. Returns them split up.</p>
 </dd></dl>
 
 </section>
@@ -333,23 +259,23 @@ and <span class="math notranslate nohighlight">\(\scriptL^{-1}\)</span> the inve
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="pylimer_tools_cpp.pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">
+          <a class="next-page" href="pylimer_tools_cpp.pylimer_tools_cpp.Atom.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator</div>
+                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.Atom</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList.html">
+          <a class="prev-page" href="pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList</div>
+                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint</div>
                 
               </div>
             </a>
@@ -382,14 +308,8 @@ and <span class="math notranslate nohighlight">\(\scriptL^{-1}\)</span> the inve
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator</a><ul>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator"><code class="docutils literal notranslate"><span class="pre">NonGaussianSpringForceEvaluator</span></code></a><ul>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.__init__"><code class="docutils literal notranslate"><span class="pre">NonGaussianSpringForceEvaluator.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.evaluateStressContribution"><code class="docutils literal notranslate"><span class="pre">NonGaussianSpringForceEvaluator.evaluateStressContribution()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.is2D"><code class="docutils literal notranslate"><span class="pre">NonGaussianSpringForceEvaluator.is2D</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.network"><code class="docutils literal notranslate"><span class="pre">NonGaussianSpringForceEvaluator.network</span></code></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.splitCSV</a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.splitCSV"><code class="docutils literal notranslate"><span class="pre">splitCSV()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -405,7 +325,5 @@ and <span class="math notranslate nohighlight">\(\scriptL^{-1}\)</span> the inve
     <script src="../_static/doctools.js"></script>
     <script src="../_static/sphinx_highlight.js"></script>
     <script src="../_static/scripts/furo.js"></script>
-    <script>window.MathJax = {"tex": {}, "extensions": ["jsMath2jax.js"], "jax": ["input/TeX"]}</script>
-    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     </body>
 </html>

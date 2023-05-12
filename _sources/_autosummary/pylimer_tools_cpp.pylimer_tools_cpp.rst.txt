@@ -17,6 +17,7 @@
       computeStoichiometricInbalance
       inverse_langevin
       predictGelationPoint
+      splitCSV
    
    
 
