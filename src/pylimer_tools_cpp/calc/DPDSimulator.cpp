@@ -4,6 +4,17 @@ namespace pylimer_tools {
 namespace calc {
   namespace dpd {
 
+    enum ComputedValues
+    {
+      TEMPERATURE,
+      PRESSURE,
+      STEP,
+      VOLUME TIMESTEP,
+      TIME,
+      MSD,
+      STRESS
+    };
+
     DPDSimulator::DPDSimulator(const pylimer_tools::entities::Universe u,
                                const int crosslinkerType,
                                const bool is2D,
@@ -129,7 +140,8 @@ namespace calc {
 
       const double halfDt = 0.5 * dt;
       double temperature = this->computeTemperature(velocities);
-      for (long int step = 0; step < nSteps; step++) {
+      long int step = 0;
+      for (; step < nSteps; step++) {
         if (withMC) {
           numShifts = this->shiftSlipSprings(1. * temperature);
           numRelocations = this->relocateSlipSprings(1. * temperature);
@@ -223,7 +235,8 @@ namespace calc {
       this->currentForces = forces;
       this->currentVelocities = velocities;
       this->currentVelocitiesPlus = velocitiesPlus;
-      this->currentStep += nSteps;
+      this->currentStep += step;
+      this->currentTime += step * dt;
       this->currentStressTensor = stressTensor;
 
       if (wasInterrupted) {

@@ -18,7 +18,7 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
 
-  std::string inputFile = suspectedPath + "melt_60_a_50.structure.out";
+  std::string inputFile = suspectedPath + "melt_83_a_100.structure.out";
   if (std::filesystem::exists(inputFile)) {
     REQUIRE(std::filesystem::exists(suspectedPath));
     universeSeq.initializeFromDataSequence({ { inputFile } });
