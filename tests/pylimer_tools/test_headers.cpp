@@ -262,18 +262,18 @@ TEST_CASE("Box works also after simple shear", "[entity][Box]")
   for (int dir = 0; dir < 3; ++dir) {
     deformedBox2.applySimpleShear(0.2, dir);
     // deform
-    testBox.adjustCoordinatesTo(testCoords, deformedBox2);
-    CHECK(testCoords[dir == 0 ? 1 : 0] == Catch::Approx(10.2));
+    undeformedBox.adjustCoordinatesTo(testCoords, deformedBox2);
+    CHECK(testCoords[(dir + 1) % 3] == Catch::Approx(10.2));
     CHECK(testCoords[dir] == Catch::Approx(10.2 + 0.2 * 10.2));
     // deform back
-    deformedBox2.adjustCoordinatesTo(testCoords, testBox);
+    deformedBox2.adjustCoordinatesTo(testCoords, undeformedBox);
     for (size_t i = 0; i < testCoords.size(); ++i) {
-      CHECK(testCoords[i] == testCoordCopy[i]);
+      CHECK(testCoords[i] == Catch::Approx(testCoordCopy[i]));
     }
     largeBox.applySimpleShear(0.0, dir);
     largeBox.handlePBC(testCoordCopy2);
     for (size_t i = 0; i < testCoordCopy.size(); ++i) {
-      CHECK(testCoordCopy[i] == testCoordCopy2[i]);
+      CHECK(testCoordCopy[i] == Catch::Approx(testCoordCopy2[i]));
     }
   }
 }

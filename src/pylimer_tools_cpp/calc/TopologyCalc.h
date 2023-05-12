@@ -16,11 +16,13 @@ namespace calc {
     const std::function<Eigen::Vector3d(Eigen::Vector3d)>& pbc,
     const double EPSILON = 1e-6)
   {
+    // TODO: check & fix PBC usage
     // Möller-Trumbore intersection algorithm, see
     // https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
-    Eigen::Vector3d edge1 = vertex1 - vertex0;
-    Eigen::Vector3d edge2 = vertex2 - vertex0;
+    Eigen::Vector3d edge1 = pbc(vertex1 - vertex0);
+    Eigen::Vector3d edge2 = pbc(vertex2 - vertex0);
 
+    // assume target and origin are in the same periodic image
     Eigen::Vector3d direction = rayTarget - rayOrigin;
     Eigen::Vector3d dir_norm = direction.normalized();
 
@@ -31,7 +33,7 @@ namespace calc {
       return false; // This ray is parallel to this triangle.
     }
 
-    Eigen::Vector3d s = rayOrigin - vertex0;
+    Eigen::Vector3d s = pbc(rayOrigin - vertex0);
     double f = 1.0 / a;
     double u = f * s.dot(h);
 
