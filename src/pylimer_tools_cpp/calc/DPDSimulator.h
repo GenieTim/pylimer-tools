@@ -88,7 +88,7 @@ namespace calc {
       std::vector<Eigen::ArrayXi> msdMeasuredIndices;
       std::vector<Eigen::VectorXd> msdOrigins;
       std::vector<size_t> msdOriginTimesteps;
-      
+
     public:
       DPDSimulator(const pylimer_tools::entities::Universe u,
                    const int crosslinkerType = 2,
@@ -101,7 +101,16 @@ namespace calc {
        */
       void runSimulation(const long int nSteps,
                          double dt = 0.06,
-                         bool withMC = false);
+                         bool withMC = false,
+                         const std::function<bool()>& shouldInterrupt,
+                         const std::function<void()>& cleanupInterrupt);
+      void runSimulation(const long int nSteps,
+                         double dt = 0.06,
+                         bool withMC = false)
+      {
+        runSimulation(
+          nSteps, dt, withMC, []() { return false; }, []() {});
+      }
 
       /**
        * @brief Compute the force vector, and return the pressure
@@ -179,7 +188,10 @@ namespace calc {
       ////////////////////////////////////////////////////////////////
       // results access & export
       pylimer_tools::entities::Universe getUniverse() const;
-      double getTemperature() const { return this->computeTemperature(this->currentVelocities); }
+      double getTemperature() const
+      {
+        return this->computeTemperature(this->currentVelocities);
+      }
 
       ////////////////////////////////////////////////////////////////
       // validation
