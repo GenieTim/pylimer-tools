@@ -32,6 +32,7 @@
       AtomStyle
       BalanceRunMode
       Box
+      ComputedValues
       DPDSimulator
       DataFileReader
       DataFileWriter

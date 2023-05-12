@@ -19,11 +19,16 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.DPDSimulator
    
       ~DPDSimulator.__init__
       ~DPDSimulator.configA
+      ~DPDSimulator.configAveragesFile
       ~DPDSimulator.configLambda
       ~DPDSimulator.configSigma
       ~DPDSimulator.configSlipspringHighCutoff
       ~DPDSimulator.configSlipspringLowCutoff
       ~DPDSimulator.configSpringConstant
+      ~DPDSimulator.configValuesToAverage
+      ~DPDSimulator.configValuesToOutput
+      ~DPDSimulator.configWhenToOutput
+      ~DPDSimulator.configWhenToOutputAverages
       ~DPDSimulator.createSlipSprings
       ~DPDSimulator.getTimestep
       ~DPDSimulator.getUniverse

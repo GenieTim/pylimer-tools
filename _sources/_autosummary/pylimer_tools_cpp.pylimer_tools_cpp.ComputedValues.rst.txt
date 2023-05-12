@@ -1,0 +1,50 @@
+pylimer\_tools\_cpp.pylimer\_tools\_cpp.ComputedValues
+======================================================
+
+.. currentmodule:: pylimer_tools_cpp.pylimer_tools_cpp
+
+.. autoclass:: ComputedValues
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~ComputedValues.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~ComputedValues.MAX_B
+      ~ComputedValues.MEAN_B
+      ~ComputedValues.MSD
+      ~ComputedValues.NUM_RELOC
+      ~ComputedValues.NUM_SHIFT
+      ~ComputedValues.PRESSURE
+      ~ComputedValues.STEP
+      ~ComputedValues.STRESS_XX
+      ~ComputedValues.STRESS_XY
+      ~ComputedValues.STRESS_XZ
+      ~ComputedValues.STRESS_YY
+      ~ComputedValues.STRESS_YZ
+      ~ComputedValues.STRESS_ZZ
+      ~ComputedValues.TEMPERATURE
+      ~ComputedValues.TIME
+      ~ComputedValues.TIMESTEP
+      ~ComputedValues.VOLUME
+      ~ComputedValues.name
+      ~ComputedValues.value
+   
+   
