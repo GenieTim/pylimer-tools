@@ -9,7 +9,8 @@ namespace calc {
       TEMPERATURE,
       PRESSURE,
       STEP,
-      VOLUME TIMESTEP,
+      VOLUME, 
+      TIMESTEP,
       TIME,
       MSD,
       STRESS
