@@ -1132,7 +1132,7 @@ init_pylimer_bound_calc(py::module_& m)
     //          py::arg("with_MC") = false)
     .def(
       "runSimulation",
-      [](const dpd::DPDSimulator& sim, int nSteps, double dt, bool withMC) {
+      [](dpd::DPDSimulator& sim, int nSteps, double dt, bool withMC) {
         return sim.runSimulation(
           nSteps,
           dt,
