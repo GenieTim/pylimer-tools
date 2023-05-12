@@ -253,7 +253,7 @@ def extractThermoParams(file, header: Union[str, List[str], None] = "Step Temp E
     return df
 
 
-def readMultiSectionSeparatedValueFile(file: str, separator: str = None, use_cache: bool = True, comment: str = None):
+def readMultiSectionSeparatedValueFile(file: str, separator: str = None, use_cache: bool = True, comment: str = None, skip_err: bool = False):
     """
     Reads a tsv-like file (could also be e.g. space separated, or csv if you use separator = ",")
     which contains multiple headers throughout the file.
@@ -276,13 +276,13 @@ def readMultiSectionSeparatedValueFile(file: str, separator: str = None, use_cac
         return cacheContent
 
     def csv_section_generator(file_pointer, sep):
-        first_line = file_pointer.readline()
+        first_line = file_pointer.readline().strip()
         first_line_split = first_line.split(sep)
         line = first_line
         while line:
             yield line
             prev_point = file_pointer.tell()
-            line = file_pointer.readline()
+            line = file_pointer.readline().strip()
             line_split = line.split(sep)
             if (len(line_split) != len(first_line_split)):
                 file_pointer.seek(prev_point)
@@ -293,18 +293,18 @@ def readMultiSectionSeparatedValueFile(file: str, separator: str = None, use_cac
                 w[0].isalpha() for w in line_split if len(w) > 0
             ]) > 0.74*len(line_split)
             if is_header:
-                break
+                return
 
     tmp_csv_files = []
     with open(file, 'r') as fp:
         while True:
-            csvFileToWrite = "{}/{}_{}".format(
-                tempfile.gettempdir(),
+            csvFileToWrite = "{}/{}_{}_{}".format(
+                tempfile.gettempdir(), len(tmp_csv_files),
                 hashlib.md5(datetime.now().strftime("%m.%d.%Y, %H:%M:%S.%f").encode()).hexdigest(), 'tmp_thermo_file.csv')
             n_lines = 0
             with open(csvFileToWrite, 'w') as output_csv:
                 for line in csv_section_generator(fp, sep=separator):
-                    output_csv.write(line + "\n")
+                    output_csv.write(line.strip() + "\n")
                     n_lines += 1
             if (n_lines > 1):
                 tmp_csv_files.append(csvFileToWrite)
@@ -322,11 +322,12 @@ def readMultiSectionSeparatedValueFile(file: str, separator: str = None, use_cac
                 f, sep=separator, comment=comment))
             try:
                 os.remove(f)
-            except Exception as e:
+            except OSError as e:
                 pass
-        except Exception as e:
-            warnings.warn("Failed to read csv file {}".format(tmp_csv_files))
-            raise e
+        except pd.errors.ParserError as e:
+            warnings.warn("Failed to read csv file {}".format(f))
+            if (not skip_err):
+                raise e
     df = pd.concat(data_frames, ignore_index=True)
     doCache(df, file, suffix)
     # print("Read {} rows for file {}".format(len(df), file))
