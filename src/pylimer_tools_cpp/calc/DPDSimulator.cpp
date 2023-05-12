@@ -216,22 +216,24 @@ namespace calc {
         }
 
         // output
-        std::array<double, 12> values = { step + this->currentStep + 1,
-                                          dt,
-                                          this->currentTime + (step + 1) * dt,
-                                          this->box.getVolume(),
-                                          pressure +
-                                            kineticPressureTerm temperature,
-                                          stressTensor(0, 0),
-                                          stressTensor(1, 1),
-                                          stressTensor(2, 2),
-                                          stressTensor(0, 1),
-                                          stressTensor(0, 2),
-                                          stressTensor(1, 2),
-                                          meanB,
-                                          maxB,
-                                          numShifts,
-                                          numRelocations };
+        std::array<double, 17> values = {
+          static_cast<double>(step + this->currentStep + 1),
+          dt,
+          this->currentTime + static_cast<double>(step + 1) * dt,
+          this->box.getVolume(),
+          pressure + kineticPressureTerm,
+          temperature,
+          stressTensor(0, 0),
+          stressTensor(1, 1),
+          stressTensor(2, 2),
+          stressTensor(0, 1),
+          stressTensor(0, 2),
+          stressTensor(1, 2),
+          meanB,
+          maxB,
+          static_cast<double>(numShifts),
+          static_cast<double>(numRelocations)
+        };
         if ((step + 1) % this->outputValuesEvery == 0) {
           outputBuffer.clear();
           for (ComputedValues val : this->valuesToOutput) {
@@ -262,12 +264,12 @@ namespace calc {
 
         // compute averages
         int averagesIdx = 0;
+        size_t msdIdx = 0;
         for (ComputedValues val : this->valuesToAverage) {
           switch (val) {
             case ComputedValues::MSD:
               // compute MSD
-              size_t msdIdx = 0;
-              for (; msdIdx < msdMeasuredIndices.size(); ++msdIdx) {
+              for (msdIdx = 0; msdIdx < msdMeasuredIndices.size(); ++msdIdx) {
                 double result =
                   (this->msdOrigins[msdIdx] -
                    coordinates(this->msdMeasuredIndices[msdIdx]))
@@ -277,7 +279,7 @@ namespace calc {
                 runningAverages[averagesIdx + msdIdx] +=
                   result / static_cast<double>(this->outputAveragesEvery);
               }
-              averagesIds += msdIdx;
+              averagesIdx += msdIdx;
               break;
             default:
               runningAverages[averagesIdx] +=
@@ -894,7 +896,10 @@ namespace calc {
       return result;
     }
 
-    long int DPDSimulator::getTimestep() const { return this->currentStep; };
+    long int DPDSimulator::getTimestep() const
+    {
+      return this->currentStep;
+    };
 
     void DPDSimulator::validateNeighbourlist(double cutoff)
     {
