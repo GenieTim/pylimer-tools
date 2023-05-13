@@ -16,6 +16,7 @@ import pandas as pd
 
 from pylimer_tools.utils.cacheUtility import doCache, loadCache
 from pylimer_tools.utils.optimizeDf import optimize, reduce_mem_usage
+from pylimer_tools_cpp import splitCSV
 
 
 def detectHeaders(file: str, max_nr_of_lines_to_read: int = 1500, use_cache: bool = True) -> List[str]:
@@ -86,11 +87,11 @@ def readOneGroup(fp, header, min_line_len=4, additional_lines_skip=0, lines_to_r
         raise ValueError("header must have more than zero characters")
     assert(isinstance(header, str) or (
         isinstance(header, list) and len(header) > 0))
-    csvFileToWrite = "{}/{}_{}".format(
+    csv_file_to_write = "{}/{}_{}".format(
         tempfile.gettempdir(),
         hashlib.md5(datetime.now().strftime("%m.%d.%Y, %H:%M:%S.%f").encode()).hexdigest(), 'tmp_thermo_file.csv')
     n_lines = 0
-    with open(csvFileToWrite, 'w') as output_csv:
+    with open(csv_file_to_write, 'w') as output_csv:
         line = fp.readline()
         separator = ", "
         headerLen = None
@@ -149,7 +150,7 @@ def readOneGroup(fp, header, min_line_len=4, additional_lines_skip=0, lines_to_r
                 continue
             output_csv.write((separator.join(line.split())).strip() + "\n")
             n_lines += 1
-    return csvFileToWrite if n_lines > 0 else ""
+    return csv_file_to_write if n_lines > 0 else ""
 
 
 def getThermoCacheNameSuffix(header: Union[str, List[str], None] = "Step Temp E_pair E_mol TotEng Press", texts_to_read: float = 50, min_line_len: float = 5) -> str:
@@ -267,7 +268,7 @@ def readMultiSectionSeparatedValueFile(file: str, separator: str = None, use_cac
         - comment: a character such as "#" to indicate the separator for where a comment starts
     """
     suffix = (base64.urlsafe_b64encode(comment.encode("utf-8")).decode('utf-8') if comment is not None else "") + \
-        "mssv-" + \
+        "mssv2-" + \
         base64.urlsafe_b64encode(
             separator.encode("utf-8")).decode('utf-8') if separator is not None else "-any"
     cacheContent = loadCache(file, suffix)
@@ -275,61 +276,76 @@ def readMultiSectionSeparatedValueFile(file: str, separator: str = None, use_cac
     if (cacheContent is not None and use_cache):
         return cacheContent
 
-    def csv_section_generator(file_pointer, sep):
-        first_line = file_pointer.readline().strip()
-        first_line_split = first_line.split(sep)
-        line = first_line
-        while line:
-            yield line
-            prev_point = file_pointer.tell()
-            line = file_pointer.readline().strip()
-            line_split = line.split(sep)
-            if (len(line_split) != len(first_line_split)):
-                file_pointer.seek(prev_point)
-                return
-            # potentially, here, you would want to introduce a check that
-            # the line is not another header line somehow
-            is_header = np.sum([
-                w[0].isalpha() for w in line_split if len(w) > 0
-            ]) > 0.74*len(line_split)
-            if is_header:
-                return
+    print("Splitting CSV...")
+    previous_len = -1
 
-    tmp_csv_files = []
-    with open(file, 'r') as fp:
-        while True:
-            csvFileToWrite = "{}/{}_{}_{}".format(
-                tempfile.gettempdir(), len(tmp_csv_files),
-                hashlib.md5(datetime.now().strftime("%m.%d.%Y, %H:%M:%S.%f").encode()).hexdigest(), 'tmp_thermo_file.csv')
-            n_lines = 0
-            with open(csvFileToWrite, 'w') as output_csv:
-                for line in csv_section_generator(fp, sep=separator):
-                    output_csv.write(line.strip() + "\n")
-                    n_lines += 1
-            if (n_lines > 1):
-                tmp_csv_files.append(csvFileToWrite)
-
-            if (n_lines <= 1):
-                break
+    tmp_csv_files = splitCSV(file, separator)
+    print("CSV split to {} files... e.g. to {}, {} or {}".format(len(tmp_csv_files), tmp_csv_files[0], tmp_csv_files[1] if len(
+        tmp_csv_files) > 1 else "", tmp_csv_files[2] if len(tmp_csv_files) > 2 else ""))
 
     if (len(tmp_csv_files) == 0):
         return pd.DataFrame()
-    # read the csv files again
-    data_frames = []
-    for f in tmp_csv_files:
-        try:
-            data_frames.append(pd.read_csv(
-                f, sep=separator, comment=comment))
+
+    # determine the columns we want to have in the end
+    all_headers = set()
+    detected_dtypes = {}
+    for file in tmp_csv_files:
+        header_line = ""
+        first_line = ""
+        with(open(file, 'r')) as fp:
+            header_line = next(fp)
+            first_line = next(fp)
+        headers = header_line.strip().split(separator)
+        for i, h in enumerate(headers):
+            if (h not in all_headers):
+                first_line_split = first_line.strip().split(separator)
+                if (np.all([c.isdigit() or c == "-" for c in first_line_split[i]])):
+                    detected_dtypes[h] = np.int64
+                elif (np.all([c.isdigit() or c == "-" or c == "." or c == "e" or c == "E" for c in first_line_split[i]])):
+                    detected_dtypes[h] = np.float64
+                all_headers.add(h)
+    all_headers = list(all_headers)
+    csv_file_to_write = "{}/{}_{}".format(
+        tempfile.gettempdir(),
+        hashlib.md5(datetime.now().strftime("%m.%d.%Y, %H:%M:%S.%f").encode()).hexdigest(), 'tmp_mssv2_file.csv')
+
+    print("{} Headers mapped...".format(len(all_headers)))
+
+    # re-join the CSV files in one big file with all the columns
+    # put NaN where we do not have a value for a column
+    with open(csv_file_to_write, 'w') as outFile:
+        outFile.write(separator.join(all_headers) + "\n")
+        for file in tmp_csv_files:
+            with(open(file, 'r')) as fp:
+                header_line = next(fp)
+                split_header = header_line.strip().split(separator)
+                map_to_col = []
+                n_found = 0
+                for i, col in enumerate(all_headers):
+                    if (col in split_header):
+                        map_to_col.append(split_header.index(col))
+                        n_found += 1
+                    else:
+                        map_to_col.append(-1)
+                assert(n_found == len(split_header))
+                for line in fp:
+                    if (line == header_line or line.startswith("Step")):
+                        continue
+                    split_line = line.strip().split(separator)
+                    str_to_write = separator.join(
+                        [split_line[i] if i != -1 else "NaN" for i in map_to_col])
+                    outFile.write(str_to_write + "\n")
             try:
-                os.remove(f)
+                os.remove(file)
             except OSError as e:
                 pass
-        except pd.errors.ParserError as e:
-            warnings.warn("Failed to read csv file {}".format(f))
-            if (not skip_err):
-                raise e
-    df = pd.concat(data_frames, ignore_index=True)
-    doCache(df, file, suffix)
+            print("File {} handled".format(file))
+    # read the csv files again
+    print("Reading final csv file {}".format(csv_file_to_write))
+    df = pd.read_csv(
+        csv_file_to_write, sep=separator, comment=comment, dtype=detected_dtypes, na_values=["NaN"])
+    # doCache(df, file, suffix)
+    doCache(reduce_mem_usage(df), file, suffix)
     # print("Read {} rows for file {}".format(len(df), file))
 
     return df
