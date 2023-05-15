@@ -72,6 +72,8 @@ namespace calc {
       double A = 25.;
       double sigma = 3.;
       double gamma = 0.5 * 3. * 3.;
+      long int nStepsMC = 500;
+      long int nStepsDPD = 500;
       std::string averagesFile = "";
       std::vector<ComputedValues> valuesToAverage;
       std::vector<ComputedValues> valuesToOutput;
@@ -241,6 +243,10 @@ namespace calc {
       }
 
       void configWhenToOutput(int then = 50) { this->outputValuesEvery = then; }
+
+      void configNumStepsMC(long int steps = 500) {  this->nStepsMC = steps; }
+
+      void configNumStepsDPD(long int steps = 500) {  this->nStepsDPD = steps; }
 
       ////////////////////////////////////////////////////////////////
       // results access & export
