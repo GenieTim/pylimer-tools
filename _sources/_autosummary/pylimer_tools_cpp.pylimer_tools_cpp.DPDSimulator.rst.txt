@@ -21,6 +21,8 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.DPDSimulator
       ~DPDSimulator.configA
       ~DPDSimulator.configAveragesFile
       ~DPDSimulator.configLambda
+      ~DPDSimulator.configNumStepsDPD
+      ~DPDSimulator.configNumStepsMC
       ~DPDSimulator.configSigma
       ~DPDSimulator.configSlipspringHighCutoff
       ~DPDSimulator.configSlipspringLowCutoff

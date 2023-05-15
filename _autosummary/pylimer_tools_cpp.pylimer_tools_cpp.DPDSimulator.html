@@ -275,6 +275,12 @@ with slip-springs as presented by Langeloth et al.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configLambda" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configLambda"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configLambda</span></code></a>(self[, l])</p></td>
 <td><p>Configure the modified velocity verlet integration parameter <cite>lambda</cite>.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configNumStepsDPD" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configNumStepsDPD"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configNumStepsDPD</span></code></a>(self, arg0)</p></td>
+<td><p>Configure the number of steps to do in one DPD sequence.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configNumStepsMC" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configNumStepsMC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configNumStepsMC</span></code></a>(self, arg0)</p></td>
+<td><p>Configure the number of steps to do in one MC sequence.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configSigma" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configSigma"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configSigma</span></code></a>(self[, sigma])</p></td>
 <td><p>Configure the force-field (pair-style) parameter <cite>sigma</cite>.</p></td>
 </tr>
@@ -339,6 +345,18 @@ with slip-springs as presented by Langeloth et al.</p>
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configLambda">
 <span class="sig-name descname"><span class="pre">configLambda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.65</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configLambda" title="Permalink to this definition">#</a></dt>
 <dd><p>Configure the modified velocity verlet integration parameter <cite>lambda</cite>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configNumStepsDPD">
+<span class="sig-name descname"><span class="pre">configNumStepsDPD</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configNumStepsDPD" title="Permalink to this definition">#</a></dt>
+<dd><p>Configure the number of steps to do in one DPD sequence.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configNumStepsMC">
+<span class="sig-name descname"><span class="pre">configNumStepsMC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configNumStepsMC" title="Permalink to this definition">#</a></dt>
+<dd><p>Configure the number of steps to do in one MC sequence.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -500,6 +518,8 @@ with slip-springs as presented by Langeloth et al.</p>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configA"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configA()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configAveragesFile"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configAveragesFile()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configLambda"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configLambda()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configNumStepsDPD"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configNumStepsDPD()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configNumStepsMC"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configNumStepsMC()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configSigma"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configSigma()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configSlipspringHighCutoff"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configSlipspringHighCutoff()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configSlipspringLowCutoff"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configSlipspringLowCutoff()</span></code></a></li>
