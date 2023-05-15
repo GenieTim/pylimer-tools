@@ -1239,6 +1239,12 @@ init_pylimer_bound_calc(py::module_& m)
           Arguments:
                - values: a list of ComputeValues enum values
      )pbdoc")
+    .def("configNumStepsMC", &dpd::DPDSimulator::configNumStepsMC, R"pbdoc(
+          Configure the number of steps to do in one MC sequence.
+     )pbdoc")
+    .def("configNumStepsDPD", &dpd::DPDSimulator::configNumStepsDPD, R"pbdoc(
+          Configure the number of steps to do in one DPD sequence.
+     )pbdoc")
     .def("startMeasuringMSDForAtoms",
          &dpd::DPDSimulator::startMeasuringMSDForAtoms,
          R"pbdoc(

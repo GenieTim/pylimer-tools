@@ -170,11 +170,16 @@ namespace calc {
 
       const double halfDt = 0.5 * dt;
       double temperature = this->computeTemperature(velocities);
+
+      // start iterating over the steps to do
       long int step = 0;
       for (; step < nSteps; step++) {
-        if (withMC) {
-          numShifts = this->shiftSlipSprings(1. * temperature);
+        if (withMC && ((step % this->nStepsDPD) == 0)) {
+          numShifts = 0;
           numRelocations = this->relocateSlipSprings(1. * temperature);
+          for (int i = 0; i < this->nStepsMC; ++i) {
+            numShifts += this->shiftSlipSprings(1. * temperature);
+          }
         }
         // update coordinates & velocities
         velocitiesPlus = velocities + halfDt * forces;
