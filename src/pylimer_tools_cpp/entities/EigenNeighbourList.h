@@ -208,6 +208,11 @@ namespace entities {
                 [this->getBucketIndexForTriplet(
                   this->getBucketTripletForCoordinates(coordinates))])
             .sum();
+
+        if (result.size() < nResults) {
+          // heuristic minimum
+          result.conservativeResize(nResults);
+        }
         for (bucket_idx_t bucketIndex :
              this->neighbourBucketNeighboursDefaultCutoff
                [this->getBucketIndexForTriplet(

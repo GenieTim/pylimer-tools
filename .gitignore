@@ -133,6 +133,7 @@ dmypy.json
 # dependencies
 vendor/igraph
 vendor/nlopt
+vendor/nlopt
 
 # build targets
 coverage.html
