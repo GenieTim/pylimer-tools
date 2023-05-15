@@ -52,7 +52,7 @@ def loadCache(file: str, suffix: str, disableWarnings: bool = False):
                     with open(cacheFileName, 'rb') as cacheFile:
                         toReturn = pickle.load(cacheFile)
                     return toReturn
-                except pickle._pickle.UnpicklingError as e:
+                except pickle.UnpicklingError as e:
                     warnings.warn(
                         "Unpickling of cache file {} failed: {}".format(file, e))
             else:
