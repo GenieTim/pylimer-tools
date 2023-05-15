@@ -379,8 +379,8 @@ namespace calc {
         coordinates(this->bondPartnerCoordinatesA) -
         coordinates(this->bondPartnerCoordinatesB);
       this->box.handlePBC(bondDistances);
-      assert(bondDistances.minCoeff() > this->box.getLowX());
-      assert(bondDistances.maxCoeff() < this->box.getHighX());
+      assert(bondDistances.minCoeff() > -this->box.getL().maxCoeff());
+      assert(bondDistances.maxCoeff() < this->box.getL().maxCoeff());
       forces(this->bondPartnerCoordinatesA) -= this->k * bondDistances;
       forces(this->bondPartnerCoordinatesB) += this->k * bondDistances;
       for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
