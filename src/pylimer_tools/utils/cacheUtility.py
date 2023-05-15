@@ -48,9 +48,13 @@ def loadCache(file: str, suffix: str, disableWarnings: bool = False):
             mtimeOrigin = datetime.datetime.fromtimestamp(
                 pathlib.Path(file).stat().st_mtime)
             if (mtimeCache > mtimeOrigin):
-                with open(cacheFileName, 'rb') as cacheFile:
-                    toReturn = pickle.load(cacheFile)
-                return toReturn
+                try:
+                    with open(cacheFileName, 'rb') as cacheFile:
+                        toReturn = pickle.load(cacheFile)
+                    return toReturn
+                except pickle._pickle.UnpicklingError as e:
+                    warnings.warn(
+                        "Unpickling of cache file {} failed: {}".format(file, e))
             else:
                 # print("Dump cache file is elder than dump. Reloading...")
                 pass

@@ -319,10 +319,13 @@ TEST_CASE("CsvTokenizer works", "[utils][StringUtil]")
   REQUIRE(tk2.get<long double>(2) ==
           Catch::Approx(static_cast<long double>(0.001)));
 
-  std::vector<std::string> split = pu::split("test, test2", ", ");
-  REQUIRE(split.size() == 2);
-  std::vector<std::string> split2 = pu::split("test\ttest2", "\t");
-  REQUIRE(split2.size() == 2);
+  std::vector<std::string> split;
+  split.reserve(2);
+  int nSplit = pu::split(split, "test, test2", ", ");
+  REQUIRE(nSplit == 2);
+  CHECK(split[1] == "test2");
+  nSplit = pu::split(split, "test\ttest2", "\t");
+  REQUIRE(nSplit == 2);
 }
 
 TEST_CASE("String utility functions work", "[utils][StringUtil]")

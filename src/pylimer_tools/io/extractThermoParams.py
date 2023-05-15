@@ -214,6 +214,7 @@ def extractThermoParams(file, header: Union[str, List[str], None] = "Step Temp E
             try:
                 os.remove(filePath)
             except Exception as e:
+                warnings.warn("Could not remove file {}".format(filePath))
                 pass
             return tmpDf
         except Exception as e:
@@ -289,16 +290,27 @@ def readMultiSectionSeparatedValueFile(file: str, separator: str = None, use_cac
     # determine the columns we want to have in the end
     all_headers = set()
     detected_dtypes = {}
-    for file in tmp_csv_files:
+    erronous_files = []
+    for csv_file in tmp_csv_files:
         header_line = ""
         first_line = ""
-        with(open(file, 'r')) as fp:
-            header_line = next(fp)
-            first_line = next(fp)
+        got_err = False
+        with(open(csv_file, 'r')) as fp:
+            try:
+                header_line = next(fp)
+                first_line = next(fp)
+            except StopIteration as e:
+                erronous_files.append(csv_file)
+                got_err = True
+        if (got_err):
+            continue
         headers = header_line.strip().split(separator)
         for i, h in enumerate(headers):
             if (h not in all_headers):
                 first_line_split = first_line.strip().split(separator)
+                if (len(first_line_split) != len(headers)):
+                    raise ValueError(
+                        "Headers and first line do not match in nr of values", first_line, header_line)
                 if (np.all([c.isdigit() or c == "-" for c in first_line_split[i]])):
                     detected_dtypes[h] = np.int64
                 elif (np.all([c.isdigit() or c == "-" or c == "." or c == "e" or c == "E" for c in first_line_split[i]])):
@@ -315,8 +327,16 @@ def readMultiSectionSeparatedValueFile(file: str, separator: str = None, use_cac
     # put NaN where we do not have a value for a column
     with open(csv_file_to_write, 'w') as outFile:
         outFile.write(separator.join(all_headers) + "\n")
-        for file in tmp_csv_files:
-            with(open(file, 'r')) as fp:
+        for csv_file in tmp_csv_files:
+            if (csv_file in erronous_files):
+                print("File {} skipped".format(csv_file))
+                try:
+                    os.remove(csv_file)
+                except OSError as e:
+                    warnings.warn("Could not remove file {}".format(csv_file))
+                    pass
+                continue
+            with(open(csv_file, 'r')) as fp:
                 header_line = next(fp)
                 split_header = header_line.strip().split(separator)
                 map_to_col = []
@@ -336,16 +356,26 @@ def readMultiSectionSeparatedValueFile(file: str, separator: str = None, use_cac
                         [split_line[i] if i != -1 else "NaN" for i in map_to_col])
                     outFile.write(str_to_write + "\n")
             try:
-                os.remove(file)
+                os.remove(csv_file)
             except OSError as e:
+                warnings.warn("Could not remove file {}".format(csv_file))
                 pass
-            print("File {} handled".format(file))
+            print("File {} handled".format(csv_file))
     # read the csv files again
     print("Reading final csv file {}".format(csv_file_to_write))
-    df = pd.read_csv(
-        csv_file_to_write, sep=separator, comment=comment, dtype=detected_dtypes, na_values=["NaN"])
-    # doCache(df, file, suffix)
-    doCache(reduce_mem_usage(df), file, suffix)
+    try:
+        df = pd.read_csv(
+            csv_file_to_write, sep=separator, comment=comment, dtype=detected_dtypes, na_values=["NaN"])
+    except pd.errors.EmptyDataError as e:
+        warnings.warn("Data file {} turned out to be empty".format(file))
+        return pd.DataFrame()
+    doCache(df, file, suffix)
+    try:
+        os.remove(csv_file_to_write)
+    except OSError as e:
+        warnings.warn("Could not remove file {}".format(csv_file_to_write))
+        pass
+    # doCache(reduce_mem_usage(df), file, suffix)
     # print("Read {} rows for file {}".format(len(df), file))
 
     return df
