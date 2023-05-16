@@ -77,8 +77,8 @@ namespace calc {
       std::string averagesFile = "";
       std::vector<ComputedValues> valuesToAverage;
       std::vector<ComputedValues> valuesToOutput;
-      int outputAveragesEvery = 1;
-      int outputValuesEvery = 1;
+      int outputAveragesEvery = 50;
+      int outputValuesEvery = 5;
 
       ////////////////////////////////////////////////////////////////
       // simulation state
