@@ -133,21 +133,26 @@ namespace calc {
       }
       if (outputBuffer.length() > 0) {
         outputBuffer.pop_back();
+        std::cout << outputBuffer << std::endl;
       }
-      std::cout << outputBuffer << std::endl;
       bool doAverage = this->averagesFile != "";
 
       // prepare averages
       std::ofstream averagesOutput;
       int numAverages = 0;
       std::string averagesOutputBuffer = "OutputStep";
+      int numHasMSD = 0;
       if (doAverage) {
         averagesOutput.open(this->averagesFile, std::ios::out | std::ios::app);
         averagesOutputBuffer.reserve(80 * 20);
         for (ComputedValues val : this->valuesToAverage) {
           switch (val) {
             case ComputedValues::MSD:
+              numHasMSD += 1;
               RUNTIME_EXP_IFN(this->msdMeasuredIndices.size() ==
+                                this->msdOrigins.size(),
+                              "Invalid MSD state found.");
+              RUNTIME_EXP_IFN(this->msdOriginTimesteps.size() ==
                                 this->msdOrigins.size(),
                               "Invalid MSD state found.");
               numAverages += this->msdOrigins.size();
@@ -167,7 +172,11 @@ namespace calc {
       }
       std::vector<double> runningAverages =
         pylimer_tools::utils::initializeWithValue<double>(numAverages, 0.);
-      assert(runningAverages.size() == numAverages);
+      RUNTIME_EXP_IFN(runningAverages.size() == numAverages, "");
+      RUNTIME_EXP_IFN(this->valuesToAverage.size() +
+                          (numHasMSD * this->msdOrigins.size()) - (numHasMSD) ==
+                        numAverages,
+                      "");
 
       int numShifts = 0;
       int numRelocations = 0;
@@ -241,7 +250,8 @@ namespace calc {
           meanB,
           maxB,
           static_cast<double>(numShifts),
-          static_cast<double>(numRelocations)
+          static_cast<double>(numRelocations),
+          0.
         };
         if ((step + 1) % this->outputValuesEvery == 0) {
           outputBuffer.clear();
@@ -266,9 +276,9 @@ namespace calc {
           }
           if (!outputBuffer.empty()) {
             outputBuffer.pop_back(); // remove last "\t"
+            outputBuffer += "\n";
+            std::cout << outputBuffer;
           }
-          outputBuffer += "\n";
-          std::cout << outputBuffer;
         }
 
         // compute averages
@@ -957,7 +967,8 @@ namespace calc {
           relevantPairs.size() == relevantNeighbors.size(),
           "Pairs and neighbours resulted in different sized partners: " +
             std::to_string(relevantPairs.size()) + " vs. " +
-            std::to_string(relevantNeighbors.size()) + ".");
+            std::to_string(relevantNeighbors.size()) + " for atom at idx " +
+            std::to_string(i) + ".");
         std::sort(relevantPairs.begin(), relevantPairs.end());
         std::sort(relevantNeighbors.begin(), relevantNeighbors.end());
 
