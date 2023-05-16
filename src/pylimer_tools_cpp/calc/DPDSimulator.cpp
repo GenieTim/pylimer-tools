@@ -173,10 +173,11 @@ namespace calc {
       std::vector<double> runningAverages =
         pylimer_tools::utils::initializeWithValue<double>(numAverages, 0.);
       RUNTIME_EXP_IFN(runningAverages.size() == numAverages, "");
-      RUNTIME_EXP_IFN(this->valuesToAverage.size() +
-                          (numHasMSD * this->msdOrigins.size()) - (numHasMSD) ==
-                        numAverages,
-                      "");
+      RUNTIME_EXP_IFN((this->valuesToAverage.size() +
+                         (numHasMSD * this->msdOrigins.size()) - (numHasMSD) ==
+                       numAverages) ||
+                        !doAverage,
+                      "Anticipate miscounted number of averages.");
 
       int numShifts = 0;
       int numRelocations = 0;
@@ -284,29 +285,31 @@ namespace calc {
         // compute averages
         int averagesIdx = 0;
         size_t msdIdx = 0;
-        for (ComputedValues val : this->valuesToAverage) {
-          switch (val) {
-            case ComputedValues::MSD:
-              // compute MSD
-              for (msdIdx = 0; msdIdx < msdMeasuredIndices.size(); ++msdIdx) {
-                double result =
-                  (this->msdOrigins[msdIdx] -
-                   coordinates(this->msdMeasuredIndices[msdIdx]))
-                    .squaredNorm() /
-                  (static_cast<double>(this->msdMeasuredIndices[msdIdx].size() /
-                                       3.));
-                runningAverages[averagesIdx + msdIdx] +=
-                  result / static_cast<double>(this->outputAveragesEvery);
-              }
-              averagesIdx += msdIdx;
-              break;
-            default:
-              runningAverages[averagesIdx] +=
-                values[val] / static_cast<double>(this->outputAveragesEvery);
-              averagesIdx += 1;
+        if (doAverage) {
+          for (ComputedValues val : this->valuesToAverage) {
+            switch (val) {
+              case ComputedValues::MSD:
+                // compute MSD
+                for (msdIdx = 0; msdIdx < msdMeasuredIndices.size(); ++msdIdx) {
+                  double result =
+                    (this->msdOrigins[msdIdx] -
+                     coordinates(this->msdMeasuredIndices[msdIdx]))
+                      .squaredNorm() /
+                    (static_cast<double>(
+                      this->msdMeasuredIndices[msdIdx].size() / 3.));
+                  runningAverages[averagesIdx + msdIdx] +=
+                    result / static_cast<double>(this->outputAveragesEvery);
+                }
+                averagesIdx += msdIdx;
+                break;
+              default:
+                runningAverages[averagesIdx] +=
+                  values[val] / static_cast<double>(this->outputAveragesEvery);
+                averagesIdx += 1;
+            }
           }
+          assert(averagesIdx == numAverages);
         }
-        assert(averagesIdx == numAverages);
 
         // check (and if, output) averages
         if ((step + 1) % this->outputAveragesEvery == 0 && doAverage) {
