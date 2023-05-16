@@ -147,6 +147,9 @@ namespace calc {
         for (ComputedValues val : this->valuesToAverage) {
           switch (val) {
             case ComputedValues::MSD:
+              RUNTIME_EXP_IFN(this->msdMeasuredIndices.size() ==
+                                this->msdOrigins.size(),
+                              "Invalid MSD state found.");
               numAverages += this->msdOrigins.size();
               for (size_t i = 0; i < this->msdOrigins.size(); ++i) {
                 averagesOutputBuffer +=
@@ -154,16 +157,17 @@ namespace calc {
                   std::to_string(this->msdOriginTimesteps[i]);
               }
               break;
-              break;
             default:
               numAverages += 1;
               averagesOutputBuffer += "\t" + ComputedValuesNames[val];
+              break;
           }
         }
         averagesOutput << averagesOutputBuffer << std::endl;
       }
       std::vector<double> runningAverages =
         pylimer_tools::utils::initializeWithValue<double>(numAverages, 0.);
+      assert(runningAverages.size() == numAverages);
 
       int numShifts = 0;
       int numRelocations = 0;
@@ -292,6 +296,7 @@ namespace calc {
               averagesIdx += 1;
           }
         }
+        assert(averagesIdx == numAverages);
 
         // check (and if, output) averages
         if ((step + 1) % this->outputAveragesEvery == 0 && doAverage) {
