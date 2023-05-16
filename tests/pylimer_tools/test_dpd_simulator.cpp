@@ -55,6 +55,9 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
       suspectedPath + "melt_83_a_100.structure.avg-out.txt";
     REQUIRE_NOTHROW(simulator.configAveragesFile(averageFile));
 
+    std::vector<size_t> atomIdsForMSD = { 1, 4, 6 };
+    REQUIRE_NOTHROW(simulator.startMeasuringMSDForAtoms(atomIdsForMSD));
+
     // actual simulation
     REQUIRE_NOTHROW(simulator.runSimulation(75, 0.06, false));
     REQUIRE_NOTHROW(simulator.validateState());
