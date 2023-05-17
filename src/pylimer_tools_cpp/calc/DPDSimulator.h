@@ -244,9 +244,9 @@ namespace calc {
 
       void configWhenToOutput(int then = 50) { this->outputValuesEvery = then; }
 
-      void configNumStepsMC(long int steps = 500) {  this->nStepsMC = steps; }
+      void configNumStepsMC(long int steps = 500) { this->nStepsMC = steps; }
 
-      void configNumStepsDPD(long int steps = 500) {  this->nStepsDPD = steps; }
+      void configNumStepsDPD(long int steps = 500) { this->nStepsDPD = steps; }
 
       ////////////////////////////////////////////////////////////////
       // results access & export

@@ -198,6 +198,7 @@ namespace calc {
         // update coordinates & velocities
         velocitiesPlus = velocities + halfDt * forces;
         this->coordinates += dt * velocitiesPlus;
+        this->neighbourlist.resetCoordinates(this->coordinates);
         velocities += lambda * dt * forces;
 
         // TODO: figure out, what the issue is, how the velocities
@@ -205,8 +206,8 @@ namespace calc {
         // temperature = this->computeTemperature(velocities);
 
         // re-compute the forces with these updated coordinates & velocities
-        double pressure =
-          computeForces(forces, stressTensor, coordinates, velocities, dt, 1.0);
+        double pressure = computeForces(
+          forces, stressTensor, this->coordinates, velocities, dt, 1.0);
 
         // correct the velocities
         velocities = velocitiesPlus + halfDt * forces;
@@ -223,8 +224,8 @@ namespace calc {
 
         // compute bond properties
         Eigen::VectorXd bondDistances =
-          coordinates(this->bondPartnerCoordinatesA) -
-          coordinates(this->bondPartnerCoordinatesB);
+          this->coordinates(this->bondPartnerCoordinatesA) -
+          this->coordinates(this->bondPartnerCoordinatesB);
         this->box.handlePBC(bondDistances);
         double meanB = 0.0;
         double maxB = 0.0;
@@ -264,7 +265,7 @@ namespace calc {
                      ++msdIdx) {
                   double result =
                     (this->msdOrigins[msdIdx] -
-                     coordinates(this->msdMeasuredIndices[msdIdx]))
+                     this->coordinates(this->msdMeasuredIndices[msdIdx]))
                       .squaredNorm() /
                     (static_cast<double>(
                       this->msdMeasuredIndices[msdIdx].size() / 3.));
@@ -293,7 +294,7 @@ namespace calc {
                 for (msdIdx = 0; msdIdx < msdMeasuredIndices.size(); ++msdIdx) {
                   double result =
                     (this->msdOrigins[msdIdx] -
-                     coordinates(this->msdMeasuredIndices[msdIdx]))
+                     this->coordinates(this->msdMeasuredIndices[msdIdx]))
                       .squaredNorm() /
                     (static_cast<double>(
                       this->msdMeasuredIndices[msdIdx].size() / 3.));
@@ -322,8 +323,6 @@ namespace calc {
           }
           averagesOutput << averagesOutputBuffer << std::endl;
         }
-
-        this->neighbourlist.resetCoordinates(coordinates);
 
         if (step % 50 == 0) {
           std::flush(std::cout);
@@ -922,7 +921,7 @@ namespace calc {
     long int DPDSimulator::getTimestep() const
     {
       return this->currentStep;
-    };
+    }
 
     void DPDSimulator::validateNeighbourlist(double cutoff)
     {
@@ -935,7 +934,7 @@ namespace calc {
       // actually loop the atoms
       for (size_t i = 0; i < this->numAtoms; ++i) {
         int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
-          neighbors, coordinates.segment(3 * i, 3), cutoff);
+          neighbors, this->coordinates.segment(3 * i, 3), cutoff);
 
         std::vector<size_t> relevantNeighbors;
         std::vector<size_t> relevantPairs;
@@ -944,8 +943,8 @@ namespace calc {
           if (j <= i) {
             continue;
           }
-          Eigen::Vector3d pairdistance =
-            coordinates.segment(3 * i, 3) - coordinates.segment(3 * j, 3);
+          Eigen::Vector3d pairdistance = this->coordinates.segment(3 * i, 3) -
+                                         this->coordinates.segment(3 * j, 3);
           this->box.handlePBC(pairdistance);
           const double rNorm = pairdistance.norm();
           if (rNorm >= cutoff || rNorm < 1e-12) {
@@ -955,8 +954,8 @@ namespace calc {
           relevantNeighbors.push_back(j);
         }
         for (size_t j = i + 1; j < this->numAtoms; ++j) {
-          Eigen::Vector3d pairdistance =
-            coordinates.segment(3 * i, 3) - coordinates.segment(3 * j, 3);
+          Eigen::Vector3d pairdistance = this->coordinates.segment(3 * i, 3) -
+                                         this->coordinates.segment(3 * j, 3);
           this->box.handlePBC(pairdistance);
           const double rNorm = pairdistance.norm();
           if (rNorm >= cutoff || rNorm < 1e-12) {
@@ -964,6 +963,17 @@ namespace calc {
           }
 
           relevantPairs.push_back(j);
+          bool found = false;
+          for (size_t k = 0; k < numNeighbors; ++k) {
+            if (neighbors[k] == j) {
+              found = true;
+              break;
+            }
+          }
+          RUNTIME_EXP_IFN(found,
+                          "Did not find pair neighbour " + std::to_string(j) +
+                            " in list of neighbors of atom " +
+                            std::to_string(i) + ".");
         }
 
         RUNTIME_EXP_IFN(
@@ -975,8 +985,9 @@ namespace calc {
             pylimer_tools::utils::join(
               relevantPairs.begin(), relevantPairs.end(), std::string(", ")) +
             ". NeighbourList's neighbours are: " +
-            pylimer_tools::utils::join(
-              relevantNeighbors.begin(), relevantNeighbors.end(), std::string(", ")) +
+            pylimer_tools::utils::join(relevantNeighbors.begin(),
+                                       relevantNeighbors.end(),
+                                       std::string(", ")) +
             ".");
         std::sort(relevantPairs.begin(), relevantPairs.end());
         std::sort(relevantNeighbors.begin(), relevantNeighbors.end());
