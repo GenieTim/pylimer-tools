@@ -971,7 +971,13 @@ namespace calc {
           "Pairs and neighbours resulted in different sized partners: " +
             std::to_string(relevantPairs.size()) + " vs. " +
             std::to_string(relevantNeighbors.size()) + " for atom at idx " +
-            std::to_string(i) + ".");
+            std::to_string(i) + ". Pair's neighbours are: " +
+            pylimer_tools::utils::join(
+              relevantPairs.begin(), relevantPairs.end(), std::string(", ")) +
+            ". NeighbourList's neighbours are: " +
+            pylimer_tools::utils::join(
+              relevantNeighbors.begin(), relevantNeighbors.end(), std::string(", ")) +
+            ".");
         std::sort(relevantPairs.begin(), relevantPairs.end());
         std::sort(relevantNeighbors.begin(), relevantNeighbors.end());
 
