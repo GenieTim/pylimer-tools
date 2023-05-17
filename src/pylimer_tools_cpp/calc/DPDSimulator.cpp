@@ -383,23 +383,22 @@ namespace calc {
      */
     double DPDSimulator::computeForces(Eigen::VectorXd& forces,
                                        Eigen::Matrix3d& stressTensor,
-                                       const Eigen::VectorXd& coordinates,
+                                       const Eigen::VectorXd& coords,
                                        const Eigen::VectorXd& velocities,
                                        const double dt,
                                        const double cutoff)
     {
       // initialisation
       assert(coordinates.size() == velocities.size());
-      assert(forces.size() == coordinates.size());
+      assert(forces.size() == coords.size());
       double pressure = 0.0;
-      forces = Eigen::VectorXd::Zero(coordinates.size());
+      forces = Eigen::VectorXd::Zero(coords.size());
       stressTensor = Eigen::Matrix3d::Zero();
 
       // actual computation
       // (attractive) bond forces
-      Eigen::VectorXd bondDistances =
-        coordinates(this->bondPartnerCoordinatesA) -
-        coordinates(this->bondPartnerCoordinatesB);
+      Eigen::VectorXd bondDistances = coords(this->bondPartnerCoordinatesA) -
+                                      coords(this->bondPartnerCoordinatesB);
       this->box.handlePBC(bondDistances);
       assert(bondDistances.minCoeff() > -this->box.getL().maxCoeff());
       assert(bondDistances.maxCoeff() < this->box.getL().maxCoeff());
@@ -430,7 +429,7 @@ namespace calc {
       // actually loop the atoms
       for (size_t i = 0; i < this->numAtoms; ++i) {
         int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
-          neighbors, coordinates.segment(3 * i, 3), cutoff);
+          neighbors, coords.segment(3 * i, 3), cutoff);
 
         // pair forces
         // for (size_t j = i + 1; j < this->numAtoms; ++j) {
@@ -439,8 +438,7 @@ namespace calc {
           if (j <= i) {
             continue;
           }
-          pairdistance =
-            coordinates.segment(3 * i, 3) - coordinates.segment(3 * j, 3);
+          pairdistance = coords.segment(3 * i, 3) - coords.segment(3 * j, 3);
           this->box.handlePBC(pairdistance);
           const double rNorm = pairdistance.norm();
           if (rNorm >= cutoff || rNorm < 1e-12) {
@@ -503,12 +501,13 @@ namespace calc {
      * @param atomIds
      */
     void DPDSimulator::startMeasuringMSDForAtoms(
-      const std::vector<size_t> atomIds)
+      const std::vector<size_t> atomIdsToMeasure)
     {
       // Translate atom IDS to indices of the local structure
-      Eigen::ArrayXi coordinateIndices = Eigen::ArrayXi(3 * atomIds.size());
-      for (size_t i = 0; i < atomIds.size(); ++i) {
-        size_t atomId = atomIds[i];
+      Eigen::ArrayXi coordinateIndices =
+        Eigen::ArrayXi(3 * atomIdsToMeasure.size());
+      for (size_t i = 0; i < atomIdsToMeasure.size(); ++i) {
+        size_t atomId = atomIdsToMeasure[i];
         size_t index = this->universe.getIdxByAtomId(atomId);
         coordinateIndices[3 * i] = 3 * index;
         coordinateIndices[3 * i + 1] = 3 * index + 1;
@@ -649,7 +648,7 @@ namespace calc {
      */
     int DPDSimulator::relocateSlipSprings(const double kbT)
     {
-      int nAccept;
+      int nAccept = 0;
       std::vector<size_t> candidates;
       std::uniform_int_distribution<int> chainendDist(
         0, this->chainEndIndices.size() - 1);
@@ -905,13 +904,13 @@ namespace calc {
         bondTo[i] = this->universe.getAtomIdByIdx(bondTo[i]);
         bondFrom[i] = this->universe.getAtomIdByIdx(bondFrom[i]);
       }
-      std::vector<int> bondTypes(this->bondTypes.data(),
-                                 this->bondTypes.data() +
-                                   this->bondTypes.size());
+      std::vector<int> newBondTypes(this->bondTypes.data(),
+                                    this->bondTypes.data() +
+                                      this->bondTypes.size());
       result.addBonds(this->numBonds + this->numSlipSprings,
                       bondFrom,
                       bondTo,
-                      bondTypes,
+                      newBondTypes,
                       false,
                       false);
 
@@ -925,6 +924,7 @@ namespace calc {
 
     void DPDSimulator::validateNeighbourlist(double cutoff)
     {
+      // this->neighbourlist.resetCoordinates(this->coordinates);
       // pre-allocate the neighbor indices array
       Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
         this->numAtoms *

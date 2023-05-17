@@ -25,6 +25,9 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     pcd::DPDSimulator simulator = pcd::DPDSimulator(universe, 2, false, "seed");
 
     // configuration
+    REQUIRE_NOTHROW(simulator.validateState());
+    CHECK_NOTHROW(simulator.validateNeighbourlist(2.0));
+    CHECK_NOTHROW(simulator.validateNeighbourlist(1.0));
     REQUIRE_NOTHROW(simulator.configA(25.));
     REQUIRE_NOTHROW(simulator.configSigma(3.));
     REQUIRE_NOTHROW(simulator.configSlipspringLowCutoff(0.5));
@@ -59,7 +62,8 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     // actual simulation
     REQUIRE_NOTHROW(simulator.runSimulation(75, 0.06, false));
     REQUIRE_NOTHROW(simulator.validateState());
-    REQUIRE_NOTHROW(simulator.validateNeighbourlist(1.0));
+    CHECK_NOTHROW(simulator.validateNeighbourlist(2.0));
+    CHECK_NOTHROW(simulator.validateNeighbourlist(1.0));
 
     CHECK(simulator.getTemperature() == Catch::Approx(1.0).epsilon(0.5));
 
