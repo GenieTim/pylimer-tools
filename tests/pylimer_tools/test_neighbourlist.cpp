@@ -89,6 +89,69 @@ TEST_CASE("Manually accurate NeighbourList", "[entity][NeighbourList]")
   REQUIRE(neighbours.size() == 1);
 }
 
+TEST_CASE("Random coordinates EigenNeighbourList",
+          "[entity][EigenNeighbourList]")
+{
+  int numAtoms = 10 * 10 * 10 * 3;
+  Eigen::VectorXd coordinates = Eigen::VectorXd::Random(numAtoms * 3);
+  pe::Box box = pe::Box(10, 10, 10);
+  pe::EigenNeighbourList neighbourList =
+    pe::EigenNeighbourList(coordinates, box, 1.0);
+  double cutoff = 1.0;
+  // pre-allocate the neighbor indices array
+  Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
+    numAtoms * (std::ceil((3.1 * cutoff) * (3.1 * cutoff) * (3.1 * cutoff)) /
+                box.getVolume())));
+
+  for (int i = 0; i < numAtoms; ++i) {
+    int numNeighbors = neighbourList.getIndicesCloseToCoordinates(
+      neighbors, coordinates.segment(3 * i, 3), cutoff);
+
+    std::vector<size_t> relevantNeighbors;
+    std::vector<size_t> relevantPairs;
+    for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
+      const size_t j = neighbors[neigh_idx];
+      if (j <= i) {
+        continue;
+      }
+      Eigen::Vector3d pairdistance =
+        coordinates.segment(3 * i, 3) - coordinates.segment(3 * j, 3);
+      box.handlePBC(pairdistance);
+      const double rNorm = pairdistance.norm();
+      if (rNorm >= cutoff || rNorm < 1e-12) {
+        continue;
+      }
+
+      relevantNeighbors.push_back(j);
+    }
+    for (size_t j = i + 1; j < numAtoms; ++j) {
+      Eigen::Vector3d pairdistance =
+        coordinates.segment(3 * i, 3) - coordinates.segment(3 * j, 3);
+      box.handlePBC(pairdistance);
+      const double rNorm = pairdistance.norm();
+      if (rNorm >= cutoff || rNorm < 1e-12) {
+        continue;
+      }
+
+      relevantPairs.push_back(j);
+      bool found = false;
+      for (size_t k = 0; k < numNeighbors; ++k) {
+        if (neighbors[k] == j) {
+          found = true;
+          break;
+        }
+      }
+      CHECK(found);
+    }
+
+    CHECK(relevantPairs.size() == relevantNeighbors.size());
+    std::sort(relevantPairs.begin(), relevantPairs.end());
+    std::sort(relevantNeighbors.begin(), relevantNeighbors.end());
+
+    CHECK(relevantNeighbors == relevantPairs);
+  }
+}
+
 TEST_CASE("Manually accurate EigenNeighbourList",
           "[entity][EigenNeighbourList]")
 {
@@ -132,9 +195,8 @@ TEST_CASE("Manually accurate EigenNeighbourList",
     CHECK(buckets[bucketIndex].size() == bucketSizes[bucketIndex]);
     Eigen::Vector3d centralCoordinates =
       neighbourList.getCentralCoordinatesOfBucket(bucketIndex);
-    indices =
-      neighbourList.getCombinedBucketIndicesForCoordinates(centralCoordinates,
-                                                           0.01);
+    indices = neighbourList.getCombinedBucketIndicesForCoordinates(
+      centralCoordinates, 0.01);
     CHECK(indices.size() == 1);
     CHECK(indices[0] == bucketIndex);
     // small enough cut-off to only query this one bucket
@@ -149,21 +211,17 @@ TEST_CASE("Manually accurate EigenNeighbourList",
     }
   }
   CHECK(buckets.size() == 10 * 10 * 10);
-  indices =
-    neighbourList.getCombinedBucketIndicesForCoordinates(
-      Eigen::Vector3d(0., 0., 0.), 1.9);
+  indices = neighbourList.getCombinedBucketIndicesForCoordinates(
+    Eigen::Vector3d(0., 0., 0.), 1.9);
   CHECK(indices.size() == 8);
-  indices =
-    neighbourList.getCombinedBucketIndicesForCoordinates(
-      Eigen::Vector3d(0., 0., 0.), 0.2);
+  indices = neighbourList.getCombinedBucketIndicesForCoordinates(
+    Eigen::Vector3d(0., 0., 0.), 0.2);
   CHECK(indices.size() == 8);
-  indices =
-    neighbourList.getCombinedBucketIndicesForCoordinates(
-      Eigen::Vector3d(1., 1., 1.), 2.0);
+  indices = neighbourList.getCombinedBucketIndicesForCoordinates(
+    Eigen::Vector3d(1., 1., 1.), 2.0);
   CHECK(indices.size() == 9 * 3);
-  indices =
-    neighbourList.getCombinedBucketIndicesForCoordinates(
-      Eigen::Vector3d(1., 1., 1.), 0.2);
+  indices = neighbourList.getCombinedBucketIndicesForCoordinates(
+    Eigen::Vector3d(1., 1., 1.), 0.2);
   CHECK(indices.size() == 1);
   CHECK(true);
 }

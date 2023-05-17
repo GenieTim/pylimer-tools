@@ -213,10 +213,10 @@ namespace calc {
         this->highCutoff = highC;
       }
 
-      void configSigma(const double sigma)
+      void configSigma(const double newSigma)
       {
-        this->sigma = sigma;
-        this->gamma = 0.5 * sigma * sigma;
+        this->sigma = newSigma;
+        this->gamma = 0.5 * newSigma * newSigma;
       }
 
       void configA(const double newA) { this->A = newA; }
