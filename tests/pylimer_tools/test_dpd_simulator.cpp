@@ -7,8 +7,6 @@
 #include <cstdio>
 
 namespace pe = pylimer_tools::entities;
-namespace pu = pylimer_tools::utils;
-namespace pcm = pylimer_tools::calc::mehp;
 namespace pcd = pylimer_tools::calc::dpd;
 
 TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
