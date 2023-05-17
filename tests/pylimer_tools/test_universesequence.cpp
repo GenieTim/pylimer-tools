@@ -124,4 +124,4 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
   //     suspectedPath + "melt_fene_N_78_rev.lammpstrj");
   //   REQUIRE(universeSeq.getLength() > 8638005/10);
   // }
-}
+};
