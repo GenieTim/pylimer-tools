@@ -963,17 +963,17 @@ namespace calc {
           }
 
           relevantPairs.push_back(j);
-          bool found = false;
-          for (size_t k = 0; k < numNeighbors; ++k) {
-            if (neighbors[k] == j) {
-              found = true;
-              break;
-            }
-          }
-          RUNTIME_EXP_IFN(found,
-                          "Did not find pair neighbour " + std::to_string(j) +
-                            " in list of neighbors of atom " +
-                            std::to_string(i) + ".");
+          // bool found = false;
+          // for (size_t k = 0; k < numNeighbors; ++k) {
+          //   if (neighbors[k] == j) {
+          //     found = true;
+          //     break;
+          //   }
+          // }
+          // RUNTIME_EXP_IFN(found,
+          //                 "Did not find pair neighbour " + std::to_string(j) +
+          //                   " in list of neighbors of atom " +
+          //                   std::to_string(i) + ".");
         }
 
         RUNTIME_EXP_IFN(

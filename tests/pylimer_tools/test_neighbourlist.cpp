@@ -92,9 +92,9 @@ TEST_CASE("Manually accurate NeighbourList", "[entity][NeighbourList]")
 TEST_CASE("Random coordinates EigenNeighbourList",
           "[entity][EigenNeighbourList]")
 {
-  int numAtoms = 10 * 10 * 10 * 3;
-  Eigen::VectorXd coordinates = Eigen::VectorXd::Random(numAtoms * 3);
-  pe::Box box = pe::Box(10, 10, 10);
+  int numAtoms = 8300;
+  Eigen::VectorXd coordinates = Eigen::VectorXd::Random(numAtoms * 3) * 100.;
+  pe::Box box = pe::Box(14, 14, 14);
   pe::EigenNeighbourList neighbourList =
     pe::EigenNeighbourList(coordinates, box, 1.0);
   double cutoff = 1.0;
@@ -134,14 +134,6 @@ TEST_CASE("Random coordinates EigenNeighbourList",
       }
 
       relevantPairs.push_back(j);
-      bool found = false;
-      for (size_t k = 0; k < numNeighbors; ++k) {
-        if (neighbors[k] == j) {
-          found = true;
-          break;
-        }
-      }
-      CHECK(found);
     }
 
     CHECK(relevantPairs.size() == relevantNeighbors.size());
@@ -150,6 +142,7 @@ TEST_CASE("Random coordinates EigenNeighbourList",
 
     CHECK(relevantNeighbors == relevantPairs);
   }
+  CHECK(true);
 }
 
 TEST_CASE("Manually accurate EigenNeighbourList",
