@@ -65,10 +65,10 @@ add_library(test_sources
 		pylimer_tools/test_universesequence.cpp 
 		pylimer_tools/test_molecule.cpp 
 		pylimer_tools/test_neighbourlist.cpp 
-		pylimer_tools/test_readers_writers.cpp 
 		pylimer_tools/test_dpd_simulator.cpp
 		pylimer_tools/test_force_balance.cpp
 		pylimer_tools/test_force_relaxation.cpp
+		pylimer_tools/test_readers_writers.cpp 
 )
 # pylimer_tools/test_force_balance2.cpp
 
