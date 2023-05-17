@@ -109,4 +109,4 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
     //   return parser5.getLength();
     // };
   }
-}
+};

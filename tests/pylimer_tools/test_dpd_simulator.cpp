@@ -10,6 +10,15 @@
 namespace pe = pylimer_tools::entities;
 namespace pcd = pylimer_tools::calc::dpd;
 
+TEST_CASE("Filler", "")
+{
+  // no clue what the reason is, BUT:
+  // without this filler-test,
+  // the test below will fail when run after certain other tests,
+  // noteably tests where the TEST_CASE doesn't end with a semicolon.
+  REQUIRE(true);
+};
+
 TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
 {
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -17,11 +26,11 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
 
   std::string inputFile = suspectedPath + "melt_83_a_100.structure.out";
   if (std::filesystem::exists(inputFile)) {
-    pe::UniverseSequence universeSeq = pe::UniverseSequence();
-    REQUIRE(universeSeq.getLength() == 0);
-    universeSeq.initializeFromDataSequence({ { inputFile } });
-    REQUIRE(universeSeq.getLength() == 1);
-    pe::Universe universe = universeSeq.atIndex(0);
+    pe::UniverseSequence universeSequence = pe::UniverseSequence();
+    REQUIRE(universeSequence.getLength() == 0);
+    universeSequence.initializeFromDataSequence({ { inputFile } });
+    REQUIRE(universeSequence.getLength() == 1);
+    pe::Universe universe = universeSequence.atIndex(0);
 
     pcd::DPDSimulator simulator = pcd::DPDSimulator(universe, 2, false, "seed");
 
@@ -82,4 +91,4 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     REQUIRE(std::filesystem::exists(averageFile));
     std::remove(averageFile.c_str());
   }
-}
+};
