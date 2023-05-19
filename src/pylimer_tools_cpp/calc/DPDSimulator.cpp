@@ -917,14 +917,14 @@ namespace calc {
       return result;
     }
 
-    long int DPDSimulator::getTimestep() const
-    {
-      return this->currentStep;
-    }
+    long int DPDSimulator::getTimestep() const { return this->currentStep; }
 
     void DPDSimulator::validateNeighbourlist(double cutoff)
     {
       // this->neighbourlist.resetCoordinates(this->coordinates);
+      RUNTIME_EXP_IFN(this->neighbourlist.getNumBinnedCoordinates() ==
+                        this->coordinates.size() / 3,
+                      "Not all coordinates are represented.");
       // pre-allocate the neighbor indices array
       Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
         this->numAtoms *
@@ -971,7 +971,8 @@ namespace calc {
           //   }
           // }
           // RUNTIME_EXP_IFN(found,
-          //                 "Did not find pair neighbour " + std::to_string(j) +
+          //                 "Did not find pair neighbour " + std::to_string(j)
+          //                 +
           //                   " in list of neighbors of atom " +
           //                   std::to_string(i) + ".");
         }
