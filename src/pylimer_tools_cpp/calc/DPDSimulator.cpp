@@ -925,6 +925,9 @@ namespace calc {
       RUNTIME_EXP_IFN(this->neighbourlist.getNumBinnedCoordinates() ==
                         this->coordinates.size() / 3,
                       "Not all coordinates are represented.");
+      RUNTIME_EXP_IFN(
+        this->neighbourlist.checkIfCoordinatesAreCurrent(this->coordinates),
+        "Apparently, the neighbourlist's coordinates were not reset properly.");
       // pre-allocate the neighbor indices array
       Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
         this->numAtoms *

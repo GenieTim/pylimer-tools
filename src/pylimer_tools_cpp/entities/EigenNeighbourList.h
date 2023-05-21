@@ -102,6 +102,37 @@ namespace entities {
       }
     }
 
+    bool checkIfCoordinatesAreCurrent(Eigen::VectorXd& newCoordinates)
+    {
+      Eigen::ArrayXi neighbourBucketSizes2 =
+        Eigen::ArrayXi::Zero(this->totalNrOfBuckets);
+      std::unordered_map<size_t, std::vector<size_t>> neighbourBuckets2;
+      for (size_t i = 0; i < (newCoordinates.size() / 3); ++i) {
+        int bucketIndex =
+          this->getBucketIndexForTriplet(this->getBucketTripletForCoordinates(
+            newCoordinates.segment(3 * i, 3)));
+        if (neighbourBuckets2[bucketIndex].size() <=
+            neighbourBucketSizes2[bucketIndex]) {
+          neighbourBuckets2[bucketIndex].push_back(i);
+        } else {
+          neighbourBuckets2[bucketIndex][neighbourBucketSizes2[bucketIndex]] =
+            i;
+        }
+        neighbourBucketSizes2[bucketIndex]++;
+      }
+      if (!(neighbourBucketSizes2 == this->neighbourBucketSizes).all()) {
+        return false;
+      }
+      for (auto& it : neighbourBuckets2) {
+        for (size_t i = 0; i < neighbourBuckets2[it.first].size(); ++i) {
+          if (neighbourBuckets2[it.first][i] != this->neighbourBuckets[it.first][i]) {
+            return false;
+          }
+        }
+      }
+      return true;
+    }
+
     /**
      * @brief Get the Indices Close To Coordinates with the Default Cut-Off
      *
