@@ -120,7 +120,7 @@ namespace entities {
         }
         neighbourBucketSizes2[bucketIndex]++;
       }
-      if (!(neighbourBucketSizes2 == this->neighbourBucketSizes).all()) {
+      if (!(neighbourBucketSizes2 == this->neighbourBucketSizes.array()).all()) {
         return false;
       }
       for (auto& it : neighbourBuckets2) {

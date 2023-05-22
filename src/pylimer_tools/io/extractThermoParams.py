@@ -19,6 +19,9 @@ from pylimer_tools.utils.optimizeDf import optimize, reduce_mem_usage
 from pylimer_tools_cpp import splitCSV
 
 
+def _is_numeric_string(test: str):
+    return np.all([c.isnumeric() or c == "." or c == "+" or c == "-" or c == "e" or c == "E" for c in test.strip()])
+
 def detectHeaders(file: str, max_nr_of_lines_to_read: int = 1500, use_cache: bool = True) -> List[str]:
     """
     Read `max_nr_of_lines_to_read` lines from the given file and return all possible header lines.
@@ -46,7 +49,7 @@ def detectHeaders(file: str, max_nr_of_lines_to_read: int = 1500, use_cache: boo
             if (previous_line is not None and len(line.strip().split()) == len(previous_line.removeprefix("#").strip().split()) and np.sum([
                 w[0].isalpha() for w in previous_line.split()
             ]) > 0.74*len(previous_line.split()) and np.sum([
-                np.all([c.isnumeric() or c == "." or c == "+" or c == "-" or c == "e" for c in w.strip()]) for w in line.split()
+                _is_numeric_string(w) for w in line.split()
             ]) > 0.5*len(line.split()) and "..." not in previous_line and len(previous_line.split()) > 2 and not np.any([
                 previous_line.startswith(val) for val in [
                     "Memory usage per processor",
