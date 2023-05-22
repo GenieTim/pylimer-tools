@@ -125,12 +125,72 @@ namespace entities {
       }
       for (auto& it : neighbourBuckets2) {
         for (size_t i = 0; i < neighbourBuckets2[it.first].size(); ++i) {
-          if (neighbourBuckets2[it.first][i] != this->neighbourBuckets[it.first][i]) {
+          if (neighbourBuckets2[it.first][i] !=
+              this->neighbourBuckets[it.first][i]) {
             return false;
           }
         }
       }
       return true;
+    }
+
+    void validateWhyNotIncluded(Eigen::Vector3d sourceCoords,
+                                Eigen::Vector3d targetCoords,
+                                double newCutoff = -1.0)
+    {
+      if (newCutoff <= 0.) {
+        newCutoff = this->cutoff;
+      }
+      Eigen::Array3i baseTriplet =
+        this->getBucketTripletForCoordinates(sourceCoords);
+      int baseBucketIndex = this->getBucketIndexForTriplet(baseTriplet);
+
+      Eigen::Array3i targetTriplet =
+        this->getBucketTripletForCoordinates(targetCoords);
+      int targetBucketIndex = this->getBucketIndexForTriplet(targetTriplet);
+
+      bool foundSource = false;
+      bool foundTarget = false;
+      if (newCutoff == this->cutoff) {
+        for (bucket_idx_t bucketIndex :
+             this->neighbourBucketNeighboursDefaultCutoff[baseBucketIndex]) {
+          foundSource = foundSource || baseBucketIndex == bucketIndex;
+          foundTarget = foundTarget || targetBucketIndex == bucketIndex;
+        }
+      } else {
+        Eigen::Array3i maxIndices = this->getBucketTripletForCoordinates(
+          sourceCoords + Eigen::Vector3d::Constant(newCutoff));
+        Eigen::Array3i minIndices = this->getBucketTripletForCoordinates(
+          sourceCoords - Eigen::Vector3d::Constant(newCutoff));
+        Eigen::Array3i indexTriplet;
+        // now, do permutations of all these
+        for (int i = minIndices[0]; i <= maxIndices[0]; ++i) {
+          indexTriplet[0] = i;
+          for (int j = minIndices[1]; j <= maxIndices[1]; ++j) {
+            indexTriplet[1] = j;
+            for (int k = minIndices[2]; k <= maxIndices[2]; ++k) {
+              indexTriplet[2] = k;
+              bucket_idx_t bucketIndex =
+                this->getBucketIndexForTriplet(indexTriplet);
+              foundSource = foundSource || baseBucketIndex == bucketIndex;
+              foundTarget = foundTarget || targetBucketIndex == bucketIndex;
+            }
+          }
+        }
+
+        if (!foundTarget || !foundSource) {
+          std::cerr << "With source indices " << baseTriplet << ", got max "
+                    << maxIndices << " and min " << minIndices
+                    << " but not target " << targetTriplet << std::endl;
+        }
+      }
+      if (!foundSource) {
+        std::cerr << "Couldn't find source bucket in list" << std::endl;
+      }
+      if (!foundTarget) {
+        std::cerr << "Target bucket " << targetBucketIndex
+                  << " was not found in list." << std::endl;
+      }
     }
 
     /**

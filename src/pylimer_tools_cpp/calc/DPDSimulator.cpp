@@ -980,6 +980,25 @@ namespace calc {
           //                   std::to_string(i) + ".");
         }
 
+        std::sort(relevantPairs.begin(), relevantPairs.end());
+        std::sort(relevantNeighbors.begin(), relevantNeighbors.end());
+        if (relevantPairs.size() > relevantNeighbors.size()) {
+          // debug why
+          // find the difference
+          std::vector<size_t> diff;
+          std::set_difference(relevantPairs.begin(),
+                              relevantPairs.end(),
+                              relevantNeighbors.begin(),
+                              relevantNeighbors.end(),
+                              std::back_inserter(diff));
+          // figure out why not included
+          for (size_t diff_j : diff) {
+            this->neighbourlist.validateWhyNotIncluded(
+              this->coordinates.segment(3 * i, 3),
+              this->coordinates.segment(3 * diff_j, 3));
+          }
+        }
+
         RUNTIME_EXP_IFN(
           relevantPairs.size() == relevantNeighbors.size(),
           "Pairs and neighbours resulted in different sized partners: " +
@@ -993,8 +1012,6 @@ namespace calc {
                                        relevantNeighbors.end(),
                                        std::string(", ")) +
             ".");
-        std::sort(relevantPairs.begin(), relevantPairs.end());
-        std::sort(relevantNeighbors.begin(), relevantNeighbors.end());
 
         RUNTIME_EXP_IFN(relevantNeighbors == relevantPairs,
                         "Pairs and neighbours are not equal.");
