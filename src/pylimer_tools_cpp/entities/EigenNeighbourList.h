@@ -154,8 +154,11 @@ namespace entities {
       if (newCutoff == this->cutoff) {
         for (bucket_idx_t bucketIndex :
              this->neighbourBucketNeighboursDefaultCutoff[baseBucketIndex]) {
-          foundSource = foundSource || baseBucketIndex == bucketIndex;
-          foundTarget = foundTarget || targetBucketIndex == bucketIndex;
+          foundSource = foundSource || (baseBucketIndex == bucketIndex);
+          foundTarget = foundTarget || (targetBucketIndex == bucketIndex);
+        }
+        if (!foundTarget || !foundSource) {
+          std::cerr << "Used default neighbour cutoff's list" << std::endl;
         }
       } else {
         Eigen::Array3i maxIndices = this->getBucketTripletForCoordinates(
@@ -172,8 +175,8 @@ namespace entities {
               indexTriplet[2] = k;
               bucket_idx_t bucketIndex =
                 this->getBucketIndexForTriplet(indexTriplet);
-              foundSource = foundSource || baseBucketIndex == bucketIndex;
-              foundTarget = foundTarget || targetBucketIndex == bucketIndex;
+              foundSource = foundSource || (baseBucketIndex == bucketIndex);
+              foundTarget = foundTarget || (targetBucketIndex == bucketIndex);
             }
           }
         }
@@ -185,7 +188,7 @@ namespace entities {
         }
       }
       if (!foundSource) {
-        std::cerr << "Couldn't find source bucket in list" << std::endl;
+        std::cerr << "Couldn't find source bucket "<<  <<" in list" << std::endl;
       }
       if (!foundTarget) {
         std::cerr << "Target bucket " << targetBucketIndex
