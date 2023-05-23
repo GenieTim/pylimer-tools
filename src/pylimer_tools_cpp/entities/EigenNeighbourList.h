@@ -215,6 +215,9 @@ namespace entities {
                        bucketIdxs.begin(), bucketIdxs.end(), std::string(", "))
                   << std::endl;
       }
+      if (foundSource && foundTarget) {
+        std::cout << "Target coords should actually be included." << std::endl;
+      }
     }
 
     /**
@@ -223,73 +226,22 @@ namespace entities {
      * @param coordinates
      * @return Eigen::ArrayXi
      */
-    Eigen::ArrayXi getIndicesCloseToCoordinates(
-      Eigen::Vector3d coordinates) const
+    Eigen::ArrayXi getIndicesCloseToCoordinates(Eigen::Vector3d coordinates,
+                                                double newCutoff = -1.) const
     {
-      return this->getIndicesCloseToCoordinates(coordinates, this->cutoff);
+      if (newCutoff == -1.) {
+        newCutoff = this->cutoff;
+      }
+      Eigen::ArrayXi result = Eigen::ArrayXi(12);
+      int num =
+        this->getIndicesCloseToCoordinates(result, coordinates, newCutoff);
+      result.conservativeResize(num);
+      return result;
     }
 
     long int getNumBinnedCoordinates() const
     {
       return this->neighbourBucketSizes.sum();
-    }
-
-    /**
-     * @brief Get the Indices of Coordinates Close To the Coordinates of another
-     * Index
-     *
-     * This function must be O(1), otherwise, this whole neighbor list will be
-     * useless
-     *
-     * NOTE: the resulting list will not be reduced, i.e., it will contain
-     * indices that have a distance > upperCutoff. Additionally,
-     * the requested coordinates will also be included!
-     *
-     * @param idx
-     * @param upperCutoff
-     * @return Eigen::ArrayXi
-     */
-    Eigen::ArrayXi getIndicesCloseToCoordinates(
-      const Eigen::Vector3d& coordinates,
-      const double upperCutoff) const
-    {
-#ifndef NDEBUG
-      INVALIDARG_EXP_IFN(upperCutoff > 0.0,
-                         "Expected upper cutoff > 0., got " +
-                           std::to_string(upperCutoff) + ".");
-#endif
-      std::vector<bucket_idx_t> bucketIndices;
-      if (upperCutoff == this->cutoff) {
-        bucketIndices = this->neighbourBucketNeighboursDefaultCutoff
-                          [this->getBucketIndexForTriplet(
-                            this->getBucketTripletForCoordinates(coordinates))];
-      } else {
-        bucketIndices = this->getCombinedBucketIndicesForCoordinates(
-          coordinates, upperCutoff);
-      }
-
-      // first, count the number of results we will get
-      long int nResults = this->neighbourBucketSizes(bucketIndices).sum();
-
-      Eigen::ArrayXi results = Eigen::ArrayXi(nResults);
-
-      // Eigen::Vector3d difference;
-      int results_idx = 0;
-      for (bucket_idx_t bucketIndex : bucketIndices) {
-        const ArrayXli bucketContent =
-          Eigen::Map<const ArrayXli, Eigen::Unaligned>(
-            this->neighbourBuckets[bucketIndex].data(),
-            this->neighbourBucketSizes[bucketIndex]);
-        results.segment(results_idx, this->neighbourBucketSizes[bucketIndex]) =
-          bucketContent.cast<int>();
-        results_idx += this->neighbourBucketSizes[bucketIndex];
-      }
-
-#ifndef NDEBUG
-      assert(results_idx == nResults);
-#endif
-      // return results
-      return results;
     }
 
     /**
@@ -309,7 +261,7 @@ namespace entities {
      */
     int getIndicesCloseToCoordinates(Eigen::ArrayXi& result,
                                      const Eigen::Vector3d coordinates,
-                                     const double upperCutoff)
+                                     const double upperCutoff) const
     {
 
 #ifndef NDEBUG
@@ -365,6 +317,9 @@ namespace entities {
         std::set<bucket_idx_t> buckets;
         Array3li indexTriplet;
         // now, do permutations of all these
+        assert(minIndices[0] <= maxIndices[0]);
+        assert(minIndices[1] <= maxIndices[1]);
+        assert(minIndices[2] <= maxIndices[2]);
         for (int i = minIndices[0]; i <= maxIndices[0]; ++i) {
           indexTriplet[0] = i;
           for (int j = minIndices[1]; j <= maxIndices[1]; ++j) {
