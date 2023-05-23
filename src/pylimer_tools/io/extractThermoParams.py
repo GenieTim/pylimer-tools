@@ -309,13 +309,14 @@ def readMultiSectionSeparatedValueFile(file: str, separator: str = None, use_cac
                 got_err = True
         if (got_err):
             continue
-        headers = header_line.strip().split(separator)
+        headers = re.split("{}+".format(separator), header_line.strip())
         if (np.sum([_is_numeric_string(h) for h in headers]) > 0.5*len(headers)):
             warnings.warn("CSV file {} has header line {}, which does not seem to be a header.".format(
                 csv_file, header_line))
         for i, h in enumerate(headers):
             if (h not in all_headers):
-                first_line_split = re.split("{}+".format(separator), first_line.strip())
+                first_line_split = re.split(
+                    "{}+".format(separator), first_line.strip())
                 if (len(first_line_split) != len(headers)):
                     raise ValueError(
                         "Headers and first line do not match in nr of values", first_line, header_line)
