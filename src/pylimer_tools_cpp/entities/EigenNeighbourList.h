@@ -25,6 +25,7 @@ namespace entities {
   typedef long int coordinate_idx_t;
 
   typedef Eigen::Array<long int, 3, 1> Array3li;
+  typedef Eigen::Array<long int, Eigen::Dynamic, 1> ArrayXli;
 
   class EigenNeighbourList
   {
@@ -275,12 +276,12 @@ namespace entities {
       // Eigen::Vector3d difference;
       int results_idx = 0;
       for (bucket_idx_t bucketIndex : bucketIndices) {
-        const Eigen::ArrayXi bucketContent =
-          Eigen::Map<const Eigen::ArrayXi, Eigen::Unaligned>(
+        const ArrayXli bucketContent =
+          Eigen::Map<const ArrayXli, Eigen::Unaligned>(
             this->neighbourBuckets[bucketIndex].data(),
             this->neighbourBucketSizes[bucketIndex]);
         results.segment(results_idx, this->neighbourBucketSizes[bucketIndex]) =
-          bucketContent;
+          bucketContent.cast<int>();
         results_idx += this->neighbourBucketSizes[bucketIndex];
       }
 
@@ -474,7 +475,7 @@ namespace entities {
     Array3li normalizeTriplet(Array3li& triplet)
     {
       triplet = (triplet - (triplet / this->nrOfBuckets) * this->nrOfBuckets);
-      triplet += this->nrOfBuckets * (triplet < 0).cast<int>();
+      triplet += this->nrOfBuckets * (triplet < 0).cast<long int>();
       return triplet;
     }
 
