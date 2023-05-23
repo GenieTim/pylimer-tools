@@ -123,12 +123,14 @@ namespace utils {
     while ((pos_end = s.find(delimiter, pos_start)) != std::string::npos) {
       token = s.substr(pos_start, pos_end - pos_start);
       pos_start = pos_end + delim_len;
-      if (res_idx >= res.size()) {
-        res.push_back(token);
-      } else {
-        res[res_idx] = token;
+      if (token != "") {
+        if (res_idx >= res.size()) {
+          res.push_back(token);
+        } else {
+          res[res_idx] = token;
+        }
+        res_idx += 1;
       }
-      res_idx += 1;
     }
     if (res_idx >= res.size()) {
       res.push_back(s.substr(pos_start));

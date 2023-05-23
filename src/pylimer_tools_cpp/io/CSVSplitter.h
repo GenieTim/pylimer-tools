@@ -40,7 +40,7 @@ namespace utils {
       shortenedLine = pylimer_tools::utils::trimLineOmitComment(line);
       int newLength =
         pylimer_tools::utils::split(tokenzierResults, shortenedLine, delimiter);
-      if (newLength != previousLen) {
+      if (newLength != previousLen || tokenzierResults[0] == "Step") {
         // todo: also check for headers with same length?!?
         previousLen = newLength;
         outputFile.close();

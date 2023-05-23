@@ -5,6 +5,7 @@ import hashlib
 import os
 import pathlib
 import pickle
+import re
 import tempfile
 import warnings
 from datetime import datetime
@@ -21,6 +22,7 @@ from pylimer_tools_cpp import splitCSV
 
 def _is_numeric_string(test: str):
     return np.all([c.isnumeric() or c == "." or c == "+" or c == "-" or c == "e" or c == "E" for c in test.strip()])
+
 
 def detectHeaders(file: str, max_nr_of_lines_to_read: int = 1500, use_cache: bool = True) -> List[str]:
     """
@@ -308,9 +310,12 @@ def readMultiSectionSeparatedValueFile(file: str, separator: str = None, use_cac
         if (got_err):
             continue
         headers = header_line.strip().split(separator)
+        if (np.sum([_is_numeric_string(h) for h in headers]) > 0.5*len(headers)):
+            warnings.warn("CSV file {} has header line {}, which does not seem to be a header.".format(
+                csv_file, header_line))
         for i, h in enumerate(headers):
             if (h not in all_headers):
-                first_line_split = first_line.strip().split(separator)
+                first_line_split = re.split("{}+".format(separator), first_line.strip())
                 if (len(first_line_split) != len(headers)):
                     raise ValueError(
                         "Headers and first line do not match in nr of values", first_line, header_line)
