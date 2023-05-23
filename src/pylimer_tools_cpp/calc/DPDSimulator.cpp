@@ -269,7 +269,7 @@ namespace calc {
                       .squaredNorm() /
                     (static_cast<double>(
                       this->msdMeasuredIndices[msdIdx].size() / 3.));
-                  outputBuffer += "\t" + std::to_string(result);
+                  outputBuffer += std::to_string(result) +"\t";
                 }
                 break;
               default:
@@ -995,7 +995,8 @@ namespace calc {
           for (size_t diff_j : diff) {
             this->neighbourlist.validateWhyNotIncluded(
               this->coordinates.segment(3 * i, 3),
-              this->coordinates.segment(3 * diff_j, 3), cutoff);
+              this->coordinates.segment(3 * diff_j, 3),
+              cutoff);
           }
         }
 
