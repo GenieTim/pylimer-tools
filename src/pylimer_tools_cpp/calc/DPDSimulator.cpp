@@ -269,7 +269,7 @@ namespace calc {
                       .squaredNorm() /
                     (static_cast<double>(
                       this->msdMeasuredIndices[msdIdx].size() / 3.));
-                  outputBuffer += std::to_string(result) +"\t";
+                  outputBuffer += std::to_string(result) + "\t";
                 }
                 break;
               default:
@@ -941,6 +941,8 @@ namespace calc {
 
         std::vector<size_t> relevantNeighbors;
         std::vector<size_t> relevantPairs;
+
+        // neigbhourlist
         for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
           const size_t j = neighbors[neigh_idx];
           if (j <= i) {
@@ -956,6 +958,8 @@ namespace calc {
 
           relevantNeighbors.push_back(j);
         }
+
+        // pairs
         for (size_t j = i + 1; j < this->numAtoms; ++j) {
           Eigen::Vector3d pairdistance = this->coordinates.segment(3 * i, 3) -
                                          this->coordinates.segment(3 * j, 3);
@@ -983,6 +987,7 @@ namespace calc {
         std::sort(relevantPairs.begin(), relevantPairs.end());
         std::sort(relevantNeighbors.begin(), relevantNeighbors.end());
         if (relevantPairs.size() > relevantNeighbors.size()) {
+          std::cout << "Debugging neighbourlist. " << numNeighbors << std::endl;
           // debug why
           // find the difference
           std::vector<size_t> diff;
@@ -991,6 +996,8 @@ namespace calc {
                               relevantNeighbors.begin(),
                               relevantNeighbors.end(),
                               std::back_inserter(diff));
+          assert(diff.size() >=
+                 (relevantPairs.size() - relevantNeighbors.size()));
           // figure out why not included
           for (size_t diff_j : diff) {
             this->neighbourlist.validateWhyNotIncluded(
