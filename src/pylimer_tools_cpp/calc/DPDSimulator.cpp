@@ -735,10 +735,12 @@ namespace calc {
         const size_t partnerA = this->bondPartnersA[springIdx];
         const size_t partnerB = this->bondPartnersB[springIdx];
         // attempt to shift the spring around partnerA
-        if (this->shiftOneAtATime){
-        n_accept += this->attemptSlipSpringShift(springIdx, partnerA);
-        n_accept += this->attemptSlipSpringShift(springIdx, partnerB);} else {
-        n_accept += this->attemptSlipSpringShift(springIdx);}
+        if (this->shiftOneAtATime) {
+          n_accept += this->attemptSlipSpringShift(springIdx, partnerA);
+          n_accept += this->attemptSlipSpringShift(springIdx, partnerB);
+        } else {
+          n_accept += this->attemptSlipSpringShift(springIdx);
+        }
         if (this->bondPartnersA[springIdx] == this->bondPartnersB[springIdx]) {
           // complete relocation of this bond
           std::uniform_int_distribution<int> firstChoice(0, this->numAtoms);
@@ -812,8 +814,8 @@ namespace calc {
       if (distrLimitB == 0 && this->shiftPossibilityEmpty) {
         distrLimitB += 1;
       }
-      std::uniform_int_distribution<int> dista(0, distrLimitB);
-      int randomIdxB = dista(this->e2);
+      std::uniform_int_distribution<int> distb(0, distrLimitB);
+      int randomIdxB = distb(this->e2);
       if (randomIdxB >= this->idxFunctionalities[partnerB]) {
         assert(this->shiftPossibilityEmpty);
       } else {
