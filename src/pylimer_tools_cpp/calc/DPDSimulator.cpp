@@ -938,6 +938,8 @@ namespace calc {
       for (size_t i = 0; i < this->numAtoms; ++i) {
         int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
           neighbors, this->coordinates.segment(3 * i, 3), cutoff);
+        Eigen::ArrayXi neighbors2 = this->neighbourlist.getIndicesCloseToCoordinates(this->coordinates.segment(3*i, 3), cutoff);
+        RUNTIME_EXP_IFN((neighbors.segment(0, numNeighbors) == neighbors2).all(), "Neighbors should be equal no matter the method, but apparently, they are not.");
 
         std::vector<size_t> relevantNeighbors;
         std::vector<size_t> relevantPairs;
@@ -958,6 +960,8 @@ namespace calc {
 
           relevantNeighbors.push_back(j);
         }
+
+        assert(relevantNeighbors.size() <= numNeighbors);
 
         // pairs
         for (size_t j = i + 1; j < this->numAtoms; ++j) {

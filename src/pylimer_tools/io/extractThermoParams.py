@@ -347,7 +347,7 @@ def readMultiSectionSeparatedValueFile(file: str, separator: str = None, use_cac
                 continue
             with(open(csv_file, 'r')) as fp:
                 header_line = next(fp)
-                split_header = header_line.strip().split(separator)
+                split_header = re.split("{}+".format(separator), header_line.strip())
                 map_to_col = []
                 n_found = 0
                 for i, col in enumerate(all_headers):
@@ -360,7 +360,7 @@ def readMultiSectionSeparatedValueFile(file: str, separator: str = None, use_cac
                 for line in fp:
                     if (line == header_line or line.startswith("Step")):
                         continue
-                    split_line = line.strip().split(separator)
+                    split_line = re.split("{}+".format(separator), line.strip())
                     str_to_write = separator.join(
                         [split_line[i] if i != -1 else "NaN" for i in map_to_col])
                     outFile.write(str_to_write + "\n")
@@ -374,7 +374,7 @@ def readMultiSectionSeparatedValueFile(file: str, separator: str = None, use_cac
     print("Reading final csv file {}".format(csv_file_to_write))
     try:
         df = pd.read_csv(
-            csv_file_to_write, sep=separator, comment=comment, dtype=detected_dtypes, na_values=["NaN"])
+            csv_file_to_write, sep=separator + "+", comment=comment, dtype=detected_dtypes, na_values=["NaN"])
     except pd.errors.EmptyDataError as e:
         warnings.warn("Data file {} turned out to be empty".format(file))
         return pd.DataFrame()
