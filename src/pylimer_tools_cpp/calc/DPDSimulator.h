@@ -65,6 +65,8 @@ namespace calc {
       ////////////////////////////////////////////////////////////////
       // configuration
       bool is2D = false;
+      bool shiftPossibilityEmpty = true;
+      bool shiftOneAtATime = false;
       double lambda = 0.65;
       double k = 2.;
       double lowCutoff = 0.5;
@@ -248,6 +250,16 @@ namespace calc {
 
       void configNumStepsDPD(long int steps = 500) { this->nStepsDPD = steps; }
 
+      void configShiftPossibilityEmpty(bool shiftPossibilityEmptyConfig = true)
+      {
+        this->shiftPossibilityEmpty = shiftPossibilityEmptyConfig;
+      }
+
+      void configShiftOneAtATime(bool shiftOne = true)
+      {
+        this->shiftOneAtATime = shiftOne;
+      }
+
       ////////////////////////////////////////////////////////////////
       // results access & export
       pylimer_tools::entities::Universe getUniverse() const;
@@ -268,6 +280,9 @@ namespace calc {
 
       bool attemptSlipSpringShift(const size_t springIdx,
                                   const size_t endToShift,
+                                  const double kbT = 1.);
+
+      bool attemptSlipSpringShift(const size_t springIdx,
                                   const double kbT = 1.);
 
       void replaceSlipSpringPartner(const size_t springIdx,
