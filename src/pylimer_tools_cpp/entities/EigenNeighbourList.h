@@ -176,10 +176,10 @@ namespace entities {
         Array3li indexTriplet;
         // now, do permutations of all these
         for (long int i = minIndices[0]; i <= maxIndices[0]; ++i) {
-          indexTriplet[0] = i;
           for (long int j = minIndices[1]; j <= maxIndices[1]; ++j) {
-            indexTriplet[1] = j;
             for (long int k = minIndices[2]; k <= maxIndices[2]; ++k) {
+              indexTriplet[0] = i;
+              indexTriplet[1] = j;
               indexTriplet[2] = k;
               bucket_idx_t bucketIndex =
                 this->getBucketIndexForTriplet(indexTriplet);
@@ -194,11 +194,13 @@ namespace entities {
           std::cerr << "With source indices " << baseTriplet << ", got max "
                     << maxIndices << " and min " << minIndices
                     << " but not target " << targetTriplet << std::endl;
-          std::cerr << "Normalized, that's "
-                    << this->normalizeTriplet(baseTriplet) << ", got max "
-                    << maxIndices << " and min "
-                    << this->normalizeTriplet(minIndices) << ", target "
-                    << this->normalizeTriplet(targetTriplet) << std::endl;
+          this->normalizeTriplet(baseTriplet);
+          this->normalizeTriplet(maxIndices);
+          this->normalizeTriplet(minIndices);
+          this->normalizeTriplet(targetTriplet);
+          std::cerr << "Normalized, that's " << baseTriplet << ", got max "
+                    << maxIndices << " and min " << minIndices << ", target "
+                    << targetTriplet << std::endl;
         }
       }
       if (!foundSource) {
@@ -302,7 +304,6 @@ namespace entities {
         // TODO: this is more or less identical to
         // EigenNeighbourList::getCombinedIndicesForCoordinates
         // with some minor additions here and there
-        Array3li indexBasis = this->getBucketTripletForCoordinates(coordinates);
         Array3li maxIndices = this->getBucketTripletForCoordinates(
           coordinates + Eigen::Vector3d::Constant(upperCutoff));
         Array3li minIndices = this->getBucketTripletForCoordinates(
@@ -320,12 +321,13 @@ namespace entities {
         assert(minIndices[0] <= maxIndices[0]);
         assert(minIndices[1] <= maxIndices[1]);
         assert(minIndices[2] <= maxIndices[2]);
-        for (int i = minIndices[0]; i <= maxIndices[0]; ++i) {
-          indexTriplet[0] = i;
-          for (int j = minIndices[1]; j <= maxIndices[1]; ++j) {
-            indexTriplet[1] = j;
-            for (int k = minIndices[2]; k <= maxIndices[2]; ++k) {
+        for (long int i = minIndices[0]; i <= maxIndices[0]; ++i) {
+          for (long int j = minIndices[1]; j <= maxIndices[1]; ++j) {
+            for (long int k = minIndices[2]; k <= maxIndices[2]; ++k) {
+              indexTriplet[0] = i;
+              indexTriplet[1] = j;
               indexTriplet[2] = k;
+              //
               bucket_idx_t bucketIndex =
                 this->getBucketIndexForTriplet(indexTriplet);
               // found the bucket, insert its contents into the results if
@@ -333,7 +335,7 @@ namespace entities {
               if (buckets.insert(bucketIndex).second) {
                 for (int indexInBucket = 0;
                      indexInBucket < this->neighbourBucketSizes[bucketIndex];
-                     indexInBucket++) {
+                     ++indexInBucket) {
                   coordinate_idx_t atomIndex =
                     this->neighbourBuckets[bucketIndex][indexInBucket];
                   result[results_idx] = atomIndex;
@@ -427,11 +429,10 @@ namespace entities {
       return static_cast<bucket_idx_t>(bucketIndex);
     }
 
-    Array3li normalizeTriplet(Array3li& triplet)
+    void normalizeTriplet(Array3li& triplet) const
     {
       triplet = (triplet - (triplet / this->nrOfBuckets) * this->nrOfBuckets);
       triplet += this->nrOfBuckets * (triplet < 0).cast<long int>();
-      return triplet;
     }
 
     Array3li tripletFromIndex(bucket_idx_t index) const
@@ -449,14 +450,17 @@ namespace entities {
 
     bucket_idx_t getBucketIndexForTriplet(Array3li ind) const
     {
-      bucket_idx_t bucketIndexX =
-        this->normalizeBucketIndex(ind[0], this->nrOfBuckets[0]);
-      bucket_idx_t bucketIndexY =
-        this->normalizeBucketIndex(ind[1], this->nrOfBuckets[1]);
-      bucket_idx_t bucketIndexZ =
-        this->normalizeBucketIndex(ind[2], this->nrOfBuckets[2]);
-      return bucketIndexX + bucketIndexY * this->nrOfBuckets[0] +
-             bucketIndexZ * this->nrOfBuckets[0] * this->nrOfBuckets[1];
+      this->normalizeTriplet(ind);
+      return ind[0] + ind[1] * this->nrOfBuckets[0] +
+             ind[2] * this->nrOfBuckets[0] * this->nrOfBuckets[1];
+      // bucket_idx_t bucketIndexX =
+      //   this->normalizeBucketIndex(ind[0], this->nrOfBuckets[0]);
+      // bucket_idx_t bucketIndexY =
+      //   this->normalizeBucketIndex(ind[1], this->nrOfBuckets[1]);
+      // bucket_idx_t bucketIndexZ =
+      //   this->normalizeBucketIndex(ind[2], this->nrOfBuckets[2]);
+      // return bucketIndexX + bucketIndexY * this->nrOfBuckets[0] +
+      //        bucketIndexZ * this->nrOfBuckets[0] * this->nrOfBuckets[1];
     }
 
     Array3li getBucketTripletForCoordinates(

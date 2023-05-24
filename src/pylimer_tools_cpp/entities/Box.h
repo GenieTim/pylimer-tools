@@ -8,6 +8,7 @@
 #include <cmath>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 namespace pylimer_tools {
 namespace entities {
@@ -32,19 +33,33 @@ namespace entities {
              (this->L[coord] * std::nearbyint(dcoord * this->oneOverL[coord]));
     }
 
-    Eigen::Vector3d minImageDistance(Eigen::Vector3d coords) const
+    // Eigen::Vector3d minImageDistance(Eigen::Vector3d coords) const
+    // {
+    //   return coords -
+    //          (this->L * (coords.array() * this->oneOverL).round()).matrix();
+    // }
+    template<typename Derived>
+    void minImageDistance(Eigen::MatrixBase<Derived>& coords) const
     {
-      return coords -
-             (this->L * (coords.array() * this->oneOverL).round()).matrix();
+      coords -=
+        (this->L.replicate(coords.size() / 3, 1) *
+         (coords.array() * this->oneOverL.replicate(coords.size() / 3, 1))
+           .round())
+          .matrix();
     }
 
-    Eigen::VectorXd minImageDistance(Eigen::VectorXd coords) const
+    template<typename VectorType>
+    VectorType minImageDistancesStdContainer(VectorType& coords) const
     {
-      return coords -
-             (this->L.replicate(coords.size() / 3, 1) *
-              (coords.array() * this->oneOverL.replicate(coords.size() / 3, 1))
-                .round())
-               .matrix();
+      INVALIDARG_EXP_IFN(
+        coords.size() % 3 == 0,
+        "Expect coordinates to be in order x, y, z, repeatedly.");
+
+      for (size_t i = 0; i < coords.size(); ++i) {
+        coords[i] = this->minImageDistance(coords[i], i % 3);
+      }
+
+      return coords;
     }
 
     double iterateForPlacementIn(double coord, double min, double max) const
@@ -153,30 +168,25 @@ namespace entities {
     double getShearMagnitude() const { return this->simpleShearMagnitude; }
     int getShearDirection() const { return this->shearDirection; }
 
-    template<typename VectorType>
-    VectorType minImageDistances(VectorType& coords) const
+    template<typename T>
+    std::vector<T> minImageDistances(std::vector<T>& coords) const
     {
-      INVALIDARG_EXP_IFN(
-        coords.size() % 3 == 0,
-        "Expect coordinates to be in order x, y, z, repeatedly.");
-
-      for (size_t i = 0; i < coords.size(); ++i) {
-        coords[i] = this->minImageDistance(coords[i], i % 3);
-      }
-
-      return coords;
+      return this->minImageDistancesStdContainer(coords);
+    }
+    template<typename T, size_t N>
+    std::array<T, N> minImageDistances(std::array<T, N>& coords) const
+    {
+      return this->minImageDistancesStdContainer(coords);
     }
 
     template<typename Derived>
-    Eigen::MatrixBase<Derived> minImageDistances(
-      Eigen::MatrixBase<Derived>& coords) const
+    void minImageDistances(Eigen::MatrixBase<Derived>& coords) const
     {
       INVALIDARG_EXP_IFN(
         coords.size() % 3 == 0,
         "Expect coordinates to be in order x, y, z, repeatedly.");
 
-      coords = this->minImageDistance(coords);
-      return coords;
+      this->minImageDistance(coords);
     }
 
     template<typename VectorType>
