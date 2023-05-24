@@ -1239,6 +1239,8 @@ init_pylimer_bound_calc(py::module_& m)
           Arguments:
                - values: a list of ComputeValues enum values
      )pbdoc")
+     .def("configShiftPossibilityEmpty", &dpd::DPDSimulator::configShiftPossibilityEmpty, R"pbdoc()pbdoc")
+     .def("configShiftOneAtATime", &dpd::DPDSimulator::configShiftOneAtATime, R"pbdoc()pbdoc")
     .def("configNumStepsMC", &dpd::DPDSimulator::configNumStepsMC, R"pbdoc(
           Configure the number of steps to do in one MC sequence.
      )pbdoc")

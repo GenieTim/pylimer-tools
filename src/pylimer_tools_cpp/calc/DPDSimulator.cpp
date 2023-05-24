@@ -704,7 +704,7 @@ namespace calc {
           accept = true;
         } else {
           double factor = std::exp(-deltaEnergy / kbT);
-          if (this->uniform_rand_mean0std1(this->e2) * 0.5 + 1. < factor) {
+          if (this->uniform_rand_between_0_1(this->e2) < factor) {
             accept = true;
           }
         }
@@ -735,8 +735,10 @@ namespace calc {
         const size_t partnerA = this->bondPartnersA[springIdx];
         const size_t partnerB = this->bondPartnersB[springIdx];
         // attempt to shift the spring around partnerA
+        if (this->shiftOneAtATime){
         n_accept += this->attemptSlipSpringShift(springIdx, partnerA);
-        n_accept += this->attemptSlipSpringShift(springIdx, partnerB);
+        n_accept += this->attemptSlipSpringShift(springIdx, partnerB);} else {
+        n_accept += this->attemptSlipSpringShift(springIdx);}
         if (this->bondPartnersA[springIdx] == this->bondPartnersB[springIdx]) {
           // complete relocation of this bond
           std::uniform_int_distribution<int> firstChoice(0, this->numAtoms);
@@ -776,7 +778,78 @@ namespace calc {
     }
 
     /**
-     * @brief
+     *
+     * @param springIdx
+     * @param kbT
+     * @return true
+     * @return false
+     */
+    bool DPDSimulator::attemptSlipSpringShift(const size_t springIdx,
+                                              const double kbT)
+    {
+      const size_t partnerA = this->bondPartnersA[springIdx];
+      const size_t partnerB = this->bondPartnersB[springIdx];
+      size_t newPartnerA = partnerA;
+      size_t newPartnerB = partnerB;
+      // attempt to shift the spring around partnerA
+      int distrLimitA = this->idxFunctionalities[partnerA] - 1;
+      if (distrLimitA == 0 && this->shiftPossibilityEmpty) {
+        distrLimitA += 1;
+      }
+      std::uniform_int_distribution<int> dista(0, distrLimitA);
+      int randomIdxA = dista(this->e2);
+      if (randomIdxA >= this->idxFunctionalities[partnerA]) {
+        assert(this->shiftPossibilityEmpty);
+      } else {
+        const size_t selectedBondA = this->bondsOfIndex[partnerA][randomIdxA];
+        newPartnerA = this->bondPartnersA[selectedBondA] == partnerA
+                        ? this->bondPartnersB[selectedBondA]
+                        : this->bondPartnersA[selectedBondA];
+      }
+
+      // and around B
+      int distrLimitB = this->idxFunctionalities[partnerB] - 1;
+      if (distrLimitB == 0 && this->shiftPossibilityEmpty) {
+        distrLimitB += 1;
+      }
+      std::uniform_int_distribution<int> dista(0, distrLimitB);
+      int randomIdxB = dista(this->e2);
+      if (randomIdxB >= this->idxFunctionalities[partnerB]) {
+        assert(this->shiftPossibilityEmpty);
+      } else {
+        const size_t selectedBondB = this->bondsOfIndex[partnerB][randomIdxB];
+        newPartnerB = this->bondPartnersA[selectedBondB] == partnerB
+                        ? this->bondPartnersB[selectedBondB]
+                        : this->bondPartnersA[selectedBondB];
+      }
+
+      // compute the Metropolis criterion
+      double bondEnergyNow =
+        -this->k * (this->coordinates.segment(partnerA * 3, 3) -
+                    this->coordinates.segment(partnerB * 3, 3))
+                     .squaredNorm();
+      double bondEnergyNew =
+        -this->k * (this->coordinates.segment(newPartnerA * 3, 3) -
+                    this->coordinates.segment(newPartnerB * 3, 3))
+                     .squaredNorm();
+      double deltaEnergy = bondEnergyNew - bondEnergyNow;
+      bool accept = false;
+      if (deltaEnergy < 0.0) {
+        accept = true;
+      } else {
+        double factor = std::exp(-deltaEnergy / kbT);
+        if (this->uniform_rand_between_0_1(this->e2) < factor) {
+          accept = true;
+        }
+      }
+      if (accept) {
+        this->replaceSlipSpringPartner(springIdx, partnerA, newPartnerA);
+        this->replaceSlipSpringPartner(springIdx, partnerB, newPartnerB);
+      }
+      return accept;
+    };
+
+    /**
      *
      * @param springIdx
      * @param endToShift
@@ -796,9 +869,17 @@ namespace calc {
                                 : this->bondPartnersB[springIdx];
       assert(partnerA == endToShift);
       // attempt to shift the spring around partnerA
-      std::uniform_int_distribution<int> dist(
-        0, this->idxFunctionalities[partnerA] - 1);
-      const size_t selectedBond = this->bondsOfIndex[partnerA][dist(this->e2)];
+      int distr_limit = this->idxFunctionalities[partnerA] - 1;
+      if (distr_limit == 0 && this->shiftPossibilityEmpty) {
+        distr_limit += 1;
+      }
+      std::uniform_int_distribution<int> dist(0, distr_limit);
+      int random_idx = dist(this->e2);
+      if (random_idx >= this->idxFunctionalities[partnerA]) {
+        assert(this->shiftPossibilityEmpty);
+        return false;
+      }
+      const size_t selectedBond = this->bondsOfIndex[partnerA][random_idx];
       const size_t replacementForA =
         this->bondPartnersA[selectedBond] == partnerA
           ? this->bondPartnersB[selectedBond]
@@ -818,7 +899,7 @@ namespace calc {
         accept = true;
       } else {
         double factor = std::exp(-deltaEnergy / kbT);
-        if (this->uniform_rand_mean0std1(this->e2) * 0.5 + 1. < factor) {
+        if (this->uniform_rand_between_0_1(this->e2) < factor) {
           accept = true;
         }
       }
@@ -917,7 +998,10 @@ namespace calc {
       return result;
     }
 
-    long int DPDSimulator::getTimestep() const { return this->currentStep; }
+    long int DPDSimulator::getTimestep() const
+    {
+      return this->currentStep;
+    }
 
     void DPDSimulator::validateNeighbourlist(double cutoff)
     {
@@ -938,8 +1022,13 @@ namespace calc {
       for (size_t i = 0; i < this->numAtoms; ++i) {
         int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
           neighbors, this->coordinates.segment(3 * i, 3), cutoff);
-        Eigen::ArrayXi neighbors2 = this->neighbourlist.getIndicesCloseToCoordinates(this->coordinates.segment(3*i, 3), cutoff);
-        RUNTIME_EXP_IFN((neighbors.segment(0, numNeighbors) == neighbors2).all(), "Neighbors should be equal no matter the method, but apparently, they are not.");
+        Eigen::ArrayXi neighbors2 =
+          this->neighbourlist.getIndicesCloseToCoordinates(
+            this->coordinates.segment(3 * i, 3), cutoff);
+        RUNTIME_EXP_IFN(
+          (neighbors.segment(0, numNeighbors) == neighbors2).all(),
+          "Neighbors should be equal no matter the method, but apparently, "
+          "they are not.");
 
         std::vector<size_t> relevantNeighbors;
         std::vector<size_t> relevantPairs;
