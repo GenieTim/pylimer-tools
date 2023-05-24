@@ -10,15 +10,6 @@
 namespace pe = pylimer_tools::entities;
 namespace pcd = pylimer_tools::calc::dpd;
 
-TEST_CASE("Filler", "")
-{
-  // no clue what the reason is, BUT:
-  // without this filler-test,
-  // the test below will fail when run after certain other tests,
-  // noteably tests where the TEST_CASE doesn't end with a semicolon.
-  REQUIRE(true);
-};
-
 TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
 {
   std::string suspectedPath = "../pylimer_tools/fixtures/";
