@@ -255,7 +255,7 @@ namespace calc {
         this->shiftPossibilityEmpty = shiftPossibilityEmptyConfig;
       }
 
-      void configShiftOneAtATime(bool shiftOne = true)
+      void configShiftOneAtATime(bool shiftOne = false)
       {
         this->shiftOneAtATime = shiftOne;
       }
