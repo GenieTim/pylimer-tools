@@ -546,21 +546,22 @@ namespace calc {
       for (size_t i = 0; i < this->numAtoms; ++i) {
         sourceIds.push_back(i);
       }
-      std::shuffle(sourceIds.begin(), sourceIds.end(), this->e2);
 
       // search for neighbours that are elibile
+      Eigen::ArrayXi pairs = Eigen::ArrayXi(16);
       while (createdLastIteration > 0 && totalCreated < num) {
         createdLastIteration = 0;
+        std::shuffle(sourceIds.begin(), sourceIds.end(), this->e2);
         for (size_t i : sourceIds) {
           int numCandidates = 0;
           // for each atom, search for possible partners
-          Eigen::ArrayXi pairs =
-            this->neighbourlist.getIndicesCloseToCoordinates(
-              this->coordinates.segment(3 * i, 3), this->highCutoff);
-          for (size_t j = 0; j < pairs.size(); ++j) {
+          int numNeighs = this->neighbourlist.getIndicesCloseToCoordinates(
+            pairs, this->coordinates.segment(3 * i, 3), this->highCutoff);
+          for (size_t j = 0; j < numNeighs; ++j) {
             Eigen::Vector3d distance =
               this->coordinates.segment(3 * i, 3) -
               this->coordinates.segment(3 * pairs[j], 3);
+            this->box.handlePBC(distance);
             if (distance.norm() > this->lowCutoff &&
                 distance.norm() <= this->highCutoff) {
               if (numCandidates < candidates.size()) {
@@ -674,6 +675,7 @@ namespace calc {
           Eigen::Vector3d distance =
             this->coordinates.segment(3 * candidateIndex, 3) -
             this->coordinates.segment(3 * pairs[j], 3);
+          this->box.handlePBC(distance);
           if (distance.norm() > this->lowCutoff &&
               distance.norm() <= this->highCutoff) {
             if (numCandidates >= candidates.size()) {
@@ -729,6 +731,7 @@ namespace calc {
     {
       int n_accept = 0;
       std::vector<size_t> candidates;
+      std::uniform_int_distribution<int> uniformDistNatoms(0, this->numAtoms);
       for (size_t springIdx = this->numBonds;
            springIdx < (this->numBonds + this->numSlipSprings);
            ++springIdx) {
@@ -743,8 +746,7 @@ namespace calc {
         }
         if (this->bondPartnersA[springIdx] == this->bondPartnersB[springIdx]) {
           // complete relocation of this bond
-          std::uniform_int_distribution<int> firstChoice(0, this->numAtoms);
-          int firstPartner = firstChoice(this->e2);
+          int firstPartner = uniformDistNatoms(this->e2);
           // search for neighbours
           int numCandidates = 0;
           // for this first chosen atom, search for possible partners
@@ -755,6 +757,7 @@ namespace calc {
             Eigen::Vector3d distance =
               this->coordinates.segment(3 * firstPartner, 3) -
               this->coordinates.segment(3 * pairs[j], 3);
+            this->box.handlePBC(distance);
             if (distance.norm() > this->lowCutoff &&
                 distance.norm() <= this->highCutoff) {
               if (numCandidates >= candidates.size()) {
