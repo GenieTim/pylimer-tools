@@ -654,6 +654,7 @@ namespace calc {
     {
       int nAccept = 0;
       std::vector<size_t> candidates;
+      Eigen::ArrayXi neighbours = Eigen::ArrayXi(12);
       std::uniform_int_distribution<int> chainendDist(
         0, this->chainEndIndices.size() - 1);
       for (size_t springIdx = this->numBonds;
@@ -672,19 +673,21 @@ namespace calc {
         // search for neighbours
         int numCandidates = 0;
         // for each atom, search for possible partners
-        Eigen::ArrayXi pairs = this->neighbourlist.getIndicesCloseToCoordinates(
-          this->coordinates.segment(3 * candidateIndex, 3), this->highCutoff);
-        for (size_t j = 0; j < pairs.size(); ++j) {
+        int numNeighs = this->neighbourlist.getIndicesCloseToCoordinates(
+          neighbours,
+          this->coordinates.segment(3 * candidateIndex, 3),
+          this->highCutoff);
+        for (size_t j = 0; j < numNeighs; ++j) {
           Eigen::Vector3d distance =
             this->coordinates.segment(3 * candidateIndex, 3) -
-            this->coordinates.segment(3 * pairs[j], 3);
+            this->coordinates.segment(3 * neighbours[j], 3);
           this->box.handlePBC(distance);
           if (distance.norm() > this->lowCutoff &&
               distance.norm() <= this->highCutoff) {
             if (numCandidates >= candidates.size()) {
-              candidates.push_back(j);
+              candidates.push_back(neighbours[j]);
             } else {
-              candidates[numCandidates++] = j;
+              candidates[numCandidates++] = neighbours[j];
             }
           }
         }
@@ -734,6 +737,8 @@ namespace calc {
     {
       int n_accept = 0;
       std::vector<size_t> candidates;
+      Eigen::ArrayXi neighbours = Eigen::ArrayXi(12);
+
       std::uniform_int_distribution<int> uniformDistNatoms(0, this->numAtoms);
       for (size_t springIdx = this->numBonds;
            springIdx < (this->numBonds + this->numSlipSprings);
@@ -753,20 +758,21 @@ namespace calc {
           // search for neighbours
           int numCandidates = 0;
           // for this first chosen atom, search for possible partners
-          Eigen::ArrayXi pairs =
-            this->neighbourlist.getIndicesCloseToCoordinates(
-              this->coordinates.segment(3 * firstPartner, 3), this->highCutoff);
-          for (size_t j = 0; j < pairs.size(); ++j) {
+          int numNeighs = this->neighbourlist.getIndicesCloseToCoordinates(
+            neighbours,
+            this->coordinates.segment(3 * firstPartner, 3),
+            this->highCutoff);
+          for (size_t j = 0; j < numNeighs; ++j) {
             Eigen::Vector3d distance =
               this->coordinates.segment(3 * firstPartner, 3) -
-              this->coordinates.segment(3 * pairs[j], 3);
+              this->coordinates.segment(3 * neighbours[j], 3);
             this->box.handlePBC(distance);
             if (distance.norm() > this->lowCutoff &&
                 distance.norm() <= this->highCutoff) {
               if (numCandidates >= candidates.size()) {
-                candidates.push_back(j);
+                candidates.push_back(neighbours[j]);
               } else {
-                candidates[numCandidates++] = j;
+                candidates[numCandidates++] = neighbours[j];
               }
             }
           }
@@ -1008,7 +1014,10 @@ namespace calc {
       return result;
     }
 
-    long int DPDSimulator::getTimestep() const { return this->currentStep; }
+    long int DPDSimulator::getTimestep() const
+    {
+      return this->currentStep;
+    }
 
     void DPDSimulator::validateNeighbourlist(double cutoff)
     {
