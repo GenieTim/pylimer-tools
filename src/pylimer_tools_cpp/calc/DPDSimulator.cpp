@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <random>
 
 namespace pylimer_tools {
 namespace calc {
@@ -541,6 +542,8 @@ namespace calc {
       slipSpringTo.reserve(num);
 
       // randomly permute the atoms to start the search with
+      // we do this over just randomly selecting an index
+      // in order to reduce the probability of finding the same start twice
       std::vector<size_t> sourceIds;
       sourceIds.reserve(this->numAtoms);
       for (size_t i = 0; i < this->numAtoms; ++i) {
@@ -548,7 +551,7 @@ namespace calc {
       }
 
       // search for neighbours that are elibile
-      Eigen::ArrayXi pairs = Eigen::ArrayXi(16);
+      Eigen::ArrayXi neighbours = Eigen::ArrayXi(16);
       while (createdLastIteration > 0 && totalCreated < num) {
         createdLastIteration = 0;
         std::shuffle(sourceIds.begin(), sourceIds.end(), this->e2);
@@ -556,18 +559,18 @@ namespace calc {
           int numCandidates = 0;
           // for each atom, search for possible partners
           int numNeighs = this->neighbourlist.getIndicesCloseToCoordinates(
-            pairs, this->coordinates.segment(3 * i, 3), this->highCutoff);
+            neighbours, this->coordinates.segment(3 * i, 3), this->highCutoff);
           for (size_t j = 0; j < numNeighs; ++j) {
             Eigen::Vector3d distance =
               this->coordinates.segment(3 * i, 3) -
-              this->coordinates.segment(3 * pairs[j], 3);
+              this->coordinates.segment(3 * neighbours[j], 3);
             this->box.handlePBC(distance);
             if (distance.norm() > this->lowCutoff &&
                 distance.norm() <= this->highCutoff) {
               if (numCandidates < candidates.size()) {
-                candidates[numCandidates] = j;
+                candidates[numCandidates] = neighbours[j];
               } else {
-                candidates.push_back(j);
+                candidates.push_back(neighbours[j]);
               }
               numCandidates += 1;
             }
@@ -605,6 +608,10 @@ namespace calc {
     {
       INVALIDARG_EXP_IFN(partnerA.size() == partnerB.size(),
                          "Require same size A & B");
+      for (size_t i = 0; i < partnerA.size(); ++i) {
+        INVALIDARG_EXP_IFN(partnerA[i] < this->numAtoms, "Invalid partner id");
+        INVALIDARG_EXP_IFN(partnerB[i] < this->numAtoms, "Invalid partner id");
+      }
       size_t sizeBefore = this->numBonds + this->numSlipSprings;
       this->bondPartnersA.conservativeResize(sizeBefore + partnerA.size());
       this->bondPartnersB.conservativeResize(sizeBefore + partnerB.size());
@@ -621,14 +628,10 @@ namespace calc {
         Eigen::Map<ArrayXst, Eigen::Unaligned>(partnerB.data(), partnerB.size())
           .cast<int>();
       this->bondTypes.segment(sizeBefore, partnerB.size()) = bondType;
-      for (size_t i = 0; i < partnerA.size(); ++i) {
-        this->bondsOfIndex[this->bondPartnersA[sizeBefore + i]].push_back(
-          sizeBefore + i);
-        this->bondsOfIndex[this->bondPartnersB[sizeBefore + i]].push_back(
-          sizeBefore + i);
-      }
 
       for (size_t i = sizeBefore; i < sizeBefore + partnerA.size(); ++i) {
+        this->bondsOfIndex[this->bondPartnersA[i]].push_back(i);
+        this->bondsOfIndex[this->bondPartnersB[i]].push_back(i);
         for (int dir = 0; dir < 3; ++dir) {
           this->bondPartnerCoordinatesA[i * 3 + dir] =
             this->bondPartnersA[i] * 3 + dir;
@@ -1005,10 +1008,7 @@ namespace calc {
       return result;
     }
 
-    long int DPDSimulator::getTimestep() const
-    {
-      return this->currentStep;
-    }
+    long int DPDSimulator::getTimestep() const { return this->currentStep; }
 
     void DPDSimulator::validateNeighbourlist(double cutoff)
     {
