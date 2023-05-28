@@ -784,8 +784,10 @@ namespace calc {
                                                            numCandidates - 1);
           int secondPartner = candidates[candidateDist(this->e2)];
           // actually relocate both ends
-          this->replaceSlipSpringPartner(springIdx, partnerA, firstPartner);
-          this->replaceSlipSpringPartner(springIdx, partnerB, secondPartner);
+          this->replaceSlipSpringPartner(
+            springIdx, this->bondPartnersA[springIdx], firstPartner);
+          this->replaceSlipSpringPartner(
+            springIdx, this->bondPartnersB[springIdx], secondPartner);
         }
       }
       return n_accept;
@@ -875,6 +877,10 @@ namespace calc {
                                               const size_t endToShift,
                                               const double kbT)
     {
+      INVALIDARG_EXP_IFN(
+        this->bondPartnersA[springIdx] == endToShift ||
+          this->bondPartnersB[springIdx] == endToShift,
+        "This spring and its partners do not match, cannot attempt shift.");
       const size_t partnerA = this->bondPartnersA[springIdx] == endToShift
                                 ? this->bondPartnersA[springIdx]
                                 : this->bondPartnersB[springIdx];
