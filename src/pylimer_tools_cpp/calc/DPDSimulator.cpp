@@ -925,8 +925,9 @@ namespace calc {
                                                 const size_t partnerBefore,
                                                 const size_t partnerAfter)
     {
-      assert(this->bondPartnersA[springIdx] == partnerBefore ||
-             this->bondPartnersB[springIdx] == partnerBefore);
+      INVALIDARG_EXP_IFN(this->bondPartnersA[springIdx] == partnerBefore ||
+                           this->bondPartnersB[springIdx] == partnerBefore,
+                         "This spring and its partners do not match.");
       if (this->bondPartnersA[springIdx] == partnerBefore) {
         this->bondPartnersA[springIdx] = partnerAfter;
         for (int dir = 0; dir < 3; ++dir) {
@@ -953,7 +954,8 @@ namespace calc {
           return;
         }
       }
-      throw std::runtime_error("Invalid internal state.");
+      throw std::runtime_error("Invalid internal state: replacing slip-spring "
+                               "partner, but did not find it internally.");
     }
 
     pylimer_tools::entities::Universe DPDSimulator::getUniverse() const
@@ -1130,30 +1132,57 @@ namespace calc {
      */
     void DPDSimulator::validateState()
     {
+      // atoms
       RUNTIME_EXP_IFN(this->coordinates.size() == 3 * this->numAtoms,
-                      "State violation");
+                      "State violation: size of coordinates incorrect.");
       RUNTIME_EXP_IFN(this->idxFunctionalities.size() == this->numAtoms,
-                      "State violation");
+                      "State violation: size of functionalities incorrect.");
       RUNTIME_EXP_IFN(this->atomTypes.size() == this->numAtoms,
-                      "State violation");
+                      "State violation: size of atom types incorrect.");
       RUNTIME_EXP_IFN(this->atomIds.size() == this->numAtoms,
-                      "State violation");
-      RUNTIME_EXP_IFN(this->bondsOfIndex.size() == this->numAtoms,
-                      "State violation");
-
+                      "State violation: size of atom ids incorrect.");
+      RUNTIME_EXP_IFN(
+        this->bondsOfIndex.size() == this->numAtoms,
+        "State violation: bonds of indices distributed incorrectly.");
+      // bonds
       RUNTIME_EXP_IFN(this->bondPartnersA.size() == this->bondPartnersB.size(),
-                      "State violation");
+                      "State violation: nr of bonds inconsistent.");
       RUNTIME_EXP_IFN(this->bondPartnerCoordinatesA.size() ==
                         3 * this->bondPartnersA.size(),
-                      "State violation");
+                      "State violation: nr of bonds inconsistent.");
       RUNTIME_EXP_IFN(this->bondPartnerCoordinatesB.size() ==
                         3 * this->bondPartnersB.size(),
-                      "State violation");
+                      "State violation: nr of bonds inconsistent.");
       RUNTIME_EXP_IFN(this->bondTypes.size() == this->bondPartnersA.size(),
-                      "State violation");
+                      "State violation: nr of bonds inconsistent.");
       RUNTIME_EXP_IFN(this->bondPartnersB.size() ==
                         this->numBonds + this->numSlipSprings,
-                      "State violation");
+                      "State violation: nr of bonds inconsistent.");
+      // internal structure
+      RUNTIME_EXP_IFN((this->bondPartnersB.array() < this->numAtoms).all(),
+                      "State violation: too large indices found (e.g. " +
+                        std::to_string(this->bondPartnersB.maxCoeff()) +
+                        " for " + std::to_string(this->numAtoms) + " atoms)");
+      RUNTIME_EXP_IFN((this->bondPartnersA.array() < this->numAtoms).all(),
+                      "State violation: too large indices found (e.g. " +
+                        std::to_string(this->bondPartnersA.maxCoeff()) +
+                        " for " + std::to_string(this->numAtoms) + " atoms)");
+      for (size_t i = 0; i < this->numBonds + this->numSlipSprings; ++i) {
+        for (int dir = 0; dir < 3; ++dir) {
+          RUNTIME_EXP_IFN(this->bondPartnerCoordinatesA[i * 3 + dir] ==
+                            this->bondPartnersA[i] * 3 + dir,
+                          "Bond partners not accurate.");
+          RUNTIME_EXP_IFN(this->bondPartnerCoordinatesB[i * 3 + dir] ==
+                            this->bondPartnersB[i] * 3 + dir,
+                          "Bond partners not accurate.");
+        }
+        RUNTIME_EXP_IFN(pylimer_tools::utils::contains(
+                          this->bondsOfIndex[this->bondPartnersA[i]], i),
+                        "Reverse-link is incorrect.");
+        RUNTIME_EXP_IFN(pylimer_tools::utils::contains(
+                          this->bondsOfIndex[this->bondPartnersB[i]], i),
+                        "Reverse-link is incorrect.");
+      }
     }
 
   }
