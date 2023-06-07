@@ -37,25 +37,35 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     REQUIRE_THROWS(simulator.configSlipspringLowCutoff(2.0));
     REQUIRE_THROWS(simulator.configSlipspringHighCutoff(0.5));
 
-    std::vector<pcd::ComputedValues> outputQuantities = {
-      pcd::ComputedValues::STEP,      pcd::ComputedValues::TEMPERATURE,
-      pcd::ComputedValues::PRESSURE,  pcd::ComputedValues::STRESS_XX,
-      pcd::ComputedValues::STRESS_YY, pcd::ComputedValues::STRESS_ZZ,
-      pcd::ComputedValues::MSD
+    std::vector<pcd::ComputedDoubleValues> outputQuantities = {
+      pcd::ComputedDoubleValues::TEMPERATURE,
+      pcd::ComputedDoubleValues::PRESSURE,  pcd::ComputedDoubleValues::STRESS_XX,
+      pcd::ComputedDoubleValues::STRESS_YY, pcd::ComputedDoubleValues::STRESS_ZZ,
+      pcd::ComputedDoubleValues::MSD
     };
 
-    REQUIRE_NOTHROW(simulator.configValuesToOutput(outputQuantities));
+    pcd::OutputConfiguration config;
+    config.filename = "";
+    config.outputEvery = 5;
+    config.doubleValues = outputQuantities;
+    config.intValues = { pcd::ComputedIntValues::STEP };
 
-    std::vector<pcd::ComputedValues> averageQuantities = {
-      pcd::ComputedValues::TEMPERATURE, pcd::ComputedValues::PRESSURE,
-      pcd::ComputedValues::STRESS_XX,   pcd::ComputedValues::STRESS_YY,
-      pcd::ComputedValues::STRESS_ZZ,   pcd::ComputedValues::MSD
+    REQUIRE_NOTHROW(simulator.configStepOutput({config}));
+
+    std::vector<pcd::ComputedDoubleValues> averageQuantities = {
+      pcd::ComputedDoubleValues::TEMPERATURE, pcd::ComputedDoubleValues::PRESSURE,
+      pcd::ComputedDoubleValues::STRESS_XX,   pcd::ComputedDoubleValues::STRESS_YY,
+      pcd::ComputedDoubleValues::STRESS_ZZ,   pcd::ComputedDoubleValues::MSD
     };
 
-    REQUIRE_NOTHROW(simulator.configValuesToAverage(averageQuantities));
     std::string averageFile =
       suspectedPath + "melt_83_a_100.structure.avg-out.txt";
-    REQUIRE_NOTHROW(simulator.configAveragesFile(averageFile));
+    pcd::OutputConfiguration avgconfig;
+    avgconfig.outputEvery = 20;
+    avgconfig.filename = averageFile;
+    avgconfig.doubleValues = averageQuantities;
+
+    REQUIRE_NOTHROW(simulator.configAverageOutput({avgconfig}));
 
     std::vector<size_t> atomIdsForMSD = { 1, 4, 6 };
     REQUIRE_NOTHROW(simulator.startMeasuringMSDForAtoms(atomIdsForMSD));
