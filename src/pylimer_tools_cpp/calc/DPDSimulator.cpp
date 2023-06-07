@@ -117,68 +117,17 @@ namespace calc {
 
       // output headers
       std::ios::sync_with_stdio(false);
-      std::string outputBuffer = "";
-      outputBuffer.reserve(80 * 20);
-      for (ComputedValues val : this->valuesToOutput) {
-        switch (val) {
-          case ComputedValues::MSD:
-            for (size_t i = 0; i < this->msdOrigins.size(); ++i) {
-              outputBuffer += "MSD" + std::to_string(i) + "_" +
-                              std::to_string(this->msdOriginTimesteps[i]) +
-                              "\t";
-            }
-            break;
-          default:
-            outputBuffer += ComputedValuesNames[val] + "\t";
-        }
-      }
-      if (outputBuffer.length() > 0) {
-        outputBuffer.pop_back();
-        std::cout << outputBuffer << std::endl;
-      }
-      bool doAverage = this->averagesFile != "";
+      this->openFilesOutputHeader(this->outputConfigs);
 
       // prepare averages
-      std::ofstream averagesOutput;
-      int numAverages = 0;
-      std::string averagesOutputBuffer = "OutputStep";
-      int numHasMSD = 0;
-      if (doAverage) {
-        averagesOutput.open(this->averagesFile, std::ios::out | std::ios::app);
-        averagesOutputBuffer.reserve(80 * 20);
-        for (ComputedValues val : this->valuesToAverage) {
-          switch (val) {
-            case ComputedValues::MSD:
-              numHasMSD += 1;
-              RUNTIME_EXP_IFN(this->msdMeasuredIndices.size() ==
-                                this->msdOrigins.size(),
-                              "Invalid MSD state found.");
-              RUNTIME_EXP_IFN(this->msdOriginTimesteps.size() ==
-                                this->msdOrigins.size(),
-                              "Invalid MSD state found.");
-              numAverages += this->msdOrigins.size();
-              for (size_t i = 0; i < this->msdOrigins.size(); ++i) {
-                averagesOutputBuffer +=
-                  "\tMSD" + std::to_string(i) + "_" +
-                  std::to_string(this->msdOriginTimesteps[i]);
-              }
-              break;
-            default:
-              numAverages += 1;
-              averagesOutputBuffer += "\t" + ComputedValuesNames[val];
-              break;
-          }
-        }
-        averagesOutput << averagesOutputBuffer << std::endl;
-      }
+      bool doAverage = this->outputAverageConfigs.size() > 0;
+      int numAverages =
+        this->openFilesOutputHeader(this->outputAverageConfigs, "OutputStep");
+      std::string averagesOutputBuffer; averagesOutputBuffer.reserve(100);
+
       std::vector<double> runningAverages =
         pylimer_tools::utils::initializeWithValue<double>(numAverages, 0.);
       RUNTIME_EXP_IFN(runningAverages.size() == numAverages, "");
-      RUNTIME_EXP_IFN((this->valuesToAverage.size() +
-                         (numHasMSD * this->msdOrigins.size()) - (numHasMSD) ==
-                       numAverages) ||
-                        !doAverage,
-                      "Anticipate miscounted number of averages.");
 
       int numShifts = 0;
       int numRelocations = 0;
@@ -237,8 +186,12 @@ namespace calc {
         }
 
         // output
-        std::array<double, 17> values = {
-          static_cast<double>(step + this->currentStep + 1),
+        std::array<int, 3> intvalues = {
+          step + this->currentStep + 1,
+          numShifts,
+          numRelocations,
+        };
+        std::array<double, 14> doublevalues = {
           dt,
           this->currentTime + static_cast<double>(step + 1) * dt,
           this->box.getVolume(),
@@ -252,35 +205,17 @@ namespace calc {
           stressTensor(1, 2),
           meanB,
           maxB,
-          static_cast<double>(numShifts),
-          static_cast<double>(numRelocations),
           0.
         };
-        if ((step + 1) % this->outputValuesEvery == 0) {
-          outputBuffer.clear();
-          for (ComputedValues val : this->valuesToOutput) {
-            switch (val) {
-              case ComputedValues::MSD:
-                // compute MSD
-                for (size_t msdIdx = 0; msdIdx < msdMeasuredIndices.size();
-                     ++msdIdx) {
-                  double result =
-                    (this->msdOrigins[msdIdx] -
-                     this->coordinates(this->msdMeasuredIndices[msdIdx]))
-                      .squaredNorm() /
-                    (static_cast<double>(
-                      this->msdMeasuredIndices[msdIdx].size() / 3.));
-                  outputBuffer += std::to_string(result) + "\t";
-                }
-                break;
-              default:
-                outputBuffer += std::to_string(values[val]) + "\t";
-            }
-          }
-          if (!outputBuffer.empty()) {
-            outputBuffer.pop_back(); // remove last "\t"
-            outputBuffer += "\n";
-            std::cout << outputBuffer;
+        int streamIdx = 0;
+        for (streamIdx = 0; streamIdx < this->outputConfigs.size();
+             ++streamIdx) {
+          if ((step + 1) % this->outputConfigs[streamIdx].outputEvery == 0) {
+            this->doOutputValues(this->outputConfigs[streamIdx],
+                                 invalues,
+                                 doublevalues,
+                                 outputBuffer,
+                                 streamidx);
           }
         }
 
@@ -288,41 +223,58 @@ namespace calc {
         int averagesIdx = 0;
         size_t msdIdx = 0;
         if (doAverage) {
-          for (ComputedValues val : this->valuesToAverage) {
-            switch (val) {
-              case ComputedValues::MSD:
-                // compute MSD
-                for (msdIdx = 0; msdIdx < msdMeasuredIndices.size(); ++msdIdx) {
-                  double result =
-                    (this->msdOrigins[msdIdx] -
-                     this->coordinates(this->msdMeasuredIndices[msdIdx]))
-                      .squaredNorm() /
-                    (static_cast<double>(
-                      this->msdMeasuredIndices[msdIdx].size() / 3.));
-                  runningAverages[averagesIdx + msdIdx] +=
-                    result / static_cast<double>(this->outputAveragesEvery);
-                }
-                averagesIdx += msdIdx;
-                break;
-              default:
-                runningAverages[averagesIdx] +=
-                  values[val] / static_cast<double>(this->outputAveragesEvery);
-                averagesIdx += 1;
+          for (OutputConfiguration oc : configs) {
+            for (ComputedIntValues val : oc.intValues) {
+              switch (val) {
+                default:
+                  runningAverages[averagesIdx] +=
+                    values[val] / static_cast<double>(config.outputEvery);
+                  averagesIdx += 1;
+                  break;
+              }
             }
+            for (ComputedDoubleValues val : oc.doubleValues) {
+              switch (val) {
+                case ComputedValues::MSD:
+                  // compute MSD
+                  for (msdIdx = 0; msdIdx < msdMeasuredIndices.size();
+                       ++msdIdx) {
+                    double result =
+                      (this->msdOrigins[msdIdx] -
+                       this->coordinates(this->msdMeasuredIndices[msdIdx]))
+                        .squaredNorm() /
+                      (static_cast<double>(
+                        this->msdMeasuredIndices[msdIdx].size() / 3.));
+                    runningAverages[averagesIdx + msdIdx] +=
+                      result / static_cast<double>(oc.outputEvery);
+                  }
+                  averagesIdx += msdIdx;
+                  break;
+                default:
+                  runningAverages[averagesIdx] +=
+                    values[val] / static_cast<double>(oc.outputEvery);
+                  averagesIdx += 1;
+                  break;
+              }
+            }
+
+            // check (and if, output) averages
+            if ((step + 1) % oc.outputEvery == 0 && doAverage) {
+              // output & start again
+              averagesOutputBuffer.clear();
+              averagesOutputBuffer += std::to_string(step);
+              for (size_t i = 0; i < runningAverages.size(); ++i) {
+                averagesOutputBuffer +=
+                  "\t" + std::to_string(runningAverages[i]);
+                runningAverages[i] = 0.;
+              }
+              this->outputFileStreams[streamIdx] << averagesOutputBuffer
+                                                 << std::endl;
+            }
+
+            streamIdx += 1;
           }
           assert(averagesIdx == numAverages);
-        }
-
-        // check (and if, output) averages
-        if ((step + 1) % this->outputAveragesEvery == 0 && doAverage) {
-          // output & start again
-          averagesOutputBuffer.clear();
-          averagesOutputBuffer += std::to_string(step);
-          for (size_t i = 0; i < runningAverages.size(); ++i) {
-            averagesOutputBuffer += "\t" + std::to_string(runningAverages[i]);
-            runningAverages[i] = 0.;
-          }
-          averagesOutput << averagesOutputBuffer << std::endl;
         }
 
         if (step % 50 == 0) {
@@ -337,7 +289,10 @@ namespace calc {
 
       // finish up
       std::ios::sync_with_stdio(true);
-      averagesOutput.close();
+      for (std::ofstream s : this->outputFileStreams) {
+        s.close();
+      }
+      this->outputFileStreams.clear();
       this->currentForces = forces;
       this->currentVelocities = velocities;
       this->currentVelocitiesPlus = velocitiesPlus;
@@ -973,6 +928,61 @@ namespace calc {
                                "partner, but did not find it internally.");
     }
 
+    /**
+     * @brief Open the specified files, and write the headers
+     *
+     * @param configs
+     * @return int
+     */
+    int DPDSimulator::openFilesOutputHeader(
+      std::vector<OutputConfiguration>& configs,
+      std::string prefix)
+    {
+      int numComputes = 0;
+      for (OutputConfiguration oc : configs) {
+        std::ofstream output;
+        if (oc.filename != "" && oc.filename != "stdio") {
+          output.open(oc.filename, std::ios::out | std::ios::app);
+        } else {
+          output = std::cout;
+        }
+
+        std::string outputBuffer = prefix;
+        outputBuffer.reserve(80 * 20);
+
+        for (ComputedIntValues val : oc.intValues) {
+          switch (val) {
+            default:
+              numComputes += 1;
+              outputBuffer += ComputedIntValuesNames[val] + "\t";
+          }
+        }
+        for (ComputedDoubleValues val : oc.doubleValues) {
+          switch (val) {
+            case ComputedDoubleValues::MSD:
+              for (size_t i = 0; i < this->msdOrigins.size(); ++i) {
+                outputBuffer += "MSD" + std::to_string(i) + "_" +
+                                std::to_string(this->msdOriginTimesteps[i]) +
+                                "\t";
+              }
+              numComputes += this->msdOrigins.size();
+              break;
+            default:
+              numComputes += 1;
+              outputBuffer += ComputedDoubleValuesNames[val] + "\t";
+          }
+        }
+        output << outputBuffer << std::endl;
+        this->outputFileStreams.push_back(output);
+      }
+      return numComputes;
+    };
+
+    /**
+     * @brief Convert the current structure to a Unvierse
+     *
+     * @return pylimer_tools::entities::Universe
+     */
     pylimer_tools::entities::Universe DPDSimulator::getUniverse() const
     {
       pylimer_tools::entities::Universe result =

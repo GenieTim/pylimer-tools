@@ -27,32 +27,49 @@ namespace calc {
 
   namespace dpd {
 
-    enum ComputedValues
+    enum ComputedIntValues
     {
       STEP = 0,
-      TIMESTEP = 1,
-      TIME = 2,
-      VOLUME = 3,
-      PRESSURE = 4,
-      TEMPERATURE = 5,
-      STRESS_XX = 6,
-      STRESS_YY = 7,
-      STRESS_ZZ = 8,
-      STRESS_XY = 9,
-      STRESS_XZ = 10,
-      STRESS_YZ = 11,
-      MEAN_B = 12,
-      MAX_B = 13,
-      NUM_SHIFT = 14,
-      NUM_RELOC = 15,
-      MSD = 16
+      NUM_SHIFT = 1,
+      NUM_RELOC = 2,
     };
 
-    const std::array<std::string, 17> ComputedValuesNames = {
-      "Step",        "TimeStep",    "Time",        "Volume",      "Pressure",
-      "Temperature", "Stress[0,0]", "Stress[1,1]", "Stress[2,2]", "Stress[0,1]",
-      "Stress[0,2]", "Stress[1,2]", "<b>",         "max(b)",      "numShift",
-      "numReloc",    "MSD"
+    const std::array<std::string, 3> ComputedIntValuesNames = {
+      "Step",
+      "numShift",
+      "numReloc",
+    };
+
+    enum ComputedDoubleValues
+    {
+      TIMESTEP = 0,
+      TIME = 1,
+      VOLUME = 2,
+      PRESSURE = 3,
+      TEMPERATURE = 4,
+      STRESS_XX = 5,
+      STRESS_YY = 6,
+      STRESS_ZZ = 7,
+      STRESS_XY = 8,
+      STRESS_XZ = 9,
+      STRESS_YZ = 10,
+      MEAN_B = 11,
+      MAX_B = 12,
+      MSD = 13
+    };
+
+    const std::array<std::string, 14> ComputedDoubleValuesNames = {
+      "TimeStep",    "Time",        "Volume",      "Pressure",    "Temperature",
+      "Stress[0,0]", "Stress[1,1]", "Stress[2,2]", "Stress[0,1]", "Stress[0,2]",
+      "Stress[1,2]", "<b>",         "max(b)",      "MSD"
+    };
+
+    struct OutputConfiguration
+    {
+      std::vector<ComputedIntValues> intValues;
+      std::vector<ComputedDoubleValues> doubleValues;
+      std::string filename;
+      int outputEvery;
     };
 
     typedef Eigen::Array<size_t, Eigen::Dynamic, 1> ArrayXst;
@@ -76,11 +93,9 @@ namespace calc {
       double gamma = 0.5 * 3. * 3.;
       long int nStepsMC = 500;
       long int nStepsDPD = 500;
-      std::string averagesFile = "";
-      std::vector<ComputedValues> valuesToAverage;
-      std::vector<ComputedValues> valuesToOutput;
-      int outputAveragesEvery = 50;
-      int outputValuesEvery = 5;
+      std::vector<OutputConfiguration> outputConfigs;
+      std::vector<OutputConfiguration> outputAverageConfigs;
+      std::vector<std::ofstream> outputFileStreams;
 
       ////////////////////////////////////////////////////////////////
       // simulation state
@@ -225,26 +240,15 @@ namespace calc {
 
       void startMeasuringMSDForAtoms(const std::vector<size_t> atomIds);
 
-      void configAveragesFile(std::string newFile)
+      void configAverageOutput(std::vector<OutputConfiguration> vals)
       {
-        this->averagesFile = newFile;
-      };
-
-      void configValuesToAverage(std::vector<ComputedValues> vals)
-      {
-        this->valuesToAverage = vals;
+        this->outputAverageConfigs = vals;
       }
 
-      void configWhenToOutputAverages(int then = 50)
+      void configStepOutput(std::vector<OutputConfiguration> vals)
       {
-        this->outputAveragesEvery = then;
+        this->outputConfigs = vals;
       }
-      void configValuesToOutput(std::vector<ComputedValues> vals)
-      {
-        this->valuesToOutput = vals;
-      }
-
-      void configWhenToOutput(int then = 50) { this->outputValuesEvery = then; }
 
       void configNumStepsMC(long int steps = 500) { this->nStepsMC = steps; }
 
@@ -262,7 +266,49 @@ namespace calc {
 
       ////////////////////////////////////////////////////////////////
       // results access & export
+      int openFilesOutputHeader(std::vector<OutputConfiguration>& configs,
+                                std::string prefix = "");
+      inline void doOutputValues(OutputConfiguration& oc,
+                                 std::array<int, 3>& intvalues,
+                                 std::array<double, 14>& doublevalues,
+                                 std::string& outputBuffer,
+                                 int streamIdx = 0)
+      {
+        for (ComputedIntValues val : oc.intValues) {
+          switch (val) {
+            default:
+              outputBuffer += std::to_string(intvalues[val]) + "\t";
+          }
+        }
+        for (ComputedDoubleValues val : oc.doubleValues) {
+          switch (val) {
+            case ComputedDoubleValues::MSD:
+              // compute MSD
+              for (size_t msdIdx = 0; msdIdx < msdMeasuredIndices.size();
+                   ++msdIdx) {
+                double result =
+                  (this->msdOrigins[msdIdx] -
+                   this->coordinates(this->msdMeasuredIndices[msdIdx]))
+                    .squaredNorm() /
+                  (static_cast<double>(this->msdMeasuredIndices[msdIdx].size() /
+                                       3.));
+                outputBuffer += std::to_string(result) + "\t";
+              }
+              break;
+            default:
+              outputBuffer += std::to_string(doublevalues[val]) + "\t";
+          }
+        }
+        if (!outputBuffer.empty()) {
+          outputBuffer.pop_back(); // remove last "\t"
+          outputBuffer += "\n";
+          this->outputFileStreams[streamIdx] << outputBuffer;
+          outputBuffer.clear();
+        }
+      };
+
       pylimer_tools::entities::Universe getUniverse() const;
+
       double getTemperature() const
       {
         return this->computeTemperature(this->currentVelocities);
