@@ -21,6 +21,8 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include <memory>
+#include <fstream>
 
 namespace pylimer_tools {
 namespace calc {
@@ -95,7 +97,8 @@ namespace calc {
       long int nStepsDPD = 500;
       std::vector<OutputConfiguration> outputConfigs;
       std::vector<OutputConfiguration> outputAverageConfigs;
-      std::vector<std::ofstream> outputFileStreams;
+      std::vector<std::shared_ptr<std::ostream>> outputStreams;
+      std::vector<int> outputFileStreams;
 
       ////////////////////////////////////////////////////////////////
       // simulation state
@@ -267,13 +270,15 @@ namespace calc {
       ////////////////////////////////////////////////////////////////
       // results access & export
       int openFilesOutputHeader(std::vector<OutputConfiguration>& configs,
-                                std::string prefix = "");
+                                std::string prefix = "",
+                                int streamIdx = 0);
       inline void doOutputValues(OutputConfiguration& oc,
                                  std::array<int, 3>& intvalues,
                                  std::array<double, 14>& doublevalues,
                                  std::string& outputBuffer,
                                  int streamIdx = 0)
       {
+        assert(streamIdx <= this->outputStreams.size());
         for (ComputedIntValues val : oc.intValues) {
           switch (val) {
             default:
@@ -302,7 +307,8 @@ namespace calc {
         if (!outputBuffer.empty()) {
           outputBuffer.pop_back(); // remove last "\t"
           outputBuffer += "\n";
-          this->outputFileStreams[streamIdx] << outputBuffer;
+          // output the buffer, clear it
+          (*(this->outputStreams[streamIdx])) << outputBuffer << std::endl;
           outputBuffer.clear();
         }
       };

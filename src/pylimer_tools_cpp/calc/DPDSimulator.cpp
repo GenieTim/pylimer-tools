@@ -118,12 +118,15 @@ namespace calc {
       // output headers
       std::ios::sync_with_stdio(false);
       this->openFilesOutputHeader(this->outputConfigs);
+      std::string outputBuffer;
+      outputBuffer.reserve(this->outputConfigs.size() * 50);
 
       // prepare averages
       bool doAverage = this->outputAverageConfigs.size() > 0;
-      int numAverages =
-        this->openFilesOutputHeader(this->outputAverageConfigs, "OutputStep");
-      std::string averagesOutputBuffer; averagesOutputBuffer.reserve(100);
+      int numAverages = this->openFilesOutputHeader(
+        this->outputAverageConfigs, "OutputStep", this->outputConfigs.size());
+      std::string averagesOutputBuffer;
+      averagesOutputBuffer.reserve(this->outputAverageConfigs.size() * 50);
 
       std::vector<double> runningAverages =
         pylimer_tools::utils::initializeWithValue<double>(numAverages, 0.);
@@ -187,7 +190,7 @@ namespace calc {
 
         // output
         std::array<int, 3> intvalues = {
-          step + this->currentStep + 1,
+          static_cast<int>(step + this->currentStep + 1),
           numShifts,
           numRelocations,
         };
@@ -212,10 +215,10 @@ namespace calc {
              ++streamIdx) {
           if ((step + 1) % this->outputConfigs[streamIdx].outputEvery == 0) {
             this->doOutputValues(this->outputConfigs[streamIdx],
-                                 invalues,
+                                 intvalues,
                                  doublevalues,
                                  outputBuffer,
-                                 streamidx);
+                                 streamIdx);
           }
         }
 
@@ -223,19 +226,19 @@ namespace calc {
         int averagesIdx = 0;
         size_t msdIdx = 0;
         if (doAverage) {
-          for (OutputConfiguration oc : configs) {
+          for (OutputConfiguration oc : this->outputAverageConfigs) {
             for (ComputedIntValues val : oc.intValues) {
               switch (val) {
                 default:
                   runningAverages[averagesIdx] +=
-                    values[val] / static_cast<double>(config.outputEvery);
+                    intvalues[val] / static_cast<double>(oc.outputEvery);
                   averagesIdx += 1;
                   break;
               }
             }
             for (ComputedDoubleValues val : oc.doubleValues) {
               switch (val) {
-                case ComputedValues::MSD:
+                case ComputedDoubleValues::MSD:
                   // compute MSD
                   for (msdIdx = 0; msdIdx < msdMeasuredIndices.size();
                        ++msdIdx) {
@@ -252,7 +255,7 @@ namespace calc {
                   break;
                 default:
                   runningAverages[averagesIdx] +=
-                    values[val] / static_cast<double>(oc.outputEvery);
+                    doublevalues[val] / static_cast<double>(oc.outputEvery);
                   averagesIdx += 1;
                   break;
               }
@@ -268,8 +271,8 @@ namespace calc {
                   "\t" + std::to_string(runningAverages[i]);
                 runningAverages[i] = 0.;
               }
-              this->outputFileStreams[streamIdx] << averagesOutputBuffer
-                                                 << std::endl;
+              (*(this->outputStreams[streamIdx]))
+                << averagesOutputBuffer << std::endl;
             }
 
             streamIdx += 1;
@@ -289,9 +292,7 @@ namespace calc {
 
       // finish up
       std::ios::sync_with_stdio(true);
-      for (std::ofstream s : this->outputFileStreams) {
-        s.close();
-      }
+      this->outputStreams.clear();
       this->outputFileStreams.clear();
       this->currentForces = forces;
       this->currentVelocities = velocities;
@@ -936,15 +937,18 @@ namespace calc {
      */
     int DPDSimulator::openFilesOutputHeader(
       std::vector<OutputConfiguration>& configs,
-      std::string prefix)
+      std::string prefix,
+      int streamIdx)
     {
+      assert(streamIdx >= this->outputStreams.size());
       int numComputes = 0;
       for (OutputConfiguration oc : configs) {
-        std::ofstream output;
         if (oc.filename != "" && oc.filename != "stdio") {
-          output.open(oc.filename, std::ios::out | std::ios::app);
+          this->outputStreams.push_back(std::make_shared<std::ofstream>(
+            oc.filename, std::ios::out | std::ios::app));
+          this->outputFileStreams.push_back(streamIdx);
         } else {
-          output = std::cout;
+          this->outputStreams.push_back(std::shared_ptr<std::ostream>(&std::cout, [](void*) {}));
         }
 
         std::string outputBuffer = prefix;
@@ -972,8 +976,8 @@ namespace calc {
               outputBuffer += ComputedDoubleValuesNames[val] + "\t";
           }
         }
-        output << outputBuffer << std::endl;
-        this->outputFileStreams.push_back(output);
+        (*this->outputStreams[streamIdx]) << outputBuffer << std::endl;
+        streamIdx += 1;
       }
       return numComputes;
     };
