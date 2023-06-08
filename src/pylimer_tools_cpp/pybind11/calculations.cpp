@@ -1106,24 +1106,40 @@ init_pylimer_bound_calc(py::module_& m)
   //      )pbdoc",
   //          py::arg("newCrosslinkerType") = 2);
 
-  py::enum_<dpd::ComputedValues>(m, "ComputedValues")
-    .value("STEP", dpd::ComputedValues::STEP)
-    .value("TIMESTEP", dpd::ComputedValues::TIMESTEP)
-    .value("TIME", dpd::ComputedValues::TIME)
-    .value("VOLUME", dpd::ComputedValues::VOLUME)
-    .value("PRESSURE", dpd::ComputedValues::PRESSURE)
-    .value("TEMPERATURE", dpd::ComputedValues::TEMPERATURE)
-    .value("STRESS_XX", dpd::ComputedValues::STRESS_XX)
-    .value("STRESS_YY", dpd::ComputedValues::STRESS_YY)
-    .value("STRESS_ZZ", dpd::ComputedValues::STRESS_ZZ)
-    .value("STRESS_XY", dpd::ComputedValues::STRESS_XY)
-    .value("STRESS_XZ", dpd::ComputedValues::STRESS_XZ)
-    .value("STRESS_YZ", dpd::ComputedValues::STRESS_YZ)
-    .value("MEAN_B", dpd::ComputedValues::MEAN_B)
-    .value("MAX_B", dpd::ComputedValues::MAX_B)
-    .value("NUM_SHIFT", dpd::ComputedValues::NUM_SHIFT)
-    .value("NUM_RELOC", dpd::ComputedValues::NUM_RELOC)
-    .value("MSD", dpd::ComputedValues::MSD);
+  py::enum_<dpd::ComputedDoubleValues>(m, "ComputedDoubleValues")
+    .value("TIMESTEP", dpd::ComputedDoubleValues::TIMESTEP)
+    .value("TIME", dpd::ComputedDoubleValues::TIME)
+    .value("VOLUME", dpd::ComputedDoubleValues::VOLUME)
+    .value("PRESSURE", dpd::ComputedDoubleValues::PRESSURE)
+    .value("TEMPERATURE", dpd::ComputedDoubleValues::TEMPERATURE)
+    .value("STRESS_XX", dpd::ComputedDoubleValues::STRESS_XX)
+    .value("STRESS_YY", dpd::ComputedDoubleValues::STRESS_YY)
+    .value("STRESS_ZZ", dpd::ComputedDoubleValues::STRESS_ZZ)
+    .value("STRESS_XY", dpd::ComputedDoubleValues::STRESS_XY)
+    .value("STRESS_XZ", dpd::ComputedDoubleValues::STRESS_XZ)
+    .value("STRESS_YZ", dpd::ComputedDoubleValues::STRESS_YZ)
+    .value("MEAN_B", dpd::ComputedDoubleValues::MEAN_B)
+    .value("MAX_B", dpd::ComputedDoubleValues::MAX_B)
+    .value("MSD", dpd::ComputedDoubleValues::MSD);
+
+  py::enum_<dpd::ComputedIntValues>(m, "ComputedIntValues")
+    .value("STEP", dpd::ComputedIntValues::STEP)
+    .value("NUM_SHIFT", dpd::ComputedIntValues::NUM_SHIFT)
+    .value("NUM_RELOC", dpd::ComputedIntValues::NUM_RELOC);
+
+  py::class_<dpd::OutputConfiguration>(m, "OutputConfiguration")
+    .def_readwrite("intValues", &dpd::OutputConfiguration::intValues)
+    .def_readwrite("doubleValues", &dpd::OutputConfiguration::doubleValues)
+    .def_readwrite(
+      "filename",
+      &dpd::OutputConfiguration::filename,
+      R"pbdoc(The file to write to. Empty means standard output (console).)pbdoc")
+    .def_readwrite(
+      "outputEvery",
+      &dpd::OutputConfiguration::outputEvery,
+      R"pbdoc(How often to write the values to the output. 
+      For averages, this value also says how many values will be averaged.
+     )pbdoc");
 
   /**
    * DPD Simulations
@@ -1205,42 +1221,28 @@ init_pylimer_bound_calc(py::module_& m)
           Configure the higher cut-off of how far a pair may be distanced for a slip-spring to be created.
      )pbdoc",
          py::arg("cutoff") = 0.5)
-    .def("configAveragesFile",
-         &dpd::DPDSimulator::configAveragesFile,
-         R"pbdoc(
-          Set the file to which to write the averages.
-     )pbdoc",
-         py::arg("averages_file"))
-    .def("configWhenToOutputAverages",
-         &dpd::DPDSimulator::configWhenToOutputAverages,
-         R"pbdoc(
-          Set at which multiple of a time-step the averages shall be written.
-     )pbdoc",
-         py::arg("each") = 50)
-    .def("configWhenToOutput",
-         &dpd::DPDSimulator::configWhenToOutput,
-         R"pbdoc(
-          Set at which multiple of a time-step the log shall be output.
-     )pbdoc",
-         py::arg("each") = 50)
-    .def("configValuesToAverage",
-         &dpd::DPDSimulator::configValuesToAverage,
+    .def("configAverageOutput",
+         &dpd::DPDSimulator::configAverageOutput,
          R"pbdoc(
           Set which values to compute averages for.
 
           Arguments:
-               - values: a list of ComputeValues enum values
+               - values: a list of OutputConfiguration structs
      )pbdoc")
-    .def("configValuesToOutput",
-         &dpd::DPDSimulator::configValuesToOutput,
+    .def("configStepOutput",
+         &dpd::DPDSimulator::configStepOutput,
          R"pbdoc(
           Set which values to log.
           
           Arguments:
-               - values: a list of ComputeValues enum values
+               - values: a list of OutputConfiguration structs
      )pbdoc")
-     .def("configShiftPossibilityEmpty", &dpd::DPDSimulator::configShiftPossibilityEmpty, R"pbdoc()pbdoc")
-     .def("configShiftOneAtATime", &dpd::DPDSimulator::configShiftOneAtATime, R"pbdoc()pbdoc")
+    .def("configShiftPossibilityEmpty",
+         &dpd::DPDSimulator::configShiftPossibilityEmpty,
+         R"pbdoc()pbdoc")
+    .def("configShiftOneAtATime",
+         &dpd::DPDSimulator::configShiftOneAtATime,
+         R"pbdoc()pbdoc")
     .def("configNumStepsMC", &dpd::DPDSimulator::configNumStepsMC, R"pbdoc(
           Configure the number of steps to do in one MC sequence.
      )pbdoc")

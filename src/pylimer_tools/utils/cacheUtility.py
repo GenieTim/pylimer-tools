@@ -5,7 +5,8 @@ import pathlib
 import pickle
 import tempfile
 import warnings
-
+from typing import Iterable, List, Union
+import numpy as np
 
 def doCache(obj, file: str, suffix: str):
     """
@@ -21,7 +22,7 @@ def doCache(obj, file: str, suffix: str):
         pickle.dump(obj, cacheFile)
 
 
-def loadCache(file: str, suffix: str, disableWarnings: bool = False):
+def loadCache(file: Union[str, List[str], None], suffix: str, disableWarnings: bool = False):
     """
     Load an object from cache.
 
@@ -33,9 +34,13 @@ def loadCache(file: str, suffix: str, disableWarnings: bool = False):
     Returns:
         - cache: either the content of the cache, or None if the cache has to be loaded again / is non existant
     """
+    if (file is None):
+        file = ""
+    if (not isinstance(file, list)):
+        file = [file]
     cacheFileName = getCacheFileName(file, suffix)
     if (os.path.isfile(cacheFileName)):
-        if (not os.path.isfile(file)):
+        if (not os.path.isfile(f) for f in file):
             if (not disableWarnings):
                 warnings.warn(
                     'Cache called for non-existent file. Make sure the key is time-restricted')
@@ -45,9 +50,9 @@ def loadCache(file: str, suffix: str, disableWarnings: bool = False):
         else:
             mtimeCache = datetime.datetime.fromtimestamp(
                 pathlib.Path(cacheFileName).stat().st_mtime)
-            mtimeOrigin = datetime.datetime.fromtimestamp(
-                pathlib.Path(file).stat().st_mtime)
-            if (mtimeCache > mtimeOrigin):
+            mtimesOrigin = [datetime.datetime.fromtimestamp(
+                pathlib.Path(f).stat().st_mtime) for f in file]
+            if (np.all(mtimeCache > np.array(mtimesOrigin))):
                 try:
                     with open(cacheFileName, 'rb') as cacheFile:
                         toReturn = pickle.load(cacheFile)
@@ -62,7 +67,7 @@ def loadCache(file: str, suffix: str, disableWarnings: bool = False):
     return None
 
 
-def getCacheFileName(file: str, suffix: str):
+def getCacheFileName(file: Union[str, List[str], None], suffix: str):
     """
     Get the name and path of a cache file. Internal method.
 
@@ -73,6 +78,10 @@ def getCacheFileName(file: str, suffix: str):
     Returns:
         - cacheFileName: the path to the cache file
     """
+    if (isinstance(file, list)):
+        file = "".join(file)
+    if (file is None):
+        file = ""
     cacheFileName = "{}/{}-{}.pickle".format(
         tempfile.gettempdir(),
         hashlib.md5(file.encode()).hexdigest(), suffix)
