@@ -33,7 +33,8 @@
       AtomStyle
       BalanceRunMode
       Box
-      ComputedValues
+      ComputedDoubleValues
+      ComputedIntValues
       DPDSimulator
       DataFileReader
       DataFileWriter
@@ -50,6 +51,7 @@
       MoleculeType
       NeighbourList
       NonGaussianSpringForceEvaluator
+      OutputConfiguration
       SimpleSpringMEHPForceEvaluator
       SimplifiedBalanceNetwork
       SimplifiedNetwork

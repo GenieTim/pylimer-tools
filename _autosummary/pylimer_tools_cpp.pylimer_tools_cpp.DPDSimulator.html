@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader" href="pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.html" /><link rel="prev" title="pylimer_tools_cpp.pylimer_tools_cpp.ComputedValues" href="pylimer_tools_cpp.pylimer_tools_cpp.ComputedValues.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader" href="pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.html" /><link rel="prev" title="pylimer_tools_cpp.pylimer_tools_cpp.ComputedIntValues" href="pylimer_tools_cpp.pylimer_tools_cpp.ComputedIntValues.html" />
 
     <!-- Generated with Sphinx 7.0.1 and Furo 2023.05.20 -->
         <title>pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator - PylimerTools documentation</title>
@@ -181,7 +181,8 @@
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle.html">pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.html">pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Box.html">pylimer_tools_cpp.pylimer_tools_cpp.Box</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.ComputedValues.html">pylimer_tools_cpp.pylimer_tools_cpp.ComputedValues</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.ComputedDoubleValues.html">pylimer_tools_cpp.pylimer_tools_cpp.ComputedDoubleValues</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.ComputedIntValues.html">pylimer_tools_cpp.pylimer_tools_cpp.ComputedIntValues</a></li>
 <li class="toctree-l4 current current-page"><a class="current reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader.html">pylimer_tools_cpp.pylimer_tools_cpp.DataFileReader</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.html">pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter</a></li>
@@ -198,6 +199,7 @@
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType.html">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList.html">pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">pylimer_tools_cpp.pylimer_tools_cpp.NonGaussianSpringForceEvaluator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.html">pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">pylimer_tools_cpp.pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork.html">pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedBalanceNetwork</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedNetwork.html">pylimer_tools_cpp.pylimer_tools_cpp.SimplifiedNetwork</a></li>
@@ -269,8 +271,8 @@ with slip-springs as presented by Langeloth et al.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configA" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configA"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configA</span></code></a>(self[, A])</p></td>
 <td><p>Configure the force-field (pair-style) parameter <cite>A</cite>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configAveragesFile" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configAveragesFile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configAveragesFile</span></code></a>(self, averages_file)</p></td>
-<td><p>Set the file to which to write the averages.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configAverageOutput" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configAverageOutput"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configAverageOutput</span></code></a>(self, arg0)</p></td>
+<td><p>Set which values to compute averages for.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configLambda" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configLambda"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configLambda</span></code></a>(self[, l])</p></td>
 <td><p>Configure the modified velocity verlet integration parameter <cite>lambda</cite>.</p></td>
@@ -299,37 +301,28 @@ with slip-springs as presented by Langeloth et al.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configSpringConstant" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configSpringConstant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configSpringConstant</span></code></a>(self[, k])</p></td>
 <td><p>Configure the force-field (bond-style) parameter <cite>k</cite>, the spring constant.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configValuesToAverage" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configValuesToAverage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configValuesToAverage</span></code></a>(self, arg0)</p></td>
-<td><p>Set which values to compute averages for.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configValuesToOutput" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configValuesToOutput"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configValuesToOutput</span></code></a>(self, arg0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configStepOutput" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configStepOutput"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configStepOutput</span></code></a>(self, arg0)</p></td>
 <td><p>Set which values to log.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configWhenToOutput" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configWhenToOutput"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configWhenToOutput</span></code></a>(self[, each])</p></td>
-<td><p>Set at which multiple of a time-step the log shall be output.</p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configWhenToOutputAverages" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configWhenToOutputAverages"><code class="xref py py-obj docutils literal notranslate"><span class="pre">configWhenToOutputAverages</span></code></a>(self[, each])</p></td>
-<td><p>Set at which multiple of a time-step the averages shall be written.</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.createSlipSprings" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.createSlipSprings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">createSlipSprings</span></code></a>(self, num[, bond_type])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.createSlipSprings" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.createSlipSprings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">createSlipSprings</span></code></a>(self, num[, bond_type])</p></td>
 <td><p>Randomly add the specified number of slip-springs to neighbours within the specified cut-offs.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.getTimestep" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.getTimestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getTimestep</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.getTimestep" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.getTimestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getTimestep</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.getUniverse" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.getUniverse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getUniverse</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.getUniverse" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.getUniverse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getUniverse</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.runSimulation" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.runSimulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">runSimulation</span></code></a>(self, n_steps[, dt, with_MC])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.runSimulation" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.runSimulation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">runSimulation</span></code></a>(self, n_steps[, dt, with_MC])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.startMeasuringMSDForAtoms" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.startMeasuringMSDForAtoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">startMeasuringMSDForAtoms</span></code></a>(self, atom_ids)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.startMeasuringMSDForAtoms" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.startMeasuringMSDForAtoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">startMeasuringMSDForAtoms</span></code></a>(self, atom_ids)</p></td>
 <td><p>Set a new origin for measuing the mean square displacement for a specified set of atoms</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.validateNeighbourList" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.validateNeighbourList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validateNeighbourList</span></code></a>(self, arg0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.validateNeighbourList" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.validateNeighbourList"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validateNeighbourList</span></code></a>(self, arg0)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.validateState" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.validateState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validateState</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.validateState" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.validateState"><code class="xref py py-obj docutils literal notranslate"><span class="pre">validateState</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -342,9 +335,14 @@ with slip-springs as presented by Langeloth et al.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configAveragesFile">
-<span class="sig-name descname"><span class="pre">configAveragesFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">averages_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configAveragesFile" title="Permalink to this definition">#</a></dt>
-<dd><p>Set the file to which to write the averages.</p>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configAverageOutput">
+<span class="sig-name descname"><span class="pre">configAverageOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.html#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration" title="pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configAverageOutput" title="Permalink to this definition">#</a></dt>
+<dd><p>Set which values to compute averages for.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>values</strong> (<em>-</em>) – a list of OutputConfiguration structs</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -400,37 +398,14 @@ with slip-springs as presented by Langeloth et al.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configValuesToAverage">
-<span class="sig-name descname"><span class="pre">configValuesToAverage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.ComputedValues.html#pylimer_tools_cpp.pylimer_tools_cpp.ComputedValues" title="pylimer_tools_cpp.pylimer_tools_cpp.ComputedValues"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.ComputedValues</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configValuesToAverage" title="Permalink to this definition">#</a></dt>
-<dd><p>Set which values to compute averages for.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>values</strong> (<em>-</em>) – a list of ComputeValues enum values</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configValuesToOutput">
-<span class="sig-name descname"><span class="pre">configValuesToOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.ComputedValues.html#pylimer_tools_cpp.pylimer_tools_cpp.ComputedValues" title="pylimer_tools_cpp.pylimer_tools_cpp.ComputedValues"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.ComputedValues</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configValuesToOutput" title="Permalink to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configStepOutput">
+<span class="sig-name descname"><span class="pre">configStepOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.html#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration" title="pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configStepOutput" title="Permalink to this definition">#</a></dt>
 <dd><p>Set which values to log.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>values</strong> (<em>-</em>) – a list of ComputeValues enum values</p>
+<dd class="field-odd"><p><strong>values</strong> (<em>-</em>) – a list of OutputConfiguration structs</p>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configWhenToOutput">
-<span class="sig-name descname"><span class="pre">configWhenToOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">each</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configWhenToOutput" title="Permalink to this definition">#</a></dt>
-<dd><p>Set at which multiple of a time-step the log shall be output.</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configWhenToOutputAverages">
-<span class="sig-name descname"><span class="pre">configWhenToOutputAverages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">each</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configWhenToOutputAverages" title="Permalink to this definition">#</a></dt>
-<dd><p>Set at which multiple of a time-step the averages shall be written.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -488,14 +463,14 @@ with slip-springs as presented by Langeloth et al.</p>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="pylimer_tools_cpp.pylimer_tools_cpp.ComputedValues.html">
+          <a class="prev-page" href="pylimer_tools_cpp.pylimer_tools_cpp.ComputedIntValues.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.ComputedValues</div>
+                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.ComputedIntValues</div>
                 
               </div>
             </a>
@@ -532,7 +507,7 @@ with slip-springs as presented by Langeloth et al.</p>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator"><code class="docutils literal notranslate"><span class="pre">DPDSimulator</span></code></a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.__init__"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.__init__()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configA"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configA()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configAveragesFile"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configAveragesFile()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configAverageOutput"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configAverageOutput()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configLambda"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configLambda()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configNumStepsDPD"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configNumStepsDPD()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configNumStepsMC"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configNumStepsMC()</span></code></a></li>
@@ -542,10 +517,7 @@ with slip-springs as presented by Langeloth et al.</p>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configSlipspringHighCutoff"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configSlipspringHighCutoff()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configSlipspringLowCutoff"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configSlipspringLowCutoff()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configSpringConstant"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configSpringConstant()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configValuesToAverage"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configValuesToAverage()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configValuesToOutput"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configValuesToOutput()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configWhenToOutput"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configWhenToOutput()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configWhenToOutputAverages"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configWhenToOutputAverages()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configStepOutput"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.configStepOutput()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.createSlipSprings"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.createSlipSprings()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.getTimestep"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.getTimestep()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.getUniverse"><code class="docutils literal notranslate"><span class="pre">DPDSimulator.getUniverse()</span></code></a></li>
