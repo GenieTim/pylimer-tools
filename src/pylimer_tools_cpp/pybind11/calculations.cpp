@@ -1128,6 +1128,8 @@ init_pylimer_bound_calc(py::module_& m)
     .value("NUM_RELOC", dpd::ComputedIntValues::NUM_RELOC);
 
   py::class_<dpd::OutputConfiguration>(m, "OutputConfiguration")
+    .def(
+      py::init<>(), "Get an instance of this struct")
     .def_readwrite("intValues", &dpd::OutputConfiguration::intValues)
     .def_readwrite("doubleValues", &dpd::OutputConfiguration::doubleValues)
     .def_readwrite(

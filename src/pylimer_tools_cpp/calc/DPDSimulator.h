@@ -12,17 +12,17 @@
 #include <array>
 #include <cassert>
 #include <cstdint>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <limits>
 #include <map>
+#include <memory>
 #include <nlopt.hpp>
 #include <random>
 #include <string>
 #include <tuple>
 #include <vector>
-#include <memory>
-#include <fstream>
 
 namespace pylimer_tools {
 namespace calc {
@@ -72,6 +72,12 @@ namespace calc {
       std::vector<ComputedDoubleValues> doubleValues;
       std::string filename;
       int outputEvery;
+
+      OutputConfiguration()
+        : filename("")
+        , outputEvery(10)
+      {
+      }
     };
 
     typedef Eigen::Array<size_t, Eigen::Dynamic, 1> ArrayXst;
