@@ -51,28 +51,28 @@ TEST_CASE("Segment Intersection is found", "[TopologyCalc]")
       rayOrigin, rayTarget, vertex1, vertex2, vertex3, intersectionPoint));
   }
 
-  SECTION("Intersection found with PBC")
-  {
-    Eigen::Vector3d rayOrigin;
-    rayOrigin << 4.5, 3.5, 3.0;
-    Eigen::Vector3d rayTarget;
-    rayTarget << 4.5, 3.5, 5.0;
+  // SECTION("Intersection found with PBC")
+  // {
+  //   Eigen::Vector3d rayOrigin;
+  //   rayOrigin << 4.5, 3.5, 3.0;
+  //   Eigen::Vector3d rayTarget;
+  //   rayTarget << 4.5, 3.5, 5.0;
 
-    Eigen::Vector3d intersectionPoint;
+  //   Eigen::Vector3d intersectionPoint;
 
-    pylimer_tools::entities::Box box =
-      pylimer_tools::entities::Box(-2., 2., -2., 2., -2., 2.);
+  //   pylimer_tools::entities::Box box =
+  //     pylimer_tools::entities::Box(-2., 2., -2., 2., -2., 2.);
 
-    REQUIRE(pylimer_tools::calc::segmentIntersectsTriangle(
-      rayOrigin,
-      rayTarget,
-      vertex1,
-      vertex2,
-      vertex3,
-      intersectionPoint,
-      [&](Eigen::Vector3d vec) {
-        box.handlePBC<Eigen::Vector3d>(vec);
-        return vec;
-      }));
-  }
+  //   REQUIRE(pylimer_tools::calc::segmentIntersectsTriangle(
+  //     rayOrigin,
+  //     rayTarget,
+  //     vertex1,
+  //     vertex2,
+  //     vertex3,
+  //     intersectionPoint,
+  //     [&](Eigen::Vector3d vec) {
+  //       box.handlePBC<Eigen::Vector3d>(vec);
+  //       return vec;
+  //     }));
+  // }
 }

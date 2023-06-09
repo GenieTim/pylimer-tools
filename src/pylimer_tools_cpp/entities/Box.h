@@ -44,7 +44,7 @@ namespace entities {
       coords -=
         (this->L.replicate(coords.size() / 3, 1) *
          (coords.array() * this->oneOverL.replicate(coords.size() / 3, 1))
-           .round())
+           .rint())
           .matrix();
     }
 
