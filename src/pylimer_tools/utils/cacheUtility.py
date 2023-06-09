@@ -6,23 +6,26 @@ import pickle
 import tempfile
 import warnings
 from typing import Iterable, List, Union
+
 import numpy as np
 
-def doCache(obj, file: str, suffix: str):
+
+def doCache(obj, file: str, suffix: str, tmp_dir: str = None):
     """
     Store the object in the cache
 
     Arguments:
-        - obj: the object to cache
+        - obj: the thing to cache
         - file: the path to the file to save the object to
         - suffix: the file name's suffix
+        - tmp_dir: the directory to store the cache in
     """
-    cacheFileName = getCacheFileName(file, suffix)
+    cacheFileName = getCacheFileName(file, suffix, tmp_dir)
     with open(cacheFileName, 'wb') as cacheFile:
         pickle.dump(obj, cacheFile)
 
 
-def loadCache(file: Union[str, List[str], None], suffix: str, disableWarnings: bool = False):
+def loadCache(file: Union[str, List[str], None], suffix: str, disableWarnings: bool = False, tmp_dir: str = None):
     """
     Load an object from cache.
 
@@ -30,6 +33,7 @@ def loadCache(file: Union[str, List[str], None], suffix: str, disableWarnings: b
         - file: a cache name. Ideally the file that is read, such that the filemtime of `file` can be used to check whether cache must be generated anew
         - suffix: the file name's suffix
         - disableWarnings: whether to disable warnings about missing possibilities to check for filemtime
+        - tmp_dir: the directory to load the cache from
 
     Returns:
         - cache: either the content of the cache, or None if the cache has to be loaded again / is non existant
@@ -38,9 +42,9 @@ def loadCache(file: Union[str, List[str], None], suffix: str, disableWarnings: b
         file = ""
     if (not isinstance(file, list)):
         file = [file]
-    cacheFileName = getCacheFileName(file, suffix)
+    cacheFileName = getCacheFileName(file, suffix, tmp_dir)
     if (os.path.isfile(cacheFileName)):
-        if (not os.path.isfile(f) for f in file):
+        if (not np.all([os.path.isfile(f) for f in file])):
             if (not disableWarnings):
                 warnings.warn(
                     'Cache called for non-existent file. Make sure the key is time-restricted')
@@ -67,13 +71,14 @@ def loadCache(file: Union[str, List[str], None], suffix: str, disableWarnings: b
     return None
 
 
-def getCacheFileName(file: Union[str, List[str], None], suffix: str):
+def getCacheFileName(file: Union[str, List[str], None], suffix: str, tmp_dir: str = None):
     """
     Get the name and path of a cache file. Internal method.
 
     Arguments:
         - file: a cache name. Ideally the file that is read.
         - suffix: the file name's suffix
+        - tmp_dir: the temporary directory
 
     Returns:
         - cacheFileName: the path to the cache file
@@ -83,6 +88,6 @@ def getCacheFileName(file: Union[str, List[str], None], suffix: str):
     if (file is None):
         file = ""
     cacheFileName = "{}/{}-{}.pickle".format(
-        tempfile.gettempdir(),
+        tempfile.gettempdir() if tmp_dir is None else tmp_dir,
         hashlib.md5(file.encode()).hexdigest(), suffix)
     return cacheFileName

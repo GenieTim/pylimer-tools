@@ -161,8 +161,8 @@ catch_discover_tests(pylimer_tests)
 
 catch_discover_tests(header_tests)
 
-if(CODE_COVERAGE)
-	
+# disable for a moment
+if(CODE_COVERAGE AND CMAKE_COMPILER_IS_GNUCXX)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage")
 	set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage")
 	target_compile_options(pylimer_tests PRIVATE -O0 -g -fprofile-arcs -ftest-coverage )

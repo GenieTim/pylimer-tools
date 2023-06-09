@@ -105,7 +105,7 @@ if (NOT DEFINED CODE_COVERAGE)
 option(CODE_COVERAGE "Collect coverage from test library" OFF)
 endif()
 
-if(CODE_COVERAGE)
+if(CODE_COVERAGE AND CMAKE_COMPILER_IS_GNUCXX)
 	if (CMAKE_BUILD_TYPE EQUAL "RELEASE")
 		message(WARNING "Using coverage reduces build type to debug from release")
 	endif()
