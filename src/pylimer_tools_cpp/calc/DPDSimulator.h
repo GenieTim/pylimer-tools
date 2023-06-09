@@ -308,7 +308,7 @@ namespace calc {
           outputBuffer.pop_back(); // remove last "\t"
           outputBuffer += "\n";
           // output the buffer, clear it
-          (*(this->outputStreams[streamIdx])) << outputBuffer << std::endl;
+          (*(this->outputStreams[streamIdx])) << outputBuffer;
           outputBuffer.clear();
         }
       };

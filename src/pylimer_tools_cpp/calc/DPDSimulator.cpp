@@ -908,7 +908,7 @@ namespace calc {
       } else {
         this->bondPartnersB[springIdx] = partnerAfter;
         for (int dir = 0; dir < 3; ++dir) {
-          this->bondPartnerCoordinatesA[3 * springIdx + dir] =
+          this->bondPartnerCoordinatesB[3 * springIdx + dir] =
             3 * partnerAfter + dir;
         }
       }
@@ -948,7 +948,8 @@ namespace calc {
             oc.filename, std::ios::out | std::ios::app));
           this->outputFileStreams.push_back(streamIdx);
         } else {
-          this->outputStreams.push_back(std::shared_ptr<std::ostream>(&std::cout, [](void*) {}));
+          this->outputStreams.push_back(
+            std::shared_ptr<std::ostream>(&std::cout, [](void*) {}));
         }
 
         std::string outputBuffer = prefix;
@@ -1198,12 +1199,21 @@ namespace calc {
                         " for " + std::to_string(this->numAtoms) + " atoms)");
       for (size_t i = 0; i < this->numBonds + this->numSlipSprings; ++i) {
         for (int dir = 0; dir < 3; ++dir) {
-          RUNTIME_EXP_IFN(this->bondPartnerCoordinatesA[i * 3 + dir] ==
-                            this->bondPartnersA[i] * 3 + dir,
-                          "Bond partners not accurate.");
+          RUNTIME_EXP_IFN(
+            this->bondPartnerCoordinatesA[i * 3 + dir] ==
+              this->bondPartnersA[i] * 3 + dir,
+            "Bond partners not accurate: got partner coordinate idx " +
+              std::to_string(this->bondPartnerCoordinatesA[i * 3 + dir]) +
+              " but expected " +
+              std::to_string(this->bondPartnersA[i] * 3 + dir) + " at index " +
+              std::to_string(i) + " and dir " + std::to_string(dir) + ".");
           RUNTIME_EXP_IFN(this->bondPartnerCoordinatesB[i * 3 + dir] ==
                             this->bondPartnersB[i] * 3 + dir,
-                          "Bond partners not accurate.");
+            "Bond partners not accurate: got partner coordinate idx " +
+              std::to_string(this->bondPartnerCoordinatesB[i * 3 + dir]) +
+              " but expected " +
+              std::to_string(this->bondPartnersB[i] * 3 + dir) + " at index " +
+              std::to_string(i) + " and dir " + std::to_string(dir) + ".");
         }
         RUNTIME_EXP_IFN(pylimer_tools::utils::contains(
                           this->bondsOfIndex[this->bondPartnersA[i]], i),

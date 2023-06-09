@@ -77,12 +77,15 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     CHECK_NOTHROW(simulator.validateNeighbourlist(1.0));
 
     CHECK(simulator.getTemperature() == Catch::Approx(1.0).epsilon(0.5));
+    CHECK_NOTHROW(simulator.validateState());
 
     simulator.createSlipSprings(100, 2);
+    CHECK_NOTHROW(simulator.validateState());
 
     pe::Universe resultUniverse = simulator.getUniverse();
     CHECK(resultUniverse.getNrOfBonds() == 100 + universe.getNrOfBonds());
     CHECK(resultUniverse.getNrOfAtoms() == universe.getNrOfAtoms());
+    CHECK_NOTHROW(simulator.validateState());
 
     CHECK_NOTHROW(simulator.runSimulation(75, 0.06, true));
 
