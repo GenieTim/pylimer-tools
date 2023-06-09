@@ -146,11 +146,16 @@ TEST_CASE("Box can do PBC computations", "[entity][Box]")
 
     Eigen::Vector3d distances6;
     distances6 << 5.0, 5.0, 5.0;
+    REQUIRE_NOTHROW(testBox.handlePBC(distances6));
+    CHECK(distances6[0] == Catch::Approx(5.));
+    CHECK(distances6[1] == Catch::Approx(5.));
+    CHECK(distances6[2] == Catch::Approx(5.));
     testBox.applySimpleShear(0.1, 2);
     REQUIRE_NOTHROW(testBox.handlePBC(distances6));
     CHECK(distances6[0] == Catch::Approx(5.));
     CHECK(distances6[1] == Catch::Approx(5.));
     CHECK(distances6[2] == Catch::Approx(5.));
+    REQUIRE(testBox.getVolume() == Catch::Approx(10. * 10. * 10.));
 
     Eigen::Vector3d distances7;
     distances7 << 73.7435, 0.0657623, -5.26946;
