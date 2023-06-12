@@ -663,12 +663,12 @@ namespace calc {
           this->coordinates.segment(partnerA * 3, 3) -
           this->coordinates.segment(partnerB * 3, 3);
         this->box.handlePBC(bondDistanceNow);
-        double bondEnergyNow = -k * bondDistanceNow.squaredNorm();
+        double bondEnergyNow = k * bondDistanceNow.squaredNorm();
         Eigen::Vector3d bondDistanceNew =
           this->coordinates.segment(candidateIndex * 3, 3) -
           this->coordinates.segment(candidatePartnerIndex * 3, 3);
         this->box.handlePBC(bondDistanceNew);
-        double bondEnergyNew = -k * bondDistanceNew.squaredNorm();
+        double bondEnergyNew = k * bondDistanceNew.squaredNorm();
         double deltaEnergy = bondEnergyNew - bondEnergyNow;
         bool accept = false;
         if (deltaEnergy < 0.0) {
@@ -813,12 +813,12 @@ namespace calc {
         (this->coordinates.segment(partnerA * 3, 3) -
          this->coordinates.segment(partnerB * 3, 3));
       this->box.handlePBC(bondDistanceNow);
-      double bondEnergyNow = -this->k * bondDistanceNow.squaredNorm();
+      double bondEnergyNow = this->k * bondDistanceNow.squaredNorm();
       Eigen::Vector3d bondDistanceNew =
         (this->coordinates.segment(newPartnerA * 3, 3) -
          this->coordinates.segment(newPartnerB * 3, 3));
       this->box.handlePBC(bondDistanceNew);
-      double bondEnergyNew = -this->k * bondDistanceNew.squaredNorm();
+      double bondEnergyNew = this->k * bondDistanceNew.squaredNorm();
       double deltaEnergy = bondEnergyNew - bondEnergyNow;
       bool accept = false;
       if (deltaEnergy < 0.0) {
@@ -888,12 +888,12 @@ namespace calc {
         (this->coordinates.segment(partnerA * 3, 3) -
          this->coordinates.segment(partnerB * 3, 3));
       this->box.handlePBC(bondDistanceNow);
-      double bondEnergyNow = -this->k * bondDistanceNow.squaredNorm();
+      double bondEnergyNow = this->k * bondDistanceNow.squaredNorm();
       Eigen::Vector3d bondDistanceNew =
         (this->coordinates.segment(replacementForA * 3, 3) -
          this->coordinates.segment(partnerB * 3, 3));
       this->box.handlePBC(bondDistanceNew);
-      double bondEnergyNew = -this->k * bondDistanceNew.squaredNorm();
+      double bondEnergyNew = this->k * bondDistanceNew.squaredNorm();
       double deltaEnergy = bondEnergyNew - bondEnergyNow;
       bool accept = false;
       if (deltaEnergy < 0.0) {
