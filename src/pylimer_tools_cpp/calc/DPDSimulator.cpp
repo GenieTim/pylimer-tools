@@ -60,6 +60,7 @@ namespace calc {
       this->idxFunctionalities = Eigen::ArrayXi::Zero(this->numAtoms);
       this->atomTypes = u.getPropertyValues<int>("type");
       this->atomIds = u.getPropertyValues<long int>("id");
+      this->maxBondLen = 0.45*this->box.getL().maxCoeff();
 
       this->bondsOfIndex.reserve(this->numAtoms);
       for (size_t i = 0; i < this->numAtoms; ++i) {
@@ -187,7 +188,7 @@ namespace calc {
           meanB += b / (this->bondPartnersA.size());
           maxB = std::max(maxB, b);
           if (b > this->maxBondLen) {
-            std::cerr << "WARNING: bond " << i << " has length " << b
+            std::cerr << step << " WARNING: bond " << i << " has length " << b
                       << ", which is too long!" << std::endl;
           }
         }
