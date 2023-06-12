@@ -89,6 +89,7 @@ namespace calc {
     private:
       ////////////////////////////////////////////////////////////////
       // configuration
+      double maxBondLen = 5.;
       bool is2D = false;
       bool shiftPossibilityEmpty = true;
       bool shiftOneAtATime = false;
@@ -198,11 +199,33 @@ namespace calc {
       double computeTemperature(const Eigen::VectorXd& velocities) const;
 
       /**
+       * @brief Compute the temperature
+       *
+       * @param velocities
+       * @return double
+       */
+      double getTemperature() const
+      {
+        return this->computeTemperature(this->currentVelocities);
+      };
+
+      /**
        * @brief Get access to the current stress-tensor
        *
        * @return Eigen::Matrix3d
        */
       Eigen::Matrix3d getStressTensor() const;
+
+      double computeBondLength(int bondIdx) const
+      {
+        Eigen::Vector3d bondDistances =
+          this->coordinates(
+            this->bondPartnerCoordinatesA.segment(3 * bondIdx, 3)) -
+          this->coordinates(
+            this->bondPartnerCoordinatesB.segment(3 * bondIdx, 3));
+        this->box.handlePBC(bondDistances);
+        return bondDistances.norm();
+      };
 
       long int getTimestep() const;
 
