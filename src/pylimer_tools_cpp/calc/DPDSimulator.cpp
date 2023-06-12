@@ -940,8 +940,11 @@ namespace calc {
       std::string prefix,
       int streamIdx)
     {
-      assert(streamIdx >= this->outputStreams.size());
+      INVALIDARG_EXP_IFN(streamIdx == this->outputStreams.size(),
+                         "The stream idx " + std::to_string(streamIdx) +
+                           " hints at an invalid state.");
       int numComputes = 0;
+      this->outputStreams.reserve(streamIdx + configs.size());
       for (OutputConfiguration oc : configs) {
         if (oc.filename != "" && oc.filename != "stdio") {
           this->outputStreams.push_back(std::make_shared<std::ofstream>(
@@ -977,6 +980,11 @@ namespace calc {
               outputBuffer += ComputedDoubleValuesNames[val] + "\t";
           }
         }
+
+        if (!outputBuffer.empty()) {
+          outputBuffer.pop_back(); // remove trailing tab
+        }
+
         (*this->outputStreams[streamIdx]) << outputBuffer << std::endl;
         streamIdx += 1;
       }
@@ -1207,8 +1215,9 @@ namespace calc {
               " but expected " +
               std::to_string(this->bondPartnersA[i] * 3 + dir) + " at index " +
               std::to_string(i) + " and dir " + std::to_string(dir) + ".");
-          RUNTIME_EXP_IFN(this->bondPartnerCoordinatesB[i * 3 + dir] ==
-                            this->bondPartnersB[i] * 3 + dir,
+          RUNTIME_EXP_IFN(
+            this->bondPartnerCoordinatesB[i * 3 + dir] ==
+              this->bondPartnersB[i] * 3 + dir,
             "Bond partners not accurate: got partner coordinate idx " +
               std::to_string(this->bondPartnerCoordinatesB[i * 3 + dir]) +
               " but expected " +

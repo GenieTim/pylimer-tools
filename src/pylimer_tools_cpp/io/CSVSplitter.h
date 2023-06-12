@@ -37,7 +37,9 @@ namespace utils {
     tokenzierResults.reserve(16);
 
     while (std::getline(file, line)) {
-      shortenedLine = pylimer_tools::utils::trimLineOmitComment(line);
+      // omit comment
+      shortenedLine = pylimer_tools::utils::rstrip(line, "#");
+      shortenedLine = pylimer_tools::utils::trim(shortenedLine);
       int newLength =
         pylimer_tools::utils::split(tokenzierResults, shortenedLine, delimiter);
       if (newLength != previousLen || tokenzierResults[0] == "Step") {
@@ -49,7 +51,7 @@ namespace utils {
         results.push_back(currentTempFile);
         outputFile.open(currentTempFile);
       }
-      outputFile << line << "\n";
+      outputFile << shortenedLine << "\n";
     }
 
     outputFile.close();
