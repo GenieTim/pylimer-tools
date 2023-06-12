@@ -31,6 +31,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.DPDSimulator
       ~DPDSimulator.configSpringConstant
       ~DPDSimulator.configStepOutput
       ~DPDSimulator.createSlipSprings
+      ~DPDSimulator.getTemperature
       ~DPDSimulator.getTimestep
       ~DPDSimulator.getUniverse
       ~DPDSimulator.runSimulation
