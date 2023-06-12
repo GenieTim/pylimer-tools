@@ -812,12 +812,12 @@ namespace calc {
       Eigen::Vector3d bondDistanceNow =
         (this->coordinates.segment(partnerA * 3, 3) -
          this->coordinates.segment(partnerB * 3, 3));
-      this->handlePBC(bondDistanceNow);
+      this->box.handlePBC(bondDistanceNow);
       double bondEnergyNow = -this->k * bondDistanceNow.squaredNorm();
       Eigen::Vector3d bondDistanceNew =
         (this->coordinates.segment(newPartnerA * 3, 3) -
          this->coordinates.segment(newPartnerB * 3, 3));
-      this->handlePBC(bondDistanceNew);
+      this->box.handlePBC(bondDistanceNew);
       double bondEnergyNew = -this->k * bondDistanceNew.squaredNorm();
       double deltaEnergy = bondEnergyNew - bondEnergyNow;
       bool accept = false;
