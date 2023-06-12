@@ -25,7 +25,7 @@ def doCache(obj, file: str, suffix: str, tmp_dir: str = None):
         pickle.dump(obj, cacheFile)
 
 
-def loadCache(file: Union[str, List[str], None], suffix: str, disableWarnings: bool = False, tmp_dir: str = None):
+def loadCache(file: Union[str, List[str], None], suffix: str, disableWarnings: bool = False, tmp_dir: str = None, anyway: bool = False):
     """
     Load an object from cache.
 
@@ -56,7 +56,7 @@ def loadCache(file: Union[str, List[str], None], suffix: str, disableWarnings: b
                 pathlib.Path(cacheFileName).stat().st_mtime)
             mtimesOrigin = [datetime.datetime.fromtimestamp(
                 pathlib.Path(f).stat().st_mtime) for f in file]
-            if (np.all(mtimeCache > np.array(mtimesOrigin))):
+            if (np.all(mtimeCache > np.array(mtimesOrigin)) or anyway):
                 try:
                     with open(cacheFileName, 'rb') as cacheFile:
                         toReturn = pickle.load(cacheFile)
