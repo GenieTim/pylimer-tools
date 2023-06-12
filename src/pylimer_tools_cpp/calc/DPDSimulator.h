@@ -344,11 +344,6 @@ namespace calc {
 
       pylimer_tools::entities::Universe getUniverse() const;
 
-      double getTemperature() const
-      {
-        return this->computeTemperature(this->currentVelocities);
-      }
-
       ////////////////////////////////////////////////////////////////
       // validation
       void validateState();
