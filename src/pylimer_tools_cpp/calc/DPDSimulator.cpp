@@ -60,7 +60,7 @@ namespace calc {
       this->idxFunctionalities = Eigen::ArrayXi::Zero(this->numAtoms);
       this->atomTypes = u.getPropertyValues<int>("type");
       this->atomIds = u.getPropertyValues<long int>("id");
-      this->maxBondLen = 0.45*this->box.getL().maxCoeff();
+      this->maxBondLen = 0.45 * this->box.getL().maxCoeff();
 
       this->bondsOfIndex.reserve(this->numAtoms);
       for (size_t i = 0; i < this->numAtoms; ++i) {
@@ -184,7 +184,7 @@ namespace calc {
         double meanB = 0.0;
         double maxB = 0.0;
         for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
-          double b = bondDistances.segment(3*i, 3).norm();
+          double b = bondDistances.segment(3 * i, 3).norm();
           meanB += b / (this->bondPartnersA.size());
           maxB = std::max(maxB, b);
           if (b > this->maxBondLen) {
@@ -659,14 +659,16 @@ namespace calc {
         int candidatePartnerIndex = candidates[candidateDist(this->e2)];
 
         // compute the Metropolis criterion
-        double bondEnergyNow =
-          -k * (this->coordinates.segment(partnerA * 3, 3) -
-                this->coordinates.segment(partnerB * 3, 3))
-                 .squaredNorm();
-        double bondEnergyNew =
-          -k * (this->coordinates.segment(candidateIndex * 3, 3) -
-                this->coordinates.segment(candidatePartnerIndex * 3, 3))
-                 .squaredNorm();
+        Eigen::Vector3d bondDistanceNow =
+          this->coordinates.segment(partnerA * 3, 3) -
+          this->coordinates.segment(partnerB * 3, 3);
+        this->box.handlePBC(bondDistanceNow);
+        double bondEnergyNow = -k * bondDistanceNow.squaredNorm();
+        Eigen::Vector3d bondDistanceNew =
+          this->coordinates.segment(candidateIndex * 3, 3) -
+          this->coordinates.segment(candidatePartnerIndex * 3, 3);
+        this->box.handlePBC(bondDistanceNew);
+        double bondEnergyNew = -k * bondDistanceNew.squaredNorm();
         double deltaEnergy = bondEnergyNew - bondEnergyNow;
         bool accept = false;
         if (deltaEnergy < 0.0) {
@@ -807,14 +809,16 @@ namespace calc {
       }
 
       // compute the Metropolis criterion
-      double bondEnergyNow =
-        -this->k * (this->coordinates.segment(partnerA * 3, 3) -
-                    this->coordinates.segment(partnerB * 3, 3))
-                     .squaredNorm();
-      double bondEnergyNew =
-        -this->k * (this->coordinates.segment(newPartnerA * 3, 3) -
-                    this->coordinates.segment(newPartnerB * 3, 3))
-                     .squaredNorm();
+      Eigen::Vector3d bondDistanceNow =
+        (this->coordinates.segment(partnerA * 3, 3) -
+         this->coordinates.segment(partnerB * 3, 3));
+      this->handlePBC(bondDistanceNow);
+      double bondEnergyNow = -this->k * bondDistanceNow.squaredNorm();
+      Eigen::Vector3d bondDistanceNew =
+        (this->coordinates.segment(newPartnerA * 3, 3) -
+         this->coordinates.segment(newPartnerB * 3, 3));
+      this->handlePBC(bondDistanceNew);
+      double bondEnergyNew = -this->k * bondDistanceNew.squaredNorm();
       double deltaEnergy = bondEnergyNew - bondEnergyNow;
       bool accept = false;
       if (deltaEnergy < 0.0) {
@@ -833,8 +837,8 @@ namespace calc {
                        "energy before "
                     << bondEnergyNow << " and now " << bondEnergyNew
                     << " for bond " << springIdx << std::endl;
-                    std::cerr << "Bond length is " << this->computeBondLength(springIdx)
-                     << std::endl;
+          std::cerr << "Bond length is " << this->computeBondLength(springIdx)
+                    << std::endl;
         }
       }
       return accept;
@@ -880,14 +884,16 @@ namespace calc {
           ? this->bondPartnersB[selectedBond]
           : this->bondPartnersA[selectedBond];
       // compute the Metropolis criterion
-      double bondEnergyNow =
-        -this->k * (this->coordinates.segment(partnerA * 3, 3) -
-                    this->coordinates.segment(partnerB * 3, 3))
-                     .squaredNorm();
-      double bondEnergyNew =
-        -this->k * (this->coordinates.segment(replacementForA * 3, 3) -
-                    this->coordinates.segment(partnerB * 3, 3))
-                     .squaredNorm();
+      Eigen::Vector3d bondDistanceNow =
+        (this->coordinates.segment(partnerA * 3, 3) -
+         this->coordinates.segment(partnerB * 3, 3));
+      this->box.handlePBC(bondDistanceNow);
+      double bondEnergyNow = -this->k * bondDistanceNow.squaredNorm();
+      Eigen::Vector3d bondDistanceNew =
+        (this->coordinates.segment(replacementForA * 3, 3) -
+         this->coordinates.segment(partnerB * 3, 3));
+      this->box.handlePBC(bondDistanceNew);
+      double bondEnergyNew = -this->k * bondDistanceNew.squaredNorm();
       double deltaEnergy = bondEnergyNew - bondEnergyNow;
       bool accept = false;
       if (deltaEnergy < 0.0) {
