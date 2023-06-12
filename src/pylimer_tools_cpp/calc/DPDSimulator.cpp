@@ -648,8 +648,9 @@ namespace calc {
             if (numCandidates >= candidates.size()) {
               candidates.push_back(neighbours[j]);
             } else {
-              candidates[numCandidates++] = neighbours[j];
+              candidates[numCandidates] = neighbours[j];
             }
+            numCandidates += 1;
           }
         }
         if (numCandidates == 0) {
@@ -738,8 +739,9 @@ namespace calc {
               if (numCandidates >= candidates.size()) {
                 candidates.push_back(neighbours[j]);
               } else {
-                candidates[numCandidates++] = neighbours[j];
+                candidates[numCandidates] = neighbours[j];
               }
+              numCandidates += 1;
             }
           }
           if (numCandidates == 0) {
