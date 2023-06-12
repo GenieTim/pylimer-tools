@@ -124,7 +124,7 @@ namespace calc {
       // prepare averages
       bool doAverage = this->outputAverageConfigs.size() > 0;
       int numAverages = this->openFilesOutputHeader(
-        this->outputAverageConfigs, "OutputStep", this->outputConfigs.size());
+        this->outputAverageConfigs, "OutputStep\t", this->outputConfigs.size());
       std::string averagesOutputBuffer;
       averagesOutputBuffer.reserve(this->outputAverageConfigs.size() * 50);
 
@@ -183,9 +183,13 @@ namespace calc {
         double meanB = 0.0;
         double maxB = 0.0;
         for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
-          double b = bondDistances.segment(3 * i, 3).norm();
+          double b = bondDistances.segment(3*i, 3).norm();
           meanB += b / (this->bondPartnersA.size());
           maxB = std::max(maxB, b);
+          if (b > this->maxBondLen) {
+            std::cerr << "WARNING: bond " << i << " has length " << b
+                      << ", which is too long!" << std::endl;
+          }
         }
 
         // output
@@ -677,6 +681,9 @@ namespace calc {
           this->replaceSlipSpringPartner(
             springIdx, partnerB, candidatePartnerIndex);
           nAccept++;
+          RUNTIME_EXP_IFN(
+            this->computeBondLength(springIdx) <= this->highCutoff,
+            "By relocation, newly created bonds should not be too long.");
         }
       }
       return nAccept;
@@ -744,6 +751,9 @@ namespace calc {
             springIdx, this->bondPartnersA[springIdx], firstPartner);
           this->replaceSlipSpringPartner(
             springIdx, this->bondPartnersB[springIdx], secondPartner);
+          RUNTIME_EXP_IFN(
+            this->computeBondLength(springIdx) <= this->highCutoff,
+            "By shifting, newly created bonds should not be too long.");
         }
       }
       return n_accept;
@@ -771,7 +781,7 @@ namespace calc {
       std::uniform_int_distribution<int> dista(0, distrLimitA);
       int randomIdxA = dista(this->e2);
       if (randomIdxA >= this->idxFunctionalities[partnerA]) {
-        assert(this->shiftPossibilityEmpty);
+        RUNTIME_EXP_IFN(this->shiftPossibilityEmpty, "Invalid state.");
       } else {
         const size_t selectedBondA = this->bondsOfIndex[partnerA][randomIdxA];
         newPartnerA = this->bondPartnersA[selectedBondA] == partnerA
@@ -817,6 +827,14 @@ namespace calc {
       if (accept) {
         this->replaceSlipSpringPartner(springIdx, partnerA, newPartnerA);
         this->replaceSlipSpringPartner(springIdx, partnerB, newPartnerB);
+        if (this->computeBondLength(springIdx) > this->maxBondLen) {
+          std::cerr << "After shifting, managed to get too long bond with bond "
+                       "energy before "
+                    << bondEnergyNow << " and now " << bondEnergyNew
+                    << " for bond " << springIdx << std::endl;
+                    std::cerr << "Bond length is " << this->computeBondLength(springIdx)
+                     << std::endl;
+        }
       }
       return accept;
     };

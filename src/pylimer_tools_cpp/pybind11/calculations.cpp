@@ -1259,6 +1259,7 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("atom_ids"))
     .def("getUniverse", &dpd::DPDSimulator::getUniverse)
     .def("getTimestep", &dpd::DPDSimulator::getTimestep)
+    .def("getTemperature", &dpd::DPDSimulator::getTemperature)
     .def("validateNeighbourList", &dpd::DPDSimulator::validateNeighbourlist)
     .def("validateState", &dpd::DPDSimulator::validateState);
 }
