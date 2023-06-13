@@ -706,7 +706,8 @@ namespace calc {
       std::vector<size_t> candidates;
       Eigen::ArrayXi neighbours = Eigen::ArrayXi(12);
 
-      std::uniform_int_distribution<int> uniformDistNatoms(0, this->numAtoms);
+      std::uniform_int_distribution<int> uniformDistNatoms(0,
+                                                           this->numAtoms - 1);
       for (size_t springIdx = this->numBonds;
            springIdx < (this->numBonds + this->numSlipSprings);
            ++springIdx) {
@@ -729,7 +730,11 @@ namespace calc {
             neighbours,
             this->coordinates.segment(3 * firstPartner, 3),
             this->highCutoff);
+          RUNTIME_EXP_IFN(numNeighs <= neighbours.size(),
+                          "Neighbourlist does not act as it should.");
           for (size_t j = 0; j < numNeighs; ++j) {
+            RUNTIME_EXP_IFN(neighbours[j] < this->numAtoms,
+                            "Neighbourlist seems inconsequent.");
             Eigen::Vector3d distance =
               this->coordinates.segment(3 * firstPartner, 3) -
               this->coordinates.segment(3 * neighbours[j], 3);
@@ -923,6 +928,12 @@ namespace calc {
                                                 const size_t partnerBefore,
                                                 const size_t partnerAfter)
     {
+      INVALIDARG_EXP_IFN(springIdx < this->bondPartnersA.size(),
+                         "Cannot replace on a non-existing spring.");
+      INVALIDARG_EXP_IFN(partnerBefore < this->numAtoms,
+                         "Cannot replace with a non-existing bead.");
+      INVALIDARG_EXP_IFN(partnerAfter < this->numAtoms,
+                         "Cannot replace with a non-existing bead.");
       INVALIDARG_EXP_IFN(this->bondPartnersA[springIdx] == partnerBefore ||
                            this->bondPartnersB[springIdx] == partnerBefore,
                          "This spring and its partners do not match.");
