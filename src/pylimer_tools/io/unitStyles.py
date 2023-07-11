@@ -122,7 +122,7 @@ class UnitStyleFactory(object):
             # *might* be wrong
             # epsZero = (8.8541878128e-12*ureg.farad/ureg.meter)
             return UnitStyle({
-                'mass': polymerData.M_k*ureg('g/mol') if 'accept_mol' in kwargs else polymerData.M_k*ureg('g')/AVOGADRO_CONST,
+                'mass': polymerData.Mb*ureg('g/mol') if 'accept_mol' in kwargs else polymerData.Mb*ureg('g')/AVOGADRO_CONST,
                 'distance': ureg.sigma,
                 'time': ureg.tau,
                 'energy': ureg.eps,
@@ -200,3 +200,4 @@ class UnitStyleFactory(object):
         else:
             raise NotImplementedError(
                 "Unity type '{}' is not implemented".format(unitType))
+
