@@ -7,6 +7,7 @@ from collections import Counter
 from typing import Iterable, Tuple
 
 import numpy as np
+
 from pylimer_tools_cpp import Molecule, MoleculeType, Universe
 
 
@@ -359,6 +360,8 @@ def computeCrosslinkerConversion(network: Universe, crosslinkerType, f: int = No
     if (f is None):
         if (functionalityPerType is None):
             functionalityPerType = network.determineFunctionalityPerType()
+        if (crosslinkerType not in functionalityPerType):
+            return 0.0
         f = functionalityPerType[crosslinkerType]
     return calculateEffectiveCrosslinkerFunctionality(network, crosslinkerType) / f
 
