@@ -153,6 +153,8 @@ namespace entities {
       return AtomGraphParent::computeBondLengths(&this->box);
     };
     Eigen::Vector3d getPositionVectorForVertex(const int vertexId) const;
+    Eigen::Vector3d getUnwrappedPositionVectorForVertex(
+      const int vertexId) const;
     std::vector<LoopIntersectionInfo> findLoopEntanglements(
       const std::vector<long int>& vertexIndicesLoop1,
       const std::vector<long int>& vertexIndicesLoop2,

@@ -1213,7 +1213,7 @@ namespace calc {
         loopMinCoords.push_back(minCoords);
         loopMaxCoords.push_back(maxCoords);
 
-        // loop reduction
+        // loop reduction to springs
         std::set<size_t> reducedLoop;
         for (size_t i = 0; i < loop.size(); ++i) {
           // reduced loop

@@ -64,6 +64,9 @@ def loadCache(file: Union[str, List[str], None], suffix: str, disableWarnings: b
                 except pickle.UnpicklingError as e:
                     warnings.warn(
                         "Unpickling of cache file {} failed: {}".format(file, e))
+                except ModuleNotFoundError as e:
+                    warnings.warn(
+                        "Unpickling of cache file {} failed: {}".format(file, e))
             else:
                 # print("Dump cache file is elder than dump. Reloading...")
                 pass

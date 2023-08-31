@@ -1733,6 +1733,23 @@ namespace entities {
     return vertex;
   }
 
+  Eigen::Vector3d Universe::getUnwrappedPositionVectorForVertex(
+    const int vertexId) const
+  {
+
+    Eigen::Vector3d vertex = Eigen::Vector3d::Zero();
+    vertex[0] = igraph_cattribute_VAN(&this->graph, "x", vertexId);
+    vertex[1] = igraph_cattribute_VAN(&this->graph, "y", vertexId);
+    vertex[2] = igraph_cattribute_VAN(&this->graph, "z", vertexId);
+
+    Eigen::Array3d image = Eigen::Array3d::Zero();
+    image[0] = igraph_cattribute_VAN(&this->graph, "nx", vertexId);
+    image[1] = igraph_cattribute_VAN(&this->graph, "ny", vertexId);
+    image[2] = igraph_cattribute_VAN(&this->graph, "nz", vertexId);
+
+    return vertex + (this->getBox().getL() * image).matrix();
+  }
+
   /**
    * @brief Compute the x distance for all bonds passed in
    *
