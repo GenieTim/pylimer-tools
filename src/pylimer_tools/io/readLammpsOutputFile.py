@@ -62,8 +62,11 @@ def readAveragesFile(filepath, use_cache: bool = True) -> pd.DataFrame:
         header_line = line1
     header_line = header_line.removeprefix("#").strip()
 
-    data = pd.read_csv(filepath, comment="#",
-                       names=header_line.split(), sep=" ")
+    try:
+        data = pd.read_csv(filepath, comment="#",
+                           names=header_line.split(), sep=" ")
+    except pd.errors.EmptyDataError as e:
+        return pd.DataFrame()
 
     return data
 
