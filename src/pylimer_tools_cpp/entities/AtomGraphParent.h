@@ -10,6 +10,7 @@ extern "C"
 #include "Atom.h"
 #include <Eigen/Dense>
 #include <algorithm>
+#include <limits.h>
 #include <map>
 #include <unordered_map>
 #include <vector>
@@ -72,6 +73,90 @@ namespace entities {
      * @return int
      */
     int getNrOfBonds() const;
+
+    /**
+     * @brief convert the atom types involved in one angle into one long number
+     *
+     */
+    long hashAngleType(int typeFrom, int typeVia, int typeTo) const;
+
+    /**
+     * @brief convert the atom types involved in one dihedral angle into one
+     * long number
+     *
+     */
+    long hashDihedralAngleType(int typeFrom,
+                          int typeVia1,
+                          int typeVia2,
+                          int typeTo) const;
+
+    /**
+     * @brief Combine vertex indices to a hash, that respects the order of the
+     * indices
+     *
+     * @param r a
+     * @param count the number of vertex elements to combine
+     * @param ... the vertex indices
+     * @return unsigned long long
+     */
+    template<typename vertex_idx_type>
+    unsigned long long hashVertexIndicesOrderRelevant(int r,
+                                                      int count,
+                                                      ...) const
+    {
+      unsigned long long hash = 0;
+      int numVerticesTotal = this->getNrOfAtoms() + 1;
+      // bits used: log(pow(numVerticesTotal, count))/log(2)
+      // -> possible overflow?!?
+      if (std::log(std::pow(r, count)) / std::log(2) >=
+          sizeof(unsigned long long) * CHAR_BIT) {
+        throw std::invalid_argument(
+          "With this r and count, the hash will overflow.");
+      }
+
+      va_list args;
+      va_start(args, count);
+
+      for (int i = 0; i < count; i++) {
+        const vertex_idx_type nextVertexIdx = va_arg(args, vertex_idx_type);
+        hash *= numVerticesTotal;
+        hash += nextVertexIdx;
+      }
+
+      va_end(args);
+
+      return hash;
+    }
+
+    /**
+     * @brief Combine vertex indices to a hash, that does not respect the order
+     * of the indices
+     *
+     * @param count the number of vertex elements to combine
+     * @param ... the vertex indices
+     * @return unsigned long long
+     */
+    template<typename vertex_idx_type>
+    unsigned long long hashVertexIndicesOrderIrrelevant(int count, ...) const
+    {
+      unsigned long long hash_product = 1;
+      unsigned long long hash_sum = 0;
+      unsigned int hash_xor = 0;
+
+      va_list args;
+      va_start(args, count);
+
+      for (int i = 0; i < count; i++) {
+        const vertex_idx_type nextVertexIdx = va_arg(args, vertex_idx_type);
+        hash_product *= nextVertexIdx;
+        hash_sum += nextVertexIdx;
+        hash_xor ^= nextVertexIdx;
+      }
+
+      va_end(args);
+
+      return hash_product + hash_sum + ((unsigned long long)hash_xor << 32);
+    }
 
     /**
      * @brief Get all atoms of a certain type

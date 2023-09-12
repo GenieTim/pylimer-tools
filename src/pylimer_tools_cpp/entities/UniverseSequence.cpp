@@ -69,7 +69,8 @@ namespace entities {
   void UniverseSequence::setDataFileAtomStyle(
     std::vector<pylimer_tools::utils::AtomStyle> newDataFileAtomStyle)
   {
-    INVALIDARG_EXP_IFN(newDataFileAtomStyle.size() <= 3, "Expect at most 3 atom styles");
+    INVALIDARG_EXP_IFN(newDataFileAtomStyle.size() <= 3,
+                       "Expect at most 3 atom styles");
     this->dataFileAtomStyle = newDataFileAtomStyle;
   }
 
@@ -313,7 +314,15 @@ namespace entities {
     if (fileParser.getNrOfAngles() > 0) {
       universe.addAngles(fileParser.getAngleFrom(),
                          fileParser.getAngleVia(),
-                         fileParser.getAngleTo());
+                         fileParser.getAngleTo(),
+                         fileParser.getAngleTypes());
+    }
+    if (fileParser.getNrOfDihedralAngles() > 0) {
+      universe.addDihedralAngles(fileParser.getDihedralAngleFrom(),
+                                 fileParser.getDihedralAngleVia1(),
+                                 fileParser.getDihedralAngleVia2(),
+                                 fileParser.getDihedralAngleTo(),
+                                 fileParser.getDihedralAngleTypes());
     }
     return universe;
   }

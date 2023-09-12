@@ -354,6 +354,56 @@ namespace entities {
   }
 
   /**
+   * @brief convert the atom types involved in one angle into one long number
+   *
+   */
+  long AtomGraphParent::hashAngleType(int typeFrom,
+                                      int typeVia,
+                                      int typeTo) const
+  {
+    if (typeFrom < 0 || typeTo < 0 || typeVia < 0) {
+      throw std::invalid_argument(
+        "AtomGraphParent::hashAngleType requires positve types");
+    }
+    if (typeFrom > 1000 || typeTo > 1000 || typeVia > 1000) {
+      throw std::invalid_argument(
+        "AtomGraphParent::hashAngleType requires types < 1000");
+    }
+    if (typeFrom < typeTo) {
+      std::swap(typeFrom, typeTo);
+    }
+    long hash = (typeFrom << 20) | (typeVia << 10) | typeTo;
+    return hash;
+    // unhashing: typeFrom = hash >> 20; typeVia = (hash >> 10) & 0x3ff; typeTo =
+    // (hash & 0x3ff);
+  };
+
+  /**
+   * @brief convert the atom types involved in one angle into one long number
+   *
+   */
+  long AtomGraphParent::hashDihedralAngleType(int typeFrom,
+                                      int typeVia1,
+                                      int typeVia2,
+                                      int typeTo) const
+  {
+    if (typeFrom < 0 || typeTo < 0 || typeVia1 < 0 || typeVia2 < 0) {
+      throw std::invalid_argument(
+        "AtomGraphParent::hashAngleType requires positve types");
+    }
+    if (typeFrom > 1000 || typeTo > 1000 || typeVia1 > 1000 || typeVia2 > 1000) {
+      throw std::invalid_argument(
+        "AtomGraphParent::hashAngleType requires types < 1000");
+    }
+    if (typeFrom < typeTo) {
+      std::swap(typeFrom, typeTo);
+      std::swap(typeVia1, typeVia2);
+    }
+    long hash = (typeFrom << 30) | (typeVia1 << 20) | (typeVia2 << 10) | typeTo;
+    return hash;
+  };
+
+  /**
    * @brief Get all edges associated with this graph
    *
    * @return std::map<std::string, std::vector<long int>>
@@ -513,10 +563,11 @@ namespace entities {
     return result;
   }
 
-    void AtomGraphParent::writeGraphToFile(const std::string& filename) const {
-      FILE* fp = fopen(filename.c_str(), "w");
-      igraph_write_graph_gml(&this->graph, fp, 0, NULL, "PylimerTools");
-      fclose(fp);
-    };
+  void AtomGraphParent::writeGraphToFile(const std::string& filename) const
+  {
+    FILE* fp = fopen(filename.c_str(), "w");
+    igraph_write_graph_gml(&this->graph, fp, 0, NULL, "PylimerTools");
+    fclose(fp);
+  };
 } // namespace entities
 } // namespace pylimer_tools

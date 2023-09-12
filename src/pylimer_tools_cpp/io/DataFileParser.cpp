@@ -160,6 +160,27 @@ namespace utils {
       }
     }
 
+    // then, read dihedral angles
+    if (this->nDihedralAngles > 0) {
+      this->skipLinesToContains(line, file, "Dihedrals");
+      // skip this line too
+      if (!getline(file, line)) {
+        throw std::runtime_error(
+          "Data file ended too early. Not able to read any dihedral angles.");
+      }
+      // then, skip empty lines
+      this->skipEmptyLines(line, file);
+
+      for (int i = 0; i < this->nDihedralAngles; i++) {
+        this->readDihedralAngle(line);
+
+        if (!getline(file, line) && i + 1 < this->nDihedralAngles) {
+          throw std::runtime_error(
+            "Data file ended too early. Not enough dihedral angles read.");
+        }
+      }
+    }
+
     // we ignore dihedrals etc. for now.
     file.close();
   }
@@ -195,12 +216,16 @@ namespace utils {
       this->nBonds = (this->parseTypesInLine<int>(line, 1))[0];
     } else if (contains(line, "angles")) {
       this->nAngles = (this->parseTypesInLine<int>(line, 1))[0];
+    } else if (contains(line, "dihedrals")) {
+      this->nDihedralAngles = (this->parseTypesInLine<int>(line, 1))[0];
     } else if (contains(line, "atom types")) {
       this->nAtomTypes = (this->parseTypesInLine<int>(line, 1))[0];
     } else if (contains(line, "bond types")) {
       this->nBondTypes = (this->parseTypesInLine<int>(line, 1))[0];
     } else if (contains(line, "angle types")) {
       this->nAngleTypes = (this->parseTypesInLine<int>(line, 1))[0];
+    } else if (contains(line, "dihedral types")) {
+      this->nDihedralAngleTypes = (this->parseTypesInLine<int>(line, 1))[0];
     } else if (contains(line, "xlo xhi")) {
       std::vector<double> parsedL = this->parseTypesInLine<double>(line, 2);
       this->xHi = parsedL[1];
@@ -331,6 +356,26 @@ namespace utils {
     this->angleFrom.push_back(angleFrom);
     this->angleVia.push_back(angleVia);
     this->angleTo.push_back(angleTo);
+  }
+
+  void DataFileParser::readDihedralAngle(std::string line)
+  {
+    size_t angleId, angleType, angleFrom, angleVia1, angleVia2, angleTo;
+    sscanf(line.c_str(),
+           "%zu %zu %zu %zu %zu %zu",
+           &angleId,
+           &angleType,
+           &angleFrom,
+           &angleVia1,
+           &angleVia2,
+           &angleTo);
+
+    this->dihedralAngleIds.push_back(angleId);
+    this->dihedralAngleTypes.push_back(angleType);
+    this->dihedralAngleFrom.push_back(angleFrom);
+    this->dihedralAngleVia1.push_back(angleVia1);
+    this->dihedralAngleVia2.push_back(angleVia2);
+    this->dihedralAngleTo.push_back(angleTo);
   }
 } // namespace utils
 } // namespace pylimer_tools

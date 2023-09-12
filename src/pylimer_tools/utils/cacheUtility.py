@@ -3,6 +3,7 @@ import hashlib
 import os
 import pathlib
 import pickle
+import shutil
 import tempfile
 import warnings
 from typing import Iterable, List, Union
@@ -43,6 +44,9 @@ def loadCache(file: Union[str, List[str], None], suffix: str, disableWarnings: b
     if (not isinstance(file, list)):
         file = [file]
     cacheFileName = getCacheFileName(file, suffix, tmp_dir)
+    oldCacheFileName = getCacheFileName(file, suffix, tmp_dir, True)
+    if (os.path.isfile(oldCacheFileName) and not os.path.isfile(cacheFileName)):
+        shutil.copy2(oldCacheFileName, cacheFileName)
     if (os.path.isfile(cacheFileName)):
         if (not np.all([os.path.isfile(f) for f in file])):
             if (not disableWarnings):
@@ -56,7 +60,7 @@ def loadCache(file: Union[str, List[str], None], suffix: str, disableWarnings: b
                 pathlib.Path(cacheFileName).stat().st_mtime)
             mtimesOrigin = [datetime.datetime.fromtimestamp(
                 pathlib.Path(f).stat().st_mtime) for f in file]
-            if (np.all(mtimeCache > np.array(mtimesOrigin)) or anyway):
+            if (np.all([mtimeCache > mt for mt in mtimesOrigin]) or anyway):
                 try:
                     with open(cacheFileName, 'rb') as cacheFile:
                         toReturn = pickle.load(cacheFile)
@@ -74,7 +78,7 @@ def loadCache(file: Union[str, List[str], None], suffix: str, disableWarnings: b
     return None
 
 
-def getCacheFileName(file: Union[str, List[str], None], suffix: str, tmp_dir: str = None):
+def getCacheFileName(file: Union[str, List[str], None], suffix: str, tmp_dir: str = None, old: bool = False):
     """
     Get the name and path of a cache file. Internal method.
 
@@ -87,7 +91,7 @@ def getCacheFileName(file: Union[str, List[str], None], suffix: str, tmp_dir: st
         - cacheFileName: the path to the cache file
     """
     if (isinstance(file, list)):
-        file = "".join(file)
+        file = "".join(sorted(file) if not old else file)
     if (file is None):
         file = ""
     cacheFileName = "{}/{}-{}.pickle".format(

@@ -1,5 +1,6 @@
 #include "Universe.h"
 #include "../calc/TopologyCalc.h"
+#include "../utils/BoolUtils.h"
 #include "../utils/GraphUtils.h"
 #include "../utils/StringUtils.h"
 #include "../utils/VectorUtils.h"
@@ -399,11 +400,21 @@ namespace entities {
     }
   }
 
+  /**
+   * @brief Add additional angles to the universe
+   *
+   * @param from
+   * @param via
+   * @param to
+   * @param types
+   */
   void Universe::addAngles(std::vector<long int> from,
                            std::vector<long int> via,
-                           std::vector<long int> to)
+                           std::vector<long int> to,
+                           std::vector<int> types)
   {
-    if (from.size() != to.size() || from.size() != via.size()) {
+    if (!all_equal<size_t>(
+          4, from.size(), to.size(), via.size(), types.size())) {
       throw std::invalid_argument("All angle inputs must have the same size.");
     }
 
@@ -412,8 +423,47 @@ namespace entities {
     this->angleVia.insert(
       std::end(this->angleVia), std::begin(via), std::end(via));
     this->angleTo.insert(std::end(this->angleTo), std::begin(to), std::end(to));
+
+    this->angleType.insert(
+      std::end(this->angleType), std::begin(types), std::end(types));
   }
 
+  /**
+   * @brief Add additional angles to the universe
+   *
+   * @param from
+   * @param via
+   * @param to
+   * @param types
+   */
+  void Universe::addDihedralAngles(std::vector<long int> from,
+                                   std::vector<long int> via1,
+                                   std::vector<long int> via2,
+                                   std::vector<long int> to,
+                                   std::vector<int> types)
+  {
+    if (!all_equal<size_t>(
+          5, from.size(), to.size(), via1.size(), via2.size(), types.size())) {
+      throw std::invalid_argument("All angle inputs must have the same size.");
+    }
+
+    this->dihedralAngleFrom.insert(
+      std::end(this->angleFrom), std::begin(from), std::end(from));
+    this->dihedralAngleVia1.insert(
+      std::end(this->dihedralAngleVia1), std::begin(via1), std::end(via1));
+    this->dihedralAngleVia2.insert(
+      std::end(this->dihedralAngleVia2), std::begin(via2), std::end(via2));
+    this->dihedralAngleTo.insert(
+      std::end(this->dihedralAngleTo), std::begin(to), std::end(to));
+
+    this->dihedralAngleType.insert(
+      std::end(this->dihedralAngleType), std::begin(types), std::end(types));
+  }
+
+  /**
+   * @brief Simplify the underlying graph by removing double edges etc.
+   *
+   */
   void Universe::simplify()
   {
     igraph_attribute_combination_t comb;
@@ -443,6 +493,13 @@ namespace entities {
     return result;
   };
 
+  /**
+   * @brief Count the number of atoms within a certain distance.
+   *
+   * @param distances
+   * @param unwrapped
+   * @return std::vector<size_t>
+   */
   std::vector<size_t> Universe::countAtomsInSkinDistance(
     std::vector<double> distances,
     bool unwrapped) const
@@ -823,6 +880,15 @@ namespace entities {
     return molecules;
   }
 
+  /**
+   * @brief Detect loops (cycles) in the graph
+   *
+   * @param crosslinkerType
+   * @param maxLength
+   * @param skipSelfLoops
+   * @param edges
+   * @return std::vector<std::vector<long int>>
+   */
   std::vector<std::vector<long int>> Universe::findLoops(
     const int crosslinkerType,
     const int maxLength,
@@ -1399,6 +1465,29 @@ namespace entities {
     results.insert_or_assign("angle_from", this->angleFrom);
     results.insert_or_assign("angle_to", this->angleTo);
     results.insert_or_assign("angle_via", this->angleVia);
+    std::vector<long int> angleTypes(this->angleType.begin(),
+                                     this->angleType.end());
+    results.insert_or_assign("angle_type", angleTypes);
+
+    return results;
+  }
+
+  /**
+   * @brief Get all dihedral angles stored in this universe
+   *
+   * @return std::map<std::string, std::vector<long int>>
+   */
+  std::map<std::string, std::vector<long int>> Universe::getDihedralAngles()
+    const
+  {
+    std::map<std::string, std::vector<long int>> results;
+    results.insert_or_assign("dihedral_angle_from", this->dihedralAngleFrom);
+    results.insert_or_assign("dihedral_angle_via1", this->dihedralAngleVia1);
+    results.insert_or_assign("dihedral_angle_via2", this->dihedralAngleVia2);
+    results.insert_or_assign("dihedral_angle_to", this->dihedralAngleTo);
+    std::vector<long int> angleTypes(this->dihedralAngleType.begin(),
+                                     this->dihedralAngleType.end());
+    results.insert_or_assign("dihedral_angle_type", angleTypes);
 
     return results;
   }
@@ -1410,10 +1499,11 @@ namespace entities {
    */
   std::map<std::string, std::vector<long int>> Universe::detectAngles() const
   {
-    std::set<int> anglesFound;
+    std::set<unsigned long long> anglesFound;
     std::vector<long int> angleFromFound;
     std::vector<long int> angleToFound;
     std::vector<long int> angleViaFound;
+    std::vector<long int> angleTypeFound;
     // query all atoms
     igraph_vit_t vit;
     igraph_vit_create(&this->graph, igraph_vss_all(), &vit);
@@ -1433,14 +1523,28 @@ namespace entities {
         for (size_t connectionJ = connectionI + 1;
              connectionJ < connections.size();
              ++connectionJ) {
-          int angleKey =
-            vertexIdx xor connections[connectionI] xor connections[connectionJ];
+          // r = 2642240 is not huge, but what we get.
+          // TODO: check the probability of hash collisions
+          unsigned long long angleKey =
+            this->hashVertexIndicesOrderRelevant<long int>(
+              2642240,
+              3,
+              std::max(connections[connectionI], connections[connectionJ]),
+              vertexIdx,
+              std::min(connections[connectionI], connections[connectionJ]));
           if (!pylimer_tools::utils::map_has_key(anglesFound, angleKey)) {
+            int atomTypeFrom =
+              this->getPropertyValue<int>("type", connections[connectionI]);
+            int atomTypeVia = this->getPropertyValue<int>("type", vertexIdx);
+            int atomTypeTo =
+              this->getPropertyValue<int>("type", connections[connectionJ]);
             angleFromFound.push_back(
               this->getAtomIdByIdx(connections[connectionI]));
             angleViaFound.push_back(this->getAtomIdByIdx(vertexIdx));
             angleToFound.push_back(
               this->getAtomIdByIdx(connections[connectionJ]));
+            angleTypeFound.push_back(
+              this->hashAngleType(atomTypeFrom, atomTypeVia, atomTypeTo));
             anglesFound.insert(angleKey);
           }
         }
@@ -1453,6 +1557,91 @@ namespace entities {
     results.insert_or_assign("angle_from", angleFromFound);
     results.insert_or_assign("angle_to", angleToFound);
     results.insert_or_assign("angle_via", angleViaFound);
+    results.insert_or_assign("angle_type", angleTypeFound);
+
+    return results;
+  }
+
+  /**
+   * @brief Find all dihedralangles that appear in this universe
+   *
+   * @return std::map<std::string, std::vector<long int>>
+   */
+  std::map<std::string, std::vector<long int>> Universe::detectDihedralAngles()
+    const
+  {
+    std::set<unsigned long long> anglesFound;
+    std::vector<long int> angleFromFound;
+    std::vector<long int> angleVia1Found;
+    std::vector<long int> angleVia2Found;
+    std::vector<long int> angleToFound;
+    std::vector<long int> angleTypeFound;
+    // query all atoms
+    igraph_vit_t vit;
+    igraph_vit_create(&this->graph, igraph_vss_all(), &vit);
+    while (!IGRAPH_VIT_END(vit)) {
+      const long int vertexIdx = static_cast<long int>(IGRAPH_VIT_GET(vit));
+      // find the connected atoms
+      igraph_vector_int_list_t neighbors;
+      igraph_vector_int_list_init(&neighbors, 0);
+      igraph_neighborhood(
+        &this->graph, &neighbors, igraph_vss_1(vertexIdx), 3, IGRAPH_ALL, 0);
+      // loop the connections to find angles
+      for (size_t neighborI = 0;
+           neighborI < igraph_vector_int_list_size(&neighbors);
+           neighborI++) {
+        igraph_vector_int_t* dihedral_involvements =
+          igraph_vector_int_list_get_ptr(&neighbors, neighborI);
+        RUNTIME_EXP_IFN(
+          igraph_vector_int_size(dihedral_involvements) == 4,
+          "Expected 4 neighbors, got " +
+            std::to_string(igraph_vector_int_size(dihedral_involvements)) +
+            " when detecting dihedrals.");
+        long int vertexIdxFrom =
+          igraph_vector_int_get(dihedral_involvements, 0);
+        long int vertexIdxVia1 =
+          igraph_vector_int_get(dihedral_involvements, 1);
+        long int vertexIdxVia2 =
+          igraph_vector_int_get(dihedral_involvements, 2);
+        long int vertexIdxTo = igraph_vector_int_get(dihedral_involvements, 3);
+        RUNTIME_EXP_IFN(
+          vertexIdxFrom == vertexIdx || vertexIdxTo == vertexIdx,
+          "Expected the original vertex to be found in the neighbourhood.");
+        if (vertexIdxFrom < vertexIdxTo) {
+          std::swap(vertexIdxFrom, vertexIdxTo);
+          std::swap(vertexIdxVia1, vertexIdxVia2);
+        }
+        // r = 65536 (-> highest for which we don't get hash collisions or
+        // overflow) is not huge, but what we get.
+        // TODO: check the probability of hash collisions
+        unsigned long long angleKey =
+          this->hashVertexIndicesOrderRelevant<long int>(
+            65536, 4, vertexIdxFrom, vertexIdxVia1, vertexIdxVia2, vertexIdxTo);
+        if (!pylimer_tools::utils::map_has_key(anglesFound, angleKey)) {
+          int atomTypeFrom = this->getPropertyValue<int>("type", vertexIdxFrom);
+          int atomTypeVia1 = this->getPropertyValue<int>("type", vertexIdxVia1);
+          int atomTypeVia2 = this->getPropertyValue<int>("type", vertexIdxVia2);
+          int atomTypeTo = this->getPropertyValue<int>("type", vertexIdxTo);
+
+          angleFromFound.push_back(this->getAtomIdByIdx(vertexIdxFrom));
+          angleVia1Found.push_back(this->getAtomIdByIdx(vertexIdxVia1));
+          angleVia2Found.push_back(this->getAtomIdByIdx(vertexIdxVia2));
+          angleToFound.push_back(this->getAtomIdByIdx(vertexIdxTo));
+          angleTypeFound.push_back(this->hashDihedralAngleType(
+            atomTypeFrom, atomTypeVia1, atomTypeVia2, atomTypeTo));
+          anglesFound.insert(angleKey);
+        }
+      }
+      igraph_vector_int_list_destroy(&neighbors);
+    }
+    igraph_vit_destroy(&vit);
+
+    std::map<std::string, std::vector<long int>> results;
+    results.insert_or_assign("angle_from", angleFromFound);
+    results.insert_or_assign("angle_to", angleToFound);
+    results.insert_or_assign("angle_via1", angleVia1Found);
+    results.insert_or_assign("angle_via2", angleVia2Found);
+    results.insert_or_assign("angle_type", angleTypeFound);
 
     return results;
   }
@@ -1474,8 +1663,8 @@ namespace entities {
     // 3. if the walk reaches another crosslinker, we found a
     //    crosslinker-crosslinker connection.
     //    To reduce duplicates, we only take the ones where we started from a
-    //    crosslinker with a smaller (or equal, for self-/primary-loops) vertex
-    //    index
+    //    crosslinker with a smaller (or equal, for self-/primary-loops)
+    //    vertex index
     Universe newUniverse =
       Universe(this->box.getLx(), this->box.getLy(), this->box.getLz());
     std::vector<long int> bondFrom;
@@ -1520,8 +1709,8 @@ namespace entities {
     // with the algorithm above, self-loops are counted twice.
     // let's just remove the second (and/or fourth) one where needed
     // NOTE: some assumptions are made here that could be problematic;
-    // for example, that there are not more than 1 self-loops per cross-link in
-    // the beginning
+    // for example, that there are not more than 1 self-loops per cross-link
+    // in the beginning
     std::vector<size_t> indicesToRemove;
     std::map<int, int> nrOfSelfLoops;
     for (size_t i = 0; i < bondTo.size(); ++i) {
@@ -1577,6 +1766,19 @@ namespace entities {
     assert(this->angleFrom.size() == this->angleTo.size());
     assert(this->angleFrom.size() == this->angleVia.size());
     return this->angleFrom.size();
+  }
+
+  /**
+   * @brief Get the number of angles stored in this universe.
+   *
+   * @return const int
+   */
+  size_t Universe::getNrOfDihedralAngles() const
+  {
+    assert(this->dihedralAngleFrom.size() == this->dihedralAngleTo.size());
+    assert(this->dihedralAngleFrom.size() == this->dihedralAngleVia1.size());
+    assert(this->dihedralAngleFrom.size() == this->dihedralAngleVia2.size());
+    return this->dihedralAngleFrom.size();
   }
 
   /**
@@ -1790,7 +1992,8 @@ namespace entities {
   };
 
   /**
-   * @brief Compute the distance for all bonds passed in in a certain direction
+   * @brief Compute the distance for all bonds passed in in a certain
+   * direction
    *
    * @param bondFrom
    * @param bondTo
