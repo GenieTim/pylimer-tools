@@ -21,6 +21,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Universe
       ~Universe.addAngles
       ~Universe.addAtoms
       ~Universe.addBonds
+      ~Universe.addDihedralAngles
       ~Universe.computeBondLengths
       ~Universe.computeDxs
       ~Universe.computeDys
@@ -37,6 +38,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Universe
       ~Universe.countAtomTypes
       ~Universe.countAtomsInSkinDistance
       ~Universe.detectAngles
+      ~Universe.detectDihedralAngles
       ~Universe.determineEffectiveFunctionalityPerType
       ~Universe.determineFunctionalityPerType
       ~Universe.findLoops
@@ -68,6 +70,8 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Universe
       ~Universe.getTimestep
       ~Universe.getVolume
       ~Universe.hasInfiniteStrand
+      ~Universe.hashAngleType
+      ~Universe.hashDihedralAngleType
       ~Universe.removeAtoms
       ~Universe.removeBonds
       ~Universe.replaceAtom
