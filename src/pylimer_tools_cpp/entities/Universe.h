@@ -80,7 +80,13 @@ namespace entities {
     // others
     void addAngles(std::vector<long int> from,
                    std::vector<long int> via,
-                   std::vector<long int> to);
+                   std::vector<long int> to,
+                   std::vector<int> types);
+    void addDihedralAngles(std::vector<long int> from,
+                           std::vector<long int> via1,
+                           std::vector<long int> via2,
+                           std::vector<long int> to,
+                           std::vector<int> types);
     void setMasses(std::map<int, double> massPerType);
     void setBox(Box box, bool rescaleAtomCoordinates = false);
     void setTimestep(long int timestep) { this->timestep = timestep; };
@@ -92,6 +98,7 @@ namespace entities {
     std::vector<Atom> getAtoms() const;
     // std::map<std::st¨ring, std::vector<long int>> getBonds() const;
     std::map<std::string, std::vector<long int>> getAngles() const;
+    std::map<std::string, std::vector<long int>> getDihedralAngles() const;
     std::vector<Universe> getClusters() const;
     std::vector<Molecule> getMolecules(const int atomTypeToOmit = -1) const;
     std::vector<Molecule> getChainsWithCrosslinker(
@@ -129,6 +136,7 @@ namespace entities {
     size_t getNrOfAtoms() const;
     size_t getNrOfBonds() const;
     size_t getNrOfAngles() const;
+    size_t getNrOfDihedralAngles() const;
     std::map<int, double> getMasses();
     long int getTimestep() { return this->timestep; };
     long int getAtomIdByIdx(const int vertexId) const;
@@ -139,6 +147,7 @@ namespace entities {
 
     // computations
     std::map<std::string, std::vector<long int>> detectAngles() const;
+    std::map<std::string, std::vector<long int>> detectDihedralAngles() const;
     std::map<int, int> determineFunctionalityPerType() const;
     std::map<int, double> determineEffectiveFunctionalityPerType() const;
     std::map<int, double> computeWeightFractions() const;
@@ -185,9 +194,18 @@ namespace entities {
     // igraph_t graph;
     std::unordered_map<int, int> atomIdToVertexIdx;
     // extra info
+    // TODO: might want to move the angle business to the parent?!?
+    // angles (NOTE: only atom-ids, not vertex-idxs are used!)
     std::vector<long int> angleFrom;
     std::vector<long int> angleTo;
     std::vector<long int> angleVia;
+    std::vector<int> angleType;
+    // dihedral angles (NOTE: only atom-ids, not vertex-idxs are used!)
+    std::vector<long int> dihedralAngleFrom;
+    std::vector<long int> dihedralAngleVia1;
+    std::vector<long int> dihedralAngleVia2;
+    std::vector<long int> dihedralAngleTo;
+    std::vector<int> dihedralAngleType;
 
     // type's properties
     std::map<int, double>

@@ -35,6 +35,10 @@ namespace utils {
     {
       this->includeAngles = includeAngles;
     }
+    void configIncludeDihedralAngles(const bool includeDihedralAngles)
+    {
+      this->includeDihedralAngles = includeDihedralAngles;
+    }
     void configMoveIntoBox(const bool doMoveIntoBox = true)
     {
       this->moveIntoBox = doMoveIntoBox;
@@ -67,6 +71,28 @@ namespace utils {
       int uniqueAtomTypes = std::max(this->universe.countAtomTypes().size(),
                                      this->universe.getMasses().size());
 
+      std::map<std::string, std::vector<long int>> bonds =
+        this->universe.getBonds();
+      std::map<std::string, std::vector<long int>> angles =
+        this->universe.getAngles();
+      std::map<std::string, std::vector<long int>> dihedral_angles =
+        this->universe.getDihedralAngles();
+
+      int nrOfAngleTypes = this->includeAngles
+                             ? *std::max_element(angles["angle_type"].begin(),
+                                                 angles["angle_type"].end())
+                             : 0;
+      int nrOfDihedralAngleTypes =
+        this->includeDihedralAngles
+          ? *std::max_element(dihedral_angles["dihedral_angle_type"].begin(),
+                              dihedral_angles["dihedral_angle_type"].end())
+          : 0;
+      int nrOfBondTypes =
+        *std::max_element(bonds["bond_type"].begin(), bonds["bond_type"].end());
+      if (nrOfBondTypes < 1) {
+        nrOfBondTypes = 1;
+      }
+
       file.open(filePath);
       file << std::setprecision(std::numeric_limits<double>::digits10 + 1);
 
@@ -78,13 +104,17 @@ namespace utils {
       file << "\t "
            << (this->includeAngles ? this->universe.getNrOfAngles() : 0)
            << " angles\n";
-      file << "\t " << 0 << " dihedrals\n";
+      file << "\t "
+           << (this->includeDihedralAngles
+                 ? this->universe.getNrOfDihedralAngles()
+                 : 0)
+           << " dihedrals\n";
       file << "\t " << 0 << " impropers\n";
       file << "\n";
       file << "\t " << uniqueAtomTypes << " atom types\n";
-      file << "\t " << 1 << " bond types\n"; // TODO: fix bond types overall
-      file << "\t " << (this->includeAngles ? 1 : 0) << " angle types\n";
-      file << "\t " << 0 << " dihedral types\n";
+      file << "\t " << nrOfBondTypes << " bond types\n";
+      file << "\t " << nrOfAngleTypes << " angle types\n";
+      file << "\t " << nrOfDihedralAngleTypes << " dihedral types\n";
       file << "\t " << 0 << " improper types\n";
       file << "\n";
       file << "\t " << this->universe.getBox().getLowX() << " "
@@ -108,8 +138,6 @@ namespace utils {
 
       // write bonds
       file << "Bonds\n\n";
-      std::map<std::string, std::vector<long int>> bonds =
-        this->universe.getBonds();
       for (size_t i = 0; i < this->universe.getNrOfBonds(); ++i) {
         long int bondType = bonds.at("bond_type")[i];
         if (bondType == -1) {
@@ -124,14 +152,25 @@ namespace utils {
       // write angles
       if (this->includeAngles && this->universe.getNrOfAngles() > 0) {
         file << "Angles\n\n";
-        std::map<std::string, std::vector<long int>> angles =
-          this->universe.getAngles();
         for (size_t i = 0; i < this->universe.getNrOfAngles(); ++i) {
-          int angleType = 1; // TODO: support angle types?
-          file << "\t" << i << "\t" << angleType << "\t"
+          file << "\t" << i << "\t" << angles["angle_type"][i] << "\t"
                << (this->oldNewAtomIdMap[angles["angle_from"][i]]) << "\t"
                << (this->oldNewAtomIdMap[angles["angle_via"][i]]) << "\t"
                << (this->oldNewAtomIdMap[angles["angle_to"][i]]) << "\n";
+        }
+        file << "\n";
+      }
+
+      // write dihedarl angles
+      if (this->includeDihedralAngles &&
+          this->universe.getNrOfDihedralAngles() > 0) {
+            file << "Dihedrals\n\n";
+        for (size_t i = 0; i < this->universe.getNrOfDihedralAngles(); ++i) {
+          file << "\t" << i << "\t" << dihedral_angles["dihedral_angle_type"][i] << "\t"
+               << (this->oldNewAtomIdMap[dihedral_angles["dihedral_angle_from"][i]]) << "\t"
+               << (this->oldNewAtomIdMap[dihedral_angles["dihedral_angle_via1"][i]]) << "\t"
+               << (this->oldNewAtomIdMap[dihedral_angles["dihedral_angle_via2"][i]]) << "\t"
+               << (this->oldNewAtomIdMap[dihedral_angles["dihedral_angle_to"][i]]) << "\n";
         }
         file << "\n";
       }
@@ -144,6 +183,7 @@ namespace utils {
     pylimer_tools::entities::Universe universe;
     std::unordered_map<long int, int> oldNewAtomIdMap;
     bool includeAngles = true;
+    bool includeDihedralAngles = true;
     bool moleculeIdxSwappable = false;
     int crosslinkerType = 2;
     bool reindexAtoms = false;
@@ -194,36 +234,24 @@ namespace utils {
       long int atomId = this->reindexAtoms ? nAtomsOutput : atom.getId();
       const pylimer_tools::entities::Box box = this->universe.getBox();
       this->oldNewAtomIdMap[atom.getId()] = atomId;
-      int nx =
-        this->attemptImageReset
-          ? this->getImageFlagForCoordinate(atom.getUnwrappedX(&box),
-                                            box.getLowX(),
-                                            box.getHighX())
-          : atom.getNX();
-      int ny =
-        this->attemptImageReset
-          ? this->getImageFlagForCoordinate(atom.getUnwrappedY(&box),
-                                            box.getLowY(),
-                                            box.getHighY())
-          : atom.getNY();
-      int nz =
-        this->attemptImageReset
-          ? this->getImageFlagForCoordinate(atom.getUnwrappedZ(&box),
-                                            box.getLowZ(),
-                                            box.getHighZ())
-          : atom.getNZ();
+      int nx = this->attemptImageReset
+                 ? this->getImageFlagForCoordinate(
+                     atom.getUnwrappedX(&box), box.getLowX(), box.getHighX())
+                 : atom.getNX();
+      int ny = this->attemptImageReset
+                 ? this->getImageFlagForCoordinate(
+                     atom.getUnwrappedY(&box), box.getLowY(), box.getHighY())
+                 : atom.getNY();
+      int nz = this->attemptImageReset
+                 ? this->getImageFlagForCoordinate(
+                     atom.getUnwrappedZ(&box), box.getLowZ(), box.getHighZ())
+                 : atom.getNZ();
       double x = this->conditionallyMoveCoordinateIntoBox(
-        atom.getUnwrappedX(&box),
-        box.getLowX(),
-        box.getHighX());
+        atom.getUnwrappedX(&box), box.getLowX(), box.getHighX());
       double y = this->conditionallyMoveCoordinateIntoBox(
-        atom.getUnwrappedY(&box),
-        box.getLowY(),
-        box.getHighY());
+        atom.getUnwrappedY(&box), box.getLowY(), box.getHighY());
       double z = this->conditionallyMoveCoordinateIntoBox(
-        atom.getUnwrappedZ(&box),
-        box.getLowZ(),
-        box.getHighZ());
+        atom.getUnwrappedZ(&box), box.getLowZ(), box.getHighZ());
       if (this->customAtomFormat.size() < 2) {
         file << "\t" << atomId << "\t" << moleculeIdx << "\t" << atom.getType()
              << "\t" << x << "\t" << y << "\t" << z << "\t" << nx << "\t" << ny

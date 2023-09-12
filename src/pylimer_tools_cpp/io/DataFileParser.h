@@ -80,6 +80,27 @@ namespace utils {
     std::vector<long int> getAngleVia() { return this->angleVia; }
     std::vector<long int> getAngleTo() { return this->angleTo; }
 
+    // access dihedral angle data
+    int getNrOfDihedralAngles() { return this->nDihedralAngles; }
+    int getNrOfDihedralAngleTypes() { return this->nDihedralAngleTypes; }
+    std::vector<int> getDihedralAngleTypes()
+    {
+      return this->dihedralAngleTypes;
+    }
+    std::vector<long int> getDihedralAngleFrom()
+    {
+      return this->dihedralAngleFrom;
+    }
+    std::vector<long int> getDihedralAngleVia1()
+    {
+      return this->dihedralAngleVia1;
+    }
+    std::vector<long int> getDihedralAngleVia2()
+    {
+      return this->dihedralAngleVia2;
+    }
+    std::vector<long int> getDihedralAngleTo() { return this->dihedralAngleTo; }
+
     // get box info
     double getLowX() { return this->xLo; }
     double getHighX() { return this->xHi; }
@@ -98,6 +119,7 @@ namespace utils {
     void readAtomHybrid(std::string line, AtomStyle style1, AtomStyle style2);
     void readBond(std::string line);
     void readAngle(std::string line);
+    void readDihedralAngle(std::string line);
     static void skipEmptyLines(std::string& line, std::ifstream& file);
     static void skipLinesToContains(std::string& line,
                                     std::ifstream& file,
@@ -124,6 +146,8 @@ namespace utils {
     int nAtomTypes;
     int nBondTypes;
     int nAngleTypes;
+    int nDihedralAngles;
+    int nDihedralAngleTypes;
 
     // box sizes
     double xLo;
@@ -145,16 +169,27 @@ namespace utils {
     std::vector<int> atomNx;
     std::vector<int> atomNy;
     std::vector<int> atomNz;
+
+    // bonds
     std::vector<long int> bondIds;
     std::vector<int> bondTypes;
     std::vector<long int> bondFrom;
     std::vector<long int> bondTo;
 
+    // angles
     std::vector<long int> angleIds;
     std::vector<int> angleTypes;
     std::vector<long int> angleFrom;
     std::vector<long int> angleVia;
     std::vector<long int> angleTo;
+
+    // dihedrals
+    std::vector<long int> dihedralAngleIds;
+    std::vector<int> dihedralAngleTypes;
+    std::vector<long int> dihedralAngleFrom;
+    std::vector<long int> dihedralAngleVia1;
+    std::vector<long int> dihedralAngleVia2;
+    std::vector<long int> dihedralAngleTo;
   };
 } // namespace utils
 } // namespace pylimer_tools

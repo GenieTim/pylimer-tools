@@ -493,6 +493,33 @@ init_pylimer_bound_entities(py::module_& m)
          "just a method to preserve read & write capabilities",
          py::arg("from"),
          py::arg("via"),
+         py::arg("to"),
+         py::arg("types"))
+    .def("addDihedralAngles",
+         &Universe::addDihedralAngles,
+         "Add dihedral angles to the Universe. No relation to the underlying graph, "
+         "just a method to preserve read & write capabilities",
+         py::arg("from"),
+         py::arg("via1"),
+         py::arg("via2"),
+         py::arg("to"),
+         py::arg("types"))
+    .def("hashAngleType",
+         &Universe::hashAngleType,
+         R"pbdoc(
+          Convert the three integers 
+     )pbdoc",
+         py::arg("from"),
+         py::arg("via"),
+         py::arg("to"))
+    .def("hashDihedralAngleType",
+         &Universe::hashDihedralAngleType,
+         R"pbdoc(
+          Convert the four integers 
+     )pbdoc",
+         py::arg("from"),
+         py::arg("via1"),
+         py::arg("via2"),
          py::arg("to"))
     .def("setMasses",
          &Universe::setMasses,
@@ -697,11 +724,24 @@ init_pylimer_bound_entities(py::module_& m)
          "respecting periodic boundaries.")
     .def("detectAngles",
          &Universe::detectAngles,
-         "Returns just as "
-         ":func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getAngles`, "
-         "but "
-         "all angles that are found in the "
-         "network.")
+         R"pbdoc(Returns just as 
+          :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getAngles`, 
+          but all angles that are detected in the network, rather than the one already set.
+          Note that the angle types are determined by 
+          :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.hashAngleType`,
+          which serves angle types that should be mapped by you back to smaller numbers, 
+          before serving them to :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.addAngles`.
+         )pbdoc")
+    .def("detectDihedralAngles",
+         &Universe::detectDihedralAngles,
+         R"pbdoc(Returns just as 
+          :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getDihedralAngles`, 
+          but all dihedral angles that are detected in the network, rather than the one already set.
+          Note that the angle types are determined by 
+          :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.hashDihedralAngleType`,
+          which serves angle types that should be mapped by you back to smaller numbers, 
+          before serving them to :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.addDiheralAngles`.
+         )pbdoc")
     .def("hasInfiniteStrand",
          &Universe::hasInfiniteStrand,
          R"pbdoc(
@@ -873,9 +913,12 @@ init_pylimer_bound_entities(py::module_& m)
          "Reset and initialize the Universes from an ordered list of Lammps "
          "data (:code:`write_data`) files.",
          py::arg("data_files"))
-     .def("setDataFileAtomStyle", &UniverseSequence::setDataFileAtomStyle, R"pbdoc(
+    .def("setDataFileAtomStyle",
+         &UniverseSequence::setDataFileAtomStyle,
+         R"pbdoc(
           Set the format of the data files to be read. See :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle`.
-     )pbdoc", py::arg("atom_styles"))
+     )pbdoc",
+         py::arg("atom_styles"))
     .def("next",
          &UniverseSequence::next,
          R"pbdoc(Get the Universe that's next in the sequence.)pbdoc")
@@ -914,7 +957,7 @@ init_pylimer_bound_entities(py::module_& m)
          R"pbdoc(
           Compute the mean square displacement for atoms with the specified ids
      )pbdoc",
-         py::arg("atom_ids"), 
+         py::arg("atom_ids"),
          py::arg("nr_of_origins") = 25,
          py::arg("reduce_memory") = false)
     // operators

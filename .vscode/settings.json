@@ -133,5 +133,6 @@
     "cfenv": "cpp",
     "__verbose_abort": "cpp",
     "globals.h": "c"
-  }
+  },
+  "C_Cpp.clang_format_path": "/usr/local/opt/llvm/bin/clang-format"
 }
