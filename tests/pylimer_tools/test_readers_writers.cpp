@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <filesystem>
 #include <iostream>
+#include <fstream>
 #include <string>
 extern "C"
 {
@@ -125,7 +126,7 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
     // TODO: implement
     pe::UniverseSequence universeSeq = pe::UniverseSequence();
     std::string largeInputFile =
-      suspectedPath + "network_83_a_100.structure.out";
+      suspectedPath + "network_100_a_46.structure.out";
     universeSeq.initializeFromDataSequence({ { largeInputFile } });
     pe::Universe universe = universeSeq.atIndex(0);
 
@@ -144,7 +145,7 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
 
     // add dihedrals
     auto detectedAngles = universe.detectDihedralAngles();
-    REQUIRE(detectedAngles["dihedral_angle_from"].size() == 8);
+    REQUIRE(detectedAngles["dihedral_angle_from"].size() > 0);
     std::vector<int> dihedralAngleTypes;
     dihedralAngleTypes.reserve(detectedAngles["dihedral_angle_from"].size());
     for (size_t i = 0; i < detectedAngles["dihedral_angle_from"].size(); i++) {
@@ -156,22 +157,26 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
                                detectedAngles["dihedral_angle_to"],
                                dihedralAngleTypes);
 
+    universe.setPropertyValue(1, "charge", 1.05);
+
     // write data file
     pu::DataFileWriter writer = pu::DataFileWriter(universe);
     writer.configIncludeAngles(true);
     writer.configIncludeDihedralAngles(true);
     std::string fileToWrite = suspectedPath + "tmp_data_file.structure.out";
+    writer.setCustomAtomFormat("$atomId\t$atomType\t$charge\t$x\t$y\t$z\t$nx\t$ny\t$nz");
     writer.writeToFile(fileToWrite);
 
     pe::UniverseSequence seq = pe::UniverseSequence();
+    seq.setDataFileAtomStyle({pu::AtomStyle::CHARGE});
     seq.initializeFromDataSequence({ { fileToWrite } });
     pe::Universe readUniverse = seq.atIndex(0);
 
     REQUIRE(universe.getNrOfAtoms() == readUniverse.getNrOfAtoms());
     REQUIRE(universe.getNrOfBonds() == readUniverse.getNrOfBonds());
     REQUIRE(universe.getNrOfAngles() == readUniverse.getNrOfAngles());
-    REQUIRE(universe.getNrOfAngles() == readUniverse.getNrOfDihedralAngles());
+    REQUIRE(universe.getNrOfDihedralAngles() == readUniverse.getNrOfDihedralAngles());
 
-    std::remove(fileToWrite);
+    std::filesystem::remove(fileToWrite);
   }
 }

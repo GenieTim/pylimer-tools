@@ -79,9 +79,19 @@ namespace entities {
     this->timestep = src.timestep;
     this->NAtoms = src.NAtoms;
     this->NBonds = src.NBonds;
+    // angles
     this->angleFrom = src.angleFrom;
-    this->angleTo = src.angleTo;
     this->angleVia = src.angleVia;
+    this->angleTo = src.angleTo;
+    this->angleType = src.angleType;
+
+    // dihedral angles
+    this->dihedralAngleFrom = src.dihedralAngleFrom;
+    this->dihedralAngleVia1 = src.dihedralAngleVia1;
+    this->dihedralAngleVia2 = src.dihedralAngleVia2;
+    this->dihedralAngleTo = src.dihedralAngleTo;
+    this->dihedralAngleType = src.dihedralAngleType;
+
     // using copy assignement operators ourselfes
     this->box = src.box;
     this->atomIdToVertexIdx = src.atomIdToVertexIdx;
@@ -95,9 +105,21 @@ namespace entities {
     std::swap(this->timestep, src.timestep);
     std::swap(this->NAtoms, src.NAtoms);
     std::swap(this->NBonds, src.NBonds);
+
+    // angles
     std::swap(this->angleFrom, src.angleFrom);
-    std::swap(this->angleTo, src.angleTo);
     std::swap(this->angleVia, src.angleVia);
+    std::swap(this->angleTo, src.angleTo);
+    std::swap(this->angleType, src.angleType);
+
+    // dihedrals
+    std::swap(this->dihedralAngleFrom, src.dihedralAngleFrom);
+    std::swap(this->dihedralAngleVia1, src.dihedralAngleVia1);
+    std::swap(this->dihedralAngleVia2, src.dihedralAngleVia2);
+    std::swap(this->dihedralAngleTo, src.dihedralAngleTo);
+    std::swap(this->dihedralAngleType, src.dihedralAngleType);
+
+    //
     std::swap(this->box, src.box);
     std::swap(this->graph, src.graph);
     std::swap(this->atomIdToVertexIdx, src.atomIdToVertexIdx);
@@ -451,9 +473,15 @@ namespace entities {
     this->angleVia.insert(
       std::end(this->angleVia), std::begin(via), std::end(via));
     this->angleTo.insert(std::end(this->angleTo), std::begin(to), std::end(to));
-
     this->angleType.insert(
       std::end(this->angleType), std::begin(types), std::end(types));
+
+    RUNTIME_EXP_IFN(all_equal<size_t>(4,
+                                      this->angleFrom.size(),
+                                      this->angleTo.size(),
+                                      this->angleVia.size(),
+                                      this->angleType.size()),
+                    "Angles' state is inconsistent.");
   }
 
   /**
@@ -1488,6 +1516,12 @@ namespace entities {
    */
   std::map<std::string, std::vector<long int>> Universe::getAngles() const
   {
+    RUNTIME_EXP_IFN(all_equal<size_t>(4,
+                                      this->angleFrom.size(),
+                                      this->angleTo.size(),
+                                      this->angleVia.size(),
+                                      this->angleType.size()),
+                    "Angles' state is inconsistent.");
     std::map<std::string, std::vector<long int>> results;
     results.insert_or_assign("angle_from", this->angleFrom);
     results.insert_or_assign("angle_to", this->angleTo);
@@ -1507,6 +1541,13 @@ namespace entities {
   std::map<std::string, std::vector<long int>> Universe::getDihedralAngles()
     const
   {
+    RUNTIME_EXP_IFN(all_equal<size_t>(5,
+                                      this->dihedralAngleFrom.size(),
+                                      this->dihedralAngleTo.size(),
+                                      this->dihedralAngleVia1.size(),
+                                      this->dihedralAngleVia2.size(),
+                                      this->dihedralAngleType.size()),
+                    "Dihedral angles' state is inconsistent.");
     std::map<std::string, std::vector<long int>> results;
     results.insert_or_assign("dihedral_angle_from", this->dihedralAngleFrom);
     results.insert_or_assign("dihedral_angle_via1", this->dihedralAngleVia1);
@@ -1794,8 +1835,12 @@ namespace entities {
    */
   size_t Universe::getNrOfAngles() const
   {
-    assert(this->angleFrom.size() == this->angleTo.size());
-    assert(this->angleFrom.size() == this->angleVia.size());
+    RUNTIME_EXP_IFN(all_equal<size_t>(4,
+                                      this->angleFrom.size(),
+                                      this->angleTo.size(),
+                                      this->angleVia.size(),
+                                      this->angleType.size()),
+      "Invalid internal state: the angle info is not consistent");
     return this->angleFrom.size();
   }
 
@@ -1808,11 +1853,11 @@ namespace entities {
   {
     RUNTIME_EXP_IFN(
       all_equal<size_t>(5,
-                this->dihedralAngleFrom.size(),
-                this->dihedralAngleTo.size(),
-                this->dihedralAngleVia1.size(),
-                this->dihedralAngleVia2.size(), 
-                this->dihedralAngleType.size()),
+                        this->dihedralAngleFrom.size(),
+                        this->dihedralAngleTo.size(),
+                        this->dihedralAngleVia1.size(),
+                        this->dihedralAngleVia2.size(),
+                        this->dihedralAngleType.size()),
       "Invalid internal state: the dihedral info is not consistent");
     return this->dihedralAngleFrom.size();
   }
