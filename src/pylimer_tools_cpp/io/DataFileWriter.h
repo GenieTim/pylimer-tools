@@ -50,6 +50,24 @@ namespace utils {
     void setCustomAtomFormat(const std::string atomFormat)
     {
       this->customAtomFormat = atomFormat;
+      this->customAtomFormatAdditionalProperties.clear();
+      // find custom properties
+      std::regex property_regex("(\\$[a-zA-Z]+)");
+      auto words_begin = std::sregex_iterator(
+        atomFormat.begin(), atomFormat.end(), property_regex);
+      auto words_end = std::sregex_iterator();
+      for (std::sregex_iterator i = words_begin; i != words_end; ++i) {
+        std::smatch match = *i;
+        std::string match_str = match.str();
+        match_str.erase(std::remove(match_str.begin(), match_str.end(), '$'),
+                   match_str.end());
+        if (match_str != "atomId" && match_str != "moleculeId" &&
+            match_str != "atomType" && match_str != "nx" && match_str != "ny" &&
+            match_str != "nz" && match_str != "x" && match_str != "y" &&
+            match_str != "z") {
+          this->customAtomFormatAdditionalProperties.push_back(match_str);
+        }
+      }
     }
     void configMoleculeIdxForSwap(const bool includeSwap)
     {
@@ -164,13 +182,22 @@ namespace utils {
       // write dihedarl angles
       if (this->includeDihedralAngles &&
           this->universe.getNrOfDihedralAngles() > 0) {
-            file << "Dihedrals\n\n";
+        file << "Dihedrals\n\n";
         for (size_t i = 0; i < this->universe.getNrOfDihedralAngles(); ++i) {
-          file << "\t" << i << "\t" << dihedral_angles["dihedral_angle_type"][i] << "\t"
-               << (this->oldNewAtomIdMap[dihedral_angles["dihedral_angle_from"][i]]) << "\t"
-               << (this->oldNewAtomIdMap[dihedral_angles["dihedral_angle_via1"][i]]) << "\t"
-               << (this->oldNewAtomIdMap[dihedral_angles["dihedral_angle_via2"][i]]) << "\t"
-               << (this->oldNewAtomIdMap[dihedral_angles["dihedral_angle_to"][i]]) << "\n";
+          file
+            << "\t" << i << "\t" << dihedral_angles["dihedral_angle_type"][i]
+            << "\t"
+            << (this
+                  ->oldNewAtomIdMap[dihedral_angles["dihedral_angle_from"][i]])
+            << "\t"
+            << (this
+                  ->oldNewAtomIdMap[dihedral_angles["dihedral_angle_via1"][i]])
+            << "\t"
+            << (this
+                  ->oldNewAtomIdMap[dihedral_angles["dihedral_angle_via2"][i]])
+            << "\t"
+            << (this->oldNewAtomIdMap[dihedral_angles["dihedral_angle_to"][i]])
+            << "\n";
         }
         file << "\n";
       }
@@ -190,6 +217,7 @@ namespace utils {
     bool moveIntoBox = false;
     bool attemptImageReset = false;
     std::string customAtomFormat = "";
+    std::vector<std::string> customAtomFormatAdditionalProperties;
     // functions
     // TODO: move the following to the box
     int getImageFlagForCoordinate(double coord,
@@ -276,6 +304,16 @@ namespace utils {
           std::regex_replace(outputStr, std::regex("\\$y"), std::to_string(y));
         outputStr =
           std::regex_replace(outputStr, std::regex("\\$z"), std::to_string(z));
+        for (std::string additionalProperty :
+             this->customAtomFormatAdditionalProperties) {
+          outputStr = std::regex_replace(
+            outputStr,
+            std::regex("\\$" + additionalProperty),
+            std::to_string(this->universe.getPropertyValue<double>(
+              additionalProperty.c_str(),
+              this->universe.getIdxByAtomId(atom.getId()))));
+        }
+
         file << outputStr << "\n";
       }
     }

@@ -64,7 +64,7 @@ TEST_CASE("Manually accurate NeighbourList", "[entity][NeighbourList]")
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
   const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
   universe.setBox(box);
-  universe.addAtoms(8,
+  universe.addAtoms(
                     { { 1, 2, 3, 4, 5, 6, 7, 8 } },     // id
                     { { 2, 1, 1, 1, 2, 1, 1, 1 } },     // type
                     { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // x
@@ -151,7 +151,7 @@ TEST_CASE("Manually accurate EigenNeighbourList",
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
   const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
   universe.setBox(box);
-  universe.addAtoms(8,
+  universe.addAtoms(
                     { { 1, 2, 3, 4, 5, 6, 7, 8 } },     // id
                     { { 2, 1, 1, 1, 2, 1, 1, 1 } },     // type
                     { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // x

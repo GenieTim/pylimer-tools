@@ -109,6 +109,8 @@ namespace utils {
         case AtomStyle::HYBRID:
           this->readAtomHybrid(line, atomStyle2, atomStyle3);
           break;
+        case AtomStyle::CHARGE:
+          this->readAtomCharge(line);
         default:
           throw std::invalid_argument("This atom style is not supported yet.");
           break;
@@ -254,6 +256,39 @@ namespace utils {
     key = tokenizer.get<int>(0);
     // for now, we just override duplicate keys
     this->masses[key] = tokenizer.get<double>(1);
+  }
+
+  void DataFileParser::readAtomCharge(std::string line)
+  {
+    size_t atomId, nx, ny, nz;
+    int atomType, moleculeId;
+    double charge;
+    double x, y, z;
+    int resFound = sscanf(line.c_str(),
+                          "%zd %d %le %le %le %le %zd %zd %zd",
+                          &atomId,
+                          &atomType,
+                          &charge,
+                          &x,
+                          &y,
+                          &z,
+                          &nx,
+                          &ny,
+                          &nz);
+
+    this->atomIds.push_back(atomId);
+    this->moleculeIds.push_back(moleculeId);
+    this->atomTypes.push_back(atomType);
+    this->atomX.push_back(x);
+    this->atomY.push_back(y);
+    this->atomZ.push_back(z);
+    this->additionalAtomData["charge"].push_back(charge);
+
+    if (resFound > 6) {
+      this->atomNx.push_back(nx);
+      this->atomNy.push_back(ny);
+      this->atomNz.push_back(nz);
+    }
   }
 
   void DataFileParser::readAtom(std::string line)

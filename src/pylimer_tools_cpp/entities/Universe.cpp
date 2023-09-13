@@ -143,25 +143,41 @@ namespace entities {
                           std::vector<int> newNy,
                           std::vector<int> newNz)
   {
+    std::unordered_map<std::string, std::vector<double>> additionalData;
     this->addAtoms(
-      newIds.size(), newIds, newTypes, newX, newY, newZ, newNx, newNy, newNz);
+      newIds, newTypes, newX, newY, newZ, newNx, newNy, newNz, additionalData);
   }
 
-  void Universe::addAtoms(const size_t NNewAtoms,
-                          std::vector<long int> newIds,
-                          std::vector<int> newTypes,
-                          std::vector<double> newX,
-                          std::vector<double> newY,
-                          std::vector<double> newZ,
-                          std::vector<int> newNx,
-                          std::vector<int> newNy,
-                          std::vector<int> newNz)
+  void Universe::addAtoms(
+    std::vector<long int> newIds,
+    std::vector<int> newTypes,
+    std::vector<double> newX,
+    std::vector<double> newY,
+    std::vector<double> newZ,
+    std::vector<int> newNx,
+    std::vector<int> newNy,
+    std::vector<int> newNz,
+    std::unordered_map<std::string, std::vector<double>> additionalData)
   {
-    if (newTypes.size() != NNewAtoms || newIds.size() != newTypes.size() ||
-        newX.size() != newNx.size() || newY.size() != newNy.size() ||
-        newZ.size() != newNz.size() || newX.size() != newY.size() ||
-        NNewAtoms != newZ.size()) {
-      throw std::invalid_argument("All atom inputs must have the same size.");
+    size_t NNewAtoms = newNy.size();
+    INVALIDARG_EXP_IFN(all_equal<size_t>(8,
+                                         newTypes.size(),
+                                         newIds.size(),
+                                         newX.size(),
+                                         newNx.size(),
+                                         newY.size(),
+                                         newNy.size(),
+                                         newZ.size(),
+                                         newNz.size()),
+                       "All atom inputs must have the same size.");
+
+    if (!additionalData.empty()) {
+      for (const auto& [key, value] : additionalData) {
+        INVALIDARG_EXP_IFN(NNewAtoms == value.size(),
+                           "Key " + key +
+                             " in additional atom data has not the same length "
+                             "as the other atom properties.");
+      }
     }
     // actually add the vertices
     if (igraph_add_vertices(&this->graph, NNewAtoms, 0)) {
@@ -204,6 +220,12 @@ namespace entities {
       igraph_cattribute_VAN_setv(&this->graph, "ny", &valueVec);
       pylimer_tools::utils::StdVectorToIgraphVectorT(newNz, &valueVec);
       igraph_cattribute_VAN_setv(&this->graph, "nz", &valueVec);
+      if (!additionalData.empty()) {
+        for (const auto& [key, value] : additionalData) {
+          pylimer_tools::utils::StdVectorToIgraphVectorT(value, &valueVec);
+          igraph_cattribute_VAN_setv(&this->graph, key.c_str(), &valueVec);
+        }
+      }
       igraph_vector_destroy(&valueVec);
     } else {
       for (size_t i = 0; i < NNewAtoms; ++i) {
@@ -220,6 +242,12 @@ namespace entities {
           &this->graph, "ny", this->NAtoms + i, newNy[i]);
         igraph_cattribute_VAN_set(
           &this->graph, "nz", this->NAtoms + i, newNz[i]);
+        if (!additionalData.empty()) {
+          for (const auto& [key, value] : additionalData) {
+            igraph_cattribute_VAN_set(
+              &this->graph, key.c_str(), this->NAtoms + i, value[i]);
+          }
+        }
       }
     }
     // this->NAtoms += NNewAtoms;
@@ -1499,7 +1527,6 @@ namespace entities {
    */
   std::map<std::string, std::vector<long int>> Universe::detectAngles() const
   {
-    std::set<unsigned long long> anglesFound;
     std::vector<long int> angleFromFound;
     std::vector<long int> angleToFound;
     std::vector<long int> angleViaFound;
@@ -1523,30 +1550,19 @@ namespace entities {
         for (size_t connectionJ = connectionI + 1;
              connectionJ < connections.size();
              ++connectionJ) {
-          // r = 2642240 is not huge, but what we get.
-          // TODO: check the probability of hash collisions
-          unsigned long long angleKey =
-            this->hashVertexIndicesOrderRelevant<long int>(
-              2642240,
-              3,
-              std::max(connections[connectionI], connections[connectionJ]),
-              vertexIdx,
-              std::min(connections[connectionI], connections[connectionJ]));
-          if (!pylimer_tools::utils::map_has_key(anglesFound, angleKey)) {
-            int atomTypeFrom =
-              this->getPropertyValue<int>("type", connections[connectionI]);
-            int atomTypeVia = this->getPropertyValue<int>("type", vertexIdx);
-            int atomTypeTo =
-              this->getPropertyValue<int>("type", connections[connectionJ]);
-            angleFromFound.push_back(
-              this->getAtomIdByIdx(connections[connectionI]));
-            angleViaFound.push_back(this->getAtomIdByIdx(vertexIdx));
-            angleToFound.push_back(
-              this->getAtomIdByIdx(connections[connectionJ]));
-            angleTypeFound.push_back(
-              this->hashAngleType(atomTypeFrom, atomTypeVia, atomTypeTo));
-            anglesFound.insert(angleKey);
-          }
+          // TODO: check again that we do not get duplicates this way
+          int atomTypeFrom =
+            this->getPropertyValue<int>("type", connections[connectionI]);
+          int atomTypeVia = this->getPropertyValue<int>("type", vertexIdx);
+          int atomTypeTo =
+            this->getPropertyValue<int>("type", connections[connectionJ]);
+          angleFromFound.push_back(
+            this->getAtomIdByIdx(connections[connectionI]));
+          angleViaFound.push_back(this->getAtomIdByIdx(vertexIdx));
+          angleToFound.push_back(
+            this->getAtomIdByIdx(connections[connectionJ]));
+          angleTypeFound.push_back(
+            this->hashAngleType(atomTypeFrom, atomTypeVia, atomTypeTo));
         }
       }
       IGRAPH_VIT_NEXT(vit);
@@ -1563,14 +1579,13 @@ namespace entities {
   }
 
   /**
-   * @brief Find all dihedralangles that appear in this universe
+   * @brief Find all dihedral angles that appear in this universe
    *
    * @return std::map<std::string, std::vector<long int>>
    */
   std::map<std::string, std::vector<long int>> Universe::detectDihedralAngles()
     const
   {
-    std::set<unsigned long long> anglesFound;
     std::vector<long int> angleFromFound;
     std::vector<long int> angleVia1Found;
     std::vector<long int> angleVia2Found;
@@ -1582,66 +1597,83 @@ namespace entities {
     while (!IGRAPH_VIT_END(vit)) {
       const long int vertexIdx = static_cast<long int>(IGRAPH_VIT_GET(vit));
       // find the connected atoms
-      igraph_vector_int_list_t neighbors;
-      igraph_vector_int_list_init(&neighbors, 0);
-      igraph_neighborhood(
-        &this->graph, &neighbors, igraph_vss_1(vertexIdx), 3, IGRAPH_ALL, 0);
-      // loop the connections to find angles
-      for (size_t neighborI = 0;
-           neighborI < igraph_vector_int_list_size(&neighbors);
-           neighborI++) {
-        igraph_vector_int_t* dihedral_involvements =
-          igraph_vector_int_list_get_ptr(&neighbors, neighborI);
-        RUNTIME_EXP_IFN(
-          igraph_vector_int_size(dihedral_involvements) == 4,
-          "Expected 4 neighbors, got " +
-            std::to_string(igraph_vector_int_size(dihedral_involvements)) +
-            " when detecting dihedrals.");
-        long int vertexIdxFrom =
-          igraph_vector_int_get(dihedral_involvements, 0);
-        long int vertexIdxVia1 =
-          igraph_vector_int_get(dihedral_involvements, 1);
-        long int vertexIdxVia2 =
-          igraph_vector_int_get(dihedral_involvements, 2);
-        long int vertexIdxTo = igraph_vector_int_get(dihedral_involvements, 3);
+      igraph_vector_int_t dihedral_paths_v;
+      igraph_vector_int_init(&dihedral_paths_v, 4);
+      igraph_get_all_simple_paths(&this->graph,
+                                  &dihedral_paths_v,
+                                  vertexIdx,
+                                  igraph_vss_all(),
+                                  5,
+                                  IGRAPH_ALL);
+
+      std::vector<std::vector<int>> dihedral_sets;
+      // std::cout << "Found paths: " <<
+      // igraph_vector_int_size(&dihedral_paths_v)
+      //           << std::endl;
+      dihedral_sets.reserve(igraph_vector_int_size(&dihedral_paths_v) / 4);
+      std::vector<int> current_dihedral_path;
+      current_dihedral_path.reserve(4);
+      for (size_t i = 0; i < igraph_vector_int_size(&dihedral_paths_v); i++) {
+        const int current_vertex = igraph_vector_int_get(&dihedral_paths_v, i);
+        if (current_vertex == -1) {
+          if (current_dihedral_path.size() == 4) {
+            // std::cout << "Found dihedral path of length 4" << std::endl;
+            dihedral_sets.push_back(current_dihedral_path);
+          }
+          current_dihedral_path.clear();
+        } else {
+          current_dihedral_path.push_back(current_vertex);
+        }
+      }
+      if (current_dihedral_path.size() == 4) {
+        dihedral_sets.push_back(current_dihedral_path);
+      }
+
+      igraph_vector_int_destroy(&dihedral_paths_v);
+      
+      // std::cout << "Found dihedral paths: " << dihedral_sets.size() << std::endl;
+
+      for (std::vector<int> dihedral_path : dihedral_sets) {
+        RUNTIME_EXP_IFN(dihedral_path.size() == 4,
+                        "Expected 4 neighbors, got " +
+                          std::to_string(dihedral_path.size()) +
+                          " when detecting dihedrals.");
+        long int vertexIdxFrom = dihedral_path[0];
+        long int vertexIdxVia1 = dihedral_path[1];
+        long int vertexIdxVia2 = dihedral_path[2];
+        long int vertexIdxTo = dihedral_path[3];
         RUNTIME_EXP_IFN(
           vertexIdxFrom == vertexIdx || vertexIdxTo == vertexIdx,
           "Expected the original vertex to be found in the neighbourhood.");
         if (vertexIdxFrom < vertexIdxTo) {
-          std::swap(vertexIdxFrom, vertexIdxTo);
-          std::swap(vertexIdxVia1, vertexIdxVia2);
+          // we list every dihedral twice otherwise
+          continue;
+          // std::swap(vertexIdxFrom, vertexIdxTo);
+          // std::swap(vertexIdxVia1, vertexIdxVia2);
         }
-        // r = 65536 (-> highest for which we don't get hash collisions or
-        // overflow) is not huge, but what we get.
-        // TODO: check the probability of hash collisions
-        unsigned long long angleKey =
-          this->hashVertexIndicesOrderRelevant<long int>(
-            65536, 4, vertexIdxFrom, vertexIdxVia1, vertexIdxVia2, vertexIdxTo);
-        if (!pylimer_tools::utils::map_has_key(anglesFound, angleKey)) {
-          int atomTypeFrom = this->getPropertyValue<int>("type", vertexIdxFrom);
-          int atomTypeVia1 = this->getPropertyValue<int>("type", vertexIdxVia1);
-          int atomTypeVia2 = this->getPropertyValue<int>("type", vertexIdxVia2);
-          int atomTypeTo = this->getPropertyValue<int>("type", vertexIdxTo);
 
-          angleFromFound.push_back(this->getAtomIdByIdx(vertexIdxFrom));
-          angleVia1Found.push_back(this->getAtomIdByIdx(vertexIdxVia1));
-          angleVia2Found.push_back(this->getAtomIdByIdx(vertexIdxVia2));
-          angleToFound.push_back(this->getAtomIdByIdx(vertexIdxTo));
-          angleTypeFound.push_back(this->hashDihedralAngleType(
-            atomTypeFrom, atomTypeVia1, atomTypeVia2, atomTypeTo));
-          anglesFound.insert(angleKey);
-        }
+        int atomTypeFrom = this->getPropertyValue<int>("type", vertexIdxFrom);
+        int atomTypeVia1 = this->getPropertyValue<int>("type", vertexIdxVia1);
+        int atomTypeVia2 = this->getPropertyValue<int>("type", vertexIdxVia2);
+        int atomTypeTo = this->getPropertyValue<int>("type", vertexIdxTo);
+
+        angleFromFound.push_back(this->getAtomIdByIdx(vertexIdxFrom));
+        angleVia1Found.push_back(this->getAtomIdByIdx(vertexIdxVia1));
+        angleVia2Found.push_back(this->getAtomIdByIdx(vertexIdxVia2));
+        angleToFound.push_back(this->getAtomIdByIdx(vertexIdxTo));
+        angleTypeFound.push_back(this->hashDihedralAngleType(
+          atomTypeFrom, atomTypeVia1, atomTypeVia2, atomTypeTo));
       }
-      igraph_vector_int_list_destroy(&neighbors);
+      IGRAPH_VIT_NEXT(vit);
     }
     igraph_vit_destroy(&vit);
 
     std::map<std::string, std::vector<long int>> results;
-    results.insert_or_assign("angle_from", angleFromFound);
-    results.insert_or_assign("angle_to", angleToFound);
-    results.insert_or_assign("angle_via1", angleVia1Found);
-    results.insert_or_assign("angle_via2", angleVia2Found);
-    results.insert_or_assign("angle_type", angleTypeFound);
+    results.insert_or_assign("dihedral_angle_from", angleFromFound);
+    results.insert_or_assign("dihedral_angle_to", angleToFound);
+    results.insert_or_assign("dihedral_angle_via1", angleVia1Found);
+    results.insert_or_assign("dihedral_angle_via2", angleVia2Found);
+    results.insert_or_assign("dihedral_angle_type", angleTypeFound);
 
     return results;
   }
@@ -1736,8 +1768,7 @@ namespace entities {
     std::vector<int> zeros =
       pylimer_tools::utils::initializeWithValue(crosslinkers.size(), 0);
 
-    newUniverse.addAtoms(crosslinkers.size(),
-                         this->getPropertyValues<long int>("id", crosslinkers),
+    newUniverse.addAtoms(this->getPropertyValues<long int>("id", crosslinkers),
                          this->getPropertyValues<int>("type", crosslinkers),
                          this->getPropertyValues<double>("x", crosslinkers),
                          this->getPropertyValues<double>("y", crosslinkers),

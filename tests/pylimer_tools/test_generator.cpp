@@ -51,8 +51,13 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
   REQUIRE(universe.getVolume() == 10.0 * 10.0 * 10.0);
 
   auto angles = universe.detectAngles();
+  std::vector<int> angleTypes;
+  angleTypes.reserve(angles["angle_from"].size());
+  for (size_t i = 0; i < angles["angle_from"].size(); i++) {
+    angleTypes.push_back(1);
+  }
   universe.addAngles(
-    angles["angle_from"], angles["angle_via"], angles["angle_to"]);
+    angles["angle_from"], angles["angle_via"], angles["angle_to"], angleTypes);
   REQUIRE(universe.getNrOfAngles() > 0);
 
   SECTION("Nrs of chains is correct")

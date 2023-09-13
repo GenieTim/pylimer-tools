@@ -16,6 +16,8 @@ all_equal(int count, ...)
   for (int i = 1; i < count; ++i) {
     T next = va_arg(args, T);
     if (first != next) {
+      std::cout << "Discrepancy at i = " << i << ": " << first << " vs. "
+                << next << std::endl;
       result = false;
       break;
     }
