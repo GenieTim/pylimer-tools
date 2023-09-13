@@ -32,6 +32,14 @@ init_pylimer_bound_writers(py::module_& m)
            Default: true.
       )pbdoc",
          py::arg("includeAngles") = true)
+    .def("configIncludeDihedralAngles",
+         &DataFileWriter::configIncludeDihedralAngles,
+         R"pbdoc(
+           Set whether to include the dihedral angles from the universe in the file or not.
+
+           Default: true.
+      )pbdoc",
+         py::arg("includeDihedralAngles") = true)
     .def("configReindexAtoms",
          &DataFileWriter::configReindexAtoms,
          R"pbdoc(
@@ -72,6 +80,9 @@ init_pylimer_bound_writers(py::module_& m)
                - $ny
                - $nz
 
+          Additionally, you can use the keys used in 
+          :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.setPropertyValue`
+          as placeholders (as long as they are alphanumeric only; prefix in the format with '$' as well).
           Specifically useful if you need a different (or hybrid) atom style in LAMMPS.
       )pbdoc",
          py::arg("atomFormat") =
