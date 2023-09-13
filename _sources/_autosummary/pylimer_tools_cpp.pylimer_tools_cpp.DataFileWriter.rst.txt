@@ -21,6 +21,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.DataFileWriter
       ~DataFileWriter.configAttemptImageReset
       ~DataFileWriter.configCrosslinkerType
       ~DataFileWriter.configIncludeAngles
+      ~DataFileWriter.configIncludeDihedralAngles
       ~DataFileWriter.configMoleculeIdxForSwap
       ~DataFileWriter.configMoveIntoBox
       ~DataFileWriter.configReindexAtoms
