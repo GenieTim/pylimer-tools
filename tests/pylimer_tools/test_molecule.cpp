@@ -107,7 +107,7 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
    */
   const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
   universe.setBox(box);
-  universe.addAtoms(8,
+  universe.addAtoms(
                     { { 1, 2, 3, 4, 5, 6, 7, 8 } },     // id
                     { { 2, 1, 1, 1, 2, 1, 1, 1 } },     // type
                     { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // x

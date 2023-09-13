@@ -543,6 +543,14 @@ init_pylimer_bound_entities(py::module_& m)
             )pbdoc",
          py::arg("box"),
          py::arg("rescaleAtoms") = false)
+     .def("setVertexProperty", &Universe::setPropertyValue<double>,
+     R"pbdoc(
+            Set a specific property for a specific vertex.
+            )pbdoc",
+         py::arg("vertexId"),
+         py::arg("propertyName"),
+         py::arg("value")
+     )
     // getters
     .def("getClusters", &Universe::getClusters, R"pbdoc(
             Get the components of the universe that are not connected to each other.
@@ -646,17 +654,17 @@ init_pylimer_bound_entities(py::module_& m)
          &Molecule::getAtomByVertexIdx,
          R"pbdoc(Get an atom for a specific vertex.)pbdoc",
          py::arg("vertexId"))
+    .def(
+      "getAtomByVertexIdx",
+      &Universe::getAtomByVertexIdx,
+      R"pbdoc(Find an atom by the ID of the vertex of the underlying graph.)pbdoc",
+      py::arg("vertexId"))
     .def("getAtoms", &Universe::getAtoms, R"pbdoc(
             Get all atoms.
             )pbdoc")
     .def("getAtomsOfType", &Universe::getAtomsOfType, R"pbdoc(
             Find many atom by their type.
             )pbdoc")
-    .def(
-      "getAtomByVertexIdx",
-      &Universe::getAtomByVertexIdx,
-      R"pbdoc(Find an atom by the ID of the vertex of the underlying graph.)pbdoc",
-      py::arg("vertexId"))
     .def("getAtomIdByIdx",
          &Universe::getAtomIdByIdx,
          "Get the id of the atom by the vertex id of the underlying graph.",

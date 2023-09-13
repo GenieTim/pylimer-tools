@@ -1096,7 +1096,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
    * 4-7-3
    */
   universe.setBox(pe::Box(-15.0, 15.0, -15.0, 15.0, -15.0, 15.0));
-  universe.addAtoms(9,
+  universe.addAtoms(
                     { { 1, 2, 3, 4, 5, 6, 7, 8, 9 } },     // id
                     { { 2, 2, 2, 2, 1, 1, 1, 1, 1 } },     // type
                     { { -5, 5, 5, -5, 0, 5, -5, -5, 0 } }, // x
@@ -1146,8 +1146,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
      * where * = 9 & 10, where the latter is connected to 1 & 3,
      * the former to 4 and 2
      */
-    universe.addAtoms(
-      1, { 10 }, { 1 }, { 0. }, { 0. }, { 0. }, { 1 }, { 1 }, { 1 });
+    universe.addAtoms( { 10 }, { 1 }, { 0. }, { 0. }, { 0. }, { 1 }, { 1 }, { 1 });
     universe.addBonds(2, { { 1, 10 } }, { { 10, 3 } });
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance(universe, 2, false);

@@ -76,8 +76,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
 
   SECTION("atoms can be added")
   {
-    universe.addAtoms(2,
-                      { { 0, 1 } },
+    universe.addAtoms({ { 0, 1 } },
                       { { 1, 1 } },
                       { { 0.0, 1.0 } },
                       { { 0.0, 1.0 } },
@@ -86,8 +85,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                       { { 0, 0 } },
                       { { 0, 0 } });
     REQUIRE(universe.getNrOfAtoms() == 2);
-    universe.addAtoms(2,
-                      { { 3, 4 } },
+    universe.addAtoms({ { 3, 4 } },
                       { { 1, 1 } },
                       { { 0.0, 1.0 } },
                       { { 0.0, 1.0 } },
@@ -201,7 +199,8 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                                      threeZeros,
                                      threeZeros));
     // different lengths
-    REQUIRE_THROWS(universe.addAngles(oneTwoThree, fourLongZeros, oneTwoThree));
+    REQUIRE_THROWS(
+      universe.addAngles(oneTwoThree, fourLongZeros, oneTwoThree, threeZeros));
     // different lengths
     REQUIRE_THROWS(
       universe.addBonds(3, oneTwoThree, fourLongZeros, threeZeros));
@@ -222,8 +221,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
      * 8-7
      */
     universe.setBox(pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0));
-    universe.addAtoms(8,
-                      { { 1, 2, 3, 4, 5, 6, 7, 8 } },   // id
+    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },   // id
                       { { 1, 1, 1, 2, 1, 2, 2, 1 } },   // type
                       { { -5, 5, 5, -5, 7, 1, 1, 7 } }, // x
                       { { -5, -5, 5, 5, 0, 0, 0, 0 } }, // y
@@ -271,8 +269,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     #
     # *4
     */
-    universe.addAtoms(8,
-                      { { 1, 2, 3, 4, 5, 6, 7, 8 } },       // id
+    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },       // id
                       { { 1, 1, 1, 2, 1, 2, 2, 1 } },       // type
                       { { 1.25, 2, 3, 1.01, 2, 4, 1, 1 } }, // x
                       { { 1, 1, 1, 4.01, 2, 1, 2, 3 } },    // y
@@ -393,10 +390,35 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     {
       REQUIRE(universe.getAngles()["angle_from"].size() == 0);
       auto detectedAngles = universe.detectAngles();
+      REQUIRE(detectedAngles["angle_from"].size() == 8);
+      std::vector<int> angleTypes;
+      angleTypes.reserve(detectedAngles["angle_from"].size());
+      for (size_t i = 0; i < detectedAngles["angle_from"].size(); i++) {
+        angleTypes.push_back(1);
+      }
       universe.addAngles(detectedAngles["angle_from"],
+                         detectedAngles["angle_via"],
                          detectedAngles["angle_to"],
-                         detectedAngles["angle_via"]);
-      REQUIRE(universe.getAngles()["angle_from"].size() == 6);
+                         angleTypes);
+      REQUIRE(universe.getAngles()["angle_from"].size() == 8);
+    }
+
+    SECTION("get dihedral angles returns")
+    {
+      REQUIRE(universe.getDihedralAngles()["dihedral_angle_from"].size() == 0);
+      auto detectedAngles = universe.detectDihedralAngles();
+      REQUIRE(detectedAngles["dihedral_angle_from"].size() == 8);
+      std::vector<int> angleTypes;
+      angleTypes.reserve(detectedAngles["dihedral_angle_from"].size());
+      for (size_t i = 0; i < detectedAngles["dihedral_angle_from"].size(); i++) {
+        angleTypes.push_back(1);
+      }
+      universe.addDihedralAngles(detectedAngles["dihedral_angle_from"],
+                         detectedAngles["dihedral_angle_via1"],
+                         detectedAngles["dihedral_angle_via2"],
+                         detectedAngles["dihedral_angle_to"],
+                         angleTypes);
+      REQUIRE(universe.getDihedralAngles()["dihedral_angle_from"].size() == 8);
     }
 
     SECTION("get atoms returns")
@@ -503,8 +525,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
        *
        * 10
        */
-      universe.addAtoms(2,
-                        { { 9, 10 } },
+      universe.addAtoms({ { 9, 10 } },
                         { { 1, 1 } },
                         { { 0.0, 0.0 } },
                         { { 1.0, 0.0 } },
@@ -654,8 +675,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     #
     # *7-*6-5
     */
-    universe.addAtoms(6,
-                      { { 1, 2, 3, 5, 6, 7 } }, // id
+    universe.addAtoms({ { 1, 2, 3, 5, 6, 7 } }, // id
                       { { 1, 1, 1, 1, 2, 2 } }, // type
                       { { 3, 2, 2, 2, 2, 2 } }, // x
                       { { 1, 1, 1, 1, 1, 1 } }, // y
@@ -701,8 +721,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       // 9-8
       // | |
       // ↳-*7-*6-5
-      universe.addAtoms(2,
-                        { { 8, 9 } }, // id
+      universe.addAtoms({ { 8, 9 } }, // id
                         { { 1, 1 } }, // type
                         { { 0, 1 } }, // x
                         { { 2, 3 } }, // y
@@ -746,8 +765,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
         for (size_t j = 0; j < nrOfMolecules[i]; ++j) {
           std::vector<long int> atomId;
           atomId.push_back(currentId);
-          universe.addAtoms(1,
-                            atomId,
+          universe.addAtoms(atomId,
                             type,
                             oneZeroDouble,
                             oneZeroDouble,
@@ -789,8 +807,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       for (size_t i = 0; i < 10; ++i) {
         for (size_t j = 0; j < 10; ++j) {
           currentId += 1;
-          universe2.addAtoms(1,
-                             getVectorWithOne<long int>(currentId),
+          universe2.addAtoms(getVectorWithOne<long int>(currentId),
                              type,
                              oneZeroDouble,
                              oneZeroDouble,
@@ -811,8 +828,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
         std::vector<int> type2 = getVectorWithOne(2);
         for (size_t i = 0; i < 10; ++i) {
           currentId += 1;
-          universe2.addAtoms(1,
-                             getVectorWithOne<long int>(currentId),
+          universe2.addAtoms(getVectorWithOne<long int>(currentId),
                              type2,
                              oneZeroDouble,
                              oneZeroDouble,
@@ -830,8 +846,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
   {
     const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
     universe.setBox(box);
-    universe.addAtoms(8,
-                      { { 1, 2, 3, 4, 5, 6, 7, 8 } },     // id
+    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },     // id
                       { { 2, 1, 1, 1, 2, 1, 1, 1 } },     // type
                       { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // x
                       { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // y

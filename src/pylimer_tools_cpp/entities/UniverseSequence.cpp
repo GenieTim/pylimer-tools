@@ -219,8 +219,7 @@ namespace entities {
         Universe dataFileUniverse = Universe(this->dataFileParser.getLx(),
                                              this->dataFileParser.getLy(),
                                              this->dataFileParser.getLz());
-        dataFileUniverse.addAtoms(this->dataFileParser.getNrOfAtoms(),
-                                  this->dataFileParser.getAtomIds(),
+        dataFileUniverse.addAtoms(this->dataFileParser.getAtomIds(),
                                   this->dataFileParser.getAtomTypes(),
                                   this->dataFileParser.getAtomX(),
                                   this->dataFileParser.getAtomY(),
@@ -251,8 +250,7 @@ namespace entities {
                                " due to different nr of atom properties");
     }
 
-    newUniverse.addAtoms(nAtoms,
-                         atomIds,
+    newUniverse.addAtoms(atomIds,
                          atomTypes,
                          positionsX,
                          positionsY,
@@ -295,15 +293,15 @@ namespace entities {
                                      fileParser.getHighY(),
                                      fileParser.getLowZ(),
                                      fileParser.getHighZ()));
-    universe.addAtoms(fileParser.getNrOfAtoms(),
-                      fileParser.getAtomIds(),
+    universe.addAtoms(fileParser.getAtomIds(),
                       fileParser.getAtomTypes(),
                       fileParser.getAtomX(),
                       fileParser.getAtomY(),
                       fileParser.getAtomZ(),
                       fileParser.getAtomNx(),
                       fileParser.getAtomNy(),
-                      fileParser.getAtomNz());
+                      fileParser.getAtomNz(),
+                      fileParser.getAdditionalAtomData());
     universe.addBonds(fileParser.getNrOfBonds(),
                       fileParser.getBondFrom(),
                       fileParser.getBondTo(),
@@ -324,6 +322,7 @@ namespace entities {
                                  fileParser.getDihedralAngleTo(),
                                  fileParser.getDihedralAngleTypes());
     }
+    
     return universe;
   }
 

@@ -61,6 +61,7 @@ namespace entities {
       if (vertex1OfEdge == vertexIdx) {
         results.push_back(vertex2OfEdge);
       } else {
+        assert(vertex2OfEdge == vertexIdx);
         results.push_back(vertex1OfEdge);
       }
       IGRAPH_EIT_NEXT(iterator);

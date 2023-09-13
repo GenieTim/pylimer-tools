@@ -86,9 +86,9 @@ namespace entities {
      *
      */
     long hashDihedralAngleType(int typeFrom,
-                          int typeVia1,
-                          int typeVia2,
-                          int typeTo) const;
+                               int typeVia1,
+                               int typeVia2,
+                               int typeTo) const;
 
     /**
      * @brief Combine vertex indices to a hash, that respects the order of the
@@ -198,6 +198,12 @@ namespace entities {
      */
     std::vector<Atom> verticesToAtoms(
       const std::vector<long int>& vertexIds) const;
+
+    bool vertexPropertyExists(const char* propertyName) const
+    {
+      return igraph_cattribute_has_attr(
+        &this->graph, IGRAPH_ATTRIBUTE_VERTEX, propertyName);
+    };
 
     /**
      * @brief Get the value of a property (attribute) of each and every vertex

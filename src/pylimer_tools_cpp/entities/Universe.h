@@ -53,15 +53,15 @@ namespace entities {
                   std::vector<int> nx,
                   std::vector<int> ny,
                   std::vector<int> nz);
-    void addAtoms(const size_t NNewAtoms,
-                  std::vector<long int> ids,
+    void addAtoms(std::vector<long int> ids,
                   std::vector<int> types,
                   std::vector<double> x,
                   std::vector<double> y,
                   std::vector<double> z,
                   std::vector<int> nx,
                   std::vector<int> ny,
-                  std::vector<int> nz);
+                  std::vector<int> nz,
+                  std::unordered_map<std::string, std::vector<double>> additionalData);
     void removeAtoms(std::vector<long int> ids);
     void replaceAtom(const long int id, const Atom& replacement);
     // bonds

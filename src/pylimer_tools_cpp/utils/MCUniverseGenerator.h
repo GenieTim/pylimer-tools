@@ -67,8 +67,7 @@ namespace utils {
         pylimer_tools::entities::Universe(this->box);
       int nrOfAtoms = this->simplifiedUniverse.ids.size();
       std::vector<int> zeros = initializeWithValue(nrOfAtoms, 0);
-      universe.addAtoms(nrOfAtoms,
-                        this->simplifiedUniverse.ids,
+      universe.addAtoms(this->simplifiedUniverse.ids,
                         this->simplifiedUniverse.types,
                         this->simplifiedUniverse.x,
                         this->simplifiedUniverse.y,
