@@ -17,7 +17,7 @@ namespace utils {
                             const AtomStyle atomStyle3)
   {
     if (!std::filesystem::exists(filePath)) {
-      throw std::invalid_argument("File to read (" + filePath +
+      throw std::invalid_argument("Data file to read (" + filePath +
                                   ") does not exist.");
     }
 
@@ -111,6 +111,7 @@ namespace utils {
           break;
         case AtomStyle::CHARGE:
           this->readAtomCharge(line);
+          break;
         default:
           throw std::invalid_argument("This atom style is not supported yet.");
           break;
