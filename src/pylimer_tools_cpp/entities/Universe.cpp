@@ -476,14 +476,13 @@ namespace entities {
     }
 
     this->dihedralAngleFrom.insert(
-      std::end(this->angleFrom), std::begin(from), std::end(from));
+      std::end(this->dihedralAngleFrom), std::begin(from), std::end(from));
     this->dihedralAngleVia1.insert(
       std::end(this->dihedralAngleVia1), std::begin(via1), std::end(via1));
     this->dihedralAngleVia2.insert(
       std::end(this->dihedralAngleVia2), std::begin(via2), std::end(via2));
     this->dihedralAngleTo.insert(
       std::end(this->dihedralAngleTo), std::begin(to), std::end(to));
-
     this->dihedralAngleType.insert(
       std::end(this->dihedralAngleType), std::begin(types), std::end(types));
   }
@@ -1630,8 +1629,9 @@ namespace entities {
       }
 
       igraph_vector_int_destroy(&dihedral_paths_v);
-      
-      // std::cout << "Found dihedral paths: " << dihedral_sets.size() << std::endl;
+
+      // std::cout << "Found dihedral paths: " << dihedral_sets.size() <<
+      // std::endl;
 
       for (std::vector<int> dihedral_path : dihedral_sets) {
         RUNTIME_EXP_IFN(dihedral_path.size() == 4,
@@ -1806,9 +1806,14 @@ namespace entities {
    */
   size_t Universe::getNrOfDihedralAngles() const
   {
-    assert(this->dihedralAngleFrom.size() == this->dihedralAngleTo.size());
-    assert(this->dihedralAngleFrom.size() == this->dihedralAngleVia1.size());
-    assert(this->dihedralAngleFrom.size() == this->dihedralAngleVia2.size());
+    RUNTIME_EXP_IFN(
+      all_equal<size_t>(5,
+                this->dihedralAngleFrom.size(),
+                this->dihedralAngleTo.size(),
+                this->dihedralAngleVia1.size(),
+                this->dihedralAngleVia2.size(), 
+                this->dihedralAngleType.size()),
+      "Invalid internal state: the dihedral info is not consistent");
     return this->dihedralAngleFrom.size();
   }
 

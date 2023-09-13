@@ -36,6 +36,18 @@ namespace utils {
     return false;
   }
 
+  template <typename T>
+  static inline T max_element(std::vector<T>& vec, const T defaultMax) {
+    if (vec.size() == 0) {
+      return defaultMax;
+    }
+    if (vec.size() == 1) {
+      return vec[0];
+    }
+    T value = *std::max_element(vec.begin(), vec.end());
+    return value;
+  }
+
   typedef Eigen::Array<bool, Eigen::Dynamic, 1> ArrayXb;
 
   /**

@@ -52,7 +52,7 @@ namespace utils {
       this->customAtomFormat = atomFormat;
       this->customAtomFormatAdditionalProperties.clear();
       // find custom properties
-      std::regex property_regex("(\\$[a-zA-Z]+)");
+      std::regex property_regex("(\\$[a-zA-Z0-9]+)");
       auto words_begin = std::sregex_iterator(
         atomFormat.begin(), atomFormat.end(), property_regex);
       auto words_end = std::sregex_iterator();
@@ -60,7 +60,7 @@ namespace utils {
         std::smatch match = *i;
         std::string match_str = match.str();
         match_str.erase(std::remove(match_str.begin(), match_str.end(), '$'),
-                   match_str.end());
+                        match_str.end());
         if (match_str != "atomId" && match_str != "moleculeId" &&
             match_str != "atomType" && match_str != "nx" && match_str != "ny" &&
             match_str != "nz" && match_str != "x" && match_str != "y" &&
@@ -86,8 +86,9 @@ namespace utils {
       std::ofstream file;
       auto t = std::time(nullptr);
       auto tm = *std::localtime(&t);
-      int uniqueAtomTypes = std::max(this->universe.countAtomTypes().size(),
-                                     this->universe.getMasses().size());
+      std::vector<int> allAtomTypes = this->universe.getAtomTypes();
+      int nrOfAtomTypes =
+        pylimer_tools::utils::max_element<int>(allAtomTypes, 1);
 
       std::map<std::string, std::vector<long int>> bonds =
         this->universe.getBonds();
@@ -96,22 +97,32 @@ namespace utils {
       std::map<std::string, std::vector<long int>> dihedral_angles =
         this->universe.getDihedralAngles();
 
-      int nrOfAngleTypes = this->includeAngles
-                             ? *std::max_element(angles["angle_type"].begin(),
-                                                 angles["angle_type"].end())
-                             : 0;
-      int nrOfDihedralAngleTypes =
-        this->includeDihedralAngles
-          ? *std::max_element(dihedral_angles["dihedral_angle_type"].begin(),
-                              dihedral_angles["dihedral_angle_type"].end())
-          : 0;
-      int nrOfBondTypes =
-        *std::max_element(bonds["bond_type"].begin(), bonds["bond_type"].end());
+      long int nrOfAngleTypes = pylimer_tools::utils::max_element<long int>(angles["angle_type"], 0);
+      if (nrOfAngleTypes < 1) {
+        nrOfAngleTypes = 1;
+      }
+      if (!this->includeAngles) {
+        nrOfAngleTypes =0;
+      }
+
+      long int nrOfDihedralAngleTypes = pylimer_tools::utils::max_element<long int>(dihedral_angles["dihedral_angle_type"], 0);
+      if (nrOfDihedralAngleTypes < 1) {
+        nrOfDihedralAngleTypes = 1;
+      }
+      if (!this->includeDihedralAngles) {
+        nrOfDihedralAngleTypes = 0;
+      }
+
+      long int nrOfBondTypes =pylimer_tools::utils::max_element<long int>(bonds["bond_type"], 0);
       if (nrOfBondTypes < 1) {
         nrOfBondTypes = 1;
       }
 
-      file.open(filePath);
+      file.open(filePath, std::ios::out | std::ios::trunc);
+      if (!file.is_open()) {
+        throw std::invalid_argument("Failed to open '" + filePath +
+                                    "' for writing.");
+      }
       file << std::setprecision(std::numeric_limits<double>::digits10 + 1);
 
       // write header
@@ -129,7 +140,7 @@ namespace utils {
            << " dihedrals\n";
       file << "\t " << 0 << " impropers\n";
       file << "\n";
-      file << "\t " << uniqueAtomTypes << " atom types\n";
+      file << "\t " << nrOfAtomTypes << " atom types\n";
       file << "\t " << nrOfBondTypes << " bond types\n";
       file << "\t " << nrOfAngleTypes << " angle types\n";
       file << "\t " << nrOfDihedralAngleTypes << " dihedral types\n";
