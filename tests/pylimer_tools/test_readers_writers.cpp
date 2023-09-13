@@ -1,7 +1,10 @@
+#include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include "../../src/pylimer_tools_cpp/io/DataFileParser.h"
+#include "../../src/pylimer_tools_cpp/io/DataFileWriter.h"
 #include "../../src/pylimer_tools_cpp/io/DumpFileParser.h"
 #include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <cstdio>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -11,6 +14,7 @@ extern "C"
 }
 
 namespace pu = pylimer_tools::utils;
+namespace pe = pylimer_tools::entities;
 
 TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
 {
@@ -110,3 +114,64 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
     // };
   }
 };
+
+TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
+{
+  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  REQUIRE(std::filesystem::exists(suspectedPath));
+
+  SECTION("Files are read and written")
+  {
+    // TODO: implement
+    pe::UniverseSequence universeSeq = pe::UniverseSequence();
+    std::string largeInputFile =
+      suspectedPath + "network_83_a_100.structure.out";
+    universeSeq.initializeFromDataSequence({ { largeInputFile } });
+    pe::Universe universe = universeSeq.atIndex(0);
+
+    // add angles
+    auto angles = universe.detectAngles();
+    std::vector<int> angleTypes;
+    angleTypes.reserve(angles["angle_from"].size());
+    for (size_t i = 0; i < angles["angle_from"].size(); i++) {
+      angleTypes.push_back(1);
+    }
+    universe.addAngles(angles["angle_from"],
+                       angles["angle_via"],
+                       angles["angle_to"],
+                       angleTypes);
+    REQUIRE(universe.getNrOfAngles() > 0);
+
+    // add dihedrals
+    auto detectedAngles = universe.detectDihedralAngles();
+    REQUIRE(detectedAngles["dihedral_angle_from"].size() == 8);
+    std::vector<int> dihedralAngleTypes;
+    dihedralAngleTypes.reserve(detectedAngles["dihedral_angle_from"].size());
+    for (size_t i = 0; i < detectedAngles["dihedral_angle_from"].size(); i++) {
+      dihedralAngleTypes.push_back(1);
+    }
+    universe.addDihedralAngles(detectedAngles["dihedral_angle_from"],
+                               detectedAngles["dihedral_angle_via1"],
+                               detectedAngles["dihedral_angle_via2"],
+                               detectedAngles["dihedral_angle_to"],
+                               dihedralAngleTypes);
+
+    // write data file
+    pu::DataFileWriter writer = pu::DataFileWriter(universe);
+    writer.configIncludeAngles(true);
+    writer.configIncludeDihedralAngles(true);
+    std::string fileToWrite = suspectedPath + "tmp_data_file.structure.out";
+    writer.writeToFile(fileToWrite);
+
+    pe::UniverseSequence seq = pe::UniverseSequence();
+    seq.initializeFromDataSequence({ { fileToWrite } });
+    pe::Universe readUniverse = seq.atIndex(0);
+
+    REQUIRE(universe.getNrOfAtoms() == readUniverse.getNrOfAtoms());
+    REQUIRE(universe.getNrOfBonds() == readUniverse.getNrOfBonds());
+    REQUIRE(universe.getNrOfAngles() == readUniverse.getNrOfAngles());
+    REQUIRE(universe.getNrOfAngles() == readUniverse.getNrOfDihedralAngles());
+
+    std::remove(fileToWrite);
+  }
+}
