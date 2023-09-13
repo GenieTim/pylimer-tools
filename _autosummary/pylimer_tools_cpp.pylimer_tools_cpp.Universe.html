@@ -450,7 +450,10 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setTimestep" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setTimestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setTimestep</span></code></a>(self, timestep)</p></td>
 <td><p>Set the timestep when this Universe was captured.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.simplify" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.simplify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simplify</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setVertexProperty" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setVertexProperty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setVertexProperty</span></code></a>(self, vertexId, ...)</p></td>
+<td><p>Set a specific property for a specific vertex.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.simplify" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.simplify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simplify</span></code></a>(self)</p></td>
 <td><p>Remove self links and double bonds.</p></td>
 </tr>
 </tbody>
@@ -926,6 +929,12 @@ and you may run out of memory when using this function, if your Universe/Network
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setVertexProperty">
+<span class="sig-name descname"><span class="pre">setVertexProperty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertexId</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">propertyName</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setVertexProperty" title="Link to this definition">#</a></dt>
+<dd><p>Set a specific property for a specific vertex.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.Universe.simplify">
 <span class="sig-name descname"><span class="pre">simplify</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.simplify" title="Link to this definition">#</a></dt>
 <dd><p>Remove self links and double bonds. This function is called automatically after adding bonds.</p>
@@ -1053,6 +1062,7 @@ and you may run out of memory when using this function, if your Universe/Network
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setBoxLengths"><code class="docutils literal notranslate"><span class="pre">Universe.setBoxLengths()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setMasses"><code class="docutils literal notranslate"><span class="pre">Universe.setMasses()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setTimestep"><code class="docutils literal notranslate"><span class="pre">Universe.setTimestep()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setVertexProperty"><code class="docutils literal notranslate"><span class="pre">Universe.setVertexProperty()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.simplify"><code class="docutils literal notranslate"><span class="pre">Universe.simplify()</span></code></a></li>
 </ul>
 </li>
