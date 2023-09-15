@@ -163,6 +163,9 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
     pu::DataFileWriter writer = pu::DataFileWriter(universe);
     writer.configIncludeAngles(true);
     writer.configIncludeDihedralAngles(true);
+    writer.configMoleculeIdxForSwap(false);
+    writer.configMoveIntoBox(true);
+    writer.configAttemptImageReset(true);
     std::string fileToWrite = suspectedPath + "tmp_data_file.structure.out";
     writer.setCustomAtomFormat("$atomId\t$atomType\t$charge\t$x\t$y\t$z\t$nx\t$ny\t$nz");
     writer.writeToFile(fileToWrite);
