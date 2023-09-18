@@ -4,9 +4,9 @@ import unittest
 import mock
 import pandas as pd
 
-from pylimer_tools.io.extractThermoParams import (detectHeaders,
-                                                  extractThermoParams,
-                                                  getThermoCacheNameSuffix)
+from pylimer_tools.io.extractThermoParams import (
+    detectHeaders, extractThermoParams, getThermoCacheNameSuffix,
+    readMultiSectionSeparatedValueFile)
 from pylimer_tools.io.readLammpsOutputFile import (readAveragesFile,
                                                    readCorrelationFile,
                                                    readDataFile, readDumpFile,
@@ -70,7 +70,8 @@ class TestFileReader(PandasComparingTestCase):
         self.assertListEqual(list(readData4.columns), list(readData5.columns))
         self.assertListEqual(list(readData.columns), list(readData4.columns))
         self.assertDataframeEqual(readData4, readData5, check_dtype=False)
-        self.assertDataframeEqual(readData, reduce_mem_usage(readData4), check_dtype=False)
+        self.assertDataframeEqual(
+            readData, reduce_mem_usage(readData4), check_dtype=False)
 
     @mock.patch('pylimer_tools.io.extractThermoParams.os.remove')
     def test_cacheDeleteFail(self, mockOsRemove):
@@ -157,3 +158,12 @@ class TestFileReader(PandasComparingTestCase):
         self.assertIsInstance(data, pd.DataFrame)
         self.assertEqual(len(data["Timestep"].unique()), 2)
         self.assertEqual(len(data), 118)
+
+    def test_multisectionFile(self):
+        dataFile = os.path.join(os.path.dirname(
+            __file__), "../fixtures/example_multisection_value.txt")
+        data = readMultiSectionSeparatedValueFile(dataFile)
+        self.assertIsInstance(data, pd.DataFrame)
+        self.assertEqual(len(data["Header3"].unique()), 3)
+        self.assertEqual(len(data["Step"].unique()), 4)
+        self.assertEqual(len(data), 4)
