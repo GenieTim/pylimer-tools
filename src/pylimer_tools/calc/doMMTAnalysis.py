@@ -5,14 +5,15 @@ from collections import Counter
 
 import numpy as np
 import pint
-import pylimer_tools.calc.doMEHPAnalysis as mehp
 import scipy.special
-from pylimer_tools.io.unitStyles import UnitStyle
-from pylimer_tools_cpp import Universe
 from scipy import optimize
 
+import pylimer_tools.calc.doMEHPAnalysis as mehp
+from pylimer_tools.io.unitStyles import UnitStyle
+from pylimer_tools_cpp import Universe
 
-def predictShearModulus(network: Universe, unitStyle: UnitStyle, crosslinkerType: int = None, r: float = None, p: float = None, f: int = None, nu: float = None, T: pint.Quantity = None, strandLength: int = None, functionalityPerType: dict = None):
+
+def predictShearModulus(network: Universe, unitStyle: UnitStyle, crosslinkerType: int = None, r: float = None, p: float = None, f: int = None, nu: float = None, T: pint.Quantity = None, strandLength: int = None, functionalityPerType: dict = None, Ge1: float = None):
     """
     Predict the shear modulus using MMT Analysis.
 
@@ -30,6 +31,7 @@ def predictShearModulus(network: Universe, unitStyle: UnitStyle, crosslinkerType
       - T: the temperature to compute the modulus at. Default: 273.15 K
       - strandLength: the length of the network strands (in nr. of beads). Optional, can be passed to improve performance
       - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. Optional, can be passed to improve performance
+      - Ge1: the melt entanglement modulus
 
     Returns:
       - G: the predicted shear modulus, or `None` if the universe is empty.
@@ -38,7 +40,7 @@ def predictShearModulus(network: Universe, unitStyle: UnitStyle, crosslinkerType
       - Support more than one crosslinker type (as is supported by original formula)
     """
     G_MMT_phantom, G_MMT_entanglement, _, _ = computeModulusDecomposition(
-        network, unitStyle, crosslinkerType, r, p, f, nu, T)
+        network, unitStyle, crosslinkerType, r, p, f, nu, T, Ge1=Ge1)
     return G_MMT_phantom + G_MMT_entanglement
 
 
@@ -335,7 +337,7 @@ def computeMMsProbabilities(r, p, f):
     return np.clip(alpha, 0, 1), np.clip(beta, 0, 1)  # TODO: reconsider
 
 
-def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crosslinkerType: int = None, r: float = None, p: float = None, f: int = None, nu: float = None, T: pint.Quantity = None, strandLength: int = None, functionalityPerType: dict = None, Ge1=0.22):
+def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crosslinkerType: int = None, r: float = None, p: float = None, f: int = None, nu: float = None, T: pint.Quantity = None, strandLength: int = None, functionalityPerType: dict = None, Ge1: float = None):
     """
     Compute four different estimates of the plateau modulus, using MMT, ANM and PNM.
 
@@ -350,6 +352,7 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crossli
       - T: the temperature to compute the modulus at. Default: 298.15 K
       - strandLength: the length of the network strands (in nr. of beads). Optional, can be passed to improve performance
       - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. Optional, can be passed to improve performance
+      - Ge1: the melt entanglement modulus
 
     Returns:
       - G_MMT_phantom: the phantom contribution to the MMT modulus
@@ -382,6 +385,10 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crossli
             (network.getVolume()*unitStyle.getBaseUnitOf('volume'))
     if (T is None):
         T = (273.15+25)*unitStyle.getUnderlyingUnitRegistry()('kelvin')
+    if (Ge1 is None):
+        Ge1 = (8.3145 *  # gas constant, J/(mol*K)
+               T.to("kelvin").magnitude * # Temperature in Kelvin
+               1e6 * 94.79281)*unitStyle.getUnderlyingUnitRegistry()('MPa')  # -> MPa, melt entanglement modulus
 
     # affine
     G_ANM = nu*unitStyle.kB*T
@@ -397,7 +404,7 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crossli
     G_MMT_phantom = GammaMMT*nu*unitStyle.kB*T
     # fraction of elastically effective strands. TODO : check adjustment with r
     pel = ((1/(p)) - alpha/p)**2
-    G_MMT_entanglement = Ge1*unitStyle.getUnderlyingUnitRegistry()('MPa')*(pel**2)
+    G_MMT_entanglement = Ge1*(pel**2)
     # entanglement part. TODO : check adjustment with r (and where the 0.22 is coming from? Fabian' s fit!)
     return G_MMT_phantom, G_MMT_entanglement, G_ANM, G_PNM
 
