@@ -388,7 +388,7 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crossli
     if (Ge1 is None):
         Ge1 = (8.3145 *  # gas constant, J/(mol*K)
                T.to("kelvin").magnitude * # Temperature in Kelvin
-               1e6 * 94.79281)*unitStyle.getUnderlyingUnitRegistry()('MPa')  # -> MPa, melt entanglement modulus
+               1e-6 * 94.79281)*unitStyle.getUnderlyingUnitRegistry()('MPa')  # -> MPa, melt entanglement modulus
 
     # affine
     G_ANM = nu*unitStyle.kB*T
