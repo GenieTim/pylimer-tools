@@ -282,6 +282,19 @@ def readMultiSectionSeparatedValueFile(file: str, separator: str = None, use_cac
     if (cacheContent is not None and use_cache):
         return cacheContent
 
+    if (separator is None):
+        # detect separator
+        with open(file) as f:
+            first_line = f.readline().strip('\n')
+        possible_separators = [",", ";", " ", "\t"]
+        best_sep = " "
+        best_sep_count = 0
+        for sep in possible_separators:
+            if (first_line.count(sep) > best_sep_count):
+                best_sep_count = first_line.count(sep)
+                best_sep = sep
+        separator = best_sep
+
     print("Splitting CSV...")
     previous_len = -1
 
