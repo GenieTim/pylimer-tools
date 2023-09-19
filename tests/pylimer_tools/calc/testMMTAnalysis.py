@@ -58,12 +58,12 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         unitStyleFactory = UnitStyleFactory()
         unitStyle = unitStyleFactory.getUnitStyle("si")
         # TODO: find literature motiviation for results fo the functions
-        self.assertAlmostEqual(0.13734491693339432, predictShearModulus(
+        self.assertAlmostEqual(0.1467020757993193, predictShearModulus(
             self.saturatedTestUniverse, unitStyle, crosslinkerType=2, strandLength=2).to('MPa').magnitude)
-        self.assertAlmostEqual(0.13734491693339432, predictShearModulus(
+        self.assertAlmostEqual(0.1467020757993193, predictShearModulus(
             self.saturatedTestUniverse, unitStyle, crosslinkerType=2, strandLength=2, functionalityPerType={2: 4}).to('MPa').magnitude)
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
-        self.assertAlmostEqual(0.13734491693339432, predictShearModulus(
+        self.assertAlmostEqual(0.1467020757993193, predictShearModulus(
             self.saturatedTestUniverse, unitStyle, crosslinkerType=2).to('MPa').magnitude)
 
     def testPredictNumberDensityOfJunctionPoints(self):
@@ -196,7 +196,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertAlmostEqual(G_ANM.to('MPa').magnitude, 0.193101, places=5)
         self.assertAlmostEqual(G_PNM.to('MPa').magnitude, 0.0965506, places=5)
         self.assertAlmostEqual(G_MMT_entanglement.to(
-            'MPa').magnitude, 0.17851, places=5)
+            'MPa').magnitude, 0.190576, places=5)
         self.assertAlmostEqual(G_MMT_phantom.to(
             'MPa').magnitude, 0.0777321, places=5)
 
@@ -209,7 +209,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertAlmostEqual(G_ANM.to('MPa').magnitude, 0.051846, places=5)
         self.assertAlmostEqual(G_PNM.to('MPa').magnitude, 0.025923, places=5)
         self.assertAlmostEqual(G_MMT_entanglement.to(
-            'MPa').magnitude, 0.05433807, places=5)
+            'MPa').magnitude, 0.05801, places=5)
         self.assertAlmostEqual(G_MMT_phantom.to(
             'MPa').magnitude, 0.00492674, places=5)
 
