@@ -425,11 +425,14 @@ namespace entities {
     }
 
     igraph_vector_int_destroy(&vertex_ids);
-    // actually comput the mean
+    // actually compute the mean
     std::unordered_map<int, double> actual_means;
     actual_means.reserve(this->getLength());
     for (const auto& result_pair : results) {
       std::vector<double> sds = result_pair.second;
+      if (sds.size() == 0) {
+        continue;
+      }
       actual_means[result_pair.first] =
         (Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(sds.data(), sds.size()))
           .mean();
