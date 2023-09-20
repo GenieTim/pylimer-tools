@@ -14,8 +14,8 @@ from pylimer_tools.io.readLammpsOutputFile import (readAveragesFile,
                                                    readLogFile)
 from pylimer_tools.utils.cacheUtility import getCacheFileName
 from pylimer_tools.utils.optimizeDf import optimize, reduce_mem_usage
-from pylimer_tools_cpp import (DataFileReader, DumpFileReader, Universe,
-                               UniverseSequence)
+from pylimer_tools_cpp import (AtomStyle, DataFileReader, DumpFileReader,
+                               Universe, UniverseSequence)
 from tests.pylimer_tools.pdComparingTestCase import PandasComparingTestCase
 
 
@@ -56,6 +56,11 @@ class TestFileReader(PandasComparingTestCase):
         self.assertListEqual(detectedHeaders, [
             "Step Temp E_pair E_mol TotEng Press"
         ])
+        # again, this time from cache
+        detectedHeaders2 = detectHeaders(
+            thermoFile, max_nr_of_lines_to_read=150)
+        self.assertListEqual(detectedHeaders2, detectedHeaders)
+        # use them to read the file
         readData5 = extractThermoParams(thermoFile, header=detectedHeaders)
         detectedHeaders = detectHeaders(
             thermoFile, max_nr_of_lines_to_read=1500000)
@@ -101,7 +106,7 @@ class TestFileReader(PandasComparingTestCase):
     def test_LammpsDataReader(self):
         dataFile = os.path.join(os.path.dirname(
             __file__), "../fixtures/lammps_data_file.out")
-        universe = readDataFile(dataFile)
+        universe = readDataFile(dataFile, [AtomStyle.BOND])
         self.assertIsInstance(universe, Universe)
         self.assertEqual(universe.getNrOfAtoms(), 3000)
 
@@ -126,6 +131,10 @@ class TestFileReader(PandasComparingTestCase):
         self.assertIsInstance(universe, Universe)
         self.assertEqual(universeSequence.getLength(), 1)
         universe = universeSequence.atIndex(0)
+        self.assertEqual(universe.getNrOfAtoms(), 12)
+        universeSequence2 = readDumpFile(dataFile, dumpFile, [AtomStyle.BOND])
+        self.assertIsInstance(universeSequence2, UniverseSequence)
+        universe = universeSequence2.atIndex(0)
         self.assertEqual(universe.getNrOfAtoms(), 12)
 
     def test_avgReader(self):
@@ -158,6 +167,9 @@ class TestFileReader(PandasComparingTestCase):
         self.assertIsInstance(data, pd.DataFrame)
         self.assertEqual(len(data["Timestep"].unique()), 2)
         self.assertEqual(len(data), 118)
+        # again, from cache
+        data2 = readCorrelationFile(dataFile)
+        self.assertDataframeEqual(data, data2)
 
     def test_multisectionFile(self):
         dataFile = os.path.join(os.path.dirname(
@@ -167,3 +179,6 @@ class TestFileReader(PandasComparingTestCase):
         self.assertEqual(len(data["Header3"].unique()), 3)
         self.assertEqual(len(data["Step"].unique()), 4)
         self.assertEqual(len(data), 4)
+        # again, from cache
+        data2 = readMultiSectionSeparatedValueFile(dataFile)
+        self.assertDataframeEqual(data, data2)
