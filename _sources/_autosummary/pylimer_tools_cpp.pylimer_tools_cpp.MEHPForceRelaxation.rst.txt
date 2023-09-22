@@ -34,6 +34,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceRelaxation
       ~MEHPForceRelaxation.getNrOfSprings
       ~MEHPForceRelaxation.getPressure
       ~MEHPForceRelaxation.getResidualNorm
+      ~MEHPForceRelaxation.getSolubleWeightFraction
       ~MEHPForceRelaxation.getStressTensor
       ~MEHPForceRelaxation.runForceRelaxation
       ~MEHPForceRelaxation.setForceEvaluator

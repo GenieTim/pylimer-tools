@@ -335,13 +335,16 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getResidualNorm" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getResidualNorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getResidualNorm</span></code></a>(self)</p></td>
 <td><p>Returns the residual norm at the current state of the simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getStressTensor" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getStressTensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getStressTensor</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getSolubleWeightFraction" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getSolubleWeightFraction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getSolubleWeightFraction</span></code></a>(self, arg0)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getStressTensor" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getStressTensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getStressTensor</span></code></a>(self)</p></td>
 <td><p>Returns the stress tensor at the current state of the simulation.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.runForceRelaxation" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.runForceRelaxation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">runForceRelaxation</span></code></a>(self[, algorithm, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.runForceRelaxation" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.runForceRelaxation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">runForceRelaxation</span></code></a>(self[, algorithm, ...])</p></td>
 <td><p>Run the simulation.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.setForceEvaluator" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.setForceEvaluator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setForceEvaluator</span></code></a>(self, arg0)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.setForceEvaluator" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.setForceEvaluator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setForceEvaluator</span></code></a>(self, arg0)</p></td>
 <td><p>Reset the currently used force evaluator.</p></td>
 </tr>
 </tbody>
@@ -501,6 +504,11 @@ Use a value &lt; 0 to indicate that there is no maximum number of active connect
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getSolubleWeightFraction">
+<span class="sig-name descname"><span class="pre">getSolubleWeightFraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getSolubleWeightFraction" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getStressTensor">
 <span class="sig-name descname"><span class="pre">getStressTensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Annotated[List[Annotated[List[float],</span> <span class="pre">FixedSize(3)]],</span> <span class="pre">FixedSize(3)]</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getStressTensor" title="Link to this definition">#</a></dt>
 <dd><p>Returns the stress tensor at the current state of the simulation.</p>
@@ -609,6 +617,7 @@ As a consequence though, you cannot simply benchmark only this method; you must 
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getNrOfSprings"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.getNrOfSprings()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getPressure"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.getPressure()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getResidualNorm"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.getResidualNorm()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getSolubleWeightFraction"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.getSolubleWeightFraction()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getStressTensor"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.getStressTensor()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.runForceRelaxation"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.runForceRelaxation()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.setForceEvaluator"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.setForceEvaluator()</span></code></a></li>
