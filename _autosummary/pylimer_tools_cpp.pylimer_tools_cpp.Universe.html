@@ -414,46 +414,49 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getNrOfBondsOfVertex" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.getNrOfBondsOfVertex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNrOfBondsOfVertex</span></code></a>(self, arg0)</p></td>
 <td><p>Count the number of immediate neighbours of an atom, specified by its vertex id.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getTimestep" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.getTimestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getTimestep</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getNrOfDihedralAngles" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.getNrOfDihedralAngles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNrOfDihedralAngles</span></code></a>(self)</p></td>
+<td><p>Query the number of dihedralangles that have been added to this universe.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getTimestep" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.getTimestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getTimestep</span></code></a>(self)</p></td>
 <td><p>Query the timestep when this universe was captured.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getVolume" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.getVolume"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getVolume</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getVolume" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.getVolume"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getVolume</span></code></a>(self)</p></td>
 <td><p>Query the volume of the underlying bounding box.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.hasInfiniteStrand" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.hasInfiniteStrand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hasInfiniteStrand</span></code></a>(self, arg0, arg1)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.hasInfiniteStrand" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.hasInfiniteStrand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hasInfiniteStrand</span></code></a>(self, arg0, arg1)</p></td>
 <td><p>Checks whether there is a strand (with cross-linker) in the universe that loops through periodic images without coming back.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.hashAngleType" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.hashAngleType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hashAngleType</span></code></a>(self, from, via, to)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.hashAngleType" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.hashAngleType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hashAngleType</span></code></a>(self, from, via, to)</p></td>
 <td><p>Convert the three integers</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.hashDihedralAngleType" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.hashDihedralAngleType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hashDihedralAngleType</span></code></a>(self, from, via1, via2, to)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.hashDihedralAngleType" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.hashDihedralAngleType"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hashDihedralAngleType</span></code></a>(self, from, via1, via2, to)</p></td>
 <td><p>Convert the four integers</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.removeAtoms" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.removeAtoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">removeAtoms</span></code></a>(self, atomIds)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.removeAtoms" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.removeAtoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">removeAtoms</span></code></a>(self, atomIds)</p></td>
 <td><p>Remove atoms and all associated bonds by their atom ids.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.removeBonds" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.removeBonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">removeBonds</span></code></a>(self, from, to)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.removeBonds" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.removeBonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">removeBonds</span></code></a>(self, from, to)</p></td>
 <td><p>Remove bonds by their connected atom ids.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.replaceAtom" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.replaceAtom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">replaceAtom</span></code></a>(self, atomId, replacementAtom)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.replaceAtom" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.replaceAtom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">replaceAtom</span></code></a>(self, atomId, replacementAtom)</p></td>
 <td><p>Replace the properties of an atom with the properties of another given atom.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setBox" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setBox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setBox</span></code></a>(self, box[, rescaleAtoms])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setBox" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setBox"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setBox</span></code></a>(self, box[, rescaleAtoms])</p></td>
 <td><p>Override the currently assigned box with the one specified.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setBoxLengths" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setBoxLengths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setBoxLengths</span></code></a>(self, Lx, Ly, Lz[, rescaleAtoms])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setBoxLengths" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setBoxLengths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setBoxLengths</span></code></a>(self, Lx, Ly, Lz[, rescaleAtoms])</p></td>
 <td><p>Set the box side lengths.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setMasses" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setMasses"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMasses</span></code></a>(self, massPerType)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setMasses" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setMasses"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setMasses</span></code></a>(self, massPerType)</p></td>
 <td><p>Set the mass per type of atom.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setTimestep" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setTimestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setTimestep</span></code></a>(self, timestep)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setTimestep" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setTimestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setTimestep</span></code></a>(self, timestep)</p></td>
 <td><p>Set the timestep when this Universe was captured.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setVertexProperty" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setVertexProperty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setVertexProperty</span></code></a>(self, vertexId, ...)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.setVertexProperty" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.setVertexProperty"><code class="xref py py-obj docutils literal notranslate"><span class="pre">setVertexProperty</span></code></a>(self, vertexId, ...)</p></td>
 <td><p>Set a specific property for a specific vertex.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.simplify" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.simplify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simplify</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.simplify" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.simplify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simplify</span></code></a>(self)</p></td>
 <td><p>Remove self links and double bonds.</p></td>
 </tr>
 </tbody>
@@ -850,6 +853,12 @@ Useful e.g. to reduce the memory useage and runtime of
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.Universe.getNrOfDihedralAngles">
+<span class="sig-name descname"><span class="pre">getNrOfDihedralAngles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getNrOfDihedralAngles" title="Link to this definition">#</a></dt>
+<dd><p>Query the number of dihedralangles that have been added to this universe.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.Universe.getTimestep">
 <span class="sig-name descname"><span class="pre">getTimestep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getTimestep" title="Link to this definition">#</a></dt>
 <dd><p>Query the timestep when this universe was captured.</p>
@@ -1050,6 +1059,7 @@ and you may run out of memory when using this function, if your Universe/Network
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getNrOfBonds"><code class="docutils literal notranslate"><span class="pre">Universe.getNrOfBonds()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getNrOfBondsOfAtom"><code class="docutils literal notranslate"><span class="pre">Universe.getNrOfBondsOfAtom()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getNrOfBondsOfVertex"><code class="docutils literal notranslate"><span class="pre">Universe.getNrOfBondsOfVertex()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getNrOfDihedralAngles"><code class="docutils literal notranslate"><span class="pre">Universe.getNrOfDihedralAngles()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getTimestep"><code class="docutils literal notranslate"><span class="pre">Universe.getTimestep()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.getVolume"><code class="docutils literal notranslate"><span class="pre">Universe.getVolume()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.hasInfiniteStrand"><code class="docutils literal notranslate"><span class="pre">Universe.hasInfiniteStrand()</span></code></a></li>

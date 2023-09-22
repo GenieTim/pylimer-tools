@@ -67,6 +67,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Universe
       ~Universe.getNrOfBonds
       ~Universe.getNrOfBondsOfAtom
       ~Universe.getNrOfBondsOfVertex
+      ~Universe.getNrOfDihedralAngles
       ~Universe.getTimestep
       ~Universe.getVolume
       ~Universe.hasInfiniteStrand
