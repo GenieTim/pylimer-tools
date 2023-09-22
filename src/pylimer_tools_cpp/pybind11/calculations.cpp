@@ -405,6 +405,10 @@ init_pylimer_bound_calc(py::module_& m)
           :param tolerance: springs under this length are considered inactive
      )pbdoc",
          py::arg("tolerance") = 0.1)
+     .def("getSolubleWeightFraction", &mehp::MEHPForceRelaxation::getSolubleWeightFraction,
+     R"pbdoc(
+
+     )pbdoc")
     .def("getEffectiveFunctionalityOfAtoms",
          &mehp::MEHPForceRelaxation::getEffectiveFunctionalityOfAtoms,
          R"pbdoc(

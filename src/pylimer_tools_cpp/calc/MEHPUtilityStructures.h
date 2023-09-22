@@ -45,6 +45,7 @@ namespace calc {
       Eigen::ArrayXi springCoordinateIndexB;
       Eigen::ArrayXi springIndexA;
       Eigen::ArrayXi springIndexB;
+      ArrayXArrayXi springIndicesOfLinks;   // maps link -> springs
       // interesting properties
       ArrayXb springIsActive;
     };
