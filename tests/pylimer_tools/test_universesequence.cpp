@@ -3,8 +3,8 @@
 #include "../../src/pylimer_tools_cpp/entities/Molecule.h"
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
-#include <catch2/catch_test_macros.hpp>
 #include <catch2/catch_approx.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -90,15 +90,15 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
     REQUIRE(universe.getNrOfAngles() == 1);
   }
 
-  SECTION("MSD computation works") {
+  SECTION("MSD computation works")
+  {
     universeSeq.initializeFromDumpFile(
       suspectedPath + "lammps_data_file_small.out",
       suspectedPath + "lammps_dump_small_3step.lammpstrj");
     REQUIRE(universeSeq.getLength() == 3);
-    std::unordered_map<int, double> msdForAtoms = universeSeq.computeMsdForAtoms({
-      10000, 20000, 30000
-    }, 1, true);
-    REQUIRE(msdForAtoms[1] == Catch::Approx(0.23646));
+    std::unordered_map<int, double> msdForAtoms =
+      universeSeq.computeMsdForAtoms({ 10000, 20000, 30000 }, 1, true);
+    REQUIRE(msdForAtoms[1] == Catch::Approx(0.2364648387));
   }
 
   SECTION("Reading large files is sensibly fast")

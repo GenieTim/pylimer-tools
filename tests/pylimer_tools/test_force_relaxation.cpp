@@ -200,17 +200,19 @@ TEST_CASE(
       // initial system values
       CHECK(forceRelaxer2.getPressure() ==
             Catch::Approx(0.39911682390778536 / 79.));
-      CHECK(forceRelaxer2.getForce()*79 == Catch::Approx(552894.1903005145));
+      CHECK(forceRelaxer2.getForce() * 79 == Catch::Approx(552894.1903005145));
       CHECK(forceRelaxer2.getAverageContourLength() == Catch::Approx(79.0));
       Eigen::VectorXd contourLengths = forceRelaxer2.getSpringContourLength();
       for (int i = 0; i < contourLengths.size(); ++i) {
         CHECK(contourLengths[i] ==
               Catch::Approx(forceRelaxer2.getAverageContourLength()));
       }
-      CHECK(forceRelaxer2.getResidualNorm()*79 == Catch::Approx(1457.465048151));
+      CHECK(forceRelaxer2.getResidualNorm() * 79 ==
+            Catch::Approx(1457.465048151));
       REQUIRE_NOTHROW(forceRelaxer2.runForceRelaxation());
       CHECK(forceRelaxer2.getNrOfSprings() == 8142);
       CHECK(forceRelaxer2.getNrOfIterations() > 1);
+      CHECK(forceRelaxer2.getSolubleWeightFraction() > 0.);
 
       // conversion factors
       double kb = 1.381e-23; // Boltzmann, J/K
@@ -304,6 +306,7 @@ TEST_CASE(
     CHECK(forceRelaxer2.getAverageSpringLength() > 1.0);
     CHECK(forceRelaxer2.getEffectiveFunctionalityOfAtoms().size() ==
           forceRelaxer2.getNrOfNodes());
+    CHECK(forceRelaxer2.getSolubleWeightFraction() > 0.);
 
     pe::Universe universe3 = forceRelaxer2.getCrosslinkerVerse();
     CHECK(universe3.getNrOfAtoms() == forceRelaxer2.getNrOfNodes());
@@ -331,6 +334,18 @@ TEST_CASE(
     //   auto duration = duration_cast<std::chrono::microseconds>(stop - start);
     //   std::cout << "Took: " << duration.count() << std::endl;
     // }
+  }
+
+  SECTION("Simple melt case")
+  {
+    std::string dataFile = suspectedPath + "lammps_data_file.out";
+    universeSeq.initializeFromDataSequence({ { dataFile } });
+    pe::Universe universe = universeSeq.atIndex(0);
+    pcm::MEHPForceRelaxation forceRelaxer =
+      pcm::MEHPForceRelaxation(universe, 2, true);
+    // not a proper network -> 0 springs
+    CHECK(forceRelaxer.getNrOfSprings() == 0);
+    CHECK(forceRelaxer.getSolubleWeightFraction() == 0.);
   }
 }
 
@@ -405,6 +420,7 @@ TEST_CASE(
       // "LN_COBYLA", "LN_NEWUOA_BOUND"
       CHECK(forceRelaxer2.getNrOfSprings() == 8142);
       CHECK(forceRelaxer2.getNrOfIterations() > 1);
+      CHECK(forceRelaxer2.getSolubleWeightFraction() > 0.);
 
       // conversion factors
       double kb = 1.381e-23; // Boltzmann, J/K
@@ -415,8 +431,8 @@ TEST_CASE(
       double beadMass = 161.;                           // g/mol
       double Nb = 80.; // nr of beads per strand
       double conversionFactor =
-        (forceRelaxer2.getNetwork().meanSpringContourLength) * 3. * kb *
-        T / (slope * beadMass); // J/sigma^2
+        (forceRelaxer2.getNetwork().meanSpringContourLength) * 3. * kb * T /
+        (slope * beadMass); // J/sigma^2
       CHECK(conversionFactor / (sigmaToM * sigmaToM * 79. * 79.) ==
             Catch::Approx(0.0002486513));
       double nu =
@@ -431,12 +447,12 @@ TEST_CASE(
         Catch::Approx(
           (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) / 3.)
           .epsilon(0.02));
-      CHECK(forceRelaxer2.getPressure()* 79. ==
+      CHECK(forceRelaxer2.getPressure() * 79. ==
             Catch::Approx(0.1538073308)); // LJ Units [?]
       CHECK(forceRelaxer2.getPressure() * conversionFactor /
               (sigmaToM * sigmaToM * sigmaToM * 79.) ==
-            Catch::Approx(
-              61308.9809826224 * 80./79.)); // shear modulus from the pressure, MPa
+            Catch::Approx(61308.9809826224 * 80. /
+                          79.)); // shear modulus from the pressure, MPa
       double nrOfChainCorrection =
         (forceRelaxer2.getDefaultNrOfChains() / nrOfChains);
       double expectedNb2 = slope * Nb * beadMass;
