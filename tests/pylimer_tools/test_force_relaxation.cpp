@@ -213,6 +213,7 @@ TEST_CASE(
       CHECK(forceRelaxer2.getNrOfSprings() == 8142);
       CHECK(forceRelaxer2.getNrOfIterations() > 1);
       CHECK(forceRelaxer2.getSolubleWeightFraction() > 0.);
+      CHECK(forceRelaxer2.getSolubleWeightFraction() < 1.);
 
       // conversion factors
       double kb = 1.381e-23; // Boltzmann, J/K
@@ -345,7 +346,7 @@ TEST_CASE(
       pcm::MEHPForceRelaxation(universe, 2, true);
     // not a proper network -> 0 springs
     CHECK(forceRelaxer.getNrOfSprings() == 0);
-    CHECK(forceRelaxer.getSolubleWeightFraction() == 0.);
+    CHECK(forceRelaxer.getSolubleWeightFraction() == 1.);
   }
 }
 
@@ -421,6 +422,7 @@ TEST_CASE(
       CHECK(forceRelaxer2.getNrOfSprings() == 8142);
       CHECK(forceRelaxer2.getNrOfIterations() > 1);
       CHECK(forceRelaxer2.getSolubleWeightFraction() > 0.);
+      CHECK(forceRelaxer2.getSolubleWeightFraction() < 1.);
 
       // conversion factors
       double kb = 1.381e-23; // Boltzmann, J/K
