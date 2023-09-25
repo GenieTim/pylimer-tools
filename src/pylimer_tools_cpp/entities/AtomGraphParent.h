@@ -203,7 +203,29 @@ namespace entities {
     {
       return igraph_cattribute_has_attr(
         &this->graph, IGRAPH_ATTRIBUTE_VERTEX, propertyName);
-    };
+    }
+
+    /**
+     * @brief Count how often a certain value appears in the vertex properties
+     *
+     * For example, to count the number of cross-links, one could use
+     * this->countPropertyValue<int>("type", crosslinkerType)
+     *
+     * @tparam IN
+     * @param propertyName
+     * @param targetValue
+     * @return int
+     */
+    template<typename IN>
+    int countPropertyValue(const char* propertyName, IN targetValue) const
+    {
+      std::vector<IN> values = this->getPropertyValues<IN>(propertyName);
+      int result = 0;
+      for (IN value : values) {
+        result += (value == targetValue);
+      }
+      return result;
+    }
 
     /**
      * @brief Get the value of a property (attribute) of each and every vertex

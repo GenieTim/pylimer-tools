@@ -132,7 +132,10 @@
     "shared_mutex": "cpp",
     "cfenv": "cpp",
     "__verbose_abort": "cpp",
-    "globals.h": "c"
+    "globals.h": "c",
+    "charconv": "cpp",
+    "format": "cpp",
+    "span": "cpp"
   },
   "C_Cpp.clang_format_path": "/usr/local/opt/llvm/bin/clang-format"
 }

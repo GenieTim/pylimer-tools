@@ -546,7 +546,9 @@ namespace entities {
       result[atomType] += 1;
     }
     return result;
-  };
+  }
+
+  
 
   /**
    * @brief Count the number of atoms within a certain distance.

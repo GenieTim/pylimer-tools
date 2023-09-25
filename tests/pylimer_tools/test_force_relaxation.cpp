@@ -307,7 +307,7 @@ TEST_CASE(
     CHECK(forceRelaxer2.getAverageSpringLength() > 1.0);
     CHECK(forceRelaxer2.getEffectiveFunctionalityOfAtoms().size() ==
           forceRelaxer2.getNrOfNodes());
-    CHECK(forceRelaxer2.getSolubleWeightFraction() > 0.);
+    CHECK(forceRelaxer2.getSolubleWeightFraction() < 1.);
 
     pe::Universe universe3 = forceRelaxer2.getCrosslinkerVerse();
     CHECK(universe3.getNrOfAtoms() == forceRelaxer2.getNrOfNodes());

@@ -132,6 +132,18 @@ namespace calc {
       }
 
       /**
+       * @brief Get the Dangling Weight Fraction
+       *
+       * @param tolerance
+       * @return double
+       */
+      double getDanglingWeightFraction(double tolerance = 0.1)
+      {
+        return this->computeDanglingWeightFraction(
+          &this->initialConfig, this->currentSpringDistances, tolerance);
+      }
+
+      /**
        * @brief Get the Effective Functionality Of each node
        *
        * Returns the number of active springs connected to each atom, atomId
@@ -297,6 +309,7 @@ namespace calc {
         // need to include all but dangling and free chains in order to
         // model entanglement
         size_t nrOfSprings = 0;
+        size_t omittedChainsAtoms = 0;
         for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
           std::vector<pylimer_tools::entities::Atom> endAtoms =
             crosslinkerChains[i].getAtomsOfType(crosslinkerType);
@@ -305,6 +318,10 @@ namespace calc {
               crosslinkerChains[i].getType() ==
                 pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
             nrOfSprings += 1;
+          } else {
+            // assert(endAtoms.size() == 0); // can also be
+            omittedChainsAtoms +=
+              (crosslinkerChains[i].getNrOfAtoms() - endAtoms.size());
           }
         }
 
@@ -406,6 +423,15 @@ namespace calc {
           net->meanSpringContourLength = net->springsContourLength.mean();
         }
 
+        // check whether spring contour lengths are what we want them to be
+        size_t numCrosslinkers =
+          this->universe.countPropertyValue<int>("type", crosslinkerType);
+        assert((net->springsContourLength.array() -
+                Eigen::ArrayXd::Ones(net->nrOfSprings))
+                   .sum() +
+                 omittedChainsAtoms + numCrosslinkers ==
+               this->universe.getNrOfAtoms());
+
         return true; // crosslinkerUniverse.getNrOfBonds() == net->nrOfSprings;
       };
 
@@ -502,6 +528,46 @@ namespace calc {
       {
         return (this->findActiveSprings(springDistances, tolerance) == true)
           .count();
+      }
+
+      /**
+       * @brief Compute the weight fraction of non-active springs
+       *
+       * @param net
+       * @param springDistances
+       * @param tolerance
+       * @return double
+       */
+      double computeDanglingWeightFraction(
+        Network* net,
+        const Eigen::VectorXd& springDistances,
+        const double tolerance = 0.1) const
+      {
+        if (net->nrOfSprings * 3 != springDistances.size()) {
+          throw std::invalid_argument(
+            "Spring distances and network don't match");
+        }
+        if (net->nrOfSprings < 1) {
+          return 1.;
+        }
+        // find all active springs
+        ArrayXb activeSprings =
+          this->findActiveSprings(springDistances, tolerance);
+        if (activeSprings.count() == 0) {
+          return 1.;
+        }
+        // as of now, the springsContourLength is equal to the number of bonds
+        // from cross-link to cross-link. therefore, the number of atoms of each
+        // of these springs is one less
+        Eigen::ArrayXd allActiveAtomsPerChains =
+          activeSprings.cast<double>() *
+          (net->springsContourLength.array() -
+           Eigen::ArrayXd::Ones(net->nrOfSprings));
+        // finally, normalise by the number of atoms.
+        // NOTE: currently, the weight of the atoms is ignored
+        return 1. - ((allActiveAtomsPerChains).matrix().sum() +
+                     this->getNrOfActiveNodes()) /
+                      this->universe.getNrOfAtoms();
       }
 
       /**
