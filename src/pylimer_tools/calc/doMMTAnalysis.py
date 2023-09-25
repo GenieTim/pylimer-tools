@@ -120,9 +120,12 @@ def calculateWeightFractionOfDanglingChains(network: Universe, crosslinkerType: 
       - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. 
 
     Returns:
-      - weightFraction $\\Phi_d = 1 - \\Phi_{el}$: weightDangling/weightTotal
+      - weightFraction $\\Phi_d = 1 - \\Phi_{el} - w_{sol}$: weightDangling/weightTotal
     """
-    return 1 - calculateWeightFractionOfBackbone(network, crosslinkerType, strandLength, functionalityPerType, weightFractions, r, p)
+    return 1. \
+        - calculateWeightFractionOfBackbone(network, crosslinkerType, strandLength, functionalityPerType, weightFractions, r, p) \
+        - computeWeightFractionOfSolubleMaterial(
+            network, crosslinkerType, strandLength, functionalityPerType, weightFractions, r, p)
 
 
 def calculateWeightFractionOfBackbone(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None, r: float = None, p: float = None) -> float:
@@ -244,6 +247,7 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, crosslinkerType: i
 
     if (weightFractions is None):
         weightFractions = computeWeightFractions(network)
+        assert(np.sum(weightFractions.values()) == 1)
 
     if (p is None):
         assert(network is not None)
@@ -387,7 +391,7 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crossli
         T = (273.15+25)*unitStyle.getUnderlyingUnitRegistry()('kelvin')
     if (Ge1 is None):
         Ge1 = (8.3145 *  # gas constant, J/(mol*K)
-               T.to("kelvin").magnitude * # Temperature in Kelvin
+               T.to("kelvin").magnitude *  # Temperature in Kelvin
                1e-6 * 94.79281)*unitStyle.getUnderlyingUnitRegistry()('MPa')  # -> MPa, melt entanglement modulus
 
     # affine

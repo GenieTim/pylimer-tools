@@ -405,10 +405,23 @@ init_pylimer_bound_calc(py::module_& m)
           :param tolerance: springs under this length are considered inactive
      )pbdoc",
          py::arg("tolerance") = 0.1)
-     .def("getSolubleWeightFraction", &mehp::MEHPForceRelaxation::getSolubleWeightFraction,
-     R"pbdoc(
+    .def("getSolubleWeightFraction",
+         &mehp::MEHPForceRelaxation::getSolubleWeightFraction,
+         R"pbdoc(
+          Compute the weight fraction of springs connected to active
+          springs (any depth). 
+          
+          Caution: ignores atom masses.
+     )pbdoc",
+         py::arg("tolerance") = 0.1)
+    .def("getDanglingWeightFraction",
+         &mehp::MEHPForceRelaxation::getDanglingWeightFraction,
+         R"pbdoc(
+          Compute the weight fraction of non-active springs
 
-     )pbdoc")
+          Caution: ignores atom masses.
+     )pbdoc",
+         py::arg("tolerance") = 0.1)
     .def("getEffectiveFunctionalityOfAtoms",
          &mehp::MEHPForceRelaxation::getEffectiveFunctionalityOfAtoms,
          R"pbdoc(
@@ -609,6 +622,23 @@ init_pylimer_bound_calc(py::module_& m)
          R"pbdoc(
           Returns the pressure at the current state of the simulation.
      )pbdoc")
+    .def("getSolubleWeightFraction",
+         &mehp::MEHPForceBalance::getSolubleWeightFraction,
+         R"pbdoc(
+          Compute the weight fraction of springs connected to active
+          springs (any depth). 
+          
+          Caution: ignores atom masses.
+     )pbdoc",
+         py::arg("tolerance") = 0.1)
+    .def("getDanglingWeightFraction",
+         &mehp::MEHPForceBalance::getDanglingWeightFraction,
+         R"pbdoc(
+          Compute the weight fraction of non-active springs
+
+          Caution: ignores atom masses.
+     )pbdoc",
+         py::arg("tolerance") = 0.1)
     .def("addSlipLinks",
          py::overload_cast<const std::vector<size_t>&,
                            const std::vector<size_t>&,
@@ -1132,18 +1162,16 @@ init_pylimer_bound_calc(py::module_& m)
     .value("NUM_RELOC", dpd::ComputedIntValues::NUM_RELOC);
 
   py::class_<dpd::OutputConfiguration>(m, "OutputConfiguration")
-    .def(
-      py::init<>(), "Get an instance of this struct")
+    .def(py::init<>(), "Get an instance of this struct")
     .def_readwrite("intValues", &dpd::OutputConfiguration::intValues)
     .def_readwrite("doubleValues", &dpd::OutputConfiguration::doubleValues)
     .def_readwrite(
       "filename",
       &dpd::OutputConfiguration::filename,
       R"pbdoc(The file to write to. Empty means standard output (console).)pbdoc")
-    .def_readwrite(
-      "outputEvery",
-      &dpd::OutputConfiguration::outputEvery,
-      R"pbdoc(How often to write the values to the output. 
+    .def_readwrite("outputEvery",
+                   &dpd::OutputConfiguration::outputEvery,
+                   R"pbdoc(How often to write the values to the output. 
       For averages, this value also says how many values will be averaged.
      )pbdoc");
 
