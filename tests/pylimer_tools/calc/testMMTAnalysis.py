@@ -98,9 +98,6 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertDictEqual(
             {}, computeWeightFractions(self.emptyUniverse))
 
-        self.assertRaises(IndexError, lambda: computeWeightFractions(
-            self.testUniverse))
-
         self.testUniverse.setMasses({1: 1, 2: 1})
         weightFractions = computeWeightFractions(
             self.testUniverse)
@@ -130,10 +127,13 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             self.testUniverse, 2, functionalityPerType={1: 2, 2: 2}))
         self.assertRaises(NotImplementedError, lambda: computeWeightFractionOfSolubleMaterial(
             self.testUniverse, 2, functionalityPerType={1: 1, 2: 3}))
+        self.assertRaises(ValueError, lambda: computeWeightFractionOfSolubleMaterial(
+            self.testUniverse, 7))
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
-        resTuple = computeWeightFractionOfSolubleMaterial(
+
+        resTuple = computeWeightFractionsAndProbabilities(
             self.saturatedTestUniverse, 2)
-        expectedTuple = (0.010699588477366243, {
+        expectedTuple = ({
                          1: 0.85, 2: 0.15}, 0.111111111111111, 0.111111111111111)
         self.assertEqual(len(resTuple), len(expectedTuple))
         for i in range(len(resTuple)):
@@ -147,6 +147,10 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
                 raise ValueError(
                     "Expected integer, float or dict for comparison")
 
+        self.assertAlmostEqual(0.010699588477366243, computeWeightFractionOfSolubleMaterial(
+            self.saturatedTestUniverse, 2
+        ))
+
     # def testProbabilityCalculations(self):
     #     self.assertRaises(
     #         ValueError, lambda: computeMMsProbabilities(0.9, 2, 2))
@@ -156,7 +160,9 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
     def testBackboneWeightFractionCalculations(self):
         self.assertEqual(0, calculateWeightFractionOfBackbone(
             self.emptyUniverse, 2, {}))
-        self.assertEqual(1, calculateWeightFractionOfDanglingChains(
+        self.assertEqual(0, calculateWeightFractionOfDanglingChains(
+            self.emptyUniverse, 2, {}))
+        self.assertEqual(1, computeWeightFractionOfSolubleMaterial(
             self.emptyUniverse, 2, {}))
         self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
         self.assertAlmostEqual(1.0, computeExtentOfReaction(
@@ -164,9 +170,11 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         # TODO: get some literature backed values to test for
         bb = calculateWeightFractionOfBackbone(
             self.saturatedTestUniverse, crosslinkerType=2)
+        wsol = computeWeightFractionOfSolubleMaterial(
+            self.saturatedTestUniverse, crosslinkerType=2)
         self.assertAlmostEqual(0.8, bb)
         self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
-        self.assertEqual(1-bb, calculateWeightFractionOfDanglingChains(
+        self.assertEqual(1-bb-wsol, calculateWeightFractionOfDanglingChains(
             self.saturatedTestUniverse, 2))
 
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
