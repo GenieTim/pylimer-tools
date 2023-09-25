@@ -233,7 +233,7 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, crosslinkerType: i
       - :math:`\\alpha` (float): Macosko & Miller's :math:`P(F_A)`
       - :math:`\\beta` (float): Macosko & Miller's :math:`P(F_B)`
     """
-    if (network.getNrOfBonds() == 0):
+    if (network is not None and network.getNrOfBonds() == 0):
         return 1.
 
     if (functionalityPerType is None or crosslinkerType not in functionalityPerType):
