@@ -24,6 +24,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance
       ~MEHPForceBalance.evaluateDistanceBetween
       ~MEHPForceBalance.getAverageSpringLength
       ~MEHPForceBalance.getCrosslinkerVerse
+      ~MEHPForceBalance.getDanglingWeightFraction
       ~MEHPForceBalance.getDefaultNrOfChains
       ~MEHPForceBalance.getDefaultR0Square
       ~MEHPForceBalance.getDisplacementResidualNorm
@@ -41,6 +42,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance
       ~MEHPForceBalance.getNrOfNodes
       ~MEHPForceBalance.getNrOfSprings
       ~MEHPForceBalance.getPressure
+      ~MEHPForceBalance.getSolubleWeightFraction
       ~MEHPForceBalance.getSpringPartitions
       ~MEHPForceBalance.getSpringpartitionIndicesOfSliplink
       ~MEHPForceBalance.getStressTensor
