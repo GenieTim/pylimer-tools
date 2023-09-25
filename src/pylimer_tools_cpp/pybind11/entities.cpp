@@ -809,6 +809,8 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("crossLinkerType"))
     .def("computeWeightFractions", &Universe::computeWeightFractions, R"pbdoc(
             Compute the weight fractions of each atom type in the network.
+
+            If no masses are stored, 
             )pbdoc")
     .def(
       "computeEndToEndDistances", &Universe::computeEndToEndDistances, R"pbdoc(

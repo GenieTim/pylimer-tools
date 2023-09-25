@@ -548,8 +548,6 @@ namespace entities {
     return result;
   }
 
-  
-
   /**
    * @brief Count the number of atoms within a certain distance.
    *
@@ -1433,11 +1431,21 @@ namespace entities {
     }
 
     std::vector<int> types = this->getPropertyValues<int>("type");
+    std::map<int, int> numberPerType = this->countAtomTypes();
+
+    // if we do not have any masses stored, we return the "general" fractions
+    if (this->massPerType.empty()) {
+      // Cast the int_map to double_map
+      for (const auto& [key, value] : numberPerType) {
+        partialMasses[key] = static_cast<double>(value) / this->getNrOfAtoms();
+      }
+      return partialMasses;
+    }
+
     double totalMass = 0.0;
-    for (int type : types) {
-      totalMass += this->massPerType.at(type);
-      partialMasses.try_emplace(type, 0.0);
-      partialMasses[type] += this->massPerType.at(type);
+    for (const auto& [type, count] : numberPerType) {
+      totalMass += this->massPerType.at(type) * count;
+      partialMasses[type] += this->massPerType.at(type) * count;
     }
 
     if (totalMass == 0.0) {
@@ -1842,7 +1850,7 @@ namespace entities {
                                       this->angleTo.size(),
                                       this->angleVia.size(),
                                       this->angleType.size()),
-      "Invalid internal state: the angle info is not consistent");
+                    "Invalid internal state: the angle info is not consistent");
     return this->angleFrom.size();
   }
 
