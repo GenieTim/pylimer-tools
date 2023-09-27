@@ -16,7 +16,7 @@ extern "C"
 namespace pylimer_tools {
 namespace entities {
 
-    NeighbourList::NeighbourList(const std::vector<Atom> &atoms, const Box &box, double cutoff)
+    NeighbourList::NeighbourList(const std::vector<Atom> atoms, const Box box, double cutoff)
     {
       if (cutoff <= 1e-3) {
         throw std::invalid_argument("Cutoff must be larger than zero");
@@ -63,13 +63,13 @@ namespace entities {
     };
 
     std::vector<pylimer_tools::entities::Atom> NeighbourList::getAtomsCloseTo(
-      pylimer_tools::entities::Atom &atom)
+      pylimer_tools::entities::Atom atom)
     {
       return this->getAtomsCloseTo(atom, this->cutoff);
     }
 
     std::vector<pylimer_tools::entities::Atom> NeighbourList::getAtomsCloseTo(
-      pylimer_tools::entities::Atom &atom,
+      pylimer_tools::entities::Atom atom,
       double upperCutoff,
       double lowerCutoff,
       bool unwrapped)
