@@ -308,6 +308,10 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
 
     SECTION("Masses are persisted in session")
     {
+      std::map<int, double> weightFractions = universe.computeWeightFractions();
+      CHECK(!weightFractions.empty());
+      CHECK(weightFractions[2] ==
+            (3. / 8.)); // without masses, the default is 1.0 per type
       std::map<int, double> masses = universe.getMasses();
       REQUIRE(masses.size() == 0);
       masses[1] = 1.0;
@@ -316,9 +320,9 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       std::map<int, double> newMasses = universe.getMasses();
       CHECK(newMasses[1] == 1.0);
       CHECK(newMasses[2] == 2.0);
-      std::map<int, double> weightFraction = universe.computeWeightFractions();
-      CHECK(weightFraction[1] == (5.0 * 1.0) / (3.0 * 2.0 + 5.0 * 1.0));
-      CHECK(weightFraction[2] == (2.0 * 3.0) / (3.0 * 2.0 + 5.0 * 1.0));
+      weightFractions = universe.computeWeightFractions();
+      CHECK(weightFractions[1] == (5.0 * 1.0) / (3.0 * 2.0 + 5.0 * 1.0));
+      CHECK(weightFractions[2] == (2.0 * 3.0) / (3.0 * 2.0 + 5.0 * 1.0));
       CHECK(universe.computeTotalMass() == Catch::Approx(5 * 1.0 + 3 * 2.0));
       std::map<int, double> otherMasses(masses);
       otherMasses[2] = 0.0;
@@ -410,14 +414,15 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(detectedAngles["dihedral_angle_from"].size() == 8);
       std::vector<int> angleTypes;
       angleTypes.reserve(detectedAngles["dihedral_angle_from"].size());
-      for (size_t i = 0; i < detectedAngles["dihedral_angle_from"].size(); i++) {
+      for (size_t i = 0; i < detectedAngles["dihedral_angle_from"].size();
+           i++) {
         angleTypes.push_back(1);
       }
       universe.addDihedralAngles(detectedAngles["dihedral_angle_from"],
-                         detectedAngles["dihedral_angle_via1"],
-                         detectedAngles["dihedral_angle_via2"],
-                         detectedAngles["dihedral_angle_to"],
-                         angleTypes);
+                                 detectedAngles["dihedral_angle_via1"],
+                                 detectedAngles["dihedral_angle_via2"],
+                                 detectedAngles["dihedral_angle_to"],
+                                 angleTypes);
       REQUIRE(universe.getDihedralAngles()["dihedral_angle_from"].size() == 8);
     }
 

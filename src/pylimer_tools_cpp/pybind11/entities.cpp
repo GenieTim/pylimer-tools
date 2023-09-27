@@ -714,6 +714,9 @@ init_pylimer_bound_entities(py::module_& m)
     .def("getNrOfAngles", &Universe::getNrOfAngles, R"pbdoc(
             Query the number of angles that have been added to this universe.
             )pbdoc")
+    .def("getNrOfDihedralAngles", &Universe::getNrOfDihedralAngles, R"pbdoc(
+            Query the number of dihedralangles that have been added to this universe.
+            )pbdoc")
     .def("getTimestep", &Universe::getTimestep, R"pbdoc(
             Query the timestep when this universe was captured.
             )pbdoc")
@@ -806,6 +809,8 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("crossLinkerType"))
     .def("computeWeightFractions", &Universe::computeWeightFractions, R"pbdoc(
             Compute the weight fractions of each atom type in the network.
+
+            If no masses are stored, 
             )pbdoc")
     .def(
       "computeEndToEndDistances", &Universe::computeEndToEndDistances, R"pbdoc(

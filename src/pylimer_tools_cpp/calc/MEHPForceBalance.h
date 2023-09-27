@@ -479,6 +479,30 @@ namespace calc {
       }
 
       /**
+       * @brief Get the Soluble Weight Fraction
+       *
+       * @param tolerance
+       * @return double
+       */
+      double getSolubleWeightFraction(double tolerance = 0.1)
+      {
+        return this->computeSolubleWeightFraction(
+          &this->initialConfig, this->currentSpringDistances, tolerance);
+      }
+
+      /**
+       * @brief Get the Dangling Weight Fraction
+       *
+       * @param tolerance
+       * @return double
+       */
+      double getDanglingWeightFraction(double tolerance = 0.1)
+      {
+        return this->computeDanglingWeightFraction(
+          &this->initialConfig, this->currentSpringDistances, tolerance);
+      }
+
+      /**
        * @brief Get the Effective Functionality Of each node
        *
        * Returns the number of active springs connected to each atom, atomId
@@ -490,6 +514,110 @@ namespace calc {
        */
       std::unordered_map<long int, int> getEffectiveFunctionalityOfAtoms(
         double tolerance = 0.1) const;
+
+      /**
+       * @brief Compute the weight fraction of non-active springs
+       *
+       * @param net
+       * @param springDistances
+       * @param tolerance
+       * @return double
+       */
+      double computeDanglingWeightFraction(
+        ForceBalanceNetwork* net,
+        const Eigen::VectorXd& springDistances,
+        const double tolerance = 0.1) const
+      {
+        if (net->nrOfSprings * 3 != springDistances.size()) {
+          throw std::invalid_argument(
+            "Spring distances and network don't match");
+        }
+        if (net->nrOfSprings < 1) {
+          return 1.;
+        }
+        // find all active springs
+        ArrayXb activeSprings =
+          this->findActiveSprings(springDistances, tolerance);
+        if (activeSprings.count() == 0) {
+          return 1.;
+        }
+        // as of now, the springsContourLength is equal to the number of bonds
+        // from cross-link to cross-link. therefore, the number of atoms of each
+        // of these springs is one less
+        Eigen::ArrayXd allActiveAtomsPerChains =
+          activeSprings.cast<double>() *
+          (net->springsContourLength.array() -
+           Eigen::ArrayXd::Ones(net->nrOfSprings));
+        // finally, normalise by the number of atoms.
+        // NOTE: currently, the weight of the atoms is ignored
+        return 1. - ((allActiveAtomsPerChains).matrix().sum() +
+                     this->getNrOfActiveNodes()) /
+                      this->universe.getNrOfAtoms();
+      }
+
+      /**
+       * @brief Compute the weight fraction of springs connected to active
+       * springs (any depth)
+       *
+       * @param net
+       * @param springDistances
+       * @param tolerance
+       * @return double
+       */
+      double computeSolubleWeightFraction(
+        ForceBalanceNetwork* net,
+        const Eigen::VectorXd& springDistances,
+        const double tolerance = 0.1) const
+      {
+        if (net->nrOfSprings * 3 != springDistances.size()) {
+          throw std::invalid_argument(
+            "Spring distances and network don't match");
+        }
+        if (net->nrOfSprings < 1) {
+          return 1.;
+        }
+        // find all active springs
+        ArrayXb activeSprings =
+          this->findActiveSprings(springDistances, tolerance);
+        if (activeSprings.count() == 0) {
+          return 1.;
+        }
+        // then, iteratively walk along the springs to mark those as "active"
+        // that are connected to active springs
+        bool hadChanged = true;
+        while (hadChanged) {
+          ArrayXb oldActiveSprings = activeSprings;
+          for (size_t i = 0; i < net->nrOfNodes; ++i) {
+            bool anyActive = false;
+            for (size_t spring_idx : net->springIndicesOfLinks[i]) {
+              if (activeSprings[spring_idx]) {
+                anyActive = true;
+                break;
+              }
+            }
+
+            if (anyActive) {
+              for (size_t spring_idx : net->springIndicesOfLinks[i]) {
+                activeSprings[spring_idx] = true;
+              }
+            }
+          }
+          hadChanged = (oldActiveSprings.count() != activeSprings.count());
+        }
+
+        // as of now, the springsContourLength is equal to the number of bonds
+        // from cross-link to cross-link. therefore, the number of atoms of each
+        // of these springs is one less
+        Eigen::ArrayXd allActiveAtomsPerChains =
+          activeSprings.cast<double>() *
+          (net->springsContourLength.array() -
+           Eigen::ArrayXd::Ones(net->nrOfSprings));
+        // finally, normalise by the number of atoms.
+        // NOTE: currently, the weight of the atoms is ignored
+        return 1. - ((allActiveAtomsPerChains).matrix().sum() +
+                     this->getNrOfActiveNodes()) /
+                      this->universe.getNrOfAtoms();
+      }
 
       /**
        * @brief Get the Ids Of active Nodes
@@ -862,7 +990,7 @@ namespace calc {
                                    const Eigen::VectorXd& u,
                                    Eigen::VectorXd& springPartitions,
                                    double swappableCutoff,
-        const bool respectLoops = true);
+                                   const bool respectLoops = true);
 
       /**
        * @brief Loop all springs, swap slip-links on them if they are close
