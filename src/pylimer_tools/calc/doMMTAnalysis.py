@@ -63,7 +63,7 @@ def predictNumberDensityOfJunctionPoints(network: Universe, crosslinkerType: int
     if (functionalityPerType is None or crosslinkerType not in functionalityPerType):
         functionalityPerType = network.determineFunctionalityPerType()
 
-    _, weightFractions, alpha, _ = computeWeightFractionOfSolubleMaterial(
+    weightFractions, alpha, _ = computeWeightFractionsAndProbabilities(
         network, crosslinkerType, strandLength, functionalityPerType)
 
     if (functionalityPerType[crosslinkerType] == 3):
@@ -120,9 +120,12 @@ def calculateWeightFractionOfDanglingChains(network: Universe, crosslinkerType: 
       - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. 
 
     Returns:
-      - weightFraction $\\Phi_d = 1 - \\Phi_{el}$: weightDangling/weightTotal
+      - weightFraction $\\Phi_d = 1 - \\Phi_{el} - w_{sol}$: weightDangling/weightTotal
     """
-    return 1 - calculateWeightFractionOfBackbone(network, crosslinkerType, strandLength, functionalityPerType, weightFractions, r, p)
+    return 1. \
+        - calculateWeightFractionOfBackbone(network, crosslinkerType, strandLength, functionalityPerType, weightFractions, r, p) \
+        - computeWeightFractionOfSolubleMaterial(
+            network, crosslinkerType, strandLength, functionalityPerType, weightFractions, r, p)
 
 
 def calculateWeightFractionOfBackbone(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None, r: float = None, p: float = None) -> float:
@@ -148,8 +151,8 @@ def calculateWeightFractionOfBackbone(network: Universe, crosslinkerType: int, s
     if (functionalityPerType is None or crosslinkerType not in functionalityPerType):
         functionalityPerType = network.determineFunctionalityPerType()
 
-    W_sol, weightFractions, alpha, beta = computeWeightFractionOfSolubleMaterial(
-        network, crosslinkerType, strandLength, functionalityPerType, weightFractions, r, p)
+    weightFractions, alpha, beta = computeWeightFractionsAndProbabilities(network, crosslinkerType, strandLength, functionalityPerType, weightFractions, r, p)
+    W_sol = computeWeightFractionOfSolubleMaterial(network, crosslinkerType, strandLength, functionalityPerType, weightFractions, r, p)
     if (W_sol < 0 or W_sol > 1):
         warnings.warn(
             "The weight fraction W_sol predicted by MMT ({}) is outside accepted range. Falling back to measurement.".format(W_sol))
@@ -191,6 +194,7 @@ def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.7
     """
     if (network.getNrOfAtoms() == 0):
         return None
+    
     fractions = network.getClusters()
     weights = np.array([f.computeTotalMass() for f in fractions])
     totalWeight = weights.sum()
@@ -229,9 +233,31 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, crosslinkerType: i
       - :math:`\\alpha` (float): Macosko & Miller's :math:`P(F_A)`
       - :math:`\\beta` (float): Macosko & Miller's :math:`P(F_B)`
     """
+    if (network.getNrOfBonds() == 0):
+        return 1.
+
     if (functionalityPerType is None or crosslinkerType not in functionalityPerType):
         assert(network is not None)
         functionalityPerType = network.determineFunctionalityPerType()
+
+    weightFractions, alpha, beta = computeWeightFractionsAndProbabilities(network, crosslinkerType, strandLength, functionalityPerType, weightFractions, r, p)
+
+    W_sol = 0
+    for key in weightFractions:
+        coeff = alpha if key == crosslinkerType else beta
+        W_sol += weightFractions[key] * \
+            (math.pow(coeff, functionalityPerType[key]))
+
+    return W_sol
+
+def computeWeightFractionsAndProbabilities(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None, r: float = None, p: float = None):
+
+    if (functionalityPerType is None or crosslinkerType not in functionalityPerType):
+        assert(network is not None)
+        functionalityPerType = network.determineFunctionalityPerType()
+        if (crosslinkerType not in functionalityPerType):
+            raise ValueError("The crosslinker type {} is not present in the network. Got types {}".format(
+                crosslinkerType, ", ".join([str(t) for t in functionalityPerType.keys()])))
 
     if (functionalityPerType[crosslinkerType] not in range(3, 7)):
         raise NotImplementedError(
@@ -244,6 +270,7 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, crosslinkerType: i
 
     if (weightFractions is None):
         weightFractions = computeWeightFractions(network)
+        assert(math.isclose(sum(w for w in weightFractions.values()), 1., abs_tol=1e-9))
 
     if (p is None):
         assert(network is not None)
@@ -265,14 +292,8 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, crosslinkerType: i
         r, p, functionalityPerType[crosslinkerType])
     assert(alpha <= 1 and alpha >= 0)
     assert(beta <= 1 and beta >= 0)
-    W_sol = 0
-    for key in weightFractions:
-        coeff = alpha if key == crosslinkerType else beta
-        W_sol += weightFractions[key] * \
-            (math.pow(coeff, functionalityPerType[key]))
 
-    return W_sol, weightFractions, alpha, beta
-
+    return weightFractions, alpha, beta
 
 def computeMMsProbabilities(r, p, f):
     """
@@ -387,7 +408,7 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crossli
         T = (273.15+25)*unitStyle.getUnderlyingUnitRegistry()('kelvin')
     if (Ge1 is None):
         Ge1 = (8.3145 *  # gas constant, J/(mol*K)
-               T.to("kelvin").magnitude * # Temperature in Kelvin
+               T.to("kelvin").magnitude *  # Temperature in Kelvin
                1e-6 * 94.79281)*unitStyle.getUnderlyingUnitRegistry()('MPa')  # -> MPa, melt entanglement modulus
 
     # affine

@@ -120,6 +120,30 @@ namespace calc {
       }
 
       /**
+       * @brief Get the Soluble Weight Fraction
+       *
+       * @param tolerance
+       * @return double
+       */
+      double getSolubleWeightFraction(double tolerance = 0.1)
+      {
+        return this->computeSolubleWeightFraction(
+          &this->initialConfig, this->currentSpringDistances, tolerance);
+      }
+
+      /**
+       * @brief Get the Dangling Weight Fraction
+       *
+       * @param tolerance
+       * @return double
+       */
+      double getDanglingWeightFraction(double tolerance = 0.1)
+      {
+        return this->computeDanglingWeightFraction(
+          &this->initialConfig, this->currentSpringDistances, tolerance);
+      }
+
+      /**
        * @brief Get the Effective Functionality Of each node
        *
        * Returns the number of active springs connected to each atom, atomId
@@ -257,18 +281,57 @@ namespace calc {
        * @return true
        * @return false
        */
-      bool ConvertNetwork(Network* net, const int crosslinkerType = 2)
+      bool ConvertNetwork(Network* net,
+                          const int crosslinkerType = 2,
+                          bool remove2functionalCrosslinkers = false)
       {
-        pylimer_tools::entities::Universe crosslinkerUniverse =
-          this->universe.getNetworkOfCrosslinker(crosslinkerType);
+        std::vector<pylimer_tools::entities::Atom> xlinkers =
+          this->universe.getAtomsOfType(crosslinkerType);
+
+        if (remove2functionalCrosslinkers) {
+          for (pylimer_tools::entities::Atom xlinker : xlinkers) {
+            // change type of cross-linkers with a degree <= 2 to "normal",
+            // non-cross-link beads
+            size_t vertexId = this->universe.getIdxByAtomId(xlinker.getId());
+            if (this->universe.computeFunctionalityForVertex(vertexId) <= 2) {
+              this->universe.setPropertyValue(
+                vertexId, "type", crosslinkerType - 1);
+            }
+          }
+          xlinkers = this->universe.getAtomsOfType(crosslinkerType);
+        }
+
+        size_t nrOfXlinks = xlinkers.size();
+
+        std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
+          this->universe.getChainsWithCrosslinker(crosslinkerType);
+
+        // need to include all but dangling and free chains in order to
+        // model entanglement
+        size_t nrOfSprings = 0;
+        size_t omittedChainsAtoms = 0;
+        for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
+          std::vector<pylimer_tools::entities::Atom> endAtoms =
+            crosslinkerChains[i].getAtomsOfType(crosslinkerType);
+          if (crosslinkerChains[i].getType() ==
+                pylimer_tools::entities::MoleculeType::NETWORK_STRAND ||
+              crosslinkerChains[i].getType() ==
+                pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
+            nrOfSprings += 1;
+          } else {
+            // assert(endAtoms.size() == 0); // can also be
+            omittedChainsAtoms +=
+              (crosslinkerChains[i].getNrOfAtoms() - endAtoms.size());
+          }
+        }
 
         // crosslinkerUniverse.simplify();
-        pylimer_tools::entities::Box box = crosslinkerUniverse.getBox();
+        pylimer_tools::entities::Box box = this->universe.getBox();
         net->L[0] = box.getLx();
         net->L[1] = box.getLy();
         net->L[2] = box.getLz();
-        net->nrOfNodes = crosslinkerUniverse.getNrOfAtoms();
-        net->nrOfSprings = crosslinkerUniverse.getNrOfBonds();
+        net->nrOfNodes = nrOfXlinks;
+        net->nrOfSprings = nrOfSprings;
         net->coordinates = Eigen::VectorXd::Zero(3 * net->nrOfNodes);
         net->oldAtomIds = Eigen::ArrayXi::Zero(net->nrOfNodes);
         net->springIndexA = Eigen::ArrayXi::Zero(net->nrOfSprings);
@@ -280,12 +343,15 @@ namespace calc {
         net->springIsActive = ArrayXb::Constant(net->nrOfSprings, false);
         net->springsContourLength = Eigen::VectorXd::Zero(net->nrOfSprings);
 
+        net->springIndicesOfLinks.reserve(net->nrOfNodes);
+        for (size_t i = 0; i < net->nrOfNodes; ++i) {
+          net->springIndicesOfLinks.push_back(std::vector<size_t>());
+        }
+
         // convert beads
-        std::vector<pylimer_tools::entities::Atom> allAtoms =
-          crosslinkerUniverse.getAtoms();
         std::map<int, int> atomIdToNode;
-        for (size_t i = 0; i < allAtoms.size(); ++i) {
-          pylimer_tools::entities::Atom atom = allAtoms[i];
+        for (size_t i = 0; i < xlinkers.size(); ++i) {
+          pylimer_tools::entities::Atom atom = xlinkers[i];
           atomIdToNode[atom.getId()] = i;
           net->oldAtomIds[i] = atom.getId();
           net->coordinates[3 * i + 0] = atom.getX();
@@ -294,56 +360,79 @@ namespace calc {
         }
 
         // convert springs
-        std::map<std::string, std::vector<long int>> allBonds =
-          crosslinkerUniverse.getBonds();
-        std::vector<size_t> contourLengthsToFix;
-        double usualContourLength = 0.0;
-        size_t nrOfUsualContourLenghts = 0;
-        for (size_t i = 0; i < net->nrOfSprings; ++i) {
-          int atomIdFrom = allBonds["bond_from"][i];
-          int atomIdTo = allBonds["bond_to"][i];
-          net->springIndexA[i] = atomIdToNode.at(atomIdFrom);
-          net->springIndexB[i] = atomIdToNode.at(atomIdTo);
-          for (size_t j = 0; j < 3; j++) {
-            net->springCoordinateIndexA[3 * i + j] =
-              atomIdToNode.at(atomIdFrom) * 3 + j;
-            net->springCoordinateIndexB[3 * i + j] =
-              atomIdToNode.at(atomIdTo) * 3 + j;
-          }
-          // also find contour length of this chain
-          int contourLength =
-            this->universe
-              .getShortestPath(this->universe.getIdxByAtomId(atomIdTo),
-                               this->universe.getIdxByAtomId(atomIdFrom))
-              .size() -
-            1;
-          // TODO: decide whether to -2
-          net->springsContourLength[i] = static_cast<double>(contourLength);
-          if (contourLength == 0) {
-            // fix.
-            assert(atomIdFrom == atomIdTo);
-            contourLengthsToFix.push_back(i);
-            // std::cout << "Found contour length 1: " << atomIdFrom << " " <<
-            // atomIdTo << std::endl;
-          } else {
-            usualContourLength += contourLength;
-            nrOfUsualContourLenghts += 1;
-          }
-        }
+        size_t spring_idx = 0;
+        for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
+          std::vector<pylimer_tools::entities::Atom> xlinkersOfChain =
+            crosslinkerChains[i].getAtomsOfType(crosslinkerType);
+          long int nodeIdxFrom;
+          long int nodeIdxTo;
+          bool addChain = false;
+          if (crosslinkerChains[i].getType() ==
+              pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
+            assert(xlinkersOfChain.size() == 2);
+            nodeIdxFrom = atomIdToNode.at(xlinkersOfChain[0].getId());
+            nodeIdxTo = atomIdToNode.at(xlinkersOfChain[1].getId());
+            if (nodeIdxFrom > nodeIdxTo) {
+              std::swap(nodeIdxFrom, nodeIdxTo);
+            }
+            addChain = true;
 
-        // TODO: this is clearly an ugly resultion of fixing this issue of
-        // finding the length of a primary loop
-        usualContourLength =
-          usualContourLength / static_cast<double>(nrOfUsualContourLenghts);
-        for (size_t idx : contourLengthsToFix) {
-          net->springsContourLength[idx] = usualContourLength;
+            net->springsContourLength[spring_idx] =
+              crosslinkerChains[i].getNrOfAtoms() - 1; // TODO: -2?
+          } else if (crosslinkerChains[i].getType() ==
+                     pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
+            assert(xlinkersOfChain.size() == 1 ||
+                   (xlinkersOfChain.size() == 2 &&
+                    xlinkersOfChain[0].getId() == xlinkersOfChain[1].getId()));
+
+            nodeIdxFrom = atomIdToNode.at(xlinkersOfChain[0].getId());
+            nodeIdxTo = nodeIdxFrom;
+            addChain = true;
+
+            net->springsContourLength[spring_idx] =
+              crosslinkerChains[i].getNrOfAtoms(); // TODO: -1?
+          }
+
+          if (addChain) {
+            std::vector<pylimer_tools::entities::Atom> allChainAtoms =
+              crosslinkerChains[i].getAtoms();
+
+            pylimer_tools::utils::addIfNotContained(
+              net->springIndicesOfLinks[nodeIdxFrom], spring_idx);
+            if (nodeIdxFrom != nodeIdxTo) {
+              pylimer_tools::utils::addIfNotContained(
+                net->springIndicesOfLinks[nodeIdxTo], spring_idx);
+            }
+
+            net->springIndexA[spring_idx] = nodeIdxFrom;
+            net->springIndexB[spring_idx] = nodeIdxTo;
+            for (size_t j = 0; j < 3; j++) {
+              net->springCoordinateIndexA[3 * spring_idx + j] =
+                nodeIdxFrom * 3 + j;
+              net->springCoordinateIndexB[3 * spring_idx + j] =
+                nodeIdxTo * 3 + j;
+            }
+
+            spring_idx += 1;
+          }
         }
 
         // box volume
         net->vol = net->L[0] * net->L[1] * net->L[2];
-        net->meanSpringContourLength = net->springsContourLength.mean();
+        if (net->nrOfSprings > 0) {
+          net->meanSpringContourLength = net->springsContourLength.mean();
+        }
 
-        return crosslinkerUniverse.getNrOfBonds() == net->nrOfSprings;
+        // check whether spring contour lengths are what we want them to be
+        size_t numCrosslinkers =
+          this->universe.countPropertyValue<int>("type", crosslinkerType);
+        assert((net->springsContourLength.array() -
+                Eigen::ArrayXd::Ones(net->nrOfSprings))
+                   .sum() +
+                 omittedChainsAtoms + numCrosslinkers ==
+               this->universe.getNrOfAtoms());
+
+        return true; // crosslinkerUniverse.getNrOfBonds() == net->nrOfSprings;
       };
 
       /**
@@ -439,6 +528,110 @@ namespace calc {
       {
         return (this->findActiveSprings(springDistances, tolerance) == true)
           .count();
+      }
+
+      /**
+       * @brief Compute the weight fraction of non-active springs
+       *
+       * @param net
+       * @param springDistances
+       * @param tolerance
+       * @return double
+       */
+      double computeDanglingWeightFraction(
+        Network* net,
+        const Eigen::VectorXd& springDistances,
+        const double tolerance = 0.1) const
+      {
+        if (net->nrOfSprings * 3 != springDistances.size()) {
+          throw std::invalid_argument(
+            "Spring distances and network don't match");
+        }
+        if (net->nrOfSprings < 1) {
+          return 1.;
+        }
+        // find all active springs
+        ArrayXb activeSprings =
+          this->findActiveSprings(springDistances, tolerance);
+        if (activeSprings.count() == 0) {
+          return 1.;
+        }
+        // as of now, the springsContourLength is equal to the number of bonds
+        // from cross-link to cross-link. therefore, the number of atoms of each
+        // of these springs is one less
+        Eigen::ArrayXd allActiveAtomsPerChains =
+          activeSprings.cast<double>() *
+          (net->springsContourLength.array() -
+           Eigen::ArrayXd::Ones(net->nrOfSprings));
+        // finally, normalise by the number of atoms.
+        // NOTE: currently, the weight of the atoms is ignored
+        return 1. - ((allActiveAtomsPerChains).matrix().sum() +
+                     this->getNrOfActiveNodes()) /
+                      this->universe.getNrOfAtoms();
+      }
+
+      /**
+       * @brief Compute the weight fraction of springs connected to active
+       * springs (any depth)
+       *
+       * @param net
+       * @param springDistances
+       * @param tolerance
+       * @return double
+       */
+      double computeSolubleWeightFraction(
+        Network* net,
+        const Eigen::VectorXd& springDistances,
+        const double tolerance = 0.1) const
+      {
+        if (net->nrOfSprings * 3 != springDistances.size()) {
+          throw std::invalid_argument(
+            "Spring distances and network don't match");
+        }
+        if (net->nrOfSprings < 1) {
+          return 1.;
+        }
+        // find all active springs
+        ArrayXb activeSprings =
+          this->findActiveSprings(springDistances, tolerance);
+        if (activeSprings.count() == 0) {
+          return 1.;
+        }
+        // then, iteratively walk along the springs to mark those as "active"
+        // that are connected to active springs
+        bool hadChanged = true;
+        while (hadChanged) {
+          ArrayXb oldActiveSprings = activeSprings;
+          for (size_t i = 0; i < net->nrOfNodes; ++i) {
+            bool anyActive = false;
+            for (size_t spring_idx : net->springIndicesOfLinks[i]) {
+              if (activeSprings[spring_idx]) {
+                anyActive = true;
+                break;
+              }
+            }
+
+            if (anyActive) {
+              for (size_t spring_idx : net->springIndicesOfLinks[i]) {
+                activeSprings[spring_idx] = true;
+              }
+            }
+          }
+          hadChanged = (oldActiveSprings.count() != activeSprings.count());
+        }
+
+        // as of now, the springsContourLength is equal to the number of bonds
+        // from cross-link to cross-link. therefore, the number of atoms of each
+        // of these springs is one less
+        Eigen::ArrayXd allActiveAtomsPerChains =
+          activeSprings.cast<double>() *
+          (net->springsContourLength.array() -
+           Eigen::ArrayXd::Ones(net->nrOfSprings));
+        // finally, normalise by the number of atoms.
+        // NOTE: currently, the weight of the atoms is ignored
+        return 1. - ((allActiveAtomsPerChains).matrix().sum() +
+                     this->getNrOfActiveNodes()) /
+                      this->universe.getNrOfAtoms();
       }
 
       /**

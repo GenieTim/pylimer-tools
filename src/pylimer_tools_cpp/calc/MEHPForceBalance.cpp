@@ -4977,15 +4977,15 @@ namespace calc {
       net.oldAtomIds = Eigen::ArrayXi::Zero(net.nrOfLinks);
       net.linkIsSliplink = ArrayXb::Constant(net.nrOfLinks, false);
       net.springIndicesOfLinks.reserve(net.nrOfLinks);
-      net.partialToFullSpringIndex = Eigen::ArrayXi(net.nrOfPartialSprings);
       for (size_t i = 0; i < net.nrOfLinks; ++i) {
         net.springIndicesOfLinks.push_back(std::vector<size_t>());
       }
       net.linkIndicesOfSprings.reserve(net.nrOfSprings);
-      this->currentSpringPartitionsVec = Eigen::VectorXd::Ones(net.nrOfSprings);
       for (size_t i = 0; i < net.nrOfSprings; ++i) {
         net.linkIndicesOfSprings.push_back(std::vector<size_t>());
       }
+      net.partialToFullSpringIndex = Eigen::ArrayXi(net.nrOfPartialSprings);
+      this->currentSpringPartitionsVec = Eigen::VectorXd::Ones(net.nrOfSprings);
       net.springIndexA = Eigen::ArrayXi::Zero(net.nrOfSprings);
       net.springIndexB = Eigen::ArrayXi::Zero(net.nrOfSprings);
       net.springCoordinateIndexA = Eigen::ArrayXi::Zero(3 * net.nrOfSprings);
