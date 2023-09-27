@@ -127,7 +127,7 @@ namespace entities {
 
   void EigenNeighbourList::validateWhyNotIncluded(Eigen::Vector3d sourceCoords,
                                                   Eigen::Vector3d targetCoords,
-                                                  double newCutoff = -1.0)
+                                                  double newCutoff)
   {
     if (newCutoff <= 0.) {
       newCutoff = this->cutoff;
@@ -213,7 +213,7 @@ namespace entities {
    */
   Eigen::ArrayXi EigenNeighbourList::getIndicesCloseToCoordinates(
     Eigen::Vector3d coordinates,
-    double newCutoff = -1.) const
+    double newCutoff) const
   {
     if (newCutoff == -1.) {
       newCutoff = this->cutoff;
