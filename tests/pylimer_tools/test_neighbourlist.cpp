@@ -35,27 +35,27 @@ TEST_CASE("NeighbourList works as intended", "[entity][NeighbourList]")
   pe::NeighbourList neighbourList =
     pe::NeighbourList(universe.getAtoms(), universe.getBox(), 3.0);
 
+  pe::Atom testAtom10000 = universe.getAtom(10000);
   std::vector<pe::Atom> neighbours =
-    neighbourList.getAtomsCloseTo(universe.getAtom(10000), 0.000001);
+    neighbourList.getAtomsCloseTo(testAtom10000, 0.000001);
   REQUIRE(neighbours.size() == 0);
 
-  neighbours =
-    neighbourList.getAtomsCloseTo(universe.getAtom(10000), 1.0, 0.9999);
+  neighbours = neighbourList.getAtomsCloseTo(testAtom10000, 1.0, 0.9999);
   REQUIRE(neighbours.size() == 0);
 
-  neighbours = neighbourList.getAtomsCloseTo(universe.getAtom(20000));
+  pe::Atom testAtom20000 = universe.getAtom(20000);
+  neighbours = neighbourList.getAtomsCloseTo(testAtom20000);
   REQUIRE(neighbours.size() > 0);
 
-  REQUIRE_THROWS(
-    neighbourList.getAtomsCloseTo(universe.getAtom(10000), 2.0, 3.0));
+  REQUIRE_THROWS(neighbourList.getAtomsCloseTo(testAtom10000, 2.0, 3.0));
 
   // remove
-  neighbourList.removeAtom(universe.getAtom(10000));
+  neighbourList.removeAtom(testAtom10000);
   // make sure we cannot query the remove atom
-  REQUIRE_THROWS(neighbourList.getAtomsCloseTo(universe.getAtom(10000)));
+  REQUIRE_THROWS(neighbourList.getAtomsCloseTo(testAtom10000));
   // nor find it in other neighbour lists
   std::vector<pe::Atom> neighbours2 =
-    neighbourList.getAtomsCloseTo(universe.getAtom(20000));
+    neighbourList.getAtomsCloseTo(testAtom20000);
   REQUIRE(neighbours2.size() == neighbours.size() - 1);
 }
 
@@ -64,8 +64,7 @@ TEST_CASE("Manually accurate NeighbourList", "[entity][NeighbourList]")
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
   const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
   universe.setBox(box);
-  universe.addAtoms(
-                    { { 1, 2, 3, 4, 5, 6, 7, 8 } },     // id
+  universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },     // id
                     { { 2, 1, 1, 1, 2, 1, 1, 1 } },     // type
                     { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // x
                     { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // y
@@ -78,14 +77,14 @@ TEST_CASE("Manually accurate NeighbourList", "[entity][NeighbourList]")
   pe::NeighbourList neighbourList =
     pe::NeighbourList(universe.getAtoms(), universe.getBox(), 3.0);
 
-  std::vector<pe::Atom> neighbours =
-    neighbourList.getAtomsCloseTo(universe.getAtom(2), 1.0);
+  pe::Atom atom2 = universe.getAtom(2);
+  std::vector<pe::Atom> neighbours = neighbourList.getAtomsCloseTo(atom2, 1.0);
   REQUIRE(neighbours.size() == 0);
-  neighbours = neighbourList.getAtomsCloseTo(universe.getAtom(2), 2.0);
+  neighbours = neighbourList.getAtomsCloseTo(atom2, 2.0);
   REQUIRE(neighbours.size() == 2);
-  neighbours = neighbourList.getAtomsCloseTo(universe.getAtom(2), 2.0, 1.8);
+  neighbours = neighbourList.getAtomsCloseTo(atom2, 2.0, 1.8);
   REQUIRE(neighbours.size() == 0);
-  neighbours = neighbourList.getAtomsCloseTo(universe.getAtom(1), 2.0);
+  neighbours = neighbourList.getAtomsCloseTo(atom2, 2.0);
   REQUIRE(neighbours.size() == 1);
 }
 
@@ -151,8 +150,7 @@ TEST_CASE("Manually accurate EigenNeighbourList",
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
   const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
   universe.setBox(box);
-  universe.addAtoms(
-                    { { 1, 2, 3, 4, 5, 6, 7, 8 } },     // id
+  universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },     // id
                     { { 2, 1, 1, 1, 2, 1, 1, 1 } },     // type
                     { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // x
                     { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // y
