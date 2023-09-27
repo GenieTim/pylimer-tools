@@ -404,15 +404,15 @@ init_pylimer_bound_entities(py::module_& m)
     m,
     "NeighbourList",
     "Gives access to somewhat fast queries on the neighbourhood of atoms")
-    .def(py::init<const std::vector<pylimer_tools::entities::Atom>,
-                  const pylimer_tools::entities::Box,
+    .def(py::init<const &std::vector<pylimer_tools::entities::Atom>,
+                  const &pylimer_tools::entities::Box,
                   double>(),
          "Instantiates a new neighbour list",
          py::arg("atoms"),
          py::arg("box"),
          py::arg("cutoff"))
     .def("getAtomsCloseTo",
-         py::overload_cast<Atom, double, double, bool>(
+         py::overload_cast<&Atom, double, double, bool>(
            &NeighbourList::getAtomsCloseTo),
          R"pbdoc(
           List all atoms that are close to a given one. 
