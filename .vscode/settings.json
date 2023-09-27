@@ -135,7 +135,8 @@
     "globals.h": "c",
     "charconv": "cpp",
     "format": "cpp",
-    "span": "cpp"
+    "span": "cpp",
+    "ranges": "cpp"
   },
   "C_Cpp.clang_format_path": "/usr/local/opt/llvm/bin/clang-format"
 }

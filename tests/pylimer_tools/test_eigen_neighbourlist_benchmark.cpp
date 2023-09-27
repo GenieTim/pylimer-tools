@@ -11,7 +11,6 @@
 #include <vector>
 
 namespace pe = pylimer_tools::entities;
-namespace pu = pylimer_tools::utils;
 
 template<typename... Args>
 std::string

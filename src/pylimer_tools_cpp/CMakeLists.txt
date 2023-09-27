@@ -67,6 +67,8 @@ target_sources(pylimer_tools
 		${CMAKE_CURRENT_LIST_DIR}/entities/Molecule.cpp
 		${CMAKE_CURRENT_LIST_DIR}/entities/Universe.cpp
 		${CMAKE_CURRENT_LIST_DIR}/entities/UniverseSequence.cpp
+		${CMAKE_CURRENT_LIST_DIR}/entities/NeighbourList.cpp
+		${CMAKE_CURRENT_LIST_DIR}/entities/EigenNeighbourList.cpp
 
 		${CMAKE_CURRENT_LIST_DIR}/io/DataFileParser.cpp
 		${CMAKE_CURRENT_LIST_DIR}/io/DumpFileParser.cpp
@@ -82,6 +84,7 @@ target_sources(pylimer_tools
 		${CMAKE_CURRENT_LIST_DIR}/entities/Universe.h
 		${CMAKE_CURRENT_LIST_DIR}/entities/UniverseSequence.h
 		${CMAKE_CURRENT_LIST_DIR}/entities/NeighbourList.h
+		${CMAKE_CURRENT_LIST_DIR}/entities/EigenNeighbourList.h
 
 		${CMAKE_CURRENT_LIST_DIR}/io/DataFileParser.h
 		${CMAKE_CURRENT_LIST_DIR}/io/DumpFileParser.h
