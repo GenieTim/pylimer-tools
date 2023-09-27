@@ -84,6 +84,8 @@ TEST_CASE("Manually accurate NeighbourList", "[entity][NeighbourList]")
   REQUIRE(neighbours.size() == 2);
   neighbours = neighbourList.getAtomsCloseTo(atom2, 2.0, 1.8);
   REQUIRE(neighbours.size() == 0);
+  pe::Atom atom3 = universe.getAtom(3);
+  neighbourList.removeAtom(atom3);
   neighbours = neighbourList.getAtomsCloseTo(atom2, 2.0);
   REQUIRE(neighbours.size() == 1);
 }
