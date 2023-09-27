@@ -16,7 +16,7 @@ extern "C"
 namespace pylimer_tools {
 namespace entities {
 
-    NeighbourList::NeighbourList(const std::vector<Atom> atoms, const Box box, double cutoff)
+    NeighbourList::NeighbourList(const std::vector<Atom> &atoms, const Box &box, double cutoff)
     {
       if (cutoff <= 1e-3) {
         throw std::invalid_argument("Cutoff must be larger than zero");
@@ -63,16 +63,16 @@ namespace entities {
     };
 
     std::vector<pylimer_tools::entities::Atom> NeighbourList::getAtomsCloseTo(
-      pylimer_tools::entities::Atom atom)
+      pylimer_tools::entities::Atom &atom)
     {
       return this->getAtomsCloseTo(atom, this->cutoff);
     }
 
     std::vector<pylimer_tools::entities::Atom> NeighbourList::getAtomsCloseTo(
-      pylimer_tools::entities::Atom atom,
+      pylimer_tools::entities::Atom &atom,
       double upperCutoff,
-      double lowerCutoff = 0.0,
-      bool unwrapped = false)
+      double lowerCutoff,
+      bool unwrapped)
     {
 
       if (lowerCutoff > upperCutoff) {
@@ -167,7 +167,7 @@ namespace entities {
     // protected
     /////////////////////////////////////////////////////////////
 
-    size_t NeighbourList::normalizeBucketIndex(long int bucketIndex, size_t nrOfBuckets)
+    size_t NeighbourList::normalizeBucketIndex(long int bucketIndex, size_t nrOfBuckets) const
     {
       while (bucketIndex < 0) {
         bucketIndex = bucketIndex + nrOfBuckets;
@@ -179,7 +179,7 @@ namespace entities {
     }
 
     size_t NeighbourList::getBucketIndexForTriplet(
-      std::tuple<long int, long int, long int> ind)
+      std::tuple<long int, long int, long int> ind) const
     {
       size_t bucketIndexX =
         this->normalizeBucketIndex(std::get<0>(ind), this->nrOfBucketsX);
