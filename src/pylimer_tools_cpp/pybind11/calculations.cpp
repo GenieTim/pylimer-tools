@@ -281,7 +281,12 @@ init_pylimer_bound_calc(py::module_& m)
   py::class_<mehp::MEHPForceRelaxation>(m, "MEHPForceRelaxation", R"pbdoc(
     A small simulation tool for quickly minimizing the force between the cross-linker beads.
      )pbdoc")
-    .def(py::init<pe::Universe, int, bool, mehp::MEHPForceEvaluator*>(),
+    .def(py::init<pe::Universe,
+                  int,
+                  bool,
+                  mehp::MEHPForceEvaluator*,
+                  double,
+                  bool>(),
          R"pbdoc(
           Instantiate the simulator for a certain universe.
 
@@ -293,7 +298,9 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("universe"),
          py::arg("crosslinkerType") = 2,
          py::arg("is2D") = false,
-         py::arg("forceEvaluator") = nullptr)
+         py::arg("forceEvaluator") = nullptr,
+         py::arg("kappa") = 1.0,
+         py::arg("remove2functionalCrosslinkers") = true)
     .def("runForceRelaxation",
          &mehp::MEHPForceRelaxation::runForceRelaxation,
          R"pbdoc(
@@ -325,6 +332,11 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceRelaxation::getForce,
          R"pbdoc(
           Returns the force at the current state of the simulation.
+     )pbdoc")
+    .def("getResiduals",
+         &mehp::MEHPForceRelaxation::getResiduals,
+         R"pbdoc(
+          Returns the residuals at the current state of the simulation.
      )pbdoc")
     .def("getResidualNorm",
          &mehp::MEHPForceRelaxation::getResidualNorm,
@@ -430,6 +442,21 @@ init_pylimer_bound_calc(py::module_& m)
           :param tolerance: springs under this length are considered inactive
      )pbdoc",
          py::arg("tolerance") = 0.1)
+    .def(
+      "getSpringLengths", &mehp::MEHPForceRelaxation::getSpringLengths, R"pbdoc(
+          Get the current lengths for all the springs.
+
+          Returns:
+               - distances: a vector of size nrOfSprings, with each the norm of the distances
+     )pbdoc")
+    .def("getSpringDistances",
+         &mehp::MEHPForceRelaxation::getSpringDistances,
+         R"pbdoc(
+          Get the current coordinate differences for all the springs.
+
+          Returns:
+               - distances: a vector of size 3*nrOfSprings, with each x, y, z values of the springs
+     )pbdoc")
     .def("getAverageSpringLength",
          &mehp::MEHPForceRelaxation::getAverageSpringLength,
          R"pbdoc(
@@ -445,6 +472,11 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceRelaxation::getDefaultNrOfChains,
          R"pbdoc(
           Returns the value effectively used in :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()` for normalizing the distances.`.
+     )pbdoc")
+    .def("getCurrentDisplacements",
+         &mehp::MEHPForceRelaxation::getCurrentDisplacements,
+         R"pbdoc(
+          Returns the current displacement.
      )pbdoc")
     .def("getNrOfIterations",
          &mehp::MEHPForceRelaxation::getNrOfIterations,
@@ -500,7 +532,7 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("crosslinkerType") = 2,
          py::arg("is2D") = false,
          py::arg("kappa") = 1.0,
-         py::arg("remove2functionalCrosslinkers") = false)
+         py::arg("remove2functionalCrosslinkers") = true)
     .def("__copy__",
          [](const mehp::MEHPForceBalance& self) {
            return mehp::MEHPForceBalance(self);

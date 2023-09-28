@@ -645,6 +645,9 @@ TEST_CASE("Free chains collapse",
   universe.addBonds(bondFrom, bondTo);
   REQUIRE(universe.getNrOfAtoms() == nrOfBeads);
   REQUIRE(universe.getNrOfBonds() == nrOfBeads - 1);
+  // add a primary loop to check that it collapses
+  universe.addBonds({ 0, static_cast<long>(nrOfBeadsPerChain) },
+                    { static_cast<long>(nrOfBeadsPerChain), 0 });
 
   // now, check for every force evaluator, that the maximum entropy is when all
   // these beads overlap first, the gaussian spring one

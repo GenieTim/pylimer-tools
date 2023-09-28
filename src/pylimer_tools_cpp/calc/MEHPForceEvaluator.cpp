@@ -44,8 +44,7 @@ namespace calc {
     {
       assert(n == this->net.nrOfNodes * 3);
       assert(u.size() == this->net.coordinates.size());
-      assert(n == this->net.nrOfNodes * 3);
-      assert(u.size() == this->net.coordinates.size());
+      assert(springDistances.size() == 3*this->net.nrOfSprings);
 
       double s2 = 0.0;
       for (size_t i = 0; i < this->net.nrOfSprings; ++i) {

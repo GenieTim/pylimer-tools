@@ -40,17 +40,14 @@ namespace calc {
       }
 
       Network net = this->initialConfig;
-      const int M = this->universe.getMolecules(crosslinkerType).size();
-      const int N = this->universe.getMeanStrandLength(crosslinkerType) + 1;
-      const double bM = this->universe.computeMeanBondLength();
-      const int f =
-        this->universe.determineFunctionalityPerType()[crosslinkerType];
       bool is2D = this->is2D;
 
       /* array allocation */
       std::vector<double> u0 =
         pylimer_tools::utils::initializeWithValue(3 * net.nrOfNodes, 0.0);
-      Eigen::VectorXd u = Eigen::VectorXd::Zero(3 * net.nrOfNodes);
+      for (int i = 0; i < 3 * net.nrOfNodes; ++i) {
+        u0[i] = this->currentDisplacements[i];
+      }
 
       /* force relaxation */
       nlopt::opt opt(algorithm, 3 * net.nrOfNodes);
@@ -69,8 +66,8 @@ namespace calc {
       lowerBounds.reserve(3 * net.nrOfNodes);
       for (size_t i = 0; i < net.nrOfNodes; ++i) {
         for (size_t dir = 0; dir < 3; ++dir) {
-          upperBounds.push_back(net.L[dir] * 0.5);
-          lowerBounds.push_back(-net.L[dir] * 0.5);
+          lowerBounds.push_back(-net.L[dir]); //  * 0.5 -> lead to some few atoms not being where they should. Maybe one box is still not enough?!?
+          upperBounds.push_back(net.L[dir]); //  * 0.5
         }
       }
       opt.set_upper_bounds(upperBounds);
@@ -93,7 +90,7 @@ namespace calc {
 
       // query solution & exit reason
       assert(u0.size() == 3 * net.nrOfNodes);
-      u = Eigen::Map<Eigen::VectorXd>(u0.data(), u0.size());
+      Eigen::VectorXd u = Eigen::Map<Eigen::VectorXd>(u0.data(), u0.size());
       this->currentDisplacements = u;
       this->currentSpringDistances =
         this->evaluateSpringDistances(&net, this->currentDisplacements, is2D);
@@ -117,20 +114,17 @@ namespace calc {
       const Eigen::VectorXd& u,
       const bool is2D)
     {
-      double boxHalfs[3];
-      boxHalfs[0] = 0.5 * net->L[0];
-      boxHalfs[1] = 0.5 * net->L[1];
-      boxHalfs[2] = 0.5 * net->L[2];
+      // this is unnecessary overhead :P
+      pylimer_tools::entities::Box box =
+        pylimer_tools::entities::Box(net->L[0], net->L[1], net->L[2]);
+
       // first, the distances
       assert(u.size() == net->coordinates.size());
       Eigen::VectorXd actualCoordinates = net->coordinates + u;
       // It *could* be more efficient to index u instead of the coordinates
-      Eigen::VectorXd coordinatesSpringEndA =
-        actualCoordinates(net->springCoordinateIndexA);
-      Eigen::VectorXd coordinatesSpringEndB =
-        actualCoordinates(net->springCoordinateIndexB);
       Eigen::VectorXd springDistances =
-        (coordinatesSpringEndA - coordinatesSpringEndB);
+        (actualCoordinates(net->springCoordinateIndexA) -
+         actualCoordinates(net->springCoordinateIndexB));
 
       if (is2D) {
         // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
@@ -141,33 +135,7 @@ namespace calc {
       }
       assert(springDistances.size() == net->nrOfSprings * 3);
 
-      // Possibly improvable PBC
-      for (size_t j = 0; j < 3 * net->nrOfSprings; ++j) {
-        int iterations = 0;
-        while (springDistances[j] > boxHalfs[j % 3]) {
-          springDistances[j] -= net->L[j % 3];
-          iterations++;
-          if (iterations > 10) {
-            throw std::runtime_error(
-              "Too many iterations in PBC from " +
-              std::to_string(coordinatesSpringEndA[j]) + " to " +
-              std::to_string(coordinatesSpringEndB[j]) + ", currently at " +
-              std::to_string(springDistances[j]));
-          }
-        }
-        iterations = 0;
-        while (springDistances[j] < -boxHalfs[j % 3]) {
-          springDistances[j] += net->L[j % 3];
-          iterations++;
-          if (iterations > 10) {
-            throw std::runtime_error(
-              "Too many iterations in PBC from " +
-              std::to_string(coordinatesSpringEndA[j]) + " to " +
-              std::to_string(coordinatesSpringEndB[j]) + ", currently at " +
-              std::to_string(springDistances[j]));
-          }
-        }
-      }
+      box.handlePBC(springDistances);
 
       return springDistances;
     }
