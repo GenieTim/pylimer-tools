@@ -20,6 +20,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceRelaxation
       ~MEHPForceRelaxation.__init__
       ~MEHPForceRelaxation.getAverageSpringLength
       ~MEHPForceRelaxation.getCrosslinkerVerse
+      ~MEHPForceRelaxation.getCurrentDisplacements
       ~MEHPForceRelaxation.getDanglingWeightFraction
       ~MEHPForceRelaxation.getDefaultNrOfChains
       ~MEHPForceRelaxation.getDefaultR0Square
@@ -35,7 +36,10 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceRelaxation
       ~MEHPForceRelaxation.getNrOfSprings
       ~MEHPForceRelaxation.getPressure
       ~MEHPForceRelaxation.getResidualNorm
+      ~MEHPForceRelaxation.getResiduals
       ~MEHPForceRelaxation.getSolubleWeightFraction
+      ~MEHPForceRelaxation.getSpringDistances
+      ~MEHPForceRelaxation.getSpringLengths
       ~MEHPForceRelaxation.getStressTensor
       ~MEHPForceRelaxation.runForceRelaxation
       ~MEHPForceRelaxation.setForceEvaluator
