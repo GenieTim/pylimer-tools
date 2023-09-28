@@ -4186,7 +4186,7 @@ namespace calc {
     }
 
     /**
-     * FORCE RELAXATION DATA ACCESS
+     * FORCE BALANCE DATA ACCESS
      */
     pylimer_tools::entities::Universe MEHPForceBalance::getCrosslinkerVerse(
       int newCrosslinkerType) const

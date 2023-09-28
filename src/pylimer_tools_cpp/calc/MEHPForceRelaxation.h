@@ -30,7 +30,8 @@ namespace calc {
                           int crosslinkerType = 2,
                           bool is2D = false,
                           MEHPForceEvaluator* forceEvaluator = nullptr,
-                          double kappa = 1.0)
+                          double kappa = 1.0,
+                          bool remove2functionalCrosslinkers = false)
         : universe(u)
       {
         if (forceEvaluator == nullptr) {
@@ -44,7 +45,7 @@ namespace calc {
           universe.getMolecules(this->crosslinkerType).size();
         // interpret network already to be able to give early results
         Network net;
-        ConvertNetwork(&net, crosslinkerType);
+        ConvertNetwork(&net, crosslinkerType, remove2functionalCrosslinkers);
         this->initialConfig = net;
         this->is2D = is2D;
         this->currentDisplacements =
@@ -261,8 +262,37 @@ namespace calc {
 
       ExitReason getExitReason() const { return this->exitReason; }
 
+      Eigen::VectorXd getCurrentDisplacements() const { return this->currentDisplacements; }
+
       /**
-       * @brief Compute the spring lenghts
+       * @brief Get the Spring Lengths
+       * 
+       * @return Eigen::VectorXd 
+       */
+      Eigen::VectorXd getSpringLengths() const {
+        Eigen::VectorXd springDistances =  this->getSpringDistances();
+        Eigen::VectorXd springLengths = Eigen::VectorXd::Zero(this->initialConfig.nrOfSprings);
+        for (int i = 0; i < this->initialConfig.nrOfSprings; ++i) {
+          springLengths[i] = springDistances.segment(3*i,3).norm();
+        }
+        return springLengths;
+      }
+
+      /**
+       * @brief Get the Spring Distances
+       * 
+       * @return Eigen::VectorXd 
+       */
+      Eigen::VectorXd getSpringDistances() const {
+        return this->evaluateSpringDistances(
+          &this->initialConfig,
+          this->currentDisplacements,
+          this->is2D
+        );
+      }
+
+      /**
+       * @brief Compute the spring lengths
        *
        * @param net the network to do the computation for
        * @param u the displacements on top of the network
@@ -314,9 +344,7 @@ namespace calc {
           std::vector<pylimer_tools::entities::Atom> endAtoms =
             crosslinkerChains[i].getAtomsOfType(crosslinkerType);
           if (crosslinkerChains[i].getType() ==
-                pylimer_tools::entities::MoleculeType::NETWORK_STRAND ||
-              crosslinkerChains[i].getType() ==
-                pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
+              pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
             nrOfSprings += 1;
           } else {
             // assert(endAtoms.size() == 0); // can also be
@@ -366,7 +394,6 @@ namespace calc {
             crosslinkerChains[i].getAtomsOfType(crosslinkerType);
           long int nodeIdxFrom;
           long int nodeIdxTo;
-          bool addChain = false;
           if (crosslinkerChains[i].getType() ==
               pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
             assert(xlinkersOfChain.size() == 2);
@@ -375,25 +402,10 @@ namespace calc {
             if (nodeIdxFrom > nodeIdxTo) {
               std::swap(nodeIdxFrom, nodeIdxTo);
             }
-            addChain = true;
 
             net->springsContourLength[spring_idx] =
               crosslinkerChains[i].getNrOfAtoms() - 1; // TODO: -2?
-          } else if (crosslinkerChains[i].getType() ==
-                     pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
-            assert(xlinkersOfChain.size() == 1 ||
-                   (xlinkersOfChain.size() == 2 &&
-                    xlinkersOfChain[0].getId() == xlinkersOfChain[1].getId()));
 
-            nodeIdxFrom = atomIdToNode.at(xlinkersOfChain[0].getId());
-            nodeIdxTo = nodeIdxFrom;
-            addChain = true;
-
-            net->springsContourLength[spring_idx] =
-              crosslinkerChains[i].getNrOfAtoms(); // TODO: -1?
-          }
-
-          if (addChain) {
             std::vector<pylimer_tools::entities::Atom> allChainAtoms =
               crosslinkerChains[i].getAtoms();
 
