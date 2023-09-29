@@ -25,6 +25,11 @@ namespace entities {
   typedef Eigen::Array<long int, 3, 1> Array3li;
   typedef Eigen::Array<long int, Eigen::Dynamic, 1> ArrayXli;
 
+  /**
+   * @brief An implementation of a neighbour list using binning, using Eigen for
+   * performance
+   *
+   */
   class EigenNeighbourList
   {
   public:

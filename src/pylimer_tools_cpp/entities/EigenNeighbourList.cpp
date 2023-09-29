@@ -206,7 +206,7 @@ namespace entities {
   }
 
   /**
-   * @brief Get the Indices Close To Coordinates with the Default Cut-Off
+   * @brief Get the indices close to given coordinates with the default cut-off
    *
    * @param coordinates
    * @return Eigen::ArrayXi
@@ -225,6 +225,11 @@ namespace entities {
     return result;
   }
 
+  /**
+   * @brief Get the number of coordinates actually stored/binned
+   * 
+   * @return long int 
+   */
   long int EigenNeighbourList::getNumBinnedCoordinates() const
   {
     return this->neighbourBucketSizes.sum();

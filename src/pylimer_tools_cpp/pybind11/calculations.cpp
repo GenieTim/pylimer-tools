@@ -490,8 +490,7 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceRelaxation::getCrosslinkerVerse,
          R"pbdoc(
           Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
-     )pbdoc",
-         py::arg("newCrosslinkerType") = 2);
+     )pbdoc");
 
   py::enum_<mehp::BalanceRunMode>(m, "BalanceRunMode")
     .value("EIGEN_ALL", mehp::BalanceRunMode::EIGEN_ALL)
@@ -858,8 +857,7 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceBalance::getCrosslinkerVerse,
          R"pbdoc(
           Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
-     )pbdoc",
-         py::arg("newCrosslinkerType") = 2);
+     )pbdoc");
 
   ////////////////////////////////////////////////////////////////
 
