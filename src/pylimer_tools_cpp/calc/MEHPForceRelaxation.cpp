@@ -66,7 +66,9 @@ namespace calc {
       lowerBounds.reserve(3 * net.nrOfNodes);
       for (size_t i = 0; i < net.nrOfNodes; ++i) {
         for (size_t dir = 0; dir < 3; ++dir) {
-          lowerBounds.push_back(-net.L[dir]); //  * 0.5 -> lead to some few atoms not being where they should. Maybe one box is still not enough?!?
+          lowerBounds.push_back(
+            -net.L[dir]); //  * 0.5 -> lead to some few atoms not being where
+                          //  they should. Maybe one box is still not enough?!?
           upperBounds.push_back(net.L[dir]); //  * 0.5
         }
       }
@@ -143,8 +145,7 @@ namespace calc {
     /**
      * FORCE RELAXATION DATA ACCESS
      */
-    pylimer_tools::entities::Universe MEHPForceRelaxation::getCrosslinkerVerse(
-      int newCrosslinkerType) const
+    pylimer_tools::entities::Universe MEHPForceRelaxation::getCrosslinkerVerse() const
     {
       // convert nodes & springs back to a universe
       pylimer_tools::entities::Universe xlinkUniverse =
@@ -169,6 +170,10 @@ namespace calc {
         z.push_back(this->initialConfig.coordinates[3 * i + 2] +
                     this->currentDisplacements[3 * i + 2]);
         ids.push_back(this->initialConfig.oldAtomIds[i]);
+        // override type, since the types may be different from crosslinkerType if converted with dangling chains
+        types[i] = this->universe.getPropertyValue<int>(
+          "type",
+          this->universe.getIdxByAtomId(this->initialConfig.oldAtomIds[i]));
       }
       xlinkUniverse.addAtoms(ids, types, x, y, z, zeros, zeros, zeros);
       std::vector<long int> bondFrom;

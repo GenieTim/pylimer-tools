@@ -63,14 +63,19 @@ namespace calc {
                        int crosslinkerType = 2,
                        bool is2D = false,
                        double kappa = 1.0,
-                       bool remove2functionalCrosslinkers = false)
+                       bool remove2functionalCrosslinkers = false,
+                       bool removeDanglingChains = false
+                       )
         : universe(u)
       {
         this->crosslinkerType = crosslinkerType;
         this->box = u.getBox();
         // interpret network already to be able to give early results
         ForceBalanceNetwork net;
-        ConvertNetwork(net, crosslinkerType, remove2functionalCrosslinkers);
+        ConvertNetwork(net,
+                       crosslinkerType,
+                       remove2functionalCrosslinkers,
+                       removeDanglingChains);
         this->initialConfig = net;
         this->is2D = is2D;
         this->currentDisplacements =
@@ -415,8 +420,7 @@ namespace calc {
        * @param newCrosslinkerType the type to give the cross-linkers
        * @return pylimer_tools::entities::Universe
        */
-      pylimer_tools::entities::Universe getCrosslinkerVerse(
-        int newCrosslinkerType = 2) const;
+      pylimer_tools::entities::Universe getCrosslinkerVerse() const;
 
       int getDefaultNrOfChains() const { return this->defaultNrOfChains; }
 
@@ -1179,7 +1183,8 @@ namespace calc {
        */
       bool ConvertNetwork(ForceBalanceNetwork& net,
                           const int crosslinkerType,
-                          bool remove2functionalCrosslinkers);
+                          bool remove2functionalCrosslinkers = false,
+                          bool removeDanglingChains = false);
 
       /**
        * @brief Compute the gamma factor from certain spring distances

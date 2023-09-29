@@ -13,12 +13,16 @@ extern "C"
 #include <unordered_map>
 #include <vector>
 
-#include <stdexcept>
 #include <algorithm>
+#include <stdexcept>
 
 namespace pylimer_tools {
 namespace entities {
 
+  /**
+   * @brief A simple neighbour list implementation using binning
+   *
+   */
   class NeighbourList
   {
   public:

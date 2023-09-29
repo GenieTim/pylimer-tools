@@ -729,10 +729,10 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         CHECK(forceBalancer2.getPressure() ==
               Catch::Approx(forceRelaxer.getPressure()));
         CHECK(forceBalancer2.getPressure() ==
-              Catch::Approx(0.39911682390778536 / 79.));
+              Catch::Approx(0.0061105865));
         REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
         CHECK_NOTHROW(forceBalancer2.validateNetwork());
-        CHECK(forceBalancer2.getNrOfSprings() == 8142);
+        CHECK(forceBalancer2.getNrOfSprings() == 9859);
         CHECK(forceBalancer2.getNrOfIterations() > 1);
         CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
 
@@ -748,7 +748,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
           (forceBalancer2.getNetwork().meanSpringContourLength / Nb) * 3. * kb *
           T / (slope * beadMass); // J/sigma^2
         CHECK(conversionFactor / (sigmaToM * sigmaToM * 79.) ==
-              Catch::Approx(0.000245543));
+              Catch::Approx(0.0002450018));
         double nu =
           nrOfChains / (forceBalancer2.getVolume() * sigmaToM * sigmaToM *
                         sigmaToM); // chain number density, m^-3
@@ -759,7 +759,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
               Catch::Approx(0.153806 / 79.)); // LJ Units [?]
         CHECK(forceBalancer2.getPressure() * conversionFactor /
                 (sigmaToM * sigmaToM * sigmaToM) ==
-              Catch::Approx(61308.3)); // shear modulus from the pressure, MPa
+              Catch::Approx(61172.8878)); // shear modulus from the pressure, MPa
         double nrOfChainCorrection =
           (forceBalancer2.getDefaultNrOfChains() / nrOfChains);
         double expectedNb2 = slope * Nb * beadMass;
@@ -802,7 +802,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         CHECK(forceBalancer2.getPressure() ==
               Catch::Approx(forceRelaxer.getPressure()));
         CHECK(forceBalancer2.getPressure() ==
-              Catch::Approx(0.39911682390778536 / 79.));
+              Catch::Approx(0.0061105865));
         // add entanglements
         // TODO: these are random values, as are the results... :P
         size_t nrOfSprings = forceRelaxer.getNetwork().nrOfSprings;
@@ -814,7 +814,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
           { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
         REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
         // TODO: replace this value thereafter
-        CHECK(forceBalancer2.getPressure() == Catch::Approx(0.0019534759));
+        CHECK(forceBalancer2.getPressure() == Catch::Approx(0.0019536099));
       }
     } else {
       std::cout << "Skipping large file PDMS MEHP run" << std::endl;

@@ -190,7 +190,7 @@ TEST_CASE(
       CHECK(static_cast<double>(universe2.getMolecules(2).size()) ==
             Catch::Approx(nrOfChains));
       pcm::MEHPForceRelaxation forceRelaxer2 =
-        pcm::MEHPForceRelaxation(universe2, 2);
+        pcm::MEHPForceRelaxation(universe2, 2, false, nullptr, 1.0, false, true);
       REQUIRE(forceRelaxer2.getExitReason() == pcm::ExitReason::UNSET);
       REQUIRE(forceRelaxer2.getNrOfIterations() == 0);
       REQUIRE(forceRelaxer2.getVolume() ==
@@ -394,7 +394,7 @@ TEST_CASE(
       pcm::NonGaussianSpringForceEvaluator nonGaussianForceEvaluator =
         pcm::NonGaussianSpringForceEvaluator(1.0, 78., 0.98);
       pcm::MEHPForceRelaxation forceRelaxer2 = pcm::MEHPForceRelaxation(
-        universe2, 2, false, &nonGaussianForceEvaluator);
+        universe2, 2, false, &nonGaussianForceEvaluator, 1.0, false);
       REQUIRE(forceRelaxer2.getExitReason() == pcm::ExitReason::UNSET);
       REQUIRE(forceRelaxer2.getNrOfIterations() == 0);
       REQUIRE(forceRelaxer2.getVolume() ==
@@ -699,8 +699,8 @@ TEST_CASE("Free chains collapse",
   // std::cout << forceRelaxerLangevin.getNrOfIterations() << ", "
   //           << forceRelaxerLangevin.getForce() << ", "
   //           << forceRelaxerLangevin.getResidualNorm() << std::endl;
-  REQUIRE(forceRelaxerLangevin.getForce() >=
-          forceRelaxerSimpleSpring.getForce());
+  CHECK(forceRelaxerLangevin.getForce() + 1. == Catch::Approx(1.0));
+  CHECK(forceRelaxerSimpleSpring.getForce() + 1. == Catch::Approx(1.0));
   REQUIRE(forceRelaxerLangevin.getResidualNorm() >=
           forceRelaxerSimpleSpring.getResidualNorm());
 
