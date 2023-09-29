@@ -286,7 +286,7 @@ init_pylimer_bound_calc(py::module_& m)
                   bool,
                   mehp::MEHPForceEvaluator*,
                   double,
-                  bool>(),
+                  bool, bool>(),
          R"pbdoc(
           Instantiate the simulator for a certain universe.
 
@@ -294,13 +294,20 @@ init_pylimer_bound_calc(py::module_& m)
           :param crosslinkerType: The atom type of the cross-linkers. Needed to reduce the network.
           :param is2D: Whether to ignore the z direction.
           :param forceEvaluator: The force evaluator to use
+          :param kappa: The spring constant
+          :param remove2functionalCrosslinkers: Whether to replace two-functional cross-links with a "normal" chain bead
+          :param removeDanglingChains: Whether to remove dangling chains before running the simulation. 
+               **Caution*: Removing the dangling chains will result in incorrect results fo the computation of 
+               :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getSolubleWeightFraction()` and
+               :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getDanglingWeightFraction()`
           )pbdoc",
          py::arg("universe"),
          py::arg("crosslinkerType") = 2,
          py::arg("is2D") = false,
          py::arg("forceEvaluator") = nullptr,
          py::arg("kappa") = 1.0,
-         py::arg("remove2functionalCrosslinkers") = true)
+         py::arg("remove2functionalCrosslinkers") = true,
+         py::arg("removeDanglingChains") = false)
     .def("runForceRelaxation",
          &mehp::MEHPForceRelaxation::runForceRelaxation,
          R"pbdoc(

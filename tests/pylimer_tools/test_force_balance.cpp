@@ -814,7 +814,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
           { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 });
         REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
         // TODO: replace this value thereafter
-        CHECK(forceBalancer2.getPressure() == Catch::Approx(0.0019536099));
+        CHECK(forceBalancer2.getPressure() == Catch::Approx(0.001955022));
       }
     } else {
       std::cout << "Skipping large file PDMS MEHP run" << std::endl;
@@ -910,7 +910,7 @@ TEST_CASE("MEHP Force Balance can randomly add slip-links ignoring cross-links",
     pe::Universe universe = universeSeq.atIndex(0);
     std::cout << "Read file. " << std::endl;
     pcm::MEHPForceBalance forceBalancer =
-      pcm::MEHPForceBalance(universe, 2, false, 1.0, true);
+      pcm::MEHPForceBalance(universe, 2, false, 1.0, false, false);
     // TODO: using a seed does not seem to work properly
     size_t nrOfAddedLinks =
       forceBalancer.randomlyAddSliplinks(250, 2.0, 100, 2.0, true, 12);
@@ -1025,7 +1025,7 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
     pe::Universe universe = universeSeq.atIndex(0);
     std::cout << "Read file. " << std::endl;
     pcm::MEHPForceBalance forceBalancer =
-      pcm::MEHPForceBalance(universe, 2, false, 1.0, true);
+      pcm::MEHPForceBalance(universe, 2, false, 1.0, false, false);
     size_t nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(1000, 2.0, 100);
     REQUIRE(nrOfAddedLinks >= 100);
     // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
