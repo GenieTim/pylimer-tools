@@ -180,9 +180,10 @@ def readCorrelationFile(filepath, group_key="Timestep", use_cache: bool = True) 
     with open(filepath, 'r') as f:
         currentData = []
         currentKey = None
-        normalLineLen = None
         title_line = f.readline()
         header_line = f.readline()
+        cols = header_line.removeprefix("#").strip().split()
+        normalLineLen = len(cols)
         lines_interpreted = 0
         for line in f:
             if ((line.startswith("#") or len(line.strip()) == 0) and group_key not in line):
@@ -197,16 +198,15 @@ def readCorrelationFile(filepath, group_key="Timestep", use_cache: bool = True) 
                 # new key
                 currentKey = line
             elif (len(split) == normalLineLen or normalLineLen is None):
-                normalLineLen = len(split)
+                #normalLineLen = len(split)
                 currentData.append(split)
             else:
                 raise ValueError(
-                    "Did not expect {} splited values on line with content {} in rdf file {}".format(len(split), line, filepath))
+                    "Did not expect {} splited values on line with content {} in correlation file {}".format(len(split), line, filepath))
             lines_interpreted += 1
         if (currentKey is not None):
             data[currentKey] = currentData
 
-    cols = header_line.removeprefix("#").strip().split()
     cols.append(group_key)
     correlatedDataAssembled = []
     for key in data.keys():

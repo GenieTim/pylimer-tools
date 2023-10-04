@@ -640,6 +640,7 @@ namespace entities {
         Universe newUniverse = Universe(this->box);
         newUniverse.initializeFromGraph(g);
         newUniverse.setMasses(this->massPerType);
+        // TODO: add angles, dihedrals etc.
         clusters.push_back(newUniverse);
       }
 
