@@ -37,7 +37,7 @@ namespace entities {
       double lowerCutoff = 0.0,
       bool unwrapped = false);
 
-    void removeAtom(Atom atom);
+    void removeAtom(Atom atom, std::string debugHint = "");
 
   protected:
     size_t normalizeBucketIndex(long int bucketIndex, size_t nrOfBuckets) const;
