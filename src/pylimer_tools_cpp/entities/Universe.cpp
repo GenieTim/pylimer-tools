@@ -1462,6 +1462,41 @@ namespace entities {
   }
 
   /**
+   * @brief Compute the weight fraction of clusters which contain one of the
+   * atoms given
+   *
+   * @param atomIds
+   * @return double
+   */
+  double Universe::computeWeightFractionOfClustersAssociatedWith(
+    std::vector<long int> atomIds) const
+  {
+    double totalMass = 0.0;
+    double partialMass = 0.0;
+
+    std::vector<pylimer_tools::entities::Universe> clusters =
+      this->getClusters();
+    for (pylimer_tools::entities::Universe cluster : clusters) {
+      double clusterMass = cluster.computeTotalMass();
+      totalMass += clusterMass;
+      for (size_t atomIdIdx = atomIds.size()-1; atomIdIdx >= 0; atomIdIdx--) {
+        long int atomId = atomIds[atomIdIdx];
+        if (cluster.containsAtomWithId(atomId)) {
+          partialMass += clusterMass;
+          atomIds.erase(atomIds.begin() + atomIdIdx);
+          break;
+        }
+      }
+    }
+
+    if (totalMass > 0.0) {
+      return partialMass / totalMass;
+    } else {
+      return totalMass;
+    }
+  }
+
+  /**
    * @brief Get an atom id by its vertex index
    *
    * @param vertexId
@@ -1487,6 +1522,18 @@ namespace entities {
     //     std::to_string(atomId) + ") does not exist");
     // }
     return this->atomIdToVertexIdx.at(atomId);
+  }
+
+  /**
+   * @brief Check whether the given atom id is present in this universe
+   *
+   * @param atomId
+   * @return true
+   * @return false
+   */
+  bool Universe::containsAtomWithId(const int atomId) const
+  {
+    return pylimer_tools::utils::map_has_key(this->atomIdToVertexIdx, atomId);
   }
 
   /**
