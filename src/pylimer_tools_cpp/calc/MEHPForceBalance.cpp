@@ -940,7 +940,9 @@ namespace calc {
         this->universe.getChainsWithCrosslinker(crosslinkerType);
       std::vector<size_t> usableSpringIdxs;
       usableSpringIdxs.reserve(crosslinkerChains.size());
-      bool danglingChainsAreKept = this->initialConfig.nrOfNodes > this->universe.getAtomsOfType(crosslinkerType).size();
+      bool danglingChainsAreKept =
+        this->initialConfig.nrOfNodes >
+        this->universe.getAtomsOfType(crosslinkerType).size();
       // and also query all the corresponding atoms we use to place slip-links
       // on
       size_t nrOfEligibleAtoms = 0;
@@ -964,7 +966,8 @@ namespace calc {
             chain.getType() ==
               pylimer_tools::entities::MoleculeType::NETWORK_STRAND ||
             (chain.getType() ==
-              pylimer_tools::entities::MoleculeType::DANGLING_CHAIN && danglingChainsAreKept)) {
+               pylimer_tools::entities::MoleculeType::DANGLING_CHAIN &&
+             danglingChainsAreKept)) {
           assert(i == this->initialConfig.springToMoleculeIds[springId]);
           // TODO: also check that this is not a higher order dangling strand
           usableSpringIdxs.push_back(i);
@@ -989,6 +992,8 @@ namespace calc {
       // build neighbourlist
       std::vector<pylimer_tools::entities::Atom> atomsForNeighbourList =
         this->universe.getAtoms();
+      std::vector<bool> isMasked = pylimer_tools::utils::initializeWithValue(
+        this->universe.getNrOfAtoms(), false);
       if (excludeCrosslinks) {
         // TODO: check whether it is faster to just only query the other ones
         atomsForNeighbourList.erase(
@@ -996,7 +1001,16 @@ namespace calc {
                          atomsForNeighbourList.end(),
                          [&](pylimer_tools::entities::Atom a) -> bool {
                            return a.getType() == this->crosslinkerType;
-                         }));
+                         }), atomsForNeighbourList.end());
+        for (size_t i = 0; i < this->universe.getNrOfAtoms(); ++i) {
+          isMasked[i] = (this->universe.getAtomByVertexIdx(i).getType() ==
+                         this->crosslinkerType);
+        }
+        for (pylimer_tools::entities::Atom a : atomsForNeighbourList) {
+          RUNTIME_EXP_IFN(
+            a.getType() != this->crosslinkerType,
+            "Removing cross-linkers from neighborlist did not seem to work.");
+        }
       }
       pylimer_tools::entities::NeighbourList neighbourList =
         pylimer_tools::entities::NeighbourList(
@@ -1008,14 +1022,9 @@ namespace calc {
       // this way is more performant than
       // sampling integers and checking whether they have been sampled already
       std::vector<size_t> toSampleFrom;
-      std::vector<bool> isMasked;
       toSampleFrom.reserve(this->universe.getNrOfAtoms());
-      isMasked.reserve(this->universe.getNrOfAtoms());
       for (size_t i = 0; i < this->universe.getNrOfAtoms(); ++i) {
         toSampleFrom.push_back(i);
-        isMasked[i] = (excludeCrosslinks &&
-                       this->universe.getAtomByVertexIdx(i).getType() ==
-                         this->crosslinkerType);
       }
       std::shuffle(toSampleFrom.begin(), toSampleFrom.end(), rng);
 
@@ -1058,11 +1067,15 @@ namespace calc {
         sampleIdx += 1;
         pylimer_tools::entities::Atom a1 =
           this->universe.getAtomByVertexIdx(sampledVertexId);
+        RUNTIME_EXP_IFN(!excludeCrosslinks ||
+                          a1.getType() != this->crosslinkerType,
+                        "Sampled atom is cross-link, but may not be");
         isMasked[sampledVertexId] = true;
         // then, find neighbouring atoms (but not from the same strand?!)
         std::vector<pylimer_tools::entities::Atom> neighbours =
           neighbourList.getAtomsCloseTo(a1);
-        neighbourList.removeAtom(a1);
+        neighbourList.removeAtom(a1,
+                                 "After querying neighbours. Impossible case.");
         // filter the neighbours to include only those from other strands
         // NOTE: this skews the whole thing a bit
         neighbours.erase(
@@ -1070,17 +1083,20 @@ namespace calc {
             neighbours.begin(),
             neighbours.end(),
             [&](pylimer_tools::entities::Atom a) -> bool {
-              return (atomToStrand[a.getId()] ==
-                        atomToStrand[a1.getId()] // do not use "at", because not
-                                                 // all atoms in the neighbours
-                                                 // have been assigned a strand
-                      && std::abs(static_cast<double>(
-                           atomIdxInStrand[a.getId()] -
-                           atomIdxInStrand[a1.getId()])) < sameStrandCutoff);
+              return (
+                (atomToStrand[a.getId()] ==
+                   atomToStrand[a1.getId()] // do not use "at", because not
+                                            // all atoms in the neighbours
+                                            // have been assigned a strand
+                 && (std::abs(static_cast<double>(
+                       atomIdxInStrand[a.getId()] -
+                       atomIdxInStrand[a1.getId()])) < sameStrandCutoff))
+                // the following check should not be necessary?!?
+                || isMasked[this->universe.getIdxByAtomId(a.getId())]);
             }),
           neighbours.end());
         if (neighbours.size() == 0) {
-          std::cerr << "Not enough neighbours found." << std::endl;
+          std::cerr << "Not enough close neighbours found." << std::endl;
           continue;
         }
         // then, randomly select one of them
@@ -1094,7 +1110,14 @@ namespace calc {
         // finally, remove them from the neighbour lists so that they are not
         // sampled more than once
         size_t sampledVertexId2 = this->universe.getIdxByAtomId(a2.getId());
-        neighbourList.removeAtom(a2);
+        RUNTIME_EXP_IFN(sampledVertexId2 != sampledVertexId,
+                        "Second sample may not be equal to the first");
+        RUNTIME_EXP_IFN(!excludeCrosslinks ||
+                          a2.getType() != this->crosslinkerType,
+                        "Sampled atom is cross-link, but may not be");
+        RUNTIME_EXP_IFN(!isMasked[sampledVertexId2],
+                        "Sampled vertex 2 is masked, but could not be");
+        neighbourList.removeAtom(a2, "Removing sampled vertex 2");
         isMasked[sampledVertexId2] = true;
         // it is actually quite a lot of expensive stuff done until we get to
         // this check but only this way we have the balance of removing atoms
