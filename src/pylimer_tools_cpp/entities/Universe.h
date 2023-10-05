@@ -94,6 +94,7 @@ namespace entities {
     void simplify();
 
     // getters
+    bool containsAtomWithId(const int atomId) const;
     Atom getAtom(const int atomId) const;
     std::vector<Atom> getAtoms() const;
     // std::map<std::st¨ring, std::vector<long int>> getBonds() const;
@@ -151,6 +152,7 @@ namespace entities {
     std::map<int, int> determineFunctionalityPerType() const;
     std::map<int, double> determineEffectiveFunctionalityPerType() const;
     std::map<int, double> computeWeightFractions() const;
+    double computeWeightFractionOfClustersAssociatedWith(std::vector<long int> atomIds) const;
     std::vector<double> computeDxs(const std::vector<long int> bondFrom,
                                    const std::vector<long int> bondTo);
     std::vector<double> computeDys(const std::vector<long int> bondFrom,

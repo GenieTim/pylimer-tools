@@ -64,8 +64,7 @@ namespace calc {
                        bool is2D = false,
                        double kappa = 1.0,
                        bool remove2functionalCrosslinkers = false,
-                       bool removeDanglingChains = false
-                       )
+                       bool removeDanglingChains = false)
         : universe(u)
       {
         this->crosslinkerType = crosslinkerType;
@@ -580,47 +579,13 @@ namespace calc {
         if (net->nrOfSprings < 1) {
           return 1.;
         }
-        // find all active springs
-        ArrayXb activeSprings =
-          this->findActiveSprings(springDistances, tolerance);
-        if (activeSprings.count() == 0) {
-          return 1.;
-        }
-        // then, iteratively walk along the springs to mark those as "active"
-        // that are connected to active springs
-        bool hadChanged = true;
-        while (hadChanged) {
-          ArrayXb oldActiveSprings = activeSprings;
-          for (size_t i = 0; i < net->nrOfNodes; ++i) {
-            bool anyActive = false;
-            for (size_t spring_idx : net->springIndicesOfLinks[i]) {
-              if (activeSprings[spring_idx]) {
-                anyActive = true;
-                break;
-              }
-            }
+        std::vector<long int> activeCrosslinkIds =
+          this->getIdsOfActiveNodes(tolerance, 2, -1);
+        double activeClusterWeightFraction =
+          this->universe.computeWeightFractionOfClustersAssociatedWith(
+            activeCrosslinkIds);
 
-            if (anyActive) {
-              for (size_t spring_idx : net->springIndicesOfLinks[i]) {
-                activeSprings[spring_idx] = true;
-              }
-            }
-          }
-          hadChanged = (oldActiveSprings.count() != activeSprings.count());
-        }
-
-        // as of now, the springsContourLength is equal to the number of bonds
-        // from cross-link to cross-link. therefore, the number of atoms of each
-        // of these springs is one less
-        Eigen::ArrayXd allActiveAtomsPerChains =
-          activeSprings.cast<double>() *
-          (net->springsContourLength.array() -
-           Eigen::ArrayXd::Ones(net->nrOfSprings));
-        // finally, normalise by the number of atoms.
-        // NOTE: currently, the weight of the atoms is ignored
-        return 1. - ((allActiveAtomsPerChains).matrix().sum() +
-                     this->getNrOfActiveNodes()) /
-                      this->universe.getNrOfAtoms();
+        return 1. - activeClusterWeightFraction;
       }
 
       /**
