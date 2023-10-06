@@ -235,7 +235,7 @@ namespace calc {
             // default tolerance: 0.25*atom's cube length
             size_t nRemoved = this->removeInactiveCrosslinks(
               net, u, springPartitions, removalTolerance);
-            net.meanSpringContourLength = net.springsContourLength.mean();
+            net.meanSpringContourLength = net.springsContourLength.size() > 0 ? net.springsContourLength.mean() : 0.;
             if (nRemoved > 0) {
               std::cout << "Removed " << nRemoved << " inactive springs. "
                         << std::endl;
@@ -247,7 +247,7 @@ namespace calc {
             // std::cout << "Removing 2-f cross-links" << std::endl;
             size_t nRemoved =
               this->removeTwofunctionalCrosslinks(net, u, springPartitions);
-            net.meanSpringContourLength = net.springsContourLength.mean();
+            net.meanSpringContourLength = net.springsContourLength.size() > 0 ? net.springsContourLength.mean() : 0.;
             if (nRemoved > 0) {
               std::cout << "Removed " << nRemoved
                         << " cross-linkers with f = 2. " << std::endl;
@@ -283,7 +283,7 @@ namespace calc {
                     << std::endl;
         }
       } while (currentResidual / initialResidual > xtol &&
-               iterationsDone < maxNrOfSteps);
+               iterationsDone < maxNrOfSteps && net.nrOfSprings > 0);
 
       // query solution & exit reason
       this->exitReason = (iterationsDone == maxNrOfSteps)
