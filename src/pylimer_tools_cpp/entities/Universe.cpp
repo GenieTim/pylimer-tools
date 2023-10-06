@@ -1479,11 +1479,12 @@ namespace entities {
     for (pylimer_tools::entities::Universe cluster : clusters) {
       double clusterMass = cluster.computeTotalMass();
       totalMass += clusterMass;
-      for (size_t atomIdIdx = atomIds.size()-1; atomIdIdx >= 0; atomIdIdx--) {
-        long int atomId = atomIds[atomIdIdx];
+      // for (size_t atomIdIdx = atomIds.size()-1; atomIdIdx >= 0; --atomIdIdx) {
+      //   long int atomId = atomIds[atomIdIdx];
+      for (long int atomId : atomIds) {
         if (cluster.containsAtomWithId(atomId)) {
           partialMass += clusterMass;
-          atomIds.erase(atomIds.begin() + atomIdIdx);
+          // atomIds.erase(atomIds.begin() + atomIdIdx);
           break;
         }
       }
