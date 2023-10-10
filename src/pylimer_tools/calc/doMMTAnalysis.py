@@ -10,7 +10,7 @@ from scipy import optimize
 
 import pylimer_tools.calc.doMEHPAnalysis as mehp
 from pylimer_tools.io.unitStyles import UnitStyle
-from pylimer_tools_cpp import Universe
+from pylimer_tools_cpp import Universe, MoleculeType
 
 
 def predictShearModulus(network: Universe, unitStyle: UnitStyle, crosslinkerType: int = None, r: float = None, p: float = None, f: int = None, nu: float = None, T: pint.Quantity = None, strandLength: int = None, functionalityPerType: dict = None, Ge1: float = None):
@@ -151,12 +151,14 @@ def calculateWeightFractionOfBackbone(network: Universe, crosslinkerType: int, s
     if (functionalityPerType is None or crosslinkerType not in functionalityPerType):
         functionalityPerType = network.determineFunctionalityPerType()
 
-    weightFractions, alpha, beta = computeWeightFractionsAndProbabilities(network, crosslinkerType, strandLength, functionalityPerType, weightFractions, r, p)
-    W_sol = computeWeightFractionOfSolubleMaterial(network, crosslinkerType, strandLength, functionalityPerType, weightFractions, r, p)
+    weightFractions, alpha, beta = computeWeightFractionsAndProbabilities(
+        network, crosslinkerType, strandLength, functionalityPerType, weightFractions, r, p)
+    W_sol = computeWeightFractionOfSolubleMaterial(
+        network, crosslinkerType, strandLength, functionalityPerType, weightFractions, r, p)
     if (W_sol < 0 or W_sol > 1):
         warnings.warn(
             "The weight fraction W_sol predicted by MMT ({}) is outside accepted range. Falling back to measurement.".format(W_sol))
-        W_sol = measureWeightFractioOfSolubleMaterial(network)
+        W_sol = measureWeightFractionOfSolubleMaterial(network)
 
     Phi_el = 0
     W_a = weightFractions[crosslinkerType] / \
@@ -179,7 +181,48 @@ def calculateWeightFractionOfBackbone(network: Universe, crosslinkerType: int, s
     return Phi_el
 
 
-def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.75, absTol: float = None) -> float:
+def measureLowerBoundWeightFractionOfSolubleMaterial(network: Universe, crosslinkerType: int, relTol: float = 0.75, absTol: float = None) -> float:
+    """
+    Compute a lower bound on the weight fraction of soluble material by counting.
+    This works as:
+        - only clusters, which do not contain loops and are smaller than the relTol of the biggest, are counted as soluble
+
+    Arguments:
+      - network: the poylmer network to do the computation for
+      - relTol: the fraction of the maximum weight that counts as soluble. Ignored if absTol is specified
+      - absTol: the weight from which on a component is not soluble anymore
+
+    Returns:
+      - :math:`W_{sol}` (float): the weight fraction of soluble material as counted.
+
+    """
+    if (network.getNrOfAtoms() == 0):
+        return None
+
+    def is_soluble_cluster(cluster):
+        chains = cluster.getChainsWithCrosslinker(crosslinkerType)
+        if (np.any([c.getType() == MoleculeType.PRIMARY_LOOP for c in chains])):
+            return False
+        loops = cluster.findLoops(crosslinkerType)
+        return len(loops) == 0
+
+    fractions = network.getClusters()
+    weights = np.array([f.computeTotalMass() for f in fractions])
+    totalWeight = weights.sum()
+    solubleWeight = 0
+    for i in range(len(fractions)):
+        w = weights[i]
+        if (absTol is not None):
+            if (w < absTol and is_soluble_cluster(fractions[i])):
+                solubleWeight += w
+        else:
+            if (w < relTol*weights.max() and is_soluble_cluster(fractions[i])):
+                solubleWeight += w
+
+    return solubleWeight/totalWeight
+
+
+def measureWeightFractionOfSolubleMaterial(network: Universe, relTol: float = 0.75, absTol: float = None) -> float:
     """
     Compute the weight fraction of soluble material by counting.
 
@@ -194,7 +237,7 @@ def measureWeightFractioOfSolubleMaterial(network: Universe, relTol: float = 0.7
     """
     if (network.getNrOfAtoms() == 0):
         return None
-    
+
     fractions = network.getClusters()
     weights = np.array([f.computeTotalMass() for f in fractions])
     totalWeight = weights.sum()
@@ -240,7 +283,8 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, crosslinkerType: i
         assert(network is not None)
         functionalityPerType = network.determineFunctionalityPerType()
 
-    weightFractions, alpha, beta = computeWeightFractionsAndProbabilities(network, crosslinkerType, strandLength, functionalityPerType, weightFractions, r, p)
+    weightFractions, alpha, beta = computeWeightFractionsAndProbabilities(
+        network, crosslinkerType, strandLength, functionalityPerType, weightFractions, r, p)
 
     W_sol = 0
     for key in weightFractions:
@@ -249,6 +293,7 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, crosslinkerType: i
             (math.pow(coeff, functionalityPerType[key]))
 
     return W_sol
+
 
 def computeWeightFractionsAndProbabilities(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None, r: float = None, p: float = None):
 
@@ -294,6 +339,7 @@ def computeWeightFractionsAndProbabilities(network: Universe, crosslinkerType: i
     assert(beta <= 1 and beta >= 0)
 
     return weightFractions, alpha, beta
+
 
 def computeMMsProbabilities(r, p, f):
     """
