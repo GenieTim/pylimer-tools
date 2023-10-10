@@ -261,7 +261,7 @@
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>obj</strong> (<em>-</em>) – the thing to cache</p></li>
-<li><p><strong>file</strong> (<em>-</em>) – the path to the file to save the object to</p></li>
+<li><p><strong>file</strong> (<em>-</em>) – a part of what’s use for the cache’s name. Ideally the file that is read, such that the filemtime of <cite>file</cite> can be used to check whether cache must be generated anew</p></li>
 <li><p><strong>suffix</strong> (<em>-</em>) – the file name’s suffix</p></li>
 <li><p><strong>tmp_dir</strong> (<em>-</em>) – the directory to store the cache in</p></li>
 </ul>
@@ -276,7 +276,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>file</strong> (<em>-</em>) – a cache name. Ideally the file that is read.</p></li>
+<li><p><strong>file</strong> (<em>-</em>) – a part of what’s use for the cache’s name. Ideally the file that is read, such that the filemtime of <cite>file</cite> can be used to check whether cache must be generated anew</p></li>
 <li><p><strong>suffix</strong> (<em>-</em>) – the file name’s suffix</p></li>
 <li><p><strong>tmp_dir</strong> (<em>-</em>) – the temporary directory</p></li>
 </ul>
@@ -300,7 +300,7 @@
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>file</strong> (<em>-</em>) – a cache name. Ideally the file that is read, such that the filemtime of <cite>file</cite> can be used to check whether cache must be generated anew</p></li>
+<li><p><strong>file</strong> (<em>-</em>) – a part of what’s use for the cache’s name. Ideally the file that is read, such that the filemtime of <cite>file</cite> can be used to check whether cache must be generated anew</p></li>
 <li><p><strong>suffix</strong> (<em>-</em>) – the file name’s suffix</p></li>
 <li><p><strong>disableWarnings</strong> (<em>-</em>) – whether to disable warnings about missing possibilities to check for filemtime</p></li>
 <li><p><strong>tmp_dir</strong> (<em>-</em>) – the directory to load the cache from</p></li>

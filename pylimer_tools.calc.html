@@ -927,8 +927,38 @@ See: <a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.measureWeightFractioOfSolubleMaterial">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">measureWeightFractioOfSolubleMaterial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">relTol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absTol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.measureWeightFractioOfSolubleMaterial" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.measureLowerBoundWeightFractionOfSolubleMaterial">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">measureLowerBoundWeightFractionOfSolubleMaterial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinkerType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relTol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absTol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.measureLowerBoundWeightFractionOfSolubleMaterial" title="Link to this definition">#</a></dt>
+<dd><p>Compute a lower bound on the weight fraction of soluble material by counting.
+This works as:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>only clusters, which do not contain loops and are smaller than the relTol of the biggest, are counted as soluble</p></li>
+</ul>
+</div></blockquote>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> (<em>-</em>) – the poylmer network to do the computation for</p></li>
+<li><p><strong>relTol</strong> (<em>-</em>) – the fraction of the maximum weight that counts as soluble. Ignored if absTol is specified</p></li>
+<li><p><strong>absTol</strong> (<em>-</em>) – the weight from which on a component is not soluble anymore</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the weight fraction of soluble material as counted.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(W_{sol}\)</span> (float)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.measureWeightFractionOfSolubleMaterial">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">measureWeightFractionOfSolubleMaterial</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">relTol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">absTol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.measureWeightFractionOfSolubleMaterial" title="Link to this definition">#</a></dt>
 <dd><p>Compute the weight fraction of soluble material by counting.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1171,7 +1201,8 @@ See: <a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeWeightFractionOfSolubleMaterial"><code class="docutils literal notranslate"><span class="pre">computeWeightFractionOfSolubleMaterial()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeWeightFractions"><code class="docutils literal notranslate"><span class="pre">computeWeightFractions()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeWeightFractionsAndProbabilities"><code class="docutils literal notranslate"><span class="pre">computeWeightFractionsAndProbabilities()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.measureWeightFractioOfSolubleMaterial"><code class="docutils literal notranslate"><span class="pre">measureWeightFractioOfSolubleMaterial()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.measureLowerBoundWeightFractionOfSolubleMaterial"><code class="docutils literal notranslate"><span class="pre">measureLowerBoundWeightFractionOfSolubleMaterial()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.measureWeightFractionOfSolubleMaterial"><code class="docutils literal notranslate"><span class="pre">measureWeightFractionOfSolubleMaterial()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.predictGelationPoint"><code class="docutils literal notranslate"><span class="pre">predictGelationPoint()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.predictNumberDensityOfJunctionPoints"><code class="docutils literal notranslate"><span class="pre">predictNumberDensityOfJunctionPoints()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.predictNumberDensityOfNetworkStrands"><code class="docutils literal notranslate"><span class="pre">predictNumberDensityOfNetworkStrands()</span></code></a></li>
