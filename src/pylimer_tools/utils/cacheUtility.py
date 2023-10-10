@@ -17,7 +17,7 @@ def doCache(obj, file: str, suffix: str, tmp_dir: str = None):
 
     Arguments:
         - obj: the thing to cache
-        - file: the path to the file to save the object to
+        - file: a part of what's use for the cache's name. Ideally the file that is read, such that the filemtime of `file` can be used to check whether cache must be generated anew
         - suffix: the file name's suffix
         - tmp_dir: the directory to store the cache in
     """
@@ -31,7 +31,7 @@ def loadCache(file: Union[str, List[str], None], suffix: str, disableWarnings: b
     Load an object from cache.
 
     Arguments:
-        - file: a cache name. Ideally the file that is read, such that the filemtime of `file` can be used to check whether cache must be generated anew
+        - file: a part of what's use for the cache's name. Ideally the file that is read, such that the filemtime of `file` can be used to check whether cache must be generated anew
         - suffix: the file name's suffix
         - disableWarnings: whether to disable warnings about missing possibilities to check for filemtime
         - tmp_dir: the directory to load the cache from
@@ -83,7 +83,7 @@ def getCacheFileName(file: Union[str, List[str], None], suffix: str, tmp_dir: st
     Get the name and path of a cache file. Internal method.
 
     Arguments:
-        - file: a cache name. Ideally the file that is read.
+        - file: a part of what's use for the cache's name. Ideally the file that is read, such that the filemtime of `file` can be used to check whether cache must be generated anew
         - suffix: the file name's suffix
         - tmp_dir: the temporary directory
 

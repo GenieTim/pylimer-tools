@@ -110,16 +110,20 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
 
     def testSolubleWeightFractionMeasurement(self):
         self.testUniverse.setMasses({1: 1, 2: 1})
-        self.assertEqual(measureWeightFractioOfSolubleMaterial(
+        self.assertEqual(measureWeightFractionOfSolubleMaterial(
             self.emptyUniverse), None)
-        self.assertEqual(measureWeightFractioOfSolubleMaterial(
+        self.assertEqual(measureWeightFractionOfSolubleMaterial(
             self.testUniverse, relTol=0), 0.0)
-        self.assertEqual(measureWeightFractioOfSolubleMaterial(
-            self.testUniverse, absTol=0), 0.0)
-        self.assertEqual(measureWeightFractioOfSolubleMaterial(
+        self.assertEqual(measureWeightFractionOfSolubleMaterial(
             self.testUniverse, absTol=10000), 1.0)
-        self.assertEqual(measureWeightFractioOfSolubleMaterial(
+        self.assertEqual(measureWeightFractionOfSolubleMaterial(
             self.testUniverse), 1/8)
+        self.assertEqual(measureLowerBoundWeightFractionOfSolubleMaterial(
+            self.emptyUniverse), None)
+        self.assertEqual(measureLowerBoundWeightFractionOfSolubleMaterial(
+            self.testUniverse, absTol=0), 0.0)
+        self.assertEqual(measureLowerBoundWeightFractionOfSolubleMaterial(
+            self.testUniverse, absTol=10000), 1.0)
 
     def testSolubleMaterialWeightFractionCalculation(self):
         self.testUniverse.setMasses({1: 1, 2: 1})
