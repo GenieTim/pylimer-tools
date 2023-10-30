@@ -21,6 +21,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Universe
       ~Universe.addAngles
       ~Universe.addAtoms
       ~Universe.addBonds
+      ~Universe.addBondsWithTypes
       ~Universe.addDihedralAngles
       ~Universe.computeBondLengths
       ~Universe.computeDxs
