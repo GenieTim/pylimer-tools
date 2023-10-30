@@ -286,7 +286,8 @@ init_pylimer_bound_calc(py::module_& m)
                   bool,
                   mehp::MEHPForceEvaluator*,
                   double,
-                  bool, bool>(),
+                  bool,
+                  bool>(),
          R"pbdoc(
           Instantiate the simulator for a certain universe.
 
@@ -1300,6 +1301,20 @@ init_pylimer_bound_calc(py::module_& m)
           Arguments:
                - values: a list of OutputConfiguration structs
      )pbdoc")
+    .def("configAutoCorrelatorOutput",
+         &dpd::DPDSimulator::configAutoCorrelatorOutput,
+         R"pbdoc(
+          Set which values to compute multiple-tau autocorrelation for.
+          If you use this, you should cite `doi:10.1063/1.3491098 <https://pubs.aip.org/aip/jcp/article-abstract/133/15/154103/190247/Efficient-on-the-fly-calculation-of-time?redirectedFrom=fulltext>`_
+
+          Arguments:
+               - values: a list of OutputConfiguration structs
+               - p
+     )pbdoc",
+         py::arg("values"),
+         py::arg("numcorrin") = 32,
+         py::arg("p") = 16,
+         py::arg("m") = 2)
     .def("configStepOutput",
          &dpd::DPDSimulator::configStepOutput,
          R"pbdoc(

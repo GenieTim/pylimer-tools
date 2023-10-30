@@ -357,11 +357,17 @@ namespace entities {
   {
     this->addBonds(from.size(), from, to);
   }
+  
   void Universe::addBonds(const size_t NNewBonds,
                           std::vector<long int> from,
                           std::vector<long int> to)
   {
     this->addBonds(NNewBonds, from, to, std::vector<int>());
+  }
+
+  void Universe::addBonds(std::vector<long int> from, std::vector<long int> to, std::vector<int> types)
+  {
+    this->addBonds(from.size(), from, to, types);
   }
 
   void Universe::addBonds(const size_t NNewBonds,

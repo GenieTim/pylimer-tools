@@ -480,6 +480,15 @@ init_pylimer_bound_entities(py::module_& m)
          "skipped.",
          py::arg("from"),
          py::arg("to"))
+    .def("addBondsWithTypes",
+         py::overload_cast<std::vector<long int>, std::vector<long int>, std::vector<int>>(
+           &Universe::addBonds),
+         "Add bonds to the underlying atoms, edges to the underlying graph. "
+         "If the connected atoms are not found, the bonds are silently "
+         "skipped.",
+         py::arg("from"),
+         py::arg("to"),
+         py::arg("types"))
     .def("removeBonds",
          &Universe::removeBonds,
          R"pbdoc(

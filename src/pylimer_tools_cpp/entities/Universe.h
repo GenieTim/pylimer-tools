@@ -53,19 +53,23 @@ namespace entities {
                   std::vector<int> nx,
                   std::vector<int> ny,
                   std::vector<int> nz);
-    void addAtoms(std::vector<long int> ids,
-                  std::vector<int> types,
-                  std::vector<double> x,
-                  std::vector<double> y,
-                  std::vector<double> z,
-                  std::vector<int> nx,
-                  std::vector<int> ny,
-                  std::vector<int> nz,
-                  std::unordered_map<std::string, std::vector<double>> additionalData);
+    void addAtoms(
+      std::vector<long int> ids,
+      std::vector<int> types,
+      std::vector<double> x,
+      std::vector<double> y,
+      std::vector<double> z,
+      std::vector<int> nx,
+      std::vector<int> ny,
+      std::vector<int> nz,
+      std::unordered_map<std::string, std::vector<double>> additionalData);
     void removeAtoms(std::vector<long int> ids);
     void replaceAtom(const long int id, const Atom& replacement);
     // bonds
     void addBonds(std::vector<long int> from, std::vector<long int> to);
+    void addBonds(std::vector<long int> from,
+                  std::vector<long int> to,
+                  std::vector<int> types);
     void addBonds(const size_t NNewBonds,
                   std::vector<long int> from,
                   std::vector<long int> to);
@@ -152,7 +156,8 @@ namespace entities {
     std::map<int, int> determineFunctionalityPerType() const;
     std::map<int, double> determineEffectiveFunctionalityPerType() const;
     std::map<int, double> computeWeightFractions() const;
-    double computeWeightFractionOfClustersAssociatedWith(std::vector<long int> atomIds) const;
+    double computeWeightFractionOfClustersAssociatedWith(
+      std::vector<long int> atomIds) const;
     std::vector<double> computeDxs(const std::vector<long int> bondFrom,
                                    const std::vector<long int> bondTo);
     std::vector<double> computeDys(const std::vector<long int> bondFrom,
