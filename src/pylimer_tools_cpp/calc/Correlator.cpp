@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
 
-#include "correlator.h"
+#include "Correlator.h"
 #include <math.h>
 
 namespace pylimer_tools {
