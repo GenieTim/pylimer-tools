@@ -1,5 +1,5 @@
 {
-  "C_Cpp.errorSquiggles": "Enabled",
+  "C_Cpp.errorSquiggles": "enabledIfIncludesResolve",
   "files.associations": {
     "*.rdfa": "html",
     ".babelrc": "json",
@@ -138,5 +138,10 @@
     "span": "cpp",
     "ranges": "cpp"
   },
-  "C_Cpp.clang_format_path": "/usr/local/opt/llvm/bin/clang-format"
+  "C_Cpp.clang_format_path": "/usr/local/opt/llvm/bin/clang-format",
+  "C_Cpp.default.cppStandard": "c++17",
+  "C_Cpp.default.cStandard": "c17",
+  "C_Cpp.default.intelliSenseMode": "macos-gcc-x64",
+  "C_Cpp.inlayHints.autoDeclarationTypes.showOnLeft": true,
+  "C_Cpp.clang_format_sortIncludes": null
 }

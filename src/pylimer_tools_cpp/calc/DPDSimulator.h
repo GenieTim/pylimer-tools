@@ -5,6 +5,7 @@
 #include "../entities/Box.h"
 #include "../entities/EigenNeighbourList.h"
 #include "../entities/Universe.h"
+#include "Correlator.h"
 #include "MEHPForceEvaluator.h"
 #include "MEHPUtilityStructures.h"
 #include <Eigen/Dense>
@@ -53,17 +54,34 @@ namespace calc {
       STRESS_YY = 6,
       STRESS_ZZ = 7,
       STRESS_XY = 8,
-      STRESS_XZ = 9,
-      STRESS_YZ = 10,
-      MEAN_B = 11,
-      MAX_B = 12,
-      MSD = 13
+      STRESS_YZ = 9,
+      STRESS_XZ = 10,
+      STRESS_NXY = 11,
+      STRESS_NYZ = 12,
+      STRESS_NXZ = 13,
+      MEAN_B = 14,
+      MAX_B = 15,
+      MSD = 16
     };
 
-    const std::array<std::string, 14> ComputedDoubleValuesNames = {
-      "TimeStep",    "Time",        "Volume",      "Pressure",    "Temperature",
-      "Stress[0,0]", "Stress[1,1]", "Stress[2,2]", "Stress[0,1]", "Stress[0,2]",
-      "Stress[1,2]", "<b>",         "max(b)",      "MSD"
+    const std::array<std::string, 17> ComputedDoubleValuesNames = {
+      "TimeStep",
+      "Time",
+      "Volume",
+      "Pressure",
+      "Temperature",
+      "Stress[0,0]",
+      "Stress[1,1]",
+      "Stress[2,2]",
+      "Stress[0,1]",
+      "Stress[1,2]",
+      "Stress[0,2]",
+      "Stress[0,0]-Stress[1,1]",
+      "Stress[1,1]-Stress[2,2]",
+      "Stress[0,0]-Stress[2,2]",
+      "<b>",
+      "max(b)",
+      "MSD"
     };
 
     struct OutputConfiguration
@@ -104,6 +122,8 @@ namespace calc {
       long int nStepsDPD = 500;
       std::vector<OutputConfiguration> outputConfigs;
       std::vector<OutputConfiguration> outputAverageConfigs;
+      std::vector<OutputConfiguration> outputAutoCorrelationConfigs;
+      std::vector<pylimer_tools::calc::Correlator> autocorrelators;
       std::vector<std::shared_ptr<std::ostream>> outputStreams;
       std::vector<int> outputFileStreams;
 
@@ -272,6 +292,27 @@ namespace calc {
 
       void startMeasuringMSDForAtoms(const std::vector<size_t> atomIds);
 
+      void configAutoCorrelatorOutput(std::vector<OutputConfiguration> vals,
+                                      const unsigned int numcorrin = 32,
+                                      const unsigned int pin = 16,
+                                      const unsigned int min = 2)
+      {
+        int num_values_to_correlate = 0;
+        for (size_t i = 0; i < vals.size(); ++i) {
+          INVALIDARG_EXP_IFN(
+            vals[i].intValues.size() > 0,
+            "Correlation of integer values is not supported yet.");
+          num_values_to_correlate += vals[i].doubleValues.size();
+        }
+        this->autocorrelators.clear();
+        this->autocorrelators.reserve(num_values_to_correlate);
+        for (size_t i = 0; i < num_values_to_correlate; ++i) {
+          this->autocorrelators.push_back(
+            pylimer_tools::calc::Correlator(numcorrin, pin, min));
+        }
+        this->outputAutoCorrelationConfigs = vals;
+      }
+
       void configAverageOutput(std::vector<OutputConfiguration> vals)
       {
         this->outputAverageConfigs = vals;
@@ -303,7 +344,7 @@ namespace calc {
                                 int streamIdx = 0);
       inline void doOutputValues(OutputConfiguration& oc,
                                  std::array<int, 3>& intvalues,
-                                 std::array<double, 14>& doublevalues,
+                                 std::array<double, 17>& doublevalues,
                                  std::string& outputBuffer,
                                  int streamIdx = 0)
       {

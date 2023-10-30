@@ -1,4 +1,5 @@
 #include "./DPDSimulator.h"
+#include "./Correlator.h"
 
 #include <fstream>
 #include <iostream>
@@ -133,6 +134,15 @@ namespace calc {
         pylimer_tools::utils::initializeWithValue<double>(numAverages, 0.);
       RUNTIME_EXP_IFN(runningAverages.size() == numAverages, "");
 
+      // prepare autocorrelation
+      int numAutocorrelations =
+        this->openFilesOutputHeader(this->outputAutoCorrelationConfigs,
+                                    "Step\t",
+                                    this->outputConfigs.size() + numAverages);
+      std::string autocorrelationOutputBuffer;
+      autocorrelationOutputBuffer.reserve(
+        this->outputAutoCorrelationConfigs.size() * 50);
+
       int numShifts = 0;
       int numRelocations = 0;
 
@@ -199,7 +209,7 @@ namespace calc {
           numShifts,
           numRelocations,
         };
-        std::array<double, 14> doublevalues = {
+        std::array<double, 17> doublevalues = {
           dt,
           this->currentTime + static_cast<double>(step + 1) * dt,
           this->box.getVolume(),
@@ -209,8 +219,11 @@ namespace calc {
           stressTensor(1, 1),
           stressTensor(2, 2),
           stressTensor(0, 1),
-          stressTensor(0, 2),
           stressTensor(1, 2),
+          stressTensor(0, 2),
+          stressTensor(0, 0) - stressTensor(1, 1),
+          stressTensor(1, 1) - stressTensor(2, 2),
+          stressTensor(0, 0) - stressTensor(2, 2),
           meanB,
           maxB,
           0.
@@ -285,6 +298,53 @@ namespace calc {
           assert(averagesIdx == numAverages);
         }
 
+        // do autocorrelation
+        size_t autocorrelator_idx = 0;
+        for (OutputConfiguration oc : this->outputAutoCorrelationConfigs) {
+          const size_t autocorrelator_idx_before = autocorrelator_idx;
+          for (ComputedDoubleValues cv : oc.doubleValues) {
+            this->autocorrelators[autocorrelator_idx].add(doublevalues[cv]);
+            autocorrelator_idx += 1;
+          }
+          if ((step + 1) % oc.outputEvery == 0) {
+            autocorrelationOutputBuffer.clear();
+            autocorrelationOutputBuffer +=
+              "# TimeStep " + std::to_string(step) + "\n";
+            int npcorr = 0;
+            for (int autocorr_idx_offset = 0;
+                 autocorr_idx_offset < oc.doubleValues.size();
+                 ++autocorr_idx_offset) {
+              size_t idx = autocorrelator_idx_before + autocorr_idx_offset;
+              this->autocorrelators[idx].evaluate();
+              RUNTIME_EXP_IFN(npcorr == 0 ||
+                                npcorr == this->autocorrelators[idx].npcorr,
+                              "Autocorrelation states are inconsistent.");
+              if (npcorr == 0) {
+                npcorr = this->autocorrelators[idx].npcorr;
+              }
+            }
+
+            for (size_t output_idx = 0; output_idx += 1; output_idx < npcorr) {
+              autocorrelationOutputBuffer += std::to_string(
+                this->autocorrelators[autocorrelator_idx_before].t[output_idx]);
+              for (int autocorr_idx_offset = 0;
+                   autocorr_idx_offset < oc.doubleValues.size();
+                   ++autocorr_idx_offset) {
+                size_t idx = autocorrelator_idx_before + autocorr_idx_offset;
+                autocorrelationOutputBuffer +=
+                  "\t" +
+                  std::to_string(this->autocorrelators[idx].f[output_idx]);
+              }
+            }
+            (*(this->outputStreams[streamIdx]))
+              << autocorrelationOutputBuffer << std::endl;
+            streamIdx += 1;
+          }
+
+          streamIdx += 1;
+        }
+
+        // / end output
         if (step % 50 == 0) {
           std::flush(std::cout);
         }
