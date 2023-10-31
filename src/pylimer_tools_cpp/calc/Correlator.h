@@ -81,7 +81,13 @@ namespace calc {
     Correlator(const unsigned int numcorrin = 32,
                const unsigned int pin = 16,
                const unsigned int min = 2);
+    /// Rule of three
+    // destructor
     ~Correlator();
+    // copy-constructor
+    Correlator(const Correlator& src);
+    // copy-assignment operator
+    Correlator& operator=(Correlator src);
 
     /** Set size of correlator */
     void setsize(const unsigned int numcorrin = 32,

@@ -39,8 +39,10 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
 
     std::vector<pcd::ComputedDoubleValues> outputQuantities = {
       pcd::ComputedDoubleValues::TEMPERATURE,
-      pcd::ComputedDoubleValues::PRESSURE,  pcd::ComputedDoubleValues::STRESS_XX,
-      pcd::ComputedDoubleValues::STRESS_YY, pcd::ComputedDoubleValues::STRESS_ZZ,
+      pcd::ComputedDoubleValues::PRESSURE,
+      pcd::ComputedDoubleValues::STRESS_XX,
+      pcd::ComputedDoubleValues::STRESS_YY,
+      pcd::ComputedDoubleValues::STRESS_ZZ,
       pcd::ComputedDoubleValues::MSD
     };
 
@@ -50,12 +52,15 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     config.doubleValues = outputQuantities;
     config.intValues = { pcd::ComputedIntValues::STEP };
 
-    REQUIRE_NOTHROW(simulator.configStepOutput({config}));
+    REQUIRE_NOTHROW(simulator.configStepOutput({ config }));
 
     std::vector<pcd::ComputedDoubleValues> averageQuantities = {
-      pcd::ComputedDoubleValues::TEMPERATURE, pcd::ComputedDoubleValues::PRESSURE,
-      pcd::ComputedDoubleValues::STRESS_XX,   pcd::ComputedDoubleValues::STRESS_YY,
-      pcd::ComputedDoubleValues::STRESS_ZZ,   pcd::ComputedDoubleValues::MSD
+      pcd::ComputedDoubleValues::TEMPERATURE,
+      pcd::ComputedDoubleValues::PRESSURE,
+      pcd::ComputedDoubleValues::STRESS_XX,
+      pcd::ComputedDoubleValues::STRESS_YY,
+      pcd::ComputedDoubleValues::STRESS_ZZ,
+      pcd::ComputedDoubleValues::MSD
     };
 
     std::string averageFile =
@@ -65,7 +70,27 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     avgconfig.filename = averageFile;
     avgconfig.doubleValues = averageQuantities;
 
-    REQUIRE_NOTHROW(simulator.configAverageOutput({avgconfig}));
+    REQUIRE_NOTHROW(simulator.configAverageOutput({ avgconfig }));
+
+    std::vector<pcd::ComputedDoubleValues> autocorrelationQuantities = {
+      pcd::ComputedDoubleValues::STRESS_XX,
+      pcd::ComputedDoubleValues::STRESS_YY,
+      pcd::ComputedDoubleValues::STRESS_ZZ,
+      pcd::ComputedDoubleValues::STRESS_XY,
+      pcd::ComputedDoubleValues::STRESS_YZ,
+      pcd::ComputedDoubleValues::STRESS_XZ,
+      pcd::ComputedDoubleValues::STRESS_NXY,
+      pcd::ComputedDoubleValues::STRESS_NYZ,
+      pcd::ComputedDoubleValues::STRESS_NXZ,
+    };
+    std::string autocorrFile =
+      suspectedPath + "melt_83_a_100.structure.autocorr-out.txt";
+    pcd::OutputConfiguration autocorrconfig;
+    autocorrconfig.outputEvery = 75;
+    autocorrconfig.filename = autocorrFile;
+    autocorrconfig.doubleValues = autocorrelationQuantities;
+
+    REQUIRE_NOTHROW(simulator.configAutoCorrelatorOutput({ autocorrconfig }));
 
     std::vector<size_t> atomIdsForMSD = { 1, 4, 6 };
     REQUIRE_NOTHROW(simulator.startMeasuringMSDForAtoms(atomIdsForMSD));
@@ -87,12 +112,14 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     CHECK(resultUniverse.getNrOfAtoms() == universe.getNrOfAtoms());
     CHECK_NOTHROW(simulator.validateState());
 
-    CHECK_NOTHROW(simulator.runSimulation(75, 0.06, true));
+    CHECK_NOTHROW(simulator.runSimulation(76, 0.06, true));
 
     CHECK_NOTHROW(simulator.validateState());
     CHECK_NOTHROW(simulator.validateNeighbourlist(1.0));
 
-    REQUIRE(std::filesystem::exists(averageFile));
+    CHECK(std::filesystem::exists(averageFile));
     std::remove(averageFile.c_str());
+    CHECK(std::filesystem::exists(autocorrFile));
+    std::remove(autocorrFile.c_str());
   }
 };

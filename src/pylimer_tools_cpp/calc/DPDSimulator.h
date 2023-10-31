@@ -300,15 +300,16 @@ namespace calc {
         int num_values_to_correlate = 0;
         for (size_t i = 0; i < vals.size(); ++i) {
           INVALIDARG_EXP_IFN(
-            vals[i].intValues.size() > 0,
+            vals[i].intValues.size() == 0,
             "Correlation of integer values is not supported yet.");
           num_values_to_correlate += vals[i].doubleValues.size();
         }
         this->autocorrelators.clear();
         this->autocorrelators.reserve(num_values_to_correlate);
         for (size_t i = 0; i < num_values_to_correlate; ++i) {
-          this->autocorrelators.push_back(
-            pylimer_tools::calc::Correlator(numcorrin, pin, min));
+          pylimer_tools::calc::Correlator correlator =
+            pylimer_tools::calc::Correlator(numcorrin, pin, min);
+          this->autocorrelators.push_back(correlator);
         }
         this->outputAutoCorrelationConfigs = vals;
       }
