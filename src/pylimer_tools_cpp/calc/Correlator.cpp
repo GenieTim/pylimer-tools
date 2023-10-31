@@ -21,6 +21,7 @@ SOFTWARE.
  */
 
 #include "Correlator.h"
+#include <algorithm>
 #include <math.h>
 
 namespace pylimer_tools {
@@ -50,6 +51,46 @@ namespace calc {
 
     delete[] t;
     delete[] f;
+  }
+
+  // copy-constructor
+  Correlator::Correlator(const Correlator& src)
+    : Correlator(src.numcorrelators, src.p, src.m)
+  {
+    // copy values/etc.
+    std::memcpy(this->shift, src.shift, sizeof(this->shift));
+    std::memcpy(this->correlation, src.correlation, sizeof(this->correlation));
+    std::memcpy(
+      this->ncorrelation, src.ncorrelation, sizeof(this->ncorrelation));
+    std::memcpy(this->accumulator, src.accumulator, sizeof(this->accumulator));
+    std::memcpy(
+      this->naccumulator, src.naccumulator, sizeof(this->naccumulator));
+    std::memcpy(this->insertindex, src.insertindex, sizeof(this->insertindex));
+    std::memcpy(this->t, src.t, sizeof(this->t));
+    std::memcpy(this->f, src.f, sizeof(this->f));
+  }
+
+  // copy-assignment operator
+  Correlator& Correlator::operator=(Correlator src)
+  {
+    std::swap(this->shift, src.shift);
+    std::swap(this->correlation, src.correlation);
+    std::swap(this->ncorrelation, src.ncorrelation);
+    std::swap(this->accumulator, src.accumulator);
+    std::swap(this->naccumulator, src.naccumulator);
+    std::swap(this->insertindex, src.insertindex);
+    std::swap(this->numcorrelators, src.numcorrelators);
+    std::swap(this->dmin, src.dmin);
+    std::swap(this->length, src.length);
+    std::swap(this->kmax, src.kmax);
+    std::swap(this->p, src.p);
+    std::swap(this->m, src.m);
+    std::swap(this->t, src.t);
+    std::swap(this->f, src.f);
+    std::swap(this->npcorr, src.npcorr);
+    std::swap(this->accval, src.accval);
+
+    return *this;
   }
 
   void Correlator::setsize(const unsigned int numcorrin,

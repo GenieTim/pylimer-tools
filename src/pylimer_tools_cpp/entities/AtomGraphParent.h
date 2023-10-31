@@ -387,7 +387,6 @@ namespace entities {
      * @param box
      * @param vertexIds
      */
-
     template<typename OutVectorType>
     OutVectorType getAssumedVertexCoordinates(
       OutVectorType& results,

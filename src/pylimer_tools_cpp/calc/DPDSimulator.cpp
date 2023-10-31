@@ -135,10 +135,10 @@ namespace calc {
       RUNTIME_EXP_IFN(runningAverages.size() == numAverages, "");
 
       // prepare autocorrelation
-      int numAutocorrelations =
-        this->openFilesOutputHeader(this->outputAutoCorrelationConfigs,
-                                    "Step\t",
-                                    this->outputConfigs.size() + numAverages);
+      int numAutocorrelations = this->openFilesOutputHeader(
+        this->outputAutoCorrelationConfigs,
+        "Step\t",
+        this->outputConfigs.size() + this->outputAverageConfigs.size());
       std::string autocorrelationOutputBuffer;
       autocorrelationOutputBuffer.reserve(
         this->outputAutoCorrelationConfigs.size() * 50);
