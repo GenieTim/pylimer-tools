@@ -9,10 +9,10 @@ namespace pylimer_tools {
 namespace calc {
   namespace dpd {
 
-    DPDSimulator::DPDSimulator(const pylimer_tools::entities::Universe u,
+    DPDSimulator::DPDSimulator(const pylimer_tools::entities::Universe &u,
                                const int crosslinkerType,
                                const bool is2D,
-                               const std::string seed)
+                               const std::string &seed)
       : box(u.getBox())
       , universe(u)
       , neighbourlist(
@@ -241,9 +241,9 @@ namespace calc {
         }
 
         // compute averages
-        int averagesIdx = 0;
         size_t msdIdx = 0;
         if (doAverage) {
+          int averagesIdx = 0;
           for (OutputConfiguration oc : this->outputAverageConfigs) {
             for (ComputedIntValues val : oc.intValues) {
               switch (val) {
@@ -303,6 +303,7 @@ namespace calc {
         for (OutputConfiguration oc : this->outputAutoCorrelationConfigs) {
           const size_t autocorrelator_idx_before = autocorrelator_idx;
           for (ComputedDoubleValues cv : oc.doubleValues) {
+            assert(autocorrelator_idx < this->autocorrelators.size());
             this->autocorrelators[autocorrelator_idx].add(doublevalues[cv]);
             autocorrelator_idx += 1;
           }
@@ -310,21 +311,18 @@ namespace calc {
             autocorrelationOutputBuffer.clear();
             autocorrelationOutputBuffer +=
               "# TimeStep " + std::to_string(step) + "\n";
-            int npcorr = 0;
+            int npcorr =
+              this->autocorrelators[autocorrelator_idx_before].npcorr;
             for (int autocorr_idx_offset = 0;
                  autocorr_idx_offset < oc.doubleValues.size();
                  ++autocorr_idx_offset) {
               size_t idx = autocorrelator_idx_before + autocorr_idx_offset;
               this->autocorrelators[idx].evaluate();
-              RUNTIME_EXP_IFN(npcorr == 0 ||
-                                npcorr == this->autocorrelators[idx].npcorr,
+              RUNTIME_EXP_IFN(npcorr == this->autocorrelators[idx].npcorr,
                               "Autocorrelation states are inconsistent.");
-              if (npcorr == 0) {
-                npcorr = this->autocorrelators[idx].npcorr;
-              }
             }
 
-            for (size_t output_idx = 0; output_idx += 1; output_idx < npcorr) {
+            for (size_t output_idx = 0; output_idx < npcorr; output_idx += 1) {
               autocorrelationOutputBuffer += std::to_string(
                 this->autocorrelators[autocorrelator_idx_before].t[output_idx]);
               for (int autocorr_idx_offset = 0;
@@ -335,6 +333,7 @@ namespace calc {
                   "\t" +
                   std::to_string(this->autocorrelators[idx].f[output_idx]);
               }
+              autocorrelationOutputBuffer += "\n";
             }
             (*(this->outputStreams[streamIdx]))
               << autocorrelationOutputBuffer << std::endl;
@@ -523,7 +522,7 @@ namespace calc {
      * @param atomIds
      */
     void DPDSimulator::startMeasuringMSDForAtoms(
-      const std::vector<size_t> atomIdsToMeasure)
+      const std::vector<size_t> &atomIdsToMeasure)
     {
       // Translate atom IDS to indices of the local structure
       Eigen::ArrayXi coordinateIndices =
@@ -1034,8 +1033,8 @@ namespace calc {
      * @return int
      */
     int DPDSimulator::openFilesOutputHeader(
-      std::vector<OutputConfiguration>& configs,
-      std::string prefix,
+      const std::vector<OutputConfiguration>& configs,
+      const std::string& prefix,
       int streamIdx)
     {
       INVALIDARG_EXP_IFN(streamIdx == this->outputStreams.size(),
