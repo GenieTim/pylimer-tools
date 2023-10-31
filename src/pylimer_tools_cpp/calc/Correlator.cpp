@@ -23,6 +23,7 @@ SOFTWARE.
 #include "Correlator.h"
 #include <algorithm>
 #include <math.h>
+#include <cstring> // for memcpy
 
 namespace pylimer_tools {
 namespace calc {
@@ -73,6 +74,10 @@ namespace calc {
   // copy-assignment operator
   Correlator& Correlator::operator=(Correlator src)
   {
+    if (this == &src) {
+      return *this;
+    }
+
     std::swap(this->shift, src.shift);
     std::swap(this->correlation, src.correlation);
     std::swap(this->ncorrelation, src.ncorrelation);
@@ -122,11 +127,12 @@ namespace calc {
 
     t = new double[length];
     f = new double[length];
+
+    this->initialize();
   }
 
   void Correlator::initialize()
   {
-
     for (unsigned int j = 0; j < numcorrelators; ++j) {
       for (unsigned int i = 0; i < p; ++i) {
         shift[j][i] = -2E10;

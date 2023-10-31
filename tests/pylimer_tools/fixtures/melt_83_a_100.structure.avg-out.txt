@@ -1,0 +1,9 @@
+OutputStep	Temperature	Pressure	Stress[0,0]	Stress[1,1]	Stress[2,2]	MSD0_0
+OutputStep	Temperature	Pressure	Stress[0,0]	Stress[1,1]	Stress[2,2]	MSD0_0
+OutputStep	Temperature	Pressure	Stress[0,0]	Stress[1,1]	Stress[2,2]	MSD0_0
+OutputStep	Temperature	Pressure	Stress[0,0]	Stress[1,1]	Stress[2,2]	MSD0_0
+OutputStep	Temperature	Pressure	Stress[0,0]	Stress[1,1]	Stress[2,2]	MSD0_0
+OutputStep	Temperature	Pressure	Stress[0,0]	Stress[1,1]	Stress[2,2]	MSD0_0
+19	30.047289	98.205082	-555418.981275	-128530.773557	-131152.429660	21.306554
+39	4.524040	15.688748	-8832.545191	-60957.076724	-60426.988632	33.657381
+59	2.187300	15.984911	-22483.334924	-55603.928587	-54587.500294	29.866373

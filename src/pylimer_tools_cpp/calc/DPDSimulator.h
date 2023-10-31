@@ -174,10 +174,10 @@ namespace calc {
       std::vector<size_t> msdOriginTimesteps;
 
     public:
-      DPDSimulator(const pylimer_tools::entities::Universe u,
+      DPDSimulator(const pylimer_tools::entities::Universe &u,
                    const int crosslinkerType = 2,
                    const bool is2D = false,
-                   const std::string seed = "");
+                   const std::string &seed = "");
 
       /**
        * @brief actually do run the simulation
@@ -290,9 +290,9 @@ namespace calc {
 
       void configA(const double newA) { this->A = newA; }
 
-      void startMeasuringMSDForAtoms(const std::vector<size_t> atomIds);
+      void startMeasuringMSDForAtoms(const std::vector<size_t> &atomIds);
 
-      void configAutoCorrelatorOutput(std::vector<OutputConfiguration> vals,
+      void configAutoCorrelatorOutput(std::vector<OutputConfiguration> &vals,
                                       const unsigned int numcorrin = 32,
                                       const unsigned int pin = 16,
                                       const unsigned int min = 2)
@@ -314,12 +314,12 @@ namespace calc {
         this->outputAutoCorrelationConfigs = vals;
       }
 
-      void configAverageOutput(std::vector<OutputConfiguration> vals)
+      void configAverageOutput(const std::vector<OutputConfiguration> &vals)
       {
         this->outputAverageConfigs = vals;
       }
 
-      void configStepOutput(std::vector<OutputConfiguration> vals)
+      void configStepOutput(const std::vector<OutputConfiguration> &vals)
       {
         this->outputConfigs = vals;
       }
@@ -340,8 +340,8 @@ namespace calc {
 
       ////////////////////////////////////////////////////////////////
       // results access & export
-      int openFilesOutputHeader(std::vector<OutputConfiguration>& configs,
-                                std::string prefix = "",
+      int openFilesOutputHeader(const std::vector<OutputConfiguration>& configs,
+                                const std::string &prefix = "",
                                 int streamIdx = 0);
       inline void doOutputValues(OutputConfiguration& oc,
                                  std::array<int, 3>& intvalues,

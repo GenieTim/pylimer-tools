@@ -52,7 +52,8 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     config.doubleValues = outputQuantities;
     config.intValues = { pcd::ComputedIntValues::STEP };
 
-    REQUIRE_NOTHROW(simulator.configStepOutput({ config }));
+    std::vector<pcd::OutputConfiguration> configs = { config };
+    REQUIRE_NOTHROW(simulator.configStepOutput(configs));
 
     std::vector<pcd::ComputedDoubleValues> averageQuantities = {
       pcd::ComputedDoubleValues::TEMPERATURE,
@@ -70,7 +71,8 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     avgconfig.filename = averageFile;
     avgconfig.doubleValues = averageQuantities;
 
-    REQUIRE_NOTHROW(simulator.configAverageOutput({ avgconfig }));
+    std::vector<pcd::OutputConfiguration> avgconfigs = { avgconfig };
+    REQUIRE_NOTHROW(simulator.configAverageOutput(avgconfigs));
 
     std::vector<pcd::ComputedDoubleValues> autocorrelationQuantities = {
       pcd::ComputedDoubleValues::STRESS_XX,
@@ -90,7 +92,8 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     autocorrconfig.filename = autocorrFile;
     autocorrconfig.doubleValues = autocorrelationQuantities;
 
-    REQUIRE_NOTHROW(simulator.configAutoCorrelatorOutput({ autocorrconfig }));
+    std::vector<pcd::OutputConfiguration> autocorrconfigs = { autocorrconfig };
+    REQUIRE_NOTHROW(simulator.configAutoCorrelatorOutput(autocorrconfigs));
 
     std::vector<size_t> atomIdsForMSD = { 1, 4, 6 };
     REQUIRE_NOTHROW(simulator.startMeasuringMSDForAtoms(atomIdsForMSD));
