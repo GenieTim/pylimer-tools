@@ -1,3 +1,8 @@
 Step	Stress[0,0]	Stress[1,1]	Stress[2,2]	Stress[0,1]	Stress[1,2]	Stress[0,2]	Stress[0,0]-Stress[1,1]	Stress[1,1]-Stress[2,2]	Stress[0,0]-Stress[2,2]
 Step	Stress[0,0]	Stress[1,1]	Stress[2,2]	Stress[0,1]	Stress[1,2]	Stress[0,2]	Stress[0,0]-Stress[1,1]	Stress[1,1]-Stress[2,2]	Stress[0,0]-Stress[2,2]
 Step	Stress[0,0]	Stress[1,1]	Stress[2,2]	Stress[0,1]	Stress[1,2]	Stress[0,2]	Stress[0,0]-Stress[1,1]	Stress[1,1]-Stress[2,2]	Stress[0,0]-Stress[2,2]
+Step	Stress[0,0]	Stress[1,1]	Stress[2,2]	Stress[0,1]	Stress[1,2]	Stress[0,2]	Stress[0,0]-Stress[1,1]	Stress[1,1]-Stress[2,2]	Stress[0,0]-Stress[2,2]
+Step	Stress[0,0]	Stress[1,1]	Stress[2,2]	Stress[0,1]	Stress[1,2]	Stress[0,2]	Stress[0,0]-Stress[1,1]	Stress[1,1]-Stress[2,2]	Stress[0,0]-Stress[2,2]
+Step	Stress[0,0]	Stress[1,1]	Stress[2,2]	Stress[0,1]	Stress[1,2]	Stress[0,2]	Stress[0,0]-Stress[1,1]	Stress[1,1]-Stress[2,2]	Stress[0,0]-Stress[2,2]
+Step	Stress[0,0]	Stress[1,1]	Stress[2,2]	Stress[0,1]	Stress[1,2]	Stress[0,2]	Stress[0,0]-Stress[1,1]	Stress[1,1]-Stress[2,2]	Stress[0,0]-Stress[2,2]
+Step	Stress[0,0]	Stress[1,1]	Stress[2,2]	Stress[0,1]	Stress[1,2]	Stress[0,2]	Stress[0,0]-Stress[1,1]	Stress[1,1]-Stress[2,2]	Stress[0,0]-Stress[2,2]
