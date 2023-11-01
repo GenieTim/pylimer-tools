@@ -107,9 +107,11 @@ add_library(header_test_sources
 		pylimer_tools/test_calc.cpp
 		pylimer_tools/test_vector_utils.cpp
 )
+add_dependencies(header_test_sources igraph)
 #add_dependencies(header_test_sources pylimer_tools)
 target_link_libraries(header_test_sources PUBLIC 
 	Catch2::Catch2
+	${igraph_LIBRARIES}
 )
 
 # link Eigen libraries. Difficulty due to Windows GitHub Action, somehow.
