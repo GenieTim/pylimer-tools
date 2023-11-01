@@ -9,10 +9,10 @@ namespace pylimer_tools {
 namespace calc {
   namespace dpd {
 
-    DPDSimulator::DPDSimulator(const pylimer_tools::entities::Universe &u,
+    DPDSimulator::DPDSimulator(const pylimer_tools::entities::Universe& u,
                                const int crosslinkerType,
                                const bool is2D,
-                               const std::string &seed)
+                               const std::string& seed)
       : box(u.getBox())
       , universe(u)
       , neighbourlist(
@@ -311,14 +311,15 @@ namespace calc {
             autocorrelationOutputBuffer.clear();
             autocorrelationOutputBuffer +=
               "# TimeStep " + std::to_string(step) + "\n";
-            int npcorr =
+            this->autocorrelators[autocorrelator_idx_before].evaluate();
+            const unsigned int npcorr =
               this->autocorrelators[autocorrelator_idx_before].npcorr;
-            for (int autocorr_idx_offset = 0;
+            for (int autocorr_idx_offset = 1;
                  autocorr_idx_offset < oc.doubleValues.size();
                  ++autocorr_idx_offset) {
               size_t idx = autocorrelator_idx_before + autocorr_idx_offset;
               this->autocorrelators[idx].evaluate();
-              RUNTIME_EXP_IFN(npcorr == this->autocorrelators[idx].npcorr,
+              RUNTIME_EXP_IFN(this->autocorrelators[idx].npcorr == npcorr,
                               "Autocorrelation states are inconsistent.");
             }
 
@@ -333,6 +334,7 @@ namespace calc {
                   "\t" +
                   std::to_string(this->autocorrelators[idx].f[output_idx]);
               }
+
               autocorrelationOutputBuffer += "\n";
             }
             (*(this->outputStreams[streamIdx]))
@@ -522,7 +524,7 @@ namespace calc {
      * @param atomIds
      */
     void DPDSimulator::startMeasuringMSDForAtoms(
-      const std::vector<size_t> &atomIdsToMeasure)
+      const std::vector<size_t>& atomIdsToMeasure)
     {
       // Translate atom IDS to indices of the local structure
       Eigen::ArrayXi coordinateIndices =

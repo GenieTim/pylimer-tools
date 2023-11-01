@@ -17,8 +17,8 @@ namespace entities {
   // TODO: connectivity (& graphs) could be stored only once if they stay the
   // same over a sequence.
   void UniverseSequence::initializeFromDumpFile(
-    const std::string initialStructureDataFile,
-    const std::string dumpFile)
+    const std::string& initialStructureDataFile,
+    const std::string& dumpFile)
   {
     this->modeDataFiles = false;
     this->reset();
@@ -36,7 +36,7 @@ namespace entities {
   };
 
   void UniverseSequence::initializeFromDataSequence(
-    const std::vector<std::string> dataFiles)
+    const std::vector<std::string>& dataFiles)
   {
     this->modeDataFiles = true;
     this->reset();
@@ -67,7 +67,7 @@ namespace entities {
   }
 
   void UniverseSequence::setDataFileAtomStyle(
-    std::vector<pylimer_tools::utils::AtomStyle> newDataFileAtomStyle)
+    const std::vector<pylimer_tools::utils::AtomStyle>& newDataFileAtomStyle)
   {
     INVALIDARG_EXP_IFN(newDataFileAtomStyle.size() <= 3,
                        "Expect at most 3 atom styles");
@@ -250,14 +250,8 @@ namespace entities {
                                " due to different nr of atom properties");
     }
 
-    newUniverse.addAtoms(atomIds,
-                         atomTypes,
-                         positionsX,
-                         positionsY,
-                         positionsZ,
-                         nx,
-                         ny,
-                         nz);
+    newUniverse.addAtoms(
+      atomIds, atomTypes, positionsX, positionsY, positionsZ, nx, ny, nz);
     // ignore it if the bond atoms do not exist, as we want to be compatible for
     // dumps of only certain atom groups
     newUniverse.addBonds(this->dataFileParser.getNrOfBonds(),
@@ -270,7 +264,7 @@ namespace entities {
     return newUniverse;
   };
 
-  Universe UniverseSequence::readDataFile(const std::string filePath)
+  Universe UniverseSequence::readDataFile(const std::string& filePath)
   {
     pylimer_tools::utils::AtomStyle style1 =
       this->dataFileAtomStyle.size() > 0
@@ -322,7 +316,7 @@ namespace entities {
                                  fileParser.getDihedralAngleTo(),
                                  fileParser.getDihedralAngleTypes());
     }
-    
+
     return universe;
   }
 
@@ -354,7 +348,7 @@ namespace entities {
    * @return std::unordered_map<int, std::vector<double>>
    */
   std::unordered_map<int, double> UniverseSequence::computeMsdForAtoms(
-    const std::vector<long int> atomIds,
+    const std::vector<long int>& atomIds,
     int nrOfOrigins,
     bool reduceMemory)
   {

@@ -13,9 +13,9 @@ namespace entities {
   class UniverseSequence
   {
   public:
-    void initializeFromDumpFile(const std::string initialStructureFile,
-                                const std::string dumpFile);
-    void initializeFromDataSequence(const std::vector<std::string> dataFiles);
+    void initializeFromDumpFile(const std::string &initialStructureFile,
+                                const std::string &dumpFile);
+    void initializeFromDataSequence(const std::vector<std::string> &dataFiles);
     Universe next();
     Universe atIndex(size_t index);
     void resetIterator();
@@ -23,10 +23,10 @@ namespace entities {
     void forgetAtIndex(size_t index);
     std::vector<Universe> getAll();
 
-    void setDataFileAtomStyle(std::vector<pylimer_tools::utils::AtomStyle> dataFileAtomStyle);
+    void setDataFileAtomStyle(const std::vector<pylimer_tools::utils::AtomStyle> &dataFileAtomStyle);
 
     // computations
-    std::unordered_map<int, double> computeMsdForAtoms(const std::vector<long int> atomIds, int nrOfOrigins = 10, bool reduceMemory = false); 
+    std::unordered_map<int, double> computeMsdForAtoms(const std::vector<long int> &atomIds, int nrOfOrigins = 10, bool reduceMemory = false); 
 
   protected:
     size_t index = 0; // current index of the iterator
@@ -40,7 +40,7 @@ namespace entities {
     std::vector<pylimer_tools::utils::AtomStyle> dataFileAtomStyle;
 
     void reset();
-    Universe readDataFile(const std::string filePath);
+    Universe readDataFile(const std::string &filePath);
     Universe readDataFileAtIndex(const size_t index);
     Universe readDumpFileAtIndex(const size_t index);
   };

@@ -22,13 +22,13 @@ Use pip:
 
 ## Usage
 
-**NOTE**: currently, this release's API is _unstable_ and subject to change.
+**NOTE**: currently, the API of this release is _unstable_ and subject to change.
 
 See the [documentation](https://genietim.github.io/pylimer-tools) for a current list of all available functions.
 
 ### Example
 
-Example useage can be found in the [documentation](https://genietim.github.io/pylimer-tools), the [tests](https://github.com/GenieTim/pylimer-tools/tree/main/tests),
+Example usage can be found in the [documentation](https://genietim.github.io/pylimer-tools), the [tests](https://github.com/GenieTim/pylimer-tools/tree/main/tests),
 the [CLI application](https://github.com/GenieTim/pylimer-tools/tree/main//src/pylimer_tools/pylimer_tools.py) or in the following code snippet:
 
 ```python
