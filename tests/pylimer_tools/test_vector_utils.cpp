@@ -1,6 +1,6 @@
 #include "../../src/pylimer_tools_cpp/entities/Atom.h"
 #include "../../src/pylimer_tools_cpp/entities/Box.h"
-#include "../../src/pylimer_tools_cpp/utils/GraphUtils.h"
+#include "../../src/pylimer_tools_cpp/utils/VectorUtils.h"
 #include "../../src/pylimer_tools_cpp/utils/StringUtils.h"
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
