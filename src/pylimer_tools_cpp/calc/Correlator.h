@@ -22,10 +22,15 @@ SOFTWARE.
 #ifndef __correlator_h
 #define __correlator_h
 
+#include <Eigen/Dense>
 #include <stdio.h>
 
 namespace pylimer_tools {
 namespace calc {
+  typedef Eigen::Matrix<unsigned long int, Eigen::Dynamic, Eigen::Dynamic>
+    MatrixXuli;
+  typedef Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> VectorXui;
+
   ////////////////////////////////////////////////////
   /// Standard Scalar Correlator f(tau)=<A(t)A(t+tau)>
   class Correlator
@@ -33,18 +38,18 @@ namespace calc {
 
   protected:
     /** Where the coming values are stored */
-    double** shift;
+    Eigen::MatrixXd shift;
     /** Array containing the actual calculated correlation function */
-    double** correlation;
+    Eigen::MatrixXd correlation;
     /** Number of values accumulated in cor */
-    unsigned long int** ncorrelation;
+    MatrixXuli ncorrelation;
 
     /** Accumulator in each correlator */
-    double* accumulator;
+    Eigen::VectorXd accumulator;
     /** Index that controls accumulation in each correlator */
-    unsigned int* naccumulator;
+    VectorXui naccumulator;
     /** Index pointing at the position at which the current value is inserted */
-    unsigned int* insertindex;
+    VectorXui insertindex;
 
     /** Number of Correlators */
     unsigned int numcorrelators;
@@ -70,7 +75,7 @@ namespace calc {
     unsigned int p;
     /** Number of points over which to average; RECOMMENDED: p mod m = 0 */
     unsigned int m;
-    double *t, *f;
+    Eigen::VectorXd t, f;
     unsigned int npcorr;
 
     /** Accumulated result of incoming values **/
@@ -81,13 +86,6 @@ namespace calc {
     Correlator(const unsigned int numcorrin = 32,
                const unsigned int pin = 16,
                const unsigned int min = 2);
-    /// Rule of three
-    // destructor
-    ~Correlator();
-    // copy-constructor
-    Correlator(const Correlator& src);
-    // copy-assignment operator
-    Correlator& operator=(Correlator src);
 
     /** Set size of correlator */
     void setsize(const unsigned int numcorrin = 32,
@@ -99,9 +97,6 @@ namespace calc {
 
     /** Evaluate the current state of the correlator */
     void evaluate(const bool norm = false);
-
-    /** Initialize all values (current and average) to zero */
-    void initialize();
   };
 
 }

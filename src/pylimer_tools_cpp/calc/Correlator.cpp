@@ -22,8 +22,8 @@ SOFTWARE.
 
 #include "Correlator.h"
 #include <algorithm>
-#include <math.h>
 #include <cstring> // for memcpy
+#include <math.h>
 
 namespace pylimer_tools {
 namespace calc {
@@ -37,67 +37,6 @@ namespace calc {
     setsize(numcorrin, pin, min);
   }
 
-  Correlator::~Correlator()
-  {
-
-    if (numcorrelators == 0)
-      return;
-
-    delete[] shift;
-    delete[] correlation;
-    delete[] ncorrelation;
-    delete[] accumulator;
-    delete[] naccumulator;
-    delete[] insertindex;
-
-    delete[] t;
-    delete[] f;
-  }
-
-  // copy-constructor
-  Correlator::Correlator(const Correlator& src)
-    : Correlator(src.numcorrelators, src.p, src.m)
-  {
-    // copy values/etc.
-    std::memcpy(this->shift, src.shift, sizeof(this->shift));
-    std::memcpy(this->correlation, src.correlation, sizeof(this->correlation));
-    std::memcpy(
-      this->ncorrelation, src.ncorrelation, sizeof(this->ncorrelation));
-    std::memcpy(this->accumulator, src.accumulator, sizeof(this->accumulator));
-    std::memcpy(
-      this->naccumulator, src.naccumulator, sizeof(this->naccumulator));
-    std::memcpy(this->insertindex, src.insertindex, sizeof(this->insertindex));
-    std::memcpy(this->t, src.t, sizeof(this->t));
-    std::memcpy(this->f, src.f, sizeof(this->f));
-  }
-
-  // copy-assignment operator
-  Correlator& Correlator::operator=(Correlator src)
-  {
-    if (this == &src) {
-      return *this;
-    }
-
-    std::swap(this->shift, src.shift);
-    std::swap(this->correlation, src.correlation);
-    std::swap(this->ncorrelation, src.ncorrelation);
-    std::swap(this->accumulator, src.accumulator);
-    std::swap(this->naccumulator, src.naccumulator);
-    std::swap(this->insertindex, src.insertindex);
-    std::swap(this->numcorrelators, src.numcorrelators);
-    std::swap(this->dmin, src.dmin);
-    std::swap(this->length, src.length);
-    std::swap(this->kmax, src.kmax);
-    std::swap(this->p, src.p);
-    std::swap(this->m, src.m);
-    std::swap(this->t, src.t);
-    std::swap(this->f, src.f);
-    std::swap(this->npcorr, src.npcorr);
-    std::swap(this->accval, src.accval);
-
-    return *this;
-  }
-
   void Correlator::setsize(const unsigned int numcorrin,
                            const unsigned int pin,
                            const unsigned int min)
@@ -109,45 +48,16 @@ namespace calc {
 
     length = numcorrelators * p;
 
-    shift = new double*[numcorrelators];
-    correlation = new double*[numcorrelators];
-    ncorrelation = new unsigned long int*[numcorrelators];
-    accumulator = new double[numcorrelators];
-    naccumulator = new unsigned int[numcorrelators];
-    insertindex = new unsigned int[numcorrelators];
+    // initialize all values, set to 0
+    shift = Eigen::MatrixXd::Constant(numcorrelators, p, -2e10);
+    correlation = Eigen::MatrixXd::Zero(numcorrelators, p);
+    ncorrelation = MatrixXuli::Zero(numcorrelators, p);
+    accumulator = Eigen::VectorXd::Zero(numcorrelators);
+    naccumulator = VectorXui::Zero(numcorrelators);
+    insertindex = VectorXui::Zero(numcorrelators);
 
-    for (unsigned int j = 0; j < numcorrelators; ++j) {
-      shift[j] = new double[p];
-
-      /* It can be optimized: Apart from correlator 0, correlation and
-       * ncorrelation arrays only use p/2 values */
-      correlation[j] = new double[p];
-      ncorrelation[j] = new unsigned long int[p];
-    }
-
-    t = new double[length];
-    f = new double[length];
-
-    this->initialize();
-  }
-
-  void Correlator::initialize()
-  {
-    for (unsigned int j = 0; j < numcorrelators; ++j) {
-      for (unsigned int i = 0; i < p; ++i) {
-        shift[j][i] = -2E10;
-        correlation[j][i] = 0;
-        ncorrelation[j][i] = 0;
-      }
-      accumulator[j] = 0.0;
-      naccumulator[j] = 0;
-      insertindex[j] = 0;
-    }
-
-    for (unsigned int i = 0; i < length; ++i) {
-      t[i] = 0;
-      f[i] = 0;
-    }
+    t = Eigen::VectorXd::Zero(length);
+    f = Eigen::VectorXd::Zero(length);
 
     npcorr = 0;
     kmax = 0;
@@ -164,7 +74,7 @@ namespace calc {
       kmax = k;
 
     /// Insert new value in shift array
-    shift[k][insertindex[k]] = w;
+    shift(k, insertindex[k]) = w;
 
     /// Add to average value
     if (k == 0)
@@ -184,9 +94,9 @@ namespace calc {
     if (k == 0) { /// First correlator is different
       int ind2 = ind1;
       for (unsigned int j = 0; j < p; ++j) {
-        if (shift[k][ind2] > -1e10) {
-          correlation[k][j] += shift[k][ind1] * shift[k][ind2];
-          ++ncorrelation[k][j];
+        if (shift(k, ind2) > -1e10) {
+          correlation(k, j) += shift(k, ind1) * shift(k, ind2);
+          ncorrelation(k, j) += 1;
         }
         --ind2;
         if (ind2 < 0)
@@ -197,9 +107,9 @@ namespace calc {
       for (unsigned int j = dmin; j < p; ++j) {
         if (ind2 < 0)
           ind2 += p;
-        if (shift[k][ind2] > -1e10) {
-          correlation[k][j] += shift[k][ind1] * shift[k][ind2];
-          ++ncorrelation[k][j];
+        if (shift(k, ind2) > -1e10) {
+          correlation(k, j) += shift(k, ind1) * shift(k, ind2);
+          ncorrelation(k, j) += 1;
         }
         --ind2;
       }
@@ -216,13 +126,13 @@ namespace calc {
 
     double aux = 0;
     if (norm)
-      aux = (accval / ncorrelation[0][0]) * (accval / ncorrelation[0][0]);
+      aux = (accval / ncorrelation(0, 0)) * (accval / ncorrelation(0, 0));
 
     // First correlator
     for (unsigned int i = 0; i < p; ++i) {
-      if (ncorrelation[0][i] > 0) {
+      if (ncorrelation(0, i) > 0) {
         t[im] = i;
-        f[im] = correlation[0][i] / ncorrelation[0][i] - aux;
+        f[im] = correlation(0, i) / ncorrelation(0, i) - aux;
         ++im;
       }
     }
@@ -230,9 +140,9 @@ namespace calc {
     // Subsequent correlators
     for (int k = 1; k < kmax; ++k) {
       for (int i = dmin; i < p; ++i) {
-        if (ncorrelation[k][i] > 0) {
+        if (ncorrelation(k, i) > 0) {
           t[im] = i * pow((double)m, k);
-          f[im] = correlation[k][i] / ncorrelation[k][i] - aux;
+          f[im] = correlation(k, i) / ncorrelation(k, i) - aux;
           ++im;
         }
       }
