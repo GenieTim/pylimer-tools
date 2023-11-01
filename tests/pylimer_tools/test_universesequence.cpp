@@ -96,9 +96,11 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
       suspectedPath + "lammps_data_file_small.out",
       suspectedPath + "lammps_dump_small_3step.lammpstrj");
     REQUIRE(universeSeq.getLength() == 3);
+    std::vector<long int> atomIds = { 10000, 20000, 30000 };
     std::unordered_map<int, double> msdForAtoms =
-      universeSeq.computeMsdForAtoms({ 10000, 20000, 30000 }, 1, true);
+      universeSeq.computeMsdForAtoms(atomIds, 1, true);
     REQUIRE(msdForAtoms[1] == Catch::Approx(0.2364648387));
+    std::cout << "MSD computation works." << std::endl;
   }
 
   SECTION("Reading large files is sensibly fast")
