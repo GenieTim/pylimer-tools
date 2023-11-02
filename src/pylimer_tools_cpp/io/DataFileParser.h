@@ -100,7 +100,10 @@ namespace utils {
       return this->dihedralAngleVia2;
     }
     std::vector<long int> getDihedralAngleTo() { return this->dihedralAngleTo; }
-    std::unordered_map<std::string, std::vector<double>> getAdditionalAtomData() { return this->additionalAtomData; }
+    std::unordered_map<std::string, std::vector<double>> getAdditionalAtomData()
+    {
+      return this->additionalAtomData;
+    }
 
     // get box info
     double getLowX() { return this->xLo; }
@@ -118,6 +121,7 @@ namespace utils {
     void readMass(const std::string line);
     // different atom styles
     void readAtom(std::string line);
+    void readAtomFull(std::string line);
     void readAtomCharge(std::string line);
     void readAtomHybrid(std::string line, AtomStyle style1, AtomStyle style2);
     // bonds, angles, etc.

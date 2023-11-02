@@ -14,6 +14,7 @@ extern "C"
 }
 
 namespace pe = pylimer_tools::entities;
+namespace pu = pylimer_tools::utils;
 
 TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
 {
@@ -137,5 +138,19 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
   //                     "chain_near_min.out",
   //     suspectedPath + "melt_fene_N_78_rev.lammpstrj");
   //   REQUIRE(universeSeq.getLength() > 8638005/10);
+  // }
+
+  // SECTION("Some non-commited large file reading works")
+  // {
+  //   std::string dataFilePath =
+  //     "/Volumes/drHobbies43/doctorate-hobbies-4/simulations/"
+  //     "atomistic-simulations/structure/"
+  //     "atomistic_melt_pdms_1000_a_43_v_1.structure.out";
+  //   std::vector<std::string> dataFileSeq = { dataFilePath };
+  //   std::vector<pu::AtomStyle> atomStyle = { pu::AtomStyle::FULL };
+  //   universeSeq.setDataFileAtomStyle(atomStyle);
+  //   universeSeq.initializeFromDataSequence(dataFileSeq);
+
+  //   REQUIRE_NOTHROW(universeSeq.atIndex(0));
   // }
 };
