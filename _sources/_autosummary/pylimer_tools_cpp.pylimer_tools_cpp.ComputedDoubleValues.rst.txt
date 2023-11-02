@@ -31,6 +31,9 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.ComputedDoubleValues
       ~ComputedDoubleValues.MEAN_B
       ~ComputedDoubleValues.MSD
       ~ComputedDoubleValues.PRESSURE
+      ~ComputedDoubleValues.STRESS_NXY
+      ~ComputedDoubleValues.STRESS_NXZ
+      ~ComputedDoubleValues.STRESS_NYZ
       ~ComputedDoubleValues.STRESS_XX
       ~ComputedDoubleValues.STRESS_XY
       ~ComputedDoubleValues.STRESS_XZ
