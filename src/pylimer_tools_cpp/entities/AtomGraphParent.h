@@ -201,7 +201,7 @@ namespace entities {
 
     /**
      * @brief Check whether a vertex property exists
-     * 
+     *
      * @param propertyName the property to check
      * @return true if the attribute has been set at any point in time
      * @return false or not
@@ -302,10 +302,10 @@ namespace entities {
 
     /**
      * @brief Get the unwrapped coordinates for a given set of vertices
-     * 
-     * @param selector 
-     * @param box 
-     * @return Eigen::VectorXd 
+     *
+     * @param selector
+     * @param box
+     * @return Eigen::VectorXd
      */
     Eigen::VectorXd getUnwrappedVertexCoordinates(
       const igraph_vs_t selector,
@@ -385,7 +385,7 @@ namespace entities {
      * @tparam OutVectorType
      * @param results
      * @param box
-     * @param vertexIds
+     * @param vertexIds the vertices lined up
      */
     template<typename OutVectorType>
     OutVectorType getAssumedVertexCoordinates(
@@ -404,8 +404,6 @@ namespace entities {
 
       Eigen::VectorXd coordinates =
         this->getUnwrappedVertexCoordinates(vertex_ids, box);
-      for (size_t i = 0; i < coordinates.size(); ++i) {
-      }
 
       igraph_vector_int_destroy(&vertex_ids);
 
@@ -423,6 +421,11 @@ namespace entities {
       results[1] = lastCoords[1];
       results[2] = lastCoords[2];
       for (int i = 0; i < distances.size(); i += 3) {
+        // TODO: rather than relying on the vertex ids to be subsequently
+        // connected, it would be nice if we could support graph-like structures
+        // as well (check if igraph_is_tree, then, start with root and do e.g.
+        // recursively)
+
         // for each next atom, we can use the shortest distance to the previous
         // in order to compensate/ignore the image flags while still enabling
         // larger end-to-end distances than the box size

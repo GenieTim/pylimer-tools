@@ -349,6 +349,8 @@ namespace utils {
       std::vector<pylimer_tools::entities::Molecule> molecules =
         this->universe.getMolecules(this->crosslinkerType);
       for (pylimer_tools::entities::Molecule molecule : molecules) {
+        // image flag reset attempt might not be the best yet
+        // could try to use ->getAssumedVertexCoordinates() for more reset options
         std::vector<pylimer_tools::entities::Atom> atoms =
           (this->moleculeIdxSwappable || this->attemptImageReset)
             ? molecule.getAtomsLinedUp()
