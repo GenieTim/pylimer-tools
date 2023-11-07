@@ -106,14 +106,15 @@ namespace utils {
         case AtomStyle::MOLECULAR:
           this->readAtom(line);
           break;
-        case AtomStyle::HYBRID:
-          this->readAtomHybrid(line, atomStyle2, atomStyle3);
-          break;
         case AtomStyle::CHARGE:
           this->readAtomCharge(line);
           break;
         case AtomStyle::FULL:
           this->readAtomFull(line);
+          break;
+        case AtomStyle::HYBRID:
+          this->readAtomHybrid(line, atomStyle2, atomStyle3);
+          break;
         default:
           throw std::invalid_argument("This atom style is not supported yet.");
           break;

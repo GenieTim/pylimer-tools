@@ -315,7 +315,7 @@ namespace entities {
                                  fileParser.getDihedralAngleVia2(),
                                  fileParser.getDihedralAngleTo(),
                                  fileParser.getDihedralAngleTypes());
-    }
+    }    
 
     return universe;
   }
