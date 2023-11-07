@@ -38,7 +38,7 @@ def readDataFile(structureFile: str, atom_style: Union[List[AtomStyle], None] = 
     return universe
 
 
-def readAveragesFile(filepath, use_cache: bool = True) -> pd.DataFrame:
+def readAveragesFile(filepath, use_cache: bool = True, sep=" ") -> pd.DataFrame:
     """
     Read a file written by a `fix ave/time` command.
 
@@ -49,7 +49,7 @@ def readAveragesFile(filepath, use_cache: bool = True) -> pd.DataFrame:
     - then one header indicating the columns,
     - and then either data or potentially a second header, if it is a sectioned file (e.g., from a `fix ave/time ... vector`)
     """
-    assert(os.path.isfile(filepath))
+    assert (os.path.isfile(filepath))
     header_line = None
     with open(filepath, 'r') as f:
         line0 = f.readline()
@@ -59,12 +59,12 @@ def readAveragesFile(filepath, use_cache: bool = True) -> pd.DataFrame:
         if (line2.startswith("#")):
             return readSectionedAveragesFile(filepath, use_cache=use_cache)
 
-        header_line = line1
+        header_line = line1 if line1.startswith("#") else line0
     header_line = header_line.removeprefix("#").strip()
 
     try:
         data = pd.read_csv(filepath, comment="#",
-                           names=header_line.split(), sep=" ")
+                           names=header_line.split(), sep=sep)
     except pd.errors.EmptyDataError as e:
         return pd.DataFrame()
 
@@ -78,7 +78,7 @@ def readSectionedAveragesFile(filepath, use_cache: bool = True) -> pd.DataFrame:
     Use the section delimeter columns together with pandas' groupby()
     to restore the original sections.
     """
-    assert(os.path.isfile(filepath))
+    assert (os.path.isfile(filepath))
 
     cache_suffix = "sectionedavg-cache.pickle"
     cacheContent = loadCache(filepath, cache_suffix)
@@ -111,7 +111,7 @@ def readSectionedAveragesFile(filepath, use_cache: bool = True) -> pd.DataFrame:
         currentKey = None
         for line in f:
             if (currentKey == None):
-                assert(len(line.split()) == len(header_line1.split()))
+                assert (len(line.split()) == len(header_line1.split()))
                 currentKey = line
                 continue
             splitLine = line.split()
@@ -120,7 +120,7 @@ def readSectionedAveragesFile(filepath, use_cache: bool = True) -> pd.DataFrame:
                 currentData = []
                 currentKey = line
             else:
-                assert(len(splitLine) == len(header_line2_split))
+                assert (len(splitLine) == len(header_line2_split))
                 currentData.append(splitLine)
         data[currentKey] = currentData
 
@@ -166,7 +166,7 @@ def readCorrelationFile(filepath, group_key="Timestep", use_cache: bool = True) 
         - correlatedData: a DataFrame containing all the data of the file.
             Use the group_key with the DataFrame's groupby() to restore the original sections.
     """
-    assert(os.path.isfile(filepath))
+    assert (os.path.isfile(filepath))
 
     cache_suffix = "{}-correlation-cache.pickle".format(
         group_key if isinstance(group_key, str) else "g")
@@ -180,8 +180,11 @@ def readCorrelationFile(filepath, group_key="Timestep", use_cache: bool = True) 
     with open(filepath, 'r') as f:
         currentData = []
         currentKey = None
-        title_line = f.readline()
         header_line = f.readline()
+        if (header_line.startswith("#")):
+            # in LAMMPS files, there is a title line that does not exist in our DPD output,
+            # -> this line is needed for LAMMPS
+            header_line = f.readline()
         cols = header_line.removeprefix("#").strip().split()
         normalLineLen = len(cols)
         lines_interpreted = 0
@@ -198,7 +201,7 @@ def readCorrelationFile(filepath, group_key="Timestep", use_cache: bool = True) 
                 # new key
                 currentKey = line
             elif (len(split) == normalLineLen or normalLineLen is None):
-                #normalLineLen = len(split)
+                # normalLineLen = len(split)
                 currentData.append(split)
             else:
                 raise ValueError(
@@ -216,11 +219,11 @@ def readCorrelationFile(filepath, group_key="Timestep", use_cache: bool = True) 
         if (results is None):
             warnings.warn("Did not find {} with number in {} when reading {}".format(
                 group_key, key, filepath))
-        assert(results is not None)
+        assert (results is not None)
         timestep = int(results.group(1))
         for row in data[key]:
             row.append(timestep)
-            assert(len(row) == len(cols))
+            assert (len(row) == len(cols))
             correlatedDataAssembled.append(row)
 
     correlatedData = pd.DataFrame(
