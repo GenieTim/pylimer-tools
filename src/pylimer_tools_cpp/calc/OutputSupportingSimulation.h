@@ -1,5 +1,5 @@
-#ifndef MEHP_FORCE_RELAX2_H
-#define MEHP_FORCE_RELAX2_H
+#ifndef OUTPUT_SUPPORTING_SIM_H
+#define OUTPUT_SUPPORTING_SIM_H
 
 #include "../utils/utilityMacros.h"
 #include "Correlator.h"
