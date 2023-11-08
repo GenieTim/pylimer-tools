@@ -193,6 +193,8 @@ def readCorrelationFile(filepath, group_key="Timestep", use_cache: bool = True) 
                 if (lines_interpreted == 0):
                     header_line = line
                 continue
+            if (line == header_line):
+                continue
             split = line.split()
             if (len(split) == 2 or group_key in line):
                 if (currentKey is not None):
@@ -214,7 +216,7 @@ def readCorrelationFile(filepath, group_key="Timestep", use_cache: bool = True) 
     correlatedDataAssembled = []
     for key in data.keys():
         assert (group_key in str(key))
-        compiledRegex = re.compile(r"{}: ([\d]+)".format(group_key))
+        compiledRegex = re.compile(r"{}:? ([\d]+)".format(group_key))
         results = compiledRegex.search(key)
         if (results is None):
             warnings.warn("Did not find {} with number in {} when reading {}".format(
