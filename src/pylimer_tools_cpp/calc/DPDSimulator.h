@@ -34,7 +34,7 @@ namespace calc {
     typedef Eigen::Array<size_t, Eigen::Dynamic, 1> ArrayXst;
     typedef Eigen::Array<long int, Eigen::Dynamic, 1> ArrayXli;
 
-    class DPDSimulator : pylimer_tools::calc::OutputSupportingSimulation
+    class DPDSimulator : public pylimer_tools::calc::OutputSupportingSimulation
     {
 
     private:
