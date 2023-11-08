@@ -125,8 +125,9 @@ namespace calc {
 
       // prepare averages
       bool doAverage = this->outputAverageConfigs.size() > 0;
-      int numAverages = this->openFilesOutputHeader(
-        this->outputAverageConfigs, "OutputStep\t", this->outputConfigs.size());
+      int numAverages = this->openFilesOutputHeader(this->outputAverageConfigs,
+                                                    "# OutputStep\t",
+                                                    this->outputConfigs.size());
       std::string averagesOutputBuffer;
       averagesOutputBuffer.reserve(this->outputAverageConfigs.size() * 50);
 
@@ -204,12 +205,12 @@ namespace calc {
         }
 
         // output
-        std::array<int, 3> intvalues = {
+        std::array<int, NUM_COMPUTABLE_INT_VALUES> intvalues = {
           static_cast<int>(step + this->currentStep + 1),
           numShifts,
           numRelocations,
         };
-        std::array<double, 17> doublevalues = {
+        std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES> doublevalues = {
           dt,
           this->currentTime + static_cast<double>(step + 1) * dt,
           this->box.getVolume(),
@@ -283,7 +284,8 @@ namespace calc {
             if ((step + 1) % oc.outputEvery == 0 && doAverage) {
               // output & start again
               averagesOutputBuffer.clear();
-              averagesOutputBuffer += std::to_string(step);
+              averagesOutputBuffer +=
+                std::to_string(intvalues[ComputedIntValues::STEP]);
               for (size_t i = 0; i < runningAverages.size(); ++i) {
                 averagesOutputBuffer +=
                   "\t" + std::to_string(runningAverages[i]);
@@ -310,7 +312,8 @@ namespace calc {
           if ((step + 1) % oc.outputEvery == 0) {
             autocorrelationOutputBuffer.clear();
             autocorrelationOutputBuffer +=
-              "# TimeStep " + std::to_string(step) + "\n";
+              "# TimeStep " +
+              std::to_string(intvalues[ComputedIntValues::STEP]) + "\n";
             this->autocorrelators[autocorrelator_idx_before].evaluate();
             const unsigned int npcorr =
               this->autocorrelators[autocorrelator_idx_before].npcorr;
@@ -334,11 +337,10 @@ namespace calc {
                   "\t" +
                   std::to_string(this->autocorrelators[idx].f[output_idx]);
               }
-
               autocorrelationOutputBuffer += "\n";
             }
             (*(this->outputStreams[streamIdx]))
-              << autocorrelationOutputBuffer << std::endl;
+              << autocorrelationOutputBuffer << std::flush;
             streamIdx += 1;
           }
 
@@ -1028,67 +1030,6 @@ namespace calc {
                                "partner, but did not find it internally.");
     }
 
-    /**
-     * @brief Open the specified files, and write the headers
-     *
-     * @param configs
-     * @return int
-     */
-    int DPDSimulator::openFilesOutputHeader(
-      const std::vector<OutputConfiguration>& configs,
-      const std::string& prefix,
-      int streamIdx)
-    {
-      INVALIDARG_EXP_IFN(streamIdx == this->outputStreams.size(),
-                         "The stream idx " + std::to_string(streamIdx) +
-                           " hints at an invalid state.");
-      int numComputes = 0;
-      this->outputStreams.reserve(streamIdx + configs.size());
-      for (OutputConfiguration oc : configs) {
-        if (oc.filename != "" && oc.filename != "stdio") {
-          this->outputStreams.push_back(std::make_shared<std::ofstream>(
-            oc.filename, std::ios::out | std::ios::app));
-          this->outputFileStreams.push_back(streamIdx);
-        } else {
-          this->outputStreams.push_back(
-            std::shared_ptr<std::ostream>(&std::cout, [](void*) {}));
-        }
-
-        std::string outputBuffer = prefix;
-        outputBuffer.reserve(80 * 20);
-
-        for (ComputedIntValues val : oc.intValues) {
-          switch (val) {
-            default:
-              numComputes += 1;
-              outputBuffer += ComputedIntValuesNames[val] + "\t";
-          }
-        }
-        for (ComputedDoubleValues val : oc.doubleValues) {
-          switch (val) {
-            case ComputedDoubleValues::MSD:
-              for (size_t i = 0; i < this->msdOrigins.size(); ++i) {
-                outputBuffer += "MSD" + std::to_string(i) + "_" +
-                                std::to_string(this->msdOriginTimesteps[i]) +
-                                "\t";
-              }
-              numComputes += this->msdOrigins.size();
-              break;
-            default:
-              numComputes += 1;
-              outputBuffer += ComputedDoubleValuesNames[val] + "\t";
-          }
-        }
-
-        if (!outputBuffer.empty()) {
-          outputBuffer.pop_back(); // remove trailing tab
-        }
-
-        (*this->outputStreams[streamIdx]) << outputBuffer << std::endl;
-        streamIdx += 1;
-      }
-      return numComputes;
-    };
 
     /**
      * @brief Convert the current structure to a Unvierse
