@@ -69,6 +69,8 @@ namespace calc {
                               double xtol = 1e-12,
                               double ftol = 1e-9);
 
+      void runPhantomSteps(const long int nrOfSteps = 50000, const double dt = 0.01, const double kappa = 1., const double T = 1., const double gamma = 0.1);
+
       /**
        * @brief Get the universe consisting of cross-linkers only
        *

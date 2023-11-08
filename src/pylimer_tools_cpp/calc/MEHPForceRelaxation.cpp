@@ -111,6 +111,36 @@ namespace calc {
       this->nrOfStepsDone += opt.get_numevals();
     }
 
+    void MEHPForceRelaxation::runPhantomSteps(const long int nrOfSteps,
+                                              const double dt,
+                                              const double kappa,
+                                              const double T,
+                                              const double gamma)
+    {
+      Eigen::VectorXd u = this->currentDisplacements;
+      Eigen::VectorXd f =
+        Eigen::VectorXd::Zero(3 * this->initialConfig.nrOfNodes);
+      Eigen::VectorXd v =
+        Eigen::VectorXd::Zero(3 * this->initialConfig.nrOfNodes);
+      for (long int step = 0; step < nrOfSteps; ++step) {
+        // compute spring forces
+        double force = this->forceEvaluator->evaluateForceSetGradient(
+          this->initialConfig.nrOfNodes * 3, u, f.data(), nullptr);
+        // add Langevin thermo
+        f += -gamma * v +
+             sqrt(2. * gamma * T / dt) * Eigen::VectorXd::Random(f.size());
+        v += 0.5 * f * dt;
+
+        // apply deformation
+        v += 0.5 * f * dt;
+        u += v * dt + 0.5 * f * dt * dt;
+
+        // output things
+      }
+
+      // store final state, potentially
+    }
+
     Eigen::VectorXd MEHPForceRelaxation::evaluateSpringDistances(
       const Network* net,
       const Eigen::VectorXd& u,
@@ -145,7 +175,8 @@ namespace calc {
     /**
      * FORCE RELAXATION DATA ACCESS
      */
-    pylimer_tools::entities::Universe MEHPForceRelaxation::getCrosslinkerVerse() const
+    pylimer_tools::entities::Universe MEHPForceRelaxation::getCrosslinkerVerse()
+      const
     {
       // convert nodes & springs back to a universe
       pylimer_tools::entities::Universe xlinkUniverse =
@@ -170,7 +201,8 @@ namespace calc {
         z.push_back(this->initialConfig.coordinates[3 * i + 2] +
                     this->currentDisplacements[3 * i + 2]);
         ids.push_back(this->initialConfig.oldAtomIds[i]);
-        // override type, since the types may be different from crosslinkerType if converted with dangling chains
+        // override type, since the types may be different from crosslinkerType
+        // if converted with dangling chains
         types[i] = this->universe.getPropertyValue<int>(
           "type",
           this->universe.getIdxByAtomId(this->initialConfig.oldAtomIds[i]));
@@ -383,7 +415,7 @@ namespace calc {
           this->currentDisplacements,
           r);
       } catch (const std::exception& e) {
-        delete[] (r);
+        delete[](r);
         throw e;
       }
 
@@ -392,7 +424,7 @@ namespace calc {
       for (size_t i = 0; i < this->initialConfig.nrOfNodes * 3; ++i) {
         results[i] = r[i];
       }
-      delete[] (r);
+      delete[](r);
       return results;
     }
 

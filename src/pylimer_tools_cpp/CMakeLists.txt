@@ -74,6 +74,7 @@ target_sources(pylimer_tools
 		${CMAKE_CURRENT_LIST_DIR}/io/DumpFileParser.cpp
 
 		${CMAKE_CURRENT_LIST_DIR}/calc/Correlator.cpp
+		${CMAKE_CURRENT_LIST_DIR}/calc/OutputSupportingSimulation.cpp
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceEvaluator.cpp
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceRelaxation.cpp
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance.cpp
@@ -93,6 +94,7 @@ target_sources(pylimer_tools
 		${CMAKE_CURRENT_LIST_DIR}/utils/VectorUtils.h
 
 		${CMAKE_CURRENT_LIST_DIR}/calc/Correlator.h
+		${CMAKE_CURRENT_LIST_DIR}/calc/OutputSupportingSimulation.h
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPanalysis.h
 		${CMAKE_CURRENT_LIST_DIR}/calc/MMTanalysis.h
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPUtilityStructures.h
