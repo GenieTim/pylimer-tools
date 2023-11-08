@@ -10,6 +10,7 @@
 #include <iostream>
 #include <map>
 #include <nlopt.hpp>
+#include <random>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -117,6 +118,12 @@ namespace calc {
                                               const double T,
                                               const double gamma)
     {
+      // initialise random generator for Langevin thermostat
+      std::default_random_engine generator;
+      std::normal_distribution<double> distribution(0., 1.);
+      auto gaussian = [&](double) { return distribution(generator); };
+
+      // initialise other data structures
       Eigen::VectorXd u = this->currentDisplacements;
       Eigen::VectorXd f =
         Eigen::VectorXd::Zero(3 * this->initialConfig.nrOfNodes);
@@ -127,8 +134,8 @@ namespace calc {
         double force = this->forceEvaluator->evaluateForceSetGradient(
           this->initialConfig.nrOfNodes * 3, u, f.data(), nullptr);
         // add Langevin thermo
-        f += -gamma * v +
-             sqrt(2. * gamma * T / dt) * Eigen::VectorXd::Random(f.size());
+        f += -gamma * v + sqrt(2. * gamma * T / dt) *
+                            Eigen::VectorXd::NullaryExpr(f.size(), gaussian);
         v += 0.5 * f * dt;
 
         // apply deformation
