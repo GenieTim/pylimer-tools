@@ -237,6 +237,7 @@ namespace calc {
                                  intvalues,
                                  doublevalues,
                                  outputBuffer,
+                                 this->coordinates,
                                  streamIdx);
           }
         }
@@ -1029,7 +1030,6 @@ namespace calc {
       throw std::runtime_error("Invalid internal state: replacing slip-spring "
                                "partner, but did not find it internally.");
     }
-
 
     /**
      * @brief Convert the current structure to a Unvierse
