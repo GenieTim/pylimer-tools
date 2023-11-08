@@ -9,7 +9,7 @@ namespace calc {
    * @param configs
    * @return int
    */
-  int OuputSupportingSimulation::openFilesOutputHeader(
+  int OutputSupportingSimulation::openFilesOutputHeader(
     const std::vector<OutputConfiguration>& configs,
     const std::string& prefix,
     int streamIdx)

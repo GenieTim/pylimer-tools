@@ -2,10 +2,12 @@
 #define MEHP_FORCE_RELAX2_H
 
 #include "../utils/utilityMacros.h"
+#include "Correlator.h"
 #include <Eigen/Dense>
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -115,6 +117,7 @@ namespace calc {
                                std::array<int, 3>& intvalues,
                                std::array<double, 17>& doublevalues,
                                std::string& outputBuffer,
+                               Eigen::VectorXd& coordinates,
                                int streamIdx = 0)
     {
       assert(streamIdx <= this->outputStreams.size());
@@ -130,12 +133,11 @@ namespace calc {
             // compute MSD
             for (size_t msdIdx = 0; msdIdx < msdMeasuredIndices.size();
                  ++msdIdx) {
-              double result =
-                (this->msdOrigins[msdIdx] -
-                 this->coordinates(this->msdMeasuredIndices[msdIdx]))
-                  .squaredNorm() /
-                (static_cast<double>(this->msdMeasuredIndices[msdIdx].size() /
-                                     3.));
+              double result = (this->msdOrigins[msdIdx] -
+                               coordinates(this->msdMeasuredIndices[msdIdx]))
+                                .squaredNorm() /
+                              (static_cast<double>(
+                                this->msdMeasuredIndices[msdIdx].size() / 3.));
               outputBuffer += std::to_string(result) + "\t";
             }
             break;
@@ -184,7 +186,7 @@ namespace calc {
     {
       this->outputConfigs = vals;
     }
-  }
+  };
 }
 }
 
