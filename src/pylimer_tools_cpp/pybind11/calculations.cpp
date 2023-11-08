@@ -1178,40 +1178,40 @@ init_pylimer_bound_calc(py::module_& m)
   //      )pbdoc",
   //          py::arg("newCrosslinkerType") = 2);
 
-  py::enum_<dpd::ComputedDoubleValues>(m, "ComputedDoubleValues")
-    .value("TIMESTEP", dpd::ComputedDoubleValues::TIMESTEP)
-    .value("TIME", dpd::ComputedDoubleValues::TIME)
-    .value("VOLUME", dpd::ComputedDoubleValues::VOLUME)
-    .value("PRESSURE", dpd::ComputedDoubleValues::PRESSURE)
-    .value("TEMPERATURE", dpd::ComputedDoubleValues::TEMPERATURE)
-    .value("STRESS_XX", dpd::ComputedDoubleValues::STRESS_XX)
-    .value("STRESS_YY", dpd::ComputedDoubleValues::STRESS_YY)
-    .value("STRESS_ZZ", dpd::ComputedDoubleValues::STRESS_ZZ)
-    .value("STRESS_XY", dpd::ComputedDoubleValues::STRESS_XY)
-    .value("STRESS_XZ", dpd::ComputedDoubleValues::STRESS_XZ)
-    .value("STRESS_YZ", dpd::ComputedDoubleValues::STRESS_YZ)
-    .value("STRESS_NXY", dpd::ComputedDoubleValues::STRESS_NXY)
-    .value("STRESS_NXZ", dpd::ComputedDoubleValues::STRESS_NXZ)
-    .value("STRESS_NYZ", dpd::ComputedDoubleValues::STRESS_NYZ)
-    .value("MEAN_B", dpd::ComputedDoubleValues::MEAN_B)
-    .value("MAX_B", dpd::ComputedDoubleValues::MAX_B)
-    .value("MSD", dpd::ComputedDoubleValues::MSD);
+  py::enum_<ComputedDoubleValues>(m, "ComputedDoubleValues")
+    .value("TIMESTEP", ComputedDoubleValues::TIMESTEP)
+    .value("TIME", ComputedDoubleValues::TIME)
+    .value("VOLUME", ComputedDoubleValues::VOLUME)
+    .value("PRESSURE", ComputedDoubleValues::PRESSURE)
+    .value("TEMPERATURE", ComputedDoubleValues::TEMPERATURE)
+    .value("STRESS_XX", ComputedDoubleValues::STRESS_XX)
+    .value("STRESS_YY", ComputedDoubleValues::STRESS_YY)
+    .value("STRESS_ZZ", ComputedDoubleValues::STRESS_ZZ)
+    .value("STRESS_XY", ComputedDoubleValues::STRESS_XY)
+    .value("STRESS_XZ", ComputedDoubleValues::STRESS_XZ)
+    .value("STRESS_YZ", ComputedDoubleValues::STRESS_YZ)
+    .value("STRESS_NXY", ComputedDoubleValues::STRESS_NXY)
+    .value("STRESS_NXZ", ComputedDoubleValues::STRESS_NXZ)
+    .value("STRESS_NYZ", ComputedDoubleValues::STRESS_NYZ)
+    .value("MEAN_B", ComputedDoubleValues::MEAN_B)
+    .value("MAX_B", ComputedDoubleValues::MAX_B)
+    .value("MSD", ComputedDoubleValues::MSD);
 
-  py::enum_<dpd::ComputedIntValues>(m, "ComputedIntValues")
-    .value("STEP", dpd::ComputedIntValues::STEP)
-    .value("NUM_SHIFT", dpd::ComputedIntValues::NUM_SHIFT)
-    .value("NUM_RELOC", dpd::ComputedIntValues::NUM_RELOC);
+  py::enum_<ComputedIntValues>(m, "ComputedIntValues")
+    .value("STEP", ComputedIntValues::STEP)
+    .value("NUM_SHIFT", ComputedIntValues::NUM_SHIFT)
+    .value("NUM_RELOC", ComputedIntValues::NUM_RELOC);
 
-  py::class_<dpd::OutputConfiguration>(m, "OutputConfiguration")
+  py::class_<OutputConfiguration>(m, "OutputConfiguration")
     .def(py::init<>(), "Get an instance of this struct")
-    .def_readwrite("intValues", &dpd::OutputConfiguration::intValues)
-    .def_readwrite("doubleValues", &dpd::OutputConfiguration::doubleValues)
+    .def_readwrite("intValues", &OutputConfiguration::intValues)
+    .def_readwrite("doubleValues", &OutputConfiguration::doubleValues)
     .def_readwrite(
       "filename",
-      &dpd::OutputConfiguration::filename,
+      &OutputConfiguration::filename,
       R"pbdoc(The file to write to. Empty means standard output (console).)pbdoc")
     .def_readwrite("outputEvery",
-                   &dpd::OutputConfiguration::outputEvery,
+                   &OutputConfiguration::outputEvery,
                    R"pbdoc(How often to write the values to the output. 
       For averages, this value also says how many values will be averaged.
      )pbdoc");
