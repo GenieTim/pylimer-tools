@@ -1,6 +1,7 @@
 #ifndef OUTPUT_SUPPORTING_SIM_H
 #define OUTPUT_SUPPORTING_SIM_H
 
+#include "../utils/VectorUtils.h"
 #include "../utils/utilityMacros.h"
 #include "Correlator.h"
 #include <Eigen/Dense>
@@ -11,7 +12,7 @@
 #include <iomanip>
 #include <iostream>
 #include <map>
-#include <nlopt.hpp>
+#include <numeric>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -83,10 +84,13 @@ namespace calc {
     std::vector<ComputedDoubleValues> doubleValues;
     std::string filename;
     int outputEvery;
+    int useEvery; // use every: for autocorrelation/averaging, how often to
+                  // include values
 
     OutputConfiguration()
       : filename("")
       , outputEvery(10)
+      , useEvery(1)
     {
     }
   };
@@ -100,6 +104,13 @@ namespace calc {
     std::vector<OutputConfiguration> outputAverageConfigs;
     std::vector<OutputConfiguration> outputAutoCorrelationConfigs;
     ////////////////////////////////////////////////////////////////
+    // output speedups
+    std::array<int, NUM_COMPUTABLE_DOUBLE_VALUES> doubleValueRequiredEvery;
+    int requireStressTensorEvery = 0;
+    int requireBondLenEvery = 0;
+    std::string outputBuffer;
+    bool doAverage = false;
+    ////////////////////////////////////////////////////////////////
     // output streams
     std::vector<std::shared_ptr<std::ostream>> outputStreams;
     std::vector<int> outputFileStreams;
@@ -109,15 +120,197 @@ namespace calc {
     std::vector<Eigen::ArrayXi> msdMeasuredIndices;
     std::vector<Eigen::VectorXd> msdOrigins;
     std::vector<size_t> msdOriginTimesteps;
+    std::vector<double> runningAverages;
 
     int openFilesOutputHeader(const std::vector<OutputConfiguration>& configs,
                               const std::string& prefix = "",
                               int streamIdx = 0);
+
+    inline bool requiresEvaluation(const ComputedDoubleValues val,
+                                   const long int currentStep) const
+    {
+      return (this->doubleValueRequiredEvery[val] != 0) &&
+             ((currentStep % this->doubleValueRequiredEvery[val]) == 0);
+    }
+
+    /**
+     * @brief Iterate all possible output configurations, handle them
+     *
+     * @param current_step
+     */
+    inline void handleOutput(const long int currentStep)
+    {
+      // "lazily" compute the values we need, others less lazily when they are
+      // computationally inexpensive
+      std::array<long int, NUM_COMPUTABLE_INT_VALUES> intvalues = {
+        currentStep,
+        getNumShifts(),
+        getNumRelocations(),
+      };
+
+      Eigen::Matrix3d stressTensor =
+        ((this->requireStressTensorEvery > 0) &&
+         (currentStep % this->requireStressTensorEvery) == 0)
+          ? this->getStressTensor()
+          : Eigen::Matrix3d::Zero();
+      double pressure = stressTensor.trace();
+      double kineticPressureTerm =
+        requiresEvaluation(PRESSURE, currentStep)
+          ? ((getNumParticles() * this->getTemperature()) / this->getVolume())
+          : 0.0;
+      Eigen::VectorXd bondLengths =
+        (((this->requireBondLenEvery > 0)) &&
+         ((currentStep % this->requireBondLenEvery) == 0))
+          ? this->getBondLengths()
+          : Eigen::Vector3d::Zero();
+
+      std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES> doublevalues = {
+        getTimestep(),
+        getCurrentTime(currentStep),
+        getVolume(),
+        pressure + kineticPressureTerm,
+        requiresEvaluation(TEMPERATURE, currentStep) ? getTemperature() : 0.,
+        stressTensor(0, 0),
+        stressTensor(1, 1),
+        stressTensor(2, 2),
+        stressTensor(0, 1),
+        stressTensor(1, 2),
+        stressTensor(0, 2),
+        stressTensor(0, 0) - stressTensor(1, 1),
+        stressTensor(1, 1) - stressTensor(2, 2),
+        stressTensor(0, 0) - stressTensor(2, 2),
+        requiresEvaluation(MEAN_B, currentStep) ? bondLengths.mean() : 0.0,
+        requiresEvaluation(MAX_B, currentStep) ? bondLengths.maxCoeff() : 0.0,
+        0.
+      };
+      int streamIdx = 0;
+      for (streamIdx = 0; streamIdx < this->outputConfigs.size(); ++streamIdx) {
+        if (currentStep % this->outputConfigs[streamIdx].outputEvery == 0) {
+          this->doOutputValues(
+            this->outputConfigs[streamIdx], intvalues, doublevalues, streamIdx);
+        }
+      }
+
+      // compute averages
+      size_t msdIdx = 0;
+      if (doAverage) {
+        int averagesIdx = 0;
+        for (OutputConfiguration oc : this->outputAverageConfigs) {
+          if ((currentStep % oc.useEvery) == 0) {
+            for (ComputedIntValues val : oc.intValues) {
+              switch (val) {
+                default:
+                  runningAverages[averagesIdx] +=
+                    intvalues[val] / static_cast<double>(oc.outputEvery);
+                  averagesIdx += 1;
+                  break;
+              }
+            }
+            for (ComputedDoubleValues val : oc.doubleValues) {
+              switch (val) {
+                case ComputedDoubleValues::MSD:
+                  // compute MSD
+                  for (msdIdx = 0; msdIdx < msdMeasuredIndices.size();
+                       ++msdIdx) {
+                    double result =
+                      (this->msdOrigins[msdIdx] -
+                       getCoordinates()(this->msdMeasuredIndices[msdIdx]))
+                        .squaredNorm() /
+                      (static_cast<double>(
+                        this->msdMeasuredIndices[msdIdx].size() / 3.));
+                    runningAverages[averagesIdx + msdIdx] +=
+                      result / static_cast<double>(oc.outputEvery);
+                  }
+                  averagesIdx += msdIdx;
+                  break;
+                default:
+                  runningAverages[averagesIdx] +=
+                    doublevalues[val] / static_cast<double>(oc.outputEvery);
+                  averagesIdx += 1;
+                  break;
+              }
+            }
+          }
+
+          // check (and if, output) averages
+          if (currentStep % oc.outputEvery == 0) {
+            // output & start again
+            outputBuffer.clear();
+            outputBuffer += std::to_string(intvalues[ComputedIntValues::STEP]);
+            for (size_t i = 0; i < runningAverages.size(); ++i) {
+              outputBuffer += "\t" + std::to_string(runningAverages[i]);
+              runningAverages[i] = 0.;
+            }
+            (*(this->outputStreams[streamIdx])) << outputBuffer << std::endl;
+          }
+
+          streamIdx += 1;
+        }
+      }
+
+      // do autocorrelation
+      size_t autocorrelator_idx = 0;
+      for (OutputConfiguration oc : this->outputAutoCorrelationConfigs) {
+        const size_t autocorrelator_idx_before = autocorrelator_idx;
+        for (ComputedDoubleValues cv : oc.doubleValues) {
+          assert(autocorrelator_idx < this->autocorrelators.size());
+          this->autocorrelators[autocorrelator_idx].add(doublevalues[cv]);
+          autocorrelator_idx += 1;
+        }
+        if (currentStep % oc.outputEvery == 0) {
+          outputBuffer.clear();
+          outputBuffer += "# TimeStep " +
+                          std::to_string(intvalues[ComputedIntValues::STEP]) +
+                          "\n";
+          this->autocorrelators[autocorrelator_idx_before].evaluate();
+          const unsigned int npcorr =
+            this->autocorrelators[autocorrelator_idx_before].npcorr;
+          for (int autocorr_idx_offset = 1;
+               autocorr_idx_offset < oc.doubleValues.size();
+               ++autocorr_idx_offset) {
+            size_t idx = autocorrelator_idx_before + autocorr_idx_offset;
+            this->autocorrelators[idx].evaluate();
+            RUNTIME_EXP_IFN(this->autocorrelators[idx].npcorr == npcorr,
+                            "Autocorrelation states are inconsistent.");
+          }
+
+          for (size_t output_idx = 0; output_idx < npcorr; output_idx += 1) {
+            outputBuffer += std::to_string(
+              this->autocorrelators[autocorrelator_idx_before].t[output_idx]);
+            for (int autocorr_idx_offset = 0;
+                 autocorr_idx_offset < oc.doubleValues.size();
+                 ++autocorr_idx_offset) {
+              size_t idx = autocorrelator_idx_before + autocorr_idx_offset;
+              outputBuffer +=
+                "\t" + std::to_string(this->autocorrelators[idx].f[output_idx]);
+            }
+            outputBuffer += "\n";
+          }
+          (*(this->outputStreams[streamIdx])) << outputBuffer << std::flush;
+          streamIdx += 1;
+        }
+
+        streamIdx += 1;
+      }
+
+      if (currentStep % 50 == 0) {
+        std::flush(std::cout);
+      }
+    }
+
+    /**
+     * @brief Output the passed valus
+     *
+     * @param oc
+     * @param intvalues
+     * @param doublevalues
+     * @param outputBuffer
+     * @param coordinates
+     * @param streamIdx
+     */
     inline void doOutputValues(OutputConfiguration& oc,
-                               std::array<int, 3>& intvalues,
+                               std::array<long int, 3>& intvalues,
                                std::array<double, 17>& doublevalues,
-                               std::string& outputBuffer,
-                               Eigen::VectorXd& coordinates,
                                int streamIdx = 0)
     {
       assert(streamIdx <= this->outputStreams.size());
@@ -133,11 +326,12 @@ namespace calc {
             // compute MSD
             for (size_t msdIdx = 0; msdIdx < msdMeasuredIndices.size();
                  ++msdIdx) {
-              double result = (this->msdOrigins[msdIdx] -
-                               coordinates(this->msdMeasuredIndices[msdIdx]))
-                                .squaredNorm() /
-                              (static_cast<double>(
-                                this->msdMeasuredIndices[msdIdx].size() / 3.));
+              double result =
+                (this->msdOrigins[msdIdx] -
+                 getCoordinates()(this->msdMeasuredIndices[msdIdx]))
+                  .squaredNorm() /
+                (static_cast<double>(this->msdMeasuredIndices[msdIdx].size() /
+                                     3.));
               outputBuffer += std::to_string(result) + "\t";
             }
             break;
@@ -154,7 +348,50 @@ namespace calc {
       }
     };
 
+    /**
+     * @brief Remember how often a particular value is needed to be computed for
+     * any of the outputs
+     *
+     * @param configs
+     */
+    void updateValuesRequiredEvery(
+      const std::vector<OutputConfiguration>& configs)
+    {
+      for (OutputConfiguration c : configs) {
+        for (ComputedDoubleValues v : c.doubleValues) {
+          if (this->doubleValueRequiredEvery[v] == 0) {
+            this->doubleValueRequiredEvery[v] = c.useEvery;
+          } else {
+            this->doubleValueRequiredEvery[v] =
+              std::gcd(c.useEvery, this->doubleValueRequiredEvery[v]);
+          }
+        }
+      }
+      std::vector<ComputedDoubleValues> stressTensorRequiringValues = {
+        STRESS_XX, STRESS_YY,  STRESS_ZZ,  STRESS_XY,  STRESS_YZ,
+        STRESS_XZ, STRESS_NXY, STRESS_NYZ, STRESS_NXZ, PRESSURE
+      };
+      for (ComputedDoubleValues v : stressTensorRequiringValues) {
+        if (requireStressTensorEvery == 0) {
+          requireStressTensorEvery = this->doubleValueRequiredEvery[v];
+        } else {
+          requireStressTensorEvery = std::gcd(
+            requireStressTensorEvery, this->doubleValueRequiredEvery[v]);
+        }
+      }
+      // similarly for the bond length
+      requireBondLenEvery =
+        std::gcd(this->doubleValueRequiredEvery[ComputedDoubleValues::MAX_B],
+                 this->doubleValueRequiredEvery[ComputedDoubleValues::MEAN_B]);
+    }
+
   public:
+    OutputSupportingSimulation()
+    {
+      this->doubleValueRequiredEvery.fill(0);
+      this->outputBuffer.reserve(600);
+    }
+
     void configAutoCorrelatorOutput(std::vector<OutputConfiguration>& vals,
                                     const unsigned int numcorrin = 32,
                                     const unsigned int pin = 16,
@@ -169,6 +406,7 @@ namespace calc {
       }
       this->autocorrelators.clear();
       this->autocorrelators.reserve(num_values_to_correlate);
+      this->updateValuesRequiredEvery(vals);
       for (size_t i = 0; i < num_values_to_correlate; ++i) {
         pylimer_tools::calc::Correlator correlator =
           pylimer_tools::calc::Correlator(numcorrin, pin, min);
@@ -177,15 +415,45 @@ namespace calc {
       this->outputAutoCorrelationConfigs = vals;
     }
 
-    void configAverageOutput(const std::vector<OutputConfiguration>& vals)
+    void configAverageOutput(const std::vector<OutputConfiguration>& configs)
     {
-      this->outputAverageConfigs = vals;
+      this->outputAverageConfigs = configs;
+      this->updateValuesRequiredEvery(configs);
+
+      int numAverages = 0;
+      for (OutputConfiguration c : configs) {
+        for (ComputedDoubleValues v : c.doubleValues) {
+          numAverages += 1;
+        }
+        for (ComputedIntValues v : c.intValues) {
+          numAverages += 1;
+        }
+      }
+
+      this->runningAverages =
+        pylimer_tools::utils::initializeWithValue<double>(numAverages, 0.);
+      this->doAverage = numAverages > 0;
     }
 
     void configStepOutput(const std::vector<OutputConfiguration>& vals)
     {
+      for (OutputConfiguration config : vals) {
+        config.useEvery = config.outputEvery;
+      }
       this->outputConfigs = vals;
+      this->updateValuesRequiredEvery(vals);
     }
+
+    virtual double getTimestep() = 0;
+    virtual double getCurrentTime(double currentStep) = 0;
+    virtual Eigen::Matrix3d getStressTensor() = 0;
+    virtual int getNumShifts() = 0;
+    virtual int getNumRelocations() = 0;
+    virtual Eigen::VectorXd getBondLengths() = 0;
+    virtual Eigen::VectorXd getCoordinates() = 0;
+    virtual double getTemperature() = 0;
+    virtual size_t getNumParticles() = 0;
+    virtual double getVolume() = 0;
   };
 }
 }

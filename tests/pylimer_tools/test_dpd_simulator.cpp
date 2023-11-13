@@ -101,7 +101,7 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     REQUIRE_NOTHROW(simulator.startMeasuringMSDForAtoms(atomIdsForMSD));
 
     // actual simulation
-    REQUIRE_NOTHROW(simulator.runSimulation(75, 0.06, false));
+    REQUIRE_NOTHROW(simulator.runSimulation(75, false));
     REQUIRE_NOTHROW(simulator.validateState());
     std::cout << "DPD ran, state validated." << std::endl;
     CHECK_NOTHROW(simulator.validateNeighbourlist(2.0));
@@ -119,7 +119,7 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     CHECK(resultUniverse.getNrOfAtoms() == universe.getNrOfAtoms());
     CHECK_NOTHROW(simulator.validateState());
 
-    CHECK_NOTHROW(simulator.runSimulation(76, 0.06, true));
+    CHECK_NOTHROW(simulator.runSimulation(76, true));
 
     CHECK_NOTHROW(simulator.validateState());
     std::cout << "DPD ran with slip-springs, state validated." << std::endl;

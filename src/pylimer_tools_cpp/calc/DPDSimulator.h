@@ -53,11 +53,14 @@ namespace calc {
       double gamma = 0.5 * 3. * 3.;
       long int nStepsMC = 500;
       long int nStepsDPD = 500;
+      double dt = 0.06;
 
       ////////////////////////////////////////////////////////////////
       // simulation state
       long int currentStep = 0;
       double currentTime = 0.;
+      long int numShifts = 0;
+      long int numRelocations = 0;
       Eigen::VectorXd currentVelocitiesPlus;
       Eigen::VectorXd currentVelocities;
       Eigen::VectorXd currentForces;
@@ -105,17 +108,14 @@ namespace calc {
        *
        */
       void runSimulation(const long int nSteps,
-                         double dt,
                          bool withMC,
                          const std::function<bool()>& shouldInterrupt,
                          const std::function<void()>& cleanupInterrupt);
 
-      void runSimulation(const long int nSteps,
-                         double dt = 0.06,
-                         bool withMC = false)
+      void runSimulation(const long int nSteps, bool withMC = false)
       {
         runSimulation(
-          nSteps, dt, withMC, []() { return false; }, []() {});
+          nSteps, withMC, []() { return false; }, []() {});
       }
 
       /**
@@ -183,6 +183,8 @@ namespace calc {
 
       ////////////////////////////////////////////////////////////////
       // configuration
+      void configTimeStep(const double dt = 0.06) { this->dt = dt; }
+
       void configLambda(const double l) { this->lambda = l; }
 
       void configSpringConstant(const double nk) { this->k = nk; }
@@ -231,6 +233,36 @@ namespace calc {
       // results access & export
 
       pylimer_tools::entities::Universe getUniverse() const;
+
+      double getTimestep() override { return this->dt; }
+      double getCurrentTime(double currentStep) override
+      {
+        return this->currentTime;
+      }
+      Eigen::Matrix3d getStressTensor() override
+      {
+        return this->currentStressTensor;
+      }
+      int getNumShifts() override { return this->numShifts; }
+      int getNumRelocations() override { return this->numRelocations; }
+      size_t getNumParticles() override { return this->numAtoms; }
+      double getVolume() override { return this->box.getVolume(); }
+      Eigen::VectorXd getBondLengths() override
+      {
+        Eigen::VectorXd bondDistances =
+          this->coordinates(this->bondPartnerCoordinatesA) -
+          this->coordinates(this->bondPartnerCoordinatesB);
+        this->box.handlePBC(bondDistances);
+
+        Eigen::VectorXd bondLengths = Eigen::VectorXd::Zero(this->numBonds);
+        for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
+          double b = bondDistances.segment(3 * i, 3).norm();
+          bondLengths[i] = b;
+        }
+        return bondLengths;
+      }
+      Eigen::VectorXd getCoordinates() override { return this->coordinates; }
+      double getTemperature() override { return this->computeTemperature(this->currentVelocities); }
 
       ////////////////////////////////////////////////////////////////
       // validation
