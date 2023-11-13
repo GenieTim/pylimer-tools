@@ -933,11 +933,6 @@ namespace calc {
       return result;
     }
 
-    long int DPDSimulator::getTimestep() const
-    {
-      return this->currentStep;
-    }
-
     void DPDSimulator::validateNeighbourlist(double cutoff)
     {
       // this->neighbourlist.resetCoordinates(this->coordinates);
