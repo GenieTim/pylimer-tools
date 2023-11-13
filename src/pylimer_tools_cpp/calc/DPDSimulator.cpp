@@ -106,15 +106,10 @@ namespace calc {
      */
     void DPDSimulator::runSimulation(
       const long int nSteps,
-      double dt,
       bool withMC,
       const std::function<bool()>& shouldInterrupt,
       const std::function<void()>& cleanupInterrupt)
     {
-      Eigen::VectorXd velocitiesPlus = this->currentVelocitiesPlus;
-      Eigen::VectorXd velocities = this->currentVelocities;
-      Eigen::VectorXd forces = this->currentForces;
-      Eigen::Matrix3d stressTensor = Eigen::Matrix3d::Zero();
       bool wasInterrupted = false;
 
       // output headers
@@ -144,47 +139,51 @@ namespace calc {
       autocorrelationOutputBuffer.reserve(
         this->outputAutoCorrelationConfigs.size() * 50);
 
-      int numShifts = 0;
-      int numRelocations = 0;
-
       const double halfDt = 0.5 * dt;
-      double temperature = this->computeTemperature(velocities);
+      double temperature = this->computeTemperature(this->currentVelocities);
 
       // start iterating over the steps to do
       long int step = 0;
       for (; step < nSteps; step++) {
         if (withMC && ((step % this->nStepsDPD) == 0)) {
-          numShifts = 0;
-          numRelocations = this->relocateSlipSprings(1. * temperature);
+          this->numShifts = 0;
+          this->numRelocations = this->relocateSlipSprings(1. * temperature);
           for (int i = 0; i < this->nStepsMC; ++i) {
-            numShifts += this->shiftSlipSprings(1. * temperature);
+            this->numShifts += this->shiftSlipSprings(1. * temperature);
           }
         }
         // update coordinates & velocities
-        velocitiesPlus = velocities + halfDt * forces;
-        this->coordinates += dt * velocitiesPlus;
+        this->currentVelocitiesPlus =
+          this->currentVelocities + halfDt * this->currentForces;
+        this->coordinates += dt * this->currentVelocitiesPlus;
         this->neighbourlist.resetCoordinates(this->coordinates);
-        velocities += lambda * dt * forces;
+        this->currentVelocities += lambda * dt * this->currentForces;
 
         // TODO: figure out, what the issue is, how the velocities
         // should be synchronized for the pressure
         // temperature = this->computeTemperature(velocities);
 
         // re-compute the forces with these updated coordinates & velocities
-        double pressure = computeForces(
-          forces, stressTensor, this->coordinates, velocities, dt, 1.0);
+        double pressure = computeForces(this->currentForces,
+                                        this->currentStressTensor,
+                                        this->coordinates,
+                                        this->currentVelocities,
+                                        dt,
+                                        1.0);
 
         // correct the velocities
-        velocities = velocitiesPlus + halfDt * forces;
-        temperature = this->computeTemperature(velocities);
+        this->currentVelocities =
+          this->currentVelocitiesPlus + halfDt * this->currentForces;
+        temperature = this->computeTemperature(this->currentVelocities);
 
         // kinetic term of the stress/pressure
         double kineticPressureTerm =
           ((this->numAtoms * temperature) / this->box.getVolume());
         const double m = 1.;
         for (size_t i = 0; i < this->numAtoms; ++i) {
-          stressTensor -= m * velocities.segment(3 * i, 3) *
-                          velocities.segment(3 * i, 3).transpose();
+          this->currentStressTensor -=
+            m * this->currentVelocities.segment(3 * i, 3) *
+            this->currentVelocities.segment(3 * i, 3).transpose();
         }
 
         // compute bond properties
@@ -205,154 +204,11 @@ namespace calc {
         }
 
         // output
-        std::array<int, NUM_COMPUTABLE_INT_VALUES> intvalues = {
-          static_cast<int>(step + this->currentStep + 1),
-          numShifts,
-          numRelocations,
-        };
-        std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES> doublevalues = {
-          dt,
-          this->currentTime + static_cast<double>(step + 1) * dt,
-          this->box.getVolume(),
-          pressure + kineticPressureTerm,
-          temperature,
-          stressTensor(0, 0),
-          stressTensor(1, 1),
-          stressTensor(2, 2),
-          stressTensor(0, 1),
-          stressTensor(1, 2),
-          stressTensor(0, 2),
-          stressTensor(0, 0) - stressTensor(1, 1),
-          stressTensor(1, 1) - stressTensor(2, 2),
-          stressTensor(0, 0) - stressTensor(2, 2),
-          meanB,
-          maxB,
-          0.
-        };
-        int streamIdx = 0;
-        for (streamIdx = 0; streamIdx < this->outputConfigs.size();
-             ++streamIdx) {
-          if ((step + 1) % this->outputConfigs[streamIdx].outputEvery == 0) {
-            this->doOutputValues(this->outputConfigs[streamIdx],
-                                 intvalues,
-                                 doublevalues,
-                                 outputBuffer,
-                                 this->coordinates,
-                                 streamIdx);
-          }
-        }
+        this->currentStep += 1;
+        this->currentTime += dt;
+        this->handleOutput(this->currentStep);
 
-        // compute averages
-        size_t msdIdx = 0;
-        if (doAverage) {
-          int averagesIdx = 0;
-          for (OutputConfiguration oc : this->outputAverageConfigs) {
-            for (ComputedIntValues val : oc.intValues) {
-              switch (val) {
-                default:
-                  runningAverages[averagesIdx] +=
-                    intvalues[val] / static_cast<double>(oc.outputEvery);
-                  averagesIdx += 1;
-                  break;
-              }
-            }
-            for (ComputedDoubleValues val : oc.doubleValues) {
-              switch (val) {
-                case ComputedDoubleValues::MSD:
-                  // compute MSD
-                  for (msdIdx = 0; msdIdx < msdMeasuredIndices.size();
-                       ++msdIdx) {
-                    double result =
-                      (this->msdOrigins[msdIdx] -
-                       this->coordinates(this->msdMeasuredIndices[msdIdx]))
-                        .squaredNorm() /
-                      (static_cast<double>(
-                        this->msdMeasuredIndices[msdIdx].size() / 3.));
-                    runningAverages[averagesIdx + msdIdx] +=
-                      result / static_cast<double>(oc.outputEvery);
-                  }
-                  averagesIdx += msdIdx;
-                  break;
-                default:
-                  runningAverages[averagesIdx] +=
-                    doublevalues[val] / static_cast<double>(oc.outputEvery);
-                  averagesIdx += 1;
-                  break;
-              }
-            }
-
-            // check (and if, output) averages
-            if ((step + 1) % oc.outputEvery == 0 && doAverage) {
-              // output & start again
-              averagesOutputBuffer.clear();
-              averagesOutputBuffer +=
-                std::to_string(intvalues[ComputedIntValues::STEP]);
-              for (size_t i = 0; i < runningAverages.size(); ++i) {
-                averagesOutputBuffer +=
-                  "\t" + std::to_string(runningAverages[i]);
-                runningAverages[i] = 0.;
-              }
-              (*(this->outputStreams[streamIdx]))
-                << averagesOutputBuffer << std::endl;
-            }
-
-            streamIdx += 1;
-          }
-          assert(averagesIdx == numAverages);
-        }
-
-        // do autocorrelation
-        size_t autocorrelator_idx = 0;
-        for (OutputConfiguration oc : this->outputAutoCorrelationConfigs) {
-          const size_t autocorrelator_idx_before = autocorrelator_idx;
-          for (ComputedDoubleValues cv : oc.doubleValues) {
-            assert(autocorrelator_idx < this->autocorrelators.size());
-            this->autocorrelators[autocorrelator_idx].add(doublevalues[cv]);
-            autocorrelator_idx += 1;
-          }
-          if ((step + 1) % oc.outputEvery == 0) {
-            autocorrelationOutputBuffer.clear();
-            autocorrelationOutputBuffer +=
-              "# TimeStep " +
-              std::to_string(intvalues[ComputedIntValues::STEP]) + "\n";
-            this->autocorrelators[autocorrelator_idx_before].evaluate();
-            const unsigned int npcorr =
-              this->autocorrelators[autocorrelator_idx_before].npcorr;
-            for (int autocorr_idx_offset = 1;
-                 autocorr_idx_offset < oc.doubleValues.size();
-                 ++autocorr_idx_offset) {
-              size_t idx = autocorrelator_idx_before + autocorr_idx_offset;
-              this->autocorrelators[idx].evaluate();
-              RUNTIME_EXP_IFN(this->autocorrelators[idx].npcorr == npcorr,
-                              "Autocorrelation states are inconsistent.");
-            }
-
-            for (size_t output_idx = 0; output_idx < npcorr; output_idx += 1) {
-              autocorrelationOutputBuffer += std::to_string(
-                this->autocorrelators[autocorrelator_idx_before].t[output_idx]);
-              for (int autocorr_idx_offset = 0;
-                   autocorr_idx_offset < oc.doubleValues.size();
-                   ++autocorr_idx_offset) {
-                size_t idx = autocorrelator_idx_before + autocorr_idx_offset;
-                autocorrelationOutputBuffer +=
-                  "\t" +
-                  std::to_string(this->autocorrelators[idx].f[output_idx]);
-              }
-              autocorrelationOutputBuffer += "\n";
-            }
-            (*(this->outputStreams[streamIdx]))
-              << autocorrelationOutputBuffer << std::flush;
-            streamIdx += 1;
-          }
-
-          streamIdx += 1;
-        }
-
-        // / end output
-        if (step % 50 == 0) {
-          std::flush(std::cout);
-        }
-
+        // allow Ctrl+C etc., without locking too much
         if (shouldInterrupt()) {
           wasInterrupted = true;
           break;
@@ -363,12 +219,6 @@ namespace calc {
       std::ios::sync_with_stdio(true);
       this->outputStreams.clear();
       this->outputFileStreams.clear();
-      this->currentForces = forces;
-      this->currentVelocities = velocities;
-      this->currentVelocitiesPlus = velocitiesPlus;
-      this->currentStep += step;
-      this->currentTime += step * dt;
-      this->currentStressTensor = stressTensor;
 
       if (wasInterrupted) {
         cleanupInterrupt();
