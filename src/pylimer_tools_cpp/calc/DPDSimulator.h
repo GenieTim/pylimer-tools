@@ -140,17 +140,6 @@ namespace calc {
       double computeTemperature(const Eigen::VectorXd& velocities) const;
 
       /**
-       * @brief Compute the temperature
-       *
-       * @param velocities
-       * @return double
-       */
-      double getTemperature() const
-      {
-        return this->computeTemperature(this->currentVelocities);
-      };
-
-      /**
        * @brief Get access to the current stress-tensor
        *
        * @return Eigen::Matrix3d
@@ -167,8 +156,6 @@ namespace calc {
         this->box.handlePBC(bondDistances);
         return bondDistances.norm();
       };
-
-      long int getTimestep() const;
 
       ////////////////////////////////////////////////////////////////
       // MC Procedures

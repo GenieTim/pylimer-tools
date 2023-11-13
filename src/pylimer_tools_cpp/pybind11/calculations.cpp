@@ -1243,9 +1243,9 @@ init_pylimer_bound_calc(py::module_& m)
     .def(
       "runSimulation",
       [](dpd::DPDSimulator& sim, int nSteps, double dt, bool withMC) {
+          sim.configTimeStep(dt);
         return sim.runSimulation(
           nSteps,
-          dt,
           withMC,
           []() { return PyErr_CheckSignals() != 0; },
           []() { throw py::error_already_set(); });
