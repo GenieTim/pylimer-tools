@@ -29,15 +29,19 @@ namespace utils {
     const int col3width = 15;
     const int col4width = 15;
     const int col5width = 12;
+    const int unitwidth = 5;
 
     template<typename T>
-    void printNumberLeftWithWidth(T t,
-                                  std::string unit,
-                                  const int width,
-                                  const int precision) const
+    void printNumberRightWithWidth(T t,
+                                   std::string unit,
+                                   const int width,
+                                   const int precision) const
     {
-      std::cout << std::left << std::setw(width) << std::setfill(' ')
-                << std::setprecision(precision) << t << " [" << unit << "]";
+      std::cout << std::right << std::setw(width - unitwidth)
+                << std::setfill(' ') << std::setprecision(precision) << t;
+      // add unit
+      std::cout << std::left << std::setw(unitwidth) << std::setfill(' ')
+                << (" [" + unit + "]");
     }
 
     template<typename T>
@@ -84,14 +88,14 @@ namespace utils {
       this->printLeftWithWidth(this->sectionNames[idx], this->col1width);
       this->printLeftWithWidth(this->sectionNumMeasurements[idx],
                                this->col2width);
-      this->printNumberLeftWithWidth(this->sectionMean_mus[idx] *
-                                       conversionFactor,
-                                     unit,
-                                     this->col3width,
-                                     5);
-      this->printNumberLeftWithWidth(
+      this->printNumberRightWithWidth(this->sectionMean_mus[idx] *
+                                        conversionFactor,
+                                      unit,
+                                      this->col3width,
+                                      5);
+      this->printNumberRightWithWidth(
         this->sectionVariance_mus[idx] * 1., "µs", this->col4width, 5);
-      this->printNumberLeftWithWidth(
+      this->printNumberRightWithWidth(
         this->sectionMean_mus[idx] / total, "%", this->col5width, 2);
       std::cout << std::endl;
     }
@@ -101,6 +105,8 @@ namespace utils {
     {
       this->sectionMean_mus.fill(0.);
       this->sectionVariance_mus.fill(0.);
+      this->sectionNumMeasurements.fill(0);
+      this->sectionNames.fill("");
     }
 
     /**
