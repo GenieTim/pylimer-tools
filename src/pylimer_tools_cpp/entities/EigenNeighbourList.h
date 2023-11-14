@@ -6,7 +6,9 @@ extern "C"
 #include <igraph/igraph.h>
 }
 #include "Box.h"
+#include "../utils/ExtraEigenTypes.h"
 #include <Eigen/Dense>
+#include <cereal/access.hpp>
 #include <iostream>
 #include <map>
 #include <set>
@@ -22,9 +24,6 @@ namespace entities {
   typedef long int bucket_idx_t;
   typedef long int coordinate_idx_t;
 
-  typedef Eigen::Array<long int, 3, 1> Array3li;
-  typedef Eigen::Array<long int, Eigen::Dynamic, 1> ArrayXli;
-
   /**
    * @brief An implementation of a neighbour list using binning, using Eigen for
    * performance
@@ -33,7 +32,12 @@ namespace entities {
   class EigenNeighbourList
   {
   public:
+    EigenNeighbourList(){}
     EigenNeighbourList(const Eigen::VectorXd& coordinates,
+                       const Box box,
+                       double cutoff);
+
+    void initialize(const Eigen::VectorXd& coordinates,
                        const Box box,
                        double cutoff);
 
@@ -93,6 +97,18 @@ namespace entities {
       const Eigen::Vector3d& coordinates,
       double newCutoff) const;
 
+    template<class Archive>
+    void serialize(Archive& ar)
+    {
+      ar(bucketWidths,
+         nrOfBuckets,
+         cutoff,
+         box,
+         neighbourBuckets,
+         neighbourBucketNeighboursDefaultCutoff,
+         neighbourBucketSizes);
+    }
+
   protected:
     /**
      * @brief Do "PBC" with a bucket index in one direction
@@ -104,18 +120,18 @@ namespace entities {
     bucket_idx_t normalizeBucketIndex(long int bucketIndex,
                                       size_t nrOfBuckets) const;
 
-    void normalizeTriplet(Array3li& triplet) const;
+    void normalizeTriplet(Eigen::Array3li& triplet) const;
 
-    Array3li tripletFromIndex(bucket_idx_t index) const;
+    Eigen::Array3li tripletFromIndex(bucket_idx_t index) const;
 
-    bucket_idx_t getBucketIndexForTriplet(Array3li ind) const;
+    bucket_idx_t getBucketIndexForTriplet(Eigen::Array3li ind) const;
 
-    Array3li getBucketTripletForCoordinates(
+    Eigen::Array3li getBucketTripletForCoordinates(
       const Eigen::Vector3d& coordinates) const;
 
   private:
     Eigen::Array3d bucketWidths;
-    Array3li nrOfBuckets;
+    Eigen::Array3li nrOfBuckets;
 
     size_t totalNrOfBuckets;
 
@@ -127,6 +143,7 @@ namespace entities {
     std::vector<std::vector<bucket_idx_t>>
       neighbourBucketNeighboursDefaultCutoff;
     Eigen::VectorXi neighbourBucketSizes;
+
   };
 };
 };

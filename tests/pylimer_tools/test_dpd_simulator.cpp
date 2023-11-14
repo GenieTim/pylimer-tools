@@ -100,6 +100,10 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     std::vector<size_t> atomIdsForMSD = { 1, 4, 6 };
     REQUIRE_NOTHROW(simulator.startMeasuringMSDForAtoms(atomIdsForMSD));
 
+    // restart files
+    std::string restartFile = suspectedPath + "dpd_restart_file.bin";
+    simulator.configRestartOutput(restartFile, 20);
+
     // actual simulation
     REQUIRE_NOTHROW(simulator.runSimulation(75, false));
     REQUIRE_NOTHROW(simulator.validateState());
@@ -129,5 +133,13 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     std::remove(averageFile.c_str());
     CHECK(std::filesystem::exists(autocorrFile));
     std::remove(autocorrFile.c_str());
+    REQUIRE(std::filesystem::exists(restartFile));
+
+    pcd::DPDSimulator sim2 = pcd::DPDSimulator::readRestartFile(restartFile);
+    REQUIRE_NOTHROW(sim2.runSimulation(5, false));
+    CHECK(sim2.getTemperature() ==
+          Catch::Approx(simulator.getTemperature()).epsilon(0.1));
+    CHECK_NOTHROW(sim2.validateState());
+    std::remove(restartFile.c_str());
   }
 };
