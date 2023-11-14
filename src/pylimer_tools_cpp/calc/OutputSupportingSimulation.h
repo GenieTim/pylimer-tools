@@ -1,6 +1,7 @@
 #ifndef OUTPUT_SUPPORTING_SIM_H
 #define OUTPUT_SUPPORTING_SIM_H
 
+#include "../utils/CerealUtils.h"
 #include "../utils/VectorUtils.h"
 #include "../utils/utilityMacros.h"
 #include "Correlator.h"
@@ -16,6 +17,9 @@
 #include <string>
 #include <tuple>
 #include <vector>
+
+#include <cereal/types/base_class.hpp>
+#include <cereal/types/polymorphic.hpp>
 
 namespace pylimer_tools {
 namespace calc {
@@ -93,6 +97,12 @@ namespace calc {
       , useEvery(1)
     {
     }
+
+    template<class Archive>
+    void serialize(Archive& ar)
+    {
+      ar(intValues, doubleValues, filename, outputEvery, useEvery);
+    }
   };
 
   class OutputSupportingSimulation
@@ -103,6 +113,10 @@ namespace calc {
     std::vector<OutputConfiguration> outputConfigs;
     std::vector<OutputConfiguration> outputAverageConfigs;
     std::vector<OutputConfiguration> outputAutoCorrelationConfigs;
+    ////////////////////////////////////////////////////////////////
+    // restart configurations
+    int outputRestartEvery = 0;
+    std::string restartOutputFile;
     ////////////////////////////////////////////////////////////////
     // output speedups
     std::array<int, NUM_COMPUTABLE_DOUBLE_VALUES> doubleValueRequiredEvery;
@@ -293,10 +307,23 @@ namespace calc {
         streamIdx += 1;
       }
 
+      // potentially write restart file
+      if (this->outputRestartEvery > 0 &&
+          currentStep % this->outputRestartEvery == 0) {
+        this->writeRestartFile(this->restartOutputFile);
+      }
+
       if (currentStep % 50 == 0) {
         std::flush(std::cout);
       }
     }
+
+    virtual void writeRestartFile(std::string filename) = 0;
+    // static OutputSupportingSimulation readRestartFile(std::string filename)
+    // {
+    //   throw std::runtime_error(
+    //     "Cannot read restart file on abstract base class.");
+    // };
 
     /**
      * @brief Output the passed valus
@@ -442,6 +469,40 @@ namespace calc {
       }
       this->outputConfigs = vals;
       this->updateValuesRequiredEvery(vals);
+    }
+
+    void configRestartOutput(const std::string outputFile, int outputEvery)
+    {
+      this->outputRestartEvery = outputEvery;
+      this->restartOutputFile = outputFile;
+    }
+
+    template<class Archive>
+    void serialize(Archive& ar)
+    {
+      ar(
+        // output configurations
+        outputConfigs,
+        outputAverageConfigs,
+        outputAutoCorrelationConfigs,
+        // restart configurations - meta!
+        outputRestartEvery,
+        restartOutputFile,
+        // output speedups – could also recompute instead ?!?
+        doubleValueRequiredEvery,
+        requireStressTensorEvery,
+        requireBondLenEvery,
+        outputBuffer,
+        doAverage,
+        // output streams – here, it gets dangerous!
+        outputFileStreams,
+        // outputStreams,
+        // computation state
+        autocorrelators,
+        msdMeasuredIndices,
+        msdOrigins,
+        msdOriginTimesteps,
+        runningAverages);
     }
 
     virtual double getTimestep() = 0;

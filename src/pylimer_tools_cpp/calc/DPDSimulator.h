@@ -5,6 +5,7 @@
 #include "../entities/Box.h"
 #include "../entities/EigenNeighbourList.h"
 #include "../entities/Universe.h"
+#include "../utils/ExtraEigenTypes.h"
 #include "Correlator.h"
 #include "MEHPForceEvaluator.h"
 #include "MEHPUtilityStructures.h"
@@ -13,6 +14,9 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cereal/access.hpp>
+#include <cereal/types/base_class.hpp>
+#include <cereal/types/polymorphic.hpp>
 #include <cstdint>
 #include <fstream>
 #include <iomanip>
@@ -31,13 +35,13 @@ namespace calc {
 
   namespace dpd {
 
-    typedef Eigen::Array<size_t, Eigen::Dynamic, 1> ArrayXst;
-    typedef Eigen::Array<long int, Eigen::Dynamic, 1> ArrayXli;
-
     class DPDSimulator : public pylimer_tools::calc::OutputSupportingSimulation
     {
 
     private:
+      DPDSimulator(){}; // not exposed to users, only used by Cereal
+      friend class cereal::access;
+
       ////////////////////////////////////////////////////////////////
       // configuration
       double maxBondLen = 5.;
@@ -249,12 +253,76 @@ namespace calc {
         return bondLengths;
       }
       Eigen::VectorXd getCoordinates() override { return this->coordinates; }
-      double getTemperature() override { return this->computeTemperature(this->currentVelocities); }
+      double getTemperature() override
+      {
+        return this->computeTemperature(this->currentVelocities);
+      }
 
       ////////////////////////////////////////////////////////////////
       // validation
       void validateState();
       void validateNeighbourlist(double cutoff);
+
+      ////////////////////////////////////////////////////////////////
+      // serialization
+      template<class Archive>
+      void serialize(Archive& ar)
+      {
+        ar(cereal::virtual_base_class<OutputSupportingSimulation>(this),
+           // configuration
+           maxBondLen,
+           is2D,
+           shiftPossibilityEmpty,
+           shiftOneAtATime,
+           lambda,
+           k,
+           lowCutoff,
+           highCutoff,
+           A,
+           sigma,
+           gamma,
+           nStepsDPD,
+           nStepsMC,
+           dt,
+           // simulation state
+           currentStep,
+           currentTime,
+           numShifts,
+           numRelocations,
+           currentVelocitiesPlus,
+           currentVelocities,
+           currentForces,
+           currentStressTensor,
+           // randomness – skip
+           // universe structure
+           numAtoms,
+           numBonds,
+           numSlipSprings,
+           box,
+           universe,
+           // -> atoms
+           coordinates,
+           idxFunctionalities,
+           atomTypes,
+           atomIds,
+           chainEndIndices,
+           // -> bonds
+           bondPartnerCoordinatesA,
+           bondPartnerCoordinatesB,
+           bondPartnersA,
+           bondPartnersB,
+           bondTypes,
+           bondsOfIndex,
+           // neighbourlist
+           neighbourlist);
+      }
+
+      static DPDSimulator readRestartFile(std::string filename)
+      {
+        DPDSimulator res;
+        pylimer_tools::utils::deserializeFromFile<DPDSimulator>(res, filename);
+        return res;
+      };
 
     protected:
       void addSlipSprings(std::vector<size_t>& partnerA,
@@ -271,10 +339,20 @@ namespace calc {
       void replaceSlipSpringPartner(const size_t springIdx,
                                     const size_t partnerBefore,
                                     const size_t partnerAfter);
-    };
-  }
 
+      void writeRestartFile(std::string filename) override
+      {
+        pylimer_tools::utils::serializeToFile<DPDSimulator>(
+          *this, filename);
+      };
+    };
+  };
 }
 }
+
+CEREAL_REGISTER_TYPE(pylimer_tools::calc::dpd::DPDSimulator);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(
+  pylimer_tools::calc::OutputSupportingSimulation,
+  pylimer_tools::calc::dpd::DPDSimulator);
 
 #endif

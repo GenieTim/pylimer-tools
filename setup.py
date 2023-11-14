@@ -20,7 +20,7 @@ except ImportError:
     raise
 
 
-cmake_args = ["-DCMAKE_BUILD_TYPE=RelWithDebInfo"]
+cmake_args = ["-DCMAKE_BUILD_TYPE=RelWithDebInfo", "-Dvendor_suffix=skbuild"]
 # cmake_args = ["-Digraph_DEBUG=ON", "-DCMAKE_FIND_DEBUG_MODE=ON"]
 
 if (os.getenv('VCPKG_ROOT')):
@@ -88,5 +88,5 @@ setup(
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Operating System :: OS Independent"
     ],
-    
+
 )

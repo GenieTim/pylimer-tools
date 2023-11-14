@@ -76,6 +76,7 @@ add_library(test_sources
 add_dependencies(test_sources pylimer_tools)
 include_directories(${igraph_INCLUDE_DIRS})
 include_directories(${nlopt_INCLUDE_DIRS})
+include_directories(${cereal_INCLUDE_DIRS})
 include_directories(${EIGEN3_INCLUDE_DIRS})
 include_directories(${EIGEN3_INCLUDE_DIRS}/eigen3)
 message("Found igraph for tests. Including ${igraph_INCLUDE_DIRS}, linking to ${igraph_LIBRARIES}")
@@ -108,6 +109,7 @@ add_library(header_test_sources
 		pylimer_tools/test_vector_utils.cpp
 )
 add_dependencies(header_test_sources igraph)
+add_dependencies(header_test_sources cerealLib)
 #add_dependencies(header_test_sources pylimer_tools)
 target_link_libraries(header_test_sources PUBLIC 
 	Catch2::Catch2
