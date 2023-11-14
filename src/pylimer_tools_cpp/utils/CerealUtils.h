@@ -129,11 +129,17 @@ CEREAL_SAVE_FUNCTION_NAME(Archive& ar, igraph_t const& graph)
   // after storing the edges, must also store the attributes
   // query them first
   igraph_strvector_t gnames;
+  igraph_strvector_init(&gnames, 1);
   igraph_vector_int_t gtypes;
+  igraph_vector_int_init(&gtypes, 1);
   igraph_strvector_t vnames;
+  igraph_strvector_init(&vnames, 1);
   igraph_vector_int_t vtypes;
+  igraph_vector_int_init(&vtypes, 1);
   igraph_strvector_t enames;
+  igraph_strvector_init(&enames, 1);
   igraph_vector_int_t etypes;
+  igraph_vector_int_init(&etypes, 1);
   igraph_cattribute_list(
     &graph, &gnames, &gtypes, &vnames, &vtypes, &enames, &etypes);
 
@@ -336,7 +342,7 @@ namespace utils {
   }
 
   template<typename T>
-  void deserializeFromFile(T &obj, std::string file)
+  void deserializeFromFile(T& obj, std::string file)
   {
     std::ifstream is(file);
     cereal::BinaryInputArchive iarchive(is);
