@@ -122,6 +122,28 @@ namespace calc {
     std::vector<size_t> msdOriginTimesteps;
     std::vector<double> runningAverages;
 
+    void prepareAllOutputs()
+    {
+      // output headers
+      std::ios::sync_with_stdio(false);
+      this->openFilesOutputHeader(this->outputConfigs);
+
+      // prepare averages
+      int numAverages = this->openFilesOutputHeader(this->outputAverageConfigs,
+                                                    "# OutputStep\t",
+                                                    this->outputConfigs.size());
+      RUNTIME_EXP_IFN(runningAverages.size() == numAverages, "");
+
+      // prepare autocorrelation
+      this->openFilesOutputHeader(this->outputAutoCorrelationConfigs,
+                                  "Step\t",
+                                  this->outputConfigs.size() +
+                                    this->outputAverageConfigs.size());
+      std::string autocorrelationOutputBuffer;
+      autocorrelationOutputBuffer.reserve(
+        this->outputAutoCorrelationConfigs.size() * 50);
+    }
+
     int openFilesOutputHeader(const std::vector<OutputConfiguration>& configs,
                               const std::string& prefix = "",
                               int streamIdx = 0);

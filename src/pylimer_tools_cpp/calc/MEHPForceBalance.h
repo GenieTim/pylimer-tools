@@ -6,6 +6,7 @@
 #include "../entities/NeighbourList.h"
 #include "../entities/Universe.h"
 #include "MEHPForceEvaluator.h"
+#include "OutputSupportingSimulation.h"
 #include "MEHPUtilityStructures.h"
 #include <Eigen/Dense>
 #include <algorithm>
@@ -54,8 +55,7 @@ namespace calc {
       ALL_MC_CYCLE
     };
 
-    // heavily inspired by Prof. Dr. Andrei Gusev's Code
-    class MEHPForceBalance
+    class MEHPForceBalance : public pylimer_tools::calc::OutputSupportingSimulation
     {
 
     public:
