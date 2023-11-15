@@ -297,7 +297,7 @@ TEST_CASE(
     auto stressTensor = forceRelaxer2.getStressTensor();
     CHECK(forceRelaxer2.getPressure() ==
           Catch::Approx(
-            (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) / 3.)
+            (stressTensor(0, 0) + stressTensor(1, 1) + stressTensor(2, 2)) / 3.)
             .epsilon(0.02));
     CHECK(forceRelaxer2.getResidualNorm() > 0.0);
     CHECK(forceRelaxer2.getForce() > 0.0);
@@ -447,7 +447,7 @@ TEST_CASE(
       CHECK(
         forceRelaxer2.getPressure() ==
         Catch::Approx(
-          (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) / 3.)
+          (stressTensor(0, 0) + stressTensor(1, 1) + stressTensor(2, 2)) / 3.)
           .epsilon(0.02));
       CHECK(forceRelaxer2.getPressure() * 79. ==
             Catch::Approx(0.1538073308)); // LJ Units [?]
@@ -593,7 +593,7 @@ TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
   CHECK(r[5] == Catch::Approx(-r[2]));
 
   // cleanup
-  delete[] (r);
+  delete[](r);
 }
 
 TEST_CASE("Free chains collapse",
@@ -705,14 +705,13 @@ TEST_CASE("Free chains collapse",
   REQUIRE(forceRelaxerLangevin.getResidualNorm() >=
           forceRelaxerSimpleSpring.getResidualNorm());
 
-  std::array<std::array<double, 3>, 3> stressTensorSimpleSpring =
+  Eigen::Matrix3d stressTensorSimpleSpring =
     forceRelaxerSimpleSpring.getStressTensor();
-  std::array<std::array<double, 3>, 3> stressTensorLangevin =
-    forceRelaxerLangevin.getStressTensor();
+  Eigen::Matrix3d stressTensorLangevin = forceRelaxerLangevin.getStressTensor();
   for (size_t i = 0; i < 3; ++i) {
     for (size_t j = 0; j < 3; ++j) {
-      CHECK(stressTensorLangevin[i][j] + 1e-5 ==
-            Catch::Approx(stressTensorSimpleSpring[i][j] + 1e-5).margin(5e-7));
+      CHECK(stressTensorLangevin(i, j) + 1e-5 ==
+            Catch::Approx(stressTensorSimpleSpring(i, j) + 1e-5).margin(5e-7));
     }
   }
 }

@@ -46,7 +46,7 @@ namespace calc {
       std::map<std::string, std::vector<long int>> edges = u.getEdges();
       this->bondPartnersA =
         Eigen::Map<Eigen::ArrayXli, Eigen::Unaligned>(edges["edge_from"].data(),
-                                               edges["edge_from"].size())
+                                                      edges["edge_from"].size())
           .cast<int>();
       this->bondPartnersB = Eigen::Map<Eigen::ArrayXli, Eigen::Unaligned>(
                               edges["edge_to"].data(), edges["edge_to"].size())
@@ -118,6 +118,11 @@ namespace calc {
 
       this->prepareAllOutputs();
 
+      pylimer_tools::utils::PerformanceTimer timer =
+        pylimer_tools::utils::PerformanceTimer<5>();
+      timer.registerSections(
+        { "Time-stepping", "Forces", "Output", "Shift", "Relocation" });
+
       // start iterating over the steps to do
       long int step = 0;
       for (; step < nSteps; step++) {
@@ -188,7 +193,7 @@ namespace calc {
       if (wasInterrupted) {
         cleanupInterrupt();
       }
-      
+
       timer.stop();
       timer.output();
     }
@@ -465,10 +470,12 @@ namespace calc {
       this->bondTypes.conservativeResize(sizeBefore + partnerB.size());
 
       this->bondPartnersA.segment(sizeBefore, partnerA.size()) =
-        Eigen::Map<Eigen::ArrayXst, Eigen::Unaligned>(partnerA.data(), partnerA.size())
+        Eigen::Map<Eigen::ArrayXst, Eigen::Unaligned>(partnerA.data(),
+                                                      partnerA.size())
           .cast<int>();
       this->bondPartnersB.segment(sizeBefore, partnerB.size()) =
-        Eigen::Map<Eigen::ArrayXst, Eigen::Unaligned>(partnerB.data(), partnerB.size())
+        Eigen::Map<Eigen::ArrayXst, Eigen::Unaligned>(partnerB.data(),
+                                                      partnerB.size())
           .cast<int>();
       this->bondTypes.segment(sizeBefore, partnerB.size()) = bondType;
 

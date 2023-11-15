@@ -340,7 +340,7 @@ namespace calc {
                                     const size_t partnerBefore,
                                     const size_t partnerAfter);
 
-      void writeRestartFile(std::string filename) override
+      void writeRestartFile(std::string &filename) override
       {
         pylimer_tools::utils::serializeToFile<DPDSimulator>(
           *this, filename);

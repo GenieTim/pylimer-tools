@@ -27,7 +27,7 @@ namespace calc {
     {
 
     public:
-      MEHPForceRelaxation(const pylimer_tools::entities::Universe &u,
+      MEHPForceRelaxation(const pylimer_tools::entities::Universe& u,
                           int crosslinkerType = 2,
                           bool is2D = false,
                           MEHPForceEvaluator* forceEvaluator = nullptr,
@@ -95,7 +95,7 @@ namespace calc {
 
       double getDefaultR0Square() const { return this->defaultR0Squared; }
 
-      double getVolume() const { return this->initialConfig.vol; }
+      double getVolume() override { return this->initialConfig.vol; }
 
       int getNrOfNodes() const { return this->initialConfig.nrOfNodes; }
 
@@ -229,8 +229,6 @@ namespace calc {
        */
       double getAverageSpringLength() const;
 
-      std::array<std::array<double, 3>, 3> getStressTensor() const;
-
       /**
        * @brief Get the Pressure
        *
@@ -318,6 +316,63 @@ namespace calc {
       static Eigen::VectorXd evaluateSpringDistances(const Network* net,
                                                      const Eigen::VectorXd& u,
                                                      const bool is2D);
+
+      Eigen::Matrix3d getStressTensor() override
+      {
+        std::array<std::array<double, 3>, 3> stressTensor =
+          this->evaluateStressTensor(this->currentSpringDistances,
+                                     this->getVolume());
+        Eigen::Matrix3d result = Eigen::Matrix3d::Zero();
+        for (size_t i = 0; i < 3; ++i) {
+          for (size_t j = 0; j < 3; ++j) {
+            result(i, j) = stressTensor[i][j];
+          }
+        }
+        return result;
+      }
+
+      double getTimestep() override { return this->dt; }
+
+      double getCurrentTime(double currentStep) override
+      {
+        return this->dt * currentStep;
+      }
+
+      void writeRestartFile(std::string& filename) override
+      {
+        throw std::runtime_error("No restarts allowed here, yet");
+      }
+
+      int getNumShifts() override { return 0; }
+      int getNumRelocations() override { return 0; }
+
+      Eigen::VectorXd getBondLengths() override
+      {
+        Eigen::VectorXd lens =
+          Eigen::VectorXd::Zero(this->currentSpringDistances.size() / 3);
+
+        for (size_t i = 0; i < this->currentSpringDistances.size() / 3; ++i) {
+          double b = lens.segment(3 * i, 3).norm();
+          lens[i] = b;
+        }
+
+        return lens;
+      }
+
+      Eigen::VectorXd getCoordinates() override
+      {
+        return this->initialConfig.coordinates + this->currentDisplacements;
+      }
+
+      double getTemperature() override
+      {
+        return -1; // TODO: implement?
+      }
+
+      size_t getNumParticles() override
+      {
+        return this->initialConfig.nrOfNodes;
+      }
 
     protected:
       /**
@@ -766,6 +821,7 @@ namespace calc {
       Eigen::VectorXd currentForces;
       int crosslinkerType;
       int nrOfStepsDone = 0;
+      double dt = 1;
       ExitReason exitReason = ExitReason::UNSET;
     };
   } // namespace mehp
