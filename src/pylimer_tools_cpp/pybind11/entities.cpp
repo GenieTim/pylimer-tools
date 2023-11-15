@@ -8,6 +8,8 @@
 #include "../entities/Universe.h"
 #include "../entities/UniverseSequence.h"
 
+#include "../utils/CerealUtils.h"
+
 #include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -89,7 +91,9 @@ init_pylimer_bound_entities(py::module_& m)
                                    b.getLowZ(),
                                    b.getHighX(),
                                    b.getHighY(),
-                                   b.getHighZ());
+                                   b.getHighZ(),
+                                   b.getShearMagnitude(),
+                                   b.getShearDirection());
            },
            [](py::tuple t) { // __setstate__
              if (t.size() != 6) {
@@ -103,6 +107,9 @@ init_pylimer_bound_entities(py::module_& m)
                          t[3].cast<double>(),
                          t[4].cast<double>(),
                          t[5].cast<double>());
+             if (t.size() > 6) {
+               b.applySimpleShear(t[6].cast<double>(), t[7].cast<int>());
+             }
 
              return b;
            }),
@@ -481,8 +488,9 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("from"),
          py::arg("to"))
     .def("addBondsWithTypes",
-         py::overload_cast<std::vector<long int>, std::vector<long int>, std::vector<int>>(
-           &Universe::addBonds),
+         py::overload_cast<std::vector<long int>,
+                           std::vector<long int>,
+                           std::vector<int>>(&Universe::addBonds),
          "Add bonds to the underlying atoms, edges to the underlying graph. "
          "If the connected atoms are not found, the bonds are silently "
          "skipped.",
@@ -506,7 +514,8 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("types"))
     .def("addDihedralAngles",
          &Universe::addDihedralAngles,
-         "Add dihedral angles to the Universe. No relation to the underlying graph, "
+         "Add dihedral angles to the Universe. No relation to the underlying "
+         "graph, "
          "just a method to preserve read & write capabilities",
          py::arg("from"),
          py::arg("via1"),
@@ -552,14 +561,14 @@ init_pylimer_bound_entities(py::module_& m)
             )pbdoc",
          py::arg("box"),
          py::arg("rescaleAtoms") = false)
-     .def("setVertexProperty", &Universe::setPropertyValue<double>,
-     R"pbdoc(
+    .def("setVertexProperty",
+         &Universe::setPropertyValue<double>,
+         R"pbdoc(
             Set a specific property for a specific vertex.
             )pbdoc",
          py::arg("vertexId"),
          py::arg("propertyName"),
-         py::arg("value")
-     )
+         py::arg("value"))
     // getters
     .def("getClusters", &Universe::getClusters, R"pbdoc(
             Get the components of the universe that are not connected to each other.
@@ -870,6 +879,16 @@ init_pylimer_bound_entities(py::module_& m)
          &Universe::simplify,
          "Remove self links and double bonds. This function is called "
          "automatically after adding bonds.")
+    .def(py::pickle(
+      [](const Universe& u) {
+        return py::make_tuple(pylimer_tools::utils::serializeToString(u));
+      },
+      [](py::tuple t) {
+        std::string in = t[0].cast<std::string>();
+        Universe u;
+        pylimer_tools::utils::deserializeFromString(u, in);
+        return u;
+      }))
     .def("__copy__",
          [](const Universe& universe) { return Universe(universe); });
 

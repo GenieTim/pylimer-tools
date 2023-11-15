@@ -337,6 +337,23 @@ namespace pylimer_tools {
 namespace utils {
 
   template<typename T>
+  std::string serializeToString(T obj)
+  {
+    std::stringstream os;
+    cereal::BinaryOutputArchive oarchive(os);
+    oarchive(obj);
+    return os.str();
+  }
+
+  template<typename T>
+  void deserializeFromString(T& obj, std::string& in)
+  {
+    std::stringstream is(in);
+    cereal::BinaryInputArchive iarchive(is);
+    iarchive(obj);
+  }
+
+  template<typename T>
   void serializeToFile(T obj, std::string file)
   {
     std::ofstream os(file);
