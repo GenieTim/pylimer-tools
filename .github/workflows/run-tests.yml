@@ -21,7 +21,11 @@ jobs:
           path: |
             ./_skbuild
             ./vendor/igraph
+            ./vendor/igraph-skbuild
             ./vendor/nlopt
+            ./vendor/nlopt-skbuild
+            ./vendor/cereal
+            ./vendor/cereal-skbuild
             ./tests/build
           key: ${{ runner.os }}-py-3.10.6-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
