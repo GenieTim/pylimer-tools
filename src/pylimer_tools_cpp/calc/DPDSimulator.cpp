@@ -112,35 +112,10 @@ namespace calc {
     {
       bool wasInterrupted = false;
 
-      // output headers
-      std::ios::sync_with_stdio(false);
-      this->openFilesOutputHeader(this->outputConfigs);
-      std::string outputBuffer;
-      outputBuffer.reserve(this->outputConfigs.size() * 50);
-
-      // prepare averages
-      bool doAverage = this->outputAverageConfigs.size() > 0;
-      int numAverages = this->openFilesOutputHeader(this->outputAverageConfigs,
-                                                    "# OutputStep\t",
-                                                    this->outputConfigs.size());
-      std::string averagesOutputBuffer;
-      averagesOutputBuffer.reserve(this->outputAverageConfigs.size() * 50);
-
-      std::vector<double> runningAverages =
-        pylimer_tools::utils::initializeWithValue<double>(numAverages, 0.);
-      RUNTIME_EXP_IFN(runningAverages.size() == numAverages, "");
-
-      // prepare autocorrelation
-      int numAutocorrelations = this->openFilesOutputHeader(
-        this->outputAutoCorrelationConfigs,
-        "Step\t",
-        this->outputConfigs.size() + this->outputAverageConfigs.size());
-      std::string autocorrelationOutputBuffer;
-      autocorrelationOutputBuffer.reserve(
-        this->outputAutoCorrelationConfigs.size() * 50);
-
-      const double halfDt = 0.5 * dt;
+      const double halfDt = 0.5 * this->dt;
       double temperature = this->computeTemperature(this->currentVelocities);
+
+      this->prepareAllOutputs();
 
       // start iterating over the steps to do
       long int step = 0;
@@ -157,7 +132,7 @@ namespace calc {
           this->currentVelocities + halfDt * this->currentForces;
         this->coordinates += dt * this->currentVelocitiesPlus;
         this->neighbourlist.resetCoordinates(this->coordinates);
-        this->currentVelocities += lambda * dt * this->currentForces;
+        this->currentVelocities += lambda * this->dt * this->currentForces;
 
         // TODO: figure out, what the issue is, how the velocities
         // should be synchronized for the pressure
@@ -168,7 +143,7 @@ namespace calc {
                                         this->currentStressTensor,
                                         this->coordinates,
                                         this->currentVelocities,
-                                        dt,
+                                        this->dt,
                                         1.0);
 
         // correct the velocities
@@ -205,7 +180,7 @@ namespace calc {
 
         // output
         this->currentStep += 1;
-        this->currentTime += dt;
+        this->currentTime += this->dt;
         this->handleOutput(this->currentStep);
 
         // allow Ctrl+C etc., without locking too much

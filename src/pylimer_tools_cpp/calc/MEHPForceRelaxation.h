@@ -6,6 +6,7 @@
 #include "../entities/Universe.h"
 #include "MEHPForceEvaluator.h"
 #include "MEHPUtilityStructures.h"
+#include "OutputSupportingSimulation.h"
 #include <Eigen/Dense>
 #include <algorithm>
 #include <array>
@@ -21,12 +22,12 @@
 namespace pylimer_tools {
 namespace calc {
   namespace mehp {
-    // heavily inspired by Prof. Dr. Andrei Gusev's Code
     class MEHPForceRelaxation
+      : public pylimer_tools::calc::OutputSupportingSimulation
     {
 
     public:
-      MEHPForceRelaxation(const pylimer_tools::entities::Universe u,
+      MEHPForceRelaxation(const pylimer_tools::entities::Universe &u,
                           int crosslinkerType = 2,
                           bool is2D = false,
                           MEHPForceEvaluator* forceEvaluator = nullptr,
@@ -46,10 +47,17 @@ namespace calc {
           universe.getMolecules(this->crosslinkerType).size();
         // interpret network already to be able to give early results
         Network net;
-        ConvertNetwork(&net, crosslinkerType, remove2functionalCrosslinkers, removeDanglingChains);
+        ConvertNetwork(&net,
+                       crosslinkerType,
+                       remove2functionalCrosslinkers,
+                       removeDanglingChains);
         this->initialConfig = net;
         this->is2D = is2D;
         this->currentDisplacements =
+          Eigen::VectorXd::Zero(net.coordinates.size());
+        this->currentForces = Eigen::VectorXd::Zero(net.coordinates.size());
+        this->currentVelocities = Eigen::VectorXd::Zero(net.coordinates.size());
+        this->currentVelocitiesPlus =
           Eigen::VectorXd::Zero(net.coordinates.size());
         this->currentSpringDistances =
           this->evaluateSpringDistances(&net, this->currentDisplacements, is2D);
@@ -69,7 +77,11 @@ namespace calc {
                               double xtol = 1e-12,
                               double ftol = 1e-9);
 
-      void runPhantomSteps(const long int nrOfSteps = 50000, const double dt = 0.01, const double kappa = 1., const double T = 1., const double gamma = 0.1);
+      void runPhantomSteps(const long int nrOfSteps = 50000,
+                           const double dt = 0.01,
+                           const double kappa = 1.,
+                           const double T = 1.,
+                           const double gamma = 0.1);
 
       /**
        * @brief Get the universe consisting of cross-linkers only
@@ -749,6 +761,9 @@ namespace calc {
       Network initialConfig;
       Eigen::VectorXd currentDisplacements;
       Eigen::VectorXd currentSpringDistances;
+      Eigen::VectorXd currentVelocities;
+      Eigen::VectorXd currentVelocitiesPlus;
+      Eigen::VectorXd currentForces;
       int crosslinkerType;
       int nrOfStepsDone = 0;
       ExitReason exitReason = ExitReason::UNSET;

@@ -123,26 +123,30 @@ namespace calc {
       std::normal_distribution<double> distribution(0., 1.);
       auto gaussian = [&](double) { return distribution(generator); };
 
+      this->prepareAllOutputs();
+
       // initialise other data structures
-      Eigen::VectorXd u = this->currentDisplacements;
-      Eigen::VectorXd f =
-        Eigen::VectorXd::Zero(3 * this->initialConfig.nrOfNodes);
-      Eigen::VectorXd v =
-        Eigen::VectorXd::Zero(3 * this->initialConfig.nrOfNodes);
       for (long int step = 0; step < nrOfSteps; ++step) {
         // compute spring forces
         double force = this->forceEvaluator->evaluateForceSetGradient(
-          this->initialConfig.nrOfNodes * 3, u, f.data(), nullptr);
+          this->initialConfig.nrOfNodes * 3,
+          this->currentDisplacements,
+          this->currentForces.data(),
+          nullptr);
         // add Langevin thermo
-        f += -gamma * v + sqrt(2. * gamma * T / dt) *
-                            Eigen::VectorXd::NullaryExpr(f.size(), gaussian);
-        v += 0.5 * f * dt;
+        this->currentForces +=
+          -gamma * this->currentVelocities +
+          sqrt(2. * gamma * T / dt) *
+            Eigen::VectorXd::NullaryExpr(this->currentForces.size(), gaussian);
+        this->currentVelocities += 0.5 * this->currentForces * dt;
 
         // apply deformation
-        v += 0.5 * f * dt;
-        u += v * dt + 0.5 * f * dt * dt;
+        this->currentVelocities += 0.5 * this->currentForces * dt;
+        this->currentDisplacements +=
+          this->currentVelocities * dt + 0.5 * this->currentForces * dt * dt;
 
         // output things
+        this->handleOutput(this->currentStep);
       }
 
       // store final state, potentially
