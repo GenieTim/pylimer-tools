@@ -24,6 +24,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.DPDSimulator
       ~DPDSimulator.configLambda
       ~DPDSimulator.configNumStepsDPD
       ~DPDSimulator.configNumStepsMC
+      ~DPDSimulator.configRestartOutput
       ~DPDSimulator.configShiftOneAtATime
       ~DPDSimulator.configShiftPossibilityEmpty
       ~DPDSimulator.configSigma
@@ -35,6 +36,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.DPDSimulator
       ~DPDSimulator.getTemperature
       ~DPDSimulator.getTimestep
       ~DPDSimulator.getUniverse
+      ~DPDSimulator.readRestartFile
       ~DPDSimulator.runSimulation
       ~DPDSimulator.startMeasuringMSDForAtoms
       ~DPDSimulator.validateNeighbourList
