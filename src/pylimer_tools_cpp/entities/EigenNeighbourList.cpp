@@ -18,10 +18,16 @@ extern "C"
 
 namespace pylimer_tools {
 namespace entities {
-
   EigenNeighbourList::EigenNeighbourList(const Eigen::VectorXd& coordinates,
                                          const Box box,
                                          double cutoff)
+  {
+    this->initialize(coordinates, box, cutoff);
+  }
+
+  void EigenNeighbourList::initialize(const Eigen::VectorXd& coordinates,
+                                 const Box box,
+                                 double cutoff)
   {
     INVALIDARG_EXP_IFN(cutoff > 1e-3, "Cutoff must be larger than zero");
     INVALIDARG_EXP_IFN(coordinates.size() % 3 == 0,
@@ -132,10 +138,12 @@ namespace entities {
     if (newCutoff <= 0.) {
       newCutoff = this->cutoff;
     }
-    Array3li baseTriplet = this->getBucketTripletForCoordinates(sourceCoords);
+    Eigen::Array3li baseTriplet =
+      this->getBucketTripletForCoordinates(sourceCoords);
     int baseBucketIndex = this->getBucketIndexForTriplet(baseTriplet);
 
-    Array3li targetTriplet = this->getBucketTripletForCoordinates(targetCoords);
+    Eigen::Array3li targetTriplet =
+      this->getBucketTripletForCoordinates(targetCoords);
     int targetBucketIndex = this->getBucketIndexForTriplet(targetTriplet);
 
     bool foundSource = false;
@@ -152,11 +160,11 @@ namespace entities {
         std::cerr << "Used default neighbour cutoff's list" << std::endl;
       }
     } else {
-      Array3li maxIndices = this->getBucketTripletForCoordinates(
+      Eigen::Array3li maxIndices = this->getBucketTripletForCoordinates(
         sourceCoords + Eigen::Vector3d::Constant(newCutoff));
-      Array3li minIndices = this->getBucketTripletForCoordinates(
+      Eigen::Array3li minIndices = this->getBucketTripletForCoordinates(
         sourceCoords - Eigen::Vector3d::Constant(newCutoff));
-      Array3li indexTriplet;
+      Eigen::Array3li indexTriplet;
       // now, do permutations of all these
       for (long int i = minIndices[0]; i <= maxIndices[0]; ++i) {
         for (long int j = minIndices[1]; j <= maxIndices[1]; ++j) {
@@ -227,8 +235,8 @@ namespace entities {
 
   /**
    * @brief Get the number of coordinates actually stored/binned
-   * 
-   * @return long int 
+   *
+   * @return long int
    */
   long int EigenNeighbourList::getNumBinnedCoordinates() const
   {
@@ -294,9 +302,9 @@ namespace entities {
       // TODO: this is more or less identical to
       // EigenNeighbourList::getCombinedIndicesForCoordinates
       // with some minor additions here and there
-      Array3li maxIndices = this->getBucketTripletForCoordinates(
+      Eigen::Array3li maxIndices = this->getBucketTripletForCoordinates(
         coordinates + Eigen::Vector3d::Constant(upperCutoff));
-      Array3li minIndices = this->getBucketTripletForCoordinates(
+      Eigen::Array3li minIndices = this->getBucketTripletForCoordinates(
         coordinates - Eigen::Vector3d::Constant(upperCutoff));
 
       if (result.size() < 12) {
@@ -306,7 +314,7 @@ namespace entities {
 
       // use a set to avoid returning duplicates
       std::set<bucket_idx_t> buckets;
-      Array3li indexTriplet;
+      Eigen::Array3li indexTriplet;
       // now, do permutations of all these
       assert(minIndices[0] <= maxIndices[0]);
       assert(minIndices[1] <= maxIndices[1]);
@@ -362,12 +370,13 @@ namespace entities {
   Eigen::Vector3d EigenNeighbourList::getCentralCoordinatesOfBucket(
     int bucketIndex)
   {
-    Array3li coeffs = this->tripletFromIndex(bucketIndex);
+    Eigen::Array3li coeffs = this->tripletFromIndex(bucketIndex);
     Eigen::Vector3d results = coeffs.cast<double>() * this->bucketWidths +
                               0.5 * this->bucketWidths + this->box.getLowL();
 
 #ifndef NDEBUG
-    Array3li verifyCoeffs = this->getBucketTripletForCoordinates(results);
+    Eigen::Array3li verifyCoeffs =
+      this->getBucketTripletForCoordinates(results);
     this->normalizeTriplet(verifyCoeffs);
     int verifyBucketIdx = this->getBucketIndexForTriplet(coeffs);
     assert(verifyBucketIdx == bucketIndex);
@@ -381,15 +390,16 @@ namespace entities {
     const Eigen::Vector3d& coordinates,
     double newCutoff) const
   {
-    Array3li indexBasis = this->getBucketTripletForCoordinates(coordinates);
-    Array3li maxIndices = this->getBucketTripletForCoordinates(
+    Eigen::Array3li indexBasis =
+      this->getBucketTripletForCoordinates(coordinates);
+    Eigen::Array3li maxIndices = this->getBucketTripletForCoordinates(
       coordinates + Eigen::Vector3d::Constant(newCutoff));
-    Array3li minIndices = this->getBucketTripletForCoordinates(
+    Eigen::Array3li minIndices = this->getBucketTripletForCoordinates(
       coordinates - Eigen::Vector3d::Constant(newCutoff));
 
     // use a set to avoid returning duplicates
     std::set<bucket_idx_t> result;
-    Array3li indexTriplet;
+    Eigen::Array3li indexTriplet;
     // now, do permutations of all these
     for (int i = minIndices[0]; i <= maxIndices[0]; ++i) {
       indexTriplet[0] = i;
@@ -424,13 +434,13 @@ namespace entities {
     return static_cast<bucket_idx_t>(bucketIndex);
   }
 
-  void EigenNeighbourList::normalizeTriplet(Array3li& triplet) const
+  void EigenNeighbourList::normalizeTriplet(Eigen::Array3li& triplet) const
   {
     triplet = (triplet - (triplet / this->nrOfBuckets) * this->nrOfBuckets);
     triplet += this->nrOfBuckets * (triplet < 0).cast<long int>();
   }
 
-  Array3li EigenNeighbourList::tripletFromIndex(bucket_idx_t index) const
+  Eigen::Array3li EigenNeighbourList::tripletFromIndex(bucket_idx_t index) const
   {
     bucket_idx_t bucketIndexZ =
       std::floor(index / (this->nrOfBuckets[0] * this->nrOfBuckets[1]));
@@ -440,10 +450,11 @@ namespace entities {
     bucket_idx_t bucketIndexX =
       index - bucketIndexZ * (this->nrOfBuckets[0] * this->nrOfBuckets[1]) -
       bucketIndexY * this->nrOfBuckets[0];
-    return Array3li(bucketIndexX, bucketIndexY, bucketIndexZ);
+    return Eigen::Array3li(bucketIndexX, bucketIndexY, bucketIndexZ);
   }
 
-  bucket_idx_t EigenNeighbourList::getBucketIndexForTriplet(Array3li ind) const
+  bucket_idx_t EigenNeighbourList::getBucketIndexForTriplet(
+    Eigen::Array3li ind) const
   {
     this->normalizeTriplet(ind);
     return ind[0] + ind[1] * this->nrOfBuckets[0] +
@@ -458,7 +469,7 @@ namespace entities {
     //        bucketIndexZ * this->nrOfBuckets[0] * this->nrOfBuckets[1];
   }
 
-  Array3li EigenNeighbourList::getBucketTripletForCoordinates(
+  Eigen::Array3li EigenNeighbourList::getBucketTripletForCoordinates(
     const Eigen::Vector3d& coordinates) const
   {
     return ((coordinates.array() + this->box.getLowL()) / this->bucketWidths)

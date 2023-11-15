@@ -36,8 +36,9 @@ namespace utils {
     return false;
   }
 
-  template <typename T>
-  static inline T max_element(std::vector<T>& vec, const T defaultMax) {
+  template<typename T>
+  static inline T max_element(std::vector<T>& vec, const T defaultMax)
+  {
     if (vec.size() == 0) {
       return defaultMax;
     }
@@ -187,62 +188,56 @@ namespace utils {
     }
   }
 
-  template<typename IN1>
-  static inline void StdVectorToIgraphVectorT(IN1& vectR, igraph_vector_t* v)
+#define MAKE_CONVERSION_FROM_STD_VEC_TO_IGRAPH(IGRAPH_VEC)                     \
+  template<typename IN1>                                                       \
+  static inline void StdVectorToIgraphVectorT(IN1& vectR, IGRAPH_VEC##_t* v)   \
+  {                                                                            \
+    size_t n = vectR.size();                                                   \
+                                                                               \
+    /* Make sure that there is enough space for the items in v */              \
+    IGRAPH_VEC##_resize(v, n);                                                 \
+                                                                               \
+    /* Copy all the items */                                                   \
+    for (size_t i = 0; i < n; ++i) {                                           \
+      IGRAPH_VEC##_set(v, i, vectR[i]);                                        \
+    }                                                                          \
+  }
+
+  MAKE_CONVERSION_FROM_STD_VEC_TO_IGRAPH(igraph_vector);
+  MAKE_CONVERSION_FROM_STD_VEC_TO_IGRAPH(igraph_vector_int);
+
+  static inline void StdVectorToIgraphVectorT(std::vector<std::string>& vectR,
+                                              igraph_strvector_t* v)
   {
     size_t n = vectR.size();
-
-    /* Make sure that there is enough space for the items in v */
-    igraph_vector_resize(v, n);
-
-    /* Copy all the items */
+    igraph_strvector_resize(v, n);
     for (size_t i = 0; i < n; ++i) {
-      igraph_vector_set(v, i, vectR[i]);
+      igraph_strvector_set(v, i, vectR[i].c_str());
     }
   }
 
-  template<typename IN1>
-  static inline void StdVectorToIgraphVectorT(IN1& vectR,
-                                              igraph_vector_int_t* v)
-  {
-    size_t n = vectR.size();
+  // MAKE_CONVERSION_FROM_STD_VEC_TO_IGRAPH(igraph_strvector);
 
-    /* Make sure that there is enough space for the items in v */
-    igraph_vector_int_resize(v, n);
-
-    /* Copy all the items */
-    for (size_t i = 0; i < n; ++i) {
-      igraph_vector_int_set(v, i, vectR[i]);
-    }
+#define MAKE_CONVERSION_FROM_IGRAPH_VEC_TO_STD(IGRAPH_VEC)                     \
+  template<typename IN>                                                        \
+  static inline void igraphVectorTToStdVector(IGRAPH_VEC##_t* v,               \
+                                              std::vector<IN>& vectL)          \
+  {                                                                            \
+    long n = IGRAPH_VEC##_size(v);                                             \
+                                                                               \
+    /* Make sure that there is enough space for the items in v */              \
+    vectL.clear();                                                             \
+    vectL.reserve(n);                                                          \
+                                                                               \
+    /* Copy all the items */                                                   \
+    for (size_t i = 0; i < n; ++i) {                                           \
+      vectL.push_back(IGRAPH_VEC##_get(v, i));                                 \
+    }                                                                          \
   }
 
-  template<typename IN>
-  static inline void igraphVectorTToStdVector(igraph_vector_t* v,
-                                              std::vector<IN>& vectL)
-  {
-    long n = igraph_vector_size(v);
-
-    vectL.clear();
-    vectL.reserve(n);
-
-    for (long i = 0; i < n; ++i) {
-      vectL.push_back(igraph_vector_get(v, i));
-    }
-  }
-
-  template<typename IN>
-  static inline void igraphVectorTToStdVector(igraph_vector_int_t* v,
-                                              std::vector<IN>& vectL)
-  {
-    long n = igraph_vector_int_size(v);
-
-    vectL.clear();
-    vectL.reserve(n);
-
-    for (long i = 0; i < n; ++i) {
-      vectL.push_back(igraph_vector_int_get(v, i));
-    }
-  }
+  MAKE_CONVERSION_FROM_IGRAPH_VEC_TO_STD(igraph_vector);
+  MAKE_CONVERSION_FROM_IGRAPH_VEC_TO_STD(igraph_vector_int);
+  MAKE_CONVERSION_FROM_IGRAPH_VEC_TO_STD(igraph_strvector);
 
   template<typename IN>
   static inline std::vector<IN> initializeWithValue(size_t n, IN value)

@@ -5,6 +5,7 @@ extern "C"
 {
 #include <igraph/igraph.h>
 }
+#include "../utils/CerealUtils.h"
 #include "../utils/GraphUtils.h"
 #include "../utils/StringUtils.h"
 #include "Atom.h"
@@ -439,6 +440,12 @@ namespace entities {
     }
 
     void writeGraphToFile(const std::string& filename) const;
+
+    template<class Archive>
+    void serialize(Archive& ar)
+    {
+      ar(graph);
+    }
 
   protected:
     igraph_t graph;

@@ -58,8 +58,9 @@ message("Using toolchain file ${CMAKE_TOOLCHAIN_FILE}")
 
 # add sources & targets
 add_subdirectory(src/pylimer_tools_cpp)
-add_dependencies(pylimer_tools igraphLib)
+add_dependencies(pylimer_tools igraph)
 add_dependencies(pylimer_tools nlopt)
+add_dependencies(pylimer_tools cerealLib)
 
 pybind11_add_module(pylimer_tools_cpp MODULE 
   src/pylimer_tools_cpp/pybind11/entities.cpp
@@ -73,8 +74,9 @@ pybind11_add_module(pylimer_tools_cpp MODULE
 # add other dependencies
 include_directories(${igraph_INCLUDE_DIRS})
 include_directories(${nlopt_INCLUDE_DIRS})
+include_directories(${cereal_INCLUDE_DIRS})
 
-message("pylimer_tools_cpp includes igraph from ${igraph_INCLUDE_DIRS}")
+message("pylimer_tools_cpp includes igraph from ${igraph_INCLUDE_DIRS}, nlopt from ${nlopt_INCLUDE_DIRS} and cereal from ${cereal_INCLUDE_DIRS}")
 
 # link
 target_link_libraries(pylimer_tools_cpp 

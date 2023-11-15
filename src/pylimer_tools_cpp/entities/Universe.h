@@ -5,10 +5,15 @@ extern "C"
 {
 #include <igraph/igraph.h>
 }
+#include "../utils/CerealUtils.h"
 #include "Atom.h"
 #include "AtomGraphParent.h"
 #include "Molecule.h"
 #include <Eigen/Dense>
+#include <cereal/types/base_class.hpp>
+#include <cereal/types/map.hpp>
+#include <cereal/types/polymorphic.hpp>
+#include <cereal/types/unordered_map.hpp>
 #include <map>
 #include <unordered_map>
 #include <vector>
@@ -28,7 +33,7 @@ namespace entities {
   class Universe : public AtomGraphParent
   {
   public:
-    Universe(const double Lx, const double Ly, const double Lz);
+    Universe(const double Lx = 1., const double Ly = 1., const double Lz = 1.);
     Universe(Box box);
 
     // rule of three:
@@ -191,6 +196,32 @@ namespace entities {
     double computePolydispersityIndex(int crosslinkerType) const;
     bool validate();
 
+    template<class Archive>
+    void serialize(Archive& archive)
+    {
+      archive(cereal::virtual_base_class<AtomGraphParent>(this),
+              // properties
+              timestep,
+              NAtoms,
+              NBonds,
+              box,
+              // connectivity
+              atomIdToVertexIdx,
+              // angles etc.
+              angleFrom,
+              angleTo,
+              angleVia,
+              angleType,
+              // dihedral angles etc.
+              dihedralAngleFrom,
+              dihedralAngleTo,
+              dihedralAngleVia1,
+              dihedralAngleVia2,
+              dihedralAngleType,
+              // type's properties
+              massPerType);
+    }
+
   protected:
     // properties of the universe
     long int timestep;
@@ -230,5 +261,9 @@ namespace entities {
   };
 } // namespace entities
 } // namespace pylimer_tools
+
+CEREAL_REGISTER_TYPE(pylimer_tools::entities::Universe);
+CEREAL_REGISTER_POLYMORPHIC_RELATION(pylimer_tools::entities::AtomGraphParent,
+                                     pylimer_tools::entities::Universe);
 
 #endif

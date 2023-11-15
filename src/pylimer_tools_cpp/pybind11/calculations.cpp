@@ -1243,7 +1243,7 @@ init_pylimer_bound_calc(py::module_& m)
     .def(
       "runSimulation",
       [](dpd::DPDSimulator& sim, int nSteps, double dt, bool withMC) {
-          sim.configTimeStep(dt);
+        sim.configTimeStep(dt);
         return sim.runSimulation(
           nSteps,
           withMC,
@@ -1296,6 +1296,23 @@ init_pylimer_bound_calc(py::module_& m)
           Configure the higher cut-off of how far a pair may be distanced for a slip-spring to be created.
      )pbdoc",
          py::arg("cutoff") = 0.5)
+    .def_static("readRestartFile",
+                &dpd::DPDSimulator::readRestartFile,
+                R"pbdoc(
+          Read a restart file in order to continue a simulation.
+     )pbdoc",
+                py::arg("file"))
+    .def("configRestartOutput",
+         &dpd::DPDSimulator::configRestartOutput,
+         R"pbdoc(
+          Set when to output a restart where.
+
+          Arguments:
+               - file: the file path to the restart file to write
+               - outputEvery: how often to output the restart file
+     )pbdoc",
+         py::arg("file"),
+         py::arg("outputEvery") = 50000)
     .def("configAverageOutput",
          &dpd::DPDSimulator::configAverageOutput,
          R"pbdoc(

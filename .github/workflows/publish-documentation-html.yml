@@ -12,17 +12,22 @@ jobs:
 
     name: Build & Publish Documentation to GitHub Pages
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: "3.10.6"
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: |
             ~/.cache/pip
             ./_skbuild
             ./vendor/igraph
+            ./vendor/igraph-skbuild
+            ./vendor/nlopt
+            ./vendor/nlopt-skbuild
+            ./vendor/cereal
+            ./vendor/cereal-skbuild
           key: ${{ runner.os }}-pip-3.10.6-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-3.10.6-
