@@ -20,7 +20,7 @@ except ImportError:
     raise
 
 
-cmake_args = ["-DCMAKE_BUILD_TYPE=RelWithDebInfo", "-Dvendor_suffix=skbuild"]
+cmake_args = ["-DCMAKE_BUILD_TYPE=RelWithDebInfo", "-Dvendor_suffix=-skbuild"]
 # cmake_args = ["-Digraph_DEBUG=ON", "-DCMAKE_FIND_DEBUG_MODE=ON"]
 
 if (os.getenv('VCPKG_ROOT')):
@@ -40,9 +40,11 @@ if (os.getenv('VCPKG_ROOT')):
 # as the two build directories of vendor do not interact well.
 vendorFilesToDelete = [
     os.path.abspath(os.path.join(
-        os.path.dirname(__file__), 'vendor/igraph/src/igraphLib-build')),
+        os.path.dirname(__file__), 'vendor/igraph-skbuild/src/igraphLib-build')),
     os.path.abspath(os.path.join(
-        os.path.dirname(__file__), 'vendor/nlopt/src/nloptLib-build'))
+        os.path.dirname(__file__), 'vendor/nlopt-skbuild/src/nloptLib-build')),
+    os.path.abspath(os.path.join(
+        os.path.dirname(__file__), 'vendor/cereal-skbuild/src/cerealLib-build'))
 ]
 for vendorFile in vendorFilesToDelete:
     if (os.path.exists(vendorFile)):
