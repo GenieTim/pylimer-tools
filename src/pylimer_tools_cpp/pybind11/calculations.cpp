@@ -712,13 +712,13 @@ init_pylimer_bound_calc(py::module_& m)
          R"pbdoc()pbdoc",
          py::arg("maxLoopLength") = -1)
     .def("getStressTensor",
-         &mehp::MEHPForceBalance::getStressTensor,
+         &mehp::MEHPForceBalance::getStressTensorArray,
          R"pbdoc(
           Returns the stress tensor at the current state of the simulation.
      )pbdoc",
          py::arg("oneOverSpringPartitionUpperLimit") = 1.)
     .def("getStressTensorLinkBased",
-         &mehp::MEHPForceBalance::getStressTensorLinkBased,
+         &mehp::MEHPForceBalance::getStressTensorArrayLinkBased,
          R"pbdoc(
           Returns the stress tensor at the current state of the simulation.
      )pbdoc",
@@ -1307,9 +1307,17 @@ init_pylimer_bound_calc(py::module_& m)
          R"pbdoc(
           Set when to output a restart where.
 
+          Note:
+               The filename determines the type of serialisation: 
+               .json, .xml are supported; other file endings will lead to binary serialisation (fastest!).
+
+          Caution:
+               This method may not be backwards- nor forward-compatible.
+               Use the same version of pylimer-tools if you want to be sure that things work.
+
           Arguments:
                - file: the file path to the restart file to write
-               - outputEvery: how often to output the restart file
+               - outputEvery: how often to write the restart file
      )pbdoc",
          py::arg("file"),
          py::arg("outputEvery") = 50000)

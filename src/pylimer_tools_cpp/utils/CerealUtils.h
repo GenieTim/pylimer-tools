@@ -157,7 +157,7 @@ CEREAL_SAVE_FUNCTION_NAME(Archive& ar, igraph_t const& graph)
     ar(std::string(name));
     ar(igraph_vector_int_get(&vtypes, i));
     switch (igraph_vector_int_get(&vtypes, i)) {
-      case IGRAPH_ATTRIBUTE_DEFAULT:
+      //case IGRAPH_ATTRIBUTE_DEFAULT:
       case IGRAPH_ATTRIBUTE_NUMERIC: {
         igraph_vector_t results;
         igraph_vector_init(&results, numVertices);
@@ -197,7 +197,7 @@ CEREAL_SAVE_FUNCTION_NAME(Archive& ar, igraph_t const& graph)
     ar(std::string(name));
     ar(igraph_vector_int_get(&etypes, i));
     switch (igraph_vector_int_get(&etypes, i)) {
-      case IGRAPH_ATTRIBUTE_DEFAULT:
+      //case IGRAPH_ATTRIBUTE_DEFAULT:
       case IGRAPH_ATTRIBUTE_NUMERIC: {
         igraph_vector_t results;
         igraph_vector_init(&results, numEdges);
@@ -267,7 +267,7 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, igraph_t& graph)
     int attributeType;
     ar(attributeType);
     switch (attributeType) {
-      case IGRAPH_ATTRIBUTE_DEFAULT:
+      //case IGRAPH_ATTRIBUTE_DEFAULT:
       case IGRAPH_ATTRIBUTE_NUMERIC: {
         std::vector<double> attributes;
         ar(attributes);
@@ -303,7 +303,7 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, igraph_t& graph)
     int attributeType;
     ar(attributeType);
     switch (attributeType) {
-      case IGRAPH_ATTRIBUTE_DEFAULT:
+      //case IGRAPH_ATTRIBUTE_DEFAULT:
       case IGRAPH_ATTRIBUTE_NUMERIC: {
         std::vector<double> attributes;
         ar(attributes);

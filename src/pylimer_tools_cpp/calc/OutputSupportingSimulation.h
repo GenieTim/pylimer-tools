@@ -224,6 +224,7 @@ namespace calc {
         if (currentStep % this->outputConfigs[streamIdx].outputEvery == 0) {
           this->doOutputValues(
             this->outputConfigs[streamIdx], intvalues, doublevalues, streamIdx);
+          outputBuffer.clear();
         }
       }
 
@@ -271,13 +272,13 @@ namespace calc {
           // check (and if, output) averages
           if (currentStep % oc.outputEvery == 0) {
             // output & start again
-            outputBuffer.clear();
             outputBuffer += std::to_string(intvalues[ComputedIntValues::STEP]);
             for (size_t i = 0; i < runningAverages.size(); ++i) {
               outputBuffer += "\t" + std::to_string(runningAverages[i]);
               runningAverages[i] = 0.;
             }
             (*(this->outputStreams[streamIdx])) << outputBuffer << std::endl;
+            outputBuffer.clear();
           }
 
           streamIdx += 1;
@@ -294,7 +295,6 @@ namespace calc {
           autocorrelator_idx += 1;
         }
         if (currentStep % oc.outputEvery == 0) {
-          outputBuffer.clear();
           outputBuffer += "# TimeStep " +
                           std::to_string(intvalues[ComputedIntValues::STEP]) +
                           "\n";
@@ -324,6 +324,7 @@ namespace calc {
           }
           (*(this->outputStreams[streamIdx])) << outputBuffer << std::flush;
           streamIdx += 1;
+          outputBuffer.clear();
         }
 
         streamIdx += 1;
@@ -340,7 +341,7 @@ namespace calc {
       }
     }
 
-    virtual void writeRestartFile(std::string &filename) = 0;
+    virtual void writeRestartFile(std::string& filename) = 0;
     // static OutputSupportingSimulation readRestartFile(std::string filename)
     // {
     //   throw std::runtime_error(
