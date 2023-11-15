@@ -394,11 +394,21 @@ If you use this, you should cite <a class="reference external" href="https://pub
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configRestartOutput">
 <span class="sig-name descname"><span class="pre">configRestartOutput</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator" title="pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputEvery</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">50000</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.DPDSimulator.configRestartOutput" title="Link to this definition">#</a></dt>
 <dd><p>Set when to output a restart where.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The filename determines the type of serialisation:
+.json, .xml are supported; other file endings will lead to binary serialisation (fastest!).</p>
+</div>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>This method may not be backwards- nor forward-compatible.
+Use the same version of pylimer-tools if you want to be sure that things work.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>file</strong> (<em>-</em>) – the file path to the restart file to write</p></li>
-<li><p><strong>outputEvery</strong> (<em>-</em>) – how often to output the restart file</p></li>
+<li><p><strong>outputEvery</strong> (<em>-</em>) – how often to write the restart file</p></li>
 </ul>
 </dd>
 </dl>
