@@ -8,8 +8,8 @@ ROOT_DIR=$(pwd)
 # therefore, we need to delete vendor caches
 if [ -d "_skbuild" ]; then
   rm -rf ./_skbuild
-  rm -rf ./vendor/igraph/src/igraphLib-build
-  rm -rf ./vendor/nlopt/src/nloptLib-build
+  # rm -rf ./vendor/igraph/src/igraphLib-build
+  # rm -rf ./vendor/nlopt/src/nloptLib-build
 fi
 
 cd "$ROOT_DIR/tests" || exit 2

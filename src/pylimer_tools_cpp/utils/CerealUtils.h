@@ -253,11 +253,13 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, igraph_t& graph)
   igraph_vector_int_init(&allEdges, numEdges);
   pylimer_tools::utils::StdVectorToIgraphVectorT(edges, &allEdges);
 
+  igraph_add_vertices(&graph, numVertices, nullptr);
   igraph_add_edges(&graph, &allEdges, nullptr);
 
   // deserialize vertex attributes
   size_t numVertexAttributes;
   ar(make_size_tag(numVertexAttributes));
+
   for (size_t i = 0; i < numVertexAttributes; ++i) {
     std::string attributeName;
     ar(attributeName);
@@ -269,21 +271,21 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, igraph_t& graph)
         std::vector<double> attributes;
         ar(attributes);
         igraph_vector_t results;
-        igraph_vector_init(&results, 1);
+        igraph_vector_init(&results, attributes.size());
         pylimer_tools::utils::StdVectorToIgraphVectorT(attributes, &results);
         igraph_cattribute_VAN_setv(&graph, attributeName.c_str(), &results);
         igraph_vector_destroy(&results);
-      } break;
+      }; break;
       case IGRAPH_ATTRIBUTE_STRING: {
         std::vector<std::string> strattributes;
         ar(strattributes);
         igraph_strvector_t strresults;
-        igraph_strvector_init(&strresults, 1);
+        igraph_strvector_init(&strresults, strattributes.size());
         pylimer_tools::utils::StdVectorToIgraphVectorT(strattributes,
                                                        &strresults);
         igraph_cattribute_VAS_setv(&graph, attributeName.c_str(), &strresults);
         igraph_strvector_destroy(&strresults);
-      } break;
+      }; break;
       default:
         throw std::runtime_error("This attribute type (" +
                                  std::to_string(attributeType) +

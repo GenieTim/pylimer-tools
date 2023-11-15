@@ -18,21 +18,22 @@ if (NOT DEFINED igraph_LOADED)
 			set(LIBRARY_SUFFIX ".a")
 		endif()
 
+		set(igraph_PREFIX_PATH "${CMAKE_CURRENT_LIST_DIR}/igraph${vendor_suffix}")
+
 		ExternalProject_Add(
 				igraphLib
 				GIT_REPOSITORY https://github.com/igraph/igraph.git
 				GIT_TAG 6559f7e92f64d6f71a61063132dace9ce72cf680 # 0.10.7
-				PREFIX ${CMAKE_CURRENT_LIST_DIR}/igraph${vendor_suffix}
-				INSTALL_DIR ${CMAKE_CURRENT_LIST_DIR}/igraph${vendor_suffix}/igraphLib-install
-				CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_LIST_DIR}/igraph${vendor_suffix}/igraphLib-install -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_LIBDIR=${CMAKE_CURRENT_LIST_DIR}/igraph/igraphLib-install/lib -DIGRAPH_GRAPHML_SUPPORT=ON -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true
-				BUILD_COMMAND ${CMAKE_COMMAND} --build ${CMAKE_CURRENT_LIST_DIR}/igraph${vendor_suffix}/src/igraphLib-build --config Release
-				BUILD_BYPRODUCTS ${CMAKE_CURRENT_LIST_DIR}/igraph${vendor_suffix}/igraphLib-install/lib/${LIBRARY_PREFIX}igraph${LIBRARY_SUFFIX}
+				PREFIX ${igraph_PREFIX_PATH}
+				INSTALL_DIR ${igraph_PREFIX_PATH}/igraphLib-install
+				CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${igraph_PREFIX_PATH}/igraphLib-install -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_LIBDIR=${igraph_PREFIX_PATH}/igraphLib-install/lib -DIGRAPH_GRAPHML_SUPPORT=ON -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true
+				BUILD_COMMAND ${CMAKE_COMMAND} --build ${igraph_PREFIX_PATH}/src/igraphLib-build --config Release
+				BUILD_BYPRODUCTS ${igraph_PREFIX_PATH}/igraphLib-install/lib/${LIBRARY_PREFIX}igraph${LIBRARY_SUFFIX}
 				UPDATE_DISCONNECTED ON
 		)
 		# FetchContent_MakeAvailable(igraphLib)
 		add_library(igraph SHARED IMPORTED)
 		add_dependencies(igraph igraphLib)
-		set(igraph_PREFIX_PATH "${CMAKE_CURRENT_LIST_DIR}/igraph${vendor_suffix}")
 		if (MSVC)
 			set(igraph_INCLUDE_DIRS "${igraph_PREFIX_PATH}/igraphLib-install/include" "${igraph_PREFIX_PATH}/src/igraphLib/msvc/include")
 		else()
