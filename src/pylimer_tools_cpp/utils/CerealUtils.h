@@ -11,6 +11,7 @@
 #include "./VectorUtils.h"
 #include <Eigen/Dense>
 #include <cereal/archives/binary.hpp>
+#include <cereal/archives/json.hpp>
 #include <cereal/archives/xml.hpp>
 // #include <cereal/types/map.hpp>
 // #include <cereal/types/set.hpp>
@@ -257,7 +258,7 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, igraph_t& graph)
   igraph_add_edges(&graph, &allEdges, nullptr);
 
   // deserialize vertex attributes
-  size_t numVertexAttributes;
+  size_type numVertexAttributes;
   ar(make_size_tag(numVertexAttributes));
 
   for (size_t i = 0; i < numVertexAttributes; ++i) {
@@ -294,7 +295,7 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, igraph_t& graph)
   }
 
   // and same for edge attributes
-  size_t numEdgeAttributes;
+  size_type numEdgeAttributes;
   ar(make_size_tag(numEdgeAttributes));
   for (size_t i = 0; i < numEdgeAttributes; ++i) {
     std::string attributeName;
@@ -339,16 +340,32 @@ namespace utils {
   void serializeToFile(T obj, std::string file)
   {
     std::ofstream os(file);
-    cereal::BinaryOutputArchive oarchive(os);
-    oarchive(obj);
+    if (file.ends_with("json")) {
+      cereal::JSONOutputArchive oarchive(os);
+      oarchive(obj);
+    } else if (file.ends_with("xml")) {
+      cereal::XMLOutputArchive oarchive(os);
+      oarchive(obj);
+    } else {
+      cereal::BinaryOutputArchive oarchive(os);
+      oarchive(obj);
+    }
   }
 
   template<typename T>
   void deserializeFromFile(T& obj, std::string file)
   {
     std::ifstream is(file);
-    cereal::BinaryInputArchive iarchive(is);
-    iarchive(obj);
+    if (file.ends_with("json")) {
+      cereal::JSONInputArchive iarchive(is);
+      iarchive(obj);
+    } else if (file.ends_with("xml")) {
+      cereal::XMLInputArchive iarchive(is);
+      iarchive(obj);
+    } else {
+      cereal::BinaryInputArchive iarchive(is);
+      iarchive(obj);
+    }
   }
 }
 }
