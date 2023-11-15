@@ -96,7 +96,7 @@ namespace utils {
       this->printNumberRightWithWidth(
         this->sectionVariance_mus[idx] * 1., "µs", this->col4width, 5);
       this->printNumberRightWithWidth(
-        this->sectionMean_mus[idx] / total, "%", this->col5width, 2);
+        100 * this->sectionMean_mus[idx] / total, "%", this->col5width, 2);
       std::cout << std::endl;
     }
 

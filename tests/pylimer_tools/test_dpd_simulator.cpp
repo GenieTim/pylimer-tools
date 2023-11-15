@@ -100,8 +100,9 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     std::vector<size_t> atomIdsForMSD = { 1, 4, 6 };
     REQUIRE_NOTHROW(simulator.startMeasuringMSDForAtoms(atomIdsForMSD));
 
-    // restart files
-    std::string restartFile = suspectedPath + "dpd_restart_file.bin";
+    // restart files    
+    std::string restartFile = suspectedPath + "dpd_restart_file.xml";
+    // std::string restartFile = suspectedPath + "dpd_restart_file.bin";
     simulator.configRestartOutput(restartFile, 20);
 
     // actual simulation
