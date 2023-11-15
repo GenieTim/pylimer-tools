@@ -1,4 +1,5 @@
 #include "./DPDSimulator.h"
+#include "../utils/PerformanceTimer.h"
 #include "./Correlator.h"
 
 #include <fstream>
@@ -44,13 +45,13 @@ namespace calc {
       this->coordinates = u.getUnwrappedVertexCoordinates(&this->box);
       std::map<std::string, std::vector<long int>> edges = u.getEdges();
       this->bondPartnersA =
-        Eigen::Map<ArrayXli, Eigen::Unaligned>(edges["edge_from"].data(),
+        Eigen::Map<Eigen::ArrayXli, Eigen::Unaligned>(edges["edge_from"].data(),
                                                edges["edge_from"].size())
           .cast<int>();
-      this->bondPartnersB = Eigen::Map<ArrayXli, Eigen::Unaligned>(
+      this->bondPartnersB = Eigen::Map<Eigen::ArrayXli, Eigen::Unaligned>(
                               edges["edge_to"].data(), edges["edge_to"].size())
                               .cast<int>();
-      this->bondTypes = Eigen::Map<ArrayXli, Eigen::Unaligned>(
+      this->bondTypes = Eigen::Map<Eigen::ArrayXli, Eigen::Unaligned>(
                           edges["edge_type"].data(), edges["edge_type"].size())
                           .cast<int>();
 
@@ -122,12 +123,15 @@ namespace calc {
       for (; step < nSteps; step++) {
         if (withMC && ((step % this->nStepsDPD) == 0)) {
           this->numShifts = 0;
+          timer.section(4);
           this->numRelocations = this->relocateSlipSprings(1. * temperature);
+          timer.section(3);
           for (int i = 0; i < this->nStepsMC; ++i) {
             this->numShifts += this->shiftSlipSprings(1. * temperature);
           }
         }
         // update coordinates & velocities
+        timer.section(0);
         this->currentVelocitiesPlus =
           this->currentVelocities + halfDt * this->currentForces;
         this->coordinates += dt * this->currentVelocitiesPlus;
@@ -139,6 +143,7 @@ namespace calc {
         // temperature = this->computeTemperature(velocities);
 
         // re-compute the forces with these updated coordinates & velocities
+        timer.section(1);
         double pressure = computeForces(this->currentForces,
                                         this->currentStressTensor,
                                         this->coordinates,
@@ -147,6 +152,7 @@ namespace calc {
                                         1.0);
 
         // correct the velocities
+        timer.section(0);
         this->currentVelocities =
           this->currentVelocitiesPlus + halfDt * this->currentForces;
         temperature = this->computeTemperature(this->currentVelocities);
@@ -161,24 +167,8 @@ namespace calc {
             this->currentVelocities.segment(3 * i, 3).transpose();
         }
 
-        // compute bond properties
-        Eigen::VectorXd bondDistances =
-          this->coordinates(this->bondPartnerCoordinatesA) -
-          this->coordinates(this->bondPartnerCoordinatesB);
-        this->box.handlePBC(bondDistances);
-        double meanB = 0.0;
-        double maxB = 0.0;
-        for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
-          double b = bondDistances.segment(3 * i, 3).norm();
-          meanB += b / (this->bondPartnersA.size());
-          maxB = std::max(maxB, b);
-          if (b > this->maxBondLen) {
-            std::cerr << step << " WARNING: bond " << i << " has length " << b
-                      << ", which is too long!" << std::endl;
-          }
-        }
-
         // output
+        timer.section(2);
         this->currentStep += 1;
         this->currentTime += this->dt;
         this->handleOutput(this->currentStep);
@@ -198,6 +188,9 @@ namespace calc {
       if (wasInterrupted) {
         cleanupInterrupt();
       }
+      
+      timer.stop();
+      timer.output();
     }
 
     /**
@@ -472,10 +465,10 @@ namespace calc {
       this->bondTypes.conservativeResize(sizeBefore + partnerB.size());
 
       this->bondPartnersA.segment(sizeBefore, partnerA.size()) =
-        Eigen::Map<ArrayXst, Eigen::Unaligned>(partnerA.data(), partnerA.size())
+        Eigen::Map<Eigen::ArrayXst, Eigen::Unaligned>(partnerA.data(), partnerA.size())
           .cast<int>();
       this->bondPartnersB.segment(sizeBefore, partnerB.size()) =
-        Eigen::Map<ArrayXst, Eigen::Unaligned>(partnerB.data(), partnerB.size())
+        Eigen::Map<Eigen::ArrayXst, Eigen::Unaligned>(partnerB.data(), partnerB.size())
           .cast<int>();
       this->bondTypes.segment(sizeBefore, partnerB.size()) = bondType;
 

@@ -28,6 +28,8 @@ add_dependencies(pylimer_tools igraph)
 include_directories(${igraph_INCLUDE_DIRS})
 add_dependencies(pylimer_tools nlopt)
 include_directories(${nlopt_INCLUDE_DIRS})
+add_dependencies(pylimer_tools cerealLib)
+include_directories(${cereal_INCLUDE_DIRS})
 
 target_link_libraries(pylimer_tools PUBLIC 
 	${igraph_LIBRARIES} 
@@ -46,9 +48,8 @@ else()
 	target_link_libraries(pylimer_tools PUBLIC ${EIGEN3_LIBRARIES})
 	message(STATUS "Eigen include directories: ${EIGEN3_INCLUDE_DIRS}, libraries ${EIGEN3_LIBRARIES}")
 endif()
-# Eigen3::Eigen 
 
-message("pylimer_tools includes igraph from ${igraph_INCLUDE_DIRS}, nlopt from ${nlopt_INCLUDE_DIRS}")
+message("pylimer_tools includes igraph from ${igraph_INCLUDE_DIRS}, nlopt from ${nlopt_INCLUDE_DIRS} and cereal from ${cereal_INCLUDE_DIRS}")
 
 # optional additional dependencies
 find_package(OpenMP)
@@ -90,7 +91,10 @@ target_sources(pylimer_tools
 
 		${CMAKE_CURRENT_LIST_DIR}/io/DataFileParser.h
 		${CMAKE_CURRENT_LIST_DIR}/io/DumpFileParser.h
+		${CMAKE_CURRENT_LIST_DIR}/utils/CerealUtils.h
+		${CMAKE_CURRENT_LIST_DIR}/utils/ExtraEigenTypes.h
 		${CMAKE_CURRENT_LIST_DIR}/utils/GraphUtils.h
+		${CMAKE_CURRENT_LIST_DIR}/utils/PerformanceTimer.h
 		${CMAKE_CURRENT_LIST_DIR}/utils/VectorUtils.h
 
 		${CMAKE_CURRENT_LIST_DIR}/calc/Correlator.h
@@ -109,7 +113,7 @@ target_sources(pylimer_tools
 set_target_properties(pylimer_tools PROPERTIES VERSION ${PROJECT_VERSION})
 
 if (NOT DEFINED CODE_COVERAGE)
-option(CODE_COVERAGE "Collect coverage from test library" OFF)
+	option(CODE_COVERAGE "Collect coverage from test library" OFF)
 endif()
 
 if(CODE_COVERAGE AND CMAKE_COMPILER_IS_GNUCXX)

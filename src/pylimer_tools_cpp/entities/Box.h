@@ -308,6 +308,19 @@ namespace entities {
              lhs.getShearDirection() == rhs.getShearDirection() &&
              lhs.getShearMagnitude() == rhs.getShearMagnitude();
     }
+
+    template<class Archive>
+    void serialize(Archive& ar)
+    {
+      ar(L,
+         volume,
+         boxHalfs,
+         oneOverL,
+         loCoords,
+         hiCoords,
+         simpleShearMagnitude,
+         shearDirection);
+    }
   };
 } // namespace entities
 } // namespace pylimer_tools

@@ -65,7 +65,7 @@ namespace calc {
             -------------------------------------------------
             */
 
-    /** Lenght of result arrays */
+    /** Length of result arrays */
     unsigned int length;
     /** Maximum correlator attained during simulation */
     unsigned int kmax;
@@ -97,6 +97,31 @@ namespace calc {
 
     /** Evaluate the current state of the correlator */
     void evaluate(const bool norm = false);
+
+    /** serialize this object */
+    template<class Archive>
+    void serialize(Archive& ar)
+    {
+      ar(
+        // private...
+        shift,
+        correlation,
+        ncorrelation,
+        accumulator,
+        naccumulator,
+        insertindex,
+        numcorrelators,
+        dmin,
+        length,
+        kmax,
+        // ...and public members
+        p,
+        m,
+        t,
+        f,
+        npcorr,
+        accval);
+    }
   };
 
 }
