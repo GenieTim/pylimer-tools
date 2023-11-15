@@ -250,7 +250,8 @@ TEST_CASE("MC swap accept and reject work with cross-links",
     Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
     CHECK(net.linkIndicesOfSprings[1].size() == 3);
     outputNetwork(net, u, partitions);
-    CHECK_FALSE(forceBalancer.swapSlipLinkReversibly(net, u, partitions, 5, 1., 0));
+    CHECK_FALSE(
+      forceBalancer.swapSlipLinkReversibly(net, u, partitions, 5, 1., 0));
     CHECK(forceBalancer.swapSlipLinkReversibly(net, u, partitions, 5, 1., 5));
     // check that the connectivity around the cross-link changed
     outputNetwork(net, u, partitions);
@@ -574,9 +575,9 @@ TEST_CASE("MEHP Force Balance handles slip-link convergence correctly",
   SECTION("Stress tensor computations are equivalent")
   {
     std::array<std::array<double, 3>, 3> stressTensor1 =
-      forceBalancer.getStressTensor();
+      forceBalancer.getStressTensorArray();
     std::array<std::array<double, 3>, 3> stressTensor2 =
-      forceBalancer.getStressTensorLinkBased();
+      forceBalancer.getStressTensorArrayLinkBased();
     for (size_t i = 0; i < 3; ++i) {
       for (size_t j = 0; j < 3; ++j) {
         CHECK(stressTensor1[i][j] == Catch::Approx(stressTensor2[i][j]));
@@ -631,9 +632,9 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
       // SECTION("Stress tensor computations are equivalent")
       // {
       std::array<std::array<double, 3>, 3> stressTensor1 =
-        forceBalancer2.getStressTensor();
+        forceBalancer2.getStressTensorArray();
       std::array<std::array<double, 3>, 3> stressTensor2 =
-        forceBalancer2.getStressTensorLinkBased();
+        forceBalancer2.getStressTensorArrayLinkBased();
       for (size_t i = 0; i < 3; ++i) {
         for (size_t j = 0; j < 3; ++j) {
           CHECK(stressTensor1[i][j] == Catch::Approx(stressTensor2[i][j]));
@@ -728,8 +729,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         // initial system values
         CHECK(forceBalancer2.getPressure() ==
               Catch::Approx(forceRelaxer.getPressure()));
-        CHECK(forceBalancer2.getPressure() ==
-              Catch::Approx(0.0061105865));
+        CHECK(forceBalancer2.getPressure() == Catch::Approx(0.0061105865));
         REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
         CHECK_NOTHROW(forceBalancer2.validateNetwork());
         CHECK(forceBalancer2.getNrOfSprings() == 9859);
@@ -757,9 +757,10 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         // final values
         CHECK(forceBalancer2.getPressure() ==
               Catch::Approx(0.153806 / 79.)); // LJ Units [?]
-        CHECK(forceBalancer2.getPressure() * conversionFactor /
-                (sigmaToM * sigmaToM * sigmaToM) ==
-              Catch::Approx(61172.8878)); // shear modulus from the pressure, MPa
+        CHECK(
+          forceBalancer2.getPressure() * conversionFactor /
+            (sigmaToM * sigmaToM * sigmaToM) ==
+          Catch::Approx(61172.8878)); // shear modulus from the pressure, MPa
         double nrOfChainCorrection =
           (forceBalancer2.getDefaultNrOfChains() / nrOfChains);
         double expectedNb2 = slope * Nb * beadMass;
@@ -801,8 +802,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         // initial system values
         CHECK(forceBalancer2.getPressure() ==
               Catch::Approx(forceRelaxer.getPressure()));
-        CHECK(forceBalancer2.getPressure() ==
-              Catch::Approx(0.0061105865));
+        CHECK(forceBalancer2.getPressure() == Catch::Approx(0.0061105865));
         // add entanglements
         // TODO: these are random values, as are the results... :P
         size_t nrOfSprings = forceRelaxer.getNetwork().nrOfSprings;
@@ -854,7 +854,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
     auto stressTensor = forceBalancer2.getStressTensor();
     CHECK(forceBalancer2.getPressure() ==
           Catch::Approx(
-            (stressTensor[0][0] + stressTensor[1][1] + stressTensor[2][2]) / 3.)
+            (stressTensor(0, 0) + stressTensor(1, 1) + stressTensor(2, 2)) / 3.)
             .epsilon(0.02));
     CHECK_NOTHROW(forceBalancer2.validateNetwork());
     // TODO: find better, more accurate tests here
@@ -900,8 +900,7 @@ TEST_CASE("MEHP Force Balance can randomly add slip-links ignoring cross-links",
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
 
-  std::string inputFile =
-    suspectedPath + "network_100_a_46.structure.out";
+  std::string inputFile = suspectedPath + "network_100_a_46.structure.out";
   if (std::filesystem::exists(inputFile)) {
     REQUIRE(std::filesystem::exists(suspectedPath));
     std::cout << "Reading file " << inputFile << std::endl;
@@ -950,8 +949,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
 
-  std::string inputFile =
-    suspectedPath + "network_100_a_46.structure.out";
+  std::string inputFile = suspectedPath + "network_100_a_46.structure.out";
   if (std::filesystem::exists(inputFile)) {
     REQUIRE(std::filesystem::exists(suspectedPath));
     std::cout << "Reading file " << inputFile << std::endl;
@@ -970,8 +968,9 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
     REQUIRE(nrOfAddedLinks >= 25);
     // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
     pe::Box oldBox = universe.getBox();
-    forceBalancer.deformTo(
-      pe::Box(4 * oldBox.getLx(), 0.5 * oldBox.getLy(), 0.5 * oldBox.getLz()));
+    pe::Box newBox =
+      pe::Box(4 * oldBox.getLx(), 0.5 * oldBox.getLy(), 0.5 * oldBox.getLz());
+    forceBalancer.deformTo(newBox);
     REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
       pcm::BalanceRunMode::ITERATIVE,
       1.0,
@@ -1015,8 +1014,7 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
 
-  std::string inputFile =
-    suspectedPath + "network_100_a_46.structure.out";
+  std::string inputFile = suspectedPath + "network_100_a_46.structure.out";
   if (std::filesystem::exists(inputFile)) {
     REQUIRE(std::filesystem::exists(suspectedPath));
     std::cout << "Reading file " << inputFile << std::endl;
@@ -1096,8 +1094,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
    * 4-7-3
    */
   universe.setBox(pe::Box(-15.0, 15.0, -15.0, 15.0, -15.0, 15.0));
-  universe.addAtoms(
-                    { { 1, 2, 3, 4, 5, 6, 7, 8, 9 } },     // id
+  universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8, 9 } },     // id
                     { { 2, 2, 2, 2, 1, 1, 1, 1, 1 } },     // type
                     { { -5, 5, 5, -5, 0, 5, -5, -5, 0 } }, // x
                     { { 5, 5, -5, -5, 5, 0, 0, 0, 0 } },   // y
@@ -1146,7 +1143,8 @@ TEST_CASE("MEHP Force Balance handles slip-links",
      * where * = 9 & 10, where the latter is connected to 1 & 3,
      * the former to 4 and 2
      */
-    universe.addAtoms( { 10 }, { 1 }, { 0. }, { 0. }, { 0. }, { 1 }, { 1 }, { 1 });
+    universe.addAtoms(
+      { 10 }, { 1 }, { 0. }, { 0. }, { 0. }, { 1 }, { 1 }, { 1 });
     universe.addBonds(2, { { 1, 10 } }, { { 10, 3 } });
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance(universe, 2, false);
@@ -1486,14 +1484,12 @@ TEST_CASE("Free chains collapse",
   //           << forceBalancer.getForce() << ", "
   //           << forceBalancer.getResidualNorm() << std::endl;
 
-  std::array<std::array<double, 3>, 3> stressTensorSimpleSpring =
-    forceBalancer.getStressTensor();
-  std::array<std::array<double, 3>, 3> stressTensorLangevin =
-    forceBalancer.getStressTensor();
+  Eigen::Matrix3d stressTensorSimpleSpring = forceBalancer.getStressTensor();
+  Eigen::Matrix3d stressTensorLangevin = forceBalancer.getStressTensor();
   for (size_t i = 0; i < 3; ++i) {
     for (size_t j = 0; j < 3; ++j) {
-      CHECK(stressTensorLangevin[i][j] + 1e-5 ==
-            Catch::Approx(stressTensorSimpleSpring[i][j] + 1e-5));
+      CHECK(stressTensorLangevin(i, j) + 1e-5 ==
+            Catch::Approx(stressTensorSimpleSpring(i, j) + 1e-5));
     }
   }
 }

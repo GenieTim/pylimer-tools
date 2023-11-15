@@ -340,7 +340,7 @@ namespace calc {
       }
     }
 
-    virtual void writeRestartFile(std::string filename) = 0;
+    virtual void writeRestartFile(std::string &filename) = 0;
     // static OutputSupportingSimulation readRestartFile(std::string filename)
     // {
     //   throw std::runtime_error(

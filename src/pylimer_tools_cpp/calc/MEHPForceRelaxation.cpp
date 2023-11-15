@@ -146,7 +146,7 @@ namespace calc {
           this->currentVelocities * dt + 0.5 * this->currentForces * dt * dt;
 
         // output things
-        this->handleOutput(this->currentStep);
+        this->handleOutput(step);
       }
 
       // store final state, potentially
@@ -317,13 +317,6 @@ namespace calc {
         this->evaluateSpringDistances(net, u, this->is2D);
 
       return this->evaluateStressTensor(springDistances, net->vol);
-    }
-
-    std::array<std::array<double, 3>, 3> MEHPForceRelaxation::getStressTensor()
-      const
-    {
-      return this->evaluateStressTensor(this->currentSpringDistances,
-                                        this->initialConfig.vol);
     }
 
     /**

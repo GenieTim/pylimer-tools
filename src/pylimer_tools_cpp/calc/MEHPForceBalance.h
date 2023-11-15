@@ -6,8 +6,8 @@
 #include "../entities/NeighbourList.h"
 #include "../entities/Universe.h"
 #include "MEHPForceEvaluator.h"
-#include "OutputSupportingSimulation.h"
 #include "MEHPUtilityStructures.h"
+#include "OutputSupportingSimulation.h"
 #include <Eigen/Dense>
 #include <algorithm>
 #include <array>
@@ -55,11 +55,12 @@ namespace calc {
       ALL_MC_CYCLE
     };
 
-    class MEHPForceBalance : public pylimer_tools::calc::OutputSupportingSimulation
+    class MEHPForceBalance
+      : public pylimer_tools::calc::OutputSupportingSimulation
     {
 
     public:
-      MEHPForceBalance(const pylimer_tools::entities::Universe u,
+      MEHPForceBalance(const pylimer_tools::entities::Universe& u,
                        int crosslinkerType = 2,
                        bool is2D = false,
                        double kappa = 1.0,
@@ -127,7 +128,7 @@ namespace calc {
        */
       double computePartitionUpdateZeroResidual(
         const ForceBalanceNetwork& net,
-        const std::vector<size_t> involvedPartitions,
+        const std::vector<size_t>& involvedPartitions,
         const size_t link_idx,
         const Eigen::VectorXd& displacements,
         Eigen::VectorXd& springPartitions,
@@ -331,7 +332,7 @@ namespace calc {
        *
        * @param box
        */
-      void deformTo(pylimer_tools::entities::Box newBox)
+      void deformTo(pylimer_tools::entities::Box& newBox)
       {
         this->box.adjustCoordinatesTo(this->initialConfig.coordinates, newBox);
         this->box.adjustCoordinatesTo(this->currentDisplacements, newBox);
@@ -425,7 +426,7 @@ namespace calc {
 
       double getDefaultR0Square() const { return this->defaultR0Squared; }
 
-      double getVolume() const { return this->initialConfig.vol; }
+      double getVolume() override { return this->initialConfig.vol; }
 
       int getNrOfNodes() const { return this->initialConfig.nrOfNodes; }
 
@@ -666,10 +667,10 @@ namespace calc {
        */
       double getAverageSpringLength() const;
 
-      std::array<std::array<double, 3>, 3> getStressTensor(
+      std::array<std::array<double, 3>, 3> getStressTensorArray(
         const double oneOverSpringPartitionUpperLimit = -1.0) const;
 
-      std::array<std::array<double, 3>, 3> getStressTensorLinkBased(
+      std::array<std::array<double, 3>, 3> getStressTensorArrayLinkBased(
         const double oneOverSpringPartitionUpperLimit = -1.0,
         const bool xlinksOnly = false) const;
 
@@ -1135,6 +1136,64 @@ namespace calc {
           }
         }
         return results;
+      }
+
+      void writeRestartFile(std::string& file) override
+      {
+        throw std::runtime_error("Restart not supported yet");
+      }
+
+      double getTimestep() override
+      {
+        return 1.; // this->dt;
+      }
+
+      double getCurrentTime(double currentStep) override
+      {
+        return this->nrOfStepsDone;
+      }
+
+      Eigen::Matrix3d getStressTensor() override
+      {
+        std::array<std::array<double, 3>, 3> stressTensor =
+          this->getStressTensorArray();
+        Eigen::Matrix3d result = Eigen::Matrix3d::Zero();
+        for (size_t i = 0; i < 3; ++i) {
+          for (size_t j = 0; j < 3; ++j) {
+            result(i, j) = stressTensor[i][j];
+          }
+        }
+        return result;
+      }
+      int getNumShifts() override { return 0; }
+      int getNumRelocations() override { return 0; }
+
+      Eigen::VectorXd getBondLengths() override
+      {
+        Eigen::VectorXd lens =
+          Eigen::VectorXd::Zero(this->currentSpringDistances.size() / 3);
+
+        for (size_t i = 0; i < this->currentSpringDistances.size() / 3; ++i) {
+          double b = lens.segment(3 * i, 3).norm();
+          lens[i] = b;
+        }
+
+        return lens;
+      }
+
+      Eigen::VectorXd getCoordinates() override
+      {
+        return this->initialConfig.coordinates + this->currentDisplacements;
+      }
+
+      double getTemperature() override
+      {
+        return -1; // TODO: implement?
+      }
+
+      size_t getNumParticles() override
+      {
+        return this->initialConfig.nrOfNodes;
       }
 
     protected:
