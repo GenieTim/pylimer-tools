@@ -101,9 +101,9 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     REQUIRE_NOTHROW(simulator.startMeasuringMSDForAtoms(atomIdsForMSD));
 
     // restart files    
-    std::string restartFile = suspectedPath + "dpd_restart_file.xml";
-    // std::string restartFile = suspectedPath + "dpd_restart_file.bin";
-    simulator.configRestartOutput(restartFile, 20);
+    // std::string restartFile = suspectedPath + "dpd_restart_file.xml";
+    std::string restartFile = suspectedPath + "dpd_restart_file.bin";
+    simulator.configRestartOutput(restartFile, 30);
 
     // actual simulation
     REQUIRE_NOTHROW(simulator.runSimulation(75, false));
