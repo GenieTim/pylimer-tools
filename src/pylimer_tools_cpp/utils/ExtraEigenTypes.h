@@ -5,11 +5,16 @@
 
 namespace Eigen {
 
-  typedef Array<long int, 3, 1> Array3li;
-  typedef Array<long int, Dynamic, 1> ArrayXli;
-  typedef Array<size_t, Dynamic, 1> ArrayXst;
+typedef Array<long int, 3, 1> Array3li;
+typedef Array<long int, Dynamic, 1> ArrayXli;
+typedef Array<size_t, Dynamic, 1> ArrayXst;
 }
 
+#pragma omp declare reduction(+ : Eigen::VectorXd : omp_out =                  \
+                                omp_out + omp_in)                              \
+  initializer(omp_priv = Eigen::VectorXd::Zero(omp_orig.size()))
+#pragma omp declare reduction(+ : Eigen::Matrix3d : omp_out =                  \
+                                omp_out + omp_in)                              \
+  initializer(omp_priv = Eigen::Matrix3d::Zero())
 
-
-#endif 
+#endif
