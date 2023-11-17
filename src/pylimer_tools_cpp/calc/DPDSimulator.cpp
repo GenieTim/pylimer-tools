@@ -247,6 +247,8 @@ namespace calc {
       forces.setZero();
       stressTensor.setZero();
 
+      const double squareCutoff = cutoff*cutoff;
+
       // actual computation
       // (attractive) bond forces
       timer.section(DPDPerformanceSections::BOND_FORCE);
@@ -296,11 +298,13 @@ namespace calc {
           Eigen::Vector3d pairdistance =
             coords.segment(3 * i, 3) - coords.segment(3 * j, 3);
           this->box.handlePBC(pairdistance);
-          const double rNorm = pairdistance.norm();
-          if (rNorm >= cutoff || rNorm < 1e-12) {
+          // slight performance improvement, taking the square norm here
+          const double rNorm2 = pairdistance.squaredNorm();
+          if (rNorm2 >= squareCutoff || rNorm2 < 1e-12) {
             continue;
           }
 
+          const double rNorm = std::sqrt(rNorm2);
           const double one_minus_rnorm = 1. - rNorm;
           const double one_minus_rnorm2 = (1. - rNorm) * (1. - rNorm);
           Eigen::Vector3d pairdistanceNormed = pairdistance / rNorm;

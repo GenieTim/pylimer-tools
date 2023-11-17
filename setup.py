@@ -20,6 +20,7 @@ except ImportError:
     raise
 
 
+# "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON",
 cmake_args = ["-DCMAKE_BUILD_TYPE=RelWithDebInfo", "-Dvendor_suffix=-skbuild"]
 # cmake_args = ["-Digraph_DEBUG=ON", "-DCMAKE_FIND_DEBUG_MODE=ON"]
 
