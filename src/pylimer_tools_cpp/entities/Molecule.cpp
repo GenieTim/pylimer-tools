@@ -19,8 +19,8 @@ namespace entities {
 
   Molecule::Molecule(const Box* parent,
                      const igraph_t* ingraph,
-                     MoleculeType type,
-                     std::map<int, double> massPerType)
+                     const MoleculeType type,
+                     const std::map<int, double>& massPerType)
   {
     this->parent = parent;
     this->initializeFromGraph(ingraph);
@@ -136,10 +136,13 @@ namespace entities {
   double Molecule::computeTotalMass()
   {
     std::vector<int> presentTypes = this->getPropertyValues<int>("type");
-    double totalWeight = 0.0;
-    for (int type : presentTypes) {
-      totalWeight += this->massPerType[type];
-    }
+    double totalWeight =
+      std::reduce(presentTypes.begin(),
+                  presentTypes.end(),
+                  0.0,
+                  [&massPerType = this->massPerType](double val, int type) {
+                    return val + massPerType[type];
+                  });
     return totalWeight;
   }
 
@@ -196,7 +199,6 @@ namespace entities {
   double Molecule::computeRadiusOfGyration()
   {
     double meanX = 0.0, meanY = 0.0, meanZ = 0.0;
-    double meanNx = 0, meanNy = 0, meanNz = 0;
     // would be faster to just query the attributes.
     // But the OOP interface is just too tempting
     // as long as there are no external additional performance demands
@@ -236,12 +238,19 @@ namespace entities {
                                   0,
                                   0);
 
-    double Rg2 = 0.0;
     double correctingFactor = 1. / totalMass;
-    for (Atom a : allAtoms) {
-      double dist = a.distanceToUnwrapped(virtualCenterAtom, this->parent);
-      Rg2 += correctingFactor * this->massPerType.at(a.getType()) * dist * dist;
-    }
+
+    // reduce to the mean
+    auto innerReduction = [&virtualCenterAtom,
+                           correctingFactor,
+                           &massPerType = this->massPerType,
+                           &box = this->parent](double val, Atom a) -> double {
+      double dist = a.distanceToUnwrapped(virtualCenterAtom, box);
+      return val +
+             (correctingFactor * massPerType.at(a.getType()) * dist * dist);
+    };
+    double Rg2 =
+      std::reduce(allAtoms.begin(), allAtoms.end(), 0., innerReduction);
 
     return Rg2;
   }

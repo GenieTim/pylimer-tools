@@ -181,7 +181,7 @@ namespace utils {
 
   template<typename IN>
   static inline void eraseIndices(std::vector<IN> from,
-                                  std::vector<long int> indices)
+                                  std::vector<long int> &indices)
   {
     for (auto index : indices) {
       from.erase(index);
@@ -242,11 +242,10 @@ namespace utils {
   template<typename IN>
   static inline std::vector<IN> initializeWithValue(size_t n, IN value)
   {
-    std::vector<IN> result;
-    result.reserve(n);
-    for (size_t i = 0; i < n; ++i) {
-      result.push_back(value);
-    }
+    std::vector<IN> result = std::vector<IN>(n, value);
+    // for (size_t i = 0; i < n; ++i) {
+    //   result.push_back(value);
+    // }
     return result;
   }
 } // namespace utils

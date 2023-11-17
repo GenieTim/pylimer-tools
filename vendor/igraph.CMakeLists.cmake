@@ -23,7 +23,7 @@ if (NOT DEFINED igraph_LOADED)
 		ExternalProject_Add(
 				igraphLib
 				GIT_REPOSITORY https://github.com/igraph/igraph.git
-				GIT_TAG 6559f7e92f64d6f71a61063132dace9ce72cf680 # 0.10.7
+				GIT_TAG e5bfb604776e3e2905859e8e0a5aff59381026a7 # 0.10.8
 				PREFIX ${igraph_PREFIX_PATH}
 				INSTALL_DIR ${igraph_PREFIX_PATH}/igraphLib-install
 				CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${igraph_PREFIX_PATH}/igraphLib-install -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_LIBDIR=${igraph_PREFIX_PATH}/igraphLib-install/lib -DIGRAPH_GRAPHML_SUPPORT=ON -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true

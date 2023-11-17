@@ -34,7 +34,7 @@ namespace entities {
   {
   public:
     Universe(const double Lx = 1., const double Ly = 1., const double Lz = 1.);
-    Universe(Box box);
+    Universe(const Box& box);
 
     // rule of three:
     // 1. destructor (to destroy the graph)
@@ -50,54 +50,56 @@ namespace entities {
                        const double Lz,
                        bool rescaleAtomCoordinates = false);
     // atoms
-    void addAtoms(std::vector<long int> ids,
-                  std::vector<int> types,
-                  std::vector<double> x,
-                  std::vector<double> y,
-                  std::vector<double> z,
-                  std::vector<int> nx,
-                  std::vector<int> ny,
-                  std::vector<int> nz);
+    void addAtoms(const std::vector<long int>& ids,
+                  const std::vector<int>& types,
+                  const std::vector<double>& x,
+                  const std::vector<double>& y,
+                  const std::vector<double>& z,
+                  const std::vector<int>& nx,
+                  const std::vector<int>& ny,
+                  const std::vector<int>& nz);
     void addAtoms(
-      std::vector<long int> ids,
-      std::vector<int> types,
-      std::vector<double> x,
-      std::vector<double> y,
-      std::vector<double> z,
-      std::vector<int> nx,
-      std::vector<int> ny,
-      std::vector<int> nz,
-      std::unordered_map<std::string, std::vector<double>> additionalData);
-    void removeAtoms(std::vector<long int> ids);
+      const std::vector<long int>& ids,
+      const std::vector<int>& types,
+      const std::vector<double>& x,
+      const std::vector<double>& y,
+      const std::vector<double>& z,
+      const std::vector<int>& nx,
+      const std::vector<int>& ny,
+      const std::vector<int>& nz,
+      const std::unordered_map<std::string, std::vector<double>>&
+        additionalData);
+    void removeAtoms(const std::vector<long int>& ids);
     void replaceAtom(const long int id, const Atom& replacement);
     // bonds
-    void addBonds(std::vector<long int> from, std::vector<long int> to);
-    void addBonds(std::vector<long int> from,
-                  std::vector<long int> to,
-                  std::vector<int> types);
+    void addBonds(const std::vector<long int>& from,
+                  const std::vector<long int>& to);
+    void addBonds(const std::vector<long int>& from,
+                  const std::vector<long int>& to,
+                  const std::vector<int>& types);
     void addBonds(const size_t NNewBonds,
-                  std::vector<long int> from,
-                  std::vector<long int> to);
+                  const std::vector<long int>& from,
+                  const std::vector<long int>& to);
     void addBonds(const size_t NNewBonds,
-                  std::vector<long int> from,
-                  std::vector<long int> to,
-                  std::vector<int> bondTypes,
+                  const std::vector<long int>& from,
+                  const std::vector<long int>& to,
+                  const std::vector<int>& bondTypes,
                   const bool ignoreNonExistentAtoms = false,
                   const bool simplify = false);
-    void removeBonds(const std::vector<long int> atomIdsFrom,
-                     const std::vector<long int> atomIdsTo);
+    void removeBonds(const std::vector<long int>& atomIdsFrom,
+                     const std::vector<long int>& atomIdsTo);
     // others
-    void addAngles(std::vector<long int> from,
-                   std::vector<long int> via,
-                   std::vector<long int> to,
-                   std::vector<int> types);
-    void addDihedralAngles(std::vector<long int> from,
-                           std::vector<long int> via1,
-                           std::vector<long int> via2,
-                           std::vector<long int> to,
-                           std::vector<int> types);
-    void setMasses(std::map<int, double> massPerType);
-    void setBox(Box box, bool rescaleAtomCoordinates = false);
+    void addAngles(const std::vector<long int>& from,
+                   const std::vector<long int>& via,
+                   const std::vector<long int>& to,
+                   const std::vector<int>& types);
+    void addDihedralAngles(const std::vector<long int>& from,
+                           const std::vector<long int>& via1,
+                           const std::vector<long int>& via2,
+                           const std::vector<long int>& to,
+                           const std::vector<int>& types);
+    void setMasses(const std::map<int, double>& massPerType);
+    void setBox(const Box& box, bool rescaleAtomCoordinates = false);
     void setTimestep(long int timestep) { this->timestep = timestep; };
     void initializeFromGraph(const igraph_t* ingraph);
     void simplify();
@@ -149,8 +151,8 @@ namespace entities {
     size_t getNrOfDihedralAngles() const;
     std::map<int, double> getMasses();
     long int getTimestep() { return this->timestep; };
-    long int getAtomIdByIdx(const int vertexId) const;
-    long int getIdxByAtomId(const int atomId) const;
+    long int getAtomIdByIdx(const int vertexId) const override;
+    long int getIdxByAtomId(const int atomId) const override;
 
     // operators
     Atom operator[](size_t index) const { return this->getAtom(index); }
@@ -163,12 +165,12 @@ namespace entities {
     std::map<int, double> computeWeightFractions() const;
     double computeWeightFractionOfClustersAssociatedWith(
       std::vector<long int> atomIds) const;
-    std::vector<double> computeDxs(const std::vector<long int> bondFrom,
-                                   const std::vector<long int> bondTo);
-    std::vector<double> computeDys(const std::vector<long int> bondFrom,
-                                   const std::vector<long int> bondTo);
-    std::vector<double> computeDzs(const std::vector<long int> bondFrom,
-                                   const std::vector<long int> bondTo);
+    std::vector<double> computeDxs(const std::vector<long int>& bondFrom,
+                                   const std::vector<long int>& bondTo);
+    std::vector<double> computeDys(const std::vector<long int>& bondFrom,
+                                   const std::vector<long int>& bondTo);
+    std::vector<double> computeDzs(const std::vector<long int>& bondFrom,
+                                   const std::vector<long int>& bondTo);
     std::vector<double> computeBondLengths()
     {
       return AtomGraphParent::computeBondLengths(&this->box);
@@ -254,10 +256,10 @@ namespace entities {
     igraph_vs_t getVerticesOfType(const int type) const;
     std::vector<long int> getIndicesOfType(const int type) const;
     igraph_vs_t getVerticesByIndices(std::vector<long int> indices) const;
-    std::vector<double> computeDs(const std::vector<long int> bondFrom,
-                                  const std::vector<long int> bondTo,
-                                  std::string direction,
-                                  double boxLimit) const;
+    std::vector<double> computeDs(const std::vector<long int>& bondFrom,
+                                  const std::vector<long int>& bondTo,
+                                  const std::string& direction,
+                                  const double boxLimit) const;
   };
 } // namespace entities
 } // namespace pylimer_tools

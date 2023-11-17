@@ -114,6 +114,7 @@ namespace calc {
       bool wasInterrupted = false;
 
       const double halfDt = 0.5 * this->dt;
+      const double lambdaDt = this->lambda * this->dt;
       double temperature = this->computeTemperature(this->currentVelocities);
 
       this->prepareAllOutputs();
@@ -141,7 +142,7 @@ namespace calc {
           this->currentVelocities + halfDt * this->currentForces;
         this->coordinates += dt * this->currentVelocitiesPlus;
         this->neighbourlist.resetCoordinates(this->coordinates);
-        this->currentVelocities += lambda * this->dt * this->currentForces;
+        this->currentVelocities += lambdaDt * this->currentForces;
 
         // TODO: figure out, what the issue is, how the velocities
         // should be synchronized for the pressure
@@ -149,7 +150,7 @@ namespace calc {
 
         // re-compute the forces with these updated coordinates & velocities
         timer.section(DPDPerformanceSections::FORCES);
-        double pressure = computeForces(this->currentForces,
+        computeForces(this->currentForces,
                                         this->currentStressTensor,
                                         this->coordinates,
                                         this->currentVelocities,
@@ -164,8 +165,6 @@ namespace calc {
         temperature = this->computeTemperature(this->currentVelocities);
 
         // kinetic term of the stress/pressure
-        double kineticPressureTerm =
-          ((this->numAtoms * temperature) / this->box.getVolume());
         const double m = 1.;
         for (size_t i = 0; i < this->numAtoms; ++i) {
           this->currentStressTensor -=
@@ -342,16 +341,6 @@ namespace calc {
       // reset Eigen threads
       Eigen::setNbThreads(0);
       return pressure / (3. * this->box.getVolume());
-    }
-
-    /**
-     * @brief Get access to the current stress-tensor
-     *
-     * @return Eigen::Matrix3d
-     */
-    Eigen::Matrix3d DPDSimulator::getStressTensor() const
-    {
-      return this->currentStressTensor;
     }
 
     /**

@@ -411,15 +411,15 @@ init_pylimer_bound_entities(py::module_& m)
     m,
     "NeighbourList",
     "Gives access to somewhat fast queries on the neighbourhood of atoms")
-    .def(py::init<const std::vector<pylimer_tools::entities::Atom>,
-                  const pylimer_tools::entities::Box,
+    .def(py::init<const std::vector<pylimer_tools::entities::Atom>&,
+                  const pylimer_tools::entities::Box&,
                   double>(),
          "Instantiates a new neighbour list",
          py::arg("atoms"),
          py::arg("box"),
          py::arg("cutoff"))
     .def("getAtomsCloseTo",
-         py::overload_cast<Atom, double, double, bool>(
+         py::overload_cast<const Atom&, double, double, bool>(
            &NeighbourList::getAtomsCloseTo),
          R"pbdoc(
           List all atoms that are close to a given one. 
@@ -449,14 +449,14 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("Lz"))
     // setters
     .def("addAtoms",
-         py::overload_cast<std::vector<long int>,
-                           std::vector<int>,
-                           std::vector<double>,
-                           std::vector<double>,
-                           std::vector<double>,
-                           std::vector<int>,
-                           std::vector<int>,
-                           std::vector<int>>(&Universe::addAtoms),
+         py::overload_cast<const std::vector<long int>&,
+                           const std::vector<int>&,
+                           const std::vector<double>&,
+                           const std::vector<double>&,
+                           const std::vector<double>&,
+                           const std::vector<int>&,
+                           const std::vector<int>&,
+                           const std::vector<int>&>(&Universe::addAtoms),
          "Add atoms to the Universe, vertices to the underlying graph.",
          py::arg("ids"),
          py::arg("types"),
@@ -480,17 +480,17 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("atomId"),
          py::arg("replacementAtom"))
     .def("addBonds",
-         py::overload_cast<std::vector<long int>, std::vector<long int>>(
-           &Universe::addBonds),
+         py::overload_cast<const std::vector<long int>&,
+                           const std::vector<long int>&>(&Universe::addBonds),
          "Add bonds to the underlying atoms, edges to the underlying graph. "
          "If the connected atoms are not found, the bonds are silently "
          "skipped.",
          py::arg("from"),
          py::arg("to"))
     .def("addBondsWithTypes",
-         py::overload_cast<std::vector<long int>,
-                           std::vector<long int>,
-                           std::vector<int>>(&Universe::addBonds),
+         py::overload_cast<const std::vector<long int>&,
+                           const std::vector<long int>&,
+                           const std::vector<int>&>(&Universe::addBonds),
          "Add bonds to the underlying atoms, edges to the underlying graph. "
          "If the connected atoms are not found, the bonds are silently "
          "skipped.",
@@ -921,9 +921,8 @@ init_pylimer_bound_entities(py::module_& m)
        An iterator to iterate throught the universes in :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence`.
   )pbdoc")
     .def("__iter__",
-         [](LazyUniverseSequenceIterator& it) -> LazyUniverseSequenceIterator& {
-           return it;
-         })
+         [](const LazyUniverseSequenceIterator& it)
+           -> const LazyUniverseSequenceIterator& { return it; })
     .def("__next__", &LazyUniverseSequenceIterator::next);
 
   py::class_<UniverseSequence>(m, "UniverseSequence", R"pbdoc(

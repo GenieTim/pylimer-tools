@@ -19,14 +19,14 @@ extern "C"
 namespace pylimer_tools {
 namespace entities {
   EigenNeighbourList::EigenNeighbourList(const Eigen::VectorXd& coordinates,
-                                         const Box box,
+                                         const Box &box,
                                          double cutoff)
   {
     this->initialize(coordinates, box, cutoff);
   }
 
   void EigenNeighbourList::initialize(const Eigen::VectorXd& coordinates,
-                                 const Box box,
+                                 const Box &box,
                                  double cutoff)
   {
     INVALIDARG_EXP_IFN(cutoff > 1e-3, "Cutoff must be larger than zero");

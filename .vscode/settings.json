@@ -1,5 +1,6 @@
 {
   "C_Cpp.errorSquiggles": "enabledIfIncludesResolve",
+  "c-cpp-flylint.cppcheck.extraArgs": ["--quiet"],
   "files.associations": {
     "*.rdfa": "html",
     ".babelrc": "json",

@@ -16,8 +16,8 @@ extern "C"
 namespace pylimer_tools {
 namespace entities {
 
-  NeighbourList::NeighbourList(const std::vector<Atom> atoms,
-                               const Box box,
+  NeighbourList::NeighbourList(const std::vector<Atom> &atoms,
+                               const Box &box,
                                double cutoff)
   {
     if (cutoff <= 1e-3) {
@@ -59,13 +59,13 @@ namespace entities {
   };
 
   std::vector<pylimer_tools::entities::Atom> NeighbourList::getAtomsCloseTo(
-    pylimer_tools::entities::Atom atom)
+    const pylimer_tools::entities::Atom &atom)
   {
     return this->getAtomsCloseTo(atom, this->cutoff);
   }
 
   std::vector<pylimer_tools::entities::Atom> NeighbourList::getAtomsCloseTo(
-    pylimer_tools::entities::Atom atom,
+    const pylimer_tools::entities::Atom &atom,
     double upperCutoff,
     double lowerCutoff,
     bool unwrapped)
@@ -128,7 +128,7 @@ namespace entities {
     return results;
   }
 
-  void NeighbourList::removeAtom(Atom atom, std::string debugHint)
+  void NeighbourList::removeAtom(const Atom &atom, const std::string debugHint)
   {
     if (this->idToAtomIdx.size() == 0) {
       this->idToAtomIdx.reserve(this->atoms.size());

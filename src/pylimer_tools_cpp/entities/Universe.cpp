@@ -24,7 +24,7 @@ extern "C"
 
 namespace pylimer_tools {
 namespace entities {
-  Universe::Universe(Box box)
+  Universe::Universe(const Box& box)
   {
     /* turn on attribute handling: TODO: move to some main() function  */
     if (!igraph_has_attribute_table()) {
@@ -156,14 +156,14 @@ namespace entities {
   }
 
   // other functions
-  void Universe::addAtoms(std::vector<long int> newIds,
-                          std::vector<int> newTypes,
-                          std::vector<double> newX,
-                          std::vector<double> newY,
-                          std::vector<double> newZ,
-                          std::vector<int> newNx,
-                          std::vector<int> newNy,
-                          std::vector<int> newNz)
+  void Universe::addAtoms(const std::vector<long int>& newIds,
+                          const std::vector<int>& newTypes,
+                          const std::vector<double>& newX,
+                          const std::vector<double>& newY,
+                          const std::vector<double>& newZ,
+                          const std::vector<int>& newNx,
+                          const std::vector<int>& newNy,
+                          const std::vector<int>& newNz)
   {
     std::unordered_map<std::string, std::vector<double>> additionalData;
     this->addAtoms(
@@ -171,15 +171,15 @@ namespace entities {
   }
 
   void Universe::addAtoms(
-    std::vector<long int> newIds,
-    std::vector<int> newTypes,
-    std::vector<double> newX,
-    std::vector<double> newY,
-    std::vector<double> newZ,
-    std::vector<int> newNx,
-    std::vector<int> newNy,
-    std::vector<int> newNz,
-    std::unordered_map<std::string, std::vector<double>> additionalData)
+    const std::vector<long int>& newIds,
+    const std::vector<int>& newTypes,
+    const std::vector<double>& newX,
+    const std::vector<double>& newY,
+    const std::vector<double>& newZ,
+    const std::vector<int>& newNx,
+    const std::vector<int>& newNy,
+    const std::vector<int>& newNz,
+    const std::unordered_map<std::string, std::vector<double>>& additionalData)
   {
     size_t NNewAtoms = newNy.size();
     INVALIDARG_EXP_IFN(all_equal<size_t>(8,
@@ -297,7 +297,7 @@ namespace entities {
       &this->graph, "type", vertexIdx, replacement.getType());
   }
 
-  void Universe::removeAtoms(std::vector<long int> ids)
+  void Universe::removeAtoms(const std::vector<long int>& ids)
   {
     igraph_vector_int_t vertexIds;
     igraph_vector_int_init(&vertexIds, ids.size());
@@ -327,8 +327,8 @@ namespace entities {
     this->NBonds = igraph_ecount(&this->graph);
   }
 
-  void Universe::removeBonds(const std::vector<long int> atomIdsFrom,
-                             const std::vector<long int> atomIdsTo)
+  void Universe::removeBonds(const std::vector<long int>& atomIdsFrom,
+                             const std::vector<long int>& atomIdsTo)
   {
     if (atomIdsFrom.size() != atomIdsTo.size()) {
       throw std::invalid_argument(
@@ -353,27 +353,30 @@ namespace entities {
     this->NBonds = igraph_ecount(&this->graph);
   }
 
-  void Universe::addBonds(std::vector<long int> from, std::vector<long int> to)
+  void Universe::addBonds(const std::vector<long int>& from,
+                          const std::vector<long int>& to)
   {
     this->addBonds(from.size(), from, to);
   }
-  
+
   void Universe::addBonds(const size_t NNewBonds,
-                          std::vector<long int> from,
-                          std::vector<long int> to)
+                          const std::vector<long int>& from,
+                          const std::vector<long int>& to)
   {
     this->addBonds(NNewBonds, from, to, std::vector<int>());
   }
 
-  void Universe::addBonds(std::vector<long int> from, std::vector<long int> to, std::vector<int> types)
+  void Universe::addBonds(const std::vector<long int>& from,
+                          const std::vector<long int>& to,
+                          const std::vector<int>& types)
   {
     this->addBonds(from.size(), from, to, types);
   }
 
   void Universe::addBonds(const size_t NNewBonds,
-                          std::vector<long int> from,
-                          std::vector<long int> to,
-                          std::vector<int> bondTypes,
+                          const std::vector<long int>& from,
+                          const std::vector<long int>& to,
+                          const std::vector<int>& bondTypes,
                           const bool ignoreNonExistentAtoms,
                           const bool simplify)
   {
@@ -395,16 +398,12 @@ namespace entities {
         // two at once to throw in case one end cannot be resolved
         size_t vertexFrom = this->atomIdToVertexIdx.at(newEdgesVector[i - 1]);
         size_t vertexTo = this->atomIdToVertexIdx.at(newEdgesVector[i]);
-        igraph_vector_int_set(
-          &newEdges,
-          innerIndex,
-          this->atomIdToVertexIdx.at(newEdgesVector[i - 1]));
+        igraph_vector_int_set(&newEdges, innerIndex, vertexFrom);
         innerIndex += 1;
-        igraph_vector_int_set(
-          &newEdges, innerIndex, this->atomIdToVertexIdx.at(newEdgesVector[i]));
+        igraph_vector_int_set(&newEdges, innerIndex, vertexTo);
         innerIndex += 1;
         actualNrOfBondsAdded += 1;
-      } catch (std::out_of_range ex) {
+      } catch (std::out_of_range& ex) {
         if (!ignoreNonExistentAtoms) {
           igraph_vector_int_destroy(&newEdges);
           throw std::invalid_argument(
@@ -464,10 +463,10 @@ namespace entities {
    * @param to
    * @param types
    */
-  void Universe::addAngles(std::vector<long int> from,
-                           std::vector<long int> via,
-                           std::vector<long int> to,
-                           std::vector<int> types)
+  void Universe::addAngles(const std::vector<long int>& from,
+                           const std::vector<long int>& via,
+                           const std::vector<long int>& to,
+                           const std::vector<int>& types)
   {
     if (!all_equal<size_t>(
           4, from.size(), to.size(), via.size(), types.size())) {
@@ -498,11 +497,11 @@ namespace entities {
    * @param to
    * @param types
    */
-  void Universe::addDihedralAngles(std::vector<long int> from,
-                                   std::vector<long int> via1,
-                                   std::vector<long int> via2,
-                                   std::vector<long int> to,
-                                   std::vector<int> types)
+  void Universe::addDihedralAngles(const std::vector<long int>& from,
+                                   const std::vector<long int>& via1,
+                                   const std::vector<long int>& via2,
+                                   const std::vector<long int>& to,
+                                   const std::vector<int>& types)
   {
     if (!all_equal<size_t>(
           5, from.size(), to.size(), via1.size(), via2.size(), types.size())) {
@@ -607,7 +606,7 @@ namespace entities {
    *
    * @param massPerType the weight per type
    */
-  void Universe::setMasses(std::map<int, double> massPerType)
+  void Universe::setMasses(const std::map<int, double>& massPerType)
   {
     this->massPerType = massPerType;
   }
@@ -1252,11 +1251,8 @@ namespace entities {
     // NOTE: there are exponentially many paths between two vertices of a graph,
     // and you may run out of memory when using this function, if your graph is
     // lattice-like.
-    std::map<int, std::vector<std::vector<Atom>>> results;
-
     std::vector<long int> startingCrosslinkers =
       this->getIndicesOfType(crosslinkerType);
-    std::unordered_set<int> processedPathsKeys;
 
     // note: this algorithm is not particularly efficient
     // it is of the order of O(n*n!)
@@ -1437,7 +1433,6 @@ namespace entities {
       return partialMasses;
     }
 
-    std::vector<int> types = this->getPropertyValues<int>("type");
     std::map<int, int> numberPerType = this->countAtomTypes();
 
     // if we do not have any masses stored, we return the "general" fractions
@@ -1485,14 +1480,11 @@ namespace entities {
     for (pylimer_tools::entities::Universe cluster : clusters) {
       double clusterMass = cluster.computeTotalMass();
       totalMass += clusterMass;
-      // for (size_t atomIdIdx = atomIds.size()-1; atomIdIdx >= 0; --atomIdIdx) {
-      //   long int atomId = atomIds[atomIdIdx];
-      for (long int atomId : atomIds) {
-        if (cluster.containsAtomWithId(atomId)) {
-          partialMass += clusterMass;
-          // atomIds.erase(atomIds.begin() + atomIdIdx);
-          break;
-        }
+      if (std::any_of(
+            atomIds.begin(), atomIds.end(), [cluster](long int atomId) {
+              return cluster.containsAtomWithId(atomId);
+            })) {
+        partialMass += clusterMass;
       }
     }
 
@@ -2105,8 +2097,9 @@ namespace entities {
    * @param bondTo
    * @return std::vector<double>
    */
-  std::vector<double> Universe::computeDxs(const std::vector<long int> bondFrom,
-                                           const std::vector<long int> bondTo)
+  std::vector<double> Universe::computeDxs(
+    const std::vector<long int>& bondFrom,
+    const std::vector<long int>& bondTo)
   {
     return this->computeDs(bondFrom, bondTo, "x", this->box.getLx());
   };
@@ -2118,8 +2111,9 @@ namespace entities {
    * @param bondTo
    * @return std::vector<double>
    */
-  std::vector<double> Universe::computeDys(const std::vector<long int> bondFrom,
-                                           const std::vector<long int> bondTo)
+  std::vector<double> Universe::computeDys(
+    const std::vector<long int>& bondFrom,
+    const std::vector<long int>& bondTo)
   {
     return this->computeDs(bondFrom, bondTo, "y", this->box.getLy());
   };
@@ -2131,8 +2125,9 @@ namespace entities {
    * @param bondTo
    * @return std::vector<double>
    */
-  std::vector<double> Universe::computeDzs(const std::vector<long int> bondFrom,
-                                           const std::vector<long int> bondTo)
+  std::vector<double> Universe::computeDzs(
+    const std::vector<long int>& bondFrom,
+    const std::vector<long int>& bondTo)
   {
     return this->computeDs(bondFrom, bondTo, "z", this->box.getLz());
   };
@@ -2147,10 +2142,10 @@ namespace entities {
    * @param boxLimit
    * @return std::vector<double>
    */
-  std::vector<double> Universe::computeDs(const std::vector<long int> bondFrom,
-                                          const std::vector<long int> bondTo,
-                                          std::string direction,
-                                          double boxLimit) const
+  std::vector<double> Universe::computeDs(const std::vector<long int>& bondFrom,
+                                          const std::vector<long int>& bondTo,
+                                          const std::string& direction,
+                                          const double boxLimit) const
   {
     if (bondFrom.size() != bondTo.size()) {
       throw std::invalid_argument(
@@ -2222,12 +2217,11 @@ namespace entities {
     std::vector<Molecule> molecules = this->getMolecules(crosslinkerType);
 
     double multiplier = 1.0 / static_cast<double>(molecules.size());
-    double meanStrandLength = 0;
+    double meanStrandLength = std::reduce(
+      molecules.begin(), molecules.end(), 0.0, [multiplier](double val, const Molecule &molecule) {
+        return val + static_cast<double>(molecule.getLength()) * multiplier;
+      });
 
-    for (Molecule molecule : molecules) {
-      meanStrandLength +=
-        static_cast<double>(molecule.getLength()) * multiplier;
-    }
     return meanStrandLength;
   }
 
@@ -2245,15 +2239,13 @@ namespace entities {
     std::vector<Molecule> molecules =
       this->getChainsWithCrosslinker(crosslinkerType);
 
-    double meanEndToEndDistance = 0;
-    int validMolecules = 0;
     std::vector<double> distances;
     distances.reserve(molecules.size());
-
-    for (Molecule molecule : molecules) {
-      double dist = molecule.computeEndToEndDistance();
-      distances.push_back(dist);
-    }
+    std::transform(
+      molecules.begin(),
+      molecules.end(),
+      std::back_inserter(distances),
+      [](Molecule molecule) { return molecule.computeEndToEndDistance(); });
 
     return distances;
   }
@@ -2419,8 +2411,6 @@ namespace entities {
   double Universe::computeNumberAverageMolecularWeight(
     int crosslinkerType) const
   {
-    double weightAverage = 0.0;
-
     std::vector<Molecule> molecules = this->getMolecules(crosslinkerType);
     std::map<int, double> massPerTypeToUse(this->massPerType);
     massPerTypeToUse[crosslinkerType] = 0.0;
@@ -2489,7 +2479,7 @@ namespace entities {
     return this->NBonds;
   }
 
-  void Universe::setBox(Box passedBox, bool rescaleAtomCoordinates)
+  void Universe::setBox(const Box &passedBox, bool rescaleAtomCoordinates)
   {
     if (rescaleAtomCoordinates) {
       double scalingFactorX = passedBox.getLx() / this->box.getLx();
