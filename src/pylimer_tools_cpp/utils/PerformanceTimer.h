@@ -93,8 +93,11 @@ namespace utils {
                                       unit,
                                       this->col3width,
                                       5);
-      this->printNumberRightWithWidth(
-        this->sectionVariance_mus[idx] * 1., "µs", this->col4width, 5);
+      this->printNumberRightWithWidth(this->sectionVariance_mus[idx] *
+                                        conversionFactor,
+                                      unit,
+                                      this->col4width,
+                                      5);
       this->printNumberRightWithWidth(
         100 * this->sectionMean_mus[idx] / total, "%", this->col5width, 2);
       std::cout << std::endl;
@@ -168,8 +171,10 @@ namespace utils {
       // see e.g.
       // https://math.stackexchange.com/questions/102978/incremental-computation-of-standard-deviation#comment241843_103025
       this->sectionVariance_mus[this->currentSection] =
-        (numMeasurementsBefore > 0 ? (((numMeasurementsBefore - 1) / (numMeasurementsBefore)) *
-          this->sectionVariance_mus[this->currentSection]) : 0) +
+        (numMeasurementsBefore > 0
+           ? (((numMeasurementsBefore - 1) / (numMeasurementsBefore)) *
+              this->sectionVariance_mus[this->currentSection])
+           : 0) +
         denominator * SQUARE(us - this->sectionMean_mus[this->currentSection]);
 
       // record the new average microseconds

@@ -259,6 +259,8 @@ namespace calc {
       forces(this->bondPartnerCoordinatesA) -= this->k * bondDistances;
       forces(this->bondPartnerCoordinatesB) += this->k * bondDistances;
 
+      // we use our own parallelization -> disable the one by Eigen
+      Eigen::setNbThreads(1);
 #pragma omp parallel for reduction(+ : stressTensor, pressure)
       for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
         // TODO: check sign
@@ -280,6 +282,7 @@ namespace calc {
          this->box.getVolume())));
 
       // actually loop the atoms
+#pragma omp parallel for reduction(+ : forces, stressTensor, pressure) private(neighbors)
       for (size_t i = 0; i < this->numAtoms; ++i) {
         int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
           neighbors, coords.segment(3 * i, 3), cutoff);
@@ -336,6 +339,8 @@ namespace calc {
         }
       }
 
+      // reset Eigen threads
+      Eigen::setNbThreads(0);
       return pressure / (3. * this->box.getVolume());
     }
 
