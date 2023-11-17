@@ -24,12 +24,6 @@ extern "C"
 #include <unordered_set>
 #include <vector>
 
-#ifdef PARALLEL
-#define EXEC_POLICY std::execution::parallel_policy
-#else
-#define EXEC_POLICY std::execution::sequenced_policy
-#endif
-
 namespace pylimer_tools {
 namespace entities {
   Universe::Universe(const Box& box)
@@ -2225,8 +2219,7 @@ namespace entities {
     std::vector<Molecule> molecules = this->getMolecules(crosslinkerType);
 
     double multiplier = 1.0 / static_cast<double>(molecules.size());
-    double meanStrandLength = std::reduce(
-      EXEC_POLICY,
+    double meanStrandLength = std::accumulate(
       molecules.begin(),
       molecules.end(),
       0.0,
