@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <random>
 #include <string>
 #include <type_traits>
 
@@ -26,6 +27,44 @@ extern "C"
 }
 
 namespace cereal {
+////////////////////////////////////////////////////////////////
+// serialization of some randomness
+template<class Archive>
+void
+save(Archive& archive,
+     const std::uniform_real_distribution<double>& distribution)
+{
+  archive(distribution.a(), distribution.b());
+}
+
+template<class Archive>
+void
+load(Archive& archive, std::uniform_real_distribution<double>& distribution)
+{
+  double a, b;
+  archive(a, b);
+  distribution = std::uniform_real_distribution<double>(a, b);
+}
+
+template<class Archive>
+void
+save(Archive& archive, const std::mt19937& mt)
+{
+  std::ostringstream oss;
+  oss << mt;
+  archive(oss.str());
+}
+
+template<class Archive>
+void
+load(Archive& archive, std::mt19937& mt)
+{
+  std::string str;
+  archive(str);
+  std::istringstream iss(str);
+  iss >> mt;
+}
+
 ////////////////////////////////////////////////////////////////
 // serialization of Eigen objects
 
@@ -317,8 +356,6 @@ template<class Archive>
 inline void
 CEREAL_LOAD_FUNCTION_NAME(Archive& ar, igraph_t& graph)
 {
-  igraph_set_attribute_table(&igraph_cattribute_table);
-  igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
   size_t numVertices;
   ar(make_nvp("num_vertices", numVertices));
   size_t numEdges;

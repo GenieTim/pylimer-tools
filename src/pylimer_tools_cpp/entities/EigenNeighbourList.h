@@ -5,8 +5,8 @@ extern "C"
 {
 #include <igraph/igraph.h>
 }
-#include "Box.h"
 #include "../utils/ExtraEigenTypes.h"
+#include "Box.h"
 #include <Eigen/Dense>
 #include <cereal/access.hpp>
 #include <iostream>
@@ -32,14 +32,14 @@ namespace entities {
   class EigenNeighbourList
   {
   public:
-    EigenNeighbourList(){}
+    EigenNeighbourList() {}
     EigenNeighbourList(const Eigen::VectorXd& coordinates,
                        const Box box,
                        double cutoff);
 
     void initialize(const Eigen::VectorXd& coordinates,
-                       const Box box,
-                       double cutoff);
+                    const Box box,
+                    double cutoff);
 
     /**
      * @brief Re-bin with a new set of coordinates
@@ -102,6 +102,7 @@ namespace entities {
     {
       ar(bucketWidths,
          nrOfBuckets,
+         totalNrOfBuckets,
          cutoff,
          box,
          neighbourBuckets,
@@ -143,7 +144,6 @@ namespace entities {
     std::vector<std::vector<bucket_idx_t>>
       neighbourBucketNeighboursDefaultCutoff;
     Eigen::VectorXi neighbourBucketSizes;
-
   };
 };
 };

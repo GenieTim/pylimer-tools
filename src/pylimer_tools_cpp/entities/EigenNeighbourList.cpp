@@ -84,7 +84,7 @@ namespace entities {
   void EigenNeighbourList::resetCoordinates(Eigen::VectorXd& newCoordinates)
   {
     // just override all the buckets.
-    this->neighbourBucketSizes = Eigen::ArrayXi::Zero(this->totalNrOfBuckets);
+    this->neighbourBucketSizes.setZero();// = Eigen::ArrayXi::Zero(this->totalNrOfBuckets);
     for (size_t i = 0; i < (newCoordinates.size() / 3); ++i) {
       int bucketIndex = this->getBucketIndexForTriplet(
         this->getBucketTripletForCoordinates(newCoordinates.segment(3 * i, 3)));
