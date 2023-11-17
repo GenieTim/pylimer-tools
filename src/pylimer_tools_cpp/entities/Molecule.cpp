@@ -4,7 +4,6 @@
 #include "Atom.h"
 #include <Eigen/Dense>
 #include <algorithm>
-#include <execution>
 #include <iostream>
 #include <numeric>
 #include <set>
