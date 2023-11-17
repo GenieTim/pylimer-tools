@@ -8,6 +8,10 @@
 #include <iostream>
 #include <string>
 
+#ifdef OPENMP_FOUND
+#include <omp.h>
+#endif
+
 namespace pylimer_tools {
 
 namespace utils {
@@ -219,8 +223,13 @@ namespace utils {
       }
       this->printLine();
 
-      std::cout << "\n"
-                << "Total: " << total << " µs per one of " << numMeasurements
+      std::cout << "\n";
+
+#ifdef OPENMP_FOUND
+      std::cout << "OpenMP: " << omp_get_num_threads() << " threads."
+                << std::endl;
+#endif
+      std::cout << "Total: " << total << " µs per one of " << numMeasurements
                 << " measurements." << std::endl;
     }
   };
