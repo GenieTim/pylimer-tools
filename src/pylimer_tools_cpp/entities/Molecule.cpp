@@ -140,7 +140,7 @@ namespace entities {
       std::reduce(presentTypes.begin(),
                   presentTypes.end(),
                   0.0,
-                  [&massPerType = this->massPerType](double val, int type) {
+                  [&massPerType = this->massPerType](int type, double val) {
                     return val + massPerType[type];
                   });
     return totalWeight;
@@ -244,7 +244,7 @@ namespace entities {
     auto innerReduction = [&virtualCenterAtom,
                            correctingFactor,
                            &massPerType = this->massPerType,
-                           &box = this->parent](double val, Atom a) -> double {
+                           &box = this->parent](const Atom &a, double val) -> double {
       double dist = a.distanceToUnwrapped(virtualCenterAtom, box);
       return val +
              (correctingFactor * massPerType.at(a.getType()) * dist * dist);
