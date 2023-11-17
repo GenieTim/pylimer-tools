@@ -2218,7 +2218,7 @@ namespace entities {
 
     double multiplier = 1.0 / static_cast<double>(molecules.size());
     double meanStrandLength = std::reduce(
-      molecules.begin(), molecules.end(), 0.0, [multiplier](double val, const Molecule &molecule) {
+      molecules.begin(), molecules.end(), 0.0, [multiplier](const Molecule &molecule, double val) {
         return val + static_cast<double>(molecule.getLength()) * multiplier;
       });
 
