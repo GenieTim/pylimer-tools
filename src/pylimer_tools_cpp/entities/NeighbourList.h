@@ -26,18 +26,18 @@ namespace entities {
   class NeighbourList
   {
   public:
-    NeighbourList(const std::vector<Atom> atoms, const Box box, double cutoff);
+    NeighbourList(const std::vector<Atom> &atoms, const Box &box, double cutoff);
 
     std::vector<pylimer_tools::entities::Atom> getAtomsCloseTo(
-      pylimer_tools::entities::Atom atom);
+      const pylimer_tools::entities::Atom &atom);
 
     std::vector<pylimer_tools::entities::Atom> getAtomsCloseTo(
-      pylimer_tools::entities::Atom atom,
+      const pylimer_tools::entities::Atom &atom,
       double upperCutoff,
       double lowerCutoff = 0.0,
       bool unwrapped = false);
 
-    void removeAtom(Atom atom, std::string debugHint = "");
+    void removeAtom(const Atom &atom, const std::string debugHint = "");
 
   protected:
     size_t normalizeBucketIndex(long int bucketIndex, size_t nrOfBuckets) const;

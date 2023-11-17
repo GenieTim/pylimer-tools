@@ -452,10 +452,10 @@ namespace entities {
     igraph_vs_t getVerticesWithDegreeSelector(int degree) const;
     std::vector<long int> getVerticesWithDegree(int degree) const;
     std::vector<long int> getVerticesWithDegree(
-      std::vector<int> ofDegrees) const;
+      const std::vector<int> &ofDegrees) const;
     std::vector<long int> getVerticesWithDegree(
       const igraph_t* someGraph,
-      std::vector<int> ofDegrees) const;
+      const std::vector<int> &ofDegrees) const;
   };
 
 } // namespace entities

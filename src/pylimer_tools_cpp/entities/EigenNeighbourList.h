@@ -34,11 +34,11 @@ namespace entities {
   public:
     EigenNeighbourList() {}
     EigenNeighbourList(const Eigen::VectorXd& coordinates,
-                       const Box box,
+                       const Box &box,
                        double cutoff);
 
     void initialize(const Eigen::VectorXd& coordinates,
-                    const Box box,
+                    const Box &box,
                     double cutoff);
 
     /**

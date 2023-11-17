@@ -261,123 +261,120 @@ namespace entities {
   {
     std::vector<Atom> results;
     results.reserve(vertexIds.size());
-    for (long int vertexId : vertexIds) {
-      results.push_back(this->getAtomByVertexIdx(vertexId));
-    }
+    std::transform(
+      vertexIds.begin(),
+      vertexIds.end(),
+      std::back_inserter(results),
+      [&](long int vertexId) { return this->getAtomByVertexIdx(vertexId); });
     return results;
   };
 
-    /**
-     * @brief Check whether a vertex property exists
-     * 
-     * @param propertyName the property to check
-     * @return true if the attribute has been set at any point in time
-     * @return false or not
-     */
+  /**
+   * @brief Check whether a vertex property exists
+   *
+   * @param propertyName the property to check
+   * @return true if the attribute has been set at any point in time
+   * @return false or not
+   */
   bool AtomGraphParent::vertexPropertyExists(const char* propertyName) const
-    {
-      return igraph_cattribute_has_attr(
-        &this->graph, IGRAPH_ATTRIBUTE_VERTEX, propertyName);
-    };
+  {
+    return igraph_cattribute_has_attr(
+      &this->graph, IGRAPH_ATTRIBUTE_VERTEX, propertyName);
+  };
 
-    /**
-     * @brief Get the unwrapped coordinates for a given set of vertices
-     * 
-     * @param selector 
-     * @param box 
-     * @return Eigen::VectorXd 
-     */
-    Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
-      const igraph_vs_t selector,
-      const pylimer_tools::entities::Box* box) const
-    {
-      igraph_vector_t xvalues;
-      igraph_vector_init(&xvalues, 0);
-      igraph_vector_t yvalues;
-      igraph_vector_init(&yvalues, 0);
-      igraph_vector_t zvalues;
-      igraph_vector_init(&zvalues, 0);
-      igraph_vector_t nxvalues;
-      igraph_vector_init(&nxvalues, 0);
-      igraph_vector_t nyvalues;
-      igraph_vector_init(&nyvalues, 0);
-      igraph_vector_t nzvalues;
-      igraph_vector_init(&nzvalues, 0);
+  /**
+   * @brief Get the unwrapped coordinates for a given set of vertices
+   *
+   * @param selector
+   * @param box
+   * @return Eigen::VectorXd
+   */
+  Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
+    const igraph_vs_t selector,
+    const pylimer_tools::entities::Box* box) const
+  {
+    igraph_vector_t xvalues;
+    igraph_vector_init(&xvalues, 0);
+    igraph_vector_t yvalues;
+    igraph_vector_init(&yvalues, 0);
+    igraph_vector_t zvalues;
+    igraph_vector_init(&zvalues, 0);
+    igraph_vector_t nxvalues;
+    igraph_vector_init(&nxvalues, 0);
+    igraph_vector_t nyvalues;
+    igraph_vector_init(&nyvalues, 0);
+    igraph_vector_t nzvalues;
+    igraph_vector_init(&nzvalues, 0);
 
-      if (igraph_cattribute_VANV(
-            &this->graph, "x", igraph_vss_all(), &xvalues)) {
-        throw std::runtime_error("Failed to query property x of graph.");
-      }
-      if (igraph_cattribute_VANV(
-            &this->graph, "y", igraph_vss_all(), &yvalues)) {
-        throw std::runtime_error("Failed to query property y of graph.");
-      }
-      if (igraph_cattribute_VANV(
-            &this->graph, "z", igraph_vss_all(), &zvalues)) {
-        throw std::runtime_error("Failed to query property z of graph.");
-      }
-      if (igraph_cattribute_VANV(
-            &this->graph, "nx", igraph_vss_all(), &nxvalues)) {
-        throw std::runtime_error("Failed to query property nx of graph.");
-      }
-      if (igraph_cattribute_VANV(
-            &this->graph, "ny", igraph_vss_all(), &nyvalues)) {
-        throw std::runtime_error("Failed to query property ny of graph.");
-      }
-      if (igraph_cattribute_VANV(
-            &this->graph, "nz", igraph_vss_all(), &nzvalues)) {
-        throw std::runtime_error("Failed to query property nz of graph.");
-      }
-
-      const size_t size = igraph_vector_size(&xvalues);
-      Eigen::VectorXd results = Eigen::VectorXd::Zero(size * 3);
-      for (size_t i = 0; i < size; i++) {
-        results[3 * i] = igraph_vector_get(&xvalues, i) +
-                         (box->getLx() * igraph_vector_get(&nxvalues, i));
-        results[3 * i + 1] = igraph_vector_get(&yvalues, i) +
-                             (box->getLy() * igraph_vector_get(&nyvalues, i));
-        results[3 * i + 2] = igraph_vector_get(&zvalues, i) +
-                             (box->getLz() * igraph_vector_get(&nzvalues, i));
-      }
-
-      igraph_vector_destroy(&xvalues);
-      igraph_vector_destroy(&yvalues);
-      igraph_vector_destroy(&zvalues);
-      igraph_vector_destroy(&nxvalues);
-      igraph_vector_destroy(&nyvalues);
-      igraph_vector_destroy(&nzvalues);
-
-      return results;
+    if (igraph_cattribute_VANV(&this->graph, "x", igraph_vss_all(), &xvalues)) {
+      throw std::runtime_error("Failed to query property x of graph.");
+    }
+    if (igraph_cattribute_VANV(&this->graph, "y", igraph_vss_all(), &yvalues)) {
+      throw std::runtime_error("Failed to query property y of graph.");
+    }
+    if (igraph_cattribute_VANV(&this->graph, "z", igraph_vss_all(), &zvalues)) {
+      throw std::runtime_error("Failed to query property z of graph.");
+    }
+    if (igraph_cattribute_VANV(
+          &this->graph, "nx", igraph_vss_all(), &nxvalues)) {
+      throw std::runtime_error("Failed to query property nx of graph.");
+    }
+    if (igraph_cattribute_VANV(
+          &this->graph, "ny", igraph_vss_all(), &nyvalues)) {
+      throw std::runtime_error("Failed to query property ny of graph.");
+    }
+    if (igraph_cattribute_VANV(
+          &this->graph, "nz", igraph_vss_all(), &nzvalues)) {
+      throw std::runtime_error("Failed to query property nz of graph.");
     }
 
-
-    Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
-      const pylimer_tools::entities::Box* box) const
-    {
-      return this->getUnwrappedVertexCoordinates(igraph_vss_all(), box);
+    const size_t size = igraph_vector_size(&xvalues);
+    Eigen::VectorXd results = Eigen::VectorXd::Zero(size * 3);
+    for (size_t i = 0; i < size; i++) {
+      results[3 * i] = igraph_vector_get(&xvalues, i) +
+                       (box->getLx() * igraph_vector_get(&nxvalues, i));
+      results[3 * i + 1] = igraph_vector_get(&yvalues, i) +
+                           (box->getLy() * igraph_vector_get(&nyvalues, i));
+      results[3 * i + 2] = igraph_vector_get(&zvalues, i) +
+                           (box->getLz() * igraph_vector_get(&nzvalues, i));
     }
 
-    Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
-      igraph_vector_int_t& vertices,
-      const pylimer_tools::entities::Box* box) const
-    {
-      return this->getUnwrappedVertexCoordinates(igraph_vss_vector(&vertices),
-                                                 box);
-    }
+    igraph_vector_destroy(&xvalues);
+    igraph_vector_destroy(&yvalues);
+    igraph_vector_destroy(&zvalues);
+    igraph_vector_destroy(&nxvalues);
+    igraph_vector_destroy(&nyvalues);
+    igraph_vector_destroy(&nzvalues);
 
-    Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
-      std::vector<long int>& vertices,
-      const pylimer_tools::entities::Box* box) const
-    {
-      igraph_vector_int_t vertices_v;
-      igraph_vector_int_init(&vertices_v, vertices.size());
-      pylimer_tools::utils::StdVectorToIgraphVectorT(vertices, &vertices_v);
-      Eigen::VectorXd result =
-        this->getUnwrappedVertexCoordinates(vertices_v, box);
-      igraph_vector_int_destroy(&vertices_v);
-      return result;
-    }
+    return results;
+  }
 
+  Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
+    const pylimer_tools::entities::Box* box) const
+  {
+    return this->getUnwrappedVertexCoordinates(igraph_vss_all(), box);
+  }
+
+  Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
+    igraph_vector_int_t& vertices,
+    const pylimer_tools::entities::Box* box) const
+  {
+    return this->getUnwrappedVertexCoordinates(igraph_vss_vector(&vertices),
+                                               box);
+  }
+
+  Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
+    std::vector<long int>& vertices,
+    const pylimer_tools::entities::Box* box) const
+  {
+    igraph_vector_int_t vertices_v;
+    igraph_vector_int_init(&vertices_v, vertices.size());
+    pylimer_tools::utils::StdVectorToIgraphVectorT(vertices, &vertices_v);
+    Eigen::VectorXd result =
+      this->getUnwrappedVertexCoordinates(vertices_v, box);
+    igraph_vector_int_destroy(&vertices_v);
+    return result;
+  }
 
   /**
    * @brief Get all atoms with a certain number of bonds
@@ -487,8 +484,8 @@ namespace entities {
     }
     long hash = (typeFrom << 20) | (typeVia << 10) | typeTo;
     return hash;
-    // unhashing: typeFrom = hash >> 20; typeVia = (hash >> 10) & 0x3ff; typeTo =
-    // (hash & 0x3ff);
+    // unhashing: typeFrom = hash >> 20; typeVia = (hash >> 10) & 0x3ff; typeTo
+    // = (hash & 0x3ff);
   };
 
   /**
@@ -496,15 +493,16 @@ namespace entities {
    *
    */
   long AtomGraphParent::hashDihedralAngleType(int typeFrom,
-                                      int typeVia1,
-                                      int typeVia2,
-                                      int typeTo) const
+                                              int typeVia1,
+                                              int typeVia2,
+                                              int typeTo) const
   {
     if (typeFrom < 0 || typeTo < 0 || typeVia1 < 0 || typeVia2 < 0) {
       throw std::invalid_argument(
         "AtomGraphParent::hashAngleType requires positve types");
     }
-    if (typeFrom > 1000 || typeTo > 1000 || typeVia1 > 1000 || typeVia2 > 1000) {
+    if (typeFrom > 1000 || typeTo > 1000 || typeVia1 > 1000 ||
+        typeVia2 > 1000) {
       throw std::invalid_argument(
         "AtomGraphParent::hashAngleType requires types < 1000");
     }
@@ -611,7 +609,7 @@ namespace entities {
 
   std::vector<long int> AtomGraphParent::getVerticesWithDegree(
     const igraph_t* someGraph,
-    std::vector<int> ofDegrees) const
+    const std::vector<int>& ofDegrees) const
   {
     int graphSize = igraph_vcount(someGraph);
     igraph_vector_int_t degrees;
@@ -649,14 +647,15 @@ namespace entities {
   }
 
   std::vector<long int> AtomGraphParent::getVerticesWithDegree(
-    std::vector<int> ofDegrees) const
+    const std::vector<int>& ofDegrees) const
   {
     return this->getVerticesWithDegree(&this->graph, ofDegrees);
   }
 
   std::vector<long int> AtomGraphParent::getVerticesWithDegree(int degree) const
   {
-    return this->getVerticesWithDegree(std::vector<int>{ degree });
+    const std::vector<int> degrees = { degree };
+    return this->getVerticesWithDegree(degrees);
   }
 
   igraph_vs_t AtomGraphParent::getVerticesWithDegreeSelector(int degree) const

@@ -166,13 +166,6 @@ namespace calc {
        */
       double computeTemperature(const Eigen::VectorXd& velocities) const;
 
-      /**
-       * @brief Get access to the current stress-tensor
-       *
-       * @return Eigen::Matrix3d
-       */
-      Eigen::Matrix3d getStressTensor() const;
-
       double computeBondLength(int bondIdx) const
       {
         Eigen::Vector3d bondDistances =
@@ -253,14 +246,25 @@ namespace calc {
       {
         return this->currentTime;
       }
+
+      /**
+       * @brief Get access to the current stress-tensor
+       *
+       * @return Eigen::Matrix3d
+       */
       Eigen::Matrix3d getStressTensor() override
       {
         return this->currentStressTensor;
       }
+      
       int getNumShifts() override { return this->numShifts; }
+
       int getNumRelocations() override { return this->numRelocations; }
+
       size_t getNumParticles() override { return this->numAtoms; }
+
       double getVolume() override { return this->box.getVolume(); }
+
       Eigen::VectorXd getBondLengths() override
       {
         Eigen::VectorXd bondDistances =
@@ -276,7 +280,9 @@ namespace calc {
         }
         return bondLengths;
       }
+
       Eigen::VectorXd getCoordinates() override { return this->coordinates; }
+
       double getTemperature() override
       {
         return this->computeTemperature(this->currentVelocities);

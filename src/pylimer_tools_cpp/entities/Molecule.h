@@ -30,8 +30,8 @@ namespace entities {
   public:
     Molecule(const Box* parent,
              const igraph_t* graph,
-             MoleculeType type,
-             std::map<int, double> massPerType);
+             const MoleculeType type,
+             const std::map<int, double> &massPerType);
 
     // rule of three:
     // 1. destructor (to destroy the graph)
@@ -54,8 +54,8 @@ namespace entities {
     {
       return this->getPropertyValues<int>("type");
     }
-    long int getAtomIdByIdx(const int vertexId) const;
-    long int getIdxByAtomId(const int atomId) const;
+    long int getAtomIdByIdx(const int vertexId) const override;
+    long int getIdxByAtomId(const int atomId) const override;
 
     // computations
     double computeEndToEndDistance();
