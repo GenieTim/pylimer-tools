@@ -53,13 +53,14 @@ message("pylimer_tools includes igraph from ${igraph_INCLUDE_DIRS}, nlopt from $
 
 # optional additional dependencies
 find_package(OpenMP)
-if (OpenMP_FOUND AND OpenMP_INCLUDE_DIRS)
-  include_directories(${OpenMP_INCLUDE_DIRS})
-	target_link_libraries(pylimer_tools PRIVATE ${OpenMP_LIBRARIES})
+if (OpenMP_CXX_FOUND)
+  include_directories(${OpenMP_CXX_INCLUDE_DIRS})
+	# target_link_libraries(pylimer_tools PRIVATE ${OpenMP_CXX_LIBRARIES})
+	target_link_libraries(pylimer_tools PUBLIC OpenMp::OpenMP_CXX)
 	add_definitions(-DOPENMP_FOUND=true)
-	message(INFO "Found OpenMP")
+	message(STATUS "Found OpenMP")
 else()
-	message("Did not find OpenMP")
+	message(AUTHOR_WARNING "Did not find OpenMP")
 endif()
 
 target_sources(pylimer_tools

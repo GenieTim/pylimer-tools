@@ -30,6 +30,9 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#ifdef OPENMP_FOUND
+#include <omp.h>
+#endif
 
 namespace pylimer_tools {
 namespace calc {
@@ -266,6 +269,7 @@ namespace calc {
         this->box.handlePBC(bondDistances);
 
         Eigen::VectorXd bondLengths = Eigen::VectorXd::Zero(this->numBonds);
+#pragma omp parallel for
         for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
           double b = bondDistances.segment(3 * i, 3).norm();
           bondLengths[i] = b;
