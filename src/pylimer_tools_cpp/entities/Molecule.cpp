@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <iostream>
 #include <numeric>
+#include <execution>
 #include <set>
 extern "C"
 {
@@ -13,6 +14,12 @@ extern "C"
 }
 #ifdef OPENMP_FOUND
 #include <omp.h>
+#endif
+
+#ifdef PARALLEL
+#define EXEC_POLICY std::execution::parallel_policy
+#else
+#define EXEC_POLICY std::execution::sequenced_policy
 #endif
 
 namespace pylimer_tools {
@@ -138,7 +145,8 @@ namespace entities {
   {
     std::vector<int> presentTypes = this->getPropertyValues<int>("type");
     double totalWeight =
-      std::reduce(presentTypes.begin(),
+      std::reduce(EXEC_POLICY,
+        presentTypes.begin(),
                   presentTypes.end(),
                   0.0,
                   [&massPerType = this->massPerType](double val, int type) {
@@ -252,7 +260,7 @@ namespace entities {
              (correctingFactor * massPerType.at(a.getType()) * dist * dist);
     };
     double Rg2 =
-      std::reduce(allAtoms.begin(), allAtoms.end(), 0., innerReduction);
+      std::reduce(EXEC_POLICY, allAtoms.begin(), allAtoms.end(), 0., innerReduction);
 
     return Rg2;
   }

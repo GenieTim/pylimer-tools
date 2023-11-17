@@ -15,13 +15,20 @@ extern "C"
 
 #include <Eigen/Dense>
 #include <algorithm>
-#include <numeric>
+#include <execution>
 #include <iterator> // for back_inserter
 #include <map>
+#include <numeric>
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+
+#ifdef PARALLEL
+#define EXEC_POLICY std::execution::parallel_policy
+#else
+#define EXEC_POLICY std::execution::sequenced_policy
+#endif
 
 namespace pylimer_tools {
 namespace entities {
@@ -2219,6 +2226,7 @@ namespace entities {
 
     double multiplier = 1.0 / static_cast<double>(molecules.size());
     double meanStrandLength = std::reduce(
+      EXEC_POLICY,
       molecules.begin(),
       molecules.end(),
       0.0,
