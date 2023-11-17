@@ -2218,7 +2218,10 @@ namespace entities {
 
     double multiplier = 1.0 / static_cast<double>(molecules.size());
     double meanStrandLength = std::reduce(
-      molecules.begin(), molecules.end(), 0.0, [multiplier](const Molecule &molecule, double val) {
+      molecules.begin(),
+      molecules.end(),
+      0.0,
+      [multiplier](double val, const Molecule molecule) {
         return val + static_cast<double>(molecule.getLength()) * multiplier;
       });
 
@@ -2479,7 +2482,7 @@ namespace entities {
     return this->NBonds;
   }
 
-  void Universe::setBox(const Box &passedBox, bool rescaleAtomCoordinates)
+  void Universe::setBox(const Box& passedBox, bool rescaleAtomCoordinates)
   {
     if (rescaleAtomCoordinates) {
       double scalingFactorX = passedBox.getLx() / this->box.getLx();
