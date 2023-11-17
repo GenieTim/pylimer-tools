@@ -15,6 +15,7 @@ extern "C"
 
 #include <Eigen/Dense>
 #include <algorithm>
+#include <numeric>
 #include <iterator> // for back_inserter
 #include <map>
 #include <set>

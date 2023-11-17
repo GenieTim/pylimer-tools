@@ -5,6 +5,7 @@
 #include <Eigen/Dense>
 #include <algorithm>
 #include <iostream>
+#include <numeric>
 #include <set>
 extern "C"
 {
