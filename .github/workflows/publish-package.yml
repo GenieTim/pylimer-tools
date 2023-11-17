@@ -103,7 +103,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Install additional dependencies
-        run: brew install bison flex
+        run: brew install bison flex libomp
 
       - name: Build
         run: ./bin/build-wheel.sh
@@ -153,7 +153,7 @@ jobs:
         with:
           python-versions: "cp38-cp38 cp39-cp39 cp310-cp310"
           build-requirements: "cython numpy scikit-build pybind11 cmake ninja wheel"
-          system-packages: "bison flex"
+          system-packages: "bison flex libomp"
 
       - name: Store the build
         uses: actions/upload-artifact@v2
@@ -213,7 +213,7 @@ jobs:
         with:
           user: __token__
           password: ${{ secrets.PYPI_API_TOKEN }}
-          skip_existing: true
+          skip-existing: true
 
   github_release:
     runs-on: ubuntu-latest
