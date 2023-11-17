@@ -6,6 +6,7 @@
 #include "../entities/EigenNeighbourList.h"
 #include "../entities/Universe.h"
 #include "../utils/ExtraEigenTypes.h"
+#include "../utils/PerformanceTimer.h"
 #include "Correlator.h"
 #include "MEHPForceEvaluator.h"
 #include "MEHPUtilityStructures.h"
@@ -34,6 +35,23 @@ namespace pylimer_tools {
 namespace calc {
 
   namespace dpd {
+
+    enum DPDPerformanceSections
+    {
+      TIME_STEPPING,
+      FORCES,
+      PAIR_FORCE,
+      BOND_FORCE,
+      OUTPUT,
+      SHIFT,
+      RELOCATION,
+      NUM_PERFORMANCE_SECTIONS
+    };
+
+    static const std::array<std::string, 7> DPDPerformanceSectionNames = {
+      "Time-Stepping", "Forces", "Pair-Forces", "Bond-Forces",
+      "Output",        "Shift",  "Relocation"
+    };
 
     class DPDSimulator : public pylimer_tools::calc::OutputSupportingSimulation
     {
@@ -131,6 +149,8 @@ namespace calc {
         Eigen::Matrix3d& stressTensor,
         const Eigen::VectorXd& coordinates,
         const Eigen::VectorXd& velocities,
+        pylimer_tools::utils::PerformanceTimer<
+          DPDPerformanceSections::NUM_PERFORMANCE_SECTIONS>& timer,
         const double dt = 0.06,
         const double cutoff =
           1.0); // unfortunately not const because of the random nr generator

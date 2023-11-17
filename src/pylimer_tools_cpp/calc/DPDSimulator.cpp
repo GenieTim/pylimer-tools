@@ -119,24 +119,24 @@ namespace calc {
       this->prepareAllOutputs();
 
       pylimer_tools::utils::PerformanceTimer timer =
-        pylimer_tools::utils::PerformanceTimer<5>();
-      timer.registerSections(
-        { "Time-stepping", "Forces", "Output", "Shift", "Relocation" });
+        pylimer_tools::utils::PerformanceTimer<
+          DPDPerformanceSections::NUM_PERFORMANCE_SECTIONS>();
+      timer.registerSections(DPDPerformanceSectionNames);
 
       // start iterating over the steps to do
       long int step = 0;
       for (; step < nSteps; step++) {
         if (withMC && ((step % this->nStepsDPD) == 0)) {
           this->numShifts = 0;
-          timer.section(4);
+          timer.section(DPDPerformanceSections::RELOCATION);
           this->numRelocations = this->relocateSlipSprings(1. * temperature);
-          timer.section(3);
+          timer.section(DPDPerformanceSections::SHIFT);
           for (int i = 0; i < this->nStepsMC; ++i) {
             this->numShifts += this->shiftSlipSprings(1. * temperature);
           }
         }
         // update coordinates & velocities
-        timer.section(0);
+        timer.section(DPDPerformanceSections::TIME_STEPPING);
         this->currentVelocitiesPlus =
           this->currentVelocities + halfDt * this->currentForces;
         this->coordinates += dt * this->currentVelocitiesPlus;
@@ -148,16 +148,17 @@ namespace calc {
         // temperature = this->computeTemperature(velocities);
 
         // re-compute the forces with these updated coordinates & velocities
-        timer.section(1);
+        timer.section(DPDPerformanceSections::FORCES);
         double pressure = computeForces(this->currentForces,
                                         this->currentStressTensor,
                                         this->coordinates,
                                         this->currentVelocities,
+                                        timer,
                                         this->dt,
                                         1.0);
 
         // correct the velocities
-        timer.section(0);
+        timer.section(DPDPerformanceSections::TIME_STEPPING);
         this->currentVelocities =
           this->currentVelocitiesPlus + halfDt * this->currentForces;
         temperature = this->computeTemperature(this->currentVelocities);
@@ -173,7 +174,7 @@ namespace calc {
         }
 
         // output
-        timer.section(2);
+        timer.section(DPDPerformanceSections::OUTPUT);
         this->currentStep += 1;
         this->currentTime += this->dt;
         this->handleOutput(this->currentStep);
@@ -230,12 +231,15 @@ namespace calc {
      * @param k
      * @return double
      */
-    double DPDSimulator::computeForces(Eigen::VectorXd& forces,
-                                       Eigen::Matrix3d& stressTensor,
-                                       const Eigen::VectorXd& coords,
-                                       const Eigen::VectorXd& velocities,
-                                       const double dt,
-                                       const double cutoff)
+    double DPDSimulator::computeForces(
+      Eigen::VectorXd& forces,
+      Eigen::Matrix3d& stressTensor,
+      const Eigen::VectorXd& coords,
+      const Eigen::VectorXd& velocities,
+      pylimer_tools::utils::PerformanceTimer<
+        DPDPerformanceSections::NUM_PERFORMANCE_SECTIONS>& timer,
+      const double dt,
+      const double cutoff)
     {
       // initialisation
       assert(coordinates.size() == velocities.size());
@@ -246,6 +250,7 @@ namespace calc {
 
       // actual computation
       // (attractive) bond forces
+      timer.section(DPDPerformanceSections::BOND_FORCE);
       Eigen::VectorXd bondDistances = coords(this->bondPartnerCoordinatesA) -
                                       coords(this->bondPartnerCoordinatesB);
       this->box.handlePBC(bondDistances);
@@ -264,6 +269,7 @@ namespace calc {
                         bondDistances.segment(3 * i, 3).transpose();
       }
 
+      timer.section(DPDPerformanceSections::PAIR_FORCE);
       Eigen::Vector3d pairdistance;
       Eigen::Vector3d pairdistanceNormed;
       Eigen::Vector3d velocitydiff;
