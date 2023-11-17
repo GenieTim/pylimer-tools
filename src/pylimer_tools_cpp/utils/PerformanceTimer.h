@@ -168,8 +168,8 @@ namespace utils {
       // see e.g.
       // https://math.stackexchange.com/questions/102978/incremental-computation-of-standard-deviation#comment241843_103025
       this->sectionVariance_mus[this->currentSection] =
-        ((numMeasurementsBefore - 1) / (numMeasurementsBefore)) *
-          this->sectionVariance_mus[this->currentSection] +
+        (numMeasurementsBefore > 0 ? (((numMeasurementsBefore - 1) / (numMeasurementsBefore)) *
+          this->sectionVariance_mus[this->currentSection]) : 0) +
         denominator * SQUARE(us - this->sectionMean_mus[this->currentSection]);
 
       // record the new average microseconds

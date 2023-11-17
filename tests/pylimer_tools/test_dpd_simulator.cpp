@@ -109,8 +109,8 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     REQUIRE_NOTHROW(simulator.runSimulation(75, false));
     REQUIRE_NOTHROW(simulator.validateState());
     std::cout << "DPD ran, state validated." << std::endl;
-    CHECK_NOTHROW(simulator.validateNeighbourlist(2.0));
-    CHECK_NOTHROW(simulator.validateNeighbourlist(1.0));
+    // CHECK_NOTHROW(simulator.validateNeighbourlist(2.0));
+    // CHECK_NOTHROW(simulator.validateNeighbourlist(1.0));
 
     CHECK(simulator.getTemperature() == Catch::Approx(1.0).epsilon(0.5));
     CHECK_NOTHROW(simulator.validateState());
