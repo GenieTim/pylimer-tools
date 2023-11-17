@@ -7,15 +7,14 @@
 #include "Box.h"
 #include "NeighbourList.h"
 
+#include <Eigen/Dense>
+
 extern "C"
 {
 #include <igraph/igraph.h>
 }
-#include <cassert>
-
-#include <Eigen/Dense>
 #include <algorithm>
-#include <execution>
+#include <cassert>
 #include <iterator> // for back_inserter
 #include <map>
 #include <numeric>
@@ -23,6 +22,7 @@ extern "C"
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+
 
 namespace pylimer_tools {
 namespace entities {
