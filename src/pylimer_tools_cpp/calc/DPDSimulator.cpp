@@ -151,12 +151,12 @@ namespace calc {
         // re-compute the forces with these updated coordinates & velocities
         timer.section(DPDPerformanceSections::FORCES);
         computeForces(this->currentForces,
-                                        this->currentStressTensor,
-                                        this->coordinates,
-                                        this->currentVelocities,
-                                        timer,
-                                        this->dt,
-                                        1.0);
+                      this->currentStressTensor,
+                      this->coordinates,
+                      this->currentVelocities,
+                      timer,
+                      this->dt,
+                      1.0);
 
         // correct the velocities
         timer.section(DPDPerformanceSections::TIME_STEPPING);
@@ -247,7 +247,7 @@ namespace calc {
       forces.setZero();
       stressTensor.setZero();
 
-      const double squareCutoff = cutoff*cutoff;
+      const double squareCutoff = cutoff * cutoff;
 
       // actual computation
       // (attractive) bond forces
@@ -276,69 +276,76 @@ namespace calc {
 
       timer.section(DPDPerformanceSections::PAIR_FORCE);
 
-      // pre-allocate the neighbor indices array
-      Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
-        this->numAtoms *
-        (std::ceil((3.1 * cutoff) * (3.1 * cutoff) * (3.1 * cutoff)) /
-         this->box.getVolume())));
-
       // actually loop the atoms
-#pragma omp parallel for reduction(+ : forces, stressTensor, pressure) private(neighbors)
-      for (size_t i = 0; i < this->numAtoms; ++i) {
-        int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
-          neighbors, coords.segment(3 * i, 3), cutoff);
+#pragma omp parallel
+      {
+        // pre-allocate the neighbor indices array
+        Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
+          this->numAtoms *
+          (std::ceil((3.1 * cutoff) * (3.1 * cutoff) * (3.1 * cutoff)) /
+           this->box.getVolume())));
+        Eigen::Vector3d pairdistance;
+        Eigen::Vector3d pairdistanceNormed;
+        Eigen::Vector3d velocitydiff;
+        Eigen::Vector3d pairForce;
 
-        // pair forces
-        // for (size_t j = i + 1; j < this->numAtoms; ++j) {
-        for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
-          const size_t j = neighbors[neigh_idx];
-          if (j <= i) {
-            continue;
+#pragma omp for reduction(+ : forces, stressTensor, pressure)
+        for (size_t i = 0; i < this->numAtoms; ++i) {
+          int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
+            neighbors, coords.segment(3 * i, 3), cutoff);
+
+          // pair forces
+          // for (size_t j = i + 1; j < this->numAtoms; ++j) {
+          for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
+            const size_t j = neighbors[neigh_idx];
+            if (j <= i) {
+              continue;
+            }
+            pairdistance = coords.segment(3 * i, 3) - coords.segment(3 * j, 3);
+            this->box.handlePBC(pairdistance);
+            // slight performance improvement, taking the square norm here
+            const double rNorm2 = pairdistance.squaredNorm();
+            if (rNorm2 >= squareCutoff || rNorm2 < 1e-12) {
+              continue;
+            }
+
+            const double rNorm = std::sqrt(rNorm2);
+            const double one_minus_rnorm = 1. - rNorm;
+            const double one_minus_rnorm2 = (1. - rNorm) * (1. - rNorm);
+            pairdistanceNormed = pairdistance / rNorm;
+
+            // conservative repulsion force
+            double pairForceConst = this->A * one_minus_rnorm;
+            // pairForce = this->A * one_minus_rnorm * pairdistanceNormed;
+
+            // dissipative/drag force
+            velocitydiff =
+              velocities.segment(3 * i, 3) - velocities.segment(3 * j, 3);
+            const double rij_dot_vij = pairdistanceNormed.dot(velocitydiff);
+            const double gamma_weighted_rij_dot_vij =
+              this->gamma * one_minus_rnorm2 * rij_dot_vij;
+
+            pairForceConst -= gamma_weighted_rij_dot_vij;
+            // pairForce += -gamma_weighted_rij_dot_vij * pairdistanceNormed;
+
+            // random force
+            const double constant_rnd_prefix =
+              this->sigma * one_minus_rnorm / sqrt(dt);
+            const double random_val = this->uniform_rand_mean0std1(this->e2);
+
+            // pairForce += constant_rnd_prefix * random_val *
+            // pairdistanceNormed;
+            pairForceConst += constant_rnd_prefix * random_val;
+            pairForce = pairForceConst * pairdistanceNormed;
+
+            // actually assign the new forces
+            forces.segment(3 * i, 3) += pairForce;
+            forces.segment(3 * j, 3) -= pairForce;
+
+            // pressure update
+            pressure += pairForce.dot(pairdistance);
+            stressTensor -= pairForce * pairdistance.transpose();
           }
-          Eigen::Vector3d pairdistance =
-            coords.segment(3 * i, 3) - coords.segment(3 * j, 3);
-          this->box.handlePBC(pairdistance);
-          // slight performance improvement, taking the square norm here
-          const double rNorm2 = pairdistance.squaredNorm();
-          if (rNorm2 >= squareCutoff || rNorm2 < 1e-12) {
-            continue;
-          }
-
-          const double rNorm = std::sqrt(rNorm2);
-          const double one_minus_rnorm = 1. - rNorm;
-          const double one_minus_rnorm2 = (1. - rNorm) * (1. - rNorm);
-          Eigen::Vector3d pairdistanceNormed = pairdistance / rNorm;
-
-          // conservative repulsion force
-          double pairForceConst = this->A * one_minus_rnorm;
-          // pairForce = this->A * one_minus_rnorm * pairdistanceNormed;
-
-          // dissipative/drag force
-          Eigen::Vector3d velocitydiff =
-            velocities.segment(3 * i, 3) - velocities.segment(3 * j, 3);
-          const double rij_dot_vij = pairdistanceNormed.dot(velocitydiff);
-          const double gamma_weighted_rij_dot_vij =
-            this->gamma * one_minus_rnorm2 * rij_dot_vij;
-
-          pairForceConst -= gamma_weighted_rij_dot_vij;
-          // pairForce += -gamma_weighted_rij_dot_vij * pairdistanceNormed;
-
-          // random force
-          const double constant_rnd_prefix =
-            this->sigma * one_minus_rnorm / sqrt(dt);
-          const double random_val = this->uniform_rand_mean0std1(this->e2);
-
-          // pairForce += constant_rnd_prefix * random_val * pairdistanceNormed;
-          pairForceConst += constant_rnd_prefix * random_val;
-          Eigen::Vector3d pairForce = pairForceConst * pairdistanceNormed;
-
-          // actually assign the new forces
-          forces.segment(3 * i, 3) += pairForce;
-          forces.segment(3 * j, 3) -= pairForce;
-
-          // pressure update
-          pressure += pairForce.dot(pairdistance);
-          stressTensor -= pairForce * pairdistance.transpose();
         }
       }
 
