@@ -272,9 +272,9 @@ namespace calc {
           this->coordinates(this->bondPartnerCoordinatesB);
         this->box.handlePBC(bondDistances);
 
-        Eigen::VectorXd bondLengths = Eigen::VectorXd::Zero(this->numBonds);
+        Eigen::VectorXd bondLengths = Eigen::VectorXd::Zero(this->numBonds + this->numSlipSprings);
 #pragma omp parallel for
-        for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
+        for (size_t i = 0; i < (this->numBonds + this->numSlipSprings); ++i) {
           double b = bondDistances.segment(3 * i, 3).norm();
           bondLengths[i] = b;
         }
