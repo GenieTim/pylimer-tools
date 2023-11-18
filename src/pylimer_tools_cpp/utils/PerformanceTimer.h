@@ -226,7 +226,7 @@ namespace utils {
       std::cout << "\n";
 
 #ifdef OPENMP_FOUND
-      std::cout << "OpenMP: " << omp_get_num_threads() << " threads."
+      std::cout << "OpenMP: " << omp_get_max_threads() << " threads."
                 << std::endl;
 #endif
       std::cout << "Total: " << total << " µs per one of " << numMeasurements
