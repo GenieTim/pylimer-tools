@@ -289,8 +289,8 @@ namespace calc {
         Eigen::Vector3d velocitydiff;
         Eigen::Vector3d pairForce;
 
-#pragma omp for reduction(+ : forces, stressTensor, pressure)
-        for (size_t i = 0; i < this->numAtoms; ++i) {
+#pragma omp for reduction(+ : forces, stressTensor, pressure) schedule(dynamic,4)
+        for (size_t i = 0; i < this->numAtoms-1; ++i) {
           int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
             neighbors, coords.segment(3 * i, 3), cutoff);
 
