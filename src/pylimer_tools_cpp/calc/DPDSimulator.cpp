@@ -124,6 +124,8 @@ namespace calc {
           DPDPerformanceSections::NUM_PERFORMANCE_SECTIONS>();
       timer.registerSections(DPDPerformanceSectionNames);
 
+      pylimer_tools::entities::Box originalBox = this->box;
+
       // start iterating over the steps to do
       long int step = 0;
       for (; step < nSteps; step++) {
@@ -172,6 +174,12 @@ namespace calc {
             this->currentVelocities.segment(3 * i, 3).transpose();
         }
 
+        if (this->doDeformation) {
+          this->box = originalBox.interpolate(this->deformationTargetBox,
+                                              static_cast<double>(step) /
+                                                static_cast<double>(nSteps));
+        }
+
         // output
         timer.section(DPDPerformanceSections::OUTPUT);
         this->currentStep += 1;
@@ -189,6 +197,11 @@ namespace calc {
       std::ios::sync_with_stdio(true);
       this->outputStreams.clear();
       this->outputFileStreams.clear();
+
+      if (this->doDeformation) {
+        this->box = this->deformationTargetBox;
+        this->doDeformation = false;
+      }
 
       if (wasInterrupted) {
         cleanupInterrupt();
@@ -289,8 +302,10 @@ namespace calc {
         Eigen::Vector3d velocitydiff;
         Eigen::Vector3d pairForce;
 
-#pragma omp for reduction(+ : forces, stressTensor, pressure) schedule(dynamic, 16)
-        for (size_t i = 0; i < this->numAtoms-1; ++i) {
+        // need to fix the schedule as with higher i, the workload gets much
+        // less
+#pragma omp for reduction(+ : forces, stressTensor, pressure) schedule(static, 16)
+        for (size_t i = 0; i < this->numAtoms - 1; ++i) {
           int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
             neighbors, coords.segment(3 * i, 3), cutoff);
 

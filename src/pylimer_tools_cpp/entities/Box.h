@@ -309,6 +309,43 @@ namespace entities {
              lhs.getShearMagnitude() == rhs.getShearMagnitude();
     }
 
+    /**
+     * @brief Find a ("linear") intermediate between two different boxes
+     *
+     * @param other
+     * @param interpolationFactor
+     * @return Box the new box
+     */
+    Box interpolate(const Box& other, double interpolationFactor) const
+    {
+      INVALIDARG_EXP_IFN(interpolationFactor >= 0. && interpolationFactor <= 1.,
+                         "Cannot extrapolate box.");
+      INVALIDARG_EXP_IFN(
+        other.getShearDirection() == this->getShearDirection() ||
+          (other.getShearDirection() == -1 || this->getShearDirection() == -1),
+        "Cannot interpolate mroe than one shear direction");
+#define INTERPOLATE(x, y)                                                      \
+  interpolationFactor*(x) + (1. - interpolationFactor) * (y)
+      Box newBox = Box(INTERPOLATE(this->getLowX(), other.getLowX()),
+                       INTERPOLATE(this->getHighX(), other.getHighX()),
+                       INTERPOLATE(this->getLowY(), other.getLowY()),
+                       INTERPOLATE(this->getHighY(), other.getHighY()),
+                       INTERPOLATE(this->getLowZ(), other.getLowZ()),
+                       INTERPOLATE(this->getHighZ(), other.getHighZ()));
+      newBox.applySimpleShear(
+        INTERPOLATE(this->getShearMagnitude(), other.getShearMagnitude()),
+        this->getShearDirection() == -1 ? other.getShearDirection()
+                                       : this->getShearDirection());
+
+      return newBox;
+    }
+
+    /**
+     * @brief Serialize this box using Cereal
+     *
+     * @tparam Archive
+     * @param ar
+     */
     template<class Archive>
     void serialize(Archive& ar)
     {
