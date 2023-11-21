@@ -19,8 +19,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#ifndef __correlator_h
-#define __correlator_h
+#ifndef CORRELATOR_H
+#define CORRELATOR_H
 
 #include <Eigen/Dense>
 #include <stdio.h>
