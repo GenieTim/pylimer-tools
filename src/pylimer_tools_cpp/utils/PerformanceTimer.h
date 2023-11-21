@@ -103,7 +103,12 @@ namespace utils {
                                       this->col4width,
                                       5);
       this->printNumberRightWithWidth(
-        100 * this->sectionMean_mus[idx] / total, "%", this->col5width, 2);
+        100 * ((static_cast<double>(this->sectionNumMeasurements[idx]) *
+                this->sectionMean_mus[idx]) /
+               total),
+        "%",
+        this->col5width,
+        2);
       std::cout << std::endl;
     }
 
@@ -214,7 +219,8 @@ namespace utils {
       double total = 0.0;
       long int numMeasurements = 0;
       for (unsigned int i = 0; i < S; ++i) {
-        total += this->sectionMean_mus[i];
+        total += this->sectionMean_mus[i] *
+                 static_cast<double>(this->sectionNumMeasurements[i]);
         numMeasurements += this->sectionNumMeasurements[i];
       }
 
