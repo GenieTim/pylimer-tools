@@ -21,8 +21,10 @@ SOFTWARE.
  */
 
 #include "Correlator.h"
+#include "../utils/utilityMacros.h"
 #include <algorithm>
 #include <cstring> // for memcpy
+#include <limits.h>
 #include <math.h>
 
 namespace pylimer_tools {
@@ -41,6 +43,8 @@ namespace calc {
                            const unsigned int pin,
                            const unsigned int min)
   {
+    INVALIDARG_EXP_IFN(numcorrin < INT_MAX && pin < INT_MAX && min < INT_MAX,
+                       "Arguments must be able to cast to integers.");
     numcorrelators = numcorrin;
     p = pin;
     m = min;
@@ -68,7 +72,7 @@ namespace calc {
   {
 
     /// If we exceed the correlator side, the value is discarded
-    if (k == numcorrelators)
+    if (k >= numcorrelators)
       return;
     if (k > kmax)
       kmax = k;
@@ -90,23 +94,30 @@ namespace calc {
     }
 
     /// Calculate correlation function
-    unsigned int ind1 = insertindex[k];
+    const unsigned int ind1 = insertindex[k];
+    // TODO: change to asserts or remove once we don't get any crashes here
+    // anymore
+    RUNTIME_EXP_IFN(k < numcorrelators,
+                    "Cannot evaluate correlator outside its bounds.");
+    RUNTIME_EXP_IFN(ind1 < p, "Cannot evaluate correlator outside its bounds.");
     if (k == 0) { /// First correlator is different
-      int ind2 = ind1;
+      int ind2 = static_cast<int>(ind1);
       for (unsigned int j = 0; j < p; ++j) {
         if (shift(k, ind2) > -1e10) {
           correlation(k, j) += shift(k, ind1) * shift(k, ind2);
           ncorrelation(k, j) += 1;
         }
         --ind2;
-        if (ind2 < 0)
+        if (ind2 < 0) {
           ind2 += p;
+        }
       }
     } else {
-      int ind2 = ind1 - dmin;
+      int ind2 = static_cast<int>(ind1) - static_cast<int>(dmin);
       for (unsigned int j = dmin; j < p; ++j) {
-        if (ind2 < 0)
+        if (ind2 < 0) {
           ind2 += p;
+        }
         if (shift(k, ind2) > -1e10) {
           correlation(k, j) += shift(k, ind1) * shift(k, ind2);
           ncorrelation(k, j) += 1;
@@ -116,17 +127,19 @@ namespace calc {
     }
 
     ++insertindex[k];
-    if (insertindex[k] == p)
+    if (insertindex[k] == p) {
       insertindex[k] = 0;
+    }
   }
 
   void Correlator::evaluate(const bool norm)
   {
     unsigned int im = 0;
 
-    double aux = 0;
-    if (norm)
+    double aux = 0.;
+    if (norm) {
       aux = (accval / ncorrelation(0, 0)) * (accval / ncorrelation(0, 0));
+    }
 
     // First correlator
     for (unsigned int i = 0; i < p; ++i) {
