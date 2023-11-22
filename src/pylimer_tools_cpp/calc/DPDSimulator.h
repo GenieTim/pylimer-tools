@@ -65,6 +65,7 @@ namespace calc {
 
       ////////////////////////////////////////////////////////////////
       // configuration
+      bool doDeformation = false;
       double maxBondLen = 5.;
       bool is2D = false;
       bool shiftPossibilityEmpty = true;
@@ -103,6 +104,7 @@ namespace calc {
       int numBonds = 0;
       int numSlipSprings = 0;
       pylimer_tools::entities::Box box;
+      pylimer_tools::entities::Box deformationTargetBox;
       pylimer_tools::entities::Universe universe;
 
       // atoms
@@ -247,6 +249,11 @@ namespace calc {
       }
 
       bool getShiftOneAtATime() const { return this->shiftOneAtATime; }
+      
+      void configBoxDeformation(const pylimer_tools::entities::Box &newBox) {
+        this->deformationTargetBox = newBox;
+        this->doDeformation = true;
+      }
 
       ////////////////////////////////////////////////////////////////
       // results access & export
@@ -328,6 +335,7 @@ namespace calc {
            gamma,
            nStepsDPD,
            nStepsMC,
+           doDeformation,
            dt,
            // simulation state
            currentStep,
@@ -347,6 +355,7 @@ namespace calc {
            numBonds,
            numSlipSprings,
            box,
+           deformationTargetBox,
            universe,
            // -> atoms
            coordinates,
