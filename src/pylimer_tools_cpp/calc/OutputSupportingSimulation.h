@@ -511,6 +511,7 @@ namespace calc {
         outputConfigs,
         outputAverageConfigs,
         outputAutoCorrelationConfigs,
+        // appendToFilesWhenOpening,
         // restart configurations - meta!
         outputRestartEvery,
         restartOutputFile,

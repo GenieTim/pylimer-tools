@@ -260,7 +260,6 @@ namespace calc {
       forces.setZero();
       stressTensor.setZero();
 
-
       // actual computation
       // (attractive) bond forces
       timer.section(DPDPerformanceSections::BOND_FORCE);
@@ -291,7 +290,8 @@ namespace calc {
       // actually loop the atoms
 #pragma omp parallel
       {
-      const double squareCutoff = cutoff * cutoff;
+        const double squareCutoff = cutoff * cutoff;
+        const double sigmaOverSqrtDt = this->sigma / std::sqrt(dt);
         // pre-allocate the neighbor indices array
         Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
           this->numAtoms *
@@ -310,7 +310,6 @@ namespace calc {
             neighbors, coords.segment(3 * i, 3), cutoff);
 
           // pair forces
-          // for (size_t j = i + 1; j < this->numAtoms; ++j) {
           for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
             const size_t j = neighbors[neigh_idx];
             if (j <= i) {
@@ -329,10 +328,6 @@ namespace calc {
             const double one_minus_rnorm2 = (1. - rNorm) * (1. - rNorm);
             pairdistanceNormed = pairdistance / rNorm;
 
-            // conservative repulsion force
-            double pairForceConst = this->A * one_minus_rnorm;
-            // pairForce = this->A * one_minus_rnorm * pairdistanceNormed;
-
             // dissipative/drag force
             velocitydiff =
               velocities.segment(3 * i, 3) - velocities.segment(3 * j, 3);
@@ -340,17 +335,19 @@ namespace calc {
             const double gamma_weighted_rij_dot_vij =
               this->gamma * one_minus_rnorm2 * rij_dot_vij;
 
-            pairForceConst -= gamma_weighted_rij_dot_vij;
-            // pairForce += -gamma_weighted_rij_dot_vij * pairdistanceNormed;
+            // conservative repulsion force - dissipative/drag force
+            // TODO: check if we get fma here
+            double pairForceConst =
+              this->A * one_minus_rnorm - gamma_weighted_rij_dot_vij;
 
             // random force
             const double constant_rnd_prefix =
-              this->sigma * one_minus_rnorm / sqrt(dt);
+              one_minus_rnorm * sigmaOverSqrtDt;
             const double random_val = this->uniform_rand_mean0std1(this->e2);
 
-            // pairForce += constant_rnd_prefix * random_val *
-            // pairdistanceNormed;
             pairForceConst += constant_rnd_prefix * random_val;
+
+            // back to 3D/Eigen Vector
             pairForce = pairForceConst * pairdistanceNormed;
 
             // actually assign the new forces
