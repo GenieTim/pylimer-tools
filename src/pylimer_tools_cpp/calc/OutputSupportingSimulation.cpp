@@ -14,7 +14,6 @@ namespace calc {
     const std::string& prefix,
     int streamIdx)
   {
-    // TODO: check that we append if we come from restart file
     INVALIDARG_EXP_IFN(streamIdx == this->outputStreams.size(),
                        "The stream idx " + std::to_string(streamIdx) +
                          " hints at an invalid state.");
@@ -23,7 +22,9 @@ namespace calc {
     for (OutputConfiguration oc : configs) {
       if (oc.filename != "" && oc.filename != "stdio") {
         this->outputStreams.push_back(std::make_shared<std::ofstream>(
-          oc.filename, std::ios::out | std::ios::app));
+          oc.filename,
+          std::ios::out | (this->appendToFilesWhenOpening ? std::ios::app
+                                                          : std::ios::trunc)));
         this->outputFileStreams.push_back(streamIdx);
       } else {
         this->outputStreams.push_back(

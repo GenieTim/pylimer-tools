@@ -260,7 +260,6 @@ namespace calc {
       forces.setZero();
       stressTensor.setZero();
 
-      const double squareCutoff = cutoff * cutoff;
 
       // actual computation
       // (attractive) bond forces
@@ -292,6 +291,7 @@ namespace calc {
       // actually loop the atoms
 #pragma omp parallel
       {
+      const double squareCutoff = cutoff * cutoff;
         // pre-allocate the neighbor indices array
         Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
           this->numAtoms *
@@ -304,7 +304,7 @@ namespace calc {
 
         // need to fix the schedule as with higher i, the workload gets much
         // less
-#pragma omp for reduction(+ : forces, stressTensor, pressure) schedule(static, 16)
+#pragma omp for reduction(+ : forces, stressTensor, pressure) schedule(dynamic, 16)
         for (size_t i = 0; i < this->numAtoms - 1; ++i) {
           int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
             neighbors, coords.segment(3 * i, 3), cutoff);

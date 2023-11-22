@@ -204,17 +204,15 @@ TEST_CASE("Manually accurate EigenNeighbourList",
     }
   }
   CHECK(buckets.size() == 10 * 10 * 10);
-  indices = neighbourList.getCombinedBucketIndicesForCoordinates(
-    Eigen::Vector3d(0., 0., 0.), 1.9);
+  Eigen::Vector3d zeroVec = Eigen::Vector3d(0., 0., 0.);
+  indices = neighbourList.getCombinedBucketIndicesForCoordinates(zeroVec, 1.9);
   CHECK(indices.size() == 8);
-  indices = neighbourList.getCombinedBucketIndicesForCoordinates(
-    Eigen::Vector3d(0., 0., 0.), 0.2);
+  indices = neighbourList.getCombinedBucketIndicesForCoordinates(zeroVec, 0.2);
+  Eigen::Vector3d oneVec = Eigen::Vector3d(1., 1., 1.);
   CHECK(indices.size() == 8);
-  indices = neighbourList.getCombinedBucketIndicesForCoordinates(
-    Eigen::Vector3d(1., 1., 1.), 2.0);
+  indices = neighbourList.getCombinedBucketIndicesForCoordinates(oneVec, 2.0);
   CHECK(indices.size() == 9 * 3);
-  indices = neighbourList.getCombinedBucketIndicesForCoordinates(
-    Eigen::Vector3d(1., 1., 1.), 0.2);
+  indices = neighbourList.getCombinedBucketIndicesForCoordinates(oneVec, 0.2);
   CHECK(indices.size() == 1);
   CHECK(true);
 }

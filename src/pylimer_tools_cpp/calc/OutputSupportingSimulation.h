@@ -113,6 +113,7 @@ namespace calc {
     std::vector<OutputConfiguration> outputConfigs;
     std::vector<OutputConfiguration> outputAverageConfigs;
     std::vector<OutputConfiguration> outputAutoCorrelationConfigs;
+    bool appendToFilesWhenOpening = false;
     ////////////////////////////////////////////////////////////////
     // restart configurations
     int outputRestartEvery = 0;
@@ -156,6 +157,8 @@ namespace calc {
       std::string autocorrelationOutputBuffer;
       autocorrelationOutputBuffer.reserve(
         this->outputAutoCorrelationConfigs.size() * 50);
+
+      this->appendToFilesWhenOpening = true;
     }
 
     int openFilesOutputHeader(const std::vector<OutputConfiguration>& configs,
