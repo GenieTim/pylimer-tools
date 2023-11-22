@@ -14,6 +14,7 @@ namespace calc {
     const std::string& prefix,
     int streamIdx)
   {
+    // TODO: check that we append if we come from restart file
     INVALIDARG_EXP_IFN(streamIdx == this->outputStreams.size(),
                        "The stream idx " + std::to_string(streamIdx) +
                          " hints at an invalid state.");

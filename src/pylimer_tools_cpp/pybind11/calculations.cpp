@@ -1372,6 +1372,13 @@ init_pylimer_bound_calc(py::module_& m)
     .def("getUniverse", &dpd::DPDSimulator::getUniverse)
     .def("getTimestep", &dpd::DPDSimulator::getTimestep)
     .def("getTemperature", &dpd::DPDSimulator::getTemperature)
+    .def("getSpringConstant", &dpd::DPDSimulator::getSpringConstant)
+    .def("getShiftOneAtATime", &dpd::DPDSimulator::getShiftOneAtATime)
+    .def("getNumSlipSprings", &dpd::DPDSimulator::getNumSlipSprings)
+    .def("getNumStepsDPD", &dpd::DPDSimulator::getNumStepsDPD)
+    .def("getNumStepsMC", &dpd::DPDSimulator::getNumStepsMC)
+    .def("getShiftPossibilityEmpty",
+         &dpd::DPDSimulator::getShiftPossibilityEmpty)
     .def("validateNeighbourList", &dpd::DPDSimulator::validateNeighbourlist)
     .def("validateState", &dpd::DPDSimulator::validateState);
 }
