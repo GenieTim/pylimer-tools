@@ -378,6 +378,7 @@ namespace calc {
       {
         DPDSimulator res;
         pylimer_tools::utils::deserializeFromFile<DPDSimulator>(res, filename);
+        res.appendToFilesWhenOpening = true;
         return res;
       };
 

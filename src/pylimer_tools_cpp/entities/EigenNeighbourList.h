@@ -34,11 +34,11 @@ namespace entities {
   public:
     EigenNeighbourList() {}
     EigenNeighbourList(const Eigen::VectorXd& coordinates,
-                       const Box &box,
+                       const Box& box,
                        double cutoff);
 
     void initialize(const Eigen::VectorXd& coordinates,
-                    const Box &box,
+                    const Box& box,
                     double cutoff);
 
     /**
@@ -52,7 +52,7 @@ namespace entities {
 
     void validateWhyNotIncluded(Eigen::Vector3d sourceCoords,
                                 Eigen::Vector3d targetCoords,
-                                double newCutoff = -1.0);
+                                double newCutoff = -1.0) const;
 
     /**
      * @brief Get the Indices Close To Coordinates with the Default Cut-Off
@@ -89,9 +89,9 @@ namespace entities {
      *
      * @return std::vector<std::vector<coordinate_idx_t>>
      */
-    std::vector<std::vector<coordinate_idx_t>> getNeighbourBuckets();
-    Eigen::VectorXi getNeighbourBucketSizes();
-    Eigen::Vector3d getCentralCoordinatesOfBucket(int bucketIndex);
+    std::vector<std::vector<coordinate_idx_t>> getNeighbourBuckets() const;
+    Eigen::VectorXi getNeighbourBucketSizes() const;
+    Eigen::Vector3d getCentralCoordinatesOfBucket(int bucketIndex) const;
 
     std::vector<bucket_idx_t> getCombinedBucketIndicesForCoordinates(
       const Eigen::Vector3d& coordinates,

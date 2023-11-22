@@ -133,7 +133,7 @@ namespace entities {
 
   void EigenNeighbourList::validateWhyNotIncluded(Eigen::Vector3d sourceCoords,
                                                   Eigen::Vector3d targetCoords,
-                                                  double newCutoff)
+                                                  double newCutoff)const
   {
     if (newCutoff <= 0.) {
       newCutoff = this->cutoff;
@@ -359,16 +359,16 @@ namespace entities {
    * @return std::vector<std::vector<coordinate_idx_t>>
    */
   std::vector<std::vector<coordinate_idx_t>>
-  EigenNeighbourList::getNeighbourBuckets()
+  EigenNeighbourList::getNeighbourBuckets() const
   {
     return this->neighbourBuckets;
   }
-  Eigen::VectorXi EigenNeighbourList::getNeighbourBucketSizes()
+  Eigen::VectorXi EigenNeighbourList::getNeighbourBucketSizes() const
   {
     return this->neighbourBucketSizes;
   }
   Eigen::Vector3d EigenNeighbourList::getCentralCoordinatesOfBucket(
-    int bucketIndex)
+    int bucketIndex) const
   {
     Eigen::Array3li coeffs = this->tripletFromIndex(bucketIndex);
     Eigen::Vector3d results = coeffs.cast<double>() * this->bucketWidths +
