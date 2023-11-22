@@ -93,6 +93,15 @@ namespace calc {
       Eigen::Matrix3d currentStressTensor;
 
       ////////////////////////////////////////////////////////////////
+      // state of bond formation
+      int bondsToForm = 0;
+      std::unordered_map<int, int> maxBondsPerType;
+      double bondFormationDistance = 1.0;
+      int formBondsEvery = 50;
+      int atomTypeBondFormationFrom = 1;
+      int atomTypeBondFormationTo = 2;
+
+      ////////////////////////////////////////////////////////////////
       // randomness
       std::mt19937 e2;
       std::uniform_real_distribution<double> uniform_rand_mean0std1;
@@ -146,6 +155,16 @@ namespace calc {
       }
 
       /**
+       * @brief Create a new bond between two nodes
+       *
+       * @param fromIdx
+       * @param toIdx
+       */
+      void addBond(const long int fromIdx,
+                   const long int toIdx,
+                   const int bondType);
+
+      /**
        * @brief Compute the force vector, and return the pressure
        *
        */
@@ -168,6 +187,12 @@ namespace calc {
        */
       double computeTemperature(const Eigen::VectorXd& velocities) const;
 
+      /**
+       * @brief Compute the length of one specific bond
+       *
+       * @param bondIdx
+       * @return double
+       */
       double computeBondLength(int bondIdx) const
       {
         Eigen::Vector3d bondDistances =
@@ -249,10 +274,73 @@ namespace calc {
       }
 
       bool getShiftOneAtATime() const { return this->shiftOneAtATime; }
-      
-      void configBoxDeformation(const pylimer_tools::entities::Box &newBox) {
+
+      void configBoxDeformation(const pylimer_tools::entities::Box& newBox)
+      {
         this->deformationTargetBox = newBox;
         this->doDeformation = true;
+      }
+
+      void configBondFormation(
+        const int numBondsToForm,
+        const std::unordered_map<int, int>& numBondsPerType,
+        const double bondFormationDist = 1.0,
+        const int formBondEvery = 50)
+      {
+        this->bondsToForm = numBondsToForm;
+        this->maxBondsPerType = numBondsPerType;
+        this->bondFormationDistance = bondFormationDist;
+        this->formBondsEvery = formBondEvery;
+      }
+
+      void attemptBondFormation()
+      {
+        double cutoff = this->bondFormationDistance;
+        Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
+          this->numAtoms *
+          (std::ceil((3.1 * cutoff) * (3.1 * cutoff) * (3.1 * cutoff)) /
+           this->box.getVolume())));
+        for (size_t atom_idx = 0; atom_idx < this->numAtoms; ++atom_idx) {
+          if (this->atomTypes[atom_idx] != this->atomTypeBondFormationFrom) {
+            continue;
+          }
+          if (this->idxFunctionalities[atom_idx] >=
+              this->maxBondsPerType[this->atomTypes[atom_idx]]) {
+            continue;
+          }
+
+          // find neighbours
+          int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
+            neighbors, this->coordinates.segment(3 * atom_idx, 3), cutoff);
+          std::vector<int> possibleCandidates;
+          for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
+            // loop neighbours to find applicable partner
+            const size_t j = neighbors[neigh_idx];
+            double r2 =
+              (this->coordinates.segment(3 * atom_idx, 3) - this->coordinates.segment(3 * j, 3))
+                .norm();
+            if (r2 <= cutoff &&
+                (this->idxFunctionalities[j] <
+                 this->maxBondsPerType[this->atomTypes[j]]) &&
+                (this->atomTypeBondFormationTo == this->atomTypes[j])) {
+              possibleCandidates.push_back(j);
+            }
+          }
+
+          if (possibleCandidates.size() == 0) {
+            continue;
+          }
+
+          // yay, we can form a bond
+          // NOTE: currently, we build only 1 
+          std::shuffle(
+            possibleCandidates.begin(), possibleCandidates.end(), this->e2);
+          this->addBond(atom_idx, possibleCandidates[0], 3); // TODO: decide on bond type
+          this->bondsToForm -= 1;
+          if (this->bondsToForm <= 0) {
+            break;
+          }
+        }
       }
 
       ////////////////////////////////////////////////////////////////
@@ -303,7 +391,10 @@ namespace calc {
         return bondLengths;
       }
 
-      Eigen::VectorXd getCoordinates() override { return this->coordinates; }
+      Eigen::VectorXd getCoordinates() override
+      {
+        return this->coordinates;
+      }
 
       double getTemperature() override
       {

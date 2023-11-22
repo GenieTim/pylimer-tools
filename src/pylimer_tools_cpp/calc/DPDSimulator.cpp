@@ -174,10 +174,16 @@ namespace calc {
             this->currentVelocities.segment(3 * i, 3).transpose();
         }
 
+        // deformation
         if (this->doDeformation) {
           this->box = originalBox.interpolate(this->deformationTargetBox,
                                               static_cast<double>(step) /
                                                 static_cast<double>(nSteps));
+        }
+
+        // bond formation
+        if (this->bondsToForm > 0 && step % this->formBondsEvery == 0) {
+          this->attemptBondFormation();
         }
 
         // output
@@ -209,6 +215,64 @@ namespace calc {
 
       timer.stop();
       timer.output();
+    }
+
+    /**
+     * @brief Create a new bond between two nodes
+     *
+     * CAUTION: this is an expensive operation, involving resizing of Eigen
+     * containers etc. Use sparsely.
+     *
+     * @param fromIdx
+     * @param toIdx
+     */
+    void DPDSimulator::addBond(const long int fromIdx,
+                               const long int toIdx,
+                               const int bondType)
+    {
+      // allocate space for the new bonds
+      this->bondPartnerCoordinatesA.conservativeResize(
+        this->bondPartnerCoordinatesA.size() + 3);
+      this->bondPartnerCoordinatesB.conservativeResize(
+        this->bondPartnerCoordinatesB.size() + 3);
+      this->bondPartnersA.conservativeResize(this->bondPartnersA.size() + 1);
+      this->bondPartnersB.conservativeResize(this->bondPartnersB.size() + 1);
+      this->bondTypes.conservativeResize(this->bondTypes.size() + 1);
+
+      // move the data to make space (to keep slip-springs at the end of the
+      // thing)
+      int newBondIdx = this->numBonds;
+      this->bondPartnerCoordinatesA.segment((this->numBonds + 1) * 3,
+                                            this->numSlipSprings * 3) =
+        this->bondPartnerCoordinatesA.segment(this->numBonds * 3,
+                                              this->numSlipSprings * 3);
+      this->bondPartnerCoordinatesB.segment((this->numBonds + 1) * 3,
+                                            this->numSlipSprings * 3) =
+        this->bondPartnerCoordinatesB.segment(this->numBonds * 3,
+                                              this->numSlipSprings * 3);
+      this->bondPartnersA.segment(this->numBonds + 1, this->numSlipSprings) =
+        this->bondPartnersA.segment(this->numBonds, this->numSlipSprings);
+      this->bondPartnersB.segment(this->numBonds + 1, this->numSlipSprings) =
+        this->bondPartnersB.segment(this->numBonds, this->numSlipSprings);
+      this->bondTypes.segment(this->numBonds + 1, this->numSlipSprings) =
+        this->bondTypes.segment(this->numBonds, this->numSlipSprings);
+
+      // actually register the new bond
+      this->bondTypes[newBondIdx] = bondType;
+      this->bondPartnersA[newBondIdx] = fromIdx;
+      this->bondPartnersB[newBondIdx] = toIdx;
+      for (size_t i = 0; i < 3; ++i) {
+        this->bondPartnerCoordinatesA[3 * newBondIdx + i] = 3 * fromIdx + i;
+        this->bondPartnerCoordinatesB[3 * newBondIdx + i] = 3 * toIdx + i;
+      }
+      this->bondsOfIndex[fromIdx].push_back(newBondIdx);
+      this->bondsOfIndex[toIdx].push_back(newBondIdx);
+
+      // count the new bonds
+      this->numBonds += 1;
+      this->idxFunctionalities[fromIdx] += 1;
+      this->idxFunctionalities[toIdx] += 1;
+      // TODO: figure out what to do with chain end indices
     }
 
     /**

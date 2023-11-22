@@ -1363,6 +1363,21 @@ init_pylimer_bound_calc(py::module_& m)
     .def("configNumStepsDPD", &dpd::DPDSimulator::configNumStepsDPD, R"pbdoc(
           Configure the number of steps to do in one DPD sequence.
      )pbdoc")
+    .def("configBondFormation",
+         &dpd::DPDSimulator::configBondFormation,
+         R"pbdoc(
+          Configure how to do bond formation during the run.
+
+          Arguments:
+          - num_bonds_to_form (int): the nr of bonds to form in total. Use 0 to stop bond formation.
+          - num_bonds_per_atom_type (dict): the nr of bonds each atom type may have at most (e.g., 2 for strand atoms, 4 for a tertiary cross-links)
+          - bond_formation_dist (float): the maximum distance allowed to form bonds
+          - attempt_bond_formation_every (int): attempt to form bonds every this many steps during the simulation run
+         )pbdoc",
+         py::arg("num_bonds_to_form"),
+         py::arg("max_bonds_per_atom_type"),
+         py::arg("bond_formation_dist") = 1.0,
+         py::arg("attempt_bond_formation_every") = 50)
     .def("startMeasuringMSDForAtoms",
          &dpd::DPDSimulator::startMeasuringMSDForAtoms,
          R"pbdoc(
