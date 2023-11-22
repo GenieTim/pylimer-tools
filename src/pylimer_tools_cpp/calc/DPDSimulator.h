@@ -196,6 +196,8 @@ namespace calc {
 
       void configSpringConstant(const double nk) { this->k = nk; }
 
+      double getSpringConstant() const { return this->k; }
+
       void configSlipspringLowCutoff(const double lowC)
       {
         INVALIDARG_EXP_IFN(
@@ -224,17 +226,27 @@ namespace calc {
 
       void configNumStepsMC(long int steps = 500) { this->nStepsMC = steps; }
 
+      long int getNumStepsMC() { return this->nStepsMC; }
+
       void configNumStepsDPD(long int steps = 500) { this->nStepsDPD = steps; }
+
+      long int getNumStepsDPD() { return this->nStepsDPD; }
 
       void configShiftPossibilityEmpty(bool shiftPossibilityEmptyConfig = true)
       {
         this->shiftPossibilityEmpty = shiftPossibilityEmptyConfig;
+      }
+      bool getShiftPossibilityEmpty() const
+      {
+        return this->shiftPossibilityEmpty;
       }
 
       void configShiftOneAtATime(bool shiftOne = false)
       {
         this->shiftOneAtATime = shiftOne;
       }
+
+      bool getShiftOneAtATime() const { return this->shiftOneAtATime; }
 
       ////////////////////////////////////////////////////////////////
       // results access & export
@@ -256,12 +268,14 @@ namespace calc {
       {
         return this->currentStressTensor;
       }
-      
+
       int getNumShifts() override { return this->numShifts; }
 
       int getNumRelocations() override { return this->numRelocations; }
 
       size_t getNumParticles() override { return this->numAtoms; }
+
+      size_t getNumSlipSprings() const { return this->numSlipSprings; }
 
       double getVolume() override { return this->box.getVolume(); }
 
@@ -272,7 +286,8 @@ namespace calc {
           this->coordinates(this->bondPartnerCoordinatesB);
         this->box.handlePBC(bondDistances);
 
-        Eigen::VectorXd bondLengths = Eigen::VectorXd::Zero(this->numBonds + this->numSlipSprings);
+        Eigen::VectorXd bondLengths =
+          Eigen::VectorXd::Zero(this->numBonds + this->numSlipSprings);
 #pragma omp parallel for
         for (size_t i = 0; i < (this->numBonds + this->numSlipSprings); ++i) {
           double b = bondDistances.segment(3 * i, 3).norm();

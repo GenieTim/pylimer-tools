@@ -37,7 +37,7 @@ namespace utils {
 
     template<typename T>
     void printNumberRightWithWidth(T t,
-                                   std::string unit,
+                                   const std::string &unit,
                                    const int width,
                                    const int precision) const
     {
