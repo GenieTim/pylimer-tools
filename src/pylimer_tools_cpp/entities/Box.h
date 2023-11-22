@@ -27,7 +27,7 @@ namespace entities {
     int shearDirection = -1;
 
   protected:
-    double minImageDistance(double dcoord, const int coord) const
+    inline double minImageDistance(double dcoord, const int coord) const
     {
       return dcoord -
              (this->L[coord] * std::nearbyint(dcoord * this->oneOverL[coord]));
@@ -39,7 +39,7 @@ namespace entities {
     //          (this->L * (coords.array() * this->oneOverL).round()).matrix();
     // }
     template<typename Derived>
-    void minImageDistance(Eigen::MatrixBase<Derived>& coords) const
+    inline void minImageDistance(Eigen::MatrixBase<Derived>& coords) const
     {
       coords -=
         (this->L.replicate(coords.size() / 3, 1) *
@@ -49,7 +49,7 @@ namespace entities {
     }
 
     template<typename VectorType>
-    VectorType minImageDistancesStdContainer(VectorType& coords) const
+    inline VectorType minImageDistancesStdContainer(VectorType& coords) const
     {
       INVALIDARG_EXP_IFN(
         coords.size() % 3 == 0,
@@ -169,18 +169,19 @@ namespace entities {
     int getShearDirection() const { return this->shearDirection; }
 
     template<typename T>
-    std::vector<T> minImageDistances(std::vector<T>& coords) const
+    inline std::vector<T> minImageDistances(std::vector<T>& coords) const
     {
       return this->minImageDistancesStdContainer(coords);
     }
+
     template<typename T, size_t N>
-    std::array<T, N> minImageDistances(std::array<T, N>& coords) const
+    inline std::array<T, N> minImageDistances(std::array<T, N>& coords) const
     {
       return this->minImageDistancesStdContainer(coords);
     }
 
     template<typename Derived>
-    void minImageDistances(Eigen::MatrixBase<Derived>& coords) const
+    inline void minImageDistances(Eigen::MatrixBase<Derived>& coords) const
     {
       INVALIDARG_EXP_IFN(
         coords.size() % 3 == 0,
@@ -251,7 +252,7 @@ namespace entities {
     }
 
     template<typename VectorType>
-    void handlePBC(VectorType& distances) const
+    inline void handlePBC(VectorType& distances) const
     {
       const bool isSheared =
         (this->getShearDirection() >= 0 && this->getShearDirection() <= 2);

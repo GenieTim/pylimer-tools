@@ -19,15 +19,15 @@ extern "C"
 namespace pylimer_tools {
 namespace entities {
   EigenNeighbourList::EigenNeighbourList(const Eigen::VectorXd& coordinates,
-                                         const Box &box,
+                                         const Box& box,
                                          double cutoff)
   {
     this->initialize(coordinates, box, cutoff);
   }
 
   void EigenNeighbourList::initialize(const Eigen::VectorXd& coordinates,
-                                 const Box &box,
-                                 double cutoff)
+                                      const Box& box,
+                                      double cutoff)
   {
     INVALIDARG_EXP_IFN(cutoff > 1e-3, "Cutoff must be larger than zero");
     INVALIDARG_EXP_IFN(coordinates.size() % 3 == 0,
@@ -84,7 +84,7 @@ namespace entities {
   void EigenNeighbourList::resetCoordinates(Eigen::VectorXd& newCoordinates)
   {
     // just override all the buckets.
-    this->neighbourBucketSizes.setZero();// = Eigen::ArrayXi::Zero(this->totalNrOfBuckets);
+    this->neighbourBucketSizes.setZero();
     for (size_t i = 0; i < (newCoordinates.size() / 3); ++i) {
       int bucketIndex = this->getBucketIndexForTriplet(
         this->getBucketTripletForCoordinates(newCoordinates.segment(3 * i, 3)));
@@ -133,7 +133,7 @@ namespace entities {
 
   void EigenNeighbourList::validateWhyNotIncluded(Eigen::Vector3d sourceCoords,
                                                   Eigen::Vector3d targetCoords,
-                                                  double newCutoff)const
+                                                  double newCutoff) const
   {
     if (newCutoff <= 0.) {
       newCutoff = this->cutoff;
@@ -272,13 +272,13 @@ namespace entities {
 
     int results_idx = 0;
     if (upperCutoff == this->cutoff) {
+      const bucket_idx_t coordinatesBucketIdx = this->getBucketIndexForTriplet(
+        this->getBucketTripletForCoordinates(coordinates));
       // first, count the number of results we will get
       long int nResults =
         this
           ->neighbourBucketSizes(
-            this->neighbourBucketNeighboursDefaultCutoff
-              [this->getBucketIndexForTriplet(
-                this->getBucketTripletForCoordinates(coordinates))])
+            this->neighbourBucketNeighboursDefaultCutoff[coordinatesBucketIdx])
           .sum();
 
       if (result.size() < nResults) {
@@ -286,9 +286,7 @@ namespace entities {
         result.conservativeResize(nResults);
       }
       for (bucket_idx_t bucketIndex :
-           this->neighbourBucketNeighboursDefaultCutoff
-             [this->getBucketIndexForTriplet(
-               this->getBucketTripletForCoordinates(coordinates))]) {
+           this->neighbourBucketNeighboursDefaultCutoff[coordinatesBucketIdx]) {
         for (int indexInBucket = 0;
              indexInBucket < this->neighbourBucketSizes[bucketIndex];
              indexInBucket++) {

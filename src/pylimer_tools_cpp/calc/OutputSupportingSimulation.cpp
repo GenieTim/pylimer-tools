@@ -19,6 +19,8 @@ namespace calc {
                          " hints at an invalid state.");
     int numComputes = 0;
     this->outputStreams.reserve(streamIdx + configs.size());
+    std::string outputBuffer = "";
+    outputBuffer.reserve(80 * 20);
     for (OutputConfiguration oc : configs) {
       if (oc.filename != "" && oc.filename != "stdio") {
         this->outputStreams.push_back(std::make_shared<std::ofstream>(
@@ -31,8 +33,7 @@ namespace calc {
           std::shared_ptr<std::ostream>(&std::cout, [](void*) {}));
       }
 
-      std::string outputBuffer = prefix;
-      outputBuffer.reserve(80 * 20);
+      outputBuffer = prefix;
 
       for (ComputedIntValues val : oc.intValues) {
         switch (val) {
@@ -63,6 +64,7 @@ namespace calc {
 
       (*this->outputStreams[streamIdx]) << outputBuffer << std::endl;
       streamIdx += 1;
+      outputBuffer.clear();
     }
     return numComputes;
   };
