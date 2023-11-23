@@ -100,7 +100,7 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     std::vector<size_t> atomIdsForMSD = { 1, 4, 6 };
     REQUIRE_NOTHROW(simulator.startMeasuringMSDForAtoms(atomIdsForMSD));
 
-    // restart files    
+    // restart files
     // std::string restartFile = suspectedPath + "dpd_restart_file.xml";
     std::string restartFile = suspectedPath + "dpd_restart_file.bin";
     simulator.configRestartOutput(restartFile, 30);
@@ -142,5 +142,72 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
           Catch::Approx(simulator.getTemperature()).epsilon(0.1));
     CHECK_NOTHROW(sim2.validateState());
     std::remove(restartFile.c_str());
+  }
+};
+
+TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator]")
+{
+  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  REQUIRE(std::filesystem::exists(suspectedPath));
+
+  std::string inputFile =
+    suspectedPath + "melt_213_a_47_106_xlinks_v_1.structure.out";
+  if (std::filesystem::exists(inputFile)) {
+    pe::UniverseSequence universeSequence = pe::UniverseSequence();
+    REQUIRE(universeSequence.getLength() == 0);
+    universeSequence.initializeFromDataSequence({ { inputFile } });
+    REQUIRE(universeSequence.getLength() == 1);
+    pe::Universe universe = universeSequence.atIndex(0);
+
+    pcd::DPDSimulator simulator =
+      pcd::DPDSimulator(universe, 2, false, "seed2");
+
+    // configuration
+    REQUIRE_NOTHROW(simulator.validateState());
+    REQUIRE_NOTHROW(simulator.configA(25.));
+    REQUIRE_NOTHROW(simulator.configSigma(3.));
+    REQUIRE_NOTHROW(simulator.configSlipspringLowCutoff(0.5));
+    REQUIRE_NOTHROW(simulator.configSlipspringHighCutoff(2.0));
+    REQUIRE_THROWS(simulator.configSlipspringLowCutoff(3.0));
+    REQUIRE_THROWS(simulator.configSlipspringLowCutoff(2.0));
+    REQUIRE_THROWS(simulator.configSlipspringHighCutoff(0.5));
+
+    std::vector<pc::ComputedDoubleValues> outputQuantities = {
+      pc::ComputedDoubleValues::TEMPERATURE,
+      pc::ComputedDoubleValues::PRESSURE,
+      pc::ComputedDoubleValues::STRESS_XX,
+      pc::ComputedDoubleValues::STRESS_YY,
+      pc::ComputedDoubleValues::STRESS_ZZ,
+      pc::ComputedDoubleValues::MSD
+    };
+
+    pc::OutputConfiguration config;
+    config.filename = "";
+    config.outputEvery = 5;
+    config.doubleValues = outputQuantities;
+    config.intValues = { pc::ComputedIntValues::STEP };
+
+    std::vector<pc::OutputConfiguration> configs = { config };
+    REQUIRE_NOTHROW(simulator.configStepOutput(configs));
+
+    std::unordered_map<int, int> numBondsPerType;
+    numBondsPerType[1] = 2;
+    numBondsPerType[2] = 4;
+    REQUIRE_NOTHROW(
+      simulator.configBondFormation(212, numBondsPerType, 2.2, 5));
+    size_t numBondsBefore = simulator.getNumBonds();
+
+    // actual simulation
+    REQUIRE_NOTHROW(simulator.runSimulation(75, false));
+    REQUIRE_NOTHROW(simulator.validateState());
+    std::cout << "DPD ran, state validated." << std::endl;
+
+    // check that we actually have formed bonds
+    CHECK(simulator.getNumBonds() >= (200 + numBondsBefore));
+    pe::Universe universeAfter = simulator.getUniverse();
+    std::map<int, int> finalFunctionalityPerType =
+      universeAfter.determineFunctionalityPerType();
+    CHECK(finalFunctionalityPerType.at(1) == 2);
+    CHECK(finalFunctionalityPerType.at(2) <= 4);
   }
 };
