@@ -372,6 +372,8 @@ namespace calc {
 
       size_t getNumSlipSprings() const { return this->numSlipSprings; }
 
+      size_t getNumBonds() const { return this->numBonds; }
+
       double getVolume() override { return this->box.getVolume(); }
 
       Eigen::VectorXd getBondLengths() override
