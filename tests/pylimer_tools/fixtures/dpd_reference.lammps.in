@@ -1,0 +1,40 @@
+# LAMMPS input file: values to test e.g. stress & pressure computations
+units           lj
+atom_style hybrid bond edpd
+variable kb equal 1.0
+comm_modify vel yes
+special_bonds lj 1.0 1.0 1.0 #coul 1.0 1.0 1.0
+bond_style harmonic 
+newton on
+neigh_modify every 1 delay 0 check yes #one 5000
+neighbor 3.25 bin
+
+variable seed equal 2570894
+
+read_data ./melt_83_a_100.structure.out
+
+variable sigmaPaper equal 0
+variable T equal 1. 
+variable gamma equal 0.5*${sigmaPaper}^2/(${kb}*${T})
+variable A equal 25.
+variable cutoff equal 1.0
+variable k equal 0. # 2.0
+
+bond_coeff * ${k} 0.0
+
+pair_style dpd ${T} ${cutoff} ${seed}
+pair_coeff * * ${A} ${gamma}
+
+fix 1 all mvv/dpd 0.5
+run_style verlet 
+
+timestep 0.06
+
+# compute stresses
+compute pA all pressure thermo_temp
+
+compute 3 all temp/com
+thermo_style    custom step temp vol dt press c_3 c_pA[1] c_pA[2] c_pA[3] c_pA[4] c_pA[5] c_pA[6] 
+thermo 1
+
+run 500

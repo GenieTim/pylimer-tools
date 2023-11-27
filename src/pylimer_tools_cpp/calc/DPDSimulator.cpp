@@ -95,6 +95,10 @@ namespace calc {
       this->currentVelocities = Eigen::VectorXd::Zero(coordinates.size());
       this->currentForces = Eigen::VectorXd::Zero(coordinates.size());
       this->currentStressTensor = Eigen::Matrix3d::Zero();
+      // with zero velocity, we don't have kinetic contributions
+      // we want to compute forces such that the initial pressure etc. is
+      // correct
+      this->refreshCurrentState();
     }
 
     /**
@@ -152,13 +156,13 @@ namespace calc {
 
         // re-compute the forces with these updated coordinates & velocities
         timer.section(DPDPerformanceSections::FORCES);
-        computeForces(this->currentForces,
-                      this->currentStressTensor,
-                      this->coordinates,
-                      this->currentVelocities,
-                      timer,
-                      this->dt,
-                      1.0);
+        this->currentPressure = computeForces(this->currentForces,
+                                              this->currentStressTensor,
+                                              this->coordinates,
+                                              this->currentVelocities,
+                                              timer,
+                                              this->dt,
+                                              1.0);
 
         // correct the velocities
         timer.section(DPDPerformanceSections::TIME_STEPPING);
@@ -337,23 +341,19 @@ namespace calc {
 
       // we use our own parallelization -> disable the one by Eigen
       Eigen::setNbThreads(1);
-#pragma omp parallel for reduction(+ : stressTensor, pressure)
+// #pragma omp parallel for reduction(+ : stressTensor, pressure)
       for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
-        // TODO: check sign
-        pressure += -this->k * bondDistances.segment(3 * i, 3).squaredNorm();
-        // pressure -= 0.5 * this->k * bondDistances.segment(3 * i,
-        // 3).squaredNorm();
-        // pressure += 0.5 * this->k * bondDistances.segment(3
-        // * i, 3).squaredNorm();
-        stressTensor += this->k * bondDistances.segment(3 * i, 3) *
+        // attractive force -> reduces pressure in the system
+        pressure -= this->k * bondDistances.segment(3 * i, 3).squaredNorm();
+        stressTensor -= this->k * bondDistances.segment(3 * i, 3) *
                         bondDistances.segment(3 * i, 3).transpose();
       }
 
       timer.section(DPDPerformanceSections::PAIR_FORCE);
 
       // actually loop the atoms
-#pragma omp parallel
-      {
+      // #pragma omp parallel
+      if (this->sigma > 0. || this->A > 0.) {
         const double squareCutoff = cutoff * cutoff;
         const double sigmaOverSqrtDt = this->sigma / std::sqrt(dt);
         // pre-allocate the neighbor indices array
@@ -368,7 +368,8 @@ namespace calc {
 
         // need to fix the schedule as with higher i, the workload gets much
         // less
-#pragma omp for reduction(+ : forces, stressTensor, pressure) schedule(dynamic, 16)
+        // #pragma omp for reduction(+ : forces, stressTensor, pressure) \
+//   schedule(dynamic, 16)
         for (size_t i = 0; i < this->numAtoms - 1; ++i) {
           int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
             neighbors, coords.segment(3 * i, 3), cutoff);
@@ -383,7 +384,7 @@ namespace calc {
             this->box.handlePBC(pairdistance);
             // slight performance improvement, taking the square norm here
             const double rNorm2 = pairdistance.squaredNorm();
-            if (rNorm2 >= squareCutoff || rNorm2 < 1e-12) {
+            if (rNorm2 >= squareCutoff || rNorm2 < 1e-15) {
               continue;
             }
 
@@ -398,6 +399,9 @@ namespace calc {
             const double rij_dot_vij = pairdistanceNormed.dot(velocitydiff);
             const double gamma_weighted_rij_dot_vij =
               this->gamma * one_minus_rnorm2 * rij_dot_vij;
+            if (this->sigma == 0.) {
+              assert(APPROX_EQUAL(gamma_weighted_rij_dot_vij, 0.0, 1e-15));
+            }
 
             // conservative repulsion force - dissipative/drag force
             // TODO: check if we get fma here
@@ -408,6 +412,10 @@ namespace calc {
             const double constant_rnd_prefix =
               one_minus_rnorm * sigmaOverSqrtDt;
             const double random_val = this->uniform_rand_mean0std1(this->e2);
+            if (this->sigma == 0.) {
+              assert(
+                (APPROX_EQUAL(constant_rnd_prefix * random_val, 0.0, 1e-10)));
+            }
 
             pairForceConst += constant_rnd_prefix * random_val;
 
@@ -418,16 +426,21 @@ namespace calc {
             forces.segment(3 * i, 3) += pairForce;
             forces.segment(3 * j, 3) -= pairForce;
 
-            // pressure update
+            // pressure update: repulsive force -> increases pressure
             pressure += pairForce.dot(pairdistance);
-            stressTensor -= pairForce * pairdistance.transpose();
+            stressTensor += pairForce * pairdistance.transpose();
           }
         }
       }
 
       // reset Eigen threads
       Eigen::setNbThreads(0);
-      return pressure / (3. * this->box.getVolume());
+      pressure /= (3. * this->box.getVolume());
+      stressTensor /= this->box.getVolume();
+#ifndef NDEBUG
+      assert(APPROX_EQUAL(stressTensor.trace() / 3., pressure, 1e-3));
+#endif
+      return pressure;
     }
 
     /**
