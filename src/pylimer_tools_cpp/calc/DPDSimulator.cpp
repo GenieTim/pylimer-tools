@@ -341,7 +341,7 @@ namespace calc {
 
       // we use our own parallelization -> disable the one by Eigen
       Eigen::setNbThreads(1);
-// #pragma omp parallel for reduction(+ : stressTensor, pressure)
+#pragma omp parallel for reduction(+ : stressTensor, pressure)
       for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
         // attractive force -> reduces pressure in the system
         pressure -= this->k * bondDistances.segment(3 * i, 3).squaredNorm();
@@ -351,9 +351,9 @@ namespace calc {
 
       timer.section(DPDPerformanceSections::PAIR_FORCE);
 
-      // actually loop the atoms
-      // #pragma omp parallel
-      if (this->sigma > 0. || this->A > 0.) {
+// actually loop the atoms
+#pragma omp parallel
+      {
         const double squareCutoff = cutoff * cutoff;
         const double sigmaOverSqrtDt = this->sigma / std::sqrt(dt);
         // pre-allocate the neighbor indices array
@@ -366,10 +366,10 @@ namespace calc {
         Eigen::Vector3d velocitydiff;
         Eigen::Vector3d pairForce;
 
-        // need to fix the schedule as with higher i, the workload gets much
-        // less
-        // #pragma omp for reduction(+ : forces, stressTensor, pressure) \
-//   schedule(dynamic, 16)
+// need to fix the schedule as with higher i, the workload gets much
+// less
+#pragma omp for reduction(+ : forces, stressTensor, pressure)                  \
+  schedule(dynamic, 16)
         for (size_t i = 0; i < this->numAtoms - 1; ++i) {
           int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
             neighbors, coords.segment(3 * i, 3), cutoff);
