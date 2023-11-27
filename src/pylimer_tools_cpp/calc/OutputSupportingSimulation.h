@@ -192,7 +192,7 @@ namespace calc {
          (currentStep % this->requireStressTensorEvery) == 0)
           ? this->getStressTensor()
           : Eigen::Matrix3d::Zero();
-      double pressure = stressTensor.trace();
+      double pressure = stressTensor.trace() / 3.;
       double kineticPressureTerm =
         requiresEvaluation(PRESSURE, currentStep)
           ? ((getNumParticles() * this->getTemperature()) / this->getVolume())

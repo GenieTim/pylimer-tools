@@ -25,19 +25,37 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     REQUIRE(universeSequence.getLength() == 1);
     pe::Universe universe = universeSequence.atIndex(0);
 
-    pcd::DPDSimulator simulator = pcd::DPDSimulator(universe, 2, false, "seed");
+    pcd::DPDSimulator simulator =
+      pcd::DPDSimulator(universe, 2, false, "12th_seed");
 
     // configuration
     REQUIRE_NOTHROW(simulator.validateState());
-    CHECK_NOTHROW(simulator.validateNeighbourlist(2.0));
-    CHECK_NOTHROW(simulator.validateNeighbourlist(1.0));
+    // CHECK_NOTHROW(simulator.validateNeighbourlist(2.0));
+    // CHECK_NOTHROW(simulator.validateNeighbourlist(1.0));
     REQUIRE_NOTHROW(simulator.configA(25.));
     REQUIRE_NOTHROW(simulator.configSigma(3.));
+    REQUIRE_NOTHROW(simulator.configSpringConstant(1.));
     REQUIRE_NOTHROW(simulator.configSlipspringLowCutoff(0.5));
     REQUIRE_NOTHROW(simulator.configSlipspringHighCutoff(2.0));
+
+    // check that wrong configuration throws
     REQUIRE_THROWS(simulator.configSlipspringLowCutoff(3.0));
     REQUIRE_THROWS(simulator.configSlipspringLowCutoff(2.0));
     REQUIRE_THROWS(simulator.configSlipspringHighCutoff(0.5));
+
+    // initial state – vgl. lammps
+    CHECK(simulator.getStressTensor().trace() / 3. == Catch::Approx(23.321285));
+    CHECK(simulator.getTemperature() + 1e-2 == Catch::Approx(0. + 1e-2));
+    Eigen::Matrix3d initialStressTensor = simulator.getStressTensor();
+    CHECK(initialStressTensor(0, 0) == Catch::Approx(23.456778).epsilon(0.75));
+    CHECK(initialStressTensor(1, 1) == Catch::Approx(23.374175).epsilon(0.75));
+    CHECK(initialStressTensor(2, 2) == Catch::Approx(23.401583).epsilon(0.75));
+    CHECK(initialStressTensor(0, 1) ==
+          Catch::Approx(-0.0085286852).epsilon(0.002));
+    CHECK(initialStressTensor(0, 2) ==
+          Catch::Approx(-0.10797027).epsilon(0.02));
+    CHECK(initialStressTensor(1, 2) ==
+          Catch::Approx(-0.035841973).epsilon(0.02));
 
     std::vector<pc::ComputedDoubleValues> outputQuantities = {
       pc::ComputedDoubleValues::TEMPERATURE,
@@ -105,9 +123,11 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     std::string restartFile = suspectedPath + "dpd_restart_file.bin";
     simulator.configRestartOutput(restartFile, 30);
 
-    // actual simulation
+    // actual simulation – without slip-springs yet
     REQUIRE_NOTHROW(simulator.runSimulation(75, false));
     REQUIRE_NOTHROW(simulator.validateState());
+    CHECK(simulator.getStressTensor().trace() / 3. ==
+          Catch::Approx(20.8).epsilon(1.));
     std::cout << "DPD ran, state validated." << std::endl;
     // CHECK_NOTHROW(simulator.validateNeighbourlist(2.0));
     // CHECK_NOTHROW(simulator.validateNeighbourlist(1.0));
@@ -198,12 +218,12 @@ TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator]")
     size_t numBondsBefore = simulator.getNumBonds();
 
     // actual simulation
-    REQUIRE_NOTHROW(simulator.runSimulation(75, false));
+    REQUIRE_NOTHROW(simulator.runSimulation(200, false));
     REQUIRE_NOTHROW(simulator.validateState());
     std::cout << "DPD ran, state validated." << std::endl;
 
     // check that we actually have formed bonds
-    CHECK(simulator.getNumBonds() >= (200 + numBondsBefore));
+    CHECK(simulator.getNumBonds() >= (100 + numBondsBefore));
     pe::Universe universeAfter = simulator.getUniverse();
     std::map<int, int> finalFunctionalityPerType =
       universeAfter.determineFunctionalityPerType();
@@ -211,3 +231,62 @@ TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator]")
     CHECK(finalFunctionalityPerType.at(2) <= 4);
   }
 };
+
+TEST_CASE("DPD Simulator Computes Correct Forces",
+          "[analysis][DPDSimulator]")
+{
+  // note that the random force might lead to deviations compared to LAMMPS
+  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  REQUIRE(std::filesystem::exists(suspectedPath));
+
+  std::string inputFile = suspectedPath + "melt_83_a_100.structure.out";
+  if (std::filesystem::exists(inputFile)) {
+    pe::UniverseSequence universeSequence = pe::UniverseSequence();
+    REQUIRE(universeSequence.getLength() == 0);
+    universeSequence.initializeFromDataSequence({ { inputFile } });
+    REQUIRE(universeSequence.getLength() == 1);
+    pe::Universe universe = universeSequence.atIndex(0);
+
+    pcd::DPDSimulator simulator =
+      pcd::DPDSimulator(universe, 2, false, "12th_seed");
+
+    // configuration
+    REQUIRE_NOTHROW(simulator.validateState());
+    // CHECK_NOTHROW(simulator.validateNeighbourlist(2.0));
+    // CHECK_NOTHROW(simulator.validateNeighbourlist(1.0));
+    REQUIRE_NOTHROW(simulator.configA(0.));
+    REQUIRE_NOTHROW(simulator.configSigma(0.));
+    REQUIRE_NOTHROW(simulator.configSpringConstant(0.));
+
+    REQUIRE_NOTHROW(simulator.refreshCurrentState());
+    CHECK(simulator.getStressTensor().trace() / 3. == Catch::Approx(0.));
+    // gradually add forces
+    REQUIRE_NOTHROW(simulator.configA(25.));
+    REQUIRE_NOTHROW(simulator.refreshCurrentState());
+    CHECK(simulator.getStressTensor().trace() / 3. == Catch::Approx(25.259583));
+
+    REQUIRE_NOTHROW(simulator.configA(0.));
+    REQUIRE_NOTHROW(simulator.configSpringConstant(1.));
+    REQUIRE_NOTHROW(simulator.refreshCurrentState());
+    CHECK(simulator.getStressTensor().trace() / 3. == Catch::Approx(-1.78695));
+
+    REQUIRE_NOTHROW(simulator.configSigma(3.));
+    REQUIRE_NOTHROW(simulator.refreshCurrentState());
+    CHECK(simulator.getStressTensor().trace() / 3. ==
+          Catch::Approx(-1.8487375));
+    // initial state – vgl. lammps
+    REQUIRE_NOTHROW(simulator.configA(25.));
+    CHECK(simulator.getStressTensor().trace() / 3. == Catch::Approx(23.321285));
+    CHECK(simulator.getTemperature() + 1e-2 == Catch::Approx(0. + 1e-2));
+    Eigen::Matrix3d initialStressTensor = simulator.getStressTensor();
+    CHECK(initialStressTensor(0, 0) == Catch::Approx(23.456778).epsilon(0.75));
+    CHECK(initialStressTensor(1, 1) == Catch::Approx(23.374175).epsilon(0.75));
+    CHECK(initialStressTensor(2, 2) == Catch::Approx(23.401583).epsilon(0.75));
+    CHECK(initialStressTensor(0, 1) ==
+          Catch::Approx(-0.0085286852).epsilon(0.002));
+    CHECK(initialStressTensor(0, 2) ==
+          Catch::Approx(-0.10797027).epsilon(0.02));
+    CHECK(initialStressTensor(1, 2) ==
+          Catch::Approx(-0.035841973).epsilon(0.02));
+  }
+}

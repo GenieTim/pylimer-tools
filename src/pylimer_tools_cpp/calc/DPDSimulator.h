@@ -91,6 +91,7 @@ namespace calc {
       Eigen::VectorXd currentVelocities;
       Eigen::VectorXd currentForces;
       Eigen::Matrix3d currentStressTensor;
+      double currentPressure = 0.;
 
       ////////////////////////////////////////////////////////////////
       // state of bond formation
@@ -152,6 +153,27 @@ namespace calc {
       {
         runSimulation(
           nSteps, withMC, []() { return false; }, []() {});
+      }
+
+      void refreshCurrentState()
+      {
+        pylimer_tools::utils::PerformanceTimer timer =
+          pylimer_tools::utils::PerformanceTimer<
+            DPDPerformanceSections::NUM_PERFORMANCE_SECTIONS>();
+        this->currentPressure = computeForces(this->currentForces,
+                                              this->currentStressTensor,
+                                              this->coordinates,
+                                              this->currentVelocities,
+                                              timer,
+                                              this->dt,
+                                              1.0);
+        // kinetic term of the stress/pressure
+        const double m = 1.;
+        for (size_t i = 0; i < this->numAtoms; ++i) {
+          this->currentStressTensor -=
+            m * this->currentVelocities.segment(3 * i, 3) *
+            this->currentVelocities.segment(3 * i, 3).transpose();
+        }
       }
 
       /**
@@ -316,9 +338,9 @@ namespace calc {
           for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
             // loop neighbours to find applicable partner
             const size_t j = neighbors[neigh_idx];
-            double r2 =
-              (this->coordinates.segment(3 * atom_idx, 3) - this->coordinates.segment(3 * j, 3))
-                .norm();
+            double r2 = (this->coordinates.segment(3 * atom_idx, 3) -
+                         this->coordinates.segment(3 * j, 3))
+                          .norm();
             if (r2 <= cutoff &&
                 (this->idxFunctionalities[j] <
                  this->maxBondsPerType[this->atomTypes[j]]) &&
@@ -332,10 +354,11 @@ namespace calc {
           }
 
           // yay, we can form a bond
-          // NOTE: currently, we build only 1 
+          // NOTE: currently, we build only 1
           std::shuffle(
             possibleCandidates.begin(), possibleCandidates.end(), this->e2);
-          this->addBond(atom_idx, possibleCandidates[0], 3); // TODO: decide on bond type
+          this->addBond(
+            atom_idx, possibleCandidates[0], 3); // TODO: decide on bond type
           this->bondsToForm -= 1;
           if (this->bondsToForm <= 0) {
             break;
@@ -393,10 +416,7 @@ namespace calc {
         return bondLengths;
       }
 
-      Eigen::VectorXd getCoordinates() override
-      {
-        return this->coordinates;
-      }
+      Eigen::VectorXd getCoordinates() override { return this->coordinates; }
 
       double getTemperature() override
       {
