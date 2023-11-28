@@ -3,7 +3,7 @@ units           lj
 atom_style hybrid bond edpd
 variable kb equal 1.0
 comm_modify vel yes
-special_bonds lj 1.0 1.0 1.0 #coul 1.0 1.0 1.0
+special_bonds lj 1.0 1.0 1.0 coul 1.0 1.0 1.0
 bond_style harmonic 
 newton on
 neigh_modify every 1 delay 0 check yes #one 5000
@@ -16,9 +16,9 @@ read_data ./melt_83_a_100.structure.out
 variable sigmaPaper equal 0
 variable T equal 1. 
 variable gamma equal 0.5*${sigmaPaper}^2/(${kb}*${T})
-variable A equal 25.
+variable A equal 0.
 variable cutoff equal 1.0
-variable k equal 0. # 2.0
+variable k equal 1. # 2.0
 
 bond_coeff * ${k} 0.0
 
