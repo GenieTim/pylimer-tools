@@ -213,21 +213,6 @@ double gaussian_random(double mean = 0.0, double std = 1.0) {
           1.0); // unfortunately not const because of the random nr generator
 
       /**
-       * @brief Compute the force vector, and return the pressure
-       *
-       */
-      double computeForcesNaive(
-        Eigen::VectorXd& forces,
-        Eigen::Matrix3d& stressTensor,
-        const Eigen::VectorXd& coordinates,
-        const Eigen::VectorXd& velocities,
-        pylimer_tools::utils::PerformanceTimer<
-          DPDPerformanceSections::NUM_PERFORMANCE_SECTIONS>& timer,
-        const double dt = 0.06,
-        const double cutoff =
-          1.0); // unfortunately not const because of the random nr generator
-
-      /**
        * @brief Compute the temperature
        *
        * @param velocities
