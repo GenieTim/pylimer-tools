@@ -84,6 +84,8 @@ namespace entities {
                                      const Eigen::Vector3d coordinates,
                                      const double upperCutoff) const;
 
+    int getHigherIndicesWithinCutoff(Eigen::ArrayXi& result,const Eigen::VectorXd &coordinates, const int source, const double cutoff) const;
+
     /**
      * @brief For debugging/test purposes: the actual buckets
      *
