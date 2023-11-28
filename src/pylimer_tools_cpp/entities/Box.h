@@ -310,6 +310,26 @@ namespace entities {
              lhs.getShearMagnitude() == rhs.getShearMagnitude();
     }
 
+    static double naivePBC(const double oldVal, const double L)
+    {
+      double val = oldVal;
+      int num_iterations = 0;
+      while (val > 0.5 * L && num_iterations <= 100) {
+        val -= L;
+        num_iterations++;
+      }
+      while (val < -0.5 * L && num_iterations <= 100) {
+        val += L;
+        num_iterations++;
+      }
+      if (num_iterations >= 100) {
+        throw std::runtime_error(
+          "Too many iterations in naivePBC for value of " +
+          std::to_string(oldVal) + " and L = " + std::to_string(L) + ".");
+      }
+      return val;
+    }
+
     /**
      * @brief Find a ("linear") intermediate between two different boxes
      *
@@ -336,7 +356,7 @@ namespace entities {
       newBox.applySimpleShear(
         INTERPOLATE(this->getShearMagnitude(), other.getShearMagnitude()),
         this->getShearDirection() == -1 ? other.getShearDirection()
-                                       : this->getShearDirection());
+                                        : this->getShearDirection());
 
       return newBox;
     }

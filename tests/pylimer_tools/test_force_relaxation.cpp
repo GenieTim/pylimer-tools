@@ -5,6 +5,7 @@
 #include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <chrono>
 #include <cmath>
 #include <filesystem>
@@ -514,14 +515,19 @@ TEST_CASE("Inverse Langevin test",
           "[analysis][MEHPForceRelaxation][NonGaussianSpringForceEvaluator]")
 {
   // simple test to make sure the inverse langevin approximation is fine
-  CHECK(pcm::langevin_inv(0.01) == Catch::Approx(0.0300018).epsilon(0.02));
-  CHECK(pcm::langevin_inv(0.1) == Catch::Approx(0.301817).epsilon(0.02));
-  CHECK(pcm::langevin_inv(0.25) == Catch::Approx(0.779897).epsilon(0.02));
-  CHECK(pcm::langevin_inv(0.5) == Catch::Approx(1.79676).epsilon(0.02));
-  CHECK(pcm::langevin_inv(0.9999) == Catch::Approx(10000).epsilon(0.02));
-  CHECK(pcm::langevin_inv(1. / 3.) == Catch::Approx(1.07456).epsilon(0.02));
-  CHECK(pcm::langevin_inv(1.03078 / 3.) ==
-        Catch::Approx(1.11306).epsilon(0.02));
+  CHECK_THAT(pcm::langevin_inv(0.01),
+             Catch::Matchers::WithinRel(0.0300018, 0.02));
+  CHECK_THAT(pcm::langevin_inv(0.1),
+             Catch::Matchers::WithinRel(0.301817, 0.02));
+  CHECK_THAT(pcm::langevin_inv(0.25),
+             Catch::Matchers::WithinRel(0.779897, 0.02));
+  CHECK_THAT(pcm::langevin_inv(0.5), Catch::Matchers::WithinRel(1.79676, 0.02));
+  CHECK_THAT(pcm::langevin_inv(0.9999),
+             Catch::Matchers::WithinRel(10000, 0.02));
+  CHECK_THAT(pcm::langevin_inv(1. / 3.),
+             Catch::Matchers::WithinRel(1.07456, 0.02));
+  CHECK_THAT(pcm::langevin_inv(1.03078 / 3.),
+             Catch::Matchers::WithinRel(1.11306, 0.02));
 }
 
 TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
@@ -557,10 +563,10 @@ TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
   }
   // then, some values as compared to what is obtained from a Mathematica script
   springDistances[0] = 1.0;
-  CHECK(forceEvaluatorInstance.evaluateForceSetGradient(
-          net.nrOfNodes * 3, springDistances, u, r) ==
-        Catch::Approx(0.517942).epsilon(0.02));
-  CHECK(r[0] == Catch::Approx(1.07456).epsilon(0.02));
+  CHECK_THAT(forceEvaluatorInstance.evaluateForceSetGradient(
+               net.nrOfNodes * 3, springDistances, u, r),
+             Catch::Matchers::WithinRel(0.517942, 0.02));
+  CHECK_THAT(r[0], Catch::Matchers::WithinRel(1.07456, 0.02));
   CHECK(r[1] == 0.0);
   CHECK(r[2] == 0.0);
   CHECK(r[3] == Catch::Approx(-r[0]));
@@ -570,9 +576,9 @@ TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
   // and again some others
   springDistances[1] = -1.0;
   double rDist = std::sqrt(2.0);
-  CHECK(forceEvaluatorInstance.evaluateForceSetGradient(
-          net.nrOfNodes * 3, springDistances, u, r) ==
-        Catch::Approx(1.07797).epsilon(0.02));
+  CHECK_THAT(forceEvaluatorInstance.evaluateForceSetGradient(
+               net.nrOfNodes * 3, springDistances, u, r),
+             Catch::Matchers::WithinRel(1.07797, 0.02));
   CHECK(r[0] == Catch::Approx(1.6542 * 1.0 / rDist).epsilon(0.02));
   CHECK(r[1] == Catch::Approx(-1.6542 * 1.0 / rDist).epsilon(0.02));
   CHECK(r[2] == 0.0);
@@ -581,9 +587,9 @@ TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
   CHECK(r[5] == Catch::Approx(-r[2]));
   // and a final one
   springDistances[2] = 0.25;
-  CHECK(forceEvaluatorInstance.evaluateForceSetGradient(
-          net.nrOfNodes * 3, springDistances, u, r) ==
-        Catch::Approx(1.11463).epsilon(0.02));
+  CHECK_THAT(forceEvaluatorInstance.evaluateForceSetGradient(
+          net.nrOfNodes * 3, springDistances, u, r) ,
+        Catch::Matchers::WithinRel(1.11463, 0.02));
   double OneOverRDist = 1.0 / std::sqrt(2.0 + 0.25 * 0.25);
   CHECK(r[0] == Catch::Approx(1.68968 * OneOverRDist).epsilon(0.02));
   CHECK(r[1] == Catch::Approx(-1.68968 * OneOverRDist).epsilon(0.02));
@@ -593,7 +599,7 @@ TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
   CHECK(r[5] == Catch::Approx(-r[2]));
 
   // cleanup
-  delete[](r);
+  delete[] (r);
 }
 
 TEST_CASE("Free chains collapse",

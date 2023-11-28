@@ -353,6 +353,10 @@ namespace calc {
                         bondDistances.segment(3 * i, 3).transpose();
       }
 
+      // multiply by 2 to account for the second end of each bond
+      pressure *= 2;
+      stressTensor *= 2;
+
       timer.section(DPDPerformanceSections::PAIR_FORCE);
 
 // actually loop the atoms
@@ -388,6 +392,9 @@ namespace calc {
             this->box.handlePBC(pairdistance);
             // slight performance improvement, taking the square norm here
             const double rNorm2 = pairdistance.squaredNorm();
+#ifndef NDEBUG
+            assert(rNorm2 < (0.5 * this->box.getL()).matrix().squaredNorm());
+#endif
             if (rNorm2 >= squareCutoff || rNorm2 < 1e-15) {
               continue;
             }
@@ -403,9 +410,11 @@ namespace calc {
             const double rij_dot_vij = pairdistanceNormed.dot(velocitydiff);
             const double gamma_weighted_rij_dot_vij =
               this->gamma * one_minus_rnorm2 * rij_dot_vij;
+#ifndef NDEBUG
             if (this->sigma == 0.) {
               assert(APPROX_EQUAL(gamma_weighted_rij_dot_vij, 0.0, 1e-15));
             }
+#endif
 
             // conservative repulsion force - dissipative/drag force
             // TODO: check if we get fma here
@@ -416,10 +425,12 @@ namespace calc {
             const double constant_rnd_prefix =
               one_minus_rnorm * sigmaOverSqrtDt;
             const double random_val = this->uniform_rand_mean0std1(this->e2);
+#ifndef NDEBUG
             if (this->sigma == 0.) {
               assert(
                 (APPROX_EQUAL(constant_rnd_prefix * random_val, 0.0, 1e-10)));
             }
+#endif
 
             pairForceConst += constant_rnd_prefix * random_val;
 
@@ -445,6 +456,133 @@ namespace calc {
       assert(APPROX_EQUAL(stressTensor.trace() / 3., pressure, 1e-3));
 #endif
       return pressure;
+    }
+
+    /**
+     * @brief Compute the force vector, and return the pressure
+     *
+     * @param forces
+     * @param coordinates
+     * @param velocities
+     * @param dt
+     * @param cutoff
+     * @param A
+     * @param sigma
+     * @param k
+     * @return double
+     */
+    double DPDSimulator::computeForcesNaive(
+      Eigen::VectorXd& forces,
+      Eigen::Matrix3d& stressTensor,
+      const Eigen::VectorXd& coordinates,
+      const Eigen::VectorXd& velocities,
+      pylimer_tools::utils::PerformanceTimer<
+        DPDPerformanceSections::NUM_PERFORMANCE_SECTIONS>& timer,
+      const double dt,
+      const double cutoff)
+    {
+      // initialisation
+      assert(coordinates.size() == velocities.size());
+      assert(forces.size() == coordinates.size());
+      forces.setZero();
+      stressTensor.setZero();
+      double pressure = 0.0;
+      Eigen::Array3d L = this->box.getL();
+
+      // actual computation
+      for (size_t i = 0; i < coordinates.size() / 3; ++i) {
+        for (size_t j = i + 1; j < coordinates.size() / 3; ++j) {
+          const double dx =
+            this->box.naivePBC(coordinates[3 * i] - coordinates[3 * j], L[0]);
+          const double dy = this->box.naivePBC(
+            coordinates[3 * i + 1] - coordinates[3 * j + 1], L[1]);
+          const double dz = this->box.naivePBC(
+            coordinates[3 * i + 2] - coordinates[3 * j + 2], L[2]);
+          const double rNorm2 = (dx * dx + dy * dy + dz * dz);
+          if (rNorm2 >= cutoff || rNorm2 < 1e-15) {
+            // this is a performance bottleneck, commonly solved by using
+            // neighbour lists
+            continue;
+          }
+          const double rNorm = std::sqrt(rNorm2);
+          const double one_minus_rnorm = 1. - rNorm;
+          const double one_minus_rnorm2 = (1. - rNorm) * (1. - rNorm);
+          const double dxNorm = dx / rNorm;
+          const double dyNorm = dy / rNorm;
+          const double dzNorm = dz / rNorm;
+
+          // conservative repulsion force
+          double forceTerm = this->A * one_minus_rnorm;
+          // forces[3 * i] += a * one_minus_rnorm * dxNorm;
+          // forces[3 * i + 1] += a * one_minus_rnorm * dyNorm;
+          // forces[3 * i + 2] += a * one_minus_rnorm * dzNorm;
+
+          // forces[3 * j] -= a * one_minus_rnorm * dxNorm;
+          // forces[3 * j + 1] -= a * one_minus_rnorm * dyNorm;
+          // forces[3 * j + 2] -= a * one_minus_rnorm * dzNorm;
+
+          // dissipative/drag force
+          const double dvx = velocities[3 * i] - velocities[3 * j];
+          const double dvy = velocities[3 * i + 1] - velocities[3 * j + 1];
+          const double dvz = velocities[3 * i + 2] - velocities[3 * j + 2];
+          const double rij_dot_vij =
+            (dvx * dxNorm + dvy * dyNorm + dvz * dzNorm);
+          const double gamma_weighted_rij_dot_vij =
+            gamma * one_minus_rnorm2 * rij_dot_vij;
+
+          forceTerm -= gamma_weighted_rij_dot_vij;
+
+          // forces[3 * i] += -gamma_weighted_rij_dot_vij * dxNorm;
+          // forces[3 * i + 1] += -gamma_weighted_rij_dot_vij * dyNorm;
+          // forces[3 * i + 2] += -gamma_weighted_rij_dot_vij * dzNorm;
+
+          // forces[3 * j] -= -gamma_weighted_rij_dot_vij * dxNorm;
+          // forces[3 * j + 1] -= -gamma_weighted_rij_dot_vij * dyNorm;
+          // forces[3 * j + 2] -= -gamma_weighted_rij_dot_vij * dzNorm;
+
+          // random force
+          const double constant_rnd_prefix = sigma * one_minus_rnorm / sqrt(dt);
+          const double random_val = this->gaussian_random();
+          // const double random_force_x = constant_rnd_prefix * random_val *
+          // dxNorm; const double random_force_y = constant_rnd_prefix *
+          // random_val
+          // * dyNorm; const double random_force_z = constant_rnd_prefix *
+          // random_val * dzNorm;
+
+          // forces[3 * i] += random_force_x;
+          // forces[3 * i + 1] += random_force_y;
+          // forces[3 * i + 2] += random_force_z;
+
+          // forces[3 * j] -= random_force_x;
+          // forces[3 * j + 1] -= random_force_y;
+          // forces[3 * j + 2] -= random_force_z;
+          forceTerm += constant_rnd_prefix * random_val;
+
+          forces[3 * i] += forceTerm * dxNorm;
+          forces[3 * i + 1] += forceTerm * dyNorm;
+          forces[3 * i + 2] += forceTerm * dzNorm;
+
+          forces[3 * j] -= forceTerm * dxNorm;
+          forces[3 * j + 1] -= forceTerm * dyNorm;
+          forces[3 * j + 2] -= forceTerm * dzNorm;
+
+          // pressure update
+          pressure += (forceTerm * dxNorm * dx + forceTerm * dyNorm * dy +
+                       forceTerm * dzNorm * dz);
+          stressTensor(0, 0) += forceTerm * dxNorm * dx;
+          stressTensor(1, 1) += forceTerm * dyNorm * dy;
+          stressTensor(2, 2) += forceTerm * dzNorm * dz;
+          stressTensor(0, 1) += forceTerm * dxNorm * dy;
+          stressTensor(0, 2) += forceTerm * dxNorm * dz;
+          stressTensor(1, 2) += forceTerm * dyNorm * dz;
+          //
+          stressTensor(1, 0) += forceTerm * dyNorm * dx;
+          stressTensor(2, 0) += forceTerm * dzNorm * dx;
+          stressTensor(2, 1) += forceTerm * dzNorm * dy;
+        }
+      }
+
+      return pressure / (3 * L[0] * L[1] * L[2]);
     }
 
     /**
