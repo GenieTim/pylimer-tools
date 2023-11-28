@@ -7,7 +7,7 @@ special_bonds lj 1.0 1.0 1.0 coul 1.0 1.0 1.0
 bond_style harmonic 
 newton on
 neigh_modify every 1 delay 0 check yes one 5000
-neighbor 2 bin
+neighbor 6 bin
 
 variable seed equal 23425
 
@@ -37,4 +37,4 @@ compute 3 all temp/com
 thermo_style    custom step temp vol dt press c_3 c_pA[1] c_pA[2] c_pA[3] c_pA[4] c_pA[5] c_pA[6] 
 thermo 1
 
-run 500
+run 75

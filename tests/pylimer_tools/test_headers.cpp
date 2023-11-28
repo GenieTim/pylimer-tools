@@ -3,6 +3,7 @@
 #include "../../src/pylimer_tools_cpp/utils/GraphUtils.h"
 #include "../../src/pylimer_tools_cpp/utils/StringUtils.h"
 #include <catch2/catch_approx.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
 #include <iostream>
@@ -163,8 +164,8 @@ TEST_CASE("Box can do PBC computations", "[entity][Box]")
     testBox2.applySimpleShear(-0.1, 2);
     REQUIRE_NOTHROW(testBox2.handlePBC(distances7));
     CHECK(distances7[0] == Catch::Approx(-2.12143).epsilon(0.001));
-    CHECK(distances7[1] == Catch::Approx(0.0657623).epsilon(0.001));
-    CHECK(distances7[2] == Catch::Approx(2.31703).epsilon(0.001));
+    CHECK_THAT(distances7[1], Catch::Matchers::WithinRel(0.0657623, 0.001));
+    CHECK_THAT(distances7[2], Catch::Matchers::WithinRel(2.31703, 0.001));
   }
 
   SECTION("Mixed Box")

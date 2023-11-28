@@ -134,6 +134,17 @@ namespace calc {
 
       pylimer_tools::entities::EigenNeighbourList neighbourlist;
 
+
+double gaussian_random(double mean = 0.0, double std = 1.0) {
+  std::random_device rd;
+
+  std::mt19937 e2(rd());
+
+  std::normal_distribution<> dist(mean, std);
+
+  return dist(e2);
+}
+
     public:
       DPDSimulator(const pylimer_tools::entities::Universe& u,
                    const int crosslinkerType = 2,
@@ -191,6 +202,21 @@ namespace calc {
        *
        */
       double computeForces(
+        Eigen::VectorXd& forces,
+        Eigen::Matrix3d& stressTensor,
+        const Eigen::VectorXd& coordinates,
+        const Eigen::VectorXd& velocities,
+        pylimer_tools::utils::PerformanceTimer<
+          DPDPerformanceSections::NUM_PERFORMANCE_SECTIONS>& timer,
+        const double dt = 0.06,
+        const double cutoff =
+          1.0); // unfortunately not const because of the random nr generator
+
+      /**
+       * @brief Compute the force vector, and return the pressure
+       *
+       */
+      double computeForcesNaive(
         Eigen::VectorXd& forces,
         Eigen::Matrix3d& stressTensor,
         const Eigen::VectorXd& coordinates,
