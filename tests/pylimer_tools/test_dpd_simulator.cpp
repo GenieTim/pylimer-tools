@@ -232,8 +232,7 @@ TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator]")
   }
 };
 
-TEST_CASE("DPD Simulator Computes Correct Forces",
-          "[analysis][DPDSimulator]")
+TEST_CASE("DPD Simulator Computes Correct Forces", "[analysis][DPDSimulator]")
 {
   // note that the random force might lead to deviations compared to LAMMPS
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -248,7 +247,7 @@ TEST_CASE("DPD Simulator Computes Correct Forces",
     pe::Universe universe = universeSequence.atIndex(0);
 
     pcd::DPDSimulator simulator =
-      pcd::DPDSimulator(universe, 2, false, "12th_seed");
+      pcd::DPDSimulator(universe, 2, false, "14th_seed");
 
     // configuration
     REQUIRE_NOTHROW(simulator.validateState());
@@ -260,21 +259,32 @@ TEST_CASE("DPD Simulator Computes Correct Forces",
 
     REQUIRE_NOTHROW(simulator.refreshCurrentState());
     CHECK(simulator.getStressTensor().trace() / 3. == Catch::Approx(0.));
+    CHECK(simulator.getStressTensor()(1, 2) == Catch::Approx(0.));
+    CHECK(simulator.getStressTensor()(1, 1) == Catch::Approx(0.));
+
     // gradually add forces
     REQUIRE_NOTHROW(simulator.configA(25.));
     REQUIRE_NOTHROW(simulator.refreshCurrentState());
     CHECK(simulator.getStressTensor().trace() / 3. == Catch::Approx(25.259583));
+    CHECK(simulator.getStressTensor()(0, 0) == Catch::Approx(25.394731));
+    CHECK(simulator.getStressTensor()(1, 1) == Catch::Approx(25.249986));
+    CHECK(simulator.getStressTensor()(1, 2) == Catch::Approx(-0.033026848));
 
     REQUIRE_NOTHROW(simulator.configA(0.));
     REQUIRE_NOTHROW(simulator.configSpringConstant(1.));
     REQUIRE_NOTHROW(simulator.refreshCurrentState());
     CHECK(simulator.getStressTensor().trace() / 3. == Catch::Approx(-1.78695));
+    CHECK(simulator.getStressTensor()(0, 0) == Catch::Approx(-1.8259387));
+    CHECK(simulator.getStressTensor()(1, 1) == Catch::Approx(-1.7699664));
+    CHECK(simulator.getStressTensor()(1, 2) == Catch::Approx(0.021150486));
 
+    // CAUTION, randomness
     REQUIRE_NOTHROW(simulator.configSigma(3.));
     REQUIRE_NOTHROW(simulator.refreshCurrentState());
     CHECK(simulator.getStressTensor().trace() / 3. ==
           Catch::Approx(-1.8487375));
-    // initial state – vgl. lammps
+
+    // complete initial state
     REQUIRE_NOTHROW(simulator.configA(25.));
     CHECK(simulator.getStressTensor().trace() / 3. == Catch::Approx(23.321285));
     CHECK(simulator.getTemperature() + 1e-2 == Catch::Approx(0. + 1e-2));

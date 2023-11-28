@@ -367,7 +367,7 @@ namespace calc {
         Eigen::Vector3d pairForce;
 
 // need to fix the schedule as with higher i, the workload gets much
-// less
+// less¨
 #pragma omp for reduction(+ : forces, stressTensor, pressure)                  \
   schedule(dynamic, 16)
         for (size_t i = 0; i < this->numAtoms - 1; ++i) {
