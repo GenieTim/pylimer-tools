@@ -345,6 +345,10 @@ namespace calc {
       for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
         // attractive force -> reduces pressure in the system
         pressure -= this->k * bondDistances.segment(3 * i, 3).squaredNorm();
+#ifndef NDEBUG
+        assert(bondDistances.segment(3 * i, 3).norm() <
+               (0.5 * this->box.getL()).matrix().norm());
+#endif
         stressTensor -= this->k * bondDistances.segment(3 * i, 3) *
                         bondDistances.segment(3 * i, 3).transpose();
       }
@@ -434,7 +438,7 @@ namespace calc {
       }
 
       // reset Eigen threads
-      Eigen::setNbThreads(0);
+      // Eigen::setNbThreads(0);
       pressure /= (3. * this->box.getVolume());
       stressTensor /= this->box.getVolume();
 #ifndef NDEBUG
