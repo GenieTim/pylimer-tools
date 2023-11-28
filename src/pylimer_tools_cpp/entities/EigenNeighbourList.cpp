@@ -244,6 +244,39 @@ namespace entities {
   }
 
   /**
+   * @brief Similar to getIndicesCloseToCoordinates, this function returns those
+   * coordinates, but filtered for cutoff and higher index
+   *
+   * @param result the array to write the coordinates into
+   * @param coordinates the coordinates underlying this neighbour list
+   * @param source the source index. Only resulting atoms with higher index are
+   * returned
+   * @param cutoff the cut-off to use. Only atoms within this distance are
+   * returned in results.
+   * @return int the number of first (valid) entries in result.
+   */
+  int EigenNeighbourList::getHigherIndicesWithinCutoff(
+    Eigen::ArrayXi& result,
+    const Eigen::VectorXd& coordinates,
+    const int source,
+    const double cutoff) const
+  {
+    int numNeighbours = this->getIndicesCloseToCoordinates(
+      result, coordinates.segment(3 * source, 3), cutoff);
+    int actualNumNeighbours = 0;
+    const double cutoff2 = cutoff * cutoff;
+    for (size_t i = 0; i < numNeighbours; ++i) {
+      if (result[i] > source && (coordinates.segment(3 * source, 3) -
+                                 coordinates.segment(result[i] * 3, 3))
+                                    .squaredNorm() < cutoff2) {
+        result[actualNumNeighbours] = result[i];
+        actualNumNeighbours += 1;
+      }
+    }
+    return actualNumNeighbours;
+  };
+
+  /**
    * @brief Get the Indices of Coordinates Close To the Coordinates of another
    * Index
    *

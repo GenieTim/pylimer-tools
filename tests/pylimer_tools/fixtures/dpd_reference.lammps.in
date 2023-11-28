@@ -6,10 +6,10 @@ comm_modify vel yes
 special_bonds lj 1.0 1.0 1.0 coul 1.0 1.0 1.0
 bond_style harmonic 
 newton on
-neigh_modify every 1 delay 0 check yes #one 5000
-neighbor 3.25 bin
+neigh_modify every 1 delay 0 check yes one 5000
+neighbor 2 bin
 
-variable seed equal 2570894
+variable seed equal 23425
 
 read_data ./melt_83_a_100.structure.out
 

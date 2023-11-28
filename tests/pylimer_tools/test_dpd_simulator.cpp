@@ -195,6 +195,7 @@ TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator]")
     std::vector<pc::ComputedDoubleValues> outputQuantities = {
       pc::ComputedDoubleValues::TEMPERATURE,
       pc::ComputedDoubleValues::PRESSURE,
+      pc::ComputedDoubleValues::VOLUME,
       pc::ComputedDoubleValues::STRESS_XX,
       pc::ComputedDoubleValues::STRESS_YY,
       pc::ComputedDoubleValues::STRESS_ZZ,
@@ -251,8 +252,11 @@ TEST_CASE("DPD Simulator Computes Correct Forces", "[analysis][DPDSimulator]")
 
     // configuration
     REQUIRE_NOTHROW(simulator.validateState());
+    CHECK(simulator.getVolume() == Catch::Approx(2766.6667));
     // CHECK_NOTHROW(simulator.validateNeighbourlist(2.0));
     // CHECK_NOTHROW(simulator.validateNeighbourlist(1.0));
+
+    // DISABLE all forces by configuration
     REQUIRE_NOTHROW(simulator.configA(0.));
     REQUIRE_NOTHROW(simulator.configSigma(0.));
     REQUIRE_NOTHROW(simulator.configSpringConstant(0.));
@@ -286,6 +290,9 @@ TEST_CASE("DPD Simulator Computes Correct Forces", "[analysis][DPDSimulator]")
 
     // complete initial state
     REQUIRE_NOTHROW(simulator.configA(25.));
+    REQUIRE_NOTHROW(simulator.configSigma(3.));
+    REQUIRE_NOTHROW(simulator.configSpringConstant(1.));
+    REQUIRE_NOTHROW(simulator.refreshCurrentState());
     CHECK(simulator.getStressTensor().trace() / 3. == Catch::Approx(23.321285));
     CHECK(simulator.getTemperature() + 1e-2 == Catch::Approx(0. + 1e-2));
     Eigen::Matrix3d initialStressTensor = simulator.getStressTensor();
@@ -298,5 +305,39 @@ TEST_CASE("DPD Simulator Computes Correct Forces", "[analysis][DPDSimulator]")
           Catch::Approx(-0.10797027).epsilon(0.02));
     CHECK(initialStressTensor(1, 2) ==
           Catch::Approx(-0.035841973).epsilon(0.02));
+  }
+}
+
+TEST_CASE("DPD Simulator Converts Correctly", "[analysis][DPDSimulator]")
+{
+  // note that the random force might lead to deviations compared to LAMMPS
+  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  REQUIRE(std::filesystem::exists(suspectedPath));
+
+  std::string inputFile = suspectedPath + "melt_83_a_100.structure.out";
+  if (std::filesystem::exists(inputFile)) {
+    pe::UniverseSequence universeSequence = pe::UniverseSequence();
+    REQUIRE(universeSequence.getLength() == 0);
+    universeSequence.initializeFromDataSequence({ { inputFile } });
+    REQUIRE(universeSequence.getLength() == 1);
+    pe::Universe universe = universeSequence.atIndex(0);
+
+    pcd::DPDSimulator simulator =
+      pcd::DPDSimulator(universe, 2, false, "12th_seed");
+
+    pe::Universe resultUniverse = simulator.getUniverse();
+
+    CHECK(resultUniverse.getNrOfAtoms() == universe.getNrOfAtoms());
+    CHECK(resultUniverse.getNrOfBonds() == universe.getNrOfBonds());
+    std::map<std::string, std::vector<long int>> previousEdges =
+      universe.getEdges();
+    std::map<std::string, std::vector<long int>> newEdges =
+      resultUniverse.getEdges();
+
+    for (size_t i = 0; i < resultUniverse.getNrOfBonds(); ++i) {
+      CHECK(previousEdges["edge_from"][i] == newEdges["edge_from"][i]);
+      CHECK(previousEdges["edge_to"][i] == newEdges["edge_to"][i]);
+      CHECK(previousEdges["edge_type"][i] == newEdges["edge_type"][i]);
+    }
   }
 }
