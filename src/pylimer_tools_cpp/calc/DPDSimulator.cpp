@@ -349,10 +349,6 @@ namespace calc {
                         bondDistances.segment(3 * i, 3).transpose();
       }
 
-      // multiply by 2 to account for the second end of each bond
-      pressure *= 2;
-      stressTensor *= 2;
-
       timer.section(DPDPerformanceSections::PAIR_FORCE);
 
 // actually loop the atoms
