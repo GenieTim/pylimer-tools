@@ -229,7 +229,9 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, igraph_strvector_t& vec)
 // the graph
 template<class Archive>
 inline void
-CEREAL_SAVE_FUNCTION_NAME(Archive& ar, igraph_t const& graph)
+CEREAL_SAVE_FUNCTION_NAME(Archive& ar,
+                          igraph_t const& graph,
+                          std::uint32_t const version)
 {
   size_t numVertices = igraph_vcount(&graph);
   ar(make_nvp("num_vertices", numVertices));
@@ -354,7 +356,9 @@ CEREAL_SAVE_FUNCTION_NAME(Archive& ar, igraph_t const& graph)
 
 template<class Archive>
 inline void
-CEREAL_LOAD_FUNCTION_NAME(Archive& ar, igraph_t& graph)
+CEREAL_LOAD_FUNCTION_NAME(Archive& ar,
+                          igraph_t& graph,
+                          std::uint32_t const version)
 {
   size_t numVertices;
   ar(make_nvp("num_vertices", numVertices));
@@ -443,7 +447,10 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, igraph_t& graph)
   igraph_vector_int_destroy(&etypes);
   igraph_strvector_destroy(&enames);
 }
+
+
 } // namespace cereal
+CEREAL_CLASS_VERSION(igraph_t, 1);
 
 namespace pylimer_tools {
 namespace utils {

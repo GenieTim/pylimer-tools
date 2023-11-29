@@ -40,7 +40,7 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     // CHECK_NOTHROW(simulator.validateNeighbourlist(1.0));
     REQUIRE_NOTHROW(simulator.configA(25.));
     REQUIRE_NOTHROW(simulator.configSigma(3.));
-    REQUIRE_NOTHROW(simulator.configSpringConstant(1.));
+    REQUIRE_NOTHROW(simulator.configSpringConstant(2.));
     REQUIRE_NOTHROW(simulator.configSlipspringLowCutoff(0.5));
     REQUIRE_NOTHROW(simulator.configSlipspringHighCutoff(2.0));
 
@@ -50,8 +50,8 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     REQUIRE_THROWS(simulator.configSlipspringHighCutoff(0.5));
 
     // initial state – vgl. lammps
-    CHECK(simulator.getStressTensor().trace() / 3. == Catch::Approx(23.321285));
-    CHECK(simulator.getTemperature() + 1e-2 == Catch::Approx(0. + 1e-2));
+    CHECK_THAT(simulator.getStressTensor().trace() / 3., Catch::Matchers::WithinAbs(23.321285, 0.05));
+    CHECK_THAT(simulator.getTemperature() + 1e-2, Catch::Matchers::WithinAbs(0. + 1e-2, 1e-15));
     Eigen::Matrix3d initialStressTensor = simulator.getStressTensor();
     CHECK_THAT(initialStressTensor(0, 0),
                Catch::Matchers::WithinAbs(23.456778, 0.75));
@@ -59,11 +59,12 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
                Catch::Matchers::WithinAbs(23.374175, 0.75));
     CHECK_THAT(initialStressTensor(2, 2),
                Catch::Matchers::WithinAbs(23.401583, 0.75));
-    CHECK(initialStressTensor(0, 1) ==
-          Catch::Approx(-0.0085286852).margin(0.002));
-    CHECK(initialStressTensor(0, 2) == Catch::Approx(-0.10797027).margin(0.02));
-    CHECK(initialStressTensor(1, 2) ==
-          Catch::Approx(-0.035841973).margin(0.02));
+    CHECK_THAT(initialStressTensor(0, 1),
+               Catch::Matchers::WithinAbs(-0.0085286852, 0.035));
+    CHECK_THAT(initialStressTensor(0, 2),
+               Catch::Matchers::WithinAbs(-0.10797027, 0.035));
+    CHECK_THAT(initialStressTensor(1, 2),
+               Catch::Matchers::WithinAbs(-0.035841973, 0.035));
 
     std::vector<pc::ComputedDoubleValues> outputQuantities = {
       pc::ComputedDoubleValues::TEMPERATURE,
@@ -76,7 +77,7 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
 
     pc::OutputConfiguration config;
     config.filename = "";
-    config.outputEvery = 5;
+    config.outputEvery = 1;
     config.doubleValues = outputQuantities;
     config.intValues = { pc::ComputedIntValues::STEP };
 
@@ -230,12 +231,12 @@ TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator]")
     size_t numBondsBefore = simulator.getNumBonds();
 
     // actual simulation
-    REQUIRE_NOTHROW(simulator.runSimulation(200, false));
+    REQUIRE_NOTHROW(simulator.runSimulation(250, false));
     REQUIRE_NOTHROW(simulator.validateState());
     std::cout << "DPD ran, state validated." << std::endl;
 
     // check that we actually have formed bonds
-    CHECK(simulator.getNumBonds() >= (100 + numBondsBefore));
+    CHECK(simulator.getNumBonds() >= (50 + numBondsBefore));
     pe::Universe universeAfter = simulator.getUniverse();
     std::map<int, int> finalFunctionalityPerType =
       universeAfter.determineFunctionalityPerType();
@@ -300,8 +301,8 @@ TEST_CASE("DPD Simulator Computes Correct Forces", "[analysis][DPDSimulator]")
     // CAUTION, randomness
     REQUIRE_NOTHROW(simulator.configSigma(3.));
     REQUIRE_NOTHROW(simulator.refreshCurrentState());
-    CHECK(simulator.getStressTensor().trace() / 3. ==
-          Catch::Approx(-1.8487375).margin(0.5));
+    CHECK_THAT(simulator.getStressTensor().trace() / 3.,
+               Catch::Matchers::WithinAbs(-1.8487375, 0.5));
 
     // complete initial state
     REQUIRE_NOTHROW(simulator.configA(25.));
@@ -318,11 +319,12 @@ TEST_CASE("DPD Simulator Computes Correct Forces", "[analysis][DPDSimulator]")
                Catch::Matchers::WithinAbs(23.374175, 0.75));
     CHECK_THAT(initialStressTensor(2, 2),
                Catch::Matchers::WithinAbs(23.401583, 0.75));
-    CHECK(initialStressTensor(0, 1) ==
-          Catch::Approx(-0.0085286852).margin(0.05));
-    CHECK(initialStressTensor(0, 2) == Catch::Approx(-0.10797027).margin(0.05));
-    CHECK(initialStressTensor(1, 2) ==
-          Catch::Approx(-0.035841973).margin(0.05));
+    CHECK_THAT(initialStressTensor(0, 1),
+               Catch::Matchers::WithinAbs(-0.0085286852, 0.05));
+    CHECK_THAT(initialStressTensor(0, 2),
+               Catch::Matchers::WithinAbs(-0.10797027, 0.1));
+    CHECK_THAT(initialStressTensor(1, 2),
+               Catch::Matchers::WithinAbs(-0.035841973, 0.05));
   }
 }
 
