@@ -19,6 +19,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.DPDSimulator
    
       ~DPDSimulator.__init__
       ~DPDSimulator.configA
+      ~DPDSimulator.configAllowRelocationInNetwork
       ~DPDSimulator.configAutoCorrelatorOutput
       ~DPDSimulator.configAverageOutput
       ~DPDSimulator.configBondFormation
