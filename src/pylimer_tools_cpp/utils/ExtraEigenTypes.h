@@ -8,6 +8,7 @@ namespace Eigen {
 typedef Array<long int, 3, 1> Array3li;
 typedef Array<long int, Dynamic, 1> ArrayXli;
 typedef Array<size_t, Dynamic, 1> ArrayXst;
+typedef Array<bool, Dynamic, 1> ArrayXb;
 }
 
 #pragma omp declare reduction(+ : Eigen::VectorXd : omp_out =                  \

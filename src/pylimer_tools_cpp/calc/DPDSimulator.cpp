@@ -63,6 +63,7 @@ namespace calc {
       this->atomTypes = u.getPropertyValues<int>("type");
       this->atomIds = u.getPropertyValues<long int>("id");
       this->maxBondLen = 0.45 * this->box.getL().maxCoeff();
+      this->crosslinkerType = crosslinkerType;
 
       this->bondsOfIndex.reserve(this->numAtoms);
       for (size_t i = 0; i < this->numAtoms; ++i) {
@@ -82,11 +83,13 @@ namespace calc {
             this->bondPartnersB[i] * 3 + dir;
         }
       }
+      this->isRelocationTarget =
+        Eigen::ArrayXb::Constant(this->numAtoms, false);
       for (size_t i = 0; i < this->numAtoms; ++i) {
         this->idxFunctionalities[i] = this->bondsOfIndex[i].size();
-        if (this->idxFunctionalities[i] < 2 ||
-            this->atomTypes[i] == crosslinkerType) {
+        if (this->idxFunctionalities[i] < 2) {
           this->chainEndIndices.push_back(i);
+          this->isRelocationTarget[i] = (this->atomTypes[i] != crosslinkerType);
         }
       }
 
@@ -187,6 +190,7 @@ namespace calc {
 
         // bond formation
         if (this->bondsToForm > 0 && step % this->formBondsEvery == 0) {
+          timer.section(DPDPerformanceSections::MODIFY);
           this->attemptBondFormation();
         }
 
@@ -276,7 +280,23 @@ namespace calc {
       this->numBonds += 1;
       this->idxFunctionalities[fromIdx] += 1;
       this->idxFunctionalities[toIdx] += 1;
-      // TODO: figure out what to do with chain end indices
+      // also adjust chain end indices
+      if (!this->allowRelocationInNetwork) {
+        this->isRelocationTarget[fromIdx] =
+          (this->idxFunctionalities[fromIdx] < 2) &&
+          (this->atomTypes[fromIdx] != this->crosslinkerType);
+        this->isRelocationTarget[toIdx] =
+          (this->idxFunctionalities[toIdx] < 2) &&
+          (this->atomTypes[toIdx] != this->crosslinkerType);
+        // remove the atoms from chain ends, if they were in there
+        if (!this->isRelocationTarget[fromIdx]) {
+          pylimer_tools::utils::removeIfContained<size_t>(this->chainEndIndices,
+                                                  fromIdx);
+        }
+        if (!this->isRelocationTarget[toIdx]) {
+          pylimer_tools::utils::removeIfContained<size_t>(this->chainEndIndices, toIdx);
+        }
+      }
     }
 
     /**
@@ -488,7 +508,9 @@ namespace calc {
       std::vector<size_t> sourceIds;
       sourceIds.reserve(this->numAtoms);
       for (size_t i = 0; i < this->numAtoms; ++i) {
-        sourceIds.push_back(i);
+        if (this->atomTypes[i] != this->crosslinkerType) {
+          sourceIds.push_back(i);
+        }
       }
 
       // search for neighbours that are elibile
@@ -502,6 +524,9 @@ namespace calc {
           int numNeighs = this->neighbourlist.getIndicesCloseToCoordinates(
             neighbours, this->coordinates.segment(3 * i, 3), this->highCutoff);
           for (size_t j = 0; j < numNeighs; ++j) {
+            if (this->atomTypes[neighbours[j]] == this->crosslinkerType) {
+              continue;
+            }
             Eigen::Vector3d distance =
               this->coordinates.segment(3 * i, 3) -
               this->coordinates.segment(3 * neighbours[j], 3);
@@ -587,7 +612,7 @@ namespace calc {
     }
 
     /**
-     * @brief
+     * @brief Move slip-springs that are at ends to new ends
      *
      * @param kbT
      * @param k
@@ -603,8 +628,8 @@ namespace calc {
       for (size_t springIdx = this->numBonds;
            springIdx < (this->numBonds + this->numSlipSprings);
            ++springIdx) {
-        if (!(this->idxFunctionalities[this->bondPartnersA[springIdx]] < 2 ||
-              this->idxFunctionalities[this->bondPartnersB[springIdx]] < 2)) {
+        if (!(this->isRelocationTarget[this->bondPartnersA[springIdx]] ||
+              this->isRelocationTarget[this->bondPartnersB[springIdx]])) {
           continue;
         }
         // design & attempt move
@@ -621,6 +646,10 @@ namespace calc {
           this->coordinates.segment(3 * candidateIndex, 3),
           this->highCutoff);
         for (size_t j = 0; j < numNeighs; ++j) {
+          // slip-springs to cross-links are not allowed
+          if (this->atomTypes[neighbours[j]] == this->crosslinkerType) {
+            continue;
+          }
           Eigen::Vector3d distance =
             this->coordinates.segment(3 * candidateIndex, 3) -
             this->coordinates.segment(3 * neighbours[j], 3);
@@ -705,6 +734,14 @@ namespace calc {
         if (this->bondPartnersA[springIdx] == this->bondPartnersB[springIdx]) {
           // complete relocation of this bond
           int firstPartner = uniformDistNatoms(this->e2);
+          size_t n_attempts = 0;
+          while (this->atomTypes[firstPartner] == this->crosslinkerType) {
+            firstPartner = uniformDistNatoms(this->e2);
+            n_attempts++;
+            RUNTIME_EXP_IFN(
+              n_attempts < 1000,
+              "Too many times, a cross-link was chosen randomly.");
+          }
           // search for neighbours
           int numCandidates = 0;
           // for this first chosen atom, search for possible partners
@@ -717,6 +754,10 @@ namespace calc {
           for (size_t j = 0; j < numNeighs; ++j) {
             RUNTIME_EXP_IFN(neighbours[j] < this->numAtoms,
                             "Neighbourlist seems inconsequent.");
+            if (this->idxFunctionalities[neighbours[j]] > 2) {
+              // we won't relocate to cross-links
+              continue;
+            }
             Eigen::Vector3d distance =
               this->coordinates.segment(3 * firstPartner, 3) -
               this->coordinates.segment(3 * neighbours[j], 3);
@@ -797,6 +838,12 @@ namespace calc {
                         : this->bondPartnersA[selectedBondB];
       }
 
+      // if cross-link, we don't allow shifting
+      if (this->idxFunctionalities[newPartnerA] > 2 ||
+          this->idxFunctionalities[newPartnerB] > 2) {
+        return false;
+      }
+
       // compute the Metropolis criterion
       Eigen::Vector3d bondDistanceNow =
         (this->coordinates.segment(partnerA * 3, 3) -
@@ -872,6 +919,10 @@ namespace calc {
         this->bondPartnersA[selectedBond] == partnerA
           ? this->bondPartnersB[selectedBond]
           : this->bondPartnersA[selectedBond];
+      // if cross-link, we don't allow shifting
+      if (this->idxFunctionalities[replacementForA] > 2) {
+        return false;
+      }
       // compute the Metropolis criterion
       Eigen::Vector3d bondDistanceNow =
         (this->coordinates.segment(partnerA * 3, 3) -

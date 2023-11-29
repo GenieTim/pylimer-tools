@@ -48,12 +48,13 @@ namespace calc {
       OUTPUT,
       SHIFT,
       RELOCATION,
+      MODIFY,
       NUM_PERFORMANCE_SECTIONS
     };
 
-    static const std::array<std::string, 7> DPDPerformanceSectionNames = {
+    static const std::array<std::string, 8> DPDPerformanceSectionNames = {
       "Time-Stepping", "Forces", "Pair-Forces", "Bond-Forces",
-      "Output",        "Shift",  "Relocation"
+      "Output",        "Shift",  "Relocation", "Modify"
     };
 
     class DPDSimulator : public pylimer_tools::calc::OutputSupportingSimulation
@@ -70,6 +71,7 @@ namespace calc {
       bool is2D = false;
       bool shiftPossibilityEmpty = true;
       bool shiftOneAtATime = false;
+      bool allowRelocationInNetwork = false;
       double lambda = 0.65;
       double k = 2.;
       double lowCutoff = 0.5;
@@ -80,6 +82,7 @@ namespace calc {
       long int nStepsMC = 500;
       long int nStepsDPD = 500;
       double dt = 0.06;
+      int crosslinkerType = 2;
 
       ////////////////////////////////////////////////////////////////
       // simulation state
@@ -120,6 +123,7 @@ namespace calc {
       // atoms
       Eigen::VectorXd coordinates;
       Eigen::ArrayXi idxFunctionalities;
+      Eigen::ArrayXb isRelocationTarget;
       std::vector<int> atomTypes;
       std::vector<long int> atomIds;
       std::vector<size_t> chainEndIndices;
@@ -133,17 +137,6 @@ namespace calc {
       std::vector<std::vector<size_t>> bondsOfIndex;
 
       pylimer_tools::entities::EigenNeighbourList neighbourlist;
-
-
-double gaussian_random(double mean = 0.0, double std = 1.0) {
-  std::random_device rd;
-
-  std::mt19937 e2(rd());
-
-  std::normal_distribution<> dist(mean, std);
-
-  return dist(e2);
-}
 
     public:
       DPDSimulator(const pylimer_tools::entities::Universe& u,
@@ -282,6 +275,39 @@ double gaussian_random(double mean = 0.0, double std = 1.0) {
 
       void configA(const double newA) { this->A = newA; }
 
+      void configAllowRelocationInNetwork(const bool allowReloc)
+      {
+        this->allowRelocationInNetwork = allowReloc;
+        this->isRelocationTarget.setConstant(false);
+        this->chainEndIndices.clear();
+        for (size_t i = 0; i < this->numAtoms; ++i) {
+          if (this->idxFunctionalities[i] < 2) {
+            this->isRelocationTarget[i] = true;
+            this->chainEndIndices.push_back(i);
+          } else if (allowReloc &&
+                     this->atomTypes[i] != this->crosslinkerType) {
+            // check if this is a bead that's connected to a cross-linker
+            if (this->idxFunctionalities[i] == 2) {
+              // this "any of" here might be a bit overkill, given that we know
+              // that there are only two cases
+              bool oneOfTheBeadsIsXlink = std::any_of(
+                this->bondsOfIndex[i].begin(),
+                this->bondsOfIndex[i].end(),
+                [&](size_t bondIdx) {
+                  assert(this->bondPartnersA[bondIdx] == i ||
+                         this->bondPartnersB[bondIdx] == i);
+                  return this->atomTypes[this->bondPartnersA[bondIdx]] ==
+                           this->crosslinkerType ||
+                         this->atomTypes[this->bondPartnersB[bondIdx]] ==
+                           this->crosslinkerType;
+                });
+              this->isRelocationTarget[i] = true;
+              this->chainEndIndices.push_back(i);
+            }
+          }
+        }
+      }
+
       void startMeasuringMSDForAtoms(const std::vector<size_t>& atomIds);
 
       void configNumStepsMC(long int steps = 500) { this->nStepsMC = steps; }
@@ -326,13 +352,19 @@ double gaussian_random(double mean = 0.0, double std = 1.0) {
         this->formBondsEvery = formBondEvery;
       }
 
+      /**
+       * @brief Try to form as many bonds as we can
+       *
+       */
       void attemptBondFormation()
       {
         double cutoff = this->bondFormationDistance;
+        // allocate possible neighbours
         Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
           this->numAtoms *
           (std::ceil((3.1 * cutoff) * (3.1 * cutoff) * (3.1 * cutoff)) /
            this->box.getVolume())));
+        // iterate atoms - we want to start from the cross-links
         for (size_t atom_idx = 0; atom_idx < this->numAtoms; ++atom_idx) {
           if (this->atomTypes[atom_idx] != this->atomTypeBondFormationFrom) {
             continue;
@@ -442,11 +474,11 @@ double gaussian_random(double mean = 0.0, double std = 1.0) {
       ////////////////////////////////////////////////////////////////
       // serialization
       template<class Archive>
-      void serialize(Archive& ar)
+      void serialize(Archive& ar, std::uint32_t const version)
       {
-        ar(cereal::virtual_base_class<OutputSupportingSimulation>(this),
-           // configuration
-           maxBondLen,
+        ar(cereal::virtual_base_class<OutputSupportingSimulation>(this));
+        // configuration
+        ar(maxBondLen,
            is2D,
            shiftPossibilityEmpty,
            shiftOneAtATime,
@@ -460,22 +492,32 @@ double gaussian_random(double mean = 0.0, double std = 1.0) {
            nStepsDPD,
            nStepsMC,
            doDeformation,
-           dt,
-           // simulation state
-           currentStep,
+           dt);
+        if (version > 1) {
+          ar(allowRelocationInNetwork, crosslinkerType);
+        }
+        // state of bond formation
+        if (version > 1) {
+          ar(bondsToForm,
+             maxBondsPerType,
+             bondFormationDistance,
+             formBondsEvery,
+             atomTypeBondFormationFrom,
+             atomTypeBondFormationTo);
+        }
+        // simulation state
+        ar(currentStep,
            currentTime,
            numShifts,
            numRelocations,
            currentVelocitiesPlus,
            currentVelocities,
            currentForces,
-           currentStressTensor,
-           // randomness
-           e2,
-           uniform_rand_mean0std1,
-           uniform_rand_between_0_1,
-           // universe structure
-           numAtoms,
+           currentStressTensor);
+        // randomness
+        ar(e2, uniform_rand_mean0std1, uniform_rand_between_0_1);
+        // universe structure
+        ar(numAtoms,
            numBonds,
            numSlipSprings,
            box,
@@ -493,9 +535,12 @@ double gaussian_random(double mean = 0.0, double std = 1.0) {
            bondPartnersA,
            bondPartnersB,
            bondTypes,
-           bondsOfIndex,
-           // neighbourlist
-           neighbourlist);
+           bondsOfIndex);
+        if (version > 1) {
+          ar(isRelocationTarget);
+        }
+        // neighbourlist
+        ar(neighbourlist);
       }
 
       static DPDSimulator readRestartFile(std::string filename)
@@ -535,5 +580,6 @@ CEREAL_REGISTER_TYPE(pylimer_tools::calc::dpd::DPDSimulator);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(
   pylimer_tools::calc::OutputSupportingSimulation,
   pylimer_tools::calc::dpd::DPDSimulator);
+CEREAL_CLASS_VERSION(pylimer_tools::calc::dpd::DPDSimulator, 2);
 
 #endif

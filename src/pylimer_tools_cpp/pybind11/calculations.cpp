@@ -1378,6 +1378,17 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("max_bonds_per_atom_type"),
          py::arg("bond_formation_dist") = 1.0,
          py::arg("attempt_bond_formation_every") = 50)
+    .def("configAllowRelocationInNetwork",
+         &dpd::DPDSimulator::configAllowRelocationInNetwork,
+         R"pbdoc(
+          Configure whether a relocation step may happen when a slip-spring has ended at a cross-link.
+          
+          Side-effect: if true, the relocations may also happen *to* a slip-spring next to a cross-link.
+
+          Arguments:
+          - allow_relocation_in_network (bool): Whether to allow relocation in the network or not.
+         )pbdoc",
+         py::arg("allow_relocation_in_network") = false)
     .def("startMeasuringMSDForAtoms",
          &dpd::DPDSimulator::startMeasuringMSDForAtoms,
          R"pbdoc(

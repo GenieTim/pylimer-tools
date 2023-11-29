@@ -18,6 +18,12 @@ extern "C"
 namespace pylimer_tools {
 namespace utils {
   template<typename T>
+  static inline void removeIfContained(std::vector<T>& vec, const T& value)
+  {
+    vec.erase(std::remove(vec.begin(), vec.end(), value), vec.end());
+  }
+
+  template<typename T>
   static inline bool contains(std::vector<T>& vec, const T value)
   {
     if (std::find(vec.begin(), vec.end(), value) == vec.end()) {
@@ -181,7 +187,7 @@ namespace utils {
 
   template<typename IN>
   static inline void eraseIndices(std::vector<IN> from,
-                                  std::vector<long int> &indices)
+                                  std::vector<long int>& indices)
   {
     for (auto index : indices) {
       from.erase(index);
