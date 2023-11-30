@@ -87,8 +87,7 @@ namespace calc {
         Eigen::ArrayXb::Constant(this->numAtoms, false);
       for (size_t i = 0; i < this->numAtoms; ++i) {
         this->idxFunctionalities[i] = this->bondsOfIndex[i].size();
-        if (this->idxFunctionalities[i] < 2 &&
-            this->atomTypes[i] != crosslinkerType) {
+        if (this->idxFunctionalities[i] < 2) {
           this->chainEndIndices.push_back(i);
           this->isRelocationTarget[i] = true;
         }
@@ -284,11 +283,8 @@ namespace calc {
       // also adjust chain end indices
       if (!this->allowRelocationInNetwork) {
         this->isRelocationTarget[fromIdx] =
-          (this->idxFunctionalities[fromIdx] < 2) &&
-          (this->atomTypes[fromIdx] != this->crosslinkerType);
-        this->isRelocationTarget[toIdx] =
-          (this->idxFunctionalities[toIdx] < 2) &&
-          (this->atomTypes[toIdx] != this->crosslinkerType);
+          (this->idxFunctionalities[fromIdx] < 2);
+        this->isRelocationTarget[toIdx] = (this->idxFunctionalities[toIdx] < 2);
         // remove the atoms from chain ends, if they were in there
         if (!this->isRelocationTarget[fromIdx]) {
           pylimer_tools::utils::removeIfContained<size_t>(this->chainEndIndices,
@@ -828,6 +824,11 @@ namespace calc {
       size_t newPartnerB = partnerB;
       // attempt to shift the spring around partnerA
       int distrLimitA = this->idxFunctionalities[partnerA] - 1;
+      if (distrLimitA < 0) {
+        RUNTIME_EXP_IFN(this->atomTypes[partnerA] == this->crosslinkerType,
+                        "Only cross-links are allowed to be single beads.");
+        return false;
+      }
       if (distrLimitA == 0 && this->shiftPossibilityEmpty) {
         distrLimitA += 1;
       }
@@ -844,6 +845,11 @@ namespace calc {
 
       // and around B
       int distrLimitB = this->idxFunctionalities[partnerB] - 1;
+      if (distrLimitB < 0) {
+        RUNTIME_EXP_IFN(this->atomTypes[partnerB] == this->crosslinkerType,
+                        "Only cross-links are allowed to be single beads.");
+        return false;
+      }
       if (distrLimitB == 0 && this->shiftPossibilityEmpty) {
         distrLimitB += 1;
       }
@@ -926,10 +932,9 @@ namespace calc {
       // attempt to shift the spring around partnerA
       int distr_limit = this->idxFunctionalities[partnerA] - 1;
       if (distr_limit < 0) {
-        std::cerr << "Invalid state: a slip-spring shift was attempted to "
-                     "bead without enough bonds."
-                  << std::endl;
-        this->validateState();
+        RUNTIME_EXP_IFN(this->atomTypes[partnerA] == this->crosslinkerType,
+                        "Only cross-links are allowed to be single beads.");
+        return false;
       }
       RUNTIME_EXP_IFN(distr_limit >= 0,
                       "Invalid state: a slip-spring shift was attempted to "
@@ -999,6 +1004,10 @@ namespace calc {
       INVALIDARG_EXP_IFN(this->bondPartnersA[springIdx] == partnerBefore ||
                            this->bondPartnersB[springIdx] == partnerBefore,
                          "This spring and its partners do not match.");
+      INVALIDARG_EXP_IFN(
+        (this->atomTypes[partnerAfter] != this->crosslinkerType ||
+         this->idxFunctionalities[partnerAfter] <= 2),
+        "Cannot form slip-springs with cross-links.");
       if (this->bondPartnersA[springIdx] == partnerBefore) {
         this->bondPartnersA[springIdx] = partnerAfter;
         for (int dir = 0; dir < 3; ++dir) {
@@ -1220,7 +1229,9 @@ namespace calc {
           this->bondsOfIndex[i].begin(),
           this->bondsOfIndex[i].end(),
           0,
-          [&](int val, size_t bondIdx) { return val + static_cast<int>(bondIdx < this->numBonds); });
+          [&](int val, size_t bondIdx) {
+            return val + static_cast<int>(bondIdx < this->numBonds);
+          });
         if (this->numSlipSprings == 0) {
           RUNTIME_EXP_IFN(num_actual_bonds == this->bondsOfIndex[i].size(),
                           "State violation: bonds of index " +
@@ -1229,6 +1240,14 @@ namespace calc {
         }
         RUNTIME_EXP_IFN(this->idxFunctionalities[i] == num_actual_bonds,
                         "State violation: inconsistent idx functionalities");
+        RUNTIME_EXP_IFN(this->idxFunctionalities[i] >= 1 ||
+                          this->atomTypes[i] == this->crosslinkerType,
+                        "Single beads are only supported as cross-links yet.");
+        if (this->idxFunctionalities[i] == 1) {
+          RUNTIME_EXP_IFN(
+            this->isRelocationTarget[i],
+            "Expected functionalities of 1 to be relocation targets.");
+        }
       }
       RUNTIME_EXP_IFN(this->isRelocationTarget.size() == this->numAtoms,
                       "State violation: size of relocation targets incorrect.");
@@ -1238,7 +1257,7 @@ namespace calc {
       for (size_t i : this->chainEndIndices) {
         RUNTIME_EXP_IFN(this->isRelocationTarget[i],
                         "Expect chain ends to be relocation targets.");
-        RUNTIME_EXP_IFN(this->idxFunctionalities[i] == 1 ||
+        RUNTIME_EXP_IFN(this->idxFunctionalities[i] <= 1 ||
                           this->allowRelocationInNetwork,
                         "Expect chain ends to have a functionality of 1, have "
                         "relocation in network enabled");
@@ -1292,12 +1311,17 @@ namespace calc {
         RUNTIME_EXP_IFN(pylimer_tools::utils::contains(
                           this->bondsOfIndex[this->bondPartnersB[i]], i),
                         "Reverse-link is incorrect.");
-        if (i >= this->numBonds) {
-          RUNTIME_EXP_IFN(this->bondPartnersA[i] != this->crosslinkerType,
-                          "Expect slip-links to not involve cross-links");
-          RUNTIME_EXP_IFN(this->bondPartnersB[i] != this->crosslinkerType,
-                          "Expect slip-links to not involve cross-links");
-        }
+        // the following check is incorrect, as cross-links may have
+        // slip-springs for f < 2, and during cross-linking might have one while
+        // being upgraded to f > 2
+        // if (i >= this->numBonds) {
+        //   RUNTIME_EXP_IFN(this->atomType[this->bondPartnersA[i]] !=
+        //                     this->crosslinkerType,
+        //                   "Expect slip-links to not involve cross-links");
+        //   RUNTIME_EXP_IFN(this->atomType[this->bondPartnersB[i]] !=
+        //                     this->crosslinkerType,
+        //                   "Expect slip-links to not involve cross-links");
+        // }
       }
     }
 
