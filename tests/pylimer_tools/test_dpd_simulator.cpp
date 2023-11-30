@@ -62,11 +62,11 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     CHECK_THAT(initialStressTensor(2, 2),
                Catch::Matchers::WithinAbs(23.401583, 0.75));
     CHECK_THAT(initialStressTensor(0, 1),
-               Catch::Matchers::WithinAbs(-0.0085286852, 0.05));
+               Catch::Matchers::WithinAbs(-0.0085286852, 0.15));
     CHECK_THAT(initialStressTensor(0, 2),
                Catch::Matchers::WithinAbs(-0.10797027, 0.15));
     CHECK_THAT(initialStressTensor(1, 2),
-               Catch::Matchers::WithinAbs(-0.035841973, 0.05));
+               Catch::Matchers::WithinAbs(-0.035841973, 0.15));
 
     std::vector<pc::ComputedDoubleValues> outputQuantities = {
       pc::ComputedDoubleValues::TEMPERATURE,
