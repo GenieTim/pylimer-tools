@@ -644,8 +644,16 @@ namespace calc {
       for (size_t springIdx = this->numBonds;
            springIdx < (this->numBonds + this->numSlipSprings);
            ++springIdx) {
-        if (!(this->isRelocationTarget[this->bondPartnersA[springIdx]] ||
-              this->isRelocationTarget[this->bondPartnersB[springIdx]])) {
+        if ((!(this->isRelocationTarget[this->bondPartnersA[springIdx]] ||
+               this->isRelocationTarget[this->bondPartnersB[springIdx]])) &&
+            // always relocate from cross-links away, e.g. in case the
+            // cross-link has gained an additional bond and is no longer a
+            // relocation target.
+            // consequently, we are inconsistent iff 
+            !(this->atomTypes[this->bondPartnersA[springIdx]] ==
+                this->crosslinkerType ||
+              this->atomTypes[this->bondPartnersB[springIdx]] ==
+                this->crosslinkerType)) {
           continue;
         }
         // design & attempt move
