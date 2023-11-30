@@ -291,10 +291,11 @@ namespace calc {
         // remove the atoms from chain ends, if they were in there
         if (!this->isRelocationTarget[fromIdx]) {
           pylimer_tools::utils::removeIfContained<size_t>(this->chainEndIndices,
-                                                  fromIdx);
+                                                          fromIdx);
         }
         if (!this->isRelocationTarget[toIdx]) {
-          pylimer_tools::utils::removeIfContained<size_t>(this->chainEndIndices, toIdx);
+          pylimer_tools::utils::removeIfContained<size_t>(this->chainEndIndices,
+                                                          toIdx);
         }
       }
     }
@@ -1234,6 +1235,12 @@ namespace calc {
         RUNTIME_EXP_IFN(pylimer_tools::utils::contains(
                           this->bondsOfIndex[this->bondPartnersB[i]], i),
                         "Reverse-link is incorrect.");
+        if (i >= this->numBonds) {
+          RUNTIME_EXP_IFN(this->bondPartnersA[i] != this->crosslinkerType,
+                          "Expect slip-links to not involve cross-links");
+          RUNTIME_EXP_IFN(this->bondPartnersB[i] != this->crosslinkerType,
+                          "Expect slip-links to not involve cross-links");
+        }
       }
     }
 
