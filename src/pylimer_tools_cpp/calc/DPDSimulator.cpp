@@ -1254,6 +1254,12 @@ namespace calc {
         RUNTIME_EXP_IFN(pylimer_tools::utils::contains(
                           this->bondsOfIndex[this->bondPartnersB[i]], i),
                         "Reverse-link is incorrect.");
+        if (i >= this->numBonds) {
+          RUNTIME_EXP_IFN(this->bondPartnersA[i] != this->crosslinkerType,
+                          "Expect slip-links to not involve cross-links");
+          RUNTIME_EXP_IFN(this->bondPartnersB[i] != this->crosslinkerType,
+                          "Expect slip-links to not involve cross-links");
+        }
       }
     }
 
