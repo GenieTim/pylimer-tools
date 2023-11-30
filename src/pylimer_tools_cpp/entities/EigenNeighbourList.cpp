@@ -266,11 +266,14 @@ namespace entities {
     int actualNumNeighbours = 0;
     const double cutoff2 = cutoff * cutoff;
     for (size_t i = 0; i < numNeighbours; ++i) {
-      if (result[i] > source && (coordinates.segment(3 * source, 3) -
-                                 coordinates.segment(result[i] * 3, 3))
-                                    .squaredNorm() < cutoff2) {
-        result[actualNumNeighbours] = result[i];
-        actualNumNeighbours += 1;
+      if (result[i] > source) {
+        Eigen::Vector3d dist = coordinates.segment(3 * source, 3) -
+                               coordinates.segment(result[i] * 3, 3);
+        this->box.handlePBC(dist);
+        if (dist.squaredNorm() < cutoff2) {
+          result[actualNumNeighbours] = result[i];
+          actualNumNeighbours += 1;
+        }
       }
     }
     return actualNumNeighbours;
