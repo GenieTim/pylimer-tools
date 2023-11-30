@@ -291,12 +291,17 @@ namespace calc {
         // remove the atoms from chain ends, if they were in there
         if (!this->isRelocationTarget[fromIdx]) {
           pylimer_tools::utils::removeIfContained<size_t>(this->chainEndIndices,
-                                                  fromIdx);
+                                                          fromIdx);
         }
         if (!this->isRelocationTarget[toIdx]) {
-          pylimer_tools::utils::removeIfContained<size_t>(this->chainEndIndices, toIdx);
+          pylimer_tools::utils::removeIfContained<size_t>(this->chainEndIndices,
+                                                          toIdx);
         }
       }
+
+#ifndef NDEBUG
+      this->validateState();
+#endif
     }
 
     /**
@@ -374,7 +379,6 @@ namespace calc {
 // actually loop the atoms
 #pragma omp parallel
       {
-        const double squareCutoff = cutoff * cutoff;
         const double sigmaOverSqrtDt = this->sigma / std::sqrt(dt);
         // pre-allocate the neighbor indices array
         Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
@@ -385,28 +389,43 @@ namespace calc {
         Eigen::Vector3d pairdistanceNormed;
         Eigen::Vector3d velocitydiff;
         Eigen::Vector3d pairForce;
+        Eigen::Vector3d zeroOneTwo;
+        zeroOneTwo << 0, 1, 2;
 
 // need to fix the schedule as with higher i, the workload gets much
-// less¨
+// less
 #pragma omp for reduction(+ : forces, stressTensor, pressure)                  \
   schedule(dynamic, 16)
         for (size_t i = 0; i < this->numAtoms - 1; ++i) {
-          int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
-            neighbors, coords.segment(3 * i, 3), cutoff);
+          int numNeighbors = this->neighbourlist.getHigherIndicesWithinCutoff(
+            neighbors, coords, i, cutoff);
+
+          // pair forces
+          // Eigen::ArrayXi neighbourCoordIndices =
+          // (neighbors.head(numNeighbors) * 3)
+          //            .replicate(1, 3)
+          //            .transpose()
+          //            .eval()
+          //            .reshaped(3 * numNeighbors, 1) +
+          //          zeroOneTwo.replicate(numNeighbors, 1);
+          // Eigen::VectorXd pairDistances =
+          //   coords.segment(3 * i, 3).replicate(numNeighbors, 1) -
+          //   coords(neighbourCoordIndices);
+          // this->box.handlePBC(pairDistances);
+          // Eigen::VectorXd rNorms = pairDistances.reshaped(numNeighbors,
+          // 3).rowwise().norm(); assert(rNorms.size() == numNeighbors);
+          // Eigen::VectorXd pairDistancesNormed = pairDistances /
+          // rNorms.replicate(1, 3).transpose().eval().reshaped(3*numNeighbors,
+          // 1); Eigen::VectorXd velocityDiffs = velocities.segment(3 * i,
+          // 3).replicate(numNeighbors, 1) - velocities(neighbourCoordIndices);
 
           // pair forces
           for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
             const size_t j = neighbors[neigh_idx];
-            if (j <= i) {
-              continue;
-            }
             pairdistance = coords.segment(3 * i, 3) - coords.segment(3 * j, 3);
             this->box.handlePBC(pairdistance);
             // slight performance improvement, taking the square norm here
             const double rNorm2 = pairdistance.squaredNorm();
-            if (rNorm2 >= squareCutoff || rNorm2 < 1e-15) {
-              continue;
-            }
 
             const double rNorm = std::sqrt(rNorm2);
             const double one_minus_rnorm = 1. - rNorm;
@@ -905,6 +924,7 @@ namespace calc {
       assert(partnerA == endToShift);
       // attempt to shift the spring around partnerA
       int distr_limit = this->idxFunctionalities[partnerA] - 1;
+      RUNTIME_EXP_IFN(distr_limit >= 0, "Invalid state: a slip-spring shift was attempted to bead without enough bonds.");
       if (distr_limit == 0 && this->shiftPossibilityEmpty) {
         distr_limit += 1;
       }
