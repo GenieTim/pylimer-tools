@@ -87,9 +87,10 @@ namespace calc {
         Eigen::ArrayXb::Constant(this->numAtoms, false);
       for (size_t i = 0; i < this->numAtoms; ++i) {
         this->idxFunctionalities[i] = this->bondsOfIndex[i].size();
-        if (this->idxFunctionalities[i] < 2) {
+        if (this->idxFunctionalities[i] < 2 &&
+            this->atomTypes[i] != crosslinkerType) {
           this->chainEndIndices.push_back(i);
-          this->isRelocationTarget[i] = (this->atomTypes[i] != crosslinkerType);
+          this->isRelocationTarget[i] = true;
         }
       }
 
@@ -924,7 +925,15 @@ namespace calc {
       assert(partnerA == endToShift);
       // attempt to shift the spring around partnerA
       int distr_limit = this->idxFunctionalities[partnerA] - 1;
-      RUNTIME_EXP_IFN(distr_limit >= 0, "Invalid state: a slip-spring shift was attempted to bead without enough bonds.");
+      if (distr_limit < 0) {
+        std::cerr << "Invalid state: a slip-spring shift was attempted to "
+                     "bead without enough bonds."
+                  << std::endl;
+        this->validateState();
+      }
+      RUNTIME_EXP_IFN(distr_limit >= 0,
+                      "Invalid state: a slip-spring shift was attempted to "
+                      "bead without enough bonds.");
       if (distr_limit == 0 && this->shiftPossibilityEmpty) {
         distr_limit += 1;
       }
@@ -1206,6 +1215,34 @@ namespace calc {
       RUNTIME_EXP_IFN(
         this->bondsOfIndex.size() == this->numAtoms,
         "State violation: bonds of indices distributed incorrectly.");
+      for (size_t i = 0; i < this->numAtoms; ++i) {
+        int num_actual_bonds = std::accumulate(
+          this->bondsOfIndex[i].begin(),
+          this->bondsOfIndex[i].end(),
+          0,
+          [&](int val, size_t bondIdx) { return val + static_cast<int>(bondIdx < this->numBonds); });
+        if (this->numSlipSprings == 0) {
+          RUNTIME_EXP_IFN(num_actual_bonds == this->bondsOfIndex[i].size(),
+                          "State violation: bonds of index " +
+                            std::to_string(i) +
+                            " were not counted appropriately.");
+        }
+        RUNTIME_EXP_IFN(this->idxFunctionalities[i] == num_actual_bonds,
+                        "State violation: inconsistent idx functionalities");
+      }
+      RUNTIME_EXP_IFN(this->isRelocationTarget.size() == this->numAtoms,
+                      "State violation: size of relocation targets incorrect.");
+      RUNTIME_EXP_IFN(this->isRelocationTarget.cast<int>().sum() ==
+                        this->chainEndIndices.size(),
+                      "Expect relocation targets to be equal to chain ends.");
+      for (size_t i : this->chainEndIndices) {
+        RUNTIME_EXP_IFN(this->isRelocationTarget[i],
+                        "Expect chain ends to be relocation targets.");
+        RUNTIME_EXP_IFN(this->idxFunctionalities[i] == 1 ||
+                          this->allowRelocationInNetwork,
+                        "Expect chain ends to have a functionality of 1, have "
+                        "relocation in network enabled");
+      }
       // bonds
       RUNTIME_EXP_IFN(this->bondPartnersA.size() == this->bondPartnersB.size(),
                       "State violation: nr of bonds inconsistent.");
@@ -1229,6 +1266,7 @@ namespace calc {
                       "State violation: too large indices found (e.g. " +
                         std::to_string(this->bondPartnersA.maxCoeff()) +
                         " for " + std::to_string(this->numAtoms) + " atoms)");
+      // loop springs
       for (size_t i = 0; i < this->numBonds + this->numSlipSprings; ++i) {
         for (int dir = 0; dir < 3; ++dir) {
           RUNTIME_EXP_IFN(
