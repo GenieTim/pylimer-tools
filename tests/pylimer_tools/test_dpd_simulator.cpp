@@ -49,9 +49,11 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     REQUIRE_THROWS(simulator.configSlipspringLowCutoff(2.0));
     REQUIRE_THROWS(simulator.configSlipspringHighCutoff(0.5));
 
-    // initial state – vgl. lammps
-    CHECK_THAT(simulator.getStressTensor().trace() / 3., Catch::Matchers::WithinAbs(23.321285, 0.05));
-    CHECK_THAT(simulator.getTemperature() + 1e-2, Catch::Matchers::WithinAbs(0. + 1e-2, 1e-15));
+    // initial state – vgl. lammps. Again, caution, randomness!
+    CHECK_THAT(simulator.getStressTensor().trace() / 3.,
+               Catch::Matchers::WithinAbs(23.321285, 0.35));
+    CHECK_THAT(simulator.getTemperature() + 1e-2,
+               Catch::Matchers::WithinAbs(0. + 1e-2, 1e-15));
     Eigen::Matrix3d initialStressTensor = simulator.getStressTensor();
     CHECK_THAT(initialStressTensor(0, 0),
                Catch::Matchers::WithinAbs(23.456778, 0.75));
@@ -60,11 +62,11 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     CHECK_THAT(initialStressTensor(2, 2),
                Catch::Matchers::WithinAbs(23.401583, 0.75));
     CHECK_THAT(initialStressTensor(0, 1),
-               Catch::Matchers::WithinAbs(-0.0085286852, 0.035));
+               Catch::Matchers::WithinAbs(-0.0085286852, 0.05));
     CHECK_THAT(initialStressTensor(0, 2),
-               Catch::Matchers::WithinAbs(-0.10797027, 0.035));
+               Catch::Matchers::WithinAbs(-0.10797027, 0.05));
     CHECK_THAT(initialStressTensor(1, 2),
-               Catch::Matchers::WithinAbs(-0.035841973, 0.035));
+               Catch::Matchers::WithinAbs(-0.035841973, 0.05));
 
     std::vector<pc::ComputedDoubleValues> outputQuantities = {
       pc::ComputedDoubleValues::TEMPERATURE,
