@@ -1,4 +1,5 @@
 #include "../../src/pylimer_tools_cpp/entities/EigenNeighbourList.h"
+#include "../../src/pylimer_tools_cpp/utils/utilityMacros.h"
 #include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -31,6 +32,7 @@ string_format(const std::string& format, Args... args)
 void
 runBenchmarkWithConfig(double neighbourBinSize = 1.0,
                        double cutoff = 1.0,
+                       double scalingFactor = 1.0,
                        double density = 3.,
                        double scatter = 5.)
 {
@@ -63,16 +65,18 @@ runBenchmarkWithConfig(double neighbourBinSize = 1.0,
   //                     density,
   //                     scatter);
   std::string benchmarkName =
-    string_format("EigenNeighList_con_%lf_query_%lf_rho_%lf_s_%lf",
+    string_format("EigenNeighList_con_%lf_scal_%lf_query_%lf_rho_%lf_s_%lf",
                   neighbourBinSize,
+                  scalingFactor,
                   cutoff,
                   density,
                   scatter);
+  bool expectDefaultCutoff = APPROX_EQUAL(cutoff, neighbourBinSize, 1e-15);
   BENCHMARK(benchmarkName.c_str())
   {
     // std::cout << "Setting up Neighlist" << std::endl;
     pe::EigenNeighbourList neighbourlist =
-      pe::EigenNeighbourList(coordinates, box, neighbourBinSize);
+      pe::EigenNeighbourList(coordinates, box, neighbourBinSize, scalingFactor);
     // std::cout << "Neighlist set up" << std::endl;
 
     double meanNrOfNeighs = 0.0;
@@ -84,15 +88,17 @@ runBenchmarkWithConfig(double neighbourBinSize = 1.0,
       // std::cout << "Step " << step << std::endl;
       Eigen::Vector3d pairdistance;
       for (size_t i : ids) {
-        int numNeighbors = neighbourlist.getIndicesCloseToCoordinates(
-          neighbors, coordinates.segment(3 * i, 3), cutoff);
+        int numNeighbors = neighbourlist.getHigherIndicesWithinCutoff(
+          neighbors, coordinates, i, cutoff);
+        // int numNeighbors = neighbourlist.getIndicesCloseToCoordinates(
+        //   neighbors,
+        //   coordinates.segment(3 * i, 3),
+        //   cutoff,
+        //   expectDefaultCutoff);
         int actualNumNeighs = 0;
         // pair forces
         for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
           const size_t j = neighbors[neigh_idx];
-          if (j <= i) {
-            continue;
-          }
           pairdistance =
             coordinates.segment(3 * i, 3) - coordinates.segment(3 * j, 3);
           box.handlePBC(pairdistance);
@@ -116,12 +122,16 @@ runBenchmarkWithConfig(double neighbourBinSize = 1.0,
 TEST_CASE("Eigen Neighbourlist Benchmark",
           "[benchmark][EigenNeighbourList][long]")
 {
-  for (double outerCutoff = 0.5; outerCutoff <= 2.5; outerCutoff += 0.5) {
-    for (double innerCutoff = 0.5 * outerCutoff; innerCutoff <= 2 * outerCutoff;
-         innerCutoff +=
-         0.2 * 1.5 * outerCutoff) { // 5 iterations per outer cut-off
-      runBenchmarkWithConfig(innerCutoff, outerCutoff, 3., 5.);
-    }
-  }
+  // for (double outerCutoff = 0.5; outerCutoff <= 2.5; outerCutoff += 0.5) {
+  //   for (double innerCutoff = 0.5 * outerCutoff; innerCutoff <= 2 *
+  //   outerCutoff;
+  //        innerCutoff +=
+  //        0.2 * 1.5 * outerCutoff) { // 5 iterations per outer cut-off
+  //     runBenchmarkWithConfig(innerCutoff, outerCutoff, 3., 5.);
+  //   }
+  // }
+  runBenchmarkWithConfig(1.0, 1.0, 1.0, 3.0, 2.5);
+  runBenchmarkWithConfig(1.0, 1.0, 2.0, 3.0, 2.5);
+  runBenchmarkWithConfig(1.0, 1.0, 3.0, 3.0, 2.5);
   REQUIRE(true);
 }

@@ -35,11 +35,13 @@ namespace entities {
     EigenNeighbourList() {}
     EigenNeighbourList(const Eigen::VectorXd& coordinates,
                        const Box& box,
-                       double cutoff);
+                       double cutoff,
+                       double scalingFactor = 2.);
 
     void initialize(const Eigen::VectorXd& coordinates,
                     const Box& box,
-                    double cutoff);
+                    double cutoff,
+                       double scalingFactor = 2.);
 
     /**
      * @brief Re-bin with a new set of coordinates
@@ -82,7 +84,8 @@ namespace entities {
      */
     int getIndicesCloseToCoordinates(Eigen::ArrayXi& result,
                                      const Eigen::Vector3d coordinates,
-                                     const double upperCutoff) const;
+                                     const double upperCutoff,
+                                     bool expectDefault = false) const;
 
     int getHigherIndicesWithinCutoff(Eigen::ArrayXi& result,const Eigen::VectorXd &coordinates, const int source, const double cutoff) const;
 
@@ -97,7 +100,7 @@ namespace entities {
 
     std::vector<bucket_idx_t> getCombinedBucketIndicesForCoordinates(
       const Eigen::Vector3d& coordinates,
-      double newCutoff) const;
+      double newCutoff, bool sort = false) const;
 
     template<class Archive>
     void serialize(Archive& ar)
@@ -106,6 +109,7 @@ namespace entities {
          nrOfBuckets,
          totalNrOfBuckets,
          cutoff,
+         scalingFactor,
          box,
          neighbourBuckets,
          neighbourBucketNeighboursDefaultCutoff,
@@ -139,6 +143,8 @@ namespace entities {
     size_t totalNrOfBuckets;
 
     double cutoff;
+    double scalingFactor;
+    double actualCutoff;
 
     pylimer_tools::entities::Box box;
 
