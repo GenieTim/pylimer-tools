@@ -20,23 +20,27 @@ namespace pylimer_tools {
 namespace entities {
   EigenNeighbourList::EigenNeighbourList(const Eigen::VectorXd& coordinates,
                                          const Box& box,
-                                         double cutoff)
+                                         double cutoff,
+                                         double scalingFactor)
   {
-    this->initialize(coordinates, box, cutoff);
+    this->initialize(coordinates, box, cutoff, scalingFactor);
   }
 
   void EigenNeighbourList::initialize(const Eigen::VectorXd& coordinates,
                                       const Box& box,
-                                      double cutoff)
+                                      double cutoff,
+                                      double scalingFactor)
   {
     INVALIDARG_EXP_IFN(cutoff > 1e-3, "Cutoff must be larger than zero");
     INVALIDARG_EXP_IFN(coordinates.size() % 3 == 0,
                        "Coordinates must be in three");
 
+    this->actualCutoff = cutoff / scalingFactor;
     this->cutoff = cutoff;
+    this->scalingFactor = scalingFactor;
     this->box = box;
 
-    this->nrOfBuckets = (box.getL().array() / cutoff).floor().cast<long int>();
+    this->nrOfBuckets = (box.getL().array() / this->actualCutoff).floor().cast<long int>();
 
     this->bucketWidths = box.getL() / this->nrOfBuckets.cast<double>();
 
@@ -58,8 +62,8 @@ namespace entities {
       Eigen::Vector3d centralCoordinates =
         this->getCentralCoordinatesOfBucket(bucketIndex);
       this->neighbourBucketNeighboursDefaultCutoff.push_back(
-        this->getCombinedBucketIndicesForCoordinates(centralCoordinates,
-                                                     cutoff));
+        this->getCombinedBucketIndicesForCoordinates(
+          centralCoordinates, this->cutoff, true));
     }
 
     assert(this->neighbourBucketNeighboursDefaultCutoff.size() ==
@@ -297,7 +301,8 @@ namespace entities {
   int EigenNeighbourList::getIndicesCloseToCoordinates(
     Eigen::ArrayXi& result,
     const Eigen::Vector3d coordinates,
-    const double upperCutoff) const
+    const double upperCutoff,
+                                     bool expectDefault) const
   {
 
 #ifndef NDEBUG
@@ -333,6 +338,7 @@ namespace entities {
         }
       }
     } else {
+      INVALIDARG_EXP_IFN(!expectDefault, "Expected default cutoff, but did not get it");
       // TODO: this is more or less identical to
       // EigenNeighbourList::getCombinedIndicesForCoordinates
       // with some minor additions here and there
@@ -422,7 +428,8 @@ namespace entities {
   std::vector<bucket_idx_t>
   EigenNeighbourList::getCombinedBucketIndicesForCoordinates(
     const Eigen::Vector3d& coordinates,
-    double newCutoff) const
+    double newCutoff,
+    bool sort) const
   {
     Eigen::Array3li indexBasis =
       this->getBucketTripletForCoordinates(coordinates);
@@ -447,6 +454,9 @@ namespace entities {
     }
 
     std::vector<bucket_idx_t> res(result.begin(), result.end());
+    if (sort) {
+      std::sort(res.begin(), res.end());
+    }
     return res;
   }
   //////////////////////////////////////////////////////////

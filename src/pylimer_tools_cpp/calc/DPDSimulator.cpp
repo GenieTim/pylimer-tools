@@ -265,6 +265,15 @@ namespace calc {
       this->bondTypes.segment(this->numBonds + 1, this->numSlipSprings) =
         this->bondTypes.segment(this->numBonds, this->numSlipSprings);
 
+      // also update all other references to the previous bond
+      for (size_t i = 0; i < this->numAtoms; ++i) {
+        for (size_t j = 0; j < this->bondsOfIndex[i].size(); ++j) {
+          if (this->bondsOfIndex[i][j] >= newBondIdx) {
+            this->bondsOfIndex[i][j] += 1;
+          }
+        }
+      }
+
       // actually register the new bond
       this->bondTypes[newBondIdx] = bondType;
       this->bondPartnersA[newBondIdx] = fromIdx;
@@ -649,7 +658,7 @@ namespace calc {
             // always relocate from cross-links away, e.g. in case the
             // cross-link has gained an additional bond and is no longer a
             // relocation target.
-            // consequently, we are inconsistent iff 
+            // consequently, we are inconsistent for cross-links with f = 2
             !(this->atomTypes[this->bondPartnersA[springIdx]] ==
                 this->crosslinkerType ||
               this->atomTypes[this->bondPartnersB[springIdx]] ==
