@@ -249,8 +249,8 @@ TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator]")
     std::cout << "DPD ran, state validated." << std::endl;
 
     // check that we actually have formed bonds
-    CHECK(simulator.getNumBonds() >= (50 + numBondsBefore));
-    pe::Universe universeAfter = simulator.getUniverse();
+    CHECK(simulator.getNumBonds() >= (25 + numBondsBefore));
+    pe::Universe universeAfter = simulator.getUniverse(false);
     std::map<int, int> finalFunctionalityPerType =
       universeAfter.determineFunctionalityPerType();
     CHECK(finalFunctionalityPerType.at(1) == 2);

@@ -414,7 +414,7 @@ namespace calc {
       ////////////////////////////////////////////////////////////////
       // results access & export
 
-      pylimer_tools::entities::Universe getUniverse() const;
+      pylimer_tools::entities::Universe getUniverse(bool withSlipsprings = true) const;
 
       double getTimestep() override { return this->dt; }
       double getCurrentTime(double currentStep) override
