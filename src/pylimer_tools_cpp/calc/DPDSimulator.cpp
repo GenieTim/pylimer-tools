@@ -287,6 +287,12 @@ namespace calc {
       }
       this->bondsOfIndex[fromIdx].push_back(newBondIdx);
       this->bondsOfIndex[toIdx].push_back(newBondIdx);
+      // TODO: we know that everything is sorted, except for the new -> just
+      // insert it where it belongs instead.
+      std::sort(this->bondsOfIndex[fromIdx].begin(),
+                this->bondsOfIndex[fromIdx].end());
+      std::sort(this->bondsOfIndex[toIdx].begin(),
+                this->bondsOfIndex[toIdx].end());
 
       // count the new bonds
       this->numBonds += 1;
@@ -1019,6 +1025,9 @@ namespace calc {
                                                 const size_t partnerBefore,
                                                 const size_t partnerAfter)
     {
+      if (partnerAfter == partnerBefore) {
+        return;
+      }
       INVALIDARG_EXP_IFN(springIdx < this->bondPartnersA.size(),
                          "Cannot replace on a non-existing spring.");
       INVALIDARG_EXP_IFN(partnerBefore < this->numAtoms,
@@ -1068,7 +1077,7 @@ namespace calc {
      *
      * @return pylimer_tools::entities::Universe
      */
-    pylimer_tools::entities::Universe DPDSimulator::getUniverse() const
+    pylimer_tools::entities::Universe DPDSimulator::getUniverse(bool withSlipsprings) const
     {
       pylimer_tools::entities::Universe result =
         pylimer_tools::entities::Universe(this->box);
@@ -1092,20 +1101,18 @@ namespace calc {
       result.addAtoms(
         this->atomIds, this->atomTypes, xs, ys, zs, zeros, zeros, zeros);
 
-      std::vector<long int> bondFrom(this->bondPartnersA.data(),
-                                     this->bondPartnersA.data() +
-                                       this->bondPartnersA.size());
-      std::vector<long int> bondTo(this->bondPartnersB.data(),
-                                   this->bondPartnersB.data() +
-                                     this->bondPartnersB.size());
-      for (size_t i = 0; i < this->bondPartnersB.size(); ++i) {
-        bondTo[i] = this->universe.getAtomIdByIdx(bondTo[i]);
-        bondFrom[i] = this->universe.getAtomIdByIdx(bondFrom[i]);
+      size_t numBondsToAdd = withSlipsprings ? (this->numBonds + this->numSlipSprings) : this->numBonds;
+      std::vector<long int> bondFrom; bondFrom.reserve(numBondsToAdd);
+      std::vector<long int> bondTo; bondTo.reserve(numBondsToAdd);
+      std::vector<int> newBondTypes; newBondTypes.reserve(numBondsToAdd);
+
+      for (size_t i = 0; i < numBondsToAdd; ++i) {
+        bondTo.push_back(this->universe.getAtomIdByIdx(this->bondPartnersA[i]));
+        bondFrom.push_back(this->universe.getAtomIdByIdx(this->bondPartnersB[i]));
+        newBondTypes.push_back(this->bondTypes[i]);
       }
-      std::vector<int> newBondTypes(this->bondTypes.data(),
-                                    this->bondTypes.data() +
-                                      this->bondTypes.size());
-      result.addBonds(this->numBonds + this->numSlipSprings,
+      
+      result.addBonds(numBondsToAdd,
                       bondFrom,
                       bondTo,
                       newBondTypes,
@@ -1272,6 +1279,15 @@ namespace calc {
           RUNTIME_EXP_IFN(
             this->isRelocationTarget[i],
             "Expected functionalities of 1 to be relocation targets.");
+        }
+        for (size_t j = 0; j < this->bondsOfIndex[i].size(); ++j) {
+          if (j < this->idxFunctionalities[i]) {
+            RUNTIME_EXP_IFN(this->bondsOfIndex[i][j] < this->numBonds,
+                            "Expect bonds to come before slip springs.");
+          } else {
+            RUNTIME_EXP_IFN(this->bondsOfIndex[i][j] >= this->numBonds,
+                            "Expect bonds to come before slip springs.");
+          }
         }
       }
       RUNTIME_EXP_IFN(this->isRelocationTarget.size() == this->numAtoms,
