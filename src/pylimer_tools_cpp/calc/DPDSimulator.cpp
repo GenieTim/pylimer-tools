@@ -174,10 +174,10 @@ namespace calc {
         temperature = this->computeTemperature(this->currentVelocities);
 
         // kinetic term of the stress/pressure
-        const double m = 1.;
+        const double m_over_boxv = 1. / this->box.getVolume();
         for (size_t i = 0; i < this->numAtoms; ++i) {
           this->currentStressTensor -=
-            m * this->currentVelocities.segment(3 * i, 3) *
+            m_over_boxv * this->currentVelocities.segment(3 * i, 3) *
             this->currentVelocities.segment(3 * i, 3).transpose();
         }
 
@@ -246,26 +246,29 @@ namespace calc {
       this->bondPartnersA.conservativeResize(this->bondPartnersA.size() + 1);
       this->bondPartnersB.conservativeResize(this->bondPartnersB.size() + 1);
       this->bondTypes.conservativeResize(this->bondTypes.size() + 1);
+      assert(this->bondPartnersA.size() == this->bondPartnersB.size());
+      assert(this->bondPartnersA.size() == this->bondTypes.size());
+      assert(this->bondPartnersA.size() ==
+             this->numBonds + this->numSlipSprings + 1);
 
       // move the data to make space (to keep slip-springs at the end of the
       // thing)
       int newBondIdx = this->numBonds;
-      this->bondPartnerCoordinatesA.segment((this->numBonds + 1) * 3,
-                                            this->numSlipSprings * 3) =
-        this->bondPartnerCoordinatesA.segment(this->numBonds * 3,
-                                              this->numSlipSprings * 3);
-      this->bondPartnerCoordinatesB.segment((this->numBonds + 1) * 3,
-                                            this->numSlipSprings * 3) =
-        this->bondPartnerCoordinatesB.segment(this->numBonds * 3,
-                                              this->numSlipSprings * 3);
-      this->bondPartnersA.segment(this->numBonds + 1, this->numSlipSprings) =
-        this->bondPartnersA.segment(this->numBonds, this->numSlipSprings);
-      this->bondPartnersB.segment(this->numBonds + 1, this->numSlipSprings) =
-        this->bondPartnersB.segment(this->numBonds, this->numSlipSprings);
-      this->bondTypes.segment(this->numBonds + 1, this->numSlipSprings) =
-        this->bondTypes.segment(this->numBonds, this->numSlipSprings);
+      for (int i = this->numBonds + this->numSlipSprings; i >= this->numBonds;
+           --i) {
+        this->bondPartnersA[i] = this->bondPartnersA[i - 1];
+        this->bondPartnersB[i] = this->bondPartnersB[i - 1];
+        this->bondTypes[i] = this->bondTypes[i - 1];
 
-      // also update all other references to the previous bond
+        for (int dir = 0; dir < 3; ++dir) {
+          this->bondPartnerCoordinatesA[i * 3 + dir] =
+            this->bondPartnerCoordinatesA[(i - 1) * 3 + dir];
+          this->bondPartnerCoordinatesB[i * 3 + dir] =
+            this->bondPartnerCoordinatesB[(i - 1) * 3 + dir];
+        }
+      }
+
+      // also update all other references to the slip-springs
       for (size_t i = 0; i < this->numAtoms; ++i) {
         for (size_t j = 0; j < this->bondsOfIndex[i].size(); ++j) {
           if (this->bondsOfIndex[i][j] >= newBondIdx) {
@@ -306,7 +309,11 @@ namespace calc {
       }
 
 #ifndef NDEBUG
+      // std::cout << "Added bond " << newBondIdx << " between " << fromIdx
+      //           << " and " << toIdx << ". Checking state..." << std::endl;
       this->validateState();
+      // std::cout << "Added bond " << newBondIdx << ". State checked."
+      //           << std::endl;
 #endif
     }
 
@@ -1324,10 +1331,16 @@ namespace calc {
         }
         RUNTIME_EXP_IFN(pylimer_tools::utils::contains(
                           this->bondsOfIndex[this->bondPartnersA[i]], i),
-                        "Reverse-link is incorrect.");
+                        "Reverse-link is incorrect. Bond " + std::to_string(i) +
+                          " (of " + std::to_string(this->numBonds) +
+                          ") was not found in bonds of partner A, " +
+                          std::to_string(this->bondPartnersA[i]) + ".");
         RUNTIME_EXP_IFN(pylimer_tools::utils::contains(
                           this->bondsOfIndex[this->bondPartnersB[i]], i),
-                        "Reverse-link is incorrect.");
+                        "Reverse-link is incorrect. Bond " + std::to_string(i) +
+                          " (of " + std::to_string(this->numBonds) +
+                          ") was not found in bonds of partner B, " +
+                          std::to_string(this->bondPartnersA[i]) + ".");
         // the following check is incorrect, as cross-links may have
         // slip-springs for f < 2, and during cross-linking might have one while
         // being upgraded to f > 2

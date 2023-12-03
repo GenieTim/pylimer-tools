@@ -172,11 +172,11 @@ namespace calc {
                                               this->dt,
                                               1.0);
         // kinetic term of the stress/pressure
-        const double m = 1.;
+        const double m_over_boxv = 1. / this->box.getVolume();
         for (size_t i = 0; i < this->numAtoms; ++i) {
           this->currentStressTensor -=
-            m * this->currentVelocities.segment(3 * i, 3) *
-            this->currentVelocities.segment(3 * i, 3).transpose();
+            (m_over_boxv * this->currentVelocities.segment(3 * i, 3) *
+            this->currentVelocities.segment(3 * i, 3).transpose());
         }
       }
 
