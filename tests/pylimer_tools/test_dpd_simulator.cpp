@@ -148,6 +148,9 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     CHECK_NOTHROW(simulator.validateState());
 
     simulator.createSlipSprings(100, 2);
+    // turn down the DPD & MC steps as we don't do as many total steps
+    REQUIRE_NOTHROW(simulator.configNumStepsDPD(25));
+    REQUIRE_NOTHROW(simulator.configNumStepsMC(25));
     CHECK_NOTHROW(simulator.validateState());
     std::cout << "DPD slip-springs created." << std::endl;
 
@@ -200,11 +203,19 @@ TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator]")
     REQUIRE_NOTHROW(simulator.validateState());
     REQUIRE_NOTHROW(simulator.configA(25.));
     REQUIRE_NOTHROW(simulator.configSigma(3.));
+    // turn down the DPD & MC steps as we don't do as many total steps
+    REQUIRE_NOTHROW(simulator.configNumStepsDPD(50));
+    REQUIRE_NOTHROW(simulator.configNumStepsMC(50));
     REQUIRE_NOTHROW(simulator.configSlipspringLowCutoff(0.5));
     REQUIRE_NOTHROW(simulator.configSlipspringHighCutoff(2.0));
     REQUIRE_THROWS(simulator.configSlipspringLowCutoff(3.0));
     REQUIRE_THROWS(simulator.configSlipspringLowCutoff(2.0));
     REQUIRE_THROWS(simulator.configSlipspringHighCutoff(0.5));
+
+    simulator.createSlipSprings(100, 2);
+    // turn down the DPD & MC steps as we don't do as many total steps
+    REQUIRE_NOTHROW(simulator.configNumStepsDPD(25));
+    REQUIRE_NOTHROW(simulator.configNumStepsMC(25));
 
     std::vector<pc::ComputedDoubleValues> outputQuantities = {
       pc::ComputedDoubleValues::TEMPERATURE,
