@@ -54,7 +54,7 @@ namespace calc {
 
     static const std::array<std::string, 8> DPDPerformanceSectionNames = {
       "Time-Stepping", "Forces", "Pair-Forces", "Bond-Forces",
-      "Output",        "Shift",  "Relocation", "Modify"
+      "Output",        "Shift",  "Relocation",  "Modify"
     };
 
     class DPDSimulator : public pylimer_tools::calc::OutputSupportingSimulation
@@ -351,6 +351,8 @@ namespace calc {
         this->bondFormationDistance = bondFormationDist;
         this->formBondsEvery = formBondEvery;
       }
+
+      int getNrOfBondsToForm() const { return this->bondsToForm; }
 
       /**
        * @brief Try to form as many bonds as we can

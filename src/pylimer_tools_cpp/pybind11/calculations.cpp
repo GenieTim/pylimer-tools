@@ -1378,6 +1378,9 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("max_bonds_per_atom_type"),
          py::arg("bond_formation_dist") = 1.0,
          py::arg("attempt_bond_formation_every") = 50)
+     .def("getNrOfBondsToForm", &dpd::DPDSimulator::getNrOfBondsToForm, R"pbdoc(
+          Get the number of bonds that are configured to have to be formed.
+     )pbdoc")
     .def("configAllowRelocationInNetwork",
          &dpd::DPDSimulator::configAllowRelocationInNetwork,
          R"pbdoc(
