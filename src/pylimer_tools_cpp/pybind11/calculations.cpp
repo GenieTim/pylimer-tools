@@ -1398,7 +1398,12 @@ init_pylimer_bound_calc(py::module_& m)
           Set a new origin for measuing the mean square displacement for a specified set of atoms
          )pbdoc",
          py::arg("atom_ids"))
-    .def("getUniverse", &dpd::DPDSimulator::getUniverse)
+    .def("getUniverse", &dpd::DPDSimulator::getUniverse, R"pbdoc(
+     Get a universe instance from the current coordinates (and connectivity).
+
+     Arguments:
+          - with_slip_springs (bool): whether to include slip-springs in the returned universe.
+    )pbdoc", py::arg("with_slipsprings") = true)
     .def("getTimestep", &dpd::DPDSimulator::getTimestep)
     .def("getCurrentTimestep", &dpd::DPDSimulator::getCurrentTimestep)
     .def("getTemperature", &dpd::DPDSimulator::getTemperature)
