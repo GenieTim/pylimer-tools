@@ -176,7 +176,7 @@ namespace calc {
         for (size_t i = 0; i < this->numAtoms; ++i) {
           this->currentStressTensor -=
             (m_over_boxv * this->currentVelocities.segment(3 * i, 3) *
-            this->currentVelocities.segment(3 * i, 3).transpose());
+             this->currentVelocities.segment(3 * i, 3).transpose());
         }
       }
 
@@ -421,6 +421,8 @@ namespace calc {
       {
         return this->currentTime;
       }
+
+      int getCurrentTimestep() const { return this->currentStep; }
 
       /**
        * @brief Get access to the current stress-tensor
