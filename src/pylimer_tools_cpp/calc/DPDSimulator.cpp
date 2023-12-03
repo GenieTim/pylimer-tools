@@ -1058,6 +1058,7 @@ namespace calc {
           return;
         }
       }
+      this->validateState();
       throw std::runtime_error("Invalid internal state: replacing slip-spring "
                                "partner, but did not find it internally.");
     }
