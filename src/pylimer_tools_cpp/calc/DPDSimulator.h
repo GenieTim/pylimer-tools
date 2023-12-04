@@ -83,6 +83,7 @@ namespace calc {
       long int nStepsDPD = 500;
       double dt = 0.06;
       int crosslinkerType = 2;
+      int slipspringBondType = 9;
 
       ////////////////////////////////////////////////////////////////
       // simulation state
@@ -141,6 +142,7 @@ namespace calc {
     public:
       DPDSimulator(const pylimer_tools::entities::Universe& u,
                    const int crosslinkerType = 2,
+                   const int slipspringBondType = 9,
                    const bool is2D = false,
                    const std::string& seed = "");
 
@@ -235,7 +237,7 @@ namespace calc {
       /**
        * @brief Randomly add new slip-springs
        */
-      int createSlipSprings(const int num, const int bondType);
+      int createSlipSprings(const int num, int bondType = 0);
 
       int shiftSlipSprings(const double kbT = 1.);
 
@@ -403,7 +405,9 @@ namespace calc {
           std::shuffle(
             possibleCandidates.begin(), possibleCandidates.end(), this->e2);
           this->addBond(
-            atom_idx, possibleCandidates[0], 3); // TODO: decide on bond type
+            atom_idx,
+            possibleCandidates[0],
+            this->slipspringBondType == 3 ? 4 : 3); // TODO: decide on bond type
           this->bondsToForm -= 1;
           if (this->bondsToForm <= 0) {
             break;
@@ -414,7 +418,8 @@ namespace calc {
       ////////////////////////////////////////////////////////////////
       // results access & export
 
-      pylimer_tools::entities::Universe getUniverse(bool withSlipsprings = true) const;
+      pylimer_tools::entities::Universe getUniverse(
+        bool withSlipsprings = true) const;
 
       double getTimestep() override { return this->dt; }
       double getCurrentTime(double currentStep) override
@@ -500,6 +505,9 @@ namespace calc {
         if (version > 1) {
           ar(allowRelocationInNetwork, crosslinkerType);
         }
+        if (version > 2) {
+          ar(slipspringBondType);
+        }
         // state of bond formation
         if (version > 1) {
           ar(bondsToForm,
@@ -584,6 +592,6 @@ CEREAL_REGISTER_TYPE(pylimer_tools::calc::dpd::DPDSimulator);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(
   pylimer_tools::calc::OutputSupportingSimulation,
   pylimer_tools::calc::dpd::DPDSimulator);
-CEREAL_CLASS_VERSION(pylimer_tools::calc::dpd::DPDSimulator, 2);
+CEREAL_CLASS_VERSION(pylimer_tools::calc::dpd::DPDSimulator, 3);
 
 #endif
