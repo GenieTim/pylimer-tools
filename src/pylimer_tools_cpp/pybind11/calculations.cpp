@@ -1226,7 +1226,7 @@ init_pylimer_bound_calc(py::module_& m)
           with slip-springs as presented by Langeloth et al.
      )pbdoc")
     .def(
-      py::init<const pe::Universe, const int, const bool, const std::string>(),
+      py::init<const pe::Universe, const int, const int, const bool, const std::string>(),
       "Get an instance of this class",
       py::arg("universe"),
       py::arg("crosslinker_type") = 2,
