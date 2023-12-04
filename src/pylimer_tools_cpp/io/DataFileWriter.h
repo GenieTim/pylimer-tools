@@ -97,15 +97,18 @@ namespace utils {
       std::map<std::string, std::vector<long int>> dihedral_angles =
         this->universe.getDihedralAngles();
 
-      long int nrOfAngleTypes = pylimer_tools::utils::max_element<long int>(angles["angle_type"], 0);
+      long int nrOfAngleTypes =
+        pylimer_tools::utils::max_element<long int>(angles["angle_type"], 0);
       if (nrOfAngleTypes < 1) {
         nrOfAngleTypes = 1;
       }
       if (!this->includeAngles) {
-        nrOfAngleTypes =0;
+        nrOfAngleTypes = 0;
       }
 
-      long int nrOfDihedralAngleTypes = pylimer_tools::utils::max_element<long int>(dihedral_angles["dihedral_angle_type"], 0);
+      long int nrOfDihedralAngleTypes =
+        pylimer_tools::utils::max_element<long int>(
+          dihedral_angles["dihedral_angle_type"], 0);
       if (nrOfDihedralAngleTypes < 1) {
         nrOfDihedralAngleTypes = 1;
       }
@@ -113,7 +116,8 @@ namespace utils {
         nrOfDihedralAngleTypes = 0;
       }
 
-      long int nrOfBondTypes =pylimer_tools::utils::max_element<long int>(bonds["bond_type"], 0);
+      long int nrOfBondTypes =
+        pylimer_tools::utils::max_element<long int>(bonds["bond_type"], 0);
       if (nrOfBondTypes < 1) {
         nrOfBondTypes = 1;
       }
@@ -350,10 +354,11 @@ namespace utils {
         this->universe.getMolecules(this->crosslinkerType);
       for (pylimer_tools::entities::Molecule molecule : molecules) {
         // image flag reset attempt might not be the best yet
-        // could try to use ->getAssumedVertexCoordinates() for more reset options
+        // could try to use ->getAssumedVertexCoordinates() for more reset
+        // options
         std::vector<pylimer_tools::entities::Atom> atoms =
           (this->moleculeIdxSwappable || this->attemptImageReset)
-            ? molecule.getAtomsLinedUp()
+            ? molecule.getAtomsLinedUp(this->crosslinkerType, true)
             : molecule.getAtoms();
         nMoleculesOutput += 1;
 
