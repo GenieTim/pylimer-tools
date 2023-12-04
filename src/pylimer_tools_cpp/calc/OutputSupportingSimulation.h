@@ -295,6 +295,7 @@ namespace calc {
         const size_t autocorrelator_idx_before = autocorrelator_idx;
         for (ComputedDoubleValues cv : oc.doubleValues) {
           assert(autocorrelator_idx < this->autocorrelators.size());
+          RUNTIME_EXP_IFN(std::isfinite(doublevalues[cv]), "Expect output quantities to be finite, found " + std::to_string(doublevalues[cv]) + " for property " + ComputedDoubleValuesNames[cv] +".");
           this->autocorrelators[autocorrelator_idx].add(doublevalues[cv]);
           autocorrelator_idx += 1;
         }
@@ -377,8 +378,7 @@ namespace calc {
         }
       }
       for (ComputedDoubleValues val : oc.doubleValues) {
-      RUNTIME_EXP_IFN(std::isfinite(doublevalues[val]), "Expect output quantities to be finite, found " + std::to_string(doublevalues[val]) + " for property " + ComputedDoubleValuesNames[val] +".");
-
+        RUNTIME_EXP_IFN(std::isfinite(doublevalues[val]), "Expect output quantities to be finite, found " + std::to_string(doublevalues[val]) + " for property " + ComputedDoubleValuesNames[val] +".");
         switch (val) {
           case ComputedDoubleValues::MSD:
             // compute MSD
@@ -481,12 +481,8 @@ namespace calc {
 
       int numAverages = 0;
       for (OutputConfiguration c : configs) {
-        for (ComputedDoubleValues v : c.doubleValues) {
-          numAverages += 1;
-        }
-        for (ComputedIntValues v : c.intValues) {
-          numAverages += 1;
-        }
+        numAverages += c.doubleValues.size();
+        numAverages += c.intValues.size();
         INVALIDARG_EXP_IFN(c.outputEvery >= c.useEvery, "Require useEvery to be smaller than output every");
       }
 
