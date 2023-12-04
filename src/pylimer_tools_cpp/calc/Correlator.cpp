@@ -81,8 +81,8 @@ namespace calc {
     shift(k, insertindex[k]) = w;
 
     /// Add to average value
-    if (k == 0)
-      accval += w;
+    if (k == 0){
+      accval += w;}
 
     /// Add to accumulator and, if needed, add to next correlator
     accumulator[k] += w;
