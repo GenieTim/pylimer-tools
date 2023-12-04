@@ -32,7 +32,7 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     pe::Universe universe = universeSequence.atIndex(0);
 
     pcd::DPDSimulator simulator =
-      pcd::DPDSimulator(universe, 2, false, "12th_seed");
+      pcd::DPDSimulator(universe, 2, 9, false, "12th_seed");
 
     // configuration
     REQUIRE_NOTHROW(simulator.validateState());
@@ -197,7 +197,7 @@ TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator]")
     pe::Universe universe = universeSequence.atIndex(0);
 
     pcd::DPDSimulator simulator =
-      pcd::DPDSimulator(universe, 2, false, "seed2");
+      pcd::DPDSimulator(universe, 2, 9, false, "seed2");
 
     // configuration
     REQUIRE_NOTHROW(simulator.validateState());
@@ -277,7 +277,7 @@ TEST_CASE("DPD Simulator Computes Correct Forces", "[analysis][DPDSimulator]")
     pe::Universe universe = universeSequence.atIndex(0);
 
     pcd::DPDSimulator simulator =
-      pcd::DPDSimulator(universe, 2, false, "14th_seed");
+      pcd::DPDSimulator(universe, 2, 9, false, "14th_seed");
 
     // configuration
     REQUIRE_NOTHROW(simulator.validateState());
@@ -357,7 +357,7 @@ TEST_CASE("DPD Simulator Converts Correctly", "[analysis][DPDSimulator]")
     pe::Universe universe = universeSequence.atIndex(0);
 
     pcd::DPDSimulator simulator =
-      pcd::DPDSimulator(universe, 2, false, "12th_seed");
+      pcd::DPDSimulator(universe, 2, 9, false, "12th_seed");
 
     pe::Universe resultUniverse = simulator.getUniverse();
 

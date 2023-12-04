@@ -194,10 +194,10 @@ namespace calc {
           ? this->getStressTensor()
           : Eigen::Matrix3d::Zero();
       double pressure = stressTensor.trace() / 3.;
-      double kineticPressureTerm =
-        requiresEvaluation(PRESSURE, currentStep)
-          ? ((getNumParticles() * this->getTemperature()) / this->getVolume())
-          : 0.0;
+      // double kineticPressureTerm =
+      //   requiresEvaluation(PRESSURE, currentStep)
+      //     ? ((getNumParticles() * this->getTemperature()) / this->getVolume())
+      //     : 0.0;
       Eigen::VectorXd bondLengths =
         (((this->requireBondLenEvery > 0)) &&
          ((currentStep % this->requireBondLenEvery) == 0))
@@ -208,7 +208,7 @@ namespace calc {
         getTimestep(),
         getCurrentTime(currentStep),
         getVolume(),
-        pressure + kineticPressureTerm,
+        pressure,// + kineticPressureTerm,
         requiresEvaluation(TEMPERATURE, currentStep) ? getTemperature() : 0.,
         stressTensor(0, 0),
         stressTensor(1, 1),
