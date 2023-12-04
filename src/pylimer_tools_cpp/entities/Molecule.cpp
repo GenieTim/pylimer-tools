@@ -391,9 +391,33 @@ namespace entities {
     return results;
   }
 
-  std::vector<Atom> Molecule::getAtomsLinedUp(int crossLinkerType) const
+  std::vector<Atom> Molecule::getAtomsLinedUp(int crossLinkerType,
+                                              bool assumedCoordinates) const
   {
-    return this->verticesToAtoms(this->getVerticesLinedUp(crossLinkerType));
+    std::vector<long int> vertices = this->getVerticesLinedUp(crossLinkerType);
+    if (!assumedCoordinates) {
+      return this->verticesToAtoms(vertices);
+    } else {
+      std::vector<pylimer_tools::entities::Atom> results;
+      results.reserve(vertices.size());
+      std::vector<double> coordinates =
+        pylimer_tools::utils::initializeWithValue(vertices.size() * 3, 0.0);
+      this->getAssumedVertexCoordinates<std::vector<double>>(
+        coordinates, this->parent, vertices);
+      for (size_t i = 0; i < vertices.size(); ++i) {
+        long int vertex = vertices[i];
+        results.push_back(pylimer_tools::entities::Atom(
+          this->getAtomIdByIdx(vertex),
+          this->getPropertyValue<int>("type", vertex),
+          coordinates[3 * i],
+          coordinates[3 * i + 1],
+          coordinates[3 * i + 2],
+          0,
+          0,
+          0));
+      }
+      return results;
+    }
   };
 
 } // namespace entities

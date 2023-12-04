@@ -297,7 +297,8 @@ init_pylimer_bound_entities(py::module_& m)
             Use the `crosslinkType` parameter to force the atoms in a primary loop 
             to start with the cross-link.
             )pbdoc",
-         py::arg("crosslinkType") = 2)
+         py::arg("crosslinkType") = 2,
+         py::arg("assumed_coordinates") = false)
     .def("getNrOfBonds",
          &Molecule::getNrOfBonds,
          "Counts and returns the number of bonds associated with this "

@@ -194,9 +194,9 @@ namespace calc {
         temperature = this->computeTemperature(this->currentVelocities);
 
         // kinetic term of the stress/pressure
-        const double m_over_boxv = 1. / this->box.getVolume();
+        const double m_over_boxv = 1. / (this->box.getVolume());
         for (size_t i = 0; i < this->numAtoms; ++i) {
-          this->currentStressTensor -=
+          this->currentStressTensor +=
             m_over_boxv * this->currentVelocities.segment(3 * i, 3) *
             this->currentVelocities.segment(3 * i, 3).transpose();
         }
