@@ -370,14 +370,14 @@ namespace calc {
     {
       assert(streamIdx <= this->outputStreams.size());
       for (ComputedIntValues val : oc.intValues) {
-        RUNTIME_EXP_IFN(std::isfinite(intvalues[val]), "Expect output quantities to be finite, found " + std::to_string(intvalues[val]) + " for property " + ComputedIntValuesNames[val]);
+        RUNTIME_EXP_IFN(std::isfinite(intvalues[val]), "Expect output quantities to be finite, found " + std::to_string(intvalues[val]) + " for property " + ComputedIntValuesNames[val] +".");
         switch (val) {
           default:
             outputBuffer += std::to_string(intvalues[val]) + "\t";
         }
       }
       for (ComputedDoubleValues val : oc.doubleValues) {
-      RUNTIME_EXP_IFN(std::isfinite(doublevalues[val]), "Expect output quantities to be finite, found " + std::to_string(doublevalues[val]) + " for property " + ComputedDoubleValuesNames[val]);
+      RUNTIME_EXP_IFN(std::isfinite(doublevalues[val]), "Expect output quantities to be finite, found " + std::to_string(doublevalues[val]) + " for property " + ComputedDoubleValuesNames[val] +".");
 
         switch (val) {
           case ComputedDoubleValues::MSD:
