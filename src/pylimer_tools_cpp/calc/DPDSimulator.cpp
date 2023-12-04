@@ -12,6 +12,7 @@ namespace calc {
 
     DPDSimulator::DPDSimulator(const pylimer_tools::entities::Universe& u,
                                const int crosslinkerType,
+                               const int slipspringBondType,
                                const bool is2D,
                                const std::string& seed)
       : box(u.getBox())
@@ -44,26 +45,44 @@ namespace calc {
       this->box = u.getBox();
       this->coordinates = u.getUnwrappedVertexCoordinates(&this->box);
       std::map<std::string, std::vector<long int>> edges = u.getEdges();
-      this->bondPartnersA =
-        Eigen::Map<Eigen::ArrayXli, Eigen::Unaligned>(edges["edge_from"].data(),
-                                                      edges["edge_from"].size())
-          .cast<int>();
-      this->bondPartnersB = Eigen::Map<Eigen::ArrayXli, Eigen::Unaligned>(
-                              edges["edge_to"].data(), edges["edge_to"].size())
-                              .cast<int>();
-      this->bondTypes = Eigen::Map<Eigen::ArrayXli, Eigen::Unaligned>(
-                          edges["edge_type"].data(), edges["edge_type"].size())
-                          .cast<int>();
+      this->bondPartnersA = Eigen::ArrayXi::Zero(edges["edge_from"].size());
+      this->bondPartnersB = Eigen::ArrayXi::Zero(edges["edge_to"].size());
+      this->bondTypes = Eigen::ArrayXi::Zero(edges["edge_type"].size());
+
+      this->numBonds = 0;
+      this->numSlipSprings = 0;
+      // we have to "sort" the edges such that the slip-springs are at the end
+      // so, first add "normal" bonds
+      for (size_t i = 0; i < edges["edge_from"].size(); i++) {
+        if (edges["edge_type"][i] != slipspringBondType) {
+          this->bondPartnersA(this->numBonds) = edges["edge_from"][i];
+          this->bondPartnersB(this->numBonds) = edges["edge_to"][i];
+          this->bondTypes(this->numBonds) = edges["edge_type"][i];
+          this->numBonds += 1;
+        }
+      }
+      // then, iterate again to add slip-springs
+      for (size_t i = 0; i < edges["edge_from"].size(); i++) {
+        if (edges["edge_type"][i] == slipspringBondType) {
+          this->bondPartnersA(this->numBonds + this->numSlipSprings) =
+            edges["edge_from"][i];
+          this->bondPartnersB(this->numBonds + this->numSlipSprings) =
+            edges["edge_to"][i];
+          this->bondTypes(this->numBonds + this->numSlipSprings) =
+            edges["edge_type"][i];
+          this->numSlipSprings += 1;
+        }
+      }
 
       this->neighbourlist = pylimer_tools::entities::EigenNeighbourList(
         coordinates, this->box, 1.0);
       this->numAtoms = this->coordinates.size() / 3;
-      this->numBonds = this->bondPartnersA.size();
       this->idxFunctionalities = Eigen::ArrayXi::Zero(this->numAtoms);
       this->atomTypes = u.getPropertyValues<int>("type");
       this->atomIds = u.getPropertyValues<long int>("id");
       this->maxBondLen = 0.45 * this->box.getL().maxCoeff();
       this->crosslinkerType = crosslinkerType;
+      this->slipspringBondType = slipspringBondType;
 
       this->bondsOfIndex.reserve(this->numAtoms);
       for (size_t i = 0; i < this->numAtoms; ++i) {
@@ -73,6 +92,7 @@ namespace calc {
       }
       this->bondPartnerCoordinatesA = Eigen::ArrayXi(3 * this->numBonds);
       this->bondPartnerCoordinatesB = Eigen::ArrayXi(3 * this->numBonds);
+      // TODO: read slip-links
       for (size_t i = 0; i < this->numBonds; ++i) {
         this->bondsOfIndex[this->bondPartnersA[i]].push_back(i);
         this->bondsOfIndex[this->bondPartnersB[i]].push_back(i);
@@ -528,8 +548,11 @@ namespace calc {
      * @param hiCutoff
      * @return int
      */
-    int DPDSimulator::createSlipSprings(const int num, const int bondType)
+    int DPDSimulator::createSlipSprings(const int num, int bondType)
     {
+      if (bondType == 0) {
+        bondType = this->slipspringBondType;
+      }
       int createdLastIteration = 100;
       int totalCreated = 0;
       std::vector<size_t> candidates;
@@ -595,7 +618,7 @@ namespace calc {
         }
       }
 
-      this->addSlipSprings(slipSpringFrom, slipSpringTo, bondType);
+      this->addSlipSprings(slipSpringFrom, slipSpringTo, this->slipspringBondType);
       return totalCreated;
     }
 
@@ -1077,7 +1100,8 @@ namespace calc {
      *
      * @return pylimer_tools::entities::Universe
      */
-    pylimer_tools::entities::Universe DPDSimulator::getUniverse(bool withSlipsprings) const
+    pylimer_tools::entities::Universe DPDSimulator::getUniverse(
+      bool withSlipsprings) const
     {
       pylimer_tools::entities::Universe result =
         pylimer_tools::entities::Universe(this->box);
@@ -1101,23 +1125,25 @@ namespace calc {
       result.addAtoms(
         this->atomIds, this->atomTypes, xs, ys, zs, zeros, zeros, zeros);
 
-      size_t numBondsToAdd = withSlipsprings ? (this->numBonds + this->numSlipSprings) : this->numBonds;
-      std::vector<long int> bondFrom; bondFrom.reserve(numBondsToAdd);
-      std::vector<long int> bondTo; bondTo.reserve(numBondsToAdd);
-      std::vector<int> newBondTypes; newBondTypes.reserve(numBondsToAdd);
+      size_t numBondsToAdd = withSlipsprings
+                               ? (this->numBonds + this->numSlipSprings)
+                               : this->numBonds;
+      std::vector<long int> bondFrom;
+      bondFrom.reserve(numBondsToAdd);
+      std::vector<long int> bondTo;
+      bondTo.reserve(numBondsToAdd);
+      std::vector<int> newBondTypes;
+      newBondTypes.reserve(numBondsToAdd);
 
       for (size_t i = 0; i < numBondsToAdd; ++i) {
         bondTo.push_back(this->universe.getAtomIdByIdx(this->bondPartnersA[i]));
-        bondFrom.push_back(this->universe.getAtomIdByIdx(this->bondPartnersB[i]));
+        bondFrom.push_back(
+          this->universe.getAtomIdByIdx(this->bondPartnersB[i]));
         newBondTypes.push_back(this->bondTypes[i]);
       }
-      
-      result.addBonds(numBondsToAdd,
-                      bondFrom,
-                      bondTo,
-                      newBondTypes,
-                      false,
-                      false);
+
+      result.addBonds(
+        numBondsToAdd, bondFrom, bondTo, newBondTypes, false, false);
 
       return result;
     }

@@ -1230,6 +1230,7 @@ init_pylimer_bound_calc(py::module_& m)
       "Get an instance of this class",
       py::arg("universe"),
       py::arg("crosslinker_type") = 2,
+      py::arg("slipspring_bond_type") = 9,
       py::arg("is_2D") = false,
       py::arg("seed") = "")
     //     .def("runSimulation",
@@ -1378,7 +1379,7 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("max_bonds_per_atom_type"),
          py::arg("bond_formation_dist") = 1.0,
          py::arg("attempt_bond_formation_every") = 50)
-     .def("getNrOfBondsToForm", &dpd::DPDSimulator::getNrOfBondsToForm, R"pbdoc(
+    .def("getNrOfBondsToForm", &dpd::DPDSimulator::getNrOfBondsToForm, R"pbdoc(
           Get the number of bonds that are configured to have to be formed.
      )pbdoc")
     .def("configAllowRelocationInNetwork",
@@ -1398,12 +1399,15 @@ init_pylimer_bound_calc(py::module_& m)
           Set a new origin for measuing the mean square displacement for a specified set of atoms
          )pbdoc",
          py::arg("atom_ids"))
-    .def("getUniverse", &dpd::DPDSimulator::getUniverse, R"pbdoc(
+    .def("getUniverse",
+         &dpd::DPDSimulator::getUniverse,
+         R"pbdoc(
      Get a universe instance from the current coordinates (and connectivity).
 
      Arguments:
           - with_slip_springs (bool): whether to include slip-springs in the returned universe.
-    )pbdoc", py::arg("with_slipsprings") = true)
+    )pbdoc",
+         py::arg("with_slipsprings") = true)
     .def("getTimestep", &dpd::DPDSimulator::getTimestep)
     .def("getCurrentTimestep", &dpd::DPDSimulator::getCurrentTimestep)
     .def("getTemperature", &dpd::DPDSimulator::getTemperature)

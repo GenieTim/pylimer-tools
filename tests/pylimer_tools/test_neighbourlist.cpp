@@ -97,7 +97,7 @@ TEST_CASE("Random coordinates EigenNeighbourList",
   Eigen::VectorXd coordinates = Eigen::VectorXd::Random(numAtoms * 3) * 100.;
   pe::Box box = pe::Box(14, 14, 14);
   pe::EigenNeighbourList neighbourList =
-    pe::EigenNeighbourList(coordinates, box, 1.0);
+    pe::EigenNeighbourList(coordinates, box, 1.0, 1.0);
   double cutoff = 1.0;
   // pre-allocate the neighbor indices array
   Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
@@ -164,7 +164,7 @@ TEST_CASE("Manually accurate EigenNeighbourList",
 
   Eigen::VectorXd coordinates = universe.getUnwrappedVertexCoordinates(&box);
   pe::EigenNeighbourList neighbourList =
-    pe::EigenNeighbourList(coordinates, universe.getBox(), 2.0);
+    pe::EigenNeighbourList(coordinates, universe.getBox(), 2.0, 1.0);
 
   Eigen::ArrayXi neighbours = neighbourList.getIndicesCloseToCoordinates(
     coordinates.segment(3 * universe.getIdxByAtomId(2), 3), 1.0);
