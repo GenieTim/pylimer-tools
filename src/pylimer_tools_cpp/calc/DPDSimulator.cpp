@@ -411,6 +411,7 @@ namespace calc {
         pressure -= this->k * bondDistances.segment(3 * i, 3).squaredNorm();
         stressTensor -= this->k * bondDistances.segment(3 * i, 3) *
                         bondDistances.segment(3 * i, 3).transpose();
+        assert(std::isfinite(bondDistances.segment(3 * i, 3).squaredNorm()));
       }
 
       timer.section(DPDPerformanceSections::PAIR_FORCE);
@@ -499,6 +500,7 @@ namespace calc {
 
             // pressure update: repulsive force -> increases pressure
             pressure += pairForce.dot(pairdistance);
+            assert(std::isfinite(pressure));
             stressTensor += pairForce * pairdistance.transpose();
           }
         }
@@ -618,7 +620,8 @@ namespace calc {
         }
       }
 
-      this->addSlipSprings(slipSpringFrom, slipSpringTo, this->slipspringBondType);
+      this->addSlipSprings(
+        slipSpringFrom, slipSpringTo, this->slipspringBondType);
       return totalCreated;
     }
 

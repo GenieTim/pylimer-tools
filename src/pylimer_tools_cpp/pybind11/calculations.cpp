@@ -1225,14 +1225,17 @@ init_pylimer_bound_calc(py::module_& m)
           A quick-and-dirty implementation of the DPD simulation
           with slip-springs as presented by Langeloth et al.
      )pbdoc")
-    .def(
-      py::init<const pe::Universe, const int, const int, const bool, const std::string>(),
-      "Get an instance of this class",
-      py::arg("universe"),
-      py::arg("crosslinker_type") = 2,
-      py::arg("slipspring_bond_type") = 9,
-      py::arg("is_2D") = false,
-      py::arg("seed") = "")
+    .def(py::init<const pe::Universe,
+                  const int,
+                  const int,
+                  const bool,
+                  const std::string>(),
+         "Get an instance of this class",
+         py::arg("universe"),
+         py::arg("crosslinker_type") = 2,
+         py::arg("slipspring_bond_type") = 9,
+         py::arg("is_2D") = false,
+         py::arg("seed") = "")
     //     .def("runSimulation",
     //          &dpd::DPDSimulator::runSimulation,
     //          R"pbdoc(
@@ -1408,6 +1411,11 @@ init_pylimer_bound_calc(py::module_& m)
           - with_slip_springs (bool): whether to include slip-springs in the returned universe.
     )pbdoc",
          py::arg("with_slipsprings") = true)
+    .def(
+      "refreshCurrentState", &dpd::DPDSimulator::refreshCurrentState, R"pbdoc(
+          After re-configuring the force-field parameters, 
+          this method should be called to update the current stress tensor etc.
+     )pbdoc")
     .def("getTimestep", &dpd::DPDSimulator::getTimestep)
     .def("getCurrentTimestep", &dpd::DPDSimulator::getCurrentTimestep)
     .def("getTemperature", &dpd::DPDSimulator::getTemperature)
