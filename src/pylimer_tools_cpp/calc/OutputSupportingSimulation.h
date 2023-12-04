@@ -304,6 +304,7 @@ namespace calc {
           this->autocorrelators[autocorrelator_idx_before].evaluate();
           const unsigned int npcorr =
             this->autocorrelators[autocorrelator_idx_before].npcorr;
+          RUNTIME_EXP_IFN(npcorr > 0, "Expected more than 0 correlator results.");
           for (int autocorr_idx_offset = 1;
                autocorr_idx_offset < oc.doubleValues.size();
                ++autocorr_idx_offset) {
@@ -455,6 +456,7 @@ namespace calc {
         INVALIDARG_EXP_IFN(
           vals[i].intValues.size() == 0,
           "Correlation of integer values is not supported yet.");
+          INVALIDARG_EXP_IFN(vals[i].outputEvery >= vals[i].useEvery, "Require useEvery to be smaller than output every");
         num_values_to_correlate += vals[i].doubleValues.size();
       }
       this->autocorrelators.clear();
@@ -481,6 +483,7 @@ namespace calc {
         for (ComputedIntValues v : c.intValues) {
           numAverages += 1;
         }
+        INVALIDARG_EXP_IFN(c.outputEvery >= c.useEvery, "Require useEvery to be smaller than output every");
       }
 
       this->runningAverages =
