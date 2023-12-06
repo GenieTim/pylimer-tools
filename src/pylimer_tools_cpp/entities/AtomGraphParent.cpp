@@ -87,7 +87,18 @@ namespace entities {
     // igraph_vit_destroy(&vit);
 
     return results;
-  }
+  };
+
+  /**
+   * @brief Get the Atoms Connected To an Atom
+   *
+   * @param atom the atom for which to get the atoms connected to it
+   * @return std::vector<Atom>
+   */
+  std::vector<Atom> AtomGraphParent::getConnectedAtoms(const Atom& atom) const
+  {
+    return this->getAtomsConnectedTo(this->getIdxByAtomId(atom.getId()));
+  };
 
   /**
    * @brief Get the Atoms Connected To an Atom specified by its vertex Id

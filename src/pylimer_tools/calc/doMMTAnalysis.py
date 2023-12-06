@@ -165,15 +165,15 @@ def calculateWeightFractionOfBackbone(network: Universe, crosslinkerType: int, s
         functionalityPerType[crosslinkerType]
     W_xl = weightFractions[crosslinkerType]
     W_x2 = 1-W_xl
-    assert(W_a <= 1 and W_a >= 0)
-    assert(W_xl <= 1 and W_xl >= 0)
-    assert(W_x2 <= 1 and W_x2 >= 0)
-    assert(W_sol <= 1 and W_sol >= 0)
+    assert (W_a <= 1 and W_a >= 0)
+    assert (W_xl <= 1 and W_xl >= 0)
+    assert (W_x2 <= 1 and W_x2 >= 0)
+    assert (W_sol <= 1 and W_sol >= 0)
     if (functionalityPerType[crosslinkerType] == 3):
         Phi_el = ((W_x2*(1-beta)**2) +
                   (W_xl*((1-alpha)**3 + 3*alpha*(1-W_a)*((1-alpha)**2))))/(1-W_sol)
     else:
-        assert(functionalityPerType[crosslinkerType] == 4)
+        assert (functionalityPerType[crosslinkerType] == 4)
         Phi_el = ((W_x2*(1-beta)**2) +
                   (W_xl*(((1-alpha)**4) + 4*alpha*(1-W_a) * ((1-alpha)**3) +
                          6*(alpha**2)*(1-2*W_a)*(1-alpha)**2)))/(1-W_sol)
@@ -280,7 +280,7 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, crosslinkerType: i
         return 1.
 
     if (functionalityPerType is None or crosslinkerType not in functionalityPerType):
-        assert(network is not None)
+        assert (network is not None)
         functionalityPerType = network.determineFunctionalityPerType()
 
     weightFractions, alpha, beta = computeWeightFractionsAndProbabilities(
@@ -298,7 +298,7 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, crosslinkerType: i
 def computeWeightFractionsAndProbabilities(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None, r: float = None, p: float = None):
 
     if (functionalityPerType is None or crosslinkerType not in functionalityPerType):
-        assert(network is not None)
+        assert (network is not None)
         functionalityPerType = network.determineFunctionalityPerType()
         if (crosslinkerType not in functionalityPerType):
             raise ValueError("The crosslinker type {} is not present in the network. Got types {}".format(
@@ -315,10 +315,11 @@ def computeWeightFractionsAndProbabilities(network: Universe, crosslinkerType: i
 
     if (weightFractions is None):
         weightFractions = computeWeightFractions(network)
-        assert(math.isclose(sum(w for w in weightFractions.values()), 1., abs_tol=1e-9))
+        assert (math.isclose(
+            sum(w for w in weightFractions.values()), 1., abs_tol=1e-9))
 
     if (p is None):
-        assert(network is not None)
+        assert (network is not None)
         p = mehp.computeCrosslinkerConversion(
             network, crosslinkerType, functionalityPerType[crosslinkerType])
         if (p < 0 or p > 1):
@@ -326,17 +327,17 @@ def computeWeightFractionsAndProbabilities(network: Universe, crosslinkerType: i
                 "The p computed ({}) is outside the accepted range. Falling back to effective cross-linker functionality.".format(p))
             p = mehp.calculateEffectiveCrosslinkerFunctionality(
                 network, crosslinkerType)
-    assert(p <= 1 and p >= 0)
+    assert (p <= 1 and p >= 0)
     if (r is None):
-        assert(network is not None)
+        assert (network is not None)
         r = computeStoichiometricInbalance(
             network, crosslinkerType, strandLength=strandLength, functionalityPerType=functionalityPerType)
-    assert(r >= 0)
+    assert (r >= 0)
 
     alpha, beta = computeMMsProbabilities(
         r, p, functionalityPerType[crosslinkerType])
-    assert(alpha <= 1 and alpha >= 0)
-    assert(beta <= 1 and beta >= 0)
+    assert (alpha <= 1 and alpha >= 0)
+    assert (beta <= 1 and beta >= 0)
 
     return weightFractions, alpha, beta
 
@@ -376,7 +377,7 @@ def computeMMsProbabilities(r, p, f):
         if (not (1/(p**2) < 2*r and (1/(p**2) > r))):
             warnings.warn(
                 "The resulting P(F_A) is probably unreliable, as the detected root does not fulfill the required conditions.")
-    elif(f == 4):
+    elif (f == 4):
         alpha = (((1./(r*p*p)) - 3./4.)**(1./2.) - (1./2.))
         if (not (1/(p**2) < 3*r and (1/(p**2) > r))):
             warnings.warn(
@@ -563,7 +564,7 @@ def computeStoichiometricInbalance(network: Universe, crosslinkerType: int, stra
     return crosslinkerFormableBonds/(otherFormableBonds/strandLength)
 
 
-def computeExtentOfReaction(network: Universe, crosslinkerType, functionalityPerType: dict = None, strandLength: float = None) -> float:
+def computeExtentOfReaction(network: Universe, crosslinkerType, functionalityPerType: dict = None) -> float:
     """
     Compute the extent of polymerization reaction
     (nr. of formed bonds in reaction / max. nr. of bonds formable)
@@ -572,15 +573,12 @@ def computeExtentOfReaction(network: Universe, crosslinkerType, functionalityPer
             this will not be rounded/respected in any way
         - if the system contains solvent or other molecules that should not be binding to 
             cross-linkers, make sure to remove them before calling this function
-        - useage of mehp.computeCrosslinkerConversion is recommended instead for more consistent results (no dependency on strandLength)
 
     Arguments:
       - network: the poylmer network to do the computation for
       - crosslinkerType: the atom type of crosslinker beads
       - functionalityPerType: a dictionary with key: type, and value: functionality of this atom type. 
           If None: will use max functionality per type.
-      - strandLength: the length of the network strands (in nr. of beads). 
-          If None: will compute from network structure
 
     Returns:
       - p (float): the extent of reaction
@@ -593,7 +591,8 @@ def computeExtentOfReaction(network: Universe, crosslinkerType, functionalityPer
         functionalityPerType = network.determineFunctionalityPerType()
 
     numStrands = len(network.getMolecules(crosslinkerType))
-    numCrosslinkers = len(network.getAtomsOfType(crosslinkerType))
+    crosslinks = network.getAtomsOfType(crosslinkerType)
+    numCrosslinkers = len(crosslinks)
 
     # assuming strand has functionality 2
     maxFormableBonds = min(numStrands*2, numCrosslinkers *
@@ -602,12 +601,11 @@ def computeExtentOfReaction(network: Universe, crosslinkerType, functionalityPer
     if (maxFormableBonds == 0):
         return 1
 
-    if (strandLength is None):
-        strands = network.getMolecules(crosslinkerType)
-        strandLength = np.mean([m.getLength() for m in strands])
-
-    actuallyFormedBonds = (network.getNrOfBonds() -
-                           (numStrands * (strandLength-1)))
+    actuallyFormedBonds = 0
+    for crosslink in crosslinks:
+        connected_to = network.getConnectedAtoms(crosslink)
+        actuallyFormedBonds += len(
+            [a for a in connected_to if a.getType() != crosslinkerType])
 
     return actuallyFormedBonds/(maxFormableBonds)
 

@@ -49,6 +49,15 @@ namespace entities {
     std::vector<long int> getVertexIdxsConnectedTo(
       const long int vertexIdx) const;
 
+
+    /**
+     * @brief Get the Atoms Connected To an Atom
+     *
+     * @param atom the atom for which to get the atoms connected to it
+     * @return std::vector<Atom>
+     */
+    std::vector<Atom> getConnectedAtoms(const Atom &atom) const;
+
     /**
      * @brief Get the Atoms Connected To an Atom specified by its vertex Id
      *

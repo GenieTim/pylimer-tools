@@ -256,6 +256,11 @@ init_pylimer_bound_entities(py::module_& m)
     .def("getAtomsConnectedTo", &Molecule::getAtomsConnectedTo, R"pbdoc(
             Get the atoms connected to a specified vertex id.
             )pbdoc")
+    .def("getConnectedAtoms", &Molecule::getConnectedAtoms, R"pbdoc(
+            Get the atoms connected to a specified atom.
+
+            Internally uses :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsConnectedTo`
+            )pbdoc")
     .def("getEdges", &Molecule::getEdges, R"pbdoc(
             Get all bonds. Returns a dict with three properties: 'edge_from', 'edge_to' and 'edge_type'.
             The order is not necessarily related to any structural property.
@@ -587,6 +592,11 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("atomTypeToOmit"))
     .def("getAtomsConnectedTo", &Universe::getAtomsConnectedTo, R"pbdoc(
             Get the atoms connected to a specified vertex id.
+            )pbdoc")
+    .def("getConnectedAtoms", &Universe::getConnectedAtoms, R"pbdoc(
+            Get the atoms connected to a specified atom.
+
+            Internally uses :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getAtomsConnectedTo`
             )pbdoc")
     .def("getAtomsOfDegree", &Universe::getAtomsOfDegree, R"pbdoc(
             Get the atoms that have the specified number of bonds.
