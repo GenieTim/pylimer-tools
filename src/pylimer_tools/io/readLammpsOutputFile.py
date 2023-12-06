@@ -197,7 +197,7 @@ def readCorrelationFile(filepath, group_key="Timestep", use_cache: bool = True) 
                 continue
             split = line.split()
             if (len(split) == 2 or group_key in line):
-                if (currentKey is not None):
+                if (currentKey is not None and len(currentData) > 0):
                     data[currentKey] = currentData
                     currentData = []
                 # new key
@@ -209,7 +209,7 @@ def readCorrelationFile(filepath, group_key="Timestep", use_cache: bool = True) 
                 raise ValueError(
                     "Did not expect {} splited values on line with content {} in correlation file {}".format(len(split), line, filepath))
             lines_interpreted += 1
-        if (currentKey is not None):
+        if (currentKey is not None and len(currentData) > 0):
             data[currentKey] = currentData
 
     cols.append(group_key)
