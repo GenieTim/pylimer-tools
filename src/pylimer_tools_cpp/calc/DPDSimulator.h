@@ -355,17 +355,23 @@ namespace calc {
         const int formTo = 1)
       {
         INVALIDARG_EXP_IFN(bondFormationDist > 0.0,
-                           "Bond formation distance must be > 0.");
+                           "Bond formation distance must be > 0, got " +
+                             std::to_string(bondFormationDist) + ".");
         INVALIDARG_EXP_IFN(formBondEvery > 0,
-                           "Bond formation iteration must be > 0.");
+                           "Bond formation iteration must be > 0, got " +
+                             std::to_string(formBondEvery) + ".");
         std::map<int, int> functionalities =
           this->universe.determineFunctionalityPerType();
         for (const auto& type : functionalities) {
           INVALIDARG_EXP_IFN(
-            numBondsPerType.count(type.first) >= type.second,
+            numBondsPerType.at(type.first) >= type.second,
             "Number of bonds per type must be bigger than their current "
             "functionality. Got issue with type " +
-              std::to_string(type.first) + ".");
+              std::to_string(type.first) +
+              ": it currently has a functionality of " +
+              std::to_string(type.second) + ", but " +
+              std::to_string(numBondsPerType.at(type.first)) +
+              " was requested.");
         }
         this->bondsToForm = numBondsToForm;
         this->maxBondsPerType = numBondsPerType;
