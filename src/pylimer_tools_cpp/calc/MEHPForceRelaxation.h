@@ -101,6 +101,16 @@ namespace calc {
 
       int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
 
+      size_t getNumBonds() override { return this->getNrOfSprings(); }
+
+      size_t getNumExtraBonds() override { return 0; }
+
+      long int getNumBondsToForm() override { return 0; }
+
+      size_t getNumAtoms() override { return this->getNrOfNodes(); }
+
+      size_t getNumExtraAtoms() override { return 0; }
+
       Network getNetwork() const { return this->initialConfig; }
 
       // MEHPForceEvaluator getForceEvaluator() const

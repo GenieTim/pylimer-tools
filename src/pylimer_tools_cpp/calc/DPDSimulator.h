@@ -409,7 +409,7 @@ namespace calc {
             double r2 = (this->coordinates.segment(3 * atom_idx, 3) -
                          this->coordinates.segment(3 * j, 3))
                           .norm();
-            if (r2 <= cutoff && i != j &&
+            if (r2 <= cutoff && atom_idx != j &&
                 (this->idxFunctionalities[j] <
                  this->maxBondsPerType[this->atomTypes[j]]) &&
                 (this->atomTypeBondFormationTo == this->atomTypes[j])) {
@@ -468,7 +468,12 @@ namespace calc {
 
       size_t getNumSlipSprings() const { return this->numSlipSprings; }
 
-      size_t getNumBonds() const { return this->numBonds; }
+      size_t getNumBonds() override { return this->numBonds; }
+      size_t getNumExtraBonds() override { return this->numSlipSprings; }
+      long int getNumBondsToForm() override { return this->bondsToForm; }
+
+      size_t getNumAtoms() override { return this->numAtoms; }
+      size_t getNumExtraAtoms() override { return 0; }
 
       double getVolume() override { return this->box.getVolume(); }
 
