@@ -2,6 +2,7 @@ import os
 import re
 import warnings
 from typing import Iterable, List, Union
+import numpy as np
 
 import pandas as pd
 
@@ -188,15 +189,22 @@ def readCorrelationFile(filepath, group_key="Timestep", use_cache: bool = True) 
         cols = header_line.removeprefix("#").strip().split()
         normalLineLen = len(cols)
         lines_interpreted = 0
+
+        def isGroupKey(line):
+            # if (isinstance(group_key, list)):
+            #     return np.any([x in line for x in group_key])
+            # else:
+                return group_key in line
+
         for line in f:
-            if ((line.startswith("#") or len(line.strip()) == 0) and group_key not in line):
+            if ((line.startswith("#") or len(line.strip()) == 0) and not isGroupKey(line)):
                 if (lines_interpreted == 0):
                     header_line = line
                 continue
             if (line == header_line):
                 continue
-            split = line.split()
-            if (len(split) == 2 or group_key in line):
+            split = line.removeprefix("#").strip().split()
+            if (len(split) == 2 or isGroupKey(line)):
                 if (currentKey is not None and len(currentData) > 0):
                     data[currentKey] = currentData
                     currentData = []
