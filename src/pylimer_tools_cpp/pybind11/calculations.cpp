@@ -1377,11 +1377,15 @@ init_pylimer_bound_calc(py::module_& m)
           - num_bonds_per_atom_type (dict): the nr of bonds each atom type may have at most (e.g., 2 for strand atoms, 4 for a tertiary cross-links)
           - bond_formation_dist (float): the maximum distance allowed to form bonds
           - attempt_bond_formation_every (int): attempt to form bonds every this many steps during the simulation run
+          - atom_type_form_from (int): the atom type to start forming bonds from. 
+          - atom_type_form_to (int): the atom type to start forming bonds to.
          )pbdoc",
          py::arg("num_bonds_to_form"),
          py::arg("max_bonds_per_atom_type"),
          py::arg("bond_formation_dist") = 1.0,
-         py::arg("attempt_bond_formation_every") = 50)
+         py::arg("attempt_bond_formation_every") = 50,
+         py::arg("atom_type_form_from") = 2,
+         py::arg("atom_type_form_to") = 1)
     .def("getNrOfBondsToForm", &dpd::DPDSimulator::getNrOfBondsToForm, R"pbdoc(
           Get the number of bonds that are configured to have to be formed.
      )pbdoc")

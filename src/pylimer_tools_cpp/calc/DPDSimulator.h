@@ -101,7 +101,7 @@ namespace calc {
       // state of bond formation
       int bondsToForm = 0;
       std::unordered_map<int, int> maxBondsPerType;
-      double bondFormationDistance = 1.0;
+      double bondFormationDistance = 1.1;
       int formBondsEvery = 50;
       int atomTypeBondFormationFrom = 1;
       int atomTypeBondFormationTo = 2;
@@ -163,7 +163,7 @@ namespace calc {
 
       /**
        * @brief re-calculate stress tensor & pressure
-       * 
+       *
        */
       void refreshCurrentState()
       {
@@ -349,13 +349,30 @@ namespace calc {
       void configBondFormation(
         const int numBondsToForm,
         const std::unordered_map<int, int>& numBondsPerType,
-        const double bondFormationDist = 1.0,
-        const int formBondEvery = 50)
+        const double bondFormationDist = 1.1,
+        const int formBondEvery = 10,
+        const int formFrom = 2,
+        const int formTo = 1)
       {
+        INVALIDARG_EXP_IFN(bondFormationDist > 0.0,
+                           "Bond formation distance must be > 0.");
+        INVALIDARG_EXP_IFN(formBondEvery > 0,
+                           "Bond formation iteration must be > 0.");
+        std::map<int, int> functionalities =
+          this->universe.determineFunctionalityPerType();
+        for (const auto& type : functionalities) {
+          INVALIDARG_EXP_IFN(
+            numBondsPerType.count(type.first) >= type.second,
+            "Number of bonds per type must be bigger than their current "
+            "functionality. Got issue with type " +
+              std::to_string(type.first) + ".");
+        }
         this->bondsToForm = numBondsToForm;
         this->maxBondsPerType = numBondsPerType;
         this->bondFormationDistance = bondFormationDist;
         this->formBondsEvery = formBondEvery;
+        this->atomTypeBondFormationFrom = formFrom;
+        this->atomTypeBondFormationTo = formTo;
       }
 
       int getNrOfBondsToForm() const { return this->bondsToForm; }
@@ -392,7 +409,7 @@ namespace calc {
             double r2 = (this->coordinates.segment(3 * atom_idx, 3) -
                          this->coordinates.segment(3 * j, 3))
                           .norm();
-            if (r2 <= cutoff &&
+            if (r2 <= cutoff && i != j &&
                 (this->idxFunctionalities[j] <
                  this->maxBondsPerType[this->atomTypes[j]]) &&
                 (this->atomTypeBondFormationTo == this->atomTypes[j])) {
