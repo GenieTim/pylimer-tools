@@ -90,10 +90,9 @@ namespace calc {
         bonds.reserve(4);
         this->bondsOfIndex.push_back(bonds);
       }
-      this->bondPartnerCoordinatesA = Eigen::ArrayXi(3 * this->numBonds);
-      this->bondPartnerCoordinatesB = Eigen::ArrayXi(3 * this->numBonds);
-      // TODO: read slip-links
-      for (size_t i = 0; i < this->numBonds; ++i) {
+      this->bondPartnerCoordinatesA = Eigen::ArrayXi(3 * this->bondPartnersA.size());
+      this->bondPartnerCoordinatesB = Eigen::ArrayXi(3 * this->bondPartnersB.size());
+      for (size_t i = 0; i < this->numBonds + this->numSlipSprings; ++i) {
         this->bondsOfIndex[this->bondPartnersA[i]].push_back(i);
         this->bondsOfIndex[this->bondPartnersB[i]].push_back(i);
         for (int dir = 0; dir < 3; ++dir) {
