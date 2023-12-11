@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <cmath>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -16,7 +17,6 @@
 #include <numeric>
 #include <string>
 #include <tuple>
-#include <cmath>
 #include <vector>
 
 #include <cereal/types/base_class.hpp>
@@ -25,13 +25,18 @@
 namespace pylimer_tools {
 namespace calc {
 
-#define NUM_COMPUTABLE_INT_VALUES 3
+#define NUM_COMPUTABLE_INT_VALUES 8
 
   enum ComputedIntValues
   {
     STEP = 0,
     NUM_SHIFT = 1,
     NUM_RELOC = 2,
+    NUM_ATOMS = 3,
+    NUM_EXTRA_ATOMS = 4,
+    NUM_BONDS = 5,
+    NUM_EXTRA_BONDS = 6,
+    NUM_BONDS_TO_FORM = 7,
   };
 
   const std::array<std::string, NUM_COMPUTABLE_INT_VALUES>
@@ -39,6 +44,11 @@ namespace calc {
       "Step",
       "numShift",
       "numReloc",
+      "numAtoms",
+      "numExtraAtoms",
+      "numBonds",
+      "numExtraBonds",
+      "numBondsToForm",
     };
 
 #define NUM_COMPUTABLE_DOUBLE_VALUES 17
@@ -186,6 +196,11 @@ namespace calc {
         currentStep,
         getNumShifts(),
         getNumRelocations(),
+        static_cast<long int>(getNumAtoms()),
+        static_cast<long int>(getNumExtraAtoms()),
+        static_cast<long int>(getNumBonds()),
+        static_cast<long int>(getNumExtraBonds()),
+        getNumBondsToForm(),
       };
 
       Eigen::Matrix3d stressTensor =
@@ -196,8 +211,8 @@ namespace calc {
       double pressure = stressTensor.trace() / 3.;
       // double kineticPressureTerm =
       //   requiresEvaluation(PRESSURE, currentStep)
-      //     ? ((getNumParticles() * this->getTemperature()) / this->getVolume())
-      //     : 0.0;
+      //     ? ((getNumParticles() * this->getTemperature()) /
+      //     this->getVolume()) : 0.0;
       Eigen::VectorXd bondLengths =
         (((this->requireBondLenEvery > 0)) &&
          ((currentStep % this->requireBondLenEvery) == 0))
@@ -208,7 +223,7 @@ namespace calc {
         getTimestep(),
         getCurrentTime(currentStep),
         getVolume(),
-        pressure,// + kineticPressureTerm,
+        pressure, // + kineticPressureTerm,
         requiresEvaluation(TEMPERATURE, currentStep) ? getTemperature() : 0.,
         stressTensor(0, 0),
         stressTensor(1, 1),
@@ -295,7 +310,11 @@ namespace calc {
         const size_t autocorrelator_idx_before = autocorrelator_idx;
         for (ComputedDoubleValues cv : oc.doubleValues) {
           assert(autocorrelator_idx < this->autocorrelators.size());
-          RUNTIME_EXP_IFN(std::isfinite(doublevalues[cv]), "Expect output quantities to be finite, found " + std::to_string(doublevalues[cv]) + " for property " + ComputedDoubleValuesNames[cv] +".");
+          RUNTIME_EXP_IFN(std::isfinite(doublevalues[cv]),
+                          "Expect output quantities to be finite, found " +
+                            std::to_string(doublevalues[cv]) +
+                            " for property " + ComputedDoubleValuesNames[cv] +
+                            ".");
           this->autocorrelators[autocorrelator_idx].add(doublevalues[cv]);
           autocorrelator_idx += 1;
         }
@@ -306,7 +325,8 @@ namespace calc {
           this->autocorrelators[autocorrelator_idx_before].evaluate();
           const unsigned int npcorr =
             this->autocorrelators[autocorrelator_idx_before].npcorr;
-          RUNTIME_EXP_IFN(npcorr > 0, "Expected more than 0 correlator results.");
+          RUNTIME_EXP_IFN(npcorr > 0,
+                          "Expected more than 0 correlator results.");
           for (int autocorr_idx_offset = 1;
                autocorr_idx_offset < oc.doubleValues.size();
                ++autocorr_idx_offset) {
@@ -365,20 +385,26 @@ namespace calc {
      * @param streamIdx
      */
     inline void doOutputValues(OutputConfiguration& oc,
-                               std::array<long int, 3>& intvalues,
-                               std::array<double, 17>& doublevalues,
+                               std::array<long int, NUM_COMPUTABLE_INT_VALUES>& intvalues,
+                               std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES>& doublevalues,
                                int streamIdx = 0)
     {
       assert(streamIdx <= this->outputStreams.size());
       for (ComputedIntValues val : oc.intValues) {
-        RUNTIME_EXP_IFN(std::isfinite(intvalues[val]), "Expect output quantities to be finite, found " + std::to_string(intvalues[val]) + " for property " + ComputedIntValuesNames[val] +".");
+        RUNTIME_EXP_IFN(std::isfinite(intvalues[val]),
+                        "Expect output quantities to be finite, found " +
+                          std::to_string(intvalues[val]) + " for property " +
+                          ComputedIntValuesNames[val] + ".");
         switch (val) {
           default:
             outputBuffer += std::to_string(intvalues[val]) + "\t";
         }
       }
       for (ComputedDoubleValues val : oc.doubleValues) {
-        RUNTIME_EXP_IFN(std::isfinite(doublevalues[val]), "Expect output quantities to be finite, found " + std::to_string(doublevalues[val]) + " for property " + ComputedDoubleValuesNames[val] +".");
+        RUNTIME_EXP_IFN(std::isfinite(doublevalues[val]),
+                        "Expect output quantities to be finite, found " +
+                          std::to_string(doublevalues[val]) + " for property " +
+                          ComputedDoubleValuesNames[val] + ".");
         switch (val) {
           case ComputedDoubleValues::MSD:
             // compute MSD
@@ -460,7 +486,8 @@ namespace calc {
         INVALIDARG_EXP_IFN(
           vals[i].intValues.size() == 0,
           "Correlation of integer values is not supported yet.");
-          INVALIDARG_EXP_IFN(vals[i].outputEvery >= vals[i].useEvery, "Require useEvery to be smaller than output every");
+        INVALIDARG_EXP_IFN(vals[i].outputEvery >= vals[i].useEvery,
+                           "Require useEvery to be smaller than output every");
         num_values_to_correlate += vals[i].doubleValues.size();
       }
       this->autocorrelators.clear();
@@ -483,7 +510,8 @@ namespace calc {
       for (OutputConfiguration c : configs) {
         numAverages += c.doubleValues.size();
         numAverages += c.intValues.size();
-        INVALIDARG_EXP_IFN(c.outputEvery >= c.useEvery, "Require useEvery to be smaller than output every");
+        INVALIDARG_EXP_IFN(c.outputEvery >= c.useEvery,
+                           "Require useEvery to be smaller than output every");
       }
 
       this->runningAverages =
@@ -543,6 +571,11 @@ namespace calc {
     virtual Eigen::VectorXd getBondLengths() = 0;
     virtual Eigen::VectorXd getCoordinates() = 0;
     virtual double getTemperature() = 0;
+    virtual size_t getNumAtoms() = 0;
+    virtual size_t getNumExtraAtoms() = 0;
+    virtual size_t getNumBonds() = 0;
+    virtual size_t getNumExtraBonds() = 0;
+    virtual long int getNumBondsToForm() = 0;
     virtual size_t getNumParticles() = 0;
     virtual double getVolume() = 0;
   };

@@ -432,6 +432,16 @@ namespace calc {
 
       int getNrOfLinks() const { return this->initialConfig.nrOfLinks; }
 
+      size_t getNumBonds() override { return this->getNrOfSprings(); }
+
+      size_t getNumExtraBonds() override { return 0; }
+
+      long int getNumBondsToForm() override { return 0; }
+
+      size_t getNumAtoms() override { return this->getNrOfNodes(); }
+
+      size_t getNumExtraAtoms() override { return this->getNrOfLinks(); }
+
       int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
 
       Eigen::VectorXd getCurrentDisplacements() const

@@ -1200,7 +1200,12 @@ init_pylimer_bound_calc(py::module_& m)
   py::enum_<ComputedIntValues>(m, "ComputedIntValues")
     .value("STEP", ComputedIntValues::STEP)
     .value("NUM_SHIFT", ComputedIntValues::NUM_SHIFT)
-    .value("NUM_RELOC", ComputedIntValues::NUM_RELOC);
+    .value("NUM_RELOC", ComputedIntValues::NUM_RELOC)
+    .value("NUM_ATOMS", ComputedIntValues::NUM_ATOMS)
+    .value("NUM_EXTRA_ATOMS", ComputedIntValues::NUM_EXTRA_ATOMS)
+    .value("NUM_BONDS", ComputedIntValues::NUM_BONDS)
+    .value("NUM_EXTRA_BONDS", ComputedIntValues::NUM_EXTRA_BONDS)
+    .value("NUM_BONDS_TO_FORM", ComputedIntValues::NUM_BONDS_TO_FORM);
 
   py::class_<OutputConfiguration>(m, "OutputConfiguration")
     .def(py::init<>(), "Get an instance of this struct")
