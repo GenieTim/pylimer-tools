@@ -90,8 +90,10 @@ namespace calc {
         bonds.reserve(4);
         this->bondsOfIndex.push_back(bonds);
       }
-      this->bondPartnerCoordinatesA = Eigen::ArrayXi(3 * this->bondPartnersA.size());
-      this->bondPartnerCoordinatesB = Eigen::ArrayXi(3 * this->bondPartnersB.size());
+      this->bondPartnerCoordinatesA =
+        Eigen::ArrayXi(3 * this->bondPartnersA.size());
+      this->bondPartnerCoordinatesB =
+        Eigen::ArrayXi(3 * this->bondPartnersB.size());
       for (size_t i = 0; i < this->numBonds + this->numSlipSprings; ++i) {
         this->bondsOfIndex[this->bondPartnersA[i]].push_back(i);
         this->bondsOfIndex[this->bondPartnersB[i]].push_back(i);
@@ -111,6 +113,8 @@ namespace calc {
           this->isRelocationTarget[i] = true;
         }
       }
+
+      this->resetBondOffsets();
 
       // simulation state
       this->currentVelocitiesPlus = Eigen::VectorXd::Zero(coordinates.size());
@@ -265,6 +269,7 @@ namespace calc {
       this->bondPartnersA.conservativeResize(this->bondPartnersA.size() + 1);
       this->bondPartnersB.conservativeResize(this->bondPartnersB.size() + 1);
       this->bondTypes.conservativeResize(this->bondTypes.size() + 1);
+      this->bondBoxOffsets.conservativeResize(this->bondBoxOffsets.size() + 3);
       assert(this->bondPartnersA.size() == this->bondPartnersB.size());
       assert(this->bondPartnersA.size() == this->bondTypes.size());
       assert(this->bondPartnersA.size() ==
@@ -284,6 +289,8 @@ namespace calc {
             this->bondPartnerCoordinatesA[(i - 1) * 3 + dir];
           this->bondPartnerCoordinatesB[i * 3 + dir] =
             this->bondPartnerCoordinatesB[(i - 1) * 3 + dir];
+          this->bondBoxOffsets[i * 3 + dir] =
+            this->bondBoxOffsets[(i - 1) * 3 + dir];
         }
       }
 
@@ -306,6 +313,7 @@ namespace calc {
       }
       this->bondsOfIndex[fromIdx].push_back(newBondIdx);
       this->bondsOfIndex[toIdx].push_back(newBondIdx);
+      this->resetBondOffset(newBondIdx);
       // TODO: we know that everything is sorted, except for the new -> just
       // insert it where it belongs instead.
       std::sort(this->bondsOfIndex[fromIdx].begin(),
@@ -395,16 +403,18 @@ namespace calc {
       // (attractive) bond forces
       timer.section(DPDPerformanceSections::BOND_FORCE);
       Eigen::VectorXd bondDistances = coords(this->bondPartnerCoordinatesA) -
-                                      coords(this->bondPartnerCoordinatesB);
-      this->box.handlePBC(bondDistances);
-      assert(bondDistances.minCoeff() > -this->box.getL().maxCoeff());
-      assert(bondDistances.maxCoeff() < this->box.getL().maxCoeff());
+                                      coords(this->bondPartnerCoordinatesB) +
+                                      this->bondBoxOffsets;
+      // this->box.handlePBC(bondDistances);
+      // assert(bondDistances.minCoeff() > -this->box.getL().maxCoeff());
+      // assert(bondDistances.maxCoeff() < this->box.getL().maxCoeff());
       forces(this->bondPartnerCoordinatesA) -= this->k * bondDistances;
       forces(this->bondPartnerCoordinatesB) += this->k * bondDistances;
 
       // we use our own parallelization -> disable the one by Eigen
       Eigen::setNbThreads(1);
-#pragma omp parallel for reduction(+ : stressTensor, pressure)
+#pragma omp parallel for reduction(+ : stressTensor, pressure)                 \
+  schedule(static, 16)
       for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
         // attractive force -> reduces pressure in the system
         pressure -= this->k * bondDistances.segment(3 * i, 3).squaredNorm();
@@ -649,6 +659,7 @@ namespace calc {
       this->bondPartnerCoordinatesB.conservativeResize(
         3 * (sizeBefore + partnerB.size()));
       this->bondTypes.conservativeResize(sizeBefore + partnerB.size());
+      this->bondBoxOffsets.conservativeResize(3 * (sizeBefore + partnerA.size()));
 
       this->bondPartnersA.segment(sizeBefore, partnerA.size()) =
         Eigen::Map<Eigen::ArrayXst, Eigen::Unaligned>(partnerA.data(),
@@ -669,6 +680,7 @@ namespace calc {
           this->bondPartnerCoordinatesB[i * 3 + dir] =
             this->bondPartnersB[i] * 3 + dir;
         }
+        this->resetBondOffset(i);
       }
 
       this->numSlipSprings += partnerA.size();
@@ -1079,6 +1091,7 @@ namespace calc {
             3 * partnerAfter + dir;
         }
       }
+      this->resetBondOffset(springIdx);
       // add to the bonds of the new bond partner
       this->bondsOfIndex[partnerAfter].push_back(springIdx);
       // remove from the bonds of the previous bond partner
@@ -1345,6 +1358,9 @@ namespace calc {
       RUNTIME_EXP_IFN(this->bondPartnersB.size() ==
                         this->numBonds + this->numSlipSprings,
                       "State violation: nr of bonds inconsistent.");
+      RUNTIME_EXP_IFN(this->bondBoxOffsets.size() ==
+                        (this->numBonds + this->numSlipSprings) * 3,
+                      "State violation: nr of box bond offsets incorrect.");
       // internal structure
       RUNTIME_EXP_IFN((this->bondPartnersB.array() < this->numAtoms).all(),
                       "State violation: too large indices found (e.g. " +

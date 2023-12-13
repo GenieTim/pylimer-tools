@@ -134,6 +134,7 @@ namespace calc {
       Eigen::ArrayXi bondPartnerCoordinatesB;
       Eigen::ArrayXi bondPartnersB;
       Eigen::ArrayXi bondTypes;
+      Eigen::VectorXd bondBoxOffsets;
       // mapping between atoms and bonds
       std::vector<std::vector<size_t>> bondsOfIndex;
 
@@ -231,8 +232,8 @@ namespace calc {
           this->coordinates(
             this->bondPartnerCoordinatesA.segment(3 * bondIdx, 3)) -
           this->coordinates(
-            this->bondPartnerCoordinatesB.segment(3 * bondIdx, 3));
-        this->box.handlePBC(bondDistances);
+            this->bondPartnerCoordinatesB.segment(3 * bondIdx, 3)) +
+          this->bondBoxOffsets.segment(3 * bondIdx, 3);
         return bondDistances.norm();
       };
 
@@ -487,8 +488,9 @@ namespace calc {
       {
         Eigen::VectorXd bondDistances =
           this->coordinates(this->bondPartnerCoordinatesA) -
-          this->coordinates(this->bondPartnerCoordinatesB);
-        this->box.handlePBC(bondDistances);
+          this->coordinates(this->bondPartnerCoordinatesB) +
+          this->bondBoxOffsets;
+        // this->box.handlePBC(bondDistances);
 
         Eigen::VectorXd bondLengths =
           Eigen::VectorXd::Zero(this->numBonds + this->numSlipSprings);
@@ -583,6 +585,11 @@ namespace calc {
         if (version > 1) {
           ar(isRelocationTarget);
         }
+        if (version > 3) {
+          ar(bondBoxOffsets);
+        } else {
+          this->resetBondOffsets();
+        }
         // neighbourlist
         ar(neighbourlist);
       }
@@ -615,6 +622,29 @@ namespace calc {
       {
         pylimer_tools::utils::serializeToFile<DPDSimulator>(*this, filename);
       };
+
+      /**
+       * @brief Reset the offset required for the PBC bonds,
+       *
+       * This enables us having bonds longer than the box.
+       * However, when calling this function, you reset that fact, i.e., only
+       * call this if you are sure that you currently do not have bonds that
+       * escape the box.
+       *
+       */
+      void resetBondOffsets()
+      {
+        this->bondBoxOffsets =
+          this->box.getOffset(this->coordinates(this->bondPartnerCoordinatesA) -
+                              this->coordinates(this->bondPartnerCoordinatesB));
+      }
+
+      void resetBondOffset(int bondIdx)
+      {
+        this->bondBoxOffsets.segment(bondIdx * 3, 3) = this->box.getOffset(
+          this->coordinates.segment(3 * this->bondPartnersA[bondIdx], 3) -
+          this->coordinates.segment(3 * this->bondPartnersB[bondIdx], 3));
+      }
     };
   };
 }
@@ -624,6 +654,6 @@ CEREAL_REGISTER_TYPE(pylimer_tools::calc::dpd::DPDSimulator);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(
   pylimer_tools::calc::OutputSupportingSimulation,
   pylimer_tools::calc::dpd::DPDSimulator);
-CEREAL_CLASS_VERSION(pylimer_tools::calc::dpd::DPDSimulator, 3);
+CEREAL_CLASS_VERSION(pylimer_tools::calc::dpd::DPDSimulator, 4);
 
 #endif
