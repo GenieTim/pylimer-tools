@@ -112,7 +112,8 @@ namespace utils {
       if (nrOfDihedralAngleTypes < 1) {
         nrOfDihedralAngleTypes = 1;
       }
-      if (!this->includeDihedralAngles) {
+      if (!this->includeDihedralAngles ||
+          dihedral_angles["dihedral_angle_type"].size() == 0) {
         nrOfDihedralAngleTypes = 0;
       }
 
@@ -120,6 +121,9 @@ namespace utils {
         pylimer_tools::utils::max_element<long int>(bonds["bond_type"], 0);
       if (nrOfBondTypes < 1) {
         nrOfBondTypes = 1;
+      }
+      if (bonds["bond_from"].size() == 0) {
+        nrOfBondTypes = 0;
       }
 
       file.open(filePath, std::ios::out | std::ios::trunc);

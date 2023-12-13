@@ -602,6 +602,10 @@ namespace calc {
         return res;
       };
 
+      void writeRestartFile(std::string& filename) override
+      {
+        pylimer_tools::utils::serializeToFile<DPDSimulator>(*this, filename);
+      };
     protected:
       void addSlipSprings(std::vector<size_t>& partnerA,
                           std::vector<size_t>& partnerB,
@@ -618,10 +622,6 @@ namespace calc {
                                     const size_t partnerBefore,
                                     const size_t partnerAfter);
 
-      void writeRestartFile(std::string& filename) override
-      {
-        pylimer_tools::utils::serializeToFile<DPDSimulator>(*this, filename);
-      };
 
       /**
        * @brief Reset the offset required for the PBC bonds,

@@ -120,31 +120,33 @@ namespace utils {
           break;
       }
 
-      if (!getline(file, line)) {
+      if (!getline(file, line) && i < this->nAtoms - 1) {
         throw std::runtime_error(
-          "Data file ended too early. Not enough atoms read.");
+          "Data file ended too early. Not enough atoms read. Read " +
+          std::to_string(i) + " of " + std::to_string(this->nAtoms) + ".");
       }
     }
 
     // Then, read bonds
-    this->skipLinesToContains(line, file, "Bonds");
-    // skip this line too
-    if (!getline(file, line)) {
-      throw std::runtime_error(
-        "Data file ended too early. Not able to read any bonds.");
-    }
-    // then, skip empty lines
-    this->skipEmptyLines(line, file);
-
-    for (int i = 0; i < this->nBonds; i++) {
-      this->readBond(line);
-
-      if (!getline(file, line) && i + 1 < this->nBonds) {
+    if (this->nBonds > 0) {
+      this->skipLinesToContains(line, file, "Bonds");
+      // skip this line too
+      if (!getline(file, line)) {
         throw std::runtime_error(
-          "Data file ended too early. Not enough bonds read.");
+          "Data file ended too early. Not able to read any bonds.");
+      }
+      // then, skip empty lines
+      this->skipEmptyLines(line, file);
+
+      for (int i = 0; i < this->nBonds; i++) {
+        this->readBond(line);
+
+        if (!getline(file, line) && i + 1 < this->nBonds) {
+          throw std::runtime_error(
+            "Data file ended too early. Not enough bonds read.");
+        }
       }
     }
-
     // Then, read angles
     if (this->nAngles > 0) {
       this->skipLinesToContains(line, file, "Angles");
@@ -214,7 +216,7 @@ namespace utils {
     } while (getline(file, line));
   }
 
-  void DataFileParser::readNs(const std::string line)
+  void DataFileParser::readNs(const std::string &line)
   {
     if (contains(line, "atoms")) {
       this->nAtoms = (this->parseTypesInLine<int>(line, 1))[0];
@@ -247,9 +249,8 @@ namespace utils {
     }
   }
 
-  void DataFileParser::readMass(const std::string line)
+  void DataFileParser::readMass(const std::string &line)
   {
-    int iteration = 0;
     int key = 0;
     pylimer_tools::utils::CsvTokenizer tokenizer(line);
     if (tokenizer.getLength() != 2) {
@@ -262,7 +263,7 @@ namespace utils {
     this->masses[key] = tokenizer.get<double>(1);
   }
 
-  void DataFileParser::readAtomFull(std::string line)
+  void DataFileParser::readAtomFull(const std::string &line)
   {
     size_t atomId, nx, ny, nz;
     int atomType, moleculeId;
@@ -296,10 +297,10 @@ namespace utils {
     }
   }
 
-  void DataFileParser::readAtomCharge(std::string line)
+  void DataFileParser::readAtomCharge(const std::string &line)
   {
     size_t atomId, nx, ny, nz;
-    int atomType, moleculeId;
+    int atomType;
     double charge;
     double x, y, z;
     int resFound = sscanf(line.c_str(),
@@ -315,7 +316,7 @@ namespace utils {
                           &nz);
 
     this->atomIds.push_back(atomId);
-    this->moleculeIds.push_back(moleculeId);
+    this->moleculeIds.push_back(0);
     this->atomTypes.push_back(atomType);
     this->atomX.push_back(x);
     this->atomY.push_back(y);
@@ -329,13 +330,13 @@ namespace utils {
     }
   }
 
-  void DataFileParser::readAtom(std::string line)
+  void DataFileParser::readAtom(const std::string &line)
   {
     size_t atomId, nx, ny, nz;
     int atomType, moleculeId;
     double x, y, z;
     int resFound = sscanf(line.c_str(),
-                          "%zd %d %d %le %le %le %zd %zd %zd",
+                          "%lu %d %d %le %le %le %lu %lu %lu",
                           &atomId,
                           &moleculeId,
                           &atomType,
@@ -360,7 +361,7 @@ namespace utils {
     }
   }
 
-  void DataFileParser::readAtomHybrid(std::string line,
+  void DataFileParser::readAtomHybrid(const std::string &line,
                                       AtomStyle style1,
                                       AtomStyle style2)
   {
@@ -402,7 +403,7 @@ namespace utils {
     }
   }
 
-  void DataFileParser::readBond(std::string line)
+  void DataFileParser::readBond(const std::string &line)
   {
     size_t bondId, bondType, bondFrom, bondTo;
     sscanf(
@@ -413,7 +414,7 @@ namespace utils {
     this->bondTo.push_back(bondTo);
   }
 
-  void DataFileParser::readAngle(std::string line)
+  void DataFileParser::readAngle(const std::string &line)
   {
     size_t angleId, angleType, angleFrom, angleVia, angleTo;
     sscanf(line.c_str(),
@@ -431,7 +432,7 @@ namespace utils {
     this->angleTo.push_back(angleTo);
   }
 
-  void DataFileParser::readDihedralAngle(std::string line)
+  void DataFileParser::readDihedralAngle(const std::string &line)
   {
     size_t angleId, angleType, angleFrom, angleVia1, angleVia2, angleTo;
     sscanf(line.c_str(),
