@@ -190,6 +190,13 @@ namespace entities {
       this->minImageDistance(coords);
     }
 
+    Eigen::MatrixXd getOffset(const Eigen::VectorXd& coords) const
+    {
+      return -(this->L.replicate(coords.size() / 3, 1) *
+              (coords.array() * this->oneOverL.replicate(coords.size() / 3, 1))
+                .rint()).matrix();
+    }
+
     template<typename VectorType>
     void adjustCoordinatesTo(VectorType& coords, const Box& newBox) const
     {
