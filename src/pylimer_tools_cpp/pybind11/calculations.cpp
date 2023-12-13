@@ -1428,13 +1428,26 @@ init_pylimer_bound_calc(py::module_& m)
     .def("getTimestep", &dpd::DPDSimulator::getTimestep)
     .def("getCurrentTimestep", &dpd::DPDSimulator::getCurrentTimestep)
     .def("getTemperature", &dpd::DPDSimulator::getTemperature)
+    .def("getBondLengths", &dpd::DPDSimulator::getBondLengths)
+    .def("getCoordinates", &dpd::DPDSimulator::getCoordinates)
     .def("getSpringConstant", &dpd::DPDSimulator::getSpringConstant)
     .def("getShiftOneAtATime", &dpd::DPDSimulator::getShiftOneAtATime)
     .def("getNumSlipSprings", &dpd::DPDSimulator::getNumSlipSprings)
+    .def("getStressTensor", &dpd::DPDSimulator::getStressTensor)
     .def("getNumStepsDPD", &dpd::DPDSimulator::getNumStepsDPD)
     .def("getNumStepsMC", &dpd::DPDSimulator::getNumStepsMC)
     .def("getShiftPossibilityEmpty",
          &dpd::DPDSimulator::getShiftPossibilityEmpty)
+    .def("writeRestartFile",
+         &dpd::DPDSimulator::writeRestartFile,
+         R"pbdoc(
+          Explicitily force the writing of a restart file, now!
+
+          Arguments:
+          - file (str): the file path and name of the restart file to be written.
+               Can end in xml, json or anything else (-> binary).
+     )pbdoc",
+         py::arg("file"))
     .def("validateNeighbourList", &dpd::DPDSimulator::validateNeighbourlist)
     .def("validateState", &dpd::DPDSimulator::validateState);
 }

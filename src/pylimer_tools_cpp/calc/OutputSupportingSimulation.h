@@ -367,7 +367,6 @@ namespace calc {
       }
     }
 
-    virtual void writeRestartFile(std::string& filename) = 0;
     // static OutputSupportingSimulation readRestartFile(std::string filename)
     // {
     //   throw std::runtime_error(
@@ -476,6 +475,8 @@ namespace calc {
       this->outputBuffer.reserve(600);
     }
 
+    virtual void writeRestartFile(std::string& filename) = 0;
+    
     void configAutoCorrelatorOutput(std::vector<OutputConfiguration>& vals,
                                     const unsigned int numcorrin = 32,
                                     const unsigned int pin = 16,

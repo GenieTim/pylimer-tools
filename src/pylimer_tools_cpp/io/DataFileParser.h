@@ -117,17 +117,17 @@ namespace utils {
     double getLz() { return this->zHi - this->zLo; }
 
   private:
-    void readNs(const std::string line);
-    void readMass(const std::string line);
+    void readNs(const std::string &line);
+    void readMass(const std::string &line);
     // different atom styles
-    void readAtom(std::string line);
-    void readAtomFull(std::string line);
-    void readAtomCharge(std::string line);
-    void readAtomHybrid(std::string line, AtomStyle style1, AtomStyle style2);
+    void readAtom(const std::string &line);
+    void readAtomFull(const std::string &line);
+    void readAtomCharge(const std::string& line);
+    void readAtomHybrid(const std::string &line, AtomStyle style1, AtomStyle style2);
     // bonds, angles, etc.
-    void readBond(std::string line);
-    void readAngle(std::string line);
-    void readDihedralAngle(std::string line);
+    void readBond(const std::string &line);
+    void readAngle(const std::string &line);
+    void readDihedralAngle(const std::string &line);
 
     // utilities
     static void skipEmptyLines(std::string& line, std::ifstream& file);
@@ -136,7 +136,7 @@ namespace utils {
                                     std::string upTo);
 
     template<typename OUT>
-    inline std::vector<OUT> parseTypesInLine(const std::string line,
+    inline std::vector<OUT> parseTypesInLine(const std::string &line,
                                              int nToRead)
     {
       std::vector<OUT> resultnumbers;
