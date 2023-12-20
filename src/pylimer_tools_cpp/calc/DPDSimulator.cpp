@@ -206,11 +206,13 @@ namespace calc {
 
         // deformation
         if (this->doDeformation) {
-          pe::Box previousBox = this->box;
+          pylimer_tools::entities::Box previousBox = this->box;
           this->box = originalBox.interpolate(this->deformationTargetBox,
                                               static_cast<double>(step) /
                                                 static_cast<double>(nSteps));
-          this->bondBoxOffsets
+          this->bondBoxOffsets *= (this->box.getL() / previousBox.getL())
+                                    .replicate(this->numBonds, 1)
+                                    .matrix();
         }
 
         // bond formation
@@ -943,8 +945,8 @@ namespace calc {
       // compute the Metropolis criterion
       Eigen::Vector3d bondDistanceNow =
         (this->coordinates.segment(partnerA * 3, 3) -
-         this->coordinates.segment(partnerB * 3, 3))
-         + this->bondBoxOffsets.segment(3*springIdx, 3);
+         this->coordinates.segment(partnerB * 3, 3)) +
+        this->bondBoxOffsets.segment(3 * springIdx, 3);
       double bondEnergyNow = this->k * bondDistanceNow.squaredNorm();
       Eigen::Vector3d bondDistanceNew =
         (this->coordinates.segment(newPartnerA * 3, 3) -
