@@ -34,6 +34,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Molecule
       ~Molecule.getAtomsOfDegree
       ~Molecule.getAtomsOfType
       ~Molecule.getBonds
+      ~Molecule.getConnectedAtoms
       ~Molecule.getEdges
       ~Molecule.getIdxByAtomId
       ~Molecule.getKey

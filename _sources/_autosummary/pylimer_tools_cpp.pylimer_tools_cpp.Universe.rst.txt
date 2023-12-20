@@ -58,6 +58,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Universe
       ~Universe.getBox
       ~Universe.getChainsWithCrosslinker
       ~Universe.getClusters
+      ~Universe.getConnectedAtoms
       ~Universe.getEdges
       ~Universe.getIdxByAtomId
       ~Universe.getMasses

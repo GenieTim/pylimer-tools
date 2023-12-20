@@ -35,20 +35,27 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.DPDSimulator
       ~DPDSimulator.configSpringConstant
       ~DPDSimulator.configStepOutput
       ~DPDSimulator.createSlipSprings
+      ~DPDSimulator.getBondLengths
+      ~DPDSimulator.getCoordinates
+      ~DPDSimulator.getCurrentTimestep
+      ~DPDSimulator.getNrOfBondsToForm
       ~DPDSimulator.getNumSlipSprings
       ~DPDSimulator.getNumStepsDPD
       ~DPDSimulator.getNumStepsMC
       ~DPDSimulator.getShiftOneAtATime
       ~DPDSimulator.getShiftPossibilityEmpty
       ~DPDSimulator.getSpringConstant
+      ~DPDSimulator.getStressTensor
       ~DPDSimulator.getTemperature
       ~DPDSimulator.getTimestep
       ~DPDSimulator.getUniverse
       ~DPDSimulator.readRestartFile
+      ~DPDSimulator.refreshCurrentState
       ~DPDSimulator.runSimulation
       ~DPDSimulator.startMeasuringMSDForAtoms
       ~DPDSimulator.validateNeighbourList
       ~DPDSimulator.validateState
+      ~DPDSimulator.writeRestartFile
    
    
 
