@@ -312,9 +312,9 @@ namespace calc {
         if (outputFrequency > 0 && iterationsDone % outputFrequency == 0) {
           this->handleOutput(iterationsDone);
         }
-      } while (
-        currentResidual / initialResidual > xtol &&
-        iterationsDone<maxNrOfSteps&& this->initialConfig.nrOfSprings> 0);
+      } while (currentResidual / initialResidual > xtol &&
+               iterationsDone < maxNrOfSteps &&
+               this->initialConfig.nrOfSprings > 0);
 
       // query solution & exit reason
       this->exitReason = (iterationsDone == maxNrOfSteps)
@@ -4935,7 +4935,14 @@ namespace calc {
         Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
       ArrayXb springIsActive =
         this->findActiveSprings(this->currentPartialSpringDistances, tolerance);
-      for (size_t i = 0; i < this->initialConfig.nrOfPartialSprings; i++) {
+      RUNTIME_EXP_IFN(
+        springIsActive.size() == this->initialConfig.nrOfPartialSprings,
+        "Expect findActiveSprings to return an "
+        "appropriately sized result. Got only " +
+          std::to_string(springIsActive.size()) + " entries for " +
+          std::to_string(this->initialConfig.nrOfPartialSprings) +
+          " partial springs.");
+      for (size_t i = 0; i < this->initialConfig.nrOfPartialSprings; ++i) {
         if (springIsActive[i] == true) /* active spring */
         {
           int a = this->initialConfig.springPartIndexA[i];
