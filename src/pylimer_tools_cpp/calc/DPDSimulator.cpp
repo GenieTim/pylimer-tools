@@ -206,9 +206,11 @@ namespace calc {
 
         // deformation
         if (this->doDeformation) {
+          pe::Box previousBox = this->box;
           this->box = originalBox.interpolate(this->deformationTargetBox,
                                               static_cast<double>(step) /
                                                 static_cast<double>(nSteps));
+          this->bondBoxOffsets
         }
 
         // bond formation

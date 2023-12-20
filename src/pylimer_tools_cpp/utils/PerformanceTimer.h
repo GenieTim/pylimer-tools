@@ -74,20 +74,28 @@ namespace utils {
       this->printLine();
     }
 
-    void printSection(const unsigned int idx, const double total) const
-    {
+    std::pair<std::string, double> formatTime(const double us_time) const {
       std::string unit = "µs";
-      double conversionFactor = 0.0;
-      if (total > 1e9) {
+      double conversionFactor = 1.;
+      if (us_time > 1e9) {
         unit = "h";
         conversionFactor = 1. / (1e6 * 60 * 60);
-      } else if (total > 1e6) {
+      } else if (us_time > 1e6) {
         unit = "s";
         conversionFactor = 1. / 1e6;
-      } else if (total > 1e3) {
+      } else if (us_time > 1e3) {
         unit = "ms";
         conversionFactor = 1. / 1e3;
       }
+
+      return std::make_pair(unit, conversionFactor);
+    }
+
+    void printSection(const unsigned int idx, const double total) const
+    {
+      std::pair<std::string, double> timeConversion = this->formatTime(total);
+      std::string unit = timeConversion.first;
+      double conversionFactor = timeConversion.second;
 
       this->printLeftWithWidth(this->sectionNames[idx], this->col1width);
       this->printLeftWithWidth(this->sectionNumMeasurements[idx],
@@ -231,11 +239,14 @@ namespace utils {
 
       std::cout << "\n";
 
+      std::pair<std::string, double> totalTimeConversion = this->formatTime(total);
+      // std::pair<double, std::string> meanTimeConversion = this->formatTime(total/(static_cast<double>(numMeasurements)));
+
 #ifdef OPENMP_FOUND
       std::cout << "OpenMP: " << omp_get_max_threads() << " threads."
                 << std::endl;
 #endif
-      std::cout << "Total: " << total << " µs per one of " << numMeasurements
+      std::cout << "Total: " << (total*totalTimeConversion.second) << " "<<totalTimeConversion.first << " for " << numMeasurements
                 << " measurements." << std::endl;
     }
   };
