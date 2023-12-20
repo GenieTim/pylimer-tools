@@ -8,6 +8,9 @@
 #include <filesystem>
 #include <iostream>
 #include <string>
+#ifdef OPENMP_FOUND
+#include <omp.h>
+#endif
 
 namespace pe = pylimer_tools::entities;
 namespace pc = pylimer_tools::calc;
@@ -376,7 +379,8 @@ TEST_CASE("DPD Simulator Converts Correctly", "[analysis][DPDSimulator]")
   }
 }
 
-TEST_CASE("DPD Simulator's restart files are accurate", "[analysis][DPDSimulator]")
+TEST_CASE("DPD Simulator's restart files are accurate",
+          "[analysis][DPDSimulator]")
 {
   // note that the random force might lead to deviations compared to LAMMPS
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -394,19 +398,53 @@ TEST_CASE("DPD Simulator's restart files are accurate", "[analysis][DPDSimulator
       pcd::DPDSimulator(universe, 2, 9, false, "14th_seed");
 
     simulator.createSlipSprings(100, 2);
-    
+
     std::string restartFile = "restartFile-for-accuracy-test.bin";
     simulator.writeRestartFile(restartFile);
 
     REQUIRE(std::filesystem::exists(restartFile));
 
     pcd::DPDSimulator sim2 = pcd::DPDSimulator::readRestartFile(restartFile);
-    
+
+    std::remove(restartFile.c_str());
+
+#ifdef OPENMP_FOUND
+// we cannot have more than 1 thread, otherwise the random number generator will not play nicely.
+    omp_set_num_threads(1);
+#endif
+    CHECK(simulator.getCoordinates().isApprox(sim2.getCoordinates()));
+    CHECK(simulator.getBondLengths().isApprox(sim2.getBondLengths()));
+    CHECK(simulator.getStressTensor().isApprox(sim2.getStressTensor()));
+    CHECK(sim2.getTemperature() == simulator.getTemperature());
+    CHECK_NOTHROW(sim2.validateState());
+
+    for (size_t i = 0; i < 1000; ++i) {
+      CHECK(sim2.getUniformRandBetween0And1() ==
+            simulator.getUniformRandBetween0And1());
+      CHECK(sim2.getUniformRandMean0Std1() ==
+            simulator.getUniformRandMean0Std1());
+    }
+
+    simulator.refreshCurrentState();
+    sim2.refreshCurrentState();
+
+    CHECK(simulator.getCoordinates().isApprox(sim2.getCoordinates()));
+    CHECK(simulator.getBondLengths().isApprox(sim2.getBondLengths()));
+    CHECK(simulator.getStressTensor().isApprox(sim2.getStressTensor()));
+    CHECK(sim2.getTemperature() == simulator.getTemperature());
+
+    for (size_t i = 0; i < 10; ++i) {
+      CHECK(sim2.getUniformRandBetween0And1() ==
+            simulator.getUniformRandBetween0And1());
+      CHECK(sim2.getUniformRandMean0Std1() ==
+            simulator.getUniformRandMean0Std1());
+    }
+
+    simulator.runSimulation(5, false);
+    sim2.runSimulation(5, false);
+
     CHECK(simulator.getCoordinates().isApprox(sim2.getCoordinates()));
     CHECK(simulator.getBondLengths().isApprox(sim2.getBondLengths()));
     CHECK(sim2.getTemperature() == simulator.getTemperature());
-    CHECK_NOTHROW(sim2.validateState());
-    std::remove(restartFile.c_str());
   }
 }
-
