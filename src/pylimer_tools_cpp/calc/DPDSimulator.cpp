@@ -661,7 +661,8 @@ namespace calc {
       this->bondPartnerCoordinatesB.conservativeResize(
         3 * (sizeBefore + partnerB.size()));
       this->bondTypes.conservativeResize(sizeBefore + partnerB.size());
-      this->bondBoxOffsets.conservativeResize(3 * (sizeBefore + partnerA.size()));
+      this->bondBoxOffsets.conservativeResize(3 *
+                                              (sizeBefore + partnerA.size()));
 
       this->bondPartnersA.segment(sizeBefore, partnerA.size()) =
         Eigen::Map<Eigen::ArrayXst, Eigen::Unaligned>(partnerA.data(),
@@ -1001,8 +1002,12 @@ namespace calc {
       // attempt to shift the spring around partnerA
       int distr_limit = this->idxFunctionalities[partnerA] - 1;
       if (distr_limit < 0) {
-        RUNTIME_EXP_IFN(this->atomTypes[partnerA] == this->crosslinkerType,
-                        "Only cross-links are allowed to be single beads.");
+        RUNTIME_EXP_IFN(
+          this->atomTypes[partnerA] == this->crosslinkerType,
+          "Only cross-links are allowed to be single beads. Found bead " +
+            std::to_string(partnerA) + " to have type " +
+            std::to_string(this->atomTypes[partnerA]) + " with functionality " +
+            std::to_string(distr_limit) + ".");
         return false;
       }
       RUNTIME_EXP_IFN(distr_limit >= 0,
@@ -1315,9 +1320,13 @@ namespace calc {
         }
         RUNTIME_EXP_IFN(this->idxFunctionalities[i] == num_actual_bonds,
                         "State violation: inconsistent idx functionalities");
-        RUNTIME_EXP_IFN(this->idxFunctionalities[i] >= 1 ||
-                          this->atomTypes[i] == this->crosslinkerType,
-                        "Single beads are only supported as cross-links yet.");
+        RUNTIME_EXP_IFN(
+          this->idxFunctionalities[i] >= 1 ||
+            this->atomTypes[i] == this->crosslinkerType,
+          "Only cross-links are allowed to be single beads. Found bead " +
+            std::to_string(i) + " to have type " +
+            std::to_string(this->atomTypes[i]) + " with functionality " +
+            std::to_string(this->idxFunctionalities[i]) + ".");
         if (this->idxFunctionalities[i] == 1) {
           RUNTIME_EXP_IFN(
             this->isRelocationTarget[i],
