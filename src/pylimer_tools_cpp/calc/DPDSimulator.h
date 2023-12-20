@@ -413,9 +413,10 @@ namespace calc {
           for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
             // loop neighbours to find applicable partner
             const size_t j = neighbors[neigh_idx];
-            double r2 = (this->coordinates.segment(3 * atom_idx, 3) -
-                         this->coordinates.segment(3 * j, 3))
-                          .norm();
+            Eigen::Vector3d vec = this->coordinates.segment(3 * atom_idx, 3) -
+                                  this->coordinates.segment(3 * j, 3);
+            this->box.handlePBC(vec);
+            double r2 = (vec).norm();
             if (r2 <= cutoff && atom_idx != j &&
                 (this->idxFunctionalities[j] <
                  this->maxBondsPerType[this->atomTypes[j]]) &&
@@ -513,6 +514,12 @@ namespace calc {
       // validation
       void validateState();
       void validateNeighbourlist(double cutoff);
+      double getUniformRandMean0Std1() {
+        return this->uniform_rand_mean0std1(this->e2);
+      }
+      double getUniformRandBetween0And1() {
+        return this->uniform_rand_between_0_1(this->e2);
+      }
 
       ////////////////////////////////////////////////////////////////
       // serialization
@@ -606,6 +613,7 @@ namespace calc {
       {
         pylimer_tools::utils::serializeToFile<DPDSimulator>(*this, filename);
       };
+
     protected:
       void addSlipSprings(std::vector<size_t>& partnerA,
                           std::vector<size_t>& partnerB,
@@ -621,7 +629,6 @@ namespace calc {
       void replaceSlipSpringPartner(const size_t springIdx,
                                     const size_t partnerBefore,
                                     const size_t partnerAfter);
-
 
       /**
        * @brief Reset the offset required for the PBC bonds,

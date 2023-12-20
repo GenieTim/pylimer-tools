@@ -941,8 +941,8 @@ namespace calc {
       // compute the Metropolis criterion
       Eigen::Vector3d bondDistanceNow =
         (this->coordinates.segment(partnerA * 3, 3) -
-         this->coordinates.segment(partnerB * 3, 3));
-      this->box.handlePBC(bondDistanceNow);
+         this->coordinates.segment(partnerB * 3, 3))
+         + this->bondBoxOffsets.segment(3*springIdx, 3);
       double bondEnergyNow = this->k * bondDistanceNow.squaredNorm();
       Eigen::Vector3d bondDistanceNew =
         (this->coordinates.segment(newPartnerA * 3, 3) -
