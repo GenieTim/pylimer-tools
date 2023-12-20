@@ -375,3 +375,38 @@ TEST_CASE("DPD Simulator Converts Correctly", "[analysis][DPDSimulator]")
     }
   }
 }
+
+TEST_CASE("DPD Simulator's restart files are accurate", "[analysis][DPDSimulator]")
+{
+  // note that the random force might lead to deviations compared to LAMMPS
+  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  REQUIRE(std::filesystem::exists(suspectedPath));
+
+  std::string inputFile = suspectedPath + "melt_83_a_100.structure.out";
+  if (std::filesystem::exists(inputFile)) {
+    pe::UniverseSequence universeSequence = pe::UniverseSequence();
+    REQUIRE(universeSequence.getLength() == 0);
+    universeSequence.initializeFromDataSequence({ { inputFile } });
+    REQUIRE(universeSequence.getLength() == 1);
+    pe::Universe universe = universeSequence.atIndex(0);
+
+    pcd::DPDSimulator simulator =
+      pcd::DPDSimulator(universe, 2, 9, false, "14th_seed");
+
+    simulator.createSlipSprings(100, 2);
+    
+    std::string restartFile = "restartFile-for-accuracy-test.bin";
+    simulator.writeRestartFile(restartFile);
+
+    REQUIRE(std::filesystem::exists(restartFile));
+
+    pcd::DPDSimulator sim2 = pcd::DPDSimulator::readRestartFile(restartFile);
+    
+    CHECK(simulator.getCoordinates().isApprox(sim2.getCoordinates()));
+    CHECK(simulator.getBondLengths().isApprox(sim2.getBondLengths()));
+    CHECK(sim2.getTemperature() == simulator.getTemperature());
+    CHECK_NOTHROW(sim2.validateState());
+    std::remove(restartFile.c_str());
+  }
+}
+
