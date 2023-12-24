@@ -2,7 +2,7 @@
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
-#include "../utils/MemoryUtil.h"
+// #include "../utils/MemoryUtil.h"
 #include <Eigen/Dense>
 #include <algorithm>
 #include <array>
@@ -1203,8 +1203,8 @@ namespace calc {
      */
     size_t MEHPForceBalance::addSliplinksBasedOnCycles(const int maxLoopLength)
     {
-      std::cout << "Detecting slip-links based on cycles. Base memory useage: "
-                << getCurrentRSS() << ", peak " << getPeakRSS() << std::endl;
+      // std::cout << "Detecting slip-links based on cycles. Base memory useage: "
+      //           << getCurrentRSS() << ", peak " << getPeakRSS() << std::endl;
       std::vector<std::vector<long int>> loopEdges;
       std::vector<std::vector<long int>> loops = this->universe.findLoops(
         this->crosslinkerType, maxLoopLength, false, &loopEdges);
@@ -1285,8 +1285,8 @@ namespace calc {
                                            reducedLoop.end());
         reducedLoops.push_back(reducedLoopVec);
       }
-      std::cout << "After finding loops, memory useage: " << getCurrentRSS()
-                << ", peak " << getPeakRSS() << std::endl;
+      // std::cout << "After finding loops, memory useage: " << getCurrentRSS()
+      //           << ", peak " << getPeakRSS() << std::endl;
 
       // fetch some data to later estimate alpha & beta
       std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
@@ -1309,8 +1309,8 @@ namespace calc {
         }
       }
 
-      std::cout << "After mapping chains again, memory useage: "
-                << getCurrentRSS() << ", peak " << getPeakRSS() << std::endl;
+      // std::cout << "After mapping chains again, memory useage: "
+      //           << getCurrentRSS() << ", peak " << getPeakRSS() << std::endl;
 
       // the resulting vectors to fill
       std::unordered_map<long int, long int> intersectionsOfEdges;
@@ -1422,11 +1422,11 @@ namespace calc {
 
         // make space: cleanup the loop i
         loops[i] = std::vector<long int>();
-        std::cout
-          << "After checking intersections of loop " << i << " ("
-          << relevantIntersections.size()
-          << " relevant intersections found in total yet), memory useage: "
-          << getCurrentRSS() << ", peak " << getPeakRSS() << std::endl;
+        // std::cout
+        //   << "After checking intersections of loop " << i << " ("
+        //   << relevantIntersections.size()
+        //   << " relevant intersections found in total yet), memory useage: "
+        //   << getCurrentRSS() << ", peak " << getPeakRSS() << std::endl;
       }
 
       // Actually make them into slip-links...
