@@ -391,13 +391,16 @@ namespace calc {
       void attemptBondFormation()
       {
         double cutoff = this->bondFormationDistance;
+        int bondsFormed = 0;
         // allocate possible neighbours
         Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
           this->numAtoms *
           (std::ceil((3.1 * cutoff) * (3.1 * cutoff) * (3.1 * cutoff)) /
            this->box.getVolume())));
+        std::vector<int> possibleCandidates;
         // iterate atoms - we want to start from the cross-links
         for (size_t atom_idx = 0; atom_idx < this->numAtoms; ++atom_idx) {
+          possibleCandidates.clear();
           if (this->atomTypes[atom_idx] != this->atomTypeBondFormationFrom) {
             continue;
           }
@@ -409,7 +412,6 @@ namespace calc {
           // find neighbours
           int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
             neighbors, this->coordinates.segment(3 * atom_idx, 3), cutoff);
-          std::vector<int> possibleCandidates;
           for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
             // loop neighbours to find applicable partner
             const size_t j = neighbors[neigh_idx];
@@ -438,9 +440,14 @@ namespace calc {
             possibleCandidates[0],
             this->slipspringBondType == 3 ? 4 : 3); // TODO: decide on bond type
           this->bondsToForm -= 1;
+          bondsFormed += 1;
           if (this->bondsToForm <= 0) {
             break;
           }
+        }
+
+        if (bondsFormed > 0) {
+          this->validateState();
         }
       }
 
@@ -514,10 +521,12 @@ namespace calc {
       // validation
       void validateState();
       void validateNeighbourlist(double cutoff);
-      double getUniformRandMean0Std1() {
+      double getUniformRandMean0Std1()
+      {
         return this->uniform_rand_mean0std1(this->e2);
       }
-      double getUniformRandBetween0And1() {
+      double getUniformRandBetween0And1()
+      {
         return this->uniform_rand_between_0_1(this->e2);
       }
 

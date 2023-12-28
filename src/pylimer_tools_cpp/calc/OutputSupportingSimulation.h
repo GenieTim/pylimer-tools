@@ -41,14 +41,8 @@ namespace calc {
 
   const std::array<std::string, NUM_COMPUTABLE_INT_VALUES>
     ComputedIntValuesNames = {
-      "Step",
-      "numShift",
-      "numReloc",
-      "numAtoms",
-      "numExtraAtoms",
-      "numBonds",
-      "numExtraBonds",
-      "numBondsToForm",
+      "Step",          "numShift", "numReloc",      "numAtoms",
+      "numExtraAtoms", "numBonds", "numExtraBonds", "numBondsToForm",
     };
 
 #define NUM_COMPUTABLE_DOUBLE_VALUES 17
@@ -147,6 +141,7 @@ namespace calc {
     std::vector<Eigen::VectorXd> msdOrigins;
     std::vector<size_t> msdOriginTimesteps;
     std::vector<double> runningAverages;
+    int numStepsInAverage = 0;
 
     void prepareAllOutputs()
     {
@@ -248,16 +243,19 @@ namespace calc {
       }
 
       // compute averages
-      size_t msdIdx = 0;
       if (doAverage) {
-        int averagesIdx = 0;
+        size_t msdIdx = 0;
+        size_t averagesIdx = 0;
         for (OutputConfiguration oc : this->outputAverageConfigs) {
+          size_t previousAverageIdx = averagesIdx;
           if ((currentStep % oc.useEvery) == 0) {
+            this->numStepsInAverage += (averagesIdx == 0 ? 1 : 0);
+            double multiplier = (static_cast<double>(oc.useEvery) /
+                                 static_cast<double>(oc.outputEvery));
             for (ComputedIntValues val : oc.intValues) {
               switch (val) {
                 default:
-                  runningAverages[averagesIdx] +=
-                    intvalues[val] / static_cast<double>(oc.outputEvery);
+                  runningAverages[averagesIdx] += intvalues[val] * multiplier;
                   averagesIdx += 1;
                   break;
               }
@@ -275,7 +273,7 @@ namespace calc {
                       (static_cast<double>(
                         this->msdMeasuredIndices[msdIdx].size() / 3.));
                     runningAverages[averagesIdx + msdIdx] +=
-                      result / static_cast<double>(oc.outputEvery);
+                      result * multiplier;
                   }
                   averagesIdx += msdIdx;
                   break;
@@ -290,9 +288,12 @@ namespace calc {
 
           // check (and if, output) averages
           if (currentStep % oc.outputEvery == 0) {
+            if (previousAverageIdx == 0) {
+              assert(this->numStepsInAverage == oc.outputEvery / oc.useEvery);
+            }
             // output & start again
             outputBuffer += std::to_string(intvalues[ComputedIntValues::STEP]);
-            for (size_t i = 0; i < runningAverages.size(); ++i) {
+            for (size_t i = previousAverageIdx; i < averagesIdx; ++i) {
               outputBuffer += "\t" + std::to_string(runningAverages[i]);
               runningAverages[i] = 0.;
             }
@@ -383,10 +384,11 @@ namespace calc {
      * @param coordinates
      * @param streamIdx
      */
-    inline void doOutputValues(OutputConfiguration& oc,
-                               std::array<long int, NUM_COMPUTABLE_INT_VALUES>& intvalues,
-                               std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES>& doublevalues,
-                               int streamIdx = 0)
+    inline void doOutputValues(
+      OutputConfiguration& oc,
+      std::array<long int, NUM_COMPUTABLE_INT_VALUES>& intvalues,
+      std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES>& doublevalues,
+      int streamIdx = 0)
     {
       assert(streamIdx <= this->outputStreams.size());
       for (ComputedIntValues val : oc.intValues) {
@@ -476,7 +478,7 @@ namespace calc {
     }
 
     virtual void writeRestartFile(std::string& filename) = 0;
-    
+
     void configAutoCorrelatorOutput(std::vector<OutputConfiguration>& vals,
                                     const unsigned int numcorrin = 32,
                                     const unsigned int pin = 16,
@@ -513,6 +515,8 @@ namespace calc {
         numAverages += c.intValues.size();
         INVALIDARG_EXP_IFN(c.outputEvery >= c.useEvery,
                            "Require useEvery to be smaller than output every");
+        INVALIDARG_EXP_IFN(c.outputEvery % c.useEvery == 0,
+                           "Output every must be a multiple of useEvery");
       }
 
       this->runningAverages =
@@ -520,10 +524,10 @@ namespace calc {
       this->doAverage = numAverages > 0;
     }
 
-    void configStepOutput(const std::vector<OutputConfiguration>& vals)
+    void configStepOutput(std::vector<OutputConfiguration>& vals)
     {
-      for (OutputConfiguration config : vals) {
-        config.useEvery = config.outputEvery;
+      for (size_t i = 0; i < vals.size(); ++i) {
+        vals[i].useEvery = vals[i].outputEvery;
       }
       this->outputConfigs = vals;
       this->updateValuesRequiredEvery(vals);

@@ -1083,9 +1083,12 @@ namespace calc {
       while (nrOfSlipLinksPlaced < minimumNrOfSliplinks ||
              nrOfAttempts < nrOfSliplinksToSample) {
         // first, randomly sample an atom
-        while (isMasked[toSampleFrom[sampleIdx]] &&
-               sampleIdx < toSampleFrom.size()) {
+        while (isMasked[toSampleFrom[sampleIdx]]) {
           sampleIdx += 1;
+
+          if (sampleIdx >= toSampleFrom.size()) {
+            break;
+          }
         }
         if (sampleIdx >= toSampleFrom.size()) {
           // this is a path that should barely ever be reached
