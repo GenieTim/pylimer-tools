@@ -84,6 +84,7 @@ namespace calc {
       double dt = 0.06;
       int crosslinkerType = 2;
       int slipspringBondType = 9;
+      bool assumeBoxLargeEnough = false;
 
       ////////////////////////////////////////////////////////////////
       // simulation state
@@ -234,6 +235,9 @@ namespace calc {
           this->coordinates(
             this->bondPartnerCoordinatesB.segment(3 * bondIdx, 3)) +
           this->bondBoxOffsets.segment(3 * bondIdx, 3);
+        if (this->assumeBoxLargeEnough) {
+          this->box.handlePBC(bondDistances);
+        }
         return bondDistances.norm();
       };
 
@@ -250,6 +254,12 @@ namespace calc {
 
       ////////////////////////////////////////////////////////////////
       // configuration
+      void configAssumeBoxLargeEnough()
+      {
+        this->assumeBoxLargeEnough = true;
+        this->bondBoxOffsets.setZero();
+      }
+
       void configTimeStep(const double dt = 0.06) { this->dt = dt; }
 
       void configLambda(const double l) { this->lambda = l; }
@@ -498,7 +508,11 @@ namespace calc {
           this->coordinates(this->bondPartnerCoordinatesA) -
           this->coordinates(this->bondPartnerCoordinatesB) +
           this->bondBoxOffsets;
-        // this->box.handlePBC(bondDistances);
+        if (this->assumeBoxLargeEnough) {
+          // this should not do anything anymore, here,
+          // assuming the assumption holds.
+          this->box.handlePBC(bondDistances);
+        }
 
         Eigen::VectorXd bondLengths =
           Eigen::VectorXd::Zero(this->numBonds + this->numSlipSprings);
@@ -557,6 +571,9 @@ namespace calc {
         }
         if (version > 2) {
           ar(slipspringBondType);
+        }
+        if (version > 4) {
+          ar(assumeBoxLargeEnough);
         }
         // state of bond formation
         if (version > 1) {
@@ -670,6 +687,6 @@ CEREAL_REGISTER_TYPE(pylimer_tools::calc::dpd::DPDSimulator);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(
   pylimer_tools::calc::OutputSupportingSimulation,
   pylimer_tools::calc::dpd::DPDSimulator);
-CEREAL_CLASS_VERSION(pylimer_tools::calc::dpd::DPDSimulator, 4);
+CEREAL_CLASS_VERSION(pylimer_tools::calc::dpd::DPDSimulator, 5);
 
 #endif
