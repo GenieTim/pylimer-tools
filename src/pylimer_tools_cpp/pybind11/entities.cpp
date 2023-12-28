@@ -510,6 +510,12 @@ init_pylimer_bound_entities(py::module_& m)
           )pbdoc",
          py::arg("from"),
          py::arg("to"))
+    .def("removeBondsOfType",
+         &Universe::removeBondsOfType,
+         R"pbdoc(
+          Remove bonds with a specific type. 
+          )pbdoc",
+         py::arg("bond_type"))
     .def("addAngles",
          &Universe::addAngles,
          "Add angles to the Universe. No relation to the underlying graph, "

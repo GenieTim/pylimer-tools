@@ -23,7 +23,6 @@ extern "C"
 #include <unordered_set>
 #include <vector>
 
-
 namespace pylimer_tools {
 namespace entities {
   Universe::Universe(const Box& box)
@@ -353,6 +352,39 @@ namespace entities {
     }
 
     this->NBonds = igraph_ecount(&this->graph);
+  }
+
+  void Universe::removeBondsOfType(const int bondType)
+  {
+    RUNTIME_EXP_IFN(
+      igraph_cattribute_has_attr(&this->graph, IGRAPH_ATTRIBUTE_EDGE, "type"),
+      "The graph does not have any bond types associated.");
+    std::vector<size_t> edgesToRemove;
+    // load types
+    igraph_vector_t typesVec;
+    igraph_vector_init(&typesVec, 0);
+    if (igraph_cattribute_EANV(&this->graph,
+                               "type",
+                               igraph_ess_all(IGRAPH_EDGEORDER_ID),
+                               &typesVec)) {
+      throw std::runtime_error("Failed to fetch type attribute");
+    }
+    // enumerate the bonds to delete
+    for (size_t i = 0; i < igraph_vector_size(&typesVec); ++i) {
+      if (igraph_vector_get(&typesVec, i) == bondType) {
+        edgesToRemove.push_back(i);
+      }
+    }
+    igraph_vector_destroy(&typesVec);
+
+    // convert to actually usable type
+    igraph_vector_int_t edges_to_remove;
+    igraph_vector_int_init(&edges_to_remove, edgesToRemove.size());
+    pylimer_tools::utils::StdVectorToIgraphVectorT(edgesToRemove,
+                                                   &edges_to_remove);
+
+    igraph_delete_edges(&this->graph, igraph_ess_vector(&edges_to_remove));
+    igraph_vector_int_destroy(&edges_to_remove);
   }
 
   void Universe::addBonds(const std::vector<long int>& from,

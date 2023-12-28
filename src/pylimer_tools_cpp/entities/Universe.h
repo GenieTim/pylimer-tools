@@ -88,6 +88,7 @@ namespace entities {
                   const bool simplify = false);
     void removeBonds(const std::vector<long int>& atomIdsFrom,
                      const std::vector<long int>& atomIdsTo);
+    void removeBondsOfType(const int bondType);
     // others
     void addAngles(const std::vector<long int>& from,
                    const std::vector<long int>& via,
