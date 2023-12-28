@@ -45,6 +45,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.DPDSimulator
       ~DPDSimulator.getNumStepsMC
       ~DPDSimulator.getShiftOneAtATime
       ~DPDSimulator.getShiftPossibilityEmpty
+      ~DPDSimulator.getSlipSpringBondType
       ~DPDSimulator.getSpringConstant
       ~DPDSimulator.getStressTensor
       ~DPDSimulator.getTemperature
