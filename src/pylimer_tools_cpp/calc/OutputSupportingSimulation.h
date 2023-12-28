@@ -289,7 +289,13 @@ namespace calc {
           // check (and if, output) averages
           if (currentStep % oc.outputEvery == 0) {
             if (previousAverageIdx == 0) {
-              assert(this->numStepsInAverage == oc.outputEvery / oc.useEvery);
+              RUNTIME_EXP_IFN(
+                this->numStepsInAverage == oc.outputEvery / oc.useEvery,
+                "Got " + std::to_string(this->numStepsInAverage) +
+                  " steps in average for output every " +
+                  std::to_string(oc.outputEvery) + " and use every " +
+                  std::to_string(oc.useEvery) + ".");
+              this->numStepsInAverage = 0;
             }
             // output & start again
             outputBuffer += std::to_string(intvalues[ComputedIntValues::STEP]);
