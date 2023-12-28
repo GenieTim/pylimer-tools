@@ -409,7 +409,9 @@ namespace calc {
       Eigen::VectorXd bondDistances = coords(this->bondPartnerCoordinatesA) -
                                       coords(this->bondPartnerCoordinatesB) +
                                       this->bondBoxOffsets;
-      // this->box.handlePBC(bondDistances);
+      if (this->assumeBoxLargeEnough) {
+        this->box.handlePBC(bondDistances);
+      }
       // assert(bondDistances.minCoeff() > -this->box.getL().maxCoeff());
       // assert(bondDistances.maxCoeff() < this->box.getL().maxCoeff());
       forces(this->bondPartnerCoordinatesA) -= this->k * bondDistances;
@@ -947,6 +949,9 @@ namespace calc {
         (this->coordinates.segment(partnerA * 3, 3) -
          this->coordinates.segment(partnerB * 3, 3)) +
         this->bondBoxOffsets.segment(3 * springIdx, 3);
+      if (this->assumeBoxLargeEnough) {
+        this->box.handlePBC(bondDistanceNow);
+      }
       double bondEnergyNow = this->k * bondDistanceNow.squaredNorm();
       Eigen::Vector3d bondDistanceNew =
         (this->coordinates.segment(newPartnerA * 3, 3) -

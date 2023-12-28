@@ -1262,6 +1262,14 @@ init_pylimer_bound_calc(py::module_& m)
       py::arg("n_steps"),
       py::arg("dt") = 0.06,
       py::arg("with_MC") = false)
+    .def("assumeBoxLargeEnough",
+         &dpd::DPDSimulator::configAssumeBoxLargeEnough,
+         R"pbdoc(
+          Configure whether to run PBC on the bonds or not.
+
+          If your bonds could get larger than half the box length, this must be kept false (default).
+          Otherwise, you can set it to true and therewith get some securities.
+         )pbdoc")
     .def("createSlipSprings",
          &dpd::DPDSimulator::createSlipSprings,
          R"pbdoc(
