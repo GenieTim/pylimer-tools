@@ -329,6 +329,8 @@ namespace calc {
 
       void configNumStepsMC(long int steps = 500) { this->nStepsMC = steps; }
 
+      int getSlipSpringBondType() const { return this->slipspringBondType; }
+
       long int getNumStepsMC() { return this->nStepsMC; }
 
       void configNumStepsDPD(long int steps = 500) { this->nStepsDPD = steps; }
