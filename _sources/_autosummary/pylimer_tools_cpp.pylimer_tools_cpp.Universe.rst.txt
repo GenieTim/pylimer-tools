@@ -77,6 +77,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.Universe
       ~Universe.hashDihedralAngleType
       ~Universe.removeAtoms
       ~Universe.removeBonds
+      ~Universe.removeBondsOfType
       ~Universe.replaceAtom
       ~Universe.setBox
       ~Universe.setBoxLengths
