@@ -22,7 +22,8 @@ except ImportError:
 
 
 # "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON",
-cmake_args = ["-DCMAKE_BUILD_TYPE=RelWithDebInfo", "-Dvendor_suffix=-skbuild-{}".format(platform.system())]
+cmake_args = ["-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+              "-Dvendor_suffix=-skbuild-{}".format(platform.system())]
 # cmake_args = ["-Digraph_DEBUG=ON", "-DCMAKE_FIND_DEBUG_MODE=ON"]
 
 if (os.getenv('VCPKG_ROOT')):
@@ -44,11 +45,11 @@ else:
 # as the two build directories of vendor do not interact well.
 vendorFilesToDelete = [
     os.path.abspath(os.path.join(
-        os.path.dirname(__file__), 'vendor/igraph-skbuild/src/igraphLib-build')),
+        os.path.dirname(__file__), "vendor/igraph-skbuild-{}/src/igraphLib-build".format(platform.system()))),
     os.path.abspath(os.path.join(
-        os.path.dirname(__file__), 'vendor/nlopt-skbuild/src/nloptLib-build')),
+        os.path.dirname(__file__), "vendor/nlopt-skbuild-{}/src/nloptLib-build".format(platform.system()))),
     os.path.abspath(os.path.join(
-        os.path.dirname(__file__), 'vendor/cereal-skbuild/src/cerealLib-build'))
+        os.path.dirname(__file__), "vendor/cereal-skbuild-{}/src/cerealLib-build".format(platform.system())))
 ]
 for vendorFile in vendorFilesToDelete:
     if (os.path.exists(vendorFile)):
