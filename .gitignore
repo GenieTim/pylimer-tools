@@ -134,7 +134,7 @@ dmypy.json
 vendor/igraph
 vendor/nlopt
 vendor/cereal
-vendor/*-skbuild
+vendor/*-skbuild*
 
 # build targets
 coverage.html

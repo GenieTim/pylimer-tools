@@ -1,4 +1,5 @@
 import os
+import platform
 import shutil
 import string
 import sys
@@ -21,7 +22,7 @@ except ImportError:
 
 
 # "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON",
-cmake_args = ["-DCMAKE_BUILD_TYPE=RelWithDebInfo", "-Dvendor_suffix=-skbuild"]
+cmake_args = ["-DCMAKE_BUILD_TYPE=RelWithDebInfo", "-Dvendor_suffix=-skbuild-{}".format(platform.system())]
 # cmake_args = ["-Digraph_DEBUG=ON", "-DCMAKE_FIND_DEBUG_MODE=ON"]
 
 if (os.getenv('VCPKG_ROOT')):
@@ -35,6 +36,8 @@ if (os.getenv('VCPKG_ROOT')):
     else:
         warnings.warn(
             "Detected VCPKG_ROOT. Did not find toolchain file {} though.".format(toolchainFile))
+else:
+    print("VCPKG_ROOT not set. Not using vcpk dependencies.")
 
 # delete vendor caches — this is useful if you compile
 # this project using CMake (e.g. for tests) as well as skbuild,

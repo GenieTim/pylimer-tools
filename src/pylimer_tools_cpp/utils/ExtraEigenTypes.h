@@ -11,11 +11,14 @@ typedef Array<size_t, Dynamic, 1> ArrayXst;
 typedef Array<bool, Dynamic, 1> ArrayXb;
 }
 
+
+#ifdef OPENMP_FOUND
 #pragma omp declare reduction(+ : Eigen::VectorXd : omp_out =                  \
                                 omp_out + omp_in)                              \
   initializer(omp_priv = Eigen::VectorXd::Zero(omp_orig.size()))
 #pragma omp declare reduction(+ : Eigen::Matrix3d : omp_out =                  \
                                 omp_out + omp_in)                              \
   initializer(omp_priv = Eigen::Matrix3d::Zero())
+#endif
 
 #endif
