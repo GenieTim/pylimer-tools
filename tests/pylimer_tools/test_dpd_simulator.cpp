@@ -256,8 +256,8 @@ TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator]")
     pe::Universe universeAfter = simulator.getUniverse(false);
     std::map<int, int> finalFunctionalityPerType =
       universeAfter.determineFunctionalityPerType();
-    CHECK(finalFunctionalityPerType.at(1) == 2);
-    CHECK(finalFunctionalityPerType.at(2) <= 4);
+    CHECK(finalFunctionalityPerType.at(1) == 2.);
+    CHECK(finalFunctionalityPerType.at(2) <= 4.);
   }
 };
 
@@ -409,7 +409,8 @@ TEST_CASE("DPD Simulator's restart files are accurate",
     std::remove(restartFile.c_str());
 
 #ifdef OPENMP_FOUND
-// we cannot have more than 1 thread, otherwise the random number generator will not play nicely.
+    // we cannot have more than 1 thread, otherwise the random number generator
+    // will not play nicely.
     omp_set_num_threads(1);
 #endif
     CHECK(simulator.getCoordinates().isApprox(sim2.getCoordinates()));
@@ -440,8 +441,8 @@ TEST_CASE("DPD Simulator's restart files are accurate",
             simulator.getUniformRandMean0Std1());
     }
 
-    simulator.runSimulation(5, false);
-    sim2.runSimulation(5, false);
+    simulator.runSimulation(500, false);
+    sim2.runSimulation(500, false);
 
     CHECK(simulator.getCoordinates().isApprox(sim2.getCoordinates()));
     CHECK(simulator.getBondLengths().isApprox(sim2.getBondLengths()));
