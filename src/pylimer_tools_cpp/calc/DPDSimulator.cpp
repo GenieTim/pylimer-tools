@@ -107,7 +107,18 @@ namespace calc {
       this->isRelocationTarget =
         Eigen::ArrayXb::Constant(this->numAtoms, false);
       for (size_t i = 0; i < this->numAtoms; ++i) {
-        this->idxFunctionalities[i] = this->bondsOfIndex[i].size();
+        // if we already have slip-springs, the functionality must account for that:
+        // the idxFunctionalities should not include the slip-springs
+        this->idxFunctionalities[i] =
+          this->numSlipSprings == 0
+            ? this->bondsOfIndex[i].size()
+            : std::accumulate(this->bondsOfIndex[i].begin(),
+                              this->bondsOfIndex[i].end(),
+                              0,
+                              [&](int val, size_t bondIdx) {
+                                return val + static_cast<int>(bondIdx <
+                                                              this->numBonds);
+                              });
         if (this->idxFunctionalities[i] < 2) {
           this->chainEndIndices.push_back(i);
           this->isRelocationTarget[i] = true;
