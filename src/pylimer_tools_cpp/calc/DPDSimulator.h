@@ -135,6 +135,7 @@ namespace calc {
       Eigen::ArrayXi bondPartnerCoordinatesB;
       Eigen::ArrayXi bondPartnersB;
       Eigen::ArrayXi bondTypes;
+      Eigen::ArrayXd bondDuplicationPenalty;
       Eigen::VectorXd bondBoxOffsets;
       // mapping between atoms and bonds
       std::vector<std::vector<size_t>> bondsOfIndex;
@@ -463,6 +464,59 @@ namespace calc {
         }
       }
 
+      /**
+       * @brief Sets the bond duplication penalty back to defaults.
+       *
+       * The bond duplication penalty is here, to enforce
+       * "slip springs connecting two already bonded beads do not contribute in
+       * the DPD steps"
+       */
+      void resetBondDuplicationPenalty()
+      {
+        this->bondDuplicationPenalty = Eigen::ArrayXd::Constant(
+          3 * (this->numBonds + this->numSlipSprings), 1.);
+        // this->bondDuplicationPenalty.setConstant(1.);
+        std::unordered_set<size_t> partners;
+        for (size_t i = 0; i < this->numAtoms; ++i) {
+          partners.clear();
+          // here as well, we rely on the bonds of index being sorted
+          for (size_t bondIdx : this->bondsOfIndex[i]) {
+            size_t atomPartnerIdx = this->bondPartnersA[bondIdx] == i
+                                      ? this->bondPartnersB[bondIdx]
+                                      : this->bondPartnersA[bondIdx];
+            if (partners.contains(atomPartnerIdx)) {
+              // "real" bonds always contribute -> check that this is a
+              // slip-spring
+              if (bondIdx >= this->numBonds) {
+                this->bondDuplicationPenalty.segment(3 * bondIdx, 3).setZero();
+              }
+            } else {
+              partners.insert(atomPartnerIdx);
+            }
+          }
+        }
+      }
+
+      void resetBondDuplicationPenalty(size_t atomIdx)
+      {
+        std::unordered_set<size_t> partners;
+        // here as well, we rely on the bonds of index being sorted
+        for (size_t bondIdx : this->bondsOfIndex[atomIdx]) {
+          size_t atomPartnerIdx = this->bondPartnersA[bondIdx] == atomIdx
+                                    ? this->bondPartnersB[bondIdx]
+                                    : this->bondPartnersA[bondIdx];
+          if (partners.contains(atomPartnerIdx)) {
+            // "real" bonds always contribute -> check that this is a
+            // slip-spring
+            if (bondIdx >= this->numBonds) {
+              this->bondDuplicationPenalty.segment(3 * bondIdx, 3).setZero();
+            }
+          } else {
+            partners.insert(atomPartnerIdx);
+          }
+        }
+      }
+
       ////////////////////////////////////////////////////////////////
       // results access & export
 
@@ -595,6 +649,11 @@ namespace calc {
            currentVelocities,
            currentForces,
            currentStressTensor);
+        if (version > 5) {
+          ar(this->bondDuplicationPenalty);
+        } else {
+          this->resetBondDuplicationPenalty();
+        }
         // randomness
         ar(e2, uniform_rand_mean0std1, uniform_rand_between_0_1);
         // universe structure
@@ -689,6 +748,6 @@ CEREAL_REGISTER_TYPE(pylimer_tools::calc::dpd::DPDSimulator);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(
   pylimer_tools::calc::OutputSupportingSimulation,
   pylimer_tools::calc::dpd::DPDSimulator);
-CEREAL_CLASS_VERSION(pylimer_tools::calc::dpd::DPDSimulator, 5);
+CEREAL_CLASS_VERSION(pylimer_tools::calc::dpd::DPDSimulator, 6);
 
 #endif
