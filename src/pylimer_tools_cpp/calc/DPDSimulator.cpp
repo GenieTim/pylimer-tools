@@ -107,8 +107,8 @@ namespace calc {
       this->isRelocationTarget =
         Eigen::ArrayXb::Constant(this->numAtoms, false);
       for (size_t i = 0; i < this->numAtoms; ++i) {
-        // if we already have slip-springs, the functionality must account for that:
-        // the idxFunctionalities should not include the slip-springs
+        // if we already have slip-springs, the functionality must account for
+        // that: the idxFunctionalities should not include the slip-springs
         this->idxFunctionalities[i] =
           this->numSlipSprings == 0
             ? this->bondsOfIndex[i].size()
@@ -126,6 +126,7 @@ namespace calc {
       }
 
       this->resetBondOffsets();
+      this->resetBondDuplicationPenalty();
 
       // simulation state
       this->currentVelocitiesPlus = Eigen::VectorXd::Zero(coordinates.size());
@@ -416,10 +417,15 @@ namespace calc {
 
       // actual computation
       // (attractive) bond forces
+      // TODO: investigate whether we would be faster to just push the indices
+      // of the bonds to ignore
       timer.section(DPDPerformanceSections::BOND_FORCE);
-      Eigen::VectorXd bondDistances = coords(this->bondPartnerCoordinatesA) -
-                                      coords(this->bondPartnerCoordinatesB) +
-                                      this->bondBoxOffsets;
+      Eigen::VectorXd bondDistances =
+        ((coords(this->bondPartnerCoordinatesA) -
+          coords(this->bondPartnerCoordinatesB) + this->bondBoxOffsets)
+           .array() *
+         this->bondDuplicationPenalty)
+          .matrix();
       if (this->assumeBoxLargeEnough) {
         this->box.handlePBC(bondDistances);
       }
@@ -1133,6 +1139,8 @@ namespace calc {
           return;
         }
       }
+      this->resetBondDuplicationPenalty(partnerAfter);
+      this->resetBondDuplicationPenalty(partnerBefore);
       this->validateState();
       throw std::runtime_error("Invalid internal state: replacing slip-spring "
                                "partner, but did not find it internally.");
@@ -1393,6 +1401,34 @@ namespace calc {
       RUNTIME_EXP_IFN(this->bondBoxOffsets.size() ==
                         (this->numBonds + this->numSlipSprings) * 3,
                       "State violation: nr of box bond offsets incorrect.");
+
+      // bond duplication penalty
+      std::unordered_set<size_t> partners;
+      for (size_t i = 0; i < this->numAtoms; ++i) {
+        partners.clear();
+        // here as well, we rely on the bonds of index being sorted
+        for (size_t bondIdx : this->bondsOfIndex[i]) {
+          size_t atomPartnerIdx = this->bondPartnersA[bondIdx] == i
+                                    ? this->bondPartnersB[bondIdx]
+                                    : this->bondPartnersA[bondIdx];
+          bool expectZero = false;
+          if (partners.contains(atomPartnerIdx)) {
+            // "real" bonds always contribute -> check that this is a
+            // slip-spring
+            if (bondIdx >= this->numBonds) {
+              expectZero = true;
+            }
+          } else {
+            partners.insert(atomPartnerIdx);
+          }
+          RUNTIME_EXP_IFN(this->bondDuplicationPenalty.segment(3 * bondIdx, 3)
+                            .isApprox(expectZero
+                                        ? Eigen::Array3d::Zero()
+                                        : Eigen::Array3d::Constant(1.)),
+                          "Incorrect bondDuplicationPenalty");
+        }
+      }
+
       // internal structure
       RUNTIME_EXP_IFN((this->bondPartnersB.array() < this->numAtoms).all(),
                       "State violation: too large indices found (e.g. " +
@@ -1402,6 +1438,9 @@ namespace calc {
                       "State violation: too large indices found (e.g. " +
                         std::to_string(this->bondPartnersA.maxCoeff()) +
                         " for " + std::to_string(this->numAtoms) + " atoms)");
+      RUNTIME_EXP_IFN(
+        !(this->bondPartnersA.array() == this->bondPartnersB.array()).any(),
+        "Bonds with oneself are not allowed.");
       // loop springs
       for (size_t i = 0; i < this->numBonds + this->numSlipSprings; ++i) {
         for (int dir = 0; dir < 3; ++dir) {
