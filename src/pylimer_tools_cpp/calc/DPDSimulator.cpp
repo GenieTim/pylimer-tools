@@ -286,6 +286,7 @@ namespace calc {
       this->bondPartnersB.conservativeResize(this->bondPartnersB.size() + 1);
       this->bondTypes.conservativeResize(this->bondTypes.size() + 1);
       this->bondBoxOffsets.conservativeResize(this->bondBoxOffsets.size() + 3);
+      this->bondDuplicationPenalty.conservativeResize(this->bondDuplicationPenalty.size() + 3);
       assert(this->bondPartnersA.size() == this->bondPartnersB.size());
       assert(this->bondPartnersA.size() == this->bondTypes.size());
       assert(this->bondPartnersA.size() ==
@@ -307,6 +308,8 @@ namespace calc {
             this->bondPartnerCoordinatesB[(i - 1) * 3 + dir];
           this->bondBoxOffsets[i * 3 + dir] =
             this->bondBoxOffsets[(i - 1) * 3 + dir];
+          this->bondDuplicationPenalty[i * 3 + dir] =
+            this->bondDuplicationPenalty[(i - 1) * 3 + dir];
         }
       }
 
@@ -336,6 +339,8 @@ namespace calc {
                 this->bondsOfIndex[fromIdx].end());
       std::sort(this->bondsOfIndex[toIdx].begin(),
                 this->bondsOfIndex[toIdx].end());
+
+      this->resetBondDuplicationPenalty(newBondIdx);
 
       // count the new bonds
       this->numBonds += 1;
@@ -684,6 +689,8 @@ namespace calc {
       this->bondTypes.conservativeResize(sizeBefore + partnerB.size());
       this->bondBoxOffsets.conservativeResize(3 *
                                               (sizeBefore + partnerA.size()));
+      this->bondDuplicationPenalty.conservativeResize(3 *
+                                              (sizeBefore + partnerA.size()));
 
       this->bondPartnersA.segment(sizeBefore, partnerA.size()) =
         Eigen::Map<Eigen::ArrayXst, Eigen::Unaligned>(partnerA.data(),
@@ -705,6 +712,7 @@ namespace calc {
             this->bondPartnersB[i] * 3 + dir;
         }
         this->resetBondOffset(i);
+        this->resetBondDuplicationPenalty(i);
       }
 
       this->numSlipSprings += partnerA.size();
@@ -1401,6 +1409,12 @@ namespace calc {
       RUNTIME_EXP_IFN(this->bondBoxOffsets.size() ==
                         (this->numBonds + this->numSlipSprings) * 3,
                       "State violation: nr of box bond offsets incorrect.");
+      RUNTIME_EXP_IFN(
+        this->bondDuplicationPenalty.size() ==
+          (this->numBonds + this->numSlipSprings) * 3,
+        "State violation: nr of bond duplication penalities incorrect: got " +
+          std::to_string(this->bondDuplicationPenalty.size()) + " for " +
+          std::to_string(this->numBonds + this->numSlipSprings) + "bonds.");
 
       // bond duplication penalty
       std::unordered_set<size_t> partners;
