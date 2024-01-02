@@ -476,30 +476,16 @@ namespace calc {
         this->bondDuplicationPenalty = Eigen::ArrayXd::Constant(
           3 * (this->numBonds + this->numSlipSprings), 1.);
         // this->bondDuplicationPenalty.setConstant(1.);
-        std::unordered_set<size_t> partners;
+
         for (size_t i = 0; i < this->numAtoms; ++i) {
-          partners.clear();
-          // here as well, we rely on the bonds of index being sorted
-          for (size_t bondIdx : this->bondsOfIndex[i]) {
-            size_t atomPartnerIdx = this->bondPartnersA[bondIdx] == i
-                                      ? this->bondPartnersB[bondIdx]
-                                      : this->bondPartnersA[bondIdx];
-            if (partners.contains(atomPartnerIdx)) {
-              // "real" bonds always contribute -> check that this is a
-              // slip-spring
-              if (bondIdx >= this->numBonds) {
-                this->bondDuplicationPenalty.segment(3 * bondIdx, 3).setZero();
-              }
-            } else {
-              partners.insert(atomPartnerIdx);
-            }
-          }
+          this->resetBondDuplicationPenalty(i);
         }
       }
 
       void resetBondDuplicationPenalty(size_t atomIdx)
       {
         std::unordered_set<size_t> partners;
+        partners.reserve(this->bondsOfIndex[atomIdx].size());
         // here as well, we rely on the bonds of index being sorted
         for (size_t bondIdx : this->bondsOfIndex[atomIdx]) {
           size_t atomPartnerIdx = this->bondPartnersA[bondIdx] == atomIdx
