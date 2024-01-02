@@ -340,7 +340,8 @@ namespace calc {
       std::sort(this->bondsOfIndex[toIdx].begin(),
                 this->bondsOfIndex[toIdx].end());
 
-      this->resetBondDuplicationPenalty(newBondIdx);
+      this->resetBondDuplicationPenalty(fromIdx);
+      this->resetBondDuplicationPenalty(toIdx);
 
       // count the new bonds
       this->numBonds += 1;
@@ -712,7 +713,8 @@ namespace calc {
             this->bondPartnersB[i] * 3 + dir;
         }
         this->resetBondOffset(i);
-        this->resetBondDuplicationPenalty(i);
+        this->resetBondDuplicationPenalty(this->bondPartnersA[i]);
+        this->resetBondDuplicationPenalty(this->bondPartnersB[i]);
       }
 
       this->numSlipSprings += partnerA.size();
