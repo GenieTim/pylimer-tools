@@ -488,6 +488,7 @@ namespace calc {
         partners.reserve(this->bondsOfIndex[atomIdx].size());
         // here as well, we rely on the bonds of index being sorted
         for (size_t bondIdx : this->bondsOfIndex[atomIdx]) {
+          this->bondDuplicationPenalty.segment(3 * bondIdx, 3).setConstant(1.);
           size_t atomPartnerIdx = this->bondPartnersA[bondIdx] == atomIdx
                                     ? this->bondPartnersB[bondIdx]
                                     : this->bondPartnersA[bondIdx];
