@@ -485,7 +485,6 @@ namespace calc {
        */
       void resetBondDuplicationPenalty()
       {
-        std::cout << "resetBondDuplicationPenalty" << std::endl;
         this->bondDuplicationPenalty = Eigen::ArrayXd::Constant(
           3 * (this->numBonds + this->numSlipSprings), 1.);
         // this->bondDuplicationPenalty.setConstant(1.);

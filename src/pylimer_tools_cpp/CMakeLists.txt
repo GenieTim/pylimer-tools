@@ -60,10 +60,8 @@ message("pylimer_tools includes igraph from ${igraph_INCLUDE_DIRS}, nlopt from $
 # optional additional dependencies
 IF (WIN32)
 		message(AUTHOR_WARNING "On Windows, OpenMP will not be used")
-		add_definitions(-DOPENMP_FOUND=false)
 elseif(CODE_COVERAGE)
 		message(AUTHOR_WARNING "Code-coverage is enabled, openmp will not be used")
-		add_definitions(-DOPENMP_FOUND=false)
 else()
 	find_package(OpenMP)
 	if (OpenMP_CXX_FOUND)
