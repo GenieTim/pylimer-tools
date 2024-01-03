@@ -126,7 +126,7 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
     // TODO: implement
     pe::UniverseSequence universeSeq = pe::UniverseSequence();
     std::string largeInputFile =
-      suspectedPath + "network_100_a_46.structure.out";
+      suspectedPath + "structure/network_100_a_46.structure.out";
     universeSeq.initializeFromDataSequence({ { largeInputFile } });
     pe::Universe universe = universeSeq.atIndex(0);
 

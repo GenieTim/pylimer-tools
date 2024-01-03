@@ -286,7 +286,8 @@ namespace calc {
       this->bondPartnersB.conservativeResize(this->bondPartnersB.size() + 1);
       this->bondTypes.conservativeResize(this->bondTypes.size() + 1);
       this->bondBoxOffsets.conservativeResize(this->bondBoxOffsets.size() + 3);
-      this->bondDuplicationPenalty.conservativeResize(this->bondDuplicationPenalty.size() + 3);
+      this->bondDuplicationPenalty.conservativeResize(
+        this->bondDuplicationPenalty.size() + 3);
       assert(this->bondPartnersA.size() == this->bondPartnersB.size());
       assert(this->bondPartnersA.size() == this->bondTypes.size());
       assert(this->bondPartnersA.size() ==
@@ -330,16 +331,12 @@ namespace calc {
         this->bondPartnerCoordinatesA[3 * newBondIdx + i] = 3 * fromIdx + i;
         this->bondPartnerCoordinatesB[3 * newBondIdx + i] = 3 * toIdx + i;
       }
-      this->bondsOfIndex[fromIdx].push_back(newBondIdx);
-      this->bondsOfIndex[toIdx].push_back(newBondIdx);
-      this->resetBondOffset(newBondIdx);
-      // TODO: we know that everything is sorted, except for the new -> just
-      // insert it where it belongs instead.
-      std::sort(this->bondsOfIndex[fromIdx].begin(),
-                this->bondsOfIndex[fromIdx].end());
-      std::sort(this->bondsOfIndex[toIdx].begin(),
-                this->bondsOfIndex[toIdx].end());
+      pylimer_tools::utils::addToSorted<size_t>(this->bondsOfIndex[fromIdx],
+                                                newBondIdx);
+      pylimer_tools::utils::addToSorted<size_t>(this->bondsOfIndex[toIdx],
+                                                newBondIdx);
 
+      this->resetBondOffset(newBondIdx);
       this->resetBondDuplicationPenalty(fromIdx);
       this->resetBondDuplicationPenalty(toIdx);
 
@@ -434,24 +431,30 @@ namespace calc {
           .matrix();
       if (this->assumeBoxLargeEnough) {
         this->box.handlePBC(bondDistances);
-        #ifndef NDEBUG
+#ifndef NDEBUG
         for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
-          if (bondDistances.segment(3 * i, 3).squaredNorm() > 0.5*this->box.getL().minCoeff()) {
-            std::cerr << "WARNING: Bond " << i<< " has length " << bondDistances.segment(3 * i, 3).squaredNorm() << ", which violates the assumption that the box is large enough" << std::endl;
+          if (bondDistances.segment(3 * i, 3).squaredNorm() >
+              0.5 * this->box.getL().minCoeff()) {
+            std::cerr
+              << "WARNING: Bond " << i << " has length "
+              << bondDistances.segment(3 * i, 3).squaredNorm()
+              << ", which violates the assumption that the box is large enough"
+              << std::endl;
           }
         }
-        #endif
+#endif
       } else {
-        #ifndef NDEBUG
+#ifndef NDEBUG
         for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
-          if (this->bondBoxOffsets.segment(3*i,3) != this->box.getOffset(
-            coords(this->bondPartnerCoordinatesA.segment(3*i,3)) -
-          coords(this->bondPartnerCoordinatesB.segment(3*i,3))
-          )) {
-            std::cerr << "INFO: Bond " << i << " spans more than one image." << std::endl;
+          if (this->bondBoxOffsets.segment(3 * i, 3) !=
+              this->box.getOffset(
+                coords(this->bondPartnerCoordinatesA.segment(3 * i, 3)) -
+                coords(this->bondPartnerCoordinatesB.segment(3 * i, 3)))) {
+            std::cerr << "INFO: Bond " << i << " spans more than one image."
+                      << std::endl;
           }
         }
-        #endif
+#endif
       }
       // assert(bondDistances.minCoeff() > -this->box.getL().maxCoeff());
       // assert(bondDistances.maxCoeff() < this->box.getL().maxCoeff());
@@ -708,8 +711,8 @@ namespace calc {
       this->bondTypes.conservativeResize(sizeBefore + partnerB.size());
       this->bondBoxOffsets.conservativeResize(3 *
                                               (sizeBefore + partnerA.size()));
-      this->bondDuplicationPenalty.conservativeResize(3 *
-                                              (sizeBefore + partnerA.size()));
+      this->bondDuplicationPenalty.conservativeResize(
+        3 * (sizeBefore + partnerA.size()));
 
       this->bondPartnersA.segment(sizeBefore, partnerA.size()) =
         Eigen::Map<Eigen::ArrayXst, Eigen::Unaligned>(partnerA.data(),
@@ -1155,7 +1158,7 @@ namespace calc {
       }
       this->resetBondOffset(springIdx);
       // add to the bonds of the new bond partner
-      this->bondsOfIndex[partnerAfter].push_back(springIdx);
+      pylimer_tools::utils::addToSorted<size_t>(this->bondsOfIndex[partnerAfter], springIdx);
       // remove from the bonds of the previous bond partner
       for (size_t i = this->idxFunctionalities[partnerBefore];
            i < this->bondsOfIndex[partnerBefore].size();
@@ -1397,6 +1400,11 @@ namespace calc {
             RUNTIME_EXP_IFN(this->bondsOfIndex[i][j] >= this->numBonds,
                             "Expect bonds to come before slip springs.");
           }
+          if (j > 0) {
+            RUNTIME_EXP_IFN(this->bondsOfIndex[i][j] >
+                              this->bondsOfIndex[i][j - 1],
+                            "Require bonds of atom to be sorted.");
+          }
         }
       }
       RUNTIME_EXP_IFN(this->isRelocationTarget.size() == this->numAtoms,
@@ -1455,11 +1463,17 @@ namespace calc {
           } else {
             partners.insert(atomPartnerIdx);
           }
-          RUNTIME_EXP_IFN(this->bondDuplicationPenalty.segment(3 * bondIdx, 3)
-                            .isApprox(expectZero
-                                        ? Eigen::Array3d::Zero()
-                                        : Eigen::Array3d::Constant(1.)),
-                          "Incorrect bondDuplicationPenalty");
+          RUNTIME_EXP_IFN(
+            this->bondDuplicationPenalty.segment(3 * bondIdx, 3)
+              .isApprox(expectZero ? Eigen::Array3d::Zero()
+                                   : Eigen::Array3d::Constant(1.)),
+            "Incorrect bondDuplicationPenalty: found bond " +
+              std::to_string(bondIdx) + " of " +
+              std::to_string(this->numBonds) + "to should have " +
+              std::to_string(expectZero ? 0 : 1) + " but it did not (" +
+              std::to_string(
+                this->bondDuplicationPenalty.segment(3 * bondIdx, 3).sum()) +
+              ").");
         }
       }
 
