@@ -75,7 +75,6 @@ add_library(test_sources
 
 if(CODE_COVERAGE)
 		message(AUTHOR_WARNING "Code-coverage is enabled, openmp will not be used")
-		add_definitions(-DOPENMP_FOUND=false)
 else()
 	find_package(OpenMP)
 	if (OpenMP_CXX_FOUND)
