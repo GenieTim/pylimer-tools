@@ -434,6 +434,24 @@ namespace calc {
           .matrix();
       if (this->assumeBoxLargeEnough) {
         this->box.handlePBC(bondDistances);
+        #ifndef NDEBUG
+        for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
+          if (bondDistances.segment(3 * i, 3).squaredNorm() > 0.5*this->box.getL().minCoeff()) {
+            std::cerr << "WARNING: Bond " << i<< " has length " << bondDistances.segment(3 * i, 3).squaredNorm() << ", which violates the assumption that the box is large enough" << std::endl;
+          }
+        }
+        #endif
+      } else {
+        #ifndef NDEBUG
+        for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
+          if (this->bondBoxOffsets.segment(3*i,3) != this->box.getOffset(
+            coords(this->bondPartnerCoordinatesA.segment(3*i,3)) -
+          coords(this->bondPartnerCoordinatesB.segment(3*i,3))
+          )) {
+            std::cerr << "INFO: Bond " << i << " spans more than one image." << std::endl;
+          }
+        }
+        #endif
       }
       // assert(bondDistances.minCoeff() > -this->box.getL().maxCoeff());
       // assert(bondDistances.maxCoeff() < this->box.getL().maxCoeff());
