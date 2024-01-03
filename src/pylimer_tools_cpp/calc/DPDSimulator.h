@@ -189,6 +189,18 @@ namespace calc {
         }
       }
 
+      void reseedRandomness(const std::string &seed)
+      {
+        // initialize the random number generator
+        if (seed == "") {
+          std::random_device rd;
+          this->e2 = std::mt19937(rd());
+        } else {
+          std::seed_seq seed2(seed.begin(), seed.end());
+          this->e2 = std::mt19937(seed2);
+        }
+      }
+
       /**
        * @brief Create a new bond between two nodes
        *
@@ -477,7 +489,7 @@ namespace calc {
           3 * (this->numBonds + this->numSlipSprings), 1.);
         // this->bondDuplicationPenalty.setConstant(1.);
 
-        for (size_t i = 0; i < this->numAtoms; ++i) {
+        for (size_t i = 0; i < this->numAtoms - 1; ++i) {
           this->resetBondDuplicationPenalty(i);
         }
       }
@@ -488,14 +500,14 @@ namespace calc {
         partners.reserve(this->bondsOfIndex[atomIdx].size());
         // here as well, we rely on the bonds of index being sorted
         for (size_t bondIdx : this->bondsOfIndex[atomIdx]) {
+          size_t atomPartnerIdx = this->bondPartnersA[bondIdx] == atomIdx
+                                    ? this->bondPartnersB[bondIdx]
+                                    : this->bondPartnersA[bondIdx];
           if (bondIdx >= this->numBonds) {
             // all others should stay 1 anyway
             this->bondDuplicationPenalty.segment(3 * bondIdx, 3)
               .setConstant(1.);
           }
-          size_t atomPartnerIdx = this->bondPartnersA[bondIdx] == atomIdx
-                                    ? this->bondPartnersB[bondIdx]
-                                    : this->bondPartnersA[bondIdx];
           if (partners.contains(atomPartnerIdx)) {
             // "real" bonds always contribute -> check that this is a
             // slip-spring

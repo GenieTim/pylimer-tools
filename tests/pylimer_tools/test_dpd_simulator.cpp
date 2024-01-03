@@ -382,7 +382,7 @@ TEST_CASE("DPD Simulator Converts Correctly", "[analysis][DPDSimulator]")
   }
 }
 
-TEST_CASE("New PBC computation is correct", "[analysis][DPDSimulator]")
+TEST_CASE("New PBC computation is correct", "[analysis][DPDSimulator][1proc]")
 {
   std::string suspectedPath = "../pylimer_tools/fixtures/";
   REQUIRE(std::filesystem::exists(suspectedPath));
@@ -402,20 +402,31 @@ TEST_CASE("New PBC computation is correct", "[analysis][DPDSimulator]")
       pcd::DPDSimulator(universe, 2, 9, false, "15th_seed");
 
     simulator.createSlipSprings(100, 2);
-    simulator.refreshCurrentState();
 
-    Eigen::Matrix3d stressTensor0 = simulator.getStressTensor();
-    double temperature0 = simulator.getTemperature();
-    Eigen::VectorXd bondLengths0 = simulator.getBondLengths();
+#ifdef OPENMP_FOUND
+    // we cannot have more than 1 thread, otherwise the random number generator
+    // will not play nicely.
+    omp_set_num_threads(1);
+#endif
+
+    // invoke copy-constructor
+    pcd::DPDSimulator simulator2 = simulator;
 
     // switch to "common" PBC
-    simulator.configAssumeBoxLargeEnough();
-    simulator.refreshCurrentState();
+    simulator2.configAssumeBoxLargeEnough();
 
-    CHECK(simulator.getStressTensor().isApprox(stressTensor0));
+    simulator.reseedRandomness("15th_seed");
+    simulator.refreshCurrentState();
+    simulator2.reseedRandomness("15th_seed");
+    simulator2.refreshCurrentState();
+
+    CHECK(simulator.getUniformRandBetween0And1() ==
+          simulator2.getUniformRandBetween0And1());
     CHECK_THAT(simulator.getTemperature(),
-               Catch::Matchers::WithinRel(temperature0));
-    CHECK(simulator.getBondLengths().isApprox(bondLengths0));
+               Catch::Matchers::WithinRel(simulator2.getTemperature()));
+    CHECK(simulator.getBondLengths().isApprox(simulator2.getBondLengths()));
+    CHECK(simulator.getStressTensor().isApprox(simulator2.getStressTensor()));
+    // std::cout << simulator.getStressTensor() << std::endl;
   }
 }
 

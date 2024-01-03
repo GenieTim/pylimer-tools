@@ -24,14 +24,7 @@ namespace calc {
     {
       INVALIDARG_EXP_IFN(!is2D, "2D simulations are not supported yet.");
       this->is2D = is2D;
-      // initialize the random number generator
-      if (seed == "") {
-        std::random_device rd;
-        this->e2 = std::mt19937(rd());
-      } else {
-        std::seed_seq seed2(seed.begin(), seed.end());
-        this->e2 = std::mt19937(seed2);
-      }
+      this->reseedRandomness(seed);
       double mean = 0.0;
       double std = 1.0;
       double a = mean - std::sqrt(3.) * std;
@@ -1143,22 +1136,26 @@ namespace calc {
         (this->atomTypes[partnerAfter] != this->crosslinkerType ||
          this->idxFunctionalities[partnerAfter] <= 2),
         "Cannot form slip-springs with cross-links.");
+      size_t otherPartner;
       if (this->bondPartnersA[springIdx] == partnerBefore) {
         this->bondPartnersA[springIdx] = partnerAfter;
         for (int dir = 0; dir < 3; ++dir) {
           this->bondPartnerCoordinatesA[3 * springIdx + dir] =
             3 * partnerAfter + dir;
         }
+        otherPartner = this->bondPartnersB[springIdx];
       } else {
         this->bondPartnersB[springIdx] = partnerAfter;
         for (int dir = 0; dir < 3; ++dir) {
           this->bondPartnerCoordinatesB[3 * springIdx + dir] =
             3 * partnerAfter + dir;
         }
+        otherPartner = this->bondPartnersA[springIdx];
       }
       this->resetBondOffset(springIdx);
       // add to the bonds of the new bond partner
-      pylimer_tools::utils::addToSorted<size_t>(this->bondsOfIndex[partnerAfter], springIdx);
+      pylimer_tools::utils::addToSorted<size_t>(
+        this->bondsOfIndex[partnerAfter], springIdx);
       // remove from the bonds of the previous bond partner
       for (size_t i = this->idxFunctionalities[partnerBefore];
            i < this->bondsOfIndex[partnerBefore].size();
@@ -1172,6 +1169,7 @@ namespace calc {
       }
       this->resetBondDuplicationPenalty(partnerAfter);
       this->resetBondDuplicationPenalty(partnerBefore);
+      this->resetBondDuplicationPenalty(otherPartner);
       this->validateState();
       throw std::runtime_error("Invalid internal state: replacing slip-spring "
                                "partner, but did not find it internally.");
@@ -1469,7 +1467,8 @@ namespace calc {
                                    : Eigen::Array3d::Constant(1.)),
             "Incorrect bondDuplicationPenalty: found bond " +
               std::to_string(bondIdx) + " of " +
-              std::to_string(this->numBonds) + "to should have " +
+              std::to_string(this->numBonds) + " (+ " +
+              std::to_string(this->numSlipSprings) + ") to should have " +
               std::to_string(expectZero ? 0 : 1) + " but it did not (" +
               std::to_string(
                 this->bondDuplicationPenalty.segment(3 * bondIdx, 3).sum()) +
