@@ -73,6 +73,17 @@ add_library(test_sources
 )
 # pylimer_tools/test_force_balance2.cpp
 
+find_package(OpenMP)
+if (OpenMP_CXX_FOUND)
+	include_directories(${OpenMP_CXX_INCLUDE_DIRS})
+	# target_link_libraries(test_sources PRIVATE ${OpenMP_CXX_LIBRARIES})
+	target_link_libraries(test_sources PUBLIC OpenMP::OpenMP_CXX)
+	add_definitions(-DOPENMP_FOUND=true)
+	message(STATUS "Found OpenMP")
+else()
+	message(AUTHOR_WARNING "Did not find OpenMP")
+endif()
+
 add_dependencies(test_sources pylimer_tools)
 include_directories(${igraph_INCLUDE_DIRS})
 include_directories(${nlopt_INCLUDE_DIRS})

@@ -380,7 +380,7 @@ TEST_CASE("DPD Simulator Converts Correctly", "[analysis][DPDSimulator]")
 }
 
 TEST_CASE("DPD Simulator's restart files are accurate",
-          "[analysis][DPDSimulator]")
+          "[analysis][DPDSimulator][1proc]")
 {
   // note that the random force might lead to deviations compared to LAMMPS
   std::string suspectedPath = "../pylimer_tools/fixtures/";
