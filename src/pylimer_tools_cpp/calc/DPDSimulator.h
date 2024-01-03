@@ -485,6 +485,7 @@ namespace calc {
        */
       void resetBondDuplicationPenalty()
       {
+        std::cout << "resetBondDuplicationPenalty" << std::endl;
         this->bondDuplicationPenalty = Eigen::ArrayXd::Constant(
           3 * (this->numBonds + this->numSlipSprings), 1.);
         // this->bondDuplicationPenalty.setConstant(1.);
@@ -593,6 +594,7 @@ namespace calc {
       ////////////////////////////////////////////////////////////////
       // validation
       void validateState();
+      void validateDebugState();
       void validateNeighbourlist(double cutoff);
       double getUniformRandMean0Std1()
       {
@@ -653,7 +655,7 @@ namespace calc {
            currentForces,
            currentStressTensor);
         if (version > 5) {
-          ar(this->bondDuplicationPenalty);
+          ar(bondDuplicationPenalty);
         } else {
           this->resetBondDuplicationPenalty();
         }
