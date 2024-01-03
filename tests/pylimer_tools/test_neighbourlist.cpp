@@ -91,7 +91,7 @@ TEST_CASE("Manually accurate NeighbourList", "[entity][NeighbourList]")
 }
 
 TEST_CASE("Random coordinates EigenNeighbourList",
-          "[entity][EigenNeighbourList]")
+          "[entity][EigenNeighbourList][long]")
 {
   int numAtoms = 8300;
   Eigen::VectorXd coordinates = Eigen::VectorXd::Random(numAtoms * 3) * 100.;
