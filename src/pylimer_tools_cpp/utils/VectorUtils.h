@@ -254,6 +254,20 @@ namespace utils {
     // }
     return result;
   }
+
+  /**
+   * @brief Add an element to a (assumed) sorted vector where it belongs
+   *
+   * @tparam IN the vector's template parameter
+   * @param vec the vector to add the element to
+   * @param value the element to add
+   */
+  template<typename IN>
+  static inline void addToSorted(std::vector<IN>& vec, IN value)
+  {
+    auto it = std::upper_bound(vec.begin(), vec.end(), value);
+    vec.insert(it, value);
+  }
 } // namespace utils
 } // namespace pylimer_tools
 

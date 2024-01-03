@@ -22,7 +22,8 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
   std::string suspectedPath = "../pylimer_tools/fixtures/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
-  std::string inputFile = suspectedPath + "melt_83_a_100.structure.out";
+  std::string inputFile =
+    suspectedPath + "structure/melt_83_a_100.structure.out";
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     std::vector<pu::AtomStyle> atomStyles = { pu::AtomStyle::HYBRID,
@@ -189,7 +190,7 @@ TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator]")
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile =
-    suspectedPath + "melt_213_a_47_106_xlinks_v_1.structure.out";
+    suspectedPath + "structure/melt_213_a_47_106_xlinks_v_1.structure.out";
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     REQUIRE(universeSequence.getLength() == 0);
@@ -267,7 +268,8 @@ TEST_CASE("DPD Simulator Computes Correct Forces", "[analysis][DPDSimulator]")
   std::string suspectedPath = "../pylimer_tools/fixtures/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
-  std::string inputFile = suspectedPath + "melt_83_a_100.structure.out";
+  std::string inputFile =
+    suspectedPath + "structure/melt_83_a_100.structure.out";
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     REQUIRE(universeSequence.getLength() == 0);
@@ -351,7 +353,8 @@ TEST_CASE("DPD Simulator Converts Correctly", "[analysis][DPDSimulator]")
   std::string suspectedPath = "../pylimer_tools/fixtures/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
-  std::string inputFile = suspectedPath + "melt_83_a_100.structure.out";
+  std::string inputFile =
+    suspectedPath + "structure/melt_83_a_100.structure.out";
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     REQUIRE(universeSequence.getLength() == 0);
@@ -379,6 +382,43 @@ TEST_CASE("DPD Simulator Converts Correctly", "[analysis][DPDSimulator]")
   }
 }
 
+TEST_CASE("New PBC computation is correct", "[analysis][DPDSimulator]")
+{
+  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  REQUIRE(std::filesystem::exists(suspectedPath));
+
+  std::string inputFile =
+    suspectedPath + "structure/"
+                    "crosslinked_p_0.98_melt_100_a_3_50_xlinks_v_14.converted."
+                    "structure.out-equilibration_do_crosslink.structure.out";
+  if (std::filesystem::exists(inputFile)) {
+    pe::UniverseSequence universeSequence = pe::UniverseSequence();
+    REQUIRE(universeSequence.getLength() == 0);
+    universeSequence.initializeFromDataSequence({ { inputFile } });
+    REQUIRE(universeSequence.getLength() == 1);
+    pe::Universe universe = universeSequence.atIndex(0);
+
+    pcd::DPDSimulator simulator =
+      pcd::DPDSimulator(universe, 2, 9, false, "15th_seed");
+
+    simulator.createSlipSprings(100, 2);
+    simulator.refreshCurrentState();
+
+    Eigen::Matrix3d stressTensor0 = simulator.getStressTensor();
+    double temperature0 = simulator.getTemperature();
+    Eigen::VectorXd bondLengths0 = simulator.getBondLengths();
+
+    // switch to "common" PBC
+    simulator.configAssumeBoxLargeEnough();
+    simulator.refreshCurrentState();
+
+    CHECK(simulator.getStressTensor().isApprox(stressTensor0));
+    CHECK_THAT(simulator.getTemperature(),
+               Catch::Matchers::WithinRel(temperature0));
+    CHECK(simulator.getBondLengths().isApprox(bondLengths0));
+  }
+}
+
 TEST_CASE("DPD Simulator's restart files are accurate",
           "[analysis][DPDSimulator][1proc]")
 {
@@ -386,7 +426,8 @@ TEST_CASE("DPD Simulator's restart files are accurate",
   std::string suspectedPath = "../pylimer_tools/fixtures/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
-  std::string inputFile = suspectedPath + "melt_83_a_100.structure.out";
+  std::string inputFile =
+    suspectedPath + "structure/melt_83_a_100.structure.out";
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     REQUIRE(universeSequence.getLength() == 0);
