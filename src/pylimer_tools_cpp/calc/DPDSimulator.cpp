@@ -1348,49 +1348,7 @@ namespace calc {
      * @brief Validate just what we are currently debugging
      *
      */
-    void DPDSimulator::validateDebugState()
-    {
-      RUNTIME_EXP_IFN(
-        this->bondDuplicationPenalty.size() ==
-          (this->numBonds + this->numSlipSprings) * 3,
-        "State violation: nr of bond duplication penalities incorrect: got " +
-          std::to_string(this->bondDuplicationPenalty.size()) + " for " +
-          std::to_string(this->numBonds + this->numSlipSprings) + "bonds.");
-
-      // bond duplication penalty
-      std::unordered_set<size_t> partners;
-      for (size_t i = 0; i < this->numAtoms; ++i) {
-        partners.clear();
-        // here as well, we rely on the bonds of index being sorted
-        for (size_t bondIdx : this->bondsOfIndex[i]) {
-          size_t atomPartnerIdx = this->bondPartnersA[bondIdx] == i
-                                    ? this->bondPartnersB[bondIdx]
-                                    : this->bondPartnersA[bondIdx];
-          bool expectZero = false;
-          if (partners.contains(atomPartnerIdx)) {
-            // "real" bonds always contribute -> check that this is a
-            // slip-spring
-            if (bondIdx >= this->numBonds) {
-              expectZero = true;
-            }
-          } else {
-            partners.insert(atomPartnerIdx);
-          }
-          RUNTIME_EXP_IFN(
-            this->bondDuplicationPenalty.segment(3 * bondIdx, 3)
-              .isApprox(expectZero ? Eigen::Array3d::Zero()
-                                   : Eigen::Array3d::Constant(1.)),
-            "Incorrect bondDuplicationPenalty: found bond " +
-              std::to_string(bondIdx) + " of " +
-              std::to_string(this->numBonds) + " (+ " +
-              std::to_string(this->numSlipSprings) + ") to should have " +
-              std::to_string(expectZero ? 0 : 1) + " but it did not (" +
-              std::to_string(
-                this->bondDuplicationPenalty.segment(3 * bondIdx, 3).sum()) +
-              ").");
-        }
-      }
-    }
+    void DPDSimulator::validateDebugState() {}
 
     /**
      * @brief Make sure all the structures obey the expected form

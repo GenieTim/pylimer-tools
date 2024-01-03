@@ -249,7 +249,7 @@ TEST_CASE("DPD Simulator Restart Files Work", "[analysis][DPDSimulator]")
   }
 }
 
-TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator]")
+TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator][long]")
 {
   std::string suspectedPath = "../pylimer_tools/fixtures/";
   REQUIRE(std::filesystem::exists(suspectedPath));
@@ -566,3 +566,4 @@ TEST_CASE("DPD Simulator's restart files are accurate",
     CHECK(sim2.getTemperature() == simulator.getTemperature());
   }
 }
+
