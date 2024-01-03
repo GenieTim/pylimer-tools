@@ -139,7 +139,13 @@
     "span": "cpp",
     "ranges": "cpp",
     "cassert": "cpp",
-    "*.pmt": "cpp"
+    "*.pmt": "cpp",
+    "csetjmp": "cpp",
+    "csignal": "cpp",
+    "strstream": "cpp",
+    "coroutine": "cpp",
+    "source_location": "cpp",
+    "stdfloat": "cpp"
   },
   "C_Cpp.clang_format_path": "/usr/local/opt/llvm/bin/clang-format",
   "C_Cpp.default.cppStandard": "c++17",

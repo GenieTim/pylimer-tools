@@ -3,8 +3,8 @@
 #include "../../src/pylimer_tools_cpp/utils/GraphUtils.h"
 #include "../../src/pylimer_tools_cpp/utils/StringUtils.h"
 #include <catch2/catch_approx.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -282,6 +282,18 @@ TEST_CASE("Box works also after simple shear", "[entity][Box]")
       CHECK(testCoordCopy[i] == Catch::Approx(testCoordCopy2[i]));
     }
   }
+}
+
+TEST_CASE("Box's offset corresponds to PBC", "[entity][Box]")
+{
+  pe::Box box = pe::Box(10., 10., 10.);
+  Eigen::Vector3d diff = Eigen::Vector3d::Constant(15.);
+  CHECK(box.getOffset(diff).isApprox(Eigen::Vector3d::Constant(-20.)));
+  Eigen::Vector3d diff2 = diff;
+  box.handlePBC(diff2);
+  CHECK(box.getOffset(diff2).isApprox(Eigen::Vector3d::Zero()));
+  CHECK(diff2.isApprox(Eigen::Vector3d::Constant(-5.)));
+  CHECK((diff + box.getOffset(diff)).isApprox(diff2));
 }
 
 TEST_CASE("Box throws", "[entity][Box]")

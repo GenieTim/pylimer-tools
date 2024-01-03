@@ -11,7 +11,7 @@ neigh_modify every 1 delay 0 check yes one 5000
 
 variable seed equal 23425
 
-read_data ./melt_83_a_100.structure.out
+read_data ./structure/melt_83_a_100.structure.out
 
 variable sigmaPaper equal 3
 variable T equal 1. 
