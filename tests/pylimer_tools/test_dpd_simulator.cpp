@@ -179,6 +179,7 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     CHECK(sim2.getTemperature() ==
           Catch::Approx(simulator.getTemperature()).margin(0.1));
     CHECK_NOTHROW(sim2.validateState());
+    std::cout << "DPD ran from restart, state validated." << std::endl;
     std::remove(restartFile.c_str());
   }
 };

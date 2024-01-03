@@ -9,6 +9,12 @@ add_library(pylimer_tools pylimer_tools.cpp)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
+# other options we offer
+if (NOT DEFINED CODE_COVERAGE)
+	option(CODE_COVERAGE "Collect coverage from test library" OFF)
+endif()
+
+
 # TODO: remove
 # set(CMAKE_CXX_FLAGS "-pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wmissing-declarations -Wmissing-include-dirs -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-overflow=5 -Wswitch-default -Wundef -Wno-unused -g")
 
@@ -54,6 +60,9 @@ message("pylimer_tools includes igraph from ${igraph_INCLUDE_DIRS}, nlopt from $
 # optional additional dependencies
 IF (WIN32)
 		message(AUTHOR_WARNING "On Windows, OpenMP will not be used")
+		add_definitions(-DOPENMP_FOUND=false)
+elseif(CODE_COVERAGE)
+		message(AUTHOR_WARNING "Code-coverage is enabled, openmp will not be used")
 		add_definitions(-DOPENMP_FOUND=false)
 else()
 	find_package(OpenMP)
@@ -117,10 +126,6 @@ target_sources(pylimer_tools
 # ${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance2.h
 
 set_target_properties(pylimer_tools PROPERTIES VERSION ${PROJECT_VERSION})
-
-if (NOT DEFINED CODE_COVERAGE)
-	option(CODE_COVERAGE "Collect coverage from test library" OFF)
-endif()
 
 if(CODE_COVERAGE AND CMAKE_COMPILER_IS_GNUCXX)
 	if (CMAKE_BUILD_TYPE EQUAL "RELEASE")
