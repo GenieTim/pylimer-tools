@@ -826,7 +826,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
   {
     REQUIRE(std::filesystem::exists(suspectedPath));
     universeSeq.initializeFromDataSequence(
-      { { suspectedPath + "equil_phantom_hexa_lattice_60x60_25_bx_sqrtNbsqrt0."
+      { { suspectedPath + "structure/equil_phantom_hexa_lattice_60x60_25_bx_sqrtNbsqrt0."
                           "333_2d_t_7500001.structure.out" } });
     REQUIRE(universeSeq.getLength() == 1);
     pe::Universe universe = universeSeq.atIndex(0);
@@ -900,7 +900,7 @@ TEST_CASE("MEHP Force Balance can randomly add slip-links ignoring cross-links",
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
 
-  std::string inputFile = suspectedPath + "network_100_a_46.structure.out";
+  std::string inputFile = suspectedPath + "structure/network_100_a_46.structure.out";
   if (std::filesystem::exists(inputFile)) {
     REQUIRE(std::filesystem::exists(suspectedPath));
     std::cout << "Reading file " << inputFile << std::endl;
@@ -949,7 +949,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
 
-  std::string inputFile = suspectedPath + "network_100_a_46.structure.out";
+  std::string inputFile = suspectedPath + "structure/network_100_a_46.structure.out";
   if (std::filesystem::exists(inputFile)) {
     REQUIRE(std::filesystem::exists(suspectedPath));
     std::cout << "Reading file " << inputFile << std::endl;
@@ -1014,7 +1014,7 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
 
-  std::string inputFile = suspectedPath + "network_100_a_46.structure.out";
+  std::string inputFile = suspectedPath + "structure/network_100_a_46.structure.out";
   if (std::filesystem::exists(inputFile)) {
     REQUIRE(std::filesystem::exists(suspectedPath));
     std::cout << "Reading file " << inputFile << std::endl;

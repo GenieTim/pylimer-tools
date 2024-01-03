@@ -17,12 +17,71 @@ namespace pc = pylimer_tools::calc;
 namespace pu = pylimer_tools::utils;
 namespace pcd = pylimer_tools::calc::dpd;
 
-TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
+/**
+ * @brief Auxiliary helper function: sets different output types
+ *
+ * @param simulator
+ */
+void
+setupAllOutputs(pcd::DPDSimulator& simulator,
+                const std::string& averageFile,
+                const std::string& autocorrFile)
+{
+  std::vector<pc::ComputedDoubleValues> outputQuantities = {
+    pc::ComputedDoubleValues::TEMPERATURE, pc::ComputedDoubleValues::PRESSURE,
+    pc::ComputedDoubleValues::STRESS_XX,   pc::ComputedDoubleValues::STRESS_YY,
+    pc::ComputedDoubleValues::STRESS_ZZ,   pc::ComputedDoubleValues::MSD
+  };
+
+  pc::OutputConfiguration config;
+  config.filename = "";
+  config.outputEvery = 1;
+  config.doubleValues = outputQuantities;
+  config.intValues = { pc::ComputedIntValues::STEP };
+
+  std::vector<pc::OutputConfiguration> configs = { config };
+  REQUIRE_NOTHROW(simulator.configStepOutput(configs));
+
+  std::vector<pc::ComputedDoubleValues> averageQuantities = {
+    pc::ComputedDoubleValues::TEMPERATURE, pc::ComputedDoubleValues::PRESSURE,
+    pc::ComputedDoubleValues::STRESS_XX,   pc::ComputedDoubleValues::STRESS_YY,
+    pc::ComputedDoubleValues::STRESS_ZZ,   pc::ComputedDoubleValues::MSD
+  };
+
+  pc::OutputConfiguration avgconfig;
+  avgconfig.outputEvery = 20;
+  avgconfig.filename = averageFile;
+  avgconfig.doubleValues = averageQuantities;
+
+  std::vector<pc::OutputConfiguration> avgconfigs = { avgconfig };
+  REQUIRE_NOTHROW(simulator.configAverageOutput(avgconfigs));
+
+  std::vector<pc::ComputedDoubleValues> autocorrelationQuantities = {
+    pc::ComputedDoubleValues::STRESS_XX,  pc::ComputedDoubleValues::STRESS_YY,
+    pc::ComputedDoubleValues::STRESS_ZZ,  pc::ComputedDoubleValues::STRESS_XY,
+    pc::ComputedDoubleValues::STRESS_YZ,  pc::ComputedDoubleValues::STRESS_XZ,
+    pc::ComputedDoubleValues::STRESS_NXY, pc::ComputedDoubleValues::STRESS_NYZ,
+    pc::ComputedDoubleValues::STRESS_NXZ,
+  };
+  pc::OutputConfiguration autocorrconfig;
+  autocorrconfig.outputEvery = 25;
+  autocorrconfig.filename = autocorrFile;
+  autocorrconfig.doubleValues = autocorrelationQuantities;
+
+  std::vector<pc::OutputConfiguration> autocorrconfigs = { autocorrconfig };
+  REQUIRE_NOTHROW(simulator.configAutoCorrelatorOutput(autocorrconfigs));
+
+  std::vector<size_t> atomIdsForMSD = { 1, 4, 6 };
+  REQUIRE_NOTHROW(simulator.startMeasuringMSDForAtoms(atomIdsForMSD));
+}
+
+TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator][long]")
 {
   std::string suspectedPath = "../pylimer_tools/fixtures/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
-  std::string inputFile = suspectedPath + "melt_83_a_100.structure.out";
+  std::string inputFile =
+    suspectedPath + "structure/melt_83_a_100.structure.out";
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     std::vector<pu::AtomStyle> atomStyles = { pu::AtomStyle::HYBRID,
@@ -71,66 +130,11 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     CHECK_THAT(initialStressTensor(1, 2),
                Catch::Matchers::WithinAbs(-0.035841973, 0.2));
 
-    std::vector<pc::ComputedDoubleValues> outputQuantities = {
-      pc::ComputedDoubleValues::TEMPERATURE,
-      pc::ComputedDoubleValues::PRESSURE,
-      pc::ComputedDoubleValues::STRESS_XX,
-      pc::ComputedDoubleValues::STRESS_YY,
-      pc::ComputedDoubleValues::STRESS_ZZ,
-      pc::ComputedDoubleValues::MSD
-    };
-
-    pc::OutputConfiguration config;
-    config.filename = "";
-    config.outputEvery = 1;
-    config.doubleValues = outputQuantities;
-    config.intValues = { pc::ComputedIntValues::STEP };
-
-    std::vector<pc::OutputConfiguration> configs = { config };
-    REQUIRE_NOTHROW(simulator.configStepOutput(configs));
-
-    std::vector<pc::ComputedDoubleValues> averageQuantities = {
-      pc::ComputedDoubleValues::TEMPERATURE,
-      pc::ComputedDoubleValues::PRESSURE,
-      pc::ComputedDoubleValues::STRESS_XX,
-      pc::ComputedDoubleValues::STRESS_YY,
-      pc::ComputedDoubleValues::STRESS_ZZ,
-      pc::ComputedDoubleValues::MSD
-    };
-
     std::string averageFile =
       suspectedPath + "melt_83_a_100.structure.avg-out.txt";
-    pc::OutputConfiguration avgconfig;
-    avgconfig.outputEvery = 20;
-    avgconfig.filename = averageFile;
-    avgconfig.doubleValues = averageQuantities;
-
-    std::vector<pc::OutputConfiguration> avgconfigs = { avgconfig };
-    REQUIRE_NOTHROW(simulator.configAverageOutput(avgconfigs));
-
-    std::vector<pc::ComputedDoubleValues> autocorrelationQuantities = {
-      pc::ComputedDoubleValues::STRESS_XX,
-      pc::ComputedDoubleValues::STRESS_YY,
-      pc::ComputedDoubleValues::STRESS_ZZ,
-      pc::ComputedDoubleValues::STRESS_XY,
-      pc::ComputedDoubleValues::STRESS_YZ,
-      pc::ComputedDoubleValues::STRESS_XZ,
-      pc::ComputedDoubleValues::STRESS_NXY,
-      pc::ComputedDoubleValues::STRESS_NYZ,
-      pc::ComputedDoubleValues::STRESS_NXZ,
-    };
     std::string autocorrFile =
       suspectedPath + "melt_83_a_100.structure.autocorr-out.txt";
-    pc::OutputConfiguration autocorrconfig;
-    autocorrconfig.outputEvery = 25;
-    autocorrconfig.filename = autocorrFile;
-    autocorrconfig.doubleValues = autocorrelationQuantities;
-
-    std::vector<pc::OutputConfiguration> autocorrconfigs = { autocorrconfig };
-    REQUIRE_NOTHROW(simulator.configAutoCorrelatorOutput(autocorrconfigs));
-
-    std::vector<size_t> atomIdsForMSD = { 1, 4, 6 };
-    REQUIRE_NOTHROW(simulator.startMeasuringMSDForAtoms(atomIdsForMSD));
+    setupAllOutputs(simulator, averageFile, autocorrFile);
 
     // restart files
     // std::string restartFile = suspectedPath + "dpd_restart_file.xml";
@@ -175,14 +179,75 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator]")
     REQUIRE(std::filesystem::exists(restartFile));
 
     pcd::DPDSimulator sim2 = pcd::DPDSimulator::readRestartFile(restartFile);
+    CHECK_NOTHROW(sim2.validateState());
+    std::cout << "DPD read from restart file, state validated." << std::endl;
     REQUIRE_NOTHROW(sim2.runSimulation(5, false));
     CHECK(sim2.getTemperature() ==
           Catch::Approx(simulator.getTemperature()).margin(0.1));
     CHECK_NOTHROW(sim2.validateState());
-    std::cout << "DPD ran from restart, state validated." << std::endl;
+    std::cout << "DPD ran from restart file, state validated." << std::endl;
     std::remove(restartFile.c_str());
   }
 };
+
+TEST_CASE("DPD Simulator Restart Files Work", "[analysis][DPDSimulator]")
+{
+
+  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  REQUIRE(std::filesystem::exists(suspectedPath));
+
+  std::string inputFile =
+    suspectedPath + "structure/melt_83_a_100.structure.out";
+  if (std::filesystem::exists(inputFile)) {
+    pe::UniverseSequence universeSequence = pe::UniverseSequence();
+    std::vector<pu::AtomStyle> atomStyles = { pu::AtomStyle::HYBRID,
+                                              pu::AtomStyle::BOND,
+                                              pu::AtomStyle::EDPD };
+    universeSequence.setDataFileAtomStyle(atomStyles);
+    REQUIRE(universeSequence.getLength() == 0);
+    universeSequence.initializeFromDataSequence({ { inputFile } });
+    REQUIRE(universeSequence.getLength() == 1);
+    pe::Universe universe = universeSequence.atIndex(0);
+
+    pcd::DPDSimulator simulator =
+      pcd::DPDSimulator(universe, 2, 9, false, "1st_seed");
+
+    std::string averageFile =
+      suspectedPath + "melt_83_a_100.structure.avg-out.txt";
+    std::string autocorrFile =
+      suspectedPath + "melt_83_a_100.structure.autocorr-out.txt";
+    setupAllOutputs(simulator, averageFile, autocorrFile);
+
+    simulator.createSlipSprings(100, 2);
+    // turn down the DPD & MC steps as we don't do as many total steps
+    REQUIRE_NOTHROW(simulator.configNumStepsDPD(25));
+    REQUIRE_NOTHROW(simulator.configNumStepsMC(25));
+    CHECK_NOTHROW(simulator.validateState());
+    std::cout << "DPD slip-springs created." << std::endl;
+
+    CHECK_NOTHROW(simulator.runSimulation(5, true));
+    CHECK_NOTHROW(simulator.validateState());
+
+    std::string restartFile = suspectedPath + "dpd_restart_file.bin";
+    simulator.writeRestartFile(restartFile);
+
+    CHECK_NOTHROW(simulator.validateState());
+
+    pcd::DPDSimulator simulator2 =
+      pcd::DPDSimulator::readRestartFile(restartFile);
+
+    CHECK_NOTHROW(simulator2.validateState());
+    CHECK_NOTHROW(simulator2.runSimulation(5, true));
+    CHECK_NOTHROW(simulator2.validateState());
+    std::cout << "DPD restart file is read appropriately." << std::endl;
+
+    CHECK(std::filesystem::exists(averageFile));
+    std::remove(averageFile.c_str());
+    CHECK(std::filesystem::exists(autocorrFile));
+    std::remove(autocorrFile.c_str());
+    REQUIRE(std::filesystem::exists(restartFile));
+  }
+}
 
 TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator]")
 {
@@ -190,7 +255,7 @@ TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator]")
   REQUIRE(std::filesystem::exists(suspectedPath));
 
   std::string inputFile =
-    suspectedPath + "melt_213_a_47_106_xlinks_v_1.structure.out";
+    suspectedPath + "structure/melt_213_a_47_106_xlinks_v_1.structure.out";
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     REQUIRE(universeSequence.getLength() == 0);
@@ -268,7 +333,8 @@ TEST_CASE("DPD Simulator Computes Correct Forces", "[analysis][DPDSimulator]")
   std::string suspectedPath = "../pylimer_tools/fixtures/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
-  std::string inputFile = suspectedPath + "melt_83_a_100.structure.out";
+  std::string inputFile =
+    suspectedPath + "structure/melt_83_a_100.structure.out";
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     REQUIRE(universeSequence.getLength() == 0);
@@ -352,7 +418,8 @@ TEST_CASE("DPD Simulator Converts Correctly", "[analysis][DPDSimulator]")
   std::string suspectedPath = "../pylimer_tools/fixtures/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
-  std::string inputFile = suspectedPath + "melt_83_a_100.structure.out";
+  std::string inputFile =
+    suspectedPath + "structure/melt_83_a_100.structure.out";
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     REQUIRE(universeSequence.getLength() == 0);
@@ -380,14 +447,63 @@ TEST_CASE("DPD Simulator Converts Correctly", "[analysis][DPDSimulator]")
   }
 }
 
+TEST_CASE("New PBC computation is correct", "[analysis][DPDSimulator][1proc]")
+{
+  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  REQUIRE(std::filesystem::exists(suspectedPath));
+
+  std::string inputFile =
+    suspectedPath + "structure/"
+                    "crosslinked_p_0.98_melt_100_a_3_50_xlinks_v_14.converted."
+                    "structure.out-equilibration_do_crosslink.structure.out";
+  if (std::filesystem::exists(inputFile)) {
+    pe::UniverseSequence universeSequence = pe::UniverseSequence();
+    REQUIRE(universeSequence.getLength() == 0);
+    universeSequence.initializeFromDataSequence({ { inputFile } });
+    REQUIRE(universeSequence.getLength() == 1);
+    pe::Universe universe = universeSequence.atIndex(0);
+
+    pcd::DPDSimulator simulator =
+      pcd::DPDSimulator(universe, 2, 9, false, "15th_seed");
+
+    simulator.createSlipSprings(100, 2);
+
+#ifdef OPENMP_FOUND
+    // we cannot have more than 1 thread, otherwise the random number generator
+    // will not play nicely.
+    omp_set_num_threads(1);
+#endif
+
+    // invoke copy-constructor
+    pcd::DPDSimulator simulator2 = simulator;
+
+    // switch to "common" PBC
+    simulator2.configAssumeBoxLargeEnough();
+
+    simulator.reseedRandomness("15th_seed");
+    simulator.refreshCurrentState();
+    simulator2.reseedRandomness("15th_seed");
+    simulator2.refreshCurrentState();
+
+    CHECK(simulator.getUniformRandBetween0And1() ==
+          simulator2.getUniformRandBetween0And1());
+    CHECK_THAT(simulator.getTemperature(),
+               Catch::Matchers::WithinRel(simulator2.getTemperature()));
+    CHECK(simulator.getBondLengths().isApprox(simulator2.getBondLengths()));
+    CHECK(simulator.getStressTensor().isApprox(simulator2.getStressTensor()));
+    // std::cout << simulator.getStressTensor() << std::endl;
+  }
+}
+
 TEST_CASE("DPD Simulator's restart files are accurate",
-          "[analysis][DPDSimulator]")
+          "[analysis][DPDSimulator][1proc]")
 {
   // note that the random force might lead to deviations compared to LAMMPS
   std::string suspectedPath = "../pylimer_tools/fixtures/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
-  std::string inputFile = suspectedPath + "melt_83_a_100.structure.out";
+  std::string inputFile =
+    suspectedPath + "structure/melt_83_a_100.structure.out";
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     REQUIRE(universeSequence.getLength() == 0);

@@ -24,14 +24,7 @@ namespace calc {
     {
       INVALIDARG_EXP_IFN(!is2D, "2D simulations are not supported yet.");
       this->is2D = is2D;
-      // initialize the random number generator
-      if (seed == "") {
-        std::random_device rd;
-        this->e2 = std::mt19937(rd());
-      } else {
-        std::seed_seq seed2(seed.begin(), seed.end());
-        this->e2 = std::mt19937(seed2);
-      }
+      this->reseedRandomness(seed);
       double mean = 0.0;
       double std = 1.0;
       double a = mean - std::sqrt(3.) * std;
@@ -286,7 +279,8 @@ namespace calc {
       this->bondPartnersB.conservativeResize(this->bondPartnersB.size() + 1);
       this->bondTypes.conservativeResize(this->bondTypes.size() + 1);
       this->bondBoxOffsets.conservativeResize(this->bondBoxOffsets.size() + 3);
-      this->bondDuplicationPenalty.conservativeResize(this->bondDuplicationPenalty.size() + 3);
+      this->bondDuplicationPenalty.conservativeResize(
+        this->bondDuplicationPenalty.size() + 3);
       assert(this->bondPartnersA.size() == this->bondPartnersB.size());
       assert(this->bondPartnersA.size() == this->bondTypes.size());
       assert(this->bondPartnersA.size() ==
@@ -330,16 +324,12 @@ namespace calc {
         this->bondPartnerCoordinatesA[3 * newBondIdx + i] = 3 * fromIdx + i;
         this->bondPartnerCoordinatesB[3 * newBondIdx + i] = 3 * toIdx + i;
       }
-      this->bondsOfIndex[fromIdx].push_back(newBondIdx);
-      this->bondsOfIndex[toIdx].push_back(newBondIdx);
-      this->resetBondOffset(newBondIdx);
-      // TODO: we know that everything is sorted, except for the new -> just
-      // insert it where it belongs instead.
-      std::sort(this->bondsOfIndex[fromIdx].begin(),
-                this->bondsOfIndex[fromIdx].end());
-      std::sort(this->bondsOfIndex[toIdx].begin(),
-                this->bondsOfIndex[toIdx].end());
+      pylimer_tools::utils::addToSorted<size_t>(this->bondsOfIndex[fromIdx],
+                                                newBondIdx);
+      pylimer_tools::utils::addToSorted<size_t>(this->bondsOfIndex[toIdx],
+                                                newBondIdx);
 
+      this->resetBondOffset(newBondIdx);
       this->resetBondDuplicationPenalty(fromIdx);
       this->resetBondDuplicationPenalty(toIdx);
 
@@ -434,24 +424,30 @@ namespace calc {
           .matrix();
       if (this->assumeBoxLargeEnough) {
         this->box.handlePBC(bondDistances);
-        #ifndef NDEBUG
+#ifndef NDEBUG
         for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
-          if (bondDistances.segment(3 * i, 3).squaredNorm() > 0.5*this->box.getL().minCoeff()) {
-            std::cerr << "WARNING: Bond " << i<< " has length " << bondDistances.segment(3 * i, 3).squaredNorm() << ", which violates the assumption that the box is large enough" << std::endl;
+          if (bondDistances.segment(3 * i, 3).squaredNorm() >
+              0.5 * this->box.getL().minCoeff()) {
+            std::cerr
+              << "WARNING: Bond " << i << " has length "
+              << bondDistances.segment(3 * i, 3).squaredNorm()
+              << ", which violates the assumption that the box is large enough"
+              << std::endl;
           }
         }
-        #endif
+#endif
       } else {
-        #ifndef NDEBUG
+#ifndef NDEBUG
         for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
-          if (this->bondBoxOffsets.segment(3*i,3) != this->box.getOffset(
-            coords(this->bondPartnerCoordinatesA.segment(3*i,3)) -
-          coords(this->bondPartnerCoordinatesB.segment(3*i,3))
-          )) {
-            std::cerr << "INFO: Bond " << i << " spans more than one image." << std::endl;
+          if (this->bondBoxOffsets.segment(3 * i, 3) !=
+              this->box.getOffset(
+                coords(this->bondPartnerCoordinatesA.segment(3 * i, 3)) -
+                coords(this->bondPartnerCoordinatesB.segment(3 * i, 3)))) {
+            std::cerr << "INFO: Bond " << i << " spans more than one image."
+                      << std::endl;
           }
         }
-        #endif
+#endif
       }
       // assert(bondDistances.minCoeff() > -this->box.getL().maxCoeff());
       // assert(bondDistances.maxCoeff() < this->box.getL().maxCoeff());
@@ -708,8 +704,8 @@ namespace calc {
       this->bondTypes.conservativeResize(sizeBefore + partnerB.size());
       this->bondBoxOffsets.conservativeResize(3 *
                                               (sizeBefore + partnerA.size()));
-      this->bondDuplicationPenalty.conservativeResize(3 *
-                                              (sizeBefore + partnerA.size()));
+      this->bondDuplicationPenalty.conservativeResize(
+        3 * (sizeBefore + partnerA.size()));
 
       this->bondPartnersA.segment(sizeBefore, partnerA.size()) =
         Eigen::Map<Eigen::ArrayXst, Eigen::Unaligned>(partnerA.data(),
@@ -1140,22 +1136,26 @@ namespace calc {
         (this->atomTypes[partnerAfter] != this->crosslinkerType ||
          this->idxFunctionalities[partnerAfter] <= 2),
         "Cannot form slip-springs with cross-links.");
+      size_t otherPartner;
       if (this->bondPartnersA[springIdx] == partnerBefore) {
         this->bondPartnersA[springIdx] = partnerAfter;
         for (int dir = 0; dir < 3; ++dir) {
           this->bondPartnerCoordinatesA[3 * springIdx + dir] =
             3 * partnerAfter + dir;
         }
+        otherPartner = this->bondPartnersB[springIdx];
       } else {
         this->bondPartnersB[springIdx] = partnerAfter;
         for (int dir = 0; dir < 3; ++dir) {
           this->bondPartnerCoordinatesB[3 * springIdx + dir] =
             3 * partnerAfter + dir;
         }
+        otherPartner = this->bondPartnersA[springIdx];
       }
       this->resetBondOffset(springIdx);
       // add to the bonds of the new bond partner
-      this->bondsOfIndex[partnerAfter].push_back(springIdx);
+      pylimer_tools::utils::addToSorted<size_t>(
+        this->bondsOfIndex[partnerAfter], springIdx);
       // remove from the bonds of the previous bond partner
       for (size_t i = this->idxFunctionalities[partnerBefore];
            i < this->bondsOfIndex[partnerBefore].size();
@@ -1164,11 +1164,12 @@ namespace calc {
           // remove this
           this->bondsOfIndex[partnerBefore].erase(
             this->bondsOfIndex[partnerBefore].begin() + i);
+          this->resetBondDuplicationPenalty(partnerAfter);
+          this->resetBondDuplicationPenalty(partnerBefore);
+          // this->resetBondDuplicationPenalty(otherPartner);
           return;
         }
       }
-      this->resetBondDuplicationPenalty(partnerAfter);
-      this->resetBondDuplicationPenalty(partnerBefore);
       this->validateState();
       throw std::runtime_error("Invalid internal state: replacing slip-spring "
                                "partner, but did not find it internally.");
@@ -1344,6 +1345,54 @@ namespace calc {
     }
 
     /**
+     * @brief Validate just what we are currently debugging
+     *
+     */
+    void DPDSimulator::validateDebugState()
+    {
+      RUNTIME_EXP_IFN(
+        this->bondDuplicationPenalty.size() ==
+          (this->numBonds + this->numSlipSprings) * 3,
+        "State violation: nr of bond duplication penalities incorrect: got " +
+          std::to_string(this->bondDuplicationPenalty.size()) + " for " +
+          std::to_string(this->numBonds + this->numSlipSprings) + "bonds.");
+
+      // bond duplication penalty
+      std::unordered_set<size_t> partners;
+      for (size_t i = 0; i < this->numAtoms; ++i) {
+        partners.clear();
+        // here as well, we rely on the bonds of index being sorted
+        for (size_t bondIdx : this->bondsOfIndex[i]) {
+          size_t atomPartnerIdx = this->bondPartnersA[bondIdx] == i
+                                    ? this->bondPartnersB[bondIdx]
+                                    : this->bondPartnersA[bondIdx];
+          bool expectZero = false;
+          if (partners.contains(atomPartnerIdx)) {
+            // "real" bonds always contribute -> check that this is a
+            // slip-spring
+            if (bondIdx >= this->numBonds) {
+              expectZero = true;
+            }
+          } else {
+            partners.insert(atomPartnerIdx);
+          }
+          RUNTIME_EXP_IFN(
+            this->bondDuplicationPenalty.segment(3 * bondIdx, 3)
+              .isApprox(expectZero ? Eigen::Array3d::Zero()
+                                   : Eigen::Array3d::Constant(1.)),
+            "Incorrect bondDuplicationPenalty: found bond " +
+              std::to_string(bondIdx) + " of " +
+              std::to_string(this->numBonds) + " (+ " +
+              std::to_string(this->numSlipSprings) + ") to should have " +
+              std::to_string(expectZero ? 0 : 1) + " but it did not (" +
+              std::to_string(
+                this->bondDuplicationPenalty.segment(3 * bondIdx, 3).sum()) +
+              ").");
+        }
+      }
+    }
+
+    /**
      * @brief Make sure all the structures obey the expected form
      *
      */
@@ -1396,6 +1445,11 @@ namespace calc {
           } else {
             RUNTIME_EXP_IFN(this->bondsOfIndex[i][j] >= this->numBonds,
                             "Expect bonds to come before slip springs.");
+          }
+          if (j > 0) {
+            RUNTIME_EXP_IFN(this->bondsOfIndex[i][j] >
+                              this->bondsOfIndex[i][j - 1],
+                            "Require bonds of atom to be sorted.");
           }
         }
       }
@@ -1455,11 +1509,18 @@ namespace calc {
           } else {
             partners.insert(atomPartnerIdx);
           }
-          RUNTIME_EXP_IFN(this->bondDuplicationPenalty.segment(3 * bondIdx, 3)
-                            .isApprox(expectZero
-                                        ? Eigen::Array3d::Zero()
-                                        : Eigen::Array3d::Constant(1.)),
-                          "Incorrect bondDuplicationPenalty");
+          RUNTIME_EXP_IFN(
+            this->bondDuplicationPenalty.segment(3 * bondIdx, 3)
+              .isApprox(expectZero ? Eigen::Array3d::Zero()
+                                   : Eigen::Array3d::Constant(1.)),
+            "Incorrect bondDuplicationPenalty: found bond " +
+              std::to_string(bondIdx) + " of " +
+              std::to_string(this->numBonds) + " (+ " +
+              std::to_string(this->numSlipSprings) + ") to should have " +
+              std::to_string(expectZero ? 0 : 1) + " but it did not (" +
+              std::to_string(
+                this->bondDuplicationPenalty.segment(3 * bondIdx, 3).sum()) +
+              ").");
         }
       }
 

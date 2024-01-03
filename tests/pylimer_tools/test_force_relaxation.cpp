@@ -272,7 +272,7 @@ TEST_CASE(
   {
     REQUIRE(std::filesystem::exists(suspectedPath));
     universeSeq.initializeFromDataSequence(
-      { { suspectedPath + "equil_phantom_hexa_lattice_60x60_25_bx_sqrtNbsqrt0."
+      { { suspectedPath + "structure/equil_phantom_hexa_lattice_60x60_25_bx_sqrtNbsqrt0."
                           "333_2d_t_7500001.structure.out" } });
     REQUIRE(universeSeq.getLength() == 1);
     pe::Universe universe = universeSeq.atIndex(0);

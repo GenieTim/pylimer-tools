@@ -1,7 +1,7 @@
 #include "../../src/pylimer_tools_cpp/entities/Atom.h"
 #include "../../src/pylimer_tools_cpp/entities/Box.h"
-#include "../../src/pylimer_tools_cpp/utils/VectorUtils.h"
 #include "../../src/pylimer_tools_cpp/utils/StringUtils.h"
+#include "../../src/pylimer_tools_cpp/utils/VectorUtils.h"
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <filesystem>
@@ -50,7 +50,8 @@ TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
     }
   }
 
-  SECTION("Empty vectors are empty") {
+  SECTION("Empty vectors are empty")
+  {
     Eigen::VectorXd v = Eigen::VectorXd::Zero(0);
     CHECK(v.size() == 0);
     Eigen::ArrayXi a = Eigen::ArrayXi::Zero(0);
@@ -139,4 +140,17 @@ TEST_CASE("Elements can be found and conditionally added", "[VectorUtils]")
   CHECK(testVec.size() == 5);
   CHECK(pu::contains(testVec, 100));
   CHECK(pu::last(testVec) == 100);
+}
+
+TEST_CASE("Elements are inserted to a sorted vector")
+{
+  std::vector<size_t> vec = { 1, 3, 5, 7, 9 };
+  size_t size_before = vec.size();
+  pylimer_tools::utils::addToSorted<size_t>(vec, 4);
+  CHECK(vec.size() == size_before + 1);
+  CHECK(vec[2] == 4);
+  pylimer_tools::utils::addToSorted<size_t>(vec, 0);
+  for (size_t i = 1; i < vec.size(); ++i) {
+    CHECK(vec[i] > vec[i - 1]);
+  }
 }
