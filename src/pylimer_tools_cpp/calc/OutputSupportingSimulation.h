@@ -141,7 +141,6 @@ namespace calc {
     std::vector<Eigen::VectorXd> msdOrigins;
     std::vector<size_t> msdOriginTimesteps;
     std::vector<double> runningAverages;
-    int numStepsInAverage = 0;
 
     void prepareAllOutputs()
     {
@@ -249,7 +248,6 @@ namespace calc {
         for (OutputConfiguration oc : this->outputAverageConfigs) {
           size_t previousAverageIdx = averagesIdx;
           if ((currentStep % oc.useEvery) == 0) {
-            this->numStepsInAverage += (averagesIdx == 0 ? 1 : 0);
             double multiplier = (static_cast<double>(oc.useEvery) /
                                  static_cast<double>(oc.outputEvery));
             for (ComputedIntValues val : oc.intValues) {
@@ -288,15 +286,6 @@ namespace calc {
 
           // check (and if, output) averages
           if (currentStep % oc.outputEvery == 0) {
-            if (previousAverageIdx == 0) {
-              RUNTIME_EXP_IFN(
-                this->numStepsInAverage == oc.outputEvery / oc.useEvery,
-                "Got " + std::to_string(this->numStepsInAverage) +
-                  " steps in average for output every " +
-                  std::to_string(oc.outputEvery) + " and use every " +
-                  std::to_string(oc.useEvery) + ".");
-              this->numStepsInAverage = 0;
-            }
             // output & start again
             outputBuffer += std::to_string(intvalues[ComputedIntValues::STEP]);
             for (size_t i = previousAverageIdx; i < averagesIdx; ++i) {
