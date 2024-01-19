@@ -4,6 +4,7 @@
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
+#include "RandomWalker.h"
 #include "StringUtils.h"
 #include <algorithm>
 #include <filesystem>
@@ -390,17 +391,6 @@ namespace utils {
                                   int chainLen,
                                   int atomType = 1)
     {
-      // std::cout << "Doing random walk from/to" << std::endl;
-      std::vector<double> xs;
-      xs.reserve(chainLen);
-      std::vector<double> ys;
-      ys.reserve(chainLen);
-      std::vector<double> zs;
-      zs.reserve(chainLen);
-
-      std::uniform_real_distribution<double> angleDistribution =
-        std::uniform_real_distribution<double>(0, 2 * M_PI);
-
       double lastX = this->simplifiedUniverse.x[from];
       double lastY = this->simplifiedUniverse.y[from];
       double lastZ = this->simplifiedUniverse.z[from];
@@ -423,90 +413,23 @@ namespace utils {
           : lastZ + this->_getDeltaDistance(
                       this->simplifiedUniverse.z[to], lastZ, this->box.getLz());
 
-      for (int i = 0; i < chainLen; ++i) {
-        double dx = targetX - lastX;
-        double dy = targetY - lastY;
-        double dz = targetZ - lastZ;
-        // for primary loops, dx, dy & dz are zero, intially.
-        // therewith, alpha will be NaN
-        double remainingDistance = std::sqrt(dx * dx + dy * dy + dz * dz);
-        // alpha = theta in Wikipedia
-        double idealAlpha =
-          std::acos(std::clamp(dz / remainingDistance, -1.0, 1.0));
-        // beta = phi in Wikipedia
-        double idealBeta = (dx == 0.0) ? (M_PI * 0.5) : (std::atan2(dy, dx));
-        double bondLenToUse = this->beadDistance;
-        double idealWeight = 0.0;
-        double bondsRemaining = ((chainLen - i) + 1);
-        if (((remainingDistance) / (bondsRemaining)) > this->beadDistance) {
-          // need to constrain, cannot use random alpha & beta
-          // TODO: find some a bit more sophisticated probability adjustment (or
-          // simply use constraints for probability)
-          idealWeight = 1.0;
-          bondLenToUse = remainingDistance / (bondsRemaining);
-          if (bondLenToUse > 2 * this->beadDistance) {
-            std::cout << "Using bond length: " << bondLenToUse << " for "
-                      << bondsRemaining << " remaining bonds between " << lastX
-                      << ", " << lastY << ", " << lastZ
-                      << " to target: " << targetX << ", " << targetY << ", "
-                      << targetZ << " with length " << remainingDistance
-                      << " at i = " << i << " of " << chainLen << std::endl;
-          }
-          // std::min(((double)i) / ((double)chainLen) +
-          //              (remainingDistance / (chainLen - i + 1)),
-          //          1.0);
-        }
+      std::unordered_map<std::string, std::vector<double>> walk_results =
+        pylimer_tools::utils::doRandomWalkChainFromTo(
+          this->box,
+          std::array<double, 3>{
+            lastX,
+            lastY,
+            lastZ,
+          },
+          std::array<double, 3>{ targetX, targetY, targetZ },
+          chainLen,
+          this->beadDistance);
 
-        double alpha = (1.0 - idealWeight) * angleDistribution(this->rng) +
-                       idealWeight * idealAlpha;
-        // happens e.g. for primary loops
-        if (isnan(alpha)) {
-          // std::cout << "Got nan for alpha with idealAlpha = " << idealAlpha
-          //           << ", weight = " << idealWeight << ", dx = " << dx
-          //           << ", dy = " << dy << ", dz = " << dz << " at i = " << i
-          //           << std::endl;
-          alpha = isnan(idealAlpha) ? angleDistribution(this->rng) : idealAlpha;
-        };
-        double beta = (1.0 - idealWeight) * angleDistribution(this->rng) +
-                      idealWeight * idealBeta;
-        if (isnan(beta)) {
-          // std::cout << "Got nan for beta with idealBeta = " << idealBeta
-          //           << ", weight = " << idealWeight << ", dx = " << dx
-          //           << ", dy = " << dy << ", dz = " << dz << " at i = " << i
-          //           << std::endl;
-
-          beta = isnan(idealBeta) ? angleDistribution(this->rng) : idealBeta;
-        }
-        // std::cout << "Using ideal weight " << idealWeight << " at " << i
-        //           << ", remaining d: " << remainingDistance << " with alpha "
-        //           << alpha << ", ideal " << idealAlpha << ", beta " << beta
-        //           <<
-        //           ", ideal " << idealBeta << std::endl;
-        // coordinate system conversion: confirmation e.g. in
-        // https://math.stackexchange.com/a/1385150/738831 or
-        // https://en.wikipedia.org/wiki/Spherical_coordinate_system
-        xs.push_back(lastX + bondLenToUse * std::cos(beta) * std::sin(alpha));
-        lastX = xs[i];
-        ys.push_back(lastY + bondLenToUse * std::sin(beta) * std::sin(alpha));
-        lastY = ys[i];
-        zs.push_back(lastZ + bondLenToUse * std::cos(alpha));
-        lastZ = zs[i];
-        assert(!isnan(lastX) && !isnan(lastY) && !isnan(lastZ));
-      }
-
-      // std::cout << "Made chain with final " << lastX << ", " << lastY << ", "
-      //           << lastZ << " to target: " << targetX << ", " << targetY <<
-      //           ",
-      //           "
-      //           << targetZ << " with length "
-      //           << this->getDistance(lastX, lastY, lastZ, targetX, targetY,
-      //                                targetZ)
-      //           << std::endl;
-
+      // assemeble and add these atoms
       Positions positions;
-      positions.x = xs;
-      positions.y = ys;
-      positions.z = zs;
+      positions.x = walk_results["x"];
+      positions.y = walk_results["y"];
+      positions.z = walk_results["z"];
       std::vector<size_t> idxs =
         this->addAtomsWithType(chainLen, atomType, positions);
       // initalize some bond specific

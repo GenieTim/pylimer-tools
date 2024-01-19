@@ -803,10 +803,15 @@ namespace calc {
 
         // compute the Metropolis criterion
         Eigen::Vector3d bondDistanceNow =
-          this->coordinates.segment(partnerA * 3, 3) -
-          this->coordinates.segment(partnerB * 3, 3);
-        this->box.handlePBC(bondDistanceNow);
+          (this->coordinates.segment(partnerA * 3, 3) -
+           this->coordinates.segment(partnerB * 3, 3)) +
+          this->bondBoxOffsets.segment(3 * springIdx, 3);
+        if (this->assumeBoxLargeEnough) {
+          this->box.handlePBC(bondDistanceNow);
+        }
         double bondEnergyNow = k * bondDistanceNow.squaredNorm();
+        // for the new slip-spring, we cannot rely on bond box offsets.
+        // it really is a new slip-spring
         Eigen::Vector3d bondDistanceNew =
           this->coordinates.segment(candidateIndex * 3, 3) -
           this->coordinates.segment(candidatePartnerIndex * 3, 3);
@@ -892,6 +897,8 @@ namespace calc {
             Eigen::Vector3d distance =
               this->coordinates.segment(3 * firstPartner, 3) -
               this->coordinates.segment(3 * neighbours[j], 3);
+            // here as well, we cannot rely on the bond box offsets,
+            // as this is a completely new slip-spring (bond)
             this->box.handlePBC(distance);
             if (distance.norm() > this->lowCutoff &&
                 distance.norm() <= this->highCutoff) {
@@ -948,14 +955,20 @@ namespace calc {
         distrLimitA += 1;
       }
       std::uniform_int_distribution<int> dista(0, distrLimitA);
+      size_t selectedRailBondA;
+      bool shiftEndAIsFirstOnRailBond;
       int randomIdxA = dista(this->e2);
       if (randomIdxA >= this->idxFunctionalities[partnerA]) {
         RUNTIME_EXP_IFN(this->shiftPossibilityEmpty, "Invalid state.");
       } else {
-        const size_t selectedBondA = this->bondsOfIndex[partnerA][randomIdxA];
-        newPartnerA = this->bondPartnersA[selectedBondA] == partnerA
-                        ? this->bondPartnersB[selectedBondA]
-                        : this->bondPartnersA[selectedBondA];
+        selectedRailBondA = this->bondsOfIndex[partnerA][randomIdxA];
+        assert(this->bondPartnersA[selectedRailBondA] == partnerA ||
+               this->bondPartnersB[selectedRailBondA] == partnerA);
+        shiftEndAIsFirstOnRailBond =
+          this->bondPartnersA[selectedRailBondA] == partnerA;
+        newPartnerA = shiftEndAIsFirstOnRailBond
+                        ? this->bondPartnersB[selectedRailBondA]
+                        : this->bondPartnersA[selectedRailBondA];
       }
 
       // and around B
@@ -969,14 +982,20 @@ namespace calc {
         distrLimitB += 1;
       }
       std::uniform_int_distribution<int> distb(0, distrLimitB);
+      size_t selectedRailBondB;
+      bool shiftEndBIsFirstOnRailBond;
       int randomIdxB = distb(this->e2);
       if (randomIdxB >= this->idxFunctionalities[partnerB]) {
         assert(this->shiftPossibilityEmpty);
       } else {
-        const size_t selectedBondB = this->bondsOfIndex[partnerB][randomIdxB];
-        newPartnerB = this->bondPartnersA[selectedBondB] == partnerB
-                        ? this->bondPartnersB[selectedBondB]
-                        : this->bondPartnersA[selectedBondB];
+        selectedRailBondB = this->bondsOfIndex[partnerB][randomIdxB];
+        assert(this->bondPartnersA[selectedRailBondB] == partnerB ||
+               this->bondPartnersB[selectedRailBondB] == partnerB);
+        shiftEndBIsFirstOnRailBond =
+          this->bondPartnersA[selectedRailBondB] == partnerB;
+        newPartnerB = shiftEndBIsFirstOnRailBond
+                        ? this->bondPartnersB[selectedRailBondB]
+                        : this->bondPartnersA[selectedRailBondB];
       }
 
       // if cross-link, we don't allow shifting
@@ -994,10 +1013,21 @@ namespace calc {
         this->box.handlePBC(bondDistanceNow);
       }
       double bondEnergyNow = this->k * bondDistanceNow.squaredNorm();
+      Eigen::Vector3d bondDistanceRailA =
+        this->coordinates.segment(newPartnerA * 3, 3) -
+        this->coordinates.segment(partnerA * 3, 3) +
+        (shiftEndAIsFirstOnRailBond ? 1. : -1.) *
+          this->bondBoxOffsets.segment(3 * selectedRailBondA, 3);
+      Eigen::Vector3d bondDistanceRailB =
+        this->coordinates.segment(newPartnerB * 3, 3) -
+        this->coordinates.segment(partnerB * 3, 3) +
+        (shiftEndBIsFirstOnRailBond ? 1. : -1.) *
+          this->bondBoxOffsets.segment(3 * selectedRailBondB, 3);
       Eigen::Vector3d bondDistanceNew =
-        (this->coordinates.segment(newPartnerA * 3, 3) -
-         this->coordinates.segment(newPartnerB * 3, 3));
-      this->box.handlePBC(bondDistanceNew);
+        bondDistanceNow + bondDistanceRailA + bondDistanceRailB;
+      if (this->assumeBoxLargeEnough) {
+        this->box.handlePBC(bondDistanceNew);
+      }
       double bondEnergyNew = this->k * bondDistanceNew.squaredNorm();
       double deltaEnergy = bondEnergyNew - bondEnergyNow;
       bool accept = false;
@@ -1040,12 +1070,11 @@ namespace calc {
         this->bondPartnersA[springIdx] == endToShift ||
           this->bondPartnersB[springIdx] == endToShift,
         "This spring and its partners do not match, cannot attempt shift.");
-      const size_t partnerA = this->bondPartnersA[springIdx] == endToShift
-                                ? this->bondPartnersA[springIdx]
-                                : this->bondPartnersB[springIdx];
-      const size_t partnerB = this->bondPartnersB[springIdx] == endToShift
-                                ? this->bondPartnersA[springIdx]
-                                : this->bondPartnersB[springIdx];
+      const bool shiftEndIsFirst = this->bondPartnersA[springIdx] == endToShift;
+      const size_t partnerA = shiftEndIsFirst ? this->bondPartnersA[springIdx]
+                                              : this->bondPartnersB[springIdx];
+      const size_t partnerB = shiftEndIsFirst ? this->bondPartnersA[springIdx]
+                                              : this->bondPartnersB[springIdx];
       assert(partnerA == endToShift);
       // attempt to shift the spring around partnerA
       int distr_limit = this->idxFunctionalities[partnerA] - 1;
@@ -1070,11 +1099,12 @@ namespace calc {
         assert(this->shiftPossibilityEmpty);
         return false;
       }
-      const size_t selectedBond = this->bondsOfIndex[partnerA][random_idx];
-      const size_t replacementForA =
-        this->bondPartnersA[selectedBond] == partnerA
-          ? this->bondPartnersB[selectedBond]
-          : this->bondPartnersA[selectedBond];
+      const size_t selectedRailBond = this->bondsOfIndex[partnerA][random_idx];
+      const bool shiftEndIsFirstOnRailBond =
+        this->bondPartnersA[selectedRailBond] == partnerA;
+      const size_t replacementForA = shiftEndIsFirstOnRailBond
+                                       ? this->bondPartnersB[selectedRailBond]
+                                       : this->bondPartnersA[selectedRailBond];
       // if cross-link, we don't allow shifting
       if (this->idxFunctionalities[replacementForA] > 2) {
         return false;
@@ -1083,15 +1113,21 @@ namespace calc {
       Eigen::Vector3d bondDistanceNow =
         (this->coordinates.segment(partnerA * 3, 3) -
          this->coordinates.segment(partnerB * 3, 3)) +
-        this->bondBoxOffsets.segment(3 * springIdx, 3);
+        ((shiftEndIsFirst ? 1. : -1.) *
+         this->bondBoxOffsets.segment(3 * springIdx, 3));
       if (this->assumeBoxLargeEnough) {
         this->box.handlePBC(bondDistanceNow);
       }
       double bondEnergyNow = this->k * bondDistanceNow.squaredNorm();
       Eigen::Vector3d bondDistanceNew =
+        bondDistanceNow +
         (this->coordinates.segment(replacementForA * 3, 3) -
-         this->coordinates.segment(partnerB * 3, 3));
-      this->box.handlePBC(bondDistanceNew);
+         this->coordinates.segment(partnerA * 3, 3)) +
+        ((shiftEndIsFirstOnRailBond ? 1. : -1.) *
+         this->bondBoxOffsets.segment(3 * selectedRailBond, 3));
+      if (this->assumeBoxLargeEnough) {
+        this->box.handlePBC(bondDistanceNew);
+      }
       double bondEnergyNew = this->k * bondDistanceNew.squaredNorm();
       double deltaEnergy = bondEnergyNew - bondEnergyNow;
       bool accept = false;

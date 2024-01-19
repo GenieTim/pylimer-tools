@@ -2,7 +2,6 @@
 #define DPD_SIMULATOR_H
 
 #include "../entities/Atom.h"
-#include "../entities/Box.h"
 #include "../entities/EigenNeighbourList.h"
 #include "../entities/Universe.h"
 #include "../utils/ExtraEigenTypes.h"
@@ -270,7 +269,11 @@ namespace calc {
       void configAssumeBoxLargeEnough()
       {
         this->assumeBoxLargeEnough = true;
-        this->bondBoxOffsets.setZero();
+        // this->bondBoxOffsets.setZero();
+      }
+
+      bool assumesBoxLargeEnough() const {
+        return this->assumeBoxLargeEnough;
       }
 
       void configTimeStep(const double dt = 0.06) { this->dt = dt; }

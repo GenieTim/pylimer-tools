@@ -47,6 +47,7 @@ def loadCache(file: Union[str, List[str], None], suffix: str, disableWarnings: b
     oldCacheFileName = getCacheFileName(file, suffix, tmp_dir, True)
     if (os.path.isfile(oldCacheFileName) and not os.path.isfile(cacheFileName)):
         shutil.copy2(oldCacheFileName, cacheFileName)
+        os.remove(oldCacheFileName)
     if (os.path.isfile(cacheFileName)):
         if (not np.all([os.path.isfile(f) for f in file])):
             if (not disableWarnings):
@@ -56,10 +57,8 @@ def loadCache(file: Union[str, List[str], None], suffix: str, disableWarnings: b
                 toReturn = pickle.load(cacheFile)
             return toReturn
         else:
-            mtimeCache = datetime.datetime.fromtimestamp(
-                pathlib.Path(cacheFileName).stat().st_mtime)
-            mtimesOrigin = [datetime.datetime.fromtimestamp(
-                pathlib.Path(f).stat().st_mtime) for f in file]
+            mtimeCache = datetime.datetime.fromtimestamp(os.path.getmtime(cacheFileName))
+            mtimesOrigin = [datetime.datetime.fromtimestamp(os.path.getmtime(f)) for f in file]
             if (np.all([mtimeCache > mt for mt in mtimesOrigin]) or anyway):
                 try:
                     with open(cacheFileName, 'rb') as cacheFile:

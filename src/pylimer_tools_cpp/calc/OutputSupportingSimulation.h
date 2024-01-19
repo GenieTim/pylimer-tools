@@ -245,7 +245,7 @@ namespace calc {
       if (doAverage) {
         size_t msdIdx = 0;
         size_t averagesIdx = 0;
-        for (OutputConfiguration oc : this->outputAverageConfigs) {
+        for (const OutputConfiguration &oc : this->outputAverageConfigs) {
           size_t previousAverageIdx = averagesIdx;
           if ((currentStep % oc.useEvery) == 0) {
             double multiplier = (static_cast<double>(oc.useEvery) /
@@ -253,7 +253,7 @@ namespace calc {
             for (ComputedIntValues val : oc.intValues) {
               switch (val) {
                 default:
-                  runningAverages[averagesIdx] += intvalues[val] * multiplier;
+                  runningAverages[averagesIdx] += static_cast<double>(intvalues[val]) * multiplier;
                   averagesIdx += 1;
                   break;
               }
@@ -277,7 +277,7 @@ namespace calc {
                   break;
                 default:
                   runningAverages[averagesIdx] +=
-                    doublevalues[val] / static_cast<double>(oc.outputEvery);
+                    doublevalues[val] * multiplier;
                   averagesIdx += 1;
                   break;
               }
@@ -302,7 +302,7 @@ namespace calc {
 
       // do autocorrelation
       size_t autocorrelator_idx = 0;
-      for (OutputConfiguration oc : this->outputAutoCorrelationConfigs) {
+      for (const OutputConfiguration &oc : this->outputAutoCorrelationConfigs) {
         const size_t autocorrelator_idx_before = autocorrelator_idx;
         for (ComputedDoubleValues cv : oc.doubleValues) {
           assert(autocorrelator_idx < this->autocorrelators.size());
@@ -380,9 +380,9 @@ namespace calc {
      * @param streamIdx
      */
     inline void doOutputValues(
-      OutputConfiguration& oc,
-      std::array<long int, NUM_COMPUTABLE_INT_VALUES>& intvalues,
-      std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES>& doublevalues,
+      const OutputConfiguration& oc,
+      const std::array<long int, NUM_COMPUTABLE_INT_VALUES>& intvalues,
+      const std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES>& doublevalues,
       int streamIdx = 0)
     {
       assert(streamIdx <= this->outputStreams.size());
@@ -505,7 +505,7 @@ namespace calc {
       this->updateValuesRequiredEvery(configs);
 
       int numAverages = 0;
-      for (OutputConfiguration c : configs) {
+      for (const OutputConfiguration &c : configs) {
         numAverages += c.doubleValues.size();
         numAverages += c.intValues.size();
         INVALIDARG_EXP_IFN(c.outputEvery >= c.useEvery,

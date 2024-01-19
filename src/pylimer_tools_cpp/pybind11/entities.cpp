@@ -433,10 +433,12 @@ init_pylimer_bound_entities(py::module_& m)
           It is possible to request it within a new cutoff, 
           though the underlying neighbour list will not be regenerated.
           For performance reasons, it is recommended to initialize a 
-          new NeighbourList if you require a differnt cutoff, depending on your use case.
+          new NeighbourList if you require a different cutoff, depending on your use case.
 
           You can use a negative value for the newCutoff to use the cutoff used for 
           filling the neighbour list buckets.
+
+
          )pbdoc",
          py::arg("atom"),
          py::arg("upperCutoff") = 1.0,
@@ -493,6 +495,20 @@ init_pylimer_bound_entities(py::module_& m)
          "skipped.",
          py::arg("from"),
          py::arg("to"))
+    .def("addBonds",
+         py::overload_cast<const size_t,
+                           const std::vector<long int>&,
+                           const std::vector<long int>&,
+                           const std::vector<int>&,
+                           const bool,
+                           const bool>(&Universe::addBonds),
+         "Add bonds to the underlying atoms, edges to the underlying graph. ",
+         py::arg("num_bonds"),
+         py::arg("from"),
+         py::arg("to"),
+         py::arg("bond_types"),
+         py::arg("ignore_non_existent_atoms") = false,
+         py::arg("simplify_universe") = true)
     .def("addBondsWithTypes",
          py::overload_cast<const std::vector<long int>&,
                            const std::vector<long int>&,
