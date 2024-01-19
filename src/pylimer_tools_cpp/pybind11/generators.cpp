@@ -2,6 +2,7 @@
 #define PYBIND_GENERATORS_H
 
 #include "../utils/MCUniverseGenerator.h"
+#include "../utils/RandomWalker.h"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -58,6 +59,18 @@ init_pylimer_bound_generators(py::module_& m)
     .def("getUniverse", &MCUniverseGenerator::getUniverse, R"pbdoc(
             Fetch the current (or final) state of the universe.
             )pbdoc");
+
+  m.def("doRandomWalkChainFromTo",
+        &doRandomWalkChainFromTo,
+        R"pbdoc(
+            Do a random walk from one point to another.
+            )pbdoc",
+        py::arg("box"),
+        py::arg("from"),
+        py::arg("to"),
+        py::arg("chainLen"),
+        py::arg("beadDistance") = 1.,
+        py::arg("seed") = "");
 }
 
 #endif

@@ -495,6 +495,84 @@ TEST_CASE("New PBC computation is correct", "[analysis][DPDSimulator][1proc]")
   }
 }
 
+TEST_CASE("For large systems the PBC method does not matter",
+          "[analysis][DPDSimulator][1proc][long]")
+{
+  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  REQUIRE(std::filesystem::exists(suspectedPath));
+
+  std::string inputFile = suspectedPath +
+                          "structure/"
+                          "3d-diamond-lattice_3x3x3_a_23_d_3_v_0.structure.out";
+  if (std::filesystem::exists(inputFile)) {
+    pe::UniverseSequence universeSequence = pe::UniverseSequence();
+    REQUIRE(universeSequence.getLength() == 0);
+    universeSequence.initializeFromDataSequence({ { inputFile } });
+    REQUIRE(universeSequence.getLength() == 1);
+    pe::Universe universe = universeSequence.atIndex(0);
+
+    pcd::DPDSimulator simulator =
+      pcd::DPDSimulator(universe, 2, 9, false, "19th_seed");
+
+    simulator.createSlipSprings(static_cast<int>(0.1 * universe.getNrOfAtoms()),
+                                2);
+
+    std::vector<pc::ComputedDoubleValues> outputQuantities = {
+      pc::ComputedDoubleValues::TEMPERATURE,
+      pc::ComputedDoubleValues::PRESSURE,
+      pc::ComputedDoubleValues::MAX_B,
+      pc::ComputedDoubleValues::MEAN_B
+    };
+
+    pc::OutputConfiguration config;
+    config.filename = "";
+    config.outputEvery = 1;
+    config.doubleValues = outputQuantities;
+    config.intValues = { pc::ComputedIntValues::STEP };
+
+    std::vector<pc::OutputConfiguration> configs = { config };
+    REQUIRE_NOTHROW(simulator.configStepOutput(configs));
+
+#ifdef OPENMP_FOUND
+    // we cannot have more than 1 thread, otherwise the random number generator
+    // will not play nicely.
+    omp_set_num_threads(1);
+#endif
+
+    // invoke copy-constructor
+    pcd::DPDSimulator simulator2 = pcd::DPDSimulator(simulator);
+
+    // switch to "common" PBC
+    simulator2.configAssumeBoxLargeEnough();
+
+    REQUIRE(!simulator.assumesBoxLargeEnough());
+    REQUIRE(simulator2.assumesBoxLargeEnough());
+
+    simulator.reseedRandomness("20th_seed");
+    simulator.refreshCurrentState();
+    simulator2.reseedRandomness("20th_seed");
+    simulator2.refreshCurrentState();
+
+    CHECK(simulator.getUniformRandBetween0And1() ==
+          simulator2.getUniformRandBetween0And1());
+    CHECK_THAT(simulator.getTemperature(),
+               Catch::Matchers::WithinRel(simulator2.getTemperature()));
+    CHECK(simulator.getBondLengths().isApprox(simulator2.getBondLengths()));
+    CHECK(simulator.getStressTensor().isApprox(simulator2.getStressTensor()));
+
+    // not sure what value is sensible here...
+    simulator.runSimulation(50, true);
+    simulator2.runSimulation(50, true);
+
+    CHECK(simulator.getUniformRandBetween0And1() ==
+          simulator2.getUniformRandBetween0And1());
+    CHECK_THAT(simulator.getTemperature(),
+               Catch::Matchers::WithinRel(simulator2.getTemperature()));
+    CHECK(simulator.getBondLengths().isApprox(simulator2.getBondLengths()));
+    CHECK(simulator.getStressTensor().isApprox(simulator2.getStressTensor()));
+  }
+}
+
 TEST_CASE("DPD Simulator's restart files are accurate",
           "[analysis][DPDSimulator][1proc]")
 {
@@ -566,4 +644,3 @@ TEST_CASE("DPD Simulator's restart files are accurate",
     CHECK(sim2.getTemperature() == simulator.getTemperature());
   }
 }
-
