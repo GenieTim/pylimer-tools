@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.html" /><link rel="prev" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin" href="pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin.html" /><link rel="prev" title="pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance" href="pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator - PylimerTools documentation</title>
+        <title>pylimer_tools_cpp.pylimer_tools_cpp.doRandomWalkChainFromTo - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -174,7 +174,7 @@
 <li class="toctree-l2 current has-children"><a class="reference internal" href="../pylimer_tools_cpp.html">pylimer_tools_cpp package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of pylimer_tools_cpp package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l3 current has-children"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.html">pylimer_tools_cpp.pylimer_tools_cpp</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of pylimer_tools_cpp.pylimer_tools_cpp</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance.html">pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.doRandomWalkChainFromTo.html">pylimer_tools_cpp.pylimer_tools_cpp.doRandomWalkChainFromTo</a></li>
+<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.doRandomWalkChainFromTo</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin.html">pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint.html">pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.splitCSV.html">pylimer_tools_cpp.pylimer_tools_cpp.splitCSV</a></li>
@@ -193,7 +193,7 @@
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.LinkSwappingMode.html">pylimer_tools_cpp.pylimer_tools_cpp.LinkSwappingMode</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator.html">pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.html">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance</a></li>
-<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.html">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.html">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.html">pylimer_tools_cpp.pylimer_tools_cpp.Molecule</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator.html">pylimer_tools_cpp.pylimer_tools_cpp.MoleculeIterator</a></li>
@@ -247,69 +247,12 @@
           </label>
         </div>
         <article role="main">
-          <section id="pylimer-tools-cpp-pylimer-tools-cpp-mehpforceevaluator">
-<h1>pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator<a class="headerlink" href="#pylimer-tools-cpp-pylimer-tools-cpp-mehpforceevaluator" title="Link to this heading">#</a></h1>
-<dl class="py class">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">MEHPForceEvaluator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator" title="Link to this definition">#</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
-<p>The base interface to change the way the force is evaluated during a MEHP run.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.__init__" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<p class="rubric">Methods</p>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.__init__" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self)</p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.evaluateStressContribution" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.evaluateStressContribution"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluateStressContribution</span></code></a>(self, ...)</p></td>
-<td><p>An evaluation of the stress-contribution.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p class="rubric">Attributes</p>
-<div class="table-wrapper autosummary longtable docutils container">
-<table class="autosummary longtable docutils align-default">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.is2D" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.is2D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">is2D</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.network" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.network"><code class="xref py py-obj docutils literal notranslate"><span class="pre">network</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.evaluateStressContribution">
-<span class="sig-name descname"><span class="pre">evaluateStressContribution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator" title="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">springDistances</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">i</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">j</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spring_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.evaluateStressContribution" title="Link to this definition">#</a></dt>
-<dd><p>An evaluation of the stress-contribution.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>springDistances</strong> – the three coordinate differences for one spring.</p></li>
-<li><p><strong>i</strong> – the row index of the stress tensor</p></li>
-<li><p><strong>j</strong> – the column index of the stress tensor</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.is2D">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">is2D</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.is2D" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py property">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.network">
-<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">network</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.network" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
+          <section id="pylimer-tools-cpp-pylimer-tools-cpp-dorandomwalkchainfromto">
+<h1>pylimer_tools_cpp.pylimer_tools_cpp.doRandomWalkChainFromTo<a class="headerlink" href="#pylimer-tools-cpp-pylimer-tools-cpp-dorandomwalkchainfromto" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.doRandomWalkChainFromTo">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">doRandomWalkChainFromTo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">box:</span> <span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Box,</span> <span class="pre">from:</span> <span class="pre">Annotated[List[float],</span> <span class="pre">FixedSize(3)],</span> <span class="pre">to:</span> <span class="pre">Annotated[List[float],</span> <span class="pre">FixedSize(3)],</span> <span class="pre">chainLen:</span> <span class="pre">int,</span> <span class="pre">beadDistance:</span> <span class="pre">float</span> <span class="pre">=</span> <span class="pre">1.0,</span> <span class="pre">seed:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">''</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.doRandomWalkChainFromTo" title="Link to this definition">#</a></dt>
+<dd><p>Do a random walk from one point to another.</p>
 </dd></dl>
 
 </section>
@@ -319,23 +262,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.html">
+          <a class="next-page" href="pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation</div>
+                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.html">
+          <a class="prev-page" href="pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance</div>
+                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance</div>
                 
               </div>
             </a>
@@ -368,14 +311,8 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator</a><ul>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator"><code class="docutils literal notranslate"><span class="pre">MEHPForceEvaluator</span></code></a><ul>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.__init__"><code class="docutils literal notranslate"><span class="pre">MEHPForceEvaluator.__init__()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.evaluateStressContribution"><code class="docutils literal notranslate"><span class="pre">MEHPForceEvaluator.evaluateStressContribution()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.is2D"><code class="docutils literal notranslate"><span class="pre">MEHPForceEvaluator.is2D</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.network"><code class="docutils literal notranslate"><span class="pre">MEHPForceEvaluator.network</span></code></a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.doRandomWalkChainFromTo</a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.doRandomWalkChainFromTo"><code class="docutils literal notranslate"><span class="pre">doRandomWalkChainFromTo()</span></code></a></li>
 </ul>
 </li>
 </ul>

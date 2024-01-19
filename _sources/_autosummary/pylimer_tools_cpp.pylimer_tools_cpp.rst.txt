@@ -15,6 +15,7 @@
       :toctree: 
    
       computeStoichiometricInbalance
+      doRandomWalkChainFromTo
       inverse_langevin
       predictGelationPoint
       splitCSV

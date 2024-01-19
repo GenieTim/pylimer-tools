@@ -174,6 +174,7 @@
 <li class="toctree-l2 current has-children"><a class="reference internal" href="../pylimer_tools_cpp.html">pylimer_tools_cpp package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of pylimer_tools_cpp package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l3 current has-children"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.html">pylimer_tools_cpp.pylimer_tools_cpp</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of pylimer_tools_cpp.pylimer_tools_cpp</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance.html">pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.doRandomWalkChainFromTo.html">pylimer_tools_cpp.pylimer_tools_cpp.doRandomWalkChainFromTo</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin.html">pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint.html">pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.splitCSV.html">pylimer_tools_cpp.pylimer_tools_cpp.splitCSV</a></li>
@@ -273,8 +274,8 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.addAtoms" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.addAtoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">addAtoms</span></code></a>(self, ids, types, x, y, z, nx, ny, nz)</p></td>
 <td><p>Add atoms to the Universe, vertices to the underlying graph.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.addBonds" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.addBonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">addBonds</span></code></a>(self, from, to)</p></td>
-<td><p>Add bonds to the underlying atoms, edges to the underlying graph.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.addBonds" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.addBonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">addBonds</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Overloaded function.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.addBondsWithTypes" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe.addBondsWithTypes"><code class="xref py py-obj docutils literal notranslate"><span class="pre">addBondsWithTypes</span></code></a>(self, from, to, types)</p></td>
 <td><p>Add bonds to the underlying atoms, edges to the underlying graph.</p></td>
@@ -485,8 +486,16 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.Universe.addBonds">
-<span class="sig-name descname"><span class="pre">addBonds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">self:</span> <span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe,</span> <span class="pre">from:</span> <span class="pre">List[int],</span> <span class="pre">to:</span> <span class="pre">List[int]</span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.addBonds" title="Link to this definition">#</a></dt>
-<dd><p>Add bonds to the underlying atoms, edges to the underlying graph. If the connected atoms are not found, the bonds are silently skipped.</p>
+<span class="sig-name descname"><span class="pre">addBonds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Universe.addBonds" title="Link to this definition">#</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic simple">
+<li><p>addBonds(self: pylimer_tools_cpp.pylimer_tools_cpp.Universe, from: List[int], to: List[int]) -&gt; None</p></li>
+</ol>
+<p>Add bonds to the underlying atoms, edges to the underlying graph. If the connected atoms are not found, the bonds are silently skipped.</p>
+<ol class="arabic simple" start="2">
+<li><p>addBonds(self: pylimer_tools_cpp.pylimer_tools_cpp.Universe, num_bonds: int, from: List[int], to: List[int], bond_types: List[int], ignore_non_existent_atoms: bool = False, simplify_universe: bool = True) -&gt; None</p></li>
+</ol>
+<p>Add bonds to the underlying atoms, edges to the underlying graph.</p>
 </dd></dl>
 
 <dl class="py method">
