@@ -188,7 +188,7 @@ namespace calc {
         }
       }
 
-      void reseedRandomness(const std::string &seed)
+      void reseedRandomness(const std::string& seed)
       {
         // initialize the random number generator
         if (seed == "") {
@@ -233,13 +233,7 @@ namespace calc {
        */
       double computeTemperature(const Eigen::VectorXd& velocities) const;
 
-      /**
-       * @brief Compute the length of one specific bond
-       *
-       * @param bondIdx
-       * @return double
-       */
-      double computeBondLength(int bondIdx) const
+      inline Eigen::Vector3d computeBondDistance(int bondIdx) const
       {
         Eigen::Vector3d bondDistances =
           this->coordinates(
@@ -250,8 +244,19 @@ namespace calc {
         if (this->assumeBoxLargeEnough) {
           this->box.handlePBC(bondDistances);
         }
-        return bondDistances.norm();
-      };
+        return bondDistances;
+      }
+
+      /**
+       * @brief Compute the length of one specific bond
+       *
+       * @param bondIdx
+       * @return double
+       */
+      double computeBondLength(int bondIdx) const
+      {
+        return this->computeBondDistance(bondIdx).norm();
+      }
 
       ////////////////////////////////////////////////////////////////
       // MC Procedures
@@ -272,9 +277,7 @@ namespace calc {
         // this->bondBoxOffsets.setZero();
       }
 
-      bool assumesBoxLargeEnough() const {
-        return this->assumeBoxLargeEnough;
-      }
+      bool assumesBoxLargeEnough() const { return this->assumeBoxLargeEnough; }
 
       void configTimeStep(const double dt = 0.06) { this->dt = dt; }
 
