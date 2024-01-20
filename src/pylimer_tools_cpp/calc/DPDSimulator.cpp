@@ -960,6 +960,7 @@ namespace calc {
       int randomIdxA = dista(this->e2);
       if (randomIdxA >= this->idxFunctionalities[partnerA]) {
         RUNTIME_EXP_IFN(this->shiftPossibilityEmpty, "Invalid state.");
+        return false;
       } else {
         selectedRailBondA = this->bondsOfIndex[partnerA][randomIdxA];
         assert(this->bondPartnersA[selectedRailBondA] == partnerA ||
@@ -986,7 +987,8 @@ namespace calc {
       bool shiftEndBIsFirstOnRailBond;
       int randomIdxB = distb(this->e2);
       if (randomIdxB >= this->idxFunctionalities[partnerB]) {
-        assert(this->shiftPossibilityEmpty);
+        RUNTIME_EXP_IFN(this->shiftPossibilityEmpty, "Invalid state.");
+        return false;
       } else {
         selectedRailBondB = this->bondsOfIndex[partnerB][randomIdxB];
         assert(this->bondPartnersA[selectedRailBondB] == partnerB ||
@@ -1013,6 +1015,8 @@ namespace calc {
         this->box.handlePBC(bondDistanceNow);
       }
       double bondEnergyNow = this->k * bondDistanceNow.squaredNorm();
+      Eigen::Array3d originalOffsets =
+        this->bondBoxOffsets.segment(3 * springIdx, 3);
       Eigen::Vector3d bondDistanceRailA =
         this->coordinates.segment(newPartnerA * 3, 3) -
         this->coordinates.segment(partnerA * 3, 3) +
@@ -1024,7 +1028,7 @@ namespace calc {
         (shiftEndBIsFirstOnRailBond ? 1. : -1.) *
           this->bondBoxOffsets.segment(3 * selectedRailBondB, 3);
       Eigen::Vector3d bondDistanceNew =
-        bondDistanceNow + bondDistanceRailA + bondDistanceRailB;
+        bondDistanceNow + bondDistanceRailA - bondDistanceRailB;
       if (this->assumeBoxLargeEnough) {
         this->box.handlePBC(bondDistanceNew);
       }
@@ -1042,12 +1046,41 @@ namespace calc {
       if (accept) {
         this->replaceSlipSpringPartner(springIdx, partnerA, newPartnerA);
         this->replaceSlipSpringPartner(springIdx, partnerB, newPartnerB);
+#ifndef NDEBUG
+        if (!this->computeBondDistance(springIdx).cwiseAbs().isApprox(
+              bondDistanceNew.cwiseAbs())) {
+          std::cerr << "Expected bond distance " << bondDistanceNew
+                    << " based on " << bondDistanceNow << ", "
+                    << bondDistanceRailA << ", " << bondDistanceRailB
+                    << std::endl;
+          std::cerr << "Instead, got " << this->computeBondDistance(springIdx)
+                    << std::endl;
+          std::cerr << "Involved coordinates: "
+                    << this->coordinates.segment(partnerA * 3, 3) << ", "
+                    << this->coordinates.segment(partnerB * 3, 3)
+                    << ", and new "
+                    << this->coordinates.segment(newPartnerA * 3, 3) << ", "
+                    << this->coordinates.segment(newPartnerB * 3, 3)
+                    << " in box " << this->box.getL() << " with offsets "
+                    << originalOffsets
+                    << " on original slip-link between A & B, "
+                    << this->bondBoxOffsets.segment(3 * selectedRailBondA, 3)
+                    << " on rail A and "
+                    << this->bondBoxOffsets.segment(3 * selectedRailBondB, 3)
+                    << " on rail B. " << std::endl;
+          std::cerr << "Currently stored offsets are "
+                    << this->bondBoxOffsets.segment(3 * springIdx, 3)
+                    << std::endl;
+        }
+#endif
         if (this->computeBondLength(springIdx) > this->maxBondLen) {
           std::cerr << "After shifting, managed to get too long bond with bond "
                        "energy before "
                     << bondEnergyNow << " and now " << bondEnergyNew
                     << " for bond " << springIdx << std::endl;
           std::cerr << "Bond length is " << this->computeBondLength(springIdx)
+                    << " (original: " << bondDistanceNow.norm()
+                    << ", now supposedly: " << bondDistanceNew.norm() << ")"
                     << std::endl;
         }
       }
