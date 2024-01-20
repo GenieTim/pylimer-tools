@@ -1106,8 +1106,8 @@ namespace calc {
       const bool shiftEndIsFirst = this->bondPartnersA[springIdx] == endToShift;
       const size_t partnerA = shiftEndIsFirst ? this->bondPartnersA[springIdx]
                                               : this->bondPartnersB[springIdx];
-      const size_t partnerB = shiftEndIsFirst ? this->bondPartnersA[springIdx]
-                                              : this->bondPartnersB[springIdx];
+      const size_t partnerB = shiftEndIsFirst ? this->bondPartnersB[springIdx]
+                                              : this->bondPartnersA[springIdx];
       assert(partnerA == endToShift);
       // attempt to shift the spring around partnerA
       int distr_limit = this->idxFunctionalities[partnerA] - 1;
