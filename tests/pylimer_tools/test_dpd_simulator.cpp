@@ -166,10 +166,24 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator][long]")
     CHECK(resultUniverse.getNrOfAtoms() == universe.getNrOfAtoms());
     CHECK_NOTHROW(simulator.validateState());
 
-    CHECK_NOTHROW(simulator.runSimulation(76, true));
+    CHECK_NOTHROW(simulator.configShiftOneAtATime(false));
+    CHECK_NOTHROW(simulator.configShiftPossibilityEmpty(true));
+    CHECK_NOTHROW(simulator.runSimulation(26, true));
+    CHECK_NOTHROW(simulator.configShiftPossibilityEmpty(false));
+    CHECK_NOTHROW(simulator.runSimulation(26, true));
 
     CHECK_NOTHROW(simulator.validateState());
-    std::cout << "DPD ran with slip-springs, state validated." << std::endl;
+    std::cout << "DPD ran with slip-springs (both), state validated." << std::endl;
+
+    CHECK_NOTHROW(simulator.configShiftOneAtATime(true));
+    CHECK_NOTHROW(simulator.configShiftPossibilityEmpty(true));
+    CHECK_NOTHROW(simulator.runSimulation(26, true));
+    CHECK_NOTHROW(simulator.configShiftPossibilityEmpty(false));
+    CHECK_NOTHROW(simulator.runSimulation(26, true));
+
+    CHECK_NOTHROW(simulator.validateState());
+    std::cout << "DPD ran with slip-springs (single), state validated."
+              << std::endl;
     CHECK_NOTHROW(simulator.validateNeighbourlist(1.0));
 
     CHECK(std::filesystem::exists(averageFile));

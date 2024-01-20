@@ -1143,6 +1143,8 @@ namespace calc {
         return false;
       }
       // compute the Metropolis criterion
+      Eigen::Array3d originalOffsets =
+        this->bondBoxOffsets.segment(3 * springIdx, 3);
       Eigen::Vector3d bondDistanceNow =
         (this->coordinates.segment(partnerA * 3, 3) -
          this->coordinates.segment(partnerB * 3, 3)) +
@@ -1152,12 +1154,12 @@ namespace calc {
         this->box.handlePBC(bondDistanceNow);
       }
       double bondEnergyNow = this->k * bondDistanceNow.squaredNorm();
-      Eigen::Vector3d bondDistanceNew =
-        bondDistanceNow +
+      Eigen::Vector3d railDistance =
         (this->coordinates.segment(replacementForA * 3, 3) -
          this->coordinates.segment(partnerA * 3, 3)) +
         ((shiftEndIsFirstOnRailBond ? 1. : -1.) *
          this->bondBoxOffsets.segment(3 * selectedRailBond, 3));
+      Eigen::Vector3d bondDistanceNew = bondDistanceNow + railDistance;
       if (this->assumeBoxLargeEnough) {
         this->box.handlePBC(bondDistanceNew);
       }
@@ -1174,6 +1176,29 @@ namespace calc {
       }
       if (accept) {
         this->replaceSlipSpringPartner(springIdx, partnerA, replacementForA);
+#ifndef NDEBUG
+        if (!this->computeBondDistance(springIdx).cwiseAbs().isApprox(
+              bondDistanceNew.cwiseAbs())) {
+          std::cerr << "Expected bond distance " << bondDistanceNew
+                    << " based on " << bondDistanceNow << ", " << railDistance
+                    << "." << std::endl;
+          std::cerr << "Instead, got " << this->computeBondDistance(springIdx)
+                    << std::endl;
+          std::cerr << "Involved coordinates: "
+                    << this->coordinates.segment(partnerA * 3, 3) << ", "
+                    << this->coordinates.segment(partnerB * 3, 3)
+                    << ", and new "
+                    << this->coordinates.segment(replacementForA * 3, 3)
+                    << " in box " << this->box.getL() << " with offsets "
+                    << originalOffsets
+                    << " on original slip-link between A & B, "
+                    << this->bondBoxOffsets.segment(3 * selectedRailBond, 3)
+                    << " on rail A. " << std::endl;
+          std::cerr << "Currently stored offsets are "
+                    << this->bondBoxOffsets.segment(3 * springIdx, 3)
+                    << std::endl;
+        }
+#endif
       }
       return accept;
     };
