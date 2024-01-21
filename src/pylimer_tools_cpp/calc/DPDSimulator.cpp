@@ -1047,8 +1047,9 @@ namespace calc {
         this->replaceSlipSpringPartner(springIdx, partnerA, newPartnerA);
         this->replaceSlipSpringPartner(springIdx, partnerB, newPartnerB);
 #ifndef NDEBUG
-        if (!this->computeBondDistance(springIdx).cwiseAbs().isApprox(
-              bondDistanceNew.cwiseAbs())) {
+        if (!((this->computeBondDistance(springIdx).cwiseAbs() -
+               bondDistanceNew.cwiseAbs())
+                .maxCoeff() < 1e-10)) {
           std::cerr << "Expected bond distance " << bondDistanceNew
                     << " based on " << bondDistanceNow << ", "
                     << bondDistanceRailA << ", " << bondDistanceRailB
@@ -1177,8 +1178,9 @@ namespace calc {
       if (accept) {
         this->replaceSlipSpringPartner(springIdx, partnerA, replacementForA);
 #ifndef NDEBUG
-        if (!this->computeBondDistance(springIdx).cwiseAbs().isApprox(
-              bondDistanceNew.cwiseAbs())) {
+        if (!((this->computeBondDistance(springIdx).cwiseAbs() -
+               bondDistanceNew.cwiseAbs())
+                .maxCoeff() < 1e-10)) {
           std::cerr << "Expected bond distance " << bondDistanceNew
                     << " based on " << bondDistanceNow << ", " << railDistance
                     << "." << std::endl;
