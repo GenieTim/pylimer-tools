@@ -1047,12 +1047,32 @@ namespace calc {
         this->replaceSlipSpringPartner(springIdx, partnerA, newPartnerA);
         this->replaceSlipSpringPartner(springIdx, partnerB, newPartnerB);
         if (!this->assumeBoxLargeEnough) {
+#ifndef NDEBUG
+          if (!((this->bondBoxOffsets.segment(3 * springIdx, 3) -
+                 (originalOffsets +
+                  ((shiftEndAIsFirstOnRailBond ? 1. : -1.) *
+                   this->bondBoxOffsets.segment(3 * selectedRailBondA, 3)) -
+                  ((shiftEndBIsFirstOnRailBond ? 1. : -1.) *
+                   this->bondBoxOffsets.segment(3 * selectedRailBondB, 3))))
+                  .maxCoeff() < 1e-10)) {
+            std::cerr
+              << "Expected bond offset is not fulfilled: got "
+              << this->bondBoxOffsets.segment(3 * springIdx, 3)
+              << " instead of "
+              << originalOffsets +
+                   ((shiftEndAIsFirstOnRailBond ? 1. : -1.) *
+                    this->bondBoxOffsets.segment(3 * selectedRailBondA, 3)) -
+                   ((shiftEndBIsFirstOnRailBond ? 1. : -1.) *
+                    this->bondBoxOffsets.segment(3 * selectedRailBondB, 3))
+              << std::endl;
+          }
+#endif
           this->bondBoxOffsets.segment(3 * springIdx, 3) =
             originalOffsets +
             ((shiftEndAIsFirstOnRailBond ? 1. : -1.) *
-              this->bondBoxOffsets.segment(3 * selectedRailBondA, 3)) -
+             this->bondBoxOffsets.segment(3 * selectedRailBondA, 3)) -
             ((shiftEndBIsFirstOnRailBond ? 1. : -1.) *
-              this->bondBoxOffsets.segment(3 * selectedRailBondB, 3));
+             this->bondBoxOffsets.segment(3 * selectedRailBondB, 3));
         }
 #ifndef NDEBUG
         if (!((this->computeBondDistance(springIdx).cwiseAbs() -
@@ -1186,10 +1206,26 @@ namespace calc {
       if (accept) {
         this->replaceSlipSpringPartner(springIdx, partnerA, replacementForA);
         if (!this->assumeBoxLargeEnough) {
+#ifndef NDEBUG
+          if (!((this->bondBoxOffsets.segment(3 * springIdx, 3) -
+                 (originalOffsets +
+                  (shiftEndIsFirstOnRailBond ? 1. : -1.) *
+                    this->bondBoxOffsets.segment(3 * selectedRailBond, 3)))
+                  .maxCoeff() < 1e-10)) {
+            std::cerr << "Expected bond offset is not fulfilled: got "
+                      << this->bondBoxOffsets.segment(3 * springIdx, 3)
+                      << " instead of "
+                      << (originalOffsets +
+                          (shiftEndIsFirstOnRailBond ? 1. : -1.) *
+                            this->bondBoxOffsets.segment(3 * selectedRailBond,
+                                                         3))
+                      << std::endl;
+          }
+#endif
           this->bondBoxOffsets.segment(3 * springIdx, 3) =
             originalOffsets +
             (shiftEndIsFirstOnRailBond ? 1. : -1.) *
-             this->bondBoxOffsets.segment(3 * selectedRailBond, 3);
+              this->bondBoxOffsets.segment(3 * selectedRailBond, 3);
         }
 #ifndef NDEBUG
         if (!((this->computeBondDistance(springIdx).cwiseAbs() -
