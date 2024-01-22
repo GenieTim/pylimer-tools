@@ -167,38 +167,14 @@ namespace calc {
        * @brief re-calculate stress tensor & pressure
        *
        */
-      void refreshCurrentState()
-      {
-        pylimer_tools::utils::PerformanceTimer timer =
-          pylimer_tools::utils::PerformanceTimer<
-            DPDPerformanceSections::NUM_PERFORMANCE_SECTIONS>();
-        this->currentPressure = computeForces(this->currentForces,
-                                              this->currentStressTensor,
-                                              this->coordinates,
-                                              this->currentVelocities,
-                                              timer,
-                                              this->dt,
-                                              1.0);
-        // kinetic term of the stress/pressure
-        const double m_over_boxv = 1. / (this->box.getVolume());
-        for (size_t i = 0; i < this->numAtoms; ++i) {
-          this->currentStressTensor +=
-            (m_over_boxv * this->currentVelocities.segment(3 * i, 3) *
-             this->currentVelocities.segment(3 * i, 3).transpose());
-        }
-      }
+      void refreshCurrentState();
 
-      void reseedRandomness(const std::string& seed)
-      {
-        // initialize the random number generator
-        if (seed == "") {
-          std::random_device rd;
-          this->e2 = std::mt19937(rd());
-        } else {
-          std::seed_seq seed2(seed.begin(), seed.end());
-          this->e2 = std::mt19937(seed2);
-        }
-      }
+/**
+ * @brief Set a new seed for the random generator
+ * 
+ * @param seed 
+ */
+      void reseedRandomness(const std::string& seed);
 
       /**
        * @brief Create a new bond between two nodes
@@ -419,68 +395,7 @@ namespace calc {
        * @brief Try to form as many bonds as we can
        *
        */
-      void attemptBondFormation()
-      {
-        double cutoff = this->bondFormationDistance;
-        int bondsFormed = 0;
-        // allocate possible neighbours
-        Eigen::ArrayXi neighbors = Eigen::ArrayXi(static_cast<int>(
-          this->numAtoms *
-          (std::ceil((3.1 * cutoff) * (3.1 * cutoff) * (3.1 * cutoff)) /
-           this->box.getVolume())));
-        std::vector<int> possibleCandidates;
-        // iterate atoms - we want to start from the cross-links
-        for (size_t atom_idx = 0; atom_idx < this->numAtoms; ++atom_idx) {
-          possibleCandidates.clear();
-          if (this->atomTypes[atom_idx] != this->atomTypeBondFormationFrom) {
-            continue;
-          }
-          if (this->idxFunctionalities[atom_idx] >=
-              this->maxBondsPerType[this->atomTypes[atom_idx]]) {
-            continue;
-          }
-
-          // find neighbours
-          int numNeighbors = this->neighbourlist.getIndicesCloseToCoordinates(
-            neighbors, this->coordinates.segment(3 * atom_idx, 3), cutoff);
-          for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
-            // loop neighbours to find applicable partner
-            const size_t j = neighbors[neigh_idx];
-            Eigen::Vector3d vec = this->coordinates.segment(3 * atom_idx, 3) -
-                                  this->coordinates.segment(3 * j, 3);
-            this->box.handlePBC(vec);
-            double r2 = (vec).norm();
-            if (r2 <= cutoff && atom_idx != j &&
-                (this->idxFunctionalities[j] <
-                 this->maxBondsPerType[this->atomTypes[j]]) &&
-                (this->atomTypeBondFormationTo == this->atomTypes[j])) {
-              possibleCandidates.push_back(j);
-            }
-          }
-
-          if (possibleCandidates.size() == 0) {
-            continue;
-          }
-
-          // yay, we can form a bond
-          // NOTE: currently, we build only 1
-          std::shuffle(
-            possibleCandidates.begin(), possibleCandidates.end(), this->e2);
-          this->addBond(
-            atom_idx,
-            possibleCandidates[0],
-            this->slipspringBondType == 3 ? 4 : 3); // TODO: decide on bond type
-          this->bondsToForm -= 1;
-          bondsFormed += 1;
-          if (this->bondsToForm <= 0) {
-            break;
-          }
-        }
-
-        if (bondsFormed > 0) {
-          this->validateState();
-        }
-      }
+      void attemptBondFormation();
 
       /**
        * @brief Sets the bond duplication penalty back to defaults.
@@ -489,42 +404,9 @@ namespace calc {
        * "slip springs connecting two already bonded beads do not contribute in
        * the DPD steps"
        */
-      void resetBondDuplicationPenalty()
-      {
-        this->bondDuplicationPenalty = Eigen::ArrayXd::Constant(
-          3 * (this->numBonds + this->numSlipSprings), 1.);
-        // this->bondDuplicationPenalty.setConstant(1.);
+      void resetBondDuplicationPenalty();
 
-        for (size_t i = 0; i < this->numAtoms - 1; ++i) {
-          this->resetBondDuplicationPenalty(i);
-        }
-      }
-
-      void resetBondDuplicationPenalty(size_t atomIdx)
-      {
-        std::unordered_set<size_t> partners;
-        partners.reserve(this->bondsOfIndex[atomIdx].size());
-        // here as well, we rely on the bonds of index being sorted
-        for (size_t bondIdx : this->bondsOfIndex[atomIdx]) {
-          size_t atomPartnerIdx = this->bondPartnersA[bondIdx] == atomIdx
-                                    ? this->bondPartnersB[bondIdx]
-                                    : this->bondPartnersA[bondIdx];
-          if (bondIdx >= this->numBonds) {
-            // all others should stay 1 anyway
-            this->bondDuplicationPenalty.segment(3 * bondIdx, 3)
-              .setConstant(1.);
-          }
-          if (partners.contains(atomPartnerIdx)) {
-            // "real" bonds always contribute -> check that this is a
-            // slip-spring
-            if (bondIdx >= this->numBonds) {
-              this->bondDuplicationPenalty.segment(3 * bondIdx, 3).setZero();
-            }
-          } else {
-            partners.insert(atomPartnerIdx);
-          }
-        }
-      }
+      void resetBondDuplicationPenalty(size_t atomIdx);
 
       ////////////////////////////////////////////////////////////////
       // results access & export
@@ -736,19 +618,9 @@ namespace calc {
        * escape the box.
        *
        */
-      void resetBondOffsets()
-      {
-        this->bondBoxOffsets =
-          this->box.getOffset(this->coordinates(this->bondPartnerCoordinatesA) -
-                              this->coordinates(this->bondPartnerCoordinatesB));
-      }
+      void resetBondOffsets();
 
-      void resetBondOffset(int bondIdx)
-      {
-        this->bondBoxOffsets.segment(bondIdx * 3, 3) = this->box.getOffset(
-          this->coordinates.segment(3 * this->bondPartnersA[bondIdx], 3) -
-          this->coordinates.segment(3 * this->bondPartnersB[bondIdx], 3));
-      }
+      void resetBondOffset(int bondIdx);
     };
   };
 }
