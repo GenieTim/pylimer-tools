@@ -10,7 +10,7 @@ endif()
 if (NOT DEFINED igraph_LOADED)
 	find_package(igraph)
 
-	if (${igraph_FOUND})
+	if (${igraph_FOUND} AND TARGET igraph)
 		message("Found igraph library")
 		set(igraph_LIBRARIES igraph::igraph)
 		set(igraph_INCLUDE_DIRS "")
