@@ -1015,7 +1015,7 @@ namespace calc {
         this->box.handlePBC(bondDistanceNow);
       }
       double bondEnergyNow = this->k * bondDistanceNow.squaredNorm();
-      Eigen::Array3d originalOffsets =
+      Eigen::Vector3d originalOffsets =
         this->bondBoxOffsets.segment(3 * springIdx, 3);
       Eigen::Vector3d bondDistanceRailA =
         this->coordinates.segment(newPartnerA * 3, 3) -
@@ -1046,6 +1046,14 @@ namespace calc {
       if (accept) {
         this->replaceSlipSpringPartner(springIdx, partnerA, newPartnerA);
         this->replaceSlipSpringPartner(springIdx, partnerB, newPartnerB);
+        if (!this->assumeBoxLargeEnough) {
+          this->bondBoxOffsets.segment(3 * springIdx, 3) =
+            originalOffsets +
+            ((shiftEndAIsFirstOnRailBond ? 1. : -1.) *
+              this->bondBoxOffsets.segment(3 * selectedRailBondA, 3)) -
+            ((shiftEndBIsFirstOnRailBond ? 1. : -1.) *
+              this->bondBoxOffsets.segment(3 * selectedRailBondB, 3));
+        }
 #ifndef NDEBUG
         if (!((this->computeBondDistance(springIdx).cwiseAbs() -
                bondDistanceNew.cwiseAbs())
@@ -1144,7 +1152,7 @@ namespace calc {
         return false;
       }
       // compute the Metropolis criterion
-      Eigen::Array3d originalOffsets =
+      Eigen::Vector3d originalOffsets =
         this->bondBoxOffsets.segment(3 * springIdx, 3);
       Eigen::Vector3d bondDistanceNow =
         (this->coordinates.segment(partnerA * 3, 3) -
@@ -1177,6 +1185,12 @@ namespace calc {
       }
       if (accept) {
         this->replaceSlipSpringPartner(springIdx, partnerA, replacementForA);
+        if (!this->assumeBoxLargeEnough) {
+          this->bondBoxOffsets.segment(3 * springIdx, 3) =
+            originalOffsets +
+            (shiftEndIsFirstOnRailBond ? 1. : -1.) *
+             this->bondBoxOffsets.segment(3 * selectedRailBond, 3);
+        }
 #ifndef NDEBUG
         if (!((this->computeBondDistance(springIdx).cwiseAbs() -
                bondDistanceNew.cwiseAbs())
