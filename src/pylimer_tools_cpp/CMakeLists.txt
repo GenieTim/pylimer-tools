@@ -120,6 +120,8 @@ target_sources(pylimer_tools
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance.h
 		${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.h
 )
+
+set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -vec-report3 -ftree-vectorizer-verbose=6" )
 # ${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance2.cpp
 # ${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance2.h
 
