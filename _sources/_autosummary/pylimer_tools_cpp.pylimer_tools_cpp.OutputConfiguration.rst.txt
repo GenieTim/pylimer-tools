@@ -27,9 +27,11 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.OutputConfiguration
 
    .. autosummary::
    
+      ~OutputConfiguration.append
       ~OutputConfiguration.doubleValues
       ~OutputConfiguration.filename
       ~OutputConfiguration.intValues
       ~OutputConfiguration.outputEvery
+      ~OutputConfiguration.useEvery
    
    

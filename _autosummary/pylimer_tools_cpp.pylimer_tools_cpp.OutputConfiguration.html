@@ -274,21 +274,33 @@
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.doubleValues" title="pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.doubleValues"><code class="xref py py-obj docutils literal notranslate"><span class="pre">doubleValues</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.append" title="pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.append"><code class="xref py py-obj docutils literal notranslate"><span class="pre">append</span></code></a></p></td>
+<td><p>Whether to append to the file or truncate it</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.doubleValues" title="pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.doubleValues"><code class="xref py py-obj docutils literal notranslate"><span class="pre">doubleValues</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.filename" title="pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.filename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filename</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.filename" title="pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.filename"><code class="xref py py-obj docutils literal notranslate"><span class="pre">filename</span></code></a></p></td>
 <td><p>The file to write to.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.intValues" title="pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.intValues"><code class="xref py py-obj docutils literal notranslate"><span class="pre">intValues</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.intValues" title="pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.intValues"><code class="xref py py-obj docutils literal notranslate"><span class="pre">intValues</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.outputEvery" title="pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.outputEvery"><code class="xref py py-obj docutils literal notranslate"><span class="pre">outputEvery</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.outputEvery" title="pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.outputEvery"><code class="xref py py-obj docutils literal notranslate"><span class="pre">outputEvery</span></code></a></p></td>
 <td><p>How often to write the values to the output.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.useEvery" title="pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.useEvery"><code class="xref py py-obj docutils literal notranslate"><span class="pre">useEvery</span></code></a></p></td>
+<td><p>for autocorrelation/averaging, how often to include values</p></td>
 </tr>
 </tbody>
 </table>
 </div>
+<dl class="py property">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.append">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">append</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.append" title="Link to this definition">#</a></dt>
+<dd><p>Whether to append to the file or truncate it</p>
+</dd></dl>
+
 <dl class="py property">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.doubleValues">
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">doubleValues</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.doubleValues" title="Link to this definition">#</a></dt>
@@ -310,6 +322,12 @@
 <em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">outputEvery</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.outputEvery" title="Link to this definition">#</a></dt>
 <dd><p>How often to write the values to the output.
 For averages, this value also says how many values will be averaged.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.useEvery">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">useEvery</span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.useEvery" title="Link to this definition">#</a></dt>
+<dd><p>for autocorrelation/averaging, how often to include values</p>
 </dd></dl>
 
 </dd></dl>
@@ -373,10 +391,12 @@ For averages, this value also says how many values will be averaged.</p>
 <li><a class="reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration</a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration"><code class="docutils literal notranslate"><span class="pre">OutputConfiguration</span></code></a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.__init__"><code class="docutils literal notranslate"><span class="pre">OutputConfiguration.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.append"><code class="docutils literal notranslate"><span class="pre">OutputConfiguration.append</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.doubleValues"><code class="docutils literal notranslate"><span class="pre">OutputConfiguration.doubleValues</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.filename"><code class="docutils literal notranslate"><span class="pre">OutputConfiguration.filename</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.intValues"><code class="docutils literal notranslate"><span class="pre">OutputConfiguration.intValues</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.outputEvery"><code class="docutils literal notranslate"><span class="pre">OutputConfiguration.outputEvery</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.OutputConfiguration.useEvery"><code class="docutils literal notranslate"><span class="pre">OutputConfiguration.useEvery</span></code></a></li>
 </ul>
 </li>
 </ul>
