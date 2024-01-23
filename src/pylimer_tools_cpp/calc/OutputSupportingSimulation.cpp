@@ -23,10 +23,10 @@ namespace calc {
     outputBuffer.reserve(80 * 20);
     for (OutputConfiguration oc : configs) {
       if (oc.filename != "" && oc.filename != "stdio") {
+        // always append, as the truncation happened already
+        // (`this->validateAndTruncateOutputFiles`)
         this->outputStreams.push_back(std::make_shared<std::ofstream>(
-          oc.filename,
-          std::ios::out | (this->appendToFilesWhenOpening ? std::ios::app
-                                                          : std::ios::trunc)));
+          oc.filename, std::ios::out | std::ios::app));
         this->outputFileStreams.push_back(streamIdx);
       } else {
         this->outputStreams.push_back(

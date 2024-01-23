@@ -7,8 +7,6 @@
 #include "../utils/ExtraEigenTypes.h"
 #include "../utils/PerformanceTimer.h"
 #include "Correlator.h"
-#include "MEHPForceEvaluator.h"
-#include "MEHPUtilityStructures.h"
 #include "OutputSupportingSimulation.h"
 #include <Eigen/Dense>
 #include <algorithm>
@@ -17,17 +15,13 @@
 #include <cereal/access.hpp>
 #include <cereal/types/base_class.hpp>
 #include <cereal/types/polymorphic.hpp>
-#include <cstdint>
 #include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <limits>
-#include <map>
-#include <memory>
-#include <nlopt.hpp>
 #include <random>
 #include <string>
-#include <tuple>
+#include <unordered_map>
 #include <vector>
 #ifdef OPENMP_FOUND
 #include <omp.h>
@@ -65,25 +59,25 @@ namespace calc {
 
       ////////////////////////////////////////////////////////////////
       // configuration
-      bool doDeformation = false;
-      double maxBondLen = 5.;
-      bool is2D = false;
-      bool shiftPossibilityEmpty = true;
-      bool shiftOneAtATime = false;
       bool allowRelocationInNetwork = false;
-      double lambda = 0.65;
-      double k = 2.;
-      double lowCutoff = 0.5;
-      double highCutoff = 2.0;
+      bool assumeBoxLargeEnough = false;
+      bool doDeformation = false;
+      bool is2D = false;
+      bool shiftOneAtATime = false;
+      bool shiftPossibilityEmpty = true;
       double A = 25.;
-      double sigma = 3.;
-      double gamma = 0.5 * 3. * 3.;
-      long int nStepsMC = 500;
-      long int nStepsDPD = 500;
       double dt = 0.06;
+      double gamma = 0.5 * 3. * 3.;
+      double highCutoff = 2.0;
+      double k = 2.;
+      double lambda = 0.65;
+      double lowCutoff = 0.5;
+      double maxBondLen = 5.;
+      double sigma = 3.;
       int crosslinkerType = 2;
       int slipspringBondType = 9;
-      bool assumeBoxLargeEnough = false;
+      long int nStepsDPD = 500;
+      long int nStepsMC = 500;
 
       ////////////////////////////////////////////////////////////////
       // simulation state
@@ -169,11 +163,11 @@ namespace calc {
        */
       void refreshCurrentState();
 
-/**
- * @brief Set a new seed for the random generator
- * 
- * @param seed 
- */
+      /**
+       * @brief Set a new seed for the random generator
+       *
+       * @param seed
+       */
       void reseedRandomness(const std::string& seed);
 
       /**
@@ -584,7 +578,6 @@ namespace calc {
       {
         DPDSimulator res;
         pylimer_tools::utils::deserializeFromFile<DPDSimulator>(res, filename);
-        res.appendToFilesWhenOpening = true;
         return res;
       };
 
