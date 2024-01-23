@@ -1211,6 +1211,12 @@ init_pylimer_bound_calc(py::module_& m)
     .def(py::init<>(), "Get an instance of this struct")
     .def_readwrite("intValues", &OutputConfiguration::intValues)
     .def_readwrite("doubleValues", &OutputConfiguration::doubleValues)
+    .def_readwrite("useEvery", &OutputConfiguration::useEvery, R"pbdoc(
+     for autocorrelation/averaging, how often to include values
+    )pbdoc")
+    .def_readwrite("append", &OutputConfiguration::append, R"pbdoc(
+     Whether to append to the file or truncate it
+    )pbdoc")
     .def_readwrite(
       "filename",
       &OutputConfiguration::filename,

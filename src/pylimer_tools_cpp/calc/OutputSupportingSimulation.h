@@ -91,17 +91,22 @@ namespace calc {
   {
     std::vector<ComputedIntValues> intValues;
     std::vector<ComputedDoubleValues> doubleValues;
-    std::string filename;
-    int outputEvery;
-    int useEvery; // use every: for autocorrelation/averaging, how often to
-                  // include values
+    std::string filename = "";
+    int outputEvery = 10;
+    /**
+     * @brief use every: for autocorrelation/averaging, how often to include
+     * values
+     */
+    int useEvery = 1;
+    /**
+     * @brief Whether to append to the file or truncate it
+     *
+     * This does not need to be persisted, as when restarting, the output will
+     * append anyway.
+     */
+    bool append = false;
 
-    OutputConfiguration()
-      : filename("")
-      , outputEvery(10)
-      , useEvery(1)
-    {
-    }
+    OutputConfiguration() {}
 
     template<class Archive>
     void serialize(Archive& ar)
@@ -118,7 +123,6 @@ namespace calc {
     std::vector<OutputConfiguration> outputConfigs;
     std::vector<OutputConfiguration> outputAverageConfigs;
     std::vector<OutputConfiguration> outputAutoCorrelationConfigs;
-    bool appendToFilesWhenOpening = false;
     ////////////////////////////////////////////////////////////////
     // restart configurations
     int outputRestartEvery = 0;
@@ -152,7 +156,9 @@ namespace calc {
       int numAverages = this->openFilesOutputHeader(this->outputAverageConfigs,
                                                     "# OutputStep\t",
                                                     this->outputConfigs.size());
-      RUNTIME_EXP_IFN(runningAverages.size() == numAverages, "");
+      RUNTIME_EXP_IFN(runningAverages.size() == numAverages,
+                      "The nr. of running averages is not consistent with the "
+                      "number of output quantities.");
 
       // prepare autocorrelation
       this->openFilesOutputHeader(this->outputAutoCorrelationConfigs,
@@ -162,8 +168,6 @@ namespace calc {
       std::string autocorrelationOutputBuffer;
       autocorrelationOutputBuffer.reserve(
         this->outputAutoCorrelationConfigs.size() * 50);
-
-      this->appendToFilesWhenOpening = true;
     }
 
     int openFilesOutputHeader(const std::vector<OutputConfiguration>& configs,
@@ -245,7 +249,7 @@ namespace calc {
       if (doAverage) {
         size_t msdIdx = 0;
         size_t averagesIdx = 0;
-        for (const OutputConfiguration &oc : this->outputAverageConfigs) {
+        for (const OutputConfiguration& oc : this->outputAverageConfigs) {
           size_t previousAverageIdx = averagesIdx;
           if ((currentStep % oc.useEvery) == 0) {
             double multiplier = (static_cast<double>(oc.useEvery) /
@@ -253,7 +257,8 @@ namespace calc {
             for (ComputedIntValues val : oc.intValues) {
               switch (val) {
                 default:
-                  runningAverages[averagesIdx] += static_cast<double>(intvalues[val]) * multiplier;
+                  runningAverages[averagesIdx] +=
+                    static_cast<double>(intvalues[val]) * multiplier;
                   averagesIdx += 1;
                   break;
               }
@@ -302,7 +307,7 @@ namespace calc {
 
       // do autocorrelation
       size_t autocorrelator_idx = 0;
-      for (const OutputConfiguration &oc : this->outputAutoCorrelationConfigs) {
+      for (const OutputConfiguration& oc : this->outputAutoCorrelationConfigs) {
         const size_t autocorrelator_idx_before = autocorrelator_idx;
         for (ComputedDoubleValues cv : oc.doubleValues) {
           assert(autocorrelator_idx < this->autocorrelators.size());
@@ -474,6 +479,26 @@ namespace calc {
 
     virtual void writeRestartFile(std::string& filename) = 0;
 
+    void validateAndTruncateOutputFiles(const std::vector<OutputConfiguration>& vals) const
+    {
+      for (size_t i = 0; i < vals.size(); ++i) {
+        if (vals[i].filename.size() > 0) {
+          // empty the file
+          std::ifstream file;
+          file.open(
+            vals[i].filename.c_str(),
+            std::ifstream::out |
+              (vals[i].append ? std::ifstream::app : std::ifstream::trunc));
+          if (!file.is_open() || file.fail()) {
+            file.close();
+            throw std::invalid_argument("The file " + vals[i].filename +
+                                        " could not be opened.");
+          }
+          file.close();
+        }
+      }
+    }
+
     void configAutoCorrelatorOutput(std::vector<OutputConfiguration>& vals,
                                     const unsigned int numcorrin = 32,
                                     const unsigned int pin = 16,
@@ -488,6 +513,7 @@ namespace calc {
                            "Require useEvery to be smaller than output every");
         num_values_to_correlate += vals[i].doubleValues.size();
       }
+      this->validateAndTruncateOutputFiles(vals);
       this->autocorrelators.clear();
       this->autocorrelators.reserve(num_values_to_correlate);
       this->updateValuesRequiredEvery(vals);
@@ -505,7 +531,7 @@ namespace calc {
       this->updateValuesRequiredEvery(configs);
 
       int numAverages = 0;
-      for (const OutputConfiguration &c : configs) {
+      for (const OutputConfiguration& c : configs) {
         numAverages += c.doubleValues.size();
         numAverages += c.intValues.size();
         INVALIDARG_EXP_IFN(c.outputEvery >= c.useEvery,
@@ -513,6 +539,8 @@ namespace calc {
         INVALIDARG_EXP_IFN(c.outputEvery % c.useEvery == 0,
                            "Output every must be a multiple of useEvery");
       }
+
+      this->validateAndTruncateOutputFiles(configs);
 
       this->runningAverages =
         pylimer_tools::utils::initializeWithValue<double>(numAverages, 0.);
@@ -524,6 +552,8 @@ namespace calc {
       for (size_t i = 0; i < vals.size(); ++i) {
         vals[i].useEvery = vals[i].outputEvery;
       }
+
+      this->validateAndTruncateOutputFiles(vals);
       this->outputConfigs = vals;
       this->updateValuesRequiredEvery(vals);
     }
@@ -535,14 +565,15 @@ namespace calc {
     }
 
     template<class Archive>
-    void serialize(Archive& ar)
+    void serialize(Archive& ar) //, std::uint32_t const version)
     {
       ar(
         // output configurations
         outputConfigs,
         outputAverageConfigs,
-        outputAutoCorrelationConfigs,
-        // appendToFilesWhenOpening,
+        outputAutoCorrelationConfigs);
+
+      ar(
         // restart configurations - meta!
         outputRestartEvery,
         restartOutputFile,
@@ -581,5 +612,7 @@ namespace calc {
   };
 }
 }
+// CEREAL_CLASS_VERSION(pylimer_tools::calc::dpd::OutputsupportingSimulation,
+// 1);
 
 #endif

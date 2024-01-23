@@ -588,7 +588,7 @@ TEST_CASE("For large systems the PBC method does not matter",
 }
 
 TEST_CASE("DPD Simulator's restart files are accurate",
-          "[analysis][DPDSimulator][1proc]")
+          "[analysis][DPDSimulator][1proc][long]")
 {
   // note that the random force might lead to deviations compared to LAMMPS
   std::string suspectedPath = "../pylimer_tools/fixtures/";

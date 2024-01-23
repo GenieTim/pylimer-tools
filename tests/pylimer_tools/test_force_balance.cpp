@@ -943,7 +943,7 @@ TEST_CASE("MEHP Force Balance can randomly add slip-links ignoring cross-links",
 }
 
 TEST_CASE("MEHP Force Balance can run with swapping slip-links",
-          "[analysis][MEHPForceBalance]")
+          "[analysis][MEHPForceBalance][long]")
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
