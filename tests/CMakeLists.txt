@@ -183,10 +183,15 @@ if (CODE_COVERAGE)
 		NAME pylimer_tests-gcov
 		EXECUTABLE pylimer_tests
 		DEPENDENCIES pylimer_tests
+		LCOV_ARGS --ignore-errors inconsistent,source
+		EXCLUDE "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*"
 	)
 	setup_target_for_coverage_lcov(
 		NAME header_tests-gcov
 		EXECUTABLE header_tests
 		DEPENDENCIES header_tests
+		LCOV_ARGS --ignore-errors inconsistent,source
+		EXCLUDE "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*"
 	)
+		# BASE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/.."
 endif()

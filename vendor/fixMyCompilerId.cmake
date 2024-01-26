@@ -25,3 +25,6 @@ foreach(LANG ${LANGUAGES})
 	endif()
 endforeach()
 
+set(COVERAGE_EXCLUDES "${CMAKE_CURRENT_LIST_DIR}/../tests/_deps")
+set(LCOV_ARGS "--ignore-errors inconsistent")
+set(CODE_COVERAGE_VERBOSE True)
