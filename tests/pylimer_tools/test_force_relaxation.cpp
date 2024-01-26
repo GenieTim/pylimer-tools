@@ -721,3 +721,35 @@ TEST_CASE("Free chains collapse",
     }
   }
 }
+
+
+TEST_CASE("Fully active chains are fully active",
+          "[analysis][MEHPForceRelaxation]")
+{
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  REQUIRE(universeSeq.getLength() == 0);
+  std::string suspectedPath = "../pylimer_tools/fixtures/";
+
+  SECTION("MEHP Force Relaxation 3D case")
+  {
+    // perfect diamond network = fully connected => 
+    // maximum is at perfect crystal structure -> must be all active.
+    std::string inputFile =
+      suspectedPath +
+      "3d-diamond-lattice_10x10x10_a_3_d_0.85_v_0.V-fixed.structure.out";
+    if (std::filesystem::exists(inputFile)) {
+      std::cout << "Reading file " << inputFile << std::endl;
+      universeSeq.initializeFromDataSequence({ { inputFile } });
+      pe::Universe universe = universeSeq.atIndex(0);
+      std::cout << "Read file " << inputFile << std::endl;
+
+      pcm::MEHPForceRelaxation forceRelaxer =
+        pcm::MEHPForceRelaxation(universe, 2, false);
+      REQUIRE_NOTHROW(forceRelaxer.runForceRelaxation());
+      REQUIRE(forceRelaxer.getNrOfIterations() > 0);
+      CHECK(forceRelaxer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+      CHECK(forceRelaxer.getNrOfActiveSprings() ==
+            forceRelaxer.getNrOfSprings());
+    }
+  }
+}

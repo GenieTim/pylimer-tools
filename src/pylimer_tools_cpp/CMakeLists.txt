@@ -146,24 +146,10 @@ if(CODE_COVERAGE AND CMAKE_COMPILER_IS_GNUCXX)
 		message(WARNING "Using coverage reduces build type to debug from release")
 	endif()
 	set(ENABLE_COVERAGE ON)
-	set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/CMake-codecov/cmake" ${CMAKE_MODULE_PATH})
-	find_package(codecov)
+	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/cmake-modules")
+	include(CodeCoverage)
+	append_coverage_compiler_flags()
 
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage ")
-	set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage ")
-	target_compile_options(pylimer_tools PRIVATE -O0 -g -fprofile-arcs -ftest-coverage )
-
-	if(CMAKE_COMPILER_IS_GNUCXX)
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-abs-path")
-		set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fprofile-abs-path")
-		target_compile_options(pylimer_tools PRIVATE -fprofile-abs-path)
-	endif()
-
-	target_link_libraries(
-		pylimer_tools
-		PRIVATE
-		--coverage
-	)
 	add_coverage(pylimer_tools)
 else()
 	message("Code Coverage is disabled.")

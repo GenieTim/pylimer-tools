@@ -26,7 +26,8 @@ else
   CCOMPILER=$CC
 fi
 ADDITIONALFLAGS=()
-if command -v clang++ || command -v g++; then
+if (command -v clang++ || command -v g++) && ! ([ -z "$CCOMPILER" ] || [ -z "$CXXCOMPILER" ]); then
+  echo "Using compiler: $CCOMPILER and $CXXCOMPILER"
   ADDITIONALFLAGS=("${ADDITIONALFLAGS[@]}" -D CODE_COVERAGE=ON -D LEAK_ANALYSIS=ON -D CMAKE_C_COMPILER="$CCOMPILER" -D CMAKE_CXX_COMPILER="$CXXCOMPILER")
 else
   ADDITIONALFLAGS=("${ADDITIONALFLAGS[@]}" -D CODE_COVERAGE=OFF -D LEAK_ANALYSIS=OFF)
