@@ -5,6 +5,10 @@ on:
     branches:
       - workflow_dispatch
 
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   build-deploy:
     runs-on: windows-latest
@@ -12,13 +16,13 @@ jobs:
     name: Run Python + C++ Tests on Windows
     steps:
       - uses: actions/checkout@v4
-        with: 
+        with:
           submodules: "recursive"
 
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.10.6'
-          cache: 'pip'
+          python-version: "3.10.6"
+          cache: "pip"
 
       - uses: actions/cache@v3
         with:
@@ -35,7 +39,7 @@ jobs:
 
       - name: Install Dependencies
         run: pip install -r requirements.txt
-      
+
       - name: Add msbuild to PATH
         uses: microsoft/setup-msbuild@v1.3
 
@@ -43,7 +47,7 @@ jobs:
         uses: crazy-max/ghaction-chocolatey@v3
         with:
           args: install -y winflexbison3 eigen lcov
-      
+
       - name: Build
         run: pip install . --verbose
 
