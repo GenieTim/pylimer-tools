@@ -17,12 +17,6 @@ endif()
 option(CODE_COVERAGE "Collect coverage from test library" OFF)
 option(LEAK_ANALYSIS "Check for memory leaks in the test" OFF)
 
-if (CODE_COVERAGE)
-	set(ENABLE_COVERAGE ON)
-	set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../vendor/CMake-codecov/cmake" ${CMAKE_MODULE_PATH})
-	find_package(codecov)
-endif()
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wmissing-declarations -Wmissing-include-dirs -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-promo -Wstrict-overflow=5 -Wswitch-default -Wundef -Wno-unused -Weffc++") # -Wsign-conversion
 
 if(CMAKE_COMPILER_IS_GNUCXX)
@@ -179,44 +173,20 @@ catch_discover_tests(pylimer_tests)
 
 catch_discover_tests(header_tests)
 
-# disable for a moment
-if(CODE_COVERAGE AND CMAKE_COMPILER_IS_GNUCXX)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage")
-	set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -O0 -g -fprofile-arcs -ftest-coverage")
-	target_compile_options(pylimer_tests PRIVATE -O0 -g -fprofile-arcs -ftest-coverage )
-
-	if(CMAKE_COMPILER_IS_GNUCXX)
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fprofile-abs-path")
-		set(CMAKE_CXX_FLAGS " ${CMAKE_CXX_FLAGS} -fprofile-abs-path")
-		target_compile_options(pylimer_tests PRIVATE -fprofile-abs-path)
-	endif()
-
-	add_coverage(pylimer_tests)
-	target_link_libraries(
-		pylimer_tests
-		PRIVATE
-		--coverage
+# code coverage setup in the end
+if (CODE_COVERAGE)
+	set(ENABLE_COVERAGE ON)
+	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../vendor/cmake-modules")
+	include(CodeCoverage)
+	append_coverage_compiler_flags()
+	setup_target_for_coverage_lcov(
+		NAME pylimer_tests-gcov
+		EXECUTABLE pylimer_tests
+		DEPENDENCIES pylimer_tests
 	)
-	
-	# add_coverage(pylimer_tools)
-	add_coverage(test_sources)
-
-	target_link_libraries(
-		test_sources
-		PRIVATE
-		--coverage
+	setup_target_for_coverage_lcov(
+		NAME header_tests-gcov
+		EXECUTABLE header_tests
+		DEPENDENCIES header_tests
 	)
-
-	target_compile_options(header_tests PRIVATE -O0 -g -fprofile-arcs -ftest-coverage )
-	if(CMAKE_COMPILER_IS_GNUCXX)
-		target_compile_options(header_tests PRIVATE -fprofile-abs-path)
-	endif()
-
-	add_coverage(header_tests)
-	target_link_libraries(header_tests 
-		PRIVATE 
-		--coverage
-	)
-
-	coverage_evaluate()
 endif()

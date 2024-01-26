@@ -1,6 +1,6 @@
 [submodule "lib/igraph"]
 	path = lib/igraph
 	url = git@github.com:igraph/igraph.git
-[submodule "vendor/CMake-codecov"]
-	path = vendor/CMake-codecov
-	url = git@github.com:RWTH-HPC/CMake-codecov.git
+[submodule "vendor/cmake-modules"]
+	path = vendor/cmake-modules
+	url = git@github.com:bilke/cmake-modules.git

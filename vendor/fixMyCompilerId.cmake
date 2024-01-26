@@ -1,0 +1,21 @@
+# for some reason, my MacMini's Homebrew llvm clang does not get a set CMAK_{LANG}_COMPILER_ID
+
+get_property(LANGUAGES GLOBAL PROPERTY ENABLED_LANGUAGES)
+foreach(LANG ${LANGUAGES})
+	if ("${CMAKE_${LANG}_COMPILER_ID}" MATCHES "")
+		if ("${CMAKE_${LANG}_COMPILER}" MATCHES ".*/llvm/bin/clang.?.?")
+			# SEE: https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_ID.html
+			set(CMAKE_${LANG}_COMPILER_ID "Clang")
+			set(CMAKE_${LANG}_COMPILER_ID "Clang" CACHE INTERNAL "The id of the ${LANG} compiler" FORCE)
+			message("Set CMAKE_${LANG}_COMPILER_ID to Clang")
+		endif()
+	endif()
+	if ("${CMAKE_${LANG}_COMPILER_VERSION}" MATCHES "")
+		execute_process(COMMAND "${CMAKE_${LANG}_COMPILER}" --version OUTPUT_VARIABLE TMP_VERSION_O)
+		string(REGEX MATCH "version ([0-9]*\\.[0-9]*\\.[0-9]*)" _ ${TMP_VERSION_O})
+		SET(CMAKE_${LANG}_COMPILER_VERSION ${CMAKE_MATCH_1})
+		SET(CMAKE_${LANG}_COMPILER_VERSION ${CMAKE_MATCH_1} CACHE INTERNAL "The version of the ${LANG} compiler" FORCE)
+		message("Set CMAKE_${LANG}_COMPILER_VERSION to ${CMAKE_${LANG}_COMPILER_VERSION}")
+	endif()
+endforeach()
+
