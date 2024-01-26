@@ -141,16 +141,14 @@ endif()
 
 set_target_properties(pylimer_tools PROPERTIES VERSION ${PROJECT_VERSION})
 
-if(CODE_COVERAGE AND CMAKE_COMPILER_IS_GNUCXX)
+if (CODE_COVERAGE)
+	set(ENABLE_COVERAGE ON)
 	if (CMAKE_BUILD_TYPE EQUAL "RELEASE")
 		message(WARNING "Using coverage reduces build type to debug from release")
 	endif()
-	set(ENABLE_COVERAGE ON)
 	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/cmake-modules")
 	include(CodeCoverage)
 	append_coverage_compiler_flags()
-
-	add_coverage(pylimer_tools)
 else()
 	message("Code Coverage is disabled.")
 endif()
