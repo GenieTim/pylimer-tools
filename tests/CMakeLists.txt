@@ -184,6 +184,7 @@ if (CODE_COVERAGE)
 		EXECUTABLE pylimer_tests
 		DEPENDENCIES pylimer_tests
 		LCOV_ARGS --ignore-errors inconsistent,source
+		EXECUTABLE_ARGS --skip-benchmarks --durations yes "~[long]"
 		EXCLUDE "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*"
 	)
 	setup_target_for_coverage_lcov(
@@ -191,7 +192,8 @@ if (CODE_COVERAGE)
 		EXECUTABLE header_tests
 		DEPENDENCIES header_tests
 		LCOV_ARGS --ignore-errors inconsistent,source
+		EXECUTABLE_ARGS --skip-benchmarks --durations yes "~[long]"
 		EXCLUDE "${CMAKE_CURRENT_LIST_DIR}/build/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/_deps/*" "${CMAKE_CURRENT_LIST_DIR}/../_deps/*"
 	)
-		# BASE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/.."
+	# BASE_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/.."
 endif()

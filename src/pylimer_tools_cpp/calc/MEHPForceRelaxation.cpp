@@ -166,8 +166,9 @@ namespace calc {
       Eigen::VectorXd actualCoordinates = net->coordinates + u;
       // It *could* be more efficient to index u instead of the coordinates
       Eigen::VectorXd springDistances =
-        (actualCoordinates(net->springCoordinateIndexA) -
-         actualCoordinates(net->springCoordinateIndexB));
+        (actualCoordinates(net->springCoordinateIndexB) -
+         actualCoordinates(net->springCoordinateIndexA)) +
+        net->springBoxOffset;
 
       if (is2D) {
         // springDistances(Eigen::seq(2, Eigen::last, Eigen::fix<3>)) =
@@ -178,7 +179,9 @@ namespace calc {
       }
       assert(springDistances.size() == net->nrOfSprings * 3);
 
-      box.handlePBC(springDistances);
+      if (net->assumeBoxLargeEnough) {
+        box.handlePBC(springDistances);
+      }
 
       return springDistances;
     }
@@ -419,7 +422,7 @@ namespace calc {
           this->currentDisplacements,
           r);
       } catch (const std::exception& e) {
-        delete[](r);
+        delete[] (r);
         throw e;
       }
 
@@ -428,7 +431,7 @@ namespace calc {
       for (size_t i = 0; i < this->initialConfig.nrOfNodes * 3; ++i) {
         results[i] = r[i];
       }
-      delete[](r);
+      delete[] (r);
       return results;
     }
 

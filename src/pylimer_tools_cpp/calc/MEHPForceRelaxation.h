@@ -113,6 +113,10 @@ namespace calc {
 
       Network getNetwork() const { return this->initialConfig; }
 
+      void configAssumeBoxLargeEnough(bool assumption = true) {
+        this->initialConfig.assumeBoxLargeEnough = assumption;
+      }
+
       // MEHPForceEvaluator getForceEvaluator() const
       // {
       //   return *this->forceEvaluator;
@@ -471,6 +475,7 @@ namespace calc {
         net->springIndexB = Eigen::ArrayXi::Zero(net->nrOfSprings);
         net->springCoordinateIndexA =
           Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
+        net->springBoxOffset = Eigen::VectorXd::Zero(3 * net->nrOfSprings);
         net->springCoordinateIndexB =
           Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
         net->springIsActive = ArrayXb::Constant(net->nrOfSprings, false);
@@ -548,7 +553,15 @@ namespace calc {
               std::swap(nodeIdxFrom, nodeIdxTo);
             }
             std::vector<pylimer_tools::entities::Atom> allChainAtoms =
-              crosslinkerChains[i].getAtoms();
+              crosslinkerChains[i].getAtomsLinedUp();
+            net->springBoxOffset.segment(3 * spring_idx, 3) =
+              crosslinkerChains[i].getOverallBondBoxOffset(crosslinkerType);
+
+            if (atomIdToNode.at(allChainAtoms[0].getId()) == nodeIdxTo) {
+              net->springBoxOffset.segment(3 * spring_idx, 3) *= -1;
+            } else {
+              assert(atomIdToNode.at(allChainAtoms[0].getId()) == nodeIdxFrom);
+            }
 
             pylimer_tools::utils::addIfNotContained(
               net->springIndicesOfLinks[nodeIdxFrom], spring_idx);

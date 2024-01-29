@@ -425,6 +425,7 @@ namespace calc {
       Eigen::VectorXd relevantPartialDistancesA =
         (displacedCoords(relevantSpringPartCoordinateIndexB) -
          displacedCoords(relevantSpringPartCoordinateIndexA));
+         // TODO: implement box not large enough case
       this->box.handlePBC(relevantPartialDistancesA);
 
       // NOTE: we have many zeros too much, here, actually.
@@ -496,7 +497,8 @@ namespace calc {
       Eigen::VectorXd displacedCoords = net.coordinates + u;
       Eigen::VectorXd relevantPartialDistancesA =
         (displacedCoords(net.springPartCoordinateIndexB) -
-         displacedCoords(net.springPartCoordinateIndexA));
+         displacedCoords(net.springPartCoordinateIndexA)) +
+        net.springPartBoxOffset;
       for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
         for (size_t dir = 0; dir < 3; ++dir) {
           if (std::abs(relevantPartialDistancesA[3 * i + dir]) >
@@ -513,7 +515,9 @@ namespace calc {
           }
         }
       }
-      this->box.handlePBC(relevantPartialDistancesA);
+      if (this->assumeBoxLargeEnough) {
+        this->box.handlePBC(relevantPartialDistancesA);
+      }
       Eigen::VectorXd partialDistancesOverSpringPartitions =
         (relevantPartialDistancesA.array() * oneOverSpringPartitions.array())
           .matrix();
@@ -1206,7 +1210,8 @@ namespace calc {
      */
     size_t MEHPForceBalance::addSliplinksBasedOnCycles(const int maxLoopLength)
     {
-      // std::cout << "Detecting slip-links based on cycles. Base memory useage: "
+      // std::cout << "Detecting slip-links based on cycles. Base memory useage:
+      // "
       //           << getCurrentRSS() << ", peak " << getPeakRSS() << std::endl;
       std::vector<std::vector<long int>> loopEdges;
       std::vector<std::vector<long int>> loops = this->universe.findLoops(
@@ -1617,6 +1622,8 @@ namespace calc {
         pylimer_tools::utils::removeRow(net.springPartIndexB, partialSpringIdx);
         pylimer_tools::utils::removeRows(
           net.springPartCoordinateIndexB, 3 * partialSpringIdx, 3);
+        pylimer_tools::utils::removeRows(
+          net.springPartBoxOffset, 3 * partialSpringIdx, 3);
         pylimer_tools::utils::removeRow(net.partialToFullSpringIndex,
                                         partialSpringIdx);
         pylimer_tools::utils::removeRow(net.partialSpringIsPartial,
@@ -1767,7 +1774,9 @@ namespace calc {
     }
 
     /**
-     * @brief
+     * @brief remove a link from the network
+     *
+     *
      *
      * @param net
      * @param displacements
@@ -1862,7 +1871,7 @@ namespace calc {
     }
 
     /**
-     * @brief
+     * @brief Combine two springs
      *
      * @param net
      * @param springPartitions
@@ -1919,6 +1928,9 @@ namespace calc {
             3 * newEnd + dir;
         }
       }
+      // TODO: fix / adjust prefix
+      net.springPartBoxOffset.segment(3 * keptSpringIdx, 3) +=
+        net.springPartBoxOffset.segment(3 * removedSpringIdx, 3);
       // remove the spring from the link
       // NOTE: currently, we allow it not to be present,
       // as it might be removed earlier already
@@ -2012,6 +2024,8 @@ namespace calc {
                                        3 * removedSpringIdx,
                                        3,
                                        skipEigenResize);
+      pylimer_tools::utils::removeRows(
+        net.springPartBoxOffset, 3 * removedSpringIdx, 3, skipEigenResize);
       // renumber stuff
       for (size_t loopSpringIdx = 0;
            loopSpringIdx < net.localToGlobalSpringIndex.size();
@@ -2028,7 +2042,7 @@ namespace calc {
     }
 
     /**
-     * @brief
+     * @brief Combine two springs
      *
      * @param net
      * @param springPartitions
@@ -2151,7 +2165,7 @@ namespace calc {
           // std::cout << "Start start" << std::endl;
           // from start
           RUNTIME_EXP_IFN(removedSpringsLinks[0] == linkToReduce,
-                          "No way this expcetion is every shown, right?");
+                          "No way this expcetion is ever shown, right?");
           net.linkIndicesOfSprings[keptSpringIdx][0] = removedSpringsLinks[1];
           // have to insert it reverse order
           // happens automatically if we always insert the next the start
@@ -2186,6 +2200,9 @@ namespace calc {
              net.linkIndicesOfSprings[keptSpringIdx].size() - 1);
       assert(net.linkIndicesOfSprings[keptSpringIdx].size() ==
              keptSpringsLinks.size() + removedSpringsLinks.size() - 2);
+      // TODO: fix prefix
+      net.springPartBoxOffset.segment(3 * remainingPartialSpringIdx, 3) +=
+        net.springPartBoxOffset.segment(3 * removedPartialSpringIdx, 3);
 
       // tell the links of their new spring index
       for (size_t linkOfRemovedSpring : removedSpringsLinks) {
@@ -2254,6 +2271,8 @@ namespace calc {
         net.springPartCoordinateIndexA, 3 * removedPartialSpringIdx, 3);
       pylimer_tools::utils::removeRows(
         net.springPartCoordinateIndexB, 3 * removedPartialSpringIdx, 3);
+      pylimer_tools::utils::removeRows(
+        net.springPartBoxOffset, 3 * removedPartialSpringIdx, 3);
 
       // spring indices & coordinates
       if (net.springIndexA[removedSpringIdx] == linkToReduce) {
@@ -2506,6 +2525,7 @@ namespace calc {
                                                         net.nrOfPartialSprings);
       net.springPartCoordinateIndexB.conservativeResize(3 *
                                                         net.nrOfPartialSprings);
+      net.springPartBoxOffset.conservativeResize(3 * net.nrOfPartialSprings);
       net.partialToFullSpringIndex.conservativeResize(net.nrOfPartialSprings);
       net.partialSpringIsPartial.conservativeResize(net.nrOfPartialSprings);
       // add the new info
@@ -2585,6 +2605,11 @@ namespace calc {
         net.springPartCoordinateIndexB[3 * newPartialSpringIdx + dir] =
           3 * springPartToReplace + dir;
       }
+      // TODO: implement. this is problematic.
+      // net.springPartBoxOffset.segment(3*newPartialSpringIdx, 3) =
+      // this->box.getOffset(
+
+      // );
 
       // renormalize this spring
       // mostly by moving the next slip-link further
@@ -3868,6 +3893,8 @@ namespace calc {
           Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx1, 3 * linkIdx1 + 2);
       }
 
+      // TODO: update box offset
+
       // std::swap(net.linkIndicesOfSprings[springIdx][firstPositionInSpring],
       //           net.linkIndicesOfSprings[springIdx][firstPositionInSpring +
       //           1]);
@@ -4229,8 +4256,11 @@ namespace calc {
       Eigen::VectorXd displacedCoords = net.coordinates + u;
       Eigen::VectorXd partialDistances =
         (displacedCoords(net.springPartCoordinateIndexB) -
-         displacedCoords(net.springPartCoordinateIndexA));
-      this->box.handlePBC(partialDistances);
+         displacedCoords(net.springPartCoordinateIndexA)) +
+        net.springPartBoxOffset;
+      if (this->assumeBoxLargeEnough) {
+        this->box.handlePBC(partialDistances);
+      }
 
       // reset for 2D systems
       if (this->is2D) {
@@ -4372,6 +4402,8 @@ namespace calc {
       this->initialConfig.springPartCoordinateIndexA.conservativeResize(
         3 * (currentNrOfPartialSprings + 2 * additionalLen));
       this->initialConfig.springPartCoordinateIndexB.conservativeResize(
+        3 * (currentNrOfPartialSprings + 2 * additionalLen));
+      this->initialConfig.springPartBoxOffset.conservativeResize(
         3 * (currentNrOfPartialSprings + 2 * additionalLen));
       this->initialConfig.springPartIndexA.conservativeResize(
         currentNrOfPartialSprings + 2 * additionalLen);
@@ -4530,6 +4562,8 @@ namespace calc {
               .springPartCoordinateIndexB[3 * newSpringIndex + offset] =
               3 * springPartner2 + offset;
           }
+
+          // TODO: set box offsets
 
           this->currentSpringPartitionsVec[newSpringIndex] =
             this->currentSpringPartitionsVec[lastSpringIndex] - alpha;
@@ -4754,8 +4788,11 @@ namespace calc {
       Eigen::VectorXd displacedCoords = net.coordinates + u;
       Eigen::VectorXd relevantPartialDistancesA =
         (displacedCoords(net.springPartCoordinateIndexB) -
-         displacedCoords(net.springPartCoordinateIndexA));
-      this->box.handlePBC(relevantPartialDistancesA);
+         displacedCoords(net.springPartCoordinateIndexA)) +
+        net.springPartBoxOffset;
+      if (this->assumeBoxLargeEnough) {
+        this->box.handlePBC(relevantPartialDistancesA);
+      }
 
       for (size_t partialSpringIdx = 0;
            partialSpringIdx < net.nrOfPartialSprings;
@@ -5081,6 +5118,7 @@ namespace calc {
       net.springIndexB = Eigen::ArrayXi::Zero(net.nrOfSprings);
       net.springCoordinateIndexA = Eigen::ArrayXi::Zero(3 * net.nrOfSprings);
       net.springCoordinateIndexB = Eigen::ArrayXi::Zero(3 * net.nrOfSprings);
+      net.springPartBoxOffset = Eigen::VectorXd::Zero(3 * net.nrOfSprings);
       net.springIsActive = ArrayXb::Constant(net.nrOfSprings, false);
       net.springsContourLength = Eigen::VectorXd::Zero(net.nrOfSprings);
       net.oldAtomIdToSpringIndex.reserve(this->universe.getNrOfAtoms());
@@ -5109,6 +5147,13 @@ namespace calc {
         bool addChain = false;
         if (crosslinkerChains[i].getType() ==
             pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
+          // make sure the order is the same as in Molecule::getVerticesLinedUp
+          std::sort(xlinkersOfChain.begin(),
+                    xlinkersOfChain.end(),
+                    [](pylimer_tools::entities::Atom& a1,
+                       pylimer_tools::entities::Atom& a2) {
+                      return a1.getId() < a2.getId();
+                    });
           assert(xlinkersOfChain.size() == 2);
           nodeIdxFrom = atomIdToNode.at(xlinkersOfChain[0].getId());
           nodeIdxTo = atomIdToNode.at(xlinkersOfChain[1].getId());
@@ -5117,6 +5162,8 @@ namespace calc {
           // spring contour length = nr of bonds between two cross-linkers
           net.springsContourLength[spring_idx] =
             crosslinkerChains[i].getNrOfAtoms() - 1;
+          net.springPartBoxOffset.segment(3 * spring_idx, 3) =
+            crosslinkerChains[i].getOverallBondBoxOffset(crosslinkerType);
         } else if (crosslinkerChains[i].getType() ==
                    pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
           assert(xlinkersOfChain.size() == 1 ||
@@ -5139,23 +5186,33 @@ namespace calc {
           assert(xlinkersOfChain.size() == 1);
           std::vector<pylimer_tools::entities::Atom> endsOfChain =
             crosslinkerChains[i].getAtomsOfDegree(1);
+          // make sure the order is the same as in Molecule::getVerticesLinedUp
+          std::sort(endsOfChain.begin(),
+                    endsOfChain.end(),
+                    [](pylimer_tools::entities::Atom& a1,
+                       pylimer_tools::entities::Atom& a2) {
+                      return a1.getId() < a2.getId();
+                    });
           assert(endsOfChain.size() == 2);
 
           nodeIdxFrom = atomIdToNode.at(endsOfChain[0].getId());
           nodeIdxTo = atomIdToNode.at(endsOfChain[1].getId());
           net.springsContourLength[spring_idx] =
             crosslinkerChains[i].getNrOfAtoms() - 1;
+          net.springPartBoxOffset.segment(3 * spring_idx, 3) =
+            crosslinkerChains[i].getOverallBondBoxOffset(crosslinkerType);
           addChain = true;
         }
 
         if (addChain) {
           if (nodeIdxFrom > nodeIdxTo) {
             std::swap(nodeIdxFrom, nodeIdxTo);
+            net.springPartBoxOffset.segment(3 * spring_idx, 3) *= -1;
           }
           net.springToMoleculeIds.push_back(i);
           std::vector<pylimer_tools::entities::Atom> allChainAtoms =
             crosslinkerChains[i].getAtoms();
-          for (pylimer_tools::entities::Atom a : allChainAtoms) {
+          for (const pylimer_tools::entities::Atom& a : allChainAtoms) {
             net.oldAtomIdToSpringIndex[a.getId()] = spring_idx;
           }
 
@@ -5269,6 +5326,9 @@ namespace calc {
                       "Invalid size of springIndexB");
       RUNTIME_EXP_IFN(net.springPartIndexA.size() == net.nrOfPartialSprings,
                       "Invalid size of springPartIndexA");
+      RUNTIME_EXP_IFN(net.springPartBoxOffset.size() ==
+                        net.nrOfPartialSprings * 3,
+                      "Invalid size of springPartBoxOffset");
       RUNTIME_EXP_IFN(net.springPartIndexB.size() == net.nrOfPartialSprings,
                       "Invalid size of springPartIndexB");
       RUNTIME_EXP_IFN(net.springIsActive.size() == net.nrOfSprings,

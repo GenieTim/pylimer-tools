@@ -45,9 +45,14 @@ namespace calc {
       Eigen::ArrayXi springCoordinateIndexB;
       Eigen::ArrayXi springIndexA;
       Eigen::ArrayXi springIndexB;
+      Eigen::VectorXd springBoxOffset;
+
       ArrayXArrayXi springIndicesOfLinks;   // maps link -> springs
       // interesting properties
       ArrayXb springIsActive;
+
+      // config
+      bool assumeBoxLargeEnough = false;
     };
 
     struct ForceBalanceNetwork
@@ -80,6 +85,7 @@ namespace calc {
       Eigen::ArrayXi springPartCoordinateIndexB;
       Eigen::ArrayXi springPartIndexA;
       Eigen::ArrayXi springPartIndexB;
+      Eigen::VectorXd springPartBoxOffset;
       Eigen::ArrayXi nrOfCrosslinkSwapsEndured;
 
       // these may be empty, or not, depending on the method used
