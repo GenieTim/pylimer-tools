@@ -67,6 +67,11 @@ testGradient(pcm::MEHPForceEvaluator* forceEvaluator)
   net.nrOfLoops = 1;
   net.springsContourLength = Eigen::VectorXd::Constant(4, 1.0);
   net.meanSpringContourLength = 1.0;
+  // net.assumeBoxLargeEnough = true;
+  net.springBoxOffset =
+    universe.getBox().getOffset(net.coordinates(net.springCoordinateIndexB) -
+                                net.coordinates(net.springCoordinateIndexA));
+
   REQUIRE(net.coordinates.size() == 12);
   // test that Eigen does as expected
   Eigen::VectorXd coordinatesSpringEndA =
@@ -86,11 +91,11 @@ testGradient(pcm::MEHPForceEvaluator* forceEvaluator)
     0.0, 0.0, 0.0, // 1
   };
   Eigen::VectorXd springDistances =
-    (coordinatesSpringEndA - coordinatesSpringEndB);
+    (coordinatesSpringEndB - coordinatesSpringEndA);
   for (size_t i = 0; i < 12; ++i) {
     REQUIRE(coordinatesSpringEndA[i] == expectedCoordsA[i]);
     REQUIRE(coordinatesSpringEndB[i] == expectedCoordsB[i]);
-    REQUIRE(springDistances[i] == expectedCoordsA[i] - expectedCoordsB[i]);
+    REQUIRE(springDistances[i] == expectedCoordsB[i] - expectedCoordsA[i]);
   }
   // setup gradient and coordinates
   const double h = 1.e-5;
@@ -272,8 +277,9 @@ TEST_CASE(
   {
     REQUIRE(std::filesystem::exists(suspectedPath));
     universeSeq.initializeFromDataSequence(
-      { { suspectedPath + "structure/equil_phantom_hexa_lattice_60x60_25_bx_sqrtNbsqrt0."
-                          "333_2d_t_7500001.structure.out" } });
+      { { suspectedPath +
+          "structure/equil_phantom_hexa_lattice_60x60_25_bx_sqrtNbsqrt0."
+          "333_2d_t_7500001.structure.out" } });
     REQUIRE(universeSeq.getLength() == 1);
     pe::Universe universe = universeSeq.atIndex(0);
     pcm::MEHPForceRelaxation forceRelaxer =
@@ -588,8 +594,8 @@ TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
   // and a final one
   springDistances[2] = 0.25;
   CHECK_THAT(forceEvaluatorInstance.evaluateForceSetGradient(
-          net.nrOfNodes * 3, springDistances, u, r) ,
-        Catch::Matchers::WithinRel(1.11463, 0.02));
+               net.nrOfNodes * 3, springDistances, u, r),
+             Catch::Matchers::WithinRel(1.11463, 0.02));
   double OneOverRDist = 1.0 / std::sqrt(2.0 + 0.25 * 0.25);
   CHECK(r[0] == Catch::Approx(1.68968 * OneOverRDist).epsilon(0.02));
   CHECK(r[1] == Catch::Approx(-1.68968 * OneOverRDist).epsilon(0.02));
@@ -722,7 +728,6 @@ TEST_CASE("Free chains collapse",
   }
 }
 
-
 TEST_CASE("Fully active chains are fully active",
           "[analysis][MEHPForceRelaxation]")
 {
@@ -732,7 +737,7 @@ TEST_CASE("Fully active chains are fully active",
 
   SECTION("MEHP Force Relaxation 3D case")
   {
-    // perfect diamond network = fully connected => 
+    // perfect diamond network = fully connected =>
     // maximum is at perfect crystal structure -> must be all active.
     std::string inputFile =
       suspectedPath +

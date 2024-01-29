@@ -324,6 +324,42 @@ namespace entities {
     return results;
   };
 
+  /**
+   * @brief Get the overall offset in terms of boxes (for PBC)
+   *
+   * The offset is computed as if computing the vector of the first to the last
+   * atom (coords of last minus coords of first).
+   *
+   * NOTE: even for primary loops, it is possible that this is not equal to
+   * zero.
+   * @param crosslinkerType
+   * @return Eigen::Vector3d
+   */
+  Eigen::Vector3d Molecule::getOverallBondBoxOffset(
+    const int crosslinkerType) const
+  {
+    std::vector<long int> alignedVertices =
+      this->getVerticesLinedUp(crosslinkerType);
+    Eigen::VectorXd alignedCoordinates =
+      Eigen::VectorXd::Zero(3 * alignedVertices.size());
+    this->getAssumedVertexCoordinates(
+      alignedCoordinates, this->parent, alignedVertices);
+    Eigen::Vector3d result = Eigen::Vector3d::Zero();
+    for (size_t i = 1; i < alignedVertices.size(); ++i) {
+      result +=
+        this->parent->getOffset(alignedCoordinates.segment((i) * 3, 3) -
+                                alignedCoordinates.segment((i - 1) * 3, 3));
+    }
+    return result;
+  };
+
+  /**
+   * @brief Get the ids of the vertices in order of the chain, starting from one
+   * end to the other
+   *
+   * @param crossLinkerType
+   * @return std::vector<long int>
+   */
   std::vector<long int> Molecule::getVerticesLinedUp(int crossLinkerType) const
   {
 

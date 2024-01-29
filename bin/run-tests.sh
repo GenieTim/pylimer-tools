@@ -19,16 +19,9 @@ echo "======== Starting tests ========"
 MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp ./pylimer_tests --skip-benchmarks --benchmark-samples 10 --durations yes || exit 6 #  -s --durations yes
 MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp ./header_tests --skip-benchmarks --benchmark-samples 10 --durations yes || exit 8
 
-"$GENERATOR_BIN" pylimer_tests-gcov
+MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp time "$GENERATOR_BIN" pylimer_tests-gcov
 find . -name "*Universe.cpp.gcov" -exec cat {} \;
-"$GENERATOR_BIN" header_tests-gcov
-# "$GENERATOR_BIN" pylimer_tests-gcov
-# "$GENERATOR_BIN" test_sources-gcov
-
-"$GENERATOR_BIN" header_tests-geninfo
-"$GENERATOR_BIN" pylimer_tests-geninfo
-"$GENERATOR_BIN" pylimer_tools-geninfo
-# "$GENERATOR_BIN" pylimer_tools-genhtml
+MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp time "$GENERATOR_BIN" header_tests-gcov
 
 cd "$ROOT_DIR" || exit 8
 

@@ -29,7 +29,7 @@ namespace calc {
       assert(n == this->net.nrOfNodes * 3);
       assert(u.size() == this->net.coordinates.size());
       Eigen::VectorXd springDistances =
-        MEHPForceRelaxation::evaluateSpringDistances(&this->net, u, this->is2D);
+        -1*MEHPForceRelaxation::evaluateSpringDistances(&this->net, u, this->is2D);
       assert(n == this->net.nrOfNodes * 3);
       assert(u.size() == this->net.coordinates.size());
 

@@ -472,6 +472,11 @@ namespace calc {
       std::vector<Eigen::ArrayXi> getRandomCoordinateSets(
         const ForceBalanceNetwork& net) const;
 
+      void configAssumeBoxLargeEnough(bool assumption) {
+        throw std::invalid_argument("Assumption of a large enough box is not supported yet");
+        this->assumeBoxLargeEnough = assumption;
+      }
+
       /**
        * @brief Get the Nr Of Active Nodes
        *
@@ -1415,6 +1420,7 @@ namespace calc {
       pylimer_tools::entities::Universe universe;
       pylimer_tools::entities::Box box;
       bool is2D = false;
+      bool assumeBoxLargeEnough = true;
       double kappa = 1.0;
       bool simulationHasRun = false;
       int stepOutputFrequency = 0;
