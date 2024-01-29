@@ -435,6 +435,7 @@ namespace entities {
     return actual_means;
   }
 
+
   // resets
   void UniverseSequence::resetIterator()
   {
