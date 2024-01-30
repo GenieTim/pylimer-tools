@@ -218,7 +218,7 @@ TEST_CASE("MEHP Force Relaxation does not collapse",
 
     // compare to what we expect
     CHECK(forceRelaxerNew.getNrOfActiveSprings() == 8);
-    CHECK(forceRelaxerConventional.getNrOfActiveNodes() == 4);
+    CHECK(forceRelaxerNew.getNrOfActiveNodes() == 4);
     CHECK(forceRelaxerNew.getAverageSpringLength() == Catch::Approx(5.0));
     CHECK_THAT(forceRelaxerNew.getGammaFactor(),
                Catch::Matchers::WithinAbs(1.0, 1e-3));
