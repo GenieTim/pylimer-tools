@@ -335,8 +335,7 @@ namespace entities {
    * @param crosslinkerType
    * @return Eigen::Vector3d
    */
-  Eigen::Vector3d Molecule::getOverallBondBoxOffset(
-    const int crosslinkerType) const
+  Eigen::Vector3d Molecule::getOverallBondSum(const int crosslinkerType) const
   {
     std::vector<long int> alignedVertices =
       this->getVerticesLinedUp(crosslinkerType);
@@ -346,9 +345,10 @@ namespace entities {
       alignedCoordinates, this->parent, alignedVertices);
     Eigen::Vector3d result = Eigen::Vector3d::Zero();
     for (size_t i = 1; i < alignedVertices.size(); ++i) {
-      result +=
-        this->parent->getOffset(alignedCoordinates.segment((i) * 3, 3) -
-                                alignedCoordinates.segment((i - 1) * 3, 3));
+      Eigen::Vector3d distance = alignedCoordinates.segment((i) * 3, 3) -
+                                 alignedCoordinates.segment((i - 1) * 3, 3);
+      this->parent->handlePBC(distance);
+      result += distance;
     }
     return result;
   };

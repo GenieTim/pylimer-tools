@@ -155,6 +155,76 @@ TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
   }
 }
 
+TEST_CASE("MEHP Force Relaxation does not collapse",
+          "[analysis][MEHPForceRelaxation][SimpleSpringMEHPForceEvaluator]")
+{
+
+  pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+  /**
+   * @brief A grid of two rows, each one bead between the two cross-links
+   *
+   */
+  universe.addAtoms(
+    { { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 } },
+    { { 2, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1 } },
+    { { 0.,
+        2.5,
+        5,
+        7.5,
+        0.1,
+        2.5,
+        5,
+        7.5,
+        -0.1,
+        5.,
+        0.,
+        5. } }, // x with slight (0.1) deviation, so we don't start perfect
+    { { 0.1, 0., -0.1, 0., 5., 5., 5., 5., 2.5, 2.5, 7.5, 7.5 } }, // y
+    { { 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0. } },        // z
+    { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } });
+  universe.addBonds(
+    { { 1, 1, 1, 1, 3, 3, 3, 3, 5, 5, 5, 5, 7, 7, 7, 7 } },
+    { { 2, 9, 4, 11, 2, 4, 10, 12, 9, 11, 6, 8, 6, 8, 10, 12 } });
+
+  SECTION("Running conventional MEHP")
+  {
+    pcm::MEHPForceRelaxation forceRelaxerConventional =
+      pcm::MEHPForceRelaxation(universe, 2, true);
+    forceRelaxerConventional.configAssumeBoxLargeEnough(true);
+    REQUIRE_NOTHROW(forceRelaxerConventional.runForceRelaxation());
+    REQUIRE(forceRelaxerConventional.getNrOfIterations() > 0);
+    CHECK(forceRelaxerConventional.getExitReason() ==
+          pcm::ExitReason::F_TOLERANCE);
+    CHECK(forceRelaxerConventional.getNrOfActiveSprings() ==
+          forceRelaxerConventional.getNrOfSprings());
+    // compare to what we expect
+    CHECK(forceRelaxerConventional.getNrOfActiveSprings() == 8);
+    CHECK(forceRelaxerConventional.getNrOfActiveNodes() == 4);
+    CHECK(forceRelaxerConventional.getAverageSpringLength() == 5.0);
+    CHECK_THAT(forceRelaxerConventional.getGammaFactor(),
+               Catch::Matchers::WithinAbs(1.0, 1e-3));
+  }
+  SECTION("Running new MEHP")
+  {
+    pcm::MEHPForceRelaxation forceRelaxerNew =
+      pcm::MEHPForceRelaxation(universe, 2, true);
+    REQUIRE_NOTHROW(forceRelaxerNew.runForceRelaxation());
+    REQUIRE(forceRelaxerNew.getNrOfIterations() > 0);
+    CHECK(forceRelaxerNew.getExitReason() == pcm::ExitReason::F_TOLERANCE);
+    CHECK(forceRelaxerNew.getNrOfActiveSprings() ==
+          forceRelaxerNew.getNrOfSprings());
+
+    // compare to what we expect
+    CHECK(forceRelaxerNew.getNrOfActiveSprings() == 8);
+    CHECK(forceRelaxerConventional.getNrOfActiveNodes() == 4);
+    CHECK(forceRelaxerNew.getAverageSpringLength() == Catch::Approx(5.0));
+    CHECK_THAT(forceRelaxerNew.getGammaFactor(),
+               Catch::Matchers::WithinAbs(1.0, 1e-3));
+  }
+};
+
 TEST_CASE(
   "MEHP Force Relaxation2 runs",
   "[analysis][MEHPForceRelaxation][SimpleSpringMEHPForceEvaluator][long]")

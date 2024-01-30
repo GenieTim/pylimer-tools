@@ -113,7 +113,8 @@ namespace calc {
 
       Network getNetwork() const { return this->initialConfig; }
 
-      void configAssumeBoxLargeEnough(bool assumption = true) {
+      void configAssumeBoxLargeEnough(bool assumption = true)
+      {
         this->initialConfig.assumeBoxLargeEnough = assumption;
       }
 
@@ -480,6 +481,8 @@ namespace calc {
           Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
         net->springIsActive = ArrayXb::Constant(net->nrOfSprings, false);
         net->springsContourLength = Eigen::VectorXd::Zero(net->nrOfSprings);
+        Eigen::VectorXd targetDistances =
+          Eigen::VectorXd::Zero(3 * net->nrOfSprings);
 
         net->springIndicesOfLinks.reserve(net->nrOfNodes);
         for (size_t i = 0; i < net->nrOfNodes; ++i) {
@@ -554,11 +557,11 @@ namespace calc {
             }
             std::vector<pylimer_tools::entities::Atom> allChainAtoms =
               crosslinkerChains[i].getAtomsLinedUp();
-            net->springBoxOffset.segment(3 * spring_idx, 3) =
-              crosslinkerChains[i].getOverallBondBoxOffset(crosslinkerType);
+            targetDistances.segment(3 * spring_idx, 3) =
+              crosslinkerChains[i].getOverallBondSum(crosslinkerType);
 
             if (atomIdToNode.at(allChainAtoms[0].getId()) == nodeIdxTo) {
-              net->springBoxOffset.segment(3 * spring_idx, 3) *= -1;
+              targetDistances.segment(3 * spring_idx, 3) *= -1;
             } else {
               assert(atomIdToNode.at(allChainAtoms[0].getId()) == nodeIdxFrom);
             }
@@ -588,6 +591,13 @@ namespace calc {
         if (net->nrOfSprings > 0) {
           net->meanSpringContourLength = net->springsContourLength.mean();
         }
+
+        net->springBoxOffset = ((net->coordinates(net->springCoordinateIndexA) -
+                                net->coordinates(net->springCoordinateIndexB)) +
+                               targetDistances);
+        // net->springBoxOffset = this->universe.getBox().getOffset(
+        //   net->coordinates(net->springCoordinateIndexB) -
+        //   net->coordinates(net->springCoordinateIndexA));
 
         // check whether spring contour lengths are what we want them to be
         size_t numCrosslinkers = xlinkers.size();

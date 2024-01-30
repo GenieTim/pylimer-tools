@@ -871,3 +871,110 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     CHECK(result[2] == 0);
   }
 }
+
+TEST_CASE("Coordinates work")
+{
+  pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+
+  SECTION("with molecules and lined up")
+  {
+    /**
+     * @brief A grid of two rows, each one bead between the two cross-links
+     *
+     */
+    universe.addAtoms(
+      { { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 } },
+      { { 2, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1 } },
+      { { 0.,
+          2.5,
+          5,
+          7.5,
+          0.1,
+          2.5,
+          5,
+          7.5,
+          -0.1,
+          5.,
+          0.,
+          5. } }, // x with slight (0.1) deviation, so we don't start perfect
+      { { 0.1, 0., -0.1, 0., 5., 5., 5., 5., 2.5, 2.5, 7.5, 7.5 } }, // y
+      { { 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0. } },        // z
+      { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+      { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+      { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } });
+    universe.addBonds(
+      { { 1, 1, 1, 1, 3, 3, 3, 3, 5, 5, 5, 5, 7, 7, 7, 7 } },
+      { { 2, 9, 4, 11, 2, 4, 10, 12, 9, 11, 6, 8, 6, 8, 10, 12 } });
+    std::vector<pe::Molecule> molecules = universe.getChainsWithCrosslinker(2);
+
+    for (const pe::Molecule& molecule : molecules) {
+      CHECK(molecule.getLength() == 3);
+      std::vector<pe::Atom> atoms = molecule.getAtomsLinedUp();
+      std::vector<long int> alignedVertices = molecule.getVerticesLinedUp(2);
+      CHECK(alignedVertices.size() == molecule.getLength());
+      CHECK(atoms.size() == molecule.getLength());
+      for (size_t i = 0; i < 3; ++i) {
+        CHECK(molecule.getIdxByAtomId(atoms[i].getId()) == alignedVertices[i]);
+      }
+      CHECK(atoms[0].getType() == 2);
+      CHECK(atoms[1].getType() == 1);
+      CHECK(atoms[2].getType() == 2);
+      Eigen::Vector3d tmpDist = molecule.getOverallBondSum(2);
+      CHECK(tmpDist[2] == 0.0);
+    }
+
+    std::vector<pe::Atom> atomsLinedUp = molecules[0].getAtomsLinedUp();
+    CHECK(atomsLinedUp[0].getId() == 1);
+    CHECK(atomsLinedUp[1].getId() == 2);
+    CHECK(atomsLinedUp[2].getId() == 3);
+    Eigen::Vector3d dist = molecules[0].getOverallBondSum(2);
+    CHECK(dist[0] == 5.);
+    CHECK(dist[1] == -0.2);
+
+    std::vector<long int> alignedVertices = molecules[0].getVerticesLinedUp(2);
+    Eigen::VectorXd alignedCoordinates =
+      Eigen::VectorXd::Zero(3 * alignedVertices.size());
+    pe::Box box = universe.getBox();
+    Eigen::VectorXd vertexCoordinates =
+      molecules[0].getUnwrappedVertexCoordinates(alignedVertices, &box);
+    molecules[0].getAssumedVertexCoordinates(
+      alignedCoordinates, &box, alignedVertices);
+    CHECK(vertexCoordinates[0] == 0.);
+    CHECK(vertexCoordinates[1] == 0.1);
+    CHECK(alignedCoordinates[0] == 0.);
+    CHECK(alignedCoordinates[1] == 0.1);
+    for (size_t i = 0; i < 3; ++i) {
+      CHECK(alignedCoordinates[3 * i + 0] == atomsLinedUp[i].getX());
+      CHECK(alignedCoordinates[3 * i + 1] == atomsLinedUp[i].getY());
+      CHECK(alignedCoordinates[3 * i + 2] == atomsLinedUp[i].getZ());
+      //
+      CHECK(alignedCoordinates[3 * i + 0] == vertexCoordinates[3 * i + 0]);
+      CHECK(alignedCoordinates[3 * i + 1] == vertexCoordinates[3 * i + 1]);
+      CHECK(alignedCoordinates[3 * i + 2] == vertexCoordinates[3 * i + 2]);
+    }
+  }
+
+  SECTION("Coordinates are fetched appropriately")
+  {
+    const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
+    universe.setBox(box);
+    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },     // id
+                      { { 2, 1, 1, 1, 2, 1, 1, 1 } },     // type
+                      { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // x
+                      { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // y
+                      { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // z
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },     // nx
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },     // ny
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } }      // nz
+    );
+    std::vector<long int> indices = { { 1, 2, 3 } };
+    Eigen::VectorXd coordinates =
+      universe.getUnwrappedVertexCoordinates(indices, &box);
+    CHECK(coordinates.size() == 9);
+    for (size_t i = 0; i < 3; ++i) {
+      for (size_t dir = 0; dir < 3; ++dir) {
+        CHECK(coordinates[i * 3 + dir] == i + 2);
+      }
+    }
+  }
+}
