@@ -5163,7 +5163,7 @@ namespace calc {
           net.springsContourLength[spring_idx] =
             crosslinkerChains[i].getNrOfAtoms() - 1;
           net.springPartBoxOffset.segment(3 * spring_idx, 3) =
-            crosslinkerChains[i].getOverallBondBoxOffset(crosslinkerType);
+            this->box.getOffset(crosslinkerChains[i].getOverallBondSum(crosslinkerType));
         } else if (crosslinkerChains[i].getType() ==
                    pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
           assert(xlinkersOfChain.size() == 1 ||
@@ -5200,7 +5200,7 @@ namespace calc {
           net.springsContourLength[spring_idx] =
             crosslinkerChains[i].getNrOfAtoms() - 1;
           net.springPartBoxOffset.segment(3 * spring_idx, 3) =
-            crosslinkerChains[i].getOverallBondBoxOffset(crosslinkerType);
+            this->box.getOffset(crosslinkerChains[i].getOverallBondSum(crosslinkerType));
           addChain = true;
         }
 
