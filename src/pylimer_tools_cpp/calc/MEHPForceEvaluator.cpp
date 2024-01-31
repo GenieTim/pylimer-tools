@@ -33,17 +33,15 @@ namespace calc {
       assert(n == this->net.nrOfNodes * 3);
       assert(u.size() == this->net.coordinates.size());
 
-      return evaluateForceSetGradient(n, springDistances, u, grad);
+      return evaluateForceSetGradient(n, springDistances, grad);
     }
 
     double SimpleSpringMEHPForceEvaluator::evaluateForceSetGradient(
       const size_t n,
       const Eigen::VectorXd& springDistances,
-      const Eigen::VectorXd& u,
       double* grad) const
     {
       assert(n == this->net.nrOfNodes * 3);
-      assert(u.size() == this->net.coordinates.size());
       assert(springDistances.size() == 3*this->net.nrOfSprings);
 
       double s2 = 0.0;
@@ -179,7 +177,6 @@ namespace calc {
     double NonGaussianSpringForceEvaluator::evaluateForceSetGradient(
       const size_t n,
       const Eigen::VectorXd& springDistances,
-      const Eigen::VectorXd& u,
       double* grad) const
     {
       // this->springForceEvaluator.setNetwork(this->net);
