@@ -47,7 +47,6 @@ public:
   virtual returntype evaluateForceAndGradient(
     const size_t n,
     const Eigen::VectorXd& springDistances,
-    const Eigen::VectorXd& u,
     bool requiresGradient) const
   {
     PYBIND11_OVERRIDE_PURE(
@@ -57,7 +56,6 @@ public:
                                    name) */
       n,
       springDistances,
-      u,
       requiresGradient /* Argument(s) */
     );
   }
@@ -65,11 +63,10 @@ public:
   // actually overriding function, but simplifying for python possibilities
   double evaluateForceSetGradient(const size_t n,
                                   const Eigen::VectorXd& springDistances,
-                                  const Eigen::VectorXd& u,
                                   double* grad) const override
   {
     std::pair<double, std::vector<double>> trampolineResult =
-      this->evaluateForceAndGradient(n, springDistances, u, grad != nullptr);
+      this->evaluateForceAndGradient(n, springDistances, grad != nullptr);
     if (grad != nullptr) {
       assert(trampolineResult.second.size() == n);
       for (size_t i = 0; i < n; ++i) {
@@ -336,6 +333,14 @@ init_pylimer_bound_calc(py::module_& m)
          R"pbdoc(
           Reset the currently used force evaluator.
      )pbdoc")
+    .def("configRerunEpsilon",
+         &mehp::MEHPForceRelaxation::configRerunEps,
+         R"pbdoc(
+          Configure the offset from the lower and upper bounds for the simulation to suggest another run (
+               See: :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.requiresAnotherRun()`
+          ).
+         )pbdoc",
+         py::arg("epsilon") = 1e-3)
     .def("getForce",
          &mehp::MEHPForceRelaxation::getForce,
          R"pbdoc(
@@ -481,11 +486,6 @@ init_pylimer_bound_calc(py::module_& m)
          R"pbdoc(
           Returns the value effectively used in :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()` for normalizing the distances.`.
      )pbdoc")
-    .def("getCurrentDisplacements",
-         &mehp::MEHPForceRelaxation::getCurrentDisplacements,
-         R"pbdoc(
-          Returns the current displacement.
-     )pbdoc")
     .def("getNrOfIterations",
          &mehp::MEHPForceRelaxation::getNrOfIterations,
          R"pbdoc(
@@ -493,6 +493,17 @@ init_pylimer_bound_calc(py::module_& m)
      )pbdoc")
     .def("getExitReason", &mehp::MEHPForceRelaxation::getExitReason, R"pbdoc(
            Returns the reason for termination of the simulation
+     )pbdoc")
+    .def(
+      "requiresAnotherRun", &mehp::MEHPForceRelaxation::suggestsRerun, R"pbdoc(
+          For performance reasons, the objective is only minimised within the distances of one box.
+          This means, that there is a possibility, e.g. for a single strand longer than two boxes, 
+          that it would not be globally minimised.
+
+          If the final displacement of one of the atoms is close 
+          (1e-3, configurable via :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.configRerunEpsilon()`) 
+          to the imposed min/max, after minimizing,
+          this method would return true.
      )pbdoc")
     .def("getCrosslinkerVerse",
          &mehp::MEHPForceRelaxation::getCrosslinkerVerse,

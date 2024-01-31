@@ -29,7 +29,7 @@ namespace calc {
       double ftol)
     {
       this->simulationHasRun = true;
-      this->forceEvaluator->setNetwork(this->initialConfig);
+      this->forceEvaluator->setNetwork(this->forceRelaxationNetwork);
       this->forceEvaluator->setIs2D(this->is2D);
       this->forceEvaluator->prepareForEvaluations();
       double stress[3][3];
@@ -40,15 +40,12 @@ namespace calc {
         }
       }
 
-      Network net = this->initialConfig;
+      Network net = this->forceRelaxationNetwork;
       bool is2D = this->is2D;
 
       /* array allocation */
       std::vector<double> u0 =
         pylimer_tools::utils::initializeWithValue(3 * net.nrOfNodes, 0.0);
-      for (int i = 0; i < 3 * net.nrOfNodes; ++i) {
-        u0[i] = this->currentDisplacements[i];
-      }
 
       /* force relaxation */
       nlopt::opt opt(algorithm, 3 * net.nrOfNodes);
@@ -93,10 +90,18 @@ namespace calc {
 
       // query solution & exit reason
       assert(u0.size() == 3 * net.nrOfNodes);
-      Eigen::VectorXd u = Eigen::Map<Eigen::VectorXd>(u0.data(), u0.size());
-      this->currentDisplacements = u;
+      bool require_rerun = false;
+      for (size_t i = 0; i < u0.size(); ++i) {
+        this->forceRelaxationNetwork.coordinates[i] += u0[i];
+        if (!(u0[i] < upperBounds[i] - this->suggestRerunEps) ||
+            !(u0[i] > lowerBounds[i] + this->suggestRerunEps)) {
+          require_rerun = true;
+        }
+      }
+      this->forceEvaluator->setNetwork(this->forceRelaxationNetwork);
+      this->simulationSuggestsRerun = require_rerun;
       this->currentSpringDistances =
-        this->evaluateSpringDistances(&net, this->currentDisplacements, is2D);
+        this->evaluateSpringDistances(&this->forceRelaxationNetwork, is2D);
 
       this->exitReason = ExitReason::OTHER;
       if (nloptException != nullptr) {
@@ -129,10 +134,9 @@ namespace calc {
       for (long int step = 0; step < nrOfSteps; ++step) {
         // compute spring forces
         double force = this->forceEvaluator->evaluateForceSetGradient(
-          this->initialConfig.nrOfNodes * 3,
-          this->currentDisplacements,
-          this->currentForces.data(),
-          nullptr);
+          this->forceRelaxationNetwork.nrOfNodes * 3,
+          this->currentSpringDistances,
+          this->currentForces.data());
         // add Langevin thermo
         this->currentForces +=
           -gamma * this->currentVelocities +
@@ -142,14 +146,25 @@ namespace calc {
 
         // apply deformation
         this->currentVelocities += 0.5 * this->currentForces * dt;
-        this->currentDisplacements +=
+        this->forceRelaxationNetwork.coordinates +=
           this->currentVelocities * dt + 0.5 * this->currentForces * dt * dt;
+        this->currentSpringDistances = this->evaluateSpringDistances(
+          &this->forceRelaxationNetwork, this->is2D);
 
         // output things
         this->handleOutput(step);
       }
 
+      this->forceEvaluator->setNetwork(this->forceRelaxationNetwork);
       // store final state, potentially
+    }
+
+    Eigen::VectorXd MEHPForceRelaxation::evaluateSpringDistances(
+      const Network* net,
+      const bool is2D)
+    {
+      Eigen::VectorXd u = Eigen::VectorXd::Zero(net->coordinates.size());
+      return MEHPForceRelaxation::evaluateSpringDistances(net, u, is2D);
     }
 
     Eigen::VectorXd MEHPForceRelaxation::evaluateSpringDistances(
@@ -197,40 +212,40 @@ namespace calc {
         pylimer_tools::entities::Universe(this->universe.getBox());
       std::vector<long int> ids;
       std::vector<int> types = pylimer_tools::utils::initializeWithValue(
-        this->initialConfig.nrOfNodes, crosslinkerType);
+        this->forceRelaxationNetwork.nrOfNodes, crosslinkerType);
       std::vector<double> x;
       std::vector<double> y;
       std::vector<double> z;
       std::vector<int> zeros = pylimer_tools::utils::initializeWithValue(
-        this->initialConfig.nrOfNodes, 0);
-      ids.reserve(this->initialConfig.nrOfNodes);
-      x.reserve(this->initialConfig.nrOfNodes);
-      y.reserve(this->initialConfig.nrOfNodes);
-      z.reserve(this->initialConfig.nrOfNodes);
-      for (int i = 0; i < this->initialConfig.nrOfNodes; ++i) {
-        x.push_back(this->initialConfig.coordinates[3 * i + 0] +
-                    this->currentDisplacements[3 * i + 0]);
-        y.push_back(this->initialConfig.coordinates[3 * i + 1] +
-                    this->currentDisplacements[3 * i + 1]);
-        z.push_back(this->initialConfig.coordinates[3 * i + 2] +
-                    this->currentDisplacements[3 * i + 2]);
-        ids.push_back(this->initialConfig.oldAtomIds[i]);
+        this->forceRelaxationNetwork.nrOfNodes, 0);
+      ids.reserve(this->forceRelaxationNetwork.nrOfNodes);
+      x.reserve(this->forceRelaxationNetwork.nrOfNodes);
+      y.reserve(this->forceRelaxationNetwork.nrOfNodes);
+      z.reserve(this->forceRelaxationNetwork.nrOfNodes);
+      for (int i = 0; i < this->forceRelaxationNetwork.nrOfNodes; ++i) {
+        x.push_back(this->forceRelaxationNetwork.coordinates[3 * i + 0]);
+        y.push_back(this->forceRelaxationNetwork.coordinates[3 * i + 1]);
+        z.push_back(this->forceRelaxationNetwork.coordinates[3 * i + 2]);
+        ids.push_back(this->forceRelaxationNetwork.oldAtomIds[i]);
         // override type, since the types may be different from crosslinkerType
         // if converted with dangling chains
         types[i] = this->universe.getPropertyValue<int>(
           "type",
-          this->universe.getIdxByAtomId(this->initialConfig.oldAtomIds[i]));
+          this->universe.getIdxByAtomId(
+            this->forceRelaxationNetwork.oldAtomIds[i]));
       }
       xlinkUniverse.addAtoms(ids, types, x, y, z, zeros, zeros, zeros);
       std::vector<long int> bondFrom;
       std::vector<long int> bondTo;
-      bondFrom.reserve(this->initialConfig.nrOfSprings);
-      bondTo.reserve(this->initialConfig.nrOfSprings);
-      for (int i = 0; i < this->initialConfig.nrOfSprings; ++i) {
+      bondFrom.reserve(this->forceRelaxationNetwork.nrOfSprings);
+      bondTo.reserve(this->forceRelaxationNetwork.nrOfSprings);
+      for (int i = 0; i < this->forceRelaxationNetwork.nrOfSprings; ++i) {
         bondFrom.push_back(
-          this->initialConfig.oldAtomIds[this->initialConfig.springIndexA[i]]);
+          this->forceRelaxationNetwork
+            .oldAtomIds[this->forceRelaxationNetwork.springIndexA[i]]);
         bondTo.push_back(
-          this->initialConfig.oldAtomIds[this->initialConfig.springIndexB[i]]);
+          this->forceRelaxationNetwork
+            .oldAtomIds[this->forceRelaxationNetwork.springIndexB[i]]);
       }
       xlinkUniverse.addBonds(
         bondFrom.size(),
@@ -250,7 +265,7 @@ namespace calc {
     double MEHPForceRelaxation::getAverageSpringLength() const
     {
       double r2 = 0.0;
-      for (int i = 0; i < this->initialConfig.nrOfSprings; i++) {
+      for (int i = 0; i < this->forceRelaxationNetwork.nrOfSprings; i++) {
         double r2local = 0.0;
         for (int j = 0; j < 3; ++j) {
           r2local += this->currentSpringDistances[i * 3 + j] *
@@ -258,7 +273,7 @@ namespace calc {
         }
         r2 += sqrt(r2local);
       }
-      return r2 / this->initialConfig.nrOfSprings;
+      return r2 / this->forceRelaxationNetwork.nrOfSprings;
     }
 
     /**
@@ -337,12 +352,12 @@ namespace calc {
       double tolerance) const
     {
       std::unordered_map<long int, int> results;
-      results.reserve(this->initialConfig.nrOfNodes);
+      results.reserve(this->forceRelaxationNetwork.nrOfNodes);
 
       Eigen::VectorXi nrOfActiveSpringsConnected =
         this->getNrOfActiveSpringsConnected(tolerance);
-      for (size_t i = 0; i < this->initialConfig.nrOfNodes; i++) {
-        results.emplace(this->initialConfig.oldAtomIds[i],
+      for (size_t i = 0; i < this->forceRelaxationNetwork.nrOfNodes; i++) {
+        results.emplace(this->forceRelaxationNetwork.oldAtomIds[i],
                         nrOfActiveSpringsConnected[i]);
       }
       return results;
@@ -363,15 +378,15 @@ namespace calc {
       int maximumNrOfActiveConnections) const
     {
       std::vector<long int> results;
-      results.reserve(this->initialConfig.nrOfNodes);
+      results.reserve(this->forceRelaxationNetwork.nrOfNodes);
 
       Eigen::VectorXi nrOfActiveSpringsConnected =
         this->getNrOfActiveSpringsConnected(tolerance);
-      for (size_t i = 0; i < this->initialConfig.nrOfNodes; i++) {
+      for (size_t i = 0; i < this->forceRelaxationNetwork.nrOfNodes; i++) {
         if (nrOfActiveSpringsConnected[i] >= minimumNrOfActiveConnections &&
             (maximumNrOfActiveConnections < 0 ||
              maximumNrOfActiveConnections >= nrOfActiveSpringsConnected[i])) {
-          results.push_back(this->initialConfig.oldAtomIds[i]);
+          results.push_back(this->forceRelaxationNetwork.oldAtomIds[i]);
         }
       }
 
@@ -389,14 +404,14 @@ namespace calc {
       double tolerance) const
     {
       Eigen::VectorXi nrOfActiveSpringsConnected =
-        Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
+        Eigen::VectorXi::Zero(this->forceRelaxationNetwork.nrOfNodes);
       ArrayXb springIsActive =
         this->findActiveSprings(this->currentSpringDistances, tolerance);
-      for (size_t i = 0; i < this->initialConfig.nrOfSprings; i++) {
+      for (size_t i = 0; i < this->forceRelaxationNetwork.nrOfSprings; i++) {
         if (springIsActive[i] == true) /* active spring */
         {
-          int a = this->initialConfig.springIndexA[i];
-          int b = this->initialConfig.springIndexB[i];
+          int a = this->forceRelaxationNetwork.springIndexA[i];
+          int b = this->forceRelaxationNetwork.springIndexB[i];
           ++(nrOfActiveSpringsConnected[a]);
           ++(nrOfActiveSpringsConnected[b]);
         }
@@ -411,15 +426,14 @@ namespace calc {
      */
     Eigen::VectorXd MEHPForceRelaxation::getResiduals() const
     {
-      double* r = new double[3 * this->initialConfig.nrOfNodes];
-      for (size_t i = 0; i < this->initialConfig.nrOfNodes * 3; ++i) {
+      double* r = new double[3 * this->forceRelaxationNetwork.nrOfNodes];
+      for (size_t i = 0; i < this->forceRelaxationNetwork.nrOfNodes * 3; ++i) {
         r[i] = 0.0;
       }
       try {
         this->forceEvaluator->evaluateForceSetGradient(
-          3 * this->initialConfig.nrOfNodes,
+          3 * this->forceRelaxationNetwork.nrOfNodes,
           this->currentSpringDistances,
-          this->currentDisplacements,
           r);
       } catch (const std::exception& e) {
         delete[] (r);
@@ -427,8 +441,8 @@ namespace calc {
       }
 
       Eigen::VectorXd results =
-        Eigen::VectorXd::Zero(this->initialConfig.nrOfNodes * 3);
-      for (size_t i = 0; i < this->initialConfig.nrOfNodes * 3; ++i) {
+        Eigen::VectorXd::Zero(this->forceRelaxationNetwork.nrOfNodes * 3);
+      for (size_t i = 0; i < this->forceRelaxationNetwork.nrOfNodes * 3; ++i) {
         results[i] = r[i];
       }
       delete[] (r);
@@ -453,9 +467,8 @@ namespace calc {
     double MEHPForceRelaxation::getForce() const
     {
       return this->forceEvaluator->evaluateForceSetGradient(
-        3 * this->initialConfig.nrOfNodes,
+        3 * this->forceRelaxationNetwork.nrOfNodes,
         this->currentSpringDistances,
-        this->currentDisplacements,
         nullptr);
     }
 

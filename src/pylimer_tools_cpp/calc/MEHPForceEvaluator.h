@@ -42,7 +42,6 @@ namespace calc {
       virtual double evaluateForceSetGradient(
         const size_t n,
         const Eigen::VectorXd& springDistances,
-        const Eigen::VectorXd& u,
         double* grad) const = 0;
 
       virtual double evaluateStressContribution(double springDistances[3],
@@ -70,7 +69,6 @@ namespace calc {
 
       double evaluateForceSetGradient(const size_t n,
                                       const Eigen::VectorXd& springDistances,
-                                      const Eigen::VectorXd& u,
                                       double* grad) const override;
       double evaluateStressContribution(double springDistances[3],
                                         size_t i,
@@ -110,7 +108,6 @@ namespace calc {
 
       double evaluateForceSetGradient(const size_t n,
                                       const Eigen::VectorXd& springDistances,
-                                      const Eigen::VectorXd& u,
                                       double* grad) const override;
       double evaluateStressContribution(double springDistances[3],
                                         size_t i,

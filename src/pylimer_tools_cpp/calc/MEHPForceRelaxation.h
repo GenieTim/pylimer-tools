@@ -51,16 +51,14 @@ namespace calc {
                        crosslinkerType,
                        remove2functionalCrosslinkers,
                        removeDanglingChains);
-        this->initialConfig = net;
+        this->forceRelaxationNetwork = net;
         this->is2D = is2D;
-        this->currentDisplacements =
-          Eigen::VectorXd::Zero(net.coordinates.size());
         this->currentForces = Eigen::VectorXd::Zero(net.coordinates.size());
         this->currentVelocities = Eigen::VectorXd::Zero(net.coordinates.size());
         this->currentVelocitiesPlus =
           Eigen::VectorXd::Zero(net.coordinates.size());
         this->currentSpringDistances =
-          this->evaluateSpringDistances(&net, this->currentDisplacements, is2D);
+          this->evaluateSpringDistances(&net, is2D);
         this->setForceEvaluator(forceEvaluator);
       };
 
@@ -95,11 +93,17 @@ namespace calc {
 
       double getDefaultR0Square() const { return this->defaultR0Squared; }
 
-      double getVolume() override { return this->initialConfig.vol; }
+      double getVolume() override { return this->forceRelaxationNetwork.vol; }
 
-      int getNrOfNodes() const { return this->initialConfig.nrOfNodes; }
+      int getNrOfNodes() const
+      {
+        return this->forceRelaxationNetwork.nrOfNodes;
+      }
 
-      int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
+      int getNrOfSprings() const
+      {
+        return this->forceRelaxationNetwork.nrOfSprings;
+      }
 
       size_t getNumBonds() override { return this->getNrOfSprings(); }
 
@@ -111,11 +115,11 @@ namespace calc {
 
       size_t getNumExtraAtoms() override { return 0; }
 
-      Network getNetwork() const { return this->initialConfig; }
+      Network getNetwork() const { return this->forceRelaxationNetwork; }
 
       void configAssumeBoxLargeEnough(bool assumption = true)
       {
-        this->initialConfig.assumeBoxLargeEnough = assumption;
+        this->forceRelaxationNetwork.assumeBoxLargeEnough = assumption;
       }
 
       // MEHPForceEvaluator getForceEvaluator() const
@@ -126,7 +130,7 @@ namespace calc {
       void setForceEvaluator(MEHPForceEvaluator* forceEvaluator)
       {
         this->forceEvaluator = forceEvaluator;
-        this->forceEvaluator->setNetwork(this->initialConfig);
+        this->forceEvaluator->setNetwork(this->forceRelaxationNetwork);
         this->forceEvaluator->setIs2D(this->is2D);
         this->forceEvaluator->prepareForEvaluations();
       }
@@ -157,8 +161,9 @@ namespace calc {
        */
       double getSolubleWeightFraction(double tolerance = 0.1)
       {
-        return this->computeSolubleWeightFraction(
-          &this->initialConfig, this->currentSpringDistances, tolerance);
+        return this->computeSolubleWeightFraction(&this->forceRelaxationNetwork,
+                                                  this->currentSpringDistances,
+                                                  tolerance);
       }
 
       /**
@@ -170,7 +175,9 @@ namespace calc {
       double getDanglingWeightFraction(double tolerance = 0.1)
       {
         return this->computeDanglingWeightFraction(
-          &this->initialConfig, this->currentSpringDistances, tolerance);
+          &this->forceRelaxationNetwork,
+          this->currentSpringDistances,
+          tolerance);
       }
 
       /**
@@ -229,12 +236,12 @@ namespace calc {
 
       double getAverageContourLength() const
       {
-        return this->initialConfig.meanSpringContourLength;
+        return this->forceRelaxationNetwork.meanSpringContourLength;
       }
 
       Eigen::VectorXd getSpringContourLength() const
       {
-        return this->initialConfig.springsContourLength;
+        return this->forceRelaxationNetwork.springsContourLength;
       }
 
       /**
@@ -289,11 +296,6 @@ namespace calc {
 
       ExitReason getExitReason() const { return this->exitReason; }
 
-      Eigen::VectorXd getCurrentDisplacements() const
-      {
-        return this->currentDisplacements;
-      }
-
       /**
        * @brief Get the Spring Lengths
        *
@@ -303,8 +305,8 @@ namespace calc {
       {
         Eigen::VectorXd springDistances = this->getSpringDistances();
         Eigen::VectorXd springLengths =
-          Eigen::VectorXd::Zero(this->initialConfig.nrOfSprings);
-        for (int i = 0; i < this->initialConfig.nrOfSprings; ++i) {
+          Eigen::VectorXd::Zero(this->forceRelaxationNetwork.nrOfSprings);
+        for (int i = 0; i < this->forceRelaxationNetwork.nrOfSprings; ++i) {
           springLengths[i] = springDistances.segment(3 * i, 3).norm();
         }
         return springLengths;
@@ -317,21 +319,42 @@ namespace calc {
        */
       Eigen::VectorXd getSpringDistances() const
       {
-        return this->evaluateSpringDistances(
-          &this->initialConfig, this->currentDisplacements, this->is2D);
+        return this->evaluateSpringDistances(&this->forceRelaxationNetwork,
+                                             this->is2D);
       }
 
       /**
        * @brief Compute the spring lengths
        *
        * @param net the network to do the computation for
-       * @param u the displacements on top of the network
        * @return Eigen::VectorXd
        */
       static Eigen::VectorXd evaluateSpringDistances(const Network* net,
-                                                     const Eigen::VectorXd& u,
                                                      const bool is2D);
+      static Eigen::VectorXd evaluateSpringDistances(
+        const Network* net,
+        const Eigen::VectorXd& displacement,
+        const bool is2D);
 
+      /**
+       * @brief Return whether the simulation resulted in offsets close to the
+       * limits
+       *
+       * @return true
+       * @return false
+       */
+      bool suggestsRerun() const
+      {
+        return this->simulationSuggestsRerun || !this->simulationHasRun;
+      }
+
+      void configRerunEps(double eps = 1e-3) { this->suggestRerunEps = eps; }
+
+      /**
+       * @brief Get the Stress Tensor
+       *
+       * @return Eigen::Matrix3d
+       */
       Eigen::Matrix3d getStressTensor() override
       {
         std::array<std::array<double, 3>, 3> stressTensor =
@@ -376,7 +399,7 @@ namespace calc {
 
       Eigen::VectorXd getCoordinates() override
       {
-        return this->initialConfig.coordinates + this->currentDisplacements;
+        return this->forceRelaxationNetwork.coordinates;
       }
 
       double getTemperature() override
@@ -386,7 +409,7 @@ namespace calc {
 
       size_t getNumParticles() override
       {
-        return this->initialConfig.nrOfNodes;
+        return this->forceRelaxationNetwork.nrOfNodes;
       }
 
     protected:
@@ -592,9 +615,10 @@ namespace calc {
           net->meanSpringContourLength = net->springsContourLength.mean();
         }
 
-        net->springBoxOffset = ((net->coordinates(net->springCoordinateIndexA) -
-                                net->coordinates(net->springCoordinateIndexB)) +
-                               targetDistances);
+        net->springBoxOffset =
+          ((net->coordinates(net->springCoordinateIndexA) -
+            net->coordinates(net->springCoordinateIndexB)) +
+           targetDistances);
         // net->springBoxOffset = this->universe.getBox().getOffset(
         //   net->coordinates(net->springCoordinateIndexB) -
         //   net->coordinates(net->springCoordinateIndexA));
@@ -637,8 +661,8 @@ namespace calc {
        */
       double evaluatePressure(const Eigen::VectorXd& springDistances) const
       {
-        auto stressTensor =
-          this->evaluateStressTensor(springDistances, this->initialConfig.vol);
+        auto stressTensor = this->evaluateStressTensor(
+          springDistances, this->forceRelaxationNetwork.vol);
         return this->evaluatePressure(stressTensor);
       }
 
@@ -833,29 +857,28 @@ namespace calc {
       }
 
     private:
+      // state
       pylimer_tools::entities::Universe universe;
       MEHPForceEvaluator* forceEvaluator;
-
-      SimpleSpringMEHPForceEvaluator
-        springForceEvaluator; // helper for memory time
-      bool is2D = false;
       bool simulationHasRun = false;
-      int stepOutputFrequency = 0;
-      int defaultNrOfChains = 0;
-      double defaultR0Squared = 0.0;
-      std::string stepOutputFile;
+      bool simulationSuggestsRerun = false;
       bool outputEndNodes = false;
-      std::string endNodesFile;
-      Network initialConfig;
-      Eigen::VectorXd currentDisplacements;
+      ExitReason exitReason = ExitReason::UNSET;
+      int nrOfStepsDone = 0;
+      Network forceRelaxationNetwork;
       Eigen::VectorXd currentSpringDistances;
       Eigen::VectorXd currentVelocities;
       Eigen::VectorXd currentVelocitiesPlus;
       Eigen::VectorXd currentForces;
+      // config
+      SimpleSpringMEHPForceEvaluator
+        springForceEvaluator; // helper for memory time
+      bool is2D = false;
+      int defaultNrOfChains = 0;
+      double defaultR0Squared = 0.0;
+      double suggestRerunEps = 1e-3;
       int crosslinkerType;
-      int nrOfStepsDone = 0;
       double dt = 1;
-      ExitReason exitReason = ExitReason::UNSET;
     };
   } // namespace mehp
 } // namespace calc
