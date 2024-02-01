@@ -1,10 +1,13 @@
 #ifndef DUMP_FILE_PARSER_H
 #define DUMP_FILE_PARSER_H
 
-#include "../entities/Universe.h"
+#include "../entities/Box.h"
+#include "../entities/Atom.h"
 #include "../utils/StringUtils.h"
+#include "../utils/VectorUtils.h"
 #include <algorithm>
 #include <any>
+#include <array>
 #include <cctype>
 #include <cstring>
 #include <filesystem>
@@ -66,9 +69,13 @@ namespace utils {
     bool keyHasDirectionalColumn(std::string headerKey,
                                  std::string dirPraefix,
                                  std::string dirSuffix);
+    std::vector<long int> readTimeSteps();
+    std::vector<pylimer_tools::entities::Box> readBoxes();
+    std::vector<std::vector<pylimer_tools::entities::Atom>> readAtoms();
 
   private:
     std::string cleanHeader(std::string header);
+    void rewind();
 
     template<typename OUT>
     inline std::vector<OUT> parseTypesInLine(std::string line)
@@ -136,7 +143,7 @@ namespace utils {
     std::vector<OUT> results;
     results.reserve(relevantData.size());
 
-    for (pylimer_tools::utils::CsvTokenizer lineTok : relevantData) {
+    for (const pylimer_tools::utils::CsvTokenizer& lineTok : relevantData) {
       results.push_back(lineTok.get<OUT>(colIdx));
     }
 

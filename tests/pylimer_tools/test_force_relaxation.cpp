@@ -633,14 +633,14 @@ TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
   // actually check values
   // first, the zero positions
   CHECK(forceEvaluatorInstance.evaluateForceSetGradient(
-          net.nrOfNodes * 3, springDistances, u, r) == 0.0);
+          net.nrOfNodes * 3, springDistances, r) == 0.0);
   for (int i = 0; i < net.nrOfNodes * 3; ++i) {
     CHECK(r[i] == 0.0);
   }
   // then, some values as compared to what is obtained from a Mathematica script
   springDistances[0] = 1.0;
   CHECK_THAT(forceEvaluatorInstance.evaluateForceSetGradient(
-               net.nrOfNodes * 3, springDistances, u, r),
+               net.nrOfNodes * 3, springDistances, r),
              Catch::Matchers::WithinRel(0.517942, 0.02));
   CHECK_THAT(r[0], Catch::Matchers::WithinRel(1.07456, 0.02));
   CHECK(r[1] == 0.0);
@@ -653,7 +653,7 @@ TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
   springDistances[1] = -1.0;
   double rDist = std::sqrt(2.0);
   CHECK_THAT(forceEvaluatorInstance.evaluateForceSetGradient(
-               net.nrOfNodes * 3, springDistances, u, r),
+               net.nrOfNodes * 3, springDistances, r),
              Catch::Matchers::WithinRel(1.07797, 0.02));
   CHECK(r[0] == Catch::Approx(1.6542 * 1.0 / rDist).epsilon(0.02));
   CHECK(r[1] == Catch::Approx(-1.6542 * 1.0 / rDist).epsilon(0.02));
@@ -664,7 +664,7 @@ TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
   // and a final one
   springDistances[2] = 0.25;
   CHECK_THAT(forceEvaluatorInstance.evaluateForceSetGradient(
-               net.nrOfNodes * 3, springDistances, u, r),
+               net.nrOfNodes * 3, springDistances, r),
              Catch::Matchers::WithinRel(1.11463, 0.02));
   double OneOverRDist = 1.0 / std::sqrt(2.0 + 0.25 * 0.25);
   CHECK(r[0] == Catch::Approx(1.68968 * OneOverRDist).epsilon(0.02));

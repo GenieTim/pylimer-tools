@@ -43,6 +43,10 @@ namespace entities {
     Universe readDataFile(const std::string &filePath);
     Universe readDataFileAtIndex(const size_t index);
     Universe readDumpFileAtIndex(const size_t index);
+
+        std::unordered_map<int, double> computeMsdForAtomsFromDataFiles(const std::vector<long int> &atomIds, int nrOfOrigins = 10, bool reduceMemory = false); 
+        std::unordered_map<int, double> computeMsdForAtomsFromDumpFile(const std::vector<long int> &atomIds, int nrOfOrigins = 10, bool reduceMemory = false); 
+
   };
 } // namespace entities
 } // namespace pylimer_tools
