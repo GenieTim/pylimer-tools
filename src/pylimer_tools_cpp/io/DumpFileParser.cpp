@@ -312,6 +312,7 @@ namespace utils {
     while (std::getline(this->file, line)) {
       if (nextLineIsTimeStep) {
         results.push_back(std::stoi(line));
+        nextLineIsTimeStep = false;
       }
       if (pylimer_tools::utils::startsWith(line, "ITEM: TIMESTEP")) {
         nextLineIsTimeStep = true;
@@ -349,7 +350,9 @@ namespace utils {
           "File ended before reading box bounds of all three coordinates");
         RUNTIME_EXP_IFN(2 == sscanf(line.c_str(), "%le %le", &loZ, &hiZ),
                         "Could not read the expected two box coords");
-        results.push_back(pylimer_tools::entities::Box(loX, hiX, loY, hiY, loZ, hiZ));
+        results.push_back(
+          pylimer_tools::entities::Box(loX, hiX, loY, hiY, loZ, hiZ));
+        nextLineIsBoxBounds = false;
       }
       if (pylimer_tools::utils::startsWith(line, "ITEM: BOX BOUNDS")) {
         nextLineIsBoxBounds = true;
@@ -381,15 +384,13 @@ namespace utils {
     results.reserve(this->getLength());
 
     std::string line = this->currentLine;
-    bool nextLineIsNumAtoms = false;
     std::string atomFormat = "";
     int numAtoms = 0;
     while (std::getline(this->file, line)) {
-      if (nextLineIsNumAtoms) {
-        numAtoms = std::stoi(line);
-      }
       if (pylimer_tools::utils::startsWith(line, "ITEM: NUMBER OF ATOMS")) {
-        nextLineIsNumAtoms = true;
+        RUNTIME_EXP_IFN(std::getline(this->file, line),
+                        "File ended before num atoms could be read");
+        numAtoms = std::stoi(line);
       }
       if (pylimer_tools::utils::startsWith(line, "ITEM: ATOMS")) {
         atomFormat = pylimer_tools::utils::trimLineOmitComment(
