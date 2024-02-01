@@ -315,7 +315,7 @@ namespace entities {
                                  fileParser.getDihedralAngleVia2(),
                                  fileParser.getDihedralAngleTo(),
                                  fileParser.getDihedralAngleTypes());
-    }    
+    }
 
     return universe;
   }
@@ -348,6 +348,102 @@ namespace entities {
    * @return std::unordered_map<int, std::vector<double>>
    */
   std::unordered_map<int, double> UniverseSequence::computeMsdForAtoms(
+    const std::vector<long int>& atomIds,
+    int nrOfOrigins,
+    bool reduceMemory)
+  {
+    if (this->modeDataFiles) {
+      return this->computeMsdForAtomsFromDataFiles(
+        atomIds, nrOfOrigins, reduceMemory);
+    } else {
+      return this->computeMsdForAtomsFromDumpFile(
+        atomIds, nrOfOrigins, reduceMemory);
+    }
+  }
+
+  std::unordered_map<int, double>
+  UniverseSequence::computeMsdForAtomsFromDumpFile(
+    const std::vector<long int>& atomIds,
+    int nrOfOrigins,
+    bool reduceMemory)
+  {
+    std::vector<long int> timesteps = this->dumpFileParser.readTimeSteps();
+    std::cout << "Read time-steps" << std::endl;
+    std::vector<Box> boxes = this->dumpFileParser.readBoxes();
+    std::cout << "Read boxes" << std::endl;
+    std::vector<std::vector<Atom>> atoms = this->dumpFileParser.readAtoms();
+    std::cout << "Read atoms" << std::endl;
+
+    // assemble all coordinates
+    std::vector<Eigen::VectorXd> coordinates;
+    coordinates.reserve(this->getLength());
+
+    for (size_t i = 0; i < this->getLength(); ++i) {
+      std::unordered_map<long int, int> atomIdToAtomIndex;
+      for (size_t j = 0; j < atoms[i].size(); ++j) {
+        atomIdToAtomIndex[atoms[i][j].getId()] = j;
+      }
+      Eigen::VectorXd localCoordinates =
+        Eigen::VectorXd::Zero(3 * atoms[i].size());
+      for (size_t j = 0; j < atomIds.size(); ++j) {
+        Atom atom = atoms[i][atomIdToAtomIndex.at(atomIds[j])];
+        Eigen::Vector3d coords;
+        atom.getUnwrappedCoordinates<Eigen::Vector3d>(coords, &boxes[i]);
+        localCoordinates.segment(3 * j, 3) = coords;
+      }
+      coordinates.push_back(localCoordinates);
+    }
+
+    std::cout << "Assembled coordinates" << std::endl;
+
+    std::unordered_map<int, std::vector<double>> results;
+    results.reserve(this->getLength());
+    // next, we actually start computations
+    // this is a highly inefficient algorithm, but no idea how to do better
+    // (except for omitting some data, skipping the graph, or other minor
+    // optimizations)
+    const int stepSize = std::max(
+      1, static_cast<int>(std::floor(this->getLength() / nrOfOrigins)));
+    Eigen::VectorXd distance = Eigen::VectorXd::Zero(3 * atomIds.size());
+    for (size_t parent_universe_idx = 0;
+         parent_universe_idx < this->getLength();
+         parent_universe_idx += stepSize) {
+
+      for (size_t universe_idx = parent_universe_idx + 1;
+           universe_idx < this->getLength();
+           ++universe_idx) {
+
+        int delta_t =
+          (timesteps[universe_idx] - timesteps[parent_universe_idx]);
+
+        distance = coordinates[parent_universe_idx] - coordinates[universe_idx];
+        for (size_t atom_id = 0; atom_id < atomIds.size(); ++atom_id) {
+          results[delta_t].push_back(
+            distance.segment(3 * atom_id, 3).squaredNorm());
+        }
+      }
+      std::cout << "Universe " << parent_universe_idx
+                << " as basis has been handled." << std::endl;
+    }
+
+    // actually compute the mean
+    std::unordered_map<int, double> actual_means;
+    actual_means.reserve(this->getLength());
+    for (const auto& result_pair : results) {
+      std::vector<double> sds = result_pair.second;
+      if (sds.size() == 0) {
+        continue;
+      }
+      actual_means[result_pair.first] =
+        (Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(sds.data(), sds.size()))
+          .mean();
+    }
+
+    return actual_means;
+  }
+
+  std::unordered_map<int, double>
+  UniverseSequence::computeMsdForAtomsFromDataFiles(
     const std::vector<long int>& atomIds,
     int nrOfOrigins,
     bool reduceMemory)
