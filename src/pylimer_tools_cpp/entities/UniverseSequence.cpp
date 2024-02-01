@@ -374,17 +374,21 @@ namespace entities {
     std::vector<std::vector<Atom>> atoms = this->dumpFileParser.readAtoms();
     std::cout << "Read atoms" << std::endl;
 
+    RUNTIME_EXP_IFN(timesteps.size() == boxes.size(), "Dump file seems inconsistent");
+    RUNTIME_EXP_IFN(timesteps.size() == atoms.size(), "Dump file seems inconsistent");
+
     // assemble all coordinates
     std::vector<Eigen::VectorXd> coordinates;
     coordinates.reserve(this->getLength());
 
     for (size_t i = 0; i < this->getLength(); ++i) {
       std::unordered_map<long int, int> atomIdToAtomIndex;
+      atomIdToAtomIndex.reserve(atoms[i].size());
       for (size_t j = 0; j < atoms[i].size(); ++j) {
         atomIdToAtomIndex[atoms[i][j].getId()] = j;
       }
       Eigen::VectorXd localCoordinates =
-        Eigen::VectorXd::Zero(3 * atoms[i].size());
+        Eigen::VectorXd::Zero(3 * atomIds.size());
       for (size_t j = 0; j < atomIds.size(); ++j) {
         Atom atom = atoms[i][atomIdToAtomIndex.at(atomIds[j])];
         Eigen::Vector3d coords;
