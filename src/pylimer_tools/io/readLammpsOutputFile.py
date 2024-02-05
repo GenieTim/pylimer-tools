@@ -8,7 +8,7 @@ import pandas as pd
 
 from pylimer_tools.io.extractThermoParams import extractThermoParams
 from pylimer_tools.utils.cacheUtility import doCache, loadCache
-from pylimer_tools_cpp import AtomStyle, Universe, UniverseSequence
+from pylimer_tools_cpp.pylimer_tools_cpp import AtomStyle, Universe, UniverseSequence
 
 
 def readLogFile(filepath, lines_to_read_to_detect_header=500000) -> pd.DataFrame:
@@ -194,7 +194,7 @@ def readCorrelationFile(filepath, group_key="Timestep", use_cache: bool = True) 
             # if (isinstance(group_key, list)):
             #     return np.any([x in line for x in group_key])
             # else:
-                return group_key in line
+            return group_key in line
 
         for line in f:
             if ((line.startswith("#") or len(line.strip()) == 0) and not isGroupKey(line)):

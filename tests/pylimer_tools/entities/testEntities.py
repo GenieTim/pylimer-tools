@@ -8,7 +8,8 @@ import numpy as np
 import pandas as pd
 import pandas.testing as pd_testing
 
-from pylimer_tools_cpp import Atom, Molecule, MoleculeType, Universe
+from pylimer_tools_cpp.pylimer_tools_cpp import (Atom, Molecule, MoleculeType,
+                                                 Universe)
 
 if __name__ == '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../.."))

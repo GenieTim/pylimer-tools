@@ -5,7 +5,7 @@ import numpy as np
 
 import pylimer_tools.calc.doMEHPAnalysis as mehp
 import pylimer_tools.calc.doMMTAnalysis as mmt
-from pylimer_tools_cpp import UniverseSequence
+from pylimer_tools_cpp.pylimer_tools_cpp import UniverseSequence
 
 
 @click.command()
