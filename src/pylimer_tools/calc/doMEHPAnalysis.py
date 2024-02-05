@@ -8,7 +8,8 @@ from typing import Iterable, Tuple
 
 import numpy as np
 
-from pylimer_tools_cpp import Molecule, MoleculeType, Universe
+from pylimer_tools_cpp.pylimer_tools_cpp import (Molecule, MoleculeType,
+                                                 Universe)
 
 
 def predictShearModulus(networks: Iterable[Universe], T: float = 1, k_B: float = 1, foreignAtomType=None, totalMass=1) -> float:

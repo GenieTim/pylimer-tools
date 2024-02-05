@@ -3,7 +3,7 @@
 import click
 import numpy as np
 
-from pylimer_tools_cpp import UniverseSequence
+from pylimer_tools_cpp.pylimer_tools_cpp import UniverseSequence
 
 
 @click.command()

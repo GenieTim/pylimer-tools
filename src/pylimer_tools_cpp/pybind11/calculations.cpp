@@ -1333,6 +1333,12 @@ init_pylimer_bound_calc(py::module_& m)
           Configure the higher cut-off of how far a pair may be distanced for a slip-spring to be created.
      )pbdoc",
          py::arg("cutoff") = 0.5)
+    .def("configBoxDeformation",
+         &dpd::DPDSimulator::configBoxDeformation,
+         R"pbdoc(
+          Configure where to (incrementally) deform the box to during the next simulation run.
+     )pbdoc",
+         py::arg("target_box"))
     .def_static("readRestartFile",
                 &dpd::DPDSimulator::readRestartFile,
                 R"pbdoc(

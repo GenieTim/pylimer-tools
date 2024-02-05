@@ -3,8 +3,10 @@ import sys
 import unittest
 
 import pandas as pd
+
 from pylimer_tools.calc.doMEHPAnalysis import *
-from pylimer_tools_cpp import Molecule, MoleculeType, Universe
+from pylimer_tools_cpp.pylimer_tools_cpp import (Molecule, MoleculeType,
+                                                 Universe)
 
 if __name__ == '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../"))
