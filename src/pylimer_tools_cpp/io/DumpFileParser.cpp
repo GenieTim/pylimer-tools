@@ -302,68 +302,13 @@ namespace utils {
 
   std::vector<long int> DumpFileParser::readTimeSteps()
   {
-    this->rewind();
-
-    std::vector<long int> results;
-    results.reserve(this->getLength());
-
-    std::string line = this->currentLine;
-    bool nextLineIsTimeStep = false;
-    while (std::getline(this->file, line)) {
-      if (nextLineIsTimeStep) {
-        results.push_back(std::stoi(line));
-        nextLineIsTimeStep = false;
-      }
-      if (pylimer_tools::utils::startsWith(line, "ITEM: TIMESTEP")) {
-        nextLineIsTimeStep = true;
-      }
-    }
-
-    // go back to the beginning of the file
-    this->rewind();
-
-    // return the time-steps
-    return results;
+    return this->readDumpFileSections(ReadableDumpFileSections::TIMESTEP)
+      .timesteps;
   };
 
   std::vector<pylimer_tools::entities::Box> DumpFileParser::readBoxes()
   {
-    this->rewind();
-    std::vector<pylimer_tools::entities::Box> results;
-    results.reserve(this->getLength());
-
-    std::string line = this->currentLine;
-    bool nextLineIsBoxBounds = false;
-    double loX, hiX, loY, hiY, loZ, hiZ;
-    while (std::getline(this->file, line)) {
-      if (nextLineIsBoxBounds) {
-        // read the next 3 lines, the box
-        RUNTIME_EXP_IFN(2 == sscanf(line.c_str(), "%le %le", &loX, &hiX),
-                        "Could not read the expected two box coords");
-        RUNTIME_EXP_IFN(
-          std::getline(this->file, line),
-          "File ended before reading box bounds of all three coordinates");
-        RUNTIME_EXP_IFN(2 == sscanf(line.c_str(), "%le %le", &loY, &hiY),
-                        "Could not read the expected two box coords");
-        RUNTIME_EXP_IFN(
-          std::getline(this->file, line),
-          "File ended before reading box bounds of all three coordinates");
-        RUNTIME_EXP_IFN(2 == sscanf(line.c_str(), "%le %le", &loZ, &hiZ),
-                        "Could not read the expected two box coords");
-        results.push_back(
-          pylimer_tools::entities::Box(loX, hiX, loY, hiY, loZ, hiZ));
-        nextLineIsBoxBounds = false;
-      }
-      if (pylimer_tools::utils::startsWith(line, "ITEM: BOX BOUNDS")) {
-        nextLineIsBoxBounds = true;
-      }
-    }
-
-    // go back to the beginning of the file
-    this->rewind();
-
-    // return the box bounds
-    return results;
+    return this->readDumpFileSections(ReadableDumpFileSections::BOX).boxes;
   };
 
   constexpr unsigned int str2int(const char* str, int h = 0)
@@ -378,21 +323,60 @@ namespace utils {
   std::vector<std::vector<pylimer_tools::entities::Atom>>
   DumpFileParser::readAtoms()
   {
+    return this->readDumpFileSections(ReadableDumpFileSections::ATOM).atoms;
+  };
+
+  ReadDumpFileSections DumpFileParser::readDumpFileSections(
+    ReadableDumpFileSections sectionsToRead)
+  {
     this->rewind();
 
-    std::vector<std::vector<pylimer_tools::entities::Atom>> results;
-    results.reserve(this->getLength());
+    std::vector<std::vector<pylimer_tools::entities::Atom>> resultingAtoms;
+    resultingAtoms.reserve(this->getLength());
+
+    std::vector<pylimer_tools::entities::Box> resultingBoxes;
+    resultingBoxes.reserve(this->getLength());
+
+    std::vector<long int> resultingTimeSteps;
+    resultingTimeSteps.reserve(this->getLength());
 
     std::string line = this->currentLine;
     std::string atomFormat = "";
     int numAtoms = 0;
     while (std::getline(this->file, line)) {
-      if (pylimer_tools::utils::startsWith(line, "ITEM: NUMBER OF ATOMS")) {
+      if (pylimer_tools::utils::startsWith(line, "ITEM: TIMESTEP") &&
+          (sectionsToRead & ReadableDumpFileSections::TIMESTEP)) {
+        RUNTIME_EXP_IFN(std::getline(this->file, line),
+                        "File ended before reading an indicated time-step.");
+        resultingTimeSteps.push_back(std::stol(line));
+      } else if (pylimer_tools::utils::startsWith(line, "ITEM: BOX BOUNDS") &&
+                 (sectionsToRead & ReadableDumpFileSections::BOX)) {
+        double loX, hiX, loY, hiY, loZ, hiZ;
+        RUNTIME_EXP_IFN(std::getline(this->file, line),
+                        "File ended before box could be read");
+        // read the next 3 lines, the box
+        RUNTIME_EXP_IFN(2 == sscanf(line.c_str(), "%le %le", &loX, &hiX),
+                        "Could not read the expected two box coords");
+        RUNTIME_EXP_IFN(
+          std::getline(this->file, line),
+          "File ended before reading box bounds of all three coordinates");
+        RUNTIME_EXP_IFN(2 == sscanf(line.c_str(), "%le %le", &loY, &hiY),
+                        "Could not read the expected two box coords");
+        RUNTIME_EXP_IFN(
+          std::getline(this->file, line),
+          "File ended before reading box bounds of all three coordinates");
+        RUNTIME_EXP_IFN(2 == sscanf(line.c_str(), "%le %le", &loZ, &hiZ),
+                        "Could not read the expected two box coords");
+        resultingBoxes.push_back(
+          pylimer_tools::entities::Box(loX, hiX, loY, hiY, loZ, hiZ));
+      } else if (pylimer_tools::utils::startsWith(line,
+                                                  "ITEM: NUMBER OF ATOMS") &&
+                 (sectionsToRead & ReadableDumpFileSections::ATOM)) {
         RUNTIME_EXP_IFN(std::getline(this->file, line),
                         "File ended before num atoms could be read");
         numAtoms = std::stoi(line);
-      }
-      if (pylimer_tools::utils::startsWith(line, "ITEM: ATOMS")) {
+      } else if (pylimer_tools::utils::startsWith(line, "ITEM: ATOMS") &&
+                 (sectionsToRead & ReadableDumpFileSections::ATOM)) {
         atomFormat = pylimer_tools::utils::trimLineOmitComment(
           line.substr(std::string("ITEM: ATOMS ").length()));
         double x, y, z = 0.;
@@ -446,7 +430,7 @@ namespace utils {
           localResults.push_back(
             pylimer_tools::entities::Atom(id, type, x, y, z, nx, ny, nz));
         }
-        results.push_back(localResults);
+        resultingAtoms.push_back(localResults);
       }
     }
 
@@ -455,6 +439,10 @@ namespace utils {
     this->file.seekg(this->groupPosMap.at(0));
 
     // return the time-steps
+    ReadDumpFileSections results;
+    results.atoms = resultingAtoms;
+    results.boxes = resultingBoxes;
+    results.timesteps = resultingTimeSteps;
     return results;
   };
 
@@ -467,7 +455,7 @@ namespace utils {
     if (this->file.eof()) {
       this->file.clear();
     }
-    this->file.seekg(this->groupPosMap.at(0));
+    this->file.seekg(0, std::ios::beg);
   }
 
   /**
