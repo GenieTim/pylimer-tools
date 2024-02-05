@@ -425,7 +425,7 @@ namespace calc {
       Eigen::VectorXd relevantPartialDistancesA =
         (displacedCoords(relevantSpringPartCoordinateIndexB) -
          displacedCoords(relevantSpringPartCoordinateIndexA));
-         // TODO: implement box not large enough case
+      // TODO: implement box not large enough case
       this->box.handlePBC(relevantPartialDistancesA);
 
       // NOTE: we have many zeros too much, here, actually.
@@ -4854,28 +4854,43 @@ namespace calc {
       return stress;
     }
 
-    std::array<std::array<double, 3>, 3> MEHPForceBalance::getStressTensorArray(
+    Eigen::Matrix3d MEHPForceBalance::getStressTensor(
       const double oneOverSpringPartitionUpperLimit) const
     {
-      return this->evaluateStressTensor(this->initialConfig,
-                                        this->currentDisplacements,
-                                        this->currentSpringPartitionsVec,
-                                        1.0,
-                                        oneOverSpringPartitionUpperLimit);
+      std::array<std::array<double, 3>, 3> res =
+        this->evaluateStressTensor(this->initialConfig,
+                                   this->currentDisplacements,
+                                   this->currentSpringPartitionsVec,
+                                   1.0,
+                                   oneOverSpringPartitionUpperLimit);
+
+      Eigen::Matrix3d convertedRes = Eigen::Matrix3d::Zero();
+      for (size_t i = 0; i < 3; ++i) {
+        for (size_t j = 0; j < 3; ++j) {
+          convertedRes(i, j) = res[i][j];
+        }
+      }
+      return convertedRes;
     }
 
-    std::array<std::array<double, 3>, 3>
-    MEHPForceBalance::getStressTensorArrayLinkBased(
+    Eigen::Matrix3d MEHPForceBalance::getStressTensorLinkBased(
       const double oneOverSpringPartitionUpperLimit,
       const bool xlinksOnly) const
     {
-      return this->evaluateStressTensorLinkBased(
-        this->initialConfig,
-        this->currentDisplacements,
-        this->currentSpringPartitionsVec,
-        1.0,
-        oneOverSpringPartitionUpperLimit,
-        xlinksOnly);
+      std::array<std::array<double, 3>, 3> res =
+        this->evaluateStressTensorLinkBased(this->initialConfig,
+                                            this->currentDisplacements,
+                                            this->currentSpringPartitionsVec,
+                                            1.0,
+                                            oneOverSpringPartitionUpperLimit,
+                                            xlinksOnly);
+      Eigen::Matrix3d convertedRes = Eigen::Matrix3d::Zero();
+      for (size_t i = 0; i < 3; ++i) {
+        for (size_t j = 0; j < 3; ++j) {
+          convertedRes(i, j) = res[i][j];
+        }
+      }
+      return convertedRes;
     }
 
     /**
@@ -5163,7 +5178,8 @@ namespace calc {
           net.springsContourLength[spring_idx] =
             crosslinkerChains[i].getNrOfAtoms() - 1;
           net.springPartBoxOffset.segment(3 * spring_idx, 3) =
-            this->box.getOffset(crosslinkerChains[i].getOverallBondSum(crosslinkerType));
+            this->box.getOffset(
+              crosslinkerChains[i].getOverallBondSum(crosslinkerType));
         } else if (crosslinkerChains[i].getType() ==
                    pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
           assert(xlinkersOfChain.size() == 1 ||
@@ -5200,7 +5216,8 @@ namespace calc {
           net.springsContourLength[spring_idx] =
             crosslinkerChains[i].getNrOfAtoms() - 1;
           net.springPartBoxOffset.segment(3 * spring_idx, 3) =
-            this->box.getOffset(crosslinkerChains[i].getOverallBondSum(crosslinkerType));
+            this->box.getOffset(
+              crosslinkerChains[i].getOverallBondSum(crosslinkerType));
           addChain = true;
         }
 

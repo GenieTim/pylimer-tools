@@ -722,14 +722,17 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceBalance::addSliplinksBasedOnCycles,
          R"pbdoc()pbdoc",
          py::arg("maxLoopLength") = -1)
-    .def("getStressTensor",
-         &mehp::MEHPForceBalance::getStressTensorArray,
-         R"pbdoc(
+    .def(
+      "getStressTensor",
+      [](mehp::MEHPForceBalance& fb, const double oneOver = 1.) {
+        return fb.getStressTensor(oneOver);
+      },
+      R"pbdoc(
           Returns the stress tensor at the current state of the simulation.
      )pbdoc",
-         py::arg("oneOverSpringPartitionUpperLimit") = 1.)
+      py::arg("oneOverSpringPartitionUpperLimit") = 1.)
     .def("getStressTensorLinkBased",
-         &mehp::MEHPForceBalance::getStressTensorArrayLinkBased,
+         &mehp::MEHPForceBalance::getStressTensorLinkBased,
          R"pbdoc(
           Returns the stress tensor at the current state of the simulation.
      )pbdoc",
