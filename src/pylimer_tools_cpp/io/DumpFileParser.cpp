@@ -311,11 +311,12 @@ namespace utils {
     return this->readDumpFileSections(ReadableDumpFileSections::BOX).boxes;
   };
 
-  constexpr unsigned int str2int(const char* str, int h = 0)
+  constexpr unsigned int str2int(const char* str, const int h = 0)
   {
     return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
   }
-  constexpr unsigned int str2int(const std::string str, int h = 0)
+  // constexpr
+  unsigned int str2int(const std::string &str, const int h = 0)
   {
     return str2int(str.c_str(), h);
   }

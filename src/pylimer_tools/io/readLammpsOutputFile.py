@@ -2,13 +2,14 @@ import os
 import re
 import warnings
 from typing import Iterable, List, Union
-import numpy as np
 
+import numpy as np
 import pandas as pd
 
 from pylimer_tools.io.extractThermoParams import extractThermoParams
 from pylimer_tools.utils.cacheUtility import doCache, loadCache
-from pylimer_tools_cpp.pylimer_tools_cpp import AtomStyle, Universe, UniverseSequence
+from pylimer_tools_cpp.pylimer_tools_cpp import (AtomStyle, Universe,
+                                                 UniverseSequence)
 
 
 def readLogFile(filepath, lines_to_read_to_detect_header=500000) -> pd.DataFrame:
@@ -111,11 +112,11 @@ def readSectionedAveragesFile(filepath, use_cache: bool = True) -> pd.DataFrame:
         currentData = []
         currentKey = None
         for line in f:
+            splitLine = line.split()
             if (currentKey == None):
-                assert (len(line.split()) == len(header_line1.split()))
+                assert (len(splitLine) == len(header_line1.split()))
                 currentKey = line
                 continue
-            splitLine = line.split()
             if (len(splitLine) == len(header_line1_split)):
                 data[currentKey] = currentData
                 currentData = []
@@ -126,7 +127,7 @@ def readSectionedAveragesFile(filepath, use_cache: bool = True) -> pd.DataFrame:
         data[currentKey] = currentData
 
     # convert all the data to a dataframe
-    df = pd.DataFrame()
+    dfs_to_concat = []
 
     if (header_line1_split is None):
         raise ValueError("Did not find a useable header line.")
@@ -136,7 +137,9 @@ def readSectionedAveragesFile(filepath, use_cache: bool = True) -> pd.DataFrame:
         local_dataframe = pd.DataFrame(data[key], columns=header_line2_split)
         for i, col in enumerate(header_line1_split):
             local_dataframe[col] = split_key[i]
-        df = pd.concat([df, local_dataframe], ignore_index=True)
+        dfs_to_concat.append(local_dataframe)
+
+    df = pd.concat(dfs_to_concat, ignore_index=True)
 
     # convert all columns of DataFrame
     df = df.apply(pd.to_numeric, errors='ignore')
