@@ -24,6 +24,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.DPDSimulator
       ~DPDSimulator.configAutoCorrelatorOutput
       ~DPDSimulator.configAverageOutput
       ~DPDSimulator.configBondFormation
+      ~DPDSimulator.configBoxDeformation
       ~DPDSimulator.configLambda
       ~DPDSimulator.configNumStepsDPD
       ~DPDSimulator.configNumStepsMC
