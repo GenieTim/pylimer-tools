@@ -4,7 +4,8 @@ import unittest
 import numpy as np
 import pandas as pd
 import pandas.testing as pd_testing
-from pylimer_tools_cpp import Universe
+
+from pylimer_tools_cpp.pylimer_tools_cpp import Universe
 
 
 class TestEntitiesNew(unittest.TestCase):

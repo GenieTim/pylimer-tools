@@ -124,20 +124,20 @@ target_sources(pylimer_tools
 # ${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance2.h
 
 # DEBUG whether vectorization works or not
-if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  # using Clang
-	# set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -Rpass-missed -Rpass-analysis" )
-	set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize" )
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  # using GCC
-	set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -fopt-info-vec-missed" )
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
-  # using Intel C++
-	set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -qopt-report" )
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-  # using Visual Studio C++
-	set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -Qvec-report:2" )
-endif()
+# if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+#   # using Clang
+# 	# set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -Rpass-missed -Rpass-analysis" )
+# 	set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize" )
+# elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+#   # using GCC
+# 	set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -fopt-info-vec-missed" )
+# elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
+#   # using Intel C++
+# 	set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -qopt-report" )
+# elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+#   # using Visual Studio C++
+# 	set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -Qvec-report:2" )
+# endif()
 
 set_target_properties(pylimer_tools PROPERTIES VERSION ${PROJECT_VERSION})
 

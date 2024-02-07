@@ -17,7 +17,7 @@ import pandas as pd
 
 from pylimer_tools.utils.cacheUtility import doCache, loadCache
 from pylimer_tools.utils.optimizeDf import optimize, reduce_mem_usage
-from pylimer_tools_cpp import splitCSV
+from pylimer_tools_cpp.pylimer_tools_cpp import splitCSV
 
 
 def _is_numeric_string(test: str):

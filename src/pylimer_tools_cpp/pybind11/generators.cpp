@@ -66,8 +66,8 @@ init_pylimer_bound_generators(py::module_& m)
             Do a random walk from one point to another.
             )pbdoc",
         py::arg("box"),
-        py::arg("from"),
-        py::arg("to"),
+        py::arg("from_coordinates"),
+        py::arg("to_coordinates"),
         py::arg("chainLen"),
         py::arg("beadDistance") = 1.,
         py::arg("seed") = "");

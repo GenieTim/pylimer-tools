@@ -14,8 +14,9 @@ from pylimer_tools.io.readLammpsOutputFile import (readAveragesFile,
                                                    readLogFile)
 from pylimer_tools.utils.cacheUtility import getCacheFileName
 from pylimer_tools.utils.optimizeDf import optimize, reduce_mem_usage
-from pylimer_tools_cpp import (AtomStyle, DataFileReader, DumpFileReader,
-                               Universe, UniverseSequence)
+from pylimer_tools_cpp.pylimer_tools_cpp import (AtomStyle, DataFileReader,
+                                                 DumpFileReader, Universe,
+                                                 UniverseSequence)
 from tests.pylimer_tools.pdComparingTestCase import PandasComparingTestCase
 
 

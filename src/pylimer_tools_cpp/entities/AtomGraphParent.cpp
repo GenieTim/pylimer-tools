@@ -317,25 +317,22 @@ namespace entities {
     igraph_vector_t nzvalues;
     igraph_vector_init(&nzvalues, 0);
 
-    if (igraph_cattribute_VANV(&this->graph, "x", igraph_vss_all(), &xvalues)) {
+    if (igraph_cattribute_VANV(&this->graph, "x", selector, &xvalues)) {
       throw std::runtime_error("Failed to query property x of graph.");
     }
-    if (igraph_cattribute_VANV(&this->graph, "y", igraph_vss_all(), &yvalues)) {
+    if (igraph_cattribute_VANV(&this->graph, "y", selector, &yvalues)) {
       throw std::runtime_error("Failed to query property y of graph.");
     }
-    if (igraph_cattribute_VANV(&this->graph, "z", igraph_vss_all(), &zvalues)) {
+    if (igraph_cattribute_VANV(&this->graph, "z", selector, &zvalues)) {
       throw std::runtime_error("Failed to query property z of graph.");
     }
-    if (igraph_cattribute_VANV(
-          &this->graph, "nx", igraph_vss_all(), &nxvalues)) {
+    if (igraph_cattribute_VANV(&this->graph, "nx", selector, &nxvalues)) {
       throw std::runtime_error("Failed to query property nx of graph.");
     }
-    if (igraph_cattribute_VANV(
-          &this->graph, "ny", igraph_vss_all(), &nyvalues)) {
+    if (igraph_cattribute_VANV(&this->graph, "ny", selector, &nyvalues)) {
       throw std::runtime_error("Failed to query property ny of graph.");
     }
-    if (igraph_cattribute_VANV(
-          &this->graph, "nz", igraph_vss_all(), &nzvalues)) {
+    if (igraph_cattribute_VANV(&this->graph, "nz", selector, &nzvalues)) {
       throw std::runtime_error("Failed to query property nz of graph.");
     }
 
@@ -384,6 +381,7 @@ namespace entities {
     Eigen::VectorXd result =
       this->getUnwrappedVertexCoordinates(vertices_v, box);
     igraph_vector_int_destroy(&vertices_v);
+    assert(result.size() == vertices.size() * 3);
     return result;
   }
 

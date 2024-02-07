@@ -1,9 +1,10 @@
 
 import unittest
-import numpy as np
 
+import numpy as np
 import pandas as pd
-from pylimer_tools_cpp import Box, Universe
+
+from pylimer_tools_cpp.pylimer_tools_cpp import Box, Universe
 
 
 class TestEntityCalculations(unittest.TestCase):
