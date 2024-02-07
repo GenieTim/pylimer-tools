@@ -52,6 +52,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.DPDSimulator
       ~DPDSimulator.getTemperature
       ~DPDSimulator.getTimestep
       ~DPDSimulator.getUniverse
+      ~DPDSimulator.getVolume
       ~DPDSimulator.readRestartFile
       ~DPDSimulator.refreshCurrentState
       ~DPDSimulator.runSimulation
