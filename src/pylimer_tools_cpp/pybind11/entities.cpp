@@ -48,6 +48,12 @@ init_pylimer_bound_entities(py::module_& m)
           currently, only rectangular boxes are supported.
         )pbdoc")
     .def(py::init<const double, const double, const double>())
+    .def(py::init<const double,
+                  const double,
+                  const double,
+                  const double,
+                  const double,
+                  const double>())
     .def("applySimpleShear",
          &Box::applySimpleShear,
          R"pbdoc(
@@ -493,8 +499,8 @@ init_pylimer_bound_entities(py::module_& m)
          "Add bonds to the underlying atoms, edges to the underlying graph. "
          "If the connected atoms are not found, the bonds are silently "
          "skipped.",
-         py::arg("from"),
-         py::arg("to"))
+         py::arg("bonds_from"),
+         py::arg("bonds_to"))
     .def("addBonds",
          py::overload_cast<const size_t,
                            const std::vector<long int>&,
@@ -504,8 +510,8 @@ init_pylimer_bound_entities(py::module_& m)
                            const bool>(&Universe::addBonds),
          "Add bonds to the underlying atoms, edges to the underlying graph. ",
          py::arg("num_bonds"),
-         py::arg("from"),
-         py::arg("to"),
+         py::arg("bonds_from"),
+         py::arg("bonds_to"),
          py::arg("bond_types"),
          py::arg("ignore_non_existent_atoms") = false,
          py::arg("simplify_universe") = true)
@@ -516,16 +522,16 @@ init_pylimer_bound_entities(py::module_& m)
          "Add bonds to the underlying atoms, edges to the underlying graph. "
          "If the connected atoms are not found, the bonds are silently "
          "skipped.",
-         py::arg("from"),
-         py::arg("to"),
-         py::arg("types"))
+         py::arg("bonds_from"),
+         py::arg("bonds_to"),
+         py::arg("bond_types"))
     .def("removeBonds",
          &Universe::removeBonds,
          R"pbdoc(
           Remove bonds by their connected atom ids. 
           )pbdoc",
-         py::arg("from"),
-         py::arg("to"))
+         py::arg("bonds_from"),
+         py::arg("bonds_to"))
     .def("removeBondsOfType",
          &Universe::removeBondsOfType,
          R"pbdoc(
@@ -536,37 +542,37 @@ init_pylimer_bound_entities(py::module_& m)
          &Universe::addAngles,
          "Add angles to the Universe. No relation to the underlying graph, "
          "just a method to preserve read & write capabilities",
-         py::arg("from"),
-         py::arg("via"),
-         py::arg("to"),
-         py::arg("types"))
+         py::arg("angles_from"),
+         py::arg("angles_via"),
+         py::arg("angles_to"),
+         py::arg("angle_types"))
     .def("addDihedralAngles",
          &Universe::addDihedralAngles,
          "Add dihedral angles to the Universe. No relation to the underlying "
          "graph, "
          "just a method to preserve read & write capabilities",
-         py::arg("from"),
-         py::arg("via1"),
-         py::arg("via2"),
-         py::arg("to"),
-         py::arg("types"))
+         py::arg("angles_from"),
+         py::arg("angles_via1"),
+         py::arg("angles_via2"),
+         py::arg("angles_to"),
+         py::arg("angle_types"))
     .def("hashAngleType",
          &Universe::hashAngleType,
          R"pbdoc(
           Convert the three integers 
      )pbdoc",
-         py::arg("from"),
-         py::arg("via"),
-         py::arg("to"))
+         py::arg("angle_from"),
+         py::arg("angle_via"),
+         py::arg("angle_to"))
     .def("hashDihedralAngleType",
          &Universe::hashDihedralAngleType,
          R"pbdoc(
           Convert the four integers 
      )pbdoc",
-         py::arg("from"),
-         py::arg("via1"),
-         py::arg("via2"),
-         py::arg("to"))
+         py::arg("angle_from"),
+         py::arg("angle_via1"),
+         py::arg("angle_via2"),
+         py::arg("angle_to"))
     .def("setMasses",
          &Universe::setMasses,
          "Set the mass per type of atom.",

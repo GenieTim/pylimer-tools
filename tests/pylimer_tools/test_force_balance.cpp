@@ -461,13 +461,11 @@ TEST_CASE("MEHP Force Balance handles slip-link convergence correctly",
 
   SECTION("Stress tensor computations are equivalent")
   {
-    std::array<std::array<double, 3>, 3> stressTensor1 =
-      forceBalancer.getStressTensorArray();
-    std::array<std::array<double, 3>, 3> stressTensor2 =
-      forceBalancer.getStressTensorArrayLinkBased();
+    Eigen::Matrix3d stressTensor1 = forceBalancer.getStressTensor();
+    Eigen::Matrix3d stressTensor2 = forceBalancer.getStressTensorLinkBased();
     for (size_t i = 0; i < 3; ++i) {
       for (size_t j = 0; j < 3; ++j) {
-        CHECK(stressTensor1[i][j] == Catch::Approx(stressTensor2[i][j]));
+        CHECK(stressTensor1(i, j) == Catch::Approx(stressTensor2(i, j)));
       }
     }
   }
@@ -518,13 +516,11 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
 
       // SECTION("Stress tensor computations are equivalent")
       // {
-      std::array<std::array<double, 3>, 3> stressTensor1 =
-        forceBalancer2.getStressTensorArray();
-      std::array<std::array<double, 3>, 3> stressTensor2 =
-        forceBalancer2.getStressTensorArrayLinkBased();
+      Eigen::Matrix3d stressTensor1 = forceBalancer2.getStressTensor();
+      Eigen::Matrix3d stressTensor2 = forceBalancer2.getStressTensorLinkBased();
       for (size_t i = 0; i < 3; ++i) {
         for (size_t j = 0; j < 3; ++j) {
-          CHECK(stressTensor1[i][j] == Catch::Approx(stressTensor2[i][j]));
+          CHECK(stressTensor1(i, j) == Catch::Approx(stressTensor2(i, j)));
         }
       }
       // }
@@ -1395,7 +1391,7 @@ TEST_CASE("Fully active chains are fully active",
 
   SECTION("MEHP Force Balance 3D case")
   {
-    // perfect diamond network = fully connected => 
+    // perfect diamond network = fully connected =>
     // maximum is at perfect crystal structure -> must be all active.
     std::string inputFile =
       suspectedPath +

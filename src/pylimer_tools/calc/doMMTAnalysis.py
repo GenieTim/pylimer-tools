@@ -10,7 +10,7 @@ from scipy import optimize
 
 import pylimer_tools.calc.doMEHPAnalysis as mehp
 from pylimer_tools.io.unitStyles import UnitStyle
-from pylimer_tools_cpp import Universe, MoleculeType
+from pylimer_tools_cpp.pylimer_tools_cpp import MoleculeType, Universe
 
 
 def predictShearModulus(network: Universe, unitStyle: UnitStyle, crosslinkerType: int = None, r: float = None, p: float = None, f: int = None, nu: float = None, T: pint.Quantity = None, strandLength: int = None, functionalityPerType: dict = None, Ge1: float = None):

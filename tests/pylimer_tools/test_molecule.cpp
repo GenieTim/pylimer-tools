@@ -83,11 +83,41 @@ TEST_CASE("Molecules work as intended", "[entity][Molecule]")
     REQUIRE(atomsInLine.size() == molecule1.getNrOfAtoms());
     REQUIRE(molecule1.getAtomsOfDegree(2).size() == 1);
     REQUIRE(molecule1.getAtomsOfDegree(1).size() == 2);
+    REQUIRE(atomsInLine[0].getId() == 20000);
+    REQUIRE(atomsInLine[2].getId() == 90000);
+
+    Eigen::Vector3d boxDistance = molecule1.getOverallBondSum(2);
+    CHECK(boxDistance[0] == 0.);
+    CHECK(boxDistance[1] == 0.);
+    CHECK(boxDistance[2] == 0.);
 
     pe::Atom firstAtom = molecule1.getAtomByVertexIdx(0);
     REQUIRE(firstAtom.getId() == molecule1.getAtomIdByIdx(0));
     REQUIRE(0 == molecule1.getIdxByAtomId(firstAtom.getId()));
   }
+}
+
+TEST_CASE("Molecules sum the bonds correctly", "[entity][Molecule]")
+{
+  pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+
+  universe.addAtoms({ { 1, 2, 3, 4, 5 } },        // id
+                    { { 2, 1, 1, 1, 2 } },        // type
+                    { { 5., 7., 9., 11., 13. } }, // x
+                    { { 0., 0., 0., 0., 0 } },    // y
+                    { { 0., 0., 0., 0., 0 } },    // z
+                    { { 0, 0, 0, 0, 0 } },
+                    { { 0, 0, 0, 0, 0 } },
+                    { { 0, 0, 0, 0, 0 } });
+  universe.addBonds({ { 1, 2, 3, 4 } }, { { 2, 3, 4, 5 } });
+
+  std::vector<pe::Molecule> molecules = universe.getMolecules();
+  REQUIRE(molecules.size() == 1);
+
+  Eigen::Vector3d overallSum = molecules[0].getOverallBondSum(2);
+  CHECK(overallSum[0] == 13. - 5.);
+  CHECK(overallSum[1] == 0.);
+  CHECK(overallSum[2] == 0.);
 }
 
 TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
@@ -107,8 +137,7 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
    */
   const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
   universe.setBox(box);
-  universe.addAtoms(
-                    { { 1, 2, 3, 4, 5, 6, 7, 8 } },     // id
+  universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },     // id
                     { { 2, 1, 1, 1, 2, 1, 1, 1 } },     // type
                     { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // x
                     { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // y
@@ -176,11 +205,11 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
       molecules[1].getAssumedVertexCoordinates<Eigen::VectorXd>(
         assumedCoordinates, &box, vertices);
     for (int i = 0; i < 4; ++i) {
-      CHECK(assumedCoordinates[(i)*3] ==
+      CHECK(assumedCoordinates[(i) * 3] ==
             Catch::Approx(29. + static_cast<double>(i)));
-      CHECK(assumedCoordinates[(i)*3 + 1] ==
+      CHECK(assumedCoordinates[(i) * 3 + 1] ==
             Catch::Approx(29. + static_cast<double>(i)));
-      CHECK(assumedCoordinates[(i)*3 + 2] ==
+      CHECK(assumedCoordinates[(i) * 3 + 2] ==
             Catch::Approx(29. + static_cast<double>(i)));
     }
   }

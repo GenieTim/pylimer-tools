@@ -472,8 +472,10 @@ namespace calc {
       std::vector<Eigen::ArrayXi> getRandomCoordinateSets(
         const ForceBalanceNetwork& net) const;
 
-      void configAssumeBoxLargeEnough(bool assumption) {
-        throw std::invalid_argument("Assumption of a large enough box is not supported yet");
+      void configAssumeBoxLargeEnough(bool assumption)
+      {
+        throw std::invalid_argument(
+          "Assumption of a large enough box is not supported yet");
         this->assumeBoxLargeEnough = assumption;
       }
 
@@ -682,10 +684,10 @@ namespace calc {
        */
       double getAverageSpringLength() const;
 
-      std::array<std::array<double, 3>, 3> getStressTensorArray(
-        const double oneOverSpringPartitionUpperLimit = -1.0) const;
+      Eigen::Matrix3d getStressTensor(
+        const double oneOverSpringPartitionUpperLimit) const;
 
-      std::array<std::array<double, 3>, 3> getStressTensorArrayLinkBased(
+      Eigen::Matrix3d getStressTensorLinkBased(
         const double oneOverSpringPartitionUpperLimit = -1.0,
         const bool xlinksOnly = false) const;
 
@@ -1170,15 +1172,7 @@ namespace calc {
 
       Eigen::Matrix3d getStressTensor() override
       {
-        std::array<std::array<double, 3>, 3> stressTensor =
-          this->getStressTensorArray();
-        Eigen::Matrix3d result = Eigen::Matrix3d::Zero();
-        for (size_t i = 0; i < 3; ++i) {
-          for (size_t j = 0; j < 3; ++j) {
-            result(i, j) = stressTensor[i][j];
-          }
-        }
-        return result;
+        return this->getStressTensor(-1.0);
       }
       int getNumShifts() override { return 0; }
       int getNumRelocations() override { return 0; }

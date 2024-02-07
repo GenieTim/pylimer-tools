@@ -1,7 +1,6 @@
 #include "DumpFileParser.h"
-#include "../entities/Universe.h"
-#include "../entities/UniverseSequence.h"
 #include "../utils/StringUtils.h"
+#include "../utils/VectorUtils.h"
 #include <algorithm>
 #include <any>
 #include <cctype>
@@ -173,7 +172,7 @@ namespace utils {
       throw std::invalid_argument("Cannot check for header '" + headerKey +
                                   "' without reading a group first.");
     }
-    return pylimer_tools::utils::map_has_key(this->headerColMap,headerKey);
+    return pylimer_tools::utils::map_has_key(this->headerColMap, headerKey);
   }
 
   /**
@@ -301,6 +300,165 @@ namespace utils {
     //           << std::endl;
   };
 
+  std::vector<long int> DumpFileParser::readTimeSteps()
+  {
+    return this->readDumpFileSections(ReadableDumpFileSections::TIMESTEP)
+      .timesteps;
+  };
+
+  std::vector<pylimer_tools::entities::Box> DumpFileParser::readBoxes()
+  {
+    return this->readDumpFileSections(ReadableDumpFileSections::BOX).boxes;
+  };
+
+  constexpr unsigned int str2int(const char* str, const int h = 0)
+  {
+    return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
+  }
+  // constexpr
+  unsigned int str2int(const std::string &str, const int h = 0)
+  {
+    return str2int(str.c_str(), h);
+  }
+
+  std::vector<std::vector<pylimer_tools::entities::Atom>>
+  DumpFileParser::readAtoms()
+  {
+    return this->readDumpFileSections(ReadableDumpFileSections::ATOM).atoms;
+  };
+
+  ReadDumpFileSections DumpFileParser::readDumpFileSections(
+    ReadableDumpFileSections sectionsToRead)
+  {
+    this->rewind();
+
+    std::vector<std::vector<pylimer_tools::entities::Atom>> resultingAtoms;
+    resultingAtoms.reserve(this->getLength());
+
+    std::vector<pylimer_tools::entities::Box> resultingBoxes;
+    resultingBoxes.reserve(this->getLength());
+
+    std::vector<long int> resultingTimeSteps;
+    resultingTimeSteps.reserve(this->getLength());
+
+    std::string line = this->currentLine;
+    std::string atomFormat = "";
+    int numAtoms = 0;
+    while (std::getline(this->file, line)) {
+      if (pylimer_tools::utils::startsWith(line, "ITEM: TIMESTEP") &&
+          (sectionsToRead & ReadableDumpFileSections::TIMESTEP)) {
+        RUNTIME_EXP_IFN(std::getline(this->file, line),
+                        "File ended before reading an indicated time-step.");
+        resultingTimeSteps.push_back(std::stol(line));
+      } else if (pylimer_tools::utils::startsWith(line, "ITEM: BOX BOUNDS") &&
+                 (sectionsToRead & ReadableDumpFileSections::BOX)) {
+        double loX, hiX, loY, hiY, loZ, hiZ;
+        RUNTIME_EXP_IFN(std::getline(this->file, line),
+                        "File ended before box could be read");
+        // read the next 3 lines, the box
+        RUNTIME_EXP_IFN(2 == sscanf(line.c_str(), "%le %le", &loX, &hiX),
+                        "Could not read the expected two box coords");
+        RUNTIME_EXP_IFN(
+          std::getline(this->file, line),
+          "File ended before reading box bounds of all three coordinates");
+        RUNTIME_EXP_IFN(2 == sscanf(line.c_str(), "%le %le", &loY, &hiY),
+                        "Could not read the expected two box coords");
+        RUNTIME_EXP_IFN(
+          std::getline(this->file, line),
+          "File ended before reading box bounds of all three coordinates");
+        RUNTIME_EXP_IFN(2 == sscanf(line.c_str(), "%le %le", &loZ, &hiZ),
+                        "Could not read the expected two box coords");
+        resultingBoxes.push_back(
+          pylimer_tools::entities::Box(loX, hiX, loY, hiY, loZ, hiZ));
+      } else if (pylimer_tools::utils::startsWith(line,
+                                                  "ITEM: NUMBER OF ATOMS") &&
+                 (sectionsToRead & ReadableDumpFileSections::ATOM)) {
+        RUNTIME_EXP_IFN(std::getline(this->file, line),
+                        "File ended before num atoms could be read");
+        numAtoms = std::stoi(line);
+      } else if (pylimer_tools::utils::startsWith(line, "ITEM: ATOMS") &&
+                 (sectionsToRead & ReadableDumpFileSections::ATOM)) {
+        atomFormat = pylimer_tools::utils::trimLineOmitComment(
+          line.substr(std::string("ITEM: ATOMS ").length()));
+        double x, y, z = 0.;
+        int nx, ny, nz = 0;
+        int id, type;
+        std::vector<pylimer_tools::entities::Atom> localResults;
+        localResults.reserve(numAtoms);
+        for (size_t i = 0; i < numAtoms; ++i) {
+          RUNTIME_EXP_IFN(std::getline(this->file, line),
+                          "File ended before all atoms could be read");
+          // special frequent case
+          if (atomFormat == "id type x y z ix iy iz") {
+            sscanf(line.c_str(),
+                   "%d %d %le %le %le %d %d %d",
+                   &id,
+                   &type,
+                   &x,
+                   &y,
+                   &z,
+                   &nx,
+                   &ny,
+                   &nz);
+          } else {
+            std::vector<std::string> splitFormat;
+            pylimer_tools::utils::split(splitFormat, atomFormat, " ");
+            std::stringstream ss(line);
+            for (const std::string& formatPart : splitFormat) {
+              switch (str2int(formatPart)) {
+                case str2int("id"):
+                  ss >> id;
+                case str2int("type"):
+                  ss >> type;
+                case str2int("x"):
+                  ss >> x;
+                case str2int("y"):
+                  ss >> y;
+                case str2int("z"):
+                  ss >> z;
+                case str2int("ix"):
+                  ss >> nx;
+                case str2int("iy"):
+                  ss >> ny;
+                case str2int("iz"):
+                  ss >> nz;
+                default:
+                  throw std::runtime_error("Not implemented format part: " +
+                                           formatPart);
+              }
+            }
+          }
+          localResults.push_back(
+            pylimer_tools::entities::Atom(id, type, x, y, z, nx, ny, nz));
+        }
+        resultingAtoms.push_back(localResults);
+      }
+    }
+
+    // go back to the beginning of the file
+    this->file.clear();
+    this->file.seekg(this->groupPosMap.at(0));
+
+    // return the time-steps
+    ReadDumpFileSections results;
+    results.atoms = resultingAtoms;
+    results.boxes = resultingBoxes;
+    results.timesteps = resultingTimeSteps;
+    return results;
+  };
+
+  void DumpFileParser::rewind()
+  {
+    if (!this->file.is_open()) {
+      throw std::runtime_error("Cannot read from closed file.");
+    }
+
+    if (this->file.eof()) {
+      this->file.clear();
+    }
+    this->file.seekg(0, std::ios::beg);
+  }
+
   /**
    * @brief Forget the data at a certain index
    *
@@ -308,7 +466,7 @@ namespace utils {
    */
   void DumpFileParser::forgetAt(const size_t index)
   {
-    if (pylimer_tools::utils::map_has_key(this->data,index)) {
+    if (pylimer_tools::utils::map_has_key(this->data, index)) {
       this->data.erase(index);
     }
   };
@@ -350,7 +508,7 @@ namespace utils {
       }
     }
     newHeader = pylimer_tools::utils::rtrim(newHeader);
-    if (!pylimer_tools::utils::map_has_key(this->headerColMap,newHeader)) {
+    if (!pylimer_tools::utils::map_has_key(this->headerColMap, newHeader)) {
       this->headerColMap.insert_or_assign(newHeader, columns);
     }
 

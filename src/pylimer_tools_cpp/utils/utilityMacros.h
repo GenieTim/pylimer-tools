@@ -34,4 +34,49 @@
 
 #define XOR(value1, value2) !(value1) != !(value2)
 
+// enum as flags
+#define MAKE_FLAGS_ENUM(TEnum, TUnder)                                         \
+  constexpr TEnum operator~(TEnum a)                                           \
+  {                                                                            \
+    return static_cast<TEnum>(~static_cast<TUnder>(a));                        \
+  }                                                                            \
+  constexpr TEnum operator|(TEnum a, TEnum b)                                  \
+  {                                                                            \
+    return static_cast<TEnum>(static_cast<TUnder>(a) |                         \
+                              static_cast<TUnder>(b));                         \
+  }                                                                            \
+  constexpr TEnum operator&(TEnum a, TEnum b)                                  \
+  {                                                                            \
+    return static_cast<TEnum>(static_cast<TUnder>(a) &                         \
+                              static_cast<TUnder>(b));                         \
+  }                                                                            \
+  constexpr TEnum operator^(TEnum a, TEnum b)                                  \
+  {                                                                            \
+    return static_cast<TEnum>(static_cast<TUnder>(a) ^                         \
+                              static_cast<TUnder>(b));                         \
+  }                                                                            \
+  constexpr TEnum& operator|=(TEnum& a, TEnum b)                               \
+  {                                                                            \
+    a = static_cast<TEnum>(static_cast<TUnder>(a) | static_cast<TUnder>(b));   \
+    return a;                                                                  \
+  }                                                                            \
+  constexpr TEnum& operator&=(TEnum& a, TEnum b)                               \
+  {                                                                            \
+    a = static_cast<TEnum>(static_cast<TUnder>(a) & static_cast<TUnder>(b));   \
+    return a;                                                                  \
+  }                                                                            \
+  constexpr TEnum& operator^=(TEnum& a, TEnum b)                               \
+  {                                                                            \
+    a = static_cast<TEnum>(static_cast<TUnder>(a) ^ static_cast<TUnder>(b));   \
+    return a;                                                                  \
+  }                                                                            \
+  constexpr bool operator==(const TEnum& a, const TEnum& b)                    \
+  {                                                                            \
+    return static_cast<TUnder>(a) == static_cast<TUnder>(b);                   \
+  }                                                                            \
+  constexpr bool operator==(const TEnum& a, const TUnder& b)                   \
+  {                                                                            \
+    return static_cast<TUnder>(a) == b;                                        \
+  }
+
 #endif

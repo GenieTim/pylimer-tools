@@ -1,10 +1,14 @@
 #ifndef DUMP_FILE_PARSER_H
 #define DUMP_FILE_PARSER_H
 
-#include "../entities/Universe.h"
+#include "../entities/Atom.h"
+#include "../entities/Box.h"
 #include "../utils/StringUtils.h"
+#include "../utils/VectorUtils.h"
+#include "../utils/utilityMacros.h"
 #include <algorithm>
 #include <any>
+#include <array>
 #include <cctype>
 #include <cstring>
 #include <filesystem>
@@ -18,6 +22,22 @@ namespace utils {
   // types
   typedef std::map<std::string, std::vector<pylimer_tools::utils::CsvTokenizer>>
     data_item_t;
+
+  enum ReadableDumpFileSections : uint32_t
+  {
+    TIMESTEP = (1 << 0),
+    BOX = (1 << 1),
+    ATOM = (1 << 2),
+  };
+
+  MAKE_FLAGS_ENUM(ReadableDumpFileSections, uint32_t);
+
+  struct ReadDumpFileSections
+  {
+    std::vector<long int> timesteps;
+    std::vector<pylimer_tools::entities::Box> boxes;
+    std::vector<std::vector<pylimer_tools::entities::Atom>> atoms;
+  };
 
   class DumpFileParser
   {
@@ -67,8 +87,17 @@ namespace utils {
                                  std::string dirPraefix,
                                  std::string dirSuffix);
 
+    std::string getFile() const { return this->filePath; }
+
+    std::vector<long int> readTimeSteps();
+    std::vector<pylimer_tools::entities::Box> readBoxes();
+    std::vector<std::vector<pylimer_tools::entities::Atom>> readAtoms();
+    ReadDumpFileSections readDumpFileSections(
+      ReadableDumpFileSections sectionsToRead);
+
   private:
     std::string cleanHeader(std::string header);
+    void rewind();
 
     template<typename OUT>
     inline std::vector<OUT> parseTypesInLine(std::string line)
@@ -136,7 +165,7 @@ namespace utils {
     std::vector<OUT> results;
     results.reserve(relevantData.size());
 
-    for (pylimer_tools::utils::CsvTokenizer lineTok : relevantData) {
+    for (const pylimer_tools::utils::CsvTokenizer& lineTok : relevantData) {
       results.push_back(lineTok.get<OUT>(colIdx));
     }
 
