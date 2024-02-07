@@ -48,6 +48,12 @@ init_pylimer_bound_entities(py::module_& m)
           currently, only rectangular boxes are supported.
         )pbdoc")
     .def(py::init<const double, const double, const double>())
+    .def(py::init<const double,
+                  const double,
+                  const double,
+                  const double,
+                  const double,
+                  const double>())
     .def("applySimpleShear",
          &Box::applySimpleShear,
          R"pbdoc(
