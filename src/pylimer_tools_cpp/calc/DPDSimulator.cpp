@@ -215,9 +215,14 @@ namespace calc {
           this->box = originalBox.interpolate(this->deformationTargetBox,
                                               static_cast<double>(step) /
                                                 static_cast<double>(nSteps));
-          this->bondBoxOffsets *= (this->box.getL() / previousBox.getL())
-                                    .replicate(this->numBonds, 1)
-                                    .matrix();
+          assert(this->bondBoxOffsets.size() ==
+                 3 * (this->numBonds + this->numSlipSprings));
+          assert(this->box.getL().size() == 3);
+          this->bondBoxOffsets =
+            (this->bondBoxOffsets.array() *
+             (this->box.getL() / previousBox.getL())
+               .replicate((this->numBonds + this->numSlipSprings), 1))
+              .matrix();
         }
 
         // bond formation

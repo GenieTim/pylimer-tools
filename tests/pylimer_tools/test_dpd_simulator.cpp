@@ -173,7 +173,8 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator][long]")
     CHECK_NOTHROW(simulator.runSimulation(26, true));
 
     CHECK_NOTHROW(simulator.validateState());
-    std::cout << "DPD ran with slip-springs (both), state validated." << std::endl;
+    std::cout << "DPD ran with slip-springs (both), state validated."
+              << std::endl;
 
     CHECK_NOTHROW(simulator.configShiftOneAtATime(true));
     CHECK_NOTHROW(simulator.configShiftPossibilityEmpty(true));
@@ -458,6 +459,46 @@ TEST_CASE("DPD Simulator Converts Correctly", "[analysis][DPDSimulator]")
       CHECK(previousEdges["edge_to"][i] == newEdges["edge_to"][i]);
       CHECK(previousEdges["edge_type"][i] == newEdges["edge_type"][i]);
     }
+  }
+}
+
+TEST_CASE("DPD can deform box", "[analysis][DPDSimulator]")
+{
+
+  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  REQUIRE(std::filesystem::exists(suspectedPath));
+
+  std::string inputFile =
+    suspectedPath + "structure/"
+                    "crosslinked_p_0.98_melt_100_a_3_50_xlinks_v_14.converted."
+                    "structure.out-equilibration_do_crosslink.structure.out";
+  if (std::filesystem::exists(inputFile)) {
+    pe::UniverseSequence universeSequence = pe::UniverseSequence();
+    REQUIRE(universeSequence.getLength() == 0);
+    universeSequence.initializeFromDataSequence({ { inputFile } });
+    REQUIRE(universeSequence.getLength() == 1);
+    pe::Universe universe = universeSequence.atIndex(0);
+
+    pcd::DPDSimulator simulator =
+      pcd::DPDSimulator(universe, 2, 9, false, "25th_seed");
+
+    REQUIRE_NOTHROW(simulator.createSlipSprings(100, 2));
+    REQUIRE_NOTHROW(simulator.runSimulation(10));
+
+    pe::Box secondBox = pe::Box(1.2 * universe.getBox().getLowX(),
+                                1.2 * universe.getBox().getHighX(),
+                                universe.getBox().getLowY(),
+                                universe.getBox().getHighY(),
+                                (1. / 1.2) * universe.getBox().getLowZ(),
+                                (1. / 1.2) * universe.getBox().getHighZ());
+
+    CHECK(secondBox.getVolume() == Catch::Approx(simulator.getVolume()));
+
+    simulator.configBoxDeformation(secondBox);
+
+    REQUIRE_NOTHROW(simulator.runSimulation(50));
+
+    REQUIRE_NOTHROW(simulator.validateState());
   }
 }
 
