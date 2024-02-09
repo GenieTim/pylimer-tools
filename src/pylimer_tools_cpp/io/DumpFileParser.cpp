@@ -423,8 +423,8 @@ namespace utils {
                 case str2int("iz"):
                   ss >> nz;
                 default:
-                  throw std::runtime_error("Not implemented format part: " +
-                                           formatPart);
+                  throw std::runtime_error("Not implemented format part: '" +
+                                           formatPart + "'");
               }
             }
           }
