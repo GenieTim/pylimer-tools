@@ -694,10 +694,16 @@ namespace calc {
           // pair forces
           for (size_t neigh_idx = 0; neigh_idx < numNeighbors; ++neigh_idx) {
             const size_t j = neighbors[neigh_idx];
-            pairdistance = coords.segment(3 * i, 3) - coords.segment(3 * j, 3);
+            pairdistance = coords.segment(3 * i, 3) - coords.segment(3 * j, 3)
+            ;
             this->box.handlePBC(pairdistance);
             // slight performance improvement, taking the square norm here
             const double rNorm2 = pairdistance.squaredNorm();
+            if (rNorm2 == 0.) {
+              std::cerr << "WARNING: zero distance between atoms " << i
+                        << " and " << j << "." << std::endl;
+              continue;
+            }
 
             const double rNorm = std::sqrt(rNorm2);
             const double one_minus_rnorm = 1. - rNorm;
@@ -743,7 +749,7 @@ namespace calc {
       pressure /= (3. * this->box.getVolume());
       stressTensor /= this->box.getVolume();
 #ifndef NDEBUG
-      assert(APPROX_EQUAL(stressTensor.trace() / 3., pressure, 1e-3));
+      assert(APPROX_REL_EQUAL(stressTensor.trace() / 3., pressure, 1e-5));
 #endif
       return pressure;
     }

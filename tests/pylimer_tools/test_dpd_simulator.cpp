@@ -470,8 +470,8 @@ TEST_CASE("DPD can deform box", "[analysis][DPDSimulator]")
 
   std::string inputFile =
     suspectedPath + "structure/"
-                    "crosslinked_p_0.98_melt_100_a_3_50_xlinks_v_14.converted."
-                    "structure.out-equilibration_do_crosslink.structure.out";
+                    "crosslinked_p_0.98_melt_100_a_38_50_xlinks_v_22.structure."
+                    "out-equilibration_do_crosslink.structure.out";
   if (std::filesystem::exists(inputFile)) {
     pe::UniverseSequence universeSequence = pe::UniverseSequence();
     REQUIRE(universeSequence.getLength() == 0);
@@ -482,8 +482,30 @@ TEST_CASE("DPD can deform box", "[analysis][DPDSimulator]")
     pcd::DPDSimulator simulator =
       pcd::DPDSimulator(universe, 2, 9, false, "25th_seed");
 
+    std::vector<pc::ComputedDoubleValues> outputQuantities = {
+      pc::ComputedDoubleValues::TEMPERATURE,
+      pc::ComputedDoubleValues::PRESSURE,
+      pc::ComputedDoubleValues::VOLUME,
+      pc::ComputedDoubleValues::STRESS_XX,
+      pc::ComputedDoubleValues::STRESS_YY,
+      pc::ComputedDoubleValues::STRESS_ZZ,
+      pc::ComputedDoubleValues::MSD
+    };
+
+    pc::OutputConfiguration config;
+    config.filename = "";
+    config.outputEvery = 5;
+    config.doubleValues = outputQuantities;
+    config.intValues = { pc::ComputedIntValues::STEP };
+
+    std::vector<pc::OutputConfiguration> configs = { config };
+    REQUIRE_NOTHROW(simulator.configStepOutput(configs));
+
+    REQUIRE_NOTHROW(simulator.validateState());
     REQUIRE_NOTHROW(simulator.createSlipSprings(100, 2));
+    REQUIRE_NOTHROW(simulator.validateState());
     REQUIRE_NOTHROW(simulator.runSimulation(10));
+    REQUIRE_NOTHROW(simulator.validateState());
 
     pe::Box secondBox = pe::Box(1.2 * universe.getBox().getLowX(),
                                 1.2 * universe.getBox().getHighX(),
@@ -497,7 +519,9 @@ TEST_CASE("DPD can deform box", "[analysis][DPDSimulator]")
     simulator.configBoxDeformation(secondBox);
 
     REQUIRE_NOTHROW(simulator.runSimulation(50));
+    REQUIRE_NOTHROW(simulator.validateState());
 
+    REQUIRE_NOTHROW(simulator.runSimulation(50));
     REQUIRE_NOTHROW(simulator.validateState());
   }
 }
