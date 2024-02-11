@@ -462,7 +462,7 @@ TEST_CASE("DPD Simulator Converts Correctly", "[analysis][DPDSimulator]")
   }
 }
 
-TEST_CASE("DPD can deform box", "[analysis][DPDSimulator]")
+TEST_CASE("DPD can deform box", "[analysis][DPDSimulator][long]")
 {
 
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -507,22 +507,33 @@ TEST_CASE("DPD can deform box", "[analysis][DPDSimulator]")
     REQUIRE_NOTHROW(simulator.runSimulation(10));
     REQUIRE_NOTHROW(simulator.validateState());
 
-    pe::Box secondBox = pe::Box(1.2 * universe.getBox().getLowX(),
-                                1.2 * universe.getBox().getHighX(),
+    pe::Box secondBox = pe::Box(1.1 * universe.getBox().getLowX(),
+                                1.1 * universe.getBox().getHighX(),
                                 universe.getBox().getLowY(),
                                 universe.getBox().getHighY(),
-                                (1. / 1.2) * universe.getBox().getLowZ(),
-                                (1. / 1.2) * universe.getBox().getHighZ());
+                                (1. / 1.1) * universe.getBox().getLowZ(),
+                                (1. / 1.1) * universe.getBox().getHighZ());
 
     CHECK(secondBox.getVolume() == Catch::Approx(simulator.getVolume()));
 
-    simulator.configBoxDeformation(secondBox);
+    SECTION("Deform slowly")
+    {
+      simulator.configBoxDeformation(secondBox);
 
-    REQUIRE_NOTHROW(simulator.runSimulation(50));
-    REQUIRE_NOTHROW(simulator.validateState());
+      REQUIRE_NOTHROW(simulator.runSimulation(200));
+      REQUIRE_NOTHROW(simulator.validateState());
 
-    REQUIRE_NOTHROW(simulator.runSimulation(50));
-    REQUIRE_NOTHROW(simulator.validateState());
+      REQUIRE_NOTHROW(simulator.runSimulation(50));
+      REQUIRE_NOTHROW(simulator.validateState());
+    }
+
+    SECTION("Deform immediately")
+    {
+      simulator.deformBoxImmediately(secondBox);
+
+      REQUIRE_NOTHROW(simulator.runSimulation(200));
+      REQUIRE_NOTHROW(simulator.validateState());
+    }
   }
 }
 

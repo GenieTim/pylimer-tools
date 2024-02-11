@@ -348,6 +348,8 @@ namespace calc {
         this->doDeformation = true;
       }
 
+      void deformBoxImmediately(const pylimer_tools::entities::Box& newBox);
+
       void configBondFormation(
         const int numBondsToForm,
         const std::unordered_map<int, int>& numBondsPerType,
