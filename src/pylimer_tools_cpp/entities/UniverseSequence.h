@@ -27,6 +27,12 @@ namespace entities {
 
     // computations
     std::unordered_map<long int, double> computeMsdForAtoms(const std::vector<long int> &atomIds, int nrOfOrigins = 10, bool reduceMemory = false); 
+    std::unordered_map<long int, double> computeDistanceAutocorrelationFromToAtoms(
+      const std::vector<long int> &atomIdsFrom,
+      const std::vector<long int> &atomIdsTo,
+      int nrOfOrigins = 10,
+      bool reduceMemory = false
+    );
 
   protected:
     size_t index = 0; // current index of the iterator
@@ -44,9 +50,8 @@ namespace entities {
     Universe readDataFileAtIndex(const size_t index);
     Universe readDumpFileAtIndex(const size_t index);
 
-        std::unordered_map<long int, double> computeMsdForAtomsFromDataFiles(const std::vector<long int> &atomIds, int nrOfOrigins = 10, bool reduceMemory = false); 
-        std::unordered_map<long int, double> computeMsdForAtomsFromDumpFile(const std::vector<long int> &atomIds, int nrOfOrigins = 10, bool reduceMemory = false); 
-
+    std::unordered_map<long int, double> computeMsdForAtomsFromDataFiles(const std::vector<long int> &atomIds, int nrOfOrigins = 10, bool reduceMemory = false); 
+    std::unordered_map<long int, double> computeMsdForAtomsFromDumpFile(const std::vector<long int> &atomIds, int nrOfOrigins = 10, bool reduceMemory = false); 
   };
 } // namespace entities
 } // namespace pylimer_tools
