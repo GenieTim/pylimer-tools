@@ -407,21 +407,21 @@ namespace utils {
             for (const std::string& formatPart : splitFormat) {
               switch (str2int(formatPart)) {
                 case str2int("id"):
-                  ss >> id;
+                  ss >> id; break;
                 case str2int("type"):
-                  ss >> type;
+                  ss >> type; break;
                 case str2int("x"):
-                  ss >> x;
+                  ss >> x; break;
                 case str2int("y"):
-                  ss >> y;
+                  ss >> y; break;
                 case str2int("z"):
-                  ss >> z;
+                  ss >> z; break;
                 case str2int("ix"):
-                  ss >> nx;
+                  ss >> nx; break;
                 case str2int("iy"):
-                  ss >> ny;
+                  ss >> ny; break;
                 case str2int("iz"):
-                  ss >> nz;
+                  ss >> nz; break;
                 default:
                   throw std::runtime_error("Not implemented format part: '" +
                                            formatPart + "'");
