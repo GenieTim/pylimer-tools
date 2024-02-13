@@ -68,6 +68,7 @@ namespace calc {
       long int nrOfSprings;
       long int nrOfPartialSprings;
       long int nrOfSpringsWithPartition;
+      bool isUpToDate = true;
       // coordinates & connectivity
       Eigen::VectorXd coordinates;
       Eigen::VectorXd springsContourLength; /* the N for each spring */

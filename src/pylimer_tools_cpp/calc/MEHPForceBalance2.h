@@ -1231,6 +1231,10 @@ namespace calc {
        * 
        */
       void convertFromGraph() {
+        if (!igraph_cattribute_GAB(&this->graph, "is_up_to_date")) {
+          this->updateGraph();
+        }
+
         this->net.nrOfPartialSprings = igraph_ecount(&this->graph);
         this->net.nrOfLinks = igraph_vcount(&this->graph);
         igraph_vector_int_t edgeTypes;
@@ -1245,18 +1249,47 @@ namespace calc {
         }
         this->net.nrOfSprings = this->net.nrOfPartialSprings - numPartialSprings;
 
-        // resize
-        this->net.coordinates.conservativeResize(3*this->net.nrOfLinks);
-        this->net.springsContourLength.conservativeResize(this->net.nrOfSprings);
+        // reset & resize
+        this->net.coordinates.resize(3*this->net.nrOfLinks);
+        this->net.springsContourLength.resize(this->net.nrOfSprings);
+        this->net.springIndicesOfLinks.clear();
+        this->net.linkIndicesOfSprings.clear();
+        this->net.partialSpringIsPartial.setConstant(false);
+        this->net.localToGlobalSpringIndex.clear();
+        this->net.partialToFullSpringIndex.resize(this->net.nrOfPartialSprings);
+        this->net.springPartCoordinateIndexA.resize(3*this->net.nrOfPartialSprings);
+        this->net.springPartCoordinateIndexB.resize(3*this->net.nrOfPartialSprings);
+        this->net.springPartIndexA.resize(this->net.nrOfPartialSprings);
+        this->net.springPartIndexB.resize(this->net.nrOfPartialSprings);
+        this->net.springPartBoxOffset.resize(this->net.nrOfPartialSprings);
+        this->currentSpringPartitionsVec.resize(this->net.nrOfPartialSprings);
 
+        // reset everything we cleared
+        for (size_t i = 0; i < this->net.nrOfSprings; ++i) {
+          std::vector<size_t> vec;
+          this->net.linkIndicesOfSprings.push_back(vec);
+        }
+        for (size_t i = 0; i < this->net.nrOfLinks; ++i) {
+          std::vector<size_t> vec;
+          this->net.springInciesOfLinks.push_back(vec);
+        }
 
         // fetch other properties needed
+        // springs / partial springs
         igraph_vector_int_t allEdges;
-        igraph_vector_int_init(&allEdges, this->net.nrOfPartialSprings);
+        igraph_vector_int_init(&allEdges, 2*this->net.nrOfPartialSprings);
         if (igraph_edges(
               &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &allEdges)) {
           throw std::runtime_error("Failed to get all edges");
         }
+
+        igraph_vector_int_t parentEdges;
+        igraph_vector_int_init(&parentEdges, this->net.nrOfPartialSprings);
+        igraph_cattribute_EANV(&this->graph, "parent_edge", igraph_ess_all(IGRAPH_EDGEORDER_ID), &parentEdges);
+
+        igraph_vector_t partitionFraction;
+        igraph_vector_init(&partitionFraction, this->net.nrOfPartialSprings);
+        igraph_cattribute_EANV(&this->graph, "partition_fraction", igraph_ess_all(IGRAPH_EDGEORDER_ID), &partitionFraction);
 
         igraph_vector_t bondBoxOffsetX;
         igraph_vector_init(&bondBoxOffsetX, this->net.nrOfPartialSprings);
@@ -1276,15 +1309,108 @@ namespace calc {
                                  "bond_box_z",
                                  igraph_ess_all(IGRAPH_EDGEORDER_ID),
                                  &bondBoxOffsetZ);
+        
+        for (size_t i = 0; i< this->net.nrOfPartialSprings; ++i) {
+          this->net.partialToFullSpringIndex(i) = igraph_vector_int_get(&parentEdges, i);
+          this->net.springPartIndexA(i) = igraph_vector_int_get(&allEdges, 2*i);
+          this->net.springPartIndexB(i) = igraph_vector_int_get(&allEdges, 2*i+1);
+
+          for (size_t dir = 0; dir < 3, ++dir) {
+            this->net.springPartCoordinateIndexA(3*i+dir) = 3*this->net.springPartIndexA(i)+dir;
+            this->net.springPartCoordinateIndexB(3*i+dir) = 3*this->net.springPartIndexB(i)+dir;
+          }
+
+          this->net.springIndicesOfLinks[igraph_vector_int_get(&allEdges, 2*i)].push_back(i);
+          this->net.springIndicesOfLinks[igraph_vector_int_get(&allEdges, 2*i+1)].push_back(i);
+          this->net.springPartBoxOffset(i*3+0) = igraph_vector_int_get(&bondBoxOffsetX, i);
+          this->net.springPartBoxOffset(i*3+1) = igraph_vector_int_get(&bondBoxOffsetY, i);
+          this->net.springPartBoxOffset(i*3+2) = igraph_vector_int_get(&bondBoxOffsetZ, i);
+          this->net.partialSpringIsPartial(i) = (igraph_vector_int_get(&edgeTypes, i) == this->partialSpringBondType);
+          this->currentSpringPartitionsVec(i) = igraph_vector_get(&partitionFraction, i);
+        }
 
         // cleanup
         igraph_vector_int_destroy(&edgeTypes);
         igraph_vector_int_destroy(&allEdges);
-        igraph_vector_int_destroy(&bondBoxOffsetX);
-        igraph_vector_int_destroy(&bondBoxOffsetY);
-        igraph_vector_int_destroy(&bondBoxOffsetZ);
+        igraph_vector_int_destroy(&parentEdges)
+        igraph_vector_destroy(&bondBoxOffsetX);
+        igraph_vector_destroy(&bondBoxOffsetY);
+        igraph_vector_destroy(&bondBoxOffsetZ);
 
+// same for per-link properties
+        igraph_vector_t coordsX;
+        igraph_vector_init(&coordsX, this->net.nrOfLinks);
+        igraph_cattribute_VANV(&this->graph, "x", igraph_vss_all(), &coordsX);
+
+        igraph_vector_t coordsY;
+        igraph_vector_init(&coordsY, this->net.nrOfLinks);
+        igraph_cattribute_VANV(&this->graph, "y", igraph_vss_all(), &coordsY);
+        
+        igraph_vector_t coordsZ;
+        igraph_vector_init(&coordsZ, this->net.nrOfLinks);
+        igraph_cattribute_VANV(&this->graph, "z", igraph_vss_all(), &coordsZ);
+
+        igraph_vector_int_t linkType;
+        igraph_vector_int_init(&linkType, this->net.nrOfLinks);
+        igraph_cattribute_VANV(&this->graph, "type", igraph_vss_all(), &linkType);
+
+        // actually write things
+        for (size_t i = 0; i< this->net.nrOfLinks; ++i) {
+          this->net.coordinates(3*i+0) = igraph_vector_get(&coordsX, i);
+          this->net.coordinates(3*i+1) = igraph_vector_get(&coordsY, i);
+          this->net.coordinates(3*i+2) = igraph_vector_get(&coordsZ, i);
+          this->net.linkIsSliplink(i) = igraph_vector_int_get(&linkType, i) == this->splipLinkType;
+        }
+
+        // cleanup
+        igraph_vector_int_destroy(&linkType);
+        igraph_vector_destroy(&coordsX);
+        igraph_vector_destroy(&coordsY);
+        igraph_vector_destroy(&coordsZ);
+
+        // mark as done
+        net.isUpToDate = true;
       };
+
+      void updateGraph() {
+        // write the current coordinates to the graph
+        igraph_vector_t coordsX;
+        igraph_vector_init(&coordsX, this->net.nrOfLinks);
+
+        igraph_vector_t coordsY;
+        igraph_vector_init(&coordsY, this->net.nrOfLinks);
+        
+        igraph_vector_t coordsZ;
+        igraph_vector_init(&coordsZ, this->net.nrOfLinks);
+
+        for (size_t i = 0; i < this->net.nrOfLinks; ++i) {
+          igraph_vector_set(&coordsX, this->net.coordinates(3*i+0));
+          igraph_vector_set(&coordsY, this->net.coordinates(3*i+1));
+          igraph_vector_set(&coordsZ, this->net.coordinates(3*i+2));
+        }
+
+        igraph_cattribute_VAN_setv(&this->graph, "x", &coordsX);
+        igraph_cattribute_VAN_setv(&this->graph, "y", &coordsY);
+        igraph_cattribute_VAN_setv(&this->graph, "z", &coordsZ);
+
+        igraph_vector_destroy(&coordsX);
+        igraph_vector_destroy(&coordsY);
+        igraph_vector_destroy(&coordsZ);
+
+        // as well as the current spring partition
+        igraph_vector_t partitionFraction;
+        igraph_vector_init(&partitionFraction, this->net.nrOfPartialSprings);
+
+        for (size_t i =0; i < this->net.nrOfPartialSprings; ++i) {
+          igraph_vector_set(&partitionFraction, this->currentSpringPartitionsVec(i));
+        }
+
+        igraph_cattribute_EAN_setv(&this->graph, "partition_fraction", &partitionFraction);
+
+        igraph_vector_destroy(&partitionFraction);
+
+        igraph_cattribute_GAB_set(&this->graph, "is_up_to_date", true);
+      }
 
       /**
        * @brief Compute the gamma factor from certain spring distances
