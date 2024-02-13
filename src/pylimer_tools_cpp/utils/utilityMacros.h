@@ -25,7 +25,11 @@
 
 // mathematical closeness
 #define APPROX_EQUAL(value1, value2, eps)                                      \
-  value1 + eps >= value2&& value1 - eps <= value2
+  (value1 + eps >= value2) && (value1 - eps <= value2)
+
+// NOTE: the "<=" is needed (not "<") to account for 0.
+#define APPROX_REL_EQUAL(value1, value2, eps)                                  \
+  std::abs(value1 - value2) <= (eps * std::max(std::abs(value1), std::abs(value2)))
 
 #define APPROX_WITHIN(value1, lo, hi, eps)                                     \
   value1 + eps >= lo&& value1 - eps <= hi

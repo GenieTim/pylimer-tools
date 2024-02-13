@@ -1470,6 +1470,7 @@ init_pylimer_bound_calc(py::module_& m)
     .def("getStressTensor", &dpd::DPDSimulator::getStressTensor)
     .def("getNumStepsDPD", &dpd::DPDSimulator::getNumStepsDPD)
     .def("getNumStepsMC", &dpd::DPDSimulator::getNumStepsMC)
+    .def("getVolume", &dpd::DPDSimulator::getVolume)
     .def("getSlipSpringBondType", &dpd::DPDSimulator::getSlipSpringBondType)
     .def("getShiftPossibilityEmpty",
          &dpd::DPDSimulator::getShiftPossibilityEmpty)

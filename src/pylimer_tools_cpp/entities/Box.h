@@ -193,8 +193,9 @@ namespace entities {
     Eigen::MatrixXd getOffset(const Eigen::VectorXd& coords) const
     {
       return -(this->L.replicate(coords.size() / 3, 1) *
-              (coords.array() * this->oneOverL.replicate(coords.size() / 3, 1))
-                .rint()).matrix();
+               (coords.array() * this->oneOverL.replicate(coords.size() / 3, 1))
+                 .rint())
+                .matrix();
     }
 
     template<typename VectorType>
@@ -318,30 +319,38 @@ namespace entities {
     }
 
     /**
-     * @brief Find a ("linear") intermediate between two different boxes
+     * @brief Find a ("linear" in terms of volume) intermediate between two
+     * different boxes
+     *
+     * NOTE: the implementation entails that the deformation might not be
+     * symmetric.
      *
      * @param other
      * @param interpolationFactor
      * @return Box the new box
      */
-    Box interpolate(const Box& other, double interpolationFactor) const
+    Box interpolate(const Box& other, double f) const
     {
-      INVALIDARG_EXP_IFN(interpolationFactor >= 0. && interpolationFactor <= 1.,
-                         "Cannot extrapolate box.");
+      INVALIDARG_EXP_IFN(f >= 0. && f <= 1., "Cannot extrapolate box.");
       INVALIDARG_EXP_IFN(
         other.getShearDirection() == this->getShearDirection() ||
           (other.getShearDirection() == -1 || this->getShearDirection() == -1),
-        "Cannot interpolate mroe than one shear direction");
-#define INTERPOLATE(x, y)                                                      \
-  interpolationFactor*(x) + (1. - interpolationFactor) * (y)
-      Box newBox = Box(INTERPOLATE(this->getLowX(), other.getLowX()),
-                       INTERPOLATE(this->getHighX(), other.getHighX()),
-                       INTERPOLATE(this->getLowY(), other.getLowY()),
-                       INTERPOLATE(this->getHighY(), other.getHighY()),
-                       INTERPOLATE(this->getLowZ(), other.getLowZ()),
-                       INTERPOLATE(this->getHighZ(), other.getHighZ()));
+        "Cannot interpolate more than one shear direction");
+      double newLx = (1 - f) * this->getLx() + f * other.getLx();
+      double newLy = (this->getLx() * this->getLy() * (1 - f) +
+                      other.getLx() * other.getLy() * f) /
+                     (newLx);
+      double newLz =
+        (this->getVolume() * (1 - f) + other.getVolume() * f) / (newLy * newLx);
+
+      Box newBox = Box(this->getLowX() * (newLx / (this->getLx())),
+                       this->getHighX() * (newLx / (this->getLx())),
+                       this->getLowY() * (newLy / (this->getLy())),
+                       this->getHighY() * (newLy / (this->getLy())),
+                       this->getLowZ() * (newLz / (this->getLz())),
+                       this->getHighZ() * (newLz / (this->getLz())));
       newBox.applySimpleShear(
-        INTERPOLATE(this->getShearMagnitude(), other.getShearMagnitude()),
+        (1 - f) * this->getShearMagnitude() + f * other.getShearMagnitude(),
         this->getShearDirection() == -1 ? other.getShearDirection()
                                         : this->getShearDirection());
 

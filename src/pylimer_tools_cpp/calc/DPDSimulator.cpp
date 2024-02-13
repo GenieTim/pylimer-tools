@@ -163,7 +163,7 @@ namespace calc {
 
       // start iterating over the steps to do
       long int step = 0;
-      for (; step < nSteps; step++) {
+      for (; step < nSteps; ++step) {
         if (withMC && ((step % this->nStepsDPD) == 0)) {
           this->numShifts = 0;
           timer.section(DPDPerformanceSections::RELOCATION);
@@ -180,6 +180,15 @@ namespace calc {
         this->coordinates += dt * this->currentVelocitiesPlus;
         this->neighbourlist.resetCoordinates(this->coordinates);
         this->currentVelocities += lambdaDt * this->currentForces;
+
+        // deformation
+        if (this->doDeformation) {
+          // adjust box
+          pylimer_tools::entities::Box nextBox = originalBox.interpolate(
+            this->deformationTargetBox,
+            (1. + static_cast<double>(step)) / static_cast<double>(nSteps));
+          this->deformBoxImmediately(nextBox);
+        }
 
         // TODO: figure out, what the issue is, how the velocities
         // should be synchronized for the pressure
@@ -209,17 +218,6 @@ namespace calc {
             this->currentVelocities.segment(3 * i, 3).transpose();
         }
 
-        // deformation
-        if (this->doDeformation) {
-          pylimer_tools::entities::Box previousBox = this->box;
-          this->box = originalBox.interpolate(this->deformationTargetBox,
-                                              static_cast<double>(step) /
-                                                static_cast<double>(nSteps));
-          this->bondBoxOffsets *= (this->box.getL() / previousBox.getL())
-                                    .replicate(this->numBonds, 1)
-                                    .matrix();
-        }
-
         // bond formation
         if (this->bondsToForm > 0 && step % this->formBondsEvery == 0) {
           timer.section(DPDPerformanceSections::MODIFY);
@@ -245,7 +243,7 @@ namespace calc {
       this->outputFileStreams.clear();
 
       if (this->doDeformation) {
-        this->box = this->deformationTargetBox;
+        this->deformBoxImmediately(this->deformationTargetBox);
         this->doDeformation = false;
       }
 
@@ -537,6 +535,44 @@ namespace calc {
 #endif
     }
 
+    void DPDSimulator::deformBoxImmediately(const pylimer_tools::entities::Box& newBox)
+      {
+        bool isDifferent = newBox == this->box;
+        pylimer_tools::entities::Box previousBox = this->box;
+        // rescale box offsets
+        this->box = newBox;
+        assert(newBox == this->box);
+        Eigen::VectorXd newOffsets =
+          (this->bondBoxOffsets.array() *
+           (this->box.getL() / previousBox.getL())
+             .replicate((this->numBonds + this->numSlipSprings), 1))
+            .matrix();
+        this->bondBoxOffsets = newOffsets;
+
+        // rescale coordinates
+        Eigen::VectorXd previousCoords = this->coordinates;
+
+        Eigen::Array3d scalingFactor = newBox.getL() / previousBox.getL();
+        assert(!isDifferent || !scalingFactor.isApproxToConstant(1.));
+        // rescale per-atom quantities
+        for (size_t i = 0; i < this->numAtoms; ++i) {
+          for (size_t dir = 0; dir < 3; ++dir) {
+            this->coordinates[3 * i + dir] *= scalingFactor[dir];
+            this->currentVelocities[3 * i + dir] *= scalingFactor[dir];
+            this->currentVelocitiesPlus[3 * i + dir] *= scalingFactor[dir];
+            this->currentForces[3 * i + dir] *= scalingFactor[dir];
+          }
+        }
+
+        // reset neighbour-list.
+        // *maybe* it would be faster to implement a way to adjust the box, but
+        // yeah...
+        this->neighbourlist = pylimer_tools::entities::EigenNeighbourList(
+          this->coordinates,
+          this->box,
+          1.0); //.resetCoordinates(this->coordinates);
+      }
+
     /**
      * @brief Determine the temperature of the system
      *
@@ -693,6 +729,11 @@ namespace calc {
             this->box.handlePBC(pairdistance);
             // slight performance improvement, taking the square norm here
             const double rNorm2 = pairdistance.squaredNorm();
+            if (rNorm2 == 0.) {
+              std::cerr << "WARNING: zero distance between atoms " << i
+                        << " and " << j << "." << std::endl;
+              continue;
+            }
 
             const double rNorm = std::sqrt(rNorm2);
             const double one_minus_rnorm = 1. - rNorm;
@@ -738,7 +779,7 @@ namespace calc {
       pressure /= (3. * this->box.getVolume());
       stressTensor /= this->box.getVolume();
 #ifndef NDEBUG
-      assert(APPROX_EQUAL(stressTensor.trace() / 3., pressure, 1e-3));
+      assert(APPROX_REL_EQUAL(stressTensor.trace() / 3., pressure, 1e-5));
 #endif
       return pressure;
     }
