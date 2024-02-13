@@ -1039,6 +1039,18 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("atom_ids"),
          py::arg("nr_of_origins") = 25,
          py::arg("reduce_memory") = false)
+         .def("computeDistanceAutocorrelationFromTo",
+         &UniverseSequence::computeDistanceAutocorrelationFromToAtoms,
+         R"pbdoc(
+          Compute the autocorrelation of the dot product of the distance vector from certain to other atoms.
+
+          For example, this can be used to compute Eq. 4.51 from Masao Doi, Introduction to Polymer Physics, p. 74.
+         )pbdoc",
+         py::arg("atom_ids_from"),
+         py::arg("atom_ids_to"),
+         py::arg("nr_of_origins") = 25,
+         py::arg("reduce_memory") = false
+         )
     // operators
     .def(
       "__getitem__",

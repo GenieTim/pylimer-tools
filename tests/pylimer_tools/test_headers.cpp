@@ -301,6 +301,38 @@ TEST_CASE("Box throws", "[entity][Box]")
   REQUIRE_THROWS(pe::Box(0.0, -1.0, 0.0, -1.0, 0.0, -1.0));
 }
 
+TEST_CASE("Box can interpolate", "[entity][Box]")
+{
+  pe::Box box = pe::Box(10., 10., 10.);
+  pe::Box target = pe::Box(20., 5., 10.);
+  CHECK(box.getVolume() == Catch::Approx(target.getVolume()));
+
+  pe::Box result = box.interpolate(target, 0.5);
+  CHECK(result.getLx() == Catch::Approx(15.));
+  CHECK(result.getLy() == Catch::Approx(20. / 3.));
+  CHECK(result.getLz() == Catch::Approx(10.));
+  CHECK(result.getVolume() == Catch::Approx(box.getVolume()));
+  CHECK(result.getShearDirection() == -1);
+
+  result = box.interpolate(target, 1.0);
+  CHECK((result.getL().isApprox(target.getL())));
+  CHECK(result.getShearDirection() == -1);
+  result = box.interpolate(target, 0.0);
+  CHECK((result.getL().isApprox(box.getL())));
+  CHECK(result.getShearDirection() == -1);
+
+  Eigen::Array3d ls = target.getL();
+  CHECK(ls[0] == Catch::Approx(20.));
+  CHECK(ls[1] == Catch::Approx(5.));
+  CHECK(ls[2] == Catch::Approx(10.));
+  Eigen::ArrayXd lsLong = ls.replicate(3, 1);
+  for (size_t i = 0; i < 3; ++i) {
+    for (size_t dir = 0; dir < 3; ++dir) {
+      CHECK(lsLong[i * 3 + dir] == Catch::Approx(ls[dir]));
+    }
+  }
+}
+
 TEST_CASE("Atoms persist state", "[entity][Atom]")
 {
   pe::Atom atom1 = pe::Atom(0, 0, 0.0, 0.0, 0.0, 0, 0, 0);
