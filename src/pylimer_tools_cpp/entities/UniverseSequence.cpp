@@ -339,20 +339,21 @@ namespace entities {
       this->universeCache.erase(index);
     }
   }
-  
-  std::unordered_map<long int, double> UniverseSequence::computeDistanceAutocorrelationFromToAtoms(
-      const std::vector<long int> &atomIdsFrom,
-      const std::vector<long int> &atomIdsTo,
-      int nrOfOrigins,
-      bool reduceMemory
-    ) {
-      if (this->modeDataFiles) {
-        throw std::runtime_error("Datafiles R_ee not implemented yet.");
-      }
 
-      INVALIDARG_EXP_IFN(atomIdsFrom.size() == atomIdsTo.size(), "Same size from and to is required.");
+  std::unordered_map<long int, double>
+  UniverseSequence::computeDistanceAutocorrelationFromToAtoms(
+    const std::vector<long int>& atomIdsFrom,
+    const std::vector<long int>& atomIdsTo,
+    int nrOfOrigins,
+    bool reduceMemory)
+  {
+    if (this->modeDataFiles) {
+      throw std::runtime_error("Datafiles R_ee not implemented yet.");
+    }
 
-      
+    INVALIDARG_EXP_IFN(atomIdsFrom.size() == atomIdsTo.size(),
+                       "Same size from and to is required.");
+
     pylimer_tools::utils::ReadDumpFileSections sections =
       this->dumpFileParser.readDumpFileSections(
         pylimer_tools::utils::ReadableDumpFileSections::TIMESTEP |
@@ -401,14 +402,11 @@ namespace entities {
         Eigen::VectorXd::Zero(3 * atomIdsFrom.size());
       Eigen::VectorXd localCoordinatesTo =
         Eigen::VectorXd::Zero(3 * atomIdsTo.size());
-      Eigen::Vector3d coords;
       for (size_t j = 0; j < atomIdsFrom.size(); ++j) {
         Atom atomFrom = atoms[i][atomIdToAtomIndex.at(atomIdsFrom[j])];
-        atomFrom.getUnwrappedCoordinates<Eigen::Vector3d>(coords, &boxes[i]);
-        localCoordinatesFrom.segment(3 * j, 3) = coords;
+        localCoordinatesFrom.segment(3 * j, 3) = atomFrom.getUnwrappedCoordinates(&boxes[i]);
         Atom atomTo = atoms[i][atomIdToAtomIndex.at(atomIdsTo[j])];
-        atomTo.getUnwrappedCoordinates<Eigen::Vector3d>(coords, &boxes[i]);
-        localCoordinatesTo.segment(3 * j, 3) = coords;
+        localCoordinatesTo.segment(3 * j, 3) = atomTo.getUnwrappedCoordinates(&boxes[i]);
       }
       endToEndVectors.push_back(localCoordinatesTo - localCoordinatesFrom);
     }
@@ -442,10 +440,11 @@ namespace entities {
                     << this->dumpFileParser.getFile() << std::endl;
         }
 
-
-        double localMean = (endToEndVectors[universe_idx - startingIndex].dot(endToEndVectors[parent_universe_idx - startingIndex]))/(static_cast<double>(
-          endToEndVectors[universe_idx - startingIndex].size() / 3
-        ));
+        double localMean =
+          (endToEndVectors[universe_idx - startingIndex].dot(
+            endToEndVectors[parent_universe_idx - startingIndex])) /
+          (static_cast<double>(
+            endToEndVectors[universe_idx - startingIndex].size() / 3));
         results[delta_t].push_back(localMean);
       }
       std::cout << "Universe " << parent_universe_idx
@@ -466,7 +465,7 @@ namespace entities {
     }
 
     return actual_means;
-    }
+  }
 
   // computations
   /**

@@ -61,7 +61,7 @@ namespace entities {
       return delta;
     }
 
-    void vectorTo(const Atom &b, const Box* box, double *result) const
+    void vectorTo(const Atom& b, const Box* box, double* result) const
     {
       result[0] = this->_getDeltaDistance(
         this->x, b.getX(), this->nx, b.getNX(), box->getLx());
@@ -71,14 +71,14 @@ namespace entities {
         this->z, b.getZ(), this->nz, b.getNZ(), box->getLz());
     }
 
-    void vectorToUnwrapped(const Atom &b, const Box* box, double* result) const
+    void vectorToUnwrapped(const Atom& b, const Box* box, double* result) const
     {
       result[0] = this->getUnwrappedX(box) - b.getUnwrappedX(box);
       result[1] = this->getUnwrappedY(box) - b.getUnwrappedY(box);
       result[2] = this->getUnwrappedZ(box) - b.getUnwrappedZ(box);
     }
 
-    std::vector<double> computeVectorTo(const Atom &b, const Box &box) const
+    std::vector<double> computeVectorTo(const Atom& b, const Box& box) const
     {
       double result[3];
       vectorTo(b, &box, result);
@@ -88,7 +88,7 @@ namespace entities {
       return resultV;
     }
 
-    std::array<double, 3> meanPositionWith(const Atom &b, const Box* box) const
+    std::array<double, 3> meanPositionWith(const Atom& b, const Box* box) const
     {
       double distanceVec[3];
       vectorTo(b, box, distanceVec);
@@ -99,7 +99,8 @@ namespace entities {
       return box->minImageDistances(result);
     }
 
-    std::array<double, 3> meanPositionWithUnwrapped(const Atom &b, const Box* box) const
+    std::array<double, 3> meanPositionWithUnwrapped(const Atom& b,
+                                                    const Box* box) const
     {
       double distanceVec[3];
       vectorToUnwrapped(b, box, distanceVec);
@@ -110,7 +111,7 @@ namespace entities {
       return box->minImageDistances(result);
     }
 
-    double distanceTo(const Atom &b, const Box* box) const
+    double distanceTo(const Atom& b, const Box* box) const
     {
       double distanceVec[3];
       vectorTo(b, box, distanceVec);
@@ -120,7 +121,7 @@ namespace entities {
                   distanceVec[2] * distanceVec[2]);
     }
 
-    double distanceToUnwrapped(const Atom &b, const Box* box) const
+    double distanceToUnwrapped(const Atom& b, const Box* box) const
     {
       double distanceVec[3];
       this->vectorToUnwrapped(b, box, distanceVec);
@@ -170,6 +171,12 @@ namespace entities {
       vec[0] = this->getUnwrappedX(box);
       vec[1] = this->getUnwrappedY(box);
       vec[2] = this->getUnwrappedZ(box);
+    }
+    Eigen::Vector3d getUnwrappedCoordinates(const Box* box) const
+    {
+      Eigen::Vector3d coords = Eigen::Vector3d::Zero();
+      this->getUnwrappedCoordinates<Eigen::Vector3d>(coords, box);
+      return coords;
     }
 
   private:
