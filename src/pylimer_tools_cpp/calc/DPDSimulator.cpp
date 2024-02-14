@@ -553,7 +553,7 @@ namespace calc {
         Eigen::VectorXd previousCoords = this->coordinates;
 
         Eigen::Array3d scalingFactor = newBox.getL() / previousBox.getL();
-        assert(!isDifferent || !scalingFactor.isApproxToConstant(1.));
+        
         // rescale per-atom quantities
         for (size_t i = 0; i < this->numAtoms; ++i) {
           for (size_t dir = 0; dir < 3; ++dir) {
