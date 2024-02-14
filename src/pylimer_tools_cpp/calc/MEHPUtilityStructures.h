@@ -1,17 +1,46 @@
 #ifndef MEHP_UTILITY_STRUCT_H
 #define MEHP_UTILITY_STRUCT_H
 
+#include "../utils/utilityMacros.h"
 #include <Eigen/Dense>
 #include <map>
+#include <set>
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include <set>
-#include "../utils/utilityMacros.h"
 
 namespace pylimer_tools {
 namespace calc {
   namespace mehp {
+
+    enum BalanceRunMode
+    {
+      EIGEN_RANDOM,
+      EIGEN_HEURISTIC,
+      EIGEN_STRANDS,
+      EIGEN_ALL,
+      ITERATIVE
+    };
+
+    enum StructureSimplificationMode
+    {
+      NO_SIMPLIFICATION,
+      X2F_ONLY,
+      INACTIVE_ONLY,
+      ALL_TIM,
+      ALL_ANDREI
+    };
+
+    enum LinkSwappingMode
+    {
+      NO_SWAPPING,
+      SLIPLINKS_ONLY,
+      ALL,
+      ALL_CYCLE,
+      ALL_MC,
+      ALL_MC_CYCLE
+    };
+
     enum ExitReason
     {
       UNSET,
@@ -47,7 +76,7 @@ namespace calc {
       Eigen::ArrayXi springIndexB;
       Eigen::VectorXd springBoxOffset;
 
-      ArrayXArrayXi springIndicesOfLinks;   // maps link -> springs
+      ArrayXArrayXi springIndicesOfLinks; // maps link -> springs
       // interesting properties
       ArrayXb springIsActive;
 
@@ -74,7 +103,8 @@ namespace calc {
       Eigen::VectorXd springsContourLength; /* the N for each spring */
       ArrayXArrayXi springIndicesOfLinks;   // maps link -> springs
       ArrayXArrayXi linkIndicesOfSprings;   // maps spring -> links
-      ArrayXb partialSpringIsPartial; // indicates whether a spring involves a slip-link
+      ArrayXb partialSpringIsPartial; // indicates whether a spring involves a
+                                      // slip-link
       // local to global: from the 2D structures to the 1D Eigen vector
       ArrayXArrayXi localToGlobalSpringIndex;
       // map the "local", partial, spring indices to the full-length springs
@@ -91,14 +121,14 @@ namespace calc {
 
       // these may be empty, or not, depending on the method used
       // to determine the slip-links
-      ArrayXArrayXi loops; // each loop just records its spring idx
+      ArrayXArrayXi loops;           // each loop just records its spring idx
       ArrayXArrayXi loopsOfSliplink; // each slip-link has two loops, ideally
 
       // old stuff used for conversion. Does not include slip-links
       Eigen::ArrayXi springCoordinateIndexA;
       Eigen::ArrayXi springCoordinateIndexB;
       Eigen::ArrayXi oldAtomIds;
-      std::vector<size_t> springToMoleculeIds; // maps 
+      std::vector<size_t> springToMoleculeIds; // maps
       ArrayXb springIsActive;
       Eigen::ArrayXi springIndexA;
       Eigen::ArrayXi springIndexB;
