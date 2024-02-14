@@ -316,7 +316,7 @@ namespace utils {
     return !str[h] ? 5381 : (str2int(str, h + 1) * 33) ^ str[h];
   }
   // constexpr
-  unsigned int str2int(const std::string &str, const int h = 0)
+  unsigned int str2int(const std::string& str, const int h = 0)
   {
     return str2int(str.c_str(), h);
   }
@@ -344,6 +344,7 @@ namespace utils {
     std::string line = this->currentLine;
     std::string atomFormat = "";
     int numAtoms = 0;
+    size_t sectionsRead = 0;
     while (std::getline(this->file, line)) {
       if (pylimer_tools::utils::startsWith(line, "ITEM: TIMESTEP") &&
           (sectionsToRead & ReadableDumpFileSections::TIMESTEP)) {
@@ -382,6 +383,8 @@ namespace utils {
           line.substr(std::string("ITEM: ATOMS ").length()));
         double x, y, z = 0.;
         int nx, ny, nz = 0;
+        bool isUnwrappedX, isUnwrappedY, isUnwrappedZ = false;
+        bool isScaledX, isScaledY, isScaledZ = false;
         int id, type;
         std::vector<pylimer_tools::entities::Atom> localResults;
         localResults.reserve(numAtoms);
@@ -407,31 +410,88 @@ namespace utils {
             for (const std::string& formatPart : splitFormat) {
               switch (str2int(formatPart)) {
                 case str2int("id"):
-                  ss >> id; break;
+                  ss >> id;
+                  break;
                 case str2int("type"):
-                  ss >> type; break;
+                  ss >> type;
+                  break;
                 case str2int("x"):
-                  ss >> x; break;
+                  ss >> x;
+                  break;
+                case str2int("xu"):
+                  ss >> x;
+                  isUnwrappedX = true;
+                  break;
+                case str2int("xs"):
+                  ss >> x;
+                  isScaledX = true;
+                  break;
+                case str2int("xsu"):
+                  ss >> x;
+                  isUnwrappedX = true;
+                  isScaledX = true;
+                  break;
                 case str2int("y"):
-                  ss >> y; break;
+                  ss >> y;
+                  break;
+                case str2int("yu"):
+                  ss >> y;
+                  isUnwrappedY = true;
+                  break;
+                case str2int("ys"):
+                  ss >> y;
+                  isScaledY = true;
+                  break;
+                case str2int("ysu"):
+                  ss >> y;
+                  isUnwrappedY = true;
+                  isScaledY = true;
+                  break;
                 case str2int("z"):
-                  ss >> z; break;
+                  ss >> z;
+                  break;
+                case str2int("zu"):
+                  ss >> z;
+                  isUnwrappedZ = true;
+                  break;
+                case str2int("zs"):
+                  ss >> z;
+                  isScaledZ = true;
+                  break;
+                case str2int("zsu"):
+                  ss >> z;
+                  isUnwrappedZ = true;
+                  isScaledZ = true;
+                  break;
                 case str2int("ix"):
-                  ss >> nx; break;
+                  ss >> nx;
+                  break;
                 case str2int("iy"):
-                  ss >> ny; break;
+                  ss >> ny;
+                  break;
                 case str2int("iz"):
-                  ss >> nz; break;
+                  ss >> nz;
+                  break;
                 default:
                   throw std::runtime_error("Not implemented format part: '" +
                                            formatPart + "'");
               }
             }
           }
-          localResults.push_back(
-            pylimer_tools::entities::Atom(id, type, x, y, z, nx, ny, nz));
+          localResults.push_back(pylimer_tools::entities::Atom(
+            id,
+            type,
+            x * (isScaledX ? resultingBoxes[sectionsRead].getLx() : 1.),
+            y * (isScaledY ? resultingBoxes[sectionsRead].getLy() : 1.),
+            z * (isScaledZ ? resultingBoxes[sectionsRead].getLz() : 1.),
+            isUnwrappedX ? 0 : nx,
+            isUnwrappedY ? 0 : ny,
+            isUnwrappedZ ? 0 : nz));
         }
         resultingAtoms.push_back(localResults);
+        sectionsRead += 1;
+        assert(resultingBoxes.size() == sectionsRead);
+        assert(resultingTimeSteps.size() == sectionsRead);
       }
     }
 
