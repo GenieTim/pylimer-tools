@@ -207,9 +207,9 @@ namespace calc {
       {
         Eigen::Vector3d bondDistances =
           this->coordinates(
-            this->bondPartnerCoordinatesA.segment(3 * bondIdx, 3)) -
+            this->bondPartnerCoordinatesB.segment(3 * bondIdx, 3)) -
           this->coordinates(
-            this->bondPartnerCoordinatesB.segment(3 * bondIdx, 3)) +
+            this->bondPartnerCoordinatesA.segment(3 * bondIdx, 3)) +
           this->bondBoxOffsets.segment(3 * bondIdx, 3);
         if (this->assumeBoxLargeEnough) {
           this->box.handlePBC(bondDistances);
@@ -448,8 +448,8 @@ namespace calc {
       Eigen::VectorXd getBondLengths() override
       {
         Eigen::VectorXd bondDistances =
-          this->coordinates(this->bondPartnerCoordinatesA) -
-          this->coordinates(this->bondPartnerCoordinatesB) +
+          this->coordinates(this->bondPartnerCoordinatesB) -
+          this->coordinates(this->bondPartnerCoordinatesA) +
           this->bondBoxOffsets;
         if (this->assumeBoxLargeEnough) {
           // this should not do anything anymore, here,
