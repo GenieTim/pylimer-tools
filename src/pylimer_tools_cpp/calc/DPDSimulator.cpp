@@ -352,15 +352,15 @@ namespace calc {
     void DPDSimulator::resetBondOffsets()
     {
       this->bondBoxOffsets =
-        this->box.getOffset(this->coordinates(this->bondPartnerCoordinatesA) -
-                            this->coordinates(this->bondPartnerCoordinatesB));
+        this->box.getOffset(this->coordinates(this->bondPartnerCoordinatesB) -
+                            this->coordinates(this->bondPartnerCoordinatesA));
     }
 
     void DPDSimulator::resetBondOffset(int bondIdx)
     {
       this->bondBoxOffsets.segment(bondIdx * 3, 3) = this->box.getOffset(
-        this->coordinates.segment(3 * this->bondPartnersA[bondIdx], 3) -
-        this->coordinates.segment(3 * this->bondPartnersB[bondIdx], 3));
+        this->coordinates.segment(3 * this->bondPartnersB[bondIdx], 3) -
+        this->coordinates.segment(3 * this->bondPartnersA[bondIdx], 3));
     }
 
     /**
@@ -628,8 +628,8 @@ namespace calc {
       // of the bonds to ignore
       timer.section(DPDPerformanceSections::BOND_FORCE);
       Eigen::VectorXd bondDistances =
-        ((coords(this->bondPartnerCoordinatesA) -
-          coords(this->bondPartnerCoordinatesB) + this->bondBoxOffsets)
+        ((coords(this->bondPartnerCoordinatesB) -
+          coords(this->bondPartnerCoordinatesA) + this->bondBoxOffsets)
            .array() *
          this->bondDuplicationPenalty)
           .matrix();
@@ -652,8 +652,8 @@ namespace calc {
         for (size_t i = 0; i < this->bondPartnersA.size(); ++i) {
           if (this->bondBoxOffsets.segment(3 * i, 3) !=
               this->box.getOffset(
-                coords(this->bondPartnerCoordinatesA.segment(3 * i, 3)) -
-                coords(this->bondPartnerCoordinatesB.segment(3 * i, 3)))) {
+                coords(this->bondPartnerCoordinatesB.segment(3 * i, 3)) -
+                coords(this->bondPartnerCoordinatesA.segment(3 * i, 3)))) {
             std::cerr << "INFO: Bond " << i << " spans more than one image."
                       << std::endl;
           }
@@ -662,8 +662,8 @@ namespace calc {
       }
       // assert(bondDistances.minCoeff() > -this->box.getL().maxCoeff());
       // assert(bondDistances.maxCoeff() < this->box.getL().maxCoeff());
-      forces(this->bondPartnerCoordinatesA) -= this->k * bondDistances;
-      forces(this->bondPartnerCoordinatesB) += this->k * bondDistances;
+      forces(this->bondPartnerCoordinatesA) += this->k * bondDistances;
+      forces(this->bondPartnerCoordinatesB) -= this->k * bondDistances;
 
       // we use our own parallelization -> disable the one by Eigen
       Eigen::setNbThreads(1);

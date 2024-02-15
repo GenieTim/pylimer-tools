@@ -56,6 +56,7 @@ add_library(test_sources
 	OBJECT 
 		pylimer_tools/test_dpd_simulator.cpp
 		pylimer_tools/test_force_balance.cpp
+		pylimer_tools/test_force_balance2.cpp
 		pylimer_tools/test_force_relaxation.cpp
 		pylimer_tools/test_generator.cpp 
 		pylimer_tools/test_molecule.cpp 
