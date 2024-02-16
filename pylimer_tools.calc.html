@@ -740,7 +740,7 @@ If None: will use max functionality per type.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.computeMMsProbabilities">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">computeMMsProbabilities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.computeMMsProbabilities" title="Link to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">computeMMsProbabilities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.computeMMsProbabilities" title="Link to this definition">#</a></dt>
 <dd><p>Compute Macosko and Miller’s probabilities <span class="math notranslate nohighlight">\(P(F_A)\)</span> and <span class="math notranslate nohighlight">\(P(F_B)\)</span></p>
 <dl class="simple">
 <dt>Sources:</dt><dd><ul class="simple">
@@ -753,7 +753,7 @@ If None: will use max functionality per type.</p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>r</strong> (<em>-</em>) – the stoichiometric inbalance</p></li>
-<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction</p></li>
+<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the cross-links</p></li>
 <li><p><strong>f</strong> (<em>-</em>) – the functionality of the the crosslinker</p></li>
 </ul>
 </dd>
@@ -1109,6 +1109,11 @@ This works as:</p>
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.validate_r_and_p">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">validate_r_and_p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.validate_r_and_p" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-pylimer_tools.calc">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pylimer_tools.calc" title="Link to this heading">#</a></h2>
@@ -1205,6 +1210,7 @@ This works as:</p>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.predictNumberDensityOfJunctionPoints"><code class="docutils literal notranslate"><span class="pre">predictNumberDensityOfJunctionPoints()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.predictNumberDensityOfNetworkStrands"><code class="docutils literal notranslate"><span class="pre">predictNumberDensityOfNetworkStrands()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.predictShearModulus"><code class="docutils literal notranslate"><span class="pre">predictShearModulus()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.validate_r_and_p"><code class="docutils literal notranslate"><span class="pre">validate_r_and_p()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-pylimer_tools.calc">Module contents</a></li>
