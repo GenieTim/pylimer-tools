@@ -68,6 +68,7 @@ namespace entities {
       return AtomGraphParent::computeBondLengths(this->parent);
     };
     Eigen::Vector3d getOverallBondSum(const int crosslinkerType = 2) const;
+    Eigen::Vector3d getOverallBondSumFromTo(size_t atomIdFrom, size_t atomIdTo, const int crosslinkerType = 2) const;
 
     // operators
     Atom operator[](size_t index) const

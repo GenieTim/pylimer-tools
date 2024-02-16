@@ -352,7 +352,7 @@ def computeMMsProbabilities(r, p, f):
 
     Arguments:
       - r: the stoichiometric inbalance
-      - p: the extent of reaction
+      - p: the extent of reaction in terms of the 
       - f: the functionality of the the crosslinker
 
     Returns:
@@ -361,7 +361,7 @@ def computeMMsProbabilities(r, p, f):
     """
     # first, check a few things required by the formulae
     # since we want alpha, beta \in [0,1], given they are supposed to be probabilities
-    if (p > 1 or p < 0):
+    if (p < 0):
         raise ValueError(
             "An extent of reaction ouside of [0, 1] is not supported. Got {}".format(p))
     # if (p < 1/math.sqrt(2) or p > 1):

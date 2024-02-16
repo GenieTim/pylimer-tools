@@ -354,6 +354,56 @@ namespace entities {
   };
 
   /**
+   * @brief Get the overall offset in terms of boxes (for PBC)
+   *
+   * The offset is computed as if computing the vector of the first to the last
+   * atom (coords of last minus coords of first).
+   *
+   * NOTE: even for primary loops, it is possible that this is not equal to
+   * zero.
+   * @param atomIdFrom
+   * @param atomIdTo
+   * @param crosslinkerType
+   * @return Eigen::Vector3d
+   */
+  Eigen::Vector3d Molecule::getOverallBondSumFromTo(
+    size_t atomIdFrom,
+    size_t atomIdTo,
+    const int crosslinkerType) const
+  {
+    std::vector<long int> alignedVertices =
+      this->getVerticesLinedUp(crosslinkerType);
+    Eigen::VectorXd alignedCoordinates =
+      Eigen::VectorXd::Zero(3 * alignedVertices.size());
+    this->getAssumedVertexCoordinates(
+      alignedCoordinates, this->parent, alignedVertices);
+    Eigen::Vector3d result = Eigen::Vector3d::Zero();
+    size_t vertexIdFrom = this->atomIdToVertexIdx.at(atomIdFrom);
+    size_t vertexIdTo = this->atomIdToVertexIdx.at(atomIdTo);
+    bool recording = false;
+    for (size_t i = 1; i < alignedVertices.size(); ++i) {
+      if (recording) {
+        Eigen::Vector3d distance = alignedCoordinates.segment((i) * 3, 3) -
+                                   alignedCoordinates.segment((i - 1) * 3, 3);
+        this->parent->handlePBC(distance);
+        result += distance;
+
+        if (alignedVertices[i] == vertexIdFrom ||
+            alignedVertices[i] == vertexIdTo) {
+          return result;
+        }
+      }
+
+      if (alignedVertices[i] == vertexIdFrom ||
+          alignedVertices[i] == vertexIdTo) {
+        recording = true;
+      }
+    }
+    throw std::runtime_error(
+      "apparently, did not find both vertices to compute overall bond sum for");
+  };
+
+  /**
    * @brief Get the ids of the vertices in order of the chain, starting from one
    * end to the other
    *
