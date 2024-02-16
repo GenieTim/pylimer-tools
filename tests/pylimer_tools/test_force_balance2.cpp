@@ -749,7 +749,7 @@ TEST_CASE("MEHP Force Balance can randomly add slip-links ignoring cross-links",
     size_t nrOfSpringsBefore = net.nrOfSprings;
     REQUIRE_NOTHROW(forceBalancer.validateNetwork(net, partitions));
     // remove all springs...
-    numRemoved = forceBalancer.removeInactiveCrosslinks(net, partitions, 1e5);
+    numRemoved = forceBalancer.removeInactiveCrosslinks(partitions, 1e5);
     REQUIRE(numRemoved == nrOfSpringsBefore);
   }
 }
@@ -855,7 +855,7 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
     // due to the randomness, it _could_ be one day that actually all strands
     // are active. unlikely, but I can imagine it to be possible.
     size_t numInactiveRemoved =
-      forceBalancer.removeInactiveCrosslinks(net, partitions, 0.1);
+      forceBalancer.removeInactiveCrosslinks(partitions, 0.1);
     REQUIRE_NOTHROW(forceBalancer.validateNetwork());
     CHECK(numInactiveRemoved > 0);
     REQUIRE_NOTHROW(forceBalancer.validateNetwork(net, partitions));
@@ -878,7 +878,7 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
     // due to the randomness, it _could_ be one day that actually all strands
     // are active. unlikely, but I can imagine it to be possible.
     numInactiveRemoved =
-      forceBalancer.removeInactiveCrosslinks(net, partitions, 0.1);
+      forceBalancer.removeInactiveCrosslinks(partitions, 0.1);
     CHECK(numInactiveRemoved > 0);
     numInactiveRemoved = forceBalancer.removeTwofunctionalCrosslinks();
     CHECK(numInactiveRemoved > 0);

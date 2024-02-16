@@ -18,21 +18,23 @@
 namespace pylimer_tools {
 namespace calc {
   namespace mehp {
+#ifndef CLAMP_ONE_OVER_SPRINGPARTITION
 /**
  * @brief a macro for doing the clamping in the routines using kappa,
  * to prevent deivision by zero issues / multiplications by infinity
  */
 #define CLAMP_ONE_OVER_SPRINGPARTITION(                                        \
   isPartialSpring, val, N, oneOverSpringPartitionUpperLimit)                   \
-  (!isPartialSpring)                                                           \
-    ? val                                                                      \
-    : std::clamp(val,                                                          \
-                 (oneOverSpringPartitionUpperLimit > 0.)                       \
-                   ? (1. / (N - 1. / oneOverSpringPartitionUpperLimit))        \
-                   : (0.0),                                                    \
-                 (oneOverSpringPartitionUpperLimit > 0.)                       \
-                   ? (oneOverSpringPartitionUpperLimit)                        \
-                   : (N));
+  ((!isPartialSpring)                                                          \
+     ? val                                                                     \
+     : std::clamp(val,                                                         \
+                  (oneOverSpringPartitionUpperLimit > 0.)                      \
+                    ? (1. / (N - 1. / oneOverSpringPartitionUpperLimit))       \
+                    : (0.0),                                                   \
+                  (oneOverSpringPartitionUpperLimit > 0.)                      \
+                    ? (oneOverSpringPartitionUpperLimit)                       \
+                    : (N)));
+#endif
 
     /**
      * FORCE RELAXATION
@@ -2771,8 +2773,8 @@ namespace calc {
               (MEHPForceBalance::evaluateDistanceBetween(
                 net,
                 u,
-                springsPartners[partner_idx + 1],
                 springsPartners[partner_idx],
+                springsPartners[partner_idx + 1],
                 this->is2D));
             double distanceForward = vecForward.squaredNorm();
             double idealValue =
@@ -4349,7 +4351,7 @@ namespace calc {
       INVALIDARG_EXP_IFN(
         loopsOfSliplinks.size() == 0 ||
           loopsOfSliplinks.size() == additionalLen,
-        "You must provide either loops for all new slip-links, or non at all.");
+        "You must provide either loops for all new slip-links, or none at all.");
       INVALIDARG_EXP_IFN(
         (loopsOfSliplinks.size() == 0 &&
          this->initialConfig.loopsOfSliplink.size() == 0) ||
