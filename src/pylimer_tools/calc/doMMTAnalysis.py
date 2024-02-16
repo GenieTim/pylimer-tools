@@ -342,7 +342,7 @@ def computeWeightFractionsAndProbabilities(network: Universe, crosslinkerType: i
     return weightFractions, alpha, beta
 
 
-def computeMMsProbabilities(r, p, f):
+def computeMMsProbabilities(r: float, p: float, f: int):
     """
     Compute Macosko and Miller's probabilities :math:`P(F_A)` and :math:`P(F_B)`
 
@@ -352,7 +352,7 @@ def computeMMsProbabilities(r, p, f):
 
     Arguments:
       - r: the stoichiometric inbalance
-      - p: the extent of reaction
+      - p: the extent of reaction in terms of the cross-links
       - f: the functionality of the the crosslinker
 
     Returns:
@@ -361,9 +361,7 @@ def computeMMsProbabilities(r, p, f):
     """
     # first, check a few things required by the formulae
     # since we want alpha, beta \in [0,1], given they are supposed to be probabilities
-    if (p > 1 or p < 0):
-        raise ValueError(
-            "An extent of reaction ouside of [0, 1] is not supported. Got {}".format(p))
+    validate_r_and_p(r, p, f)
     # if (p < 1/math.sqrt(2) or p > 1):
     #     raise ValueError(
     #         "The extent of reaction has to be inside [1/sqrt(2), 1] for the result to be realistic. Got {}".format(p))
@@ -398,11 +396,25 @@ def computeMMsProbabilities(r, p, f):
     beta = r*p*alpha**(f-1) + 1 - r*p
     if (alpha > 1 or alpha < 0):
         warnings.warn(
-            "The resulting P(F_A) is probably unreliable, as it will be clipped to [0,1] from {}".format(alpha))
+            "The resulting P(F_A) from r = {}, p = {} for f = {} is probably unreliable, as it will be clipped to [0,1] from {}".format(r, p, f, alpha))
     if (beta > 1 or beta < 0):
         warnings.warn(
-            "The resulting P(F_B) is probably unreliable, as it will be clipped to [0,1] from {}".format(beta))
+            "The resulting P(F_B) from r = {}, p = {} for f = {} is probably unreliable, as it will be clipped to [0,1] from {}".format(r, p, f, beta))
     return np.clip(alpha, 0, 1), np.clip(beta, 0, 1)  # TODO: reconsider
+
+
+def validate_r_and_p(r: float, p: float, f: int):
+    if (p < 0):
+        raise ValueError("p must be positive")
+    # assume:
+    n_chains = 1000
+    # -> compute:
+    n_xlinks = r*2*n_chains/f
+    max_possible_bonds = min(2*n_chains, f*n_xlinks)
+    p_max = max_possible_bonds/(n_xlinks*f)
+    if (p > p_max):
+        raise ValueError(
+            "For a system with r = {} and f = {}, p (in terms of cross-links) must be < {}, {} given.".format(r, f, p_max, p))
 
 
 def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crosslinkerType: int = None, r: float = None, p: float = None, f: int = None, nu: float = None, T: pint.Quantity = None, strandLength: int = None, functionalityPerType: dict = None, Ge1: float = None):
