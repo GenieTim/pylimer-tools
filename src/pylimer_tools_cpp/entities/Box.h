@@ -190,12 +190,29 @@ namespace entities {
       this->minImageDistance(coords);
     }
 
-    Eigen::MatrixXd getOffset(const Eigen::VectorXd& coords) const
+    Eigen::VectorXd getOffset(const Eigen::VectorXd& coords) const
     {
       return -(this->L.replicate(coords.size() / 3, 1) *
                (coords.array() * this->oneOverL.replicate(coords.size() / 3, 1))
                  .rint())
                 .matrix();
+    }
+
+    bool isValidOffset(const Eigen::VectorXd& offset,
+                       double precision = 1e-5) const
+    {
+      if (!(offset.size() % 3 == 0)) {
+        return false;
+      }
+      for (int i = 0; i < offset.size(); ++i) {
+        if (offset[i] > precision) {
+          bool rowIsValid = (fmod(offset[i], this->L[i % 3]) < precision);
+          if (!rowIsValid) {
+            return false;
+          }
+        }
+      }
+      return true;
     }
 
     template<typename VectorType>
