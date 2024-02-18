@@ -88,15 +88,15 @@ namespace calc {
     {
       // TODO: some info is redundant.
       // adjust code to support one way of storing things only
-      double L[3];                    /* box sizes */
-      double boxHalfs[3];             /* half box sizes */
-      double vol;                     /* box volume */
-      double meanSpringContourLength; /* mean N */
-      long int nrOfLinks; /* number of links, = nrOfNodes + nrOfSlipLinks */
-      long int nrOfNodes; /* number of cross-links */
-      long int nrOfSprings;
-      long int nrOfPartialSprings;
-      long int nrOfSpringsWithPartition;
+      double L[3];                          /* box sizes */
+      double boxHalfs[3];                   /* half box sizes */
+      double vol = 0.0;                     /* box volume */
+      double meanSpringContourLength = 0.0; /* mean N */
+      long int nrOfLinks = 0; /* number of links, = nrOfNodes + nrOfSlipLinks */
+      long int nrOfNodes = 0; /* number of cross-links */
+      long int nrOfSprings = 0;
+      long int nrOfPartialSprings = 0;
+      long int nrOfSpringsWithPartition = 0;
       bool isUpToDate = true;
       // coordinates & connectivity
       Eigen::VectorXd coordinates;

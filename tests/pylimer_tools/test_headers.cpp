@@ -294,6 +294,8 @@ TEST_CASE("Box's offset corresponds to PBC", "[entity][Box]")
   CHECK(box.getOffset(diff2).isApprox(Eigen::Vector3d::Zero()));
   CHECK(diff2.isApprox(Eigen::Vector3d::Constant(-5.)));
   CHECK((diff + box.getOffset(diff)).isApprox(diff2));
+  CHECK(box.isValidOffset(box.getOffset(diff)));
+  CHECK_FALSE(box.isValidOffset(Eigen::Vector3d::Constant(3.2)));
 }
 
 TEST_CASE("Box throws", "[entity][Box]")

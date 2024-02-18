@@ -419,7 +419,7 @@ namespace calc {
       //             << objectiveDisplacement[2] << ", for "
       //             << objectiveDisplacementContributors << "." << std::endl;
       // }
-      igraph_cattribute_GAB_set(&this->graph, "is_up_to_date", false);
+      // igraph_cattribute_GAB_set(&this->graph, "is_up_to_date", false);
       return dist;
     }
 
@@ -564,7 +564,7 @@ namespace calc {
       net.coordinates(resultingCoordinateIndexMask) +=
         damping * objectivesToSet;
 
-      igraph_cattribute_GAB_set(&this->graph, "is_up_to_date", false);
+      // igraph_cattribute_GAB_set(&this->graph, "is_up_to_date", false);
 
       return maxDiff;
     };
@@ -1161,9 +1161,11 @@ namespace calc {
       }
       INVALIDARG_EXP_IFN((loopsOfSliplinks.size() == 0 && loops.size() == 0),
                          "Loops are not yet supported.");
+      if (!igraph_cattribute_GAB(&this->graph, "is_up_to_date")) {
+        this->updateGraph();
+      }
       // validate inputs
-      size_t currentNrOfLinks = this->net.nrOfLinks;
-      size_t currentNrOfPartialSprings = this->net.nrOfPartialSprings;
+      size_t currentNrOfPartialSprings = igraph_ecount(&this->graph);
       if (additionalLen != x.size() || additionalLen != y.size() ||
           additionalLen != z.size()) {
         throw std::invalid_argument("x, y and z must have the same dimensions");
@@ -1209,7 +1211,107 @@ namespace calc {
         assert(degree == 0);
       }
 
-      // TODO: continue
+      igraph_vector_int_t edges_that_have_been_replaced;
+      igraph_vector_int_init(&edges_that_have_been_replaced, 0);
+      igraph_vector_int_reserve(&edges_that_have_been_replaced,
+                                2 * additionalLen);
+      for (size_t i = 0; i < additionalLen; ++i) {
+        igraph_integer_t spring1ToReplace =
+          this->findPartialSpringByFraction(strandIdx1[i], alpha1[i]);
+        igraph_integer_t spring2ToReplace =
+          this->findPartialSpringByFraction(strandIdx2[i], alpha2[i]);
+        igraph_integer_t from1, to1, from2, to2;
+        igraph_edge(&this->graph, spring1ToReplace, &from1, &to1);
+        igraph_edge(&this->graph, spring2ToReplace, &from2, &to2);
+        // add the four new edges
+        igraph_integer_t newEdgeId = igraph_ecount(&this->graph);
+        igraph_add_edge(&this->graph, from1, numVerticesBefore + i);
+        double currentPartition1 = igraph_cattribute_EAN(
+          &this->graph, "partition_fraction", spring1ToReplace);
+        igraph_cattribute_EAN_set(&this->graph,
+                                  "partition_fraction",
+                                  newEdgeId,
+                                  alpha1[i] * currentPartition1);
+        igraph_cattribute_EAN_set(
+          &this->graph,
+          "parent_edge",
+          newEdgeId,
+          igraph_cattribute_EAN(&this->graph, "parent_edge", spring1ToReplace));
+        // for the box offsets, we can simply give them to one of the two new
+        // edges – all the rest should be handled by the optimisation, actually.
+        for (std::string dir : { "x", "y", "z" }) {
+          igraph_cattribute_EAN_set(
+            &this->graph,
+            ("bond_box_" + dir).c_str(),
+            newEdgeId,
+            igraph_cattribute_EAN(
+              &this->graph, ("bond_box_" + dir).c_str(), spring1ToReplace));
+        }
+        newEdgeId += 1;
+        igraph_add_edge(&this->graph, to1, numVerticesBefore + i);
+        igraph_cattribute_EAN_set(&this->graph,
+                                  "partition_fraction",
+                                  newEdgeId,
+                                  (1. - alpha1[i]) * currentPartition1);
+        igraph_cattribute_EAN_set(
+          &this->graph,
+          "parent_edge",
+          newEdgeId,
+          igraph_cattribute_EAN(&this->graph, "parent_edge", spring1ToReplace));
+        // ... and the other gets 0s as bond box offset.
+        for (std::string dir : { "x", "y", "z" }) {
+          igraph_cattribute_EAN_set(
+            &this->graph, ("bond_box_" + dir).c_str(), newEdgeId, 0.0);
+        }
+        // second (third and fourth new) edge
+        double currentPartition2 = igraph_cattribute_EAN(
+          &this->graph, "partition_fraction", spring2ToReplace);
+        newEdgeId += 1;
+        igraph_add_edge(&this->graph, from2, numVerticesBefore + i);
+        igraph_cattribute_EAN_set(&this->graph,
+                                  "partition_fraction",
+                                  newEdgeId,
+                                  alpha2[i] * currentPartition2);
+        igraph_cattribute_EAN_set(
+          &this->graph,
+          "parent_edge",
+          newEdgeId,
+          igraph_cattribute_EAN(&this->graph, "parent_edge", spring2ToReplace));
+        for (std::string dir : { "x", "y", "z" }) {
+          igraph_cattribute_EAN_set(
+            &this->graph,
+            ("bond_box_" + dir).c_str(),
+            newEdgeId,
+            igraph_cattribute_EAN(
+              &this->graph, ("bond_box_" + dir).c_str(), spring2ToReplace));
+        }
+        newEdgeId += 1;
+        igraph_add_edge(&this->graph, to2, numVerticesBefore + i);
+        igraph_cattribute_EAN_set(&this->graph,
+                                  "partition_fraction",
+                                  newEdgeId,
+                                  (1. - alpha2[i]) * currentPartition2);
+        igraph_cattribute_EAN_set(
+          &this->graph,
+          "parent_edge",
+          newEdgeId,
+          igraph_cattribute_EAN(&this->graph, "parent_edge", spring2ToReplace));
+        for (std::string dir : { "x", "y", "z" }) {
+          igraph_cattribute_EAN_set(
+            &this->graph, ("bond_box_" + dir).c_str(), newEdgeId, 0.0);
+        }
+
+        // mark the old ones to be removed
+        igraph_vector_int_push_back(&edges_that_have_been_replaced,
+                                    spring1ToReplace);
+        igraph_vector_int_push_back(&edges_that_have_been_replaced,
+                                    spring2ToReplace);
+      }
+
+      // delete the old edges, which have been "split up"
+      igraph_delete_edges(&this->graph,
+                          igraph_ess_vector(&edges_that_have_been_replaced));
+      this->convertFromGraph();
     }
 
     //----------------------------------------------------------------
@@ -1280,26 +1382,25 @@ namespace calc {
     {
       assert(this->net.isUpToDate);
       Eigen::VectorXi nrOfActivePartialSpringsConnected =
-        Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
+        Eigen::VectorXi::Zero(this->net.nrOfNodes);
       ArrayXb springIsActive =
         this->findActiveSprings(this->currentPartialSpringDistances, tolerance);
       RUNTIME_EXP_IFN(
-        springIsActive.size() == this->initialConfig.nrOfPartialSprings,
+        springIsActive.size() == this->net.nrOfPartialSprings,
         "Expect findActiveSprings to return an "
         "appropriately sized result. Got only " +
           std::to_string(springIsActive.size()) + " entries for " +
-          std::to_string(this->initialConfig.nrOfPartialSprings) +
-          " partial springs.");
-      for (size_t i = 0; i < this->initialConfig.nrOfPartialSprings; ++i) {
+          std::to_string(this->net.nrOfPartialSprings) + " partial springs.");
+      for (size_t i = 0; i < this->net.nrOfPartialSprings; ++i) {
         if (springIsActive[i] == true) /* active spring */
         {
-          int a = this->initialConfig.springPartIndexA[i];
-          int b = this->initialConfig.springPartIndexB[i];
-          if (!this->initialConfig.linkIsSliplink[a]) {
+          int a = this->net.springPartIndexA[i];
+          int b = this->net.springPartIndexB[i];
+          if (!this->net.linkIsSliplink[a]) {
             ++(nrOfActivePartialSpringsConnected[a]);
           }
 
-          if (!this->initialConfig.linkIsSliplink[b]) {
+          if (!this->net.linkIsSliplink[b]) {
             ++(nrOfActivePartialSpringsConnected[b]);
           }
         }
