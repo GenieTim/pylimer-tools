@@ -1,5 +1,5 @@
 {
-  "C_Cpp.errorSquiggles": "enabledIfIncludesResolve",
+  "C_Cpp.errorSquiggles": "enabled",
   "c-cpp-flylint.cppcheck.extraArgs": ["--quiet"],
   "files.associations": {
     "*.rdfa": "html",

@@ -248,7 +248,7 @@ namespace calc {
           if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
               simplificationMode == StructureSimplificationMode::ALL_TIM) {
             // std::cout << "Removing 2-f cross-links" << std::endl;
-            size_t nRemoved = this->removeTwofunctionalCrosslinks();
+            size_t nRemoved = this->removeTwofunctionalLinks();
             this->net.meanSpringContourLength =
               this->net.springsContourLength.size() > 0
                 ? this->net.springsContourLength.mean()
@@ -914,9 +914,9 @@ namespace calc {
       RUNTIME_EXP_IFN(neighbours.size() == 2,
                       "Expect f = 2 to have 2 neighbours");
 
+      size_t newEdgeId = igraph_ecount(&this->graph);
       igraph_add_edge(&this->graph, neighbours[0], neighbours[1]);
       // verify our assumption of the new edge id
-      size_t newEdgeId = igraph_ecount(&this->graph) - 1;
       igraph_integer_t from, to;
       igraph_edge(&this->graph, newEdgeId, &from, &to);
       RUNTIME_EXP_IFN((from == neighbours[0] && to == neighbours[1]),
@@ -998,6 +998,56 @@ namespace calc {
       igraph_delete_vertices(&this->graph, igraph_vss_1(linkIdx));
       this->net.isUpToDate = false;
     }
+
+    /**
+     * @brief Remove a certain, 3-functional link from the structures,
+     * combining the two strands
+     */
+    void MEHPForceBalance2::remove3fLink(const size_t linkIdx)
+    {
+      // before combining the two strands, need to know which ones.
+      // easiest case: the
+      igraph_es_t selector;
+      igraph_es_incident(&selector, linkIdx, IGRAPH_ALL);
+      igraph_eit_t iterator;
+      igraph_eit_create(&this->graph, selector, &iterator);
+      std::vector<size_t> parents;
+      std::vector<igraph_integer_t> edgeIds;
+      RUNTIME_EXP_IFN(IGRAPH_EIT_SIZE(iterator) == 3, "Expect f = 3");
+      parents.reserve(IGRAPH_EIT_SIZE(iterator));
+      edgeIds.reserve(IGRAPH_EIT_SIZE(iterator));
+      while (!IGRAPH_EIT_END(iterator)) {
+        parents.push_back(igraph_cattribute_EAN(
+          &this->graph, "parent_edge", IGRAPH_EIT_GET(iterator)));
+        edgeIds.push_back(IGRAPH_EIT_GET(iterator));
+        IGRAPH_EIT_NEXT(iterator);
+      }
+
+      igraph_es_destroy(&selector);
+      igraph_eit_destroy(&iterator);
+
+      igraph_integer_t edgeToRemove;
+      if (std::all_of(parents.begin(), parents.end(), [&](size_t i) {
+            return i == parents[0];
+          })) {
+        // all equal -> this spring will be removed as a whole
+        // CAUTION: any iteration will be invalidated
+        this->removeParentSpring(parents[0]);
+        return;
+      }
+      // not all equal -> want to re-connect the two that belong to the same
+      // parent after removing the link
+      if (parents[0] == parents[1]) {
+        edgeToRemove = edgeIds[2];
+      } else if (parents[0] == parents[2]) {
+        edgeToRemove = edgeIds[1];
+      } else {
+        assert(parents[1] == parents[2]);
+        edgeToRemove = edgeIds[0];
+      }
+      igraph_delete_edges(&this->graph, igraph_ess_1(edgeToRemove));
+      this->remove2fLink(linkIdx);
+    };
 
     /**
      * @brief marks a certain "parent" spring as non-existing
@@ -1116,9 +1166,7 @@ namespace calc {
       Eigen::VectorXd& springPartitions,
       double tolerance)
     {
-      size_t numRemovedTotal = this->removeSubfunctionalVertices(2);
-      // then, replace f = 2
-      this->removeTwofunctionalCrosslinks();
+      size_t numRemovedTotal = this->removeSubfunctionalVertices();
       // and remove all springs that are inactive
       size_t numSpringsRemoved = this->removeInactiveParentEdges(tolerance);
 
