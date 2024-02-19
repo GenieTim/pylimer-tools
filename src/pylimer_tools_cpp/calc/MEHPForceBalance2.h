@@ -160,7 +160,7 @@ namespace calc {
       };
 
       static MEHPForceBalance2 constructWithoutSlipLinks(
-        const pylimer_tools::entities::Universe &universe,
+        const pylimer_tools::entities::Universe& universe,
         int crosslinkerType = 2,
         bool is2D = false,
         double kappa = 1.0)
@@ -169,8 +169,31 @@ namespace calc {
           universe, 0, 1.0, 0, 1, 0, crosslinkerType, is2D, kappa);
       }
 
+      static MEHPForceBalance2 constructWithSlipLinks(
+        const pylimer_tools::entities::Universe& universe,
+        const std::vector<size_t>& strandIdx1,
+        const std::vector<size_t>& strandIdx2,
+        const std::vector<double>& x,
+        const std::vector<double>& y,
+        const std::vector<double>& z,
+        const std::vector<double>& alpha1,
+        const std::vector<double>& alpha2,
+        int crosslinkerType = 2,
+        bool is2D = false,
+        double kappa = 1.0,
+        bool clampAlpha = false)
+      {
+        MEHPForceBalance2 fb =
+          MEHPForceBalance2(universe, crosslinkerType, is2D, kappa);
+        fb.addSlipLinks(
+          strandIdx1, strandIdx2, x, y, z, alpha1, alpha2, clampAlpha);
+        // convert the graph to the network usable for simulations
+        fb.finaliseInitialisation();
+        return fb;
+      }
+
       static MEHPForceBalance2 constructWithRandomSlipLinks(
-        const pylimer_tools::entities::Universe &universe,
+        const pylimer_tools::entities::Universe& universe,
         const size_t nrOfSliplinksToSample,
         const double cutoff,
         const size_t minimumNrOfSliplinks,
@@ -377,6 +400,7 @@ namespace calc {
         }
 
         // cleanup the graph
+        fb.removeSubfunctionalVertices();
 
         // convert the graph to the network usable for simulations
         fb.finaliseInitialisation();
@@ -757,12 +781,13 @@ namespace calc {
                                       double tolerance);
 
       /**
-       * @brief Remove all vertices with a functionality < the specified value
+       * @brief Remove all vertices (incl. edges!) with a functionality < 3 for
+       * cross-links, < 4 for slip-links
        *
-       * @param maxFunctionalityToBeKept
+       * @param minCrosslinkFunctionalityToBeKept
        * @return size_t the number of removed vertices
        */
-      size_t removeSubfunctionalVertices(int maxFunctionalityToBeKept = 2)
+      size_t removeSubfunctionalVertices()
       {
         size_t numRemovedTotal = 0;
         size_t numRemovedInIteration = 0;
@@ -771,6 +796,10 @@ namespace calc {
 
           igraph_vector_int_t degrees;
           igraph_vector_int_init(&degrees, igraph_vcount(&this->graph));
+          igraph_vector_t types;
+          igraph_vector_init(&types, igraph_vcount(&this->graph));
+          igraph_cattribute_VANV(
+            &this->graph, "type", igraph_vss_all(), &types);
           // we count self-loops here
           // only afterwards, we check, whether they actually have relevant bond
           // box offsets
@@ -780,7 +809,7 @@ namespace calc {
           igraph_vector_int_t indicesToRemove;
           igraph_vector_int_init(&indicesToRemove, 0);
           for (size_t i = 0; i < igraph_vcount(&this->graph); ++i) {
-            if (igraph_vector_int_get(&degrees, i) < maxFunctionalityToBeKept) {
+            if (igraph_vector_int_get(&degrees, i) < 2) {
               igraph_vector_int_push_back(&indicesToRemove, i);
             }
           }
@@ -791,7 +820,34 @@ namespace calc {
           numRemovedInIteration = igraph_vector_int_size(&indicesToRemove);
 
           igraph_vector_int_destroy(&indicesToRemove);
+
+          // the function may lead to slip-links being inconsistenly
+          // linked (e.g., at the end of a chain)
+          // -> here, we remove those dangling ones.
+          // f = 1 and below have been removed
+          // -> cleanup remaining f = 2 and f = 3
+          if (numRemovedInIteration > 0) {
+            // reload degree and type, since the vertex index changed
+            igraph_degree(
+              &this->graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true);
+            igraph_cattribute_VANV(
+              &this->graph, "type", igraph_vss_all(), &types);
+          }
+          for (long int i = igraph_vcount(&this->graph); i >= 0; --i) {
+            if (castToIgraphInt(igraph_vector_int_get(&degrees, i)) == 2) {
+              this->remove2fLink(i);
+              numRemovedInIteration += 1;
+            } else if (castToIgraphInt(igraph_vector_int_get(&degrees, i)) ==
+                         3 &&
+                       castToIgraphInt(igraph_vector_get(&types, i)) ==
+                         this->splipLinkType) {
+              this->remove3fLink(i);
+              numRemovedInIteration += 1;
+            }
+          }
+
           igraph_vector_int_destroy(&degrees);
+          igraph_vector_destroy(&types);
           numRemovedTotal += numRemovedInIteration;
         } while (numRemovedInIteration > 0);
 
@@ -872,6 +928,10 @@ namespace calc {
        * @brief Remove a spring (and all its parts, incl. slip-links) from the
        * structures
        *
+       * NOTE: this may result in slip-links with f = 2.
+       * They are not automatically removed in order to preserve vertex
+       * iterations.
+       *
        * @param net
        * @param springPartitions
        */
@@ -900,6 +960,9 @@ namespace calc {
         igraph_vector_destroy(&parentEdges);
         // actually remove all edges
         this->removePartialSprings(edgeIdsToRemove);
+        // as the above may lead to slip-links with f = 2,
+        // we want to remove those as well
+        // this->removeTwofunctionalLinks();
       };
 
       /**
@@ -989,6 +1052,12 @@ namespace calc {
       void remove2fLink(const size_t linkIdx);
 
       /**
+       * @brief Remove a certain, 3-functional link from the structures,
+       * combining the two strands
+       */
+      void remove3fLink(const size_t linkIdx);
+
+      /**
        * @brief Remove a certain link from the structures, removing all
        * connections
        */
@@ -1047,7 +1116,7 @@ namespace calc {
        * @param displacements
        * @param springPartitions
        */
-      size_t removeTwofunctionalCrosslinks()
+      size_t removeTwofunctionalLinks()
       {
         assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
 
@@ -1131,7 +1200,10 @@ namespace calc {
 
       size_t getNumAtoms() override { return this->getNrOfNodes(); }
 
-      size_t getNumExtraAtoms() override { return this->getNrOfLinks(); }
+      size_t getNumExtraAtoms() override
+      {
+        return this->getNrOfLinks() - this->getNrOfNodes();
+      }
 
       int getNrOfSprings() const { return this->net.nrOfSprings; }
 
@@ -1414,56 +1486,6 @@ namespace calc {
       int getNrOfIterations() const { return this->nrOfStepsDone; }
 
       ExitReason getExitReason() const { return this->exitReason; }
-
-      void addSlipLinks(const std::vector<size_t>& strandIdx1,
-                        const std::vector<size_t>& strandIdx2,
-                        const std::vector<double>& x,
-                        const std::vector<double>& y,
-                        const std::vector<double>& z)
-      {
-        std::vector<double> alphas;
-        alphas.reserve(x.size());
-        for (size_t i = 0; i < x.size(); ++i) {
-          alphas.push_back(0.5);
-        }
-        return this->addSlipLinks(
-          strandIdx1, strandIdx2, x, y, z, alphas, alphas);
-      }
-
-      void addSlipLinks(const std::vector<size_t>& strandIdx1,
-                        const std::vector<size_t>& strandIdx2,
-                        const std::vector<double>& x,
-                        const std::vector<double>& y,
-                        const std::vector<double>& z,
-                        const std::vector<double>& alpha1,
-                        const std::vector<double>& alpha2,
-                        bool clampAlpha = false)
-      {
-        std::vector<std::vector<size_t>> loops;
-        std::vector<std::vector<size_t>> loopsOfSliplinks;
-        return this->addSlipLinks(strandIdx1,
-                                  strandIdx2,
-                                  x,
-                                  y,
-                                  z,
-                                  alpha1,
-                                  alpha2,
-                                  loops,
-                                  loopsOfSliplinks,
-                                  clampAlpha);
-      }
-
-      void addSlipLinks(const std::vector<size_t>& strandIdx1,
-                        const std::vector<size_t>& strandIdx2,
-                        const std::vector<double>& x,
-                        const std::vector<double>& y,
-                        const std::vector<double>& z,
-                        const std::vector<double>& alpha1,
-                        const std::vector<double>& alpha2,
-                        std::vector<std::vector<size_t>> loops,
-                        std::vector<std::vector<size_t>> loopsOfSliplinks,
-                        bool clampAlpha = false);
-
       /**
        * @brief Compute the spring lenghts
        *
@@ -2216,6 +2238,55 @@ namespace calc {
       size_t getNumParticles() override { return this->net.nrOfNodes; }
 
     protected:
+      void addSlipLinks(const std::vector<size_t>& strandIdx1,
+                        const std::vector<size_t>& strandIdx2,
+                        const std::vector<double>& x,
+                        const std::vector<double>& y,
+                        const std::vector<double>& z)
+      {
+        std::vector<double> alphas;
+        alphas.reserve(x.size());
+        for (size_t i = 0; i < x.size(); ++i) {
+          alphas.push_back(0.5);
+        }
+        return this->addSlipLinks(
+          strandIdx1, strandIdx2, x, y, z, alphas, alphas);
+      }
+
+      void addSlipLinks(const std::vector<size_t>& strandIdx1,
+                        const std::vector<size_t>& strandIdx2,
+                        const std::vector<double>& x,
+                        const std::vector<double>& y,
+                        const std::vector<double>& z,
+                        const std::vector<double>& alpha1,
+                        const std::vector<double>& alpha2,
+                        bool clampAlpha = false)
+      {
+        std::vector<std::vector<size_t>> loops;
+        std::vector<std::vector<size_t>> loopsOfSliplinks;
+        return this->addSlipLinks(strandIdx1,
+                                  strandIdx2,
+                                  x,
+                                  y,
+                                  z,
+                                  alpha1,
+                                  alpha2,
+                                  loops,
+                                  loopsOfSliplinks,
+                                  clampAlpha);
+      }
+
+      void addSlipLinks(const std::vector<size_t>& strandIdx1,
+                        const std::vector<size_t>& strandIdx2,
+                        const std::vector<double>& x,
+                        const std::vector<double>& y,
+                        const std::vector<double>& z,
+                        const std::vector<double>& alpha1,
+                        const std::vector<double>& alpha2,
+                        std::vector<std::vector<size_t>> loops,
+                        std::vector<std::vector<size_t>> loopsOfSliplinks,
+                        bool clampAlpha = false);
+
       /**
        * @brief Compute a few properties of the simulator
        *
