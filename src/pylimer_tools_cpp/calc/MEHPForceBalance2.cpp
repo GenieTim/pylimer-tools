@@ -711,9 +711,9 @@ namespace calc {
      * @brief Given a vertex id and a rail edge, returns the other two edges
      * that are not part of the rail
      */
-    std::vector<size_t> MEHPForceBalance2::getOffRailConnectedEdgeIds(
-      size_t vertexId,
-      size_t railEdge)
+    std::vector<igraph_integer_t> MEHPForceBalance2::getOffRailConnectedEdgeIds(
+      igraph_integer_t vertexId,
+      igraph_integer_t railEdge)
     {
       INVALIDARG_EXP_IFN(igraph_cattribute_VAN(&this->graph,
                                                "type",
@@ -721,12 +721,12 @@ namespace calc {
                          "Can only search for rail around slip-links");
 
       // fetch the edges involved
-      size_t otherRailEdge = this->getOtherRailEdgeId(vertexId, railEdge);
+      igraph_integer_t otherRailEdge = this->getOtherRailEdgeId(vertexId, railEdge);
       igraph_es_t selector;
       igraph_es_incident(&selector, vertexId, IGRAPH_ALL);
       igraph_eit_t iterator;
       igraph_eit_create(&this->graph, selector, &iterator);
-      std::vector<size_t> results;
+      std::vector<igraph_integer_t> results;
       results.reserve(IGRAPH_EIT_SIZE(iterator) - 2);
       while (!IGRAPH_EIT_END(iterator)) {
         if ((IGRAPH_EIT_GET(iterator) != railEdge) &&
@@ -748,8 +748,8 @@ namespace calc {
      * opposite direction
      *
      */
-    size_t MEHPForceBalance2::getOtherRailEdgeId(size_t vertexId,
-                                                 size_t railEdge)
+    igraph_integer_t MEHPForceBalance2::getOtherRailEdgeId(igraph_integer_t vertexId,
+                                                 igraph_integer_t railEdge)
     {
       INVALIDARG_EXP_IFN(igraph_cattribute_VAN(&this->graph,
                                                "type",
