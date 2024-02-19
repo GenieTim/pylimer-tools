@@ -403,6 +403,37 @@ namespace entities {
       "apparently, did not find both vertices to compute overall bond sum for");
   };
 
+  size_t Molecule::getNrOfBondsFromTo(
+
+    size_t atomIdFrom,
+    size_t atomIdTo,
+    const int crosslinkerType) const
+  {
+    std::vector<long int> alignedVertices =
+      this->getVerticesLinedUp(crosslinkerType);
+    size_t vertexIdFrom = this->atomIdToVertexIdx.at(atomIdFrom);
+    size_t vertexIdTo = this->atomIdToVertexIdx.at(atomIdTo);
+    bool recording = false;
+    size_t result = 0;
+    for (size_t i = 1; i < alignedVertices.size(); ++i) {
+      if (recording) {
+        result += 1;
+
+        if (alignedVertices[i] == vertexIdFrom ||
+            alignedVertices[i] == vertexIdTo) {
+          return result;
+        }
+      }
+
+      if (alignedVertices[i] == vertexIdFrom ||
+          alignedVertices[i] == vertexIdTo) {
+        recording = true;
+      }
+    }
+    throw std::runtime_error(
+      "apparently, did not find both vertices to count atoms between");
+  }
+
   /**
    * @brief Get the ids of the vertices in order of the chain, starting from one
    * end to the other

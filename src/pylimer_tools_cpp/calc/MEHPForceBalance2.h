@@ -608,6 +608,13 @@ namespace calc {
                                     chain.getLength());
         igraph_cattribute_EAN_set(
           &this->graph, "parent_edge", edgeId, chainIdx);
+        igraph_cattribute_EAN_set(
+          &this->graph,
+          "contour_length",
+          edgeId,
+          chain.getNrOfBondsFromTo(linedUpAtoms[atom1Idx].getId(),
+                                   linedUpAtoms[atom2Idx].getId(),
+                                   crosslinkerType));
         // use the actual position of the vertices!
         Eigen::Vector3d expectedDistance =
           chain.getOverallBondSumFromTo(linedUpAtoms[atom1Idx].getId(),
@@ -1135,20 +1142,6 @@ namespace calc {
       };
 
       /**
-       * @brief Add slip-links to this system
-       *
-       * @param sliplinkDensity
-       * @param cutoff
-       * @return size_t the nr of actually added slip-links
-       */
-      size_t randomlyAddSliplinks(const size_t nrOfSliplinksToSample,
-                                  const double cutoff = 2.0,
-                                  const size_t minimumNrOfSliplinks = 0,
-                                  const double sameStrandCutoff = 2.0,
-                                  const bool excludeCrosslinks = false,
-                                  const int seed = -1);
-
-      /**
        * @brief Add slip-links to this system based on entangled loops
        *
        * @return size_t the nr of actually added slip-links
@@ -1212,7 +1205,24 @@ namespace calc {
         INVALIDARG_EXP_IFN(springsContourLengths.size() ==
                              this->net.springsContourLength.size(),
                            "Contour length must have the correct dimensions.");
+        assert(this->net.isUpToDate);
+        assert(igraph_cattribute_GAB(&this->graph, "up_to_date"));
         this->net.springsContourLength = springsContourLengths;
+        igraph_vector_t partialContour;
+        igraph_vector_init(&partialContour, this->net.nrOfPartialSprings);
+        for (size_t i = 0; i < this->net.nrOfSprings; ++i) {
+          for (size_t partialSpring : this->net.localToGlobalSpringIndex[i]) {
+            igraph_vector_set(
+              &partialContour,
+              partialSpring,
+              springsContourLengths[i] /
+                static_cast<double>(
+                  this->net.localToGlobalSpringIndex[i].size()));
+          }
+        }
+        igraph_cattribute_EAN_setv(
+          &this->graph, "contour_length", &partialContour);
+        igraph_vector_destroy(&partialContour);
       }
 
       std::vector<Eigen::ArrayXi> getIndependentCoordinateSets(
@@ -2334,11 +2344,16 @@ namespace calc {
                                &parentEdges);
 
         std::unordered_set<igraph_integer_t> parentEdgeIds;
+        igraph_integer_t maxParentEdgeId = 0;
         for (size_t i = 0; i < igraph_vector_size(&edgeTypes); ++i) {
           parentEdgeIds.insert(
             castToIgraphInt(igraph_vector_get(&parentEdges, i)));
+          maxParentEdgeId =
+            std::max(castToIgraphInt(igraph_vector_get(&parentEdges, i)),
+                maxParentEdgeId);
         }
         this->net.nrOfSprings = parentEdgeIds.size();
+        assert(maxParentEdgeId == parentEdgeIds.size() - 1);
         size_t numPartialSprings =
           this->net.nrOfPartialSprings - this->net.nrOfSprings;
 
@@ -2384,6 +2399,12 @@ namespace calc {
                                "partition_fraction",
                                igraph_ess_all(IGRAPH_EDGEORDER_ID),
                                &partitionFraction);
+        igraph_vector_t contourLength;
+        igraph_vector_init(&contourLength, this->net.nrOfPartialSprings);
+        igraph_cattribute_EANV(&this->graph,
+                               "contour_length",
+                               igraph_ess_all(IGRAPH_EDGEORDER_ID),
+                               &contourLength);
         igraph_vector_t bondBoxOffsetX;
         igraph_vector_init(&bondBoxOffsetX, this->net.nrOfPartialSprings);
         igraph_cattribute_EANV(&this->graph,
@@ -2403,9 +2424,12 @@ namespace calc {
                                igraph_ess_all(IGRAPH_EDGEORDER_ID),
                                &bondBoxOffsetZ);
 
+        this->net.springsContourLength.setZero();
         for (size_t i = 0; i < this->net.nrOfPartialSprings; ++i) {
           this->net.partialToFullSpringIndex(i) =
             castToIgraphInt(igraph_vector_get(&parentEdges, i));
+          this->net.springsContourLength(this->net.partialToFullSpringIndex(
+            i)) += igraph_vector_get(&contourLength, i);
           this->net
             .localToGlobalSpringIndex[castToIgraphInt(
               igraph_vector_get(&parentEdges, i))]
@@ -2469,6 +2493,7 @@ namespace calc {
         igraph_vector_destroy(&edgeTypes);
         igraph_vector_int_destroy(&allEdges);
         igraph_vector_destroy(&parentEdges);
+        igraph_vector_destroy(&contourLength);
         igraph_vector_destroy(&bondBoxOffsetX);
         igraph_vector_destroy(&bondBoxOffsetY);
         igraph_vector_destroy(&bondBoxOffsetZ);

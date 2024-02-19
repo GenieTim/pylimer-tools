@@ -31,7 +31,7 @@ namespace entities {
     Molecule(const Box* parent,
              const igraph_t* graph,
              const MoleculeType type,
-             const std::map<int, double> &massPerType);
+             const std::map<int, double>& massPerType);
 
     // rule of three:
     // 1. destructor (to destroy the graph)
@@ -45,7 +45,8 @@ namespace entities {
     MoleculeType getType();
     std::vector<Atom> getAtoms();
     // std::map<std::string, std::vector<long int>> getBonds() const;
-    std::vector<Atom> getAtomsLinedUp(int crossLinkerType = 2, bool assumedCoordinates = false) const;
+    std::vector<Atom> getAtomsLinedUp(int crossLinkerType = 2,
+                                      bool assumedCoordinates = false) const;
     std::vector<long int> getVerticesLinedUp(int crossLinkerType = 2) const;
     int getNrOfAtoms() const;
     const Box* getBox() const;
@@ -68,7 +69,13 @@ namespace entities {
       return AtomGraphParent::computeBondLengths(this->parent);
     };
     Eigen::Vector3d getOverallBondSum(const int crosslinkerType = 2) const;
-    Eigen::Vector3d getOverallBondSumFromTo(size_t atomIdFrom, size_t atomIdTo, const int crosslinkerType = 2) const;
+    Eigen::Vector3d getOverallBondSumFromTo(
+      size_t atomIdFrom,
+      size_t atomIdTo,
+      const int crosslinkerType = 2) const;
+    size_t getNrOfBondsFromTo(size_t atomIdFrom,
+                              size_t atomIdTo,
+                              const int crosslinkerType = 2) const;
 
     // operators
     Atom operator[](size_t index) const
