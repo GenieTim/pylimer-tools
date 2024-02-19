@@ -581,6 +581,29 @@ namespace calc {
       }
 
       /**
+       * @brief Copy all relevant properties from one edge to another
+       *
+       * @param from source edge id
+       * @param to target edge id
+       */
+      void copyBondProperties(const igraph_integer_t from,
+                              const igraph_integer_t to)
+      {
+        for (std::string property : { "bond_box_x",
+                                      "bond_box_y",
+                                      "bond_box_z",
+                                      "parent_edge",
+                                      "partition_fraction",
+                                      "contour_length" }) {
+          igraph_cattribute_EAN_set(
+            &this->graph,
+            property.c_str(),
+            to,
+            igraph_cattribute_EAN(&this->graph, property.c_str(), from));
+        }
+      }
+
+      /**
        * @brief Use an existing chain to set the relevant edge properties
        *
        * @param chain
@@ -636,6 +659,37 @@ namespace calc {
         assert(this->universe.getBox().isValidOffset(actualDistance -
                                                      expectedDistance));
         assert(this->computeEdgeLength(edgeId).isApprox(expectedDistance));
+      }
+
+      /**
+       * @brief Returns the box offset for a given edge
+       *
+       * CAUTION: make sure the graph is up to date!
+       *
+       * @param edgeId
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d getBondBoxOffsetForEdgeFrom(igraph_integer_t edgeId,
+                                                  igraph_integer_t vertexIdx)
+      {
+        Eigen::Vector3d boxOffset = this->getBondBoxOffsetForEdge(edgeId);
+
+        igraph_integer_t from, to;
+        igraph_edge(&this->graph, edgeId, &from, &to);
+        assert(from == vertexIdx || to == vertexIdx);
+
+        if (from == vertexIdx) {
+          return bondBoxOffset;
+        } else {
+          return -1. * bondBoxOffset;
+        }
+      }
+
+      
+      Eigen::Vector3d getBondBoxOffsetForEdgeTo(igraph_integer_t edgeId,
+                                                  igraph_integer_t vertexIdx)
+      {
+        return -1. * this->getBondBoxOffsetForEdgeFrom(edgeId, vertexIdx);
       }
 
       /**
@@ -983,12 +1037,11 @@ namespace calc {
         igraph_vector_int_init(&edgeIdsToRemoveVec, edgeIdsToRemove.size());
         pylimer_tools::utils::StdVectorToIgraphVectorT(edgeIdsToRemove,
                                                        &edgeIdsToRemoveVec);
-        igraph_es_t iterator;
         igraph_delete_edges(&this->graph,
                             igraph_ess_vector(&edgeIdsToRemoveVec));
         igraph_vector_int_destroy(&edgeIdsToRemoveVec);
         // remove vertices that "got lost"
-        this->removeOrphanedVertices();
+        // this->removeOrphanedVertices();
 
         this->net.isUpToDate = false;
       }
@@ -1070,19 +1123,30 @@ namespace calc {
        */
       void removeLink(const size_t linkIdx);
 
+      igraph_integer_t getOtherEdgePartner(
+        igraph_integer_t edgeId,
+        igraph_integer_t wrongPartnerVertexIdx)
+      {
+        igraph_integer_t from, to;
+        igraph_edge(&this->graph, edgeId, &from, &to);
+        return (from == wrongPartnerVertexIdx) ? to : from;
+      }
+
       /**
        * @brief Given a vertex id and a rail edge, returns the other two edges
        * that are not part of the rail
        */
-      std::vector<size_t> getOffRailConnectedEdgeIds(size_t vertexId,
-                                                     size_t railEdge);
+      std::vector<igraph_integer_t> getOffRailConnectedEdgeIds(
+        igraph_integer_t vertexId,
+        size_t railEdge);
 
       /**
        * @brief Given a vertex and a connected edge, returns the edge in the
        * opposite direction
        *
        */
-      size_t getOtherRailEdgeId(size_t vertexId, size_t railEdge);
+      igraph_integer_t getOtherRailEdgeId(igraph_integer_t vertexId,
+                                          size_t railEdge);
 
       void relaxationLight(ForceBalanceNetwork& net,
                            Eigen::VectorXd& springPartitions,
@@ -2017,27 +2081,32 @@ namespace calc {
        */
       void swapSlipLinks(ForceBalanceNetwork& net,
                          Eigen::VectorXd& springPartitions,
-                         double swappableCutoff);
+                         double swappableCutoff){
+
+      };
 
       /**
-       *
+       * @brief Swap the two links on one partial spring
        */
-      void swapSlipLinks(ForceBalanceNetwork& net,
-                         const size_t partialSpringIdx)
+      void swapSlipLinks(const size_t partialSpringIdx)
       {
-        const size_t linkIdx1 = net.springPartIndexA[partialSpringIdx];
-        const size_t linkIdx2 = net.springPartIndexB[partialSpringIdx];
+        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
+        igraph_integer_t linkIdx1, linkIdx2;
+        igraph_edge(&this->graph, partialSpringIdx, &linkIdx1, &linkIdx2);
         INVALIDARG_EXP_IFN(linkIdx1 != linkIdx2,
                            "Cannot swap link with itself.");
 
         INVALIDARG_EXP_IFN(
-          net.linkIsSliplink[linkIdx1],
+          castToIgraphInt(igraph_cattribute_VAN(
+            &this->graph, "type", linkIdx1)) == this->slipLinkType,
           "Only partial springs with only slip-links allow swapping.");
         INVALIDARG_EXP_IFN(
-          net.linkIsSliplink[linkIdx2],
+          castToIgraphInt(igraph_cattribute_VAN(
+            &this->graph, "type", linkIdx2)) == this->slipLinkType,
           "Only partial springs with only slip-links allow swapping.");
 
-        const size_t springIdx = net.partialToFullSpringIndex[partialSpringIdx];
+        const size_t springIdx = castToIgraphInt(
+          igraph_cattribute_EAN(&this->graph, partialSpringIdx, "parent_edge"));
 
         igraph_vector_int_t edgesOfLink1;
         igraph_vector_int_init(&edgesOfLink1, 4);
@@ -2047,8 +2116,31 @@ namespace calc {
         igraph_vector_int_init(&edgesOfLink2, 4);
         igraph_incident(&this->graph, &edgesOfLink2, linkIdx2, IGRAPH_ALL);
 
-        // TODO: figure out which edge to actually cut.
-        // difficult when same "parent" bond
+        // figure out which edge to actually cut.
+        igraph_integer_t otherEdge1 =
+          this->getOtherRailEdgeId(linkIdx1, partialSpringIdx);
+        igraph_integer_t otherEdge2 =
+          this->getOtherRailEdgeId(linkIdx2, partialSpringIdx);
+        igraph_integer_t newEdge1 = igraph_ecount(&this->graph);
+        igraph_create_edge(linkIdx1,
+                           this->getOtherEdgePartner(otherEdge2, linkIdx2));
+        this->copyBondProperties(otherEdge1, newEdge1);
+        igraph_integer_t newEdge2 = igraph_ecount(&this->graph);
+        igraph_create_edge(linkIdx2,
+                           this->getOtherEdgePartner(otherEdge1, linkIdx1));
+        this->copyBondProperties(otherEdge2, newEdge2);
+        // re-set box offset based on sum of the participating vectors
+        this->setBondBoxOffsetForEdge(
+          newEdge1,
+          this->getBondBoxOffsetForEdgeTo(otherEdge1, linkIdx1) +
+            this->getBondBoxOffsetForEdgeFrom(partialSpringIdx, linkIdx1));
+        this->setBondBoxOffsetForEdge(
+          newEdge2,
+          this->getBondBoxOffsetForEdgeTo(otherEdge2, linkIdx2) +
+            this->getBondBoxOffsetForEdgeFrom(partialSpringIdx, linkIdx2));
+
+        // actually cut
+        this->removePartialSprings({ otherEdge1, otherEdge2 });
 
         igraph_vector_int_destroy(&edgesOfLink1);
         igraph_vector_int_destroy(&edgesOfLink2);
@@ -2350,7 +2442,7 @@ namespace calc {
             castToIgraphInt(igraph_vector_get(&parentEdges, i)));
           maxParentEdgeId =
             std::max(castToIgraphInt(igraph_vector_get(&parentEdges, i)),
-                maxParentEdgeId);
+                     maxParentEdgeId);
         }
         this->net.nrOfSprings = parentEdgeIds.size();
         assert(maxParentEdgeId == parentEdgeIds.size() - 1);
