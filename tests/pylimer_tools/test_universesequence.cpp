@@ -110,8 +110,8 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
       suspectedPath + "lammps_data_file_small.out",
       suspectedPath + "lammps_dump_small_3step.lammpstrj");
     REQUIRE(universeSeq.getLength() == 3);
-    std::vector<long int> atomIdsFrom = { 10000 };
-    std::vector<long int> atomIdsTo = { 10000 };
+    std::vector<long int> atomIdsFrom = { 10000, 20000, 30000 };
+    std::vector<long int> atomIdsTo = { 10000, 20000, 30000 };
     std::unordered_map<long int, double> ree =
       universeSeq.computeDistanceAutocorrelationFromToAtoms(
         atomIdsFrom, atomIdsTo, 1, true);
@@ -132,6 +132,40 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
       CHECK(ree[dt + 1] == Catch::Approx((coords2 - coords1).squaredNorm()));
     }
     // std::cout << "R_ee computation works." << std::endl;
+    atomIdsFrom = { 70000, 80000, 74363, 70000 };
+    atomIdsTo = { 80000, 74363, 70000, 90000 };
+    for (size_t universe_i = 0; universe_i < universeSeq.getLength();
+         universe_i++) {
+      // make sure the atoms chosen above have the same coordinates in all
+      // universes
+      for (size_t atomI = 0; atomI < atomIdsFrom.size(); atomI++) {
+        Eigen::Vector3d coordsFrom = universeSeq.atIndex(universe_i)
+                                       .getAtom(atomIdsFrom[atomI])
+                                       .getUnwrappedCoordinates(&box);
+        Eigen::Vector3d coordsTo = universeSeq.atIndex(universe_i)
+                                     .getAtom(atomIdsTo[atomI])
+                                     .getUnwrappedCoordinates(&box);
+        CHECK(coordsFrom.isApprox(
+          universe.getAtom(atomIdsFrom[atomI]).getUnwrappedCoordinates(&box)));
+        CHECK(coordsTo.isApprox(
+          universe.getAtom(atomIdsTo[atomI]).getUnwrappedCoordinates(&box)));
+      }
+    }
+    ree = universeSeq.computeDistanceAutocorrelationFromToAtoms(
+      atomIdsFrom, atomIdsTo, 1, true);
+    for (size_t dt = 0; dt < 2; ++dt) {
+      double distMean = 0.0;
+      for (size_t i = 0; i < atomIdsTo.size(); ++i) {
+        coords1 =
+          universe.getAtom(atomIdsFrom[i]).getUnwrappedCoordinates(&box);
+        coords2 = universe.getAtom(atomIdsTo[i]).getUnwrappedCoordinates(&box);
+        distMean += (coords2 - coords1).squaredNorm() /
+                    static_cast<double>(atomIdsTo.size());
+      }
+      CHECK(distMean == Catch::Approx(ree[dt + 1]));
+    }
+
+    std::cout << "R_ee computation works." << std::endl;
   }
 
   SECTION("Reading large files is sensibly fast")
