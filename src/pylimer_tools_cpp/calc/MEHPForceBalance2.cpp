@@ -717,7 +717,7 @@ namespace calc {
     {
       INVALIDARG_EXP_IFN(igraph_cattribute_VAN(&this->graph,
                                                "type",
-                                               vertexId) != this->splipLinkType,
+                                               vertexId) != this->slipLinkType,
                          "Can only search for rail around slip-links");
 
       // fetch the edges involved
@@ -753,7 +753,7 @@ namespace calc {
     {
       INVALIDARG_EXP_IFN(igraph_cattribute_VAN(&this->graph,
                                                "type",
-                                               vertexId) != this->splipLinkType,
+                                               vertexId) != this->slipLinkType,
                          "Can only search for rail around slip-links");
       // fetch the edges involved
       igraph_es_t selector;
@@ -1251,7 +1251,7 @@ namespace calc {
         igraph_cattribute_VAN_set(
           &this->graph, "z", numVerticesBefore + i, z[i]);
         igraph_cattribute_VAN_set(
-          &this->graph, "type", numVerticesBefore + i, this->splipLinkType);
+          &this->graph, "type", numVerticesBefore + i, this->slipLinkType);
         // check that our assumption regarding the vertex id is correct
         igraph_integer_t degree;
         igraph_degree_1(
