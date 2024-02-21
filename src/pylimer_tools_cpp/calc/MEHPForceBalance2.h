@@ -68,7 +68,7 @@ namespace calc {
       bool outputEndNodes = false;
       std::string endNodesFile;
       int crosslinkerType = 2;
-      int splipLinkType = 3;
+      int slipLinkType = 3;
       int partialBondType = 2;
       int normalBondType = 1;
       bool assumeBoxLargeEnough = false;
@@ -117,7 +117,7 @@ namespace calc {
         this->defaultNrOfChains = src.defaultNrOfChains;
         this->outputEndNodes = src.outputEndNodes;
         this->endNodesFile = src.endNodesFile;
-        this->splipLinkType = src.splipLinkType;
+        this->slipLinkType = src.slipLinkType;
         this->partialBondType = src.partialBondType;
         this->normalBondType = src.normalBondType;
         this->assumeBoxLargeEnough = src.assumeBoxLargeEnough;
@@ -143,7 +143,7 @@ namespace calc {
         std::swap(this->outputEndNodes, src.outputEndNodes);
         std::swap(this->endNodesFile, src.endNodesFile);
         std::swap(this->crosslinkerType, src.crosslinkerType);
-        std::swap(this->splipLinkType, src.splipLinkType);
+        std::swap(this->slipLinkType, src.slipLinkType);
         std::swap(this->partialBondType, src.partialBondType);
         std::swap(this->normalBondType, src.normalBondType);
         std::swap(this->assumeBoxLargeEnough, src.assumeBoxLargeEnough);
@@ -551,7 +551,7 @@ namespace calc {
           std::swap(atom1, atom2);
         }
         igraph_cattribute_VAN_set(
-          &this->graph, "type", vertexId, this->splipLinkType);
+          &this->graph, "type", vertexId, this->slipLinkType);
         igraph_cattribute_VAN_set(
           &this->graph, "atom_1_id", vertexId, atom1.getId());
         igraph_cattribute_VAN_set(
@@ -901,7 +901,7 @@ namespace calc {
             } else if (castToIgraphInt(igraph_vector_int_get(&degrees, i)) ==
                          3 &&
                        castToIgraphInt(igraph_vector_get(&types, i)) ==
-                         this->splipLinkType) {
+                         this->slipLinkType) {
               this->remove3fLink(i);
               numRemovedInIteration += 1;
             }
@@ -2106,7 +2106,7 @@ namespace calc {
           "Only partial springs with only slip-links allow swapping.");
 
         const size_t springIdx = castToIgraphInt(
-          igraph_cattribute_EAN(&this->graph, partialSpringIdx, "parent_edge"));
+          igraph_cattribute_EAN(&this->graph, "parent_edge", partialSpringIdx));
 
         igraph_vector_int_t edgesOfLink1;
         igraph_vector_int_init(&edgesOfLink1, 4);
@@ -2122,11 +2122,11 @@ namespace calc {
         igraph_integer_t otherEdge2 =
           this->getOtherRailEdgeId(linkIdx2, partialSpringIdx);
         igraph_integer_t newEdge1 = igraph_ecount(&this->graph);
-        igraph_create_edge(linkIdx1,
+        igraph_add_edge(linkIdx1,
                            this->getOtherEdgePartner(otherEdge2, linkIdx2));
         this->copyBondProperties(otherEdge1, newEdge1);
         igraph_integer_t newEdge2 = igraph_ecount(&this->graph);
-        igraph_create_edge(linkIdx2,
+        igraph_add_edge(linkIdx2,
                            this->getOtherEdgePartner(otherEdge1, linkIdx1));
         this->copyBondProperties(otherEdge2, newEdge2);
         // re-set box offset based on sum of the participating vectors
@@ -2140,7 +2140,8 @@ namespace calc {
             this->getBondBoxOffsetForEdgeFrom(partialSpringIdx, linkIdx2));
 
         // actually cut
-        this->removePartialSprings({ otherEdge1, otherEdge2 });
+        std::vector<igraph_integer_t> eToRemove = { otherEdge1, otherEdge2 };
+        this->removePartialSprings(eToRemove);
 
         igraph_vector_int_destroy(&edgesOfLink1);
         igraph_vector_int_destroy(&edgesOfLink2);
@@ -2615,7 +2616,7 @@ namespace calc {
           this->net.coordinates(3 * i + 2) = igraph_vector_get(&coordsZ, i);
           this->net.linkIsSliplink(i) =
             castToIgraphInt(igraph_vector_get(&linkType, i)) ==
-            this->splipLinkType;
+            this->slipLinkType;
         }
 
         // cleanup
