@@ -114,24 +114,21 @@ namespace entities {
     }
 
     std::string positionSuffix = "";
-    double xMultiplier = 1.0;
-    double yMultiplier = 1.0;
-    double zMultiplier = 1.0;
     bool isUnwrapped = false;
+    bool isScaled = false;
     if (!this->dumpFileParser.keyHasDirectionalColumn("ATOMS", "", "")) {
       if (this->dumpFileParser.keyHasDirectionalColumn("ATOMS", "", "u")) {
         isUnwrapped = true;
         positionSuffix = "u";
       } else {
-        xMultiplier = newUniverse.getBox().getLx();
-        yMultiplier = newUniverse.getBox().getLy();
-        zMultiplier = newUniverse.getBox().getLz();
         if (this->dumpFileParser.keyHasDirectionalColumn("ATOMS", "", "su")) {
           positionSuffix = "su";
           isUnwrapped = true;
+          isScaled = true;
         } else if (this->dumpFileParser.keyHasDirectionalColumn(
                      "ATOMS", "", "s")) {
           positionSuffix = "s";
+          isScaled = true;
         } else {
           throw std::runtime_error("Did not find neither positional atom "
                                    "fields in atom data of dump file.");
@@ -156,11 +153,11 @@ namespace entities {
         ", " + std::to_string(positionsY.size()) + ", " +
         std::to_string(positionsZ.size()) + "). Is the file defect?");
     };
-    if (xMultiplier != 1.0 && yMultiplier != 1.0 && zMultiplier != 1.0) {
+    if (isScaled) {
       for (size_t i = 0; i < positionsZ.size(); ++i) {
-        positionsX[i] *= xMultiplier;
-        positionsY[i] *= yMultiplier;
-        positionsZ[i] *= zMultiplier;
+        positionsX[i] *= newUniverse.getBox().getLx();
+        positionsY[i] *= newUniverse.getBox().getLx();
+        positionsZ[i] *= newUniverse.getBox().getLx();
       }
     }
 
@@ -180,7 +177,7 @@ namespace entities {
       nAtoms = this->dataFileParser.getNrOfAtoms();
     }
 
-    if (this->dumpFileParser.keyHasDirectionalColumn("ATOMS", "i", "")) {
+    if (this->dumpFileParser.keyHasDirectionalColumn("ATOMS", "i", "") && !isUnwrapped) {
       nx = this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "ix");
       ny = this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "iy");
       nz = this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "iz");
@@ -404,9 +401,11 @@ namespace entities {
         Eigen::VectorXd::Zero(3 * atomIdsTo.size());
       for (size_t j = 0; j < atomIdsFrom.size(); ++j) {
         Atom atomFrom = atoms[i][atomIdToAtomIndex.at(atomIdsFrom[j])];
-        localCoordinatesFrom.segment(3 * j, 3) = atomFrom.getUnwrappedCoordinates(&boxes[i]);
+        localCoordinatesFrom.segment(3 * j, 3) =
+          atomFrom.getUnwrappedCoordinates(&boxes[i]);
         Atom atomTo = atoms[i][atomIdToAtomIndex.at(atomIdsTo[j])];
-        localCoordinatesTo.segment(3 * j, 3) = atomTo.getUnwrappedCoordinates(&boxes[i]);
+        localCoordinatesTo.segment(3 * j, 3) =
+          atomTo.getUnwrappedCoordinates(&boxes[i]);
       }
       endToEndVectors.push_back(localCoordinatesTo - localCoordinatesFrom);
     }
@@ -427,7 +426,7 @@ namespace entities {
          parent_universe_idx < this->getLength();
          parent_universe_idx += stepSize) {
 
-      for (size_t universe_idx = parent_universe_idx + 1;
+      for (size_t universe_idx = parent_universe_idx;
            universe_idx < this->getLength();
            ++universe_idx) {
         long int delta_t =
@@ -440,11 +439,16 @@ namespace entities {
                     << this->dumpFileParser.getFile() << std::endl;
         }
 
+        // verify
+        assert(endToEndVectors[universe_idx - startingIndex].size() ==
+               atomIdsFrom.size() * 3);
+        assert(endToEndVectors[parent_universe_idx - startingIndex].size() ==
+               atomIdsFrom.size() * 3);
+        // compute the mean for all atoms between these two universes
         double localMean =
           (endToEndVectors[universe_idx - startingIndex].dot(
             endToEndVectors[parent_universe_idx - startingIndex])) /
-          (static_cast<double>(
-            endToEndVectors[universe_idx - startingIndex].size() / 3));
+          (static_cast<double>(atomIdsFrom.size()));
         results[delta_t].push_back(localMean);
       }
       std::cout << "Universe " << parent_universe_idx
