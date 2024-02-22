@@ -706,6 +706,26 @@ If <cite>None</cite>, it will be computed for each molecule in the first Univers
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.computeEntanglementModulus">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">computeEntanglementModulus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ge1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Quantity</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit_style</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">UnitStyle</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.computeEntanglementModulus" title="Link to this definition">#</a></dt>
+<dd><p>Compute MMT’s entanglement contribution to the equilibrium shear modulus, given by
+<span class="math notranslate nohighlight">\(k_B T \epsilon_e T_e\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<em>-</em>) – the cross-linker conversion</p></li>
+<li><p><strong>r</strong> (<em>-</em>) – the stoichiometric inbalance</p></li>
+<li><p><strong>f</strong> (<em>-</em>) – the functionality of the cross-links</p></li>
+<li><p><strong>Ge1</strong> (<em>-</em>) – the melt entanglement modulus <span class="math notranslate nohighlight">\(G_e(1) = k_B T \epsilon_e\)</span></p></li>
+<li><p><strong>alpha</strong> (<em>-</em>) – <span class="math notranslate nohighlight">\(P(F_a^{out})\)</span>, optional</p></li>
+<li><p><strong>T</strong> (<em>-</em>) – the temperatures; defaults to room temperature</p></li>
+<li><p><strong>unit_style</strong> (<em>-</em>) – the units used, needed for T if not defined</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.computeExtentOfReaction">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">computeExtentOfReaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinkerType</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionalityPerType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.computeExtentOfReaction" title="Link to this definition">#</a></dt>
 <dd><p>Compute the extent of polymerization reaction
@@ -736,6 +756,51 @@ If None: will use max functionality per type.</p></li>
 </p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.computeExtractedModulus">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">computeExtractedModulus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Ge1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_sol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlink_concentration_0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Quantity</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit_style</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">UnitStyle</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.computeExtractedModulus" title="Link to this definition">#</a></dt>
+<dd><p>Compute MMT’s modulus, assuming the solvent is removed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<em>-</em>) – the cross-linker conversion</p></li>
+<li><p><strong>r</strong> (<em>-</em>) – the stoichiometric inbalance</p></li>
+<li><p><strong>f</strong> (<em>-</em>) – the functionality of the cross-links</p></li>
+<li><p><strong>Ge1</strong> (<em>-</em>) – the melt entanglement modulus <span class="math notranslate nohighlight">\(G_e(1) = k_B T \epsilon_e\)</span></p></li>
+<li><p><strong>xlink_concentration_0</strong> (<em>-</em>) – [A_f]_0, in 1/volume units</p></li>
+<li><p><strong>alpha</strong> (<em>-</em>) – <span class="math notranslate nohighlight">\(P(F_a^{out})\)</span>, optional</p></li>
+<li><p><strong>T</strong> (<em>-</em>) – the temperatures; defaults to room temperature</p></li>
+<li><p><strong>w_sol</strong> (<em>-</em>) – the soluble fraction (to be removed)</p></li>
+<li><p><strong>unit_style</strong> (<em>-</em>) – the units used, needed for T if not defined</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.computeJunctionModulus">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">computeJunctionModulus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlink_concentration_0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit_style</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">UnitStyle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Quantity</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.computeJunctionModulus" title="Link to this definition">#</a></dt>
+<dd><blockquote>
+<div><p>Compute MMT’s junction modulus, given by
+:math:<a href="#id1"><span class="problematic" id="id2">`</span></a>G_{junctions} = k_B T [A_f]_0 sum_{m=3}^{f}</p>
+</div></blockquote>
+<p>rac{m-2}{2} P(X_{m,f})</p>
+<blockquote>
+<div><dl class="simple">
+<dt>Arguments:</dt><dd><ul class="simple">
+<li><p>p: the cross-linker conversion</p></li>
+<li><p>r: the stoichiometric inbalance</p></li>
+<li><p>xlink_concentration_0: [A_f]_0, in 1/volume units</p></li>
+<li><p>unit_style: the units used, for example for k_B</p></li>
+<li><p>f: the functionality of the cross-links</p></li>
+<li><p>alpha: <span class="math notranslate nohighlight">\(P(F_a^{out})\)</span>, optional</p></li>
+<li><p>T: the temperatures; defaults to room temperature</p></li>
+</ul>
+</dd>
+</dl>
+</div></blockquote>
 </dd></dl>
 
 <dl class="py function">
@@ -791,7 +856,7 @@ If None: will use max functionality per type.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the phantom contribution to the MMT modulus
+<dd class="field-even"><p>the phantom contribution to the MMT modulus; see also <a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeJunctionModulus" title="pylimer_tools.calc.doMMTAnalysis.computeJunctionModulus"><code class="xref py py-func docutils literal notranslate"><span class="pre">pylimer_tools.calc.doMMTAnalysis.computeJunctionModulus()</span></code></a>
 - G_MMT_entanglement: the entanglement contribution to the MMT modulus
 - G_ANM: the ANM estimate of the modulus
 - G_PNM: the PNM estimate of the modulus</p>
@@ -809,6 +874,7 @@ If None: will use max functionality per type.</p></li>
 <dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.computeProbabilityThatMonomerIsEffective">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">computeProbabilityThatMonomerIsEffective</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">functionalityOfMonomer</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expectedDegreeOfEffect</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PFaout</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.computeProbabilityThatMonomerIsEffective" title="Link to this definition">#</a></dt>
 <dd><p>Compute the probability that an Af, monomer will be an effective cross-link of degree m</p>
+<p><span class="math notranslate nohighlight">\(P(X_m^f) = inom{f}{m} [P(F_A^{out})]^{f-m}[1-P(F_A^{out})]^m\)</span></p>
 <dl class="simple">
 <dt>Source:</dt><dd><ul class="simple">
 <li><p>Eq. 45 in Miller, Macosko 1976, A New Derivation of Post Gel Properties of Network</p></li>
@@ -819,7 +885,8 @@ If None: will use max functionality per type.</p></li>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>functionalityOfMonomer</strong> (<em>-</em>) – f</p></li>
-<li><p><strong>-</strong> – </p></li>
+<li><p><strong>expectedDecreeOfEffect</strong> (<em>-</em>) – m</p></li>
+<li><p><strong>alpha</strong> (<em>-</em>) – <span class="math notranslate nohighlight">\(P(F_A^{out})\)</span></p></li>
 </ul>
 </dd>
 </dl>
@@ -857,6 +924,22 @@ If <cite>None</cite>: will use max functionality per type.</p></li>
 <li><p>r (float)</p></li>
 </ul>
 </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.computeTrappingFactor">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">computeTrappingFactor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.computeTrappingFactor" title="Link to this definition">#</a></dt>
+<dd><p>Compute the trapping factor <span class="math notranslate nohighlight">\(T_e\)</span></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the cross-links</p></li>
+<li><p><strong>r</strong> (<em>-</em>) – the stoichiometric inbalance of reactants.</p></li>
+<li><p><strong>f</strong> (<em>-</em>) – functionality of the cross-links. Only needed if alpha is None.</p></li>
+<li><p><strong>alpha</strong> (<em>-</em>) – <span class="math notranslate nohighlight">\(P(F_a^{out})\)</span>, see <code class="xref py py-func docutils literal notranslate"><span class="pre">computeMMSProbabilities()</span></code></p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -900,6 +983,25 @@ See: <a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.computeWeightFractionOfSolubleMaterialFromWeightFractions">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">computeWeightFractionOfSolubleMaterialFromWeightFractions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_g</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.computeWeightFractionOfSolubleMaterialFromWeightFractions" title="Link to this definition">#</a></dt>
+<dd><p>Use MMT to compute the weight fraction of soluble material using</p>
+<p>:math:<a href="#id3"><span class="problematic" id="id4">`</span></a>W_{sol} = w_A_f P(F_A^{out})^f + w_B_g [rpP(F_A^{out})^{f-1}+1-rp]^g</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>r</strong> (<em>-</em>) – the stoichiometric inbalance</p></li>
+<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the cross-links</p></li>
+<li><p><strong>f</strong> (<em>-</em>) – the functionality of the the crosslinker</p></li>
+<li><p><strong>w_f</strong> (<em>-</em>) – the weight fraction of the cross-links</p></li>
+<li><p><strong>w_g</strong> (<em>-</em>) – the weight fraction of ordinary chains</p></li>
+<li><p><strong>g</strong> (<em>-</em>) – the functionality of the ordinary chains</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.computeWeightFractions">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">computeWeightFractions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.computeWeightFractions" title="Link to this definition">#</a></dt>
 <dd><p>Compute the weight fractions of each atom type in the network.</p>
@@ -922,7 +1024,10 @@ See: <a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.computeWeightFractionsAndProbabilities">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">computeWeightFractionsAndProbabilities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinkerType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strandLength</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionalityPerType</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weightFractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.computeWeightFractionsAndProbabilities" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
+<dd><p>Shortcut function filling all missing parameters,
+computing the weight fractions per type in the network,
+and the MMT probabilities <span class="math notranslate nohighlight">\(P(F_a^{out})\)</span> and  <span class="math notranslate nohighlight">\(P(F_b^{out})\)</span></p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.measureLowerBoundWeightFractionOfSolubleMaterial">
@@ -993,7 +1098,7 @@ This works as:</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>r</strong> (<em>-</em>) – the stoichiometric inbalance of reactants (see: #computeStoichiometricInbalance)</p></li>
-<li><p><strong>f</strong> (<em>-</em>) – functionality of the crosslinkers</p></li>
+<li><p><strong>f</strong> (<em>-</em>) – functionality of the cross-links</p></li>
 <li><p><strong>g</strong> (<em>-</em>) – functionality of the precursor polymer</p></li>
 </ul>
 </dd>
@@ -1110,6 +1215,19 @@ This works as:</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.predict_p_from_w_sol">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">predict_p_from_w_sol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">wsol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w_g</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.predict_p_from_w_sol" title="Link to this definition">#</a></dt>
+<dd><p>Compute the extent of reaction based on the weight fraction of soluble material.</p>
+<p>Arguments:
+- wsol: the weight fraction of soluble material
+- r: the stoichiometric inbalance
+- w_f: the weight fraction of cross-links with functionality f,
+- w_g: the weight fraction of precursor chains with functionality g,
+- f: the functionality of the cross-links
+- g: the functionality of the precursor chains</p>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.doMMTAnalysis.validate_r_and_p">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.doMMTAnalysis.</span></span><span class="sig-name descname"><span class="pre">validate_r_and_p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.doMMTAnalysis.validate_r_and_p" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -1196,12 +1314,17 @@ This works as:</p>
 <li><a class="reference internal" href="#module-pylimer_tools.calc.doMMTAnalysis">pylimer_tools.calc.doMMTAnalysis module</a><ul>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.calculateWeightFractionOfBackbone"><code class="docutils literal notranslate"><span class="pre">calculateWeightFractionOfBackbone()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.calculateWeightFractionOfDanglingChains"><code class="docutils literal notranslate"><span class="pre">calculateWeightFractionOfDanglingChains()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeEntanglementModulus"><code class="docutils literal notranslate"><span class="pre">computeEntanglementModulus()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeExtentOfReaction"><code class="docutils literal notranslate"><span class="pre">computeExtentOfReaction()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeExtractedModulus"><code class="docutils literal notranslate"><span class="pre">computeExtractedModulus()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeJunctionModulus"><code class="docutils literal notranslate"><span class="pre">computeJunctionModulus()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeMMsProbabilities"><code class="docutils literal notranslate"><span class="pre">computeMMsProbabilities()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeModulusDecomposition"><code class="docutils literal notranslate"><span class="pre">computeModulusDecomposition()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeProbabilityThatMonomerIsEffective"><code class="docutils literal notranslate"><span class="pre">computeProbabilityThatMonomerIsEffective()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeStoichiometricInbalance"><code class="docutils literal notranslate"><span class="pre">computeStoichiometricInbalance()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeTrappingFactor"><code class="docutils literal notranslate"><span class="pre">computeTrappingFactor()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeWeightFractionOfSolubleMaterial"><code class="docutils literal notranslate"><span class="pre">computeWeightFractionOfSolubleMaterial()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeWeightFractionOfSolubleMaterialFromWeightFractions"><code class="docutils literal notranslate"><span class="pre">computeWeightFractionOfSolubleMaterialFromWeightFractions()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeWeightFractions"><code class="docutils literal notranslate"><span class="pre">computeWeightFractions()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.computeWeightFractionsAndProbabilities"><code class="docutils literal notranslate"><span class="pre">computeWeightFractionsAndProbabilities()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.measureLowerBoundWeightFractionOfSolubleMaterial"><code class="docutils literal notranslate"><span class="pre">measureLowerBoundWeightFractionOfSolubleMaterial()</span></code></a></li>
@@ -1210,6 +1333,7 @@ This works as:</p>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.predictNumberDensityOfJunctionPoints"><code class="docutils literal notranslate"><span class="pre">predictNumberDensityOfJunctionPoints()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.predictNumberDensityOfNetworkStrands"><code class="docutils literal notranslate"><span class="pre">predictNumberDensityOfNetworkStrands()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.predictShearModulus"><code class="docutils literal notranslate"><span class="pre">predictShearModulus()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.predict_p_from_w_sol"><code class="docutils literal notranslate"><span class="pre">predict_p_from_w_sol()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.doMMTAnalysis.validate_r_and_p"><code class="docutils literal notranslate"><span class="pre">validate_r_and_p()</span></code></a></li>
 </ul>
 </li>
