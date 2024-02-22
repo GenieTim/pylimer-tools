@@ -2,6 +2,7 @@
 import math
 import warnings
 from collections import Counter
+from typing import Union
 
 import numpy as np
 import pint
@@ -295,8 +296,30 @@ def computeWeightFractionOfSolubleMaterial(network: Universe, crosslinkerType: i
     return W_sol
 
 
-def computeWeightFractionsAndProbabilities(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None, r: float = None, p: float = None):
+def computeWeightFractionOfSolubleMaterialFromWeightFractions(r: float, p: float, f: int, w_f: float, w_g: float, g: int = 2):
+    """
+    Use MMT to compute the weight fraction of soluble material using
 
+    :math:`W_{sol} = w_A_f P(F_A^{out})^f + w_B_g [rpP(F_A^{out})^{f-1}+1-rp]^g
+
+    Arguments:
+      - r: the stoichiometric inbalance
+      - p: the extent of reaction in terms of the cross-links
+      - f: the functionality of the the crosslinker
+      - w_f: the weight fraction of the cross-links
+      - w_g: the weight fraction of ordinary chains
+      - g: the functionality of the ordinary chains
+    """
+    alpha, _ = computeMMsProbabilities(r, p, f)
+    return w_f*(alpha**f) + w_g*((r*p*(alpha**(f-1)) + 1 - r*p)**g)
+
+
+def computeWeightFractionsAndProbabilities(network: Universe, crosslinkerType: int, strandLength: int = None, functionalityPerType: dict = None, weightFractions: dict = None, r: float = None, p: float = None):
+    """
+    Shortcut function filling all missing parameters,
+    computing the weight fractions per type in the network,
+    and the MMT probabilities :math:`P(F_a^{out})` and  :math:`P(F_b^{out})`
+    """
     if (functionalityPerType is None or crosslinkerType not in functionalityPerType):
         assert (network is not None)
         functionalityPerType = network.determineFunctionalityPerType()
@@ -435,7 +458,7 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crossli
       - Ge1: the melt entanglement modulus
 
     Returns:
-      - G_MMT_phantom: the phantom contribution to the MMT modulus
+      - G_MMT_phantom: the phantom contribution to the MMT modulus; see also :func:`pylimer_tools.calc.doMMTAnalysis.computeJunctionModulus`
       - G_MMT_entanglement: the entanglement contribution to the MMT modulus
       - G_ANM: the ANM estimate of the modulus
       - G_PNM: the PNM estimate of the modulus
@@ -482,23 +505,120 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crossli
                         computeProbabilityThatMonomerIsEffective(f, m, alpha))
     GammaMMT = (2*r/f) * GammaMMTSum
     G_MMT_phantom = GammaMMT*nu*unitStyle.kB*T
-    # fraction of elastically effective strands. TODO : check adjustment with r
-    pel = ((1/(p)) - alpha/p)**2
-    G_MMT_entanglement = Ge1*(pel**2)
+    # fraction of elastically effective strands.
+    Te = computeTrappingFactor(p, r, f, alpha)
+    G_MMT_entanglement = Ge1*Te
     # entanglement part. TODO : check adjustment with r (and where the 0.22 is coming from? Fabian' s fit!)
     return G_MMT_phantom, G_MMT_entanglement, G_ANM, G_PNM
+
+def computeExtractedModulus(p: float, r: float, f: int, Ge1: pint.Quantity, w_sol: float, xlink_concentration_0: pint.Quantity,  alpha: Union[float, None] = None, T: pint.Quantity = None, unit_style: Union[None, UnitStyle] = None):
+    """
+    Compute MMT's modulus, assuming the solvent is removed
+
+    Arguments:
+        - p: the cross-linker conversion
+        - r: the stoichiometric inbalance
+        - f: the functionality of the cross-links
+        - Ge1: the melt entanglement modulus :math:`G_e(1) = k_B T \epsilon_e`
+        - xlink_concentration_0: [A_f]_0, in 1/volume units
+        - alpha: :math:`P(F_a^{out})`, optional
+        - T: the temperatures; defaults to room temperature    
+        - w_sol: the soluble fraction (to be removed)
+        - unit_style: the units used, needed for T if not defined
+    """
+    if (T is None):
+        T = (273.15+25)*unit_style.getUnderlyingUnitRegistry()('kelvin')
+    if (alpha is None):
+        alpha, _ = computeMMsProbabilities(r, p, f)
+
+    junction_part = (1-w_sol)**(-1/3) * computeJunctionModulus(p,
+                                                               r, xlink_concentration_0, unit_style, f, alpha, T)
+    entanglement_part = (1-w_sol)**(-2) * computeEntanglementModulus(p, r,
+                                                                     f, Ge1, alpha, T, unit_style)
+    return junction_part + entanglement_part
+
+
+def computeEntanglementModulus(p: float, r: float, f: int, Ge1: pint.Quantity, alpha: Union[float, None] = None, T: pint.Quantity = None, unit_style: Union[None, UnitStyle] = None):
+    """
+    Compute MMT's entanglement contribution to the equilibrium shear modulus, given by
+    :math:`k_B T \epsilon_e T_e`
+
+    Arguments:
+        - p: the cross-linker conversion
+        - r: the stoichiometric inbalance
+        - f: the functionality of the cross-links
+        - Ge1: the melt entanglement modulus :math:`G_e(1) = k_B T \epsilon_e`
+        - alpha: :math:`P(F_a^{out})`, optional
+        - T: the temperatures; defaults to room temperature    
+        - unit_style: the units used, needed for T if not defined
+    """
+    if (T is None):
+        T = (273.15+25)*unit_style.getUnderlyingUnitRegistry()('kelvin')
+    if (alpha is None):
+        alpha, _ = computeMMsProbabilities(r, p, f)
+    Te = computeTrappingFactor(p, r, f, alpha)
+    return Te * Ge1
+
+
+def computeJunctionModulus(p: float, r: float, xlink_concentration_0: pint.Quantity, unit_style: UnitStyle, f: Union[int, None] = None, alpha: Union[float, None] = None, T: pint.Quantity = None):
+    """
+    Compute MMT's junction modulus, given by
+    :math:`G_{junctions} = k_B T [A_f]_0 \sum_{m=3}^{f} \frac{m-2}{2} P(X_{m,f})
+
+    Arguments:
+        - p: the cross-linker conversion
+        - r: the stoichiometric inbalance
+        - xlink_concentration_0: [A_f]_0, in 1/volume units
+        - unit_style: the units used, for example for k_B
+        - f: the functionality of the cross-links
+        - alpha: :math:`P(F_a^{out})`, optional
+        - T: the temperatures; defaults to room temperature
+    """
+    if (T is None):
+        T = (273.15+25)*unit_style.getUnderlyingUnitRegistry()('kelvin')
+    if (alpha is None):
+        alpha, _ = computeMMsProbabilities(r, p, f)
+    GammaMMTSum = 0.0
+    for m in range(3, f+1):
+        GammaMMTSum += (((m-2)/2) *
+                        computeProbabilityThatMonomerIsEffective(f, m, alpha))
+
+    return unit_style.kB*T*xlink_concentration_0*GammaMMTSum
+
+
+def computeTrappingFactor(p: float, r: float, f: Union[int, None] = None, alpha: Union[float, None] = None) -> float:
+    """
+    Compute the trapping factor :math:`T_e`
+
+    Arguments:
+        - p: the extent of reaction in terms of the cross-links
+        - r: the stoichiometric inbalance of reactants.
+        - f: functionality of the cross-links. Only needed if alpha is None.
+        - alpha: :math:`P(F_a^{out})`, see :func:`~pylimer_tools.calc.doMMTAnalysis.computeMMSProbabilities()`
+    """
+    if (alpha is None):
+        if (f is None):
+            raise ValueError(
+                "The argument f is required, if alpha is not provided")
+        alpha, _ = computeMMsProbabilities(r, p, f)
+
+    pel = ((1/(r*p))*(1-alpha))**2
+    return pel**2
 
 
 def computeProbabilityThatMonomerIsEffective(functionalityOfMonomer: int, expectedDegreeOfEffect: int, PFaout: float):
     """
     Compute the probability that an Af, monomer will be an effective cross-link of degree m 
 
+    :math:`P(X_m^f) = \binom{f}{m} [P(F_A^{out})]^{f-m}[1-P(F_A^{out})]^m`
+
     Source:
         - Eq. 45 in Miller, Macosko 1976, A New Derivation of Post Gel Properties of Network
 
     Arguments:
         - functionalityOfMonomer: f
-        - 
+        - expectedDecreeOfEffect: m
+        - alpha: :math:`P(F_A^{out})`
     """
     f = functionalityOfMonomer
     m = expectedDegreeOfEffect
@@ -632,7 +752,7 @@ def predictGelationPoint(r: float, f: int, g: int = 2) -> float:
 
     Arguments:
       - r (double): the stoichiometric inbalance of reactants (see: #computeStoichiometricInbalance)
-      - f (int): functionality of the crosslinkers
+      - f (int): functionality of the cross-links
       - g (int): functionality of the precursor polymer
 
     Returns:
@@ -641,3 +761,29 @@ def predictGelationPoint(r: float, f: int, g: int = 2) -> float:
     # if (r is None):
     #   r = calculateEffectiveCrosslinkerFunctionality(network, crosslinkerType, f)
     return math.sqrt(1/(r*(f-1)*(g-1)))
+
+
+def predict_p_from_w_sol(wsol: float, r: float, w_f: float, w_g: float, f: int, g: int = 2):
+    """
+    Compute the extent of reaction based on the weight fraction of soluble material.
+
+    Arguments:
+    - wsol: the weight fraction of soluble material
+    - r: the stoichiometric inbalance
+    - w_f: the weight fraction of cross-links with functionality f,
+    - w_g: the weight fraction of precursor chains with functionality g,
+    - f: the functionality of the cross-links
+    - g: the functionality of the precursor chains    
+    """
+    def compute_wsol(p):
+        try:
+            P_F_A_out, _ = computeMMsProbabilities(r, p, f)
+        except ValueError as e:
+            P_F_A_out = 1.  # highest value -> this will not be the optimum
+        return w_f * P_F_A_out**f + w_g * (r*p*P_F_A_out**(f-1) + 1 - r*p)**g
+
+    res = optimize.minimize_scalar(lambda p: abs(
+        wsol - compute_wsol(p)), bounds=[1e-3, 1.-1e-3])
+    if (not res.success):
+        warnings.warn("The p predicted from w_sol might be incorrect")
+    return res.x
