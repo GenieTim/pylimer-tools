@@ -709,12 +709,12 @@ namespace calc {
         this->universe.getBox().handlePBC(additionalDistance2);
         expectedDistance += additionalDistance1 + additionalDistance2;
 
-        Eigen::Vector3d actualDistance = this->computeEdgeLength(edgeId);
+        Eigen::Vector3d actualDistance = this->computeEdgeDistance(edgeId);
         this->setBondBoxOffsetForEdge(edgeId,
                                       actualDistance - expectedDistance);
         assert(this->universe.getBox().isValidOffset(actualDistance -
                                                      expectedDistance));
-        assert(this->computeEdgeLength(edgeId).isApprox(expectedDistance));
+        assert(this->computeEdgeDistance(edgeId).isApprox(expectedDistance));
       }
 
       /**
@@ -765,7 +765,6 @@ namespace calc {
 
         return bondBoxOffset;
       }
-
       /**
        * @brief Compute the length of an edge based on the graph
        *
@@ -774,7 +773,7 @@ namespace calc {
        * @param edgeId
        * @return Eigen::Vector3d
        */
-      Eigen::Vector3d computeEdgeLength(igraph_integer_t edgeId)
+      Eigen::Vector3d computeEdgeDistance(igraph_integer_t edgeId)
       {
         igraph_integer_t from, to;
         igraph_edge(&this->graph, edgeId, &from, &to);
@@ -786,6 +785,43 @@ namespace calc {
           this->universe.getBox().handlePBC(dist);
         }
         return dist;
+      }
+
+      /**
+       * @brief Compute the length of an edge based on the graph in a certain
+       * direction
+       *
+       * CAUTION: make sure the graph is up to date!
+       *
+       * @param edgeId
+       * @param vertexId
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d computeEdgeDistanceFrom(igraph_integer_t edgeId,
+                                              igraph_integer_t vertexId)
+      {
+        igraph_integer_t from, to;
+        igraph_edge(&this->graph, edgeId, &from, &to);
+        assert(from == vertexId || to == vertexId);
+
+        Eigen::Vector3d dist = this->computeEdgeDistance(edgeId);
+        return dist * (vertexId == from ? 1. : -1.);
+      }
+
+      /**
+       * @brief Compute the length of an edge based on the graph in a certain
+       * direction
+       *
+       * CAUTION: make sure the graph is up to date!
+       *
+       * @param edgeId
+       * @param vertexId the target vertex id
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d computeEdgeDistanceTo(igraph_integer_t edgeId,
+                                            igraph_integer_t vertexId)
+      {
+        return -1. * this->computeEdgeDistanceFrom(edgeId, vertexId);
       }
 
       /**
@@ -814,7 +850,7 @@ namespace calc {
         for (igraph_integer_t i = 0; i < igraph_vector_size(&parentEdges);
              ++i) {
           if (igraph_vector_get(&parentEdges, i) == parentEdgeId) {
-            dist += this->computeEdgeLength(i);
+            dist += this->computeEdgeDistance(i);
           }
         }
 
@@ -2941,8 +2977,36 @@ namespace calc {
         ForceBalanceNetwork& net,
         Eigen::VectorXd& springPartitions,
         const size_t partialSpringIdx,
-        const double oneOverSpringPartitionUpperLimit = 1.0){
+        const double oneOverSpringPartitionUpperLimit = 1.0)
+      {
 
+        igraph_integer_t from, to;
+        igraph_edge(&this->graph, partialSpringIdx, &from, &to);
+
+        igraph_integer_t otherRailFrom =
+          this->getOtherRailEdgeId(from, partialSpringIdx);
+        igraph_integer_t otherRailTo =
+          this->getOtherRailEdgeId(to, partialSpringIdx);
+
+        Eigen::Vector3d thisSpringDistance =
+          this->computeEdgeDistance(partialSpringIdx);
+        Eigen::Vector3d otherRailFromSpringDistance =
+          this->computeEdgeDistanceTo(otherRailFrom, from);
+        Eigen::Vector3d otherRailToSpringDistance =
+          this->computeEdgeDistanceFrom(otherRailTo, to);
+
+        double forceEstimateBefore =
+          (-otherRailFromSpringDistance + thisSpringDistance).squaredNorm() +
+          (-thisSpringDistance + otherRailToSpringDistance).squaredNorm();
+        double forceEstimateAfter =
+          (2. * thisSpringDistance + otherRailToSpringDistance).squaredNorm() +
+          (-2 * thisSpringDistance - otherRailFromSpringDistance).squaredNorm();
+
+        if (forceEstimateAfter <= forceEstimateBefore) {
+          this->swapSlipLinks(partialSpringIdx);
+          return true;
+        }
+        return false;
       };
 
       /**
@@ -2961,7 +3025,60 @@ namespace calc {
         Eigen::VectorXd& springPartitions,
         const size_t partialSpringIdx,
         const double oneOverSpringPartitionUpperLimit = 1.0,
-        const bool respectLoops = true);
+        const bool respectLoops = true)
+      {
+        igraph_integer_t from, to;
+        igraph_edge(&this->graph, partialSpringIdx, &from, &to);
+
+        igraph_integer_t xlinkIdx =
+          castToIgraphInt(igraph_cattribute_VAN(&this->graph, "type", from)) ==
+              this->crosslinkerType
+            ? from
+            : to;
+        igraph_integer_t slipLinkIdx = xlinkIdx == from ? to : from;
+        assert(castToIgraphInt(igraph_cattribute_VAN(
+                 &this->graph, "type", xlinkIdx)) == this->crosslinkerType);
+
+        igraph_vector_int_t edgesOfCrossLink;
+        igraph_vector_int_init(&edgesOfCrossLink, 4);
+        igraph_incident(&this->graph, &edgesOfCrossLink, xlinkIdx, IGRAPH_ALL);
+        RUNTIME_EXP_IFN(igraph_vector_int_size(&edgesOfCrossLink) > 0,
+                        "Expected to find more than one edge on slip-link");
+
+        igraph_integer_t otherRailPart =
+          this->getOtherRailEdgeId(slpLinkIdx, partialSpringIdx);
+
+        Eigen::Vector3d otherRailDistance =
+          this->computeEdgeDistanceFrom(otherRailPart, slipLinkIdx);
+        Eigen::Vector3d thisRailDistance =
+          this->computeEdgeDistanceTo(partialSpringIdx, xlinkIdx);
+
+        for (size_t i = 0; i < igraph_vector_int_size(&edgesOfCrossLink); ++i) {
+          igraph_integer_t attemptedEdge =
+            igraph_vector_int_get(&edgesOfCrossLink, i);
+          if (attemptedEdge == partialSpringIdx) {
+            continue;
+          }
+          Eigen::Vector3d attemptSpringDistance =
+            this->computeEdgeDistanceFrom(attemptedEdge, xlinkIdx);
+
+          double forceEstimateBefore =
+            (otherRailDistance + thisRailDistance).squaredNorm() +
+            (attemptSpringDistance).squaredNorm();
+          double forceEstimateAfter =
+            (-thisRailDistance - otherRailDistance).squaredNorm() +
+            (attemptSpringDistance + thisRailDistance).squaredNorm();
+
+          if (forceEstimateAfter < forceEstimateBefore) {
+            // CAUTION: wrong order can destroy the edge ids etc.
+            this->insertSlipLinkIntoRail(slipLinkIdx, attemptedEdge);
+            this->unlinkSlipLinkFromRail(slipLinkIdx, partialSpringIdx);
+            return true;
+          }
+        }
+
+        return false
+      };
     };
   } // namespace mehp
 } // namespace calc

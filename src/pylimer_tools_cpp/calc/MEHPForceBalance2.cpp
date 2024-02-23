@@ -2184,10 +2184,9 @@ namespace calc {
 
       double oneOverVolume = 1. / (net.L[0] * net.L[1] * net.L[2]);
 
-      Eigen::VectorXd displacedCoords = net.coordinates;
       Eigen::VectorXd relevantPartialDistancesA =
-        (displacedCoords(net.springPartCoordinateIndexB) -
-         displacedCoords(net.springPartCoordinateIndexA)) +
+        (net.coordinates(net.springPartCoordinateIndexB) -
+         net.coordinates(net.springPartCoordinateIndexA)) +
         net.springPartBoxOffset;
       if (this->assumeBoxLargeEnough) {
         this->universe.getBox().handlePBC(relevantPartialDistancesA);
