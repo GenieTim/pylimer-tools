@@ -512,6 +512,24 @@ namespace calc {
       }
 
       /**
+       * @brief Check whether a given edge involves a cross-link
+       *
+       * @param edgeId
+       * @return true
+       * @return false
+       */
+      bool springInvolvesCrossLink(const igraph_integer_t edgeId)
+      {
+        igraph_integer_t from, to;
+        igraph_edge(&this->graph, edgeId, &from, &to);
+
+        return (castToIgraphInt(igraph_cattribute_VAN(
+                  &this->graph, "type", from)) == this->crosslinkerType) ||
+               (castToIgraphInt(igraph_cattribute_VAN(
+                  &this->graph, "type", to)) == this->crosslinkerType);
+      }
+
+      /**
        * @brief Set the Vertex Properties From Atom object (for a cross-link) in
        * the graph
        *
@@ -527,6 +545,7 @@ namespace calc {
           &this->graph, "atom_id", vertexId, atom.getId());
         igraph_cattribute_VAN_set(
           &this->graph, "type", vertexId, atom.getType());
+        igraph_cattribute_VAN_set(&this->graph, "num_link_swaps", vertexId, 0);
         Eigen::Vector3d coords = atom.getCoordinates();
         this->setVertexCoordinates(vertexId, coords);
       }
@@ -581,6 +600,24 @@ namespace calc {
       }
 
       /**
+       * @brief Copy one specific bond property from one edge to another
+       *
+       * @param name
+       * @param from
+       * @param to
+       */
+      void copyBondProperty(const char* name,
+                            const igraph_integer_t from,
+                            const igraph_integer_t to)
+      {
+        igraph_cattribute_EAN_set(
+          &this->graph,
+          name,
+          to,
+          igraph_cattribute_EAN(&this->graph, name, from));
+      }
+
+      /**
        * @brief Copy all relevant properties from one edge to another
        *
        * @param from source edge id
@@ -595,11 +632,30 @@ namespace calc {
                                       "parent_edge",
                                       "partition_fraction",
                                       "contour_length" }) {
+          this->copyBondProperty(property.c_str(), from, to);
+        }
+      }
+
+      /**
+       * @brief Copy some relevant properties from one edge to another, but
+       * scaled
+       *
+       * @param from
+       * @param to
+       * @param scaleFactor
+       */
+      void copyScaleBondProperties(const igraph_integer_t from,
+                                   const igraph_integer_t to,
+                                   double scaleFactor = 0.5)
+      {
+        for (std::string property :
+             { "partition_fraction", "contour_length" }) {
           igraph_cattribute_EAN_set(
             &this->graph,
             property.c_str(),
             to,
-            igraph_cattribute_EAN(&this->graph, property.c_str(), from));
+            igraph_cattribute_EAN(&this->graph, property.c_str(), from) *
+              scaleFactor);
         }
       }
 
@@ -679,15 +735,14 @@ namespace calc {
         assert(from == vertexIdx || to == vertexIdx);
 
         if (from == vertexIdx) {
-          return bondBoxOffset;
+          return boxOffset;
         } else {
-          return -1. * bondBoxOffset;
+          return -1. * boxOffset;
         }
       }
 
-      
       Eigen::Vector3d getBondBoxOffsetForEdgeTo(igraph_integer_t edgeId,
-                                                  igraph_integer_t vertexIdx)
+                                                igraph_integer_t vertexIdx)
       {
         return -1. * this->getBondBoxOffsetForEdgeFrom(edgeId, vertexIdx);
       }
@@ -774,47 +829,7 @@ namespace calc {
        * @param tolerance the acceptance tolerance, partial springs longer than
        * this are active
        */
-      size_t removeInactiveParentEdges(double tolerance)
-      {
-        size_t numRemoved = 0;
-
-        igraph_vector_t parentEdges;
-        igraph_vector_init(&parentEdges, this->net.nrOfPartialSprings);
-        igraph_cattribute_EANV(&this->graph,
-                               "parent_edge",
-                               igraph_ess_all(IGRAPH_EDGEORDER_ID),
-                               &parentEdges);
-
-        std::unordered_map<igraph_integer_t, bool> isRemovalCandidate;
-        for (igraph_integer_t i = 0; i < igraph_vector_size(&parentEdges);
-             ++i) {
-          igraph_integer_t parentEdgeid =
-            castToIgraphInt(igraph_vector_get(&parentEdges, i));
-          isRemovalCandidate[parentEdgeid] = true;
-        }
-        for (igraph_integer_t i = 0; i < igraph_vector_size(&parentEdges);
-             ++i) {
-          igraph_integer_t parentEdgeid =
-            castToIgraphInt(igraph_vector_get(&parentEdges, i));
-          if (isRemovalCandidate.at(parentEdgeid)) {
-            isRemovalCandidate[parentEdgeid] =
-              this->computeEdgeLength(i).squaredNorm() <= tolerance;
-          }
-        }
-
-        igraph_vector_destroy(&parentEdges);
-
-        std::vector<igraph_integer_t> edgeIdsToRemove;
-        for (auto& [key, value] : isRemovalCandidate) {
-          if (value) {
-            edgeIdsToRemove.push_back(key);
-          }
-        }
-
-        this->removePartialSprings(edgeIdsToRemove);
-
-        return numRemoved;
-      }
+      size_t removeInactiveParentEdges(double tolerance);
 
       /**
        * @brief Remove cross-linkers, springs and associated slip-links with the
@@ -848,75 +863,7 @@ namespace calc {
        * @param minCrosslinkFunctionalityToBeKept
        * @return size_t the number of removed vertices
        */
-      size_t removeSubfunctionalVertices()
-      {
-        size_t numRemovedTotal = 0;
-        size_t numRemovedInIteration = 0;
-        do {
-          numRemovedInIteration = 0;
-
-          igraph_vector_int_t degrees;
-          igraph_vector_int_init(&degrees, igraph_vcount(&this->graph));
-          igraph_vector_t types;
-          igraph_vector_init(&types, igraph_vcount(&this->graph));
-          igraph_cattribute_VANV(
-            &this->graph, "type", igraph_vss_all(), &types);
-          // we count self-loops here
-          // only afterwards, we check, whether they actually have relevant bond
-          // box offsets
-          igraph_degree(
-            &this->graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true);
-
-          igraph_vector_int_t indicesToRemove;
-          igraph_vector_int_init(&indicesToRemove, 0);
-          for (size_t i = 0; i < igraph_vcount(&this->graph); ++i) {
-            if (igraph_vector_int_get(&degrees, i) < 2) {
-              igraph_vector_int_push_back(&indicesToRemove, i);
-            }
-          }
-
-          igraph_delete_vertices(&this->graph,
-                                 igraph_vss_vector(&indicesToRemove));
-
-          numRemovedInIteration = igraph_vector_int_size(&indicesToRemove);
-
-          igraph_vector_int_destroy(&indicesToRemove);
-
-          // the function may lead to slip-links being inconsistenly
-          // linked (e.g., at the end of a chain)
-          // -> here, we remove those dangling ones.
-          // f = 1 and below have been removed
-          // -> cleanup remaining f = 2 and f = 3
-          if (numRemovedInIteration > 0) {
-            // reload degree and type, since the vertex index changed
-            igraph_degree(
-              &this->graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true);
-            igraph_cattribute_VANV(
-              &this->graph, "type", igraph_vss_all(), &types);
-          }
-          for (long int i = igraph_vcount(&this->graph); i >= 0; --i) {
-            if (castToIgraphInt(igraph_vector_int_get(&degrees, i)) == 2) {
-              this->remove2fLink(i);
-              numRemovedInIteration += 1;
-            } else if (castToIgraphInt(igraph_vector_int_get(&degrees, i)) ==
-                         3 &&
-                       castToIgraphInt(igraph_vector_get(&types, i)) ==
-                         this->slipLinkType) {
-              this->remove3fLink(i);
-              numRemovedInIteration += 1;
-            }
-          }
-
-          igraph_vector_int_destroy(&degrees);
-          igraph_vector_destroy(&types);
-          numRemovedTotal += numRemovedInIteration;
-        } while (numRemovedInIteration > 0);
-
-        if (numRemovedTotal > 0) {
-          this->net.isUpToDate = false;
-        }
-        return numRemovedTotal;
-      }
+      size_t removeSubfunctionalVertices();
 
       /**
        * @brief Remove double listed springs from cross-links (if they have
@@ -953,37 +900,7 @@ namespace calc {
       /**
        * @brief remove all vertices that don't have any connections
        */
-      void removeOrphanedVertices()
-      {
-        if (!igraph_cattribute_GAB(&this->graph, "is_up_to_date")) {
-          this->updateGraph();
-        }
-
-        igraph_vector_int_t degrees;
-        igraph_vector_int_init(&degrees, igraph_vcount(&this->graph));
-        igraph_degree(
-          &this->graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true);
-
-        std::vector<size_t> vertexIds;
-
-        for (size_t i = 0; i < igraph_vector_int_size(&degrees); ++i) {
-          if (igraph_vector_int_get(&degrees, i) == 0) {
-            vertexIds.push_back(i);
-          }
-        }
-
-        if (vertexIds.size() == 0) {
-          return;
-        }
-
-        igraph_vector_int_t vertexIdsVec;
-        igraph_vector_int_init(&vertexIdsVec, vertexIds.size());
-        pylimer_tools::utils::StdVectorToIgraphVectorT(vertexIds,
-                                                       &vertexIdsVec);
-        igraph_delete_vertices(&this->graph, igraph_vss_vector(&vertexIdsVec));
-
-        this->net.isUpToDate = false;
-      }
+      void removeOrphanedVertices();
 
       /**
        * @brief Remove a spring (and all its parts, incl. slip-links) from the
@@ -996,60 +913,47 @@ namespace calc {
        * @param net
        * @param springPartitions
        */
-      void removeParentSpring(const size_t springIdx)
-      {
-        if (!igraph_cattribute_GAB(&this->graph, "is_up_to_date")) {
-          this->updateGraph();
-        }
-
-        igraph_vector_t parentEdges;
-        igraph_vector_init(&parentEdges, this->net.nrOfPartialSprings);
-        igraph_cattribute_EANV(&this->graph,
-                               "parent_edge",
-                               igraph_ess_all(IGRAPH_EDGEORDER_ID),
-                               &parentEdges);
-
-        std::vector<igraph_integer_t> edgeIdsToRemove;
-        edgeIdsToRemove.reserve(4);
-        for (igraph_integer_t i = 0; i < igraph_vector_size(&parentEdges);
-             ++i) {
-          if (igraph_vector_get(&parentEdges, i) == springIdx) {
-            edgeIdsToRemove.push_back(i);
-          }
-        }
-
-        igraph_vector_destroy(&parentEdges);
-        // actually remove all edges
-        this->removePartialSprings(edgeIdsToRemove);
-        // as the above may lead to slip-links with f = 2,
-        // we want to remove those as well
-        // this->removeTwofunctionalLinks();
-      };
+      void removeParentSpring(const size_t springIdx);
 
       /**
        * @brief Remove a set of edges from the graph
        *
        * @param edgeIdsToRemove
        */
-      void removePartialSprings(std::vector<igraph_integer_t>& edgeIdsToRemove)
-      {
-        igraph_vector_int_t edgeIdsToRemoveVec;
-        igraph_vector_int_init(&edgeIdsToRemoveVec, edgeIdsToRemove.size());
-        pylimer_tools::utils::StdVectorToIgraphVectorT(edgeIdsToRemove,
-                                                       &edgeIdsToRemoveVec);
-        igraph_delete_edges(&this->graph,
-                            igraph_ess_vector(&edgeIdsToRemoveVec));
-        igraph_vector_int_destroy(&edgeIdsToRemoveVec);
-        // remove vertices that "got lost"
-        // this->removeOrphanedVertices();
-
-        this->net.isUpToDate = false;
-      }
+      void removePartialSprings(std::vector<igraph_integer_t>& edgeIdsToRemove);
 
       /**
        * @brief marks a certain "parent" spring as non-existing
        */
       void combineParentSprings(size_t springIdxBefore, size_t springIdxNow);
+
+      /**
+       * @brief Combine two partial springs to be only one
+       *
+       * @param edge1Id
+       * @param edge2Id
+       */
+      void combinePartialSprings(const igraph_integer_t edge1Id,
+                                 const igraph_integer_t edge2Id);
+
+      /**
+       * @brief Remove a slip-link and combine the two edges corresponding to
+       * the rail
+       *
+       * @param vertexId
+       * @param railEdgeId
+       */
+      void unlinkSlipLinkFromRail(const igraph_integer_t vertexId,
+                                  const igraph_integer_t railEdgeId);
+
+      /**
+       * @brief Inserts the given slip-link into a partial spring
+       *
+       * @param vertexId the slip-link to insert into the spring
+       * @param railEdgeId the spring to be halfed
+       */
+      void insertSlipLinkIntoRail(const igraph_integer_t vertexId,
+                                  const igraph_integer_t railEdgeId);
 
       /**
        * @brief List the edges and vertices of one spring, in order
@@ -1081,29 +985,7 @@ namespace calc {
        * @return igraph_integer_t
        */
       igraph_integer_t findPartialSpringByFraction(size_t springIdx,
-                                                   double alpha)
-      {
-        igraph_vector_int_t edges;
-        igraph_vector_int_init(&edges, 0);
-
-        this->findEdgesAndVerticesOfSpring(springIdx, nullptr, &edges);
-
-        double currentAlpha = 0.0;
-        igraph_integer_t previousEdgeId = igraph_vector_int_get(&edges, 0);
-        for (size_t i = 1; i < igraph_vector_int_size(&edges); ++i) {
-          igraph_integer_t edgeId = igraph_vector_int_get(&edges, i);
-          currentAlpha +=
-            igraph_cattribute_EAN(&this->graph, "partition_fraction", edgeId);
-          if (currentAlpha > alpha) {
-            break;
-          }
-          previousEdgeId = edgeId;
-        }
-
-        igraph_vector_int_destroy(&edges);
-
-        return previousEdgeId;
-      }
+                                                   double alpha);
 
       /**
        * @brief Remove a certain, 2-functional link from the structures,
@@ -1138,7 +1020,7 @@ namespace calc {
        */
       std::vector<igraph_integer_t> getOffRailConnectedEdgeIds(
         igraph_integer_t vertexId,
-        size_t railEdge);
+        igraph_integer_t railEdgeId);
 
       /**
        * @brief Given a vertex and a connected edge, returns the edge in the
@@ -1146,7 +1028,7 @@ namespace calc {
        *
        */
       igraph_integer_t getOtherRailEdgeId(igraph_integer_t vertexId,
-                                          size_t railEdge);
+                                          igraph_integer_t railEdgeId);
 
       void relaxationLight(ForceBalanceNetwork& net,
                            Eigen::VectorXd& springPartitions,
@@ -2044,7 +1926,50 @@ namespace calc {
         Eigen::VectorXd& springPartitions,
         const double oneOverSpringPartitionUpperLimit,
         const int nrOfCrosslinkSwapsAllowedPerSliplink = -1,
-        const bool respectLoops = true);
+        const bool respectLoops = true)
+      {
+        for (size_t sliplinkIdx = net.nrOfNodes; sliplinkIdx < net.nrOfLinks;
+             ++sliplinkIdx) {
+          // check this slip-link
+          // std::cout << "Moving slip-link " << sliplinkIdx << " to its best
+          // branch"
+          //           << std::endl;
+          this->moveSlipLinkToItsBestBranch(
+            net,
+            springPartitions,
+            sliplinkIdx,
+            oneOverSpringPartitionUpperLimit,
+            nrOfCrosslinkSwapsAllowedPerSliplink,
+            respectLoops);
+          // this->validateNetwork(net, springPartitions);
+        }
+        this->validateNetwork(net, springPartitions);
+      };
+
+      /**
+       * @brief Decide whether the spring fraction is short enough to have a
+       * spring deserve swapping
+       *
+       * @param edgeId the edge to check for its fraction
+       * @param oneOverSpringPartitionUpperLimit
+       * @return true
+       * @return false
+       */
+      bool partialSpringRequestsSwapping(
+        const igraph_integer_t edgeId,
+        const double oneOverSpringPartitionUpperLimit)
+      {
+        const double N =
+          igraph_cattribute_EAN(&this->graph, "contour_length", edgeId);
+        const double swappableCutoff =
+          (oneOverSpringPartitionUpperLimit > 0.)
+            ? 1. / (N - 1. / oneOverSpringPartitionUpperLimit)
+            : 1e-12;
+
+        return (igraph_cattribute_EAN(&this->graph,
+                                      "partition_fraction",
+                                      edgeId) < swappableCutoff);
+      }
 
       /**
        * @brief Move a slip-link if appropriate to other springs
@@ -2054,13 +1979,50 @@ namespace calc {
        * @param springPartitions
        * @param oneOverSpringPartitionUpperLimit
        */
-      void moveSlipLinkToItsBestBranch(
+      bool moveSlipLinkToItsBestBranch(
         ForceBalanceNetwork& net,
         Eigen::VectorXd& springPartitions,
         size_t slipLinkIdx,
         const double oneOverSpringPartitionUpperLimit,
         const int nrOfCrosslinkSwapsAllowedPerSliplink = -1,
-        const bool respectLoops = true);
+        const bool respectLoops = true)
+      {
+        INVALIDARG_EXP_IFN(castToIgraphInt(igraph_cattribute_EAN(
+                             &this->graph, "type", slipLinkIdx)) ==
+                             this->slipLinkType,
+                           "Passed slip-link must be one.");
+        RUNTIME_EXP_IFN(igraph_cattribute_GAB(&this->graph, "is_up_to_date"),
+                        "Should not move slip-link if graph is not up-to-date");
+
+        igraph_vector_int_t edgesOfLink;
+        igraph_vector_int_init(&edgesOfLink, 4);
+        igraph_incident(&this->graph, &edgesOfLink, slipLinkIdx, IGRAPH_ALL);
+
+        if (igraph_vector_int_size(&edgesOfLink) != 4) {
+          return false;
+        }
+
+        bool didSwap = false;
+        for (size_t i = 0; i < igraph_vector_int_size(&edgesOfLink); ++i) {
+          const igraph_integer_t edgeId =
+            igraph_vector_int_get(&edgesOfLink, i);
+          if (this->partialSpringRequestsSwapping(
+                edgeId, oneOverSpringPartitionUpperLimit)) {
+            didSwap =
+              this->swapSlipLinkReversibly(net,
+                                           springPartitions,
+                                           edgeId,
+                                           oneOverSpringPartitionUpperLimit,
+                                           nrOfCrosslinkSwapsAllowedPerSliplink,
+                                           respectLoops);
+          }
+          if (didSwap) {
+            return didSwap;
+          }
+        }
+
+        return didSwap;
+      };
 
       /**
        * @brief Loop all springs, swap slip-links on them if they are close
@@ -2070,8 +2032,28 @@ namespace calc {
        */
       void swapSlipLinksInclXlinks(ForceBalanceNetwork& net,
                                    Eigen::VectorXd& springPartitions,
-                                   double swappableCutoff,
-                                   const bool respectLoops = true);
+                                   double oneOverSpringPartitionUpperLimit,
+                                   const bool respectLoops = true)
+      {
+        for (long int i = igraph_ecount(&this->graph); i >= 0; --i) {
+          // problem: when moving slip-links, the edges ids change
+          // "solution": edge ids increase -> if we remove one, we might
+          // re-visit the previous, but otherwise, things should be fine
+          if (this->partialSpringRequestsSwapping(
+                i, oneOverSpringPartitionUpperLimit)) {
+            if (this->springInvolvesCrossLink(i)) {
+              this->rotateSlipLinkAroundCrosslink(
+                net,
+                springPartitions,
+                i,
+                oneOverSpringPartitionUpperLimit,
+                respectLoops);
+            } else {
+              this->swapSlipLinks(i);
+            }
+          }
+        }
+      };
 
       /**
        * @brief Loop all springs, swap slip-links on them if they are close
@@ -2081,8 +2063,19 @@ namespace calc {
        */
       void swapSlipLinks(ForceBalanceNetwork& net,
                          Eigen::VectorXd& springPartitions,
-                         double swappableCutoff){
-
+                         double oneOverSpringPartitionUpperLimit)
+      {
+        for (long int i = igraph_ecount(&this->graph); i >= 0; --i) {
+          // problem: when moving slip-links, the edges ids change
+          // "solution": edge ids increase -> if we remove one, we might
+          // re-visit the previous, but otherwise, things should be fine
+          if (this->partialSpringRequestsSwapping(
+                i, oneOverSpringPartitionUpperLimit)) {
+            if (!this->springInvolvesCrossLink(i)) {
+              this->swapSlipLinks(i);
+            }
+          }
+        }
       };
 
       /**
@@ -2105,9 +2098,6 @@ namespace calc {
             &this->graph, "type", linkIdx2)) == this->slipLinkType,
           "Only partial springs with only slip-links allow swapping.");
 
-        const size_t springIdx = castToIgraphInt(
-          igraph_cattribute_EAN(&this->graph, "parent_edge", partialSpringIdx));
-
         igraph_vector_int_t edgesOfLink1;
         igraph_vector_int_init(&edgesOfLink1, 4);
         igraph_incident(&this->graph, &edgesOfLink1, linkIdx1, IGRAPH_ALL);
@@ -2122,12 +2112,14 @@ namespace calc {
         igraph_integer_t otherEdge2 =
           this->getOtherRailEdgeId(linkIdx2, partialSpringIdx);
         igraph_integer_t newEdge1 = igraph_ecount(&this->graph);
-        igraph_add_edge(linkIdx1,
-                           this->getOtherEdgePartner(otherEdge2, linkIdx2));
+        igraph_add_edge(&this->graph,
+                        linkIdx1,
+                        this->getOtherEdgePartner(otherEdge2, linkIdx2));
         this->copyBondProperties(otherEdge1, newEdge1);
         igraph_integer_t newEdge2 = igraph_ecount(&this->graph);
-        igraph_add_edge(linkIdx2,
-                           this->getOtherEdgePartner(otherEdge1, linkIdx1));
+        igraph_add_edge(&this->graph,
+                        linkIdx2,
+                        this->getOtherEdgePartner(otherEdge1, linkIdx1));
         this->copyBondProperties(otherEdge2, newEdge2);
         // re-set box offset based on sum of the participating vectors
         this->setBondBoxOffsetForEdge(
@@ -2148,20 +2140,117 @@ namespace calc {
         this->net.isUpToDate = false;
       };
 
+      /**
+       * @brief Swap slip- or cross-links along a partial spring, iff the
+       * slip-link may still swap, and iff the swap is MC favourable
+       *
+       * @param net
+       * @param springPartitions
+       * @param partialSpringIdx edge idx
+       * @param oneOverSpringPartitionUpperLimit
+       * @param nrOfCrosslinkSwapsAllowedPerSliplink
+       * @param respectLoops
+       * @return true if the swap was successful
+       * @return false if the swap was not successful
+       */
       bool swapSlipLinkReversibly(
         ForceBalanceNetwork& net,
         Eigen::VectorXd& springPartitions,
         const size_t partialSpringIdx,
         const double oneOverSpringPartitionUpperLimit = 1.0,
         const int nrOfCrosslinkSwapsAllowedPerSliplink = -1,
-        const bool respectLoops = true);
+        const bool respectLoops = true)
+      {
+        // analyse spring
+        if (this->springInvolvesCrossLink(partialSpringIdx)) {
+          igraph_integer_t from, to;
+          igraph_edge(&this->graph, partialSpringIdx, &from, &to);
+          igraph_integer_t slipLinkIdx = from;
+          if (castToIgraphInt(igraph_cattribute_VAN(
+                &this->graph, "type", from)) == this->crosslinkerType) {
+            slipLinkIdx = to;
+          }
 
-      long int rotateSlipLinkAroundCrosslink(
+          // first check if allowed.
+          if ((nrOfCrosslinkSwapsAllowedPerSliplink < 0) ||
+              (castToIgraphInt(igraph_cattribute_VAN(
+                 &this->graph, "num_link_swaps", slipLinkIdx)) <
+               nrOfCrosslinkSwapsAllowedPerSliplink)) {
+            bool didSwap = this->swapSlipLinkWithXlinkReversibly(
+              net,
+              springPartitions,
+              partialSpringIdx,
+              oneOverSpringPartitionUpperLimit,
+              respectLoops);
+            if (didSwap) {
+              igraph_cattribute_VAN_set(&this->graph,
+                                        "num_link_swaps",
+                                        slipLinkIdx,
+                                        igraph_cattribute_VAN(&this->graph,
+                                                              "num_link_swaps",
+                                                              slipLinkIdx) +
+                                          1);
+            }
+            return didSwap;
+          }
+          return false;
+        } else {
+          return this->swapSlipLinksReversibly(
+            net,
+            springPartitions,
+            partialSpringIdx,
+            oneOverSpringPartitionUpperLimit);
+        }
+      };
+
+      /**
+       * @brief Move a slip-link from one spring attached to a cross-link to
+       * another spring attached to the same cross-link
+       *
+       * @param net
+       * @param u
+       * @param springPartitions
+       * @param partialSpringIdx
+       */
+      void rotateSlipLinkAroundCrosslink(
         ForceBalanceNetwork& net,
         Eigen::VectorXd& springPartitions,
         const size_t partialSpringIdx,
         double oneOverSpringPartitionUpperLimit = 1.0,
-        const bool respectLoops = true);
+        const bool respectLoops = true)
+      {
+        igraph_integer_t from, to;
+        igraph_edge(&this->graph, partialSpringIdx, &from, &to);
+
+        igraph_integer_t xlinkIdx =
+          castToIgraphInt(igraph_cattribute_VAN(&this->graph, "type", from)) ==
+              this->crosslinkerType
+            ? from
+            : to;
+        igraph_integer_t slipLinkIdx = xlinkIdx == from ? to : from;
+        assert(castToIgraphInt(igraph_cattribute_VAN(
+                 &this->graph, "type", xlinkIdx)) == this->crosslinkerType);
+
+        this->unlinkSlipLinkFromRail(slipLinkIdx, partialSpringIdx);
+
+        igraph_vector_int_t edgesOfCrossLink;
+        igraph_vector_int_init(&edgesOfCrossLink, 4);
+        igraph_incident(&this->graph, &edgesOfCrossLink, xlinkIdx, IGRAPH_ALL);
+        RUNTIME_EXP_IFN(igraph_vector_int_size(&edgesOfCrossLink) > 0,
+                        "Expected to find more than one edge on slip-link");
+        int nextEdgeIndex = igraph_vector_int_get(&edgesOfCrossLink, 0);
+        // use the smallest edge index as the new rail
+        for (size_t i = 1; i < igraph_vector_int_size(&edgesOfCrossLink); ++i) {
+          if (igraph_vector_int_get(&edgesOfCrossLink, i) < nextEdgeIndex) {
+            nextEdgeIndex = i;
+          }
+        }
+
+        igraph_vector_int_destroy(&edgesOfCrossLink);
+
+        this->insertSlipLinkIntoRail(
+          slipLinkIdx, igraph_vector_int_get(&edgesOfCrossLink, nextEdgeIndex));
+      };
 
       /**
        * @brief Displace one link to the mean of all connected neighbours
@@ -2465,6 +2554,7 @@ namespace calc {
         this->net.springPartIndexA.resize(this->net.nrOfPartialSprings);
         this->net.springPartIndexB.resize(this->net.nrOfPartialSprings);
         this->net.springPartBoxOffset.resize(this->net.nrOfPartialSprings);
+        this->net.nrOfCrosslinkSwapsEndured.resize(this->net.nrOfLinks);
         this->currentSpringPartitionsVec.resize(this->net.nrOfPartialSprings);
 
         // reset everything we cleared
@@ -2604,6 +2694,11 @@ namespace calc {
         igraph_vector_init(&coordsZ, this->net.nrOfLinks);
         igraph_cattribute_VANV(&this->graph, "z", igraph_vss_all(), &coordsZ);
 
+        igraph_vector_t numLinkSwaps;
+        igraph_vector_init(&numLinkSwaps, this->net.nrOfLinks);
+        igraph_cattribute_VANV(
+          &this->graph, "num_link_swaps", igraph_vss_all(), &numLinkSwaps);
+
         igraph_vector_t linkType;
         igraph_vector_init(&linkType, this->net.nrOfLinks);
         igraph_cattribute_VANV(
@@ -2614,6 +2709,8 @@ namespace calc {
           this->net.coordinates(3 * i + 0) = igraph_vector_get(&coordsX, i);
           this->net.coordinates(3 * i + 1) = igraph_vector_get(&coordsY, i);
           this->net.coordinates(3 * i + 2) = igraph_vector_get(&coordsZ, i);
+          this->net.nrOfCrosslinkSwapsEndured(i) =
+            castToIgraphInt(igraph_vector_get(&numLinkSwaps, i));
           this->net.linkIsSliplink(i) =
             castToIgraphInt(igraph_vector_get(&linkType, i)) ==
             this->slipLinkType;
@@ -2829,12 +2926,36 @@ namespace calc {
         return i1 > i2 ? std::make_pair(i1, i2) : std::make_pair(i2, i1);
       }
 
+      /**
+       * @brief Swap two slip-links along a partial spring, iff the move leads
+       * to a smaller stress diagonal squared norm
+       *
+       * @param net
+       * @param springPartitions
+       * @param partialSpringIdx
+       * @param oneOverSpringPartitionUpperLimit
+       * @return true
+       * @return false
+       */
       bool swapSlipLinksReversibly(
         ForceBalanceNetwork& net,
         Eigen::VectorXd& springPartitions,
         const size_t partialSpringIdx,
-        const double oneOverSpringPartitionUpperLimit = 1.0);
+        const double oneOverSpringPartitionUpperLimit = 1.0){
 
+      };
+
+      /**
+       * @brief Swap a slip-link and a cross-link along a partial spring, iff
+       * the move leads to a smaller stress diagonal squared norm
+       *
+       * @param net
+       * @param springPartitions
+       * @param partialSpringIdx
+       * @param oneOverSpringPartitionUpperLimit
+       * @return true
+       * @return false
+       */
       bool swapSlipLinkWithXlinkReversibly(
         ForceBalanceNetwork& net,
         Eigen::VectorXd& springPartitions,

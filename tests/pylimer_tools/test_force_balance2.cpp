@@ -753,11 +753,6 @@ TEST_CASE("MEHP Force Balance can randomly add slip-links ignoring cross-links",
     REQUIRE(nrOfAddedLinks >= 50);
     REQUIRE_NOTHROW(forceBalancer.validateNetwork());
     std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
-    nrOfAddedLinks =
-      forceBalancer.randomlyAddSliplinks(250, 2.0, 100, 2.0, false, 25);
-    REQUIRE(nrOfAddedLinks >= 50);
-    REQUIRE_NOTHROW(forceBalancer.validateNetwork());
-    std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
 
     pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
     Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();

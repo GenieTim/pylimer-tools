@@ -115,6 +115,7 @@ namespace calc {
             } else if (allowSlipLinksToPassEachOther == LinkSwappingMode::ALL) {
               this->swapSlipLinksInclXlinks(this->net,
                                             this->currentSpringPartitionsVec,
+
                                             oneOverSpringPartitionUpperLimit);
             } else if (allowSlipLinksToPassEachOther ==
                        LinkSwappingMode::ALL_MC) {
@@ -707,13 +708,48 @@ namespace calc {
       igraph_vector_int_destroy(&verticesOnPath);
     }
 
+
+      /**
+       * @brief Find the index of a partial spring, given the fractn of the
+       * total spring to traverse
+       *
+       * @param springIdx
+       * @param alpha
+       * @return igraph_integer_t
+       */
+      igraph_integer_t MEHPForceBalance2::findPartialSpringByFraction(size_t springIdx,
+                                                   double alpha)
+      {
+        igraph_vector_int_t edges;
+        igraph_vector_int_init(&edges, 0);
+
+        this->findEdgesAndVerticesOfSpring(springIdx, nullptr, &edges);
+
+        double currentAlpha = 0.0;
+        igraph_integer_t previousEdgeId = igraph_vector_int_get(&edges, 0);
+        for (size_t i = 1; i < igraph_vector_int_size(&edges); ++i) {
+          igraph_integer_t edgeId = igraph_vector_int_get(&edges, i);
+          currentAlpha +=
+            igraph_cattribute_EAN(&this->graph, "partition_fraction", edgeId);
+          if (currentAlpha > alpha) {
+            break;
+          }
+          previousEdgeId = edgeId;
+        }
+
+        igraph_vector_int_destroy(&edges);
+
+        return previousEdgeId;
+      }
+
+
     /**
      * @brief Given a vertex id and a rail edge, returns the other two edges
      * that are not part of the rail
      */
     std::vector<igraph_integer_t> MEHPForceBalance2::getOffRailConnectedEdgeIds(
       igraph_integer_t vertexId,
-      igraph_integer_t railEdge)
+      igraph_integer_t railEdgeId)
     {
       INVALIDARG_EXP_IFN(igraph_cattribute_VAN(&this->graph,
                                                "type",
@@ -721,7 +757,8 @@ namespace calc {
                          "Can only search for rail around slip-links");
 
       // fetch the edges involved
-      igraph_integer_t otherRailEdge = this->getOtherRailEdgeId(vertexId, railEdge);
+      igraph_integer_t otherRailEdge =
+        this->getOtherRailEdgeId(vertexId, railEdgeId);
       igraph_es_t selector;
       igraph_es_incident(&selector, vertexId, IGRAPH_ALL);
       igraph_eit_t iterator;
@@ -729,7 +766,7 @@ namespace calc {
       std::vector<igraph_integer_t> results;
       results.reserve(IGRAPH_EIT_SIZE(iterator) - 2);
       while (!IGRAPH_EIT_END(iterator)) {
-        if ((IGRAPH_EIT_GET(iterator) != railEdge) &&
+        if ((IGRAPH_EIT_GET(iterator) != railEdgeId) &&
             (IGRAPH_EIT_GET(iterator) != otherRailEdge)) {
           results.push_back(IGRAPH_EIT_GET(iterator));
         }
@@ -748,8 +785,9 @@ namespace calc {
      * opposite direction
      *
      */
-    igraph_integer_t MEHPForceBalance2::getOtherRailEdgeId(igraph_integer_t vertexId,
-                                                 igraph_integer_t railEdge)
+    igraph_integer_t MEHPForceBalance2::getOtherRailEdgeId(
+      igraph_integer_t vertexId,
+      igraph_integer_t railEdgeId)
     {
       INVALIDARG_EXP_IFN(igraph_cattribute_VAN(&this->graph,
                                                "type",
@@ -766,7 +804,7 @@ namespace calc {
       size_t current_idx = 0;
       while (!IGRAPH_EIT_END(iterator)) {
         igraph_vector_int_push_back(&edgeIds, IGRAPH_EIT_GET(iterator));
-        if (IGRAPH_EIT_GET(iterator) == railEdge) {
+        if (IGRAPH_EIT_GET(iterator) == railEdgeId) {
           rail_idx = current_idx;
         }
         IGRAPH_EIT_NEXT(iterator);
@@ -839,7 +877,7 @@ namespace calc {
       size_t result = 0;
       bool foundResult = false;
       for (size_t i = 0; i < igraph_vector_int_size(&edgesOnPath); ++i) {
-        if (igraph_cattribute_EAN(&subgraph, "prev_edge_id", i) == railEdge) {
+        if (igraph_cattribute_EAN(&subgraph, "prev_edge_id", i) == railEdgeId) {
           // yay, found the rail.
           // now: on either side of this is the
           // link we talk about. We are interested in the edge on the other
@@ -881,6 +919,197 @@ namespace calc {
     //----------------------------------------------------------------
 
     /**
+     * @brief Combine two partial springs to be only one
+     *
+     * @param edge1Id
+     * @param edge2Id
+     */
+    void MEHPForceBalance2::combinePartialSprings(
+      const igraph_integer_t edge1Id,
+      const igraph_integer_t edge2Id)
+    {
+      igraph_integer_t from1, to1;
+      igraph_edge(&this->graph, edge1Id, &from1, &to1);
+      igraph_integer_t from2, to2;
+      igraph_edge(&this->graph, edge2Id, &from2, &to2);
+      igraph_integer_t centralLink;
+      if (from1 == from2 || from1 == to2) {
+        centralLink = from1;
+      } else {
+        RUNTIME_EXP_IFN((to1 == from2 || to1 == to2),
+                        "Could not find central link");
+        centralLink = to1;
+      }
+
+      size_t newEdgeId = igraph_ecount(&this->graph);
+      igraph_add_edge(&this->graph,
+                      to1 == centralLink ? from1 : to1,
+                      to2 == centralLink ? from2 : to2);
+      // verify our assumption of the new edge id
+      igraph_integer_t from, to;
+      igraph_edge(&this->graph, newEdgeId, &from, &to);
+      RUNTIME_EXP_IFN((from == (to1 == centralLink ? from1 : to1) &&
+                       to == (to2 == centralLink ? from2 : to2)),
+                      "Assumption made on edges is incorrect");
+
+      igraph_cattribute_EAN_set(
+        &this->graph,
+        "parent_edge",
+        newEdgeId,
+        igraph_cattribute_EAN(&this->graph, "parent_edge", edge1Id));
+
+      // merge edge properties
+      if (igraph_cattribute_EAN(&this->graph, "parent_edge", edge1Id) !=
+          igraph_cattribute_EAN(&this->graph, "parent_edge", edge2Id)) {
+        // two different "parent" springs -> need to recalculate some stuff
+        // probably only if link is cross-link
+        this->combineParentSprings(
+          igraph_cattribute_EAN(&this->graph, "parent_edge", edge1Id),
+          igraph_cattribute_EAN(&this->graph, "parent_edge", edge2Id));
+      } else {
+        // the same "parent" spring
+        igraph_cattribute_EAN_set(
+          &this->graph,
+          "partition_fraction",
+          newEdgeId,
+          igraph_cattribute_EAN(&this->graph, "partition_fraction", edge1Id) +
+            igraph_cattribute_EAN(&this->graph, "partition_fraction", edge2Id));
+      }
+
+      // "new" spawning edge will be between the two neighbours
+      double removedEdgeBoxPrefix = (from1 == centralLink) ? 1. : -1.;
+      igraph_edge(&this->graph, edge2Id, &from, &to);
+      double keptEdgeBondPrefix = (from1 == centralLink) ? -1. : 1.;
+
+      for (std::string dir : { "x", "y", "z" }) {
+        igraph_cattribute_EAN_set(
+          &this->graph,
+          ("bond_box_" + dir).c_str(),
+          newEdgeId,
+          // TODO: rethink the prefixes
+          igraph_cattribute_EAN(
+            &this->graph, ("bond_box_" + dir).c_str(), edge2Id) *
+              keptEdgeBondPrefix +
+            igraph_cattribute_EAN(
+              &this->graph, ("bond_box_" + dir).c_str(), edge1Id) *
+              removedEdgeBoxPrefix);
+      }
+
+      igraph_delete_edges(&this->graph, igraph_ess_1(edge1Id));
+      igraph_delete_edges(&this->graph, igraph_ess_1(edge2Id));
+      this->net.isUpToDate = false;
+    }
+
+    /**
+     * @brief Remove a slip-link and combine the two edges corresponding to
+     * the rail
+     *
+     * @param vertexId
+     * @param railEdgeId
+     */
+    void MEHPForceBalance2::unlinkSlipLinkFromRail(
+      const igraph_integer_t vertexId,
+      const igraph_integer_t railEdgeId)
+    {
+      igraph_integer_t otherRailEdge =
+        this->getOtherRailEdgeId(vertexId, railEdgeId);
+
+      this->combinePartialSprings(railEdgeId, otherRailEdge);
+    }
+
+    /**
+     * @brief Inserts the given slip-link into a partial spring
+     *
+     * @param vertexId the slip-link to insert into the spring
+     * @param railEdgeId the spring to be halfed
+     */
+    void MEHPForceBalance2::insertSlipLinkIntoRail(
+      const igraph_integer_t vertexId,
+      const igraph_integer_t railEdgeId)
+    {
+      igraph_integer_t from, to;
+      igraph_edge(&this->graph, railEdgeId, &from, &to);
+
+      igraph_integer_t newEdge1 = igraph_ecount(&this->graph);
+      igraph_add_edge(&this->graph, from, vertexId);
+      igraph_integer_t newEdge2 = newEdge1 + 1;
+      igraph_add_edge(&this->graph, vertexId, to);
+
+      this->copyScaleBondProperties(railEdgeId, newEdge1, 0.5);
+      this->copyBondProperty("parent_edge", railEdgeId, newEdge1);
+      this->copyScaleBondProperties(railEdgeId, newEdge2, 0.5);
+      this->copyBondProperty("parent_edge", railEdgeId, newEdge2);
+      // TODO: figure out which of the two new edges should get the offset?!?
+      // for now, assume it does not matter, give to second one
+      this->setBondBoxOffsetForEdge(newEdge1, Eigen::Vector3d::Zero());
+      this->setBondBoxOffsetForEdge(newEdge2,
+                                    this->getBondBoxOffsetForEdge(railEdgeId));
+
+      igraph_delete_edges(&this->graph, igraph_ess_1(railEdgeId));
+      this->net.isUpToDate = false;
+    }
+
+    /**
+     * @brief Remove a spring (and all its parts, incl. slip-links) from the
+     * structures
+     *
+     * NOTE: this may result in slip-links with f = 2.
+     * They are not automatically removed in order to preserve vertex
+     * iterations.
+     *
+     * @param net
+     * @param springPartitions
+     */
+    void MEHPForceBalance2::removeParentSpring(const size_t springIdx)
+    {
+      if (!igraph_cattribute_GAB(&this->graph, "is_up_to_date")) {
+        this->updateGraph();
+      }
+
+      igraph_vector_t parentEdges;
+      igraph_vector_init(&parentEdges, this->net.nrOfPartialSprings);
+      igraph_cattribute_EANV(&this->graph,
+                             "parent_edge",
+                             igraph_ess_all(IGRAPH_EDGEORDER_ID),
+                             &parentEdges);
+
+      std::vector<igraph_integer_t> edgeIdsToRemove;
+      edgeIdsToRemove.reserve(4);
+      for (igraph_integer_t i = 0; i < igraph_vector_size(&parentEdges); ++i) {
+        if (igraph_vector_get(&parentEdges, i) == springIdx) {
+          edgeIdsToRemove.push_back(i);
+        }
+      }
+
+      igraph_vector_destroy(&parentEdges);
+      // actually remove all edges
+      this->removePartialSprings(edgeIdsToRemove);
+      // as the above may lead to slip-links with f = 2,
+      // we want to remove those as well
+      // this->removeTwofunctionalLinks();
+    };
+
+    /**
+     * @brief Remove a set of edges from the graph
+     *
+     * @param edgeIdsToRemove
+     */
+    void MEHPForceBalance2::removePartialSprings(
+      std::vector<igraph_integer_t>& edgeIdsToRemove)
+    {
+      igraph_vector_int_t edgeIdsToRemoveVec;
+      igraph_vector_int_init(&edgeIdsToRemoveVec, edgeIdsToRemove.size());
+      pylimer_tools::utils::StdVectorToIgraphVectorT(edgeIdsToRemove,
+                                                     &edgeIdsToRemoveVec);
+      igraph_delete_edges(&this->graph, igraph_ess_vector(&edgeIdsToRemoveVec));
+      igraph_vector_int_destroy(&edgeIdsToRemoveVec);
+      // remove vertices that "got lost"
+      // this->removeOrphanedVertices();
+
+      this->net.isUpToDate = false;
+    }
+
+    /**
      * @brief Remove a certain link from the structures, removing all
      * connections
      */
@@ -920,7 +1149,7 @@ namespace calc {
       igraph_integer_t from, to;
       igraph_edge(&this->graph, newEdgeId, &from, &to);
       RUNTIME_EXP_IFN((from == neighbours[0] && to == neighbours[1]),
-                      "Assumption made on edges is incorrect");
+                      "Assumption made on edges isi incorrect");
 
       // fetch the edges involved
       igraph_es_t selector;
@@ -944,56 +1173,7 @@ namespace calc {
       size_t removedEdge2 = std::max(igraph_vector_int_get(&edgeIds, 0),
                                      igraph_vector_int_get(&edgeIds, 1));
 
-      igraph_cattribute_EAN_set(
-        &this->graph,
-        "parent_edge",
-        newEdgeId,
-        igraph_cattribute_EAN(&this->graph, "parent_edge", removedEdge1));
-
-      // merge edge properties
-      if (igraph_cattribute_EAN(&this->graph, "parent_edge", removedEdge1) !=
-          igraph_cattribute_EAN(&this->graph, "parent_edge", removedEdge2)) {
-        // two different "parent" springs -> need to recalculate some stuff
-        // probably only if link is cross-link
-        this->combineParentSprings(
-          igraph_cattribute_EAN(&this->graph, "parent_edge", removedEdge1),
-          igraph_cattribute_EAN(&this->graph, "parent_edge", removedEdge2));
-      } else {
-        // the same "parent" spring
-        igraph_cattribute_EAN_set(
-          &this->graph,
-          "partition_fraction",
-          newEdgeId,
-          igraph_cattribute_EAN(
-            &this->graph, "partition_fraction", removedEdge1) +
-            igraph_cattribute_EAN(
-              &this->graph, "partition_fraction", removedEdge2));
-      }
-
-      // "new" spawning edge will be between the two neighbours
-      igraph_edge(&this->graph, removedEdge1, &from, &to);
-      double removedEdgeBoxPrefix = (from == linkIdx) ? 1. : -1.;
-      igraph_edge(&this->graph, removedEdge2, &from, &to);
-      double keptEdgeBondPrefix = (from == linkIdx) ? -1. : 1.;
-
-      for (std::string dir : { "x", "y", "z" }) {
-        igraph_cattribute_EAN_set(
-          &this->graph,
-          ("bond_box_" + dir).c_str(),
-          newEdgeId,
-          // TODO: rethink the prefixes
-          igraph_cattribute_EAN(
-            &this->graph, ("bond_box_" + dir).c_str(), removedEdge2) *
-              keptEdgeBondPrefix +
-            igraph_cattribute_EAN(
-              &this->graph, ("bond_box_" + dir).c_str(), removedEdge1) *
-              removedEdgeBoxPrefix);
-      }
-
-      igraph_delete_edges(&this->graph,
-                          igraph_ess_1(std::max(removedEdge1, removedEdge2)));
-      igraph_delete_edges(&this->graph,
-                          igraph_ess_1(std::min(removedEdge1, removedEdge2)));
+      this->combinePartialSprings(removedEdge1, removedEdge2);
 
       igraph_delete_vertices(&this->graph, igraph_vss_1(linkIdx));
       this->net.isUpToDate = false;
@@ -1127,6 +1307,167 @@ namespace calc {
     //----------------------------------------------------------------
     // MARK: Concrete structure modification
     //----------------------------------------------------------------
+
+
+
+      /**
+       * @brief Remove all "parent" springs that have no active "children"
+       *
+       * @param tolerance the acceptance tolerance, partial springs longer than
+       * this are active
+       */
+      size_t MEHPForceBalance2::removeInactiveParentEdges(double tolerance)
+      {
+        size_t numRemoved = 0;
+
+        igraph_vector_t parentEdges;
+        igraph_vector_init(&parentEdges, this->net.nrOfPartialSprings);
+        igraph_cattribute_EANV(&this->graph,
+                               "parent_edge",
+                               igraph_ess_all(IGRAPH_EDGEORDER_ID),
+                               &parentEdges);
+
+        std::unordered_map<igraph_integer_t, bool> isRemovalCandidate;
+        for (igraph_integer_t i = 0; i < igraph_vector_size(&parentEdges);
+             ++i) {
+          igraph_integer_t parentEdgeid =
+            castToIgraphInt(igraph_vector_get(&parentEdges, i));
+          isRemovalCandidate[parentEdgeid] = true;
+        }
+        for (igraph_integer_t i = 0; i < igraph_vector_size(&parentEdges);
+             ++i) {
+          igraph_integer_t parentEdgeid =
+            castToIgraphInt(igraph_vector_get(&parentEdges, i));
+          if (isRemovalCandidate.at(parentEdgeid)) {
+            isRemovalCandidate[parentEdgeid] =
+              this->computeEdgeLength(i).squaredNorm() <= tolerance;
+          }
+        }
+
+        igraph_vector_destroy(&parentEdges);
+
+        std::vector<igraph_integer_t> edgeIdsToRemove;
+        for (auto& [key, value] : isRemovalCandidate) {
+          if (value) {
+            edgeIdsToRemove.push_back(key);
+          }
+        }
+
+        this->removePartialSprings(edgeIdsToRemove);
+
+        return numRemoved;
+      }
+
+    /**
+     * @brief remove all vertices that don't have any connections
+     */
+    void MEHPForceBalance2::removeOrphanedVertices()
+    {
+      if (!igraph_cattribute_GAB(&this->graph, "is_up_to_date")) {
+        this->updateGraph();
+      }
+
+      igraph_vector_int_t degrees;
+      igraph_vector_int_init(&degrees, igraph_vcount(&this->graph));
+      igraph_degree(&this->graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true);
+
+      std::vector<size_t> vertexIds;
+
+      for (size_t i = 0; i < igraph_vector_int_size(&degrees); ++i) {
+        if (igraph_vector_int_get(&degrees, i) == 0) {
+          vertexIds.push_back(i);
+        }
+      }
+
+      if (vertexIds.size() == 0) {
+        return;
+      }
+
+      igraph_vector_int_t vertexIdsVec;
+      igraph_vector_int_init(&vertexIdsVec, vertexIds.size());
+      pylimer_tools::utils::StdVectorToIgraphVectorT(vertexIds, &vertexIdsVec);
+      igraph_delete_vertices(&this->graph, igraph_vss_vector(&vertexIdsVec));
+
+      this->net.isUpToDate = false;
+    }
+
+
+      /**
+       * @brief Remove all vertices (incl. edges!) with a functionality < 3 for
+       * cross-links, < 4 for slip-links
+       *
+       * @param minCrosslinkFunctionalityToBeKept
+       * @return size_t the number of removed vertices
+       */
+      size_t MEHPForceBalance2::removeSubfunctionalVertices()
+      {
+        size_t numRemovedTotal = 0;
+        size_t numRemovedInIteration = 0;
+        do {
+          numRemovedInIteration = 0;
+
+          igraph_vector_int_t degrees;
+          igraph_vector_int_init(&degrees, igraph_vcount(&this->graph));
+          igraph_vector_t types;
+          igraph_vector_init(&types, igraph_vcount(&this->graph));
+          igraph_cattribute_VANV(
+            &this->graph, "type", igraph_vss_all(), &types);
+          // we count self-loops here
+          // only afterwards, we check, whether they actually have relevant bond
+          // box offsets
+          igraph_degree(
+            &this->graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true);
+
+          igraph_vector_int_t indicesToRemove;
+          igraph_vector_int_init(&indicesToRemove, 0);
+          for (size_t i = 0; i < igraph_vcount(&this->graph); ++i) {
+            if (igraph_vector_int_get(&degrees, i) < 2) {
+              igraph_vector_int_push_back(&indicesToRemove, i);
+            }
+          }
+
+          igraph_delete_vertices(&this->graph,
+                                 igraph_vss_vector(&indicesToRemove));
+
+          numRemovedInIteration = igraph_vector_int_size(&indicesToRemove);
+
+          igraph_vector_int_destroy(&indicesToRemove);
+
+          // the function may lead to slip-links being inconsistenly
+          // linked (e.g., at the end of a chain)
+          // -> here, we remove those dangling ones.
+          // f = 1 and below have been removed
+          // -> cleanup remaining f = 2 and f = 3
+          if (numRemovedInIteration > 0) {
+            // reload degree and type, since the vertex index changed
+            igraph_degree(
+              &this->graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true);
+            igraph_cattribute_VANV(
+              &this->graph, "type", igraph_vss_all(), &types);
+          }
+          for (long int i = igraph_vcount(&this->graph); i >= 0; --i) {
+            if (castToIgraphInt(igraph_vector_int_get(&degrees, i)) == 2) {
+              this->remove2fLink(i);
+              numRemovedInIteration += 1;
+            } else if (castToIgraphInt(igraph_vector_int_get(&degrees, i)) ==
+                         3 &&
+                       castToIgraphInt(igraph_vector_get(&types, i)) ==
+                         this->slipLinkType) {
+              this->remove3fLink(i);
+              numRemovedInIteration += 1;
+            }
+          }
+
+          igraph_vector_int_destroy(&degrees);
+          igraph_vector_destroy(&types);
+          numRemovedTotal += numRemovedInIteration;
+        } while (numRemovedInIteration > 0);
+
+        if (numRemovedTotal > 0) {
+          this->net.isUpToDate = false;
+        }
+        return numRemovedTotal;
+      }
 
     /**
      * @brief Remove cross-links which do not have any springs with a certain
