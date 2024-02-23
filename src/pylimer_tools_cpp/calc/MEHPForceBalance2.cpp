@@ -1340,7 +1340,7 @@ namespace calc {
             castToIgraphInt(igraph_vector_get(&parentEdges, i));
           if (isRemovalCandidate.at(parentEdgeid)) {
             isRemovalCandidate[parentEdgeid] =
-              this->computeEdgeLength(i).squaredNorm() <= tolerance;
+              this->computeEdgeDistance(i).squaredNorm() <= tolerance;
           }
         }
 

@@ -22,6 +22,10 @@
 #include <string>
 #include <tuple>
 #include <vector>
+extern "C"
+{
+#include <igraph/igraph.h>
+}
 
 namespace pylimer_tools {
 namespace calc {
@@ -44,7 +48,7 @@ namespace calc {
                     : (N)));
 #endif
 
-    igraph_integer_t castToIgraphInt(igraph_real_t c)
+    static inline igraph_integer_t castToIgraphInt(igraph_real_t c)
     {
       return static_cast<igraph_integer_t>(std::lround(c));
     }
@@ -3046,7 +3050,7 @@ namespace calc {
                         "Expected to find more than one edge on slip-link");
 
         igraph_integer_t otherRailPart =
-          this->getOtherRailEdgeId(slpLinkIdx, partialSpringIdx);
+          this->getOtherRailEdgeId(slipLinkIdx, partialSpringIdx);
 
         Eigen::Vector3d otherRailDistance =
           this->computeEdgeDistanceFrom(otherRailPart, slipLinkIdx);
@@ -3077,7 +3081,7 @@ namespace calc {
           }
         }
 
-        return false
+        return false;
       };
     };
   } // namespace mehp
