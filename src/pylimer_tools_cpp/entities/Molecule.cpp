@@ -403,11 +403,9 @@ namespace entities {
       "apparently, did not find both vertices to compute overall bond sum for");
   };
 
-  size_t Molecule::getNrOfBondsFromTo(
-
-    size_t atomIdFrom,
-    size_t atomIdTo,
-    const int crosslinkerType) const
+  size_t Molecule::getNrOfBondsFromTo(size_t atomIdFrom,
+                                      size_t atomIdTo,
+                                      const int crosslinkerType) const
   {
     std::vector<long int> alignedVertices =
       this->getVerticesLinedUp(crosslinkerType);
@@ -431,7 +429,8 @@ namespace entities {
       }
     }
     throw std::runtime_error(
-      "apparently, did not find both vertices to count atoms between");
+      "apparently, did not find both vertices (" + std::to_string(atomIdTo) +
+      " & " + std::to_string(atomIdFrom) + ") to count atoms between");
   }
 
   /**
