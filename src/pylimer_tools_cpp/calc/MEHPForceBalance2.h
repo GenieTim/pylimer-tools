@@ -96,9 +96,11 @@ namespace calc {
         this->crosslinkerType = crosslinkerType;
         // interpret network already to be able to give early results
         ForceBalanceNetwork network;
+        network.isUpToDate = false;
         this->net = network;
         this->is2D = is2D;
         igraph_empty(&this->graph, 0, IGRAPH_UNDIRECTED);
+        igraph_cattribute_GAB_set(&this->graph, "is_up_to_date", false);
       };
 
     public:
@@ -187,8 +189,8 @@ namespace calc {
         double kappa = 1.0,
         bool clampAlpha = false)
       {
-        MEHPForceBalance2 fb =
-          MEHPForceBalance2(universe, crosslinkerType, is2D, kappa);
+        MEHPForceBalance2 fb = MEHPForceBalance2::constructWithoutSlipLinks(
+          universe, crosslinkerType, is2D, kappa);
         fb.addSlipLinks(
           strandIdx1, strandIdx2, x, y, z, alpha1, alpha2, clampAlpha);
         // convert the graph to the network usable for simulations
@@ -218,7 +220,7 @@ namespace calc {
                              fb.universe.getNrOfAtoms() / 2,
                            "Number of slip-links to place must be less than "
                            "the possible number of slip-links to place.");
-        INVALIDARG_EXP_IFN(nrOfSliplinksToSample > minimumNrOfSliplinks,
+        INVALIDARG_EXP_IFN(nrOfSliplinksToSample >= minimumNrOfSliplinks,
                            "Maximum nr. should be larger than minimum, got " +
                              std::to_string(nrOfSliplinksToSample) + " and " +
                              std::to_string(minimumNrOfSliplinks) + ".");
@@ -544,7 +546,7 @@ namespace calc {
         const igraph_integer_t vertexId,
         const pylimer_tools::entities::Atom& atom)
       {
-        assert(atom.getType() == this->crosslinkerType);
+        // assert(atom.getType() == this->crosslinkerType);
         igraph_cattribute_VAN_set(
           &this->graph, "atom_id", vertexId, atom.getId());
         igraph_cattribute_VAN_set(
@@ -2525,6 +2527,7 @@ namespace calc {
        */
       void finaliseInitialisation()
       {
+        igraph_cattribute_GAB_set(&this->graph, "is_up_to_date", true);
         this->convertFromGraph();
         this->currentSpringDistances =
           this->evaluateSpringDistances(this->net, this->is2D);
