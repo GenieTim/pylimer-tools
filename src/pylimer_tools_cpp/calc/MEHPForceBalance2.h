@@ -597,6 +597,7 @@ namespace calc {
       void setBondBoxOffsetForEdge(const igraph_integer_t edgeId,
                                    const Eigen::Vector3d& bondBoxOffset)
       {
+        assert(bondBoxOffset.array().isFinite().all());
         igraph_cattribute_EAN_set(
           &this->graph, "bond_box_x", edgeId, bondBoxOffset[0]);
         igraph_cattribute_EAN_set(
@@ -715,6 +716,7 @@ namespace calc {
         this->universe.getBox().handlePBC(additionalDistance2);
         expectedDistance += additionalDistance1 + additionalDistance2;
 
+        this->setBondBoxOffsetForEdge(edgeId, Eigen::Vector3d::Zero());
         Eigen::Vector3d actualDistance = this->computeEdgeDistance(edgeId);
         this->setBondBoxOffsetForEdge(edgeId,
                                       actualDistance - expectedDistance);
@@ -2554,12 +2556,6 @@ namespace calc {
 
         this->net.nrOfPartialSprings = igraph_ecount(&this->graph);
         this->net.nrOfLinks = igraph_vcount(&this->graph);
-        igraph_vector_t edgeTypes;
-        igraph_vector_init(&edgeTypes, this->net.nrOfPartialSprings);
-        igraph_cattribute_EANV(&this->graph,
-                               "type",
-                               igraph_ess_all(IGRAPH_EDGEORDER_ID),
-                               &edgeTypes);
 
         igraph_vector_t parentEdges;
         igraph_vector_init(&parentEdges, this->net.nrOfPartialSprings);
@@ -2570,7 +2566,7 @@ namespace calc {
 
         std::unordered_set<igraph_integer_t> parentEdgeIds;
         igraph_integer_t maxParentEdgeId = 0;
-        for (size_t i = 0; i < igraph_vector_size(&edgeTypes); ++i) {
+        for (size_t i = 0; i < igraph_vector_size(&parentEdges); ++i) {
           parentEdgeIds.insert(
             castToIgraphInt(igraph_vector_get(&parentEdges, i)));
           maxParentEdgeId =
@@ -2685,7 +2681,7 @@ namespace calc {
           this->net.springPartBoxOffset(i * 3 + 2) =
             igraph_vector_get(&bondBoxOffsetZ, i);
           this->net.partialSpringIsPartial(i) =
-            (igraph_vector_get(&edgeTypes, i) == this->partialBondType);
+            i >= this->net.nrOfSprings;
           this->currentSpringPartitionsVec(i) =
             igraph_vector_get(&partitionFraction, i);
         }
@@ -2716,7 +2712,6 @@ namespace calc {
         }
 
         // cleanup
-        igraph_vector_destroy(&edgeTypes);
         igraph_vector_int_destroy(&allEdges);
         igraph_vector_destroy(&parentEdges);
         igraph_vector_destroy(&contourLength);

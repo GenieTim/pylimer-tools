@@ -381,7 +381,7 @@ namespace entities {
     size_t vertexIdFrom = this->atomIdToVertexIdx.at(atomIdFrom);
     size_t vertexIdTo = this->atomIdToVertexIdx.at(atomIdTo);
     bool recording = false;
-    for (size_t i = 1; i < alignedVertices.size(); ++i) {
+    for (size_t i = 0; i < alignedVertices.size(); ++i) {
       if (recording) {
         Eigen::Vector3d distance = alignedCoordinates.segment((i) * 3, 3) -
                                    alignedCoordinates.segment((i - 1) * 3, 3);
@@ -413,7 +413,7 @@ namespace entities {
     size_t vertexIdTo = this->atomIdToVertexIdx.at(atomIdTo);
     bool recording = false;
     size_t result = 0;
-    for (size_t i = 1; i < alignedVertices.size(); ++i) {
+    for (size_t i = 0; i < alignedVertices.size(); ++i) {
       if (recording) {
         result += 1;
 
@@ -442,7 +442,6 @@ namespace entities {
    */
   std::vector<long int> Molecule::getVerticesLinedUp(int crossLinkerType) const
   {
-
     std::vector<long int> results;
     size_t nrOfAtoms = this->getNrOfAtoms();
     results.reserve(nrOfAtoms);
