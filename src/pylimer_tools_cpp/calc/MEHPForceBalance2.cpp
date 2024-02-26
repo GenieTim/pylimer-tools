@@ -630,6 +630,10 @@ namespace calc {
       }
 
       this->findEdgesAndVerticesOfSpring(&allEdgesOfParent, vertices, edges);
+      if (vertices != nullptr && edges != nullptr) {
+        assert(igraph_vector_int_size(vertices) ==
+               igraph_vector_int_size(edges) + 1);
+      }
 
       igraph_vector_destroy(&parentEdges);
       igraph_vector_int_destroy(&allEdgesOfParent);
@@ -647,19 +651,29 @@ namespace calc {
       igraph_vector_int_t* vertices,
       igraph_vector_int_t* edges)
     {
+      assert(igraph_vector_int_size(unorderedEdges) > 0);
       assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
       // figure out, where the rail is currently going through.
       igraph_t subgraph;
       igraph_empty(&subgraph, 0, IGRAPH_UNDIRECTED);
       igraph_subgraph_from_edges(
-        &this->graph, &subgraph, igraph_ess_vector(unorderedEdges), true);
+        &this->graph,
+        &subgraph,
+        igraph_ess_vector(unorderedEdges),
+        false); // keep vertices in order to keep vertex ids
 
       igraph_vector_int_t edgesOnPath;
-      igraph_vector_int_init(&edgesOnPath, igraph_ecount(&subgraph));
+      igraph_vector_int_init(&edgesOnPath, 0);
+      igraph_vector_int_reserve(&edgesOnPath, igraph_ecount(&subgraph));
       igraph_vector_int_t verticesOnPath;
-      igraph_vector_int_init(&verticesOnPath, igraph_vcount(&subgraph));
-      igraph_eulerian_path(&subgraph, &edgesOnPath, &verticesOnPath);
+      igraph_vector_int_init(&verticesOnPath, 0);
+      igraph_vector_int_reserve(&verticesOnPath, igraph_ecount(&subgraph) + 1);
+      RUNTIME_EXP_IFN(
+        igraph_eulerian_path(&subgraph, &edgesOnPath, &verticesOnPath) == 0,
+        "Could not find expected Eulerian path.");
       assert(igraph_vector_int_size(&edgesOnPath) == igraph_ecount(&subgraph));
+      assert(igraph_vector_int_size(unorderedEdges) ==
+             igraph_ecount(&subgraph));
 
       if (edges != nullptr) {
         igraph_vector_int_clear(edges);
@@ -671,27 +685,21 @@ namespace calc {
                                     "prev_edge_id",
                                     igraph_vector_int_get(&edgesOnPath, i))));
         }
+        assert(igraph_vector_int_size(&edgesOnPath) ==
+               igraph_vector_int_size(edges));
       }
       if (vertices != nullptr) {
         igraph_vector_int_clear(vertices);
         for (size_t i = 0; i < igraph_vector_int_size(&verticesOnPath); ++i) {
           igraph_vector_int_push_back(
-            vertices,
-            castToIgraphInt(igraph_cattribute_EAN(
-              &subgraph,
-              "prev_vertex_id",
-              igraph_vector_int_get(&verticesOnPath, i))));
+            vertices, igraph_vector_int_get(&verticesOnPath, i));
         }
+        assert(igraph_vector_int_size(&verticesOnPath) ==
+               igraph_vector_int_size(vertices));
       }
-      igraph_integer_t vertex0Id = castToIgraphInt(
-        igraph_cattribute_EAN(&subgraph,
-                              "prev_vertex_id",
-                              igraph_vector_int_get(&verticesOnPath, 0)));
-      igraph_integer_t vertexEndId = castToIgraphInt(igraph_cattribute_EAN(
-        &subgraph,
-        "prev_vertex_id",
-        igraph_vector_int_get(&verticesOnPath,
-                              igraph_vector_int_size(&verticesOnPath) - 1)));
+      igraph_integer_t vertex0Id = igraph_vector_int_get(&verticesOnPath, 0);
+      igraph_integer_t vertexEndId = igraph_vector_int_get(
+        &verticesOnPath, igraph_vector_int_size(&verticesOnPath) - 1);
       //  make sure the ordering is consistent between different calls to this
       //  function
       if (vertex0Id > vertexEndId) {
@@ -701,6 +709,11 @@ namespace calc {
         if (edges != nullptr) {
           igraph_vector_int_reverse(edges);
         }
+      }
+
+      if (vertices != nullptr && edges != nullptr) {
+        assert(igraph_vector_int_size(vertices) ==
+               igraph_vector_int_size(edges) + 1);
       }
 
       igraph_destroy(&subgraph);
@@ -863,13 +876,15 @@ namespace calc {
 
       igraph_t subgraph;
       igraph_empty(&subgraph, 0, IGRAPH_UNDIRECTED);
-      igraph_subgraph_from_edges(
-        &this->graph, &subgraph, igraph_ess_vector(&allEdgesOfParent), true);
+      igraph_subgraph_from_edges(&this->graph,
+                                 &subgraph,
+                                 igraph_ess_vector(&allEdgesOfParent),
+                                 false); // keep vertices for ids
 
       igraph_vector_int_t edgesOnPath;
       igraph_vector_int_init(&edgesOnPath, igraph_ecount(&subgraph));
       igraph_vector_int_t verticesOnPath;
-      igraph_vector_int_init(&verticesOnPath, igraph_vcount(&subgraph));
+      igraph_vector_int_init(&verticesOnPath, igraph_ecount(&subgraph) + 1);
       igraph_eulerian_path(&subgraph, &edgesOnPath, &verticesOnPath);
       assert(igraph_vector_int_size(&edgesOnPath) == igraph_ecount(&subgraph));
 
@@ -883,22 +898,18 @@ namespace calc {
           // side!
           igraph_integer_t from, to;
           igraph_edge(&subgraph, i - 1, &from, &to);
-          if ((igraph_cattribute_VAN(&subgraph, "prev_vertex_id", from) ==
-               vertexId) ||
-              (igraph_cattribute_VAN(&subgraph, "prev_vertex_id", to) ==
-               vertexId)) {
+          if ((from == vertexId) || (to == vertexId)) {
             // i-1 is on-rail
             result = igraph_cattribute_EAN(&subgraph, "prev_edge_id", i - 1);
             foundResult = true;
+            break;
           } else {
             igraph_edge(&subgraph, i + 1, &from, &to);
-            assert((igraph_cattribute_VAN(&subgraph, "prev_vertex_id", from) ==
-                    vertexId) ||
-                   (igraph_cattribute_VAN(&subgraph, "prev_vertex_id", to) ==
-                    vertexId));
+            assert((from == vertexId) || (to == vertexId));
             // i+1 is on-rail
             result = igraph_cattribute_EAN(&subgraph, "prev_edge_id", i + 1);
             foundResult = true;
+            break;
           }
         }
       }

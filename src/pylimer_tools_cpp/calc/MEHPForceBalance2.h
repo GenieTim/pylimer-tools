@@ -96,6 +96,10 @@ namespace calc {
         this->crosslinkerType = crosslinkerType;
         // interpret network already to be able to give early results
         ForceBalanceNetwork network;
+        for (size_t dir = 0; dir < 3; ++dir) {
+          network.L[dir] = universe.getBox().getL()[dir];
+          network.boxHalfs[dir] = network.L[dir] * 0.5;
+        }
         network.isUpToDate = false;
         this->net = network;
         this->is2D = is2D;
@@ -211,6 +215,7 @@ namespace calc {
       {
         MEHPForceBalance2 fb =
           MEHPForceBalance2(universe, crosslinkerType, is2D, kappa);
+        fb.net.isUpToDate = false;
 
         INVALIDARG_EXP_IFN(minimumNrOfSliplinks <
                              fb.universe.getNrOfAtoms() / 2,
@@ -354,6 +359,7 @@ namespace calc {
         igraph_add_vertices(
           &fb.graph, currentVertexId + pairsOfAtoms.size(), nullptr);
 
+        size_t parentEdgeId = 0;
         for (size_t chainIdx = 0; chainIdx < crosslinkerChains.size();
              ++chainIdx) {
           pylimer_tools::entities::Molecule chain = crosslinkerChains[chainIdx];
@@ -389,7 +395,7 @@ namespace calc {
               igraph_integer_t currentEdgeId = igraph_ecount(&fb.graph);
               igraph_add_edge(&fb.graph, previousVertexId, thisVertexId);
               fb.setBondPropertiesBasedOnChain(
-                chain, previousIdx, i, currentEdgeId, chainIdx);
+                chain, previousIdx, i, currentEdgeId, parentEdgeId);
               //
               previousIdx = i;
               previousVertexId = thisVertexId;
@@ -401,12 +407,16 @@ namespace calc {
           igraph_add_edge(&fb.graph,
                           previousVertexId,
                           endAtomIdToVertexId.at(lastAtom.getId()));
-          fb.setBondPropertiesBasedOnChain(
-            chain, previousIdx, chain.getLength() - 1, currentEdgeId, chainIdx);
+          fb.setBondPropertiesBasedOnChain(chain,
+                                           previousIdx,
+                                           chain.getLength() - 1,
+                                           currentEdgeId,
+                                           parentEdgeId);
+          parentEdgeId += 1;
         }
 
         // cleanup the graph
-        fb.removeSubfunctionalVertices();
+        // fb.removeSubfunctionalVertices();
 
         // convert the graph to the network usable for simulations
         fb.finaliseInitialisation();
@@ -719,10 +729,11 @@ namespace calc {
         this->setBondBoxOffsetForEdge(edgeId, Eigen::Vector3d::Zero());
         Eigen::Vector3d actualDistance = this->computeEdgeDistance(edgeId);
         this->setBondBoxOffsetForEdge(edgeId,
-                                      actualDistance - expectedDistance);
-        assert(this->universe.getBox().isValidOffset(actualDistance -
-                                                     expectedDistance));
-        assert(this->computeEdgeDistance(edgeId).isApprox(expectedDistance));
+                                      expectedDistance - actualDistance);
+        assert(this->universe.getBox().isValidOffset(expectedDistance -
+                                                     actualDistance));
+        Eigen::Vector3d newActualDistance = this->computeEdgeDistance(edgeId);
+        assert(newActualDistance.isApprox(expectedDistance));
       }
 
       /**
@@ -1196,7 +1207,7 @@ namespace calc {
                              this->net.springsContourLength.size(),
                            "Contour length must have the correct dimensions.");
         assert(this->net.isUpToDate);
-        assert(igraph_cattribute_GAB(&this->graph, "up_to_date"));
+        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
         this->net.springsContourLength = springsContourLengths;
         igraph_vector_t partialContour;
         igraph_vector_init(&partialContour, this->net.nrOfPartialSprings);
@@ -2533,14 +2544,19 @@ namespace calc {
         this->convertFromGraph();
         this->currentSpringDistances =
           this->evaluateSpringDistances(this->net, this->is2D);
+        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
         this->currentPartialSpringDistances =
           this->evaluatePartialSpringDistances(this->net, this->is2D);
+        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
         this->defaultR0Squared =
           this->universe.computeMeanSquareEndToEndDistance(
             this->crosslinkerType);
+        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
         this->defaultNrOfChains =
           this->universe.getMolecules(this->crosslinkerType).size();
+        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
         this->validateNetwork();
+        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
       }
 
       /**
@@ -2554,6 +2570,7 @@ namespace calc {
           this->updateGraph();
         }
 
+        this->net.isUpToDate = false;
         this->net.nrOfPartialSprings = igraph_ecount(&this->graph);
         this->net.nrOfLinks = igraph_vcount(&this->graph);
 
@@ -2567,14 +2584,14 @@ namespace calc {
         std::unordered_set<igraph_integer_t> parentEdgeIds;
         igraph_integer_t maxParentEdgeId = 0;
         for (size_t i = 0; i < igraph_vector_size(&parentEdges); ++i) {
-          parentEdgeIds.insert(
-            castToIgraphInt(igraph_vector_get(&parentEdges, i)));
-          maxParentEdgeId =
-            std::max(castToIgraphInt(igraph_vector_get(&parentEdges, i)),
-                     maxParentEdgeId);
+          igraph_integer_t parentEdgeId =
+            castToIgraphInt(igraph_vector_get(&parentEdges, i));
+          parentEdgeIds.insert(parentEdgeId);
+          maxParentEdgeId = std::max(parentEdgeId, maxParentEdgeId);
         }
         this->net.nrOfSprings = parentEdgeIds.size();
-        assert(maxParentEdgeId == parentEdgeIds.size() - 1);
+        assert(maxParentEdgeId == parentEdgeIds.size() - 1 ||
+               parentEdgeIds.size() == 0);
         size_t numPartialSprings =
           this->net.nrOfPartialSprings - this->net.nrOfSprings;
 
@@ -2583,23 +2600,30 @@ namespace calc {
         this->net.springsContourLength.resize(this->net.nrOfSprings);
         this->net.springIndicesOfLinks.clear();
         this->net.linkIndicesOfSprings.clear();
-        this->net.partialSpringIsPartial.setConstant(false);
+        this->net.partialSpringIsPartial.resize(this->net.nrOfPartialSprings);
         this->net.localToGlobalSpringIndex.clear();
         this->net.partialToFullSpringIndex.resize(this->net.nrOfPartialSprings);
+        this->net.linkIsSliplink.resize(this->net.nrOfLinks);
         this->net.springPartCoordinateIndexA.resize(
           3 * this->net.nrOfPartialSprings);
         this->net.springPartCoordinateIndexB.resize(
           3 * this->net.nrOfPartialSprings);
         this->net.springPartIndexA.resize(this->net.nrOfPartialSprings);
         this->net.springPartIndexB.resize(this->net.nrOfPartialSprings);
-        this->net.springPartBoxOffset.resize(this->net.nrOfPartialSprings);
-        this->net.nrOfCrosslinkSwapsEndured.resize(this->net.nrOfLinks);
+        this->net.springPartBoxOffset.resize(3 * this->net.nrOfPartialSprings);
         this->currentSpringPartitionsVec.resize(this->net.nrOfPartialSprings);
+
+        this->net.springIsActive.resize(this->net.nrOfSprings);
+        this->net.springIndexA.resize(this->net.nrOfSprings);
+        this->net.springIndexB.resize(this->net.nrOfSprings);
+        this->net.springCoordinateIndexA.resize(3 * this->net.nrOfSprings);
+        this->net.springCoordinateIndexB.resize(3 * this->net.nrOfSprings);
 
         // reset everything we cleared
         for (size_t i = 0; i < this->net.nrOfSprings; ++i) {
           std::vector<size_t> vec;
           this->net.linkIndicesOfSprings.push_back(vec);
+          this->net.localToGlobalSpringIndex.push_back(vec);
         }
         for (size_t i = 0; i < this->net.nrOfLinks; ++i) {
           std::vector<size_t> vec;
@@ -2680,8 +2704,6 @@ namespace calc {
             igraph_vector_get(&bondBoxOffsetY, i);
           this->net.springPartBoxOffset(i * 3 + 2) =
             igraph_vector_get(&bondBoxOffsetZ, i);
-          this->net.partialSpringIsPartial(i) =
-            i >= this->net.nrOfSprings;
           this->currentSpringPartitionsVec(i) =
             igraph_vector_get(&partitionFraction, i);
         }
@@ -2697,18 +2719,40 @@ namespace calc {
           igraph_vector_int_init(&verticesOnPath, 0);
 
           this->findEdgesAndVerticesOfSpring(i, &verticesOnPath, &edgesOnPath);
+          assert(igraph_vector_int_size(&edgesOnPath) > 0);
+          assert(igraph_vector_int_size(&verticesOnPath) ==
+                 igraph_vector_int_size(&edgesOnPath) + 1);
 
           std::vector<size_t> linkIndicesOfThisSpring;
           pylimer_tools::utils::igraphVectorTToStdVector(
             &verticesOnPath, linkIndicesOfThisSpring);
+          assert(linkIndicesOfThisSpring.size() ==
+                 igraph_vector_int_size(&verticesOnPath));
+          assert(linkIndicesOfThisSpring.size() > 1);
           this->net.linkIndicesOfSprings[i] = linkIndicesOfThisSpring;
           std::vector<size_t> edgeIdsOfThisSpring;
           pylimer_tools::utils::igraphVectorTToStdVector(&edgesOnPath,
                                                          edgeIdsOfThisSpring);
           this->net.localToGlobalSpringIndex[i] = edgeIdsOfThisSpring;
+          this->net.springIndexA[i] = this->net.linkIndicesOfSprings[i][0];
+          this->net.springIndexB[i] =
+            pylimer_tools::utils::last(this->net.linkIndicesOfSprings[i]);
+          for (size_t dir = 0; dir < 3; ++dir) {
+            this->net.springCoordinateIndexA[3 * i + dir] =
+              3 * this->net.springIndexA[i] + dir;
+            this->net.springCoordinateIndexB[3 * i + dir] =
+              3 * this->net.springIndexB[i] + dir;
+          }
 
           igraph_vector_int_destroy(&edgesOnPath);
           igraph_vector_int_destroy(&verticesOnPath);
+        }
+
+        for (size_t i = 0; i < this->net.nrOfPartialSprings; ++i) {
+          this->net.partialSpringIsPartial(i) =
+            this->net
+              .linkIndicesOfSprings[this->net.partialToFullSpringIndex(i)]
+              .size() > 2;
         }
 
         // cleanup
@@ -2743,16 +2787,34 @@ namespace calc {
           &this->graph, "type", igraph_vss_all(), &linkType);
 
         // actually write things
+        size_t numCrosslinks = 0;
         for (size_t i = 0; i < this->net.nrOfLinks; ++i) {
           this->net.coordinates(3 * i + 0) = igraph_vector_get(&coordsX, i);
           this->net.coordinates(3 * i + 1) = igraph_vector_get(&coordsY, i);
           this->net.coordinates(3 * i + 2) = igraph_vector_get(&coordsZ, i);
-          this->net.nrOfCrosslinkSwapsEndured(i) =
-            castToIgraphInt(igraph_vector_get(&numLinkSwaps, i));
           this->net.linkIsSliplink(i) =
             castToIgraphInt(igraph_vector_get(&linkType, i)) ==
             this->slipLinkType;
+          if (castToIgraphInt(igraph_vector_get(&linkType, i)) ==
+              this->crosslinkerType) {
+            numCrosslinks += 1;
+          }
         }
+        this->net.nrOfNodes = numCrosslinks;
+
+        this->net.nrOfCrosslinkSwapsEndured.resize(this->net.nrOfLinks -
+                                                   this->net.nrOfNodes);
+        this->net.oldAtomIds.resize(numCrosslinks);
+        size_t slipLinkIdx = 0;
+        for (size_t i = 0; i < this->net.nrOfLinks; ++i) {
+          if (castToIgraphInt(igraph_vector_get(&linkType, i)) !=
+              this->crosslinkerType) {
+            this->net.nrOfCrosslinkSwapsEndured(slipLinkIdx) =
+              castToIgraphInt(igraph_vector_get(&numLinkSwaps, i));
+            slipLinkIdx += 1;
+          }
+        }
+        assert(slipLinkIdx == this->net.nrOfLinks - this->net.nrOfNodes);
 
         // cleanup
         igraph_vector_destroy(&linkType);
@@ -2761,7 +2823,7 @@ namespace calc {
         igraph_vector_destroy(&coordsZ);
 
         // mark as done
-        net.isUpToDate = true;
+        this->net.isUpToDate = true;
       };
 
       /**
