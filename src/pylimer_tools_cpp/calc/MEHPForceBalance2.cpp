@@ -310,6 +310,7 @@ namespace calc {
       const size_t linkIdx,
       const double oneOverSpringPartitionUpperLimit) const
     {
+      assert(net.isUpToDate);
       INVALIDARG_EXP_IFN(linkIdx < net.nrOfLinks, "Invalid link-idx");
       std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
       // Eigen::Vector3d currentDisplacement = u.segment(3 * linkIdx, 3);
@@ -402,14 +403,13 @@ namespace calc {
       // take mean for displacement
       // prevent NaN from division by zero
       Eigen::Vector3d coordsBefore = net.coordinates.segment(3 * linkIdx, 3);
+      double denominator = (objectiveDisplacementContributors == 0.0
+                              ? 0.0
+                              : 1. / objectiveDisplacementContributors);
       net.coordinates.segment(3 * linkIdx, 3) +=
-        objectiveDisplacement / (objectiveDisplacementContributors == 0.0
-                                   ? 1.0
-                                   : objectiveDisplacementContributors);
+        objectiveDisplacement * denominator;
 
-      double dist = (net.coordinates.segment(3 * linkIdx, 3) - coordsBefore)
-                      .segment(3 * linkIdx, 3)
-                      .squaredNorm();
+      double dist = (objectiveDisplacement * denominator).squaredNorm();
       // if (dist > 0.1) {
       //   std::cout << "Moving " << linkIdx << " for " << dist
       //             << " with displacements " << u.segment(3 * linkIdx, 3)[0]
@@ -738,10 +738,11 @@ namespace calc {
       igraph_vector_int_init(&edges, 0);
 
       this->findEdgesAndVerticesOfSpring(springIdx, nullptr, &edges);
+      assert(igraph_vector_int_size(&edges) > 0);
 
       double currentAlpha = 0.0;
       igraph_integer_t previousEdgeId = igraph_vector_int_get(&edges, 0);
-      for (size_t i = 1; i < igraph_vector_int_size(&edges); ++i) {
+      for (size_t i = 0; i < igraph_vector_int_size(&edges); ++i) {
         igraph_integer_t edgeId = igraph_vector_int_get(&edges, i);
         currentAlpha +=
           igraph_cattribute_EAN(&this->graph, "partition_fraction", edgeId);
@@ -804,7 +805,7 @@ namespace calc {
     {
       INVALIDARG_EXP_IFN(igraph_cattribute_VAN(&this->graph,
                                                "type",
-                                               vertexId) != this->slipLinkType,
+                                               vertexId) == this->slipLinkType,
                          "Can only search for rail around slip-links");
       // fetch the edges involved
       igraph_es_t selector;
@@ -816,7 +817,7 @@ namespace calc {
       igraph_integer_t rail_idx = -1;
       size_t current_idx = 0;
       while (!IGRAPH_EIT_END(iterator)) {
-        igraph_vector_int_push_back(&edgeIds, IGRAPH_EIT_GET(iterator));
+        igraph_vector_int_set(&edgeIds, current_idx, IGRAPH_EIT_GET(iterator));
         if (IGRAPH_EIT_GET(iterator) == railEdgeId) {
           rail_idx = current_idx;
         }
@@ -824,12 +825,14 @@ namespace calc {
         current_idx += 1;
       }
       assert(rail_idx >= 0);
+      assert(current_idx == igraph_vector_int_size(&edgeIds));
 
       igraph_vector_t parents;
       igraph_vector_init(&parents, igraph_vector_int_size(&edgeIds));
       igraph_cattribute_EANV(&this->graph, "parent_edge", selector, &parents);
 
-      igraph_integer_t railParent = igraph_vector_get(&parents, rail_idx);
+      igraph_integer_t railParent =
+        castToIgraphInt(igraph_vector_get(&parents, rail_idx));
 
       // iff the link is a cross-link, or the
       // slip-link is not involved twice with the same strand (rail),
@@ -892,7 +895,8 @@ namespace calc {
       size_t result = 0;
       bool foundResult = false;
       for (size_t i = 0; i < igraph_vector_int_size(&edgesOnPath); ++i) {
-        if (igraph_cattribute_EAN(&subgraph, "prev_edge_id", i) == railEdgeId) {
+        if (castToIgraphInt(igraph_cattribute_EAN(
+              &subgraph, "prev_edge_id", i)) == railEdgeId) {
           // yay, found the rail.
           // now: on either side of this is the
           // link we talk about. We are interested in the edge on the other
@@ -901,14 +905,16 @@ namespace calc {
           igraph_edge(&subgraph, i - 1, &from, &to);
           if ((from == vertexId) || (to == vertexId)) {
             // i-1 is on-rail
-            result = igraph_cattribute_EAN(&subgraph, "prev_edge_id", i - 1);
+            result = castToIgraphInt(
+              igraph_cattribute_EAN(&subgraph, "prev_edge_id", i - 1));
             foundResult = true;
             break;
           } else {
             igraph_edge(&subgraph, i + 1, &from, &to);
             assert((from == vertexId) || (to == vertexId));
             // i+1 is on-rail
-            result = igraph_cattribute_EAN(&subgraph, "prev_edge_id", i + 1);
+            result = castToIgraphInt(
+              igraph_cattribute_EAN(&subgraph, "prev_edge_id", i + 1));
             foundResult = true;
             break;
           }
@@ -1565,9 +1571,8 @@ namespace calc {
       }
       INVALIDARG_EXP_IFN((loopsOfSliplinks.size() == 0 && loops.size() == 0),
                          "Loops are not yet supported.");
-      if (!igraph_cattribute_GAB(&this->graph, "is_up_to_date")) {
-        this->updateGraph();
-      }
+      assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
+      assert(this->net.isUpToDate);
       // validate inputs
       size_t currentNrOfPartialSprings = igraph_ecount(&this->graph);
       if (additionalLen != x.size() || additionalLen != y.size() ||
@@ -1580,16 +1585,14 @@ namespace calc {
           "Strand indices and alpha estimates must have the same length");
       }
       for (size_t i = 0; i < additionalLen; ++i) {
-        INVALIDARG_EXP_IFN(strandIdx1[i] < igraph_ecount(&this->graph),
-                           "Invalid spring index " +
-                             std::to_string(strandIdx1[i]) +
-                             ", expected below " +
-                             std::to_string(igraph_ecount(&this->graph)) + ".");
-        INVALIDARG_EXP_IFN(strandIdx2[i] < igraph_ecount(&this->graph),
-                           "Invalid spring index " +
-                             std::to_string(strandIdx2[i]) +
-                             ", expected below " +
-                             std::to_string(igraph_ecount(&this->graph)) + ".");
+        INVALIDARG_EXP_IFN(
+          strandIdx1[i] < this->net.nrOfSprings,
+          "Invalid spring index " + std::to_string(strandIdx1[i]) +
+            ", expected below " + std::to_string(this->net.nrOfSprings) + ".");
+        INVALIDARG_EXP_IFN(
+          strandIdx2[i] < this->net.nrOfSprings,
+          "Invalid spring index " + std::to_string(strandIdx2[i]) +
+            ", expected below " + std::to_string(this->net.nrOfSprings) + ".");
         INVALIDARG_EXP_IFN(APPROX_WITHIN(alpha1[i], 0.0, 1.0, 1e-12),
                            "Expected alpha within [0, 1], got " +
                              std::to_string(alpha1[i]) + ".");
@@ -1599,6 +1602,7 @@ namespace calc {
       }
 
       // then, loop the slip-links to add
+      igraph_integer_t numEdgesBefore = igraph_ecount(&this->graph);
       igraph_integer_t numVerticesBefore = igraph_vcount(&this->graph);
       igraph_add_vertices(&this->graph, additionalLen, nullptr);
       for (size_t i = 0; i < additionalLen; ++i) {
@@ -1617,106 +1621,57 @@ namespace calc {
         assert(degree == 0);
       }
 
-      igraph_vector_int_t edges_that_have_been_replaced;
-      igraph_vector_int_init(&edges_that_have_been_replaced, 0);
-      igraph_vector_int_reserve(&edges_that_have_been_replaced,
-                                2 * additionalLen);
-      for (size_t i = 0; i < additionalLen; ++i) {
-        igraph_integer_t spring1ToReplace =
-          this->findPartialSpringByFraction(strandIdx1[i], alpha1[i]);
-        igraph_integer_t spring2ToReplace =
-          this->findPartialSpringByFraction(strandIdx2[i], alpha2[i]);
-        igraph_integer_t from1, to1, from2, to2;
-        igraph_edge(&this->graph, spring1ToReplace, &from1, &to1);
-        igraph_edge(&this->graph, spring2ToReplace, &from2, &to2);
-        // add the four new edges
-        igraph_integer_t newEdgeId = igraph_ecount(&this->graph);
-        igraph_add_edge(&this->graph, from1, numVerticesBefore + i);
-        double currentPartition1 = igraph_cattribute_EAN(
-          &this->graph, "partition_fraction", spring1ToReplace);
-        igraph_cattribute_EAN_set(&this->graph,
-                                  "partition_fraction",
-                                  newEdgeId,
-                                  alpha1[i] * currentPartition1);
-        igraph_cattribute_EAN_set(
-          &this->graph,
-          "parent_edge",
-          newEdgeId,
-          igraph_cattribute_EAN(&this->graph, "parent_edge", spring1ToReplace));
-        // for the box offsets, we can simply give them to one of the two new
-        // edges – all the rest should be handled by the optimisation, actually.
-        for (std::string dir : { "x", "y", "z" }) {
-          igraph_cattribute_EAN_set(
-            &this->graph,
-            ("bond_box_" + dir).c_str(),
-            newEdgeId,
-            igraph_cattribute_EAN(
-              &this->graph, ("bond_box_" + dir).c_str(), spring1ToReplace));
-        }
-        newEdgeId += 1;
-        igraph_add_edge(&this->graph, to1, numVerticesBefore + i);
-        igraph_cattribute_EAN_set(&this->graph,
-                                  "partition_fraction",
-                                  newEdgeId,
-                                  (1. - alpha1[i]) * currentPartition1);
-        igraph_cattribute_EAN_set(
-          &this->graph,
-          "parent_edge",
-          newEdgeId,
-          igraph_cattribute_EAN(&this->graph, "parent_edge", spring1ToReplace));
-        // ... and the other gets 0s as bond box offset.
-        for (std::string dir : { "x", "y", "z" }) {
-          igraph_cattribute_EAN_set(
-            &this->graph, ("bond_box_" + dir).c_str(), newEdgeId, 0.0);
-        }
-        // second (third and fourth new) edge
-        double currentPartition2 = igraph_cattribute_EAN(
-          &this->graph, "partition_fraction", spring2ToReplace);
-        newEdgeId += 1;
-        igraph_add_edge(&this->graph, from2, numVerticesBefore + i);
-        igraph_cattribute_EAN_set(&this->graph,
-                                  "partition_fraction",
-                                  newEdgeId,
-                                  alpha2[i] * currentPartition2);
-        igraph_cattribute_EAN_set(
-          &this->graph,
-          "parent_edge",
-          newEdgeId,
-          igraph_cattribute_EAN(&this->graph, "parent_edge", spring2ToReplace));
-        for (std::string dir : { "x", "y", "z" }) {
-          igraph_cattribute_EAN_set(
-            &this->graph,
-            ("bond_box_" + dir).c_str(),
-            newEdgeId,
-            igraph_cattribute_EAN(
-              &this->graph, ("bond_box_" + dir).c_str(), spring2ToReplace));
-        }
-        newEdgeId += 1;
-        igraph_add_edge(&this->graph, to2, numVerticesBefore + i);
-        igraph_cattribute_EAN_set(&this->graph,
-                                  "partition_fraction",
-                                  newEdgeId,
-                                  (1. - alpha2[i]) * currentPartition2);
-        igraph_cattribute_EAN_set(
-          &this->graph,
-          "parent_edge",
-          newEdgeId,
-          igraph_cattribute_EAN(&this->graph, "parent_edge", spring2ToReplace));
-        for (std::string dir : { "x", "y", "z" }) {
-          igraph_cattribute_EAN_set(
-            &this->graph, ("bond_box_" + dir).c_str(), newEdgeId, 0.0);
-        }
+      this->net.isUpToDate = false;
 
-        // mark the old ones to be removed
-        igraph_vector_int_push_back(&edges_that_have_been_replaced,
-                                    spring1ToReplace);
-        igraph_vector_int_push_back(&edges_that_have_been_replaced,
-                                    spring2ToReplace);
+      for (size_t i = 0; i < additionalLen; ++i) {
+        // repeat the insertion twice, for both strands
+        for (size_t v = 0; v < 2; ++v) {
+          size_t strandIdx = v == 0 ? strandIdx1[i] : strandIdx2[i];
+          double alpha = v == 0 ? alpha1[i] : alpha2[i];
+          this->validateIgraphSpring(strandIdx);
+          igraph_integer_t edgeToReplace =
+            this->findPartialSpringByFraction(strandIdx, alpha);
+          assert(igraph_cattribute_EAN(
+                   &this->graph, "parent_edge", edgeToReplace) == strandIdx);
+          igraph_integer_t from, to;
+          igraph_edge(&this->graph, edgeToReplace, &from, &to);
+          // add the four new edges
+          double currentPartition = igraph_cattribute_EAN(
+            &this->graph, "partition_fraction", edgeToReplace);
+          assert(APPROX_WITHIN(currentPartition, 0.0, 1.0, 1e-5));
+          // for the box offsets, we can simply give them to one of the two new
+          // edges – all the rest should be handled by the optimisation,
+          // actually.
+          this->createEdge(from,
+                           numVerticesBefore + i,
+                           strandIdx,
+                           alpha * currentPartition,
+                           this->getBondBoxOffsetForEdge(edgeToReplace));
+          igraph_integer_t newEdgeId =
+            this->createEdge(to,
+                             numVerticesBefore + i,
+                             strandIdx,
+                             (1. - alpha) * currentPartition,
+                             Eigen::Vector3d::Zero());
+          // check assumptions
+          assert(igraph_ecount(&this->graph) == newEdgeId + 1);
+          // mark the old ones to be removed
+          igraph_delete_edges(&this->graph, igraph_ess_1(edgeToReplace));
+          assert(igraph_ecount(&this->graph) == newEdgeId);
+        }
       }
 
       // delete the old edges, which have been "split up"
-      igraph_delete_edges(&this->graph,
-                          igraph_ess_vector(&edges_that_have_been_replaced));
+      size_t numNewEdges = additionalLen * 2;
+
+      size_t numEdgesNow = igraph_ecount(&this->graph);
+      assert(numEdgesNow == numNewEdges + numEdgesBefore);
+
+      for (size_t i = 0; i < numNewEdges; ++i) {
+        this->validateIgraphSpring(igraph_cattribute_EAN(
+          &this->graph, "parent_edge", igraph_ecount(&this->graph) - (i + 1)));
+      }
+
       this->convertFromGraph();
     }
 
