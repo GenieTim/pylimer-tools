@@ -195,6 +195,7 @@ namespace calc {
       {
         MEHPForceBalance2 fb = MEHPForceBalance2::constructWithoutSlipLinks(
           universe, crosslinkerType, is2D, kappa);
+        fb.validateNetwork();
         fb.addSlipLinks(
           strandIdx1, strandIdx2, x, y, z, alpha1, alpha2, clampAlpha);
         // convert the graph to the network usable for simulations
@@ -605,6 +606,35 @@ namespace calc {
       }
 
       /**
+       * @brief Create a new edge in the graph with the specified properties
+       *
+       * @param from
+       * @param to
+       * @param parent
+       * @param partitionFraction
+       * @param boxOffset
+       * @return igraph_integer_t
+       */
+      igraph_integer_t createEdge(igraph_integer_t from,
+                                  igraph_integer_t to,
+                                  long int parent,
+                                  double partitionFraction,
+                                  Eigen::Vector3d boxOffset)
+      {
+        igraph_integer_t newEdgeId = igraph_ecount(&this->graph);
+        igraph_add_edge(&this->graph, from, to);
+        igraph_integer_t newFrom, newTo;
+        igraph_edge(&this->graph, newEdgeId, &newFrom, &newTo);
+        assert(newFrom == from && newTo == to);
+        igraph_cattribute_EAN_set(
+          &this->graph, "partition_fraction", newEdgeId, partitionFraction);
+        this->setBondBoxOffsetForEdge(newEdgeId, boxOffset);
+        igraph_cattribute_EAN_set(
+          &this->graph, "parent_edge", newEdgeId, parent);
+        return newEdgeId;
+      }
+
+      /**
        * @brief Set the Bond Box Offset For an edge
        *
        * @param edgeId
@@ -672,7 +702,8 @@ namespace calc {
                                    double scaleFactor = 0.5)
       {
         for (std::string property :
-             { "partition_fraction" }) { //, "contour_length"
+             { "partition_fraction",
+               "local_contour_length" }) { //, "contour_length"
           igraph_cattribute_EAN_set(
             &this->graph,
             property.c_str(),
@@ -1587,12 +1618,12 @@ namespace calc {
         bool is2d = false) const
       {
         assert(net.isUpToDate);
-        assert(net.springIndexA(springIdx) == linkIdx ||
-               net.springIndexB(springIdx) == linkIdx);
+        assert(net.springPartIndexA(springIdx) == linkIdx ||
+               net.springPartIndexB(springIdx) == linkIdx);
 
         Eigen::Vector3d dist =
-          net.coordinates.segment(3 * net.springIndexB(springIdx), 3) -
-          net.coordinates.segment(3 * net.springIndexA(springIdx), 3) +
+          net.coordinates.segment(3 * net.springPartIndexB(springIdx), 3) -
+          net.coordinates.segment(3 * net.springPartIndexA(springIdx), 3) +
           net.springPartBoxOffset.segment(3 * springIdx, 3);
 
         if (this->assumeBoxLargeEnough) {
@@ -1603,7 +1634,7 @@ namespace calc {
           dist[2] = 0.0;
         }
 
-        return dist * (net.springIndexA(springIdx) == linkIdx ? -1. : 1.);
+        return dist * (net.springPartIndexA(springIdx) == linkIdx ? -1. : 1.);
       }
 
       /**
@@ -1638,6 +1669,42 @@ namespace calc {
 
       bool validateNetwork(const ForceBalanceNetwork& net,
                            const Eigen::VectorXd& springPartitions) const;
+
+      bool validateIgraphSpring(const size_t parentEdgeId)
+      {
+        igraph_vector_t parentEdges;
+        igraph_vector_init(&parentEdges, this->net.nrOfPartialSprings);
+        igraph_cattribute_EANV(&this->graph,
+                               "parent_edge",
+                               igraph_ess_all(IGRAPH_EDGEORDER_ID),
+                               &parentEdges);
+
+        double partitionSum = 0.;
+        std::string partialSpringString = "";
+        for (igraph_integer_t i = 0; i < igraph_vector_size(&parentEdges);
+             ++i) {
+          if (castToIgraphInt(igraph_vector_get(&parentEdges, i)) ==
+              parentEdgeId) {
+            partitionSum +=
+              igraph_cattribute_EAN(&this->graph, "partition_fraction", i);
+            partialSpringString += std::to_string(igraph_cattribute_EAN(
+                                     &this->graph, "partition_fraction", i)) +
+                                   ", ";
+          }
+        }
+
+        if (!(APPROX_EQUAL(partitionSum, 1.0, 1e-5))) {
+          RUNTIME_EXP_IFN(
+            APPROX_EQUAL(partitionSum, 1.0, 1e-5),
+            "Expected parition sum to be closer to 1., got " +
+              std::to_string(partitionSum) + " for parent spring " +
+              std::to_string(parentEdgeId) +
+              ". Partial Springs are: " + partialSpringString + ".");
+        }
+
+        igraph_vector_destroy(&parentEdges);
+        return true;
+      }
 
       ForceBalanceNetwork getNetwork() { return this->net; }
 
@@ -2843,6 +2910,14 @@ namespace calc {
        */
       void updateGraph()
       {
+        RUNTIME_EXP_IFN(this->net.isUpToDate,
+                        "Should not update graph with outdated network");
+        RUNTIME_EXP_IFN(igraph_vcount(&this->graph) == this->net.nrOfLinks,
+                        "Should not update graph with outdated network");
+        RUNTIME_EXP_IFN(igraph_ecount(&this->graph) ==
+                          this->net.nrOfPartialSprings,
+                        "Should not update graph with outdated network");
+
         // write the current coordinates to the graph
         igraph_vector_t coordsX;
         igraph_vector_init(&coordsX, this->net.nrOfLinks);
@@ -3113,13 +3188,13 @@ namespace calc {
             : to;
         igraph_integer_t slipLinkIdx = xlinkIdx == from ? to : from;
         assert(castToIgraphInt(igraph_cattribute_VAN(
-                 &this->graph, "type", xlinkIdx)) == this->crosslinkerType);
+                 &this->graph, "type", slipLinkIdx)) == this->slipLinkType);
 
         igraph_vector_int_t edgesOfCrossLink;
         igraph_vector_int_init(&edgesOfCrossLink, 4);
         igraph_incident(&this->graph, &edgesOfCrossLink, xlinkIdx, IGRAPH_ALL);
         RUNTIME_EXP_IFN(igraph_vector_int_size(&edgesOfCrossLink) > 0,
-                        "Expected to find more than one edge on slip-link");
+                        "Expected to find more than one edge on cross-link");
 
         igraph_integer_t otherRailPart =
           this->getOtherRailEdgeId(slipLinkIdx, partialSpringIdx);
