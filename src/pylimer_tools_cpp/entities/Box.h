@@ -206,7 +206,8 @@ namespace entities {
       }
       for (int i = 0; i < offset.size(); ++i) {
         if (offset[i] > precision) {
-          bool rowIsValid = (fmod(offset[i], this->L[i % 3]) < precision);
+          double multiple = offset[i] / this->L[i % 3];
+          bool rowIsValid = std::abs(multiple - round(multiple)) < precision;
           if (!rowIsValid) {
             return false;
           }
