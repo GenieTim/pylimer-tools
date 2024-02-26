@@ -373,11 +373,15 @@ namespace calc {
           igraph_integer_t previousVertexId =
             endAtomIdToVertexId.at(linedUpAtoms[0].getId());
           fb.setVertexPropertiesFromAtom(
-            endAtomIdToVertexId.at(linedUpAtoms[0].getId()), linedUpAtoms[0]);
+            endAtomIdToVertexId.at(linedUpAtoms[0].getId()),
+            linedUpAtoms[0],
+            fb.crosslinkerType);
           pylimer_tools::entities::Atom lastAtom =
             pylimer_tools::utils::last(linedUpAtoms);
           fb.setVertexPropertiesFromAtom(
-            endAtomIdToVertexId.at(lastAtom.getId()), lastAtom);
+            endAtomIdToVertexId.at(lastAtom.getId()),
+            lastAtom,
+            fb.crosslinkerType);
           for (size_t i = 1; i < linedUpAtoms.size(); i++) {
             pylimer_tools::entities::Atom a = linedUpAtoms[i];
             if (pairOfAtom[universe.getIdxByAtomId(a.getId())] != -1) {
@@ -554,13 +558,15 @@ namespace calc {
        */
       void setVertexPropertiesFromAtom(
         const igraph_integer_t vertexId,
-        const pylimer_tools::entities::Atom& atom)
+        const pylimer_tools::entities::Atom& atom,
+        const int atomType)
       {
+        assert(atomType == this->crosslinkerType ||
+               atomType == this->slipLinkType);
         // assert(atom.getType() == this->crosslinkerType);
         igraph_cattribute_VAN_set(
           &this->graph, "atom_id", vertexId, atom.getId());
-        igraph_cattribute_VAN_set(
-          &this->graph, "type", vertexId, atom.getType());
+        igraph_cattribute_VAN_set(&this->graph, "type", vertexId, atomType);
         igraph_cattribute_VAN_set(&this->graph, "num_link_swaps", vertexId, 0);
         Eigen::Vector3d coords = atom.getCoordinates();
         this->setVertexCoordinates(vertexId, coords);
@@ -666,7 +672,7 @@ namespace calc {
                                    double scaleFactor = 0.5)
       {
         for (std::string property :
-             { "partition_fraction", "contour_length" }) {
+             { "partition_fraction" }) { //, "contour_length"
           igraph_cattribute_EAN_set(
             &this->graph,
             property.c_str(),
@@ -700,13 +706,15 @@ namespace calc {
         igraph_cattribute_EAN_set(&this->graph,
                                   "partition_fraction",
                                   edgeId,
-                                  (atom2Idx - atom1Idx + 1) /
-                                    chain.getLength());
+                                  static_cast<double>(atom2Idx - atom1Idx + 1) /
+                                    static_cast<double>(chain.getLength()));
         igraph_cattribute_EAN_set(
           &this->graph, "parent_edge", edgeId, chainIdx);
         igraph_cattribute_EAN_set(
+          &this->graph, "contour_length", edgeId, chain.getLength());
+        igraph_cattribute_EAN_set(
           &this->graph,
-          "contour_length",
+          "local_contour_length",
           edgeId,
           chain.getNrOfBondsFromTo(linedUpAtoms[atom1Idx].getId(),
                                    linedUpAtoms[atom2Idx].getId(),
@@ -1211,6 +1219,8 @@ namespace calc {
         this->net.springsContourLength = springsContourLengths;
         igraph_vector_t partialContour;
         igraph_vector_init(&partialContour, this->net.nrOfPartialSprings);
+        igraph_vector_t fullContour;
+        igraph_vector_init(&fullContour, this->net.nrOfPartialSprings);
         for (size_t i = 0; i < this->net.nrOfSprings; ++i) {
           for (size_t partialSpring : this->net.localToGlobalSpringIndex[i]) {
             igraph_vector_set(
@@ -1219,11 +1229,16 @@ namespace calc {
               springsContourLengths[i] /
                 static_cast<double>(
                   this->net.localToGlobalSpringIndex[i].size()));
+            igraph_vector_set(
+              &fullContour, partialSpring, springsContourLengths[i]);
           }
         }
         igraph_cattribute_EAN_setv(
-          &this->graph, "contour_length", &partialContour);
+          &this->graph, "local_contour_length", &partialContour);
         igraph_vector_destroy(&partialContour);
+        igraph_cattribute_EAN_setv(
+          &this->graph, "contour_length", &fullContour);
+        igraph_vector_destroy(&fullContour);
       }
 
       std::vector<Eigen::ArrayXi> getIndependentCoordinateSets(
@@ -2692,12 +2707,6 @@ namespace calc {
               3 * this->net.springPartIndexB(i) + dir;
           }
 
-          this->net
-            .springIndicesOfLinks[igraph_vector_int_get(&allEdges, 2 * i)]
-            .push_back(i);
-          this->net
-            .springIndicesOfLinks[igraph_vector_int_get(&allEdges, 2 * i + 1)]
-            .push_back(i);
           this->net.springPartBoxOffset(i * 3 + 0) =
             igraph_vector_get(&bondBoxOffsetX, i);
           this->net.springPartBoxOffset(i * 3 + 1) =
@@ -2730,6 +2739,9 @@ namespace calc {
                  igraph_vector_int_size(&verticesOnPath));
           assert(linkIndicesOfThisSpring.size() > 1);
           this->net.linkIndicesOfSprings[i] = linkIndicesOfThisSpring;
+          for (size_t linkIdx : linkIndicesOfThisSpring) {
+            this->net.springIndicesOfLinks[linkIdx].push_back(i);
+          }
           std::vector<size_t> edgeIdsOfThisSpring;
           pylimer_tools::utils::igraphVectorTToStdVector(&edgesOnPath,
                                                          edgeIdsOfThisSpring);
@@ -2792,11 +2804,11 @@ namespace calc {
           this->net.coordinates(3 * i + 0) = igraph_vector_get(&coordsX, i);
           this->net.coordinates(3 * i + 1) = igraph_vector_get(&coordsY, i);
           this->net.coordinates(3 * i + 2) = igraph_vector_get(&coordsZ, i);
-          this->net.linkIsSliplink(i) =
-            castToIgraphInt(igraph_vector_get(&linkType, i)) ==
-            this->slipLinkType;
-          if (castToIgraphInt(igraph_vector_get(&linkType, i)) ==
-              this->crosslinkerType) {
+          int alinkType = castToIgraphInt(igraph_vector_get(&linkType, i));
+          assert(alinkType == this->slipLinkType ||
+                 alinkType == this->crosslinkerType);
+          this->net.linkIsSliplink(i) = alinkType == this->slipLinkType;
+          if (alinkType == this->crosslinkerType) {
             numCrosslinks += 1;
           }
         }

@@ -310,6 +310,7 @@ namespace calc {
       const size_t linkIdx,
       const double oneOverSpringPartitionUpperLimit) const
     {
+      INVALIDARG_EXP_IFN(linkIdx < net.nrOfLinks, "Invalid link-idx");
       std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
       // Eigen::Vector3d currentDisplacement = u.segment(3 * linkIdx, 3);
       Eigen::Vector3d objectiveDisplacement =
@@ -765,7 +766,7 @@ namespace calc {
     {
       INVALIDARG_EXP_IFN(igraph_cattribute_VAN(&this->graph,
                                                "type",
-                                               vertexId) != this->slipLinkType,
+                                               vertexId) == this->slipLinkType,
                          "Can only search for rail around slip-links");
 
       // fetch the edges involved
@@ -1266,15 +1267,21 @@ namespace calc {
                              "partition_fraction",
                              igraph_ess_all(IGRAPH_EDGEORDER_ID),
                              &partitionFraction);
+      igraph_vector_t contourLengths;
+      igraph_vector_init(&contourLengths, this->net.nrOfPartialSprings);
+      igraph_cattribute_EANV(&this->graph,
+                             "contour_length",
+                             igraph_ess_all(IGRAPH_EDGEORDER_ID),
+                             &contourLengths);
 
+      double springContourLengthNew =
+        this->net.springsContourLength[springIdxBefore] +
+        this->net.springsContourLength[springIdxNow];
       double scalingFactorRemoved =
         (this->net.springsContourLength[springIdxBefore]) /
-        (this->net.springsContourLength[springIdxBefore] +
-         this->net.springsContourLength[springIdxNow]);
-      double scalingFactorNow =
-        (this->net.springsContourLength[springIdxNow]) /
-        (this->net.springsContourLength[springIdxBefore] +
-         this->net.springsContourLength[springIdxNow]);
+        (springContourLengthNew);
+      double scalingFactorNow = (this->net.springsContourLength[springIdxNow]) /
+                                (springContourLengthNew);
 
       for (size_t i = 0; i < igraph_vector_size(&parentEdges); ++i) {
         // update the new value of the parent edge
@@ -1286,6 +1293,7 @@ namespace calc {
                             i,
                             igraph_vector_get(&partitionFraction, i) *
                               scalingFactorRemoved);
+          igraph_vector_set(&contourLengths, i, springContourLengthNew);
         } else if (igraph_vector_get(&parentEdges, i) > springIdxBefore) {
           igraph_vector_set(
             &parentEdges, i, igraph_vector_get(&parentEdges, i) - 1);
@@ -1296,14 +1304,18 @@ namespace calc {
                             i,
                             igraph_vector_get(&partitionFraction, i) *
                               scalingFactorNow);
+          igraph_vector_set(&contourLengths, i, springContourLengthNew);
         }
       }
 
       igraph_cattribute_EAN_setv(&this->graph, "parent_edge", &parentEdges);
       igraph_cattribute_EAN_setv(
+        &this->graph, "contour_length", &contourLengths);
+      igraph_cattribute_EAN_setv(
         &this->graph, "partition_fraction", &partitionFraction);
 
       igraph_vector_destroy(&parentEdges);
+      igraph_vector_destroy(&contourLengths);
       igraph_vector_destroy(&partitionFraction);
 
       this->net.springsContourLength(springIdxNow) +=
@@ -2583,7 +2595,12 @@ namespace calc {
                       "Invalid size of link is sliplink");
       RUNTIME_EXP_IFN(
         net.linkIsSliplink.count() == (net.nrOfLinks - net.nrOfNodes),
-        "Nr of nodes plus nr of slp-links should give the total nr of links");
+        "Nr of nodes plus nr of slp-links should give the total nr of links. "
+        "Got " +
+          std::to_string(net.linkIsSliplink.count()) +
+          " links marked as slip-link, but " + std::to_string(net.nrOfLinks) +
+          " total links, of which " + std::to_string(net.nrOfNodes) +
+          " are cross-links.");
       RUNTIME_EXP_IFN(net.oldAtomIds.size() == net.nrOfNodes,
                       "Invalid size of old atom ids");
       RUNTIME_EXP_IFN(net.springCoordinateIndexA.size() == net.nrOfSprings * 3,
