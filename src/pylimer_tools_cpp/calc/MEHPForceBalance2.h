@@ -33,7 +33,7 @@ namespace calc {
 #ifndef CLAMP_ONE_OVER_SPRINGPARTITION
 /**
  * @brief a macro for doing the clamping in the routines using kappa,
- * to prevent deivision by zero issues / multiplications by infinity
+ * to prevent division by zero issues / multiplications by infinity
  */
 #define CLAMP_ONE_OVER_SPRINGPARTITION(                                        \
   isPartialSpring, val, N, oneOverSpringPartitionUpperLimit)                   \
@@ -100,6 +100,7 @@ namespace calc {
           network.L[dir] = universe.getBox().getL()[dir];
           network.boxHalfs[dir] = network.L[dir] * 0.5;
         }
+        network.vol = universe.getBox().getVolume();
         network.isUpToDate = false;
         this->net = network;
         this->is2D = is2D;
@@ -217,6 +218,7 @@ namespace calc {
         MEHPForceBalance2 fb =
           MEHPForceBalance2(universe, crosslinkerType, is2D, kappa);
         fb.net.isUpToDate = false;
+        igraph_cattribute_GAB_set(&fb.graph, "is_up_to_date", true);
 
         INVALIDARG_EXP_IFN(minimumNrOfSliplinks <
                              fb.universe.getNrOfAtoms() / 2,
@@ -262,7 +264,7 @@ namespace calc {
           }
         }
 
-        // filter, we don't want cross-links etc.
+        // filter, we don't want cross-links etc. as targets
         std::vector<pylimer_tools::entities::Atom> atomsForNeighbourList =
           fb.universe.getAtomsOfDegree(2);
         std::random_device rd{};
@@ -275,10 +277,11 @@ namespace calc {
         size_t numLinksFoundInIteration = 0;
         while (pairsOfAtoms.size() < minimumNrOfSliplinks &&
                numLinksFoundInIteration > 0) {
+          numLinksFoundInIteration = 0;
           for (pylimer_tools::entities::Atom a1 : atomsForNeighbourList) {
             size_t atomVertexIdx1 = universe.getIdxByAtomId(a1.getId());
-            // find neighbors
-            if (pairOfAtom[atomVertexIdx1] == -1) {
+            // make sure this atom does not yet have a pair
+            if (pairOfAtom[atomVertexIdx1] != -1) {
               continue;
             }
             // then, find neighbouring atoms (but not from the same strand?!)
@@ -330,6 +333,9 @@ namespace calc {
             break;
           }
         }
+
+        std::cout << "Found " << pairsOfAtoms.size() << " random slip-links."
+                  << std::endl;
 
         // add ends of chains
         std::unordered_map<size_t, igraph_integer_t> endAtomIdToVertexId;
@@ -425,6 +431,7 @@ namespace calc {
 
         // convert the graph to the network usable for simulations
         fb.finaliseInitialisation();
+        assert(fb.getNumExtraAtoms() == pairsOfAtoms.size());
 
         return fb;
       }
@@ -500,6 +507,8 @@ namespace calc {
         // displacements(involvedCoordinateIndices) = displacementsBefore;
         return retVal;
       }
+
+      void synchronise() { this->convertFromGraph(); }
 
       /**
        * @brief
@@ -598,6 +607,7 @@ namespace calc {
           &this->graph, "atom_1_id", vertexId, atom1.getId());
         igraph_cattribute_VAN_set(
           &this->graph, "atom_2_id", vertexId, atom2.getId());
+        igraph_cattribute_VAN_set(&this->graph, "num_link_swaps", vertexId, 0);
         Eigen::Vector3d coords = atom1.getCoordinates();
         Eigen::Vector3d dist = atom2.getCoordinates() - coords;
         this->universe.getBox().handlePBC(dist);
@@ -619,8 +629,14 @@ namespace calc {
                                   igraph_integer_t to,
                                   long int parent,
                                   double partitionFraction,
+                                  double contourLength,
                                   Eigen::Vector3d boxOffset)
       {
+        // igraph, in undirected graphs, orders the edges from small to large
+        if (from > to) {
+          std::swap(from, to);
+          boxOffset *= -1.;
+        }
         igraph_integer_t newEdgeId = igraph_ecount(&this->graph);
         igraph_add_edge(&this->graph, from, to);
         igraph_integer_t newFrom, newTo;
@@ -629,6 +645,8 @@ namespace calc {
         igraph_cattribute_EAN_set(
           &this->graph, "partition_fraction", newEdgeId, partitionFraction);
         this->setBondBoxOffsetForEdge(newEdgeId, boxOffset);
+        igraph_cattribute_EAN_set(
+          &this->graph, "contour_length", newEdgeId, contourLength);
         igraph_cattribute_EAN_set(
           &this->graph, "parent_edge", newEdgeId, parent);
         return newEdgeId;
@@ -833,6 +851,7 @@ namespace calc {
        */
       Eigen::Vector3d computeEdgeDistance(igraph_integer_t edgeId)
       {
+        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
         igraph_integer_t from, to;
         igraph_edge(&this->graph, edgeId, &from, &to);
 
@@ -843,6 +862,46 @@ namespace calc {
           this->universe.getBox().handlePBC(dist);
         }
         return dist;
+      }
+
+      /**
+       * @brief Shortcut to query the edge's partition fraction
+       *
+       * @param edgeId
+       * @return double
+       */
+      double getEdgeFraction(igraph_integer_t edgeId)
+      {
+        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
+        return igraph_cattribute_EAN(
+          &this->graph, "partition_fraction", edgeId);
+      }
+
+      /**
+       * @brief Shortcut to compute 1/(N*fraction)
+       *
+       * @param edgeId
+       * @param oneOverSpringPartitionUpperLimit
+       * @param isPartialSpring
+       * @return double
+       */
+      double getEdgeDenominator(
+        igraph_integer_t edgeId,
+        const double oneOverSpringPartitionUpperLimit = 1.0,
+        bool isPartialSpring = true)
+      {
+        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
+        const double N =
+          igraph_cattribute_EAN(&this->graph, "contour_length", edgeId);
+        const double fraction = this->getEdgeFraction(edgeId);
+        double denominator = 1. / (fraction * N);
+        if (oneOverSpringPartitionUpperLimit > 0. ||
+            !std::isfinite(denominator)) {
+          denominator = CLAMP_ONE_OVER_SPRINGPARTITION(
+            isPartialSpring, denominator, N, oneOverSpringPartitionUpperLimit);
+        }
+
+        return denominator;
       }
 
       /**
@@ -1050,6 +1109,18 @@ namespace calc {
                                   const igraph_integer_t railEdgeId);
 
       /**
+       * @brief Move a slip-link from one rail to another
+       *
+       * @param vertexId the slip-link to remove from one and insert into
+       * another spring
+       * @param sourceRailEdgeId the spring to be twiced
+       * @param targetRailEdgeId the spring to be halfed
+       */
+      void moveSlipLinkFromRailToRail(const igraph_integer_t vertexId,
+                                      const igraph_integer_t sourceRailEdgeId,
+                                      const igraph_integer_t targetRailEdgeId);
+
+      /**
        * @brief List the edges and vertices of one spring, in order
        *
        * @param springIdx
@@ -1079,7 +1150,8 @@ namespace calc {
        * @return igraph_integer_t
        */
       igraph_integer_t findPartialSpringByFraction(size_t springIdx,
-                                                   double alpha);
+                                                   double alpha,
+                                                   double& fractionTillThere);
 
       /**
        * @brief Remove a certain, 2-functional link from the structures,
@@ -1622,8 +1694,8 @@ namespace calc {
                net.springPartIndexB(springIdx) == linkIdx);
 
         Eigen::Vector3d dist =
-          net.coordinates.segment(3 * net.springPartIndexB(springIdx), 3) -
-          net.coordinates.segment(3 * net.springPartIndexA(springIdx), 3) +
+          (net.coordinates.segment(3 * net.springPartIndexB(springIdx), 3) -
+           net.coordinates.segment(3 * net.springPartIndexA(springIdx), 3)) +
           net.springPartBoxOffset.segment(3 * springIdx, 3);
 
         if (this->assumeBoxLargeEnough) {
@@ -1685,11 +1757,17 @@ namespace calc {
              ++i) {
           if (castToIgraphInt(igraph_vector_get(&parentEdges, i)) ==
               parentEdgeId) {
-            partitionSum +=
+            double thisPartition =
               igraph_cattribute_EAN(&this->graph, "partition_fraction", i);
-            partialSpringString += std::to_string(igraph_cattribute_EAN(
-                                     &this->graph, "partition_fraction", i)) +
-                                   ", ";
+            partitionSum += thisPartition;
+
+            partialSpringString += std::to_string(thisPartition) + ", ";
+            if (!APPROX_WITHIN(thisPartition, 0., 1., 1e-5)) {
+              RUNTIME_EXP_IFN(APPROX_WITHIN(thisPartition, 0., 1., 1e-5),
+                              "Expected partition to be between 1 and 0, got " +
+                                std::to_string(thisPartition) + " for spring " +
+                                std::to_string(i) + ".");
+            }
           }
         }
 
@@ -1724,21 +1802,12 @@ namespace calc {
       {
         Eigen::VectorXi debugNrSpringsVisited =
           Eigen::VectorXi::Zero(this->net.nrOfPartialSprings);
-        return this->net.linkIsSliplink[index]
-                 ? this->evaluateForceOnSlipLink(
-                     index,
-                     this->net,
-                     this->currentSpringPartitionsVec,
-                     debugNrSpringsVisited,
-                     1.0,
-                     oneOverSpringPartitionUpperLimit)
-                 : this->evaluateForceOnCrossLink(
-                     index,
-                     this->net,
-                     this->currentSpringPartitionsVec,
-                     debugNrSpringsVisited,
-                     1.0,
-                     oneOverSpringPartitionUpperLimit);
+        return this->evaluateForceOnLink(index,
+                                         this->net,
+                                         this->currentSpringPartitionsVec,
+                                         debugNrSpringsVisited,
+                                         1.0,
+                                         oneOverSpringPartitionUpperLimit);
       }
 
       /**
@@ -2243,11 +2312,12 @@ namespace calc {
         igraph_vector_int_init(&edgesOfLink2, 4);
         igraph_incident(&this->graph, &edgesOfLink2, linkIdx2, IGRAPH_ALL);
 
-        // figure out which edge to actually cut.
+        // add the new edges
         igraph_integer_t otherEdge1 =
           this->getOtherRailEdgeId(linkIdx1, partialSpringIdx);
         igraph_integer_t otherEdge2 =
           this->getOtherRailEdgeId(linkIdx2, partialSpringIdx);
+        // CAUTION: the from & to might not be consistent (can swap)
         igraph_integer_t newEdge1 = igraph_ecount(&this->graph);
         igraph_add_edge(&this->graph,
                         linkIdx1,
@@ -2319,15 +2389,6 @@ namespace calc {
               partialSpringIdx,
               oneOverSpringPartitionUpperLimit,
               respectLoops);
-            if (didSwap) {
-              igraph_cattribute_VAN_set(&this->graph,
-                                        "num_link_swaps",
-                                        slipLinkIdx,
-                                        igraph_cattribute_VAN(&this->graph,
-                                                              "num_link_swaps",
-                                                              slipLinkIdx) +
-                                          1);
-            }
             return didSwap;
           }
           return false;
@@ -2756,8 +2817,9 @@ namespace calc {
         for (size_t i = 0; i < this->net.nrOfPartialSprings; ++i) {
           this->net.partialToFullSpringIndex(i) =
             castToIgraphInt(igraph_vector_get(&parentEdges, i));
+          assert(std::isfinite(igraph_vector_get(&contourLength, i)));
           this->net.springsContourLength(this->net.partialToFullSpringIndex(
-            i)) += igraph_vector_get(&contourLength, i);
+            i)) = igraph_vector_get(&contourLength, i);
           this->net
             .localToGlobalSpringIndex[castToIgraphInt(
               igraph_vector_get(&parentEdges, i))]
@@ -3036,8 +3098,6 @@ namespace calc {
       /**
        * @brief Compute the force acting on a slip-link
        *
-       * TODO: use "global" partial distances
-       *
        * @param linkIdx
        * @param net
        * @param u
@@ -3046,28 +3106,7 @@ namespace calc {
        * @param minCutoff
        * @return Eigen::Vector3d
        */
-      Eigen::Matrix3d evaluateForceOnSlipLink(
-        const size_t linkIdx,
-        const ForceBalanceNetwork& net,
-        const Eigen::VectorXd& springPartitions,
-        Eigen::VectorXi& debugNrSpringsVisited,
-        const double kappa0 = 1.0,
-        const double oneOverSpringPartitionUpperLimit = 1.0) const;
-
-      /**
-       * @brief Compute the force acting on a cross-link
-       *
-       * TODO: use "global" partial distances
-       *
-       * @param linkIdx
-       * @param net
-       * @param u
-       * @param springPartitions
-       * @param kappa0
-       * @param minCutoff
-       * @return Eigen::Vector3d
-       */
-      Eigen::Matrix3d evaluateForceOnCrossLink(
+      Eigen::Matrix3d evaluateForceOnLink(
         const size_t linkIdx,
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& springPartitions,
@@ -3130,7 +3169,6 @@ namespace calc {
         const size_t partialSpringIdx,
         const double oneOverSpringPartitionUpperLimit = 1.0)
       {
-
         igraph_integer_t from, to;
         igraph_edge(&this->graph, partialSpringIdx, &from, &to);
 
@@ -3139,22 +3177,39 @@ namespace calc {
         igraph_integer_t otherRailTo =
           this->getOtherRailEdgeId(to, partialSpringIdx);
 
+        double thisSpringDenominator = this->getEdgeDenominator(
+          partialSpringIdx, oneOverSpringPartitionUpperLimit);
         Eigen::Vector3d thisSpringDistance =
           this->computeEdgeDistance(partialSpringIdx);
+        double otherRailFromDenominator = this->getEdgeDenominator(
+          otherRailFrom, oneOverSpringPartitionUpperLimit);
         Eigen::Vector3d otherRailFromSpringDistance =
           this->computeEdgeDistanceTo(otherRailFrom, from);
+        double otherRailToDenominator = this->getEdgeDenominator(
+          otherRailTo, oneOverSpringPartitionUpperLimit);
         Eigen::Vector3d otherRailToSpringDistance =
           this->computeEdgeDistanceFrom(otherRailTo, to);
 
         double forceEstimateBefore =
-          (-otherRailFromSpringDistance + thisSpringDistance).squaredNorm() +
-          (-thisSpringDistance + otherRailToSpringDistance).squaredNorm();
+          (-otherRailFromSpringDistance * otherRailFromDenominator +
+           thisSpringDistance * thisSpringDenominator)
+            .squaredNorm() +
+          (-thisSpringDistance * thisSpringDenominator +
+           otherRailToSpringDistance * otherRailToDenominator)
+            .squaredNorm();
         double forceEstimateAfter =
-          (2. * thisSpringDistance + otherRailToSpringDistance).squaredNorm() +
-          (-2 * thisSpringDistance - otherRailFromSpringDistance).squaredNorm();
+          (thisSpringDistance * thisSpringDenominator +
+           (otherRailToSpringDistance + thisSpringDistance) *
+             otherRailToDenominator)
+            .squaredNorm() +
+          (-thisSpringDistance * thisSpringDenominator -
+           (thisSpringDistance + otherRailFromSpringDistance) *
+             otherRailFromDenominator)
+            .squaredNorm();
 
         if (forceEstimateAfter <= forceEstimateBefore) {
           this->swapSlipLinks(partialSpringIdx);
+          net.isUpToDate = false;
           return true;
         }
         return false;
@@ -3221,9 +3276,16 @@ namespace calc {
             (attemptSpringDistance + thisRailDistance).squaredNorm();
 
           if (forceEstimateAfter < forceEstimateBefore) {
-            // CAUTION: wrong order can destroy the edge ids etc.
-            this->insertSlipLinkIntoRail(slipLinkIdx, attemptedEdge);
-            this->unlinkSlipLinkFromRail(slipLinkIdx, partialSpringIdx);
+            igraph_cattribute_VAN_set(&this->graph,
+                                      "num_link_swaps",
+                                      slipLinkIdx,
+                                      igraph_cattribute_VAN(&this->graph,
+                                                            "num_link_swaps",
+                                                            slipLinkIdx) +
+                                        1);
+            this->moveSlipLinkFromRailToRail(
+              slipLinkIdx, partialSpringIdx, attemptedEdge);
+            net.isUpToDate = false;
             return true;
           }
         }

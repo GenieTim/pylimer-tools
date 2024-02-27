@@ -728,11 +728,14 @@ namespace calc {
      *
      * @param springIdx
      * @param alpha
+     * @param fractionTillThere the sum of the fractions before reaching the
+     * searched index
      * @return igraph_integer_t
      */
     igraph_integer_t MEHPForceBalance2::findPartialSpringByFraction(
       size_t springIdx,
-      double alpha)
+      double alpha,
+      double& fractionTillThere)
     {
       igraph_vector_int_t edges;
       igraph_vector_int_init(&edges, 0);
@@ -741,20 +744,24 @@ namespace calc {
       assert(igraph_vector_int_size(&edges) > 0);
 
       double currentAlpha = 0.0;
-      igraph_integer_t previousEdgeId = igraph_vector_int_get(&edges, 0);
+      igraph_integer_t edgeId = igraph_vector_int_get(&edges, 0);
       for (size_t i = 0; i < igraph_vector_int_size(&edges); ++i) {
-        igraph_integer_t edgeId = igraph_vector_int_get(&edges, i);
-        currentAlpha +=
+        edgeId = igraph_vector_int_get(&edges, i);
+        igraph_real_t thisEdgeFraction =
           igraph_cattribute_EAN(&this->graph, "partition_fraction", edgeId);
+        assert(APPROX_WITHIN(thisEdgeFraction, 0.0, 1.0, 1e-5));
+        currentAlpha += thisEdgeFraction;
+
         if (currentAlpha > alpha) {
+          fractionTillThere = currentAlpha - thisEdgeFraction;
           break;
         }
-        previousEdgeId = edgeId;
       }
+      assert(APPROX_WITHIN(currentAlpha, 0.0, 1.0, 1e-5));
 
       igraph_vector_int_destroy(&edges);
 
-      return previousEdgeId;
+      return edgeId;
     }
 
     /**
@@ -958,22 +965,19 @@ namespace calc {
         centralLink = to1;
       }
 
-      size_t newEdgeId = igraph_ecount(&this->graph);
-      igraph_add_edge(&this->graph,
-                      to1 == centralLink ? from1 : to1,
-                      to2 == centralLink ? from2 : to2);
-      // verify our assumption of the new edge id
-      igraph_integer_t from, to;
-      igraph_edge(&this->graph, newEdgeId, &from, &to);
-      RUNTIME_EXP_IFN((from == (to1 == centralLink ? from1 : to1) &&
-                       to == (to2 == centralLink ? from2 : to2)),
-                      "Assumption made on edges is incorrect");
+      size_t newEdgeId = this->createEdge(
+        to1 == centralLink ? from1 : to1,
+        to2 == centralLink ? from2 : to2,
+        igraph_cattribute_EAN(&this->graph, "parent_edge", edge1Id),
+        igraph_cattribute_EAN(&this->graph, "partition_fraction", edge1Id) +
+          igraph_cattribute_EAN(&this->graph, "partition_fraction", edge2Id),
+        igraph_cattribute_EAN(&this->graph, "contour_length", edge1Id),
+        this->getBondBoxOffsetForEdgeFrom(edge2Id, centralLink) +
+          this->getBondBoxOffsetForEdgeTo(edge1Id, centralLink));
 
-      igraph_cattribute_EAN_set(
-        &this->graph,
-        "parent_edge",
-        newEdgeId,
-        igraph_cattribute_EAN(&this->graph, "parent_edge", edge1Id));
+      // delete the old edges
+      igraph_delete_edges(&this->graph, igraph_ess_1(edge1Id));
+      igraph_delete_edges(&this->graph, igraph_ess_1(edge2Id));
 
       // merge edge properties
       if (igraph_cattribute_EAN(&this->graph, "parent_edge", edge1Id) !=
@@ -983,37 +987,7 @@ namespace calc {
         this->combineParentSprings(
           igraph_cattribute_EAN(&this->graph, "parent_edge", edge1Id),
           igraph_cattribute_EAN(&this->graph, "parent_edge", edge2Id));
-      } else {
-        // the same "parent" spring
-        igraph_cattribute_EAN_set(
-          &this->graph,
-          "partition_fraction",
-          newEdgeId,
-          igraph_cattribute_EAN(&this->graph, "partition_fraction", edge1Id) +
-            igraph_cattribute_EAN(&this->graph, "partition_fraction", edge2Id));
       }
-
-      // "new" spawning edge will be between the two neighbours
-      double removedEdgeBoxPrefix = (from1 == centralLink) ? 1. : -1.;
-      igraph_edge(&this->graph, edge2Id, &from, &to);
-      double keptEdgeBondPrefix = (from1 == centralLink) ? -1. : 1.;
-
-      for (std::string dir : { "x", "y", "z" }) {
-        igraph_cattribute_EAN_set(
-          &this->graph,
-          ("bond_box_" + dir).c_str(),
-          newEdgeId,
-          // TODO: rethink the prefixes
-          igraph_cattribute_EAN(
-            &this->graph, ("bond_box_" + dir).c_str(), edge2Id) *
-              keptEdgeBondPrefix +
-            igraph_cattribute_EAN(
-              &this->graph, ("bond_box_" + dir).c_str(), edge1Id) *
-              removedEdgeBoxPrefix);
-      }
-
-      igraph_delete_edges(&this->graph, igraph_ess_1(edge1Id));
-      igraph_delete_edges(&this->graph, igraph_ess_1(edge2Id));
       this->net.isUpToDate = false;
     }
 
@@ -1047,22 +1021,67 @@ namespace calc {
       igraph_integer_t from, to;
       igraph_edge(&this->graph, railEdgeId, &from, &to);
 
-      igraph_integer_t newEdge1 = igraph_ecount(&this->graph);
-      igraph_add_edge(&this->graph, from, vertexId);
-      igraph_integer_t newEdge2 = newEdge1 + 1;
-      igraph_add_edge(&this->graph, vertexId, to);
-
-      this->copyScaleBondProperties(railEdgeId, newEdge1, 0.5);
-      this->copyBondProperty("parent_edge", railEdgeId, newEdge1);
-      this->copyScaleBondProperties(railEdgeId, newEdge2, 0.5);
-      this->copyBondProperty("parent_edge", railEdgeId, newEdge2);
-      // TODO: figure out which of the two new edges should get the offset?!?
-      // for now, assume it does not matter, give to second one
-      this->setBondBoxOffsetForEdge(newEdge1, Eigen::Vector3d::Zero());
-      this->setBondBoxOffsetForEdge(newEdge2,
-                                    this->getBondBoxOffsetForEdge(railEdgeId));
+      igraph_integer_t newEdge1 = this->createEdge(
+        vertexId,
+        from,
+        igraph_cattribute_EAN(&this->graph, "parent_edge", railEdgeId),
+        0.5 *
+          igraph_cattribute_EAN(&this->graph, "partition_fraction", railEdgeId),
+        igraph_cattribute_EAN(&this->graph, "contour_length", railEdgeId),
+        Eigen::Vector3d::Zero());
+      igraph_integer_t newEdge2 = this->createEdge(
+        vertexId,
+        to,
+        igraph_cattribute_EAN(&this->graph, "parent_edge", railEdgeId),
+        0.5 *
+          igraph_cattribute_EAN(&this->graph, "partition_fraction", railEdgeId),
+        igraph_cattribute_EAN(&this->graph, "contour_length", railEdgeId),
+        this->getBondBoxOffsetForEdge(railEdgeId));
 
       igraph_delete_edges(&this->graph, igraph_ess_1(railEdgeId));
+      this->net.isUpToDate = false;
+    }
+
+    void MEHPForceBalance2::moveSlipLinkFromRailToRail(
+      const igraph_integer_t vertexId,
+      const igraph_integer_t sourceRailEdgeId,
+      const igraph_integer_t targetRailEdgeId)
+    {
+      // the difficulty in this implementation is that
+      // the edge ids change
+
+      igraph_integer_t otherRailEdge =
+        this->getOtherRailEdgeId(vertexId, sourceRailEdgeId);
+
+      // replace the target edge with two new edges, via the vertex
+      igraph_integer_t from, to;
+      igraph_edge(&this->graph, targetRailEdgeId, &from, &to);
+
+      igraph_integer_t newEdge1 = this->createEdge(
+        vertexId,
+        from,
+        igraph_cattribute_EAN(&this->graph, "parent_edge", targetRailEdgeId),
+        0.5 * igraph_cattribute_EAN(
+                &this->graph, "partition_fraction", targetRailEdgeId),
+        igraph_cattribute_EAN(&this->graph, "contour_length", targetRailEdgeId),
+        Eigen::Vector3d::Zero());
+      igraph_integer_t newEdge2 = this->createEdge(
+        vertexId,
+        to,
+        igraph_cattribute_EAN(&this->graph, "parent_edge", targetRailEdgeId),
+        0.5 * igraph_cattribute_EAN(
+                &this->graph, "partition_fraction", targetRailEdgeId),
+        igraph_cattribute_EAN(&this->graph, "contour_length", targetRailEdgeId),
+        this->getBondBoxOffsetForEdge(targetRailEdgeId));
+
+      // delete the old one
+      igraph_delete_edges(&this->graph, igraph_ess_1(targetRailEdgeId));
+
+      // and re-weld the source
+      this->combinePartialSprings(
+        sourceRailEdgeId - (targetRailEdgeId < sourceRailEdgeId ? 1 : 0),
+        otherRailEdge - (targetRailEdgeId < otherRailEdge ? 1 : 0));
+
       this->net.isUpToDate = false;
     }
 
@@ -1160,14 +1179,6 @@ namespace calc {
       RUNTIME_EXP_IFN(neighbours.size() == 2,
                       "Expect f = 2 to have 2 neighbours");
 
-      size_t newEdgeId = igraph_ecount(&this->graph);
-      igraph_add_edge(&this->graph, neighbours[0], neighbours[1]);
-      // verify our assumption of the new edge id
-      igraph_integer_t from, to;
-      igraph_edge(&this->graph, newEdgeId, &from, &to);
-      RUNTIME_EXP_IFN((from == neighbours[0] && to == neighbours[1]),
-                      "Assumption made on edges isi incorrect");
-
       // fetch the edges involved
       igraph_es_t selector;
       igraph_es_incident(&selector, linkIdx, IGRAPH_ALL);
@@ -1257,9 +1268,7 @@ namespace calc {
       if (springIdxBefore < springIdxNow) {
         std::swap(springIdxBefore, springIdxNow);
       }
-      if (!igraph_cattribute_GAB(&this->graph, "is_up_to_date")) {
-        this->updateGraph();
-      }
+      assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
 
       igraph_vector_t parentEdges;
       igraph_vector_init(&parentEdges, this->net.nrOfPartialSprings);
@@ -1280,18 +1289,31 @@ namespace calc {
                              igraph_ess_all(IGRAPH_EDGEORDER_ID),
                              &contourLengths);
 
+      double springContourLengthNow = -1.;
+      double springContourLengthBefore = -1.;
+      for (size_t i = 0; i < igraph_vector_size(&parentEdges); ++i) {
+        if (castToIgraphInt(igraph_vector_get(&parentEdges, i)) ==
+            springIdxBefore) {
+          springContourLengthBefore = igraph_vector_get(&contourLengths, i);
+        }
+        if (castToIgraphInt(igraph_vector_get(&parentEdges, i)) ==
+            springIdxNow) {
+          springContourLengthNow = igraph_vector_get(&contourLengths, i);
+        }
+        if (springContourLengthBefore > 0 && springContourLengthNow > 0) {
+          break;
+        }
+      }
       double springContourLengthNew =
-        this->net.springsContourLength[springIdxBefore] +
-        this->net.springsContourLength[springIdxNow];
+        springContourLengthNow + springContourLengthBefore;
       double scalingFactorRemoved =
-        (this->net.springsContourLength[springIdxBefore]) /
-        (springContourLengthNew);
-      double scalingFactorNow = (this->net.springsContourLength[springIdxNow]) /
-                                (springContourLengthNew);
+        (springContourLengthBefore) / (springContourLengthNew);
+      double scalingFactorNow =
+        (springContourLengthNow) / (springContourLengthNew);
 
       for (size_t i = 0; i < igraph_vector_size(&parentEdges); ++i) {
         // update the new value of the parent edge
-        if (static_cast<size_t>(igraph_vector_get(&parentEdges, i)) ==
+        if (castToIgraphInt(igraph_vector_get(&parentEdges, i)) ==
             springIdxBefore) {
           // ...if the edge was merged,
           igraph_vector_set(&parentEdges, i, springIdxNow);
@@ -1300,10 +1322,13 @@ namespace calc {
                             igraph_vector_get(&partitionFraction, i) *
                               scalingFactorRemoved);
           igraph_vector_set(&contourLengths, i, springContourLengthNew);
-        } else if (igraph_vector_get(&parentEdges, i) > springIdxBefore) {
+        } else if (castToIgraphInt(igraph_vector_get(&parentEdges, i)) >
+                   springIdxBefore) {
+          // if the edge id has to change
           igraph_vector_set(
             &parentEdges, i, igraph_vector_get(&parentEdges, i) - 1);
-        } else if (igraph_vector_get(&parentEdges, i) == springIdxNow) {
+        } else if (castToIgraphInt(igraph_vector_get(&parentEdges, i)) ==
+                   springIdxNow) {
           // ...the edge was merged into
           // update partition fraction
           igraph_vector_set(&partitionFraction,
@@ -1324,11 +1349,6 @@ namespace calc {
       igraph_vector_destroy(&contourLengths);
       igraph_vector_destroy(&partitionFraction);
 
-      this->net.springsContourLength(springIdxNow) +=
-        this->net.springsContourLength(springIdxBefore);
-      pylimer_tools::utils::removeRow(this->net.springsContourLength,
-                                      springIdxBefore);
-
       this->net.isUpToDate = false;
     }
 
@@ -1344,6 +1364,7 @@ namespace calc {
      */
     size_t MEHPForceBalance2::removeInactiveParentEdges(double tolerance)
     {
+      assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
       size_t numRemoved = 0;
 
       igraph_vector_t parentEdges;
@@ -1354,18 +1375,23 @@ namespace calc {
                              &parentEdges);
 
       std::unordered_map<igraph_integer_t, bool> isRemovalCandidate;
+      std::unordered_map<igraph_integer_t, std::vector<size_t>>
+        parentsPartialSprings;
       for (igraph_integer_t i = 0; i < igraph_vector_size(&parentEdges); ++i) {
-        igraph_integer_t parentEdgeid =
+        igraph_integer_t parentEdgeId =
           castToIgraphInt(igraph_vector_get(&parentEdges, i));
-        isRemovalCandidate[parentEdgeid] = true;
+        isRemovalCandidate[parentEdgeId] = true;
+        std::vector<size_t> vec;
+        parentsPartialSprings[parentEdgeId] = vec;
       }
       for (igraph_integer_t i = 0; i < igraph_vector_size(&parentEdges); ++i) {
-        igraph_integer_t parentEdgeid =
+        igraph_integer_t parentEdgeId =
           castToIgraphInt(igraph_vector_get(&parentEdges, i));
-        if (isRemovalCandidate.at(parentEdgeid)) {
-          isRemovalCandidate[parentEdgeid] =
+        if (isRemovalCandidate.at(parentEdgeId)) {
+          isRemovalCandidate[parentEdgeId] =
             this->computeEdgeDistance(i).squaredNorm() <= tolerance;
         }
+        parentsPartialSprings[parentEdgeId].push_back(i);
       }
 
       igraph_vector_destroy(&parentEdges);
@@ -1373,7 +1399,9 @@ namespace calc {
       std::vector<igraph_integer_t> edgeIdsToRemove;
       for (auto& [key, value] : isRemovalCandidate) {
         if (value) {
-          edgeIdsToRemove.push_back(key);
+          edgeIdsToRemove.insert(edgeIdsToRemove.end(),
+                                 parentsPartialSprings[key].begin(),
+                                 parentsPartialSprings[key].end());
         }
       }
 
@@ -1614,6 +1642,8 @@ namespace calc {
           &this->graph, "z", numVerticesBefore + i, z[i]);
         igraph_cattribute_VAN_set(
           &this->graph, "type", numVerticesBefore + i, this->slipLinkType);
+        igraph_cattribute_VAN_set(
+          &this->graph, "num_link_swaps", numVerticesBefore + i, 0);
         // check that our assumption regarding the vertex id is correct
         igraph_integer_t degree;
         igraph_degree_1(
@@ -1629,8 +1659,10 @@ namespace calc {
           size_t strandIdx = v == 0 ? strandIdx1[i] : strandIdx2[i];
           double alpha = v == 0 ? alpha1[i] : alpha2[i];
           this->validateIgraphSpring(strandIdx);
+          double prevAlphaSum = 0.;
           igraph_integer_t edgeToReplace =
-            this->findPartialSpringByFraction(strandIdx, alpha);
+            this->findPartialSpringByFraction(strandIdx, alpha, prevAlphaSum);
+          double remainingAlpha = alpha - prevAlphaSum;
           assert(igraph_cattribute_EAN(
                    &this->graph, "parent_edge", edgeToReplace) == strandIdx);
           igraph_integer_t from, to;
@@ -1638,39 +1670,43 @@ namespace calc {
           // add the four new edges
           double currentPartition = igraph_cattribute_EAN(
             &this->graph, "partition_fraction", edgeToReplace);
+          assert(prevAlphaSum + currentPartition > alpha);
+          double currentContourLength = igraph_cattribute_EAN(
+            &this->graph, "contour_length", edgeToReplace);
           assert(APPROX_WITHIN(currentPartition, 0.0, 1.0, 1e-5));
           // for the box offsets, we can simply give them to one of the two new
           // edges – all the rest should be handled by the optimisation,
           // actually.
+          assert(APPROX_WITHIN(remainingAlpha, 0.0, 1.0, 1e-5));
           this->createEdge(from,
                            numVerticesBefore + i,
                            strandIdx,
-                           alpha * currentPartition,
+                           remainingAlpha,
+                           currentContourLength,
                            this->getBondBoxOffsetForEdge(edgeToReplace));
+          assert(
+            APPROX_WITHIN(currentPartition - remainingAlpha, 0.0, 1.0, 1e-5));
           igraph_integer_t newEdgeId =
             this->createEdge(to,
                              numVerticesBefore + i,
                              strandIdx,
-                             (1. - alpha) * currentPartition,
+                             currentPartition - remainingAlpha,
+                             currentContourLength,
                              Eigen::Vector3d::Zero());
           // check assumptions
           assert(igraph_ecount(&this->graph) == newEdgeId + 1);
           // mark the old ones to be removed
           igraph_delete_edges(&this->graph, igraph_ess_1(edgeToReplace));
           assert(igraph_ecount(&this->graph) == newEdgeId);
+          this->validateIgraphSpring(strandIdx);
         }
       }
 
-      // delete the old edges, which have been "split up"
+      // some more sanity checks
       size_t numNewEdges = additionalLen * 2;
 
       size_t numEdgesNow = igraph_ecount(&this->graph);
       assert(numEdgesNow == numNewEdges + numEdgesBefore);
-
-      for (size_t i = 0; i < numNewEdges; ++i) {
-        this->validateIgraphSpring(igraph_cattribute_EAN(
-          &this->graph, "parent_edge", igraph_ecount(&this->graph) - (i + 1)));
-      }
 
       this->convertFromGraph();
     }
@@ -1907,76 +1943,6 @@ namespace calc {
     //----------------------------------------------------------------
 
     /**
-     * @brief Compute the force acting on a cross-link
-     *
-     * TODO: use "global" partial distances
-     *
-     * @param linkIdx
-     * @param net
-     * @param u
-     * @param springPartitions
-     * @param kappa0
-     * @param minCutoff
-     * @return Eigen::Vector3d
-     */
-    Eigen::Matrix3d MEHPForceBalance2::evaluateForceOnCrossLink(
-      const size_t linkIdx,
-      const ForceBalanceNetwork& net,
-      const Eigen::VectorXd& springPartitions,
-      Eigen::VectorXi& debugNrSpringsVisited,
-      const double kappa0,
-      const double oneOverSpringPartitionUpperLimit) const
-    {
-      assert(net.isUpToDate);
-      INVALIDARG_EXP_IFN(!net.linkIsSliplink[linkIdx],
-                         "This link is not a cross-link");
-      std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
-      Eigen::Matrix3d force = Eigen::Matrix3d::Zero();
-      for (size_t springIndex : springIndices) {
-        std::vector<size_t> springsPartners =
-          net.linkIndicesOfSprings[springIndex];
-        // special case for primary loops
-        std::vector<size_t> partnerIndices = { 0, springsPartners.size() - 1 };
-        for (size_t partner_idx : partnerIndices) {
-          if (springsPartners[partner_idx] != linkIdx) {
-            continue;
-          }
-          size_t springGlobalIdx;
-          if (partner_idx == 0) {
-            springGlobalIdx = net.localToGlobalSpringIndex[springIndex][0];
-          } else {
-            RUNTIME_EXP_IFN(springsPartners[springsPartners.size() - 1] ==
-                              linkIdx,
-                            "Unexpected state. Cross-link must be either first "
-                            "or last in springs' contributors.");
-            springGlobalIdx = pylimer_tools::utils::last<size_t>(
-              net.localToGlobalSpringIndex[springIndex]);
-          }
-          Eigen::Vector3d distance = this->evaluatePartialSpringDistanceFrom(
-            net, springGlobalIdx, linkIdx, this->is2D);
-          debugNrSpringsVisited[springGlobalIdx] += 1;
-          const double N = net.springsContourLength[springIndex];
-          double denominator = 1. / (springPartitions[springGlobalIdx] * N);
-          if (oneOverSpringPartitionUpperLimit > 0 ||
-              !std::isfinite(denominator)) {
-            denominator = CLAMP_ONE_OVER_SPRINGPARTITION(
-              net.partialSpringIsPartial[springGlobalIdx],
-              denominator,
-              N,
-              oneOverSpringPartitionUpperLimit);
-          }
-
-          for (size_t i = 0; i < 3; ++i) {
-            for (size_t j = 0; j < 3; ++j) {
-              force(i, j) += kappa0 * denominator * distance[i] * distance[j];
-            }
-          }
-        }
-      }
-      return force;
-    };
-
-    /**
      * @brief Compute the force acting on a slip-link
      *
      * TODO: use "global" partial distances
@@ -1989,7 +1955,7 @@ namespace calc {
      * @param minCutoff
      * @return Eigen::Vector3d
      */
-    Eigen::Matrix3d MEHPForceBalance2::evaluateForceOnSlipLink(
+    Eigen::Matrix3d MEHPForceBalance2::evaluateForceOnLink(
       const size_t linkIdx,
       const ForceBalanceNetwork& net,
       const Eigen::VectorXd& springPartitions,
@@ -1998,60 +1964,37 @@ namespace calc {
       const double oneOverSpringPartitionUpperLimit) const
     {
       assert(net.isUpToDate);
-      INVALIDARG_EXP_IFN(net.linkIsSliplink[linkIdx],
-                         "This link is not a slip-link");
+      assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
 
       std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
       Eigen::Matrix3d force = Eigen::Matrix3d::Zero();
 
-      for (size_t springIndex : springIndices) {
-        std::vector<size_t> springsPartners =
-          net.linkIndicesOfSprings[springIndex];
-        for (size_t partner_idx = 1; partner_idx < springsPartners.size() - 1;
-             ++partner_idx) {
-          // TODO: think what happens when multiple on same strand
-          if (springsPartners[partner_idx] == linkIdx) {
-            size_t backSpringGlobalIdx =
-              net.localToGlobalSpringIndex[springIndex][partner_idx - 1];
-            size_t forwardSpringGlobalIdx =
-              net.localToGlobalSpringIndex[springIndex][partner_idx];
-            Eigen::Vector3d vecBack = this->evaluatePartialSpringDistanceFrom(
-              net, backSpringGlobalIdx, linkIdx, this->is2D);
-            Eigen::Vector3d vecForward =
-              this->evaluatePartialSpringDistanceFrom(
-                net, forwardSpringGlobalIdx, linkIdx, this->is2D);
+      igraph_vector_int_t edgesOfSlipLink;
+      igraph_vector_int_init(&edgesOfSlipLink, 4);
+      igraph_incident(&this->graph, &edgesOfSlipLink, linkIdx, IGRAPH_ALL);
 
-            debugNrSpringsVisited[backSpringGlobalIdx] += 1;
-            debugNrSpringsVisited[forwardSpringGlobalIdx] += 1;
-
-            const double N = net.springsContourLength[springIndex];
-            double denominatorBack =
-              1. / (springPartitions[backSpringGlobalIdx] * N);
-            if (oneOverSpringPartitionUpperLimit > 0 ||
-                !std::isfinite(denominatorBack)) {
-              denominatorBack = CLAMP_ONE_OVER_SPRINGPARTITION(
-                true, denominatorBack, N, oneOverSpringPartitionUpperLimit);
-            }
-
-            double denominatorForward =
-              1 / (springPartitions[forwardSpringGlobalIdx] *
-                   net.springsContourLength[springIndex]);
-            if (oneOverSpringPartitionUpperLimit > 0 ||
-                !std::isfinite(denominatorForward)) {
-              denominatorForward = CLAMP_ONE_OVER_SPRINGPARTITION(
-                true, denominatorForward, N, oneOverSpringPartitionUpperLimit);
-            }
-            for (size_t i = 0; i < 3; ++i) {
-              for (size_t j = 0; j < 3; ++j) {
-                force(i, j) +=
-                  kappa0 * denominatorBack * vecBack[i] * vecBack[j];
-                force(i, j) +=
-                  kappa0 * denominatorForward * vecForward[i] * vecForward[j];
-              }
-            }
-          }
+      for (size_t i = 0; i < igraph_vector_int_size(&edgesOfSlipLink); ++i) {
+        igraph_integer_t edgeId = igraph_vector_int_get(&edgesOfSlipLink, i);
+        Eigen::Vector3d vec = this->evaluatePartialSpringDistanceFrom(
+          net, edgeId, linkIdx, this->is2D);
+        debugNrSpringsVisited[edgeId] += 1;
+        const double N =
+          igraph_cattribute_EAN(&this->graph, "contour_length", edgeId);
+        double denominator = 1. / (N * springPartitions[edgeId]);
+        if (oneOverSpringPartitionUpperLimit > 0 ||
+            !std::isfinite(denominator)) {
+          denominator =
+            CLAMP_ONE_OVER_SPRINGPARTITION(net.partialSpringIsPartial[edgeId],
+                                           denominator,
+                                           N,
+                                           oneOverSpringPartitionUpperLimit);
         }
+
+        force += kappa0 * denominator * (vec * vec.transpose());
       }
+
+      igraph_vector_int_destroy(&edgesOfSlipLink);
+
       return force;
     };
 
@@ -2083,19 +2026,12 @@ namespace calc {
       size_t nrOfLinksToInspect = xlinksOnly ? net.nrOfNodes : net.nrOfLinks;
       for (size_t linkIdx = 0; linkIdx < nrOfLinksToInspect; ++linkIdx) {
         Eigen::Matrix3d force =
-          net.linkIsSliplink[linkIdx]
-            ? this->evaluateForceOnSlipLink(linkIdx,
-                                            net,
-                                            springPartitions,
-                                            debugNrSpringsVisited,
-                                            kappa0,
-                                            oneOverSpringPartitionUpperLimit)
-            : this->evaluateForceOnCrossLink(linkIdx,
-                                             net,
-                                             springPartitions,
-                                             debugNrSpringsVisited,
-                                             kappa0,
-                                             oneOverSpringPartitionUpperLimit);
+          this->evaluateForceOnLink(linkIdx,
+                                    net,
+                                    springPartitions,
+                                    debugNrSpringsVisited,
+                                    kappa0,
+                                    oneOverSpringPartitionUpperLimit);
         /* spring contribution to the overall stress tensor */
         RUNTIME_EXP_IFN(std::isfinite(force.squaredNorm()),
                         "Got non-finite force contribution to stress tensor: " +
