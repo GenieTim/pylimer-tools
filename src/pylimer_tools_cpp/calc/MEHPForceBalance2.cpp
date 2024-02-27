@@ -1167,9 +1167,7 @@ namespace calc {
      */
     void MEHPForceBalance2::remove2fLink(const size_t linkIdx)
     {
-      if (!igraph_cattribute_GAB(&this->graph, "is_up_to_date")) {
-        this->updateGraph();
-      }
+      assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
 
       std::vector<size_t> neighbours = this->getNeighbourLinkIndices(linkIdx);
       if (neighbours.size() == 0) {
@@ -1183,7 +1181,7 @@ namespace calc {
       // fetch the edges involved
       igraph_vector_int_t edgesOfLink;
       igraph_vector_int_init(&edgesOfLink, 2);
-      igraph_incident(&this->graph, &edgesOfLink, slipLinkIdx, IGRAPH_ALL);
+      igraph_incident(&this->graph, &edgesOfLink, linkIdx, IGRAPH_ALL);
 
       RUNTIME_EXP_IFN(igraph_vector_int_size(&edgesOfLink) == 2,
                       "Expect f = 2 to have 2 edges, got " +

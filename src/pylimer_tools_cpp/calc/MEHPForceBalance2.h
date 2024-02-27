@@ -267,12 +267,14 @@ namespace calc {
         // filter, we don't want cross-links etc. as targets
         std::vector<pylimer_tools::entities::Atom> atomsForNeighbourList =
           fb.universe.getAtomsOfDegree(2);
-        atomsForNeighbourList.erase(std::remove_if(
-          atomsForNeighbourList.begin(),
-          atomsForNeighbourList.end(),
-          [crosslinkerType](const pylimer_tools::entities::Atom& a) {
-            return a.getType() == crosslinkerType;
-          }));
+        atomsForNeighbourList.erase(
+          std::remove_if(
+            atomsForNeighbourList.begin(),
+            atomsForNeighbourList.end(),
+            [crosslinkerType](const pylimer_tools::entities::Atom& a) {
+              return a.getType() == crosslinkerType;
+            }),
+          atomsForNeighbourList.end());
         // some randomness for placement
         std::random_device rd{};
         std::mt19937 rng = std::mt19937(seed > 0 ? seed : rd());
@@ -343,8 +345,8 @@ namespace calc {
           }
         }
 
-        std::cout << "Found " << pairsOfAtoms.size() << " random slip-links."
-                  << std::endl;
+        // std::cout << "Found " << pairsOfAtoms.size() << " random slip-links."
+        //           << std::endl;
 
         // add ends of chains
         std::unordered_map<size_t, igraph_integer_t> endAtomIdToVertexId;
@@ -398,7 +400,8 @@ namespace calc {
             endAtomIdToVertexId.at(lastAtom.getId()),
             lastAtom,
             fb.crosslinkerType);
-          for (size_t i = 1; i < linedUpAtoms.size(); i++) {
+          assert(linedUpAtoms.size() == chain.getLength());
+          for (size_t i = 1; i < linedUpAtoms.size() - 1; i++) {
             pylimer_tools::entities::Atom a = linedUpAtoms[i];
             if (pairOfAtom[universe.getIdxByAtomId(a.getId())] != -1) {
               igraph_integer_t thisVertexId =
