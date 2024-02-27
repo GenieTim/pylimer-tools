@@ -267,6 +267,13 @@ namespace calc {
         // filter, we don't want cross-links etc. as targets
         std::vector<pylimer_tools::entities::Atom> atomsForNeighbourList =
           fb.universe.getAtomsOfDegree(2);
+        atomsForNeighbourList.erase(std::remove_if(
+          atomsForNeighbourList.begin(),
+          atomsForNeighbourList.end(),
+          [crosslinkerType](const pylimer_tools::entities::Atom& a) {
+            return a.getType() == crosslinkerType;
+          }));
+        // some randomness for placement
         std::random_device rd{};
         std::mt19937 rng = std::mt19937(seed > 0 ? seed : rd());
         std::shuffle(
@@ -274,7 +281,7 @@ namespace calc {
         pylimer_tools::entities::NeighbourList neighbourList =
           pylimer_tools::entities::NeighbourList(
             atomsForNeighbourList, fb.universe.getBox(), cutoff);
-        size_t numLinksFoundInIteration = 0;
+        size_t numLinksFoundInIteration = 1;
         while (pairsOfAtoms.size() < minimumNrOfSliplinks &&
                numLinksFoundInIteration > 0) {
           numLinksFoundInIteration = 0;
@@ -325,6 +332,8 @@ namespace calc {
             pairOfAtom[atomVertexIdx1] = pairsOfAtoms.size();
             pairsOfAtoms.push_back(std::make_pair(a1.getId(), a2.getId()));
             numLinksFoundInIteration += 1;
+            neighbourList.removeAtom(a2,
+                                     "After marking atom as second pair part.");
             if (pairsOfAtoms.size() >= nrOfSliplinksToSample) {
               break;
             }
@@ -423,6 +432,7 @@ namespace calc {
                                            chain.getLength() - 1,
                                            currentEdgeId,
                                            parentEdgeId);
+          fb.validateIgraphSpring(parentEdgeId);
           parentEdgeId += 1;
         }
 
@@ -748,6 +758,8 @@ namespace calc {
         const size_t chainIdx)
       {
         assert(atom1Idx < atom2Idx);
+        assert(APPROX_WITHIN(atom1Idx, 0, chain.getLength() - 2, 1e-2));
+        assert(APPROX_WITHIN(atom2Idx, 1, chain.getLength() - 1, 1e-2));
         igraph_integer_t from, to;
         igraph_edge(&this->graph, edgeId, &from, &to);
         std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
@@ -755,8 +767,8 @@ namespace calc {
         igraph_cattribute_EAN_set(&this->graph,
                                   "partition_fraction",
                                   edgeId,
-                                  static_cast<double>(atom2Idx - atom1Idx + 1) /
-                                    static_cast<double>(chain.getLength()));
+                                  static_cast<double>(atom2Idx - atom1Idx) /
+                                    static_cast<double>(chain.getLength() - 1));
         igraph_cattribute_EAN_set(
           &this->graph, "parent_edge", edgeId, chainIdx);
         igraph_cattribute_EAN_set(
@@ -2205,6 +2217,7 @@ namespace calc {
         igraph_incident(&this->graph, &edgesOfLink, slipLinkIdx, IGRAPH_ALL);
 
         if (igraph_vector_int_size(&edgesOfLink) != 4) {
+          igraph_vector_int_destroy(&edgesOfLink);
           return false;
         }
 
@@ -2223,10 +2236,11 @@ namespace calc {
                                            respectLoops);
           }
           if (didSwap) {
-            return didSwap;
+            break;
           }
         }
 
+        igraph_vector_int_destroy(&edgesOfLink);
         return didSwap;
       };
 
