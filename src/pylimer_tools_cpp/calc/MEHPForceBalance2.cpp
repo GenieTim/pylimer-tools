@@ -1163,6 +1163,7 @@ namespace calc {
      * @brief Remove a certain, 2-functional link from the structures, combining
      * the two strands
      *
+     * Invalidates both vertex and edge iterators
      */
     void MEHPForceBalance2::remove2fLink(const size_t linkIdx)
     {
@@ -1180,26 +1181,21 @@ namespace calc {
                       "Expect f = 2 to have 2 neighbours");
 
       // fetch the edges involved
-      igraph_es_t selector;
-      igraph_es_incident(&selector, linkIdx, IGRAPH_ALL);
-      igraph_eit_t iterator;
-      igraph_eit_create(&this->graph, selector, &iterator);
-      igraph_vector_int_t edgeIds;
-      igraph_vector_int_init(&edgeIds, 0);
-      igraph_vector_int_reserve(&edgeIds, IGRAPH_EIT_SIZE(iterator));
-      RUNTIME_EXP_IFN(IGRAPH_EIT_SIZE(iterator) == 2,
-                      "Expected f = 2 to have 2 edges");
-      while (!IGRAPH_EIT_END(iterator)) {
-        igraph_vector_int_push_back(&edgeIds, IGRAPH_EIT_GET(iterator));
-        IGRAPH_EIT_NEXT(iterator);
-      }
-      igraph_es_destroy(&selector);
-      igraph_eit_destroy(&iterator);
+      igraph_vector_int_t edgesOfLink;
+      igraph_vector_int_init(&edgesOfLink, 2);
+      igraph_incident(&this->graph, &edgesOfLink, slipLinkIdx, IGRAPH_ALL);
 
-      size_t removedEdge1 = std::min(igraph_vector_int_get(&edgeIds, 0),
-                                     igraph_vector_int_get(&edgeIds, 1));
-      size_t removedEdge2 = std::max(igraph_vector_int_get(&edgeIds, 0),
-                                     igraph_vector_int_get(&edgeIds, 1));
+      RUNTIME_EXP_IFN(igraph_vector_int_size(&edgesOfLink) == 2,
+                      "Expect f = 2 to have 2 edges, got " +
+                        std::to_string(igraph_vector_int_size(&edgesOfLink)) +
+                        ".");
+
+      size_t removedEdge1 = std::min(igraph_vector_int_get(&edgesOfLink, 0),
+                                     igraph_vector_int_get(&edgesOfLink, 1));
+      size_t removedEdge2 = std::max(igraph_vector_int_get(&edgesOfLink, 0),
+                                     igraph_vector_int_get(&edgesOfLink, 1));
+
+      igraph_vector_int_destroy(&edgesOfLink);
 
       this->combinePartialSprings(removedEdge1, removedEdge2);
 
@@ -1210,6 +1206,8 @@ namespace calc {
     /**
      * @brief Remove a certain, 3-functional link from the structures,
      * combining the two strands
+     *
+     * Invalidates both vertex and edge iterators
      */
     void MEHPForceBalance2::remove3fLink(const size_t linkIdx)
     {
