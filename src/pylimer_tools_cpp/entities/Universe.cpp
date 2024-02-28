@@ -217,7 +217,9 @@ namespace entities {
         for (size_t j = 0; j < i; ++j) {
           this->atomIdToVertexIdx.erase(newIds[j]);
         }
-        throw std::invalid_argument("Atom ids must be unique");
+        throw std::invalid_argument("Atom ids must be unique; at least " +
+                                    std::to_string(newIds[i]) +
+                                    " is found twice.");
       }
     }
     // append attributes
