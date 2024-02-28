@@ -521,7 +521,11 @@ namespace calc {
         return retVal;
       }
 
-      void synchronise() { this->convertFromGraph(); }
+      void synchronise()
+      {
+        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
+        this->convertFromGraph();
+      }
 
       /**
        * @brief
@@ -1023,8 +1027,7 @@ namespace calc {
        * @param springPartitions
        * @param tolerance
        */
-      size_t removeInactiveCrosslinks(Eigen::VectorXd& springPartitions,
-                                      double tolerance);
+      size_t removeInactiveCrosslinks(double tolerance = 1e-5);
 
       /**
        * @brief Remove all vertices (incl. edges!) with a functionality < 3 for
@@ -2542,7 +2545,8 @@ namespace calc {
        * @param linkIdx
        * @return std::vector<size_t>
        */
-      std::vector<size_t> getNeighbourLinkIndices(const size_t linkIdx)
+      std::vector<size_t> getNeighbourLinkIndices(const size_t linkIdx,
+                                                  bool ignoreSelf = false)
       {
         std::vector<size_t> results;
         results.reserve(4);
@@ -2556,7 +2560,9 @@ namespace calc {
         for (size_t i = 0; i < igraph_vector_int_list_size(&res); ++i) {
           igraph_vector_int_t* resI = igraph_vector_int_list_get_ptr(&res, i);
           for (size_t j = 0; j < igraph_vector_int_size(resI); ++j) {
-            results.push_back(igraph_vector_int_get(resI, j));
+            if (!ignoreSelf || igraph_vector_int_get(resI, j) != linkIdx) {
+              results.push_back(igraph_vector_int_get(resI, j));
+            }
           }
         }
 
