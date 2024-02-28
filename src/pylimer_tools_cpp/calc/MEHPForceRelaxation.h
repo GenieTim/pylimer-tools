@@ -540,7 +540,7 @@ namespace calc {
 
             // spring contour length = nr of bonds between two cross-linkers
             net->springsContourLength[spring_idx] =
-              crosslinkerChains[i].getNrOfAtoms() - 1;
+              crosslinkerChains[i].getNrOfBonds();
           } else if (crosslinkerChains[i].getType() ==
                      pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
             assert(xlinkersOfChain.size() == 1 ||
@@ -552,11 +552,7 @@ namespace calc {
             addChain = true;
 
             net->springsContourLength[spring_idx] =
-              crosslinkerChains[i].getNrOfAtoms();
-            if (xlinkersOfChain.size() == 2) {
-              net->springsContourLength[spring_idx] =
-                crosslinkerChains[i].getNrOfAtoms() - 1;
-            }
+              crosslinkerChains[i].getNrOfBonds();
           } else if (crosslinkerChains[i].getType() ==
                        pylimer_tools::entities::MoleculeType::DANGLING_CHAIN &&
                      !removeDanglingChains) {
@@ -570,7 +566,7 @@ namespace calc {
             nodeIdxFrom = atomIdToNode.at(endsOfChain[0].getId());
             nodeIdxTo = atomIdToNode.at(endsOfChain[1].getId());
             net->springsContourLength[spring_idx] =
-              crosslinkerChains[i].getNrOfAtoms() - 1;
+              crosslinkerChains[i].getNrOfBonds();
             addChain = true;
           }
 

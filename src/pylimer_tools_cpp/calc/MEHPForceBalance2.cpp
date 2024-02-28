@@ -228,6 +228,10 @@ namespace calc {
           this->net, oneOverSpringPartitions);
         iterationsDone += 1;
         if (iterationsDone % 10 == 0) {
+          if (simplificationMode !=
+              StructureSimplificationMode::NO_SIMPLIFICATION) {
+            this->updateGraph();
+          }
           if (simplificationMode ==
                 StructureSimplificationMode::INACTIVE_ONLY ||
               simplificationMode == StructureSimplificationMode::ALL_TIM) {
@@ -290,6 +294,7 @@ namespace calc {
       std::cout << iterationsDone << " steps done. "
                 << "Last max distance moved: " << maxDistanceMoved << std::endl;
 
+      this->updateGraph();
       this->validateNetwork();
       this->currentSpringDistances =
         this->evaluateSpringDistances(net, this->is2D);
@@ -2413,7 +2418,8 @@ namespace calc {
         ids.push_back(this->net.oldAtomIds[i]);
         // override type, since the types may be different from crosslinkerType
         // if converted with dangling chains
-        types[i] = this->net.linkIsSliplink[i] ? this->slipLinkType : this->crosslinkerType;
+        types[i] = this->net.linkIsSliplink[i] ? this->slipLinkType
+                                               : this->crosslinkerType;
       }
       xlinkUniverse.addAtoms(ids, types, x, y, z, zeros, zeros, zeros);
       std::vector<long int> bondFrom;

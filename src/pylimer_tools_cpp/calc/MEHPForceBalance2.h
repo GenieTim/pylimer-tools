@@ -777,7 +777,7 @@ namespace calc {
         igraph_cattribute_EAN_set(
           &this->graph, "parent_edge", edgeId, chainIdx);
         igraph_cattribute_EAN_set(
-          &this->graph, "contour_length", edgeId, chain.getLength());
+          &this->graph, "contour_length", edgeId, chain.getNrOfBonds());
         igraph_cattribute_EAN_set(
           &this->graph,
           "local_contour_length",
@@ -2864,7 +2864,12 @@ namespace calc {
           this->currentSpringPartitionsVec(i) =
             igraph_vector_get(&partitionFraction, i);
         }
-        this->net.meanSpringContourLength = this->net.springsContourLength.mean();
+        if (this->net.nrOfSprings > 0) {
+          this->net.meanSpringContourLength =
+            this->net.springsContourLength.mean();
+        } else {
+          this->net.meanSpringContourLength = 0.;
+        }
 
         // then, for the "parent" springs, we need to know the order of the
         // partial springs
