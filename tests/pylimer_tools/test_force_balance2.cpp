@@ -592,22 +592,24 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
         std::cout << "Doing phantom force balance" << std::endl;
         pcm::MEHPForceRelaxation forceRelaxer =
           pcm::MEHPForceRelaxation(universe2, 2);
-        // the strands are different -> cannot compare the distances anymore
-        // CHECK((forceBalancer2.getCurrentSpringDistances() -
-        // forceRelaxer.getCurrentSpringDistances()).isMuchSmallerThan(1e-12));
         CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::UNSET);
         CHECK(forceBalancer2.getNrOfIterations() == 0);
         CHECK(forceBalancer2.getVolume() ==
               Catch::Approx(universe2.getVolume()));
         CHECK(forceBalancer2.getVolume() ==
               Catch::Approx(97.383096 * 97.383096 * 97.383096));
+        CHECK(forceBalancer2.getNrOfSprings() == 10000);
         // initial system values
         CHECK(forceBalancer2.getPressure() ==
               Catch::Approx(forceRelaxer.getPressure()));
+        CHECK(
+          forceRelaxer.getNetwork().meanSpringContourLength ==
+          Catch::Approx(forceBalancer2.getNetwork().meanSpringContourLength));
         CHECK(forceBalancer2.getPressure() == Catch::Approx(0.0061105865));
         CHECK_NOTHROW(forceBalancer2.runForceRelaxation());
         CHECK_NOTHROW(forceBalancer2.validateNetwork());
-        CHECK(forceBalancer2.getNrOfSprings() == 9859);
+        CHECK_NOTHROW(forceBalancer2.removeSubfunctionalVertices());
+        CHECK(forceBalancer2.getNrOfSprings() == 9876);
         CHECK(forceBalancer2.getNrOfIterations() > 1);
         CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
 
@@ -1225,7 +1227,7 @@ TEST_CASE(
     }
   }
 }
-TEST_CASE("Free chains collapse",
+TEST_CASE("MEHP Force Balance 2 Free chains collapse",
           "[analysis][MEHPForceBalance2][NonGaussianSpringForceEvaluator]["
           "SimpleSpringMEHPForceEvaluator]")
 {
@@ -1291,6 +1293,7 @@ TEST_CASE("Free chains collapse",
   CHECK(forceBalancer.getAverageSpringLength() <= 3e-6);
   CHECK_NOTHROW(forceBalancer.validateNetwork());
 
+  std::cout << "Getting cross-linker verse" << std::endl;
   pe::Universe resultingUniverse = forceBalancer.getCrosslinkerVerse();
   // auto distances = resultingUniverse.computeBondLengths();
   // for (auto i : distances) {

@@ -2413,8 +2413,7 @@ namespace calc {
         ids.push_back(this->net.oldAtomIds[i]);
         // override type, since the types may be different from crosslinkerType
         // if converted with dangling chains
-        types[i] = this->universe.getPropertyValue<int>(
-          "type", this->universe.getIdxByAtomId(this->net.oldAtomIds[i]));
+        types[i] = this->net.linkIsSliplink[i] ? this->slipLinkType : this->crosslinkerType;
       }
       xlinkUniverse.addAtoms(ids, types, x, y, z, zeros, zeros, zeros);
       std::vector<long int> bondFrom;
@@ -2790,7 +2789,7 @@ namespace calc {
         RUNTIME_EXP_IFN(
           net.loopsOfSliplink.size() == (net.nrOfLinks - net.nrOfNodes),
           "Each slip-link must have associated list of loops, or none.");
-        for (std::vector<size_t> loopsOfSliplink : net.loopsOfSliplink) {
+        for (const std::vector<size_t>& loopsOfSliplink : net.loopsOfSliplink) {
           RUNTIME_EXP_IFN(
             loopsOfSliplink.size() <= 2,
             "Cannot have a slip-link attributed to more than two loops.");
@@ -2799,7 +2798,7 @@ namespace calc {
                             "Loop index out of range.");
           }
         }
-        for (std::vector<size_t> loop : net.loops) {
+        for (const std::vector<size_t>& loop : net.loops) {
           for (size_t i : loop) {
             RUNTIME_EXP_IFN(i >= net.nrOfSprings,
                             "Loop's spring index out of range.");

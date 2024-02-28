@@ -617,6 +617,8 @@ namespace calc {
         igraph_cattribute_VAN_set(
           &this->graph, "type", vertexId, this->slipLinkType);
         igraph_cattribute_VAN_set(
+          &this->graph, "atom_id", vertexId, atom1.getId());
+        igraph_cattribute_VAN_set(
           &this->graph, "atom_1_id", vertexId, atom1.getId());
         igraph_cattribute_VAN_set(
           &this->graph, "atom_2_id", vertexId, atom2.getId());
@@ -2862,6 +2864,7 @@ namespace calc {
           this->currentSpringPartitionsVec(i) =
             igraph_vector_get(&partitionFraction, i);
         }
+        this->net.meanSpringContourLength = this->net.springsContourLength.mean();
 
         // then, for the "parent" springs, we need to know the order of the
         // partial springs
@@ -2944,6 +2947,11 @@ namespace calc {
         igraph_cattribute_VANV(
           &this->graph, "type", igraph_vss_all(), &linkType);
 
+        igraph_vector_t linkAtomId;
+        igraph_vector_init(&linkAtomId, this->net.nrOfLinks);
+        igraph_cattribute_VANV(
+          &this->graph, "atom_id", igraph_vss_all(), &linkAtomId);
+
         // actually write things
         size_t numCrosslinks = 0;
         for (size_t i = 0; i < this->net.nrOfLinks; ++i) {
@@ -2964,15 +2972,21 @@ namespace calc {
                                                    this->net.nrOfNodes);
         this->net.oldAtomIds.resize(numCrosslinks);
         size_t slipLinkIdx = 0;
+        size_t crossLinkIdx = 0;
         for (size_t i = 0; i < this->net.nrOfLinks; ++i) {
           if (castToIgraphInt(igraph_vector_get(&linkType, i)) !=
               this->crosslinkerType) {
             this->net.nrOfCrosslinkSwapsEndured(slipLinkIdx) =
               castToIgraphInt(igraph_vector_get(&numLinkSwaps, i));
             slipLinkIdx += 1;
+          } else {
+            this->net.oldAtomIds[crossLinkIdx] =
+              castToIgraphInt(igraph_vector_get(&linkAtomId, i));
+            crossLinkIdx += 1;
           }
         }
         assert(slipLinkIdx == this->net.nrOfLinks - this->net.nrOfNodes);
+        assert(crossLinkIdx == this->net.nrOfNodes);
 
         // cleanup
         igraph_vector_destroy(&linkType);
