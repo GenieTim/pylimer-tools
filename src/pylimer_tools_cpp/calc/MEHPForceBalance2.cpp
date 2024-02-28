@@ -237,39 +237,31 @@ namespace calc {
               simplificationMode == StructureSimplificationMode::ALL_TIM) {
             // std::cout << "Removing inactive cross-links" << std::endl;
             // default tolerance: 0.25*atom's cube length
-            size_t nRemoved = this->removeInactiveCrosslinks(
-              this->currentSpringPartitionsVec, removalTolerance);
-            this->net.meanSpringContourLength =
-              this->net.springsContourLength.size() > 0
-                ? this->net.springsContourLength.mean()
-                : 0.;
+            size_t nRemoved = this->removeInactiveCrosslinks(removalTolerance);
             if (nRemoved > 0) {
+              this->net.isUpToDate = false;
               std::cout << "Removed " << nRemoved << " inactive springs. "
                         << std::endl;
             }
-            // this->validateNetwork(this->net,
-            // this->currentDisplacements, this->currentSpringPartitionsVec);
           }
           if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
               simplificationMode == StructureSimplificationMode::ALL_TIM) {
             // std::cout << "Removing 2-f cross-links" << std::endl;
             size_t nRemoved = this->removeTwofunctionalLinks();
-            this->net.meanSpringContourLength =
-              this->net.springsContourLength.size() > 0
-                ? this->net.springsContourLength.mean()
-                : 0.;
             if (nRemoved > 0) {
+              this->net.isUpToDate = false;
               std::cout << "Removed " << nRemoved
                         << " cross-linkers with f = 2. " << std::endl;
             }
-            // this->validateNetwork(this->net,
-            // this->currentDisplacements, this->currentSpringPartitionsVec);
           }
           if (simplificationMode == StructureSimplificationMode::ALL_ANDREI) {
             std::cout << "Removing cross-links and springs, Andrei's way"
                       << std::endl;
-            this->doRemovalAndreisWay(this->currentSpringPartitionsVec,
-                                      removalTolerance);
+            size_t nRemoved = this->doRemovalAndreisWay(
+              this->currentSpringPartitionsVec, removalTolerance);
+            if (nRemoved > 0) {
+              this->net.isUpToDate = false;
+            }
           }
           if (simplificationMode !=
               StructureSimplificationMode::NO_SIMPLIFICATION) {
@@ -1174,14 +1166,17 @@ namespace calc {
     {
       assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
 
-      std::vector<size_t> neighbours = this->getNeighbourLinkIndices(linkIdx);
+      std::vector<size_t> neighbours =
+        this->getNeighbourLinkIndices(linkIdx, false);
       if (neighbours.size() == 0) {
         igraph_delete_vertices(&this->graph, igraph_vss_1(linkIdx));
         this->net.isUpToDate = false;
         return;
       }
       RUNTIME_EXP_IFN(neighbours.size() == 2,
-                      "Expect f = 2 to have 2 neighbours");
+                      "Expect f = 2 to have 2 neighbours, got " +
+                        std::to_string(neighbours.size()) + " for link " +
+                        std::to_string(linkIdx) + ".");
 
       // fetch the edges involved
       igraph_vector_int_t edgesOfLink;
@@ -1455,8 +1450,11 @@ namespace calc {
     {
       size_t numRemovedTotal = 0;
       size_t numRemovedInIteration = 0;
+      // size_t primaryLoopsRemovedTotal = 0;
+      size_t primaryLoopsRemovedInIteration = 0;
       do {
         numRemovedInIteration = 0;
+        primaryLoopsRemovedInIteration = 0;
 
         igraph_vector_int_t degrees;
         igraph_vector_int_init(&degrees, igraph_vcount(&this->graph));
@@ -1483,6 +1481,7 @@ namespace calc {
         numRemovedInIteration = igraph_vector_int_size(&indicesToRemove);
 
         igraph_vector_int_destroy(&indicesToRemove);
+        igraph_vector_int_destroy(&degrees);
 
         // the function may lead to slip-links being inconsistenly
         // linked (e.g., at the end of a chain)
@@ -1490,28 +1489,25 @@ namespace calc {
         // f = 1 and below have been removed
         // -> cleanup remaining f = 2 and f = 3
         if (numRemovedInIteration > 0) {
-          // reload degree and type, since the vertex index changed
-          igraph_degree(
-            &this->graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true);
-          igraph_cattribute_VANV(
-            &this->graph, "type", igraph_vss_all(), &types);
-        }
-        for (long int i = igraph_vcount(&this->graph); i >= 0; --i) {
-          if (castToIgraphInt(igraph_vector_int_get(&degrees, i)) == 2) {
-            this->remove2fLink(i);
-            numRemovedInIteration += 1;
-          } else if (castToIgraphInt(igraph_vector_int_get(&degrees, i)) == 3 &&
-                     castToIgraphInt(igraph_vector_get(&types, i)) ==
-                       this->slipLinkType) {
-            this->remove3fLink(i);
-            numRemovedInIteration += 1;
+          for (long int i = igraph_vcount(&this->graph); i >= 0; --i) {
+            igraph_integer_t degree;
+            igraph_degree_1(&this->graph, &degree, i, IGRAPH_ALL, true);
+            if (degree == 2) {
+              this->remove2fLink(i);
+              numRemovedInIteration += 1;
+            } else if (degree == 3 && castToIgraphInt(igraph_vector_get(
+                                        &types, i)) == this->slipLinkType) {
+              this->remove3fLink(i);
+              numRemovedInIteration += 1;
+            }
           }
         }
 
-        igraph_vector_int_destroy(&degrees);
         igraph_vector_destroy(&types);
         numRemovedTotal += numRemovedInIteration;
-      } while (numRemovedInIteration > 0);
+        primaryLoopsRemovedInIteration = this->cleanupPrimaryLoopsInStructure();
+        // primaryLoopsRemovedTotal += primaryLoopsRemovedInIteration;
+      } while (numRemovedInIteration > 0 || primaryLoopsRemovedInIteration > 0);
 
       if (numRemovedTotal > 0) {
         this->net.isUpToDate = false;
@@ -1528,9 +1524,7 @@ namespace calc {
      * @param springPartitions
      * @param tolerance
      */
-    size_t MEHPForceBalance2::removeInactiveCrosslinks(
-      Eigen::VectorXd& springPartitions,
-      double tolerance)
+    size_t MEHPForceBalance2::removeInactiveCrosslinks(double tolerance)
     {
       size_t numRemoved = 0;
       size_t numRemovedInIteration = 0;

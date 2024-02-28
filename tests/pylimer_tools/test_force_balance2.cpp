@@ -602,13 +602,16 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
         // initial system values
         CHECK(forceBalancer2.getPressure() ==
               Catch::Approx(forceRelaxer.getPressure()));
+        CHECK(forceBalancer2.getNrOfSprings() == forceRelaxer.getNrOfSprings());
         CHECK(
           forceRelaxer.getNetwork().meanSpringContourLength ==
           Catch::Approx(forceBalancer2.getNetwork().meanSpringContourLength));
         CHECK(forceBalancer2.getPressure() == Catch::Approx(0.0061105865));
         CHECK_NOTHROW(forceBalancer2.runForceRelaxation());
         CHECK_NOTHROW(forceBalancer2.validateNetwork());
+        CHECK_NOTHROW(forceBalancer2.removeInactiveCrosslinks());
         CHECK_NOTHROW(forceBalancer2.removeSubfunctionalVertices());
+        CHECK_NOTHROW(forceBalancer2.synchronise());
         CHECK(forceBalancer2.getNrOfSprings() == 9876);
         CHECK(forceBalancer2.getNrOfIterations() > 1);
         CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
@@ -812,7 +815,7 @@ TEST_CASE(
     size_t nrOfSpringsBefore = net.nrOfSprings;
     CHECK_NOTHROW(forceBalancer.validateNetwork(net, partitions));
     // remove all springs...
-    numRemoved = forceBalancer.removeInactiveCrosslinks(partitions, 1e5);
+    numRemoved = forceBalancer.removeInactiveCrosslinks(1e5);
     CHECK(numRemoved == nrOfSpringsBefore);
   }
 }
@@ -916,7 +919,7 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
     // due to the randomness, it _could_ be one day that actually all strands
     // are active. unlikely, but I can imagine it to be possible.
     size_t numInactiveRemoved =
-      forceBalancer.removeInactiveCrosslinks(partitions, 0.1);
+      forceBalancer.removeInactiveCrosslinks(0.1);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
     CHECK(numInactiveRemoved > 0);
     CHECK_NOTHROW(forceBalancer.validateNetwork(net, partitions));
@@ -936,15 +939,14 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
     // run a while to get inactive links
     forceBalancer.runForceRelaxation(pcm::BalanceRunMode::ITERATIVE, 1.0, 100);
     net = forceBalancer.getNetwork();
-    partitions = forceBalancer.getSpringPartitions();
     // due to the randomness, it _could_ be one day that actually all strands
     // are active. unlikely, but I can imagine it to be possible.
     numInactiveRemoved =
-      forceBalancer.removeInactiveCrosslinks(partitions, 0.1);
+      forceBalancer.removeInactiveCrosslinks(0.1);
     CHECK(numInactiveRemoved > 0);
     numInactiveRemoved = forceBalancer.removeTwofunctionalLinks();
     CHECK(numInactiveRemoved > 0);
-    CHECK_NOTHROW(forceBalancer.validateNetwork(net, partitions));
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
   }
 }
 
