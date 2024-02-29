@@ -95,7 +95,7 @@ namespace calc {
                 << " while simplification mode is " << simplificationMode
                 << std::endl;
       std::cout << "Using oneOverSpringPartitionUpperLimit = "
-                << oneOverSpringPartitionUpperLimit;
+                << oneOverSpringPartitionUpperLimit << std::endl;
       double currentResidual = 0.0;
       double intermediateResidual = 0.0;
       size_t iterationsDone = 0;
@@ -977,13 +977,14 @@ namespace calc {
       igraph_delete_edges(&this->graph, igraph_ess_1(edge2Id));
 
       // merge edge properties
-      if (igraph_cattribute_EAN(&this->graph, "parent_edge", edge1Id) !=
-          igraph_cattribute_EAN(&this->graph, "parent_edge", edge2Id)) {
+      igraph_integer_t parent1 = castToIgraphInt(
+        igraph_cattribute_EAN(&this->graph, "parent_edge", edge1Id));
+      igraph_integer_t parent2 = castToIgraphInt(
+        igraph_cattribute_EAN(&this->graph, "parent_edge", edge2Id));
+      if (parent1 != parent2) {
         // two different "parent" springs -> need to recalculate some stuff
         // probably only if link is cross-link
-        this->combineParentSprings(
-          igraph_cattribute_EAN(&this->graph, "parent_edge", edge1Id),
-          igraph_cattribute_EAN(&this->graph, "parent_edge", edge2Id));
+        this->combineParentSprings(parent1, parent2);
       }
       this->net.isUpToDate = false;
     }
@@ -1166,27 +1167,37 @@ namespace calc {
     {
       assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
 
-      std::vector<size_t> neighbours =
-        this->getNeighbourLinkIndices(linkIdx, false);
-      if (neighbours.size() == 0) {
-        igraph_delete_vertices(&this->graph, igraph_vss_1(linkIdx));
-        this->net.isUpToDate = false;
-        return;
-      }
-      RUNTIME_EXP_IFN(neighbours.size() == 2,
-                      "Expect f = 2 to have 2 neighbours, got " +
-                        std::to_string(neighbours.size()) + " for link " +
-                        std::to_string(linkIdx) + ".");
-
       // fetch the edges involved
       igraph_vector_int_t edgesOfLink;
       igraph_vector_int_init(&edgesOfLink, 2);
       igraph_incident(&this->graph, &edgesOfLink, linkIdx, IGRAPH_ALL);
 
-      RUNTIME_EXP_IFN(igraph_vector_int_size(&edgesOfLink) == 2,
-                      "Expect f = 2 to have 2 edges, got " +
-                        std::to_string(igraph_vector_int_size(&edgesOfLink)) +
-                        ".");
+      if (igraph_vector_int_size(&edgesOfLink) == 0) {
+        igraph_delete_vertices(&this->graph, igraph_vss_1(linkIdx));
+        igraph_vector_int_destroy(&edgesOfLink);
+        this->net.isUpToDate = false;
+        return;
+      }
+
+      if (igraph_vector_int_size(&edgesOfLink) == 1) {
+        igraph_integer_t from, to;
+        igraph_edge(
+          &this->graph, igraph_vector_int_get(&edgesOfLink, 0), &from, &to);
+        if (from != to) {
+          throw std::runtime_error("Only self-loops are acceptable 'f = 1'");
+        }
+
+        igraph_delete_vertices(&this->graph, igraph_vss_1(linkIdx));
+        igraph_vector_int_destroy(&edgesOfLink);
+        this->net.isUpToDate = false;
+        return;
+      }
+
+      if (igraph_vector_int_size(&edgesOfLink) != 2) {
+        throw std::runtime_error(
+          "Expect f = 2 to have 2 edges, got " +
+          std::to_string(igraph_vector_int_size(&edgesOfLink)) + ".");
+      }
 
       size_t removedEdge1 = std::min(igraph_vector_int_get(&edgesOfLink, 0),
                                      igraph_vector_int_get(&edgesOfLink, 1));
@@ -1259,8 +1270,10 @@ namespace calc {
     void MEHPForceBalance2::combineParentSprings(size_t springIdxBefore,
                                                  size_t springIdxNow)
     {
-      INVALIDARG_EXP_IFN(springIdxBefore != springIdxNow,
-                         "Will only replace higher with lower spring idx");
+      if (springIdxBefore == springIdxNow) {
+        throw std::invalid_argument(
+          "Will only replace higher with lower spring idx");
+      }
       if (springIdxBefore < springIdxNow) {
         std::swap(springIdxBefore, springIdxNow);
       }
@@ -1361,7 +1374,6 @@ namespace calc {
     size_t MEHPForceBalance2::removeInactiveParentEdges(double tolerance)
     {
       assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
-      size_t numRemoved = 0;
 
       igraph_vector_t parentEdges;
       igraph_vector_init(&parentEdges, this->net.nrOfPartialSprings);
@@ -1402,6 +1414,11 @@ namespace calc {
       }
 
       this->removePartialSprings(edgeIdsToRemove);
+      size_t numRemoved = edgeIdsToRemove.size();
+
+      if (numRemoved > 0) {
+        this->renumberParentSprings();
+      }
 
       return numRemoved;
     }
@@ -1450,11 +1467,12 @@ namespace calc {
     {
       size_t numRemovedTotal = 0;
       size_t numRemovedInIteration = 0;
-      // size_t primaryLoopsRemovedTotal = 0;
+      size_t primaryLoopsRemovedTotal = this->cleanupPrimaryLoopsInStructure();
+      std::cout << "Removed " << primaryLoopsRemovedTotal << " primary loops"
+                << std::endl;
       size_t primaryLoopsRemovedInIteration = 0;
       do {
         numRemovedInIteration = 0;
-        primaryLoopsRemovedInIteration = 0;
 
         igraph_vector_int_t degrees;
         igraph_vector_int_init(&degrees, igraph_vcount(&this->graph));
@@ -1471,6 +1489,12 @@ namespace calc {
         igraph_vector_int_init(&indicesToRemove, 0);
         for (size_t i = 0; i < igraph_vcount(&this->graph); ++i) {
           if (igraph_vector_int_get(&degrees, i) < 2) {
+            igraph_vector_int_t edgesOfVertex;
+            igraph_vector_int_init(&edgesOfVertex, 1);
+            igraph_incident(&this->graph, &edgesOfVertex, i, IGRAPH_ALL);
+            assert(igraph_vector_int_size(&edgesOfVertex) ==
+                   igraph_vector_int_get(&degrees, i));
+
             igraph_vector_int_push_back(&indicesToRemove, i);
           }
         }
@@ -1479,19 +1503,24 @@ namespace calc {
                                igraph_vss_vector(&indicesToRemove));
 
         numRemovedInIteration = igraph_vector_int_size(&indicesToRemove);
+        std::cout << "Removed " << numRemovedInIteration
+                  << " vertices with degree < 2" << std::endl;
 
         igraph_vector_int_destroy(&indicesToRemove);
         igraph_vector_int_destroy(&degrees);
+
+        primaryLoopsRemovedInIteration = this->cleanupPrimaryLoopsInStructure();
+        std::cout << "Removed " << primaryLoopsRemovedInIteration
+                  << " primary loops" << std::endl;
 
         // the function may lead to slip-links being inconsistenly
         // linked (e.g., at the end of a chain)
         // -> here, we remove those dangling ones.
         // f = 1 and below have been removed
         // -> cleanup remaining f = 2 and f = 3
-        if (numRemovedInIteration > 0) {
+        if (numRemovedInIteration > 0 || primaryLoopsRemovedInIteration > 0) {
           for (long int i = igraph_vcount(&this->graph); i >= 0; --i) {
-            igraph_integer_t degree;
-            igraph_degree_1(&this->graph, &degree, i, IGRAPH_ALL, true);
+            igraph_integer_t degree = this->getVertexDegree(i);
             if (degree == 2) {
               this->remove2fLink(i);
               numRemovedInIteration += 1;
@@ -1503,17 +1532,148 @@ namespace calc {
           }
         }
 
+        std::cout << "Removed " << numRemovedInIteration
+                  << " vertices with degree == 2 or slip-Links degree == 3"
+                  << std::endl;
+
         igraph_vector_destroy(&types);
         numRemovedTotal += numRemovedInIteration;
-        primaryLoopsRemovedInIteration = this->cleanupPrimaryLoopsInStructure();
-        // primaryLoopsRemovedTotal += primaryLoopsRemovedInIteration;
+        primaryLoopsRemovedInIteration +=
+          this->cleanupPrimaryLoopsInStructure();
+        primaryLoopsRemovedTotal += primaryLoopsRemovedInIteration;
+        std::cout << "Removed " << primaryLoopsRemovedInIteration
+                  << " primary loops" << std::endl;
       } while (numRemovedInIteration > 0 || primaryLoopsRemovedInIteration > 0);
 
-      if (numRemovedTotal > 0) {
+      if (numRemovedTotal > 0 || primaryLoopsRemovedTotal > 0) {
+        this->renumberParentSprings();
         this->net.isUpToDate = false;
       }
       return numRemovedTotal;
     }
+
+    /**
+     * @brief Remove chains that have two otherwise not connected ends
+     *
+     * @return size_t the nr of chains removed
+     */
+    size_t MEHPForceBalance2::removeFreeChains()
+    {
+      igraph_vector_int_t degrees;
+      igraph_vector_int_init(&degrees, igraph_vcount(&this->graph));
+      igraph_degree(&this->graph, &degrees, igraph_vss_all(), IGRAPH_ALL, true);
+
+      igraph_vector_int_t allEdges;
+      igraph_vector_int_init(&allEdges, igraph_ecount(&this->graph) * 2);
+      if (igraph_edges(
+            &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &allEdges)) {
+        throw std::runtime_error("Failed to get all edges");
+      }
+
+      igraph_vector_int_t verticesToDelete;
+      igraph_vector_int_init(&verticesToDelete, 0);
+      for (size_t i = 0; i < igraph_ecount(&this->graph); ++i) {
+        igraph_integer_t from = igraph_vector_int_get(&allEdges, 2 * i + 0);
+        igraph_integer_t to = igraph_vector_int_get(&allEdges, 2 * i + 1);
+        if (igraph_vector_int_get(&degrees, from) == 1 &&
+            igraph_vector_int_get(&degrees, to) == 1) {
+          igraph_vector_int_push_back(&verticesToDelete, from);
+          igraph_vector_int_push_back(&verticesToDelete, to);
+        }
+      }
+
+      igraph_delete_vertices(&this->graph,
+                             igraph_vss_vector(&verticesToDelete));
+
+      size_t numVerticesDeleted = igraph_vector_int_size(&verticesToDelete);
+      assert(numVerticesDeleted % 2 == 0);
+
+      igraph_vector_int_destroy(&verticesToDelete);
+      igraph_vector_int_destroy(&allEdges);
+      igraph_vector_int_destroy(&degrees);
+
+      if (numVerticesDeleted > 0) {
+        this->renumberParentSprings();
+        this->net.isUpToDate = false;
+      }
+
+      return numVerticesDeleted / 2;
+    }
+
+    /**
+     * @brief When springs have been removed, it is possible that the
+     * numbering is not sequential anymore. This function fixes that.
+     *
+     */
+    void MEHPForceBalance2::renumberParentSprings()
+    {
+      igraph_vector_t parentEdges;
+      igraph_vector_init(&parentEdges, igraph_ecount(&this->graph));
+      igraph_cattribute_EANV(&this->graph,
+                             "parent_edge",
+                             igraph_ess_all(IGRAPH_EDGEORDER_ID),
+                             &parentEdges);
+
+      // find unique parent edge ids
+      std::unordered_set<igraph_integer_t> parentEdgeIds;
+      for (size_t i = 0; i < igraph_vector_size(&parentEdges); ++i) {
+        igraph_integer_t parentEdgeId =
+          castToIgraphInt(igraph_vector_get(&parentEdges, i));
+        parentEdgeIds.insert(parentEdgeId);
+      }
+
+      // convert to vector, sort
+      std::vector<igraph_integer_t> parentEdgeIdsVec;
+      std::copy(parentEdgeIds.begin(),
+                parentEdgeIds.end(),
+                std::back_inserter(parentEdgeIdsVec));
+      std::sort(parentEdgeIdsVec.begin(), parentEdgeIdsVec.end());
+
+      // iterate to find gaps
+      for (long int i = parentEdgeIdsVec.size() - 2; i >= 0; --i) {
+        // gap found if difference > 0
+        int diffForEdgeId = parentEdgeIdsVec[i + 1] - (parentEdgeIdsVec[i] + 1);
+        assert(diffForEdgeId >= 0);
+        if (diffForEdgeId > 0) {
+          for (size_t j = 0; j < igraph_vector_size(&parentEdges); ++j) {
+            igraph_integer_t parentEdgeId =
+              castToIgraphInt(igraph_vector_get(&parentEdges, j));
+            if (parentEdgeId >= parentEdgeIdsVec[i + 1]) {
+              igraph_vector_set(
+                &parentEdges,
+                j,
+                static_cast<igraph_real_t>(parentEdgeId - diffForEdgeId));
+            }
+          }
+        }
+      }
+      // finally, close the last gap: if the smallest parent id is not 0
+      for (size_t j = 0; j < igraph_vector_size(&parentEdges); ++j) {
+        int lastGapDiff = parentEdgeIdsVec[0];
+        igraph_integer_t parentEdgeId =
+          castToIgraphInt(igraph_vector_get(&parentEdges, j));
+        igraph_vector_set(
+          &parentEdges,
+          j,
+          static_cast<igraph_real_t>(parentEdgeId - lastGapDiff));
+      }
+
+      igraph_cattribute_EAN_setv(&this->graph, "parent_edge", &parentEdges);
+
+      // validate the new numbering
+      std::unordered_set<igraph_integer_t> parentEdgeIdsNow;
+      igraph_integer_t maxParentEdgeId = 0;
+      for (size_t i = 0; i < igraph_vector_size(&parentEdges); ++i) {
+        igraph_integer_t parentEdgeId =
+          castToIgraphInt(igraph_vector_get(&parentEdges, i));
+        parentEdgeIdsNow.insert(parentEdgeId);
+        maxParentEdgeId = std::max(parentEdgeId, maxParentEdgeId);
+      }
+      assert(maxParentEdgeId == parentEdgeIdsNow.size() - 1 ||
+             parentEdgeIdsNow.size() == 0);
+
+      igraph_vector_destroy(&parentEdges);
+    };
 
     /**
      * @brief Remove cross-links which do not have any springs with a certain
@@ -1533,6 +1693,10 @@ namespace calc {
         numRemovedInIteration = this->removeSubfunctionalVertices();
         numRemoved += numRemovedInIteration;
       } while (numRemovedInIteration > 0);
+
+      if (numRemoved > 0) {
+        this->renumberParentSprings();
+      }
 
       return numRemoved;
     };
@@ -1559,6 +1723,11 @@ namespace calc {
         numRemovedTotal +=
           this->doRemovalAndreisWay(springPartitions, tolerance);
       }
+
+      if (numRemovedTotal > 0) {
+        this->renumberParentSprings();
+      }
+
       return numRemovedTotal;
     };
 

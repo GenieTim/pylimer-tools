@@ -1292,7 +1292,7 @@ TEST_CASE("MEHP Force Balance runs with non-network",
     }
   }
 }
-TEST_CASE("Free chains collapse",
+TEST_CASE("MEHP Force Balance Free chains collapse",
           "[analysis][MEHPForceBalance][NonGaussianSpringForceEvaluator]["
           "SimpleSpringMEHPForceEvaluator]")
 {
@@ -1347,6 +1347,9 @@ TEST_CASE("Free chains collapse",
   // these beads overlap first, the gaussian spring one
   pcm::MEHPForceBalance forceBalancer =
     pcm::MEHPForceBalance(universe, 2, false);
+  CHECK(forceBalancer.getNrOfSprings() ==
+        forceBalancer.getNrOfPartialSprings());
+  CHECK(forceBalancer.getNrOfSprings() == nrOfBeads / nrOfBeadsPerChain);
   REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
     pcm::BalanceRunMode::ITERATIVE, 1.0, 50000, 1e-18));
   REQUIRE(forceBalancer.getNrOfIterations() > 0);
@@ -1382,12 +1385,12 @@ TEST_CASE("Free chains collapse",
   }
 }
 
-TEST_CASE("Fully active chains are fully active",
+TEST_CASE("MEHP Force Balance Fully active chains are fully active",
           "[analysis][MEHPForceBalance]")
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
 
   SECTION("MEHP Force Balance 3D case")
   {
@@ -1401,6 +1404,12 @@ TEST_CASE("Fully active chains are fully active",
       universeSeq.initializeFromDataSequence({ { inputFile } });
       pe::Universe universe = universeSeq.atIndex(0);
       std::cout << "Read file " << inputFile << std::endl;
+
+      std::vector<pe::Molecule> molecules =
+        universe.getChainsWithCrosslinker(2);
+      for (pe::Molecule mol : molecules) {
+        CHECK(mol.getType() == pe::NETWORK_STRAND);
+      }
 
       pcm::MEHPForceBalance forceBalancer =
         pcm::MEHPForceBalance(universe, 2, false);

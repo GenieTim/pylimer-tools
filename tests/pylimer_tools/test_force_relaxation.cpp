@@ -803,7 +803,7 @@ TEST_CASE("Fully active chains are fully active",
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
 
   SECTION("MEHP Force Relaxation 3D case")
   {

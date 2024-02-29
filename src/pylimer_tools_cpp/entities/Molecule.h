@@ -42,12 +42,14 @@ namespace entities {
     Molecule& operator=(Molecule src);
     // getters
     int getLength() const;
-    MoleculeType getType();
+    MoleculeType getType() const;
     std::vector<Atom> getAtoms();
     // std::map<std::string, std::vector<long int>> getBonds() const;
     std::vector<Atom> getAtomsLinedUp(int crossLinkerType = 2,
-                                      bool assumedCoordinates = false) const;
-    std::vector<long int> getVerticesLinedUp(int crossLinkerType = 2) const;
+                                      bool assumedCoordinates = false,
+                                      bool closeLoop = false) const;
+    std::vector<long int> getVerticesLinedUp(int crossLinkerType = 2,
+                                             bool closeLoop = false) const;
     int getNrOfAtoms() const;
     const Box* getBox() const;
     std::string getKey() const;

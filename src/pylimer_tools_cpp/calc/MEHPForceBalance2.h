@@ -254,7 +254,7 @@ namespace calc {
                             pylimer_tools::entities::MoleculeType::UNDEFINED,
                           "Couldn't determine molecule type.");
           std::vector<pylimer_tools::entities::Atom> atoms =
-            crosslinkerChains[i].getAtomsLinedUp(crosslinkerType);
+            crosslinkerChains[i].getAtomsLinedUp(crosslinkerType, true, true);
           for (size_t atomIdx = 0; atomIdx < atoms.size(); ++atomIdx) {
             pylimer_tools::entities::Atom atom = atoms[atomIdx];
             if (atom.getType() != crosslinkerType) {
@@ -357,7 +357,7 @@ namespace calc {
             continue;
           }
           std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
-            chain.getAtomsLinedUp(crosslinkerType);
+            chain.getAtomsLinedUp(crosslinkerType, false, true);
           if (!pylimer_tools::utils::map_has_key(endAtomIdToVertexId,
                                                  linedUpAtoms[0].getId())) {
             endAtomIdToVertexId[linedUpAtoms[0].getId()] = currentVertexId;
@@ -386,7 +386,7 @@ namespace calc {
           }
 
           std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
-            chain.getAtomsLinedUp(crosslinkerType);
+            chain.getAtomsLinedUp(crosslinkerType, false, true);
           size_t previousIdx = 0;
           igraph_integer_t previousVertexId =
             endAtomIdToVertexId.at(linedUpAtoms[0].getId());
@@ -400,28 +400,30 @@ namespace calc {
             endAtomIdToVertexId.at(lastAtom.getId()),
             lastAtom,
             fb.crosslinkerType);
-          assert(linedUpAtoms.size() == chain.getLength());
-          for (size_t i = 1; i < linedUpAtoms.size() - 1; i++) {
-            pylimer_tools::entities::Atom a = linedUpAtoms[i];
-            if (pairOfAtom[universe.getIdxByAtomId(a.getId())] != -1) {
-              igraph_integer_t thisVertexId =
-                currentVertexId +
-                pairOfAtom[universe.getIdxByAtomId(a.getId())];
-              // set the mean x,y,z of the two involved atoms
-              pylimer_tools::entities::Atom a1 = universe.getAtom(
-                pairsOfAtoms[pairOfAtom[universe.getIdxByAtomId(a.getId())]]
-                  .first);
-              pylimer_tools::entities::Atom a2 = universe.getAtom(
-                pairsOfAtoms[pairOfAtom[universe.getIdxByAtomId(a.getId())]]
-                  .second);
-              fb.setVertexPropertiesFromAtoms(thisVertexId, a1, a2);
-              igraph_integer_t currentEdgeId = igraph_ecount(&fb.graph);
-              igraph_add_edge(&fb.graph, previousVertexId, thisVertexId);
-              fb.setBondPropertiesBasedOnChain(
-                chain, previousIdx, i, currentEdgeId, parentEdgeId);
-              //
-              previousIdx = i;
-              previousVertexId = thisVertexId;
+          assert(linedUpAtoms.size() == chain.getLength() || linedUpAtoms.size() == chain.getLength()+1);
+          if (pairsOfAtoms.size() > 0) {
+            for (size_t i = 1; i < linedUpAtoms.size() - 1; i++) {
+              pylimer_tools::entities::Atom a = linedUpAtoms[i];
+              if (pairOfAtom[universe.getIdxByAtomId(a.getId())] != -1) {
+                igraph_integer_t thisVertexId =
+                  currentVertexId +
+                  pairOfAtom[universe.getIdxByAtomId(a.getId())];
+                // set the mean x,y,z of the two involved atoms
+                pylimer_tools::entities::Atom a1 = universe.getAtom(
+                  pairsOfAtoms[pairOfAtom[universe.getIdxByAtomId(a.getId())]]
+                    .first);
+                pylimer_tools::entities::Atom a2 = universe.getAtom(
+                  pairsOfAtoms[pairOfAtom[universe.getIdxByAtomId(a.getId())]]
+                    .second);
+                fb.setVertexPropertiesFromAtoms(thisVertexId, a1, a2);
+                igraph_integer_t currentEdgeId = igraph_ecount(&fb.graph);
+                igraph_add_edge(&fb.graph, previousVertexId, thisVertexId);
+                fb.setBondPropertiesBasedOnChain(
+                  chain, previousIdx, i, currentEdgeId, parentEdgeId);
+                //
+                previousIdx = i;
+                previousVertexId = thisVertexId;
+              }
             }
           }
 
@@ -437,6 +439,17 @@ namespace calc {
                                            parentEdgeId);
           fb.validateIgraphSpring(parentEdgeId);
           parentEdgeId += 1;
+        }
+
+        // validate the creation
+        for (auto& [key, value] : endAtomIdToVertexId) {
+          size_t savedAtomId =
+            castToIgraphInt(igraph_cattribute_VAN(&fb.graph, "atom_id", value));
+          assert(savedAtomId == key);
+          size_t degreeNow = fb.getVertexDegree(value);
+          size_t degreeBefore =
+            universe.getVertexDegree(universe.getIdxByAtomId(key));
+          assert(degreeNow == degreeBefore);
         }
 
         // cleanup the graph
@@ -574,6 +587,21 @@ namespace calc {
                   &this->graph, "type", from)) == this->crosslinkerType) ||
                (castToIgraphInt(igraph_cattribute_VAN(
                   &this->graph, "type", to)) == this->crosslinkerType);
+      }
+
+      /**
+       * @brief Shorthand to query the degree of a vertex
+       *
+       * @param vertexId
+       * @param loops
+       * @return igraph_integer_t
+       */
+      igraph_integer_t getVertexDegree(const igraph_integer_t vertexId,
+                                       const bool loops = true)
+      {
+        igraph_integer_t degree;
+        igraph_degree_1(&this->graph, &degree, vertexId, IGRAPH_ALL, loops);
+        return degree;
       }
 
       /**
@@ -772,7 +800,7 @@ namespace calc {
         igraph_integer_t from, to;
         igraph_edge(&this->graph, edgeId, &from, &to);
         std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
-          chain.getAtomsLinedUp(crosslinkerType);
+          chain.getAtomsLinedUp(crosslinkerType, true, true);
         igraph_cattribute_EAN_set(&this->graph,
                                   "partition_fraction",
                                   edgeId,
@@ -860,6 +888,7 @@ namespace calc {
           igraph_cattribute_EAN(&this->graph, "bond_box_y", edgeId),
           igraph_cattribute_EAN(&this->graph, "bond_box_z", edgeId);
 
+        assert(bondBoxOffset.allFinite());
         return bondBoxOffset;
       }
       /**
@@ -882,6 +911,7 @@ namespace calc {
         if (this->assumeBoxLargeEnough) {
           this->universe.getBox().handlePBC(dist);
         }
+        assert(dist.allFinite());
         return dist;
       }
 
@@ -1019,6 +1049,16 @@ namespace calc {
                                  double tolerance);
 
       /**
+       * @brief Remove chains that have two otherwise not connected ends
+       * Mostly useful for phantom simulations, to compare methods
+       *
+       * The current algorithm to construct the network does keep free chains.
+       *
+       * @return size_t
+       */
+      size_t removeFreeChains();
+
+      /**
        * @brief Remove cross-links which do not have any springs with a certain
        * minimum length
        *
@@ -1048,7 +1088,7 @@ namespace calc {
       size_t cleanupPrimaryLoopsInStructure()
       {
         igraph_vector_int_t allEdges;
-        igraph_vector_int_init(&allEdges, 2 * this->net.nrOfPartialSprings);
+        igraph_vector_int_init(&allEdges, igraph_ecount(&this->graph) * 2);
         if (igraph_edges(
               &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &allEdges)) {
           throw std::runtime_error("Failed to get all edges");
@@ -1067,6 +1107,9 @@ namespace calc {
         }
 
         this->removePartialSprings(edgesToRemove);
+        if (edgesToRemove.size() > 0) {
+          this->renumberParentSprings();
+        }
         return edgesToRemove.size();
       };
 
@@ -1099,6 +1142,13 @@ namespace calc {
        * @brief marks a certain "parent" spring as non-existing
        */
       void combineParentSprings(size_t springIdxBefore, size_t springIdxNow);
+
+      /**
+       * @brief When springs have been removed, it is possible that the
+       * numbering is not sequential anymore. This function fixes that.
+       *
+       */
+      void renumberParentSprings();
 
       /**
        * @brief Combine two partial springs to be only one
@@ -1311,11 +1361,11 @@ namespace calc {
 
       double getDefaultR0Square() const { return this->defaultR0Squared; }
 
-      double getVolume() override { return this->net.vol; }
+      double getVolume() override { return this->getNetwork().vol; }
 
-      int getNrOfNodes() const { return this->net.nrOfNodes; }
+      int getNrOfNodes() const { return this->getNetwork().nrOfNodes; }
 
-      int getNrOfLinks() const { return this->net.nrOfLinks; }
+      int getNrOfLinks() const { return this->getNetwork().nrOfLinks; }
 
       size_t getNumBonds() override { return this->getNrOfSprings(); }
 
@@ -1331,6 +1381,11 @@ namespace calc {
       }
 
       int getNrOfSprings() const { return this->net.nrOfSprings; }
+      
+      int getNrOfPartialSprings() const
+      {
+        return this->getNetwork().nrOfPartialSprings;
+      }
 
       void setSpringContourLengths(const Eigen::VectorXd springsContourLengths)
       {
@@ -1388,7 +1443,7 @@ namespace calc {
        * considered inactive
        * @return int
        */
-      int getNrOfActiveNodes(double tolerance = 0.1,
+      int getNrOfActiveNodes(double tolerance = 0.01,
                              int minimumNrOfActiveConnections = 2,
                              int maximumNrOfActiveConnections = -1,
                              bool usePartial = false) const
@@ -1407,7 +1462,7 @@ namespace calc {
        * @param tolerance
        * @return double
        */
-      double getSolubleWeightFraction(double tolerance = 0.1)
+      double getSolubleWeightFraction(double tolerance = 0.01)
       {
         return this->computeSolubleWeightFraction(
           &this->net, this->currentSpringDistances, tolerance);
@@ -1419,7 +1474,7 @@ namespace calc {
        * @param tolerance
        * @return double
        */
-      double getDanglingWeightFraction(double tolerance = 0.1)
+      double getDanglingWeightFraction(double tolerance = 0.01)
       {
         return this->computeDanglingWeightFraction(
           &this->net, this->currentSpringDistances, tolerance);
@@ -1436,7 +1491,7 @@ namespace calc {
        * @return std::unordered_map<long int, int>
        */
       std::unordered_map<long int, int> getEffectiveFunctionalityOfAtoms(
-        double tolerance = 0.1) const;
+        double tolerance = 0.01) const;
 
       /**
        * @brief Compute the weight fraction of non-active springs
@@ -1449,7 +1504,7 @@ namespace calc {
       double computeDanglingWeightFraction(
         ForceBalanceNetwork* net,
         const Eigen::VectorXd& springDistances,
-        const double tolerance = 0.1) const
+        const double tolerance = 0.01) const
       {
         if (net->nrOfSprings * 3 != springDistances.size()) {
           throw std::invalid_argument(
@@ -1490,7 +1545,7 @@ namespace calc {
       double computeSolubleWeightFraction(
         ForceBalanceNetwork* net,
         const Eigen::VectorXd& springDistances,
-        const double tolerance = 0.1) const
+        const double tolerance = 0.01) const
       {
         if (net->nrOfSprings * 3 != springDistances.size()) {
           throw std::invalid_argument(
@@ -1518,7 +1573,7 @@ namespace calc {
        * @return std::vector<long int> the atom ids
        */
       std::vector<long int> getIdsOfActiveNodes(
-        double tolerance = 0.1,
+        double tolerance = 0.01,
         int minimumNrOfActiveConnections = 2,
         int maximumNrOfActiveConnections = -1,
         bool usePartial = false) const;
@@ -1541,7 +1596,7 @@ namespace calc {
        * @return Eigen::VectorXi
        */
       Eigen::VectorXi getNrOfActiveSpringsConnected(
-        double tolerance = 0.1) const;
+        double tolerance = 0.01) const;
 
       /**
        * @brief Get the Nr Of Active Springs connected to each node
@@ -1551,31 +1606,42 @@ namespace calc {
        * @return Eigen::VectorXi
        */
       Eigen::VectorXi getNrOfActivePartialSpringsConnected(
-        double tolerance = 0.1) const;
+        double tolerance = 0.01) const;
 
       /**
        * @brief Get the Nr Of Active Springs object
        *
-       * @param tol the tolerance: springs under a certain length are considered
-       * inactive
+       * @param tolerance the tolerance: springs under a certain length are
+       * considered inactive
        * @return int
        */
-      int getNrOfActiveSprings(double tol = 0.1) const
+      int getNrOfActiveSprings(double tolerance = 0.01) const
       {
-        return this->countNrOfActiveSprings(this->currentSpringDistances, tol);
+        ArrayXb result = ArrayXb::Constant(
+          this->currentPartialSpringDistances.size() / 3, false);
+        for (size_t i = 0; i < this->currentPartialSpringDistances.size() / 3;
+             ++i) {
+          size_t springIdx = this->net.partialToFullSpringIndex[i];
+          result[springIdx] =
+            result[springIdx] ||
+            this->currentPartialSpringDistances.segment(3 * i, 3)
+                .squaredNorm() > tolerance;
+        }
+
+        return (result == true).count();
       }
 
       /**
        * @brief Get the Nr Of Active Springs object
        *
-       * @param tol the tolerance: springs under a certain length are considered
-       * inactive
+       * @param tolerance the tolerance: springs under a certain length are
+       * considered inactive
        * @return int
        */
-      int getNrOfActivePartialSprings(double tol = 0.1) const
+      int getNrOfActivePartialSprings(double tolerance = 0.01) const
       {
         return this->countNrOfActiveSprings(this->currentPartialSpringDistances,
-                                            tol);
+                                            tolerance);
       }
 
       /**
@@ -1804,7 +1870,7 @@ namespace calc {
         return true;
       }
 
-      ForceBalanceNetwork getNetwork() { return this->net; }
+      ForceBalanceNetwork getNetwork() const { return this->net; }
 
       Eigen::VectorXd getSpringPartitions()
       {
@@ -2538,39 +2604,6 @@ namespace calc {
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& oneOverSpringPartitions) const;
 
-      /**
-       * @brief Get the Link Indices of all neighbours of a specified link
-       *
-       * @param net
-       * @param linkIdx
-       * @return std::vector<size_t>
-       */
-      std::vector<size_t> getNeighbourLinkIndices(const size_t linkIdx,
-                                                  bool ignoreSelf = false)
-      {
-        std::vector<size_t> results;
-        results.reserve(4);
-        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
-
-        igraph_vector_int_list_t res;
-        igraph_vector_int_list_init(&res, 4);
-        igraph_neighborhood(
-          &this->graph, &res, igraph_vss_1(linkIdx), 1, IGRAPH_ALL, 1);
-
-        for (size_t i = 0; i < igraph_vector_int_list_size(&res); ++i) {
-          igraph_vector_int_t* resI = igraph_vector_int_list_get_ptr(&res, i);
-          for (size_t j = 0; j < igraph_vector_int_size(resI); ++j) {
-            if (!ignoreSelf || igraph_vector_int_get(resI, j) != linkIdx) {
-              results.push_back(igraph_vector_int_get(resI, j));
-            }
-          }
-        }
-
-        igraph_vector_int_list_destroy(&res);
-
-        return results;
-      }
-
       void writeRestartFile(std::string& file) override
       {
         throw std::runtime_error("Restart not supported yet");
@@ -2801,7 +2834,7 @@ namespace calc {
         // fetch other properties needed
         // springs / partial springs
         igraph_vector_int_t allEdges;
-        igraph_vector_int_init(&allEdges, 2 * this->net.nrOfPartialSprings);
+        igraph_vector_int_init(&allEdges, igraph_ecount(&this->graph) * 2);
         if (igraph_edges(
               &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &allEdges)) {
           throw std::runtime_error("Failed to get all edges");
@@ -3164,7 +3197,7 @@ namespace calc {
        * @return int
        */
       int countNrOfActiveSprings(const Eigen::VectorXd& springDistances,
-                                 const double tolerance = 0.1) const
+                                 const double tolerance = 0.01) const
       {
         return (this->findActiveSprings(springDistances, tolerance) == true)
           .count();
@@ -3179,7 +3212,7 @@ namespace calc {
        * @return ArrayXb
        */
       ArrayXb findActiveSprings(const Eigen::VectorXd& springDistances,
-                                const double tolerance = 0.1) const
+                                const double tolerance = 0.01) const
       {
         ArrayXb result = ArrayXb::Constant(springDistances.size() / 3, false);
         for (size_t i = 0; i < springDistances.size() / 3; ++i) {
