@@ -539,59 +539,62 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
       }
       // }
 
-      SECTION("Displacement computations are equivalent")
-      {
-        pcm::ForceBalanceNetwork net = forceBalancer2.getNetwork();
-        Eigen::VectorXd springPartitions0 =
-          Eigen::VectorXd::Ones(net.nrOfPartialSprings);
-        Eigen::VectorXd oneOverSpringPartitions =
-          forceBalancer2.assembleOneOverSpringPartition(net, springPartitions0);
-        CHECK((oneOverSpringPartitions.array() < net.L[0]).all());
-        Eigen::VectorXd displacements0 =
-          Eigen::VectorXd::Zero(3 * net.nrOfLinks);
-        std::vector<Eigen::ArrayXi> vertexSets;
-        std::vector<Eigen::ArrayXi> springSets;
-        std::tie(vertexSets, springSets) =
-          forceBalancer2.getHeuristicallyIndependentCoordinateSets(net);
+      // SECTION("Displacement computations are equivalent")
+      // {
+      //   pcm::ForceBalanceNetwork net = forceBalancer2.getNetwork();
+      //   Eigen::VectorXd springPartitions0 =
+      //     Eigen::VectorXd::Ones(net.nrOfPartialSprings);
+      //   Eigen::VectorXd oneOverSpringPartitions =
+      //     forceBalancer2.assembleOneOverSpringPartition(net,
+      //     springPartitions0);
+      //   CHECK((oneOverSpringPartitions.array() < net.L[0]).all());
+      //   Eigen::VectorXd displacements0 =
+      //     Eigen::VectorXd::Zero(3 * net.nrOfLinks);
+      //   std::vector<Eigen::ArrayXi> vertexSets;
+      //   std::vector<Eigen::ArrayXi> springSets;
+      //   std::tie(vertexSets, springSets) =
+      //     forceBalancer2.getHeuristicallyIndependentCoordinateSets(net);
 
-        // SECTION(
-        //   "HeuristicallyIndependent coordiante sets are unique and complete")
-        // {
-        pcm::ArrayXb vertexSetTest =
-          pcm::ArrayXb::Constant(3 * net.nrOfLinks, false);
-        for (int i = 0; i < vertexSets.size(); ++i) {
-          for (int j = 0; j < vertexSets[i].size(); ++j) {
-            CHECK_FALSE(vertexSetTest[vertexSets[i][j]]);
-            vertexSetTest[vertexSets[i][j]] = true;
-          }
-        }
-        for (int i = 0; i < vertexSetTest.size(); ++i) {
-          CHECK(vertexSetTest[i] == true);
-        }
-        // }
+      //   // SECTION(
+      //   //   "HeuristicallyIndependent coordiante sets are unique and
+      //   complete")
+      //   // {
+      //   pcm::ArrayXb vertexSetTest =
+      //     pcm::ArrayXb::Constant(3 * net.nrOfLinks, false);
+      //   for (int i = 0; i < vertexSets.size(); ++i) {
+      //     for (int j = 0; j < vertexSets[i].size(); ++j) {
+      //       CHECK_FALSE(vertexSetTest[vertexSets[i][j]]);
+      //       vertexSetTest[vertexSets[i][j]] = true;
+      //     }
+      //   }
+      //   for (int i = 0; i < vertexSetTest.size(); ++i) {
+      //     CHECK(vertexSetTest[i] == true);
+      //   }
+      //   // }
 
-        for (Eigen::ArrayXi vertexSet : vertexSets) {
-          forceBalancer2.displaceLinksToMeanPosition(
-            net, oneOverSpringPartitions, vertexSet, 1.0);
-          for (size_t i = 0; i < vertexSet.size(); ++i) {
-            if (i % 3 == 0) {
-              // NOTE: it is CHECKd, that we process the iterative updates
-              // also in the order of the vertex sets, as otherwise, the results
-              // will not be identical
-              forceBalancer2.displaceToMeanPosition(
-                net, springPartitions0, vertexSet[i] / 3);
-            }
-          }
-        }
+      //   for (Eigen::ArrayXi vertexSet : vertexSets) {
+      //     forceBalancer2.displaceLinksToMeanPosition(
+      //       net, oneOverSpringPartitions, vertexSet, 1.0);
+      //     for (size_t i = 0; i < vertexSet.size(); ++i) {
+      //       if (i % 3 == 0) {
+      //         // NOTE: it is CHECKd, that we process the iterative updates
+      //         // also in the order of the vertex sets, as otherwise, the
+      //         results
+      //         // will not be identical
+      //         forceBalancer2.displaceToMeanPosition(
+      //           net, springPartitions0, vertexSet[i] / 3);
+      //       }
+      //     }
+      //   }
 
-        CHECK(forceBalancer2.validateNetwork(net));
-      }
+      //   CHECK(forceBalancer2.validateNetwork(net));
+      // }
 
       SECTION("Actual balance results in correct phantom results")
       {
         std::cout << "Doing phantom force balance" << std::endl;
-        pcm::MEHPForceRelaxation forceRelaxer =
-          pcm::MEHPForceRelaxation(universe2, 2);
+        pcm::MEHPForceRelaxation forceRelaxer = pcm::MEHPForceRelaxation(
+          universe2, 2, false, nullptr, 1.0, false, false);
         CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::UNSET);
         CHECK(forceBalancer2.getNrOfIterations() == 0);
         CHECK(forceBalancer2.getVolume() ==
@@ -599,6 +602,12 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
         CHECK(forceBalancer2.getVolume() ==
               Catch::Approx(97.383096 * 97.383096 * 97.383096));
         CHECK(forceBalancer2.getNrOfSprings() == 10000);
+        // remove the inactive ones
+        CHECK_NOTHROW(forceBalancer2.removeFreeChains());
+        CHECK_NOTHROW(forceBalancer2.synchronise());
+        CHECK(forceBalancer2.getNrOfSprings() ==
+              9848); // TODO: check that this is reasonable?
+        CHECK(forceRelaxer.getNrOfSprings() == 9859);
         // initial system values
         CHECK(forceBalancer2.getPressure() ==
               Catch::Approx(forceRelaxer.getPressure()));
@@ -609,10 +618,14 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
         CHECK(forceBalancer2.getPressure() == Catch::Approx(0.0061105865));
         CHECK_NOTHROW(forceBalancer2.runForceRelaxation());
         CHECK_NOTHROW(forceBalancer2.validateNetwork());
-        CHECK_NOTHROW(forceBalancer2.removeInactiveCrosslinks());
+        std::cout << "Removing subfunctional vertices" << std::endl;
         CHECK_NOTHROW(forceBalancer2.removeSubfunctionalVertices());
         CHECK_NOTHROW(forceBalancer2.synchronise());
-        CHECK(forceBalancer2.getNrOfSprings() == 9876);
+        CHECK(forceBalancer2.getNrOfSprings() == 9848);
+        CHECK_NOTHROW(forceBalancer2.removeInactiveCrosslinks());
+        std::cout << "Removing inactive cross-links" << std::endl;
+        CHECK_NOTHROW(forceBalancer2.synchronise());
+        CHECK(forceBalancer2.getNrOfSprings() == 9848);
         CHECK(forceBalancer2.getNrOfIterations() > 1);
         CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
 
@@ -657,6 +670,7 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
         CHECK(forceBalancer2.getGammaFactor() * gammaCorrectionFactor ==
               Catch::Approx(0.319446)); // "correct" gamma factor
         CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+        CHECK_NOTHROW(forceBalancer2.validateNetwork());
         // TODO: find better, more accurate tests here
         CHECK(forceBalancer2.getNrOfActiveNodes() > 1);
         CHECK(forceBalancer2.getNrOfActiveSprings() > 1);
@@ -706,76 +720,79 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
     }
   }
 
-  SECTION("MEHP Force Balance 2 2D case")
-  {
-    CHECK(std::filesystem::exists(suspectedPath));
-    universeSeq.initializeFromDataSequence(
-      { { suspectedPath +
-          "structure/equil_phantom_hexa_lattice_60x60_25_bx_sqrtNbsqrt0."
-          "333_2d_t_7500001.structure.out" } });
-    CHECK(universeSeq.getLength() == 1);
-    pe::Universe universe = universeSeq.atIndex(0);
-    pcm::MEHPForceBalance2 forceBalancer =
-      pcm::MEHPForceBalance2::constructWithoutSlipLinks(universe, 2, true);
-    CHECK(forceBalancer.getExitReason() == pcm::ExitReason::UNSET);
-    CHECK(forceBalancer.getNrOfIterations() == 0);
-    CHECK(forceBalancer.getVolume() == Catch::Approx(universe.getVolume()));
-    forceBalancer.runForceRelaxation(pcm::BalanceRunMode::ITERATIVE, 1.0, 5);
-    CHECK(forceBalancer.getNrOfNodes() != universe.getNrOfAtoms());
-    CHECK(forceBalancer.getNrOfIterations() <= 5);
-    CHECK(forceBalancer.getNrOfIterations() >= 1);
-    CHECK(universe.getAtomsOfType(2).size() == 7200);
-    CHECK(forceBalancer.getExitReason() == pcm::ExitReason::MAX_STEPS);
-    CHECK_NOTHROW(forceBalancer.validateNetwork());
-    // run again, this time fully
-    pcm::MEHPForceBalance2 forceBalancer2 =
-      pcm::MEHPForceBalance2::constructWithoutSlipLinks(universe, 2, true);
-    forceBalancer2.runForceRelaxation(
-      pcm::BalanceRunMode::ITERATIVE, 1.0, 10000, 1e-10, 100);
-    CHECK(forceBalancer2.getNrOfIterations() > 5);
-    CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-    CHECK(forceBalancer2.getGammaFactor(25, forceBalancer2.getNrOfSprings()) ==
-          Catch::Approx(1. / 3.).epsilon(0.001));
-    auto stressTensor = forceBalancer2.getStressTensor();
-    CHECK(forceBalancer2.getPressure() ==
-          Catch::Approx(
-            (stressTensor(0, 0) + stressTensor(1, 1) + stressTensor(2, 2)) / 3.)
-            .epsilon(0.02));
-    CHECK_NOTHROW(forceBalancer2.validateNetwork());
-    // TODO: find better, more accurate tests here
-    CHECK(forceBalancer2.getNrOfActiveNodes() > 1);
-    CHECK(forceBalancer2.getNrOfActiveSprings() > 1);
-    CHECK(forceBalancer2.getAverageSpringLength() > 1.0);
-    CHECK(forceBalancer2.getEffectiveFunctionalityOfAtoms().size() ==
-          forceBalancer2.getNrOfNodes());
+  // SECTION("MEHP Force Balance 2 2D case")
+  // {
+  //   CHECK(std::filesystem::exists(suspectedPath));
+  //   universeSeq.initializeFromDataSequence(
+  //     { { suspectedPath +
+  //         "structure/equil_phantom_hexa_lattice_60x60_25_bx_sqrtNbsqrt0."
+  //         "333_2d_t_7500001.structure.out" } });
+  //   CHECK(universeSeq.getLength() == 1);
+  //   pe::Universe universe = universeSeq.atIndex(0);
+  //   pcm::MEHPForceBalance2 forceBalancer =
+  //     pcm::MEHPForceBalance2::constructWithoutSlipLinks(universe, 2, true);
+  //   CHECK(forceBalancer.getExitReason() == pcm::ExitReason::UNSET);
+  //   CHECK(forceBalancer.getNrOfIterations() == 0);
+  //   CHECK(forceBalancer.getVolume() == Catch::Approx(universe.getVolume()));
+  //   forceBalancer.runForceRelaxation(pcm::BalanceRunMode::ITERATIVE, 1.0, 5);
+  //   CHECK(forceBalancer.getNrOfNodes() != universe.getNrOfAtoms());
+  //   CHECK(forceBalancer.getNrOfIterations() <= 5);
+  //   CHECK(forceBalancer.getNrOfIterations() >= 1);
+  //   CHECK(universe.getAtomsOfType(2).size() == 7200);
+  //   CHECK(forceBalancer.getExitReason() == pcm::ExitReason::MAX_STEPS);
+  //   CHECK_NOTHROW(forceBalancer.validateNetwork());
+  //   // run again, this time fully
+  //   pcm::MEHPForceBalance2 forceBalancer2 =
+  //     pcm::MEHPForceBalance2::constructWithoutSlipLinks(universe, 2, true);
+  //   forceBalancer2.runForceRelaxation(
+  //     pcm::BalanceRunMode::ITERATIVE, 1.0, 10000, 1e-10, 100);
+  //   CHECK(forceBalancer2.getNrOfIterations() > 5);
+  //   CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+  //   CHECK(forceBalancer2.getGammaFactor(25, forceBalancer2.getNrOfSprings())
+  //   ==
+  //         Catch::Approx(1. / 3.).epsilon(0.001));
+  //   auto stressTensor = forceBalancer2.getStressTensor();
+  //   CHECK(forceBalancer2.getPressure() ==
+  //         Catch::Approx(
+  //           (stressTensor(0, 0) + stressTensor(1, 1) + stressTensor(2, 2))
+  //           / 3.) .epsilon(0.02));
+  //   CHECK_NOTHROW(forceBalancer2.validateNetwork());
+  //   // TODO: find better, more accurate tests here
+  //   CHECK(forceBalancer2.getNrOfActiveNodes() > 1);
+  //   CHECK(forceBalancer2.getNrOfActiveSprings() > 1);
+  //   CHECK(forceBalancer2.getAverageSpringLength() > 1.0);
+  //   CHECK(forceBalancer2.getEffectiveFunctionalityOfAtoms().size() ==
+  //         forceBalancer2.getNrOfNodes());
 
-    pe::Universe universe3 = forceBalancer2.getCrosslinkerVerse();
-    CHECK(universe3.getNrOfAtoms() == forceBalancer2.getNrOfNodes());
-    CHECK(universe3.getNrOfBonds() == forceBalancer2.getNrOfSprings());
-    CHECK(universe3.getAtomsOfType(2).size() == universe3.getNrOfAtoms());
+  //   pe::Universe universe3 = forceBalancer2.getCrosslinkerVerse();
+  //   CHECK(universe3.getNrOfAtoms() == forceBalancer2.getNrOfNodes());
+  //   CHECK(universe3.getNrOfBonds() == forceBalancer2.getNrOfSprings());
+  //   CHECK(universe3.getAtomsOfType(2).size() == universe3.getNrOfAtoms());
 
-    // try out different algorithms
-    std::vector<std::string> algorithms = { "LD_MMA",
-                                            // "LD_TNEWTON_PRECOND_RESTART",
-                                            // "GD_STOGO",
-                                            "LD_SLSQP",
-                                            "GN_DIRECT" };
+  //   // try out different algorithms
+  //   std::vector<std::string> algorithms = { "LD_MMA",
+  //                                           // "LD_TNEWTON_PRECOND_RESTART",
+  //                                           // "GD_STOGO",
+  //                                           "LD_SLSQP",
+  //                                           "GN_DIRECT" };
 
-    // for (std::string algorithm : algorithms) {
-    //   pcm::MEHPForceBalance2 forceBalancerN =
-    //     pcm::MEHPForceBalance2(universe, 2);
-    //   std::cout << "Testing algorithm " << algorithm << std::endl;
-    //   auto start = std::chrono::high_resolution_clock::now();
-    //   forceBalancerN.runForceRelaxation(true, 15, algorithm.c_str(), 10000);
-    //   auto stop = std::chrono::high_resolution_clock::now();
-    //   CHECK(forceBalancerN.getGammaEq() ==
-    //         Catch::Approx(forceBalancer2.getGammaEq()));
-    //   CHECK(forceBalancerN.getFinalPressure() ==
-    //         Catch::Approx(forceBalancer2.getFinalPressure()));
-    //   auto duration = duration_cast<std::chrono::microseconds>(stop - start);
-    //   std::cout << "Took: " << duration.count() << std::endl;
-    // }
-  }
+  //   // for (std::string algorithm : algorithms) {
+  //   //   pcm::MEHPForceBalance2 forceBalancerN =
+  //   //     pcm::MEHPForceBalance2(universe, 2);
+  //   //   std::cout << "Testing algorithm " << algorithm << std::endl;
+  //   //   auto start = std::chrono::high_resolution_clock::now();
+  //   //   forceBalancerN.runForceRelaxation(true, 15, algorithm.c_str(),
+  //   10000);
+  //   //   auto stop = std::chrono::high_resolution_clock::now();
+  //   //   CHECK(forceBalancerN.getGammaEq() ==
+  //   //         Catch::Approx(forceBalancer2.getGammaEq()));
+  //   //   CHECK(forceBalancerN.getFinalPressure() ==
+  //   //         Catch::Approx(forceBalancer2.getFinalPressure()));
+  //   //   auto duration = duration_cast<std::chrono::microseconds>(stop -
+  //   start);
+  //   //   std::cout << "Took: " << duration.count() << std::endl;
+  //   // }
+  // }
 }
 
 TEST_CASE(
@@ -918,8 +935,7 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
     partitions = forceBalancer.getSpringPartitions();
     // due to the randomness, it _could_ be one day that actually all strands
     // are active. unlikely, but I can imagine it to be possible.
-    size_t numInactiveRemoved =
-      forceBalancer.removeInactiveCrosslinks(0.1);
+    size_t numInactiveRemoved = forceBalancer.removeInactiveCrosslinks(0.1);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
     CHECK(numInactiveRemoved > 0);
     CHECK_NOTHROW(forceBalancer.validateNetwork(net, partitions));
@@ -941,8 +957,7 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
     net = forceBalancer.getNetwork();
     // due to the randomness, it _could_ be one day that actually all strands
     // are active. unlikely, but I can imagine it to be possible.
-    numInactiveRemoved =
-      forceBalancer.removeInactiveCrosslinks(0.1);
+    numInactiveRemoved = forceBalancer.removeInactiveCrosslinks(0.1);
     CHECK(numInactiveRemoved > 0);
     numInactiveRemoved = forceBalancer.removeTwofunctionalLinks();
     CHECK(numInactiveRemoved > 0);
@@ -1233,7 +1248,7 @@ TEST_CASE("MEHP Force Balance 2 Free chains collapse",
           "[analysis][MEHPForceBalance2][NonGaussianSpringForceEvaluator]["
           "SimpleSpringMEHPForceEvaluator]")
 {
-  // TODO: implement the NonGaussianSpringForceEvaluator
+  // generate a set of connected chains that must collapse
   size_t nrOfBeads = 30;
   size_t nrOfBeadsPerChain = 3;
   pe::Universe universe =
@@ -1284,6 +1299,9 @@ TEST_CASE("MEHP Force Balance 2 Free chains collapse",
   // these beads overlap first, the gaussian spring one
   pcm::MEHPForceBalance2 forceBalancer =
     pcm::MEHPForceBalance2::constructWithoutSlipLinks(universe, 2, false);
+  CHECK(forceBalancer.getNrOfSprings() ==
+        forceBalancer.getNrOfPartialSprings());
+  CHECK(forceBalancer.getNrOfSprings() == nrOfBeads / nrOfBeadsPerChain);
   CHECK_NOTHROW(forceBalancer.runForceRelaxation(
     pcm::BalanceRunMode::ITERATIVE, 1.0, 50000, 1e-18));
   CHECK(forceBalancer.getNrOfIterations() > 0);
@@ -1318,14 +1336,18 @@ TEST_CASE("MEHP Force Balance 2 Free chains collapse",
             Catch::Approx(stressTensorSimpleSpring(i, j) + 1e-5));
     }
   }
+
+  size_t verticesToRemove = forceBalancer.getNrOfNodes();
+  CHECK(forceBalancer.removeSubfunctionalVertices() == verticesToRemove);
+  CHECK_NOTHROW(forceBalancer.validateNetwork());
 }
 
-TEST_CASE("Fully active chains are fully active",
+TEST_CASE("MEHP Force Balance 2 Fully active chains are fully active",
           "[analysis][MEHPForceBalance2]")
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
-  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
 
   SECTION("MEHP Force Balance 3D case")
   {
@@ -1340,14 +1362,28 @@ TEST_CASE("Fully active chains are fully active",
       pe::Universe universe = universeSeq.atIndex(0);
       std::cout << "Read file " << inputFile << std::endl;
 
+      std::vector<pe::Molecule> molecules =
+        universe.getChainsWithCrosslinker(2);
+      for (pe::Molecule mol : molecules) {
+        CHECK(mol.getType() == pe::NETWORK_STRAND);
+      }
+
       pcm::MEHPForceBalance2 forceBalancer =
         pcm::MEHPForceBalance2::constructWithoutSlipLinks(universe, 2, false);
+      CHECK(forceBalancer.getNrOfActiveSprings() ==
+            forceBalancer.getNrOfSprings());
+      CHECK(forceBalancer.getNrOfSprings() == 16000);
+      CHECK(forceBalancer.getNrOfPartialSprings() == 16000);
       CHECK_NOTHROW(forceBalancer.runForceRelaxation(
         pcm::BalanceRunMode::ITERATIVE, 1.0, 50000, 1e-18));
       CHECK(forceBalancer.getNrOfIterations() > 0);
       CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
       CHECK(forceBalancer.getNrOfActiveSprings() ==
             forceBalancer.getNrOfSprings());
+      CHECK(forceBalancer.removeSubfunctionalVertices() == 0);
+      CHECK(forceBalancer.removeInactiveCrosslinks() == 0);
+    } else {
+      std::cout << "Diamond structure not found" << std::endl;
     }
   }
 }

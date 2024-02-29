@@ -362,7 +362,7 @@ namespace utils {
         // options
         std::vector<pylimer_tools::entities::Atom> atoms =
           (this->moleculeIdxSwappable || this->attemptImageReset)
-            ? molecule.getAtomsLinedUp(this->crosslinkerType, true)
+            ? molecule.getAtomsLinedUp(this->crosslinkerType, true, false)
             : molecule.getAtoms();
         nMoleculesOutput += 1;
 

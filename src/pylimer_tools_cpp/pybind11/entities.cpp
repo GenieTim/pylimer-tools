@@ -309,7 +309,8 @@ init_pylimer_bound_entities(py::module_& m)
             to start with the cross-link.
             )pbdoc",
          py::arg("crosslinkType") = 2,
-         py::arg("assumed_coordinates") = false)
+         py::arg("assumed_coordinates") = false,
+         py::arg("close_loop") = false)
     .def("getNrOfBonds",
          &Molecule::getNrOfBonds,
          "Counts and returns the number of bonds associated with this "

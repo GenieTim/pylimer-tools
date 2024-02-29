@@ -49,14 +49,13 @@ namespace entities {
     std::vector<long int> getVertexIdxsConnectedTo(
       const long int vertexIdx) const;
 
-
     /**
      * @brief Get the Atoms Connected To an Atom
      *
      * @param atom the atom for which to get the atoms connected to it
      * @return std::vector<Atom>
      */
-    std::vector<Atom> getConnectedAtoms(const Atom &atom) const;
+    std::vector<Atom> getConnectedAtoms(const Atom& atom) const;
 
     /**
      * @brief Get the Atoms Connected To an Atom specified by its vertex Id
@@ -356,6 +355,21 @@ namespace entities {
     std::vector<Atom> getAtomsOfDegree(const int degree) const;
 
     /**
+     * @brief Shorthand to query the degree of a vertex
+     *
+     * @param vertexId
+     * @param loops
+     * @return igraph_integer_t
+     */
+    igraph_integer_t getVertexDegree(const igraph_integer_t vertexId,
+                                     const bool loops = true) const
+    {
+      igraph_integer_t degree;
+      igraph_degree_1(&this->graph, &degree, vertexId, IGRAPH_ALL, loops);
+      return degree;
+    }
+
+    /**
      * @brief compute the lengths of all bonds
      *
      * @return std::vector<double>
@@ -461,10 +475,10 @@ namespace entities {
     igraph_vs_t getVerticesWithDegreeSelector(int degree) const;
     std::vector<long int> getVerticesWithDegree(int degree) const;
     std::vector<long int> getVerticesWithDegree(
-      const std::vector<int> &ofDegrees) const;
+      const std::vector<int>& ofDegrees) const;
     std::vector<long int> getVerticesWithDegree(
       const igraph_t* someGraph,
-      const std::vector<int> &ofDegrees) const;
+      const std::vector<int>& ofDegrees) const;
   };
 
 } // namespace entities

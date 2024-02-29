@@ -415,6 +415,11 @@ namespace calc {
       size_t getNumExtraAtoms() override { return this->getNrOfLinks(); }
 
       int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
+      
+      int getNrOfPartialSprings() const
+      {
+        return this->initialConfig.nrOfPartialSprings;
+      }
 
       Eigen::VectorXd getCurrentDisplacements() const
       {
@@ -458,7 +463,7 @@ namespace calc {
        * considered inactive
        * @return int
        */
-      int getNrOfActiveNodes(double tolerance = 0.1,
+      int getNrOfActiveNodes(double tolerance = 0.01,
                              int minimumNrOfActiveConnections = 2,
                              int maximumNrOfActiveConnections = -1,
                              bool usePartial = false) const
@@ -477,7 +482,7 @@ namespace calc {
        * @param tolerance
        * @return double
        */
-      double getSolubleWeightFraction(double tolerance = 0.1)
+      double getSolubleWeightFraction(double tolerance = 0.01)
       {
         return this->computeSolubleWeightFraction(
           &this->initialConfig, this->currentSpringDistances, tolerance);
@@ -489,7 +494,7 @@ namespace calc {
        * @param tolerance
        * @return double
        */
-      double getDanglingWeightFraction(double tolerance = 0.1)
+      double getDanglingWeightFraction(double tolerance = 0.01)
       {
         return this->computeDanglingWeightFraction(
           &this->initialConfig, this->currentSpringDistances, tolerance);
@@ -506,7 +511,7 @@ namespace calc {
        * @return std::unordered_map<long int, int>
        */
       std::unordered_map<long int, int> getEffectiveFunctionalityOfAtoms(
-        double tolerance = 0.1) const;
+        double tolerance = 0.01) const;
 
       /**
        * @brief Compute the weight fraction of non-active springs
@@ -519,7 +524,7 @@ namespace calc {
       double computeDanglingWeightFraction(
         ForceBalanceNetwork* net,
         const Eigen::VectorXd& springDistances,
-        const double tolerance = 0.1) const
+        const double tolerance = 0.01) const
       {
         if (net->nrOfSprings * 3 != springDistances.size()) {
           throw std::invalid_argument(
@@ -560,7 +565,7 @@ namespace calc {
       double computeSolubleWeightFraction(
         ForceBalanceNetwork* net,
         const Eigen::VectorXd& springDistances,
-        const double tolerance = 0.1) const
+        const double tolerance = 0.01) const
       {
         if (net->nrOfSprings * 3 != springDistances.size()) {
           throw std::invalid_argument(
@@ -588,7 +593,7 @@ namespace calc {
        * @return std::vector<long int> the atom ids
        */
       std::vector<long int> getIdsOfActiveNodes(
-        double tolerance = 0.1,
+        double tolerance = 0.01,
         int minimumNrOfActiveConnections = 2,
         int maximumNrOfActiveConnections = -1,
         bool usePartial = false) const;
@@ -612,7 +617,7 @@ namespace calc {
        * @return Eigen::VectorXi
        */
       Eigen::VectorXi getNrOfActiveSpringsConnected(
-        double tolerance = 0.1) const;
+        double tolerance = 0.01) const;
 
       /**
        * @brief Get the Nr Of Active Springs connected to each node
@@ -622,7 +627,7 @@ namespace calc {
        * @return Eigen::VectorXi
        */
       Eigen::VectorXi getNrOfActivePartialSpringsConnected(
-        double tolerance = 0.1) const;
+        double tolerance = 0.01) const;
 
       /**
        * @brief Get the Nr Of Active Springs object
@@ -631,9 +636,10 @@ namespace calc {
        * inactive
        * @return int
        */
-      int getNrOfActiveSprings(double tol = 0.1) const
+      int getNrOfActiveSprings(double tolerance = 0.01) const
       {
-        return this->countNrOfActiveSprings(this->currentSpringDistances, tol);
+        return this->countNrOfActiveSprings(this->currentSpringDistances,
+                                            tolerance);
       }
 
       /**
@@ -643,10 +649,10 @@ namespace calc {
        * inactive
        * @return int
        */
-      int getNrOfActivePartialSprings(double tol = 0.1) const
+      int getNrOfActivePartialSprings(double tolerance = 0.01) const
       {
         return this->countNrOfActiveSprings(this->currentPartialSpringDistances,
-                                            tol);
+                                            tolerance);
       }
 
       /**
@@ -749,10 +755,86 @@ namespace calc {
                                               const Eigen::VectorXd& u,
                                               const bool is2D) const;
 
+      /**
+       * @brief Compute one spring length
+       *
+       * @param net
+       * @param springIdx
+       * @param is2D
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d evaluatePartialSpringDistance(
+        const ForceBalanceNetwork& net,
+        const Eigen::VectorXd& u,
+        const size_t springIdx,
+        bool is2d = false) const
+      {
+        return this->evaluatePartialSpringDistanceTo(
+          net, u, springIdx, net.springIndexB(springIdx), is2d);
+      }
+
       Eigen::VectorXd evaluatePartialSpringDistances(
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
         const bool is2D) const;
+
+      /**
+       * @brief Compute one spring length, in a specific direction
+       *
+       * @param net
+       * @param springIdx
+       * @param linkIdx the vector "target"
+       * @param is2D
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d evaluatePartialSpringDistanceTo(
+        const ForceBalanceNetwork& net,
+        const Eigen::VectorXd& u,
+        const size_t springIdx,
+        const size_t linkIdx,
+        bool is2d = false) const
+      {
+        assert(net.isUpToDate);
+        assert(net.springPartIndexA(springIdx) == linkIdx ||
+               net.springPartIndexB(springIdx) == linkIdx);
+
+        Eigen::Vector3d dist =
+          ((net.coordinates.segment(3 * net.springPartIndexB(springIdx), 3) +
+            u.segment(3 * net.springPartIndexB(springIdx), 3)) -
+           (net.coordinates.segment(3 * net.springPartIndexA(springIdx), 3) +
+            u.segment(3 * net.springPartIndexA(springIdx), 3))) +
+          net.springPartBoxOffset.segment(3 * springIdx, 3);
+
+        if (this->assumeBoxLargeEnough) {
+          this->universe.getBox().handlePBC<Eigen::Vector3d>(dist);
+        }
+
+        if (is2D) {
+          dist[2] = 0.0;
+        }
+
+        return dist * (net.springPartIndexA(springIdx) == linkIdx ? -1. : 1.);
+      }
+
+      /**
+       * @brief Compute one spring length, in a specific direction
+       *
+       * @param net
+       * @param springIdx
+       * @param linkIdx the vector "source"
+       * @param is2D
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d evaluatePartialSpringDistanceFrom(
+        const ForceBalanceNetwork& net,
+        const Eigen::VectorXd& u,
+        const size_t springIdx,
+        const size_t linkIdx,
+        bool is2d = false) const
+      {
+        return -1. * this->evaluatePartialSpringDistanceTo(
+                       net, u, springIdx, linkIdx, is2d);
+      }
 
       /**
        * @brief Compute one spring length
@@ -1337,7 +1419,7 @@ namespace calc {
        * @return int
        */
       int countNrOfActiveSprings(const Eigen::VectorXd& springDistances,
-                                 const double tolerance = 0.1) const
+                                 const double tolerance = 0.01) const
       {
         return (this->findActiveSprings(springDistances, tolerance) == true)
           .count();
@@ -1352,7 +1434,7 @@ namespace calc {
        * @return ArrayXb
        */
       ArrayXb findActiveSprings(const Eigen::VectorXd& springDistances,
-                                const double tolerance = 0.1) const
+                                const double tolerance = 0.01) const
       {
         ArrayXb result = ArrayXb::Constant(springDistances.size() / 3, false);
         for (size_t i = 0; i < springDistances.size() / 3; ++i) {

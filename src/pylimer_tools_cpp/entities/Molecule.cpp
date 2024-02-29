@@ -187,7 +187,7 @@ namespace entities {
    *
    * @return MoleculeType
    */
-  MoleculeType Molecule::getType()
+  MoleculeType Molecule::getType() const
   {
     return this->typeOfThisMolecule;
   };
@@ -440,7 +440,8 @@ namespace entities {
    * @param crossLinkerType
    * @return std::vector<long int>
    */
-  std::vector<long int> Molecule::getVerticesLinedUp(int crossLinkerType) const
+  std::vector<long int> Molecule::getVerticesLinedUp(int crossLinkerType,
+                                                     bool closeLoop) const
   {
     std::vector<long int> results;
     size_t nrOfAtoms = this->getNrOfAtoms();
@@ -455,6 +456,8 @@ namespace entities {
       });
       vertexIdToStartWith = ends[0];
     } else {
+      assert(this->getType() == MoleculeType::UNDEFINED ||
+             this->getType() == MoleculeType::PRIMARY_LOOP);
       std::vector<Atom> xlinkers = this->getAtomsOfType(crossLinkerType);
       if (xlinkers.size() > 0) {
         vertexIdToStartWith = this->getIdxByAtomId(xlinkers[0].getId());
@@ -493,6 +496,8 @@ namespace entities {
         subConnections = this->getVertexIdxsConnectedTo(currentCenter);
       }
       if (loopFound) {
+        assert(this->getType() == MoleculeType::UNDEFINED ||
+               this->getType() == MoleculeType::PRIMARY_LOOP);
         break;
       }
     }
@@ -503,13 +508,20 @@ namespace entities {
         std::to_string(results.size()) + " instead of " +
         std::to_string(this->getNrOfAtoms()) + " atoms.");
     }
+
+    if (closeLoop && loopFound) {
+      results.push_back(results[0]);
+    }
+
     return results;
   }
 
   std::vector<Atom> Molecule::getAtomsLinedUp(int crossLinkerType,
-                                              bool assumedCoordinates) const
+                                              bool assumedCoordinates,
+                                              bool closeLoop) const
   {
-    std::vector<long int> vertices = this->getVerticesLinedUp(crossLinkerType);
+    std::vector<long int> vertices =
+      this->getVerticesLinedUp(crossLinkerType, closeLoop);
     if (!assumedCoordinates) {
       return this->verticesToAtoms(vertices);
     } else {

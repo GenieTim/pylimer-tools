@@ -115,7 +115,7 @@ namespace calc {
                 << " while simplification mode is " << simplificationMode
                 << std::endl;
       std::cout << "Using oneOverSpringPartitionUpperLimit = "
-                << oneOverSpringPartitionUpperLimit;
+                << oneOverSpringPartitionUpperLimit << std::endl;
       double currentResidual = 0.0;
       double intermediateResidual = 0.0;
       size_t iterationsDone = 0;
@@ -412,23 +412,27 @@ namespace calc {
       Eigen::ArrayXi relevantSpringPartCoordinateIndexB =
         net.springPartCoordinateIndexB(involvedSpringPartCoordinateIndexMask);
 
-      // assert(relevantSpringPartCoordinateIndexB.size() ==
-      //        relevantSpringPartCoordinateIndexA.size());
-      // assert(relevantSpringPartCoordinateIndexA.size() ==
-      //        involvedSpringPartCoordinateIndexMask.size());
-      // assert(resultingCoordinateIndexMask.maxCoeff() <
-      //        net.coordinates.size());
-      // assert(involvedSpringPartCoordinateIndexMask.maxCoeff() <
-      //        net.springCoordinateIndexA.size());
+#ifndef NDEBUG
+      // some debugging
+      assert(relevantSpringPartCoordinateIndexB.size() ==
+             relevantSpringPartCoordinateIndexA.size());
+      assert(relevantSpringPartCoordinateIndexA.size() ==
+             involvedSpringPartCoordinateIndexMask.size());
+      assert(resultingCoordinateIndexMask.maxCoeff() < net.coordinates.size());
+      assert(involvedSpringPartCoordinateIndexMask.maxCoeff() <
+             net.springCoordinateIndexA.size());
+#endif
 
       // TODO: we could save some time and space by directly adjusting the
       // coordinates
       Eigen::VectorXd displacedCoords = net.coordinates + u;
       Eigen::VectorXd relevantPartialDistancesA =
         (displacedCoords(relevantSpringPartCoordinateIndexB) -
-         displacedCoords(relevantSpringPartCoordinateIndexA));
-      // TODO: implement box not large enough case
-      this->box.handlePBC(relevantPartialDistancesA);
+         displacedCoords(relevantSpringPartCoordinateIndexA) +
+         net.springPartBoxOffset(involvedSpringPartCoordinateIndexMask));
+      if (this->assumeBoxLargeEnough) {
+        this->box.handlePBC(relevantPartialDistancesA);
+      }
 
       // NOTE: we have many zeros too much, here, actually.
       Eigen::ArrayXd oneOverSumOfSpringPartials = Eigen::ArrayXd::Zero(
@@ -1914,25 +1918,30 @@ namespace calc {
       // start with removal
       net.nrOfPartialSprings -= 1;
       // tell the kept one their new end
-      size_t newEnd = net.springPartIndexA[removedSpringIdx] == linkToReduce
-                        ? net.springPartIndexB[removedSpringIdx]
-                        : net.springPartIndexA[removedSpringIdx];
+      bool removedIsA = net.springPartIndexA[removedSpringIdx] == linkToReduce;
+      size_t newEnd = removedIsA ? net.springPartIndexB[removedSpringIdx]
+                                 : net.springPartIndexA[removedSpringIdx];
+      double offsetMultiplier = removedIsA ? -1. : 1.;
       if (net.springPartIndexA[keptSpringIdx] == linkToReduce) {
         net.springPartIndexA[keptSpringIdx] = newEnd;
         for (size_t dir = 0; dir < 3; ++dir) {
           net.springPartCoordinateIndexA[3 * keptSpringIdx + dir] =
             3 * newEnd + dir;
         }
+        net.springPartBoxOffset.segment(3 * keptSpringIdx, 3) =
+          -net.springPartBoxOffset.segment(3 * keptSpringIdx, 3) +
+          offsetMultiplier *
+            net.springPartBoxOffset.segment(3 * removedSpringIdx, 3);
       } else {
         net.springPartIndexB[keptSpringIdx] = newEnd;
         for (size_t dir = 0; dir < 3; ++dir) {
           net.springPartCoordinateIndexB[3 * keptSpringIdx + dir] =
             3 * newEnd + dir;
         }
+        net.springPartBoxOffset.segment(3 * keptSpringIdx, 3) +=
+          offsetMultiplier *
+          net.springPartBoxOffset.segment(3 * removedSpringIdx, 3);
       }
-      // TODO: fix / adjust prefix
-      net.springPartBoxOffset.segment(3 * keptSpringIdx, 3) +=
-        net.springPartBoxOffset.segment(3 * removedSpringIdx, 3);
       // remove the spring from the link
       // NOTE: currently, we allow it not to be present,
       // as it might be removed earlier already
@@ -2202,9 +2211,6 @@ namespace calc {
              net.linkIndicesOfSprings[keptSpringIdx].size() - 1);
       assert(net.linkIndicesOfSprings[keptSpringIdx].size() ==
              keptSpringsLinks.size() + removedSpringsLinks.size() - 2);
-      // TODO: fix prefix
-      net.springPartBoxOffset.segment(3 * remainingPartialSpringIdx, 3) +=
-        net.springPartBoxOffset.segment(3 * removedPartialSpringIdx, 3);
 
       // tell the links of their new spring index
       for (size_t linkOfRemovedSpring : removedSpringsLinks) {
@@ -2248,6 +2254,7 @@ namespace calc {
       size_t otherEndOfRemovedSpring =
         removedIsA ? net.springPartIndexB[removedPartialSpringIdx]
                    : net.springPartIndexA[removedPartialSpringIdx];
+      double offsetMultiplier = removedIsA ? -1. : 1.;
       if (net.springPartIndexA[remainingPartialSpringIdx] == linkToReduce) {
         net.springPartIndexA[remainingPartialSpringIdx] =
           otherEndOfRemovedSpring;
@@ -2255,6 +2262,10 @@ namespace calc {
           net.springPartCoordinateIndexA[3 * remainingPartialSpringIdx + dir] =
             3 * otherEndOfRemovedSpring + dir;
         }
+        net.springPartBoxOffset.segment(3 * remainingPartialSpringIdx, 3) =
+          -net.springPartBoxOffset.segment(3 * remainingPartialSpringIdx, 3) +
+          offsetMultiplier *
+            net.springPartBoxOffset.segment(3 * removedPartialSpringIdx, 3);
       } else {
         RUNTIME_EXP_IFN(
           net.springPartIndexB[remainingPartialSpringIdx] == linkToReduce, "");
@@ -2264,6 +2275,9 @@ namespace calc {
           net.springPartCoordinateIndexB[3 * remainingPartialSpringIdx + dir] =
             3 * otherEndOfRemovedSpring + dir;
         }
+        net.springPartBoxOffset.segment(3 * remainingPartialSpringIdx, 3) +=
+          offsetMultiplier *
+          net.springPartBoxOffset.segment(3 * removedPartialSpringIdx, 3);
       }
       pylimer_tools::utils::removeRow(net.springPartIndexA,
                                       removedPartialSpringIdx);
@@ -3971,24 +3985,9 @@ namespace calc {
             size_t globalSpringIndex =
               net.localToGlobalSpringIndex[(springIndices[spring_index])]
                                           [partner_idx];
-            Eigen::Vector3d partialDistance;
-            // add partial distance to the total distance
-            if (springsPartners[partner_idx] == linkIdx) {
-              partialDistance = MEHPForceBalance::evaluateDistanceBetween(
-                net,
-                u,
-                springsPartners[partner_idx + 1],
-                springsPartners[partner_idx],
-                this->is2D);
-            } else {
-              assert(springsPartners[partner_idx + 1] == linkIdx);
-              partialDistance = MEHPForceBalance::evaluateDistanceBetween(
-                net,
-                u,
-                springsPartners[partner_idx],
-                springsPartners[partner_idx + 1],
-                this->is2D);
-            }
+            Eigen::Vector3d partialDistance =
+              this->evaluatePartialSpringDistanceFrom(
+                net, u, globalSpringIndex, linkIdx, this->is2D);
             // add to displacement
             double contourLengthFraction = springPartitions[globalSpringIndex];
             // std::cout << "Contribution from " <<
@@ -4348,10 +4347,10 @@ namespace calc {
       if (additionalLen == 0) {
         return;
       }
-      INVALIDARG_EXP_IFN(
-        loopsOfSliplinks.size() == 0 ||
-          loopsOfSliplinks.size() == additionalLen,
-        "You must provide either loops for all new slip-links, or none at all.");
+      INVALIDARG_EXP_IFN(loopsOfSliplinks.size() == 0 ||
+                           loopsOfSliplinks.size() == additionalLen,
+                         "You must provide either loops for all new "
+                         "slip-links, or none at all.");
       INVALIDARG_EXP_IFN(
         (loopsOfSliplinks.size() == 0 &&
          this->initialConfig.loopsOfSliplink.size() == 0) ||
