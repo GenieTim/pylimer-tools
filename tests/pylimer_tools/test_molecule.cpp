@@ -119,6 +119,26 @@ TEST_CASE("Molecules sum the bonds correctly", "[entity][Molecule]")
   CHECK(overallSum[0] == 13. - 5.);
   CHECK(overallSum[1] == 0.);
   CHECK(overallSum[2] == 0.);
+
+  Eigen::Vector3d partialSum = molecules[0].getOverallBondSumFromTo(1, 2);
+  CHECK(partialSum[0] == 2.);
+  CHECK(partialSum[1] == 0.);
+  CHECK(partialSum[2] == 0.);
+  CHECK(molecules[0].getNrOfBondsFromTo(1, 2) == 1);
+
+  // reverse order of indices
+  CHECK_THROWS(molecules[0].getOverallBondSumFromTo(2, 1));
+  CHECK_THROWS(molecules[0].getNrOfBondsFromTo(2, 1));
+  partialSum = molecules[0].getOverallBondSumFromTo(2, 1, 2, false);
+  CHECK(partialSum[0] == 2.);
+  CHECK(partialSum[1] == 0.);
+  CHECK(partialSum[2] == 0.);
+
+  CHECK(molecules[0].getNrOfBondsFromTo(1, 2, 2, false) == 1);
+  CHECK(molecules[0].getNrOfBondsFromTo(2, 4, 2, true) == 2);
+  CHECK(molecules[0].getNrOfBondsFromTo(2, 4, 2, false) == 2);
+  CHECK(molecules[0].getNrOfBondsFromTo(4, 2, 2, false) == 2);
+  CHECK(molecules[0].getNrOfBondsFromTo(1, 5) == molecules[0].getNrOfBonds());
 }
 
 TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
