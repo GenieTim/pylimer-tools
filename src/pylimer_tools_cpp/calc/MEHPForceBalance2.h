@@ -109,6 +109,10 @@ namespace calc {
       };
 
     public:
+      //----------------------------------------------------------------
+      // MARK: Constructors
+      //----------------------------------------------------------------
+
       // rule of three:
       // 1. destructor (to destroy the graph)
       ~MEHPForceBalance2() { igraph_destroy(&this->graph); };
@@ -174,11 +178,7 @@ namespace calc {
         const pylimer_tools::entities::Universe& universe,
         int crosslinkerType = 2,
         bool is2D = false,
-        double kappa = 1.0)
-      {
-        return MEHPForceBalance2::constructWithRandomSlipLinks(
-          universe, 0, 1.0, 0, 1, 0, crosslinkerType, is2D, kappa);
-      }
+        double kappa = 1.0);
 
       static MEHPForceBalance2 constructWithSlipLinks(
         const pylimer_tools::entities::Universe& universe,
@@ -192,17 +192,7 @@ namespace calc {
         int crosslinkerType = 2,
         bool is2D = false,
         double kappa = 1.0,
-        bool clampAlpha = false)
-      {
-        MEHPForceBalance2 fb = MEHPForceBalance2::constructWithoutSlipLinks(
-          universe, crosslinkerType, is2D, kappa);
-        fb.validateNetwork();
-        fb.addSlipLinks(
-          strandIdx1, strandIdx2, x, y, z, alpha1, alpha2, clampAlpha);
-        // convert the graph to the network usable for simulations
-        fb.finaliseInitialisation();
-        return fb;
-      }
+        bool clampAlpha = false);
 
       static MEHPForceBalance2 constructWithRandomSlipLinks(
         const pylimer_tools::entities::Universe& universe,
@@ -213,255 +203,11 @@ namespace calc {
         const int seed,
         int crosslinkerType = 2,
         bool is2D = false,
-        double kappa = 1.0)
-      {
-        MEHPForceBalance2 fb =
-          MEHPForceBalance2(universe, crosslinkerType, is2D, kappa);
-        fb.net.isUpToDate = false;
-        igraph_cattribute_GAB_set(&fb.graph, "is_up_to_date", true);
+        double kappa = 1.0);
 
-        INVALIDARG_EXP_IFN(minimumNrOfSliplinks <
-                             fb.universe.getNrOfAtoms() / 2,
-                           "Minimum number of slip-links must be less than the "
-                           "possible number of slip-links to place.");
-        INVALIDARG_EXP_IFN(nrOfSliplinksToSample <
-                             fb.universe.getNrOfAtoms() / 2,
-                           "Number of slip-links to place must be less than "
-                           "the possible number of slip-links to place.");
-        INVALIDARG_EXP_IFN(nrOfSliplinksToSample >= minimumNrOfSliplinks,
-                           "Maximum nr. should be larger than minimum, got " +
-                             std::to_string(nrOfSliplinksToSample) + " and " +
-                             std::to_string(minimumNrOfSliplinks) + ".");
-        INVALIDARG_EXP_IFN(cutoff > 0.0,
-                           "Expected a cutoff > 0.0, got " +
-                             std::to_string(cutoff) + ".");
-
-        std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
-          fb.universe.getChainsWithCrosslinker(crosslinkerType);
-        std::vector<std::pair<size_t, size_t>> pairsOfAtoms;
-        pairsOfAtoms.reserve(nrOfSliplinksToSample);
-        std::vector<long int> pairOfAtom =
-          pylimer_tools::utils::initializeWithValue<long int>(
-            fb.universe.getNrOfAtoms(), -1);
-
-        std::unordered_map<size_t, size_t> atomToStrand;
-        atomToStrand.reserve(universe.getNrOfAtoms());
-        std::unordered_map<size_t, size_t> atomIdxInStrand;
-        atomIdxInStrand.reserve(universe.getNrOfAtoms());
-        for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
-          pylimer_tools::entities::Molecule chain = crosslinkerChains[i];
-          RUNTIME_EXP_IFN(chain.getType() !=
-                            pylimer_tools::entities::MoleculeType::UNDEFINED,
-                          "Couldn't determine molecule type.");
-          std::vector<pylimer_tools::entities::Atom> atoms =
-            crosslinkerChains[i].getAtomsLinedUp(crosslinkerType, true, true);
-          for (size_t atomIdx = 0; atomIdx < atoms.size(); ++atomIdx) {
-            pylimer_tools::entities::Atom atom = atoms[atomIdx];
-            if (atom.getType() != crosslinkerType) {
-              atomToStrand.emplace(atom.getId(), i);
-              atomIdxInStrand.emplace(atom.getId(), atomIdx);
-            }
-          }
-        }
-
-        // filter, we don't want cross-links etc. as targets
-        std::vector<pylimer_tools::entities::Atom> atomsForNeighbourList =
-          fb.universe.getAtomsOfDegree(2);
-        atomsForNeighbourList.erase(
-          std::remove_if(
-            atomsForNeighbourList.begin(),
-            atomsForNeighbourList.end(),
-            [crosslinkerType](const pylimer_tools::entities::Atom& a) {
-              return a.getType() == crosslinkerType;
-            }),
-          atomsForNeighbourList.end());
-        // some randomness for placement
-        std::random_device rd{};
-        std::mt19937 rng = std::mt19937(seed > 0 ? seed : rd());
-        std::shuffle(
-          atomsForNeighbourList.begin(), atomsForNeighbourList.end(), rng);
-        pylimer_tools::entities::NeighbourList neighbourList =
-          pylimer_tools::entities::NeighbourList(
-            atomsForNeighbourList, fb.universe.getBox(), cutoff);
-        size_t numLinksFoundInIteration = 1;
-        while (pairsOfAtoms.size() < minimumNrOfSliplinks &&
-               numLinksFoundInIteration > 0) {
-          numLinksFoundInIteration = 0;
-          for (pylimer_tools::entities::Atom a1 : atomsForNeighbourList) {
-            size_t atomVertexIdx1 = universe.getIdxByAtomId(a1.getId());
-            // make sure this atom does not yet have a pair
-            if (pairOfAtom[atomVertexIdx1] != -1) {
-              continue;
-            }
-            // then, find neighbouring atoms (but not from the same strand?!)
-            std::vector<pylimer_tools::entities::Atom> neighbours =
-              neighbourList.getAtomsCloseTo(a1);
-            neighbourList.removeAtom(
-              a1, "After querying neighbours. Impossible case.");
-            // filter the neighbours to include only those from other strands
-            // NOTE: this skews the whole thing a bit
-            neighbours.erase(
-              std::remove_if(
-                neighbours.begin(),
-                neighbours.end(),
-                [&](const pylimer_tools::entities::Atom& a) -> bool {
-                  return (
-                    (atomToStrand[a.getId()] ==
-                       atomToStrand[a1.getId()] // do not use "at", because not
-                                                // all atoms in the neighbours
-                                                // have been assigned a strand
-                     && (std::abs(static_cast<double>(
-                           atomIdxInStrand[a.getId()] -
-                           atomIdxInStrand[a1.getId()])) < sameStrandCutoff)));
-                }),
-              neighbours.end());
-            if (neighbours.size() == 0) {
-              // std::cerr << "Not enough close neighbours found." << std::endl;
-              continue;
-            }
-            // then, randomly select one of them
-            pylimer_tools::entities::Atom a2 = neighbours[0];
-            if (neighbours.size() > 1) {
-              size_t randomA2Idx = std::uniform_int_distribution<size_t>{
-                0, neighbours.size() - 1
-              }(rng);
-              a2 = neighbours[randomA2Idx];
-            }
-
-            size_t atomVertexIdx2 = universe.getIdxByAtomId(a2.getId());
-            assert(pairOfAtom[atomVertexIdx2] == -1);
-            pairOfAtom[atomVertexIdx2] = pairsOfAtoms.size();
-            pairOfAtom[atomVertexIdx1] = pairsOfAtoms.size();
-            pairsOfAtoms.push_back(std::make_pair(a1.getId(), a2.getId()));
-            numLinksFoundInIteration += 1;
-            neighbourList.removeAtom(a2,
-                                     "After marking atom as second pair part.");
-            if (pairsOfAtoms.size() >= nrOfSliplinksToSample) {
-              break;
-            }
-          }
-          if (pairsOfAtoms.size() >= nrOfSliplinksToSample) {
-            break;
-          }
-        }
-
-        // std::cout << "Found " << pairsOfAtoms.size() << " random slip-links."
-        //           << std::endl;
-
-        // add ends of chains
-        std::unordered_map<size_t, igraph_integer_t> endAtomIdToVertexId;
-        igraph_integer_t currentVertexId = 0;
-        for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
-          pylimer_tools::entities::Molecule chain = crosslinkerChains[i];
-          if (chain.getLength() < 2) {
-            continue;
-          }
-          std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
-            chain.getAtomsLinedUp(crosslinkerType, false, true);
-          if (!pylimer_tools::utils::map_has_key(endAtomIdToVertexId,
-                                                 linedUpAtoms[0].getId())) {
-            endAtomIdToVertexId[linedUpAtoms[0].getId()] = currentVertexId;
-            currentVertexId += 1;
-          }
-          if (!pylimer_tools::utils::map_has_key(
-                endAtomIdToVertexId,
-                pylimer_tools::utils::last(linedUpAtoms).getId())) {
-            endAtomIdToVertexId[pylimer_tools::utils::last(linedUpAtoms)
-                                  .getId()] = currentVertexId;
-            currentVertexId += 1;
-          }
-        }
-
-        // create `currentVertexId` vertices for the chain-end atoms, and
-        // `pairsOfAtoms.size()` vertices for the so many slip-links
-        igraph_add_vertices(
-          &fb.graph, currentVertexId + pairsOfAtoms.size(), nullptr);
-
-        size_t parentEdgeId = 0;
-        for (size_t chainIdx = 0; chainIdx < crosslinkerChains.size();
-             ++chainIdx) {
-          pylimer_tools::entities::Molecule chain = crosslinkerChains[chainIdx];
-          if (chain.getLength() < 2) {
-            continue;
-          }
-
-          std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
-            chain.getAtomsLinedUp(crosslinkerType, false, true);
-          size_t previousIdx = 0;
-          igraph_integer_t previousVertexId =
-            endAtomIdToVertexId.at(linedUpAtoms[0].getId());
-          fb.setVertexPropertiesFromAtom(
-            endAtomIdToVertexId.at(linedUpAtoms[0].getId()),
-            linedUpAtoms[0],
-            fb.crosslinkerType);
-          pylimer_tools::entities::Atom lastAtom =
-            pylimer_tools::utils::last(linedUpAtoms);
-          fb.setVertexPropertiesFromAtom(
-            endAtomIdToVertexId.at(lastAtom.getId()),
-            lastAtom,
-            fb.crosslinkerType);
-          assert(linedUpAtoms.size() == chain.getLength() ||
-                 linedUpAtoms.size() == chain.getLength() + 1);
-          if (pairsOfAtoms.size() > 0) {
-            for (size_t i = 1; i < linedUpAtoms.size() - 1; i++) {
-              pylimer_tools::entities::Atom a = linedUpAtoms[i];
-              if (pairOfAtom[universe.getIdxByAtomId(a.getId())] != -1) {
-                igraph_integer_t thisVertexId =
-                  currentVertexId +
-                  pairOfAtom[universe.getIdxByAtomId(a.getId())];
-                // set the mean x,y,z of the two involved atoms
-                pylimer_tools::entities::Atom a1 = universe.getAtom(
-                  pairsOfAtoms[pairOfAtom[universe.getIdxByAtomId(a.getId())]]
-                    .first);
-                pylimer_tools::entities::Atom a2 = universe.getAtom(
-                  pairsOfAtoms[pairOfAtom[universe.getIdxByAtomId(a.getId())]]
-                    .second);
-                fb.setVertexPropertiesFromAtoms(thisVertexId, a1, a2);
-                igraph_integer_t currentEdgeId = igraph_ecount(&fb.graph);
-                igraph_add_edge(&fb.graph, previousVertexId, thisVertexId);
-                fb.setBondPropertiesBasedOnChain(
-                  chain, previousIdx, i, currentEdgeId, parentEdgeId);
-                //
-                previousIdx = i;
-                previousVertexId = thisVertexId;
-              }
-            }
-          }
-
-          // close the chain
-          igraph_integer_t currentEdgeId = igraph_ecount(&fb.graph);
-          igraph_add_edge(&fb.graph,
-                          previousVertexId,
-                          endAtomIdToVertexId.at(lastAtom.getId()));
-          fb.setBondPropertiesBasedOnChain(chain,
-                                           previousIdx,
-                                           linedUpAtoms.size() - 1,
-                                           currentEdgeId,
-                                           parentEdgeId);
-          fb.validateIgraphSpring(parentEdgeId);
-          parentEdgeId += 1;
-        }
-
-        // validate the creation
-        for (auto& [key, value] : endAtomIdToVertexId) {
-          size_t savedAtomId =
-            castToIgraphInt(igraph_cattribute_VAN(&fb.graph, "atom_id", value));
-          assert(savedAtomId == key);
-          size_t degreeNow = fb.getVertexDegree(value);
-          size_t degreeBefore =
-            universe.getVertexDegree(universe.getIdxByAtomId(key));
-          assert(degreeNow == degreeBefore);
-        }
-
-        // cleanup the graph
-        // fb.removeSubfunctionalVertices();
-
-        // convert the graph to the network usable for simulations
-        fb.finaliseInitialisation();
-        assert(fb.getNumExtraAtoms() == pairsOfAtoms.size());
-
-        return fb;
-      }
+      //----------------------------------------------------------------
+      // MARK: Simulation / Optimization Procedures
+      //----------------------------------------------------------------
 
       /**
        * @brief Actually do run the simulation
@@ -502,536 +248,18 @@ namespace calc {
         const std::vector<size_t>& involvedPartitions,
         const size_t link_idx,
         Eigen::VectorXd& springPartitions,
-        double oneOverSpringPartitionUpperLimit = 1.0) const
-      {
-        // TODO: revise, hard!
-        assert(involvedPartitions.size() == 4);
-        double firstMeanVal = 0.5 * (springPartitions[involvedPartitions[0]] +
-                                     springPartitions[involvedPartitions[1]]);
-        double secondMeanVal = 0.5 * (springPartitions[involvedPartitions[2]] +
-                                      springPartitions[involvedPartitions[3]]);
-        // Eigen::ArrayXi involvedCoordinateIndices = Eigen::ArrayXi(12);
-        // for (size_t i = 0; i < 4; ++i) {
-        //   involvedCoordinateIndices[3 * i] = 3 * involvedPartitions[i];
-        //   involvedCoordinateIndices[3 * i + 1] = 3 * involvedPartitions[i] +
-        //   1; involvedCoordinateIndices[3 * i + 2] = 3 * involvedPartitions[i]
-        //   + 2;
-        // }
-        // Eigen::VectorXd displacementsBefore =
-        //   displacements(involvedCoordinateIndices);
-        Eigen::Vector4d partitionsBefore = springPartitions(involvedPartitions);
-        springPartitions[involvedPartitions[0]] = firstMeanVal;
-        springPartitions[involvedPartitions[1]] = firstMeanVal;
-        springPartitions[involvedPartitions[2]] = secondMeanVal;
-        springPartitions[involvedPartitions[3]] = secondMeanVal;
-        // this->displaceToMeanPosition(
-        //   this->net, displacements, springPartitions, link_idx);
-        double retVal = this->updateSpringPartition(
-          net, springPartitions, link_idx, oneOverSpringPartitionUpperLimit);
-        // it seems to be faster to re-use memory rather than copying the whole
-        // vectors
-        springPartitions(involvedPartitions) = partitionsBefore;
-        // displacements(involvedCoordinateIndices) = displacementsBefore;
-        return retVal;
-      }
+        double oneOverSpringPartitionUpperLimit = 1.0) const;
 
+      /**
+       * @brief Publicly available method to convert graph to network
+       *
+       */
       void synchronise()
       {
-        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
+        INVALIDARG_EXP_IFN(
+          igraph_cattribute_GAB(&this->graph, "is_up_to_date"),
+          "Graph must be up to date to be converted to network.");
         this->convertFromGraph();
-      }
-
-      /**
-       * @brief
-       *
-       * CAUTION: make sure the graph is up to date!
-       *
-       * @param vertexId
-       * @return Eigen::Vector3d
-       */
-      Eigen::Vector3d getCoordinatesForVertex(igraph_integer_t vertexId)
-      {
-        Eigen::Vector3d coordinates;
-        coordinates << igraph_cattribute_VAN(&this->graph, "x", vertexId),
-          igraph_cattribute_VAN(&this->graph, "y", vertexId),
-          igraph_cattribute_VAN(&this->graph, "z", vertexId);
-        return coordinates;
-      }
-
-      /**
-       * @brief Set the Vertex Coordinates in the graph
-       *
-       * @param vertexId
-       * @param coordinates
-       */
-      void setVertexCoordinates(const igraph_integer_t vertexId,
-                                const Eigen::Vector3d& coordinates)
-      {
-        igraph_cattribute_VAN_set(&this->graph, "x", vertexId, coordinates[0]);
-        igraph_cattribute_VAN_set(&this->graph, "y", vertexId, coordinates[1]);
-        igraph_cattribute_VAN_set(&this->graph, "z", vertexId, coordinates[2]);
-      }
-
-      /**
-       * @brief Check whether a given edge involves a cross-link
-       *
-       * @param edgeId
-       * @return true
-       * @return false
-       */
-      bool springInvolvesCrossLink(const igraph_integer_t edgeId)
-      {
-        igraph_integer_t from, to;
-        igraph_edge(&this->graph, edgeId, &from, &to);
-
-        return (castToIgraphInt(igraph_cattribute_VAN(
-                  &this->graph, "type", from)) == this->crosslinkerType) ||
-               (castToIgraphInt(igraph_cattribute_VAN(
-                  &this->graph, "type", to)) == this->crosslinkerType);
-      }
-
-      /**
-       * @brief Shorthand to query the degree of a vertex
-       *
-       * @param vertexId
-       * @param loops
-       * @return igraph_integer_t
-       */
-      igraph_integer_t getVertexDegree(const igraph_integer_t vertexId,
-                                       const bool loops = true)
-      {
-        igraph_integer_t degree;
-        igraph_degree_1(&this->graph, &degree, vertexId, IGRAPH_ALL, loops);
-        return degree;
-      }
-
-      /**
-       * @brief Set the Vertex Properties From Atom object (for a cross-link) in
-       * the graph
-       *
-       * @param vertexId
-       * @param atom
-       */
-      void setVertexPropertiesFromAtom(
-        const igraph_integer_t vertexId,
-        const pylimer_tools::entities::Atom& atom,
-        const int atomType)
-      {
-        assert(atomType == this->crosslinkerType ||
-               atomType == this->slipLinkType);
-        // assert(atom.getType() == this->crosslinkerType);
-        igraph_cattribute_VAN_set(
-          &this->graph, "atom_id", vertexId, atom.getId());
-        igraph_cattribute_VAN_set(&this->graph, "type", vertexId, atomType);
-        igraph_cattribute_VAN_set(&this->graph, "num_link_swaps", vertexId, 0);
-        Eigen::Vector3d coords = atom.getCoordinates();
-        this->setVertexCoordinates(vertexId, coords);
-      }
-
-      /**
-       * @brief Set the Vertex Properties of a slip-link based on the two
-       * involved atoms
-       *
-       * @param vertexId
-       * @param atom1
-       * @param atom2
-       */
-      void setVertexPropertiesFromAtoms(const igraph_integer_t vertexId,
-                                        pylimer_tools::entities::Atom& atom1,
-                                        pylimer_tools::entities::Atom& atom2)
-      {
-        assert(atom1.getType() != this->crosslinkerType &&
-               atom2.getType() != this->crosslinkerType);
-        if (atom1.getId() > atom2.getId()) {
-          // make sure a second call to this function would result in same
-          // result
-          std::swap(atom1, atom2);
-        }
-        igraph_cattribute_VAN_set(
-          &this->graph, "type", vertexId, this->slipLinkType);
-        igraph_cattribute_VAN_set(
-          &this->graph, "atom_id", vertexId, atom1.getId());
-        igraph_cattribute_VAN_set(
-          &this->graph, "atom_1_id", vertexId, atom1.getId());
-        igraph_cattribute_VAN_set(
-          &this->graph, "atom_2_id", vertexId, atom2.getId());
-        igraph_cattribute_VAN_set(&this->graph, "num_link_swaps", vertexId, 0);
-        Eigen::Vector3d coords = atom1.getCoordinates();
-        Eigen::Vector3d dist = atom2.getCoordinates() - coords;
-        this->universe.getBox().handlePBC(dist);
-        coords += 0.5 * dist;
-        this->setVertexCoordinates(vertexId, coords);
-      }
-
-      /**
-       * @brief Create a new edge in the graph with the specified properties
-       *
-       * @param from
-       * @param to
-       * @param parent
-       * @param partitionFraction
-       * @param boxOffset
-       * @return igraph_integer_t
-       */
-      igraph_integer_t createEdge(igraph_integer_t from,
-                                  igraph_integer_t to,
-                                  long int parent,
-                                  double partitionFraction,
-                                  double contourLength,
-                                  Eigen::Vector3d boxOffset)
-      {
-        // igraph, in undirected graphs, orders the edges from small to large
-        if (from > to) {
-          std::swap(from, to);
-          boxOffset *= -1.;
-        }
-        igraph_integer_t newEdgeId = igraph_ecount(&this->graph);
-        igraph_add_edge(&this->graph, from, to);
-        igraph_integer_t newFrom, newTo;
-        igraph_edge(&this->graph, newEdgeId, &newFrom, &newTo);
-        assert(newFrom == from && newTo == to);
-        igraph_cattribute_EAN_set(
-          &this->graph, "partition_fraction", newEdgeId, partitionFraction);
-        this->setBondBoxOffsetForEdge(newEdgeId, boxOffset);
-        igraph_cattribute_EAN_set(
-          &this->graph, "contour_length", newEdgeId, contourLength);
-        igraph_cattribute_EAN_set(
-          &this->graph, "parent_edge", newEdgeId, parent);
-        return newEdgeId;
-      }
-
-      /**
-       * @brief Set the Bond Box Offset For an edge
-       *
-       * @param edgeId
-       * @param bondBoxOffset
-       */
-      void setBondBoxOffsetForEdge(const igraph_integer_t edgeId,
-                                   const Eigen::Vector3d& bondBoxOffset)
-      {
-        assert(bondBoxOffset.array().isFinite().all());
-        igraph_cattribute_EAN_set(
-          &this->graph, "bond_box_x", edgeId, bondBoxOffset[0]);
-        igraph_cattribute_EAN_set(
-          &this->graph, "bond_box_y", edgeId, bondBoxOffset[1]);
-        igraph_cattribute_EAN_set(
-          &this->graph, "bond_box_z", edgeId, bondBoxOffset[2]);
-      }
-
-      /**
-       * @brief Copy one specific bond property from one edge to another
-       *
-       * @param name
-       * @param from
-       * @param to
-       */
-      void copyBondProperty(const char* name,
-                            const igraph_integer_t from,
-                            const igraph_integer_t to)
-      {
-        igraph_cattribute_EAN_set(
-          &this->graph,
-          name,
-          to,
-          igraph_cattribute_EAN(&this->graph, name, from));
-      }
-
-      /**
-       * @brief Copy all relevant properties from one edge to another
-       *
-       * @param from source edge id
-       * @param to target edge id
-       */
-      void copyBondProperties(const igraph_integer_t from,
-                              const igraph_integer_t to)
-      {
-        for (std::string property : { "bond_box_x",
-                                      "bond_box_y",
-                                      "bond_box_z",
-                                      "parent_edge",
-                                      "partition_fraction",
-                                      "contour_length" }) {
-          this->copyBondProperty(property.c_str(), from, to);
-        }
-      }
-
-      /**
-       * @brief Copy some relevant properties from one edge to another, but
-       * scaled
-       *
-       * @param from
-       * @param to
-       * @param scaleFactor
-       */
-      void copyScaleBondProperties(const igraph_integer_t from,
-                                   const igraph_integer_t to,
-                                   double scaleFactor = 0.5)
-      {
-        for (std::string property :
-             { "partition_fraction",
-               "local_contour_length" }) { //, "contour_length"
-          igraph_cattribute_EAN_set(
-            &this->graph,
-            property.c_str(),
-            to,
-            igraph_cattribute_EAN(&this->graph, property.c_str(), from) *
-              scaleFactor);
-        }
-      }
-
-      /**
-       * @brief Use an existing chain to set the relevant edge properties
-       *
-       * @param chain
-       * @param atom1Idx
-       * @param atom2Idx
-       * @param edgeId
-       * @param chainIdx
-       */
-      void setBondPropertiesBasedOnChain(
-        const pylimer_tools::entities::Molecule& chain,
-        const size_t atom1Idx,
-        const size_t atom2Idx,
-        const igraph_integer_t edgeId,
-        const size_t chainIdx)
-      {
-        assert(atom1Idx < atom2Idx);
-        if (chain.getType() ==
-            pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
-          assert(APPROX_WITHIN(atom1Idx, 0, chain.getLength() - 1, 1e-2));
-          assert(APPROX_WITHIN(atom2Idx, 1, chain.getLength(), 1e-2));
-        } else {
-          assert(APPROX_WITHIN(atom1Idx, 0, chain.getLength() - 2, 1e-2));
-          assert(APPROX_WITHIN(atom2Idx, 1, chain.getLength() - 1, 1e-2));
-        }
-        igraph_integer_t from, to;
-        igraph_edge(&this->graph, edgeId, &from, &to);
-        std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
-          chain.getAtomsLinedUp(crosslinkerType, false, true);
-        igraph_cattribute_EAN_set(&this->graph,
-                                  "partition_fraction",
-                                  edgeId,
-                                  static_cast<double>(atom2Idx - atom1Idx) /
-                                    static_cast<double>(chain.getNrOfBonds()));
-        igraph_cattribute_EAN_set(
-          &this->graph, "parent_edge", edgeId, chainIdx);
-        igraph_cattribute_EAN_set(
-          &this->graph, "contour_length", edgeId, chain.getNrOfBonds());
-        igraph_cattribute_EAN_set(
-          &this->graph,
-          "local_contour_length",
-          edgeId,
-          chain.getNrOfBondsFromTo(linedUpAtoms[atom1Idx].getId(),
-                                   linedUpAtoms[atom2Idx].getId(),
-                                   crosslinkerType));
-        // use the actual position of the vertices!
-        Eigen::Vector3d expectedDistance =
-          chain.getOverallBondSumFromTo(linedUpAtoms[atom1Idx].getId(),
-                                        linedUpAtoms[atom2Idx].getId(),
-                                        crosslinkerType);
-        Eigen::Vector3d additionalDistance1 =
-          linedUpAtoms[atom1Idx].getCoordinates() -
-          this->getCoordinatesForVertex(from);
-        this->universe.getBox().handlePBC(additionalDistance1);
-        Eigen::Vector3d additionalDistance2 =
-          this->getCoordinatesForVertex(to) -
-          linedUpAtoms[atom2Idx].getCoordinates();
-        this->universe.getBox().handlePBC(additionalDistance2);
-        expectedDistance += additionalDistance1 + additionalDistance2;
-
-        this->setBondBoxOffsetForEdge(edgeId, Eigen::Vector3d::Zero());
-        Eigen::Vector3d actualDistance = this->computeEdgeDistance(edgeId);
-        this->setBondBoxOffsetForEdge(edgeId,
-                                      expectedDistance - actualDistance);
-        assert(this->universe.getBox().isValidOffset(expectedDistance -
-                                                     actualDistance));
-        Eigen::Vector3d newActualDistance = this->computeEdgeDistance(edgeId);
-        assert(newActualDistance.isApprox(expectedDistance));
-      }
-
-      /**
-       * @brief Returns the box offset for a given edge
-       *
-       * CAUTION: make sure the graph is up to date!
-       *
-       * @param edgeId
-       * @return Eigen::Vector3d
-       */
-      Eigen::Vector3d getBondBoxOffsetForEdgeFrom(igraph_integer_t edgeId,
-                                                  igraph_integer_t vertexIdx)
-      {
-        Eigen::Vector3d boxOffset = this->getBondBoxOffsetForEdge(edgeId);
-
-        igraph_integer_t from, to;
-        igraph_edge(&this->graph, edgeId, &from, &to);
-        assert(from == vertexIdx || to == vertexIdx);
-
-        if (from == vertexIdx) {
-          return boxOffset;
-        } else {
-          return -1. * boxOffset;
-        }
-      }
-
-      Eigen::Vector3d getBondBoxOffsetForEdgeTo(igraph_integer_t edgeId,
-                                                igraph_integer_t vertexIdx)
-      {
-        return -1. * this->getBondBoxOffsetForEdgeFrom(edgeId, vertexIdx);
-      }
-
-      /**
-       * @brief Returns the box offset for a given edge
-       *
-       * CAUTION: make sure the graph is up to date!
-       *
-       * @param edgeId
-       * @return Eigen::Vector3d
-       */
-      Eigen::Vector3d getBondBoxOffsetForEdge(igraph_integer_t edgeId)
-      {
-        Eigen::Vector3d bondBoxOffset;
-        bondBoxOffset << igraph_cattribute_EAN(
-          &this->graph, "bond_box_x", edgeId),
-          igraph_cattribute_EAN(&this->graph, "bond_box_y", edgeId),
-          igraph_cattribute_EAN(&this->graph, "bond_box_z", edgeId);
-
-        assert(bondBoxOffset.allFinite());
-        return bondBoxOffset;
-      }
-      /**
-       * @brief Compute the length of an edge based on the graph
-       *
-       * CAUTION: make sure the graph is up to date!
-       *
-       * @param edgeId
-       * @return Eigen::Vector3d
-       */
-      Eigen::Vector3d computeEdgeDistance(igraph_integer_t edgeId)
-      {
-        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
-        igraph_integer_t from, to;
-        igraph_edge(&this->graph, edgeId, &from, &to);
-
-        Eigen::Vector3d dist = this->getCoordinatesForVertex(to) -
-                               this->getCoordinatesForVertex(from) +
-                               this->getBondBoxOffsetForEdge(edgeId);
-        if (this->assumeBoxLargeEnough) {
-          this->universe.getBox().handlePBC(dist);
-        }
-        assert(dist.allFinite());
-        return dist;
-      }
-
-      /**
-       * @brief Shortcut to query the edge's partition fraction
-       *
-       * @param edgeId
-       * @return double
-       */
-      double getEdgeFraction(igraph_integer_t edgeId)
-      {
-        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
-        return igraph_cattribute_EAN(
-          &this->graph, "partition_fraction", edgeId);
-      }
-
-      /**
-       * @brief Shortcut to compute 1/(N*fraction)
-       *
-       * @param edgeId
-       * @param oneOverSpringPartitionUpperLimit
-       * @param isPartialSpring
-       * @return double
-       */
-      double getEdgeDenominator(
-        igraph_integer_t edgeId,
-        const double oneOverSpringPartitionUpperLimit = 1.0,
-        bool isPartialSpring = true)
-      {
-        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
-        const double N =
-          igraph_cattribute_EAN(&this->graph, "contour_length", edgeId);
-        const double fraction = this->getEdgeFraction(edgeId);
-        double denominator = 1. / (fraction * N);
-        if (oneOverSpringPartitionUpperLimit > 0. ||
-            !std::isfinite(denominator)) {
-          denominator = CLAMP_ONE_OVER_SPRINGPARTITION(
-            isPartialSpring, denominator, N, oneOverSpringPartitionUpperLimit);
-        }
-
-        return denominator;
-      }
-
-      /**
-       * @brief Compute the length of an edge based on the graph in a certain
-       * direction
-       *
-       * CAUTION: make sure the graph is up to date!
-       *
-       * @param edgeId
-       * @param vertexId
-       * @return Eigen::Vector3d
-       */
-      Eigen::Vector3d computeEdgeDistanceFrom(igraph_integer_t edgeId,
-                                              igraph_integer_t vertexId)
-      {
-        igraph_integer_t from, to;
-        igraph_edge(&this->graph, edgeId, &from, &to);
-        assert(from == vertexId || to == vertexId);
-
-        Eigen::Vector3d dist = this->computeEdgeDistance(edgeId);
-        return dist * (vertexId == from ? 1. : -1.);
-      }
-
-      /**
-       * @brief Compute the length of an edge based on the graph in a certain
-       * direction
-       *
-       * CAUTION: make sure the graph is up to date!
-       *
-       * @param edgeId
-       * @param vertexId the target vertex id
-       * @return Eigen::Vector3d
-       */
-      Eigen::Vector3d computeEdgeDistanceTo(igraph_integer_t edgeId,
-                                            igraph_integer_t vertexId)
-      {
-        return -1. * this->computeEdgeDistanceFrom(edgeId, vertexId);
-      }
-
-      /**
-       * @brief Compute the length of an edge based on the graph
-       *
-       * CAUTION: make sure the graph is up to date!
-       * Also, this function is O(|E|), since all edges are iterated to check
-       * their parent edge id.
-       *
-       * @param parentEdgeId
-       * @return Eigen::Vector3d
-       */
-      Eigen::Vector3d computeParentEdgeLength(size_t parentEdgeId)
-      {
-        Eigen::Vector3d dist = Eigen::Vector3d::Zero();
-
-        igraph_vector_t parentEdges;
-        igraph_vector_init(&parentEdges, this->net.nrOfPartialSprings);
-        igraph_cattribute_EANV(&this->graph,
-                               "parent_edge",
-                               igraph_ess_all(IGRAPH_EDGEORDER_ID),
-                               &parentEdges);
-
-        std::vector<size_t> edgeIdsToRemove;
-        edgeIdsToRemove.reserve(4);
-        for (igraph_integer_t i = 0; i < igraph_vector_size(&parentEdges);
-             ++i) {
-          if (igraph_vector_get(&parentEdges, i) == parentEdgeId) {
-            dist += this->computeEdgeDistance(i);
-          }
-        }
-
-        igraph_vector_destroy(&parentEdges);
-
-        return dist;
       }
 
       /**
@@ -1102,198 +330,12 @@ namespace calc {
        * @param net
        * @return size_t the nr of removed edges
        */
-      size_t cleanupPrimaryLoopsInStructure()
-      {
-        igraph_vector_int_t allEdges;
-        igraph_vector_int_init(&allEdges, igraph_ecount(&this->graph) * 2);
-        if (igraph_edges(
-              &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &allEdges)) {
-          throw std::runtime_error("Failed to get all edges");
-        }
-
-        std::vector<igraph_integer_t> edgesToRemove;
-        for (igraph_integer_t i = 0; i < igraph_ecount(&this->graph); ++i) {
-          if (igraph_vector_int_get(&allEdges, 2 * i + 0) ==
-              igraph_vector_int_get(&allEdges, 2 * i + 1)) {
-            // check if this primary loop has length 0 -> remove
-            if (this->getBondBoxOffsetForEdge(i).norm() <
-                1e-3 * this->universe.getBox().getL().minCoeff()) {
-              edgesToRemove.push_back(i);
-            }
-          }
-        }
-
-        this->removePartialSprings(edgesToRemove);
-        if (edgesToRemove.size() > 0) {
-          this->renumberParentSprings();
-          // since we remove partial springs without adjusting any partitions,
-          // we need to do that now
-          this->renormalizePartitions();
-        }
-        return edgesToRemove.size();
-      };
+      size_t cleanupPrimaryLoopsInStructure();
 
       /**
        * @brief remove all vertices that don't have any connections
        */
       size_t removeOrphanedVertices();
-
-      /**
-       * @brief Remove a spring (and all its parts, incl. slip-links) from the
-       * structures
-       *
-       * NOTE: this may result in slip-links with f = 2.
-       * They are not automatically removed in order to preserve vertex
-       * iterations.
-       *
-       * @param net
-       * @param springPartitions
-       */
-      void removeParentSpring(const size_t springIdx);
-
-      /**
-       * @brief Remove a set of edges from the graph
-       *
-       * @param edgeIdsToRemove
-       */
-      void removePartialSprings(std::vector<igraph_integer_t>& edgeIdsToRemove);
-
-      /**
-       * @brief marks a certain "parent" spring as non-existing
-       */
-      void combineParentSprings(size_t springIdxBefore, size_t springIdxNow, double contourLengthBefore = -1.);
-
-      /**
-       * @brief When springs have been removed, it is possible that the
-       * numbering is not sequential anymore. This function fixes that.
-       *
-       */
-      void renumberParentSprings();
-
-      /**
-       * @brief When spring has been removed, it is possible that the
-       * sum of the partitions don't add up to one anymore. This function fixes
-       * that.
-       *
-       */
-      void renormalizePartitions();
-
-      /**
-       * @brief Combine two partial springs to be only one
-       *
-       * @param edge1Id
-       * @param edge2Id
-       */
-      void combinePartialSprings(const igraph_integer_t edge1Id,
-                                 const igraph_integer_t edge2Id,
-                                 const igraph_integer_t centralLink);
-
-      /**
-       * @brief Remove a slip-link and combine the two edges corresponding to
-       * the rail
-       *
-       * @param vertexId
-       * @param railEdgeId
-       */
-      void unlinkSlipLinkFromRail(const igraph_integer_t vertexId,
-                                  const igraph_integer_t railEdgeId);
-
-      /**
-       * @brief Inserts the given slip-link into a partial spring
-       *
-       * @param vertexId the slip-link to insert into the spring
-       * @param railEdgeId the spring to be halfed
-       */
-      void insertSlipLinkIntoRail(const igraph_integer_t vertexId,
-                                  const igraph_integer_t railEdgeId);
-
-      /**
-       * @brief Move a slip-link from one rail to another
-       *
-       * @param vertexId the slip-link to remove from one and insert into
-       * another spring
-       * @param sourceRailEdgeId the spring to be twiced
-       * @param targetRailEdgeId the spring to be halfed
-       */
-      void moveSlipLinkFromRailToRail(const igraph_integer_t vertexId,
-                                      const igraph_integer_t sourceRailEdgeId,
-                                      const igraph_integer_t targetRailEdgeId);
-
-      /**
-       * @brief List the edges and vertices of one spring, in order
-       *
-       * @param springIdx
-       * @param vertices
-       * @param edges
-       */
-      void findEdgesAndVerticesOfSpring(size_t springIdx,
-                                        igraph_vector_int_t* vertices,
-                                        igraph_vector_int_t* edges);
-      /**
-       * @brief List the edges and vertices of one spring, in order
-       *
-       * @param unorderedEdges
-       * @param vertices
-       * @param edges
-       */
-      void findEdgesAndVerticesOfSpring(igraph_vector_int_t* unorderedEdges,
-                                        igraph_vector_int_t* vertices,
-                                        igraph_vector_int_t* edges);
-
-      /**
-       * @brief Find the index of a partial spring, given the fractn of the
-       * total spring to traverse
-       *
-       * @param springIdx
-       * @param alpha
-       * @return igraph_integer_t
-       */
-      igraph_integer_t findPartialSpringByFraction(size_t springIdx,
-                                                   double alpha,
-                                                   double& fractionTillThere);
-
-      /**
-       * @brief Remove a certain, 2-functional link from the structures,
-       * combining the two strands
-       */
-      void remove2fLink(const size_t linkIdx);
-
-      /**
-       * @brief Remove a certain, 3-functional link from the structures,
-       * combining the two strands
-       */
-      void remove3fLink(const size_t linkIdx);
-
-      /**
-       * @brief Remove a certain link from the structures, removing all
-       * connections
-       */
-      void removeLink(const size_t linkIdx);
-
-      igraph_integer_t getOtherEdgePartner(
-        igraph_integer_t edgeId,
-        igraph_integer_t wrongPartnerVertexIdx)
-      {
-        igraph_integer_t from, to;
-        igraph_edge(&this->graph, edgeId, &from, &to);
-        return (from == wrongPartnerVertexIdx) ? to : from;
-      }
-
-      /**
-       * @brief Given a vertex id and a rail edge, returns the other two edges
-       * that are not part of the rail
-       */
-      std::vector<igraph_integer_t> getOffRailConnectedEdgeIds(
-        igraph_integer_t vertexId,
-        igraph_integer_t railEdgeId);
-
-      /**
-       * @brief Given a vertex and a connected edge, returns the edge in the
-       * opposite direction
-       *
-       */
-      igraph_integer_t getOtherRailEdgeId(igraph_integer_t vertexId,
-                                          igraph_integer_t railEdgeId);
 
       void relaxationLight(ForceBalanceNetwork& net,
                            Eigen::VectorXd& springPartitions,
@@ -1334,25 +376,7 @@ namespace calc {
        * @param displacements
        * @param springPartitions
        */
-      size_t removeTwofunctionalLinks()
-      {
-        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
-
-        size_t numRemoved = 0;
-        long int vcount = igraph_vcount(&this->graph);
-        for (long int i = vcount - 1; i >= 0; --i) {
-          igraph_integer_t degree;
-          // count self-loops; they should be removed in another way
-          igraph_degree_1(&this->graph, &degree, i, IGRAPH_ALL, true);
-          if (degree == 2) {
-            // remove this link
-            numRemoved += 1;
-            this->remove2fLink(i);
-          }
-        }
-
-        return numRemoved;
-      };
+      size_t removeTwofunctionalLinks();
 
       /**
        * @brief Add slip-links to this system based on entangled loops
@@ -2817,6 +1841,658 @@ namespace calc {
       size_t getNumParticles() override { return this->net.nrOfNodes; }
 
     protected:
+      /**
+       * @brief
+       *
+       * CAUTION: make sure the graph is up to date!
+       *
+       * @param vertexId
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d getCoordinatesForVertex(igraph_integer_t vertexId)
+      {
+        Eigen::Vector3d coordinates;
+        coordinates << igraph_cattribute_VAN(&this->graph, "x", vertexId),
+          igraph_cattribute_VAN(&this->graph, "y", vertexId),
+          igraph_cattribute_VAN(&this->graph, "z", vertexId);
+        return coordinates;
+      }
+
+      /**
+       * @brief Set the Vertex Coordinates in the graph
+       *
+       * @param vertexId
+       * @param coordinates
+       */
+      void setVertexCoordinates(const igraph_integer_t vertexId,
+                                const Eigen::Vector3d& coordinates)
+      {
+        igraph_cattribute_VAN_set(&this->graph, "x", vertexId, coordinates[0]);
+        igraph_cattribute_VAN_set(&this->graph, "y", vertexId, coordinates[1]);
+        igraph_cattribute_VAN_set(&this->graph, "z", vertexId, coordinates[2]);
+      }
+
+      /**
+       * @brief Check whether a given edge involves a cross-link
+       *
+       * @param edgeId
+       * @return true
+       * @return false
+       */
+      bool springInvolvesCrossLink(const igraph_integer_t edgeId)
+      {
+        igraph_integer_t from, to;
+        igraph_edge(&this->graph, edgeId, &from, &to);
+
+        return (castToIgraphInt(igraph_cattribute_VAN(
+                  &this->graph, "type", from)) == this->crosslinkerType) ||
+               (castToIgraphInt(igraph_cattribute_VAN(
+                  &this->graph, "type", to)) == this->crosslinkerType);
+      }
+
+      /**
+       * @brief Shorthand to query the degree of a vertex
+       *
+       * @param vertexId
+       * @param loops
+       * @return igraph_integer_t
+       */
+      igraph_integer_t getVertexDegree(const igraph_integer_t vertexId,
+                                       const bool loops = true)
+      {
+        igraph_integer_t degree;
+        igraph_degree_1(&this->graph, &degree, vertexId, IGRAPH_ALL, loops);
+        return degree;
+      }
+
+      /**
+       * @brief Set the Vertex Properties From Atom object (for a cross-link) in
+       * the graph
+       *
+       * @param vertexId
+       * @param atom
+       */
+      void setVertexPropertiesFromAtom(
+        const igraph_integer_t vertexId,
+        const pylimer_tools::entities::Atom& atom,
+        const int atomType)
+      {
+        assert(atomType == this->crosslinkerType ||
+               atomType == this->slipLinkType);
+        // assert(atom.getType() == this->crosslinkerType);
+        igraph_cattribute_VAN_set(
+          &this->graph, "atom_id", vertexId, atom.getId());
+        igraph_cattribute_VAN_set(&this->graph, "type", vertexId, atomType);
+        igraph_cattribute_VAN_set(&this->graph, "num_link_swaps", vertexId, 0);
+        Eigen::Vector3d coords = atom.getCoordinates();
+        this->setVertexCoordinates(vertexId, coords);
+      }
+
+      /**
+       * @brief Set the Vertex Properties of a slip-link based on the two
+       * involved atoms
+       *
+       * @param vertexId
+       * @param atom1
+       * @param atom2
+       */
+      void setVertexPropertiesFromAtoms(const igraph_integer_t vertexId,
+                                        pylimer_tools::entities::Atom& atom1,
+                                        pylimer_tools::entities::Atom& atom2)
+      {
+        assert(atom1.getType() != this->crosslinkerType &&
+               atom2.getType() != this->crosslinkerType);
+        if (atom1.getId() > atom2.getId()) {
+          // make sure a second call to this function would result in same
+          // result
+          std::swap(atom1, atom2);
+        }
+        igraph_cattribute_VAN_set(
+          &this->graph, "type", vertexId, this->slipLinkType);
+        igraph_cattribute_VAN_set(
+          &this->graph, "atom_id", vertexId, atom1.getId());
+        igraph_cattribute_VAN_set(
+          &this->graph, "atom_1_id", vertexId, atom1.getId());
+        igraph_cattribute_VAN_set(
+          &this->graph, "atom_2_id", vertexId, atom2.getId());
+        igraph_cattribute_VAN_set(&this->graph, "num_link_swaps", vertexId, 0);
+        Eigen::Vector3d coords = atom1.getCoordinates();
+        Eigen::Vector3d dist = atom2.getCoordinates() - coords;
+        this->universe.getBox().handlePBC(dist);
+        coords += 0.5 * dist;
+        this->setVertexCoordinates(vertexId, coords);
+      }
+
+      /**
+       * @brief Create a new edge in the graph with the specified properties
+       *
+       * @param from
+       * @param to
+       * @param parent
+       * @param partitionFraction
+       * @param boxOffset
+       * @return igraph_integer_t
+       */
+      igraph_integer_t createEdge(igraph_integer_t from,
+                                  igraph_integer_t to,
+                                  long int parent,
+                                  double partitionFraction,
+                                  double contourLength,
+                                  Eigen::Vector3d boxOffset)
+      {
+        // igraph, in undirected graphs, orders the edges from small to large
+        if (from > to) {
+          std::swap(from, to);
+          boxOffset *= -1.;
+        }
+        igraph_integer_t newEdgeId = igraph_ecount(&this->graph);
+        igraph_add_edge(&this->graph, from, to);
+        igraph_integer_t newFrom, newTo;
+        igraph_edge(&this->graph, newEdgeId, &newFrom, &newTo);
+        assert(newFrom == from && newTo == to);
+        igraph_cattribute_EAN_set(
+          &this->graph, "partition_fraction", newEdgeId, partitionFraction);
+        this->setBondBoxOffsetForEdge(newEdgeId, boxOffset);
+        igraph_cattribute_EAN_set(
+          &this->graph, "contour_length", newEdgeId, contourLength);
+        igraph_cattribute_EAN_set(
+          &this->graph, "parent_edge", newEdgeId, parent);
+        return newEdgeId;
+      }
+
+      /**
+       * @brief Set the Bond Box Offset For an edge
+       *
+       * @param edgeId
+       * @param bondBoxOffset
+       */
+      void setBondBoxOffsetForEdge(const igraph_integer_t edgeId,
+                                   const Eigen::Vector3d& bondBoxOffset)
+      {
+        assert(bondBoxOffset.array().isFinite().all());
+        igraph_cattribute_EAN_set(
+          &this->graph, "bond_box_x", edgeId, bondBoxOffset[0]);
+        igraph_cattribute_EAN_set(
+          &this->graph, "bond_box_y", edgeId, bondBoxOffset[1]);
+        igraph_cattribute_EAN_set(
+          &this->graph, "bond_box_z", edgeId, bondBoxOffset[2]);
+      }
+
+      /**
+       * @brief Copy one specific bond property from one edge to another
+       *
+       * @param name
+       * @param from
+       * @param to
+       */
+      void copyBondProperty(const char* name,
+                            const igraph_integer_t from,
+                            const igraph_integer_t to)
+      {
+        igraph_cattribute_EAN_set(
+          &this->graph,
+          name,
+          to,
+          igraph_cattribute_EAN(&this->graph, name, from));
+      }
+
+      /**
+       * @brief Copy all relevant properties from one edge to another
+       *
+       * @param from source edge id
+       * @param to target edge id
+       */
+      void copyBondProperties(const igraph_integer_t from,
+                              const igraph_integer_t to)
+      {
+        for (std::string property : { "bond_box_x",
+                                      "bond_box_y",
+                                      "bond_box_z",
+                                      "parent_edge",
+                                      "partition_fraction",
+                                      "contour_length" }) {
+          this->copyBondProperty(property.c_str(), from, to);
+        }
+      }
+
+      /**
+       * @brief Copy some relevant properties from one edge to another, but
+       * scaled
+       *
+       * @param from
+       * @param to
+       * @param scaleFactor
+       */
+      void copyScaleBondProperties(const igraph_integer_t from,
+                                   const igraph_integer_t to,
+                                   double scaleFactor = 0.5)
+      {
+        for (std::string property :
+             { "partition_fraction",
+               "local_contour_length" }) { //, "contour_length"
+          igraph_cattribute_EAN_set(
+            &this->graph,
+            property.c_str(),
+            to,
+            igraph_cattribute_EAN(&this->graph, property.c_str(), from) *
+              scaleFactor);
+        }
+      }
+
+      /**
+       * @brief Use an existing chain to set the relevant edge properties
+       *
+       * @param chain
+       * @param atom1Idx
+       * @param atom2Idx
+       * @param edgeId
+       * @param chainIdx
+       */
+      void setBondPropertiesBasedOnChain(
+        const pylimer_tools::entities::Molecule& chain,
+        const size_t atom1Idx,
+        const size_t atom2Idx,
+        const igraph_integer_t edgeId,
+        const size_t chainIdx)
+      {
+        assert(atom1Idx < atom2Idx);
+        if (chain.getType() ==
+            pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
+          assert(APPROX_WITHIN(atom1Idx, 0, chain.getLength() - 1, 1e-2));
+          assert(APPROX_WITHIN(atom2Idx, 1, chain.getLength(), 1e-2));
+        } else {
+          assert(APPROX_WITHIN(atom1Idx, 0, chain.getLength() - 2, 1e-2));
+          assert(APPROX_WITHIN(atom2Idx, 1, chain.getLength() - 1, 1e-2));
+        }
+        igraph_integer_t from, to;
+        igraph_edge(&this->graph, edgeId, &from, &to);
+        std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
+          chain.getAtomsLinedUp(crosslinkerType, false, true);
+        igraph_cattribute_EAN_set(&this->graph,
+                                  "partition_fraction",
+                                  edgeId,
+                                  static_cast<double>(atom2Idx - atom1Idx) /
+                                    static_cast<double>(chain.getNrOfBonds()));
+        igraph_cattribute_EAN_set(
+          &this->graph, "parent_edge", edgeId, chainIdx);
+        igraph_cattribute_EAN_set(
+          &this->graph, "contour_length", edgeId, chain.getNrOfBonds());
+        igraph_cattribute_EAN_set(
+          &this->graph,
+          "local_contour_length",
+          edgeId,
+          chain.getNrOfBondsFromTo(linedUpAtoms[atom1Idx].getId(),
+                                   linedUpAtoms[atom2Idx].getId(),
+                                   crosslinkerType));
+        // use the actual position of the vertices!
+        Eigen::Vector3d expectedDistance =
+          chain.getOverallBondSumFromTo(linedUpAtoms[atom1Idx].getId(),
+                                        linedUpAtoms[atom2Idx].getId(),
+                                        crosslinkerType);
+        Eigen::Vector3d additionalDistance1 =
+          linedUpAtoms[atom1Idx].getCoordinates() -
+          this->getCoordinatesForVertex(from);
+        this->universe.getBox().handlePBC(additionalDistance1);
+        Eigen::Vector3d additionalDistance2 =
+          this->getCoordinatesForVertex(to) -
+          linedUpAtoms[atom2Idx].getCoordinates();
+        this->universe.getBox().handlePBC(additionalDistance2);
+        expectedDistance += additionalDistance1 + additionalDistance2;
+
+        this->setBondBoxOffsetForEdge(edgeId, Eigen::Vector3d::Zero());
+        Eigen::Vector3d actualDistance = this->computeEdgeDistance(edgeId);
+        this->setBondBoxOffsetForEdge(edgeId,
+                                      expectedDistance - actualDistance);
+        assert(this->universe.getBox().isValidOffset(expectedDistance -
+                                                     actualDistance));
+        Eigen::Vector3d newActualDistance = this->computeEdgeDistance(edgeId);
+        assert(newActualDistance.isApprox(expectedDistance));
+      }
+
+      /**
+       * @brief Returns the box offset for a given edge
+       *
+       * CAUTION: make sure the graph is up to date!
+       *
+       * @param edgeId
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d getBondBoxOffsetForEdgeFrom(igraph_integer_t edgeId,
+                                                  igraph_integer_t vertexIdx)
+      {
+        Eigen::Vector3d boxOffset = this->getBondBoxOffsetForEdge(edgeId);
+
+        igraph_integer_t from, to;
+        igraph_edge(&this->graph, edgeId, &from, &to);
+        assert(from == vertexIdx || to == vertexIdx);
+
+        if (from == vertexIdx) {
+          return boxOffset;
+        } else {
+          return -1. * boxOffset;
+        }
+      }
+
+      Eigen::Vector3d getBondBoxOffsetForEdgeTo(igraph_integer_t edgeId,
+                                                igraph_integer_t vertexIdx)
+      {
+        return -1. * this->getBondBoxOffsetForEdgeFrom(edgeId, vertexIdx);
+      }
+
+      /**
+       * @brief Returns the box offset for a given edge
+       *
+       * CAUTION: make sure the graph is up to date!
+       *
+       * @param edgeId
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d getBondBoxOffsetForEdge(igraph_integer_t edgeId)
+      {
+        Eigen::Vector3d bondBoxOffset;
+        bondBoxOffset << igraph_cattribute_EAN(
+          &this->graph, "bond_box_x", edgeId),
+          igraph_cattribute_EAN(&this->graph, "bond_box_y", edgeId),
+          igraph_cattribute_EAN(&this->graph, "bond_box_z", edgeId);
+
+        assert(bondBoxOffset.allFinite());
+        return bondBoxOffset;
+      }
+      /**
+       * @brief Compute the length of an edge based on the graph
+       *
+       * CAUTION: make sure the graph is up to date!
+       *
+       * @param edgeId
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d computeEdgeDistance(igraph_integer_t edgeId)
+      {
+        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
+        igraph_integer_t from, to;
+        igraph_edge(&this->graph, edgeId, &from, &to);
+
+        Eigen::Vector3d dist = this->getCoordinatesForVertex(to) -
+                               this->getCoordinatesForVertex(from) +
+                               this->getBondBoxOffsetForEdge(edgeId);
+        if (this->assumeBoxLargeEnough) {
+          this->universe.getBox().handlePBC(dist);
+        }
+        assert(dist.allFinite());
+        return dist;
+      }
+
+      /**
+       * @brief Shortcut to query the edge's partition fraction
+       *
+       * @param edgeId
+       * @return double
+       */
+      double getEdgeFraction(igraph_integer_t edgeId)
+      {
+        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
+        return igraph_cattribute_EAN(
+          &this->graph, "partition_fraction", edgeId);
+      }
+
+      /**
+       * @brief Shortcut to compute 1/(N*fraction)
+       *
+       * @param edgeId
+       * @param oneOverSpringPartitionUpperLimit
+       * @param isPartialSpring
+       * @return double
+       */
+      double getEdgeDenominator(
+        igraph_integer_t edgeId,
+        const double oneOverSpringPartitionUpperLimit = 1.0,
+        bool isPartialSpring = true)
+      {
+        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
+        const double N =
+          igraph_cattribute_EAN(&this->graph, "contour_length", edgeId);
+        const double fraction = this->getEdgeFraction(edgeId);
+        double denominator = 1. / (fraction * N);
+        if (oneOverSpringPartitionUpperLimit > 0. ||
+            !std::isfinite(denominator)) {
+          denominator = CLAMP_ONE_OVER_SPRINGPARTITION(
+            isPartialSpring, denominator, N, oneOverSpringPartitionUpperLimit);
+        }
+
+        return denominator;
+      }
+
+      /**
+       * @brief Compute the length of an edge based on the graph in a certain
+       * direction
+       *
+       * CAUTION: make sure the graph is up to date!
+       *
+       * @param edgeId
+       * @param vertexId
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d computeEdgeDistanceFrom(igraph_integer_t edgeId,
+                                              igraph_integer_t vertexId)
+      {
+        igraph_integer_t from, to;
+        igraph_edge(&this->graph, edgeId, &from, &to);
+        assert(from == vertexId || to == vertexId);
+
+        Eigen::Vector3d dist = this->computeEdgeDistance(edgeId);
+        return dist * (vertexId == from ? 1. : -1.);
+      }
+
+      /**
+       * @brief Compute the length of an edge based on the graph in a certain
+       * direction
+       *
+       * CAUTION: make sure the graph is up to date!
+       *
+       * @param edgeId
+       * @param vertexId the target vertex id
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d computeEdgeDistanceTo(igraph_integer_t edgeId,
+                                            igraph_integer_t vertexId)
+      {
+        return -1. * this->computeEdgeDistanceFrom(edgeId, vertexId);
+      }
+
+      /**
+       * @brief Compute the length of an edge based on the graph
+       *
+       * CAUTION: make sure the graph is up to date!
+       * Also, this function is O(|E|), since all edges are iterated to check
+       * their parent edge id.
+       *
+       * @param parentEdgeId
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d computeParentEdgeLength(size_t parentEdgeId)
+      {
+        Eigen::Vector3d dist = Eigen::Vector3d::Zero();
+
+        igraph_vector_t parentEdges;
+        igraph_vector_init(&parentEdges, this->net.nrOfPartialSprings);
+        igraph_cattribute_EANV(&this->graph,
+                               "parent_edge",
+                               igraph_ess_all(IGRAPH_EDGEORDER_ID),
+                               &parentEdges);
+
+        std::vector<size_t> edgeIdsToRemove;
+        edgeIdsToRemove.reserve(4);
+        for (igraph_integer_t i = 0; i < igraph_vector_size(&parentEdges);
+             ++i) {
+          if (igraph_vector_get(&parentEdges, i) == parentEdgeId) {
+            dist += this->computeEdgeDistance(i);
+          }
+        }
+
+        igraph_vector_destroy(&parentEdges);
+
+        return dist;
+      }
+
+      /**
+       * @brief Remove a spring (and all its parts, incl. slip-links) from the
+       * structures
+       *
+       * NOTE: this may result in slip-links with f = 2.
+       * They are not automatically removed in order to preserve vertex
+       * iterations.
+       *
+       * @param net
+       * @param springPartitions
+       */
+      void removeParentSpring(const size_t springIdx);
+
+      /**
+       * @brief Remove a set of edges from the graph
+       *
+       * @param edgeIdsToRemove
+       */
+      void removePartialSprings(std::vector<igraph_integer_t>& edgeIdsToRemove);
+
+      /**
+       * @brief marks a certain "parent" spring as non-existing
+       */
+      void combineParentSprings(size_t springIdxBefore,
+                                size_t springIdxNow,
+                                double contourLengthBefore = -1.);
+
+      /**
+       * @brief When springs have been removed, it is possible that the
+       * numbering is not sequential anymore. This function fixes that.
+       *
+       */
+      void renumberParentSprings();
+
+      /**
+       * @brief When spring has been removed, it is possible that the
+       * sum of the partitions don't add up to one anymore. This function fixes
+       * that.
+       *
+       */
+      void renormalizePartitions();
+
+      /**
+       * @brief Combine two partial springs to be only one
+       *
+       * @param edge1Id
+       * @param edge2Id
+       */
+      void combinePartialSprings(const igraph_integer_t edge1Id,
+                                 const igraph_integer_t edge2Id,
+                                 const igraph_integer_t centralLink);
+
+      /**
+       * @brief Remove a slip-link and combine the two edges corresponding to
+       * the rail
+       *
+       * @param vertexId
+       * @param railEdgeId
+       */
+      void unlinkSlipLinkFromRail(const igraph_integer_t vertexId,
+                                  const igraph_integer_t railEdgeId);
+
+      /**
+       * @brief Inserts the given slip-link into a partial spring
+       *
+       * @param vertexId the slip-link to insert into the spring
+       * @param railEdgeId the spring to be halfed
+       */
+      void insertSlipLinkIntoRail(const igraph_integer_t vertexId,
+                                  const igraph_integer_t railEdgeId);
+
+      /**
+       * @brief Move a slip-link from one rail to another
+       *
+       * @param vertexId the slip-link to remove from one and insert into
+       * another spring
+       * @param sourceRailEdgeId the spring to be twiced
+       * @param targetRailEdgeId the spring to be halfed
+       */
+      void moveSlipLinkFromRailToRail(const igraph_integer_t vertexId,
+                                      const igraph_integer_t sourceRailEdgeId,
+                                      const igraph_integer_t targetRailEdgeId);
+
+      /**
+       * @brief List the edges and vertices of one spring, in order
+       *
+       * @param springIdx
+       * @param vertices
+       * @param edges
+       */
+      void findEdgesAndVerticesOfSpring(size_t springIdx,
+                                        igraph_vector_int_t* vertices,
+                                        igraph_vector_int_t* edges);
+      /**
+       * @brief List the edges and vertices of one spring, in order
+       *
+       * @param unorderedEdges
+       * @param vertices
+       * @param edges
+       */
+      void findEdgesAndVerticesOfSpring(igraph_vector_int_t* unorderedEdges,
+                                        igraph_vector_int_t* vertices,
+                                        igraph_vector_int_t* edges);
+
+      /**
+       * @brief Find the index of a partial spring, given the fractn of the
+       * total spring to traverse
+       *
+       * @param springIdx
+       * @param alpha
+       * @return igraph_integer_t
+       */
+      igraph_integer_t findPartialSpringByFraction(size_t springIdx,
+                                                   double alpha,
+                                                   double& fractionTillThere);
+
+      /**
+       * @brief Remove a certain, 2-functional link from the structures,
+       * combining the two strands
+       */
+      void remove2fLink(const size_t linkIdx);
+
+      /**
+       * @brief Remove a certain, 3-functional link from the structures,
+       * combining the two strands
+       */
+      void remove3fLink(const size_t linkIdx);
+
+      /**
+       * @brief Remove a certain link from the structures, removing all
+       * connections
+       */
+      void removeLink(const size_t linkIdx);
+
+      igraph_integer_t getOtherEdgePartner(
+        igraph_integer_t edgeId,
+        igraph_integer_t wrongPartnerVertexIdx)
+      {
+        igraph_integer_t from, to;
+        igraph_edge(&this->graph, edgeId, &from, &to);
+        return (from == wrongPartnerVertexIdx) ? to : from;
+      }
+
+      /**
+       * @brief Given a vertex id and a rail edge, returns the other two edges
+       * that are not part of the rail
+       */
+      std::vector<igraph_integer_t> getOffRailConnectedEdgeIds(
+        igraph_integer_t vertexId,
+        igraph_integer_t railEdgeId);
+
+      /**
+       * @brief Given a vertex and a connected edge, returns the edge in the
+       * opposite direction
+       *
+       */
+      igraph_integer_t getOtherRailEdgeId(igraph_integer_t vertexId,
+                                          igraph_integer_t railEdgeId);
+
       void addSlipLinks(const std::vector<size_t>& strandIdx1,
                         const std::vector<size_t>& strandIdx2,
                         const std::vector<double>& x,
@@ -2832,6 +2508,18 @@ namespace calc {
           strandIdx1, strandIdx2, x, y, z, alphas, alphas);
       }
 
+      /**
+       * @brief Concretely add new slip-links
+       *
+       * @param strandIdx1
+       * @param strandIdx2
+       * @param x
+       * @param y
+       * @param z
+       * @param alpha1
+       * @param alpha2
+       * @param clampAlpha
+       */
       void addSlipLinks(const std::vector<size_t>& strandIdx1,
                         const std::vector<size_t>& strandIdx2,
                         const std::vector<double>& x,
