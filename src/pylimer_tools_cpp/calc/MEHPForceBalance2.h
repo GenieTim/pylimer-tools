@@ -1161,7 +1161,7 @@ namespace calc {
       /**
        * @brief marks a certain "parent" spring as non-existing
        */
-      void combineParentSprings(size_t springIdxBefore, size_t springIdxNow);
+      void combineParentSprings(size_t springIdxBefore, size_t springIdxNow, double contourLengthBefore = -1.);
 
       /**
        * @brief When springs have been removed, it is possible that the
@@ -1859,26 +1859,43 @@ namespace calc {
 
       void debugParentEdge(const size_t parentEdgeId)
       {
-        // igraph_vector_t parentEdges;
-        // igraph_vector_init(&parentEdges, this->net.nrOfPartialSprings);
-        // igraph_cattribute_EANV(&this->graph,
-        //                        "parent_edge",
-        //                        igraph_ess_all(IGRAPH_EDGEORDER_ID),
-        //                        &parentEdges);
+        igraph_vector_t parentEdges;
+        igraph_vector_init(&parentEdges, 0);
+        igraph_cattribute_EANV(&this->graph,
+                               "parent_edge",
+                               igraph_ess_all(IGRAPH_EDGEORDER_ID),
+                               &parentEdges);
+        igraph_vector_t partitionFraction;
+        igraph_vector_init(&partitionFraction, 0);
+        igraph_cattribute_EANV(&this->graph,
+                               "partition_fraction",
+                               igraph_ess_all(IGRAPH_EDGEORDER_ID),
+                               &partitionFraction);
+        igraph_vector_t contourLengths;
+        igraph_vector_init(&contourLengths, 0);
+        igraph_cattribute_EANV(&this->graph,
+                               "contour_length",
+                               igraph_ess_all(IGRAPH_EDGEORDER_ID),
+                               &contourLengths);
 
-        // std::cout << "Debugging edge " << parentEdgeId << std::endl;
-        // for (igraph_integer_t i = 0; i < igraph_vector_size(&parentEdges);
-        //      ++i) {
-        //   if (castToIgraphInt(igraph_vector_get(&parentEdges, i)) ==
-        //       parentEdgeId) {
-        //     igraph_integer_t from, to;
-        //     igraph_edge(&this->graph, i, &from, &to);
-        //     std::cout << i << ":\t" << from << "\t" << to << std::endl;
-        //   }
-        // }
-        // std::cout << "That's all." << std::endl;
+        std::cout << "Debugging edge " << parentEdgeId << std::endl;
+        for (igraph_integer_t i = 0; i < igraph_vector_size(&parentEdges);
+             ++i) {
+          if (castToIgraphInt(igraph_vector_get(&parentEdges, i)) ==
+              parentEdgeId) {
+            igraph_integer_t from, to;
+            igraph_edge(&this->graph, i, &from, &to);
+            std::cout << i << "(" << igraph_vector_get(&contourLengths, i)
+                      << "):\t" << from << "\t" << to << "\t("
+                      << igraph_vector_get(&partitionFraction, i) << ")"
+                      << std::endl;
+          }
+        }
+        std::cout << "That's all." << std::endl;
 
-        // igraph_vector_destroy(&parentEdges);
+        igraph_vector_destroy(&parentEdges);
+        igraph_vector_destroy(&partitionFraction);
+        igraph_vector_destroy(&contourLengths);
       }
 
       bool validateIgraphSprings()
@@ -1907,6 +1924,7 @@ namespace calc {
 
       bool validateIgraphSpring(const size_t parentEdgeId)
       {
+        this->debugParentEdge(parentEdgeId);
         igraph_vector_t parentEdges;
         igraph_vector_init(&parentEdges, this->net.nrOfPartialSprings);
         igraph_cattribute_EANV(&this->graph,
@@ -1951,7 +1969,6 @@ namespace calc {
         igraph_empty(&subgraph, 0, IGRAPH_UNDIRECTED);
         igraph_subgraph_from_edges(
           &this->graph, &subgraph, igraph_ess_vector(&edgesOnPath), false);
-        this->debugParentEdge(parentEdgeId);
 
         igraph_vector_int_t verticesOnPath;
         igraph_vector_int_init(&verticesOnPath, 0);

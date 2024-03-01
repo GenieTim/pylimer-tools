@@ -989,13 +989,18 @@ namespace calc {
         igraph_cattribute_EAN(&this->graph, "contour_length", edge1Id),
         this->getBondBoxOffsetForEdgeFrom(edge2Id, centralLink) +
           this->getBondBoxOffsetForEdgeTo(edge1Id, centralLink));
-
-      std::cout << "Combining " << edge1Id << " with " << edge2Id << " to "
+#ifndef NDEBUG
+      std::cout << "Combining " << edge1Id << " (parent " << parent1
+                << ") with " << edge2Id << " (" << parent2 << ") to "
                 << newEdgeId << std::endl;
+#endif
 
       if (parent1 == parent2) {
         this->debugParentEdge(parent1);
       }
+
+      // need this iff edge2 is the last remaining of its parent
+      double contourLengthBefore = igraph_cattribute_EAN(&this->graph, "contour_length", edge2Id);
 
       // delete the old edges – order matters!
       igraph_delete_edges(&this->graph, igraph_ess_1(edge2Id));
@@ -1005,11 +1010,10 @@ namespace calc {
       if (parent1 != parent2) {
         std::cout << "Merging " << parent1 << " & " << parent2 << std::endl;
         assert(castToIgraphInt(igraph_cattribute_VAN(
-                 &this->graph, "type", centralLink)) ==
-                 this->crosslinkerType);
+                 &this->graph, "type", centralLink)) == this->crosslinkerType);
         // two different "parent" springs -> need to recalculate some stuff
         // probably only if link is cross-link
-        this->combineParentSprings(parent1, parent2);
+        this->combineParentSprings(parent1, parent2, contourLengthBefore);
       }
 
 #ifndef NDEBUG
@@ -1300,7 +1304,8 @@ namespace calc {
      * @brief marks a certain "parent" spring as non-existing
      */
     void MEHPForceBalance2::combineParentSprings(size_t springIdxBefore,
-                                                 size_t springIdxNow)
+                                                 size_t springIdxNow,
+                                                 double contourLengthBefore)
     {
       if (springIdxBefore == springIdxNow) {
         throw std::invalid_argument(
@@ -1310,6 +1315,11 @@ namespace calc {
         std::swap(springIdxBefore, springIdxNow);
       }
       assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
+
+#ifndef NDEBUG
+      std::cout << "Combining parent " << springIdxBefore << " into "
+                << springIdxNow << std::endl;
+#endif
 
       igraph_vector_t parentEdges;
       igraph_vector_init(&parentEdges, this->net.nrOfPartialSprings);
@@ -1348,13 +1358,22 @@ namespace calc {
           springPartitionNow += igraph_vector_get(&partitionFraction, i);
         }
       }
+      assert(springContourLengthNow > 0);
+      bool otherEndExist = true;
+      if (springContourLengthBefore < 0.) {
+        otherEndExist = false;
+        assert(contourLengthBefore > 0.);
+        springContourLengthBefore = contourLengthBefore;
+      }
+      assert(springContourLengthBefore > 0);
       double springContourLengthNew =
         springContourLengthNow + springContourLengthBefore;
       double scalingFactorRemoved =
         (springContourLengthBefore) /
         (springContourLengthNew * springParitionBefore);
-      double scalingFactorNow = (springContourLengthNow) /
-                                (springContourLengthNew * springPartitionNow);
+      double scalingFactorNow = otherEndExist ? ((springContourLengthNow) /
+                                (springContourLengthNew * springPartitionNow)) : (1. / springPartitionNow);
+
 
       for (size_t i = 0; i < igraph_vector_size(&parentEdges); ++i) {
         // update the new value of the parent edge
@@ -1465,7 +1484,7 @@ namespace calc {
 
     /**
      * @brief remove all vertices that don't have any connections
-     * 
+     *
      * @return size_t the nr of vertices removed
      */
     size_t MEHPForceBalance2::removeOrphanedVertices()
@@ -1552,8 +1571,8 @@ namespace calc {
                 << std::endl;
       size_t primaryLoopsRemovedInIteration = 0;
       do {
+        this->removeDanglingChains();
         numRemovedInIteration = this->removeOrphanedVertices();
-        numRemovedInIteration += this->removeDanglingChains();
 
 #ifndef NDEBUG
         this->validateIgraphSprings();
