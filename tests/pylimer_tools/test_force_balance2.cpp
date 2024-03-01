@@ -6,6 +6,7 @@
 #include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <chrono>
 #include <cmath>
 #include <filesystem>
@@ -900,7 +901,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
   }
 }
 
-TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
+TEST_CASE("MEHP Force Balance 2 can randomly add and remove slip-links",
           "[analysis][MEHPForceBalance2]")
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
@@ -921,17 +922,18 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
         universe, 1000, 2.0, 100, 2.0, 23);
     size_t nrOfAddedLinks = forceBalancer.getNumExtraAtoms();
     CHECK(nrOfAddedLinks >= 100);
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
     // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
 
-    pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
     Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
     size_t numRemoved = forceBalancer.removeTwofunctionalLinks();
-    CHECK_NOTHROW(forceBalancer.validateNetwork());
     CHECK(numRemoved > 0);
+    CHECK_NOTHROW(forceBalancer.synchronise());
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
 
     // run a while to get inactive links
     forceBalancer.runForceRelaxation(pcm::BalanceRunMode::ITERATIVE, 1.0, 100);
-    net = forceBalancer.getNetwork();
+    pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
     partitions = forceBalancer.getSpringPartitions();
     // due to the randomness, it _could_ be one day that actually all strands
     // are active. unlikely, but I can imagine it to be possible.
@@ -1337,10 +1339,90 @@ TEST_CASE("MEHP Force Balance 2 Free chains collapse",
     }
   }
 
-  size_t verticesToRemove = forceBalancer.getNrOfNodes();
-  CHECK(forceBalancer.removeSubfunctionalVertices() == verticesToRemove);
-  CHECK_NOTHROW(forceBalancer.validateNetwork());
+  SECTION("Total Removal Works")
+  {
+    size_t verticesToRemove = forceBalancer.getNrOfNodes();
+    CHECK(forceBalancer.removeSubfunctionalVertices() == verticesToRemove);
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
+  }
+
+  SECTION("Partial Removal Works")
+  {
+    size_t verticesToRemove = forceBalancer.getNrOfNodes() - 2;
+    CHECK(forceBalancer.removeTwofunctionalLinks() == verticesToRemove);
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
+  }
 }
+
+TEST_CASE("MEHP Force Balance 2 does not collapse",
+          "[analysis][MEHPForceBalance2]")
+{
+  pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+  /**
+   * @brief A grid of two rows, each one bead between the two cross-links
+   *
+   */
+  universe.addAtoms(
+    { { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 } },
+    { { 2, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1 } },
+    { { 0.,
+        2.5,
+        5,
+        7.5,
+        0.1,
+        2.5,
+        5,
+        7.5,
+        -0.1,
+        5.,
+        0.,
+        5. } }, // x with slight (0.1) deviation, so we don't start perfect
+    { { 0.1, 0., -0.1, 0., 5., 5., 5., 5., 2.5, 2.5, 7.5, 7.5 } }, // y
+    { { 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0. } },        // z
+    { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } });
+  universe.addBonds(
+    { { 1, 1, 1, 1, 3, 3, 3, 3, 5, 5, 5, 5, 7, 7, 7, 7 } },
+    { { 2, 9, 4, 11, 2, 4, 10, 12, 9, 11, 6, 8, 6, 8, 10, 12 } });
+
+  SECTION("Running conventional MEHP")
+  {
+    pcm::MEHPForceBalance2 forceRelaxerConventional =
+      pcm::MEHPForceBalance2::constructWithoutSlipLinks(universe, 2, true);
+    forceRelaxerConventional.configAssumeBoxLargeEnough(true);
+    REQUIRE_NOTHROW(forceRelaxerConventional.runForceRelaxation());
+    REQUIRE(forceRelaxerConventional.getNrOfIterations() > 0);
+    CHECK(forceRelaxerConventional.getExitReason() ==
+          pcm::ExitReason::X_TOLERANCE);
+    CHECK(forceRelaxerConventional.getNrOfActiveSprings() ==
+          forceRelaxerConventional.getNrOfSprings());
+    // compare to what we expect
+    CHECK(forceRelaxerConventional.getNrOfActiveSprings() == 8);
+    CHECK(forceRelaxerConventional.getNrOfActiveNodes() == 4);
+    // CHECK(forceRelaxerConventional.getAverageSpringLength() ==
+    // Catch::Approx(5.)); CHECK_THAT(forceRelaxerConventional.getGammaFactor(),
+    //            Catch::Matchers::WithinAbs(1.0, 1e-3));
+  }
+  SECTION("Running new MEHP")
+  {
+    pcm::MEHPForceBalance2 forceRelaxerNew =
+      pcm::MEHPForceBalance2::constructWithoutSlipLinks(universe, 2, true);
+    forceRelaxerNew.configAssumeBoxLargeEnough(false);
+    REQUIRE_NOTHROW(forceRelaxerNew.runForceRelaxation());
+    REQUIRE(forceRelaxerNew.getNrOfIterations() > 0);
+    CHECK(forceRelaxerNew.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+    CHECK(forceRelaxerNew.getNrOfActiveSprings() ==
+          forceRelaxerNew.getNrOfSprings());
+
+    // compare to what we expect
+    CHECK(forceRelaxerNew.getNrOfActiveSprings() == 8);
+    CHECK(forceRelaxerNew.getNrOfActiveNodes() == 4);
+    CHECK(forceRelaxerNew.getAverageSpringLength() == Catch::Approx(5.0));
+    CHECK_THAT(forceRelaxerNew.getGammaFactor(),
+               Catch::Matchers::WithinAbs(1.0, 1e-2));
+  }
+};
 
 TEST_CASE("MEHP Force Balance 2 Fully active chains are fully active",
           "[analysis][MEHPForceBalance2]")
@@ -1362,6 +1444,7 @@ TEST_CASE("MEHP Force Balance 2 Fully active chains are fully active",
       pe::Universe universe = universeSeq.atIndex(0);
       std::cout << "Read file " << inputFile << std::endl;
 
+      // validate that this is indeed an infinite structure
       std::vector<pe::Molecule> molecules =
         universe.getChainsWithCrosslinker(2);
       for (pe::Molecule mol : molecules) {

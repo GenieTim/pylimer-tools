@@ -366,13 +366,13 @@ namespace entities {
    * @param crosslinkerType
    * @return Eigen::Vector3d
    */
-  Eigen::Vector3d Molecule::getOverallBondSumFromTo(
-    size_t atomIdFrom,
-    size_t atomIdTo,
-    const int crosslinkerType) const
+  Eigen::Vector3d Molecule::getOverallBondSumFromTo(size_t atomIdFrom,
+                                                    size_t atomIdTo,
+                                                    const int crosslinkerType,
+                                                    bool requireOrder) const
   {
     std::vector<long int> alignedVertices =
-      this->getVerticesLinedUp(crosslinkerType);
+      this->getVerticesLinedUp(crosslinkerType, true);
     Eigen::VectorXd alignedCoordinates =
       Eigen::VectorXd::Zero(3 * alignedVertices.size());
     this->getAssumedVertexCoordinates(
@@ -388,27 +388,28 @@ namespace entities {
         this->parent->handlePBC(distance);
         result += distance;
 
-        if (alignedVertices[i] == vertexIdFrom ||
+        if ((alignedVertices[i] == vertexIdFrom && !requireOrder) ||
             alignedVertices[i] == vertexIdTo) {
           return result;
         }
       }
 
       if (alignedVertices[i] == vertexIdFrom ||
-          alignedVertices[i] == vertexIdTo) {
+          (alignedVertices[i] == vertexIdTo && !requireOrder)) {
         recording = true;
       }
     }
     throw std::runtime_error(
-      "apparently, did not find both vertices to compute overall bond sum for");
+      "Did not find both vertices to compute overall bond sum for");
   };
 
   size_t Molecule::getNrOfBondsFromTo(size_t atomIdFrom,
                                       size_t atomIdTo,
-                                      const int crosslinkerType) const
+                                      const int crosslinkerType,
+                                      bool requireOrder) const
   {
     std::vector<long int> alignedVertices =
-      this->getVerticesLinedUp(crosslinkerType);
+      this->getVerticesLinedUp(crosslinkerType, true);
     size_t vertexIdFrom = this->atomIdToVertexIdx.at(atomIdFrom);
     size_t vertexIdTo = this->atomIdToVertexIdx.at(atomIdTo);
     bool recording = false;
@@ -417,20 +418,20 @@ namespace entities {
       if (recording) {
         result += 1;
 
-        if (alignedVertices[i] == vertexIdFrom ||
+        if ((alignedVertices[i] == vertexIdFrom && !requireOrder) ||
             alignedVertices[i] == vertexIdTo) {
           return result;
         }
       }
 
       if (alignedVertices[i] == vertexIdFrom ||
-          alignedVertices[i] == vertexIdTo) {
+          (alignedVertices[i] == vertexIdTo && !requireOrder)) {
         recording = true;
       }
     }
     throw std::runtime_error(
-      "apparently, did not find both vertices (" + std::to_string(atomIdTo) +
-      " & " + std::to_string(atomIdFrom) + ") to count atoms between");
+      "Did not find both vertices (" + std::to_string(atomIdTo) + " & " +
+      std::to_string(atomIdFrom) + ") to count atoms between");
   }
 
   /**
@@ -446,6 +447,14 @@ namespace entities {
     std::vector<long int> results;
     size_t nrOfAtoms = this->getNrOfAtoms();
     results.reserve(nrOfAtoms);
+
+    if (nrOfAtoms == 1) {
+      results.push_back(0);
+      return results;
+    }
+    if (nrOfAtoms == 0) {
+      return results;
+    }
 
     long int vertexIdToStartWith = 0;
     std::vector<long int> ends = this->getVerticesWithDegree(1);

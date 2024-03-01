@@ -400,7 +400,8 @@ namespace calc {
             endAtomIdToVertexId.at(lastAtom.getId()),
             lastAtom,
             fb.crosslinkerType);
-          assert(linedUpAtoms.size() == chain.getLength() || linedUpAtoms.size() == chain.getLength()+1);
+          assert(linedUpAtoms.size() == chain.getLength() ||
+                 linedUpAtoms.size() == chain.getLength() + 1);
           if (pairsOfAtoms.size() > 0) {
             for (size_t i = 1; i < linedUpAtoms.size() - 1; i++) {
               pylimer_tools::entities::Atom a = linedUpAtoms[i];
@@ -434,7 +435,7 @@ namespace calc {
                           endAtomIdToVertexId.at(lastAtom.getId()));
           fb.setBondPropertiesBasedOnChain(chain,
                                            previousIdx,
-                                           chain.getLength() - 1,
+                                           linedUpAtoms.size() - 1,
                                            currentEdgeId,
                                            parentEdgeId);
           fb.validateIgraphSpring(parentEdgeId);
@@ -795,17 +796,23 @@ namespace calc {
         const size_t chainIdx)
       {
         assert(atom1Idx < atom2Idx);
-        assert(APPROX_WITHIN(atom1Idx, 0, chain.getLength() - 2, 1e-2));
-        assert(APPROX_WITHIN(atom2Idx, 1, chain.getLength() - 1, 1e-2));
+        if (chain.getType() ==
+            pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
+          assert(APPROX_WITHIN(atom1Idx, 0, chain.getLength() - 1, 1e-2));
+          assert(APPROX_WITHIN(atom2Idx, 1, chain.getLength(), 1e-2));
+        } else {
+          assert(APPROX_WITHIN(atom1Idx, 0, chain.getLength() - 2, 1e-2));
+          assert(APPROX_WITHIN(atom2Idx, 1, chain.getLength() - 1, 1e-2));
+        }
         igraph_integer_t from, to;
         igraph_edge(&this->graph, edgeId, &from, &to);
         std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
-          chain.getAtomsLinedUp(crosslinkerType, true, true);
+          chain.getAtomsLinedUp(crosslinkerType, false, true);
         igraph_cattribute_EAN_set(&this->graph,
                                   "partition_fraction",
                                   edgeId,
                                   static_cast<double>(atom2Idx - atom1Idx) /
-                                    static_cast<double>(chain.getLength() - 1));
+                                    static_cast<double>(chain.getNrOfBonds()));
         igraph_cattribute_EAN_set(
           &this->graph, "parent_edge", edgeId, chainIdx);
         igraph_cattribute_EAN_set(
@@ -1059,6 +1066,16 @@ namespace calc {
       size_t removeFreeChains();
 
       /**
+       * @brief Remove chains with links with f = 1.
+       *
+       * NOTE: this function may result in even more chains with links with f
+       * = 1.
+       *
+       * @return size_t
+       */
+      size_t removeDanglingChains();
+
+      /**
        * @brief Remove cross-links which do not have any springs with a certain
        * minimum length
        *
@@ -1109,6 +1126,9 @@ namespace calc {
         this->removePartialSprings(edgesToRemove);
         if (edgesToRemove.size() > 0) {
           this->renumberParentSprings();
+          // since we remove partial springs without adjusting any partitions,
+          // we need to do that now
+          this->renormalizePartitions();
         }
         return edgesToRemove.size();
       };
@@ -1116,7 +1136,7 @@ namespace calc {
       /**
        * @brief remove all vertices that don't have any connections
        */
-      void removeOrphanedVertices();
+      size_t removeOrphanedVertices();
 
       /**
        * @brief Remove a spring (and all its parts, incl. slip-links) from the
@@ -1151,13 +1171,22 @@ namespace calc {
       void renumberParentSprings();
 
       /**
+       * @brief When spring has been removed, it is possible that the
+       * sum of the partitions don't add up to one anymore. This function fixes
+       * that.
+       *
+       */
+      void renormalizePartitions();
+
+      /**
        * @brief Combine two partial springs to be only one
        *
        * @param edge1Id
        * @param edge2Id
        */
       void combinePartialSprings(const igraph_integer_t edge1Id,
-                                 const igraph_integer_t edge2Id);
+                                 const igraph_integer_t edge2Id,
+                                 const igraph_integer_t centralLink);
 
       /**
        * @brief Remove a slip-link and combine the two edges corresponding to
@@ -1310,9 +1339,11 @@ namespace calc {
         assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
 
         size_t numRemoved = 0;
-        for (long int i = igraph_vcount(&this->graph); i >= 0; --i) {
+        long int vcount = igraph_vcount(&this->graph);
+        for (long int i = vcount - 1; i >= 0; --i) {
           igraph_integer_t degree;
-          igraph_degree_1(&this->graph, &degree, i, IGRAPH_ALL, false);
+          // count self-loops; they should be removed in another way
+          igraph_degree_1(&this->graph, &degree, i, IGRAPH_ALL, true);
           if (degree == 2) {
             // remove this link
             numRemoved += 1;
@@ -1381,7 +1412,7 @@ namespace calc {
       }
 
       int getNrOfSprings() const { return this->net.nrOfSprings; }
-      
+
       int getNrOfPartialSprings() const
       {
         return this->getNetwork().nrOfPartialSprings;
@@ -1431,8 +1462,6 @@ namespace calc {
 
       void configAssumeBoxLargeEnough(bool assumption)
       {
-        throw std::invalid_argument(
-          "Assumption of a large enough box is not supported yet");
         this->assumeBoxLargeEnough = assumption;
       }
 
@@ -1617,10 +1646,10 @@ namespace calc {
        */
       int getNrOfActiveSprings(double tolerance = 0.01) const
       {
+        assert(this->net.isUpToDate);
         ArrayXb result = ArrayXb::Constant(
           this->currentPartialSpringDistances.size() / 3, false);
-        for (size_t i = 0; i < this->currentPartialSpringDistances.size() / 3;
-             ++i) {
+        for (size_t i = 0; i < this->net.nrOfPartialSprings; ++i) {
           size_t springIdx = this->net.partialToFullSpringIndex[i];
           result[springIdx] =
             result[springIdx] ||
@@ -1828,6 +1857,54 @@ namespace calc {
       bool validateNetwork(const ForceBalanceNetwork& net,
                            const Eigen::VectorXd& springPartitions) const;
 
+      void debugParentEdge(const size_t parentEdgeId)
+      {
+        // igraph_vector_t parentEdges;
+        // igraph_vector_init(&parentEdges, this->net.nrOfPartialSprings);
+        // igraph_cattribute_EANV(&this->graph,
+        //                        "parent_edge",
+        //                        igraph_ess_all(IGRAPH_EDGEORDER_ID),
+        //                        &parentEdges);
+
+        // std::cout << "Debugging edge " << parentEdgeId << std::endl;
+        // for (igraph_integer_t i = 0; i < igraph_vector_size(&parentEdges);
+        //      ++i) {
+        //   if (castToIgraphInt(igraph_vector_get(&parentEdges, i)) ==
+        //       parentEdgeId) {
+        //     igraph_integer_t from, to;
+        //     igraph_edge(&this->graph, i, &from, &to);
+        //     std::cout << i << ":\t" << from << "\t" << to << std::endl;
+        //   }
+        // }
+        // std::cout << "That's all." << std::endl;
+
+        // igraph_vector_destroy(&parentEdges);
+      }
+
+      bool validateIgraphSprings()
+      {
+        igraph_vector_t parentEdges;
+        igraph_vector_init(&parentEdges, this->net.nrOfPartialSprings);
+        igraph_cattribute_EANV(&this->graph,
+                               "parent_edge",
+                               igraph_ess_all(IGRAPH_EDGEORDER_ID),
+                               &parentEdges);
+
+        std::unordered_set<igraph_integer_t> visitedSprings;
+
+        for (size_t i = 0; i < igraph_ecount(&this->graph); i++) {
+          igraph_integer_t spring =
+            castToIgraphInt(igraph_vector_get(&parentEdges, i));
+          if (!visitedSprings.contains(spring)) {
+            this->validateIgraphSpring(spring);
+            visitedSprings.insert(spring);
+          }
+        }
+
+        igraph_vector_destroy(&parentEdges);
+        return true;
+      }
+
       bool validateIgraphSpring(const size_t parentEdgeId)
       {
         igraph_vector_t parentEdges;
@@ -1839,10 +1916,13 @@ namespace calc {
 
         double partitionSum = 0.;
         std::string partialSpringString = "";
+        igraph_vector_int_t edgesOnPath;
+        igraph_vector_int_init(&edgesOnPath, 0);
         for (igraph_integer_t i = 0; i < igraph_vector_size(&parentEdges);
              ++i) {
           if (castToIgraphInt(igraph_vector_get(&parentEdges, i)) ==
               parentEdgeId) {
+            igraph_vector_int_push_back(&edgesOnPath, i);
             double thisPartition =
               igraph_cattribute_EAN(&this->graph, "partition_fraction", i);
             partitionSum += thisPartition;
@@ -1865,6 +1945,40 @@ namespace calc {
               std::to_string(parentEdgeId) +
               ". Partial Springs are: " + partialSpringString + ".");
         }
+
+        // validate that we can make one chain
+        igraph_t subgraph;
+        igraph_empty(&subgraph, 0, IGRAPH_UNDIRECTED);
+        igraph_subgraph_from_edges(
+          &this->graph, &subgraph, igraph_ess_vector(&edgesOnPath), false);
+        this->debugParentEdge(parentEdgeId);
+
+        igraph_vector_int_t verticesOnPath;
+        igraph_vector_int_init(&verticesOnPath, 0);
+        if (igraph_eulerian_path(&subgraph, &edgesOnPath, &verticesOnPath)) {
+          throw std::runtime_error(
+            "Failed to find simple path for the spring " +
+            std::to_string(parentEdgeId));
+        }
+        if (castToIgraphInt(igraph_cattribute_VAN(
+              &subgraph, "type", igraph_vector_int_get(&verticesOnPath, 0))) !=
+            this->crosslinkerType) {
+          throw std::runtime_error("Parent edge " +
+                                   std::to_string(parentEdgeId) +
+                                   " does not start with a cross-link");
+        }
+        if (castToIgraphInt(igraph_cattribute_VAN(
+              &subgraph,
+              "type",
+              igraph_vector_int_get(&verticesOnPath,
+                                    igraph_vector_int_size(&verticesOnPath) -
+                                      1))) != this->crosslinkerType) {
+          throw std::runtime_error("Parent edge " +
+                                   std::to_string(parentEdgeId) +
+                                   " does not end with a cross-link");
+        }
+        igraph_vector_int_destroy(&edgesOnPath);
+        igraph_destroy(&subgraph);
 
         igraph_vector_destroy(&parentEdges);
         return true;
@@ -2743,12 +2857,6 @@ namespace calc {
       {
         igraph_cattribute_GAB_set(&this->graph, "is_up_to_date", true);
         this->convertFromGraph();
-        this->currentSpringDistances =
-          this->evaluateSpringDistances(this->net, this->is2D);
-        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
-        this->currentPartialSpringDistances =
-          this->evaluatePartialSpringDistances(this->net, this->is2D);
-        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
         this->defaultR0Squared =
           this->universe.computeMeanSquareEndToEndDistance(
             this->crosslinkerType);
@@ -2767,9 +2875,7 @@ namespace calc {
        */
       void convertFromGraph()
       {
-        if (!igraph_cattribute_GAB(&this->graph, "is_up_to_date")) {
-          this->updateGraph();
-        }
+        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
 
         this->net.isUpToDate = false;
         this->net.nrOfPartialSprings = igraph_ecount(&this->graph);
@@ -3040,6 +3146,14 @@ namespace calc {
 
         // mark as done
         this->net.isUpToDate = true;
+
+        // compute other local properties
+        this->currentSpringDistances =
+          this->evaluateSpringDistances(this->net, this->is2D);
+        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
+        this->currentPartialSpringDistances =
+          this->evaluatePartialSpringDistances(this->net, this->is2D);
+        assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
       };
 
       /**
