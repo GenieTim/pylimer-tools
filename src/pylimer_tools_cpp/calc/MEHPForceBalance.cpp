@@ -314,9 +314,9 @@ namespace calc {
         if (outputFrequency > 0 && iterationsDone % outputFrequency == 0) {
           this->handleOutput(iterationsDone);
         }
-      } while (currentResidual / initialResidual > xtol &&
-               iterationsDone < maxNrOfSteps &&
-               this->initialConfig.nrOfSprings > 0);
+      } while (
+        currentResidual / initialResidual > xtol &&
+        iterationsDone<maxNrOfSteps&& this->initialConfig.nrOfSprings> 0);
 
       // query solution & exit reason
       this->exitReason = (iterationsDone == maxNrOfSteps)
@@ -3881,9 +3881,17 @@ namespace calc {
       RUNTIME_EXP_IFN(firstPositionInSpring <
                         net.linkIndicesOfSprings[springIdx].size() - 1,
                       "Required assumption not met.");
+
+      // update box offset before doing the swapping
+      net.springPartBoxOffset.segment(otherPartialOfLinkIdx1 * 3, 3) =
+        (this->getPartialSpringBoxOffsetTo(
+           net, otherPartialOfLinkIdx1, linkIdx1) +
+         this->getPartialSpringBoxOffsetTo(net, partialSpringIdx, linkIdx2));
+      net.springPartBoxOffset.segment(otherPartialOfLinkIdx2 * 3, 3) =
+        (this->getPartialSpringBoxOffsetTo(
+           net, otherPartialOfLinkIdx2, linkIdx2) +
+         this->getPartialSpringBoxOffsetTo(net, partialSpringIdx, linkIdx1));
       // actually do the swapping
-      // net.springPartIndexA[partialSpringIdx] = linkIdx2;
-      // net.springPartIndexB[partialSpringIdx] = linkIdx1;
       if (net.springPartIndexA[otherPartialOfLinkIdx1] == linkIdx1) {
         net.springPartIndexA[otherPartialOfLinkIdx1] = linkIdx2;
         net.springPartCoordinateIndexA.segment(3 * otherPartialOfLinkIdx1, 3) =
@@ -3908,8 +3916,6 @@ namespace calc {
         net.springPartCoordinateIndexB.segment(3 * otherPartialOfLinkIdx2, 3) =
           Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx1, 3 * linkIdx1 + 2);
       }
-
-      // TODO: update box offset
 
       // std::swap(net.linkIndicesOfSprings[springIdx][firstPositionInSpring],
       //           net.linkIndicesOfSprings[springIdx][firstPositionInSpring +

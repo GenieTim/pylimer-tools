@@ -415,7 +415,7 @@ namespace calc {
       size_t getNumExtraAtoms() override { return this->getNrOfLinks(); }
 
       int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
-      
+
       int getNrOfPartialSprings() const
       {
         return this->initialConfig.nrOfPartialSprings;
@@ -777,6 +777,37 @@ namespace calc {
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
         const bool is2D) const;
+
+      /**
+       * @brief Query the box offset for a specific spring in a specific
+       * direction
+       *
+       * @param net
+       * @param partialSpringIdx
+       * @param linkIdx
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d getPartialSpringBoxOffsetTo(
+        const ForceBalanceNetwork& net,
+        const size_t partialSpringIdx,
+        const size_t linkIdx)
+      {
+        Eigen::Vector3d dist =
+          net.springPartBoxOffset.segment(3 * partialSpringIdx, 3);
+        if (net.springPartIndexA(partialSpringIdx) == linkIdx) {
+          return -1. * dist;
+        }
+        return dist;
+      }
+
+      Eigen::Vector3d getPartialSpringBoxOffsetFrom(
+        const ForceBalanceNetwork& net,
+        const size_t partialSpringIdx,
+        const size_t linkIdx)
+      {
+        return -1. * this->getPartialSpringBoxOffsetTo(
+                       net, partialSpringIdx, linkIdx);
+      }
 
       /**
        * @brief Compute one spring length, in a specific direction
