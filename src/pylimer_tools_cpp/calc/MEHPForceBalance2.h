@@ -174,11 +174,19 @@ namespace calc {
         return *this;
       };
 
+      //----------------------------------------------------------------
+      // MARK: Constructors
+      //----------------------------------------------------------------
+
       static MEHPForceBalance2 constructWithoutSlipLinks(
         const pylimer_tools::entities::Universe& universe,
         int crosslinkerType = 2,
         bool is2D = false,
-        double kappa = 1.0);
+        double kappa = 1.0)
+      {
+        return MEHPForceBalance2::constructWithRandomSlipLinks(
+          universe, 0, 1.0, 0, 1, 0, crosslinkerType, is2D, kappa);
+      }
 
       static MEHPForceBalance2 constructWithSlipLinks(
         const pylimer_tools::entities::Universe& universe,
@@ -192,7 +200,17 @@ namespace calc {
         int crosslinkerType = 2,
         bool is2D = false,
         double kappa = 1.0,
-        bool clampAlpha = false);
+        bool clampAlpha = true)
+      {
+        MEHPForceBalance2 fb = MEHPForceBalance2::constructWithoutSlipLinks(
+          universe, crosslinkerType, is2D, kappa);
+        fb.validateNetwork();
+        fb.addSlipLinks(
+          strandIdx1, strandIdx2, x, y, z, alpha1, alpha2, clampAlpha);
+        // convert the graph to the network usable for simulations
+        fb.finaliseInitialisation();
+        return fb;
+      }
 
       static MEHPForceBalance2 constructWithRandomSlipLinks(
         const pylimer_tools::entities::Universe& universe,
@@ -200,10 +218,258 @@ namespace calc {
         const double cutoff,
         const size_t minimumNrOfSliplinks,
         const double sameStrandCutoff,
-        const int seed,
+        const int seed = -1,
         int crosslinkerType = 2,
         bool is2D = false,
-        double kappa = 1.0);
+        double kappa = 1.0)
+      {
+        MEHPForceBalance2 fb =
+          MEHPForceBalance2(universe, crosslinkerType, is2D, kappa);
+        fb.net.isUpToDate = false;
+        igraph_cattribute_GAB_set(&fb.graph, "is_up_to_date", true);
+
+        INVALIDARG_EXP_IFN(minimumNrOfSliplinks <
+                             fb.universe.getNrOfAtoms() / 2,
+                           "Minimum number of slip-links must be less than the "
+                           "possible number of slip-links to place.");
+        INVALIDARG_EXP_IFN(nrOfSliplinksToSample <
+                             fb.universe.getNrOfAtoms() / 2,
+                           "Number of slip-links to place must be less than "
+                           "the possible number of slip-links to place.");
+        INVALIDARG_EXP_IFN(nrOfSliplinksToSample >= minimumNrOfSliplinks,
+                           "Maximum nr. should be larger than minimum, got " +
+                             std::to_string(nrOfSliplinksToSample) + " and " +
+                             std::to_string(minimumNrOfSliplinks) + ".");
+        INVALIDARG_EXP_IFN(cutoff > 0.0,
+                           "Expected a cutoff > 0.0, got " +
+                             std::to_string(cutoff) + ".");
+
+        std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
+          fb.universe.getChainsWithCrosslinker(crosslinkerType);
+        std::vector<std::pair<size_t, size_t>> pairsOfAtoms;
+        pairsOfAtoms.reserve(nrOfSliplinksToSample);
+        std::vector<long int> pairOfAtom =
+          pylimer_tools::utils::initializeWithValue<long int>(
+            fb.universe.getNrOfAtoms(), -1);
+
+        std::unordered_map<size_t, size_t> atomToStrand;
+        atomToStrand.reserve(universe.getNrOfAtoms());
+        std::unordered_map<size_t, size_t> atomIdxInStrand;
+        atomIdxInStrand.reserve(universe.getNrOfAtoms());
+        for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
+          pylimer_tools::entities::Molecule chain = crosslinkerChains[i];
+          RUNTIME_EXP_IFN(chain.getType() !=
+                            pylimer_tools::entities::MoleculeType::UNDEFINED,
+                          "Couldn't determine molecule type.");
+          std::vector<pylimer_tools::entities::Atom> atoms =
+            crosslinkerChains[i].getAtomsLinedUp(crosslinkerType, true, true);
+          for (size_t atomIdx = 0; atomIdx < atoms.size(); ++atomIdx) {
+            pylimer_tools::entities::Atom atom = atoms[atomIdx];
+            if (atom.getType() != crosslinkerType) {
+              atomToStrand.emplace(atom.getId(), i);
+              atomIdxInStrand.emplace(atom.getId(), atomIdx);
+            }
+          }
+        }
+
+        // filter, we don't want cross-links etc. as targets
+        std::vector<pylimer_tools::entities::Atom> atomsForNeighbourList =
+          fb.universe.getAtomsOfDegree(2);
+        atomsForNeighbourList.erase(
+          std::remove_if(
+            atomsForNeighbourList.begin(),
+            atomsForNeighbourList.end(),
+            [crosslinkerType](const pylimer_tools::entities::Atom& a) {
+              return a.getType() == crosslinkerType;
+            }),
+          atomsForNeighbourList.end());
+        // some randomness for placement
+        std::random_device rd{};
+        std::mt19937 rng = std::mt19937(seed > 0 ? seed : rd());
+        std::shuffle(
+          atomsForNeighbourList.begin(), atomsForNeighbourList.end(), rng);
+        pylimer_tools::entities::NeighbourList neighbourList =
+          pylimer_tools::entities::NeighbourList(
+            atomsForNeighbourList, fb.universe.getBox(), cutoff);
+        size_t numLinksFoundInIteration = 1;
+        while (pairsOfAtoms.size() < minimumNrOfSliplinks &&
+               numLinksFoundInIteration > 0) {
+          numLinksFoundInIteration = 0;
+          for (pylimer_tools::entities::Atom a1 : atomsForNeighbourList) {
+            size_t atomVertexIdx1 = universe.getIdxByAtomId(a1.getId());
+            // make sure this atom does not yet have a pair
+            if (pairOfAtom[atomVertexIdx1] != -1) {
+              continue;
+            }
+            // then, find neighbouring atoms (but not from the same strand?!)
+            std::vector<pylimer_tools::entities::Atom> neighbours =
+              neighbourList.getAtomsCloseTo(a1);
+            neighbourList.removeAtom(
+              a1, "After querying neighbours. Impossible case.");
+            // filter the neighbours to include only those from other strands
+            // NOTE: this skews the whole thing a bit
+            neighbours.erase(
+              std::remove_if(
+                neighbours.begin(),
+                neighbours.end(),
+                [&](const pylimer_tools::entities::Atom& a) -> bool {
+                  return (
+                    (atomToStrand[a.getId()] ==
+                       atomToStrand[a1.getId()] // do not use "at", because not
+                                                // all atoms in the neighbours
+                                                // have been assigned a strand
+                     && (std::abs(static_cast<double>(
+                           atomIdxInStrand[a.getId()] -
+                           atomIdxInStrand[a1.getId()])) < sameStrandCutoff)));
+                }),
+              neighbours.end());
+            if (neighbours.size() == 0) {
+              // std::cerr << "Not enough close neighbours found." << std::endl;
+              continue;
+            }
+            // then, randomly select one of them
+            pylimer_tools::entities::Atom a2 = neighbours[0];
+            if (neighbours.size() > 1) {
+              size_t randomA2Idx = std::uniform_int_distribution<size_t>{
+                0, neighbours.size() - 1
+              }(rng);
+              a2 = neighbours[randomA2Idx];
+            }
+
+            size_t atomVertexIdx2 = universe.getIdxByAtomId(a2.getId());
+            assert(pairOfAtom[atomVertexIdx2] == -1);
+            pairOfAtom[atomVertexIdx2] = pairsOfAtoms.size();
+            pairOfAtom[atomVertexIdx1] = pairsOfAtoms.size();
+            pairsOfAtoms.push_back(std::make_pair(a1.getId(), a2.getId()));
+            numLinksFoundInIteration += 1;
+            neighbourList.removeAtom(a2,
+                                     "After marking atom as second pair part.");
+            if (pairsOfAtoms.size() >= nrOfSliplinksToSample) {
+              break;
+            }
+          }
+          if (pairsOfAtoms.size() >= nrOfSliplinksToSample) {
+            break;
+          }
+        }
+
+        // std::cout << "Found " << pairsOfAtoms.size() << " random slip-links."
+        //           << std::endl;
+
+        // add ends of chains
+        std::unordered_map<size_t, igraph_integer_t> endAtomIdToVertexId;
+        igraph_integer_t currentVertexId = 0;
+        for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
+          pylimer_tools::entities::Molecule chain = crosslinkerChains[i];
+          if (chain.getLength() < 2) {
+            continue;
+          }
+          std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
+            chain.getAtomsLinedUp(crosslinkerType, false, true);
+          if (!pylimer_tools::utils::map_has_key(endAtomIdToVertexId,
+                                                 linedUpAtoms[0].getId())) {
+            endAtomIdToVertexId[linedUpAtoms[0].getId()] = currentVertexId;
+            currentVertexId += 1;
+          }
+          if (!pylimer_tools::utils::map_has_key(
+                endAtomIdToVertexId,
+                pylimer_tools::utils::last(linedUpAtoms).getId())) {
+            endAtomIdToVertexId[pylimer_tools::utils::last(linedUpAtoms)
+                                  .getId()] = currentVertexId;
+            currentVertexId += 1;
+          }
+        }
+
+        // create `currentVertexId` vertices for the chain-end atoms, and
+        // `pairsOfAtoms.size()` vertices for the so many slip-links
+        igraph_add_vertices(
+          &fb.graph, currentVertexId + pairsOfAtoms.size(), nullptr);
+
+        size_t parentEdgeId = 0;
+        for (size_t chainIdx = 0; chainIdx < crosslinkerChains.size();
+             ++chainIdx) {
+          pylimer_tools::entities::Molecule chain = crosslinkerChains[chainIdx];
+          if (chain.getLength() < 2) {
+            continue;
+          }
+
+          std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
+            chain.getAtomsLinedUp(crosslinkerType, false, true);
+          size_t previousIdx = 0;
+          igraph_integer_t previousVertexId =
+            endAtomIdToVertexId.at(linedUpAtoms[0].getId());
+          fb.setVertexPropertiesFromAtom(
+            endAtomIdToVertexId.at(linedUpAtoms[0].getId()),
+            linedUpAtoms[0],
+            fb.crosslinkerType);
+          pylimer_tools::entities::Atom lastAtom =
+            pylimer_tools::utils::last(linedUpAtoms);
+          fb.setVertexPropertiesFromAtom(
+            endAtomIdToVertexId.at(lastAtom.getId()),
+            lastAtom,
+            fb.crosslinkerType);
+          assert(linedUpAtoms.size() == chain.getLength() ||
+                 linedUpAtoms.size() == chain.getLength() + 1);
+          if (pairsOfAtoms.size() > 0) {
+            for (size_t i = 1; i < linedUpAtoms.size() - 1; i++) {
+              pylimer_tools::entities::Atom a = linedUpAtoms[i];
+              if (pairOfAtom[universe.getIdxByAtomId(a.getId())] != -1) {
+                igraph_integer_t thisVertexId =
+                  currentVertexId +
+                  pairOfAtom[universe.getIdxByAtomId(a.getId())];
+                // set the mean x,y,z of the two involved atoms
+                pylimer_tools::entities::Atom a1 = universe.getAtom(
+                  pairsOfAtoms[pairOfAtom[universe.getIdxByAtomId(a.getId())]]
+                    .first);
+                pylimer_tools::entities::Atom a2 = universe.getAtom(
+                  pairsOfAtoms[pairOfAtom[universe.getIdxByAtomId(a.getId())]]
+                    .second);
+                fb.setVertexPropertiesFromAtoms(thisVertexId, a1, a2);
+                igraph_integer_t currentEdgeId = igraph_ecount(&fb.graph);
+                igraph_add_edge(&fb.graph, previousVertexId, thisVertexId);
+                fb.setBondPropertiesBasedOnChain(
+                  chain, previousIdx, i, currentEdgeId, parentEdgeId);
+                //
+                previousIdx = i;
+                previousVertexId = thisVertexId;
+              }
+            }
+          }
+
+          // close the chain
+          igraph_integer_t currentEdgeId = igraph_ecount(&fb.graph);
+          igraph_add_edge(&fb.graph,
+                          previousVertexId,
+                          endAtomIdToVertexId.at(lastAtom.getId()));
+          fb.setBondPropertiesBasedOnChain(chain,
+                                           previousIdx,
+                                           linedUpAtoms.size() - 1,
+                                           currentEdgeId,
+                                           parentEdgeId);
+          fb.validateIgraphSpring(parentEdgeId);
+          parentEdgeId += 1;
+        }
+
+        // validate the creation
+        for (auto& [key, value] : endAtomIdToVertexId) {
+          size_t savedAtomId =
+            castToIgraphInt(igraph_cattribute_VAN(&fb.graph, "atom_id", value));
+          assert(savedAtomId == key);
+          size_t degreeNow = fb.getVertexDegree(value);
+          size_t degreeBefore =
+            universe.getVertexDegree(universe.getIdxByAtomId(key));
+          assert(degreeNow == degreeBefore);
+        }
+
+        // cleanup the graph
+        // fb.removeSubfunctionalVertices();
+
+        // convert the graph to the network usable for simulations
+        fb.finaliseInitialisation();
+        assert(fb.getNumExtraAtoms() == pairsOfAtoms.size());
+
+        return fb;
+      }
 
       //----------------------------------------------------------------
       // MARK: Simulation / Optimization Procedures
@@ -909,7 +1175,7 @@ namespace calc {
               parentEdgeId) {
             igraph_integer_t from, to;
             igraph_edge(&this->graph, i, &from, &to);
-            std::cout << i << "(" << igraph_vector_get(&contourLengths, i)
+            std::cout << i << " (" << igraph_vector_get(&contourLengths, i)
                       << "):\t" << from << "\t" << to << "\t("
                       << igraph_vector_get(&partitionFraction, i) << ")"
                       << std::endl;
@@ -1851,6 +2117,7 @@ namespace calc {
        */
       Eigen::Vector3d getCoordinatesForVertex(igraph_integer_t vertexId)
       {
+        assert(vertexId < igraph_vcount(&this->graph));
         Eigen::Vector3d coordinates;
         coordinates << igraph_cattribute_VAN(&this->graph, "x", vertexId),
           igraph_cattribute_VAN(&this->graph, "y", vertexId),
@@ -1867,6 +2134,7 @@ namespace calc {
       void setVertexCoordinates(const igraph_integer_t vertexId,
                                 const Eigen::Vector3d& coordinates)
       {
+        assert(vertexId < igraph_vcount(&this->graph));
         igraph_cattribute_VAN_set(&this->graph, "x", vertexId, coordinates[0]);
         igraph_cattribute_VAN_set(&this->graph, "y", vertexId, coordinates[1]);
         igraph_cattribute_VAN_set(&this->graph, "z", vertexId, coordinates[2]);
@@ -1881,6 +2149,7 @@ namespace calc {
        */
       bool springInvolvesCrossLink(const igraph_integer_t edgeId)
       {
+        assert(edgeId < igraph_ecount(&this->graph));
         igraph_integer_t from, to;
         igraph_edge(&this->graph, edgeId, &from, &to);
 
@@ -1900,6 +2169,7 @@ namespace calc {
       igraph_integer_t getVertexDegree(const igraph_integer_t vertexId,
                                        const bool loops = true)
       {
+        assert(vertexId < igraph_vcount(&this->graph));
         igraph_integer_t degree;
         igraph_degree_1(&this->graph, &degree, vertexId, IGRAPH_ALL, loops);
         return degree;
@@ -1917,6 +2187,7 @@ namespace calc {
         const pylimer_tools::entities::Atom& atom,
         const int atomType)
       {
+        assert(vertexId < igraph_vcount(&this->graph));
         assert(atomType == this->crosslinkerType ||
                atomType == this->slipLinkType);
         // assert(atom.getType() == this->crosslinkerType);
@@ -1940,6 +2211,7 @@ namespace calc {
                                         pylimer_tools::entities::Atom& atom1,
                                         pylimer_tools::entities::Atom& atom2)
       {
+        assert(vertexId < igraph_vcount(&this->graph));
         assert(atom1.getType() != this->crosslinkerType &&
                atom2.getType() != this->crosslinkerType);
         if (atom1.getId() > atom2.getId()) {
@@ -1985,6 +2257,8 @@ namespace calc {
           std::swap(from, to);
           boxOffset *= -1.;
         }
+        assert(from < igraph_vcount(&this->graph));
+        assert(to < igraph_vcount(&this->graph));
         igraph_integer_t newEdgeId = igraph_ecount(&this->graph);
         igraph_add_edge(&this->graph, from, to);
         igraph_integer_t newFrom, newTo;
@@ -2009,6 +2283,7 @@ namespace calc {
       void setBondBoxOffsetForEdge(const igraph_integer_t edgeId,
                                    const Eigen::Vector3d& bondBoxOffset)
       {
+        assert(edgeId < igraph_ecount(&this->graph));
         assert(bondBoxOffset.array().isFinite().all());
         igraph_cattribute_EAN_set(
           &this->graph, "bond_box_x", edgeId, bondBoxOffset[0]);
