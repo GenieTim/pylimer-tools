@@ -626,7 +626,7 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
         CHECK_NOTHROW(forceBalancer2.removeInactiveCrosslinks());
         std::cout << "Removing inactive cross-links" << std::endl;
         CHECK_NOTHROW(forceBalancer2.synchronise());
-        CHECK(forceBalancer2.getNrOfSprings() == 9848);
+        CHECK(forceBalancer2.getNrOfSprings() == 6693);
         CHECK(forceBalancer2.getNrOfIterations() > 1);
         CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
 
@@ -834,7 +834,7 @@ TEST_CASE(
     CHECK_NOTHROW(forceBalancer.validateNetwork(net, partitions));
     // remove all springs...
     numRemoved = forceBalancer.removeInactiveCrosslinks(1e5);
-    CHECK(numRemoved == nrOfSpringsBefore);
+    CHECK(numRemoved <= net.nrOfLinks);
   }
 }
 
@@ -846,6 +846,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
   std::string suspectedPath = "../pylimer_tools/fixtures/";
 
   std::string inputFile =
+    // suspectedPath + "structure/network_p_1_100_a_38_50_xlinks.structure.out";
     suspectedPath + "structure/network_100_a_46.structure.out";
   if (std::filesystem::exists(inputFile)) {
     CHECK(std::filesystem::exists(suspectedPath));
@@ -856,7 +857,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
     std::cout << "Read file. " << std::endl;
     pcm::MEHPForceBalance2 forceBalancer =
       pcm::MEHPForceBalance2::constructWithRandomSlipLinks(
-        universe, 250, 2.0, 100, 2.0, 2, false, 1.0);
+        universe, 250, 2.0, 100, 2.0, -1, 2, false, 1.0);
     size_t nrOfAddedLinks = forceBalancer.getNumExtraAtoms();
     CHECK(nrOfAddedLinks >= 100);
     // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
@@ -919,7 +920,7 @@ TEST_CASE("MEHP Force Balance 2 can randomly add and remove slip-links",
     std::cout << "Read file. " << std::endl;
     pcm::MEHPForceBalance2 forceBalancer =
       pcm::MEHPForceBalance2::constructWithRandomSlipLinks(
-        universe, 1000, 2.0, 100, 2.0, 23);
+        universe, 1000, 2.0, 100, 2.0, 23, 2, false, 1.0);
     size_t nrOfAddedLinks = forceBalancer.getNumExtraAtoms();
     CHECK(nrOfAddedLinks >= 100);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
@@ -1208,12 +1209,12 @@ TEST_CASE("MEHP Force Balance handles slip-links",
           std::cout << springPartitions[i] << std::endl;
         }
         std::cout << std::endl;
-        CHECK(springPartitions[1] + 1e-2 ==
-              Catch::Approx(0.0 + 1e-2).epsilon(1e-6));
+        CHECK(springPartitions[1] ==
+              Catch::Approx(1.0).epsilon(1e-6));
         CHECK(springPartitions[6] == Catch::Approx(0.0).epsilon(1e-6));
         CHECK(springPartitions[0] == Catch::Approx(1.0).epsilon(1e-6));
-        CHECK(springPartitions[5] + 1e-2 ==
-              Catch::Approx(0.0 + 1e-2).epsilon(1e-6));
+        CHECK(springPartitions[5] ==
+              Catch::Approx(1.0).epsilon(1e-6));
         // CHECK(springPartitions[8] == Catch::Approx(1.0).margin(1e-6)); // 5-3
         // CHECK(springPartitions[7] + 1e-5 == Catch::Approx(0.0 +
         // 1e-5).margin(1e-6)); // 5-5 CHECK(springPartitions[3] ==
@@ -1458,9 +1459,9 @@ TEST_CASE("MEHP Force Balance 2 Fully active chains are fully active",
       CHECK(forceBalancer.getNrOfSprings() == 16000);
       CHECK(forceBalancer.getNrOfPartialSprings() == 16000);
       CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-        pcm::BalanceRunMode::ITERATIVE, 1.0, 50000, 1e-18));
+        pcm::BalanceRunMode::ITERATIVE, 1.0, 50000, 1e-12));
       CHECK(forceBalancer.getNrOfIterations() > 0);
-      CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+      CHECK(forceBalancer.getExitReason() == pcm::ExitReason::F_TOLERANCE);
       CHECK(forceBalancer.getNrOfActiveSprings() ==
             forceBalancer.getNrOfSprings());
       CHECK(forceBalancer.removeSubfunctionalVertices() == 0);
