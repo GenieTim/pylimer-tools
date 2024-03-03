@@ -1641,19 +1641,26 @@ namespace calc {
         const int nrOfCrosslinkSwapsAllowedPerSliplink = -1,
         const bool respectLoops = true)
       {
-        for (size_t sliplinkIdx = net.nrOfNodes; sliplinkIdx < net.nrOfLinks;
-             ++sliplinkIdx) {
+        igraph_integer_t numVertices = igraph_vcount(&this->graph);
+        igraph_vector_t linkType;
+        igraph_vector_init(&linkType, this->net.nrOfLinks);
+        igraph_cattribute_VANV(
+          &this->graph, "type", igraph_vss_all(), &linkType);
+        for (size_t linkIdx = 0; linkIdx < numVertices; ++linkIdx) {
           // check this slip-link
           // std::cout << "Moving slip-link " << sliplinkIdx << " to its best
           // branch"
           //           << std::endl;
-          this->moveSlipLinkToItsBestBranch(
-            net,
-            springPartitions,
-            sliplinkIdx,
-            oneOverSpringPartitionUpperLimit,
-            nrOfCrosslinkSwapsAllowedPerSliplink,
-            respectLoops);
+          if (castToIgraphInt(igraph_vector_get(&linkType, linkIdx)) ==
+              this->slipLinkType) {
+            this->moveSlipLinkToItsBestBranch(
+              net,
+              springPartitions,
+              linkIdx,
+              oneOverSpringPartitionUpperLimit,
+              nrOfCrosslinkSwapsAllowedPerSliplink,
+              respectLoops);
+          }
           // this->validateNetwork(net, springPartitions);
         }
         this->validateNetwork(net, springPartitions);
@@ -1672,6 +1679,7 @@ namespace calc {
         const igraph_integer_t edgeId,
         const double oneOverSpringPartitionUpperLimit)
       {
+        assert(edgeId < igraph_ecount(&this->graph));
         const double N =
           igraph_cattribute_EAN(&this->graph, "contour_length", edgeId);
         const double swappableCutoff =
@@ -1700,10 +1708,13 @@ namespace calc {
         const int nrOfCrosslinkSwapsAllowedPerSliplink = -1,
         const bool respectLoops = true)
       {
-        INVALIDARG_EXP_IFN(castToIgraphInt(igraph_cattribute_EAN(
-                             &this->graph, "type", slipLinkIdx)) ==
-                             this->slipLinkType,
-                           "Passed slip-link must be one.");
+        if (castToIgraphInt(igraph_cattribute_VAN(
+              &this->graph, "type", slipLinkIdx)) != this->slipLinkType) {
+          INVALIDARG_EXP_IFN(castToIgraphInt(igraph_cattribute_VAN(
+                               &this->graph, "type", slipLinkIdx)) ==
+                               this->slipLinkType,
+                             "Passed slip-link must be one.");
+        }
         RUNTIME_EXP_IFN(igraph_cattribute_GAB(&this->graph, "is_up_to_date"),
                         "Should not move slip-link if graph is not up-to-date");
 
@@ -1750,7 +1761,7 @@ namespace calc {
                                    double oneOverSpringPartitionUpperLimit,
                                    const bool respectLoops = true)
       {
-        for (long int i = igraph_ecount(&this->graph); i >= 0; --i) {
+        for (long int i = igraph_ecount(&this->graph) - 1; i >= 0; --i) {
           // problem: when moving slip-links, the edges ids change
           // "solution": edge ids increase -> if we remove one, we might
           // re-visit the previous, but otherwise, things should be fine
@@ -1780,7 +1791,7 @@ namespace calc {
                          Eigen::VectorXd& springPartitions,
                          double oneOverSpringPartitionUpperLimit)
       {
-        for (long int i = igraph_ecount(&this->graph); i >= 0; --i) {
+        for (long int i = igraph_ecount(&this->graph) - 1; i >= 0; --i) {
           // problem: when moving slip-links, the edges ids change
           // "solution": edge ids increase -> if we remove one, we might
           // re-visit the previous, but otherwise, things should be fine
@@ -1853,6 +1864,12 @@ namespace calc {
 
         igraph_vector_int_destroy(&edgesOfLink1);
         igraph_vector_int_destroy(&edgesOfLink2);
+
+#ifndef NDEBUG
+        this->validateIgraphSpring(castToIgraphInt(igraph_cattribute_EAN(
+          &this->graph, "parent_spring", partialSpringIdx)));
+#endif
+
         this->net.isUpToDate = false;
       };
 
@@ -1886,6 +1903,8 @@ namespace calc {
                 &this->graph, "type", from)) == this->crosslinkerType) {
             slipLinkIdx = to;
           }
+          assert(castToIgraphInt(igraph_cattribute_VAN(
+                   &this->graph, "type", slipLinkIdx)) == this->slipLinkType);
 
           // first check if allowed.
           if ((nrOfCrosslinkSwapsAllowedPerSliplink < 0) ||
@@ -3340,6 +3359,10 @@ namespace calc {
       {
         igraph_integer_t from, to;
         igraph_edge(&this->graph, partialSpringIdx, &from, &to);
+        assert(castToIgraphInt(igraph_cattribute_VAN(
+                 &this->graph, "type", from)) == this->slipLinkType);
+        assert(castToIgraphInt(igraph_cattribute_VAN(
+                 &this->graph, "type", to)) == this->slipLinkType);
 
         igraph_integer_t otherRailFrom =
           this->getOtherRailEdgeId(from, partialSpringIdx);

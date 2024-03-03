@@ -182,6 +182,7 @@ namespace calc {
             innerIterationsDone += 1;
           } while (doInnerIterations && innerIterationsDone < 50);
         }
+        assert(this->net.isUpToDate);
         igraph_cattribute_GAB_set(&this->graph, "is_up_to_date", false);
 
         intermediateResidual = this->getDisplacementResidualNormFor(
@@ -227,6 +228,7 @@ namespace calc {
             }
           }
         }
+        assert(this->net.isUpToDate);
         igraph_cattribute_GAB_set(&this->graph, "is_up_to_date", false);
 
         currentResidual = this->getDisplacementResidualNormFor(
@@ -280,6 +282,7 @@ namespace calc {
         if (outputFrequency > 0 && iterationsDone % outputFrequency == 0) {
           this->handleOutput(iterationsDone);
         }
+        assert(this->net.isUpToDate);
       } while (currentResidual / initialResidual > xtol &&
                iterationsDone < maxNrOfSteps && this->net.nrOfSprings > 0);
 
@@ -816,6 +819,11 @@ namespace calc {
                                                "type",
                                                vertexId) == this->slipLinkType,
                          "Can only search for rail around slip-links");
+#ifndef NDEBUG
+      igraph_integer_t fromRail, toRail;
+      igraph_edge(&this->graph, railEdgeId, &fromRail, &toRail);
+      assert(fromRail == vertexId || toRail == vertexId);
+#endif
       // fetch the edges involved
       igraph_es_t selector;
       igraph_es_incident(&selector, vertexId, IGRAPH_ALL);
@@ -842,6 +850,8 @@ namespace calc {
 
       igraph_integer_t railParent =
         castToIgraphInt(igraph_vector_get(&parents, rail_idx));
+      assert(railParent ==
+             igraph_cattribute_EAN(&this->graph, "parent_edge", railEdgeId));
 
       // iff the link is a cross-link, or the
       // slip-link is not involved twice with the same strand (rail),
@@ -911,8 +921,10 @@ namespace calc {
           // link we talk about. We are interested in the edge on the other
           // side!
           igraph_integer_t from, to;
-          igraph_edge(&subgraph, i - 1, &from, &to);
-          if ((from == vertexId) || (to == vertexId)) {
+          if (i != 0) {
+            igraph_edge(&subgraph, i - 1, &from, &to);
+          }
+          if (i != 0 && ((from == vertexId) || (to == vertexId))) {
             // i-1 is on-rail
             result = castToIgraphInt(
               igraph_cattribute_EAN(&subgraph, "prev_edge_id", i - 1));
