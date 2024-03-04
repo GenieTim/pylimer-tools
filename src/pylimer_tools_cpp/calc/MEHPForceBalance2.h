@@ -1968,14 +1968,13 @@ namespace calc {
         // use the smallest edge index as the new rail
         for (size_t i = 1; i < igraph_vector_int_size(&edgesOfCrossLink); ++i) {
           if (igraph_vector_int_get(&edgesOfCrossLink, i) < nextEdgeIndex) {
-            nextEdgeIndex = i;
+            nextEdgeIndex = igraph_vector_int_get(&edgesOfCrossLink, i);
           }
         }
 
         igraph_vector_int_destroy(&edgesOfCrossLink);
 
-        this->insertSlipLinkIntoRail(
-          slipLinkIdx, igraph_vector_int_get(&edgesOfCrossLink, nextEdgeIndex));
+        this->insertSlipLinkIntoRail(slipLinkIdx, nextEdgeIndex);
       };
 
       /**
