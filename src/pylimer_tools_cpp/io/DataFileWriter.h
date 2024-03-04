@@ -22,12 +22,12 @@ namespace utils {
   {
 
   public:
-    DataFileWriter(const pylimer_tools::entities::Universe u)
+    DataFileWriter(const pylimer_tools::entities::Universe& u)
       : universe(u)
     {
       // this->universe = u;
     }
-    void setUniverseToWrite(const pylimer_tools::entities::Universe u)
+    void setUniverseToWrite(const pylimer_tools::entities::Universe& u)
     {
       this->universe = u;
     }
@@ -274,22 +274,22 @@ namespace utils {
       return coord;
     }
     void writeAtom(std::ofstream& file,
-                   pylimer_tools::entities::Atom atom,
+                   const pylimer_tools::entities::Atom& atom,
                    int moleculeIdx,
                    int nAtomsOutput)
     {
       long int atomId = this->reindexAtoms ? nAtomsOutput : atom.getId();
       const pylimer_tools::entities::Box box = this->universe.getBox();
       this->oldNewAtomIdMap[atom.getId()] = atomId;
-      int nx = this->attemptImageReset
+      int nx = this->moveIntoBox
                  ? this->getImageFlagForCoordinate(
                      atom.getUnwrappedX(&box), box.getLowX(), box.getHighX())
                  : atom.getNX();
-      int ny = this->attemptImageReset
+      int ny = this->moveIntoBox
                  ? this->getImageFlagForCoordinate(
                      atom.getUnwrappedY(&box), box.getLowY(), box.getHighY())
                  : atom.getNY();
-      int nz = this->attemptImageReset
+      int nz = this->moveIntoBox
                  ? this->getImageFlagForCoordinate(
                      atom.getUnwrappedZ(&box), box.getLowZ(), box.getHighZ())
                  : atom.getNZ();
@@ -323,7 +323,7 @@ namespace utils {
           std::regex_replace(outputStr, std::regex("\\$y"), std::to_string(y));
         outputStr =
           std::regex_replace(outputStr, std::regex("\\$z"), std::to_string(z));
-        for (std::string additionalProperty :
+        for (std::string &additionalProperty :
              this->customAtomFormatAdditionalProperties) {
           outputStr = std::regex_replace(
             outputStr,
@@ -347,7 +347,7 @@ namespace utils {
       // first, we output the crosslinker beads
       std::vector<pylimer_tools::entities::Atom> crosslinkers =
         this->universe.getAtomsOfType(this->crosslinkerType);
-      for (pylimer_tools::entities::Atom crosslinker : crosslinkers) {
+      for (const pylimer_tools::entities::Atom &crosslinker : crosslinkers) {
         nAtomsOutput += 1;
         this->writeAtom(file, crosslinker, 0, nAtomsOutput);
       }
@@ -357,12 +357,11 @@ namespace utils {
       std::vector<pylimer_tools::entities::Molecule> molecules =
         this->universe.getMolecules(this->crosslinkerType);
       for (pylimer_tools::entities::Molecule molecule : molecules) {
-        // image flag reset attempt might not be the best yet
-        // could try to use ->getAssumedVertexCoordinates() for more reset
-        // options
+        // image flag reset attempt might not be the best yet?
         std::vector<pylimer_tools::entities::Atom> atoms =
           (this->moleculeIdxSwappable || this->attemptImageReset)
-            ? molecule.getAtomsLinedUp(this->crosslinkerType, true, false)
+            ? molecule.getAtomsLinedUp(this->crosslinkerType,
+                                       this->attemptImageReset, false)
             : molecule.getAtoms();
         nMoleculesOutput += 1;
 

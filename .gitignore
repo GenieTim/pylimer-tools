@@ -152,3 +152,5 @@ tests/pylimer_tools/fixtures/xlinked_0.90005_pdms_1e4_a_78_bs_t_775036.structure
 output*.txt
 
 tests/pylimer_tools/fixtures/xlinked_1e4_a_28_f_3_p_0.151515151515152.structure.out
+
+tests/pylimer_tools/fixtures/tmp-test-data-file.out
