@@ -314,9 +314,9 @@ namespace calc {
         if (outputFrequency > 0 && iterationsDone % outputFrequency == 0) {
           this->handleOutput(iterationsDone);
         }
-      } while (
-        currentResidual / initialResidual > xtol &&
-        iterationsDone<maxNrOfSteps&& this->initialConfig.nrOfSprings> 0);
+      } while (currentResidual / initialResidual > xtol &&
+               iterationsDone < maxNrOfSteps &&
+               this->initialConfig.nrOfSprings > 0);
 
       // query solution & exit reason
       this->exitReason = (iterationsDone == maxNrOfSteps)
@@ -4570,7 +4570,9 @@ namespace calc {
               3 * springPartner2 + offset;
           }
 
-          // TODO: set box offsets
+          // TODO: set box offsets to something different?!?
+          this->initialConfig.springPartBoxOffset.segment(
+            3 * newSpringIndex, 3) = Eigen::Vector3d::Zero();
 
           this->currentSpringPartitionsVec[newSpringIndex] =
             this->currentSpringPartitionsVec[lastSpringIndex] - alpha;

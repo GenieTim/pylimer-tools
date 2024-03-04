@@ -1858,7 +1858,7 @@ namespace calc {
           this->getBondBoxOffsetForEdgeTo(otherEdge2, linkIdx2) +
             this->getBondBoxOffsetForEdgeFrom(partialSpringIdx, linkIdx2));
 
-        // actually cut
+        // actually "cut" by removing the old edge
         std::vector<igraph_integer_t> eToRemove = { otherEdge1, otherEdge2 };
         this->removePartialSprings(eToRemove);
 
@@ -1867,7 +1867,7 @@ namespace calc {
 
 #ifndef NDEBUG
         this->validateIgraphSpring(castToIgraphInt(igraph_cattribute_EAN(
-          &this->graph, "parent_spring", partialSpringIdx)));
+          &this->graph, "parent_edge", partialSpringIdx)));
 #endif
 
         this->net.isUpToDate = false;

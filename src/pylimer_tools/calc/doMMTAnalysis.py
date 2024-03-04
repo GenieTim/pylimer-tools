@@ -684,7 +684,7 @@ def computeStoichiometricInbalance(network: Universe, crosslinkerType: int, stra
         functionalityPerType[crosslinkerType]
     otherFormableBonds = 0
     for key in counts:
-        if (key in ignoreTypes):
+        if (key in ignoreTypes or counts[key] == 0):
             continue
         if (key not in functionalityPerType):
             raise ValueError(
