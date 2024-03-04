@@ -1612,7 +1612,7 @@ namespace calc {
     size_t MEHPForceBalance2::removeDanglingChains()
     {
       size_t numRemoved = 0;
-      for (long int i = igraph_vcount(&this->graph); i >= 0; --i) {
+      for (long int i = igraph_vcount(&this->graph) - 1; i >= 0; --i) {
         if (this->getVertexDegree(i) == 1) {
           igraph_vector_int_t edgesOfVertex;
           igraph_vector_int_init(&edgesOfVertex, 1);
@@ -1675,7 +1675,7 @@ namespace calc {
         // f = 1 and below have been removed
         // -> cleanup remaining f = 2 and f = 3
         if (numRemovedInIteration > 0 || primaryLoopsRemovedInIteration > 0) {
-          for (long int i = igraph_vcount(&this->graph); i >= 0; --i) {
+          for (long int i = igraph_vcount(&this->graph) - 1; i >= 0; --i) {
             igraph_integer_t degree = this->getVertexDegree(i);
             if (degree == 2) {
               this->remove2fLink(i);
