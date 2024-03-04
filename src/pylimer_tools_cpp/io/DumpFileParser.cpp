@@ -381,11 +381,11 @@ namespace utils {
                  (sectionsToRead & ReadableDumpFileSections::ATOM)) {
         atomFormat = pylimer_tools::utils::trimLineOmitComment(
           line.substr(std::string("ITEM: ATOMS ").length()));
-        double x, y, z = 0.;
-        int nx, ny, nz = 0;
-        bool isUnwrappedX, isUnwrappedY, isUnwrappedZ = false;
-        bool isScaledX, isScaledY, isScaledZ = false;
-        int id, type;
+        double x = 0., y = 0, z = 0.;
+        int nx = 0, ny =0, nz = 0;
+        bool isUnwrappedX = false, isUnwrappedY = false, isUnwrappedZ = false;
+        bool isScaledX = false, isScaledY = false, isScaledZ = false;
+        int id = 0, type = 1;
         std::vector<pylimer_tools::entities::Atom> localResults;
         localResults.reserve(numAtoms);
         for (size_t i = 0; i < numAtoms; ++i) {
