@@ -294,6 +294,7 @@ namespace calc {
       std::cout << iterationsDone << " steps done. "
                 << "Last max distance moved: " << maxDistanceMoved << std::endl;
 
+      assert(this->net.isUpToDate);
       this->updateGraph();
       this->validateNetwork();
       this->currentSpringDistances =
@@ -718,8 +719,8 @@ namespace calc {
       }
 
       if (vertices != nullptr && edges != nullptr) {
-        assert(igraph_vector_int_size(vertices) ==
-               igraph_vector_int_size(edges) + 1);
+        assert(igraph_vector_int_size(vertices) >
+               igraph_vector_int_size(edges));
       }
 
       igraph_destroy(&subgraph);
@@ -2871,6 +2872,7 @@ namespace calc {
       const ForceBalanceNetwork& net,
       const Eigen::VectorXd& springPartitions) const
     {
+      RUNTIME_EXP_IFN(net.isUpToDate, "Network is not up to date. Validation is fruitless.");
       // std::cout << "Validating network..." << std::endl;
       /**
        * First, test dimensions

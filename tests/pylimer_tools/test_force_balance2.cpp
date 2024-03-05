@@ -822,19 +822,18 @@ TEST_CASE(
     CHECK_NOTHROW(forceBalancer.validateNetwork());
     std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
 
-    pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
-    Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
     size_t numRemoved = forceBalancer.removeTwofunctionalLinks();
-    net = forceBalancer.getNetwork();
-    CHECK_NOTHROW(forceBalancer.validateNetwork(net, partitions));
+    CHECK_NOTHROW(forceBalancer.synchronise());
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
     CHECK(numRemoved > 0);
     // numRemoved = forceBalancer.removeInactiveCrosslinks(net, displacements,
     // partitions, 1e-20); CHECK(numRemoved == 204); // TODO: analyze these
-    size_t nrOfSpringsBefore = net.nrOfSprings;
-    CHECK_NOTHROW(forceBalancer.validateNetwork(net, partitions));
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
     // remove all springs...
     numRemoved = forceBalancer.removeInactiveCrosslinks(1e5);
-    CHECK(numRemoved <= net.nrOfLinks);
+    // resp., remove all cross-links.
+    CHECK(numRemoved <= forceBalancer.getNumAtoms());
+    CHECK(forceBalancer.getNumBonds() == 0);
   }
 }
 
@@ -877,6 +876,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
       50,
       false,
       pcm::LinkSwappingMode::ALL_MC));
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
       pcm::BalanceRunMode::ITERATIVE,
       1.0,
@@ -888,6 +888,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
       50,
       false,
       pcm::LinkSwappingMode::SLIPLINKS_ONLY));
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
       pcm::BalanceRunMode::ITERATIVE,
       1.0,
@@ -1209,12 +1210,10 @@ TEST_CASE("MEHP Force Balance handles slip-links",
           std::cout << springPartitions[i] << std::endl;
         }
         std::cout << std::endl;
-        CHECK(springPartitions[1] ==
-              Catch::Approx(1.0).epsilon(1e-6));
+        CHECK(springPartitions[1] == Catch::Approx(1.0).epsilon(1e-6));
         CHECK(springPartitions[6] == Catch::Approx(0.0).epsilon(1e-6));
         CHECK(springPartitions[0] == Catch::Approx(1.0).epsilon(1e-6));
-        CHECK(springPartitions[5] ==
-              Catch::Approx(1.0).epsilon(1e-6));
+        CHECK(springPartitions[5] == Catch::Approx(1.0).epsilon(1e-6));
         // CHECK(springPartitions[8] == Catch::Approx(1.0).margin(1e-6)); // 5-3
         // CHECK(springPartitions[7] + 1e-5 == Catch::Approx(0.0 +
         // 1e-5).margin(1e-6)); // 5-5 CHECK(springPartitions[3] ==
