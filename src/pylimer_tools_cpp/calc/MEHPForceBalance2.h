@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <unordered_set>
 #include <cmath>
 #include <cstdint>
 #include <iomanip>
