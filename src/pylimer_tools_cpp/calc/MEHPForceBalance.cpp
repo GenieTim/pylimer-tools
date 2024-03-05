@@ -2621,11 +2621,9 @@ namespace calc {
         net.springPartCoordinateIndexB[3 * newPartialSpringIdx + dir] =
           3 * springPartToReplace + dir;
       }
-      // TODO: implement. this is problematic.
-      // net.springPartBoxOffset.segment(3*newPartialSpringIdx, 3) =
-      // this->box.getOffset(
-
-      // );
+      // TODO: this is problematic: instead, the decision has to be made, how
+      // the previous/existing offset should be split, etc.
+      net.springPartBoxOffset.segment(3*newPartialSpringIdx, 3) = Eigen::Vector3d::Zero();
 
       // renormalize this spring
       // mostly by moving the next slip-link further
