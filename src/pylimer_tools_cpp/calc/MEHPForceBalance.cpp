@@ -2623,7 +2623,8 @@ namespace calc {
       }
       // TODO: this is problematic: instead, the decision has to be made, how
       // the previous/existing offset should be split, etc.
-      net.springPartBoxOffset.segment(3*newPartialSpringIdx, 3) = Eigen::Vector3d::Zero();
+      net.springPartBoxOffset.segment(3 * newPartialSpringIdx, 3) =
+        Eigen::Vector3d::Zero();
 
       // renormalize this spring
       // mostly by moving the next slip-link further
@@ -3819,7 +3820,10 @@ namespace calc {
     {
       const size_t linkIdx1 = net.springPartIndexA[partialSpringIdx];
       const size_t linkIdx2 = net.springPartIndexB[partialSpringIdx];
-      INVALIDARG_EXP_IFN(linkIdx1 != linkIdx2, "Cannot swap link with itself.");
+      INVALIDARG_EXP_IFN(linkIdx1 != linkIdx2,
+                         "Cannot swap link with itself: got " +
+                           std::to_string(linkIdx1) + " and " +
+                           std::to_string(linkIdx2) + ".");
       // std::cout << "Swapping link " << linkIdx1 << " and " << linkIdx2
       //           << std::endl;
       INVALIDARG_EXP_IFN(
