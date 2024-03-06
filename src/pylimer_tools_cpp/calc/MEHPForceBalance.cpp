@@ -3475,6 +3475,37 @@ namespace calc {
     }
 
     /**
+     * @brief Adjust the two spring's box offsets to work best with the
+     * specified slip-link
+     *
+     * @param net the network to adjust
+     * @param slipLinkIdx the slip-link around which to adjust the two springs
+     * @param spring1 one of the two partial spring idx
+     * @param spring2 the partial spring idx of the other spring
+     */
+    void MEHPForceBalance::reAlignSlipLinkToImages(ForceBalanceNetwork& net,
+                                                   const size_t slipLinkIdx,
+                                                   const size_t spring1,
+                                                   const size_t spring2) const
+    {
+      assert(net.springPartIndexA[spring1] == slipLinkIdx ||
+             net.springPartIndexB[spring1] == slipLinkIdx);
+      assert(net.springPartIndexA[spring2] == slipLinkIdx ||
+             net.springPartIndexB[spring2] == slipLinkIdx);
+      Eigen::Vector3d totalOffset =
+        this->getPartialSpringBoxOffsetTo(net, spring1, slipLinkIdx) +
+        this->getPartialSpringBoxOffsetFrom(net, spring2, slipLinkIdx);
+      if (totalOffset.maxCoeff() <
+          this->universe.getBox().getL().maxCoeff() * 0.2) {
+            // nothing to adjust...
+        return;
+      }
+
+      // TODO: implement
+      
+    };
+
+    /**
      * @brief Do one displacement step
      *
      * @param net
@@ -4572,9 +4603,11 @@ namespace calc {
               3 * springPartner2 + offset;
           }
 
-          // TODO: set box offsets to something different?!?
+          // set box offsets
           this->initialConfig.springPartBoxOffset.segment(
             3 * newSpringIndex, 3) = Eigen::Vector3d::Zero();
+          this->reAlignSlipLinkToImages(
+            this->initialConfig, newNodeIdx, newSpringIndex, lastSpringIndex);
 
           this->currentSpringPartitionsVec[newSpringIndex] =
             this->currentSpringPartitionsVec[lastSpringIndex] - alpha;
