@@ -47,6 +47,7 @@ namespace calc {
       F_TOLERANCE,
       X_TOLERANCE,
       MAX_STEPS,
+      NO_STEPS_POSSIBLE,
       FAILURE,
       OTHER
     };
