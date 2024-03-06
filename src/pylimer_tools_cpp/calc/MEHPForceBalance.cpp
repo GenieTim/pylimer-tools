@@ -3484,6 +3484,7 @@ namespace calc {
      * @param spring2 the partial spring idx of the other spring
      */
     void MEHPForceBalance::reAlignSlipLinkToImages(ForceBalanceNetwork& net,
+                                                   Eigen::VectorXd& u,
                                                    const size_t slipLinkIdx,
                                                    const size_t spring1,
                                                    const size_t spring2) const
@@ -3492,17 +3493,70 @@ namespace calc {
              net.springPartIndexB[spring1] == slipLinkIdx);
       assert(net.springPartIndexA[spring2] == slipLinkIdx ||
              net.springPartIndexB[spring2] == slipLinkIdx);
+      assert(net.linkIsSlipLink[slipLinkIdx]);
       Eigen::Vector3d totalOffset =
         this->getPartialSpringBoxOffsetTo(net, spring1, slipLinkIdx) +
         this->getPartialSpringBoxOffsetFrom(net, spring2, slipLinkIdx);
       if (totalOffset.maxCoeff() <
           this->universe.getBox().getL().maxCoeff() * 0.2) {
-            // nothing to adjust...
+        // nothing to adjust...
         return;
       }
 
-      // TODO: implement
-      
+      Eigen::Vector3d sourceCoords =
+        net.coordinates.segment(
+          3 * this->getOtherSpringIndex(net, spring1, slipLinkIdx)) +
+        u.segment(3 * this->getOtherSpringIndex(net, spring1, slipLinkIdx));
+      Eigen::Vector3d targetCoords =
+        net.coordinates.segment(
+          3 * this->getOtherSpringIndex(net, spring2, slipLinkIdx)) +
+        u.segment(3 * this->getOtherSpringIndex(net, spring2, slipLinkIdx)) +
+        totalOffset;
+      Eigen::Vector3d viaCoords =
+        net.coordinates.segment(3 * slipLinkIdx) + u.segment(3 * slipLinkIdx);
+
+      double bestOffsetScore = -1.;
+      Eigen::Vector3d bestOffset;
+
+      // ugly brute-force method to check all possible combinations (ideally,
+      // more or less at least)
+      Eigen::Array3i multiplicity =
+        (totalOffset / this->universe.getBox().getL()).rint().array();
+      for (int mx = std::min(0, multiplicity[0]);
+           mx < std::max(0, multiplicity[0]);
+           ++mx) {
+        for (int my = std::min(0, multiplicity[1]);
+             my < std::max(0, multiplicity[1]);
+             ++my) {
+          for (int mz = std::min(0, multiplicity[2]);
+               mz < std::max(0, multiplicity[2]);
+               ++mz) {
+            Eigen::Vector3d currentOffset;
+            currentOffset << mx * net.L[0], my * net.L[1], mz * net.L[2];
+
+            double currentScore =
+              ((viaCoords - sourceCoords) + currentOffset).squaredNorm() +
+              ((targetCoords - viaCoords) + (totalOffset - currentOffset))
+                .squaredNorm();
+
+            if (bestOffsetScore < 0 || bestOffsetScore > currentScore) {
+              bestOffsetScore = currentScore;
+              bestOffset = currentOffset;
+            }
+          }
+        }
+      }
+
+      assert(bestOffsetScore >= 0.);
+      net.springPartBoxOffset.segment(3 * spring1, 3) = bestOffset;
+      if (net.springPartIndexA[spring1] == slipLinkIdx) {
+        net.springPartBoxOffset.segment(3 * spring1, 3) *= -1.;
+      }
+      net.springPartBoxOffset.segment(3 * spring2, 3) =
+        totalOffset - bestOffset;
+      if (net.springPartIndexB[spring2] == slipLinkIdx) {
+        net.springPartBoxOffset.segment(3 * spring2, 3) *= -1.;
+      }
     };
 
     /**
@@ -4606,8 +4660,11 @@ namespace calc {
           // set box offsets
           this->initialConfig.springPartBoxOffset.segment(
             3 * newSpringIndex, 3) = Eigen::Vector3d::Zero();
-          this->reAlignSlipLinkToImages(
-            this->initialConfig, newNodeIdx, newSpringIndex, lastSpringIndex);
+          this->reAlignSlipLinkToImages(this->initialConfig,
+                                        this->currentDisplacement,
+                                        newNodeIdx,
+                                        newSpringIndex,
+                                        lastSpringIndex);
 
           this->currentSpringPartitionsVec[newSpringIndex] =
             this->currentSpringPartitionsVec[lastSpringIndex] - alpha;
