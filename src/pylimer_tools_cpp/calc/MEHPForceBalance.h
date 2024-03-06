@@ -451,8 +451,6 @@ namespace calc {
 
       void configAssumeBoxLargeEnough(bool assumption)
       {
-        throw std::invalid_argument(
-          "Assumption of a large enough box is not supported yet");
         this->assumeBoxLargeEnough = assumption;
       }
 
@@ -790,7 +788,7 @@ namespace calc {
       Eigen::Vector3d getPartialSpringBoxOffsetTo(
         const ForceBalanceNetwork& net,
         const size_t partialSpringIdx,
-        const size_t linkIdx)
+        const size_t linkIdx) const
       {
         Eigen::Vector3d dist =
           net.springPartBoxOffset.segment(3 * partialSpringIdx, 3);
@@ -803,7 +801,7 @@ namespace calc {
       Eigen::Vector3d getPartialSpringBoxOffsetFrom(
         const ForceBalanceNetwork& net,
         const size_t partialSpringIdx,
-        const size_t linkIdx)
+        const size_t linkIdx) const
       {
         return -1. * this->getPartialSpringBoxOffsetTo(
                        net, partialSpringIdx, linkIdx);
@@ -911,6 +909,13 @@ namespace calc {
         this->currentSpringPartitionsVec = newSpringPartitionsVec;
       }
 
+      /**
+       * @brief Evaluate the force on one link
+       *
+       * @param index the link index
+       * @param oneOverSpringPartitionUpperLimit
+       * @return Eigen::Matrix3d
+       */
       Eigen::Matrix3d getForceOn(
         const size_t index,
         double oneOverSpringPartitionUpperLimit = 1.0) const
@@ -1475,11 +1480,6 @@ namespace calc {
         return result;
       }
 
-      static std::pair<size_t, size_t> makeConnectivityKey(size_t i1, size_t i2)
-      {
-        return i1 > i2 ? std::make_pair(i1, i2) : std::make_pair(i2, i1);
-      }
-
       bool swapSlipLinksReversibly(
         ForceBalanceNetwork& net,
         Eigen::VectorXd& u,
@@ -1494,6 +1494,19 @@ namespace calc {
         const size_t partialSpringIdx,
         const double oneOverSpringPartitionUpperLimit = 1.0,
         const bool respectLoops = true);
+
+      /**
+       * @brief Adjust the two spring's box offsets to work best with the specified slip-link
+       *
+       * @param net the network to adjust
+       * @param slipLinkIdx the slip-link around which to adjust the two springs
+       * @param spring1 one of the two partial spring idx
+       * @param spring2 the partial spring idx of the other spring
+       */
+      void reAlignSlipLinkToImages(ForceBalanceNetwork& net,
+                                   const size_t slipLinkIdx,
+                                   const size_t spring1,
+                                   const size_t spring2) const;
 
     private:
       pylimer_tools::entities::Universe universe;

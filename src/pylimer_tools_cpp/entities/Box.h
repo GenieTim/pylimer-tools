@@ -190,6 +190,12 @@ namespace entities {
       this->minImageDistance(coords);
     }
 
+    /**
+     * @brief Compute the offset required to compensate for PBC
+     *
+     * @param coords
+     * @return Eigen::VectorXd
+     */
     Eigen::VectorXd getOffset(const Eigen::VectorXd& coords) const
     {
       return -(this->L.replicate(coords.size() / 3, 1) *

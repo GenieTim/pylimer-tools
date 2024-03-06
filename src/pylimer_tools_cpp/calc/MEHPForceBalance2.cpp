@@ -28,7 +28,6 @@ namespace calc {
      * FORCE RELAXATION
      */
     void MEHPForceBalance2::runForceRelaxation(
-      double damping,
       long int maxNrOfSteps, // default: 10000
       double xtol,
       const double initialResidualToUse,
@@ -211,8 +210,7 @@ namespace calc {
       std::cout << iterationsDone << " steps done. "
                 << "Last max distance moved: " << maxDistanceMoved << ". "
                 << "Current residual: " << currentResidual << ". "
-                << "Initial residual: " << initialResidual << ". "
-                << std::endl;
+                << "Initial residual: " << initialResidual << ". " << std::endl;
 
       assert(this->getNetwork().isUpToDate);
       this->validateNetwork();
@@ -487,7 +485,8 @@ namespace calc {
      */
     std::vector<igraph_integer_t> MEHPForceBalance2::getOffRailConnectedEdgeIds(
       igraph_integer_t vertexId,
-      igraph_integer_t railEdgeId)
+      igraph_integer_t railEdgeId,
+      igraph_integer_t avoidEdgeId)
     {
       INVALIDARG_EXP_IFN(igraph_cattribute_VAN(&this->graph,
                                                "type",
@@ -496,7 +495,7 @@ namespace calc {
 
       // fetch the edges involved
       igraph_integer_t otherRailEdge =
-        this->getOtherRailEdgeId(vertexId, railEdgeId);
+        this->getOtherRailEdgeId(vertexId, railEdgeId, avoidEdgeId);
       igraph_es_t selector;
       igraph_es_incident(&selector, vertexId, IGRAPH_ALL);
       igraph_eit_t iterator;
@@ -525,17 +524,18 @@ namespace calc {
      */
     igraph_integer_t MEHPForceBalance2::getOtherRailEdgeId(
       igraph_integer_t vertexId,
-      igraph_integer_t railEdgeId)
+      igraph_integer_t railEdgeId,
+      igraph_integer_t avoidEdgeId)
     {
       INVALIDARG_EXP_IFN(igraph_cattribute_VAN(&this->graph,
                                                "type",
                                                vertexId) == this->slipLinkType,
                          "Can only search for rail around slip-links");
-#ifndef NDEBUG
       igraph_integer_t fromRail, toRail;
       igraph_edge(&this->graph, railEdgeId, &fromRail, &toRail);
-      assert(fromRail == vertexId || toRail == vertexId);
-#endif
+      INVALIDARG_EXP_IFN(fromRail == vertexId || toRail == vertexId,
+                         "Vertex must be part of the rail");
+
       // fetch the edges involved
       igraph_es_t selector;
       igraph_es_incident(&selector, vertexId, IGRAPH_ALL);
@@ -622,32 +622,81 @@ namespace calc {
       igraph_vector_int_init(&verticesOnPath, igraph_ecount(&subgraph) + 1);
       igraph_eulerian_path(&subgraph, &edgesOnPath, &verticesOnPath);
       assert(igraph_vector_int_size(&edgesOnPath) == igraph_ecount(&subgraph));
+      if (igraph_vector_int_get(&verticesOnPath, 0) >
+          igraph_vector_int_get(&verticesOnPath,
+                                igraph_vector_int_size(&verticesOnPath) - 1)) {
+        // make sure we are always looking at the chain in the same direction
+        igraph_vector_int_reverse(&verticesOnPath);
+        igraph_vector_int_reverse(&edgesOnPath);
+      }
+      this->printVerticesOnPath(&verticesOnPath);
 
       size_t result = 0;
       bool foundResult = false;
-      for (size_t i = 0; i < igraph_vector_int_size(&edgesOnPath); ++i) {
+      for (size_t pathStepIdx = 0;
+           pathStepIdx < igraph_vector_int_size(&edgesOnPath);
+           ++pathStepIdx) {
+        igraph_integer_t thisEdgeId =
+          igraph_vector_int_get(&edgesOnPath, pathStepIdx);
         if (castToIgraphInt(igraph_cattribute_EAN(
-              &subgraph, "prev_edge_id", i)) == railEdgeId) {
-          // yay, found the rail.
-          // now: on either side of this is the
-          // link we talk about. We are interested in the edge on the other
-          // side!
+              &subgraph, "prev_edge_id", thisEdgeId)) == railEdgeId) {
           igraph_integer_t from, to;
-          if (i != 0) {
-            igraph_edge(&subgraph, i - 1, &from, &to);
+          igraph_edge(&subgraph, thisEdgeId, &from, &to);
+          igraph_integer_t fromV = castToIgraphInt(
+            igraph_cattribute_VAN(&subgraph, "prev_vertex_id", from));
+          igraph_integer_t toV = castToIgraphInt(
+            igraph_cattribute_VAN(&subgraph, "prev_vertex_id", to));
+          assert(from == fromRail && to == toRail);
+          igraph_integer_t prevEdgeId = -1;
+          igraph_integer_t nextEdgeId = -1;
+          // yay, found the rail.
+          // now: on either side of this is the link we talk about.
+          // We are interested in the edge on the other
+          // side!
+          igraph_integer_t prevfrom = -1, prevto = -1;
+          igraph_integer_t nextfrom = -1, nextto = -1;
+          if (pathStepIdx > 0) {
+            prevEdgeId = igraph_vector_int_get(&edgesOnPath, pathStepIdx - 1);
+            igraph_edge(&subgraph, prevEdgeId, &prevfrom, &prevto);
           }
-          if (i != 0 && ((from == vertexId) || (to == vertexId))) {
+          if (pathStepIdx < igraph_ecount(&subgraph) - 1) {
+            nextEdgeId = igraph_vector_int_get(&edgesOnPath, pathStepIdx + 1);
+            igraph_edge(&subgraph, nextEdgeId, &nextfrom, &nextto);
+          }
+          if (((prevfrom == vertexId) || (prevto == vertexId)) &&
+              ((nextfrom == vertexId) || (nextto == vertexId))) {
+            std::cerr << "Handling special case for partial spring "
+                      << railEdgeId << std::endl;
+            igraph_integer_t otherVertexId =
+              vertexId == fromRail ? toRail : fromRail;
+            igraph_integer_t prevPrevEdgeId = castToIgraphInt(
+              igraph_cattribute_EAN(&subgraph, "prev_edge_id", prevEdgeId));
+            igraph_integer_t prevNextEdgeId = castToIgraphInt(
+              igraph_cattribute_EAN(&subgraph, "prev_edge_id", nextEdgeId));
+            // both the previous and next edges are on the rail.
+            // this can happen if we have a secondary loop.
+            // momentary resolution (works for many examples, at least: choose
+            // the less familiar one)
+            if (((prevfrom == otherVertexId) || (prevto == otherVertexId)) ||
+                (prevPrevEdgeId == avoidEdgeId)) {
+              result = prevNextEdgeId;
+              foundResult = true;
+            } else {
+              result = prevPrevEdgeId;
+              foundResult = true;
+            }
+            break;
+          } else if ((prevfrom == vertexId) || (prevto == vertexId)) {
             // i-1 is on-rail
             result = castToIgraphInt(
-              igraph_cattribute_EAN(&subgraph, "prev_edge_id", i - 1));
+              igraph_cattribute_EAN(&subgraph, "prev_edge_id", prevEdgeId));
             foundResult = true;
             break;
           } else {
-            igraph_edge(&subgraph, i + 1, &from, &to);
-            assert((from == vertexId) || (to == vertexId));
+            assert((nextfrom == vertexId) || (nextto == vertexId));
             // i+1 is on-rail
             result = castToIgraphInt(
-              igraph_cattribute_EAN(&subgraph, "prev_edge_id", i + 1));
+              igraph_cattribute_EAN(&subgraph, "prev_edge_id", nextEdgeId));
             foundResult = true;
             break;
           }
@@ -660,7 +709,7 @@ namespace calc {
       igraph_vector_int_destroy(&edgesOnPath);
       igraph_vector_int_destroy(&verticesOnPath);
 
-      assert(foundResult);
+      RUNTIME_EXP_IFN(foundResult, "Did not find other edge.");
       return result;
     }
 
@@ -713,11 +762,11 @@ namespace calc {
         igraph_cattribute_EAN(&this->graph, "contour_length", edge1Id),
         this->getBondBoxOffsetForEdgeFrom(edge2Id, centralLink) +
           this->getBondBoxOffsetForEdgeTo(edge1Id, centralLink));
-// #ifndef NDEBUG
-//       std::cout << "Combining " << edge1Id << " (parent " << parent1
-//                 << ") with " << edge2Id << " (" << parent2 << ") to "
-//                 << newEdgeId << std::endl;
-// #endif
+      // #ifndef NDEBUG
+      //       std::cout << "Combining " << edge1Id << " (parent " << parent1
+      //                 << ") with " << edge2Id << " (" << parent2 << ") to "
+      //                 << newEdgeId << std::endl;
+      // #endif
 
       if (parent1 == parent2) {
         this->debugParentEdge(parent1);
@@ -1041,10 +1090,10 @@ namespace calc {
       assert(springIdxBefore > springIdxNow);
       assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
 
-// #ifndef NDEBUG
-//       std::cout << "Combining parent " << springIdxBefore << " into "
-//                 << springIdxNow << std::endl;
-// #endif
+      // #ifndef NDEBUG
+      //       std::cout << "Combining parent " << springIdxBefore << " into "
+      //                 << springIdxNow << std::endl;
+      // #endif
 
       igraph_vector_t parentEdges;
       igraph_vector_init(&parentEdges, this->net.nrOfPartialSprings);
@@ -1685,7 +1734,6 @@ namespace calc {
       INVALIDARG_EXP_IFN((loopsOfSliplinks.size() == 0 && loops.size() == 0),
                          "Loops are not yet supported.");
       assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
-      assert(this->net.isUpToDate);
       // validate inputs
       size_t currentNrOfPartialSprings = igraph_ecount(&this->graph);
       if (additionalLen != x.size() || additionalLen != y.size() ||
@@ -1919,10 +1967,8 @@ namespace calc {
       const double kappa0,
       const double oneOverSpringPartitionUpperLimit) const
     {
-      assert(net.isUpToDate);
       assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
 
-      std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
       Eigen::Matrix3d force = Eigen::Matrix3d::Zero();
 
       igraph_vector_int_t edgesOfSlipLink;
@@ -2164,7 +2210,7 @@ namespace calc {
         igraph_integer_t from, to;
         igraph_edge(&this->graph, i, &from, &to);
         overallForces.segment(3 * from, 3) += denominator * distance;
-        overallForces.segment(3 * from, 3) -= denominator * distance;
+        overallForces.segment(3 * to, 3) -= denominator * distance;
       }
 
       return overallForces.squaredNorm();

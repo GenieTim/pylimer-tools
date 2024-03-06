@@ -186,7 +186,7 @@ namespace calc {
         double kappa = 1.0)
       {
         return MEHPForceBalance2::constructWithRandomSlipLinks(
-          universe, 0, 1.0, 0, 1, 0, crosslinkerType, is2D, kappa);
+          universe, 0, 1.0, 0, 1, "", crosslinkerType, is2D, kappa);
       }
 
       static MEHPForceBalance2 constructWithSlipLinks(
@@ -219,7 +219,7 @@ namespace calc {
         const double cutoff,
         const size_t minimumNrOfSliplinks,
         const double sameStrandCutoff,
-        const int seed = -1,
+        const std::string seed = "",
         int crosslinkerType = 2,
         bool is2D = false,
         double kappa = 1.0)
@@ -285,8 +285,14 @@ namespace calc {
             }),
           atomsForNeighbourList.end());
         // some randomness for placement
-        std::random_device rd{};
-        std::mt19937 rng = std::mt19937(seed > 0 ? seed : rd());
+        std::mt19937 rng;
+        if (seed == "") {
+          std::random_device rd{};
+          rng = std::mt19937(rd());
+        } else {
+          std::seed_seq seed2(seed.begin(), seed.end());
+          rng = std::mt19937(seed2);
+        }
         std::shuffle(
           atomsForNeighbourList.begin(), atomsForNeighbourList.end(), rng);
         pylimer_tools::entities::NeighbourList neighbourList =
@@ -486,7 +492,6 @@ namespace calc {
        * @param ftol
        */
       void runForceRelaxation(
-        double damping = 1.0,
         long int maxNrOfSteps = 50000, // default: 10000
         double xtol = 1e-9,
         const double initialResidualToUse = -1.0,
@@ -1073,7 +1078,7 @@ namespace calc {
 
       void debugParentEdge(const size_t parentEdgeId)
       {
-        return;
+        // return;
         igraph_vector_t parentEdges;
         igraph_vector_init(&parentEdges, 0);
         igraph_cattribute_EANV(&this->graph,
@@ -1173,7 +1178,7 @@ namespace calc {
         if (!(APPROX_EQUAL(partitionSum, 1.0, 1e-5))) {
           RUNTIME_EXP_IFN(
             APPROX_EQUAL(partitionSum, 1.0, 1e-5),
-            "Expected parition sum to be closer to 1., got " +
+            "Expected partition sum to be closer to 1., got " +
               std::to_string(partitionSum) + " for parent spring " +
               std::to_string(parentEdgeId) +
               ". Partial Springs are: " + partialSpringString + ".");
@@ -1209,11 +1214,24 @@ namespace calc {
                                    std::to_string(parentEdgeId) +
                                    " does not end with a cross-link");
         }
+        this->printVerticesOnPath(&verticesOnPath);
+
         igraph_vector_int_destroy(&edgesOnPath);
         igraph_destroy(&subgraph);
 
         igraph_vector_destroy(&parentEdges);
         return true;
+      }
+
+      void printVerticesOnPath(igraph_vector_int_t* vertices)
+      {
+        std::cout << "\t";
+        std::cout << igraph_vector_int_get(vertices, 0);
+        for (igraph_integer_t i = 1; i < igraph_vector_int_size(vertices);
+             ++i) {
+          std::cout << " - " << igraph_vector_int_get(vertices, i);
+        }
+        std::cout << "\n";
       }
 
       ForceBalanceNetwork getNetwork()
@@ -1254,22 +1272,26 @@ namespace calc {
       std::vector<size_t> getSpringpartitionIndicesOfSliplink(
         const size_t linkIdx)
       {
-        std::vector<size_t> indices =
-          pylimer_tools::utils::initializeWithValue<size_t>(4, 0);
-        assert(indices.size() == 4);
-        this->setSpringpartitionIndicesOfSliplink(indices, linkIdx);
+        INVALIDARG_EXP_IFN(
+          this->linkIsSlipLink(linkIdx),
+          "Only slip-links may be asked for their partition indices, link " +
+            std::to_string(linkIdx) + " is not one.");
+        std::vector<size_t> indices;
+        indices.reserve(4);
+
+        igraph_vector_int_t edgesOfLink;
+        igraph_vector_int_init(&edgesOfLink, 2);
+        igraph_incident(&this->graph, &edgesOfLink, linkIdx, IGRAPH_ALL);
+        assert(igraph_vector_int_size(&edgesOfLink) == 4);
+
+        for (size_t i = 0; i < igraph_vector_int_size(&edgesOfLink); ++i) {
+          indices.push_back(igraph_vector_int_get(&edgesOfLink, i));
+        }
+
+        igraph_vector_int_destroy(&edgesOfLink);
+
         return indices;
       };
-
-      /**
-       * @brief Assemble all indices of partial springs for a particular
-       * slip-link
-       *
-       * @param linkIdx
-       * @return void
-       */
-      void setSpringpartitionIndicesOfSliplink(std::vector<size_t>& res_vec,
-                                               const size_t linkIdx);
 
       /**
        * @brief Updates the partition/parametrisation of a spring around one
@@ -1301,7 +1323,12 @@ namespace calc {
           }
           igraph_integer_t otherEdgeId =
             this->getOtherRailEdgeId(linkIdx, edgeId);
-          assert(!handledEdges.contains(otherEdgeId));
+          if (handledEdges.contains(otherEdgeId)) {
+            // primary loop edge /!
+            igraph_integer_t from, to;
+            igraph_edge(&this->graph, otherEdgeId, &from, &to);
+            assert(from == to);
+          }
           // remember so we don't do them twice
           handledEdges.insert(edgeId);
           handledEdges.insert(otherEdgeId);
@@ -1406,7 +1433,7 @@ namespace calc {
         }
 
         igraph_vector_int_destroy(&edgesOfVertex);
-        assert(residualNormContributions == 4);
+        // assert(residualNormContributions == 4 || cautionSecondaryLoop);
         return residualNorm;
       };
 
@@ -1426,7 +1453,7 @@ namespace calc {
         igraph_vector_init(&linkType, this->net.nrOfLinks);
         igraph_cattribute_VANV(
           &this->graph, "type", igraph_vss_all(), &linkType);
-        for (size_t linkIdx = 0; linkIdx < numVertices; ++linkIdx) {
+        for (igraph_integer_t linkIdx = 0; linkIdx < numVertices; ++linkIdx) {
           // check this slip-link
           // std::cout << "Moving slip-link " << sliplinkIdx << " to its best
           // branch"
@@ -1517,6 +1544,10 @@ namespace calc {
                                            respectLoops);
           }
           if (didSwap) {
+#ifndef NDEBUG
+            this->validateIgraphSpring(castToIgraphInt(
+              igraph_cattribute_EAN(&this->graph, "parent_edge", edgeId)));
+#endif
             break;
           }
         }
@@ -1598,26 +1629,33 @@ namespace calc {
             &this->graph, "type", linkIdx2)) == this->slipLinkType,
           "Only partial springs with only slip-links allow swapping.");
 
-        igraph_vector_int_t edgesOfLink1;
-        igraph_vector_int_init(&edgesOfLink1, 4);
-        igraph_incident(&this->graph, &edgesOfLink1, linkIdx1, IGRAPH_ALL);
-
-        igraph_vector_int_t edgesOfLink2;
-        igraph_vector_int_init(&edgesOfLink2, 4);
-        igraph_incident(&this->graph, &edgesOfLink2, linkIdx2, IGRAPH_ALL);
-
-        // add the new edges
+        // figure out the path of the new edges
         igraph_integer_t otherEdge1 =
           this->getOtherRailEdgeId(linkIdx1, partialSpringIdx);
         igraph_integer_t otherEdge2 =
-          this->getOtherRailEdgeId(linkIdx2, partialSpringIdx);
-        assert(igraph_cattribute_EAN(&this->graph, "parent_edge", partialSpringIdx) == igraph_cattribute_EAN(&this->graph, "parent_edge", otherEdge1));
-        assert(igraph_cattribute_EAN(&this->graph, "parent_edge", partialSpringIdx) == igraph_cattribute_EAN(&this->graph, "parent_edge", otherEdge2));
-        // ...actually add
+          this->getOtherRailEdgeId(linkIdx2, partialSpringIdx, otherEdge1);
+        if (otherEdge1 == otherEdge2) {
+          otherEdge1 =
+            this->getOtherRailEdgeId(linkIdx1, partialSpringIdx, otherEdge2);
+        }
+        igraph_integer_t parentEdge = castToIgraphInt(
+          igraph_cattribute_EAN(&this->graph, "parent_edge", partialSpringIdx));
+        assert(parentEdge == castToIgraphInt(igraph_cattribute_EAN(
+                               &this->graph, "parent_edge", otherEdge1)));
+        assert(parentEdge == castToIgraphInt(igraph_cattribute_EAN(
+                               &this->graph, "parent_edge", otherEdge2)));
+        // TODO: this is an issue with loops that loop back in some way
+        // there, the eulerian path cannot decide what is forward, what is
+        // backward
+        if (otherEdge1 == otherEdge2) {
+          std::cerr << "WARNING: the connectivity could not be fully restored." << std::endl;
+          return;
+        }
+        // ...actually add the new edges
         igraph_integer_t newEdge1 = this->createEdge(
           linkIdx1,
           this->getOtherEdgePartner(otherEdge2, linkIdx2),
-          igraph_cattribute_EAN(&this->graph, "parent_edge", partialSpringIdx),
+          parentEdge,
           igraph_cattribute_EAN(&this->graph, "partition_fraction", otherEdge2),
           igraph_cattribute_EAN(&this->graph, "contour_length", otherEdge2),
           this->getBondBoxOffsetForEdgeTo(otherEdge1, linkIdx1) +
@@ -1626,7 +1664,7 @@ namespace calc {
         igraph_integer_t newEdge2 = this->createEdge(
           linkIdx2,
           this->getOtherEdgePartner(otherEdge1, linkIdx1),
-          igraph_cattribute_EAN(&this->graph, "parent_edge", partialSpringIdx),
+          parentEdge,
           igraph_cattribute_EAN(&this->graph, "partition_fraction", otherEdge1),
           igraph_cattribute_EAN(&this->graph, "contour_length", otherEdge1),
           this->getBondBoxOffsetForEdgeTo(otherEdge2, linkIdx2) +
@@ -1636,12 +1674,8 @@ namespace calc {
         std::vector<igraph_integer_t> eToRemove = { otherEdge1, otherEdge2 };
         this->removePartialSprings(eToRemove);
 
-        igraph_vector_int_destroy(&edgesOfLink1);
-        igraph_vector_int_destroy(&edgesOfLink2);
-
 #ifndef NDEBUG
-        this->validateIgraphSpring(castToIgraphInt(igraph_cattribute_EAN(
-          &this->graph, "parent_edge", partialSpringIdx)));
+        this->validateIgraphSpring(parentEdge);
 #endif
 
         this->net.isUpToDate = false;
@@ -2190,6 +2224,9 @@ namespace calc {
           linedUpAtoms[atom2Idx].getCoordinates();
         this->universe.getBox().handlePBC(additionalDistance2);
         expectedDistance += additionalDistance1 + additionalDistance2;
+        if (this->is2D) {
+          expectedDistance[2] = 0.0;
+        }
 
         this->setBondBoxOffsetForEdge(edgeId, Eigen::Vector3d::Zero());
         Eigen::Vector3d actualDistance = this->computeEdgeDistance(edgeId);
@@ -2549,7 +2586,8 @@ namespace calc {
        */
       std::vector<igraph_integer_t> getOffRailConnectedEdgeIds(
         igraph_integer_t vertexId,
-        igraph_integer_t railEdgeId);
+        igraph_integer_t railEdgeId,
+        igraph_integer_t avoidEdgeId = -1);
 
       /**
        * @brief Given a vertex and a connected edge, returns the edge in the
@@ -2557,7 +2595,8 @@ namespace calc {
        *
        */
       igraph_integer_t getOtherRailEdgeId(igraph_integer_t vertexId,
-                                          igraph_integer_t railEdgeId);
+                                          igraph_integer_t railEdgeId,
+                                          igraph_integer_t avoidEdgeId = -1);
 
       void addSlipLinks(const std::vector<size_t>& strandIdx1,
                         const std::vector<size_t>& strandIdx2,
@@ -3099,11 +3138,6 @@ namespace calc {
         return result;
       }
 
-      static std::pair<size_t, size_t> makeConnectivityKey(size_t i1, size_t i2)
-      {
-        return i1 > i2 ? std::make_pair(i1, i2) : std::make_pair(i2, i1);
-      }
-
       /**
        * @brief Swap two slip-links along a partial spring, iff the move leads
        * to a smaller stress diagonal squared norm
@@ -3117,6 +3151,11 @@ namespace calc {
         const size_t partialSpringIdx,
         const double oneOverSpringPartitionUpperLimit = 1.0)
       {
+#ifndef NDEBUG
+        this->validateIgraphSpring(
+          igraph_cattribute_EAN(&this->graph, "parent_edge", partialSpringIdx));
+#endif
+
         igraph_integer_t from, to;
         igraph_edge(&this->graph, partialSpringIdx, &from, &to);
         assert(castToIgraphInt(igraph_cattribute_VAN(

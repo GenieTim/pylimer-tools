@@ -89,6 +89,27 @@ init_pylimer_bound_entities(py::module_& m)
             )pbdoc")
     .def("getLowZ", &Box::getLowZ)
     .def("getHighZ", &Box::getHighZ)
+    .def("getOffset",
+         &Box::getOffset,
+         R"pbdoc(
+          Compute the offset required to compensate for periodic boundary conditions.
+
+          Useful e.g. if you are using absolute coordinates for distances, but 
+          still need an infinite network, 
+          e.g., if the bonds need to be able to get longer than half the box.
+    )pbdoc",
+         py::arg("distances"))
+    .def(
+      "applyPBC",
+      [](const Box& box, const Eigen::VectorXd& distances) {
+        Eigen::VectorXd dist = distances;
+        box.handlePBC(dist);
+        return dist;
+      },
+      R"pbdoc(
+          Adjust the specified distances to fit into this box.
+      )pbdoc",
+      py::arg("distances"))
     .def(py::pickle(
            [](const Box& b) { // __getstate__
              /* Return a tuple that fully encodes the state of the object */
@@ -1040,7 +1061,7 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("atom_ids"),
          py::arg("nr_of_origins") = 25,
          py::arg("reduce_memory") = false)
-         .def("computeDistanceAutocorrelationFromTo",
+    .def("computeDistanceAutocorrelationFromTo",
          &UniverseSequence::computeDistanceAutocorrelationFromToAtoms,
          R"pbdoc(
           Compute the autocorrelation of the dot product of the distance vector from certain to other atoms.
@@ -1050,8 +1071,7 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("atom_ids_from"),
          py::arg("atom_ids_to"),
          py::arg("nr_of_origins") = 25,
-         py::arg("reduce_memory") = false
-         )
+         py::arg("reduce_memory") = false)
     // operators
     .def(
       "__getitem__",

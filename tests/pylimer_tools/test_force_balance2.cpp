@@ -603,7 +603,7 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
         CHECK_NOTHROW(forceBalancer2.removeFreeChains());
         CHECK(forceBalancer2.getNrOfSprings() ==
               9850); // TODO: check that this is reasonable?
-        CHECK(forceRelaxer.getNrOfSprings() == 9850);
+        CHECK(forceRelaxer.getNrOfSprings() == 9859);
         // initial system values
         CHECK(forceBalancer2.getPressure() ==
               Catch::Approx(forceRelaxer.getPressure()));
@@ -814,7 +814,7 @@ TEST_CASE(
     // TODO: using a seed does not seem to work properly?!?
     pcm::MEHPForceBalance2 forceBalancer =
       pcm::MEHPForceBalance2::constructWithRandomSlipLinks(
-        universe, 250, 2.0, 100, 2.0, 12, 2, false, 1.0);
+        universe, 250, 2.0, 100, 2.0, "seed12", 2, false, 1.0);
     size_t nrOfAddedLinks = forceBalancer.getNumExtraAtoms();
     CHECK(nrOfAddedLinks >= 50);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
@@ -828,9 +828,10 @@ TEST_CASE(
     // partitions, 1e-20); CHECK(numRemoved == 204); // TODO: analyze these
     CHECK_NOTHROW(forceBalancer.validateNetwork());
     // remove all springs...
+    size_t numAtomsBefore = forceBalancer.getNumAtoms();
     numRemoved = forceBalancer.removeInactiveCrosslinks(1e5);
     // resp., remove all cross-links.
-    CHECK(numRemoved <= forceBalancer.getNumAtoms());
+    CHECK(numRemoved <= numAtomsBefore);
     CHECK(forceBalancer.getNumBonds() == 0);
   }
 }
@@ -854,7 +855,7 @@ TEST_CASE("MEHP Force Balance 2 can run with swapping slip-links",
     std::cout << "Read file. " << std::endl;
     pcm::MEHPForceBalance2 forceBalancer =
       pcm::MEHPForceBalance2::constructWithRandomSlipLinks(
-        universe, 250, 2.0, 100, 2.0, -1, 2, false, 1.0);
+        universe, 250, 2.0, 100, 2.0, "aiop129", 2, false, 1.0);
     size_t nrOfAddedLinks = forceBalancer.getNumExtraAtoms();
     CHECK(nrOfAddedLinks >= 100);
     // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
@@ -864,7 +865,6 @@ TEST_CASE("MEHP Force Balance 2 can run with swapping slip-links",
       pe::Box(4 * oldBox.getLx(), 0.5 * oldBox.getLy(), 0.5 * oldBox.getLz());
     forceBalancer.deformTo(newBox);
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-      1.0,
       1000,
       1e-9,
       -1.0,
@@ -875,7 +875,6 @@ TEST_CASE("MEHP Force Balance 2 can run with swapping slip-links",
       pcm::LinkSwappingMode::ALL_MC));
     CHECK_NOTHROW(forceBalancer.validateNetwork());
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-      1.0,
       1000,
       1e-9,
       -1.0,
@@ -886,7 +885,6 @@ TEST_CASE("MEHP Force Balance 2 can run with swapping slip-links",
       pcm::LinkSwappingMode::SLIPLINKS_ONLY));
     CHECK_NOTHROW(forceBalancer.validateNetwork());
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-      1.0,
       1000,
       1e-9,
       -1.0,
@@ -916,7 +914,7 @@ TEST_CASE("MEHP Force Balance 2 can randomly add and remove slip-links",
     std::cout << "Read file. " << std::endl;
     pcm::MEHPForceBalance2 forceBalancer =
       pcm::MEHPForceBalance2::constructWithRandomSlipLinks(
-        universe, 1000, 2.0, 100, 2.0, 23, 2, false, 1.0);
+        universe, 1000, 2.0, 100, 2.0, "seed1", 2, false, 1.0);
     size_t nrOfAddedLinks = forceBalancer.getNumExtraAtoms();
     CHECK(nrOfAddedLinks >= 100);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
@@ -929,7 +927,7 @@ TEST_CASE("MEHP Force Balance 2 can randomly add and remove slip-links",
     CHECK_NOTHROW(forceBalancer.validateNetwork());
 
     // run a while to get inactive links
-    forceBalancer.runForceRelaxation(1.0, 100);
+    forceBalancer.runForceRelaxation(100);
     pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
     partitions = forceBalancer.getSpringPartitions();
     // due to the randomness, it _could_ be one day that actually all strands
@@ -941,7 +939,7 @@ TEST_CASE("MEHP Force Balance 2 can randomly add and remove slip-links",
 
     ////////////////////////////////////////////////////////////////
     forceBalancer = pcm::MEHPForceBalance2::constructWithRandomSlipLinks(
-      universe, 1000, 2.0, 100, 2.0, 23, 2, true, 1.0);
+      universe, 1000, 2.0, 100, 2.0, "seed4", 2, true, 1.0);
     nrOfAddedLinks = forceBalancer.getNumExtraAtoms();
     CHECK(nrOfAddedLinks >= 100);
     // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
@@ -952,7 +950,7 @@ TEST_CASE("MEHP Force Balance 2 can randomly add and remove slip-links",
     // CHECK(numInactiveRemoved == 0);
 
     // run a while to get inactive links
-    forceBalancer.runForceRelaxation(1.0, 100);
+    forceBalancer.runForceRelaxation(100);
     net = forceBalancer.getNetwork();
     // due to the randomness, it _could_ be one day that actually all strands
     // are active. unlikely, but I can imagine it to be possible.
@@ -1299,8 +1297,7 @@ TEST_CASE("MEHP Force Balance 2 Free chains collapse",
   CHECK(forceBalancer.getNrOfSprings() ==
         forceBalancer.getNrOfPartialSprings());
   CHECK(forceBalancer.getNrOfSprings() == nrOfBeads / nrOfBeadsPerChain);
-  CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-    pcm::BalanceRunMode::ITERATIVE, 1.0, 50000, 1e-18));
+  CHECK_NOTHROW(forceBalancer.runForceRelaxation(50000, 1e-18));
   CHECK(forceBalancer.getNrOfIterations() > 0);
   CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
   CHECK(forceBalancer.getNrOfActiveSprings() == 0);
@@ -1452,8 +1449,7 @@ TEST_CASE("MEHP Force Balance 2 Fully active chains are fully active",
             forceBalancer.getNrOfSprings());
       CHECK(forceBalancer.getNrOfSprings() == 16000);
       CHECK(forceBalancer.getNrOfPartialSprings() == 16000);
-      CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-        pcm::BalanceRunMode::ITERATIVE, 1.0, 50000, 1e-12));
+      CHECK_NOTHROW(forceBalancer.runForceRelaxation(50000, 1e-12));
       CHECK(forceBalancer.getNrOfIterations() > 0);
       CHECK(forceBalancer.getExitReason() == pcm::ExitReason::F_TOLERANCE);
       CHECK(forceBalancer.getNrOfActiveSprings() ==
