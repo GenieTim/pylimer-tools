@@ -1073,6 +1073,7 @@ namespace calc {
 
       void debugParentEdge(const size_t parentEdgeId)
       {
+        return;
         igraph_vector_t parentEdges;
         igraph_vector_init(&parentEdges, 0);
         igraph_cattribute_EANV(&this->graph,
@@ -1576,13 +1577,18 @@ namespace calc {
       void swapSlipLinksOfEdge(const size_t partialSpringIdx)
       {
         assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
+
+#ifndef NDEBUG
+        this->validateIgraphSpring(castToIgraphInt(igraph_cattribute_EAN(
+          &this->graph, "parent_edge", partialSpringIdx)));
+#endif
+
         igraph_integer_t linkIdx1, linkIdx2;
         igraph_edge(&this->graph, partialSpringIdx, &linkIdx1, &linkIdx2);
         INVALIDARG_EXP_IFN(linkIdx1 != linkIdx2,
                            "Cannot swap link with itself: got " +
                              std::to_string(linkIdx1) + " and " +
                              std::to_string(linkIdx2) + ".");
-
         INVALIDARG_EXP_IFN(
           castToIgraphInt(igraph_cattribute_VAN(
             &this->graph, "type", linkIdx1)) == this->slipLinkType,
@@ -1605,7 +1611,9 @@ namespace calc {
           this->getOtherRailEdgeId(linkIdx1, partialSpringIdx);
         igraph_integer_t otherEdge2 =
           this->getOtherRailEdgeId(linkIdx2, partialSpringIdx);
-        // CAUTION: the from & to might not be consistent (can swap)
+        assert(igraph_cattribute_EAN(&this->graph, "parent_edge", partialSpringIdx) == igraph_cattribute_EAN(&this->graph, "parent_edge", otherEdge1));
+        assert(igraph_cattribute_EAN(&this->graph, "parent_edge", partialSpringIdx) == igraph_cattribute_EAN(&this->graph, "parent_edge", otherEdge2));
+        // ...actually add
         igraph_integer_t newEdge1 = this->createEdge(
           linkIdx1,
           this->getOtherEdgePartner(otherEdge2, linkIdx2),

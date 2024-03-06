@@ -162,8 +162,8 @@ namespace calc {
             size_t nRemoved = this->removeInactiveCrosslinks(removalTolerance);
             if (nRemoved > 0) {
               this->net.isUpToDate = false;
-              std::cout << "Removed " << nRemoved << " inactive springs. "
-                        << std::endl;
+              // std::cout << "Removed " << nRemoved << " inactive springs. "
+              //           << std::endl;
             }
           }
           if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
@@ -172,13 +172,13 @@ namespace calc {
             size_t nRemoved = this->removeTwofunctionalLinks();
             if (nRemoved > 0) {
               this->net.isUpToDate = false;
-              std::cout << "Removed " << nRemoved
-                        << " cross-linkers with f = 2. " << std::endl;
+              // std::cout << "Removed " << nRemoved
+              //           << " cross-linkers with f = 2. " << std::endl;
             }
           }
           if (simplificationMode == StructureSimplificationMode::ALL_ANDREI) {
-            std::cout << "Removing cross-links and springs, Andrei's way"
-                      << std::endl;
+            // std::cout << "Removing cross-links and springs, Andrei's way"
+            //           << std::endl;
             size_t nRemoved = this->doRemovalAndreisWay(removalTolerance);
             if (nRemoved > 0) {
               this->net.isUpToDate = false;
@@ -196,16 +196,23 @@ namespace calc {
         if (outputFrequency > 0 && iterationsDone % outputFrequency == 0) {
           this->handleOutput(iterationsDone);
         }
-      } while (currentResidual / initialResidual > xtol &&
-               iterationsDone < maxNrOfSteps && this->net.nrOfSprings > 0);
+      } while ((currentResidual / initialResidual > xtol) &&
+               (iterationsDone < maxNrOfSteps) &&
+               (igraph_ecount(&this->graph) > 0));
 
       // query solution & exit reason
-      this->exitReason = (iterationsDone == maxNrOfSteps)
+      this->exitReason = (iterationsDone >= maxNrOfSteps)
                            ? ExitReason::MAX_STEPS
                            : ExitReason::X_TOLERANCE;
+      if (igraph_ecount(&this->graph) == 0) {
+        this->exitReason = ExitReason::NO_STEPS_POSSIBLE;
+      }
       this->nrOfStepsDone += iterationsDone;
       std::cout << iterationsDone << " steps done. "
-                << "Last max distance moved: " << maxDistanceMoved << std::endl;
+                << "Last max distance moved: " << maxDistanceMoved << ". "
+                << "Current residual: " << currentResidual << ". "
+                << "Initial residual: " << initialResidual << ". "
+                << std::endl;
 
       assert(this->getNetwork().isUpToDate);
       this->validateNetwork();
@@ -706,11 +713,11 @@ namespace calc {
         igraph_cattribute_EAN(&this->graph, "contour_length", edge1Id),
         this->getBondBoxOffsetForEdgeFrom(edge2Id, centralLink) +
           this->getBondBoxOffsetForEdgeTo(edge1Id, centralLink));
-#ifndef NDEBUG
-      std::cout << "Combining " << edge1Id << " (parent " << parent1
-                << ") with " << edge2Id << " (" << parent2 << ") to "
-                << newEdgeId << std::endl;
-#endif
+// #ifndef NDEBUG
+//       std::cout << "Combining " << edge1Id << " (parent " << parent1
+//                 << ") with " << edge2Id << " (" << parent2 << ") to "
+//                 << newEdgeId << std::endl;
+// #endif
 
       if (parent1 == parent2) {
         this->debugParentEdge(parent1);
@@ -726,7 +733,7 @@ namespace calc {
 
       // merge edge properties
       if (parent1 != parent2) {
-        std::cout << "Merging " << parent1 << " & " << parent2 << std::endl;
+        // std::cout << "Merging " << parent1 << " & " << parent2 << std::endl;
         assert(castToIgraphInt(igraph_cattribute_VAN(
                  &this->graph, "type", centralLink)) == this->crosslinkerType);
         // two different "parent" springs -> need to recalculate some stuff
@@ -1034,10 +1041,10 @@ namespace calc {
       assert(springIdxBefore > springIdxNow);
       assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
 
-#ifndef NDEBUG
-      std::cout << "Combining parent " << springIdxBefore << " into "
-                << springIdxNow << std::endl;
-#endif
+// #ifndef NDEBUG
+//       std::cout << "Combining parent " << springIdxBefore << " into "
+//                 << springIdxNow << std::endl;
+// #endif
 
       igraph_vector_t parentEdges;
       igraph_vector_init(&parentEdges, this->net.nrOfPartialSprings);
@@ -1352,8 +1359,8 @@ namespace calc {
       size_t numRemovedTotal = 0;
       size_t numRemovedInIteration = 0;
       size_t primaryLoopsRemovedTotal = this->cleanupPrimaryLoopsInStructure();
-      std::cout << "Removed " << primaryLoopsRemovedTotal << " primary loops"
-                << std::endl;
+      // std::cout << "Removed " << primaryLoopsRemovedTotal << " primary loops"
+      //           << std::endl;
       size_t primaryLoopsRemovedInIteration = 0;
       do {
         this->removeDanglingChains();
@@ -1363,15 +1370,15 @@ namespace calc {
         this->validateIgraphSprings();
 #endif
 
-        std::cout << "Removed " << numRemovedInIteration
-                  << " vertices with degree < 2" << std::endl;
+        // std::cout << "Removed " << numRemovedInIteration
+        //           << " vertices with degree < 2" << std::endl;
 
         primaryLoopsRemovedInIteration = this->cleanupPrimaryLoopsInStructure();
 #ifndef NDEBUG
         this->validateIgraphSprings();
 #endif
-        std::cout << "Removed " << primaryLoopsRemovedInIteration
-                  << " primary loops" << std::endl;
+        // std::cout << "Removed " << primaryLoopsRemovedInIteration
+        //           << " primary loops" << std::endl;
 
         igraph_vector_t types;
         igraph_vector_init(&types, 0);
@@ -1387,7 +1394,7 @@ namespace calc {
               numRemovedInIteration += 1;
             } else if (degree == 3 && castToIgraphInt(igraph_vector_get(
                                         &types, i)) == this->slipLinkType) {
-              std::cout << "Found slip-link with f = 3, unexpected!"
+              std::cerr << "Found slip-link with f = 3, unexpected!"
                         << std::endl;
               this->remove3fLink(i);
               numRemovedInIteration += 1;
@@ -1398,9 +1405,9 @@ namespace calc {
 #ifndef NDEBUG
         this->validateIgraphSprings();
 #endif
-        std::cout << "Removed " << numRemovedInIteration
-                  << " vertices with degree == 2 or slip-Links degree == 3"
-                  << std::endl;
+        // std::cout << "Removed " << numRemovedInIteration
+        //           << " vertices with degree == 2 or slip-Links degree == 3"
+        //           << std::endl;
 
         igraph_vector_destroy(&types);
         numRemovedTotal += numRemovedInIteration;
@@ -1410,8 +1417,8 @@ namespace calc {
 #ifndef NDEBUG
         this->validateIgraphSprings();
 #endif
-        std::cout << "Removed " << primaryLoopsRemovedInIteration
-                  << " primary loops" << std::endl;
+        // std::cout << "Removed " << primaryLoopsRemovedInIteration
+        //           << " primary loops" << std::endl;
       } while (numRemovedInIteration > 0 || primaryLoopsRemovedInIteration > 0);
 
       if (numRemovedTotal > 0 || primaryLoopsRemovedTotal > 0) {

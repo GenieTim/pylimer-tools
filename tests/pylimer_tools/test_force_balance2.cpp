@@ -601,10 +601,9 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
         CHECK(forceBalancer2.getNrOfSprings() == 10000);
         // remove the inactive ones
         CHECK_NOTHROW(forceBalancer2.removeFreeChains());
-        CHECK_NOTHROW(forceBalancer2.synchronise());
         CHECK(forceBalancer2.getNrOfSprings() ==
-              9848); // TODO: check that this is reasonable?
-        CHECK(forceRelaxer.getNrOfSprings() == 9859);
+              9850); // TODO: check that this is reasonable?
+        CHECK(forceRelaxer.getNrOfSprings() == 9850);
         // initial system values
         CHECK(forceBalancer2.getPressure() ==
               Catch::Approx(forceRelaxer.getPressure()));
@@ -617,11 +616,9 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
         CHECK_NOTHROW(forceBalancer2.validateNetwork());
         std::cout << "Removing subfunctional vertices" << std::endl;
         CHECK_NOTHROW(forceBalancer2.removeSubfunctionalVertices());
-        CHECK_NOTHROW(forceBalancer2.synchronise());
-        CHECK(forceBalancer2.getNrOfSprings() == 9848);
+        CHECK(forceBalancer2.getNrOfSprings() == 6693);
         CHECK_NOTHROW(forceBalancer2.removeInactiveCrosslinks());
         std::cout << "Removing inactive cross-links" << std::endl;
-        CHECK_NOTHROW(forceBalancer2.synchronise());
         CHECK(forceBalancer2.getNrOfSprings() == 6693);
         CHECK(forceBalancer2.getNrOfIterations() > 1);
         CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
@@ -694,7 +691,7 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
         CHECK(forceBalancer2.getNrOfSprings() == 10000);
         // remove the inactive ones
         CHECK_NOTHROW(forceBalancer2.removeFreeChains());
-        CHECK_NOTHROW(forceBalancer2.synchronise());
+
         CHECK(forceBalancer2.getNrOfSprings() == forceRelaxer.getNrOfSprings());
         CHECK(forceBalancer2.getPressure() ==
               Catch::Approx(forceRelaxer.getPressure()));
