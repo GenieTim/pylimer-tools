@@ -776,6 +776,17 @@ namespace calc {
         const Eigen::VectorXd& u,
         const bool is2D) const;
 
+      size_t getOtherSpringIndex(const ForceBalanceNetwork& net,
+                                 const size_t springIdx,
+                                 const size_t linkIdx) const
+      {
+        assert(net.springPartIndexA[springIdx] == linkIdx ||
+               net.springPartIndexB[springIdx] == linkIdx);
+        return net.springPartIndexA[springIdx] == linkIdx
+                 ? net.springPartIndexB[springIdx]
+                 : net.springPartIndexA[springIdx];
+      }
+
       /**
        * @brief Query the box offset for a specific spring in a specific
        * direction
@@ -1496,7 +1507,8 @@ namespace calc {
         const bool respectLoops = true);
 
       /**
-       * @brief Adjust the two spring's box offsets to work best with the specified slip-link
+       * @brief Adjust the two spring's box offsets to work best with the
+       * specified slip-link
        *
        * @param net the network to adjust
        * @param slipLinkIdx the slip-link around which to adjust the two springs
@@ -1504,6 +1516,8 @@ namespace calc {
        * @param spring2 the partial spring idx of the other spring
        */
       void reAlignSlipLinkToImages(ForceBalanceNetwork& net,
+
+                                   Eigen::VectorXd& u,
                                    const size_t slipLinkIdx,
                                    const size_t spring1,
                                    const size_t spring2) const;
