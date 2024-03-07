@@ -405,7 +405,7 @@ namespace calc {
     {
       Eigen::VectorXi nrOfActiveSpringsConnected =
         Eigen::VectorXi::Zero(this->forceRelaxationNetwork.nrOfNodes);
-      ArrayXb springIsActive =
+      Eigen::ArrayXb springIsActive =
         this->findActiveSprings(this->currentSpringDistances, tolerance);
       for (size_t i = 0; i < this->forceRelaxationNetwork.nrOfSprings; i++) {
         if (springIsActive[i] == true) /* active spring */

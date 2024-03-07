@@ -619,11 +619,12 @@ namespace calc {
       std::vector<Eigen::ArrayXi> resultingCoordinateIndexMask;
       std::vector<Eigen::ArrayXi> involvedSpringPartCoordinateIndexMask;
       // global block list: block all indices that are added to a result already
-      ArrayXb globalBlocked = ArrayXb::Constant(net.nrOfLinks, false);
+      Eigen::ArrayXb globalBlocked =
+        Eigen::ArrayXb::Constant(net.nrOfLinks, false);
       size_t remainingLinks = net.nrOfLinks;
       size_t globalStartingIdx = 0;
       while (remainingLinks > 0) {
-        ArrayXb localBlocked = globalBlocked;
+        Eigen::ArrayXb localBlocked = globalBlocked;
         std::vector<size_t> localIndexList;
         std::vector<size_t> localSpringIndexList;
 
@@ -907,6 +908,7 @@ namespace calc {
       // then, we remove all cross-links that are 0- or 1-functional
       for (long int crosslinkIdx = net.nrOfNodes - 1; crosslinkIdx >= 0;
            --crosslinkIdx) {
+        assert(net.springIndicesOfLinks.size() > crosslinkIdx);
         if (net.springIndicesOfLinks[crosslinkIdx].size() == 0 // f = 0
         ) {
           // std::cout << "Removing x-link " << crosslinkIdx << std::endl;
@@ -914,7 +916,7 @@ namespace calc {
           this->validateNetwork(net, displacements, springPartitions);
         }
 
-        if ( // or f = 1, NOT primary loop
+        else if ( // or f = 1, NOT primary loop
           net.springIndicesOfLinks[crosslinkIdx].size() == 1 &&
           XOR(
             net.linkIndicesOfSprings[net.springIndicesOfLinks[crosslinkIdx][0]]
@@ -3493,27 +3495,24 @@ namespace calc {
              net.springPartIndexB[spring1] == slipLinkIdx);
       assert(net.springPartIndexA[spring2] == slipLinkIdx ||
              net.springPartIndexB[spring2] == slipLinkIdx);
-      assert(net.linkIsSlipLink[slipLinkIdx]);
+      assert(net.linkIsSliplink[slipLinkIdx]);
       Eigen::Vector3d totalOffset =
         this->getPartialSpringBoxOffsetTo(net, spring1, slipLinkIdx) +
         this->getPartialSpringBoxOffsetFrom(net, spring2, slipLinkIdx);
-      if (totalOffset.maxCoeff() <
-          this->universe.getBox().getL().maxCoeff() * 0.2) {
-        // nothing to adjust...
-        return;
-      }
+      Eigen::Vector3d totalDistanceBefore =
+        this->evaluatePartialSpringDistanceTo(net, u, spring1, slipLinkIdx) +
+        this->evaluatePartialSpringDistanceFrom(net, u, spring2, slipLinkIdx);
 
       Eigen::Vector3d sourceCoords =
         net.coordinates.segment(
-          3 * this->getOtherSpringIndex(net, spring1, slipLinkIdx)) +
-        u.segment(3 * this->getOtherSpringIndex(net, spring1, slipLinkIdx));
+          3 * this->getOtherSpringIndex(net, spring1, slipLinkIdx), 3) +
+        u.segment(3 * this->getOtherSpringIndex(net, spring1, slipLinkIdx), 3);
       Eigen::Vector3d targetCoords =
         net.coordinates.segment(
-          3 * this->getOtherSpringIndex(net, spring2, slipLinkIdx)) +
-        u.segment(3 * this->getOtherSpringIndex(net, spring2, slipLinkIdx)) +
-        totalOffset;
-      Eigen::Vector3d viaCoords =
-        net.coordinates.segment(3 * slipLinkIdx) + u.segment(3 * slipLinkIdx);
+          3 * this->getOtherSpringIndex(net, spring2, slipLinkIdx), 3) +
+        u.segment(3 * this->getOtherSpringIndex(net, spring2, slipLinkIdx), 3);
+      Eigen::Vector3d viaCoords = net.coordinates.segment(3 * slipLinkIdx, 3) +
+                                  u.segment(3 * slipLinkIdx, 3);
 
       double bestOffsetScore = -1.;
       Eigen::Vector3d bestOffset;
@@ -3521,23 +3520,27 @@ namespace calc {
       // ugly brute-force method to check all possible combinations (ideally,
       // more or less at least)
       Eigen::Array3i multiplicity =
-        (totalOffset / this->universe.getBox().getL()).rint().array();
+        (totalOffset.array() / this->universe.getBox().getL())
+          .rint()
+          .cast<int>();
       for (int mx = std::min(0, multiplicity[0]);
-           mx < std::max(0, multiplicity[0]);
+           mx <= std::max(0, multiplicity[0]);
            ++mx) {
         for (int my = std::min(0, multiplicity[1]);
-             my < std::max(0, multiplicity[1]);
+             my <= std::max(0, multiplicity[1]);
              ++my) {
           for (int mz = std::min(0, multiplicity[2]);
-               mz < std::max(0, multiplicity[2]);
+               mz <= std::max(0, multiplicity[2]);
                ++mz) {
             Eigen::Vector3d currentOffset;
             currentOffset << mx * net.L[0], my * net.L[1], mz * net.L[2];
 
-            double currentScore =
-              ((viaCoords - sourceCoords) + currentOffset).squaredNorm() +
-              ((targetCoords - viaCoords) + (totalOffset - currentOffset))
-                .squaredNorm();
+            Eigen::Vector3d vec1 = (viaCoords - sourceCoords) + currentOffset;
+            Eigen::Vector3d vec2 =
+              (targetCoords - viaCoords) + (totalOffset - currentOffset);
+            assert((vec1 + vec2).isApprox(totalDistanceBefore));
+
+            double currentScore = vec1.squaredNorm() + vec2.squaredNorm();
 
             if (bestOffsetScore < 0 || bestOffsetScore > currentScore) {
               bestOffsetScore = currentScore;
@@ -3557,6 +3560,11 @@ namespace calc {
       if (net.springPartIndexB[spring2] == slipLinkIdx) {
         net.springPartBoxOffset.segment(3 * spring2, 3) *= -1.;
       }
+
+      Eigen::Vector3d totalDistanceNow =
+        this->evaluatePartialSpringDistanceTo(net, u, spring1, slipLinkIdx) +
+        this->evaluatePartialSpringDistanceFrom(net, u, spring2, slipLinkIdx);
+      assert((totalDistanceNow.isApprox(totalDistanceBefore)));
     };
 
     /**
@@ -4661,7 +4669,7 @@ namespace calc {
           this->initialConfig.springPartBoxOffset.segment(
             3 * newSpringIndex, 3) = Eigen::Vector3d::Zero();
           this->reAlignSlipLinkToImages(this->initialConfig,
-                                        this->currentDisplacement,
+                                        this->currentDisplacements,
                                         newNodeIdx,
                                         newSpringIndex,
                                         lastSpringIndex);
@@ -5063,7 +5071,7 @@ namespace calc {
     {
       Eigen::VectorXi nrOfActiveSpringsConnected =
         Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
-      ArrayXb springIsActive =
+      Eigen::ArrayXb springIsActive =
         this->findActiveSprings(this->currentSpringDistances, tolerance);
       for (size_t i = 0; i < this->initialConfig.nrOfSprings; i++) {
         if (springIsActive[i] == true) /* active spring */
@@ -5089,7 +5097,7 @@ namespace calc {
     {
       Eigen::VectorXi nrOfActivePartialSpringsConnected =
         Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
-      ArrayXb springIsActive =
+      Eigen::ArrayXb springIsActive =
         this->findActiveSprings(this->currentPartialSpringDistances, tolerance);
       RUNTIME_EXP_IFN(
         springIsActive.size() == this->initialConfig.nrOfPartialSprings,
@@ -5219,7 +5227,7 @@ namespace calc {
       net.coordinates = Eigen::VectorXd::Zero(3 * net.nrOfLinks);
       net.nrOfCrosslinkSwapsEndured = Eigen::ArrayXi::Zero(0);
       net.oldAtomIds = Eigen::ArrayXi::Zero(net.nrOfLinks);
-      net.linkIsSliplink = ArrayXb::Constant(net.nrOfLinks, false);
+      net.linkIsSliplink = Eigen::ArrayXb::Constant(net.nrOfLinks, false);
       net.springIndicesOfLinks.reserve(net.nrOfLinks);
       for (size_t i = 0; i < net.nrOfLinks; ++i) {
         net.springIndicesOfLinks.push_back(std::vector<size_t>());
@@ -5235,11 +5243,12 @@ namespace calc {
       net.springCoordinateIndexA = Eigen::ArrayXi::Zero(3 * net.nrOfSprings);
       net.springCoordinateIndexB = Eigen::ArrayXi::Zero(3 * net.nrOfSprings);
       net.springPartBoxOffset = Eigen::VectorXd::Zero(3 * net.nrOfSprings);
-      net.springIsActive = ArrayXb::Constant(net.nrOfSprings, false);
+      net.springIsActive = Eigen::ArrayXb::Constant(net.nrOfSprings, false);
       net.springsContourLength = Eigen::VectorXd::Zero(net.nrOfSprings);
       net.oldAtomIdToSpringIndex.reserve(this->universe.getNrOfAtoms());
       net.springToMoleculeIds.reserve(nrOfSprings);
-      net.partialSpringIsPartial = ArrayXb::Constant(net.nrOfSprings, false);
+      net.partialSpringIsPartial =
+        Eigen::ArrayXb::Constant(net.nrOfSprings, false);
 
       // convert beads
       std::map<int, int> atomIdToNode;

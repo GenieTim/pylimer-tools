@@ -14,7 +14,6 @@ if (NOT DEFINED CODE_COVERAGE)
 	option(CODE_COVERAGE "Collect coverage from test library" OFF)
 endif()
 
-
 # TODO: remove
 # set(CMAKE_CXX_FLAGS "-pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wmissing-declarations -Wmissing-include-dirs -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-overflow=5 -Wswitch-default -Wundef -Wno-unused -g")
 
@@ -91,6 +90,7 @@ target_sources(pylimer_tools
 		${CMAKE_CURRENT_LIST_DIR}/calc/OutputSupportingSimulation.cpp
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceEvaluator.cpp
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceRelaxation.cpp
+		${CMAKE_CURRENT_LIST_DIR}/calc/EntanglementDetector.cpp
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance.cpp
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance2.cpp
 		${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.cpp
@@ -118,6 +118,7 @@ target_sources(pylimer_tools
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPUtilityStructures.h
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceEvaluator.h
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceRelaxation.h
+		${CMAKE_CURRENT_LIST_DIR}/calc/EntanglementDetector.h
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance.h
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance2.h
 		${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.h
@@ -142,6 +143,9 @@ target_sources(pylimer_tools
 # endif()
 
 set_target_properties(pylimer_tools PROPERTIES VERSION ${PROJECT_VERSION})
+
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/version_config.h.in ${CMAKE_BINARY_DIR}/generated/version_config.h )
+include_directories( ${CMAKE_BINARY_DIR}/generated/ )
 
 if (CODE_COVERAGE)
 	set(ENABLE_COVERAGE ON)

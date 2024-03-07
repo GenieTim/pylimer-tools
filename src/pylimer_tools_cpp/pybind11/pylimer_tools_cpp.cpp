@@ -1,6 +1,8 @@
 
+#include "version_config.h"
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <string>
 
 namespace py = pybind11;
 
@@ -33,4 +35,9 @@ PYBIND11_MODULE(pylimer_tools_cpp, m)
   init_pylimer_bound_writers(m);
   init_pylimer_bound_generators(m);
   init_pylimer_bound_calc(m);
+
+  m.def("versionInformation", []() {
+    return "pylimer_tools, version " + std::string(__PROJECT_VERSION__) + "(" +
+           std::string(__LIB_VERSION__) + "), compiled " + std::string(__DATE__) + " " + std::string(__TIME__) + ".";
+  });
 }

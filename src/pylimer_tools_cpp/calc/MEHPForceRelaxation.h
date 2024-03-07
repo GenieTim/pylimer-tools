@@ -502,7 +502,7 @@ namespace calc {
         net->springBoxOffset = Eigen::VectorXd::Zero(3 * net->nrOfSprings);
         net->springCoordinateIndexB =
           Eigen::ArrayXi::Zero(3 * net->nrOfSprings);
-        net->springIsActive = ArrayXb::Constant(net->nrOfSprings, false);
+        net->springIsActive = Eigen::ArrayXb::Constant(net->nrOfSprings, false);
         net->springsContourLength = Eigen::VectorXd::Zero(net->nrOfSprings);
         Eigen::VectorXd targetDistances =
           Eigen::VectorXd::Zero(3 * net->nrOfSprings);
@@ -747,7 +747,7 @@ namespace calc {
           return 1.;
         }
         // find all active springs
-        ArrayXb activeSprings =
+        Eigen::ArrayXb activeSprings =
           this->findActiveSprings(springDistances, tolerance);
         if (activeSprings.count() == 0) {
           return 1.;
@@ -788,7 +788,7 @@ namespace calc {
           return 1.;
         }
         // find all active springs
-        ArrayXb activeSprings =
+        Eigen::ArrayXb activeSprings =
           this->findActiveSprings(springDistances, tolerance);
         if (activeSprings.count() == 0) {
           return 1.;
@@ -797,7 +797,7 @@ namespace calc {
         // that are connected to active springs
         bool hadChanged = true;
         while (hadChanged) {
-          ArrayXb oldActiveSprings = activeSprings;
+          Eigen::ArrayXb oldActiveSprings = activeSprings;
           for (size_t i = 0; i < net->nrOfNodes; ++i) {
             bool anyActive = false;
             for (size_t spring_idx : net->springIndicesOfLinks[i]) {
@@ -836,12 +836,12 @@ namespace calc {
        *
        * @param springDistances
        * @param tolerance
-       * @return ArrayXb
+       * @return Eigen::ArrayXb
        */
-      ArrayXb findActiveSprings(const Eigen::VectorXd& springDistances,
+      Eigen::ArrayXb findActiveSprings(const Eigen::VectorXd& springDistances,
                                 const double tolerance = 0.1) const
       {
-        ArrayXb result = ArrayXb::Constant(springDistances.size() / 3, false);
+        Eigen::ArrayXb result = Eigen::ArrayXb::Constant(springDistances.size() / 3, false);
         for (size_t i = 0; i < springDistances.size() / 3; ++i) {
           result[i] =
             sqrt(springDistances[3 * i + 0] * springDistances[3 * i + 0] +

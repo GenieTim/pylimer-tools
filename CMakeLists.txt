@@ -7,6 +7,10 @@ endif ()
 
 # start project
 project(pylimer_tools VERSION "0.1.11")
+add_definitions( -DOVERALL_PROJECT_VERSION="${CMAKE_PROJECT_VERSION}")
+
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/src/pylimer_tools_cpp/version_config.h.in ${CMAKE_BINARY_DIR}/generated/version_config.h )
+include_directories( ${CMAKE_BINARY_DIR}/generated/ )
 
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 20)
