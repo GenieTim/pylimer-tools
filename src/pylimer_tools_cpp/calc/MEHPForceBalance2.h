@@ -251,8 +251,9 @@ namespace calc {
           universe.getChainsWithCrosslinker(crosslinkerType);
 
         // add ends of chains
-        std::unordered_map<size_t, igraph_integer_t> endAtomIdToVertexId;
-        endAtomIdToVertexId.reserve(crosslinkerChains.size() * 2);
+        std::vector<igraph_integer_t> endAtomIdxToVertexId =
+          pylimer_tools::utils::initializeWithValue<igraph_integer_t>(
+            universe.getNrOfAtoms(), -1);
         igraph_integer_t currentVertexId = 0;
         for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
           pylimer_tools::entities::Molecule chain = crosslinkerChains[i];
@@ -261,16 +262,16 @@ namespace calc {
           }
           std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
             chain.getAtomsLinedUp(crosslinkerType, false, true);
-          if (!pylimer_tools::utils::map_has_key(endAtomIdToVertexId,
-                                                 linedUpAtoms[0].getId())) {
-            endAtomIdToVertexId[linedUpAtoms[0].getId()] = currentVertexId;
+          size_t firstAtomIdx =
+            universe.getIdxByAtomId(linedUpAtoms[0].getId());
+          if (endAtomIdxToVertexId[firstAtomIdx] == -1) {
+            endAtomIdxToVertexId[firstAtomIdx] = currentVertexId;
             currentVertexId += 1;
           }
-          if (!pylimer_tools::utils::map_has_key(
-                endAtomIdToVertexId,
-                pylimer_tools::utils::last(linedUpAtoms).getId())) {
-            endAtomIdToVertexId[pylimer_tools::utils::last(linedUpAtoms)
-                                  .getId()] = currentVertexId;
+          size_t lastAtomIdx = universe.getIdxByAtomId(
+            pylimer_tools::utils::last(linedUpAtoms).getId());
+          if (endAtomIdxToVertexId[lastAtomIdx] == -1) {
+            endAtomIdxToVertexId[lastAtomIdx] = currentVertexId;
             currentVertexId += 1;
           }
         }
@@ -292,15 +293,14 @@ namespace calc {
             chain.getAtomsLinedUp(crosslinkerType, false, true);
           size_t previousIdx = 0;
           igraph_integer_t previousVertexId =
-            endAtomIdToVertexId.at(linedUpAtoms[0].getId());
+            endAtomIdxToVertexId[universe.getIdxByAtomId(
+              linedUpAtoms[0].getId())];
           fb.setVertexPropertiesFromAtom(
-            endAtomIdToVertexId.at(linedUpAtoms[0].getId()),
-            linedUpAtoms[0],
-            fb.crosslinkerType);
+            previousVertexId, linedUpAtoms[0], fb.crosslinkerType);
           pylimer_tools::entities::Atom lastAtom =
             pylimer_tools::utils::last(linedUpAtoms);
           fb.setVertexPropertiesFromAtom(
-            endAtomIdToVertexId.at(lastAtom.getId()),
+            endAtomIdxToVertexId[universe.getIdxByAtomId(lastAtom.getId())],
             lastAtom,
             fb.crosslinkerType);
           assert(linedUpAtoms.size() == chain.getLength() ||
@@ -333,28 +333,37 @@ namespace calc {
 
           // close the chain
           igraph_integer_t currentEdgeId = igraph_ecount(&fb.graph);
-          igraph_add_edge(&fb.graph,
-                          previousVertexId,
-                          endAtomIdToVertexId.at(lastAtom.getId()));
+          igraph_add_edge(
+            &fb.graph,
+            previousVertexId,
+            endAtomIdxToVertexId[universe.getIdxByAtomId(lastAtom.getId())]);
           fb.setBondPropertiesBasedOnChain(chain,
                                            previousIdx,
                                            linedUpAtoms.size() - 1,
                                            currentEdgeId,
                                            parentEdgeId);
+
+#ifndef NDEBUG
           fb.validateIgraphSpring(parentEdgeId);
+#endif
           parentEdgeId += 1;
         }
 
-        // validate the creation
-        for (auto& [key, value] : endAtomIdToVertexId) {
-          size_t savedAtomId =
-            castToIgraphInt(igraph_cattribute_VAN(&fb.graph, "atom_id", value));
-          assert(savedAtomId == key);
-          size_t degreeNow = fb.getVertexDegree(value);
-          size_t degreeBefore =
-            universe.getVertexDegree(universe.getIdxByAtomId(key));
+// validate the creation
+#ifndef NDEBUG
+        for (size_t i = 0; i < endAtomIdxToVertexId.size(); ++i) {
+          if (endAtomIdxToVertexId[i] < 0) {
+            continue;
+          }
+          igraph_integer_t vertexId = endAtomIdxToVertexId[i];
+          size_t savedAtomId = castToIgraphInt(
+            igraph_cattribute_VAN(&fb.graph, "atom_id", vertexId));
+          assert(savedAtomId == universe.getAtomIdByIdx(i));
+          size_t degreeNow = fb.getVertexDegree(vertexId);
+          size_t degreeBefore = universe.getVertexDegree(i);
           assert(degreeNow == degreeBefore);
         }
+#endif
 
         // cleanup the graph
         // fb.removeSubfunctionalVertices();
@@ -1872,6 +1881,7 @@ namespace calc {
       igraph_integer_t getVertexDegree(const igraph_integer_t vertexId,
                                        const bool loops = true) const
       {
+        assert(vertexId >= 0);
         assert(vertexId < igraph_vcount(&this->graph));
         igraph_integer_t degree;
         igraph_degree_1(&this->graph, &degree, vertexId, IGRAPH_ALL, loops);
@@ -1890,6 +1900,7 @@ namespace calc {
         const pylimer_tools::entities::Atom& atom,
         const int atomType)
       {
+        assert(vertexId >= 0);
         assert(vertexId < igraph_vcount(&this->graph));
         assert(atomType == this->crosslinkerType ||
                atomType == this->slipLinkType);
@@ -1914,6 +1925,7 @@ namespace calc {
                                         pylimer_tools::entities::Atom& atom1,
                                         pylimer_tools::entities::Atom& atom2)
       {
+        assert(vertexId >= 0);
         assert(vertexId < igraph_vcount(&this->graph));
         assert(atom1.getType() != this->crosslinkerType &&
                atom2.getType() != this->crosslinkerType);

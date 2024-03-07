@@ -191,8 +191,8 @@ namespace calc {
 #endif
           }
         }
-          this->handleOutput(iterationsDone);
-        
+        this->handleOutput(iterationsDone);
+
       } while ((currentResidual / initialResidual > xtol) &&
                (iterationsDone < maxNrOfSteps) &&
                (igraph_ecount(&this->graph) > 0));
@@ -1413,7 +1413,7 @@ namespace calc {
         this->removeDanglingChains();
         numRemovedInIteration = this->removeOrphanedVertices();
 
-#ifndef NDEBUG
+#ifndef VERBOSE_DEBUG
         this->validateIgraphSprings();
 #endif
 
@@ -1421,7 +1421,7 @@ namespace calc {
         //           << " vertices with degree < 2" << std::endl;
 
         primaryLoopsRemovedInIteration = this->cleanupPrimaryLoopsInStructure();
-#ifndef NDEBUG
+#ifndef VERBOSE_DEBUG
         this->validateIgraphSprings();
 #endif
         // std::cout << "Removed " << primaryLoopsRemovedInIteration
@@ -1449,7 +1449,7 @@ namespace calc {
           }
         }
 
-#ifndef NDEBUG
+#ifndef VERBOSE_DEBUG
         this->validateIgraphSprings();
 #endif
         // std::cout << "Removed " << numRemovedInIteration
@@ -1461,7 +1461,7 @@ namespace calc {
         primaryLoopsRemovedInIteration +=
           this->cleanupPrimaryLoopsInStructure();
         primaryLoopsRemovedTotal += primaryLoopsRemovedInIteration;
-#ifndef NDEBUG
+#ifndef VERBOSE_DEBUG
         this->validateIgraphSprings();
 #endif
         // std::cout << "Removed " << primaryLoopsRemovedInIteration
@@ -1472,6 +1472,9 @@ namespace calc {
         this->renumberParentSprings();
         this->net.isUpToDate = false;
       }
+#ifndef NDEBUG
+      this->validateIgraphSprings();
+#endif
       return numRemovedTotal;
     }
 
