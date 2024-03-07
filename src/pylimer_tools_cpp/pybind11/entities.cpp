@@ -92,11 +92,11 @@ init_pylimer_bound_entities(py::module_& m)
     .def("getOffset",
          &Box::getOffset,
          R"pbdoc(
-          Compute the offset required to compensate for periodic boundary conditions.
+     Compute the offset required to compensate for periodic boundary conditions.
 
-          Useful e.g. if you are using absolute coordinates for distances, but 
-          still need an infinite network, 
-          e.g., if the bonds need to be able to get longer than half the box.
+     Useful e.g. if you are using absolute coordinates for distances, but 
+     still need an infinite network, 
+     e.g., if the bonds need to be able to get longer than half the box.
     )pbdoc",
          py::arg("distances"))
     .def(
@@ -107,7 +107,7 @@ init_pylimer_bound_entities(py::module_& m)
         return dist;
       },
       R"pbdoc(
-          Adjust the specified distances to fit into this box.
+      Adjust the specified distances to fit into this box.
       )pbdoc",
       py::arg("distances"))
     .def(py::pickle(
