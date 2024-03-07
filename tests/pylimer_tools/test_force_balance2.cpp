@@ -1448,7 +1448,7 @@ TEST_CASE("MEHP Force Balance 2 Fully active chains are fully active",
       CHECK(forceBalancer.getNrOfPartialSprings() == 16000);
       CHECK_NOTHROW(forceBalancer.runForceRelaxation(5000, 1e-8));
       CHECK(forceBalancer.getNrOfIterations() > 0);
-      CHECK(forceBalancer.getExitReason() == pcm::ExitReason::F_TOLERANCE);
+      CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
       CHECK(forceBalancer.getNrOfActiveSprings() ==
             forceBalancer.getNrOfSprings());
       CHECK(forceBalancer.removeSubfunctionalVertices() == 0);
