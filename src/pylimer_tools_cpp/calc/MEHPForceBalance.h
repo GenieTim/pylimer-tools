@@ -5,6 +5,7 @@
 #include "../entities/Box.h"
 #include "../entities/NeighbourList.h"
 #include "../entities/Universe.h"
+#include "EntanglementDetector.h"
 #include "MEHPForceEvaluator.h"
 #include "MEHPUtilityStructures.h"
 #include "OutputSupportingSimulation.h"
@@ -63,6 +64,261 @@ namespace calc {
           universe.getMolecules(this->crosslinkerType).size();
         this->validateNetwork();
       };
+
+      static MEHPForceBalance constructWithRandomSlipLinks(
+        const pylimer_tools::entities::Universe& universe,
+        const size_t nrOfSliplinksToSample,
+        const double cutoff,
+        const size_t minimumNrOfSliplinks,
+        const double sameStrandCutoff,
+        const std::string seed = "",
+        int crosslinkerType = 2,
+        bool is2D = false,
+        double kappa = 1.0)
+      {
+        pylimer_tools::entities::Universe emptyUniverse =
+          pylimer_tools::entities::Universe(universe.getBox());
+        MEHPForceBalance fb =
+          MEHPForceBalance(emptyUniverse, crosslinkerType, is2D, kappa);
+        fb.configAssumeBoxLargeEnough(false);
+
+        // sample the "entanglements"
+        pylimer_tools::calc::entanglement_detection::AtomPairEntanglements
+          entanglements = pylimer_tools::calc::entanglement_detection::
+            randomlyFindEntanglements(universe,
+                                      nrOfSliplinksToSample,
+                                      cutoff,
+                                      minimumNrOfSliplinks,
+                                      sameStrandCutoff,
+                                      seed,
+                                      crosslinkerType);
+
+        std::vector<std::pair<size_t, size_t>> pairsOfAtoms =
+          entanglements.pairsOfAtoms;
+        std::vector<long int> pairOfAtom = entanglements.pairOfAtom;
+
+        std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
+          universe.getChainsWithCrosslinker(crosslinkerType);
+
+        // add ends of chains
+        std::unordered_map<size_t, size_t> endAtomIdToLinkIdx;
+        endAtomIdToLinkIdx.reserve(crosslinkerChains.size() * 2);
+        size_t currentVertexId = 0;
+        size_t numUseableChains = 0;
+        for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
+          pylimer_tools::entities::Molecule chain = crosslinkerChains[i];
+          if (chain.getLength() < 2) {
+            continue;
+          }
+          std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
+            chain.getAtomsLinedUp(crosslinkerType, false, true);
+          if (!pylimer_tools::utils::map_has_key(endAtomIdToLinkIdx,
+                                                 linedUpAtoms[0].getId())) {
+            endAtomIdToLinkIdx[linedUpAtoms[0].getId()] = currentVertexId;
+            currentVertexId += 1;
+          }
+          if (!pylimer_tools::utils::map_has_key(
+                endAtomIdToLinkIdx,
+                pylimer_tools::utils::last(linedUpAtoms).getId())) {
+            endAtomIdToLinkIdx[pylimer_tools::utils::last(linedUpAtoms)
+                                 .getId()] = currentVertexId;
+            currentVertexId += 1;
+          }
+          numUseableChains += 1;
+        }
+
+        // resize
+        // links
+        fb.initialConfig.nrOfNodes = currentVertexId;
+        fb.initialConfig.nrOfLinks = currentVertexId + pairsOfAtoms.size();
+        fb.initialConfig.oldAtomIds.resize(fb.initialConfig.nrOfNodes);
+        fb.currentDisplacements.resize(3 * fb.initialConfig.nrOfLinks);
+        fb.initialConfig.coordinates.conservativeResize(
+          3 * fb.initialConfig.nrOfLinks);
+        fb.initialConfig.linkIsSliplink.conservativeResize(
+          fb.initialConfig.nrOfLinks);
+        fb.initialConfig.springIndicesOfLinks =
+          pylimer_tools::utils::initializeWithValue(fb.initialConfig.nrOfLinks,
+                                                    std::vector<size_t>());
+        fb.initialConfig.nrOfCrosslinkSwapsEndured.conservativeResize(
+          fb.initialConfig.nrOfLinks - fb.initialConfig.nrOfNodes);
+        fb.initialConfig.nrOfCrosslinkSwapsEndured.setZero();
+
+        // springs
+        fb.initialConfig.nrOfSprings = numUseableChains;
+        fb.initialConfig.springIndexA.conservativeResize(numUseableChains);
+        fb.initialConfig.springIndexB.conservativeResize(numUseableChains);
+        fb.initialConfig.springCoordinateIndexA.conservativeResize(
+          3 * numUseableChains);
+        fb.initialConfig.springCoordinateIndexB.conservativeResize(
+          3 * numUseableChains);
+        fb.initialConfig.springIsActive.conservativeResize(numUseableChains);
+        fb.initialConfig.springsContourLength.conservativeResize(
+          numUseableChains);
+        fb.initialConfig.linkIndicesOfSprings =
+          pylimer_tools::utils::initializeWithValue(numUseableChains,
+                                                    std::vector<size_t>());
+        fb.initialConfig.localToGlobalSpringIndex =
+          pylimer_tools::utils::initializeWithValue(numUseableChains,
+                                                    std::vector<size_t>());
+
+        // partial springs
+        // we don't know the actual number (yet), but we can over-estimate
+        // pretty well, such that we only need to reduce afterwards
+        size_t numPartialSpringsEstimate =
+          numUseableChains + 2 * pairsOfAtoms.size();
+        fb.initialConfig.nrOfPartialSprings = numPartialSpringsEstimate;
+        fb.currentSpringPartitionsVec.resize(numPartialSpringsEstimate);
+        fb.initialConfig.springPartBoxOffset.conservativeResize(
+          3 * numPartialSpringsEstimate);
+        fb.initialConfig.springPartCoordinateIndexA.conservativeResize(
+          3 * numPartialSpringsEstimate);
+        fb.initialConfig.springPartCoordinateIndexB.conservativeResize(
+          3 * numPartialSpringsEstimate);
+        fb.initialConfig.springPartIndexA.conservativeResize(
+          numPartialSpringsEstimate);
+        fb.initialConfig.springPartIndexB.conservativeResize(
+          numPartialSpringsEstimate);
+        fb.initialConfig.partialToFullSpringIndex.conservativeResize(
+          numPartialSpringsEstimate);
+        fb.initialConfig.partialSpringIsPartial.conservativeResize(
+          numPartialSpringsEstimate);
+
+        size_t springIdx = 0;
+        size_t partialSpringIdx = 0;
+        for (size_t chainIdx = 0; chainIdx < crosslinkerChains.size();
+             ++chainIdx) {
+          pylimer_tools::entities::Molecule chain = crosslinkerChains[chainIdx];
+          if (chain.getLength() < 2) {
+            continue;
+          }
+
+          fb.initialConfig.springToMoleculeIds.push_back(chainIdx);
+          std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
+            chain.getAtomsLinedUp(crosslinkerType, false, true);
+          size_t previousIdx = 0;
+
+          size_t previousLinkIdx =
+            endAtomIdToLinkIdx.at(linedUpAtoms[0].getId());
+          fb.setLinkPropertiesFromAtom(
+            fb.initialConfig,
+            endAtomIdToLinkIdx.at(linedUpAtoms[0].getId()),
+            linedUpAtoms[0],
+            fb.crosslinkerType);
+          fb.initialConfig.linkIndicesOfSprings[springIdx].push_back(
+            endAtomIdToLinkIdx.at(linedUpAtoms[0].getId()));
+          fb.initialConfig
+            .springIndicesOfLinks[endAtomIdToLinkIdx.at(
+              linedUpAtoms[0].getId())]
+            .push_back(springIdx);
+          pylimer_tools::entities::Atom lastAtom =
+            pylimer_tools::utils::last(linedUpAtoms);
+          fb.setLinkPropertiesFromAtom(fb.initialConfig,
+                                       endAtomIdToLinkIdx.at(lastAtom.getId()),
+                                       lastAtom,
+                                       fb.crosslinkerType);
+          fb.initialConfig.springIndexA[springIdx] = previousLinkIdx;
+          assert(linedUpAtoms.size() == chain.getLength() ||
+                 linedUpAtoms.size() == chain.getLength() + 1);
+          if (pairsOfAtoms.size() > 0) {
+            for (size_t i = 1; i < linedUpAtoms.size() - 1; i++) {
+              pylimer_tools::entities::Atom a = linedUpAtoms[i];
+              if (pairOfAtom[universe.getIdxByAtomId(a.getId())] != -1) {
+                size_t thisLinkIdx =
+                  currentVertexId +
+                  pairOfAtom[universe.getIdxByAtomId(a.getId())];
+                fb.initialConfig.linkIndicesOfSprings[springIdx].push_back(
+                  thisLinkIdx);
+                fb.initialConfig.springIndicesOfLinks[thisLinkIdx].push_back(
+                  springIdx);
+                // set the mean x,y,z of the two involved atoms
+                pylimer_tools::entities::Atom a1 = universe.getAtom(
+                  pairsOfAtoms[pairOfAtom[universe.getIdxByAtomId(a.getId())]]
+                    .first);
+                pylimer_tools::entities::Atom a2 = universe.getAtom(
+                  pairsOfAtoms[pairOfAtom[universe.getIdxByAtomId(a.getId())]]
+                    .second);
+                fb.setLinkPropertiesFromAtoms(
+                  fb.initialConfig, thisLinkIdx, a1, a2, fb.sliplinkType);
+
+                fb.registerPartialSpring(fb.initialConfig,
+                                         partialSpringIdx,
+                                         previousLinkIdx,
+                                         thisLinkIdx);
+                fb.setPartialSpringPropertiesBasedOnChain(
+                  fb.initialConfig,
+                  fb.currentSpringPartitionsVec,
+                  chain,
+                  previousIdx,
+                  i,
+                  springIdx,
+                  partialSpringIdx);
+                fb.initialConfig.localToGlobalSpringIndex[springIdx].push_back(
+                  partialSpringIdx);
+                //
+                previousIdx = i;
+                previousLinkIdx = thisLinkIdx;
+                partialSpringIdx += 1;
+              }
+            }
+          }
+
+          // close the chain
+          size_t lastLinkIdx = endAtomIdToLinkIdx.at(lastAtom.getId());
+          fb.registerPartialSpring(
+            fb.initialConfig, partialSpringIdx, previousLinkIdx, lastLinkIdx);
+          fb.initialConfig.linkIndicesOfSprings[springIdx].push_back(
+            lastLinkIdx);
+          fb.initialConfig.springIndicesOfLinks[lastLinkIdx].push_back(
+            springIdx);
+          fb.setPartialSpringPropertiesBasedOnChain(
+            fb.initialConfig,
+            fb.currentSpringPartitionsVec,
+            chain,
+            previousIdx,
+            linedUpAtoms.size() - 1,
+            springIdx,
+            partialSpringIdx);
+          fb.initialConfig.localToGlobalSpringIndex[springIdx].push_back(
+            partialSpringIdx);
+
+          fb.initialConfig.springIndexB[springIdx] = lastLinkIdx;
+          for (size_t dir = 0; dir < 3; ++dir) {
+            fb.initialConfig.springCoordinateIndexA[3 * springIdx + dir] =
+              3 * fb.initialConfig.springIndexA[springIdx] + dir;
+            fb.initialConfig.springCoordinateIndexB[3 * springIdx + dir] =
+              3 * fb.initialConfig.springIndexB[springIdx] + dir;
+          }
+          fb.initialConfig.springsContourLength[springIdx] =
+            chain.getNrOfBonds();
+
+          partialSpringIdx += 1;
+          springIdx += 1;
+        }
+
+        if (partialSpringIdx < numPartialSpringsEstimate) {
+          fb.initialConfig.nrOfPartialSprings = partialSpringIdx;
+          fb.currentSpringPartitionsVec.conservativeResize(partialSpringIdx);
+          fb.initialConfig.springPartBoxOffset.conservativeResize(
+            3 * partialSpringIdx);
+          fb.initialConfig.springPartCoordinateIndexA.conservativeResize(
+            3 * partialSpringIdx);
+          fb.initialConfig.springPartCoordinateIndexB.conservativeResize(
+            3 * partialSpringIdx);
+          fb.initialConfig.springPartIndexA.conservativeResize(
+            partialSpringIdx);
+          fb.initialConfig.springPartIndexB.conservativeResize(
+            partialSpringIdx);
+          fb.initialConfig.partialToFullSpringIndex.conservativeResize(
+            partialSpringIdx);
+          fb.initialConfig.partialSpringIsPartial.conservativeResize(
+            partialSpringIdx);
+        }
+
+        // TODO: complete data
+
+        return fb;
+      }
 
       /**
        * @brief Actually do run the simulation
@@ -532,7 +788,7 @@ namespace calc {
           return 1.;
         }
         // find all active springs
-        ArrayXb activeSprings =
+        Eigen::ArrayXb activeSprings =
           this->findActiveSprings(springDistances, tolerance);
         if (activeSprings.count() == 0) {
           return 1.;
@@ -767,8 +1023,24 @@ namespace calc {
         const size_t springIdx,
         bool is2d = false) const
       {
-        return this->evaluatePartialSpringDistanceTo(
-          net, u, springIdx, net.springIndexB(springIdx), is2d);
+        assert(net.isUpToDate);
+
+        Eigen::Vector3d dist =
+          ((net.coordinates.segment(3 * net.springPartIndexB(springIdx), 3) +
+            u.segment(3 * net.springPartIndexB(springIdx), 3)) -
+           (net.coordinates.segment(3 * net.springPartIndexA(springIdx), 3) +
+            u.segment(3 * net.springPartIndexA(springIdx), 3))) +
+          net.springPartBoxOffset.segment(3 * springIdx, 3);
+
+        if (this->assumeBoxLargeEnough) {
+          this->universe.getBox().handlePBC<Eigen::Vector3d>(dist);
+        }
+
+        if (is2D) {
+          dist[2] = 0.0;
+        }
+
+        return dist;
       }
 
       Eigen::VectorXd evaluatePartialSpringDistances(
@@ -834,24 +1106,10 @@ namespace calc {
         const size_t linkIdx,
         bool is2d = false) const
       {
-        assert(net.isUpToDate);
         assert(net.springPartIndexA(springIdx) == linkIdx ||
                net.springPartIndexB(springIdx) == linkIdx);
-
         Eigen::Vector3d dist =
-          ((net.coordinates.segment(3 * net.springPartIndexB(springIdx), 3) +
-            u.segment(3 * net.springPartIndexB(springIdx), 3)) -
-           (net.coordinates.segment(3 * net.springPartIndexA(springIdx), 3) +
-            u.segment(3 * net.springPartIndexA(springIdx), 3))) +
-          net.springPartBoxOffset.segment(3 * springIdx, 3);
-
-        if (this->assumeBoxLargeEnough) {
-          this->universe.getBox().handlePBC<Eigen::Vector3d>(dist);
-        }
-
-        if (is2D) {
-          dist[2] = 0.0;
-        }
+          this->evaluatePartialSpringDistance(net, u, springIdx);
 
         return dist * (net.springPartIndexA(springIdx) == linkIdx ? -1. : 1.);
       }
@@ -1157,6 +1415,22 @@ namespace calc {
                                           damping);
         return displacements;
       };
+
+      /**
+       * @brief Adjust the two spring's box offsets to work best with the
+       * specified slip-link
+       *
+       * @param net the network to adjust
+       * @param slipLinkIdx the slip-link around which to adjust the two springs
+       * @param spring1 one of the two partial spring idx
+       * @param spring2 the partial spring idx of the other spring
+       */
+      void reAlignSlipLinkToImages(ForceBalanceNetwork& net,
+
+                                   Eigen::VectorXd& u,
+                                   const size_t slipLinkIdx,
+                                   const size_t spring1,
+                                   const size_t spring2) const;
 
       /**
        * @brief Displace one link to the mean of all connected neighbours
@@ -1478,17 +1752,186 @@ namespace calc {
        *
        * @param springDistances
        * @param tolerance
-       * @return ArrayXb
+       * @return Eigen::ArrayXb
        */
-      ArrayXb findActiveSprings(const Eigen::VectorXd& springDistances,
-                                const double tolerance = 0.01) const
+      Eigen::ArrayXb findActiveSprings(const Eigen::VectorXd& springDistances,
+                                       const double tolerance = 0.01) const
       {
-        ArrayXb result = ArrayXb::Constant(springDistances.size() / 3, false);
+        Eigen::ArrayXb result =
+          Eigen::ArrayXb::Constant(springDistances.size() / 3, false);
         for (size_t i = 0; i < springDistances.size() / 3; ++i) {
           result[i] =
             springDistances.segment(3 * i, 3).squaredNorm() > tolerance;
         }
         return result;
+      }
+
+      /**
+       * @brief Sets the spring into the network
+       *
+       * @param net
+       * @param springIdx
+       * @param linkFrom
+       * @param linkTo
+       */
+      void registerPartialSpring(ForceBalanceNetwork& net,
+                                 const size_t springIdx,
+                                 const size_t linkFrom,
+                                 const size_t linkTo)
+      {
+        net.springPartIndexA[springIdx] = linkFrom;
+        net.springPartIndexB[springIdx] = linkTo;
+        for (size_t i = 0; i < 3; ++i) {
+          net.springPartCoordinateIndexA[3 * springIdx + i] = linkFrom * 3 + i;
+          net.springPartCoordinateIndexB[3 * springIdx + i] = linkTo * 3 + i;
+        }
+      }
+
+      /**
+       * @brief Set the Link Properties From two Atom objects
+       *
+       * @param net
+       * @param linkIdx
+       * @param atom1
+       * @param atom2
+       * @param atomType
+       */
+      void setLinkPropertiesFromAtoms(
+        ForceBalanceNetwork& net,
+        const size_t linkIdx,
+        const pylimer_tools::entities::Atom& atom1,
+        const pylimer_tools::entities::Atom& atom2,
+        int atomType)
+      {
+        assert(linkIdx < net.nrOfLinks);
+        assert(atom1.getType() != this->crosslinkerType &&
+               atom2.getType() != this->crosslinkerType);
+        if (atom1.getId() > atom2.getId()) {
+          // make sure a second call to this function would result in same
+          // result
+          setLinkPropertiesFromAtoms(net, linkIdx, atom2, atom1, atomType);
+          return;
+        }
+
+        Eigen::Vector3d coords = atom1.getCoordinates();
+        Eigen::Vector3d dist = atom2.getCoordinates() - coords;
+        this->universe.getBox().handlePBC(dist);
+        coords += 0.5 * dist;
+
+        net.coordinates.segment(3 * linkIdx, 3) = coords;
+        net.linkIsSliplink[linkIdx] = atomType != this->crosslinkerType;
+      }
+
+      /**
+       * @brief Set the Link Properties From an Atom object
+       *
+       * @param net
+       * @param linkIdx
+       * @param atom
+       * @param atomType
+       */
+      void setLinkPropertiesFromAtom(ForceBalanceNetwork& net,
+                                     const size_t linkIdx,
+                                     const pylimer_tools::entities::Atom& atom,
+                                     int atomType = -1)
+      {
+        if (atomType == -1) {
+          atomType = atom.getType();
+        }
+
+        net.coordinates.segment(3 * linkIdx, 3) = atom.getCoordinates();
+        net.linkIsSliplink[linkIdx] = atomType != this->crosslinkerType;
+        if (!net.linkIsSliplink[linkIdx]) {
+          net.oldAtomIds[linkIdx] = atom.getId();
+        }
+      }
+
+      /**
+       * @brief Use an existing chain to set the relevant edge properties
+       *
+       * @param chain
+       * @param atom1Idx
+       * @param atom2Idx
+       * @param edgeId
+       * @param chainIdx
+       */
+      void setPartialSpringPropertiesBasedOnChain(
+        ForceBalanceNetwork& net,
+        Eigen::VectorXd& partitions,
+        const pylimer_tools::entities::Molecule& chain,
+        const size_t atom1Idx,
+        const size_t atom2Idx,
+        const size_t springIdx,
+        const size_t partialSpringIdx)
+      {
+        assert(atom1Idx < atom2Idx);
+        if (chain.getType() ==
+            pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
+          assert(APPROX_WITHIN(atom1Idx, 0, chain.getLength() - 1, 1e-2));
+          assert(APPROX_WITHIN(atom2Idx, 1, chain.getLength(), 1e-2));
+        } else {
+          assert(APPROX_WITHIN(atom1Idx, 0, chain.getLength() - 2, 1e-2));
+          assert(APPROX_WITHIN(atom2Idx, 1, chain.getLength() - 1, 1e-2));
+        }
+
+        // set the partition, remember the partial spring mapping
+        size_t from = net.springPartIndexA[partialSpringIdx];
+        size_t to = net.springPartIndexB[partialSpringIdx];
+        std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
+          chain.getAtomsLinedUp(crosslinkerType, false, true);
+        partitions[partialSpringIdx] =
+          static_cast<double>(atom2Idx - atom1Idx) /
+          static_cast<double>(chain.getNrOfBonds());
+        net.partialToFullSpringIndex[partialSpringIdx] = springIdx;
+        net.partialSpringIsPartial[partialSpringIdx] = !(
+          atom1Idx == 0 &&
+          atom2Idx == chain.getLength() -
+                        (chain.getType() ==
+                             pylimer_tools::entities::MoleculeType::PRIMARY_LOOP
+                           ? 0
+                           : 1));
+
+        // remember the ids -> springs
+        net.oldAtomIdToSpringIndex[linedUpAtoms[atom1Idx].getId()] = springIdx;
+        net.oldAtomIdToSpringIndex[linedUpAtoms[atom2Idx].getId()] = springIdx;
+
+        // use the actual position of the vertices!
+        Eigen::Vector3d expectedDistance =
+          chain.getOverallBondSumFromTo(linedUpAtoms[atom1Idx].getId(),
+                                        linedUpAtoms[atom2Idx].getId(),
+                                        crosslinkerType);
+        Eigen::Vector3d additionalDistance1 =
+          linedUpAtoms[atom1Idx].getCoordinates() -
+          net.coordinates.segment(3 * from, 3);
+        this->universe.getBox().handlePBC(additionalDistance1);
+        Eigen::Vector3d additionalDistance2 =
+          net.coordinates.segment(3 * to, 3) -
+          linedUpAtoms[atom2Idx].getCoordinates();
+        this->universe.getBox().handlePBC(additionalDistance2);
+        expectedDistance += additionalDistance1 + additionalDistance2;
+        if (this->is2D) {
+          expectedDistance[2] = 0.0;
+        }
+
+        net.springPartBoxOffset.segment(3 * partialSpringIdx, 3) =
+          Eigen::Vector3d::Zero();
+        Eigen::Vector3d actualDistance = this->evaluatePartialSpringDistance(
+          net,
+          Eigen::VectorXd::Zero(net.coordinates.size()),
+          partialSpringIdx,
+          this->is2D);
+        net.springPartBoxOffset.segment(3 * partialSpringIdx, 3) =
+          expectedDistance - actualDistance;
+        assert(this->universe.getBox().isValidOffset(expectedDistance -
+                                                     actualDistance));
+#ifndef NDEBUG
+        Eigen::Vector3d newActualDistance = this->evaluatePartialSpringDistance(
+          net,
+          Eigen::VectorXd::Zero(net.coordinates.size()),
+          partialSpringIdx,
+          this->is2D);
+        assert(newActualDistance.isApprox(expectedDistance));
+#endif
       }
 
       bool swapSlipLinksReversibly(
@@ -1505,22 +1948,6 @@ namespace calc {
         const size_t partialSpringIdx,
         const double oneOverSpringPartitionUpperLimit = 1.0,
         const bool respectLoops = true);
-
-      /**
-       * @brief Adjust the two spring's box offsets to work best with the
-       * specified slip-link
-       *
-       * @param net the network to adjust
-       * @param slipLinkIdx the slip-link around which to adjust the two springs
-       * @param spring1 one of the two partial spring idx
-       * @param spring2 the partial spring idx of the other spring
-       */
-      void reAlignSlipLinkToImages(ForceBalanceNetwork& net,
-
-                                   Eigen::VectorXd& u,
-                                   const size_t slipLinkIdx,
-                                   const size_t spring1,
-                                   const size_t spring2) const;
 
     private:
       pylimer_tools::entities::Universe universe;
@@ -1541,7 +1968,8 @@ namespace calc {
       Eigen::VectorXd currentPartialSpringDistances;
       Eigen::VectorXd
         currentSpringPartitionsVec; /* gives the parametrisation of N */
-      int crosslinkerType;
+      int crosslinkerType = 2;
+      int sliplinkType = 3;
       int nrOfStepsDone = 0;
       ExitReason exitReason = ExitReason::UNSET;
     };

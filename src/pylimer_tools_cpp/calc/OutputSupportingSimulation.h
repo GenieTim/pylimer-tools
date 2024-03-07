@@ -130,6 +130,7 @@ namespace calc {
     ////////////////////////////////////////////////////////////////
     // output speedups
     std::array<int, NUM_COMPUTABLE_DOUBLE_VALUES> doubleValueRequiredEvery;
+    std::array<int, NUM_COMPUTABLE_INT_VALUES> intValueRequiredEvery;
     int requireStressTensorEvery = 0;
     int requireBondLenEvery = 0;
     std::string outputBuffer;
@@ -181,6 +182,13 @@ namespace calc {
              ((currentStep % this->doubleValueRequiredEvery[val]) == 0);
     }
 
+    inline bool requiresEvaluation(const ComputedIntValues val,
+                                   const long int currentStep) const
+    {
+      return (this->intValueRequiredEvery[val] != 0) &&
+             ((currentStep % this->intValueRequiredEvery[val]) == 0);
+    }
+
     /**
      * @brief Iterate all possible output configurations, handle them
      *
@@ -192,13 +200,22 @@ namespace calc {
       // computationally inexpensive
       std::array<long int, NUM_COMPUTABLE_INT_VALUES> intvalues = {
         currentStep,
-        getNumShifts(),
-        getNumRelocations(),
-        static_cast<long int>(getNumAtoms()),
-        static_cast<long int>(getNumExtraAtoms()),
-        static_cast<long int>(getNumBonds()),
-        static_cast<long int>(getNumExtraBonds()),
-        getNumBondsToForm(),
+        requiresEvaluation(NUM_SHIFT, currentStep) ? getNumShifts() : 0,
+        requiresEvaluation(NUM_RELOC, currentStep) ? getNumRelocations() : 0,
+        requiresEvaluation(NUM_ATOMS, currentStep)
+          ? static_cast<long int>(getNumAtoms())
+          : 0,
+        requiresEvaluation(NUM_EXTRA_ATOMS, currentStep)
+          ? static_cast<long int>(getNumExtraAtoms())
+          : 0,
+        requiresEvaluation(NUM_BONDS, currentStep)
+          ? static_cast<long int>(getNumBonds())
+          : 0,
+        requiresEvaluation(NUM_EXTRA_BONDS, currentStep)
+          ? static_cast<long int>(getNumExtraBonds())
+          : 0,
+        requiresEvaluation(NUM_BONDS_TO_FORM, currentStep) ? getNumBondsToForm()
+                                                           : 0,
       };
 
       Eigen::Matrix3d stressTensor =
@@ -451,6 +468,14 @@ namespace calc {
               std::gcd(c.useEvery, this->doubleValueRequiredEvery[v]);
           }
         }
+        for (ComputedIntValues i : c.intValues) {
+          if (this->intValueRequiredEvery[i] == 0) {
+            this->intValueRequiredEvery[i] = c.useEvery;
+          } else {
+            this->intValueRequiredEvery[i] =
+              std::gcd(c.useEvery, this->intValueRequiredEvery[i]);
+          }
+        }
       }
       std::vector<ComputedDoubleValues> stressTensorRequiringValues = {
         STRESS_XX, STRESS_YY,  STRESS_ZZ,  STRESS_XY,  STRESS_YZ,
@@ -474,12 +499,14 @@ namespace calc {
     OutputSupportingSimulation()
     {
       this->doubleValueRequiredEvery.fill(0);
+      this->intValueRequiredEvery.fill(0);
       this->outputBuffer.reserve(600);
     }
 
     virtual void writeRestartFile(std::string& filename) = 0;
 
-    void validateAndTruncateOutputFiles(const std::vector<OutputConfiguration>& vals) const
+    void validateAndTruncateOutputFiles(
+      const std::vector<OutputConfiguration>& vals) const
     {
       for (size_t i = 0; i < vals.size(); ++i) {
         if (vals[i].filename.size() > 0) {
@@ -565,7 +592,7 @@ namespace calc {
     }
 
     template<class Archive>
-    void serialize(Archive& ar) //, std::uint32_t const version)
+    void serialize(Archive& ar, std::uint32_t const version)
     {
       ar(
         // output configurations
@@ -579,6 +606,7 @@ namespace calc {
         restartOutputFile,
         // output speedups – could also recompute instead ?!?
         doubleValueRequiredEvery,
+        intValueRequiredEvery,
         requireStressTensorEvery,
         requireBondLenEvery,
         outputBuffer,
@@ -612,7 +640,6 @@ namespace calc {
   };
 }
 }
-// CEREAL_CLASS_VERSION(pylimer_tools::calc::dpd::OutputsupportingSimulation,
-// 1);
+CEREAL_CLASS_VERSION(pylimer_tools::calc::OutputSupportingSimulation, 2);
 
 #endif

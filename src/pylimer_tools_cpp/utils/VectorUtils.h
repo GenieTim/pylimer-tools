@@ -12,6 +12,7 @@ extern "C"
 #include <igraph/igraph.h>
 }
 #include "utilityMacros.h"
+#include "ExtraEigenTypes.h"
 #include <Eigen/Dense>
 #include <cassert>
 
@@ -55,8 +56,6 @@ namespace utils {
     return value;
   }
 
-  typedef Eigen::Array<bool, Eigen::Dynamic, 1> ArrayXb;
-
   /**
    * @brief Remove a row from an Eigen vector
    *
@@ -83,7 +82,7 @@ namespace utils {
   MAKE_REMOVE_ROW(Eigen::VectorXi);
   MAKE_REMOVE_ROW(Eigen::ArrayXi);
   MAKE_REMOVE_ROW(Eigen::ArrayXd);
-  MAKE_REMOVE_ROW(ArrayXb);
+  MAKE_REMOVE_ROW(Eigen::ArrayXb);
 
   /**
    * @brief Remove sequential rows from an Eigen vector
@@ -114,7 +113,7 @@ namespace utils {
   MAKE_REMOVE_ROWS(Eigen::VectorXi);
   MAKE_REMOVE_ROWS(Eigen::ArrayXi);
   MAKE_REMOVE_ROWS(Eigen::ArrayXd);
-  MAKE_REMOVE_ROWS(ArrayXb);
+  MAKE_REMOVE_ROWS(Eigen::ArrayXb);
 
   template<typename T>
   static inline T last(const std::vector<T>& v)

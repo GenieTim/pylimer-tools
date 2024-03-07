@@ -416,40 +416,40 @@ namespace utils {
 
   void DataFileParser::readAngle(const std::string &line)
   {
-    size_t angleId, angleType, angleFrom, angleVia, angleTo;
+    size_t newAngleId, newAngleType, newAngleFrom, newAngleVia, newAngleTo;
     sscanf(line.c_str(),
            "%zu %zu %zu %zu %zu",
-           &angleId,
-           &angleType,
-           &angleFrom,
-           &angleVia,
-           &angleTo);
+           &newAngleId,
+           &newAngleType,
+           &newAngleFrom,
+           &newAngleVia,
+           &newAngleTo);
 
-    this->angleIds.push_back(angleId);
-    this->angleTypes.push_back(angleType);
-    this->angleFrom.push_back(angleFrom);
-    this->angleVia.push_back(angleVia);
-    this->angleTo.push_back(angleTo);
+    this->angleIds.push_back(newAngleId);
+    this->angleTypes.push_back(newAngleType);
+    this->angleFrom.push_back(newAngleFrom);
+    this->angleVia.push_back(newAngleVia);
+    this->angleTo.push_back(newAngleTo);
   }
 
   void DataFileParser::readDihedralAngle(const std::string &line)
   {
-    size_t angleId, angleType, angleFrom, angleVia1, angleVia2, angleTo;
+    size_t newAngleId, newAngleType, newAngleFrom, newAngleVia1, newAngleVia2, newAngleTo;
     sscanf(line.c_str(),
            "%zu %zu %zu %zu %zu %zu",
-           &angleId,
-           &angleType,
-           &angleFrom,
-           &angleVia1,
-           &angleVia2,
-           &angleTo);
+           &newAngleId,
+           &newAngleType,
+           &newAngleFrom,
+           &newAngleVia1,
+           &newAngleVia2,
+           &newAngleTo);
 
-    this->dihedralAngleIds.push_back(angleId);
-    this->dihedralAngleTypes.push_back(angleType);
-    this->dihedralAngleFrom.push_back(angleFrom);
-    this->dihedralAngleVia1.push_back(angleVia1);
-    this->dihedralAngleVia2.push_back(angleVia2);
-    this->dihedralAngleTo.push_back(angleTo);
+    this->dihedralAngleIds.push_back(newAngleId);
+    this->dihedralAngleTypes.push_back(newAngleType);
+    this->dihedralAngleFrom.push_back(newAngleFrom);
+    this->dihedralAngleVia1.push_back(newAngleVia1);
+    this->dihedralAngleVia2.push_back(newAngleVia2);
+    this->dihedralAngleTo.push_back(newAngleTo);
   }
 } // namespace utils
 } // namespace pylimer_tools

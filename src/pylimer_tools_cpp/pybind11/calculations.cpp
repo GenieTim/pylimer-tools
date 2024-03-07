@@ -555,6 +555,20 @@ init_pylimer_bound_calc(py::module_& m)
          [](const mehp::MEHPForceBalance& self) {
            return mehp::MEHPForceBalance(self);
          })
+    .def_static("constructWithRandomSlipLinks",
+                &mehp::MEHPForceBalance2::constructWithRandomSlipLinks,
+                R"pbdoc(
+          Instantiate this simulator with randomly chosen slip-links.
+         )pbdoc",
+                py::arg("universe"),
+                py::arg("nr_of_slip_links_to_sample"),
+                py::arg("acceptable_cutoff") = 1.2,
+                py::arg("min_nr_of_slip_links") = 0,
+                py::arg("same_strand_cutoff") = 3,
+                py::arg("seed") = -1,
+                py::arg("crosslinker_type") = 2,
+                py::arg("is_2D") = false,
+                py::arg("kappa") = 1.0)
     .def_property_readonly("network", &mehp::MEHPForceBalance::getNetwork)
     //     .def("validateNetwork",
     //          py::overload_cast<>(&mehp::MEHPForceBalance::validateNetwork),
@@ -888,50 +902,50 @@ init_pylimer_bound_calc(py::module_& m)
     A small simulation tool for quickly minimizing the force between the cross-linker beads.
      )pbdoc")
     .def_static("constructWithoutSlipLinks",
-         &mehp::MEHPForceBalance2::constructWithoutSlipLinks,
-         R"pbdoc(
+                &mehp::MEHPForceBalance2::constructWithoutSlipLinks,
+                R"pbdoc(
           Instantiate this simulator without slip-links (fully phantom).
 
           The results should be compareable to the force relaxation code.
          )pbdoc",
-         py::arg("universe"),
-         py::arg("crosslinker_type") = 2,
-         py::arg("is_2D") = false,
-         py::arg("kappa") = 1.0)
+                py::arg("universe"),
+                py::arg("crosslinker_type") = 2,
+                py::arg("is_2D") = false,
+                py::arg("kappa") = 1.0)
     .def_static("constructWithSlipLinks",
-         &mehp::MEHPForceBalance2::constructWithSlipLinks,
-         R"pbdoc(
+                &mehp::MEHPForceBalance2::constructWithSlipLinks,
+                R"pbdoc(
           Instantiate this simulator with slip-links (specified by their positions, etc.).
 
           CAUTION:
                The box offset (i.e., the PBC) might not work as needed yet.
          )pbdoc",
-         py::arg("universe"),
-         py::arg("strandIdx1"),
-         py::arg("strandIdx2"),
-         py::arg("x"),
-         py::arg("y"),
-         py::arg("z"),
-         py::arg("alpha1"),
-         py::arg("alpha2"),
-         py::arg("crosslinker_type") = 2,
-         py::arg("is_2D") = false,
-         py::arg("kappa") = 1.0,
-         py::arg("clampAlpha") = false)
+                py::arg("universe"),
+                py::arg("strandIdx1"),
+                py::arg("strandIdx2"),
+                py::arg("x"),
+                py::arg("y"),
+                py::arg("z"),
+                py::arg("alpha1"),
+                py::arg("alpha2"),
+                py::arg("crosslinker_type") = 2,
+                py::arg("is_2D") = false,
+                py::arg("kappa") = 1.0,
+                py::arg("clampAlpha") = false)
     .def_static("constructWithRandomSlipLinks",
-         &mehp::MEHPForceBalance2::constructWithRandomSlipLinks,
-         R"pbdoc(
+                &mehp::MEHPForceBalance2::constructWithRandomSlipLinks,
+                R"pbdoc(
           Instantiate this simulator with randomly chosen slip-links.
          )pbdoc",
-         py::arg("universe"),
-         py::arg("nr_of_slip_links_to_sample"),
-         py::arg("acceptable_cutoff") = 1.2,
-         py::arg("min_nr_of_slip_links") = 0,
-         py::arg("same_strand_cutoff") = 2,
-         py::arg("seed") = -1,
-         py::arg("crosslinker_type") = 2,
-         py::arg("is_2D") = false,
-         py::arg("kappa") = 1.0)
+                py::arg("universe"),
+                py::arg("nr_of_slip_links_to_sample"),
+                py::arg("acceptable_cutoff") = 1.2,
+                py::arg("min_nr_of_slip_links") = 0,
+                py::arg("same_strand_cutoff") = 2,
+                py::arg("seed") = -1,
+                py::arg("crosslinker_type") = 2,
+                py::arg("is_2D") = false,
+                py::arg("kappa") = 1.0)
     .def("__copy__",
          [](const mehp::MEHPForceBalance2& self) {
            return mehp::MEHPForceBalance2(self);
@@ -963,7 +977,6 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("simplificationMode") =
            mehp::StructureSimplificationMode::NO_SIMPLIFICATION,
          py::arg("inactiveRemovalCutoff") = -1.0,
-         py::arg("outputFrequency") = 50,
          py::arg("doInnerIterations") = false,
          py::arg("allowSlipLinksToPassEachOther") =
            mehp::LinkSwappingMode::NO_SWAPPING,

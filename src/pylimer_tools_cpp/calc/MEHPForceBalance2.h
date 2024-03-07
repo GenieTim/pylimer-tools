@@ -5,6 +5,7 @@
 #include "../entities/Box.h"
 #include "../entities/NeighbourList.h"
 #include "../entities/Universe.h"
+#include "EntanglementDetector.h"
 #include "MEHPForceEvaluator.h"
 #include "MEHPUtilityStructures.h"
 #include "OutputSupportingSimulation.h"
@@ -229,139 +230,25 @@ namespace calc {
         fb.net.isUpToDate = false;
         igraph_cattribute_GAB_set(&fb.graph, "is_up_to_date", true);
 
-        INVALIDARG_EXP_IFN(minimumNrOfSliplinks <
-                             fb.universe.getNrOfAtoms() / 2,
-                           "Minimum number of slip-links must be less than the "
-                           "possible number of slip-links to place.");
-        INVALIDARG_EXP_IFN(nrOfSliplinksToSample <
-                             fb.universe.getNrOfAtoms() / 2,
-                           "Number of slip-links to place must be less than "
-                           "the possible number of slip-links to place.");
-        INVALIDARG_EXP_IFN(nrOfSliplinksToSample >= minimumNrOfSliplinks,
-                           "Maximum nr. should be larger than minimum, got " +
-                             std::to_string(nrOfSliplinksToSample) + " and " +
-                             std::to_string(minimumNrOfSliplinks) + ".");
-        INVALIDARG_EXP_IFN(cutoff > 0.0,
-                           "Expected a cutoff > 0.0, got " +
-                             std::to_string(cutoff) + ".");
+        // sample the "entanglements"
+        pylimer_tools::calc::entanglement_detection::AtomPairEntanglements
+          entanglements = pylimer_tools::calc::entanglement_detection::
+            randomlyFindEntanglements(universe,
+                                      nrOfSliplinksToSample,
+                                      cutoff,
+                                      minimumNrOfSliplinks,
+                                      sameStrandCutoff,
+                                      seed,
+                                      crosslinkerType);
 
-        std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
-          fb.universe.getChainsWithCrosslinker(crosslinkerType);
-        std::vector<std::pair<size_t, size_t>> pairsOfAtoms;
-        pairsOfAtoms.reserve(nrOfSliplinksToSample);
-        std::vector<long int> pairOfAtom =
-          pylimer_tools::utils::initializeWithValue<long int>(
-            fb.universe.getNrOfAtoms(), -1);
-
-        std::unordered_map<size_t, size_t> atomToStrand;
-        atomToStrand.reserve(universe.getNrOfAtoms());
-        std::unordered_map<size_t, size_t> atomIdxInStrand;
-        atomIdxInStrand.reserve(universe.getNrOfAtoms());
-        for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
-          pylimer_tools::entities::Molecule chain = crosslinkerChains[i];
-          RUNTIME_EXP_IFN(chain.getType() !=
-                            pylimer_tools::entities::MoleculeType::UNDEFINED,
-                          "Couldn't determine molecule type.");
-          std::vector<pylimer_tools::entities::Atom> atoms =
-            crosslinkerChains[i].getAtomsLinedUp(crosslinkerType, true, true);
-          for (size_t atomIdx = 0; atomIdx < atoms.size(); ++atomIdx) {
-            pylimer_tools::entities::Atom atom = atoms[atomIdx];
-            if (atom.getType() != crosslinkerType) {
-              atomToStrand.emplace(atom.getId(), i);
-              atomIdxInStrand.emplace(atom.getId(), atomIdx);
-            }
-          }
-        }
-
-        // filter, we don't want cross-links etc. as targets
-        std::vector<pylimer_tools::entities::Atom> atomsForNeighbourList =
-          fb.universe.getAtomsOfDegree(2);
-        atomsForNeighbourList.erase(
-          std::remove_if(
-            atomsForNeighbourList.begin(),
-            atomsForNeighbourList.end(),
-            [crosslinkerType](const pylimer_tools::entities::Atom& a) {
-              return a.getType() == crosslinkerType;
-            }),
-          atomsForNeighbourList.end());
-        // some randomness for placement
-        std::mt19937 rng;
-        if (seed == "") {
-          std::random_device rd{};
-          rng = std::mt19937(rd());
-        } else {
-          std::seed_seq seed2(seed.begin(), seed.end());
-          rng = std::mt19937(seed2);
-        }
-        std::shuffle(
-          atomsForNeighbourList.begin(), atomsForNeighbourList.end(), rng);
-        pylimer_tools::entities::NeighbourList neighbourList =
-          pylimer_tools::entities::NeighbourList(
-            atomsForNeighbourList, fb.universe.getBox(), cutoff);
-        size_t numLinksFoundInIteration = 1;
-        while (pairsOfAtoms.size() < minimumNrOfSliplinks &&
-               numLinksFoundInIteration > 0) {
-          numLinksFoundInIteration = 0;
-          for (pylimer_tools::entities::Atom a1 : atomsForNeighbourList) {
-            size_t atomVertexIdx1 = universe.getIdxByAtomId(a1.getId());
-            // make sure this atom does not yet have a pair
-            if (pairOfAtom[atomVertexIdx1] != -1) {
-              continue;
-            }
-            // then, find neighbouring atoms (but not from the same strand?!)
-            std::vector<pylimer_tools::entities::Atom> neighbours =
-              neighbourList.getAtomsCloseTo(a1);
-            neighbourList.removeAtom(
-              a1, "After querying neighbours. Impossible case.");
-            // filter the neighbours to include only those from other strands
-            // NOTE: this skews the whole thing a bit
-            neighbours.erase(
-              std::remove_if(
-                neighbours.begin(),
-                neighbours.end(),
-                [&](const pylimer_tools::entities::Atom& a) -> bool {
-                  return (
-                    (atomToStrand[a.getId()] ==
-                       atomToStrand[a1.getId()] // do not use "at", because not
-                                                // all atoms in the neighbours
-                                                // have been assigned a strand
-                     && (std::abs(static_cast<double>(
-                           atomIdxInStrand[a.getId()] -
-                           atomIdxInStrand[a1.getId()])) < sameStrandCutoff)));
-                }),
-              neighbours.end());
-            if (neighbours.size() == 0) {
-              // std::cerr << "Not enough close neighbours found." << std::endl;
-              continue;
-            }
-            // then, randomly select one of them
-            pylimer_tools::entities::Atom a2 = neighbours[0];
-            if (neighbours.size() > 1) {
-              size_t randomA2Idx = std::uniform_int_distribution<size_t>{
-                0, neighbours.size() - 1
-              }(rng);
-              a2 = neighbours[randomA2Idx];
-            }
-
-            size_t atomVertexIdx2 = universe.getIdxByAtomId(a2.getId());
-            assert(pairOfAtom[atomVertexIdx2] == -1);
-            pairOfAtom[atomVertexIdx2] = pairsOfAtoms.size();
-            pairOfAtom[atomVertexIdx1] = pairsOfAtoms.size();
-            pairsOfAtoms.push_back(std::make_pair(a1.getId(), a2.getId()));
-            numLinksFoundInIteration += 1;
-            neighbourList.removeAtom(a2,
-                                     "After marking atom as second pair part.");
-            if (pairsOfAtoms.size() >= nrOfSliplinksToSample) {
-              break;
-            }
-          }
-          if (pairsOfAtoms.size() >= nrOfSliplinksToSample) {
-            break;
-          }
-        }
-
+        std::vector<std::pair<size_t, size_t>> pairsOfAtoms =
+          entanglements.pairsOfAtoms;
+        std::vector<long int> pairOfAtom = entanglements.pairOfAtom;
         // std::cout << "Found " << pairsOfAtoms.size() << " random slip-links."
         //           << std::endl;
+
+        std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
+          universe.getChainsWithCrosslinker(crosslinkerType);
 
         // add ends of chains
         std::unordered_map<size_t, igraph_integer_t> endAtomIdToVertexId;
@@ -498,7 +385,6 @@ namespace calc {
         const StructureSimplificationMode simplificationMode =
           StructureSimplificationMode::NO_SIMPLIFICATION,
         const double inactiveRemovalCutoff = -1.0,
-        const int outputFrequency = 50,
         bool doInnerIterations = false,
         LinkSwappingMode allowSlipLinksToPassEachOther =
           LinkSwappingMode::NO_SWAPPING,
@@ -648,11 +534,14 @@ namespace calc {
 
       double getDefaultR0Square() const { return this->defaultR0Squared; }
 
-      double getVolume() override { return this->getNetwork().vol; }
+      double getVolume() override
+      {
+        return this->universe.getBox().getVolume();
+      }
 
       int getNrOfNodes() { return this->getNetwork().nrOfNodes; }
 
-      int getNrOfLinks() { return this->getNetwork().nrOfLinks; }
+      int getNrOfLinks() { return igraph_vcount(&this->graph); }
 
       size_t getNumBonds() override { return this->getNrOfSprings(); }
 
@@ -669,10 +558,7 @@ namespace calc {
 
       int getNrOfSprings() { return this->getNetwork().nrOfSprings; }
 
-      int getNrOfPartialSprings()
-      {
-        return this->getNetwork().nrOfPartialSprings;
-      }
+      int getNrOfPartialSprings() { return igraph_ecount(&this->graph); }
 
       void setSpringContourLengths(const Eigen::VectorXd springsContourLengths)
       {
@@ -799,7 +685,7 @@ namespace calc {
           return 1.;
         }
         // find all active springs
-        ArrayXb activeSprings =
+        Eigen::ArrayXb activeSprings =
           this->findActiveSprings(springDistances, tolerance);
         if (activeSprings.count() == 0) {
           return 1.;
@@ -901,7 +787,7 @@ namespace calc {
       int getNrOfActiveSprings(double tolerance = 0.01) const
       {
         assert(this->net.isUpToDate);
-        ArrayXb result = ArrayXb::Constant(
+        Eigen::ArrayXb result = Eigen::ArrayXb::Constant(
           this->currentPartialSpringDistances.size() / 3, false);
         for (size_t i = 0; i < this->net.nrOfPartialSprings; ++i) {
           size_t springIdx = this->net.partialToFullSpringIndex[i];
@@ -1078,7 +964,9 @@ namespace calc {
 
       void debugParentEdge(const size_t parentEdgeId)
       {
-        // return;
+#ifndef VERBOSE_DEBUG
+        return;
+#endif
         igraph_vector_t parentEdges;
         igraph_vector_init(&parentEdges, 0);
         igraph_cattribute_EANV(&this->graph,
@@ -1225,6 +1113,9 @@ namespace calc {
 
       void printVerticesOnPath(igraph_vector_int_t* vertices)
       {
+#ifndef VERBOSE_DEBUG
+        return;
+#endif
         std::cout << "\t";
         std::cout << igraph_vector_int_get(vertices, 0);
         for (igraph_integer_t i = 1; i < igraph_vector_int_size(vertices);
@@ -1648,7 +1539,8 @@ namespace calc {
         // there, the eulerian path cannot decide what is forward, what is
         // backward
         if (otherEdge1 == otherEdge2) {
-          std::cerr << "WARNING: the connectivity could not be fully restored." << std::endl;
+          std::cerr << "WARNING: the connectivity could not be fully restored."
+                    << std::endl;
           return;
         }
         // ...actually add the new edges
@@ -2234,8 +2126,10 @@ namespace calc {
                                       expectedDistance - actualDistance);
         assert(this->universe.getBox().isValidOffset(expectedDistance -
                                                      actualDistance));
+#ifndef NDEBUG
         Eigen::Vector3d newActualDistance = this->computeEdgeDistance(edgeId);
         assert(newActualDistance.isApprox(expectedDistance));
+#endif
       }
 
       /**
@@ -3125,12 +3019,13 @@ namespace calc {
        *
        * @param springDistances
        * @param tolerance
-       * @return ArrayXb
+       * @return Eigen::ArrayXb
        */
-      ArrayXb findActiveSprings(const Eigen::VectorXd& springDistances,
-                                const double tolerance = 0.01) const
+      Eigen::ArrayXb findActiveSprings(const Eigen::VectorXd& springDistances,
+                                       const double tolerance = 0.01) const
       {
-        ArrayXb result = ArrayXb::Constant(springDistances.size() / 3, false);
+        Eigen::ArrayXb result =
+          Eigen::ArrayXb::Constant(springDistances.size() / 3, false);
         for (size_t i = 0; i < springDistances.size() / 3; ++i) {
           result[i] =
             springDistances.segment(3 * i, 3).squaredNorm() > tolerance;

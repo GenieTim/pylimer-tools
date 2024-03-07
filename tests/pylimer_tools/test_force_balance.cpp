@@ -543,8 +543,8 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         // SECTION(
         //   "HeuristicallyIndependent coordiante sets are unique and complete")
         // {
-        pcm::ArrayXb vertexSetTest =
-          pcm::ArrayXb::Constant(3 * net.nrOfLinks, false);
+        Eigen::ArrayXb vertexSetTest =
+          Eigen::ArrayXb::Constant(3 * net.nrOfLinks, false);
         for (int i = 0; i < vertexSets.size(); ++i) {
           for (int j = 0; j < vertexSets[i].size(); ++j) {
             CHECK_FALSE(vertexSetTest[vertexSets[i][j]]);
@@ -1419,6 +1419,144 @@ TEST_CASE("MEHP Force Balance Fully active chains are fully active",
       CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
       CHECK(forceBalancer.getNrOfActiveSprings() ==
             forceBalancer.getNrOfSprings());
+    }
+  }
+}
+
+TEST_CASE(
+  "MEHP Force Balance correctly collapses melts even with random slip-links",
+  "[analysis][MEHPForceBalance]")
+{
+
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  REQUIRE(universeSeq.getLength() == 0);
+  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+
+  std::string inputFile = suspectedPath + "melt_83_a_100.structure.out";
+  if (std::filesystem::exists(inputFile)) {
+    std::cout << "Reading file " << inputFile << std::endl;
+    universeSeq.initializeFromDataSequence({ { inputFile } });
+    pe::Universe universe = universeSeq.atIndex(0);
+    std::cout << "Read file " << inputFile << std::endl;
+
+    pcm::MEHPForceBalance forceBalancer =
+      pcm::MEHPForceBalance::constructWithRandomSlipLinks(universe, 1000, 2.0, 100, 5, "my_seed_fb12");
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
+    CHECK(forceBalancer.getNetwork().nrOfPartialSprings > forceBalancer.getNetwork().nrOfSprings);
+    REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE, 1.0, 50000, 1e-9, -1., pcm::StructureSimplificationMode::ALL_TIM));
+    REQUIRE(forceBalancer.getNrOfIterations() > 0);
+    CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+    CHECK(forceBalancer.getNrOfActiveSprings() == 0);
+  }
+}
+
+TEST_CASE("MEHP Force Balance correctly re-aligns Slip-Links to Images",
+          "[analysis][MEHPForceBalance]")
+{
+  // it does not really matter with what structure we start...
+  pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+
+  pcm::MEHPForceBalance forceBalancer =
+    pcm::MEHPForceBalance(universe, 2, false);
+  forceBalancer.configAssumeBoxLargeEnough(false);
+  CHECK(forceBalancer.getPressure() == Catch::Approx(0.0));
+
+  // ...if we invoke the relevant method with our custom network
+  pcm::ForceBalanceNetwork net;
+  net.L[0] = 10.;
+  net.L[1] = 10.;
+  net.L[2] = 10.;
+  net.coordinates = Eigen::VectorXd::Zero(3 * 3);
+  net.springPartIndexA = Eigen::ArrayXi::Zero(2);
+  net.springPartIndexB = Eigen::ArrayXi::Zero(2);
+  net.springPartBoxOffset = Eigen::VectorXd::Zero(2 * 3);
+  net.linkIsSliplink = Eigen::ArrayXb::Constant(3, false);
+
+  SECTION("System 1")
+  {
+    net.springPartIndexA << 0, 2;
+    net.springPartIndexB << 2, 1;
+    net.linkIsSliplink[2] = true;
+
+    Eigen::VectorXd u = Eigen::VectorXd::Zero(net.coordinates.size());
+
+    CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 0, 1));
+    CHECK((net.springPartBoxOffset.array() == (0.0)).all());
+
+    net.coordinates << 5, 2.5, 0., // cross-link 1,
+      5., 7.5, 0.,                 // cross-link 2,
+      5., 5., 0.;                  // slip-link
+
+    net.springPartBoxOffset << 0., 0., 0., // cross-link 1 -> slip-link
+      20., 0., 0.;                         // slip-link -> cross-link 2
+
+    CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 0, 1));
+
+    for (size_t i = 0; i < 2 * 3; ++i) {
+      if (i % 3 == 0) {
+        CHECK(net.springPartBoxOffset[i] == Catch::Approx(10.));
+      } else {
+        CHECK(net.springPartBoxOffset[i] == Catch::Approx(0.));
+      }
+    }
+  }
+
+  SECTION("System 2")
+  {
+    net.springPartIndexA << 1, 2;
+    net.springPartIndexB << 2, 0;
+    net.linkIsSliplink[2] = true;
+
+    Eigen::VectorXd u = Eigen::VectorXd::Zero(net.coordinates.size());
+
+    CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 0, 1));
+    CHECK((net.springPartBoxOffset.array() == (0.0)).all());
+
+    net.coordinates << 5, 2.5, 0., // cross-link 1,
+      5., 7.5, 0.,                 // cross-link 2,
+      5., 7.5, 0.;                 // slip-link
+
+    net.springPartBoxOffset << 20., 0., 0., // cross-link 2 -> slip-link
+      0., 0., 0.;                           // slip-link -> cross-link 1
+
+    CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 1, 0));
+
+    Eigen::VectorXd expectation = Eigen::VectorXd::Zero(2 * 3);
+    expectation(0) = 10.;
+    expectation(3) = 10.;
+
+    for (size_t i = 0; i < 2 * 3; ++i) {
+      CHECK(expectation[i] == Catch::Approx(net.springPartBoxOffset[i]));
+    }
+  }
+
+  SECTION("System 3")
+  {
+    net.springPartIndexA << 2, 2;
+    net.springPartIndexB << 1, 0;
+    net.linkIsSliplink[2] = true;
+
+    Eigen::VectorXd u = Eigen::VectorXd::Zero(net.coordinates.size());
+
+    CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 0, 1));
+    CHECK((net.springPartBoxOffset.array() == (0.0)).all());
+
+    net.coordinates << 5, 2.5, 0., // cross-link 1,
+      5., 7.5, 0.,                 // cross-link 2,
+      5., 2.5, 0.;                 // slip-link
+
+    net.springPartBoxOffset << 10., 0., 0., // slip-link -> cross-link 2
+      -10., 0., 0.;                         // slip-link -> cross-link 1
+
+    CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 1, 0));
+
+    Eigen::VectorXd expectation = Eigen::VectorXd::Zero(2 * 3);
+    expectation(0) = 10.;
+    expectation(3) = -10.;
+
+    for (size_t i = 0; i < 2 * 3; ++i) {
+      CHECK(expectation[i] == Catch::Approx(net.springPartBoxOffset[i]));
     }
   }
 }

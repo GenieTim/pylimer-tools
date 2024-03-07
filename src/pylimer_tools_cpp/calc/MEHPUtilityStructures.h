@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include "../utils/ExtraEigenTypes.h"
 
 namespace pylimer_tools {
 namespace calc {
@@ -52,7 +53,6 @@ namespace calc {
       OTHER
     };
 
-    typedef Eigen::Array<bool, Eigen::Dynamic, 1> ArrayXb;
     // typedef Eigen::Array<Eigen::ArrayXi, Eigen::Dynamic, 1> ArrayXArrayXi;
     typedef std::vector<std::vector<size_t>> ArrayXArrayXi;
     typedef std::vector<std::set<size_t>> ArrayXArrayXiUnique;
@@ -79,7 +79,7 @@ namespace calc {
 
       ArrayXArrayXi springIndicesOfLinks; // maps link -> springs
       // interesting properties
-      ArrayXb springIsActive;
+      Eigen::ArrayXb springIsActive;
 
       // config
       bool assumeBoxLargeEnough = false;
@@ -104,21 +104,24 @@ namespace calc {
       Eigen::VectorXd springsContourLength; /* the N for each spring */
       ArrayXArrayXi springIndicesOfLinks;   // maps link -> springs
       ArrayXArrayXi linkIndicesOfSprings;   // maps spring -> links
-      ArrayXb partialSpringIsPartial; // indicates whether a spring involves a
+      Eigen::ArrayXb partialSpringIsPartial; // indicates whether a spring involves a
                                       // slip-link
       // local to global: from the 2D structures to the 1D Eigen vector
+      // equivalent to "partial spring indices of spring"
       ArrayXArrayXi localToGlobalSpringIndex;
       // map the "local", partial, spring indices to the full-length springs
-      Eigen::ArrayXi partialToFullSpringIndex;
       std::unordered_map<size_t, size_t> oldAtomIdToSpringIndex;
 
-      ArrayXb linkIsSliplink;
+      Eigen::ArrayXb linkIsSliplink;
+      Eigen::ArrayXi nrOfCrosslinkSwapsEndured; // count for slip-links how many cross-links they swapped around
+
+      // partial springs
       Eigen::ArrayXi springPartCoordinateIndexA;
       Eigen::ArrayXi springPartCoordinateIndexB;
       Eigen::ArrayXi springPartIndexA;
       Eigen::ArrayXi springPartIndexB;
       Eigen::VectorXd springPartBoxOffset;
-      Eigen::ArrayXi nrOfCrosslinkSwapsEndured;
+      Eigen::ArrayXi partialToFullSpringIndex;
 
       // these may be empty, or not, depending on the method used
       // to determine the slip-links
@@ -130,7 +133,7 @@ namespace calc {
       Eigen::ArrayXi springCoordinateIndexB;
       Eigen::ArrayXi oldAtomIds;
       std::vector<size_t> springToMoleculeIds; // maps
-      ArrayXb springIsActive;
+      Eigen::ArrayXb springIsActive;
       Eigen::ArrayXi springIndexA;
       Eigen::ArrayXi springIndexB;
     };

@@ -33,7 +33,6 @@ namespace calc {
       const double initialResidualToUse,
       const StructureSimplificationMode simplificationMode,
       const double inactiveRemovalCutoff,
-      const int outputFrequency,
       bool doInnerIterations,
       LinkSwappingMode allowSlipLinksToPassEachOther,
       const int swappingFrequency,
@@ -192,9 +191,8 @@ namespace calc {
 #endif
           }
         }
-        if (outputFrequency > 0 && iterationsDone % outputFrequency == 0) {
           this->handleOutput(iterationsDone);
-        }
+        
       } while ((currentResidual / initialResidual > xtol) &&
                (iterationsDone < maxNrOfSteps) &&
                (igraph_ecount(&this->graph) > 0));
@@ -1890,7 +1888,7 @@ namespace calc {
         "Network is not up to date, cannot be used for computations yet.");
       Eigen::VectorXi nrOfActiveSpringsConnected =
         Eigen::VectorXi::Zero(this->net.nrOfNodes);
-      ArrayXb springIsActive =
+      Eigen::ArrayXb springIsActive =
         this->findActiveSprings(this->currentSpringDistances, tolerance);
       for (size_t i = 0; i < this->net.nrOfSprings; i++) {
         if (springIsActive[i] == true) /* active spring */
@@ -1919,7 +1917,7 @@ namespace calc {
         "Network is not up to date, cannot be used for computations yet.");
       Eigen::VectorXi nrOfActivePartialSpringsConnected =
         Eigen::VectorXi::Zero(this->net.nrOfNodes);
-      ArrayXb springIsActive =
+      Eigen::ArrayXb springIsActive =
         this->findActiveSprings(this->currentPartialSpringDistances, tolerance);
       RUNTIME_EXP_IFN(
         springIsActive.size() == this->net.nrOfPartialSprings,

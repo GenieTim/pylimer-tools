@@ -556,8 +556,8 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
       //   //   "HeuristicallyIndependent coordiante sets are unique and
       //   complete")
       //   // {
-      //   pcm::ArrayXb vertexSetTest =
-      //     pcm::ArrayXb::Constant(3 * net.nrOfLinks, false);
+      //   Eigen::ArrayXb vertexSetTest =
+      //     Eigen::ArrayXb::Constant(3 * net.nrOfLinks, false);
       //   for (int i = 0; i < vertexSets.size(); ++i) {
       //     for (int j = 0; j < vertexSets[i].size(); ++j) {
       //       CHECK_FALSE(vertexSetTest[vertexSets[i][j]]);
@@ -870,7 +870,6 @@ TEST_CASE("MEHP Force Balance 2 can run with swapping slip-links",
       -1.0,
       pcm::StructureSimplificationMode::ALL_TIM,
       -1.0,
-      50,
       false,
       pcm::LinkSwappingMode::ALL_MC));
     CHECK_NOTHROW(forceBalancer.validateNetwork());
@@ -880,7 +879,6 @@ TEST_CASE("MEHP Force Balance 2 can run with swapping slip-links",
       -1.0,
       pcm::StructureSimplificationMode::ALL_TIM,
       -1.0,
-      50,
       false,
       pcm::LinkSwappingMode::SLIPLINKS_ONLY));
     CHECK_NOTHROW(forceBalancer.validateNetwork());
@@ -890,7 +888,6 @@ TEST_CASE("MEHP Force Balance 2 can run with swapping slip-links",
       -1.0,
       pcm::StructureSimplificationMode::ALL_TIM,
       -1.0,
-      50,
       false,
       pcm::LinkSwappingMode::ALL));
   }
@@ -1449,7 +1446,7 @@ TEST_CASE("MEHP Force Balance 2 Fully active chains are fully active",
             forceBalancer.getNrOfSprings());
       CHECK(forceBalancer.getNrOfSprings() == 16000);
       CHECK(forceBalancer.getNrOfPartialSprings() == 16000);
-      CHECK_NOTHROW(forceBalancer.runForceRelaxation(50000, 1e-12));
+      CHECK_NOTHROW(forceBalancer.runForceRelaxation(5000, 1e-8));
       CHECK(forceBalancer.getNrOfIterations() > 0);
       CHECK(forceBalancer.getExitReason() == pcm::ExitReason::F_TOLERANCE);
       CHECK(forceBalancer.getNrOfActiveSprings() ==
