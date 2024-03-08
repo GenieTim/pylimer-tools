@@ -517,6 +517,9 @@ namespace calc {
        */
       void deformTo(const pylimer_tools::entities::Box& newBox)
       {
+        if (!this->net.isUpToDate) {
+          this->convertFromGraph();
+        }
         this->universe.getBox().adjustCoordinatesTo(this->net.coordinates,
                                                     newBox);
         this->universe.getBox().adjustCoordinatesTo(
@@ -2894,7 +2897,7 @@ namespace calc {
         igraph_vector_t coordsZ;
         igraph_vector_init(&coordsZ, this->net.nrOfLinks);
 
-        for (size_t i = 0; i < this->net.nrOfLinks; ++i) {
+        for (igraph_integer_t i = 0; i < this->net.nrOfLinks; ++i) {
           igraph_vector_set(&coordsX, i, this->net.coordinates(3 * i + 0));
           igraph_vector_set(&coordsY, i, this->net.coordinates(3 * i + 1));
           igraph_vector_set(&coordsZ, i, this->net.coordinates(3 * i + 2));
@@ -2912,9 +2915,11 @@ namespace calc {
         igraph_vector_t partitionFraction;
         igraph_vector_init(&partitionFraction, this->net.nrOfPartialSprings);
 
-        for (size_t i = 0; i < this->net.nrOfPartialSprings; ++i) {
+        for (igraph_integer_t i = 0; i < this->net.nrOfPartialSprings; ++i) {
           igraph_vector_set(
             &partitionFraction, i, this->currentSpringPartitionsVec(i));
+          this->setBondBoxOffsetForEdge(
+            i, this->net.springPartBoxOffset.segment(3 * i, 3));
         }
 
         igraph_cattribute_EAN_setv(
