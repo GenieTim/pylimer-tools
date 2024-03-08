@@ -81,6 +81,7 @@ namespace calc {
         MEHPForceBalance fb =
           MEHPForceBalance(emptyUniverse, crosslinkerType, is2D, kappa);
         fb.configAssumeBoxLargeEnough(false);
+        fb.universe = universe;
 
         // sample the "entanglements"
         pylimer_tools::calc::entanglement_detection::AtomPairEntanglements
