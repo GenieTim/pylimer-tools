@@ -1076,7 +1076,7 @@ init_pylimer_bound_entities(py::module_& m)
     .def("computeDistanceFromToAtoms",
          &UniverseSequence::computeDistanceFromToAtoms,
          R"pbdoc(
-          Compute the square norm of all the (unwrapped!) distances for the given pair of atoms.
+          Compute the root square norm of all the (unwrapped!) distances for the given pair of atoms.
           
           Can be used to somewhat faster compute e.g. all the end-to-end or bond distances.
           Pay attention that the image flags are correct, otherwise, this data may not be useable.
