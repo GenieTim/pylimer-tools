@@ -20,6 +20,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.UniverseSequence
       ~UniverseSequence.__init__
       ~UniverseSequence.atIndex
       ~UniverseSequence.computeDistanceAutocorrelationFromTo
+      ~UniverseSequence.computeDistanceFromToAtoms
       ~UniverseSequence.computeMsdForAtoms
       ~UniverseSequence.forgetAtIndex
       ~UniverseSequence.getAll
