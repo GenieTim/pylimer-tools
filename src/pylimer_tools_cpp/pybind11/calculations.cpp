@@ -10,8 +10,8 @@
 #include "../calc/MMTanalysis.h"
 #include "../entities/Universe.h"
 
-#include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
+#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 namespace py = pybind11;
@@ -92,9 +92,62 @@ init_pylimer_bound_calc(py::module_& m)
         &mmt::computeStoichiometricInbalance,
         "Compute stoichiometric inbalance");
 
+  ////////////////////////////////////////////////////////////////
+  // MARK: Output Quantities
+
+  py::enum_<ComputedDoubleValues>(m, "ComputedDoubleValues")
+    .value("TIMESTEP", ComputedDoubleValues::TIMESTEP)
+    .value("TIME", ComputedDoubleValues::TIME)
+    .value("VOLUME", ComputedDoubleValues::VOLUME)
+    .value("PRESSURE", ComputedDoubleValues::PRESSURE)
+    .value("TEMPERATURE", ComputedDoubleValues::TEMPERATURE)
+    .value("STRESS_XX", ComputedDoubleValues::STRESS_XX)
+    .value("STRESS_YY", ComputedDoubleValues::STRESS_YY)
+    .value("STRESS_ZZ", ComputedDoubleValues::STRESS_ZZ)
+    .value("STRESS_XY", ComputedDoubleValues::STRESS_XY)
+    .value("STRESS_XZ", ComputedDoubleValues::STRESS_XZ)
+    .value("STRESS_YZ", ComputedDoubleValues::STRESS_YZ)
+    .value("STRESS_NXY", ComputedDoubleValues::STRESS_NXY)
+    .value("STRESS_NXZ", ComputedDoubleValues::STRESS_NXZ)
+    .value("STRESS_NYZ", ComputedDoubleValues::STRESS_NYZ)
+    .value("MEAN_B", ComputedDoubleValues::MEAN_B)
+    .value("MAX_B", ComputedDoubleValues::MAX_B)
+    .value("MSD", ComputedDoubleValues::MSD);
+
+  py::enum_<ComputedIntValues>(m, "ComputedIntValues")
+    .value("STEP", ComputedIntValues::STEP)
+    .value("NUM_SHIFT", ComputedIntValues::NUM_SHIFT)
+    .value("NUM_RELOC", ComputedIntValues::NUM_RELOC)
+    .value("NUM_ATOMS", ComputedIntValues::NUM_ATOMS)
+    .value("NUM_EXTRA_ATOMS", ComputedIntValues::NUM_EXTRA_ATOMS)
+    .value("NUM_BONDS", ComputedIntValues::NUM_BONDS)
+    .value("NUM_EXTRA_BONDS", ComputedIntValues::NUM_EXTRA_BONDS)
+    .value("NUM_BONDS_TO_FORM", ComputedIntValues::NUM_BONDS_TO_FORM);
+
+  py::class_<OutputConfiguration>(m, "OutputConfiguration")
+    .def(py::init<>(), "Get an instance of this struct")
+    .def_readwrite("intValues", &OutputConfiguration::intValues)
+    .def_readwrite("doubleValues", &OutputConfiguration::doubleValues)
+    .def_readwrite("useEvery", &OutputConfiguration::useEvery, R"pbdoc(
+     for autocorrelation/averaging, how often to include values
+    )pbdoc")
+    .def_readwrite("append", &OutputConfiguration::append, R"pbdoc(
+     Whether to append to the file or truncate it
+    )pbdoc")
+    .def_readwrite(
+      "filename",
+      &OutputConfiguration::filename,
+      R"pbdoc(The file to write to. Empty means standard output (console).)pbdoc")
+    .def_readwrite("outputEvery",
+                   &OutputConfiguration::outputEvery,
+                   R"pbdoc(How often to write the values to the output. 
+      For averages, this value also says how many values will be averaged.
+     )pbdoc");
+
   /**
    * MEHP
    */
+
   py::enum_<mehp::ExitReason>(m, "ExitReason")
     .value("UNSET", mehp::ExitReason::UNSET)
     .value("MAX_STEPS", mehp::ExitReason::MAX_STEPS)
@@ -341,6 +394,14 @@ init_pylimer_bound_calc(py::module_& m)
           ).
          )pbdoc",
          py::arg("epsilon") = 1e-3)
+    .def("configStepOutput",
+         &mehp::MEHPForceRelaxation::configStepOutput,
+         R"pbdoc(
+          Set which values to log.
+          
+          Arguments:
+               - values: a list of OutputConfiguration structs
+     )pbdoc")
     .def("getForce",
          &mehp::MEHPForceRelaxation::getForce,
          R"pbdoc(
@@ -544,7 +605,8 @@ init_pylimer_bound_calc(py::module_& m)
           :param universe: the universe to simulate with
           :param crosslinkerType: The atom type of the cross-linkers. Needed to reduce the network.
           :param is2D: Whether to ignore the z direction.
-          :param forceEvaluator: The force evaluator to use
+          :param kappa: the spring constant
+          :param remove2functionalCrosslinkers: whether to keep or remove the 2-functional cross-links when setting up the network
           )pbdoc",
          py::arg("universe"),
          py::arg("crosslinkerType") = 2,
@@ -610,6 +672,14 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceBalance::deformTo,
          R"pbdoc()pbdoc",
          py::arg("newBox"))
+    .def("configStepOutput",
+         &mehp::MEHPForceBalance::configStepOutput,
+         R"pbdoc(
+          Set which values to log.
+          
+          Arguments:
+               - values: a list of OutputConfiguration structs
+     )pbdoc")
     .def("inspectLinkDisplacementToMeanPositionUpdate",
          &mehp::MEHPForceBalance::inspectLinkDisplacementToMeanPositionUpdate,
          R"pbdoc()pbdoc",
@@ -987,6 +1057,14 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceBalance2::deformTo,
          R"pbdoc()pbdoc",
          py::arg("newBox"))
+    .def("configStepOutput",
+         &mehp::MEHPForceBalance2::configStepOutput,
+         R"pbdoc(
+          Set which values to log.
+          
+          Arguments:
+               - values: a list of OutputConfiguration structs
+     )pbdoc")
     .def("moveSlipLinksToTheirBestBranch",
          &mehp::MEHPForceBalance2::moveSlipLinksToTheirBestBranch)
     .def("getForceOn",
@@ -1192,58 +1270,6 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceBalance2::getCrosslinkerVerse,
          R"pbdoc(
           Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
-     )pbdoc");
-
-  ////////////////////////////////////////////////////////////////
-  // MARK: Output Quantities
-
-  py::enum_<ComputedDoubleValues>(m, "ComputedDoubleValues")
-    .value("TIMESTEP", ComputedDoubleValues::TIMESTEP)
-    .value("TIME", ComputedDoubleValues::TIME)
-    .value("VOLUME", ComputedDoubleValues::VOLUME)
-    .value("PRESSURE", ComputedDoubleValues::PRESSURE)
-    .value("TEMPERATURE", ComputedDoubleValues::TEMPERATURE)
-    .value("STRESS_XX", ComputedDoubleValues::STRESS_XX)
-    .value("STRESS_YY", ComputedDoubleValues::STRESS_YY)
-    .value("STRESS_ZZ", ComputedDoubleValues::STRESS_ZZ)
-    .value("STRESS_XY", ComputedDoubleValues::STRESS_XY)
-    .value("STRESS_XZ", ComputedDoubleValues::STRESS_XZ)
-    .value("STRESS_YZ", ComputedDoubleValues::STRESS_YZ)
-    .value("STRESS_NXY", ComputedDoubleValues::STRESS_NXY)
-    .value("STRESS_NXZ", ComputedDoubleValues::STRESS_NXZ)
-    .value("STRESS_NYZ", ComputedDoubleValues::STRESS_NYZ)
-    .value("MEAN_B", ComputedDoubleValues::MEAN_B)
-    .value("MAX_B", ComputedDoubleValues::MAX_B)
-    .value("MSD", ComputedDoubleValues::MSD);
-
-  py::enum_<ComputedIntValues>(m, "ComputedIntValues")
-    .value("STEP", ComputedIntValues::STEP)
-    .value("NUM_SHIFT", ComputedIntValues::NUM_SHIFT)
-    .value("NUM_RELOC", ComputedIntValues::NUM_RELOC)
-    .value("NUM_ATOMS", ComputedIntValues::NUM_ATOMS)
-    .value("NUM_EXTRA_ATOMS", ComputedIntValues::NUM_EXTRA_ATOMS)
-    .value("NUM_BONDS", ComputedIntValues::NUM_BONDS)
-    .value("NUM_EXTRA_BONDS", ComputedIntValues::NUM_EXTRA_BONDS)
-    .value("NUM_BONDS_TO_FORM", ComputedIntValues::NUM_BONDS_TO_FORM);
-
-  py::class_<OutputConfiguration>(m, "OutputConfiguration")
-    .def(py::init<>(), "Get an instance of this struct")
-    .def_readwrite("intValues", &OutputConfiguration::intValues)
-    .def_readwrite("doubleValues", &OutputConfiguration::doubleValues)
-    .def_readwrite("useEvery", &OutputConfiguration::useEvery, R"pbdoc(
-     for autocorrelation/averaging, how often to include values
-    )pbdoc")
-    .def_readwrite("append", &OutputConfiguration::append, R"pbdoc(
-     Whether to append to the file or truncate it
-    )pbdoc")
-    .def_readwrite(
-      "filename",
-      &OutputConfiguration::filename,
-      R"pbdoc(The file to write to. Empty means standard output (console).)pbdoc")
-    .def_readwrite("outputEvery",
-                   &OutputConfiguration::outputEvery,
-                   R"pbdoc(How often to write the values to the output. 
-      For averages, this value also says how many values will be averaged.
      )pbdoc");
 
   /**

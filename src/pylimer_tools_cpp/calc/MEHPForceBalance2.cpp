@@ -577,6 +577,7 @@ namespace calc {
       igraph_es_destroy(&selector);
       igraph_eit_destroy(&iterator);
       igraph_vector_destroy(&parents);
+      igraph_vector_int_destroy(&edgeIds);
 
       assert(results.size() > 0);
       if (results.size() == 1) {
