@@ -33,6 +33,11 @@ namespace entities {
       int nrOfOrigins = 10,
       bool reduceMemory = false
     );
+    std::vector<double> computeDistanceFromToAtoms(
+      const std::vector<long int> &atomIdsFrom,
+      const std::vector<long int> &atomIdsTo,
+      bool reduceMemory = false
+    );
 
   protected:
     size_t index = 0; // current index of the iterator

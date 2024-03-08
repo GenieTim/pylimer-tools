@@ -177,7 +177,8 @@ namespace entities {
       nAtoms = this->dataFileParser.getNrOfAtoms();
     }
 
-    if (this->dumpFileParser.keyHasDirectionalColumn("ATOMS", "i", "") && !isUnwrapped) {
+    if (this->dumpFileParser.keyHasDirectionalColumn("ATOMS", "i", "") &&
+        !isUnwrapped) {
       nx = this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "ix");
       ny = this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "iy");
       nz = this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "iz");
@@ -337,6 +338,75 @@ namespace entities {
     }
   }
 
+  std::vector<double> UniverseSequence::computeDistanceFromToAtoms(
+    const std::vector<long int>& atomIdsFrom,
+    const std::vector<long int>& atomIdsTo,
+    bool reduceMemory)
+  {
+    if (this->modeDataFiles) {
+      throw std::runtime_error("Datafiles R_ee not implemented yet.");
+    }
+
+    INVALIDARG_EXP_IFN(atomIdsFrom.size() == atomIdsTo.size(),
+                       "Same size from and to is required.");
+
+    pylimer_tools::utils::ReadDumpFileSections sections =
+      this->dumpFileParser.readDumpFileSections(
+        pylimer_tools::utils::ReadableDumpFileSections::TIMESTEP |
+        pylimer_tools::utils::ReadableDumpFileSections::ATOM |
+        pylimer_tools::utils::ReadableDumpFileSections::BOX);
+    std::vector<long int> timesteps = sections.timesteps;
+    std::vector<Box> boxes = sections.boxes;
+    std::vector<std::vector<Atom>> atoms = sections.atoms;
+    std::cout << "Read universes" << std::endl;
+
+    RUNTIME_EXP_IFN(timesteps.size() == boxes.size(),
+                    "Dump file seems inconsistent: read " +
+                      std::to_string(timesteps.size()) + " time-steps, but " +
+                      std::to_string(boxes.size()) + " boxes.");
+    RUNTIME_EXP_IFN(timesteps.size() == atoms.size(),
+                    "Dump file seems inconsistent: read " +
+                      std::to_string(timesteps.size()) + " time-steps, but " +
+                      std::to_string(atoms.size()) + " atoms.");
+    RUNTIME_EXP_IFN(
+      timesteps.size() == this->getLength(),
+      "Dump file seems inconsistent: read " + std::to_string(timesteps.size()) +
+        " time-steps, but expected " + std::to_string(this->getLength()) + ".");
+
+    // first, check that we start at the beginning
+    size_t startingIndex = 0;
+    for (size_t i = 1; i < timesteps.size(); ++i) {
+      if (timesteps[i] < timesteps[i - 1]) {
+        startingIndex = i;
+        std::cerr << "Correcting starting index due to time-step order to "
+                  << startingIndex << std::endl;
+      }
+    }
+
+    // assemble all distances
+    std::vector<double> results;
+    results.reserve(atomIdsTo.size() * (this->getLength() - startingIndex + 1));
+    for (size_t universe_idx = startingIndex; universe_idx < this->getLength();
+         ++universe_idx) {
+      std::unordered_map<long int, int> atomIdToAtomIndex;
+      atomIdToAtomIndex.reserve(atoms[universe_idx].size());
+      for (size_t j = 0; j < atoms[universe_idx].size(); ++j) {
+        atomIdToAtomIndex[atoms[universe_idx][j].getId()] = j;
+      }
+      for (size_t j = 0; j < atomIdsFrom.size(); ++j) {
+        Atom atomFrom =
+          atoms[universe_idx][atomIdToAtomIndex.at(atomIdsFrom[j])];
+        Atom atomTo = atoms[universe_idx][atomIdToAtomIndex.at(atomIdsTo[j])];
+        results.push_back(
+          (atomTo.getUnwrappedCoordinates(&boxes[universe_idx]) -
+           atomFrom.getUnwrappedCoordinates(&boxes[universe_idx]))
+            .norm());
+      }
+    }
+
+    return results;
+  }
+
   std::unordered_map<long int, double>
   UniverseSequence::computeDistanceAutocorrelationFromToAtoms(
     const std::vector<long int>& atomIdsFrom,
@@ -357,11 +427,9 @@ namespace entities {
         pylimer_tools::utils::ReadableDumpFileSections::ATOM |
         pylimer_tools::utils::ReadableDumpFileSections::BOX);
     std::vector<long int> timesteps = sections.timesteps;
-    std::cout << "Read time-steps" << std::endl;
     std::vector<Box> boxes = sections.boxes;
-    std::cout << "Read boxes" << std::endl;
     std::vector<std::vector<Atom>> atoms = sections.atoms;
-    std::cout << "Read atoms" << std::endl;
+    std::cout << "Read universes" << std::endl;
 
     RUNTIME_EXP_IFN(timesteps.size() == boxes.size(),
                     "Dump file seems inconsistent: read " +
@@ -701,7 +769,6 @@ namespace entities {
 
     return actual_means;
   }
-
 
   // resets
   void UniverseSequence::resetIterator()
