@@ -3491,6 +3491,9 @@ namespace calc {
                                                    const size_t spring1,
                                                    const size_t spring2) const
     {
+      if (this->assumeBoxLargeEnough) {
+        return;
+      }
       assert(net.springPartIndexA[spring1] == slipLinkIdx ||
              net.springPartIndexB[spring1] == slipLinkIdx);
       assert(net.springPartIndexA[spring2] == slipLinkIdx ||
