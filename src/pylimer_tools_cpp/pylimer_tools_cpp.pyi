@@ -249,20 +249,6 @@ class Box:
               currently, only rectangular boxes are supported.
             
     """
-    @staticmethod
-    def applyPBC(*args, **kwargs) -> ...:
-        """
-              Adjust the specified distances to fit into this box.
-        """
-    @staticmethod
-    def getOffset(*args, **kwargs) -> ...:
-        """
-             Compute the offset required to compensate for periodic boundary conditions.
-        
-             Useful e.g. if you are using absolute coordinates for distances, but 
-             still need an infinite network, 
-             e.g., if the bonds need to be able to get longer than half the box.
-        """
     def __getstate__(self) -> tuple:
         ...
     @typing.overload
@@ -274,6 +260,10 @@ class Box:
     def __setstate__(self, arg0: tuple) -> None:
         """
         Provides support for pickling.
+        """
+    def applyPBC(self, distances: numpy.ndarray) -> numpy.ndarray:
+        """
+              Adjust the specified distances to fit into this box.
         """
     def applySimpleShear(self, shearMagnitude: float, shearDirection: int = 0) -> None:
         """
@@ -310,6 +300,14 @@ class Box:
     def getLz(self) -> float:
         """
                     Get the length of the box in z direction.
+        """
+    def getOffset(self, distances: numpy.ndarray) -> numpy.ndarray:
+        """
+             Compute the offset required to compensate for periodic boundary conditions.
+        
+             Useful e.g. if you are using absolute coordinates for distances, but 
+             still need an infinite network, 
+             e.g., if the bonds need to be able to get longer than half the box.
         """
     def getVolume(self) -> float:
         """
@@ -973,7 +971,7 @@ class MEHPForceBalance:
          
     """
     @staticmethod
-    def constructWithRandomSlipLinks(universe: Universe, nr_of_slip_links_to_sample: int, acceptable_cutoff: float = 1.2, min_nr_of_slip_links: int = 0, same_strand_cutoff: float = 3, seed: str = -1, crosslinker_type: int = 2, is_2D: bool = False, kappa: float = 1.0) -> ...:
+    def constructWithRandomSlipLinks(universe: Universe, nr_of_slip_links_to_sample: int, acceptable_cutoff: float = 1.2, min_nr_of_slip_links: int = 0, same_strand_cutoff: float = 3, seed: str = -1, crosslinker_type: int = 2, is_2D: bool = False, kappa: float = 1.0) -> MEHPForceBalance:
         """
                   Instantiate this simulator with randomly chosen slip-links.
         """
