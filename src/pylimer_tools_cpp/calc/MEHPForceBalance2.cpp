@@ -197,6 +197,9 @@ namespace calc {
                (iterationsDone < maxNrOfSteps) &&
                (igraph_ecount(&this->graph) > 0));
 
+      // finish up
+      this->closeAllOutputs();
+
       // query solution & exit reason
       this->exitReason = (iterationsDone >= maxNrOfSteps)
                            ? ExitReason::MAX_STEPS

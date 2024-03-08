@@ -238,9 +238,7 @@ namespace calc {
       }
 
       // finish up
-      std::ios::sync_with_stdio(true);
-      this->outputStreams.clear();
-      this->outputFileStreams.clear();
+      this->closeAllOutputs();
 
       if (this->doDeformation) {
         this->deformBoxImmediately(this->deformationTargetBox);

@@ -314,9 +314,12 @@ namespace calc {
         if (outputFrequency > 0 && iterationsDone % outputFrequency == 0) {
           this->handleOutput(iterationsDone);
         }
-      } while (
-        currentResidual / initialResidual > xtol &&
-        iterationsDone<maxNrOfSteps&& this->initialConfig.nrOfSprings> 0);
+      } while (currentResidual / initialResidual > xtol &&
+               iterationsDone < maxNrOfSteps &&
+               this->initialConfig.nrOfSprings > 0);
+
+      // finish up
+      this->closeAllOutputs();
 
       // query solution & exit reason
       this->exitReason = (iterationsDone == maxNrOfSteps)
