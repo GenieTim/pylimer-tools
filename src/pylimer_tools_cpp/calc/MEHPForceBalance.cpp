@@ -314,9 +314,9 @@ namespace calc {
         if (outputFrequency > 0 && iterationsDone % outputFrequency == 0) {
           this->handleOutput(iterationsDone);
         }
-      } while (currentResidual / initialResidual > xtol &&
-               iterationsDone < maxNrOfSteps &&
-               this->initialConfig.nrOfSprings > 0);
+      } while (
+        currentResidual / initialResidual > xtol &&
+        iterationsDone<maxNrOfSteps&& this->initialConfig.nrOfSprings> 0);
 
       // query solution & exit reason
       this->exitReason = (iterationsDone == maxNrOfSteps)
@@ -4145,7 +4145,9 @@ namespace calc {
                                    ? 1.0
                                    : objectiveDisplacementContributors);
 
-      double dist = u.segment(3 * linkIdx, 3).squaredNorm();
+      double dist = (objectiveDisplacement /
+                     (std::min(objectiveDisplacementContributors, 1.0)))
+                      .squaredNorm();
       // if (dist > 0.1) {
       //   std::cout << "Moving " << linkIdx << " for " << dist
       //             << " with displacements " << u.segment(3 * linkIdx, 3)[0]
