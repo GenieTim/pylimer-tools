@@ -627,7 +627,7 @@ init_pylimer_bound_calc(py::module_& m)
                 py::arg("acceptable_cutoff") = 1.2,
                 py::arg("min_nr_of_slip_links") = 0,
                 py::arg("same_strand_cutoff") = 3,
-                py::arg("seed") = -1,
+                py::arg("seed") = "",
                 py::arg("crosslinker_type") = 2,
                 py::arg("is_2D") = false,
                 py::arg("kappa") = 1.0)
@@ -1012,7 +1012,7 @@ init_pylimer_bound_calc(py::module_& m)
                 py::arg("acceptable_cutoff") = 1.2,
                 py::arg("min_nr_of_slip_links") = 0,
                 py::arg("same_strand_cutoff") = 2,
-                py::arg("seed") = -1,
+                py::arg("seed") = "",
                 py::arg("crosslinker_type") = 2,
                 py::arg("is_2D") = false,
                 py::arg("kappa") = 1.0)
