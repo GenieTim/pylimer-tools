@@ -233,6 +233,9 @@ namespace calc {
          ((currentStep % this->requireBondLenEvery) == 0))
           ? this->getBondLengths()
           : Eigen::Vector3d::Zero();
+      if (bondLengths.size() == 0) {
+        bondLengths = Eigen::Vector3d::Zero();
+      }
 
       std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES> doublevalues = {
         getTimestep(),

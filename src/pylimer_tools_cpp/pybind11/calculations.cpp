@@ -767,8 +767,10 @@ init_pylimer_bound_calc(py::module_& m)
     //           Returns the residual norm at the current state of the
     //           simulation.
     //      )pbdoc")
-    .def("getNumExtraBonds", &mehp::MEHPForceBalance::getNumExtraBonds)
+    .def("getNumAtoms", &mehp::MEHPForceBalance::getNumAtoms)
     .def("getNumExtraAtoms", &mehp::MEHPForceBalance::getNumExtraAtoms)
+    .def("getNumBonds", &mehp::MEHPForceBalance::getNumBonds)
+    .def("getNumExtraBonds", &mehp::MEHPForceBalance::getNumExtraBonds)
     .def("getPressure",
          &mehp::MEHPForceBalance::getPressure,
          R"pbdoc(
@@ -1129,8 +1131,10 @@ init_pylimer_bound_calc(py::module_& m)
     //           simulation.
     //      )pbdoc")
 
-    .def("getNumExtraBonds", &mehp::MEHPForceBalance2::getNumExtraBonds)
+    .def("getNumAtoms", &mehp::MEHPForceBalance2::getNumAtoms)
     .def("getNumExtraAtoms", &mehp::MEHPForceBalance2::getNumExtraAtoms)
+    .def("getNumBonds", &mehp::MEHPForceBalance2::getNumBonds)
+    .def("getNumExtraBonds", &mehp::MEHPForceBalance2::getNumExtraBonds)
     .def("getPressure",
          &mehp::MEHPForceBalance2::getPressure,
          R"pbdoc(
@@ -1527,8 +1531,10 @@ init_pylimer_bound_calc(py::module_& m)
     .def("getSpringConstant", &dpd::DPDSimulator::getSpringConstant)
     .def("getShiftOneAtATime", &dpd::DPDSimulator::getShiftOneAtATime)
     .def("getNumSlipSprings", &dpd::DPDSimulator::getNumSlipSprings)
-    .def("getNumExtraBonds", &dpd::DPDSimulator::getNumExtraBonds)
+    .def("getNumAtoms", &dpd::DPDSimulator::getNumAtoms)
     .def("getNumExtraAtoms", &dpd::DPDSimulator::getNumExtraAtoms)
+    .def("getNumBonds", &dpd::DPDSimulator::getNumBonds)
+    .def("getNumExtraBonds", &dpd::DPDSimulator::getNumExtraBonds)
     .def("getStressTensor", &dpd::DPDSimulator::getStressTensor)
     .def("getNumStepsDPD", &dpd::DPDSimulator::getNumStepsDPD)
     .def("getNumStepsMC", &dpd::DPDSimulator::getNumStepsMC)
