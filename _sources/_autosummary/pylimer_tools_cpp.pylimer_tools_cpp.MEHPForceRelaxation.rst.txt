@@ -19,6 +19,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceRelaxation
    
       ~MEHPForceRelaxation.__init__
       ~MEHPForceRelaxation.configRerunEpsilon
+      ~MEHPForceRelaxation.configStepOutput
       ~MEHPForceRelaxation.getAverageSpringLength
       ~MEHPForceRelaxation.getCrosslinkerVerse
       ~MEHPForceRelaxation.getDanglingWeightFraction
