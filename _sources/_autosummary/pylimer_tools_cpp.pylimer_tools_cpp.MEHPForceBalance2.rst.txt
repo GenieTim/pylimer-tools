@@ -42,6 +42,8 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance2
       ~MEHPForceBalance2.getNrOfIterations
       ~MEHPForceBalance2.getNrOfNodes
       ~MEHPForceBalance2.getNrOfSprings
+      ~MEHPForceBalance2.getNumAtoms
+      ~MEHPForceBalance2.getNumBonds
       ~MEHPForceBalance2.getNumExtraAtoms
       ~MEHPForceBalance2.getNumExtraBonds
       ~MEHPForceBalance2.getPressure

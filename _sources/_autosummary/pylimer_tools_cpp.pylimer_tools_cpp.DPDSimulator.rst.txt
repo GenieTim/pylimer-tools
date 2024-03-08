@@ -41,6 +41,8 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.DPDSimulator
       ~DPDSimulator.getCoordinates
       ~DPDSimulator.getCurrentTimestep
       ~DPDSimulator.getNrOfBondsToForm
+      ~DPDSimulator.getNumAtoms
+      ~DPDSimulator.getNumBonds
       ~DPDSimulator.getNumExtraAtoms
       ~DPDSimulator.getNumExtraBonds
       ~DPDSimulator.getNumSlipSprings
