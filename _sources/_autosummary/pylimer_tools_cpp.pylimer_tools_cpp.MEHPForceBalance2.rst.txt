@@ -18,6 +18,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance2
    .. autosummary::
    
       ~MEHPForceBalance2.__init__
+      ~MEHPForceBalance2.assumeBoxLargeEnough
       ~MEHPForceBalance2.configStepOutput
       ~MEHPForceBalance2.constructWithRandomSlipLinks
       ~MEHPForceBalance2.constructWithSlipLinks
