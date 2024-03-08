@@ -36,8 +36,16 @@ PYBIND11_MODULE(pylimer_tools_cpp, m)
   init_pylimer_bound_generators(m);
   init_pylimer_bound_calc(m);
 
-  m.def("versionInformation", []() {
-    return "pylimer_tools, version " + std::string(__PROJECT_VERSION__) + "(" +
-           std::string(__LIB_VERSION__) + "), compiled " + std::string(__DATE__) + " " + std::string(__TIME__) + ".";
-  });
+  m.def(
+    "versionInformation",
+    []() {
+      return "pylimer_tools, version " + std::string(__PROJECT_VERSION__) +
+             "(" + std::string(__LIB_VERSION__) + "), compiled " +
+             std::string(__DATE__) + " " + std::string(__TIME__) + " from " +
+             std::string(__GIT_BRANCH__) + " (" + std::string(__GIT_HASH__) +
+             ").";
+    },
+    R"pbdoc(
+    Returns  a string of the the current version, incl. git hash and date of compilation.
+  )pbdoc");
 }

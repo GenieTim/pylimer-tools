@@ -9,6 +9,6 @@ cd "$(dirname "$0")/.." || exit
 rm -rf dist/
 
 pip install . --verbose
-pybind11-stubgen pylimer_tools_cpp -o src
+pybind11-stubgen pylimer_tools_cpp -o src --numpy-array-remove-parameters
 rm -rf dist/
 python -m build --sdist
