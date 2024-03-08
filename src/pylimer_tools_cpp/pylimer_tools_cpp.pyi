@@ -252,16 +252,16 @@ class Box:
     @staticmethod
     def applyPBC(*args, **kwargs) -> ...:
         """
-                  Adjust the specified distances to fit into this box.
+              Adjust the specified distances to fit into this box.
         """
     @staticmethod
     def getOffset(*args, **kwargs) -> ...:
         """
-                  Compute the offset required to compensate for periodic boundary conditions.
+             Compute the offset required to compensate for periodic boundary conditions.
         
-                  Useful e.g. if you are using absolute coordinates for distances, but 
-                  still need an infinite network, 
-                  e.g., if the bonds need to be able to get longer than half the box.
+             Useful e.g. if you are using absolute coordinates for distances, but 
+             still need an infinite network, 
+             e.g., if the bonds need to be able to get longer than half the box.
         """
     def __getstate__(self) -> tuple:
         ...
@@ -581,9 +581,9 @@ class DPDSimulator:
         """
                   Randomly add the specified number of slip-springs to neighbours within the specified cut-offs.
         """
-    def getBondLengths(self) -> numpy.ndarray[numpy.float64[m, 1]]:
+    def getBondLengths(self) -> numpy.ndarray:
         ...
-    def getCoordinates(self) -> numpy.ndarray[numpy.float64[m, 1]]:
+    def getCoordinates(self) -> numpy.ndarray:
         ...
     def getCurrentTimestep(self) -> int:
         ...
@@ -605,7 +605,7 @@ class DPDSimulator:
         ...
     def getSpringConstant(self) -> float:
         ...
-    def getStressTensor(self) -> numpy.ndarray[numpy.float64[3, 3]]:
+    def getStressTensor(self) -> numpy.ndarray:
         ...
     def getTemperature(self) -> float:
         ...
@@ -996,7 +996,7 @@ class MEHPForceBalance:
         ...
     def deformTo(self, newBox: Box) -> None:
         ...
-    def evaluateDistanceBetween(self, network: SimplifiedBalanceNetwork, displacements: numpy.ndarray[numpy.float64[m, 1]], linkIndexA: int, linkIndexB: int, is2D: bool = False) -> numpy.ndarray[numpy.float64[3, 1]]:
+    def evaluateDistanceBetween(self, network: SimplifiedBalanceNetwork, displacements: numpy.ndarray, linkIndexA: int, linkIndexB: int, is2D: bool = False) -> numpy.ndarray:
         ...
     def getAverageSpringLength(self) -> float:
         """
@@ -1025,7 +1025,7 @@ class MEHPForceBalance:
         """
                   Get the current link displacement residual norm.
         """
-    def getDisplacements(self) -> numpy.ndarray[numpy.float64[m, 1]]:
+    def getDisplacements(self) -> numpy.ndarray:
         """
                   Get the current link displacements.
         """
@@ -1039,7 +1039,7 @@ class MEHPForceBalance:
         """
                    Returns the reason for termination of the simulation
         """
-    def getForceOn(self, linkIdx: int, oneOverSpringPartitionUpperLimit: float = 1.0) -> numpy.ndarray[numpy.float64[3, 3]]:
+    def getForceOn(self, linkIdx: int, oneOverSpringPartitionUpperLimit: float = 1.0) -> numpy.ndarray:
         ...
     def getGammaFactor(self, r0squared: float = -1.0, nrOfChains: int = -1) -> float:
         """
@@ -1116,29 +1116,29 @@ class MEHPForceBalance:
                   
                   Caution: ignores atom masses.
         """
-    def getSpringPartitions(self) -> numpy.ndarray[numpy.float64[m, 1]]:
+    def getSpringPartitions(self) -> numpy.ndarray:
         """
                   Get the current spring partitions.
         """
     def getSpringpartitionIndicesOfSliplink(self, network: SimplifiedBalanceNetwork, linkIdx: int) -> list[int]:
         ...
-    def getStressTensor(self, oneOverSpringPartitionUpperLimit: float = 1.0) -> numpy.ndarray[numpy.float64[3, 3]]:
+    def getStressTensor(self, oneOverSpringPartitionUpperLimit: float = 1.0) -> numpy.ndarray:
         """
                   Returns the stress tensor at the current state of the simulation.
         """
-    def getStressTensorLinkBased(self, oneOverSpringPartitionUpperLimit: float = 1.0, xlinksOnly: bool = False) -> numpy.ndarray[numpy.float64[3, 3]]:
+    def getStressTensorLinkBased(self, oneOverSpringPartitionUpperLimit: float = 1.0, xlinksOnly: bool = False) -> numpy.ndarray:
         """
                   Returns the stress tensor at the current state of the simulation.
         """
-    def inspectDisplacementToMeanPositionUpdate(self, linkIdx: int, oneOverSpringPartitionUpperLimit: float = 1.0) -> numpy.ndarray[numpy.float64[m, 1]]:
+    def inspectDisplacementToMeanPositionUpdate(self, linkIdx: int, oneOverSpringPartitionUpperLimit: float = 1.0) -> numpy.ndarray:
         ...
-    def inspectLinkDisplacementToMeanPositionUpdate(self, linkIdx: int, damping: float = 1.0) -> numpy.ndarray[numpy.float64[m, 1]]:
+    def inspectLinkDisplacementToMeanPositionUpdate(self, linkIdx: int, damping: float = 1.0) -> numpy.ndarray:
         ...
-    def inspectParametrisationOptimsationForLink(self, linkIdx: int, displacements: numpy.ndarray[numpy.float64[m, 1]], springPartitions: numpy.ndarray[numpy.float64[m, 1]], maxNrOfSteps: int = 100, alpha_tol: float = 1e-09, minNrOfSteps: int = 1, oneOverSpringPartitionUpperLimit: float = 1.0) -> tuple[numpy.ndarray[numpy.float64[m, 1]], numpy.ndarray[numpy.float64[m, 1]], int, float, float, float, float]:
+    def inspectParametrisationOptimsationForLink(self, linkIdx: int, displacements: numpy.ndarray, springPartitions: numpy.ndarray, maxNrOfSteps: int = 100, alpha_tol: float = 1e-09, minNrOfSteps: int = 1, oneOverSpringPartitionUpperLimit: float = 1.0) -> tuple[numpy.ndarray, numpy.ndarray, int, float, float, float, float]:
         ...
-    def inspectSpringPartitionUpdate(self, linkIdx: int) -> numpy.ndarray[numpy.float64[m, 1]]:
+    def inspectSpringPartitionUpdate(self, linkIdx: int) -> numpy.ndarray:
         ...
-    def moveSlipLinksToTheirBestBranch(self, arg0: SimplifiedBalanceNetwork, arg1: numpy.ndarray[numpy.float64[m, 1]], arg2: numpy.ndarray[numpy.float64[m, 1]], arg3: float, arg4: int, arg5: bool) -> None:
+    def moveSlipLinksToTheirBestBranch(self, arg0: SimplifiedBalanceNetwork, arg1: numpy.ndarray, arg2: numpy.ndarray, arg3: float, arg4: int, arg5: bool) -> None:
         ...
     def randomlyAddSlipLinks(self, nrOfSlipLinksToSample: int, cutoff: float = 2.0, minimumNrOfSliplinks: int = 0, sameStrandCutoff: float = 2, excludeCrosslinks: bool = False, seed: int = -1) -> int:
         ...
@@ -1157,19 +1157,19 @@ class MEHPForceBalance:
                   :param innerXTolerance: The tolerance of the displacements of the slip-link as an inner exit condition.
                   :param innerAlphaTolerance: The tolerance of the contour-length when slipping the slip-link as an inner exit condition.
         """
-    def setDisplacements(self, arg0: numpy.ndarray[numpy.float64[m, 1]]) -> None:
+    def setDisplacements(self, arg0: numpy.ndarray) -> None:
         """
                   Set the current link displacements.
         """
-    def setSpringContourLengths(self, arg0: numpy.ndarray[numpy.float64[m, 1]]) -> None:
+    def setSpringContourLengths(self, arg0: numpy.ndarray) -> None:
         """
                   Set/overwrite the contour lengths.
         """
-    def setSpringPartitions(self, arg0: numpy.ndarray[numpy.float64[m, 1]]) -> None:
+    def setSpringPartitions(self, arg0: numpy.ndarray) -> None:
         """
                   Set the current spring partitions.
         """
-    def swapSlipLinksInclXlinks(self, arg0: SimplifiedBalanceNetwork, arg1: numpy.ndarray[numpy.float64[m, 1]], arg2: numpy.ndarray[numpy.float64[m, 1]], arg3: float, arg4: bool) -> None:
+    def swapSlipLinksInclXlinks(self, arg0: SimplifiedBalanceNetwork, arg1: numpy.ndarray, arg2: numpy.ndarray, arg3: float, arg4: bool) -> None:
         ...
     @property
     def network(self) -> SimplifiedBalanceNetwork:
@@ -1204,7 +1204,7 @@ class MEHPForceBalance2:
         ...
     def deformTo(self, newBox: Box) -> None:
         ...
-    def evaluateDistanceBetween(self, linkIndexA: int, linkIndexB: int, is2D: bool = False) -> numpy.ndarray[numpy.float64[3, 1]]:
+    def evaluateDistanceBetween(self, linkIndexA: int, linkIndexB: int, is2D: bool = False) -> numpy.ndarray:
         ...
     def getAverageSpringLength(self) -> float:
         """
@@ -1243,7 +1243,7 @@ class MEHPForceBalance2:
         """
                    Returns the reason for termination of the simulation
         """
-    def getForceOn(self, linkIdx: int, oneOverSpringPartitionUpperLimit: float = 1.0) -> numpy.ndarray[numpy.float64[3, 3]]:
+    def getForceOn(self, linkIdx: int, oneOverSpringPartitionUpperLimit: float = 1.0) -> numpy.ndarray:
         ...
     def getGammaFactor(self, r0squared: float = -1.0, nrOfChains: int = -1) -> float:
         """
@@ -1318,17 +1318,17 @@ class MEHPForceBalance2:
                   
                   Caution: ignores atom masses.
         """
-    def getSpringPartitions(self) -> numpy.ndarray[numpy.float64[m, 1]]:
+    def getSpringPartitions(self) -> numpy.ndarray:
         """
                   Get the current spring partitions.
         """
     def getSpringpartitionIndicesOfSliplink(self, linkIdx: int) -> list[int]:
         ...
-    def getStressTensor(self, oneOverSpringPartitionUpperLimit: float = 1.0) -> numpy.ndarray[numpy.float64[3, 3]]:
+    def getStressTensor(self, oneOverSpringPartitionUpperLimit: float = 1.0) -> numpy.ndarray:
         """
                   Returns the stress tensor at the current state of the simulation.
         """
-    def getStressTensorLinkBased(self, oneOverSpringPartitionUpperLimit: float = 1.0) -> numpy.ndarray[numpy.float64[3, 3]]:
+    def getStressTensorLinkBased(self, oneOverSpringPartitionUpperLimit: float = 1.0) -> numpy.ndarray:
         """
                   Returns the stress tensor at the current state of the simulation.
         """
@@ -1348,11 +1348,11 @@ class MEHPForceBalance2:
                   :param innerXTolerance: The tolerance of the displacements of the slip-link as an inner exit condition.
                   :param innerAlphaTolerance: The tolerance of the contour-length when slipping the slip-link as an inner exit condition.
         """
-    def setSpringContourLengths(self, arg0: numpy.ndarray[numpy.float64[m, 1]]) -> None:
+    def setSpringContourLengths(self, arg0: numpy.ndarray) -> None:
         """
                   Set/overwrite the contour lengths.
         """
-    def setSpringPartitions(self, arg0: numpy.ndarray[numpy.float64[m, 1]]) -> None:
+    def setSpringPartitions(self, arg0: numpy.ndarray) -> None:
         """
                   Set the current spring partitions.
         """
@@ -1506,7 +1506,7 @@ class MEHPForceRelaxation:
         """
                   Returns the residual norm at the current state of the simulation.
         """
-    def getResiduals(self) -> numpy.ndarray[numpy.float64[m, 1]]:
+    def getResiduals(self) -> numpy.ndarray:
         """
                   Returns the residuals at the current state of the simulation.
         """
@@ -1517,21 +1517,21 @@ class MEHPForceRelaxation:
                   
                   Caution: ignores atom masses.
         """
-    def getSpringDistances(self) -> numpy.ndarray[numpy.float64[m, 1]]:
+    def getSpringDistances(self) -> numpy.ndarray:
         """
                   Get the current coordinate differences for all the springs.
         
                   Returns:
                        - distances: a vector of size 3*nrOfSprings, with each x, y, z values of the springs
         """
-    def getSpringLengths(self) -> numpy.ndarray[numpy.float64[m, 1]]:
+    def getSpringLengths(self) -> numpy.ndarray:
         """
                   Get the current lengths for all the springs.
         
                   Returns:
                        - distances: a vector of size nrOfSprings, with each the norm of the distances
         """
-    def getStressTensor(self) -> numpy.ndarray[numpy.float64[3, 3]]:
+    def getStressTensor(self) -> numpy.ndarray:
         """
                   Returns the stress tensor at the current state of the simulation.
         """
@@ -1902,13 +1902,13 @@ class SimplifiedBalanceNetwork:
     def boxLengths(self) -> float:
         ...
     @property
-    def coordinates(self) -> numpy.ndarray[numpy.float64[m, 1]]:
+    def coordinates(self) -> numpy.ndarray:
         ...
     @property
     def linkIndicesOfSprings(self) -> list[list[int]]:
         ...
     @property
-    def linkIsSliplink(self) -> numpy.ndarray[bool[m, 1]]:
+    def linkIsSliplink(self) -> numpy.ndarray:
         ...
     @property
     def localToGlobalSpringIndex(self) -> list[list[int]]:
@@ -1917,7 +1917,7 @@ class SimplifiedBalanceNetwork:
     def nrOfCrossLinks(self) -> int:
         ...
     @property
-    def nrOfCrosslinkSwapsEndured(self) -> numpy.ndarray[numpy.int32[m, 1]]:
+    def nrOfCrosslinkSwapsEndured(self) -> numpy.ndarray:
         ...
     @property
     def nrOfLinks(self) -> int:
@@ -1929,40 +1929,40 @@ class SimplifiedBalanceNetwork:
     def nrOfSprings(self) -> int:
         ...
     @property
-    def oldAtomIds(self) -> numpy.ndarray[numpy.int32[m, 1]]:
+    def oldAtomIds(self) -> numpy.ndarray:
         ...
     @property
-    def partialToFullSpringIndex(self) -> numpy.ndarray[numpy.int32[m, 1]]:
+    def partialToFullSpringIndex(self) -> numpy.ndarray:
         ...
     @property
-    def springContourLength(self) -> numpy.ndarray[numpy.float64[m, 1]]:
+    def springContourLength(self) -> numpy.ndarray:
         ...
     @property
-    def springCoordinateIndexA(self) -> numpy.ndarray[numpy.int32[m, 1]]:
+    def springCoordinateIndexA(self) -> numpy.ndarray:
         ...
     @property
-    def springCoordinateIndexB(self) -> numpy.ndarray[numpy.int32[m, 1]]:
+    def springCoordinateIndexB(self) -> numpy.ndarray:
         ...
     @property
-    def springIndexA(self) -> numpy.ndarray[numpy.int32[m, 1]]:
+    def springIndexA(self) -> numpy.ndarray:
         ...
     @property
-    def springIndexB(self) -> numpy.ndarray[numpy.int32[m, 1]]:
+    def springIndexB(self) -> numpy.ndarray:
         ...
     @property
     def springIndicesOfLinks(self) -> list[list[int]]:
         ...
     @property
-    def springPartCoordinateIndexA(self) -> numpy.ndarray[numpy.int32[m, 1]]:
+    def springPartCoordinateIndexA(self) -> numpy.ndarray:
         ...
     @property
-    def springPartCoordinateIndexB(self) -> numpy.ndarray[numpy.int32[m, 1]]:
+    def springPartCoordinateIndexB(self) -> numpy.ndarray:
         ...
     @property
-    def springPartIndexA(self) -> numpy.ndarray[numpy.int32[m, 1]]:
+    def springPartIndexA(self) -> numpy.ndarray:
         ...
     @property
-    def springPartIndexB(self) -> numpy.ndarray[numpy.int32[m, 1]]:
+    def springPartIndexB(self) -> numpy.ndarray:
         ...
     @property
     def volume(self) -> float:
@@ -1978,7 +1978,7 @@ class SimplifiedNetwork:
     def boxLengths(self) -> float:
         ...
     @property
-    def coordinates(self) -> numpy.ndarray[numpy.float64[m, 1]]:
+    def coordinates(self) -> numpy.ndarray:
         ...
     @property
     def nrOfNodes(self) -> int:
@@ -1987,19 +1987,19 @@ class SimplifiedNetwork:
     def nrOfSprings(self) -> int:
         ...
     @property
-    def oldAtomIds(self) -> numpy.ndarray[numpy.int32[m, 1]]:
+    def oldAtomIds(self) -> numpy.ndarray:
         ...
     @property
-    def springCoordinateIndexA(self) -> numpy.ndarray[numpy.int32[m, 1]]:
+    def springCoordinateIndexA(self) -> numpy.ndarray:
         ...
     @property
-    def springCoordinateIndexB(self) -> numpy.ndarray[numpy.int32[m, 1]]:
+    def springCoordinateIndexB(self) -> numpy.ndarray:
         ...
     @property
-    def springIndexA(self) -> numpy.ndarray[numpy.int32[m, 1]]:
+    def springIndexA(self) -> numpy.ndarray:
         ...
     @property
-    def springIndexB(self) -> numpy.ndarray[numpy.int32[m, 1]]:
+    def springIndexB(self) -> numpy.ndarray:
         ...
     @property
     def volume(self) -> float:
@@ -2552,7 +2552,9 @@ def splitCSV(arg0: str, arg1: str) -> list[str]:
     Read a file containing a number of CSVs. Returns them split up.
     """
 def versionInformation() -> str:
-    ...
+    """
+        Returns  a string of the the current version, incl. git hash and date of compilation.
+    """
 DANGLING_CHAIN: MoleculeType  # value = <MoleculeType.DANGLING_CHAIN: 3>
 FREE_CHAIN: MoleculeType  # value = <MoleculeType.FREE_CHAIN: 4>
 NETWORK_STRAND: MoleculeType  # value = <MoleculeType.NETWORK_STRAND: 1>

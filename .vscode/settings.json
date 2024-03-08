@@ -19,7 +19,7 @@
     "*.twig.html": "twig",
     "*.pgf": "latex",
     "*.equil": "lmps",
-    "*.in": "lmps",
+    "*.in": "cpp",
     "core": "cpp",
     "superlusupport": "cpp",
     "*.evaluator": "cpp",

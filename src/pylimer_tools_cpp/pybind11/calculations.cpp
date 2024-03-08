@@ -10,8 +10,8 @@
 #include "../calc/MMTanalysis.h"
 #include "../entities/Universe.h"
 
-#include <pybind11/eigen.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/eigen.h>
 #include <pybind11/stl.h>
 
 namespace py = pybind11;
@@ -556,7 +556,7 @@ init_pylimer_bound_calc(py::module_& m)
            return mehp::MEHPForceBalance(self);
          })
     .def_static("constructWithRandomSlipLinks",
-                &mehp::MEHPForceBalance2::constructWithRandomSlipLinks,
+                &mehp::MEHPForceBalance::constructWithRandomSlipLinks,
                 R"pbdoc(
           Instantiate this simulator with randomly chosen slip-links.
          )pbdoc",
