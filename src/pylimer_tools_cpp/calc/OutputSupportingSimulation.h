@@ -149,6 +149,9 @@ namespace calc {
 
     void prepareAllOutputs()
     {
+      this->outputStreams.clear();
+      this->outputFileStreams.clear();
+      
       // output headers
       std::ios::sync_with_stdio(false);
       this->openFilesOutputHeader(this->outputConfigs);
