@@ -402,6 +402,14 @@ init_pylimer_bound_calc(py::module_& m)
           Arguments:
                - values: a list of OutputConfiguration structs
      )pbdoc")
+    .def("assumeBoxLargeEnough",
+         &mehp::MEHPForceRelaxation::configAssumeBoxLargeEnough,
+         R"pbdoc(
+          Configure whether to run PBC on the bonds or not.
+
+          If your bonds could get larger than half the box length, this must be kept false (default).
+          Otherwise, you can set it to true and therewith get some securities.
+         )pbdoc")
     .def("getForce",
          &mehp::MEHPForceRelaxation::getForce,
          R"pbdoc(
@@ -680,6 +688,14 @@ init_pylimer_bound_calc(py::module_& m)
           Arguments:
                - values: a list of OutputConfiguration structs
      )pbdoc")
+    .def("assumeBoxLargeEnough",
+         &mehp::MEHPForceBalance::configAssumeBoxLargeEnough,
+         R"pbdoc(
+          Configure whether to run PBC on the bonds or not.
+
+          If your bonds could get larger than half the box length, this must be kept false (default).
+          Otherwise, you can set it to true and therewith get some securities.
+         )pbdoc")
     .def("inspectLinkDisplacementToMeanPositionUpdate",
          &mehp::MEHPForceBalance::inspectLinkDisplacementToMeanPositionUpdate,
          R"pbdoc()pbdoc",
@@ -1067,6 +1083,14 @@ init_pylimer_bound_calc(py::module_& m)
           Arguments:
                - values: a list of OutputConfiguration structs
      )pbdoc")
+    .def("assumeBoxLargeEnough",
+         &mehp::MEHPForceBalance2::configAssumeBoxLargeEnough,
+         R"pbdoc(
+          Configure whether to run PBC on the bonds or not.
+
+          If your bonds could get larger than half the box length, this must be kept false (default).
+          Otherwise, you can set it to true and therewith get some securities.
+         )pbdoc")
     .def("moveSlipLinksToTheirBestBranch",
          &mehp::MEHPForceBalance2::moveSlipLinksToTheirBestBranch)
     .def("getForceOn",
