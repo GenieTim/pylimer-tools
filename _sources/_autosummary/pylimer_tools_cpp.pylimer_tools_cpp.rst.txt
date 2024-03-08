@@ -19,6 +19,7 @@
       inverse_langevin
       predictGelationPoint
       splitCSV
+      versionInformation
    
    
 
@@ -45,6 +46,7 @@
       LinkSwappingMode
       MCUniverseGenerator
       MEHPForceBalance
+      MEHPForceBalance2
       MEHPForceEvaluator
       MEHPForceRelaxation
       Molecule

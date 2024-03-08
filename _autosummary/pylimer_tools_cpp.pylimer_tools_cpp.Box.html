@@ -178,6 +178,7 @@
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin.html">pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint.html">pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.splitCSV.html">pylimer_tools_cpp.pylimer_tools_cpp.splitCSV</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.versionInformation.html">pylimer_tools_cpp.pylimer_tools_cpp.versionInformation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Atom.html">pylimer_tools_cpp.pylimer_tools_cpp.Atom</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle.html">pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.html">pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode</a></li>
@@ -193,6 +194,7 @@
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.LinkSwappingMode.html">pylimer_tools_cpp.pylimer_tools_cpp.LinkSwappingMode</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator.html">pylimer_tools_cpp.pylimer_tools_cpp.MCUniverseGenerator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.html">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance2.html">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance2</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator.html">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceEvaluator</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.html">pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Molecule.html">pylimer_tools_cpp.pylimer_tools_cpp.Molecule</a></li>
@@ -280,35 +282,41 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.__init__" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(*args, **kwargs)</p></td>
 <td><p>Overloaded function.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.applySimpleShear" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.applySimpleShear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">applySimpleShear</span></code></a>(self, shearMagnitude[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.applyPBC" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.applyPBC"><code class="xref py py-obj docutils literal notranslate"><span class="pre">applyPBC</span></code></a>(self, distances)</p></td>
+<td><p>Adjust the specified distances to fit into this box.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.applySimpleShear" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.applySimpleShear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">applySimpleShear</span></code></a>(self, shearMagnitude[, ...])</p></td>
 <td><p>Apply a simple shear to the box.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getHighX" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getHighX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getHighX</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getHighX" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getHighX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getHighX</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getHighY" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getHighY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getHighY</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getHighY" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getHighY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getHighY</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getHighZ" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getHighZ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getHighZ</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getHighZ" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getHighZ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getHighZ</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getLowX" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getLowX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getLowX</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getLowX" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getLowX"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getLowX</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getLowY" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getLowY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getLowY</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getLowY" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getLowY"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getLowY</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getLowZ" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getLowZ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getLowZ</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getLowZ" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getLowZ"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getLowZ</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getLx" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getLx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getLx</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getLx" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getLx"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getLx</span></code></a>(self)</p></td>
 <td><p>Get the length of the box in x direction.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getLy" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getLy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getLy</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getLy" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getLy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getLy</span></code></a>(self)</p></td>
 <td><p>Get the length of the box in y direction.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getLz" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getLz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getLz</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getLz" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getLz"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getLz</span></code></a>(self)</p></td>
 <td><p>Get the length of the box in z direction.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getOffset" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getOffset"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getOffset</span></code></a>(self, distances)</p></td>
+<td><p>Compute the offset required to compensate for periodic boundary conditions.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getVolume" title="pylimer_tools_cpp.pylimer_tools_cpp.Box.getVolume"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getVolume</span></code></a>(self)</p></td>
 <td><p>Compute the volume of the box.</p></td>
@@ -316,6 +324,12 @@
 </tbody>
 </table>
 </div>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.Box.applyPBC">
+<span class="sig-name descname"><span class="pre">applyPBC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self:</span> <span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Box</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distances:</span> <span class="pre">Eigen::Matrix&lt;double</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">1&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Eigen::Matrix&lt;double,</span> <span class="pre">-1,</span> <span class="pre">1,</span> <span class="pre">0,</span> <span class="pre">-1,</span> <span class="pre">1&gt;</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.applyPBC" title="Link to this definition">#</a></dt>
+<dd><p>Adjust the specified distances to fit into this box.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.Box.applySimpleShear">
 <span class="sig-name descname"><span class="pre">applySimpleShear</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box" title="pylimer_tools_cpp.pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Box</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">shearMagnitude</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shearDirection</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.applySimpleShear" title="Link to this definition">#</a></dt>
@@ -375,6 +389,15 @@ Specify another integer to disable the shear.</p>
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.Box.getLz">
 <span class="sig-name descname"><span class="pre">getLz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box" title="pylimer_tools_cpp.pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Box</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getLz" title="Link to this definition">#</a></dt>
 <dd><p>Get the length of the box in z direction.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.Box.getOffset">
+<span class="sig-name descname"><span class="pre">getOffset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self:</span> <span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Box</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distances:</span> <span class="pre">Eigen::Matrix&lt;double</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">1&gt;</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Eigen::Matrix&lt;double,</span> <span class="pre">-1,</span> <span class="pre">1,</span> <span class="pre">0,</span> <span class="pre">-1,</span> <span class="pre">1&gt;</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getOffset" title="Link to this definition">#</a></dt>
+<dd><p>Compute the offset required to compensate for periodic boundary conditions.</p>
+<p>Useful e.g. if you are using absolute coordinates for distances, but
+still need an infinite network,
+e.g., if the bonds need to be able to get longer than half the box.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -445,6 +468,7 @@ Specify another integer to disable the shear.</p>
 <li><a class="reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.Box</a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box"><code class="docutils literal notranslate"><span class="pre">Box</span></code></a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.__init__"><code class="docutils literal notranslate"><span class="pre">Box.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.applyPBC"><code class="docutils literal notranslate"><span class="pre">Box.applyPBC()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.applySimpleShear"><code class="docutils literal notranslate"><span class="pre">Box.applySimpleShear()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getHighX"><code class="docutils literal notranslate"><span class="pre">Box.getHighX()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getHighY"><code class="docutils literal notranslate"><span class="pre">Box.getHighY()</span></code></a></li>
@@ -455,6 +479,7 @@ Specify another integer to disable the shear.</p>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getLx"><code class="docutils literal notranslate"><span class="pre">Box.getLx()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getLy"><code class="docutils literal notranslate"><span class="pre">Box.getLy()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getLz"><code class="docutils literal notranslate"><span class="pre">Box.getLz()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getOffset"><code class="docutils literal notranslate"><span class="pre">Box.getOffset()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.Box.getVolume"><code class="docutils literal notranslate"><span class="pre">Box.getVolume()</span></code></a></li>
 </ul>
 </li>
