@@ -147,11 +147,15 @@ namespace calc {
     std::vector<size_t> msdOriginTimesteps;
     std::vector<double> runningAverages;
 
+    /**
+     * @brief Open all files required for output
+     *
+     */
     void prepareAllOutputs()
     {
       this->outputStreams.clear();
       this->outputFileStreams.clear();
-      
+
       // output headers
       std::ios::sync_with_stdio(false);
       this->openFilesOutputHeader(this->outputConfigs);
@@ -172,6 +176,18 @@ namespace calc {
       std::string autocorrelationOutputBuffer;
       autocorrelationOutputBuffer.reserve(
         this->outputAutoCorrelationConfigs.size() * 50);
+    }
+
+    /**
+     * @brief Close all files required for output
+     *
+     */
+    void closeAllOutputs()
+    {
+      // finish up
+      std::ios::sync_with_stdio(true);
+      this->outputStreams.clear();
+      this->outputFileStreams.clear();
     }
 
     int openFilesOutputHeader(const std::vector<OutputConfiguration>& configs,
