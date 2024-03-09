@@ -901,7 +901,8 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceBalance::getDisplacementResidualNorm,
          R"pbdoc(
           Get the current link displacement residual norm.
-     )pbdoc")
+     )pbdoc",
+         py::arg("oneOverSpringPartitionUpperLimit") = 1.)
     .def("getIdsOfActiveNodes",
          &mehp::MEHPForceBalance::getIdsOfActiveNodes,
          R"pbdoc(
@@ -1221,7 +1222,8 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceBalance2::getDisplacementResidualNorm,
          R"pbdoc(
           Get the current link displacement residual norm.
-     )pbdoc")
+     )pbdoc",
+         py::arg("oneOverSpringPartitionUpperLimit") = 1.)
     .def("getIdsOfActiveNodes",
          &mehp::MEHPForceBalance2::getIdsOfActiveNodes,
          R"pbdoc(

@@ -103,19 +103,18 @@ namespace calc {
               throw std::invalid_argument(
                 "This swapping mode is currently not supported.");
             }
-
-            if (!this->net.isUpToDate) {
-              this->convertFromGraph();
-            }
           }
         }
         maxDistanceMoved = 0.0;
         currentResidual = 0.0;
 
         // place slip-link
-        for (size_t link_idx = this->net.nrOfNodes;
-             link_idx < this->net.nrOfLinks;
+        for (size_t link_idx = 0; link_idx < igraph_vcount(&this->graph);
              ++link_idx) {
+          if (castToIgraphInt(igraph_cattribute_VAN(
+                &this->graph, "type", link_idx)) != this->slipLinkType) {
+            continue;
+          }
           // std::cout << "Handling " << link_idx << " of " << net.nrOfNodes
           //           << " / " << net.nrOfLinks << std::endl;
 
@@ -138,7 +137,12 @@ namespace calc {
           this->getDisplacementResidualNorm(oneOverSpringPartitionUpperLimit);
 
         // place cross-links
-        for (size_t link_idx = 0; link_idx < this->net.nrOfNodes; ++link_idx) {
+        for (size_t link_idx = 0; link_idx < igraph_vcount(&this->graph);
+             ++link_idx) {
+          if (castToIgraphInt(igraph_cattribute_VAN(
+                &this->graph, "type", link_idx)) != this->crossLinkerType) {
+            continue;
+          }
           double distanceMoved = this->displaceToMeanPosition(
             link_idx, oneOverSpringPartitionUpperLimit);
           if (distanceMoved > maxDistanceMoved) {
@@ -231,8 +235,11 @@ namespace calc {
       const size_t linkIdx,
       const double oneOverSpringPartitionUpperLimit)
     {
-      INVALIDARG_EXP_IFN(linkIdx < igraph_vcount(&this->graph),
-                         "Invalid link-idx");
+      INVALIDARG_EXP_IFN(
+        linkIdx < igraph_vcount(&this->graph),
+        "Invalid link-idx: cannot displace link " + std::to_string(linkIdx) +
+          " to mean position, as only " +
+          std::to_string(igraph_vcount(&this->graph)) + " links are present.");
 
       Eigen::Vector3d objectiveDisplacement = Eigen::Vector3d::Zero();
       double objectiveDisplacementContributors = 0.0;
