@@ -140,7 +140,7 @@ namespace calc {
         for (size_t link_idx = 0; link_idx < igraph_vcount(&this->graph);
              ++link_idx) {
           if (castToIgraphInt(igraph_cattribute_VAN(
-                &this->graph, "type", link_idx)) != this->crossLinkerType) {
+                &this->graph, "type", link_idx)) != this->crosslinkerType) {
             continue;
           }
           double distanceMoved = this->displaceToMeanPosition(
