@@ -83,6 +83,7 @@ target_sources(pylimer_tools
 		${CMAKE_CURRENT_LIST_DIR}/entities/NeighbourList.cpp
 		${CMAKE_CURRENT_LIST_DIR}/entities/EigenNeighbourList.cpp
 
+		${CMAKE_CURRENT_LIST_DIR}/io/AveFileReader.cpp
 		${CMAKE_CURRENT_LIST_DIR}/io/DataFileParser.cpp
 		${CMAKE_CURRENT_LIST_DIR}/io/DumpFileParser.cpp
 
@@ -103,6 +104,7 @@ target_sources(pylimer_tools
 		${CMAKE_CURRENT_LIST_DIR}/entities/NeighbourList.h
 		${CMAKE_CURRENT_LIST_DIR}/entities/EigenNeighbourList.h
 
+		${CMAKE_CURRENT_LIST_DIR}/io/AveFileReader.h
 		${CMAKE_CURRENT_LIST_DIR}/io/DataFileParser.h
 		${CMAKE_CURRENT_LIST_DIR}/io/DumpFileParser.h
 		${CMAKE_CURRENT_LIST_DIR}/utils/CerealUtils.h

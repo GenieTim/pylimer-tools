@@ -335,6 +335,11 @@ namespace utils {
     std::vector<std::vector<pylimer_tools::entities::Atom>> resultingAtoms;
     resultingAtoms.reserve(this->getLength());
 
+    std::vector<std::unordered_map<std::string, std::vector<double>>> additionalAtomData;
+    if (sectionsToRead & ReadableDumpFileSections::EXTRA_ATOM) {
+      additionalAtomData.reserve(this->getLength());
+    }
+
     std::vector<pylimer_tools::entities::Box> resultingBoxes;
     resultingBoxes.reserve(this->getLength());
 
@@ -382,12 +387,13 @@ namespace utils {
         atomFormat = pylimer_tools::utils::trimLineOmitComment(
           line.substr(std::string("ITEM: ATOMS ").length()));
         double x = 0., y = 0, z = 0.;
-        int nx = 0, ny =0, nz = 0;
+        int nx = 0, ny = 0, nz = 0;
         bool isUnwrappedX = false, isUnwrappedY = false, isUnwrappedZ = false;
         bool isScaledX = false, isScaledY = false, isScaledZ = false;
         int id = 0, type = 1;
         std::vector<pylimer_tools::entities::Atom> localResults;
         localResults.reserve(numAtoms);
+        std::unordered_map<std::string, std::vector<double>> localExtraAtomData;
         for (size_t i = 0; i < numAtoms; ++i) {
           RUNTIME_EXP_IFN(std::getline(this->file, line),
                           "File ended before all atoms could be read");
@@ -473,8 +479,13 @@ namespace utils {
                   ss >> nz;
                   break;
                 default:
-                  throw std::runtime_error("Not implemented format part: '" +
-                                           formatPart + "'");
+                if (sectionsToRead & ReadableDumpFileSections::EXTRA_ATOM) {
+                  double d;
+                  ss >> d;
+                  localExtraAtomData[formatPart].push_back(d);
+                }
+                  // throw std::runtime_error("Not implemented format part: '" +
+                  //                          formatPart + "'");
               }
             }
           }
@@ -489,6 +500,10 @@ namespace utils {
             isUnwrappedZ ? 0 : nz));
         }
         resultingAtoms.push_back(localResults);
+        if (sectionsToRead & ReadableDumpFileSections::EXTRA_ATOM) {
+          additionalAtomData.push_back(localExtraAtomData);
+        }
+        
         sectionsRead += 1;
         assert(resultingBoxes.size() == sectionsRead);
         assert(resultingTimeSteps.size() == sectionsRead);
@@ -504,6 +519,7 @@ namespace utils {
     results.atoms = resultingAtoms;
     results.boxes = resultingBoxes;
     results.timesteps = resultingTimeSteps;
+    results.extraAtomsData = additionalAtomData;
     return results;
   };
 

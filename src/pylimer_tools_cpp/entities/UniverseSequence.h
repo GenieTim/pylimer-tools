@@ -26,6 +26,7 @@ namespace entities {
     void setDataFileAtomStyle(const std::vector<pylimer_tools::utils::AtomStyle> &dataFileAtomStyle);
 
     // computations
+    std::unordered_map<long int, double> computeMsdForAtomProperties(const std::vector<long int> &atomIds, std::string x, std::string y, std::string z, int nrOfOrigins = 10, bool reduceMemory = false); 
     std::unordered_map<long int, double> computeMsdForAtoms(const std::vector<long int> &atomIds, int nrOfOrigins = 10, bool reduceMemory = false); 
     std::unordered_map<long int, double> computeDistanceAutocorrelationFromToAtoms(
       const std::vector<long int> &atomIdsFrom,
