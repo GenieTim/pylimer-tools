@@ -1062,7 +1062,7 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("atom_ids"),
          py::arg("nr_of_origins") = 25,
          py::arg("reduce_memory") = false)
-    .def("computeMsdForAtoms",
+    .def("computeMsdForAtomProperties",
          &UniverseSequence::computeMsdForAtomProperties,
          R"pbdoc(
           Compute the mean square displacement for atoms with the specified ids

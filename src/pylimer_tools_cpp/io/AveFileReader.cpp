@@ -30,7 +30,7 @@ namespace utils {
     auto count = std::count_if(std::istreambuf_iterator<char>{ in_stream },
                                {},
                                [](char c) { return c == '\n'; });
-    this->numRows = count - this->getNrOfHeaderRows();
+    this->numRows = count - this->getNrOfHeaderRows() + 1;
     return this->numRows;
   }
 
@@ -83,6 +83,9 @@ namespace utils {
     std::string line;
     std::string lastLine;
     while (getline(file, line)) {
+      if (line.size() == 0) {
+        break;
+      }
       if (line.at(0) == '#') {
         lastLine = line;
       } else {
@@ -90,8 +93,10 @@ namespace utils {
       }
     }
 
+    RUNTIME_EXP_IFN(lastLine.size() > 0, "Detected header line is empty.");
+
     std::string headerLine =
-      pylimer_tools::utils::trimLineOmitComment(lastLine);
+      pylimer_tools::utils::trim(lastLine.substr(1, lastLine.size() - 1));
     this->columnNames = pylimer_tools::utils::split(headerLine, ' ');
     return this->columnNames;
   }
