@@ -33,6 +33,7 @@
    
       Atom
       AtomStyle
+      AveFileReader
       BalanceRunMode
       Box
       ComputedDoubleValues

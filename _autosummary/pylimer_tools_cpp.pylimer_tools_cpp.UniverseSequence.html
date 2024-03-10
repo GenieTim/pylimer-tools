@@ -181,6 +181,7 @@
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.versionInformation.html">pylimer_tools_cpp.pylimer_tools_cpp.versionInformation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Atom.html">pylimer_tools_cpp.pylimer_tools_cpp.Atom</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle.html">pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.html">pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.html">pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Box.html">pylimer_tools_cpp.pylimer_tools_cpp.Box</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.ComputedDoubleValues.html">pylimer_tools_cpp.pylimer_tools_cpp.ComputedDoubleValues</a></li>
@@ -285,8 +286,8 @@ to have the UniverseSequence forget about already read universes.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.computeDistanceFromToAtoms" title="pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.computeDistanceFromToAtoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">computeDistanceFromToAtoms</span></code></a>(self, ...[, ...])</p></td>
 <td><p>Compute the root square norm of all the (unwrapped!) distances for the given pair of atoms.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.computeMsdForAtoms" title="pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.computeMsdForAtoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">computeMsdForAtoms</span></code></a>(self, atom_ids[, ...])</p></td>
-<td><p>Compute the mean square displacement for atoms with the specified ids</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.computeMsdForAtoms" title="pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.computeMsdForAtoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">computeMsdForAtoms</span></code></a>(*args, **kwargs)</p></td>
+<td><p>Overloaded function.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.forgetAtIndex" title="pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.forgetAtIndex"><code class="xref py py-obj docutils literal notranslate"><span class="pre">forgetAtIndex</span></code></a>(self, index)</p></td>
 <td><p>Clear the memory of the Universe at the given index (as of in the</p></td>
@@ -338,8 +339,20 @@ Pay attention that the image flags are correct, otherwise, this data may not be 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.computeMsdForAtoms">
-<span class="sig-name descname"><span class="pre">computeMsdForAtoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence" title="pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nr_of_origins</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduce_memory</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.computeMsdForAtoms" title="Link to this definition">#</a></dt>
-<dd><p>Compute the mean square displacement for atoms with the specified ids</p>
+<span class="sig-name descname"><span class="pre">computeMsdForAtoms</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.computeMsdForAtoms" title="Link to this definition">#</a></dt>
+<dd><p>Overloaded function.</p>
+<ol class="arabic">
+<li><p>computeMsdForAtoms(self: pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence, atom_ids: List[int], nr_of_origins: int = 25, reduce_memory: bool = False) -&gt; Dict[int, float]</p>
+<blockquote>
+<div><p>Compute the mean square displacement for atoms with the specified ids</p>
+</div></blockquote>
+</li>
+<li><p>computeMsdForAtoms(self: pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence, atom_ids: List[int], x_property: str, y_property: str, z_property: str, nr_of_origins: int = 25, reduce_memory: bool = False) -&gt; Dict[int, float]</p>
+<blockquote>
+<div><p>Compute the mean square displacement for atoms with the specified ids</p>
+</div></blockquote>
+</li>
+</ol>
 </dd></dl>
 
 <dl class="py method">

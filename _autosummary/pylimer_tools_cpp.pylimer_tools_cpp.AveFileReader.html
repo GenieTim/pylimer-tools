@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pylimer_tools_cpp.pylimer_tools_cpp.doRandomWalkChainFromTo" href="pylimer_tools_cpp.pylimer_tools_cpp.doRandomWalkChainFromTo.html" /><link rel="prev" title="pylimer_tools_cpp.pylimer_tools_cpp" href="pylimer_tools_cpp.pylimer_tools_cpp.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode" href="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.html" /><link rel="prev" title="pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle" href="pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle.html" />
 
     <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
-        <title>pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance - PylimerTools documentation</title>
+        <title>pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=36a5483c" />
@@ -173,7 +173,7 @@
 </li>
 <li class="toctree-l2 current has-children"><a class="reference internal" href="../pylimer_tools_cpp.html">pylimer_tools_cpp package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of pylimer_tools_cpp package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l3 current has-children"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.html">pylimer_tools_cpp.pylimer_tools_cpp</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><div class="visually-hidden">Toggle navigation of pylimer_tools_cpp.pylimer_tools_cpp</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance.html">pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.doRandomWalkChainFromTo.html">pylimer_tools_cpp.pylimer_tools_cpp.doRandomWalkChainFromTo</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin.html">pylimer_tools_cpp.pylimer_tools_cpp.inverse_langevin</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint.html">pylimer_tools_cpp.pylimer_tools_cpp.predictGelationPoint</a></li>
@@ -181,7 +181,7 @@
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.versionInformation.html">pylimer_tools_cpp.pylimer_tools_cpp.versionInformation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Atom.html">pylimer_tools_cpp.pylimer_tools_cpp.Atom</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle.html">pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle</a></li>
-<li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.html">pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader</a></li>
+<li class="toctree-l4 current current-page"><a class="current reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.html">pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Box.html">pylimer_tools_cpp.pylimer_tools_cpp.Box</a></li>
 <li class="toctree-l4"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.ComputedDoubleValues.html">pylimer_tools_cpp.pylimer_tools_cpp.ComputedDoubleValues</a></li>
@@ -250,12 +250,81 @@
           </label>
         </div>
         <article role="main">
-          <section id="pylimer-tools-cpp-pylimer-tools-cpp-computestoichiometricinbalance">
-<h1>pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance<a class="headerlink" href="#pylimer-tools-cpp-pylimer-tools-cpp-computestoichiometricinbalance" title="Link to this heading">#</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">computeStoichiometricInbalance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg3</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance" title="Link to this definition">#</a></dt>
-<dd><p>Compute stoichiometric inbalance</p>
+          <section id="pylimer-tools-cpp-pylimer-tools-cpp-avefilereader">
+<h1>pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader<a class="headerlink" href="#pylimer-tools-cpp-pylimer-tools-cpp-avefilereader" title="Link to this heading">#</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">AveFileReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader" title="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">filePath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader" title="Link to this definition">#</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Alternative implementation of the data file reader implemented in
+<code class="xref py py-func docutils literal notranslate"><span class="pre">pylimer_tools.readLammpsOutputFile.readAveragesFile()</span></code>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader" title="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">filePath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.__init__" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.__init__" title="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>(self, filePath)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.autocorrelateColumn" title="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.autocorrelateColumn"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocorrelateColumn</span></code></a>(self, column_index, ...)</p></td>
+<td><p>Do autocorrelation on one particular column for a speficied set of delta indices.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.autocorrelateColumnDifference" title="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.autocorrelateColumnDifference"><code class="xref py py-obj docutils literal notranslate"><span class="pre">autocorrelateColumnDifference</span></code></a>(self, ...)</p></td>
+<td><p>Do autocorrelation on the difference between two particular columns for a speficied set of delta indices.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getColumnNames" title="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getColumnNames"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getColumnNames</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getData" title="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getData"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getData</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getNrOfColumns" title="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getNrOfColumns"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNrOfColumns</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getNrOfRows" title="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getNrOfRows"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getNrOfRows</span></code></a>(self)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.autocorrelateColumn">
+<span class="sig-name descname"><span class="pre">autocorrelateColumn</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader" title="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.autocorrelateColumn" title="Link to this definition">#</a></dt>
+<dd><p>Do autocorrelation on one particular column for a speficied set of delta indices.</p>
+<p>Assumes the data is equally spaced.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.autocorrelateColumnDifference">
+<span class="sig-name descname"><span class="pre">autocorrelateColumnDifference</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader" title="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_index1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_index2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta_indices</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.autocorrelateColumnDifference" title="Link to this definition">#</a></dt>
+<dd><p>Do autocorrelation on the difference between two particular columns for a speficied set of delta indices.</p>
+<p>Assumes the data is equally spaced.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getColumnNames">
+<span class="sig-name descname"><span class="pre">getColumnNames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader" title="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getColumnNames" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getData">
+<span class="sig-name descname"><span class="pre">getData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader" title="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getData" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getNrOfColumns">
+<span class="sig-name descname"><span class="pre">getNrOfColumns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader" title="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getNrOfColumns" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getNrOfRows">
+<span class="sig-name descname"><span class="pre">getNrOfRows</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader" title="pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getNrOfRows" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </section>
@@ -265,23 +334,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="pylimer_tools_cpp.pylimer_tools_cpp.doRandomWalkChainFromTo.html">
+          <a class="next-page" href="pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.doRandomWalkChainFromTo</div>
+                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.BalanceRunMode</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="pylimer_tools_cpp.pylimer_tools_cpp.html">
+          <a class="prev-page" href="pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp</div>
+                <div class="title">pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle</div>
                 
               </div>
             </a>
@@ -314,8 +383,17 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance</a><ul>
-<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.computeStoichiometricInbalance"><code class="docutils literal notranslate"><span class="pre">computeStoichiometricInbalance()</span></code></a></li>
+<li><a class="reference internal" href="#">pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader</a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader"><code class="docutils literal notranslate"><span class="pre">AveFileReader</span></code></a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.__init__"><code class="docutils literal notranslate"><span class="pre">AveFileReader.__init__()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.autocorrelateColumn"><code class="docutils literal notranslate"><span class="pre">AveFileReader.autocorrelateColumn()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.autocorrelateColumnDifference"><code class="docutils literal notranslate"><span class="pre">AveFileReader.autocorrelateColumnDifference()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getColumnNames"><code class="docutils literal notranslate"><span class="pre">AveFileReader.getColumnNames()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getData"><code class="docutils literal notranslate"><span class="pre">AveFileReader.getData()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getNrOfColumns"><code class="docutils literal notranslate"><span class="pre">AveFileReader.getNrOfColumns()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.AveFileReader.getNrOfRows"><code class="docutils literal notranslate"><span class="pre">AveFileReader.getNrOfRows()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
