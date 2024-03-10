@@ -1,5 +1,6 @@
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include "../../src/pylimer_tools_cpp/io/DataFileParser.h"
+#include "../../src/pylimer_tools_cpp/io/AveFileReader.h"
 #include "../../src/pylimer_tools_cpp/io/DataFileWriter.h"
 #include "../../src/pylimer_tools_cpp/io/DumpFileParser.h"
 #include <catch2/benchmark/catch_benchmark_all.hpp>
@@ -182,4 +183,21 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
 
     std::filesystem::remove(fileToWrite);
   }
+}
+
+
+TEST_CASE("AveFileReader works", "[AveFileReader][io][utils]") {
+  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  REQUIRE(std::filesystem::exists(suspectedPath)); 
+  pu::AveFileReader reader = pu::AveFileReader(suspectedPath + "example_avg_file.out.avg.txt");
+
+  CHECK(reader.getNrOfRows() == 5);
+  CHECK(reader.getNrOfColumns() == 3);
+  std::vector<std::string> columnNames = reader.getColumnNames();
+  CHECK(columnNames.size() == 3);
+  CHECK(columnNames[0] == "TimeStep");
+  CHECK(columnNames[2] == "else");
+  std::vector<std::vector<double>> data = reader.getData();
+  CHECK(data[0][0] == 100);
+  CHECK(data[2][1] == 6000);
 }
