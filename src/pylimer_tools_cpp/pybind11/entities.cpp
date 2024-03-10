@@ -10,9 +10,9 @@
 
 #include "../utils/CerealUtils.h"
 
-#include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
 #include <pybind11/operators.h>
+#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
 namespace py = pybind11;
@@ -1060,6 +1060,17 @@ init_pylimer_bound_entities(py::module_& m)
           Compute the mean square displacement for atoms with the specified ids
      )pbdoc",
          py::arg("atom_ids"),
+         py::arg("nr_of_origins") = 25,
+         py::arg("reduce_memory") = false)
+    .def("computeMsdForAtoms",
+         &UniverseSequence::computeMsdForAtomProperties,
+         R"pbdoc(
+          Compute the mean square displacement for atoms with the specified ids
+     )pbdoc",
+         py::arg("atom_ids"),
+         py::arg("x_property"),
+         py::arg("y_property"),
+         py::arg("z_property"),
          py::arg("nr_of_origins") = 25,
          py::arg("reduce_memory") = false)
     .def("computeDistanceAutocorrelationFromTo",

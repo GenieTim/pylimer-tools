@@ -1,6 +1,7 @@
 #ifndef PYBIND_READERS_H
 #define PYBIND_READERS_H
 
+#include "../io/AveFileReader.h"
 #include "../io/DataFileParser.h"
 #include "../io/DumpFileParser.h"
 #include "../io/CSVSplitter.h"
@@ -33,6 +34,27 @@ using namespace pylimer_tools::utils;
 void
 init_pylimer_bound_readers(py::module_& m)
 {
+
+     py::class_<AveFileReader>(m, "AveFileReader", R"pbdoc(
+          Alternative implementation of the data file reader implemented in 
+          :func:`pylimer_tools.readLammpsOutputFile.readAveragesFile`.
+
+     )pbdoc")
+     .def(py::init<const std::string>(), py::arg("filePath"))
+     .def("getColumnNames", &AveFileReader::getColumnNames)
+     .def("getNrOfRows", &AveFileReader::getNrOfRows)
+     .def("getNrOfColumns", &AveFileReader::getNrOfColumns)
+     .def("getData", &AveFileReader::getData)
+     .def("autocorrelateColumn", &AveFileReader::autocorrelateColumn, R"pbdoc(
+          Do autocorrelation on one particular column for a speficied set of delta indices.
+
+          Assumes the data is equally spaced.
+     )pbdoc", py::arg("column_index"), py::arg("delta_indices"))
+     .def("autocorrelateColumnDifference", &AveFileReader::autocorrelateColumnDifference, R"pbdoc(
+          Do autocorrelation on the difference between two particular columns for a speficied set of delta indices.
+
+          Assumes the data is equally spaced.
+     )pbdoc", py::arg("column_index1"), py::arg("column_index2"), py::arg("delta_indices"));
 
   py::enum_<AtomStyle>(m, "AtomStyle")
     .value("NONE", AtomStyle::NONE)

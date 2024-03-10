@@ -31,8 +31,8 @@ namespace utils {
     return true;
   }
 
-  static inline bool contains(const std::string &haystack,
-                              const std::string &needle)
+  static inline bool contains(const std::string& haystack,
+                              const std::string& needle)
   {
     return haystack.find(needle) != std::string::npos;
   }
@@ -70,7 +70,7 @@ namespace utils {
   }
 
   static inline std::string rstrip(std::string haystack,
-                                   const std::string &needle)
+                                   const std::string& needle)
   {
     auto pos = haystack.find(needle);
     if (pos != std::string::npos) {
@@ -79,8 +79,8 @@ namespace utils {
     return haystack;
   }
 
-  static inline bool startsWith(const std::string &haystack,
-                                const std::string &needle)
+  static inline bool startsWith(const std::string& haystack,
+                                const std::string& needle)
   {
     return haystack.compare(0, needle.size(), needle) == 0;
   }
@@ -114,7 +114,7 @@ namespace utils {
 
   static inline int split(std::vector<std::string>& res,
                           std::string s,
-                          const std::string &delimiter)
+                          const std::string& delimiter)
   {
     size_t pos_start = 0, pos_end, delim_len = delimiter.length();
     std::string token;
@@ -145,7 +145,7 @@ namespace utils {
   {
 
   public:
-    CsvTokenizer(const std::string &subject)
+    CsvTokenizer(const std::string& subject)
     {
       this->source = subject;
       // Either use C++ 20 implementation, if <ranges> is available
@@ -177,7 +177,7 @@ namespace utils {
       } while (start != std::string::npos);
     }
 
-    CsvTokenizer(const std::string &subject, const size_t maxNrToRead)
+    CsvTokenizer(const std::string& subject, const size_t maxNrToRead)
     {
       this->source = subject;
       // Either use C++ 20 implementation, if <ranges> is available
@@ -196,7 +196,7 @@ namespace utils {
       size_t start = text.find_first_not_of(separators);
       size_t iteration = 0;
       do {
-       size_t end = text.find_first_of(separators, start);
+        size_t end = text.find_first_of(separators, start);
 
         if (end == std::string::npos) {
           std::string token = text.substr(start);
@@ -247,7 +247,7 @@ namespace utils {
     }                                                                          \
     try {                                                                      \
       return METHOD(this->results[index]);                                     \
-    } catch (std::invalid_argument &e) {                                        \
+    } catch (std::invalid_argument & e) {                                      \
       throw std::runtime_error("Failed to convert string '" +                  \
                                this->results[index] + "' to " #TYPE);          \
     }                                                                          \

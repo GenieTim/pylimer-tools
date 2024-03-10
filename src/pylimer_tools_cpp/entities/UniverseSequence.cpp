@@ -560,12 +560,175 @@ namespace entities {
     }
   }
 
+  /**
+   * @brief Compute the mean square displacement for the given atoms in the dump
+   * file
+   *
+   * @param atomIds
+   * @param nrOfOrigins
+   * @param reduceMemory
+   * @return std::unordered_map<long int, double>
+   */
+  std::unordered_map<long int, double>
+  UniverseSequence::computeMsdForAtomProperties(
+    const std::vector<long int>& atomIds,
+    std::string x,
+    std::string y,
+    std::string z,
+    int nrOfOrigins,
+    bool reduceMemory)
+  {
+    RUNTIME_EXP_IFN(!this->modeDataFiles,
+                    "UniverseSequence::computeMsdForAtomsFromDumpFile only "
+                    "works with dump files, duh.");
+    pylimer_tools::utils::ReadDumpFileSections sections =
+      this->dumpFileParser.readDumpFileSections(
+        pylimer_tools::utils::ReadableDumpFileSections::TIMESTEP |
+        pylimer_tools::utils::ReadableDumpFileSections::ATOM |
+        pylimer_tools::utils::ReadableDumpFileSections::EXTRA_ATOM |
+        pylimer_tools::utils::ReadableDumpFileSections::BOX);
+    std::vector<long int> timesteps = sections.timesteps;
+    std::cout << "Read time-steps" << std::endl;
+    std::vector<Box> boxes = sections.boxes;
+    std::cout << "Read boxes" << std::endl;
+    std::vector<std::vector<Atom>> atoms = sections.atoms;
+    std::cout << "Read atoms" << std::endl;
+    std::vector<std::unordered_map<std::string, std::vector<double>>> extraAtomData =
+      sections.extraAtomsData;
+
+    RUNTIME_EXP_IFN(timesteps.size() == boxes.size(),
+                    "Dump file seems inconsistent: read " +
+                      std::to_string(timesteps.size()) + " time-steps, but " +
+                      std::to_string(boxes.size()) + " boxes.");
+    RUNTIME_EXP_IFN(timesteps.size() == atoms.size(),
+                    "Dump file seems inconsistent: read " +
+                      std::to_string(timesteps.size()) + " time-steps, but " +
+                      std::to_string(atoms.size()) + " atoms.");
+    RUNTIME_EXP_IFN(extraAtomData.size() == atoms.size(),
+                    "Dump file seems inconsistent: read " +
+                      std::to_string(extraAtomData.size()) +
+                      " extra atom sets, but " + std::to_string(atoms.size()) +
+                      " atoms.");
+    RUNTIME_EXP_IFN(
+      timesteps.size() == this->getLength(),
+      "Dump file seems inconsistent: read " + std::to_string(timesteps.size()) +
+        " time-steps, but expected " + std::to_string(this->getLength()) + ".");
+
+    // first, check that we start at the beginning
+    size_t startingIndex = 0;
+    for (size_t i = 1; i < timesteps.size(); ++i) {
+      if (timesteps[i] < timesteps[i - 1]) {
+        startingIndex = i;
+        std::cerr << "Correcting starting index due to time-step order to "
+                  << startingIndex << std::endl;
+      }
+    }
+
+    // assemble all coordinates
+    std::vector<Eigen::VectorXd> coordinates;
+    coordinates.reserve(this->getLength() - startingIndex);
+    for (size_t i = startingIndex; i < this->getLength(); ++i) {
+      std::unordered_map<long int, int> atomIdToAtomIndex;
+      atomIdToAtomIndex.reserve(atoms[i].size());
+      for (size_t j = 0; j < atoms[i].size(); ++j) {
+        atomIdToAtomIndex[atoms[i][j].getId()] = j;
+      }
+      Eigen::VectorXd localCoordinates =
+        Eigen::VectorXd::Zero(3 * atomIds.size());
+      RUNTIME_EXP_IFN(extraAtomData[i].at(x).size() == atomIds.size(),
+                      "Wrong size");
+      RUNTIME_EXP_IFN(extraAtomData[i].at(y).size() == atomIds.size(),
+                      "Wrong size");
+      RUNTIME_EXP_IFN(extraAtomData[i].at(z).size() == atomIds.size(),
+                      "Wrong size");
+      for (size_t j = 0; j < atomIds.size(); ++j) {
+        size_t row = atomIdToAtomIndex.at(atomIds[j]);
+        Eigen::Vector3d coords;
+        coords << extraAtomData[i].at(x)[j], extraAtomData[i].at(y)[j],
+          extraAtomData[i].at(z)[j];
+        localCoordinates.segment(3 * j, 3) = coords;
+      }
+      coordinates.push_back(localCoordinates);
+    }
+
+    std::cout << "Assembled coordinates" << std::endl;
+
+    std::unordered_map<long int, std::vector<double>> results;
+    results.reserve(this->getLength() - startingIndex);
+    // next, we actually start computations
+    // this is a highly inefficient algorithm, but no idea how to do better
+    // (except for omitting some data, skipping the graph, or other minor
+    // optimizations)
+    const int stepSize =
+      std::max(1,
+               static_cast<int>(std::floor((this->getLength() - startingIndex) /
+                                           nrOfOrigins)));
+    Eigen::VectorXd distance = Eigen::VectorXd::Zero(3 * atomIds.size());
+    for (size_t parent_universe_idx = startingIndex;
+         parent_universe_idx < this->getLength();
+         parent_universe_idx += stepSize) {
+
+      for (size_t universe_idx = parent_universe_idx + 1;
+           universe_idx < this->getLength();
+           ++universe_idx) {
+        long int delta_t =
+          (timesteps[universe_idx] - timesteps[parent_universe_idx]);
+        if (delta_t < 0) {
+          std::cerr << "Encountered a negative delta time-step for universes "
+                    << universe_idx << " (" << timesteps[universe_idx] << ")"
+                    << " and " << parent_universe_idx << " ("
+                    << timesteps[parent_universe_idx] << ") in file "
+                    << this->dumpFileParser.getFile() << std::endl;
+        }
+
+        distance = coordinates[universe_idx - startingIndex] -
+                   coordinates[parent_universe_idx - startingIndex];
+        double localMean = 0.0;
+        double localMeanDenominator = 1. / static_cast<double>(atomIds.size());
+        for (size_t atom_id = 0; atom_id < atomIds.size(); ++atom_id) {
+          localMean += distance.segment(3 * atom_id, 3).squaredNorm() *
+                       localMeanDenominator;
+        }
+        results[delta_t].push_back(localMean);
+      }
+      std::cout << "Universe " << parent_universe_idx
+                << " as basis has been handled." << std::endl;
+    }
+
+    // actually compute the mean
+    std::unordered_map<long int, double> actual_means;
+    actual_means.reserve(results.size());
+    for (const auto& result_pair : results) {
+      std::vector<double> sds = result_pair.second;
+      if (sds.size() == 0) {
+        continue;
+      }
+      actual_means[result_pair.first] =
+        (Eigen::Map<Eigen::VectorXd, Eigen::Unaligned>(sds.data(), sds.size()))
+          .mean();
+    }
+
+    return actual_means;
+  }
+
+  /**
+   * @brief Compute the mean square displacement for the given atoms in the dump
+   * file
+   *
+   * @param atomIds
+   * @param nrOfOrigins
+   * @param reduceMemory
+   * @return std::unordered_map<long int, double>
+   */
   std::unordered_map<long int, double>
   UniverseSequence::computeMsdForAtomsFromDumpFile(
     const std::vector<long int>& atomIds,
     int nrOfOrigins,
     bool reduceMemory)
   {
+    RUNTIME_EXP_IFN(!this->modeDataFiles,
+                    "UniverseSequence::computeMsdForAtomsFromDumpFile only "
+                    "works with dump files, duh.");
     pylimer_tools::utils::ReadDumpFileSections sections =
       this->dumpFileParser.readDumpFileSections(
         pylimer_tools::utils::ReadableDumpFileSections::TIMESTEP |
@@ -681,6 +844,14 @@ namespace entities {
     return actual_means;
   }
 
+  /**
+   * @brief
+   *
+   * @param atomIds
+   * @param nrOfOrigins
+   * @param reduceMemory
+   * @return std::unordered_map<long int, double>
+   */
   std::unordered_map<long int, double>
   UniverseSequence::computeMsdForAtomsFromDataFiles(
     const std::vector<long int>& atomIds,

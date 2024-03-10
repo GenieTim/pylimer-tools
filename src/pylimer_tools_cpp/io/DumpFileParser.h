@@ -28,6 +28,7 @@ namespace utils {
     TIMESTEP = (1 << 0),
     BOX = (1 << 1),
     ATOM = (1 << 2),
+    EXTRA_ATOM = (1 << 3)
   };
 
   MAKE_FLAGS_ENUM(ReadableDumpFileSections, uint32_t);
@@ -37,6 +38,7 @@ namespace utils {
     std::vector<long int> timesteps;
     std::vector<pylimer_tools::entities::Box> boxes;
     std::vector<std::vector<pylimer_tools::entities::Atom>> atoms;
+    std::vector<std::unordered_map<std::string, std::vector<double>>> extraAtomsData;
   };
 
   class DumpFileParser
