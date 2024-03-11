@@ -1,14 +1,15 @@
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
-#include "../../src/pylimer_tools_cpp/io/DataFileParser.h"
 #include "../../src/pylimer_tools_cpp/io/AveFileReader.h"
+#include "../../src/pylimer_tools_cpp/io/DataFileParser.h"
 #include "../../src/pylimer_tools_cpp/io/DataFileWriter.h"
 #include "../../src/pylimer_tools_cpp/io/DumpFileParser.h"
 #include <catch2/benchmark/catch_benchmark_all.hpp>
+#include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <cstdio>
 #include <filesystem>
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
 extern "C"
 {
@@ -168,28 +169,31 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
     writer.configMoveIntoBox(true);
     writer.configAttemptImageReset(true);
     std::string fileToWrite = suspectedPath + "tmp_data_file.structure.out";
-    writer.setCustomAtomFormat("$atomId\t$atomType\t$charge\t$x\t$y\t$z\t$nx\t$ny\t$nz");
+    writer.setCustomAtomFormat(
+      "$atomId\t$atomType\t$charge\t$x\t$y\t$z\t$nx\t$ny\t$nz");
     writer.writeToFile(fileToWrite);
 
     pe::UniverseSequence seq = pe::UniverseSequence();
-    seq.setDataFileAtomStyle({pu::AtomStyle::CHARGE});
+    seq.setDataFileAtomStyle({ pu::AtomStyle::CHARGE });
     seq.initializeFromDataSequence({ { fileToWrite } });
     pe::Universe readUniverse = seq.atIndex(0);
 
     REQUIRE(universe.getNrOfAtoms() == readUniverse.getNrOfAtoms());
     REQUIRE(universe.getNrOfBonds() == readUniverse.getNrOfBonds());
     REQUIRE(universe.getNrOfAngles() == readUniverse.getNrOfAngles());
-    REQUIRE(universe.getNrOfDihedralAngles() == readUniverse.getNrOfDihedralAngles());
+    REQUIRE(universe.getNrOfDihedralAngles() ==
+            readUniverse.getNrOfDihedralAngles());
 
     std::filesystem::remove(fileToWrite);
   }
 }
 
-
-TEST_CASE("AveFileReader works", "[AveFileReader][io][utils]") {
+TEST_CASE("AveFileReader works", "[AveFileReader][io][utils]")
+{
   std::string suspectedPath = "../pylimer_tools/fixtures/";
-  REQUIRE(std::filesystem::exists(suspectedPath)); 
-  pu::AveFileReader reader = pu::AveFileReader(suspectedPath + "example_avg_file.out.avg.txt");
+  REQUIRE(std::filesystem::exists(suspectedPath));
+  pu::AveFileReader reader =
+    pu::AveFileReader(suspectedPath + "example_avg_file.out.avg.txt");
 
   CHECK(reader.getNrOfRows() == 5);
   CHECK(reader.getNrOfColumns() == 3);
@@ -200,4 +204,14 @@ TEST_CASE("AveFileReader works", "[AveFileReader][io][utils]") {
   std::vector<std::vector<double>> data = reader.getData();
   CHECK(data[0][0] == 100);
   CHECK(data[2][1] == 6000);
+  CHECK(data[0].size() == 5);
+
+  SECTION("Autocorrelation is correct")
+  {
+    std::vector<size_t> dts = { 1, 2 };
+    std::vector<double> results = reader.autocorrelateColumn(2, dts);
+    CHECK(results.size() == dts.size());
+    // ((5000*6000)+(6000*1000)+(1000*8000)+(8000*9000))/4
+    CHECK(results[0] == Catch::Approx(29000000.0));
+  }
 }
