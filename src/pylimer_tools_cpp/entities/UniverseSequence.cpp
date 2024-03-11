@@ -644,8 +644,8 @@ namespace entities {
       for (size_t j = 0; j < atomIds.size(); ++j) {
         size_t row = atomIdToAtomIndex.at(atomIds[j]);
         Eigen::Vector3d coords;
-        coords << extraAtomData[i].at(x)[j], extraAtomData[i].at(y)[j],
-          extraAtomData[i].at(z)[j];
+        coords << extraAtomData[i].at(x)[row], extraAtomData[i].at(y)[row],
+          extraAtomData[i].at(z)[row];
         localCoordinates.segment(3 * j, 3) = coords;
       }
       coordinates.push_back(localCoordinates);

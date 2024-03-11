@@ -27,10 +27,23 @@ namespace utils {
       throw std::runtime_error("Failed open file " + this->filePath);
     }
 
-    auto count = std::count_if(std::istreambuf_iterator<char>{ in_stream },
-                               {},
-                               [](char c) { return c == '\n'; });
-    this->numRows = count - this->getNrOfHeaderRows() + 1;
+    int count = 0;
+    std::string line;
+
+    // skip all header lines
+    while (getline(in_stream, line)) {
+      if (line.at(0) != '#') {
+        count += line.size() > 0;
+        break;
+      }
+    }
+    while (getline(in_stream, line)) {
+      if (line.size() > 0) {
+        count += 1;
+      }
+    }
+
+    this->numRows = count;
     return this->numRows;
   }
 
@@ -142,10 +155,15 @@ namespace utils {
     }
 
     for (size_t i = 0; i < numRows; ++i) {
-      RUNTIME_EXP_IFN(std::getline(file, line),
-                      "File ended before all rows could be read (reached row " +
-                        std::to_string(i) + " of " + std::to_string(numRows) +
-                        ")");
+      if (!std::getline(file, line)) {
+        if (i + 1 < numRows) {
+          throw std::runtime_error(
+            "File ended before all rows could be read (reached row " +
+            std::to_string(i) + " of " + std::to_string(numRows) + ")");
+        } else {
+          break;
+        }
+      }
       std::stringstream ss(line);
       for (size_t col = 0; col < numCols; ++col) {
         double val;
@@ -171,19 +189,24 @@ namespace utils {
     int numRows = this->getNrOfRows();
     // validate dts
     for (size_t i = 1; i < dts.size(); ++i) {
-      INVALIDARG_EXP_IFN(dts[i - 1] < dts[i], "Invalid dts");
-      INVALIDARG_EXP_IFN(dts[i] < numRows - 1, "Invalid dts");
+      INVALIDARG_EXP_IFN(dts[i - 1] < dts[i],
+                         "Invalid dts: they need to be sequential.");
+      INVALIDARG_EXP_IFN(dts[i] < numRows - 1,
+                         "Invalid dts: got requested " +
+                           std::to_string(dts[i]) + ", but only got " +
+                           std::to_string(numRows) + " rows.");
     }
 
+    this->getData();
     Eigen::ArrayXd colData = Eigen::Map<Eigen::ArrayXd, Eigen::Unaligned>(
-      this->getData()[column].data(), this->getData()[column].size());
+      this->data[column].data(), this->data[column].size());
     RUNTIME_EXP_IFN(colData.size() == numRows, "Invalid row sizes");
 
     std::vector<double> results;
     results.reserve(dts.size());
     for (size_t dt : dts) {
       results.push_back(
-        (colData.segment(0, numRows - dt) * colData.segment(dt, numRows))
+        (colData.segment(0, numRows - dt) * colData.segment(dt, numRows - dt))
           .mean());
     }
 
@@ -201,8 +224,12 @@ namespace utils {
     int numRows = this->getNrOfRows();
     // validate dts
     for (size_t i = 1; i < dts.size(); ++i) {
-      INVALIDARG_EXP_IFN(dts[i - 1] < dts[i], "Invalid dts");
-      INVALIDARG_EXP_IFN(dts[i] < numRows - 1, "Invalid dts");
+      INVALIDARG_EXP_IFN(dts[i - 1] < dts[i],
+                         "Invalid dts: they need to be sequential.");
+      INVALIDARG_EXP_IFN(dts[i] < numRows - 1,
+                         "Invalid dts: got requested " +
+                           std::to_string(dts[i]) + ", but only got " +
+                           std::to_string(numRows) + " rows.");
     }
 
     Eigen::ArrayXd colData =
