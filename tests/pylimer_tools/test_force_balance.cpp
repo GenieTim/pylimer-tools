@@ -1427,7 +1427,6 @@ TEST_CASE(
   "MEHP Force Balance correctly collapses melts even with random slip-links",
   "[analysis][MEHPForceBalance]")
 {
-
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
@@ -1442,6 +1441,7 @@ TEST_CASE(
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(universe, 1000, 2.0, 100, 5, "my_seed_fb12");
     CHECK_NOTHROW(forceBalancer.validateNetwork());
+    CHECK(forceBalancer.getNumExtraAtoms() > 100);
     CHECK(forceBalancer.getNetwork().nrOfPartialSprings > forceBalancer.getNetwork().nrOfSprings);
     REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
       pcm::BalanceRunMode::ITERATIVE, 1.0, 50000, 1e-9, -1., pcm::StructureSimplificationMode::ALL_TIM));

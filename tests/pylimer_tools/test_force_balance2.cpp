@@ -1236,6 +1236,7 @@ TEST_CASE(
     }
   }
 }
+
 TEST_CASE("MEHP Force Balance 2 Free chains collapse",
           "[analysis][MEHPForceBalance2][NonGaussianSpringForceEvaluator]["
           "SimpleSpringMEHPForceEvaluator]")
