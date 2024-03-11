@@ -379,7 +379,6 @@ namespace calc {
       assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
       // figure out, where the rail is currently going through.
       igraph_t subgraph;
-      igraph_empty(&subgraph, 0, IGRAPH_UNDIRECTED);
       igraph_subgraph_from_edges(
         &this->graph,
         &subgraph,
@@ -619,7 +618,6 @@ namespace calc {
       }
 
       igraph_t subgraph;
-      igraph_empty(&subgraph, 0, IGRAPH_UNDIRECTED);
       igraph_subgraph_from_edges(&this->graph,
                                  &subgraph,
                                  igraph_ess_vector(&allEdgesOfParent),
