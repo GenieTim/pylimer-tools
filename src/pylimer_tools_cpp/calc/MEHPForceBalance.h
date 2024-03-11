@@ -669,7 +669,7 @@ namespace calc {
 
       size_t getNumAtoms() override { return this->getNrOfNodes(); }
 
-      size_t getNumExtraAtoms() override { return this->getNrOfLinks(); }
+      size_t getNumExtraAtoms() override { return this->getNrOfLinks() - this->getNrOfNodes(); }
 
       int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
 
