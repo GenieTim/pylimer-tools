@@ -1086,7 +1086,6 @@ namespace calc {
 
         // validate that we can make one chain
         igraph_t subgraph;
-        igraph_empty(&subgraph, 0, IGRAPH_UNDIRECTED);
         igraph_subgraph_from_edges(
           &this->graph, &subgraph, igraph_ess_vector(&edgesOnPath), false);
 
