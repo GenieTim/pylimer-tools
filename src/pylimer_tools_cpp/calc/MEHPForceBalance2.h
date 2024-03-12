@@ -244,6 +244,11 @@ namespace calc {
         std::vector<std::pair<size_t, size_t>> pairsOfAtoms =
           entanglements.pairsOfAtoms;
         std::vector<long int> pairOfAtom = entanglements.pairOfAtom;
+        RUNTIME_EXP_IFN(
+          pairsOfAtoms.size() >= minimumNrOfSliplinks,
+          "Minimum number of slip-links could not be sampled: got " +
+            std::to_string(pairsOfAtoms.size()) + " instead of " +
+            std::to_string(minimumNrOfSliplinks) + ".");
         // std::cout << "Found " << pairsOfAtoms.size() << " random slip-links."
         //           << std::endl;
 
@@ -565,7 +570,26 @@ namespace calc {
 
       size_t getNumExtraAtoms() override
       {
-        return this->getNrOfLinks() - this->getNrOfNodes();
+        if (this->net.isUpToDate) {
+          return this->getNrOfLinks() - this->getNrOfNodes();
+        } else {
+          return this->getNrOfSlipLinks();
+        }
+      }
+
+      size_t getNrOfSlipLinks() const
+      {
+        size_t numBefore = 0;
+        igraph_vector_t types;
+        igraph_cattribute_VANV(&this->graph, "type", igraph_vss_all(), &types);
+        for (size_t i = 0; i < igraph_vector_size(&types); i++) {
+          if (castToIgraphInt(igraph_vector_get(&types, i)) ==
+              this->crosslinkerType) {
+            numBefore += 1;
+          }
+        }
+        igraph_vector_destroy(&types);
+        return numBefore;
       }
 
       int getNrOfSprings() { return this->getNetwork().nrOfSprings; }
