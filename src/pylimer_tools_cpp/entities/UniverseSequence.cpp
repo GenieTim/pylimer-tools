@@ -358,7 +358,6 @@ namespace entities {
     std::vector<long int> timesteps = sections.timesteps;
     std::vector<Box> boxes = sections.boxes;
     std::vector<std::vector<Atom>> atoms = sections.atoms;
-    std::cout << "Read universes" << std::endl;
 
     RUNTIME_EXP_IFN(timesteps.size() == boxes.size(),
                     "Dump file seems inconsistent: read " +
@@ -429,7 +428,6 @@ namespace entities {
     std::vector<long int> timesteps = sections.timesteps;
     std::vector<Box> boxes = sections.boxes;
     std::vector<std::vector<Atom>> atoms = sections.atoms;
-    std::cout << "Read universes" << std::endl;
 
     RUNTIME_EXP_IFN(timesteps.size() == boxes.size(),
                     "Dump file seems inconsistent: read " +
@@ -588,11 +586,8 @@ namespace entities {
         pylimer_tools::utils::ReadableDumpFileSections::EXTRA_ATOM |
         pylimer_tools::utils::ReadableDumpFileSections::BOX);
     std::vector<long int> timesteps = sections.timesteps;
-    std::cout << "Read time-steps" << std::endl;
     std::vector<Box> boxes = sections.boxes;
-    std::cout << "Read boxes" << std::endl;
     std::vector<std::vector<Atom>> atoms = sections.atoms;
-    std::cout << "Read atoms" << std::endl;
     std::vector<std::unordered_map<std::string, std::vector<double>>> extraAtomData =
       sections.extraAtomsData;
 
@@ -735,11 +730,8 @@ namespace entities {
         pylimer_tools::utils::ReadableDumpFileSections::ATOM |
         pylimer_tools::utils::ReadableDumpFileSections::BOX);
     std::vector<long int> timesteps = sections.timesteps;
-    std::cout << "Read time-steps" << std::endl;
     std::vector<Box> boxes = sections.boxes;
-    std::cout << "Read boxes" << std::endl;
     std::vector<std::vector<Atom>> atoms = sections.atoms;
-    std::cout << "Read atoms" << std::endl;
 
     RUNTIME_EXP_IFN(timesteps.size() == boxes.size(),
                     "Dump file seems inconsistent: read " +

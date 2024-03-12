@@ -1057,6 +1057,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       }
       std::cout << std::endl;
     }
+    net = forceBalancer.getNetwork();
     Eigen::VectorXd displacements = net.coordinates - originalCoords;
     CHECK(springPartitions[springPartitions.size() - 1] == Catch::Approx(0.5));
     CHECK(displacements[3 * displacedId] == Catch::Approx(-4.2));
@@ -1168,6 +1169,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
         for (int j = 0; j < 5; ++j) {
           forceBalancer2.displaceToMeanPosition(5, -1.);
           forceBalancer2.updateSpringPartition(5, -1.);
+          springPartitions = forceBalancer2.getSpringPartitions();
           for (int i = 0; i < net.nrOfPartialSprings; i++) {
             std::cout << net.springPartIndexA[i] << ", "
                       << net.springPartIndexB[i] << ": ";
@@ -1193,7 +1195,9 @@ TEST_CASE("MEHP Force Balance handles slip-links",
         }
         // assert expectations are met.
         // NOTE: difficulty: finding out which spring idx it actually is
-        outputNetwork(net, forceBalancer2.getSpringPartitions());
+        springPartitions = forceBalancer2.getSpringPartitions();
+        net = forceBalancer2.getNetwork();
+        outputNetwork(net, springPartitions);
         for (int i = 0; i < net.nrOfPartialSprings; i++) {
           std::cout << net.springPartIndexA[i] << ", "
                     << net.springPartIndexB[i] << ": ";

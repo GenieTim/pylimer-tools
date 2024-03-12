@@ -180,6 +180,13 @@ namespace utils {
     return results;
   }
 
+  /**
+   * @brief Do autocorrelation for a given column and set of delta indices
+   *
+   * @param column
+   * @param dts
+   * @return std::vector<double>
+   */
   std::vector<double> AveFileReader::autocorrelateColumn(
     int column,
     const std::vector<size_t>& dts)
@@ -213,6 +220,15 @@ namespace utils {
     return results;
   }
 
+  /**
+   * @brief Do autocorrelation for the difference between two columns and a
+   * given set of delta indices
+   *
+   * @param column1
+   * @param column2
+   * @param dts
+   * @return std::vector<double>
+   */
   std::vector<double> AveFileReader::autocorrelateColumnDifference(
     int column1,
     int column2,

@@ -97,3 +97,23 @@ def getCacheFileName(file: Union[str, List[str], None], suffix: str, tmp_dir: st
         tempfile.gettempdir() if tmp_dir is None else tmp_dir,
         hashlib.md5(file.encode()).hexdigest(), suffix)
     return cacheFileName
+
+def is_current_cache(file: str, dependencies: Union[str, List[str]]):
+    """
+    Determine whether the provided file is newer than all its dependencies.
+
+    Arguments:
+        - file: The cache file that is required to be newer
+        - dependencies: The list of files (or a single file path) that need to be older
+
+    Returns:
+        - True if the file is newer than all its dependencies, False otherwise
+    """
+    if (not os.path.exists(file)):
+        return False
+    if (not isinstance(dependencies, list)):
+        dependencies = [dependencies]
+    mtimeCache = datetime.datetime.fromtimestamp(os.path.getmtime(file))
+    mtimesOrigin = [datetime.datetime.fromtimestamp(os.path.getmtime(f)) for f in dependencies]
+
+    return np.all([mtimeCache > mt for mt in mtimesOrigin])

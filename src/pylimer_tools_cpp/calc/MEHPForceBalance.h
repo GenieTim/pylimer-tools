@@ -96,6 +96,11 @@ namespace calc {
 
         std::vector<std::pair<size_t, size_t>> pairsOfAtoms =
           entanglements.pairsOfAtoms;
+        RUNTIME_EXP_IFN(
+          pairsOfAtoms.size() >= minimumNrOfSliplinks,
+          "Minimum number of slip-links could not be sampled: got " +
+            std::to_string(pairsOfAtoms.size()) + " instead of " +
+            std::to_string(minimumNrOfSliplinks) + ".");
         std::vector<long int> pairOfAtom = entanglements.pairOfAtom;
 
         std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
@@ -669,7 +674,10 @@ namespace calc {
 
       size_t getNumAtoms() override { return this->getNrOfNodes(); }
 
-      size_t getNumExtraAtoms() override { return this->getNrOfLinks() - this->getNrOfNodes(); }
+      size_t getNumExtraAtoms() override
+      {
+        return this->getNrOfLinks() - this->getNrOfNodes();
+      }
 
       int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
 

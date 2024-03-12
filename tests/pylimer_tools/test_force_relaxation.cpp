@@ -822,7 +822,7 @@ TEST_CASE("Fully active chains are fully active",
         pcm::MEHPForceRelaxation(universe, 2, false);
       REQUIRE_NOTHROW(forceRelaxer.runForceRelaxation());
       REQUIRE(forceRelaxer.getNrOfIterations() > 0);
-      CHECK(forceRelaxer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+      CHECK(forceRelaxer.getExitReason() == pcm::ExitReason::F_TOLERANCE);
       CHECK(forceRelaxer.getNrOfActiveSprings() ==
             forceRelaxer.getNrOfSprings());
     }

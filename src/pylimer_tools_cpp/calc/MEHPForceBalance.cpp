@@ -270,10 +270,10 @@ namespace calc {
               this->initialConfig.springsContourLength.size() > 0
                 ? this->initialConfig.springsContourLength.mean()
                 : 0.;
-            if (nRemoved > 0) {
-              std::cout << "Removed " << nRemoved << " inactive springs. "
-                        << std::endl;
-            }
+            // if (nRemoved > 0) {
+            //   std::cout << "Removed " << nRemoved << " inactive springs. "
+            //             << std::endl;
+            // }
             // this->validateNetwork(this->initialConfig,
             // this->currentDisplacements, this->currentSpringPartitionsVec);
           }
@@ -288,16 +288,16 @@ namespace calc {
               this->initialConfig.springsContourLength.size() > 0
                 ? this->initialConfig.springsContourLength.mean()
                 : 0.;
-            if (nRemoved > 0) {
-              std::cout << "Removed " << nRemoved
-                        << " cross-linkers with f = 2. " << std::endl;
-            }
+            // if (nRemoved > 0) {
+            //   std::cout << "Removed " << nRemoved
+            //             << " cross-linkers with f = 2. " << std::endl;
+            // }
             // this->validateNetwork(this->initialConfig,
             // this->currentDisplacements, this->currentSpringPartitionsVec);
           }
           if (simplificationMode == StructureSimplificationMode::ALL_ANDREI) {
-            std::cout << "Removing cross-links and springs, Andrei's way"
-                      << std::endl;
+            // std::cout << "Removing cross-links and springs, Andrei's way"
+            //           << std::endl;
             this->doRemovalAndreisWay(this->initialConfig,
                                       this->currentDisplacements,
                                       this->currentSpringPartitionsVec,
@@ -511,7 +511,7 @@ namespace calc {
       for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
         for (size_t dir = 0; dir < 3; ++dir) {
           if (std::abs(relevantPartialDistancesA[3 * i + dir]) >
-              50. * net.L[dir]) {
+              50. * net.L[dir] && this->assumeBoxLargeEnough) {
             std::cerr
               << "WARNING: Spring " << i << " between "
               << net.springPartIndexA[i] << " and " << net.springPartIndexB[i]
@@ -900,7 +900,7 @@ namespace calc {
         }
         if (!isActive) {
           // remove this spring
-          std::cout << "Removing spring " << springIdx << std::endl;
+          // std::cout << "Removing spring " << springIdx << std::endl;
           this->validateNetwork(net, displacements, springPartitions);
           this->removeSpring(net, displacements, springPartitions, springIdx);
           this->validateNetwork(net, displacements, springPartitions);
@@ -2404,15 +2404,15 @@ namespace calc {
           1. / newTotalForNormalization;
       }
 
-      std::cout << "Removed springs around " << linkToReduce << " with spring "
-                << removedSpringIdx << " and partial "
-                << removedPartialSpringIdx << ", keeping " << keptSpringIdx
-                << " and " << remainingPartialSpringIdx << std::endl;
-      std::cout << "Spring partitions sum to " << springPartitions.sum()
-                << " for " << net.nrOfSprings
-                << " springs, contour length before was " << contourLengthBefore
-                << " and is now " << net.springsContourLength[newKeptSpringIdx]
-                << std::endl;
+      // std::cout << "Removed springs around " << linkToReduce << " with spring "
+      //           << removedSpringIdx << " and partial "
+      //           << removedPartialSpringIdx << ", keeping " << keptSpringIdx
+      //           << " and " << remainingPartialSpringIdx << std::endl;
+      // std::cout << "Spring partitions sum to " << springPartitions.sum()
+      //           << " for " << net.nrOfSprings
+      //           << " springs, contour length before was " << contourLengthBefore
+      //           << " and is now " << net.springsContourLength[newKeptSpringIdx]
+      //           << std::endl;
     }
 
     /**
@@ -4066,7 +4066,7 @@ namespace calc {
           if (std::find(handledSprings.begin(),
                         handledSprings.end(),
                         springIndices[spring_index]) != handledSprings.end()) {
-            std::cout << "primary loop detection necessary" << std::endl;
+            // std::cout << "primary loop detection necessary" << std::endl;
             continue;
           }
         }

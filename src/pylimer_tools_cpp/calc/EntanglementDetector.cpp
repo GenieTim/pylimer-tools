@@ -1,7 +1,7 @@
 #include "EntanglementDetector.h"
 #include "../entities/Molecule.h"
-#include "../entities/Universe.h"
 #include "../entities/NeighbourList.h"
+#include "../entities/Universe.h"
 #include <string>
 #include <vector>
 
@@ -100,8 +100,6 @@ namespace calc {
         std::seed_seq seed2(seed.begin(), seed.end());
         rng = std::mt19937(seed2);
       }
-      std::shuffle(
-        atomsForNeighbourList.begin(), atomsForNeighbourList.end(), rng);
       pylimer_tools::entities::NeighbourList neighbourList =
         pylimer_tools::entities::NeighbourList(
           atomsForNeighbourList, universe.getBox(), cutoff);
@@ -111,6 +109,8 @@ namespace calc {
       while (pairsOfAtoms.size() < minimumNrOfSliplinks &&
              numLinksFoundInIteration > 0) {
         numLinksFoundInIteration = 0;
+        std::shuffle(
+          atomsForNeighbourList.begin(), atomsForNeighbourList.end(), rng);
         for (pylimer_tools::entities::Atom a1 : atomsForNeighbourList) {
           size_t atomVertexIdx1 = universe.getIdxByAtomId(a1.getId());
           // make sure this atom does not yet have a pair

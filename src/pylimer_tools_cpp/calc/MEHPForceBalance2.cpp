@@ -1669,13 +1669,15 @@ namespace calc {
      */
     size_t MEHPForceBalance2::removeInactiveCrosslinks(double tolerance)
     {
-      size_t numRemoved = 0;
+      size_t numBefore = this->getNrOfSlipLinks();
+
       size_t numRemovedInIteration = 0;
       do {
         this->removeInactiveParentEdges(tolerance);
         numRemovedInIteration = this->removeSubfunctionalVertices();
-        numRemoved += numRemovedInIteration;
       } while (numRemovedInIteration > 0);
+
+      size_t numRemoved = numBefore - this->getNrOfSlipLinks();
 
       if (numRemoved > 0) {
         this->renumberParentSprings();
