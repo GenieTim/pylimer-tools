@@ -2608,9 +2608,9 @@ namespace calc {
         this->defaultNrOfChains =
           this->universe.getMolecules(this->crosslinkerType).size();
         assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
-        this->currentSpringDistances = this->evaluateSpringDistances(is2D);
+        this->currentSpringDistances = this->evaluateSpringDistances();
         this->currentPartialSpringDistances =
-          this->evaluatePartialSpringDistances(is2D);
+          this->evaluatePartialSpringDistances();
         this->validateNetwork();
         assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
       }
