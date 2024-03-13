@@ -53,18 +53,23 @@ namespace calc {
         this->is2D = is2D;
         this->currentDisplacements =
           Eigen::VectorXd::Zero(net.coordinates.size());
-        this->currentSpringDistances =
-          this->evaluateSpringDistances(net, this->currentDisplacements, is2D);
-        this->currentPartialSpringDistances =
-          this->evaluatePartialSpringDistances(
-            net, this->currentDisplacements, is2D);
-        this->defaultR0Squared =
-          universe.computeMeanSquareEndToEndDistance(crosslinkerType);
-        this->defaultNrOfChains =
-          universe.getMolecules(this->crosslinkerType).size();
-        this->validateNetwork();
+        this->completeInitialization();
       };
 
+      /**
+       * @brief Instantiate this simulator with randomly chosen slip-links.
+       *
+       * @param universe
+       * @param nrOfSliplinksToSample
+       * @param cutoff
+       * @param minimumNrOfSliplinks
+       * @param sameStrandCutoff
+       * @param seed
+       * @param crosslinkerType
+       * @param is2D
+       * @param kappa
+       * @return MEHPForceBalance
+       */
       static MEHPForceBalance constructWithRandomSlipLinks(
         const pylimer_tools::entities::Universe& universe,
         const size_t nrOfSliplinksToSample,
@@ -321,13 +326,33 @@ namespace calc {
             partialSpringIdx);
         }
 
-        // TODO: complete data
+        fb.completeInitialization();
 
         return fb;
       }
 
       /**
+       * @brief Finish initializing some member properties
+       *
+       */
+      void completeInitialization()
+      {
+        this->currentSpringDistances =
+          this->evaluateSpringDistances(this->initialConfig, this->currentDisplacements, is2D);
+        this->currentPartialSpringDistances =
+          this->evaluatePartialSpringDistances(
+            this->initialConfig, this->currentDisplacements, is2D);
+        this->defaultR0Squared =
+          universe.computeMeanSquareEndToEndDistance(crosslinkerType);
+        this->defaultNrOfChains =
+          universe.getMolecules(this->crosslinkerType).size();
+        this->validateNetwork();
+      }
+
+      /**
        * @brief Actually do run the simulation
+       *
+       * TODO: implement interruptability
        *
        * @param algorithm
        * @param maxNrOfSteps
