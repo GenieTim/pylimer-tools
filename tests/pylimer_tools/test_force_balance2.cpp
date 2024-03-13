@@ -1303,8 +1303,7 @@ TEST_CASE("MEHP Force Balance 2 Free chains collapse",
   SECTION("Large enough box")
   {
     forceBalancer.configAssumeBoxLargeEnough(true);
-    REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
-      pcm::BalanceRunMode::ITERATIVE, 1.0, 50000, 1e-18));
+    REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(50000, 1e-18));
     REQUIRE(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalancer.getNrOfActiveSprings() == 0);
@@ -1330,8 +1329,7 @@ TEST_CASE("MEHP Force Balance 2 Free chains collapse",
   SECTION("Not large enough box")
   {
     forceBalancer.configAssumeBoxLargeEnough(false);
-    REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
-      pcm::BalanceRunMode::ITERATIVE, 1.0, 50000, 1e-18));
+    REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(50000, 1e-18));
     REQUIRE(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalancer.getNrOfActiveSprings() == 0);
