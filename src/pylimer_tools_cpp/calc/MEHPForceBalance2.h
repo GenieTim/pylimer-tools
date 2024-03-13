@@ -641,6 +641,10 @@ namespace calc {
       void configAssumeBoxLargeEnough(bool assumption)
       {
         this->assumeBoxLargeEnough = assumption;
+
+        this->currentSpringDistances = this->evaluateSpringDistances();
+        this->currentPartialSpringDistances =
+          this->evaluatePartialSpringDistances();
       }
 
       /**
