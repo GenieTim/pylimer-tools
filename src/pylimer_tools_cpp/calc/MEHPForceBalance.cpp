@@ -314,9 +314,9 @@ namespace calc {
         if (outputFrequency > 0 && iterationsDone % outputFrequency == 0) {
           this->handleOutput(iterationsDone);
         }
-      } while (currentResidual / initialResidual > xtol &&
-               iterationsDone < maxNrOfSteps &&
-               this->initialConfig.nrOfSprings > 0);
+      } while (
+        currentResidual / initialResidual > xtol &&
+        iterationsDone<maxNrOfSteps&& this->initialConfig.nrOfSprings> 0);
 
       // finish up
       this->closeAllOutputs();
@@ -511,7 +511,8 @@ namespace calc {
       for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
         for (size_t dir = 0; dir < 3; ++dir) {
           if (std::abs(relevantPartialDistancesA[3 * i + dir]) >
-              50. * net.L[dir] && this->assumeBoxLargeEnough) {
+                50. * net.L[dir] &&
+              this->assumeBoxLargeEnough) {
             std::cerr
               << "WARNING: Spring " << i << " between "
               << net.springPartIndexA[i] << " and " << net.springPartIndexB[i]
@@ -2404,14 +2405,17 @@ namespace calc {
           1. / newTotalForNormalization;
       }
 
-      // std::cout << "Removed springs around " << linkToReduce << " with spring "
+      // std::cout << "Removed springs around " << linkToReduce << " with spring
+      // "
       //           << removedSpringIdx << " and partial "
       //           << removedPartialSpringIdx << ", keeping " << keptSpringIdx
       //           << " and " << remainingPartialSpringIdx << std::endl;
       // std::cout << "Spring partitions sum to " << springPartitions.sum()
       //           << " for " << net.nrOfSprings
-      //           << " springs, contour length before was " << contourLengthBefore
-      //           << " and is now " << net.springsContourLength[newKeptSpringIdx]
+      //           << " springs, contour length before was " <<
+      //           contourLengthBefore
+      //           << " and is now " <<
+      //           net.springsContourLength[newKeptSpringIdx]
       //           << std::endl;
     }
 

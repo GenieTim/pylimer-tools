@@ -1536,7 +1536,8 @@ namespace calc {
         const Eigen::ArrayXi& resultingCoordinateIndexMask,
         const double damping = 0.5) const;
 
-      double getDisplacementResidualNorm(double cutoff) const;
+      double getDisplacementResidualNorm(
+        const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
       double getDisplacementResidualNormFor(
         const ForceBalanceNetwork& net,
