@@ -374,7 +374,50 @@ namespace calc {
           LinkSwappingMode::NO_SWAPPING,
         const int swappingFrequency = 10,
         const double oneOverSpringPartitionUpperLimit = 1.0,
-        const int nrOfCrosslinkSwapsAllowedPerSliplink = -1);
+        const int nrOfCrosslinkSwapsAllowedPerSliplink = -1)
+      {
+        this->runForceRelaxation(
+          mode,
+          damping,
+          maxNrOfSteps,
+          xtol,
+          initialResidualToUse,
+          simplificationMode,
+          inactiveRemovalCutoff,
+          doInnerIterations,
+          allowSlipLinksToPassEachOther,
+          swappingFrequency,
+          oneOverSpringPartitionUpperLimit,
+          nrOfCrosslinkSwapsAllowedPerSliplink,
+          []() { return false; },
+          []() {});
+      }
+
+      /**
+       * @brief Actually do run the simulation
+       *
+       * TODO: implement interruptability
+       *
+       * @param algorithm
+       * @param maxNrOfSteps
+       * @param xtol
+       * @param ftol
+       */
+      void runForceRelaxation(
+        BalanceRunMode mode,
+        double damping,
+        long int maxNrOfSteps, // default: 10000
+        double xtol,
+        const double initialResidualToUse,
+        const StructureSimplificationMode simplificationMode,
+        const double inactiveRemovalCutoff,
+        bool doInnerIterations,
+        LinkSwappingMode allowSlipLinksToPassEachOther,
+        const int swappingFrequency,
+        const double oneOverSpringPartitionUpperLimit,
+        const int nrOfCrosslinkSwapsAllowedPerSliplink,
+        const std::function<bool()>& shouldInterrupt,
+        const std::function<void()>& cleanupInterrupt);
 
       /**
        * @brief Compute the spring update residual

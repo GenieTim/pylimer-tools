@@ -37,7 +37,9 @@ namespace calc {
       LinkSwappingMode allowSlipLinksToPassEachOther,
       const int swappingFrequency,
       const double oneOverSpringPartitionUpperLimit,
-      const int nrOfCrosslinkSwapsAllowedPerSliplink)
+      const int nrOfCrosslinkSwapsAllowedPerSliplink,
+      const std::function<bool()>& shouldInterrupt,
+      const std::function<void()>& cleanupInterrupt)
     {
       // INVALIDARG_EXP_IFN(
       //   shouldRemoveInactiveCrosslinks == false &&
@@ -78,6 +80,7 @@ namespace calc {
       this->prepareAllOutputs();
 
       // actual loop
+      bool wasInterrupted = false;
       do {
         if (allowSlipLinksToPassEachOther != LinkSwappingMode::NO_SWAPPING) {
           if (swappingFrequency > 0 &&
@@ -154,6 +157,7 @@ namespace calc {
 
         currentResidual =
           this->getDisplacementResidualNorm(oneOverSpringPartitionUpperLimit);
+        assert(currentResidual <= initialResidual);
         iterationsDone += 1;
         if (iterationsDone % 10 == 0) {
           if (simplificationMode ==
@@ -192,11 +196,18 @@ namespace calc {
 #ifndef NDEBUG
             this->validateNetwork(this->getNetwork(),
                                   this->currentSpringPartitionsVec);
+            double finalResidual = this->getDisplacementResidualNorm(
+              oneOverSpringPartitionUpperLimit);
+            assert(finalResidual <= currentResidual);
 #endif
           }
         }
         this->handleOutput(iterationsDone);
 
+        if (shouldInterrupt()) {
+          wasInterrupted = true;
+          break;
+        }
       } while ((currentResidual / initialResidual > xtol) &&
                (iterationsDone < maxNrOfSteps) &&
                (igraph_ecount(&this->graph) > 0));
@@ -222,6 +233,10 @@ namespace calc {
       this->currentSpringDistances = this->evaluateSpringDistances();
       this->currentPartialSpringDistances =
         this->evaluatePartialSpringDistances();
+      if (wasInterrupted) {
+        this->exitReason = ExitReason::INTERRUPT;
+        cleanupInterrupt();
+      }
     }
 
     /**
@@ -672,8 +687,8 @@ namespace calc {
           }
           if (((prevfrom == vertexId) || (prevto == vertexId)) &&
               ((nextfrom == vertexId) || (nextto == vertexId))) {
-            std::cerr << "Handling special case for partial spring "
-                      << railEdgeId << std::endl;
+            // std::cerr << "Handling special case for partial spring "
+            //           << railEdgeId << std::endl;
             igraph_integer_t otherVertexId =
               vertexId == fromRail ? toRail : fromRail;
             igraph_integer_t prevPrevEdgeId = castToIgraphInt(

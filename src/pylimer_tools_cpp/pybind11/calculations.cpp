@@ -645,9 +645,38 @@ init_pylimer_bound_calc(py::module_& m)
     //          R"pbdoc(
     //            Validates the internal structures.
     //      )pbdoc")
-    .def("runForceRelaxation",
-         &mehp::MEHPForceBalance::runForceRelaxation,
-         R"pbdoc(
+    .def(
+      "runForceRelaxation",
+      [](mehp::MEHPForceBalance& sim,
+         mehp::BalanceRunMode mode,
+         double damping ,
+         long int maxNrOfSteps , // default: 10000
+         double xtol ,
+         const double initialResidualToUse ,
+         const mehp::StructureSimplificationMode simplificationMode,
+         const double inactiveRemovalCutoff,
+         bool doInnerIterations,
+         const mehp::LinkSwappingMode allowSlipLinksToPassEachOther,
+         const int swappingFrequency,
+         const double oneOverSpringPartitionUpperLimit,
+         const int nrOfCrosslinkSwapsAllowedPerSliplink) {
+        return sim.runForceRelaxation(
+          mode,
+          damping,
+          maxNrOfSteps,
+          xtol,
+          initialResidualToUse,
+          simplificationMode,
+          inactiveRemovalCutoff,
+          doInnerIterations,
+          allowSlipLinksToPassEachOther,
+          swappingFrequency,
+          oneOverSpringPartitionUpperLimit,
+          nrOfCrosslinkSwapsAllowedPerSliplink,
+          []() { return PyErr_CheckSignals() != 0; },
+          []() { throw py::error_already_set(); });
+      },
+      R"pbdoc(
           Run the simulation.
           Note that the final state of the minimization is persisted and reused if you use this method again.
           This is useful if you want to run a global optimization first and add a local one afterwards.
@@ -661,21 +690,20 @@ init_pylimer_bound_calc(py::module_& m)
           :param innerXTolerance: The tolerance of the displacements of the slip-link as an inner exit condition.
           :param innerAlphaTolerance: The tolerance of the contour-length when slipping the slip-link as an inner exit condition.
           )pbdoc",
-         py::arg("runMode") = mehp::BalanceRunMode::ITERATIVE,
-         py::arg("damping") = 1.0,
-         py::arg("maxNrOfSteps") = 250000,
-         py::arg("xTolerance") = 1e-12,
-         py::arg("initialResidualNorm") = -1.0,
-         py::arg("simplificationMode") =
-           mehp::StructureSimplificationMode::NO_SIMPLIFICATION,
-         py::arg("inactiveRemovalCutoff") = -1.0,
-         py::arg("outputFrequency") = 50,
-         py::arg("doInnerIterations") = false,
-         py::arg("allowSlipLinksToPassEachOther") =
-           mehp::LinkSwappingMode::NO_SWAPPING,
-         py::arg("swappingFrequency") = 10,
-         py::arg("oneOverSpringPartitionUpperLimit") = 1.0,
-         py::arg("nrOfCrosslinkSwapsAllowedPerSliplink") = -1)
+      py::arg("runMode") = mehp::BalanceRunMode::ITERATIVE,
+      py::arg("damping") = 1.0,
+      py::arg("maxNrOfSteps") = 250000,
+      py::arg("xTolerance") = 1e-12,
+      py::arg("initialResidualNorm") = -1.0,
+      py::arg("simplificationMode") =
+        mehp::StructureSimplificationMode::NO_SIMPLIFICATION,
+      py::arg("inactiveRemovalCutoff") = -1.0,
+      py::arg("doInnerIterations") = false,
+      py::arg("allowSlipLinksToPassEachOther") =
+        mehp::LinkSwappingMode::NO_SWAPPING,
+      py::arg("swappingFrequency") = 10,
+      py::arg("oneOverSpringPartitionUpperLimit") = 1.0,
+      py::arg("nrOfCrosslinkSwapsAllowedPerSliplink") = -1)
     .def("deformTo",
          &mehp::MEHPForceBalance::deformTo,
          R"pbdoc()pbdoc",
@@ -1047,9 +1075,35 @@ init_pylimer_bound_calc(py::module_& m)
     //          R"pbdoc(
     //            Validates the internal structures.
     //      )pbdoc")
-    .def("runForceRelaxation",
-         &mehp::MEHPForceBalance2::runForceRelaxation,
-         R"pbdoc(
+
+    .def(
+      "runForceRelaxation",
+      [](mehp::MEHPForceBalance2& sim,
+         long int maxNrOfSteps, // default: 10000
+         double xtol,
+         const double initialResidualToUse,
+         const mehp::StructureSimplificationMode simplificationMode,
+         const double inactiveRemovalCutoff,
+         bool doInnerIterations,
+         const mehp::LinkSwappingMode allowSlipLinksToPassEachOther,
+         const int swappingFrequency,
+         const double oneOverSpringPartitionUpperLimit,
+         const int nrOfCrosslinkSwapsAllowedPerSliplink) {
+        return sim.runForceRelaxation(
+          maxNrOfSteps,
+          xtol,
+          initialResidualToUse,
+          simplificationMode,
+          inactiveRemovalCutoff,
+          doInnerIterations,
+          allowSlipLinksToPassEachOther,
+          swappingFrequency,
+          oneOverSpringPartitionUpperLimit,
+          nrOfCrosslinkSwapsAllowedPerSliplink,
+          []() { return PyErr_CheckSignals() != 0; },
+          []() { throw py::error_already_set(); });
+      },
+      R"pbdoc(
           Run the simulation.
           Note that the final state of the minimization is persisted and reused if you use this method again.
           This is useful if you want to run a global optimization first and add a local one afterwards.
