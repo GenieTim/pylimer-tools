@@ -1413,12 +1413,15 @@ TEST_CASE("MEHP Force Balance Fully active chains are fully active",
 
       pcm::MEHPForceBalance forceBalancer =
         pcm::MEHPForceBalance(universe, 2, false);
+      forceBalancer.configAssumeBoxLargeEnough(false);
+      double initialResidual = forceBalancer.getDisplacementResidualNorm();
       REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
         pcm::BalanceRunMode::ITERATIVE, 1.0, 50000, 1e-18));
       REQUIRE(forceBalancer.getNrOfIterations() > 0);
       CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
       CHECK(forceBalancer.getNrOfActiveSprings() ==
             forceBalancer.getNrOfSprings());
+      CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
     }
   }
 }
@@ -1439,15 +1442,24 @@ TEST_CASE(
     std::cout << "Read file " << inputFile << std::endl;
 
     pcm::MEHPForceBalance forceBalancer =
-      pcm::MEHPForceBalance::constructWithRandomSlipLinks(universe, 1000, 2.0, 100, 5, "my_seed_fb12");
+      pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+        universe, 1000, 2.0, 100, 5, "my_seed_fb12");
     CHECK_NOTHROW(forceBalancer.validateNetwork());
+    double initialResidual = forceBalancer.getDisplacementResidualNorm();
     CHECK(forceBalancer.getNumExtraAtoms() > 100);
-    CHECK(forceBalancer.getNetwork().nrOfPartialSprings > forceBalancer.getNetwork().nrOfSprings);
+    CHECK(forceBalancer.getNetwork().nrOfPartialSprings >
+          forceBalancer.getNetwork().nrOfSprings);
     REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
-      pcm::BalanceRunMode::ITERATIVE, 1.0, 50000, 1e-9, -1., pcm::StructureSimplificationMode::ALL_TIM));
+      pcm::BalanceRunMode::ITERATIVE,
+      1.0,
+      50000,
+      1e-9,
+      -1.,
+      pcm::StructureSimplificationMode::ALL_TIM));
     REQUIRE(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalancer.getNrOfActiveSprings() == 0);
+    CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
   }
 }
 
