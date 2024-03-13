@@ -387,6 +387,8 @@ namespace calc {
       /**
        * @brief Actually do run the simulation
        *
+       * TODO: implement interruptability
+       *
        * @param algorithm
        * @param maxNrOfSteps
        * @param xtol
@@ -2606,6 +2608,9 @@ namespace calc {
         this->defaultNrOfChains =
           this->universe.getMolecules(this->crosslinkerType).size();
         assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
+        this->currentSpringDistances = this->evaluateSpringDistances(is2D);
+        this->currentPartialSpringDistances =
+          this->evaluatePartialSpringDistances(is2D);
         this->validateNetwork();
         assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
       }
