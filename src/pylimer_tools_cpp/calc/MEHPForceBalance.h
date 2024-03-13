@@ -337,8 +337,8 @@ namespace calc {
        */
       void completeInitialization()
       {
-        this->currentSpringDistances =
-          this->evaluateSpringDistances(this->initialConfig, this->currentDisplacements, is2D);
+        this->currentSpringDistances = this->evaluateSpringDistances(
+          this->initialConfig, this->currentDisplacements, is2D);
         this->currentPartialSpringDistances =
           this->evaluatePartialSpringDistances(
             this->initialConfig, this->currentDisplacements, is2D);
@@ -742,6 +742,12 @@ namespace calc {
       void configAssumeBoxLargeEnough(bool assumption)
       {
         this->assumeBoxLargeEnough = assumption;
+
+        this->currentSpringDistances = this->evaluateSpringDistances(
+          this->initialConfig, this->currentDisplacements, is2D);
+        this->currentPartialSpringDistances =
+          this->evaluatePartialSpringDistances(
+            this->initialConfig, this->currentDisplacements, is2D);
       }
 
       /**
