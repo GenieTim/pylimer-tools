@@ -47,12 +47,13 @@ namespace calc {
       const double initialResidualToUse,
       const StructureSimplificationMode simplificationMode,
       const double inactiveRemovalCutoff,
-      const int outputFrequency,
       bool doInnerIterations,
       LinkSwappingMode allowSlipLinksToPassEachOther,
       const int swappingFrequency,
       const double oneOverSpringPartitionUpperLimit,
-      const int nrOfCrosslinkSwapsAllowedPerSliplink)
+      const int nrOfCrosslinkSwapsAllowedPerSliplink,
+      const std::function<bool()>& shouldInterrupt,
+      const std::function<void()>& cleanupInterrupt)
     {
       // INVALIDARG_EXP_IFN(
       //   shouldRemoveInactiveCrosslinks == false &&
@@ -123,6 +124,7 @@ namespace calc {
       this->prepareAllOutputs();
 
       // actual loop
+      bool wasInterrupted = false;
       do {
         if (allowSlipLinksToPassEachOther != LinkSwappingMode::NO_SWAPPING) {
           if (swappingFrequency > 0 &&
@@ -311,12 +313,15 @@ namespace calc {
                                   this->currentSpringPartitionsVec);
           }
         }
-        if (outputFrequency > 0 && iterationsDone % outputFrequency == 0) {
-          this->handleOutput(iterationsDone);
+        this->handleOutput(iterationsDone);
+
+        if (shouldInterrupt()) {
+          wasInterrupted = true;
+          break;
         }
-      } while (
-        currentResidual / initialResidual > xtol &&
-        iterationsDone<maxNrOfSteps&& this->initialConfig.nrOfSprings> 0);
+      } while (currentResidual / initialResidual > xtol &&
+               iterationsDone < maxNrOfSteps &&
+               this->initialConfig.nrOfSprings > 0);
 
       // finish up
       this->closeAllOutputs();
@@ -337,6 +342,10 @@ namespace calc {
       this->currentPartialSpringDistances =
         this->evaluatePartialSpringDistances(
           this->initialConfig, this->currentDisplacements, is2D);
+      if (wasInterrupted) {
+        this->exitReason = ExitReason::INTERRUPT;
+        cleanupInterrupt();
+      }
     }
 
     double MEHPForceBalance::displaceLinksToMeanPosition(
@@ -504,19 +513,19 @@ namespace calc {
       const Eigen::VectorXd& oneOverSpringPartitions) const
     {
       Eigen::VectorXd displacedCoords = net.coordinates + u;
-      Eigen::VectorXd relevantPartialDistancesA =
+      Eigen::VectorXd relevantPartialDistances =
         (displacedCoords(net.springPartCoordinateIndexB) -
          displacedCoords(net.springPartCoordinateIndexA)) +
         net.springPartBoxOffset;
       for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
         for (size_t dir = 0; dir < 3; ++dir) {
-          if (std::abs(relevantPartialDistancesA[3 * i + dir]) >
+          if (std::abs(relevantPartialDistances[3 * i + dir]) >
                 50. * net.L[dir] &&
               this->assumeBoxLargeEnough) {
             std::cerr
               << "WARNING: Spring " << i << " between "
               << net.springPartIndexA[i] << " and " << net.springPartIndexB[i]
-              << " has a length of " << relevantPartialDistancesA[3 * i + dir]
+              << " has a length of " << relevantPartialDistances[3 * i + dir]
               << " in dir " << dir << " from "
               << displacedCoords[net.springPartCoordinateIndexB[3 * i + dir]]
               << " minus "
@@ -526,10 +535,10 @@ namespace calc {
         }
       }
       if (this->assumeBoxLargeEnough) {
-        this->box.handlePBC(relevantPartialDistancesA);
+        this->box.handlePBC(relevantPartialDistances);
       }
       Eigen::VectorXd partialDistancesOverSpringPartitions =
-        (relevantPartialDistancesA.array() * oneOverSpringPartitions.array())
+        (relevantPartialDistances.array() * oneOverSpringPartitions.array())
           .matrix();
 
       // return partialDistancesOverSpringPartitions.squaredNorm();
