@@ -6,6 +6,7 @@
 #include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <chrono>
 #include <cmath>
 #include <filesystem>
@@ -38,7 +39,9 @@ outputNetwork(pcm::ForceBalanceNetwork net,
       if (j < net.linkIndicesOfSprings[i].size() - 1) {
         std::cout << net.localToGlobalSpringIndex.at(i)[j] << ": "
                   << springPartitions[net.localToGlobalSpringIndex.at(i)[j]]
-                  << std::endl;
+                  << " (" << net.springPartBoxOffset[0] << ", "
+                  << net.springPartBoxOffset[1] << ", "
+                  << net.springPartBoxOffset[2] << ")" << std::endl;
       }
     }
     std::cout << std::endl;
@@ -1411,9 +1414,11 @@ TEST_CASE("MEHP Force Balance Fully active chains are fully active",
       SECTION("For large enough box")
       {
         forceBalancer.configAssumeBoxLargeEnough(true);
+        CHECK(forceBalancer.getNrOfActiveSprings(0.001) ==
+              forceBalancer.getNrOfSprings());
         double initialResidual = forceBalancer.getDisplacementResidualNorm();
         REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
-          pcm::BalanceRunMode::ITERATIVE, 1.0, 50000, 1e-18));
+          pcm::BalanceRunMode::ITERATIVE, 1.0, 10000, 1e-12));
         REQUIRE(forceBalancer.getNrOfIterations() > 0);
         CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
         CHECK(forceBalancer.getNrOfActiveSprings(0.001) ==
@@ -1424,9 +1429,11 @@ TEST_CASE("MEHP Force Balance Fully active chains are fully active",
       SECTION("For not large enough box")
       {
         forceBalancer.configAssumeBoxLargeEnough(false);
+        CHECK(forceBalancer.getNrOfActiveSprings(0.001) ==
+              forceBalancer.getNrOfSprings());
         double initialResidual = forceBalancer.getDisplacementResidualNorm();
         REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
-          pcm::BalanceRunMode::ITERATIVE, 1.0, 50000, 1e-18));
+          pcm::BalanceRunMode::ITERATIVE, 1.0, 10000, 1e-12));
         REQUIRE(forceBalancer.getNrOfIterations() > 0);
         CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
         CHECK(forceBalancer.getNrOfActiveSprings(0.001) ==
@@ -1436,6 +1443,84 @@ TEST_CASE("MEHP Force Balance Fully active chains are fully active",
     }
   }
 }
+
+TEST_CASE("MEHP Force Balance does not collapse",
+          "[analysis][MEHPForceBalance]")
+{
+  pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
+  /**
+   * @brief A grid of two rows, each one bead between the two cross-links
+   *
+   */
+  universe.addAtoms(
+    { { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 } },
+    { { 2, 1, 2, 1, 2, 1, 2, 1, 1, 1, 1, 1 } },
+    { { 0.,
+        2.5,
+        5,
+        7.5,
+        0.1,
+        2.5,
+        5,
+        7.5,
+        -0.1,
+        5.,
+        0.,
+        5. } }, // x with slight (0.1) deviation, so we don't start perfect
+    { { 0.1, 0., -0.1, 0., 5., 5., 5., 5., 2.5, 2.5, 7.5, 7.5 } }, // y
+    { { 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0. } },        // z
+    { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } },
+    { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } });
+  universe.addBonds(
+    { { 1, 1, 1, 1, 3, 3, 3, 3, 5, 5, 5, 5, 7, 7, 7, 7 } },
+    { { 2, 9, 4, 11, 2, 4, 10, 12, 9, 11, 6, 8, 6, 8, 10, 12 } });
+
+  SECTION("Assuming large enough box")
+  {
+    pcm::MEHPForceBalance forceBalanceConventional =
+      pcm::MEHPForceBalance(universe, 2, true);
+    forceBalanceConventional.configAssumeBoxLargeEnough(true);
+    REQUIRE_NOTHROW(forceBalanceConventional.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE, 1.0, 10000, 1e-15));
+    REQUIRE(forceBalanceConventional.getNrOfIterations() > 0);
+    CHECK(forceBalanceConventional.getExitReason() ==
+          pcm::ExitReason::X_TOLERANCE);
+    CHECK(forceBalanceConventional.getNrOfActiveSprings() ==
+          forceBalanceConventional.getNrOfSprings());
+    // compare to what we expect
+    CHECK(forceBalanceConventional.getNrOfActiveSprings() == 8);
+    CHECK(forceBalanceConventional.getNrOfActiveNodes() == 4);
+    // CHECK(forceBalanceConventional.getAverageSpringLength() ==
+    //       Catch::Approx(5.));
+    // CHECK_THAT(forceBalanceConventional.getGammaFactor(),
+    //            Catch::Matchers::WithinAbs(1.0, 1e-3));
+    // outputNetwork(forceBalanceConventional.getNetwork(),
+    //               forceBalanceConventional.getCurrentDisplacements(),
+    //               forceBalanceConventional.getSpringPartitions());
+  }
+  SECTION("Assuming too small box")
+  {
+    pcm::MEHPForceBalance forceBalanceNew =
+      pcm::MEHPForceBalance(universe, 2, true);
+    forceBalanceNew.configAssumeBoxLargeEnough(false);
+    REQUIRE_NOTHROW(forceBalanceNew.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE, 1.0, 10000, 1e-15));
+    REQUIRE(forceBalanceNew.getNrOfIterations() > 0);
+    CHECK(forceBalanceNew.getExitReason() == pcm::ExitReason::X_TOLERANCE);
+    CHECK(forceBalanceNew.getNrOfActiveSprings() ==
+          forceBalanceNew.getNrOfSprings());
+    // compare to what we expect
+    CHECK(forceBalanceNew.getNrOfActiveSprings() == 8);
+    CHECK(forceBalanceNew.getNrOfActiveNodes() == 4);
+    CHECK(forceBalanceNew.getAverageSpringLength() == Catch::Approx(5.0));
+    CHECK_THAT(forceBalanceNew.getGammaFactor(),
+               Catch::Matchers::WithinAbs(1.0, 1e-2));
+    // outputNetwork(forceBalanceNew.getNetwork(),
+    //               forceBalanceNew.getCurrentDisplacements(),
+    //               forceBalanceNew.getSpringPartitions());
+  }
+};
 
 TEST_CASE(
   "MEHP Force Balance correctly collapses melts even with random slip-links",

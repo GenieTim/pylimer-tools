@@ -332,7 +332,9 @@ namespace calc {
                            : ExitReason::X_TOLERANCE;
       this->nrOfStepsDone += iterationsDone;
       std::cout << iterationsDone << " steps done. "
-                << "Last max distance moved: " << maxDistanceMoved << std::endl;
+                << "Last max distance moved: " << maxDistanceMoved << ". "
+                << "Current residual: " << currentResidual << ". "
+                << "Initial residual: " << initialResidual << ". " << std::endl;
 
       assert(this->currentDisplacements.size() ==
              3 * this->initialConfig.nrOfLinks);
@@ -5284,12 +5286,13 @@ namespace calc {
 
       // convert springs
       size_t spring_idx = 0;
+      Eigen::Vector3d expectedDistance = Eigen::Vector3d::Zero();
       // net.connectivityToSpringIndex.reserve(nrOfSprings);
       for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
         std::vector<pylimer_tools::entities::Atom> xlinkersOfChain =
           crosslinkerChains[i].getAtomsOfType(crosslinkerType);
-        long int nodeIdxFrom;
-        long int nodeIdxTo;
+        long int atomIdFrom;
+        long int atomIdTo;
         bool addChain = false;
         if (crosslinkerChains[i].getType() ==
             pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
@@ -5301,24 +5304,21 @@ namespace calc {
                       return a1.getId() < a2.getId();
                     });
           assert(xlinkersOfChain.size() == 2);
-          nodeIdxFrom = atomIdToNode.at(xlinkersOfChain[0].getId());
-          nodeIdxTo = atomIdToNode.at(xlinkersOfChain[1].getId());
+          atomIdFrom = xlinkersOfChain[0].getId();
+          atomIdTo = xlinkersOfChain[1].getId();
           addChain = true;
 
           // spring contour length = nr of bonds between two cross-linkers
           net.springsContourLength[spring_idx] =
             crosslinkerChains[i].getNrOfAtoms() - 1;
-          net.springPartBoxOffset.segment(3 * spring_idx, 3) =
-            this->box.getOffset(
-              crosslinkerChains[i].getOverallBondSum(crosslinkerType));
         } else if (crosslinkerChains[i].getType() ==
                    pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
           assert(xlinkersOfChain.size() == 1 ||
                  (xlinkersOfChain.size() == 2 &&
                   xlinkersOfChain[0].getId() == xlinkersOfChain[1].getId()));
 
-          nodeIdxFrom = atomIdToNode.at(xlinkersOfChain[0].getId());
-          nodeIdxTo = nodeIdxFrom;
+          atomIdFrom = xlinkersOfChain[0].getId();
+          atomIdTo = atomIdFrom;
           addChain = true;
 
           net.springsContourLength[spring_idx] =
@@ -5342,21 +5342,21 @@ namespace calc {
                     });
           assert(endsOfChain.size() == 2);
 
-          nodeIdxFrom = atomIdToNode.at(endsOfChain[0].getId());
-          nodeIdxTo = atomIdToNode.at(endsOfChain[1].getId());
+          atomIdFrom = endsOfChain[0].getId();
+          atomIdTo = endsOfChain[1].getId();
           net.springsContourLength[spring_idx] =
             crosslinkerChains[i].getNrOfAtoms() - 1;
-          net.springPartBoxOffset.segment(3 * spring_idx, 3) =
-            this->box.getOffset(
-              crosslinkerChains[i].getOverallBondSum(crosslinkerType));
           addChain = true;
         }
 
         if (addChain) {
+          long int nodeIdxFrom = atomIdToNode.at(atomIdFrom);
+          long int nodeIdxTo = atomIdToNode.at(atomIdTo);
           if (nodeIdxFrom > nodeIdxTo) {
             std::swap(nodeIdxFrom, nodeIdxTo);
-            net.springPartBoxOffset.segment(3 * spring_idx, 3) *= -1;
+            std::swap(atomIdFrom, atomIdTo);
           }
+
           net.springToMoleculeIds.push_back(i);
           std::vector<pylimer_tools::entities::Atom> allChainAtoms =
             crosslinkerChains[i].getAtoms();
@@ -5386,6 +5386,15 @@ namespace calc {
           zeroMap.push_back(spring_idx);
           net.localToGlobalSpringIndex.push_back(zeroMap);
           net.partialToFullSpringIndex[spring_idx] = (spring_idx);
+
+          expectedDistance = crosslinkerChains[i].getOverallBondSumFromTo(atomIdFrom, atomIdTo, crosslinkerType);
+          Eigen::Vector3d actualDistance =
+            net.coordinates.segment(3 * nodeIdxTo, 3) -
+            net.coordinates.segment(3 * nodeIdxFrom, 3);
+          net.springPartBoxOffset.segment(3 * spring_idx, 3) =
+            expectedDistance - actualDistance;
+          assert(this->universe.getBox().isValidOffset(expectedDistance -
+                                                       actualDistance));
 
           spring_idx += 1;
         }
