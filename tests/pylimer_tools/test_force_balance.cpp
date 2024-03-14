@@ -897,7 +897,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
         false,
         pcm::LinkSwappingMode::ALL));
     }
-    
+
     SECTION("Assuming large enough box")
     {
       forceBalancer.configAssumeBoxLargeEnough(true);
@@ -1459,6 +1459,7 @@ TEST_CASE("MEHP Force Balance Fully active chains are fully active",
         CHECK(forceBalancer.getNrOfActiveSprings(0.001) ==
               forceBalancer.getNrOfSprings());
         double initialResidual = forceBalancer.getDisplacementResidualNorm();
+        CHECK(std::isfinite(initialResidual));
         REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
           pcm::BalanceRunMode::ITERATIVE, 1.0, 10000, 1e-12));
         REQUIRE(forceBalancer.getNrOfIterations() > 0);
@@ -1474,6 +1475,7 @@ TEST_CASE("MEHP Force Balance Fully active chains are fully active",
         CHECK(forceBalancer.getNrOfActiveSprings(0.001) ==
               forceBalancer.getNrOfSprings());
         double initialResidual = forceBalancer.getDisplacementResidualNorm();
+        CHECK(std::isfinite(initialResidual));
         REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
           pcm::BalanceRunMode::ITERATIVE, 1.0, 10000, 1e-12));
         REQUIRE(forceBalancer.getNrOfIterations() > 0);
@@ -1594,6 +1596,7 @@ TEST_CASE(
         universe, 1000, 2.0, 100, 5, "my_seed_fb12");
     CHECK_NOTHROW(forceBalancer.validateNetwork());
     double initialResidual = forceBalancer.getDisplacementResidualNorm();
+        CHECK(std::isfinite(initialResidual));
     CHECK(forceBalancer.getNumExtraAtoms() > 100);
     CHECK(forceBalancer.getNetwork().nrOfPartialSprings >
           forceBalancer.getNetwork().nrOfSprings);
