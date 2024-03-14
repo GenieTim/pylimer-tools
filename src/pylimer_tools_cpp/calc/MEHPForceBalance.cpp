@@ -2,6 +2,7 @@
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
+#include "../utils/StringUtils.h"
 // #include "../utils/MemoryUtil.h"
 #include <Eigen/Dense>
 #include <algorithm>
@@ -2072,16 +2073,21 @@ namespace calc {
 
       // validation
       if (!this->assumeBoxLargeEnough) {
+        size_t newSpringIdx =
+          keptSpringIdx + (keptSpringIdx > removedSpringIdx ? -1 : 0);
         Eigen::Vector3d newDistance = this->evaluatePartialSpringDistanceFrom(
-          net,
-          u,
-          keptSpringIdx + (keptSpringIdx > removedSpringIdx ? -1 : 0),
-          newEnd,
-          this->is2D);
-        if (!newDistance.isApprox(distanceBefore)) {
+          net, u, newSpringIdx, newEnd, this->is2D);
+        if ((!newDistance.isApprox(distanceBefore, 1e-5)) &&
+            // this second check is needed due to 0s
+            (!(newDistance + Eigen::Vector3d::Constant(1e-5))
+                .isApprox(distanceBefore + Eigen::Vector3d::Constant(1e-5),
+                          1e-5))) {
           throw std::runtime_error(
             "After merging two partial springs, the overall distance "
-            "is not consistent.");
+            "is not consistent. Expected distance " +
+            std::to_string(distanceBefore) + ", but got " +
+            std::to_string(newDistance) + " for spring " +
+            std::to_string(newSpringIdx) + ".");
         }
       }
     }
@@ -2456,17 +2462,22 @@ namespace calc {
 
       // validation
       if (!this->assumeBoxLargeEnough) {
-        Eigen::Vector3d newDistance = this->evaluatePartialSpringDistanceFrom(
-          net,
-          u,
+        size_t newSpringIdx =
           remainingPartialSpringIdx +
-            (remainingPartialSpringIdx > removedPartialSpringIdx ? -1 : 0),
-          otherEndOfRemovedSpring,
-          this->is2D);
-        if (!newDistance.isApprox(distanceBefore)) {
+          (remainingPartialSpringIdx > removedPartialSpringIdx ? -1 : 0);
+        Eigen::Vector3d newDistance = this->evaluatePartialSpringDistanceFrom(
+          net, u, newSpringIdx, otherEndOfRemovedSpring, this->is2D);
+        if ((!newDistance.isApprox(distanceBefore, 1e-5)) &&
+            // this second check is needed due to 0s
+            (!(newDistance + Eigen::Vector3d::Constant(1e-5))
+                .isApprox(distanceBefore + Eigen::Vector3d::Constant(1e-5),
+                          1e-5))) {
           throw std::runtime_error(
-            "After merging two springs, the overall distance "
-            "is not consistent.");
+            "After merging two partial springs, the overall distance "
+            "is not consistent. Expected distance " +
+            std::to_string(distanceBefore) + ", but got " +
+            std::to_string(newDistance) + " for spring " +
+            std::to_string(newSpringIdx) + ".");
         }
       }
     }
