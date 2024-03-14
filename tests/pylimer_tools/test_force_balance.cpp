@@ -860,39 +860,81 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
     pe::Box newBox =
       pe::Box(4 * oldBox.getLx(), 0.5 * oldBox.getLy(), 0.5 * oldBox.getLz());
     forceBalancer.deformTo(newBox);
-    REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
-      pcm::BalanceRunMode::ITERATIVE,
-      1.0,
-      1000,
-      1e-9,
-      -1.0,
-      pcm::StructureSimplificationMode::ALL_TIM,
-      -1.0,
-      50,
-      false,
-      pcm::LinkSwappingMode::ALL_MC));
-    REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
-      pcm::BalanceRunMode::ITERATIVE,
-      1.0,
-      1000,
-      1e-9,
-      -1.0,
-      pcm::StructureSimplificationMode::ALL_TIM,
-      -1.0,
-      50,
-      false,
-      pcm::LinkSwappingMode::SLIPLINKS_ONLY));
-    REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
-      pcm::BalanceRunMode::ITERATIVE,
-      1.0,
-      1000,
-      1e-9,
-      -1.0,
-      pcm::StructureSimplificationMode::ALL_TIM,
-      -1.0,
-      50,
-      false,
-      pcm::LinkSwappingMode::ALL));
+
+    SECTION("Assuming too small box") {
+      forceBalancer.configAssumeBoxLargeEnough(false);
+      REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
+        pcm::BalanceRunMode::ITERATIVE,
+        1.0,
+        100,
+        1e-7,
+        -1.0,
+        pcm::StructureSimplificationMode::ALL_TIM,
+        -1.0,
+        50,
+        false,
+        pcm::LinkSwappingMode::ALL_MC));
+      REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
+        pcm::BalanceRunMode::ITERATIVE,
+        1.0,
+        100,
+        1e-8,
+        -1.0,
+        pcm::StructureSimplificationMode::ALL_TIM,
+        -1.0,
+        50,
+        false,
+        pcm::LinkSwappingMode::SLIPLINKS_ONLY));
+      REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
+        pcm::BalanceRunMode::ITERATIVE,
+        1.0,
+        100,
+        1e-9,
+        -1.0,
+        pcm::StructureSimplificationMode::ALL_TIM,
+        -1.0,
+        50,
+        false,
+        pcm::LinkSwappingMode::ALL));
+    }
+    
+    SECTION("Assuming large enough box")
+    {
+      forceBalancer.configAssumeBoxLargeEnough(true);
+      REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
+        pcm::BalanceRunMode::ITERATIVE,
+        1.0,
+        100,
+        1e-7,
+        -1.0,
+        pcm::StructureSimplificationMode::ALL_TIM,
+        -1.0,
+        50,
+        false,
+        pcm::LinkSwappingMode::ALL_MC));
+      REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
+        pcm::BalanceRunMode::ITERATIVE,
+        1.0,
+        100,
+        1e-8,
+        -1.0,
+        pcm::StructureSimplificationMode::ALL_TIM,
+        -1.0,
+        50,
+        false,
+        pcm::LinkSwappingMode::SLIPLINKS_ONLY));
+      REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
+        pcm::BalanceRunMode::ITERATIVE,
+        1.0,
+        100,
+        1e-9,
+        -1.0,
+        pcm::StructureSimplificationMode::ALL_TIM,
+        -1.0,
+        50,
+        false,
+        pcm::LinkSwappingMode::ALL));
+    }
   }
 }
 
@@ -1482,7 +1524,12 @@ TEST_CASE("MEHP Force Balance does not collapse",
       pcm::MEHPForceBalance(universe, 2, true);
     forceBalanceConventional.configAssumeBoxLargeEnough(true);
     REQUIRE_NOTHROW(forceBalanceConventional.runForceRelaxation(
-      pcm::BalanceRunMode::ITERATIVE, 1.0, 10000, 1e-15));
+      pcm::BalanceRunMode::ITERATIVE,
+      1.0,
+      10000,
+      1e-15,
+      -1,
+      pcm::StructureSimplificationMode::ALL_TIM));
     REQUIRE(forceBalanceConventional.getNrOfIterations() > 0);
     CHECK(forceBalanceConventional.getExitReason() ==
           pcm::ExitReason::X_TOLERANCE);
@@ -1505,7 +1552,12 @@ TEST_CASE("MEHP Force Balance does not collapse",
       pcm::MEHPForceBalance(universe, 2, true);
     forceBalanceNew.configAssumeBoxLargeEnough(false);
     REQUIRE_NOTHROW(forceBalanceNew.runForceRelaxation(
-      pcm::BalanceRunMode::ITERATIVE, 1.0, 10000, 1e-15));
+      pcm::BalanceRunMode::ITERATIVE,
+      1.0,
+      10000,
+      1e-15,
+      -1,
+      pcm::StructureSimplificationMode::ALL_TIM));
     REQUIRE(forceBalanceNew.getNrOfIterations() > 0);
     CHECK(forceBalanceNew.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalanceNew.getNrOfActiveSprings() ==

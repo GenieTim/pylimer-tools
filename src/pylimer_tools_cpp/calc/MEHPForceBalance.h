@@ -537,6 +537,7 @@ namespace calc {
        * @param springPartitions
        */
       void mergeSprings(ForceBalanceNetwork& net,
+                               const Eigen::VectorXd& displacements,
                         Eigen::VectorXd& springPartitions,
                         const size_t removedSpringIdx,
                         const size_t keptSpringIdx,
@@ -551,6 +552,7 @@ namespace calc {
        * @param springPartitions
        */
       void mergePartialSprings(ForceBalanceNetwork& net,
+                               const Eigen::VectorXd& displacements,
                                Eigen::VectorXd& springPartitions,
                                const size_t removedSpringIdx,
                                const size_t keptSpringIdx,
