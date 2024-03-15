@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "shell",
+      "label": "Install package",
+      "command": "python -m pip install ${workspaceFolder}"
+    },
+    {
+      "type": "shell",
+      "label": "Compile Tests",
+      "command": "./bin/build-tests.sh"
+    }
+  ]
+}

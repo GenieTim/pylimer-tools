@@ -1,0 +1,23 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug C++ Tests",
+      "cwd": "${workspaceFolder}/tests/build",
+      "program": "${workspaceFolder}/tests/build/pylimer_tests",
+      "args": ["MEHP Force Balance handles slip-links"],
+      "env": {
+        "MallocNanoZone": "0",
+        "ASAN_OPTIONS": "detect_leaks=0",
+        // "ASAN_OPTIONS": "detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1",
+        "LSAN_OPTIONS": "suppressions=${workspaceFolder}/tests/lsan.supp"
+      },
+      "preLaunchTask": "Compile Tests"
+    }
+  ]
+}

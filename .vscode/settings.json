@@ -154,5 +154,6 @@
   "C_Cpp.default.cStandard": "c17",
   "C_Cpp.default.intelliSenseMode": "macos-gcc-x64",
   "C_Cpp.inlayHints.autoDeclarationTypes.showOnLeft": true,
-  "C_Cpp.clang_format_sortIncludes": null
+  "C_Cpp.clang_format_sortIncludes": null,
+  "c-cpp-flylint.flexelint.enable": false
 }
