@@ -9,8 +9,7 @@ endif ()
 project(pylimer_tools VERSION "0.1.11")
 add_definitions( -DOVERALL_PROJECT_VERSION="${CMAKE_PROJECT_VERSION}")
 
-configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/src/pylimer_tools_cpp/version_config.h.in ${CMAKE_BINARY_DIR}/generated/version_config.h )
-include_directories( ${CMAKE_BINARY_DIR}/generated/ )
+include(${CMAKE_CURRENT_LIST_DIR}/vendor/myConfigureFile.txt)
 
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 20)
@@ -37,7 +36,7 @@ set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fPIC")
 set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} -fPIC")
 endif()
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/vendor/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/vendor/CMakeLists.txt)
 
 # prepare python bindings
 # list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
