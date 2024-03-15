@@ -1,6 +1,7 @@
 #ifndef STRING_UTIL_H
 #define STRING_UTIL_H
 
+#include <Eigen/Dense>
 #include <algorithm>
 #include <cstring>
 #include <iostream>
@@ -15,6 +16,13 @@ static std::string
 to_string(std::string input)
 {
   return input;
+}
+
+static std::string
+to_string(Eigen::Vector3d input)
+{
+  return std::to_string(input[0]) + ", " + std::to_string(input[1]) +
+         ", "+ std::to_string(input[2]);
 }
 } // namespace std
 

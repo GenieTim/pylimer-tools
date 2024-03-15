@@ -50,6 +50,7 @@ namespace calc {
       MAX_STEPS,
       NO_STEPS_POSSIBLE,
       FAILURE,
+      INTERRUPT,
       OTHER
     };
 

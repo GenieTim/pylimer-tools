@@ -364,6 +364,7 @@ namespace entities {
    * @param atomIdFrom
    * @param atomIdTo
    * @param crosslinkerType
+     * @param requireOrder
    * @return Eigen::Vector3d
    */
   Eigen::Vector3d Molecule::getOverallBondSumFromTo(size_t atomIdFrom,
@@ -390,7 +391,7 @@ namespace entities {
 
         if ((alignedVertices[i] == vertexIdFrom && !requireOrder) ||
             alignedVertices[i] == vertexIdTo) {
-          return result;
+          return result * (alignedVertices[i] == vertexIdFrom ? -1. : 1.);
         }
       }
 

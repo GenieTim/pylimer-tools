@@ -2,6 +2,7 @@
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
+#include "../utils/StringUtils.h"
 // #include "../utils/MemoryUtil.h"
 #include <Eigen/Dense>
 #include <algorithm>
@@ -47,12 +48,13 @@ namespace calc {
       const double initialResidualToUse,
       const StructureSimplificationMode simplificationMode,
       const double inactiveRemovalCutoff,
-      const int outputFrequency,
       bool doInnerIterations,
       LinkSwappingMode allowSlipLinksToPassEachOther,
       const int swappingFrequency,
       const double oneOverSpringPartitionUpperLimit,
-      const int nrOfCrosslinkSwapsAllowedPerSliplink)
+      const int nrOfCrosslinkSwapsAllowedPerSliplink,
+      const std::function<bool()>& shouldInterrupt,
+      const std::function<void()>& cleanupInterrupt)
     {
       // INVALIDARG_EXP_IFN(
       //   shouldRemoveInactiveCrosslinks == false &&
@@ -123,6 +125,7 @@ namespace calc {
       this->prepareAllOutputs();
 
       // actual loop
+      bool wasInterrupted = false;
       do {
         if (allowSlipLinksToPassEachOther != LinkSwappingMode::NO_SWAPPING) {
           if (swappingFrequency > 0 &&
@@ -311,12 +314,15 @@ namespace calc {
                                   this->currentSpringPartitionsVec);
           }
         }
-        if (outputFrequency > 0 && iterationsDone % outputFrequency == 0) {
-          this->handleOutput(iterationsDone);
+        this->handleOutput(iterationsDone);
+
+        if (shouldInterrupt()) {
+          wasInterrupted = true;
+          break;
         }
-      } while (
-        currentResidual / initialResidual > xtol &&
-        iterationsDone<maxNrOfSteps&& this->initialConfig.nrOfSprings> 0);
+      } while (currentResidual / initialResidual > xtol &&
+               iterationsDone < maxNrOfSteps &&
+               this->initialConfig.nrOfSprings > 0);
 
       // finish up
       this->closeAllOutputs();
@@ -327,7 +333,9 @@ namespace calc {
                            : ExitReason::X_TOLERANCE;
       this->nrOfStepsDone += iterationsDone;
       std::cout << iterationsDone << " steps done. "
-                << "Last max distance moved: " << maxDistanceMoved << std::endl;
+                << "Last max distance moved: " << maxDistanceMoved << ". "
+                << "Current residual: " << currentResidual << ". "
+                << "Initial residual: " << initialResidual << ". " << std::endl;
 
       assert(this->currentDisplacements.size() ==
              3 * this->initialConfig.nrOfLinks);
@@ -337,6 +345,10 @@ namespace calc {
       this->currentPartialSpringDistances =
         this->evaluatePartialSpringDistances(
           this->initialConfig, this->currentDisplacements, is2D);
+      if (wasInterrupted) {
+        this->exitReason = ExitReason::INTERRUPT;
+        cleanupInterrupt();
+      }
     }
 
     double MEHPForceBalance::displaceLinksToMeanPosition(
@@ -504,19 +516,19 @@ namespace calc {
       const Eigen::VectorXd& oneOverSpringPartitions) const
     {
       Eigen::VectorXd displacedCoords = net.coordinates + u;
-      Eigen::VectorXd relevantPartialDistancesA =
+      Eigen::VectorXd relevantPartialDistances =
         (displacedCoords(net.springPartCoordinateIndexB) -
          displacedCoords(net.springPartCoordinateIndexA)) +
         net.springPartBoxOffset;
       for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
         for (size_t dir = 0; dir < 3; ++dir) {
-          if (std::abs(relevantPartialDistancesA[3 * i + dir]) >
+          if (std::abs(relevantPartialDistances[3 * i + dir]) >
                 50. * net.L[dir] &&
               this->assumeBoxLargeEnough) {
             std::cerr
               << "WARNING: Spring " << i << " between "
               << net.springPartIndexA[i] << " and " << net.springPartIndexB[i]
-              << " has a length of " << relevantPartialDistancesA[3 * i + dir]
+              << " has a length of " << relevantPartialDistances[3 * i + dir]
               << " in dir " << dir << " from "
               << displacedCoords[net.springPartCoordinateIndexB[3 * i + dir]]
               << " minus "
@@ -526,10 +538,10 @@ namespace calc {
         }
       }
       if (this->assumeBoxLargeEnough) {
-        this->box.handlePBC(relevantPartialDistancesA);
+        this->box.handlePBC(relevantPartialDistances);
       }
       Eigen::VectorXd partialDistancesOverSpringPartitions =
-        (relevantPartialDistancesA.array() * oneOverSpringPartitions.array())
+        (relevantPartialDistances.array() * oneOverSpringPartitions.array())
           .matrix();
 
       // return partialDistancesOverSpringPartitions.squaredNorm();
@@ -884,16 +896,8 @@ namespace calc {
               std::to_string(net.coordinates.size()) + " and " +
               std::to_string(displacements.size()) + ".");
           // assert(net.coordinates.size() == displacements.size());
-          Eigen::Vector3d distance =
-            (net.coordinates.segment(3 * net.springPartIndexA[partialSpringIdx],
-                                     3) +
-             displacements.segment(3 * net.springPartIndexA[partialSpringIdx],
-                                   3)) -
-            (net.coordinates.segment(3 * net.springPartIndexB[partialSpringIdx],
-                                     3) +
-             displacements.segment(3 * net.springPartIndexB[partialSpringIdx],
-                                   3));
-          this->box.handlePBC(distance);
+          Eigen::Vector3d distance = this->evaluatePartialSpringDistance(
+            net, displacements, partialSpringIdx);
           if (distance.squaredNorm() > tolerance) {
             isActive = true;
             break;
@@ -904,7 +908,9 @@ namespace calc {
           // std::cout << "Removing spring " << springIdx << std::endl;
           this->validateNetwork(net, displacements, springPartitions);
           this->removeSpring(net, displacements, springPartitions, springIdx);
+#ifndef NDEBUG
           this->validateNetwork(net, displacements, springPartitions);
+#endif
           numRemoved += 1;
         }
       }
@@ -917,7 +923,9 @@ namespace calc {
         ) {
           // std::cout << "Removing x-link " << crosslinkIdx << std::endl;
           this->removeLink(net, displacements, crosslinkIdx);
+#ifndef NDEBUG
           this->validateNetwork(net, displacements, springPartitions);
+#endif
         }
 
         else if ( // or f = 1, NOT primary loop
@@ -937,7 +945,9 @@ namespace calc {
           numRemoved += 1;
           // to then remove the link
           this->removeLink(net, displacements, crosslinkIdx);
+#ifndef NDEBUG
           this->validateNetwork(net, displacements, springPartitions);
+#endif
         }
       }
 
@@ -1770,6 +1780,7 @@ namespace calc {
                  net.partialToFullSpringIndex[partialSpringToRemove]);
           // actually do the merge
           this->mergePartialSprings(net,
+                                    displacements,
                                     springPartitions,
                                     partialSpringToRemove,
                                     partialSpringToKeep,
@@ -1890,6 +1901,7 @@ namespace calc {
      */
     void MEHPForceBalance::mergePartialSprings(
       ForceBalanceNetwork& net,
+      const Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions,
       const size_t removedSpringIdx,
       const size_t keptSpringIdx,
@@ -1920,6 +1932,11 @@ namespace calc {
                            " and " +
                            std::to_string(net.springPartIndexB[keptSpringIdx]) +
                            " instead of " + std::to_string(linkToReduce) + ".");
+      Eigen::Vector3d distanceBefore =
+        this->evaluatePartialSpringDistanceTo(
+          net, u, removedSpringIdx, linkToReduce, this->is2D) +
+        this->evaluatePartialSpringDistanceFrom(
+          net, u, keptSpringIdx, linkToReduce, this->is2D);
       size_t fullSpringIdx = net.partialToFullSpringIndex[keptSpringIdx];
       // start with removal
       net.nrOfPartialSprings -= 1;
@@ -1934,20 +1951,17 @@ namespace calc {
           net.springPartCoordinateIndexA[3 * keptSpringIdx + dir] =
             3 * newEnd + dir;
         }
-        net.springPartBoxOffset.segment(3 * keptSpringIdx, 3) =
-          -net.springPartBoxOffset.segment(3 * keptSpringIdx, 3) +
-          offsetMultiplier *
-            net.springPartBoxOffset.segment(3 * removedSpringIdx, 3);
       } else {
         net.springPartIndexB[keptSpringIdx] = newEnd;
         for (size_t dir = 0; dir < 3; ++dir) {
           net.springPartCoordinateIndexB[3 * keptSpringIdx + dir] =
             3 * newEnd + dir;
         }
-        net.springPartBoxOffset.segment(3 * keptSpringIdx, 3) +=
-          offsetMultiplier *
-          net.springPartBoxOffset.segment(3 * removedSpringIdx, 3);
+        offsetMultiplier *= -1.;
       }
+      net.springPartBoxOffset.segment(3 * keptSpringIdx, 3) +=
+        offsetMultiplier *
+        net.springPartBoxOffset.segment(3 * removedSpringIdx, 3);
       // remove the spring from the link
       // NOTE: currently, we allow it not to be present,
       // as it might be removed earlier already
@@ -2056,6 +2070,26 @@ namespace calc {
           }
         }
       }
+
+      // validation
+      if (!this->assumeBoxLargeEnough) {
+        size_t newSpringIdx =
+          keptSpringIdx + (keptSpringIdx > removedSpringIdx ? -1 : 0);
+        Eigen::Vector3d newDistance = this->evaluatePartialSpringDistanceFrom(
+          net, u, newSpringIdx, newEnd, this->is2D);
+        if ((!newDistance.isApprox(distanceBefore, 1e-5)) &&
+            // this second check is needed due to 0s
+            (!(newDistance + Eigen::Vector3d::Constant(1e-5))
+                .isApprox(distanceBefore + Eigen::Vector3d::Constant(1e-5),
+                          1e-5))) {
+          throw std::runtime_error(
+            "After merging two partial springs, the overall distance "
+            "is not consistent. Expected distance " +
+            std::to_string(distanceBefore) + ", but got " +
+            std::to_string(newDistance) + " for spring " +
+            std::to_string(newSpringIdx) + ".");
+        }
+      }
     }
 
     /**
@@ -2065,6 +2099,7 @@ namespace calc {
      * @param springPartitions
      */
     void MEHPForceBalance::mergeSprings(ForceBalanceNetwork& net,
+                                        const Eigen::VectorXd& u,
                                         Eigen::VectorXd& springPartitions,
                                         const size_t removedSpringIdx,
                                         const size_t keptSpringIdx,
@@ -2077,12 +2112,8 @@ namespace calc {
                          "The link to reduce must be a cross-link");
       INVALIDARG_EXP_IFN(keptSpringIdx != removedSpringIdx,
                          "Cannot replace one spring with the same one.");
-      net.nrOfSprings -= 1;
-      net.nrOfPartialSprings -= 1;
-      if (net.linkIndicesOfSprings[removedSpringIdx].size() > 2 &&
-          net.linkIndicesOfSprings[keptSpringIdx].size() > 2) {
-        net.nrOfSpringsWithPartition -= 1;
-      }
+
+      size_t fullSpringIdx = net.partialToFullSpringIndex[keptSpringIdx];
       // handle links
       std::vector<size_t> removedSpringsLinks =
         net.linkIndicesOfSprings[removedSpringIdx];
@@ -2099,6 +2130,28 @@ namespace calc {
           ? pylimer_tools::utils::last(
               net.localToGlobalSpringIndex[keptSpringIdx])
           : net.localToGlobalSpringIndex[keptSpringIdx][0];
+
+      RUNTIME_EXP_IFN(
+        net.springPartIndexA[removedPartialSpringIdx] == linkToReduce ||
+          net.springPartIndexB[removedPartialSpringIdx] == linkToReduce,
+        "Did not detect correct partial springs");
+      RUNTIME_EXP_IFN(
+        net.springPartIndexA[remainingPartialSpringIdx] == linkToReduce ||
+          net.springPartIndexB[remainingPartialSpringIdx] == linkToReduce,
+        "Did not detect correct partial springs");
+
+      Eigen::Vector3d distanceBefore =
+        this->evaluatePartialSpringDistanceTo(
+          net, u, removedPartialSpringIdx, linkToReduce, this->is2D) +
+        this->evaluatePartialSpringDistanceFrom(
+          net, u, remainingPartialSpringIdx, linkToReduce, this->is2D);
+
+      net.nrOfSprings -= 1;
+      net.nrOfPartialSprings -= 1;
+      if (net.linkIndicesOfSprings[removedSpringIdx].size() > 2 &&
+          net.linkIndicesOfSprings[keptSpringIdx].size() > 2) {
+        net.nrOfSpringsWithPartition -= 1;
+      }
 
       net.linkIndicesOfSprings[keptSpringIdx].reserve(
         keptSpringsLinks.size() + removedSpringsLinks.size() - 2);
@@ -2247,14 +2300,6 @@ namespace calc {
       pylimer_tools::utils::removeRow(net.partialSpringIsPartial,
                                       removedPartialSpringIdx);
 
-      RUNTIME_EXP_IFN(
-        net.springPartIndexA[removedPartialSpringIdx] == linkToReduce ||
-          net.springPartIndexB[removedPartialSpringIdx] == linkToReduce,
-        "");
-      RUNTIME_EXP_IFN(
-        net.springPartIndexA[remainingPartialSpringIdx] == linkToReduce ||
-          net.springPartIndexB[remainingPartialSpringIdx] == linkToReduce,
-        "");
       bool removedIsA =
         net.springPartIndexA[removedPartialSpringIdx] == linkToReduce;
       size_t otherEndOfRemovedSpring =
@@ -2267,11 +2312,7 @@ namespace calc {
         for (size_t dir = 0; dir < 3; ++dir) {
           net.springPartCoordinateIndexA[3 * remainingPartialSpringIdx + dir] =
             3 * otherEndOfRemovedSpring + dir;
-        }
-        net.springPartBoxOffset.segment(3 * remainingPartialSpringIdx, 3) =
-          -net.springPartBoxOffset.segment(3 * remainingPartialSpringIdx, 3) +
-          offsetMultiplier *
-            net.springPartBoxOffset.segment(3 * removedPartialSpringIdx, 3);
+        };
       } else {
         RUNTIME_EXP_IFN(
           net.springPartIndexB[remainingPartialSpringIdx] == linkToReduce, "");
@@ -2281,10 +2322,11 @@ namespace calc {
           net.springPartCoordinateIndexB[3 * remainingPartialSpringIdx + dir] =
             3 * otherEndOfRemovedSpring + dir;
         }
-        net.springPartBoxOffset.segment(3 * remainingPartialSpringIdx, 3) +=
-          offsetMultiplier *
-          net.springPartBoxOffset.segment(3 * removedPartialSpringIdx, 3);
+        offsetMultiplier *= -1.;
       }
+      net.springPartBoxOffset.segment(3 * remainingPartialSpringIdx, 3) +=
+        offsetMultiplier *
+        net.springPartBoxOffset.segment(3 * removedPartialSpringIdx, 3);
       pylimer_tools::utils::removeRow(net.springPartIndexA,
                                       removedPartialSpringIdx);
       pylimer_tools::utils::removeRow(net.springPartIndexB,
@@ -2417,6 +2459,27 @@ namespace calc {
       //           << " and is now " <<
       //           net.springsContourLength[newKeptSpringIdx]
       //           << std::endl;
+
+      // validation
+      if (!this->assumeBoxLargeEnough) {
+        size_t newSpringIdx =
+          remainingPartialSpringIdx +
+          (remainingPartialSpringIdx > removedPartialSpringIdx ? -1 : 0);
+        Eigen::Vector3d newDistance = this->evaluatePartialSpringDistanceFrom(
+          net, u, newSpringIdx, otherEndOfRemovedSpring, this->is2D);
+        if ((!newDistance.isApprox(distanceBefore, 1e-5)) &&
+            // this second check is needed due to 0s
+            (!(newDistance + Eigen::Vector3d::Constant(1e-5))
+                .isApprox(distanceBefore + Eigen::Vector3d::Constant(1e-5),
+                          1e-5))) {
+          throw std::runtime_error(
+            "After merging two partial springs, the overall distance "
+            "is not consistent. Expected distance " +
+            std::to_string(distanceBefore) + ", but got " +
+            std::to_string(newDistance) + " for spring " +
+            std::to_string(newSpringIdx) + ".");
+        }
+      }
     }
 
     /**
@@ -2721,6 +2784,7 @@ namespace calc {
             // let's remove this
             // TODO: this is inefficient shit, so much data being moved
             this->mergeSprings(net,
+                               displacements,
                                springPartitions,
                                springsToMerge[0],
                                springsToMerge[1],
@@ -3867,6 +3931,7 @@ namespace calc {
       // but skip resizing the Eigen structures, since the additional rows are
       // still needed
       this->mergePartialSprings(net,
+                                u,
                                 springPartitions,
                                 partialSpringIdx,
                                 otherInvolvedPartialSpring,
@@ -5275,12 +5340,13 @@ namespace calc {
 
       // convert springs
       size_t spring_idx = 0;
+      Eigen::Vector3d expectedDistance = Eigen::Vector3d::Zero();
       // net.connectivityToSpringIndex.reserve(nrOfSprings);
       for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
         std::vector<pylimer_tools::entities::Atom> xlinkersOfChain =
           crosslinkerChains[i].getAtomsOfType(crosslinkerType);
-        long int nodeIdxFrom;
-        long int nodeIdxTo;
+        long int atomIdFrom;
+        long int atomIdTo;
         bool addChain = false;
         if (crosslinkerChains[i].getType() ==
             pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
@@ -5292,24 +5358,21 @@ namespace calc {
                       return a1.getId() < a2.getId();
                     });
           assert(xlinkersOfChain.size() == 2);
-          nodeIdxFrom = atomIdToNode.at(xlinkersOfChain[0].getId());
-          nodeIdxTo = atomIdToNode.at(xlinkersOfChain[1].getId());
+          atomIdFrom = xlinkersOfChain[0].getId();
+          atomIdTo = xlinkersOfChain[1].getId();
           addChain = true;
 
           // spring contour length = nr of bonds between two cross-linkers
           net.springsContourLength[spring_idx] =
             crosslinkerChains[i].getNrOfAtoms() - 1;
-          net.springPartBoxOffset.segment(3 * spring_idx, 3) =
-            this->box.getOffset(
-              crosslinkerChains[i].getOverallBondSum(crosslinkerType));
         } else if (crosslinkerChains[i].getType() ==
                    pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
           assert(xlinkersOfChain.size() == 1 ||
                  (xlinkersOfChain.size() == 2 &&
                   xlinkersOfChain[0].getId() == xlinkersOfChain[1].getId()));
 
-          nodeIdxFrom = atomIdToNode.at(xlinkersOfChain[0].getId());
-          nodeIdxTo = nodeIdxFrom;
+          atomIdFrom = xlinkersOfChain[0].getId();
+          atomIdTo = atomIdFrom;
           addChain = true;
 
           net.springsContourLength[spring_idx] =
@@ -5333,21 +5396,21 @@ namespace calc {
                     });
           assert(endsOfChain.size() == 2);
 
-          nodeIdxFrom = atomIdToNode.at(endsOfChain[0].getId());
-          nodeIdxTo = atomIdToNode.at(endsOfChain[1].getId());
+          atomIdFrom = endsOfChain[0].getId();
+          atomIdTo = endsOfChain[1].getId();
           net.springsContourLength[spring_idx] =
             crosslinkerChains[i].getNrOfAtoms() - 1;
-          net.springPartBoxOffset.segment(3 * spring_idx, 3) =
-            this->box.getOffset(
-              crosslinkerChains[i].getOverallBondSum(crosslinkerType));
           addChain = true;
         }
 
         if (addChain) {
+          long int nodeIdxFrom = atomIdToNode.at(atomIdFrom);
+          long int nodeIdxTo = atomIdToNode.at(atomIdTo);
           if (nodeIdxFrom > nodeIdxTo) {
             std::swap(nodeIdxFrom, nodeIdxTo);
-            net.springPartBoxOffset.segment(3 * spring_idx, 3) *= -1;
+            std::swap(atomIdFrom, atomIdTo);
           }
+
           net.springToMoleculeIds.push_back(i);
           std::vector<pylimer_tools::entities::Atom> allChainAtoms =
             crosslinkerChains[i].getAtoms();
@@ -5377,6 +5440,16 @@ namespace calc {
           zeroMap.push_back(spring_idx);
           net.localToGlobalSpringIndex.push_back(zeroMap);
           net.partialToFullSpringIndex[spring_idx] = (spring_idx);
+
+          expectedDistance = crosslinkerChains[i].getOverallBondSumFromTo(
+            atomIdFrom, atomIdTo, crosslinkerType, false);
+          Eigen::Vector3d actualDistance =
+            net.coordinates.segment(3 * nodeIdxTo, 3) -
+            net.coordinates.segment(3 * nodeIdxFrom, 3);
+          net.springPartBoxOffset.segment(3 * spring_idx, 3) =
+            expectedDistance - actualDistance;
+          assert(this->universe.getBox().isValidOffset(expectedDistance -
+                                                       actualDistance));
 
           spring_idx += 1;
         }
