@@ -9,7 +9,7 @@ endif ()
 project(pylimer_tools VERSION "0.1.11")
 add_definitions( -DOVERALL_PROJECT_VERSION="${CMAKE_PROJECT_VERSION}")
 
-include(${CMAKE_CURRENT_LIST_DIR}/vendor/myConfigureFile.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/vendor/myConfigureFile.cmake)
 
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 20)
