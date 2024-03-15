@@ -621,6 +621,7 @@ namespace calc {
       {
         size_t numBefore = 0;
         igraph_vector_t types;
+        igraph_vector_init(&types, igraph_vcount(&this->graph));
         igraph_cattribute_VANV(&this->graph, "type", igraph_vss_all(), &types);
         for (size_t i = 0; i < igraph_vector_size(&types); i++) {
           if (castToIgraphInt(igraph_vector_get(&types, i)) ==
