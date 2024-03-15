@@ -36,9 +36,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-py-3.11.2-
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         with:
-          python-version: "3.11.2"
+          python-version: "3.12.2"
           cache: "pip"
 
       - name: Install Dependencies
@@ -58,7 +58,7 @@ jobs:
         run: genbadge coverage -i coverage.xml -o ".github/coverage.svg"
 
       - name: Upload to CodeCov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }} # not required for public repos
           fail_ci_if_error: false # optional (default = false)

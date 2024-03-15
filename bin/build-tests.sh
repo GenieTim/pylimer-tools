@@ -39,3 +39,4 @@ fi
 cmake .. "${ADDITIONALFLAGS[@]}" || exit 1
 echo "======== Starting build ========"
 cmake --build . || exit 9
+echo "======== Tests built with $GENERATOR_BIN (" "${ADDITIONALFLAGS[@]}" ") ========"
