@@ -4,10 +4,8 @@ set_target_properties(pylimer_tools_bindings PROPERTIES LINKER_LANGUAGE CXX)
 
 # add dependencies
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/../../../vendor/CMakeLists.txt)
-
-configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/../version_config.h.in ${CMAKE_BINARY_DIR}/generated/version_config.h )
-include_directories( ${CMAKE_BINARY_DIR}/generated/ )
+include(${CMAKE_CURRENT_LIST_DIR}/../../../vendor/CMakeLists.txt)
+include(${CMAKE_CURRENT_LIST_DIR}/../../../vendor/myConfigureFile.cmake)
 
 add_dependencies(pylimer_tools_bindings igraphLib)
 include_directories(${igraph_INCLUDE_DIRS})

@@ -146,15 +146,15 @@ target_sources(pylimer_tools
 
 set_target_properties(pylimer_tools PROPERTIES VERSION ${PROJECT_VERSION})
 
-configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/version_config.h.in ${CMAKE_BINARY_DIR}/generated/version_config.h )
-include_directories( ${CMAKE_BINARY_DIR}/generated/ )
+
+include(${CMAKE_CURRENT_LIST_DIR}/../../vendor/myConfigureFile.cmake)
 
 if (CODE_COVERAGE)
 	set(ENABLE_COVERAGE ON)
 	if (CMAKE_BUILD_TYPE EQUAL "RELEASE")
 		message(WARNING "Using coverage reduces build type to debug from release")
 	endif()
-	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/cmake-modules")
+	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../vendor/cmake-modules")
 	include(CodeCoverage)
 	append_coverage_compiler_flags()
 else()
