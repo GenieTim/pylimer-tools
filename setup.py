@@ -1,14 +1,10 @@
 import os
 import platform
 import shutil
-import string
 import sys
 import warnings
-from pathlib import Path
-from tempfile import TemporaryDirectory
-from typing import Dict, Iterator, List, Union
 
-from setuptools import find_namespace_packages, find_packages
+from setuptools import find_namespace_packages
 
 try:
     from skbuild import setup
@@ -71,12 +67,15 @@ for vendorFile in vendorFilesToDelete:
 #             "Could not delete directory {}. Errors incoming.".format(skbuildCaches))
 
 
+with open("README.md", 'r') as file:
+    readme_content = file.read()
+
 setup(
     name="pylimer_tools",
     version="0.1.11",
     description="A collection of utility python functions for handling LAMMPS output and polymers in Python ",
     long_description_content_type="text/markdown",
-    long_description=Path('README.md').read_text(),
+    long_description=readme_content,
     keywords=["Polymer", "Chemistry", "Network", "LAMMPS", "Science"],
     author="Tim Bernhard",
     author_email="tim@bernhard.dev",
