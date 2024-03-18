@@ -24,7 +24,8 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance
       ~MEHPForceBalance.configStepOutput
       ~MEHPForceBalance.constructWithRandomSlipLinks
       ~MEHPForceBalance.deformTo
-      ~MEHPForceBalance.evaluateDistanceBetween
+      ~MEHPForceBalance.evaluatePartialSpringDistance
+      ~MEHPForceBalance.evaluatePartialSpringDistanceFrom
       ~MEHPForceBalance.getAverageSpringLength
       ~MEHPForceBalance.getCrosslinkerVerse
       ~MEHPForceBalance.getDanglingWeightFraction
@@ -52,6 +53,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance
       ~MEHPForceBalance.getSolubleWeightFraction
       ~MEHPForceBalance.getSpringPartitions
       ~MEHPForceBalance.getSpringpartitionIndicesOfSliplink
+      ~MEHPForceBalance.getStressOn
       ~MEHPForceBalance.getStressTensor
       ~MEHPForceBalance.getStressTensorLinkBased
       ~MEHPForceBalance.inspectDisplacementToMeanPositionUpdate
