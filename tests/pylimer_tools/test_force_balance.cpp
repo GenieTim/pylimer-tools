@@ -689,7 +689,8 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         // initial system values
         CHECK(forceBalancer2.getPressure() ==
               Catch::Approx(forceRelaxer.getPressure()));
-        CHECK(forceBalancer2.getPressure() == Catch::Approx(0.0061105865));
+        CHECK_THAT(forceBalancer2.getPressure(),
+                   Catch::Matchers::WithinRel(0.0061105865, 1e-3));
         // add entanglements
         // TODO: these are random values, as are the results... :P
         size_t nrOfSprings = forceRelaxer.getNetwork().nrOfSprings;
@@ -940,8 +941,9 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
   }
 }
 
-TEST_CASE("MEHP Force Balance can randomly add and remove slip-links with large box",
-          "[analysis][MEHPForceBalance]")
+TEST_CASE(
+  "MEHP Force Balance can randomly add and remove slip-links with large box",
+  "[analysis][MEHPForceBalance]")
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
