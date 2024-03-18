@@ -649,10 +649,10 @@ init_pylimer_bound_calc(py::module_& m)
       "runForceRelaxation",
       [](mehp::MEHPForceBalance& sim,
          mehp::BalanceRunMode mode,
-         double damping ,
-         long int maxNrOfSteps , // default: 10000
-         double xtol ,
-         const double initialResidualToUse ,
+         double damping,
+         long int maxNrOfSteps, // default: 10000
+         double xtol,
+         const double initialResidualToUse,
          const mehp::StructureSimplificationMode simplificationMode,
          const double inactiveRemovalCutoff,
          bool doInnerIterations,
@@ -733,11 +733,22 @@ init_pylimer_bound_calc(py::module_& m)
          &mehp::MEHPForceBalance::swapSlipLinksInclXlinks)
     .def("moveSlipLinksToTheirBestBranch",
          &mehp::MEHPForceBalance::moveSlipLinksToTheirBestBranch)
-    .def("getForceOn",
-         &mehp::MEHPForceBalance::getForceOn,
-         R"pbdoc()pbdoc",
-         py::arg("linkIdx"),
-         py::arg("oneOverSpringPartitionUpperLimit") = 1.0)
+    .def(
+      "getForceOn",
+      [](mehp::MEHPForceBalance& sim,
+         const size_t linkIdx,
+         const double oneOver) { return sim.getForceOn(linkIdx, oneOver); },
+      R"pbdoc()pbdoc",
+      py::arg("linkIdx"),
+      py::arg("oneOverSpringPartitionUpperLimit") = 1.0)
+    .def(
+      "getStressOn",
+      [](mehp::MEHPForceBalance& sim,
+         const size_t linkIdx,
+         const double oneOver) { return sim.getStressOn(linkIdx, oneOver); },
+      R"pbdoc()pbdoc",
+      py::arg("linkIdx"),
+      py::arg("oneOverSpringPartitionUpperLimit") = 1.0)
     .def("inspectDisplacementToMeanPositionUpdate",
          &mehp::MEHPForceBalance::inspectDisplacementToMeanPositionUpdate,
          R"pbdoc()pbdoc",
@@ -767,13 +778,20 @@ init_pylimer_bound_calc(py::module_& m)
          R"pbdoc()pbdoc",
          py::arg("network"),
          py::arg("linkIdx"))
-    .def("evaluateDistanceBetween",
-         &mehp::MEHPForceBalance::evaluateDistanceBetween,
+    .def("evaluatePartialSpringDistance",
+         &mehp::MEHPForceBalance::evaluatePartialSpringDistance,
          R"pbdoc()pbdoc",
          py::arg("network"),
          py::arg("displacements"),
-         py::arg("linkIndexA"),
-         py::arg("linkIndexB"),
+         py::arg("springIdx"),
+         py::arg("is2D") = false)
+    .def("evaluatePartialSpringDistanceFrom",
+         &mehp::MEHPForceBalance::evaluatePartialSpringDistanceFrom,
+         R"pbdoc()pbdoc",
+         py::arg("network"),
+         py::arg("displacements"),
+         py::arg("springIdx"),
+         py::arg("linkIdx"),
          py::arg("is2D") = false)
     // .def("getForceEvaluator", &mehp::MEHPForceBalance::getForceEvaluator,
     // R"pbdoc(
@@ -1116,18 +1134,18 @@ init_pylimer_bound_calc(py::module_& m)
           :param innerXTolerance: The tolerance of the displacements of the slip-link as an inner exit condition.
           :param innerAlphaTolerance: The tolerance of the contour-length when slipping the slip-link as an inner exit condition.
           )pbdoc",
-         py::arg("maxNrOfSteps") = 250000,
-         py::arg("xTolerance") = 1e-12,
-         py::arg("initialResidualNorm") = -1.0,
-         py::arg("simplificationMode") =
-           mehp::StructureSimplificationMode::NO_SIMPLIFICATION,
-         py::arg("inactiveRemovalCutoff") = -1.0,
-         py::arg("doInnerIterations") = false,
-         py::arg("allowSlipLinksToPassEachOther") =
-           mehp::LinkSwappingMode::NO_SWAPPING,
-         py::arg("swappingFrequency") = 10,
-         py::arg("oneOverSpringPartitionUpperLimit") = 1.0,
-         py::arg("nrOfCrosslinkSwapsAllowedPerSliplink") = -1)
+      py::arg("maxNrOfSteps") = 250000,
+      py::arg("xTolerance") = 1e-12,
+      py::arg("initialResidualNorm") = -1.0,
+      py::arg("simplificationMode") =
+        mehp::StructureSimplificationMode::NO_SIMPLIFICATION,
+      py::arg("inactiveRemovalCutoff") = -1.0,
+      py::arg("doInnerIterations") = false,
+      py::arg("allowSlipLinksToPassEachOther") =
+        mehp::LinkSwappingMode::NO_SWAPPING,
+      py::arg("swappingFrequency") = 10,
+      py::arg("oneOverSpringPartitionUpperLimit") = 1.0,
+      py::arg("nrOfCrosslinkSwapsAllowedPerSliplink") = -1)
     .def("deformTo",
          &mehp::MEHPForceBalance2::deformTo,
          R"pbdoc()pbdoc",
