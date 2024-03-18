@@ -10,13 +10,37 @@
       "name": "Debug C++ Tests",
       "cwd": "${workspaceFolder}/tests/build",
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
-      "args": ["MEHP Force Balance handles slip-links"],
+      "args": ["MEHP Force Balance can randomly add and remove slip-links"],
       "env": {
         "MallocNanoZone": "0",
         "ASAN_OPTIONS": "detect_leaks=0",
         // "ASAN_OPTIONS": "detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1",
         "LSAN_OPTIONS": "suppressions=${workspaceFolder}/tests/lsan.supp"
       },
+      "preLaunchTask": "Compile Tests"
+    },
+    {
+      "type": "cppdbg",
+      "request": "launch",
+      "MIMode": "lldb",
+      "name": "Debug Cpp Tests",
+      "cwd": "${workspaceFolder}/tests/build",
+      "program": "${workspaceFolder}/tests/build/pylimer_tests",
+      "args": ["MEHP Force Balance can randomly add and remove slip-links with small box"],
+      "environment": [
+        {
+          "name": "MallocNanoZone",
+          "value": "0"
+        },
+        {
+          "name": "ASAN_OPTIONS",
+          "value": "detect_leaks=0",
+        },
+        {
+          "name": "LSAN_OPTIONS",
+          "value": "suppressions=${workspaceFolder}/tests/lsan.supp"
+        }
+      ],
       "preLaunchTask": "Compile Tests"
     }
   ]

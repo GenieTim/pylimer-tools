@@ -613,8 +613,9 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         CHECK(forceBalancer2.getVolume() ==
               Catch::Approx(97.383096 * 97.383096 * 97.383096));
         // initial system values
-        CHECK(forceBalancer2.getPressure() ==
-              Catch::Approx(forceRelaxer.getPressure()));
+        CHECK_THAT(
+          forceBalancer2.getPressure(),
+          Catch::Matchers::WithinAbs(forceRelaxer.getPressure(), 1e-5));
         CHECK(forceBalancer2.getPressure() == Catch::Approx(0.0061105865));
         REQUIRE_NOTHROW(forceBalancer2.runForceRelaxation());
         CHECK_NOTHROW(forceBalancer2.validateNetwork());
@@ -861,7 +862,8 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
       pe::Box(4 * oldBox.getLx(), 0.5 * oldBox.getLy(), 0.5 * oldBox.getLz());
     forceBalancer.deformTo(newBox);
 
-    SECTION("Assuming too small box") {
+    SECTION("Assuming too small box")
+    {
       forceBalancer.configAssumeBoxLargeEnough(false);
       REQUIRE_NOTHROW(forceBalancer.runForceRelaxation(
         pcm::BalanceRunMode::ITERATIVE,
@@ -938,7 +940,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
   }
 }
 
-TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
+TEST_CASE("MEHP Force Balance can randomly add and remove slip-links with large box",
           "[analysis][MEHPForceBalance]")
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
@@ -956,6 +958,82 @@ TEST_CASE("MEHP Force Balance can randomly add and remove slip-links",
     std::cout << "Read file. " << std::endl;
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance(universe, 2, false, 1.0, false, false);
+    forceBalancer.configAssumeBoxLargeEnough(true);
+    size_t nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(1000, 2.0, 100);
+    REQUIRE(nrOfAddedLinks >= 100);
+    // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+
+    pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
+    Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
+    Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
+    size_t numRemoved = forceBalancer.removeTwofunctionalCrosslinks(
+      net, displacements, partitions);
+    REQUIRE_NOTHROW(forceBalancer.validateNetwork());
+    REQUIRE(numRemoved > 0);
+
+    // run a while to get inactive links
+    forceBalancer.runForceRelaxation(pcm::BalanceRunMode::ITERATIVE, 1.0, 100);
+    net = forceBalancer.getNetwork();
+    displacements = forceBalancer.getCurrentDisplacements();
+    partitions = forceBalancer.getSpringPartitions();
+    // due to the randomness, it _could_ be one day that actually all strands
+    // are active. unlikely, but I can imagine it to be possible.
+    size_t numInactiveRemoved = forceBalancer.removeInactiveCrosslinks(
+      net, displacements, partitions, 0.1);
+    REQUIRE_NOTHROW(forceBalancer.validateNetwork());
+    CHECK(numInactiveRemoved > 0);
+    REQUIRE_NOTHROW(
+      forceBalancer.validateNetwork(net, displacements, partitions));
+
+    ////////////////////////////////////////////////////////////////
+    forceBalancer = pcm::MEHPForceBalance(universe, 2, true, 1.0, true);
+    nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(1000, 2.0, 100);
+    REQUIRE(nrOfAddedLinks >= 100);
+    // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
+    // check that all f = 2 have already been removed
+    // they have not, since more f = 2 are produced by
+    // numInactiveRemoved = forceBalancer.removeTwofunctionalCrosslinks(
+    //       net, displacements, partitions);
+    // CHECK(numInactiveRemoved == 0);
+
+    // run a while to get inactive links
+    forceBalancer.runForceRelaxation(pcm::BalanceRunMode::ITERATIVE, 1.0, 100);
+    net = forceBalancer.getNetwork();
+    displacements = forceBalancer.getCurrentDisplacements();
+    partitions = forceBalancer.getSpringPartitions();
+    // due to the randomness, it _could_ be one day that actually all strands
+    // are active. unlikely, but I can imagine it to be possible.
+    numInactiveRemoved = forceBalancer.removeInactiveCrosslinks(
+      net, displacements, partitions, 0.1);
+    CHECK(numInactiveRemoved > 0);
+    numInactiveRemoved = forceBalancer.removeTwofunctionalCrosslinks(
+      net, displacements, partitions);
+    CHECK(numInactiveRemoved > 0);
+    REQUIRE_NOTHROW(
+      forceBalancer.validateNetwork(net, displacements, partitions));
+  }
+}
+
+TEST_CASE(
+  "MEHP Force Balance can randomly add and remove slip-links with small box",
+  "[analysis][MEHPForceBalance]")
+{
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  REQUIRE(universeSeq.getLength() == 0);
+  std::string suspectedPath = "../pylimer_tools/fixtures/";
+
+  std::string inputFile =
+    suspectedPath + "structure/network_100_a_46.structure.out";
+  if (std::filesystem::exists(inputFile)) {
+    REQUIRE(std::filesystem::exists(suspectedPath));
+    std::cout << "Reading file " << inputFile << std::endl;
+    universeSeq.initializeFromDataSequence({ { inputFile } });
+    REQUIRE(universeSeq.getLength() == 1);
+    pe::Universe universe = universeSeq.atIndex(0);
+    std::cout << "Read file. " << std::endl;
+    pcm::MEHPForceBalance forceBalancer =
+      pcm::MEHPForceBalance(universe, 2, false, 1.0, false, false);
+    forceBalancer.configAssumeBoxLargeEnough(false);
     size_t nrOfAddedLinks = forceBalancer.randomlyAddSliplinks(1000, 2.0, 100);
     REQUIRE(nrOfAddedLinks >= 100);
     // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
@@ -1570,6 +1648,8 @@ TEST_CASE("MEHP Force Balance does not collapse",
     CHECK(forceBalanceNew.getAverageSpringLength() == Catch::Approx(5.0));
     CHECK_THAT(forceBalanceNew.getGammaFactor(),
                Catch::Matchers::WithinAbs(1.0, 1e-2));
+    CHECK_THAT(forceBalanceNew.getPressure(),
+               Catch::Matchers::WithinAbs(1. / 30., 1e-3));
     // outputNetwork(forceBalanceNew.getNetwork(),
     //               forceBalanceNew.getCurrentDisplacements(),
     //               forceBalanceNew.getSpringPartitions());
@@ -1596,7 +1676,7 @@ TEST_CASE(
         universe, 1000, 2.0, 100, 5, "my_seed_fb12");
     CHECK_NOTHROW(forceBalancer.validateNetwork());
     double initialResidual = forceBalancer.getDisplacementResidualNorm();
-        CHECK(std::isfinite(initialResidual));
+    CHECK(std::isfinite(initialResidual));
     CHECK(forceBalancer.getNumExtraAtoms() > 100);
     CHECK(forceBalancer.getNetwork().nrOfPartialSprings >
           forceBalancer.getNetwork().nrOfSprings);

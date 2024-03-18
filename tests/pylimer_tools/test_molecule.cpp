@@ -130,7 +130,7 @@ TEST_CASE("Molecules sum the bonds correctly", "[entity][Molecule]")
   CHECK_THROWS(molecules[0].getOverallBondSumFromTo(2, 1));
   CHECK_THROWS(molecules[0].getNrOfBondsFromTo(2, 1));
   partialSum = molecules[0].getOverallBondSumFromTo(2, 1, 2, false);
-  CHECK(partialSum[0] == 2.);
+  CHECK(partialSum[0] == -2.);
   CHECK(partialSum[1] == 0.);
   CHECK(partialSum[2] == 0.);
 

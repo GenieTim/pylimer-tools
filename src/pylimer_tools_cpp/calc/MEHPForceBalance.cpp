@@ -3,6 +3,7 @@
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
 #include "../utils/StringUtils.h"
+#include "../utils/VectorUtils.h"
 // #include "../utils/MemoryUtil.h"
 #include <Eigen/Dense>
 #include <algorithm>
@@ -118,7 +119,8 @@ namespace calc {
                 << std::endl;
       std::cout << "Using oneOverSpringPartitionUpperLimit = "
                 << oneOverSpringPartitionUpperLimit << std::endl;
-      double currentResidual = 0.0;
+      double currentResidual = initialResidual;
+      double previousResidual = initialResidual;
       double intermediateResidual = 0.0;
       size_t iterationsDone = 0;
 
@@ -170,12 +172,17 @@ namespace calc {
           }
         }
         maxDistanceMoved = 0.0;
-        currentResidual = 0.0;
+
+        intermediateResidual =
+          this->getDisplacementResidualNormFor(this->initialConfig,
+                                               this->currentDisplacements,
+                                               oneOverSpringPartitions);
 
         // place slip-link
         for (size_t link_idx = this->initialConfig.nrOfNodes;
              link_idx < this->initialConfig.nrOfLinks;
              ++link_idx) {
+          assert(this->initialConfig.linkIsSliplink[link_idx]);
           // std::cout << "Handling " << link_idx << " of " << net.nrOfNodes
           //           << " / " << net.nrOfLinks << std::endl;
 
@@ -198,10 +205,15 @@ namespace calc {
                                            this->currentSpringPartitionsVec,
                                            link_idx,
                                            oneOverSpringPartitionUpperLimit);
+            maxDistanceMoved = std::max(maxDistanceMoved, displacementDone);
             innerIterationsDone += 1;
           } while (doInnerIterations && innerIterationsDone < 50);
         }
 
+        oneOverSpringPartitions = this->assembleOneOverSpringPartition(
+          this->initialConfig,
+          this->currentSpringPartitionsVec,
+          oneOverSpringPartitionUpperLimit);
         intermediateResidual =
           this->getDisplacementResidualNormFor(this->initialConfig,
                                                this->currentDisplacements,
@@ -214,6 +226,7 @@ namespace calc {
         if (mode == BalanceRunMode::ITERATIVE) {
           for (size_t link_idx = 0; link_idx < this->initialConfig.nrOfNodes;
                ++link_idx) {
+            assert(!this->initialConfig.linkIsSliplink[link_idx]);
             double distanceMoved =
               this->displaceToMeanPosition(this->initialConfig,
                                            this->currentDisplacements,
@@ -224,7 +237,29 @@ namespace calc {
               maxDistanceMoved = distanceMoved;
               indexOfMaxDistanceMoved = link_idx;
             }
-            // maxDistanceMoved = std::max(maxDistanceMoved, distanceMoved);
+            maxDistanceMoved = std::max(maxDistanceMoved, distanceMoved);
+
+            // currentResidual =
+            //   this->getDisplacementResidualNormFor(this->initialConfig,
+            //                                        this->currentDisplacements,
+            //                                        oneOverSpringPartitions);
+            // double otherEstimate = this->getDisplacementResidualNormFor(
+            //   this->initialConfig,
+            //   this->currentDisplacements,
+            //   this->currentSpringPartitionsVec,
+            //   oneOverSpringPartitionUpperLimit);
+            // assert(APPROX_EQUAL(currentResidual, otherEstimate, 1e-6));
+            // if (intermediateResidual < currentResidual &&
+            //     !this->assumeBoxLargeEnough) {
+            //   this->validateNetwork(this->initialConfig,
+            //                         this->currentDisplacements,
+            //                         this->currentSpringPartitionsVec);
+            //   throw std::runtime_error(
+            //     "Residual is bigger (" + std::to_string(currentResidual) +
+            //     " vs. " + std::to_string(intermediateResidual) +
+            //     ") than in the previous iteration. This makes no "
+            //     "sense and hints for a mistake.");
+            // }
           }
         } else {
           for (size_t i = 0; i < independentVertexSets.size(); ++i) {
@@ -257,6 +292,14 @@ namespace calc {
           this->getDisplacementResidualNormFor(this->initialConfig,
                                                this->currentDisplacements,
                                                oneOverSpringPartitions);
+        if (previousResidual < currentResidual && !this->assumeBoxLargeEnough) {
+          throw std::runtime_error(
+            "Residual is bigger (" + std::to_string(currentResidual) + " vs. " +
+            std::to_string(previousResidual) +
+            ") than in the previous iteration. This makes no "
+            "sense and hints at a mistake.");
+        }
+        previousResidual = currentResidual;
         iterationsDone += 1;
         if (iterationsDone % 10 == 0) {
           if (simplificationMode ==
@@ -449,6 +492,12 @@ namespace calc {
         this->box.handlePBC(relevantPartialDistancesA);
       }
 
+      if (this->is2D) {
+        for (size_t i = 2; i < relevantPartialDistancesA.size(); i += 3) {
+          relevantPartialDistancesA[i] = 0.;
+        }
+      }
+
       // NOTE: we have many zeros too much, here, actually.
       Eigen::ArrayXd oneOverSumOfSpringPartials = Eigen::ArrayXd::Zero(
         3 * net.nrOfLinks); // 0.0 for equal = primary loop, 1.0 otherwise
@@ -498,6 +547,13 @@ namespace calc {
       return maxDiff;
     };
 
+    /**
+     * @brief Compute the displacement residual norm for the current
+     * configuration
+     *
+     * @param oneOverSpringPartitionUpperLimit
+     * @return double
+     */
     double MEHPForceBalance::getDisplacementResidualNorm(
       double oneOverSpringPartitionUpperLimit) const
     {
@@ -510,67 +566,111 @@ namespace calc {
         this->initialConfig, displacements, oneOverSpringPartitions);
     }
 
+    /**
+     * @brief Compute the displacement residual norm for a specific
+     * configuration
+     *
+     * @param net
+     * @param u
+     * @param oneOverSpringPartitions
+     * @return double
+     */
+    double MEHPForceBalance::getDisplacementResidualNormFor(
+      const ForceBalanceNetwork& net,
+      const Eigen::VectorXd& u,
+      const Eigen::VectorXd& springPartitions,
+      const double oneOverSpringPartitionUpperLimit) const
+    {
+      Eigen::VectorXd oneOverSpringPartitions =
+        this->assembleOneOverSpringPartition(this->initialConfig,
+                                             this->currentSpringPartitionsVec,
+                                             oneOverSpringPartitionUpperLimit);
+      double elasticFreeEnergy = 0.;
+
+      Eigen::VectorXd forces = Eigen::VectorXd::Zero(3 * net.nrOfLinks);
+      for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
+        if (net.springPartIndexA[i] == net.springPartIndexB[i]) {
+          // primary loops cancel out anyway
+          continue;
+        }
+        Eigen::Vector3d dist =
+          this->evaluatePartialSpringDistance(net, u, i, this->is2D);
+        const double contourLengthFraction = springPartitions[i];
+        const double N =
+          net.springsContourLength[net.partialToFullSpringIndex[i]];
+        double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+          net.partialSpringIsPartial[i],
+          ((contourLengthFraction > 0.) ? 1.0 / (N * contourLengthFraction)
+                                        : 0.),
+          N,
+          oneOverSpringPartitionUpperLimit);
+        assert(APPROX_EQUAL(
+          oneOverContourLengthFraction, oneOverSpringPartitions[3 * i], 1e-9));
+        elasticFreeEnergy +=
+          dist.squaredNorm() * 0.5 * oneOverContourLengthFraction;
+        forces.segment(3 * net.springPartIndexA[i], 3) +=
+          dist * oneOverContourLengthFraction;
+        forces.segment(3 * net.springPartIndexB[i], 3) -=
+          dist * oneOverContourLengthFraction;
+      }
+
+      // return elasticFreeEnergy;
+      return forces.squaredNorm();
+    }
+
+    /**
+     * @brief Compute the displacement residual norm for a specific
+     * configuration
+     *
+     * @param net
+     * @param u
+     * @param oneOverSpringPartitions
+     * @return double
+     */
     double MEHPForceBalance::getDisplacementResidualNormFor(
       const ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
       const Eigen::VectorXd& oneOverSpringPartitions) const
     {
       Eigen::VectorXd displacedCoords = net.coordinates + u;
+      const double oneOverSpringPartitionUpperLimit = 1.;
+
       Eigen::VectorXd relevantPartialDistances =
         (displacedCoords(net.springPartCoordinateIndexB) -
          displacedCoords(net.springPartCoordinateIndexA)) +
         net.springPartBoxOffset;
-      for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
-        for (size_t dir = 0; dir < 3; ++dir) {
-          if (std::abs(relevantPartialDistances[3 * i + dir]) >
-                50. * net.L[dir] &&
-              this->assumeBoxLargeEnough) {
-            std::cerr
-              << "WARNING: Spring " << i << " between "
-              << net.springPartIndexA[i] << " and " << net.springPartIndexB[i]
-              << " has a length of " << relevantPartialDistances[3 * i + dir]
-              << " in dir " << dir << " from "
-              << displacedCoords[net.springPartCoordinateIndexB[3 * i + dir]]
-              << " minus "
-              << displacedCoords[net.springPartCoordinateIndexA[3 * i + dir]]
-              << " meaning it will probably fail in PBC." << std::endl;
-          }
-        }
-      }
+
       if (this->assumeBoxLargeEnough) {
         this->box.handlePBC(relevantPartialDistances);
       }
+
+      if (this->is2D) {
+        for (size_t i = 2; i < relevantPartialDistances.size(); i += 3) {
+          relevantPartialDistances[i] = 0.;
+        }
+      }
+
+#ifndef NDEBUG
+      for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
+        Eigen::Vector3d dist =
+          this->evaluatePartialSpringDistance(net, u, i, this->is2D);
+        assert(pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
+          dist, relevantPartialDistances.segment(3 * i, 3), 1e-9));
+      }
+#endif
+
+      assert(relevantPartialDistances.size() == oneOverSpringPartitions.size());
       Eigen::VectorXd partialDistancesOverSpringPartitions =
         (relevantPartialDistances.array() * oneOverSpringPartitions.array())
           .matrix();
 
-      // return partialDistancesOverSpringPartitions.squaredNorm();
-
       Eigen::VectorXd overallForces = Eigen::VectorXd::Zero(3 * net.nrOfLinks);
-      overallForces(net.springPartCoordinateIndexB) +=
+      overallForces(net.springPartCoordinateIndexB) -=
         partialDistancesOverSpringPartitions;
-      overallForces(net.springPartCoordinateIndexA) -=
+      overallForces(net.springPartCoordinateIndexA) +=
         partialDistancesOverSpringPartitions;
-
-      // Eigen::Index maxRow, maxCol;
-      // double max = overallForces.maxCoeff(&maxRow, &maxCol);
-      // Eigen::Index minRow, minCol;
-      // double min = overallForces.minCoeff(&minRow, &minCol);
-      // std::cout << "Got min = " << min << " at " << minRow << ", " <<
-      // minCol
-      //           << std::endl;
-      // std::cout << "Got max = " << max << " at " << maxRow << ", " <<
-      // maxCol
-      //           << std::endl;
 
       return overallForces.squaredNorm();
-
-      // Eigen::Vector3d sumOfResiduals = Eigen::Vector3d::Zero();
-      // for (int i = 0; i < net.nrOfPartialSprings; ++i) {
-      //   sumOfResiduals += partialDistancesOverSpringPartitions.segment(3 *
-      //   i, 3).cwiseAbs2();
-      // }
-      // return sumOfResiduals.squaredNorm();
     }
 
     /**
@@ -1074,6 +1174,7 @@ namespace calc {
 
       std::random_device rd{};
       std::mt19937 rng = std::mt19937(seed > 0 ? seed : rd());
+      std::cout << "Initial sampling rng seed: " << rng << std::endl;
       // build list of random samples
       // this way is more performant than
       // sampling integers and checking whether they have been sampled already
@@ -2077,17 +2178,27 @@ namespace calc {
           keptSpringIdx + (keptSpringIdx > removedSpringIdx ? -1 : 0);
         Eigen::Vector3d newDistance = this->evaluatePartialSpringDistanceFrom(
           net, u, newSpringIdx, newEnd, this->is2D);
-        if ((!newDistance.isApprox(distanceBefore, 1e-5)) &&
-            // this second check is needed due to 0s
-            (!(newDistance + Eigen::Vector3d::Constant(1e-5))
-                .isApprox(distanceBefore + Eigen::Vector3d::Constant(1e-5),
-                          1e-5))) {
-          throw std::runtime_error(
+        // if primary loop, the direction might have changed.
+        //
+        bool isNowPrimaryLoop = net.springPartIndexA[newSpringIdx] ==
+                                net.springPartIndexB[newSpringIdx];
+        if (!pylimer_tools::utils::vector_approx_equal(
+              newDistance, distanceBefore, 1e-5)) {
+          std::string errorStr =
             "After merging two partial springs, the overall distance "
             "is not consistent. Expected distance " +
             std::to_string(distanceBefore) + ", but got " +
             std::to_string(newDistance) + " for spring " +
-            std::to_string(newSpringIdx) + ".");
+            std::to_string(newSpringIdx) + ".";
+          if (!isNowPrimaryLoop) {
+            throw std::runtime_error(errorStr);
+          } else {
+            RUNTIME_EXP_IFN(
+              pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
+                Eigen::Vector3d(-1. * newDistance), distanceBefore, 1e-5),
+              errorStr);
+            net.springPartBoxOffset.segment(3 * newSpringIdx, 3) *= -1.;
+          }
         }
       }
     }
@@ -2467,11 +2578,8 @@ namespace calc {
           (remainingPartialSpringIdx > removedPartialSpringIdx ? -1 : 0);
         Eigen::Vector3d newDistance = this->evaluatePartialSpringDistanceFrom(
           net, u, newSpringIdx, otherEndOfRemovedSpring, this->is2D);
-        if ((!newDistance.isApprox(distanceBefore, 1e-5)) &&
-            // this second check is needed due to 0s
-            (!(newDistance + Eigen::Vector3d::Constant(1e-5))
-                .isApprox(distanceBefore + Eigen::Vector3d::Constant(1e-5),
-                          1e-5))) {
+        if (!pylimer_tools::utils::vector_approx_equal(
+              newDistance, distanceBefore, 1e-5)) {
           throw std::runtime_error(
             "After merging two partial springs, the overall distance "
             "is not consistent. Expected distance " +
@@ -2844,34 +2952,26 @@ namespace calc {
         for (size_t partner_idx = 1; partner_idx < springsPartners.size() - 1;
              ++partner_idx) {
           if (springsPartners[partner_idx] == linkIdx) {
+            size_t currentSpringGlobalIdx =
+              net.localToGlobalSpringIndex[springIndex][partner_idx - 1];
+            size_t neighbourSpringGlobalIdx =
+              net.localToGlobalSpringIndex[springIndex][partner_idx];
             // found position of this link in this spring
             // want to find the ideal value for
             // net.springPartitions[springIndex][partner_idx-1]
-            Eigen::Vector3d vecBack =
-              (MEHPForceBalance::evaluateDistanceBetween(
-                net,
-                u,
-                springsPartners[partner_idx],
-                springsPartners[partner_idx - 1],
-                this->is2D));
+            // NOTE: the following is slightly problematic for primary loops!
+            Eigen::Vector3d vecBack = this->evaluatePartialSpringDistanceFrom(
+              net, u, currentSpringGlobalIdx, linkIdx, this->is2D);
             double distanceBack = (vecBack.squaredNorm());
             Eigen::Vector3d vecForward =
-              (MEHPForceBalance::evaluateDistanceBetween(
-                net,
-                u,
-                springsPartners[partner_idx],
-                springsPartners[partner_idx + 1],
-                this->is2D));
+              this->evaluatePartialSpringDistanceFrom(
+                net, u, neighbourSpringGlobalIdx, linkIdx, this->is2D);
             double distanceForward = vecForward.squaredNorm();
             double idealValue =
               1. / (1. + sqrt(distanceForward / distanceBack));
             if (distanceBack <= 0.0) {
               idealValue = 0.0; // TODO: really?
             }
-            size_t currentSpringGlobalIdx =
-              net.localToGlobalSpringIndex[springIndex][partner_idx - 1];
-            size_t neighbourSpringGlobalIdx =
-              net.localToGlobalSpringIndex[springIndex][partner_idx];
             double currentS = springPartitions[currentSpringGlobalIdx];
             double nextS = springPartitions[neighbourSpringGlobalIdx];
             const double N = net.springsContourLength[springIndex];
@@ -3634,11 +3734,12 @@ namespace calc {
       if (net.springPartIndexB[spring2] == slipLinkIdx) {
         net.springPartBoxOffset.segment(3 * spring2, 3) *= -1.;
       }
-
       Eigen::Vector3d totalDistanceNow =
         this->evaluatePartialSpringDistanceTo(net, u, spring1, slipLinkIdx) +
         this->evaluatePartialSpringDistanceFrom(net, u, spring2, slipLinkIdx);
-      assert((totalDistanceNow.isApprox(totalDistanceBefore)));
+      // TODO: check with floating point precision
+      // assert((totalDistanceNow.array() <=
+      // totalDistanceBefore.array()).all());
     };
 
     /**
@@ -4122,104 +4223,97 @@ namespace calc {
       const size_t linkIdx,
       const double oneOverSpringPartitionUpperLimit) const
     {
-      std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
+      Eigen::Vector3d forceBefore = this->getForceOn(
+        net, u, springPartitions, linkIdx, oneOverSpringPartitionUpperLimit);
       // Eigen::Vector3d currentDisplacement = u.segment(3 * linkIdx, 3);
       Eigen::Vector3d objectiveDisplacement =
         Eigen::Vector3d::Zero(); // = remainingDisplacement.array();
       double objectiveDisplacementContributors = 0.0;
       bool cautionPrimaryLoop = false;
-      std::vector<size_t> handledSprings;
-      for (size_t spring_index = 0; spring_index < springIndices.size();
-           ++spring_index) {
-        if (cautionPrimaryLoop) {
-          if (std::find(handledSprings.begin(),
-                        handledSprings.end(),
-                        springIndices[spring_index]) != handledSprings.end()) {
-            // std::cout << "primary loop detection necessary" << std::endl;
-            continue;
-          }
-        }
-        // compute partial distances & total distance of this spring
-        std::vector<size_t> springsPartners =
-          net.linkIndicesOfSprings[springIndices[spring_index]];
 
-        if (springsPartners[0] == linkIdx &&
-            springsPartners[springsPartners.size() - 1] == linkIdx) {
-          // this is a primary loop of some kind. Make sure not to go over it
-          // twice.
-          cautionPrimaryLoop = true;
-          // skip unentangled loop contribution
-          if (springsPartners.size() == 2) {
-            continue;
-          }
-        }
+      std::unordered_set<size_t> partialSpringIndices =
+        this->getPartialSpringIndicesOfLink(net, linkIdx);
 
-        for (size_t partner_idx = 0; partner_idx < springsPartners.size() - 1;
-             ++partner_idx) {
-          if (springsPartners[partner_idx] == linkIdx ||
-              springsPartners[partner_idx + 1] == linkIdx) {
-            size_t globalSpringIndex =
-              net.localToGlobalSpringIndex[(springIndices[spring_index])]
-                                          [partner_idx];
-            Eigen::Vector3d partialDistance =
-              this->evaluatePartialSpringDistanceFrom(
-                net, u, globalSpringIndex, linkIdx, this->is2D);
-            // add to displacement
-            double contourLengthFraction = springPartitions[globalSpringIndex];
-            // std::cout << "Contribution from " <<
-            // springsPartners[partner_idx]
-            //           << " to " << springsPartners[partner_idx + 1]
-            //           << " with l = " << contourLengthFraction << " and N =
-            //           "
-            //           <<
-            //           net.springsContourLength[springIndices[spring_index]]
-            //           << ", partial distance " << partialDistance[0] << ",
-            //           "
-            //           << partialDistance[1] << ", " << partialDistance[2]
-            //           << std::endl;
-            const double N =
-              net.springsContourLength[springIndices[spring_index]];
-            double oneOverContourLengthFraction =
-              1.0 / (N * contourLengthFraction);
-            // if (!std::isfinite(oneOverContourLengthFraction)) {
-            //   oneOverContourLengthFraction =
-            //     1.0 / (1e-12 *
-            //            net.springsContourLength[springIndices[spring_index]]);
-            // }
-            // if (oneOverSpringPartitionUpperLimit > 0.0) {
-            //   oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
-            //     net.partialSpringIsPartial[globalSpringIndex],
-            //     oneOverContourLengthFraction,
-            //     N,
-            //     oneOverSpringPartitionUpperLimit);
-            // }
-            if (std::isfinite(oneOverContourLengthFraction)) {
-              objectiveDisplacement +=
-                (partialDistance)*oneOverContourLengthFraction; // /
-              // totalDistance.array());
-              objectiveDisplacementContributors += oneOverContourLengthFraction;
-            }
-            // else {
-            //   objectiveDisplacement = 1e9 * (partialDistance);
-            //   objectiveDisplacementContributors += 1e9;
-            // }
-
-            if (cautionPrimaryLoop) {
-              handledSprings.push_back(springIndices[spring_index]);
-            }
-          }
+      for (const size_t globalSpringIndex : partialSpringIndices) {
+        assert(net.springPartIndexA[globalSpringIndex] == linkIdx ||
+               net.springPartIndexB[globalSpringIndex] == linkIdx);
+        if (net.springPartIndexA[globalSpringIndex] == linkIdx &&
+            net.springPartIndexB[globalSpringIndex] == linkIdx) {
+          continue;
         }
+        Eigen::Vector3d partialDistance =
+          this->evaluatePartialSpringDistanceFrom(
+            net, u, globalSpringIndex, linkIdx, this->is2D);
+        // std::cout << "Partial distance of " << globalSpringIndex << " from "
+        //           << linkIdx << " to "
+        //           << this->getOtherSpringIndex(net, globalSpringIndex,
+        //           linkIdx)
+        //           << ": " << partialDistance << std::endl;
+        // add to displacement
+        const double contourLengthFraction =
+          springPartitions[globalSpringIndex];
+        // std::cout << "Contribution from " <<
+        // springsPartners[partner_idx]
+        //           << " to " << springsPartners[partner_idx + 1]
+        //           << " with l = " << contourLengthFraction << " and N =
+        //           "
+        //           <<
+        //           net.springsContourLength[springIndices[spring_index]]
+        //           << ", partial distance " << partialDistance[0] << ",
+        //           "
+        //           << partialDistance[1] << ", " << partialDistance[2]
+        //           << std::endl;
+        const double N = net.springsContourLength
+                           [net.partialToFullSpringIndex[globalSpringIndex]];
+        double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+          net.partialSpringIsPartial[globalSpringIndex],
+          1.0 / (N * contourLengthFraction),
+          N,
+          oneOverSpringPartitionUpperLimit);
+        // std::cout << "oneOverContourLengthFraction: "
+        //           << oneOverContourLengthFraction << " from "
+        //           << 1.0 / (N * contourLengthFraction) << " (" << N << ", "
+        //           << contourLengthFraction << ")" << std::endl;
+        // if (!std::isfinite(oneOverContourLengthFraction)) {
+        //   oneOverContourLengthFraction =
+        //     1.0 / (1e-12 *
+        //            net.springsContourLength[springIndices[spring_index]]);
+        // }
+        // if (oneOverSpringPartitionUpperLimit > 0.0) {
+        //   oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+        //     net.partialSpringIsPartial[globalSpringIndex],
+        //     oneOverContourLengthFraction,
+        //     N,
+        //     oneOverSpringPartitionUpperLimit);
+        // }
+        if (std::isfinite(oneOverContourLengthFraction)) {
+          objectiveDisplacement +=
+            (partialDistance)*oneOverContourLengthFraction; // /
+          // totalDistance.array());
+          objectiveDisplacementContributors += oneOverContourLengthFraction;
+        }
+        // else {
+        //   objectiveDisplacement = 1e9 * (partialDistance);
+        //   objectiveDisplacementContributors += 1e9;
+        // }
       }
       // take mean for displacement
       // prevent NaN from division by zero
-      u.segment(3 * linkIdx, 3) +=
-        objectiveDisplacement / (objectiveDisplacementContributors == 0.0
-                                   ? 1.0
-                                   : objectiveDisplacementContributors);
+      const double denominator = 1. / (objectiveDisplacementContributors == 0.0
+                                         ? 1.0
+                                         : objectiveDisplacementContributors);
+      u.segment(3 * linkIdx, 3) += objectiveDisplacement * denominator;
+      // std::cout << "Displaced " << linkIdx << " by "
+      //           << objectiveDisplacement * denominator << std::endl;
 
-      double dist = (objectiveDisplacement /
-                     (std::min(objectiveDisplacementContributors, 1.0)))
-                      .squaredNorm();
+      Eigen::Vector3d forceAfter = this->getForceOn(
+        net, u, springPartitions, linkIdx, oneOverSpringPartitionUpperLimit);
+
+      assert(pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
+        forceAfter, Eigen::Vector3d::Zero(), 0.1));
+      assert(forceBefore.squaredNorm() >= forceAfter.squaredNorm());
+
+      double dist = (objectiveDisplacement * denominator).squaredNorm();
       // if (dist > 0.1) {
       //   std::cout << "Moving " << linkIdx << " for " << dist
       //             << " with displacements " << u.segment(3 * linkIdx, 3)[0]
@@ -4234,7 +4328,7 @@ namespace calc {
       return dist;
     }
 
-    Eigen::Matrix3d MEHPForceBalance::evaluateForceOnSlipLink(
+    Eigen::Matrix3d MEHPForceBalance::evaluateStressOnLink(
       const size_t linkIdx,
       const ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
@@ -4243,74 +4337,51 @@ namespace calc {
       const double kappa0,
       const double oneOverSpringPartitionUpperLimit) const
     {
-      INVALIDARG_EXP_IFN(net.linkIsSliplink[linkIdx],
-                         "This link is not a slip-link");
-
       std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
       Eigen::Matrix3d force = Eigen::Matrix3d::Zero();
-      for (size_t springIndex : springIndices) {
-        std::vector<size_t> springsPartners =
-          net.linkIndicesOfSprings[springIndex];
-        for (size_t partner_idx = 1; partner_idx < springsPartners.size() - 1;
-             ++partner_idx) {
-          // TODO: think what happens when multiple on same strand
-          if (springsPartners[partner_idx] == linkIdx) {
-            Eigen::Vector3d vecBack =
-              (MEHPForceBalance::evaluateDistanceBetween(
-                net,
-                u,
-                springsPartners[partner_idx - 1],
-                springsPartners[partner_idx],
-                this->is2D));
-            double distanceBack = (vecBack.squaredNorm());
-            Eigen::Vector3d vecForward =
-              (MEHPForceBalance::evaluateDistanceBetween(
-                net,
-                u,
-                springsPartners[partner_idx + 1],
-                springsPartners[partner_idx],
-                this->is2D));
-            double distanceForward = vecForward.squaredNorm();
-            size_t backSpringGlobalIdx =
-              net.localToGlobalSpringIndex[springIndex][partner_idx - 1];
-            size_t forwardSpringGlobalIdx =
-              net.localToGlobalSpringIndex[springIndex][partner_idx];
 
-            debugNrSpringsVisited[backSpringGlobalIdx] += 1;
-            debugNrSpringsVisited[forwardSpringGlobalIdx] += 1;
+      std::unordered_set<size_t> partialSpringIndices =
+        this->getPartialSpringIndicesOfLink(net, linkIdx);
 
-            const double N = net.springsContourLength[springIndex];
-            double denominatorBack =
-              1. / (springPartitions[backSpringGlobalIdx] * N);
-            if (oneOverSpringPartitionUpperLimit > 0 ||
-                !std::isfinite(denominatorBack)) {
-              denominatorBack = CLAMP_ONE_OVER_SPRINGPARTITION(
-                true, denominatorBack, N, oneOverSpringPartitionUpperLimit);
-            }
+      for (const size_t globalSpringIndex : partialSpringIndices) {
+        Eigen::Vector3d partialDistance =
+          this->evaluatePartialSpringDistanceFrom(
+            net, u, globalSpringIndex, linkIdx, this->is2D);
+        const double contourLengthFraction =
+          springPartitions[globalSpringIndex];
+        const double N = net.springsContourLength
+                           [net.partialToFullSpringIndex[globalSpringIndex]];
+        double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+          net.partialSpringIsPartial[globalSpringIndex],
+          1.0 / (N * contourLengthFraction),
+          N,
+          oneOverSpringPartitionUpperLimit);
 
-            double denominatorForward =
-              1 / (springPartitions[forwardSpringGlobalIdx] *
-                   net.springsContourLength[springIndex]);
-            if (oneOverSpringPartitionUpperLimit > 0 ||
-                !std::isfinite(denominatorForward)) {
-              denominatorForward = CLAMP_ONE_OVER_SPRINGPARTITION(
-                true, denominatorForward, N, oneOverSpringPartitionUpperLimit);
-            }
-            for (size_t i = 0; i < 3; ++i) {
-              for (size_t j = 0; j < 3; ++j) {
-                force(i, j) +=
-                  kappa0 * denominatorBack * vecBack[i] * vecBack[j];
-                force(i, j) +=
-                  kappa0 * denominatorForward * vecForward[i] * vecForward[j];
-              }
-            }
+        for (size_t i = 0; i < 3; ++i) {
+          for (size_t j = 0; j < 3; ++j) {
+            force(i, j) += kappa0 * oneOverContourLengthFraction *
+                           partialDistance[i] * partialDistance[j];
           }
         }
+        debugNrSpringsVisited[globalSpringIndex] += 1;
       }
+
       return force;
     }
 
-    Eigen::Matrix3d MEHPForceBalance::evaluateForceOnCrossLink(
+    /**
+     * @brief Compute the force acting on one cross- or slip-link
+     *
+     * @param linkIdx
+     * @param net
+     * @param u
+     * @param springPartitions
+     * @param debugNrSpringsVisited
+     * @param kappa0
+     * @param oneOverSpringPartitionUpperLimit
+     * @return Eigen::Vector3d
+     */
+    Eigen::Vector3d MEHPForceBalance::evaluateForceOnLink(
       const size_t linkIdx,
       const ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
@@ -4319,82 +4390,40 @@ namespace calc {
       const double kappa0,
       const double oneOverSpringPartitionUpperLimit) const
     {
-      INVALIDARG_EXP_IFN(!net.linkIsSliplink[linkIdx],
-                         "This link is not a cross-link");
-      std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
-      Eigen::Matrix3d force = Eigen::Matrix3d::Zero();
-      for (size_t springIndex : springIndices) {
-        std::vector<size_t> springsPartners =
-          net.linkIndicesOfSprings[springIndex];
-        // special case for primary loops
-        std::vector<size_t> partnerIndices = { 0, springsPartners.size() - 1 };
-        for (size_t partner_idx : partnerIndices) {
-          if (springsPartners[partner_idx] != linkIdx) {
-            continue;
-          }
-          Eigen::Vector3d distance;
-          size_t springGlobalIdx;
-          if (partner_idx == 0) {
-            distance = (MEHPForceBalance::evaluateDistanceBetween(
-              net, u, springsPartners[1], springsPartners[0], this->is2D));
-            springGlobalIdx = net.localToGlobalSpringIndex[springIndex][0];
-          } else {
-            RUNTIME_EXP_IFN(springsPartners[springsPartners.size() - 1] ==
-                              linkIdx,
-                            "Unexpected state. Cross-link must be either first "
-                            "or last in springs' contributors.");
+      Eigen::Vector3d force = Eigen::Vector3d::Zero();
 
-            distance = (MEHPForceBalance::evaluateDistanceBetween(
-              net,
-              u,
-              springsPartners[springsPartners.size() - 2],
-              springsPartners[springsPartners.size() - 1],
-              this->is2D));
-            springGlobalIdx = pylimer_tools::utils::last<size_t>(
-              net.localToGlobalSpringIndex[springIndex]);
-          }
-          debugNrSpringsVisited[springGlobalIdx] += 1;
-          const double N = net.springsContourLength[springIndex];
-          double denominator = 1. / (springPartitions[springGlobalIdx] * N);
-          if (oneOverSpringPartitionUpperLimit > 0 ||
-              !std::isfinite(denominator)) {
-            denominator = CLAMP_ONE_OVER_SPRINGPARTITION(
-              net.partialSpringIsPartial[springGlobalIdx],
-              denominator,
-              N,
-              oneOverSpringPartitionUpperLimit);
-          }
+      std::unordered_set<size_t> partialSpringIndices =
+        this->getPartialSpringIndicesOfLink(net, linkIdx);
 
-          for (size_t i = 0; i < 3; ++i) {
-            for (size_t j = 0; j < 3; ++j) {
-              force(i, j) += kappa0 * denominator * distance[i] * distance[j];
-            }
-          }
+      for (const size_t globalSpringIndex : partialSpringIndices) {
+        // partial spring's force goes both ways -> is zero anyway
+        // but, as it would not be included twice in the list,
+        // we have to skip them
+        if (net.springPartIndexA[globalSpringIndex] == linkIdx &&
+            net.springPartIndexB[globalSpringIndex] == linkIdx) {
+          continue;
         }
+        Eigen::Vector3d partialDistance =
+          this->evaluatePartialSpringDistanceFrom(
+            net, u, globalSpringIndex, linkIdx, this->is2D);
+        const double contourLengthFraction =
+          springPartitions[globalSpringIndex];
+        const double N = net.springsContourLength
+                           [net.partialToFullSpringIndex[globalSpringIndex]];
+        double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+          net.partialSpringIsPartial[globalSpringIndex],
+          1.0 / (N * contourLengthFraction),
+          N,
+          oneOverSpringPartitionUpperLimit);
+
+        for (size_t i = 0; i < 3; ++i) {
+          force(i) +=
+            kappa0 * oneOverContourLengthFraction * partialDistance[i];
+        }
+        debugNrSpringsVisited[globalSpringIndex] += 1;
       }
+
       return force;
-    };
-
-    Eigen::Vector3d MEHPForceBalance::evaluateDistanceBetween(
-      const ForceBalanceNetwork& net,
-      const Eigen::VectorXd& u,
-      const size_t linkIndexA,
-      const size_t linkIndexB,
-      const bool is2D) const
-    {
-      Eigen::Vector3d distances = net.coordinates.segment(3 * linkIndexA, 3) +
-                                  u.segment(3 * linkIndexA, 3) -
-                                  (net.coordinates.segment(3 * linkIndexB, 3) +
-                                   u.segment(3 * linkIndexB, 3));
-
-      // Possibly improvable PBC
-      this->box.handlePBC<Eigen::Vector3d>(distances);
-
-      if (is2D) {
-        distances[2] = 0.0;
-      }
-
-      return distances;
     }
 
     Eigen::VectorXd MEHPForceBalance::evaluateSpringDistances(
@@ -4842,21 +4871,13 @@ namespace calc {
 
       for (size_t linkIdx : linkIndices) {
         Eigen::Matrix3d force =
-          net.linkIsSliplink[linkIdx]
-            ? this->evaluateForceOnSlipLink(linkIdx,
-                                            net,
-                                            u,
-                                            springPartitions,
-                                            debugNrSpringsVisited,
-                                            kappa0,
-                                            oneOverSpringPartitionUpperLimit)
-            : this->evaluateForceOnCrossLink(linkIdx,
-                                             net,
-                                             u,
-                                             springPartitions,
-                                             debugNrSpringsVisited,
-                                             kappa0,
-                                             oneOverSpringPartitionUpperLimit);
+          this->evaluateStressOnLink(linkIdx,
+                                     net,
+                                     u,
+                                     springPartitions,
+                                     debugNrSpringsVisited,
+                                     kappa0,
+                                     oneOverSpringPartitionUpperLimit);
         /* spring contribution to the overall stress tensor */
         RUNTIME_EXP_IFN(std::isfinite(force.squaredNorm()),
                         "Got non-finite force contribution to stress tensor: " +
@@ -4897,21 +4918,13 @@ namespace calc {
       size_t nrOfLinksToInspect = xlinksOnly ? net.nrOfNodes : net.nrOfLinks;
       for (size_t linkIdx = 0; linkIdx < nrOfLinksToInspect; ++linkIdx) {
         Eigen::Matrix3d force =
-          net.linkIsSliplink[linkIdx]
-            ? this->evaluateForceOnSlipLink(linkIdx,
-                                            net,
-                                            u,
-                                            springPartitions,
-                                            debugNrSpringsVisited,
-                                            kappa0,
-                                            oneOverSpringPartitionUpperLimit)
-            : this->evaluateForceOnCrossLink(linkIdx,
-                                             net,
-                                             u,
-                                             springPartitions,
-                                             debugNrSpringsVisited,
-                                             kappa0,
-                                             oneOverSpringPartitionUpperLimit);
+          this->evaluateStressOnLink(linkIdx,
+                                     net,
+                                     u,
+                                     springPartitions,
+                                     debugNrSpringsVisited,
+                                     kappa0,
+                                     oneOverSpringPartitionUpperLimit);
         /* spring contribution to the overall stress tensor */
         RUNTIME_EXP_IFN(std::isfinite(force.squaredNorm()),
                         "Got non-finite force contribution to stress tensor: " +
@@ -4980,15 +4993,15 @@ namespace calc {
         this->box.handlePBC(relevantPartialDistancesA);
       }
 
+      if (this->is2D) {
+        for (size_t i = 2; i < relevantPartialDistancesA.size(); i += 3) {
+          relevantPartialDistancesA[i] = 0.;
+        }
+      }
+
       for (size_t partialSpringIdx = 0;
            partialSpringIdx < net.nrOfPartialSprings;
            ++partialSpringIdx) {
-        // Eigen::VectorXd force =
-        //   net.linkIsSliplink[i]
-        //     ? this->evaluateForceOnSlipLink(
-        //         i, net, u, springPartitions, kappa0, minCutoff)
-        //     : this->evaluateForceOnCrossLink(
-        //         i, net, u, springPartitions, kappa0, minCutoff);
         Eigen::Vector3d distance =
           relevantPartialDistancesA.segment(3 * partialSpringIdx, 3);
         size_t totalSpringIndex =

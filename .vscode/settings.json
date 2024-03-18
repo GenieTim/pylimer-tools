@@ -147,7 +147,8 @@
     "source_location": "cpp",
     "stdfloat": "cpp",
     "dense": "cpp",
-    "__availability": "c"
+    "__availability": "c",
+    "execution": "cpp"
   },
   "C_Cpp.clang_format_path": "/usr/local/opt/llvm/bin/clang-format",
   "C_Cpp.default.cppStandard": "c++17",

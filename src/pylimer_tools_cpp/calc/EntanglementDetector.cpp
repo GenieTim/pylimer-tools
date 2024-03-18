@@ -2,6 +2,7 @@
 #include "../entities/Molecule.h"
 #include "../entities/NeighbourList.h"
 #include "../entities/Universe.h"
+#include <iostream>
 #include <string>
 #include <vector>
 
@@ -100,6 +101,7 @@ namespace calc {
         std::seed_seq seed2(seed.begin(), seed.end());
         rng = std::mt19937(seed2);
       }
+      std::cout << "Initial sampling rng seed: " << rng << std::endl;
       pylimer_tools::entities::NeighbourList neighbourList =
         pylimer_tools::entities::NeighbourList(
           atomsForNeighbourList, universe.getBox(), cutoff);

@@ -157,6 +157,7 @@ namespace calc {
       this->outputFileStreams.clear();
 
       // output headers
+      std::cout.flush();
       std::ios::sync_with_stdio(false);
       this->openFilesOutputHeader(this->outputConfigs);
 
@@ -186,6 +187,7 @@ namespace calc {
     {
       // finish up
       std::ios::sync_with_stdio(true);
+      std::cout.flush();
       this->outputStreams.clear();
       this->outputFileStreams.clear();
     }

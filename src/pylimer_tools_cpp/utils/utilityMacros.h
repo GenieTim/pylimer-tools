@@ -10,12 +10,14 @@
 // for any optimisation
 #define INVALIDARG_EXP_IFN(condition, message)                                 \
   if (!(condition)) {                                                          \
-    throw std::invalid_argument(message "\nFailed condition: " #condition);    \
+    throw std::invalid_argument(                                               \
+      std::string(message) + std::string("\nFailed condition: " #condition));  \
   }
 
 #define RUNTIME_EXP_IFN(condition, message)                                    \
   if (!(condition)) {                                                          \
-    throw std::runtime_error(message "\nFailed condition: " #condition);       \
+    throw std::runtime_error(std::string(message) +                            \
+                             std::string("\nFailed condition: " #condition));  \
   }
 
 #define REQUIRE_IGRAPH_SUCCESS(igraph_call)                                    \
@@ -29,7 +31,8 @@
 
 // NOTE: the "<=" is needed (not "<") to account for 0.
 #define APPROX_REL_EQUAL(value1, value2, eps)                                  \
-  (std::abs(value1 - value2) <= (eps * std::max(std::abs(value1), std::abs(value2))))
+  (std::abs(value1 - value2) <=                                                \
+   (eps * std::max(std::abs(value1), std::abs(value2))))
 
 #define APPROX_WITHIN(value1, lo, hi, eps)                                     \
   (((value1 + eps) >= lo) && ((value1 - eps) <= hi))
