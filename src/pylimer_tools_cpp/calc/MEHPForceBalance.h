@@ -1283,7 +1283,7 @@ namespace calc {
        */
       Eigen::Vector3d getForceOn(
         const size_t index,
-        double oneOverSpringPartitionUpperLimit = 1.0) const
+        const double oneOverSpringPartitionUpperLimit = 1.0) const
       {
         Eigen::VectorXi debugNrSpringsVisited =
           Eigen::VectorXi::Zero(this->initialConfig.nrOfPartialSprings);
@@ -1309,7 +1309,7 @@ namespace calc {
         const Eigen::VectorXd&
           springPartitions, /* gives the parametrisation of N */
         const size_t index,
-        double oneOverSpringPartitionUpperLimit = 1.0) const
+        const double oneOverSpringPartitionUpperLimit = 1.0) const
       {
         Eigen::VectorXi debugNrSpringsVisited =
           Eigen::VectorXi::Zero(this->initialConfig.nrOfPartialSprings);
@@ -1320,6 +1320,28 @@ namespace calc {
                                          debugNrSpringsVisited,
                                          1.0,
                                          oneOverSpringPartitionUpperLimit);
+      }
+
+      /**
+       * @brief Evaluate the current stress on a particulas cross- or slip-link
+       *
+       * @param linkIdx
+       * @param oneOverSpringPartitionUpperLimit
+       * @return Eigen::Matrix3d
+       */
+      Eigen::Matrix3d getStressOn(
+        const size_t linkIdx,
+        const double oneOverSpringPartitionUpperLimit = 1.0) const
+      {
+        Eigen::VectorXi debugNrSpringsVisited =
+          Eigen::VectorXi::Zero(this->initialConfig.nrOfPartialSprings);
+        return this->evaluateStressOnLink(linkIdx,
+                                          this->initialConfig,
+                                          this->currentDisplacements,
+                                          this->currentSpringPartitionsVec,
+                                          debugNrSpringsVisited,
+                                          1.0,
+                                          oneOverSpringPartitionUpperLimit);
       }
 
       /**

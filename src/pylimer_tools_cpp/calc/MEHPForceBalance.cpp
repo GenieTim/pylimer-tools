@@ -4310,8 +4310,11 @@ namespace calc {
         net, u, springPartitions, linkIdx, oneOverSpringPartitionUpperLimit);
 
       assert(pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
-        forceAfter, Eigen::Vector3d::Zero(), 0.1));
-      assert(forceBefore.squaredNorm() >= forceAfter.squaredNorm());
+        forceAfter, Eigen::Vector3d::Zero(), 0.01));
+      if (!pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
+            forceBefore, Eigen::Vector3d::Zero(), 0.01)) {
+        assert(forceBefore.squaredNorm() >= forceAfter.squaredNorm());
+      }
 
       double dist = (objectiveDisplacement * denominator).squaredNorm();
       // if (dist > 0.1) {
