@@ -123,6 +123,7 @@ namespace calc {
       double previousResidual = initialResidual;
       double intermediateResidual = 0.0;
       size_t iterationsDone = 0;
+      size_t nRemoved = 0;
 
       this->prepareAllOutputs();
 
@@ -238,28 +239,6 @@ namespace calc {
               indexOfMaxDistanceMoved = link_idx;
             }
             maxDistanceMoved = std::max(maxDistanceMoved, distanceMoved);
-
-            // currentResidual =
-            //   this->getDisplacementResidualNormFor(this->initialConfig,
-            //                                        this->currentDisplacements,
-            //                                        oneOverSpringPartitions);
-            // double otherEstimate = this->getDisplacementResidualNormFor(
-            //   this->initialConfig,
-            //   this->currentDisplacements,
-            //   this->currentSpringPartitionsVec,
-            //   oneOverSpringPartitionUpperLimit);
-            // assert(APPROX_EQUAL(currentResidual, otherEstimate, 1e-6));
-            // if (intermediateResidual < currentResidual &&
-            //     !this->assumeBoxLargeEnough) {
-            //   this->validateNetwork(this->initialConfig,
-            //                         this->currentDisplacements,
-            //                         this->currentSpringPartitionsVec);
-            //   throw std::runtime_error(
-            //     "Residual is bigger (" + std::to_string(currentResidual) +
-            //     " vs. " + std::to_string(intermediateResidual) +
-            //     ") than in the previous iteration. This makes no "
-            //     "sense and hints for a mistake.");
-            // }
           }
         } else {
           for (size_t i = 0; i < independentVertexSets.size(); ++i) {
@@ -288,26 +267,28 @@ namespace calc {
           }
         }
 
-        currentResidual =
-          this->getDisplacementResidualNormFor(this->initialConfig,
-                                               this->currentDisplacements,
-                                               oneOverSpringPartitions);
-        if (previousResidual < currentResidual && !this->assumeBoxLargeEnough) {
-          throw std::runtime_error(
-            "Residual is bigger (" + std::to_string(currentResidual) + " vs. " +
-            std::to_string(previousResidual) +
-            ") than in the previous iteration. This makes no "
-            "sense and hints at a mistake.");
-        }
+        currentResidual = this->getDisplacementResidualNormFor(
+          this->initialConfig,
+          this->currentDisplacements,
+          this->currentSpringPartitionsVec,
+          oneOverSpringPartitionUpperLimit);
+        // if (previousResidual < currentResidual && nRemoved == 0) {
+        //   throw std::runtime_error(
+        //     "Residual is bigger (" + std::to_string(currentResidual) + " vs. " +
+        //     std::to_string(previousResidual) +
+        //     ") than in the previous iteration. This makes no "
+        //     "sense and hints at a mistake.");
+        // }
         previousResidual = currentResidual;
         iterationsDone += 1;
+        nRemoved = 0;
         if (iterationsDone % 10 == 0) {
           if (simplificationMode ==
                 StructureSimplificationMode::INACTIVE_ONLY ||
               simplificationMode == StructureSimplificationMode::ALL_TIM) {
             // std::cout << "Removing inactive cross-links" << std::endl;
             // default tolerance: 0.25*atom's cube length
-            size_t nRemoved =
+            nRemoved +=
               this->removeInactiveCrosslinks(this->initialConfig,
                                              this->currentDisplacements,
                                              this->currentSpringPartitionsVec,
@@ -316,17 +297,11 @@ namespace calc {
               this->initialConfig.springsContourLength.size() > 0
                 ? this->initialConfig.springsContourLength.mean()
                 : 0.;
-            // if (nRemoved > 0) {
-            //   std::cout << "Removed " << nRemoved << " inactive springs. "
-            //             << std::endl;
-            // }
-            // this->validateNetwork(this->initialConfig,
-            // this->currentDisplacements, this->currentSpringPartitionsVec);
           }
           if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
               simplificationMode == StructureSimplificationMode::ALL_TIM) {
             // std::cout << "Removing 2-f cross-links" << std::endl;
-            size_t nRemoved = this->removeTwofunctionalCrosslinks(
+            nRemoved += this->removeTwofunctionalCrosslinks(
               this->initialConfig,
               this->currentDisplacements,
               this->currentSpringPartitionsVec);
@@ -334,20 +309,15 @@ namespace calc {
               this->initialConfig.springsContourLength.size() > 0
                 ? this->initialConfig.springsContourLength.mean()
                 : 0.;
-            // if (nRemoved > 0) {
-            //   std::cout << "Removed " << nRemoved
-            //             << " cross-linkers with f = 2. " << std::endl;
-            // }
-            // this->validateNetwork(this->initialConfig,
-            // this->currentDisplacements, this->currentSpringPartitionsVec);
           }
           if (simplificationMode == StructureSimplificationMode::ALL_ANDREI) {
             // std::cout << "Removing cross-links and springs, Andrei's way"
             //           << std::endl;
-            this->doRemovalAndreisWay(this->initialConfig,
-                                      this->currentDisplacements,
-                                      this->currentSpringPartitionsVec,
-                                      removalTolerance);
+            nRemoved +=
+              this->doRemovalAndreisWay(this->initialConfig,
+                                        this->currentDisplacements,
+                                        this->currentSpringPartitionsVec,
+                                        removalTolerance);
           }
           if (simplificationMode !=
               StructureSimplificationMode::NO_SIMPLIFICATION) {
@@ -588,31 +558,45 @@ namespace calc {
       double elasticFreeEnergy = 0.;
 
       Eigen::VectorXd forces = Eigen::VectorXd::Zero(3 * net.nrOfLinks);
-      for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
-        if (net.springPartIndexA[i] == net.springPartIndexB[i]) {
-          // primary loops cancel out anyway
-          continue;
-        }
-        Eigen::Vector3d dist =
-          this->evaluatePartialSpringDistance(net, u, i, this->is2D);
-        const double contourLengthFraction = springPartitions[i];
-        const double N =
-          net.springsContourLength[net.partialToFullSpringIndex[i]];
-        double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
-          net.partialSpringIsPartial[i],
-          ((contourLengthFraction > 0.) ? 1.0 / (N * contourLengthFraction)
-                                        : 0.),
-          N,
-          oneOverSpringPartitionUpperLimit);
-        assert(APPROX_EQUAL(
-          oneOverContourLengthFraction, oneOverSpringPartitions[3 * i], 1e-9));
-        elasticFreeEnergy +=
-          dist.squaredNorm() * 0.5 * oneOverContourLengthFraction;
-        forces.segment(3 * net.springPartIndexA[i], 3) +=
-          dist * oneOverContourLengthFraction;
-        forces.segment(3 * net.springPartIndexB[i], 3) -=
-          dist * oneOverContourLengthFraction;
+      // for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
+      //   if (net.springPartIndexA[i] == net.springPartIndexB[i]) {
+      //     // primary loops cancel out anyway
+      //     continue;
+      //   }
+      //   Eigen::Vector3d dist =
+      //     this->evaluatePartialSpringDistance(net, u, i, this->is2D);
+      //   const double contourLengthFraction = springPartitions[i];
+      //   const double N =
+      //     net.springsContourLength[net.partialToFullSpringIndex[i]];
+      //   double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+      //     net.partialSpringIsPartial[i],
+      //     ((contourLengthFraction > 0.) ? 1.0 / (N * contourLengthFraction)
+      //                                   : 0.),
+      //     N,
+      //     oneOverSpringPartitionUpperLimit);
+      //   assert(APPROX_EQUAL(
+      //     oneOverContourLengthFraction, oneOverSpringPartitions[3 * i],
+      //     1e-9));
+      //   elasticFreeEnergy +=
+      //     dist.squaredNorm() * 0.5 * oneOverContourLengthFraction;
+      //   forces.segment(3 * net.springPartIndexA[i], 3) +=
+      //     dist * oneOverContourLengthFraction;
+      //   forces.segment(3 * net.springPartIndexB[i], 3) -=
+      //     dist * oneOverContourLengthFraction;
+      // }
+      Eigen::VectorXi debugNrSpringsVisited =
+        Eigen::VectorXi::Zero(net.nrOfPartialSprings);
+      for (size_t i = 0; i < net.nrOfLinks; ++i) {
+        forces.segment(3 * i, 3) =
+          this->evaluateForceOnLink(i,
+                                    net,
+                                    u,
+                                    springPartitions,
+                                    debugNrSpringsVisited,
+                                    1.0,
+                                    oneOverSpringPartitionUpperLimit);
       }
+      assert((debugNrSpringsVisited.array() == 2).all());
 
       // return elasticFreeEnergy;
       return forces.squaredNorm();
@@ -633,7 +617,6 @@ namespace calc {
       const Eigen::VectorXd& oneOverSpringPartitions) const
     {
       Eigen::VectorXd displacedCoords = net.coordinates + u;
-      const double oneOverSpringPartitionUpperLimit = 1.;
 
       Eigen::VectorXd relevantPartialDistances =
         (displacedCoords(net.springPartCoordinateIndexB) -
@@ -884,14 +867,12 @@ namespace calc {
       for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
         const double N =
           net.springsContourLength[net.partialToFullSpringIndex[i]];
-        double valueToSet = (springPartitions0[i] > 0.0) // 1e-18 //
-                              ? 1.0 / (springPartitions0[i] * N)
-                              : 0.0;
-        valueToSet =
-          CLAMP_ONE_OVER_SPRINGPARTITION(net.partialSpringIsPartial[i],
-                                         valueToSet,
-                                         N,
-                                         oneOverSpringPartitionUpperLimit);
+        double contourLengthFraction = springPartitions0[i];
+        double valueToSet = CLAMP_ONE_OVER_SPRINGPARTITION(
+          net.partialSpringIsPartial[i],
+          1.0 / (N * contourLengthFraction),
+          N,
+          oneOverSpringPartitionUpperLimit);
 
         // if (springPartitions0[i] < 1e-9) {
         //   std::cout << "Got close call for partial spring " << i <<
@@ -1021,7 +1002,7 @@ namespace calc {
         assert(net.springIndicesOfLinks.size() > crosslinkIdx);
         if (net.springIndicesOfLinks[crosslinkIdx].size() == 0 // f = 0
         ) {
-          // std::cout << "Removing x-link " << crosslinkIdx << std::endl;
+          // std::cout << "Removing f = 0 x-link " << crosslinkIdx << std::endl;
           this->removeLink(net, displacements, crosslinkIdx);
 #ifndef NDEBUG
           this->validateNetwork(net, displacements, springPartitions);
@@ -1029,14 +1010,15 @@ namespace calc {
         }
 
         else if ( // or f = 1, NOT primary loop
-          net.springIndicesOfLinks[crosslinkIdx].size() == 1 &&
-          XOR(
+          (net.springIndicesOfLinks[crosslinkIdx].size() == 1) &&
+          (XOR(
             net.linkIndicesOfSprings[net.springIndicesOfLinks[crosslinkIdx][0]]
                                     [0] == crosslinkIdx,
             pylimer_tools::utils::last(
               net.linkIndicesOfSprings[net.springIndicesOfLinks[crosslinkIdx]
                                                                [0]]) ==
-              crosslinkIdx)) {
+              crosslinkIdx))) {
+          // std::cout << "Removing f = 1 x-link " << crosslinkIdx << std::endl;
           // need to first remove the spring
           this->removeSpring(net,
                              displacements,
@@ -1817,6 +1799,9 @@ namespace calc {
       linksToRemove.erase(
         std::unique(linksToRemove.begin(), linksToRemove.end()),
         linksToRemove.end());
+      if (linksToRemove.size() > 2) {
+        assert(linksToRemove[0] > linksToRemove[1]);
+      }
 
       for (size_t outermostI = 0; outermostI < linksToRemove.size();
            ++outermostI) {
@@ -1873,8 +1858,6 @@ namespace calc {
               " when removing spring " + std::to_string(springIdx) + ".");
           assert(involvedPartialSprings.size() == 2);
           size_t partialSpringToKeep = involvedPartialSprings[0];
-          size_t springToKeepIdx =
-            net.partialToFullSpringIndex[partialSpringToKeep];
           size_t partialSpringToRemove = involvedPartialSprings[1];
           assert(partialSpringToKeep != partialSpringToRemove);
           assert(net.partialToFullSpringIndex[partialSpringToKeep] ==
@@ -2581,7 +2564,7 @@ namespace calc {
         if (!pylimer_tools::utils::vector_approx_equal(
               newDistance, distanceBefore, 1e-5)) {
           throw std::runtime_error(
-            "After merging two partial springs, the overall distance "
+            "After merging two springs, the overall distance "
             "is not consistent. Expected distance " +
             std::to_string(distanceBefore) + ", but got " +
             std::to_string(newDistance) + " for spring " +
@@ -4360,10 +4343,16 @@ namespace calc {
           N,
           oneOverSpringPartitionUpperLimit);
 
+        double multiplier = kappa0 * oneOverContourLengthFraction;
+        if (net.springPartIndexA[globalSpringIndex] ==
+            net.springPartIndexB[globalSpringIndex]) {
+          debugNrSpringsVisited[globalSpringIndex] += 1;
+          multiplier *= 2.;
+        }
+
         for (size_t i = 0; i < 3; ++i) {
           for (size_t j = 0; j < 3; ++j) {
-            force(i, j) += kappa0 * oneOverContourLengthFraction *
-                           partialDistance[i] * partialDistance[j];
+            force(i, j) += multiplier * partialDistance[i] * partialDistance[j];
           }
         }
         debugNrSpringsVisited[globalSpringIndex] += 1;
@@ -4404,6 +4393,7 @@ namespace calc {
         // we have to skip them
         if (net.springPartIndexA[globalSpringIndex] == linkIdx &&
             net.springPartIndexB[globalSpringIndex] == linkIdx) {
+          debugNrSpringsVisited[globalSpringIndex] += 2;
           continue;
         }
         Eigen::Vector3d partialDistance =
@@ -4419,10 +4409,7 @@ namespace calc {
           N,
           oneOverSpringPartitionUpperLimit);
 
-        for (size_t i = 0; i < 3; ++i) {
-          force(i) +=
-            kappa0 * oneOverContourLengthFraction * partialDistance[i];
-        }
+        force += kappa0 * oneOverContourLengthFraction * partialDistance;
         debugNrSpringsVisited[globalSpringIndex] += 1;
       }
 
@@ -4992,6 +4979,7 @@ namespace calc {
         (displacedCoords(net.springPartCoordinateIndexB) -
          displacedCoords(net.springPartCoordinateIndexA)) +
         net.springPartBoxOffset;
+
       if (this->assumeBoxLargeEnough) {
         this->box.handlePBC(relevantPartialDistancesA);
       }
@@ -5007,23 +4995,20 @@ namespace calc {
            ++partialSpringIdx) {
         Eigen::Vector3d distance =
           relevantPartialDistancesA.segment(3 * partialSpringIdx, 3);
-        size_t totalSpringIndex =
-          net.partialToFullSpringIndex[partialSpringIdx];
-        const double N = net.springsContourLength[totalSpringIndex];
-        double denominator = 1. / (springPartitions[partialSpringIdx] * N);
-        if (oneOverSpringPartitionUpperLimit > 0. ||
-            !std::isfinite(denominator)) {
-          denominator = CLAMP_ONE_OVER_SPRINGPARTITION(
-            net.partialSpringIsPartial[partialSpringIdx],
-            denominator,
-            N,
-            oneOverSpringPartitionUpperLimit);
-        }
+        const double contourLengthFraction = springPartitions[partialSpringIdx];
+        const double N = net.springsContourLength
+                           [net.partialToFullSpringIndex[partialSpringIdx]];
+        double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+          net.partialSpringIsPartial[partialSpringIdx],
+          1.0 / (N * contourLengthFraction),
+          N,
+          oneOverSpringPartitionUpperLimit);
+
         /* spring contribution to the overall stress tensor */
         for (size_t j = 0; j < 3; j++) {
           for (size_t k = 0; k < 3; k++) {
             double contribution =
-              distance[j] * distance[k] * kappa0 * denominator;
+              distance[j] * distance[k] * kappa0 * oneOverContourLengthFraction;
             RUNTIME_EXP_IFN(
               std::isfinite(contribution),
               "Got non-finite contribution to stress tensor: " +
@@ -5032,7 +5017,7 @@ namespace calc {
                 " for partial spring " + std::to_string(partialSpringIdx) +
                 " from distances " + std::to_string(distance[j]) + ", " +
                 std::to_string(distance[k]) + " and denominator " +
-                std::to_string(denominator) + ".");
+                std::to_string(oneOverContourLengthFraction) + ".");
             // if (std::isfinite(denominator) && std::isfinite(contribution))
             // {
             stress[j][k] += contribution;

@@ -1252,6 +1252,8 @@ namespace calc {
         const ForceBalanceNetwork& net,
         const size_t linkIdx) const
       {
+        INVALIDARG_EXP_IFN(linkIdx < net.nrOfLinks,
+                           "The requested link does not exist");
         std::unordered_set<size_t> partialSpringIndices;
 
         std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
