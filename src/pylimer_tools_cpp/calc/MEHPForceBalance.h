@@ -537,7 +537,7 @@ namespace calc {
        * @param springPartitions
        */
       void mergeSprings(ForceBalanceNetwork& net,
-                               const Eigen::VectorXd& displacements,
+                        const Eigen::VectorXd& displacements,
                         Eigen::VectorXd& springPartitions,
                         const size_t removedSpringIdx,
                         const size_t keptSpringIdx,
@@ -1219,21 +1219,6 @@ namespace calc {
                        net, u, springIdx, linkIdx, is2d);
       }
 
-      /**
-       * @brief Compute one spring length
-       *
-       * @param net
-       * @param linkIndexA
-       * @param linkIndexB
-       * @param is2D
-       * @return Eigen::Vector3d
-       */
-      Eigen::Vector3d evaluateDistanceBetween(const ForceBalanceNetwork& net,
-                                              const Eigen::VectorXd& u,
-                                              const size_t linkIndexA,
-                                              const size_t linkIndexB,
-                                              const bool is2D) const;
-
       bool validateNetwork() const
       {
         return this->validateNetwork(this->initialConfig,
@@ -1263,36 +1248,78 @@ namespace calc {
         this->currentSpringPartitionsVec = newSpringPartitionsVec;
       }
 
+      std::unordered_set<size_t> getPartialSpringIndicesOfLink(
+        const ForceBalanceNetwork& net,
+        const size_t linkIdx) const
+      {
+        std::unordered_set<size_t> partialSpringIndices;
+
+        std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
+
+        for (size_t spring_index = 0; spring_index < springIndices.size();
+             ++spring_index) {
+          std::vector<size_t> springsPartners =
+            net.linkIndicesOfSprings[springIndices[spring_index]];
+          for (size_t partner_idx = 0; partner_idx < springsPartners.size() - 1;
+               ++partner_idx) {
+            if (springsPartners[partner_idx] == linkIdx ||
+                springsPartners[partner_idx + 1] == linkIdx) {
+              size_t globalSpringIndex =
+                net.localToGlobalSpringIndex[(springIndices[spring_index])]
+                                            [partner_idx];
+              partialSpringIndices.insert(globalSpringIndex);
+            }
+          }
+        }
+        return partialSpringIndices;
+      }
+
       /**
        * @brief Evaluate the force on one link
        *
        * @param index the link index
        * @param oneOverSpringPartitionUpperLimit
-       * @return Eigen::Matrix3d
+       * @return Eigen::Vector3d
        */
-      Eigen::Matrix3d getForceOn(
+      Eigen::Vector3d getForceOn(
         const size_t index,
         double oneOverSpringPartitionUpperLimit = 1.0) const
       {
         Eigen::VectorXi debugNrSpringsVisited =
           Eigen::VectorXi::Zero(this->initialConfig.nrOfPartialSprings);
-        return this->initialConfig.linkIsSliplink[index]
-                 ? this->evaluateForceOnSlipLink(
-                     index,
-                     this->initialConfig,
-                     this->currentDisplacements,
-                     this->currentSpringPartitionsVec,
-                     debugNrSpringsVisited,
-                     1.0,
-                     oneOverSpringPartitionUpperLimit)
-                 : this->evaluateForceOnCrossLink(
-                     index,
-                     this->initialConfig,
-                     this->currentDisplacements,
-                     this->currentSpringPartitionsVec,
-                     debugNrSpringsVisited,
-                     1.0,
-                     oneOverSpringPartitionUpperLimit);
+        return this->evaluateForceOnLink(index,
+                                         this->initialConfig,
+                                         this->currentDisplacements,
+                                         this->currentSpringPartitionsVec,
+                                         debugNrSpringsVisited,
+                                         1.0,
+                                         oneOverSpringPartitionUpperLimit);
+      }
+
+      /**
+       * @brief Evaluate the force on one link
+       *
+       * @param index the link index
+       * @param oneOverSpringPartitionUpperLimit
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d getForceOn(
+        const ForceBalanceNetwork& net,
+        const Eigen::VectorXd& u,
+        const Eigen::VectorXd&
+          springPartitions, /* gives the parametrisation of N */
+        const size_t index,
+        double oneOverSpringPartitionUpperLimit = 1.0) const
+      {
+        Eigen::VectorXi debugNrSpringsVisited =
+          Eigen::VectorXi::Zero(this->initialConfig.nrOfPartialSprings);
+        return this->evaluateForceOnLink(index,
+                                         net,
+                                         u,
+                                         springPartitions,
+                                         debugNrSpringsVisited,
+                                         1.0,
+                                         oneOverSpringPartitionUpperLimit);
       }
 
       /**
@@ -1587,6 +1614,12 @@ namespace calc {
       double getDisplacementResidualNormFor(
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
+        const Eigen::VectorXd& springPartitions,
+        const double oneOverSpringPartitionUpperLimit) const;
+
+      double getDisplacementResidualNormFor(
+        const ForceBalanceNetwork& net,
+        const Eigen::VectorXd& u,
         const Eigen::VectorXd& oneOverSpringPartitions) const;
 
       /**
@@ -1775,7 +1808,7 @@ namespace calc {
         const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
       /**
-       * @brief Compute the force acting on a slip-link
+       * @brief Compute the force acting on a slip- or cross-link
        *
        * TODO: use "global" partial distances
        *
@@ -1787,7 +1820,7 @@ namespace calc {
        * @param minCutoff
        * @return Eigen::Vector3d
        */
-      Eigen::Matrix3d evaluateForceOnSlipLink(
+      Eigen::Vector3d evaluateForceOnLink(
         const size_t linkIdx,
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
@@ -1797,7 +1830,7 @@ namespace calc {
         const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
       /**
-       * @brief Compute the force acting on a cross-link
+       * @brief Compute the stress acting on a slip- or cross-link
        *
        * TODO: use "global" partial distances
        *
@@ -1809,7 +1842,7 @@ namespace calc {
        * @param minCutoff
        * @return Eigen::Vector3d
        */
-      Eigen::Matrix3d evaluateForceOnCrossLink(
+      Eigen::Matrix3d evaluateStressOnLink(
         const size_t linkIdx,
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,

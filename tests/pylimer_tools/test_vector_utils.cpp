@@ -19,7 +19,7 @@ namespace pu = pylimer_tools::utils;
 
 TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
 {
-  SECTION("Summation works with same indices")
+  SECTION("Summation works with repeated indices")
   {
     Eigen::VectorXd testVec = Eigen::VectorXd::Zero(10);
     Eigen::ArrayXi testIdx = Eigen::ArrayXi::Zero(5);
@@ -29,6 +29,24 @@ TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
     REQUIRE(testVec[0] == Catch::Approx(2.));
     REQUIRE(testVec[1] == Catch::Approx(1.));
     REQUIRE(testVec[2] == 0.0);
+  }
+
+  SECTION("Summation works with different repeated indices")
+  {
+    Eigen::VectorXd testVec = Eigen::VectorXd::Zero(10);
+    Eigen::ArrayXi testIdx = Eigen::ArrayXi::Zero(5);
+    testIdx << 0, 0, 5, 5, 1;
+    Eigen::ArrayXi testIdx2 = Eigen::ArrayXi::Zero(5);
+    testIdx2 << 5, 0, 5, 1, 5;
+    Eigen::VectorXd seq = Eigen::VectorXd::Zero(7);
+    seq << 0, 1, 2, 3, 4, 5, 6;
+    Eigen::VectorXd resultsVec = Eigen::VectorXd::Zero(5);
+    resultsVec = seq(testIdx) + seq(testIdx2);
+    REQUIRE(resultsVec[0] == Catch::Approx(5.));
+    REQUIRE(resultsVec[1] == Catch::Approx(0.));
+    REQUIRE(resultsVec[2] == Catch::Approx(10.));
+    REQUIRE(resultsVec[3] == Catch::Approx(6.));
+    REQUIRE(resultsVec[4] == Catch::Approx(6.));
   }
 
   SECTION("Casting bool to double results in 1.0/0.0")

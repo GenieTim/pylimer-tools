@@ -11,8 +11,8 @@ extern "C"
 {
 #include <igraph/igraph.h>
 }
-#include "utilityMacros.h"
 #include "ExtraEigenTypes.h"
+#include "utilityMacros.h"
 #include <Eigen/Dense>
 #include <cassert>
 
@@ -182,6 +182,34 @@ namespace utils {
     std::sort(vecSorted.begin(), vecSorted.end());
     return std::adjacent_find(vecSorted.begin(), vecSorted.end()) !=
            vecSorted.end();
+  }
+
+  template<typename IN>
+  static inline bool vector_approx_equal(const IN& v1,
+                                         const IN& v2,
+                                         const double eps)
+  {
+    assert(v1.size() == v2.size());
+    for (size_t i = 0; i < v1.size(); ++i) {
+      if (!APPROX_EQUAL(v1[i], v2[i], eps)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  template<typename IN>
+  static inline bool vector_approx_rel_equal(const IN& v1,
+                                             const IN& v2,
+                                             const double eps)
+  {
+    assert(v1.size() == v2.size());
+    for (size_t i = 0; i < v1.size(); ++i) {
+      if (!APPROX_REL_EQUAL(v1[i], v2[i], eps)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   template<typename IN>
