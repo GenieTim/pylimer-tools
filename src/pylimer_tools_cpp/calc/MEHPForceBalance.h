@@ -337,10 +337,10 @@ namespace calc {
        */
       void completeInitialization()
       {
-        this->currentSpringDistances = this->evaluateSpringDistances(
+        this->currentSpringDistances = this->evaluateSpringVectors(
           this->initialConfig, this->currentDisplacements, is2D);
         this->currentPartialSpringDistances =
-          this->evaluatePartialSpringDistances(
+          this->evaluatePartialSpringVectors(
             this->initialConfig, this->currentDisplacements, is2D);
         this->defaultR0Squared =
           universe.computeMeanSquareEndToEndDistance(crosslinkerType);
@@ -788,10 +788,10 @@ namespace calc {
       {
         this->assumeBoxLargeEnough = assumption;
 
-        this->currentSpringDistances = this->evaluateSpringDistances(
+        this->currentSpringDistances = this->evaluateSpringVectors(
           this->initialConfig, this->currentDisplacements, is2D);
         this->currentPartialSpringDistances =
-          this->evaluatePartialSpringDistances(
+          this->evaluatePartialSpringVectors(
             this->initialConfig, this->currentDisplacements, is2D);
       }
 
@@ -944,7 +944,7 @@ namespace calc {
 
       Eigen::VectorXd getCurrentPartialSpringDistances() const
       {
-        return this->evaluatePartialSpringDistances(
+        return this->evaluatePartialSpringVectors(
           this->initialConfig, this->currentDisplacements, this->is2D);
       }
 
@@ -1084,13 +1084,24 @@ namespace calc {
                         bool clampAlpha = false);
 
       /**
+       * @brief Compute the spring vectors
+       *
+       * @param net the network to do the computation for
+       * @param u the displacements on top of the network
+       * @return Eigen::VectorXd
+       */
+      Eigen::VectorXd evaluateSpringVectors(const ForceBalanceNetwork& net,
+                                              const Eigen::VectorXd& u,
+                                              const bool is2D) const;
+
+      /**
        * @brief Compute the spring lenghts
        *
        * @param net the network to do the computation for
        * @param u the displacements on top of the network
        * @return Eigen::VectorXd
        */
-      Eigen::VectorXd evaluateSpringDistances(const ForceBalanceNetwork& net,
+      Eigen::VectorXd evaluateSpringLengths(const ForceBalanceNetwork& net,
                                               const Eigen::VectorXd& u,
                                               const bool is2D) const;
 
@@ -1121,14 +1132,14 @@ namespace calc {
           this->universe.getBox().handlePBC<Eigen::Vector3d>(dist);
         }
 
-        if (is2D) {
+        if (is2d) {
           dist[2] = 0.0;
         }
 
         return dist;
       }
 
-      Eigen::VectorXd evaluatePartialSpringDistances(
+      Eigen::VectorXd evaluatePartialSpringVectors(
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
         const bool is2D) const;
@@ -1194,7 +1205,7 @@ namespace calc {
         assert(net.springPartIndexA(springIdx) == linkIdx ||
                net.springPartIndexB(springIdx) == linkIdx);
         Eigen::Vector3d dist =
-          this->evaluatePartialSpringDistance(net, u, springIdx);
+          this->evaluatePartialSpringDistance(net, u, springIdx, is2d);
 
         return dist * (net.springPartIndexA(springIdx) == linkIdx ? -1. : 1.);
       }
