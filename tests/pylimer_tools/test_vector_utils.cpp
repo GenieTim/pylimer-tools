@@ -75,6 +75,22 @@ TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
     Eigen::ArrayXi a = Eigen::ArrayXi::Zero(0);
     CHECK(a.size() == 0);
   }
+
+  // SECTION("Vector addition/subtraction is as expected")
+  // {
+  //   Eigen::Vector3d coords = Eigen::Vector3d::Zero();
+  //   coords << 15.0609, 1.663, 2.32802;
+  //   Eigen::Vector3d other = Eigen::Vector3d::Zero();
+  //   other << 12.2155, 1.36349, 6.70744;
+
+  //   Eigen::Vector3d offset = Eigen::Vector3d::Zero();
+  //   offset << -0., -0., -0.;
+
+  //   Eigen::Vector3d diff = other - coords + offset;
+  //   CHECK(diff[0] == Catch::Approx(-2.84534));
+  //   CHECK(diff[1] == Catch::Approx(-0.299508));
+  //   CHECK(diff[2] == Catch::Approx(4.37942));
+  // }
 }
 
 TEST_CASE("Vector Rows can be removed", "[Eigen]")

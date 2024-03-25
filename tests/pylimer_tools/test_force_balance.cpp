@@ -851,11 +851,11 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance(universe, 2, false, 1.0, true);
     size_t nrOfAddedLinks =
-      forceBalancer.randomlyAddSliplinks(250, 2.0, 100, 2.0, true);
+      forceBalancer.randomlyAddSliplinks(250, 2.0, 100, 2.0, true, 1209);
     REQUIRE(nrOfAddedLinks >= 25);
     // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
     nrOfAddedLinks =
-      forceBalancer.randomlyAddSliplinks(250, 2.0, 100, 2.0, false);
+      forceBalancer.randomlyAddSliplinks(250, 2.0, 100, 2.0, false, 1230);
     REQUIRE(nrOfAddedLinks >= 25);
     // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
     pe::Box oldBox = universe.getBox();
