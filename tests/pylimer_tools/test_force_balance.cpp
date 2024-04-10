@@ -1568,6 +1568,57 @@ TEST_CASE("MEHP Force Balance Fully active chains are fully active",
   }
 }
 
+TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC",
+          "[analysis][MEHPForceBalance]")
+{
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  REQUIRE(universeSeq.getLength() == 0);
+  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+
+  // perfect diamond network = fully connected =>
+  // maximum is at perfect crystal structure -> must be all active.
+  std::string inputFile =
+    suspectedPath +
+    "3d-diamond-lattice_10x10x10_a_3_d_0.85_imperfect.structure.out";
+  if (std::filesystem::exists(inputFile)) {
+    std::cout << "Reading file " << inputFile << std::endl;
+    universeSeq.initializeFromDataSequence({ { inputFile } });
+    pe::Universe universe = universeSeq.atIndex(0);
+    std::cout << "Read file " << inputFile << std::endl;
+
+    pcm::MEHPForceBalance forceBalanceConventional =
+      pcm::MEHPForceBalance::constructWithRandomSlipLinks(universe, 250, 2.0, 100, 2.0, "533d", 2, false, 1.0);
+    forceBalanceConventional.configAssumeBoxLargeEnough(true);
+
+    pcm::MEHPForceBalance forceBalanceNew =
+      pcm::MEHPForceBalance::constructWithRandomSlipLinks(universe, 250, 2.0, 100, 2.0, "533d", 2, false, 1.0);
+    forceBalanceNew.configAssumeBoxLargeEnough(false);
+
+    CHECK(forceBalanceConventional.getStressTensor().isApprox(forceBalanceNew.getStressTensor()));
+
+    double initialResidual = forceBalanceConventional.getDisplacementResidualNorm();
+    CHECK(initialResidual == Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
+
+    forceBalanceConventional.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE, 1.0, 250, 1e-4
+    );
+    forceBalanceNew.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE, 1.0, 250, 1e-4
+    );
+
+    CHECK(forceBalanceConventional.getStressTensor().isApprox(forceBalanceNew.getStressTensor()));
+
+    forceBalanceConventional.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE, 1.0, 250, 1e-8, initialResidual, pcm::StructureSimplificationMode::ALL_TIM, -1., 50, false, pcm::LinkSwappingMode::ALL, 10, 1., 1
+    );
+    forceBalanceNew.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE, 1.0, 250, 1e-8, initialResidual, pcm::StructureSimplificationMode::ALL_TIM, -1., 50, false, pcm::LinkSwappingMode::ALL, 10, 1., 1
+    );
+
+    CHECK(forceBalanceConventional.getStressTensor().isApprox(forceBalanceNew.getStressTensor()));
+  }
+}
+
 TEST_CASE("MEHP Force Balance does not collapse",
           "[analysis][MEHPForceBalance]")
 {
