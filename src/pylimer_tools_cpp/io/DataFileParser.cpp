@@ -143,7 +143,9 @@ namespace utils {
 
         if (!getline(file, line) && i + 1 < this->nBonds) {
           throw std::runtime_error(
-            "Data file ended too early. Not enough bonds read.");
+            "Data file ended too early. Not enough bonds read. Read " +
+            std::to_string(i + 1) + " of " + std::to_string(this->nBonds) +
+            " expected bonds.");
         }
       }
     }
@@ -163,7 +165,9 @@ namespace utils {
 
         if (!getline(file, line) && i + 1 < this->nAngles) {
           throw std::runtime_error(
-            "Data file ended too early. Not enough angles read.");
+            "Data file ended too early. Not enough angles read. Read " +
+            std::to_string(i + 1) + " of " + std::to_string(this->nAngles) +
+            " expected angles.");
         }
       }
     }
@@ -183,8 +187,11 @@ namespace utils {
         this->readDihedralAngle(line);
 
         if (!getline(file, line) && i + 1 < this->nDihedralAngles) {
-          throw std::runtime_error(
-            "Data file ended too early. Not enough dihedral angles read.");
+          throw std::runtime_error("Data file ended too early. Not enough "
+                                   "dihedral angles read. Read " +
+                                   std::to_string(i + 1) + " of " +
+                                   std::to_string(this->nDihedralAngles) +
+                                   " expected angles.");
         }
       }
     }
@@ -216,7 +223,7 @@ namespace utils {
     } while (getline(file, line));
   }
 
-  void DataFileParser::readNs(const std::string &line)
+  void DataFileParser::readNs(const std::string& line)
   {
     if (contains(line, "atoms")) {
       this->nAtoms = (this->parseTypesInLine<int>(line, 1))[0];
@@ -249,7 +256,7 @@ namespace utils {
     }
   }
 
-  void DataFileParser::readMass(const std::string &line)
+  void DataFileParser::readMass(const std::string& line)
   {
     int key = 0;
     pylimer_tools::utils::CsvTokenizer tokenizer(line);
@@ -263,7 +270,7 @@ namespace utils {
     this->masses[key] = tokenizer.get<double>(1);
   }
 
-  void DataFileParser::readAtomFull(const std::string &line)
+  void DataFileParser::readAtomFull(const std::string& line)
   {
     size_t atomId, nx, ny, nz;
     int atomType, moleculeId;
@@ -297,7 +304,7 @@ namespace utils {
     }
   }
 
-  void DataFileParser::readAtomCharge(const std::string &line)
+  void DataFileParser::readAtomCharge(const std::string& line)
   {
     size_t atomId, nx, ny, nz;
     int atomType;
@@ -330,7 +337,7 @@ namespace utils {
     }
   }
 
-  void DataFileParser::readAtom(const std::string &line)
+  void DataFileParser::readAtom(const std::string& line)
   {
     size_t atomId, nx, ny, nz;
     int atomType, moleculeId;
@@ -361,7 +368,7 @@ namespace utils {
     }
   }
 
-  void DataFileParser::readAtomHybrid(const std::string &line,
+  void DataFileParser::readAtomHybrid(const std::string& line,
                                       AtomStyle style1,
                                       AtomStyle style2)
   {
@@ -403,7 +410,7 @@ namespace utils {
     }
   }
 
-  void DataFileParser::readBond(const std::string &line)
+  void DataFileParser::readBond(const std::string& line)
   {
     size_t bondId, bondType, bondFrom, bondTo;
     sscanf(
@@ -414,7 +421,7 @@ namespace utils {
     this->bondTo.push_back(bondTo);
   }
 
-  void DataFileParser::readAngle(const std::string &line)
+  void DataFileParser::readAngle(const std::string& line)
   {
     size_t newAngleId, newAngleType, newAngleFrom, newAngleVia, newAngleTo;
     sscanf(line.c_str(),
@@ -432,9 +439,10 @@ namespace utils {
     this->angleTo.push_back(newAngleTo);
   }
 
-  void DataFileParser::readDihedralAngle(const std::string &line)
+  void DataFileParser::readDihedralAngle(const std::string& line)
   {
-    size_t newAngleId, newAngleType, newAngleFrom, newAngleVia1, newAngleVia2, newAngleTo;
+    size_t newAngleId, newAngleType, newAngleFrom, newAngleVia1, newAngleVia2,
+      newAngleTo;
     sscanf(line.c_str(),
            "%zu %zu %zu %zu %zu %zu",
            &newAngleId,
