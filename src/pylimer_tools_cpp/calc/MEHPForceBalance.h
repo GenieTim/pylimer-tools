@@ -1091,8 +1091,8 @@ namespace calc {
        * @return Eigen::VectorXd
        */
       Eigen::VectorXd evaluateSpringVectors(const ForceBalanceNetwork& net,
-                                              const Eigen::VectorXd& u,
-                                              const bool is2D) const;
+                                            const Eigen::VectorXd& u,
+                                            const bool is2D) const;
 
       /**
        * @brief Compute the spring lenghts
@@ -1102,8 +1102,8 @@ namespace calc {
        * @return Eigen::VectorXd
        */
       Eigen::VectorXd evaluateSpringLengths(const ForceBalanceNetwork& net,
-                                              const Eigen::VectorXd& u,
-                                              const bool is2D) const;
+                                            const Eigen::VectorXd& u,
+                                            const bool is2D) const;
 
       /**
        * @brief Compute one spring length
@@ -1259,6 +1259,14 @@ namespace calc {
         this->currentSpringPartitionsVec = newSpringPartitionsVec;
       }
 
+      /**
+       * @brief List all the partial spring indices that are connected to a
+       * specified (slip/cross)link
+       *
+       * @param net
+       * @param linkIdx
+       * @return std::unordered_set<size_t>
+       */
       std::unordered_set<size_t> getPartialSpringIndicesOfLink(
         const ForceBalanceNetwork& net,
         const size_t linkIdx) const
@@ -1324,8 +1332,7 @@ namespace calc {
         const size_t index,
         const double oneOverSpringPartitionUpperLimit = 1.0) const
       {
-        Eigen::VectorXi debugNrSpringsVisited =
-          Eigen::VectorXi::Zero(this->initialConfig.nrOfPartialSprings);
+        Eigen::VectorXi debugNrSpringsVisited = Eigen::VectorXi::Zero(0);
         return this->evaluateForceOnLink(index,
                                          net,
                                          u,
@@ -1454,7 +1461,8 @@ namespace calc {
         Eigen::VectorXd& springPartitions,
         const double oneOverSpringPartitionUpperLimit,
         const int nrOfCrosslinkSwapsAllowedPerSliplink = -1,
-        const bool respectLoops = true);
+        const bool respectLoops = true,
+        const bool moveAttempt = false);
 
       /**
        * @brief Move a slip-link if appropriate to other springs
@@ -1471,7 +1479,8 @@ namespace calc {
         size_t slipLinkIdx,
         const double oneOverSpringPartitionUpperLimit,
         const int nrOfCrosslinkSwapsAllowedPerSliplink = -1,
-        const bool respectLoops = true);
+        const bool respectLoops = true,
+        const bool moveAttempt = false);
 
       /**
        * @brief Loop all springs, swap slip-links on them if they are close
@@ -1506,7 +1515,8 @@ namespace calc {
         const size_t partialSpringIdx,
         const double oneOverSpringPartitionUpperLimit = 1.0,
         const int nrOfCrosslinkSwapsAllowedPerSliplink = -1,
-        const bool respectLoops = true);
+        const bool respectLoops = true,
+        const bool moveAttempt = false);
 
       long int rotateSlipLinkAroundCrosslink(
         ForceBalanceNetwork& net,
@@ -2087,6 +2097,218 @@ namespace calc {
         assert(newActualDistance.isApprox(expectedDistance));
 #endif
       }
+
+      /**
+       * @brief Find the other partial spring connected
+       *
+       * @param net
+       * @param partialSpringIdx
+       * @param aroundLinkIdx
+       * @param notPartialSpringIdx useful for (double) secondary loops, to
+       * distinguish them
+       * @return size_t
+       */
+      size_t getOtherRailPartialSpringIdx(
+        const ForceBalanceNetwork& net,
+        const size_t partialSpringIdx,
+        const size_t aroundLinkIdx,
+        const long int notPartialSpringIdx = -1) const
+      {
+        assert(net.linkIsSliplink[aroundLinkIdx]);
+        assert(this->isPartOfSpring(net, aroundLinkIdx, partialSpringIdx));
+        size_t fullSpringIdx = net.partialToFullSpringIndex[partialSpringIdx];
+
+        for (size_t i = 0;
+             i < net.localToGlobalSpringIndex[fullSpringIdx].size();
+             ++i) {
+          if (net.localToGlobalSpringIndex[fullSpringIdx][i] ==
+              partialSpringIdx) {
+            if (i == 0) {
+              return net.localToGlobalSpringIndex[fullSpringIdx][i + 1];
+            }
+            if (i >= (net.localToGlobalSpringIndex[fullSpringIdx].size() - 1)) {
+              return net.localToGlobalSpringIndex[fullSpringIdx][i - 1];
+            }
+            size_t candidate1 =
+              net.localToGlobalSpringIndex[fullSpringIdx][i - 1];
+            size_t candidate2 =
+              net.localToGlobalSpringIndex[fullSpringIdx][i + 1];
+            size_t result = candidate1;
+            if (candidate1 == notPartialSpringIdx &&
+                this->isPartOfSpring(net, aroundLinkIdx, candidate2)) {
+              result = candidate2;
+            } else if (candidate2 == notPartialSpringIdx &&
+                       this->isPartOfSpring(net, aroundLinkIdx, candidate1)) {
+              result = candidate1;
+            } else if (this->isPartOfSpring(net, aroundLinkIdx, candidate1)) {
+              result = candidate1;
+            } else {
+              result = candidate2;
+            }
+            assert(this->isPartOfSpring(net, aroundLinkIdx, result));
+            return result;
+          }
+        }
+
+        // alternative:
+        /**
+         *
+        for (size_t inSpringIdx = 1;
+           inSpringIdx < net.linkIndicesOfSprings[springIdx].size() - 1;
+           ++inSpringIdx) {
+        if (net.localToGlobalSpringIndex[springIdx][inSpringIdx] ==
+            partialSpringIdx) {
+          if (net.linkIndicesOfSprings[springIdx][inSpringIdx] == linkIdx1 &&
+              net.linkIndicesOfSprings[springIdx][inSpringIdx + 1] ==
+                linkIdx2) {
+            RUNTIME_EXP_IFN(otherPartialOfLinkIdx1 == -1,
+                            "Expect to find sequence of links only once.");
+            otherPartialOfLinkIdx1 =
+              net.localToGlobalSpringIndex[springIdx][inSpringIdx - 1];
+            otherPartialOfLinkIdx2 =
+              net.localToGlobalSpringIndex[springIdx][inSpringIdx + 1];
+            firstPositionInSpring = inSpringIdx;
+          }
+          // else
+          if (net.linkIndicesOfSprings[springIdx][inSpringIdx] == linkIdx2 &&
+              net.linkIndicesOfSprings[springIdx][inSpringIdx + 1] ==
+                linkIdx1) {
+            RUNTIME_EXP_IFN(otherPartialOfLinkIdx1 == -1,
+                            "Expect to find sequence of links only once.");
+            otherPartialOfLinkIdx2 =
+              net.localToGlobalSpringIndex[springIdx][inSpringIdx - 1];
+            otherPartialOfLinkIdx1 =
+              net.localToGlobalSpringIndex[springIdx][inSpringIdx + 1];
+            firstPositionInSpring = inSpringIdx;
+          }
+        }
+      }
+         */
+
+        throw std::runtime_error("Did not find requested partial spring in "
+                                 "full-spring, cannot determine rail.");
+      }
+
+      size_t getOtherEnd(const ForceBalanceNetwork& net,
+                         size_t partialSpringIdx,
+                         size_t linkIdx) const
+      {
+        assert(this->isPartOfSpring(net, linkIdx, partialSpringIdx));
+        return net.springPartIndexA[partialSpringIdx] == linkIdx
+                 ? net.springPartIndexB[partialSpringIdx]
+                 : net.springPartIndexA[partialSpringIdx];
+      }
+
+      bool isPartOfSpring(const ForceBalanceNetwork& net,
+                          size_t linkIdx,
+                          size_t partialSpringIdx) const
+      {
+        return (net.springPartIndexA[partialSpringIdx] == linkIdx) ||
+               (net.springPartIndexB[partialSpringIdx] == linkIdx);
+      }
+
+      double getDenominatorOfPartialSpring(
+        const ForceBalanceNetwork& net,
+        const Eigen::VectorXd& springPartitions,
+        const size_t partialSpringIdx,
+        const double oneOverSpringPartitionUpperLimit = 1.0) const;
+
+      long int moveSlipLinkFromRailToRail(
+        ForceBalanceNetwork& net,
+        const Eigen::VectorXd& u,
+        Eigen::VectorXd& springPartitions,
+        const size_t sourcePartialSpringIdx,
+        size_t targetPartialSpringIdx,
+        const double oneOverSpringPartitionUpperLimit = 1.0)
+      {
+        INVALIDARG_EXP_IFN(sourcePartialSpringIdx != targetPartialSpringIdx,
+                           "Source and target must be different when moving "
+                           "from one cross-link branch to another.");
+
+        size_t involvedSlipLink =
+          net.linkIsSliplink[net.springPartIndexA[sourcePartialSpringIdx]]
+            ? net.springPartIndexA[sourcePartialSpringIdx]
+            : net.springPartIndexB[sourcePartialSpringIdx];
+        assert(net.linkIsSliplink[involvedSlipLink]);
+        size_t involvedCrossLink =
+          net.linkIsSliplink[net.springPartIndexA[sourcePartialSpringIdx]]
+            ? net.springPartIndexB[sourcePartialSpringIdx]
+            : net.springPartIndexA[sourcePartialSpringIdx];
+        assert(!net.linkIsSliplink[involvedCrossLink]);
+        assert(
+          (net.springPartIndexA[targetPartialSpringIdx] == involvedCrossLink) ||
+          (net.springPartIndexB[targetPartialSpringIdx] == involvedCrossLink));
+
+        size_t otherInvolvedPartialSpring = this->getOtherRailPartialSpringIdx(
+          net, sourcePartialSpringIdx, involvedSlipLink);
+
+        // check whether there is space on the target spring, at all.
+        size_t targetFullSpringIdx =
+          net.partialToFullSpringIndex[targetPartialSpringIdx];
+        const double minAlpha =
+          (oneOverSpringPartitionUpperLimit > 0.)
+            ? 1. / (net.springsContourLength[targetFullSpringIdx] -
+                    1. / oneOverSpringPartitionUpperLimit)
+            : 1e-9;
+        if (minAlpha *
+              (net.localToGlobalSpringIndex[targetFullSpringIdx].size() + 1.) >
+            1.) {
+          //
+          return -1;
+        }
+
+        // remove the slip-link from one branch of the x-link
+        // but skip resizing the Eigen structures, since the additional rows are
+        // still needed
+        this->mergePartialSprings(net,
+                                  u,
+                                  springPartitions,
+                                  sourcePartialSpringIdx,
+                                  otherInvolvedPartialSpring,
+                                  involvedSlipLink,
+                                  true);
+        // this->validateNetwork(net, u, springPartitions);
+        // ... and add it to another
+        // assert(currentPartialSpringTargetIdx >= 0);
+        // std::cout << "Handling moving link " << involvedSlipLink
+        //           << " around cross-link " << involvedCrosslink
+        //           << " from partial " << partialSpringIdx << " to "
+        //           << targetPartialSpringIdx << std::endl;
+
+        if (targetPartialSpringIdx > sourcePartialSpringIdx) {
+          targetPartialSpringIdx -= 1;
+        }
+
+        assert(
+          net.springPartIndexA[targetPartialSpringIdx] == involvedCrossLink ||
+          net.springPartIndexB[targetPartialSpringIdx] == involvedCrossLink);
+        size_t newPartialSpringIdx =
+          this->addSlipLinkToPartialSpring(net,
+                                           springPartitions,
+                                           targetPartialSpringIdx,
+                                           involvedSlipLink,
+                                           oneOverSpringPartitionUpperLimit);
+
+        if ((net.springPartIndexA[targetPartialSpringIdx] ==
+               involvedCrossLink &&
+             net.springPartIndexB[targetPartialSpringIdx] ==
+               involvedSlipLink) ||
+            (net.springPartIndexB[targetPartialSpringIdx] ==
+               involvedCrossLink &&
+             net.springPartIndexA[targetPartialSpringIdx] ==
+               involvedSlipLink)) {
+          return targetPartialSpringIdx;
+        } else {
+          RUNTIME_EXP_IFN(
+            (net.springPartIndexA[newPartialSpringIdx] == involvedCrossLink &&
+             net.springPartIndexB[newPartialSpringIdx] == involvedSlipLink) ||
+              (net.springPartIndexB[newPartialSpringIdx] == involvedCrossLink &&
+               net.springPartIndexA[newPartialSpringIdx] == involvedSlipLink),
+            "Expected to find cross- and slip-link at either partial spring, "
+            "but did not.");
+          return newPartialSpringIdx;
+        }
+      };
 
       bool swapSlipLinksReversibly(
         ForceBalanceNetwork& net,

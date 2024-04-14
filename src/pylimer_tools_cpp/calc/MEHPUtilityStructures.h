@@ -39,7 +39,9 @@ namespace calc {
       ALL,
       ALL_CYCLE,
       ALL_MC,
-      ALL_MC_CYCLE
+      ALL_MC_CYCLE,
+      ALL_MC_TRY,
+      ALL_MC_TRY_CYCLE,
     };
 
     enum ExitReason
