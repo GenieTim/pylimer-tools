@@ -7,6 +7,7 @@
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 #include <chrono>
 #include <cmath>
 #include <filesystem>
@@ -1579,7 +1580,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC",
   // maximum is at perfect crystal structure -> must be all active.
   std::string inputFile =
     suspectedPath +
-    "3d-diamond-lattice_10x10x10_a_3_d_0.85_imperfect.structure.out";
+    "3d-diamond-lattice_5x5x5_a_3_d_0.85_imperfect.structure.out";
   if (std::filesystem::exists(inputFile)) {
     std::cout << "Reading file " << inputFile << std::endl;
     universeSeq.initializeFromDataSequence({ { inputFile } });
@@ -1587,35 +1588,106 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC",
     std::cout << "Read file " << inputFile << std::endl;
 
     pcm::MEHPForceBalance forceBalanceConventional =
-      pcm::MEHPForceBalance::constructWithRandomSlipLinks(universe, 250, 2.0, 100, 2.0, "533d", 2, false, 1.0);
+      pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+        universe, 250, 2.0, 100, 2.0, "533d", 2, false, 1.0);
     forceBalanceConventional.configAssumeBoxLargeEnough(true);
 
     pcm::MEHPForceBalance forceBalanceNew =
-      pcm::MEHPForceBalance::constructWithRandomSlipLinks(universe, 250, 2.0, 100, 2.0, "533d", 2, false, 1.0);
+      pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+        universe, 250, 2.0, 100, 2.0, "533d", 2, false, 1.0);
     forceBalanceNew.configAssumeBoxLargeEnough(false);
 
-    CHECK(forceBalanceConventional.getStressTensor().isApprox(forceBalanceNew.getStressTensor()));
+    CHECK(forceBalanceConventional.getStressTensor().isApprox(
+      forceBalanceNew.getStressTensor()));
 
-    double initialResidual = forceBalanceConventional.getDisplacementResidualNorm();
-    CHECK(initialResidual == Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
-
-    forceBalanceConventional.runForceRelaxation(
-      pcm::BalanceRunMode::ITERATIVE, 1.0, 250, 1e-4
-    );
-    forceBalanceNew.runForceRelaxation(
-      pcm::BalanceRunMode::ITERATIVE, 1.0, 250, 1e-4
-    );
-
-    CHECK(forceBalanceConventional.getStressTensor().isApprox(forceBalanceNew.getStressTensor()));
+    double initialResidual =
+      forceBalanceConventional.getDisplacementResidualNorm();
+    CHECK(initialResidual ==
+          Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
 
     forceBalanceConventional.runForceRelaxation(
-      pcm::BalanceRunMode::ITERATIVE, 1.0, 250, 1e-8, initialResidual, pcm::StructureSimplificationMode::ALL_TIM, -1., 50, false, pcm::LinkSwappingMode::ALL, 10, 1., 1
-    );
+      pcm::BalanceRunMode::ITERATIVE, 1.0, 250, 1e-4);
     forceBalanceNew.runForceRelaxation(
-      pcm::BalanceRunMode::ITERATIVE, 1.0, 250, 1e-8, initialResidual, pcm::StructureSimplificationMode::ALL_TIM, -1., 50, false, pcm::LinkSwappingMode::ALL, 10, 1., 1
-    );
+      pcm::BalanceRunMode::ITERATIVE, 1.0, 250, 1e-4);
 
-    CHECK(forceBalanceConventional.getStressTensor().isApprox(forceBalanceNew.getStressTensor()));
+    CHECK(forceBalanceConventional.getStressTensor().isApprox(
+      forceBalanceNew.getStressTensor()));
+    CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
+          Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
+    CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
+          Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
+
+    forceBalanceConventional.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE,
+      1.0,
+      250,
+      1e-8,
+      initialResidual,
+      pcm::StructureSimplificationMode::ALL_TIM,
+      -1.,
+      50,
+      false,
+      pcm::LinkSwappingMode::NO_SWAPPING,
+      10,
+      1.,
+      1);
+    forceBalanceNew.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE,
+      1.0,
+      250,
+      1e-8,
+      initialResidual,
+      pcm::StructureSimplificationMode::ALL_TIM,
+      -1.,
+      50,
+      false,
+      pcm::LinkSwappingMode::NO_SWAPPING,
+      10,
+      1.,
+      1);
+
+    CHECK(forceBalanceConventional.getStressTensor().isApprox(
+      forceBalanceNew.getStressTensor()));
+    CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
+          Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
+    CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
+          Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
+
+    forceBalanceConventional.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE,
+      1.0,
+      250,
+      1e-8,
+      initialResidual,
+      pcm::StructureSimplificationMode::ALL_TIM,
+      -1.,
+      50,
+      false,
+      pcm::LinkSwappingMode::ALL_MC,
+      10,
+      1.,
+      0);
+    forceBalanceNew.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE,
+      1.0,
+      250,
+      1e-8,
+      initialResidual,
+      pcm::StructureSimplificationMode::ALL_TIM,
+      -1.,
+      50,
+      false,
+      pcm::LinkSwappingMode::ALL_MC,
+      10,
+      1.,
+      0);
+
+    CHECK(forceBalanceConventional.getStressTensor().isApprox(
+      forceBalanceNew.getStressTensor()));
+    CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
+          Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
+    CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
+          Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
   }
 }
 
