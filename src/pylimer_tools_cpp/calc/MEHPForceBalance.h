@@ -570,6 +570,7 @@ namespace calc {
        * @param slipLinkIdx
        */
       size_t addSlipLinkToPartialSpring(ForceBalanceNetwork& net,
+                                        const Eigen::VectorXd& displacements,
                                         Eigen::VectorXd& springPartitions,
                                         const size_t partialSpringIdx,
                                         const size_t slipLinkIdx,
@@ -1202,8 +1203,8 @@ namespace calc {
         const size_t linkIdx,
         bool is2d = false) const
       {
-        assert(net.springPartIndexA(springIdx) == linkIdx ||
-               net.springPartIndexB(springIdx) == linkIdx);
+        assert(this->isPartOfSpring(net, linkIdx, springIdx));
+
         Eigen::Vector3d dist =
           this->evaluatePartialSpringDistance(net, u, springIdx, is2d);
 
@@ -1584,7 +1585,7 @@ namespace calc {
        */
       void reAlignSlipLinkToImages(ForceBalanceNetwork& net,
 
-                                   Eigen::VectorXd& u,
+                                   const Eigen::VectorXd& u,
                                    const size_t slipLinkIdx,
                                    const size_t spring1,
                                    const size_t spring2) const;
@@ -2207,6 +2208,13 @@ namespace calc {
                (net.springPartIndexB[partialSpringIdx] == linkIdx);
       }
 
+      bool isPrimaryLoop(const ForceBalanceNetwork& net,
+                         size_t partialSpringIdx) const
+      {
+        return (net.springPartIndexA[partialSpringIdx] ==
+                net.springPartIndexB[partialSpringIdx]);
+      }
+
       double getDenominatorOfPartialSpring(
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& springPartitions,
@@ -2257,6 +2265,15 @@ namespace calc {
           return -1;
         }
 
+        // validation: check distances
+        Eigen::Vector3d distanceBefore =
+          this->evaluatePartialSpringDistanceTo(
+            net, u, otherInvolvedPartialSpring, involvedSlipLink, this->is2D) +
+          this->evaluatePartialSpringDistanceTo(
+            net, u, sourcePartialSpringIdx, involvedCrossLink, this->is2D) +
+          this->evaluatePartialSpringDistanceFrom(
+            net, u, targetPartialSpringIdx, involvedCrossLink, this->is2D);
+
         // remove the slip-link from one branch of the x-link
         // but skip resizing the Eigen structures, since the additional rows are
         // still needed
@@ -2278,17 +2295,24 @@ namespace calc {
         if (targetPartialSpringIdx > sourcePartialSpringIdx) {
           targetPartialSpringIdx -= 1;
         }
+        if (otherInvolvedPartialSpring > sourcePartialSpringIdx) {
+          otherInvolvedPartialSpring -= 1;
+        }
 
         assert(
-          net.springPartIndexA[targetPartialSpringIdx] == involvedCrossLink ||
-          net.springPartIndexB[targetPartialSpringIdx] == involvedCrossLink);
+          this->isPartOfSpring(net, involvedCrossLink, targetPartialSpringIdx));
+
         size_t newPartialSpringIdx =
           this->addSlipLinkToPartialSpring(net,
+                                           u,
                                            springPartitions,
                                            targetPartialSpringIdx,
                                            involvedSlipLink,
                                            oneOverSpringPartitionUpperLimit);
 
+        // finally, return the idx of the new partial spring
+        long int resultingPartialSpringIdx = 0;
+        long int remainingPartialSpringIdx = 0;
         if ((net.springPartIndexA[targetPartialSpringIdx] ==
                involvedCrossLink &&
              net.springPartIndexB[targetPartialSpringIdx] ==
@@ -2297,7 +2321,8 @@ namespace calc {
                involvedCrossLink &&
              net.springPartIndexA[targetPartialSpringIdx] ==
                involvedSlipLink)) {
-          return targetPartialSpringIdx;
+          resultingPartialSpringIdx = targetPartialSpringIdx;
+          remainingPartialSpringIdx = newPartialSpringIdx;
         } else {
           RUNTIME_EXP_IFN(
             (net.springPartIndexA[newPartialSpringIdx] == involvedCrossLink &&
@@ -2306,8 +2331,27 @@ namespace calc {
                net.springPartIndexA[newPartialSpringIdx] == involvedSlipLink),
             "Expected to find cross- and slip-link at either partial spring, "
             "but did not.");
-          return newPartialSpringIdx;
+          resultingPartialSpringIdx = newPartialSpringIdx;
+          remainingPartialSpringIdx = targetPartialSpringIdx;
         }
+
+        // validation: check distances
+        if (!this->assumeBoxLargeEnough &&
+            !this->isPrimaryLoop(net, resultingPartialSpringIdx) &&
+            !this->isPrimaryLoop(net, remainingPartialSpringIdx)) {
+          Eigen::Vector3d distanceAfter =
+            this->evaluatePartialSpringDistanceTo(net,
+                                                  u,
+                                                  otherInvolvedPartialSpring,
+                                                  involvedCrossLink,
+                                                  this->is2D) +
+            this->evaluatePartialSpringDistanceTo(
+              net, u, resultingPartialSpringIdx, involvedSlipLink, this->is2D) +
+            this->evaluatePartialSpringDistanceFrom(
+              net, u, remainingPartialSpringIdx, involvedSlipLink, this->is2D);
+          assert(distanceAfter.isApprox(distanceBefore));
+        }
+        return resultingPartialSpringIdx;
       };
 
       bool swapSlipLinksReversibly(

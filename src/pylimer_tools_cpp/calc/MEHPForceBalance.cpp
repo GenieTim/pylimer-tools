@@ -2696,6 +2696,7 @@ namespace calc {
      */
     size_t MEHPForceBalance::addSlipLinkToPartialSpring(
       ForceBalanceNetwork& net,
+      const Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions,
       const size_t partialSpringIdx,
       const size_t slipLinkIdx,
@@ -2705,8 +2706,8 @@ namespace calc {
         !net.linkIsSliplink[net.springPartIndexA[partialSpringIdx]] ||
           !net.linkIsSliplink[net.springPartIndexB[partialSpringIdx]],
         "Require at least one part to be a cross-link.");
+      const size_t newPartialSpringIdx = net.nrOfPartialSprings;
       net.nrOfPartialSprings += 1;
-      const size_t newPartialSpringIdx = net.nrOfPartialSprings - 1;
       const size_t relevantSpring =
         net.partialToFullSpringIndex[partialSpringIdx];
       const double N = net.springsContourLength[relevantSpring];
@@ -2721,6 +2722,13 @@ namespace calc {
           1.,
         "With this minimum alpha, the slip-link cannot be placed on this "
         "partial spring.");
+
+      size_t oldPartnerA = net.springPartIndexA[partialSpringIdx];
+      size_t oldPartnerB = net.springPartIndexB[partialSpringIdx];
+
+      Eigen::Vector3d distanceBefore = this->evaluatePartialSpringDistanceFrom(
+        net, u, partialSpringIdx, oldPartnerA);
+
       // std::cout << "Adding slip-link " << slipLinkIdx << " to spring "
       //           << relevantSpring << " (partial " << partialSpringIdx
       //           << ") with minAlpha = " << minAlpha << std::endl;
@@ -2744,22 +2752,22 @@ namespace calc {
       pylimer_tools::utils::addIfNotContained(
         net.springIndicesOfLinks[slipLinkIdx], relevantSpring);
 
-      size_t oldPartnerA = net.springPartIndexA[partialSpringIdx];
-      size_t oldPartnerB = net.springPartIndexB[partialSpringIdx];
-
       // slightly change numbering to keep the numbering of
       // localToGlobalSpringIndex constant. I.e., we want the
       // `newPartialSpringIdx` to correspond to the spring with the cross-link
       size_t springPartToReplace;
+      size_t partialSpringWithA;
       bool forward;
       if (net.localToGlobalSpringIndex[relevantSpring][0] == partialSpringIdx) {
         forward = true;
         if (net.linkIndicesOfSprings[relevantSpring][0] == oldPartnerA) {
           springPartToReplace = oldPartnerA;
+          partialSpringWithA = newPartialSpringIdx;
           // std::cout << "Case 1a" << std::endl;
         } else {
           assert(net.linkIndicesOfSprings[relevantSpring][0] == oldPartnerB);
           springPartToReplace = oldPartnerB;
+          partialSpringWithA = partialSpringIdx;
           // std::cout << "Case 1b" << std::endl;
         }
         net.linkIndicesOfSprings[relevantSpring].insert(
@@ -2775,11 +2783,13 @@ namespace calc {
         if (pylimer_tools::utils::last(
               net.linkIndicesOfSprings[relevantSpring]) == oldPartnerA) {
           springPartToReplace = oldPartnerA;
+          partialSpringWithA = newPartialSpringIdx;
           // std::cout << "Case 2a" << std::endl;
         } else {
           assert(pylimer_tools::utils::last(
                    net.linkIndicesOfSprings[relevantSpring]) == oldPartnerB);
           springPartToReplace = oldPartnerB;
+          partialSpringWithA = partialSpringIdx;
           // std::cout << "Case 2b" << std::endl;
         }
         net.linkIndicesOfSprings[relevantSpring].insert(
@@ -2813,10 +2823,6 @@ namespace calc {
         net.springPartCoordinateIndexB[3 * newPartialSpringIdx + dir] =
           3 * springPartToReplace + dir;
       }
-      // TODO: this is problematic: instead, the decision has to be made, how
-      // the previous/existing offset should be split, etc.
-      net.springPartBoxOffset.segment(3 * newPartialSpringIdx, 3) =
-        Eigen::Vector3d::Zero();
 
       // renormalize this spring
       // mostly by moving the next slip-link further
@@ -2863,11 +2869,43 @@ namespace calc {
         springPartitions(net.localToGlobalSpringIndex[relevantSpring]).sum();
       RUNTIME_EXP_IFN(APPROX_EQUAL(newTotalForNormalization, 1.0, 1e-9), "");
 
+      // TODO: this is problematic: instead, the decision has to be made, how
+      // the previous/existing offset should be split, etc.
+      net.springPartBoxOffset.segment(3 * newPartialSpringIdx, 3) =
+        Eigen::Vector3d::Zero();
+      this->reAlignSlipLinkToImages(
+        net, u, slipLinkIdx, partialSpringIdx, newPartialSpringIdx);
+
+      // TODO: figure out what to do with "new" primary loops
+      if (!this->assumeBoxLargeEnough && oldPartnerA != slipLinkIdx &&
+          oldPartnerB != slipLinkIdx) {
+        Eigen::Vector3d partial1 = this->evaluatePartialSpringDistanceFrom(
+          net, u, newPartialSpringIdx, slipLinkIdx, this->is2D);
+        Eigen::Vector3d partial2 = this->evaluatePartialSpringDistanceTo(
+          net, u, partialSpringIdx, slipLinkIdx, this->is2D);
+        Eigen::Vector3d distanceAfter = partial1 + partial2;
+
+        Eigen::Vector3d partialAlt1 = this->evaluatePartialSpringDistanceFrom(
+          net, u, partialSpringWithA, oldPartnerA, this->is2D);
+        Eigen::Vector3d partialAlt2 = this->evaluatePartialSpringDistanceTo(
+          net,
+          u,
+          partialSpringWithA == newPartialSpringIdx ? partialSpringIdx
+                                                    : newPartialSpringIdx,
+          oldPartnerB,
+          this->is2D);
+        Eigen::Vector3d altDistanceAfter = partialAlt1 + partialAlt2;
+
+        assert(distanceBefore.isApprox(altDistanceAfter));
+        assert(distanceAfter.isApprox(distanceBefore) ||
+               distanceAfter.isApprox(-1. * distanceBefore));
+      }
+
       return newPartialSpringIdx;
     }
 
     /**
-     * @brief Replace the two springs traversinga a two-functional cross-links
+     * @brief Replace the two springs traversing a two-functional cross-links
      * with a single spring
      *
      * @param net
@@ -3233,9 +3271,10 @@ namespace calc {
           (oneOverSpringPartitionUpperLimit > 0.)
             ? 1. / (N - 1. / oneOverSpringPartitionUpperLimit)
             : 1e-12;
-        std::vector<size_t> linksOnSpring = net.linkIndicesOfSprings[springIdx];
-        for (size_t linkI = 1; linkI < linksOnSpring.size() - 1; linkI++) {
-          if (linksOnSpring[linkI] == slipLinkIdx) {
+        for (size_t linkI = 1;
+             linkI < net.linkIndicesOfSprings[springIdx].size() - 1;
+             ++linkI) {
+          if (net.linkIndicesOfSprings[springIdx][linkI] == slipLinkIdx) {
             // found index of this slip-link.
             double partitionBeforeIdx =
               net.localToGlobalSpringIndex[springIdx][linkI - 1];
@@ -3794,7 +3833,7 @@ namespace calc {
      * @param spring2 the partial spring idx of the other spring
      */
     void MEHPForceBalance::reAlignSlipLinkToImages(ForceBalanceNetwork& net,
-                                                   Eigen::VectorXd& u,
+                                                   const Eigen::VectorXd& u,
                                                    const size_t slipLinkIdx,
                                                    const size_t spring1,
                                                    const size_t spring2) const
@@ -3802,10 +3841,8 @@ namespace calc {
       if (this->assumeBoxLargeEnough) {
         return;
       }
-      assert(net.springPartIndexA[spring1] == slipLinkIdx ||
-             net.springPartIndexB[spring1] == slipLinkIdx);
-      assert(net.springPartIndexA[spring2] == slipLinkIdx ||
-             net.springPartIndexB[spring2] == slipLinkIdx);
+      assert(this->isPartOfSpring(net, slipLinkIdx, spring1));
+      assert(this->isPartOfSpring(net, slipLinkIdx, spring2));
       assert(net.linkIsSliplink[slipLinkIdx]);
       Eigen::Vector3d totalOffset =
         this->getPartialSpringBoxOffsetTo(net, spring1, slipLinkIdx) +
@@ -4260,15 +4297,14 @@ namespace calc {
         (this->getPartialSpringBoxOffsetTo(
            net, otherPartialOfLinkIdx2, linkIdx2) +
          this->getPartialSpringBoxOffsetTo(net, partialSpringIdx, linkIdx1));
-      net.springPartBoxOffset.segment(otherPartialOfLinkIdx1 * 3, 3) =
-        newOffset1;
-      net.springPartBoxOffset.segment(otherPartialOfLinkIdx2 * 3, 3) =
-        newOffset2;
+      double offset1Sign = 1.;
+      double offset2Sign = 1.;
       // actually do the swapping
       if (net.springPartIndexA[otherPartialOfLinkIdx1] == linkIdx1) {
         net.springPartIndexA[otherPartialOfLinkIdx1] = linkIdx2;
         net.springPartCoordinateIndexA.segment(3 * otherPartialOfLinkIdx1, 3) =
           Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx2, 3 * linkIdx2 + 2);
+        offset1Sign = -1.;
       } else {
         RUNTIME_EXP_IFN(net.springPartIndexB[otherPartialOfLinkIdx1] ==
                           linkIdx1,
@@ -4281,6 +4317,7 @@ namespace calc {
         net.springPartIndexA[otherPartialOfLinkIdx2] = linkIdx1;
         net.springPartCoordinateIndexA.segment(3 * otherPartialOfLinkIdx2, 3) =
           Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx1, 3 * linkIdx1 + 2);
+        offset2Sign = -1.;
       } else {
         RUNTIME_EXP_IFN(net.springPartIndexB[otherPartialOfLinkIdx2] ==
                           linkIdx2,
@@ -4289,6 +4326,10 @@ namespace calc {
         net.springPartCoordinateIndexB.segment(3 * otherPartialOfLinkIdx2, 3) =
           Eigen::ArrayXi::LinSpaced(3, 3 * linkIdx1, 3 * linkIdx1 + 2);
       }
+      net.springPartBoxOffset.segment(otherPartialOfLinkIdx1 * 3, 3) =
+        offset1Sign * newOffset1;
+      net.springPartBoxOffset.segment(otherPartialOfLinkIdx2 * 3, 3) =
+        offset2Sign * newOffset2;
 
       // std::swap(net.linkIndicesOfSprings[springIdx][firstPositionInSpring],
       //           net.linkIndicesOfSprings[springIdx][firstPositionInSpring +
