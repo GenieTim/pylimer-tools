@@ -1589,12 +1589,12 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC",
 
     pcm::MEHPForceBalance forceBalanceConventional =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-        universe, 250, 2.0, 100, 2.0, "533d", 2, false, 1.0);
+        universe, 250, 2.0, 100, 2.0, "a533d", 2, false, 1.0);
     forceBalanceConventional.configAssumeBoxLargeEnough(true);
 
     pcm::MEHPForceBalance forceBalanceNew =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-        universe, 250, 2.0, 100, 2.0, "533d", 2, false, 1.0);
+        universe, 250, 2.0, 100, 2.0, "a533d", 2, false, 1.0);
     forceBalanceNew.configAssumeBoxLargeEnough(false);
 
     CHECK(forceBalanceConventional.getStressTensor().isApprox(
@@ -1666,7 +1666,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC",
       pcm::LinkSwappingMode::ALL_MC,
       10,
       1.,
-      0);
+      3);
     forceBalanceNew.runForceRelaxation(
       pcm::BalanceRunMode::ITERATIVE,
       1.0,
@@ -1680,7 +1680,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC",
       pcm::LinkSwappingMode::ALL_MC,
       10,
       1.,
-      0);
+      3);
 
     CHECK(forceBalanceConventional.getStressTensor().isApprox(
       forceBalanceNew.getStressTensor()));

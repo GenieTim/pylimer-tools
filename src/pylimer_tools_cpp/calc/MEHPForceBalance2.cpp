@@ -858,6 +858,7 @@ namespace calc {
           igraph_cattribute_EAN(&this->graph, "partition_fraction", railEdgeId),
         igraph_cattribute_EAN(&this->graph, "contour_length", railEdgeId),
         Eigen::Vector3d::Zero());
+      // TODO: reconsider the offsets
       igraph_integer_t newEdge2 = this->createEdge(
         vertexId,
         to,
