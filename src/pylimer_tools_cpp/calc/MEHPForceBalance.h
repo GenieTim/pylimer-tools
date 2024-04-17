@@ -308,6 +308,7 @@ namespace calc {
         }
 
         if (partialSpringIdx < numPartialSpringsEstimate) {
+          // reduce sizes again
           fb.initialConfig.nrOfPartialSprings = partialSpringIdx;
           fb.currentSpringPartitionsVec.conservativeResize(partialSpringIdx);
           fb.initialConfig.springPartBoxOffset.conservativeResize(
