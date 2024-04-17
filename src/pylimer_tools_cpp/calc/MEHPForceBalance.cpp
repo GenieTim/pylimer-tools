@@ -345,9 +345,9 @@ namespace calc {
           wasInterrupted = true;
           break;
         }
-      } while (currentResidual / initialResidual > xtol &&
-               iterationsDone < maxNrOfSteps &&
-               this->initialConfig.nrOfSprings > 0);
+      } while (
+        currentResidual / initialResidual > xtol &&
+        iterationsDone<maxNrOfSteps&& this->initialConfig.nrOfSprings> 0);
 
       // finish up
       this->closeAllOutputs();
@@ -2876,29 +2876,43 @@ namespace calc {
       this->reAlignSlipLinkToImages(
         net, u, slipLinkIdx, partialSpringIdx, newPartialSpringIdx);
 
-      // TODO: figure out what to do with "new" primary loops
-      if (!this->assumeBoxLargeEnough && oldPartnerA != slipLinkIdx &&
-          oldPartnerB != slipLinkIdx) {
-        Eigen::Vector3d partial1 = this->evaluatePartialSpringDistanceFrom(
-          net, u, newPartialSpringIdx, slipLinkIdx, this->is2D);
-        Eigen::Vector3d partial2 = this->evaluatePartialSpringDistanceTo(
-          net, u, partialSpringIdx, slipLinkIdx, this->is2D);
-        Eigen::Vector3d distanceAfter = partial1 + partial2;
+      if (!this->assumeBoxLargeEnough) {
 
-        Eigen::Vector3d partialAlt1 = this->evaluatePartialSpringDistanceFrom(
-          net, u, partialSpringWithA, oldPartnerA, this->is2D);
-        Eigen::Vector3d partialAlt2 = this->evaluatePartialSpringDistanceTo(
-          net,
-          u,
-          partialSpringWithA == newPartialSpringIdx ? partialSpringIdx
-                                                    : newPartialSpringIdx,
-          oldPartnerB,
-          this->is2D);
-        Eigen::Vector3d altDistanceAfter = partialAlt1 + partialAlt2;
+        if (oldPartnerA != slipLinkIdx && oldPartnerB != slipLinkIdx) {
+          Eigen::Vector3d partial1 = this->evaluatePartialSpringDistanceFrom(
+            net, u, newPartialSpringIdx, slipLinkIdx, this->is2D);
+          Eigen::Vector3d partial2 = this->evaluatePartialSpringDistanceTo(
+            net, u, partialSpringIdx, slipLinkIdx, this->is2D);
+          Eigen::Vector3d distanceAfter = partial1 + partial2;
 
-        assert(distanceBefore.isApprox(altDistanceAfter));
-        assert(distanceAfter.isApprox(distanceBefore) ||
-               distanceAfter.isApprox(-1. * distanceBefore));
+          Eigen::Vector3d partialAlt1 = this->evaluatePartialSpringDistanceFrom(
+            net, u, partialSpringWithA, oldPartnerA, this->is2D);
+          Eigen::Vector3d partialAlt2 = this->evaluatePartialSpringDistanceTo(
+            net,
+            u,
+            partialSpringWithA == newPartialSpringIdx ? partialSpringIdx
+                                                      : newPartialSpringIdx,
+            oldPartnerB,
+            this->is2D);
+          Eigen::Vector3d altDistanceAfter = partialAlt1 + partialAlt2;
+
+          assert(distanceBefore.isApprox(altDistanceAfter));
+          assert(distanceAfter.isApprox(distanceBefore) ||
+                 distanceAfter.isApprox(-1. * distanceBefore));
+        } else {
+          // built a new primary loop.
+          // without PBC, these are dangerous, since even though they could have
+          // non-zero length, we can't actually know its direction :P
+          net.springPartBoxOffset.segment(3 * newPartialSpringIdx, 3) =
+            this->universe.getBox().getOffset(
+              this->evaluatePartialSpringDistance(
+                net, u, newPartialSpringIdx, this->is2D));
+          net.springPartBoxOffset.segment(3 * partialSpringIdx, 3) =
+            this->universe.getBox().getOffset(
+              this->evaluatePartialSpringDistance(
+                net, u, partialSpringIdx, this->is2D));
+          // TODO: figure out what to do instead, correctly
+        }
       }
 
       return newPartialSpringIdx;
