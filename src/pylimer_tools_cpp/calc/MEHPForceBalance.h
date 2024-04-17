@@ -70,13 +70,10 @@ namespace calc {
        * @param kappa
        * @return MEHPForceBalance
        */
-      static MEHPForceBalance constructWithRandomSlipLinks(
+      static MEHPForceBalance constructWithSlipLinks(
         const pylimer_tools::entities::Universe& universe,
-        const size_t nrOfSliplinksToSample,
-        const double cutoff,
-        const size_t minimumNrOfSliplinks,
-        const double sameStrandCutoff,
-        const std::string seed = "",
+        pylimer_tools::calc::entanglement_detection::AtomPairEntanglements
+          entanglements,
         int crosslinkerType = 2,
         bool is2D = false,
         double kappa = 1.0)
@@ -87,17 +84,6 @@ namespace calc {
           MEHPForceBalance(emptyUniverse, crosslinkerType, is2D, kappa);
         fb.configAssumeBoxLargeEnough(false);
         fb.universe = universe;
-
-        // sample the "entanglements"
-        pylimer_tools::calc::entanglement_detection::AtomPairEntanglements
-          entanglements = pylimer_tools::calc::entanglement_detection::
-            randomlyFindEntanglements(universe,
-                                      nrOfSliplinksToSample,
-                                      cutoff,
-                                      minimumNrOfSliplinks,
-                                      sameStrandCutoff,
-                                      seed,
-                                      crosslinkerType);
 
         std::vector<std::pair<size_t, size_t>> pairsOfAtoms =
           entanglements.pairsOfAtoms;
@@ -144,6 +130,7 @@ namespace calc {
         fb.initialConfig.nrOfLinks = currentVertexId + pairsOfAtoms.size();
         fb.initialConfig.oldAtomIds.resize(fb.initialConfig.nrOfNodes);
         fb.currentDisplacements.resize(3 * fb.initialConfig.nrOfLinks);
+        fb.currentDisplacements.setZero();
         fb.initialConfig.coordinates.conservativeResize(
           3 * fb.initialConfig.nrOfLinks);
         fb.initialConfig.linkIsSliplink.conservativeResize(
@@ -329,6 +316,46 @@ namespace calc {
         fb.completeInitialization();
 
         return fb;
+      }
+
+      /**
+       * @brief Instantiate this simulator with randomly chosen slip-links.
+       *
+       * @param universe
+       * @param nrOfSliplinksToSample
+       * @param cutoff
+       * @param minimumNrOfSliplinks
+       * @param sameStrandCutoff
+       * @param seed
+       * @param crosslinkerType
+       * @param is2D
+       * @param kappa
+       * @return MEHPForceBalance
+       */
+      static MEHPForceBalance constructWithRandomSlipLinks(
+        const pylimer_tools::entities::Universe& universe,
+        const size_t nrOfSliplinksToSample,
+        const double cutoff,
+        const size_t minimumNrOfSliplinks,
+        const double sameStrandCutoff,
+        const std::string seed = "",
+        int crosslinkerType = 2,
+        bool is2D = false,
+        double kappa = 1.0)
+      {
+        // sample the "entanglements"
+        pylimer_tools::calc::entanglement_detection::AtomPairEntanglements
+          entanglements = pylimer_tools::calc::entanglement_detection::
+            randomlyFindEntanglements(universe,
+                                      nrOfSliplinksToSample,
+                                      cutoff,
+                                      minimumNrOfSliplinks,
+                                      sameStrandCutoff,
+                                      seed,
+                                      crosslinkerType);
+                                      
+        return MEHPForceBalance::constructWithSlipLinks(
+          universe, entanglements, crosslinkerType, is2D, kappa);
       }
 
       /**
@@ -943,10 +970,31 @@ namespace calc {
         return this->currentSpringDistances;
       }
 
+      Eigen::VectorXd getCurrentSpringLengths() const
+      {
+        Eigen::VectorXd vecs = this->getCurrentSpringDistances();
+        Eigen::VectorXd results = Eigen::VectorXd::Zero(vecs.size() / 3);
+        for (size_t i = 0; i < vecs.size() / 3; ++i) {
+          results(i) = vecs.segment(3 * i, 3).norm();
+        }
+        return results;
+      }
+
       Eigen::VectorXd getCurrentPartialSpringDistances() const
       {
         return this->evaluatePartialSpringVectors(
           this->initialConfig, this->currentDisplacements, this->is2D);
+      }
+
+      Eigen::VectorXd getCurrentPartialSpringLengths() const
+      {
+        Eigen::VectorXd vecs = this->evaluatePartialSpringVectors(
+          this->initialConfig, this->currentDisplacements, this->is2D);
+        Eigen::VectorXd results = Eigen::VectorXd::Zero(vecs.size() / 3);
+        for (size_t i = 0; i < vecs.size() / 3; ++i) {
+          results(i) = vecs.segment(3 * i, 3).norm();
+        }
+        return results;
       }
 
       /**

@@ -994,6 +994,18 @@ init_pylimer_bound_calc(py::module_& m)
           :param tolerance: springs under this length are considered inactive
      )pbdoc",
          py::arg("tolerance") = 0.1)
+    .def("getCurrentPartialSpringVectors",
+         &mehp::MEHPForceBalance::getCurrentPartialSpringDistances,
+         R"pbdoc(
+          Get the partial spring vectors.
+     )pbdoc")
+    .def("getCurrentPartialSpringLengths",
+         &mehp::MEHPForceBalance::getCurrentPartialSpringLengths,
+         R"pbdoc(
+          Get the partial spring distances.
+     )pbdoc")
+    .def("getCurrentSpringVectors",
+         &mehp::MEHPForceBalance::getCurrentSpringDistances)
     .def("getEffectiveFunctionalityOfAtoms",
          &mehp::MEHPForceBalance::getEffectiveFunctionalityOfAtoms,
          R"pbdoc(

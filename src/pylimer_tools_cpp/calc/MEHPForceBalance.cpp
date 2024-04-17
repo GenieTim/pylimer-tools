@@ -1167,7 +1167,7 @@ namespace calc {
 
       std::random_device rd{};
       std::mt19937 rng = std::mt19937(seed > 0 ? seed : rd());
-      std::cout << "Initial sampling rng seed: " << rng << std::endl;
+      // std::cout << "Initial sampling rng seed: " << rng << std::endl;
       // build list of random samples
       // this way is more performant than
       // sampling integers and checking whether they have been sampled already
