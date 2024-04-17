@@ -1569,7 +1569,7 @@ TEST_CASE("MEHP Force Balance Fully active chains are fully active",
   }
 }
 
-TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC",
+TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC imperfect Diamond Network",
           "[analysis][MEHPForceBalance]")
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
@@ -1595,6 +1595,128 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC",
     pcm::MEHPForceBalance forceBalanceNew =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
         universe, 250, 2.0, 100, 2.0, "a533d", 2, false, 1.0);
+    forceBalanceNew.configAssumeBoxLargeEnough(false);
+
+    CHECK(forceBalanceConventional.getStressTensor().isApprox(
+      forceBalanceNew.getStressTensor()));
+
+    double initialResidual =
+      forceBalanceConventional.getDisplacementResidualNorm();
+    CHECK(initialResidual ==
+          Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
+
+    forceBalanceConventional.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE, 1.0, 250, 1e-4);
+    forceBalanceNew.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE, 1.0, 250, 1e-4);
+
+    CHECK(forceBalanceConventional.getStressTensor().isApprox(
+      forceBalanceNew.getStressTensor()));
+    CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
+          Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
+    CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
+          Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
+
+    forceBalanceConventional.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE,
+      1.0,
+      250,
+      1e-8,
+      initialResidual,
+      pcm::StructureSimplificationMode::ALL_TIM,
+      -1.,
+      50,
+      false,
+      pcm::LinkSwappingMode::NO_SWAPPING,
+      10,
+      1.,
+      1);
+    forceBalanceNew.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE,
+      1.0,
+      250,
+      1e-8,
+      initialResidual,
+      pcm::StructureSimplificationMode::ALL_TIM,
+      -1.,
+      50,
+      false,
+      pcm::LinkSwappingMode::NO_SWAPPING,
+      10,
+      1.,
+      1);
+
+    CHECK(forceBalanceConventional.getStressTensor().isApprox(
+      forceBalanceNew.getStressTensor()));
+    CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
+          Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
+    CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
+          Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
+
+    forceBalanceConventional.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE,
+      1.0,
+      250,
+      1e-8,
+      initialResidual,
+      pcm::StructureSimplificationMode::ALL_TIM,
+      -1.,
+      50,
+      false,
+      pcm::LinkSwappingMode::ALL_MC,
+      10,
+      1.,
+      3);
+    forceBalanceNew.runForceRelaxation(
+      pcm::BalanceRunMode::ITERATIVE,
+      1.0,
+      250,
+      1e-8,
+      initialResidual,
+      pcm::StructureSimplificationMode::ALL_TIM,
+      -1.,
+      50,
+      false,
+      pcm::LinkSwappingMode::ALL_MC,
+      10,
+      1.,
+      3);
+
+    CHECK(forceBalanceConventional.getStressTensor().isApprox(
+      forceBalanceNew.getStressTensor()));
+    CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
+          Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
+    CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
+          Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
+  }
+}
+
+TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
+          "[analysis][MEHPForceBalance]")
+{
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  REQUIRE(universeSeq.getLength() == 0);
+  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+
+  // perfect diamond network = fully connected =>
+  // maximum is at perfect crystal structure -> must be all active.
+  std::string inputFile =
+    suspectedPath +
+    "crosslinked_p_1_1_melt_100_a_3_50_xlinks_v_1.V-fixed.structure.out-finish_crosslinking.structure.out";
+  if (std::filesystem::exists(inputFile)) {
+    std::cout << "Reading file " << inputFile << std::endl;
+    universeSeq.initializeFromDataSequence({ { inputFile } });
+    pe::Universe universe = universeSeq.atIndex(0);
+    std::cout << "Read file " << inputFile << std::endl;
+
+    pcm::MEHPForceBalance forceBalanceConventional =
+      pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+        universe, 25, 2.0, 20, 2.0, "a533d", 2, false, 1.0);
+    forceBalanceConventional.configAssumeBoxLargeEnough(true);
+
+    pcm::MEHPForceBalance forceBalanceNew =
+      pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+        universe, 25, 2.0, 20, 2.0, "a533d", 2, false, 1.0);
     forceBalanceNew.configAssumeBoxLargeEnough(false);
 
     CHECK(forceBalanceConventional.getStressTensor().isApprox(

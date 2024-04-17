@@ -511,6 +511,7 @@ def computeModulusDecomposition(network: Universe, unitStyle: UnitStyle, crossli
     # entanglement part. TODO : check adjustment with r (and where the 0.22 is coming from? Fabian' s fit!)
     return G_MMT_phantom, G_MMT_entanglement, G_ANM, G_PNM
 
+
 def computeExtractedModulus(p: float, r: float, f: int, Ge1: pint.Quantity, w_sol: float, xlink_concentration_0: pint.Quantity,  alpha: Union[float, None] = None, T: pint.Quantity = None, unit_style: Union[None, UnitStyle] = None):
     """
     Compute MMT's modulus, assuming the solvent is removed
@@ -667,7 +668,7 @@ def computeStoichiometricInbalance(network: Universe, crosslinkerType: int, stra
 
     counts = Counter(network.getAtomTypes())
 
-    if (functionalityPerType is None or crosslinkerType not in functionalityPerType):
+    if (functionalityPerType is None or not np.all([k in functionalityPerType for k in counts if counts[k] > 0])):
         functionalityPerType = network.determineEffectiveFunctionalityPerType(
         ) if effective else network.determineFunctionalityPerType()
 
@@ -683,7 +684,7 @@ def computeStoichiometricInbalance(network: Universe, crosslinkerType: int, stra
     crosslinkerFormableBonds = counts[crosslinkerType] * \
         functionalityPerType[crosslinkerType]
     otherFormableBonds = 0
-    for key in counts:        
+    for key in counts:
         if (key in ignoreTypes or counts[key] == 0):
             continue
         if (key not in functionalityPerType):
