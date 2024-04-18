@@ -29,7 +29,7 @@ def cli(files):
         non_none_bond_lengths = [
             bl for bl in bond_lengths if bl is not None and bl > 0]
         click.echo("Mean bond length: {} u, (min: {}, max: {}, median: {}) u".format(
-            np.mean(non_none_bond_lengths), np.min(non_none_bond_lengths), 
+            np.mean(non_none_bond_lengths), np.min(non_none_bond_lengths),
             np.max(non_none_bond_lengths), np.median(non_none_bond_lengths)))
         end_to_end_distances = [m.computeEndToEndDistance() for m in molecules]
         click.echo("Mean end to end distance: {} u".format(
