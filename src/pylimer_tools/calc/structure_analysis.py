@@ -374,6 +374,7 @@ def compute_weight_fractions(network: Universe) -> dict:
     """
     return network.computeWeightFractions()
 
+
 def measure_lower_bound_weight_fraction_of_soluble_material(network: Universe, crosslinker_type: int,
                                                             rel_tol: float = 0.75, abs_tol: float = None) -> float:
     """
