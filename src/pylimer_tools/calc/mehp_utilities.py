@@ -35,7 +35,7 @@ def predict_shear_modulus(networks: Iterable[Universe], temperature: float = 1, 
     for network in networks:
         nu += len(network.getMolecules(crosslinker_type)) / \
             (network.getVolume()) / len(networks)
-    return gamma*nu*k_boltzmann*temperature
+    return gamma * nu * k_boltzmann * temperature
 
 
 def compute_cycle_rank(networks: Iterable[Universe] = None, nu: int = None, mu: int = None,
@@ -116,7 +116,7 @@ def compute_effective_nr_density_of_network(networks: Iterable[Universe], abs_to
         abs_tol = r_tau_max
 
     # count how many effective strands there are
-    num_effective = np.array([r_tau > abs_tol or r_tau > rel_tol*r_tau_max
+    num_effective = np.array([r_tau > abs_tol or r_tau > rel_tol * r_tau_max
                              for r_tau in r_taus]).sum()
     mean_volume = compute_mean_universe_volume(networks)
 
@@ -138,7 +138,7 @@ def compute_mean_universe_volume(networks: Iterable[Universe], accept_different_
         raise ValueError('Must have at least one network')
     # compute the mean volume of the universes
     mean_volume = 0
-    divisor = 1/len(networks)
+    divisor = 1 / len(networks)
     network_size = networks[0].getNrOfAtoms()
     for network in networks:
         if (not accept_different_sizes and network.getNrOfAtoms() != network_size):
@@ -147,7 +147,7 @@ def compute_mean_universe_volume(networks: Iterable[Universe], accept_different_
                 + " (got one with {} instead of {})".format(
                     network.getNrOfAtoms(), network_size
                 ))
-        mean_volume += network.getVolume()*divisor
+        mean_volume += network.getVolume() * divisor
     return mean_volume
 
 
@@ -155,7 +155,7 @@ def compute_effective_nr_density_of_junctions(networks: Iterable[Universe], abs_
                                               crosslinker_type: int = 2, min_num_effective_strands=2) -> float:
     """
     Compute the number density of the elastically effective crosslinks,
-    defined as the ones that connect at least two elastically effective strands.
+    defined as the ones that connect at least `min_num_effective_strands` elastically effective strands.
     Assumes the precursor-chains to be bifunctional.
 
     Source:
@@ -181,7 +181,7 @@ def compute_effective_nr_density_of_junctions(networks: Iterable[Universe], abs_
     mean_volume = compute_mean_universe_volume(networks)
 
     if (min_num_effective_strands == 0):
-        return len(networks[0].getAtomsOfType(crosslinker_type))/mean_volume
+        return len(networks[0].getAtomsOfType(crosslinker_type)) / mean_volume
 
     # get the mean end to end distances
     r_taus = compute_mean_end_to_end_distances(networks, crosslinker_type)
@@ -193,15 +193,19 @@ def compute_effective_nr_density_of_junctions(networks: Iterable[Universe], abs_
     if (abs_tol is None):
         abs_tol = r_tau_max
 
+    key_to_molecule = {}
+    for molecule in list(networks)[0].getChainsWithCrosslinker(crosslinker_type):
+        key_to_molecule[molecule.getKey()] = molecule
+
     # count how many active connections each junction has
     junction_activity = {}
     for key in r_taus:
-        crosslinker_names = key.split("+")
-        assert (len(crosslinker_names) == 3)
-        is_active = r_taus[key] > abs_tol or r_taus[key] > rel_tol*r_tau_max
+        crosslinkers = key_to_molecule[key].getAtomsOfType(crosslinker_type)
+        assert (len(crosslinkers) == 2)
+        is_active = r_taus[key] > abs_tol or r_taus[key] > rel_tol * r_tau_max
         if (not (is_active)):
             continue
-        relevant_names = [crosslinker_names[0], crosslinker_names[1]]
+        relevant_names = [crosslinkers[0].getId(), crosslinkers[1].getId()]
         for crosslinker_name in relevant_names:
             if (crosslinker_name not in junction_activity):
                 junction_activity[crosslinker_name] = 0
@@ -210,7 +214,7 @@ def compute_effective_nr_density_of_junctions(networks: Iterable[Universe], abs_
     effective_junctions = np.array(
         [junction_activity[key] >= min_num_effective_strands for key in junction_activity])
     num_effective_junctions = effective_junctions.sum()
-    return num_effective_junctions/mean_volume
+    return num_effective_junctions / mean_volume
 
 
 def compute_topological_factor(networks: Iterable[Universe], crosslinker_type: int = 2,
@@ -255,8 +259,8 @@ def compute_topological_factor(networks: Iterable[Universe], crosslinker_type: i
         # sort crosslinkers by name as a way to keep the vector directions consistent between timesteps
         crosslinkers.sort(key=lambda a: a.getId())
         key = molecule.getKey()
-        gamma_sum += r_taus[key]*r_taus[key] / \
-            ((molecule.getLength()-2) * b *
+        gamma_sum += r_taus[key] * r_taus[key] / \
+            ((molecule.getLength() - 2) * b *
              b)  # -2: remove crosslinkers again (assumption 3)
 
     return gamma_sum / total_mass

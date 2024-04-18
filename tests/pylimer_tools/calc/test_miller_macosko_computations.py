@@ -73,14 +73,14 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         unit_style = unit_style_factory.get_unit_style("si")
         # TODO: find literature motiviation for results fo the functions
         self.assertAlmostEqual(0.1467020757993193, predict_shear_modulus(
-            self.saturatedTestUniverse, unit_style,
+            network=self.saturatedTestUniverse, unit_style=unit_style,
             crosslinker_type=2, strand_length=2).to('MPa').magnitude)
         self.assertAlmostEqual(0.1467020757993193, predict_shear_modulus(
-            self.saturatedTestUniverse, unit_style, crosslinker_type=2, strand_length=2,
+            network=self.saturatedTestUniverse, unit_style=unit_style, crosslinker_type=2, strand_length=2,
             functionality_per_type={2: 4}).to('MPa').magnitude)
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
         self.assertAlmostEqual(0.1467020757993193, predict_shear_modulus(
-            self.saturatedTestUniverse, unit_style, crosslinker_type=2).to('MPa').magnitude)
+            network=self.saturatedTestUniverse, unit_style=unit_style, crosslinker_type=2).to('MPa').magnitude)
 
     def test_predict_number_density_of_junction_points(self):
         self.testUniverse.setMasses({1: 1, 2: 1})
@@ -127,7 +127,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
     def test_soluble_weight_fraction_measurement(self):
         self.testUniverse.setMasses({1: 1, 2: 1})
         self.assertEqual(measure_weight_fraction_of_soluble_material(
-            self.emptyUniverse), None)
+            self.emptyUniverse), 0.0)
         self.assertEqual(measure_weight_fraction_of_soluble_material(
             self.testUniverse, rel_tol=0), 0.0)
         self.assertEqual(measure_weight_fraction_of_soluble_material(
@@ -135,7 +135,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertEqual(measure_weight_fraction_of_soluble_material(
             self.testUniverse), 1/8)
         self.assertEqual(measure_lower_bound_weight_fraction_of_soluble_material(
-            self.emptyUniverse, 2), None)
+            self.emptyUniverse, 2), 0.0)
         self.assertEqual(measure_lower_bound_weight_fraction_of_soluble_material(
             self.testUniverse, 2, abs_tol=0), 0.0)
         self.assertEqual(measure_lower_bound_weight_fraction_of_soluble_material(
@@ -180,7 +180,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
     def test_backbone_weight_fraction_calculations(self):
         self.assertEqual(0, compute_weight_fraction_of_backbone(
             self.emptyUniverse, 2))
-        self.assertEqual(0, compute_weight_fraction_of_dangling_chains(
+        self.assertEqual((0., 0.), compute_weight_fraction_of_dangling_chains(
             self.emptyUniverse, 2))
         self.assertEqual(1, compute_weight_fraction_of_soluble_material(
             self.emptyUniverse, 2))

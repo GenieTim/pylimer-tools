@@ -49,15 +49,15 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         self.assertSequenceEqual(
             [0, 2, 3], compute_effective_crosslinker_functionalities(self.testUniverse, 2))
         self.assertEqual(
-            5.0/3.0, compute_effective_crosslinker_functionality(self.testUniverse, 2))
+            5.0 / 3.0, compute_effective_crosslinker_functionality(self.testUniverse, 2))
         self.assertEqual(
-            5.0/3.0/3.0, compute_crosslinker_conversion(self.testUniverse, 2, 3))
+            5.0 / 3.0 / 3.0, compute_crosslinker_conversion(self.testUniverse, 2, 3))
 
     def test_mean_end_to_end_computation(self):
         self.assertCountEqual([], compute_mean_end_to_end_vectors([], 2))
         self.assertDictEqual({
-            '6+7+1-2-3-6-7': 1.0,
-            '6+7+5-6-7': 1.0
+            '1-2-3-6-7': 1.0,
+            '5-6-7': 1.0
         }, compute_mean_end_to_end_distances([self.testUniverse], 2))
 
     def test_mean_universe_volume(self):
@@ -68,7 +68,7 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         self.assertIsNone(compute_effective_nr_density_of_junctions([]))
         # Border cases
         self.assertEqual(
-            0.0, compute_effective_nr_density_of_junctions([self.testUniverse], 0, 0))
+            0.0, compute_effective_nr_density_of_junctions([self.testUniverse], 0, 0, crosslinker_type=None))
         self.assertEqual(
             0.0, compute_effective_nr_density_of_junctions([self.testUniverse], 1000, crosslinker_type=2))
         self.assertEqual(
@@ -76,18 +76,18 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         # Other border
         # 3 junctions, volume of 1
         self.assertEqual(
-            3.0/self.testUniverse.getVolume(),
+            3.0 / self.testUniverse.getVolume(),
             compute_effective_nr_density_of_junctions([self.testUniverse], 0,
-                                                      crosslinker_type=2, minNumEffectiveStrands=0))
+                                                      crosslinker_type=2, min_num_effective_strands=0))
         # actual calc: 6 & 7 are active, 4 not
         self.assertEqual(
-            2.0/self.testUniverse.getVolume(),
+            2.0 / self.testUniverse.getVolume(),
             compute_effective_nr_density_of_junctions([self.testUniverse], absTol=None, relTol=0,
-                                                      crosslinker_type=2, minNumEffectiveStrands=2))
+                                                      crosslinker_type=2, min_num_effective_strands=2))
         self.assertEqual(
-            2.0/self.testUniverse.getVolume(),
+            2.0 / self.testUniverse.getVolume(),
             compute_effective_nr_density_of_junctions([self.testUniverse], 0,
-                                                      crosslinker_type=2, minNumEffectiveStrands=2))
+                                                      crosslinker_type=2, min_num_effective_strands=2))
 
     def test_effective_nr_density_of_network_calculation(self):
         self.assertIsNone(compute_effective_nr_density_of_network([]))
@@ -101,7 +101,7 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
             0.0, compute_effective_nr_density_of_network([self.testUniverse], 1000, 1, crosslinker_type=2))
         # actual calc: we got 2 active strands in a Volume of 1
         self.assertEqual(
-            2.0/self.testUniverse.getVolume(),
+            2.0 / self.testUniverse.getVolume(),
             compute_effective_nr_density_of_network([self.testUniverse], 0, 2,
                                                     crosslinker_type=2))
 
@@ -113,19 +113,20 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         universe = self.addAtomBondData(
             universe, self.testAtoms, self.testBonds)
         # test basic exception thrown when specifying the wrong arguments
-        self.assertRaises(ValueError, lambda: compute_cycle_rank([universe]))
+        self.assertRaises(ValueError, lambda: compute_cycle_rank(
+            networks=[universe], crosslinker_type=None))
         self.assertRaises(
-            ValueError, lambda: compute_cycle_rank([universe], nu=1))
+            ValueError, lambda: compute_cycle_rank(networks=[universe], nu=1, crosslinker_type=None))
         # same nr of active strands as junctions
         self.assertEqual(
-            0.0, compute_cycle_rank([universe], None, None, 1, 1, 2))
+            0.0, compute_cycle_rank(networks=[universe], nu=None, mu=None, abs_tol=1, rel_tol=1, crosslinker_type=2))
         # other system
         self.assertEqual(
-            1/(10*10*10), compute_cycle_rank([self.saturatedTestUniverse], None, None, 1, 1, 2))
+            1 / (10 * 10 * 10), compute_cycle_rank(networks=[self.saturatedTestUniverse], nu=None, mu=None, abs_tol=1, rel_tol=1, crosslinker_type=2))
 
     def test_topological_factor_computation(self):
         self.assertEqual(
-            1 + 1.0/3.0, compute_topological_factor([self.testUniverse], 2, b=1))
+            1 + 1.0 / 3.0, compute_topological_factor([self.testUniverse], 2, b=1))
         bond_lengths = []
         for m in self.testUniverse.getMolecules(2):
             bond_lengths.extend(m.computeBondLengths())

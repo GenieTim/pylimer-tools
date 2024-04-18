@@ -1,6 +1,7 @@
 #ifndef MEHP_UTILITY_STRUCT_H
 #define MEHP_UTILITY_STRUCT_H
 
+#include "../utils/ExtraEigenTypes.h"
 #include "../utils/utilityMacros.h"
 #include <Eigen/Dense>
 #include <map>
@@ -8,7 +9,6 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
-#include "../utils/ExtraEigenTypes.h"
 
 namespace pylimer_tools {
 namespace calc {
@@ -104,11 +104,11 @@ namespace calc {
       bool isUpToDate = true;
       // coordinates & connectivity
       Eigen::VectorXd coordinates;
-      Eigen::VectorXd springsContourLength; /* the N for each spring */
-      ArrayXArrayXi springIndicesOfLinks;   // maps link -> springs
-      ArrayXArrayXi linkIndicesOfSprings;   // maps spring -> links
-      Eigen::ArrayXb partialSpringIsPartial; // indicates whether a spring involves a
-                                      // slip-link
+      Eigen::VectorXd springsContourLength;  /* the N for each spring */
+      ArrayXArrayXi springIndicesOfLinks;    // maps link -> springs
+      ArrayXArrayXi linkIndicesOfSprings;    // maps spring -> links
+      Eigen::ArrayXb partialSpringIsPartial; // indicates whether a spring
+                                             // involves a slip-link
       // local to global: from the 2D structures to the 1D Eigen vector
       // equivalent to "partial spring indices of spring"
       ArrayXArrayXi localToGlobalSpringIndex;
@@ -116,7 +116,9 @@ namespace calc {
       std::unordered_map<size_t, size_t> oldAtomIdToSpringIndex;
 
       Eigen::ArrayXb linkIsSliplink;
-      Eigen::ArrayXi nrOfCrosslinkSwapsEndured; // count for slip-links how many cross-links they swapped around
+      Eigen::ArrayXi
+        nrOfCrosslinkSwapsEndured; // count for slip-links how many cross-links
+                                   // they swapped around
 
       // partial springs
       Eigen::ArrayXi springPartCoordinateIndexA;

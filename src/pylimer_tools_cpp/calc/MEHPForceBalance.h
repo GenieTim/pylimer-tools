@@ -355,7 +355,7 @@ namespace calc {
           "Minimum number of slip-links could not be sampled: got " +
             std::to_string(entanglements.pairsOfAtoms.size()) + " instead of " +
             std::to_string(minimumNrOfSliplinks) + ".");
-            
+
         return MEHPForceBalance::constructWithSlipLinks(
           universe, entanglements, crosslinkerType, is2D, kappa);
       }

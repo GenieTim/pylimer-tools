@@ -1438,14 +1438,14 @@ TEST_CASE("MEHP Force Balance 2 Fully active chains are fully active",
 
       pcm::MEHPForceBalance2 forceBalancer =
         pcm::MEHPForceBalance2::constructWithoutSlipLinks(universe, 2, false);
-        
+
       double initialResidual = forceBalancer.getDisplacementResidualNorm();
       CHECK(forceBalancer.getNrOfActiveSprings() ==
             forceBalancer.getNrOfSprings());
       CHECK(forceBalancer.getNrOfSprings() == 16000);
       CHECK(forceBalancer.getNrOfPartialSprings() == 16000);
       CHECK_NOTHROW(forceBalancer.runForceRelaxation(5000, 1e-8));
-      
+
       CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
       CHECK(forceBalancer.getNrOfIterations() > 0);
       CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);

@@ -161,7 +161,8 @@ namespace utils {
               results.push_back(loopVertexId);
             }
             // and return it if it is a new one
-            if (!pylimer_tools::utils::map_has_key(this->loopsFound,loopHash)) {
+            if (!pylimer_tools::utils::map_has_key(this->loopsFound,
+                                                   loopHash)) {
               igraph_vector_int_destroy(&neighbours);
               igraph_vector_int_destroy(&verticesOfLoop);
               this->loopsFound.insert(loopHash);
@@ -199,7 +200,7 @@ namespace utils {
     }
 
     /**
-     * @brief Find all simple cycles. 
+     * @brief Find all simple cycles.
      * NOTE: this might use more memory than you
      * might like.
      *

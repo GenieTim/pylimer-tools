@@ -335,7 +335,8 @@ namespace utils {
     std::vector<std::vector<pylimer_tools::entities::Atom>> resultingAtoms;
     resultingAtoms.reserve(this->getLength());
 
-    std::vector<std::unordered_map<std::string, std::vector<double>>> additionalAtomData;
+    std::vector<std::unordered_map<std::string, std::vector<double>>>
+      additionalAtomData;
     if (sectionsToRead & ReadableDumpFileSections::EXTRA_ATOM) {
       additionalAtomData.reserve(this->getLength());
     }
@@ -479,11 +480,11 @@ namespace utils {
                   ss >> nz;
                   break;
                 default:
-                if (sectionsToRead & ReadableDumpFileSections::EXTRA_ATOM) {
-                  double d;
-                  ss >> d;
-                  localExtraAtomData[formatPart].push_back(d);
-                }
+                  if (sectionsToRead & ReadableDumpFileSections::EXTRA_ATOM) {
+                    double d;
+                    ss >> d;
+                    localExtraAtomData[formatPart].push_back(d);
+                  }
                   // throw std::runtime_error("Not implemented format part: '" +
                   //                          formatPart + "'");
               }
@@ -503,7 +504,7 @@ namespace utils {
         if (sectionsToRead & ReadableDumpFileSections::EXTRA_ATOM) {
           additionalAtomData.push_back(localExtraAtomData);
         }
-        
+
         sectionsRead += 1;
         assert(resultingBoxes.size() == sectionsRead);
         assert(resultingTimeSteps.size() == sectionsRead);

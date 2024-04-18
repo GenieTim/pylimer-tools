@@ -165,6 +165,7 @@
     "attogram",
     "avogadro",
     "crosslinker",
+    "crosslinkers",
     "igraph",
     "lammps",
     "LAMMPS",
@@ -175,5 +176,9 @@
     "thermo",
     "xlink",
     "xlinks"
+  ],
+  "autopep8.args": [
+    "--ignore",
+    "W690"
   ]
 }

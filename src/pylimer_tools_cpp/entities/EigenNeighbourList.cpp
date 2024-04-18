@@ -40,7 +40,8 @@ namespace entities {
     this->scalingFactor = scalingFactor;
     this->box = box;
 
-    this->nrOfBuckets = (box.getL().array() / this->actualCutoff).floor().cast<long int>();
+    this->nrOfBuckets =
+      (box.getL().array() / this->actualCutoff).floor().cast<long int>();
 
     this->bucketWidths = box.getL() / this->nrOfBuckets.cast<double>();
 
@@ -302,7 +303,7 @@ namespace entities {
     Eigen::ArrayXi& result,
     const Eigen::Vector3d coordinates,
     const double upperCutoff,
-                                     bool expectDefault) const
+    bool expectDefault) const
   {
 
 #ifndef NDEBUG
@@ -338,7 +339,8 @@ namespace entities {
         }
       }
     } else {
-      INVALIDARG_EXP_IFN(!expectDefault, "Expected default cutoff, but did not get it");
+      INVALIDARG_EXP_IFN(!expectDefault,
+                         "Expected default cutoff, but did not get it");
       // TODO: this is more or less identical to
       // EigenNeighbourList::getCombinedIndicesForCoordinates
       // with some minor additions here and there

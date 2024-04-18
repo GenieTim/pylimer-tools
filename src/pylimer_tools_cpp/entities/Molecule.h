@@ -71,17 +71,18 @@ namespace entities {
       return AtomGraphParent::computeBondLengths(this->parent);
     };
 
-  /**
-   * @brief Get the sum of all bond vectors, similar to `computeEndToEndDistanceWithDerivedImageFlags`
-   *
-   * The offset is computed as if computing the vector of the first to the last
-   * atom (coords of last minus coords of first).
-   *
-   * NOTE: even for primary loops, it is possible that this is not equal to
-   * zero.
-   * @param crosslinkerType
-   * @return Eigen::Vector3d
-   */
+    /**
+     * @brief Get the sum of all bond vectors, similar to
+     * `computeEndToEndDistanceWithDerivedImageFlags`
+     *
+     * The offset is computed as if computing the vector of the first to the
+     * last atom (coords of last minus coords of first).
+     *
+     * NOTE: even for primary loops, it is possible that this is not equal to
+     * zero.
+     * @param crosslinkerType
+     * @return Eigen::Vector3d
+     */
     Eigen::Vector3d getOverallBondSum(const int crosslinkerType = 2) const;
 
     /**
@@ -95,14 +96,14 @@ namespace entities {
      * @param atomIdFrom
      * @param atomIdTo
      * @param crosslinkerType
-     * @param requireOrder whether to throw an error if atomIdTo is occurring before atomIdFrom
+     * @param requireOrder whether to throw an error if atomIdTo is occurring
+     * before atomIdFrom
      * @return Eigen::Vector3d
      */
     Eigen::Vector3d getOverallBondSumFromTo(size_t atomIdFrom,
                                             size_t atomIdTo,
                                             const int crosslinkerType = 2,
                                             bool requireOrder = true) const;
-
 
     size_t getNrOfBondsFromTo(size_t atomIdFrom,
                               size_t atomIdTo,

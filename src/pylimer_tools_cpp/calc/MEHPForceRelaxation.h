@@ -839,9 +839,10 @@ namespace calc {
        * @return Eigen::ArrayXb
        */
       Eigen::ArrayXb findActiveSprings(const Eigen::VectorXd& springDistances,
-                                const double tolerance = 0.1) const
+                                       const double tolerance = 0.1) const
       {
-        Eigen::ArrayXb result = Eigen::ArrayXb::Constant(springDistances.size() / 3, false);
+        Eigen::ArrayXb result =
+          Eigen::ArrayXb::Constant(springDistances.size() / 3, false);
         for (size_t i = 0; i < springDistances.size() / 3; ++i) {
           result[i] =
             sqrt(springDistances[3 * i + 0] * springDistances[3 * i + 0] +

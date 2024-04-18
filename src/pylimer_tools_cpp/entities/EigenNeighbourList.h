@@ -41,7 +41,7 @@ namespace entities {
     void initialize(const Eigen::VectorXd& coordinates,
                     const Box& box,
                     double cutoff,
-                       double scalingFactor = 2.);
+                    double scalingFactor = 2.);
 
     /**
      * @brief Re-bin with a new set of coordinates
@@ -87,7 +87,10 @@ namespace entities {
                                      const double upperCutoff,
                                      bool expectDefault = false) const;
 
-    int getHigherIndicesWithinCutoff(Eigen::ArrayXi& result,const Eigen::VectorXd &coordinates, const int source, const double cutoff) const;
+    int getHigherIndicesWithinCutoff(Eigen::ArrayXi& result,
+                                     const Eigen::VectorXd& coordinates,
+                                     const int source,
+                                     const double cutoff) const;
 
     /**
      * @brief For debugging/test purposes: the actual buckets
@@ -100,7 +103,8 @@ namespace entities {
 
     std::vector<bucket_idx_t> getCombinedBucketIndicesForCoordinates(
       const Eigen::Vector3d& coordinates,
-      double newCutoff, bool sort = false) const;
+      double newCutoff,
+      bool sort = false) const;
 
     template<class Archive>
     void serialize(Archive& ar)

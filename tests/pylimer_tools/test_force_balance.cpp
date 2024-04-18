@@ -1569,7 +1569,8 @@ TEST_CASE("MEHP Force Balance Fully active chains are fully active",
   }
 }
 
-TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC imperfect Diamond Network",
+TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC "
+          "imperfect Diamond Network",
           "[analysis][MEHPForceBalance]")
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
@@ -1615,7 +1616,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC imperfec
     CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
           Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
     CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
-          Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
+               Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
 
     forceBalanceConventional.runForceRelaxation(
       pcm::BalanceRunMode::ITERATIVE,
@@ -1651,7 +1652,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC imperfec
     CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
           Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
     CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
-          Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
+               Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
 
     forceBalanceConventional.runForceRelaxation(
       pcm::BalanceRunMode::ITERATIVE,
@@ -1687,7 +1688,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC imperfec
     CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
           Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
     CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
-          Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
+               Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
   }
 }
 
@@ -1701,8 +1702,8 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
   // perfect diamond network = fully connected =>
   // maximum is at perfect crystal structure -> must be all active.
   std::string inputFile =
-    suspectedPath +
-    "crosslinked_p_1_1_melt_100_a_3_50_xlinks_v_1.V-fixed.structure.out-finish_crosslinking.structure.out";
+    suspectedPath + "crosslinked_p_1_1_melt_100_a_3_50_xlinks_v_1.V-fixed."
+                    "structure.out-finish_crosslinking.structure.out";
   if (std::filesystem::exists(inputFile)) {
     std::cout << "Reading file " << inputFile << std::endl;
     universeSeq.initializeFromDataSequence({ { inputFile } });
@@ -1737,7 +1738,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
     CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
           Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
     CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
-          Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
+               Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
 
     forceBalanceConventional.runForceRelaxation(
       pcm::BalanceRunMode::ITERATIVE,
@@ -1773,7 +1774,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
     CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
           Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
     CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
-          Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
+               Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
 
     forceBalanceConventional.runForceRelaxation(
       pcm::BalanceRunMode::ITERATIVE,
@@ -1809,7 +1810,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
     CHECK(forceBalanceConventional.getDisplacementResidualNorm() ==
           Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
     CHECK_THAT(forceBalanceConventional.getIdsOfActiveNodes(),
-          Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
+               Catch::Matchers::Equals(forceBalanceNew.getIdsOfActiveNodes()));
   }
 }
 

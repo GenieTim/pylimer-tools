@@ -19,8 +19,8 @@ def get_tail(data, percentage=0.2, min_n=25, max_percentage=0.5):
     """
     assert (percentage <= 1)
     assert (max_percentage <= 1)
-    tail_n = int(min(max(min(min_n, max_percentage*len(data)),
-                         percentage*len(data)), len(data)))
+    tail_n = int(min(max(min(min_n, max_percentage * len(data)),
+                         percentage * len(data)), len(data)))
     if (isinstance(data, pd.DataFrame) or isinstance(data, pd.Series)):
         return data.tail(tail_n)
     else:

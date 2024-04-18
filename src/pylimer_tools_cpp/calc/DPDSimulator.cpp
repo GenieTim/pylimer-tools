@@ -533,43 +533,44 @@ namespace calc {
 #endif
     }
 
-    void DPDSimulator::deformBoxImmediately(const pylimer_tools::entities::Box& newBox)
-      {
-        bool isDifferent = newBox == this->box;
-        pylimer_tools::entities::Box previousBox = this->box;
-        // rescale box offsets
-        this->box = newBox;
-        assert(newBox == this->box);
-        Eigen::VectorXd newOffsets =
-          (this->bondBoxOffsets.array() *
-           (this->box.getL() / previousBox.getL())
-             .replicate((this->numBonds + this->numSlipSprings), 1))
-            .matrix();
-        this->bondBoxOffsets = newOffsets;
+    void DPDSimulator::deformBoxImmediately(
+      const pylimer_tools::entities::Box& newBox)
+    {
+      bool isDifferent = newBox == this->box;
+      pylimer_tools::entities::Box previousBox = this->box;
+      // rescale box offsets
+      this->box = newBox;
+      assert(newBox == this->box);
+      Eigen::VectorXd newOffsets =
+        (this->bondBoxOffsets.array() *
+         (this->box.getL() / previousBox.getL())
+           .replicate((this->numBonds + this->numSlipSprings), 1))
+          .matrix();
+      this->bondBoxOffsets = newOffsets;
 
-        // rescale coordinates
-        Eigen::VectorXd previousCoords = this->coordinates;
+      // rescale coordinates
+      Eigen::VectorXd previousCoords = this->coordinates;
 
-        Eigen::Array3d scalingFactor = newBox.getL() / previousBox.getL();
-        
-        // rescale per-atom quantities
-        for (size_t i = 0; i < this->numAtoms; ++i) {
-          for (size_t dir = 0; dir < 3; ++dir) {
-            this->coordinates[3 * i + dir] *= scalingFactor[dir];
-            this->currentVelocities[3 * i + dir] *= scalingFactor[dir];
-            this->currentVelocitiesPlus[3 * i + dir] *= scalingFactor[dir];
-            this->currentForces[3 * i + dir] *= scalingFactor[dir];
-          }
+      Eigen::Array3d scalingFactor = newBox.getL() / previousBox.getL();
+
+      // rescale per-atom quantities
+      for (size_t i = 0; i < this->numAtoms; ++i) {
+        for (size_t dir = 0; dir < 3; ++dir) {
+          this->coordinates[3 * i + dir] *= scalingFactor[dir];
+          this->currentVelocities[3 * i + dir] *= scalingFactor[dir];
+          this->currentVelocitiesPlus[3 * i + dir] *= scalingFactor[dir];
+          this->currentForces[3 * i + dir] *= scalingFactor[dir];
         }
-
-        // reset neighbour-list.
-        // *maybe* it would be faster to implement a way to adjust the box, but
-        // yeah...
-        this->neighbourlist = pylimer_tools::entities::EigenNeighbourList(
-          this->coordinates,
-          this->box,
-          1.0); //.resetCoordinates(this->coordinates);
       }
+
+      // reset neighbour-list.
+      // *maybe* it would be faster to implement a way to adjust the box, but
+      // yeah...
+      this->neighbourlist = pylimer_tools::entities::EigenNeighbourList(
+        this->coordinates,
+        this->box,
+        1.0); //.resetCoordinates(this->coordinates);
+    }
 
     /**
      * @brief Determine the temperature of the system

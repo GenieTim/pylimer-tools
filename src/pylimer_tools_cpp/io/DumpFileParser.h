@@ -38,7 +38,8 @@ namespace utils {
     std::vector<long int> timesteps;
     std::vector<pylimer_tools::entities::Box> boxes;
     std::vector<std::vector<pylimer_tools::entities::Atom>> atoms;
-    std::vector<std::unordered_map<std::string, std::vector<double>>> extraAtomsData;
+    std::vector<std::unordered_map<std::string, std::vector<double>>>
+      extraAtomsData;
   };
 
   class DumpFileParser
