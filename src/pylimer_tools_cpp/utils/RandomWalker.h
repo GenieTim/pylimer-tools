@@ -68,12 +68,14 @@ namespace utils {
 
       // for primary loops, dx, dy & dz are zero, intially.
       // therewith, alpha will be NaN
-      double remainingDistance = std::sqrt(ds[0]*ds[0] + ds[1]*ds[1] + ds[2]*ds[2]);
+      double remainingDistance =
+        std::sqrt(ds[0] * ds[0] + ds[1] * ds[1] + ds[2] * ds[2]);
       // alpha = theta in Wikipedia
       double idealAlpha =
         std::acos(std::clamp(ds[2] / remainingDistance, -1.0, 1.0));
       // beta = phi in Wikipedia
-      double idealBeta = (ds[0] == 0.0) ? (M_PI * 0.5) : (std::atan2(ds[1], ds[0]));
+      double idealBeta =
+        (ds[0] == 0.0) ? (M_PI * 0.5) : (std::atan2(ds[1], ds[0]));
       double bondLenToUse = beadDistance;
       double idealWeight = 0.0;
       double bondsRemaining = ((chainLen - i) + 1);

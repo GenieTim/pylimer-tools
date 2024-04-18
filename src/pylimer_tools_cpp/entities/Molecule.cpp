@@ -56,6 +56,7 @@ namespace entities {
     for (int i = 0; i < ids.size(); ++i) {
       this->atomIdToVertexIdx[ids[i]] = i;
     }
+    // TODO: possibly use the lined up atoms instead? Check performance.
     std::sort(ids.begin(), ids.end());
     this->key =
       pylimer_tools::utils::join(ids.begin(), ids.end(), std::string("-"));
@@ -364,7 +365,7 @@ namespace entities {
    * @param atomIdFrom
    * @param atomIdTo
    * @param crosslinkerType
-     * @param requireOrder
+   * @param requireOrder
    * @return Eigen::Vector3d
    */
   Eigen::Vector3d Molecule::getOverallBondSumFromTo(size_t atomIdFrom,

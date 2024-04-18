@@ -10,7 +10,8 @@ namespace utils {
   class AveFileReader
   {
   public:
-    AveFileReader(const std::string &file) : filePath(file) {};
+    AveFileReader(const std::string& file)
+      : filePath(file){};
 
     std::vector<std::string> getColumnNames();
     int getNrOfRows();
@@ -18,9 +19,11 @@ namespace utils {
     std::vector<std::vector<double>> getData();
 
     std::vector<double> autocorrelateColumn(int column,
-                                            const std::vector<size_t> &dts);
-    std::vector<double> autocorrelateColumnDifference(int column1,int column2,
-                                            const std::vector<size_t> &dts);
+                                            const std::vector<size_t>& dts);
+    std::vector<double> autocorrelateColumnDifference(
+      int column1,
+      int column2,
+      const std::vector<size_t>& dts);
 
   private:
     std::string filePath;

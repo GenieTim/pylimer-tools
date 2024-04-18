@@ -37,7 +37,7 @@ namespace utils {
 
     template<typename T>
     void printNumberRightWithWidth(T t,
-                                   const std::string &unit,
+                                   const std::string& unit,
                                    const int width,
                                    const int precision) const
     {
@@ -74,7 +74,8 @@ namespace utils {
       this->printLine();
     }
 
-    std::pair<std::string, double> formatTime(const double us_time) const {
+    std::pair<std::string, double> formatTime(const double us_time) const
+    {
       std::string unit = "µs";
       double conversionFactor = 1.;
       if (us_time > 1e9) {
@@ -239,14 +240,17 @@ namespace utils {
 
       std::cout << "\n";
 
-      std::pair<std::string, double> totalTimeConversion = this->formatTime(total);
-      // std::pair<double, std::string> meanTimeConversion = this->formatTime(total/(static_cast<double>(numMeasurements)));
+      std::pair<std::string, double> totalTimeConversion =
+        this->formatTime(total);
+      // std::pair<double, std::string> meanTimeConversion =
+      // this->formatTime(total/(static_cast<double>(numMeasurements)));
 
 #ifdef OPENMP_FOUND
       std::cout << "OpenMP: " << omp_get_max_threads() << " threads."
                 << std::endl;
 #endif
-      std::cout << "Total: " << (total*totalTimeConversion.second) << " "<<totalTimeConversion.first << " for " << numMeasurements
+      std::cout << "Total: " << (total * totalTimeConversion.second) << " "
+                << totalTimeConversion.first << " for " << numMeasurements
                 << " measurements." << std::endl;
     }
   };

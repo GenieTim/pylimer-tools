@@ -18,7 +18,7 @@ class UnitStyle(object):
         self.unit_configuration = unit_configuration
         self.underlying_unit_registry = ureg
         # add some auxiliary constants
-        self.unit_configuration['kb'] = 1.381e-23*ureg('joule/kelvin')
+        self.unit_configuration['kb'] = 1.381e-23 * ureg('joule/kelvin')
         if ('volume' not in self.unit_configuration):
             self.unit_configuration['volume'] = self.unit_configuration['distance']**3
 
@@ -34,7 +34,7 @@ class UnitStyle(object):
         .. code:: python
 
           units = getUnitStyle("lj")
-          siMass = ljMass * units.getBaseUnitOf("mass")
+          siMass = ljMass * units.get_base_unit_of("mass")
         """
         translator = {
             "dynamic viscosity": "viscosity",
@@ -47,7 +47,7 @@ class UnitStyle(object):
 
     def __getattr__(self, property: str):
         """
-        Shorthand access for :func:`~pylimer_tools.io.unitStyles.UnitStyle.getBaseUnitOf`.
+        Shorthand access for :func:`~pylimer_tools.io.unitStyles.UnitStyle.get_base_unit_of`.
 
         Example usage:
 
@@ -90,7 +90,7 @@ class UnitStyleFactory(object):
           - **kwargs: additional arguments required force certain unit styles (e.g. lj)
         """
         ureg = self.ureg
-        elementary_charge: Final = (1.602176634e-19)*ureg.coulomb
+        elementary_charge: Final = (1.602176634e-19) * ureg.coulomb
         avogadro_constant: Final = 6.02214076e23  # any/mol
 
         if (unit_type == "lj"):
@@ -126,46 +126,46 @@ class UnitStyleFactory(object):
             # *might* be wrong
             # epsZero = (8.8541878128e-12*ureg.farad/ureg.meter)
             return UnitStyle({
-                'mass': polymer_data.Mb*ureg('g/mol')
-                if 'accept_mol' in kwargs else polymer_data.Mb*ureg('g')/avogadro_constant,
+                'mass': polymer_data.Mb * ureg('g/mol')
+                if 'accept_mol' in kwargs else polymer_data.Mb * ureg('g') / avogadro_constant,
                 'distance': ureg.sigma,
                 'time': ureg.tau,
                 'energy': ureg.eps,
                 'velocity': ureg.sigma / ureg.tau,
-                'force': ureg.eps/(ureg.sigma),
+                'force': ureg.eps / (ureg.sigma),
                 'torque': ureg.eps,
-                'temperature': polymer_data.T_ref*ureg.kelvin,
-                'pressure': polymer_data.kB_Tref_over_sigma_to_3*ureg("MPa") if
-                hasattr(polymer_data, "kB_Tref_over_sigma_to_3") else ureg.eps/(ureg.sigma**(3)),
-                'viscosity': ureg.eps*ureg.tau/(ureg.sigma**(3)),
+                'temperature': polymer_data.T_ref * ureg.kelvin,
+                'pressure': polymer_data.kB_Tref_over_sigma_to_3 * ureg("MPa") if
+                hasattr(polymer_data, "kB_Tref_over_sigma_to_3") else ureg.eps / (ureg.sigma**(3)),
+                'viscosity': ureg.eps * ureg.tau / (ureg.sigma**(3)),
                 # TODO: the use of elementary charge might not be correct, see above
                 'charge': elementary_charge,
-                'dipole': elementary_charge*ureg.sigma,
-                'electric_field': ureg.eps/(elementary_charge*ureg.sigma),
-                'density': polymer_data.M_k*ureg('g/mol')/(ureg.sigma**(dimension))
-                if 'accept_mol' in kwargs else (polymer_data.M_k/avogadro_constant)*ureg('g')/(ureg.sigma**(dimension)),
-                'dt': 0.005*ureg.tau,
-                'skin': 0.3*ureg.sigma
+                'dipole': elementary_charge * ureg.sigma,
+                'electric_field': ureg.eps / (elementary_charge * ureg.sigma),
+                'density': polymer_data.M_k * ureg('g/mol') / (ureg.sigma**(dimension))
+                if 'accept_mol' in kwargs else (polymer_data.M_k / avogadro_constant) * ureg('g') / (ureg.sigma**(dimension)),
+                'dt': 0.005 * ureg.tau,
+                'skin': 0.3 * ureg.sigma
             }, ureg)
         elif (unit_type == "real"):
             return UnitStyle({
-                "mass": ureg('g/mol') if 'accept_mol' in kwargs else ureg('g')/avogadro_constant,
+                "mass": ureg('g/mol') if 'accept_mol' in kwargs else ureg('g') / avogadro_constant,
                 "distance": ureg.angstrom,
                 "time": ureg.femtosecond,
-                "energy": ureg('kcal/mol') if 'accept_mol' in kwargs else ureg('kcal')/avogadro_constant,
-                "velocity": ureg.angstrom/ureg.femtosecond,
+                "energy": ureg('kcal/mol') if 'accept_mol' in kwargs else ureg('kcal') / avogadro_constant,
+                "velocity": ureg.angstrom / ureg.femtosecond,
                 "force": ureg('kcal/(mol*angstrom)')
-                if 'accept_mol' in kwargs else ureg('kcal')/avogadro_constant/ureg.angstrom,
-                "torque": ureg('kcal/mol') if 'accept_mol' in kwargs else ureg('kcal')/avogadro_constant,
+                if 'accept_mol' in kwargs else ureg('kcal') / avogadro_constant / ureg.angstrom,
+                "torque": ureg('kcal/mol') if 'accept_mol' in kwargs else ureg('kcal') / avogadro_constant,
                 "temperature": ureg.kelvin,
                 "pressure": ureg.atmosphere,
                 "viscosity": ureg.poise,
                 "charge": elementary_charge,
-                "dipole": elementary_charge*ureg.angstrom,
-                "electric_field": ureg.volt/ureg.angstrom,
-                "density": ureg.gram/(ureg.meter**(dimension)),
-                "dt": 1.0*ureg.femtosecond,
-                "skin": 2.0*ureg.angstrom
+                "dipole": elementary_charge * ureg.angstrom,
+                "electric_field": ureg.volt / ureg.angstrom,
+                "density": ureg.gram / (ureg.meter**(dimension)),
+                "dt": 1.0 * ureg.femtosecond,
+                "skin": 2.0 * ureg.angstrom
             }, ureg)
         elif (unit_type == "si"):
             return UnitStyle({
@@ -173,37 +173,37 @@ class UnitStyleFactory(object):
                 "distance": ureg.meter,
                 "time": ureg.second,
                 "energy": ureg.joule,
-                "velocity": ureg.meter/ureg.second,
+                "velocity": ureg.meter / ureg.second,
                 "force": ureg.newton,
-                "torque": ureg.newton*ureg.meter,
+                "torque": ureg.newton * ureg.meter,
                 "temperature": ureg.kelvin,
                 "pressure": ureg.pascal,
-                "viscosity": ureg.pascal*ureg.second,
+                "viscosity": ureg.pascal * ureg.second,
                 "charge": ureg.coulomb,
-                "dipole": ureg.coulomb*ureg.meter,
-                "electric_field": ureg.volt/ureg.meter,
-                "density": ureg.kilogram/(ureg.meter**(dimension)),
-                "dt": 1e-8*ureg.second,
-                "skin": 0.001*ureg.meter
+                "dipole": ureg.coulomb * ureg.meter,
+                "electric_field": ureg.volt / ureg.meter,
+                "density": ureg.kilogram / (ureg.meter**(dimension)),
+                "dt": 1e-8 * ureg.second,
+                "skin": 0.001 * ureg.meter
             }, ureg)
         elif (unit_type == "nano"):
             return UnitStyle({
                 "mass": ureg.attogram,
                 "distance": ureg.nanometer,
                 "time": ureg.nanosecond,
-                "energy": ureg.attogram*(ureg.nanometer**2)/(ureg.nanosecond**2),
-                "velocity": ureg.nanometer/ureg.nanosecond,
-                "force": ureg.attogram*ureg.nanometer/(ureg.nanosecond**2),
-                "torque": ureg.attogram*(ureg.nanometer**2)/(ureg.nanosecond**2),
+                "energy": ureg.attogram * (ureg.nanometer**2) / (ureg.nanosecond**2),
+                "velocity": ureg.nanometer / ureg.nanosecond,
+                "force": ureg.attogram * ureg.nanometer / (ureg.nanosecond**2),
+                "torque": ureg.attogram * (ureg.nanometer**2) / (ureg.nanosecond**2),
                 "temperature": ureg.kelvin,
-                "pressure": ureg.attogram/(ureg.nanometer*(ureg.nanosecond**2)),
-                "viscosity": ureg.attogram/(ureg.nanometer*(ureg.nanosecond)),
+                "pressure": ureg.attogram / (ureg.nanometer * (ureg.nanosecond**2)),
+                "viscosity": ureg.attogram / (ureg.nanometer * (ureg.nanosecond)),
                 "charge": elementary_charge,
-                "dipole": elementary_charge*ureg.nanometer,
-                "electric_field": ureg.volt/ureg.nanometer,
-                "density": ureg.attogram/(ureg.nanometer**(dimension)),
-                "dt": 1e-8*ureg.second,
-                "skin": 0.001*ureg.meter
+                "dipole": elementary_charge * ureg.nanometer,
+                "electric_field": ureg.volt / ureg.nanometer,
+                "density": ureg.attogram / (ureg.nanometer**(dimension)),
+                "dt": 1e-8 * ureg.second,
+                "skin": 0.001 * ureg.meter
             }, ureg)
         else:
             raise NotImplementedError(

@@ -21,8 +21,8 @@ to_string(std::string input)
 static std::string
 to_string(Eigen::Vector3d input)
 {
-  return std::to_string(input[0]) + ", " + std::to_string(input[1]) +
-         ", "+ std::to_string(input[2]);
+  return std::to_string(input[0]) + ", " + std::to_string(input[1]) + ", " +
+         std::to_string(input[2]);
 }
 } // namespace std
 

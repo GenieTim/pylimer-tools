@@ -2,9 +2,9 @@
 #define PYBIND_READERS_H
 
 #include "../io/AveFileReader.h"
+#include "../io/CSVSplitter.h"
 #include "../io/DataFileParser.h"
 #include "../io/DumpFileParser.h"
-#include "../io/CSVSplitter.h"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
@@ -35,26 +35,35 @@ void
 init_pylimer_bound_readers(py::module_& m)
 {
 
-     py::class_<AveFileReader>(m, "AveFileReader", R"pbdoc(
+  py::class_<AveFileReader>(m, "AveFileReader", R"pbdoc(
           Alternative implementation of the data file reader implemented in 
           :func:`pylimer_tools.readLammpsOutputFile.readAveragesFile`.
 
      )pbdoc")
-     .def(py::init<const std::string>(), py::arg("filePath"))
-     .def("getColumnNames", &AveFileReader::getColumnNames)
-     .def("getNrOfRows", &AveFileReader::getNrOfRows)
-     .def("getNrOfColumns", &AveFileReader::getNrOfColumns)
-     .def("getData", &AveFileReader::getData)
-     .def("autocorrelateColumn", &AveFileReader::autocorrelateColumn, R"pbdoc(
+    .def(py::init<const std::string>(), py::arg("filePath"))
+    .def("getColumnNames", &AveFileReader::getColumnNames)
+    .def("getNrOfRows", &AveFileReader::getNrOfRows)
+    .def("getNrOfColumns", &AveFileReader::getNrOfColumns)
+    .def("getData", &AveFileReader::getData)
+    .def("autocorrelateColumn",
+         &AveFileReader::autocorrelateColumn,
+         R"pbdoc(
           Do autocorrelation on one particular column for a speficied set of delta indices.
 
           Assumes the data is equally spaced.
-     )pbdoc", py::arg("column_index"), py::arg("delta_indices"))
-     .def("autocorrelateColumnDifference", &AveFileReader::autocorrelateColumnDifference, R"pbdoc(
+     )pbdoc",
+         py::arg("column_index"),
+         py::arg("delta_indices"))
+    .def("autocorrelateColumnDifference",
+         &AveFileReader::autocorrelateColumnDifference,
+         R"pbdoc(
           Do autocorrelation on the difference between two particular columns for a speficied set of delta indices.
 
           Assumes the data is equally spaced.
-     )pbdoc", py::arg("column_index1"), py::arg("column_index2"), py::arg("delta_indices"));
+     )pbdoc",
+         py::arg("column_index1"),
+         py::arg("column_index2"),
+         py::arg("delta_indices"));
 
   py::enum_<AtomStyle>(m, "AtomStyle")
     .value("NONE", AtomStyle::NONE)
@@ -168,7 +177,9 @@ init_pylimer_bound_readers(py::module_& m)
     .def("getLowZ", &DataFileParser::getLowZ)
     .def("getHighZ", &DataFileParser::getHighZ);
 
-     m.def("splitCSV", &splitCSV, "Read a file containing a number of CSVs. Returns them split up.");
+  m.def("splitCSV",
+        &splitCSV,
+        "Read a file containing a number of CSVs. Returns them split up.");
 }
 
 #endif

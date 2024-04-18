@@ -202,8 +202,8 @@ TEST_CASE("MEHP Force Relaxation does not collapse",
     // compare to what we expect
     CHECK(forceRelaxerConventional.getNrOfActiveSprings() == 8);
     CHECK(forceRelaxerConventional.getNrOfActiveNodes() == 4);
-    // CHECK(forceRelaxerConventional.getAverageSpringLength() == Catch::Approx(5.));
-    // CHECK_THAT(forceRelaxerConventional.getGammaFactor(),
+    // CHECK(forceRelaxerConventional.getAverageSpringLength() ==
+    // Catch::Approx(5.)); CHECK_THAT(forceRelaxerConventional.getGammaFactor(),
     //            Catch::Matchers::WithinAbs(1.0, 1e-3));
   }
   SECTION("Running new MEHP")
@@ -274,8 +274,7 @@ TEST_CASE(
       CHECK(forceRelaxer2.getVolume() ==
             Catch::Approx(97.383096 * 97.383096 * 97.383096));
       // initial system values
-      CHECK(forceRelaxer2.getPressure() ==
-            Catch::Approx( 0.0050530914));
+      CHECK(forceRelaxer2.getPressure() == Catch::Approx(0.0050530914));
       CHECK(forceRelaxer2.getForce() * 79 == Catch::Approx(553001.4098561466));
       CHECK(forceRelaxer2.getAverageContourLength() == Catch::Approx(79.0));
       Eigen::VectorXd contourLengths = forceRelaxer2.getSpringContourLength();
@@ -313,17 +312,18 @@ TEST_CASE(
             Catch::Approx(0.0019478781)); // LJ Units [?]
       CHECK(forceRelaxer2.getPressure() * conversionFactor /
               (sigmaToM * sigmaToM * sigmaToM) ==
-            Catch::Approx(61338.8913392133)); // shear modulus from the pressure, MPa
+            Catch::Approx(
+              61338.8913392133)); // shear modulus from the pressure, MPa
       double nrOfChainCorrection =
         (forceRelaxer2.getDefaultNrOfChains() / nrOfChains);
       double expectedNb2 = slope * Nb * beadMass;
       double nb2Correction =
         (forceRelaxer2.getDefaultR0Square() / (expectedNb2));
       double gammaCorrectionFactor = nrOfChainCorrection * nb2Correction;
-      CHECK(
-        forceRelaxer2.getGammaFactor() * nrOfChainCorrection *
-          forceRelaxer2.getDefaultR0Square() ==
-        Catch::Approx(42.6344678773)); // as from conversion-less Mathematica script
+      CHECK(forceRelaxer2.getGammaFactor() * nrOfChainCorrection *
+              forceRelaxer2.getDefaultR0Square() ==
+            Catch::Approx(
+              42.6344678773)); // as from conversion-less Mathematica script
       CHECK(forceRelaxer2.getGammaFactor() * gammaCorrectionFactor * kb * T *
               nu ==
             Catch::Approx(61338.8913392133)); // ANT shear modulus, Pa
@@ -530,7 +530,8 @@ TEST_CASE(
             Catch::Approx(0.1538847323)); // LJ Units [?]
       CHECK(forceRelaxer2.getPressure() * conversionFactor /
               (sigmaToM * sigmaToM * sigmaToM * 79.) ==
-            Catch::Approx(62116.2875121177)); // shear modulus from the pressure, MPa
+            Catch::Approx(
+              62116.2875121177)); // shear modulus from the pressure, MPa
       double nrOfChainCorrection =
         (forceRelaxer2.getDefaultNrOfChains() / nrOfChains);
       double expectedNb2 = slope * Nb * beadMass;

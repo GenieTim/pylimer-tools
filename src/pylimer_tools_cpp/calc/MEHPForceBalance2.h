@@ -406,7 +406,8 @@ namespace calc {
           LinkSwappingMode::NO_SWAPPING,
         const int swappingFrequency = 10,
         const double oneOverSpringPartitionUpperLimit = 1.0,
-        const int nrOfCrosslinkSwapsAllowedPerSliplink = -1){
+        const int nrOfCrosslinkSwapsAllowedPerSliplink = -1)
+      {
         return runForceRelaxation(
           maxNrOfSteps,
           xtol,
@@ -419,8 +420,7 @@ namespace calc {
           oneOverSpringPartitionUpperLimit,
           nrOfCrosslinkSwapsAllowedPerSliplink,
           []() { return false; },
-          []() {}
-          );
+          []() {});
       };
       /**
        * @brief Actually do run the simulation

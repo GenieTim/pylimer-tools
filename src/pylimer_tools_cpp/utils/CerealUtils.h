@@ -448,7 +448,6 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar,
   igraph_strvector_destroy(&enames);
 }
 
-
 } // namespace cereal
 CEREAL_CLASS_VERSION(igraph_t, 1);
 

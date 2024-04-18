@@ -588,8 +588,8 @@ namespace entities {
     std::vector<long int> timesteps = sections.timesteps;
     std::vector<Box> boxes = sections.boxes;
     std::vector<std::vector<Atom>> atoms = sections.atoms;
-    std::vector<std::unordered_map<std::string, std::vector<double>>> extraAtomData =
-      sections.extraAtomsData;
+    std::vector<std::unordered_map<std::string, std::vector<double>>>
+      extraAtomData = sections.extraAtomsData;
 
     RUNTIME_EXP_IFN(timesteps.size() == boxes.size(),
                     "Dump file seems inconsistent: read " +

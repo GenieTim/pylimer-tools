@@ -47,9 +47,9 @@ def detect_headers(file: str, max_nr_of_lines_to_read: int = 1500, use_cache: bo
             if (previous_line is not None and
                     len(line.strip().split()) == len(previous_line.removeprefix("#").strip().split()) and np.sum([
                         w[0].isalpha() for w in previous_line.split()
-                    ]) > 0.74*len(previous_line.split()) and np.sum([
+                    ]) > 0.74 * len(previous_line.split()) and np.sum([
                         _is_numeric_string(w) for w in line.split()
-                    ]) > 0.5*len(line.split()) and "..." not in previous_line and
+                    ]) > 0.5 * len(line.split()) and "..." not in previous_line and
                     len(previous_line.split()) > 2 and not np.any([
                         previous_line.startswith(val) for val in [
                             "Memory usage per processor",
@@ -339,7 +339,7 @@ def read_multi_section_separated_value_file(file: str, separator: str = None, us
         if (got_err):
             continue
         headers = re.split("{}+".format(separator), header_line.strip())
-        if (np.sum([_is_numeric_string(h) for h in headers]) > 0.5*len(headers)):
+        if (np.sum([_is_numeric_string(h) for h in headers]) > 0.5 * len(headers)):
             warnings.warn("CSV file {} has header line {}, which does not seem to be a header.".format(
                 csv_file, header_line))
         for i, h in enumerate(headers):

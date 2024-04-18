@@ -27,9 +27,9 @@ def cli(file, max_displacement):
         new_atom = Atom(
             atom.getId(),
             atom.getType(),
-            atom.getX() + (random.random() - 0.5)*max_displacement,
-            atom.getY() + (random.random() - 0.5)*max_displacement,
-            atom.getZ() + (random.random() - 0.5)*max_displacement,
+            atom.getX() + (random.random() - 0.5) * max_displacement,
+            atom.getY() + (random.random() - 0.5) * max_displacement,
+            atom.getZ() + (random.random() - 0.5) * max_displacement,
             atom.getNX(),
             atom.getNY(),
             atom.getNZ()

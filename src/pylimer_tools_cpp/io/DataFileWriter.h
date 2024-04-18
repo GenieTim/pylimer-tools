@@ -323,7 +323,7 @@ namespace utils {
           std::regex_replace(outputStr, std::regex("\\$y"), std::to_string(y));
         outputStr =
           std::regex_replace(outputStr, std::regex("\\$z"), std::to_string(z));
-        for (std::string &additionalProperty :
+        for (std::string& additionalProperty :
              this->customAtomFormatAdditionalProperties) {
           outputStr = std::regex_replace(
             outputStr,
@@ -347,7 +347,7 @@ namespace utils {
       // first, we output the crosslinker beads
       std::vector<pylimer_tools::entities::Atom> crosslinkers =
         this->universe.getAtomsOfType(this->crosslinkerType);
-      for (const pylimer_tools::entities::Atom &crosslinker : crosslinkers) {
+      for (const pylimer_tools::entities::Atom& crosslinker : crosslinkers) {
         nAtomsOutput += 1;
         this->writeAtom(file, crosslinker, 0, nAtomsOutput);
       }
@@ -360,8 +360,8 @@ namespace utils {
         // image flag reset attempt might not be the best yet?
         std::vector<pylimer_tools::entities::Atom> atoms =
           (this->moleculeIdxSwappable || this->attemptImageReset)
-            ? molecule.getAtomsLinedUp(this->crosslinkerType,
-                                       this->attemptImageReset, false)
+            ? molecule.getAtomsLinedUp(
+                this->crosslinkerType, this->attemptImageReset, false)
             : molecule.getAtoms();
         nMoleculesOutput += 1;
 

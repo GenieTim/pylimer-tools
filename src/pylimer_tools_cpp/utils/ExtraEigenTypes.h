@@ -11,7 +11,6 @@ typedef Array<size_t, Dynamic, 1> ArrayXst;
 typedef Array<bool, Dynamic, 1> ArrayXb;
 }
 
-
 #ifdef OPENMP_FOUND
 #pragma omp declare reduction(+ : Eigen::VectorXd : omp_out =                  \
                                 omp_out + omp_in)                              \
