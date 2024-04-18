@@ -124,71 +124,6 @@ def compute_extent_of_reaction(network: Universe, crosslinker_type, functionalit
     return actually_formed_bonds / (max_formable_bonds)
 
 
-def compute_weight_fraction_of_backbone(network: Universe, crosslinker_type: int = 2):
-    """
-    Compute the weight fraction of network backbone in infinite network
-
-    Arguments:
-      - network: the network to compute the weight fraction for
-      - crosslinker_type: the atom type to use to split the molecules
-
-    Returns:
-      - weightFraction (float): 1 - weightDangling/weightTotal,
-    """
-    if (network.getNrOfAtoms() < 1):
-        return 0.0
-    
-    weight_fraction, _ = compute_weight_fraction_of_dangling_chains(
-        network, crosslinker_type)
-    return 1.0 - weight_fraction
-
-
-def compute_weight_fraction_of_dangling_chains(network: Universe, crosslinker_type: int = 2) -> Tuple[float, float]:
-    """
-    Compute the weight fraction of dangling strands in infinite network
-
-    NOTE:
-        Currently, only primary dangling chains are taken into account.
-        There are other methods that incorporate more.
-
-    Arguments:
-      - network: the network to compute the weight fraction for
-      - crosslinker_type: the atom type to use to split the molecules
-
-    Returns:
-      - weightFraction: weightDangling/weightTotal,
-      - numFraction: numDangling/numTotal
-    """
-    if (network.getNrOfAtoms() < 1):
-        return 0.0, 0.0
-
-    weights = network.getMasses()
-
-    def get_weight_of_graph(graph):
-        counts = Counter(graph.getAtomTypes())
-        weight_total = 0
-        for key in counts:
-            weight_total += weights[key] * counts[key]
-        return weight_total
-
-    all_chains = network.getChainsWithCrosslinker(crosslinker_type)
-    num_total = network.getNrOfAtoms()
-    weight_total = get_weight_of_graph(network)
-
-    num_dangling = 0
-    weight_dangling = 0
-    for chain in all_chains:
-        if (chain.getType() == MoleculeType.DANGLING_CHAIN):
-            num_dangling += chain.getNrOfAtoms()
-            weight_dangling += get_weight_of_graph(chain)
-
-    if (weight_total == 0):
-        # warnings.warn("Total weight of network is = 0.")
-        return 0.0, num_dangling / num_total
-
-    return weight_dangling / weight_total, num_dangling / num_total
-
-
 def compute_mean_end_to_end_distances(networks: Iterable[Universe], crosslinker_type: int = 2) -> dict:
     """
     Compute the mean end to end distance between each pair of (indirectly) connected crosslinker
@@ -346,6 +281,85 @@ def compute_effective_crosslinker_functionalities(network: Universe, crosslinker
     return junction_degrees
 
 
+def compute_weight_fractions(network: Universe) -> dict:
+    """
+    Compute the weight fractions of each atom type in the network.
+
+    Arguments:
+      - network: the polymer network to do the computation for
+
+    Returns:
+      - :math:`\\vec{W_i}` (dict): using the type i as a key,
+            this dict contains the weight fractions (:math:`\\frac{W_i}{W_{tot}}`)
+    """
+    return network.computeWeightFractions()
+
+
+def compute_weight_fraction_of_backbone(network: Universe, crosslinker_type: int = 2):
+    """
+    Compute the weight fraction of network backbone in infinite network
+
+    Arguments:
+      - network: the network to compute the weight fraction for
+      - crosslinker_type: the atom type to use to split the molecules
+
+    Returns:
+      - weightFraction (float): 1 - weightDangling/weightTotal,
+    """
+    if (network.getNrOfAtoms() < 1):
+        return 0.0
+
+    weight_fraction, _ = compute_weight_fraction_of_dangling_chains(
+        network, crosslinker_type)
+    return 1.0 - weight_fraction
+
+
+def compute_weight_fraction_of_dangling_chains(network: Universe, crosslinker_type: int = 2) -> Tuple[float, float]:
+    """
+    Compute the weight fraction of dangling strands in infinite network
+
+    NOTE:
+        Currently, only primary dangling chains are taken into account.
+        There are other methods that incorporate more.
+
+    Arguments:
+      - network: the network to compute the weight fraction for
+      - crosslinker_type: the atom type to use to split the molecules
+
+    Returns:
+      - weightFraction: weightDangling/weightTotal,
+      - numFraction: numDangling/numTotal
+    """
+    if (network.getNrOfAtoms() < 1):
+        return 0.0, 0.0
+
+    weights = network.getMasses()
+
+    def get_weight_of_graph(graph):
+        counts = Counter(graph.getAtomTypes())
+        weight_total = 0
+        for key in counts:
+            weight_total += weights[key] * counts[key]
+        return weight_total
+
+    all_chains = network.getChainsWithCrosslinker(crosslinker_type)
+    num_total = network.getNrOfAtoms()
+    weight_total = get_weight_of_graph(network)
+
+    num_dangling = 0
+    weight_dangling = 0
+    for chain in all_chains:
+        if (chain.getType() == MoleculeType.DANGLING_CHAIN):
+            num_dangling += chain.getNrOfAtoms()
+            weight_dangling += get_weight_of_graph(chain)
+
+    if (weight_total == 0):
+        # warnings.warn("Total weight of network is = 0.")
+        return 0.0, num_dangling / num_total
+
+    return weight_dangling / weight_total, num_dangling / num_total
+
+
 def measure_weight_fraction_of_soluble_material(network: Universe,
                                                 rel_tol: float = 0.75, abs_tol: float = None) -> float:
     """
@@ -358,6 +372,7 @@ def measure_weight_fraction_of_soluble_material(network: Universe,
 
     Returns:
       - :math:`W_{sol}` (float): the weight fraction of soluble material as counted.
+            0. for an empty network
 
     """
     if (network.getNrOfAtoms() == 0):
@@ -378,20 +393,6 @@ def measure_weight_fraction_of_soluble_material(network: Universe,
     return soluble_weight / total_weight
 
 
-def compute_weight_fractions(network: Universe) -> dict:
-    """
-    Compute the weight fractions of each atom type in the network.
-
-    Arguments:
-      - network: the polymer network to do the computation for
-
-    Returns:
-      - :math:`\\vec{W_i}` (dict): using the type i as a key,
-            this dict contains the weight fractions (:math:`\\frac{W_i}{W_{tot}}`)
-    """
-    return network.computeWeightFractions()
-
-
 def measure_lower_bound_weight_fraction_of_soluble_material(network: Universe, crosslinker_type: int = 2,
                                                             rel_tol: float = 0.75, abs_tol: float = None) -> float:
     """
@@ -408,10 +409,11 @@ def measure_lower_bound_weight_fraction_of_soluble_material(network: Universe, c
 
     Returns:
       - :math:`W_{sol}` (float): the weight fraction of soluble material as counted.
+            0. for an empty network
 
     """
     if (network.getNrOfAtoms() == 0):
-        return None
+        return 0.0
 
     def is_soluble_cluster(cluster):
         chains = cluster.getChainsWithCrosslinker(crosslinker_type)
