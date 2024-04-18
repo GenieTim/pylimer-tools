@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from pylimer_tools.utils.optimizeDf import *
+from pylimer_tools.utils.optimize_dataframe import *
 from tests.pylimer_tools.pdComparingTestCase import PandasComparingTestCase
 
 

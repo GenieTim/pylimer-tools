@@ -23,7 +23,7 @@
 * [[`eb904b82a2`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/eb904b82a2)] - Expose lined up atoms to Python, other minor improvements (Tim Bernhard)
 * [[`5049427676`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/5049427676)] - Set precision higher when writing data files (Tim Bernhard)
 * [[`7784611143`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/7784611143)] - Add (slow) benchmarks for MEHP refactor (Tim Bernhard)
-* [[`7f674f370d`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/7f674f370d)] - Finally get all (incl. MEHP2) tests working again, incl. Python compilation useage (Tim Bernhard)
+* [[`7f674f370d`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/7f674f370d)] - Finally get all (incl. MEHP2) tests working again, incl. Python compilation usage (Tim Bernhard)
 * [[`1fcdebaffa`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/1fcdebaffa)] - Remove comparison operator from Atom entity as not actually implemented (Tim Bernhard)
 * [[`784a56c0f3`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/784a56c0f3)] - Add more tests (Tim Bernhard)
 * [[`ba6f5fad4e`](https://github.com/BernhardWebstudio/DataShot_DesktopApp/commit/ba6f5fad4e)] - Implement minimal loop order detection + tests (Tim Bernhard)
