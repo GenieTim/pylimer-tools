@@ -18,7 +18,8 @@ jobs:
       - name: flake8 Lint
         uses: py-actions/flake8@v2
         with:
-          ignore: "W605"
+          ignore: "W605,W503,W504"
           max-line-length: "150"
+          exclude: "src/pylimer_tools_cpp/__init__.py"
           path: "src"
           plugins: "pep8-naming"

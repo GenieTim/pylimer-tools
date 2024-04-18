@@ -82,7 +82,7 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         # actual calc: 6 & 7 are active, 4 not
         self.assertEqual(
             2.0 / self.testUniverse.getVolume(),
-            compute_effective_nr_density_of_junctions([self.testUniverse], absTol=None, relTol=0,
+            compute_effective_nr_density_of_junctions([self.testUniverse], abs_tol=None, rel_tol=0,
                                                       crosslinker_type=2, min_num_effective_strands=2))
         self.assertEqual(
             2.0 / self.testUniverse.getVolume(),
