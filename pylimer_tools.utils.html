@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="pylimer_tools_cpp package" href="pylimer_tools_cpp.html" /><link rel="prev" title="pylimer_tools.io package" href="pylimer_tools.io.html" />
 
-    <!-- Generated with Sphinx 7.3.5 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.6 and Furo 2024.01.29 -->
         <title>pylimer_tools.utils package - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -161,7 +161,7 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html#manual-compilation">Manual Compilation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="assumptions.html">Assumptions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="nomenclature.html">Nomenclature</a></li>
-<li class="toctree-l1"><a class="reference internal" href="useage.html">Useage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Useage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="network_generator.html">Network Generators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readers_writers.html">Readers &amp; Writers</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="modules.html">src</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of src</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
@@ -255,17 +255,19 @@
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading">¶</a></h2>
 </section>
-<section id="module-pylimer_tools.utils.cacheUtility">
-<span id="pylimer-tools-utils-cacheutility-module"></span><h2>pylimer_tools.utils.cacheUtility module<a class="headerlink" href="#module-pylimer_tools.utils.cacheUtility" title="Link to this heading">¶</a></h2>
+<section id="module-pylimer_tools.utils.cache_utility">
+<span id="pylimer-tools-utils-cache-utility-module"></span><h2>pylimer_tools.utils.cache_utility module<a class="headerlink" href="#module-pylimer_tools.utils.cache_utility" title="Link to this heading">¶</a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools.utils.cacheUtility.doCache">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.cacheUtility.</span></span><span class="sig-name descname"><span class="pre">doCache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.utils.cacheUtility.doCache" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools.utils.cache_utility.do_cache">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.cache_utility.</span></span><span class="sig-name descname"><span class="pre">do_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.utils.cache_utility.do_cache" title="Link to this definition">¶</a></dt>
 <dd><p>Store the object in the cache</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>obj</strong> (<em>-</em>) – the thing to cache</p></li>
-<li><p><strong>file</strong> (<em>-</em>) – a part of what’s use for the cache’s name. Ideally the file that is read, such that the filemtime of <cite>file</cite> can be used to check whether cache must be generated anew</p></li>
+<li><p><strong>file</strong> (<em>-</em>) – a part of what’s use for the cache’s name.
+Ideally the file that is read, such that the filemtime of <cite>file</cite> can be used
+to check whether cache must be generated anew</p></li>
 <li><p><strong>suffix</strong> (<em>-</em>) – the file name’s suffix</p></li>
 <li><p><strong>tmp_dir</strong> (<em>-</em>) – the directory to store the cache in</p></li>
 </ul>
@@ -274,13 +276,15 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools.utils.cacheUtility.getCacheFileName">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.cacheUtility.</span></span><span class="sig-name descname"><span class="pre">getCacheFileName</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.utils.cacheUtility.getCacheFileName" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools.utils.cache_utility.get_cache_file_name">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.cache_utility.</span></span><span class="sig-name descname"><span class="pre">get_cache_file_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.utils.cache_utility.get_cache_file_name" title="Link to this definition">¶</a></dt>
 <dd><p>Get the name and path of a cache file. Internal method.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>file</strong> (<em>-</em>) – a part of what’s use for the cache’s name. Ideally the file that is read, such that the filemtime of <cite>file</cite> can be used to check whether cache must be generated anew</p></li>
+<li><p><strong>file</strong> (<em>-</em>) – a part of what’s use for the cache’s name.
+Ideally the file that is read, such that the filemtime of <cite>file</cite> can be used
+to check whether cache must be generated anew</p></li>
 <li><p><strong>suffix</strong> (<em>-</em>) – the file name’s suffix</p></li>
 <li><p><strong>tmp_dir</strong> (<em>-</em>) – the temporary directory</p></li>
 </ul>
@@ -290,7 +294,7 @@
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
-<li><p>cacheFileName</p></li>
+<li><p>cache_file_name</p></li>
 </ul>
 </p>
 </dd>
@@ -298,13 +302,13 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools.utils.cacheUtility.is_current_cache">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.cacheUtility.</span></span><span class="sig-name descname"><span class="pre">is_current_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dependencies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.utils.cacheUtility.is_current_cache" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools.utils.cache_utility.is_current_cache">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.cache_utility.</span></span><span class="sig-name descname"><span class="pre">is_current_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dependencies</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.utils.cache_utility.is_current_cache" title="Link to this definition">¶</a></dt>
 <dd><p>Determine whether the provided file is newer than all its dependencies.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>file</strong> (<em>-</em>) – The cache file that is required to be newer</p></li>
+<li><p><strong>cache_file</strong> (<em>-</em>) – The cache file that is required to be newer</p></li>
 <li><p><strong>dependencies</strong> (<em>-</em>) – The list of files (or a single file path) that need to be older</p></li>
 </ul>
 </dd>
@@ -318,20 +322,23 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools.utils.cacheUtility.loadCache">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.cacheUtility.</span></span><span class="sig-name descname"><span class="pre">loadCache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disableWarnings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anyway</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.utils.cacheUtility.loadCache" title="Link to this definition">¶</a></dt>
-<dd><p>Load an object from cache.</p>
+<dt class="sig sig-object py" id="pylimer_tools.utils.cache_utility.load_cache">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.cache_utility.</span></span><span class="sig-name descname"><span class="pre">load_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disable_warnings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmp_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anyway</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.utils.cache_utility.load_cache" title="Link to this definition">¶</a></dt>
+<dd><p>Load an object from cache, iff the cache is new enough.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>file</strong> (<em>-</em>) – a part of what’s use for the cache’s name. Ideally the file that is read, such that the filemtime of <cite>file</cite> can be used to check whether cache must be generated anew</p></li>
+<li><p><strong>file</strong> (<em>-</em>) – a part of what’s use for the cache’s name. Ideally the file that is read,
+such that the filemtime of <cite>file</cite> can be used to check whether cache must be generated anew</p></li>
 <li><p><strong>suffix</strong> (<em>-</em>) – the file name’s suffix</p></li>
-<li><p><strong>disableWarnings</strong> (<em>-</em>) – whether to disable warnings about missing possibilities to check for filemtime</p></li>
+<li><p><strong>disable_warnings</strong> (<em>-</em>) – whether to disable warnings about missing possibilities to check for filemtime</p></li>
 <li><p><strong>tmp_dir</strong> (<em>-</em>) – the directory to load the cache from</p></li>
+<li><p><strong>anyway</strong> (<em>-</em>) – whether to ignore the cache’s modification time, and return the cached data anyway,
+as if it were current</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>either the content of the cache, or None if the cache has to be loaded again / is non existant</p>
+<dd class="field-even"><p>either the content of the cache, or None if the cache has to be loaded again / is non existent</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
@@ -343,19 +350,19 @@
 </dd></dl>
 
 </section>
-<section id="module-pylimer_tools.utils.getTail">
-<span id="pylimer-tools-utils-gettail-module"></span><h2>pylimer_tools.utils.getTail module<a class="headerlink" href="#module-pylimer_tools.utils.getTail" title="Link to this heading">¶</a></h2>
+<section id="module-pylimer_tools.utils.data_utility">
+<span id="pylimer-tools-utils-data-utility-module"></span><h2>pylimer_tools.utils.data_utility module<a class="headerlink" href="#module-pylimer_tools.utils.data_utility" title="Link to this heading">¶</a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools.utils.getTail.getTail">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.getTail.</span></span><span class="sig-name descname"><span class="pre">getTail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minN</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxPercentage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.utils.getTail.getTail" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools.utils.data_utility.get_tail">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.data_utility.</span></span><span class="sig-name descname"><span class="pre">get_tail</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_percentage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.utils.data_utility.get_tail" title="Link to this definition">¶</a></dt>
 <dd><p>Extract the last few entries of a list</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<em>-</em>) – the list to extract the last few entries from</p></li>
 <li><p><strong>percentage</strong> (<em>-</em>) – the percentage of entries to extract</p></li>
-<li><p><strong>minN</strong> (<em>-</em>) – the minimum number of entries to extract</p></li>
-<li><p><strong>maxPercentage</strong> (<em>-</em>) – the maximum percentage of entries to extract</p></li>
+<li><p><strong>min_n</strong> (<em>-</em>) – the minimum number of entries to extract</p></li>
+<li><p><strong>max_percentage</strong> (<em>-</em>) – the maximum percentage of entries to extract</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -369,12 +376,39 @@ but ideally <cite>percentage</cite> many percentage of the last entries.</p>
 </dl>
 </dd></dl>
 
-</section>
-<section id="module-pylimer_tools.utils.optimizeDf">
-<span id="pylimer-tools-utils-optimizedf-module"></span><h2>pylimer_tools.utils.optimizeDf module<a class="headerlink" href="#module-pylimer_tools.utils.optimizeDf" title="Link to this heading">¶</a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools.utils.optimizeDf.optimize">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.optimizeDf.</span></span><span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datetime_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.utils.optimizeDf.optimize" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools.utils.data_utility.unify_data_stepsizes">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.data_utility.</span></span><span class="sig-name descname"><span class="pre">unify_data_stepsizes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_expected_step_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#pylimer_tools.utils.data_utility.unify_data_stepsizes" title="Link to this definition">¶</a></dt>
+<dd><p>Get a DataFrame where all data points have the same step between the values in column given by <cite>key</cite>
+NOTE: this function is rather unstable, as it has a few dirty assumptions, such as:
+- steps are modulo stepsize. Breaks e.g. with steps start with 1 and go up by step_size.
+- ideal step-size is max step difference. Breaks e.g. if there is one big gap</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>-</em>) – the DataFrame to unify the step-size for</p></li>
+<li><p><strong>key</strong> (<em>-</em>) – the column name indicating the column containing the step-nr.</p></li>
+<li><p><strong>max_expected_step_size</strong> (<em>-</em>) – use to get a warning if the computed step-size is larger</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a DataFrame with a consistent step-size</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>data</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-pylimer_tools.utils.optimize_dataframe">
+<span id="pylimer-tools-utils-optimize-dataframe-module"></span><h2>pylimer_tools.utils.optimize_dataframe module<a class="headerlink" href="#module-pylimer_tools.utils.optimize_dataframe" title="Link to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.utils.optimize_dataframe.optimize">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.optimize_dataframe.</span></span><span class="sig-name descname"><span class="pre">optimize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datetime_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.utils.optimize_dataframe.optimize" title="Link to this definition">¶</a></dt>
 <dd><p>Optimize all types of all columns in a dataframe</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -393,8 +427,8 @@ but ideally <cite>percentage</cite> many percentage of the last entries.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools.utils.optimizeDf.optimize_floats">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.optimizeDf.</span></span><span class="sig-name descname"><span class="pre">optimize_floats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#pylimer_tools.utils.optimizeDf.optimize_floats" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools.utils.optimize_dataframe.optimize_floats">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.optimize_dataframe.</span></span><span class="sig-name descname"><span class="pre">optimize_floats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#pylimer_tools.utils.optimize_dataframe.optimize_floats" title="Link to this definition">¶</a></dt>
 <dd><p>Optimize the floating point type entries</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -410,8 +444,8 @@ but ideally <cite>percentage</cite> many percentage of the last entries.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools.utils.optimizeDf.optimize_ints">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.optimizeDf.</span></span><span class="sig-name descname"><span class="pre">optimize_ints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#pylimer_tools.utils.optimizeDf.optimize_ints" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools.utils.optimize_dataframe.optimize_ints">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.optimize_dataframe.</span></span><span class="sig-name descname"><span class="pre">optimize_ints</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#pylimer_tools.utils.optimize_dataframe.optimize_ints" title="Link to this definition">¶</a></dt>
 <dd><p>Optimize the integer point type entries</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -427,8 +461,8 @@ but ideally <cite>percentage</cite> many percentage of the last entries.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools.utils.optimizeDf.optimize_objects">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.optimizeDf.</span></span><span class="sig-name descname"><span class="pre">optimize_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datetime_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#pylimer_tools.utils.optimizeDf.optimize_objects" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools.utils.optimize_dataframe.optimize_objects">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.optimize_dataframe.</span></span><span class="sig-name descname"><span class="pre">optimize_objects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datetime_features</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="headerlink" href="#pylimer_tools.utils.optimize_dataframe.optimize_objects" title="Link to this definition">¶</a></dt>
 <dd><p>Optimize object type entries</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -447,8 +481,8 @@ but ideally <cite>percentage</cite> many percentage of the last entries.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools.utils.optimizeDf.reduce_mem_usage">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.optimizeDf.</span></span><span class="sig-name descname"><span class="pre">reduce_mem_usage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_to_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.utils.optimizeDf.reduce_mem_usage" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools.utils.optimize_dataframe.reduce_mem_usage">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.optimize_dataframe.</span></span><span class="sig-name descname"><span class="pre">reduce_mem_usage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_to_category</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_stats</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.utils.optimize_dataframe.reduce_mem_usage" title="Link to this definition">¶</a></dt>
 <dd><p>Iterate through all the columns of a dataframe and modify the data type to reduce memory usage.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -463,36 +497,6 @@ but ideally <cite>percentage</cite> many percentage of the last entries.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>df (pd.DataFrame)</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-<section id="module-pylimer_tools.utils.unifyDataStepsizes">
-<span id="pylimer-tools-utils-unifydatastepsizes-module"></span><h2>pylimer_tools.utils.unifyDataStepsizes module<a class="headerlink" href="#module-pylimer_tools.utils.unifyDataStepsizes" title="Link to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools.utils.unifyDataStepsizes.unifyDataStepsizes">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.utils.unifyDataStepsizes.</span></span><span class="sig-name descname"><span class="pre">unifyDataStepsizes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stepSize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxExpectedStepSize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.utils.unifyDataStepsizes.unifyDataStepsizes" title="Link to this definition">¶</a></dt>
-<dd><p>Get a DataFrame where all data points have the same step between the values in column given by <cite>key</cite>
-NOTE: this function is rather unstable, as it has a few dirty assumptions, such as:
-- steps are modulo stepsize. Breaks e.g. with steps start with 1 and go up by stepSize.
-- ideal step-size is max step difference. Breaks e.g. if there is one big gap</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>-</em>) – the DataFrame to unify the step-size for</p></li>
-<li><p><strong>key</strong> (<em>-</em>) – the column name indicating the column containing the step-nr.</p></li>
-<li><p><strong>maxExpectedStepSize</strong> (<em>-</em>) – use to get a warning if the computed step-size is larger</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>a DataFrame with a consistent step-size</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>data</p></li>
-</ul>
-</p>
 </dd>
 </dl>
 </dd></dl>
@@ -559,27 +563,24 @@ NOTE: this function is rather unstable, as it has a few dirty assumptions, such 
             <ul>
 <li><a class="reference internal" href="#">pylimer_tools.utils package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-pylimer_tools.utils.cacheUtility">pylimer_tools.utils.cacheUtility module</a><ul>
-<li><a class="reference internal" href="#pylimer_tools.utils.cacheUtility.doCache"><code class="docutils literal notranslate"><span class="pre">doCache()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools.utils.cacheUtility.getCacheFileName"><code class="docutils literal notranslate"><span class="pre">getCacheFileName()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools.utils.cacheUtility.is_current_cache"><code class="docutils literal notranslate"><span class="pre">is_current_cache()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools.utils.cacheUtility.loadCache"><code class="docutils literal notranslate"><span class="pre">loadCache()</span></code></a></li>
+<li><a class="reference internal" href="#module-pylimer_tools.utils.cache_utility">pylimer_tools.utils.cache_utility module</a><ul>
+<li><a class="reference internal" href="#pylimer_tools.utils.cache_utility.do_cache"><code class="docutils literal notranslate"><span class="pre">do_cache()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.utils.cache_utility.get_cache_file_name"><code class="docutils literal notranslate"><span class="pre">get_cache_file_name()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.utils.cache_utility.is_current_cache"><code class="docutils literal notranslate"><span class="pre">is_current_cache()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.utils.cache_utility.load_cache"><code class="docutils literal notranslate"><span class="pre">load_cache()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-pylimer_tools.utils.getTail">pylimer_tools.utils.getTail module</a><ul>
-<li><a class="reference internal" href="#pylimer_tools.utils.getTail.getTail"><code class="docutils literal notranslate"><span class="pre">getTail()</span></code></a></li>
+<li><a class="reference internal" href="#module-pylimer_tools.utils.data_utility">pylimer_tools.utils.data_utility module</a><ul>
+<li><a class="reference internal" href="#pylimer_tools.utils.data_utility.get_tail"><code class="docutils literal notranslate"><span class="pre">get_tail()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.utils.data_utility.unify_data_stepsizes"><code class="docutils literal notranslate"><span class="pre">unify_data_stepsizes()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-pylimer_tools.utils.optimizeDf">pylimer_tools.utils.optimizeDf module</a><ul>
-<li><a class="reference internal" href="#pylimer_tools.utils.optimizeDf.optimize"><code class="docutils literal notranslate"><span class="pre">optimize()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools.utils.optimizeDf.optimize_floats"><code class="docutils literal notranslate"><span class="pre">optimize_floats()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools.utils.optimizeDf.optimize_ints"><code class="docutils literal notranslate"><span class="pre">optimize_ints()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools.utils.optimizeDf.optimize_objects"><code class="docutils literal notranslate"><span class="pre">optimize_objects()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools.utils.optimizeDf.reduce_mem_usage"><code class="docutils literal notranslate"><span class="pre">reduce_mem_usage()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#module-pylimer_tools.utils.unifyDataStepsizes">pylimer_tools.utils.unifyDataStepsizes module</a><ul>
-<li><a class="reference internal" href="#pylimer_tools.utils.unifyDataStepsizes.unifyDataStepsizes"><code class="docutils literal notranslate"><span class="pre">unifyDataStepsizes()</span></code></a></li>
+<li><a class="reference internal" href="#module-pylimer_tools.utils.optimize_dataframe">pylimer_tools.utils.optimize_dataframe module</a><ul>
+<li><a class="reference internal" href="#pylimer_tools.utils.optimize_dataframe.optimize"><code class="docutils literal notranslate"><span class="pre">optimize()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.utils.optimize_dataframe.optimize_floats"><code class="docutils literal notranslate"><span class="pre">optimize_floats()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.utils.optimize_dataframe.optimize_ints"><code class="docutils literal notranslate"><span class="pre">optimize_ints()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.utils.optimize_dataframe.optimize_objects"><code class="docutils literal notranslate"><span class="pre">optimize_objects()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.utils.optimize_dataframe.reduce_mem_usage"><code class="docutils literal notranslate"><span class="pre">reduce_mem_usage()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-pylimer_tools.utils">Module contents</a></li>

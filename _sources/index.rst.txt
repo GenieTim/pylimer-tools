@@ -18,7 +18,7 @@ Welcome to PylimerTools's documentation!
    installation
    assumptions
    nomenclature
-   useage
+   usage
    network_generator
    readers_writers
    modules

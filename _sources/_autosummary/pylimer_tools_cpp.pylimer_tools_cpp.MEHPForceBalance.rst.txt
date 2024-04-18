@@ -28,6 +28,9 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance
       ~MEHPForceBalance.evaluatePartialSpringDistanceFrom
       ~MEHPForceBalance.getAverageSpringLength
       ~MEHPForceBalance.getCrosslinkerVerse
+      ~MEHPForceBalance.getCurrentPartialSpringLengths
+      ~MEHPForceBalance.getCurrentPartialSpringVectors
+      ~MEHPForceBalance.getCurrentSpringVectors
       ~MEHPForceBalance.getDanglingWeightFraction
       ~MEHPForceBalance.getDefaultNrOfChains
       ~MEHPForceBalance.getDefaultR0Square

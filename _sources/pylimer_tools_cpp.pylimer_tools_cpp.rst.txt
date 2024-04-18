@@ -13,7 +13,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp
 
    .. autosummary::
    
-      computeStoichiometricInbalance
+      computeStoichiometricImbalance
       predictGelationPoint
    
    
