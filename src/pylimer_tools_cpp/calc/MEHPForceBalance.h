@@ -87,11 +87,6 @@ namespace calc {
 
         std::vector<std::pair<size_t, size_t>> pairsOfAtoms =
           entanglements.pairsOfAtoms;
-        RUNTIME_EXP_IFN(
-          pairsOfAtoms.size() >= minimumNrOfSliplinks,
-          "Minimum number of slip-links could not be sampled: got " +
-            std::to_string(pairsOfAtoms.size()) + " instead of " +
-            std::to_string(minimumNrOfSliplinks) + ".");
         std::vector<long int> pairOfAtom = entanglements.pairOfAtom;
 
         std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
@@ -354,7 +349,13 @@ namespace calc {
                                       sameStrandCutoff,
                                       seed,
                                       crosslinkerType);
-                                      
+
+        RUNTIME_EXP_IFN(
+          entanglements.pairsOfAtoms.size() >= minimumNrOfSliplinks,
+          "Minimum number of slip-links could not be sampled: got " +
+            std::to_string(entanglements.pairsOfAtoms.size()) + " instead of " +
+            std::to_string(minimumNrOfSliplinks) + ".");
+            
         return MEHPForceBalance::constructWithSlipLinks(
           universe, entanglements, crosslinkerType, is2D, kappa);
       }

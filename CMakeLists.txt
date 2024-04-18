@@ -6,7 +6,7 @@ if (POLICY CMP0025)
 endif ()
 
 # start project
-project(pylimer_tools VERSION "0.1.11")
+project(pylimer_tools VERSION "0.2.1")
 add_definitions( -DOVERALL_PROJECT_VERSION="${CMAKE_PROJECT_VERSION}")
 
 include(${CMAKE_CURRENT_LIST_DIR}/vendor/myConfigureFile.cmake)

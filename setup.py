@@ -23,23 +23,23 @@ cmake_args = ["-DCMAKE_BUILD_TYPE=RelWithDebInfo",
 # cmake_args = ["-Digraph_DEBUG=ON", "-DCMAKE_FIND_DEBUG_MODE=ON"]
 
 if (os.getenv('VCPKG_ROOT')):
-    toolchainFile = os.path.join(
+    toolchain_file = os.path.join(
         os.getenv('VCPKG_ROOT'), "scripts", "buildsystems", "vcpkg.cmake")
-    if (os.path.isfile(toolchainFile)):
+    if (os.path.isfile(toolchain_file)):
         cmake_args.append(
-            "-DCMAKE_TOOLCHAIN_FILE={}".format(toolchainFile.replace("\\", "/")))
+            "-DCMAKE_TOOLCHAIN_FILE={}".format(toolchain_file.replace("\\", "/")))
         # cmake_args.append("-DVCPKG_TARGET_TRIPLET=x86-windows-static")
-        print("Using toolchain \"{}\"".format(toolchainFile))
+        print("Using toolchain \"{}\"".format(toolchain_file))
     else:
         warnings.warn(
-            "Detected VCPKG_ROOT. Did not find toolchain file {} though.".format(toolchainFile))
+            "Detected VCPKG_ROOT. Did not find toolchain file {} though.".format(toolchain_file))
 else:
     print("VCPKG_ROOT not set. Not using vcpk dependencies.")
 
 # delete vendor caches — this is useful if you compile
 # this project using CMake (e.g. for tests) as well as skbuild,
 # as the two build directories of vendor do not interact well.
-vendorFilesToDelete = [
+vendor_files_to_delete = [
     os.path.abspath(os.path.join(
         os.path.dirname(__file__), "vendor/igraph-skbuild-{}/src/igraphLib-build".format(platform.system()))),
     os.path.abspath(os.path.join(
@@ -47,15 +47,15 @@ vendorFilesToDelete = [
     os.path.abspath(os.path.join(
         os.path.dirname(__file__), "vendor/cereal-skbuild-{}/src/cerealLib-build".format(platform.system())))
 ]
-for vendorFile in vendorFilesToDelete:
-    if (os.path.exists(vendorFile)):
+for vendor_file in vendor_files_to_delete:
+    if (os.path.exists(vendor_file)):
         try:
-            shutil.rmtree(vendorFile)
-        except:
+            shutil.rmtree(vendor_file)
+        except Exception:
             warnings.warn(
-                "Could not delete directory {}. Errors incoming.".format(vendorFile))
+                "Could not delete directory {}. Errors incoming.".format(vendor_file))
     else:
-        print("No need to delete {}".format(vendorFile))
+        print("No need to delete {}".format(vendor_file))
 
 # skbuildCaches = os.path.abspath(os.path.join(
 #     os.path.dirname(__file__), '_skbuild'))
@@ -72,7 +72,7 @@ with open("README.md", 'r') as file:
 
 setup(
     name="pylimer_tools",
-    version="0.1.11",
+    version="0.2.1",
     description="A collection of utility python functions for handling LAMMPS output and polymers in Python ",
     long_description_content_type="text/markdown",
     long_description=readme_content,

@@ -5,7 +5,7 @@ import click
 import numpy as np
 import random
 
-from pylimer_tools.io.readLammpsOutputFile import readDataFile
+from pylimer_tools.io.read_lammps_output_file import readDataFile
 from pylimer_tools_cpp.pylimer_tools_cpp import UniverseSequence, DataFileWriter, Atom
 
 

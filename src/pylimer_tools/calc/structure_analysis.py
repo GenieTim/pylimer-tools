@@ -1,0 +1,418 @@
+from __future__ import annotations
+
+import warnings
+from collections import Counter
+from typing import Iterable, Tuple
+
+import numpy as np
+
+from pylimer_tools_cpp.pylimer_tools_cpp import MoleculeType, Universe
+
+
+def compute_stoichiometric_imbalance(network: Universe, crosslinker_type: int, strand_length: int = None,
+                                     functionality_per_type: dict = None, ignore_types: list = [],
+                                     effective: bool = False) -> float:
+    """
+    Compute the stoichiometric imbalance
+    ( nr. of bonds formable of crosslinker / nr. of formable bonds of precursor )
+
+    NOTE:
+      if your system has a non-integer number of possible bonds (e.g. one site unbonded),
+      this will not be rounded/respected in any way.
+
+    Arguments:
+      - network: the polymer network to do the computation for
+      - crosslinker_type: the type of the junctions/crosslinkers to select them in the network
+      - strand_length: the length of the network strands (in nr. of beads).
+          Used to infer the number of precursor strands.
+          If `None`: will use average length of each connected system when ignoring the crosslinkers.
+      - functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
+          If `None`: will use max functionality per type.
+      - ignore_types: a list of integers, the types to ignore for the imbalance (e.g. solvent atom types)
+      - effective: whether to use the effective functionality (if functionality_per_type is not passed) or the maximum
+
+    Returns:
+      - r (float): the stoichiometric imbalance
+    """
+    if (network.getNrOfAtoms() == 0):
+        return 0
+
+    counts = Counter(network.getAtomTypes())
+
+    if (functionality_per_type is not None and
+            not np.all([k in functionality_per_type for k in counts if counts[k] > 0])):
+        functionality_per_type = None
+        warnings.warn("Not all atom types found in functionality_per_type, " +
+                      "will ignore passed argument `functionality_per_type`.")
+
+    if (functionality_per_type is None):
+        functionality_per_type = network.determineEffectiveFunctionalityPerType(
+        ) if effective else network.determineFunctionalityPerType()
+
+    if (crosslinker_type not in counts):
+        raise ValueError(
+            "No junction with type {} seems to have been found in the network".format(crosslinker_type))
+
+    if (strand_length is None):
+        strands = network.getMolecules(crosslinker_type)
+        strand_length = np.mean([m.getLength() for m in strands if not np.all(
+            [a.getType() in ignore_types for a in m.getAtoms()])])
+
+    crosslinker_formable_bonds = counts[crosslinker_type] * \
+        functionality_per_type[crosslinker_type]
+    other_formable_bonds = 0
+    for key in counts:
+        if (key in ignore_types or counts[key] == 0):
+            continue
+        if (key not in functionality_per_type):
+            raise ValueError(
+                "Type {} must have an associated functionality".format(key))
+        if (key != crosslinker_type):
+            other_formable_bonds += counts[key]*functionality_per_type[key]
+
+    # division by 2 is implicit
+    return crosslinker_formable_bonds/(other_formable_bonds/strand_length)
+
+
+def compute_extent_of_reaction(network: Universe, crosslinker_type, functionality_per_type: dict = None) -> float:
+    """
+    Compute the extent of polymerization reaction
+    (nr. of formed bonds in reaction / max. nr. of bonds formable)
+    NOTE:
+        - if your system has a non-integer number of possible bonds (e.g. one site non-bonded),
+            this will not be rounded/respected in any way
+        - if the system contains solvent or other molecules that should not be binding to
+            cross-linkers, make sure to remove them before calling this function
+
+    Arguments:
+      - network: the polymer network to do the computation for
+      - crosslinker_type: the atom type of crosslinker beads
+      - functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
+          If None: will use max functionality per type.
+
+    Returns:
+      - p (float): the extent of reaction
+    """
+    if (network.getNrOfAtoms() == 0):
+        return 1
+
+    if (functionality_per_type is not None and crosslinker_type not in functionality_per_type):
+        functionality_per_type = None
+        warnings.warn("Cross-linker type {} not found in passed functionality_per_type, ".format(crosslinker_type) +
+                      "will ignore passed argument `functionality_per_type`.")
+
+    if (functionality_per_type is None):
+        functionality_per_type = network.determineFunctionalityPerType()
+
+    num_strands = len(network.getMolecules(crosslinker_type))
+    crosslinks = network.getAtomsOfType(crosslinker_type)
+    num_crosslinkers = len(crosslinks)
+
+    # assuming strand has functionality 2
+    max_formable_bonds = min(num_strands*2, num_crosslinkers *
+                             functionality_per_type[crosslinker_type])
+
+    if (max_formable_bonds == 0):
+        return 1
+
+    actually_formed_bonds = 0
+    for crosslink in crosslinks:
+        connected_to = network.getConnectedAtoms(crosslink)
+        actually_formed_bonds += len(
+            [a for a in connected_to if a.getType() != crosslinker_type])
+
+    return actually_formed_bonds/(max_formable_bonds)
+
+
+def compute_weight_fraction_of_backbone(network: Universe, crosslinker_type: int = 2):
+    """
+    Compute the weight fraction of network backbone in infinite network
+
+    Arguments:
+      - network: the network to compute the weight fraction for
+      - crosslinker_type: the atom type to use to split the molecules
+
+    Returns:
+      - weightFraction (float): 1 - weightDangling/weightTotal,
+    """
+    weight_fraction, _ = compute_weight_fraction_of_dangling_chains(
+        network, crosslinker_type)
+    return 1.0 - weight_fraction
+
+
+def compute_weight_fraction_of_dangling_chains(network: Universe, crosslinker_type: int = 2) -> Tuple[float, float]:
+    """
+    Compute the weight fraction of dangling strands in infinite network
+
+    Arguments:
+      - network: the network to compute the weight fraction for
+      - crosslinker_type: the atom type to use to split the molecules
+
+    Returns:
+      - weightFraction: weightDangling/weightTotal,
+      - numFraction: numDangling/numTotal
+    """
+    if (network.getNrOfAtoms() < 1):
+        return 0.0, 0.0
+
+    weights = network.getMasses()
+
+    def get_weight_of_graph(graph):
+        counts = Counter(graph.getAtomTypes())
+        weight_total = 0
+        for key in counts:
+            weight_total += weights[key]*counts[key]
+        return weight_total
+
+    all_chains = network.getChainsWithCrosslinker(crosslinker_type)
+    num_total = network.getNrOfAtoms()
+    weight_total = get_weight_of_graph(network)
+
+    num_dangling = 0
+    weight_dangling = 0
+    for chain in all_chains:
+        if (chain.getType() == MoleculeType.DANGLING_CHAIN):
+            num_dangling += chain.getNrOfAtoms()
+            weight_dangling += get_weight_of_graph(chain)
+
+    if (weight_total == 0):
+        # warnings.warn("Total weight of network is = 0.")
+        return 0.0, num_dangling/num_total
+
+    return weight_dangling/weight_total, num_dangling/num_total
+
+
+def compute_mean_end_to_end_distances(networks: Iterable[Universe], crosslinker_type) -> dict:
+    """
+    Compute the mean end to end distance between each pair of (indirectly) connected crosslinker
+
+    Arguments:
+      - networks: the different configurations of the polymer network to do the computation for
+      - crosslinker_type: the atom type to compute the in-between vectors for
+
+    Returns:
+      - endToEndDistances (dict): a dictionary with key: "{atom1.name}+{atom2.name}"
+          and value: the norm of the mean difference vector
+    """
+    r_tau_vectors = compute_mean_end_to_end_vectors(networks, crosslinker_type)
+    if (len(r_tau_vectors) < 1):
+        return {}
+
+    r_tau_vectors_array = np.array(list(r_tau_vectors.values()))
+    r_taus = np.linalg.norm(r_tau_vectors_array, axis=1)
+
+    return dict(zip(r_tau_vectors.keys(), r_taus))
+
+
+def compute_mean_end_to_end_vectors(networks: Iterable[Universe], crosslinker_type) -> dict:
+    """
+    Compute the mean end to end vectors between each pair of (indirectly) connected crosslinker
+
+    Arguments:
+      - networks: the different configurations of the polymer network to do the computation for
+      - crosslinker_type: the atom type to compute the in-between vectors for
+
+    Returns:
+      - end_to_end_vectors (dict): a dictionary with key: "{atom1.name}+{atom2.name}"
+          and value: their mean distance difference vector
+    """
+    if (len(networks) == 0):
+        return {}
+    end_to_end_vectors = {}
+    divider = 1/len(networks)
+    for network in networks:
+        current_end_to_end_vectors = compute_end_to_end_vectors(
+            network, crosslinker_type)
+        # the mean calculation in this for loop
+        # trades some memory for performance
+        # there are still many performance and memory
+        # improvements possible
+        # (e.g. computing connectivity only once, storing it only once, ....)
+        for key in current_end_to_end_vectors:
+            if (key not in end_to_end_vectors):
+                end_to_end_vectors[key] = [0, 0, 0]
+            for i in range(3):
+                end_to_end_vectors[key][i] += current_end_to_end_vectors[key][i]*divider
+    return end_to_end_vectors
+
+
+def compute_end_to_end_vectors(network: Universe, crosslinker_type) -> dict:
+    """
+    Compute the end to end vectors between each pair of (indirectly) connected crosslinker
+
+    Arguments:
+      - network: the polymer network to do the computation for
+      - crosslinker_type: the atom type to compute the in-between vectors for
+
+    Returns:
+      - end_to_end_vectors (dict): a dictionary with key: "{atom1.name}+{atom2.name}"
+          and value: their difference vector
+    """
+    # while we could do the decomposition again with explicit removal of irrelevant strand atoms,
+    # this should not be any more expensive
+    end_to_end_vectors = {}
+    molecules = network.getChainsWithCrosslinker(crosslinker_type)
+    for molecule in molecules:
+        crosslinkers = molecule.getAtomsOfType(crosslinker_type)
+        if (len(crosslinkers) != 2 or
+            molecule.getType() == MoleculeType.PRIMARY_LOOP or
+                molecule.getType() == MoleculeType.DANGLING_CHAIN):
+            # dangling, free chains and loops are irrelevant for our purposes
+            continue
+        # igraph.VertexSeq is not sortable -> use a list
+        crosslinkers = [crosslinkers[0], crosslinkers[1]]
+        # sort crosslinkers by name as a way to keep the vector directions consistent between timesteps
+        crosslinkers.sort(key=lambda a: a.getId())
+        #
+        key = molecule.getKey()
+        end_to_end_vectors[key] = crosslinkers[0].computeVectorTo(
+            crosslinkers[1], network.getBox())
+
+    return end_to_end_vectors
+
+
+def compute_crosslinker_conversion(network: Universe, crosslinker_type, f: int = None,
+                                   functionality_per_type: dict = None) -> float:
+    """
+    Compute the extent of reaction of the crosslinkers
+    (actual functionality divided by target functionality)
+
+    Arguments:
+      - network: the polymer network to do the computation for
+      - crosslinker_type: the type of the junctions/crosslinkers to select them in the network
+      - f: the functionality of the crosslinkers
+
+    Returns:
+      - r (float): the (mean) crosslinker conversion
+    """
+    if (f is None):
+        if (functionality_per_type is None):
+            functionality_per_type = network.determineFunctionalityPerType()
+        if (crosslinker_type not in functionality_per_type):
+            return 0.0
+        f = functionality_per_type[crosslinker_type]
+    return compute_effective_crosslinker_functionality(network, crosslinker_type) / f
+
+
+def compute_effective_crosslinker_functionality(network: Universe, crosslinker_type) -> float:
+    """
+    Compute the mean crosslinker functionality
+
+    Arguments:
+      - network: the polymer network to do the computation for
+      - crosslinker_type: the type of the junctions/crosslinkers to select them in the network
+
+    Returns:
+      - f (float): the (mean) effective crosslinker functionality
+    """
+    junction_degrees = compute_effective_crosslinker_functionalities(
+        network, crosslinker_type)
+    return np.mean(junction_degrees)
+
+
+def compute_effective_crosslinker_functionalities(network: Universe, crosslinker_type) -> list[int]:
+    """
+    Compute the functionality of every crosslinker in the network
+
+    Arguments:
+      - network: the polymer network to do the computation for
+      - crosslinker_type: the type of the junctions/crosslinkers to select them in the network
+
+    Returns:
+      - junctionDegrees (list[int]): the functionality of every crosslinker
+    """
+    if (network.getNrOfAtoms() == 0):
+        return []
+    junctions = network.getAtomsOfType(crosslinker_type)
+    junction_ids = [v.getId() for v in junctions]
+    junction_degrees = [network.getNrOfBondsOfAtom(id) for id in junction_ids]
+    return junction_degrees
+
+
+def measure_weight_fraction_of_soluble_material(network: Universe,
+                                                rel_tol: float = 0.75, abs_tol: float = None) -> float:
+    """
+    Compute the weight fraction of soluble material by counting.
+
+    Arguments:
+      - network: the polymer network to do the computation for
+      - rel_tol: the fraction of the maximum weight that counts as soluble. Ignored if abs_tol is specified
+      - abs_tol: the weight from which on a component is not soluble anymore
+
+    Returns:
+      - :math:`W_{sol}` (float): the weight fraction of soluble material as counted.
+
+    """
+    if (network.getNrOfAtoms() == 0):
+        return None
+
+    fractions = network.getClusters()
+    weights = np.array([f.computeTotalMass() for f in fractions])
+    total_weight = weights.sum()
+    soluble_weight = 0
+    for w in weights:
+        if (abs_tol is not None):
+            if (w < abs_tol):
+                soluble_weight += w
+        else:
+            if (w < rel_tol*weights.max()):
+                soluble_weight += w
+
+    return soluble_weight/total_weight
+
+
+def compute_weight_fractions(network: Universe) -> dict:
+    """
+    Compute the weight fractions of each atom type in the network.
+
+    Arguments:
+      - network: the polymer network to do the computation for
+
+    Returns:
+      - :math:`\\vec{W_i}` (dict): using the type i as a key,
+            this dict contains the weight fractions (:math:`\\frac{W_i}{W_{tot}}`)
+    """
+    return network.computeWeightFractions()
+
+def measure_lower_bound_weight_fraction_of_soluble_material(network: Universe, crosslinker_type: int,
+                                                            rel_tol: float = 0.75, abs_tol: float = None) -> float:
+    """
+    Compute a lower bound on the weight fraction of soluble material by counting.
+    This works as:
+        - only clusters, which do not contain loops and are smaller than the rel_tol of the biggest,
+            are counted as soluble
+
+    Arguments:
+      - network: the polymer network to do the computation for
+      - crosslinker_type: the type of the junctions/crosslinkers to select them in the network
+      - rel_tol: the fraction of the maximum weight that counts as soluble. Ignored if abs_tol is specified
+      - abs_tol: the weight from which on a component is not soluble anymore
+
+    Returns:
+      - :math:`W_{sol}` (float): the weight fraction of soluble material as counted.
+
+    """
+    if (network.getNrOfAtoms() == 0):
+        return None
+
+    def is_soluble_cluster(cluster):
+        chains = cluster.getChainsWithCrosslinker(crosslinker_type)
+        if (np.any([c.getType() == MoleculeType.PRIMARY_LOOP for c in chains])):
+            return False
+        loops = cluster.findLoops(crosslinker_type)
+        return len(loops) == 0
+
+    fractions = network.getClusters()
+    weights = np.array([f.computeTotalMass() for f in fractions])
+    total_weight = weights.sum()
+    soluble_weight = 0
+    for i in range(len(fractions)):
+        w = weights[i]
+        if (abs_tol is not None):
+            if (w < abs_tol and is_soluble_cluster(fractions[i])):
+                soluble_weight += w
+        else:
+            if (w < rel_tol*weights.max() and is_soluble_cluster(fractions[i])):
+                soluble_weight += w
+
+    return soluble_weight/total_weight
