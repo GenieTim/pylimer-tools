@@ -518,7 +518,7 @@ but in SI units
 <dd><p>Returns the conversion factor from the unit style to SI units.</p>
 <p>Example usage:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">units</span> <span class="o">=</span> <span class="n">getUnitStyle</span><span class="p">(</span><span class="s2">&quot;lj&quot;</span><span class="p">)</span>
-<span class="n">siMass</span> <span class="o">=</span> <span class="n">ljMass</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">getBaseUnitOf</span><span class="p">(</span><span class="s2">&quot;mass&quot;</span><span class="p">)</span>
+<span class="n">siMass</span> <span class="o">=</span> <span class="n">ljMass</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">get_base_unit_of</span><span class="p">(</span><span class="s2">&quot;mass&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
