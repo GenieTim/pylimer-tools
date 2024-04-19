@@ -195,7 +195,7 @@ namespace entities {
     // return this->getNrOfVertices();
   }
 
-  int Molecule::getNrOfBonds() {
+  int Molecule::getNrOfBonds() const {
     return this->getNrOfEdges();
   }
 
