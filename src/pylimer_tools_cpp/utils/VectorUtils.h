@@ -56,13 +56,19 @@ namespace utils {
     return value;
   }
 
-  static std::vector<double> segmentwise_norm(const Eigen::VectorXd &vecs, const size_t segmentSize = 3) {
-    static_assert(segmentSize > 0, "Segmentwise requires a useable size");
-    assert(vecs.size() % segmentSize == 0);
+  static std::vector<double> segmentwise_norm(const Eigen::VectorXd& vecs,
+                                              const size_t segmentSize = 3)
+  {
+    INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a useable size");
+    INVALIDARG_EXP_IFN(vecs.size() % segmentSize == 0,
+                       "The size of the supplied vector, " +
+                         std::to_string(vecs.size()) +
+                         " is not a multiple of the segment size, " +
+                         std::to_string(segmentSize) + ".");
     std::vector<double> results;
-    results.reserve(vecs.size()/segmentSize);
-    for (size_t i = 0; i < vecs.size()/segmentSize; i++) {
-      results.push_back(vecs[i].segment(segmentSize*i, segmentSize).norm());
+    results.reserve(vecs.size() / segmentSize);
+    for (size_t i = 0; i < vecs.size() / segmentSize; i++) {
+      results.push_back(vecs[i].segment(segmentSize * i, segmentSize).norm());
     }
     return results;
   }
