@@ -1067,9 +1067,9 @@ namespace calc {
       const pylimer_tools::entities::Universe& universe,
       pylimer_tools::calc::entanglement_detection::AtomPairEntanglements
         entanglements,
-      int crosslinkerType = 2,
-      bool is2D = false,
-      double kappa = 1.0)
+      int crosslinkerType,
+      bool is2D,
+      double kappa)
     {
       pylimer_tools::entities::Universe emptyUniverse =
         pylimer_tools::entities::Universe(universe.getBox());
