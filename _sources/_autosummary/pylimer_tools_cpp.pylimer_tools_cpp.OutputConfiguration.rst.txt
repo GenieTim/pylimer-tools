@@ -1,0 +1,37 @@
+pylimer\_tools\_cpp.pylimer\_tools\_cpp.OutputConfiguration
+===========================================================
+
+.. currentmodule:: pylimer_tools_cpp.pylimer_tools_cpp
+
+.. autoclass:: OutputConfiguration
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :inherited-members:
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~OutputConfiguration.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~OutputConfiguration.append
+      ~OutputConfiguration.doubleValues
+      ~OutputConfiguration.filename
+      ~OutputConfiguration.intValues
+      ~OutputConfiguration.outputEvery
+      ~OutputConfiguration.useEvery
+   
+   
