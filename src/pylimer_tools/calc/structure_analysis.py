@@ -295,7 +295,7 @@ def compute_weight_fractions(network: Universe) -> dict:
     return network.computeWeightFractions()
 
 
-def compute_weight_fraction_of_backbone(network: Universe, crosslinker_type: int = 2):
+def measure_weight_fraction_of_backbone(network: Universe, crosslinker_type: int = 2):
     """
     Compute the weight fraction of network backbone in infinite network
 
@@ -309,12 +309,12 @@ def compute_weight_fraction_of_backbone(network: Universe, crosslinker_type: int
     if (network.getNrOfAtoms() < 1):
         return 0.0
 
-    weight_fraction, _ = compute_weight_fraction_of_dangling_chains(
+    weight_fraction, _ = measure_weight_fraction_of_dangling_chains(
         network, crosslinker_type)
     return 1.0 - weight_fraction
 
 
-def compute_weight_fraction_of_dangling_chains(network: Universe, crosslinker_type: int = 2) -> Tuple[float, float]:
+def measure_weight_fraction_of_dangling_chains(network: Universe, crosslinker_type: int = 2) -> Tuple[float, float]:
     """
     Compute the weight fraction of dangling strands in infinite network
 

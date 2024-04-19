@@ -13,8 +13,8 @@ from pylimer_tools.calc.structure_analysis import (
     compute_effective_crosslinker_functionalities,
     compute_effective_crosslinker_functionality,
     compute_mean_end_to_end_distances, compute_mean_end_to_end_vectors,
-    compute_weight_fraction_of_backbone,
-    compute_weight_fraction_of_dangling_chains)
+    measure_weight_fraction_of_backbone,
+    measure_weight_fraction_of_dangling_chains)
 from pylimer_tools_cpp.pylimer_tools_cpp import MoleculeType, Universe
 
 if __name__ == '__main__':
@@ -27,13 +27,13 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
 
     def test_weight_fraction_calculations(self):
         self.assertEqual(
-            (0.0, 0.0), compute_weight_fraction_of_dangling_chains(self.emptyUniverse, 2))
+            (0.0, 0.0), measure_weight_fraction_of_dangling_chains(self.emptyUniverse, 2))
         # empty weight -> empty weight fraction
         self.testUniverse.setMasses({1: 0, 2: 0})
         self.assertEqual(
-            (0.0, 0.25), compute_weight_fraction_of_dangling_chains(self.testUniverse, 2))
+            (0.0, 0.25), measure_weight_fraction_of_backbone(self.testUniverse, 2))
         self.assertEqual(
-            1.0, compute_weight_fraction_of_backbone(self.testUniverse, 2))
+            1.0, measure_weight_fraction_of_backbone(self.testUniverse, 2))
         # non-empty weights
         self.testUniverse.setMasses({1: 1, 2: 0})
         self.assertTrue(self.testUniverse.getNrOfAtoms() > 0)
@@ -41,7 +41,7 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         all_chains = self.testUniverse.getChainsWithCrosslinker(2)
         self.assertEqual(all_chains[2].getType(), MoleculeType.DANGLING_CHAIN)
         self.assertEqual(
-            (0.2, 0.25), compute_weight_fraction_of_dangling_chains(self.testUniverse, crosslinker_type=2))
+            (0.2, 0.25), measure_weight_fraction_of_dangling_chains(self.testUniverse, crosslinker_type=2))
 
     def test_crosslinker_functionality_calculation(self):
         self.assertCountEqual(

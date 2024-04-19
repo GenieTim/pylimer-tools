@@ -114,10 +114,10 @@ def predict_number_density_of_network_strands(network: Universe, crosslinker_typ
             "Currently, only junction functionalities of 3 and 4 are supported")
 
 
-def calculate_weight_fraction_of_dangling_chains(network: Universe, crosslinker_type: int,
-                                                 strand_length: int = None, functionality_per_type: dict = None,
-                                                 weight_fractions: dict = None,
-                                                 r: float = None, p: float = None) -> float:
+def compute_weight_fraction_of_dangling_chains(network: Universe, crosslinker_type: int,
+                                               strand_length: int = None, functionality_per_type: dict = None,
+                                               weight_fractions: dict = None,
+                                               r: float = None, p: float = None) -> float:
     """
     Compute the weight fraction of dangling strands in infinite network
 
@@ -134,15 +134,15 @@ def calculate_weight_fraction_of_dangling_chains(network: Universe, crosslinker_
       - weightFraction $\\Phi_d = 1 - \\Phi_{el} - w_{sol}$: weightDangling/weightTotal
     """
     return 1. \
-        - calculate_weight_fraction_of_backbone(network, crosslinker_type, strand_length,
-                                                functionality_per_type, weight_fractions, r, p) \
+        - compute_weight_fraction_of_backbone(network, crosslinker_type, strand_length,
+                                              functionality_per_type, weight_fractions, r, p) \
         - compute_weight_fraction_of_soluble_material(
             network, crosslinker_type, strand_length, functionality_per_type, weight_fractions, r, p)
 
 
-def calculate_weight_fraction_of_backbone(network: Universe, crosslinker_type: int, strand_length: int = None,
-                                          functionality_per_type: dict = None, weight_fractions: dict = None,
-                                          r: float = None, p: float = None) -> float:
+def compute_weight_fraction_of_backbone(network: Universe, crosslinker_type: int, strand_length: int = None,
+                                        functionality_per_type: dict = None, weight_fractions: dict = None,
+                                        r: float = None, p: float = None) -> float:
     """
     Compute the weight fraction of the backbone strands in an infinite network
 

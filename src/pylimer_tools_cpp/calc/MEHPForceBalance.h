@@ -786,6 +786,8 @@ namespace calc {
         return this->initialConfig.nrOfPartialSprings;
       }
 
+      int getNumIntraChainSlipLinks() const;
+
       Eigen::VectorXd getCurrentDisplacements() const
       {
         return this->currentDisplacements;

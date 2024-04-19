@@ -4657,6 +4657,25 @@ namespace calc {
       return springLengths;
     }
 
+    int MEHPForceBalance::getNumIntraChainSlipLinks() const
+    {
+      int result = 0;
+      for (size_t i = this->initialConfig.nrOfNodes;
+           i < this->initialConfig.nrOfLinks;
+           ++i) {
+        if (this->initialConfig.springIndicesOfLinks[i].size() < 2) {
+          result += 1;
+        }
+        if (this->initialConfig.springIndicesOfLinks[i].size() == 2 &&
+            this->initialConfig.springIndicesOfLinks[i][0] ==
+              this->initialConfig.springIndicesOfLinks[i][1]) {
+          result += 1;
+        }
+      }
+
+      return result;
+    };
+
     Eigen::VectorXd MEHPForceBalance::evaluatePartialSpringVectors(
       const ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
