@@ -752,7 +752,7 @@ namespace calc {
         std::vector<double> results =
           std::vector<double>(this->initialConfig.nrOfSprings, 0.);
         for (size_t i = 0; i < this->initialConfig.nrOfPartialSprings; ++i) {
-          results[this->initialConfig.partialToFullSpring[i]] +=
+          results[this->initialConfig.partialToFullSpringIndex[i]] +=
             partialSprings.segment(3 * i, 3).norm();
         }
 
