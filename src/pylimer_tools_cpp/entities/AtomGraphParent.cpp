@@ -252,7 +252,7 @@ namespace entities {
    */
   Atom AtomGraphParent::getAtomByVertexIdx(const long int vertexIdx) const
   {
-    if (vertexIdx > this->getNrOfAtoms()) {
+    if (vertexIdx > this->getNrOfVertices()) {
       throw std::invalid_argument("Atom with this vertex id (" +
                                   std::to_string(vertexIdx) +
                                   ") does not exist");
@@ -424,8 +424,8 @@ namespace entities {
   std::vector<double> AtomGraphParent::computeBondLengths(const Box* box)
   {
     std::vector<double> lengths;
-    lengths.reserve(this->getNrOfBonds());
-    if (this->getNrOfBonds() == 0) {
+    lengths.reserve(this->getNrOfEdges());
+    if (this->getNrOfEdges() == 0) {
       return lengths;
     }
     // construct iterator
@@ -531,18 +531,18 @@ namespace entities {
   std::map<std::string, std::vector<long int>> AtomGraphParent::getEdges() const
   {
     igraph_vector_int_t allEdges;
-    igraph_vector_int_init(&allEdges, this->getNrOfBonds());
+    igraph_vector_int_init(&allEdges, this->getNrOfEdges());
     if (igraph_edges(
           &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &allEdges)) {
       throw std::runtime_error("Failed to get all edges");
     }
 
     std::vector<long int> from;
-    from.reserve(this->getNrOfBonds());
+    from.reserve(this->getNrOfEdges());
     std::vector<long int> to;
-    to.reserve(this->getNrOfBonds());
+    to.reserve(this->getNrOfEdges());
     std::vector<long int> type;
-    type.reserve(this->getNrOfBonds());
+    type.reserve(this->getNrOfEdges());
 
     for (long int i = 0; i < igraph_vector_int_size(&allEdges); i++) {
       if (i % 2 == 0) {
@@ -567,7 +567,7 @@ namespace entities {
       pylimer_tools::utils::igraphVectorTToStdVector(&typesVec, type);
       igraph_vector_destroy(&typesVec);
     } else {
-      for (size_t i = 0; i < this->getNrOfBonds(); ++i) {
+      for (size_t i = 0; i < this->getNrOfEdges(); ++i) {
         type.push_back(-1); // TODO: find a nice default
       }
     }
@@ -592,21 +592,21 @@ namespace entities {
 
     std::vector<long int> newFrom;
     std::vector<long int> newTo;
-    newFrom.reserve(this->getNrOfBonds());
-    newTo.reserve(this->getNrOfBonds());
+    newFrom.reserve(this->getNrOfEdges());
+    newTo.reserve(this->getNrOfEdges());
 
     std::vector<long int> oldFrom = vertexResults.at("edge_from");
-    assert(oldFrom.size() == this->getNrOfBonds());
+    assert(oldFrom.size() == this->getNrOfEdges());
     std::vector<long int> oldTo = vertexResults.at("edge_to");
-    assert(oldTo.size() == this->getNrOfBonds());
+    assert(oldTo.size() == this->getNrOfEdges());
 
-    for (size_t i = 0; i < this->getNrOfBonds(); ++i) {
+    for (size_t i = 0; i < this->getNrOfEdges(); ++i) {
       newFrom.push_back(this->getAtomIdByIdx(oldFrom[i]));
       newTo.push_back(this->getAtomIdByIdx(oldTo[i]));
     }
 
-    assert(newFrom.size() == this->getNrOfBonds());
-    assert(newTo.size() == this->getNrOfBonds());
+    assert(newFrom.size() == this->getNrOfEdges());
+    assert(newTo.size() == this->getNrOfEdges());
 
     std::map<std::string, std::vector<long int>> results;
     results.insert_or_assign("bond_from", newFrom);

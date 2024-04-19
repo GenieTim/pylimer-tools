@@ -114,7 +114,7 @@ namespace entities {
                                                       ...) const
     {
       unsigned long long hash = 0;
-      int numVerticesTotal = this->getNrOfAtoms() + 1;
+      int numVerticesTotal = this->getNrOfVertices() + 1;
       // bits used: log(pow(numVerticesTotal, count))/log(2)
       // -> possible overflow?!?
       if (std::log(std::pow(r, count)) / std::log(2) >=
@@ -250,11 +250,11 @@ namespace entities {
     std::vector<OUT> getPropertyValues(const char* propertyName) const
     {
       std::vector<OUT> results;
-      if (this->getNrOfAtoms() == 0) {
+      if (this->getNrOfVertices() == 0) {
         return results;
       }
       igraph_vector_t allValues;
-      igraph_vector_init(&allValues, this->getNrOfAtoms());
+      igraph_vector_init(&allValues, this->getNrOfVertices());
       if (igraph_cattribute_VANV(
             &this->graph, propertyName, igraph_vss_all(), &allValues)) {
         throw std::runtime_error("Failed to query properties of graph.");
