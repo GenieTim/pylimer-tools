@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="pylimer_tools.io package" href="pylimer_tools.io.html" /><link rel="prev" title="pylimer_tools package" href="pylimer_tools.html" />
 
-    <!-- Generated with Sphinx 7.3.6 and Furo 2024.01.29 -->
+    <!-- Generated with Sphinx 7.3.7 and Furo 2024.01.29 -->
         <title>pylimer_tools.calc package - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
@@ -459,69 +459,6 @@ If <cite>None</cite>, it will be computed for each molecule in the first Univers
 <section id="module-pylimer_tools.calc.miller_macosko_theory">
 <span id="pylimer-tools-calc-miller-macosko-theory-module"></span><h2>pylimer_tools.calc.miller_macosko_theory module<a class="headerlink" href="#module-pylimer_tools.calc.miller_macosko_theory" title="Link to this heading">¶</a></h2>
 <dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.calculate_weight_fraction_of_backbone">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">calculate_weight_fraction_of_backbone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionality_per_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.calculate_weight_fraction_of_backbone" title="Link to this definition">¶</a></dt>
-<dd><p>Compute the weight fraction of the backbone strands in an infinite network</p>
-<dl class="simple">
-<dt>Source:</dt><dd><ul class="simple">
-<li><p><a class="reference external" href="https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737">https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737</a> (see supporting information for formulae)</p></li>
-<li><p><a class="reference external" href="https://pubs.acs.org/doi/10.1021/ma00046a021">https://pubs.acs.org/doi/10.1021/ma00046a021</a> (see appendix)</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the polymer network to do the computation for</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the type of the junctions/cross-linkers to select them in the network</p></li>
-<li><p><strong>strand_length</strong> (<em>-</em>) – the length of the network strands (in nr. of beads).</p></li>
-<li><p><strong>functionality_per_type</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.</p></li>
-<li><p><strong>weight_fractions</strong> (<em>-</em>) – a dictionary with the weight fraction of each type of atom</p></li>
-<li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the cross-links</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>weight fraction of network backbone</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p><span class="math notranslate nohighlight">\(\Phi_{el}\)</span></p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.calculate_weight_fraction_of_dangling_chains">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">calculate_weight_fraction_of_dangling_chains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionality_per_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.calculate_weight_fraction_of_dangling_chains" title="Link to this definition">¶</a></dt>
-<dd><p>Compute the weight fraction of dangling strands in infinite network</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the network to compute the weight fraction for</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the atom type to use to split the molecules</p></li>
-<li><p><strong>strand_length</strong> (<em>-</em>) – the length of the network strands (in nr. of beads).</p></li>
-<li><p><strong>functionality_per_type</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.</p></li>
-<li><p><strong>weight_fractions</strong> (<em>-</em>) – a dictionary with the weight fraction of each type of atom</p></li>
-<li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the cross-links</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>weightDangling/weightTotal</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>weightFraction $Phi_d = 1 - Phi_{el} - w_{sol}$</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">compute_entanglement_modulus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">g_e_1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Quantity</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unit_style</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">None</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="pylimer_tools.io.html#pylimer_tools.io.unit_styles.UnitStyle" title="pylimer_tools.io.unit_styles.UnitStyle"><span class="pre">UnitStyle</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus" title="Link to this definition">¶</a></dt>
 <dd><p>Compute MMT’s entanglement contribution to the equilibrium shear modulus, given by
@@ -695,6 +632,69 @@ Optional, can be passed to improve performance</p></li>
 <li><p><strong>f</strong> (<em>-</em>) – functionality of the cross-links. Only needed if alpha is None.</p></li>
 <li><p><strong>alpha</strong> (<em>-</em>) – <span class="math notranslate nohighlight">\(P(F_a^{out})\)</span>, see <code class="xref py py-func docutils literal notranslate"><span class="pre">computeMMSProbabilities()</span></code></p></li>
 </ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">compute_weight_fraction_of_backbone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionality_per_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the weight fraction of the backbone strands in an infinite network</p>
+<dl class="simple">
+<dt>Source:</dt><dd><ul class="simple">
+<li><p><a class="reference external" href="https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737">https://pubs.acs.org/doi/suppl/10.1021/acs.macromol.0c02737</a> (see supporting information for formulae)</p></li>
+<li><p><a class="reference external" href="https://pubs.acs.org/doi/10.1021/ma00046a021">https://pubs.acs.org/doi/10.1021/ma00046a021</a> (see appendix)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> (<em>-</em>) – the polymer network to do the computation for</p></li>
+<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the type of the junctions/cross-linkers to select them in the network</p></li>
+<li><p><strong>strand_length</strong> (<em>-</em>) – the length of the network strands (in nr. of beads).</p></li>
+<li><p><strong>functionality_per_type</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.</p></li>
+<li><p><strong>weight_fractions</strong> (<em>-</em>) – a dictionary with the weight fraction of each type of atom</p></li>
+<li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance</p></li>
+<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the cross-links</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>weight fraction of network backbone</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(\Phi_{el}\)</span></p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">compute_weight_fraction_of_dangling_chains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionality_per_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_fractions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the weight fraction of dangling strands in infinite network</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> (<em>-</em>) – the network to compute the weight fraction for</p></li>
+<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the atom type to use to split the molecules</p></li>
+<li><p><strong>strand_length</strong> (<em>-</em>) – the length of the network strands (in nr. of beads).</p></li>
+<li><p><strong>functionality_per_type</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.</p></li>
+<li><p><strong>weight_fractions</strong> (<em>-</em>) – a dictionary with the weight fraction of each type of atom</p></li>
+<li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance</p></li>
+<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the cross-links</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>weightDangling/weightTotal</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>weightFraction $Phi_d = 1 - Phi_{el} - w_{sol}$</p></li>
+</ul>
+</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1143,58 +1143,6 @@ If <cite>None</cite>: will use max functionality per type.</p></li>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools.calc.structure_analysis.compute_weight_fraction_of_backbone">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.structure_analysis.</span></span><span class="sig-name descname"><span class="pre">compute_weight_fraction_of_backbone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.structure_analysis.compute_weight_fraction_of_backbone" title="Link to this definition">¶</a></dt>
-<dd><p>Compute the weight fraction of network backbone in infinite network</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the network to compute the weight fraction for</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the atom type to use to split the molecules</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>1 - weightDangling/weightTotal,</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>weightFraction (float)</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools.calc.structure_analysis.compute_weight_fraction_of_dangling_chains">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.structure_analysis.</span></span><span class="sig-name descname"><span class="pre">compute_weight_fraction_of_dangling_chains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools.calc.structure_analysis.compute_weight_fraction_of_dangling_chains" title="Link to this definition">¶</a></dt>
-<dd><p>Compute the weight fraction of dangling strands in infinite network</p>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Currently, only primary dangling chains are taken into account.
-There are other methods that incorporate more.</p>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>network</strong> (<em>-</em>) – the network to compute the weight fraction for</p></li>
-<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the atom type to use to split the molecules</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>weightDangling/weightTotal,
-- numFraction: numDangling/numTotal</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><ul class="simple">
-<li><p>weightFraction</p></li>
-</ul>
-</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.structure_analysis.compute_weight_fractions">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.structure_analysis.</span></span><span class="sig-name descname"><span class="pre">compute_weight_fractions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pylimer_tools.calc.structure_analysis.compute_weight_fractions" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the weight fractions of each atom type in the network.</p>
@@ -1253,6 +1201,58 @@ This works as:</p>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
 <li><p><span class="math notranslate nohighlight">\(W_{sol}\)</span> (float)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_backbone">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.structure_analysis.</span></span><span class="sig-name descname"><span class="pre">measure_weight_fraction_of_backbone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_backbone" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the weight fraction of network backbone in infinite network</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> (<em>-</em>) – the network to compute the weight fraction for</p></li>
+<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the atom type to use to split the molecules</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>1 - weightDangling/weightTotal,</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>weightFraction (float)</p></li>
+</ul>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_dangling_chains">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.structure_analysis.</span></span><span class="sig-name descname"><span class="pre">measure_weight_fraction_of_dangling_chains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="_autosummary/pylimer_tools_cpp.pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_dangling_chains" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the weight fraction of dangling strands in infinite network</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Currently, only primary dangling chains are taken into account.
+There are other methods that incorporate more.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>network</strong> (<em>-</em>) – the network to compute the weight fraction for</p></li>
+<li><p><strong>crosslinker_type</strong> (<em>-</em>) – the atom type to use to split the molecules</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>weightDangling/weightTotal,
+- numFraction: numDangling/numTotal</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><ul class="simple">
+<li><p>weightFraction</p></li>
 </ul>
 </p>
 </dd>
@@ -1361,8 +1361,6 @@ This works as:</p>
 </ul>
 </li>
 <li><a class="reference internal" href="#module-pylimer_tools.calc.miller_macosko_theory">pylimer_tools.calc.miller_macosko_theory module</a><ul>
-<li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.calculate_weight_fraction_of_backbone"><code class="docutils literal notranslate"><span class="pre">calculate_weight_fraction_of_backbone()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.calculate_weight_fraction_of_dangling_chains"><code class="docutils literal notranslate"><span class="pre">calculate_weight_fraction_of_dangling_chains()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_entanglement_modulus"><code class="docutils literal notranslate"><span class="pre">compute_entanglement_modulus()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_extracted_modulus"><code class="docutils literal notranslate"><span class="pre">compute_extracted_modulus()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_junction_modulus"><code class="docutils literal notranslate"><span class="pre">compute_junction_modulus()</span></code></a></li>
@@ -1370,6 +1368,8 @@ This works as:</p>
 <li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_modulus_decomposition"><code class="docutils literal notranslate"><span class="pre">compute_modulus_decomposition()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_probability_that_monomer_is_effective"><code class="docutils literal notranslate"><span class="pre">compute_probability_that_monomer_is_effective()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_trapping_factor"><code class="docutils literal notranslate"><span class="pre">compute_trapping_factor()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_backbone"><code class="docutils literal notranslate"><span class="pre">compute_weight_fraction_of_backbone()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_dangling_chains"><code class="docutils literal notranslate"><span class="pre">compute_weight_fraction_of_dangling_chains()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material"><code class="docutils literal notranslate"><span class="pre">compute_weight_fraction_of_soluble_material()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fraction_of_soluble_material_from_weight_fractions"><code class="docutils literal notranslate"><span class="pre">compute_weight_fraction_of_soluble_material_from_weight_fractions()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.miller_macosko_theory.compute_weight_fractions_and_probabilities"><code class="docutils literal notranslate"><span class="pre">compute_weight_fractions_and_probabilities()</span></code></a></li>
@@ -1390,10 +1390,10 @@ This works as:</p>
 <li><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.compute_mean_end_to_end_distances"><code class="docutils literal notranslate"><span class="pre">compute_mean_end_to_end_distances()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.compute_mean_end_to_end_vectors"><code class="docutils literal notranslate"><span class="pre">compute_mean_end_to_end_vectors()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance"><code class="docutils literal notranslate"><span class="pre">compute_stoichiometric_imbalance()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.compute_weight_fraction_of_backbone"><code class="docutils literal notranslate"><span class="pre">compute_weight_fraction_of_backbone()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.compute_weight_fraction_of_dangling_chains"><code class="docutils literal notranslate"><span class="pre">compute_weight_fraction_of_dangling_chains()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.compute_weight_fractions"><code class="docutils literal notranslate"><span class="pre">compute_weight_fractions()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.measure_lower_bound_weight_fraction_of_soluble_material"><code class="docutils literal notranslate"><span class="pre">measure_lower_bound_weight_fraction_of_soluble_material()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_backbone"><code class="docutils literal notranslate"><span class="pre">measure_weight_fraction_of_backbone()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_dangling_chains"><code class="docutils literal notranslate"><span class="pre">measure_weight_fraction_of_dangling_chains()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_soluble_material"><code class="docutils literal notranslate"><span class="pre">measure_weight_fraction_of_soluble_material()</span></code></a></li>
 </ul>
 </li>

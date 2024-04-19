@@ -52,6 +52,7 @@ pylimer\_tools\_cpp.pylimer\_tools\_cpp.MEHPForceBalance
       ~MEHPForceBalance.getNumBonds
       ~MEHPForceBalance.getNumExtraAtoms
       ~MEHPForceBalance.getNumExtraBonds
+      ~MEHPForceBalance.getNumIntraChainSlipLinks
       ~MEHPForceBalance.getPressure
       ~MEHPForceBalance.getSolubleWeightFraction
       ~MEHPForceBalance.getSpringPartitions
