@@ -91,6 +91,17 @@ namespace entities {
     return *this;
   };
 
+  std::vector<double> Molecule::computeBondLengths() {
+    return AtomGraphParent::computeBondLengths(this->parent);
+  }
+
+  double Molecule::computeTotalLength() {
+    std::vector<double> bondLens;
+    return std::accumulate(
+      bondLens.begin(), bondLens.end(), 0.0
+    );
+  }
+
   double Molecule::computeEndToEndDistance()
   {
     if (this->getNrOfAtoms() < 2) {

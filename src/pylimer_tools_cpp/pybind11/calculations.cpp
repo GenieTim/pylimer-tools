@@ -1007,6 +1007,9 @@ init_pylimer_bound_calc(py::module_& m)
      )pbdoc")
     .def("getCurrentSpringVectors",
          &mehp::MEHPForceBalance::getCurrentSpringDistances)
+     .def("getOverallSpringLengths", &mehp::MEHPForceBalance::getOverallSpringLengths, R"pbdoc(
+          Get the sum of the lengths of the partial springs of each spring.
+     )pbdoc")
     .def("getEffectiveFunctionalityOfAtoms",
          &mehp::MEHPForceBalance::getEffectiveFunctionalityOfAtoms,
          R"pbdoc(
