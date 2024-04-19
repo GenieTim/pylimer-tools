@@ -2511,11 +2511,13 @@ namespace entities {
   size_t Universe::getNrOfAtoms() const
   {
     return this->NAtoms;
+    // return this->getNrOfVertices();
   }
 
   size_t Universe::getNrOfBonds() const
   {
     return this->NBonds;
+    // return this->getNrOfEdges();
   }
 
   void Universe::setBox(const Box& passedBox, bool rescaleAtomCoordinates)

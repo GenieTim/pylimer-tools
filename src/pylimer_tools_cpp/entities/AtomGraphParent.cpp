@@ -203,7 +203,7 @@ namespace entities {
    *
    * @return int
    */
-  int AtomGraphParent::getNrOfAtoms() const
+  int AtomGraphParent::getNrOfVertices() const
   {
     return igraph_vcount(&this->graph);
   }
@@ -213,7 +213,7 @@ namespace entities {
    *
    * @return int
    */
-  int AtomGraphParent::getNrOfBonds() const
+  int AtomGraphParent::getNrOfEdges() const
   {
     return igraph_ecount(&this->graph);
   }

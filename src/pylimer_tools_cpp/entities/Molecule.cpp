@@ -192,6 +192,11 @@ namespace entities {
   int Molecule::getNrOfAtoms() const
   {
     return this->size;
+    // return this->getNrOfVertices();
+  }
+
+  int Molecule::getNrOfBonds() {
+    return this->getNrOfEdges();
   }
 
   /**
