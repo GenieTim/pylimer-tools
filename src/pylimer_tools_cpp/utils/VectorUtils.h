@@ -56,6 +56,17 @@ namespace utils {
     return value;
   }
 
+  static std::vector<double> segmentwise_norm(const Eigen::VectorXd &vecs, const size_t segmentSize = 3) {
+    static_assert(segmentSize > 0, "Segmentwise requires a useable size");
+    assert(vecs.size() % segmentSize == 0);
+    std::vector<double> results;
+    results.reserve(vecs.size()/segmentSize);
+    for (size_t i = 0; i < vecs.size()/segmentSize; i++) {
+      results.push_back(vecs[i].segment(segmentSize*i, segmentSize).norm());
+    }
+    return results;
+  }
+
   /**
    * @brief Remove a row from an Eigen vector
    *

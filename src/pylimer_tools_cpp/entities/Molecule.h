@@ -51,6 +51,7 @@ namespace entities {
     std::vector<long int> getVerticesLinedUp(int crossLinkerType = 2,
                                              bool closeLoop = false) const;
     int getNrOfAtoms() const;
+    int getNrOfBonds() const;
     const Box* getBox() const;
     std::string getKey() const;
     std::vector<int> getAtomTypes()
@@ -66,10 +67,8 @@ namespace entities {
     double computeRadiusOfGyration();
     double computeRadiusOfGyrationWithDerivedImageFlags() const;
     double computeTotalMass();
-    std::vector<double> computeBondLengths()
-    {
-      return AtomGraphParent::computeBondLengths(this->parent);
-    };
+    std::vector<double> computeBondLengths();
+    double computeTotalLength();
 
     /**
      * @brief Get the sum of all bond vectors, similar to
