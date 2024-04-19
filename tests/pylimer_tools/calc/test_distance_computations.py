@@ -6,7 +6,7 @@ from pylimer_tools_cpp.pylimer_tools_cpp import Atom, Box
 
 class TestDistanceCalcFunctions(unittest.TestCase):
 
-    def test_calculate_mean_bond_len(self):
+    def test_compute_mean_bond_len(self):
         base_atom = {
             "id": 1,
             "xsu": 0,

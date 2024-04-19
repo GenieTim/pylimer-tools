@@ -817,6 +817,7 @@ init_pylimer_bound_calc(py::module_& m)
     .def("getNumExtraAtoms", &mehp::MEHPForceBalance::getNumExtraAtoms)
     .def("getNumBonds", &mehp::MEHPForceBalance::getNumBonds)
     .def("getNumExtraBonds", &mehp::MEHPForceBalance::getNumExtraBonds)
+    .def("getNumIntraChainSlipLinks", &mehp::MEHPForceBalance::getNumIntraChainSlipLinks)
     .def("getPressure",
          &mehp::MEHPForceBalance::getPressure,
          R"pbdoc(

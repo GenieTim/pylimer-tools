@@ -18,7 +18,7 @@ class TestEntityCalculations(unittest.TestCase):
         universe.setBoxLengths(100, 1, 1)
         self.assertEqual(universe.getVolume(), 100*1*1)
 
-    def test_calculate_mean_bond_len(self):
+    def test_compute_mean_bond_len(self):
         base_atom = {
             "id": 1,
             "x": 0,
@@ -56,7 +56,7 @@ class TestEntityCalculations(unittest.TestCase):
             self.assertEqual(molecule.getNrOfBonds(), 2)
             self.assertEqual(np.mean(molecule.computeBondLengths()), 1)
 
-    def test_calculate_end_to_end_distance(self):
+    def test_compute_end_to_end_distance(self):
         base_atom = {
             "id": 1,
             "x": 0,
@@ -98,7 +98,7 @@ class TestEntityCalculations(unittest.TestCase):
         self.assertEqual(len(molecules), 1)
         self.assertEqual(-1, molecules[0].computeEndToEndDistance())
 
-    def test_calculate_distance_through_periodic_image(self):
+    def test_compute_distance_through_periodic_image(self):
         base_atom = {
             "id": 1,
             "x": 0,
