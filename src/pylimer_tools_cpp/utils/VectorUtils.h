@@ -68,7 +68,7 @@ namespace utils {
     std::vector<double> results;
     results.reserve(vecs.size() / segmentSize);
     for (size_t i = 0; i < vecs.size() / segmentSize; i++) {
-      results.push_back(vecs[i].segment(segmentSize * i, segmentSize).norm());
+      results.push_back(vecs.segment(segmentSize * i, segmentSize).norm());
     }
     return results;
   }
