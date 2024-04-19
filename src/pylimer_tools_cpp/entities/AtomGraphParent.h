@@ -74,14 +74,14 @@ namespace entities {
      *
      * @return int
      */
-    int getNrOfAtoms() const;
+    int getNrOfVertices() const;
 
     /**
      * @brief Get the Nr Of Bonds
      *
      * @return int
      */
-    int getNrOfBonds() const;
+    int getNrOfEdges() const;
 
     /**
      * @brief convert the atom types involved in one angle into one long number
