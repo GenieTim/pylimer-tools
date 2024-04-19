@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import warnings
 from collections import Counter
 from typing import Iterable, Tuple
@@ -9,23 +10,20 @@ import numpy as np
 from pylimer_tools_cpp.pylimer_tools_cpp import MoleculeType, Universe
 
 
-def compute_stoichiometric_imbalance(network: Universe, crosslinker_type: int, strand_length: int = None,
+def compute_stoichiometric_imbalance(network: Universe, crosslinker_type: int,
                                      functionality_per_type: dict = None, ignore_types: list = [],
                                      effective: bool = False) -> float:
     """
     Compute the stoichiometric imbalance
-    ( nr. of bonds formable of crosslinker / nr. of formable bonds of precursor )
+    ( nr. of bonds formable of crosslinker / (nr. of precursor chains * 2) )
 
     NOTE:
-      if your system has a non-integer number of possible bonds (e.g. one site unbonded),
+      if your system has a non-integer number of possible bonds (e.g. one site non-bonded),
       this will not be rounded/respected in any way.
 
     Arguments:
       - network: the polymer network to do the computation for
       - crosslinker_type: the type of the junctions/crosslinkers to select them in the network
-      - strand_length: the length of the network strands (in nr. of beads).
-          Used to infer the number of precursor strands.
-          If `None`: will use average length of each connected system when ignoring the crosslinkers.
       - functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
           If `None`: will use max functionality per type.
       - ignore_types: a list of integers, the types to ignore for the imbalance (e.g. solvent atom types)
@@ -35,7 +33,7 @@ def compute_stoichiometric_imbalance(network: Universe, crosslinker_type: int, s
       - r (float): the stoichiometric imbalance
     """
     if (network.getNrOfAtoms() == 0):
-        return 0
+        return 0.
 
     counts = Counter(network.getAtomTypes())
 
@@ -50,28 +48,22 @@ def compute_stoichiometric_imbalance(network: Universe, crosslinker_type: int, s
         ) if effective else network.determineFunctionalityPerType()
 
     if (crosslinker_type not in counts):
-        raise ValueError(
-            "No junction with type {} seems to have been found in the network".format(crosslinker_type))
+        return 0.
 
-    if (strand_length is None):
-        strands = network.getMolecules(crosslinker_type)
-        strand_length = np.mean([m.getLength() for m in strands if not np.all(
-            [a.getType() in ignore_types for a in m.getAtoms()])])
+    strands = network.getMolecules(crosslinker_type)
+    ignore_types.append(crosslinker_type)
+    num_relevant_strands = len([m for m in strands if not np.all(
+        [a.getType() in ignore_types for a in m.getAtoms()])])
 
     crosslinker_formable_bonds = counts[crosslinker_type] * \
         functionality_per_type[crosslinker_type]
-    other_formable_bonds = 0
-    for key in counts:
-        if (key in ignore_types or counts[key] == 0):
-            continue
-        if (key not in functionality_per_type):
-            raise ValueError(
-                "Type {} must have an associated functionality".format(key))
-        if (key != crosslinker_type):
-            other_formable_bonds += counts[key] * functionality_per_type[key]
+    other_formable_bonds = num_relevant_strands * 2
+
+    if (other_formable_bonds == 0):
+        return math.inf
 
     # division by 2 is implicit
-    return crosslinker_formable_bonds / (other_formable_bonds / strand_length)
+    return crosslinker_formable_bonds / (other_formable_bonds)
 
 
 def compute_extent_of_reaction(network: Universe, crosslinker_type, functionality_per_type: dict = None) -> float:
