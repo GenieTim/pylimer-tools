@@ -1281,7 +1281,7 @@ namespace calc {
           continue;
         }
         // take the mean and their index etc. to add as slip-link
-        std::array<double, 3> meanPositions = a1.meanPositionWith(a2, &box);
+        Eigen::Vector3d meanPositions = a1.meanPositionWith(a2, box);
         slipLinkXs.push_back(meanPositions[0]);
         slipLinkYs.push_back(meanPositions[1]);
         slipLinkZs.push_back(meanPositions[2]);
@@ -1350,7 +1350,7 @@ namespace calc {
         // assume each subsequent atom is bonded with a bond shorter
         // than half the bond
         Eigen::VectorXd alignedLoopCoordinates =
-          this->universe.getUnwrappedVertexCoordinates(loop, &box);
+          this->universe.getUnwrappedVertexCoordinates(loop, box);
 
         std::array<double, 3> minCoords;
         std::array<double, 3> maxCoords;

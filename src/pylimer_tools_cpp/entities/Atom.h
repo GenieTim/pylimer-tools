@@ -2,6 +2,7 @@
 #define ATOM_H
 
 #include "Box.h"
+#include <Eigen/Dense>
 #include <algorithm>
 #include <cassert>
 #include <cmath>
@@ -42,93 +43,44 @@ namespace entities {
              this->ny == ref.ny && this->nz == ref.nz;
     }
 
-    double _getDeltaDistance(double c1,
-                             double c2,
-                             int n1,
-                             int n2,
-                             double boxL) const
+    Eigen::Vector3d vectorTo(const Atom& b, const Box& box) const
     {
-      double delta = c1 - c2;
-      assert(!std::isnan(boxL) && !std::isnan(delta) && !std::isinf(delta) &&
-             !std::isinf(boxL));
-      while (delta > 0.5 * boxL) {
-        delta -= boxL;
-      }
-      while (delta < -0.5 * boxL) {
-        delta += boxL;
-      }
-
-      return delta;
+      Eigen::Vector3d dist = b.getCoordinates() - this->getCoordinates();
+      box.handlePBC(dist);
+      return dist;
     }
 
-    void vectorTo(const Atom& b, const Box* box, double* result) const
+    Eigen::Vector3d vectorToUnwrapped(const Atom& b, const Box& box) const
     {
-      result[0] = this->_getDeltaDistance(
-        this->x, b.getX(), this->nx, b.getNX(), box->getLx());
-      result[1] = this->_getDeltaDistance(
-        this->y, b.getY(), this->ny, b.getNY(), box->getLy());
-      result[2] = this->_getDeltaDistance(
-        this->z, b.getZ(), this->nz, b.getNZ(), box->getLz());
+      return b.getUnwrappedCoordinates(box) -
+             this->getUnwrappedCoordinates(box);
     }
 
-    void vectorToUnwrapped(const Atom& b, const Box* box, double* result) const
+    Eigen::Vector3d meanPositionWith(const Atom& b, const Box& box) const
     {
-      result[0] = this->getUnwrappedX(box) - b.getUnwrappedX(box);
-      result[1] = this->getUnwrappedY(box) - b.getUnwrappedY(box);
-      result[2] = this->getUnwrappedZ(box) - b.getUnwrappedZ(box);
+      Eigen::Vector3d result =
+        this->getCoordinates() + 0.5 * this->vectorTo(b, box);
+      box.handlePBC(result); // move into box
+      return result;
     }
 
-    std::vector<double> computeVectorTo(const Atom& b, const Box& box) const
+    Eigen::Vector3d meanPositionWithUnwrapped(const Atom& b,
+                                              const Box& box) const
     {
-      double result[3];
-      vectorTo(b, &box, result);
-      std::vector<double> resultV;
-      std::copy(
-        std::begin(result), std::end(result), std::back_inserter(resultV));
-      return resultV;
+      Eigen::Vector3d result =
+        this->getCoordinates() + 0.5 * this->vectorToUnwrapped(b, box);
+      box.handlePBC(result); // move into box
+      return result;
     }
 
-    std::array<double, 3> meanPositionWith(const Atom& b, const Box* box) const
+    double distanceTo(const Atom& b, const Box& box) const
     {
-      double distanceVec[3];
-      vectorTo(b, box, distanceVec);
-      std::array<double, 3> result;
-      result[0] = this->getX() - 0.5 * distanceVec[0];
-      result[1] = this->getY() - 0.5 * distanceVec[1];
-      result[2] = this->getZ() - 0.5 * distanceVec[2];
-      return box->minImageDistances(result);
+      return this->vectorTo(b, box).norm();
     }
 
-    std::array<double, 3> meanPositionWithUnwrapped(const Atom& b,
-                                                    const Box* box) const
+    double distanceToUnwrapped(const Atom& b, const Box& box) const
     {
-      double distanceVec[3];
-      vectorToUnwrapped(b, box, distanceVec);
-      std::array<double, 3> result;
-      result[0] = this->getX() - 0.5 * distanceVec[0];
-      result[1] = this->getY() - 0.5 * distanceVec[1];
-      result[2] = this->getZ() - 0.5 * distanceVec[2];
-      return box->minImageDistances(result);
-    }
-
-    double distanceTo(const Atom& b, const Box* box) const
-    {
-      double distanceVec[3];
-      vectorTo(b, box, distanceVec);
-      // norm
-      return sqrt(distanceVec[0] * distanceVec[0] +
-                  distanceVec[1] * distanceVec[1] +
-                  distanceVec[2] * distanceVec[2]);
-    }
-
-    double distanceToUnwrapped(const Atom& b, const Box* box) const
-    {
-      double distanceVec[3];
-      this->vectorToUnwrapped(b, box, distanceVec);
-      // norm
-      return sqrt(distanceVec[0] * distanceVec[0] +
-                  distanceVec[1] * distanceVec[1] +
-                  distanceVec[2] * distanceVec[2]);
+      return this->vectorToUnwrapped(b, box).norm();
     }
 
     long int getId() const { return this->id; }
@@ -136,17 +88,17 @@ namespace entities {
     double getX() const { return this->x; }
     double getY() const { return this->y; }
     double getZ() const { return this->z; }
-    double getUnwrappedX(const Box* box) const
+    double getUnwrappedX(const Box& box) const
     {
-      return this->x + (this->nx * box->getLx());
+      return this->x + (this->nx * box.getLx());
     }
-    double getUnwrappedY(const Box* box) const
+    double getUnwrappedY(const Box& box) const
     {
-      return this->y + (this->ny * box->getLy());
+      return this->y + (this->ny * box.getLy());
     }
-    double getUnwrappedZ(const Box* box) const
+    double getUnwrappedZ(const Box& box) const
     {
-      return this->z + (this->nz * box->getLz());
+      return this->z + (this->nz * box.getLz());
     }
     int getNX() const { return this->nx; }
     int getNY() const { return this->ny; }
@@ -169,7 +121,7 @@ namespace entities {
       return coords;
     }
     template<typename VectorType>
-    void getUnwrappedCoordinates(VectorType& vec, const Box* box) const
+    void getUnwrappedCoordinates(VectorType& vec, const Box& box) const
     {
       INVALIDARG_EXP_IFN(vec.size() == 3,
                          "Expect coordinates to be in order x, y, z, i.e., a "
@@ -178,15 +130,11 @@ namespace entities {
       vec[1] = this->getUnwrappedY(box);
       vec[2] = this->getUnwrappedZ(box);
     }
-    Eigen::Vector3d getUnwrappedCoordinates(const Box* box) const
+    Eigen::Vector3d getUnwrappedCoordinates(const Box& box) const
     {
       Eigen::Vector3d coords = Eigen::Vector3d::Zero();
       this->getUnwrappedCoordinates<Eigen::Vector3d>(coords, box);
       return coords;
-    }
-    Eigen::Vector3d getUnwrappedCoordinates(const Box& box) const
-    {
-      return this->getUnwrappedCoordinates(&box);
     }
 
   private:

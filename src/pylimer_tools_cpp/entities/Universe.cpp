@@ -747,7 +747,7 @@ namespace entities {
 
       if (igraph_vcount(g)) {
         molecules.push_back(
-          Molecule(&this->box, g, MoleculeType::UNDEFINED, this->massPerType));
+          Molecule(this->box, g, MoleculeType::UNDEFINED, this->massPerType));
       }
     }
     igraph_graph_list_destroy(&components);
@@ -969,7 +969,7 @@ namespace entities {
 
       // finally, create the molecule/chain
       molecules.push_back(
-        Molecule(&this->box, chain, molType, this->massPerType));
+        Molecule(this->box, chain, molType, this->massPerType));
     }
     igraph_graph_list_destroy(&components);
     igraph_destroy(&graphWithoutCrosslinkers);
@@ -2406,7 +2406,7 @@ namespace entities {
       // check whether the compiler optimizes this or not
       Atom atom1 = this->getAtomByVertexIdx(bondFrom);
       Atom atom2 = this->getAtomByVertexIdx(bondTo);
-      length += atom1.distanceTo(atom2, &this->box);
+      length += atom1.distanceTo(atom2, this->box);
       IGRAPH_EIT_NEXT(bondIterator);
     }
 

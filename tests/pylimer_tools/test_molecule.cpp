@@ -58,11 +58,11 @@ TEST_CASE("Molecules work as intended", "[entity][Molecule]")
     int iteration = 0;
     for (pe::Molecule molecule : molecules) {
       REQUIRE(molecule.getLength() == expectedLengths[iteration]);
-      REQUIRE(molecule.getBox()->getLx() ==
+      REQUIRE(molecule.getBox().getLx() ==
               Catch::Approx(32.182950030000001 * 2));
-      REQUIRE(molecule.getBox()->getLy() ==
+      REQUIRE(molecule.getBox().getLy() ==
               Catch::Approx(32.182950030000001 * 2));
-      REQUIRE(molecule.getBox()->getLz() ==
+      REQUIRE(molecule.getBox().getLz() ==
               Catch::Approx(32.182950030000001 * 2));
       REQUIRE(molecule.computeEndToEndDistance() ==
               Catch::Approx(expectedEndToEndDistances[iteration]));
@@ -188,17 +188,17 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
     }
     CHECK(igraph_vector_int_size(&all_vertices) == universe.getNrOfAtoms());
     Eigen::VectorXd coordinates =
-      universe.getUnwrappedVertexCoordinates(all_vertices, &box);
+      universe.getUnwrappedVertexCoordinates(all_vertices, box);
     CHECK(coordinates.size() == universe.getNrOfAtoms() * 3);
     igraph_vector_int_destroy(&all_vertices);
 
     for (size_t i = 0; i < 4; ++i) {
       pe::Atom atomI = universe.getAtom(5 + i);
-      CHECK(atomI.getUnwrappedX(&box) ==
+      CHECK(atomI.getUnwrappedX(box) ==
             Catch::Approx(29. + static_cast<double>(i)));
-      CHECK(atomI.getUnwrappedY(&box) ==
+      CHECK(atomI.getUnwrappedY(box) ==
             Catch::Approx(29. + static_cast<double>(i)));
-      CHECK(atomI.getUnwrappedZ(&box) ==
+      CHECK(atomI.getUnwrappedZ(box) ==
             Catch::Approx(29. + static_cast<double>(i)));
       CHECK(coordinates[(4 + i) * 3] ==
             Catch::Approx(29. + static_cast<double>(i)));
@@ -224,13 +224,13 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
       Eigen::VectorXd::Zero(molecules[1].getNrOfAtoms() * 3);
     assumedCoordinates =
       molecules[1].getAssumedVertexCoordinates<Eigen::VectorXd>(
-        assumedCoordinates, &box, vertices);
+        assumedCoordinates, box, vertices);
     for (int i = 0; i < 4; ++i) {
-      CHECK(assumedCoordinates[(i) * 3] ==
+      CHECK(assumedCoordinates[(i)*3] ==
             Catch::Approx(29. + static_cast<double>(i)));
-      CHECK(assumedCoordinates[(i) * 3 + 1] ==
+      CHECK(assumedCoordinates[(i)*3 + 1] ==
             Catch::Approx(29. + static_cast<double>(i)));
-      CHECK(assumedCoordinates[(i) * 3 + 2] ==
+      CHECK(assumedCoordinates[(i)*3 + 2] ==
             Catch::Approx(29. + static_cast<double>(i)));
     }
   }

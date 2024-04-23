@@ -162,7 +162,7 @@ TEST_CASE("Manually accurate EigenNeighbourList",
                     { { 0, 0, 0, 0, 1, 2, 2, 2 } }      // nz
   );
 
-  Eigen::VectorXd coordinates = universe.getUnwrappedVertexCoordinates(&box);
+  Eigen::VectorXd coordinates = universe.getUnwrappedVertexCoordinates(box);
   pe::EigenNeighbourList neighbourList =
     pe::EigenNeighbourList(coordinates, universe.getBox(), 2.0, 1.0);
 

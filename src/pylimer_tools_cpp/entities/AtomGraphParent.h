@@ -318,18 +318,18 @@ namespace entities {
      */
     Eigen::VectorXd getUnwrappedVertexCoordinates(
       const igraph_vs_t selector,
-      const pylimer_tools::entities::Box* box) const;
+      const pylimer_tools::entities::Box& box) const;
 
     Eigen::VectorXd getUnwrappedVertexCoordinates(
-      const pylimer_tools::entities::Box* box) const;
+      const pylimer_tools::entities::Box& box) const;
 
     Eigen::VectorXd getUnwrappedVertexCoordinates(
       igraph_vector_int_t& vertices,
-      const pylimer_tools::entities::Box* box) const;
+      const pylimer_tools::entities::Box& box) const;
 
     Eigen::VectorXd getUnwrappedVertexCoordinates(
       std::vector<long int>& vertices,
-      const pylimer_tools::entities::Box* box) const;
+      const pylimer_tools::entities::Box& box) const;
 
     /**
      * @brief Get the Property (attribute) of one vertex
@@ -374,7 +374,7 @@ namespace entities {
      *
      * @return std::vector<double>
      */
-    std::vector<double> computeBondLengths(const Box* box);
+    std::vector<double> computeBondLengths(const Box& box);
 
     /**
      * @brief Count the number of edges leading to/from one vertex
@@ -414,7 +414,7 @@ namespace entities {
     template<typename OutVectorType>
     OutVectorType getAssumedVertexCoordinates(
       OutVectorType& results,
-      const Box* box,
+      const Box& box,
       const std::vector<long int>& vertexIds) const
     {
       if (vertexIds.size() * 3 != results.size()) {
@@ -437,7 +437,7 @@ namespace entities {
         coordinates.segment(0, coordinates.size() - 3);
 
       // adjust them for the box
-      box->handlePBC(distances);
+      box.handlePBC(distances);
 
       // and now:
       Eigen::Vector3d lastCoords = coordinates.segment(0, 3);

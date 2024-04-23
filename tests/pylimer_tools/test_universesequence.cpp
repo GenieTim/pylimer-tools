@@ -125,9 +125,9 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
     pe::Universe universe = universeSeq.atIndex(0);
     pe::Box box = universe.getBox();
     Eigen::Vector3d coords1 =
-      universe.getAtom(70000).getUnwrappedCoordinates(&box);
+      universe.getAtom(70000).getUnwrappedCoordinates(box);
     Eigen::Vector3d coords2 =
-      universe.getAtom(80000).getUnwrappedCoordinates(&box);
+      universe.getAtom(80000).getUnwrappedCoordinates(box);
     for (size_t dt = 0; dt < 2; ++dt) {
       CHECK(ree[dt + 1] == Catch::Approx((coords2 - coords1).squaredNorm()));
     }
@@ -141,14 +141,14 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
       for (size_t atomI = 0; atomI < atomIdsFrom.size(); atomI++) {
         Eigen::Vector3d coordsFrom = universeSeq.atIndex(universe_i)
                                        .getAtom(atomIdsFrom[atomI])
-                                       .getUnwrappedCoordinates(&box);
+                                       .getUnwrappedCoordinates(box);
         Eigen::Vector3d coordsTo = universeSeq.atIndex(universe_i)
                                      .getAtom(atomIdsTo[atomI])
-                                     .getUnwrappedCoordinates(&box);
+                                     .getUnwrappedCoordinates(box);
         CHECK(coordsFrom.isApprox(
-          universe.getAtom(atomIdsFrom[atomI]).getUnwrappedCoordinates(&box)));
+          universe.getAtom(atomIdsFrom[atomI]).getUnwrappedCoordinates(box)));
         CHECK(coordsTo.isApprox(
-          universe.getAtom(atomIdsTo[atomI]).getUnwrappedCoordinates(&box)));
+          universe.getAtom(atomIdsTo[atomI]).getUnwrappedCoordinates(box)));
       }
     }
     ree = universeSeq.computeDistanceAutocorrelationFromToAtoms(
@@ -156,9 +156,8 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
     for (size_t dt = 0; dt < 2; ++dt) {
       double distMean = 0.0;
       for (size_t i = 0; i < atomIdsTo.size(); ++i) {
-        coords1 =
-          universe.getAtom(atomIdsFrom[i]).getUnwrappedCoordinates(&box);
-        coords2 = universe.getAtom(atomIdsTo[i]).getUnwrappedCoordinates(&box);
+        coords1 = universe.getAtom(atomIdsFrom[i]).getUnwrappedCoordinates(box);
+        coords2 = universe.getAtom(atomIdsTo[i]).getUnwrappedCoordinates(box);
         distMean += (coords2 - coords1).squaredNorm() /
                     static_cast<double>(atomIdsTo.size());
       }
