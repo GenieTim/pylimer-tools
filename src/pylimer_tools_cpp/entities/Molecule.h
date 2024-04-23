@@ -28,7 +28,7 @@ namespace entities {
   class Molecule : public AtomGraphParent
   {
   public:
-    Molecule(const Box* parent,
+    Molecule(const Box& parent,
              const igraph_t* graph,
              const MoleculeType type,
              const std::map<int, double>& massPerType);
@@ -52,7 +52,7 @@ namespace entities {
                                              bool closeLoop = false) const;
     int getNrOfAtoms() const;
     int getNrOfBonds() const;
-    const Box* getBox() const;
+    const Box& getBox() const;
     std::string getKey() const;
     std::vector<int> getAtomTypes()
     {
@@ -116,8 +116,7 @@ namespace entities {
     }
 
   private:
-    Box _boxNoUse;
-    const Box* parent;
+    Box parent;
     MoleculeType typeOfThisMolecule;
     int size;
     std::string key;
