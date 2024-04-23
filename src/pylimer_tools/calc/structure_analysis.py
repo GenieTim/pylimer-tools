@@ -50,7 +50,7 @@ def compute_stoichiometric_imbalance(network: Universe, crosslinker_type: int,
     if (crosslinker_type not in counts):
         return 0.
 
-    # TODO: use the data from the functionality_per_type to determine the 
+    # TODO: use the data from the functionality_per_type to determine the
     # functionality per strand, maybe?
     strands = network.getMolecules(crosslinker_type)
     ignore_types.append(crosslinker_type)
@@ -237,6 +237,10 @@ def compute_crosslinker_conversion(network: Universe, crosslinker_type: int = 2,
         if (crosslinker_type not in functionality_per_type):
             return 0.0
         f = functionality_per_type[crosslinker_type]
+
+    if (f == 0.):
+        warnings.warn("Crosslinker functionality = 0 is problematic.")
+
     return compute_effective_crosslinker_functionality(network, crosslinker_type) / f
 
 

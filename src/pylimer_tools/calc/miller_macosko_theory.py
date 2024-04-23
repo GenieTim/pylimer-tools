@@ -256,7 +256,7 @@ def compute_weight_fraction_of_soluble_material_from_weight_fractions(r: float, 
     return w_f * (alpha**f) + w_g * ((r * p * (alpha**(f - 1)) + 1 - r * p)**g)
 
 
-def compute_weight_fractions_and_probabilities(network: Universe, crosslinker_type: int, 
+def compute_weight_fractions_and_probabilities(network: Universe, crosslinker_type: int,
                                                functionality_per_type: dict = None, weight_fractions: dict = None,
                                                r: float = None, p: float = None):
     """
@@ -391,12 +391,16 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int):
 
 def validate_r_and_p(r: float, p: float, f: int):
     if (p < 0):
-        raise ValueError("p must be positive")
+        raise ValueError("p must be positive, got {}".format(p))
+    if (f < 2):
+        raise ValueError("f must be >= 2, got {}".format(f))
     # assume:
     n_chains = 1000
     # -> compute:
     n_xlinks = r * 2 * n_chains / f
     max_possible_bonds = min(2 * n_chains, f * n_xlinks)
+    if (n_xlinks == 0):
+        return
     p_max = max_possible_bonds / (n_xlinks * f)
     if (p > p_max):
         raise ValueError(
@@ -468,7 +472,8 @@ def compute_modulus_decomposition(network: Universe, unit_style: UnitStyle, cros
     if (g_e_1 is None):
         g_e_1 = (8.3145 *  # gas constant, J/(mol*K)
                  temperature.to("kelvin").magnitude *  # Temperature in Kelvin
-                 1e-6 * 94.79281) * unit_style.get_underlying_unit_registry()('MPa')  # -> MPa, melt entanglement modulus
+                 1e-6 * 94.79281) * unit_style.get_underlying_unit_registry()('MPa')
+        # -> MPa, melt entanglement modulus
 
     # affine
     g_anm = nu * unit_style.kB * temperature
