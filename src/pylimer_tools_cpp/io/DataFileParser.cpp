@@ -12,7 +12,7 @@ namespace pylimer_tools {
 namespace utils {
 
   void DataFileParser::read(const std::string filePath,
-                            const AtomStyle atomStyle,
+                            AtomStyle atomStyle,
                             const AtomStyle atomStyle2,
                             const AtomStyle atomStyle3)
   {
@@ -90,6 +90,16 @@ namespace utils {
     } while (getline(file, line));
 
     this->skipLinesToContains(line, file, "Atoms");
+    // detect atom style; TODO: improve
+    if (line == "Atoms # angle") {
+      atomStyle = AtomStyle::ANGLE;
+    } else if (line == "Atoms # charge") {
+      atomStyle = AtomStyle::CHARGE;
+    } else if (line == "Atoms # full") {
+      atomStyle = AtomStyle::FULL;
+    }
+
+
     // skip this line too
     if (!getline(file, line)) {
       throw std::runtime_error(

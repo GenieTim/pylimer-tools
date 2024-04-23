@@ -96,7 +96,7 @@ namespace entities {
   }
 
   double Molecule::computeTotalLength() {
-    std::vector<double> bondLens;
+    std::vector<double> bondLens = this->computeBondLengths();
     return std::accumulate(
       bondLens.begin(), bondLens.end(), 0.0
     );
