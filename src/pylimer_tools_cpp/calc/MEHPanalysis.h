@@ -51,11 +51,11 @@ namespace calc {
         }
 
         // use id to keep direction of the vector constant
-        double distanceVec[3];
+        Eigen::Vector3d distanceVec;
         if (crosslinkers[0].getId() > crosslinkers[1].getId()) {
-          crosslinkers[0].vectorTo(crosslinkers[1], box, distanceVec);
+          distanceVec = crosslinkers[0].vectorTo(crosslinkers[1], box);
         } else {
-          crosslinkers[1].vectorTo(crosslinkers[0], box, distanceVec);
+          distanceVec = crosslinkers[1].vectorTo(crosslinkers[0], box);
         }
         position_vec_t distanceVecT;
         std::copy_n(std::begin(distanceVec), 3, std::begin(distanceVecT));
