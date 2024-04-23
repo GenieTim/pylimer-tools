@@ -29,16 +29,16 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             0, compute_stoichiometric_imbalance(self.emptyUniverse, 2))
         self.assertAlmostEqual(
             (1*2 + 1*3 + 0)/(4*2 + 1*1), compute_stoichiometric_imbalance(self.testUniverse, 2,
-                                                                          strand_length=1, effective=True))
+                                                                          effective=True))
         self.assertAlmostEqual(
-            (3*3)/(5*2), compute_stoichiometric_imbalance(self.testUniverse, 2, strand_length=1,
+            (3*3)/(5*2), compute_stoichiometric_imbalance(self.testUniverse, 2,
                                                           functionality_per_type={
                                                               1: 2, 2: 3
                                                           }))
         self.assertAlmostEqual(
-            (3*3)/(5*2), compute_stoichiometric_imbalance(self.testUniverse, 2, strand_length=1))
+            (3*3)/(5*2), compute_stoichiometric_imbalance(self.testUniverse, 2,))
         self.assertAlmostEqual(
-            (3*3)/(2), compute_stoichiometric_imbalance(self.testUniverse, 2, strand_length=5,
+            (3*3)/(2), compute_stoichiometric_imbalance(self.testUniverse, 2,
                                                         functionality_per_type={
                                                             1: 2, 2: 3
                                                         }))
@@ -74,9 +74,9 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         # TODO: find literature motiviation for results fo the functions
         self.assertAlmostEqual(0.1467020757993193, predict_shear_modulus(
             network=self.saturatedTestUniverse, unit_style=unit_style,
-            crosslinker_type=2, strand_length=2).to('MPa').magnitude)
+            crosslinker_type=2).to('MPa').magnitude)
         self.assertAlmostEqual(0.1467020757993193, predict_shear_modulus(
-            network=self.saturatedTestUniverse, unit_style=unit_style, crosslinker_type=2, strand_length=2,
+            network=self.saturatedTestUniverse, unit_style=unit_style, crosslinker_type=2,
             functionality_per_type={2: 4}).to('MPa').magnitude)
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
         self.assertAlmostEqual(0.1467020757993193, predict_shear_modulus(
@@ -207,7 +207,6 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         # which is not supported by the formulas implemented
         self.assertAlmostEqual(0.14931407018789813, compute_weight_fraction_of_backbone(self.saturatedTestUniverse,
                                                                                         crosslinker_type=2,
-                                                                                        strand_length=2,
                                                                                         functionality_per_type={
                                                                                             1: 2, 2: 4
                                                                                         }))
