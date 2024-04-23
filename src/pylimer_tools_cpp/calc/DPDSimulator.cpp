@@ -36,7 +36,7 @@ namespace calc {
 
       // initialize the faster data structure
       this->box = u.getBox();
-      this->coordinates = u.getUnwrappedVertexCoordinates(&this->box);
+      this->coordinates = u.getUnwrappedVertexCoordinates(this->box);
       std::map<std::string, std::vector<long int>> edges = u.getEdges();
       this->bondPartnersA = Eigen::ArrayXi::Zero(edges["edge_from"].size());
       this->bondPartnersB = Eigen::ArrayXi::Zero(edges["edge_to"].size());

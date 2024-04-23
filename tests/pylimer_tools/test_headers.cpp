@@ -38,63 +38,63 @@ TEST_CASE("Atoms can calculate distances", "[entity][Atom]")
   SECTION("Same box image distance")
   {
     pe::Atom atom1_2 = pe::Atom(0, 0, 0.0, 0.0, 0.0, 0, 0, 0);
-    CHECK(atom1.distanceTo(atom1_2, &unitBox) == 0.0);
-    CHECK(atom1_2.distanceTo(atom1, &unitBox) == 0.0);
+    CHECK(atom1.distanceTo(atom1_2, unitBox) == 0.0);
+    CHECK(atom1_2.distanceTo(atom1, unitBox) == 0.0);
   }
 
   SECTION("Different box image distance")
   {
     pe::Atom atom1_right = pe::Atom(0, 0, -1.0, 0.0, 0.0, 1, 0, 0);
-    CHECK(atom1.distanceTo(atom1_right, &unitBox) == 0.0);
-    CHECK(atom1_right.distanceTo(atom1, &unitBox) == 0.0);
+    CHECK(atom1.distanceTo(atom1_right, unitBox) == 0.0);
+    CHECK(atom1_right.distanceTo(atom1, unitBox) == 0.0);
 
     pe::Atom atom1_below = pe::Atom(0, 0, 0.0, -1.0, 0.0, 0, 1, 0);
-    CHECK(atom1.distanceTo(atom1_below, &unitBox) == 0.0);
-    CHECK(atom1_below.distanceTo(atom1, &unitBox) == 0.0);
+    CHECK(atom1.distanceTo(atom1_below, unitBox) == 0.0);
+    CHECK(atom1_below.distanceTo(atom1, unitBox) == 0.0);
 
     pe::Atom atom1_front = pe::Atom(0, 0, 0.0, 0.0, -1.0, 0, 0, 1);
-    REQUIRE(atom1.distanceTo(atom1_front, &unitBox) == 0.0);
-    REQUIRE(atom1_front.distanceTo(atom1, &unitBox) == 0.0);
+    REQUIRE(atom1.distanceTo(atom1_front, unitBox) == 0.0);
+    REQUIRE(atom1_front.distanceTo(atom1, unitBox) == 0.0);
 
     pe::Atom atom1_lefttopback = pe::Atom(0, 0, 1.0, 1.0, 1.0, -1, -1, -1);
-    REQUIRE(atom1_lefttopback.distanceTo(atom1, &unitBox) == 0.0);
+    REQUIRE(atom1_lefttopback.distanceTo(atom1, unitBox) == 0.0);
   }
 
   SECTION("Move to the mean position in box")
   {
     pe::Atom atom1 = pe::Atom(0, 0, 0.0, 0.0, 0.0, 0, 0, 0);
     pe::Atom atom2 = pe::Atom(0, 0, 1.0, 1.0, 1.0, 0, 0, 0);
-    auto meanPosition_12 = atom1.meanPositionWith(atom2, &unitBox);
+    Eigen::Vector3d meanPosition_12 = atom1.meanPositionWith(atom2, unitBox);
     CHECK(meanPosition_12[0] == 0.0);
     CHECK(meanPosition_12[1] == 0.0);
     CHECK(meanPosition_12[2] == 0.0);
 
     pe::Atom atom3 = pe::Atom(0, 0, 0.5, 0.5, 0.5, 0, 0, 0);
-    auto meanPosition_13 = atom1.meanPositionWith(atom3, &unitBox);
+    Eigen::Vector3d meanPosition_13 = atom1.meanPositionWith(atom3, unitBox);
     CHECK(meanPosition_13[0] == 0.25);
     CHECK(meanPosition_13[1] == 0.25);
     CHECK(meanPosition_13[2] == 0.25);
 
     pe::Box unitNegBox = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
-    auto meanPosition_13n = atom1.meanPositionWith(atom3, &unitNegBox);
+    Eigen::Vector3d meanPosition_13n = atom1.meanPositionWith(atom3, unitNegBox);
     CHECK(meanPosition_13n[0] == 0.25);
     CHECK(meanPosition_13n[1] == 0.25);
     CHECK(meanPosition_13n[2] == 0.25);
 
     pe::Atom negAtom4 = pe::Atom(0, 0, -2.0, 0.0, 0.0, 0, 0, 0);
-    auto meanPosition_24 = atom2.meanPositionWith(negAtom4, &unitNegBox);
+    Eigen::Vector3d meanPosition_24 = atom2.meanPositionWith(negAtom4, unitNegBox);
     CHECK(meanPosition_24[0] == -0.5);
     CHECK(meanPosition_24[1] == 0.5);
     CHECK(meanPosition_24[2] == 0.5);
 
     pe::Atom negAtom5 = pe::Atom(0, 0, -2.0, -5.0, 1.0, 1, 1, 1);
-    auto meanPosition_25 =
-      atom2.meanPositionWithUnwrapped(negAtom5, &unitNegBox);
+    Eigen::Vector3d meanPosition_25 =
+      atom2.meanPositionWithUnwrapped(negAtom5, unitNegBox);
     CHECK(meanPosition_25[0] == ((20. - 2.) + 1.) / 2.);
     CHECK(meanPosition_25[1] == ((20. - 5.) + 1.) / 2.);
     CHECK(meanPosition_25[2] == (((20. + 1.) + 1.) / 2.) - 20.);
 
-    meanPosition_25 = atom2.meanPositionWithUnwrapped(negAtom5, &unitNegBox);
+    meanPosition_25 = atom2.meanPositionWithUnwrapped(negAtom5, unitNegBox);
     CHECK(meanPosition_25[0] == ((20. - 2.) + 1.) / 2.);
     CHECK(meanPosition_25[1] == ((20. - 5.) + 1.) / 2.);
     CHECK(meanPosition_25[2] == (((20. + 1.) + 1.) / 2.) - 20.);

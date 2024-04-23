@@ -936,9 +936,9 @@ TEST_CASE("Coordinates work")
       Eigen::VectorXd::Zero(3 * alignedVertices.size());
     pe::Box box = universe.getBox();
     Eigen::VectorXd vertexCoordinates =
-      molecules[0].getUnwrappedVertexCoordinates(alignedVertices, &box);
+      molecules[0].getUnwrappedVertexCoordinates(alignedVertices, box);
     molecules[0].getAssumedVertexCoordinates(
-      alignedCoordinates, &box, alignedVertices);
+      alignedCoordinates, box, alignedVertices);
     CHECK(vertexCoordinates[0] == 0.);
     CHECK(vertexCoordinates[1] == 0.1);
     CHECK(alignedCoordinates[0] == 0.);
@@ -969,7 +969,7 @@ TEST_CASE("Coordinates work")
     );
     std::vector<long int> indices = { { 1, 2, 3 } };
     Eigen::VectorXd coordinates =
-      universe.getUnwrappedVertexCoordinates(indices, &box);
+      universe.getUnwrappedVertexCoordinates(indices, box);
     CHECK(coordinates.size() == 9);
     for (size_t i = 0; i < 3; ++i) {
       for (size_t dir = 0; dir < 3; ++dir) {

@@ -173,7 +173,7 @@ namespace entities {
                                    const std::vector<long int>& bondTo);
     std::vector<double> computeBondLengths()
     {
-      return AtomGraphParent::computeBondLengths(&this->box);
+      return AtomGraphParent::computeBondLengths(this->box);
     };
     Eigen::Vector3d getPositionVectorForVertex(const int vertexId) const;
     Eigen::Vector3d getUnwrappedPositionVectorForVertex(

@@ -163,7 +163,7 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("nx"),
          py::arg("ny"),
          py::arg("nz"))
-    .def("computeVectorTo", &Atom::computeVectorTo, R"pbdoc(
+    .def("computeVectorTo", &Atom::vectorTo, R"pbdoc(
             Compute the vector to another atom.
             )pbdoc")
     .def("distanceTo", &Atom::distanceTo, R"pbdoc(
@@ -172,7 +172,7 @@ init_pylimer_bound_entities(py::module_& m)
     .def("vectorToUnwrapped",
          &Atom::vectorToUnwrapped,
          "Compute the vector to another atom respecting the periodic image "
-         "flag.")
+         "flags.")
     .def("distanceToUnwrapped",
          &Atom::distanceToUnwrapped,
          "Compute the distance to another atom respecting the periodic image "
@@ -266,7 +266,7 @@ init_pylimer_bound_entities(py::module_& m)
   py::class_<Molecule>(m, "Molecule", R"pbdoc(
        An (ideally) connected series of atoms/beads.
   )pbdoc")
-    .def(py::init<Box*, igraph_t*, MoleculeType, std::map<int, double>>())
+    .def(py::init<Box&, igraph_t*, MoleculeType, std::map<int, double>>())
     // getters
     .def("getLength", &Molecule::getLength, R"pbdoc(
            Counts and returns the number of atoms associated with this 

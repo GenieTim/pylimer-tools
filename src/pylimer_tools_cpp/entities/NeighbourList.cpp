@@ -111,8 +111,8 @@ namespace entities {
       for (size_t atomIndex : atomIndices) {
         double distance =
           !unwrapped
-            ? this->atoms[atomIndex].distanceTo(atom, &this->box)
-            : this->atoms[atomIndex].distanceToUnwrapped(atom, &this->box);
+            ? this->atoms[atomIndex].distanceTo(atom, this->box)
+            : this->atoms[atomIndex].distanceToUnwrapped(atom, this->box);
         if (distance < upperCutoff && distance >= lowerCutoff &&
             this->atoms[atomIndex].getId() != atom.getId()) {
           results.push_back(this->atoms[atomIndex]);
