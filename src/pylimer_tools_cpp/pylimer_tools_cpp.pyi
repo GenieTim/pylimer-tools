@@ -14,7 +14,7 @@ from __future__ import annotations
 import numpy
 import pybind11_stubgen.typing_ext
 import typing
-__all__ = ['Atom', 'AtomStyle', 'BalanceRunMode', 'Box', 'ComputedDoubleValues', 'ComputedIntValues', 'DANGLING_CHAIN', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'ExitReason', 'FREE_CHAIN', 'LazyUniverseSequenceIterator', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NETWORK_STRAND', 'NeighbourList', 'NonGaussianSpringForceEvaluator', 'OutputConfiguration', 'PRIMARY_LOOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StructureSimplificationMode', 'UNDEFINED', 'Universe', 'UniverseSequence', 'computeStoichiometricInbalance', 'doRandomWalkChainFromTo', 'inverse_langevin', 'predictGelationPoint', 'splitCSV', 'versionInformation']
+__all__ = ['Atom', 'AtomStyle', 'AveFileReader', 'BalanceRunMode', 'Box', 'ComputedDoubleValues', 'ComputedIntValues', 'DANGLING_CHAIN', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'ExitReason', 'FREE_CHAIN', 'LazyUniverseSequenceIterator', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NETWORK_STRAND', 'NeighbourList', 'NonGaussianSpringForceEvaluator', 'OutputConfiguration', 'PRIMARY_LOOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StructureSimplificationMode', 'UNDEFINED', 'Universe', 'UniverseSequence', 'computeStoichiometricInbalance', 'doRandomWalkChainFromTo', 'inverse_langevin', 'predictGelationPoint', 'splitCSV', 'versionInformation']
 class Atom:
     """
     
@@ -34,7 +34,7 @@ class Atom:
         """
         Provides support for pickling
         """
-    def computeVectorTo(self, arg0: Atom, arg1: Box) -> list[float]:
+    def computeVectorTo(self, arg0: Atom, arg1: Box) -> numpy.ndarray:
         """
                     Compute the vector to another atom.
         """
@@ -78,9 +78,9 @@ class Atom:
         """
                     Get the z coordinate of the atom.
         """
-    def vectorToUnwrapped(self, arg0: Atom, arg1: Box, arg2: float) -> None:
+    def vectorToUnwrapped(self, arg0: Atom, arg1: Box) -> numpy.ndarray:
         """
-        Compute the vector to another atom respecting the periodic image flag.
+        Compute the vector to another atom respecting the periodic image flags.
         """
 class AtomStyle:
     """
@@ -193,6 +193,36 @@ class AtomStyle:
         ...
     @property
     def value(self) -> int:
+        ...
+class AveFileReader:
+    """
+    
+              Alternative implementation of the data file reader implemented in 
+              :func:`pylimer_tools.readLammpsOutputFile.readAveragesFile`.
+    
+         
+    """
+    def __init__(self, filePath: str) -> None:
+        ...
+    def autocorrelateColumn(self, column_index: int, delta_indices: list[int]) -> list[float]:
+        """
+                  Do autocorrelation on one particular column for a speficied set of delta indices.
+        
+                  Assumes the data is equally spaced.
+        """
+    def autocorrelateColumnDifference(self, column_index1: int, column_index2: int, delta_indices: list[int]) -> list[float]:
+        """
+                  Do autocorrelation on the difference between two particular columns for a speficied set of delta indices.
+        
+                  Assumes the data is equally spaced.
+        """
+    def getColumnNames(self) -> list[str]:
+        ...
+    def getData(self) -> list[list[float]]:
+        ...
+    def getNrOfColumns(self) -> int:
+        ...
+    def getNrOfRows(self) -> int:
         ...
 class BalanceRunMode:
     """
@@ -589,6 +619,14 @@ class DPDSimulator:
         """
                   Get the number of bonds that are configured to have to be formed.
         """
+    def getNumAtoms(self) -> int:
+        ...
+    def getNumBonds(self) -> int:
+        ...
+    def getNumExtraAtoms(self) -> int:
+        ...
+    def getNumExtraBonds(self) -> int:
+        ...
     def getNumSlipSprings(self) -> int:
         ...
     def getNumStepsDPD(self) -> int:
@@ -843,10 +881,10 @@ class ExitReason:
     FAILURE: typing.ClassVar[ExitReason]  # value = <ExitReason.FAILURE: 5>
     F_TOLERANCE: typing.ClassVar[ExitReason]  # value = <ExitReason.F_TOLERANCE: 1>
     MAX_STEPS: typing.ClassVar[ExitReason]  # value = <ExitReason.MAX_STEPS: 3>
-    OTHER: typing.ClassVar[ExitReason]  # value = <ExitReason.OTHER: 6>
+    OTHER: typing.ClassVar[ExitReason]  # value = <ExitReason.OTHER: 7>
     UNSET: typing.ClassVar[ExitReason]  # value = <ExitReason.UNSET: 0>
     X_TOLERANCE: typing.ClassVar[ExitReason]  # value = <ExitReason.X_TOLERANCE: 2>
-    __members__: typing.ClassVar[dict[str, ExitReason]]  # value = {'UNSET': <ExitReason.UNSET: 0>, 'MAX_STEPS': <ExitReason.MAX_STEPS: 3>, 'F_TOLERANCE': <ExitReason.F_TOLERANCE: 1>, 'X_TOLERANCE': <ExitReason.X_TOLERANCE: 2>, 'FAILURE': <ExitReason.FAILURE: 5>, 'OTHER': <ExitReason.OTHER: 6>}
+    __members__: typing.ClassVar[dict[str, ExitReason]]  # value = {'UNSET': <ExitReason.UNSET: 0>, 'MAX_STEPS': <ExitReason.MAX_STEPS: 3>, 'F_TOLERANCE': <ExitReason.F_TOLERANCE: 1>, 'X_TOLERANCE': <ExitReason.X_TOLERANCE: 2>, 'FAILURE': <ExitReason.FAILURE: 5>, 'OTHER': <ExitReason.OTHER: 7>}
     def __eq__(self, other: typing.Any) -> bool:
         ...
     def __getstate__(self) -> int:
@@ -971,7 +1009,7 @@ class MEHPForceBalance:
          
     """
     @staticmethod
-    def constructWithRandomSlipLinks(universe: Universe, nr_of_slip_links_to_sample: int, acceptable_cutoff: float = 1.2, min_nr_of_slip_links: int = 0, same_strand_cutoff: float = 3, seed: str = -1, crosslinker_type: int = 2, is_2D: bool = False, kappa: float = 1.0) -> MEHPForceBalance:
+    def constructWithRandomSlipLinks(universe: Universe, nr_of_slip_links_to_sample: int, acceptable_cutoff: float = 1.2, min_nr_of_slip_links: int = 0, same_strand_cutoff: float = 3, seed: str = '', crosslinker_type: int = 2, is_2D: bool = False, kappa: float = 1.0) -> MEHPForceBalance:
         """
                   Instantiate this simulator with randomly chosen slip-links.
         """
@@ -984,7 +1022,8 @@ class MEHPForceBalance:
                   :param universe: the universe to simulate with
                   :param crosslinkerType: The atom type of the cross-linkers. Needed to reduce the network.
                   :param is2D: Whether to ignore the z direction.
-                  :param forceEvaluator: The force evaluator to use
+                  :param kappa: the spring constant
+                  :param remove2functionalCrosslinkers: whether to keep or remove the 2-functional cross-links when setting up the network
         """
     def addSlipLinks(self, strandIdx1: list[int], strandIdx2: list[int], x: list[float], y: list[float], z: list[float], alpha1: list[float], alpha2: list[float], clampAlpha: bool = False) -> None:
         """
@@ -992,9 +1031,25 @@ class MEHPForceBalance:
         """
     def addSliplinksBasedOnCycles(self, maxLoopLength: int = -1) -> int:
         ...
+    def assumeBoxLargeEnough(self, arg0: bool) -> None:
+        """
+                  Configure whether to run PBC on the bonds or not.
+        
+                  If your bonds could get larger than half the box length, this must be kept false (default).
+                  Otherwise, you can set it to true and therewith get some securities.
+        """
+    def configStepOutput(self, arg0: list[OutputConfiguration]) -> None:
+        """
+                  Set which values to log.
+                  
+                  Arguments:
+                       - values: a list of OutputConfiguration structs
+        """
     def deformTo(self, newBox: Box) -> None:
         ...
-    def evaluateDistanceBetween(self, network: SimplifiedBalanceNetwork, displacements: numpy.ndarray, linkIndexA: int, linkIndexB: int, is2D: bool = False) -> numpy.ndarray:
+    def evaluatePartialSpringDistance(self, network: SimplifiedBalanceNetwork, displacements: numpy.ndarray, springIdx: int, is2D: bool = False) -> numpy.ndarray:
+        ...
+    def evaluatePartialSpringDistanceFrom(self, network: SimplifiedBalanceNetwork, displacements: numpy.ndarray, springIdx: int, linkIdx: int, is2D: bool = False) -> numpy.ndarray:
         ...
     def getAverageSpringLength(self) -> float:
         """
@@ -1005,6 +1060,16 @@ class MEHPForceBalance:
         """
                   Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
         """
+    def getCurrentPartialSpringLengths(self) -> list[float]:
+        """
+                  Get the partial spring distances.
+        """
+    def getCurrentPartialSpringVectors(self) -> numpy.ndarray:
+        """
+                  Get the partial spring vectors.
+        """
+    def getCurrentSpringVectors(self) -> numpy.ndarray:
+        ...
     def getDanglingWeightFraction(self, tolerance: float = 0.1) -> float:
         """
                   Compute the weight fraction of non-active springs
@@ -1019,7 +1084,7 @@ class MEHPForceBalance:
         """
                    Returns the value effectively used in :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()` for :math:`\langle R_{0,\eta}^2\rangle`.
         """
-    def getDisplacementResidualNorm(self, arg0: float) -> float:
+    def getDisplacementResidualNorm(self, oneOverSpringPartitionUpperLimit: float = 1.0) -> float:
         """
                   Get the current link displacement residual norm.
         """
@@ -1103,6 +1168,20 @@ class MEHPForceBalance:
         
                   :param tolerance: springs under this length are considered inactive
         """
+    def getNumAtoms(self) -> int:
+        ...
+    def getNumBonds(self) -> int:
+        ...
+    def getNumExtraAtoms(self) -> int:
+        ...
+    def getNumExtraBonds(self) -> int:
+        ...
+    def getNumIntraChainSlipLinks(self) -> int:
+        ...
+    def getOverallSpringLengths(self) -> list[float]:
+        """
+                  Get the sum of the lengths of the partial springs of each spring.
+        """
     def getPressure(self) -> float:
         """
                   Returns the pressure at the current state of the simulation.
@@ -1120,6 +1199,8 @@ class MEHPForceBalance:
         """
     def getSpringpartitionIndicesOfSliplink(self, network: SimplifiedBalanceNetwork, linkIdx: int) -> list[int]:
         ...
+    def getStressOn(self, linkIdx: int, oneOverSpringPartitionUpperLimit: float = 1.0) -> numpy.ndarray:
+        ...
     def getStressTensor(self, oneOverSpringPartitionUpperLimit: float = 1.0) -> numpy.ndarray:
         """
                   Returns the stress tensor at the current state of the simulation.
@@ -1136,11 +1217,11 @@ class MEHPForceBalance:
         ...
     def inspectSpringPartitionUpdate(self, linkIdx: int) -> numpy.ndarray:
         ...
-    def moveSlipLinksToTheirBestBranch(self, arg0: SimplifiedBalanceNetwork, arg1: numpy.ndarray, arg2: numpy.ndarray, arg3: float, arg4: int, arg5: bool) -> None:
+    def moveSlipLinksToTheirBestBranch(self, arg0: SimplifiedBalanceNetwork, arg1: numpy.ndarray, arg2: numpy.ndarray, arg3: float, arg4: int, arg5: bool, arg6: bool) -> None:
         ...
     def randomlyAddSlipLinks(self, nrOfSlipLinksToSample: int, cutoff: float = 2.0, minimumNrOfSliplinks: int = 0, sameStrandCutoff: float = 2, excludeCrosslinks: bool = False, seed: int = -1) -> int:
         ...
-    def runForceRelaxation(self, runMode: BalanceRunMode = ..., damping: float = 1.0, maxNrOfSteps: int = 250000, xTolerance: float = 1e-12, initialResidualNorm: float = -1.0, simplificationMode: StructureSimplificationMode = ..., inactiveRemovalCutoff: float = -1.0, outputFrequency: int = 50, doInnerIterations: bool = False, allowSlipLinksToPassEachOther: LinkSwappingMode = ..., swappingFrequency: int = 10, oneOverSpringPartitionUpperLimit: float = 1.0, nrOfCrosslinkSwapsAllowedPerSliplink: int = -1) -> None:
+    def runForceRelaxation(self, runMode: BalanceRunMode = ..., damping: float = 1.0, maxNrOfSteps: int = 250000, xTolerance: float = 1e-12, initialResidualNorm: float = -1.0, simplificationMode: StructureSimplificationMode = ..., inactiveRemovalCutoff: float = -1.0, doInnerIterations: bool = False, allowSlipLinksToPassEachOther: LinkSwappingMode = ..., swappingFrequency: int = 10, oneOverSpringPartitionUpperLimit: float = 1.0, nrOfCrosslinkSwapsAllowedPerSliplink: int = -1) -> None:
         """
                   Run the simulation.
                   Note that the final state of the minimization is persisted and reused if you use this method again.
@@ -1179,7 +1260,7 @@ class MEHPForceBalance2:
          
     """
     @staticmethod
-    def constructWithRandomSlipLinks(universe: Universe, nr_of_slip_links_to_sample: int, acceptable_cutoff: float = 1.2, min_nr_of_slip_links: int = 0, same_strand_cutoff: float = 2, seed: str = -1, crosslinker_type: int = 2, is_2D: bool = False, kappa: float = 1.0) -> MEHPForceBalance2:
+    def constructWithRandomSlipLinks(universe: Universe, nr_of_slip_links_to_sample: int, acceptable_cutoff: float = 1.2, min_nr_of_slip_links: int = 0, same_strand_cutoff: float = 2, seed: str = '', crosslinker_type: int = 2, is_2D: bool = False, kappa: float = 1.0) -> MEHPForceBalance2:
         """
                   Instantiate this simulator with randomly chosen slip-links.
         """
@@ -1200,6 +1281,20 @@ class MEHPForceBalance2:
         """
     def __copy__(self) -> MEHPForceBalance2:
         ...
+    def assumeBoxLargeEnough(self, arg0: bool) -> None:
+        """
+                  Configure whether to run PBC on the bonds or not.
+        
+                  If your bonds could get larger than half the box length, this must be kept false (default).
+                  Otherwise, you can set it to true and therewith get some securities.
+        """
+    def configStepOutput(self, arg0: list[OutputConfiguration]) -> None:
+        """
+                  Set which values to log.
+                  
+                  Arguments:
+                       - values: a list of OutputConfiguration structs
+        """
     def deformTo(self, newBox: Box) -> None:
         ...
     def evaluateDistanceBetween(self, linkIndexA: int, linkIndexB: int, is2D: bool = False) -> numpy.ndarray:
@@ -1227,7 +1322,7 @@ class MEHPForceBalance2:
         """
                    Returns the value effectively used in :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance2.getGammaFactor()` for :math:`\langle R_{0,\eta}^2\rangle`.
         """
-    def getDisplacementResidualNorm(self, arg0: float) -> float:
+    def getDisplacementResidualNorm(self, oneOverSpringPartitionUpperLimit: float = 1.0) -> float:
         """
                   Get the current link displacement residual norm.
         """
@@ -1305,6 +1400,14 @@ class MEHPForceBalance2:
         
                   :param tolerance: springs under this length are considered inactive
         """
+    def getNumAtoms(self) -> int:
+        ...
+    def getNumBonds(self) -> int:
+        ...
+    def getNumExtraAtoms(self) -> int:
+        ...
+    def getNumExtraBonds(self) -> int:
+        ...
     def getPressure(self) -> float:
         """
                   Returns the pressure at the current state of the simulation.
@@ -1398,11 +1501,25 @@ class MEHPForceRelaxation:
                        :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getSolubleWeightFraction()` and
                        :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getDanglingWeightFraction()`
         """
+    def assumeBoxLargeEnough(self, arg0: bool) -> None:
+        """
+                  Configure whether to run PBC on the bonds or not.
+        
+                  If your bonds could get larger than half the box length, this must be kept false (default).
+                  Otherwise, you can set it to true and therewith get some securities.
+        """
     def configRerunEpsilon(self, epsilon: float = 0.001) -> None:
         """
                   Configure the offset from the lower and upper bounds for the simulation to suggest another run (
                        See: :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.requiresAnotherRun()`
                   ).
+        """
+    def configStepOutput(self, arg0: list[OutputConfiguration]) -> None:
+        """
+                  Set which values to log.
+                  
+                  Arguments:
+                       - values: a list of OutputConfiguration structs
         """
     def getAverageSpringLength(self) -> float:
         """
@@ -1634,6 +1751,8 @@ class Molecule:
                     
                     See also: :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeRadiusOfGyration()`.
         """
+    def computeTotalLength(self) -> float:
+        ...
     def computeTotalMass(self) -> float:
         """
                     Computes the total mass of this molecule.
@@ -2478,6 +2597,17 @@ class UniverseSequence:
                   Compute the autocorrelation of the dot product of the distance vector from certain to other atoms.
         
                   For example, this can be used to compute Eq. 4.51 from Masao Doi, Introduction to Polymer Physics, p. 74.
+        """
+    def computeDistanceFromToAtoms(self, atom_ids_from: list[int], atom_ids_to: list[int], reduce_memory: bool = False) -> list[float]:
+        """
+                  Compute the root square norm of all the (unwrapped!) distances for the given pair of atoms.
+                  
+                  Can be used to somewhat faster compute e.g. all the end-to-end or bond distances.
+                  Pay attention that the image flags are correct, otherwise, this data may not be useable.
+        """
+    def computeMsdForAtomProperties(self, atom_ids: list[int], x_property: str, y_property: str, z_property: str, nr_of_origins: int = 25, reduce_memory: bool = False) -> dict[int, float]:
+        """
+                  Compute the mean square displacement for atoms with the specified ids
         """
     def computeMsdForAtoms(self, atom_ids: list[int], nr_of_origins: int = 25, reduce_memory: bool = False) -> dict[int, float]:
         """
