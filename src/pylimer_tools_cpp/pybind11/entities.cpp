@@ -409,6 +409,7 @@ init_pylimer_bound_entities(py::module_& m)
                Computes the distance between 2 atoms with functionality 1, 
                ignoring whether they are cross-linkers or not.
             )pbdoc")
+    .def("computeTotalLength", &Molecule::computeTotalLength)
     // operators
     .def(
       "__getitem__",

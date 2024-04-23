@@ -48,7 +48,7 @@ namespace utils {
   {
   public:
     void read(const std::string filePath,
-              const AtomStyle atomStyle = AtomStyle::ANGLE,
+              AtomStyle atomStyle = AtomStyle::ANGLE,
               const AtomStyle atomStyle2 = AtomStyle::NONE,
               const AtomStyle atomStyle3 = AtomStyle::NONE);
 

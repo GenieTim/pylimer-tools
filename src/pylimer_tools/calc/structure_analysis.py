@@ -50,6 +50,8 @@ def compute_stoichiometric_imbalance(network: Universe, crosslinker_type: int,
     if (crosslinker_type not in counts):
         return 0.
 
+    # TODO: use the data from the functionality_per_type to determine the
+    # functionality per strand, maybe?
     strands = network.getMolecules(crosslinker_type)
     ignore_types.append(crosslinker_type)
     num_relevant_strands = len([m for m in strands if not np.all(
@@ -251,7 +253,7 @@ def compute_effective_crosslinker_functionality(network: Universe, crosslinker_t
     """
     junction_degrees = compute_effective_crosslinker_functionalities(
         network, crosslinker_type)
-    return np.mean(junction_degrees)
+    return np.mean(junction_degrees) if len(junction_degrees) > 0 else 0.
 
 
 def compute_effective_crosslinker_functionalities(network: Universe, crosslinker_type: int = 2) -> list[int]:
@@ -267,10 +269,8 @@ def compute_effective_crosslinker_functionalities(network: Universe, crosslinker
     """
     if (network.getNrOfAtoms() == 0):
         return []
-    junctions = network.getAtomsOfType(crosslinker_type)
-    junction_ids = [v.getId() for v in junctions]
-    junction_degrees = [network.getNrOfBondsOfAtom(id) for id in junction_ids]
-    return junction_degrees
+    effective_functionalities = network.determineEffectiveFunctionalityPerType()
+    return effective_functionalities[crosslinker_type] if crosslinker_type in effective_functionalities else 0.
 
 
 def compute_weight_fractions(network: Universe) -> dict:
