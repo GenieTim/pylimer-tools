@@ -397,8 +397,8 @@ namespace entities {
           atoms[universe_idx][atomIdToAtomIndex.at(atomIdsFrom[j])];
         Atom atomTo = atoms[universe_idx][atomIdToAtomIndex.at(atomIdsTo[j])];
         results.push_back(
-          (atomTo.getUnwrappedCoordinates(&boxes[universe_idx]) -
-           atomFrom.getUnwrappedCoordinates(&boxes[universe_idx]))
+          (atomTo.getUnwrappedCoordinates(boxes[universe_idx]) -
+           atomFrom.getUnwrappedCoordinates(boxes[universe_idx]))
             .norm());
       }
     }
@@ -468,10 +468,10 @@ namespace entities {
       for (size_t j = 0; j < atomIdsFrom.size(); ++j) {
         Atom atomFrom = atoms[i][atomIdToAtomIndex.at(atomIdsFrom[j])];
         localCoordinatesFrom.segment(3 * j, 3) =
-          atomFrom.getUnwrappedCoordinates(&boxes[i]);
+          atomFrom.getUnwrappedCoordinates(boxes[i]);
         Atom atomTo = atoms[i][atomIdToAtomIndex.at(atomIdsTo[j])];
         localCoordinatesTo.segment(3 * j, 3) =
-          atomTo.getUnwrappedCoordinates(&boxes[i]);
+          atomTo.getUnwrappedCoordinates(boxes[i]);
       }
       endToEndVectors.push_back(localCoordinatesTo - localCoordinatesFrom);
     }
@@ -770,7 +770,7 @@ namespace entities {
       for (size_t j = 0; j < atomIds.size(); ++j) {
         Atom atom = atoms[i][atomIdToAtomIndex.at(atomIds[j])];
         Eigen::Vector3d coords;
-        atom.getUnwrappedCoordinates<Eigen::Vector3d>(coords, &boxes[i]);
+        atom.getUnwrappedCoordinates<Eigen::Vector3d>(coords, boxes[i]);
         localCoordinates.segment(3 * j, 3) = coords;
       }
       coordinates.push_back(localCoordinates);
@@ -871,7 +871,7 @@ namespace entities {
       pylimer_tools::entities::Universe current_universe =
         this->atIndex(universe_idx);
       Eigen::VectorXd current_coordinates =
-        current_universe.getUnwrappedVertexCoordinates(vertex_ids, &box);
+        current_universe.getUnwrappedVertexCoordinates(vertex_ids, box);
       coordinates.push_back(current_coordinates);
       timesteps.push_back(current_universe.getTimestep());
       int delta_t =

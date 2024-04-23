@@ -283,22 +283,22 @@ namespace utils {
       this->oldNewAtomIdMap[atom.getId()] = atomId;
       int nx = this->moveIntoBox
                  ? this->getImageFlagForCoordinate(
-                     atom.getUnwrappedX(&box), box.getLowX(), box.getHighX())
+                     atom.getUnwrappedX(box), box.getLowX(), box.getHighX())
                  : atom.getNX();
       int ny = this->moveIntoBox
                  ? this->getImageFlagForCoordinate(
-                     atom.getUnwrappedY(&box), box.getLowY(), box.getHighY())
+                     atom.getUnwrappedY(box), box.getLowY(), box.getHighY())
                  : atom.getNY();
       int nz = this->moveIntoBox
                  ? this->getImageFlagForCoordinate(
-                     atom.getUnwrappedZ(&box), box.getLowZ(), box.getHighZ())
+                     atom.getUnwrappedZ(box), box.getLowZ(), box.getHighZ())
                  : atom.getNZ();
       double x = this->conditionallyMoveCoordinateIntoBox(
-        atom.getUnwrappedX(&box), box.getLowX(), box.getHighX());
+        atom.getUnwrappedX(box), box.getLowX(), box.getHighX());
       double y = this->conditionallyMoveCoordinateIntoBox(
-        atom.getUnwrappedY(&box), box.getLowY(), box.getHighY());
+        atom.getUnwrappedY(box), box.getLowY(), box.getHighY());
       double z = this->conditionallyMoveCoordinateIntoBox(
-        atom.getUnwrappedZ(&box), box.getLowZ(), box.getHighZ());
+        atom.getUnwrappedZ(box), box.getLowZ(), box.getHighZ());
       if (this->customAtomFormat.size() < 2) {
         file << "\t" << atomId << "\t" << moleculeIdx << "\t" << atom.getType()
              << "\t" << x << "\t" << y << "\t" << z << "\t" << nx << "\t" << ny

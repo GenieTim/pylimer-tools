@@ -18,7 +18,7 @@ extern "C"
 namespace pylimer_tools {
 namespace entities {
 
-  Molecule::Molecule(const Box* parent,
+  Molecule::Molecule(const Box& parent,
                      const igraph_t* ingraph,
                      const MoleculeType type,
                      const std::map<int, double>& massPerType)
@@ -84,22 +84,21 @@ namespace entities {
     std::swap(this->typeOfThisMolecule, src.typeOfThisMolecule);
     std::swap(this->size, src.size);
     std::swap(this->key, src.key);
-    std::swap(this->_boxNoUse, src._boxNoUse);
     std::swap(this->massPerType, src.massPerType);
     std::swap(this->graph, src.graph);
 
     return *this;
   };
 
-  std::vector<double> Molecule::computeBondLengths() {
+  std::vector<double> Molecule::computeBondLengths()
+  {
     return AtomGraphParent::computeBondLengths(this->parent);
   }
 
-  double Molecule::computeTotalLength() {
+  double Molecule::computeTotalLength()
+  {
     std::vector<double> bondLens;
-    return std::accumulate(
-      bondLens.begin(), bondLens.end(), 0.0
-    );
+    return std::accumulate(bondLens.begin(), bondLens.end(), 0.0);
   }
 
   double Molecule::computeEndToEndDistance()
@@ -195,7 +194,8 @@ namespace entities {
     // return this->getNrOfVertices();
   }
 
-  int Molecule::getNrOfBonds() const {
+  int Molecule::getNrOfBonds() const
+  {
     return this->getNrOfEdges();
   }
 
@@ -209,7 +209,7 @@ namespace entities {
     return this->typeOfThisMolecule;
   };
 
-  const Box* Molecule::getBox() const
+  const Box& Molecule::getBox() const
   {
     return this->parent;
   }
@@ -262,8 +262,8 @@ namespace entities {
     auto innerReduction = [&virtualCenterAtom,
                            correctingFactor,
                            &massPerType = this->massPerType,
-                           &box = this->parent](double val,
-                                                const Atom a) -> double {
+                           box = this->parent](double val,
+                                               const Atom a) -> double {
       double dist = a.distanceToUnwrapped(virtualCenterAtom, box);
       return val +
              (correctingFactor * massPerType.at(a.getType()) * dist * dist);
@@ -362,9 +362,9 @@ namespace entities {
       alignedCoordinates, this->parent, alignedVertices);
     Eigen::Vector3d result = Eigen::Vector3d::Zero();
     for (size_t i = 1; i < alignedVertices.size(); ++i) {
-      Eigen::Vector3d distance = alignedCoordinates.segment((i) * 3, 3) -
+      Eigen::Vector3d distance = alignedCoordinates.segment((i)*3, 3) -
                                  alignedCoordinates.segment((i - 1) * 3, 3);
-      this->parent->handlePBC(distance);
+      this->parent.handlePBC(distance);
       result += distance;
     }
     return result;
@@ -401,9 +401,9 @@ namespace entities {
     bool recording = false;
     for (size_t i = 0; i < alignedVertices.size(); ++i) {
       if (recording) {
-        Eigen::Vector3d distance = alignedCoordinates.segment((i) * 3, 3) -
+        Eigen::Vector3d distance = alignedCoordinates.segment((i)*3, 3) -
                                    alignedCoordinates.segment((i - 1) * 3, 3);
-        this->parent->handlePBC(distance);
+        this->parent.handlePBC(distance);
         result += distance;
 
         if ((alignedVertices[i] == vertexIdFrom && !requireOrder) ||

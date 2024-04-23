@@ -302,7 +302,7 @@ namespace entities {
    */
   Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
     const igraph_vs_t selector,
-    const pylimer_tools::entities::Box* box) const
+    const pylimer_tools::entities::Box& box) const
   {
     igraph_vector_t xvalues;
     igraph_vector_init(&xvalues, 0);
@@ -340,11 +340,11 @@ namespace entities {
     Eigen::VectorXd results = Eigen::VectorXd::Zero(size * 3);
     for (size_t i = 0; i < size; i++) {
       results[3 * i] = igraph_vector_get(&xvalues, i) +
-                       (box->getLx() * igraph_vector_get(&nxvalues, i));
+                       (box.getLx() * igraph_vector_get(&nxvalues, i));
       results[3 * i + 1] = igraph_vector_get(&yvalues, i) +
-                           (box->getLy() * igraph_vector_get(&nyvalues, i));
+                           (box.getLy() * igraph_vector_get(&nyvalues, i));
       results[3 * i + 2] = igraph_vector_get(&zvalues, i) +
-                           (box->getLz() * igraph_vector_get(&nzvalues, i));
+                           (box.getLz() * igraph_vector_get(&nzvalues, i));
     }
 
     igraph_vector_destroy(&xvalues);
@@ -358,14 +358,14 @@ namespace entities {
   }
 
   Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
-    const pylimer_tools::entities::Box* box) const
+    const pylimer_tools::entities::Box& box) const
   {
     return this->getUnwrappedVertexCoordinates(igraph_vss_all(), box);
   }
 
   Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
     igraph_vector_int_t& vertices,
-    const pylimer_tools::entities::Box* box) const
+    const pylimer_tools::entities::Box& box) const
   {
     return this->getUnwrappedVertexCoordinates(igraph_vss_vector(&vertices),
                                                box);
@@ -373,7 +373,7 @@ namespace entities {
 
   Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
     std::vector<long int>& vertices,
-    const pylimer_tools::entities::Box* box) const
+    const pylimer_tools::entities::Box& box) const
   {
     igraph_vector_int_t vertices_v;
     igraph_vector_int_init(&vertices_v, vertices.size());
@@ -421,7 +421,7 @@ namespace entities {
    *
    * @return std::vector<double>
    */
-  std::vector<double> AtomGraphParent::computeBondLengths(const Box* box)
+  std::vector<double> AtomGraphParent::computeBondLengths(const Box& box)
   {
     std::vector<double> lengths;
     lengths.reserve(this->getNrOfEdges());
