@@ -15,6 +15,19 @@ extern "C"
 }
 #include "./VectorUtils.h"
 
+static inline igraph_integer_t
+castToIgraphInt(igraph_real_t c)
+{
+  return static_cast<igraph_integer_t>(std::lround(c));
+}
+
+template<typename INTT>
+static inline INTT
+igraphRealToInt(igraph_real_t c)
+{
+  return static_cast<INTT>(std::lround(c));
+}
+
 namespace pylimer_tools {
 namespace utils {
 

@@ -313,18 +313,18 @@ namespace entities {
     // now, we need to update the id-atomId map
     this->atomIdToVertexIdx.clear();
 
-    igraph_vs_t allVertexIds;
-    igraph_vs_all(&allVertexIds);
-    igraph_vit_t vit;
-    igraph_vit_create(&this->graph, allVertexIds, &vit);
-    while (!IGRAPH_VIT_END(vit)) {
-      long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
-      this->atomIdToVertexIdx.emplace(VAN(&this->graph, "id", vertexId),
-                                      vertexId);
-      IGRAPH_VIT_NEXT(vit);
+    igraph_vector_t atomIds;
+    igraph_vector_init(&atomIds, igraph_vcount(&this->graph));
+    igraph_cattribute_VANV(&this->graph, "id", igraph_vss_all(), &atomIds);
+
+    for (size_t i = 0; i < igraph_vector_size(&atomIds); i++) {
+      long int atomId = castToIgraphInt(igraph_vector_get(&atomIds, i));
+      this->atomIdToVertexIdx.emplace(atomId, i);
     }
-    igraph_vit_destroy(&vit);
-    igraph_vs_destroy(&allVertexIds);
+
+    igraph_vector_destroy(&atomIds);
+
+    assert(igraph_vcount(&this->graph) == this->NAtoms - ids.size());
 
     this->NAtoms = igraph_vcount(&this->graph);
     this->NBonds = igraph_ecount(&this->graph);
@@ -882,7 +882,7 @@ namespace entities {
         while (!IGRAPH_VIT_END(endNodeVit)) {
           long int newEndNodeVertexId = (long int)IGRAPH_VIT_GET(endNodeVit);
           long int oldEndNodeId =
-            (long int)VAN(chain, "id", newEndNodeVertexId);
+            igraphRealToInt<long int>(VAN(chain, "id", newEndNodeVertexId));
           long int originalEndNodeVertexId =
             this->atomIdToVertexIdx.at(oldEndNodeId);
           // this->findVertexIdForProperty("id", oldEndNodeId);
@@ -900,8 +900,8 @@ namespace entities {
 
           // loop neighbours
           for (long int originalNeighbourId : neighborsVec) {
-            int originalNeighbourType =
-              igraph_cattribute_VAN(&graph, "type", originalNeighbourId);
+            int originalNeighbourType = igraphRealToInt<int>(
+              igraph_cattribute_VAN(&graph, "type", originalNeighbourId));
 
             if (originalNeighbourType == crosslinkerType) {
               // found a crosslinker neighbour
@@ -932,7 +932,7 @@ namespace entities {
                                        newCrosslinkerVertexIdx);
           // additional loop check
           long int originalNeighbourAtomId =
-            igraph_cattribute_VAN(&graph, "id", atomToAddOriginalId);
+            igraphRealToInt<long int>(igraph_cattribute_VAN(&graph, "id", atomToAddOriginalId));
           if (pylimer_tools::utils::graphHasVertexWithProperty(
                 chain, "id", originalNeighbourAtomId)) {
             isLoop = true;
@@ -1539,7 +1539,7 @@ namespace entities {
    */
   long int Universe::getAtomIdByIdx(const int vertexId) const
   {
-    return VAN(&this->graph, "id", vertexId);
+    return igraphRealToInt<long int>(VAN(&this->graph, "id", vertexId));
   }
 
   /**

@@ -221,12 +221,21 @@ def compute_weight_fraction_of_soluble_material(network: Universe, crosslinker_t
     if (network is not None and network.getNrOfBonds() == 0):
         return 1.
 
-    if (functionality_per_type is None or crosslinker_type not in functionality_per_type):
-        assert (network is not None)
-        functionality_per_type = network.determineFunctionalityPerType()
-
     weight_fractions, alpha, beta = compute_weight_fractions_and_probabilities(
         network, crosslinker_type, functionality_per_type, weight_fractions, r, p)
+
+    if (functionality_per_type is not None and not np.all([
+        key in functionality_per_type for key in weight_fractions.keys()
+    ])):
+        warnings.warn(
+            "functionality_per_type does not contain functionality for all types. Will be re-computed.")
+        functionality_per_type = None
+
+    if (functionality_per_type is None):
+        if (network is None):
+            raise ValueError(
+                "functionality_per_type is required if the network is not supplied.")
+        functionality_per_type = network.determineFunctionalityPerType()
 
     w_sol = 0
     for key in weight_fractions:

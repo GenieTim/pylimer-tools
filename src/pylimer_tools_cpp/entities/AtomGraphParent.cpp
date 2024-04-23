@@ -257,8 +257,8 @@ namespace entities {
                                   std::to_string(vertexIdx) +
                                   ") does not exist");
     }
-    return Atom(VAN(&this->graph, "id", vertexIdx),
-                VAN(&this->graph, "type", vertexIdx),
+    return Atom(igraphRealToInt<long int>(VAN(&this->graph, "id", vertexIdx)),
+                igraphRealToInt<int>(VAN(&this->graph, "type", vertexIdx)),
                 VAN(&this->graph, "x", vertexIdx),
                 VAN(&this->graph, "y", vertexIdx),
                 VAN(&this->graph, "z", vertexIdx),

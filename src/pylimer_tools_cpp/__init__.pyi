@@ -1,15 +1,16 @@
 """
 
-This is the C++ implementation of pylimer_tools. 
+This is the C++ implementation of pylimer_tools.
 
-The subpackage (actually compiled code) :module:`pylimer_tools_cpp.pylimer_tools_cpp` 
-should be imported automatically when you `import pylimer_tools_cpp`, 
+The subpackage (actually compiled code) :module:`pylimer_tools_cpp.pylimer_tools_cpp`
+should be imported automatically when you `import pylimer_tools_cpp`,
 meaning there is no need to use the double `pylimer_tools_cpp.pylimer_tools_cpp`,
 a single one is sufficient.
 """
 from __future__ import annotations
 from pylimer_tools_cpp.pylimer_tools_cpp import Atom
 from pylimer_tools_cpp.pylimer_tools_cpp import AtomStyle
+from pylimer_tools_cpp.pylimer_tools_cpp import AveFileReader
 from pylimer_tools_cpp.pylimer_tools_cpp import BalanceRunMode
 from pylimer_tools_cpp.pylimer_tools_cpp import Box
 from pylimer_tools_cpp.pylimer_tools_cpp import ComputedDoubleValues
@@ -45,7 +46,7 @@ from pylimer_tools_cpp.pylimer_tools_cpp import predictGelationPoint
 from pylimer_tools_cpp.pylimer_tools_cpp import splitCSV
 from pylimer_tools_cpp.pylimer_tools_cpp import versionInformation
 from . import pylimer_tools_cpp
-__all__ = ['Atom', 'AtomStyle', 'BalanceRunMode', 'Box', 'ComputedDoubleValues', 'ComputedIntValues', 'DANGLING_CHAIN', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'ExitReason', 'FREE_CHAIN', 'LazyUniverseSequenceIterator', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NETWORK_STRAND', 'NeighbourList', 'NonGaussianSpringForceEvaluator', 'OutputConfiguration', 'PRIMARY_LOOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StructureSimplificationMode', 'UNDEFINED', 'Universe', 'UniverseSequence', 'computeStoichiometricInbalance', 'doRandomWalkChainFromTo', 'inverse_langevin', 'predictGelationPoint', 'pylimer_tools_cpp', 'splitCSV', 'versionInformation']
+__all__ = ['Atom', 'AtomStyle', 'AveFileReader', 'BalanceRunMode', 'Box', 'ComputedDoubleValues', 'ComputedIntValues', 'DANGLING_CHAIN', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'ExitReason', 'FREE_CHAIN', 'LazyUniverseSequenceIterator', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NETWORK_STRAND', 'NeighbourList', 'NonGaussianSpringForceEvaluator', 'OutputConfiguration', 'PRIMARY_LOOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StructureSimplificationMode', 'UNDEFINED', 'Universe', 'UniverseSequence', 'computeStoichiometricInbalance', 'doRandomWalkChainFromTo', 'inverse_langevin', 'predictGelationPoint', 'pylimer_tools_cpp', 'splitCSV', 'versionInformation']
 DANGLING_CHAIN: MoleculeType  # value = <MoleculeType.DANGLING_CHAIN: 3>
 FREE_CHAIN: MoleculeType  # value = <MoleculeType.FREE_CHAIN: 4>
 NETWORK_STRAND: MoleculeType  # value = <MoleculeType.NETWORK_STRAND: 1>

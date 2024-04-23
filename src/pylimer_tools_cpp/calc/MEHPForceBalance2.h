@@ -5,6 +5,7 @@
 #include "../entities/Box.h"
 #include "../entities/NeighbourList.h"
 #include "../entities/Universe.h"
+#include "../utils/GraphUtils.h"
 #include "EntanglementDetector.h"
 #include "MEHPForceEvaluator.h"
 #include "MEHPUtilityStructures.h"
@@ -49,11 +50,6 @@ namespace calc {
                     ? (oneOverSpringPartitionUpperLimit)                       \
                     : (N)));
 #endif
-
-    static inline igraph_integer_t castToIgraphInt(igraph_real_t c)
-    {
-      return static_cast<igraph_integer_t>(std::lround(c));
-    }
 
     class MEHPForceBalance2
       : public pylimer_tools::calc::OutputSupportingSimulation

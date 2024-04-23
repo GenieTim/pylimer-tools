@@ -10,7 +10,7 @@ import numpy as np
 from pylimer_tools_cpp.pylimer_tools_cpp import MoleculeType, Universe
 
 
-def compute_stoichiometric_imbalance(network: Universe, crosslinker_type: int,
+def compute_stoichiometric_imbalance(network: Universe, crosslinker_type: int = 2,
                                      functionality_per_type: dict = None, ignore_types: list = [],
                                      effective: bool = False) -> float:
     """
