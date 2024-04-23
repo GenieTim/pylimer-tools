@@ -39,7 +39,7 @@ def predict_shear_modulus(**kwargs):
 
 
 def predict_number_density_of_junction_points(network: Universe, crosslinker_type: int,
-                                              strand_length: int = None, functionality_per_type: dict = None) -> float:
+                                              functionality_per_type: dict = None) -> float:
     """
     Compute the number density of network strands using MMT
 
@@ -49,7 +49,6 @@ def predict_number_density_of_junction_points(network: Universe, crosslinker_typ
     Arguments:
       - network: the network to compute the weight fraction for
       - crosslinker_type: the atom type to use to split the molecules
-      - strand_length: the length of the network strands (in nr. of beads).
       - functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
 
     Returns:
@@ -59,7 +58,7 @@ def predict_number_density_of_junction_points(network: Universe, crosslinker_typ
         functionality_per_type = network.determineFunctionalityPerType()
 
     weight_fractions, alpha, _ = compute_weight_fractions_and_probabilities(
-        network, crosslinker_type, strand_length, functionality_per_type)
+        network, crosslinker_type, functionality_per_type)
 
     if (functionality_per_type[crosslinker_type] == 3):
         return weight_fractions[crosslinker_type] * (1 - alpha)**3
@@ -70,7 +69,7 @@ def predict_number_density_of_junction_points(network: Universe, crosslinker_typ
             "Currently, only cross-linker functionalities of 3 and 4 are supported")
 
 
-def predict_number_density_of_network_strands(network: Universe, crosslinker_type: int, strand_length: int = None,
+def predict_number_density_of_network_strands(network: Universe, crosslinker_type: int,
                                               functionality_per_type: dict = None,
                                               r: float = None, p: float = None) -> float:
     """
@@ -82,7 +81,6 @@ def predict_number_density_of_network_strands(network: Universe, crosslinker_typ
     Arguments:
       - network: the network to compute the weight fraction for
       - crosslinker_type: the atom type to use to split the molecules
-      - strand_length: the length of the network strands (in nr. of beads).
       - functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
       - r: the stoichiometric imbalance
       - p: the extent of reaction in terms of the cross-links
@@ -97,7 +95,6 @@ def predict_number_density_of_network_strands(network: Universe, crosslinker_typ
     alpha, _ = compute_miller_macosko_probabilities(r=r if r is not None else compute_stoichiometric_imbalance(
         network=network,
         crosslinker_type=crosslinker_type,
-        strand_length=strand_length,
         functionality_per_type=functionality_per_type),
         p=p if p is not None else compute_crosslinker_conversion(
         network=network, crosslinker_type=crosslinker_type, f=functionality_per_type[
@@ -115,7 +112,7 @@ def predict_number_density_of_network_strands(network: Universe, crosslinker_typ
 
 
 def compute_weight_fraction_of_dangling_chains(network: Universe, crosslinker_type: int,
-                                               strand_length: int = None, functionality_per_type: dict = None,
+                                               functionality_per_type: dict = None,
                                                weight_fractions: dict = None,
                                                r: float = None, p: float = None) -> float:
     """
@@ -124,7 +121,6 @@ def compute_weight_fraction_of_dangling_chains(network: Universe, crosslinker_ty
     Arguments:
       - network: the network to compute the weight fraction for
       - crosslinker_type: the atom type to use to split the molecules
-      - strand_length: the length of the network strands (in nr. of beads).
       - functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
       - weight_fractions: a dictionary with the weight fraction of each type of atom
       - r: the stoichiometric imbalance
@@ -134,13 +130,13 @@ def compute_weight_fraction_of_dangling_chains(network: Universe, crosslinker_ty
       - weightFraction $\\Phi_d = 1 - \\Phi_{el} - w_{sol}$: weightDangling/weightTotal
     """
     return 1. \
-        - compute_weight_fraction_of_backbone(network, crosslinker_type, strand_length,
+        - compute_weight_fraction_of_backbone(network, crosslinker_type,
                                               functionality_per_type, weight_fractions, r, p) \
         - compute_weight_fraction_of_soluble_material(
-            network, crosslinker_type, strand_length, functionality_per_type, weight_fractions, r, p)
+            network, crosslinker_type, functionality_per_type, weight_fractions, r, p)
 
 
-def compute_weight_fraction_of_backbone(network: Universe, crosslinker_type: int, strand_length: int = None,
+def compute_weight_fraction_of_backbone(network: Universe, crosslinker_type: int,
                                         functionality_per_type: dict = None, weight_fractions: dict = None,
                                         r: float = None, p: float = None) -> float:
     """
@@ -153,7 +149,6 @@ def compute_weight_fraction_of_backbone(network: Universe, crosslinker_type: int
     Arguments:
       - network: the polymer network to do the computation for
       - crosslinker_type: the type of the junctions/cross-linkers to select them in the network
-      - strand_length: the length of the network strands (in nr. of beads).
       - functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
       - weight_fractions: a dictionary with the weight fraction of each type of atom
       - r: the stoichiometric imbalance
@@ -169,9 +164,9 @@ def compute_weight_fraction_of_backbone(network: Universe, crosslinker_type: int
         functionality_per_type = network.determineFunctionalityPerType()
 
     weight_fractions, alpha, beta = compute_weight_fractions_and_probabilities(
-        network, crosslinker_type, strand_length, functionality_per_type, weight_fractions, r, p)
+        network, crosslinker_type, functionality_per_type, weight_fractions, r, p)
     w_sol = compute_weight_fraction_of_soluble_material(
-        network, crosslinker_type, strand_length, functionality_per_type, weight_fractions, r, p)
+        network, crosslinker_type, functionality_per_type, weight_fractions, r, p)
     if (w_sol < 0 or w_sol > 1):
         warnings.warn(
             "The weight fraction w_sol predicted by MMT ({}) is outside accepted range. ".format(w_sol) +
@@ -199,7 +194,7 @@ def compute_weight_fraction_of_backbone(network: Universe, crosslinker_type: int
     return phi_el
 
 
-def compute_weight_fraction_of_soluble_material(network: Universe, crosslinker_type: int, strand_length: int = None,
+def compute_weight_fraction_of_soluble_material(network: Universe, crosslinker_type: int,
                                                 functionality_per_type: dict = None, weight_fractions: dict = None,
                                                 r: float = None, p: float = None) -> float:
     """
@@ -214,8 +209,6 @@ def compute_weight_fraction_of_soluble_material(network: Universe, crosslinker_t
       - crosslinker_type: the type of the junctions/cross-linkers to select them in the network
       - weight_fractions (dict): a dictionary with key: type, and value: weight fraction of type.
             Pass if you want to omit the network.
-      - strand_length (int): the length of the network strands (in nr. of beads).
-          See: :func:`~pylimer_tools.calc.miller_macosko_theory.compute_stoichiometric_imbalance`.
       - functionality_per_type (dict): a dictionary with key: type, and value: functionality of this atom type.
           See: :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.determineFunctionalityPerType`.
 
@@ -233,7 +226,7 @@ def compute_weight_fraction_of_soluble_material(network: Universe, crosslinker_t
         functionality_per_type = network.determineFunctionalityPerType()
 
     weight_fractions, alpha, beta = compute_weight_fractions_and_probabilities(
-        network, crosslinker_type, strand_length, functionality_per_type, weight_fractions, r, p)
+        network, crosslinker_type, functionality_per_type, weight_fractions, r, p)
 
     w_sol = 0
     for key in weight_fractions:
@@ -263,7 +256,7 @@ def compute_weight_fraction_of_soluble_material_from_weight_fractions(r: float, 
     return w_f * (alpha**f) + w_g * ((r * p * (alpha**(f - 1)) + 1 - r * p)**g)
 
 
-def compute_weight_fractions_and_probabilities(network: Universe, crosslinker_type: int, strand_length: int = None,
+def compute_weight_fractions_and_probabilities(network: Universe, crosslinker_type: int, 
                                                functionality_per_type: dict = None, weight_fractions: dict = None,
                                                r: float = None, p: float = None):
     """
@@ -274,8 +267,6 @@ def compute_weight_fractions_and_probabilities(network: Universe, crosslinker_ty
     Arguments:
       - network: the polymer network to do the computation for
       - crosslinker_type: the type of the junctions/cross-linkers to select them in the network
-      - strand_length (int): the length of the network strands (in nr. of beads).
-          See: :func:`~pylimer_tools.calc.miller_macosko_theory.compute_stoichiometric_imbalance`.
       - weight_fractions (dict): a dictionary with key: type, and value: weight fraction of type.
           Pass if you want to omit the network.
       - functionality_per_type (dict): a dictionary with key: type, and value: functionality of this atom type.
@@ -320,7 +311,7 @@ def compute_weight_fractions_and_probabilities(network: Universe, crosslinker_ty
     if (r is None):
         assert (network is not None)
         r = compute_stoichiometric_imbalance(
-            network, crosslinker_type, strand_length=strand_length, functionality_per_type=functionality_per_type)
+            network, crosslinker_type, functionality_per_type=functionality_per_type)
     assert (r >= 0)
 
     alpha, beta = compute_miller_macosko_probabilities(
@@ -417,7 +408,7 @@ def validate_r_and_p(r: float, p: float, f: int):
 def compute_modulus_decomposition(network: Universe, unit_style: UnitStyle, crosslinker_type: int = None,
                                   r: float = None, p: float = None, f: int = None,
                                   nu: float = None, temperature: pint.Quantity = None,
-                                  strand_length: int = None, functionality_per_type: dict = None,
+                                  functionality_per_type: dict = None,
                                   g_e_1: float = None):
     """
     Compute four different estimates of the plateau modulus, using MMT, ANM and PNM.
@@ -431,7 +422,6 @@ def compute_modulus_decomposition(network: Universe, unit_style: UnitStyle, cros
       - f: the functionality of the the crosslinker. Optional if network is specified
       - nu: the strand number density (nr of strands per volume) (ideally with units). Optional if network is specified
       - temperature: the temperature to compute the modulus at. Default: 298.15 K
-      - strand_length: the length of the network strands (in nr. of beads).
           Optional, can be passed to improve performance
       - functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
           Optional, can be passed to improve performance
@@ -451,7 +441,7 @@ def compute_modulus_decomposition(network: Universe, unit_style: UnitStyle, cros
     if (r is None):
         r = compute_stoichiometric_imbalance(
             network, crosslinker_type=crosslinker_type,
-            strand_length=strand_length, functionality_per_type=functionality_per_type)
+            functionality_per_type=functionality_per_type)
     if (p is None):
         p = compute_crosslinker_conversion(
             network, crosslinker_type, functionality_per_type=functionality_per_type)

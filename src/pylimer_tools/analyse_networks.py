@@ -27,8 +27,8 @@ def cli(files, crosslinker_type):
         universe_sequence = UniverseSequence()
         universe_sequence.initializeFromDataSequence([file_path])
         universe = universe_sequence.atIndex(0)
-        click.echo("Size: {}. Volume: {} u^3".format(
-            universe.getNrOfAtoms(), universe.getVolume()))
+        click.echo("Size: {}. Volume: {} u^3 (ρ = {})".format(
+            universe.getNrOfAtoms(), universe.getVolume(), universe.getNrOfAtoms() / universe.getVolume()))
         click.echo("{} atoms and {} bonds, {} angles, {} dihedrals".format(universe.getNrOfAtoms(
         ), universe.getNrOfBonds(), universe.getNrOfAngles(), universe.getNrOfDihedralAngles()))
         molecules = universe.getMolecules(crosslinker_type)
