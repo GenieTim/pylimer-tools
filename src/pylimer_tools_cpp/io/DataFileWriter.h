@@ -3,6 +3,7 @@
 
 #include "../entities/Atom.h"
 #include "../entities/Universe.h"
+#include "../utils/LammpsAtomStyle.h"
 #include "../utils/StringUtils.h"
 #include <algorithm>
 #include <ctime>
@@ -46,6 +47,11 @@ namespace utils {
     void configAttemptImageReset(const bool doImageReset = true)
     {
       this->attemptImageReset = doImageReset;
+    }
+    void configAtomStyle(pylimer_tools::utils::AtomStyle atomStyle =
+                           pylimer_tools::utils::AtomStyle::ANGLE)
+    {
+      this->atomStyle = atomStyle;
     }
     void setCustomAtomFormat(const std::string atomFormat)
     {
@@ -235,6 +241,8 @@ namespace utils {
     bool reindexAtoms = false;
     bool moveIntoBox = false;
     bool attemptImageReset = false;
+    pylimer_tools::utils::AtomStyle atomStyle =
+      pylimer_tools::utils::AtomStyle::ANGLE;
     std::string customAtomFormat = "";
     std::vector<std::string> customAtomFormatAdditionalProperties;
     // functions
@@ -300,9 +308,19 @@ namespace utils {
       double z = this->conditionallyMoveCoordinateIntoBox(
         atom.getUnwrappedZ(box), box.getLowZ(), box.getHighZ());
       if (this->customAtomFormat.size() < 2) {
-        file << "\t" << atomId << "\t" << moleculeIdx << "\t" << atom.getType()
-             << "\t" << x << "\t" << y << "\t" << z << "\t" << nx << "\t" << ny
-             << "\t" << nz << "\n";
+        switch (this->atomStyle) {
+          case pylimer_tools::utils::AtomStyle::ANGLE:
+          case pylimer_tools::utils::AtomStyle::BOND:
+          case pylimer_tools::utils::AtomStyle::MOLECULAR:
+            file << "\t" << atomId << "\t" << moleculeIdx << "\t"
+                 << atom.getType() << "\t" << x << "\t" << y << "\t" << z
+                 << "\t" << nx << "\t" << ny << "\t" << nz << "\n";
+            break;
+          default:
+            throw std::runtime_error(
+              "This atom style is not yet supported for writing without you "
+              "supplying a custom atom format.")
+        }
       } else {
         std::string outputStr = this->customAtomFormat;
         outputStr = std::regex_replace(
@@ -338,7 +356,9 @@ namespace utils {
     }
     void writeAtoms(std::ofstream& file)
     {
-      file << "Atoms\n\n";
+      file << "Atoms # "
+           << pylimer_tools::utils::getAtomStyleString(this->atomStyle)
+           << "\n\n";
 
       this->oldNewAtomIdMap.reserve(this->universe.getNrOfAtoms());
       int nAtomsOutput = 0;

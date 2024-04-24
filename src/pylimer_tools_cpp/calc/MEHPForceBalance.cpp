@@ -345,9 +345,9 @@ namespace calc {
           wasInterrupted = true;
           break;
         }
-      } while (
-        currentResidual / initialResidual > xtol &&
-        iterationsDone<maxNrOfSteps&& this->initialConfig.nrOfSprings> 0);
+      } while (currentResidual / initialResidual > xtol &&
+               iterationsDone < maxNrOfSteps &&
+               this->initialConfig.nrOfSprings > 0);
 
       // finish up
       this->closeAllOutputs();
@@ -1132,8 +1132,18 @@ namespace calc {
                 true;
               atomToStrand.emplace(atom.getId(), springId);
               atomIdxInStrand.emplace(atom.getId(), atomIdx);
+            } else {
+              RUNTIME_EXP_IFN(
+                this->initialConfig.oldAtomIdToSpringIndex.at(atom.getId()) ==
+                  springId,
+                "The spring numbering seems incorrect. Placing slip-links will "
+                "lead to inappropriate placement.");
             }
           }
+          RUNTIME_EXP_IFN(this->initialConfig.springToMoleculeIds[springId] ==
+                            i,
+                          "The spring numbering seems incorrect. Placing "
+                          "slip-links will lead to inappropriate placement.");
           springId += 1;
         }
       }
@@ -4502,6 +4512,18 @@ namespace calc {
       return dist;
     }
 
+    /**
+     * @brief Compute the stress tensor on one cross- or slip-link
+     *
+     * @param linkIdx
+     * @param net
+     * @param u
+     * @param springPartitions
+     * @param debugNrSpringsVisited
+     * @param kappa0
+     * @param oneOverSpringPartitionUpperLimit
+     * @return Eigen::Matrix3d
+     */
     Eigen::Matrix3d MEHPForceBalance::evaluateStressOnLink(
       const size_t linkIdx,
       const ForceBalanceNetwork& net,
@@ -4608,6 +4630,14 @@ namespace calc {
       return force;
     }
 
+    /**
+     * @brief Get a vector of all springs
+     *
+     * @param net
+     * @param u
+     * @param is2D
+     * @return Eigen::VectorXd
+     */
     Eigen::VectorXd MEHPForceBalance::evaluateSpringVectors(
       const ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
@@ -4636,6 +4666,14 @@ namespace calc {
       return springDistances;
     }
 
+    /**
+     * @brief Evaluate the sum of the length of all partial springs per spring
+     *
+     * @param net
+     * @param u
+     * @param is2D
+     * @return Eigen::VectorXd
+     */
     Eigen::VectorXd MEHPForceBalance::evaluateSpringLengths(
       const ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
@@ -4657,6 +4695,12 @@ namespace calc {
       return springLengths;
     }
 
+    /**
+     * @brief Count the number of intra-chain slip-links
+     * i.e., slip-links that entangle a strand with itself
+     *
+     * @return int
+     */
     int MEHPForceBalance::getNumIntraChainSlipLinks() const
     {
       int result = 0;
@@ -4676,6 +4720,14 @@ namespace calc {
       return result;
     };
 
+    /**
+     * @brief Evaluate the vectors between the two ends of all partial springs
+     *
+     * @param net
+     * @param u
+     * @param is2D
+     * @return Eigen::VectorXd
+     */
     Eigen::VectorXd MEHPForceBalance::evaluatePartialSpringVectors(
       const ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
@@ -4707,6 +4759,10 @@ namespace calc {
 
     /**
      * FORCE BALANCE DATA ACCESS
+     */
+    /**
+     * @brief Convert the current network back into a universe, consisting only
+     * of cross-links
      */
     pylimer_tools::entities::Universe MEHPForceBalance::getCrosslinkerVerse()
       const
@@ -4761,6 +4817,20 @@ namespace calc {
       return xlinkUniverse;
     }
 
+    /**
+     * @brief Add slip-links to the current force-balance network
+     *
+     * @param strandIdx1
+     * @param strandIdx2
+     * @param x
+     * @param y
+     * @param z
+     * @param alpha1
+     * @param alpha2
+     * @param loops
+     * @param loopsOfSliplinks
+     * @param clampAlpha
+     */
     void MEHPForceBalance::addSlipLinks(
       const std::vector<size_t>& strandIdx1,
       const std::vector<size_t>& strandIdx2,

@@ -7,6 +7,7 @@
 #include <cassert>
 #include <cmath>
 #include <cstdlib>
+#include <unordered_map>
 // #include <iostream>
 #include <iterator>
 #include <vector>
@@ -34,6 +35,20 @@ namespace entities {
       this->nx = nx;
       this->ny = ny;
       this->nz = nz;
+    };
+
+    Atom(const long int id,
+         const int type,
+         const double x,
+         const double y,
+         const double z,
+         const int nx = 0,
+         const int ny = 0,
+         const int nz = 0,
+         std::unordered_map<std::string, double>& newExtraData)
+      : Atom(id, type, x, y, z, nx, ny, nz)
+    {
+      this->extraData = newExtraData;
     };
 
     bool operator==(const Atom& ref) const
@@ -137,11 +152,17 @@ namespace entities {
       return coords;
     }
 
+    std::unordered_map<std::string, double> getExtraData() const
+    {
+      return this->extraData;
+    }
+
   private:
     long int id;
     int type;
     double x, y, z;
     int nx, ny, nz;
+    std::unordered_map<std::string, double> extraData;
   };
 } // namespace entities
 } // namespace pylimer_tools

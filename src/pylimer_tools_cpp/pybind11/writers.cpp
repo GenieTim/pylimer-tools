@@ -65,6 +65,9 @@ init_pylimer_bound_writers(py::module_& m)
            Default: false.
       )pbdoc",
          py::arg("attemptImageReset") = true)
+    .def("configAtomStyle", &DataFileWriter::configAtomStyle, R"pbdoc(
+          Set the (LAMMPS) atom style to use for writing the atoms.
+     )pbdoc")
     .def("setCustomAtomFormat",
          &DataFileWriter::setCustomAtomFormat,
          R"pbdoc(
@@ -84,6 +87,9 @@ init_pylimer_bound_writers(py::module_& m)
           :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.setPropertyValue`
           as placeholders (as long as they are alphanumeric only; prefix in the format with '$' as well).
           Specifically useful if you need a different (or hybrid) atom style in LAMMPS.
+
+          Be sure to still call :func:`~pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configAtomStyle`,
+          so that the file can be read correctly again.
       )pbdoc",
          py::arg("atomFormat") =
            "\t$atomId\t$moleculeId\t$atomType\t$x\t$y\t$z\t$nx\t$ny\t$nz")

@@ -1,4 +1,5 @@
 #include "UniverseSequence.h"
+#include "../utils/LammpsAtomStyle.h"
 #include "../io/DataFileParser.h"
 #include "../io/DumpFileParser.h"
 #include "../utils/VectorUtils.h"
