@@ -2,6 +2,7 @@
 #define DATA_FILE_PARSER_H
 
 #include "../utils/StringUtils.h"
+#include "../utils/LammpsAtomStyle.h"
 #include <algorithm>
 #include <filesystem>
 #include <iostream>
@@ -12,37 +13,6 @@
 
 namespace pylimer_tools {
 namespace utils {
-
-  enum AtomStyle
-  {
-    NONE,
-    ANGLE,
-    ATOMIC,
-    BODY,
-    BOND,
-    CHARGE,
-    DIELECTRIC,
-    DIPOLE,
-    DPD,
-    EDPD,
-    ELECTRON,
-    ELLIPSOID,
-    FULL,
-    LINE,
-    MDPD,
-    MOLECULAR,
-    PERI,
-    SMD,
-    SPH,
-    SPHERE,
-    BPM_SPHERE,
-    SPIN,
-    TDPD,
-    TEMPLATE,
-    TRI,
-    WAVEPACKET,
-    HYBRID
-  };
 
   class DataFileParser
   {

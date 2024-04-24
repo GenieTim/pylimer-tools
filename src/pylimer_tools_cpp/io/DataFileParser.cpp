@@ -91,14 +91,12 @@ namespace utils {
 
     this->skipLinesToContains(line, file, "Atoms");
     // detect atom style; TODO: improve
-    if (line == "Atoms # angle") {
-      atomStyle = AtomStyle::ANGLE;
-    } else if (line == "Atoms # charge") {
-      atomStyle = AtomStyle::CHARGE;
-    } else if (line == "Atoms # full") {
-      atomStyle = AtomStyle::FULL;
+    std::string atomStyleString = pylimer_tools::utils::trim(
+      pylimer_tools::utils::removeAllRegex(line, "Atoms[ ]+#", true)
+    );
+    if (atomStyleString.size() > 2) {
+      atomStyle = pylimer_tools::utils::getAtomStyleFromString(atomStyleString);
     }
-
 
     // skip this line too
     if (!getline(file, line)) {

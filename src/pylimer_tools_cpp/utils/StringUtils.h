@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cstring>
 #include <iostream>
+#include <regex>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -37,6 +38,28 @@ namespace utils {
       }
     }
     return true;
+  }
+
+  static inline std::string removeAll(std::string& haystack, std::string needle)
+  {
+    std::string::size_type i = haystack.find(needle);
+    while (i != std::string::npos) {
+      haystack.erase(i, needle.length());
+      i = haystack.find(needle, i);
+    }
+
+    return haystack;
+  }
+
+  static inline std::string removeAllRegex(std::string& haystack,
+                                           std::string pattern,
+                                           bool caseInsensitive = false)
+  {
+    std::regex reg(pattern,
+                   caseInsensitive ? std::regex_constants::icase |
+                                       std::regex_constants::ECMAScript
+                                   : std::regex_constants::ECMAScript);
+    return std::regex_replace(haystack, reg, "");
   }
 
   static inline bool contains(const std::string& haystack,
