@@ -1,6 +1,7 @@
-#ifndef LAMMPS_ATOM_STYLE
-#define LAMMPS_ATOM_STYLE
+#ifndef LAMMPS_ATOM_STYLE_H
+#define LAMMPS_ATOM_STYLE_H
 
+#include <algorithm>
 #include <string>
 #include <vector>
 
@@ -37,21 +38,23 @@ namespace utils {
     HYBRID
   };
 
-  std::vector<std::string> AtomStyleString = {
-    "none",       "angle",      "atomic", "body",     "bond",
-    "charge",     "dielectric", "dipole", "dpd",      "edpd",
-    "electron",   "ellipsoid",  "full",   "line",     "mdpd",
-    "molecular",  "peri",       "smd",    "sph",      "sphere",
-    "bpm_sphere", "spin",       "tdpd",   "template", "tri",
-    "wavepacket", "hybrid"
-  };
-
-  std::string getAtomStyleString(AtomStyle type)
+  static inline std::vector<std::string> getAtomStyleStrings()
   {
-    return AtomStyleString[type];
+    return { "none",       "angle",      "atomic", "body",     "bond",
+             "charge",     "dielectric", "dipole", "dpd",      "edpd",
+             "electron",   "ellipsoid",  "full",   "line",     "mdpd",
+             "molecular",  "peri",       "smd",    "sph",      "sphere",
+             "bpm_sphere", "spin",       "tdpd",   "template", "tri",
+             "wavepacket", "hybrid" };
+  }
+  static inline std::string getAtomStyleString(AtomStyle type)
+  {
+    return getAtomStyleStrings()[type];
   }
 
-  AtomStyle getAtomStyleFromString(const std::string &src) {
+  static inline AtomStyle getAtomStyleFromString(const std::string& src)
+  {
+    std::vector<std::string> AtomStyleString = getAtomStyleStrings();
     auto it = std::find(AtomStyleString.begin(), AtomStyleString.end(), src);
     if (it != AtomStyleString.end()) {
       int index = it - AtomStyleString.begin();
