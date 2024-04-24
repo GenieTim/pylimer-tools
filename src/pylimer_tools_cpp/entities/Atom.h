@@ -37,18 +37,17 @@ namespace entities {
       this->nz = nz;
     };
 
-    Atom(const long int id,
-         const int type,
-         const double x,
-         const double y,
-         const double z,
-         const int nx = 0,
-         const int ny = 0,
-         const int nz = 0,
-         std::unordered_map<std::string, double>& newExtraData)
-      : Atom(id, type, x, y, z, nx, ny, nz)
+    Atom(std::unordered_map<std::string, double>& properties)
+      : Atom(static_cast<long int>(std::lround(properties["id"])),
+             static_cast<int>(std::rint(properties["type"])),
+             properties["x"],
+             properties["y"],
+             properties["z"],
+             static_cast<int>(std::rint(properties["nx"])),
+             static_cast<int>(std::rint(properties["ny"])),
+             static_cast<int>(std::rint(properties["nz"])))
     {
-      this->extraData = newExtraData;
+      this->extraData = properties;
     };
 
     bool operator==(const Atom& ref) const
@@ -155,6 +154,10 @@ namespace entities {
     std::unordered_map<std::string, double> getExtraData() const
     {
       return this->extraData;
+    }
+
+    double getProperty(std::string &property) const {
+      return this->extraData.at(property);
     }
 
   private:

@@ -257,14 +257,22 @@ namespace entities {
                                   std::to_string(vertexIdx) +
                                   ") does not exist");
     }
-    return Atom(igraphRealToInt<long int>(VAN(&this->graph, "id", vertexIdx)),
-                igraphRealToInt<int>(VAN(&this->graph, "type", vertexIdx)),
-                VAN(&this->graph, "x", vertexIdx),
-                VAN(&this->graph, "y", vertexIdx),
-                VAN(&this->graph, "z", vertexIdx),
-                VAN(&this->graph, "nx", vertexIdx),
-                VAN(&this->graph, "ny", vertexIdx),
-                VAN(&this->graph, "nz", vertexIdx));
+
+    igraph_strvector_t vnames;
+    igraph_strvector_init(&vnames, 1);
+    igraph_cattribute_list(
+      &this->graph, nullptr, nullptr, &vnames, nullptr, nullptr, nullptr);
+
+    // fetch all atom properties
+    std::unordered_map<std::string, double> atomProperties;
+    for (size_t i = 0; i < igraph_strvector_size(&vnames); ++i) {
+      atomProperties[igraph_strvector_get(&vnames, i)] = igraph_cattribute_VAN(
+        &this->graph, igraph_strvector_get(&vnames, i), vertexIdx);
+    }
+
+    igraph_strvector_destroy(&vnames);
+    
+    return Atom(atomProperties);
   }
 
   std::vector<Atom> AtomGraphParent::verticesToAtoms(

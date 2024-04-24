@@ -298,6 +298,9 @@ namespace entities {
       &this->graph, "nz", vertexIdx, replacement.getNZ());
     igraph_cattribute_VAN_set(
       &this->graph, "type", vertexIdx, replacement.getType());
+    for (const auto& [key, value] : replacement.getExtraData()) {
+      igraph_cattribute_VAN_set(&this->graph, key.c_str(), vertexIdx, value);
+    }
   }
 
   void Universe::removeAtoms(const std::vector<long int>& ids)
@@ -931,8 +934,8 @@ namespace entities {
           newAtomsMap.insert_or_assign(atomToAddOriginalId,
                                        newCrosslinkerVertexIdx);
           // additional loop check
-          long int originalNeighbourAtomId =
-            igraphRealToInt<long int>(igraph_cattribute_VAN(&graph, "id", atomToAddOriginalId));
+          long int originalNeighbourAtomId = igraphRealToInt<long int>(
+            igraph_cattribute_VAN(&graph, "id", atomToAddOriginalId));
           if (pylimer_tools::utils::graphHasVertexWithProperty(
                 chain, "id", originalNeighbourAtomId)) {
             isLoop = true;

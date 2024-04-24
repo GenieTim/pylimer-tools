@@ -319,7 +319,7 @@ namespace utils {
           default:
             throw std::runtime_error(
               "This atom style is not yet supported for writing without you "
-              "supplying a custom atom format.")
+              "supplying a custom atom format.");
         }
       } else {
         std::string outputStr = this->customAtomFormat;
