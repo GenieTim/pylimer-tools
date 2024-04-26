@@ -66,11 +66,11 @@ class TestEntities(UniverseUsingTestCase):
             self.assertEqual(molecule.getType(),
                              MoleculeType.FREE_CHAIN)
 
-        chains_with_crossLinker = universe.getChainsWithCrosslinker(2)
-        self.assertEqual(chains_with_crossLinker[0].getType(
+        chains_with_crosslinker = universe.getChainsWithCrosslinker(2)
+        self.assertEqual(chains_with_crosslinker[0].getType(
         ), MoleculeType.FREE_CHAIN)
         self.assertEqual(
-            chains_with_crossLinker[1].getType(), MoleculeType.DANGLING_CHAIN)
+            chains_with_crosslinker[1].getType(), MoleculeType.DANGLING_CHAIN)
         universe_clone = copy.copy(universe)
         self.assertEqual(universe.getNrOfAtoms(),
                          universe_clone.getNrOfAtoms())

@@ -636,7 +636,7 @@ init_pylimer_bound_calc(py::module_& m)
                 py::arg("min_nr_of_slip_links") = 0,
                 py::arg("same_strand_cutoff") = 3,
                 py::arg("seed") = "",
-                py::arg("crossLinker_type") = 2,
+                py::arg("crosslinker_type") = 2,
                 py::arg("is_2D") = false,
                 py::arg("kappa") = 1.0)
     .def_property_readonly("network", &mehp::MEHPForceBalance::getNetwork)
@@ -1065,7 +1065,7 @@ init_pylimer_bound_calc(py::module_& m)
           The results should be compareable to the force relaxation code.
          )pbdoc",
                 py::arg("universe"),
-                py::arg("crossLinker_type") = 2,
+                py::arg("crosslinker_type") = 2,
                 py::arg("is_2D") = false,
                 py::arg("kappa") = 1.0)
     .def_static("constructWithSlipLinks",
@@ -1084,7 +1084,7 @@ init_pylimer_bound_calc(py::module_& m)
                 py::arg("z"),
                 py::arg("alpha1"),
                 py::arg("alpha2"),
-                py::arg("crossLinker_type") = 2,
+                py::arg("crosslinker_type") = 2,
                 py::arg("is_2D") = false,
                 py::arg("kappa") = 1.0,
                 py::arg("clampAlpha") = false)
@@ -1099,7 +1099,7 @@ init_pylimer_bound_calc(py::module_& m)
                 py::arg("min_nr_of_slip_links") = 0,
                 py::arg("same_strand_cutoff") = 2,
                 py::arg("seed") = "",
-                py::arg("crossLinker_type") = 2,
+                py::arg("crosslinker_type") = 2,
                 py::arg("is_2D") = false,
                 py::arg("kappa") = 1.0)
     .def("__copy__",
@@ -1414,7 +1414,7 @@ init_pylimer_bound_calc(py::module_& m)
                   const std::string>(),
          "Get an instance of this class",
          py::arg("universe"),
-         py::arg("crossLinker_type") = 2,
+         py::arg("crosslinker_type") = 2,
          py::arg("slipspring_bond_type") = 9,
          py::arg("is_2D") = false,
          py::arg("seed") = "")

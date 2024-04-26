@@ -634,7 +634,7 @@ class DPDSimulator:
                   Read a restart file in order to continue a simulation.
         """
 
-    def __init__(self, universe: Universe, crossLinker_type: int = 2, slipspring_bond_type: int = 9, is_2D: bool = False, seed: str = '') -> None:
+    def __init__(self, universe: Universe, crosslinker_type: int = 2, slipspring_bond_type: int = 9, is_2D: bool = False, seed: str = '') -> None:
         """
         Get an instance of this class
         """
@@ -1298,7 +1298,7 @@ class MEHPForceBalance:
 
     """
     @staticmethod
-    def constructWithRandomSlipLinks(universe: Universe, nr_of_slip_links_to_sample: int, acceptable_cutoff: float = 1.2, min_nr_of_slip_links: int = 0, same_strand_cutoff: float = 3, seed: str = '', crossLinker_type: int = 2, is_2D: bool = False, kappa: float = 1.0) -> MEHPForceBalance:
+    def constructWithRandomSlipLinks(universe: Universe, nr_of_slip_links_to_sample: int, acceptable_cutoff: float = 1.2, min_nr_of_slip_links: int = 0, same_strand_cutoff: float = 3, seed: str = '', crosslinker_type: int = 2, is_2D: bool = False, kappa: float = 1.0) -> MEHPForceBalance:
         """
                   Instantiate this simulator with randomly chosen slip-links.
         """
@@ -1607,12 +1607,12 @@ class MEHPForceBalance2:
 
     """
     @staticmethod
-    def constructWithRandomSlipLinks(universe: Universe, nr_of_slip_links_to_sample: int, acceptable_cutoff: float = 1.2, min_nr_of_slip_links: int = 0, same_strand_cutoff: float = 2, seed: str = '', crossLinker_type: int = 2, is_2D: bool = False, kappa: float = 1.0) -> MEHPForceBalance2:
+    def constructWithRandomSlipLinks(universe: Universe, nr_of_slip_links_to_sample: int, acceptable_cutoff: float = 1.2, min_nr_of_slip_links: int = 0, same_strand_cutoff: float = 2, seed: str = '', crosslinker_type: int = 2, is_2D: bool = False, kappa: float = 1.0) -> MEHPForceBalance2:
         """
                   Instantiate this simulator with randomly chosen slip-links.
         """
     @staticmethod
-    def constructWithSlipLinks(universe: Universe, strandIdx1: list[int], strandIdx2: list[int], x: list[float], y: list[float], z: list[float], alpha1: list[float], alpha2: list[float], crossLinker_type: int = 2, is_2D: bool = False, kappa: float = 1.0, clampAlpha: bool = False) -> MEHPForceBalance2:
+    def constructWithSlipLinks(universe: Universe, strandIdx1: list[int], strandIdx2: list[int], x: list[float], y: list[float], z: list[float], alpha1: list[float], alpha2: list[float], crosslinker_type: int = 2, is_2D: bool = False, kappa: float = 1.0, clampAlpha: bool = False) -> MEHPForceBalance2:
         """
                   Instantiate this simulator with slip-links (specified by their positions, etc.).
 
@@ -1620,7 +1620,7 @@ class MEHPForceBalance2:
                        The box offset (i.e., the PBC) might not work as needed yet.
         """
     @staticmethod
-    def constructWithoutSlipLinks(universe: Universe, crossLinker_type: int = 2, is_2D: bool = False, kappa: float = 1.0) -> MEHPForceBalance2:
+    def constructWithoutSlipLinks(universe: Universe, crosslinker_type: int = 2, is_2D: bool = False, kappa: float = 1.0) -> MEHPForceBalance2:
         """
                   Instantiate this simulator without slip-links (fully phantom).
 
