@@ -90,12 +90,14 @@ namespace utils {
     } while (getline(file, line));
 
     this->skipLinesToContains(line, file, "Atoms");
-    // detect atom style; TODO: improve
-    std::string atomStyleString = pylimer_tools::utils::trim(
-      pylimer_tools::utils::removeAllRegex(line, "Atoms[ ]+#", true)
-    );
-    if (atomStyleString.size() > 2) {
-      atomStyle = pylimer_tools::utils::getAtomStyleFromString(atomStyleString);
+    // detect atom style
+    if (pylimer_tools::utils::contains(line, "#")) {
+      std::string atomStyleString = pylimer_tools::utils::trim(
+        pylimer_tools::utils::removeAllRegex(line, "Atoms[ ]+#", true));
+      if (atomStyleString.size() > 2) {
+        atomStyle =
+          pylimer_tools::utils::getAtomStyleFromString(atomStyleString);
+      }
     }
 
     // skip this line too
@@ -124,7 +126,10 @@ namespace utils {
           this->readAtomHybrid(line, atomStyle2, atomStyle3);
           break;
         default:
-          throw std::invalid_argument("This atom style is not supported yet.");
+          throw std::invalid_argument(
+            "This atom style (" +
+            pylimer_tools::utils::getAtomStyleString(atomStyle) +
+            ") is not supported yet.");
           break;
       }
 
