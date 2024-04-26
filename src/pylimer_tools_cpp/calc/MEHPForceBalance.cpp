@@ -108,9 +108,8 @@ namespace calc {
                                                  this->currentDisplacements,
                                                  oneOverSpringPartitions);
       const double minN = this->initialConfig.springsContourLength.minCoeff();
-      std::cout << "Starting force balance procedure "
-                << "with " << initialResidual
-                << " as initial residual, got requested "
+      std::cout << "Starting force balance procedure " << "with "
+                << initialResidual << " as initial residual, got requested "
                 << initialResidualToUse
                 // "with " << independentVertexSets.size() << "vertex sets."
                 << std::endl;
@@ -1086,8 +1085,6 @@ namespace calc {
       // slip-links on
       std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
         this->universe.getChainsWithCrosslinker(crosslinkerType);
-      std::vector<size_t> usableSpringIdxs;
-      usableSpringIdxs.reserve(crosslinkerChains.size());
       bool danglingChainsAreKept =
         this->initialConfig.nrOfNodes >
         this->universe.getAtomsOfType(crosslinkerType).size();
@@ -1118,7 +1115,6 @@ namespace calc {
              danglingChainsAreKept)) {
           assert(i == this->initialConfig.springToMoleculeIds[springId]);
           // TODO: also check that this is not a higher order dangling strand
-          usableSpringIdxs.push_back(i);
           nrOfEligibleAtoms +=
             crosslinkerChains[i].getNrOfAtoms() -
             crosslinkerChains[i].getAtomsOfType(this->crosslinkerType).size();
@@ -1132,7 +1128,6 @@ namespace calc {
                 true;
               atomToStrand.emplace(atom.getId(), springId);
               atomIdxInStrand.emplace(atom.getId(), atomIdx);
-            } else {
               RUNTIME_EXP_IFN(
                 this->initialConfig.oldAtomIdToSpringIndex.at(atom.getId()) ==
                   springId,
@@ -3698,9 +3693,8 @@ namespace calc {
       }
       if (rotations >= 5) {
         std::cerr << "Could not rotate slip-link " << slipLinkIdx
-                  << " back to initial spring. "
-                  << "Initial spring was " << fullSpringIdx
-                  << ", whereas current springs are "
+                  << " back to initial spring. " << "Initial spring was "
+                  << fullSpringIdx << ", whereas current springs are "
                   << pylimer_tools::utils::join(
                        net.springIndicesOfLinks[slipLinkIdx].begin(),
                        net.springIndicesOfLinks[slipLinkIdx].end(),
@@ -3984,7 +3978,10 @@ namespace calc {
       double oneOverSpringPartitionUpperLimit,
       bool respectLoops)
     {
-      // this->validateNetwork(net, u, springPartitions);
+#ifndef NDEBUG
+      this->validateNetwork(net, u, springPartitions);
+#endif
+
       for (size_t springIdx = 0; springIdx < net.nrOfSprings; ++springIdx) {
         if (net.linkIndicesOfSprings[springIdx].size() <= 2) {
           // no need to handle springs without slip-links
@@ -4034,6 +4031,14 @@ namespace calc {
                 this->swapSlipLinks(net, partialSpringIdx);
                 // this->validateNetwork(net, u, springPartitions);
               }
+#ifndef NDEBUG
+              try {
+                this->validateNetwork(net, u, springPartitions);
+              } catch (const std::runtime_error& e) {
+                std::cerr << "Validation error: " << e.what() << std::endl;
+                assert(false);
+              }
+#endif
             }
           }
         }
@@ -4253,8 +4258,6 @@ namespace calc {
                          "Cannot swap link with itself: got " +
                            std::to_string(linkIdx1) + " and " +
                            std::to_string(linkIdx2) + ".");
-      // std::cout << "Swapping link " << linkIdx1 << " and " << linkIdx2
-      //           << std::endl;
       INVALIDARG_EXP_IFN(
         net.linkIsSliplink[linkIdx1],
         "Only partial springs with only slip-links allow swapping.");
@@ -4277,6 +4280,13 @@ namespace calc {
         this->getOtherEnd(net, otherPartialOfLinkIdx1, linkIdx1);
       const size_t unaffectedEnd2 =
         this->getOtherEnd(net, otherPartialOfLinkIdx2, linkIdx2);
+
+      std::cout << "Swapping link " << linkIdx1 << " and " << linkIdx2
+                << " on partial spring " << partialSpringIdx
+                << ". Newly linked partial springs: " << otherPartialOfLinkIdx1
+                << " (" << unaffectedEnd1 << ") " << " and "
+                << otherPartialOfLinkIdx2 << " (" << unaffectedEnd2 << ") "
+                << std::endl;
 
       Eigen::VectorXd u = Eigen::VectorXd::Zero(net.coordinates.size());
       Eigen::Vector3d distanceBefore =
@@ -4360,21 +4370,28 @@ namespace calc {
       //           1]);
 
       if (net.linkIndicesOfSprings[springIdx][firstPositionInSpring] ==
-          linkIdx1) {
+            linkIdx1 &&
+          net.linkIndicesOfSprings[springIdx][firstPositionInSpring + 1] ==
+            linkIdx2) {
         net.linkIndicesOfSprings[springIdx][firstPositionInSpring] = linkIdx2;
         net.linkIndicesOfSprings[springIdx][firstPositionInSpring + 1] =
           linkIdx1;
       } else {
         RUNTIME_EXP_IFN(
           net.linkIndicesOfSprings[springIdx][firstPositionInSpring] ==
-            linkIdx2,
+              linkIdx2 &&
+            net.linkIndicesOfSprings[springIdx][firstPositionInSpring + 1] ==
+              linkIdx1,
           "Required assumption apparently not met.");
         net.linkIndicesOfSprings[springIdx][firstPositionInSpring] = linkIdx1;
         net.linkIndicesOfSprings[springIdx][firstPositionInSpring + 1] =
           linkIdx2;
       }
 
-      if (!this->assumeBoxLargeEnough) {
+      if (!this->assumeBoxLargeEnough &&
+          // we don't handle the primary loops well yet
+          (linkIdx2 != unaffectedEnd2 && linkIdx2 != unaffectedEnd1 &&
+           linkIdx1 != unaffectedEnd1 && linkIdx1 != unaffectedEnd2)) {
         Eigen::Vector3d distanceAfter =
           this->evaluatePartialSpringDistanceFrom(
             net, u, otherPartialOfLinkIdx1, unaffectedEnd1, this->is2D) +
@@ -4383,7 +4400,8 @@ namespace calc {
           this->evaluatePartialSpringDistanceTo(
             net, u, partialSpringIdx, linkIdx1, this->is2D);
 
-        assert(distanceAfter.isApprox(distanceBefore));
+        assert(pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
+          distanceAfter, distanceBefore));
       }
     }
 
