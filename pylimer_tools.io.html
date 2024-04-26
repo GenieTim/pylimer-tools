@@ -512,6 +512,14 @@ to restore the original sections.</p>
 <p>UnitStyle: a collection of units of a particular LAMMPS unit style,
 but in SI units
 (i.e.: use this to convert your LAMMPS output data to SI units).</p>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">unit_style_factory</span> <span class="o">=</span> <span class="n">UnitStyleFactory</span><span class="p">()</span>
+<span class="n">unit_style</span> <span class="o">=</span> <span class="n">unit_style_factory</span><span class="o">.</span><span class="n">get_unit_style</span><span class="p">(</span>
+    <span class="s2">&quot;lj&quot;</span><span class="p">,</span> <span class="n">polymer</span><span class="o">=</span><span class="s2">&quot;pdms&quot;</span><span class="p">,</span> <span class="n">warning</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">accept_mol</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">lj_stress_to_si_conversion_factor</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">*</span><span class="n">unit_style</span><span class="o">.</span><span class="n">pressure</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;MPa&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">magnitude</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools.io.unit_styles.UnitStyle.get_base_unit_of">
 <span class="sig-name descname"><span class="pre">get_base_unit_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">property</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.io.unit_styles.UnitStyle.get_base_unit_of" title="Link to this definition">¶</a></dt>

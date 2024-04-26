@@ -274,6 +274,9 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList.getAtomsCloseTo" title="pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList.getAtomsCloseTo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">getAtomsCloseTo</span></code></a>(self, atom[, upperCutoff, ...])</p></td>
 <td><p>List all atoms that are close to a given one.</p></td>
 </tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList.removeAtom" title="pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList.removeAtom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">removeAtom</span></code></a>(self, atom[, debug_hint])</p></td>
+<td><p></p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -288,6 +291,11 @@ new NeighbourList if you require a different cutoff, depending on your use case.
 <p>You can use a negative value for the newCutoff to use the cutoff used for
 filling the neighbour list buckets.</p>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList.removeAtom">
+<span class="sig-name descname"><span class="pre">removeAtom</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList" title="pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">atom</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.pylimer_tools_cpp.Atom.html#pylimer_tools_cpp.pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.pylimer_tools_cpp.Atom</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug_hint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList.removeAtom" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -351,6 +359,7 @@ filling the neighbour list buckets.</p>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList"><code class="docutils literal notranslate"><span class="pre">NeighbourList</span></code></a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList.__init__"><code class="docutils literal notranslate"><span class="pre">NeighbourList.__init__()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList.getAtomsCloseTo"><code class="docutils literal notranslate"><span class="pre">NeighbourList.getAtomsCloseTo()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.pylimer_tools_cpp.NeighbourList.removeAtom"><code class="docutils literal notranslate"><span class="pre">NeighbourList.removeAtom()</span></code></a></li>
 </ul>
 </li>
 </ul>
