@@ -6001,8 +6001,7 @@ namespace calc {
              (net.springPartIndexB[partialSpringIdx] == partner0 &&
               net.springPartIndexA[partialSpringIdx] == partner1)),
             "Expect linkIndicesOfSprings and localToGlobalSpringIndex "
-            "ordering "
-            "to correspond. Got partner0 = " +
+            "ordering to correspond. Got partner0 = " +
               std::to_string(partner0) + ", partner1 = " +
               std::to_string(partner1) + " vs. springs part indices " +
               std::to_string(net.springPartIndexA[partialSpringIdx]) + " and " +
@@ -6125,7 +6124,7 @@ namespace calc {
           RUNTIME_EXP_IFN(
             net.springPartCoordinateIndexB[3 * i + dir] ==
               3 * partialEndB + dir,
-            "Spring part index and coordinate index must match.Got " +
+            "Spring part index and coordinate index must match. Got " +
               std::to_string(net.springPartCoordinateIndexB[3 * i + dir]) +
               " but expected " + std::to_string(3 * partialEndB + dir) +
               " with dir = " + std::to_string(dir) + ".");
