@@ -143,7 +143,7 @@ namespace calc {
         for (size_t link_idx = 0; link_idx < igraph_vcount(&this->graph);
              ++link_idx) {
           if (castToIgraphInt(igraph_cattribute_VAN(
-                &this->graph, "type", link_idx)) != this->crosslinkerType) {
+                &this->graph, "type", link_idx)) != this->crossLinkerType) {
             continue;
           }
           double distanceMoved = this->displaceToMeanPosition(
@@ -806,7 +806,7 @@ namespace calc {
       if (parent1 != parent2) {
         // std::cout << "Merging " << parent1 << " & " << parent2 << std::endl;
         assert(castToIgraphInt(igraph_cattribute_VAN(
-                 &this->graph, "type", centralLink)) == this->crosslinkerType);
+                 &this->graph, "type", centralLink)) == this->crossLinkerType);
         // two different "parent" springs -> need to recalculate some stuff
         // probably only if link is cross-link
         this->combineParentSprings(std::max(parent1, parent2),
@@ -2300,7 +2300,7 @@ namespace calc {
         pylimer_tools::entities::Universe(this->universe.getBox());
       std::vector<long int> ids;
       std::vector<int> types = pylimer_tools::utils::initializeWithValue(
-        this->net.nrOfNodes, crosslinkerType);
+        this->net.nrOfNodes, crossLinkerType);
       std::vector<double> x;
       std::vector<double> y;
       std::vector<double> z;
@@ -2315,10 +2315,10 @@ namespace calc {
         y.push_back(this->net.coordinates[3 * i + 1]);
         z.push_back(this->net.coordinates[3 * i + 2]);
         ids.push_back(this->net.oldAtomIds[i]);
-        // override type, since the types may be different from crosslinkerType
+        // override type, since the types may be different from crossLinkerType
         // if converted with dangling chains
         types[i] = this->net.linkIsSliplink[i] ? this->slipLinkType
-                                               : this->crosslinkerType;
+                                               : this->crossLinkerType;
       }
       xlinkUniverse.addAtoms(ids, types, x, y, z, zeros, zeros, zeros);
       std::vector<long int> bondFrom;

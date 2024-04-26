@@ -79,9 +79,9 @@ namespace utils {
     {
       this->moleculeIdxSwappable = includeSwap;
     }
-    void configCrosslinkerType(const int crosslinkerType)
+    void configCrosslinkerType(const int crossLinkerType)
     {
-      this->crosslinkerType = crosslinkerType;
+      this->crossLinkerType = crossLinkerType;
     }
     void configReindexAtoms(const bool reindex = true)
     {
@@ -237,7 +237,7 @@ namespace utils {
     bool includeAngles = true;
     bool includeDihedralAngles = true;
     bool moleculeIdxSwappable = false;
-    int crosslinkerType = 2;
+    int crossLinkerType = 2;
     bool reindexAtoms = false;
     bool moveIntoBox = false;
     bool attemptImageReset = false;
@@ -364,24 +364,24 @@ namespace utils {
       int nAtomsOutput = 0;
 
       // to support molecule idxs, we need to adjust the order of atoms output
-      // first, we output the crosslinker beads
-      std::vector<pylimer_tools::entities::Atom> crosslinkers =
-        this->universe.getAtomsOfType(this->crosslinkerType);
-      for (const pylimer_tools::entities::Atom& crosslinker : crosslinkers) {
+      // first, we output the crossLinker beads
+      std::vector<pylimer_tools::entities::Atom> crossLinkers =
+        this->universe.getAtomsOfType(this->crossLinkerType);
+      for (const pylimer_tools::entities::Atom& crossLinker : crossLinkers) {
         nAtomsOutput += 1;
-        this->writeAtom(file, crosslinker, 0, nAtomsOutput);
+        this->writeAtom(file, crossLinker, 0, nAtomsOutput);
       }
 
       // then, we can output all others
       int nMoleculesOutput = 0;
       std::vector<pylimer_tools::entities::Molecule> molecules =
-        this->universe.getMolecules(this->crosslinkerType);
+        this->universe.getMolecules(this->crossLinkerType);
       for (pylimer_tools::entities::Molecule molecule : molecules) {
         // image flag reset attempt might not be the best yet?
         std::vector<pylimer_tools::entities::Atom> atoms =
           (this->moleculeIdxSwappable || this->attemptImageReset)
             ? molecule.getAtomsLinedUp(
-                this->crosslinkerType, this->attemptImageReset, false)
+                this->crossLinkerType, this->attemptImageReset, false)
             : molecule.getAtoms();
         nMoleculesOutput += 1;
 

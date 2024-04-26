@@ -9,7 +9,7 @@ namespace calc {
 
     /*
     Compute the stoichiometric inbalance
-    ( nr. of bonds formable of crosslinker / nr. of formable bonds of precursor
+    ( nr. of bonds formable of crossLinker / nr. of formable bonds of precursor
     )
 
     NOTE:
@@ -18,12 +18,12 @@ namespace calc {
 
     Arguments:
       - network: the poylmer network to do the computation for
-      - crosslinkerType: the type of the junctions/crosslinkers to select them
+      - crossLinkerType: the type of the junctions/crossLinkers to select them
     in the network
       - strandLength: the length of the network strands (in nr. of beads).
               Used to infer the number of precursor strands.
               If `None`: will use average length of each connected system when
-    ignoring the crosslinkers.
+    ignoring the crossLinkers.
       - functionalityPerType: a dictionary with key: type, and value:
     functionality of this atom type. If `None`: will use max functionality per
     type.
@@ -33,7 +33,7 @@ namespace calc {
     */
     double computeStoichiometricInbalance(
       pylimer_tools::entities::Universe network,
-      int crosslinkerType,
+      int crossLinkerType,
       int strandLength,
       std::map<int, int> functionalityPerType)
     {
@@ -44,20 +44,20 @@ namespace calc {
 
       std::vector<int> allTypes = network.getPropertyValues<int>("type");
 
-      int crosslinkerFormableBonds = 0;
+      int crossLinkerFormableBonds = 0;
       int otherFormableBonds = 0;
 
       // count how often every type occurs
       for (int type : allTypes) {
-        if (type == crosslinkerType) {
-          crosslinkerFormableBonds += functionalityPerType[crosslinkerType];
+        if (type == crossLinkerType) {
+          crossLinkerFormableBonds += functionalityPerType[crossLinkerType];
         } else {
           otherFormableBonds += functionalityPerType[type];
         }
       }
 
       // division by 2 is implicit
-      return crosslinkerFormableBonds / (otherFormableBonds / strandLength);
+      return crossLinkerFormableBonds / (otherFormableBonds / strandLength);
     }
 
     /**
@@ -110,7 +110,7 @@ namespace calc {
     Arguments:
       - r (double): the stoichiometric inbalance of reactants (see:
     #computeStoichiometricInbalance)
-      - f (int): functionality of the crosslinkers
+      - f (int): functionality of the crossLinkers
       - g (int): functionality of the precursor polymer
 
     Returns:

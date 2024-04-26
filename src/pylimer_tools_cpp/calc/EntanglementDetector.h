@@ -40,7 +40,7 @@ namespace calc {
      * @param sameStrandCutoff the number of beads required between two atoms of
      * the same strand
      * @param seed the random seed
-     * @param crosslinkerType the type of the cross-link atoms
+     * @param crossLinkerType the type of the cross-link atoms
      * @return AtomPairEntanglements
      */
     AtomPairEntanglements randomlyFindEntanglements(
@@ -50,7 +50,7 @@ namespace calc {
       const size_t minimumNrOfSliplinks,
       const double sameStrandCutoff = 3,
       const std::string& seed = "",
-      int crosslinkerType = 2);
+      int crossLinkerType = 2);
 
   }
 

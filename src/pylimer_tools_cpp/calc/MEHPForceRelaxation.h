@@ -28,7 +28,7 @@ namespace calc {
 
     public:
       MEHPForceRelaxation(const pylimer_tools::entities::Universe& u,
-                          int crosslinkerType = 2,
+                          int crossLinkerType = 2,
                           bool is2D = false,
                           MEHPForceEvaluator* forceEvaluator = nullptr,
                           double kappa = 1.0,
@@ -40,15 +40,15 @@ namespace calc {
           this->springForceEvaluator = SimpleSpringMEHPForceEvaluator(kappa);
           forceEvaluator = &this->springForceEvaluator;
         }
-        this->crosslinkerType = crosslinkerType;
+        this->crossLinkerType = crossLinkerType;
         this->defaultR0Squared =
-          universe.computeMeanSquareEndToEndDistance(crosslinkerType);
+          universe.computeMeanSquareEndToEndDistance(crossLinkerType);
         this->defaultNrOfChains =
-          universe.getMolecules(this->crosslinkerType).size();
+          universe.getMolecules(this->crossLinkerType).size();
         // interpret network already to be able to give early results
         Network net;
         ConvertNetwork(&net,
-                       crosslinkerType,
+                       crossLinkerType,
                        remove2functionalCrosslinkers,
                        removeDanglingChains);
         this->forceRelaxationNetwork = net;
@@ -417,17 +417,17 @@ namespace calc {
        * @brief Convert the universe to a network
        *
        * @param net the target network
-       * @param crosslinkerType the atom type of the crosslinker
+       * @param crossLinkerType the atom type of the crossLinker
        * @return true
        * @return false
        */
       bool ConvertNetwork(Network* net,
-                          const int crosslinkerType = 2,
+                          const int crossLinkerType = 2,
                           bool remove2functionalCrosslinkers = false,
                           bool removeDanglingChains = false)
       {
         std::vector<pylimer_tools::entities::Atom> xlinkers =
-          this->universe.getAtomsOfType(crosslinkerType);
+          this->universe.getAtomsOfType(crossLinkerType);
 
         if (remove2functionalCrosslinkers) {
           for (pylimer_tools::entities::Atom xlinker : xlinkers) {
@@ -436,57 +436,57 @@ namespace calc {
             size_t vertexId = this->universe.getIdxByAtomId(xlinker.getId());
             if (this->universe.computeFunctionalityForVertex(vertexId) <= 2) {
               this->universe.setPropertyValue(
-                vertexId, "type", crosslinkerType - 1);
+                vertexId, "type", crossLinkerType - 1);
             }
           }
-          xlinkers = this->universe.getAtomsOfType(crosslinkerType);
+          xlinkers = this->universe.getAtomsOfType(crossLinkerType);
         }
 
-        std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
-          this->universe.getChainsWithCrosslinker(crosslinkerType);
+        std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
+          this->universe.getChainsWithCrosslinker(crossLinkerType);
 
         // need to include all but dangling and free chains in order to
         // model entanglement
         size_t nrOfSprings = 0;
         size_t omittedChainsAtoms = 0;
-        for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
+        for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
           std::vector<pylimer_tools::entities::Atom> endAtoms =
-            crosslinkerChains[i].getAtomsOfType(crosslinkerType);
-          RUNTIME_EXP_IFN(crosslinkerChains[i].getType() !=
+            crossLinkerChains[i].getAtomsOfType(crossLinkerType);
+          RUNTIME_EXP_IFN(crossLinkerChains[i].getType() !=
                             pylimer_tools::entities::MoleculeType::UNDEFINED,
                           "Cross-linker chain's chain type could not be "
                           "detected. Cannot work like that.");
-          if (crosslinkerChains[i].getType() ==
+          if (crossLinkerChains[i].getType() ==
                 pylimer_tools::entities::MoleculeType::NETWORK_STRAND ||
-              crosslinkerChains[i].getType() ==
+              crossLinkerChains[i].getType() ==
                 pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
             nrOfSprings += 1;
           } else if (!removeDanglingChains &&
-                     crosslinkerChains[i].getType() ==
+                     crossLinkerChains[i].getType() ==
                        pylimer_tools::entities::MoleculeType::DANGLING_CHAIN) {
             std::vector<pylimer_tools::entities::Atom> endAtoms =
-              crosslinkerChains[i].getAtomsOfDegree(1);
+              crossLinkerChains[i].getAtomsOfDegree(1);
             RUNTIME_EXP_IFN(endAtoms.size() == 2,
                             "Expected a dangling chain to have two ends, got " +
                               std::to_string(endAtoms.size()) + ".");
-            assert(XOR(endAtoms[0].getType() == crosslinkerType,
-                       endAtoms[1].getType() == crosslinkerType));
+            assert(XOR(endAtoms[0].getType() == crossLinkerType,
+                       endAtoms[1].getType() == crossLinkerType));
 
             pylimer_tools::entities::Atom newXlink =
-              (endAtoms[0].getType() == crosslinkerType) ? endAtoms[1]
+              (endAtoms[0].getType() == crossLinkerType) ? endAtoms[1]
                                                          : endAtoms[0];
             xlinkers.push_back(newXlink);
             nrOfSprings += 1;
           } else {
             // assert(endAtoms.size() == 0); // can also be
             omittedChainsAtoms +=
-              (crosslinkerChains[i].getNrOfAtoms() - endAtoms.size());
+              (crossLinkerChains[i].getNrOfAtoms() - endAtoms.size());
           }
         }
 
         size_t nrOfXlinks = xlinkers.size();
 
-        // crosslinkerUniverse.simplify();
+        // crossLinkerUniverse.simplify();
         pylimer_tools::entities::Box box = this->universe.getBox();
         net->L[0] = box.getLx();
         net->L[1] = box.getLy();
@@ -525,13 +525,13 @@ namespace calc {
 
         // convert springs
         size_t spring_idx = 0;
-        for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
+        for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
           std::vector<pylimer_tools::entities::Atom> xlinkersOfChain =
-            crosslinkerChains[i].getAtomsOfType(crosslinkerType);
+            crossLinkerChains[i].getAtomsOfType(crossLinkerType);
           long int nodeIdxFrom;
           long int nodeIdxTo;
           bool addChain = false;
-          if (crosslinkerChains[i].getType() ==
+          if (crossLinkerChains[i].getType() ==
               pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
             assert(xlinkersOfChain.size() == 2);
             addChain = true;
@@ -540,8 +540,8 @@ namespace calc {
 
             // spring contour length = nr of bonds between two cross-linkers
             net->springsContourLength[spring_idx] =
-              crosslinkerChains[i].getNrOfBonds();
-          } else if (crosslinkerChains[i].getType() ==
+              crossLinkerChains[i].getNrOfBonds();
+          } else if (crossLinkerChains[i].getType() ==
                      pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
             assert(xlinkersOfChain.size() == 1 ||
                    (xlinkersOfChain.size() == 2 &&
@@ -552,21 +552,21 @@ namespace calc {
             addChain = true;
 
             net->springsContourLength[spring_idx] =
-              crosslinkerChains[i].getNrOfBonds();
-          } else if (crosslinkerChains[i].getType() ==
+              crossLinkerChains[i].getNrOfBonds();
+          } else if (crossLinkerChains[i].getType() ==
                        pylimer_tools::entities::MoleculeType::DANGLING_CHAIN &&
                      !removeDanglingChains) {
             // to keep dangling chains, we convert the trailing atom to a
             // cross-link
             assert(xlinkersOfChain.size() == 1);
             std::vector<pylimer_tools::entities::Atom> endsOfChain =
-              crosslinkerChains[i].getAtomsOfDegree(1);
+              crossLinkerChains[i].getAtomsOfDegree(1);
             assert(endsOfChain.size() == 2);
 
             nodeIdxFrom = atomIdToNode.at(endsOfChain[0].getId());
             nodeIdxTo = atomIdToNode.at(endsOfChain[1].getId());
             net->springsContourLength[spring_idx] =
-              crosslinkerChains[i].getNrOfBonds();
+              crossLinkerChains[i].getNrOfBonds();
             addChain = true;
           }
 
@@ -575,9 +575,9 @@ namespace calc {
               std::swap(nodeIdxFrom, nodeIdxTo);
             }
             std::vector<pylimer_tools::entities::Atom> allChainAtoms =
-              crosslinkerChains[i].getAtomsLinedUp();
+              crossLinkerChains[i].getAtomsLinedUp();
             targetDistances.segment(3 * spring_idx, 3) =
-              crosslinkerChains[i].getOverallBondSum(crosslinkerType);
+              crossLinkerChains[i].getOverallBondSum(crossLinkerType);
 
             if (atomIdToNode.at(allChainAtoms[0].getId()) == nodeIdxTo) {
               targetDistances.segment(3 * spring_idx, 3) *= -1;
@@ -621,14 +621,14 @@ namespace calc {
 
         // check whether spring contour lengths are what we want them to be
         size_t numCrosslinkers = xlinkers.size();
-        // this->universe.countPropertyValue<int>("type", crosslinkerType);
+        // this->universe.countPropertyValue<int>("type", crossLinkerType);
         assert((net->springsContourLength.array() -
                 Eigen::ArrayXd::Ones(net->nrOfSprings))
                    .sum() +
                  omittedChainsAtoms + numCrosslinkers ==
                this->universe.getNrOfAtoms());
 
-        return true; // crosslinkerUniverse.getNrOfBonds() == net->nrOfSprings;
+        return true; // crossLinkerUniverse.getNrOfBonds() == net->nrOfSprings;
       };
 
       /**
@@ -874,7 +874,7 @@ namespace calc {
       int defaultNrOfChains = 0;
       double defaultR0Squared = 0.0;
       double suggestRerunEps = 1e-3;
-      int crosslinkerType;
+      int crossLinkerType;
       double dt = 1;
     };
   } // namespace mehp

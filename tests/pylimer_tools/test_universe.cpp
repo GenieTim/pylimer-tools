@@ -259,7 +259,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
             .size() > 0);
   }
 
-  SECTION("Molecules with crosslinkers are found")
+  SECTION("Molecules with crossLinkers are found")
   {
     /**
     # The system looks like this (in terms of bonds, not 3D placement):
@@ -442,9 +442,9 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE_THROWS(universe.getAtomByVertexIdx(999));
     }
 
-    SECTION("get atoms with crosslinkers returns")
+    SECTION("get atoms with crossLinkers returns")
     {
-      // get atoms with crosslinkers returns
+      // get atoms with crossLinkers returns
       auto chains = universe.getChainsWithCrosslinker(2);
       REQUIRE(chains.size() == 3);
       REQUIRE(chains[0].getAtoms()[0].getId() == 1);

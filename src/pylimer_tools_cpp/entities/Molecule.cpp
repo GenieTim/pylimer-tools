@@ -95,11 +95,10 @@ namespace entities {
     return AtomGraphParent::computeBondLengths(this->parent);
   }
 
-  double Molecule::computeTotalLength() {
+  double Molecule::computeTotalLength()
+  {
     std::vector<double> bondLens = this->computeBondLengths();
-    return std::accumulate(
-      bondLens.begin(), bondLens.end(), 0.0
-    );
+    return std::accumulate(bondLens.begin(), bondLens.end(), 0.0);
   }
 
   double Molecule::computeEndToEndDistance()
@@ -343,6 +342,42 @@ namespace entities {
   };
 
   /**
+   * @brief Get the atoms at the end of each chain, and/or, in case of a primary
+   * loop, two times the cross-link.
+   *
+   * This method does not handle branched structures.
+   *
+   * @param crossLinkerType
+   * @return std::pair<Atom, Atom>
+   */
+  std::pair<Atom, Atom> Molecule::getChainEnds(const int crossLinkerType) const
+  {
+    std::vector<pylimer_tools::entities::Atom> endsOfChain =
+      this->getAtomsOfDegree(1);
+    if (this->getType() == MoleculeType::PRIMARY_LOOP ||
+        (endsOfChain.size() != 2 &&
+         this->getType() != MoleculeType::UNDEFINED)) {
+      std::vector<pylimer_tools::entities::Atom> crossLinks =
+        this->getAtomsOfType(crossLinkerType);
+      RUNTIME_EXP_IFN(crossLinks.size() == 1 ||
+                        (crossLinks.size() == 2 &&
+                         crossLinks[0].getId() == crossLinks[1].getId()),
+                      "For a primary loop, expected only one cross-link.");
+      return std::make_pair(crossLinks[0], crossLinks[0]);
+    }
+    RUNTIME_EXP_IFN(endsOfChain.size() == 2,
+                    "Expected to find the two ends of the chain as atoms of "
+                    "degree 1, but found " +
+                      std::to_string(endsOfChain.size()) +
+                      " atoms with degree 1.");
+    std::pair<Atom, Atom> res = std::make_pair(endsOfChain[0], endsOfChain[1]);
+    if (res.first.getId() > res.second.getId()) {
+      std::swap(res.first, res.second);
+    }
+    return res;
+  }
+
+  /**
    * @brief Get the overall offset in terms of boxes (for PBC)
    *
    * The offset is computed as if computing the vector of the first to the last
@@ -350,13 +385,13 @@ namespace entities {
    *
    * NOTE: even for primary loops, it is possible that this is not equal to
    * zero.
-   * @param crosslinkerType
+   * @param crossLinkerType
    * @return Eigen::Vector3d
    */
-  Eigen::Vector3d Molecule::getOverallBondSum(const int crosslinkerType) const
+  Eigen::Vector3d Molecule::getOverallBondSum(const int crossLinkerType) const
   {
     std::vector<long int> alignedVertices =
-      this->getVerticesLinedUp(crosslinkerType);
+      this->getVerticesLinedUp(crossLinkerType);
     Eigen::VectorXd alignedCoordinates =
       Eigen::VectorXd::Zero(3 * alignedVertices.size());
     this->getAssumedVertexCoordinates(
@@ -381,17 +416,17 @@ namespace entities {
    * zero.
    * @param atomIdFrom
    * @param atomIdTo
-   * @param crosslinkerType
+   * @param crossLinkerType
    * @param requireOrder
    * @return Eigen::Vector3d
    */
   Eigen::Vector3d Molecule::getOverallBondSumFromTo(size_t atomIdFrom,
                                                     size_t atomIdTo,
-                                                    const int crosslinkerType,
+                                                    const int crossLinkerType,
                                                     bool requireOrder) const
   {
     std::vector<long int> alignedVertices =
-      this->getVerticesLinedUp(crosslinkerType, true);
+      this->getVerticesLinedUp(crossLinkerType, true);
     Eigen::VectorXd alignedCoordinates =
       Eigen::VectorXd::Zero(3 * alignedVertices.size());
     this->getAssumedVertexCoordinates(
@@ -424,11 +459,11 @@ namespace entities {
 
   size_t Molecule::getNrOfBondsFromTo(size_t atomIdFrom,
                                       size_t atomIdTo,
-                                      const int crosslinkerType,
+                                      const int crossLinkerType,
                                       bool requireOrder) const
   {
     std::vector<long int> alignedVertices =
-      this->getVerticesLinedUp(crosslinkerType, true);
+      this->getVerticesLinedUp(crossLinkerType, true);
     size_t vertexIdFrom = this->atomIdToVertexIdx.at(atomIdFrom);
     size_t vertexIdTo = this->atomIdToVertexIdx.at(atomIdTo);
     bool recording = false;
@@ -475,22 +510,9 @@ namespace entities {
       return results;
     }
 
-    long int vertexIdToStartWith = 0;
-    std::vector<long int> ends = this->getVerticesWithDegree(1);
-    if (ends.size() > 0) {
-      // sort to start with the end with the lowest atom id
-      std::sort(ends.begin(), ends.end(), [&](long int v1, long int v2) {
-        return this->getAtomIdByIdx(v1) < this->getAtomIdByIdx(v2);
-      });
-      vertexIdToStartWith = ends[0];
-    } else {
-      assert(this->getType() == MoleculeType::UNDEFINED ||
-             this->getType() == MoleculeType::PRIMARY_LOOP);
-      std::vector<Atom> xlinkers = this->getAtomsOfType(crossLinkerType);
-      if (xlinkers.size() > 0) {
-        vertexIdToStartWith = this->getIdxByAtomId(xlinkers[0].getId());
-      }
-    }
+    std::pair<Atom, Atom> chainEnds = this->getChainEnds(crossLinkerType);
+    long int vertexIdToStartWith =
+      this->getIdxByAtomId(chainEnds.first.getId());
 
     std::vector<long int> connections =
       this->getVertexIdxsConnectedTo(vertexIdToStartWith);

@@ -102,7 +102,7 @@ init_pylimer_bound_writers(py::module_& m)
 
            Default: 2.
       )pbdoc",
-         py::arg("crosslinkerType") = 2)
+         py::arg("crossLinkerType") = 2)
     .def("configMoleculeIdxForSwap",
          &DataFileWriter::configMoleculeIdxForSwap,
          R"pbdoc(

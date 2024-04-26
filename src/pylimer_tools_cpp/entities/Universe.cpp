@@ -707,7 +707,7 @@ namespace entities {
     if (this->getNrOfAtoms() == 0) {
       return molecules;
     }
-    // make a copy to remove crosslinkers from
+    // make a copy to remove crossLinkers from
     igraph_t graphWithoutCrosslinkers;
     if (igraph_copy(&graphWithoutCrosslinkers, &this->graph)) {
       throw std::runtime_error("Failed to copy graph.");
@@ -723,7 +723,7 @@ namespace entities {
 
       // remove elements of type
       if (igraph_delete_vertices(&graphWithoutCrosslinkers, verticesToRemove)) {
-        throw std::runtime_error("Failed to delete crosslinkers from graph.");
+        throw std::runtime_error("Failed to delete crossLinkers from graph.");
       }
 
       igraph_vs_destroy(&verticesToRemove);
@@ -819,24 +819,24 @@ namespace entities {
    * @brief Decompose the network into clusters, re-adding the atoms omitted to
    * get more clusters
    *
-   * @param crosslinkerType the type of the atoms to omit and re-add
+   * @param crossLinkerType the type of the atoms to omit and re-add
    * @return std::vector<Molecule>
    */
   std::vector<Molecule> Universe::getChainsWithCrosslinker(
-    const int crosslinkerType) const
+    const int crossLinkerType) const
   {
     std::vector<Molecule> molecules;
     if (this->getNrOfAtoms() == 0) {
       return molecules;
     }
-    // make a copy to remove crosslinkers from
+    // make a copy to remove crossLinkers from
     igraph_t graphWithoutCrosslinkers;
     if (igraph_copy(&graphWithoutCrosslinkers, &this->graph)) {
       throw std::runtime_error("Failed to copy graph.");
     }
     // select vertices of cross-linker type
     std::vector<long int> indicesToRemove =
-      this->getIndicesOfType(crosslinkerType);
+      this->getIndicesOfType(crossLinkerType);
     std::sort(indicesToRemove.rbegin(), indicesToRemove.rend());
     if (indicesToRemove.size() > 0) {
       igraph_vs_t verticesToRemove =
@@ -844,7 +844,7 @@ namespace entities {
 
       // remove elements of type
       if (igraph_delete_vertices(&graphWithoutCrosslinkers, verticesToRemove)) {
-        throw std::runtime_error("Failed to delete crosslinkers from graph.");
+        throw std::runtime_error("Failed to delete crossLinkers from graph.");
       }
 
       igraph_vs_destroy(&verticesToRemove);
@@ -860,7 +860,7 @@ namespace entities {
     size_t NComponents = igraph_graph_list_size(&components);
     molecules.reserve(NComponents);
     for (size_t i = 0; i < NComponents; ++i) {
-      // loop the chains to add the crosslinkers back
+      // loop the chains to add the crossLinkers back
       igraph_t* chain = igraph_graph_list_get_ptr(&components, i);
       int moleculeLengthBefore = igraph_vcount(chain);
       // also select ones of degree 0 for dangling atoms
@@ -906,8 +906,8 @@ namespace entities {
             int originalNeighbourType = igraphRealToInt<int>(
               igraph_cattribute_VAN(&graph, "type", originalNeighbourId));
 
-            if (originalNeighbourType == crosslinkerType) {
-              // found a crosslinker neighbour
+            if (originalNeighbourType == crossLinkerType) {
+              // found a crossLinker neighbour
               long int originalNeighbourAtomId =
                 igraph_cattribute_VAN(&graph, "id", originalNeighbourId);
               atomsToAdd.push_back(originalNeighbourId);
@@ -983,14 +983,14 @@ namespace entities {
   /**
    * @brief Detect loops (cycles) in the graph
    *
-   * @param crosslinkerType
+   * @param crossLinkerType
    * @param maxLength
    * @param skipSelfLoops
    * @param edges
    * @return std::vector<std::vector<long int>>
    */
   std::vector<std::vector<long int>> Universe::findLoops(
-    const int crosslinkerType,
+    const int crossLinkerType,
     const int maxLength,
     bool skipSelfLoops,
     std::vector<std::vector<long int>>* edges) const
@@ -1001,7 +1001,7 @@ namespace entities {
     std::vector<std::vector<long int>> results;
 
     std::vector<long int> startingCrosslinkers =
-      this->getIndicesOfType(crosslinkerType);
+      this->getIndicesOfType(crossLinkerType);
     std::unordered_set<std::string> processedPathsKeys;
 
     // note: this algorithm is not particularly efficient
@@ -1094,11 +1094,11 @@ namespace entities {
         std::to_string(startingCrosslinkerVertexId);
       if (!skipSelfLoops && !pylimer_tools::utils::set_has_key(
                               processedPathsKeys, selfLoopPathKey)) {
-        std::vector<long int> crosslinkersBonds =
+        std::vector<long int> crossLinkersBonds =
           this->getVertexIdxsConnectedTo(startingCrosslinkerVertexId);
-        if (std::find(crosslinkersBonds.begin(),
-                      crosslinkersBonds.end(),
-                      startingCrosslinkerVertexId) != crosslinkersBonds.end()) {
+        if (std::find(crossLinkersBonds.begin(),
+                      crossLinkersBonds.end(),
+                      startingCrosslinkerVertexId) != crossLinkersBonds.end()) {
 
           currentPath.clear();
           currentPath.push_back(startingCrosslinkerVertexId);
@@ -1118,12 +1118,12 @@ namespace entities {
    * and you may run out of memory when using this function, if your graph is
    * lattice-like.
    *
-   * @param crosslinkerType
+   * @param crossLinkerType
    * @param maxLength
    * @return std::map<int, std::vector<std::vector<Atom>>>
    */
   std::map<int, std::vector<std::vector<Atom>>> Universe::findLoopsOfAtoms(
-    const int crosslinkerType,
+    const int crossLinkerType,
     const int maxLength,
     bool skipSelfLoops) const
   {
@@ -1133,7 +1133,7 @@ namespace entities {
     std::map<int, std::vector<std::vector<Atom>>> results;
 
     std::vector<std::vector<long int>> loops =
-      this->findLoops(crosslinkerType, maxLength, skipSelfLoops);
+      this->findLoops(crossLinkerType, maxLength, skipSelfLoops);
 
     for (size_t i = 0; i < loops.size(); ++i) {
       std::vector<long int> loop = loops[i];
@@ -1142,7 +1142,7 @@ namespace entities {
       int currentFunctionality = 0;
       for (size_t j = 0; j < loop.size(); ++j) {
         Atom newAtom = this->getAtomByVertexIdx(loop[j]);
-        if (newAtom.getType() == crosslinkerType) {
+        if (newAtom.getType() == crossLinkerType) {
           currentFunctionality += 1;
         }
         currentPath.push_back(newAtom);
@@ -1178,11 +1178,11 @@ namespace entities {
     // First, check the two simplest cases
     // check for self-loops
     if (!skipSelfLoops && loopStart == loopStep1) {
-      std::vector<long int> crosslinkersBonds =
+      std::vector<long int> crossLinkersBonds =
         this->getVertexIdxsConnectedTo(startingCrosslinkerVertexId);
-      if (std::find(crosslinkersBonds.begin(),
-                    crosslinkersBonds.end(),
-                    startingCrosslinkerVertexId) != crosslinkersBonds.end()) {
+      if (std::find(crossLinkersBonds.begin(),
+                    crossLinkersBonds.end(),
+                    startingCrosslinkerVertexId) != crossLinkersBonds.end()) {
         minimalPath.push_back(
           this->getAtomByVertexIdx(startingCrosslinkerVertexId));
         return minimalPath;
@@ -1279,19 +1279,19 @@ namespace entities {
    * and you may run out of memory when using this function, if your graph is
    * lattice-like.
    *
-   * @param crosslinkerType
+   * @param crossLinkerType
    * @param maxLength the maximum length of the loop ()
    * @return true
    * @return false
    */
-  bool Universe::hasInfiniteStrand(const int crosslinkerType,
+  bool Universe::hasInfiniteStrand(const int crossLinkerType,
                                    const int maxLength) const
   {
     // NOTE: there are exponentially many paths between two vertices of a graph,
     // and you may run out of memory when using this function, if your graph is
     // lattice-like.
     std::vector<long int> startingCrosslinkers =
-      this->getIndicesOfType(crosslinkerType);
+      this->getIndicesOfType(crossLinkerType);
 
     // note: this algorithm is not particularly efficient
     // it is of the order of O(n*n!)
@@ -1820,42 +1820,42 @@ namespace entities {
    * Includes self-loops (from primary ones).
    * You can remove them using #simplify
    *
-   * @param crosslinkerType the atom type of the cross-linker beads
+   * @param crossLinkerType the atom type of the cross-linker beads
    * @return Universe
    */
-  Universe Universe::getNetworkOfCrosslinker(const int crosslinkerType) const
+  Universe Universe::getNetworkOfCrosslinker(const int crossLinkerType) const
   {
     // TODO: prevent duplicate of self-loops
     // How this works:
-    // 1. find all crosslinkers
-    // 2. from each crosslinker, walk in all directions
-    // 3. if the walk reaches another crosslinker, we found a
-    //    crosslinker-crosslinker connection.
+    // 1. find all crossLinkers
+    // 2. from each crossLinker, walk in all directions
+    // 3. if the walk reaches another crossLinker, we found a
+    //    crossLinker-crossLinker connection.
     //    To reduce duplicates, we only take the ones where we started from a
-    //    crosslinker with a smaller (or equal, for self-/primary-loops)
+    //    crossLinker with a smaller (or equal, for self-/primary-loops)
     //    vertex index
     Universe newUniverse =
       Universe(this->box.getLx(), this->box.getLy(), this->box.getLz());
     std::vector<long int> bondFrom;
     std::vector<long int> bondTo;
-    std::vector<long int> crosslinkers =
-      this->getIndicesOfType(crosslinkerType);
-    for (long int crosslinker : crosslinkers) {
+    std::vector<long int> crossLinkers =
+      this->getIndicesOfType(crossLinkerType);
+    for (long int crossLinker : crossLinkers) {
       std::vector<long int> connections =
-        this->getVertexIdxsConnectedTo(crosslinker);
+        this->getVertexIdxsConnectedTo(crossLinker);
       for (long int connection : connections) {
         long int currentCenter = connection;
-        long int lastCenter = crosslinker;
+        long int lastCenter = crossLinker;
         std::vector<long int> subConnections =
           this->getVertexIdxsConnectedTo(currentCenter);
         while (subConnections.size() > 0) {
           if (this->getPropertyValue<int>("type", currentCenter) ==
-              crosslinkerType) {
+              crossLinkerType) {
             // found cross-linker
-            if (currentCenter >= crosslinker) {
+            if (currentCenter >= crossLinker) {
               bondFrom.push_back(
                 this->getPropertyValue<int>("id", currentCenter));
-              bondTo.push_back(this->getPropertyValue<int>("id", crosslinker));
+              bondTo.push_back(this->getPropertyValue<int>("id", crossLinker));
             }
             break;
           }
@@ -1903,13 +1903,13 @@ namespace entities {
     }
 
     std::vector<int> zeros =
-      pylimer_tools::utils::initializeWithValue(crosslinkers.size(), 0);
+      pylimer_tools::utils::initializeWithValue(crossLinkers.size(), 0);
 
-    newUniverse.addAtoms(this->getPropertyValues<long int>("id", crosslinkers),
-                         this->getPropertyValues<int>("type", crosslinkers),
-                         this->getPropertyValues<double>("x", crosslinkers),
-                         this->getPropertyValues<double>("y", crosslinkers),
-                         this->getPropertyValues<double>("z", crosslinkers),
+    newUniverse.addAtoms(this->getPropertyValues<long int>("id", crossLinkers),
+                         this->getPropertyValues<int>("type", crossLinkers),
+                         this->getPropertyValues<double>("x", crossLinkers),
+                         this->getPropertyValues<double>("y", crossLinkers),
+                         this->getPropertyValues<double>("z", crossLinkers),
                          zeros,
                          zeros,
                          zeros);
@@ -2248,12 +2248,12 @@ namespace entities {
   /**
    * @brief Get the mean number of beads between beads with the passed type
    *
-   * @param crosslinkerType
+   * @param crossLinkerType
    * @return double
    */
-  double Universe::getMeanStrandLength(int crosslinkerType)
+  double Universe::getMeanStrandLength(int crossLinkerType)
   {
-    std::vector<Molecule> molecules = this->getMolecules(crosslinkerType);
+    std::vector<Molecule> molecules = this->getMolecules(crossLinkerType);
 
     double multiplier = 1.0 / static_cast<double>(molecules.size());
     double meanStrandLength = std::accumulate(
@@ -2273,13 +2273,13 @@ namespace entities {
    * Does not take loops into account as a contributor to the mean.
    * Returns 0 for systems without any qualifying strands.
    *
-   * @param crosslinkerType
+   * @param crossLinkerType
    * @return double
    */
-  std::vector<double> Universe::computeEndToEndDistances(int crosslinkerType)
+  std::vector<double> Universe::computeEndToEndDistances(int crossLinkerType)
   {
     std::vector<Molecule> molecules =
-      this->getChainsWithCrosslinker(crosslinkerType);
+      this->getChainsWithCrosslinker(crossLinkerType);
 
     std::vector<double> distances;
     distances.reserve(molecules.size());
@@ -2298,13 +2298,13 @@ namespace entities {
    * Does not take loops into account as a contributor to the mean.
    * Returns 0 for systems without any qualifying strands.
    *
-   * @param crosslinkerType
+   * @param crossLinkerType
    * @return double
    */
-  double Universe::computeMeanEndToEndDistance(int crosslinkerType)
+  double Universe::computeMeanEndToEndDistance(int crossLinkerType)
   {
     std::vector<Molecule> molecules =
-      this->getChainsWithCrosslinker(crosslinkerType);
+      this->getChainsWithCrosslinker(crossLinkerType);
 
     double meanEndToEndDistance = 0.0;
     int validMolecules = 0;
@@ -2330,22 +2330,22 @@ namespace entities {
    * Does not take loops into account as a contributor to the mean.
    * Returns 0 for systems without any qualifying strands.
    *
-   * @param crosslinkerType
+   * @param crossLinkerType
    * @return double
    */
   double Universe::computeMeanSquareEndToEndDistance(
-    int crosslinkerType,
+    int crossLinkerType,
     bool onlyThoseWithTwoCrosslinkers)
   {
     std::vector<Molecule> molecules =
-      this->getChainsWithCrosslinker(crosslinkerType);
+      this->getChainsWithCrosslinker(crossLinkerType);
 
     double meanEndToEndDistance = 0.0;
     int validMolecules = 0;
 
     for (Molecule molecule : molecules) {
       if (!onlyThoseWithTwoCrosslinkers ||
-          molecule.getAtomsOfType(crosslinkerType).size() == 2) {
+          molecule.getAtomsOfType(crossLinkerType).size() == 2) {
         double dist = molecule.computeEndToEndDistance();
         if (dist > 0.0) {
           meanEndToEndDistance += dist * dist;
@@ -2421,17 +2421,17 @@ namespace entities {
    *
    * @source https://www.pslc.ws/macrog/average.htm
    *
-   * @param crosslinkerType
+   * @param crossLinkerType
    * @return double
    */
   double Universe::computeWeightAverageMolecularWeight(
-    int crosslinkerType) const
+    int crossLinkerType) const
   {
     double weightAverage = 0.0;
 
-    std::vector<Molecule> molecules = this->getMolecules(crosslinkerType);
+    std::vector<Molecule> molecules = this->getMolecules(crossLinkerType);
     std::map<int, double> massPerTypeToUse(this->massPerType);
-    massPerTypeToUse[crosslinkerType] = 0.0;
+    massPerTypeToUse[crossLinkerType] = 0.0;
     double totalMass = this->computeTotalMassWithMasses(massPerTypeToUse);
     double massDivisor = 1.0 / totalMass;
     for (Molecule molecule : molecules) {
@@ -2447,15 +2447,15 @@ namespace entities {
    *
    * @source https://www.pslc.ws/macrog/average.htm
    *
-   * @param crosslinkerType
+   * @param crossLinkerType
    * @return double
    */
   double Universe::computeNumberAverageMolecularWeight(
-    int crosslinkerType) const
+    int crossLinkerType) const
   {
-    std::vector<Molecule> molecules = this->getMolecules(crosslinkerType);
+    std::vector<Molecule> molecules = this->getMolecules(crossLinkerType);
     std::map<int, double> massPerTypeToUse(this->massPerType);
-    massPerTypeToUse[crosslinkerType] = 0.0;
+    massPerTypeToUse[crossLinkerType] = 0.0;
     double totalMass = this->computeTotalMassWithMasses(massPerTypeToUse);
 
     return totalMass / static_cast<double>(molecules.size());
@@ -2467,15 +2467,15 @@ namespace entities {
    *
    * @source https://www.pslc.ws/macrog/average.htm
    *
-   * @param crosslinkerType
+   * @param crossLinkerType
    * @return double
    */
-  double Universe::computePolydispersityIndex(int crosslinkerType) const
+  double Universe::computePolydispersityIndex(int crossLinkerType) const
   {
     // TODO: check assembly whether the double getMolecules() and
     // computeTotalMass() is cancelled out or not
-    return this->computeWeightAverageMolecularWeight(crosslinkerType) /
-           this->computeNumberAverageMolecularWeight(crosslinkerType);
+    return this->computeWeightAverageMolecularWeight(crossLinkerType) /
+           this->computeNumberAverageMolecularWeight(crossLinkerType);
   }
 
   /**

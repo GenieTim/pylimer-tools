@@ -69,7 +69,7 @@ namespace calc {
       double defaultR0Squared = 0.0;
       bool outputEndNodes = false;
       std::string endNodesFile;
-      int crosslinkerType = 2;
+      int crossLinkerType = 2;
       int slipLinkType = 3;
       int partialBondType = 2;
       int normalBondType = 1;
@@ -86,12 +86,12 @@ namespace calc {
       ExitReason exitReason = ExitReason::UNSET;
 
       MEHPForceBalance2(const pylimer_tools::entities::Universe& u,
-                        int crosslinkerType = 2,
+                        int crossLinkerType = 2,
                         bool is2D = false,
                         double kappa = 1.0)
         : universe(u)
       {
-        this->crosslinkerType = crosslinkerType;
+        this->crossLinkerType = crossLinkerType;
         // interpret network already to be able to give early results
         ForceBalanceNetwork network;
         for (size_t dir = 0; dir < 3; ++dir) {
@@ -117,7 +117,7 @@ namespace calc {
       // 2. copy constructor
       MEHPForceBalance2(const MEHPForceBalance2& src)
         : MEHPForceBalance2(src.universe,
-                            src.crosslinkerType,
+                            src.crossLinkerType,
                             src.is2D,
                             src.kappa)
       {
@@ -155,7 +155,7 @@ namespace calc {
         std::swap(this->defaultNrOfChains, src.defaultNrOfChains);
         std::swap(this->outputEndNodes, src.outputEndNodes);
         std::swap(this->endNodesFile, src.endNodesFile);
-        std::swap(this->crosslinkerType, src.crosslinkerType);
+        std::swap(this->crossLinkerType, src.crossLinkerType);
         std::swap(this->slipLinkType, src.slipLinkType);
         std::swap(this->partialBondType, src.partialBondType);
         std::swap(this->normalBondType, src.normalBondType);
@@ -178,12 +178,12 @@ namespace calc {
 
       static MEHPForceBalance2 constructWithoutSlipLinks(
         const pylimer_tools::entities::Universe& universe,
-        int crosslinkerType = 2,
+        int crossLinkerType = 2,
         bool is2D = false,
         double kappa = 1.0)
       {
         return MEHPForceBalance2::constructWithRandomSlipLinks(
-          universe, 0, 1.0, 0, 1, "", crosslinkerType, is2D, kappa);
+          universe, 0, 1.0, 0, 1, "", crossLinkerType, is2D, kappa);
       }
 
       static MEHPForceBalance2 constructWithSlipLinks(
@@ -195,13 +195,13 @@ namespace calc {
         const std::vector<double>& z,
         const std::vector<double>& alpha1,
         const std::vector<double>& alpha2,
-        int crosslinkerType = 2,
+        int crossLinkerType = 2,
         bool is2D = false,
         double kappa = 1.0,
         bool clampAlpha = true)
       {
         MEHPForceBalance2 fb = MEHPForceBalance2::constructWithoutSlipLinks(
-          universe, crosslinkerType, is2D, kappa);
+          universe, crossLinkerType, is2D, kappa);
         fb.validateNetwork();
         fb.addSlipLinks(
           strandIdx1, strandIdx2, x, y, z, alpha1, alpha2, clampAlpha);
@@ -217,12 +217,12 @@ namespace calc {
         const size_t minimumNrOfSliplinks,
         const double sameStrandCutoff,
         const std::string seed = "",
-        int crosslinkerType = 2,
+        int crossLinkerType = 2,
         bool is2D = false,
         double kappa = 1.0)
       {
         MEHPForceBalance2 fb =
-          MEHPForceBalance2(universe, crosslinkerType, is2D, kappa);
+          MEHPForceBalance2(universe, crossLinkerType, is2D, kappa);
         fb.net.isUpToDate = false;
         igraph_cattribute_GAB_set(&fb.graph, "is_up_to_date", true);
 
@@ -235,7 +235,7 @@ namespace calc {
                                       minimumNrOfSliplinks,
                                       sameStrandCutoff,
                                       seed,
-                                      crosslinkerType);
+                                      crossLinkerType);
 
         std::vector<std::pair<size_t, size_t>> pairsOfAtoms =
           entanglements.pairsOfAtoms;
@@ -248,21 +248,21 @@ namespace calc {
         // std::cout << "Found " << pairsOfAtoms.size() << " random slip-links."
         //           << std::endl;
 
-        std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
-          universe.getChainsWithCrosslinker(crosslinkerType);
+        std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
+          universe.getChainsWithCrosslinker(crossLinkerType);
 
         // add ends of chains
         std::vector<igraph_integer_t> endAtomIdxToVertexId =
           pylimer_tools::utils::initializeWithValue<igraph_integer_t>(
             universe.getNrOfAtoms(), -1);
         igraph_integer_t currentVertexId = 0;
-        for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
-          pylimer_tools::entities::Molecule chain = crosslinkerChains[i];
+        for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
+          pylimer_tools::entities::Molecule chain = crossLinkerChains[i];
           if (chain.getLength() < 2) {
             continue;
           }
           std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
-            chain.getAtomsLinedUp(crosslinkerType, false, true);
+            chain.getAtomsLinedUp(crossLinkerType, false, true);
           size_t firstAtomIdx =
             universe.getIdxByAtomId(linedUpAtoms[0].getId());
           if (endAtomIdxToVertexId[firstAtomIdx] == -1) {
@@ -283,27 +283,27 @@ namespace calc {
           &fb.graph, currentVertexId + pairsOfAtoms.size(), nullptr);
 
         size_t parentEdgeId = 0;
-        for (size_t chainIdx = 0; chainIdx < crosslinkerChains.size();
+        for (size_t chainIdx = 0; chainIdx < crossLinkerChains.size();
              ++chainIdx) {
-          pylimer_tools::entities::Molecule chain = crosslinkerChains[chainIdx];
+          pylimer_tools::entities::Molecule chain = crossLinkerChains[chainIdx];
           if (chain.getLength() < 2) {
             continue;
           }
 
           std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
-            chain.getAtomsLinedUp(crosslinkerType, false, true);
+            chain.getAtomsLinedUp(crossLinkerType, false, true);
           size_t previousIdx = 0;
           igraph_integer_t previousVertexId =
             endAtomIdxToVertexId[universe.getIdxByAtomId(
               linedUpAtoms[0].getId())];
           fb.setVertexPropertiesFromAtom(
-            previousVertexId, linedUpAtoms[0], fb.crosslinkerType);
+            previousVertexId, linedUpAtoms[0], fb.crossLinkerType);
           pylimer_tools::entities::Atom lastAtom =
             pylimer_tools::utils::last(linedUpAtoms);
           fb.setVertexPropertiesFromAtom(
             endAtomIdxToVertexId[universe.getIdxByAtomId(lastAtom.getId())],
             lastAtom,
-            fb.crosslinkerType);
+            fb.crossLinkerType);
           assert(linedUpAtoms.size() == chain.getLength() ||
                  linedUpAtoms.size() == chain.getLength() + 1);
           if (pairsOfAtoms.size() > 0) {
@@ -583,26 +583,50 @@ namespace calc {
        */
       pylimer_tools::entities::Universe getCrosslinkerVerse();
 
-      int getDefaultNrOfChains() const { return this->defaultNrOfChains; }
+      int getDefaultNrOfChains() const
+      {
+        return this->defaultNrOfChains;
+      }
 
-      double getDefaultR0Square() const { return this->defaultR0Squared; }
+      double getDefaultR0Square() const
+      {
+        return this->defaultR0Squared;
+      }
 
       double getVolume() override
       {
         return this->universe.getBox().getVolume();
       }
 
-      int getNrOfNodes() { return this->getNetwork().nrOfNodes; }
+      int getNrOfNodes()
+      {
+        return this->getNetwork().nrOfNodes;
+      }
 
-      int getNrOfLinks() { return igraph_vcount(&this->graph); }
+      int getNrOfLinks()
+      {
+        return igraph_vcount(&this->graph);
+      }
 
-      size_t getNumBonds() override { return this->getNrOfSprings(); }
+      size_t getNumBonds() override
+      {
+        return this->getNrOfSprings();
+      }
 
-      size_t getNumExtraBonds() override { return 0; }
+      size_t getNumExtraBonds() override
+      {
+        return 0;
+      }
 
-      long int getNumBondsToForm() override { return 0; }
+      long int getNumBondsToForm() override
+      {
+        return 0;
+      }
 
-      size_t getNumAtoms() override { return this->getNrOfNodes(); }
+      size_t getNumAtoms() override
+      {
+        return this->getNrOfNodes();
+      }
 
       size_t getNumExtraAtoms() override
       {
@@ -621,7 +645,7 @@ namespace calc {
         igraph_cattribute_VANV(&this->graph, "type", igraph_vss_all(), &types);
         for (size_t i = 0; i < igraph_vector_size(&types); i++) {
           if (castToIgraphInt(igraph_vector_get(&types, i)) ==
-              this->crosslinkerType) {
+              this->crossLinkerType) {
             numBefore += 1;
           }
         }
@@ -629,9 +653,15 @@ namespace calc {
         return numBefore;
       }
 
-      int getNrOfSprings() { return this->getNetwork().nrOfSprings; }
+      int getNrOfSprings()
+      {
+        return this->getNetwork().nrOfSprings;
+      }
 
-      int getNrOfPartialSprings() { return igraph_ecount(&this->graph); }
+      int getNrOfPartialSprings()
+      {
+        return igraph_ecount(&this->graph);
+      }
 
       void setSpringContourLengths(const Eigen::VectorXd springsContourLengths)
       {
@@ -915,7 +945,10 @@ namespace calc {
        *
        * @return double
        */
-      double getPressure() const { return this->evaluatePressure(); }
+      double getPressure() const
+      {
+        return this->evaluatePressure();
+      }
 
       /**
        * @brief Get the Gamma Factor at the current step
@@ -938,9 +971,15 @@ namespace calc {
           this->currentSpringDistances, r02, nrOfChains);
       };
 
-      int getNrOfIterations() const { return this->nrOfStepsDone; }
+      int getNrOfIterations() const
+      {
+        return this->nrOfStepsDone;
+      }
 
-      ExitReason getExitReason() const { return this->exitReason; }
+      ExitReason getExitReason() const
+      {
+        return this->exitReason;
+      }
       /**
        * @brief Compute the spring lenghts
        *
@@ -1163,7 +1202,7 @@ namespace calc {
         }
         if (castToIgraphInt(igraph_cattribute_VAN(
               &subgraph, "type", igraph_vector_int_get(&verticesOnPath, 0))) !=
-            this->crosslinkerType) {
+            this->crossLinkerType) {
           throw std::runtime_error("Parent edge " +
                                    std::to_string(parentEdgeId) +
                                    " does not start with a cross-link");
@@ -1173,7 +1212,7 @@ namespace calc {
               "type",
               igraph_vector_int_get(&verticesOnPath,
                                     igraph_vector_int_size(&verticesOnPath) -
-                                      1))) != this->crosslinkerType) {
+                                      1))) != this->crossLinkerType) {
           throw std::runtime_error("Parent edge " +
                                    std::to_string(parentEdgeId) +
                                    " does not end with a cross-link");
@@ -1672,7 +1711,7 @@ namespace calc {
           igraph_edge(&this->graph, partialSpringIdx, &from, &to);
           igraph_integer_t slipLinkIdx = from;
           if (castToIgraphInt(igraph_cattribute_VAN(
-                &this->graph, "type", from)) == this->crosslinkerType) {
+                &this->graph, "type", from)) == this->crossLinkerType) {
             slipLinkIdx = to;
           }
           assert(castToIgraphInt(igraph_cattribute_VAN(
@@ -1710,12 +1749,12 @@ namespace calc {
 
         igraph_integer_t xlinkIdx =
           castToIgraphInt(igraph_cattribute_VAN(&this->graph, "type", from)) ==
-              this->crosslinkerType
+              this->crossLinkerType
             ? from
             : to;
         igraph_integer_t slipLinkIdx = xlinkIdx == from ? to : from;
         assert(castToIgraphInt(igraph_cattribute_VAN(
-                 &this->graph, "type", xlinkIdx)) == this->crosslinkerType);
+                 &this->graph, "type", xlinkIdx)) == this->crossLinkerType);
 
         this->unlinkSlipLinkFromRail(slipLinkIdx, partialSpringIdx);
 
@@ -1815,8 +1854,14 @@ namespace calc {
         return result;
       }
 
-      int getNumShifts() override { return 0; }
-      int getNumRelocations() override { return 0; }
+      int getNumShifts() override
+      {
+        return 0;
+      }
+      int getNumRelocations() override
+      {
+        return 0;
+      }
 
       Eigen::VectorXd getBondLengths() override
       {
@@ -1841,7 +1886,10 @@ namespace calc {
         return -1; // TODO: implement?
       }
 
-      size_t getNumParticles() override { return this->net.nrOfNodes; }
+      size_t getNumParticles() override
+      {
+        return this->net.nrOfNodes;
+      }
 
     protected:
       /**
@@ -1902,7 +1950,7 @@ namespace calc {
       {
         assert(vertexId < igraph_vcount(&this->graph));
         return (castToIgraphInt(igraph_cattribute_VAN(
-                  &this->graph, "type", vertexId)) == this->crosslinkerType);
+                  &this->graph, "type", vertexId)) == this->crossLinkerType);
       }
 
       /**
@@ -1969,9 +2017,9 @@ namespace calc {
       {
         assert(vertexId >= 0);
         assert(vertexId < igraph_vcount(&this->graph));
-        assert(atomType == this->crosslinkerType ||
+        assert(atomType == this->crossLinkerType ||
                atomType == this->slipLinkType);
-        // assert(atom.getType() == this->crosslinkerType);
+        // assert(atom.getType() == this->crossLinkerType);
         igraph_cattribute_VAN_set(
           &this->graph, "atom_id", vertexId, atom.getId());
         igraph_cattribute_VAN_set(&this->graph, "type", vertexId, atomType);
@@ -1994,8 +2042,8 @@ namespace calc {
       {
         assert(vertexId >= 0);
         assert(vertexId < igraph_vcount(&this->graph));
-        assert(atom1.getType() != this->crosslinkerType &&
-               atom2.getType() != this->crosslinkerType);
+        assert(atom1.getType() != this->crossLinkerType &&
+               atom2.getType() != this->crossLinkerType);
         if (atom1.getId() > atom2.getId()) {
           // make sure a second call to this function would result in same
           // result
@@ -2164,7 +2212,7 @@ namespace calc {
         igraph_integer_t from, to;
         igraph_edge(&this->graph, edgeId, &from, &to);
         std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
-          chain.getAtomsLinedUp(crosslinkerType, false, true);
+          chain.getAtomsLinedUp(crossLinkerType, false, true);
         igraph_cattribute_EAN_set(&this->graph,
                                   "partition_fraction",
                                   edgeId,
@@ -2180,12 +2228,12 @@ namespace calc {
           edgeId,
           chain.getNrOfBondsFromTo(linedUpAtoms[atom1Idx].getId(),
                                    linedUpAtoms[atom2Idx].getId(),
-                                   crosslinkerType));
+                                   crossLinkerType));
         // use the actual position of the vertices!
         Eigen::Vector3d expectedDistance =
           chain.getOverallBondSumFromTo(linedUpAtoms[atom1Idx].getId(),
                                         linedUpAtoms[atom2Idx].getId(),
-                                        crosslinkerType);
+                                        crossLinkerType);
         Eigen::Vector3d additionalDistance1 =
           linedUpAtoms[atom1Idx].getCoordinates() -
           this->getVertexCoordinates(from);
@@ -2642,10 +2690,10 @@ namespace calc {
         this->convertFromGraph();
         this->defaultR0Squared =
           this->universe.computeMeanSquareEndToEndDistance(
-            this->crosslinkerType);
+            this->crossLinkerType);
         assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
         this->defaultNrOfChains =
-          this->universe.getMolecules(this->crosslinkerType).size();
+          this->universe.getMolecules(this->crossLinkerType).size();
         assert(igraph_cattribute_GAB(&this->graph, "is_up_to_date"));
         this->currentSpringDistances = this->evaluateSpringDistances();
         this->currentPartialSpringDistances =
@@ -2896,9 +2944,9 @@ namespace calc {
           this->net.coordinates(3 * i + 2) = igraph_vector_get(&coordsZ, i);
           int alinkType = castToIgraphInt(igraph_vector_get(&linkType, i));
           assert(alinkType == this->slipLinkType ||
-                 alinkType == this->crosslinkerType);
+                 alinkType == this->crossLinkerType);
           this->net.linkIsSliplink(i) = alinkType == this->slipLinkType;
-          if (alinkType == this->crosslinkerType) {
+          if (alinkType == this->crossLinkerType) {
             numCrosslinks += 1;
           }
         }
@@ -2911,7 +2959,7 @@ namespace calc {
         size_t crossLinkIdx = 0;
         for (size_t i = 0; i < this->net.nrOfLinks; ++i) {
           if (castToIgraphInt(igraph_vector_get(&linkType, i)) !=
-              this->crosslinkerType) {
+              this->crossLinkerType) {
             this->net.nrOfCrosslinkSwapsEndured(slipLinkIdx) =
               castToIgraphInt(igraph_vector_get(&numLinkSwaps, i));
             slipLinkIdx += 1;
@@ -3204,7 +3252,7 @@ namespace calc {
 
         igraph_integer_t xlinkIdx =
           castToIgraphInt(igraph_cattribute_VAN(&this->graph, "type", from)) ==
-              this->crosslinkerType
+              this->crossLinkerType
             ? from
             : to;
         igraph_integer_t slipLinkIdx = xlinkIdx == from ? to : from;

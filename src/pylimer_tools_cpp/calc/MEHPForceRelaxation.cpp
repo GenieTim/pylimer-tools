@@ -212,7 +212,7 @@ namespace calc {
         pylimer_tools::entities::Universe(this->universe.getBox());
       std::vector<long int> ids;
       std::vector<int> types = pylimer_tools::utils::initializeWithValue(
-        this->forceRelaxationNetwork.nrOfNodes, crosslinkerType);
+        this->forceRelaxationNetwork.nrOfNodes, crossLinkerType);
       std::vector<double> x;
       std::vector<double> y;
       std::vector<double> z;
@@ -227,7 +227,7 @@ namespace calc {
         y.push_back(this->forceRelaxationNetwork.coordinates[3 * i + 1]);
         z.push_back(this->forceRelaxationNetwork.coordinates[3 * i + 2]);
         ids.push_back(this->forceRelaxationNetwork.oldAtomIds[i]);
-        // override type, since the types may be different from crosslinkerType
+        // override type, since the types may be different from crossLinkerType
         // if converted with dangling chains
         types[i] = this->universe.getPropertyValue<int>(
           "type",
@@ -436,7 +436,7 @@ namespace calc {
           this->currentSpringDistances,
           r);
       } catch (const std::exception& e) {
-        delete[] (r);
+        delete[](r);
         throw e;
       }
 
@@ -445,7 +445,7 @@ namespace calc {
       for (size_t i = 0; i < this->forceRelaxationNetwork.nrOfNodes * 3; ++i) {
         results[i] = r[i];
       }
-      delete[] (r);
+      delete[](r);
       return results;
     }
 
