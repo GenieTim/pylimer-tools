@@ -274,8 +274,8 @@
 <span class="n">numberOfChains</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">numberOfSolventChains</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="n">beadsPerSolventChain</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">crosslinkerConversion</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">crosslinkerFunctionality</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">crossLinkerConversion</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">crossLinkerFunctionality</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="c1"># END TODO</span>
 
 <span class="c1"># Start generating the network</span>
@@ -288,7 +288,7 @@
 <span class="n">generator</span><span class="o">.</span><span class="n">addSolventChains</span><span class="p">(</span><span class="n">numberOfSolventChains</span><span class="p">,</span> <span class="n">beadsPerSolventChain</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Added solvent chains </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%H:%M:%S&quot;</span><span class="p">)))</span>
 <span class="n">generator</span><span class="o">.</span><span class="n">addAndLinkStrands</span><span class="p">(</span><span class="n">numberOfChains</span><span class="p">,</span> <span class="n">nrOfBeadsPerChain</span><span class="p">,</span>
-                            <span class="n">crosslinkerConversion</span><span class="p">,</span> <span class="n">crosslinkerFunctionality</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                            <span class="n">crossLinkerConversion</span><span class="p">,</span> <span class="n">crossLinkerFunctionality</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Added and linked strands </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
     <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%H:%M:%S&quot;</span><span class="p">)))</span>
 <span class="n">universe</span> <span class="o">=</span> <span class="n">generator</span><span class="o">.</span><span class="n">getUniverse</span><span class="p">()</span>
