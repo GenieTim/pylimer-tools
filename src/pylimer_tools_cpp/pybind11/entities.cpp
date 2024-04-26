@@ -473,7 +473,12 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("atom"),
          py::arg("upperCutoff") = 1.0,
          py::arg("lowerCutoff") = 0.0,
-         py::arg("unwrapped") = true);
+         py::arg("unwrapped") = true)
+    .def("removeAtom",
+         &NeighbourList::removeAtom,
+         R"pbdoc()pbdoc",
+         py::arg("atom"),
+         py::arg("debug_hint") = "");
 
   py::class_<Universe>(
     m,
