@@ -19,11 +19,11 @@ namespace calc {
 
     /*
     Compute the end to end vectors between each pair of (indirectly) connected
-    crosslinker
+    crossLinker
 
     Arguments:
       - network: the polymer network to do the computation for
-      - crosslinkerType: the atom type to compute the in-between vectors for
+      - crossLinkerType: the atom type to compute the in-between vectors for
 
     Returns:
       - endToEndVectors (map): a map with key: "{molecule.key}"
@@ -31,18 +31,18 @@ namespace calc {
     */
     std::map<std::string, position_vec_t> computeEndToEndVectors(
       pylimer_tools::entities::Universe network,
-      int crosslinkerType)
+      int crossLinkerType)
     {
       std::map<std::string, position_vec_t> result;
       std::vector<pylimer_tools::entities::Molecule> molecules =
-        network.getChainsWithCrosslinker(crosslinkerType);
+        network.getChainsWithCrosslinker(crossLinkerType);
       pylimer_tools::entities::Box box = network.getBox();
 
       for (pylimer_tools::entities::Molecule chain : molecules) {
-        std::vector<pylimer_tools::entities::Atom> crosslinkers =
-          chain.getAtomsOfType(crosslinkerType);
+        std::vector<pylimer_tools::entities::Atom> crossLinkers =
+          chain.getAtomsOfType(crossLinkerType);
 
-        if (crosslinkers.size() != 2 ||
+        if (crossLinkers.size() != 2 ||
             chain.getType() ==
               pylimer_tools::entities::MoleculeType::PRIMARY_LOOP ||
             chain.getType() ==
@@ -52,10 +52,10 @@ namespace calc {
 
         // use id to keep direction of the vector constant
         Eigen::Vector3d distanceVec;
-        if (crosslinkers[0].getId() > crosslinkers[1].getId()) {
-          distanceVec = crosslinkers[0].vectorTo(crosslinkers[1], box);
+        if (crossLinkers[0].getId() > crossLinkers[1].getId()) {
+          distanceVec = crossLinkers[0].vectorTo(crossLinkers[1], box);
         } else {
-          distanceVec = crosslinkers[1].vectorTo(crosslinkers[0], box);
+          distanceVec = crossLinkers[1].vectorTo(crossLinkers[0], box);
         }
         position_vec_t distanceVecT;
         std::copy_n(std::begin(distanceVec), 3, std::begin(distanceVecT));
@@ -67,12 +67,12 @@ namespace calc {
 
     /*
     Compute the mean end to end vectors between each pair of (indirectly)
-    connected crosslinker
+    connected crossLinker
 
     Arguments:
       - networks: the different configurations of the polymer network to do the
     computation for
-      - crosslinkerType: the atom type to compute the in-between vectors for
+      - crossLinkerType: the atom type to compute the in-between vectors for
 
     Returns:
       - endToEndVectors (map): a dictionary with key: "{chain.key}"
@@ -80,7 +80,7 @@ namespace calc {
     */
     std::map<std::string, position_vec_t> computeMeanEndToEndVectors(
       pylimer_tools::entities::UniverseSequence networks,
-      int crosslinkerType)
+      int crossLinkerType)
     {
       std::map<std::string, position_vec_t> result;
 
@@ -93,7 +93,7 @@ namespace calc {
       for (int i = 0; i < networks.getLength(); ++i) {
         pylimer_tools::entities::Universe network = networks.atIndex(i);
         std::map<std::string, position_vec_t> currentEndToEndVectors =
-          computeEndToEndVectors(network, crosslinkerType);
+          computeEndToEndVectors(network, crossLinkerType);
 
         for (auto const& [key, vec] : currentEndToEndVectors) {
           if (!pylimer_tools::utils::map_has_key(result, key)) {
@@ -112,12 +112,12 @@ namespace calc {
 
     /*
     Compute the mean end to end distance between each pair of (indirectly)
-    connected crosslinker
+    connected crossLinker
 
     Arguments:
     - networks: the different configurations of the polymer network to do the
     computation for
-    - crosslinkerType: the atom type to compute the in-between vectors for
+    - crossLinkerType: the atom type to compute the in-between vectors for
 
     Returns:
     - endToEndDistances (dict): a dictionary with key:
@@ -126,10 +126,10 @@ namespace calc {
     */
     std::map<std::string, double> computeMeanEndToEndDistances(
       pylimer_tools::entities::UniverseSequence networks,
-      int crosslinkerType)
+      int crossLinkerType)
     {
       std::map<std::string, position_vec_t> distanceVectors =
-        computeMeanEndToEndVectors(networks, crosslinkerType);
+        computeMeanEndToEndVectors(networks, crossLinkerType);
       std::map<std::string, double> results;
 
       for (auto const& [key, vec] : distanceVectors) {

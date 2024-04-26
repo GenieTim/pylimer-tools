@@ -34,19 +34,19 @@ namespace calc {
 
     public:
       MEHPForceBalance(const pylimer_tools::entities::Universe& u,
-                       int crosslinkerType = 2,
+                       int crossLinkerType = 2,
                        bool is2D = false,
                        double kappa = 1.0,
                        bool remove2functionalCrosslinkers = false,
                        bool removeDanglingChains = false)
         : universe(u)
       {
-        this->crosslinkerType = crosslinkerType;
+        this->crossLinkerType = crossLinkerType;
         this->box = u.getBox();
         // interpret network already to be able to give early results
         ForceBalanceNetwork net;
         ConvertNetwork(net,
-                       crosslinkerType,
+                       crossLinkerType,
                        remove2functionalCrosslinkers,
                        removeDanglingChains);
         this->initialConfig = net;
@@ -65,7 +65,7 @@ namespace calc {
        * @param minimumNrOfSliplinks
        * @param sameStrandCutoff
        * @param seed
-       * @param crosslinkerType
+       * @param crossLinkerType
        * @param is2D
        * @param kappa
        * @return MEHPForceBalance
@@ -74,14 +74,14 @@ namespace calc {
         const pylimer_tools::entities::Universe& universe,
         pylimer_tools::calc::entanglement_detection::AtomPairEntanglements
           entanglements,
-        int crosslinkerType = 2,
+        int crossLinkerType = 2,
         bool is2D = false,
         double kappa = 1.0)
       {
         pylimer_tools::entities::Universe emptyUniverse =
           pylimer_tools::entities::Universe(universe.getBox());
         MEHPForceBalance fb =
-          MEHPForceBalance(emptyUniverse, crosslinkerType, is2D, kappa);
+          MEHPForceBalance(emptyUniverse, crossLinkerType, is2D, kappa);
         fb.configAssumeBoxLargeEnough(false);
         fb.universe = universe;
 
@@ -89,21 +89,21 @@ namespace calc {
           entanglements.pairsOfAtoms;
         std::vector<long int> pairOfAtom = entanglements.pairOfAtom;
 
-        std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
-          universe.getChainsWithCrosslinker(crosslinkerType);
+        std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
+          universe.getChainsWithCrosslinker(crossLinkerType);
 
         // add ends of chains
         std::unordered_map<size_t, size_t> endAtomIdToLinkIdx;
-        endAtomIdToLinkIdx.reserve(crosslinkerChains.size() * 2);
+        endAtomIdToLinkIdx.reserve(crossLinkerChains.size() * 2);
         size_t currentVertexId = 0;
         size_t numUseableChains = 0;
-        for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
-          pylimer_tools::entities::Molecule chain = crosslinkerChains[i];
+        for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
+          pylimer_tools::entities::Molecule chain = crossLinkerChains[i];
           if (chain.getLength() < 2) {
             continue;
           }
           std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
-            chain.getAtomsLinedUp(crosslinkerType, false, true);
+            chain.getAtomsLinedUp(crossLinkerType, false, true);
           if (!pylimer_tools::utils::map_has_key(endAtomIdToLinkIdx,
                                                  linedUpAtoms[0].getId())) {
             endAtomIdToLinkIdx[linedUpAtoms[0].getId()] = currentVertexId;
@@ -179,16 +179,16 @@ namespace calc {
 
         size_t springIdx = 0;
         size_t partialSpringIdx = 0;
-        for (size_t chainIdx = 0; chainIdx < crosslinkerChains.size();
+        for (size_t chainIdx = 0; chainIdx < crossLinkerChains.size();
              ++chainIdx) {
-          pylimer_tools::entities::Molecule chain = crosslinkerChains[chainIdx];
+          pylimer_tools::entities::Molecule chain = crossLinkerChains[chainIdx];
           if (chain.getLength() < 2) {
             continue;
           }
 
           fb.initialConfig.springToMoleculeIds.push_back(chainIdx);
           std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
-            chain.getAtomsLinedUp(crosslinkerType, false, true);
+            chain.getAtomsLinedUp(crossLinkerType, false, true);
           size_t previousIdx = 0;
 
           size_t previousLinkIdx =
@@ -197,7 +197,7 @@ namespace calc {
             fb.initialConfig,
             endAtomIdToLinkIdx.at(linedUpAtoms[0].getId()),
             linedUpAtoms[0],
-            fb.crosslinkerType);
+            fb.crossLinkerType);
           fb.initialConfig.linkIndicesOfSprings[springIdx].push_back(
             endAtomIdToLinkIdx.at(linedUpAtoms[0].getId()));
           fb.initialConfig
@@ -209,7 +209,7 @@ namespace calc {
           fb.setLinkPropertiesFromAtom(fb.initialConfig,
                                        endAtomIdToLinkIdx.at(lastAtom.getId()),
                                        lastAtom,
-                                       fb.crosslinkerType);
+                                       fb.crossLinkerType);
           fb.initialConfig.springIndexA[springIdx] = previousLinkIdx;
           assert(linedUpAtoms.size() == chain.getLength() ||
                  linedUpAtoms.size() == chain.getLength() + 1);
@@ -323,7 +323,7 @@ namespace calc {
        * @param minimumNrOfSliplinks
        * @param sameStrandCutoff
        * @param seed
-       * @param crosslinkerType
+       * @param crossLinkerType
        * @param is2D
        * @param kappa
        * @return MEHPForceBalance
@@ -335,7 +335,7 @@ namespace calc {
         const size_t minimumNrOfSliplinks,
         const double sameStrandCutoff,
         const std::string seed = "",
-        int crosslinkerType = 2,
+        int crossLinkerType = 2,
         bool is2D = false,
         double kappa = 1.0)
       {
@@ -348,7 +348,7 @@ namespace calc {
                                       minimumNrOfSliplinks,
                                       sameStrandCutoff,
                                       seed,
-                                      crosslinkerType);
+                                      crossLinkerType);
 
         RUNTIME_EXP_IFN(
           entanglements.pairsOfAtoms.size() >= minimumNrOfSliplinks,
@@ -357,7 +357,7 @@ namespace calc {
             std::to_string(minimumNrOfSliplinks) + ".");
 
         return MEHPForceBalance::constructWithSlipLinks(
-          universe, entanglements, crosslinkerType, is2D, kappa);
+          universe, entanglements, crossLinkerType, is2D, kappa);
       }
 
       /**
@@ -372,9 +372,9 @@ namespace calc {
           this->evaluatePartialSpringVectors(
             this->initialConfig, this->currentDisplacements, is2D);
         this->defaultR0Squared =
-          universe.computeMeanSquareEndToEndDistance(crosslinkerType);
+          universe.computeMeanSquareEndToEndDistance(crossLinkerType);
         this->defaultNrOfChains =
-          universe.getMolecules(this->crosslinkerType).size();
+          universe.getMolecules(this->crossLinkerType).size();
         this->validateNetwork();
       }
 
@@ -1810,12 +1810,12 @@ namespace calc {
        * @brief Convert the universe to a network
        *
        * @param net the target network
-       * @param crosslinkerType the atom type of the crosslinker
+       * @param crossLinkerType the atom type of the crossLinker
        * @return true
        * @return false
        */
       bool ConvertNetwork(ForceBalanceNetwork& net,
-                          const int crosslinkerType,
+                          const int crossLinkerType,
                           bool remove2functionalCrosslinkers = false,
                           bool removeDanglingChains = false);
 
@@ -2029,8 +2029,8 @@ namespace calc {
         int atomType)
       {
         assert(linkIdx < net.nrOfLinks);
-        assert(atom1.getType() != this->crosslinkerType &&
-               atom2.getType() != this->crosslinkerType);
+        assert(atom1.getType() != this->crossLinkerType &&
+               atom2.getType() != this->crossLinkerType);
         if (atom1.getId() > atom2.getId()) {
           // make sure a second call to this function would result in same
           // result
@@ -2044,7 +2044,7 @@ namespace calc {
         coords += 0.5 * dist;
 
         net.coordinates.segment(3 * linkIdx, 3) = coords;
-        net.linkIsSliplink[linkIdx] = atomType != this->crosslinkerType;
+        net.linkIsSliplink[linkIdx] = atomType != this->crossLinkerType;
       }
 
       /**
@@ -2065,7 +2065,7 @@ namespace calc {
         }
 
         net.coordinates.segment(3 * linkIdx, 3) = atom.getCoordinates();
-        net.linkIsSliplink[linkIdx] = atomType != this->crosslinkerType;
+        net.linkIsSliplink[linkIdx] = atomType != this->crossLinkerType;
         if (!net.linkIsSliplink[linkIdx]) {
           net.oldAtomIds[linkIdx] = atom.getId();
         }
@@ -2103,7 +2103,7 @@ namespace calc {
         size_t from = net.springPartIndexA[partialSpringIdx];
         size_t to = net.springPartIndexB[partialSpringIdx];
         std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
-          chain.getAtomsLinedUp(crosslinkerType, false, true);
+          chain.getAtomsLinedUp(crossLinkerType, false, true);
         partitions[partialSpringIdx] =
           static_cast<double>(atom2Idx - atom1Idx) /
           static_cast<double>(chain.getNrOfBonds());
@@ -2124,7 +2124,7 @@ namespace calc {
         Eigen::Vector3d expectedDistance =
           chain.getOverallBondSumFromTo(linedUpAtoms[atom1Idx].getId(),
                                         linedUpAtoms[atom2Idx].getId(),
-                                        crosslinkerType);
+                                        crossLinkerType);
         Eigen::Vector3d additionalDistance1 =
           linedUpAtoms[atom1Idx].getCoordinates() -
           net.coordinates.segment(3 * from, 3);
@@ -2197,8 +2197,8 @@ namespace calc {
 
             if (this->isPartOfSpring(net, aroundLinkIdx, candidate1) &&
                 this->isPartOfSpring(net, aroundLinkIdx, candidate2) &&
-                // we cannot handle the case where `partialSpringIdx` is a primary loop
-                // without `notPartialSpringIdx`
+                // we cannot handle the case where `partialSpringIdx` is a
+                // primary loop without `notPartialSpringIdx`
                 net.springPartIndexA[partialSpringIdx] !=
                   net.springPartIndexB[partialSpringIdx]) {
               // this is a b-a-b-a situation
@@ -2468,7 +2468,7 @@ namespace calc {
       Eigen::VectorXd currentPartialSpringDistances;
       Eigen::VectorXd
         currentSpringPartitionsVec; /* gives the parametrisation of N */
-      int crosslinkerType = 2;
+      int crossLinkerType = 2;
       int sliplinkType = 3;
       int nrOfStepsDone = 0;
       ExitReason exitReason = ExitReason::UNSET;

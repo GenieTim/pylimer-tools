@@ -11,6 +11,7 @@ extern "C"
 #include <map>
 #include <string>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 namespace pylimer_tools {
@@ -60,6 +61,7 @@ namespace entities {
     }
     long int getAtomIdByIdx(const int vertexId) const override;
     long int getIdxByAtomId(const int atomId) const override;
+    std::pair<Atom, Atom> getChainEnds(int crossLinkerType = 2) const;
 
     // computations
     double computeEndToEndDistance();
@@ -79,10 +81,10 @@ namespace entities {
      *
      * NOTE: even for primary loops, it is possible that this is not equal to
      * zero.
-     * @param crosslinkerType
+     * @param crossLinkerType
      * @return Eigen::Vector3d
      */
-    Eigen::Vector3d getOverallBondSum(const int crosslinkerType = 2) const;
+    Eigen::Vector3d getOverallBondSum(const int crossLinkerType = 2) const;
 
     /**
      * @brief Get the overall offset in terms of boxes (for PBC)
@@ -94,19 +96,19 @@ namespace entities {
      * zero.
      * @param atomIdFrom
      * @param atomIdTo
-     * @param crosslinkerType
+     * @param crossLinkerType
      * @param requireOrder whether to throw an error if atomIdTo is occurring
      * before atomIdFrom
      * @return Eigen::Vector3d
      */
     Eigen::Vector3d getOverallBondSumFromTo(size_t atomIdFrom,
                                             size_t atomIdTo,
-                                            const int crosslinkerType = 2,
+                                            const int crossLinkerType = 2,
                                             bool requireOrder = true) const;
 
     size_t getNrOfBondsFromTo(size_t atomIdFrom,
                               size_t atomIdTo,
-                              const int crosslinkerType = 2,
+                              const int crossLinkerType = 2,
                               bool requireOrder = true) const;
 
     // operators

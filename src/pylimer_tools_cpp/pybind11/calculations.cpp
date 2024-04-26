@@ -342,7 +342,7 @@ init_pylimer_bound_calc(py::module_& m)
           Instantiate the simulator for a certain universe.
 
           :param universe: the universe to simulate with
-          :param crosslinkerType: The atom type of the cross-linkers. Needed to reduce the network.
+          :param crossLinkerType: The atom type of the cross-linkers. Needed to reduce the network.
           :param is2D: Whether to ignore the z direction.
           :param forceEvaluator: The force evaluator to use
           :param kappa: The spring constant
@@ -353,7 +353,7 @@ init_pylimer_bound_calc(py::module_& m)
                :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getDanglingWeightFraction()`
           )pbdoc",
          py::arg("universe"),
-         py::arg("crosslinkerType") = 2,
+         py::arg("crossLinkerType") = 2,
          py::arg("is2D") = false,
          py::arg("forceEvaluator") = nullptr,
          py::arg("kappa") = 1.0,
@@ -611,13 +611,13 @@ init_pylimer_bound_calc(py::module_& m)
           Instantiate the simulator for a certain universe.
 
           :param universe: the universe to simulate with
-          :param crosslinkerType: The atom type of the cross-linkers. Needed to reduce the network.
+          :param crossLinkerType: The atom type of the cross-linkers. Needed to reduce the network.
           :param is2D: Whether to ignore the z direction.
           :param kappa: the spring constant
           :param remove2functionalCrosslinkers: whether to keep or remove the 2-functional cross-links when setting up the network
           )pbdoc",
          py::arg("universe"),
-         py::arg("crosslinkerType") = 2,
+         py::arg("crossLinkerType") = 2,
          py::arg("is2D") = false,
          py::arg("kappa") = 1.0,
          py::arg("remove2functionalCrosslinkers") = true)
@@ -636,7 +636,7 @@ init_pylimer_bound_calc(py::module_& m)
                 py::arg("min_nr_of_slip_links") = 0,
                 py::arg("same_strand_cutoff") = 3,
                 py::arg("seed") = "",
-                py::arg("crosslinker_type") = 2,
+                py::arg("crossLinker_type") = 2,
                 py::arg("is_2D") = false,
                 py::arg("kappa") = 1.0)
     .def_property_readonly("network", &mehp::MEHPForceBalance::getNetwork)
@@ -817,7 +817,8 @@ init_pylimer_bound_calc(py::module_& m)
     .def("getNumExtraAtoms", &mehp::MEHPForceBalance::getNumExtraAtoms)
     .def("getNumBonds", &mehp::MEHPForceBalance::getNumBonds)
     .def("getNumExtraBonds", &mehp::MEHPForceBalance::getNumExtraBonds)
-    .def("getNumIntraChainSlipLinks", &mehp::MEHPForceBalance::getNumIntraChainSlipLinks)
+    .def("getNumIntraChainSlipLinks",
+         &mehp::MEHPForceBalance::getNumIntraChainSlipLinks)
     .def("getPressure",
          &mehp::MEHPForceBalance::getPressure,
          R"pbdoc(
@@ -1007,7 +1008,9 @@ init_pylimer_bound_calc(py::module_& m)
      )pbdoc")
     .def("getCurrentSpringVectors",
          &mehp::MEHPForceBalance::getCurrentSpringDistances)
-     .def("getOverallSpringLengths", &mehp::MEHPForceBalance::getOverallSpringLengths, R"pbdoc(
+    .def("getOverallSpringLengths",
+         &mehp::MEHPForceBalance::getOverallSpringLengths,
+         R"pbdoc(
           Get the sum of the lengths of the partial springs of each spring.
      )pbdoc")
     .def("getEffectiveFunctionalityOfAtoms",
@@ -1062,7 +1065,7 @@ init_pylimer_bound_calc(py::module_& m)
           The results should be compareable to the force relaxation code.
          )pbdoc",
                 py::arg("universe"),
-                py::arg("crosslinker_type") = 2,
+                py::arg("crossLinker_type") = 2,
                 py::arg("is_2D") = false,
                 py::arg("kappa") = 1.0)
     .def_static("constructWithSlipLinks",
@@ -1081,7 +1084,7 @@ init_pylimer_bound_calc(py::module_& m)
                 py::arg("z"),
                 py::arg("alpha1"),
                 py::arg("alpha2"),
-                py::arg("crosslinker_type") = 2,
+                py::arg("crossLinker_type") = 2,
                 py::arg("is_2D") = false,
                 py::arg("kappa") = 1.0,
                 py::arg("clampAlpha") = false)
@@ -1096,7 +1099,7 @@ init_pylimer_bound_calc(py::module_& m)
                 py::arg("min_nr_of_slip_links") = 0,
                 py::arg("same_strand_cutoff") = 2,
                 py::arg("seed") = "",
-                py::arg("crosslinker_type") = 2,
+                py::arg("crossLinker_type") = 2,
                 py::arg("is_2D") = false,
                 py::arg("kappa") = 1.0)
     .def("__copy__",
@@ -1411,7 +1414,7 @@ init_pylimer_bound_calc(py::module_& m)
                   const std::string>(),
          "Get an instance of this class",
          py::arg("universe"),
-         py::arg("crosslinker_type") = 2,
+         py::arg("crossLinker_type") = 2,
          py::arg("slipspring_bond_type") = 9,
          py::arg("is_2D") = false,
          py::arg("seed") = "")

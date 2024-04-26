@@ -27,8 +27,8 @@ It could be used e.g. like this:
   numberOfChains = 0
   numberOfSolventChains = 0
   beadsPerSolventChain = 0
-  crosslinkerConversion = 0
-  crosslinkerFunctionality = 0
+  crossLinkerConversion = 0
+  crossLinkerFunctionality = 0
   # END TODO
 
   # Start generating the network
@@ -41,7 +41,7 @@ It could be used e.g. like this:
   generator.addSolventChains(numberOfSolventChains, beadsPerSolventChain, 3)
   print("Added solvent chains {}".format(datetime.now().strftime("%H:%M:%S")))
   generator.addAndLinkStrands(numberOfChains, nrOfBeadsPerChain,
-                              crosslinkerConversion, crosslinkerFunctionality, 1)
+                              crossLinkerConversion, crossLinkerFunctionality, 1)
   print("Added and linked strands {}".format(
       datetime.now().strftime("%H:%M:%S")))
   universe = generator.getUniverse()

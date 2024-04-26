@@ -158,14 +158,12 @@
   "C_Cpp.inlayHints.autoDeclarationTypes.showOnLeft": true,
   "C_Cpp.clang_format_sortIncludes": null,
   "c-cpp-flylint.flexelint.enable": false,
-  "flake8.args": [
-    "--max-line-length=120"
-  ],
+  "flake8.args": ["--max-line-length=120"],
   "cSpell.words": [
     "attogram",
     "avogadro",
-    "crosslinker",
-    "crosslinkers",
+    "crossLinker",
+    "crossLinkers",
     "igraph",
     "lammps",
     "LAMMPS",
@@ -177,8 +175,5 @@
     "xlink",
     "xlinks"
   ],
-  "autopep8.args": [
-    "--ignore",
-    "W690"
-  ]
+  "autopep8.args": ["--ignore", "W690"]
 }

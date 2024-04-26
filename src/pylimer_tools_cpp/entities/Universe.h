@@ -114,16 +114,16 @@ namespace entities {
     std::vector<Universe> getClusters() const;
     std::vector<Molecule> getMolecules(const int atomTypeToOmit = -1) const;
     std::vector<Molecule> getChainsWithCrosslinker(
-      const int crosslinkerType) const;
-    Universe getNetworkOfCrosslinker(const int crosslinkerType) const;
+      const int crossLinkerType) const;
+    Universe getNetworkOfCrosslinker(const int crossLinkerType) const;
     // TODO: find & implement a better return type, e.g. std::vector<Molecule>
     std::vector<std::vector<long int>> findLoops(
-      const int crosslinkerType,
+      const int crossLinkerType,
       const int maxLength = -1,
       bool skipSelfLoops = false,
       std::vector<std::vector<long int>>* edges = nullptr) const;
     std::map<int, std::vector<std::vector<Atom>>> findLoopsOfAtoms(
-      const int crosslinkerType,
+      const int crossLinkerType,
       const int maxLength = -1,
       bool skipSelfLoops = false) const;
     std::vector<Atom> findMinimalOrderLoopFrom(
@@ -131,7 +131,7 @@ namespace entities {
       const long int loopStep1,
       const int maxLength = -1,
       bool skipSelfLoops = false) const;
-    bool hasInfiniteStrand(const int crosslinkerType,
+    bool hasInfiniteStrand(const int crossLinkerType,
                            const int maxLength = -1) const;
     std::vector<int> getAtomTypes() const
     {
@@ -183,19 +183,19 @@ namespace entities {
       const std::vector<long int>& vertexIndicesLoop2,
       const std::vector<long int>& edgeIndicesLoop1,
       const std::vector<long int>& edgeIndicesLoop2) const;
-    double getMeanStrandLength(int crosslinkerType);
-    std::vector<double> computeEndToEndDistances(int crosslinkerType);
-    double computeMeanEndToEndDistance(int crosslinkerType);
+    double getMeanStrandLength(int crossLinkerType);
+    std::vector<double> computeEndToEndDistances(int crossLinkerType);
+    double computeMeanEndToEndDistance(int crossLinkerType);
     double computeMeanSquareEndToEndDistance(
-      int crosslinkerType,
+      int crossLinkerType,
       bool onlyThoseWithTwoCrosslinkers = false);
     double computeMeanBondLength();
     double computeTotalMass() const;
     double computeTotalMassWithMasses(
       std::map<int, double> massPerTypeToUse) const;
-    double computeWeightAverageMolecularWeight(int crosslinkerType) const;
-    double computeNumberAverageMolecularWeight(int crosslinkerType) const;
-    double computePolydispersityIndex(int crosslinkerType) const;
+    double computeWeightAverageMolecularWeight(int crossLinkerType) const;
+    double computeNumberAverageMolecularWeight(int crossLinkerType) const;
+    double computePolydispersityIndex(int crossLinkerType) const;
     bool validate();
 
     template<class Archive>

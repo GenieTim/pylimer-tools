@@ -74,7 +74,7 @@ namespace calc {
       double lowCutoff = 0.5;
       double maxBondLen = 5.;
       double sigma = 3.;
-      int crosslinkerType = 2;
+      int crossLinkerType = 2;
       int slipspringBondType = 9;
       long int nStepsDPD = 500;
       long int nStepsMC = 500;
@@ -137,7 +137,7 @@ namespace calc {
 
     public:
       DPDSimulator(const pylimer_tools::entities::Universe& u,
-                   const int crosslinkerType = 2,
+                   const int crossLinkerType = 2,
                    const int slipspringBondType = 9,
                    const bool is2D = false,
                    const std::string& seed = "");
@@ -291,7 +291,7 @@ namespace calc {
             this->isRelocationTarget[i] = true;
             this->chainEndIndices.push_back(i);
           } else if (allowReloc &&
-                     this->atomTypes[i] != this->crosslinkerType) {
+                     this->atomTypes[i] != this->crossLinkerType) {
             // check if this is a bead that's connected to a cross-linker
             if (this->idxFunctionalities[i] == 2) {
               // this "any of" here might be a bit overkill, given that we know
@@ -303,9 +303,9 @@ namespace calc {
                   assert(this->bondPartnersA[bondIdx] == i ||
                          this->bondPartnersB[bondIdx] == i);
                   return this->atomTypes[this->bondPartnersA[bondIdx]] ==
-                           this->crosslinkerType ||
+                           this->crossLinkerType ||
                          this->atomTypes[this->bondPartnersB[bondIdx]] ==
-                           this->crosslinkerType;
+                           this->crossLinkerType;
                 });
               this->isRelocationTarget[i] = true;
               this->chainEndIndices.push_back(i);
@@ -467,7 +467,10 @@ namespace calc {
         return bondLengths;
       }
 
-      Eigen::VectorXd getCoordinates() override { return this->coordinates; }
+      Eigen::VectorXd getCoordinates() override
+      {
+        return this->coordinates;
+      }
 
       double getTemperature() override
       {
@@ -511,7 +514,7 @@ namespace calc {
            doDeformation,
            dt);
         if (version > 1) {
-          ar(allowRelocationInNetwork, crosslinkerType);
+          ar(allowRelocationInNetwork, crossLinkerType);
         }
         if (version > 2) {
           ar(slipspringBondType);

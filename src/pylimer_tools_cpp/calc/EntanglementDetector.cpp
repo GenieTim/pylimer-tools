@@ -23,7 +23,7 @@ namespace calc {
      * @param sameStrandCutoff the number of beads required between two atoms of
      * the same strand
      * @param seed the random seed
-     * @param crosslinkerType the type of the cross-link atoms
+     * @param crossLinkerType the type of the cross-link atoms
      * @return AtomPairEntanglements
      */
     AtomPairEntanglements randomlyFindEntanglements(
@@ -33,7 +33,7 @@ namespace calc {
       const size_t minimumNrOfSliplinks,
       const double sameStrandCutoff,
       const std::string& seed,
-      int crosslinkerType)
+      int crossLinkerType)
     {
       INVALIDARG_EXP_IFN(minimumNrOfSliplinks < universe.getNrOfAtoms() / 2,
                          "Minimum number of slip-links must be less than the "
@@ -57,23 +57,23 @@ namespace calc {
           universe.getNrOfAtoms(), -1);
 
       // assemble some minor performance benefits
-      std::vector<pylimer_tools::entities::Molecule> crosslinkerChains =
-        universe.getChainsWithCrosslinker(crosslinkerType);
+      std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
+        universe.getChainsWithCrosslinker(crossLinkerType);
 
       std::unordered_map<size_t, size_t> atomToStrand;
       atomToStrand.reserve(universe.getNrOfAtoms());
       std::unordered_map<size_t, size_t> atomIdxInStrand;
       atomIdxInStrand.reserve(universe.getNrOfAtoms());
-      for (size_t i = 0; i < crosslinkerChains.size(); ++i) {
-        pylimer_tools::entities::Molecule chain = crosslinkerChains[i];
+      for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
+        pylimer_tools::entities::Molecule chain = crossLinkerChains[i];
         RUNTIME_EXP_IFN(chain.getType() !=
                           pylimer_tools::entities::MoleculeType::UNDEFINED,
                         "Couldn't determine molecule type.");
         std::vector<pylimer_tools::entities::Atom> atoms =
-          crosslinkerChains[i].getAtomsLinedUp(crosslinkerType, true, true);
+          crossLinkerChains[i].getAtomsLinedUp(crossLinkerType, true, true);
         for (size_t atomIdx = 0; atomIdx < atoms.size(); ++atomIdx) {
           pylimer_tools::entities::Atom atom = atoms[atomIdx];
-          if (atom.getType() != crosslinkerType) {
+          if (atom.getType() != crossLinkerType) {
             atomToStrand.emplace(atom.getId(), i);
             atomIdxInStrand.emplace(atom.getId(), atomIdx);
           }
@@ -88,8 +88,8 @@ namespace calc {
         std::remove_if(
           atomsForNeighbourList.begin(),
           atomsForNeighbourList.end(),
-          [crosslinkerType](const pylimer_tools::entities::Atom& a) {
-            return a.getType() == crosslinkerType;
+          [crossLinkerType](const pylimer_tools::entities::Atom& a) {
+            return a.getType() == crossLinkerType;
           }),
         atomsForNeighbourList.end());
       // some randomness for placement
