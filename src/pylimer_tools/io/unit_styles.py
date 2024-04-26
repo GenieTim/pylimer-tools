@@ -12,6 +12,16 @@ class UnitStyle(object):
     UnitStyle: a collection of units of a particular LAMMPS unit style,
     but in SI units
     (i.e.: use this to convert your LAMMPS output data to SI units).
+
+    Example usage:
+
+    .. code:: python
+
+        unit_style_factory = UnitStyleFactory()
+        unit_style = unit_style_factory.get_unit_style(
+            "lj", polymer="pdms", warning=False, accept_mol=True)
+
+        lj_stress_to_si_conversion_factor = (1.*unit_style.pressure).to("MPa").magnitude
     """
 
     def __init__(self, unit_configuration: dict, ureg: UnitRegistry):
