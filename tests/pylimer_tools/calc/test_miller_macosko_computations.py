@@ -64,7 +64,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
 
     def test_shear_modulus_prediction(self):
         self.assertRaises(ValueError, lambda: predict_shear_modulus(
-            network=self.emptyUniverse, crossLinker_type=2, unit_style=None))
+            network=self.emptyUniverse, crosslinker_type=2, unit_style=None))
         self.assertRaises(ValueError, lambda: predict_shear_modulus(
             network=self.emptyUniverse, unit_style=None))
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
@@ -74,13 +74,13 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         # TODO: find literature motiviation for results fo the functions
         self.assertAlmostEqual(0.1467020757993193, predict_shear_modulus(
             network=self.saturatedTestUniverse, unit_style=unit_style,
-            crossLinker_type=2).to('MPa').magnitude)
+            crosslinker_type=2).to('MPa').magnitude)
         self.assertAlmostEqual(0.1467020757993193, predict_shear_modulus(
-            network=self.saturatedTestUniverse, unit_style=unit_style, crossLinker_type=2,
+            network=self.saturatedTestUniverse, unit_style=unit_style, crosslinker_type=2,
             functionality_per_type={2: 4}).to('MPa').magnitude)
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
         self.assertAlmostEqual(0.1467020757993193, predict_shear_modulus(
-            network=self.saturatedTestUniverse, unit_style=unit_style, crossLinker_type=2).to('MPa').magnitude)
+            network=self.saturatedTestUniverse, unit_style=unit_style, crosslinker_type=2).to('MPa').magnitude)
 
     def test_predict_number_density_of_junction_points(self):
         self.testUniverse.setMasses({1: 1, 2: 1})
@@ -189,9 +189,9 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             self.saturatedTestUniverse, 2))
         # TODO: get some literature backed values to test for
         bb = compute_weight_fraction_of_backbone(
-            self.saturatedTestUniverse, crossLinker_type=2)
+            self.saturatedTestUniverse, crosslinker_type=2)
         wsol = compute_weight_fraction_of_soluble_material(
-            self.saturatedTestUniverse, crossLinker_type=2)
+            self.saturatedTestUniverse, crosslinker_type=2)
         self.assertAlmostEqual(0.8, bb)
         self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
         self.assertEqual(1 - bb - wsol, compute_weight_fraction_of_dangling_chains(
@@ -200,13 +200,13 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
         # test also as if the functionality was 4
         # self.assertRaises(ValueError, lambda: compute_weight_fraction_of_backbone(self.saturatedTestUniverse,
-        #       crossLinker_type=2, functionality_per_type={
+        #       crosslinker_type=2, functionality_per_type={
         #     1: 2, 2: 4
         # }))
         # NOTE: requires a short strand length with these systems, as otherwise, r > 1
         # which is not supported by the formulas implemented
         self.assertAlmostEqual(0.14931407018789813, compute_weight_fraction_of_backbone(self.saturatedTestUniverse,
-                                                                                        crossLinker_type=2,
+                                                                                        crosslinker_type=2,
                                                                                         functionality_per_type={
                                                                                             1: 2, 2: 4
                                                                                         }))
@@ -218,7 +218,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
 
         # these results are pretty certain, align with experimental results, confirmed
         g_mmt_phantom, g_mmt_entanglement, g_anm, g_pnm = compute_modulus_decomposition(
-            network=None, unit_style=unit_style, crossLinker_type=2, r=1., p=0.95, f=4,
+            network=None, unit_style=unit_style, crosslinker_type=2, r=1., p=0.95, f=4,
             nu=4.69218e25 *
             (unit_style.get_underlying_unit_registry()('meter')**-3),
             temperature=298 * unit_style.get_underlying_unit_registry()('kelvin')
@@ -236,7 +236,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
 
         # these in turn require further investigation into the involvement of r
         g_mmt_phantom, g_mmt_entanglement, g_anm, g_pnm = compute_modulus_decomposition(
-            network=None, unit_style=unit_style, crossLinker_type=2, r=1.3, p=0.6465, f=4,
+            network=None, unit_style=unit_style, crosslinker_type=2, r=1.3, p=0.6465, f=4,
             nu=1.25981e25 * (unit_style.get_underlying_unit_registry()(
                 'meter')**-3), temperature=298 * unit_style.get_underlying_unit_registry()('kelvin')
         )

@@ -4,15 +4,15 @@ import click
 import numpy as np
 
 from pylimer_tools.calc.structure_analysis import (
-    compute_crossLinker_conversion, compute_extent_of_reaction,
+    compute_crosslinker_conversion, compute_extent_of_reaction,
     compute_stoichiometric_imbalance)
 from pylimer_tools_cpp.pylimer_tools_cpp import UniverseSequence
 
 
 @click.command()
 @click.argument('files', nargs=-1, type=click.Path(exists=True))
-@click.option('--crossLinker_type', type=int, default=2)
-def cli(files, crossLinker_type):
+@click.option('--crosslinker_type', type=int, default=2)
+def cli(files, crosslinker_type):
     """
     Basic CLI application reading all passed files, outputting some stats on the structures therein
 
@@ -20,7 +20,7 @@ def cli(files, crossLinker_type):
       - files: list of files to read
     """
     click.echo("Processing {} files".format(len(files)))
-    crossLinker_type = crossLinker_type
+    crosslinker_type = crosslinker_type
     for file_path in files:
         click.echo("\nAnalysing File " + file_path)
 
@@ -31,7 +31,7 @@ def cli(files, crossLinker_type):
             universe.getNrOfAtoms(), universe.getVolume(), universe.getNrOfAtoms() / universe.getVolume()))
         click.echo("{} atoms and {} bonds, {} angles, {} dihedrals".format(universe.getNrOfAtoms(
         ), universe.getNrOfBonds(), universe.getNrOfAngles(), universe.getNrOfDihedralAngles()))
-        molecules = universe.getMolecules(crossLinker_type)
+        molecules = universe.getMolecules(crosslinker_type)
         bond_lengths = [np.mean(m.computeBondLengths()) for m in molecules]
         non_none_bond_lengths = [
             bl for bl in bond_lengths if bl is not None and bl > 0]
@@ -45,12 +45,12 @@ def cli(files, crossLinker_type):
             len(molecules), np.mean([m.getNrOfAtoms() for m in molecules])))
         click.echo("r = {}, p = {} ({}), D = {}".format(
             compute_stoichiometric_imbalance(
-                universe, crossLinker_type),
-            compute_extent_of_reaction(universe, crossLinker_type),
+                universe, crosslinker_type),
+            compute_extent_of_reaction(universe, crosslinker_type),
             # mehp.calculateEffectiveCrosslinkerFunctionality(
-            #     universe, crossLinker_type),
-            compute_crossLinker_conversion(universe, crossLinker_type),
-            universe.computePolydispersityIndex(crossLinker_type)
+            #     universe, crosslinker_type),
+            compute_crosslinker_conversion(universe, crosslinker_type),
+            universe.computePolydispersityIndex(crosslinker_type)
         ))
         click.echo("")
     click.echo("Arbitrary units used. E.g.: Length: u")
