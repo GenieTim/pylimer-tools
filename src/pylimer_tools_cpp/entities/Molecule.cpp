@@ -358,7 +358,7 @@ namespace entities {
     }
     if (this->getNrOfAtoms() == 1) {
       if (this->getNrOfBonds() > 0 && closePrimaryLoop) {
-        return { this->getAtomByVertexIdx(0),this->getAtomByVertexIdx(0) };
+        return { this->getAtomByVertexIdx(0), this->getAtomByVertexIdx(0) };
       } else {
         return { this->getAtomByVertexIdx(0) };
       }
@@ -377,8 +377,9 @@ namespace entities {
         "For a primary loop, expected exactly one cross-link, got " +
           std::to_string(crossLinks.size()) + " in molecule " + this->getKey() +
           ".");
-      return closePrimaryLoop ? std::vector<Atom>({ crossLinks[0], crossLinks[0] })
-                              : std::vector<Atom>({ crossLinks[0] });
+      return closePrimaryLoop
+               ? std::vector<Atom>({ crossLinks[0], crossLinks[0] })
+               : std::vector<Atom>({ crossLinks[0] });
     }
     RUNTIME_EXP_IFN(endsOfChain.size() == 2,
                     "Expected to find the two ends of the chain as atoms of "
@@ -525,8 +526,7 @@ namespace entities {
     }
 
     std::vector<Atom> chainEnds = this->getChainEnds(crossLinkerType);
-    long int vertexIdToStartWith =
-      this->getIdxByAtomId(chainEnds[0].getId());
+    long int vertexIdToStartWith = this->getIdxByAtomId(chainEnds[0].getId());
 
     std::vector<long int> connections =
       this->getVertexIdxsConnectedTo(vertexIdToStartWith);

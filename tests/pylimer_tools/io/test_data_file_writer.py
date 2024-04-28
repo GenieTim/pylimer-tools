@@ -15,7 +15,8 @@ class DataFileWriterTest(unittest.TestCase):
         writer.writeToFile(file)
 
         read_universe = read_data_file(file)
-        self.assertEqual(read_universe.get_nr_of_atoms(), universe.get_nr_of_atoms())
+        self.assertEqual(read_universe.get_nr_of_atoms(),
+                         universe.get_nr_of_atoms())
 
         # then, assert that after writing with the new image flags, things are correct
         molecule = read_universe.get_molecules(2)[0]
@@ -28,16 +29,16 @@ class DataFileWriterTest(unittest.TestCase):
 
         # add atoms that require new image flags
         universe.addAtoms(
-            [i+1 for i in range(10)], [1 for _ in range(10)],
-            [i+7. for i in range(10)], [0 for i in range(10)
-                                        ], [0 for i in range(10)],
+            [i + 1 for i in range(10)], [1 for _ in range(10)],
+            [i + 7. for i in range(10)], [0 for i in range(10)
+                                          ], [0 for i in range(10)],
             [random.randint(0, 10) for i in range(10)], [random.randint(
                 0, 10) for i in range(10)], [random.randint(0, 10) for i in range(10)]
         )
 
         universe.addBonds(
-            [i+1 for i in range(9)],
-            [i+2 for i in range(9)]
+            [i + 1 for i in range(9)],
+            [i + 2 for i in range(9)]
         )
 
         # first, make sure the random image flags actually

@@ -56,8 +56,9 @@ namespace utils {
     return value;
   }
 
-  static inline std::vector<double> segmentwise_norm(const Eigen::VectorXd& vecs,
-                                              const size_t segmentSize = 3)
+  static inline std::vector<double> segmentwise_norm(
+    const Eigen::VectorXd& vecs,
+    const size_t segmentSize = 3)
   {
     INVALIDARG_EXP_IFN(segmentSize > 0, "Segmentwise requires a useable size");
     INVALIDARG_EXP_IFN(vecs.size() % segmentSize == 0,

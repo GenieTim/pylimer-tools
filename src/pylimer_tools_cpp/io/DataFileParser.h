@@ -1,8 +1,8 @@
 #ifndef DATA_FILE_PARSER_H
 #define DATA_FILE_PARSER_H
 
-#include "../utils/StringUtils.h"
 #include "../utils/LammpsAtomStyle.h"
+#include "../utils/StringUtils.h"
 #include <algorithm>
 #include <filesystem>
 #include <iostream>

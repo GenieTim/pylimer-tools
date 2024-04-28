@@ -76,10 +76,10 @@ source_suffix = ['.rst', '.md']
 master_doc = "index"
 
 # Mathjax options
-mathjax_path="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"
+mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"
 mathjax3_config = {
     "tex": {
-        #"inlineMath": [['$', '$'], ['\\(', '\\)']]
+        # "inlineMath": [['$', '$'], ['\\(', '\\)']]
     },
     "extensions": ["jsMath2jax.js"],
     "jax": ["input/TeX"]

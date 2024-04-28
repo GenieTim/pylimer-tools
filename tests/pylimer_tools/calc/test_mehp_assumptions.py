@@ -26,20 +26,19 @@ class TestMEHPAssumptions(unittest.TestCase):
             # attempt 10 times
             # find random coords in the box
             slip_link_coords = np.array(
-                [random.random()*10, random.random()*10, random.random()*10])
-            # 
+                [random.random() * 10, random.random() * 10, random.random() * 10])
+            #
             dist_1 = slip_link_coords - coords1
             box.applyPBC(dist_1)
             dist_2 = coords2 - slip_link_coords
             box.applyPBC(dist_2)
 
-            # we have two choices, and want to 
-            reference_norm = min(linalg.norm(dist_1 + offset) + linalg.norm(dist_2), linalg.norm(dist_1) + linalg.norm(dist_2 + offset))
-            
-            # with this choice done, this test here 
+            # we have two choices, and want to
+            reference_norm = min(linalg.norm(dist_1 + offset) + linalg.norm(
+                dist_2), linalg.norm(dist_1) + linalg.norm(dist_2 + offset))
+
+            # with this choice done, this test here
             # should now check that no other combination gets smaller
-            
-            
 
 
 if __name__ == '__main__':

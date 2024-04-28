@@ -275,7 +275,8 @@ def compute_effective_crosslinker_functionalities(network: Universe, crosslinker
         return []
     junctions = network.get_atoms_by_type(crosslinker_type)
     junction_ids = [v.get_id() for v in junctions]
-    junction_degrees = [network.get_nr_of_bonds_of_atom(id) for id in junction_ids]
+    junction_degrees = [network.get_nr_of_bonds_of_atom(
+        id) for id in junction_ids]
     return junction_degrees
 
 

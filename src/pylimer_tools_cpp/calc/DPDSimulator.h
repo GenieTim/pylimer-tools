@@ -54,7 +54,7 @@ namespace calc {
     {
 
     private:
-      DPDSimulator(){}; // not exposed to users, only used by Cereal
+      DPDSimulator() {}; // not exposed to users, only used by Cereal
       friend class cereal::access;
 
       ////////////////////////////////////////////////////////////////
@@ -153,8 +153,7 @@ namespace calc {
 
       void runSimulation(const long int nSteps, bool withMC = false)
       {
-        runSimulation(
-          nSteps, withMC, []() { return false; }, []() {});
+        runSimulation(nSteps, withMC, []() { return false; }, []() {});
       }
 
       /**
@@ -467,10 +466,7 @@ namespace calc {
         return bondLengths;
       }
 
-      Eigen::VectorXd getCoordinates() override
-      {
-        return this->coordinates;
-      }
+      Eigen::VectorXd getCoordinates() override { return this->coordinates; }
 
       double getTemperature() override
       {
