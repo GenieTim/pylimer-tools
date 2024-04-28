@@ -43,8 +43,7 @@ endif()
 include(${CMAKE_CURRENT_LIST_DIR}/vendor/CMakeLists.txt)
 
 # prepare python bindings
-# Now we can find pybind11
-find_package(pybind11 CONFIG REQUIRED)
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/vendor/pybind11)
 
 message("Using toolchain file ${CMAKE_TOOLCHAIN_FILE}")
 
