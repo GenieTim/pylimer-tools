@@ -446,7 +446,6 @@ def compute_modulus_decomposition(network: Universe, unit_style: UnitStyle, cros
       - G_MMT_entanglement: the entanglement contribution to the MMT modulus
       - g_anm: the ANM estimate of the modulus
       - g_pnm: the PNM estimate of the modulus
-
     """
     if ((crosslinker_type is None or network is None) and (r is None or f is None or p is None or nu is None)):
         raise ValueError(
@@ -548,7 +547,7 @@ def compute_entanglement_modulus(p: float, r: float, f: int, g_e_1: pint.Quantit
                                  unit_style: Union[None, UnitStyle] = None):
     """
     Compute MMT's entanglement contribution to the equilibrium shear modulus, given by
-    :math:`k_B T \epsilon_e T_e`
+    :math:`k_B T \epsilon_e T_e`.
 
     Arguments:
         - p: the cross-linker conversion
@@ -572,7 +571,7 @@ def compute_junction_modulus(p: float, r: float, xlink_concentration_0: pint.Qua
                              temperature: pint.Quantity = None):
     """
     Compute MMT's junction modulus, given by
-    :math:`G_{junctions} = k_B T [A_f]_0 \sum_{m=3}^{f} \frac{m-2}{2} P(X_{m,f})`
+    :math:`G_{junctions} = k_B T [A_f]_0 \sum_{m=3}^{f} \frac{m-2}{2} P(X_{m,f})`.
 
     Arguments:
         - p: the cross-linker conversion

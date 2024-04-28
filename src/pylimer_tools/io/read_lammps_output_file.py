@@ -55,8 +55,8 @@ def read_averages_file(filepath, use_cache: bool = True, sep=" ") -> pd.DataFram
     Important assumption: the first 2 or 3 lines in the file are:
     - comment,
     - then one header indicating the columns,
-    - and then either data or potentially a second header,
-        if it is a sectioned file (e.g., from a `fix ave/time ... vector`)
+    - and then either data or potentially a second header, 
+      if it is a sectioned file (e.g., from a `fix ave/time ... vector`)
 
     Arguments:
         - filepath: the path to the averages file

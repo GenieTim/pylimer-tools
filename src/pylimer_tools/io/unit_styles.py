@@ -97,7 +97,7 @@ class UnitStyleFactory(object):
         Arguments:
           - unit_type (str): The unit type, e.g. "lj", "nano", "real", "si", ...
           - dimension (int): The dimension of the box
-          - **kwargs: additional arguments required force certain unit styles (e.g. lj)
+          - kwargs: additional arguments required force certain unit styles (e.g. style "lj" requiring "polymer")
         """
         ureg = self.ureg
         elementary_charge: Final = (1.602176634e-19) * ureg.coulomb

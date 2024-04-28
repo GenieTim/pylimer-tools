@@ -45,15 +45,15 @@ set in such a way that a `fix bond/swap` would not change the distribution of ch
   fileToWrite = filename + "_converted" + file_extension
 
   universeSeq = UniverseSequence()
-  universeSeq.initializeFromDataSequence([fileToRead])
+  universeSeq.initialize_from_data_sequence([fileToRead])
 
-  universe = universeSeq.atIndex(0)
+  universe = universeSeq.at_index(0)
 
   writer = DataFileWriter(universe)
-  writer.configIncludeAngles(True)
-  writer.configReindexAtoms(True)
-  writer.configCrosslinkerType(2)
-  writer.configMoleculeIdxForSwap(False)
+  writer.config_include_angles(True)
+  writer.config_reindex_atoms(True)
+  writer.config_crosslinker_type(2)
+  writer.config_molecule_idx_for_swap(False)
 
-  writer.writeToFile(fileToWrite)
+  writer.write_to_file(fileToWrite)
   print("Written file: {}".format(fileToWrite))

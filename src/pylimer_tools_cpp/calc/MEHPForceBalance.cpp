@@ -5609,7 +5609,6 @@ namespace calc {
      * @return double
      */
     double MEHPForceBalance::getGammaFactor(
-      double oneOverSpringPartitionUpperLimit,
       double b,
       int nrOfChains) const
     {

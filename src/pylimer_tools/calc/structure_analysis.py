@@ -371,7 +371,6 @@ def measure_weight_fraction_of_soluble_material(network: Universe,
     Returns:
       - :math:`W_{sol}` (float): the weight fraction of soluble material as counted.
             0. for an empty network
-
     """
     if (network.get_nr_of_atoms() == 0):
         return 0.
@@ -408,7 +407,6 @@ def measure_lower_bound_weight_fraction_of_soluble_material(network: Universe, c
     Returns:
       - :math:`W_{sol}` (float): the weight fraction of soluble material as counted.
             0. for an empty network
-
     """
     if (network.get_nr_of_atoms() == 0):
         return 0.0

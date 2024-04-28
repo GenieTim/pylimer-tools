@@ -1094,8 +1094,7 @@ namespace calc {
         double b = 0.96,
         int nrOfChains = -1) const;
 
-      double getGammaFactor(double oneOverSpringPartitionUpperLimit = 1.,
-                            double b = 0.96,
+      double getGammaFactor(double b = 0.96,
                             int nrOfChains = -1) const;
 
       int getNrOfIterations() const { return this->nrOfStepsDone; }
