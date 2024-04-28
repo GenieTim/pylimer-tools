@@ -50,7 +50,8 @@ def load_cache(file: Union[str, List[str], None], suffix: str, disable_warnings:
         file = [file]
     cache_file_name = get_cache_file_name(file, suffix, tmp_dir)
     old_cache_file_name = get_cache_file_name(file, suffix, tmp_dir, True)
-    if (os.path.isfile(old_cache_file_name) and not os.path.isfile(cache_file_name)):
+    if (os.path.isfile(old_cache_file_name)
+            and not os.path.isfile(cache_file_name)):
         shutil.copy2(old_cache_file_name, cache_file_name)
         os.remove(old_cache_file_name)
     if (os.path.isfile(cache_file_name)):
@@ -80,7 +81,8 @@ def load_cache(file: Union[str, List[str], None], suffix: str, disable_warnings:
     return None
 
 
-def get_cache_file_name(file: Union[str, List[str], None], suffix: str, tmp_dir: str = None, old: bool = False):
+def get_cache_file_name(file: Union[str, List[str], None],
+                        suffix: str, tmp_dir: str = None, old: bool = False):
     """
     Get the name and path of a cache file. Internal method.
 

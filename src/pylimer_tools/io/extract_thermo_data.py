@@ -17,10 +17,12 @@ from pylimer_tools_cpp import split_csv
 
 
 def _is_numeric_string(test: str) -> bool:
-    return np.all([c.isnumeric() or c == "." or c == "+" or c == "-" or c == "e" or c == "E" for c in test.strip()])
+    return np.all([c.isnumeric() or c == "." or c == "+" or c ==
+                  "-" or c == "e" or c == "E" for c in test.strip()])
 
 
-def detect_headers(file: str, max_nr_of_lines_to_read: int = 1500, use_cache: bool = True) -> List[str]:
+def detect_headers(file: str, max_nr_of_lines_to_read: int = 1500,
+                   use_cache: bool = True) -> List[str]:
     """
     Read `max_nr_of_lines_to_read` lines from the given file and return all possible header lines.
 
@@ -72,7 +74,8 @@ def detect_headers(file: str, max_nr_of_lines_to_read: int = 1500, use_cache: bo
     return results
 
 
-def read_one_group(fp, header, min_line_len=4, additional_lines_skip=0, lines_to_read_till_header=1e3) -> str:
+def read_one_group(fp, header, min_line_len=4,
+                   additional_lines_skip=0, lines_to_read_till_header=1e3) -> str:
     """
     Read one group of csv lines from the file
 
@@ -122,7 +125,8 @@ def read_one_group(fp, header, min_line_len=4, additional_lines_skip=0, lines_to
         while skip_line_fun(line, header) and line.endswith("\n"):
             line = fp.readline()
             n_lines_skipped += 1
-            if (n_lines_skipped > lines_to_read_till_header and lines_to_read_till_header > 0):
+            if (n_lines_skipped >
+                    lines_to_read_till_header and lines_to_read_till_header > 0):
                 raise RuntimeError(
                     "Skipped {} lines, not encountered any header yet.".format(n_lines_skipped))
         # found header. Take next few lines:
@@ -339,7 +343,8 @@ def read_multi_section_separated_value_file(file: str, separator: str = None, us
         if (got_err):
             continue
         headers = re.split("{}+".format(separator), header_line.strip())
-        if (np.sum([_is_numeric_string(h) for h in headers]) > 0.5 * len(headers)):
+        if (np.sum([_is_numeric_string(h)
+                    for h in headers]) > 0.5 * len(headers)):
             warnings.warn("CSV file {} has header line {}, which does not seem to be a header.".format(
                 csv_file, header_line))
         for i, h in enumerate(headers):

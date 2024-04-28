@@ -9,7 +9,8 @@ from pylimer_tools_cpp import DataFileWriter, Universe
 
 class DataFileWriterTest(unittest.TestCase):
 
-    def check_image_flags_fixed(self, universe: Universe, writer: DataFileWriter):
+    def check_image_flags_fixed(
+            self, universe: Universe, writer: DataFileWriter):
         file = os.path.join(os.path.dirname(__file__), "..",
                             "fixtures", "tmp-test-data-file.out")
         writer.writeToFile(file)
@@ -18,7 +19,8 @@ class DataFileWriterTest(unittest.TestCase):
         self.assertEqual(read_universe.get_nr_of_atoms(),
                          universe.get_nr_of_atoms())
 
-        # then, assert that after writing with the new image flags, things are correct
+        # then, assert that after writing with the new image flags, things are
+        # correct
         molecule = read_universe.get_molecules(2)[0]
         self.assertAlmostEqual(molecule.computeEndToEndDistance(
         ), molecule.computeEndToEndDistanceWithDerivedImageFlags())

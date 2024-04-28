@@ -76,13 +76,15 @@ TEST_CASE("Atoms can calculate distances", "[entity][Atom]")
     CHECK(meanPosition_13[2] == 0.25);
 
     pe::Box unitNegBox = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
-    Eigen::Vector3d meanPosition_13n = atom1.meanPositionWith(atom3, unitNegBox);
+    Eigen::Vector3d meanPosition_13n =
+      atom1.meanPositionWith(atom3, unitNegBox);
     CHECK(meanPosition_13n[0] == 0.25);
     CHECK(meanPosition_13n[1] == 0.25);
     CHECK(meanPosition_13n[2] == 0.25);
 
     pe::Atom negAtom4 = pe::Atom(0, 0, -2.0, 0.0, 0.0, 0, 0, 0);
-    Eigen::Vector3d meanPosition_24 = atom2.meanPositionWith(negAtom4, unitNegBox);
+    Eigen::Vector3d meanPosition_24 =
+      atom2.meanPositionWith(negAtom4, unitNegBox);
     CHECK(meanPosition_24[0] == -0.5);
     CHECK(meanPosition_24[1] == 0.5);
     CHECK(meanPosition_24[2] == 0.5);

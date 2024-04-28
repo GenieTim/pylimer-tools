@@ -141,7 +141,8 @@ class UniverseUsingTestCase(unittest.TestCase):
         self.saturatedTestUniverse = self.addAtomBondData(
             self.saturatedTestUniverse, self.testAtomsSaturated, self.testBondsSaturated)
 
-    def addAtomBondData(self, universe: Universe, atomData: pd.DataFrame, bondData: pd.DataFrame) -> Universe:
+    def addAtomBondData(self, universe: Universe,
+                        atomData: pd.DataFrame, bondData: pd.DataFrame) -> Universe:
         universe.addAtoms(atomData["id"].tolist(), atomData["type"].tolist(),
                           atomData["x"].tolist(), atomData["y"].tolist(
         ), atomData["z"].tolist(),

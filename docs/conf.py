@@ -17,7 +17,8 @@ import warnings
 from datetime import datetime
 
 try:
-    # this fixes an issue where conda env's site-packages are not available to Sphinx
+    # this fixes an issue where conda env's site-packages are not available to
+    # Sphinx
     paths = sysconfig.get_paths()
     pythonV = "python3.9"
     for key in paths:

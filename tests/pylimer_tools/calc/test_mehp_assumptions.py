@@ -10,9 +10,9 @@ from pylimer_tools_cpp import Box
 class TestMEHPAssumptions(unittest.TestCase):
     def test_box_offset_distribution(self):
         """
-        This test tests, whether the assumptions made to determine 
+        This test tests, whether the assumptions made to determine
         the distribution of the box offsets when introducing a slip-link
-        is correct.        
+        is correct.
         """
         box = Box(10, 10, 10)
         coords1 = np.array([5, 2.5, 0.])

@@ -123,7 +123,8 @@ def compute_effective_nr_density_of_network(networks: Iterable[Universe], abs_to
     return num_effective / mean_volume
 
 
-def compute_mean_universe_volume(networks: Iterable[Universe], accept_different_sizes: bool = False) -> float:
+def compute_mean_universe_volume(
+        networks: Iterable[Universe], accept_different_sizes: bool = False) -> float:
     """
     Compute the mean volume of a list of universes.
 
@@ -181,7 +182,8 @@ def compute_effective_nr_density_of_junctions(networks: Iterable[Universe], abs_
     mean_volume = compute_mean_universe_volume(networks)
 
     if (min_num_effective_strands == 0):
-        return len(networks[0].get_atoms_by_type(crosslinker_type)) / mean_volume
+        return len(networks[0].get_atoms_by_type(
+            crosslinker_type)) / mean_volume
 
     # get the mean end to end distances
     r_taus = compute_mean_end_to_end_distances(networks, crosslinker_type)
@@ -194,7 +196,8 @@ def compute_effective_nr_density_of_junctions(networks: Iterable[Universe], abs_
         abs_tol = r_tau_max
 
     key_to_molecule = {}
-    for molecule in list(networks)[0].get_chains_with_crosslinker(crosslinker_type):
+    for molecule in list(networks)[
+            0].get_chains_with_crosslinker(crosslinker_type):
         key_to_molecule[molecule.get_key()] = molecule
 
     # count how many active connections each junction has
@@ -256,7 +259,8 @@ def compute_topological_factor(networks: Iterable[Universe], crosslinker_type: i
         if (b is None):
             b = np.mean(molecule.compute_bond_lengths())
         crosslinkers = [crosslinkers[0], crosslinkers[1]]
-        # sort crosslinkers by name as a way to keep the vector directions consistent between timesteps
+        # sort crosslinkers by name as a way to keep the vector directions
+        # consistent between timesteps
         crosslinkers.sort(key=lambda a: a.get_id())
         key = molecule.get_key()
         gamma_sum += r_taus[key] * r_taus[key] / \
