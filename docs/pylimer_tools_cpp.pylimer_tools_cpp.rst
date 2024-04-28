@@ -1,7 +1,7 @@
 pylimer\_tools\_cpp.pylimer\_tools\_cpp
 =======================================
 
-.. automodule:: pylimer_tools_cpp.pylimer_tools_cpp
+.. automodule:: pylimer_tools_cpp
 
    
    

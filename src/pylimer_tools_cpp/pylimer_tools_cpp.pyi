@@ -983,7 +983,7 @@ class DataFileWriter:
         """
                    Set which atom type represents cross-linkers. 
                    Needed in case the moleculeIdx in the output file should have any meaning.
-                   (e.g. with :func:`~pylimer_tools_cpp.pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap`).
+                   (e.g. with :func:`~pylimer_tools_cpp.DataFileWriter.configMoleculeIdxForSwap`).
 
                    Default: 2.
         """
@@ -1041,7 +1041,7 @@ class DataFileWriter:
                        - $nz
 
                   Additionally, you can use the keys used in 
-                  :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.setPropertyValue`
+                  :func:`~pylimer_tools_cpp.Universe.setPropertyValue`
                   as placeholders (as long as they are alphanumeric only; prefix in the format with '$' as well).
                   Specifically useful if you need a different (or hybrid) atom style in LAMMPS.
         """
@@ -1170,7 +1170,7 @@ class ExitReason:
 class LazyUniverseSequenceIterator:
     """
 
-           An iterator to iterate throught the universes in :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence`.
+           An iterator to iterate throught the universes in :obj:`~pylimer_tools_cpp.UniverseSequence`.
 
     """
 
@@ -1253,7 +1253,7 @@ class LinkSwappingMode:
 class MCUniverseGenerator:
     """
 
-           A :obj:`pylimer_tools_cpp.pylimer_tools_cpp.Universe` generator using a Monte-Carlo procedure.
+           A :obj:`pylimer_tools_cpp.Universe` generator using a Monte-Carlo procedure.
 
     """
 
@@ -1352,7 +1352,7 @@ class MEHPForceBalance:
 
     def getAverageSpringLength(self) -> float:
         """
-                   Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()`,
+                   Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()`,
                    this value is normalized by the number of springs rather than the number of chains.
         """
 
@@ -1383,12 +1383,12 @@ class MEHPForceBalance:
 
     def getDefaultNrOfChains(self) -> int:
         """
-                  Returns the value effectively used in :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()` for normalizing the distances.`.
+                  Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()` for normalizing the distances.`.
         """
 
     def getDefaultR0Square(self) -> float:
         """
-                   Returns the value effectively used in :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()` for :math:`\langle R_{0,\eta}^2\rangle`.
+                   Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()` for :math:`\langle R_{0,\eta}^2\rangle`.
         """
 
     def getDisplacementResidualNorm(self, oneOverSpringPartitionUpperLimit: float = 1.0) -> float:
@@ -1430,7 +1430,7 @@ class MEHPForceBalance:
                   :math:`k_B` Boltzmann's constant.
 
                   :param r0squared: The denominator in the equation of :math:`\Gamma`. If :math:`-1.0` (default), the network is used for determination (which is not accurate). For phantom systems, the correct value is :math:`Nb^2`.
-                       For other systems, the value could be determined by `~pylimer_tools_cpp.pylimer_tools_cpp.Universe.computeMeanEndToEndDistance` on the melt system.
+                       For other systems, the value could be determined by `~pylimer_tools_cpp.Universe.computeMeanEndToEndDistance` on the melt system.
                   :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains. 
         """
 
@@ -1654,7 +1654,7 @@ class MEHPForceBalance2:
 
     def getAverageSpringLength(self) -> float:
         """
-                   Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance2.getGammaFactor()`,
+                   Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceBalance2.getGammaFactor()`,
                    this value is normalized by the number of springs rather than the number of chains.
         """
 
@@ -1672,12 +1672,12 @@ class MEHPForceBalance2:
 
     def getDefaultNrOfChains(self) -> int:
         """
-                  Returns the value effectively used in :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance2.getGammaFactor()` for normalizing the distances.`.
+                  Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceBalance2.getGammaFactor()` for normalizing the distances.`.
         """
 
     def getDefaultR0Square(self) -> float:
         """
-                   Returns the value effectively used in :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceBalance2.getGammaFactor()` for :math:`\langle R_{0,\eta}^2\rangle`.
+                   Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceBalance2.getGammaFactor()` for :math:`\langle R_{0,\eta}^2\rangle`.
         """
 
     def getDisplacementResidualNorm(self, oneOverSpringPartitionUpperLimit: float = 1.0) -> float:
@@ -1714,7 +1714,7 @@ class MEHPForceBalance2:
                   :math:`k_B` Boltzmann's constant.
 
                   :param r0squared: The denominator in the equation of :math:`\Gamma`. If :math:`-1.0` (default), the network is used for determination (which is not accurate). For phantom systems, the correct value is :math:`Nb^2`.
-                       For other systems, the value could be determined by `~pylimer_tools_cpp.pylimer_tools_cpp.Universe.computeMeanEndToEndDistance` on the melt system.
+                       For other systems, the value could be determined by `~pylimer_tools_cpp.Universe.computeMeanEndToEndDistance` on the melt system.
                   :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains. 
         """
 
@@ -1888,8 +1888,8 @@ class MEHPForceRelaxation:
                   :param remove2functionalCrosslinkers: Whether to replace two-functional cross-links with a "normal" chain bead
                   :param removeDanglingChains: Whether to remove dangling chains before running the simulation. 
                        **Caution*: Removing the dangling chains will result in incorrect results fo the computation of 
-                       :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getSolubleWeightFraction()` and
-                       :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getDanglingWeightFraction()`
+                       :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getSolubleWeightFraction()` and
+                       :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getDanglingWeightFraction()`
         """
 
     def assumeBoxLargeEnough(self, arg0: bool) -> None:
@@ -1903,7 +1903,7 @@ class MEHPForceRelaxation:
     def configRerunEpsilon(self, epsilon: float = 0.001) -> None:
         """
                   Configure the offset from the lower and upper bounds for the simulation to suggest another run (
-                       See: :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.requiresAnotherRun()`
+                       See: :func:`~pylimer_tools_cpp.MEHPForceRelaxation.requiresAnotherRun()`
                   ).
         """
 
@@ -1917,7 +1917,7 @@ class MEHPForceRelaxation:
 
     def getAverageSpringLength(self) -> float:
         """
-                   Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()`,
+                   Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()`,
                    this value is normalized by the number of springs rather than the number of chains.
         """
 
@@ -1935,12 +1935,12 @@ class MEHPForceRelaxation:
 
     def getDefaultNrOfChains(self) -> int:
         """
-                  Returns the value effectively used in :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()` for normalizing the distances.`.
+                  Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()` for normalizing the distances.`.
         """
 
     def getDefaultR0Square(self) -> float:
         """
-                   Returns the value effectively used in :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()` for :math:`\langle R_{0,\eta}^2\rangle`.
+                   Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()` for :math:`\langle R_{0,\eta}^2\rangle`.
         """
 
     def getEffectiveFunctionalityOfAtoms(self, tolerance: float = 0.1) -> dict[int, int]:
@@ -1974,7 +1974,7 @@ class MEHPForceRelaxation:
                   :math:`k_B` Boltzmann's constant.
 
                   :param r0squared: The denominator in the equation of :math:`\Gamma`. If :math:`-1.0` (default), the network is used for determination (which is not accurate). For phantom systems, the correct value is :math:`Nb^2`.
-                       For other systems, the value could be determined by `~pylimer_tools_cpp.pylimer_tools_cpp.Universe.computeMeanEndToEndDistance` on the melt system.
+                       For other systems, the value could be determined by `~pylimer_tools_cpp.Universe.computeMeanEndToEndDistance` on the melt system.
                   :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains. 
         """
 
@@ -2073,7 +2073,7 @@ class MEHPForceRelaxation:
                   that it would not be globally minimised.
 
                   If the final displacement of one of the atoms is close 
-                  (1e-3, configurable via :func:`~pylimer_tools_cpp.pylimer_tools_cpp.MEHPForceRelaxation.configRerunEpsilon()`) 
+                  (1e-3, configurable via :func:`~pylimer_tools_cpp.MEHPForceRelaxation.configRerunEpsilon()`) 
                   to the imposed min/max, after minimizing,
                   this method would return true.
         """
@@ -2148,7 +2148,7 @@ class Molecule:
                     Compute the end-to-end distance (:math:`R_{ee}`) of this molecule,
                     but ignoring the image flags attached to the atoms. 
                     This only works for Molecules that can be lined up with 
-                    :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsLinedUp()`,
+                    :func:`~pylimer_tools_cpp.Molecule.getAtomsLinedUp()`,
                     as it needs the atoms sorted such that the periodic box can still be respected somewhat.
 
                     CAUTION:
@@ -2173,13 +2173,13 @@ class Molecule:
                     Computes the radius of gyration, :math:`R_g^2` of this molecule,
                     but ignoring the image flags attached to the atoms.
                     This only works for Molecules that can be lined up with 
-                    :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsLinedUp()`,
+                    :func:`~pylimer_tools_cpp.Molecule.getAtomsLinedUp()`,
                     as it needs the atoms sorted such that the periodic box can still be respected somewhat.
                     In other words, this function computes the radius of gyration 
                     assuming the distance between two lined-up beads 
                     is smaller than half the periodic box in each direction.
 
-                    See also: :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeRadiusOfGyration()`.
+                    See also: :func:`~pylimer_tools_cpp.Molecule.computeRadiusOfGyration()`.
         """
 
     def computeTotalLength(self) -> float:
@@ -2251,7 +2251,7 @@ class Molecule:
         """
                     Get the atoms connected to a specified atom.
 
-                    Internally uses :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomsConnectedTo`
+                    Internally uses :func:`~pylimer_tools_cpp.Molecule.getAtomsConnectedTo`
         """
 
     def getEdges(self) -> dict[str, list[int]]:
@@ -2261,8 +2261,8 @@ class Molecule:
 
                     NOTE:
                        The integer values returned refer to the vertex ids, not the atom ids.
-                       Use :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getAtomIdByIdx` to translate them to atom ids, or 
-                       :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.getBonds` to have that done for you.
+                       Use :func:`~pylimer_tools_cpp.Molecule.getAtomIdByIdx` to translate them to atom ids, or 
+                       :func:`~pylimer_tools_cpp.Molecule.getBonds` to have that done for you.
         """
 
     def getIdxByAtomId(self, arg0: int) -> int:
@@ -2293,14 +2293,14 @@ class Molecule:
 
     def getType(self) -> MoleculeType:
         """
-                   Get the type of this molecule (see :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.MoleculeType` enum).
+                   Get the type of this molecule (see :obj:`~pylimer_tools_cpp.MoleculeType` enum).
         """
 
 
 class MoleculeIterator:
     """
 
-           An iterator to iterate throught the atoms in :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule`.
+           An iterator to iterate throught the atoms in :obj:`~pylimer_tools_cpp.Molecule`.
 
     """
 
@@ -2786,7 +2786,7 @@ class Universe:
                   Compute the end-to-end distance of each strand in the network.
 
                   NOTE:
-                       Internally, this uses the :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeEndToEndDistance`.
+                       Internally, this uses the :func:`~pylimer_tools_cpp.Molecule.computeEndToEndDistance`.
                        All its cautionary facts apply.
         """
 
@@ -2795,7 +2795,7 @@ class Universe:
                   Computes the mean of the end-to-end distances of each strand in the network.
 
                   NOTE:
-                       Internally, this uses the :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeEndToEndDistance`.
+                       Internally, this uses the :func:`~pylimer_tools_cpp.Molecule.computeEndToEndDistance`.
                        All its cautionary facts apply.
                        Invalid strands (where said function returns 0.0 or -1.0) are ignored.
         """
@@ -2805,7 +2805,7 @@ class Universe:
                   Computes the mean square of the end-to-end distances of each strand in the network.
 
                   NOTE:
-                       Internally, this uses the :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Molecule.computeEndToEndDistance`.
+                       Internally, this uses the :func:`~pylimer_tools_cpp.Molecule.computeEndToEndDistance`.
                        All its cautionary facts apply.
                        Invalid strands (where said function returns 0.0 or -1.0) are ignored.
         """
@@ -2832,7 +2832,7 @@ class Universe:
     def computeTotalMass(self) -> float:
         """
                   Compute the total mass of this network/universe in whatever mass unit was used when 
-                  :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.setMasses()` was called.
+                  :func:`~pylimer_tools_cpp.Universe.setMasses()` was called.
         """
 
     def computeWeightAverageMolecularWeight(self, crossLinkerType: int) -> float:
@@ -2868,23 +2868,23 @@ class Universe:
     def detectAngles(self) -> dict[str, list[int]]:
         """
         Returns just as 
-                  :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getAngles`, 
+                  :func:`~pylimer_tools_cpp.Universe.getAngles`, 
                   but all angles that are detected in the network, rather than the one already set.
                   Note that the angle types are determined by 
-                  :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.hashAngleType`,
+                  :func:`~pylimer_tools_cpp.Universe.hashAngleType`,
                   which serves angle types that should be mapped by you back to smaller numbers, 
-                  before serving them to :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.addAngles`.
+                  before serving them to :func:`~pylimer_tools_cpp.Universe.addAngles`.
         """
 
     def detectDihedralAngles(self) -> dict[str, list[int]]:
         """
         Returns just as 
-                  :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getDihedralAngles`, 
+                  :func:`~pylimer_tools_cpp.Universe.getDihedralAngles`, 
                   but all dihedral angles that are detected in the network, rather than the one already set.
                   Note that the angle types are determined by 
-                  :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.hashDihedralAngleType`,
+                  :func:`~pylimer_tools_cpp.Universe.hashDihedralAngleType`,
                   which serves angle types that should be mapped by you back to smaller numbers, 
-                  before serving them to :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.addDiheralAngles`.
+                  before serving them to :func:`~pylimer_tools_cpp.Universe.addDiheralAngles`.
         """
 
     def determineEffectiveFunctionalityPerType(self) -> dict[int, float]:
@@ -2929,7 +2929,7 @@ class Universe:
 
                    NOTE:
                        The integer values returned refer to the the atom ids, not the vertex ids.
-                       Use :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getIdxByAtomId` to translate them to vertex ids.
+                       Use :func:`~pylimer_tools_cpp.Universe.getIdxByAtomId` to translate them to vertex ids.
         """
 
     def getAtom(self, atomId: int) -> Atom:
@@ -3001,15 +3001,15 @@ class Universe:
     def getClusters(self) -> list[Universe]:
         """
                     Get the components of the universe that are not connected to each other.
-                    Returns a list of :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe`s.
-                    Unconnected, free atoms/beads become their own :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe`.
+                    Returns a list of :obj:`~pylimer_tools_cpp.Universe`s.
+                    Unconnected, free atoms/beads become their own :obj:`~pylimer_tools_cpp.Universe`.
         """
 
     def getConnectedAtoms(self, arg0: Atom) -> list[Atom]:
         """
                     Get the atoms connected to a specified atom.
 
-                    Internally uses :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getAtomsConnectedTo`
+                    Internally uses :func:`~pylimer_tools_cpp.Universe.getAtomsConnectedTo`
         """
 
     def getEdges(self) -> dict[str, list[int]]:
@@ -3019,8 +3019,8 @@ class Universe:
 
                     NOTE:
                        The integer values returned refer to the vertex ids, not the atom ids.
-                       Use :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getAtomIdByIdx` to translate them to atom ids, or
-                       :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.getBonds` to have that done for you.
+                       Use :func:`~pylimer_tools_cpp.Universe.getAtomIdByIdx` to translate them to atom ids, or
+                       :func:`~pylimer_tools_cpp.Universe.getBonds` to have that done for you.
         """
 
     def getIdxByAtomId(self, atomId: int) -> int:
@@ -3046,10 +3046,10 @@ class Universe:
         """
                     Reduce the network to contain only cross-linkers, replacing all the strands with a single bond.
                     Useful e.g. to reduce the memory useage and runtime of 
-                    :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.findLoops()` or 
-                    :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.hasInfiniteStrand()`.
+                    :func:`~pylimer_tools_cpp.Universe.findLoops()` or 
+                    :func:`~pylimer_tools_cpp.Universe.hasInfiniteStrand()`.
 
-                    Further use :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.simplify()` to remove primary loops.
+                    Further use :func:`~pylimer_tools_cpp.Universe.simplify()` to remove primary loops.
         """
 
     def getNrOfAngles(self) -> int:
@@ -3172,7 +3172,7 @@ class UniverseSequence:
          This, while it can lead to two (or more) reads of the whole file, 
          is a measure in order to enable low memory useage if needed (i.e. for large dump files).
          Use Python's iterator to have this UniverseSequence only ever retain one universe in memory.
-         Alternatively, use :func:`~pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.forgetAtIndex`
+         Alternatively, use :func:`~pylimer_tools_cpp.UniverseSequence.forgetAtIndex`
          to have the UniverseSequence forget about already read universes.
 
     """
@@ -3250,10 +3250,10 @@ class UniverseSequence:
         """
                     Get all universes initialized back in a list.
                     For big dump files or lots of data files, this might lead to memory issues.
-                    Use :func:`~pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.__iter__`
+                    Use :func:`~pylimer_tools_cpp.UniverseSequence.__iter__`
                     to have
-                    or :func:`~pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.atIndex`
-                    and :func:`~pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.forgetAtIndex`
+                    or :func:`~pylimer_tools_cpp.UniverseSequence.atIndex`
+                    and :func:`~pylimer_tools_cpp.UniverseSequence.forgetAtIndex`
                     to craft a more memory-efficient retrieval mechanism.
         """
 
@@ -3284,12 +3284,12 @@ class UniverseSequence:
     def resetIterator(self) -> None:
         """
                   Reset the internal iterator, such that a subsequent call to 
-                  :func:`~pylimer_tools_cpp.pylimer_tools_cpp.UniverseSequence.next` returns the first one again.
+                  :func:`~pylimer_tools_cpp.UniverseSequence.next` returns the first one again.
         """
 
     def setDataFileAtomStyle(self, atom_styles: list[AtomStyle]) -> None:
         """
-                  Set the format of the data files to be read. See :obj:`~pylimer_tools_cpp.pylimer_tools_cpp.AtomStyle`.
+                  Set the format of the data files to be read. See :obj:`~pylimer_tools_cpp.AtomStyle`.
         """
 
 

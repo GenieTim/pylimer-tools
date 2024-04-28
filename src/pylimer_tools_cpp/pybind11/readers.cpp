@@ -37,27 +37,30 @@ init_pylimer_bound_readers(py::module_& m)
 
   py::class_<AveFileReader>(m, "AveFileReader", R"pbdoc(
           Alternative implementation of the data file reader implemented in 
-          :func:`pylimer_tools.readLammpsOutputFile.readAveragesFile`.
+          :func:`pylimer_tools.read_lammps_output_file.read_averages_file`.
 
+          This implementation is better for certain use cases, worse for others.
+          In the end, only performance and memory usage are different.
+          For moderately sized and small files, we recommend to use the Python interface instead.
      )pbdoc")
-    .def(py::init<const std::string>(), py::arg("filePath"))
-    .def("getColumnNames", &AveFileReader::getColumnNames)
-    .def("getNrOfRows", &AveFileReader::getNrOfRows)
-    .def("getNrOfColumns", &AveFileReader::getNrOfColumns)
-    .def("getData", &AveFileReader::getData)
-    .def("autocorrelateColumn",
+    .def(py::init<const std::string>(), py::arg("file_path"))
+    .def("get_column_names", &AveFileReader::getColumnNames)
+    .def("get_nr_of_rows", &AveFileReader::getNrOfRows)
+    .def("get_nr_of_columns", &AveFileReader::getNrOfColumns)
+    .def("get_data", &AveFileReader::getData)
+    .def("autocorrelate_column",
          &AveFileReader::autocorrelateColumn,
          R"pbdoc(
-          Do autocorrelation on one particular column for a speficied set of delta indices.
+          Do autocorrelation on one particular column for a specified set of delta indices.
 
           Assumes the data is equally spaced.
      )pbdoc",
          py::arg("column_index"),
          py::arg("delta_indices"))
-    .def("autocorrelateColumnDifference",
+    .def("autocorrelate_column_difference",
          &AveFileReader::autocorrelateColumnDifference,
          R"pbdoc(
-          Do autocorrelation on the difference between two particular columns for a speficied set of delta indices.
+          Do autocorrelation on the difference between two particular columns for a specified set of delta indices.
 
           Assumes the data is equally spaced.
      )pbdoc",
@@ -97,33 +100,33 @@ init_pylimer_bound_readers(py::module_& m)
   py::class_<DumpFileParser>(m, "DumpFileReader", R"pbdoc(
        A reader for LAMMPS's `dump` files.
   )pbdoc")
-    .def(py::init<const std::string>(), py::arg("pathOfFileToRead"))
+    .def(py::init<const std::string>(), py::arg("path_of_file_to_read"))
     .def("read", &DumpFileParser::read, "Read the whole file")
-    .def("getLength",
+    .def("get_length",
          &DumpFileParser::getLength,
          "Get the number of sections (time-steps) in the file")
-    .def("getStringValuesForAt",
+    .def("get_string_values_for_at",
          &DumpFileParser::getStringValuesForAt,
          "Get the values for the section `index`, the main header "
          "`headerKey` and the column (in the header) `column`.",
          py::arg("rowIndex"),
          py::arg("headerKey"),
          py::arg("columnIndex"))
-    .def("getNumericValuesForAt",
+    .def("get_numeric_values_for_at",
          &DumpFileParser::getNumericValuesForAt,
          "Get the values for the section `index`, the main header "
          "`headerKey` and the column (in the header) `column`.")
-    .def("hasKey",
+    .def("has_key",
          &DumpFileParser::hasKey,
          "Check whether the first section has the header specified",
          py::arg("headerKey"))
-    .def("keyHasColumn",
+    .def("key_has_column",
          &DumpFileParser::keyHasColumn,
          "Check whether the header of the first section has the specified "
          "column",
          py::arg("headerKey"),
          py::arg("columnName"))
-    .def("keyHasDirectionalColumn",
+    .def("key_has_directional_column",
          &DumpFileParser::keyHasDirectionalColumn,
          "Check whether the header of the first section has all the three "
          "columns `{dirPraefix}{x|y|z}{dirSuffix}`.",
@@ -150,34 +153,34 @@ init_pylimer_bound_readers(py::module_& m)
          py::arg("atom_style") = AtomStyle::ANGLE,
          py::arg("atom_style2") = AtomStyle::NONE,
          py::arg("atom_style_3") = AtomStyle::NONE)
-    .def("getNrOfAtoms", &DataFileParser::getNrOfAtoms)
-    .def("getNrOfAtomTypes", &DataFileParser::getNrOfAtomTypes)
-    .def("getAtomIds", &DataFileParser::getAtomIds)
-    .def("getMoleculeIds", &DataFileParser::getMoleculeIds)
-    .def("getAtomTypes", &DataFileParser::getAtomTypes)
-    .def("getAtomX", &DataFileParser::getAtomX)
-    .def("getAtomY", &DataFileParser::getAtomY)
-    .def("getAtomZ", &DataFileParser::getAtomZ)
-    .def("getAtomNx", &DataFileParser::getAtomNx)
-    .def("getAtomNy", &DataFileParser::getAtomNy)
-    .def("getAtomNz", &DataFileParser::getAtomNz)
-    .def("getMasses", &DataFileParser::getMasses)
-    .def("getNrOfBonds", &DataFileParser::getNrOfBonds)
-    .def("getNrOfBondTypes", &DataFileParser::getNrOfBondTypes)
-    .def("getBondTypes", &DataFileParser::getBondTypes)
-    .def("getBondFrom", &DataFileParser::getBondFrom)
-    .def("getBondTo", &DataFileParser::getBondTo)
-    .def("getLx", &DataFileParser::getLx)
-    .def("getLowX", &DataFileParser::getLowX)
-    .def("getHighX", &DataFileParser::getHighX)
-    .def("getLy", &DataFileParser::getLy)
-    .def("getLowY", &DataFileParser::getLowY)
-    .def("getHighY", &DataFileParser::getHighY)
-    .def("getLz", &DataFileParser::getLz)
-    .def("getLowZ", &DataFileParser::getLowZ)
-    .def("getHighZ", &DataFileParser::getHighZ);
+    .def("get_nr_of_atoms", &DataFileParser::getNrOfAtoms)
+    .def("get_nr_of_atom_types", &DataFileParser::getNrOfAtomTypes)
+    .def("get_atom_ids", &DataFileParser::getAtomIds)
+    .def("get_molecule_ids", &DataFileParser::getMoleculeIds)
+    .def("get_atom_types", &DataFileParser::getAtomTypes)
+    .def("get_atom_x", &DataFileParser::getAtomX)
+    .def("get_atom_y", &DataFileParser::getAtomY)
+    .def("get_atom_z", &DataFileParser::getAtomZ)
+    .def("get_atom_nx", &DataFileParser::getAtomNx)
+    .def("get_atom_ny", &DataFileParser::getAtomNy)
+    .def("get_atom_nz", &DataFileParser::getAtomNz)
+    .def("get_masses", &DataFileParser::getMasses)
+    .def("get_nr_of_bonds", &DataFileParser::getNrOfBonds)
+    .def("get_nr_of_bond_types", &DataFileParser::getNrOfBondTypes)
+    .def("get_bond_types", &DataFileParser::getBondTypes)
+    .def("get_bond_from", &DataFileParser::getBondFrom)
+    .def("get_bond_to", &DataFileParser::getBondTo)
+    .def("get_lx", &DataFileParser::getLx)
+    .def("get_low_x", &DataFileParser::getLowX)
+    .def("get_high_x", &DataFileParser::getHighX)
+    .def("get_ly", &DataFileParser::getLy)
+    .def("get_low_y", &DataFileParser::getLowY)
+    .def("get_high_y", &DataFileParser::getHighY)
+    .def("get_lz", &DataFileParser::getLz)
+    .def("get_low_z", &DataFileParser::getLowZ)
+    .def("get_high_z", &DataFileParser::getHighZ);
 
-  m.def("splitCSV",
+  m.def("split_csv",
         &splitCSV,
         "Read a file containing a number of CSVs. Returns them split up.");
 }

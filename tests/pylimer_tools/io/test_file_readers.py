@@ -16,8 +16,7 @@ from pylimer_tools.io.read_lammps_output_file import (read_averages_file,
                                                       read_log_file)
 from pylimer_tools.utils.cache_utility import get_cache_file_name
 from pylimer_tools.utils.optimize_dataframe import reduce_mem_usage
-from pylimer_tools_cpp.pylimer_tools_cpp import (AtomStyle, Universe,
-                                                 UniverseSequence)
+from pylimer_tools_cpp import AtomStyle, Universe, UniverseSequence
 from tests.pylimer_tools.pdComparingTestCase import PandasComparingTestCase
 
 
@@ -113,7 +112,7 @@ class TestFileReader(PandasComparingTestCase):
             __file__), "../fixtures/lammps_data_file.out")
         universe = read_data_file(data_file, [AtomStyle.BOND])
         self.assertIsInstance(universe, Universe)
-        self.assertEqual(universe.getNrOfAtoms(), 3000)
+        self.assertEqual(universe.get_nr_of_atoms(), 3000)
 
         # expectedKeys = ["N_atoms", "N_Atypes", "N_Btypes", "masses", "Lx", "Ly",
         #                 "Lz", "xlo", "xhi", "ylo", "yhi", "zlo", "zhi", "atom_data", "bond_data"]
@@ -136,12 +135,12 @@ class TestFileReader(PandasComparingTestCase):
         self.assertIsInstance(universe, Universe)
         self.assertEqual(universe_sequence.getLength(), 1)
         universe = universe_sequence.atIndex(0)
-        self.assertEqual(universe.getNrOfAtoms(), 12)
+        self.assertEqual(universe.get_nr_of_atoms(), 12)
         universe_sequence2 = read_dump_file(
             data_file, dump_file, [AtomStyle.BOND])
         self.assertIsInstance(universe_sequence2, UniverseSequence)
         universe = universe_sequence2.atIndex(0)
-        self.assertEqual(universe.getNrOfAtoms(), 12)
+        self.assertEqual(universe.get_nr_of_atoms(), 12)
 
     def test_averages_reader(self):
         data_file = os.path.join(os.path.dirname(

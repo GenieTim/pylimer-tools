@@ -16,51 +16,53 @@ init_pylimer_bound_generators(py::module_& m)
 {
 
   py::class_<MCUniverseGenerator>(m, "MCUniverseGenerator", R"pbdoc(
-       A :obj:`pylimer_tools_cpp.pylimer_tools_cpp.Universe` generator using a Monte-Carlo procedure.
+       A :obj:`pylimer_tools_cpp.Universe` generator using a Monte-Carlo procedure.
   )pbdoc")
     .def(py::init<const double, const double, const double>(),
-         py::arg("Lx"),
-         py::arg("Ly"),
-         py::arg("Lz"))
-    .def("setSeed",
+         py::arg("lx"),
+         py::arg("ly"),
+         py::arg("lz"))
+    .def("set_seed",
          &MCUniverseGenerator::setSeed,
          "Set the seed for the random generator.",
          py::arg("seed"))
-    .def("setBeadDistance",
+    .def("set_bead_distance",
          &MCUniverseGenerator::setBeadDistance,
          "Set the optimal distance between beads.",
          py::arg("distance"))
-    .def("addCrosslinkers",
+    .def("add_crosslinkers",
          &MCUniverseGenerator::addCrosslinkers,
          R"pbdoc(
             Add the cross-linkers.
             )pbdoc",
-         py::arg("nrOfCrosslinkers"),
-         py::arg("crossLinkerAtomType") = 2)
-    .def("addSolventChains",
+         py::arg("nr_of_crosslinkers"),
+         py::arg("crosslinker_type") = 2)
+    .def("add_solvent_chains",
          &MCUniverseGenerator::addSolventChains,
          R"pbdoc(
             Randomly distribute additional, free chains.
             )pbdoc",
-         py::arg("nrOfSolventChains"),
-         py::arg("solventChainLength"),
-         py::arg("solventAtomType") = 3)
-    .def("addAndLinkStrands",
+         py::arg("nr_of_solvent_chains"),
+         py::arg("solvent_chain_length"),
+         py::arg("solvent_atom_type") = 3)
+    .def("add_and_link_strands",
          py::overload_cast<int, std::vector<int>, double, int, int>(
            &MCUniverseGenerator::addAndLinkStrands),
          R"pbdoc(
             Actually add strands, link them to the previously added cross-linkers.
             )pbdoc",
-         py::arg("nrOfStrands"),
-         py::arg("strandLengths"),
-         py::arg("crossLinkerConversion"),
-         py::arg("crossLinkerFunctionality"),
-         py::arg("strandAtomType") = 1)
-    .def("getUniverse", &MCUniverseGenerator::getUniverse, R"pbdoc(
+         py::arg("nr_of_strands"),
+         py::arg("strand_lengths"),
+         py::arg("crosslinker_conversion"),
+         py::arg("crosslinker_functionality"),
+         py::arg("strand_atom_type") = 1)
+    .def("get_universe", &MCUniverseGenerator::getUniverse, R"pbdoc(
             Fetch the current (or final) state of the universe.
+
+            Use this method to actually retrieve the generated structure.
             )pbdoc");
 
-  m.def("doRandomWalkChainFromTo",
+  m.def("do_random_walk_chain_from_to",
         &doRandomWalkChainFromTo,
         R"pbdoc(
             Do a random walk from one point to another.
@@ -68,8 +70,8 @@ init_pylimer_bound_generators(py::module_& m)
         py::arg("box"),
         py::arg("from_coordinates"),
         py::arg("to_coordinates"),
-        py::arg("chainLen"),
-        py::arg("beadDistance") = 1.,
+        py::arg("chain_len"),
+        py::arg("bead_distance") = 1.,
         py::arg("seed") = "");
 }
 

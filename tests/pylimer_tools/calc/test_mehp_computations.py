@@ -15,7 +15,7 @@ from pylimer_tools.calc.structure_analysis import (
     compute_mean_end_to_end_distances, compute_mean_end_to_end_vectors,
     measure_weight_fraction_of_backbone,
     measure_weight_fraction_of_dangling_chains)
-from pylimer_tools_cpp.pylimer_tools_cpp import MoleculeType, Universe
+from pylimer_tools_cpp import MoleculeType, Universe
 
 if __name__ == '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../"))
@@ -36,10 +36,10 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
             1.0, measure_weight_fraction_of_backbone(self.testUniverse, 2))
         # non-empty weights
         self.testUniverse.setMasses({1: 1, 2: 0})
-        self.assertTrue(self.testUniverse.getNrOfAtoms() > 0)
+        self.assertTrue(self.testUniverse.get_nr_of_atoms() > 0)
         self.assertEqual(self.testUniverse.getMasses(), {1: 1, 2: 0})
-        all_chains = self.testUniverse.getChainsWithCrosslinker(2)
-        self.assertEqual(all_chains[2].getType(), MoleculeType.DANGLING_CHAIN)
+        all_chains = self.testUniverse.get_chains_with_crosslinker(2)
+        self.assertEqual(all_chains[2].get_type(), MoleculeType.DANGLING_CHAIN)
         self.assertEqual(
             (0.2, 0.25), measure_weight_fraction_of_dangling_chains(self.testUniverse, crosslinker_type=2))
 
@@ -76,22 +76,22 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         # Other border
         # 3 junctions, volume of 1
         self.assertEqual(
-            3.0 / self.testUniverse.getVolume(),
+            3.0 / self.testUniverse.get_volume(),
             compute_effective_nr_density_of_junctions([self.testUniverse], 0,
                                                       crosslinker_type=2, min_num_effective_strands=0))
         # actual calc: 6 & 7 are active, 4 not
         self.assertEqual(
-            2.0 / self.testUniverse.getVolume(),
+            2.0 / self.testUniverse.get_volume(),
             compute_effective_nr_density_of_junctions([self.testUniverse], abs_tol=None, rel_tol=0,
                                                       crosslinker_type=2, min_num_effective_strands=2))
         self.assertEqual(
-            2.0 / self.testUniverse.getVolume(),
+            2.0 / self.testUniverse.get_volume(),
             compute_effective_nr_density_of_junctions([self.testUniverse], 0,
                                                       crosslinker_type=2, min_num_effective_strands=2))
 
     def test_effective_nr_density_of_network_calculation(self):
         self.assertIsNone(compute_effective_nr_density_of_network([]))
-        self.assertEqual(3, len(self.testUniverse.getMolecules(2)))
+        self.assertEqual(3, len(self.testUniverse.get_molecules(2)))
         # Border cases
         self.assertEqual(0.0, compute_effective_nr_density_of_network(
             [self.testUniverse], None, 10, crosslinker_type=2))
@@ -101,7 +101,7 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
             0.0, compute_effective_nr_density_of_network([self.testUniverse], 1000, 1, crosslinker_type=2))
         # actual calc: we got 2 active strands in a Volume of 1
         self.assertEqual(
-            2.0 / self.testUniverse.getVolume(),
+            2.0 / self.testUniverse.get_volume(),
             compute_effective_nr_density_of_network([self.testUniverse], 0, 2,
                                                     crosslinker_type=2))
 
@@ -128,8 +128,8 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         self.assertEqual(
             1 + 1.0 / 3.0, compute_topological_factor([self.testUniverse], 2, b=1))
         bond_lengths = []
-        for m in self.testUniverse.getMolecules(2):
-            bond_lengths.extend(m.computeBondLengths())
+        for m in self.testUniverse.get_molecules(2):
+            bond_lengths.extend(m.compute_bond_lengths())
         self.assertEqual(1, np.mean(bond_lengths))
         self.assertEqual(
             0.5485762961986437, compute_topological_factor([self.testUniverse], 2))

@@ -108,9 +108,8 @@ namespace calc {
                                                  this->currentDisplacements,
                                                  oneOverSpringPartitions);
       const double minN = this->initialConfig.springsContourLength.minCoeff();
-      std::cout << "Starting force balance procedure "
-                << "with " << initialResidual
-                << " as initial residual, got requested "
+      std::cout << "Starting force balance procedure " << "with "
+                << initialResidual << " as initial residual, got requested "
                 << initialResidualToUse
                 // "with " << independentVertexSets.size() << "vertex sets."
                 << std::endl;
@@ -345,9 +344,9 @@ namespace calc {
           wasInterrupted = true;
           break;
         }
-      } while (
-        currentResidual / initialResidual > xtol &&
-        iterationsDone<maxNrOfSteps&& this->initialConfig.nrOfSprings> 0);
+      } while (currentResidual / initialResidual > xtol &&
+               iterationsDone < maxNrOfSteps &&
+               this->initialConfig.nrOfSprings > 0);
 
       // finish up
       this->closeAllOutputs();
@@ -1141,14 +1140,12 @@ namespace calc {
                           "The spring numbering seems incorrect. Placing "
                           "slip-links will lead to inappropriate placement.");
 #ifndef NDEBUG
-          std::pair<pylimer_tools::entities::Atom,
-                    pylimer_tools::entities::Atom>
-            chainEnds =
-              crossLinkerChains[i].getChainEnds(this->crossLinkerType);
+          std::vector<pylimer_tools::entities::Atom> chainEnds =
+            crossLinkerChains[i].getChainEnds(this->crossLinkerType, true);
           assert(this->initialConfig.oldAtomIds
                    [this->initialConfig.linkIndicesOfSprings[springId][0]] ==
-                 chainEnds.first.getId());
-          assert(chainEnds.first.getId() == atoms[0].getId());
+                 chainEnds[0].getId());
+          assert(chainEnds[0].getId() == atoms[0].getId());
 #endif
           springId += 1;
         }
@@ -3704,9 +3701,8 @@ namespace calc {
       }
       if (rotations >= 5) {
         std::cerr << "Could not rotate slip-link " << slipLinkIdx
-                  << " back to initial spring. "
-                  << "Initial spring was " << fullSpringIdx
-                  << ", whereas current springs are "
+                  << " back to initial spring. " << "Initial spring was "
+                  << fullSpringIdx << ", whereas current springs are "
                   << pylimer_tools::utils::join(
                        net.springIndicesOfLinks[slipLinkIdx].begin(),
                        net.springIndicesOfLinks[slipLinkIdx].end(),
@@ -4296,9 +4292,9 @@ namespace calc {
       std::cout << "Swapping link " << linkIdx1 << " and " << linkIdx2
                 << " on partial spring " << partialSpringIdx
                 << ". Newly linked partial springs: " << otherPartialOfLinkIdx1
-                << " (" << unaffectedEnd1 << ") "
-                << " and " << otherPartialOfLinkIdx2 << " (" << unaffectedEnd2
-                << ") " << std::endl;
+                << " (" << unaffectedEnd1 << ") " << " and "
+                << otherPartialOfLinkIdx2 << " (" << unaffectedEnd2 << ") "
+                << std::endl;
 
       Eigen::VectorXd u = Eigen::VectorXd::Zero(net.coordinates.size());
       Eigen::Vector3d distanceBefore =
@@ -5571,22 +5567,68 @@ namespace calc {
     /**
      * @brief Get the Gamma Factor at the current step
      *
-     * @param r02 the melt <R_0^2>, for phantom = Nb^2
+     * @param b the melt <b>: mean bond length; vgl. the required <R_0^2>,
+     * computed as phantom = N<b>^2.
      * @param nrOfChains the nr of chains to average over (can be different
      * from the nr of springs thanks to omitted free chains or primary loops)
      * @return double
      */
-    double MEHPForceBalance::getGammaFactor(double r02, int nrOfChains) const
+    double MEHPForceBalance::getGammaFactorUsingPartialSprings(
+      double oneOverSpringPartitionUpperLimit,
+      double b,
+      int nrOfChains) const
     {
-      if (r02 < 0) {
-        r02 = this->defaultR0Squared;
+      if (b < 0) {
+        b = this->defaultBondLength;
       }
       if (nrOfChains < 1) {
         nrOfChains = this->defaultNrOfChains;
       }
 
-      return this->evaluateGammaFactor(
-        this->currentSpringDistances, r02, nrOfChains);
+      Eigen::VectorXd oneOverSpringPart =
+        this->assembleOneOverSpringPartition(this->initialConfig,
+                                             this->currentSpringPartitionsVec,
+                                             oneOverSpringPartitionUpperLimit) *
+        (1. / (b * b)); // compute the vector of
+      Eigen::VectorXd partialSpringVectors = this->evaluatePartialSpringVectors(
+        this->initialConfig, this->currentDisplacements, this->is2D);
+
+      return ((oneOverSpringPart.array() * partialSpringVectors.array())
+               .matrix()
+               .squaredNorm()) /
+             nrOfChains;
+    }
+
+    /**
+     * @brief Get the Gamma Factor at the current step
+     *
+     * @param b the melt <b>: mean bond length; vgl. the required <R_0^2>,
+     * computed as phantom = N<b>^2.
+     * @param nrOfChains the nr of chains to average over (can be different
+     * from the nr of springs thanks to omitted free chains or primary loops)
+     * @return double
+     */
+    double MEHPForceBalance::getGammaFactor(
+      double oneOverSpringPartitionUpperLimit,
+      double b,
+      int nrOfChains) const
+    {
+      if (b < 0) {
+        b = this->defaultBondLength;
+      }
+      if (nrOfChains < 1) {
+        nrOfChains = this->defaultNrOfChains;
+      }
+
+      Eigen::VectorXd springVectors = this->evaluateSpringVectors(
+        this->initialConfig, this->currentDisplacements, this->is2D);
+
+      for (size_t i = 0; i < this->initialConfig.nrOfSprings; ++i) {
+        springVectors *=
+          (1. / (b * b * this->initialConfig.springsContourLength[i]));
+      }
+
+      return springVectors.squaredNorm() / nrOfChains;
     }
 
     /**
@@ -5713,10 +5755,14 @@ namespace calc {
       for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
         std::vector<pylimer_tools::entities::Atom> xlinkersOfChain =
           crossLinkerChains[i].getAtomsOfType(crossLinkerType);
-        std::pair<pylimer_tools::entities::Atom, pylimer_tools::entities::Atom> chainEnds =
-          crossLinkerChains[i].getChainEnds(crossLinkerType);
-        long int atomIdFrom = chainEnds.first.getId();
-        long int atomIdTo = chainEnds.second.getId();
+        std::vector<pylimer_tools::entities::Atom> chainEnds =
+          crossLinkerChains[i].getChainEnds(crossLinkerType, true);
+        if (chainEnds.size() < 2) {
+          continue;
+        }
+        assert(chainEnds.size() == 2);
+        long int atomIdFrom = chainEnds[0].getId();
+        long int atomIdTo = chainEnds[1].getId();
         bool addChain = false;
         if (crossLinkerChains[i].getType() ==
             pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {

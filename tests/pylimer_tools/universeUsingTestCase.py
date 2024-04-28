@@ -2,7 +2,7 @@ import unittest
 
 import pandas as pd
 
-from pylimer_tools_cpp.pylimer_tools_cpp import Universe
+from pylimer_tools_cpp import Universe
 
 
 class UniverseUsingTestCase(unittest.TestCase):

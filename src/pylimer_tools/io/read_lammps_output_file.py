@@ -7,8 +7,7 @@ import pandas as pd
 
 from pylimer_tools.io.extract_thermo_data import extract_thermo_params
 from pylimer_tools.utils.cache_utility import do_cache, load_cache
-from pylimer_tools_cpp.pylimer_tools_cpp import (AtomStyle, Universe,
-                                                 UniverseSequence)
+from pylimer_tools_cpp import AtomStyle, Universe, UniverseSequence
 
 
 def read_log_file(filepath, lines_to_read_to_detect_header=500000) -> pd.DataFrame:
@@ -22,8 +21,8 @@ def read_dump_file(data_file, dump_file, atom_style: Union[List[AtomStyle], None
     """
     u_s = UniverseSequence()
     if (atom_style is not None):
-        u_s.setDataFileAtomStyle(atom_style)
-    u_s.initializeFromDumpFile(data_file, dump_file)
+        u_s.set_data_file_atom_style(atom_style)
+    u_s.initialize_from_dump_file(data_file, dump_file)
     return u_s
 
 
@@ -40,8 +39,8 @@ def read_data_file(structure_file: str, atom_style: Union[List[AtomStyle], None]
     """
     u_s = UniverseSequence()
     if (atom_style is not None):
-        u_s.setDataFileAtomStyle(atom_style)
-    u_s.initializeFromDataSequence([structure_file])
+        u_s.set_data_file_atom_style(atom_style)
+    u_s.initialize_from_data_sequence([structure_file])
     universe = u_s.atIndex(0)
     del u_s
     return universe

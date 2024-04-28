@@ -9,8 +9,7 @@ import numpy as np
 import pandas as pd
 import pandas.testing as pd_testing
 
-from pylimer_tools_cpp.pylimer_tools_cpp import (Atom, Molecule, MoleculeType,
-                                                 Universe)
+from pylimer_tools_cpp import Atom, Molecule, MoleculeType, Universe
 
 if __name__ == '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../.."))
@@ -33,13 +32,13 @@ class TestEntities(UniverseUsingTestCase):
         self.assertIsInstance(self.emptyUniverse, Universe)
         # self.assertIsInstance(universe.getUnderlyingGraph(), igraph.Graph)
         # check that the except paths work too: non-existant atom ids & type
-        self.assertEqual([], self.emptyUniverse.getAtomsOfType(1))
+        self.assertEqual([], self.emptyUniverse.get_atoms_by_type(1))
         self.assertRaises(IndexError, lambda: self.emptyUniverse.getAtom(1))
 
-        self.assertCountEqual([], self.emptyUniverse.getMolecules(0))
+        self.assertCountEqual([], self.emptyUniverse.get_molecules(0))
         self.assertCountEqual(
-            [], self.emptyUniverse.getChainsWithCrosslinker(0))
-        self.assertEqual(0, self.emptyUniverse.getNrOfAtoms())
+            [], self.emptyUniverse.get_chains_with_crosslinker(0))
+        self.assertEqual(0, self.emptyUniverse.get_nr_of_atoms())
 
         atom = self.testUniverseSmall.getAtom(1)
         # self.assertEqual(atom.getUnderlyingData(), self.testAtomsSmall.iloc[0])
@@ -47,48 +46,48 @@ class TestEntities(UniverseUsingTestCase):
 
     def test_molecule_entity(self):
         universe = self.testUniverseSmall
-        self.assertEqual(4, len(universe.getAtomsOfType(1)))
-        self.assertEqual(2, len(universe.getAtomsOfType(2)))
-        molecules = universe.getMolecules(0)
+        self.assertEqual(4, len(universe.get_atoms_by_type(1)))
+        self.assertEqual(2, len(universe.get_atoms_by_type(2)))
+        molecules = universe.get_molecules(0)
         self.assertEqual(len(molecules), 2)
         self.assertEqual(molecules[0].getLength(), 3)
         self.assertEqual(np.sum([m.getLength()
                                  for m in molecules]), len(self.testAtomsSmall))
-        molecules = universe.getMolecules(2)
+        molecules = universe.get_molecules(2)
         self.assertEqual(len(molecules), 2)
-        self.assertEqual(len(universe.getChainsWithCrosslinker(0)), 2)
+        self.assertEqual(len(universe.get_chains_with_crosslinker(0)), 2)
         for molecule in molecules:
             self.assertIsInstance(molecule, Molecule)
-        for molecule in universe.getMolecules(0):
+        for molecule in universe.get_molecules(0):
             self.assertIsInstance(molecule, Molecule)
-        for molecule in universe.getChainsWithCrosslinker(0):
+        for molecule in universe.get_chains_with_crosslinker(0):
             self.assertIsInstance(molecule, Molecule)
-            self.assertEqual(molecule.getType(),
+            self.assertEqual(molecule.get_type(),
                              MoleculeType.FREE_CHAIN)
 
-        chains_with_crosslinker = universe.getChainsWithCrosslinker(2)
-        self.assertEqual(chains_with_crosslinker[0].getType(
+        chains_with_crosslinker = universe.get_chains_with_crosslinker(2)
+        self.assertEqual(chains_with_crosslinker[0].get_type(
         ), MoleculeType.FREE_CHAIN)
         self.assertEqual(
-            chains_with_crosslinker[1].getType(), MoleculeType.DANGLING_CHAIN)
+            chains_with_crosslinker[1].get_type(), MoleculeType.DANGLING_CHAIN)
         universe_clone = copy.copy(universe)
-        self.assertEqual(universe.getNrOfAtoms(),
-                         universe_clone.getNrOfAtoms())
+        self.assertEqual(universe.get_nr_of_atoms(),
+                         universe_clone.get_nr_of_atoms())
 
     def test_molecule_entity_iterations(self):
-        molecules = self.testUniverseSmall.getMolecules(0)
+        molecules = self.testUniverseSmall.get_molecules(0)
         # test iteration & return type
         for molecule in molecules:
             self.assertIsInstance(molecule, Molecule)
         # test calculations
         self.assertEqual(molecules[0].computeEndToEndDistance(), 2)
-        self.assertEqual(np.mean(molecules[0].computeBondLengths()), 1.0)
+        self.assertEqual(np.mean(molecules[0].compute_bond_lengths()), 1.0)
 
     def test_atom_entity(self):
         atom1 = Atom(1, 1, 0.0, 0.0, 0.0, 0, 0, 0)
         self.assertIsInstance(atom1, Atom)
-        self.assertEqual(atom1.getType(), 1)
-        self.assertEqual(atom1.getId(), 1)
+        self.assertEqual(atom1.get_type(), 1)
+        self.assertEqual(atom1.get_id(), 1)
         self.assertEqual(atom1.getX(), 0)
         self.assertEqual(atom1.getY(), 0)
         self.assertEqual(atom1.getZ(), 0)

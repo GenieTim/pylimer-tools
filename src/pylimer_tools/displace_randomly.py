@@ -5,8 +5,8 @@ import random
 
 import click
 
-from pylimer_tools.io.read_lammps_output_file import readDataFile
-from pylimer_tools_cpp.pylimer_tools_cpp import (Atom, DataFileWriter)
+from pylimer_tools.io.read_lammps_output_file import read_data_file
+from pylimer_tools_cpp import Atom, DataFileWriter
 
 
 @click.command()
@@ -20,13 +20,13 @@ def cli(file, max_displacement):
       - file: the file to read (and write, with prefix "random-displaced-")
       - max_displacement: the maximum displacement
     """
-    universe = readDataFile(file)
+    universe = read_data_file(file)
 
-    atoms = universe.getAtoms()
+    atoms = universe.get_atoms()
     for atom in atoms:
         new_atom = Atom(
-            atom.getId(),
-            atom.getType(),
+            atom.get_id(),
+            atom.get_type(),
             atom.getX() + (random.random() - 0.5) * max_displacement,
             atom.getY() + (random.random() - 0.5) * max_displacement,
             atom.getZ() + (random.random() - 0.5) * max_displacement,
@@ -34,7 +34,7 @@ def cli(file, max_displacement):
             atom.getNY(),
             atom.getNZ()
         )
-        universe.replaceAtom(atom.getId(), new_atom)
+        universe.replace_atom(atom.get_id(), new_atom)
 
     writer = DataFileWriter(universe)
 
@@ -42,7 +42,7 @@ def cli(file, max_displacement):
         os.path.dirname(file),
         "random-displaced-" + os.path.basename(file)
     )
-    writer.writeToFile(
+    writer.write_to_file(
         target_file
     )
     click.echo("Written file '{}'".format(target_file))

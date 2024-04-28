@@ -162,6 +162,9 @@
   "cSpell.words": [
     "attogram",
     "avogadro",
+    "Correlator",
+    "crosslink",
+    "crosslinker",
     "crossLinker",
     "crossLinkers",
     "igraph",
@@ -171,7 +174,12 @@
     "mehp",
     "MEHP",
     "pdms",
+    "polydispersity",
+    "sliplink",
+    "sliplinks",
+    "slipspring",
     "thermo",
+    "timestep",
     "xlink",
     "xlinks"
   ],

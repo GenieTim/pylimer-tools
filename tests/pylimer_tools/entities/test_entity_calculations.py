@@ -5,18 +5,18 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from pylimer_tools_cpp.pylimer_tools_cpp import Box, Universe
+from pylimer_tools_cpp import Box, Universe
 
 
 class TestEntityCalculations(unittest.TestCase):
     def test_universe(self):
         universe = Universe(10, 10, 10)
         self.assertIsInstance(universe, Universe)
-        self.assertEqual(universe.getVolume(), 10*10*10)
+        self.assertEqual(universe.get_volume(), 10*10*10)
         universe.setBox(Box(1, 1, 1))
-        self.assertEqual(universe.getVolume(), 1)
+        self.assertEqual(universe.get_volume(), 1)
         universe.setBoxLengths(100, 1, 1)
-        self.assertEqual(universe.getVolume(), 100*1*1)
+        self.assertEqual(universe.get_volume(), 100*1*1)
 
     def test_compute_mean_bond_len(self):
         base_atom = {
@@ -50,11 +50,11 @@ class TestEntityCalculations(unittest.TestCase):
                               coords_df["nx"].tolist(), coords_df["ny"].tolist(), coords_df["nz"].tolist())
             universe.addBonds(
                 bonds_df["from"].tolist(), bonds_df["to"].tolist())
-            self.assertEqual(len(universe.getMolecules(-1)), 1)
-            molecule = universe.getMolecules(-1)[0]
+            self.assertEqual(len(universe.get_molecules(-1)), 1)
+            molecule = universe.get_molecules(-1)[0]
             self.assertEqual(molecule.getLength(), 3)
-            self.assertEqual(molecule.getNrOfBonds(), 2)
-            self.assertEqual(np.mean(molecule.computeBondLengths()), 1)
+            self.assertEqual(molecule.get_nr_of_bonds(), 2)
+            self.assertEqual(np.mean(molecule.compute_bond_lengths()), 1)
 
     def test_compute_end_to_end_distance(self):
         base_atom = {
@@ -76,7 +76,7 @@ class TestEntityCalculations(unittest.TestCase):
                           coords_df["nx"].tolist(), coords_df["ny"].tolist(), coords_df["nz"].tolist())
         universe.addBonds(
             bonds_df["bondFrom"].tolist(), bonds_df["to"].tolist())
-        molecules = universe.getMolecules(-1)
+        molecules = universe.get_molecules(-1)
         self.assertEqual(len(molecules), 1)
         self.assertEqual(molecules[0].computeEndToEndDistance(), 0)
         atoms = []
@@ -94,7 +94,7 @@ class TestEntityCalculations(unittest.TestCase):
                           coords_df["nx"].tolist(), coords_df["ny"].tolist(), coords_df["nz"].tolist())
         universe.addBonds(
             bonds_df["bondFrom"].tolist(), bonds_df["to"].tolist())
-        molecules = universe.getMolecules(-1)
+        molecules = universe.get_molecules(-1)
         self.assertEqual(len(molecules), 1)
         self.assertEqual(-1, molecules[0].computeEndToEndDistance())
 
@@ -126,9 +126,9 @@ class TestEntityCalculations(unittest.TestCase):
                 coords_df["nx"].tolist(), coords_df["ny"].tolist(), coords_df["nz"].tolist())
             universe.addBonds(
                 bonds_df["bondFrom"].tolist(), bonds_df["to"].tolist())
-            self.assertEqual(len(universe.getMolecules(-1)), 1)
-            self.assertEqual(0.0, np.mean(universe.getMolecules(-1)[
-                0].computeBondLengths()))
+            self.assertEqual(len(universe.get_molecules(-1)), 1)
+            self.assertEqual(0.0, np.mean(universe.get_molecules(-1)[
+                0].compute_bond_lengths()))
 
 
 if __name__ == '__main__':

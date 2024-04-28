@@ -120,7 +120,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertDictEqual(weight_fractions, {1: 1 - 3. / 8., 2: 3. / 8.})
         test_universe_copy = copy.copy(self.testUniverse)
         test_universe_copy.removeAtoms([1, 2, 3, 4, 5, 6])
-        self.assertTrue(test_universe_copy.getNrOfAtoms() == 2)
+        self.assertTrue(test_universe_copy.get_nr_of_atoms() == 2)
         self.assertDictEqual(compute_weight_fractions(
             test_universe_copy), {1: 1. / 2., 2: 1. / 2.})
 

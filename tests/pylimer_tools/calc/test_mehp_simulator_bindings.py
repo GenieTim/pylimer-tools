@@ -1,9 +1,9 @@
 import os
 import sys
 
-from pylimer_tools_cpp.pylimer_tools_cpp import (
-    MEHPForceRelaxation, NonGaussianSpringForceEvaluator,
-    SimpleSpringMEHPForceEvaluator)
+from pylimer_tools_cpp import (MEHPForceRelaxation,
+                               NonGaussianSpringForceEvaluator,
+                               SimpleSpringMEHPForceEvaluator)
 
 if __name__ == '__main__':
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../"))

@@ -37,7 +37,7 @@ PYBIND11_MODULE(pylimer_tools_cpp, m)
   init_pylimer_bound_calc(m);
 
   m.def(
-    "versionInformation",
+    "version_information",
     []() {
       return "pylimer_tools, version " + std::string(__PROJECT_VERSION__) +
              "(" + std::string(__LIB_VERSION__) + "), compiled " +
