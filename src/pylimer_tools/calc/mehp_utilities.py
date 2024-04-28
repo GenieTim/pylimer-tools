@@ -8,7 +8,7 @@ import numpy as np
 
 from pylimer_tools.calc.structure_analysis import \
     compute_mean_end_to_end_distances
-from pylimer_tools_cpp.pylimer_tools_cpp import MoleculeType, Universe
+from pylimer_tools_cpp import MoleculeType, Universe
 
 
 def predict_shear_modulus(networks: Iterable[Universe], temperature: float = 1, k_boltzmann: float = 1,
@@ -23,7 +23,7 @@ def predict_shear_modulus(networks: Iterable[Universe], temperature: float = 1, 
       - network: the polymer system to predict the shear modulus for
       - T: the temperature in your unit system
       - k_b: Boltzmann's constant in your unit system
-      - crosslinker_type: the type of atoms to ignore (junctions, crosslinkers)
+      - crosslinker_type: the type of atoms to ignore (junctions, cross-linkers)
       - totalMass: the :math:`M` in the respective formula
 
     Returns:
@@ -33,8 +33,8 @@ def predict_shear_modulus(networks: Iterable[Universe], temperature: float = 1, 
         networks, crosslinker_type, total_mass)
     nu = 0
     for network in networks:
-        nu += len(network.getMolecules(crosslinker_type)) / \
-            (network.getVolume()) / len(networks)
+        nu += len(network.get_molecules(crosslinker_type)) / \
+            (network.get_volume()) / len(networks)
     return gamma * nu * k_boltzmann * temperature
 
 
@@ -139,15 +139,15 @@ def compute_mean_universe_volume(networks: Iterable[Universe], accept_different_
     # compute the mean volume of the universes
     mean_volume = 0
     divisor = 1 / len(networks)
-    network_size = networks[0].getNrOfAtoms()
+    network_size = networks[0].get_nr_of_atoms()
     for network in networks:
-        if (not accept_different_sizes and network.getNrOfAtoms() != network_size):
+        if (not accept_different_sizes and network.get_nr_of_atoms() != network_size):
             raise NotImplementedError(
                 "Currently, only sequences of networks with the same size are supported"
                 + " (got one with {} instead of {})".format(
-                    network.getNrOfAtoms(), network_size
+                    network.get_nr_of_atoms(), network_size
                 ))
-        mean_volume += network.getVolume() * divisor
+        mean_volume += network.get_volume() * divisor
     return mean_volume
 
 
@@ -181,7 +181,7 @@ def compute_effective_nr_density_of_junctions(networks: Iterable[Universe], abs_
     mean_volume = compute_mean_universe_volume(networks)
 
     if (min_num_effective_strands == 0):
-        return len(networks[0].getAtomsOfType(crosslinker_type)) / mean_volume
+        return len(networks[0].get_atoms_by_type(crosslinker_type)) / mean_volume
 
     # get the mean end to end distances
     r_taus = compute_mean_end_to_end_distances(networks, crosslinker_type)
@@ -194,18 +194,18 @@ def compute_effective_nr_density_of_junctions(networks: Iterable[Universe], abs_
         abs_tol = r_tau_max
 
     key_to_molecule = {}
-    for molecule in list(networks)[0].getChainsWithCrosslinker(crosslinker_type):
-        key_to_molecule[molecule.getKey()] = molecule
+    for molecule in list(networks)[0].get_chains_with_crosslinker(crosslinker_type):
+        key_to_molecule[molecule.get_key()] = molecule
 
     # count how many active connections each junction has
     junction_activity = {}
     for key in r_taus:
-        crosslinkers = key_to_molecule[key].getAtomsOfType(crosslinker_type)
+        crosslinkers = key_to_molecule[key].get_atoms_by_type(crosslinker_type)
         assert (len(crosslinkers) == 2)
         is_active = r_taus[key] > abs_tol or r_taus[key] > rel_tol * r_tau_max
         if (not (is_active)):
             continue
-        relevant_names = [crosslinkers[0].getId(), crosslinkers[1].getId()]
+        relevant_names = [crosslinkers[0].get_id(), crosslinkers[1].get_id()]
         for crosslinker_name in relevant_names:
             if (crosslinker_name not in junction_activity):
                 junction_activity[crosslinker_name] = 0
@@ -245,20 +245,20 @@ def compute_topological_factor(networks: Iterable[Universe], crosslinker_type: i
     # find the topological factor
     gamma_sum = 0
     network = networks[0]  # this is where the second assumption is made
-    chains_to_process = network.getChainsWithCrosslinker(crosslinker_type)
+    chains_to_process = network.get_chains_with_crosslinker(crosslinker_type)
     for molecule in chains_to_process:
-        crosslinkers = molecule.getAtomsOfType(crosslinker_type)
+        crosslinkers = molecule.get_atoms_by_type(crosslinker_type)
         if (len(crosslinkers) != 2 or
-            molecule.getType() == MoleculeType.PRIMARY_LOOP or
-                molecule.getType() == MoleculeType.DANGLING_CHAIN):
+            molecule.get_type() == MoleculeType.PRIMARY_LOOP or
+                molecule.get_type() == MoleculeType.DANGLING_CHAIN):
             # dangling, free chains and loops are irrelevant for our purposes
             continue
         if (b is None):
-            b = np.mean(molecule.computeBondLengths())
+            b = np.mean(molecule.compute_bond_lengths())
         crosslinkers = [crosslinkers[0], crosslinkers[1]]
         # sort crosslinkers by name as a way to keep the vector directions consistent between timesteps
-        crosslinkers.sort(key=lambda a: a.getId())
-        key = molecule.getKey()
+        crosslinkers.sort(key=lambda a: a.get_id())
+        key = molecule.get_key()
         gamma_sum += r_taus[key] * r_taus[key] / \
             ((molecule.getLength() - 2) * b *
              b)  # -2: remove crosslinkers again (assumption 3)

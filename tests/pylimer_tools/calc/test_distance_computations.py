@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import unittest
 
-from pylimer_tools_cpp.pylimer_tools_cpp import Atom, Box
+from pylimer_tools_cpp import Atom, Box
 
 
 class TestDistanceCalcFunctions(unittest.TestCase):

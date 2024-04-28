@@ -6,7 +6,7 @@ import numpy as np
 from pylimer_tools.calc.structure_analysis import (
     compute_crosslinker_conversion, compute_extent_of_reaction,
     compute_stoichiometric_imbalance)
-from pylimer_tools_cpp.pylimer_tools_cpp import UniverseSequence
+from pylimer_tools_cpp import UniverseSequence
 
 
 @click.command()
@@ -25,24 +25,24 @@ def cli(files, crosslinker_type):
         click.echo("\nAnalysing File " + file_path)
 
         universe_sequence = UniverseSequence()
-        universe_sequence.initializeFromDataSequence([file_path])
-        universe = universe_sequence.atIndex(0)
+        universe_sequence.initialize_from_data_sequence([file_path])
+        universe = universe_sequence.at_index(0)
         click.echo("Size: {}. Volume: {} u^3 (ρ = {})".format(
-            universe.getNrOfAtoms(), universe.getVolume(), universe.getNrOfAtoms() / universe.getVolume()))
-        click.echo("{} atoms and {} bonds, {} angles, {} dihedrals".format(universe.getNrOfAtoms(
-        ), universe.getNrOfBonds(), universe.getNrOfAngles(), universe.getNrOfDihedralAngles()))
-        molecules = universe.getMolecules(crosslinker_type)
-        bond_lengths = [np.mean(m.computeBondLengths()) for m in molecules]
+            universe.get_nr_of_atoms(), universe.get_volume(), universe.get_nr_of_atoms() / universe.get_volume()))
+        click.echo("{} atoms and {} bonds, {} angles, {} dihedrals".format(universe.get_nr_of_atoms(
+        ), universe.get_nr_of_bonds(), universe.getNrOfAngles(), universe.get_nr_of_dihedral_angles()))
+        molecules = universe.get_molecules(crosslinker_type)
+        bond_lengths = [np.mean(m.compute_bond_lengths()) for m in molecules]
         non_none_bond_lengths = [
             bl for bl in bond_lengths if bl is not None and bl > 0]
         click.echo("Mean bond length: {} u, (min: {}, max: {}, median: {}) u".format(
             np.mean(non_none_bond_lengths), np.min(non_none_bond_lengths),
             np.max(non_none_bond_lengths), np.median(non_none_bond_lengths)))
-        end_to_end_distances = [m.computeEndToEndDistance() for m in molecules]
+        end_to_end_distances = [m.compute_end_to_end_distance() for m in molecules]
         click.echo("Mean end to end distance: {} u".format(
             np.mean([e for e in end_to_end_distances if e is not None and e > 0])))
         click.echo("For {} molecules of mean length of {} atoms".format(
-            len(molecules), np.mean([m.getNrOfAtoms() for m in molecules])))
+            len(molecules), np.mean([m.get_nr_of_atoms() for m in molecules])))
         click.echo("r = {}, p = {} ({}), D = {}".format(
             compute_stoichiometric_imbalance(
                 universe, crosslinker_type),
@@ -50,7 +50,7 @@ def cli(files, crosslinker_type):
             # mehp.calculateEffectiveCrosslinkerFunctionality(
             #     universe, crosslinker_type),
             compute_crosslinker_conversion(universe, crosslinker_type),
-            universe.computePolydispersityIndex(crosslinker_type)
+            universe.compute_polydispersity_index(crosslinker_type)
         ))
         click.echo("")
     click.echo("Arbitrary units used. E.g.: Length: u")

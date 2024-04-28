@@ -6,7 +6,11 @@ if (POLICY CMP0025)
 endif ()
 
 # start project
+if (NOT DEFINED VERSION_NR)
 project(pylimer_tools VERSION "0.2.1")
+else()
+project(pylimer_tools VERSION ${VERSION_NR})
+endif()
 add_definitions( -DOVERALL_PROJECT_VERSION="${CMAKE_PROJECT_VERSION}")
 
 include(${CMAKE_CURRENT_LIST_DIR}/vendor/myConfigureFile.cmake)
@@ -39,23 +43,6 @@ endif()
 include(${CMAKE_CURRENT_LIST_DIR}/vendor/CMakeLists.txt)
 
 # prepare python bindings
-# list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-list(APPEND CMAKE_MODULE_PATH /usr/local/anaconda3/lib/python3.7/site-packages/skbuild/resources/cmake/)
-find_package(PythonExtensions REQUIRED)
-
-if(SKBUILD)
-  # Scikit-Build does not add your site-packages to the search path
-  # automatically, so we need to add it _or_ the pybind11 specific directory
-  # here.
-  execute_process(
-    COMMAND "${PYTHON_EXECUTABLE}" -c
-            "import pybind11; print(pybind11.get_cmake_dir())"
-    OUTPUT_VARIABLE _tmp_dir
-    OUTPUT_STRIP_TRAILING_WHITESPACE COMMAND_ECHO STDOUT)
-  list(APPEND CMAKE_PREFIX_PATH "${_tmp_dir}")
-	set(vendor_suffix "-skbuild")
-endif()
-
 # Now we can find pybind11
 find_package(pybind11 CONFIG REQUIRED)
 
@@ -90,7 +77,6 @@ target_link_libraries(pylimer_tools_cpp
     ${igraph_LIBRARIES}
     ${nlopt_LIBRARIES}
 )
-
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 target_link_libraries(pylimer_tools_cpp 

@@ -2,10 +2,9 @@ import random
 import unittest
 
 import numpy as np
-
-
-from pylimer_tools_cpp.pylimer_tools_cpp import Box
 from numpy import linalg
+
+from pylimer_tools_cpp import Box
 
 
 class TestMEHPAssumptions(unittest.TestCase):

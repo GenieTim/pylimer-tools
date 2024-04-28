@@ -61,7 +61,7 @@ namespace entities {
     }
     long int getAtomIdByIdx(const int vertexId) const override;
     long int getIdxByAtomId(const int atomId) const override;
-    std::pair<Atom, Atom> getChainEnds(int crossLinkerType = 2) const;
+    std::vector<Atom> getChainEnds(int crossLinkerType = 2, bool closePrimaryLoop = true) const;
 
     // computations
     double computeEndToEndDistance();

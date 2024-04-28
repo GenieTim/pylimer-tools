@@ -14,7 +14,7 @@ from pylimer_tools.calc.structure_analysis import (
     compute_stoichiometric_imbalance, compute_weight_fractions,
     measure_weight_fraction_of_soluble_material)
 from pylimer_tools.io.unit_styles import UnitStyle
-from pylimer_tools_cpp.pylimer_tools_cpp import Universe
+from pylimer_tools_cpp import Universe
 
 
 def predict_shear_modulus(**kwargs):
@@ -55,7 +55,7 @@ def predict_number_density_of_junction_points(network: Universe, crosslinker_typ
       - mu: The predicted number density of junction points
     """
     if (functionality_per_type is None or crosslinker_type not in functionality_per_type):
-        functionality_per_type = network.determineFunctionalityPerType()
+        functionality_per_type = network.determine_functionality_per_type()
 
     weight_fractions, alpha, _ = compute_weight_fractions_and_probabilities(
         network, crosslinker_type, functionality_per_type)
@@ -89,9 +89,9 @@ def predict_number_density_of_network_strands(network: Universe, crosslinker_typ
       - nu: The predicted number density of network strands
     """
     if (functionality_per_type is None or crosslinker_type not in functionality_per_type):
-        functionality_per_type = network.determineFunctionalityPerType()
+        functionality_per_type = network.determine_functionality_per_type()
 
-    weight_fractions = network.computeWeightFractions()
+    weight_fractions = network.compute_weight_fractions()
     alpha, _ = compute_miller_macosko_probabilities(r=r if r is not None else compute_stoichiometric_imbalance(
         network=network,
         crosslinker_type=crosslinker_type,
@@ -157,11 +157,11 @@ def compute_weight_fraction_of_backbone(network: Universe, crosslinker_type: int
     Returns:
       - :math:`\\Phi_{el}`: weight fraction of network backbone
     """
-    if (network is not None and network.getNrOfAtoms() == 0):
+    if (network is not None and network.get_nr_of_atoms() == 0):
         return 0
 
     if (functionality_per_type is None or crosslinker_type not in functionality_per_type):
-        functionality_per_type = network.determineFunctionalityPerType()
+        functionality_per_type = network.determine_functionality_per_type()
 
     weight_fractions, alpha, beta = compute_weight_fractions_and_probabilities(
         network, crosslinker_type, functionality_per_type, weight_fractions, r, p)
@@ -210,7 +210,7 @@ def compute_weight_fraction_of_soluble_material(network: Universe, crosslinker_t
       - weight_fractions (dict): a dictionary with key: type, and value: weight fraction of type.
             Pass if you want to omit the network.
       - functionality_per_type (dict): a dictionary with key: type, and value: functionality of this atom type.
-          See: :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.determineFunctionalityPerType`.
+          See: :func:`~pylimer_tools_cpp.Universe.determine_functionality_per_type`.
 
     Returns:
       - :math:`W_{sol}` (float): the weight fraction of soluble material according to MMT.
@@ -218,7 +218,7 @@ def compute_weight_fraction_of_soluble_material(network: Universe, crosslinker_t
       - :math:`\\alpha` (float): Macosko & Miller's :math:`P(F_A)`
       - :math:`\\beta` (float): Macosko & Miller's :math:`P(F_B)`
     """
-    if (network is not None and network.getNrOfBonds() == 0):
+    if (network is not None and network.get_nr_of_bonds() == 0):
         return 1.
 
     weight_fractions, alpha, beta = compute_weight_fractions_and_probabilities(
@@ -235,7 +235,7 @@ def compute_weight_fraction_of_soluble_material(network: Universe, crosslinker_t
         if (network is None):
             raise ValueError(
                 "functionality_per_type is required if the network is not supplied.")
-        functionality_per_type = network.determineFunctionalityPerType()
+        functionality_per_type = network.determine_functionality_per_type()
 
     w_sol = 0
     for key in weight_fractions:
@@ -279,13 +279,13 @@ def compute_weight_fractions_and_probabilities(network: Universe, crosslinker_ty
       - weight_fractions (dict): a dictionary with key: type, and value: weight fraction of type.
           Pass if you want to omit the network.
       - functionality_per_type (dict): a dictionary with key: type, and value: functionality of this atom type.
-          See: :func:`~pylimer_tools_cpp.pylimer_tools_cpp.Universe.determineFunctionalityPerType`.
+          See: :func:`~pylimer_tools_cpp.Universe.determine_functionality_per_type`.
       - r: the stoichiometric imbalance
       - p: the extent of reaction in terms of the cross-links
     """
     if (functionality_per_type is None or crosslinker_type not in functionality_per_type):
         assert (network is not None)
-        functionality_per_type = network.determineFunctionalityPerType()
+        functionality_per_type = network.determine_functionality_per_type()
         if (crosslinker_type not in functionality_per_type):
             raise ValueError("The crosslinker type {} is not present in the network. Got types {}".format(
                 crosslinker_type, ", ".join([str(t) for t in functionality_per_type.keys()])))
@@ -466,15 +466,15 @@ def compute_modulus_decomposition(network: Universe, unit_style: UnitStyle, cros
                 network, crosslinker_type)
     if (f is None):
         if (functionality_per_type is None):
-            functionality_per_type = network.determineFunctionalityPerType()
+            functionality_per_type = network.determine_functionality_per_type()
         if (crosslinker_type not in functionality_per_type):
             raise ValueError(
                 "The cross-linker functionality could not be determined. " +
                 "Please pass it explicitly (`f`, or in `functionality_per_type`).")
         f = functionality_per_type[crosslinker_type]
     if (nu is None):
-        nu = len(network.getMolecules(crosslinker_type)) / \
-            (network.getVolume() * unit_style.get_base_unit_of('volume'))
+        nu = len(network.get_molecules(crosslinker_type)) / \
+            (network.get_volume() * unit_style.get_base_unit_of('volume'))
     if (temperature is None):
         temperature = (273.15 + 25) * \
             unit_style.get_underlying_unit_registry()('kelvin')

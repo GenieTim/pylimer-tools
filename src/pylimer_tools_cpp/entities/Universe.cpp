@@ -942,6 +942,7 @@ namespace entities {
           }
 
           // including all attributes
+          // TODO: include additional atom data
           for (auto property :
                { "id", "type", "x", "y", "z", "nx", "ny", "nz" }) {
             SETVAN(chain,
@@ -961,13 +962,12 @@ namespace entities {
       int newMoleculeLength = igraph_vcount(chain);
       if (newMoleculeLength == moleculeLengthBefore) {
         molType = MoleculeType::FREE_CHAIN;
+      } else if (isLoop) {
+        molType = MoleculeType::PRIMARY_LOOP;
       } else if (newMoleculeLength == moleculeLengthBefore + 1) {
         molType = MoleculeType::DANGLING_CHAIN;
       } else if (newMoleculeLength == moleculeLengthBefore + 2) {
         molType = MoleculeType::NETWORK_STRAND;
-      }
-      if (isLoop) {
-        molType = MoleculeType::PRIMARY_LOOP;
       }
 
       // finally, create the molecule/chain

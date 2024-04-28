@@ -4,7 +4,7 @@ import random
 import unittest
 
 from pylimer_tools.io.read_lammps_output_file import read_data_file
-from pylimer_tools_cpp.pylimer_tools_cpp import DataFileWriter, Universe
+from pylimer_tools_cpp import DataFileWriter, Universe
 
 
 class DataFileWriterTest(unittest.TestCase):
@@ -15,10 +15,10 @@ class DataFileWriterTest(unittest.TestCase):
         writer.writeToFile(file)
 
         read_universe = read_data_file(file)
-        self.assertEqual(read_universe.getNrOfAtoms(), universe.getNrOfAtoms())
+        self.assertEqual(read_universe.get_nr_of_atoms(), universe.get_nr_of_atoms())
 
         # then, assert that after writing with the new image flags, things are correct
-        molecule = read_universe.getMolecules(2)[0]
+        molecule = read_universe.get_molecules(2)[0]
         self.assertAlmostEqual(molecule.computeEndToEndDistance(
         ), molecule.computeEndToEndDistanceWithDerivedImageFlags())
 
@@ -42,7 +42,7 @@ class DataFileWriterTest(unittest.TestCase):
 
         # first, make sure the random image flags actually
         # lead to what we expect not to be true
-        molecule = universe.getMolecules(2)[0]
+        molecule = universe.get_molecules(2)[0]
         self.assertNotAlmostEqual(molecule.computeEndToEndDistance(
         ), molecule.computeEndToEndDistanceWithDerivedImageFlags())
 

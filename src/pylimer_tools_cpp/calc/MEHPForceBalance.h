@@ -371,8 +371,7 @@ namespace calc {
         this->currentPartialSpringDistances =
           this->evaluatePartialSpringVectors(
             this->initialConfig, this->currentDisplacements, is2D);
-        this->defaultR0Squared =
-          universe.computeMeanSquareEndToEndDistance(crossLinkerType);
+        this->defaultBondLength = universe.computeMeanBondLength();
         this->defaultNrOfChains =
           universe.getMolecules(this->crossLinkerType).size();
         this->validateNetwork();
@@ -758,7 +757,7 @@ namespace calc {
 
       int getDefaultNrOfChains() const { return this->defaultNrOfChains; }
 
-      double getDefaultR0Square() const { return this->defaultR0Squared; }
+      double getDefaultMeanBondLength() const { return this->defaultBondLength; }
 
       double getVolume() override { return this->initialConfig.vol; }
 
@@ -1084,12 +1083,20 @@ namespace calc {
       /**
        * @brief Get the Gamma Factor at the current step
        *
-       * @param r02 the melt <R_0^2>, for phantom = Nb^2
+       * @param b the melt <b>: mean bond length; vgl. the required <R_0^2>,
+       * computed as phantom = N<b>^2.
        * @param nrOfChains the nr of chains to average over (can be different
        * from the nr of springs thanks to omitted free chains or primary loops)
        * @return double
        */
-      double getGammaFactor(double r02 = -1.0, int nrOfChains = -1) const;
+      double getGammaFactorUsingPartialSprings(
+        double oneOverSpringPartitionUpperLimit = 1.,
+        double b = 0.96,
+        int nrOfChains = -1) const;
+
+      double getGammaFactor(double oneOverSpringPartitionUpperLimit = 1.,
+                            double b = 0.96,
+                            int nrOfChains = -1) const;
 
       int getNrOfIterations() const { return this->nrOfStepsDone; }
 
@@ -1820,23 +1827,6 @@ namespace calc {
                           bool removeDanglingChains = false);
 
       /**
-       * @brief Compute the gamma factor from certain spring distances
-       *
-       * @param springDistances
-       * @param r02 the melt <R_0^2>, for phantom = Nb^2
-       * @param nrOfChains the nr of chains to average over (can be different
-       * from the nr of springs thanks to omitted free chains or primary loops)
-       * @return double
-       */
-      double evaluateGammaFactor(const Eigen::VectorXd& springDistances,
-                                 double r02,
-                                 int nrOfChains) const
-      {
-        return springDistances.squaredNorm() /
-               (static_cast<double>(nrOfChains) * r02);
-      }
-
-      /**
        * @brief Evaluate the pressure of the network at specific displacements
        *
        * @param net the network to evaluate the pressure for
@@ -2458,7 +2448,7 @@ namespace calc {
       bool simulationHasRun = false;
       int stepOutputFrequency = 0;
       int defaultNrOfChains = 0;
-      double defaultR0Squared = 0.0;
+      double defaultBondLength = 0.0;
       std::string stepOutputFile;
       bool outputEndNodes = false;
       std::string endNodesFile;

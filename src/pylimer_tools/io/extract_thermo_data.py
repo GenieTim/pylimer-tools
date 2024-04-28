@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 
 from pylimer_tools.utils.cache_utility import do_cache, load_cache
-from pylimer_tools_cpp.pylimer_tools_cpp import splitCSV
+from pylimer_tools_cpp import split_csv
 
 
 def _is_numeric_string(test: str) -> bool:
@@ -312,7 +312,7 @@ def read_multi_section_separated_value_file(file: str, separator: str = None, us
 
     print("Splitting CSV...")
 
-    tmp_csv_files = splitCSV(file, separator)
+    tmp_csv_files = split_csv(file, separator)
     print("CSV split to {} files... e.g. to {}, {} or {}".format(
         len(tmp_csv_files), tmp_csv_files[0], tmp_csv_files[1] if len(
             tmp_csv_files) > 1 else "",

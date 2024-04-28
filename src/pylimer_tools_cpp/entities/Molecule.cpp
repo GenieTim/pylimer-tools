@@ -76,7 +76,7 @@ namespace entities {
     : Molecule(src.parent,
                &src.graph,
                src.typeOfThisMolecule,
-               src.massPerType){};
+               src.massPerType) {};
   // 3. copy assignment operator
   Molecule& Molecule::operator=(Molecule src)
   {
@@ -348,33 +348,47 @@ namespace entities {
    * This method does not handle branched structures.
    *
    * @param crossLinkerType
-   * @return std::pair<Atom, Atom>
+   * @return std::vector<Atom, Atom>
    */
-  std::pair<Atom, Atom> Molecule::getChainEnds(const int crossLinkerType) const
+  std::vector<Atom> Molecule::getChainEnds(const int crossLinkerType,
+                                           bool closePrimaryLoop) const
   {
+    if (this->getNrOfAtoms() == 0) {
+      return {};
+    }
+    if (this->getNrOfAtoms() == 1) {
+      if (this->getNrOfBonds() > 0 && closePrimaryLoop) {
+        return { this->getAtomByVertexIdx(0),this->getAtomByVertexIdx(0) };
+      } else {
+        return { this->getAtomByVertexIdx(0) };
+      }
+    }
     std::vector<pylimer_tools::entities::Atom> endsOfChain =
       this->getAtomsOfDegree(1);
     if (this->getType() == MoleculeType::PRIMARY_LOOP ||
-        (endsOfChain.size() != 2 &&
-         this->getType() != MoleculeType::UNDEFINED)) {
+        (endsOfChain.size() == 1 &&
+         this->getType() == MoleculeType::UNDEFINED)) {
       std::vector<pylimer_tools::entities::Atom> crossLinks =
         this->getAtomsOfType(crossLinkerType);
-      RUNTIME_EXP_IFN(crossLinks.size() == 1 ||
-                        (crossLinks.size() == 2 &&
-                         crossLinks[0].getId() == crossLinks[1].getId()),
-                      "For a primary loop, expected only one cross-link.");
-      return std::make_pair(crossLinks[0], crossLinks[0]);
+      RUNTIME_EXP_IFN(
+        crossLinks.size() == 1 ||
+          (crossLinks.size() == 2 &&
+           crossLinks[0].getId() == crossLinks[1].getId()),
+        "For a primary loop, expected exactly one cross-link, got " +
+          std::to_string(crossLinks.size()) + " in molecule " + this->getKey() +
+          ".");
+      return closePrimaryLoop ? std::vector<Atom>({ crossLinks[0], crossLinks[0] })
+                              : std::vector<Atom>({ crossLinks[0] });
     }
     RUNTIME_EXP_IFN(endsOfChain.size() == 2,
                     "Expected to find the two ends of the chain as atoms of "
                     "degree 1, but found " +
                       std::to_string(endsOfChain.size()) +
                       " atoms with degree 1.");
-    std::pair<Atom, Atom> res = std::make_pair(endsOfChain[0], endsOfChain[1]);
-    if (res.first.getId() > res.second.getId()) {
-      std::swap(res.first, res.second);
+    if (endsOfChain[0].getId() > endsOfChain[1].getId()) {
+      return { endsOfChain[1], endsOfChain[0] };
     }
-    return res;
+    return { endsOfChain[0], endsOfChain[1] };
   }
 
   /**
@@ -398,7 +412,7 @@ namespace entities {
       alignedCoordinates, this->parent, alignedVertices);
     Eigen::Vector3d result = Eigen::Vector3d::Zero();
     for (size_t i = 1; i < alignedVertices.size(); ++i) {
-      Eigen::Vector3d distance = alignedCoordinates.segment((i)*3, 3) -
+      Eigen::Vector3d distance = alignedCoordinates.segment((i) * 3, 3) -
                                  alignedCoordinates.segment((i - 1) * 3, 3);
       this->parent.handlePBC(distance);
       result += distance;
@@ -437,7 +451,7 @@ namespace entities {
     bool recording = false;
     for (size_t i = 0; i < alignedVertices.size(); ++i) {
       if (recording) {
-        Eigen::Vector3d distance = alignedCoordinates.segment((i)*3, 3) -
+        Eigen::Vector3d distance = alignedCoordinates.segment((i) * 3, 3) -
                                    alignedCoordinates.segment((i - 1) * 3, 3);
         this->parent.handlePBC(distance);
         result += distance;
@@ -510,9 +524,9 @@ namespace entities {
       return results;
     }
 
-    std::pair<Atom, Atom> chainEnds = this->getChainEnds(crossLinkerType);
+    std::vector<Atom> chainEnds = this->getChainEnds(crossLinkerType);
     long int vertexIdToStartWith =
-      this->getIdxByAtomId(chainEnds.first.getId());
+      this->getIdxByAtomId(chainEnds[0].getId());
 
     std::vector<long int> connections =
       this->getVertexIdxsConnectedTo(vertexIdToStartWith);
