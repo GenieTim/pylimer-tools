@@ -20,40 +20,40 @@ It could be used e.g. like this:
 
 
   # BEGIN TODO: define the parameters you want to generate the network with
-  sideLen = 0
+  side_len = 0
   seed = 0
-  beadDistance = 0
-  nrOfCrosslinkers = 0
-  numberOfChains = 0
-  numberOfSolventChains = 0
-  beadsPerSolventChain = 0
-  crossLinkerConversion = 0
-  crossLinkerFunctionality = 0
+  bead_distance = 0
+  nr_of_crosslinkers = 0
+  number_of_chains = 0
+  number_of_solvent_chains = 0
+  beads_per_solvent_chain = 0
+  crosslinker_conversion = 0
+  crosslinker_functionality = 0
   # END TODO
 
   # Start generating the network
-  generator = MCUniverseGenerator(sideLen, sideLen, sideLen)
-  generator.setSeed(seed)
-  generator.setBeadDistance(beadDistance)
+  generator = MCUniverseGenerator(side_len, side_len, side_len)
+  generator.set_seed(seed)
+  generator.set_bead_distance(bead_distance)
   print("Starting MC Generator {}".format(datetime.now().strftime("%H:%M:%S")))
-  generator.addCrosslinkers(nrOfCrosslinkers, 2)
+  generator.add_crosslinkers(nr_of_crosslinkers, 2)
   print("Added cross-linkers {}".format(datetime.now().strftime("%H:%M:%S")))
-  generator.addSolventChains(numberOfSolventChains, beadsPerSolventChain, 3)
+  generator.add_solvent_chains(numberOfSolventChains, beadsPerSolventChain, 3)
   print("Added solvent chains {}".format(datetime.now().strftime("%H:%M:%S")))
-  generator.addAndLinkStrands(numberOfChains, nrOfBeadsPerChain,
-                              crossLinkerConversion, crossLinkerFunctionality, 1)
+  generator.add_and_link_strands(number_of_chains, nr_of_beads_per_chain,
+                              crosslinker_conversion, crosslinker_functionality, 1)
   print("Added and linked strands {}".format(
       datetime.now().strftime("%H:%M:%S")))
-  universe = generator.getUniverse()
-  universe.setMasses({1: 1, 2: 1, 3: 1})
+  universe = generator.get_universe()
+  universe.set_masses({1: 1, 2: 1, 3: 1})
 
-  angles = universe.detectAngles()
-  universe.addAngles(angles["angle_from"],
+  angles = universe.detect_angles()
+  universe.add_angles(angles["angle_from"],
                     angles["angle_via"], angles["angle_to"])
   print("Added angles {}".format(datetime.now().strftime("%H:%M:%S")))
 
   # output new system
   dataWriter = DataFileWriter(universe)
-  dataWriter.configIncludeAngles(True)
-  dataWriter.configMoleculeIdxForSwap(mode_swappable)
-  dataWriter.writeToFile(fileToWrite)
+  dataWriter.config_include_angles(True)
+  dataWriter.config_molecule_idx_for_swap(mode_swappable)
+  dataWriter.write_to_file(fileToWrite)
