@@ -202,7 +202,7 @@ setup(
     include_package_data=True,
     extras_require={"test": ["unittest"]},
     python_requires=">=3.8",
-    ext_modules=[CMakeExtension("cmake_example")],
+    ext_modules=[CMakeExtension("pylimer_tools_cpp")],
     cmdclass={"build_ext": CMakeBuild},
     classifiers=[
         "Programming Language :: Python :: 3",

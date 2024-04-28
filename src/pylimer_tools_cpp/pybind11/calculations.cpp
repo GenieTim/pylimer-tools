@@ -932,11 +932,30 @@ init_pylimer_bound_calc(py::module_& m)
           :math:`T` the temperature and 
           :math:`k_B` Boltzmann's constant.
           
-          :param r0squared: The denominator in the equation of :math:`\Gamma`. If :math:`-1.0` (default), the network is used for determination (which is not accurate). For phantom systems, the correct value is :math:`Nb^2`.
-               For other systems, the value could be determined by `~pylimer_tools_cpp.Universe.computeMeanEndToEndDistance` on the melt system.
+          :param b: the melt <b>: mean bond length; vgl. the required <R_0^2>, computed as phantom = N<b>^2.
           :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains. 
      )pbdoc",
-         py::arg("r_0_squared") = -1.0,
+         py::arg("b_0") = -1.0,
+         py::arg("nr_of_chains") = -1)
+    .def("get_gamma_factor_using_partial_springs",
+         &mehp::MEHPForceBalance::getGammaFactorUsingPartialSprings,
+         R"pbdoc(
+          Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
+
+          :math:`\Gamma = \langle\gamma_{\eta}\rangle`, with :math:`\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}`,
+          which you can use as :math:`G_{\mathrm{ANT}} = \Gamma \nu k_B T`,
+          where :math:`\eta` is the index of a particular strand, 
+          :math:`R_{0}^2` is the melt mean square end to end distance, in phantom systems :math:`$= N_{\eta}*b^2$`
+          :math:`N_{\eta}` is the number of atoms in this strand :math:`\eta`, 
+          :math:`b` its mean square bond length,
+          :math:`T` the temperature and 
+          :math:`k_B` Boltzmann's constant.
+          
+          :param b: the melt <b>: mean bond length; vgl. the required <R_0^2>, computed as phantom = N<b>^2.
+          :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains. 
+     )pbdoc",
+         py::arg("one_over_spring_partition_upper_limit") = 1.,
+         py::arg("b_0") = -1.0,
          py::arg("nr_of_chains") = -1)
     .def("get_nr_of_nodes", &mehp::MEHPForceBalance::getNrOfNodes, R"pbdoc(
            Get the number of nodes (cross-links) considered in this simulation.

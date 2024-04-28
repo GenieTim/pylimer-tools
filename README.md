@@ -38,12 +38,12 @@ from pylimer_tools_cpp import UniverseSequence
 
 filePath = "some_lammps_output_file.dat"
 universeSequence = UniverseSequence()
-universeSequence.initializeFromDataSequence([filePath])
-universe = universeSequence.atIndex(0)
+universeSequence.initialize_from_data_sequence([filePath])
+universe = universeSequence.at_index(0)
 print("Size: {}. Volume: {} u^3".format(
-    universe.getSize(), universe.getVolume()))
+    universe.get_size(), universe.get_volume()))
 print("Mean bond length: {} u".format(
-    np.mean([m.computeBondLengths().mean() for m in universe])))
+    np.mean([m.compute_bond_lengths().mean() for m in universe])))
 print("Mean end to end distance: {} u".format(
-    np.mean([m.computeEndToEndDistance() for m in universe])))
+    np.mean([m.compute_end_to_end_distance() for m in universe])))
 ```
