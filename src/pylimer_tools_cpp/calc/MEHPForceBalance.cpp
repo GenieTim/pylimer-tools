@@ -5594,8 +5594,8 @@ namespace calc {
         this->initialConfig, this->currentDisplacements, this->is2D);
 
       return ((oneOverSpringPart.array() * partialSpringVectors.array())
-               .matrix()
-               .squaredNorm()) /
+                .matrix()
+                .squaredNorm()) /
              nrOfChains;
     }
 
@@ -5608,9 +5608,7 @@ namespace calc {
      * from the nr of springs thanks to omitted free chains or primary loops)
      * @return double
      */
-    double MEHPForceBalance::getGammaFactor(
-      double b,
-      int nrOfChains) const
+    double MEHPForceBalance::getGammaFactor(double b, int nrOfChains) const
     {
       if (b < 0) {
         b = this->defaultBondLength;

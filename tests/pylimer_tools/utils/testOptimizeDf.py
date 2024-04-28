@@ -14,19 +14,19 @@ class TestOptimizeDf(PandasComparingTestCase):
             "testFloat": np.float64(1.01),
             "testInt": np.int64(1e1),
             "testObject": testObject,
-            "testUint64": np.uint64(np.iinfo(np.uint64).max-1),
+            "testUint64": np.uint64(np.iinfo(np.uint64).max - 1),
             "testString": "strong"
         }])
         optimizedDf = optimize(df)
-        
+
         expectedOptimizedDf = pd.DataFrame([{
             "testFloat": np.float32(1.01),
             "testInt": np.int8(1e1),
             "testObject": testObject,
-            "testUint64": np.uint64(np.iinfo(np.uint64).max-1),
+            "testUint64": np.uint64(np.iinfo(np.uint64).max - 1),
             "testString": "strong"
         }])
-        
+
         # contents are equal
         self.assertEqual(df, optimizedDf)
         self.assertEqual(expectedOptimizedDf, optimizedDf)
@@ -39,8 +39,8 @@ class TestOptimizeDf(PandasComparingTestCase):
             "testFloat": np.float64(1.01),
             "testInt": np.int64(1e1),
             "testObject": testObject,
-            "testUint64": np.uint64(np.iinfo(np.uint64).max-1),
-            "testFloat64": np.float64(np.finfo(np.float32).max+10**20),
+            "testUint64": np.uint64(np.iinfo(np.uint64).max - 1),
+            "testFloat64": np.float64(np.finfo(np.float32).max + 10**20),
             "testString": "strong"
         }])
 
@@ -49,8 +49,8 @@ class TestOptimizeDf(PandasComparingTestCase):
             "testFloat": np.float16(1.01),
             "testInt": np.int8(1e1),
             "testObject": testObject,
-            "testUint64": np.uint64(np.iinfo(np.uint64).max-1),
-            "testFloat64": np.float64(np.finfo(np.float32).max+10**20),
+            "testUint64": np.uint64(np.iinfo(np.uint64).max - 1),
+            "testFloat64": np.float64(np.finfo(np.float32).max + 10**20),
             "testString": "strong"
         }])
         self.assertEqual(expectedReducedMemDf, dfExtra)
@@ -93,8 +93,8 @@ class TestOptimizeDf(PandasComparingTestCase):
     def testDeepIntOptimization(self):
         data = {}
         for i in range(52):
-            data[str(i)] = np.uint64(2**i+1)
+            data[str(i)] = np.uint64(2**i + 1)
         df = pd.DataFrame([data])
         optimizedDf = reduce_mem_usage(df)
         for i in range(52):
-            self.assertEqual(optimizedDf[str(i)][0], 2**i+1)
+            self.assertEqual(optimizedDf[str(i)][0], 2**i + 1)

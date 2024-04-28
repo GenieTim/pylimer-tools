@@ -271,7 +271,7 @@ namespace entities {
     }
 
     igraph_strvector_destroy(&vnames);
-    
+
     return Atom(atomProperties);
   }
 

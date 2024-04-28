@@ -163,12 +163,20 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("nx"),
          py::arg("ny"),
          py::arg("nz"))
-    .def("compute_vector_to", &Atom::vectorTo, R"pbdoc(
+    .def("compute_vector_to",
+         &Atom::vectorTo,
+         R"pbdoc(
             Compute the vector to another atom.
-            )pbdoc", py::arg("to_atom"), py::arg("pbc_box"))
-    .def("distance_to", &Atom::distanceTo, R"pbdoc(
+            )pbdoc",
+         py::arg("to_atom"),
+         py::arg("pbc_box"))
+    .def("distance_to",
+         &Atom::distanceTo,
+         R"pbdoc(
             Compute the distance to another atom.
-            )pbdoc", py::arg("to_atom"), py::arg("pbc_box"))
+            )pbdoc",
+         py::arg("to_atom"),
+         py::arg("pbc_box"))
     .def("vector_to_unwrapped",
          &Atom::vectorToUnwrapped,
          "Compute the vector to another atom respecting the periodic image "

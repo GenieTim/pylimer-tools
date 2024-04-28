@@ -12,11 +12,11 @@ class TestEntityCalculations(unittest.TestCase):
     def test_universe(self):
         universe = Universe(10, 10, 10)
         self.assertIsInstance(universe, Universe)
-        self.assertEqual(universe.get_volume(), 10*10*10)
+        self.assertEqual(universe.get_volume(), 10 * 10 * 10)
         universe.setBox(Box(1, 1, 1))
         self.assertEqual(universe.get_volume(), 1)
         universe.setBoxLengths(100, 1, 1)
-        self.assertEqual(universe.get_volume(), 100*1*1)
+        self.assertEqual(universe.get_volume(), 100 * 1 * 1)
 
     def test_compute_mean_bond_len(self):
         base_atom = {

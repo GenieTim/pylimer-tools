@@ -757,7 +757,10 @@ namespace calc {
 
       int getDefaultNrOfChains() const { return this->defaultNrOfChains; }
 
-      double getDefaultMeanBondLength() const { return this->defaultBondLength; }
+      double getDefaultMeanBondLength() const
+      {
+        return this->defaultBondLength;
+      }
 
       double getVolume() override { return this->initialConfig.vol; }
 
@@ -1094,8 +1097,7 @@ namespace calc {
         double b = 0.96,
         int nrOfChains = -1) const;
 
-      double getGammaFactor(double b = 0.96,
-                            int nrOfChains = -1) const;
+      double getGammaFactor(double b = 0.96, int nrOfChains = -1) const;
 
       int getNrOfIterations() const { return this->nrOfStepsDone; }
 
