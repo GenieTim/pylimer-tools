@@ -8,7 +8,8 @@ from pylimer_tools.io.unit_styles import UnitStyle, UnitStyleFactory
 
 
 class UnitStyleTest(unittest.TestCase):
-    def compare_unit_only(self, unit_style1: UnitStyle, unit_style2: UnitStyle, unit: str):
+    def compare_unit_only(self, unit_style1: UnitStyle,
+                          unit_style2: UnitStyle, unit: str):
         base_unit = 1 * unit_style1.get_base_unit_of(unit)
         units_to_compare = 1 * unit_style2.get_base_unit_of(unit)
         self.assertEqual(base_unit.to_root_units().units,

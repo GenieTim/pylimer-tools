@@ -1,10 +1,9 @@
 import os
 import warnings
+from typing import Final
 
 import pandas as pd
 from pint import UnitRegistry
-
-from typing import Final
 
 
 class UnitStyle(object):
@@ -83,7 +82,8 @@ class UnitStyleFactory(object):
     def get_unit_registry(self):
         return self.ureg
 
-    def get_unit_style(self, unit_type: str, dimension: int = 3, **kwargs) -> UnitStyle:
+    def get_unit_style(self, unit_type: str,
+                       dimension: int = 3, **kwargs) -> UnitStyle:
         """
         Get a UnitStyle instance corresponding to the unit system requested.
 
@@ -120,7 +120,8 @@ class UnitStyleFactory(object):
                             ''.join(filter(str.isalnum, row.name)).lower()):
                         polymer_data = row
                         break
-            if (not isinstance(polymer_data, dict) and not isinstance(polymer_data, tuple)):
+            if (not isinstance(polymer_data, dict)
+                    and not isinstance(polymer_data, tuple)):
                 raise ValueError(
                     "No useable data for this polymer found to use for lj units. Check whether your usage is correct.")
             # follow derivation for more accurate results
@@ -148,12 +149,14 @@ class UnitStyleFactory(object):
                 'pressure': polymer_data.kB_Tref_over_sigma_to_3 * ureg("MPa") if
                 hasattr(polymer_data, "kB_Tref_over_sigma_to_3") else ureg.eps / (ureg.sigma**(3)),
                 'viscosity': ureg.eps * ureg.tau / (ureg.sigma**(3)),
-                # TODO: the use of elementary charge might not be correct, see above
+                # TODO: the use of elementary charge might not be correct, see
+                # above
                 'charge': elementary_charge,
                 'dipole': elementary_charge * ureg.sigma,
                 'electric_field': ureg.eps / (elementary_charge * ureg.sigma),
-                'density': polymer_data.M_k * ureg('g/mol') / (ureg.sigma**(dimension))
-                if 'accept_mol' in kwargs else (polymer_data.M_k / avogadro_constant) * ureg('g') / (ureg.sigma**(dimension)),
+                'density':
+                    polymer_data.M_k * ureg('g/mol') / (ureg.sigma**(dimension)) if 'accept_mol' in kwargs
+                    else (polymer_data.M_k / avogadro_constant) * ureg('g') / (ureg.sigma**(dimension)),
                 'dt': 0.005 * ureg.tau,
                 'skin': 0.3 * ureg.sigma
             }, ureg)
@@ -164,8 +167,9 @@ class UnitStyleFactory(object):
                 "time": ureg.femtosecond,
                 "energy": ureg('kcal/mol') if 'accept_mol' in kwargs else ureg('kcal') / avogadro_constant,
                 "velocity": ureg.angstrom / ureg.femtosecond,
-                "force": ureg('kcal/(mol*angstrom)')
-                if 'accept_mol' in kwargs else ureg('kcal') / avogadro_constant / ureg.angstrom,
+                "force":
+                    ureg('kcal/(mol*angstrom)') if 'accept_mol' in kwargs
+                    else ureg('kcal') / avogadro_constant / ureg.angstrom,
                 "torque": ureg('kcal/mol') if 'accept_mol' in kwargs else ureg('kcal') / avogadro_constant,
                 "temperature": ureg.kelvin,
                 "pressure": ureg.atmosphere,

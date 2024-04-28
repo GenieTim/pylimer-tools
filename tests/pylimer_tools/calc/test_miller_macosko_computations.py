@@ -157,7 +157,8 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             1: 0.85, 2: 0.15}, 0.111111111111111, 0.111111111111111)
         self.assertEqual(len(res_tuple), len(expected_tuple))
         for i in range(len(res_tuple)):
-            if (isinstance(res_tuple[i], int) or isinstance(res_tuple[i], float)):
+            if (isinstance(res_tuple[i], int)
+                    or isinstance(res_tuple[i], float)):
                 self.assertAlmostEqual(res_tuple[i], expected_tuple[i])
             elif (isinstance(res_tuple[i], dict)):
                 for key in res_tuple[i].keys():
@@ -175,7 +176,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
     #     self.assertRaises(
     #         ValueError, lambda: compute_miller_macosko_probabilities(0.9, 2, 2))
     #     self.assertRaises(
-    #         ValueError, lambda: compute_miller_macosko_probabilities(0.1, 0.9, 3))
+    # ValueError, lambda: compute_miller_macosko_probabilities(0.1, 0.9, 3))
 
     def test_backbone_weight_fraction_calculations(self):
         self.assertEqual(0, compute_weight_fraction_of_backbone(
@@ -216,7 +217,8 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         unit_style = unit_style_factory.get_unit_style("si")
         self.assertAlmostEqual(unit_style.kb.to('J/K').magnitude, 1.381e-23)
 
-        # these results are pretty certain, align with experimental results, confirmed
+        # these results are pretty certain, align with experimental results,
+        # confirmed
         g_mmt_phantom, g_mmt_entanglement, g_anm, g_pnm = compute_modulus_decomposition(
             network=None, unit_style=unit_style, crosslinker_type=2, r=1., p=0.95, f=4,
             nu=4.69218e25 *

@@ -63,7 +63,8 @@ def predict_number_density_of_junction_points(network: Universe, crosslinker_typ
     if (functionality_per_type[crosslinker_type] == 3):
         return weight_fractions[crosslinker_type] * (1 - alpha)**3
     elif (functionality_per_type[crosslinker_type] == 4):
-        return weight_fractions[crosslinker_type] * (4 * alpha * (1 - alpha)**3 + (1 - alpha)**4)
+        return weight_fractions[crosslinker_type] * \
+            (4 * alpha * (1 - alpha)**3 + (1 - alpha)**4)
     else:
         raise NotImplementedError(
             "Currently, only cross-linker functionalities of 3 and 4 are supported")
@@ -105,7 +106,8 @@ def predict_number_density_of_network_strands(network: Universe, crosslinker_typ
     if (functionality_per_type[crosslinker_type] == 3):
         return (3 / 2) * weight_fractions[crosslinker_type] * (1 - alpha)**3
     elif (functionality_per_type[crosslinker_type] == 4):
-        return weight_fractions[crosslinker_type] * (6 * alpha * (1 - alpha)**3 + 2 * (1 - alpha)**4)
+        return weight_fractions[crosslinker_type] * \
+            (6 * alpha * (1 - alpha)**3 + 2 * (1 - alpha)**4)
     else:
         raise NotImplementedError(
             "Currently, only junction functionalities of 3 and 4 are supported")
@@ -349,7 +351,8 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int):
       - beta: :math:`P(F_B)`
     """
     # first, check a few things required by the formulae
-    # since we want alpha, beta \in [0,1], given they are supposed to be probabilities
+    # since we want alpha, beta \in [0,1], given they are supposed to be
+    # probabilities
     validate_r_and_p(r, p, f)
     # if (p < 1/math.sqrt(2) or p > 1):
     #     raise ValueError(
@@ -447,7 +450,8 @@ def compute_modulus_decomposition(network: Universe, unit_style: UnitStyle, cros
       - g_anm: the ANM estimate of the modulus
       - g_pnm: the PNM estimate of the modulus
     """
-    if ((crosslinker_type is None or network is None) and (r is None or f is None or p is None or nu is None)):
+    if ((crosslinker_type is None or network is None) and (
+            r is None or f is None or p is None or nu is None)):
         raise ValueError(
             "Either the network and crosslinker_type or the required variables must be specified")
     if (r is None):
@@ -497,7 +501,8 @@ def compute_modulus_decomposition(network: Universe, unit_style: UnitStyle, cros
     g_mmt_phantom = gamma_mmt * nu * unit_style.kB * temperature
     # fraction of elastically effective strands.
     g_mmt_entanglement = g_e_1 * compute_trapping_factor(p, r, f, alpha)
-    # entanglement part. TODO : check adjustment with r (and where the 0.22 is coming from? Fabian' s fit!)
+    # entanglement part. TODO : check adjustment with r (and where the 0.22 is
+    # coming from? Fabian' s fit!)
     return g_mmt_phantom, g_mmt_entanglement, g_anm, g_pnm
 
 
@@ -512,7 +517,7 @@ def compute_extracted_modulus(p: float, r: float, f: int, g_e_1: pint.Quantity, 
         - p: the cross-linker conversion
         - r: the stoichiometric imbalance
         - f: the functionality of the cross-links
-        - g_e_1: the melt entanglement modulus :math:`G_e(1) = k_B T \epsilon_e`
+        - g_e_1: the melt entanglement modulus :math:`G_e(1) = k_B T \\epsilon_e`
         - xlink_concentration_0: [A_f]_0, in 1/volume units
         - alpha: :math:`P(F_a^{out})`, optional
         - temperature: the temperatures; defaults to room temperature
@@ -547,13 +552,13 @@ def compute_entanglement_modulus(p: float, r: float, f: int, g_e_1: pint.Quantit
                                  unit_style: Union[None, UnitStyle] = None):
     """
     Compute MMT's entanglement contribution to the equilibrium shear modulus, given by
-    :math:`k_B T \epsilon_e T_e`.
+    :math:`k_B T \\epsilon_e T_e`.
 
     Arguments:
         - p: the cross-linker conversion
         - r: the stoichiometric imbalance
         - f: the functionality of the cross-links
-        - g_e_1: the melt entanglement modulus :math:`G_e(1) = k_B T \epsilon_e`
+        - g_e_1: the melt entanglement modulus :math:`G_e(1) = k_B T \\epsilon_e`
         - alpha: :math:`P(F_a^{out})`, optional
         - temperature: the temperatures; defaults to room temperature
         - unit_style: the units used, needed for temperature if not defined
@@ -571,7 +576,7 @@ def compute_junction_modulus(p: float, r: float, xlink_concentration_0: pint.Qua
                              temperature: pint.Quantity = None):
     """
     Compute MMT's junction modulus, given by
-    :math:`G_{junctions} = k_B T [A_f]_0 \sum_{m=3}^{f} \frac{m-2}{2} P(X_{m,f})`.
+    :math:`G_{junctions} = k_B T [A_f]_0 \\sum_{m=3}^{f} \frac{m-2}{2} P(X_{m,f})`.
 
     Arguments:
         - p: the cross-linker conversion
@@ -595,7 +600,8 @@ def compute_junction_modulus(p: float, r: float, xlink_concentration_0: pint.Qua
     return unit_style.kB * temperature * xlink_concentration_0 * gamma_mmt_sum
 
 
-def compute_trapping_factor(p: float, r: float, f: Union[int, None] = None, alpha: Union[float, None] = None) -> float:
+def compute_trapping_factor(
+        p: float, r: float, f: Union[int, None] = None, alpha: Union[float, None] = None) -> float:
     """
     Compute the trapping factor :math:`T_e`
 
@@ -657,7 +663,8 @@ def predict_gelation_point(r: float, f: int, g: int = 2) -> float:
     return math.sqrt(1 / (r * (f - 1) * (g - 1)))
 
 
-def predict_p_from_w_sol(w_sol: float, r: float, w_f: float, w_g: float, f: int, g: int = 2):
+def predict_p_from_w_sol(w_sol: float, r: float,
+                         w_f: float, w_g: float, f: int, g: int = 2):
     """
     Compute the extent of reaction based on the weight fraction of soluble material.
 
@@ -674,7 +681,8 @@ def predict_p_from_w_sol(w_sol: float, r: float, w_f: float, w_g: float, f: int,
             p_f_a_out, _ = compute_miller_macosko_probabilities(r, p, f)
         except ValueError:
             p_f_a_out = 1.  # highest value -> this will not be the optimum
-        return w_f * p_f_a_out**f + w_g * (r * p * p_f_a_out**(f - 1) + 1 - r * p)**g
+        return w_f * p_f_a_out**f + w_g * \
+            (r * p * p_f_a_out**(f - 1) + 1 - r * p)**g
 
     res = optimize.minimize_scalar(lambda p: abs(
         w_sol - compute_wsol(p)), bounds=[1e-3, 1. - 1e-3])

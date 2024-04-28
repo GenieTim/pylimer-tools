@@ -85,7 +85,8 @@ class CMakeExtension(Extension):
 
 class CMakeBuild(build_ext):
     def build_extension(self, ext: CMakeExtension) -> None:
-        # Must be in this form due to bug in .resolve() only fixed in Python 3.10+
+        # Must be in this form due to bug in .resolve() only fixed in Python
+        # 3.10+
         ext_fullpath = Path.cwd() / self.get_ext_fullpath(ext.name)
         extdir = ext_fullpath.parent.resolve()
 
@@ -116,7 +117,8 @@ class CMakeBuild(build_ext):
             cmake_args += [
                 item for item in os.environ["CMAKE_ARGS"].split(" ") if item]
 
-        # In this example, we pass in the version to C++. You might not need to.
+        # In this example, we pass in the version to C++. You might not need
+        # to.
         cmake_args += [
             f"-DVERSION_NR={self.distribution.get_version()}"]
 
@@ -143,7 +145,8 @@ class CMakeBuild(build_ext):
             single_config = any(
                 x in cmake_generator for x in {"NMake", "Ninja"})
 
-            # CMake allows an arch-in-generator style for backward compatibility
+            # CMake allows an arch-in-generator style for backward
+            # compatibility
             contains_arch = any(x in cmake_generator for x in {"ARM", "Win64"})
 
             # Specify the arch if using MSVC generator, but only if it doesn't
@@ -170,7 +173,8 @@ class CMakeBuild(build_ext):
         # across all generators.
         if "CMAKE_BUILD_PARALLEL_LEVEL" not in os.environ:
             # self.parallel is a Python 3 only way to set parallel jobs by hand
-            # using -j in the build_ext call, not supported by pip or PyPA-build.
+            # using -j in the build_ext call, not supported by pip or
+            # PyPA-build.
             if hasattr(self, "parallel") and self.parallel:
                 # CMake 3.12+ only.
                 build_args += [f"-j{self.parallel}"]

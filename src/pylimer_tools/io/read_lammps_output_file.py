@@ -10,12 +10,14 @@ from pylimer_tools.utils.cache_utility import do_cache, load_cache
 from pylimer_tools_cpp import AtomStyle, Universe, UniverseSequence
 
 
-def read_log_file(filepath, lines_to_read_to_detect_header=500000) -> pd.DataFrame:
+def read_log_file(
+        filepath, lines_to_read_to_detect_header=500000) -> pd.DataFrame:
     return extract_thermo_params(filepath, header=None, texts_to_read=500000,
                                  lines_to_read_to_detect_header=lines_to_read_to_detect_header)
 
 
-def read_dump_file(data_file, dump_file, atom_style: Union[List[AtomStyle], None] = None) -> UniverseSequence:
+def read_dump_file(data_file, dump_file,
+                   atom_style: Union[List[AtomStyle], None] = None) -> UniverseSequence:
     """
     Read a file with LAMMPS' dump of snapshots of structures into a Universe.
     """
@@ -26,7 +28,8 @@ def read_dump_file(data_file, dump_file, atom_style: Union[List[AtomStyle], None
     return u_s
 
 
-def read_data_file(structure_file: str, atom_style: Union[List[AtomStyle], None] = None) -> Universe:
+def read_data_file(structure_file: str,
+                   atom_style: Union[List[AtomStyle], None] = None) -> Universe:
     """
     Read a file with LAMMPS' data type of structure into a Universe.
 
@@ -46,7 +49,8 @@ def read_data_file(structure_file: str, atom_style: Union[List[AtomStyle], None]
     return universe
 
 
-def read_averages_file(filepath, use_cache: bool = True, sep=" ") -> pd.DataFrame:
+def read_averages_file(filepath, use_cache: bool = True,
+                       sep=" ") -> pd.DataFrame:
     """
     Read a file written by a `fix ave/time` command.
 
@@ -55,7 +59,7 @@ def read_averages_file(filepath, use_cache: bool = True, sep=" ") -> pd.DataFram
     Important assumption: the first 2 or 3 lines in the file are:
     - comment,
     - then one header indicating the columns,
-    - and then either data or potentially a second header, 
+    - and then either data or potentially a second header,
       if it is a sectioned file (e.g., from a `fix ave/time ... vector`)
 
     Arguments:
@@ -85,7 +89,8 @@ def read_averages_file(filepath, use_cache: bool = True, sep=" ") -> pd.DataFram
     return data
 
 
-def read_sectioned_averages_file(filepath, use_cache: bool = True) -> pd.DataFrame:
+def read_sectioned_averages_file(
+        filepath, use_cache: bool = True) -> pd.DataFrame:
     """
     Read a file written by a `fix ave/time` command.
 
@@ -174,7 +179,8 @@ def read_histogram_file(filepath, use_cache: bool = True) -> pd.DataFrame:
     return read_sectioned_averages_file(filepath, use_cache)
 
 
-def read_correlation_file(filepath, group_key="Timestep", use_cache: bool = True) -> pd.DataFrame:
+def read_correlation_file(filepath, group_key="Timestep",
+                          use_cache: bool = True) -> pd.DataFrame:
     """
     Read a file written by a `fix ave/correlate{/long}` command.
 
@@ -216,7 +222,8 @@ def read_correlation_file(filepath, group_key="Timestep", use_cache: bool = True
             return group_key in line
 
         for line in f:
-            if ((line.startswith("#") or len(line.strip()) == 0) and not is_group_key(line)):
+            if ((line.startswith("#") or len(line.strip()) == 0)
+                    and not is_group_key(line)):
                 if (lines_interpreted == 0):
                     header_line = line
                 continue

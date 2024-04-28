@@ -1,5 +1,6 @@
 # source: https://medium.com/bigdatarepublic/advanced-pandas-optimize-speed-and-memory-a654b53be6c2,
-# source: https://stackoverflow.com/questions/57531388/how-can-i-reduce-the-memory-of-a-pandas-dataframe
+# source:
+# https://stackoverflow.com/questions/57531388/how-can-i-reduce-the-memory-of-a-pandas-dataframe
 
 import gc
 from typing import List
@@ -8,7 +9,8 @@ import numpy as np
 import pandas as pd
 
 
-def reduce_mem_usage(df, obj_to_category=False, subset=None, inplace=True, print_stats=False):
+def reduce_mem_usage(df, obj_to_category=False, subset=None,
+                     inplace=True, print_stats=False):
     """
     Iterate through all the columns of a dataframe and modify the data type to reduce memory usage.
 
@@ -42,7 +44,8 @@ def reduce_mem_usage(df, obj_to_category=False, subset=None, inplace=True, print
                 col_type)[:4] == 'uint'
 
             if treat_as_int:
-                if c_min > np.iinfo(np.int8).min and c_max < np.iinfo(np.int8).max:
+                if c_min > np.iinfo(
+                        np.int8).min and c_max < np.iinfo(np.int8).max:
                     df[col] = df[col].astype(np.int8)
                 elif c_min > np.iinfo(np.uint8).min and c_max < np.iinfo(np.uint8).max:
                     df[col] = df[col].astype(np.uint8)
@@ -59,7 +62,8 @@ def reduce_mem_usage(df, obj_to_category=False, subset=None, inplace=True, print
                 elif c_min > np.iinfo(np.uint64).min and c_max < np.iinfo(np.uint64).max:
                     df[col] = df[col].astype(np.uint64)
             else:
-                if c_min > np.finfo(np.float16).min and c_max < np.finfo(np.float16).max:
+                if c_min > np.finfo(
+                        np.float16).min and c_max < np.finfo(np.float16).max:
                     df[col] = df[col].astype(np.float16)
                 elif c_min > np.finfo(np.float32).min and c_max < np.finfo(np.float32).max:
                     df[col] = df[col].astype(np.float32)
@@ -107,7 +111,8 @@ def optimize_ints(df: pd.DataFrame) -> pd.DataFrame:
     return df
 
 
-def optimize_objects(df: pd.DataFrame, datetime_features: List[str]) -> pd.DataFrame:
+def optimize_objects(df: pd.DataFrame,
+                     datetime_features: List[str]) -> pd.DataFrame:
     """
     Optimize object type entries
 
@@ -138,4 +143,5 @@ def optimize(df: pd.DataFrame, datetime_features: List[str] = []):
     Returns:
         - df (pd.DataFrame): dataset with the column dtypes adjusted
     """
-    return optimize_floats(optimize_ints(optimize_objects(df, datetime_features)))
+    return optimize_floats(optimize_ints(
+        optimize_objects(df, datetime_features)))

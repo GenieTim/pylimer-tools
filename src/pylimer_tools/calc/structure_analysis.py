@@ -68,7 +68,8 @@ def compute_stoichiometric_imbalance(network: Universe, crosslinker_type: int = 
     return crosslinker_formable_bonds / (other_formable_bonds)
 
 
-def compute_extent_of_reaction(network: Universe, crosslinker_type, functionality_per_type: dict = None) -> float:
+def compute_extent_of_reaction(
+        network: Universe, crosslinker_type, functionality_per_type: dict = None) -> float:
     """
     Compute the extent of polymerization reaction
     (nr. of formed bonds in reaction / max. nr. of bonds formable)
@@ -118,7 +119,8 @@ def compute_extent_of_reaction(network: Universe, crosslinker_type, functionalit
     return actually_formed_bonds / (max_formable_bonds)
 
 
-def compute_mean_end_to_end_distances(networks: Iterable[Universe], crosslinker_type: int = 2) -> dict:
+def compute_mean_end_to_end_distances(
+        networks: Iterable[Universe], crosslinker_type: int = 2) -> dict:
     """
     Compute the mean end to end distance between each pair of (indirectly) connected crosslinker
 
@@ -140,7 +142,8 @@ def compute_mean_end_to_end_distances(networks: Iterable[Universe], crosslinker_
     return dict(zip(r_tau_vectors.keys(), r_taus))
 
 
-def compute_mean_end_to_end_vectors(networks: Iterable[Universe], crosslinker_type: int = 2) -> dict:
+def compute_mean_end_to_end_vectors(
+        networks: Iterable[Universe], crosslinker_type: int = 2) -> dict:
     """
     Compute the mean end to end vectors between each pair of (indirectly) connected crosslinker
 
@@ -178,12 +181,14 @@ def compute_mean_end_to_end_vectors(networks: Iterable[Universe], crosslinker_ty
                 end_to_end_vectors[key][i] += current_end_to_end_vectors[key][i] * divider
             key_counts[key] += 1
         iteration += 1
-    if (len(key_counts) > 0 and not np.all([c == list(key_counts.values())[0] for c in key_counts.values()])):
+    if (len(key_counts) > 0 and not np.all(
+            [c == list(key_counts.values())[0] for c in key_counts.values()])):
         raise ValueError("The networks contain different molecules.")
     return end_to_end_vectors
 
 
-def compute_end_to_end_vectors(network: Universe, crosslinker_type: int = 2) -> dict:
+def compute_end_to_end_vectors(
+        network: Universe, crosslinker_type: int = 2) -> dict:
     """
     Compute the end to end vectors between each pair of (indirectly) connected crosslinker
 
@@ -208,7 +213,8 @@ def compute_end_to_end_vectors(network: Universe, crosslinker_type: int = 2) -> 
             continue
         # igraph.VertexSeq is not sortable -> use a list
         crosslinkers = [crosslinkers[0], crosslinkers[1]]
-        # sort crosslinkers by name as a way to keep the vector directions consistent between timesteps
+        # sort crosslinkers by name as a way to keep the vector directions
+        # consistent between timesteps
         crosslinkers.sort(key=lambda a: a.get_id())
         #
         end_to_end_vectors[molecule.get_key()] = crosslinkers[0].compute_vector_to(
@@ -241,10 +247,12 @@ def compute_crosslinker_conversion(network: Universe, crosslinker_type: int = 2,
     if (f == 0.):
         warnings.warn("Crosslinker functionality = 0 is problematic.")
 
-    return compute_effective_crosslinker_functionality(network, crosslinker_type) / f
+    return compute_effective_crosslinker_functionality(
+        network, crosslinker_type) / f
 
 
-def compute_effective_crosslinker_functionality(network: Universe, crosslinker_type: int = 2) -> float:
+def compute_effective_crosslinker_functionality(
+        network: Universe, crosslinker_type: int = 2) -> float:
     """
     Compute the mean crosslinker functionality
 
@@ -260,7 +268,8 @@ def compute_effective_crosslinker_functionality(network: Universe, crosslinker_t
     return np.mean(junction_degrees) if len(junction_degrees) > 0 else 0.
 
 
-def compute_effective_crosslinker_functionalities(network: Universe, crosslinker_type: int = 2) -> list[int]:
+def compute_effective_crosslinker_functionalities(
+        network: Universe, crosslinker_type: int = 2) -> list[int]:
     """
     Compute the functionality of every crosslinker in the network
 
@@ -294,7 +303,8 @@ def compute_weight_fractions(network: Universe) -> dict:
     return network.compute_weight_fractions()
 
 
-def measure_weight_fraction_of_backbone(network: Universe, crosslinker_type: int = 2):
+def measure_weight_fraction_of_backbone(
+        network: Universe, crosslinker_type: int = 2):
     """
     Compute the weight fraction of network backbone in infinite network
 
@@ -313,7 +323,8 @@ def measure_weight_fraction_of_backbone(network: Universe, crosslinker_type: int
     return 1.0 - weight_fraction
 
 
-def measure_weight_fraction_of_dangling_chains(network: Universe, crosslinker_type: int = 2) -> Tuple[float, float]:
+def measure_weight_fraction_of_dangling_chains(
+        network: Universe, crosslinker_type: int = 2) -> Tuple[float, float]:
     """
     Compute the weight fraction of dangling strands in infinite network
 
@@ -429,7 +440,8 @@ def measure_lower_bound_weight_fraction_of_soluble_material(network: Universe, c
             if (w < abs_tol and is_soluble_cluster(fractions[i])):
                 soluble_weight += w
         else:
-            if (w < rel_tol * weights.max() and is_soluble_cluster(fractions[i])):
+            if (w < rel_tol * weights.max()
+                    and is_soluble_cluster(fractions[i])):
                 soluble_weight += w
 
     return soluble_weight / total_weight
