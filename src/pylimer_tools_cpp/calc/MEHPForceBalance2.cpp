@@ -62,7 +62,7 @@ namespace calc {
           ? initialResidualToUse
           : this->getDisplacementResidualNorm(oneOverSpringPartitionUpperLimit);
       const double minN = this->getNetwork().springsContourLength.minCoeff();
-      std::cout << "Starting force balance procedure " << "with "
+      std::cout << "Starting force balance procedure " << " with "
                 << initialResidual << " as initial residual, got requested "
                 << initialResidualToUse
                 // "with " << independentVertexSets.size() << "vertex sets."
