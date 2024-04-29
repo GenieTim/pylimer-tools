@@ -366,7 +366,7 @@ namespace entities {
     std::vector<pylimer_tools::entities::Atom> endsOfChain =
       this->getAtomsOfDegree(1);
     if (this->getType() == MoleculeType::PRIMARY_LOOP ||
-        (endsOfChain.size() == 1 &&
+        ((endsOfChain.size() == 1 || endsOfChain.size() == 0) &&
          this->getType() == MoleculeType::UNDEFINED)) {
       std::vector<pylimer_tools::entities::Atom> crossLinks =
         this->getAtomsOfType(crossLinkerType);
@@ -381,11 +381,12 @@ namespace entities {
                ? std::vector<Atom>({ crossLinks[0], crossLinks[0] })
                : std::vector<Atom>({ crossLinks[0] });
     }
-    RUNTIME_EXP_IFN(endsOfChain.size() == 2,
-                    "Expected to find the two ends of the chain as atoms of "
-                    "degree 1, but found " +
-                      std::to_string(endsOfChain.size()) +
-                      " atoms with degree 1.");
+    RUNTIME_EXP_IFN(
+      endsOfChain.size() == 2,
+      "Expected to find the two ends of the chain of type " +
+        std::to_string(this->getType()) + " as atoms of degree 1, but found " +
+        std::to_string(endsOfChain.size()) +
+        " atoms with degree 1 in molecule " + this->getKey() + ".");
     if (endsOfChain[0].getId() > endsOfChain[1].getId()) {
       return { endsOfChain[1], endsOfChain[0] };
     }
