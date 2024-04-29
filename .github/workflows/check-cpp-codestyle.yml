@@ -18,6 +18,6 @@ jobs:
       - name: Run clang-format style check on C/C++ code
         uses: jidicula/clang-format-action@v4.11.0
         with:
-          clang-format-version: "16"
+          clang-format-version: "18"
           check-path: ${{ matrix.path }}
           fallback-style: "Mozilla" # optional

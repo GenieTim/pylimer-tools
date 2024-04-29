@@ -692,13 +692,13 @@ init_pylimer_bound_entities(py::module_& m)
           then those atoms will be omitted, and this function returns chains instead.
           )pbdoc",
          py::arg("atom_type_to_omit"))
-    .def("get_atoms_connected_to",
+    .def("get_atoms_connected_to_vertex",
          &Universe::getAtomsConnectedTo,
          R"pbdoc(
             Get the atoms connected to a specified vertex id.
             )pbdoc",
          py::arg("vertex_idx"))
-    .def("get_connected_atoms",
+    .def("get_atoms_connected_to",
          &Universe::getConnectedAtoms,
          R"pbdoc(
             Get the atoms connected to a specified atom.

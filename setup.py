@@ -4,8 +4,8 @@ import re
 import shutil
 import subprocess
 import sys
-from pathlib import Path
 import warnings
+from pathlib import Path
 
 from setuptools import Extension, find_namespace_packages, setup
 from setuptools.command.build_ext import build_ext
@@ -182,6 +182,7 @@ class CMakeBuild(build_ext):
         build_temp = Path(self.build_temp) / ext.name
         if not build_temp.exists():
             build_temp.mkdir(parents=True)
+        print("Building in {}".format(build_temp))
 
         subprocess.run(
             ["cmake", ext.sourcedir, *cmake_args], cwd=build_temp, check=True

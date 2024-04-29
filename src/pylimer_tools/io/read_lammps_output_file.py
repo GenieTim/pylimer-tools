@@ -12,6 +12,9 @@ from pylimer_tools_cpp import AtomStyle, Universe, UniverseSequence
 
 def read_log_file(
         filepath, lines_to_read_to_detect_header=500000) -> pd.DataFrame:
+    """
+    Read a LAMMPS' log (thermo output) file.
+    """
     return extract_thermo_params(filepath, header=None, texts_to_read=500000,
                                  lines_to_read_to_detect_header=lines_to_read_to_detect_header)
 
@@ -44,7 +47,7 @@ def read_data_file(structure_file: str,
     if (atom_style is not None):
         u_s.set_data_file_atom_style(atom_style)
     u_s.initialize_from_data_sequence([structure_file])
-    universe = u_s.atIndex(0)
+    universe = u_s.at_index(0)
     del u_s
     return universe
 

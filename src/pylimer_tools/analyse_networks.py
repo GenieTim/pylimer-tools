@@ -30,7 +30,7 @@ def cli(files, crosslinker_type):
         click.echo("Size: {}. Volume: {} u^3 (ρ = {})".format(
             universe.get_nr_of_atoms(), universe.get_volume(), universe.get_nr_of_atoms() / universe.get_volume()))
         click.echo("{} atoms and {} bonds, {} angles, {} dihedrals".format(universe.get_nr_of_atoms(
-        ), universe.get_nr_of_bonds(), universe.getNrOfAngles(), universe.get_nr_of_dihedral_angles()))
+        ), universe.get_nr_of_bonds(), universe.get_nr_of_angles(), universe.get_nr_of_dihedral_angles()))
         molecules = universe.get_molecules(crosslinker_type)
         bond_lengths = [np.mean(m.compute_bond_lengths()) for m in molecules]
         non_none_bond_lengths = [
