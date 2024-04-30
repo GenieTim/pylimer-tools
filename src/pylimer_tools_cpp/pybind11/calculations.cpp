@@ -170,6 +170,7 @@ init_pylimer_bound_calc(py::module_& m)
     .def_readonly("box_lengths", &mehp::Network::L)
     .def_readonly("volume", &mehp::Network::vol)
     .def_readonly("nr_of_nodes", &mehp::Network::nrOfNodes)
+    .def_readonly("nr_of_crosslinks", &mehp::Network::nrOfNodes)
     .def_readonly("nr_of_springs", &mehp::Network::nrOfSprings)
     // .def_readonly("nrOfLoops", &mehp::Network::nrOfLoops)
     .def_readonly("coordinates", &mehp::Network::coordinates)
@@ -189,7 +190,7 @@ init_pylimer_bound_calc(py::module_& m)
  )pbdoc")
     .def_readonly("box_lengths", &mehp::ForceBalanceNetwork::L)
     .def_readonly("volume", &mehp::ForceBalanceNetwork::vol)
-    .def_readonly("nr_of_cross_links", &mehp::ForceBalanceNetwork::nrOfNodes)
+    .def_readonly("nr_of_crosslinks", &mehp::ForceBalanceNetwork::nrOfNodes)
     .def_readonly("nr_of_links", &mehp::ForceBalanceNetwork::nrOfLinks)
     .def_readonly("nr_of_springs", &mehp::ForceBalanceNetwork::nrOfSprings)
     .def_readonly("nr_of_partial_springs",
@@ -341,11 +342,11 @@ init_pylimer_bound_calc(py::module_& m)
 
           :param universe: the universe to simulate with
           :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
-          :param is2D: Whether to ignore the z direction.
-          :param forceEvaluator: The force evaluator to use
+          :param is2d: Whether to ignore the z direction.
+          :param force_evaluator: The force evaluator to use
           :param kappa: The spring constant
-          :param remove2functionalCrosslinkers: Whether to replace two-functional cross-links with a "normal" chain bead
-          :param removeDanglingChains: Whether to remove dangling chains before running the simulation. 
+          :param remove_2functional_crosslinkers: Whether to replace two-functional cross-links with a "normal" chain bead
+          :param remove_dangling_chains: Whether to remove dangling chains before running the simulation. 
                **Caution*: Removing the dangling chains will result in incorrect results fo the computation of 
                :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getSolubleWeightFraction()` and
                :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getDanglingWeightFraction()`
@@ -617,13 +618,13 @@ init_pylimer_bound_calc(py::module_& m)
           :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
           :param is2D: Whether to ignore the z direction.
           :param kappa: the spring constant
-          :param remove2functionalCrosslinkers: whether to keep or remove the 2-functional cross-links when setting up the network
+          :param remove_2functionalCrosslinkers: whether to keep or remove the 2-functional cross-links when setting up the network
           )pbdoc",
          py::arg("universe"),
          py::arg("crosslinker_type") = 2,
          py::arg("is_2d") = false,
          py::arg("kappa") = 1.0,
-         py::arg("remove2functional_crosslinkers") = true)
+         py::arg("remove_2functional_crosslinkers") = true)
     .def("__copy__",
          [](const mehp::MEHPForceBalance& self) {
            return mehp::MEHPForceBalance(self);
@@ -636,7 +637,7 @@ init_pylimer_bound_calc(py::module_& m)
                 py::arg("universe"),
                 py::arg("nr_of_sliplinks_to_sample"),
                 py::arg("acceptable_cutoff") = 1.2,
-                py::arg("min_nr_of_sliplinks") = 0,
+                py::arg("minimum_nr_of_sliplinks") = 0,
                 py::arg("same_strand_cutoff") = 3,
                 py::arg("seed") = "",
                 py::arg("crosslinker_type") = 2,
@@ -982,7 +983,7 @@ init_pylimer_bound_calc(py::module_& m)
          R"pbdoc(
           Get the current link displacements.
      )pbdoc")
-    .def("setDisplacements",
+    .def("set_displacements",
          &mehp::MEHPForceBalance::setCurrentDisplacements,
          R"pbdoc(
           Set the current link displacements.
@@ -1145,7 +1146,7 @@ init_pylimer_bound_calc(py::module_& m)
                 py::arg("universe"),
                 py::arg("nr_of_sliplinks_to_sample"),
                 py::arg("acceptable_cutoff") = 1.2,
-                py::arg("min_nr_of_sliplinks") = 0,
+                py::arg("minimum_nr_of_sliplinks") = 0,
                 py::arg("same_strand_cutoff") = 2,
                 py::arg("seed") = "",
                 py::arg("crosslinker_type") = 2,

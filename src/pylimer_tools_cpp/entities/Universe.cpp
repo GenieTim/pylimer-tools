@@ -528,6 +528,14 @@ namespace entities {
                     "Angles' state is inconsistent.");
   }
 
+  void Universe::removeAllAngles()
+  {
+    this->angleFrom.clear();
+    this->angleVia.clear();
+    this->angleTo.clear();
+    this->angleType.clear();
+  }
+
   /**
    * @brief Add additional angles to the universe
    *
@@ -557,6 +565,15 @@ namespace entities {
       std::end(this->dihedralAngleTo), std::begin(to), std::end(to));
     this->dihedralAngleType.insert(
       std::end(this->dihedralAngleType), std::begin(types), std::end(types));
+  }
+
+  void Universe::removeAllDihedralAngles()
+  {
+    this->dihedralAngleFrom.clear();
+    this->dihedralAngleVia1.clear();
+    this->dihedralAngleVia2.clear();
+    this->dihedralAngleTo.clear();
+    this->dihedralAngleType.clear();
   }
 
   /**
@@ -844,13 +861,16 @@ namespace entities {
 
       // remove elements of type
       if (igraph_delete_vertices(&graphWithoutCrosslinkers, verticesToRemove)) {
-        throw std::runtime_error("Failed to delete crossLinkers from graph.");
+        throw std::runtime_error("Failed to delete cross-inks from graph.");
       }
 
       igraph_vs_destroy(&verticesToRemove);
+      RUNTIME_EXP_IFN(igraph_vcount(&graphWithoutCrosslinkers) ==
+                        this->getNrOfAtoms() - indicesToRemove.size(),
+                      "Expected all cross-links to be removed from the graph.");
     }
 
-    // split the copy into the separate
+    // split the copy into the separate components
     igraph_graph_list_t components;
     igraph_graph_list_init(&components, 3);
     if (igraph_decompose(
@@ -889,25 +909,25 @@ namespace entities {
           long int originalEndNodeVertexId =
             this->atomIdToVertexIdx.at(oldEndNodeId);
           // this->findVertexIdForProperty("id", oldEndNodeId);
-          igraph_vector_int_t neighbours;
-          igraph_vector_int_init(&neighbours, 0);
+          igraph_vector_int_t neighbors;
+          igraph_vector_int_init(&neighbors, 0);
 
           if (igraph_neighbors(
-                &graph, &neighbours, originalEndNodeVertexId, IGRAPH_ALL)) {
-            throw std::runtime_error("Failed to get neighbours in graph");
+                &graph, &neighbors, originalEndNodeVertexId, IGRAPH_ALL)) {
+            throw std::runtime_error("Failed to get neighbors in graph");
           }
 
-          std::vector<long int> neighborsVec;
-          pylimer_tools::utils::igraphVectorTToStdVector(&neighbours,
-                                                         neighborsVec);
-
-          // loop neighbours
-          for (long int originalNeighbourId : neighborsVec) {
+          // loop neighbors
+          for (igraph_integer_t neighIdx = 0;
+               neighIdx < igraph_vector_int_size(&neighbors);
+               ++neighIdx) {
+            igraph_integer_t originalNeighbourId =
+              igraph_vector_int_get(&neighbors, neighIdx);
             int originalNeighbourType = igraphRealToInt<int>(
               igraph_cattribute_VAN(&graph, "type", originalNeighbourId));
 
             if (originalNeighbourType == crossLinkerType) {
-              // found a crossLinker neighbour
+              // found a cross-linker neighbour
               long int originalNeighbourAtomId =
                 igraph_cattribute_VAN(&graph, "id", originalNeighbourId);
               atomsToAdd.push_back(originalNeighbourId);
@@ -923,13 +943,13 @@ namespace entities {
           }
 
           IGRAPH_VIT_NEXT(endNodeVit);
-          igraph_vector_int_destroy(&neighbours);
+          igraph_vector_int_destroy(&neighbors);
         } // loop end nodes
 
         std::unordered_map<long int, long int> newAtomsMap;
         // actually add the atoms...
         for (auto atomToAddOriginalId : atomsToAdd) {
-          igraph_add_vertices(chain, 1, 0);
+          igraph_add_vertices(chain, 1, nullptr);
           long int newCrosslinkerVertexIdx = igraph_vcount(chain) - 1;
           newAtomsMap.insert_or_assign(atomToAddOriginalId,
                                        newCrosslinkerVertexIdx);

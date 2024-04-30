@@ -102,6 +102,8 @@ namespace entities {
     void setBox(const Box& box, bool rescaleAtomCoordinates = false);
     void setTimestep(long int timestep) { this->timestep = timestep; };
     void initializeFromGraph(const igraph_t* ingraph);
+    void removeAllAngles();
+    void removeAllDihedralAngles();
     void simplify();
 
     // getters

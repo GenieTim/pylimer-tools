@@ -625,6 +625,13 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("angles_via2"),
          py::arg("angles_to"),
          py::arg("angle_types"))
+    .def("remove_all_angles", &Universe::removeAllAngles, R"pbdoc(
+
+     )pbdoc")
+    .def(
+      "remove_all_dihedral_angles", &Universe::removeAllDihedralAngles, R"pbdoc(
+          
+     )pbdoc")
     .def("hash_angle_type",
          &Universe::hashAngleType,
          R"pbdoc(
