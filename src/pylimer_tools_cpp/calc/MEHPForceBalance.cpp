@@ -3356,7 +3356,7 @@ namespace calc {
       const double oneOverSpringPartitionUpperLimit,
       const int nrOfCrosslinkSwapsAllowedPerSliplink,
       const bool respectLoops,
-      const bool moveAttempt)
+      const bool moveAttempt) const
     {
       INVALIDARG_EXP_IFN(partialSpringIdx < net.nrOfPartialSprings,
                          "Partial spring index out of range: got " +
@@ -3539,7 +3539,7 @@ namespace calc {
       Eigen::VectorXd& springPartitions,
       const size_t partialSpringIdx,
       const double oneOverSpringPartitionUpperLimit,
-      const bool respectLoops)
+      const bool respectLoops) const
     {
       size_t partnerA = net.springPartIndexA[partialSpringIdx];
       size_t partnerB = net.springPartIndexB[partialSpringIdx];
@@ -3638,7 +3638,7 @@ namespace calc {
       }
 
       // relax the affected links
-      for (size_t relaxSteps = 0; relaxSteps < 2; ++relaxSteps) {
+      for (size_t relaxSteps = 0; relaxSteps < 3; ++relaxSteps) {
         this->relaxationLight(
           net, springPartitions, u, partnerA, oneOverSpringPartitionUpperLimit);
         this->relaxationLight(
@@ -3748,7 +3748,7 @@ namespace calc {
       Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions,
       const size_t partialSpringIdx,
-      const double oneOverSpringPartitionUpperLimit)
+      const double oneOverSpringPartitionUpperLimit) const
     {
       size_t partnerA = net.springPartIndexA[partialSpringIdx];
       size_t partnerB = net.springPartIndexB[partialSpringIdx];
@@ -3816,7 +3816,7 @@ namespace calc {
       this->swapSlipLinks(net, partialSpringIdx);
 
       // relax the affected links
-      for (size_t relaxSteps = 0; relaxSteps < 2; ++relaxSteps) {
+      for (size_t relaxSteps = 0; relaxSteps < 3; ++relaxSteps) {
         this->relaxationLight(
           net, springPartitions, u, partnerA, oneOverSpringPartitionUpperLimit);
         this->relaxationLight(
@@ -3956,7 +3956,7 @@ namespace calc {
       Eigen::VectorXd& oneOverSpringPartitions,
       Eigen::VectorXd& u,
       const size_t linkIdx,
-      const double oneOverSpringPartitionUpperLimit)
+      const double oneOverSpringPartitionUpperLimit) const
     {
       if (net.linkIsSliplink[linkIdx]) {
         this->updateSpringPartition(net,
@@ -4066,7 +4066,7 @@ namespace calc {
       ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions,
-      double oneOverSpringPartitionUpperLimit)
+      double oneOverSpringPartitionUpperLimit) const
     {
       for (size_t springIdx = 0; springIdx < net.nrOfSprings; ++springIdx) {
         if (net.linkIndicesOfSprings[springIdx].size() <= 3) {
@@ -4119,7 +4119,7 @@ namespace calc {
       Eigen::VectorXd& springPartitions,
       const size_t partialSpringIdx,
       double oneOverSpringPartitionUpperLimit,
-      const bool respectLoops)
+      const bool respectLoops) const
     {
       INVALIDARG_EXP_IFN(net.springPartIndexA[partialSpringIdx] !=
                            net.springPartIndexB[partialSpringIdx],
@@ -4258,7 +4258,7 @@ namespace calc {
      * @param partialSpringIdx
      */
     void MEHPForceBalance::swapSlipLinks(ForceBalanceNetwork& net,
-                                         const size_t partialSpringIdx)
+                                         const size_t partialSpringIdx) const
     {
       const size_t linkIdx1 = net.springPartIndexA[partialSpringIdx];
       const size_t linkIdx2 = net.springPartIndexB[partialSpringIdx];

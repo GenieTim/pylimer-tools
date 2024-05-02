@@ -608,7 +608,7 @@ namespace calc {
                            Eigen::VectorXd& springPartitions,
                            Eigen::VectorXd& displacements,
                            const size_t linkIdx,
-                           const double oneOverSpringPartitionUpperLimit = 1.0)
+                           const double oneOverSpringPartitionUpperLimit = 1.0) const
       {
         Eigen::VectorXd oneOverSpringPartitions = Eigen::VectorXd::Zero(0);
         this->relaxationLight(net,
@@ -624,7 +624,7 @@ namespace calc {
                            Eigen::VectorXd& oneOverSpringPartitions,
                            Eigen::VectorXd& displacements,
                            const size_t linkIdx,
-                           const double oneOverSpringPartitionUpperLimit = 1.0);
+                           const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
       /**
        * @brief Replace the two springs traversinga a two-functional cross-links
@@ -1572,10 +1572,10 @@ namespace calc {
       void swapSlipLinks(ForceBalanceNetwork& net,
                          const Eigen::VectorXd& u,
                          Eigen::VectorXd& springPartitions,
-                         double swappableCutoff);
+                         double swappableCutoff) const;
 
       void swapSlipLinks(ForceBalanceNetwork& net,
-                         const size_t partialSpringIdx);
+                         const size_t partialSpringIdx) const;
 
       bool swapSlipLinkReversibly(
         ForceBalanceNetwork& net,
@@ -1585,7 +1585,7 @@ namespace calc {
         const double oneOverSpringPartitionUpperLimit = 1.0,
         const int nrOfCrosslinkSwapsAllowedPerSliplink = -1,
         const bool respectLoops = true,
-        const bool moveAttempt = false);
+        const bool moveAttempt = false) const;
 
       long int rotateSlipLinkAroundCrosslink(
         ForceBalanceNetwork& net,
@@ -1593,7 +1593,7 @@ namespace calc {
         Eigen::VectorXd& springPartitions,
         const size_t partialSpringIdx,
         double oneOverSpringPartitionUpperLimit = 1.0,
-        const bool respectLoops = true);
+        const bool respectLoops = true) const;
 
       /**
        * @brief Displace one link to the mean of all connected neighbours
@@ -1745,7 +1745,7 @@ namespace calc {
        */
       std::vector<size_t> getNeighbourLinkIndices(
         const ForceBalanceNetwork& net,
-        const size_t linkIdx)
+        const size_t linkIdx) const
       {
         std::vector<size_t> results;
         results.reserve(4);
@@ -2297,7 +2297,7 @@ namespace calc {
         Eigen::VectorXd& springPartitions,
         const size_t sourcePartialSpringIdx,
         size_t targetPartialSpringIdx,
-        const double oneOverSpringPartitionUpperLimit = 1.0)
+        const double oneOverSpringPartitionUpperLimit = 1.0) const
       {
         INVALIDARG_EXP_IFN(sourcePartialSpringIdx != targetPartialSpringIdx,
                            "Source and target must be different when moving "
@@ -2430,7 +2430,7 @@ namespace calc {
         Eigen::VectorXd& u,
         Eigen::VectorXd& springPartitions,
         const size_t partialSpringIdx,
-        const double oneOverSpringPartitionUpperLimit = 1.0);
+        const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
       bool swapSlipLinkWithXlinkReversibly(
         ForceBalanceNetwork& net,
@@ -2438,7 +2438,7 @@ namespace calc {
         Eigen::VectorXd& springPartitions,
         const size_t partialSpringIdx,
         const double oneOverSpringPartitionUpperLimit = 1.0,
-        const bool respectLoops = true);
+        const bool respectLoops = true) const;
 
     private:
       pylimer_tools::entities::Universe universe;
