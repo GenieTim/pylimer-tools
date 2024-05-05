@@ -428,7 +428,7 @@ If <cite>None</cite>, it will be computed for each molecule in the first Univers
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>p</strong> (<em>-</em>) – the cross-linker conversion</p></li>
 <li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance</p></li>
-<li><p><strong>f</strong> (<em>-</em>) – the functionality of the cross-links</p></li>
+<li><p><strong>f</strong> (<em>-</em>) – the functionality of the crosslinkers</p></li>
 <li><p><strong>g_e_1</strong> (<em>-</em>) – the melt entanglement modulus <span class="math notranslate nohighlight">\(G_e(1) = k_B T \epsilon_e\)</span></p></li>
 <li><p><strong>alpha</strong> (<em>-</em>) – <span class="math notranslate nohighlight">\(P(F_a^{out})\)</span>, optional</p></li>
 <li><p><strong>temperature</strong> (<em>-</em>) – the temperatures; defaults to room temperature</p></li>
@@ -447,7 +447,7 @@ If <cite>None</cite>, it will be computed for each molecule in the first Univers
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>p</strong> (<em>-</em>) – the cross-linker conversion</p></li>
 <li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance</p></li>
-<li><p><strong>f</strong> (<em>-</em>) – the functionality of the cross-links</p></li>
+<li><p><strong>f</strong> (<em>-</em>) – the functionality of the crosslinkers</p></li>
 <li><p><strong>g_e_1</strong> (<em>-</em>) – the melt entanglement modulus <span class="math notranslate nohighlight">\(G_e(1) = k_B T \epsilon_e\)</span></p></li>
 <li><p><strong>xlink_concentration_0</strong> (<em>-</em>) – [A_f]_0, in 1/volume units</p></li>
 <li><p><strong>alpha</strong> (<em>-</em>) – <span class="math notranslate nohighlight">\(P(F_a^{out})\)</span>, optional</p></li>
@@ -474,7 +474,7 @@ If <cite>None</cite>, it will be computed for each molecule in the first Univers
 <li><p>r: the stoichiometric imbalance</p></li>
 <li><p>xlink_concentration_0: [A_f]_0, in 1/volume units</p></li>
 <li><p>unit_style: the units used, for example for k_B</p></li>
-<li><p>f: the functionality of the cross-links</p></li>
+<li><p>f: the functionality of the crosslinkers</p></li>
 <li><p>alpha: <span class="math notranslate nohighlight">\(P(F_a^{out})\)</span>, optional</p></li>
 <li><p>temperature: the temperatures; defaults to room temperature</p></li>
 </ul>
@@ -498,7 +498,7 @@ If <cite>None</cite>, it will be computed for each molecule in the first Univers
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the cross-links</p></li>
+<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the crosslinkers</p></li>
 <li><p><strong>f</strong> (<em>-</em>) – the functionality of the the crosslinker</p></li>
 </ul>
 </dd>
@@ -586,9 +586,9 @@ Optional, can be passed to improve performance</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the cross-links</p></li>
+<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the crosslinkers</p></li>
 <li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance of reactants.</p></li>
-<li><p><strong>f</strong> (<em>-</em>) – functionality of the cross-links. Only needed if alpha is None.</p></li>
+<li><p><strong>f</strong> (<em>-</em>) – functionality of the crosslinkers. Only needed if alpha is None.</p></li>
 <li><p><strong>alpha</strong> (<em>-</em>) – <span class="math notranslate nohighlight">\(P(F_a^{out})\)</span>, see <code class="xref py py-func docutils literal notranslate"><span class="pre">computeMMSProbabilities()</span></code></p></li>
 </ul>
 </dd>
@@ -614,7 +614,7 @@ Optional, can be passed to improve performance</p></li>
 <li><p><strong>functionality_per_type</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.</p></li>
 <li><p><strong>weight_fractions</strong> (<em>-</em>) – a dictionary with the weight fraction of each type of atom</p></li>
 <li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the cross-links</p></li>
+<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the crosslinkers</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -641,7 +641,7 @@ Optional, can be passed to improve performance</p></li>
 <li><p><strong>functionality_per_type</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.</p></li>
 <li><p><strong>weight_fractions</strong> (<em>-</em>) – a dictionary with the weight fraction of each type of atom</p></li>
 <li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the cross-links</p></li>
+<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the crosslinkers</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -702,9 +702,9 @@ See: <a class="reference internal" href="pylimer_tools_cpp.html#pylimer_tools_cp
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the cross-links</p></li>
+<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the crosslinkers</p></li>
 <li><p><strong>f</strong> (<em>-</em>) – the functionality of the the crosslinker</p></li>
-<li><p><strong>w_f</strong> (<em>-</em>) – the weight fraction of the cross-links</p></li>
+<li><p><strong>w_f</strong> (<em>-</em>) – the weight fraction of the crosslinkers</p></li>
 <li><p><strong>w_g</strong> (<em>-</em>) – the weight fraction of ordinary chains</p></li>
 <li><p><strong>g</strong> (<em>-</em>) – the functionality of the ordinary chains</p></li>
 </ul>
@@ -728,7 +728,7 @@ Pass if you want to omit the network.</p></li>
 <li><p><strong>functionality_per_type</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.
 See: <a class="reference internal" href="pylimer_tools_cpp.html#pylimer_tools_cpp.Universe.determine_functionality_per_type" title="pylimer_tools_cpp.Universe.determine_functionality_per_type"><code class="xref py py-func docutils literal notranslate"><span class="pre">determine_functionality_per_type()</span></code></a>.</p></li>
 <li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the cross-links</p></li>
+<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the crosslinkers</p></li>
 </ul>
 </dd>
 </dl>
@@ -749,7 +749,7 @@ See: <a class="reference internal" href="pylimer_tools_cpp.html#pylimer_tools_cp
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)</p></li>
-<li><p><strong>f</strong> (<em>-</em>) – functionality of the cross-links</p></li>
+<li><p><strong>f</strong> (<em>-</em>) – functionality of the crosslinkers</p></li>
 <li><p><strong>g</strong> (<em>-</em>) – functionality of the precursor polymer</p></li>
 </ul>
 </dd>
@@ -812,7 +812,7 @@ See: <a class="reference internal" href="pylimer_tools_cpp.html#pylimer_tools_cp
 <li><p><strong>crosslinker_type</strong> (<em>-</em>) – the atom type to use to split the molecules</p></li>
 <li><p><strong>functionality_per_type</strong> (<em>-</em>) – a dictionary with key: type, and value: functionality of this atom type.</p></li>
 <li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance</p></li>
-<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the cross-links</p></li>
+<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the crosslinkers</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -834,9 +834,9 @@ See: <a class="reference internal" href="pylimer_tools_cpp.html#pylimer_tools_cp
 <p>Arguments:
 - w_sol: the weight fraction of soluble material
 - r: the stoichiometric imbalance
-- w_f: the weight fraction of cross-links with functionality f,
+- w_f: the weight fraction of crosslinkers with functionality f,
 - w_g: the weight fraction of precursor chains with functionality g,
-- f: the functionality of the cross-links
+- f: the functionality of the crosslinkers
 - g: the functionality of the precursor chains</p>
 </dd></dl>
 
@@ -1061,7 +1061,8 @@ If None: will use max functionality per type.</p></li>
 <dt class="sig sig-object py" id="pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.structure_analysis.</span></span><span class="sig-name descname"><span class="pre">compute_stoichiometric_imbalance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionality_per_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">effective</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.structure_analysis.compute_stoichiometric_imbalance" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the stoichiometric imbalance
-( nr. of bonds formable of crosslinker / (nr. of precursor chains * 2) )</p>
+( nr. of bonds formable of cross-linker / (nr. of precursor chains * 2) )</p>
+<p>r &gt; 1 means an excess of crosslinkers, whereas r = 0 implies that there are not crosslinkers in the network.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>if your system has a non-integer number of possible bonds (e.g. one site non-bonded),
@@ -1079,7 +1080,7 @@ If <cite>None</cite>: will use max functionality per type.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the stoichiometric imbalance</p>
+<dd class="field-even"><p>the stoichiometric imbalance. If the network is empty, or no crosslinkers are present 0. is returned.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><ul class="simple">
