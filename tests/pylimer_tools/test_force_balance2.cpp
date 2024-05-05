@@ -209,7 +209,7 @@ TEST_CASE("MEHP Force Balance 2 MC swap accept and reject work",
 }
 
 TEST_CASE(
-  "MEHP Force Balance 2 MC swap accept and reject work with cross-links",
+  "MEHP Force Balance 2 MC swap accept and reject work with crosslinkers",
   "[analysis][MEHPForceBalance2]")
 {
   double L = 42.819955007276754;
@@ -618,7 +618,7 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
         CHECK_NOTHROW(forceBalancer2.removeSubfunctionalVertices());
         CHECK(forceBalancer2.getNrOfSprings() == 6693);
         CHECK_NOTHROW(forceBalancer2.removeInactiveCrosslinks());
-        std::cout << "Removing inactive cross-links" << std::endl;
+        std::cout << "Removing inactive crosslinkers" << std::endl;
         CHECK(forceBalancer2.getNrOfSprings() == 6693);
         CHECK(forceBalancer2.getNrOfIterations() > 1);
         CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
@@ -795,7 +795,7 @@ TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
 }
 
 TEST_CASE(
-  "MEHP Force Balance 2 can randomly add slip-links ignoring cross-links",
+  "MEHP Force Balance 2 can randomly add slip-links ignoring crosslinkers",
   "[analysis][MEHPForceBalance2]")
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
@@ -830,7 +830,7 @@ TEST_CASE(
     // remove all springs...
     size_t numAtomsBefore = forceBalancer.getNumAtoms();
     numRemoved = forceBalancer.removeInactiveCrosslinks(1e5);
-    // resp., remove all cross-links.
+    // resp., remove all crosslinkers.
     CHECK(numRemoved <= numAtomsBefore);
     CHECK(forceBalancer.getNumBonds() == 0);
   }
@@ -1344,7 +1344,7 @@ TEST_CASE("MEHP Force Balance 2 does not collapse",
 {
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
   /**
-   * @brief A grid of two rows, each one bead between the two cross-links
+   * @brief A grid of two rows, each one bead between the two crosslinkers
    *
    */
   universe.addAtoms(

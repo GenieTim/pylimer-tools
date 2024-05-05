@@ -161,7 +161,7 @@ TEST_CASE("MEHP Force Relaxation does not collapse",
 
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
   /**
-   * @brief A grid of two rows, each one bead between the two cross-links
+   * @brief A grid of two rows, each one bead between the two crosslinkers
    *
    */
   universe.addAtoms(

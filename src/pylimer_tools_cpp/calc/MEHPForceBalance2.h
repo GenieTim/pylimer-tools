@@ -492,7 +492,7 @@ namespace calc {
       size_t removeDanglingChains();
 
       /**
-       * @brief Remove cross-links which do not have any springs with a certain
+       * @brief Remove crosslinkers which do not have any springs with a certain
        * minimum length
        *
        * @param net
@@ -504,7 +504,7 @@ namespace calc {
 
       /**
        * @brief Remove all vertices (incl. edges!) with a functionality < 3 for
-       * cross-links, < 4 for slip-links
+       * crosslinkers, < 4 for slip-links
        *
        * @param minCrosslinkFunctionalityToBeKept
        * @return size_t the number of removed vertices
@@ -512,7 +512,7 @@ namespace calc {
       size_t removeSubfunctionalVertices();
 
       /**
-       * @brief Remove double listed springs from cross-links (if they have
+       * @brief Remove double listed springs from crosslinkers (if they have
        * length 0)
        *
        * @param net
@@ -537,8 +537,8 @@ namespace calc {
       };
 
       /**
-       * @brief Replace the two springs traversinga a two-functional cross-links
-       * with a single spring
+       * @brief Replace the two springs traversinga a two-functional
+       * crosslinkers with a single spring
        *
        *
        */
@@ -1650,7 +1650,7 @@ namespace calc {
       };
 
       /**
-       * @brief Swap slip- or cross-links along a partial spring, iff the
+       * @brief Swap slip- or crosslinkers along a partial spring, iff the
        * slip-link may still swap, and iff the swap is MC favourable
        *
        * @param partialSpringIdx edge idx
@@ -1923,7 +1923,7 @@ namespace calc {
       }
 
       /**
-       * @brief Check whether a given edge is between two cross-links
+       * @brief Check whether a given edge is between two crosslinkers
        *
        * @param edgeId
        * @return true

@@ -132,13 +132,14 @@ class UnitStyleFactory(object):
             ureg.define("eps = {}e-21 joule".format(polymer_data.kB_Tref))
             # time is most difficult in lj — let's keep tau
             ureg.define('tau = 1 * tau')
+            accept_mol = ('accept_mol' in kwargs and kwargs["accept_mol"])
             # NOTE: the formula in the LAMMPS documentation contains \epsilon_0.
             # BUT: it does not add up in terms of units, so... the implementation here
             # *might* be wrong
             # epsZero = (8.8541878128e-12*ureg.farad/ureg.meter)
             return UnitStyle({
                 'mass': polymer_data.Mb * ureg('g/mol')
-                if 'accept_mol' in kwargs else polymer_data.Mb * ureg('g') / avogadro_constant,
+                if accept_mol else polymer_data.Mb * ureg('g') / avogadro_constant,
                 'distance': ureg.sigma,
                 'time': ureg.tau,
                 'energy': ureg.eps,
@@ -155,22 +156,22 @@ class UnitStyleFactory(object):
                 'dipole': elementary_charge * ureg.sigma,
                 'electric_field': ureg.eps / (elementary_charge * ureg.sigma),
                 'density':
-                    polymer_data.M_k * ureg('g/mol') / (ureg.sigma**(dimension)) if 'accept_mol' in kwargs
+                    polymer_data.M_k * ureg('g/mol') / (ureg.sigma**(dimension)) if accept_mol
                     else (polymer_data.M_k / avogadro_constant) * ureg('g') / (ureg.sigma**(dimension)),
                 'dt': 0.005 * ureg.tau,
                 'skin': 0.3 * ureg.sigma
             }, ureg)
         elif (unit_type == "real"):
             return UnitStyle({
-                "mass": ureg('g/mol') if 'accept_mol' in kwargs else ureg('g') / avogadro_constant,
+                "mass": ureg('g/mol') if accept_mol else ureg('g') / avogadro_constant,
                 "distance": ureg.angstrom,
                 "time": ureg.femtosecond,
-                "energy": ureg('kcal/mol') if 'accept_mol' in kwargs else ureg('kcal') / avogadro_constant,
+                "energy": ureg('kcal/mol') if accept_mol else ureg('kcal') / avogadro_constant,
                 "velocity": ureg.angstrom / ureg.femtosecond,
                 "force":
-                    ureg('kcal/(mol*angstrom)') if 'accept_mol' in kwargs
+                    ureg('kcal/(mol*angstrom)') if accept_mol
                     else ureg('kcal') / avogadro_constant / ureg.angstrom,
-                "torque": ureg('kcal/mol') if 'accept_mol' in kwargs else ureg('kcal') / avogadro_constant,
+                "torque": ureg('kcal/mol') if accept_mol else ureg('kcal') / avogadro_constant,
                 "temperature": ureg.kelvin,
                 "pressure": ureg.atmosphere,
                 "viscosity": ureg.poise,

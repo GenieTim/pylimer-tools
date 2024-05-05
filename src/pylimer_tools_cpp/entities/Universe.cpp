@@ -865,9 +865,10 @@ namespace entities {
       }
 
       igraph_vs_destroy(&verticesToRemove);
-      RUNTIME_EXP_IFN(igraph_vcount(&graphWithoutCrosslinkers) ==
-                        this->getNrOfAtoms() - indicesToRemove.size(),
-                      "Expected all cross-links to be removed from the graph.");
+      RUNTIME_EXP_IFN(
+        igraph_vcount(&graphWithoutCrosslinkers) ==
+          this->getNrOfAtoms() - indicesToRemove.size(),
+        "Expected all crosslinkers to be removed from the graph.");
     }
 
     // split the copy into the separate components

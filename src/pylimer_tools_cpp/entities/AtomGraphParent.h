@@ -220,7 +220,7 @@ namespace entities {
     /**
      * @brief Count how often a certain value appears in the vertex properties
      *
-     * For example, to count the number of cross-links, one could use
+     * For example, to count the number of crosslinkers, one could use
      * this->countPropertyValue<int>("type", crossLinkerType)
      *
      * @tparam IN

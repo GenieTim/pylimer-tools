@@ -60,8 +60,8 @@ namespace calc {
       // INVALIDARG_EXP_IFN(
       //   shouldRemoveInactiveCrosslinks == false &&
       //     remove2functionalCrosslinkers == true,
-      //   "Removing 2-functional cross-links only makes sense when inactive "
-      //   "cross-links may be removed too, during the procedure.");
+      //   "Removing 2-functional crosslinkers only makes sense when inactive "
+      //   "crosslinkers may be removed too, during the procedure.");
       this->simulationHasRun = true;
 
       double removalTolerance =
@@ -229,7 +229,7 @@ namespace calc {
         if (mode == BalanceRunMode::EIGEN_RANDOM) {
           independentVertexSets = getRandomCoordinateSets(this->initialConfig);
         }
-        // place cross-links
+        // place crosslinkers
         if (mode == BalanceRunMode::ITERATIVE) {
           for (size_t link_idx = 0; link_idx < this->initialConfig.nrOfNodes;
                ++link_idx) {
@@ -292,7 +292,7 @@ namespace calc {
           if (simplificationMode ==
                 StructureSimplificationMode::INACTIVE_ONLY ||
               simplificationMode == StructureSimplificationMode::ALL_TIM) {
-            // std::cout << "Removing inactive cross-links" << std::endl;
+            // std::cout << "Removing inactive crosslinkers" << std::endl;
             // default tolerance: 0.25*atom's cube length
             nRemoved +=
               this->removeInactiveCrosslinks(this->initialConfig,
@@ -306,7 +306,7 @@ namespace calc {
           }
           if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
               simplificationMode == StructureSimplificationMode::ALL_TIM) {
-            // std::cout << "Removing 2-f cross-links" << std::endl;
+            // std::cout << "Removing 2-f crosslinkers" << std::endl;
             nRemoved += this->removeTwofunctionalCrosslinks(
               this->initialConfig,
               this->currentDisplacements,
@@ -317,7 +317,7 @@ namespace calc {
                 : 0.;
           }
           if (simplificationMode == StructureSimplificationMode::ALL_ANDREI) {
-            // std::cout << "Removing cross-links and springs, Andrei's way"
+            // std::cout << "Removing crosslinkers and springs, Andrei's way"
             //           << std::endl;
             nRemoved +=
               this->doRemovalAndreisWay(this->initialConfig,
@@ -939,7 +939,7 @@ namespace calc {
     }
 
     /**
-     * @brief Remove double listed springs from cross-links
+     * @brief Remove double listed springs from crosslinkers
      *
      * @param net
      */
@@ -958,7 +958,7 @@ namespace calc {
     }
 
     /**
-     * @brief Remove cross-links which do not have any springs with a certain
+     * @brief Remove crosslinkers which do not have any springs with a certain
      * minimum length
      *
      * @param net
@@ -1006,7 +1006,7 @@ namespace calc {
         }
       }
 
-      // then, we remove all cross-links that are 0- or 1-functional
+      // then, we remove all crosslinkers that are 0- or 1-functional
       for (long int crosslinkIdx = net.nrOfNodes - 1; crosslinkIdx >= 0;
            --crosslinkIdx) {
         assert(net.springIndicesOfLinks.size() > crosslinkIdx);
@@ -2636,7 +2636,7 @@ namespace calc {
       do {
         numRemovedInIteration = 0;
         // do removal of f = 1
-        // remove all cross-links that are 0- or 1-functional
+        // remove all crosslinkers that are 0- or 1-functional
         for (long int crosslinkIdx = net.nrOfNodes - 1; crosslinkIdx >= 0;
              --crosslinkIdx) {
           if (net.springIndicesOfLinks[crosslinkIdx].size() == 0 // f = 0
@@ -2932,7 +2932,7 @@ namespace calc {
     }
 
     /**
-     * @brief Replace the two springs traversing a two-functional cross-links
+     * @brief Replace the two springs traversing a two-functional crosslinkers
      * with a single spring
      *
      * @param net
@@ -3580,7 +3580,7 @@ namespace calc {
         relevantPartialSprings.end(),
         net.localToGlobalSpringIndex[fullSpringIdx].begin(),
         net.localToGlobalSpringIndex[fullSpringIdx].end());
-      // for cross-links, we need to take all partners of all springs into
+      // for crosslinkers, we need to take all partners of all springs into
       // account
       for (size_t crosslinksSpringIdx :
            net.springIndicesOfLinks[crosslinkIdx]) {
@@ -4788,7 +4788,7 @@ namespace calc {
      */
     /**
      * @brief Convert the current network back into a universe, consisting only
-     * of cross-links
+     * of crosslinkers
      */
     pylimer_tools::entities::Universe MEHPForceBalance::getCrosslinkerVerse()
       const
@@ -5964,9 +5964,9 @@ namespace calc {
         RUNTIME_EXP_IFN(net.springPartIndexB.maxCoeff() < net.nrOfLinks,
                         "Part indices must map to links.");
         RUNTIME_EXP_IFN(net.springIndexA.maxCoeff() < net.nrOfNodes,
-                        "Full springs must consist of cross-links only.");
+                        "Full springs must consist of crosslinkers only.");
         RUNTIME_EXP_IFN(net.springIndexB.maxCoeff() < net.nrOfNodes,
-                        "Full springs must consist of cross-links only.");
+                        "Full springs must consist of crosslinkers only.");
       }
 
       /**
@@ -5985,7 +5985,7 @@ namespace calc {
       for (size_t link_idx = 0; link_idx < net.nrOfLinks; ++link_idx) {
         RUNTIME_EXP_IFN(
           net.linkIsSliplink[link_idx] == (link_idx >= net.nrOfNodes),
-          "Expected slip-links to come sequentially after cross-links.");
+          "Expected slip-links to come sequentially after crosslinkers.");
         std::vector<size_t> thisLinksSprings =
           net.springIndicesOfLinks[link_idx];
         for (size_t spring_idx : thisLinksSprings) {

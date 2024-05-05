@@ -44,8 +44,8 @@ namespace calc {
       // INVALIDARG_EXP_IFN(
       //   shouldRemoveInactiveCrosslinks == false &&
       //     remove2functionalCrosslinkers == true,
-      //   "Removing 2-functional cross-links only makes sense when inactive "
-      //   "cross-links may be removed too, during the procedure.");
+      //   "Removing 2-functional crosslinkers only makes sense when inactive "
+      //   "crosslinkers may be removed too, during the procedure.");
       this->simulationHasRun = true;
 
       double removalTolerance =
@@ -138,7 +138,7 @@ namespace calc {
         intermediateResidual =
           this->getDisplacementResidualNorm(oneOverSpringPartitionUpperLimit);
 
-        // place cross-links
+        // place crosslinkers
         for (size_t link_idx = 0; link_idx < igraph_vcount(&this->graph);
              ++link_idx) {
           if (castToIgraphInt(igraph_cattribute_VAN(
@@ -162,7 +162,7 @@ namespace calc {
           if (simplificationMode ==
                 StructureSimplificationMode::INACTIVE_ONLY ||
               simplificationMode == StructureSimplificationMode::ALL_TIM) {
-            // std::cout << "Removing inactive cross-links" << std::endl;
+            // std::cout << "Removing inactive crosslinkers" << std::endl;
             // default tolerance: 0.25*atom's cube length
             size_t nRemoved = this->removeInactiveCrosslinks(removalTolerance);
             if (nRemoved > 0) {
@@ -173,7 +173,7 @@ namespace calc {
           }
           if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
               simplificationMode == StructureSimplificationMode::ALL_TIM) {
-            // std::cout << "Removing 2-f cross-links" << std::endl;
+            // std::cout << "Removing 2-f crosslinkers" << std::endl;
             size_t nRemoved = this->removeTwofunctionalLinks();
             if (nRemoved > 0) {
               this->net.isUpToDate = false;
@@ -182,7 +182,7 @@ namespace calc {
             }
           }
           if (simplificationMode == StructureSimplificationMode::ALL_ANDREI) {
-            // std::cout << "Removing cross-links and springs, Andrei's way"
+            // std::cout << "Removing crosslinkers and springs, Andrei's way"
             //           << std::endl;
             size_t nRemoved = this->doRemovalAndreisWay(removalTolerance);
             if (nRemoved > 0) {
@@ -1222,7 +1222,7 @@ namespace calc {
     //----------------------------------------------------------------
 
     /**
-     * @brief Replace the two springs traversinga a two-functional cross-links
+     * @brief Replace the two springs traversinga a two-functional crosslinkers
      * with a single spring
      *
      * @param net
@@ -1250,7 +1250,7 @@ namespace calc {
     };
 
     /**
-     * @brief Remove double listed springs from cross-links (if they have
+     * @brief Remove double listed springs from crosslinkers (if they have
      * length 0)
      *
      * @param net
@@ -1420,7 +1420,7 @@ namespace calc {
 
     /**
      * @brief Remove all vertices (incl. edges!) with a functionality < 3 for
-     * cross-links, < 4 for slip-links
+     * crosslinkers, < 4 for slip-links
      *
      * @param minCrosslinkFunctionalityToBeKept
      * @return size_t the number of removed vertices
@@ -1674,7 +1674,7 @@ namespace calc {
     };
 
     /**
-     * @brief Remove cross-links which do not have any springs with a certain
+     * @brief Remove crosslinkers which do not have any springs with a certain
      * minimum length
      *
      * @param net
@@ -2392,7 +2392,7 @@ namespace calc {
           std::to_string(net.linkIsSliplink.count()) +
           " links marked as slip-link, but " + std::to_string(net.nrOfLinks) +
           " total links, of which " + std::to_string(net.nrOfNodes) +
-          " are cross-links.");
+          " are crosslinkers.");
       RUNTIME_EXP_IFN(net.oldAtomIds.size() == net.nrOfNodes,
                       "Invalid size of old atom ids");
       RUNTIME_EXP_IFN(net.springCoordinateIndexA.size() == net.nrOfSprings * 3,
@@ -2454,9 +2454,9 @@ namespace calc {
         RUNTIME_EXP_IFN(net.springPartIndexB.maxCoeff() < net.nrOfLinks,
                         "Part indices must map to links.");
         RUNTIME_EXP_IFN(net.springIndexA.maxCoeff() < net.nrOfNodes,
-                        "Full springs must consist of cross-links only.");
+                        "Full springs must consist of crosslinkers only.");
         RUNTIME_EXP_IFN(net.springIndexB.maxCoeff() < net.nrOfNodes,
-                        "Full springs must consist of cross-links only.");
+                        "Full springs must consist of crosslinkers only.");
       }
 
       /**
@@ -2475,7 +2475,7 @@ namespace calc {
       for (size_t link_idx = 0; link_idx < net.nrOfLinks; ++link_idx) {
         RUNTIME_EXP_IFN(
           net.linkIsSliplink[link_idx] == (link_idx >= net.nrOfNodes),
-          "Expected slip-links to come sequentially after cross-links.");
+          "Expected slip-links to come sequentially after crosslinkers.");
         std::vector<size_t> thisLinksSprings =
           net.springIndicesOfLinks[link_idx];
         for (size_t spring_idx : thisLinksSprings) {

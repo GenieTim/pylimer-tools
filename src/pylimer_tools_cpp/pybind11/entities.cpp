@@ -306,7 +306,7 @@ init_pylimer_bound_entities(py::module_& m)
 
             This method works only for lone chains, atoms and loops, 
             as it throws an error if the molecule does not allow such a "line-up", 
-            for example because of cross-links.
+            for example because of crosslinkers.
 
             Use the `crosslinker_type` parameter to force the atoms in a primary loop 
             to start with the cross-link.

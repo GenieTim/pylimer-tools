@@ -84,7 +84,7 @@ def predict_number_density_of_network_strands(network: Universe, crosslinker_typ
       - crosslinker_type: the atom type to use to split the molecules
       - functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
       - r: the stoichiometric imbalance
-      - p: the extent of reaction in terms of the cross-links
+      - p: the extent of reaction in terms of the crosslinkers
 
     Returns:
       - nu: The predicted number density of network strands
@@ -126,7 +126,7 @@ def compute_weight_fraction_of_dangling_chains(network: Universe, crosslinker_ty
       - functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
       - weight_fractions: a dictionary with the weight fraction of each type of atom
       - r: the stoichiometric imbalance
-      - p: the extent of reaction in terms of the cross-links
+      - p: the extent of reaction in terms of the crosslinkers
 
     Returns:
       - weightFraction $\\Phi_d = 1 - \\Phi_{el} - w_{sol}$: weightDangling/weightTotal
@@ -154,7 +154,7 @@ def compute_weight_fraction_of_backbone(network: Universe, crosslinker_type: int
       - functionality_per_type: a dictionary with key: type, and value: functionality of this atom type.
       - weight_fractions: a dictionary with the weight fraction of each type of atom
       - r: the stoichiometric imbalance
-      - p: the extent of reaction in terms of the cross-links
+      - p: the extent of reaction in terms of the crosslinkers
 
     Returns:
       - :math:`\\Phi_{el}`: weight fraction of network backbone
@@ -257,9 +257,9 @@ def compute_weight_fraction_of_soluble_material_from_weight_fractions(r: float, 
 
     Arguments:
       - r: the stoichiometric imbalance
-      - p: the extent of reaction in terms of the cross-links
+      - p: the extent of reaction in terms of the crosslinkers
       - f: the functionality of the the crosslinker
-      - w_f: the weight fraction of the cross-links
+      - w_f: the weight fraction of the crosslinkers
       - w_g: the weight fraction of ordinary chains
       - g: the functionality of the ordinary chains
     """
@@ -283,7 +283,7 @@ def compute_weight_fractions_and_probabilities(network: Universe, crosslinker_ty
       - functionality_per_type (dict): a dictionary with key: type, and value: functionality of this atom type.
           See: :func:`~pylimer_tools_cpp.Universe.determine_functionality_per_type`.
       - r: the stoichiometric imbalance
-      - p: the extent of reaction in terms of the cross-links
+      - p: the extent of reaction in terms of the crosslinkers
     """
     if (functionality_per_type is None or crosslinker_type not in functionality_per_type):
         assert (network is not None)
@@ -343,7 +343,7 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int):
 
     Arguments:
       - r: the stoichiometric imbalance
-      - p: the extent of reaction in terms of the cross-links
+      - p: the extent of reaction in terms of the crosslinkers
       - f: the functionality of the the crosslinker
 
     Returns:
@@ -416,7 +416,7 @@ def validate_r_and_p(r: float, p: float, f: int):
     p_max = max_possible_bonds / (n_xlinks * f)
     if (p > p_max):
         raise ValueError(
-            "For a system with r = {} and f = {}, p (in terms of cross-links) must be < {}, {} given.".format(
+            "For a system with r = {} and f = {}, p (in terms of crosslinkers) must be < {}, {} given.".format(
                 r, f, p_max, p
             ))
 
@@ -516,7 +516,7 @@ def compute_extracted_modulus(p: float, r: float, f: int, g_e_1: pint.Quantity, 
     Arguments:
         - p: the cross-linker conversion
         - r: the stoichiometric imbalance
-        - f: the functionality of the cross-links
+        - f: the functionality of the crosslinkers
         - g_e_1: the melt entanglement modulus :math:`G_e(1) = k_B T \\epsilon_e`
         - xlink_concentration_0: [A_f]_0, in 1/volume units
         - alpha: :math:`P(F_a^{out})`, optional
@@ -557,7 +557,7 @@ def compute_entanglement_modulus(p: float, r: float, f: int, g_e_1: pint.Quantit
     Arguments:
         - p: the cross-linker conversion
         - r: the stoichiometric imbalance
-        - f: the functionality of the cross-links
+        - f: the functionality of the crosslinkers
         - g_e_1: the melt entanglement modulus :math:`G_e(1) = k_B T \\epsilon_e`
         - alpha: :math:`P(F_a^{out})`, optional
         - temperature: the temperatures; defaults to room temperature
@@ -583,7 +583,7 @@ def compute_junction_modulus(p: float, r: float, xlink_concentration_0: pint.Qua
         - r: the stoichiometric imbalance
         - xlink_concentration_0: [A_f]_0, in 1/volume units
         - unit_style: the units used, for example for k_B
-        - f: the functionality of the cross-links
+        - f: the functionality of the crosslinkers
         - alpha: :math:`P(F_a^{out})`, optional
         - temperature: the temperatures; defaults to room temperature
     """
@@ -606,9 +606,9 @@ def compute_trapping_factor(
     Compute the trapping factor :math:`T_e`
 
     Arguments:
-        - p: the extent of reaction in terms of the cross-links
+        - p: the extent of reaction in terms of the crosslinkers
         - r: the stoichiometric imbalance of reactants.
-        - f: functionality of the cross-links. Only needed if alpha is None.
+        - f: functionality of the crosslinkers. Only needed if alpha is None.
         - alpha: :math:`P(F_a^{out})`, see :func:`~pylimer_tools.calc.miller_macosko_theory.computeMMSProbabilities()`
     """
     if (alpha is None):
@@ -652,7 +652,7 @@ def predict_gelation_point(r: float, f: int, g: int = 2) -> float:
 
     Arguments:
       - r (double): the stoichiometric imbalance of reactants (see: #compute_stoichiometric_imbalance)
-      - f (int): functionality of the cross-links
+      - f (int): functionality of the crosslinkers
       - g (int): functionality of the precursor polymer
 
     Returns:
@@ -671,9 +671,9 @@ def predict_p_from_w_sol(w_sol: float, r: float,
     Arguments:
     - w_sol: the weight fraction of soluble material
     - r: the stoichiometric imbalance
-    - w_f: the weight fraction of cross-links with functionality f,
+    - w_f: the weight fraction of crosslinkers with functionality f,
     - w_g: the weight fraction of precursor chains with functionality g,
-    - f: the functionality of the cross-links
+    - f: the functionality of the crosslinkers
     - g: the functionality of the precursor chains
     """
     def compute_wsol(p):

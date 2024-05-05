@@ -515,7 +515,7 @@ namespace calc {
                                  double tolerance) const;
 
       /**
-       * @brief Remove cross-links which do not have any springs with a certain
+       * @brief Remove crosslinkers which do not have any springs with a certain
        * minimum length
        *
        * @param net
@@ -529,7 +529,7 @@ namespace calc {
                                       double tolerance) const;
 
       /**
-       * @brief Remove double listed springs from cross-links
+       * @brief Remove double listed springs from crosslinkers
        *
        * @param net
        */
@@ -604,11 +604,12 @@ namespace calc {
                                         const size_t slipLinkIdx,
                                         const double alpha) const;
 
-      void relaxationLight(ForceBalanceNetwork& net,
-                           Eigen::VectorXd& springPartitions,
-                           Eigen::VectorXd& displacements,
-                           const size_t linkIdx,
-                           const double oneOverSpringPartitionUpperLimit = 1.0) const
+      void relaxationLight(
+        ForceBalanceNetwork& net,
+        Eigen::VectorXd& springPartitions,
+        Eigen::VectorXd& displacements,
+        const size_t linkIdx,
+        const double oneOverSpringPartitionUpperLimit = 1.0) const
       {
         Eigen::VectorXd oneOverSpringPartitions = Eigen::VectorXd::Zero(0);
         this->relaxationLight(net,
@@ -619,16 +620,17 @@ namespace calc {
                               oneOverSpringPartitionUpperLimit);
       };
 
-      void relaxationLight(ForceBalanceNetwork& net,
-                           Eigen::VectorXd& springPartitions,
-                           Eigen::VectorXd& oneOverSpringPartitions,
-                           Eigen::VectorXd& displacements,
-                           const size_t linkIdx,
-                           const double oneOverSpringPartitionUpperLimit = 1.0) const;
+      void relaxationLight(
+        ForceBalanceNetwork& net,
+        Eigen::VectorXd& springPartitions,
+        Eigen::VectorXd& oneOverSpringPartitions,
+        Eigen::VectorXd& displacements,
+        const size_t linkIdx,
+        const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
       /**
-       * @brief Replace the two springs traversinga a two-functional cross-links
-       * with a single spring
+       * @brief Replace the two springs traversinga a two-functional
+       * crosslinkers with a single spring
        *
        * @param net
        * @param displacements

@@ -879,7 +879,7 @@ TEST_CASE("Coordinates work")
   SECTION("with molecules and lined up")
   {
     /**
-     * @brief A grid of two rows, each one bead between the two cross-links
+     * @brief A grid of two rows, each one bead between the two crosslinkers
      *
      */
     universe.addAtoms(
