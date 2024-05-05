@@ -222,7 +222,7 @@ TEST_CASE("MC swap accept and reject work", "[analysis][MEHPForceBalance]")
   }
 }
 
-TEST_CASE("MC swap accept and reject work with cross-links",
+TEST_CASE("MC swap accept and reject work with crosslinkers",
           "[analysis][MEHPForceBalance]")
 {
   double L = 42.819955007276754;
@@ -795,8 +795,9 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
   }
 }
 
-TEST_CASE("MEHP Force Balance can randomly add slip-links ignoring cross-links",
-          "[analysis][MEHPForceBalance]")
+TEST_CASE(
+  "MEHP Force Balance can randomly add slip-links ignoring crosslinkers",
+  "[analysis][MEHPForceBalance]")
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
@@ -1182,18 +1183,12 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       Eigen::VectorXd::Zero(forceBalancer.getNrOfLinks() * 3);
     pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
 
-    outputNetwork(net, displacements, forceBalancer.getSpringPartitions());
+    // outputNetwork(net, displacements, forceBalancer.getSpringPartitions());
     for (int i = 0; i < 5; ++i) {
       forceBalancer.displaceToMeanPosition(
         net, displacements, springPartitions, 4);
       forceBalancer.updateSpringPartition(
         net, displacements, springPartitions, 4);
-      for (int i = 0; i < net.nrOfPartialSprings; i++) {
-        std::cout << net.springPartIndexA[i] << ", " << net.springPartIndexB[i]
-                  << ": ";
-        std::cout << springPartitions[i] << std::endl;
-      }
-      std::cout << std::endl;
     }
     CHECK(springPartitions[springPartitions.size() - 1] == Catch::Approx(0.5));
     CHECK(displacements[3 * 4] == Catch::Approx(-4.2));
@@ -1201,7 +1196,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
     CHECK(displacements[3 * 4 + 2] == Catch::Approx(0.8));
   }
 
-  SECTION("aye")
+  SECTION("Correct rationalisation and displacement")
   {
     // now, construct the force balancer
     pcm::MEHPForceBalance forceBalancer2 =
@@ -1335,12 +1330,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       Eigen::VectorXd displacements =
         Eigen::VectorXd::Zero(forceBalancer2.getNrOfLinks() * 3);
       pcm::ForceBalanceNetwork net = forceBalancer2.getNetwork();
-      for (int i = 0; i < net.nrOfPartialSprings; i++) {
-        std::cout << net.springPartIndexA[i] << ", " << net.springPartIndexB[i]
-                  << ": ";
-        std::cout << springPartitions[i] << std::endl;
-      }
-      std::cout << std::endl;
+      outputNetwork(net, displacements, springPartitions);
 
       forceBalancer2.displaceToMeanPosition(
         net, displacements, springPartitions, 4);
@@ -1386,13 +1376,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       }
       // assert expectations are met.
       // NOTE: difficulty: finding out which spring idx it actually is
-      outputNetwork(net, displacements, forceBalancer2.getSpringPartitions());
-      for (int i = 0; i < net.nrOfPartialSprings; i++) {
-        std::cout << net.springPartIndexA[i] << ", " << net.springPartIndexB[i]
-                  << ": ";
-        std::cout << springPartitions[i] << std::endl;
-      }
-      std::cout << std::endl;
+      outputNetwork(net, displacements, springPartitions);
       CHECK(springPartitions[5] + 1e-2 ==
             Catch::Approx(0.0 + 1e-2).epsilon(1e-6));                 // 4-1
       CHECK(springPartitions[6] == Catch::Approx(1.0).epsilon(1e-6)); // 4-2
@@ -1834,7 +1818,7 @@ TEST_CASE("MEHP Force Balance does not collapse",
 {
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
   /**
-   * @brief A grid of two rows, each one bead between the two cross-links
+   * @brief A grid of two rows, each one bead between the two crosslinkers
    *
    */
   universe.addAtoms(

@@ -81,7 +81,7 @@ namespace calc {
       }
 
       // start by setting distribution to sample from
-      // filter, we don't want cross-links etc. as targets
+      // filter, we don't want crosslinkers etc. as targets
       std::vector<pylimer_tools::entities::Atom> atomsForNeighbourList =
         universe.getAtomsOfDegree(2);
       atomsForNeighbourList.erase(

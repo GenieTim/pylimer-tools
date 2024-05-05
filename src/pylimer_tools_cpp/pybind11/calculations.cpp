@@ -165,7 +165,7 @@ init_pylimer_bound_calc(py::module_& m)
 
   py::class_<mehp::Network>(m, "SimplifiedNetwork", R"pbdoc(
      A more efficient structure of the network for use in MEHP.
-     Consists usually only of the cross-links.
+     Consists usually only of the crosslinkers.
  )pbdoc")
     .def_readonly("box_lengths", &mehp::Network::L)
     .def_readonly("volume", &mehp::Network::vol)
@@ -345,7 +345,7 @@ init_pylimer_bound_calc(py::module_& m)
           :param is2d: Whether to ignore the z direction.
           :param force_evaluator: The force evaluator to use
           :param kappa: The spring constant
-          :param remove_2functional_crosslinkers: Whether to replace two-functional cross-links with a "normal" chain bead
+          :param remove_2functional_crosslinkers: Whether to replace two-functional crosslinkers with a "normal" chain bead
           :param remove_dangling_chains: Whether to remove dangling chains before running the simulation. 
                **Caution*: Removing the dangling chains will result in incorrect results fo the computation of 
                :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getSolubleWeightFraction()` and
@@ -618,7 +618,7 @@ init_pylimer_bound_calc(py::module_& m)
           :param crosslinker_type: The atom type of the cross-linkers. Needed to reduce the network.
           :param is2D: Whether to ignore the z direction.
           :param kappa: the spring constant
-          :param remove_2functionalCrosslinkers: whether to keep or remove the 2-functional cross-links when setting up the network
+          :param remove_2functionalCrosslinkers: whether to keep or remove the 2-functional crosslinkers when setting up the network
           )pbdoc",
          py::arg("universe"),
          py::arg("crosslinker_type") = 2,
@@ -959,7 +959,7 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("b_0") = -1.0,
          py::arg("nr_of_chains") = -1)
     .def("get_nr_of_nodes", &mehp::MEHPForceBalance::getNrOfNodes, R"pbdoc(
-           Get the number of nodes (cross-links) considered in this simulation.
+           Get the number of nodes (crosslinkers) considered in this simulation.
      )pbdoc")
     .def("get_nr_of_springs",
          &mehp::MEHPForceBalance::getNrOfSprings,
@@ -1620,7 +1620,7 @@ init_pylimer_bound_calc(py::module_& m)
 
           Arguments:
           - num_bonds_to_form (int): the nr of bonds to form in total. Use 0 to stop bond formation.
-          - num_bonds_per_atom_type (dict): the nr of bonds each atom type may have at most (e.g., 2 for strand atoms, 4 for a tertiary cross-links)
+          - num_bonds_per_atom_type (dict): the nr of bonds each atom type may have at most (e.g., 2 for strand atoms, 4 for a tertiary crosslinkers)
           - bond_formation_dist (float): the maximum distance allowed to form bonds
           - attempt_bond_formation_every (int): attempt to form bonds every this many steps during the simulation run
           - atom_type_form_from (int): the atom type to start forming bonds from. 

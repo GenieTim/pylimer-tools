@@ -15,7 +15,9 @@ def compute_stoichiometric_imbalance(network: Universe, crosslinker_type: int = 
                                      effective: bool = False) -> float:
     """
     Compute the stoichiometric imbalance
-    ( nr. of bonds formable of crosslinker / (nr. of precursor chains * 2) )
+    ( nr. of bonds formable of cross-linker / (nr. of precursor chains * 2) )
+
+    r > 1 means an excess of crosslinkers, whereas r = 0 implies that there are not crosslinkers in the network.
 
     NOTE:
       if your system has a non-integer number of possible bonds (e.g. one site non-bonded),
@@ -30,7 +32,7 @@ def compute_stoichiometric_imbalance(network: Universe, crosslinker_type: int = 
       - effective: whether to use the effective functionality (if functionality_per_type is not passed) or the maximum
 
     Returns:
-      - r (float): the stoichiometric imbalance
+      - r (float): the stoichiometric imbalance. If the network is empty, or no crosslinkers are present 0. is returned.
     """
     if (network.get_nr_of_atoms() == 0):
         return 0.

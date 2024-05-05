@@ -375,7 +375,7 @@ namespace calc {
         (std::ceil((3.1 * cutoff) * (3.1 * cutoff) * (3.1 * cutoff)) /
          this->box.getVolume())));
       std::vector<int> possibleCandidates;
-      // iterate atoms - we want to start from the cross-links
+      // iterate atoms - we want to start from the crosslinkers
       for (size_t atom_idx = 0; atom_idx < this->numAtoms; ++atom_idx) {
         possibleCandidates.clear();
         if (this->atomTypes[atom_idx] != this->atomTypeBondFormationFrom) {
@@ -968,10 +968,10 @@ namespace calc {
            ++springIdx) {
         if ((!(this->isRelocationTarget[this->bondPartnersA[springIdx]] ||
                this->isRelocationTarget[this->bondPartnersB[springIdx]])) &&
-            // always relocate from cross-links away, e.g. in case the
+            // always relocate from crosslinkers away, e.g. in case the
             // cross-link has gained an additional bond and is no longer a
             // relocation target.
-            // consequently, we are inconsistent for cross-links with f = 2
+            // consequently, we are inconsistent for crosslinkers with f = 2
             !(this->atomTypes[this->bondPartnersA[springIdx]] ==
                 this->crossLinkerType ||
               this->atomTypes[this->bondPartnersB[springIdx]] ==
@@ -992,7 +992,7 @@ namespace calc {
           this->coordinates.segment(3 * candidateIndex, 3),
           this->highCutoff);
         for (size_t j = 0; j < numNeighs; ++j) {
-          // slip-springs to cross-links are not allowed
+          // slip-springs to crosslinkers are not allowed
           if (this->atomTypes[neighbours[j]] == this->crossLinkerType) {
             continue;
           }
@@ -1106,7 +1106,7 @@ namespace calc {
             RUNTIME_EXP_IFN(neighbours[j] < this->numAtoms,
                             "Neighbourlist seems inconsequent.");
             if (this->idxFunctionalities[neighbours[j]] > 2) {
-              // we won't relocate to cross-links
+              // we won't relocate to crosslinkers
               continue;
             }
             Eigen::Vector3d distance =
@@ -1163,7 +1163,7 @@ namespace calc {
       int distrLimitA = this->idxFunctionalities[partnerA] - 1;
       if (distrLimitA < 0) {
         RUNTIME_EXP_IFN(this->atomTypes[partnerA] == this->crossLinkerType,
-                        "Only cross-links are allowed to be single beads.");
+                        "Only crosslinkers are allowed to be single beads.");
         return false;
       }
       if (distrLimitA == 0 && this->shiftPossibilityEmpty) {
@@ -1191,7 +1191,7 @@ namespace calc {
       int distrLimitB = this->idxFunctionalities[partnerB] - 1;
       if (distrLimitB < 0) {
         RUNTIME_EXP_IFN(this->atomTypes[partnerB] == this->crossLinkerType,
-                        "Only cross-links are allowed to be single beads.");
+                        "Only crosslinkers are allowed to be single beads.");
         return false;
       }
       if (distrLimitB == 0 && this->shiftPossibilityEmpty) {
@@ -1355,7 +1355,7 @@ namespace calc {
       if (distr_limit < 0) {
         RUNTIME_EXP_IFN(
           this->atomTypes[partnerA] == this->crossLinkerType,
-          "Only cross-links are allowed to be single beads. Found bead " +
+          "Only crosslinkers are allowed to be single beads. Found bead " +
             std::to_string(partnerA) + " to have type " +
             std::to_string(this->atomTypes[partnerA]) + " with functionality " +
             std::to_string(distr_limit) + ".");
@@ -1490,7 +1490,7 @@ namespace calc {
       INVALIDARG_EXP_IFN(
         (this->atomTypes[partnerAfter] != this->crossLinkerType ||
          this->idxFunctionalities[partnerAfter] <= 2),
-        "Cannot form slip-springs with cross-links.");
+        "Cannot form slip-springs with crosslinkers.");
       size_t otherPartner;
       if (this->bondPartnersA[springIdx] == partnerBefore) {
         this->bondPartnersA[springIdx] = partnerAfter;
@@ -1742,7 +1742,7 @@ namespace calc {
         RUNTIME_EXP_IFN(
           this->idxFunctionalities[i] >= 1 ||
             this->atomTypes[i] == this->crossLinkerType,
-          "Only cross-links are allowed to be single beads. Found bead " +
+          "Only crosslinkers are allowed to be single beads. Found bead " +
             std::to_string(i) + " to have type " +
             std::to_string(this->atomTypes[i]) + " with functionality " +
             std::to_string(this->idxFunctionalities[i]) + ".");
@@ -1881,16 +1881,16 @@ namespace calc {
                           " (of " + std::to_string(this->numBonds) +
                           ") was not found in bonds of partner B, " +
                           std::to_string(this->bondPartnersA[i]) + ".");
-        // the following check is incorrect, as cross-links may have
+        // the following check is incorrect, as crosslinkers may have
         // slip-springs for f < 2, and during cross-linking might have one while
         // being upgraded to f > 2
         // if (i >= this->numBonds) {
         //   RUNTIME_EXP_IFN(this->atomType[this->bondPartnersA[i]] !=
         //                     this->crossLinkerType,
-        //                   "Expect slip-links to not involve cross-links");
+        //                   "Expect slip-links to not involve crosslinkers");
         //   RUNTIME_EXP_IFN(this->atomType[this->bondPartnersB[i]] !=
         //                     this->crossLinkerType,
-        //                   "Expect slip-links to not involve cross-links");
+        //                   "Expect slip-links to not involve crosslinkers");
         // }
       }
     }

@@ -97,7 +97,7 @@ namespace calc {
       double vol = 0.0;                     /* box volume */
       double meanSpringContourLength = 0.0; /* mean N */
       long int nrOfLinks = 0; /* number of links, = nrOfNodes + nrOfSlipLinks */
-      long int nrOfNodes = 0; /* number of cross-links */
+      long int nrOfNodes = 0; /* number of crosslinkers */
       long int nrOfSprings = 0;
       long int nrOfPartialSprings = 0;
       long int nrOfSpringsWithPartition = 0;
@@ -117,7 +117,7 @@ namespace calc {
 
       Eigen::ArrayXb linkIsSliplink;
       Eigen::ArrayXi
-        nrOfCrosslinkSwapsEndured; // count for slip-links how many cross-links
+        nrOfCrosslinkSwapsEndured; // count for slip-links how many crosslinkers
                                    // they swapped around
 
       // partial springs
