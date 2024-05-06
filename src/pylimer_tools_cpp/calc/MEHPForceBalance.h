@@ -831,7 +831,8 @@ namespace calc {
             this->initialConfig, this->currentDisplacements, is2D);
       }
 
-      void configMeanBondLength(double meanBondLength) {
+      void configMeanBondLength(double meanBondLength)
+      {
         this->defaultBondLength = meanBondLength;
       }
 

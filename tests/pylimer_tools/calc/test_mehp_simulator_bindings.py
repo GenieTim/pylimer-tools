@@ -19,11 +19,11 @@ class TestMEHPSimulatorBindings(UniverseUsingTestCase):
         gaussian_force_evaluator = SimpleSpringMEHPForceEvaluator(1.0)
         self.assertIsInstance(gaussian_force_evaluator,
                               SimpleSpringMEHPForceEvaluator)
-        self.assertFalse(gaussian_force_evaluator.is2D)
-        force_relaxer.setForceEvaluator(gaussian_force_evaluator)
+        self.assertFalse(gaussian_force_evaluator.is_2d)
+        force_relaxer.set_force_evaluator(gaussian_force_evaluator)
         non_gaussian_force_evaluator = NonGaussianSpringForceEvaluator(
             1.0, 20.0, 0.98)
-        self.assertFalse(non_gaussian_force_evaluator.is2D)
+        self.assertFalse(non_gaussian_force_evaluator.is_2d)
         force_relaxer_2 = MEHPForceRelaxation(
             self.testUniverse, 2, False, non_gaussian_force_evaluator)
-        self.assertEqual(force_relaxer_2.getNrOfIterations(), 0)
+        self.assertEqual(force_relaxer_2.get_nr_of_iterations(), 0)

@@ -6,5 +6,3 @@ find ./src \( -name "*.cpp" -o -name "*.h" \) -exec clang-format --style=file --
 find ./tests \( -name "*.cpp" -o -name "*.h" \) -exec clang-format --style=file --fallback-style="Mozilla" -i {} \;
 find ./src \(  -name "*.py" -o -name "*.pyi" \) -exec python -m autopep8 --in-place --aggressive {} \;
 find ./tests \(  -name "*.py" -o -name "*.pyi" \) -exec python -m autopep8 --in-place --aggressive {} \;
-
-git submodule foreach git reset --hard

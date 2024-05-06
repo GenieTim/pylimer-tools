@@ -14,6 +14,7 @@ from pylimer_tools.calc.structure_analysis import (
     compute_effective_crosslinker_functionality,
     compute_mean_end_to_end_distances, compute_mean_end_to_end_vectors,
     measure_weight_fraction_of_backbone,
+    measure_weight_fraction_of_soluble_material,
     measure_weight_fraction_of_dangling_chains)
 from pylimer_tools_cpp import MoleculeType, Universe
 
@@ -29,17 +30,16 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
         self.assertEqual(
             (0.0, 0.0), measure_weight_fraction_of_dangling_chains(self.emptyUniverse, 2))
         # empty weight -> empty weight fraction
-        self.testUniverse.setMasses({1: 0, 2: 0})
-        self.assertEqual(
-            (0.0, 0.25), measure_weight_fraction_of_backbone(self.testUniverse, 2))
-        self.assertEqual(
-            1.0, measure_weight_fraction_of_backbone(self.testUniverse, 2))
+        self.testUniverse.set_masses({1: 0, 2: 0})
+        self.assertEqual(0.0, measure_weight_fraction_of_soluble_material(self.testUniverse, 2))
+        self.assertEqual(1.0, measure_weight_fraction_of_backbone(self.testUniverse, 2))
         # non-empty weights
-        self.testUniverse.setMasses({1: 1, 2: 0})
+        self.testUniverse.set_masses({1: 1, 2: 0})
         self.assertTrue(self.testUniverse.get_nr_of_atoms() > 0)
-        self.assertEqual(self.testUniverse.getMasses(), {1: 1, 2: 0})
+        self.assertEqual(self.testUniverse.get_masses(), {1: 1, 2: 0})
         all_chains = self.testUniverse.get_chains_with_crosslinker(2)
-        self.assertEqual(all_chains[2].get_type(), MoleculeType.DANGLING_CHAIN)
+        self.assertEqual(
+            all_chains[2].get_strand_type(), MoleculeType.DANGLING_CHAIN)
         self.assertEqual(
             (0.2, 0.25), measure_weight_fraction_of_dangling_chains(self.testUniverse, crosslinker_type=2))
 

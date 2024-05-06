@@ -252,8 +252,8 @@ def compute_topological_factor(networks: Iterable[Universe], crosslinker_type: i
     for molecule in chains_to_process:
         crosslinkers = molecule.get_atoms_by_type(crosslinker_type)
         if (len(crosslinkers) != 2 or
-            molecule.get_type() == MoleculeType.PRIMARY_LOOP or
-                molecule.get_type() == MoleculeType.DANGLING_CHAIN):
+            molecule.get_strand_type() == MoleculeType.PRIMARY_LOOP or
+                molecule.get_strand_type() == MoleculeType.DANGLING_CHAIN):
             # dangling, free chains and loops are irrelevant for our purposes
             continue
         if (b is None):
@@ -264,7 +264,7 @@ def compute_topological_factor(networks: Iterable[Universe], crosslinker_type: i
         crosslinkers.sort(key=lambda a: a.get_id())
         key = molecule.get_key()
         gamma_sum += r_taus[key] * r_taus[key] / \
-            ((molecule.getLength() - 2) * b *
+            ((molecule.get_nr_of_atoms() - 2) * b *
              b)  # -2: remove crosslinkers again (assumption 3)
 
     return gamma_sum / total_mass

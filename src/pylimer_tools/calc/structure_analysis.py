@@ -209,8 +209,8 @@ def compute_end_to_end_vectors(
     for molecule in molecules:
         crosslinkers = molecule.get_atoms_by_type(crosslinker_type)
         if (len(crosslinkers) != 2 or
-            molecule.get_type() == MoleculeType.PRIMARY_LOOP or
-                molecule.get_type() == MoleculeType.DANGLING_CHAIN):
+            molecule.get_strand_type() == MoleculeType.PRIMARY_LOOP or
+                molecule.get_strand_type() == MoleculeType.DANGLING_CHAIN):
             # dangling, free chains and loops are irrelevant for our purposes
             continue
         # igraph.VertexSeq is not sortable -> use a list
@@ -315,14 +315,17 @@ def measure_weight_fraction_of_backbone(
       - crosslinker_type: the atom type to use to split the molecules
 
     Returns:
-      - weightFraction (float): 1 - weightDangling/weightTotal,
+      - weightFraction (float): 1 - weightDangling/weightTotal - weightSoluble/weightTotal,
     """
     if (network.get_nr_of_atoms() < 1):
         return 0.0
 
-    weight_fraction, _ = measure_weight_fraction_of_dangling_chains(
+    weight_fraction_dangling, _ = measure_weight_fraction_of_dangling_chains(
         network, crosslinker_type)
-    return 1.0 - weight_fraction
+    
+    weight_fraction_soluble = measure_weight_fraction_of_soluble_material(network)
+
+    return 1.0 - weight_fraction_dangling - weight_fraction_soluble
 
 
 def measure_weight_fraction_of_dangling_chains(
@@ -345,7 +348,7 @@ def measure_weight_fraction_of_dangling_chains(
     if (network.get_nr_of_atoms() < 1):
         return 0.0, 0.0
 
-    weights = network.getMasses()
+    weights = network.get_masses()
 
     def get_weight_of_graph(graph):
         counts = Counter(graph.get_atom_types())
@@ -361,7 +364,7 @@ def measure_weight_fraction_of_dangling_chains(
     num_dangling = 0
     weight_dangling = 0
     for chain in all_chains:
-        if (chain.get_type() == MoleculeType.DANGLING_CHAIN):
+        if (chain.get_strand_type() == MoleculeType.DANGLING_CHAIN):
             num_dangling += chain.get_nr_of_atoms()
             weight_dangling += get_weight_of_graph(chain)
 
@@ -373,7 +376,7 @@ def measure_weight_fraction_of_dangling_chains(
 
 
 def measure_weight_fraction_of_soluble_material(network: Universe,
-                                                rel_tol: float = 0.75, abs_tol: float = None) -> float:
+                                                rel_tol: float = 0.5, abs_tol: float = None) -> float:
     """
     Compute the weight fraction of soluble material by counting.
 
@@ -401,6 +404,9 @@ def measure_weight_fraction_of_soluble_material(network: Universe,
             if (w < rel_tol * weights.max()):
                 soluble_weight += w
 
+    if (total_weight == 0):
+        return 0.0
+
     return soluble_weight / total_weight
 
 
@@ -427,7 +433,7 @@ def measure_lower_bound_weight_fraction_of_soluble_material(network: Universe, c
 
     def is_soluble_cluster(cluster):
         chains = cluster.get_chains_with_crosslinker(crosslinker_type)
-        if (np.any([c.get_type() == MoleculeType.PRIMARY_LOOP for c in chains])):
+        if (np.any([c.get_strand_type() == MoleculeType.PRIMARY_LOOP for c in chains])):
             return False
         loops = cluster.find_loops(crosslinker_type)
         return len(loops) == 0

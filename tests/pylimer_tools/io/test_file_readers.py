@@ -131,15 +131,16 @@ class TestFileReader(PandasComparingTestCase):
             __file__), "../fixtures/lammps_dump_small.lammpstrj")
         universe_sequence = read_dump_file(data_file, dump_file)
         self.assertIsInstance(universe_sequence, UniverseSequence)
-        universe = universe_sequence.atIndex(0)
+        universe = universe_sequence.at_index(0)
         self.assertIsInstance(universe, Universe)
-        self.assertEqual(universe_sequence.getLength(), 1)
-        universe = universe_sequence.atIndex(0)
+        self.assertEqual(universe_sequence.get_length(), 1)
+        self.assertEqual(len(universe_sequence), 1)
+        universe = universe_sequence.at_index(0)
         self.assertEqual(universe.get_nr_of_atoms(), 12)
         universe_sequence2 = read_dump_file(
             data_file, dump_file, [AtomStyle.BOND])
         self.assertIsInstance(universe_sequence2, UniverseSequence)
-        universe = universe_sequence2.atIndex(0)
+        universe = universe_sequence2.at_index(0)
         self.assertEqual(universe.get_nr_of_atoms(), 12)
 
     def test_averages_reader(self):

@@ -27,7 +27,7 @@ class TestDistanceCalcFunctions(unittest.TestCase):
                 0, 0, second_atom["xsu"], second_atom["ysu"], second_atom["zsu"], 0, 0, 0)
             atom2 = Atom(
                 0, 0, third_atom["xsu"], third_atom["ysu"], third_atom["zsu"], 0, 0, 0)
-            self.assertEqual(1, atom1.distanceTo(
+            self.assertEqual(1, atom1.distance_to(
                 atom2, Box(10, 10, 10)))
 
 

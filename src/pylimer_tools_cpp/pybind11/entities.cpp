@@ -290,12 +290,16 @@ init_pylimer_bound_entities(py::module_& m)
            Note that this type might be unset; currently, only 
            :func:`~pylimer_tools_cpp.Universe.get_chains_with_crosslinker` assigns them automatically.
       )pbdoc")
-    .def("get_strand_ends", &Molecule::getChainEnds, R"pbdoc(
+    .def("get_strand_ends",
+         &Molecule::getChainEnds,
+         R"pbdoc(
           Get the ends of the given strand (= molecule).
 
           NOTE: 
                Currently only works for linear strands.
-     )pbdoc", py::arg("crosslinker_type") = 2, py::arg("close_loop") = false)
+     )pbdoc",
+         py::arg("crosslinker_type") = 2,
+         py::arg("close_loop") = false)
     .def("get_atoms", &Molecule::getAtoms, R"pbdoc(
             Returns all atom objects enclosed in this molecule, ordered by vertex id.
             )pbdoc")

@@ -17,7 +17,7 @@ class TestMEHPAssumptions(unittest.TestCase):
         box = Box(10, 10, 10)
         coords1 = np.array([5, 2.5, 0.])
         coords2 = np.array([25, 7.5, 0.])
-        offset = box.getOffset(coords2 - coords1)
+        offset = box.get_offset(coords2 - coords1)
         self.assertAlmostEqual(offset[0], -20.)
         self.assertAlmostEqual(offset[1], 0.)
         self.assertAlmostEqual(offset[2], 0.)
@@ -29,9 +29,9 @@ class TestMEHPAssumptions(unittest.TestCase):
                 [random.random() * 10, random.random() * 10, random.random() * 10])
             #
             dist_1 = slip_link_coords - coords1
-            box.applyPBC(dist_1)
+            box.apply_pbc(dist_1)
             dist_2 = coords2 - slip_link_coords
-            box.applyPBC(dist_2)
+            box.apply_pbc(dist_2)
 
             # we have two choices, and want to
             reference_norm = min(linalg.norm(dist_1 + offset) + linalg.norm(

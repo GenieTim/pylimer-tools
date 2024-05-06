@@ -103,6 +103,8 @@ class UnitStyleFactory(object):
         elementary_charge: Final = (1.602176634e-19) * ureg.coulomb
         avogadro_constant: Final = 6.02214076e23  # any/mol
 
+        accept_mol = ('accept_mol' in kwargs and kwargs["accept_mol"])
+
         if (unit_type == "lj"):
             if (("warning" not in kwargs or kwargs["warning"]) and (
                     "polymer" in kwargs and not isinstance(kwargs["polymer"], dict))):
@@ -132,7 +134,6 @@ class UnitStyleFactory(object):
             ureg.define("eps = {}e-21 joule".format(polymer_data.kB_Tref))
             # time is most difficult in lj — let's keep tau
             ureg.define('tau = 1 * tau')
-            accept_mol = ('accept_mol' in kwargs and kwargs["accept_mol"])
             # NOTE: the formula in the LAMMPS documentation contains \epsilon_0.
             # BUT: it does not add up in terms of units, so... the implementation here
             # *might* be wrong
