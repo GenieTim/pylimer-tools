@@ -31,8 +31,12 @@ class TestMEHPAnalysisFunctions(UniverseUsingTestCase):
             (0.0, 0.0), measure_weight_fraction_of_dangling_chains(self.emptyUniverse, 2))
         # empty weight -> empty weight fraction
         self.testUniverse.set_masses({1: 0, 2: 0})
-        self.assertEqual(0.0, measure_weight_fraction_of_soluble_material(self.testUniverse, 2))
-        self.assertEqual(1.0, measure_weight_fraction_of_backbone(self.testUniverse, 2))
+        self.assertEqual(
+            0.0, measure_weight_fraction_of_soluble_material(
+                self.testUniverse, 2))
+        self.assertEqual(
+            1.0, measure_weight_fraction_of_backbone(
+                self.testUniverse, 2))
         # non-empty weights
         self.testUniverse.set_masses({1: 1, 2: 0})
         self.assertTrue(self.testUniverse.get_nr_of_atoms() > 0)

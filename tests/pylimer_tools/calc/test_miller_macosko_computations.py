@@ -38,13 +38,15 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             (3 * 3) / (3 * 2), compute_stoichiometric_imbalance(self.testUniverse, 2,))
         self.assertAlmostEqual(
             (4 * 3) / (3 * 2), compute_stoichiometric_imbalance(self.testUniverse, 2,
-                                                            functionality_per_type={
-                                                                1: 2, 2: 4
-                                                            }))
+                                                                functionality_per_type={
+                                                                    1: 2, 2: 4
+                                                                }))
         self.assertAlmostEqual(
             (1 * 2 + 1 * 3 + 0) / (3 * 2), compute_stoichiometric_imbalance(self.testUniverse, 2,
-                                                                                    effective=True))
-        self.assertAlmostEqual(0., compute_stoichiometric_imbalance(self.testUniverse, 7))
+                                                                            effective=True))
+        self.assertAlmostEqual(
+            0., compute_stoichiometric_imbalance(
+                self.testUniverse, 7))
         self.assertAlmostEqual(compute_stoichiometric_imbalance(
             self.testUniverse, 2, functionality_per_type={
                 1: 2, 2: 3
@@ -208,10 +210,10 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         # NOTE: requires a short strand length with these systems, as otherwise, r > 1
         # which is not supported by the formulas implemented
         self.assertAlmostEqual(0.7674045514386211, compute_weight_fraction_of_backbone(self.saturatedTestUniverse,
-                                                                                        crosslinker_type=2,
-                                                                                        functionality_per_type={
-                                                                                            1: 2, 2: 4
-                                                                                        }))
+                                                                                       crosslinker_type=2,
+                                                                                       functionality_per_type={
+                                                                                           1: 2, 2: 4
+                                                                                       }))
 
     def test_modulus_decompositions(self):
         unit_style_factory = UnitStyleFactory()
