@@ -3006,7 +3006,8 @@ namespace calc {
       bool allowSlipLinksToPassEachOther) const
     {
       // std::cout << "Updating spring partition " << linkIdx << " of "
-      //           << net.nrOfNodes << " / " << net.nrOfLinks << std::endl;
+      //           << net.nrOfNodes << " / " << net.nrOfLinks << " with limit "
+      //           << oneOverSpringPartitionUpperLimit << std::endl;
 
       INVALIDARG_EXP_IFN(linkIdx < net.springIndicesOfLinks.size(),
                          "Link to update needs to be in the list");
@@ -3307,6 +3308,8 @@ namespace calc {
               net.localToGlobalSpringIndex[springIdx][linkI - 1];
             double partitionAfterIdx =
               net.localToGlobalSpringIndex[springIdx][linkI];
+            assert(this->isPartOfSpring(net, slipLinkIdx, partitionBeforeIdx));
+            assert(this->isPartOfSpring(net, slipLinkIdx, partitionAfterIdx));
             double didSwap = false;
             // check whether swap is needed in either direction
             // swap if yes
@@ -5620,12 +5623,16 @@ namespace calc {
       Eigen::VectorXd springVectors = this->evaluateSpringVectors(
         this->initialConfig, this->currentDisplacements, this->is2D);
 
+      double commonDenominator = 1. / (b * b * nrOfChains);
+      double result = 0.;
+
       for (size_t i = 0; i < this->initialConfig.nrOfSprings; ++i) {
-        springVectors *=
-          (1. / (b * b * this->initialConfig.springsContourLength[i]));
+        result += springVectors.segment(3 * i, 3).squaredNorm() *
+                  commonDenominator /
+                  (this->initialConfig.springsContourLength[i]);
       }
 
-      return springVectors.squaredNorm() / nrOfChains;
+      return result;
     }
 
     /**
