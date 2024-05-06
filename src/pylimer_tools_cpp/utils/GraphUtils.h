@@ -89,7 +89,7 @@ namespace utils {
                           other.currentStartIndex,
                           other.currentNeighbourIndex,
                           other.loopsFound,
-                          other.startingIndices) {};
+                          other.startingIndices){};
     // 3. copy assignment operator
     SimpleCycleFinder& operator=(SimpleCycleFinder other)
     {

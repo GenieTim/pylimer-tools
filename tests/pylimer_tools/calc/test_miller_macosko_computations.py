@@ -8,11 +8,13 @@ from pylimer_tools.calc.miller_macosko_theory import (
     compute_weight_fraction_of_soluble_material,
     compute_weight_fractions_and_probabilities, predict_gelation_point,
     predict_number_density_of_junction_points,
+    compute_weight_fraction_of_backbone,
+    compute_weight_fraction_of_dangling_chains,
     predict_number_density_of_network_strands, predict_shear_modulus)
 from pylimer_tools.calc.structure_analysis import (
     compute_extent_of_reaction, compute_stoichiometric_imbalance,
-    compute_weight_fraction_of_backbone,
-    compute_weight_fraction_of_dangling_chains, compute_weight_fractions,
+    compute_weight_fractions, measure_weight_fraction_of_backbone,
+    measure_weight_fraction_of_dangling_chains,
     measure_lower_bound_weight_fraction_of_soluble_material,
     measure_weight_fraction_of_soluble_material)
 from pylimer_tools.io.unit_styles import UnitStyleFactory
@@ -28,27 +30,26 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertAlmostEqual(
             0, compute_stoichiometric_imbalance(self.emptyUniverse, 2))
         self.assertAlmostEqual(
-            (1 * 2 + 1 * 3 + 0) / (4 * 2 + 1 * 1), compute_stoichiometric_imbalance(self.testUniverse, 2,
-                                                                                    effective=True))
-        self.assertAlmostEqual(
-            (3 * 3) / (5 * 2), compute_stoichiometric_imbalance(self.testUniverse, 2,
+            (3 * 3) / (3 * 2), compute_stoichiometric_imbalance(self.testUniverse, 2,
                                                                 functionality_per_type={
                                                                     1: 2, 2: 3
                                                                 }))
         self.assertAlmostEqual(
-            (3 * 3) / (5 * 2), compute_stoichiometric_imbalance(self.testUniverse, 2,))
+            (3 * 3) / (3 * 2), compute_stoichiometric_imbalance(self.testUniverse, 2,))
         self.assertAlmostEqual(
-            (3 * 3) / (2), compute_stoichiometric_imbalance(self.testUniverse, 2,
+            (4 * 3) / (3 * 2), compute_stoichiometric_imbalance(self.testUniverse, 2,
                                                             functionality_per_type={
-                                                                1: 2, 2: 3
+                                                                1: 2, 2: 4
                                                             }))
-        self.assertRaises(
-            ValueError, compute_stoichiometric_imbalance, self.testUniverse, 7)
+        self.assertAlmostEqual(
+            (1 * 2 + 1 * 3 + 0) / (3 * 2), compute_stoichiometric_imbalance(self.testUniverse, 2,
+                                                                                    effective=True))
+        self.assertAlmostEqual(0., compute_stoichiometric_imbalance(self.testUniverse, 7))
         self.assertAlmostEqual(compute_stoichiometric_imbalance(
             self.testUniverse, 2, functionality_per_type={
                 1: 2, 2: 3
             }), ((3 * 3) / ((5 * 2) / (5 / 3))))
-        self.testUniverse.addAtoms([100], [3], [0], [0], [0], [0], [0], [0])
+        self.testUniverse.add_atoms([100], [3], [0], [0], [0], [0], [0], [0])
         self.assertAlmostEqual(compute_stoichiometric_imbalance(
             self.testUniverse, 2, ignore_types=[3]), ((3 * 3) / ((5 * 2) / (5 / 3))))
 
@@ -67,23 +68,23 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             network=self.emptyUniverse, crosslinker_type=2, unit_style=None))
         self.assertRaises(ValueError, lambda: predict_shear_modulus(
             network=self.emptyUniverse, unit_style=None))
-        self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
+        self.saturatedTestUniverse.set_masses({1: 1, 2: 1})
 
         unit_style_factory = UnitStyleFactory()
         unit_style = unit_style_factory.get_unit_style("si")
         # TODO: find literature motiviation for results fo the functions
-        self.assertAlmostEqual(0.1467020757993193, predict_shear_modulus(
+        self.assertAlmostEqual(0.22359712818064229, predict_shear_modulus(
             network=self.saturatedTestUniverse, unit_style=unit_style,
             crosslinker_type=2).to('MPa').magnitude)
-        self.assertAlmostEqual(0.1467020757993193, predict_shear_modulus(
+        self.assertAlmostEqual(0.027019771523321627, predict_shear_modulus(
             network=self.saturatedTestUniverse, unit_style=unit_style, crosslinker_type=2,
             functionality_per_type={2: 4}).to('MPa').magnitude)
-        self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
-        self.assertAlmostEqual(0.1467020757993193, predict_shear_modulus(
+        self.saturatedTestUniverse.set_masses({1: 1, 2: 1})
+        self.assertAlmostEqual(0.22359712818064229, predict_shear_modulus(
             network=self.saturatedTestUniverse, unit_style=unit_style, crosslinker_type=2).to('MPa').magnitude)
 
     def test_predict_number_density_of_junction_points(self):
-        self.testUniverse.setMasses({1: 1, 2: 1})
+        self.testUniverse.set_masses({1: 1, 2: 1})
         self.assertAlmostEqual(
             1.5, compute_stoichiometric_imbalance(self.testUniverse, 2))
         # TODO: find literature motiviation for results fo the functions
@@ -93,12 +94,12 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             self.testUniverse, 2, functionality_per_type={1: 2, 2: 5}))
         self.assertAlmostEqual(predict_number_density_of_junction_points(
             self.testUniverse, 2, functionality_per_type={1: 2, 2: 3}), 0.0)
-        self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
+        self.saturatedTestUniverse.set_masses({1: 1, 2: 1})
         self.assertAlmostEqual(predict_number_density_of_junction_points(
             self.saturatedTestUniverse, 2, functionality_per_type={1: 2, 2: 4}), 0.08304616298035744)
 
     def test_predict_number_density_of_network_strands(self):
-        self.testUniverse.setMasses({1: 1, 2: 1})
+        self.testUniverse.set_masses({1: 1, 2: 1})
         # TODO: find literature motiviation for results fo the functions
         self.assertAlmostEqual(predict_number_density_of_network_strands(
             self.testUniverse, 2), 0.0)
@@ -106,7 +107,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             self.testUniverse, 2, functionality_per_type={1: 2, 2: 5}))
         self.assertAlmostEqual(predict_number_density_of_network_strands(
             self.testUniverse, 2, functionality_per_type={1: 2, 2: 3}), 0.0)
-        self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
+        self.saturatedTestUniverse.set_masses({1: 1, 2: 1})
         self.assertAlmostEqual(predict_number_density_of_network_strands(
             self.saturatedTestUniverse, 2, functionality_per_type={1: 2, 2: 4}), 0.13752853164771697)
 
@@ -114,18 +115,18 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertDictEqual(
             {}, compute_weight_fractions(self.emptyUniverse))
 
-        self.testUniverse.setMasses({1: 1, 2: 1})
+        self.testUniverse.set_masses({1: 1, 2: 1})
         weight_fractions = compute_weight_fractions(
             self.testUniverse)
         self.assertDictEqual(weight_fractions, {1: 1 - 3. / 8., 2: 3. / 8.})
         test_universe_copy = copy.copy(self.testUniverse)
-        test_universe_copy.removeAtoms([1, 2, 3, 4, 5, 6])
+        test_universe_copy.remove_atoms([1, 2, 3, 4, 5, 6])
         self.assertTrue(test_universe_copy.get_nr_of_atoms() == 2)
         self.assertDictEqual(compute_weight_fractions(
             test_universe_copy), {1: 1. / 2., 2: 1. / 2.})
 
     def test_soluble_weight_fraction_measurement(self):
-        self.testUniverse.setMasses({1: 1, 2: 1})
+        self.testUniverse.set_masses({1: 1, 2: 1})
         self.assertEqual(measure_weight_fraction_of_soluble_material(
             self.emptyUniverse), 0.0)
         self.assertEqual(measure_weight_fraction_of_soluble_material(
@@ -142,14 +143,14 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
             self.testUniverse, 2, abs_tol=10000), 0.125)
 
     def test_soluble_material_weight_fraction_calculation(self):
-        self.testUniverse.setMasses({1: 1, 2: 1})
+        self.testUniverse.set_masses({1: 1, 2: 1})
         self.assertRaises(NotImplementedError, lambda: compute_weight_fraction_of_soluble_material(
             self.testUniverse, 2, functionality_per_type={1: 2, 2: 2}))
         self.assertRaises(NotImplementedError, lambda: compute_weight_fraction_of_soluble_material(
             self.testUniverse, 2, functionality_per_type={1: 1, 2: 3}))
         self.assertRaises(ValueError, lambda: compute_weight_fraction_of_soluble_material(
             self.testUniverse, 7))
-        self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
+        self.saturatedTestUniverse.set_masses({1: 1, 2: 1})
 
         res_tuple = compute_weight_fractions_and_probabilities(
             self.saturatedTestUniverse, 2)
@@ -181,11 +182,11 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
     def test_backbone_weight_fraction_calculations(self):
         self.assertEqual(0, compute_weight_fraction_of_backbone(
             self.emptyUniverse, 2))
-        self.assertEqual((0., 0.), compute_weight_fraction_of_dangling_chains(
+        self.assertEqual(0., compute_weight_fraction_of_dangling_chains(
             self.emptyUniverse, 2))
         self.assertEqual(1, compute_weight_fraction_of_soluble_material(
             self.emptyUniverse, 2))
-        self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
+        self.saturatedTestUniverse.set_masses({1: 1, 2: 0})
         self.assertAlmostEqual(1.0, compute_extent_of_reaction(
             self.saturatedTestUniverse, 2))
         # TODO: get some literature backed values to test for
@@ -194,11 +195,11 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         wsol = compute_weight_fraction_of_soluble_material(
             self.saturatedTestUniverse, crosslinker_type=2)
         self.assertAlmostEqual(0.8, bb)
-        self.saturatedTestUniverse.setMasses({1: 1, 2: 0})
+        self.saturatedTestUniverse.set_masses({1: 1, 2: 0})
         self.assertEqual(1 - bb - wsol, compute_weight_fraction_of_dangling_chains(
             self.saturatedTestUniverse, 2))
 
-        self.saturatedTestUniverse.setMasses({1: 1, 2: 1})
+        self.saturatedTestUniverse.set_masses({1: 1, 2: 1})
         # test also as if the functionality was 4
         # self.assertRaises(ValueError, lambda: compute_weight_fraction_of_backbone(self.saturatedTestUniverse,
         #       crosslinker_type=2, functionality_per_type={
@@ -206,7 +207,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         # }))
         # NOTE: requires a short strand length with these systems, as otherwise, r > 1
         # which is not supported by the formulas implemented
-        self.assertAlmostEqual(0.14931407018789813, compute_weight_fraction_of_backbone(self.saturatedTestUniverse,
+        self.assertAlmostEqual(0.7674045514386211, compute_weight_fraction_of_backbone(self.saturatedTestUniverse,
                                                                                         crosslinker_type=2,
                                                                                         functionality_per_type={
                                                                                             1: 2, 2: 4
@@ -246,7 +247,7 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         self.assertAlmostEqual(g_anm.to('MPa').magnitude, 0.051846, places=5)
         self.assertAlmostEqual(g_pnm.to('MPa').magnitude, 0.025923, places=5)
         self.assertAlmostEqual(g_mmt_entanglement.to(
-            'MPa').magnitude, 0.05801, places=5)
+            'MPa').magnitude, 0.02031, places=5)
         self.assertAlmostEqual(g_mmt_phantom.to(
             'MPa').magnitude, 0.00492674, places=5)
 

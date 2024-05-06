@@ -76,7 +76,7 @@ namespace entities {
     : Molecule(src.parent,
                &src.graph,
                src.typeOfThisMolecule,
-               src.massPerType) {};
+               src.massPerType){};
   // 3. copy assignment operator
   Molecule& Molecule::operator=(Molecule src)
   {

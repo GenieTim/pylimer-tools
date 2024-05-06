@@ -79,17 +79,17 @@ class UniverseUsingTestCase(unittest.TestCase):
         self.emptyUniverse = Universe(10, 10, 10)
         # Universe 2: small (5 atoms), barely connected in two chains
         self.testUniverseSmall = Universe(10, 10, 10)
-        self.testUniverseSmall.addAtoms(self.testAtomsSmall["id"], self.testAtomsSmall["type"],
-                                        self.testAtomsSmall["x"], self.testAtomsSmall["y"], self.testAtomsSmall["z"],
-                                        self.testAtomsSmall["nx"], self.testAtomsSmall["ny"], self.testAtomsSmall["nz"])
-        self.testUniverseSmall.addBonds(
+        self.testUniverseSmall.add_atoms(self.testAtomsSmall["id"], self.testAtomsSmall["type"],
+                                         self.testAtomsSmall["x"], self.testAtomsSmall["y"], self.testAtomsSmall["z"],
+                                         self.testAtomsSmall["nx"], self.testAtomsSmall["ny"], self.testAtomsSmall["nz"])
+        self.testUniverseSmall.add_bonds(
             self.testBondsSmall["bondFrom"], self.testBondsSmall["to"])
         # Universe 3: very unsaturated
         self.testUniverse = Universe(10, 10, 10)
-        self.testUniverse.addAtoms(self.testAtoms["id"], self.testAtoms["type"],
-                                   self.testAtoms["x"], self.testAtoms["y"], self.testAtoms["z"],
-                                   self.testAtoms["nx"], self.testAtoms["ny"], self.testAtoms["nz"])
-        self.testUniverse.addBonds(
+        self.testUniverse.add_atoms(self.testAtoms["id"], self.testAtoms["type"],
+                                    self.testAtoms["x"], self.testAtoms["y"], self.testAtoms["z"],
+                                    self.testAtoms["nx"], self.testAtoms["ny"], self.testAtoms["nz"])
+        self.testUniverse.add_bonds(
             self.testBonds["bondFrom"], self.testBonds["to"])
         # an additional larger test universe where the stoichiometric imbalance is < 1
         # even when imposing a crosslinker functionality of 1
@@ -143,10 +143,10 @@ class UniverseUsingTestCase(unittest.TestCase):
 
     def addAtomBondData(self, universe: Universe,
                         atomData: pd.DataFrame, bondData: pd.DataFrame) -> Universe:
-        universe.addAtoms(atomData["id"].tolist(), atomData["type"].tolist(),
-                          atomData["x"].tolist(), atomData["y"].tolist(
+        universe.add_atoms(atomData["id"].tolist(), atomData["type"].tolist(),
+                           atomData["x"].tolist(), atomData["y"].tolist(
         ), atomData["z"].tolist(),
             atomData["nx"].tolist(), atomData["ny"].tolist(), atomData["nz"].tolist())
-        universe.addBonds(
+        universe.add_bonds(
             bondData["bondFrom"].tolist(), bondData["to"].tolist())
         return universe
