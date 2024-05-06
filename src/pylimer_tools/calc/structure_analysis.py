@@ -322,8 +322,9 @@ def measure_weight_fraction_of_backbone(
 
     weight_fraction_dangling, _ = measure_weight_fraction_of_dangling_chains(
         network, crosslinker_type)
-    
-    weight_fraction_soluble = measure_weight_fraction_of_soluble_material(network)
+
+    weight_fraction_soluble = measure_weight_fraction_of_soluble_material(
+        network)
 
     return 1.0 - weight_fraction_dangling - weight_fraction_soluble
 
@@ -433,7 +434,8 @@ def measure_lower_bound_weight_fraction_of_soluble_material(network: Universe, c
 
     def is_soluble_cluster(cluster):
         chains = cluster.get_chains_with_crosslinker(crosslinker_type)
-        if (np.any([c.get_strand_type() == MoleculeType.PRIMARY_LOOP for c in chains])):
+        if (np.any([c.get_strand_type() ==
+                    MoleculeType.PRIMARY_LOOP for c in chains])):
             return False
         loops = cluster.find_loops(crosslinker_type)
         return len(loops) == 0
