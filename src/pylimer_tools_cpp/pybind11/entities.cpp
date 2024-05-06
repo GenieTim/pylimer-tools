@@ -295,7 +295,7 @@ init_pylimer_bound_entities(py::module_& m)
 
           NOTE: 
                Currently only works for linear strands.
-     )pbdoc")
+     )pbdoc", py::arg("crosslinker_type") = 2, py::arg("close_loop") = false)
     .def("get_atoms", &Molecule::getAtoms, R"pbdoc(
             Returns all atom objects enclosed in this molecule, ordered by vertex id.
             )pbdoc")
