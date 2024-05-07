@@ -43,6 +43,8 @@ def read_data_file(structure_file: str,
     Returns:
         - universe (Universe): the Universe in the given structure file
     """
+    if (not os.path.exists(structure_file)):
+        raise ValueError("Structure file '{}' does not exist.".format(structure_file))
     u_s = UniverseSequence()
     if (atom_style is not None):
         u_s.set_data_file_atom_style(atom_style)

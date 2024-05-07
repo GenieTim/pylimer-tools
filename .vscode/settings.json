@@ -162,6 +162,7 @@
   "cSpell.words": [
     "attogram",
     "avogadro",
+    "cattribute",
     "Correlator",
     "crosslink",
     "crosslinker",
@@ -181,6 +182,8 @@
     "slipspring",
     "thermo",
     "timestep",
+    "VANV",
+    "vcount",
     "xlink",
     "xlinks"
   ],

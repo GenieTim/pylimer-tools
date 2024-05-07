@@ -899,6 +899,9 @@ namespace entities {
         igraph_vit_t endNodeVit;
         igraph_vit_create(
           chain, igraph_vss_vector(&endNodeSelectorVector), &endNodeVit);
+        // this check is in case the primary loop is "free"
+        isLoop = IGRAPH_VIT_SIZE(endNodeVit) == 0 &&
+                 (moleculeLengthBefore > 1 || igraph_ecount(chain) > 0);
         // collect atoms to add, since adding them would invalidate the iterator
         std::vector<long int> atomsToAdd;
         std::vector<std::vector<long int>> bondsToAdd;
