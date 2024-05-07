@@ -294,6 +294,8 @@ init_pylimer_bound_entities(py::module_& m)
          &Molecule::getChainEnds,
          R"pbdoc(
           Get the ends of the given strand (= molecule).
+          In case of a primary loop, the cross-link is returned, if there is one.
+          Use the argument `close_loop` to decide, whether this should be returned once or twice.
 
           NOTE: 
                Currently only works for linear strands.

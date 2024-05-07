@@ -19,19 +19,19 @@ namespace pylimer_tools {
 namespace entities {
 
   Molecule::Molecule(const Box& parent,
-                     const igraph_t* ingraph,
+                     const igraph_t* inGraph,
                      const MoleculeType type,
                      const std::map<int, double>& massPerType)
   {
     this->parent = parent;
-    this->initializeFromGraph(ingraph);
+    this->initializeFromGraph(inGraph);
     this->typeOfThisMolecule = type;
     this->massPerType = massPerType;
   };
 
-  void Molecule::initializeFromGraph(const igraph_t* ingraph)
+  void Molecule::initializeFromGraph(const igraph_t* inGraph)
   {
-    igraph_copy(&this->graph, ingraph);
+    igraph_copy(&this->graph, inGraph);
     this->size = igraph_vcount(&this->graph);
     // construct a key for this molecule: a concatenation of all ids in this
     // molecule
@@ -76,7 +76,7 @@ namespace entities {
     : Molecule(src.parent,
                &src.graph,
                src.typeOfThisMolecule,
-               src.massPerType){};
+               src.massPerType) {};
   // 3. copy assignment operator
   Molecule& Molecule::operator=(Molecule src)
   {
@@ -370,6 +370,14 @@ namespace entities {
          this->getType() == MoleculeType::UNDEFINED)) {
       std::vector<pylimer_tools::entities::Atom> crossLinks =
         this->getAtomsOfType(crossLinkerType);
+      if (crossLinks.size() == 0) {
+        // can happen e.g. in "free" primary loops.
+        // we could alternatively select a random atom,
+        // e.g. the one with the lowest id
+        return {};
+      }
+      // otherwise, primary loop,
+      // but with cross-link, which will be the start of the loop.
       RUNTIME_EXP_IFN(
         crossLinks.size() == 1 ||
           (crossLinks.size() == 2 &&

@@ -250,3 +250,31 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
           Catch::Approx(15. / 4.));
   }
 }
+
+TEST_CASE("Strand Ends are found", "[entity][Molecule]")
+{
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  REQUIRE(universeSeq.getLength() == 0);
+  std::string suspectedPath =
+    "../pylimer_tools/fixtures/structure/crosslinked_M10000_N39_p_0.9.out";
+  if (std::filesystem::exists(suspectedPath)) {
+    universeSeq.initializeFromDataSequence(
+      { { suspectedPath } });
+    REQUIRE(universeSeq.getLength() == 1);
+
+    pe::Universe universe = universeSeq.atIndex(0);
+    std::vector<pe::Molecule> molecules = universe.getChainsWithCrosslinker(2);
+
+    for (pe::Molecule chain : molecules) {
+      std::vector<pe::Atom> chainEnds = chain.getChainEnds(2, true);
+      CHECK(chainEnds.size() == 2);
+      if (chain.getType() == pe::MoleculeType::PRIMARY_LOOP) {
+        CHECK(chainEnds[0] == chainEnds[1]);
+        CHECK(chain.getChainEnds(2, false).size() == 1);
+      }
+    }
+  } else {
+    std::cout << "Skipping test: file " << suspectedPath << " not found."
+              << std::endl;
+  }
+}
