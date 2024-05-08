@@ -2081,3 +2081,22 @@ TEST_CASE("MEHP Force Balance correctly re-aligns Slip-Links to Images",
     }
   }
 }
+
+TEST_CASE("Particular MEHP Force Balance Example",
+          "[analysis][MEHPForceBalance]")
+{
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  CHECK(universeSeq.getLength() == 0);
+  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+
+  std::string inputFile = suspectedPath + "crosslinked_p_1_0.5_melt_100_a_158_100_xlinks_v_13.V-fixed.structure.out-equilibration_do_crosslink.structure.out";
+  if (std::filesystem::exists(inputFile)) {
+    std::cout << "Reading file " << inputFile << std::endl;
+    universeSeq.initializeFromDataSequence({ { inputFile } });
+    pe::Universe universe = universeSeq.atIndex(0);
+    std::cout << "Read file " << inputFile << std::endl;
+
+    pcm::MEHPForceBalance forceBalancer = pcm::MEHPForceBalance(universe, 2, false, 1.0, true, false);
+    CHECK_NOTHROW(forceBalancer.runForceRelaxation());
+  }
+}
