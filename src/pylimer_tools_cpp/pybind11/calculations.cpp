@@ -610,7 +610,7 @@ init_pylimer_bound_calc(py::module_& m)
   py::class_<mehp::MEHPForceBalance>(m, "MEHPForceBalance", R"pbdoc(
     A small simulation tool for quickly minimizing the force between the cross-linker beads.
      )pbdoc")
-    .def(py::init<pe::Universe, int, bool, double, bool>(),
+    .def(py::init<pe::Universe, int, bool, double, bool, bool>(),
          R"pbdoc(
           Instantiate the simulator for a certain universe.
 
@@ -619,12 +619,14 @@ init_pylimer_bound_calc(py::module_& m)
           :param is2D: Whether to ignore the z direction.
           :param kappa: the spring constant
           :param remove_2functionalCrosslinkers: whether to keep or remove the 2-functional crosslinkers when setting up the network
+          :param remove_dangling_chains: whether to keep or remove obviously dangling chains when setting up the network
           )pbdoc",
          py::arg("universe"),
          py::arg("crosslinker_type") = 2,
          py::arg("is_2d") = false,
          py::arg("kappa") = 1.0,
-         py::arg("remove_2functional_crosslinkers") = true)
+         py::arg("remove_2functional_crosslinkers") = true,
+         py::arg("remove_dangling_chains") = false)
     .def("__copy__",
          [](const mehp::MEHPForceBalance& self) {
            return mehp::MEHPForceBalance(self);

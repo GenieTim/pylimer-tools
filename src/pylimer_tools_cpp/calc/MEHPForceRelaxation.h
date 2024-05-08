@@ -533,7 +533,9 @@ namespace calc {
           bool addChain = false;
           if (crossLinkerChains[i].getType() ==
               pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
-            assert(xlinkersOfChain.size() == 2);
+            RUNTIME_EXP_IFN(xlinkersOfChain.size() == 2,
+                            "Expected 2 cross-linkers in network strand, got " +
+                              std::to_string(xlinkersOfChain.size()) + ".");
             addChain = true;
             nodeIdxFrom = atomIdToNode.at(xlinkersOfChain[0].getId());
             nodeIdxTo = atomIdToNode.at(xlinkersOfChain[1].getId());
@@ -543,9 +545,13 @@ namespace calc {
               crossLinkerChains[i].getNrOfBonds();
           } else if (crossLinkerChains[i].getType() ==
                      pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
-            assert(xlinkersOfChain.size() == 1 ||
-                   (xlinkersOfChain.size() == 2 &&
-                    xlinkersOfChain[0].getId() == xlinkersOfChain[1].getId()));
+            RUNTIME_EXP_IFN(
+              xlinkersOfChain.size() == 1 ||
+                (xlinkersOfChain.size() == 2 &&
+                 xlinkersOfChain[0].getId() == xlinkersOfChain[1].getId()),
+              "Expected to find 1 (or 2 equal) cross-linker in primary loop. "
+              "Found " +
+                std::to_string(xlinkersOfChain.size()) + ".");
 
             nodeIdxFrom = atomIdToNode.at(xlinkersOfChain[0].getId());
             nodeIdxTo = nodeIdxFrom;
@@ -558,10 +564,15 @@ namespace calc {
                      !removeDanglingChains) {
             // to keep dangling chains, we convert the trailing atom to a
             // cross-link
-            assert(xlinkersOfChain.size() == 1);
+            RUNTIME_EXP_IFN(xlinkersOfChain.size() == 1,
+                            "Expected 1 cross-linker in dangling strand, got " +
+                              std::to_string(xlinkersOfChain.size()) + ".");
             std::vector<pylimer_tools::entities::Atom> endsOfChain =
               crossLinkerChains[i].getAtomsOfDegree(1);
-            assert(endsOfChain.size() == 2);
+            RUNTIME_EXP_IFN(
+              endsOfChain.size() == 2,
+              "Expected 2 atoms with degree 1 for dangling strand, got " +
+                std::to_string(endsOfChain.size()) + ".");
 
             nodeIdxFrom = atomIdToNode.at(endsOfChain[0].getId());
             nodeIdxTo = atomIdToNode.at(endsOfChain[1].getId());
