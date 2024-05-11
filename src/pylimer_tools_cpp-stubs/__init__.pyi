@@ -1032,7 +1032,7 @@ class MEHPForceBalance:
         """
     def __copy__(self) -> MEHPForceBalance:
         ...
-    def __init__(self, universe: Universe, crosslinker_type: int = 2, is_2d: bool = False, kappa: float = 1.0, remove_2functional_crosslinkers: bool = True) -> None:
+    def __init__(self, universe: Universe, crosslinker_type: int = 2, is_2d: bool = False, kappa: float = 1.0, remove_2functional_crosslinkers: bool = True, remove_dangling_chains: bool = False) -> None:
         """
                   Instantiate the simulator for a certain universe.
         
@@ -1041,6 +1041,7 @@ class MEHPForceBalance:
                   :param is2D: Whether to ignore the z direction.
                   :param kappa: the spring constant
                   :param remove_2functionalCrosslinkers: whether to keep or remove the 2-functional crosslinkers when setting up the network
+                  :param remove_dangling_chains: whether to keep or remove obviously dangling chains when setting up the network
         """
     def add_sliplinks(self, strand_idx_1: list[int], strand_idx_2: list[int], x: list[float], y: list[float], z: list[float], alpha_1: list[float], alpha_2: list[float], clamp_alpha: bool = False) -> None:
         """
@@ -1896,6 +1897,8 @@ class Molecule:
     def get_strand_ends(self, crosslinker_type: int = 2, close_loop: bool = False) -> list[Atom]:
         """
                   Get the ends of the given strand (= molecule).
+                  In case of a primary loop, the cross-link is returned, if there is one.
+                  Use the argument `close_loop` to decide, whether this should be returned once or twice.
         
                   NOTE: 
                        Currently only works for linear strands.
@@ -2689,6 +2692,13 @@ class UniverseSequence:
     def compute_msd_for_atoms(self, atom_ids: list[int], nr_of_origins: int = 25, reduce_memory: bool = False) -> dict[int, float]:
         """
                   Compute the mean square displacement for atoms with the specified ids
+        """
+    def compute_vector_from_to_atoms(self, atom_ids_from: list[int], atom_ids_to: list[int], reduce_memory: bool = False) -> list[numpy.ndarray]:
+        """
+                  Compute the (unwrapped!) distances for the given pair of atoms.
+                  
+                  Can be used to somewhat faster compute e.g. all the end-to-end or bond vectors.
+                  Pay attention that the image flags are correct, otherwise, this data may not be useable.
         """
     def forget_at_index(self, index: int) -> None:
         """
