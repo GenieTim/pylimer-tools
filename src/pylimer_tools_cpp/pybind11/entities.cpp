@@ -1169,6 +1169,17 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("atom_ids_from"),
          py::arg("atom_ids_to"),
          py::arg("reduce_memory") = false)
+    .def("compute_vector_from_to_atoms",
+         &UniverseSequence::computeVectorFromToAtoms,
+         R"pbdoc(
+          Compute the (unwrapped!) distances for the given pair of atoms.
+          
+          Can be used to somewhat faster compute e.g. all the end-to-end or bond vectors.
+          Pay attention that the image flags are correct, otherwise, this data may not be useable.
+         )pbdoc",
+         py::arg("atom_ids_from"),
+         py::arg("atom_ids_to"),
+         py::arg("reduce_memory") = false)
     // operators
     .def(
       "__getitem__",

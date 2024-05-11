@@ -48,6 +48,10 @@ namespace entities {
       const std::vector<long int>& atomIdsFrom,
       const std::vector<long int>& atomIdsTo,
       bool reduceMemory = false);
+    std::vector<Eigen::Vector3d> computeVectorFromToAtoms(
+      const std::vector<long int>& atomIdsFrom,
+      const std::vector<long int>& atomIdsTo,
+      bool reduceMemory = false);
 
   protected:
     size_t index = 0; // current index of the iterator
