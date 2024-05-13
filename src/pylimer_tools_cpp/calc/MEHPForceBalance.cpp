@@ -108,8 +108,9 @@ namespace calc {
                                                  this->currentDisplacements,
                                                  oneOverSpringPartitions);
       const double minN = this->initialConfig.springsContourLength.minCoeff();
-      std::cout << "Starting force balance procedure " << "with "
-                << initialResidual << " as initial residual, got requested "
+      std::cout << "Starting force balance procedure "
+                << "with " << initialResidual
+                << " as initial residual, got requested "
                 << initialResidualToUse
                 // "with " << independentVertexSets.size() << "vertex sets."
                 << std::endl;
@@ -1139,14 +1140,17 @@ namespace calc {
                             i,
                           "The spring numbering seems incorrect. Placing "
                           "slip-links will lead to inappropriate placement.");
-#ifndef NDEBUG
+          // #ifndef NDEBUG
           std::vector<pylimer_tools::entities::Atom> chainEnds =
             crossLinkerChains[i].getChainEnds(this->crossLinkerType, true);
-          assert(this->initialConfig.oldAtomIds
-                   [this->initialConfig.linkIndicesOfSprings[springId][0]] ==
-                 chainEnds[0].getId());
-          assert(chainEnds[0].getId() == atoms[0].getId());
-#endif
+          RUNTIME_EXP_IFN(
+            this->initialConfig.oldAtomIds
+                [this->initialConfig.linkIndicesOfSprings[springId][0]] ==
+              chainEnds[0].getId(),
+            "Atom ends are inconsistent when sampling.");
+          RUNTIME_EXP_IFN(chainEnds[0].getId() == atoms[0].getId(),
+                          "Atom ends are inconsistent when sampling.");
+          // #endif
           springId += 1;
         }
       }
@@ -2603,8 +2607,11 @@ namespace calc {
           (remainingPartialSpringIdx > removedPartialSpringIdx ? -1 : 0);
         Eigen::Vector3d newDistance = this->evaluatePartialSpringDistanceFrom(
           net, u, newSpringIdx, otherEndOfRemovedSpring, this->is2D);
-        if (!pylimer_tools::utils::vector_approx_equal(
-              newDistance, distanceBefore, 1e-5)) {
+        if (!(pylimer_tools::utils::vector_approx_equal(
+                newDistance, distanceBefore, 1e-5) ||
+              (this->isLoopingSpring(net, newSpringIdx) &&
+               pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
+                 newDistance, -1. * distanceBefore, 1e-5)))) {
           throw std::runtime_error(
             "After merging two springs, the overall distance "
             "is not consistent. Expected distance " +
@@ -3704,8 +3711,9 @@ namespace calc {
       }
       if (rotations >= 5) {
         std::cerr << "Could not rotate slip-link " << slipLinkIdx
-                  << " back to initial spring. " << "Initial spring was "
-                  << fullSpringIdx << ", whereas current springs are "
+                  << " back to initial spring. "
+                  << "Initial spring was " << fullSpringIdx
+                  << ", whereas current springs are "
                   << pylimer_tools::utils::join(
                        net.springIndicesOfLinks[slipLinkIdx].begin(),
                        net.springIndicesOfLinks[slipLinkIdx].end(),
@@ -4295,9 +4303,9 @@ namespace calc {
       std::cout << "Swapping link " << linkIdx1 << " and " << linkIdx2
                 << " on partial spring " << partialSpringIdx
                 << ". Newly linked partial springs: " << otherPartialOfLinkIdx1
-                << " (" << unaffectedEnd1 << ") " << " and "
-                << otherPartialOfLinkIdx2 << " (" << unaffectedEnd2 << ") "
-                << std::endl;
+                << " (" << unaffectedEnd1 << ") "
+                << " and " << otherPartialOfLinkIdx2 << " (" << unaffectedEnd2
+                << ") " << std::endl;
 
       Eigen::VectorXd u = Eigen::VectorXd::Zero(net.coordinates.size());
       Eigen::Vector3d distanceBefore =
