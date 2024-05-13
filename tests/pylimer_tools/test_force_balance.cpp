@@ -1955,6 +1955,7 @@ TEST_CASE(
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
         universe, 1000, 2.0, 100, 5, "my_seed_fb12");
+    forceBalancer.configAssumeBoxLargeEnough(false);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
     double initialResidual = forceBalancer.getDisplacementResidualNorm();
     CHECK(std::isfinite(initialResidual));
@@ -1972,6 +1973,10 @@ TEST_CASE(
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalancer.getNrOfActiveSprings() == 0);
     CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
+
+    double pressBefore = forceBalancer.getPressure();
+    forceBalancer.configAssumeBoxLargeEnough(true);
+    CHECK(pressBefore >= forceBalancer.getPressure());
   }
 }
 
@@ -2104,6 +2109,37 @@ TEST_CASE("Particular MEHP Force Balance Example",
 
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance(universe, 2, false, 1.0, true, false);
+    forceBalancer.configAssumeBoxLargeEnough(true);
     CHECK_NOTHROW(forceBalancer.runForceRelaxation());
+
+    double pressBefore = forceBalancer.getPressure();
+    forceBalancer.configAssumeBoxLargeEnough(false);
+    CHECK(pressBefore <= forceBalancer.getPressure());
+  }
+}
+
+TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
+{
+
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  CHECK(universeSeq.getLength() == 0);
+  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+
+  std::string inputFile =
+    suspectedPath + "crosslinked_p_0.98_melt_100_a_38_50_xlinks_v_22.structure."
+                    "out-equilibration_do_crosslink.structure.out";
+  if (std::filesystem::exists(inputFile)) {
+    std::cout << "Reading file " << inputFile << std::endl;
+    universeSeq.initializeFromDataSequence({ { inputFile } });
+    pe::Universe universe = universeSeq.atIndex(0);
+    std::cout << "Read file " << inputFile << std::endl;
+
+    pcm::MEHPForceBalance forceBalancer =
+      pcm::MEHPForceBalance(universe, 2, false, 1.0, true, false);
+    forceBalancer.randomlyAddSliplinks(30, 6.0, 25, 3.0, false, 281930401);
+
+    pcm::MEHPForceBalance forceBalancer2 =
+      pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+        universe, 30, 6.0, 25, 3.0, "281930401");
   }
 }
