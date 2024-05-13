@@ -2,8 +2,11 @@
 #include "../../src/pylimer_tools_cpp/entities/Box.h"
 #include <catch2/catch_test_macros.hpp>
 
+#include <iostream>
+
 TEST_CASE("Segment Intersection is found", "[TopologyCalc]")
 {
+  std::cout << "Running test \"Segment Intersection is found\"" << std::endl;
   REQUIRE(1 == 2 - 1);
   Eigen::Vector3d vertex1;
   vertex1 << -1.0, -1.0, 0.0;

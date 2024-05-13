@@ -34,6 +34,7 @@ TEST_CASE("Certain configurations do not lead to memory corruption",
 
 TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
 {
+  std::cout << "Running test \"Universe can be generated\"" << std::endl;
   pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(10.0, 10.0, 10.0);
   generator.setSeed(8804);
   generator.setBeadDistance(0.964);
@@ -113,6 +114,7 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
 
 TEST_CASE("Large Universe can be generated", "[generator][MCUniverseGenerator]")
 {
+  std::cout << "Running test \"Large Universe can be generated\"" << std::endl;
 
   pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(10.0, 10.0, 10.0);
   generator.setSeed(8804);

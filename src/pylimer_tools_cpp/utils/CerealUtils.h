@@ -154,7 +154,7 @@ CEREAL_SAVE_FUNCTION_NAME(Archive& ar, igraph_vector_int_t const& vec)
 {
   size_type n = igraph_vector_int_size(&vec);
   ar(make_size_tag(n));
-  for (size_type i = 0; i < n; ++i) {
+  for (igraph_integer_t i = 0; i < n; ++i) {
     ar(igraph_vector_int_get(&vec, i));
   }
 }
@@ -166,7 +166,7 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, igraph_vector_int_t& vec)
   size_type n;
   ar(make_size_tag(n));
   igraph_vector_int_resize(&vec, n);
-  for (size_type i = 0; i < n; ++i) {
+  for (igraph_integer_t i = 0; i < n; ++i) {
     long int val;
     ar(val);
     igraph_vector_int_set(&vec, i, val);
@@ -179,7 +179,7 @@ CEREAL_SAVE_FUNCTION_NAME(Archive& ar, igraph_vector_t const& vec)
 {
   size_type n = igraph_vector_size(&vec);
   ar(make_size_tag(n));
-  for (size_type i = 0; i < n; ++i) {
+  for (igraph_integer_t i = 0; i < n; ++i) {
     ar(igraph_vector_get(&vec, i));
   }
 }
@@ -191,7 +191,7 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, igraph_vector_t& vec)
   size_type n;
   ar(make_size_tag(n));
   igraph_vector_resize(&vec, n);
-  for (size_type i = 0; i < n; ++i) {
+  for (igraph_integer_t i = 0; i < n; ++i) {
     double val;
     ar(val);
     igraph_vector_set(&vec, i, val);
@@ -204,7 +204,7 @@ CEREAL_SAVE_FUNCTION_NAME(Archive& ar, igraph_strvector_t const& vec)
 {
   size_type n = igraph_strvector_size(&vec);
   ar(make_size_tag(n));
-  for (size_type i = 0; i < n; ++i) {
+  for (igraph_integer_t i = 0; i < n; ++i) {
     std::string val = igraph_strvector_get(&vec, i);
     ar(val);
   }
@@ -219,7 +219,7 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, igraph_strvector_t& vec)
   igraph_strvector_resize(&vec, n);
   std::string val;
   val.reserve(50);
-  for (size_type i = 0; i < n; ++i) {
+  for (igraph_integer_t i = 0; i < n; ++i) {
     val.clear();
     ar(val);
     igraph_strvector_set(&vec, i, val.c_str());
@@ -270,12 +270,12 @@ CEREAL_SAVE_FUNCTION_NAME(Archive& ar,
   }
 
   // serizalize vertex attributes
-  size_type numVertexAttributes = igraph_strvector_size(&vnames);
+  igraph_integer_t numVertexAttributes = igraph_strvector_size(&vnames);
   assert(igraph_strvector_size(&vnames) == igraph_vector_int_size(&vtypes));
   ar(make_nvp("vertex_attr_names", vnames));
   ar(make_nvp("vertex_attr_types", vtypes));
   //   ar(make_size_tag(numVertexAttributes));
-  for (size_t i = 0; i < numVertexAttributes; i++) {
+  for (igraph_integer_t i = 0; i < numVertexAttributes; i++) {
     const char* name = igraph_strvector_get(&vnames, i);
     std::string namestr = std::string(name);
     switch (igraph_vector_int_get(&vtypes, i)) {
@@ -307,12 +307,12 @@ CEREAL_SAVE_FUNCTION_NAME(Archive& ar,
   }
 
   // serizalize edge attributes
-  size_type numEdgeAttributes = igraph_strvector_size(&enames);
+  igraph_integer_t numEdgeAttributes = igraph_strvector_size(&enames);
   assert(igraph_strvector_size(&enames) == igraph_vector_int_size(&etypes));
   ar(make_nvp("edge_attr_names", enames));
   ar(make_nvp("edge_attr_types", etypes));
   //   ar(make_size_tag(numEdgeAttributes * 3));
-  for (size_t i = 0; i < numEdgeAttributes; i++) {
+  for (igraph_integer_t i = 0; i < numEdgeAttributes; i++) {
     const char* name = igraph_strvector_get(&enames, i);
     std::string namestr = std::string(name);
     switch (igraph_vector_int_get(&etypes, i)) {
@@ -380,8 +380,8 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar,
   igraph_vector_int_init(&vtypes, 1);
   ar(make_nvp("vertex_attr_types", vtypes));
 
-  size_type numVertexAttributes = igraph_vector_int_size(&vtypes);
-  for (size_t i = 0; i < numVertexAttributes; ++i) {
+  igraph_integer_t numVertexAttributes = igraph_vector_int_size(&vtypes);
+  for (igraph_integer_t i = 0; i < numVertexAttributes; ++i) {
     std::string attributeName = std::string(igraph_strvector_get(&vnames, i));
     int attributeType = igraph_vector_int_get(&vtypes, i);
     switch (attributeType) {

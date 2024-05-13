@@ -41,6 +41,7 @@ getVectorWithOne(T val)
 
 TEST_CASE("Universe can be used", "[entity][Universe]")
 {
+  std::cout << "Running test \"Universe can be used\"" << std::endl;
   REQUIRE(1 == 1);
 
   pe::Universe universe = pe::Universe(1.0, 1.0, 1.0);

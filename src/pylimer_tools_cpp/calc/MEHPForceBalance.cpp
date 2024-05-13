@@ -6163,7 +6163,7 @@ namespace calc {
         RUNTIME_EXP_IFN(net.springPartCoordinateIndexB[3 * i] % 3 == 0,
                         "Expected spring part coordinates to be sequentially "
                         "built from spring parts.");
-        for (size_t dir = 0; dir < 3; ++dir) {
+        for (int dir = 0; dir < 3; ++dir) {
           RUNTIME_EXP_IFN(
             net.springPartCoordinateIndexA[3 * i + dir] ==
               3 * partialEndA + dir,
@@ -6184,7 +6184,7 @@ namespace calc {
       /**
        * Check that we do not have any nan or inf values in our vectors
        */
-      for (size_t coordI = 0; coordI < net.coordinates.size(); coordI++) {
+      for (long int coordI = 0; coordI < net.coordinates.size(); coordI++) {
         RUNTIME_EXP_IFN(std::isfinite(net.coordinates[coordI]),
                         "Coordinate component " + std::to_string(coordI) +
                           " must be finite, got " +
@@ -6194,7 +6194,7 @@ namespace calc {
                           " must be finite, got " + std::to_string(u[coordI]) +
                           ".");
       }
-      for (size_t dir = 0; dir < 3; ++dir) {
+      for (int dir = 0; dir < 3; ++dir) {
         RUNTIME_EXP_IFN(std::isfinite(net.L[dir]),
                         "Expected box size to be finite, got " +
                           std::to_string(net.L[dir]) + " in dir " +

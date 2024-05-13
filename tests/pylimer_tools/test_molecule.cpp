@@ -18,6 +18,7 @@ namespace pe = pylimer_tools::entities;
 
 TEST_CASE("Molecules work as intended", "[entity][Molecule]")
 {
+  std::cout << "Running test \"Molecules work as intended\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -100,6 +101,8 @@ TEST_CASE("Molecules work as intended", "[entity][Molecule]")
 
 TEST_CASE("Molecules sum the bonds correctly", "[entity][Molecule]")
 {
+  std::cout << "Running test \"Molecules sum the bonds correctly\""
+            << std::endl;
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
 
   universe.addAtoms({ { 1, 2, 3, 4, 5 } },        // id
@@ -143,6 +146,8 @@ TEST_CASE("Molecules sum the bonds correctly", "[entity][Molecule]")
 
 TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
 {
+  std::cout << "Running test \"Molecules compute radius of gyration\""
+            << std::endl;
 
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
   /**
@@ -253,13 +258,13 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
 
 TEST_CASE("Strand Ends are found", "[entity][Molecule]")
 {
+  std::cout << "Running test \"Strand Ends are found\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath =
     "../pylimer_tools/fixtures/structure/crosslinked_M10000_N39_p_0.9.out";
   if (std::filesystem::exists(suspectedPath)) {
-    universeSeq.initializeFromDataSequence(
-      { { suspectedPath } });
+    universeSeq.initializeFromDataSequence({ { suspectedPath } });
     REQUIRE(universeSeq.getLength() == 1);
 
     pe::Universe universe = universeSeq.atIndex(0);

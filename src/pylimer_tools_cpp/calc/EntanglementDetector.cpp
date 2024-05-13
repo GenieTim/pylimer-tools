@@ -162,6 +162,7 @@ namespace calc {
           numLinksFoundInIteration += 1;
           neighbourList.removeAtom(a2,
                                    "After marking atom as second pair part.");
+
           if (pairsOfAtoms.size() >= nrOfSliplinksToSample) {
             break;
           }

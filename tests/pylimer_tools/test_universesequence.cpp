@@ -18,6 +18,7 @@ namespace pu = pylimer_tools::utils;
 
 TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
 {
+  std::cout << "Running test \"UniverseSequence can be used\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";

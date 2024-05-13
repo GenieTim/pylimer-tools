@@ -19,6 +19,7 @@ namespace pu = pylimer_tools::utils;
 
 TEST_CASE("Atoms can calculate distances", "[entity][Atom]")
 {
+  std::cout << "Running test \"Atoms can calculate distances\"" << std::endl;
   pe::Atom atom1 = pe::Atom(0, 0, 0.0, 0.0, 0.0, 0, 0, 0);
   pe::Box unitBox = pe::Box(1.0, 1.0, 1.0);
 
@@ -105,6 +106,7 @@ TEST_CASE("Atoms can calculate distances", "[entity][Atom]")
 
 TEST_CASE("Box can do PBC computations", "[entity][Box]")
 {
+  std::cout << "Running test \"Box can do PBC computations\"" << std::endl;
   SECTION("Positive Box")
   {
     pe::Box testBox = pe::Box(0.0, 10.0, 0.0, 10.0, 0.0, 10.0);
@@ -227,6 +229,7 @@ TEST_CASE("Box can do PBC computations", "[entity][Box]")
 
 TEST_CASE("Box can adjust coordinates", "[entity][Box]")
 {
+  std::cout << "Running test \"Box can adjust coordinates\"" << std::endl;
   pe::Box testBox = pe::Box(10.0, 10.0, 10.0);
   REQUIRE(testBox.getVolume() == Catch::Approx(10. * 10. * 10.));
 
@@ -243,6 +246,8 @@ TEST_CASE("Box can adjust coordinates", "[entity][Box]")
 
 TEST_CASE("Box works also after simple shear", "[entity][Box]")
 {
+  std::cout << "Running test \"Box works also after simple shear\""
+            << std::endl;
   pe::Box testBox = pe::Box(0.0, 10.0, 0.0, 10.0, 0.0, 10.0);
   REQUIRE(testBox == testBox);
   REQUIRE(testBox.getVolume() == Catch::Approx(10. * 10. * 10.));
@@ -307,11 +312,13 @@ TEST_CASE("Box's offset corresponds to PBC", "[entity][Box]")
 
 TEST_CASE("Box throws", "[entity][Box]")
 {
+  std::cout << "Running test \"Box throws\"" << std::endl;
   REQUIRE_THROWS(pe::Box(0.0, -1.0, 0.0, -1.0, 0.0, -1.0));
 }
 
 TEST_CASE("Box can interpolate", "[entity][Box]")
 {
+  std::cout << "Running test \"Box can interpolate\"" << std::endl;
   pe::Box box = pe::Box(10., 10., 10.);
   pe::Box target = pe::Box(20., 5., 10.);
   CHECK(box.getVolume() == Catch::Approx(target.getVolume()));
@@ -344,6 +351,7 @@ TEST_CASE("Box can interpolate", "[entity][Box]")
 
 TEST_CASE("Atoms persist state", "[entity][Atom]")
 {
+  std::cout << "Running test \"Atoms persist state\"" << std::endl;
   pe::Atom atom1 = pe::Atom(0, 0, 0.0, 0.0, 0.0, 0, 0, 0);
   pe::Atom atom2 = pe::Atom(0, 0, 0.0, 0.0, 0.0, 0, 0, 0);
   REQUIRE(atom1 == atom2);
@@ -363,6 +371,7 @@ TEST_CASE("Atoms persist state", "[entity][Atom]")
 
 TEST_CASE("CsvTokenizer works", "[utils][StringUtil]")
 {
+  std::cout << "Running test \"CsvTokenizer works\"" << std::endl;
   pu::CsvTokenizer tk1 = pu::CsvTokenizer("test, test2");
   REQUIRE(tk1.getLength() == 2);
   REQUIRE(tk1.get<std::string>(1) == "test2");
@@ -389,6 +398,7 @@ TEST_CASE("CsvTokenizer works", "[utils][StringUtil]")
 
 TEST_CASE("String utility functions work", "[utils][StringUtil]")
 {
+  std::cout << "Running test \"String utility functions work\"" << std::endl;
   REQUIRE(std::to_string("test") == "test");
   REQUIRE(pu::isUpper("TEST"));
   REQUIRE_FALSE(pu::isUpper("TeST"));
@@ -410,6 +420,7 @@ TEST_CASE("String utility functions work", "[utils][StringUtil]")
 
 TEST_CASE("Simple Cycles are found", "[utiles][GraphUtil][SimpleCycleFinder]")
 {
+  std::cout << "Running test \"Simple Cycles are found\"" << std::endl;
   // turn on attribute handling
   igraph_set_attribute_table(&igraph_cattribute_table);
 

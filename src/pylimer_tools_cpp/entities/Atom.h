@@ -18,23 +18,15 @@ namespace entities {
   class Atom
   {
   public:
-    Atom(const long int id,
-         const int type,
-         const double x,
-         const double y,
-         const double z,
-         const int nx = 0,
-         const int ny = 0,
-         const int nz = 0)
+    Atom(const long int idNow,
+         const int typeNow,
+         const double xNow,
+         const double yNow,
+         const double zNow,
+         const int nxNow = 0,
+         const int nyNow = 0,
+         const int nzNow = 0): id(idNow), type(typeNow), x(xNow), y(yNow), z(zNow), nx(nxNow), ny(nyNow), nz(nzNow)
     {
-      this->id = id;
-      this->type = type;
-      this->x = x;
-      this->y = y;
-      this->z = z;
-      this->nx = nx;
-      this->ny = ny;
-      this->nz = nz;
     };
 
     Atom(std::unordered_map<std::string, double>& properties)

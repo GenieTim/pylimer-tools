@@ -19,6 +19,7 @@ namespace pe = pylimer_tools::entities;
 
 TEST_CASE("NeighbourList works as intended", "[entity][NeighbourList]")
 {
+  std::cout << "Running test \"NeighbourList works as intended\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -61,6 +62,7 @@ TEST_CASE("NeighbourList works as intended", "[entity][NeighbourList]")
 
 TEST_CASE("Manually accurate NeighbourList", "[entity][NeighbourList]")
 {
+  std::cout << "Running test \"Manually accurate NeighbourList\"" << std::endl;
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
   const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
   universe.setBox(box);
