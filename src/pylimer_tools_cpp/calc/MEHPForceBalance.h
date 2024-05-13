@@ -2285,7 +2285,7 @@ namespace calc {
                (net.springPartIndexB[partialSpringIdx] == linkIdx);
       }
 
-      bool isPrimaryLoop(const ForceBalanceNetwork& net,
+      bool isLoopingSpring(const ForceBalanceNetwork& net,
                          size_t partialSpringIdx) const
       {
         return (net.springPartIndexA[partialSpringIdx] ==
@@ -2414,8 +2414,8 @@ namespace calc {
 
         // validation: check distances
         if (!this->assumeBoxLargeEnough &&
-            !this->isPrimaryLoop(net, resultingPartialSpringIdx) &&
-            !this->isPrimaryLoop(net, remainingPartialSpringIdx)) {
+            !this->isLoopingSpring(net, resultingPartialSpringIdx) &&
+            !this->isLoopingSpring(net, remainingPartialSpringIdx)) {
           Eigen::Vector3d distanceAfter =
             this->evaluatePartialSpringDistanceTo(net,
                                                   u,
