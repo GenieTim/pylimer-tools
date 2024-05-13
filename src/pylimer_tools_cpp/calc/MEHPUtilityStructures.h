@@ -67,9 +67,9 @@ namespace calc {
       double L[3];                    /* box sizes */
       double vol;                     /* box volume */
       double meanSpringContourLength; /* mean N */
-      long int nrOfNodes;             /* number of nodes */
-      long int nrOfSprings;           /* number of springs */
-      long int nrOfLoops;             /* loops */
+      size_t nrOfNodes = 0;           /* number of nodes */
+      size_t nrOfSprings = 0;         /* number of springs */
+      size_t nrOfLoops = 0;           /* loops */
       // coordinates & connectivity
       Eigen::VectorXd coordinates;
       Eigen::VectorXd springsContourLength; /* the N for each spring */
@@ -96,11 +96,11 @@ namespace calc {
       double boxHalfs[3];                   /* half box sizes */
       double vol = 0.0;                     /* box volume */
       double meanSpringContourLength = 0.0; /* mean N */
-      long int nrOfLinks = 0; /* number of links, = nrOfNodes + nrOfSlipLinks */
-      long int nrOfNodes = 0; /* number of crosslinkers */
-      long int nrOfSprings = 0;
-      long int nrOfPartialSprings = 0;
-      long int nrOfSpringsWithPartition = 0;
+      size_t nrOfLinks = 0; /* number of links, = nrOfNodes + nrOfSlipLinks */
+      size_t nrOfNodes = 0; /* number of crosslinkers */
+      size_t nrOfSprings = 0;
+      size_t nrOfPartialSprings = 0;
+      size_t nrOfSpringsWithPartition = 0;
       bool isUpToDate = true;
       // coordinates & connectivity
       Eigen::VectorXd coordinates;

@@ -249,7 +249,7 @@ namespace utils {
     IGRAPH_VEC##_resize(v, n);                                                 \
                                                                                \
     /* Copy all the items */                                                   \
-    for (size_t i = 0; i < n; ++i) {                                           \
+    for (igraph_integer_t i = 0; i < n; ++i) {                                 \
       IGRAPH_VEC##_set(v, i, vectR[i]);                                        \
     }                                                                          \
   }
@@ -262,7 +262,7 @@ namespace utils {
   {
     size_t n = vectR.size();
     igraph_strvector_resize(v, n);
-    for (size_t i = 0; i < n; ++i) {
+    for (igraph_integer_t i = 0; i < n; ++i) {
       igraph_strvector_set(v, i, vectR[i].c_str());
     }
   }
@@ -274,14 +274,14 @@ namespace utils {
   static inline void igraphVectorTToStdVector(IGRAPH_VEC##_t* v,               \
                                               std::vector<IN>& vectL)          \
   {                                                                            \
-    long n = IGRAPH_VEC##_size(v);                                             \
+    igraph_integer_t n = IGRAPH_VEC##_size(v);                                 \
                                                                                \
     /* Make sure that there is enough space for the items in v */              \
     vectL.clear();                                                             \
     vectL.reserve(n);                                                          \
                                                                                \
     /* Copy all the items */                                                   \
-    for (size_t i = 0; i < n; ++i) {                                           \
+    for (igraph_integer_t i = 0; i < n; ++i) {                                 \
       vectL.push_back(IGRAPH_VEC##_get(v, i));                                 \
     }                                                                          \
   }

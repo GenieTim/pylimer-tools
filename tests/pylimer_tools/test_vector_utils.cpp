@@ -19,6 +19,7 @@ namespace pu = pylimer_tools::utils;
 
 TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
 {
+  std::cout << "Running test \"Eigen behaves as required\"" << std::endl;
   SECTION("Summation works with repeated indices")
   {
     Eigen::VectorXd testVec = Eigen::VectorXd::Zero(10);
@@ -95,6 +96,7 @@ TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
 
 TEST_CASE("Vector Rows can be removed", "[Eigen]")
 {
+  std::cout << "Running test \"Vector Rows can be removed\"" << std::endl;
   SECTION("VectorXi")
   {
     Eigen::VectorXi testVec(11);
@@ -154,6 +156,8 @@ TEST_CASE("Vector Rows can be removed", "[Eigen]")
 
 TEST_CASE("Elements can be found and conditionally added", "[VectorUtils]")
 {
+  std::cout << "Running test \"Elements can be found and conditionally added\""
+            << std::endl;
   std::vector<int> testVec;
   testVec.push_back(1);
   testVec.push_back(10000);

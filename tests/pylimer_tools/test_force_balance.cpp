@@ -55,6 +55,7 @@ outputNetwork(pcm::ForceBalanceNetwork net,
 
 TEST_CASE("Particular slip-link examples", "[analysis][MEHPForceBalance]")
 {
+  std::cout << "Running test \"Particular slip-link examples\"" << std::endl;
   double L = 42.819955007276754;
   double lmda = 1.2;
   pe::Universe universe = pe::Universe(L, L, L);
@@ -143,6 +144,7 @@ TEST_CASE("Particular slip-link examples", "[analysis][MEHPForceBalance]")
 
 TEST_CASE("MC swap accept and reject work", "[analysis][MEHPForceBalance]")
 {
+  std::cout << "Running test \"MC swap accept and reject work\"" << std::endl;
   double L = 42.819955007276754;
   pe::Universe universe = pe::Universe(L, L, L);
   /**
@@ -513,6 +515,7 @@ TEST_CASE("MEHP Force Balance handles slip-link convergence correctly",
 
 TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
 {
+  std::cout << "Running test \"MEHP Force Balance runs\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -2089,14 +2092,18 @@ TEST_CASE("Particular MEHP Force Balance Example",
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
 
-  std::string inputFile = suspectedPath + "crosslinked_p_1_0.5_melt_100_a_158_100_xlinks_v_13.V-fixed.structure.out-equilibration_do_crosslink.structure.out";
+  std::string inputFile =
+    suspectedPath +
+    "crosslinked_p_1_0.5_melt_100_a_158_100_xlinks_v_13.V-fixed.structure.out-"
+    "equilibration_do_crosslink.structure.out";
   if (std::filesystem::exists(inputFile)) {
     std::cout << "Reading file " << inputFile << std::endl;
     universeSeq.initializeFromDataSequence({ { inputFile } });
     pe::Universe universe = universeSeq.atIndex(0);
     std::cout << "Read file " << inputFile << std::endl;
 
-    pcm::MEHPForceBalance forceBalancer = pcm::MEHPForceBalance(universe, 2, false, 1.0, true, false);
+    pcm::MEHPForceBalance forceBalancer =
+      pcm::MEHPForceBalance(universe, 2, false, 1.0, true, false);
     CHECK_NOTHROW(forceBalancer.runForceRelaxation());
   }
 }

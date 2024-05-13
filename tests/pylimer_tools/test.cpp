@@ -2,16 +2,19 @@
 
 #define CATCH_CONFIG_MAIN
 #include <catch2/catch_test_macros.hpp>
+#include <iostream>
 #include <unordered_map>
 #include <vector>
 
 TEST_CASE("TESTS ARE RUN", "[general]")
 {
+  std::cout << "Running test \"TESTS ARE RUN\"" << std::endl;
   REQUIRE(1 == 2 - 1);
 }
 
 TEST_CASE("std::map behaves as expected", "[general]")
 {
+  std::cout << "Running test \"std::map behaves as expected\"" << std::endl;
   std::unordered_map<size_t, size_t> testMap;
   std::vector<size_t> zeros = { 0, 0, 0, 0, 0 };
   CHECK(testMap.emplace(0, 100).second == true);

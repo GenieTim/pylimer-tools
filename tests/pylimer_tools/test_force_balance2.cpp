@@ -484,6 +484,7 @@ TEST_CASE("MEHP Force Balance 2 handles slip-link convergence correctly",
 
 TEST_CASE("MEHP Force Balance 2 runs", "[analysis][MEHPForceBalance2][long]")
 {
+  std::cout << "Running test \"MEHP Force Balance 2 runs\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";

@@ -247,7 +247,7 @@ namespace entities {
 
       // first, scale back to non-sheared.
       if (this->shearDirection >= 0 && this->shearDirection <= 3) {
-        for (size_t i = 0; i < coords.size() / 3; ++i) {
+        for (int i = 0; i < coords.size() / 3; ++i) {
           if (this->getShearDirection() == 0) {
             coords[3 * i] -=
               this->getShearMagnitude() * coords[3 * i + 1]; // x' = x + ɣ*y
@@ -264,7 +264,7 @@ namespace entities {
       }
 
       // actually do the deformation as appropriate
-      for (size_t i = 0; i < coords.size() / 3; ++i) {
+      for (int i = 0; i < coords.size() / 3; ++i) {
         coords[3 * i] *= scalingFactorX;
         coords[3 * i + 1] *= scalingFactorY;
         coords[3 * i + 2] *= scalingFactorZ;
@@ -293,7 +293,7 @@ namespace entities {
                            "Require distances to be a multiple of 3 to handle "
                            "PBC for sheared box.");
         // scaled coordinates in the initial cubic box
-        for (size_t j = 0; j < distances.size() / 3; ++j) {
+        for (int j = 0; j < distances.size() / 3; ++j) {
           if (this->getShearDirection() == 0) {
             distances[3 * j] -=
               this->getShearMagnitude() * distances[3 * j + 1];
@@ -313,7 +313,7 @@ namespace entities {
       // back to the physical space
       if (isSheared) {
         // scaled coordinates in the initial cubic box
-        for (size_t j = 0; j < distances.size() / 3; ++j) {
+        for (int j = 0; j < distances.size() / 3; ++j) {
           if (this->getShearDirection() == 0) {
             distances[3 * j] +=
               this->getShearMagnitude() * distances[3 * j + 1];

@@ -20,6 +20,7 @@ namespace pcm = pylimer_tools::calc::mehp;
 
 TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
 {
+  std::cout << "Running test \"Force Balance Benchmarks\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";

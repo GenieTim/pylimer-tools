@@ -21,6 +21,7 @@ namespace pe = pylimer_tools::entities;
 
 TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
 {
+  std::cout << "Running test \"FileParsers can be used\"" << std::endl;
   std::string suspectedPath = "../pylimer_tools/fixtures/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
@@ -120,6 +121,7 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
 
 TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
 {
+  std::cout << "Running test \"Writers can be used\"" << std::endl;
   std::string suspectedPath = "../pylimer_tools/fixtures/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 
@@ -190,6 +192,7 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
 
 TEST_CASE("AveFileReader works", "[AveFileReader][io][utils]")
 {
+  std::cout << "Running test \"AveFileReader works\"" << std::endl;
   std::string suspectedPath = "../pylimer_tools/fixtures/";
   REQUIRE(std::filesystem::exists(suspectedPath));
   pu::AveFileReader reader =
