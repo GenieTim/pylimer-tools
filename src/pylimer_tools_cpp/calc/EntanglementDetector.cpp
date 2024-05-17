@@ -162,7 +162,7 @@ namespace calc {
           numLinksFoundInIteration += 1;
           neighbourList.removeAtom(a2,
                                    "After marking atom as second pair part.");
-
+          // std::cout << "Merging atoms " << a1.getId() << " and " << a2.getId() << " with distance " << a1.distanceTo(a2, universe.getBox()) << std::endl;
           if (pairsOfAtoms.size() >= nrOfSliplinksToSample) {
             break;
           }

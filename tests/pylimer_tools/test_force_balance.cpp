@@ -2120,14 +2120,12 @@ TEST_CASE("Particular MEHP Force Balance Example",
 
 TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
 {
-
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
 
   std::string inputFile =
-    suspectedPath + "crosslinked_p_0.98_melt_100_a_38_50_xlinks_v_22.structure."
-                    "out-equilibration_do_crosslink.structure.out";
+    suspectedPath + "crosslinked_p_0.99145_0.99145_melt_10000_a_3_5000_xlinks_v_1.V-fixed.structure.out-equilibration_do_crosslink.structure.out";
   if (std::filesystem::exists(inputFile)) {
     std::cout << "Reading file " << inputFile << std::endl;
     universeSeq.initializeFromDataSequence({ { inputFile } });
@@ -2136,10 +2134,20 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
 
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance(universe, 2, false, 1.0, true, false);
-    forceBalancer.randomlyAddSliplinks(30, 6.0, 25, 3.0, false, 281930401);
-
+      forceBalancer2.configAssumeBoxLargeEnough(true);
+    forceBalancer.randomlyAddSliplinks(100, 6.0, 90, 3.0, false, 281930401);
+    
     pcm::MEHPForceBalance forceBalancer2 =
+      pcm::MEHPForceBalance(universe, 2, false, 1.0, true, false);
+      forceBalancer2.configAssumeBoxLargeEnough(false);
+    forceBalancer2.randomlyAddSliplinks(100, 6.0, 90, 3.0, false, 281930401);
+
+    CHECK(forceBalancer.getPressure() <= forceBalancer2.getPressure());    
+
+    pcm::MEHPForceBalance forceBalancer3 =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-        universe, 30, 6.0, 25, 3.0, "281930401");
+        universe, 100, 6.0, 90, 3.0, "281930401");
+
+    CHECK_THAT(forceBalancer3.getPressure(), Catch::Matcher::WithinRel(forceBalancer2.getPressure(), 2.));
   }
 }
