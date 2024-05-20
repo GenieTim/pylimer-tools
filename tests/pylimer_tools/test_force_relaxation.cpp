@@ -140,6 +140,9 @@ testGradient(pcm::MEHPForceEvaluator* forceEvaluator)
 TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
           "[analysis][MEHPForceRelaxation][SimpleSpringMEHPForceEvaluator]")
 {
+  std::cout
+    << "Running test \"MEHP Force Relaxation2 computes correct gradients\""
+    << std::endl;
   SECTION("Test SimpleSpringMEHPForceEvaluator force gradient")
   {
     pcm::SimpleSpringMEHPForceEvaluator forceEvaluatorInstance =
@@ -158,6 +161,8 @@ TEST_CASE("MEHP Force Relaxation2 computes correct gradients",
 TEST_CASE("MEHP Force Relaxation does not collapse",
           "[analysis][MEHPForceRelaxation][SimpleSpringMEHPForceEvaluator]")
 {
+  std::cout << "Running test \"MEHP Force Relaxation does not collapse\""
+            << std::endl;
 
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
   /**
@@ -229,6 +234,7 @@ TEST_CASE(
   "MEHP Force Relaxation2 runs",
   "[analysis][MEHPForceRelaxation][SimpleSpringMEHPForceEvaluator][long]")
 {
+  std::cout << "Running test \"MEHP Force Relaxation2 runs\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -431,6 +437,9 @@ TEST_CASE(
   "MEHP Force Relaxation2 runs with non-gaussian force evaluator",
   "[analysis][MEHPForceRelaxation][NonGaussianSpringForceEvaluator][long]")
 {
+  std::cout << "Running test \"MEHP Force Relaxation2 runs with non-gaussian "
+               "force evaluator\""
+            << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -564,6 +573,9 @@ TEST_CASE(
   "MEHP Force Relaxation2 runs with Langevin force evaluator and non-network",
   "[analysis][MEHPForceRelaxation][NonGaussianSpringForceEvaluator]")
 {
+  std::cout << "Running test \"MEHP Force Relaxation2 runs with Langevin force "
+               "evaluator and non-network\""
+            << std::endl;
   return;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
@@ -590,6 +602,7 @@ TEST_CASE(
 TEST_CASE("Inverse Langevin test",
           "[analysis][MEHPForceRelaxation][NonGaussianSpringForceEvaluator]")
 {
+  std::cout << "Running test \"Inverse Langevin test\"" << std::endl;
   // simple test to make sure the inverse langevin approximation is fine
   CHECK_THAT(pcm::langevin_inv(0.01),
              Catch::Matchers::WithinRel(0.0300018, 0.02));
@@ -609,6 +622,9 @@ TEST_CASE("Inverse Langevin test",
 TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
           "[analysis][MEHPForceRelaxation][NonGaussianSpringForceEvaluator]")
 {
+  std::cout
+    << "Running test \"Manual NonGaussianSpringForceEvaluator gradient test\""
+    << std::endl;
   // return;
   // setup network
   pcm::Network net;
@@ -801,6 +817,8 @@ TEST_CASE("Free chains collapse",
 TEST_CASE("Fully active chains are fully active",
           "[analysis][MEHPForceRelaxation]")
 {
+  std::cout << "Running test \"Fully active chains are fully active\""
+            << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   REQUIRE(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/structure/";

@@ -2286,7 +2286,7 @@ namespace calc {
       }
 
       bool isLoopingSpring(const ForceBalanceNetwork& net,
-                         size_t partialSpringIdx) const
+                           size_t partialSpringIdx) const
       {
         return (net.springPartIndexA[partialSpringIdx] ==
                 net.springPartIndexB[partialSpringIdx]);

@@ -122,6 +122,7 @@ runBenchmarkWithConfig(double neighbourBinSize = 1.0,
 TEST_CASE("Eigen Neighbourlist Benchmark",
           "[benchmark][EigenNeighbourList][long]")
 {
+  std::cout << "Running test \"Eigen Neighbourlist Benchmark\"" << std::endl;
   // for (double outerCutoff = 0.5; outerCutoff <= 2.5; outerCutoff += 0.5) {
   //   for (double innerCutoff = 0.5 * outerCutoff; innerCutoff <= 2 *
   //   outerCutoff;

@@ -596,6 +596,9 @@ TEST_CASE("New PBC computation is correct", "[analysis][DPDSimulator][1proc]")
 TEST_CASE("For large systems the PBC method does not matter",
           "[analysis][DPDSimulator][1proc][long]")
 {
+  std::cout
+    << "Running test \"For large systems the PBC method does not matter\""
+    << std::endl;
   std::string suspectedPath = "../pylimer_tools/fixtures/";
   REQUIRE(std::filesystem::exists(suspectedPath));
 

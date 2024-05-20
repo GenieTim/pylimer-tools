@@ -25,9 +25,15 @@ namespace entities {
          const double zNow,
          const int nxNow = 0,
          const int nyNow = 0,
-         const int nzNow = 0): id(idNow), type(typeNow), x(xNow), y(yNow), z(zNow), nx(nxNow), ny(nyNow), nz(nzNow)
-    {
-    };
+         const int nzNow = 0)
+      : id(idNow)
+      , type(typeNow)
+      , x(xNow)
+      , y(yNow)
+      , z(zNow)
+      , nx(nxNow)
+      , ny(nyNow)
+      , nz(nzNow) {};
 
     Atom(std::unordered_map<std::string, double>& properties)
       : Atom(static_cast<long int>(std::lround(properties["id"])),

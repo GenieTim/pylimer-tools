@@ -54,7 +54,7 @@ namespace calc {
     {
 
     private:
-      DPDSimulator(){}; // not exposed to users, only used by Cereal
+      DPDSimulator() {}; // not exposed to users, only used by Cereal
       friend class cereal::access;
 
       ////////////////////////////////////////////////////////////////

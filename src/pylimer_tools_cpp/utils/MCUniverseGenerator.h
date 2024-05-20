@@ -228,7 +228,8 @@ namespace utils {
               if (dist >= ((double)beadsPerChains[nrOfStrandsAdded]) *
                             this->beadDistance) {
                 std::cout << "Got too far off link: " << targetIdx << " for "
-                          << i << " has dist " << dist << "" << "" << std::endl;
+                          << i << " has dist " << dist << ""
+                          << "" << std::endl;
               }
             }
             if (isDanglingStrand || targetIdx == -1 ||
