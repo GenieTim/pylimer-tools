@@ -11,7 +11,7 @@ namespace utils {
   {
   public:
     AveFileReader(const std::string& file)
-      : filePath(file){};
+      : filePath(file) {};
 
     std::vector<std::string> getColumnNames();
     int getNrOfRows();

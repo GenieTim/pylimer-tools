@@ -45,6 +45,9 @@ outputNetwork(pcm::ForceBalanceNetwork net, Eigen::VectorXd springPartitions)
 TEST_CASE("MEHP Force Balance 2 Particular slip-link examples",
           "[analysis][MEHPForceBalance2]")
 {
+  std::cout
+    << "Running test \"MEHP Force Balance 2 Particular slip-link examples\""
+    << std::endl;
   double L = 42.819955007276754;
   double lmda = 1.2;
   pe::Universe universe = pe::Universe(L, L, L);
@@ -116,6 +119,9 @@ TEST_CASE("MEHP Force Balance 2 Particular slip-link examples",
 TEST_CASE("MEHP Force Balance 2 MC swap accept and reject work",
           "[analysis][MEHPForceBalance2]")
 {
+  std::cout
+    << "Running test \"MEHP Force Balance 2 MC swap accept and reject work\""
+    << std::endl;
   double L = 42.819955007276754;
   pe::Universe universe = pe::Universe(L, L, L);
   /**
@@ -212,6 +218,9 @@ TEST_CASE(
   "MEHP Force Balance 2 MC swap accept and reject work with crosslinkers",
   "[analysis][MEHPForceBalance2]")
 {
+  std::cout << "Running test \"MEHP Force Balance 2 MC swap accept and reject "
+               "work with crosslinkers\""
+            << std::endl;
   double L = 42.819955007276754;
   pe::Universe universe = pe::Universe(L, L, L);
   /**
@@ -304,6 +313,9 @@ TEST_CASE(
 TEST_CASE("MEHP Force Balance 2 handles slip-links on primary loops",
           "[analysis][MEHPForceBalance2]")
 {
+  std::cout << "Running test \"MEHP Force Balance 2 handles slip-links on "
+               "primary loops\""
+            << std::endl;
   pe::Universe universe =
     pe::Universe(42.819955007276754, 42.819955007276754, 42.819955007276754);
   /**
@@ -413,6 +425,9 @@ TEST_CASE("MEHP Force Balance 2 handles slip-links on primary loops",
 TEST_CASE("MEHP Force Balance 2 handles slip-link convergence correctly",
           "[analysis][MEHPForceBalance2]")
 {
+  std::cout << "Running test \"MEHP Force Balance 2 handles slip-link "
+               "convergence correctly\""
+            << std::endl;
   pe::Universe universe =
     pe::Universe(42.819955007276754, 42.819955007276754, 42.819955007276754);
   /**
@@ -799,6 +814,9 @@ TEST_CASE(
   "MEHP Force Balance 2 can randomly add slip-links ignoring crosslinkers",
   "[analysis][MEHPForceBalance2]")
 {
+  std::cout << "Running test \"MEHP Force Balance 2 can randomly add "
+               "slip-links ignoring crosslinkers\""
+            << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -840,6 +858,9 @@ TEST_CASE(
 TEST_CASE("MEHP Force Balance 2 can run with swapping slip-links",
           "[analysis][MEHPForceBalance2][long]")
 {
+  std::cout
+    << "Running test \"MEHP Force Balance 2 can run with swapping slip-links\""
+    << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -897,6 +918,9 @@ TEST_CASE("MEHP Force Balance 2 can run with swapping slip-links",
 TEST_CASE("MEHP Force Balance 2 can randomly add and remove slip-links",
           "[analysis][MEHPForceBalance2]")
 {
+  std::cout << "Running test \"MEHP Force Balance 2 can randomly add and "
+               "remove slip-links\""
+            << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -963,6 +987,8 @@ TEST_CASE("MEHP Force Balance 2 can randomly add and remove slip-links",
 TEST_CASE("MEHP Force Balance handles slip-links",
           "[analysis][MEHPForceBalance2]")
 {
+  std::cout << "Running test \"MEHP Force Balance handles slip-links\""
+            << std::endl;
   // construct an example network
   pe::Universe universe = pe::Universe(1.0, 1.0, 1.0);
   /**
@@ -1222,6 +1248,8 @@ TEST_CASE(
   "MEHP Force Balance runs with non-network",
   "[analysis][MEHPForceBalance2][NonGaussianSpringForceEvaluator][long]")
 {
+  std::cout << "Running test \"MEHP Force Balance runs with non-network\""
+            << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -1343,6 +1371,8 @@ TEST_CASE("MEHP Force Balance 2 Free chains collapse",
 TEST_CASE("MEHP Force Balance 2 does not collapse",
           "[analysis][MEHPForceBalance2]")
 {
+  std::cout << "Running test \"MEHP Force Balance 2 does not collapse\""
+            << std::endl;
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
   /**
    * @brief A grid of two rows, each one bead between the two crosslinkers
@@ -1413,6 +1443,9 @@ TEST_CASE("MEHP Force Balance 2 does not collapse",
 TEST_CASE("MEHP Force Balance 2 Fully active chains are fully active",
           "[analysis][MEHPForceBalance2]")
 {
+  std::cout << "Running test \"MEHP Force Balance 2 Fully active chains are "
+               "fully active\""
+            << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/structure/";

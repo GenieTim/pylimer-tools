@@ -229,6 +229,9 @@ TEST_CASE("MC swap accept and reject work", "[analysis][MEHPForceBalance]")
 TEST_CASE("MC swap accept and reject work with crosslinkers",
           "[analysis][MEHPForceBalance]")
 {
+  std::cout
+    << "Running test \"MC swap accept and reject work with crosslinkers\""
+    << std::endl;
   double L = 42.819955007276754;
   pe::Universe universe = pe::Universe(L, L, L);
   /**
@@ -302,6 +305,9 @@ TEST_CASE("MC swap accept and reject work with crosslinkers",
 TEST_CASE("MEHP Force Balance handles slip-links on primary loops",
           "[analysis][MEHPForceBalance]")
 {
+  std::cout
+    << "Running test \"MEHP Force Balance handles slip-links on primary loops\""
+    << std::endl;
   pe::Universe universe =
     pe::Universe(42.819955007276754, 42.819955007276754, 42.819955007276754);
   /**
@@ -409,6 +415,9 @@ TEST_CASE("MEHP Force Balance handles slip-links on primary loops",
 TEST_CASE("MEHP Force Balance handles slip-link convergence correctly",
           "[analysis][MEHPForceBalance]")
 {
+  std::cout << "Running test \"MEHP Force Balance handles slip-link "
+               "convergence correctly\""
+            << std::endl;
   pe::Universe universe =
     pe::Universe(42.819955007276754, 42.819955007276754, 42.819955007276754);
   /**
@@ -826,6 +835,9 @@ TEST_CASE(
   "MEHP Force Balance can randomly add slip-links ignoring crosslinkers",
   "[analysis][MEHPForceBalance]")
 {
+  std::cout << "Running test \"MEHP Force Balance can randomly add slip-links "
+               "ignoring crosslinkers\""
+            << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -876,6 +888,9 @@ TEST_CASE(
 TEST_CASE("MEHP Force Balance can run with swapping slip-links",
           "[analysis][MEHPForceBalance][long]")
 {
+  std::cout
+    << "Running test \"MEHP Force Balance can run with swapping slip-links\""
+    << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -986,6 +1001,9 @@ TEST_CASE(
   "MEHP Force Balance can randomly add and remove slip-links with large box",
   "[analysis][MEHPForceBalance]")
 {
+  std::cout << "Running test \"MEHP Force Balance can randomly add and remove "
+               "slip-links with large box\""
+            << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -1061,6 +1079,9 @@ TEST_CASE(
   "MEHP Force Balance can randomly add and remove slip-links with small box",
   "[analysis][MEHPForceBalance]")
 {
+  std::cout << "Running test \"MEHP Force Balance can randomly add and remove "
+               "slip-links with small box\""
+            << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -1135,6 +1156,8 @@ TEST_CASE(
 TEST_CASE("MEHP Force Balance handles slip-links",
           "[analysis][MEHPForceBalance]")
 {
+  std::cout << "Running test \"MEHP Force Balance handles slip-links\""
+            << std::endl;
   // construct an example network
   pe::Universe universe = pe::Universe(1.0, 1.0, 1.0);
   /**
@@ -1410,6 +1433,8 @@ TEST_CASE("MEHP Force Balance handles slip-links",
 TEST_CASE("MEHP Force Balance runs with non-network",
           "[analysis][MEHPForceBalance][NonGaussianSpringForceEvaluator][long]")
 {
+  std::cout << "Running test \"MEHP Force Balance runs with non-network\""
+            << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
@@ -1519,6 +1544,9 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
 TEST_CASE("MEHP Force Balance Fully active chains are fully active",
           "[analysis][MEHPForceBalance]")
 {
+  std::cout << "Running test \"MEHP Force Balance Fully active chains are "
+               "fully active\""
+            << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
@@ -1720,6 +1748,10 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC "
 TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
           "[analysis][MEHPForceBalance][long]")
 {
+  std::cout << "Running test \"MEHP Force Balance Gives Identical Results for "
+               "Different PBC p = 1\""
+            << std::endl;
+
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
@@ -1846,6 +1878,9 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
 TEST_CASE("MEHP Force Balance does not collapse",
           "[analysis][MEHPForceBalance]")
 {
+  std::cout << "Running test \"MEHP Force Balance does not collapse\""
+            << std::endl;
+
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
   /**
    * @brief A grid of two rows, each one bead between the two crosslinkers
@@ -1941,6 +1976,9 @@ TEST_CASE(
   "MEHP Force Balance correctly collapses melts even with random slip-links",
   "[analysis][MEHPForceBalance]")
 {
+  std::cout << "Running test \"MEHP Force Balance correctly collapses melts "
+               "even with random slip-links\""
+            << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
@@ -1983,6 +2021,10 @@ TEST_CASE(
 TEST_CASE("MEHP Force Balance correctly re-aligns Slip-Links to Images",
           "[analysis][MEHPForceBalance]")
 {
+  std::cout << "Running test \"MEHP Force Balance correctly re-aligns "
+               "Slip-Links to Images\""
+            << std::endl;
+
   // it does not really matter with what structure we start...
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
 
@@ -2093,6 +2135,11 @@ TEST_CASE("MEHP Force Balance correctly re-aligns Slip-Links to Images",
 TEST_CASE("Particular MEHP Force Balance Example",
           "[analysis][MEHPForceBalance]")
 {
+  std::cout << "Running test \"Particular MEHP Force Balance Example\""
+            << std::endl;
+  std::cout << "Running test \"Particular MEHP Force Balance Example\""
+            << std::endl;
+
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
@@ -2120,34 +2167,51 @@ TEST_CASE("Particular MEHP Force Balance Example",
 
 TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
 {
+  std::cout << "Running test \"Random sampling example\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
 
   std::string inputFile =
-    suspectedPath + "crosslinked_p_0.99145_0.99145_melt_10000_a_3_5000_xlinks_v_1.V-fixed.structure.out-equilibration_do_crosslink.structure.out";
+    suspectedPath +
+    "crosslinked_p_0.99145_0.99145_melt_10000_a_3_5000_xlinks_v_1.V-fixed."
+    "structure.out-equilibration_do_crosslink.structure.out";
   if (std::filesystem::exists(inputFile)) {
     std::cout << "Reading file " << inputFile << std::endl;
     universeSeq.initializeFromDataSequence({ { inputFile } });
     pe::Universe universe = universeSeq.atIndex(0);
     std::cout << "Read file " << inputFile << std::endl;
 
+    // generate the same slip-links twice,
+    // once for each assumption
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance(universe, 2, false, 1.0, true, false);
-      forceBalancer2.configAssumeBoxLargeEnough(true);
-    forceBalancer.randomlyAddSliplinks(100, 6.0, 90, 3.0, false, 281930401);
-    
+    forceBalancer.configAssumeBoxLargeEnough(true);
+    forceBalancer.randomlyAddSliplinks(1000, 6.0, 900, 3.0, false, 281930401);
+
     pcm::MEHPForceBalance forceBalancer2 =
       pcm::MEHPForceBalance(universe, 2, false, 1.0, true, false);
-      forceBalancer2.configAssumeBoxLargeEnough(false);
-    forceBalancer2.randomlyAddSliplinks(100, 6.0, 90, 3.0, false, 281930401);
+    forceBalancer2.configAssumeBoxLargeEnough(false);
+    forceBalancer2.randomlyAddSliplinks(1000, 6.0, 900, 3.0, false, 281930401);
 
-    CHECK(forceBalancer.getPressure() <= forceBalancer2.getPressure());    
+    CHECK(forceBalancer.getPressure() <= forceBalancer2.getPressure());
+    // it is actually thinkable that the following fails for certain sceanarios.
+    // however, in general, it should not
+    CHECK(forceBalancer.getDisplacementResidualNorm(1.) <=
+          forceBalancer2.getDisplacementResidualNorm(1.));
+    CHECK(forceBalancer.getDisplacementResidualNorm(-1.) <=
+          forceBalancer2.getDisplacementResidualNorm(-1.));
+    // TODO: add a check to make sure the slip-links are actually placed
+    // identically
 
     pcm::MEHPForceBalance forceBalancer3 =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-        universe, 100, 6.0, 90, 3.0, "281930401");
+        universe, 1000, 6.0, 900, 3.0, "281930401");
 
-    CHECK_THAT(forceBalancer3.getPressure(), Catch::Matcher::WithinRel(forceBalancer2.getPressure(), 2.));
+    CHECK_THAT(forceBalancer3.getPressure(),
+               Catch::Matchers::WithinRel(forceBalancer2.getPressure(), 0.75));
+    CHECK_THAT(forceBalancer3.getDisplacementResidualNorm(),
+               Catch::Matchers::WithinRel(
+                 forceBalancer2.getDisplacementResidualNorm(), 0.75));
   }
 }

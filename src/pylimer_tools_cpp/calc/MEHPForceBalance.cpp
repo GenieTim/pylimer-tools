@@ -1298,7 +1298,9 @@ namespace calc {
           continue;
         }
         // take the mean and their index etc. to add as slip-link
-        // std::cout << "OMerging atoms " << a1.getId() << " and " << a2.getId() << " with distance " << a1.distanceTo(a2, universe.getBox()) << std::endl;
+        // std::cout << "OMerging atoms " << a1.getId() << " and " << a2.getId()
+        // << " with distance " << a1.distanceTo(a2, universe.getBox()) <<
+        // std::endl;
         Eigen::Vector3d meanPositions = a1.meanPositionWith(a2, box);
         slipLinkXs.push_back(meanPositions[0]);
         slipLinkYs.push_back(meanPositions[1]);

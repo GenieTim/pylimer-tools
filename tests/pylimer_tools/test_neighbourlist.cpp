@@ -95,6 +95,8 @@ TEST_CASE("Manually accurate NeighbourList", "[entity][NeighbourList]")
 TEST_CASE("Random coordinates EigenNeighbourList",
           "[entity][EigenNeighbourList][long]")
 {
+  std::cout << "Running test \"Random coordinates EigenNeighbourList\""
+            << std::endl;
   int numAtoms = 8300;
   Eigen::VectorXd coordinates = Eigen::VectorXd::Random(numAtoms * 3) * 100.;
   pe::Box box = pe::Box(14, 14, 14);
@@ -151,6 +153,8 @@ TEST_CASE("Random coordinates EigenNeighbourList",
 TEST_CASE("Manually accurate EigenNeighbourList",
           "[entity][EigenNeighbourList]")
 {
+  std::cout << "Running test \"Manually accurate EigenNeighbourList\""
+            << std::endl;
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
   const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
   universe.setBox(box);
