@@ -140,72 +140,23 @@ namespace utils {
       }
     }
 
-    // Then, read bonds
-    if (this->nBonds > 0) {
-      this->skipLinesToContains(line, file, "Bonds");
-      // skip this line too
-      if (!getline(file, line)) {
-        throw std::runtime_error(
-          "Data file ended too early. Not able to read any bonds.");
+    // read the rest of the file
+    while (!file.peek() != EOF) {
+      this->skipLinesToContains(
+        line, file, { "Bonds", "Angles", "Dihedrals", "Velocities" });
+
+      if (file.peek() == EOF) {
+        break;
       }
-      // then, skip empty lines
-      this->skipEmptyLines(line, file);
 
-      for (int i = 0; i < this->nBonds; i++) {
-        this->readBond(line);
-
-        if (!getline(file, line) && i + 1 < this->nBonds) {
-          throw std::runtime_error(
-            "Data file ended too early. Not enough bonds read. Read " +
-            std::to_string(i + 1) + " of " + std::to_string(this->nBonds) +
-            " expected bonds.");
-        }
-      }
-    }
-    // Then, read angles
-    if (this->nAngles > 0) {
-      this->skipLinesToContains(line, file, "Angles");
-      // skip this line too
-      if (!getline(file, line)) {
-        throw std::runtime_error(
-          "Data file ended too early. Not able to read any angles.");
-      }
-      // then, skip empty lines
-      this->skipEmptyLines(line, file);
-
-      for (int i = 0; i < this->nAngles; i++) {
-        this->readAngle(line);
-
-        if (!getline(file, line) && i + 1 < this->nAngles) {
-          throw std::runtime_error(
-            "Data file ended too early. Not enough angles read. Read " +
-            std::to_string(i + 1) + " of " + std::to_string(this->nAngles) +
-            " expected angles.");
-        }
-      }
-    }
-
-    // then, read dihedral angles
-    if (this->nDihedralAngles > 0) {
-      this->skipLinesToContains(line, file, "Dihedrals");
-      // skip this line too
-      if (!getline(file, line)) {
-        throw std::runtime_error(
-          "Data file ended too early. Not able to read any dihedral angles.");
-      }
-      // then, skip empty lines
-      this->skipEmptyLines(line, file);
-
-      for (int i = 0; i < this->nDihedralAngles; i++) {
-        this->readDihedralAngle(line);
-
-        if (!getline(file, line) && i + 1 < this->nDihedralAngles) {
-          throw std::runtime_error("Data file ended too early. Not enough "
-                                   "dihedral angles read. Read " +
-                                   std::to_string(i + 1) + " of " +
-                                   std::to_string(this->nDihedralAngles) +
-                                   " expected angles.");
-        }
+      if (contains(line, "Bonds")) {
+        this->readBonds(file, line);
+      } else if (contains(line, "Angles")) {
+        this->readAngles(file, line);
+      } else if (contains(line, "Dihedrals")) {
+        this->readDihedralAngles(file, line);
+      } else if (contains(line, "Velocities")) {
+        this->readVelocities(file, line);
       }
     }
 
@@ -223,6 +174,20 @@ namespace utils {
       }
     } while (getline(file, line));
   }
+
+  void DataFileParser::skipLinesToContains(
+    std::string& line,
+    std::ifstream& file,
+    const std::vector<std::string>& upToEitherOr)
+  {
+    do {
+      for (const std::string& upTo : upToEitherOr) {
+        if (contains(line, upTo)) {
+          return;
+        }
+      }
+    } while (getline(file, line));
+  };
 
   void DataFileParser::skipEmptyLines(std::string& line, std::ifstream& file)
   {
@@ -423,6 +388,28 @@ namespace utils {
     }
   }
 
+  void DataFileParser::readBonds(std::ifstream& file, std::string& line)
+  {
+    // skip this line too
+    if (!getline(file, line)) {
+      throw std::runtime_error(
+        "Data file ended too early. Not able to read any bonds.");
+    }
+    // then, skip empty lines
+    this->skipEmptyLines(line, file);
+
+    for (int i = 0; i < this->nBonds; i++) {
+      this->readBond(line);
+
+      if (!getline(file, line) && i + 1 < this->nBonds) {
+        throw std::runtime_error(
+          "Data file ended too early. Not enough bonds read. Read " +
+          std::to_string(i + 1) + " of " + std::to_string(this->nBonds) +
+          " expected bonds.");
+      }
+    }
+  }
+
   void DataFileParser::readBond(const std::string& line)
   {
     size_t bondId, bondType, bondFrom, bondTo;
@@ -432,6 +419,28 @@ namespace utils {
     this->bondTypes.push_back(bondType);
     this->bondFrom.push_back(bondFrom);
     this->bondTo.push_back(bondTo);
+  }
+
+  void DataFileParser::readAngles(std::ifstream& file, std::string& line)
+  {
+    // skip this line too
+    if (!getline(file, line)) {
+      throw std::runtime_error(
+        "Data file ended too early. Not able to read any angles.");
+    }
+    // then, skip empty lines
+    this->skipEmptyLines(line, file);
+
+    for (int i = 0; i < this->nAngles; i++) {
+      this->readAngle(line);
+
+      if (!getline(file, line) && i + 1 < this->nAngles) {
+        throw std::runtime_error(
+          "Data file ended too early. Not enough angles read. Read " +
+          std::to_string(i + 1) + " of " + std::to_string(this->nAngles) +
+          " expected angles.");
+      }
+    }
   }
 
   void DataFileParser::readAngle(const std::string& line)
@@ -450,6 +459,30 @@ namespace utils {
     this->angleFrom.push_back(newAngleFrom);
     this->angleVia.push_back(newAngleVia);
     this->angleTo.push_back(newAngleTo);
+  }
+
+  void DataFileParser::readDihedralAngles(std::ifstream& file,
+                                          std::string& line)
+  {
+    // skip this line too
+    if (!getline(file, line)) {
+      throw std::runtime_error(
+        "Data file ended too early. Not able to read any dihedral angles.");
+    }
+    // then, skip empty lines
+    this->skipEmptyLines(line, file);
+
+    for (int i = 0; i < this->nDihedralAngles; i++) {
+      this->readDihedralAngle(line);
+
+      if (!getline(file, line) && i + 1 < this->nDihedralAngles) {
+        throw std::runtime_error("Data file ended too early. Not enough "
+                                 "dihedral angles read. Read " +
+                                 std::to_string(i + 1) + " of " +
+                                 std::to_string(this->nDihedralAngles) +
+                                 " expected angles.");
+      }
+    }
   }
 
   void DataFileParser::readDihedralAngle(const std::string& line)
@@ -471,6 +504,58 @@ namespace utils {
     this->dihedralAngleVia1.push_back(newAngleVia1);
     this->dihedralAngleVia2.push_back(newAngleVia2);
     this->dihedralAngleTo.push_back(newAngleTo);
+  }
+
+  void DataFileParser::readVelocities(std::ifstream& file, std::string& line)
+  {
+    // skip this line too
+    if (!getline(file, line)) {
+      throw std::runtime_error("Data file ended too early. Not able to read "
+                               "any advertised velocities.");
+    }
+    // then, skip empty lines
+    this->skipEmptyLines(line, file);
+    std::unordered_map<size_t, size_t> atomIdToIdx;
+    std::vector<double> unorderedVx, unorderedVy, unorderedVz;
+    unorderedVx.reserve(this->nAtoms);
+    unorderedVy.reserve(this->nAtoms);
+    unorderedVz.reserve(this->nAtoms);
+    // start reading, assuming as many as atoms
+    for (size_t i = 0; i < this->nAtoms; ++i) {
+      size_t atomId;
+      double vx, vy, vz;
+      sscanf(line.c_str(), "%zu %le %le %le", &atomId, &vx, &vy, &vz);
+      unorderedVx.push_back(vx);
+      unorderedVy.push_back(vy);
+      unorderedVz.push_back(vz);
+      atomIdToIdx[atomId] = i;
+
+      if (!getline(file, line) && i + 1 < this->nAtoms) {
+        throw std::runtime_error("Data file ended too early. Not enough "
+                                 "velocities read. Read " +
+                                 std::to_string(i + 1) + " of " +
+                                 std::to_string(this->nAtoms) +
+                                 " expected velocities.");
+      }
+    }
+    assert(unorderedVx.size() == this->nAtoms);
+
+    // re-order for the other stuff
+    std::vector<double> orderedVx, orderedVy, orderedVz;
+    orderedVx.reserve(this->nAtoms);
+    orderedVy.reserve(this->nAtoms);
+    orderedVz.reserve(this->nAtoms);
+
+    for (size_t i = 0; i < this->nAtoms; ++i) {
+      size_t realIdx = atomIdToIdx.at(this->atomIds[i]);
+      orderedVx.push_back(unorderedVx[realIdx]);
+      orderedVy.push_back(unorderedVy[realIdx]);
+      orderedVz.push_back(unorderedVz[realIdx]);
+    }
+
+    this->additionalAtomData["vx"] = orderedVx;
+    this->additionalAtomData["vy"] = orderedVy;
+    this->additionalAtomData["vz"] = orderedVz;
   }
 } // namespace utils
 } // namespace pylimer_tools

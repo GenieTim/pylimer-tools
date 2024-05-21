@@ -568,6 +568,13 @@ init_pylimer_bound_entities(py::module_& m)
           )pbdoc",
          py::arg("atom_id"),
          py::arg("replacement_atom"))
+    .def("resample_velocities",
+         &Universe::resampleVelocities,
+         R"pbdoc()pbdoc",
+         py::arg("mean"),
+         py::arg("variance"),
+         py::arg("seed") = "",
+         py::arg("is_2d") = false)
     .def("add_bonds",
          py::overload_cast<const std::vector<long int>&,
                            const std::vector<long int>&>(&Universe::addBonds),
@@ -1011,6 +1018,12 @@ init_pylimer_bound_entities(py::module_& m)
          "Compute the dz distance for certain bonds (length in z direction).",
          py::arg("atomIdsTo"),
          py::arg("atomIdsFrom"))
+    .def(
+      "compute_temperature",
+      &Universe::computeTemperature,
+      R"pbdoc(Use the velocities per atom to compute the temperature from the kinetic energy of the system.)pbdoc",
+      py::arg("dimensions") = 3,
+      py::arg("k_b") = 1.)
     .def("simplify",
          &Universe::simplify,
          "Remove self links and double bonds. This function is called "

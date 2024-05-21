@@ -5,6 +5,8 @@
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/matchers/catch_matchers_vector.hpp>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -44,8 +46,17 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
     universeSeq.initializeFromDataSequence(
       { { suspectedPath + "lammps_data_file.out" } });
     REQUIRE(universeSeq.getLength() == 1);
-    REQUIRE(universeSeq.atIndex(0).getNrOfAtoms() == 3000);
-    REQUIRE(universeSeq.atIndex(0).getNrOfBonds() == 2900);
+
+    pe::Universe universe = universeSeq.atIndex(0);
+
+    REQUIRE(universe.getNrOfAtoms() == 3000);
+    REQUIRE(universe.getNrOfBonds() == 2900);
+
+    pe::Atom atom1695 = universe.getAtom(1695);
+    CHECK(atom1695.getProperty("vx") == Catch::Approx(1.6776911155131486));
+    CHECK(atom1695.getProperty("vy") == Catch::Approx(-1.4719491031793053));
+    CHECK_THAT(atom1695.getProperty("vz"), Catch::Matchers::WithinAbs(0., 1e-10));
+    CHECK(universe.computeTemperature(2) == Catch::Approx(4.1503370363));
   }
 
   SECTION("Empty dump files throw")

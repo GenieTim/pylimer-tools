@@ -154,7 +154,7 @@ namespace entities {
       return this->extraData;
     }
 
-    double getProperty(std::string& property) const
+    double getProperty(const std::string property) const
     {
       return this->extraData.at(property);
     }

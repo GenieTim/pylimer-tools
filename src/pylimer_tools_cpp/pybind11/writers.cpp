@@ -40,6 +40,14 @@ init_pylimer_bound_writers(py::module_& m)
            Default: true.
       )pbdoc",
          py::arg("include_dihedral_angles") = true)
+    .def("config_include_velocities",
+         &DataFileWriter::configIncludeVelocities,
+         R"pbdoc(
+           Set whether to include the velocities from the universe (if any) in the file or not.
+
+           Default: true.
+      )pbdoc",
+         py::arg("include_velocities") = true)
     .def("config_reindex_atoms",
          &DataFileWriter::configReindexAtoms,
          R"pbdoc(

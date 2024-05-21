@@ -303,6 +303,32 @@ namespace entities {
     }
   }
 
+  void Universe::resampleVelocities(double mean,
+                                    double variance,
+                                    std::string seed,
+                                    bool is2d)
+  {
+    // initialize randomness
+    std::mt19937 e2;
+    if (seed == "") {
+      std::random_device rd;
+      e2 = std::mt19937(rd());
+    } else {
+      std::seed_seq seed2(seed.begin(), seed.end());
+      e2 = std::mt19937(seed2);
+    }
+
+    std::normal_distribution<double> dist(mean, variance);
+
+    for (igraph_integer_t i = 0; i < this->NAtoms; ++i) {
+      igraph_cattribute_VAN_set(&this->graph, "vx", i, dist(e2));
+      igraph_cattribute_VAN_set(&this->graph, "vy", i, dist(e2));
+      if (!is2d) {
+        igraph_cattribute_VAN_set(&this->graph, "vz", i, dist(e2));
+      }
+    }
+  }
+
   void Universe::removeAtoms(const std::vector<long int>& ids)
   {
     igraph_vector_int_t vertexIds;
@@ -421,7 +447,12 @@ namespace entities {
   {
     if (from.size() != to.size() || from.size() != NNewBonds ||
         (bondTypes.size() != NNewBonds && bondTypes.size() != 0)) {
-      throw std::invalid_argument("All bond inputs must have the same size.");
+      throw std::invalid_argument(
+        "All bond inputs must have the same size. Got " +
+        std::to_string(from.size()) + " atoms from, " +
+        std::to_string(to.size()) + " to, and " +
+        std::to_string(bondTypes.size()) + " types, alleged " +
+        std::to_string(NNewBonds) + ".");
     }
     std::vector<long int> newEdgesVector =
       pylimer_tools::utils::interleave(from, to);
@@ -2269,6 +2300,23 @@ namespace entities {
 
     return results;
   };
+
+  double Universe::computeTemperature(const int dimensions,
+                                      const double kb) const
+  {
+    std::vector<Atom> atoms = this->getAtoms();
+    double kineticEnergy = 0.;
+    for (const Atom& atom : atoms) {
+      Eigen::Vector3d velocity;
+      velocity << atom.getProperty("vx"), atom.getProperty("vy"),
+        atom.getProperty("vz");
+      kineticEnergy +=
+        0.5 * this->massPerType.at(atom.getType()) * velocity.squaredNorm();
+    }
+
+    return kineticEnergy /
+           ((static_cast<double>(dimensions) / 2.) * (atoms.size()) * kb);
+  }
 
   /**
    * @brief Get the mean number of beads between beads with the passed type
