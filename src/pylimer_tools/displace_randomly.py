@@ -27,12 +27,12 @@ def cli(file, max_displacement):
         new_atom = Atom(
             atom.get_id(),
             atom.get_type(),
-            atom.getX() + (random.random() - 0.5) * max_displacement,
-            atom.getY() + (random.random() - 0.5) * max_displacement,
-            atom.getZ() + (random.random() - 0.5) * max_displacement,
-            atom.getNX(),
-            atom.getNY(),
-            atom.getNZ()
+            atom.get_x() + (random.random() - 0.5) * max_displacement,
+            atom.get_y() + (random.random() - 0.5) * max_displacement,
+            atom.get_z() + (random.random() - 0.5) * max_displacement,
+            atom.get_nx(),
+            atom.get_ny(),
+            atom.get_nz()
         )
         universe.replace_atom(atom.get_id(), new_atom)
 

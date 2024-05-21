@@ -23,38 +23,38 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
 {
   std::cout << "Running test \"FileParsers can be used\"" << std::endl;
   std::string suspectedPath = "../pylimer_tools/fixtures/";
-  REQUIRE(std::filesystem::exists(suspectedPath));
+  CHECK(std::filesystem::exists(suspectedPath));
 
   SECTION("Reading from dump file works")
   {
     pu::DumpFileParser parser =
       pu::DumpFileParser(suspectedPath + "lammps_dump_small.lammpstrj");
-    REQUIRE_THROWS(parser.hasKey("BOX BOUNDS"));
-    REQUIRE(parser.getLength() == 1);
-    REQUIRE_NOTHROW(parser.read());
-    REQUIRE(parser.getLength() == 1);
-    REQUIRE_THROWS(parser.readNGroups(1, 10));
-    REQUIRE_THROWS(parser.readNGroups(10, 1));
-    REQUIRE_THROWS(parser.getValuesForAt<int>(0, "BOX BOUNDS", "notexisting"));
+    CHECK_THROWS(parser.hasKey("BOX BOUNDS"));
+    CHECK(parser.getLength() == 1);
+    CHECK_NOTHROW(parser.read());
+    CHECK(parser.getLength() == 1);
+    CHECK_THROWS(parser.readNGroups(1, 10));
+    CHECK_THROWS(parser.readNGroups(10, 1));
+    CHECK_THROWS(parser.getValuesForAt<int>(0, "BOX BOUNDS", "notexisting"));
     // call copy constructor
     pu::DumpFileParser parser2 = parser;
-    REQUIRE(parser2.getLength() == 1);
+    CHECK(parser2.getLength() == 1);
 
     // test other reading capabilities
     pu::DumpFileParser parser3 =
       pu::DumpFileParser(suspectedPath + "lammps_dump_small.lammpstrj");
-    REQUIRE(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1).size() == 3);
-    REQUIRE_THROWS(parser.getValuesForAt<double>(0, "NOT EXISTING", 9));
+    CHECK(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1).size() == 3);
+    CHECK_THROWS(parser.getValuesForAt<double>(0, "NOT EXISTING", 9));
 
     // test throws
-    REQUIRE_THROWS(pu::DumpFileParser("not-existing-file.out"));
+    CHECK_THROWS(pu::DumpFileParser("not-existing-file.out"));
 
     // test without atoms
     pu::DumpFileParser parser4 = pu::DumpFileParser(
       suspectedPath + "lammps_dump_small_no_atoms.lammpstrj");
-    REQUIRE(parser4.getLength() == 1);
-    REQUIRE(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1).size() == 3);
-    REQUIRE(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1)[0] ==
+    CHECK(parser4.getLength() == 1);
+    CHECK(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1).size() == 3);
+    CHECK(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1)[0] ==
             4.8545999999999999e+01);
   }
 
@@ -62,18 +62,20 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
   {
     pu::DataFileParser parser = pu::DataFileParser();
     parser.read(suspectedPath + "lammps_data_file.out");
-    REQUIRE(parser.getNrOfAtoms() == 3000);
+    CHECK(parser.getNrOfAtoms() == 3000);
+
     // call copy constructor
     pu::DataFileParser parser2 = pu::DataFileParser();
     parser2 = parser;
-    REQUIRE(parser2.getNrOfAtoms() == 3000);
+    CHECK(parser2.getNrOfAtoms() == 3000);
     // test throws
-    REQUIRE_THROWS(parser.read("not-existing-file.out"));
+    CHECK_THROWS(parser.read("not-existing-file.out"));
 
     // test angles reading
     pu::DataFileParser parser3 = pu::DataFileParser();
     parser3.read(suspectedPath + "lammps_data_file_small_wangles.out");
-    REQUIRE(parser3.getNrOfAngles() == 1);
+    CHECK(parser3.getNrOfAngles() == 1);
+
 
     // BENCHMARK("DataFileParserOld")
     // {
@@ -95,9 +97,9 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
     pu::DumpFileParser parser =
       pu::DumpFileParser(suspectedPath + "big_dump_file.lammpstrj");
     // pre-read multiple
-    REQUIRE_NOTHROW(parser.readNGroups(9, 12));
-    REQUIRE(parser.hasKey("BOX BOUNDS") == true);
-    REQUIRE(parser.hasKey("NO EXISTING") == false);
+    CHECK_NOTHROW(parser.readNGroups(9, 12));
+    CHECK(parser.hasKey("BOX BOUNDS") == true);
+    CHECK(parser.hasKey("NO EXISTING") == false);
 
     // pu::DumpFileParser2 parser5 =
     //   pu::DumpFileParser2(suspectedPath + "big_dump_file.lammpstrj");
@@ -123,7 +125,7 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
 {
   std::cout << "Running test \"Writers can be used\"" << std::endl;
   std::string suspectedPath = "../pylimer_tools/fixtures/";
-  REQUIRE(std::filesystem::exists(suspectedPath));
+  CHECK(std::filesystem::exists(suspectedPath));
 
   SECTION("Files are read and written")
   {
@@ -145,11 +147,11 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
                        angles["angle_via"],
                        angles["angle_to"],
                        angleTypes);
-    REQUIRE(universe.getNrOfAngles() > 0);
+    CHECK(universe.getNrOfAngles() > 0);
 
     // add dihedrals
     auto detectedAngles = universe.detectDihedralAngles();
-    REQUIRE(detectedAngles["dihedral_angle_from"].size() > 0);
+    CHECK(detectedAngles["dihedral_angle_from"].size() > 0);
     std::vector<int> dihedralAngleTypes;
     dihedralAngleTypes.reserve(detectedAngles["dihedral_angle_from"].size());
     for (size_t i = 0; i < detectedAngles["dihedral_angle_from"].size(); i++) {
@@ -180,10 +182,10 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
     seq.initializeFromDataSequence({ { fileToWrite } });
     pe::Universe readUniverse = seq.atIndex(0);
 
-    REQUIRE(universe.getNrOfAtoms() == readUniverse.getNrOfAtoms());
-    REQUIRE(universe.getNrOfBonds() == readUniverse.getNrOfBonds());
-    REQUIRE(universe.getNrOfAngles() == readUniverse.getNrOfAngles());
-    REQUIRE(universe.getNrOfDihedralAngles() ==
+    CHECK(universe.getNrOfAtoms() == readUniverse.getNrOfAtoms());
+    CHECK(universe.getNrOfBonds() == readUniverse.getNrOfBonds());
+    CHECK(universe.getNrOfAngles() == readUniverse.getNrOfAngles());
+    CHECK(universe.getNrOfDihedralAngles() ==
             readUniverse.getNrOfDihedralAngles());
 
     std::filesystem::remove(fileToWrite);
@@ -194,7 +196,7 @@ TEST_CASE("AveFileReader works", "[AveFileReader][io][utils]")
 {
   std::cout << "Running test \"AveFileReader works\"" << std::endl;
   std::string suspectedPath = "../pylimer_tools/fixtures/";
-  REQUIRE(std::filesystem::exists(suspectedPath));
+  CHECK(std::filesystem::exists(suspectedPath));
   pu::AveFileReader reader =
     pu::AveFileReader(suspectedPath + "example_avg_file.out.avg.txt");
 

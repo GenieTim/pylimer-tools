@@ -98,15 +98,24 @@ namespace utils {
                         AtomStyle style1,
                         AtomStyle style2);
     // bonds, angles, etc.
+    void readBonds(std::ifstream& file, std::string& line);
     void readBond(const std::string& line);
+    void readAngles(std::ifstream& file, std::string& line);
     void readAngle(const std::string& line);
+    void readDihedralAngles(std::ifstream& file, std::string& line);
     void readDihedralAngle(const std::string& line);
+    // additional atom data
+    void readVelocities(std::ifstream& file, std::string& line);
 
     // utilities
     static void skipEmptyLines(std::string& line, std::ifstream& file);
     static void skipLinesToContains(std::string& line,
                                     std::ifstream& file,
                                     std::string upTo);
+    static void skipLinesToContains(
+      std::string& line,
+      std::ifstream& file,
+      const std::vector<std::string>& upToEitherOr);
 
     template<typename OUT>
     inline std::vector<OUT> parseTypesInLine(const std::string& line,

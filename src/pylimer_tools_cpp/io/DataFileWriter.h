@@ -32,13 +32,17 @@ namespace utils {
     {
       this->universe = u;
     }
-    void configIncludeAngles(const bool includeAngles)
+    void configIncludeAngles(const bool doIncludeAngles)
     {
-      this->includeAngles = includeAngles;
+      this->includeAngles = doIncludeAngles;
     }
-    void configIncludeDihedralAngles(const bool includeDihedralAngles)
+    void configIncludeDihedralAngles(const bool doIncludeDihedralAngles)
     {
-      this->includeDihedralAngles = includeDihedralAngles;
+      this->includeDihedralAngles = doIncludeDihedralAngles;
+    }
+    void configIncludeVelocities(const bool includeV)
+    {
+      this->includeVelocities = includeV;
     }
     void configMoveIntoBox(const bool doMoveIntoBox = true)
     {
@@ -179,6 +183,21 @@ namespace utils {
       // write atoms
       this->writeAtoms(file);
 
+      if (this->includeVelocities &&
+          this->universe.vertexPropertyExists("vx")) {
+        std::vector<pylimer_tools::entities::Atom> atoms = this->universe.getAtoms();
+
+        file << "Velocities\n\n";
+        // we could reduce some memory here by directly querying the properties
+        for (pylimer_tools::entities::Atom& atom : atoms) {
+          file << "\t" << atom.getId() << "\t" << atom.getProperty("vx") << "\t"
+               << atom.getProperty("vy") << "\t" << atom.getProperty("vz")
+               << "\n";
+        }
+
+        file << "\n";
+      }
+
       // write bonds
       file << "Bonds\n\n";
       for (size_t i = 0; i < this->universe.getNrOfBonds(); ++i) {
@@ -234,8 +253,10 @@ namespace utils {
     // properties
     pylimer_tools::entities::Universe universe;
     std::unordered_map<long int, int> oldNewAtomIdMap;
+    // config
     bool includeAngles = true;
     bool includeDihedralAngles = true;
+    bool includeVelocities = true;
     bool moleculeIdxSwappable = false;
     int crossLinkerType = 2;
     bool reindexAtoms = false;

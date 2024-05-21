@@ -70,6 +70,7 @@ namespace entities {
                     additionalData);
     void removeAtoms(const std::vector<long int>& ids);
     void replaceAtom(const long int id, const Atom& replacement);
+    void resampleVelocities(double mean, double variance, std::string seed = "", bool is2d = false);
     // bonds
     void addBonds(const std::vector<long int>& from,
                   const std::vector<long int>& to);
@@ -177,6 +178,7 @@ namespace entities {
     {
       return AtomGraphParent::computeBondLengths(this->box);
     };
+    double computeTemperature(const int dimensions = 3, const double kb = 1.) const;
     Eigen::Vector3d getPositionVectorForVertex(const int vertexId) const;
     Eigen::Vector3d getUnwrappedPositionVectorForVertex(
       const int vertexId) const;
