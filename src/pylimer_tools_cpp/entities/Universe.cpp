@@ -2304,6 +2304,11 @@ namespace entities {
   double Universe::computeTemperature(const int dimensions,
                                       const double kb) const
   {
+    INVALIDARG_EXP_IFN(this->vertexPropertyExists("vx") &&
+                         this->vertexPropertyExists("vy") &&
+                         this->vertexPropertyExists("vz"),
+                       "Velocities are not present in this universe. Cannot "
+                       "compute temperature.");
     std::vector<Atom> atoms = this->getAtoms();
     double kineticEnergy = 0.;
     for (const Atom& atom : atoms) {

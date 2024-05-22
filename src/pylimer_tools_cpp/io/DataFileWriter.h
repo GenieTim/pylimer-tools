@@ -184,8 +184,11 @@ namespace utils {
       this->writeAtoms(file);
 
       if (this->includeVelocities &&
-          this->universe.vertexPropertyExists("vx")) {
-        std::vector<pylimer_tools::entities::Atom> atoms = this->universe.getAtoms();
+          (this->universe.vertexPropertyExists("vx") &&
+           this->universe.vertexPropertyExists("vy") &&
+           this->universe.vertexPropertyExists("vz"))) {
+        std::vector<pylimer_tools::entities::Atom> atoms =
+          this->universe.getAtoms();
 
         file << "Velocities\n\n";
         // we could reduce some memory here by directly querying the properties

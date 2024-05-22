@@ -787,6 +787,12 @@ class DataFileWriter:
         
                    Default: true.
         """
+    def config_include_velocities(self, include_velocities: bool = True) -> None:
+        """
+                   Set whether to include the velocities from the universe (if any) in the file or not.
+        
+                   Default: true.
+        """
     def config_molecule_idx_for_swap(self, enableSwappability: bool = True) -> None:
         """
                         Swappable chains implies that their `moleculeIdx` in the LAMMPS data file is not 
@@ -2343,6 +2349,10 @@ class Universe:
                       Compute the polydispersity index: 
                       the weight average molecular weight over the number average molecular weight.
         """
+    def compute_temperature(self, dimensions: int = 3, k_b: float = 1.0) -> float:
+        """
+        Use the velocities per atom to compute the temperature from the kinetic energy of the system.
+        """
     def compute_total_mass(self) -> float:
         """
                   Compute the total mass of this network/universe in whatever mass unit was used when 
@@ -2601,6 +2611,8 @@ class Universe:
         """
                   Replace the properties of an atom with the properties of another given atom.
         """
+    def resample_velocities(self, mean: float, variance: float, seed: str = '', is_2d: bool = False) -> None:
+        ...
     def set_box(self, box: Box, rescale_atoms: bool = False) -> None:
         """
                   Override the currently assigned box with the one specified.
