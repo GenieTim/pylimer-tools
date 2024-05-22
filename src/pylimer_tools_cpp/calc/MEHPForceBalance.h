@@ -1192,8 +1192,26 @@ namespace calc {
       Eigen::Vector3d evaluatePartialSpringDistance(
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
+        const size_t springIdx) const
+      {
+        return this->evaluatePartialSpringDistance(
+          net, u, springIdx, this->is2D, this->assumeBoxLargeEnough);
+      }
+
+      /**
+       * @brief Compute one spring length
+       *
+       * @param net
+       * @param springIdx
+       * @param is2D
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d evaluatePartialSpringDistance(
+        const ForceBalanceNetwork& net,
+        const Eigen::VectorXd& u,
         const size_t springIdx,
-        bool is2d = false) const
+        bool is2d,
+        bool assumeBoxLargeEnough) const
       {
         assert(net.isUpToDate);
 
@@ -1204,7 +1222,7 @@ namespace calc {
             u.segment(3 * net.springPartIndexA(springIdx), 3))) +
           net.springPartBoxOffset.segment(3 * springIdx, 3);
 
-        if (this->assumeBoxLargeEnough) {
+        if (assumeBoxLargeEnough) {
           this->universe.getBox().handlePBC<Eigen::Vector3d>(dist);
         }
 
@@ -1271,17 +1289,29 @@ namespace calc {
        * @param is2D
        * @return Eigen::Vector3d
        */
+
+      Eigen::Vector3d evaluatePartialSpringDistanceTo(
+        const ForceBalanceNetwork& net,
+        const Eigen::VectorXd& u,
+        const size_t springIdx,
+        const size_t linkIdx) const
+      {
+        return this->evaluatePartialSpringDistanceTo(
+          net, u, springIdx, linkIdx, this->is2D, this->assumeBoxLargeEnough);
+      }
+
       Eigen::Vector3d evaluatePartialSpringDistanceTo(
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
         const size_t springIdx,
         const size_t linkIdx,
-        bool is2d = false) const
+        bool is2d,
+        bool assumeBoxLargeEnough) const
       {
         assert(this->isPartOfSpring(net, linkIdx, springIdx));
 
-        Eigen::Vector3d dist =
-          this->evaluatePartialSpringDistance(net, u, springIdx, is2d);
+        Eigen::Vector3d dist = this->evaluatePartialSpringDistance(
+          net, u, springIdx, is2d, assumeBoxLargeEnough);
 
         return dist * (net.springPartIndexA(springIdx) == linkIdx ? -1. : 1.);
       }
@@ -1299,11 +1329,22 @@ namespace calc {
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
         const size_t springIdx,
+        const size_t linkIdx) const
+      {
+        return this->evaluatePartialSpringDistanceFrom(
+          net, u, springIdx, linkIdx, this->is2D, this->assumeBoxLargeEnough);
+      }
+
+      Eigen::Vector3d evaluatePartialSpringDistanceFrom(
+        const ForceBalanceNetwork& net,
+        const Eigen::VectorXd& u,
+        const size_t springIdx,
         const size_t linkIdx,
-        bool is2d = false) const
+        bool is2d,
+        bool assumeBoxLargeEnough) const
       {
         return -1. * this->evaluatePartialSpringDistanceTo(
-                       net, u, springIdx, linkIdx, is2d);
+                       net, u, springIdx, linkIdx, is2d, assumeBoxLargeEnough);
       }
 
       bool validateNetwork() const
@@ -2139,20 +2180,14 @@ namespace calc {
         net.springPartBoxOffset.segment(3 * partialSpringIdx, 3) =
           Eigen::Vector3d::Zero();
         Eigen::Vector3d actualDistance = this->evaluatePartialSpringDistance(
-          net,
-          Eigen::VectorXd::Zero(net.coordinates.size()),
-          partialSpringIdx,
-          this->is2D);
+          net, Eigen::VectorXd::Zero(net.coordinates.size()), partialSpringIdx);
         net.springPartBoxOffset.segment(3 * partialSpringIdx, 3) =
           expectedDistance - actualDistance;
         assert(this->universe.getBox().isValidOffset(expectedDistance -
                                                      actualDistance));
 #ifndef NDEBUG
         Eigen::Vector3d newActualDistance = this->evaluatePartialSpringDistance(
-          net,
-          Eigen::VectorXd::Zero(net.coordinates.size()),
-          partialSpringIdx,
-          this->is2D);
+          net, Eigen::VectorXd::Zero(net.coordinates.size()), partialSpringIdx);
         assert(newActualDistance.isApprox(expectedDistance));
 #endif
       }
@@ -2345,11 +2380,11 @@ namespace calc {
         // validation: check distances
         Eigen::Vector3d distanceBefore =
           this->evaluatePartialSpringDistanceTo(
-            net, u, otherInvolvedPartialSpring, involvedSlipLink, this->is2D) +
+            net, u, otherInvolvedPartialSpring, involvedSlipLink) +
           this->evaluatePartialSpringDistanceTo(
-            net, u, sourcePartialSpringIdx, involvedCrossLink, this->is2D) +
+            net, u, sourcePartialSpringIdx, involvedCrossLink) +
           this->evaluatePartialSpringDistanceFrom(
-            net, u, targetPartialSpringIdx, involvedCrossLink, this->is2D);
+            net, u, targetPartialSpringIdx, involvedCrossLink);
 
         // remove the slip-link from one branch of the x-link
         // but skip resizing the Eigen structures, since the additional rows are
@@ -2423,9 +2458,9 @@ namespace calc {
                                                   involvedCrossLink,
                                                   this->is2D) +
             this->evaluatePartialSpringDistanceTo(
-              net, u, resultingPartialSpringIdx, involvedSlipLink, this->is2D) +
+              net, u, resultingPartialSpringIdx, involvedSlipLink) +
             this->evaluatePartialSpringDistanceFrom(
-              net, u, remainingPartialSpringIdx, involvedSlipLink, this->is2D);
+              net, u, remainingPartialSpringIdx, involvedSlipLink);
           assert(pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
             distanceAfter, distanceBefore));
         }

@@ -2191,26 +2191,46 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
 
     pcm::MEHPForceBalance forceBalancer2 =
       pcm::MEHPForceBalance(universe, 2, false, 1.0, true, false);
+
+    pcm::MEHPForceBalance forceBalancer3 =
+      pcm::MEHPForceBalance(universe, 2, false, 1.0, true, false);
+
+    // initially
+    CHECK_THAT(
+      forceBalancer2.getDisplacementResidualNorm(),
+      Catch::Matchers::WithinRel(forceBalancer3.getDisplacementResidualNorm()));
+
+    // check that the order does not matter
     forceBalancer2.configAssumeBoxLargeEnough(false);
     forceBalancer2.randomlyAddSliplinks(1000, 6.0, 900, 3.0, false, 281930401);
+    forceBalancer2.randomlyAddSliplinks(1000, 6.0, 900, 3.0, false, 281930401);
+    forceBalancer2.configAssumeBoxLargeEnough(false);
 
     CHECK(forceBalancer.getPressure() <= forceBalancer2.getPressure());
-    // it is actually thinkable that the following fails for certain sceanarios.
+    CHECK_THAT(
+      forceBalancer2.getDisplacementResidualNorm(),
+      Catch::Matchers::WithinRel(forceBalancer3.getDisplacementResidualNorm()));
+    CHECK_THAT(forceBalancer2.getPressure(),
+               Catch::Matchers::WithinRel(forceBalancer3.getPressure()));
+    // it is actually thinkable that the following fails for certain scenarios.
     // however, in general, it should not
     CHECK(forceBalancer.getDisplacementResidualNorm(1.) <=
           forceBalancer2.getDisplacementResidualNorm(1.));
     CHECK(forceBalancer.getDisplacementResidualNorm(-1.) <=
           forceBalancer2.getDisplacementResidualNorm(-1.));
+    CHECK_THAT(forceBalancer.getDisplacementResidualNorm(),
+               Catch::Matchers::WithinRel(
+                 forceBalancer2.getDisplacementResidualNorm(), 0.75));
     // TODO: add a check to make sure the slip-links are actually placed
     // identically
 
-    pcm::MEHPForceBalance forceBalancer3 =
+    pcm::MEHPForceBalance forceBalancer4 =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
         universe, 1000, 6.0, 900, 3.0, "281930401");
 
-    CHECK_THAT(forceBalancer3.getPressure(),
+    CHECK_THAT(forceBalancer4.getPressure(),
                Catch::Matchers::WithinRel(forceBalancer2.getPressure(), 0.75));
-    CHECK_THAT(forceBalancer3.getDisplacementResidualNorm(),
+    CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
                Catch::Matchers::WithinRel(
                  forceBalancer2.getDisplacementResidualNorm(), 0.75));
   }

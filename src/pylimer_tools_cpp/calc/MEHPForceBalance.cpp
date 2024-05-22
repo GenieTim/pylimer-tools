@@ -2073,9 +2073,9 @@ namespace calc {
                            " instead of " + std::to_string(linkToReduce) + ".");
       Eigen::Vector3d distanceBefore =
         this->evaluatePartialSpringDistanceTo(
-          net, u, removedSpringIdx, linkToReduce, this->is2D) +
+          net, u, removedSpringIdx, linkToReduce) +
         this->evaluatePartialSpringDistanceFrom(
-          net, u, keptSpringIdx, linkToReduce, this->is2D);
+          net, u, keptSpringIdx, linkToReduce);
       size_t fullSpringIdx = net.partialToFullSpringIndex[keptSpringIdx];
       // start with removal
       net.nrOfPartialSprings -= 1;
@@ -2209,7 +2209,7 @@ namespace calc {
         size_t newSpringIdx =
           keptSpringIdx + (keptSpringIdx > removedSpringIdx ? -1 : 0);
         Eigen::Vector3d newDistance = this->evaluatePartialSpringDistanceFrom(
-          net, u, newSpringIdx, newEnd, this->is2D);
+          net, u, newSpringIdx, newEnd);
         // if primary loop, the direction might have changed.
         //
         bool isNowPrimaryLoop = net.springPartIndexA[newSpringIdx] ==
@@ -2285,9 +2285,9 @@ namespace calc {
 
       Eigen::Vector3d distanceBefore =
         this->evaluatePartialSpringDistanceTo(
-          net, u, removedPartialSpringIdx, linkToReduce, this->is2D) +
+          net, u, removedPartialSpringIdx, linkToReduce, this->is2D, false) +
         this->evaluatePartialSpringDistanceFrom(
-          net, u, remainingPartialSpringIdx, linkToReduce, this->is2D);
+          net, u, remainingPartialSpringIdx, linkToReduce, this->is2D, false);
 
       net.nrOfSprings -= 1;
       net.nrOfPartialSprings -= 1;
@@ -2604,12 +2604,11 @@ namespace calc {
       //           << std::endl;
 
       // validation
-      if (!this->assumeBoxLargeEnough) {
         size_t newSpringIdx =
           remainingPartialSpringIdx +
           (remainingPartialSpringIdx > removedPartialSpringIdx ? -1 : 0);
         Eigen::Vector3d newDistance = this->evaluatePartialSpringDistanceFrom(
-          net, u, newSpringIdx, otherEndOfRemovedSpring, this->is2D);
+          net, u, newSpringIdx, otherEndOfRemovedSpring, this->is2D, false);
         if (!(pylimer_tools::utils::vector_approx_equal(
                 newDistance, distanceBefore, 1e-5) ||
               (this->isLoopingSpring(net, newSpringIdx) &&
@@ -2622,7 +2621,6 @@ namespace calc {
             std::to_string(newDistance) + " for spring " +
             std::to_string(newSpringIdx) + ".");
         }
-      }
     }
 
     /**
@@ -2903,20 +2901,20 @@ namespace calc {
 
         if (oldPartnerA != slipLinkIdx && oldPartnerB != slipLinkIdx) {
           Eigen::Vector3d partial1 = this->evaluatePartialSpringDistanceFrom(
-            net, u, newPartialSpringIdx, slipLinkIdx, this->is2D);
+            net, u, newPartialSpringIdx, slipLinkIdx, this->is2D, false);
           Eigen::Vector3d partial2 = this->evaluatePartialSpringDistanceTo(
-            net, u, partialSpringIdx, slipLinkIdx, this->is2D);
+            net, u, partialSpringIdx, slipLinkIdx, this->is2D, false);
           Eigen::Vector3d distanceAfter = partial1 + partial2;
 
           Eigen::Vector3d partialAlt1 = this->evaluatePartialSpringDistanceFrom(
-            net, u, partialSpringWithA, oldPartnerA, this->is2D);
+            net, u, partialSpringWithA, oldPartnerA, this->is2D, false);
           Eigen::Vector3d partialAlt2 = this->evaluatePartialSpringDistanceTo(
             net,
             u,
             partialSpringWithA == newPartialSpringIdx ? partialSpringIdx
                                                       : newPartialSpringIdx,
             oldPartnerB,
-            this->is2D);
+            this->is2D, false);
           Eigen::Vector3d altDistanceAfter = partialAlt1 + partialAlt2;
 
           assert(distanceBefore.isApprox(altDistanceAfter));
@@ -2929,11 +2927,11 @@ namespace calc {
           net.springPartBoxOffset.segment(3 * newPartialSpringIdx, 3) =
             this->universe.getBox().getOffset(
               this->evaluatePartialSpringDistance(
-                net, u, newPartialSpringIdx, this->is2D));
+                net, u, newPartialSpringIdx, this->is2D, false));
           net.springPartBoxOffset.segment(3 * partialSpringIdx, 3) =
             this->universe.getBox().getOffset(
               this->evaluatePartialSpringDistance(
-                net, u, partialSpringIdx, this->is2D));
+                net, u, partialSpringIdx, this->is2D, false));
           // TODO: figure out what to do instead, correctly
         }
       }
@@ -3049,11 +3047,11 @@ namespace calc {
             // net.springPartitions[springIndex][partner_idx-1]
             // NOTE: the following is slightly problematic for primary loops!
             Eigen::Vector3d vecBack = this->evaluatePartialSpringDistanceFrom(
-              net, u, currentSpringGlobalIdx, linkIdx, this->is2D);
+              net, u, currentSpringGlobalIdx, linkIdx);
             double distanceBack = (vecBack.squaredNorm());
             Eigen::Vector3d vecForward =
               this->evaluatePartialSpringDistanceFrom(
-                net, u, neighbourSpringGlobalIdx, linkIdx, this->is2D);
+                net, u, neighbourSpringGlobalIdx, linkIdx);
             double distanceForward = vecForward.squaredNorm();
             double idealValue =
               1. / (1. + sqrt(distanceForward / distanceBack));
@@ -3411,10 +3409,10 @@ namespace calc {
               net, partialSpringIdx, slipLinkIdx);
             Eigen::Vector3d otherRailDistance =
               this->evaluatePartialSpringDistanceFrom(
-                net, u, otherRailPart, slipLinkIdx, this->is2D);
+                net, u, otherRailPart, slipLinkIdx);
             Eigen::Vector3d thisRailDistance =
               this->evaluatePartialSpringDistanceFrom(
-                net, u, partialSpringIdx, slipLinkIdx, this->is2D);
+                net, u, partialSpringIdx, slipLinkIdx);
 
             bool found = false;
 
@@ -3490,7 +3488,7 @@ namespace calc {
               oneOverSpringPartitionUpperLimit);
           Eigen::Vector3d thisSpringDistance =
             this->evaluatePartialSpringDistance(
-              net, u, partialSpringIdx, this->is2D);
+              net, u, partialSpringIdx);
           double otherRailFromDenominator = this->getDenominatorOfPartialSpring(
             net,
             springPartitions,
@@ -3498,7 +3496,7 @@ namespace calc {
             oneOverSpringPartitionUpperLimit);
           Eigen::Vector3d otherRailFromSpringDistance =
             this->evaluatePartialSpringDistanceTo(
-              net, u, otherRailFrom, partnerA, this->is2D);
+              net, u, otherRailFrom, partnerA);
 
           double otherRailToDenominator = this->getDenominatorOfPartialSpring(
             net,
@@ -3507,7 +3505,7 @@ namespace calc {
             oneOverSpringPartitionUpperLimit);
           Eigen::Vector3d otherRailToSpringDistance =
             this->evaluatePartialSpringDistanceFrom(
-              net, u, otherRailTo, partnerB, this->is2D);
+              net, u, otherRailTo, partnerB);
 
           double forceEstimateBefore =
             (-otherRailFromSpringDistance * otherRailFromDenominator +
@@ -3878,9 +3876,6 @@ namespace calc {
                                                    const size_t spring1,
                                                    const size_t spring2) const
     {
-      if (this->assumeBoxLargeEnough) {
-        return;
-      }
       assert(this->isPartOfSpring(net, slipLinkIdx, spring1));
       assert(this->isPartOfSpring(net, slipLinkIdx, spring2));
       assert(net.linkIsSliplink[slipLinkIdx]);
@@ -3888,8 +3883,10 @@ namespace calc {
         this->getPartialSpringBoxOffsetTo(net, spring1, slipLinkIdx) +
         this->getPartialSpringBoxOffsetFrom(net, spring2, slipLinkIdx);
       Eigen::Vector3d totalDistanceBefore =
-        this->evaluatePartialSpringDistanceTo(net, u, spring1, slipLinkIdx) +
-        this->evaluatePartialSpringDistanceFrom(net, u, spring2, slipLinkIdx);
+        this->evaluatePartialSpringDistanceTo(
+          net, u, spring1, slipLinkIdx, this->is2D, false) +
+        this->evaluatePartialSpringDistanceFrom(
+          net, u, spring2, slipLinkIdx, this->is2D, false);
 
       Eigen::Vector3d sourceCoords =
         net.coordinates.segment(
@@ -3948,9 +3945,12 @@ namespace calc {
       if (net.springPartIndexB[spring2] == slipLinkIdx) {
         net.springPartBoxOffset.segment(3 * spring2, 3) *= -1.;
       }
-      Eigen::Vector3d totalDistanceNow =
-        this->evaluatePartialSpringDistanceTo(net, u, spring1, slipLinkIdx) +
-        this->evaluatePartialSpringDistanceFrom(net, u, spring2, slipLinkIdx);
+      // only for assumeBoxLargeEnough == false:
+      // (and some other restrictions)
+      // Eigen::Vector3d totalDistanceNow =
+      //   this->evaluatePartialSpringDistanceTo(net, u, spring1, slipLinkIdx) +
+      //   this->evaluatePartialSpringDistanceFrom(net, u, spring2,
+      //   slipLinkIdx);
       // TODO: check with floating point precision
       // assert((totalDistanceNow.array() <=
       // totalDistanceBefore.array()).all());
