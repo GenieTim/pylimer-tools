@@ -691,7 +691,7 @@ TEST_CASE("Manual NonGaussianSpringForceEvaluator gradient test",
   CHECK(r[5] == Catch::Approx(-r[2]));
 
   // cleanup
-  delete[] (r);
+  delete[](r);
 }
 
 TEST_CASE("Free chains collapse",

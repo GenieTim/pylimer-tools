@@ -45,7 +45,7 @@ namespace utils {
   class DumpFileParser
   {
   public:
-    DumpFileParser() {};
+    DumpFileParser(){};
     DumpFileParser(const std::string filePath);
 
     // rule of three:

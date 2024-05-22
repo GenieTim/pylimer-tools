@@ -436,7 +436,7 @@ namespace calc {
           this->currentSpringDistances,
           r);
       } catch (const std::exception& e) {
-        delete[] (r);
+        delete[](r);
         throw e;
       }
 
@@ -445,7 +445,7 @@ namespace calc {
       for (size_t i = 0; i < this->forceRelaxationNetwork.nrOfNodes * 3; ++i) {
         results[i] = r[i];
       }
-      delete[] (r);
+      delete[](r);
       return results;
     }
 

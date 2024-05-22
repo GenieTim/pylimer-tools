@@ -76,7 +76,7 @@ namespace entities {
     : Molecule(src.parent,
                &src.graph,
                src.typeOfThisMolecule,
-               src.massPerType) {};
+               src.massPerType){};
   // 3. copy assignment operator
   Molecule& Molecule::operator=(Molecule src)
   {
@@ -422,7 +422,7 @@ namespace entities {
       alignedCoordinates, this->parent, alignedVertices);
     Eigen::Vector3d result = Eigen::Vector3d::Zero();
     for (size_t i = 1; i < alignedVertices.size(); ++i) {
-      Eigen::Vector3d distance = alignedCoordinates.segment((i) * 3, 3) -
+      Eigen::Vector3d distance = alignedCoordinates.segment((i)*3, 3) -
                                  alignedCoordinates.segment((i - 1) * 3, 3);
       this->parent.handlePBC(distance);
       result += distance;
@@ -461,7 +461,7 @@ namespace entities {
     bool recording = false;
     for (size_t i = 0; i < alignedVertices.size(); ++i) {
       if (recording) {
-        Eigen::Vector3d distance = alignedCoordinates.segment((i) * 3, 3) -
+        Eigen::Vector3d distance = alignedCoordinates.segment((i)*3, 3) -
                                    alignedCoordinates.segment((i - 1) * 3, 3);
         this->parent.handlePBC(distance);
         result += distance;

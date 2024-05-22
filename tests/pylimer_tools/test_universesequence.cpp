@@ -55,7 +55,8 @@ TEST_CASE("UniverseSequence can be used", "[entity][UniverseSequence]")
     pe::Atom atom1695 = universe.getAtom(1695);
     CHECK(atom1695.getProperty("vx") == Catch::Approx(1.6776911155131486));
     CHECK(atom1695.getProperty("vy") == Catch::Approx(-1.4719491031793053));
-    CHECK_THAT(atom1695.getProperty("vz"), Catch::Matchers::WithinAbs(0., 1e-10));
+    CHECK_THAT(atom1695.getProperty("vz"),
+               Catch::Matchers::WithinAbs(0., 1e-10));
     CHECK(universe.computeTemperature(2) == Catch::Approx(4.1503370363));
   }
 
