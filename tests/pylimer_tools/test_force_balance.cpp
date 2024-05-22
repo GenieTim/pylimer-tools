@@ -2203,8 +2203,8 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
     // check that the order does not matter
     forceBalancer2.configAssumeBoxLargeEnough(false);
     forceBalancer2.randomlyAddSliplinks(1000, 6.0, 900, 3.0, false, 281930401);
-    forceBalancer2.randomlyAddSliplinks(1000, 6.0, 900, 3.0, false, 281930401);
-    forceBalancer2.configAssumeBoxLargeEnough(false);
+    forceBalancer3.randomlyAddSliplinks(1000, 6.0, 900, 3.0, false, 281930401);
+    forceBalancer3.configAssumeBoxLargeEnough(false);
 
     CHECK(forceBalancer.getPressure() <= forceBalancer2.getPressure());
     CHECK_THAT(

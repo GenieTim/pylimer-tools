@@ -26,7 +26,9 @@
       "name": "Debug Cpp Tests",
       "cwd": "${workspaceFolder}/tests/build",
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
-      "args": ["MEHP Force Balance can run with swapping slip-links"],
+      "args": [
+        "MEHP Force Balance can randomly add and remove slip-links with large box"
+      ],
       "environment": [
         {
           "name": "MallocNanoZone",
@@ -34,7 +36,7 @@
         },
         {
           "name": "ASAN_OPTIONS",
-          "value": "detect_leaks=0",
+          "value": "detect_leaks=0"
         },
         {
           "name": "LSAN_OPTIONS",

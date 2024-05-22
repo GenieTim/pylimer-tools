@@ -802,21 +802,46 @@ init_pylimer_bound_calc(py::module_& m)
          R"pbdoc()pbdoc",
          py::arg("network"),
          py::arg("link_idx"))
-    .def("evaluate_partial_spring_distance",
-         &mehp::MEHPForceBalance::evaluatePartialSpringDistance,
-         R"pbdoc()pbdoc",
-         py::arg("network"),
-         py::arg("displacements"),
-         py::arg("springIdx"),
-         py::arg("is_2d") = false)
-    .def("evaluate_partial_spring_distance_from",
-         &mehp::MEHPForceBalance::evaluatePartialSpringDistanceFrom,
-         R"pbdoc()pbdoc",
-         py::arg("network"),
-         py::arg("displacements"),
-         py::arg("springIdx"),
-         py::arg("link_idx"),
-         py::arg("is_2d") = false)
+    .def(
+      "evaluate_partial_spring_distance",
+      [](const mehp::MEHPForceBalance& sim,
+         const mehp::ForceBalanceNetwork& net,
+         const Eigen::VectorXd& u,
+         const size_t springIdx) {
+        return sim.evaluatePartialSpringDistance(net, u, springIdx);
+      }, R"pbdoc()pbdoc",
+      py::arg("network"),
+      py::arg("displacements"),
+      py::arg("spring_idx"))
+    .def(
+      "evaluate_partial_spring_distance_from",
+      [](const mehp::MEHPForceBalance& sim,
+         const mehp::ForceBalanceNetwork& net,
+         const Eigen::VectorXd& u,
+         const size_t springIdx,
+         const size_t linkIdx) {
+        return sim.evaluatePartialSpringDistanceFrom(
+          net, u, springIdx, linkIdx);
+      },
+      R"pbdoc()pbdoc",
+      py::arg("network"),
+      py::arg("displacements"),
+      py::arg("spring_idx"),
+      py::arg("link_idx"))
+    .def(
+      "evaluate_partial_spring_distance_to",
+      [](const mehp::MEHPForceBalance& sim,
+         const mehp::ForceBalanceNetwork& net,
+         const Eigen::VectorXd& u,
+         const size_t springIdx,
+         const size_t linkIdx) {
+        return sim.evaluatePartialSpringDistanceTo(net, u, springIdx, linkIdx);
+      },
+      R"pbdoc()pbdoc",
+      py::arg("network"),
+      py::arg("displacements"),
+      py::arg("spring_idx"),
+      py::arg("link_idx"))
     // .def("getForceEvaluator", &mehp::MEHPForceBalance::getForceEvaluator,
     // R"pbdoc(
     //      Query the currently used force evaluator.
