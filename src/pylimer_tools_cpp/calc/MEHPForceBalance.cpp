@@ -345,9 +345,9 @@ namespace calc {
           wasInterrupted = true;
           break;
         }
-      } while (currentResidual / initialResidual > xtol &&
-               iterationsDone < maxNrOfSteps &&
-               this->initialConfig.nrOfSprings > 0);
+      } while (
+        currentResidual / initialResidual > xtol &&
+        iterationsDone<maxNrOfSteps&& this->initialConfig.nrOfSprings> 0);
 
       // finish up
       this->closeAllOutputs();
@@ -646,8 +646,7 @@ namespace calc {
 
 #ifndef NDEBUG
       for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
-        Eigen::Vector3d dist =
-          this->evaluatePartialSpringDistance(net, u, i, this->is2D);
+        Eigen::Vector3d dist = this->evaluatePartialSpringDistance(net, u, i);
         assert(pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
           dist, relevantPartialDistances.segment(3 * i, 3), 1e-9));
       }
@@ -2208,8 +2207,8 @@ namespace calc {
       if (!this->assumeBoxLargeEnough) {
         size_t newSpringIdx =
           keptSpringIdx + (keptSpringIdx > removedSpringIdx ? -1 : 0);
-        Eigen::Vector3d newDistance = this->evaluatePartialSpringDistanceFrom(
-          net, u, newSpringIdx, newEnd);
+        Eigen::Vector3d newDistance =
+          this->evaluatePartialSpringDistanceFrom(net, u, newSpringIdx, newEnd);
         // if primary loop, the direction might have changed.
         //
         bool isNowPrimaryLoop = net.springPartIndexA[newSpringIdx] ==
@@ -2604,23 +2603,23 @@ namespace calc {
       //           << std::endl;
 
       // validation
-        size_t newSpringIdx =
-          remainingPartialSpringIdx +
-          (remainingPartialSpringIdx > removedPartialSpringIdx ? -1 : 0);
-        Eigen::Vector3d newDistance = this->evaluatePartialSpringDistanceFrom(
-          net, u, newSpringIdx, otherEndOfRemovedSpring, this->is2D, false);
-        if (!(pylimer_tools::utils::vector_approx_equal(
-                newDistance, distanceBefore, 1e-5) ||
-              (this->isLoopingSpring(net, newSpringIdx) &&
-               pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
-                 newDistance, -1. * distanceBefore, 1e-5)))) {
-          throw std::runtime_error(
-            "After merging two springs, the overall distance "
-            "is not consistent. Expected distance " +
-            std::to_string(distanceBefore) + ", but got " +
-            std::to_string(newDistance) + " for spring " +
-            std::to_string(newSpringIdx) + ".");
-        }
+      size_t newSpringIdx =
+        remainingPartialSpringIdx +
+        (remainingPartialSpringIdx > removedPartialSpringIdx ? -1 : 0);
+      Eigen::Vector3d newDistance = this->evaluatePartialSpringDistanceFrom(
+        net, u, newSpringIdx, otherEndOfRemovedSpring, this->is2D, false);
+      if (!(pylimer_tools::utils::vector_approx_equal(
+              newDistance, distanceBefore, 1e-5) ||
+            (this->isLoopingSpring(net, newSpringIdx) &&
+             pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
+               newDistance, -1. * distanceBefore, 1e-5)))) {
+        throw std::runtime_error(
+          "After merging two springs, the overall distance "
+          "is not consistent. Expected distance " +
+          std::to_string(distanceBefore) + ", but got " +
+          std::to_string(newDistance) + " for spring " +
+          std::to_string(newSpringIdx) + ".");
+      }
     }
 
     /**
@@ -2914,7 +2913,8 @@ namespace calc {
             partialSpringWithA == newPartialSpringIdx ? partialSpringIdx
                                                       : newPartialSpringIdx,
             oldPartnerB,
-            this->is2D, false);
+            this->is2D,
+            false);
           Eigen::Vector3d altDistanceAfter = partialAlt1 + partialAlt2;
 
           assert(distanceBefore.isApprox(altDistanceAfter));
@@ -3487,8 +3487,7 @@ namespace calc {
               partialSpringIdx,
               oneOverSpringPartitionUpperLimit);
           Eigen::Vector3d thisSpringDistance =
-            this->evaluatePartialSpringDistance(
-              net, u, partialSpringIdx);
+            this->evaluatePartialSpringDistance(net, u, partialSpringIdx);
           double otherRailFromDenominator = this->getDenominatorOfPartialSpring(
             net,
             springPartitions,
@@ -4313,11 +4312,11 @@ namespace calc {
       Eigen::VectorXd u = Eigen::VectorXd::Zero(net.coordinates.size());
       Eigen::Vector3d distanceBefore =
         this->evaluatePartialSpringDistanceFrom(
-          net, u, otherPartialOfLinkIdx1, unaffectedEnd1, this->is2D) +
+          net, u, otherPartialOfLinkIdx1, unaffectedEnd1, this->is2D, false) +
         this->evaluatePartialSpringDistanceTo(
-          net, u, otherPartialOfLinkIdx2, unaffectedEnd2, this->is2D) +
+          net, u, otherPartialOfLinkIdx2, unaffectedEnd2, this->is2D, false) +
         this->evaluatePartialSpringDistanceTo(
-          net, u, partialSpringIdx, linkIdx2, this->is2D);
+          net, u, partialSpringIdx, linkIdx2, this->is2D, false);
 
       long int firstPositionInSpring = -1;
       bool found = false;
@@ -4410,17 +4409,16 @@ namespace calc {
           linkIdx2;
       }
 
-      if (!this->assumeBoxLargeEnough &&
-          // we don't handle the primary loops well yet
-          (linkIdx2 != unaffectedEnd2 && linkIdx2 != unaffectedEnd1 &&
-           linkIdx1 != unaffectedEnd1 && linkIdx1 != unaffectedEnd2)) {
+      if ( // we don't handle the primary loops well yet
+        (linkIdx2 != unaffectedEnd2 && linkIdx2 != unaffectedEnd1 &&
+         linkIdx1 != unaffectedEnd1 && linkIdx1 != unaffectedEnd2)) {
         Eigen::Vector3d distanceAfter =
           this->evaluatePartialSpringDistanceFrom(
-            net, u, otherPartialOfLinkIdx1, unaffectedEnd1, this->is2D) +
+            net, u, otherPartialOfLinkIdx1, unaffectedEnd1, this->is2D, false) +
           this->evaluatePartialSpringDistanceTo(
-            net, u, otherPartialOfLinkIdx2, unaffectedEnd2, this->is2D) +
+            net, u, otherPartialOfLinkIdx2, unaffectedEnd2, this->is2D, false) +
           this->evaluatePartialSpringDistanceTo(
-            net, u, partialSpringIdx, linkIdx1, this->is2D);
+            net, u, partialSpringIdx, linkIdx1, this->is2D, false);
 
         assert(pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
           distanceAfter, distanceBefore));
@@ -4463,7 +4461,7 @@ namespace calc {
         }
         Eigen::Vector3d partialDistance =
           this->evaluatePartialSpringDistanceFrom(
-            net, u, globalSpringIndex, linkIdx, this->is2D);
+            net, u, globalSpringIndex, linkIdx);
         // std::cout << "Partial distance of " << globalSpringIndex << " from "
         //           << linkIdx << " to "
         //           << this->getOtherSpringIndex(net, globalSpringIndex,
@@ -4582,7 +4580,7 @@ namespace calc {
       for (const size_t globalSpringIndex : partialSpringIndices) {
         Eigen::Vector3d partialDistance =
           this->evaluatePartialSpringDistanceFrom(
-            net, u, globalSpringIndex, linkIdx, this->is2D);
+            net, u, globalSpringIndex, linkIdx);
         const double contourLengthFraction =
           springPartitions[globalSpringIndex];
         const double N = net.springsContourLength
@@ -4650,7 +4648,7 @@ namespace calc {
         }
         Eigen::Vector3d partialDistance =
           this->evaluatePartialSpringDistanceFrom(
-            net, u, globalSpringIndex, linkIdx, this->is2D);
+            net, u, globalSpringIndex, linkIdx);
         const double contourLengthFraction =
           springPartitions[globalSpringIndex];
         const double N = net.springsContourLength

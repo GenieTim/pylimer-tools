@@ -76,7 +76,7 @@ public:
     return trampolineResult.first;
   }
 
-  void prepareForEvaluations() override {};
+  void prepareForEvaluations() override{};
 };
 }
 

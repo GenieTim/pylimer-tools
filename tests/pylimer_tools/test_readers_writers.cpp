@@ -55,7 +55,7 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
     CHECK(parser4.getLength() == 1);
     CHECK(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1).size() == 3);
     CHECK(parser.getValuesForAt<double>(0, "BOX BOUNDS", 1)[0] ==
-            4.8545999999999999e+01);
+          4.8545999999999999e+01);
   }
 
   SECTION("Reading from data files works")
@@ -75,7 +75,6 @@ TEST_CASE("FileParsers can be used", "[utils][DumpFileParser][DataFileParser]")
     pu::DataFileParser parser3 = pu::DataFileParser();
     parser3.read(suspectedPath + "lammps_data_file_small_wangles.out");
     CHECK(parser3.getNrOfAngles() == 1);
-
 
     // BENCHMARK("DataFileParserOld")
     // {
@@ -186,7 +185,7 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
     CHECK(universe.getNrOfBonds() == readUniverse.getNrOfBonds());
     CHECK(universe.getNrOfAngles() == readUniverse.getNrOfAngles());
     CHECK(universe.getNrOfDihedralAngles() ==
-            readUniverse.getNrOfDihedralAngles());
+          readUniverse.getNrOfDihedralAngles());
 
     std::filesystem::remove(fileToWrite);
   }
