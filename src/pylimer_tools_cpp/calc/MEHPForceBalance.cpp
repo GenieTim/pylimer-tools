@@ -3907,6 +3907,13 @@ namespace calc {
         (totalOffset.array() / this->universe.getBox().getL())
           .rint()
           .cast<int>();
+      if (this->is2D) {
+        multiplicity[2] = 0;
+        sourceCoords[2] = 0.;
+        targetCoords[2] = 0.;
+        viaCoords[2] = 0.;
+        totalOffset[2] = 0.;
+      }
       for (int mx = std::min(0, multiplicity[0]);
            mx <= std::max(0, multiplicity[0]);
            ++mx) {

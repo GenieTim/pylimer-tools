@@ -1211,7 +1211,7 @@ namespace calc {
         const Eigen::VectorXd& u,
         const size_t springIdx,
         bool is2d,
-        bool assumeBoxLargeEnough) const
+        bool boxLargeEnough) const
       {
         assert(net.isUpToDate);
 
@@ -1222,7 +1222,7 @@ namespace calc {
             u.segment(3 * net.springPartIndexA(springIdx), 3))) +
           net.springPartBoxOffset.segment(3 * springIdx, 3);
 
-        if (assumeBoxLargeEnough) {
+        if (boxLargeEnough) {
           this->universe.getBox().handlePBC<Eigen::Vector3d>(dist);
         }
 
@@ -1306,12 +1306,12 @@ namespace calc {
         const size_t springIdx,
         const size_t linkIdx,
         bool is2d,
-        bool assumeBoxLargeEnough) const
+        bool boxLargeEnough) const
       {
         assert(this->isPartOfSpring(net, linkIdx, springIdx));
 
         Eigen::Vector3d dist = this->evaluatePartialSpringDistance(
-          net, u, springIdx, is2d, assumeBoxLargeEnough);
+          net, u, springIdx, is2d, boxLargeEnough);
 
         return dist * (net.springPartIndexA(springIdx) == linkIdx ? -1. : 1.);
       }
@@ -1341,10 +1341,10 @@ namespace calc {
         const size_t springIdx,
         const size_t linkIdx,
         bool is2d,
-        bool assumeBoxLargeEnough) const
+        bool boxLargeEnough) const
       {
         return -1. * this->evaluatePartialSpringDistanceTo(
-                       net, u, springIdx, linkIdx, is2d, assumeBoxLargeEnough);
+                       net, u, springIdx, linkIdx, is2d, boxLargeEnough);
       }
 
       bool validateNetwork() const
