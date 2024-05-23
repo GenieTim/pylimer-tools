@@ -2229,9 +2229,9 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
         universe, 1000, 6.0, 900, 3.0, "281930401");
 
     CHECK_THAT(forceBalancer4.getPressure(),
-               Catch::Matchers::WithinRel(forceBalancer2.getPressure(), 0.75));
+               Catch::Matchers::WithinRel(forceBalancer.getPressure(), 0.5));
     CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
                Catch::Matchers::WithinRel(
-                 forceBalancer2.getDisplacementResidualNorm(), 0.75));
+                 forceBalancer.getDisplacementResidualNorm(), 0.5));
   }
 }
