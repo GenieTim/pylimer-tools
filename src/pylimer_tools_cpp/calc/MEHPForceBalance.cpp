@@ -345,9 +345,9 @@ namespace calc {
           wasInterrupted = true;
           break;
         }
-      } while (
-        currentResidual / initialResidual > xtol &&
-        iterationsDone<maxNrOfSteps&& this->initialConfig.nrOfSprings> 0);
+      } while (currentResidual / initialResidual > xtol &&
+               iterationsDone < maxNrOfSteps &&
+               this->initialConfig.nrOfSprings > 0);
 
       // finish up
       this->closeAllOutputs();
@@ -5686,20 +5686,32 @@ namespace calc {
       // need to include all but dangling and free chains in order to
       // model entanglement
       size_t nrOfSprings = 0;
+      std::vector<bool> useChain =
+        pylimer_tools::utils::initializeWithValue<bool>(
+          crossLinkerChains.size(), false);
       for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
         RUNTIME_EXP_IFN(crossLinkerChains[i].getType() !=
                           pylimer_tools::entities::MoleculeType::UNDEFINED,
                         "Cross-linker chain's chain type could not be "
                         "detected. Cannot work like that.");
         if (crossLinkerChains[i].getType() ==
-              pylimer_tools::entities::MoleculeType::NETWORK_STRAND ||
-            crossLinkerChains[i].getType() ==
-              pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
+            pylimer_tools::entities::MoleculeType::NETWORK_STRAND) {
+          assert(
+            crossLinkerChains[i].getChainEnds(crossLinkerType, true).size() ==
+            2);
+          useChain[i] = true;
           nrOfSprings += 1;
-        }
-        if (!removeDanglingChains &&
-            crossLinkerChains[i].getType() ==
-              pylimer_tools::entities::MoleculeType::DANGLING_CHAIN) {
+        } else if (crossLinkerChains[i].getType() ==
+                   pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
+          // when omitting f=2 cross-links, it's possible that we end up with
+          // "free" primary loops – let's not use those
+          if (crossLinkerChains[i].getAtomsOfType(crossLinkerType).size() > 0) {
+            useChain[i] = true;
+            nrOfSprings += 1;
+          }
+        } else if (!removeDanglingChains &&
+                   crossLinkerChains[i].getType() ==
+                     pylimer_tools::entities::MoleculeType::DANGLING_CHAIN) {
           std::vector<pylimer_tools::entities::Atom> endAtoms =
             crossLinkerChains[i].getAtomsOfDegree(1);
           RUNTIME_EXP_IFN(endAtoms.size() == 2,
@@ -5712,6 +5724,7 @@ namespace calc {
             (endAtoms[0].getType() == crossLinkerType) ? endAtoms[1]
                                                        : endAtoms[0];
           xlinkers.push_back(newXlink);
+          useChain[i] = true;
           nrOfSprings += 1;
         }
       }
@@ -5773,14 +5786,17 @@ namespace calc {
       Eigen::Vector3d expectedDistance = Eigen::Vector3d::Zero();
       // net.connectivityToSpringIndex.reserve(nrOfSprings);
       for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
+        if (!useChain[i]) {
+          continue;
+        }
         std::vector<pylimer_tools::entities::Atom> xlinkersOfChain =
           crossLinkerChains[i].getAtomsOfType(crossLinkerType);
         std::vector<pylimer_tools::entities::Atom> chainEnds =
           crossLinkerChains[i].getChainEnds(crossLinkerType, true);
-        if (chainEnds.size() < 2) {
-          continue;
-        }
-        assert(chainEnds.size() == 2);
+        RUNTIME_EXP_IFN(
+          chainEnds.size() == 2,
+          "Expected two chain ends when converting structure. Got " +
+            std::to_string(chainEnds.size()) + ".");
         long int atomIdFrom = chainEnds[0].getId();
         long int atomIdTo = chainEnds[1].getId();
         bool addChain = false;
@@ -5808,6 +5824,7 @@ namespace calc {
             crossLinkerChains[i].getNrOfAtoms() - 1;
           addChain = true;
         }
+        assert(addChain);
 
         if (addChain) {
           long int nodeIdxFrom = atomIdToNode.at(atomIdFrom);

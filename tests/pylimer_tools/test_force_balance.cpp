@@ -2137,8 +2137,6 @@ TEST_CASE("Particular MEHP Force Balance Example",
 {
   std::cout << "Running test \"Particular MEHP Force Balance Example\""
             << std::endl;
-  std::cout << "Running test \"Particular MEHP Force Balance Example\""
-            << std::endl;
 
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
   CHECK(universeSeq.getLength() == 0);
