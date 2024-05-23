@@ -45,10 +45,11 @@ namespace calc {
         this->box = u.getBox();
         // interpret network already to be able to give early results
         ForceBalanceNetwork net;
-        ConvertNetwork(net,
-                       crossLinkerType,
-                       remove2functionalCrosslinkers,
-                       removeDanglingChains);
+        RUNTIME_EXP_IFN(ConvertNetwork(net,
+                                       crossLinkerType,
+                                       remove2functionalCrosslinkers,
+                                       removeDanglingChains),
+                        "Failed to convert network.");
         this->initialConfig = net;
         this->is2D = is2D;
         this->currentDisplacements =
