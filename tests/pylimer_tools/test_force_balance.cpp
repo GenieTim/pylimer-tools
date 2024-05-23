@@ -2204,6 +2204,7 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
     forceBalancer3.randomlyAddSliplinks(1000, 6.0, 900, 3.0, false, 281930401);
     forceBalancer3.configAssumeBoxLargeEnough(false);
 
+    // after adding slip-links
     CHECK(forceBalancer.getPressure() <= forceBalancer2.getPressure());
     CHECK_THAT(
       forceBalancer2.getDisplacementResidualNorm(),
@@ -2216,15 +2217,19 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
           forceBalancer2.getDisplacementResidualNorm(1.));
     CHECK(forceBalancer.getDisplacementResidualNorm(-1.) <=
           forceBalancer2.getDisplacementResidualNorm(-1.));
-    CHECK_THAT(forceBalancer.getDisplacementResidualNorm(),
-               Catch::Matchers::WithinRel(
-                 forceBalancer2.getDisplacementResidualNorm(), 0.75));
-    // TODO: add a check to make sure the slip-links are actually placed
-    // identically
+
+    // check to make sure the slip-links are actually placed identically
+    CHECK(forceBalancer.getNetwork().springPartIndexA.isApprox(
+      forceBalancer2.getNetwork().springPartIndexA
+    ));
+    CHECK(forceBalancer2.getNetwork().springPartIndexB.isApprox(
+      forceBalancer3.getNetwork().springPartIndexB
+    ));
 
     pcm::MEHPForceBalance forceBalancer4 =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
         universe, 1000, 6.0, 900, 3.0, "281930401");
+    forceBalancer4.configAssumeBoxLargeEnough(false);
 
     CHECK_THAT(forceBalancer4.getPressure(),
                Catch::Matchers::WithinRel(forceBalancer.getPressure(), 0.5));
