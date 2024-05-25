@@ -2232,9 +2232,18 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
     forceBalancer4.configAssumeBoxLargeEnough(false);
 
     CHECK_THAT(forceBalancer4.getPressure(),
+               Catch::Matchers::WithinRel(forceBalancer2.getPressure(), 0.5));
+    CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
+               Catch::Matchers::WithinRel(
+                 forceBalancer2.getDisplacementResidualNorm(), 0.5));
+
+    forceBalancer4.configAssumeBoxLargeEnough(true);
+
+    CHECK_THAT(forceBalancer4.getPressure(),
                Catch::Matchers::WithinRel(forceBalancer.getPressure(), 0.5));
     CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
                Catch::Matchers::WithinRel(
                  forceBalancer.getDisplacementResidualNorm(), 0.5));
+
   }
 }
