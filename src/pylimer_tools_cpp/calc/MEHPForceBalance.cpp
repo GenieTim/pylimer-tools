@@ -345,9 +345,9 @@ namespace calc {
           wasInterrupted = true;
           break;
         }
-      } while (currentResidual / initialResidual > xtol &&
-               iterationsDone < maxNrOfSteps &&
-               this->initialConfig.nrOfSprings > 0);
+      } while (
+        currentResidual / initialResidual > xtol &&
+        iterationsDone<maxNrOfSteps&& this->initialConfig.nrOfSprings> 0);
 
       // finish up
       this->closeAllOutputs();
@@ -5066,6 +5066,15 @@ namespace calc {
           size_t newSpringIndex =
             currentNrOfPartialSprings + partialSpringsAdded;
 
+          // for validation later
+          Eigen::Vector3d distanceBefore =
+            this->evaluatePartialSpringDistanceFrom(this->initialConfig,
+                                                    this->currentDisplacements,
+                                                    lastSpringIndex,
+                                                    springPartner1,
+                                                    this->is2D,
+                                                    false);
+
           this->initialConfig.partialSpringIsPartial[lastSpringIndex] = true;
           this->initialConfig.partialSpringIsPartial[newSpringIndex] = true;
 
@@ -5141,6 +5150,28 @@ namespace calc {
               targetIndexInSpring +
               1, // + 1 to compensate for the first cross-link
             newNodeIdx);
+
+          Eigen::Vector3d distanceAfter =
+            this->evaluatePartialSpringDistanceFrom(this->initialConfig,
+                                                    this->currentDisplacements,
+                                                    lastSpringIndex,
+                                                    springPartner1,
+                                                    this->is2D,
+                                                    false) +
+            this->evaluatePartialSpringDistanceFrom(this->initialConfig,
+                                                    this->currentDisplacements,
+                                                    newSpringIndex,
+                                                    newNodeIdx,
+                                                    this->is2D,
+                                                    false);
+
+          if (newNodeIdx != springPartner1 &&
+              springPartner1 != springPartner2 &&
+              newNodeIdx != springPartner1) {
+            RUNTIME_EXP_IFN(distanceAfter.isApprox(distanceBefore),
+                            "Expected that overall vector does not change upon "
+                            "adding slip-springs");
+          }
 
           partialSpringsAdded += 1;
           springIndexIndex += 1;

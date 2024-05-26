@@ -2220,11 +2220,9 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
 
     // check to make sure the slip-links are actually placed identically
     CHECK(forceBalancer.getNetwork().springPartIndexA.isApprox(
-      forceBalancer2.getNetwork().springPartIndexA
-    ));
+      forceBalancer2.getNetwork().springPartIndexA));
     CHECK(forceBalancer2.getNetwork().springPartIndexB.isApprox(
-      forceBalancer3.getNetwork().springPartIndexB
-    ));
+      forceBalancer3.getNetwork().springPartIndexB));
 
     pcm::MEHPForceBalance forceBalancer4 =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
@@ -2244,6 +2242,5 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
     CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
                Catch::Matchers::WithinRel(
                  forceBalancer.getDisplacementResidualNorm(), 0.5));
-
   }
 }
