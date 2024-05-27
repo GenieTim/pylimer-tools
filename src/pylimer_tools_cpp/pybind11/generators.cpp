@@ -73,6 +73,15 @@ init_pylimer_bound_generators(py::module_& m)
         py::arg("chain_len"),
         py::arg("bead_distance") = 1.,
         py::arg("seed") = "");
+  m.def("do_linear_walk_chain_from_to",
+        &doLinearWalkChainFromTo,
+        R"pbdoc(
+            Get coordinates linearly interpolated from one point to another (both exclusive).
+            )pbdoc",
+        py::arg("box"),
+        py::arg("from_coordinates"),
+        py::arg("to_coordinates"),
+        py::arg("chain_len"));
 }
 
 #endif

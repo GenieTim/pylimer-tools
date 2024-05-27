@@ -1413,6 +1413,18 @@ namespace calc {
         return partialSpringIndices;
       }
 
+      Eigen::VectorXd getForceMagnitudeVector(
+        const double oneOverSpringPartitionUpperLimit = 1.0) const
+      {
+        Eigen::VectorXd forceMagnitude =
+          Eigen::VectorXd::Zero(this->initialConfig.nrOfLinks);
+        for (size_t i = 0; i < this->initialConfig.nrOfLinks; ++i) {
+          forceMagnitude[i] =
+            this->getForceOn(i, oneOverSpringPartitionUpperLimit).norm();
+        }
+        return forceMagnitude;
+      }
+
       /**
        * @brief Evaluate the force on one link
        *
