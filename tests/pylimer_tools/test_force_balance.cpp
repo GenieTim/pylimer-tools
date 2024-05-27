@@ -3,6 +3,7 @@
 #include "../../src/pylimer_tools_cpp/calc/MEHPForceRelaxation.h"
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
+#include "../../src/pylimer_tools_cpp/utils/ExtraEigenTypes.h"
 #include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -2160,6 +2161,8 @@ TEST_CASE("Particular MEHP Force Balance Example",
     double pressBefore = forceBalancer.getPressure();
     forceBalancer.configAssumeBoxLargeEnough(false);
     CHECK(pressBefore <= forceBalancer.getPressure());
+  } else {
+    std::cerr << "File " << inputFile << " does not exist." << std::endl;
   }
 }
 
@@ -2185,7 +2188,7 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance(universe, 2, false, 1.0, true, false);
     forceBalancer.configAssumeBoxLargeEnough(true);
-    forceBalancer.randomlyAddSliplinks(1000, 6.0, 900, 3.0, false, 281930401);
+    forceBalancer.randomlyAddSliplinks(1000, 6.0, 900, 3.0, false, 53467829);
 
     pcm::MEHPForceBalance forceBalancer2 =
       pcm::MEHPForceBalance(universe, 2, false, 1.0, true, false);
@@ -2200,8 +2203,8 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
 
     // check that the order does not matter
     forceBalancer2.configAssumeBoxLargeEnough(false);
-    forceBalancer2.randomlyAddSliplinks(1000, 6.0, 900, 3.0, false, 281930401);
-    forceBalancer3.randomlyAddSliplinks(1000, 6.0, 900, 3.0, false, 281930401);
+    forceBalancer2.randomlyAddSliplinks(1000, 6.0, 900, 3.0, false, 53467829);
+    forceBalancer3.randomlyAddSliplinks(1000, 6.0, 900, 3.0, false, 53467829);
     forceBalancer3.configAssumeBoxLargeEnough(false);
 
     // after adding slip-links
@@ -2226,7 +2229,7 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
 
     pcm::MEHPForceBalance forceBalancer4 =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-        universe, 1000, 6.0, 900, 3.0, "281930401");
+        universe, 1000, 6.0, 900, 3.0, "53467829");
     forceBalancer4.configAssumeBoxLargeEnough(false);
 
     CHECK_THAT(forceBalancer4.getPressure(),
@@ -2242,5 +2245,119 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
     CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
                Catch::Matchers::WithinRel(
                  forceBalancer.getDisplacementResidualNorm(), 0.5));
+
+    CHECK_THAT(forceBalancer.getForceMagnitudeVector().mean(), Catch::Matchers::WithinRel(
+      Eigen::median(forceBalancer.getForceMagnitudeVector()), 0.01
+    ));
+    CHECK_THAT(forceBalancer2.getForceMagnitudeVector().mean(), Catch::Matchers::WithinRel(
+      Eigen::median(forceBalancer2.getForceMagnitudeVector()), 0.01
+    ));
+    CHECK_THAT(forceBalancer3.getForceMagnitudeVector().mean(), Catch::Matchers::WithinRel(
+      Eigen::median(forceBalancer3.getForceMagnitudeVector()), 0.01
+    ));
+    CHECK_THAT(forceBalancer4.getForceMagnitudeVector().mean(), Catch::Matchers::WithinRel(
+      Eigen::median(forceBalancer4.getForceMagnitudeVector()), 0.01
+    ));
+  } else {
+    std::cerr << "File " << inputFile << " does not exist." << std::endl;
+  }
+}
+
+TEST_CASE("Random sampling example small", "[analysis][MEHPForceBalance]")
+{
+  std::cout << "Running test \"Random sampling example small\"" << std::endl;
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  CHECK(universeSeq.getLength() == 0);
+  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+
+  std::string inputFile =
+    suspectedPath + "square_lattice_2x2_a_5.2d.structure.out";
+  if (std::filesystem::exists(inputFile)) {
+    std::cout << "Reading file " << inputFile << std::endl;
+    universeSeq.initializeFromDataSequence({ { inputFile } });
+    pe::Universe universe = universeSeq.atIndex(0);
+    std::cout << "Read file " << inputFile << std::endl;
+
+    // generate the same slip-links twice,
+    // once for each assumption
+    pcm::MEHPForceBalance forceBalancer =
+      pcm::MEHPForceBalance(universe, 2, true, 1.0, true, false);
+    forceBalancer.configAssumeBoxLargeEnough(true);
+    forceBalancer.randomlyAddSliplinks(12, 6.0, 11, 3.0, false, 86573452);
+
+    pcm::MEHPForceBalance forceBalancer2 =
+      pcm::MEHPForceBalance(universe, 2, true, 1.0, true, false);
+
+    pcm::MEHPForceBalance forceBalancer3 =
+      pcm::MEHPForceBalance(universe, 2, true, 1.0, true, false);
+
+    // initially
+    CHECK_THAT(
+      forceBalancer2.getDisplacementResidualNorm(),
+      Catch::Matchers::WithinRel(forceBalancer3.getDisplacementResidualNorm()));
+
+    // check that the order does not matter
+    forceBalancer2.configAssumeBoxLargeEnough(false);
+    forceBalancer2.randomlyAddSliplinks(12, 6.0, 11, 3.0, false, 86573452);
+    forceBalancer3.randomlyAddSliplinks(12, 6.0, 11, 3.0, false, 86573452);
+    forceBalancer3.configAssumeBoxLargeEnough(false);
+
+    // after adding slip-links
+    CHECK(forceBalancer.getPressure() <= forceBalancer2.getPressure());
+    CHECK_THAT(
+      forceBalancer2.getDisplacementResidualNorm(),
+      Catch::Matchers::WithinRel(forceBalancer3.getDisplacementResidualNorm()));
+    CHECK_THAT(forceBalancer2.getPressure(),
+               Catch::Matchers::WithinRel(forceBalancer3.getPressure()));
+    // it is actually thinkable that the following fails for certain scenarios.
+    // however, in general, it should not
+    CHECK(forceBalancer.getDisplacementResidualNorm(1.) <=
+          forceBalancer2.getDisplacementResidualNorm(1.));
+    CHECK(forceBalancer.getDisplacementResidualNorm(-1.) <=
+          forceBalancer2.getDisplacementResidualNorm(-1.));
+
+    // check to make sure the slip-links are actually placed identically
+    CHECK(forceBalancer.getNetwork().springPartIndexA.isApprox(
+      forceBalancer2.getNetwork().springPartIndexA));
+    CHECK(forceBalancer2.getNetwork().springPartIndexB.isApprox(
+      forceBalancer3.getNetwork().springPartIndexB));
+
+    pcm::MEHPForceBalance forceBalancer4 =
+      pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+        universe, 12, 6.0, 11, 3.0, "86573452", 2, true);
+    forceBalancer4.configAssumeBoxLargeEnough(false);
+
+    CHECK_THAT(forceBalancer4.getPressure(),
+               Catch::Matchers::WithinRel(forceBalancer2.getPressure(), 0.1));
+    CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
+               Catch::Matchers::WithinRel(
+                 forceBalancer2.getDisplacementResidualNorm(), 0.1));
+
+    forceBalancer4.configAssumeBoxLargeEnough(true);
+
+    CHECK_THAT(forceBalancer4.getPressure(),
+               Catch::Matchers::WithinRel(forceBalancer.getPressure(), 0.1));
+    CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
+               Catch::Matchers::WithinRel(
+                 forceBalancer.getDisplacementResidualNorm(), 0.1));
+
+    std::cout << "FB 1:" << std::endl;
+    outputNetwork(forceBalancer.getNetwork(),
+                  forceBalancer.getCurrentDisplacements(),
+                  forceBalancer.getSpringPartitions());
+    std::cout << "FB 2:" << std::endl;
+    outputNetwork(forceBalancer2.getNetwork(),
+                  forceBalancer2.getCurrentDisplacements(),
+                  forceBalancer2.getSpringPartitions());
+    std::cout << "FB 3:" << std::endl;
+    outputNetwork(forceBalancer3.getNetwork(),
+                  forceBalancer3.getCurrentDisplacements(),
+                  forceBalancer3.getSpringPartitions());
+    std::cout << "FB 4:" << std::endl;
+    outputNetwork(forceBalancer4.getNetwork(),
+                  forceBalancer4.getCurrentDisplacements(),
+                  forceBalancer4.getSpringPartitions());
+  } else {
+    std::cerr << "File " << inputFile << " does not exist." << std::endl;
   }
 }

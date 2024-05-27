@@ -21,4 +21,5 @@ TEST_CASE("std::map behaves as expected", "[general]")
   for (size_t i = 0; i < zeros.size(); ++i) {
     CHECK(testMap.emplace(zeros[i], i).second == false);
   }
+  std::cout << "Finished running test \"std::map behaves as expected\"" << std::endl;
 }

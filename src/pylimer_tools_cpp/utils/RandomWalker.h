@@ -21,7 +21,6 @@ namespace utils {
    * @param from the atom to start the random walk from
    * @param to the atom to end the random walk at
    * @param chainLen the number of atoms to add in between from and to
-   * @param atomType the type of the atoms to add
    */
   std::unordered_map<std::string, std::vector<double>> doRandomWalkChainFromTo(
     const pylimer_tools::entities::Box& box,
@@ -66,7 +65,7 @@ namespace utils {
                                                target[2] - lastZ };
       std::array<double, 3> ds = box.minImageDistances(ds);
 
-      // for primary loops, dx, dy & dz are zero, intially.
+      // for primary loops, dx, dy & dz are zero, initially.
       // therewith, alpha will be NaN
       double remainingDistance =
         std::sqrt(ds[0] * ds[0] + ds[1] * ds[1] + ds[2] * ds[2]);
@@ -133,6 +132,54 @@ namespace utils {
       zs.push_back(lastZ + bondLenToUse * std::cos(alpha));
       lastZ = zs[i];
       assert(!isnan(lastX) && !isnan(lastY) && !isnan(lastZ));
+    }
+
+    std::unordered_map<std::string, std::vector<double>> results;
+    results.reserve(3);
+    results.emplace("x", xs);
+    results.emplace("y", ys);
+    results.emplace("z", zs);
+    return results;
+  }
+
+  /**
+   * @brief Do a random walk of certain length to add a chain from one to
+   * another atom
+   *
+   * @param from the atom to start the random walk from
+   * @param to the atom to end the random walk at
+   * @param chainLen the number of atoms to add in between from and to
+   */
+  std::unordered_map<std::string, std::vector<double>> doLinearWalkChainFromTo(
+    const pylimer_tools::entities::Box& box,
+    std::array<double, 3> from,
+    std::array<double, 3> to,
+    int chainLen)
+  {
+    std::array<double, 3> dist = { to[0] - from[0],
+                                   to[1] - from[1],
+                                   to[2] - from[2] };
+
+    std::array<double, 3> pbc_dist = box.minImageDistances(dist);
+
+    std::vector<double> xs;
+    xs.reserve(chainLen);
+    std::vector<double> ys;
+    ys.reserve(chainLen);
+    std::vector<double> zs;
+    zs.reserve(chainLen);
+
+    for (size_t i = 0; i < chainLen; ++i) {
+      double denominator = (i+1) / static_cast<double>(chainLen + 1);
+      std::vector<double> currentCoords = {
+        from[0] + pbc_dist[0] * denominator,
+        from[1] + pbc_dist[1] * denominator,
+        from[2] + pbc_dist[2] * denominator,
+      };
+      std::vector<double> currentCoordsPbc = box.minImageDistances(currentCoords);
+      xs.push_back(currentCoordsPbc[0]);
+      ys.push_back(currentCoordsPbc[1]);
+      zs.push_back(currentCoordsPbc[2]);
     }
 
     std::unordered_map<std::string, std::vector<double>> results;

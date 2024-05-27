@@ -76,7 +76,7 @@ public:
     return trampolineResult.first;
   }
 
-  void prepareForEvaluations() override{};
+  void prepareForEvaluations() override {};
 };
 }
 
@@ -755,6 +755,11 @@ init_pylimer_bound_calc(py::module_& m)
       )pbdoc",
       py::arg("link_idx"),
       py::arg("one_over_spring_partition_upper_limit") = 1.0)
+    .def("get_force_magnitude_vector",
+         &mehp::MEHPForceBalance::getForceMagnitudeVector,
+         R"pbdoc(
+          Evaluate the norm of the force on each (slip- or cross-) link.
+     )pbdoc")
     .def(
       "get_stress_on",
       [](mehp::MEHPForceBalance& sim,
@@ -809,7 +814,8 @@ init_pylimer_bound_calc(py::module_& m)
          const Eigen::VectorXd& u,
          const size_t springIdx) {
         return sim.evaluatePartialSpringDistance(net, u, springIdx);
-      }, R"pbdoc()pbdoc",
+      },
+      R"pbdoc()pbdoc",
       py::arg("network"),
       py::arg("displacements"),
       py::arg("spring_idx"))

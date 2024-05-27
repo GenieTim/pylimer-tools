@@ -28,9 +28,9 @@ namespace entities {
     this->atoms = atoms;
     this->box = box;
 
-    this->nrOfBucketsX = static_cast<size_t>(std::floor(box.getLx() / cutoff));
-    this->nrOfBucketsY = static_cast<size_t>(std::floor(box.getLy() / cutoff));
-    this->nrOfBucketsZ = static_cast<size_t>(std::floor(box.getLz() / cutoff));
+    this->nrOfBucketsX = std::max((size_t)1, static_cast<size_t>(std::floor(box.getLx() / cutoff)));
+    this->nrOfBucketsY = std::max((size_t)1, static_cast<size_t>(std::floor(box.getLy() / cutoff)));
+    this->nrOfBucketsZ = std::max((size_t)1, static_cast<size_t>(std::floor(box.getLz() / cutoff)));
 
     this->bucketWidthX = box.getLx() / static_cast<double>(this->nrOfBucketsX);
     this->bucketWidthY = box.getLy() / static_cast<double>(this->nrOfBucketsY);
@@ -166,13 +166,14 @@ namespace entities {
   size_t NeighbourList::normalizeBucketIndex(long int bucketIndex,
                                              size_t nrOfBuckets) const
   {
-    while (bucketIndex < 0) {
-      bucketIndex = bucketIndex + nrOfBuckets;
-    }
-    while (bucketIndex >= nrOfBuckets) {
-      bucketIndex = bucketIndex - nrOfBuckets;
-    }
-    return static_cast<size_t>(bucketIndex);
+    return bucketIndex - nrOfBuckets * std::nearbyintl(static_cast<double>(bucketIndex) / static_cast<double>(nrOfBuckets));
+    // while (bucketIndex < 0) {
+    //   bucketIndex = bucketIndex + nrOfBuckets;
+    // }
+    // while (bucketIndex >= nrOfBuckets) {
+    //   bucketIndex = bucketIndex - nrOfBuckets;
+    // }
+    // return static_cast<size_t>(bucketIndex);
   }
 
   size_t NeighbourList::getBucketIndexForTriplet(
