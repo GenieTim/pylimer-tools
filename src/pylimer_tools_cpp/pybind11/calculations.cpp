@@ -518,6 +518,12 @@ init_pylimer_bound_calc(py::module_& m)
           Caution: ignores atom masses.
      )pbdoc",
          py::arg("tolerance") = 1e-2)
+    .def("get_active_chains",
+         &mehp::MEHPForceRelaxation::getActiveChains,
+         R"pbdoc(
+          Get the cross-linker chains that are active.
+     )pbdoc",
+         py::arg("tolerance") = 1e-2)
     .def("get_effective_functionality_of_atoms",
          &mehp::MEHPForceRelaxation::getEffectiveFunctionalityOfAtoms,
          R"pbdoc(

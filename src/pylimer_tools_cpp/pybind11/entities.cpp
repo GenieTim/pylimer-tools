@@ -453,6 +453,7 @@ init_pylimer_bound_entities(py::module_& m)
      In most cases, this is equal to the contour length.
     )pbdoc")
     // operators
+    .def(pybind11::self == pybind11::self)
     .def(
       "__getitem__",
       [](const Molecule& molecule, size_t index) {

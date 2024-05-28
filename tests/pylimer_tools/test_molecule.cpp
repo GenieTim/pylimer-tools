@@ -231,11 +231,11 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
       molecules[1].getAssumedVertexCoordinates<Eigen::VectorXd>(
         assumedCoordinates, box, vertices);
     for (int i = 0; i < 4; ++i) {
-      CHECK(assumedCoordinates[(i)*3] ==
+      CHECK(assumedCoordinates[(i) * 3] ==
             Catch::Approx(29. + static_cast<double>(i)));
-      CHECK(assumedCoordinates[(i)*3 + 1] ==
+      CHECK(assumedCoordinates[(i) * 3 + 1] ==
             Catch::Approx(29. + static_cast<double>(i)));
-      CHECK(assumedCoordinates[(i)*3 + 2] ==
+      CHECK(assumedCoordinates[(i) * 3 + 2] ==
             Catch::Approx(29. + static_cast<double>(i)));
     }
   }
@@ -282,4 +282,21 @@ TEST_CASE("Strand Ends are found", "[entity][Molecule]")
     std::cout << "Skipping test: file " << suspectedPath << " not found."
               << std::endl;
   }
+}
+
+TEST_CASE("Molecule equality works", "[entity][Molecule]")
+{
+  std::cout << "Running test \"Molecule equality works\"" << std::endl;
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+
+  std::string inputFile =
+    suspectedPath + "square_lattice_2x2_a_5.2d.structure.out";
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+
+  std::vector<pe::Molecule> chains = universe.getChainsWithCrosslinker(2);
+
+  CHECK(chains[0] == chains[0]);
+  CHECK(chains[0] != chains[1]);
 }

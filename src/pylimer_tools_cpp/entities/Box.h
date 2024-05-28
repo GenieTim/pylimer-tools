@@ -137,6 +137,18 @@ namespace entities {
       this->recomputeBoxProperties();
     }
 
+    inline bool operator==(const Box& rhs) const
+    {
+      const Box& lhs = *this;
+      return lhs.getLowX() == rhs.getLowX() && lhs.getLowY() == rhs.getLowY() &&
+             lhs.getLowZ() == rhs.getLowZ() &&
+             lhs.getHighX() == rhs.getHighX() &&
+             lhs.getHighY() == rhs.getHighY() &&
+             lhs.getHighZ() == rhs.getHighZ() &&
+             lhs.getShearDirection() == rhs.getShearDirection() &&
+             lhs.getShearMagnitude() == rhs.getShearMagnitude();
+    }
+
     void applySimpleShear(const double shearMagnitude,
                           int newShearDirection = 0)
     {
@@ -328,18 +340,6 @@ namespace entities {
           }
         }
       }
-    }
-
-    inline bool operator==(const Box& rhs) const
-    {
-      const Box& lhs = *this;
-      return lhs.getLowX() == rhs.getLowX() && lhs.getLowY() == rhs.getLowY() &&
-             lhs.getLowZ() == rhs.getLowZ() &&
-             lhs.getHighX() == rhs.getHighX() &&
-             lhs.getHighY() == rhs.getHighY() &&
-             lhs.getHighZ() == rhs.getHighZ() &&
-             lhs.getShearDirection() == rhs.getShearDirection() &&
-             lhs.getShearMagnitude() == rhs.getShearMagnitude();
     }
 
     /**

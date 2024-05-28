@@ -181,6 +181,30 @@ namespace calc {
       }
 
       /**
+       * @brief Get the cross-linker Chains that are active
+       *
+       * @param tolerance
+       * @return std::vector<pylimer_tools::entities::Molecule>
+       */
+      std::vector<pylimer_tools::entities::Molecule> getActiveChains(
+        double tolerance = 0.1) const
+      {
+        std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
+          this->universe.getChainsWithCrosslinker(crossLinkerType);
+        std::vector<pylimer_tools::entities::Molecule> resultingChains;
+        Eigen::ArrayXb springIsActive =
+          this->findActiveSprings(this->currentSpringDistances, tolerance);
+        for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
+          if (this->forceRelaxationNetwork.moleculeIdxToSpring[i] >= 0 &&
+              springIsActive[this->forceRelaxationNetwork
+                               .moleculeIdxToSpring[i]]) {
+            resultingChains.push_back(crossLinkerChains[i]);
+          }
+        }
+        return resultingChains;
+      }
+
+      /**
        * @brief Get the Effective Functionality Of each node
        *
        * Returns the number of active springs connected to each atom, atomId
@@ -444,6 +468,8 @@ namespace calc {
 
         std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
           this->universe.getChainsWithCrosslinker(crossLinkerType);
+        net->moleculeIdxToSpring =
+          Eigen::VectorXi::Constant(crossLinkerChains.size(), -1);
 
         // need to include all but dangling and free chains in order to
         // model entanglement
@@ -460,6 +486,7 @@ namespace calc {
                 pylimer_tools::entities::MoleculeType::NETWORK_STRAND ||
               crossLinkerChains[i].getType() ==
                 pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
+            net->moleculeIdxToSpring[i] = nrOfSprings;
             nrOfSprings += 1;
           } else if (!removeDanglingChains &&
                      crossLinkerChains[i].getType() ==
@@ -476,6 +503,7 @@ namespace calc {
               (endAtoms[0].getType() == crossLinkerType) ? endAtoms[1]
                                                          : endAtoms[0];
             xlinkers.push_back(newXlink);
+            net->moleculeIdxToSpring[i] = nrOfSprings;
             nrOfSprings += 1;
           } else {
             // assert(endAtoms.size() == 0); // can also be
@@ -582,9 +610,8 @@ namespace calc {
           }
 
           if (addChain) {
-            if (nodeIdxFrom > nodeIdxTo) {
-              std::swap(nodeIdxFrom, nodeIdxTo);
-            }
+            RUNTIME_EXP_IFN(net->moleculeIdxToSpring[i] == spring_idx,
+                            "Expected spring mapping to be consistent.");
             std::vector<pylimer_tools::entities::Atom> allChainAtoms =
               crossLinkerChains[i].getAtomsLinedUp();
             targetDistances.segment(3 * spring_idx, 3) =
@@ -615,6 +642,9 @@ namespace calc {
             spring_idx += 1;
           }
         }
+
+        RUNTIME_EXP_IFN(spring_idx == net->nrOfSprings,
+                        "Expected nr of springs not fulfilled.");
 
         // box volume
         net->vol = net->L[0] * net->L[1] * net->L[2];
