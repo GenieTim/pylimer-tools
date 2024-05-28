@@ -3267,6 +3267,12 @@ Otherwise, you can set it to true and therewith get some securities.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation.get_active_chains">
+<span class="sig-name descname"><span class="pre">get_active_chains</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_active_chains" title="Link to this definition">¶</a></dt>
+<dd><p>Get the cross-linker chains that are active.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceRelaxation.get_average_spring_length">
 <span class="sig-name descname"><span class="pre">get_average_spring_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation" title="pylimer_tools_cpp.MEHPForceRelaxation"><span class="pre">pylimer_tools_cpp.MEHPForceRelaxation</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_average_spring_length" title="Link to this definition">¶</a></dt>
 <dd><p>Get the average length of the springs. Note that in contrast to <code class="xref py py-func docutils literal notranslate"><span class="pre">getGammaFactor()</span></code>,
@@ -3536,10 +3542,20 @@ As a consequence though, you cannot simply benchmark only this method; you must 
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.__eq__">
+<span class="sig-name descname"><span class="pre">__eq__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.__eq__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.__getitem__">
 <span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pylimer_tools_cpp.Atom" title="pylimer_tools_cpp.Atom"><span class="pre">pylimer_tools_cpp.Atom</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.__getitem__" title="Link to this definition">¶</a></dt>
 <dd><p>Access an atom by its vertex index.</p>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.__hash__">
+<span class="sig-name descname"><span class="pre">__hash__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#pylimer_tools_cpp.Molecule.__hash__" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.__init__">
@@ -5752,6 +5768,7 @@ If you have not output the type of the atoms in the dump file, they will be set 
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.assume_box_large_enough"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.assume_box_large_enough()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.config_rerun_epsilon"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.config_rerun_epsilon()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.config_step_output"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.config_step_output()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_active_chains"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_active_chains()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_average_spring_length"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_average_spring_length()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_crosslinker_universe"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_crosslinker_universe()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceRelaxation.get_dangling_weight_fraction"><code class="docutils literal notranslate"><span class="pre">MEHPForceRelaxation.get_dangling_weight_fraction()</span></code></a></li>
@@ -5782,7 +5799,9 @@ If you have not output the type of the atoms in the dump file, they will be set 
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule"><code class="docutils literal notranslate"><span class="pre">Molecule</span></code></a><ul>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.__annotations__"><code class="docutils literal notranslate"><span class="pre">Molecule.__annotations__</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.__copy__"><code class="docutils literal notranslate"><span class="pre">Molecule.__copy__()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.__eq__"><code class="docutils literal notranslate"><span class="pre">Molecule.__eq__()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.__getitem__"><code class="docutils literal notranslate"><span class="pre">Molecule.__getitem__()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.__hash__"><code class="docutils literal notranslate"><span class="pre">Molecule.__hash__</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.__init__"><code class="docutils literal notranslate"><span class="pre">Molecule.__init__()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.__iter__"><code class="docutils literal notranslate"><span class="pre">Molecule.__iter__()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.__len__"><code class="docutils literal notranslate"><span class="pre">Molecule.__len__()</span></code></a></li>
