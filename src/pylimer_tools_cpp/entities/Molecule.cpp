@@ -204,6 +204,15 @@ namespace entities {
     return this->atomIdToVertexIdx.at(atomId);
   };
 
+  bool Molecule::containsAtom(const Atom& atom) const
+  {
+    if (!pylimer_tools::utils::map_has_key(this->atomIdToVertexIdx,
+                                           atom.getId())) {
+      return false;
+    }
+    return this->getAtomByVertexIdx(this->getIdxByAtomId(atom.getId())) == atom;
+  }
+
   /**
    * @brief Get the nr of atoms in the molecule
    *

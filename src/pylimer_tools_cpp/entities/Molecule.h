@@ -65,6 +65,7 @@ namespace entities {
     }
     long int getAtomIdByIdx(const int vertexId) const override;
     long int getIdxByAtomId(const int atomId) const override;
+    bool containsAtom(const Atom& atom) const;
     std::vector<Atom> getChainEnds(int crossLinkerType = 2,
                                    bool closePrimaryLoop = true) const;
 
