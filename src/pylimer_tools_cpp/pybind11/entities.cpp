@@ -465,6 +465,9 @@ init_pylimer_bound_entities(py::module_& m)
       R"pbdoc(
        Access an atom by its vertex index.
   )pbdoc")
+    .def("__contains__", &Molecule::containsAtom, R"pbdoc(
+          Check whether a particular atom is contained in this molecule.
+     )pbdoc")
     .def("__len__", &Molecule::getLength, R"pbdoc(
        Get the number of atoms in this molecule.
   )pbdoc")

@@ -296,7 +296,10 @@ TEST_CASE("Molecule equality works", "[entity][Molecule]")
   pe::Universe universe = universeSeq.atIndex(0);
 
   std::vector<pe::Molecule> chains = universe.getChainsWithCrosslinker(2);
+  pe::Molecule chain0 = chains[0];
 
-  CHECK(chains[0] == chains[0]);
-  CHECK(chains[0] != chains[1]);
+  CHECK(chain0 == chains[0]);
+  CHECK(chain0 != chains[1]);
+
+  CHECK(chain0.containsAtom(chain0.getAtomByVertexIdx(1)));
 }
