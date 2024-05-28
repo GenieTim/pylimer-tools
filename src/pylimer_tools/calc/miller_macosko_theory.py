@@ -67,7 +67,7 @@ def predict_number_density_of_junction_points(network: Universe, crosslinker_typ
             (4 * alpha * (1 - alpha)**3 + (1 - alpha)**4)
     else:
         raise NotImplementedError(
-            "Currently, only cross-linker functionalities of 3 and 4 are supported")
+            "Currently, only cross-linker functionalities of 3 and 4 are supported, {} given.".format(functionality_per_type[crosslinker_type]))
 
 
 def predict_number_density_of_network_strands(network: Universe, crosslinker_type: int,
@@ -110,7 +110,7 @@ def predict_number_density_of_network_strands(network: Universe, crosslinker_typ
             (6 * alpha * (1 - alpha)**3 + 2 * (1 - alpha)**4)
     else:
         raise NotImplementedError(
-            "Currently, only junction functionalities of 3 and 4 are supported")
+            "Currently, only junction functionalities of 3 and 4 are supported, {} given.".format(functionality_per_type[crosslinker_type]))
 
 
 def compute_weight_fraction_of_dangling_chains(network: Universe, crosslinker_type: int,
@@ -336,6 +336,8 @@ def compute_weight_fractions_and_probabilities(network: Universe, crosslinker_ty
 def compute_miller_macosko_probabilities(r: float, p: float, f: int):
     """
     Compute Macosko and Miller's probabilities :math:`P(F_A)` and :math:`P(F_B)`
+    i.e., the probability that a randomly chosen A (cross-link) or B (strand-end),
+    respectively, is the start of a finite chain.
 
     Sources:
       - https://pubs.acs.org/doi/10.1021/ma60050a004
@@ -361,6 +363,8 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int):
     #     raise ValueError(
     #         "The stoichiometric imbalance must be > 1/(2p^2) for the resulting alpha to be realistic. "+
     #          "Got p = {}, r = {}".format(p, r))
+    if (r == 0 or p == 0):
+        return 1.0, 1.0
 
     # actually do the calculations
     if (f == 3):
@@ -403,9 +407,14 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int):
 
 def validate_r_and_p(r: float, p: float, f: int):
     if (p < 0):
-        raise ValueError("p must be positive, got {}".format(p))
+        raise ValueError(
+            "The cross-linker conversion `p` must be positive, got {}".format(p))
+    if (r < 0):
+        raise ValueError(
+            "The stoichiometric imbalance `r` must be positive, got {}".format(r))
     if (f < 2):
-        raise ValueError("f must be >= 2, got {}".format(f))
+        raise ValueError(
+            "The cross-linker functionality `f` must be >= 2, got {}".format(f))
     # assume:
     n_chains = 1000
     # -> compute:

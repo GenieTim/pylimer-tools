@@ -29,6 +29,12 @@ namespace entities {
     this->massPerType = massPerType;
   };
 
+  /**
+   * @brief Utility method to initialise the molecule, reading all info from the
+   * graph
+   *
+   * @param inGraph
+   */
   void Molecule::initializeFromGraph(const igraph_t* inGraph)
   {
     igraph_copy(&this->graph, inGraph);
@@ -76,7 +82,7 @@ namespace entities {
     : Molecule(src.parent,
                &src.graph,
                src.typeOfThisMolecule,
-               src.massPerType){};
+               src.massPerType) {};
   // 3. copy assignment operator
   Molecule& Molecule::operator=(Molecule src)
   {
@@ -89,6 +95,31 @@ namespace entities {
 
     return *this;
   };
+
+  // other operators
+  bool Molecule::operator==(const Molecule& ref) const
+  {
+    igraph_t difference;
+    igraph_difference(&difference, &this->graph, &ref.graph);
+    igraph_integer_t ecount = igraph_ecount(&difference);
+    igraph_destroy(&difference);
+    if (ecount != 0) {
+      return false;
+    }
+    std::vector<Atom> thisAtoms = this->getAtoms();
+    std::vector<Atom> otherAtoms = ref.getAtoms();
+    if (thisAtoms.size() != otherAtoms.size()) {
+      return false;
+    }
+    for (size_t i = 0; i < otherAtoms.size(); ++i) {
+      if (thisAtoms[i] != otherAtoms[i]) {
+        return false;
+      }
+    }
+    return this->massPerType == ref.massPerType &&
+           this->typeOfThisMolecule == ref.typeOfThisMolecule &&
+           this->parent == ref.parent;
+  }
 
   std::vector<double> Molecule::computeBondLengths()
   {
@@ -325,7 +356,7 @@ namespace entities {
     return this->key;
   }
 
-  std::vector<Atom> Molecule::getAtoms()
+  std::vector<Atom> Molecule::getAtoms() const
   {
     std::vector<Atom> results;
     size_t nrOfAtoms = this->getNrOfAtoms();
@@ -422,7 +453,7 @@ namespace entities {
       alignedCoordinates, this->parent, alignedVertices);
     Eigen::Vector3d result = Eigen::Vector3d::Zero();
     for (size_t i = 1; i < alignedVertices.size(); ++i) {
-      Eigen::Vector3d distance = alignedCoordinates.segment((i)*3, 3) -
+      Eigen::Vector3d distance = alignedCoordinates.segment((i) * 3, 3) -
                                  alignedCoordinates.segment((i - 1) * 3, 3);
       this->parent.handlePBC(distance);
       result += distance;
@@ -461,7 +492,7 @@ namespace entities {
     bool recording = false;
     for (size_t i = 0; i < alignedVertices.size(); ++i) {
       if (recording) {
-        Eigen::Vector3d distance = alignedCoordinates.segment((i)*3, 3) -
+        Eigen::Vector3d distance = alignedCoordinates.segment((i) * 3, 3) -
                                    alignedCoordinates.segment((i - 1) * 3, 3);
         this->parent.handlePBC(distance);
         result += distance;

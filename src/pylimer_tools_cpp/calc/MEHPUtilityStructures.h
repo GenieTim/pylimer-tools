@@ -83,6 +83,7 @@ namespace calc {
       ArrayXArrayXi springIndicesOfLinks; // maps link -> springs
       // interesting properties
       Eigen::ArrayXb springIsActive;
+      Eigen::ArrayXi moleculeIdxToSpring;
 
       // config
       bool assumeBoxLargeEnough = false;

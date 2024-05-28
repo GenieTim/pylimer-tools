@@ -41,10 +41,14 @@ namespace entities {
     Molecule(const Molecule& src);
     // 3. copy assignment operator
     Molecule& operator=(Molecule src);
+
+    // other operators
+    bool operator==(const Molecule& ref) const;
+
     // getters
     int getLength() const;
     MoleculeType getType() const;
-    std::vector<Atom> getAtoms();
+    std::vector<Atom> getAtoms() const;
     // std::map<std::string, std::vector<long int>> getBonds() const;
     std::vector<Atom> getAtomsLinedUp(int crossLinkerType = 2,
                                       bool assumedCoordinates = false,
