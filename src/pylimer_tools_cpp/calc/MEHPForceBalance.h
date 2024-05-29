@@ -187,6 +187,7 @@ namespace calc {
             continue;
           }
 
+          Eigen::Vector3d overallDistance = chain.getOverallBondSum();
           fb.initialConfig.springToMoleculeIds.push_back(chainIdx);
           std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
             chain.getAtomsLinedUp(crossLinkerType, false, true);
@@ -285,6 +286,28 @@ namespace calc {
           }
           fb.initialConfig.springsContourLength[springIdx] =
             chain.getNrOfBonds();
+
+#ifndef NDEBUG
+          Eigen::Vector3d overallDistanceNow = Eigen::Vector3d::Zero();
+          bool hasPrimaryLoop = false;
+          for (size_t i = 0;
+               i < fb.initialConfig.localToGlobalSpringIndex[springIdx].size();
+               ++i) {
+            size_t partialSpringIdx =
+              fb.initialConfig.localToGlobalSpringIndex[springIdx][i];
+            overallDistanceNow += fb.evaluatePartialSpringDistanceFrom(
+              fb.initialConfig,
+              fb.currentDisplacements,
+              partialSpringIdx,
+              fb.initialConfig.linkIndicesOfSprings[springIdx][i]);
+            hasPrimaryLoop =
+              hasPrimaryLoop ||
+              (fb.initialConfig.springPartIndexA[partialSpringIdx] ==
+               fb.initialConfig.springPartIndexB[partialSpringIdx]);
+          }
+          assert(overallDistanceNow.isApprox(overallDistance) ||
+                 hasPrimaryLoop);
+#endif
 
           partialSpringIdx += 1;
           springIdx += 1;
