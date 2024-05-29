@@ -583,50 +583,26 @@ namespace calc {
        */
       pylimer_tools::entities::Universe getCrosslinkerVerse();
 
-      int getDefaultNrOfChains() const
-      {
-        return this->defaultNrOfChains;
-      }
+      int getDefaultNrOfChains() const { return this->defaultNrOfChains; }
 
-      double getDefaultR0Square() const
-      {
-        return this->defaultR0Squared;
-      }
+      double getDefaultR0Square() const { return this->defaultR0Squared; }
 
       double getVolume() override
       {
         return this->universe.getBox().getVolume();
       }
 
-      int getNrOfNodes()
-      {
-        return this->getNetwork().nrOfNodes;
-      }
+      int getNrOfNodes() { return this->getNetwork().nrOfNodes; }
 
-      int getNrOfLinks()
-      {
-        return igraph_vcount(&this->graph);
-      }
+      int getNrOfLinks() { return igraph_vcount(&this->graph); }
 
-      size_t getNumBonds() override
-      {
-        return this->getNrOfSprings();
-      }
+      size_t getNumBonds() override { return this->getNrOfSprings(); }
 
-      size_t getNumExtraBonds() override
-      {
-        return 0;
-      }
+      size_t getNumExtraBonds() override { return 0; }
 
-      long int getNumBondsToForm() override
-      {
-        return 0;
-      }
+      long int getNumBondsToForm() override { return 0; }
 
-      size_t getNumAtoms() override
-      {
-        return this->getNrOfNodes();
-      }
+      size_t getNumAtoms() override { return this->getNrOfNodes(); }
 
       size_t getNumExtraAtoms() override
       {
@@ -653,15 +629,9 @@ namespace calc {
         return numBefore;
       }
 
-      int getNrOfSprings()
-      {
-        return this->getNetwork().nrOfSprings;
-      }
+      int getNrOfSprings() { return this->getNetwork().nrOfSprings; }
 
-      int getNrOfPartialSprings()
-      {
-        return igraph_ecount(&this->graph);
-      }
+      int getNrOfPartialSprings() { return igraph_ecount(&this->graph); }
 
       void setSpringContourLengths(const Eigen::VectorXd springsContourLengths)
       {
@@ -945,10 +915,7 @@ namespace calc {
        *
        * @return double
        */
-      double getPressure() const
-      {
-        return this->evaluatePressure();
-      }
+      double getPressure() const { return this->evaluatePressure(); }
 
       /**
        * @brief Get the Gamma Factor at the current step
@@ -971,15 +938,9 @@ namespace calc {
           this->currentSpringDistances, r02, nrOfChains);
       };
 
-      int getNrOfIterations() const
-      {
-        return this->nrOfStepsDone;
-      }
+      int getNrOfIterations() const { return this->nrOfStepsDone; }
 
-      ExitReason getExitReason() const
-      {
-        return this->exitReason;
-      }
+      ExitReason getExitReason() const { return this->exitReason; }
       /**
        * @brief Compute the spring lenghts
        *
@@ -1854,14 +1815,8 @@ namespace calc {
         return result;
       }
 
-      int getNumShifts() override
-      {
-        return 0;
-      }
-      int getNumRelocations() override
-      {
-        return 0;
-      }
+      int getNumShifts() override { return 0; }
+      int getNumRelocations() override { return 0; }
 
       Eigen::VectorXd getBondLengths() override
       {
@@ -1886,10 +1841,7 @@ namespace calc {
         return -1; // TODO: implement?
       }
 
-      size_t getNumParticles() override
-      {
-        return this->net.nrOfNodes;
-      }
+      size_t getNumParticles() override { return this->net.nrOfNodes; }
 
     protected:
       /**

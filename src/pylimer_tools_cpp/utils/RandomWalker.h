@@ -170,13 +170,14 @@ namespace utils {
     zs.reserve(chainLen);
 
     for (size_t i = 0; i < chainLen; ++i) {
-      double denominator = (i+1) / static_cast<double>(chainLen + 1);
+      double denominator = (i + 1) / static_cast<double>(chainLen + 1);
       std::vector<double> currentCoords = {
         from[0] + pbc_dist[0] * denominator,
         from[1] + pbc_dist[1] * denominator,
         from[2] + pbc_dist[2] * denominator,
       };
-      std::vector<double> currentCoordsPbc = box.minImageDistances(currentCoords);
+      std::vector<double> currentCoordsPbc =
+        box.minImageDistances(currentCoords);
       xs.push_back(currentCoordsPbc[0]);
       ys.push_back(currentCoordsPbc[1]);
       zs.push_back(currentCoordsPbc[2]);

@@ -214,7 +214,9 @@ init_pylimer_bound_entities(py::module_& m)
          "as `iz` or `nz`).")
     .def("get_coordinates", [](const Atom& a) { return a.getCoordinates(); })
     .def("get_unwrapped_coordinates",
-         [](const Atom& a, const Box& box) { return a.getUnwrappedCoordinates(box); })
+         [](const Atom& a, const Box& box) {
+           return a.getUnwrappedCoordinates(box);
+         })
     .def(pybind11::self == pybind11::self)
     //     .def(pybind11::self != pybind11::self)
     .def(py::pickle(

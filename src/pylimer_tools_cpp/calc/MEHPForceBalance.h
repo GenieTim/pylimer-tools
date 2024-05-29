@@ -187,7 +187,8 @@ namespace calc {
             continue;
           }
 
-          Eigen::Vector3d overallDistance = chain.getOverallBondSum(fb.crossLinkerType);
+          Eigen::Vector3d overallDistance =
+            chain.getOverallBondSum(fb.crossLinkerType);
           fb.initialConfig.springToMoleculeIds.push_back(chainIdx);
           std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
             chain.getAtomsLinedUp(crossLinkerType, false, true);
@@ -300,13 +301,15 @@ namespace calc {
               fb.currentDisplacements,
               partialSpringIdx,
               fb.initialConfig.linkIndicesOfSprings[springIdx][i],
-              fb.is2D, false);
+              fb.is2D,
+              false);
             hasPrimaryLoop =
               hasPrimaryLoop ||
               (fb.initialConfig.springPartIndexA[partialSpringIdx] ==
                fb.initialConfig.springPartIndexB[partialSpringIdx]);
           }
-          assert(pylimer_tools::utils::vector_approx_equal(overallDistanceNow, overallDistance) ||
+          assert(pylimer_tools::utils::vector_approx_equal(overallDistanceNow,
+                                                           overallDistance) ||
                  hasPrimaryLoop);
 #endif
 
@@ -392,10 +395,10 @@ namespace calc {
       void completeInitialization()
       {
         this->currentSpringDistances = this->evaluateSpringVectors(
-          this->initialConfig, this->currentDisplacements, is2D);
+          this->initialConfig, this->currentDisplacements);
         this->currentPartialSpringDistances =
-          this->evaluatePartialSpringVectors(
-            this->initialConfig, this->currentDisplacements, is2D);
+          this->evaluatePartialSpringVectors(this->initialConfig,
+                                             this->currentDisplacements);
         this->defaultBondLength = universe.computeMeanBondLength();
         this->defaultNrOfChains =
           universe.getMolecules(this->crossLinkerType).size();
@@ -782,33 +785,60 @@ namespace calc {
        */
       pylimer_tools::entities::Universe getCrosslinkerVerse() const;
 
-      int getDefaultNrOfChains() const { return this->defaultNrOfChains; }
+      int getDefaultNrOfChains() const
+      {
+        return this->defaultNrOfChains;
+      }
 
       double getDefaultMeanBondLength() const
       {
         return this->defaultBondLength;
       }
 
-      double getVolume() override { return this->initialConfig.vol; }
+      double getVolume() override
+      {
+        return this->initialConfig.vol;
+      }
 
-      int getNrOfNodes() const { return this->initialConfig.nrOfNodes; }
+      int getNrOfNodes() const
+      {
+        return this->initialConfig.nrOfNodes;
+      }
 
-      int getNrOfLinks() const { return this->initialConfig.nrOfLinks; }
+      int getNrOfLinks() const
+      {
+        return this->initialConfig.nrOfLinks;
+      }
 
-      size_t getNumBonds() override { return this->getNrOfSprings(); }
+      size_t getNumBonds() override
+      {
+        return this->getNrOfSprings();
+      }
 
-      size_t getNumExtraBonds() override { return 0; }
+      size_t getNumExtraBonds() override
+      {
+        return 0;
+      }
 
-      long int getNumBondsToForm() override { return 0; }
+      long int getNumBondsToForm() override
+      {
+        return 0;
+      }
 
-      size_t getNumAtoms() override { return this->getNrOfNodes(); }
+      size_t getNumAtoms() override
+      {
+        return this->getNrOfNodes();
+      }
 
       size_t getNumExtraAtoms() override
       {
         return this->getNrOfLinks() - this->getNrOfNodes();
       }
 
-      int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
+      int getNrOfSprings() const
+      {
+        return this->initialConfig.nrOfSprings;
+      }
 
       int getNrOfPartialSprings() const
       {
@@ -850,10 +880,10 @@ namespace calc {
         this->assumeBoxLargeEnough = assumption;
 
         this->currentSpringDistances = this->evaluateSpringVectors(
-          this->initialConfig, this->currentDisplacements, is2D);
+          this->initialConfig, this->currentDisplacements);
         this->currentPartialSpringDistances =
-          this->evaluatePartialSpringVectors(
-            this->initialConfig, this->currentDisplacements, is2D);
+          this->evaluatePartialSpringVectors(this->initialConfig,
+                                             this->currentDisplacements);
       }
 
       void configMeanBondLength(double meanBondLength)
@@ -1031,14 +1061,21 @@ namespace calc {
 
       Eigen::VectorXd getCurrentPartialSpringDistances() const
       {
-        return this->evaluatePartialSpringVectors(
-          this->initialConfig, this->currentDisplacements, this->is2D);
+        Eigen::VectorXd partialSpringVectors =
+          this->evaluatePartialSpringVectors(this->initialConfig,
+                                             this->currentDisplacements);
+        Eigen::VectorXd results =
+          Eigen::VectorXd::Zero(this->initialConfig.nrOfPartialSprings);
+        for (size_t i = 0; i < this->initialConfig.nrOfPartialSprings; ++i) {
+          results[i] = partialSpringVectors.segment(3 * i, 3).norm();
+        }
+        return results;
       }
 
       std::vector<double> getCurrentPartialSpringLengths() const
       {
         Eigen::VectorXd vecs = this->evaluatePartialSpringVectors(
-          this->initialConfig, this->currentDisplacements, this->is2D);
+          this->initialConfig, this->currentDisplacements);
 
         return pylimer_tools::utils::segmentwise_norm(vecs, 3);
       }
@@ -1131,9 +1168,15 @@ namespace calc {
 
       double getGammaFactor(double b = 0.96, int nrOfChains = -1) const;
 
-      int getNrOfIterations() const { return this->nrOfStepsDone; }
+      int getNrOfIterations() const
+      {
+        return this->nrOfStepsDone;
+      }
 
-      ExitReason getExitReason() const { return this->exitReason; }
+      ExitReason getExitReason() const
+      {
+        return this->exitReason;
+      }
 
       void addSlipLinks(const std::vector<size_t>& strandIdx1,
                         const std::vector<size_t>& strandIdx2,
@@ -1193,7 +1236,15 @@ namespace calc {
        */
       Eigen::VectorXd evaluateSpringVectors(const ForceBalanceNetwork& net,
                                             const Eigen::VectorXd& u,
-                                            const bool is2D) const;
+                                            const bool is2D,
+                                            const bool assumeBoxLarge) const;
+
+      Eigen::VectorXd evaluateSpringVectors(const ForceBalanceNetwork& net,
+                                            const Eigen::VectorXd& u) const
+      {
+        return this->evaluateSpringVectors(
+          net, u, this->is2D, this->assumeBoxLargeEnough);
+      };
 
       /**
        * @brief Compute the spring lenghts
@@ -1261,7 +1312,16 @@ namespace calc {
       Eigen::VectorXd evaluatePartialSpringVectors(
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
-        const bool is2D) const;
+        const bool is2D,
+        const bool assumeLarge) const;
+
+      Eigen::VectorXd evaluatePartialSpringVectors(
+        const ForceBalanceNetwork& net,
+        const Eigen::VectorXd& u) const
+      {
+        return this->evaluatePartialSpringVectors(
+          net, u, this->is2D, this->assumeBoxLargeEnough);
+      };
 
       size_t getOtherSpringIndex(const ForceBalanceNetwork& net,
                                  const size_t springIdx,
@@ -1389,7 +1449,10 @@ namespace calc {
                            const Eigen::VectorXd& u,
                            const Eigen::VectorXd& springPartitions) const;
 
-      ForceBalanceNetwork getNetwork() { return this->initialConfig; }
+      ForceBalanceNetwork getNetwork()
+      {
+        return this->initialConfig;
+      }
 
       Eigen::VectorXd getSpringPartitions()
       {
@@ -1867,8 +1930,14 @@ namespace calc {
       {
         return this->getStressTensor(-1.0);
       }
-      int getNumShifts() override { return 0; }
-      int getNumRelocations() override { return 0; }
+      int getNumShifts() override
+      {
+        return 0;
+      }
+      int getNumRelocations() override
+      {
+        return 0;
+      }
 
       Eigen::VectorXd getBondLengths() override
       {
