@@ -452,10 +452,10 @@ namespace entities {
    * @param crossLinkerType
    * @return Eigen::Vector3d
    */
-  Eigen::Vector3d Molecule::getOverallBondSum(const int crossLinkerType) const
+  Eigen::Vector3d Molecule::getOverallBondSum(const int crossLinkerType, const bool closeLoop) const
   {
     std::vector<long int> alignedVertices =
-      this->getVerticesLinedUp(crossLinkerType);
+      this->getVerticesLinedUp(crossLinkerType, closeLoop);
     Eigen::VectorXd alignedCoordinates =
       Eigen::VectorXd::Zero(3 * alignedVertices.size());
     this->getAssumedVertexCoordinates(

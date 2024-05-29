@@ -90,7 +90,7 @@ namespace entities {
      * @param crossLinkerType
      * @return Eigen::Vector3d
      */
-    Eigen::Vector3d getOverallBondSum(const int crossLinkerType = 2) const;
+    Eigen::Vector3d getOverallBondSum(const int crossLinkerType = 2, const bool closeLoop = true) const;
 
     /**
      * @brief Get the overall offset in terms of boxes (for PBC)
