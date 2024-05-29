@@ -79,7 +79,7 @@ namespace calc {
                this->net.springsContourLength[spring_index];
       }
 
-      void prepareForEvaluations() override{};
+      void prepareForEvaluations() override {};
     };
 
     class NonGaussianSpringForceEvaluator : public MEHPForceEvaluator

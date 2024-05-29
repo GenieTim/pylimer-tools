@@ -366,9 +366,9 @@ namespace calc {
              3 * this->initialConfig.nrOfLinks);
       this->validateNetwork();
       this->currentSpringDistances = this->evaluateSpringVectors(
-        this->initialConfig, this->currentDisplacements, this->is2D);
+        this->initialConfig, this->currentDisplacements);
       this->currentPartialSpringDistances = this->evaluatePartialSpringVectors(
-        this->initialConfig, this->currentDisplacements, is2D);
+        this->initialConfig, this->currentDisplacements);
       if (wasInterrupted) {
         this->exitReason = ExitReason::INTERRUPT;
         cleanupInterrupt();
@@ -4686,29 +4686,43 @@ namespace calc {
     Eigen::VectorXd MEHPForceBalance::evaluateSpringVectors(
       const ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
-      const bool is2D) const
+      const bool is2D,
+      const bool assumeLarge) const
     {
-      // first, the distances
       assert(u.size() == net.coordinates.size());
 
-      Eigen::VectorXd displacedCoords = net.coordinates + u;
-      Eigen::VectorXd springDistances =
-        (displacedCoords(net.springCoordinateIndexB) -
-         displacedCoords(net.springCoordinateIndexA));
-      assert(springDistances.size() == net.nrOfSprings * 3);
+      Eigen::VectorXd springVectors =
+        Eigen::VectorXd::Zero(net.nrOfSprings * 3);
 
-      this->box.handlePBC(springDistances);
+      // rather than going via partial springs, we could,
+      // in the case of a large enough box, directly use the spring's end
+      // indices
+      if (assumeLarge) {
+        Eigen::VectorXd displacedCoords = (net.coordinates + u);
+        springVectors = displacedCoords(net.springCoordinateIndexB) -
+                        displacedCoords(net.springCoordinateIndexA);
+        this->box.handlePBC(springVectors);
+      } else {
+        Eigen::VectorXd partialSpringVectors =
+          this->evaluatePartialSpringVectors(net, u, is2D, assumeLarge);
+
+        // CAREFUL: this assumes a certain direction
+        for (size_t i = 0; i < net.nrOfPartialSprings; ++i) {
+          springVectors.segment(3 * net.partialToFullSpringIndex[i], 3) +=
+            partialSpringVectors.segment(3 * i, 3);
+        }
+      }
 
       // reset for 2D systems
       if (is2D && net.nrOfSprings > 0) {
         // springDistances(Eigen::seq(2, net.nrOfSprings, 3)) =
         //   Eigen::VectorXd::Zero(net.nrOfSprings);
         for (size_t i = 2; i < 3 * net.nrOfSprings; i += 3) {
-          springDistances[i] = 0.0;
+          springVectors[i] = 0.0;
         }
       }
 
-      return springDistances;
+      return springVectors;
     }
 
     /**
@@ -4728,7 +4742,7 @@ namespace calc {
       assert(u.size() == net.coordinates.size());
 
       Eigen::VectorXd partialSpringVectors =
-        this->evaluatePartialSpringVectors(net, u, is2D);
+        this->evaluatePartialSpringVectors(net, u);
       assert(partialSpringVectors.size() == net.nrOfPartialSprings * 3);
 
       Eigen::VectorXd springLengths = Eigen::VectorXd::Zero(net.nrOfSprings);
@@ -4776,7 +4790,8 @@ namespace calc {
     Eigen::VectorXd MEHPForceBalance::evaluatePartialSpringVectors(
       const ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
-      const bool is2D) const
+      const bool is2D,
+      const bool assumeLarge) const
     {
       // first, the distances
       assert(u.size() == net.coordinates.size());
@@ -4786,7 +4801,7 @@ namespace calc {
         (displacedCoords(net.springPartCoordinateIndexB) -
          displacedCoords(net.springPartCoordinateIndexA)) +
         net.springPartBoxOffset;
-      if (this->assumeBoxLargeEnough) {
+      if (assumeLarge) {
         this->box.handlePBC(partialDistances);
       }
 
@@ -4934,6 +4949,9 @@ namespace calc {
                            "Expected alpha within [0, 1], got " +
                              std::to_string(alpha2[i]) + ".");
       }
+      Eigen::VectorXd springVectorsBefore = this->evaluateSpringVectors(
+        this->initialConfig, this->currentDisplacements, this->is2D, false);
+
       // actually start adding them
       this->initialConfig.nrOfLinks += additionalLen;
       // but first, indicate the resize
@@ -5186,6 +5204,23 @@ namespace calc {
         }
       }
       this->initialConfig.nrOfSpringsWithPartition = nrOfPartitionedSprings;
+
+#ifndef NDEBUG
+      Eigen::VectorXd springVectorsAfter = this->evaluateSpringVectors(
+        this->initialConfig, this->currentDisplacements, this->is2D, false);
+      for (size_t i = 0; i < this->initialConfig.nrOfSprings; ++i) {
+        bool containsPrimaryLoop = false;
+        for (size_t partialSpringIdx :
+             this->initialConfig.localToGlobalSpringIndex[i]) {
+          containsPrimaryLoop =
+            containsPrimaryLoop || (this->initialConfig.springPartIndexA[i] ==
+                                    this->initialConfig.springPartIndexB[i]);
+        }
+        assert(containsPrimaryLoop || pylimer_tools::utils::vector_approx_equal(
+                                        springVectorsBefore.segment(3 * i, 3),
+                                        springVectorsAfter.segment(3 * i, 3)));
+      }
+#endif
 
       // do we really want to?
       this->validateNetwork();
@@ -5641,7 +5676,7 @@ namespace calc {
                                              oneOverSpringPartitionUpperLimit) *
         (1. / (b * b)); // compute the vector of
       Eigen::VectorXd partialSpringVectors = this->evaluatePartialSpringVectors(
-        this->initialConfig, this->currentDisplacements, this->is2D);
+        this->initialConfig, this->currentDisplacements);
 
       return ((oneOverSpringPart.array() * partialSpringVectors.array())
                 .matrix()
@@ -5668,7 +5703,7 @@ namespace calc {
       }
 
       Eigen::VectorXd springVectors = this->evaluateSpringVectors(
-        this->initialConfig, this->currentDisplacements, this->is2D);
+        this->initialConfig, this->currentDisplacements);
 
       double commonDenominator = 1. / (b * b * nrOfChains);
       double result = 0.;
@@ -6111,9 +6146,7 @@ namespace calc {
           size_t partner1 = net.linkIndicesOfSprings[i][partialIdx + 1];
           RUNTIME_EXP_IFN(
             ((net.springPartIndexA[partialSpringIdx] == partner0 &&
-              net.springPartIndexB[partialSpringIdx] == partner1) ||
-             (net.springPartIndexB[partialSpringIdx] == partner0 &&
-              net.springPartIndexA[partialSpringIdx] == partner1)),
+              net.springPartIndexB[partialSpringIdx] == partner1)),
             "Expect linkIndicesOfSprings and localToGlobalSpringIndex "
             "ordering to correspond. Got partner0 = " +
               std::to_string(partner0) + ", partner1 = " +
@@ -6201,8 +6234,7 @@ namespace calc {
             std::to_string(net.partialSpringIsPartial[i]) + ".");
         if (!net.linkIsSliplink[partialEndA]) {
           RUNTIME_EXP_IFN(
-            net.springIndexA[fullIdx] == partialEndA ||
-              net.springIndexB[fullIdx] == partialEndA,
+            net.springIndexA[fullIdx] == partialEndA,
             "Expect mapping of springs to work: " +
               std::to_string(partialEndA) +
               " is a cross-link, yet not part of the two ends of spring " +
@@ -6212,8 +6244,7 @@ namespace calc {
         }
         if (!net.linkIsSliplink[partialEndB]) {
           RUNTIME_EXP_IFN(
-            net.springIndexA[fullIdx] == partialEndB ||
-              net.springIndexB[fullIdx] == partialEndB,
+            net.springIndexB[fullIdx] == partialEndB,
             "Expect mapping of springs to work: " +
               std::to_string(partialEndB) +
               " is a cross-link, yet not part of the two ends of spring " +

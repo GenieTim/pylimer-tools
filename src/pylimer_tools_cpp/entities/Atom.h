@@ -33,7 +33,7 @@ namespace entities {
       , z(zNow)
       , nx(nxNow)
       , ny(nyNow)
-      , nz(nzNow){};
+      , nz(nzNow) {};
 
     Atom(std::unordered_map<std::string, double>& properties)
       : Atom(static_cast<long int>(std::lround(properties["id"])),
