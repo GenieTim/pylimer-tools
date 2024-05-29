@@ -187,7 +187,7 @@ namespace calc {
             continue;
           }
 
-          Eigen::Vector3d overallDistance = chain.getOverallBondSum();
+          Eigen::Vector3d overallDistance = chain.getOverallBondSum(fb.crossLinkerType);
           fb.initialConfig.springToMoleculeIds.push_back(chainIdx);
           std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
             chain.getAtomsLinedUp(crossLinkerType, false, true);
@@ -299,13 +299,14 @@ namespace calc {
               fb.initialConfig,
               fb.currentDisplacements,
               partialSpringIdx,
-              fb.initialConfig.linkIndicesOfSprings[springIdx][i]);
+              fb.initialConfig.linkIndicesOfSprings[springIdx][i],
+              fb.is2D, false);
             hasPrimaryLoop =
               hasPrimaryLoop ||
               (fb.initialConfig.springPartIndexA[partialSpringIdx] ==
                fb.initialConfig.springPartIndexB[partialSpringIdx]);
           }
-          assert(overallDistanceNow.isApprox(overallDistance) ||
+          assert(pylimer_tools::utils::vector_approx_equal(overallDistanceNow, overallDistance) ||
                  hasPrimaryLoop);
 #endif
 
