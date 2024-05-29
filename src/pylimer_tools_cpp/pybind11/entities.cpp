@@ -212,10 +212,14 @@ init_pylimer_bound_entities(py::module_& m)
          &Atom::getNZ,
          "Get the box image that the atom is in in z direction (also known "
          "as `iz` or `nz`).")
+    .def("get_coordinates", [](const Atom& a) { return a.getCoordinates(); })
+    .def("get_unwrapped_coordinates",
+         [](const Atom& a, const Box& box) { return a.getUnwrappedCoordinates(box); })
     .def(pybind11::self == pybind11::self)
     //     .def(pybind11::self != pybind11::self)
     .def(py::pickle(
            [](const Atom& b) { // __getstate__
+                               // TODO: support extra data
              /* Return a tuple that fully encodes the state of the object */
              return py::make_tuple(b.getId(),
                                    b.getType(),
