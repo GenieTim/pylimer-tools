@@ -131,7 +131,7 @@ TEST_CASE("Particular slip-link examples", "[analysis][MEHPForceBalance]")
   CHECK(springPartitions[2] == Catch::Approx(0.0));
   CHECK(springPartitions[3] == Catch::Approx(0.13912));
   CHECK(springPartitions[4] == Catch::Approx(1. - 0.31034482758620685));
-  outputNetwork(forceBalancer.getNetwork(), displacements, springPartitions);
+  // outputNetwork(forceBalancer.getNetwork(), displacements, springPartitions);
   /*auto results = */
   forceBalancer.inspectParametrisationOptimsationForLink(
     5,
@@ -142,7 +142,7 @@ TEST_CASE("Particular slip-link examples", "[analysis][MEHPForceBalance]")
     1,
     1e10); // cannot use 1.0 for oneOver... without setting higher contour
            // length fraction
-  outputNetwork(forceBalancer.getNetwork(), displacements, springPartitions);
+  // outputNetwork(forceBalancer.getNetwork(), displacements, springPartitions);
   CHECK(displacements[5 * 3] == Catch::Approx(5.89283));
   CHECK(displacements[5 * 3 + 1] == Catch::Approx(-1.0033));
   CHECK(displacements[5 * 3 + 2] == Catch::Approx(-3.49778));
@@ -205,7 +205,7 @@ TEST_CASE("MC swap accept and reject work", "[analysis][MEHPForceBalance]")
     pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
     Eigen::VectorXd u = forceBalancer.getCurrentDisplacements();
     Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
-    outputNetwork(net, u, partitions);
+    // outputNetwork(net, u, partitions);
     CHECK(forceBalancer.swapSlipLinkReversibly(
       net, u, partitions, 5, 1., -1, false, true));
     bool netIsIdentical = net.springPartIndexA.isApprox(
@@ -213,7 +213,7 @@ TEST_CASE("MC swap accept and reject work", "[analysis][MEHPForceBalance]")
                           net.springPartIndexB.isApprox(
                             forceBalancer.getNetwork().springPartIndexB);
     CHECK_FALSE(netIsIdentical);
-    outputNetwork(net, u, partitions);
+    // outputNetwork(net, u, partitions);
     CHECK_FALSE(partitions.isApprox(forceBalancer.getSpringPartitions()));
     CHECK_FALSE(u.isApprox(forceBalancer.getCurrentDisplacements()));
   }
@@ -283,13 +283,13 @@ TEST_CASE("MC swap accept and reject work with crosslinkers",
     Eigen::VectorXd u = forceBalancer.getCurrentDisplacements();
     Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
     CHECK(net.linkIndicesOfSprings[1].size() == 3);
-    outputNetwork(net, u, partitions);
+    // outputNetwork(net, u, partitions);
     CHECK_FALSE(forceBalancer.swapSlipLinkReversibly(
       net, u, partitions, 5, 1., 0, true, false));
     CHECK(forceBalancer.swapSlipLinkReversibly(
       net, u, partitions, 5, 1., 5, false, true));
     // check that the connectivity around the cross-link changed
-    outputNetwork(net, u, partitions);
+    // outputNetwork(net, u, partitions);
     CHECK(net.linkIndicesOfSprings[1].size() == 2);
     CHECK(net.nrOfCrosslinkSwapsEndured[0] == 1);
   }
@@ -304,7 +304,7 @@ TEST_CASE("MC swap accept and reject work with crosslinkers",
     CHECK(net.nrOfPartialSprings == 6);
     Eigen::VectorXd u = forceBalancer.getCurrentDisplacements();
     Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
-    outputNetwork(net, u, partitions);
+    // outputNetwork(net, u, partitions);
     CHECK_FALSE(
       forceBalancer.swapSlipLinkReversibly(net, u, partitions, 4, 1.));
     CHECK(net.nrOfCrosslinkSwapsEndured[0] == 0);
@@ -411,9 +411,9 @@ TEST_CASE("MEHP Force Balance handles slip-links on primary loops",
                                { 0.5333333333333333, 0.9310344827586207 },
                                { 0.5, 0.5 });
     pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
-    outputNetwork(net,
-                  Eigen::VectorXd::Zero(net.nrOfLinks * 3),
-                  forceBalancer.getSpringPartitions());
+    // outputNetwork(net,
+    //               Eigen::VectorXd::Zero(net.nrOfLinks * 3),
+    //               forceBalancer.getSpringPartitions());
     Eigen::VectorXd displacements = Eigen::VectorXd::Zero(net.nrOfLinks * 3);
     Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
     CHECK_NOTHROW(forceBalancer.displaceToMeanPosition(
@@ -486,7 +486,7 @@ TEST_CASE("MEHP Force Balance handles slip-link convergence correctly",
   Eigen::VectorXd springPartitions = forceBalancer.getSpringPartitions();
   CHECK(springPartitions[3] ==
         Catch::Approx(0.7931034482758621 - 0.13793103448275862));
-  outputNetwork(forceBalancer.getNetwork(), displacements, springPartitions);
+  // outputNetwork(forceBalancer.getNetwork(), displacements, springPartitions);
   // one output step
   forceBalancer.updateSpringPartition(
     forceBalancer.getNetwork(), displacements, springPartitions, 5, 1.e10);
@@ -520,7 +520,7 @@ TEST_CASE("MEHP Force Balance handles slip-link convergence correctly",
   CHECK(displacements[5 * 3 + 2] == Catch::Approx(0.44577));
   CHECK(springPartitions[1] == Catch::Approx(0.13793103448275862));
 
-  outputNetwork(forceBalancer.getNetwork(), displacements, springPartitions);
+  // outputNetwork(forceBalancer.getNetwork(), displacements, springPartitions);
 
   SECTION("Stress tensor computations are equivalent")
   {
@@ -1393,7 +1393,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       Eigen::VectorXd displacements =
         Eigen::VectorXd::Zero(forceBalancer2.getNrOfLinks() * 3);
       pcm::ForceBalanceNetwork net = forceBalancer2.getNetwork();
-      outputNetwork(net, displacements, springPartitions);
+      // outputNetwork(net, displacements, springPartitions);
 
       forceBalancer2.displaceToMeanPosition(
         net, displacements, springPartitions, 4);
@@ -1425,7 +1425,7 @@ TEST_CASE("MEHP Force Balance handles slip-links",
       }
       // assert expectations are met.
       // NOTE: difficulty: finding out which spring idx it actually is
-      outputNetwork(net, displacements, springPartitions);
+      // outputNetwork(net, displacements, springPartitions);
       CHECK_THAT(springPartitions[5],
                  Catch::Matchers::WithinAbs(0., 1e-3)); // 4-1(2)
       CHECK_THAT(springPartitions[6],
@@ -2306,22 +2306,11 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
         Eigen::median(forceBalancerSmallNewSampling.getForceMagnitudeVector()),
         0.25));
 
-    // DEBUG; now, REMOVE LATER
-    Eigen::VectorXd magnitudeVector =
-      forceBalancerSmallOldSampling1.getForceMagnitudeVector();
-    size_t maxIndex;
-    double maxValue = magnitudeVector.maxCoeff(&maxIndex);
-
-    std::cout << "\n\n\nnetwork 2:" << std::endl;
-    std::cout << "Max force: " << maxValue << " on link with idx " << maxIndex
-              << std::endl;
-    outputNetwork(forceBalancerSmallOldSampling1.getNetwork(),
-                  forceBalancerSmallOldSampling1.getCurrentDisplacements(),
-                  forceBalancerSmallOldSampling1.getSpringPartitions());
-    std::cout << "\n\n\nnetwork 4:" << std::endl;
-    outputNetwork(forceBalancerSmallNewSampling.getNetwork(),
-                  forceBalancerSmallNewSampling.getCurrentDisplacements(),
-                  forceBalancerSmallNewSampling.getSpringPartitions());
+    // DEBUG:
+    // Eigen::VectorXd magnitudeVector =
+    //   forceBalancerSmallOldSampling1.getForceMagnitudeVector();
+    // size_t maxIndex;
+    // double maxValue = magnitudeVector.maxCoeff(&maxIndex);
   } else {
     std::cerr << "File " << inputFile << " does not exist." << std::endl;
   }
@@ -2596,14 +2585,14 @@ TEST_CASE("Conversion of structure is equal for both methods",
       forceBalancerOldConversion.getPressure(),
       Catch::Matchers::WithinRel(forceBalancerNewConversion.getPressure()));
 
-    std::cout << "FB 1:" << std::endl;
-    outputNetwork(forceBalancerNewConversion.getNetwork(),
-                  forceBalancerNewConversion.getCurrentDisplacements(),
-                  forceBalancerNewConversion.getSpringPartitions());
-    std::cout << "\n\n\nFB 2:" << std::endl;
-    outputNetwork(forceBalancerOldConversion.getNetwork(),
-                  forceBalancerOldConversion.getCurrentDisplacements(),
-                  forceBalancerOldConversion.getSpringPartitions());
+    // std::cout << "FB 1:" << std::endl;
+    // outputNetwork(forceBalancerNewConversion.getNetwork(),
+    //               forceBalancerNewConversion.getCurrentDisplacements(),
+    //               forceBalancerNewConversion.getSpringPartitions());
+    // std::cout << "\n\n\nFB 2:" << std::endl;
+    // outputNetwork(forceBalancerOldConversion.getNetwork(),
+    //               forceBalancerOldConversion.getCurrentDisplacements(),
+    //               forceBalancerOldConversion.getSpringPartitions());
   }
 }
 
