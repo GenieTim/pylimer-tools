@@ -388,9 +388,9 @@ namespace calc {
        */
       void completeInitialization()
       {
-        this->currentSpringDistances = this->evaluateSpringVectors(
+        this->currentSpringVectors = this->evaluateSpringVectors(
           this->initialConfig, this->currentDisplacements);
-        this->currentPartialSpringDistances =
+        this->currentPartialSpringVectors =
           this->evaluatePartialSpringVectors(this->initialConfig,
                                              this->currentDisplacements);
         this->defaultBondLength = universe.computeMeanBondLength();
@@ -846,9 +846,9 @@ namespace calc {
       {
         this->assumeBoxLargeEnough = assumption;
 
-        this->currentSpringDistances = this->evaluateSpringVectors(
+        this->currentSpringVectors = this->evaluateSpringVectors(
           this->initialConfig, this->currentDisplacements);
-        this->currentPartialSpringDistances =
+        this->currentPartialSpringVectors =
           this->evaluatePartialSpringVectors(this->initialConfig,
                                              this->currentDisplacements);
       }
@@ -887,7 +887,7 @@ namespace calc {
       double getSolubleWeightFraction(double tolerance = 0.01)
       {
         return this->computeSolubleWeightFraction(
-          &this->initialConfig, this->currentSpringDistances, tolerance);
+          &this->initialConfig, this->currentSpringVectors, tolerance);
       }
 
       /**
@@ -899,7 +899,7 @@ namespace calc {
       double getDanglingWeightFraction(double tolerance = 0.01)
       {
         return this->computeDanglingWeightFraction(
-          &this->initialConfig, this->currentSpringDistances, tolerance);
+          &this->initialConfig, this->currentSpringVectors, tolerance);
       }
 
       /**
@@ -1002,7 +1002,7 @@ namespace calc {
 
       Eigen::VectorXd getCurrentSpringDistances() const
       {
-        return this->currentSpringDistances;
+        return this->currentSpringVectors;
       }
 
       std::vector<double> getCurrentSpringLengths() const
@@ -1076,7 +1076,7 @@ namespace calc {
        */
       int getNrOfActiveSprings(double tolerance = 0.01) const
       {
-        return this->countNrOfActiveSprings(this->currentSpringDistances,
+        return this->countNrOfActiveSprings(this->currentSpringVectors,
                                             tolerance);
       }
 
@@ -1089,7 +1089,7 @@ namespace calc {
        */
       int getNrOfActivePartialSprings(double tolerance = 0.01) const
       {
-        return this->countNrOfActiveSprings(this->currentPartialSpringDistances,
+        return this->countNrOfActiveSprings(this->currentPartialSpringVectors,
                                             tolerance);
       }
 
@@ -1915,9 +1915,9 @@ namespace calc {
       Eigen::VectorXd getBondLengths() override
       {
         Eigen::VectorXd lens =
-          Eigen::VectorXd::Zero(this->currentSpringDistances.size() / 3);
+          Eigen::VectorXd::Zero(this->currentSpringVectors.size() / 3);
 
-        for (size_t i = 0; i < this->currentSpringDistances.size() / 3; ++i) {
+        for (size_t i = 0; i < this->currentSpringVectors.size() / 3; ++i) {
           double b = lens.segment(3 * i, 3).norm();
           lens[i] = b;
         }
@@ -2210,11 +2210,11 @@ namespace calc {
         assert(atom1Idx < atom2Idx);
         if (chain.getType() ==
             pylimer_tools::entities::MoleculeType::PRIMARY_LOOP) {
-          assert(APPROX_WITHIN(atom1Idx, 0, chain.getLength() - 1, 1e-2));
-          assert(APPROX_WITHIN(atom2Idx, 1, chain.getLength(), 1e-2));
+          assert(APPROX_WITHIN(atom1Idx, 0, chain.getNrOfAtoms() - 1, 1e-2));
+          assert(APPROX_WITHIN(atom2Idx, 1, chain.getNrOfAtoms(), 1e-2));
         } else {
-          assert(APPROX_WITHIN(atom1Idx, 0, chain.getLength() - 2, 1e-2));
-          assert(APPROX_WITHIN(atom2Idx, 1, chain.getLength() - 1, 1e-2));
+          assert(APPROX_WITHIN(atom1Idx, 0, chain.getNrOfAtoms() - 2, 1e-2));
+          assert(APPROX_WITHIN(atom2Idx, 1, chain.getNrOfAtoms() - 1, 1e-2));
         }
 
         // set the partition, remember the partial spring mapping
@@ -2228,7 +2228,7 @@ namespace calc {
         net.partialToFullSpringIndex[partialSpringIdx] = springIdx;
         net.partialSpringIsPartial[partialSpringIdx] = !(
           atom1Idx == 0 &&
-          atom2Idx == chain.getLength() -
+          atom2Idx == chain.getNrOfAtoms() -
                         (chain.getType() ==
                              pylimer_tools::entities::MoleculeType::PRIMARY_LOOP
                            ? 0
@@ -2597,8 +2597,8 @@ namespace calc {
       std::string endNodesFile;
       ForceBalanceNetwork initialConfig;
       Eigen::VectorXd currentDisplacements;
-      Eigen::VectorXd currentSpringDistances;
-      Eigen::VectorXd currentPartialSpringDistances;
+      Eigen::VectorXd currentSpringVectors;
+      Eigen::VectorXd currentPartialSpringVectors;
       Eigen::VectorXd
         currentSpringPartitionsVec; /* gives the parametrisation of N */
       int crossLinkerType = 2;

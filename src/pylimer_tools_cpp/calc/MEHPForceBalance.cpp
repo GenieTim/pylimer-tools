@@ -365,9 +365,9 @@ namespace calc {
       assert(this->currentDisplacements.size() ==
              3 * this->initialConfig.nrOfLinks);
       this->validateNetwork();
-      this->currentSpringDistances = this->evaluateSpringVectors(
+      this->currentSpringVectors = this->evaluateSpringVectors(
         this->initialConfig, this->currentDisplacements);
-      this->currentPartialSpringDistances = this->evaluatePartialSpringVectors(
+      this->currentPartialSpringVectors = this->evaluatePartialSpringVectors(
         this->initialConfig, this->currentDisplacements);
       if (wasInterrupted) {
         this->exitReason = ExitReason::INTERRUPT;
@@ -5297,8 +5297,8 @@ namespace calc {
       for (int i = 0; i < this->initialConfig.nrOfSprings; i++) {
         double r2local = 0.0;
         for (int j = 0; j < 3; ++j) {
-          r2local += this->currentSpringDistances[i * 3 + j] *
-                     this->currentSpringDistances[i * 3 + j];
+          r2local += this->currentSpringVectors[i * 3 + j] *
+                     this->currentSpringVectors[i * 3 + j];
         }
         r2 += sqrt(r2local);
       }
@@ -5657,7 +5657,7 @@ namespace calc {
       Eigen::VectorXi nrOfActiveSpringsConnected =
         Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
       Eigen::ArrayXb springIsActive =
-        this->findActiveSprings(this->currentSpringDistances, tolerance);
+        this->findActiveSprings(this->currentSpringVectors, tolerance);
       for (size_t i = 0; i < this->initialConfig.nrOfSprings; i++) {
         if (springIsActive[i] == true) /* active spring */
         {
@@ -5683,7 +5683,7 @@ namespace calc {
       Eigen::VectorXi nrOfActivePartialSpringsConnected =
         Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
       Eigen::ArrayXb springIsActive =
-        this->findActiveSprings(this->currentPartialSpringDistances, tolerance);
+        this->findActiveSprings(this->currentPartialSpringVectors, tolerance);
       RUNTIME_EXP_IFN(
         springIsActive.size() == this->initialConfig.nrOfPartialSprings,
         "Expect findActiveSprings to return an "
@@ -5789,7 +5789,6 @@ namespace calc {
                                           bool remove2functionalCrosslinkers,
                                           bool removeDanglingChains)
     {
-
       if (remove2functionalCrosslinkers) {
         for (pylimer_tools::entities::Atom xlinker :
              this->universe.getAtomsOfType(crossLinkerType)) {
@@ -6004,7 +6003,7 @@ namespace calc {
           net.partialToFullSpringIndex[spring_idx] = (spring_idx);
 
           expectedDistance = crossLinkerChains[i].getOverallBondSumFromTo(
-            atomIdFrom, atomIdTo, crossLinkerType, false);
+            atomIdFrom, atomIdTo, crossLinkerType, true);
           Eigen::Vector3d actualDistance =
             net.coordinates.segment(3 * nodeIdxTo, 3) -
             net.coordinates.segment(3 * nodeIdxFrom, 3);
