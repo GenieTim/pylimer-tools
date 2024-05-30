@@ -94,8 +94,9 @@ namespace calc {
           universe.getChainsWithCrosslinker(crossLinkerType);
 
         // add ends of chains
-        std::unordered_map<size_t, size_t> endAtomIdToLinkIdx;
-        endAtomIdToLinkIdx.reserve(crossLinkerChains.size() * 2);
+        std::vector<long int> vertexIdToLinkIdx =
+          pylimer_tools::utils::initializeWithValue<long int>(
+            fb.universe.getNrOfAtoms(), -1);
         size_t currentVertexId = 0;
         size_t numUseableChains = 0;
         for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
@@ -105,16 +106,17 @@ namespace calc {
           }
           std::vector<pylimer_tools::entities::Atom> linedUpAtoms =
             chain.getAtomsLinedUp(crossLinkerType, false, true);
-          if (!pylimer_tools::utils::map_has_key(endAtomIdToLinkIdx,
-                                                 linedUpAtoms[0].getId())) {
-            endAtomIdToLinkIdx[linedUpAtoms[0].getId()] = currentVertexId;
+          if (vertexIdToLinkIdx[fb.universe.getIdxByAtomId(
+                linedUpAtoms[0].getId())] == -1) {
+            vertexIdToLinkIdx[fb.universe.getIdxByAtomId(
+              linedUpAtoms[0].getId())] = currentVertexId;
             currentVertexId += 1;
           }
-          if (!pylimer_tools::utils::map_has_key(
-                endAtomIdToLinkIdx,
-                pylimer_tools::utils::last(linedUpAtoms).getId())) {
-            endAtomIdToLinkIdx[pylimer_tools::utils::last(linedUpAtoms)
-                                 .getId()] = currentVertexId;
+          if (vertexIdToLinkIdx[fb.universe.getIdxByAtomId(
+                pylimer_tools::utils::last(linedUpAtoms).getId())] == -1) {
+            vertexIdToLinkIdx[fb.universe.getIdxByAtomId(
+              pylimer_tools::utils::last(linedUpAtoms).getId())] =
+              currentVertexId;
             currentVertexId += 1;
           }
           numUseableChains += 1;
@@ -195,22 +197,21 @@ namespace calc {
           size_t previousIdx = 0;
 
           size_t previousLinkIdx =
-            endAtomIdToLinkIdx.at(linedUpAtoms[0].getId());
+            vertexIdToLinkIdx[fb.universe.getIdxByAtomId(linedUpAtoms[0].getId())];
           fb.setLinkPropertiesFromAtom(
             fb.initialConfig,
-            endAtomIdToLinkIdx.at(linedUpAtoms[0].getId()),
+            previousLinkIdx,
             linedUpAtoms[0],
             fb.crossLinkerType);
-          fb.initialConfig.linkIndicesOfSprings[springIdx].push_back(
-            endAtomIdToLinkIdx.at(linedUpAtoms[0].getId()));
+          fb.initialConfig.linkIndicesOfSprings[springIdx].push_back(previousLinkIdx);
           fb.initialConfig
-            .springIndicesOfLinks[endAtomIdToLinkIdx.at(
-              linedUpAtoms[0].getId())]
+            .springIndicesOfLinks[previousLinkIdx]
             .push_back(springIdx);
           pylimer_tools::entities::Atom lastAtom =
             pylimer_tools::utils::last(linedUpAtoms);
+          size_t lastLinkIdx = vertexIdToLinkIdx[fb.universe.getIdxByAtomId(lastAtom.getId())];
           fb.setLinkPropertiesFromAtom(fb.initialConfig,
-                                       endAtomIdToLinkIdx.at(lastAtom.getId()),
+                                       lastLinkIdx,
                                        lastAtom,
                                        fb.crossLinkerType);
           fb.initialConfig.springIndexA[springIdx] = previousLinkIdx;
@@ -260,7 +261,6 @@ namespace calc {
           }
 
           // close the chain
-          size_t lastLinkIdx = endAtomIdToLinkIdx.at(lastAtom.getId());
           fb.registerPartialSpring(
             fb.initialConfig, partialSpringIdx, previousLinkIdx, lastLinkIdx);
           fb.initialConfig.linkIndicesOfSprings[springIdx].push_back(
@@ -290,7 +290,6 @@ namespace calc {
 
 #ifndef NDEBUG
           Eigen::Vector3d overallDistanceNow = Eigen::Vector3d::Zero();
-          bool hasPrimaryLoop = false;
           for (size_t i = 0;
                i < fb.initialConfig.localToGlobalSpringIndex[springIdx].size();
                ++i) {
@@ -303,14 +302,9 @@ namespace calc {
               fb.initialConfig.linkIndicesOfSprings[springIdx][i],
               fb.is2D,
               false);
-            hasPrimaryLoop =
-              hasPrimaryLoop ||
-              (fb.initialConfig.springPartIndexA[partialSpringIdx] ==
-               fb.initialConfig.springPartIndexB[partialSpringIdx]);
           }
           assert(pylimer_tools::utils::vector_approx_equal(overallDistanceNow,
-                                                           overallDistance) ||
-                 hasPrimaryLoop);
+                                                           overallDistance));
 #endif
 
           partialSpringIdx += 1;
@@ -785,60 +779,33 @@ namespace calc {
        */
       pylimer_tools::entities::Universe getCrosslinkerVerse() const;
 
-      int getDefaultNrOfChains() const
-      {
-        return this->defaultNrOfChains;
-      }
+      int getDefaultNrOfChains() const { return this->defaultNrOfChains; }
 
       double getDefaultMeanBondLength() const
       {
         return this->defaultBondLength;
       }
 
-      double getVolume() override
-      {
-        return this->initialConfig.vol;
-      }
+      double getVolume() override { return this->initialConfig.vol; }
 
-      int getNrOfNodes() const
-      {
-        return this->initialConfig.nrOfNodes;
-      }
+      int getNrOfNodes() const { return this->initialConfig.nrOfNodes; }
 
-      int getNrOfLinks() const
-      {
-        return this->initialConfig.nrOfLinks;
-      }
+      int getNrOfLinks() const { return this->initialConfig.nrOfLinks; }
 
-      size_t getNumBonds() override
-      {
-        return this->getNrOfSprings();
-      }
+      size_t getNumBonds() override { return this->getNrOfSprings(); }
 
-      size_t getNumExtraBonds() override
-      {
-        return 0;
-      }
+      size_t getNumExtraBonds() override { return 0; }
 
-      long int getNumBondsToForm() override
-      {
-        return 0;
-      }
+      long int getNumBondsToForm() override { return 0; }
 
-      size_t getNumAtoms() override
-      {
-        return this->getNrOfNodes();
-      }
+      size_t getNumAtoms() override { return this->getNrOfNodes(); }
 
       size_t getNumExtraAtoms() override
       {
         return this->getNrOfLinks() - this->getNrOfNodes();
       }
 
-      int getNrOfSprings() const
-      {
-        return this->initialConfig.nrOfSprings;
-      }
+      int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
 
       int getNrOfPartialSprings() const
       {
@@ -1168,15 +1135,9 @@ namespace calc {
 
       double getGammaFactor(double b = 0.96, int nrOfChains = -1) const;
 
-      int getNrOfIterations() const
-      {
-        return this->nrOfStepsDone;
-      }
+      int getNrOfIterations() const { return this->nrOfStepsDone; }
 
-      ExitReason getExitReason() const
-      {
-        return this->exitReason;
-      }
+      ExitReason getExitReason() const { return this->exitReason; }
 
       void addSlipLinks(const std::vector<size_t>& strandIdx1,
                         const std::vector<size_t>& strandIdx2,
@@ -1323,6 +1284,27 @@ namespace calc {
           net, u, this->is2D, this->assumeBoxLargeEnough);
       };
 
+      double sumToTotalFraction(const ForceBalanceNetwork& net,
+                                Eigen::VectorXd springPartition,
+                                size_t springIdx,
+                                size_t targetLink) const
+      {
+        double alpha = 0.;
+        for (size_t i = 0; i < net.localToGlobalSpringIndex[springIdx].size();
+             ++i) {
+          size_t currentPartialSpringIdx =
+            net.localToGlobalSpringIndex[springIdx][i];
+          if (net.springPartIndexA[currentPartialSpringIdx] == targetLink) {
+            return alpha;
+          }
+          alpha += springPartition[currentPartialSpringIdx];
+          if (net.springPartIndexB[currentPartialSpringIdx] == targetLink) {
+            return alpha;
+          }
+        }
+        throw std::runtime_error("Did not find target link in spring.");
+      }
+
       size_t getOtherSpringIndex(const ForceBalanceNetwork& net,
                                  const size_t springIdx,
                                  const size_t linkIdx) const
@@ -1449,10 +1431,7 @@ namespace calc {
                            const Eigen::VectorXd& u,
                            const Eigen::VectorXd& springPartitions) const;
 
-      ForceBalanceNetwork getNetwork()
-      {
-        return this->initialConfig;
-      }
+      ForceBalanceNetwork getNetwork() { return this->initialConfig; }
 
       Eigen::VectorXd getSpringPartitions()
       {
@@ -1930,14 +1909,8 @@ namespace calc {
       {
         return this->getStressTensor(-1.0);
       }
-      int getNumShifts() override
-      {
-        return 0;
-      }
-      int getNumRelocations() override
-      {
-        return 0;
-      }
+      int getNumShifts() override { return 0; }
+      int getNumRelocations() override { return 0; }
 
       Eigen::VectorXd getBondLengths() override
       {

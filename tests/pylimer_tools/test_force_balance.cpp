@@ -21,6 +21,12 @@ namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
 namespace pcm = pylimer_tools::calc::mehp;
 
+double
+roundForOutput(double val, double precision = 5)
+{
+  return std::round(val * std::pow(10, precision)) / std::pow(10, precision);
+}
+
 void
 outputNetwork(pcm::ForceBalanceNetwork net,
               Eigen::VectorXd displacements,
@@ -44,10 +50,10 @@ outputNetwork(pcm::ForceBalanceNetwork net,
       std::cout << std::endl;
       if (j < net.linkIndicesOfSprings[i].size() - 1) {
         std::cout << net.localToGlobalSpringIndex.at(i)[j] << ": "
-                  << springPartitions[net.localToGlobalSpringIndex.at(i)[j]]
-                  << " (" << net.springPartBoxOffset[0] << ", "
-                  << net.springPartBoxOffset[1] << ", "
-                  << net.springPartBoxOffset[2] << ")" << std::endl;
+          << springPartitions[net.localToGlobalSpringIndex.at(i)[j]] << " ("
+          << roundForOutput(net.springPartBoxOffset[0]) << ", "
+          << roundForOutput(net.springPartBoxOffset[1]) << ", "
+          << roundForOutput(net.springPartBoxOffset[2]) << ")" << std::endl;
       }
     }
     std::cout << std::endl;
@@ -2186,15 +2192,15 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
     // generate the same slip-links twice,
     // once for each assumption
     pcm::MEHPForceBalance forceBalancer =
-      pcm::MEHPForceBalance(universe, 2, false, 1.0, true, false);
+      pcm::MEHPForceBalance(universe, 2, false, 1.0, false, false);
     forceBalancer.configAssumeBoxLargeEnough(true);
     forceBalancer.randomlyAddSliplinks(1000, 6.0, 900, 3.0, false, 53467829);
 
     pcm::MEHPForceBalance forceBalancer2 =
-      pcm::MEHPForceBalance(universe, 2, false, 1.0, true, false);
+      pcm::MEHPForceBalance(universe, 2, false, 1.0, false, false);
 
     pcm::MEHPForceBalance forceBalancer3 =
-      pcm::MEHPForceBalance(universe, 2, false, 1.0, true, false);
+      pcm::MEHPForceBalance(universe, 2, false, 1.0, false, false);
 
     // initially
     CHECK_THAT(
@@ -2371,6 +2377,125 @@ TEST_CASE("Random sampling example small", "[analysis][MEHPForceBalance]")
     outputNetwork(forceBalancer4.getNetwork(),
                   forceBalancer4.getCurrentDisplacements(),
                   forceBalancer4.getSpringPartitions());
+  } else {
+    std::cerr << "File " << inputFile << " does not exist." << std::endl;
+  }
+}
+
+TEST_CASE("Yet another sampling example", "[analysis][MEHPForceBalance]")
+{
+  std::cout << "Running test \"Yet another sampling example\"" << std::endl;
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  CHECK(universeSeq.getLength() == 0);
+  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+
+  std::string inputFile =
+    suspectedPath +
+    "crosslinked_p_0.99145_0.99145_melt_10000_a_3_5000_xlinks_v_1.V-fixed."
+    "structure.out-equilibration_do_crosslink.structure.out";
+  if (std::filesystem::exists(inputFile)) {
+    std::cout << "Reading file " << inputFile << std::endl;
+    universeSeq.initializeFromDataSequence({ { inputFile } });
+    pe::Universe universe = universeSeq.atIndex(0);
+    std::cout << "Read file " << inputFile << std::endl;
+
+    // randomly sample slip-links
+    pcm::MEHPForceBalance forceBalancer4 =
+      pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+        universe, 1000, 6.0, 900, 3.0, "53467829");
+    forceBalancer4.configAssumeBoxLargeEnough(false);
+
+    // extract these randomly sampled slip-links
+    std::vector<size_t> strandIdx1;
+    std::vector<size_t> strandIdx2;
+    std::vector<double> x;
+    std::vector<double> y;
+    std::vector<double> z;
+    std::vector<double> alpha1;
+    std::vector<double> alpha2;
+
+    pcm::ForceBalanceNetwork net = forceBalancer4.getNetwork();
+    for (size_t i = 0; i < net.nrOfLinks - net.nrOfNodes; ++i) {
+      size_t linkIdx = i + net.nrOfNodes;
+      strandIdx1.push_back(net.springIndicesOfLinks[linkIdx][0]);
+      strandIdx2.push_back(
+        pylimer_tools::utils::last(net.springIndicesOfLinks[linkIdx]));
+      x.push_back(net.coordinates[3 * (linkIdx) + 0]);
+      y.push_back(net.coordinates[3 * (linkIdx) + 1]);
+      z.push_back(net.coordinates[3 * (linkIdx) + 2]);
+      alpha1.push_back(
+        forceBalancer4.sumToTotalFraction(net,
+                                          forceBalancer4.getSpringPartitions(),
+                                          net.springIndicesOfLinks[linkIdx][0],
+                                          linkIdx));
+      alpha2.push_back(forceBalancer4.sumToTotalFraction(
+        net,
+        forceBalancer4.getSpringPartitions(),
+        pylimer_tools::utils::last(net.springIndicesOfLinks[linkIdx]),
+        linkIdx));
+      // TODO: handle these primary loops, then increase required accuracy
+      // if (net.springIndicesOfLinks[linkIdx].size() == 1 ||
+      //     net.springIndicesOfLinks[linkIdx][0] ==
+      //       net.springIndicesOfLinks[linkIdx][1]) {
+      //   alpha2[alpha2.size() - 1] +=
+      // }
+    }
+
+    // generate the same slip-links twice,
+    // once for each assumption
+    pcm::MEHPForceBalance forceBalancer =
+      pcm::MEHPForceBalance(universe, 2, false, 1.0, false, false);
+    forceBalancer.configAssumeBoxLargeEnough(true);
+
+    // check that the general conversion is equal
+    REQUIRE(forceBalancer.getNetwork().springIndexA.isApprox(net.springIndexA));
+
+    forceBalancer.addSlipLinks(
+      strandIdx1, strandIdx2, x, y, z, alpha1, alpha2, false);
+    CHECK(forceBalancer.getNrOfLinks() == forceBalancer4.getNrOfLinks());
+    CHECK(forceBalancer.getNrOfPartialSprings() ==
+          forceBalancer4.getNrOfPartialSprings());
+
+    // std::cout << "\n\n\nnetwork 4:" << std::endl;
+    // outputNetwork(forceBalancer4.getNetwork(),
+    //               forceBalancer4.getCurrentDisplacements(),
+    //               forceBalancer4.getSpringPartitions());
+    // std::cout << "\n\n\nnetwork 1:" << std::endl;
+    // outputNetwork(forceBalancer.getNetwork(),
+    //               forceBalancer.getCurrentDisplacements(),
+    //               forceBalancer.getSpringPartitions());
+
+
+    pcm::MEHPForceBalance forceBalancer2 =
+      pcm::MEHPForceBalance(universe, 2, false, 1.0, false, false);
+    forceBalancer2.configAssumeBoxLargeEnough(false);
+    forceBalancer2.addSlipLinks(
+      strandIdx1, strandIdx2, x, y, z, alpha1, alpha2, false);
+
+    // after adding slip-links
+    CHECK(forceBalancer.getNetwork().springPartIndexA.isApprox(
+      forceBalancer2.getNetwork().springPartIndexA));
+    CHECK_THAT(
+      forceBalancer4.getDisplacementResidualNorm(),
+      Catch::Matchers::WithinRel(forceBalancer.getDisplacementResidualNorm(), 1e-3));
+    CHECK_THAT(forceBalancer.getPressure(),
+               Catch::Matchers::WithinRel(forceBalancer4.getPressure(), 1e-3));
+
+    CHECK(forceBalancer.getPressure() <= forceBalancer2.getPressure());
+    // it is actually thinkable that the following fails for certain scenarios.
+    // however, in general, it should not
+    CHECK(forceBalancer.getDisplacementResidualNorm(1.) <=
+          forceBalancer2.getDisplacementResidualNorm(1.));
+    CHECK(forceBalancer.getDisplacementResidualNorm(-1.) <=
+          forceBalancer2.getDisplacementResidualNorm(-1.));
+
+    // check to make sure the slip-links are actually placed identically
+    CHECK(forceBalancer.getNetwork().springPartIndexA.isApprox(
+      forceBalancer2.getNetwork().springPartIndexA));
+    // cannot compare this: the indices are different depending on sampling
+    // or addition method
+    // CHECK(forceBalancer2.getNetwork().springPartIndexB.isApprox(
+    //   forceBalancer4.getNetwork().springPartIndexB));
   } else {
     std::cerr << "File " << inputFile << " does not exist." << std::endl;
   }

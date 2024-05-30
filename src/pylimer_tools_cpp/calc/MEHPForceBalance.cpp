@@ -5266,18 +5266,18 @@ namespace calc {
       Eigen::VectorXd springVectorsAfter = this->evaluateSpringVectors(
         this->initialConfig, this->currentDisplacements, this->is2D, false);
       for (size_t i = 0; i < this->initialConfig.nrOfSprings; ++i) {
-        bool containsPrimaryLoop = false;
-        for (size_t partialSpringIdx :
-             this->initialConfig.localToGlobalSpringIndex[i]) {
-          containsPrimaryLoop =
-            containsPrimaryLoop ||
-            (this->initialConfig.springPartIndexA[partialSpringIdx] ==
-             this->initialConfig.springPartIndexB[partialSpringIdx]);
-        }
+        // bool containsPrimaryLoop = false;
+        // for (size_t partialSpringIdx :
+        //      this->initialConfig.localToGlobalSpringIndex[i]) {
+        //   containsPrimaryLoop =
+        //     containsPrimaryLoop ||
+        //     (this->initialConfig.springPartIndexA[partialSpringIdx] ==
+        //      this->initialConfig.springPartIndexB[partialSpringIdx]);
+        // }
         Eigen::Vector3d vecBefore = springVectorsBefore.segment(3 * i, 3);
         Eigen::Vector3d vecAfter = springVectorsAfter.segment(3 * i, 3);
-        assert(containsPrimaryLoop ||
-               pylimer_tools::utils::vector_approx_equal(vecBefore, vecAfter));
+        assert( // containsPrimaryLoop ||
+          pylimer_tools::utils::vector_approx_equal(vecBefore, vecAfter));
       }
 #endif
 
@@ -5789,11 +5789,10 @@ namespace calc {
                                           bool remove2functionalCrosslinkers,
                                           bool removeDanglingChains)
     {
-      std::vector<pylimer_tools::entities::Atom> xlinkers =
-        this->universe.getAtomsOfType(crossLinkerType);
 
       if (remove2functionalCrosslinkers) {
-        for (pylimer_tools::entities::Atom xlinker : xlinkers) {
+        for (pylimer_tools::entities::Atom xlinker :
+             this->universe.getAtomsOfType(crossLinkerType)) {
           // change type of cross-linkers with a degree <= 2 to "normal",
           // non-cross-link beads
           size_t vertexId = this->universe.getIdxByAtomId(xlinker.getId());
@@ -5802,7 +5801,6 @@ namespace calc {
               vertexId, "type", crossLinkerType - 1);
           }
         }
-        xlinkers = this->universe.getAtomsOfType(crossLinkerType);
       }
 
       std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
@@ -5814,6 +5812,10 @@ namespace calc {
       std::vector<bool> useChain =
         pylimer_tools::utils::initializeWithValue<bool>(
           crossLinkerChains.size(), false);
+      std::vector<long int> vertexIdToLinkIdx =
+        pylimer_tools::utils::initializeWithValue<long int>(
+          this->universe.getNrOfAtoms(), -1);
+      size_t currentLinkIdx = 0;
       for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
         RUNTIME_EXP_IFN(crossLinkerChains[i].getType() !=
                           pylimer_tools::entities::MoleculeType::UNDEFINED,
@@ -5845,16 +5847,25 @@ namespace calc {
           assert(XOR(endAtoms[0].getType() == crossLinkerType,
                      endAtoms[1].getType() == crossLinkerType));
 
-          pylimer_tools::entities::Atom newXlink =
-            (endAtoms[0].getType() == crossLinkerType) ? endAtoms[1]
-                                                       : endAtoms[0];
-          xlinkers.push_back(newXlink);
           useChain[i] = true;
           nrOfSprings += 1;
         }
+
+        if (useChain[i]) {
+          std::vector<pylimer_tools::entities::Atom> endAtoms =
+            crossLinkerChains[i].getChainEnds(crossLinkerType);
+          for (const pylimer_tools::entities::Atom& endAtom : endAtoms) {
+            size_t atomVertexIdx =
+              this->universe.getIdxByAtomId(endAtom.getId());
+            if (vertexIdToLinkIdx[atomVertexIdx] == -1) {
+              vertexIdToLinkIdx[atomVertexIdx] = currentLinkIdx;
+              currentLinkIdx += 1;
+            }
+          }
+        }
       }
 
-      size_t nrOfXlinks = xlinkers.size();
+      size_t nrOfXlinks = currentLinkIdx;
 
       // crossLinkerUniverse.simplify();
       pylimer_tools::entities::Box box = this->universe.getBox();
@@ -5895,15 +5906,18 @@ namespace calc {
       net.partialSpringIsPartial =
         Eigen::ArrayXb::Constant(net.nrOfSprings, false);
 
-      // convert beads
+      // convert (cross-linker-)beads
       std::map<int, int> atomIdToNode;
-      for (size_t i = 0; i < xlinkers.size(); ++i) {
-        pylimer_tools::entities::Atom atom = xlinkers[i];
-        atomIdToNode[atom.getId()] = i;
-        net.oldAtomIds[i] = atom.getId();
-        net.coordinates[3 * i + 0] = atom.getX();
-        net.coordinates[3 * i + 1] = atom.getY();
-        net.coordinates[3 * i + 2] = atom.getZ();
+      for (size_t i = 0; i < vertexIdToLinkIdx.size(); ++i) {
+        if (vertexIdToLinkIdx[i] != -1) {
+          size_t linkIdx = vertexIdToLinkIdx[i];
+          pylimer_tools::entities::Atom atom = this->universe.getAtomByVertexIdx(i);
+          atomIdToNode[atom.getId()] = linkIdx;
+          net.oldAtomIds[linkIdx] = atom.getId();
+          net.coordinates[3 * linkIdx + 0] = atom.getX();
+          net.coordinates[3 * linkIdx + 1] = atom.getY();
+          net.coordinates[3 * linkIdx + 2] = atom.getZ();
+        }
       }
 
       // convert springs
