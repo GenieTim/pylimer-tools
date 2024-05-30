@@ -92,6 +92,15 @@ TEST_CASE("Eigen behaves as required", "[analysis][MEHPForceBalance][Eigen]")
   //   CHECK(diff[1] == Catch::Approx(-0.299508));
   //   CHECK(diff[2] == Catch::Approx(4.37942));
   // }
+
+  SECTION("Entries can be swapped")
+  {
+    Eigen::VectorXi testVec(11);
+    testVec = Eigen::VectorXi::LinSpaced(11, 0, 10);
+    CHECK(testVec[4] == 4);
+    std::swap(testVec[3], testVec[4]);
+    CHECK(testVec[3] == 4);
+  }
 }
 
 TEST_CASE("Vector Rows can be removed", "[Eigen]")
