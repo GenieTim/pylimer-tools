@@ -2800,11 +2800,12 @@ namespace calc {
         "With this minimum alpha, the slip-link cannot be placed on this "
         "partial spring.");
 
-      size_t oldPartnerA = net.springPartIndexA[splitPartialSpringIdx];
-      size_t oldPartnerB = net.springPartIndexB[splitPartialSpringIdx];
+      const size_t oldPartnerA = net.springPartIndexA[splitPartialSpringIdx];
+      const size_t oldPartnerB = net.springPartIndexB[splitPartialSpringIdx];
 
-      Eigen::Vector3d distanceBefore = this->evaluatePartialSpringDistance(
-        net, u, splitPartialSpringIdx, this->is2D, false);
+      const Eigen::Vector3d distanceBefore =
+        this->evaluatePartialSpringDistance(
+          net, u, splitPartialSpringIdx, this->is2D, false);
 
       // std::cout << "Adding slip-link " << slipLinkIdx << " to spring "
       //           << relevantSpring << " (partial " << partialSpringIdx
@@ -2832,19 +2833,18 @@ namespace calc {
       // slightly change numbering to keep the numbering of
       // localToGlobalSpringIndex constant. I.e., we want the
       // `newPartialSpringIdx` to correspond to the spring with the cross-link
-      bool forward;
-      if (net.localToGlobalSpringIndex[relevantSpring][0] ==
-          splitPartialSpringIdx) {
-        forward = true;
+      const bool forward = !net.linkIsSliplink[oldPartnerA];
+      if (forward) {
         assert(net.linkIndicesOfSprings[relevantSpring][0] == oldPartnerA);
+        assert(net.localToGlobalSpringIndex[relevantSpring][0] ==
+               splitPartialSpringIdx);
         // std::cout << "Case 1a" << std::endl;
         net.linkIndicesOfSprings[relevantSpring].insert(
           net.linkIndicesOfSprings[relevantSpring].begin() + 1, slipLinkIdx);
         net.localToGlobalSpringIndex[relevantSpring].insert(
-          net.localToGlobalSpringIndex[relevantSpring].begin(),
+          net.localToGlobalSpringIndex[relevantSpring].begin() + 1,
           newPartialSpringIdx);
       } else {
-        forward = false;
         assert(pylimer_tools::utils::last(
                  net.localToGlobalSpringIndex[relevantSpring]) ==
                splitPartialSpringIdx);
@@ -2858,7 +2858,7 @@ namespace calc {
         net.localToGlobalSpringIndex[relevantSpring].push_back(
           newPartialSpringIdx);
       }
-      
+
       // rewire the springs
       net.springPartIndexB[splitPartialSpringIdx] = slipLinkIdx;
       net.springPartIndexA[newPartialSpringIdx] = slipLinkIdx;
@@ -2934,7 +2934,8 @@ namespace calc {
           net, u, splitPartialSpringIdx, this->is2D, false) +
         this->evaluatePartialSpringDistance(
           net, u, newPartialSpringIdx, this->is2D, false);
-      assert(distanceBefore.isApprox(distanceAfter));
+      assert(pylimer_tools::utils::vector_approx_equal(distanceBefore,
+                                                       distanceAfter));
 
       return newPartialSpringIdx;
     }
@@ -3932,7 +3933,8 @@ namespace calc {
             Eigen::Vector3d vec1 = (viaCoords - sourceCoords) + currentOffset;
             Eigen::Vector3d vec2 =
               (targetCoords - viaCoords) + (totalOffset - currentOffset);
-            assert((vec1 + vec2).isApprox(totalDistanceBefore));
+            assert(pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
+              (vec1 + vec2), totalDistanceBefore));
 
             double currentScore = vec1.squaredNorm() + vec2.squaredNorm();
 
@@ -5179,7 +5181,8 @@ namespace calc {
                                                 this->is2D,
                                                 false);
 
-          RUNTIME_EXP_IFN(distanceAfter.isApprox(distanceBefore),
+          RUNTIME_EXP_IFN(pylimer_tools::utils::vector_approx_equal(
+                            distanceAfter, distanceBefore),
                           "Expected that overall vector does not change upon "
                           "adding slip-springs");
 
