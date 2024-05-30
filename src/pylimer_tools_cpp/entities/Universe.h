@@ -70,10 +70,6 @@ namespace entities {
                     additionalData);
     void removeAtoms(const std::vector<long int>& ids);
     void replaceAtom(const long int id, const Atom& replacement);
-    void resampleVelocities(double mean,
-                            double variance,
-                            std::string seed = "",
-                            bool is2d = false);
     // bonds
     void addBonds(const std::vector<long int>& from,
                   const std::vector<long int>& to);
@@ -108,6 +104,13 @@ namespace entities {
     void initializeFromGraph(const igraph_t* ingraph);
     void removeAllAngles();
     void removeAllDihedralAngles();
+
+    // adjustments
+    void resampleVelocities(double mean,
+                            double variance,
+                            std::string seed = "",
+                            bool is2d = false);
+    void inferCoordinates(int crosslinkerType);
     void simplify();
 
     // getters

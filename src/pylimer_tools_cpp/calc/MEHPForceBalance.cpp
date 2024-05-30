@@ -3903,14 +3903,23 @@ namespace calc {
                                   u.segment(3 * slipLinkIdx, 3);
 
       double bestOffsetScore = -1.;
-      Eigen::Vector3d bestOffset;
+      Eigen::Vector3d bestOffset = Eigen::Vector3d::Zero();
 
       // ugly brute-force method to check all possible combinations (ideally,
       // more or less at least)
-      Eigen::Array3i multiplicity =
-        (totalOffset.array() / this->universe.getBox().getL())
+      Eigen::Array3i multiplicity1 =
+        (this->universe.getBox().getOffset(viaCoords - sourceCoords).array() /
+         this->universe.getBox().getL())
           .rint()
-          .cast<int>();
+          .cast<int>()
+          .abs();
+      Eigen::Array3i multiplicity2 =
+        (this->universe.getBox().getOffset(targetCoords - viaCoords).array() /
+         this->universe.getBox().getL())
+          .rint()
+          .cast<int>()
+          .abs();
+      Eigen::Array3i multiplicity = multiplicity1 + multiplicity2;
       if (this->is2D) {
         multiplicity[2] = 0;
         sourceCoords[2] = 0.;
@@ -3918,13 +3927,13 @@ namespace calc {
         viaCoords[2] = 0.;
         totalOffset[2] = 0.;
       }
-      for (int mx = std::min(0, multiplicity[0]);
+      for (int mx = std::min(0, -multiplicity[0]);
            mx <= std::max(0, multiplicity[0]);
            ++mx) {
-        for (int my = std::min(0, multiplicity[1]);
+        for (int my = std::min(0, -multiplicity[1]);
              my <= std::max(0, multiplicity[1]);
              ++my) {
-          for (int mz = std::min(0, multiplicity[2]);
+          for (int mz = std::min(0, -multiplicity[2]);
                mz <= std::max(0, multiplicity[2]);
                ++mz) {
             Eigen::Vector3d currentOffset;
@@ -5852,9 +5861,9 @@ namespace calc {
             this->universe.getAtomByVertexIdx(i);
           atomIdToNode[atom.getId()] = linkIdx;
           net.oldAtomIds[linkIdx] = atom.getId();
-          net.coordinates[3 * linkIdx + 0] = atom.getX();
-          net.coordinates[3 * linkIdx + 1] = atom.getY();
-          net.coordinates[3 * linkIdx + 2] = atom.getZ();
+          Eigen::Vector3d coords = atom.getCoordinates();
+          this->universe.getBox().handlePBC(coords);
+          net.coordinates.segment(3 * linkIdx, 3) = coords;
         }
       }
 

@@ -607,6 +607,18 @@ namespace entities {
     this->dihedralAngleType.clear();
   }
 
+  void Universe::inferCoordinates(int crosslinkerType)
+  {
+    std::vector<Molecule> molecules = this->getMolecules(crosslinkerType);
+    for (const Molecule& molecule : molecules) {
+      std::vector<Atom> linedUpAtoms =
+        molecule.getAtomsLinedUp(crosslinkerType, true, false);
+      for (const Atom& atom : linedUpAtoms) {
+        this->replaceAtom(atom.getId(), atom);
+      }
+    }
+  };
+
   /**
    * @brief Simplify the underlying graph by removing double edges etc.
    *

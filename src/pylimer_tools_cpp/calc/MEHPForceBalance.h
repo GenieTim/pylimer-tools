@@ -2191,7 +2191,9 @@ namespace calc {
           atomType = atom.getType();
         }
 
-        net.coordinates.segment(3 * linkIdx, 3) = atom.getCoordinates();
+        Eigen::Vector3d coords = atom.getCoordinates();
+        this->universe.getBox().handlePBC(coords);
+        net.coordinates.segment(3 * linkIdx, 3) = coords;
         net.linkIsSliplink[linkIdx] = atomType != this->crossLinkerType;
         if (!net.linkIsSliplink[linkIdx]) {
           net.oldAtomIds[linkIdx] = atom.getId();
