@@ -2767,7 +2767,7 @@ namespace calc {
      *
      * @param net
      * @param springPartitions
-     * @param partialSpringIdx
+     * @param splitPartialSpringIdx
      * @param slipLinkIdx
      * @param alpha
      */
@@ -2775,18 +2775,18 @@ namespace calc {
       ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
       Eigen::VectorXd& springPartitions,
-      const size_t partialSpringIdx,
+      const size_t splitPartialSpringIdx,
       const size_t slipLinkIdx,
       const double oneOverSpringPartitionUpperLimit) const
     {
       INVALIDARG_EXP_IFN(
-        !net.linkIsSliplink[net.springPartIndexA[partialSpringIdx]] ||
-          !net.linkIsSliplink[net.springPartIndexB[partialSpringIdx]],
+        !net.linkIsSliplink[net.springPartIndexA[splitPartialSpringIdx]] ||
+          !net.linkIsSliplink[net.springPartIndexB[splitPartialSpringIdx]],
         "Require at least one part to be a cross-link.");
       const size_t newPartialSpringIdx = net.nrOfPartialSprings;
       net.nrOfPartialSprings += 1;
       const size_t relevantSpring =
-        net.partialToFullSpringIndex[partialSpringIdx];
+        net.partialToFullSpringIndex[splitPartialSpringIdx];
       const double N = net.springsContourLength[relevantSpring];
       const double minAlpha =
         (oneOverSpringPartitionUpperLimit > 0.)
@@ -2800,11 +2800,11 @@ namespace calc {
         "With this minimum alpha, the slip-link cannot be placed on this "
         "partial spring.");
 
-      size_t oldPartnerA = net.springPartIndexA[partialSpringIdx];
-      size_t oldPartnerB = net.springPartIndexB[partialSpringIdx];
+      size_t oldPartnerA = net.springPartIndexA[splitPartialSpringIdx];
+      size_t oldPartnerB = net.springPartIndexB[splitPartialSpringIdx];
 
-      Eigen::Vector3d distanceBefore = this->evaluatePartialSpringDistanceFrom(
-        net, u, partialSpringIdx, oldPartnerA);
+      Eigen::Vector3d distanceBefore = this->evaluatePartialSpringDistance(
+        net, u, splitPartialSpringIdx, this->is2D, false);
 
       // std::cout << "Adding slip-link " << slipLinkIdx << " to spring "
       //           << relevantSpring << " (partial " << partialSpringIdx
@@ -2822,7 +2822,7 @@ namespace calc {
       net.partialToFullSpringIndex.conservativeResize(net.nrOfPartialSprings);
       net.partialSpringIsPartial.conservativeResize(net.nrOfPartialSprings);
       // add the new info
-      net.partialSpringIsPartial[partialSpringIdx] = true;
+      net.partialSpringIsPartial[splitPartialSpringIdx] = true;
       net.partialSpringIsPartial[newPartialSpringIdx] = true;
       net.partialToFullSpringIndex[newPartialSpringIdx] = relevantSpring;
 
@@ -2832,21 +2832,12 @@ namespace calc {
       // slightly change numbering to keep the numbering of
       // localToGlobalSpringIndex constant. I.e., we want the
       // `newPartialSpringIdx` to correspond to the spring with the cross-link
-      size_t springPartToReplace;
-      size_t partialSpringWithA;
       bool forward;
-      if (net.localToGlobalSpringIndex[relevantSpring][0] == partialSpringIdx) {
+      if (net.localToGlobalSpringIndex[relevantSpring][0] ==
+          splitPartialSpringIdx) {
         forward = true;
-        if (net.linkIndicesOfSprings[relevantSpring][0] == oldPartnerA) {
-          springPartToReplace = oldPartnerA;
-          partialSpringWithA = newPartialSpringIdx;
-          // std::cout << "Case 1a" << std::endl;
-        } else {
-          assert(net.linkIndicesOfSprings[relevantSpring][0] == oldPartnerB);
-          springPartToReplace = oldPartnerB;
-          partialSpringWithA = partialSpringIdx;
-          // std::cout << "Case 1b" << std::endl;
-        }
+        assert(net.linkIndicesOfSprings[relevantSpring][0] == oldPartnerA);
+        // std::cout << "Case 1a" << std::endl;
         net.linkIndicesOfSprings[relevantSpring].insert(
           net.linkIndicesOfSprings[relevantSpring].begin() + 1, slipLinkIdx);
         net.localToGlobalSpringIndex[relevantSpring].insert(
@@ -2856,19 +2847,10 @@ namespace calc {
         forward = false;
         assert(pylimer_tools::utils::last(
                  net.localToGlobalSpringIndex[relevantSpring]) ==
-               partialSpringIdx);
-        if (pylimer_tools::utils::last(
-              net.linkIndicesOfSprings[relevantSpring]) == oldPartnerA) {
-          springPartToReplace = oldPartnerA;
-          partialSpringWithA = newPartialSpringIdx;
-          // std::cout << "Case 2a" << std::endl;
-        } else {
-          assert(pylimer_tools::utils::last(
-                   net.linkIndicesOfSprings[relevantSpring]) == oldPartnerB);
-          springPartToReplace = oldPartnerB;
-          partialSpringWithA = partialSpringIdx;
-          // std::cout << "Case 2b" << std::endl;
-        }
+               splitPartialSpringIdx);
+        assert(pylimer_tools::utils::last(
+                 net.linkIndicesOfSprings[relevantSpring]) == oldPartnerB);
+        // std::cout << "Case 2b" << std::endl;
         net.linkIndicesOfSprings[relevantSpring].insert(
           net.linkIndicesOfSprings[relevantSpring].begin() +
             (net.linkIndicesOfSprings[relevantSpring].size() - 1),
@@ -2876,29 +2858,22 @@ namespace calc {
         net.localToGlobalSpringIndex[relevantSpring].push_back(
           newPartialSpringIdx);
       }
-
+      
       // rewire the springs
-      if (net.springPartIndexB[partialSpringIdx] == springPartToReplace) {
-        net.springPartIndexB[partialSpringIdx] = slipLinkIdx;
-      } else {
-        assert(net.springPartIndexA[partialSpringIdx] == springPartToReplace);
-        net.springPartIndexA[partialSpringIdx] = slipLinkIdx;
-      }
+      net.springPartIndexB[splitPartialSpringIdx] = slipLinkIdx;
       net.springPartIndexA[newPartialSpringIdx] = slipLinkIdx;
-      net.springPartIndexB[newPartialSpringIdx] = springPartToReplace;
+      net.springPartIndexB[newPartialSpringIdx] = oldPartnerB;
+
       for (size_t dir = 0; dir < 3; ++dir) {
-        net.springPartCoordinateIndexA[3 * partialSpringIdx + dir] =
-          3 * net.springPartIndexA[partialSpringIdx] + dir;
-        net.springPartCoordinateIndexB[3 * partialSpringIdx + dir] =
-          3 * net.springPartIndexB[partialSpringIdx] + dir;
+        net.springPartCoordinateIndexA[3 * splitPartialSpringIdx + dir] =
+          3 * net.springPartIndexA[splitPartialSpringIdx] + dir;
+        net.springPartCoordinateIndexB[3 * splitPartialSpringIdx + dir] =
+          3 * net.springPartIndexB[splitPartialSpringIdx] + dir;
 
         net.springPartCoordinateIndexA[3 * newPartialSpringIdx + dir] =
           3 * net.springPartIndexA[newPartialSpringIdx] + dir;
         net.springPartCoordinateIndexB[3 * newPartialSpringIdx + dir] =
           3 * net.springPartIndexB[newPartialSpringIdx] + dir;
-
-        net.springPartCoordinateIndexB[3 * newPartialSpringIdx + dir] =
-          3 * springPartToReplace + dir;
       }
 
       // renormalize this spring
@@ -2951,47 +2926,15 @@ namespace calc {
       net.springPartBoxOffset.segment(3 * newPartialSpringIdx, 3) =
         Eigen::Vector3d::Zero();
       this->reAlignSlipLinkToImages(
-        net, u, slipLinkIdx, partialSpringIdx, newPartialSpringIdx);
+        net, u, slipLinkIdx, splitPartialSpringIdx, newPartialSpringIdx);
 
-      if (!this->assumeBoxLargeEnough) {
-
-        if (oldPartnerA != slipLinkIdx && oldPartnerB != slipLinkIdx) {
-          Eigen::Vector3d partial1 = this->evaluatePartialSpringDistanceFrom(
-            net, u, newPartialSpringIdx, slipLinkIdx, this->is2D, false);
-          Eigen::Vector3d partial2 = this->evaluatePartialSpringDistanceTo(
-            net, u, partialSpringIdx, slipLinkIdx, this->is2D, false);
-          Eigen::Vector3d distanceAfter = partial1 + partial2;
-
-          Eigen::Vector3d partialAlt1 = this->evaluatePartialSpringDistanceFrom(
-            net, u, partialSpringWithA, oldPartnerA, this->is2D, false);
-          Eigen::Vector3d partialAlt2 = this->evaluatePartialSpringDistanceTo(
-            net,
-            u,
-            partialSpringWithA == newPartialSpringIdx ? partialSpringIdx
-                                                      : newPartialSpringIdx,
-            oldPartnerB,
-            this->is2D,
-            false);
-          Eigen::Vector3d altDistanceAfter = partialAlt1 + partialAlt2;
-
-          assert(distanceBefore.isApprox(altDistanceAfter));
-          assert(distanceAfter.isApprox(distanceBefore) ||
-                 distanceAfter.isApprox(-1. * distanceBefore));
-        } else {
-          // built a new primary loop.
-          // without PBC, these are dangerous, since even though they could have
-          // non-zero length, we can't actually know its direction :P
-          net.springPartBoxOffset.segment(3 * newPartialSpringIdx, 3) =
-            this->universe.getBox().getOffset(
-              this->evaluatePartialSpringDistance(
-                net, u, newPartialSpringIdx, this->is2D, false));
-          net.springPartBoxOffset.segment(3 * partialSpringIdx, 3) =
-            this->universe.getBox().getOffset(
-              this->evaluatePartialSpringDistance(
-                net, u, partialSpringIdx, this->is2D, false));
-          // TODO: figure out what to do instead, correctly
-        }
-      }
+      this->validateNetwork(net, u, springPartitions);
+      Eigen::Vector3d distanceAfter =
+        this->evaluatePartialSpringDistance(
+          net, u, splitPartialSpringIdx, this->is2D, false) +
+        this->evaluatePartialSpringDistance(
+          net, u, newPartialSpringIdx, this->is2D, false);
+      assert(distanceBefore.isApprox(distanceAfter));
 
       return newPartialSpringIdx;
     }
@@ -3926,32 +3869,35 @@ namespace calc {
      * @param spring1 one of the two partial spring idx
      * @param spring2 the partial spring idx of the other spring
      */
-    void MEHPForceBalance::reAlignSlipLinkToImages(ForceBalanceNetwork& net,
-                                                   const Eigen::VectorXd& u,
-                                                   const size_t slipLinkIdx,
-                                                   const size_t spring1,
-                                                   const size_t spring2) const
+    void MEHPForceBalance::reAlignSlipLinkToImages(
+      ForceBalanceNetwork& net,
+      const Eigen::VectorXd& u,
+      const size_t slipLinkIdx,
+      const size_t partialSpringIdx1,
+      const size_t partialSpringIdx2) const
     {
-      assert(this->isPartOfSpring(net, slipLinkIdx, spring1));
-      assert(this->isPartOfSpring(net, slipLinkIdx, spring2));
+      assert(net.springPartIndexB[partialSpringIdx1] == slipLinkIdx);
+      assert(net.springPartIndexA[partialSpringIdx2] == slipLinkIdx);
       assert(net.linkIsSliplink[slipLinkIdx]);
+      assert(net.partialToFullSpringIndex[partialSpringIdx1] ==
+             net.partialToFullSpringIndex[partialSpringIdx2]);
       Eigen::Vector3d totalOffset =
-        this->getPartialSpringBoxOffsetTo(net, spring1, slipLinkIdx) +
-        this->getPartialSpringBoxOffsetFrom(net, spring2, slipLinkIdx);
+        this->getPartialSpringBoxOffset(net, partialSpringIdx1) +
+        this->getPartialSpringBoxOffset(net, partialSpringIdx2);
       Eigen::Vector3d totalDistanceBefore =
-        this->evaluatePartialSpringDistanceTo(
-          net, u, spring1, slipLinkIdx, this->is2D, false) +
-        this->evaluatePartialSpringDistanceFrom(
-          net, u, spring2, slipLinkIdx, this->is2D, false);
+        this->evaluatePartialSpringDistance(
+          net, u, partialSpringIdx1, this->is2D, false) +
+        this->evaluatePartialSpringDistance(
+          net, u, partialSpringIdx2, this->is2D, false);
 
       Eigen::Vector3d sourceCoords =
-        net.coordinates.segment(
-          3 * this->getOtherSpringIndex(net, spring1, slipLinkIdx), 3) +
-        u.segment(3 * this->getOtherSpringIndex(net, spring1, slipLinkIdx), 3);
+        net.coordinates.segment(3 * net.springPartIndexA[partialSpringIdx1],
+                                3) +
+        u.segment(3 * net.springPartIndexA[partialSpringIdx1], 3);
       Eigen::Vector3d targetCoords =
-        net.coordinates.segment(
-          3 * this->getOtherSpringIndex(net, spring2, slipLinkIdx), 3) +
-        u.segment(3 * this->getOtherSpringIndex(net, spring2, slipLinkIdx), 3);
+        net.coordinates.segment(3 * net.springPartIndexB[partialSpringIdx2],
+                                3) +
+        u.segment(3 * net.springPartIndexB[partialSpringIdx2], 3);
       Eigen::Vector3d viaCoords = net.coordinates.segment(3 * slipLinkIdx, 3) +
                                   u.segment(3 * slipLinkIdx, 3);
 
@@ -3999,24 +3945,18 @@ namespace calc {
       }
 
       assert(bestOffsetScore >= 0.);
-      net.springPartBoxOffset.segment(3 * spring1, 3) = bestOffset;
-      if (net.springPartIndexA[spring1] == slipLinkIdx) {
-        net.springPartBoxOffset.segment(3 * spring1, 3) *= -1.;
-      }
-      net.springPartBoxOffset.segment(3 * spring2, 3) =
+      net.springPartBoxOffset.segment(3 * partialSpringIdx1, 3) = bestOffset;
+      net.springPartBoxOffset.segment(3 * partialSpringIdx2, 3) =
         totalOffset - bestOffset;
-      if (net.springPartIndexB[spring2] == slipLinkIdx) {
-        net.springPartBoxOffset.segment(3 * spring2, 3) *= -1.;
-      }
       // only for assumeBoxLargeEnough == false:
       // (and some other restrictions)
-      // Eigen::Vector3d totalDistanceNow =
-      //   this->evaluatePartialSpringDistanceTo(net, u, spring1, slipLinkIdx) +
-      //   this->evaluatePartialSpringDistanceFrom(net, u, spring2,
-      //   slipLinkIdx);
-      // TODO: check with floating point precision
-      // assert((totalDistanceNow.array() <=
-      // totalDistanceBefore.array()).all());
+      Eigen::Vector3d totalDistanceNow =
+        this->evaluatePartialSpringDistance(
+          net, u, partialSpringIdx1, this->is2D, false) +
+        this->evaluatePartialSpringDistance(
+          net, u, partialSpringIdx2, this->is2D, false);
+      assert(pylimer_tools::utils::vector_approx_equal(totalDistanceNow,
+                                                       totalDistanceBefore));
     };
 
     /**
@@ -5135,89 +5075,90 @@ namespace calc {
           size_t newNodeIdx = currentNrOfLinks + i;
 
           // update connectivity
-          size_t lastSpringIndex =
+          size_t dividedPartialSpringIdx =
             this->initialConfig
               .localToGlobalSpringIndex[springIndex][targetIndexInSpring];
-          size_t newSpringIndex =
+          size_t newPartialSpringIdx =
             currentNrOfPartialSprings + partialSpringsAdded;
 
           // for validation later
           Eigen::Vector3d distanceBefore =
-            this->evaluatePartialSpringDistanceFrom(this->initialConfig,
-                                                    this->currentDisplacements,
-                                                    lastSpringIndex,
-                                                    springPartner1,
-                                                    this->is2D,
-                                                    false);
+            this->evaluatePartialSpringDistance(this->initialConfig,
+                                                this->currentDisplacements,
+                                                dividedPartialSpringIdx,
+                                                this->is2D,
+                                                false);
 
-          this->initialConfig.partialSpringIsPartial[lastSpringIndex] = true;
-          this->initialConfig.partialSpringIsPartial[newSpringIndex] = true;
+          this->initialConfig.partialSpringIsPartial[dividedPartialSpringIdx] =
+            true;
+          this->initialConfig.partialSpringIsPartial[newPartialSpringIdx] =
+            true;
 
           this->initialConfig.localToGlobalSpringIndex[springIndex].insert(
             this->initialConfig.localToGlobalSpringIndex[springIndex].begin() +
               targetIndexInSpring + 1,
-            newSpringIndex);
-          this->initialConfig.partialToFullSpringIndex[newSpringIndex] =
+            newPartialSpringIdx);
+          this->initialConfig.partialToFullSpringIndex[newPartialSpringIdx] =
             (springIndex);
 
           // adjust also the coordinates
           this->currentDisplacements.segment(3 * newNodeIdx, 3) =
             Eigen::Vector3d::Zero();
-          if (this->initialConfig.springPartIndexA[lastSpringIndex] ==
-              springPartner1) {
-            this->initialConfig.springPartIndexB[lastSpringIndex] = newNodeIdx;
-            for (size_t offset = 0; offset < 3; ++offset) {
-              this->initialConfig
-                .springPartCoordinateIndexB[3 * lastSpringIndex + offset] =
-                3 * newNodeIdx + offset;
-            }
-          } else {
-            assert(this->initialConfig.springPartIndexA[lastSpringIndex] ==
-                   springPartner2);
-            this->initialConfig.springPartIndexA[lastSpringIndex] = newNodeIdx;
-            for (size_t offset = 0; offset < 3; ++offset) {
-              this->initialConfig
-                .springPartCoordinateIndexA[3 * lastSpringIndex + offset] =
-                3 * newNodeIdx + offset;
-            }
-          }
-          // add the new one
-          this->initialConfig.springPartIndexA[newSpringIndex] = newNodeIdx;
-          this->initialConfig.springPartIndexB[newSpringIndex] = springPartner2;
+          assert(
+            this->initialConfig.springPartIndexA[dividedPartialSpringIdx] ==
+            springPartner1);
+          this->initialConfig.springPartIndexB[dividedPartialSpringIdx] =
+            newNodeIdx;
           for (size_t offset = 0; offset < 3; ++offset) {
             this->initialConfig
-              .springPartCoordinateIndexA[3 * newSpringIndex + offset] =
-              3 * newNodeIdx + offset;
+              .springPartCoordinateIndexB[3 * dividedPartialSpringIdx +
+                                          offset] = 3 * newNodeIdx + offset;
+          }
+
+          // add the new one
+          this->initialConfig.springPartIndexA[newPartialSpringIdx] =
+            newNodeIdx;
+          this->initialConfig.springPartIndexB[newPartialSpringIdx] =
+            springPartner2;
+          for (int dir = 0; dir < 3; ++dir) {
             this->initialConfig
-              .springPartCoordinateIndexB[3 * newSpringIndex + offset] =
-              3 * springPartner2 + offset;
+              .springPartCoordinateIndexA[3 * newPartialSpringIdx + dir] =
+              3 * newNodeIdx + dir;
+            this->initialConfig
+              .springPartCoordinateIndexB[3 * newPartialSpringIdx + dir] =
+              3 * springPartner2 + dir;
           }
 
           // set box offsets
           this->initialConfig.springPartBoxOffset.segment(
-            3 * newSpringIndex, 3) = Eigen::Vector3d::Zero();
+            3 * newPartialSpringIdx, 3) = Eigen::Vector3d::Zero();
           this->reAlignSlipLinkToImages(this->initialConfig,
                                         this->currentDisplacements,
                                         newNodeIdx,
-                                        newSpringIndex,
-                                        lastSpringIndex);
+                                        dividedPartialSpringIdx,
+                                        newPartialSpringIdx);
 
-          this->currentSpringPartitionsVec[newSpringIndex] =
-            this->currentSpringPartitionsVec[lastSpringIndex] - alpha;
+          this->currentSpringPartitionsVec[newPartialSpringIdx] =
+            this->currentSpringPartitionsVec[dividedPartialSpringIdx] - alpha;
           RUNTIME_EXP_IFN(
-            APPROX_WITHIN(
-              this->currentSpringPartitionsVec[newSpringIndex], 0.0, 1.0, 1e-9),
-            "Spring partition must be between 0 and 1, got " +
-              std::to_string(this->currentSpringPartitionsVec[newSpringIndex]) +
-              ".");
-          this->currentSpringPartitionsVec[lastSpringIndex] = alpha;
-          RUNTIME_EXP_IFN(
-            APPROX_WITHIN(this->currentSpringPartitionsVec[lastSpringIndex],
+            APPROX_WITHIN(this->currentSpringPartitionsVec[newPartialSpringIdx],
                           0.0,
                           1.0,
                           1e-9),
             "Spring partition must be between 0 and 1, got " +
-              std::to_string(this->currentSpringPartitionsVec[newSpringIndex]) +
+              std::to_string(
+                this->currentSpringPartitionsVec[newPartialSpringIdx]) +
+              ".");
+          this->currentSpringPartitionsVec[dividedPartialSpringIdx] = alpha;
+          RUNTIME_EXP_IFN(
+            APPROX_WITHIN(
+              this->currentSpringPartitionsVec[dividedPartialSpringIdx],
+              0.0,
+              1.0,
+              1e-9),
+            "Spring partition must be between 0 and 1, got " +
+              std::to_string(
+                this->currentSpringPartitionsVec[newPartialSpringIdx]) +
               ".");
 
           this->initialConfig.linkIndicesOfSprings[springIndex].insert(
@@ -5227,26 +5168,20 @@ namespace calc {
             newNodeIdx);
 
           Eigen::Vector3d distanceAfter =
-            this->evaluatePartialSpringDistanceFrom(this->initialConfig,
-                                                    this->currentDisplacements,
-                                                    lastSpringIndex,
-                                                    springPartner1,
-                                                    this->is2D,
-                                                    false) +
-            this->evaluatePartialSpringDistanceFrom(this->initialConfig,
-                                                    this->currentDisplacements,
-                                                    newSpringIndex,
-                                                    newNodeIdx,
-                                                    this->is2D,
-                                                    false);
+            this->evaluatePartialSpringDistance(this->initialConfig,
+                                                this->currentDisplacements,
+                                                dividedPartialSpringIdx,
+                                                this->is2D,
+                                                false) +
+            this->evaluatePartialSpringDistance(this->initialConfig,
+                                                this->currentDisplacements,
+                                                newPartialSpringIdx,
+                                                this->is2D,
+                                                false);
 
-          if (newNodeIdx != springPartner1 &&
-              springPartner1 != springPartner2 &&
-              newNodeIdx != springPartner1) {
-            RUNTIME_EXP_IFN(distanceAfter.isApprox(distanceBefore),
-                            "Expected that overall vector does not change upon "
-                            "adding slip-springs");
-          }
+          RUNTIME_EXP_IFN(distanceAfter.isApprox(distanceBefore),
+                          "Expected that overall vector does not change upon "
+                          "adding slip-springs");
 
           partialSpringsAdded += 1;
           springIndexIndex += 1;
@@ -5266,14 +5201,14 @@ namespace calc {
       Eigen::VectorXd springVectorsAfter = this->evaluateSpringVectors(
         this->initialConfig, this->currentDisplacements, this->is2D, false);
       for (size_t i = 0; i < this->initialConfig.nrOfSprings; ++i) {
-        // bool containsPrimaryLoop = false;
-        // for (size_t partialSpringIdx :
-        //      this->initialConfig.localToGlobalSpringIndex[i]) {
-        //   containsPrimaryLoop =
-        //     containsPrimaryLoop ||
-        //     (this->initialConfig.springPartIndexA[partialSpringIdx] ==
-        //      this->initialConfig.springPartIndexB[partialSpringIdx]);
-        // }
+        bool containsPrimaryLoop = false;
+        for (size_t partialSpringIdx :
+             this->initialConfig.localToGlobalSpringIndex[i]) {
+          containsPrimaryLoop =
+            containsPrimaryLoop ||
+            (this->initialConfig.springPartIndexA[partialSpringIdx] ==
+             this->initialConfig.springPartIndexB[partialSpringIdx]);
+        }
         Eigen::Vector3d vecBefore = springVectorsBefore.segment(3 * i, 3);
         Eigen::Vector3d vecAfter = springVectorsAfter.segment(3 * i, 3);
         assert( // containsPrimaryLoop ||
@@ -5910,7 +5845,8 @@ namespace calc {
       for (size_t i = 0; i < vertexIdToLinkIdx.size(); ++i) {
         if (vertexIdToLinkIdx[i] != -1) {
           size_t linkIdx = vertexIdToLinkIdx[i];
-          pylimer_tools::entities::Atom atom = this->universe.getAtomByVertexIdx(i);
+          pylimer_tools::entities::Atom atom =
+            this->universe.getAtomByVertexIdx(i);
           atomIdToNode[atom.getId()] = linkIdx;
           net.oldAtomIds[linkIdx] = atom.getId();
           net.coordinates[3 * linkIdx + 0] = atom.getX();

@@ -2192,122 +2192,132 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
 
     // generate the same slip-links twice,
     // once for each assumption
-    pcm::MEHPForceBalance forceBalancer =
+    pcm::MEHPForceBalance forceBalancerLargeOldSampling =
       pcm::MEHPForceBalance(universe, 2, false, 1.0, false, false);
-    forceBalancer.configAssumeBoxLargeEnough(true);
-    forceBalancer.randomlyAddSliplinks(1000, 6.0, 900, 3.0, false, 53467829);
+    forceBalancerLargeOldSampling.configAssumeBoxLargeEnough(true);
+    forceBalancerLargeOldSampling.randomlyAddSliplinks(
+      1000, 6.0, 900, 3.0, false, 53467829);
 
-    pcm::MEHPForceBalance forceBalancer2 =
+    pcm::MEHPForceBalance forceBalancerSmallOldSampling1 =
       pcm::MEHPForceBalance(universe, 2, false, 1.0, false, false);
 
-    pcm::MEHPForceBalance forceBalancer3 =
+    pcm::MEHPForceBalance forceBalancerSmallOldSampling2 =
       pcm::MEHPForceBalance(universe, 2, false, 1.0, false, false);
 
     // initially
-    CHECK_THAT(
-      forceBalancer2.getDisplacementResidualNorm(),
-      Catch::Matchers::WithinRel(forceBalancer3.getDisplacementResidualNorm()));
+    CHECK_THAT(forceBalancerSmallOldSampling1.getDisplacementResidualNorm(),
+               Catch::Matchers::WithinRel(
+                 forceBalancerSmallOldSampling2.getDisplacementResidualNorm()));
 
     // check that the order does not matter
-    forceBalancer2.configAssumeBoxLargeEnough(false);
-    forceBalancer2.randomlyAddSliplinks(1000, 6.0, 900, 3.0, false, 53467829);
-    forceBalancer3.randomlyAddSliplinks(1000, 6.0, 900, 3.0, false, 53467829);
-    forceBalancer3.configAssumeBoxLargeEnough(false);
+    forceBalancerSmallOldSampling1.configAssumeBoxLargeEnough(false);
+    forceBalancerSmallOldSampling1.randomlyAddSliplinks(
+      1000, 6.0, 900, 3.0, false, 53467829);
+    forceBalancerSmallOldSampling2.randomlyAddSliplinks(
+      1000, 6.0, 900, 3.0, false, 53467829);
+    forceBalancerSmallOldSampling2.configAssumeBoxLargeEnough(false);
 
     // after adding slip-links
-    CHECK(forceBalancer.getPressure() <= forceBalancer2.getPressure());
+    CHECK(forceBalancerLargeOldSampling.getPressure() <=
+          forceBalancerSmallOldSampling1.getPressure());
+    CHECK_THAT(forceBalancerSmallOldSampling1.getDisplacementResidualNorm(),
+               Catch::Matchers::WithinRel(
+                 forceBalancerSmallOldSampling2.getDisplacementResidualNorm()));
     CHECK_THAT(
-      forceBalancer2.getDisplacementResidualNorm(),
-      Catch::Matchers::WithinRel(forceBalancer3.getDisplacementResidualNorm()));
-    CHECK_THAT(forceBalancer2.getPressure(),
-               Catch::Matchers::WithinRel(forceBalancer3.getPressure()));
+      forceBalancerSmallOldSampling1.getPressure(),
+      Catch::Matchers::WithinRel(forceBalancerSmallOldSampling2.getPressure()));
 
     // it is actually thinkable that the following fails for certain scenarios.
     // however, in general, it should not
-    CHECK(forceBalancer.getDisplacementResidualNorm(1.) <=
-          forceBalancer2.getDisplacementResidualNorm(1.));
-    CHECK(forceBalancer.getDisplacementResidualNorm(-1.) <=
-          forceBalancer2.getDisplacementResidualNorm(-1.));
+    CHECK(forceBalancerLargeOldSampling.getDisplacementResidualNorm(1.) <=
+          forceBalancerSmallOldSampling1.getDisplacementResidualNorm(1.));
+    CHECK(forceBalancerLargeOldSampling.getDisplacementResidualNorm(-1.) <=
+          forceBalancerSmallOldSampling1.getDisplacementResidualNorm(-1.));
 
     // check to make sure the slip-links are actually placed identically
-    CHECK(forceBalancer.getNetwork().springPartIndexA.isApprox(
-      forceBalancer2.getNetwork().springPartIndexA));
-    CHECK(forceBalancer2.getNetwork().springPartIndexB.isApprox(
-      forceBalancer3.getNetwork().springPartIndexB));
+    CHECK(forceBalancerLargeOldSampling.getNetwork().springPartIndexA.isApprox(
+      forceBalancerSmallOldSampling1.getNetwork().springPartIndexA));
+    CHECK(forceBalancerSmallOldSampling1.getNetwork().springPartIndexB.isApprox(
+      forceBalancerSmallOldSampling2.getNetwork().springPartIndexB));
 
-    pcm::MEHPForceBalance forceBalancer4 =
+    pcm::MEHPForceBalance forceBalancerSmallNewSampling =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
         universe, 1000, 6.0, 900, 3.0, "53467829");
-    forceBalancer4.configAssumeBoxLargeEnough(false);
+    forceBalancerSmallNewSampling.configAssumeBoxLargeEnough(false);
 
-    CHECK_THAT(
-      forceBalancer4.getNrOfPartialSprings(),
-      Catch::Matchers::WithinRel(forceBalancer2.getNrOfPartialSprings(), 0.1));
-    CHECK_THAT(forceBalancer4.getPressure(),
-               Catch::Matchers::WithinRel(forceBalancer2.getPressure(), 0.5));
-    CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
+    CHECK_THAT(forceBalancerSmallNewSampling.getNrOfPartialSprings(),
                Catch::Matchers::WithinRel(
-                 forceBalancer2.getDisplacementResidualNorm(), 0.5));
+                 forceBalancerSmallOldSampling1.getNrOfPartialSprings(), 0.1));
+    CHECK_THAT(forceBalancerSmallNewSampling.getPressure(),
+               Catch::Matchers::WithinRel(
+                 forceBalancerSmallOldSampling1.getPressure(), 0.5));
+    CHECK_THAT(
+      forceBalancerSmallNewSampling.getDisplacementResidualNorm(),
+      Catch::Matchers::WithinRel(
+        forceBalancerSmallOldSampling1.getDisplacementResidualNorm(), 0.5));
 
     // check that the spring vectors are equal
-    Eigen::VectorXd springVectors2 = forceBalancer2.evaluateSpringVectors(
-      forceBalancer2.getNetwork(), forceBalancer2.getCurrentDisplacements());
-    Eigen::VectorXd springVectors4 = forceBalancer4.evaluateSpringVectors(
-      forceBalancer4.getNetwork(), forceBalancer4.getCurrentDisplacements());
-    REQUIRE(forceBalancer2.getNetwork().nrOfSprings ==
-            forceBalancer4.getNetwork().nrOfSprings);
+    Eigen::VectorXd springVectorsSmallOldSampling =
+      forceBalancerSmallOldSampling1.evaluateSpringVectors(
+        forceBalancerSmallOldSampling1.getNetwork(),
+        forceBalancerSmallOldSampling1.getCurrentDisplacements());
+    Eigen::VectorXd springVectorsSmallNewSampling =
+      forceBalancerSmallNewSampling.evaluateSpringVectors(
+        forceBalancerSmallNewSampling.getNetwork(),
+        forceBalancerSmallNewSampling.getCurrentDisplacements());
+    REQUIRE(forceBalancerSmallOldSampling1.getNetwork().nrOfSprings ==
+            forceBalancerSmallNewSampling.getNetwork().nrOfSprings);
 
-    for (size_t springIdx = 0;
-         springIdx < forceBalancer2.getNetwork().nrOfSprings;
-         ++springIdx) {
-      if (forceBalancer2.getNetwork().linkIndicesOfSprings[springIdx].size() <=
-            2 &&
-          forceBalancer4.getNetwork().linkIndicesOfSprings[springIdx].size() <=
-            2) {
-        CHECK(springVectors2.segment(3 * springIdx, 3)
-                .isApprox(springVectors4.segment(3 * springIdx, 3)));
-      }
-    }
+    CHECK(
+      springVectorsSmallOldSampling.isApprox(springVectorsSmallNewSampling));
 
-    forceBalancer4.configAssumeBoxLargeEnough(true);
+    forceBalancerSmallNewSampling.configAssumeBoxLargeEnough(true);
 
-    CHECK_THAT(forceBalancer4.getPressure(),
-               Catch::Matchers::WithinRel(forceBalancer.getPressure(), 0.5));
-    CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
+    CHECK_THAT(forceBalancerSmallNewSampling.getPressure(),
                Catch::Matchers::WithinRel(
-                 forceBalancer.getDisplacementResidualNorm(), 0.5));
+                 forceBalancerLargeOldSampling.getPressure(), 0.5));
+    CHECK_THAT(
+      forceBalancerSmallNewSampling.getDisplacementResidualNorm(),
+      Catch::Matchers::WithinRel(
+        forceBalancerLargeOldSampling.getDisplacementResidualNorm(), 0.5));
 
-    CHECK_THAT(forceBalancer.getForceMagnitudeVector().mean(),
-               Catch::Matchers::WithinRel(
-                 Eigen::median(forceBalancer.getForceMagnitudeVector()), 0.25));
     CHECK_THAT(
-      forceBalancer2.getForceMagnitudeVector().mean(),
+      forceBalancerLargeOldSampling.getForceMagnitudeVector().mean(),
       Catch::Matchers::WithinRel(
-        Eigen::median(forceBalancer2.getForceMagnitudeVector()), 0.25));
+        Eigen::median(forceBalancerLargeOldSampling.getForceMagnitudeVector()),
+        0.25));
     CHECK_THAT(
-      forceBalancer3.getForceMagnitudeVector().mean(),
+      forceBalancerSmallOldSampling1.getForceMagnitudeVector().mean(),
       Catch::Matchers::WithinRel(
-        Eigen::median(forceBalancer3.getForceMagnitudeVector()), 0.25));
+        Eigen::median(forceBalancerSmallOldSampling1.getForceMagnitudeVector()),
+        0.25));
     CHECK_THAT(
-      forceBalancer4.getForceMagnitudeVector().mean(),
+      forceBalancerSmallOldSampling2.getForceMagnitudeVector().mean(),
       Catch::Matchers::WithinRel(
-        Eigen::median(forceBalancer4.getForceMagnitudeVector()), 0.25));
+        Eigen::median(forceBalancerSmallOldSampling2.getForceMagnitudeVector()),
+        0.25));
+    CHECK_THAT(
+      forceBalancerSmallNewSampling.getForceMagnitudeVector().mean(),
+      Catch::Matchers::WithinRel(
+        Eigen::median(forceBalancerSmallNewSampling.getForceMagnitudeVector()),
+        0.25));
 
     // DEBUG; now, REMOVE LATER
-    Eigen::VectorXd magnitudeVector = forceBalancer2.getForceMagnitudeVector();
+    Eigen::VectorXd magnitudeVector =
+      forceBalancerSmallOldSampling1.getForceMagnitudeVector();
     size_t maxIndex;
     double maxValue = magnitudeVector.maxCoeff(&maxIndex);
 
     std::cout << "\n\n\nnetwork 2:" << std::endl;
     std::cout << "Max force: " << maxValue << " on link with idx " << maxIndex
               << std::endl;
-    outputNetwork(forceBalancer2.getNetwork(),
-                  forceBalancer2.getCurrentDisplacements(),
-                  forceBalancer2.getSpringPartitions());
+    outputNetwork(forceBalancerSmallOldSampling1.getNetwork(),
+                  forceBalancerSmallOldSampling1.getCurrentDisplacements(),
+                  forceBalancerSmallOldSampling1.getSpringPartitions());
     std::cout << "\n\n\nnetwork 4:" << std::endl;
-    outputNetwork(forceBalancer4.getNetwork(),
-                  forceBalancer4.getCurrentDisplacements(),
-                  forceBalancer4.getSpringPartitions());
+    outputNetwork(forceBalancerSmallNewSampling.getNetwork(),
+                  forceBalancerSmallNewSampling.getCurrentDisplacements(),
+                  forceBalancerSmallNewSampling.getSpringPartitions());
   } else {
     std::cerr << "File " << inputFile << " does not exist." << std::endl;
   }
@@ -2430,10 +2440,10 @@ TEST_CASE("Yet another sampling example", "[analysis][MEHPForceBalance]")
     std::cout << "Read file " << inputFile << std::endl;
 
     // randomly sample slip-links
-    pcm::MEHPForceBalance forceBalancer4 =
+    pcm::MEHPForceBalance forceBalancerNewSampling =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
         universe, 1000, 6.0, 900, 3.0, "53467829");
-    forceBalancer4.configAssumeBoxLargeEnough(false);
+    forceBalancerNewSampling.configAssumeBoxLargeEnough(false);
 
     // extract these randomly sampled slip-links
     std::vector<size_t> strandIdx1;
@@ -2444,7 +2454,7 @@ TEST_CASE("Yet another sampling example", "[analysis][MEHPForceBalance]")
     std::vector<double> alpha1;
     std::vector<double> alpha2;
 
-    pcm::ForceBalanceNetwork net = forceBalancer4.getNetwork();
+    pcm::ForceBalanceNetwork net = forceBalancerNewSampling.getNetwork();
     for (size_t i = 0; i < net.nrOfLinks - net.nrOfNodes; ++i) {
       size_t linkIdx = i + net.nrOfNodes;
       strandIdx1.push_back(net.springIndicesOfLinks[linkIdx][0]);
@@ -2453,14 +2463,14 @@ TEST_CASE("Yet another sampling example", "[analysis][MEHPForceBalance]")
       x.push_back(net.coordinates[3 * (linkIdx) + 0]);
       y.push_back(net.coordinates[3 * (linkIdx) + 1]);
       z.push_back(net.coordinates[3 * (linkIdx) + 2]);
-      alpha1.push_back(
-        forceBalancer4.sumToTotalFraction(net,
-                                          forceBalancer4.getSpringPartitions(),
-                                          net.springIndicesOfLinks[linkIdx][0],
-                                          linkIdx));
-      alpha2.push_back(forceBalancer4.sumToTotalFraction(
+      alpha1.push_back(forceBalancerNewSampling.sumToTotalFraction(
         net,
-        forceBalancer4.getSpringPartitions(),
+        forceBalancerNewSampling.getSpringPartitions(),
+        net.springIndicesOfLinks[linkIdx][0],
+        linkIdx));
+      alpha2.push_back(forceBalancerNewSampling.sumToTotalFraction(
+        net,
+        forceBalancerNewSampling.getSpringPartitions(),
         pylimer_tools::utils::last(net.springIndicesOfLinks[linkIdx]),
         linkIdx));
       // TODO: handle these primary loops, then increase required accuracy
@@ -2473,18 +2483,20 @@ TEST_CASE("Yet another sampling example", "[analysis][MEHPForceBalance]")
 
     // generate the same slip-links twice,
     // once for each assumption
-    pcm::MEHPForceBalance forceBalancer =
+    pcm::MEHPForceBalance forceBalancerOldSamplingLarge =
       pcm::MEHPForceBalance(universe, 2, false, 1.0, false, false);
-    forceBalancer.configAssumeBoxLargeEnough(true);
+    forceBalancerOldSamplingLarge.configAssumeBoxLargeEnough(true);
 
     // check that the general conversion is equal
-    REQUIRE(forceBalancer.getNetwork().springIndexA.isApprox(net.springIndexA));
+    REQUIRE(forceBalancerOldSamplingLarge.getNetwork().springIndexA.isApprox(
+      net.springIndexA));
 
-    forceBalancer.addSlipLinks(
+    forceBalancerOldSamplingLarge.addSlipLinks(
       strandIdx1, strandIdx2, x, y, z, alpha1, alpha2, false);
-    CHECK(forceBalancer.getNrOfLinks() == forceBalancer4.getNrOfLinks());
-    CHECK(forceBalancer.getNrOfPartialSprings() ==
-          forceBalancer4.getNrOfPartialSprings());
+    CHECK(forceBalancerOldSamplingLarge.getNrOfLinks() ==
+          forceBalancerNewSampling.getNrOfLinks());
+    CHECK(forceBalancerOldSamplingLarge.getNrOfPartialSprings() ==
+          forceBalancerNewSampling.getNrOfPartialSprings());
 
     // std::cout << "\n\n\nnetwork 4:" << std::endl;
     // outputNetwork(forceBalancer4.getNetwork(),
@@ -2495,32 +2507,35 @@ TEST_CASE("Yet another sampling example", "[analysis][MEHPForceBalance]")
     //               forceBalancer.getCurrentDisplacements(),
     //               forceBalancer.getSpringPartitions());
 
-    pcm::MEHPForceBalance forceBalancer2 =
+    pcm::MEHPForceBalance forceBalancerOldSamplingSmall =
       pcm::MEHPForceBalance(universe, 2, false, 1.0, false, false);
-    forceBalancer2.configAssumeBoxLargeEnough(false);
-    forceBalancer2.addSlipLinks(
+    forceBalancerOldSamplingSmall.configAssumeBoxLargeEnough(false);
+    forceBalancerOldSamplingSmall.addSlipLinks(
       strandIdx1, strandIdx2, x, y, z, alpha1, alpha2, false);
 
     // after adding slip-links
-    CHECK(forceBalancer.getNetwork().springPartIndexA.isApprox(
-      forceBalancer2.getNetwork().springPartIndexA));
-    CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
-               Catch::Matchers::WithinRel(
-                 forceBalancer.getDisplacementResidualNorm(), 1e-3));
-    CHECK_THAT(forceBalancer.getPressure(),
-               Catch::Matchers::WithinRel(forceBalancer4.getPressure(), 1e-3));
+    CHECK(forceBalancerOldSamplingLarge.getNetwork().springPartIndexA.isApprox(
+      forceBalancerOldSamplingSmall.getNetwork().springPartIndexA));
+    CHECK_THAT(
+      forceBalancerNewSampling.getDisplacementResidualNorm(),
+      Catch::Matchers::WithinRel(
+        forceBalancerOldSamplingLarge.getDisplacementResidualNorm(), 1e-3));
+    CHECK_THAT(
+      forceBalancerOldSamplingLarge.getPressure(),
+      Catch::Matchers::WithinRel(forceBalancerNewSampling.getPressure(), 1e-3));
 
-    CHECK(forceBalancer.getPressure() <= forceBalancer2.getPressure());
+    CHECK(forceBalancerOldSamplingLarge.getPressure() <=
+          forceBalancerOldSamplingSmall.getPressure());
     // it is actually thinkable that the following fails for certain scenarios.
     // however, in general, it should not
-    CHECK(forceBalancer.getDisplacementResidualNorm(1.) <=
-          forceBalancer2.getDisplacementResidualNorm(1.));
-    CHECK(forceBalancer.getDisplacementResidualNorm(-1.) <=
-          forceBalancer2.getDisplacementResidualNorm(-1.));
+    CHECK(forceBalancerOldSamplingLarge.getDisplacementResidualNorm(1.) <=
+          forceBalancerOldSamplingSmall.getDisplacementResidualNorm(1.));
+    CHECK(forceBalancerOldSamplingLarge.getDisplacementResidualNorm(-1.) <=
+          forceBalancerOldSamplingSmall.getDisplacementResidualNorm(-1.));
 
     // check to make sure the slip-links are actually placed identically
-    CHECK(forceBalancer.getNetwork().springPartIndexA.isApprox(
-      forceBalancer2.getNetwork().springPartIndexA));
+    CHECK(forceBalancerOldSamplingLarge.getNetwork().springPartIndexA.isApprox(
+      forceBalancerOldSamplingSmall.getNetwork().springPartIndexA));
     // cannot compare this: the indices are different depending on sampling
     // or addition method
     // CHECK(forceBalancer2.getNetwork().springPartIndexB.isApprox(
@@ -2550,39 +2565,96 @@ TEST_CASE("Conversion of structure is equal for both methods",
     std::cout << "Read file " << inputFile << std::endl;
 
     // randomly sample NO slip-links
-    pcm::MEHPForceBalance forceBalancer =
+    pcm::MEHPForceBalance forceBalancerNewConversion =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
         universe, 0, 6.0, 0, 3.0, "");
-    forceBalancer.configAssumeBoxLargeEnough(false);
+    forceBalancerNewConversion.configAssumeBoxLargeEnough(false);
 
-    pcm::MEHPForceBalance forceBalancer2 =
+    pcm::MEHPForceBalance forceBalancerOldConversion =
       pcm::MEHPForceBalance(universe, 2, false, 1.0, false, false);
-    forceBalancer2.configAssumeBoxLargeEnough(false);
+    forceBalancerOldConversion.configAssumeBoxLargeEnough(false);
 
     // check to make sure the links are actually placed identically
-    CHECK(forceBalancer.getNetwork().springPartIndexA.isApprox(
-      forceBalancer2.getNetwork().springPartIndexA));
-    CHECK(forceBalancer.getNetwork().springPartIndexB.isApprox(
-      forceBalancer2.getNetwork().springPartIndexB));
-    CHECK(forceBalancer.getNetwork().coordinates.isApprox(
-      forceBalancer2.getNetwork().coordinates));
-    CHECK(forceBalancer.getNetwork().springPartBoxOffset.isApprox(
-      forceBalancer2.getNetwork().springPartBoxOffset));
+    CHECK(forceBalancerNewConversion.getNetwork().springPartIndexA.isApprox(
+      forceBalancerOldConversion.getNetwork().springPartIndexA));
+    CHECK(forceBalancerNewConversion.getNetwork().springPartIndexB.isApprox(
+      forceBalancerOldConversion.getNetwork().springPartIndexB));
+    CHECK(forceBalancerNewConversion.getNetwork().coordinates.isApprox(
+      forceBalancerOldConversion.getNetwork().coordinates));
+    CHECK(forceBalancerNewConversion.getNetwork().springPartBoxOffset.isApprox(
+      forceBalancerOldConversion.getNetwork().springPartBoxOffset));
 
     // and of course the corresponding computations
+    CHECK_THAT(forceBalancerOldConversion.getDisplacementResidualNorm(),
+               Catch::Matchers::WithinRel(
+                 forceBalancerNewConversion.getDisplacementResidualNorm()));
     CHECK_THAT(
-      forceBalancer2.getDisplacementResidualNorm(),
-      Catch::Matchers::WithinRel(forceBalancer.getDisplacementResidualNorm()));
-    CHECK_THAT(forceBalancer2.getPressure(),
-               Catch::Matchers::WithinRel(forceBalancer.getPressure()));
+      forceBalancerOldConversion.getPressure(),
+      Catch::Matchers::WithinRel(forceBalancerNewConversion.getPressure()));
 
     std::cout << "FB 1:" << std::endl;
-    outputNetwork(forceBalancer.getNetwork(),
-                  forceBalancer.getCurrentDisplacements(),
-                  forceBalancer.getSpringPartitions());
+    outputNetwork(forceBalancerNewConversion.getNetwork(),
+                  forceBalancerNewConversion.getCurrentDisplacements(),
+                  forceBalancerNewConversion.getSpringPartitions());
     std::cout << "\n\n\nFB 2:" << std::endl;
-    outputNetwork(forceBalancer2.getNetwork(),
-                  forceBalancer2.getCurrentDisplacements(),
-                  forceBalancer2.getSpringPartitions());
+    outputNetwork(forceBalancerOldConversion.getNetwork(),
+                  forceBalancerOldConversion.getCurrentDisplacements(),
+                  forceBalancerOldConversion.getSpringPartitions());
   }
+}
+
+TEST_CASE("Adding slip-links does not influence other springs",
+          "[analysis][MEHPForceBalance]")
+{
+  std::cout
+    << "Running test \"Adding slip-links does not influence other springs\""
+    << std::endl;
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+
+  std::string inputFile =
+    suspectedPath +
+    "crosslinked_p_0.99145_0.99145_melt_10000_a_3_5000_xlinks_v_1.V-fixed."
+    "structure.out-equilibration_do_crosslink.structure.out";
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+  std::cout << "Read file " << inputFile << std::endl;
+
+  // generate the same slip-links twice,
+  // once for each assumption
+  pcm::MEHPForceBalance forceBalancerOldSamplingSmall =
+    pcm::MEHPForceBalance(universe, 2, false, 1.0, false, false);
+  forceBalancerOldSamplingSmall.configAssumeBoxLargeEnough(false);
+  Eigen::VectorXd springVectorsWithoutSlipLinks =
+    forceBalancerOldSamplingSmall.evaluateSpringVectors(
+      forceBalancerOldSamplingSmall.getNetwork(),
+      forceBalancerOldSamplingSmall.getCurrentDisplacements());
+  forceBalancerOldSamplingSmall.randomlyAddSliplinks(
+    1000, 6.0, 900, 3.0, false, 53467829);
+
+  Eigen::VectorXd springVectorsWithSlipLinks =
+    forceBalancerOldSamplingSmall.evaluateSpringVectors(
+      forceBalancerOldSamplingSmall.getNetwork(),
+      forceBalancerOldSamplingSmall.getCurrentDisplacements());
+
+  CHECK(springVectorsWithoutSlipLinks.isApprox(springVectorsWithSlipLinks));
+
+  // and the same for sampling method 2
+  pcm::MEHPForceBalance forceBalancer2 =
+    pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+      universe, 1000, 6.0, 900, 3.0, "53467829");
+  forceBalancer2.configAssumeBoxLargeEnough(false);
+
+  pcm::MEHPForceBalance forceBalancer2Without =
+    pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+      universe, 0, 6.0, 0, 3.0, "53467829");
+  forceBalancer2Without.configAssumeBoxLargeEnough(false);
+
+  CHECK(forceBalancer2
+          .evaluateSpringVectors(forceBalancer2.getNetwork(),
+                                 forceBalancer2.getCurrentDisplacements())
+          .isApprox(forceBalancer2Without.evaluateSpringVectors(
+            forceBalancer2Without.getNetwork(),
+            forceBalancer2Without.getCurrentDisplacements())));
 }

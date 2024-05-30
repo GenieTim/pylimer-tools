@@ -196,24 +196,22 @@ namespace calc {
             chain.getAtomsLinedUp(crossLinkerType, false, true);
           size_t previousIdx = 0;
 
-          size_t previousLinkIdx =
-            vertexIdToLinkIdx[fb.universe.getIdxByAtomId(linedUpAtoms[0].getId())];
-          fb.setLinkPropertiesFromAtom(
-            fb.initialConfig,
-            previousLinkIdx,
-            linedUpAtoms[0],
-            fb.crossLinkerType);
-          fb.initialConfig.linkIndicesOfSprings[springIdx].push_back(previousLinkIdx);
-          fb.initialConfig
-            .springIndicesOfLinks[previousLinkIdx]
-            .push_back(springIdx);
+          size_t previousLinkIdx = vertexIdToLinkIdx[fb.universe.getIdxByAtomId(
+            linedUpAtoms[0].getId())];
+          fb.setLinkPropertiesFromAtom(fb.initialConfig,
+                                       previousLinkIdx,
+                                       linedUpAtoms[0],
+                                       fb.crossLinkerType);
+          fb.initialConfig.linkIndicesOfSprings[springIdx].push_back(
+            previousLinkIdx);
+          fb.initialConfig.springIndicesOfLinks[previousLinkIdx].push_back(
+            springIdx);
           pylimer_tools::entities::Atom lastAtom =
             pylimer_tools::utils::last(linedUpAtoms);
-          size_t lastLinkIdx = vertexIdToLinkIdx[fb.universe.getIdxByAtomId(lastAtom.getId())];
-          fb.setLinkPropertiesFromAtom(fb.initialConfig,
-                                       lastLinkIdx,
-                                       lastAtom,
-                                       fb.crossLinkerType);
+          size_t lastLinkIdx =
+            vertexIdToLinkIdx[fb.universe.getIdxByAtomId(lastAtom.getId())];
+          fb.setLinkPropertiesFromAtom(
+            fb.initialConfig, lastLinkIdx, lastAtom, fb.crossLinkerType);
           fb.initialConfig.springIndexA[springIdx] = previousLinkIdx;
           assert(linedUpAtoms.size() == chain.getLength() ||
                  linedUpAtoms.size() == chain.getLength() + 1);
@@ -390,9 +388,8 @@ namespace calc {
       {
         this->currentSpringVectors = this->evaluateSpringVectors(
           this->initialConfig, this->currentDisplacements);
-        this->currentPartialSpringVectors =
-          this->evaluatePartialSpringVectors(this->initialConfig,
-                                             this->currentDisplacements);
+        this->currentPartialSpringVectors = this->evaluatePartialSpringVectors(
+          this->initialConfig, this->currentDisplacements);
         this->defaultBondLength = universe.computeMeanBondLength();
         this->defaultNrOfChains =
           universe.getMolecules(this->crossLinkerType).size();
@@ -848,9 +845,8 @@ namespace calc {
 
         this->currentSpringVectors = this->evaluateSpringVectors(
           this->initialConfig, this->currentDisplacements);
-        this->currentPartialSpringVectors =
-          this->evaluatePartialSpringVectors(this->initialConfig,
-                                             this->currentDisplacements);
+        this->currentPartialSpringVectors = this->evaluatePartialSpringVectors(
+          this->initialConfig, this->currentDisplacements);
       }
 
       void configMeanBondLength(double meanBondLength)
@@ -1317,6 +1313,21 @@ namespace calc {
       }
 
       /**
+       * @brief Query the box offset for a specific spring
+       *
+       * @param net
+       * @param partialSpringIdx
+       * @param linkIdx
+       * @return Eigen::Vector3d
+       */
+      Eigen::Vector3d getPartialSpringBoxOffset(
+        const ForceBalanceNetwork& net,
+        const size_t partialSpringIdx) const
+      {
+        return net.springPartBoxOffset.segment(3 * partialSpringIdx, 3);
+      }
+
+      /**
        * @brief Query the box offset for a specific spring in a specific
        * direction
        *
@@ -1330,12 +1341,10 @@ namespace calc {
         const size_t partialSpringIdx,
         const size_t linkIdx) const
       {
-        Eigen::Vector3d dist =
-          net.springPartBoxOffset.segment(3 * partialSpringIdx, 3);
-        if (net.springPartIndexA(partialSpringIdx) == linkIdx) {
-          return -1. * dist;
-        }
-        return dist;
+        return (net.springPartIndexA(partialSpringIdx) == linkIdx)
+                 ? (-1. *
+                    this->getPartialSpringBoxOffset(net, partialSpringIdx))
+                 : (this->getPartialSpringBoxOffset(net, partialSpringIdx));
       }
 
       Eigen::Vector3d getPartialSpringBoxOffsetFrom(
