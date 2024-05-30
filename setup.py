@@ -10,7 +10,7 @@ from pathlib import Path
 from setuptools import Extension, find_namespace_packages, setup
 from setuptools.command.build_ext import build_ext
 
-VERSION = "0.2.2"
+VERSION = "0.2.3"
 
 # "-DCMAKE_VERBOSE_MAKEFILE:BOOL=ON",
 cmake_args = ["-DCMAKE_BUILD_TYPE=RelWithDebInfo",
