@@ -454,6 +454,22 @@ init_pylimer_bound_entities(py::module_& m)
                Computes the distance between 2 atoms with functionality 1, 
                ignoring whether they are cross-linkers or not.
             )pbdoc")
+    .def("compute_total_vector",
+         &Molecule::getOverallBondSum,
+         R"pbdoc(
+               Computes the sum of all bond vectors.
+            )pbdoc",
+         py::arg("crosslinker_type") = 2,
+         py::arg("close_loop") = true)
+    .def("compute_vector_from_to",
+         &Molecule::getOverallBondSumFromTo,
+         R"pbdoc(
+               Computes the sum of all bond vectors between two specified atoms.
+            )pbdoc",
+         py::arg("atom_id_from"),
+         py::arg("atom_id_to"),
+         py::arg("crosslinker_type") = 2,
+         py::arg("require_order") = true)
     .def("compute_total_length", &Molecule::computeTotalLength, R"pbdoc(
      Computes the sum of the lengths of all bonds.
      In most cases, this is equal to the contour length.

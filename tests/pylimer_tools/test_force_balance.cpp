@@ -50,10 +50,11 @@ outputNetwork(pcm::ForceBalanceNetwork net,
       std::cout << std::endl;
       if (j < net.linkIndicesOfSprings[i].size() - 1) {
         std::cout << net.localToGlobalSpringIndex.at(i)[j] << ": "
-          << springPartitions[net.localToGlobalSpringIndex.at(i)[j]] << " ("
-          << roundForOutput(net.springPartBoxOffset[0]) << ", "
-          << roundForOutput(net.springPartBoxOffset[1]) << ", "
-          << roundForOutput(net.springPartBoxOffset[2]) << ")" << std::endl;
+                  << springPartitions[net.localToGlobalSpringIndex.at(i)[j]]
+                  << " (" << roundForOutput(net.springPartBoxOffset[0]) << ", "
+                  << roundForOutput(net.springPartBoxOffset[1]) << ", "
+                  << roundForOutput(net.springPartBoxOffset[2]) << ")"
+                  << std::endl;
       }
     }
     std::cout << std::endl;
@@ -2220,6 +2221,7 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
       Catch::Matchers::WithinRel(forceBalancer3.getDisplacementResidualNorm()));
     CHECK_THAT(forceBalancer2.getPressure(),
                Catch::Matchers::WithinRel(forceBalancer3.getPressure()));
+
     // it is actually thinkable that the following fails for certain scenarios.
     // however, in general, it should not
     CHECK(forceBalancer.getDisplacementResidualNorm(1.) <=
@@ -2238,11 +2240,34 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
         universe, 1000, 6.0, 900, 3.0, "53467829");
     forceBalancer4.configAssumeBoxLargeEnough(false);
 
+    CHECK_THAT(
+      forceBalancer4.getNrOfPartialSprings(),
+      Catch::Matchers::WithinRel(forceBalancer2.getNrOfPartialSprings(), 0.1));
     CHECK_THAT(forceBalancer4.getPressure(),
                Catch::Matchers::WithinRel(forceBalancer2.getPressure(), 0.5));
     CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
                Catch::Matchers::WithinRel(
                  forceBalancer2.getDisplacementResidualNorm(), 0.5));
+
+    // check that the spring vectors are equal
+    Eigen::VectorXd springVectors2 = forceBalancer2.evaluateSpringVectors(
+      forceBalancer2.getNetwork(), forceBalancer2.getCurrentDisplacements());
+    Eigen::VectorXd springVectors4 = forceBalancer4.evaluateSpringVectors(
+      forceBalancer4.getNetwork(), forceBalancer4.getCurrentDisplacements());
+    REQUIRE(forceBalancer2.getNetwork().nrOfSprings ==
+            forceBalancer4.getNetwork().nrOfSprings);
+
+    for (size_t springIdx = 0;
+         springIdx < forceBalancer2.getNetwork().nrOfSprings;
+         ++springIdx) {
+      if (forceBalancer2.getNetwork().linkIndicesOfSprings[springIdx].size() <=
+            2 &&
+          forceBalancer4.getNetwork().linkIndicesOfSprings[springIdx].size() <=
+            2) {
+        CHECK(springVectors2.segment(3 * springIdx, 3)
+                .isApprox(springVectors4.segment(3 * springIdx, 3)));
+      }
+    }
 
     forceBalancer4.configAssumeBoxLargeEnough(true);
 
@@ -2273,11 +2298,16 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
     size_t maxIndex;
     double maxValue = magnitudeVector.maxCoeff(&maxIndex);
 
+    std::cout << "\n\n\nnetwork 2:" << std::endl;
     std::cout << "Max force: " << maxValue << " on link with idx " << maxIndex
               << std::endl;
     outputNetwork(forceBalancer2.getNetwork(),
                   forceBalancer2.getCurrentDisplacements(),
                   forceBalancer2.getSpringPartitions());
+    std::cout << "\n\n\nnetwork 4:" << std::endl;
+    outputNetwork(forceBalancer4.getNetwork(),
+                  forceBalancer4.getCurrentDisplacements(),
+                  forceBalancer4.getSpringPartitions());
   } else {
     std::cerr << "File " << inputFile << " does not exist." << std::endl;
   }
@@ -2361,22 +2391,22 @@ TEST_CASE("Random sampling example small", "[analysis][MEHPForceBalance]")
                Catch::Matchers::WithinRel(
                  forceBalancer.getDisplacementResidualNorm(), 0.1));
 
-    std::cout << "FB 1:" << std::endl;
-    outputNetwork(forceBalancer.getNetwork(),
-                  forceBalancer.getCurrentDisplacements(),
-                  forceBalancer.getSpringPartitions());
-    std::cout << "FB 2:" << std::endl;
-    outputNetwork(forceBalancer2.getNetwork(),
-                  forceBalancer2.getCurrentDisplacements(),
-                  forceBalancer2.getSpringPartitions());
-    std::cout << "FB 3:" << std::endl;
-    outputNetwork(forceBalancer3.getNetwork(),
-                  forceBalancer3.getCurrentDisplacements(),
-                  forceBalancer3.getSpringPartitions());
-    std::cout << "FB 4:" << std::endl;
-    outputNetwork(forceBalancer4.getNetwork(),
-                  forceBalancer4.getCurrentDisplacements(),
-                  forceBalancer4.getSpringPartitions());
+    // std::cout << "FB 1:" << std::endl;
+    // outputNetwork(forceBalancer.getNetwork(),
+    //               forceBalancer.getCurrentDisplacements(),
+    //               forceBalancer.getSpringPartitions());
+    // std::cout << "FB 2:" << std::endl;
+    // outputNetwork(forceBalancer2.getNetwork(),
+    //               forceBalancer2.getCurrentDisplacements(),
+    //               forceBalancer2.getSpringPartitions());
+    // std::cout << "FB 3:" << std::endl;
+    // outputNetwork(forceBalancer3.getNetwork(),
+    //               forceBalancer3.getCurrentDisplacements(),
+    //               forceBalancer3.getSpringPartitions());
+    // std::cout << "FB 4:" << std::endl;
+    // outputNetwork(forceBalancer4.getNetwork(),
+    //               forceBalancer4.getCurrentDisplacements(),
+    //               forceBalancer4.getSpringPartitions());
   } else {
     std::cerr << "File " << inputFile << " does not exist." << std::endl;
   }
@@ -2465,7 +2495,6 @@ TEST_CASE("Yet another sampling example", "[analysis][MEHPForceBalance]")
     //               forceBalancer.getCurrentDisplacements(),
     //               forceBalancer.getSpringPartitions());
 
-
     pcm::MEHPForceBalance forceBalancer2 =
       pcm::MEHPForceBalance(universe, 2, false, 1.0, false, false);
     forceBalancer2.configAssumeBoxLargeEnough(false);
@@ -2475,9 +2504,9 @@ TEST_CASE("Yet another sampling example", "[analysis][MEHPForceBalance]")
     // after adding slip-links
     CHECK(forceBalancer.getNetwork().springPartIndexA.isApprox(
       forceBalancer2.getNetwork().springPartIndexA));
-    CHECK_THAT(
-      forceBalancer4.getDisplacementResidualNorm(),
-      Catch::Matchers::WithinRel(forceBalancer.getDisplacementResidualNorm(), 1e-3));
+    CHECK_THAT(forceBalancer4.getDisplacementResidualNorm(),
+               Catch::Matchers::WithinRel(
+                 forceBalancer.getDisplacementResidualNorm(), 1e-3));
     CHECK_THAT(forceBalancer.getPressure(),
                Catch::Matchers::WithinRel(forceBalancer4.getPressure(), 1e-3));
 
@@ -2498,5 +2527,62 @@ TEST_CASE("Yet another sampling example", "[analysis][MEHPForceBalance]")
     //   forceBalancer4.getNetwork().springPartIndexB));
   } else {
     std::cerr << "File " << inputFile << " does not exist." << std::endl;
+  }
+}
+
+TEST_CASE("Conversion of structure is equal for both methods",
+          "[analysis][MEHPForceBalance]")
+{
+  std::cout
+    << "Running test \"Conversion of structure is equal for both methods\""
+    << std::endl;
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+
+  std::string inputFile =
+    suspectedPath +
+    "crosslinked_p_0.99145_0.99145_melt_10000_a_3_5000_xlinks_v_1.V-fixed."
+    "structure.out-equilibration_do_crosslink.structure.out";
+  if (std::filesystem::exists(inputFile)) {
+    std::cout << "Reading file " << inputFile << std::endl;
+    universeSeq.initializeFromDataSequence({ { inputFile } });
+    pe::Universe universe = universeSeq.atIndex(0);
+    std::cout << "Read file " << inputFile << std::endl;
+
+    // randomly sample NO slip-links
+    pcm::MEHPForceBalance forceBalancer =
+      pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+        universe, 0, 6.0, 0, 3.0, "");
+    forceBalancer.configAssumeBoxLargeEnough(false);
+
+    pcm::MEHPForceBalance forceBalancer2 =
+      pcm::MEHPForceBalance(universe, 2, false, 1.0, false, false);
+    forceBalancer2.configAssumeBoxLargeEnough(false);
+
+    // check to make sure the links are actually placed identically
+    CHECK(forceBalancer.getNetwork().springPartIndexA.isApprox(
+      forceBalancer2.getNetwork().springPartIndexA));
+    CHECK(forceBalancer.getNetwork().springPartIndexB.isApprox(
+      forceBalancer2.getNetwork().springPartIndexB));
+    CHECK(forceBalancer.getNetwork().coordinates.isApprox(
+      forceBalancer2.getNetwork().coordinates));
+    CHECK(forceBalancer.getNetwork().springPartBoxOffset.isApprox(
+      forceBalancer2.getNetwork().springPartBoxOffset));
+
+    // and of course the corresponding computations
+    CHECK_THAT(
+      forceBalancer2.getDisplacementResidualNorm(),
+      Catch::Matchers::WithinRel(forceBalancer.getDisplacementResidualNorm()));
+    CHECK_THAT(forceBalancer2.getPressure(),
+               Catch::Matchers::WithinRel(forceBalancer.getPressure()));
+
+    std::cout << "FB 1:" << std::endl;
+    outputNetwork(forceBalancer.getNetwork(),
+                  forceBalancer.getCurrentDisplacements(),
+                  forceBalancer.getSpringPartitions());
+    std::cout << "\n\n\nFB 2:" << std::endl;
+    outputNetwork(forceBalancer2.getNetwork(),
+                  forceBalancer2.getCurrentDisplacements(),
+                  forceBalancer2.getSpringPartitions());
   }
 }
