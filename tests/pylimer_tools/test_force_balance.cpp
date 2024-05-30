@@ -49,12 +49,16 @@ outputNetwork(pcm::ForceBalanceNetwork net,
       }
       std::cout << std::endl;
       if (j < net.linkIndicesOfSprings[i].size() - 1) {
-        std::cout << net.localToGlobalSpringIndex.at(i)[j] << ": "
-                  << springPartitions[net.localToGlobalSpringIndex.at(i)[j]]
-                  << " (" << roundForOutput(net.springPartBoxOffset[0]) << ", "
-                  << roundForOutput(net.springPartBoxOffset[1]) << ", "
-                  << roundForOutput(net.springPartBoxOffset[2]) << ")"
-                  << std::endl;
+        size_t partialSpringIdx = net.localToGlobalSpringIndex[i][j];
+        std::cout
+          << partialSpringIdx << ": " << springPartitions[partialSpringIdx]
+          << " ("
+          << roundForOutput(net.springPartBoxOffset[3 * partialSpringIdx + 0])
+          << ", "
+          << roundForOutput(net.springPartBoxOffset[3 * partialSpringIdx + 1])
+          << ", "
+          << roundForOutput(net.springPartBoxOffset[3 * partialSpringIdx + 2])
+          << ")" << std::endl;
       }
     }
     std::cout << std::endl;
@@ -2650,6 +2654,9 @@ TEST_CASE("Adding slip-links does not influence other springs",
     pcm::MEHPForceBalance::constructWithRandomSlipLinks(
       universe, 0, 6.0, 0, 3.0, "53467829");
   forceBalancer2Without.configAssumeBoxLargeEnough(false);
+
+  CHECK(forceBalancer2.getNrOfPartialSprings() >
+        forceBalancer2Without.getNrOfPartialSprings());
 
   CHECK(forceBalancer2
           .evaluateSpringVectors(forceBalancer2.getNetwork(),

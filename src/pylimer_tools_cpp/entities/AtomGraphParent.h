@@ -441,6 +441,8 @@ namespace entities {
 
       // and now:
       Eigen::Vector3d lastCoords = coordinates.segment(0, 3);
+      // put them into the box already
+      box.handlePBC(lastCoords);
       results[0] = lastCoords[0];
       results[1] = lastCoords[1];
       results[2] = lastCoords[2];
