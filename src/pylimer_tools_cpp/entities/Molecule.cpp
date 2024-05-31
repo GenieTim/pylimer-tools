@@ -576,7 +576,11 @@ namespace entities {
     }
 
     std::vector<Atom> chainEnds = this->getChainEnds(crossLinkerType);
-    long int vertexIdToStartWith = this->getIdxByAtomId(chainEnds[0].getId());
+    long int vertexIdToStartWith = 0;
+    // chainEnds may be empty e.g. for "free" primary loops
+    if (chainEnds.size() > 0) {
+      vertexIdToStartWith = this->getIdxByAtomId(chainEnds[0].getId());
+    }
 
     std::vector<long int> connections =
       this->getVertexIdxsConnectedTo(vertexIdToStartWith);

@@ -56,6 +56,15 @@ namespace utils {
     return value;
   }
 
+  template<typename T>
+  static inline size_t index_of(std::vector<T>& vec, const T val) {
+    auto it = std::find(vec.begin(), vec.end(), val);
+    if (it == vec.end()) {
+      throw std::invalid_argument("Value must be present, not found in vector");
+    }
+    return std::distance(vec.begin(), it);
+  }
+
   static inline std::vector<double> segmentwise_norm(
     const Eigen::VectorXd& vecs,
     const size_t segmentSize = 3)

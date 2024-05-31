@@ -293,13 +293,12 @@ namespace calc {
                ++i) {
             size_t partialSpringIdx =
               fb.initialConfig.localToGlobalSpringIndex[springIdx][i];
-            overallDistanceNow += fb.evaluatePartialSpringDistanceFrom(
-              fb.initialConfig,
-              fb.currentDisplacements,
-              partialSpringIdx,
-              fb.initialConfig.linkIndicesOfSprings[springIdx][i],
-              fb.is2D,
-              false);
+            overallDistanceNow +=
+              fb.evaluatePartialSpringDistance(fb.initialConfig,
+                                               fb.currentDisplacements,
+                                               partialSpringIdx,
+                                               fb.is2D,
+                                               false);
           }
           assert(pylimer_tools::utils::vector_approx_equal(overallDistanceNow,
                                                            overallDistance));
@@ -2431,16 +2430,19 @@ namespace calc {
         size_t targetPartialSpringIdx,
         const double oneOverSpringPartitionUpperLimit = 1.0) const
       {
+#ifndef NDEBUG
+        this->validateNetwork(net, u, springPartitions);
+#endif
         INVALIDARG_EXP_IFN(sourcePartialSpringIdx != targetPartialSpringIdx,
                            "Source and target must be different when moving "
                            "from one cross-link branch to another.");
 
-        size_t involvedSlipLink =
+        const size_t involvedSlipLink =
           net.linkIsSliplink[net.springPartIndexA[sourcePartialSpringIdx]]
             ? net.springPartIndexA[sourcePartialSpringIdx]
             : net.springPartIndexB[sourcePartialSpringIdx];
         assert(net.linkIsSliplink[involvedSlipLink]);
-        size_t involvedCrossLink =
+        const size_t involvedCrossLink =
           net.linkIsSliplink[net.springPartIndexA[sourcePartialSpringIdx]]
             ? net.springPartIndexB[sourcePartialSpringIdx]
             : net.springPartIndexA[sourcePartialSpringIdx];
@@ -2448,13 +2450,25 @@ namespace calc {
         assert(
           (net.springPartIndexA[targetPartialSpringIdx] == involvedCrossLink) ||
           (net.springPartIndexB[targetPartialSpringIdx] == involvedCrossLink));
+        const size_t targetFullSpringIdx =
+          net.partialToFullSpringIndex[targetPartialSpringIdx];
+        const size_t sourceFullSpringIdx =
+          net.partialToFullSpringIndex[sourcePartialSpringIdx];
 
-        size_t otherInvolvedPartialSpring = this->getOtherRailPartialSpringIdx(
-          net, sourcePartialSpringIdx, involvedSlipLink);
+        assert(net.localToGlobalSpringIndex[sourceFullSpringIdx][0] ==
+                 sourcePartialSpringIdx ||
+               pylimer_tools::utils::last(
+                 net.localToGlobalSpringIndex[sourceFullSpringIdx]) ==
+                 sourcePartialSpringIdx);
+
+        size_t otherInvolvedPartialSpring =
+          net.springPartIndexA[sourcePartialSpringIdx] == involvedCrossLink
+            ? net.localToGlobalSpringIndex[sourceFullSpringIdx][1]
+            : net.localToGlobalSpringIndex
+                [sourceFullSpringIdx]
+                [net.localToGlobalSpringIndex[sourceFullSpringIdx].size() - 2];
 
         // check whether there is space on the target spring, at all.
-        size_t targetFullSpringIdx =
-          net.partialToFullSpringIndex[targetPartialSpringIdx];
         const double minAlpha =
           (oneOverSpringPartitionUpperLimit > 0.)
             ? 1. / (net.springsContourLength[targetFullSpringIdx] -
@@ -2469,24 +2483,12 @@ namespace calc {
 
         // validation: check distances
         Eigen::Vector3d distanceBefore =
-          this->evaluatePartialSpringDistanceTo(net,
-                                                u,
-                                                otherInvolvedPartialSpring,
-                                                involvedSlipLink,
-                                                this->is2D,
-                                                false) +
-          this->evaluatePartialSpringDistanceTo(net,
-                                                u,
-                                                sourcePartialSpringIdx,
-                                                involvedCrossLink,
-                                                this->is2D,
-                                                false) +
-          this->evaluatePartialSpringDistanceFrom(net,
-                                                  u,
-                                                  targetPartialSpringIdx,
-                                                  involvedCrossLink,
-                                                  this->is2D,
-                                                  false);
+          this->evaluatePartialSpringDistance(
+            net, u, otherInvolvedPartialSpring, this->is2D, false) +
+          this->evaluatePartialSpringDistance(
+            net, u, sourcePartialSpringIdx, this->is2D, false) +
+          this->evaluatePartialSpringDistance(
+            net, u, targetPartialSpringIdx, this->is2D, false);
 
         // remove the slip-link from one branch of the x-link
         // but skip resizing the Eigen structures, since the additional rows are
@@ -2550,31 +2552,16 @@ namespace calc {
         }
 
         // validation: check distances
-        if (!this->assumeBoxLargeEnough &&
-            !this->isLoopingSpring(net, resultingPartialSpringIdx) &&
-            !this->isLoopingSpring(net, remainingPartialSpringIdx)) {
-          Eigen::Vector3d distanceAfter =
-            this->evaluatePartialSpringDistanceTo(net,
-                                                  u,
-                                                  otherInvolvedPartialSpring,
-                                                  involvedCrossLink,
-                                                  this->is2D,
-                                                  false) +
-            this->evaluatePartialSpringDistanceTo(net,
-                                                  u,
-                                                  resultingPartialSpringIdx,
-                                                  involvedSlipLink,
-                                                  this->is2D,
-                                                  false) +
-            this->evaluatePartialSpringDistanceFrom(net,
-                                                    u,
-                                                    remainingPartialSpringIdx,
-                                                    involvedSlipLink,
-                                                    this->is2D,
-                                                    false);
-          assert(pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
-            distanceAfter, distanceBefore));
-        }
+        Eigen::Vector3d distanceAfter =
+          this->evaluatePartialSpringDistance(
+            net, u, otherInvolvedPartialSpring, this->is2D, false) +
+          this->evaluatePartialSpringDistance(
+            net, u, resultingPartialSpringIdx, this->is2D, false) +
+          this->evaluatePartialSpringDistance(
+            net, u, remainingPartialSpringIdx, this->is2D, false);
+        assert(pylimer_tools::utils::vector_approx_equal<Eigen::Vector3d>(
+          distanceAfter, distanceBefore));
+
         return resultingPartialSpringIdx;
       };
 
