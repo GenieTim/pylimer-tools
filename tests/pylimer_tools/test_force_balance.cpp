@@ -799,7 +799,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
       pcm::BalanceRunMode::ITERATIVE, 1.0, 10000, 1e-10, 100);
     CHECK(forceBalancer2.getNrOfIterations() > 5);
     CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-    CHECK(forceBalancer2.getGammaFactor(25, forceBalancer2.getNrOfSprings()) ==
+    CHECK(forceBalancer2.getGammaFactor(1., forceBalancer2.getNrOfSprings()) ==
           Catch::Approx(1. / 3.).epsilon(0.001));
     auto stressTensor = forceBalancer2.getStressTensor();
     CHECK(forceBalancer2.getPressure() ==
