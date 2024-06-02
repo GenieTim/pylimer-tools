@@ -2054,6 +2054,7 @@ TEST_CASE("MEHP Force Balance correctly re-aligns Slip-Links to Images",
   net.springPartIndexA = Eigen::ArrayXi::Zero(2);
   net.springPartIndexB = Eigen::ArrayXi::Zero(2);
   net.springPartBoxOffset = Eigen::VectorXd::Zero(2 * 3);
+  net.partialToFullSpringIndex = Eigen::ArrayXi::Zero(2);
   net.linkIsSliplink = Eigen::ArrayXb::Constant(3, false);
 
   SECTION("System 1")
@@ -2075,11 +2076,12 @@ TEST_CASE("MEHP Force Balance correctly re-aligns Slip-Links to Images",
       20., 0., 0.;                         // slip-link -> cross-link 2
 
     CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 0, 1));
+    CHECK(net.coordinates.segment(3*2, 3)[1] == 5.);
 
+    CHECK(net.springPartBoxOffset[0] == Catch::Approx(10.));
+    CHECK(net.springPartBoxOffset[3] == Catch::Approx(10.));
     for (size_t i = 0; i < 2 * 3; ++i) {
-      if (i % 3 == 0) {
-        CHECK(net.springPartBoxOffset[i] == Catch::Approx(10.));
-      } else {
+      if (i % 3 != 0) {
         CHECK(net.springPartBoxOffset[i] == Catch::Approx(0.));
       }
     }
@@ -2103,7 +2105,7 @@ TEST_CASE("MEHP Force Balance correctly re-aligns Slip-Links to Images",
     net.springPartBoxOffset << 20., 0., 0., // cross-link 2 -> slip-link
       0., 0., 0.;                           // slip-link -> cross-link 1
 
-    CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 1, 0));
+    CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 0, 1));
 
     Eigen::VectorXd expectation = Eigen::VectorXd::Zero(2 * 3);
     expectation(0) = 10.;
@@ -2116,13 +2118,13 @@ TEST_CASE("MEHP Force Balance correctly re-aligns Slip-Links to Images",
 
   SECTION("System 3")
   {
-    net.springPartIndexA << 2, 2;
-    net.springPartIndexB << 1, 0;
+    net.springPartIndexA << 2, 0;
+    net.springPartIndexB << 1, 2;
     net.linkIsSliplink[2] = true;
 
     Eigen::VectorXd u = Eigen::VectorXd::Zero(net.coordinates.size());
 
-    CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 0, 1));
+    CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 1, 0));
     CHECK((net.springPartBoxOffset.array() == (0.0)).all());
 
     net.coordinates << 5, 2.5, 0., // cross-link 1,
@@ -2135,8 +2137,8 @@ TEST_CASE("MEHP Force Balance correctly re-aligns Slip-Links to Images",
     CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 1, 0));
 
     Eigen::VectorXd expectation = Eigen::VectorXd::Zero(2 * 3);
-    expectation(0) = 10.;
-    expectation(3) = -10.;
+    expectation(0) = 0.;
+    expectation(3) = 0.;
 
     for (size_t i = 0; i < 2 * 3; ++i) {
       CHECK(expectation[i] == Catch::Approx(net.springPartBoxOffset[i]));
