@@ -3906,19 +3906,33 @@ namespace calc {
       Eigen::Vector3d viaCoords = net.coordinates.segment(3 * slipLinkIdx, 3) +
                                   u.segment(3 * slipLinkIdx, 3);
 
+      // std::cout << net.springPartIndexA[partialSpringIdx1] << ": "
+      //           << sourceCoords << " to "
+      //           << net.springPartIndexB[partialSpringIdx2] << ": "
+      //           << targetCoords << " via " << viaCoords << std::endl;
+
       double bestOffsetScore = -1.;
       Eigen::Vector3d bestOffset = Eigen::Vector3d::Zero();
 
       // ugly brute-force method to check all possible combinations (ideally,
       // more or less at least)
       Eigen::Array3i multiplicity1 =
-        (this->universe.getBox().getOffset(viaCoords - sourceCoords).array() /
+        ((this->universe.getBox()
+            .getOffset(viaCoords - sourceCoords)
+            .array()
+            .abs() +
+          this->getPartialSpringBoxOffset(net, partialSpringIdx1)
+            .array()
+            .abs()) /
          this->universe.getBox().getL())
           .rint()
           .cast<int>()
           .abs();
       Eigen::Array3i multiplicity2 =
-        (this->universe.getBox().getOffset(targetCoords - viaCoords).array() /
+        ((this->universe.getBox().getOffset(targetCoords - viaCoords).array() +
+          this->getPartialSpringBoxOffset(net, partialSpringIdx2)
+            .array()
+            .abs()) /
          this->universe.getBox().getL())
           .rint()
           .cast<int>()
@@ -3950,6 +3964,10 @@ namespace calc {
               (vec1 + vec2), totalDistanceBefore));
 
             double currentScore = vec1.squaredNorm() + vec2.squaredNorm();
+            // std::cout << "Score: " << currentScore << " for offset "
+            //           << currentOffset << std::endl;
+            // std::cout << "vec 1: " << vec1 << std::endl;
+            // std::cout << "vec 2: " << vec2 << std::endl;
 
             if (bestOffsetScore < 0 || bestOffsetScore > currentScore) {
               bestOffsetScore = currentScore;
@@ -3963,8 +3981,6 @@ namespace calc {
       net.springPartBoxOffset.segment(3 * partialSpringIdx1, 3) = bestOffset;
       net.springPartBoxOffset.segment(3 * partialSpringIdx2, 3) =
         totalOffset - bestOffset;
-      // only for assumeBoxLargeEnough == false:
-      // (and some other restrictions)
       Eigen::Vector3d totalDistanceNow =
         this->evaluatePartialSpringDistance(
           net, u, partialSpringIdx1, this->is2D, false) +

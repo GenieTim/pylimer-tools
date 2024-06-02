@@ -7,7 +7,7 @@ endif ()
 
 # start project
 if (NOT DEFINED VERSION_NR)
-project(pylimer_tools VERSION "0.2.3")
+project(pylimer_tools VERSION "0.2.4")
 else()
 project(pylimer_tools VERSION ${VERSION_NR})
 endif()
