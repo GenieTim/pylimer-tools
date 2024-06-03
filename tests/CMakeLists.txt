@@ -67,8 +67,10 @@ add_library(test_sources
 )
 # pylimer_tools/test_force_balance2.cpp
 
-if(CODE_COVERAGE)
-		message(AUTHOR_WARNING "Code-coverage is enabled, openmp will not be used")
+IF (WIN32)
+		message(AUTHOR_WARNING "On Windows, OpenMP will not be used")
+# elseif(CODE_COVERAGE)
+# 		message(AUTHOR_WARNING "Code-coverage is enabled, openmp will not be used")
 else()
 	find_package(OpenMP)
 	if (OpenMP_CXX_FOUND)

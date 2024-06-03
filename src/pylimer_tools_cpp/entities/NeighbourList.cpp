@@ -169,9 +169,11 @@ namespace entities {
   size_t NeighbourList::normalizeBucketIndex(long int bucketIndex,
                                              size_t nrOfBuckets) const
   {
-    return bucketIndex -
-           nrOfBuckets * std::nearbyintl(static_cast<double>(bucketIndex) /
-                                         static_cast<double>(nrOfBuckets));
+    size_t result =
+      bucketIndex - nrOfBuckets * std::floorl(static_cast<double>(bucketIndex) /
+                                              static_cast<double>(nrOfBuckets));
+    assert(result >= 0 && result <= nrOfBuckets);
+    return result;
     // while (bucketIndex < 0) {
     //   bucketIndex = bucketIndex + nrOfBuckets;
     // }
