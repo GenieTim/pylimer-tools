@@ -690,9 +690,12 @@ namespace entities {
       atoms, this->getBox(), pylimer_tools::utils::last<double>(distances));
 
     for (size_t i = 1; i < distances.size(); ++i) {
-      for (Atom a : atoms) {
+      for (const Atom& a : atoms) {
         std::vector<Atom> closeAtoms = neighbourList.getAtomsCloseTo(
           a, distances[i], distances[i - 1], unwrapped);
+        // std::cout << closeAtoms.size() << " atoms close to " << a.getId()
+        //           << " between " << distances[i] << " and " << distances[i - 1]
+        //           << std::endl;
         result[i - 1] += closeAtoms.size();
       }
     }

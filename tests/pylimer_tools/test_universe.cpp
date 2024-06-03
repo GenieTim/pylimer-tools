@@ -849,7 +849,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     }
   }
 
-  SECTION("Local Denstity Computation")
+  SECTION("Local Density Computation")
   {
     const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
     universe.setBox(box);
@@ -868,6 +868,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
     CHECK(result.size() == distances.size() - 1);
     CHECK(result.size() == 3);
     CHECK(result[0] == 0);
+    // num neighbours between 1. and 2. (sqrt(3))
     CHECK(result[1] == 12);
     CHECK(result[2] == 0);
   }

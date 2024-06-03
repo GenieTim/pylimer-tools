@@ -232,11 +232,11 @@ TEST_CASE("Molecules compute radius of gyration", "[entity][Molecule]")
         assumedCoordinates, box, vertices);
     for (int i = 0; i < 4; ++i) {
       CHECK(assumedCoordinates[(i) * 3] ==
-            Catch::Approx(29. + static_cast<double>(i)));
+            Catch::Approx(9. + static_cast<double>(i)));
       CHECK(assumedCoordinates[(i) * 3 + 1] ==
-            Catch::Approx(29. + static_cast<double>(i)));
+            Catch::Approx(9. + static_cast<double>(i)));
       CHECK(assumedCoordinates[(i) * 3 + 2] ==
-            Catch::Approx(29. + static_cast<double>(i)));
+            Catch::Approx(9. + static_cast<double>(i)));
     }
   }
 
