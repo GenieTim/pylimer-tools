@@ -171,7 +171,7 @@ namespace entities {
                                              size_t nrOfBuckets) const
   {
     size_t result =
-      bucketIndex - nrOfBuckets * std::floorl(static_cast<double>(bucketIndex) /
+      bucketIndex - nrOfBuckets * std::floor(static_cast<double>(bucketIndex) /
                                               static_cast<double>(nrOfBuckets));
     assert(result >= 0 && result <= nrOfBuckets);
     return result;
