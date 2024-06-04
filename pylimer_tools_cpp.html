@@ -3608,10 +3608,7 @@ No specific order is guaranteed.</p>
 <dd><p>Compute the end-to-end distance (<span class="math notranslate nohighlight">\(R_{ee}\)</span>) of this molecule.</p>
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
-<p>Returns 0.0 if the molecule does not have two or more atoms.
-Returns -1.0 if not exactly 2 ends were found.
-Computes the distance between 2 atoms with functionality 1,
-ignoring whether they are cross-linkers or not.</p>
+<p>Returns 0.0 if the molecule does not have two or more atoms.</p>
 </div>
 </dd></dl>
 
@@ -3626,9 +3623,32 @@ as it needs the atoms sorted such that the periodic box can still be respected s
 <div class="admonition caution">
 <p class="admonition-title">Caution</p>
 <p>Returns 0.0 if the molecule does not have two or more atoms.
-Requires bonds to be shorter than half the box length.
-Computes the distance between 2 atoms with functionality 1,
-ignoring whether they are cross-linkers or not.</p>
+Requires bonds to be shorter than half the box length.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.compute_end_to_end_vector">
+<span class="sig-name descname"><span class="pre">compute_end_to_end_vector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.compute_end_to_end_vector" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the end-to-end vector (<span class="math notranslate nohighlight">\(\overrightarrow{R}_{ee}\)</span>) of this molecule.</p>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>Returns 0.0 if the molecule does not have two or more atoms.</p>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.Molecule.compute_end_to_end_vector_with_derived_image_flags">
+<span class="sig-name descname"><span class="pre">compute_end_to_end_vector_with_derived_image_flags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><span class="pre">pylimer_tools_cpp.Molecule</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="m"><span class="pre">3</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Molecule.compute_end_to_end_vector_with_derived_image_flags" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the end-to-end vector (<span class="math notranslate nohighlight">\(\overrightarrow{R}_{ee}\)</span>) of this molecule,
+but ignoring the image flags attached to the atoms.
+This only works for Molecules that can be lined up with
+<code class="xref py py-func docutils literal notranslate"><span class="pre">getAtomsLinedUp()</span></code>,
+as it needs the atoms sorted such that the periodic box can still be respected somewhat.</p>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>Returns 0.0 if the molecule does not have two or more atoms.
+Requires bonds to be shorter than half the box length.</p>
 </div>
 </dd></dl>
 
@@ -5840,6 +5860,8 @@ If you have not output the type of the atoms in the dump file, they will be set 
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.compute_bond_lengths"><code class="docutils literal notranslate"><span class="pre">Molecule.compute_bond_lengths()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.compute_end_to_end_distance"><code class="docutils literal notranslate"><span class="pre">Molecule.compute_end_to_end_distance()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.compute_end_to_end_distance_with_derived_image_flags"><code class="docutils literal notranslate"><span class="pre">Molecule.compute_end_to_end_distance_with_derived_image_flags()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.compute_end_to_end_vector"><code class="docutils literal notranslate"><span class="pre">Molecule.compute_end_to_end_vector()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.compute_end_to_end_vector_with_derived_image_flags"><code class="docutils literal notranslate"><span class="pre">Molecule.compute_end_to_end_vector_with_derived_image_flags()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.compute_radius_of_gyration"><code class="docutils literal notranslate"><span class="pre">Molecule.compute_radius_of_gyration()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.compute_radius_of_gyration_with_derived_image_flags"><code class="docutils literal notranslate"><span class="pre">Molecule.compute_radius_of_gyration_with_derived_image_flags()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Molecule.compute_total_length"><code class="docutils literal notranslate"><span class="pre">Molecule.compute_total_length()</span></code></a></li>
