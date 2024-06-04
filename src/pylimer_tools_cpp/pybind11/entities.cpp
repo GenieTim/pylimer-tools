@@ -428,6 +428,14 @@ init_pylimer_bound_entities(py::module_& m)
             
             See also: :func:`~pylimer_tools_cpp.Molecule.computeRadiusOfGyration()`.
             )pbdoc")
+    .def("compute_end_to_end_vector",
+         &Molecule::computeEndToEndVector,
+         R"pbdoc(
+            Compute the end-to-end vector (:math:`\overrightarrow{R}_{ee}`) of this molecule. 
+
+            CAUTION:
+               Returns 0.0 if the molecule does not have two or more atoms.
+            )pbdoc")
     .def("compute_end_to_end_distance",
          &Molecule::computeEndToEndDistance,
          R"pbdoc(
@@ -435,9 +443,19 @@ init_pylimer_bound_entities(py::module_& m)
 
             CAUTION:
                Returns 0.0 if the molecule does not have two or more atoms.
-               Returns -1.0 if not exactly 2 ends were found.
-               Computes the distance between 2 atoms with functionality 1, 
-               ignoring whether they are cross-linkers or not.
+            )pbdoc")
+    .def("compute_end_to_end_vector_with_derived_image_flags",
+         &Molecule::computeEndToEndVectorWithDerivedImageFlags,
+         R"pbdoc(
+            Compute the end-to-end vector (:math:`\overrightarrow{R}_{ee}`) of this molecule,
+            but ignoring the image flags attached to the atoms. 
+            This only works for Molecules that can be lined up with 
+            :func:`~pylimer_tools_cpp.Molecule.getAtomsLinedUp()`,
+            as it needs the atoms sorted such that the periodic box can still be respected somewhat.
+
+            CAUTION:
+               Returns 0.0 if the molecule does not have two or more atoms.
+               Requires bonds to be shorter than half the box length.
             )pbdoc")
     .def("compute_end_to_end_distance_with_derived_image_flags",
          &Molecule::computeEndToEndDistanceWithDerivedImageFlags,
@@ -451,8 +469,6 @@ init_pylimer_bound_entities(py::module_& m)
             CAUTION:
                Returns 0.0 if the molecule does not have two or more atoms.
                Requires bonds to be shorter than half the box length.
-               Computes the distance between 2 atoms with functionality 1, 
-               ignoring whether they are cross-linkers or not.
             )pbdoc")
     .def("compute_total_vector",
          &Molecule::getOverallBondSum,

@@ -92,8 +92,11 @@ def compute_extent_of_reaction(
     """
     if (network.get_nr_of_atoms() == 0):
         return 1
+    
+    if (len(network.get_atoms_by_type(crosslinker_type)) == 0):
+        return 0
 
-    if (functionality_per_type is not None and crosslinker_type not in functionality_per_type):
+    if ((functionality_per_type is not None) and (crosslinker_type not in functionality_per_type)):
         functionality_per_type = None
         warnings.warn("Cross-linker type {} not found in passed functionality_per_type, ".format(crosslinker_type) +
                       "will ignore passed argument `functionality_per_type`.")

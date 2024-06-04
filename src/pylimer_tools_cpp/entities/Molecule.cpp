@@ -132,15 +132,18 @@ namespace entities {
     return std::accumulate(bondLens.begin(), bondLens.end(), 0.0);
   }
 
-  double Molecule::computeEndToEndDistance()
+  double Molecule::computeEndToEndDistance() const
+  {
+    return this->computeEndToEndVector().norm();
+  }
+
+  Eigen::Vector3d Molecule::computeEndToEndVector() const
   {
     if (this->getNrOfAtoms() < 2) {
-      return 0.0;
+      return Eigen::Vector3d::Zero();
     }
 
-    std::vector<Atom> endNodes = this->getAtomsOfDegree(1);
-
-    double distance = -1.0; // TODO: find a nice default for "no end to end"
+    std::vector<Atom> endNodes = this->getChainEnds();
 
     // we only compute an end-to-end distance if we have exactly two ends.
     // this is clearly not optimal, but at least unambiguous
@@ -149,16 +152,23 @@ namespace entities {
       // check whether the compiler optimizes this or not
       Atom atom1 = endNodes[0];
       Atom atom2 = endNodes[1];
-      distance = atom1.distanceToUnwrapped(atom2, this->parent);
+      return atom1.vectorToUnwrapped(atom2, this->parent);
     }
-    return distance;
+
+    throw std::runtime_error(
+      "Cannot compute end-to-end vector for Molecule with " +
+      std::to_string(endNodes.size()) + " end(s).");
   }
 
   double Molecule::computeEndToEndDistanceWithDerivedImageFlags() const
   {
+    return this->computeEndToEndVectorWithDerivedImageFlags().norm();
+  }
+
+  Eigen::Vector3d Molecule::computeEndToEndVectorWithDerivedImageFlags() const {
     const std::vector<long int> vertices = this->getVerticesLinedUp();
     if (vertices.size() == 0 || vertices.size() == 1) {
-      return 0.0;
+      return Eigen::Vector3d::Zero();
     }
 
     Eigen::VectorXd coordinates = Eigen::VectorXd(vertices.size() * 3);
@@ -168,7 +178,7 @@ namespace entities {
       coordinates.segment(0, 3) -
       coordinates.segment(3 * (vertices.size() - 1), 3);
 
-    return distance.norm();
+    return distance;
   }
 
   /**

@@ -70,7 +70,9 @@ namespace entities {
                                    bool closePrimaryLoop = true) const;
 
     // computations
-    double computeEndToEndDistance();
+    Eigen::Vector3d computeEndToEndVector() const;
+    double computeEndToEndDistance() const;
+    Eigen::Vector3d computeEndToEndVectorWithDerivedImageFlags() const;
     double computeEndToEndDistanceWithDerivedImageFlags() const;
     double computeRadiusOfGyration();
     double computeRadiusOfGyrationWithDerivedImageFlags() const;

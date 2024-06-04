@@ -4583,19 +4583,19 @@ namespace calc {
           oneOverSpringPartitionUpperLimit);
 
         double multiplier = kappa0 * oneOverContourLengthFraction;
+
+        stress += multiplier * partialDistance * partialDistance.transpose();
+        debugNrSpringsVisited[globalSpringIndex] += 1;
+
+        // also account for primary loops.
+        // they may have non-zero length thanks to assuming the box is not large enough...
         if (net.springPartIndexA[globalSpringIndex] ==
             net.springPartIndexB[globalSpringIndex]) {
-          debugNrSpringsVisited[globalSpringIndex] += 1;
-          multiplier *= 2.;
-        }
+          stress +=
+            multiplier * (-partialDistance) * (-partialDistance).transpose();
 
-        for (size_t i = 0; i < 3; ++i) {
-          for (size_t j = 0; j < 3; ++j) {
-            stress(i, j) +=
-              multiplier * partialDistance[i] * partialDistance[j];
-          }
+          debugNrSpringsVisited[globalSpringIndex] += 1;
         }
-        debugNrSpringsVisited[globalSpringIndex] += 1;
       }
 
       return stress;
@@ -5279,7 +5279,6 @@ namespace calc {
       const double kappa0,
       const double oneOverSpringPartitionUpperLimit) const
     {
-
       Eigen::Matrix3d stress = Eigen::Matrix3d::Zero();
       INVALIDARG_EXP_IFN(
         springPartitions.size() == net.springPartIndexA.size(),
@@ -5338,7 +5337,7 @@ namespace calc {
 
       size_t nrOfLinksToInspect = xlinksOnly ? net.nrOfNodes : net.nrOfLinks;
       for (size_t linkIdx = 0; linkIdx < nrOfLinksToInspect; ++linkIdx) {
-        Eigen::Matrix3d force =
+        Eigen::Matrix3d stressOnLink =
           this->evaluateStressOnLink(linkIdx,
                                      net,
                                      u,
@@ -5347,11 +5346,11 @@ namespace calc {
                                      kappa0,
                                      oneOverSpringPartitionUpperLimit);
         /* spring contribution to the overall stress tensor */
-        RUNTIME_EXP_IFN(std::isfinite(force.squaredNorm()),
+        RUNTIME_EXP_IFN(std::isfinite(stressOnLink.squaredNorm()),
                         "Got non-finite force contribution to stress tensor: " +
-                          std::to_string(force.squaredNorm()) + " at link " +
-                          std::to_string(linkIdx) + "!");
-        stress += force;
+                          std::to_string(stressOnLink.squaredNorm()) +
+                          " at link " + std::to_string(linkIdx) + "!");
+        stress += stressOnLink;
       }
 
       std::array<std::array<double, 3>, 3> stressA;
