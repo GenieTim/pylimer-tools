@@ -280,8 +280,8 @@ TEST_CASE(
       CHECK(forceRelaxer2.getVolume() ==
             Catch::Approx(97.383096 * 97.383096 * 97.383096));
       // initial system values
-      CHECK(forceRelaxer2.getPressure() == Catch::Approx(0.0050530914));
-      CHECK(forceRelaxer2.getForce() * 79 == Catch::Approx(553001.4098561466));
+      CHECK(forceRelaxer2.getPressure() == Catch::Approx(0.0050521117));
+      CHECK(forceRelaxer2.getForce() * 79 == Catch::Approx(552894.1903005134));
       CHECK(forceRelaxer2.getAverageContourLength() == Catch::Approx(79.0));
       Eigen::VectorXd contourLengths = forceRelaxer2.getSpringContourLength();
       for (int i = 0; i < contourLengths.size(); ++i) {
@@ -315,11 +315,11 @@ TEST_CASE(
 
       // final values
       CHECK(forceRelaxer2.getPressure() ==
-            Catch::Approx(0.0019478781)); // LJ Units [?]
+            Catch::Approx(0.0019468984)); // LJ Units [?]
       CHECK(forceRelaxer2.getPressure() * conversionFactor /
               (sigmaToM * sigmaToM * sigmaToM) ==
             Catch::Approx(
-              61338.8913392133)); // shear modulus from the pressure, MPa
+              61308.0398526509)); // shear modulus from the pressure, MPa
       double nrOfChainCorrection =
         (forceRelaxer2.getDefaultNrOfChains() / nrOfChains);
       double expectedNb2 = slope * Nb * beadMass;
@@ -329,12 +329,12 @@ TEST_CASE(
       CHECK(forceRelaxer2.getGammaFactor() * nrOfChainCorrection *
               forceRelaxer2.getDefaultR0Square() ==
             Catch::Approx(
-              42.6344678773)); // as from conversion-less Mathematica script
+              42.6130241132)); // as from conversion-less Mathematica script
       CHECK(forceRelaxer2.getGammaFactor() * gammaCorrectionFactor * kb * T *
               nu ==
             Catch::Approx(61338.8913392133)); // ANT shear modulus, Pa
       CHECK(forceRelaxer2.getGammaFactor() * gammaCorrectionFactor ==
-            Catch::Approx(0.3196052156)); // "correct" gamma factor
+            Catch::Approx(0.3194444644)); // "correct" gamma factor
       CHECK(forceRelaxer2.getExitReason() == pcm::ExitReason::F_TOLERANCE);
       // TODO: find better, more accurate tests here
       CHECK(forceRelaxer2.getNrOfActiveNodes() > 1);

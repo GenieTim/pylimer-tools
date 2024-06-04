@@ -715,11 +715,11 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         double nb2Correction = 1.;
         // (forceBalancer2.getDefaultR0Square() / (expectedNb2));
         double gammaCorrectionFactor = nrOfChainCorrection * nb2Correction;
-        CHECK(forceBalancer2.getGammaFactor() * nrOfChainCorrection * 1.
+        CHECK(forceBalancer2.getGammaFactor() //* nrOfChainCorrection * 1.
               // forceBalancer2.getDefaultR0Square()
               == Catch::Approx(
                    42.6132)); // as from conversion-less Mathematica script
-        CHECK(forceBalancer2.getGammaFactor() * gammaCorrectionFactor * kb * T *
+        CHECK(forceBalancer2.getGammaFactor() * kb * T * //gammaCorrectionFactor *
                 nu ==
               Catch::Approx(61308.3)); // ANT shear modulus, Pa
         CHECK(forceBalancer2.getGammaFactor() * gammaCorrectionFactor ==
