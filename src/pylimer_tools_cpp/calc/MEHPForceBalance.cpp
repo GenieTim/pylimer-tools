@@ -2305,7 +2305,7 @@ namespace calc {
         // add to end...
         if (removedSpringsLinks[removedSpringsLinks.size() - 1] ==
             linkToReduce) {
-          std::cout << "End end" << std::endl;
+          // std::cout << "End end" << std::endl;
           // ...from end
           net.linkIndicesOfSprings[keptSpringIdx][keptSpringsLinks.size() - 1] =
             removedSpringsLinks[removedSpringsLinks.size() - 2];
@@ -2342,7 +2342,7 @@ namespace calc {
           distanceBefore *= -1.;
         } else {
           // ...from start
-          std::cout << "End start" << std::endl;
+          // std::cout << "End start" << std::endl;
           RUNTIME_EXP_IFN(removedSpringsLinks[0] == linkToReduce,
                           "Things don't make sense anymore.");
           net.linkIndicesOfSprings[keptSpringIdx][keptSpringsLinks.size() - 1] =
@@ -2365,7 +2365,7 @@ namespace calc {
         // add to start...
         if (removedSpringsLinks[removedSpringsLinks.size() - 1] ==
             linkToReduce) {
-          std::cout << "Start end" << std::endl;
+          // std::cout << "Start end" << std::endl;
           // from end
           net.linkIndicesOfSprings[keptSpringIdx][0] =
             removedSpringsLinks[removedSpringsLinks.size() - 2];
@@ -2384,7 +2384,7 @@ namespace calc {
           }
           distanceBefore += distanceBeforeRemainingSpring;
         } else {
-          std::cout << "Start start" << std::endl;
+          // std::cout << "Start start" << std::endl;
           // from start
           RUNTIME_EXP_IFN(removedSpringsLinks[0] == linkToReduce,
                           "No way this exception is ever shown, right?");
