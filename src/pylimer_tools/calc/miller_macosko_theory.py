@@ -10,10 +10,8 @@ from scipy import optimize
 from pylimer_tools.calc.structure_analysis import (
     compute_crosslinker_conversion,
     compute_effective_crosslinker_functionality,
-    compute_stoichiometric_imbalance,
-    compute_weight_fractions,
-    measure_weight_fraction_of_soluble_material,
-)
+    compute_stoichiometric_imbalance, compute_weight_fractions,
+    measure_weight_fraction_of_soluble_material)
 from pylimer_tools.io.unit_styles import UnitStyle
 from pylimer_tools_cpp import Universe
 
@@ -34,7 +32,8 @@ def predict_shear_modulus(**kwargs):
     ToDo:
       - Support more than one crosslinker type (as is supported by original formula)
     """
-    g_mmt_phantom, g_mmt_entanglement, _, _ = compute_modulus_decomposition(**kwargs)
+    g_mmt_phantom, g_mmt_entanglement, _, _ = compute_modulus_decomposition(
+        **kwargs)
     return g_mmt_phantom + g_mmt_entanglement
 
 
@@ -108,6 +107,8 @@ def predict_number_density_of_network_strands(
         raise ValueError("Could not determine cross-linker functionality")
 
     weight_fractions = network.compute_weight_fractions()
+    if (crosslinker_type not in weight_fractions):
+        weight_fractions[crosslinker_type] = 0.
     alpha, _ = compute_miller_macosko_probabilities(
         r=(
             r
@@ -226,7 +227,8 @@ def compute_weight_fraction_of_backbone(
         w_sol = measure_weight_fraction_of_soluble_material(network)
 
     phi_el = 0
-    w_a = weight_fractions[crosslinker_type] / functionality_per_type[crosslinker_type]
+    w_a = weight_fractions[crosslinker_type] / \
+        functionality_per_type[crosslinker_type]
     w_xl = weight_fractions[crosslinker_type]
     w_x2 = 1 - w_xl
     assert w_a <= 1 and w_a >= 0
@@ -292,7 +294,7 @@ def compute_weight_fraction_of_soluble_material(
     )
 
     if functionality_per_type is not None and not np.all(
-        [key in functionality_per_type for key in weight_fractions.keys()]
+        [key in functionality_per_type for key in weight_fractions.keys() if weight_fractions[key] > 0.]
     ):
         warnings.warn(
             "functionality_per_type does not contain functionality for all types. Will be re-computed."
@@ -377,19 +379,21 @@ def compute_weight_fractions_and_probabilities(
             )
         )
 
-    for key in functionality_per_type:
-        if key != crosslinker_type and functionality_per_type[key] != 2:
-            raise NotImplementedError(
-                "Currently, only strand functionality of 2 is supported. {} given for type {}".format(
-                    functionality_per_type[key], key
-                )
-            )
-
     if weight_fractions is None:
         weight_fractions = compute_weight_fractions(network)
         assert math.isclose(
             sum(w for w in weight_fractions.values()), 1.0, abs_tol=1e-9
         )
+        if (crosslinker_type not in weight_fractions):
+            weight_fractions[crosslinker_type] = 0.
+
+    for key in functionality_per_type:
+        if key != crosslinker_type and functionality_per_type[key] != 2 and weight_fractions[key] > 0:
+            raise NotImplementedError(
+                "Currently, only strand functionality of 2 is supported. {} given for type {}".format(
+                    functionality_per_type[key], key
+                )
+            )
 
     if p is None:
         assert network is not None
@@ -401,9 +405,11 @@ def compute_weight_fractions_and_probabilities(
                 "The p computed ({}) is outside the accepted range. ".format(p)
                 + "Falling back to effective cross-linker functionality."
             )
-            p = compute_effective_crosslinker_functionality(network, crosslinker_type)
+            p = compute_effective_crosslinker_functionality(
+                network, crosslinker_type)
     if p > 1 or p < 0:
-        raise ValueError("Detected p = {}. Need p in (0, 1).".format(p))
+        raise ValueError("Detected p = {} for f = {}. Need p in (0, 1).".format(
+            p, functionality_per_type[crosslinker_type]))
     if r is None:
         assert network is not None
         r = compute_stoichiometric_imbalance(
@@ -509,11 +515,13 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int):
 def validate_r_and_p(r: float, p: float, f: int):
     if p < 0:
         raise ValueError(
-            "The cross-linker conversion `p` must be positive, got {}".format(p)
+            "The cross-linker conversion `p` must be positive, got {}".format(
+                p)
         )
     if r < 0:
         raise ValueError(
-            "The stoichiometric imbalance `r` must be positive, got {}".format(r)
+            "The stoichiometric imbalance `r` must be positive, got {}".format(
+                r)
         )
     if f < 2:
         raise ValueError(
@@ -592,7 +600,8 @@ def compute_modulus_decomposition(
                 "The p computed ({}) is outside the accepted range. ".format(p)
                 + "Falling back to effective cross-linker functionality."
             )
-            p = compute_effective_crosslinker_functionality(network, crosslinker_type)
+            p = compute_effective_crosslinker_functionality(
+                network, crosslinker_type)
     if f is None:
         if functionality_per_type is None:
             functionality_per_type = network.determine_functionality_per_type()
@@ -774,7 +783,8 @@ def compute_trapping_factor(
     """
     if alpha is None:
         if f is None:
-            raise ValueError("The argument f is required, if alpha is not provided")
+            raise ValueError(
+                "The argument f is required, if alpha is not provided")
         alpha, _ = compute_miller_macosko_probabilities(r, p, f)
 
     pel = ((1 / (r * p)) * (1 - alpha)) ** 2
@@ -845,7 +855,8 @@ def predict_p_from_w_sol(
         except ValueError:
             p_f_a_out = 1.0  # highest value -> this will not be the optimum
         return (
-            w_f * p_f_a_out**f + w_g * (r * p * p_f_a_out ** (f - 1) + 1 - r * p) ** g
+            w_f * p_f_a_out**f + w_g *
+            (r * p * p_f_a_out ** (f - 1) + 1 - r * p) ** g
         )
 
     res = optimize.minimize_scalar(

@@ -165,7 +165,8 @@ namespace entities {
     return this->computeEndToEndVectorWithDerivedImageFlags().norm();
   }
 
-  Eigen::Vector3d Molecule::computeEndToEndVectorWithDerivedImageFlags() const {
+  Eigen::Vector3d Molecule::computeEndToEndVectorWithDerivedImageFlags() const
+  {
     const std::vector<long int> vertices = this->getVerticesLinedUp();
     if (vertices.size() == 0 || vertices.size() == 1) {
       return Eigen::Vector3d::Zero();
@@ -175,8 +176,8 @@ namespace entities {
     this->getAssumedVertexCoordinates(coordinates, this->parent, vertices);
 
     Eigen::Vector3d distance =
-      coordinates.segment(0, 3) -
-      coordinates.segment(3 * (vertices.size() - 1), 3);
+      coordinates.segment(3 * (vertices.size() - 1), 3) -
+      coordinates.segment(0, 3);
 
     return distance;
   }
