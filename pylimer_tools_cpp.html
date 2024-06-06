@@ -951,6 +951,12 @@ e.g., if the bonds need to be able to get longer than half the box.</p>
 <p><span class="math notranslate nohighlight">\(V = L_x \cdot L_y \cdot L_z\)</span></p>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.Box.is_valid_offset">
+<span class="sig-name descname"><span class="pre">is_valid_offset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Box" title="pylimer_tools_cpp.Box"><span class="pre">pylimer_tools_cpp.Box</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">potential_offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abs_precision</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1e-05</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Box.is_valid_offset" title="Link to this definition">¶</a></dt>
+<dd><p>Check whether the passed offest is a valid one in this box.</p>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -4666,7 +4672,8 @@ the weight average molecular weight over the number average molecular weight.</p
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Universe.compute_weight_fractions">
 <span class="sig-name descname"><span class="pre">compute_weight_fractions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.Universe</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Universe.compute_weight_fractions" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the weight fractions of each atom type in the network.</p>
-<p>If no masses are stored,</p>
+<p>If no masses are stored, assumes a mass of 1 for each atom.</p>
+<p>If the total mass is 0., returns the total mass per atom type.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -5444,6 +5451,7 @@ If you have not output the type of the atoms in the dump file, they will be set 
 <li><a class="reference internal" href="#pylimer_tools_cpp.Box.get_lz"><code class="docutils literal notranslate"><span class="pre">Box.get_lz()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Box.get_offset"><code class="docutils literal notranslate"><span class="pre">Box.get_offset()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Box.get_volume"><code class="docutils literal notranslate"><span class="pre">Box.get_volume()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.Box.is_valid_offset"><code class="docutils literal notranslate"><span class="pre">Box.is_valid_offset()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.ComputedDoubleValues"><code class="docutils literal notranslate"><span class="pre">ComputedDoubleValues</span></code></a><ul>
