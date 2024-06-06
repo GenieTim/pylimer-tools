@@ -694,7 +694,8 @@ namespace entities {
         std::vector<Atom> closeAtoms = neighbourList.getAtomsCloseTo(
           a, distances[i], distances[i - 1], unwrapped);
         // std::cout << closeAtoms.size() << " atoms close to " << a.getId()
-        //           << " between " << distances[i] << " and " << distances[i - 1]
+        //           << " between " << distances[i] << " and " << distances[i -
+        //           1]
         //           << std::endl;
         result[i - 1] += closeAtoms.size();
       }
@@ -1465,6 +1466,9 @@ namespace entities {
     for (int type : uniqueTypes) {
       result[type] = 0;
     }
+    for (const auto& [type, mass] : this->massPerType) {
+      result[type] = 0;
+    }
 
     // complexity: O(|V|)
     igraph_vit_t vit;
@@ -1555,6 +1559,12 @@ namespace entities {
     }
 
     double totalMass = 0.0;
+
+    // make sure we have a record for all types
+    for (const auto& [type, mass] : this->massPerType) {
+      partialMasses[type] = 0.;
+    }
+
     for (const auto& [type, count] : numberPerType) {
       totalMass += this->massPerType.at(type) * count;
       partialMasses[type] += this->massPerType.at(type) * count;

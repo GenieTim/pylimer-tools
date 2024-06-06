@@ -46,6 +46,8 @@ class Atom:
         """
         Compute the distance to another atom respecting the periodic image flag.
         """
+    def get_coordinates(self) -> numpy.ndarray:
+        ...
     def get_id(self) -> int:
         """
                     Get the id of the atom.
@@ -66,6 +68,8 @@ class Atom:
         """
                     Get the type of the atom.
         """
+    def get_unwrapped_coordinates(self, arg0: Box) -> numpy.ndarray:
+        ...
     def get_x(self) -> float:
         """
                     Get the x coordinate of the atom.
@@ -347,6 +351,10 @@ class Box:
                     Compute the volume of the box.
         
                     :math:`V = L_x \cdot L_y \cdot L_z`
+        """
+    def is_valid_offset(self, potential_offset: numpy.ndarray, abs_precision: float = 1e-05) -> bool:
+        """
+                  Check whether the passed offest is a valid one in this box.
         """
 class ComputedDoubleValues:
     """
@@ -1760,6 +1768,10 @@ class Molecule:
       
     """
     __hash__: typing.ClassVar[None] = None
+    def __contains__(self, arg0: Atom) -> bool:
+        """
+                  Check whether a particular atom is contained in this molecule.
+        """
     def __copy__(self) -> Molecule:
         ...
     def __eq__(self, arg0: Molecule) -> bool:
@@ -1789,9 +1801,6 @@ class Molecule:
         
                     CAUTION:
                        Returns 0.0 if the molecule does not have two or more atoms.
-                       Returns -1.0 if not exactly 2 ends were found.
-                       Computes the distance between 2 atoms with functionality 1, 
-                       ignoring whether they are cross-linkers or not.
         """
     def compute_end_to_end_distance_with_derived_image_flags(self) -> float:
         """
@@ -1804,8 +1813,25 @@ class Molecule:
                     CAUTION:
                        Returns 0.0 if the molecule does not have two or more atoms.
                        Requires bonds to be shorter than half the box length.
-                       Computes the distance between 2 atoms with functionality 1, 
-                       ignoring whether they are cross-linkers or not.
+        """
+    def compute_end_to_end_vector(self) -> numpy.ndarray:
+        """
+                    Compute the end-to-end vector (:math:`\overrightarrow{R}_{ee}`) of this molecule. 
+        
+                    CAUTION:
+                       Returns 0.0 if the molecule does not have two or more atoms.
+        """
+    def compute_end_to_end_vector_with_derived_image_flags(self) -> numpy.ndarray:
+        """
+                    Compute the end-to-end vector (:math:`\overrightarrow{R}_{ee}`) of this molecule,
+                    but ignoring the image flags attached to the atoms. 
+                    This only works for Molecules that can be lined up with 
+                    :func:`~pylimer_tools_cpp.Molecule.getAtomsLinedUp()`,
+                    as it needs the atoms sorted such that the periodic box can still be respected somewhat.
+        
+                    CAUTION:
+                       Returns 0.0 if the molecule does not have two or more atoms.
+                       Requires bonds to be shorter than half the box length.
         """
     def compute_radius_of_gyration(self) -> float:
         """
@@ -1837,6 +1863,14 @@ class Molecule:
     def compute_total_mass(self) -> float:
         """
                     Computes the total mass of this molecule.
+        """
+    def compute_total_vector(self, crosslinker_type: int = 2, close_loop: bool = True) -> numpy.ndarray:
+        """
+                       Computes the sum of all bond vectors.
+        """
+    def compute_vector_from_to(self, atom_id_from: int, atom_id_to: int, crosslinker_type: int = 2, require_order: bool = True) -> numpy.ndarray:
+        """
+                       Computes the sum of all bond vectors between two specified atoms.
         """
     def get_atom_by_id(self, atom_id: int) -> Atom:
         """

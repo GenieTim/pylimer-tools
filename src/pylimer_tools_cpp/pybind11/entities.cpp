@@ -111,6 +111,12 @@ init_pylimer_bound_entities(py::module_& m)
       Apply periodic boundary conditions (PBC): adjust the specified distances to fit into this box.
       )pbdoc",
       py::arg("distances"))
+    .def("is_valid_offset",
+         &Box::isValidOffset,
+         R"pbdoc(
+          Check whether the passed offest is a valid one in this box.
+     )pbdoc",
+         py::arg("potential_offset"), py::arg("abs_precision") = 1e-5)
     .def(py::pickle(
            [](const Box& b) { // __getstate__
              /* Return a tuple that fully encodes the state of the object */
@@ -1012,7 +1018,9 @@ init_pylimer_bound_entities(py::module_& m)
     .def("compute_weight_fractions", &Universe::computeWeightFractions, R"pbdoc(
             Compute the weight fractions of each atom type in the network.
 
-            If no masses are stored, 
+            If no masses are stored, assumes a mass of 1 for each atom.
+
+            If the total mass is 0., returns the total mass per atom type.
             )pbdoc")
     .def("compute_end_to_end_distances",
          &Universe::computeEndToEndDistances,
