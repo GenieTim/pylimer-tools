@@ -251,6 +251,7 @@ def compute_crosslinker_conversion(network: Universe, crosslinker_type: int = 2,
 
     if (f == 0.):
         warnings.warn("Crosslinker functionality = 0 is problematic.")
+        return 0.
 
     return compute_effective_crosslinker_functionality(
         network, crosslinker_type) / f

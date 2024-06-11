@@ -311,6 +311,8 @@ def compute_weight_fraction_of_soluble_material(
     w_sol = 0
     for key in weight_fractions:
         coefficient = alpha if key == crosslinker_type else beta
+        if (key not in weight_fractions or math.isclose(weight_fractions[key], 0, abs_tol=1e-10)):
+            continue
         w_sol += weight_fractions[key] * (
             math.pow(coefficient, functionality_per_type[key])
         )
@@ -445,19 +447,13 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int):
       - alpha: :math:`P(F_A)`
       - beta: :math:`P(F_B)`
     """
+    if r == 0 or p == 0 or f == 0:
+        return 1.0, 1.0
+
     # first, check a few things required by the formulae
     # since we want alpha, beta \in [0,1], given they are supposed to be
     # probabilities
     validate_r_and_p(r, p, f)
-    # if (p < 1/math.sqrt(2) or p > 1):
-    #     raise ValueError(
-    #         "The extent of reaction has to be inside [1/sqrt(2), 1] for the result to be realistic. Got {}".format(p))
-    # if (r <= 1/(2*p*p) and f == 3):
-    #     raise ValueError(
-    #         "The stoichiometric imbalance must be > 1/(2p^2) for the resulting alpha to be realistic. "+
-    #          "Got p = {}, r = {}".format(p, r))
-    if r == 0 or p == 0:
-        return 1.0, 1.0
 
     # actually do the calculations
     if f == 3:
@@ -631,7 +627,7 @@ def compute_modulus_decomposition(
     # affine
     g_anm = nu * unit_style.kB * temperature
     # phantom
-    g_pnm = (1 - 2 / f) * nu * unit_style.kB * temperature
+    g_pnm = (1 - 2 / f) * nu * unit_style.kB * temperature if f != 0 else 0.0
     # MMT:
     alpha, beta = compute_miller_macosko_probabilities(r, p, f)
     gamma_mmt_sum = 0.0
@@ -639,7 +635,7 @@ def compute_modulus_decomposition(
         gamma_mmt_sum += ((m - 2) / 2) * compute_probability_that_monomer_is_effective(
             f, m, alpha
         )
-    gamma_mmt = (2 * r / f) * gamma_mmt_sum
+    gamma_mmt = (2 * r / f) * gamma_mmt_sum if f != 0 else 0.0
     g_mmt_phantom = gamma_mmt * nu * unit_style.kB * temperature
     # fraction of elastically effective strands.
     g_mmt_entanglement = g_e_1 * compute_trapping_factor(p, r, f, alpha)
@@ -786,6 +782,9 @@ def compute_trapping_factor(
             raise ValueError(
                 "The argument f is required, if alpha is not provided")
         alpha, _ = compute_miller_macosko_probabilities(r, p, f)
+
+    if p == 0 or r == 0:
+        return 0.
 
     pel = ((1 / (r * p)) * (1 - alpha)) ** 2
     return pel**2
