@@ -23,6 +23,10 @@ def compute_stoichiometric_imbalance(network: Universe, crosslinker_type: int = 
       if your system has a non-integer number of possible bonds (e.g. one site non-bonded),
       this will not be rounded/respected in any way.
 
+      Currently, only g = 2 chains are respected yet, and only one type of crosslinker is supported.
+      If you have e.g. solvent chains in the network,
+      use `ignore_types` to not count them.
+
     Arguments:
       - network: the polymer network to do the computation for
       - crosslinker_type: the type of the junctions/crosslinkers to select them in the network
@@ -40,9 +44,9 @@ def compute_stoichiometric_imbalance(network: Universe, crosslinker_type: int = 
     counts = Counter(network.get_atom_types())
 
     if (functionality_per_type is not None and
-            not np.all([k in functionality_per_type for k in counts if counts[k] > 0])):
+            crosslinker_type not in functionality_per_type):
         functionality_per_type = None
-        warnings.warn("Not all atom types found in functionality_per_type, " +
+        warnings.warn("Cross-link's atom type not found in functionality_per_type, " +
                       "will ignore passed argument `functionality_per_type`.")
 
     if (functionality_per_type is None):
