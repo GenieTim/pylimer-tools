@@ -557,6 +557,10 @@ respectively, is the start of a finite chain.</p>
 </ul>
 </dd>
 </dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Currently, only systems with B_2 and A_f are supported.</p>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -644,15 +648,20 @@ Optional, can be passed to improve performance</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.miller_macosko_theory.compute_trapping_factor">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">compute_trapping_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.compute_trapping_factor" title="Link to this definition">¶</a></dt>
-<dd><p>Compute the trapping factor <span class="math notranslate nohighlight">\(T_e\)</span></p>
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.miller_macosko_theory.</span></span><span class="sig-name descname"><span class="pre">compute_trapping_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="pylimer_tools_cpp.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">r</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.miller_macosko_theory.compute_trapping_factor" title="Link to this definition">¶</a></dt>
+<dd><p>Compute the Langley trapping factor <span class="math notranslate nohighlight">\(T_e\)</span>.
+Not all parameters are required; they will be computed from the network if needed.
+Provide all parameters if you don’t have the network.</p>
+<p>Literature: <a class="reference external" href="https://doi.org/10.1021/ma60004a015">https://doi.org/10.1021/ma60004a015</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the crosslinkers</p></li>
+<li><p><strong>network</strong> (<em>-</em>) – the network to compute the trapping factor for.</p></li>
+<li><p><strong>p</strong> (<em>-</em>) – the extent of reaction in terms of the crosslinkers.</p></li>
 <li><p><strong>r</strong> (<em>-</em>) – the stoichiometric imbalance of reactants.</p></li>
 <li><p><strong>f</strong> (<em>-</em>) – functionality of the crosslinkers. Only needed if alpha is None.</p></li>
-<li><p><strong>alpha</strong> (<em>-</em>) – <span class="math notranslate nohighlight">\(P(F_a^{out})\)</span>, see <code class="xref py py-func docutils literal notranslate"><span class="pre">computeMMSProbabilities()</span></code></p></li>
+<li><p><strong>alpha</strong> (<em>-</em>) – <span class="math notranslate nohighlight">\(P(F_a^{out})\)</span>, see <code class="xref py py-func docutils literal notranslate"><span class="pre">compute_mms_probabilities()</span></code></p></li>
+<li><p><strong>beta</strong> (<em>-</em>) – <span class="math notranslate nohighlight">\(P(F_b^{out})\)</span>, see <code class="xref py py-func docutils literal notranslate"><span class="pre">compute_mms_probabilities()</span></code></p></li>
 </ul>
 </dd>
 </dl>
@@ -1130,6 +1139,9 @@ If None: will use max functionality per type.</p></li>
 <p class="admonition-title">Note</p>
 <p>if your system has a non-integer number of possible bonds (e.g. one site non-bonded),
 this will not be rounded/respected in any way.</p>
+<p>Currently, only g = 2 chains are respected yet, and only one type of crosslinker is supported.
+If you have e.g. solvent chains in the network,
+use <cite>ignore_types</cite> to not count them.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
