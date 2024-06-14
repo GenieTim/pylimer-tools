@@ -369,13 +369,20 @@ namespace entities {
                       std::to_string(timesteps.size()) + " time-steps, but " +
                       std::to_string(atoms.size()) + " atoms.");
     RUNTIME_EXP_IFN(
-      timesteps.size() == this->getLength(),
+      timesteps.size() >= this->getLength(),
       "Dump file seems inconsistent: read " + std::to_string(timesteps.size()) +
         " time-steps, but expected " + std::to_string(this->getLength()) + ".");
+    if (timesteps.size() > this->getLength()) {
+      std::cerr << "WARNING: Dump file is either inconsistent or still being "
+                   "written to. Continuing with "
+                << std::to_string(this->getLength()) << " instead of "
+                << std::to_string(timesteps.size()) << " time-steps. "
+                << std::endl;
+    }
 
     // first, check that we start at the beginning
     size_t startingIndex = 0;
-    for (size_t i = 1; i < timesteps.size(); ++i) {
+    for (size_t i = 1; i < this->getLength(); ++i) {
       if (timesteps[i] < timesteps[i - 1]) {
         startingIndex = i;
         std::cerr << "Correcting starting index due to time-step order to "
@@ -437,13 +444,20 @@ namespace entities {
                       std::to_string(timesteps.size()) + " time-steps, but " +
                       std::to_string(atoms.size()) + " atoms.");
     RUNTIME_EXP_IFN(
-      timesteps.size() == this->getLength(),
+      timesteps.size() >= this->getLength(),
       "Dump file seems inconsistent: read " + std::to_string(timesteps.size()) +
         " time-steps, but expected " + std::to_string(this->getLength()) + ".");
+    if (timesteps.size() > this->getLength()) {
+      std::cerr << "WARNING: Dump file is either inconsistent or still being "
+                   "written to. Continuing with "
+                << std::to_string(this->getLength()) << " instead of "
+                << std::to_string(timesteps.size()) << " time-steps. "
+                << std::endl;
+    }
 
     // first, check that we start at the beginning
     size_t startingIndex = 0;
-    for (size_t i = 1; i < timesteps.size(); ++i) {
+    for (size_t i = 1; i < this->getLength(); ++i) {
       if (timesteps[i] < timesteps[i - 1]) {
         startingIndex = i;
         std::cerr << "Correcting starting index due to time-step order to "
@@ -506,13 +520,20 @@ namespace entities {
                       std::to_string(timesteps.size()) + " time-steps, but " +
                       std::to_string(atoms.size()) + " atoms.");
     RUNTIME_EXP_IFN(
-      timesteps.size() == this->getLength(),
+      timesteps.size() >= this->getLength(),
       "Dump file seems inconsistent: read " + std::to_string(timesteps.size()) +
         " time-steps, but expected " + std::to_string(this->getLength()) + ".");
+    if (timesteps.size() > this->getLength()) {
+      std::cerr << "WARNING: Dump file is either inconsistent or still being "
+                   "written to. Continuing with "
+                << std::to_string(this->getLength()) << " instead of "
+                << std::to_string(timesteps.size()) << " time-steps. "
+                << std::endl;
+    }
 
     // first, check that we start at the beginning
     size_t startingIndex = 0;
-    for (size_t i = 1; i < timesteps.size(); ++i) {
+    for (size_t i = 1; i < this->getLength(); ++i) {
       if (timesteps[i] < timesteps[i - 1]) {
         startingIndex = i;
         std::cerr << "Correcting starting index due to time-step order to "
@@ -673,13 +694,20 @@ namespace entities {
                       " extra atom sets, but " + std::to_string(atoms.size()) +
                       " atoms.");
     RUNTIME_EXP_IFN(
-      timesteps.size() == this->getLength(),
+      timesteps.size() >= this->getLength(),
       "Dump file seems inconsistent: read " + std::to_string(timesteps.size()) +
         " time-steps, but expected " + std::to_string(this->getLength()) + ".");
+    if (timesteps.size() > this->getLength()) {
+      std::cerr << "WARNING: Dump file is either inconsistent or still being "
+                   "written to. Continuing with "
+                << std::to_string(this->getLength()) << " instead of "
+                << std::to_string(timesteps.size()) << " time-steps. "
+                << std::endl;
+    }
 
     // first, check that we start at the beginning
     size_t startingIndex = 0;
-    for (size_t i = 1; i < timesteps.size(); ++i) {
+    for (size_t i = 1; i < this->getLength(); ++i) {
       if (timesteps[i] < timesteps[i - 1]) {
         startingIndex = i;
         std::cerr << "Correcting starting index due to time-step order to "
@@ -810,13 +838,20 @@ namespace entities {
                       std::to_string(timesteps.size()) + " time-steps, but " +
                       std::to_string(atoms.size()) + " atoms.");
     RUNTIME_EXP_IFN(
-      timesteps.size() == this->getLength(),
+      timesteps.size() >= this->getLength(),
       "Dump file seems inconsistent: read " + std::to_string(timesteps.size()) +
         " time-steps, but expected " + std::to_string(this->getLength()) + ".");
+    if (timesteps.size() > this->getLength()) {
+      std::cerr << "WARNING: Dump file is either inconsistent or still being "
+                   "written to. Continuing with "
+                << std::to_string(this->getLength()) << " instead of "
+                << std::to_string(timesteps.size()) << " time-steps. "
+                << std::endl;
+    }
 
     // first, check that we start at the beginning
     size_t startingIndex = 0;
-    for (size_t i = 1; i < timesteps.size(); ++i) {
+    for (size_t i = 1; i < this->getLength(); ++i) {
       if (timesteps[i] < timesteps[i - 1]) {
         startingIndex = i;
         std::cerr << "Correcting starting index due to time-step order to "
