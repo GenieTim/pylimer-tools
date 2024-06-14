@@ -15,6 +15,15 @@ from pylimer_tools.calc.structure_analysis import (
 from pylimer_tools.io.unit_styles import UnitStyle
 from pylimer_tools_cpp import Universe
 
+"""
+This module provides access to various computations introduced in the Miller-Macosko theory.
+
+Caution:
+    - not all systems are supported yet.
+        In particular, for most methods, only A_f and B_2 is supported.
+
+"""
+
 
 def predict_shear_modulus(**kwargs):
     """
@@ -107,8 +116,8 @@ def predict_number_density_of_network_strands(
         raise ValueError("Could not determine cross-linker functionality")
 
     weight_fractions = network.compute_weight_fractions()
-    if (crosslinker_type not in weight_fractions):
-        weight_fractions[crosslinker_type] = 0.
+    if crosslinker_type not in weight_fractions:
+        weight_fractions[crosslinker_type] = 0.0
     alpha, _ = compute_miller_macosko_probabilities(
         r=(
             r
@@ -168,6 +177,10 @@ def compute_weight_fraction_of_dangling_chains(
     Returns:
       - weightFraction $\\Phi_d = 1 - \\Phi_{el} - w_{sol}$: weightDangling/weightTotal
     """
+
+    # possible alternative?!:
+    # 2*beta*(1-beta)
+
     return (
         1.0
         - compute_weight_fraction_of_backbone(
@@ -294,7 +307,11 @@ def compute_weight_fraction_of_soluble_material(
     )
 
     if functionality_per_type is not None and not np.all(
-        [key in functionality_per_type for key in weight_fractions.keys() if weight_fractions[key] > 0.]
+        [
+            key in functionality_per_type
+            for key in weight_fractions.keys()
+            if weight_fractions[key] > 0.0
+        ]
     ):
         warnings.warn(
             "functionality_per_type does not contain functionality for all types. Will be re-computed."
@@ -302,16 +319,15 @@ def compute_weight_fraction_of_soluble_material(
         functionality_per_type = None
 
     if functionality_per_type is None:
-        if network is None:
-            raise ValueError(
-                "functionality_per_type is required if the network is not supplied."
-            )
+        _require_network(network, "functionality_per_type")
         functionality_per_type = network.determine_functionality_per_type()
 
     w_sol = 0
     for key in weight_fractions:
         coefficient = alpha if key == crosslinker_type else beta
-        if (key not in weight_fractions or math.isclose(weight_fractions[key], 0, abs_tol=1e-10)):
+        if key not in weight_fractions or math.isclose(
+            weight_fractions[key], 0, abs_tol=1e-10
+        ):
             continue
         w_sol += weight_fractions[key] * (
             math.pow(coefficient, functionality_per_type[key])
@@ -386,11 +402,15 @@ def compute_weight_fractions_and_probabilities(
         assert math.isclose(
             sum(w for w in weight_fractions.values()), 1.0, abs_tol=1e-9
         )
-        if (crosslinker_type not in weight_fractions):
-            weight_fractions[crosslinker_type] = 0.
+        if crosslinker_type not in weight_fractions:
+            weight_fractions[crosslinker_type] = 0.0
 
     for key in functionality_per_type:
-        if key != crosslinker_type and functionality_per_type[key] != 2 and weight_fractions[key] > 0:
+        if (
+            key != crosslinker_type
+            and functionality_per_type[key] != 2
+            and weight_fractions[key] > 0
+        ):
             raise NotImplementedError(
                 "Currently, only strand functionality of 2 is supported. {} given for type {}".format(
                     functionality_per_type[key], key
@@ -410,8 +430,11 @@ def compute_weight_fractions_and_probabilities(
             p = compute_effective_crosslinker_functionality(
                 network, crosslinker_type)
     if p > 1 or p < 0:
-        raise ValueError("Detected p = {} for f = {}. Need p in (0, 1).".format(
-            p, functionality_per_type[crosslinker_type]))
+        raise ValueError(
+            "Detected p = {} for f = {}. Need p in (0, 1).".format(
+                p, functionality_per_type[crosslinker_type]
+            )
+        )
     if r is None:
         assert network is not None
         r = compute_stoichiometric_imbalance(
@@ -437,6 +460,9 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int):
     Sources:
       - https://pubs.acs.org/doi/10.1021/ma60050a004
       - https://doi.org/10.1021/ma60050a003
+
+    Note:
+        Currently, only systems with B_2 and A_f are supported.
 
     Arguments:
       - r: the stoichiometric imbalance
@@ -638,7 +664,8 @@ def compute_modulus_decomposition(
     gamma_mmt = (2 * r / f) * gamma_mmt_sum if f != 0 else 0.0
     g_mmt_phantom = gamma_mmt * nu * unit_style.kB * temperature
     # fraction of elastically effective strands.
-    g_mmt_entanglement = g_e_1 * compute_trapping_factor(p, r, f, alpha)
+    g_mmt_entanglement = g_e_1 * \
+        compute_trapping_factor(p=p, r=r, f=f, alpha=alpha)
     # entanglement part. TODO : check adjustment with r (and where the 0.22 is
     # coming from? Fabian' s fit!)
     return g_mmt_phantom, g_mmt_entanglement, g_anm, g_pnm
@@ -725,7 +752,7 @@ def compute_entanglement_modulus(
         )
     if alpha is None:
         alpha, _ = compute_miller_macosko_probabilities(r, p, f)
-    return compute_trapping_factor(p, r, f, alpha) * g_e_1
+    return compute_trapping_factor(p=p, r=r, f=f, alpha=alpha) * g_e_1
 
 
 def compute_junction_modulus(
@@ -766,27 +793,51 @@ def compute_junction_modulus(
 
 
 def compute_trapping_factor(
-    p: float, r: float, f: Union[int, None] = None, alpha: Union[float, None] = None
+    network: Universe = None,
+    p: float = None,
+    r: float = None,
+    f: Union[int, None] = None,
+    alpha: Union[float, None] = None,
+    beta: Union[float, None] = None,
+    crosslinker_type: int = 2,
 ) -> float:
     """
-    Compute the trapping factor :math:`T_e`
+    Compute the Langley trapping factor :math:`T_e`.
+    Not all parameters are required; they will be computed from the network if needed.
+    Provide all parameters if you don't have the network.
+
+    Literature: https://doi.org/10.1021/ma60004a015
 
     Arguments:
-        - p: the extent of reaction in terms of the crosslinkers
+        - network: the network to compute the trapping factor for. 
+        - p: the extent of reaction in terms of the crosslinkers.
         - r: the stoichiometric imbalance of reactants.
         - f: functionality of the crosslinkers. Only needed if alpha is None.
-        - alpha: :math:`P(F_a^{out})`, see :func:`~pylimer_tools.calc.miller_macosko_theory.computeMMSProbabilities()`
+        - alpha: :math:`P(F_a^{out})`, see :func:`~pylimer_tools.calc.miller_macosko_theory.compute_mms_probabilities()`
+        - beta: :math:`P(F_b^{out})`, see :func:`~pylimer_tools.calc.miller_macosko_theory.compute_mms_probabilities()`
     """
-    if alpha is None:
+    if p is None:
+        _require_network(network, "p")
+        p = compute_crosslinker_conversion(
+            network, crosslinker_type=crosslinker_type, f=f)
+    if r is None:
+        _require_network(network, "r")
+        r = compute_stoichiometric_imbalance(network, crosslinker_type=crosslinker_type, functionality_per_type={
+            crosslinker_type: f
+        })
+
+    if alpha is None or beta is None:
         if f is None:
-            raise ValueError(
-                "The argument f is required, if alpha is not provided")
-        alpha, _ = compute_miller_macosko_probabilities(r, p, f)
+            _require_network(network, "f")
+            f = network.determine_functionality_per_type()[crosslinker_type]
+        alpha, beta = compute_miller_macosko_probabilities(r, p, f)
 
     if p == 0 or r == 0:
-        return 0.
+        return 0.0
 
-    pel = ((1 / (r * p)) * (1 - alpha)) ** 2
+    # for long B2s reacting with small A_fs
+    # return (1 - beta)**4
+    pel = ((1 / (p)) * (1 - alpha)) ** 2
     return pel**2
 
 
@@ -864,3 +915,12 @@ def predict_p_from_w_sol(
     if not res.success:
         warnings.warn("The p predicted from w_sol might be incorrect")
     return res.x
+
+
+def _require_network(network: Universe = None, instead_of: str = ""):
+    if (network is None):
+        if (instead_of == ""):
+            raise ValueError("A network is required")
+        else:
+            raise ValueError(
+                "If `{}` is not specified, a network is required".format(instead_of))
