@@ -816,6 +816,10 @@ def compute_trapping_factor(
         - alpha: :math:`P(F_a^{out})`, see :func:`~pylimer_tools.calc.miller_macosko_theory.compute_mms_probabilities()`
         - beta: :math:`P(F_b^{out})`, see :func:`~pylimer_tools.calc.miller_macosko_theory.compute_mms_probabilities()`
     """
+    if f is None:
+        _require_network(network, "f")
+        f = network.determine_functionality_per_type()[crosslinker_type]
+
     if p is None:
         _require_network(network, "p")
         p = compute_crosslinker_conversion(
@@ -827,9 +831,6 @@ def compute_trapping_factor(
         })
 
     if alpha is None or beta is None:
-        if f is None:
-            _require_network(network, "f")
-            f = network.determine_functionality_per_type()[crosslinker_type]
         alpha, beta = compute_miller_macosko_probabilities(r, p, f)
 
     if p == 0 or r == 0:
