@@ -44,7 +44,8 @@ def compute_stoichiometric_imbalance(network: Universe, crosslinker_type: int = 
     counts = Counter(network.get_atom_types())
 
     if (functionality_per_type is not None and
-            crosslinker_type not in functionality_per_type):
+            (crosslinker_type not in functionality_per_type or
+             functionality_per_type[crosslinker_type] is None)):
         functionality_per_type = None
         warnings.warn("Cross-link's atom type not found in functionality_per_type, " +
                       "will ignore passed argument `functionality_per_type`.")
@@ -96,7 +97,7 @@ def compute_extent_of_reaction(
     """
     if (network.get_nr_of_atoms() == 0):
         return 1
-    
+
     if (len(network.get_atoms_by_type(crosslinker_type)) == 0):
         return 0
 
