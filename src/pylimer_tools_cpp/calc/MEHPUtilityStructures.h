@@ -13,16 +13,6 @@
 namespace pylimer_tools {
 namespace calc {
   namespace mehp {
-
-    enum BalanceRunMode
-    {
-      EIGEN_RANDOM,
-      EIGEN_HEURISTIC,
-      EIGEN_STRANDS,
-      EIGEN_ALL,
-      ITERATIVE
-    };
-
     enum StructureSimplificationMode
     {
       NO_SIMPLIFICATION,
