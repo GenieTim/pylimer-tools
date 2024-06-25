@@ -949,6 +949,10 @@ init_pylimer_bound_calc(py::module_& m)
       },
       R"pbdoc(
           Returns the stress tensor at the current state of the simulation.
+
+          The units are in :math:`[\text{units of }\kappa]/[\text{distance units}]`,
+          where the units of :math:`\kappa` should be :math:`[\text{force}]/[\text{distance units}]^2`.
+          Make sure to multiply by :math:`\kappa` or configure it appropriately.
      )pbdoc",
       py::arg("one_over_spring_partition_upper_limit") = 1.)
     .def("get_stress_tensor_link_based",
