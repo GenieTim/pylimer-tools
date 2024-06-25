@@ -18,3 +18,14 @@ Here a few words used in this documentation (and/or the library, respectively) w
 - Vertex: this package uses a graph, internally, to monitor the connectivity. A vertex in this case is used as the bead/atom. 
 
 .. _Mass vs. Weight: https://en.wikipedia.org/wiki/Mass_versus_weight
+
+Conventions
+===========
+
+In addition to the nomenclature listed above,
+we try to follow the following naming conventions:
+
+- all Python expose functionality tries to follow PEP 8
+- in C++ codes, in turn, camelCase is used for variable and function names
+- whenever there is a configurable parameter on a simulation, the corresponding `config_...()` function can be called with an empty argument to reset the parameter to its default value.
+- whenever a subset can be queried by certain properties, the corresponding function uses the naming convention `get_..._by_...` 
