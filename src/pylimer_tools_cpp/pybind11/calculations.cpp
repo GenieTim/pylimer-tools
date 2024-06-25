@@ -590,13 +590,6 @@ init_pylimer_bound_calc(py::module_& m)
           Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
      )pbdoc");
 
-  py::enum_<mehp::BalanceRunMode>(m, "BalanceRunMode")
-    .value("EIGEN_ALL", mehp::BalanceRunMode::EIGEN_ALL)
-    .value("EIGEN_RANDOM", mehp::BalanceRunMode::EIGEN_RANDOM)
-    .value("EIGEN_HEURISTIC", mehp::BalanceRunMode::EIGEN_HEURISTIC)
-    .value("EIGEN_STRANDS", mehp::BalanceRunMode::EIGEN_STRANDS)
-    .value("ITERATIVE", mehp::BalanceRunMode::ITERATIVE);
-
   py::enum_<mehp::StructureSimplificationMode>(m, "StructureSimplificationMode")
     .value("NO_SIMPLIFICATION",
            mehp::StructureSimplificationMode::NO_SIMPLIFICATION)
@@ -630,8 +623,7 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("universe"),
          py::arg("crosslinker_type") = 2,
          py::arg("is_2d") = false,
-         py::arg("kappa") = 1.0,
-         py::arg("remove_2functional_crosslinkers") = true,
+         py::arg("remove_2functional_crosslinkers") = false,
          py::arg("remove_dangling_chains") = false)
     .def("__copy__",
          [](const mehp::MEHPForceBalance& self) {
@@ -649,8 +641,7 @@ init_pylimer_bound_calc(py::module_& m)
                 py::arg("same_strand_cutoff") = 3,
                 py::arg("seed") = "",
                 py::arg("crosslinker_type") = 2,
-                py::arg("is_2d") = false,
-                py::arg("kappa") = 1.0)
+                py::arg("is_2d") = false)
     .def_property_readonly("network", &mehp::MEHPForceBalance::getNetwork)
     //     .def("validateNetwork",
     //          py::overload_cast<>(&mehp::MEHPForceBalance::validateNetwork),
@@ -660,8 +651,6 @@ init_pylimer_bound_calc(py::module_& m)
     .def(
       "run_force_relaxation",
       [](mehp::MEHPForceBalance& sim,
-         mehp::BalanceRunMode mode,
-         double damping,
          long int maxNrOfSteps, // default: 10000
          double xtol,
          const double initialResidualToUse,
@@ -673,8 +662,6 @@ init_pylimer_bound_calc(py::module_& m)
          const double oneOverSpringPartitionUpperLimit,
          const int nrOfCrosslinkSwapsAllowedPerSliplink) {
         return sim.runForceRelaxation(
-          mode,
-          damping,
           maxNrOfSteps,
           xtol,
           initialResidualToUse,
@@ -694,16 +681,12 @@ init_pylimer_bound_calc(py::module_& m)
           This is useful if you want to run a global optimization first and add a local one afterwards.
           As a consequence though, you cannot simply benchmark only this method; you must include the setup.
 
-          :param runMode: Choice of the mode to run the simulation with.
-          :param damping: For certain run modes, a damping factor helps to improve performance.
           :param maxNrOfSteps: The maximum number of steps to do during the simulation.
           :param xTolerance: The tolerance of the displacements as an exit condition.
           :param innerMaxNrOfSteps: The maximum number of steps to do per iteration during the slip-link displacements.
           :param innerXTolerance: The tolerance of the displacements of the slip-link as an inner exit condition.
           :param innerAlphaTolerance: The tolerance of the contour-length when slipping the slip-link as an inner exit condition.
           )pbdoc",
-      py::arg("run_mode") = mehp::BalanceRunMode::ITERATIVE,
-      py::arg("damping") = 1.0,
       py::arg("max_nr_of_steps") = 250000,
       py::arg("x_tolerance") = 1e-12,
       py::arg("initial_residual_norm") = -1.0,
@@ -740,13 +723,13 @@ init_pylimer_bound_calc(py::module_& m)
           Otherwise, you can set it to true and therewith get some securities.
          )pbdoc",
          py::arg("box_large_enough") = false)
-    .def("inspect_link_displacement_to_mean_position_update",
-         &mehp::MEHPForceBalance::inspectLinkDisplacementToMeanPositionUpdate,
-         R"pbdoc(
-          Helper method to debug and/or understand what happens to certain links when being displaced.
-         )pbdoc",
-         py::arg("link_idx"),
-         py::arg("damping") = 1.0)
+     .def("config_mean_bond_length",
+     &mehp::MEHPForceBalance::configMeanBondLength,
+     R"pbdoc(
+     Configure the :math:`b` used e.g. for the topological Gamma-factor.
+     )pbdoc", py::arg("b") = 1.0)
+     .def("config_spring_constant", &mehp::MEHPForceBalance::configSpringConstant,
+     R"pbdoc()pbdoc", py::arg("kappa") = 1.0)
     .def("swap_sliplinks_incl_xlinks",
          &mehp::MEHPForceBalance::swapSlipLinksInclXlinks)
     .def("move_sliplinks_to_their_best_branch",
