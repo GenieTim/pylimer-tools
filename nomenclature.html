@@ -218,6 +218,7 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html#manual-compilation">Manual Compilation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="assumptions.html">Assumptions</a></li>
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Nomenclature</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#conventions">Conventions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="usage.html">Useage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="network_generator.html">Network Generators</a></li>
 <li class="toctree-l1"><a class="reference internal" href="readers_writers.html">Readers &amp; Writers</a></li>
@@ -294,6 +295,17 @@ and  <a class="reference internal" href="pylimer_tools_cpp.html#pylimer_tools_cp
 <li><p><a class="reference internal" href="pylimer_tools_cpp.html#pylimer_tools_cpp.Molecule" title="pylimer_tools_cpp.Molecule"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Molecule</span></code></a>: a collection of atoms that are necessarily connected. Could be a chain, a strand or a single atom</p></li>
 <li><p><a class="reference internal" href="pylimer_tools_cpp.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Universe</span></code></a>: a concise collection of atoms, not necessarily all connected</p></li>
 <li><p>Vertex: this package uses a graph, internally, to monitor the connectivity. A vertex in this case is used as the bead/atom.</p></li>
+</ul>
+</section>
+<section id="conventions">
+<h1>Conventions<a class="headerlink" href="#conventions" title="Link to this heading">¶</a></h1>
+<p>In addition to the nomenclature listed above,
+we try to follow the following naming conventions:</p>
+<ul class="simple">
+<li><p>all Python expose functionality tries to follow PEP 8</p></li>
+<li><p>in C++ codes, in turn, camelCase is used for variable and function names</p></li>
+<li><p>whenever there is a configurable parameter on a simulation, the corresponding <cite>config_…()</cite> function can be called with an empty argument to reset the parameter to its default value.</p></li>
+<li><p>whenever a subset can be queried by certain properties, the corresponding function uses the naming convention <cite>get_…_by_…</cite></p></li>
 </ul>
 </section>
 
