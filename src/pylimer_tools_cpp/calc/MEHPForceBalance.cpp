@@ -42,8 +42,6 @@ namespace calc {
      * FORCE RELAXATION
      */
     void MEHPForceBalance::runForceRelaxation(
-      BalanceRunMode mode,
-      double damping,
       long int maxNrOfSteps, // default: 10000
       double xtol,
       const double initialResidualToUse,
@@ -75,28 +73,7 @@ namespace calc {
       std::vector<Eigen::ArrayXi> independentVertexSets;
       double maxDistanceMoved = 0.0;
       size_t indexOfMaxDistanceMoved = 0;
-      // default = all
-      std::vector<Eigen::ArrayXi> independentVertexsSpringSets;
-      if (mode == BalanceRunMode::EIGEN_HEURISTIC) {
-        std::tie(independentVertexSets, independentVertexsSpringSets) =
-          getHeuristicallyIndependentCoordinateSets(this->initialConfig);
-      } else if (mode == BalanceRunMode::EIGEN_RANDOM) {
-        independentVertexSets =
-          this->getRandomCoordinateSets(this->initialConfig);
-      } else if (mode == BalanceRunMode::EIGEN_STRANDS) {
-        independentVertexSets = {
-          this->initialConfig.springPartCoordinateIndexA,
-          this->initialConfig.springPartCoordinateIndexB
-        };
-      } else if (mode == BalanceRunMode::EIGEN_ALL) {
-        independentVertexSets = { Eigen::ArrayXi::LinSpaced(
-          3 * this->initialConfig.nrOfLinks,
-          0,
-          3 * this->initialConfig.nrOfLinks - 1) };
-      }
-      // this->getIndependentCoordinateSets(this->initialConfig);
-      // { this->initialConfig.springPartCoordinateIndexA,
-      // this->initialConfig.springPartCoordinateIndexB };
+
       Eigen::VectorXd oneOverSpringPartitions =
         this->assembleOneOverSpringPartition(this->initialConfig,
                                              this->currentSpringPartitionsVec,
@@ -227,51 +204,21 @@ namespace calc {
                                                this->currentDisplacements,
                                                oneOverSpringPartitions);
 
-        if (mode == BalanceRunMode::EIGEN_RANDOM) {
-          independentVertexSets = getRandomCoordinateSets(this->initialConfig);
-        }
         // place crosslinkers
-        if (mode == BalanceRunMode::ITERATIVE) {
-          for (size_t link_idx = 0; link_idx < this->initialConfig.nrOfNodes;
-               ++link_idx) {
-            assert(!this->initialConfig.linkIsSliplink[link_idx]);
-            double distanceMoved =
-              this->displaceToMeanPosition(this->initialConfig,
-                                           this->currentDisplacements,
-                                           this->currentSpringPartitionsVec,
-                                           link_idx,
-                                           oneOverSpringPartitionUpperLimit);
-            if (distanceMoved > maxDistanceMoved) {
-              maxDistanceMoved = distanceMoved;
-              indexOfMaxDistanceMoved = link_idx;
-            }
-            maxDistanceMoved = std::max(maxDistanceMoved, distanceMoved);
+        for (size_t link_idx = 0; link_idx < this->initialConfig.nrOfNodes;
+             ++link_idx) {
+          assert(!this->initialConfig.linkIsSliplink[link_idx]);
+          double distanceMoved =
+            this->displaceToMeanPosition(this->initialConfig,
+                                         this->currentDisplacements,
+                                         this->currentSpringPartitionsVec,
+                                         link_idx,
+                                         oneOverSpringPartitionUpperLimit);
+          if (distanceMoved > maxDistanceMoved) {
+            maxDistanceMoved = distanceMoved;
+            indexOfMaxDistanceMoved = link_idx;
           }
-        } else {
-          for (size_t i = 0; i < independentVertexSets.size(); ++i) {
-            Eigen::ArrayXi vertexSet = independentVertexSets[i];
-            if (independentVertexsSpringSets.size() ==
-                independentVertexSets.size()) {
-              Eigen::ArrayXi independentVertexsSpringSet =
-                independentVertexsSpringSets[i];
-              maxDistanceMoved = std::max(
-                maxDistanceMoved,
-                this->displaceLinksToMeanPosition(this->initialConfig,
-                                                  this->currentDisplacements,
-                                                  oneOverSpringPartitions,
-                                                  independentVertexsSpringSet,
-                                                  vertexSet,
-                                                  damping));
-            } else {
-              maxDistanceMoved = std::max(
-                maxDistanceMoved,
-                this->displaceLinksToMeanPosition(this->initialConfig,
-                                                  this->currentDisplacements,
-                                                  oneOverSpringPartitions,
-                                                  vertexSet,
-                                                  damping));
-            }
-          }
+          maxDistanceMoved = std::max(maxDistanceMoved, distanceMoved);
         }
 
         currentResidual = this->getDisplacementResidualNormFor(
@@ -345,9 +292,9 @@ namespace calc {
           wasInterrupted = true;
           break;
         }
-      } while (currentResidual / initialResidual > xtol &&
-               iterationsDone < maxNrOfSteps &&
-               this->initialConfig.nrOfSprings > 0);
+      } while (
+        currentResidual / initialResidual > xtol &&
+        iterationsDone<maxNrOfSteps&& this->initialConfig.nrOfSprings> 0);
 
       // finish up
       this->closeAllOutputs();
@@ -374,159 +321,6 @@ namespace calc {
         cleanupInterrupt();
       }
     }
-
-    double MEHPForceBalance::displaceLinksToMeanPosition(
-      const ForceBalanceNetwork& net,
-      Eigen::VectorXd& u,
-      Eigen::VectorXd& springPartitions0,
-      double damping) const
-    {
-
-      Eigen::ArrayXi mask =
-        Eigen::ArrayXi::LinSpaced(3 * net.nrOfLinks, 0, 3 * net.nrOfLinks - 1);
-      Eigen::VectorXd oneOverSpringPartitions =
-        this->assembleOneOverSpringPartition(net, springPartitions0);
-
-      return this->displaceLinksToMeanPosition(
-        net, u, oneOverSpringPartitions, mask, damping);
-    }
-
-    /**
-     * @brief Displace one link to the mean of all connected neighbours
-     *
-     * @param net the force balance network
-     * @param u the current displacements, wherein the resulting coordinates
-     * shall be stored
-     * @return double, the distance (squared norm) displaced
-     */
-    double MEHPForceBalance::displaceLinksToMeanPosition(
-      const ForceBalanceNetwork& net,
-      Eigen::VectorXd& u,
-      const Eigen::VectorXd& oneOverSpringPartitions,
-      const Eigen::ArrayXi& resultingCoordinateIndexMask,
-      const double damping) const
-    {
-      Eigen::ArrayXi involvedSpringPartCoordinateIndexMask =
-        Eigen::ArrayXi::LinSpaced(
-          3 * net.nrOfPartialSprings, 0, 3 * net.nrOfPartialSprings - 1);
-      return this->displaceLinksToMeanPosition(
-        net,
-        u,
-        oneOverSpringPartitions,
-        involvedSpringPartCoordinateIndexMask,
-        resultingCoordinateIndexMask,
-        damping);
-    }
-
-    /**
-     * @brief Displace one link to the mean of all connected neighbours
-     *
-     * @param net the force balance network
-     * @param u the current displacements, wherein the resulting coordinates
-     * shall be stored
-     * @return double, the distance (squared norm) displaced
-     */
-    double MEHPForceBalance::displaceLinksToMeanPosition(
-      const ForceBalanceNetwork& net,
-      Eigen::VectorXd& u,
-      const Eigen::VectorXd& oneOverSpringPartitions,
-      const Eigen::ArrayXi& involvedSpringPartCoordinateIndexMask,
-      const Eigen::ArrayXi& resultingCoordinateIndexMask,
-      const double damping) const
-    {
-      INVALIDARG_EXP_IFN(
-        u.size() == net.coordinates.size(),
-        "Coordinates and displacements must have the same size");
-      INVALIDARG_EXP_IFN(oneOverSpringPartitions.size() ==
-                           net.springPartCoordinateIndexB.size(),
-                         "Spring partitions must have the size of the nr of "
-                         "spring coordinates");
-      INVALIDARG_EXP_IFN(resultingCoordinateIndexMask.size() % 3 == 0,
-                         "Mask is expected to mask the coordinates");
-      INVALIDARG_EXP_IFN(involvedSpringPartCoordinateIndexMask.size() % 3 == 0,
-                         "Mask is expected to mask the coordinates");
-
-      Eigen::ArrayXi relevantSpringPartCoordinateIndexA =
-        net.springPartCoordinateIndexA(involvedSpringPartCoordinateIndexMask);
-      Eigen::ArrayXi relevantSpringPartCoordinateIndexB =
-        net.springPartCoordinateIndexB(involvedSpringPartCoordinateIndexMask);
-
-#ifndef NDEBUG
-      // some debugging
-      assert(relevantSpringPartCoordinateIndexB.size() ==
-             relevantSpringPartCoordinateIndexA.size());
-      assert(relevantSpringPartCoordinateIndexA.size() ==
-             involvedSpringPartCoordinateIndexMask.size());
-      assert(resultingCoordinateIndexMask.maxCoeff() < net.coordinates.size());
-      assert(involvedSpringPartCoordinateIndexMask.maxCoeff() <
-             net.springCoordinateIndexA.size());
-#endif
-
-      // TODO: we could save some time and space by directly adjusting the
-      // coordinates
-      Eigen::VectorXd displacedCoords = net.coordinates + u;
-      Eigen::VectorXd relevantPartialDistancesA =
-        (displacedCoords(relevantSpringPartCoordinateIndexB) -
-         displacedCoords(relevantSpringPartCoordinateIndexA) +
-         net.springPartBoxOffset(involvedSpringPartCoordinateIndexMask));
-      if (this->assumeBoxLargeEnough) {
-        this->box.handlePBC(relevantPartialDistancesA);
-      }
-
-      if (this->is2D) {
-        for (size_t i = 2; i < relevantPartialDistancesA.size(); i += 3) {
-          relevantPartialDistancesA[i] = 0.;
-        }
-      }
-
-      // NOTE: we have many zeros too much, here, actually.
-      Eigen::ArrayXd oneOverSumOfSpringPartials = Eigen::ArrayXd::Zero(
-        3 * net.nrOfLinks); // 0.0 for equal = primary loop, 1.0 otherwise
-      oneOverSumOfSpringPartials(relevantSpringPartCoordinateIndexA) +=
-        oneOverSpringPartitions(involvedSpringPartCoordinateIndexMask).array();
-      oneOverSumOfSpringPartials(relevantSpringPartCoordinateIndexB) +=
-        oneOverSpringPartitions(involvedSpringPartCoordinateIndexMask).array();
-      // prevent NaN values from dividing by zero afterwards
-      oneOverSumOfSpringPartials = (oneOverSumOfSpringPartials <= 1e-12)
-                                     .select(1.0, oneOverSumOfSpringPartials);
-
-      Eigen::VectorXd partialDistancesOverSpringPartitions =
-        (relevantPartialDistancesA.array() *
-         oneOverSpringPartitions(involvedSpringPartCoordinateIndexMask).array())
-          .matrix();
-      // NOTE: we have many zeros too much, here, actually.
-      Eigen::VectorXd objectiveDisplacements =
-        Eigen::VectorXd::Zero(3 * net.nrOfLinks);
-      objectiveDisplacements(relevantSpringPartCoordinateIndexA) +=
-        partialDistancesOverSpringPartitions;
-      objectiveDisplacements(relevantSpringPartCoordinateIndexB) -=
-        partialDistancesOverSpringPartitions;
-      // ...and take the average
-      objectiveDisplacements(resultingCoordinateIndexMask) =
-        (objectiveDisplacements(resultingCoordinateIndexMask).array() /
-         oneOverSumOfSpringPartials(resultingCoordinateIndexMask))
-          .matrix();
-
-      // reset for 2D systems
-      if (this->is2D) {
-        objectiveDisplacements(Eigen::seq(2, net.nrOfLinks, 3)) =
-          Eigen::VectorXd::Zero(net.nrOfLinks);
-      }
-
-      // find the actual (max) displacement we did
-      double maxDiff = 0.;
-      Eigen::VectorXd objectivesToSet =
-        objectiveDisplacements(resultingCoordinateIndexMask);
-      for (size_t i = 0; i < resultingCoordinateIndexMask.size() / 3; i++) {
-        maxDiff =
-          std::max(maxDiff, objectivesToSet.segment(3 * i, 3).squaredNorm());
-      }
-      // double maxDiff =
-      // (objectiveDisplacements(mask)).cwiseAbs2().maxCoeff();
-      u(resultingCoordinateIndexMask) += damping * objectivesToSet;
-
-      return maxDiff;
-    };
 
     /**
      * @brief Compute the displacement residual norm for the current
@@ -604,7 +398,6 @@ namespace calc {
                                     u,
                                     springPartitions,
                                     debugNrSpringsVisited,
-                                    1.0,
                                     oneOverSpringPartitionUpperLimit);
       }
       assert((debugNrSpringsVisited.array() == 2).all());
@@ -665,192 +458,6 @@ namespace calc {
 
       return overallForces.squaredNorm();
     }
-
-    /**
-     * @brief Estimate some sets of random vertices
-     *
-     * This is particularly useful (used) for parallelising the displacements.
-     * Note that the returned Eigen::ArrayXi will contain the indices to the
-     * coordinates rather than the actual vertex indices.
-     *
-     * @param net
-     * @return std::vector<Eigen::ArrayXi>
-     */
-    std::vector<Eigen::ArrayXi> MEHPForceBalance::getRandomCoordinateSets(
-      const ForceBalanceNetwork& net) const
-    {
-      std::vector<Eigen::ArrayXi> results;
-      results.reserve(2);
-      Eigen::ArrayXf randomFloats = Eigen::ArrayXf::Random(net.nrOfLinks);
-      size_t nrOfPositiveFloats = (randomFloats > 0).count();
-      // TODO: implement something better
-      Eigen::ArrayXi links1 = Eigen::ArrayXi(nrOfPositiveFloats * 3);
-      size_t links1Idx = 0;
-      Eigen::ArrayXi links2 =
-        Eigen::ArrayXi((net.nrOfLinks - nrOfPositiveFloats) * 3);
-      size_t links2Idx = 0;
-      for (size_t i = 0; i < net.nrOfLinks; ++i) {
-        if (randomFloats[i] > 0) {
-          links1[links1Idx * 3] = 3 * i;
-          links1[links1Idx * 3 + 1] = 3 * i + 1;
-          links1[links1Idx * 3 + 2] = 3 * i + 2;
-          links1Idx += 1;
-        } else {
-          links2[links2Idx * 3] = 3 * i;
-          links2[links2Idx * 3 + 1] = 3 * i + 1;
-          links2[links2Idx * 3 + 2] = 3 * i + 2;
-          links2Idx += 1;
-        }
-      }
-      results.push_back(links1);
-      results.push_back(links2);
-      return results;
-    }
-
-    /**
-     * @brief Estimate some sets of independent vertices
-     *
-     * This is useful (used) for parallelising the displacements.
-     * Note that the returned Eigen::ArrayXi will contain the indices to the
-     * coordinates rather than the actual vertex indices.
-     *
-     * Time complexity: ca. O(|v||e|)
-     *
-     * @param net
-     * @return std::vector<Eigen::ArrayXi>
-     */
-    std::pair<std::vector<Eigen::ArrayXi>, std::vector<Eigen::ArrayXi>>
-    MEHPForceBalance::getHeuristicallyIndependentCoordinateSets(
-      const ForceBalanceNetwork& net) const
-    {
-      // std::vector<Eigen::ArrayXi> results = { net.springCoordinateIndexA,
-      //                                         net.springCoordinateIndexB };
-      std::vector<Eigen::ArrayXi> resultingCoordinateIndexMask;
-      std::vector<Eigen::ArrayXi> involvedSpringPartCoordinateIndexMask;
-      // global block list: block all indices that are added to a result already
-      Eigen::ArrayXb globalBlocked =
-        Eigen::ArrayXb::Constant(net.nrOfLinks, false);
-      size_t remainingLinks = net.nrOfLinks;
-      size_t globalStartingIdx = 0;
-      while (remainingLinks > 0) {
-        Eigen::ArrayXb localBlocked = globalBlocked;
-        std::vector<size_t> localIndexList;
-        std::vector<size_t> localSpringIndexList;
-
-        size_t localStartingIndex = globalStartingIdx;
-        while (localStartingIndex < net.nrOfLinks) {
-          while (localBlocked[localStartingIndex]) {
-            localStartingIndex += 1;
-            if (!(localStartingIndex < net.nrOfLinks)) {
-              goto while2exit;
-            }
-          }
-          // add this link to the current results list
-          localIndexList.push_back(localStartingIndex);
-          remainingLinks -= 1;
-          localBlocked[localStartingIndex] = true;
-          globalBlocked[localStartingIndex] = true;
-          // block the neighbours
-          std::vector<size_t> connections =
-            net.springIndicesOfLinks[localStartingIndex];
-          for (size_t springIdx : connections) {
-            localSpringIndexList.push_back(springIdx);
-            std::vector<size_t> springPartners =
-              net.linkIndicesOfSprings[springIdx];
-            for (size_t i = 0; i < springPartners.size(); i++) {
-              if (springPartners[i] == localStartingIndex) {
-                if (i > 0) {
-                  localBlocked[springPartners[i - 1]] = true;
-                }
-                if (i < springPartners.size() - 1) {
-                  localBlocked[springPartners[i + 1]] = true;
-                }
-                break;
-              }
-            }
-          }
-        }
-      while2exit:
-
-        while (globalStartingIdx < net.nrOfLinks &&
-               globalBlocked[globalStartingIdx]) {
-          globalStartingIdx += 1;
-        }
-
-        // translate the localIndexList to the results
-        Eigen::ArrayXi localRes =
-          Eigen::ArrayXi::Zero(3 * localIndexList.size());
-        for (int i = 0; i < localIndexList.size(); i++) {
-          localRes.segment(3 * i, 3) << 3 * localIndexList[i],
-            3 * localIndexList[i] + 1, 3 * localIndexList[i] + 2;
-        }
-        resultingCoordinateIndexMask.push_back(localRes);
-        Eigen::ArrayXi localSpringRes =
-          Eigen::ArrayXi::Zero(3 * localSpringIndexList.size());
-        for (int i = 0; i < localSpringIndexList.size(); i++) {
-          localSpringRes.segment(3 * i, 3) << 3 * localSpringIndexList[i],
-            3 * localSpringIndexList[i] + 1, 3 * localSpringIndexList[i] + 2;
-        }
-        involvedSpringPartCoordinateIndexMask.push_back(localSpringRes);
-      }
-
-      return std::make_pair(resultingCoordinateIndexMask,
-                            involvedSpringPartCoordinateIndexMask);
-    }
-
-    /**
-     * @brief Build a graph of the current configuration and find all the sets
-     * of independent vertices
-     *
-     * This is particularly useful (used) for parallelising the displacements.
-     * Note that the returned Eigen::ArrayXi will contain the indices to the
-     * coordinates rather than the actual vertex indices.
-     *
-     * @param net
-     * @return std::vector<Eigen::ArrayXi>
-     */
-    std::vector<Eigen::ArrayXi> MEHPForceBalance::getIndependentCoordinateSets(
-      const ForceBalanceNetwork& net) const
-    {
-      std::vector<Eigen::ArrayXi> results;
-      // build graph
-      igraph_t graph;
-      igraph_empty(&graph, net.nrOfLinks, IGRAPH_UNDIRECTED);
-      igraph_vector_int_t edges;
-      igraph_vector_int_init(&edges, net.nrOfPartialSprings * 2);
-      for (int i = 0; i < net.nrOfPartialSprings; ++i) {
-        // igraph_vector_int_push_back(&edges, net.springPartIndexA[i]);
-        // igraph_vector_int_push_back(&edges, net.springPartIndexB[i]);
-        igraph_vector_int_set(&edges, 2 * i, net.springPartIndexA[i]);
-        igraph_vector_int_set(&edges, 2 * i + 1, net.springPartIndexB[i]);
-      }
-      assert(igraph_vector_int_size(&edges) == net.nrOfPartialSprings * 2);
-      igraph_add_edges(&graph, &edges, nullptr);
-      igraph_vector_int_destroy(&edges);
-
-      // find dependencies in graph
-      igraph_vector_int_list_t dependencies;
-      igraph_vector_int_list_init(&dependencies, 0);
-      igraph_independent_vertex_sets(&graph, &dependencies, -1, -1);
-
-      // assemble to results
-      results.reserve(igraph_vector_int_list_size(&dependencies));
-      for (size_t i = 0; i < igraph_vector_int_list_size(&dependencies); ++i) {
-        igraph_vector_int_t* depsI =
-          igraph_vector_int_list_get_ptr(&dependencies, i);
-        Eigen::ArrayXi result = Eigen::ArrayXi(igraph_vector_int_size(depsI));
-        for (size_t j = 0; j < igraph_vector_int_size(depsI); ++j) {
-          igraph_integer_t resI = igraph_vector_int_get(depsI, j);
-          for (size_t dir = 0; dir < 3; ++dir) {
-            result[3 * j + dir] = 3 * resI + dir;
-          }
-        }
-        results.push_back(result);
-      }
-      igraph_vector_int_list_destroy(&dependencies);
-
-      return results;
-    };
 
     /**
      * @brief Translate the spring partition vector to its 3*size
@@ -3623,7 +3230,6 @@ namespace calc {
                                          net,
                                          u,
                                          springPartitions,
-                                         1.0,
                                          oneOverSpringPartitionUpperLimit)
           .diagonal()
           .squaredNorm();
@@ -3667,7 +3273,6 @@ namespace calc {
                                          net,
                                          u,
                                          springPartitions,
-                                         1.0,
                                          oneOverSpringPartitionUpperLimit)
           .diagonal()
           .squaredNorm();
@@ -3708,7 +3313,6 @@ namespace calc {
                                            net,
                                            u,
                                            springPartitions,
-                                           1.0,
                                            oneOverSpringPartitionUpperLimit)
             .diagonal()
             .squaredNorm();
@@ -3818,7 +3422,6 @@ namespace calc {
                                          net,
                                          u,
                                          springPartitions,
-                                         1.0,
                                          oneOverSpringPartitionUpperLimit)
           .diagonal()
           .squaredNorm();
@@ -3846,7 +3449,6 @@ namespace calc {
                                          net,
                                          u,
                                          springPartitions,
-                                         1.0,
                                          oneOverSpringPartitionUpperLimit)
           .diagonal()
           .squaredNorm();
@@ -4549,7 +4151,6 @@ namespace calc {
      * @param u
      * @param springPartitions
      * @param debugNrSpringsVisited
-     * @param kappa0
      * @param oneOverSpringPartitionUpperLimit
      * @return Eigen::Matrix3d
      */
@@ -4559,7 +4160,6 @@ namespace calc {
       const Eigen::VectorXd& u,
       const Eigen::VectorXd& springPartitions,
       Eigen::VectorXi& debugNrSpringsVisited,
-      const double kappa0,
       const double oneOverSpringPartitionUpperLimit) const
     {
       std::vector<size_t> springIndices = net.springIndicesOfLinks[linkIdx];
@@ -4582,13 +4182,14 @@ namespace calc {
           N,
           oneOverSpringPartitionUpperLimit);
 
-        double multiplier = kappa0 * oneOverContourLengthFraction;
+        double multiplier = this->kappa * oneOverContourLengthFraction;
 
         stress += multiplier * partialDistance * partialDistance.transpose();
         debugNrSpringsVisited[globalSpringIndex] += 1;
 
         // also account for primary loops.
-        // they may have non-zero length thanks to assuming the box is not large enough...
+        // they may have non-zero length thanks to assuming the box is not large
+        // enough...
         if (net.springPartIndexA[globalSpringIndex] ==
             net.springPartIndexB[globalSpringIndex]) {
           stress +=
@@ -4609,7 +4210,6 @@ namespace calc {
      * @param u
      * @param springPartitions
      * @param debugNrSpringsVisited
-     * @param kappa0
      * @param oneOverSpringPartitionUpperLimit
      * @return Eigen::Vector3d
      */
@@ -4619,7 +4219,6 @@ namespace calc {
       const Eigen::VectorXd& u,
       const Eigen::VectorXd& springPartitions,
       Eigen::VectorXi& debugNrSpringsVisited,
-      const double kappa0,
       const double oneOverSpringPartitionUpperLimit) const
     {
       Eigen::Vector3d force = Eigen::Vector3d::Zero();
@@ -4651,7 +4250,7 @@ namespace calc {
           N,
           oneOverSpringPartitionUpperLimit);
 
-        force += kappa0 * oneOverContourLengthFraction * partialDistance;
+        force += this->kappa * oneOverContourLengthFraction * partialDistance;
         if (debugNrSpringsVisited.size() > 0) {
           debugNrSpringsVisited[globalSpringIndex] += 1;
         }
@@ -5276,7 +4875,6 @@ namespace calc {
       const ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
       const Eigen::VectorXd& springPartitions,
-      const double kappa0,
       const double oneOverSpringPartitionUpperLimit) const
     {
       Eigen::Matrix3d stress = Eigen::Matrix3d::Zero();
@@ -5296,7 +4894,6 @@ namespace calc {
                                      u,
                                      springPartitions,
                                      debugNrSpringsVisited,
-                                     kappa0,
                                      oneOverSpringPartitionUpperLimit);
         /* spring contribution to the overall stress tensor */
         RUNTIME_EXP_IFN(std::isfinite(force.squaredNorm()),
@@ -5321,7 +4918,6 @@ namespace calc {
       const ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
       const Eigen::VectorXd& springPartitions,
-      const double kappa0,
       const double oneOverSpringPartitionUpperLimit,
       const bool xlinksOnly) const
     {
@@ -5343,7 +4939,6 @@ namespace calc {
                                      u,
                                      springPartitions,
                                      debugNrSpringsVisited,
-                                     kappa0,
                                      oneOverSpringPartitionUpperLimit);
         /* spring contribution to the overall stress tensor */
         RUNTIME_EXP_IFN(std::isfinite(stressOnLink.squaredNorm()),
@@ -5389,7 +4984,6 @@ namespace calc {
       const ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
       const Eigen::VectorXd& springPartitions,
-      const double kappa0,
       const double oneOverSpringPartitionUpperLimit) const
     {
       std::array<std::array<double, 3>, 3> stress;
@@ -5438,7 +5032,7 @@ namespace calc {
         for (size_t j = 0; j < 3; j++) {
           for (size_t k = 0; k < 3; k++) {
             double contribution =
-              distance[j] * distance[k] * kappa0 * oneOverContourLengthFraction;
+              distance[j] * distance[k] * this->kappa * oneOverContourLengthFraction;
             RUNTIME_EXP_IFN(
               std::isfinite(contribution),
               "Got non-finite contribution to stress tensor: " +
@@ -5478,7 +5072,6 @@ namespace calc {
         this->evaluateStressTensor(this->initialConfig,
                                    this->currentDisplacements,
                                    this->currentSpringPartitionsVec,
-                                   1.0,
                                    oneOverSpringPartitionUpperLimit);
 
       Eigen::Matrix3d convertedRes = Eigen::Matrix3d::Zero();
@@ -5498,7 +5091,6 @@ namespace calc {
         this->evaluateStressTensorLinkBased(this->initialConfig,
                                             this->currentDisplacements,
                                             this->currentSpringPartitionsVec,
-                                            1.0,
                                             oneOverSpringPartitionUpperLimit,
                                             xlinksOnly);
       Eigen::Matrix3d convertedRes = Eigen::Matrix3d::Zero();

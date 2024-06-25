@@ -36,7 +36,6 @@ namespace calc {
       MEHPForceBalance(const pylimer_tools::entities::Universe& u,
                        int crossLinkerType = 2,
                        bool is2D = false,
-                       double kappa = 1.0,
                        bool remove2functionalCrosslinkers = false,
                        bool removeDanglingChains = false)
         : universe(u)
@@ -68,7 +67,6 @@ namespace calc {
        * @param seed
        * @param crossLinkerType
        * @param is2D
-       * @param kappa
        * @return MEHPForceBalance
        */
       static MEHPForceBalance constructWithSlipLinks(
@@ -76,13 +74,12 @@ namespace calc {
         pylimer_tools::calc::entanglement_detection::AtomPairEntanglements
           entanglements,
         int crossLinkerType = 2,
-        bool is2D = false,
-        double kappa = 1.0)
+        bool is2D = false)
       {
         pylimer_tools::entities::Universe emptyUniverse =
           pylimer_tools::entities::Universe(universe.getBox());
         MEHPForceBalance fb =
-          MEHPForceBalance(emptyUniverse, crossLinkerType, is2D, kappa);
+          MEHPForceBalance(emptyUniverse, crossLinkerType, is2D, false, false);
         fb.configAssumeBoxLargeEnough(false);
         fb.universe = universe;
 
@@ -344,7 +341,6 @@ namespace calc {
        * @param seed
        * @param crossLinkerType
        * @param is2D
-       * @param kappa
        * @return MEHPForceBalance
        */
       static MEHPForceBalance constructWithRandomSlipLinks(
@@ -355,8 +351,7 @@ namespace calc {
         const double sameStrandCutoff,
         const std::string seed = "",
         int crossLinkerType = 2,
-        bool is2D = false,
-        double kappa = 1.0)
+        bool is2D = false)
       {
         // sample the "entanglements"
         pylimer_tools::calc::entanglement_detection::AtomPairEntanglements
@@ -376,7 +371,7 @@ namespace calc {
             std::to_string(minimumNrOfSliplinks) + ".");
 
         return MEHPForceBalance::constructWithSlipLinks(
-          universe, entanglements, crossLinkerType, is2D, kappa);
+          universe, entanglements, crossLinkerType, is2D);
       }
 
       /**
@@ -406,8 +401,6 @@ namespace calc {
        * @param ftol
        */
       void runForceRelaxation(
-        BalanceRunMode mode = BalanceRunMode::ITERATIVE,
-        double damping = 1.0,
         long int maxNrOfSteps = 50000, // default: 10000
         double xtol = 1e-9,
         const double initialResidualToUse = -1.0,
@@ -423,8 +416,6 @@ namespace calc {
         const int nrOfCrosslinkSwapsAllowedPerSliplink = -1)
       {
         this->runForceRelaxation(
-          mode,
-          damping,
           maxNrOfSteps,
           xtol,
           initialResidualToUse,
@@ -450,8 +441,6 @@ namespace calc {
        * @param ftol
        */
       void runForceRelaxation(
-        BalanceRunMode mode,
-        double damping,
         long int maxNrOfSteps, // default: 10000
         double xtol,
         const double initialResidualToUse,
@@ -775,33 +764,60 @@ namespace calc {
        */
       pylimer_tools::entities::Universe getCrosslinkerVerse() const;
 
-      int getDefaultNrOfChains() const { return this->defaultNrOfChains; }
+      int getDefaultNrOfChains() const
+      {
+        return this->defaultNrOfChains;
+      }
 
       double getDefaultMeanBondLength() const
       {
         return this->defaultBondLength;
       }
 
-      double getVolume() override { return this->initialConfig.vol; }
+      double getVolume() override
+      {
+        return this->initialConfig.vol;
+      }
 
-      int getNrOfNodes() const { return this->initialConfig.nrOfNodes; }
+      int getNrOfNodes() const
+      {
+        return this->initialConfig.nrOfNodes;
+      }
 
-      int getNrOfLinks() const { return this->initialConfig.nrOfLinks; }
+      int getNrOfLinks() const
+      {
+        return this->initialConfig.nrOfLinks;
+      }
 
-      size_t getNumBonds() override { return this->getNrOfSprings(); }
+      size_t getNumBonds() override
+      {
+        return this->getNrOfSprings();
+      }
 
-      size_t getNumExtraBonds() override { return 0; }
+      size_t getNumExtraBonds() override
+      {
+        return 0;
+      }
 
-      long int getNumBondsToForm() override { return 0; }
+      long int getNumBondsToForm() override
+      {
+        return 0;
+      }
 
-      size_t getNumAtoms() override { return this->getNrOfNodes(); }
+      size_t getNumAtoms() override
+      {
+        return this->getNrOfNodes();
+      }
 
       size_t getNumExtraAtoms() override
       {
         return this->getNrOfLinks() - this->getNrOfNodes();
       }
 
-      int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
+      int getNrOfSprings() const
+      {
+        return this->initialConfig.nrOfSprings;
+      }
 
       int getNrOfPartialSprings() const
       {
@@ -828,16 +844,6 @@ namespace calc {
         this->initialConfig.springsContourLength = springsContourLengths;
       }
 
-      std::vector<Eigen::ArrayXi> getIndependentCoordinateSets(
-        const ForceBalanceNetwork& net) const;
-
-      std::pair<std::vector<Eigen::ArrayXi>, std::vector<Eigen::ArrayXi>>
-      getHeuristicallyIndependentCoordinateSets(
-        const ForceBalanceNetwork& net) const;
-
-      std::vector<Eigen::ArrayXi> getRandomCoordinateSets(
-        const ForceBalanceNetwork& net) const;
-
       void configAssumeBoxLargeEnough(bool assumption)
       {
         this->assumeBoxLargeEnough = assumption;
@@ -851,6 +857,10 @@ namespace calc {
       void configMeanBondLength(double meanBondLength)
       {
         this->defaultBondLength = meanBondLength;
+      }
+
+      void configSpringConstant(double kappa = 1.0) {
+        this->kappa = kappa;
       }
 
       /**
@@ -1130,9 +1140,15 @@ namespace calc {
 
       double getGammaFactor(double b = 0.96, int nrOfChains = -1) const;
 
-      int getNrOfIterations() const { return this->nrOfStepsDone; }
+      int getNrOfIterations() const
+      {
+        return this->nrOfStepsDone;
+      }
 
-      ExitReason getExitReason() const { return this->exitReason; }
+      ExitReason getExitReason() const
+      {
+        return this->exitReason;
+      }
 
       void addSlipLinks(const std::vector<size_t>& strandIdx1,
                         const std::vector<size_t>& strandIdx2,
@@ -1279,6 +1295,15 @@ namespace calc {
           net, u, this->is2D, this->assumeBoxLargeEnough);
       };
 
+      /**
+       * @brief Sum the partitions up to a given link in a spring
+       *
+       * @param net
+       * @param springPartition
+       * @param springIdx
+       * @param targetLink
+       * @return double
+       */
       double sumToTotalFraction(const ForceBalanceNetwork& net,
                                 Eigen::VectorXd springPartition,
                                 size_t springIdx,
@@ -1439,7 +1464,10 @@ namespace calc {
                            const Eigen::VectorXd& u,
                            const Eigen::VectorXd& springPartitions) const;
 
-      ForceBalanceNetwork getNetwork() { return this->initialConfig; }
+      ForceBalanceNetwork getNetwork()
+      {
+        return this->initialConfig;
+      }
 
       Eigen::VectorXd getSpringPartitions()
       {
@@ -1517,7 +1545,6 @@ namespace calc {
                                          this->currentDisplacements,
                                          this->currentSpringPartitionsVec,
                                          debugNrSpringsVisited,
-                                         1.0,
                                          oneOverSpringPartitionUpperLimit);
       }
 
@@ -1542,7 +1569,6 @@ namespace calc {
                                          u,
                                          springPartitions,
                                          debugNrSpringsVisited,
-                                         1.0,
                                          oneOverSpringPartitionUpperLimit);
       }
 
@@ -1564,7 +1590,6 @@ namespace calc {
                                           this->currentDisplacements,
                                           this->currentSpringPartitionsVec,
                                           debugNrSpringsVisited,
-                                          1.0,
                                           oneOverSpringPartitionUpperLimit);
       }
 
@@ -1752,32 +1777,6 @@ namespace calc {
       };
 
       /**
-       * @brief Displace one link to the mean of all connected neighbours
-       *
-       * @param u the current displacements, wherein the resulting coordinates
-       * shall be stored
-       * @param linkIdx the idx of the link to displace
-       * @return double, the distance (squared norm) displaced
-       */
-      Eigen::VectorXd inspectLinkDisplacementToMeanPositionUpdate(
-        const size_t linkIdx,
-        double damping = 1.0) const
-      {
-        Eigen::VectorXd displacements = this->currentDisplacements;
-        Eigen::VectorXd oneOverSpringPartitions =
-          this->assembleOneOverSpringPartition(
-            this->initialConfig, this->currentSpringPartitionsVec);
-        Eigen::Array3i mask;
-        mask << 3 * linkIdx, 3 * linkIdx + 1, 3 * linkIdx + 2;
-        this->displaceLinksToMeanPosition(this->initialConfig,
-                                          displacements,
-                                          oneOverSpringPartitions,
-                                          mask,
-                                          damping);
-        return displacements;
-      };
-
-      /**
        * @brief Adjust the two spring's box offsets to work best with the
        * specified slip-link
        *
@@ -1820,42 +1819,6 @@ namespace calc {
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& springPartitions0,
         const double oneOverSpringPartitionUpperLimit = 1.0) const;
-
-      double displaceLinksToMeanPosition(const ForceBalanceNetwork& net,
-                                         Eigen::VectorXd& u,
-                                         Eigen::VectorXd& springPartitions0,
-                                         double damping = 0.5) const;
-
-      /**
-       * @brief Displace one link to the mean of all connected neighbours
-       *
-       * @param net the force balance network
-       * @param u the current displacements, wherein the resulting coordinates
-       * shall be stored
-       * @return double, the distance (squared norm) displaced
-       */
-      double displaceLinksToMeanPosition(
-        const ForceBalanceNetwork& net,
-        Eigen::VectorXd& u,
-        const Eigen::VectorXd& oneOverSpringPartitions,
-        const Eigen::ArrayXi& resultingCoordinateIndexMask,
-        const double damping) const;
-
-      /**
-       * @brief Displace one link to the mean of all connected neighbours
-       *
-       * @param net the force balance network
-       * @param u the current displacements, wherein the resulting coordinates
-       * shall be stored
-       * @return double, the distance (squared norm) displaced
-       */
-      double displaceLinksToMeanPosition(
-        const ForceBalanceNetwork& net,
-        Eigen::VectorXd& u,
-        const Eigen::VectorXd& oneOverSpringPartitions,
-        const Eigen::ArrayXi& involvedSpringPartCoordinateIndexMask,
-        const Eigen::ArrayXi& resultingCoordinateIndexMask,
-        const double damping = 0.5) const;
 
       double getDisplacementResidualNorm(
         const double oneOverSpringPartitionUpperLimit = 1.0) const;
@@ -1917,8 +1880,14 @@ namespace calc {
       {
         return this->getStressTensor(-1.0);
       }
-      int getNumShifts() override { return 0; }
-      int getNumRelocations() override { return 0; }
+      int getNumShifts() override
+      {
+        return 0;
+      }
+      int getNumRelocations() override
+      {
+        return 0;
+      }
 
       Eigen::VectorXd getBondLengths() override
       {
@@ -2003,7 +1972,6 @@ namespace calc {
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
         const Eigen::VectorXd& springPartitions,
-        const double kappa0 = 1.0,
         const double oneOverSpringPartitionUpperLimit = 1.0,
         const bool xlinksOnly = false) const;
 
@@ -2021,7 +1989,6 @@ namespace calc {
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
         const Eigen::VectorXd& springPartitions,
-        const double kappa0 = 1.0,
         const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
       /**
@@ -2036,7 +2003,6 @@ namespace calc {
         const ForceBalanceNetwork& net,
         const Eigen::VectorXd& u,
         const Eigen::VectorXd& springPartitions,
-        const double kappa0 = 1.0,
         const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
       /**
@@ -2048,7 +2014,6 @@ namespace calc {
        * @param net
        * @param u
        * @param springPartitions
-       * @param kappa0
        * @param minCutoff
        * @return Eigen::Vector3d
        */
@@ -2058,7 +2023,6 @@ namespace calc {
         const Eigen::VectorXd& u,
         const Eigen::VectorXd& springPartitions,
         Eigen::VectorXi& debugNrSpringsVisited,
-        const double kappa0 = 1.0,
         const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
       /**
@@ -2070,7 +2034,6 @@ namespace calc {
        * @param net
        * @param u
        * @param springPartitions
-       * @param kappa0
        * @param minCutoff
        * @return Eigen::Vector3d
        */
@@ -2080,7 +2043,6 @@ namespace calc {
         const Eigen::VectorXd& u,
         const Eigen::VectorXd& springPartitions,
         Eigen::VectorXi& debugNrSpringsVisited,
-        const double kappa0 = 1.0,
         const double oneOverSpringPartitionUpperLimit = 1.0) const;
 
       /**
