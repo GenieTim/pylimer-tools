@@ -248,6 +248,8 @@ def compute_weight_fraction_of_backbone(
     assert w_xl <= 1 and w_xl >= 0
     assert w_x2 <= 1 and w_x2 >= 0
     assert w_sol <= 1 and w_sol >= 0
+    if (w_sol == 1):
+        return 0
     if functionality_per_type[crosslinker_type] == 3:
         phi_el = (
             (w_x2 * (1 - beta) ** 2)
