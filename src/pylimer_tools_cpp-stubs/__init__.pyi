@@ -14,7 +14,7 @@ from __future__ import annotations
 import numpy
 import pybind11_stubgen.typing_ext
 import typing
-__all__ = ['Atom', 'AtomStyle', 'AveFileReader', 'BalanceRunMode', 'Box', 'ComputedDoubleValues', 'ComputedIntValues', 'DANGLING_CHAIN', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'ExitReason', 'FREE_CHAIN', 'LazyUniverseSequenceIterator', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NETWORK_STRAND', 'NeighbourList', 'NonGaussianSpringForceEvaluator', 'OutputConfiguration', 'PRIMARY_LOOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StructureSimplificationMode', 'UNDEFINED', 'Universe', 'UniverseSequence', 'compute_stoichiometric_imbalance', 'do_linear_walk_chain_from_to', 'do_random_walk_chain_from_to', 'inverse_langevin', 'predict_gelation_point', 'split_csv', 'version_information']
+__all__ = ['Atom', 'AtomStyle', 'AveFileReader', 'Box', 'ComputedDoubleValues', 'ComputedIntValues', 'DANGLING_CHAIN', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'ExitReason', 'FREE_CHAIN', 'LazyUniverseSequenceIterator', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceBalance2', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NETWORK_STRAND', 'NeighbourList', 'NonGaussianSpringForceEvaluator', 'OutputConfiguration', 'PRIMARY_LOOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StructureSimplificationMode', 'UNDEFINED', 'Universe', 'UniverseSequence', 'compute_stoichiometric_imbalance', 'do_linear_walk_chain_from_to', 'do_random_walk_chain_from_to', 'inverse_langevin', 'predict_gelation_point', 'split_csv', 'version_information']
 class Atom:
     """
     
@@ -230,52 +230,6 @@ class AveFileReader:
     def get_nr_of_columns(self) -> int:
         ...
     def get_nr_of_rows(self) -> int:
-        ...
-class BalanceRunMode:
-    """
-    Members:
-    
-      EIGEN_ALL
-    
-      EIGEN_RANDOM
-    
-      EIGEN_HEURISTIC
-    
-      EIGEN_STRANDS
-    
-      ITERATIVE
-    """
-    EIGEN_ALL: typing.ClassVar[BalanceRunMode]  # value = <BalanceRunMode.EIGEN_ALL: 3>
-    EIGEN_HEURISTIC: typing.ClassVar[BalanceRunMode]  # value = <BalanceRunMode.EIGEN_HEURISTIC: 1>
-    EIGEN_RANDOM: typing.ClassVar[BalanceRunMode]  # value = <BalanceRunMode.EIGEN_RANDOM: 0>
-    EIGEN_STRANDS: typing.ClassVar[BalanceRunMode]  # value = <BalanceRunMode.EIGEN_STRANDS: 2>
-    ITERATIVE: typing.ClassVar[BalanceRunMode]  # value = <BalanceRunMode.ITERATIVE: 4>
-    __members__: typing.ClassVar[dict[str, BalanceRunMode]]  # value = {'EIGEN_ALL': <BalanceRunMode.EIGEN_ALL: 3>, 'EIGEN_RANDOM': <BalanceRunMode.EIGEN_RANDOM: 0>, 'EIGEN_HEURISTIC': <BalanceRunMode.EIGEN_HEURISTIC: 1>, 'EIGEN_STRANDS': <BalanceRunMode.EIGEN_STRANDS: 2>, 'ITERATIVE': <BalanceRunMode.ITERATIVE: 4>}
-    def __eq__(self, other: typing.Any) -> bool:
-        ...
-    def __getstate__(self) -> int:
-        ...
-    def __hash__(self) -> int:
-        ...
-    def __index__(self) -> int:
-        ...
-    def __init__(self, value: int) -> None:
-        ...
-    def __int__(self) -> int:
-        ...
-    def __ne__(self, other: typing.Any) -> bool:
-        ...
-    def __repr__(self) -> str:
-        ...
-    def __setstate__(self, state: int) -> None:
-        ...
-    def __str__(self) -> str:
-        ...
-    @property
-    def name(self) -> str:
-        ...
-    @property
-    def value(self) -> int:
         ...
 class Box:
     """
@@ -1040,13 +994,13 @@ class MEHPForceBalance:
          
     """
     @staticmethod
-    def construct_with_random_sliplinks(universe: Universe, nr_of_sliplinks_to_sample: int, acceptable_cutoff: float = 1.2, minimum_nr_of_sliplinks: int = 0, same_strand_cutoff: float = 3, seed: str = '', crosslinker_type: int = 2, is_2d: bool = False, kappa: float = 1.0) -> MEHPForceBalance:
+    def construct_with_random_sliplinks(universe: Universe, nr_of_sliplinks_to_sample: int, acceptable_cutoff: float = 1.2, minimum_nr_of_sliplinks: int = 0, same_strand_cutoff: float = 3, seed: str = '', crosslinker_type: int = 2, is_2d: bool = False) -> MEHPForceBalance:
         """
                   Instantiate this simulator with randomly chosen slip-links.
         """
     def __copy__(self) -> MEHPForceBalance:
         ...
-    def __init__(self, universe: Universe, crosslinker_type: int = 2, is_2d: bool = False, kappa: float = 1.0, remove_2functional_crosslinkers: bool = True, remove_dangling_chains: bool = False) -> None:
+    def __init__(self, universe: Universe, crosslinker_type: int = 2, is_2d: bool = False, remove_2functional_crosslinkers: bool = False, remove_dangling_chains: bool = False) -> None:
         """
                   Instantiate the simulator for a certain universe.
         
@@ -1075,6 +1029,12 @@ class MEHPForceBalance:
                   If your bonds could get larger than half the box length, this must be kept false (default).
                   Otherwise, you can set it to true and therewith get some securities.
         """
+    def config_mean_bond_length(self, b: float = 1.0) -> None:
+        """
+             Configure the :math:`b` used e.g. for the topological Gamma-factor.
+        """
+    def config_spring_constant(self, kappa: float = 1.0) -> None:
+        ...
     def config_step_output(self, arg0: list[OutputConfiguration]) -> None:
         """
                   Set which values to log.
@@ -1271,16 +1231,16 @@ class MEHPForceBalance:
     def get_stress_tensor(self, one_over_spring_partition_upper_limit: float = 1.0) -> numpy.ndarray:
         """
                   Returns the stress tensor at the current state of the simulation.
+        
+                  The units are in :math:`[\text{units of }\kappa]/[\text{distance units}]`,
+                  where the units of :math:`\kappa` should be :math:`[\text{force}]/[\text{distance units}]^2`.
+                  Make sure to multiply by :math:`\kappa` or configure it appropriately.
         """
     def get_stress_tensor_link_based(self, one_over_spring_partition_upper_limit: float = 1.0, xlinks_only: bool = False) -> numpy.ndarray:
         """
                   Returns the stress tensor at the current state of the simulation.
         """
     def inspect_displacement_to_mean_position_update(self, link_idx: int, one_over_spring_partition_upper_limit: float = 1.0) -> numpy.ndarray:
-        """
-                  Helper method to debug and/or understand what happens to certain links when being displaced.
-        """
-    def inspect_link_displacement_to_mean_position_update(self, link_idx: int, damping: float = 1.0) -> numpy.ndarray:
         """
                   Helper method to debug and/or understand what happens to certain links when being displaced.
         """
@@ -1300,15 +1260,13 @@ class MEHPForceBalance:
         """
                   Randomly sample and add slip-links based on certain criteria.
         """
-    def run_force_relaxation(self, run_mode: BalanceRunMode = ..., damping: float = 1.0, max_nr_of_steps: int = 250000, x_tolerance: float = 1e-12, initial_residual_norm: float = -1.0, simplification_mode: StructureSimplificationMode = ..., inactive_removal_cutoff: float = -1.0, do_inner_iterations: bool = False, allow_sliplinks_to_pass_each_other: LinkSwappingMode = ..., swapping_frequency: int = 10, one_over_spring_partition_upper_limit: float = 1.0, nr_of_crosslink_swaps_allowed_per_sliplink: int = -1) -> None:
+    def run_force_relaxation(self, max_nr_of_steps: int = 250000, x_tolerance: float = 1e-12, initial_residual_norm: float = -1.0, simplification_mode: StructureSimplificationMode = ..., inactive_removal_cutoff: float = -1.0, do_inner_iterations: bool = False, allow_sliplinks_to_pass_each_other: LinkSwappingMode = ..., swapping_frequency: int = 10, one_over_spring_partition_upper_limit: float = 1.0, nr_of_crosslink_swaps_allowed_per_sliplink: int = -1) -> None:
         """
                   Run the simulation.
                   Note that the final state of the minimization is persisted and reused if you use this method again.
                   This is useful if you want to run a global optimization first and add a local one afterwards.
                   As a consequence though, you cannot simply benchmark only this method; you must include the setup.
         
-                  :param runMode: Choice of the mode to run the simulation with.
-                  :param damping: For certain run modes, a damping factor helps to improve performance.
                   :param maxNrOfSteps: The maximum number of steps to do during the simulation.
                   :param xTolerance: The tolerance of the displacements as an exit condition.
                   :param innerMaxNrOfSteps: The maximum number of steps to do per iteration during the slip-link displacements.
@@ -2416,7 +2374,9 @@ class Universe:
         """
                     Compute the weight fractions of each atom type in the network.
         
-                    If no masses are stored, 
+                    If no masses are stored, assumes a mass of 1 for each atom.
+        
+                    If the total mass is 0., returns the total mass per atom type.
         """
     def count_atom_types(self) -> dict[int, int]:
         """
