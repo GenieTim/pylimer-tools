@@ -406,7 +406,7 @@ namespace calc {
         const double initialResidualToUse = -1.0,
         const StructureSimplificationMode simplificationMode =
           StructureSimplificationMode::NO_SIMPLIFICATION,
-        const double inactiveRemovalCutoff = -1.0,
+        const double inactiveRemovalCutoff = 0.01,
         const int outputFrequency = 50,
         bool doInnerIterations = false,
         LinkSwappingMode allowSlipLinksToPassEachOther =

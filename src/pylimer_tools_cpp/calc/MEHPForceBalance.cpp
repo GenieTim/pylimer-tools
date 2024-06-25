@@ -62,12 +62,10 @@ namespace calc {
       //   "crosslinkers may be removed too, during the procedure.");
       this->simulationHasRun = true;
 
-      double removalTolerance =
-        (inactiveRemovalCutoff > 0.0)
-          ? inactiveRemovalCutoff
-          : (0.25 *
-             std::pow(this->initialConfig.vol / this->universe.getNrOfAtoms(),
-                      1. / 3.));
+      INVALIDARG_EXP_IFN(
+        inactiveRemovalCutoff > 0.0 ||
+          simplificationMode == StructureSimplificationMode::NO_SIMPLIFICATION,
+        "Removal cut-off must be positive when simplification is enabled.");
 
       /* array allocation */
       std::vector<Eigen::ArrayXi> independentVertexSets;
@@ -246,7 +244,7 @@ namespace calc {
               this->removeInactiveCrosslinks(this->initialConfig,
                                              this->currentDisplacements,
                                              this->currentSpringPartitionsVec,
-                                             removalTolerance);
+                                             inactiveRemovalCutoff);
             this->initialConfig.meanSpringContourLength =
               this->initialConfig.springsContourLength.size() > 0
                 ? this->initialConfig.springsContourLength.mean()
@@ -271,7 +269,7 @@ namespace calc {
               this->doRemovalAndreisWay(this->initialConfig,
                                         this->currentDisplacements,
                                         this->currentSpringPartitionsVec,
-                                        removalTolerance);
+                                        inactiveRemovalCutoff);
           }
           // cleanup some things
           if (simplificationMode !=
@@ -292,9 +290,9 @@ namespace calc {
           wasInterrupted = true;
           break;
         }
-      } while (
-        currentResidual / initialResidual > xtol &&
-        iterationsDone<maxNrOfSteps&& this->initialConfig.nrOfSprings> 0);
+      } while (currentResidual / initialResidual > xtol &&
+               iterationsDone < maxNrOfSteps &&
+               this->initialConfig.nrOfSprings > 0);
 
       // finish up
       this->closeAllOutputs();
@@ -649,7 +647,9 @@ namespace calc {
         }
       }
 
+#ifndef NDEBUG
       this->validateNetwork(net, displacements, springPartitions);
+#endif
 
       return numRemoved;
     }
@@ -2581,13 +2581,17 @@ namespace calc {
 
             // std::cout << "Removed cross-link " << crosslinkIdx << std::endl;
 
+#ifndef NDEBUG
             this->validateNetwork(net, displacements, springPartitions);
+#endif
             numRemoved += 1;
           }
           // else: TODO: decide
         }
       }
+#ifndef NDEBUG
       this->validateNetwork(net, displacements, springPartitions);
+#endif
       return numRemoved;
     }
 
@@ -5031,8 +5035,8 @@ namespace calc {
         /* spring contribution to the overall stress tensor */
         for (size_t j = 0; j < 3; j++) {
           for (size_t k = 0; k < 3; k++) {
-            double contribution =
-              distance[j] * distance[k] * this->kappa * oneOverContourLengthFraction;
+            double contribution = distance[j] * distance[k] * this->kappa *
+                                  oneOverContourLengthFraction;
             RUNTIME_EXP_IFN(
               std::isfinite(contribution),
               "Got non-finite contribution to stress tensor: " +
