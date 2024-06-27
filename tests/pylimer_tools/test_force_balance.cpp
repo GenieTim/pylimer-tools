@@ -587,7 +587,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
           CHECK(stressTensor1(i, j) == Catch::Approx(stressTensor2(i, j)));
         }
       }
-      
+
       SECTION("Actual balance results in correct phantom results")
       {
         std::cout << "Doing phantom force balance" << std::endl;
@@ -644,11 +644,13 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         double nb2Correction = 1.;
         // (forceBalancer2.getDefaultR0Square() / (expectedNb2));
         double gammaCorrectionFactor = nrOfChainCorrection * nb2Correction;
-        CHECK(forceBalancer2.getGammaFactor() //* nrOfChainCorrection * 1.
-              // forceBalancer2.getDefaultR0Square()
-              == Catch::Approx(
-                   42.6132)); // as from conversion-less Mathematica script
-        CHECK(forceBalancer2.getGammaFactor() * kb * T * //gammaCorrectionFactor *
+        CHECK(
+          forceBalancer2.getGammaFactor() //* nrOfChainCorrection * 1.
+                                          // forceBalancer2.getDefaultR0Square()
+          ==
+          Catch::Approx(42.6132)); // as from conversion-less Mathematica script
+        CHECK(forceBalancer2.getGammaFactor() * kb *
+                T * // gammaCorrectionFactor *
                 nu ==
               Catch::Approx(61308.3)); // ANT shear modulus, Pa
         CHECK(forceBalancer2.getGammaFactor() * gammaCorrectionFactor ==
@@ -724,8 +726,7 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
     // run again, this time fully
     pcm::MEHPForceBalance forceBalancer2 =
       pcm::MEHPForceBalance(universe, 2, true);
-    forceBalancer2.runForceRelaxation(
-      10000, 1e-10, 100);
+    forceBalancer2.runForceRelaxation(10000, 1e-10, 100);
     CHECK(forceBalancer2.getNrOfIterations() > 5);
     CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalancer2.getGammaFactor(1., forceBalancer2.getNrOfSprings()) ==
@@ -1359,8 +1360,7 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
   SECTION("Large enough box")
   {
     forceBalancer.configAssumeBoxLargeEnough(true);
-    CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-      50000, 1e-18));
+    CHECK_NOTHROW(forceBalancer.runForceRelaxation(50000, 1e-18));
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalancer.getNrOfActiveSprings() == 0);
@@ -1372,8 +1372,7 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
   SECTION("Not large enough box")
   {
     forceBalancer.configAssumeBoxLargeEnough(false);
-    CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-      50000, 1e-18));
+    CHECK_NOTHROW(forceBalancer.runForceRelaxation(50000, 1e-18));
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalancer.getNrOfActiveSprings() == 0);
@@ -1422,8 +1421,7 @@ TEST_CASE("MEHP Force Balance Fully active chains are fully active",
               forceBalancer.getNrOfSprings());
         double initialResidual = forceBalancer.getDisplacementResidualNorm();
         CHECK(std::isfinite(initialResidual));
-        CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-          10000, 1e-12));
+        CHECK_NOTHROW(forceBalancer.runForceRelaxation(10000, 1e-12));
         CHECK(forceBalancer.getNrOfIterations() > 0);
         CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
         CHECK(forceBalancer.getNrOfActiveSprings(0.001) ==
@@ -1438,8 +1436,7 @@ TEST_CASE("MEHP Force Balance Fully active chains are fully active",
               forceBalancer.getNrOfSprings());
         double initialResidual = forceBalancer.getDisplacementResidualNorm();
         CHECK(std::isfinite(initialResidual));
-        CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-          10000, 1e-12));
+        CHECK_NOTHROW(forceBalancer.runForceRelaxation(10000, 1e-12));
         CHECK(forceBalancer.getNrOfIterations() > 0);
         CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
         CHECK(forceBalancer.getNrOfActiveSprings(0.001) ==
@@ -1487,10 +1484,8 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC "
     CHECK(initialResidual ==
           Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
 
-    forceBalanceConventional.runForceRelaxation(
-      250, 1e-4);
-    forceBalanceNew.runForceRelaxation(
-      250, 1e-4);
+    forceBalanceConventional.runForceRelaxation(250, 1e-4);
+    forceBalanceNew.runForceRelaxation(250, 1e-4);
 
     CHECK(forceBalanceConventional.getStressTensor().isApprox(
       forceBalanceNew.getStressTensor()));
@@ -1620,10 +1615,8 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
     CHECK(initialResidual ==
           Catch::Approx(forceBalanceNew.getDisplacementResidualNorm()));
 
-    forceBalanceConventional.runForceRelaxation(
-      250, 1e-4);
-    forceBalanceNew.runForceRelaxation(
-      250, 1e-4);
+    forceBalanceConventional.runForceRelaxation(250, 1e-4);
+    forceBalanceNew.runForceRelaxation(250, 1e-4);
 
     CHECK(forceBalanceConventional.getStressTensor().isApprox(
       forceBalanceNew.getStressTensor()));
@@ -1742,10 +1735,7 @@ TEST_CASE("MEHP Force Balance does not collapse",
       pcm::MEHPForceBalance(universe, 2, true);
     forceBalanceConventional.configAssumeBoxLargeEnough(true);
     CHECK_NOTHROW(forceBalanceConventional.runForceRelaxation(
-      10000,
-      1e-15,
-      -1,
-      pcm::StructureSimplificationMode::ALL_TIM));
+      10000, 1e-15, -1, pcm::StructureSimplificationMode::ALL_TIM));
     CHECK(forceBalanceConventional.getNrOfIterations() > 0);
     CHECK(forceBalanceConventional.getExitReason() ==
           pcm::ExitReason::X_TOLERANCE);
@@ -1768,10 +1758,7 @@ TEST_CASE("MEHP Force Balance does not collapse",
       pcm::MEHPForceBalance(universe, 2, true);
     forceBalanceNew.configAssumeBoxLargeEnough(false);
     CHECK_NOTHROW(forceBalanceNew.runForceRelaxation(
-      10000,
-      1e-15,
-      -1,
-      pcm::StructureSimplificationMode::ALL_TIM));
+      10000, 1e-15, -1, pcm::StructureSimplificationMode::ALL_TIM));
     CHECK(forceBalanceNew.getNrOfIterations() > 0);
     CHECK(forceBalanceNew.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalanceNew.getNrOfActiveSprings() ==
@@ -1823,10 +1810,7 @@ TEST_CASE(
     CHECK(forceBalancer.getNetwork().nrOfPartialSprings >
           forceBalancer.getNetwork().nrOfSprings);
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-      50000,
-      1e-9,
-      -1.,
-      pcm::StructureSimplificationMode::ALL_TIM));
+      50000, 1e-9, -1., pcm::StructureSimplificationMode::ALL_TIM));
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalancer.getNrOfActiveSprings() == 0);
@@ -1884,7 +1868,7 @@ TEST_CASE("MEHP Force Balance correctly re-aligns Slip-Links to Images",
       20., 0., 0.;                         // slip-link -> cross-link 2
 
     CHECK_NOTHROW(forceBalancer.reAlignSlipLinkToImages(net, u, 2, 0, 1));
-    CHECK(net.coordinates.segment(3*2, 3)[1] == 5.);
+    CHECK(net.coordinates.segment(3 * 2, 3)[1] == 5.);
 
     CHECK(net.springPartBoxOffset[0] == Catch::Approx(10.));
     CHECK(net.springPartBoxOffset[3] == Catch::Approx(10.));

@@ -7,10 +7,10 @@ extern "C"
 #include "Box.h"
 #include "NeighbourList.h"
 #include <Eigen/Dense>
+#include <cmath>
 #include <map>
 #include <unordered_map>
 #include <vector>
-#include <cmath>
 
 #include <algorithm>
 
@@ -172,7 +172,7 @@ namespace entities {
   {
     size_t result =
       bucketIndex - nrOfBuckets * std::floor(static_cast<double>(bucketIndex) /
-                                              static_cast<double>(nrOfBuckets));
+                                             static_cast<double>(nrOfBuckets));
     assert(result >= 0 && result <= nrOfBuckets);
     return result;
     // while (bucketIndex < 0) {

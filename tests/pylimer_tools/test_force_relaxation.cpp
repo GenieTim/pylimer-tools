@@ -540,7 +540,7 @@ TEST_CASE(
       CHECK(forceRelaxer2.getPressure() * conversionFactor /
               (sigmaToM * sigmaToM * sigmaToM * 79.) ==
             Catch::Approx(
-             62085.0438157862)); // shear modulus from the pressure, MPa
+              62085.0438157862)); // shear modulus from the pressure, MPa
       double nrOfChainCorrection =
         (forceRelaxer2.getDefaultNrOfChains() / nrOfChains);
       double expectedNb2 = slope * Nb * beadMass;

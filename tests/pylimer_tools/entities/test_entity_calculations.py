@@ -96,7 +96,9 @@ class TestEntityCalculations(unittest.TestCase):
             bonds_df["bondFrom"].tolist(), bonds_df["to"].tolist())
         molecules = universe.get_molecules(-1)
         self.assertEqual(len(molecules), 1)
-        self.assertRaises(RuntimeError, lambda: molecules[0].compute_end_to_end_distance())
+        self.assertRaises(
+            RuntimeError,
+            lambda: molecules[0].compute_end_to_end_distance())
 
     def test_compute_distance_through_periodic_image(self):
         base_atom = {
