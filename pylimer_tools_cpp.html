@@ -2028,6 +2028,8 @@ so that the file can be read correctly again.</p>
 <p>ALL_CYCLE</p>
 <p>ALL_MC</p>
 <p>ALL_MC_CYCLE</p>
+<p>ALL_MC_TRY</p>
+<p>ALL_MC_TRY_CYCLE</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.LinkSwappingMode.ALL">
 <span class="sig-name descname"><span class="pre">ALL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LinkSwappingMode.ALL:</span> <span class="pre">2&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.LinkSwappingMode.ALL" title="Link to this definition">¶</a></dt>
@@ -2046,6 +2048,16 @@ so that the file can be read correctly again.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.LinkSwappingMode.ALL_MC_CYCLE">
 <span class="sig-name descname"><span class="pre">ALL_MC_CYCLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LinkSwappingMode.ALL_MC_CYCLE:</span> <span class="pre">5&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.LinkSwappingMode.ALL_MC_CYCLE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.LinkSwappingMode.ALL_MC_TRY">
+<span class="sig-name descname"><span class="pre">ALL_MC_TRY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LinkSwappingMode.ALL_MC_TRY:</span> <span class="pre">6&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.LinkSwappingMode.ALL_MC_TRY" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.LinkSwappingMode.ALL_MC_TRY_CYCLE">
+<span class="sig-name descname"><span class="pre">ALL_MC_TRY_CYCLE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;LinkSwappingMode.ALL_MC_TRY_CYCLE:</span> <span class="pre">7&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.LinkSwappingMode.ALL_MC_TRY_CYCLE" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -2095,7 +2107,7 @@ so that the file can be read correctly again.</p>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.LinkSwappingMode.__members__">
-<span class="sig-name descname"><span class="pre">__members__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'ALL':</span> <span class="pre">&lt;LinkSwappingMode.ALL:</span> <span class="pre">2&gt;,</span> <span class="pre">'ALL_CYCLE':</span> <span class="pre">&lt;LinkSwappingMode.ALL_CYCLE:</span> <span class="pre">3&gt;,</span> <span class="pre">'ALL_MC':</span> <span class="pre">&lt;LinkSwappingMode.ALL_MC:</span> <span class="pre">4&gt;,</span> <span class="pre">'ALL_MC_CYCLE':</span> <span class="pre">&lt;LinkSwappingMode.ALL_MC_CYCLE:</span> <span class="pre">5&gt;,</span> <span class="pre">'NO_SWAPPING':</span> <span class="pre">&lt;LinkSwappingMode.NO_SWAPPING:</span> <span class="pre">0&gt;,</span> <span class="pre">'SLIPLINKS_ONLY':</span> <span class="pre">&lt;LinkSwappingMode.SLIPLINKS_ONLY:</span> <span class="pre">1&gt;}</span></em><a class="headerlink" href="#pylimer_tools_cpp.LinkSwappingMode.__members__" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__members__</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'ALL':</span> <span class="pre">&lt;LinkSwappingMode.ALL:</span> <span class="pre">2&gt;,</span> <span class="pre">'ALL_CYCLE':</span> <span class="pre">&lt;LinkSwappingMode.ALL_CYCLE:</span> <span class="pre">3&gt;,</span> <span class="pre">'ALL_MC':</span> <span class="pre">&lt;LinkSwappingMode.ALL_MC:</span> <span class="pre">4&gt;,</span> <span class="pre">'ALL_MC_CYCLE':</span> <span class="pre">&lt;LinkSwappingMode.ALL_MC_CYCLE:</span> <span class="pre">5&gt;,</span> <span class="pre">'ALL_MC_TRY':</span> <span class="pre">&lt;LinkSwappingMode.ALL_MC_TRY:</span> <span class="pre">6&gt;,</span> <span class="pre">'ALL_MC_TRY_CYCLE':</span> <span class="pre">&lt;LinkSwappingMode.ALL_MC_TRY_CYCLE:</span> <span class="pre">7&gt;,</span> <span class="pre">'NO_SWAPPING':</span> <span class="pre">&lt;LinkSwappingMode.NO_SWAPPING:</span> <span class="pre">0&gt;,</span> <span class="pre">'SLIPLINKS_ONLY':</span> <span class="pre">&lt;LinkSwappingMode.SLIPLINKS_ONLY:</span> <span class="pre">1&gt;}</span></em><a class="headerlink" href="#pylimer_tools_cpp.LinkSwappingMode.__members__" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -5540,6 +5552,8 @@ If you have not output the type of the atoms in the dump file, they will be set 
 <li><a class="reference internal" href="#pylimer_tools_cpp.LinkSwappingMode.ALL_CYCLE"><code class="docutils literal notranslate"><span class="pre">LinkSwappingMode.ALL_CYCLE</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.LinkSwappingMode.ALL_MC"><code class="docutils literal notranslate"><span class="pre">LinkSwappingMode.ALL_MC</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.LinkSwappingMode.ALL_MC_CYCLE"><code class="docutils literal notranslate"><span class="pre">LinkSwappingMode.ALL_MC_CYCLE</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.LinkSwappingMode.ALL_MC_TRY"><code class="docutils literal notranslate"><span class="pre">LinkSwappingMode.ALL_MC_TRY</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.LinkSwappingMode.ALL_MC_TRY_CYCLE"><code class="docutils literal notranslate"><span class="pre">LinkSwappingMode.ALL_MC_TRY_CYCLE</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.LinkSwappingMode.NO_SWAPPING"><code class="docutils literal notranslate"><span class="pre">LinkSwappingMode.NO_SWAPPING</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.LinkSwappingMode.SLIPLINKS_ONLY"><code class="docutils literal notranslate"><span class="pre">LinkSwappingMode.SLIPLINKS_ONLY</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.LinkSwappingMode.__annotations__"><code class="docutils literal notranslate"><span class="pre">LinkSwappingMode.__annotations__</span></code></a></li>
