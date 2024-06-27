@@ -10,40 +10,20 @@ import os
 import sys
 import sysconfig
 import warnings
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 from datetime import datetime
-
-try:
-    # this fixes an issue where conda env's site-packages are not available to
-    # Sphinx
-    paths = sysconfig.get_paths()
-    pythonV = "python3.9"
-    for key in paths:
-        path = paths[key]
-        dirname = os.path.basename(path)
-        if "python" in dirname and "." in dirname:
-            pythonV = dirname
-            break
-
-    if (os.getenv("CONDA_PREFIX") is not None):
-        newPath = os.path.join(os.getenv("CONDA_PREFIX"),
-                               "lib", pythonV, "site-packages")
-        sys.path.append(newPath)
-    # vgl.: sys.path.insert(
-    #     0, "/usr/local/anaconda3/envs/autowig/lib/python3.7/site-packages")
-    import pylimer_tools_cpp
-except ImportError:
-    warnings.warn("Failed to import pylimer_tools_cpp")
+import pylimer_tools_cpp
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'PylimerTools'
-copyright = '2021-' + datetime.now().strftime('%Y') + ', Tim Bernhard'
-author = 'Tim Bernhard'
+project = "PylimerTools"
+copyright = "2021-" + datetime.now().strftime("%Y") + ", Tim Bernhard"
+author = "Tim Bernhard"
 
 
 # -- General configuration ---------------------------------------------------
@@ -56,22 +36,25 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
+    "sphinx_automodapi.automodapi",
     # "sphinx.ext.jsmath",
-    "sphinx.ext.mathjax"
+    "sphinx.ext.mathjax",
 ]
 
+numpydoc_show_class_members = False  # needed to avoid having methods and attributes of classes being shown multiple times.
+
 autosummary_generate = True
-autoclass_content = 'both'
+autoclass_content = "both"
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['../docs-template']
+templates_path = ["../docs-template"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
-source_suffix = ['.rst', '.md']
+source_suffix = [".rst", ".md"]
 
 # The master toctree document.
 master_doc = "index"
@@ -83,28 +66,26 @@ mathjax3_config = {
         # "inlineMath": [['$', '$'], ['\\(', '\\)']]
     },
     "extensions": ["jsMath2jax.js"],
-    "jax": ["input/TeX"]
+    "jax": ["input/TeX"],
 }
-mathjax_options = {
-    "async": "async"
-}
+mathjax_options = {"async": "async"}
 
 # -- Options for HTML output -------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'furo'
+html_theme = "furo"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 # add custom css files here, absolute URLS or
 # relative to the `html_static_path` directory
 html_css_files = [
-    'css/custom.css',
+    "css/custom.css",
 ]
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
