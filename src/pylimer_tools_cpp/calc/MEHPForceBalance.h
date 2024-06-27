@@ -764,60 +764,33 @@ namespace calc {
        */
       pylimer_tools::entities::Universe getCrosslinkerVerse() const;
 
-      int getDefaultNrOfChains() const
-      {
-        return this->defaultNrOfChains;
-      }
+      int getDefaultNrOfChains() const { return this->defaultNrOfChains; }
 
       double getDefaultMeanBondLength() const
       {
         return this->defaultBondLength;
       }
 
-      double getVolume() override
-      {
-        return this->initialConfig.vol;
-      }
+      double getVolume() override { return this->initialConfig.vol; }
 
-      int getNrOfNodes() const
-      {
-        return this->initialConfig.nrOfNodes;
-      }
+      int getNrOfNodes() const { return this->initialConfig.nrOfNodes; }
 
-      int getNrOfLinks() const
-      {
-        return this->initialConfig.nrOfLinks;
-      }
+      int getNrOfLinks() const { return this->initialConfig.nrOfLinks; }
 
-      size_t getNumBonds() override
-      {
-        return this->getNrOfSprings();
-      }
+      size_t getNumBonds() override { return this->getNrOfSprings(); }
 
-      size_t getNumExtraBonds() override
-      {
-        return 0;
-      }
+      size_t getNumExtraBonds() override { return 0; }
 
-      long int getNumBondsToForm() override
-      {
-        return 0;
-      }
+      long int getNumBondsToForm() override { return 0; }
 
-      size_t getNumAtoms() override
-      {
-        return this->getNrOfNodes();
-      }
+      size_t getNumAtoms() override { return this->getNrOfNodes(); }
 
       size_t getNumExtraAtoms() override
       {
         return this->getNrOfLinks() - this->getNrOfNodes();
       }
 
-      int getNrOfSprings() const
-      {
-        return this->initialConfig.nrOfSprings;
-      }
+      int getNrOfSprings() const { return this->initialConfig.nrOfSprings; }
 
       int getNrOfPartialSprings() const
       {
@@ -859,9 +832,7 @@ namespace calc {
         this->defaultBondLength = meanBondLength;
       }
 
-      void configSpringConstant(double kappa = 1.0) {
-        this->kappa = kappa;
-      }
+      void configSpringConstant(double kappa = 1.0) { this->kappa = kappa; }
 
       /**
        * @brief Get the Nr Of Active Nodes
@@ -1019,13 +990,15 @@ namespace calc {
 
       std::vector<double> getOverallSpringLengths() const
       {
-        Eigen::VectorXd partialSprings =
+        Eigen::VectorXd partialSpringDistances =
           this->getCurrentPartialSpringDistances();
+        assert(partialSpringDistances.size() ==
+               this->initialConfig.nrOfPartialSprings);
         std::vector<double> results =
           std::vector<double>(this->initialConfig.nrOfSprings, 0.);
         for (size_t i = 0; i < this->initialConfig.nrOfPartialSprings; ++i) {
           results[this->initialConfig.partialToFullSpringIndex[i]] +=
-            partialSprings.segment(3 * i, 3).norm();
+            partialSpringDistances[i];
         }
 
         return results;
@@ -1140,15 +1113,9 @@ namespace calc {
 
       double getGammaFactor(double b = 0.96, int nrOfChains = -1) const;
 
-      int getNrOfIterations() const
-      {
-        return this->nrOfStepsDone;
-      }
+      int getNrOfIterations() const { return this->nrOfStepsDone; }
 
-      ExitReason getExitReason() const
-      {
-        return this->exitReason;
-      }
+      ExitReason getExitReason() const { return this->exitReason; }
 
       void addSlipLinks(const std::vector<size_t>& strandIdx1,
                         const std::vector<size_t>& strandIdx2,
@@ -1464,10 +1431,7 @@ namespace calc {
                            const Eigen::VectorXd& u,
                            const Eigen::VectorXd& springPartitions) const;
 
-      ForceBalanceNetwork getNetwork()
-      {
-        return this->initialConfig;
-      }
+      ForceBalanceNetwork getNetwork() { return this->initialConfig; }
 
       Eigen::VectorXd getSpringPartitions()
       {
@@ -1880,14 +1844,8 @@ namespace calc {
       {
         return this->getStressTensor(-1.0);
       }
-      int getNumShifts() override
-      {
-        return 0;
-      }
-      int getNumRelocations() override
-      {
-        return 0;
-      }
+      int getNumShifts() override { return 0; }
+      int getNumRelocations() override { return 0; }
 
       Eigen::VectorXd getBondLengths() override
       {

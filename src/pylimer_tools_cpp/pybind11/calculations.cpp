@@ -723,13 +723,16 @@ init_pylimer_bound_calc(py::module_& m)
           Otherwise, you can set it to true and therewith get some securities.
          )pbdoc",
          py::arg("box_large_enough") = false)
-     .def("config_mean_bond_length",
-     &mehp::MEHPForceBalance::configMeanBondLength,
-     R"pbdoc(
+    .def("config_mean_bond_length",
+         &mehp::MEHPForceBalance::configMeanBondLength,
+         R"pbdoc(
      Configure the :math:`b` used e.g. for the topological Gamma-factor.
-     )pbdoc", py::arg("b") = 1.0)
-     .def("config_spring_constant", &mehp::MEHPForceBalance::configSpringConstant,
-     R"pbdoc()pbdoc", py::arg("kappa") = 1.0)
+     )pbdoc",
+         py::arg("b") = 1.0)
+    .def("config_spring_constant",
+         &mehp::MEHPForceBalance::configSpringConstant,
+         R"pbdoc()pbdoc",
+         py::arg("kappa") = 1.0)
     .def("swap_sliplinks_incl_xlinks",
          &mehp::MEHPForceBalance::swapSlipLinksInclXlinks)
     .def("move_sliplinks_to_their_best_branch",

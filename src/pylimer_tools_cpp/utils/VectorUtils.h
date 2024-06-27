@@ -57,7 +57,8 @@ namespace utils {
   }
 
   template<typename T>
-  static inline size_t index_of(std::vector<T>& vec, const T val) {
+  static inline size_t index_of(std::vector<T>& vec, const T val)
+  {
     auto it = std::find(vec.begin(), vec.end(), val);
     if (it == vec.end()) {
       throw std::invalid_argument("Value must be present, not found in vector");

@@ -355,7 +355,8 @@ def compute_weight_fraction_of_soluble_material_from_weight_fractions(
       - g: the functionality of the ordinary chains
     """
     alpha, _ = compute_miller_macosko_probabilities(r, p, f)
-    return w_f * (alpha**f) + w_g * ((r * p * (alpha ** (f - 1)) + 1 - r * p) ** g)
+    return w_f * (alpha**f) + w_g * \
+        ((r * p * (alpha ** (f - 1)) + 1 - r * p) ** g)
 
 
 def compute_weight_fractions_and_probabilities(
@@ -811,7 +812,7 @@ def compute_trapping_factor(
     Literature: https://doi.org/10.1021/ma60004a015
 
     Arguments:
-        - network: the network to compute the trapping factor for. 
+        - network: the network to compute the trapping factor for.
         - p: the extent of reaction in terms of the crosslinkers.
         - r: the stoichiometric imbalance of reactants.
         - f: functionality of the crosslinkers. Only needed if alpha is None.
@@ -863,7 +864,8 @@ def compute_probability_that_monomer_is_effective(
     f = functionality_of_monomer
     m = expected_degree_of_effect
     alpha = p_f_a_out
-    return scipy.special.binom(f, m) * (alpha ** (f - m)) * ((1.0 - alpha) ** m)
+    return scipy.special.binom(
+        f, m) * (alpha ** (f - m)) * ((1.0 - alpha) ** m)
 
 
 def predict_gelation_point(r: float, f: int, g: int = 2) -> float:

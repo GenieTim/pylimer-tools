@@ -116,7 +116,8 @@ init_pylimer_bound_entities(py::module_& m)
          R"pbdoc(
           Check whether the passed offest is a valid one in this box.
      )pbdoc",
-         py::arg("potential_offset"), py::arg("abs_precision") = 1e-5)
+         py::arg("potential_offset"),
+         py::arg("abs_precision") = 1e-5)
     .def(py::pickle(
            [](const Box& b) { // __getstate__
              /* Return a tuple that fully encodes the state of the object */
