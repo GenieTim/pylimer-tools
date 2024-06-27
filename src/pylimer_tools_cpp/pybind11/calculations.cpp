@@ -604,7 +604,9 @@ init_pylimer_bound_calc(py::module_& m)
     .value("ALL", mehp::LinkSwappingMode::ALL)
     .value("ALL_CYCLE", mehp::LinkSwappingMode::ALL_CYCLE)
     .value("ALL_MC", mehp::LinkSwappingMode::ALL_MC)
-    .value("ALL_MC_CYCLE", mehp::LinkSwappingMode::ALL_MC_CYCLE);
+    .value("ALL_MC_CYCLE", mehp::LinkSwappingMode::ALL_MC_CYCLE)
+    .value("ALL_MC_TRY", mehp::LinkSwappingMode::ALL_MC_TRY)
+    .value("ALL_MC_TRY_CYCLE", mehp::LinkSwappingMode::ALL_MC_TRY_CYCLE);
 
   py::class_<mehp::MEHPForceBalance>(m, "MEHPForceBalance", R"pbdoc(
     A small simulation tool for quickly minimizing the force between the cross-linker beads.
