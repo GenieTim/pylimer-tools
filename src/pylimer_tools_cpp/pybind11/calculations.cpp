@@ -683,11 +683,16 @@ init_pylimer_bound_calc(py::module_& m)
           This is useful if you want to run a global optimization first and add a local one afterwards.
           As a consequence though, you cannot simply benchmark only this method; you must include the setup.
 
-          :param maxNrOfSteps: The maximum number of steps to do during the simulation.
-          :param xTolerance: The tolerance of the displacements as an exit condition.
-          :param innerMaxNrOfSteps: The maximum number of steps to do per iteration during the slip-link displacements.
-          :param innerXTolerance: The tolerance of the displacements of the slip-link as an inner exit condition.
-          :param innerAlphaTolerance: The tolerance of the contour-length when slipping the slip-link as an inner exit condition.
+          :param max_nr_of_steps: The maximum number of steps to do during the simulation.
+          :param x_tolerance: The tolerance of the displacements as an exit condition.
+          :param initial_residual_norm: The residual norm relative to which the relative tolerance is specified. Negative values mean, it will be replaced with the current one.
+          :param simplification_mode: How to simplify the structure during the minimization.
+          :param inactive_removal_cutoff: The tolerance in distance units of the partial spring length to count as active, relevant if simplification mode is specified to be something other than NO_SIMPLIFICATION.
+          :param do_inner_iterations: Whether to do inner iterations; usually, they are not helpful.
+          :param allow_sliplinks_to_pass_each_other: Whether slip-links can pass each other.
+          :param swapping_frequency: How often slip-links attempt to swap.
+          :param one_over_spring_partition_upper_limit: Super-secret parameter. Use 1, gradually increase (and then -1) if you want to publish.
+          :param nr_of_crosslink_swaps_allowed_per_sliplink: Use to stear whether slip-links can cross cross-links when swapping is enabled.
           )pbdoc",
       py::arg("max_nr_of_steps") = 250000,
       py::arg("x_tolerance") = 1e-12,
