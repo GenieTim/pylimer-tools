@@ -1,0 +1,27 @@
+OutputConfiguration
+===================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: OutputConfiguration
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~OutputConfiguration.append
+      ~OutputConfiguration.double_values
+      ~OutputConfiguration.filename
+      ~OutputConfiguration.int_values
+      ~OutputConfiguration.output_every
+      ~OutputConfiguration.use_every
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: append
+   .. autoattribute:: double_values
+   .. autoattribute:: filename
+   .. autoattribute:: int_values
+   .. autoattribute:: output_every
+   .. autoattribute:: use_every

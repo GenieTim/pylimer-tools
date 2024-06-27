@@ -1,0 +1,27 @@
+MCUniverseGenerator
+===================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: MCUniverseGenerator
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~MCUniverseGenerator.add_and_link_strands
+      ~MCUniverseGenerator.add_crosslinkers
+      ~MCUniverseGenerator.add_solvent_chains
+      ~MCUniverseGenerator.get_universe
+      ~MCUniverseGenerator.set_bead_distance
+      ~MCUniverseGenerator.set_seed
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: add_and_link_strands
+   .. automethod:: add_crosslinkers
+   .. automethod:: add_solvent_chains
+   .. automethod:: get_universe
+   .. automethod:: set_bead_distance
+   .. automethod:: set_seed

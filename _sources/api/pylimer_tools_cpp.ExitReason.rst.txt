@@ -1,0 +1,31 @@
+ExitReason
+==========
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: ExitReason
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~ExitReason.FAILURE
+      ~ExitReason.F_TOLERANCE
+      ~ExitReason.MAX_STEPS
+      ~ExitReason.OTHER
+      ~ExitReason.UNSET
+      ~ExitReason.X_TOLERANCE
+      ~ExitReason.name
+      ~ExitReason.value
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: FAILURE
+   .. autoattribute:: F_TOLERANCE
+   .. autoattribute:: MAX_STEPS
+   .. autoattribute:: OTHER
+   .. autoattribute:: UNSET
+   .. autoattribute:: X_TOLERANCE
+   .. autoattribute:: name
+   .. autoattribute:: value

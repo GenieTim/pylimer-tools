@@ -1,0 +1,73 @@
+Molecule
+========
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: Molecule
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Molecule.compute_bond_lengths
+      ~Molecule.compute_end_to_end_distance
+      ~Molecule.compute_end_to_end_distance_with_derived_image_flags
+      ~Molecule.compute_end_to_end_vector
+      ~Molecule.compute_end_to_end_vector_with_derived_image_flags
+      ~Molecule.compute_radius_of_gyration
+      ~Molecule.compute_radius_of_gyration_with_derived_image_flags
+      ~Molecule.compute_total_length
+      ~Molecule.compute_total_mass
+      ~Molecule.compute_total_vector
+      ~Molecule.compute_vector_from_to
+      ~Molecule.get_atom_by_id
+      ~Molecule.get_atom_by_vertex_idx
+      ~Molecule.get_atom_id_by_vertex_idx
+      ~Molecule.get_atom_types
+      ~Molecule.get_atoms
+      ~Molecule.get_atoms_by_degree
+      ~Molecule.get_atoms_by_type
+      ~Molecule.get_atoms_connected_to
+      ~Molecule.get_atoms_connected_to_vertex
+      ~Molecule.get_atoms_lined_up
+      ~Molecule.get_bonds
+      ~Molecule.get_edges
+      ~Molecule.get_key
+      ~Molecule.get_nr_of_atoms
+      ~Molecule.get_nr_of_bonds
+      ~Molecule.get_strand_ends
+      ~Molecule.get_strand_type
+      ~Molecule.get_vertex_idx_by_atom_id
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: compute_bond_lengths
+   .. automethod:: compute_end_to_end_distance
+   .. automethod:: compute_end_to_end_distance_with_derived_image_flags
+   .. automethod:: compute_end_to_end_vector
+   .. automethod:: compute_end_to_end_vector_with_derived_image_flags
+   .. automethod:: compute_radius_of_gyration
+   .. automethod:: compute_radius_of_gyration_with_derived_image_flags
+   .. automethod:: compute_total_length
+   .. automethod:: compute_total_mass
+   .. automethod:: compute_total_vector
+   .. automethod:: compute_vector_from_to
+   .. automethod:: get_atom_by_id
+   .. automethod:: get_atom_by_vertex_idx
+   .. automethod:: get_atom_id_by_vertex_idx
+   .. automethod:: get_atom_types
+   .. automethod:: get_atoms
+   .. automethod:: get_atoms_by_degree
+   .. automethod:: get_atoms_by_type
+   .. automethod:: get_atoms_connected_to
+   .. automethod:: get_atoms_connected_to_vertex
+   .. automethod:: get_atoms_lined_up
+   .. automethod:: get_bonds
+   .. automethod:: get_edges
+   .. automethod:: get_key
+   .. automethod:: get_nr_of_atoms
+   .. automethod:: get_nr_of_bonds
+   .. automethod:: get_strand_ends
+   .. automethod:: get_strand_type
+   .. automethod:: get_vertex_idx_by_atom_id

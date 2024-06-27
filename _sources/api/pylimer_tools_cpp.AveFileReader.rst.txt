@@ -1,0 +1,27 @@
+AveFileReader
+=============
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: AveFileReader
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~AveFileReader.autocorrelate_column
+      ~AveFileReader.autocorrelate_column_difference
+      ~AveFileReader.get_column_names
+      ~AveFileReader.get_data
+      ~AveFileReader.get_nr_of_columns
+      ~AveFileReader.get_nr_of_rows
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: autocorrelate_column
+   .. automethod:: autocorrelate_column_difference
+   .. automethod:: get_column_names
+   .. automethod:: get_data
+   .. automethod:: get_nr_of_columns
+   .. automethod:: get_nr_of_rows

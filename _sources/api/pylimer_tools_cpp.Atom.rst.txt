@@ -1,0 +1,43 @@
+Atom
+====
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: Atom
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Atom.compute_vector_to
+      ~Atom.distance_to
+      ~Atom.distance_to_unwrapped
+      ~Atom.get_coordinates
+      ~Atom.get_id
+      ~Atom.get_nx
+      ~Atom.get_ny
+      ~Atom.get_nz
+      ~Atom.get_type
+      ~Atom.get_unwrapped_coordinates
+      ~Atom.get_x
+      ~Atom.get_y
+      ~Atom.get_z
+      ~Atom.vector_to_unwrapped
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: compute_vector_to
+   .. automethod:: distance_to
+   .. automethod:: distance_to_unwrapped
+   .. automethod:: get_coordinates
+   .. automethod:: get_id
+   .. automethod:: get_nx
+   .. automethod:: get_ny
+   .. automethod:: get_nz
+   .. automethod:: get_type
+   .. automethod:: get_unwrapped_coordinates
+   .. automethod:: get_x
+   .. automethod:: get_y
+   .. automethod:: get_z
+   .. automethod:: vector_to_unwrapped

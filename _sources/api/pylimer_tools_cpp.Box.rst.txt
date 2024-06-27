@@ -1,0 +1,43 @@
+Box
+===
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: Box
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Box.apply_pbc
+      ~Box.apply_simple_shear
+      ~Box.get_high_x
+      ~Box.get_high_y
+      ~Box.get_high_z
+      ~Box.get_low_x
+      ~Box.get_low_y
+      ~Box.get_low_z
+      ~Box.get_lx
+      ~Box.get_ly
+      ~Box.get_lz
+      ~Box.get_offset
+      ~Box.get_volume
+      ~Box.is_valid_offset
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: apply_pbc
+   .. automethod:: apply_simple_shear
+   .. automethod:: get_high_x
+   .. automethod:: get_high_y
+   .. automethod:: get_high_z
+   .. automethod:: get_low_x
+   .. automethod:: get_low_y
+   .. automethod:: get_low_z
+   .. automethod:: get_lx
+   .. automethod:: get_ly
+   .. automethod:: get_lz
+   .. automethod:: get_offset
+   .. automethod:: get_volume
+   .. automethod:: is_valid_offset

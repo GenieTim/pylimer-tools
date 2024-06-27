@@ -1,0 +1,29 @@
+DumpFileReader
+==============
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: DumpFileReader
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~DumpFileReader.get_length
+      ~DumpFileReader.get_numeric_values_for_at
+      ~DumpFileReader.get_string_values_for_at
+      ~DumpFileReader.has_key
+      ~DumpFileReader.key_has_column
+      ~DumpFileReader.key_has_directional_column
+      ~DumpFileReader.read
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: get_length
+   .. automethod:: get_numeric_values_for_at
+   .. automethod:: get_string_values_for_at
+   .. automethod:: has_key
+   .. automethod:: key_has_column
+   .. automethod:: key_has_directional_column
+   .. automethod:: read

@@ -1,0 +1,61 @@
+SimplifiedBalanceNetwork
+========================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: SimplifiedBalanceNetwork
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~SimplifiedBalanceNetwork.box_lengths
+      ~SimplifiedBalanceNetwork.coordinates
+      ~SimplifiedBalanceNetwork.link_indices_of_springs
+      ~SimplifiedBalanceNetwork.link_is_sliplink
+      ~SimplifiedBalanceNetwork.local_to_global_spring_index
+      ~SimplifiedBalanceNetwork.nr_of_crosslink_swaps_endured
+      ~SimplifiedBalanceNetwork.nr_of_crosslinks
+      ~SimplifiedBalanceNetwork.nr_of_links
+      ~SimplifiedBalanceNetwork.nr_of_partial_springs
+      ~SimplifiedBalanceNetwork.nr_of_springs
+      ~SimplifiedBalanceNetwork.old_atom_ids
+      ~SimplifiedBalanceNetwork.partial_to_full_spring_index
+      ~SimplifiedBalanceNetwork.spring_contour_length
+      ~SimplifiedBalanceNetwork.spring_coordinate_index_a
+      ~SimplifiedBalanceNetwork.spring_coordinate_index_b
+      ~SimplifiedBalanceNetwork.spring_index_a
+      ~SimplifiedBalanceNetwork.spring_index_b
+      ~SimplifiedBalanceNetwork.spring_indices_of_links
+      ~SimplifiedBalanceNetwork.spring_part_coordinate_index_a
+      ~SimplifiedBalanceNetwork.spring_part_coordinate_index_b
+      ~SimplifiedBalanceNetwork.spring_part_index_a
+      ~SimplifiedBalanceNetwork.spring_part_index_b
+      ~SimplifiedBalanceNetwork.volume
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: box_lengths
+   .. autoattribute:: coordinates
+   .. autoattribute:: link_indices_of_springs
+   .. autoattribute:: link_is_sliplink
+   .. autoattribute:: local_to_global_spring_index
+   .. autoattribute:: nr_of_crosslink_swaps_endured
+   .. autoattribute:: nr_of_crosslinks
+   .. autoattribute:: nr_of_links
+   .. autoattribute:: nr_of_partial_springs
+   .. autoattribute:: nr_of_springs
+   .. autoattribute:: old_atom_ids
+   .. autoattribute:: partial_to_full_spring_index
+   .. autoattribute:: spring_contour_length
+   .. autoattribute:: spring_coordinate_index_a
+   .. autoattribute:: spring_coordinate_index_b
+   .. autoattribute:: spring_index_a
+   .. autoattribute:: spring_index_b
+   .. autoattribute:: spring_indices_of_links
+   .. autoattribute:: spring_part_coordinate_index_a
+   .. autoattribute:: spring_part_coordinate_index_b
+   .. autoattribute:: spring_part_index_a
+   .. autoattribute:: spring_part_index_b
+   .. autoattribute:: volume

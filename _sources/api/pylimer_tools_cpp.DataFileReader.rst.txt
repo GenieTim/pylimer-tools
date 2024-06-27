@@ -1,0 +1,69 @@
+DataFileReader
+==============
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: DataFileReader
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~DataFileReader.get_atom_ids
+      ~DataFileReader.get_atom_nx
+      ~DataFileReader.get_atom_ny
+      ~DataFileReader.get_atom_nz
+      ~DataFileReader.get_atom_types
+      ~DataFileReader.get_atom_x
+      ~DataFileReader.get_atom_y
+      ~DataFileReader.get_atom_z
+      ~DataFileReader.get_bond_from
+      ~DataFileReader.get_bond_to
+      ~DataFileReader.get_bond_types
+      ~DataFileReader.get_high_x
+      ~DataFileReader.get_high_y
+      ~DataFileReader.get_high_z
+      ~DataFileReader.get_low_x
+      ~DataFileReader.get_low_y
+      ~DataFileReader.get_low_z
+      ~DataFileReader.get_lx
+      ~DataFileReader.get_ly
+      ~DataFileReader.get_lz
+      ~DataFileReader.get_masses
+      ~DataFileReader.get_molecule_ids
+      ~DataFileReader.get_nr_of_atom_types
+      ~DataFileReader.get_nr_of_atoms
+      ~DataFileReader.get_nr_of_bond_types
+      ~DataFileReader.get_nr_of_bonds
+      ~DataFileReader.read
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: get_atom_ids
+   .. automethod:: get_atom_nx
+   .. automethod:: get_atom_ny
+   .. automethod:: get_atom_nz
+   .. automethod:: get_atom_types
+   .. automethod:: get_atom_x
+   .. automethod:: get_atom_y
+   .. automethod:: get_atom_z
+   .. automethod:: get_bond_from
+   .. automethod:: get_bond_to
+   .. automethod:: get_bond_types
+   .. automethod:: get_high_x
+   .. automethod:: get_high_y
+   .. automethod:: get_high_z
+   .. automethod:: get_low_x
+   .. automethod:: get_low_y
+   .. automethod:: get_low_z
+   .. automethod:: get_lx
+   .. automethod:: get_ly
+   .. automethod:: get_lz
+   .. automethod:: get_masses
+   .. automethod:: get_molecule_ids
+   .. automethod:: get_nr_of_atom_types
+   .. automethod:: get_nr_of_atoms
+   .. automethod:: get_nr_of_bond_types
+   .. automethod:: get_nr_of_bonds
+   .. automethod:: read

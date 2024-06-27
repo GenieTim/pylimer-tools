@@ -1,0 +1,35 @@
+LinkSwappingMode
+================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: LinkSwappingMode
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~LinkSwappingMode.ALL
+      ~LinkSwappingMode.ALL_CYCLE
+      ~LinkSwappingMode.ALL_MC
+      ~LinkSwappingMode.ALL_MC_CYCLE
+      ~LinkSwappingMode.ALL_MC_TRY
+      ~LinkSwappingMode.ALL_MC_TRY_CYCLE
+      ~LinkSwappingMode.NO_SWAPPING
+      ~LinkSwappingMode.SLIPLINKS_ONLY
+      ~LinkSwappingMode.name
+      ~LinkSwappingMode.value
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: ALL
+   .. autoattribute:: ALL_CYCLE
+   .. autoattribute:: ALL_MC
+   .. autoattribute:: ALL_MC_CYCLE
+   .. autoattribute:: ALL_MC_TRY
+   .. autoattribute:: ALL_MC_TRY_CYCLE
+   .. autoattribute:: NO_SWAPPING
+   .. autoattribute:: SLIPLINKS_ONLY
+   .. autoattribute:: name
+   .. autoattribute:: value

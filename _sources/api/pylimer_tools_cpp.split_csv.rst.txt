@@ -1,0 +1,6 @@
+split_csv
+=========
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autofunction:: split_csv

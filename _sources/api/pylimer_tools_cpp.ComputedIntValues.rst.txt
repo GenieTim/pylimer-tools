@@ -1,0 +1,35 @@
+ComputedIntValues
+=================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: ComputedIntValues
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~ComputedIntValues.NUM_ATOMS
+      ~ComputedIntValues.NUM_BONDS
+      ~ComputedIntValues.NUM_BONDS_TO_FORM
+      ~ComputedIntValues.NUM_EXTRA_ATOMS
+      ~ComputedIntValues.NUM_EXTRA_BONDS
+      ~ComputedIntValues.NUM_RELOC
+      ~ComputedIntValues.NUM_SHIFT
+      ~ComputedIntValues.STEP
+      ~ComputedIntValues.name
+      ~ComputedIntValues.value
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: NUM_ATOMS
+   .. autoattribute:: NUM_BONDS
+   .. autoattribute:: NUM_BONDS_TO_FORM
+   .. autoattribute:: NUM_EXTRA_ATOMS
+   .. autoattribute:: NUM_EXTRA_BONDS
+   .. autoattribute:: NUM_RELOC
+   .. autoattribute:: NUM_SHIFT
+   .. autoattribute:: STEP
+   .. autoattribute:: name
+   .. autoattribute:: value

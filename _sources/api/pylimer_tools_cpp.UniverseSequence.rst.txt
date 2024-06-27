@@ -1,0 +1,43 @@
+UniverseSequence
+================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: UniverseSequence
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~UniverseSequence.at_index
+      ~UniverseSequence.compute_distance_autocorrelation_from_to
+      ~UniverseSequence.compute_distance_from_to_atoms
+      ~UniverseSequence.compute_msd_for_atom_properties
+      ~UniverseSequence.compute_msd_for_atoms
+      ~UniverseSequence.compute_vector_from_to_atoms
+      ~UniverseSequence.forget_at_index
+      ~UniverseSequence.get_all
+      ~UniverseSequence.get_length
+      ~UniverseSequence.initialize_from_data_sequence
+      ~UniverseSequence.initialize_from_dump_file
+      ~UniverseSequence.next
+      ~UniverseSequence.reset_iterator
+      ~UniverseSequence.set_data_file_atom_style
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: at_index
+   .. automethod:: compute_distance_autocorrelation_from_to
+   .. automethod:: compute_distance_from_to_atoms
+   .. automethod:: compute_msd_for_atom_properties
+   .. automethod:: compute_msd_for_atoms
+   .. automethod:: compute_vector_from_to_atoms
+   .. automethod:: forget_at_index
+   .. automethod:: get_all
+   .. automethod:: get_length
+   .. automethod:: initialize_from_data_sequence
+   .. automethod:: initialize_from_dump_file
+   .. automethod:: next
+   .. automethod:: reset_iterator
+   .. automethod:: set_data_file_atom_style

@@ -1,0 +1,53 @@
+ComputedDoubleValues
+====================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: ComputedDoubleValues
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~ComputedDoubleValues.MAX_B
+      ~ComputedDoubleValues.MEAN_B
+      ~ComputedDoubleValues.MSD
+      ~ComputedDoubleValues.PRESSURE
+      ~ComputedDoubleValues.STRESS_NXY
+      ~ComputedDoubleValues.STRESS_NXZ
+      ~ComputedDoubleValues.STRESS_NYZ
+      ~ComputedDoubleValues.STRESS_XX
+      ~ComputedDoubleValues.STRESS_XY
+      ~ComputedDoubleValues.STRESS_XZ
+      ~ComputedDoubleValues.STRESS_YY
+      ~ComputedDoubleValues.STRESS_YZ
+      ~ComputedDoubleValues.STRESS_ZZ
+      ~ComputedDoubleValues.TEMPERATURE
+      ~ComputedDoubleValues.TIME
+      ~ComputedDoubleValues.TIMESTEP
+      ~ComputedDoubleValues.VOLUME
+      ~ComputedDoubleValues.name
+      ~ComputedDoubleValues.value
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: MAX_B
+   .. autoattribute:: MEAN_B
+   .. autoattribute:: MSD
+   .. autoattribute:: PRESSURE
+   .. autoattribute:: STRESS_NXY
+   .. autoattribute:: STRESS_NXZ
+   .. autoattribute:: STRESS_NYZ
+   .. autoattribute:: STRESS_XX
+   .. autoattribute:: STRESS_XY
+   .. autoattribute:: STRESS_XZ
+   .. autoattribute:: STRESS_YY
+   .. autoattribute:: STRESS_YZ
+   .. autoattribute:: STRESS_ZZ
+   .. autoattribute:: TEMPERATURE
+   .. autoattribute:: TIME
+   .. autoattribute:: TIMESTEP
+   .. autoattribute:: VOLUME
+   .. autoattribute:: name
+   .. autoattribute:: value

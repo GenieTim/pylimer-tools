@@ -1,0 +1,7 @@
+LazyUniverseSequenceIterator
+============================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: LazyUniverseSequenceIterator
+   :show-inheritance:

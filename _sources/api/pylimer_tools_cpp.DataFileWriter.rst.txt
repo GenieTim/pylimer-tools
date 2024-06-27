@@ -1,0 +1,39 @@
+DataFileWriter
+==============
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: DataFileWriter
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~DataFileWriter.config_atom_style
+      ~DataFileWriter.config_attempt_image_reset
+      ~DataFileWriter.config_crosslinker_type
+      ~DataFileWriter.config_include_angles
+      ~DataFileWriter.config_include_dihedral_angles
+      ~DataFileWriter.config_include_velocities
+      ~DataFileWriter.config_molecule_idx_for_swap
+      ~DataFileWriter.config_move_into_box
+      ~DataFileWriter.config_reindex_atoms
+      ~DataFileWriter.set_custom_atom_format
+      ~DataFileWriter.set_universe_to_write
+      ~DataFileWriter.write_to_file
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: config_atom_style
+   .. automethod:: config_attempt_image_reset
+   .. automethod:: config_crosslinker_type
+   .. automethod:: config_include_angles
+   .. automethod:: config_include_dihedral_angles
+   .. automethod:: config_include_velocities
+   .. automethod:: config_molecule_idx_for_swap
+   .. automethod:: config_move_into_box
+   .. automethod:: config_reindex_atoms
+   .. automethod:: set_custom_atom_format
+   .. automethod:: set_universe_to_write
+   .. automethod:: write_to_file

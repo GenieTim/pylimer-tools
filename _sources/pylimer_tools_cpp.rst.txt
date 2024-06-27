@@ -4,16 +4,15 @@ pylimer\_tools\_cpp package
 Module contents
 ---------------
 
-.. automodule:: pylimer_tools_cpp
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :special-members:
+.. automodapi:: pylimer_tools_cpp
+   :inherited-members:
+   :no-inheritance-diagram:
+   :include-all-objects:
    
-Submodules
-----------
+.. Submodules
+.. ----------
 
-.. autosummary::
-   :toctree: _autosummary
-   :template: custom-module-template.rst
-   :recursive:
+.. .. autosummary::
+..    :toctree: _autosummary
+..    :template: custom-module-template.rst
+..    :recursive:

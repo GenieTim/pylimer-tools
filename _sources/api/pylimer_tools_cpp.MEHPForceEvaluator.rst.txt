@@ -1,0 +1,29 @@
+MEHPForceEvaluator
+==================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: MEHPForceEvaluator
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~MEHPForceEvaluator.is_2d
+      ~MEHPForceEvaluator.network
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~MEHPForceEvaluator.evaluate_stress_contribution
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: is_2d
+   .. autoattribute:: network
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: evaluate_stress_contribution

@@ -1,0 +1,29 @@
+NonGaussianSpringForceEvaluator
+===============================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: NonGaussianSpringForceEvaluator
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~NonGaussianSpringForceEvaluator.is_2d
+      ~NonGaussianSpringForceEvaluator.network
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~NonGaussianSpringForceEvaluator.evaluate_stress_contribution
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: is_2d
+   .. autoattribute:: network
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: evaluate_stress_contribution

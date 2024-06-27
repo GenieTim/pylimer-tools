@@ -1,0 +1,73 @@
+AtomStyle
+=========
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: AtomStyle
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~AtomStyle.ANGLE
+      ~AtomStyle.ATOMIC
+      ~AtomStyle.BODY
+      ~AtomStyle.BOND
+      ~AtomStyle.BPM_SPHERE
+      ~AtomStyle.CHARGE
+      ~AtomStyle.DIELECTRIC
+      ~AtomStyle.DIPOLE
+      ~AtomStyle.DPD
+      ~AtomStyle.EDPD
+      ~AtomStyle.ELECTRON
+      ~AtomStyle.ELLIPSOID
+      ~AtomStyle.FULL
+      ~AtomStyle.HYBRID
+      ~AtomStyle.LINE
+      ~AtomStyle.MDPD
+      ~AtomStyle.MOLECULAR
+      ~AtomStyle.NONE
+      ~AtomStyle.PERI
+      ~AtomStyle.SMD
+      ~AtomStyle.SPH
+      ~AtomStyle.SPHERE
+      ~AtomStyle.SPIN
+      ~AtomStyle.TDPD
+      ~AtomStyle.TEMPLATE
+      ~AtomStyle.TRI
+      ~AtomStyle.WAVEPACKET
+      ~AtomStyle.name
+      ~AtomStyle.value
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: ANGLE
+   .. autoattribute:: ATOMIC
+   .. autoattribute:: BODY
+   .. autoattribute:: BOND
+   .. autoattribute:: BPM_SPHERE
+   .. autoattribute:: CHARGE
+   .. autoattribute:: DIELECTRIC
+   .. autoattribute:: DIPOLE
+   .. autoattribute:: DPD
+   .. autoattribute:: EDPD
+   .. autoattribute:: ELECTRON
+   .. autoattribute:: ELLIPSOID
+   .. autoattribute:: FULL
+   .. autoattribute:: HYBRID
+   .. autoattribute:: LINE
+   .. autoattribute:: MDPD
+   .. autoattribute:: MOLECULAR
+   .. autoattribute:: NONE
+   .. autoattribute:: PERI
+   .. autoattribute:: SMD
+   .. autoattribute:: SPH
+   .. autoattribute:: SPHERE
+   .. autoattribute:: SPIN
+   .. autoattribute:: TDPD
+   .. autoattribute:: TEMPLATE
+   .. autoattribute:: TRI
+   .. autoattribute:: WAVEPACKET
+   .. autoattribute:: name
+   .. autoattribute:: value

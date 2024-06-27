@@ -1,0 +1,29 @@
+StructureSimplificationMode
+===========================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: StructureSimplificationMode
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~StructureSimplificationMode.ALL_ANDREI
+      ~StructureSimplificationMode.ALL_TIM
+      ~StructureSimplificationMode.INACTIVE_ONLY
+      ~StructureSimplificationMode.NO_SIMPLIFICATION
+      ~StructureSimplificationMode.X2F_ONLY
+      ~StructureSimplificationMode.name
+      ~StructureSimplificationMode.value
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: ALL_ANDREI
+   .. autoattribute:: ALL_TIM
+   .. autoattribute:: INACTIVE_ONLY
+   .. autoattribute:: NO_SIMPLIFICATION
+   .. autoattribute:: X2F_ONLY
+   .. autoattribute:: name
+   .. autoattribute:: value

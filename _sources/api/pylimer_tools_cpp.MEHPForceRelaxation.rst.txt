@@ -1,0 +1,73 @@
+MEHPForceRelaxation
+===================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: MEHPForceRelaxation
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~MEHPForceRelaxation.assume_box_large_enough
+      ~MEHPForceRelaxation.config_rerun_epsilon
+      ~MEHPForceRelaxation.config_step_output
+      ~MEHPForceRelaxation.get_active_chains
+      ~MEHPForceRelaxation.get_average_spring_length
+      ~MEHPForceRelaxation.get_crosslinker_universe
+      ~MEHPForceRelaxation.get_dangling_weight_fraction
+      ~MEHPForceRelaxation.get_default_nr_of_chains
+      ~MEHPForceRelaxation.get_default_r0_square
+      ~MEHPForceRelaxation.get_effective_functionality_of_atoms
+      ~MEHPForceRelaxation.get_exit_reason
+      ~MEHPForceRelaxation.get_force
+      ~MEHPForceRelaxation.get_gamma_factor
+      ~MEHPForceRelaxation.get_ids_of_active_nodes
+      ~MEHPForceRelaxation.get_nr_of_active_nodes
+      ~MEHPForceRelaxation.get_nr_of_active_springs
+      ~MEHPForceRelaxation.get_nr_of_iterations
+      ~MEHPForceRelaxation.get_nr_of_nodes
+      ~MEHPForceRelaxation.get_nr_of_springs
+      ~MEHPForceRelaxation.get_pressure
+      ~MEHPForceRelaxation.get_residual_norm
+      ~MEHPForceRelaxation.get_residuals
+      ~MEHPForceRelaxation.get_soluble_weight_fraction
+      ~MEHPForceRelaxation.get_spring_distances
+      ~MEHPForceRelaxation.get_spring_lengths
+      ~MEHPForceRelaxation.get_stress_tensor
+      ~MEHPForceRelaxation.requires_another_run
+      ~MEHPForceRelaxation.run_force_relaxation
+      ~MEHPForceRelaxation.set_force_evaluator
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: assume_box_large_enough
+   .. automethod:: config_rerun_epsilon
+   .. automethod:: config_step_output
+   .. automethod:: get_active_chains
+   .. automethod:: get_average_spring_length
+   .. automethod:: get_crosslinker_universe
+   .. automethod:: get_dangling_weight_fraction
+   .. automethod:: get_default_nr_of_chains
+   .. automethod:: get_default_r0_square
+   .. automethod:: get_effective_functionality_of_atoms
+   .. automethod:: get_exit_reason
+   .. automethod:: get_force
+   .. automethod:: get_gamma_factor
+   .. automethod:: get_ids_of_active_nodes
+   .. automethod:: get_nr_of_active_nodes
+   .. automethod:: get_nr_of_active_springs
+   .. automethod:: get_nr_of_iterations
+   .. automethod:: get_nr_of_nodes
+   .. automethod:: get_nr_of_springs
+   .. automethod:: get_pressure
+   .. automethod:: get_residual_norm
+   .. automethod:: get_residuals
+   .. automethod:: get_soluble_weight_fraction
+   .. automethod:: get_spring_distances
+   .. automethod:: get_spring_lengths
+   .. automethod:: get_stress_tensor
+   .. automethod:: requires_another_run
+   .. automethod:: run_force_relaxation
+   .. automethod:: set_force_evaluator

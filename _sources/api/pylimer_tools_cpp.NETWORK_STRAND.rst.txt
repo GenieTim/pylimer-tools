@@ -1,0 +1,6 @@
+NETWORK_STRAND
+==============
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autodata:: NETWORK_STRAND

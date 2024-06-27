@@ -1,0 +1,29 @@
+MoleculeType
+============
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: MoleculeType
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~MoleculeType.DANGLING_CHAIN
+      ~MoleculeType.FREE_CHAIN
+      ~MoleculeType.NETWORK_STRAND
+      ~MoleculeType.PRIMARY_LOOP
+      ~MoleculeType.UNDEFINED
+      ~MoleculeType.name
+      ~MoleculeType.value
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: DANGLING_CHAIN
+   .. autoattribute:: FREE_CHAIN
+   .. autoattribute:: NETWORK_STRAND
+   .. autoattribute:: PRIMARY_LOOP
+   .. autoattribute:: UNDEFINED
+   .. autoattribute:: name
+   .. autoattribute:: value

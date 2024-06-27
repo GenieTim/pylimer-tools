@@ -1,0 +1,155 @@
+Universe
+========
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: Universe
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~Universe.add_angles
+      ~Universe.add_atoms
+      ~Universe.add_bonds
+      ~Universe.add_bonds_with_types
+      ~Universe.add_dihedral_angles
+      ~Universe.compute_bond_lengths
+      ~Universe.compute_dxs
+      ~Universe.compute_dys
+      ~Universe.compute_dzs
+      ~Universe.compute_end_to_end_distances
+      ~Universe.compute_mean_end_to_end_distance
+      ~Universe.compute_mean_square_end_to_end_distance
+      ~Universe.compute_mean_strand_length
+      ~Universe.compute_number_average_molecular_weight
+      ~Universe.compute_polydispersity_index
+      ~Universe.compute_temperature
+      ~Universe.compute_total_mass
+      ~Universe.compute_weight_average_molecular_weight
+      ~Universe.compute_weight_fractions
+      ~Universe.count_atom_types
+      ~Universe.count_atoms_in_skin_distance
+      ~Universe.detect_angles
+      ~Universe.detect_dihedral_angles
+      ~Universe.determine_effective_functionality_per_type
+      ~Universe.determine_functionality_per_type
+      ~Universe.find_loops
+      ~Universe.find_minimal_order_loop_from
+      ~Universe.get_angles
+      ~Universe.get_atom
+      ~Universe.get_atom_by_vertex_id
+      ~Universe.get_atom_id_by_vertex_idx
+      ~Universe.get_atom_types
+      ~Universe.get_atoms
+      ~Universe.get_atoms_by_degree
+      ~Universe.get_atoms_by_type
+      ~Universe.get_atoms_connected_to
+      ~Universe.get_atoms_connected_to_vertex
+      ~Universe.get_bonds
+      ~Universe.get_box
+      ~Universe.get_chains_with_crosslinker
+      ~Universe.get_clusters
+      ~Universe.get_edges
+      ~Universe.get_masses
+      ~Universe.get_molecules
+      ~Universe.get_network_of_crosslinker
+      ~Universe.get_nr_of_angles
+      ~Universe.get_nr_of_atoms
+      ~Universe.get_nr_of_bonds
+      ~Universe.get_nr_of_bonds_of_atom
+      ~Universe.get_nr_of_bonds_of_vertex
+      ~Universe.get_nr_of_dihedral_angles
+      ~Universe.get_timestep
+      ~Universe.get_vertex_idx_by_atom_id
+      ~Universe.get_volume
+      ~Universe.has_infinite_strand
+      ~Universe.hash_angle_type
+      ~Universe.hash_dihedral_angle_type
+      ~Universe.remove_all_angles
+      ~Universe.remove_all_dihedral_angles
+      ~Universe.remove_atoms
+      ~Universe.remove_bonds
+      ~Universe.remove_bonds_by_type
+      ~Universe.replace_atom
+      ~Universe.resample_velocities
+      ~Universe.set_box
+      ~Universe.set_box_lengths
+      ~Universe.set_masses
+      ~Universe.set_timestep
+      ~Universe.set_vertex_property
+      ~Universe.simplify
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: add_angles
+   .. automethod:: add_atoms
+   .. automethod:: add_bonds
+   .. automethod:: add_bonds_with_types
+   .. automethod:: add_dihedral_angles
+   .. automethod:: compute_bond_lengths
+   .. automethod:: compute_dxs
+   .. automethod:: compute_dys
+   .. automethod:: compute_dzs
+   .. automethod:: compute_end_to_end_distances
+   .. automethod:: compute_mean_end_to_end_distance
+   .. automethod:: compute_mean_square_end_to_end_distance
+   .. automethod:: compute_mean_strand_length
+   .. automethod:: compute_number_average_molecular_weight
+   .. automethod:: compute_polydispersity_index
+   .. automethod:: compute_temperature
+   .. automethod:: compute_total_mass
+   .. automethod:: compute_weight_average_molecular_weight
+   .. automethod:: compute_weight_fractions
+   .. automethod:: count_atom_types
+   .. automethod:: count_atoms_in_skin_distance
+   .. automethod:: detect_angles
+   .. automethod:: detect_dihedral_angles
+   .. automethod:: determine_effective_functionality_per_type
+   .. automethod:: determine_functionality_per_type
+   .. automethod:: find_loops
+   .. automethod:: find_minimal_order_loop_from
+   .. automethod:: get_angles
+   .. automethod:: get_atom
+   .. automethod:: get_atom_by_vertex_id
+   .. automethod:: get_atom_id_by_vertex_idx
+   .. automethod:: get_atom_types
+   .. automethod:: get_atoms
+   .. automethod:: get_atoms_by_degree
+   .. automethod:: get_atoms_by_type
+   .. automethod:: get_atoms_connected_to
+   .. automethod:: get_atoms_connected_to_vertex
+   .. automethod:: get_bonds
+   .. automethod:: get_box
+   .. automethod:: get_chains_with_crosslinker
+   .. automethod:: get_clusters
+   .. automethod:: get_edges
+   .. automethod:: get_masses
+   .. automethod:: get_molecules
+   .. automethod:: get_network_of_crosslinker
+   .. automethod:: get_nr_of_angles
+   .. automethod:: get_nr_of_atoms
+   .. automethod:: get_nr_of_bonds
+   .. automethod:: get_nr_of_bonds_of_atom
+   .. automethod:: get_nr_of_bonds_of_vertex
+   .. automethod:: get_nr_of_dihedral_angles
+   .. automethod:: get_timestep
+   .. automethod:: get_vertex_idx_by_atom_id
+   .. automethod:: get_volume
+   .. automethod:: has_infinite_strand
+   .. automethod:: hash_angle_type
+   .. automethod:: hash_dihedral_angle_type
+   .. automethod:: remove_all_angles
+   .. automethod:: remove_all_dihedral_angles
+   .. automethod:: remove_atoms
+   .. automethod:: remove_bonds
+   .. automethod:: remove_bonds_by_type
+   .. automethod:: replace_atom
+   .. automethod:: resample_velocities
+   .. automethod:: set_box
+   .. automethod:: set_box_lengths
+   .. automethod:: set_masses
+   .. automethod:: set_timestep
+   .. automethod:: set_vertex_property
+   .. automethod:: simplify

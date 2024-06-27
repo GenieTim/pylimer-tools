@@ -1,0 +1,6 @@
+FREE_CHAIN
+==========
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autodata:: FREE_CHAIN

@@ -1,0 +1,6 @@
+DANGLING_CHAIN
+==============
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autodata:: DANGLING_CHAIN

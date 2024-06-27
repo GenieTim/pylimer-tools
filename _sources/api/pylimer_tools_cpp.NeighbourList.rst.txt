@@ -1,0 +1,19 @@
+NeighbourList
+=============
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: NeighbourList
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~NeighbourList.get_atoms_close_to
+      ~NeighbourList.remove_atom
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: get_atoms_close_to
+   .. automethod:: remove_atom

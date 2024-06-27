@@ -1,0 +1,37 @@
+SimplifiedNetwork
+=================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: SimplifiedNetwork
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~SimplifiedNetwork.box_lengths
+      ~SimplifiedNetwork.coordinates
+      ~SimplifiedNetwork.nr_of_crosslinks
+      ~SimplifiedNetwork.nr_of_nodes
+      ~SimplifiedNetwork.nr_of_springs
+      ~SimplifiedNetwork.old_atom_ids
+      ~SimplifiedNetwork.spring_coordinate_index_a
+      ~SimplifiedNetwork.spring_coordinate_index_b
+      ~SimplifiedNetwork.spring_index_a
+      ~SimplifiedNetwork.spring_index_b
+      ~SimplifiedNetwork.volume
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: box_lengths
+   .. autoattribute:: coordinates
+   .. autoattribute:: nr_of_crosslinks
+   .. autoattribute:: nr_of_nodes
+   .. autoattribute:: nr_of_springs
+   .. autoattribute:: old_atom_ids
+   .. autoattribute:: spring_coordinate_index_a
+   .. autoattribute:: spring_coordinate_index_b
+   .. autoattribute:: spring_index_a
+   .. autoattribute:: spring_index_b
+   .. autoattribute:: volume

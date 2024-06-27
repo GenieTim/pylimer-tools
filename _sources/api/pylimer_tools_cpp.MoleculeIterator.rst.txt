@@ -1,0 +1,7 @@
+MoleculeIterator
+================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: MoleculeIterator
+   :show-inheritance:

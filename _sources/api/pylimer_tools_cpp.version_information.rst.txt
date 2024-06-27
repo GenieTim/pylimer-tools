@@ -1,0 +1,6 @@
+version_information
+===================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autofunction:: version_information

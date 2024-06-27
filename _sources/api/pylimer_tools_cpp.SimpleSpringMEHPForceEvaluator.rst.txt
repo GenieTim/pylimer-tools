@@ -1,0 +1,29 @@
+SimpleSpringMEHPForceEvaluator
+==============================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: SimpleSpringMEHPForceEvaluator
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~SimpleSpringMEHPForceEvaluator.is_2d
+      ~SimpleSpringMEHPForceEvaluator.network
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~SimpleSpringMEHPForceEvaluator.evaluate_stress_contribution
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: is_2d
+   .. autoattribute:: network
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: evaluate_stress_contribution

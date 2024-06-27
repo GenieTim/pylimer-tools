@@ -1,0 +1,141 @@
+MEHPForceBalance
+================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: MEHPForceBalance
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~MEHPForceBalance.network
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~MEHPForceBalance.add_sliplinks
+      ~MEHPForceBalance.add_sliplinks_based_on_cycles
+      ~MEHPForceBalance.config_assume_box_large_enough
+      ~MEHPForceBalance.config_mean_bond_length
+      ~MEHPForceBalance.config_spring_constant
+      ~MEHPForceBalance.config_step_output
+      ~MEHPForceBalance.construct_with_random_sliplinks
+      ~MEHPForceBalance.deform_to
+      ~MEHPForceBalance.evaluate_partial_spring_distance
+      ~MEHPForceBalance.evaluate_partial_spring_distance_from
+      ~MEHPForceBalance.evaluate_partial_spring_distance_to
+      ~MEHPForceBalance.get_average_spring_length
+      ~MEHPForceBalance.get_crosslinker_universe
+      ~MEHPForceBalance.get_current_partial_spring_lengths
+      ~MEHPForceBalance.get_current_partial_spring_vectors
+      ~MEHPForceBalance.get_current_spring_vectors
+      ~MEHPForceBalance.get_dangling_weight_fraction
+      ~MEHPForceBalance.get_default_mean_bond_length
+      ~MEHPForceBalance.get_default_nr_of_chains
+      ~MEHPForceBalance.get_displacement_residual_norm
+      ~MEHPForceBalance.get_displacements
+      ~MEHPForceBalance.get_effective_functionality_of_atoms
+      ~MEHPForceBalance.get_exit_reason
+      ~MEHPForceBalance.get_force_magnitude_vector
+      ~MEHPForceBalance.get_force_on
+      ~MEHPForceBalance.get_gamma_factor
+      ~MEHPForceBalance.get_gamma_factor_using_partial_springs
+      ~MEHPForceBalance.get_ids_of_active_nodes
+      ~MEHPForceBalance.get_neighbour_link_indices
+      ~MEHPForceBalance.get_nr_of_active_nodes
+      ~MEHPForceBalance.get_nr_of_active_partial_springs
+      ~MEHPForceBalance.get_nr_of_active_springs
+      ~MEHPForceBalance.get_nr_of_atoms
+      ~MEHPForceBalance.get_nr_of_bonds
+      ~MEHPForceBalance.get_nr_of_extra_atoms
+      ~MEHPForceBalance.get_nr_of_extra_bonds
+      ~MEHPForceBalance.get_nr_of_intra_chain_sliplinks
+      ~MEHPForceBalance.get_nr_of_iterations
+      ~MEHPForceBalance.get_nr_of_nodes
+      ~MEHPForceBalance.get_nr_of_springs
+      ~MEHPForceBalance.get_overall_spring_lengths
+      ~MEHPForceBalance.get_pressure
+      ~MEHPForceBalance.get_soluble_weight_fraction
+      ~MEHPForceBalance.get_spring_partitions
+      ~MEHPForceBalance.get_springpartition_indices_of_sliplink
+      ~MEHPForceBalance.get_stress_on
+      ~MEHPForceBalance.get_stress_tensor
+      ~MEHPForceBalance.get_stress_tensor_link_based
+      ~MEHPForceBalance.inspect_displacement_to_mean_position_update
+      ~MEHPForceBalance.inspect_parametrisation_optimsation_for_link
+      ~MEHPForceBalance.inspect_spring_partition_update
+      ~MEHPForceBalance.move_sliplinks_to_their_best_branch
+      ~MEHPForceBalance.randomly_add_sliplinks
+      ~MEHPForceBalance.run_force_relaxation
+      ~MEHPForceBalance.set_displacements
+      ~MEHPForceBalance.set_spring_contour_lengths
+      ~MEHPForceBalance.set_spring_partitions
+      ~MEHPForceBalance.swap_sliplinks_incl_xlinks
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: network
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: add_sliplinks
+   .. automethod:: add_sliplinks_based_on_cycles
+   .. automethod:: config_assume_box_large_enough
+   .. automethod:: config_mean_bond_length
+   .. automethod:: config_spring_constant
+   .. automethod:: config_step_output
+   .. automethod:: construct_with_random_sliplinks
+   .. automethod:: deform_to
+   .. automethod:: evaluate_partial_spring_distance
+   .. automethod:: evaluate_partial_spring_distance_from
+   .. automethod:: evaluate_partial_spring_distance_to
+   .. automethod:: get_average_spring_length
+   .. automethod:: get_crosslinker_universe
+   .. automethod:: get_current_partial_spring_lengths
+   .. automethod:: get_current_partial_spring_vectors
+   .. automethod:: get_current_spring_vectors
+   .. automethod:: get_dangling_weight_fraction
+   .. automethod:: get_default_mean_bond_length
+   .. automethod:: get_default_nr_of_chains
+   .. automethod:: get_displacement_residual_norm
+   .. automethod:: get_displacements
+   .. automethod:: get_effective_functionality_of_atoms
+   .. automethod:: get_exit_reason
+   .. automethod:: get_force_magnitude_vector
+   .. automethod:: get_force_on
+   .. automethod:: get_gamma_factor
+   .. automethod:: get_gamma_factor_using_partial_springs
+   .. automethod:: get_ids_of_active_nodes
+   .. automethod:: get_neighbour_link_indices
+   .. automethod:: get_nr_of_active_nodes
+   .. automethod:: get_nr_of_active_partial_springs
+   .. automethod:: get_nr_of_active_springs
+   .. automethod:: get_nr_of_atoms
+   .. automethod:: get_nr_of_bonds
+   .. automethod:: get_nr_of_extra_atoms
+   .. automethod:: get_nr_of_extra_bonds
+   .. automethod:: get_nr_of_intra_chain_sliplinks
+   .. automethod:: get_nr_of_iterations
+   .. automethod:: get_nr_of_nodes
+   .. automethod:: get_nr_of_springs
+   .. automethod:: get_overall_spring_lengths
+   .. automethod:: get_pressure
+   .. automethod:: get_soluble_weight_fraction
+   .. automethod:: get_spring_partitions
+   .. automethod:: get_springpartition_indices_of_sliplink
+   .. automethod:: get_stress_on
+   .. automethod:: get_stress_tensor
+   .. automethod:: get_stress_tensor_link_based
+   .. automethod:: inspect_displacement_to_mean_position_update
+   .. automethod:: inspect_parametrisation_optimsation_for_link
+   .. automethod:: inspect_spring_partition_update
+   .. automethod:: move_sliplinks_to_their_best_branch
+   .. automethod:: randomly_add_sliplinks
+   .. automethod:: run_force_relaxation
+   .. automethod:: set_displacements
+   .. automethod:: set_spring_contour_lengths
+   .. automethod:: set_spring_partitions
+   .. automethod:: swap_sliplinks_incl_xlinks
