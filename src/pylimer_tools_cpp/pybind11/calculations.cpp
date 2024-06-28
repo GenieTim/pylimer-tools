@@ -662,7 +662,8 @@ init_pylimer_bound_calc(py::module_& m)
          const mehp::LinkSwappingMode allowSlipLinksToPassEachOther,
          const int swappingFrequency,
          const double oneOverSpringPartitionUpperLimit,
-         const int nrOfCrosslinkSwapsAllowedPerSliplink) {
+         const int nrOfCrosslinkSwapsAllowedPerSliplink,
+         const bool disableSlipping) {
         return sim.runForceRelaxation(
           maxNrOfSteps,
           xtol,
@@ -674,6 +675,7 @@ init_pylimer_bound_calc(py::module_& m)
           swappingFrequency,
           oneOverSpringPartitionUpperLimit,
           nrOfCrosslinkSwapsAllowedPerSliplink,
+          disableSlipping,
           []() { return PyErr_CheckSignals() != 0; },
           []() { throw py::error_already_set(); });
       },
@@ -692,7 +694,8 @@ init_pylimer_bound_calc(py::module_& m)
           :param allow_sliplinks_to_pass_each_other: Whether slip-links can pass each other.
           :param swapping_frequency: How often slip-links attempt to swap.
           :param one_over_spring_partition_upper_limit: Super-secret parameter. Use 1, gradually increase (and then -1) if you want to publish.
-          :param nr_of_crosslink_swaps_allowed_per_sliplink: Use to stear whether slip-links can cross cross-links when swapping is enabled.
+          :param nr_of_crosslink_swaps_allowed_per_sliplink: Use to steer whether slip-links can cross cross-links when swapping is enabled.
+          :param disable_slipping: Whether slip-links should be prohibited from slipping.
           )pbdoc",
       py::arg("max_nr_of_steps") = 250000,
       py::arg("x_tolerance") = 1e-12,
@@ -705,7 +708,8 @@ init_pylimer_bound_calc(py::module_& m)
         mehp::LinkSwappingMode::NO_SWAPPING,
       py::arg("swapping_frequency") = 10,
       py::arg("one_over_spring_partition_upper_limit") = 1.0,
-      py::arg("nr_of_crosslink_swaps_allowed_per_sliplink") = -1)
+      py::arg("nr_of_crosslink_swaps_allowed_per_sliplink") = -1,
+      py::arg("disable_slipping") = false)
     .def("deform_to",
          &mehp::MEHPForceBalance::deformTo,
          R"pbdoc(

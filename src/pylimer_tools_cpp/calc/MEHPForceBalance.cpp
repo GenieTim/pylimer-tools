@@ -52,6 +52,7 @@ namespace calc {
       const int swappingFrequency,
       const double oneOverSpringPartitionUpperLimit,
       const int nrOfCrosslinkSwapsAllowedPerSliplink,
+      const bool disableSlipping,
       const std::function<bool()>& shouldInterrupt,
       const std::function<void()>& cleanupInterrupt)
     {
@@ -174,14 +175,16 @@ namespace calc {
           //           << " / " << net.nrOfLinks << std::endl;
           int innerIterationsDone = 0;
           do {
-            double r2 =
-              this->updateSpringPartition(this->initialConfig,
-                                          this->currentDisplacements,
-                                          this->currentSpringPartitionsVec,
-                                          oneOverSpringPartitions,
-                                          link_idx,
-                                          oneOverSpringPartitionUpperLimit,
-                                          allowSlipLinksToPassEachOther);
+            if (!disableSlipping) {
+              double r2 =
+                this->updateSpringPartition(this->initialConfig,
+                                            this->currentDisplacements,
+                                            this->currentSpringPartitionsVec,
+                                            oneOverSpringPartitions,
+                                            link_idx,
+                                            oneOverSpringPartitionUpperLimit,
+                                            allowSlipLinksToPassEachOther);
+            }
             double displacementDone =
               this->displaceToMeanPosition(this->initialConfig,
                                            this->currentDisplacements,
