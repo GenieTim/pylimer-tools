@@ -453,7 +453,7 @@ namespace calc {
         const int swappingFrequency,
         const double oneOverSpringPartitionUpperLimit,
         const int nrOfCrosslinkSwapsAllowedPerSliplink,
-        const bool disableSlipping = false,
+        const bool disableSlipping,
         const std::function<bool()>& shouldInterrupt,
         const std::function<void()>& cleanupInterrupt);
 
