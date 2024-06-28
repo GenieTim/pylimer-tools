@@ -413,7 +413,8 @@ namespace calc {
           LinkSwappingMode::NO_SWAPPING,
         const int swappingFrequency = 10,
         const double oneOverSpringPartitionUpperLimit = 1.0,
-        const int nrOfCrosslinkSwapsAllowedPerSliplink = -1)
+        const int nrOfCrosslinkSwapsAllowedPerSliplink = -1,
+        const bool disableSlipping = false)
       {
         this->runForceRelaxation(
           maxNrOfSteps,
@@ -426,6 +427,7 @@ namespace calc {
           swappingFrequency,
           oneOverSpringPartitionUpperLimit,
           nrOfCrosslinkSwapsAllowedPerSliplink,
+          disableSlipping,
           []() { return false; },
           []() {});
       }
@@ -451,6 +453,7 @@ namespace calc {
         const int swappingFrequency,
         const double oneOverSpringPartitionUpperLimit,
         const int nrOfCrosslinkSwapsAllowedPerSliplink,
+        const bool disableSlipping = false,
         const std::function<bool()>& shouldInterrupt,
         const std::function<void()>& cleanupInterrupt);
 
