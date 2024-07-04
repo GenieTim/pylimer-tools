@@ -1,0 +1,6 @@
+randomly_sample_entanglements
+=============================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autofunction:: randomly_sample_entanglements

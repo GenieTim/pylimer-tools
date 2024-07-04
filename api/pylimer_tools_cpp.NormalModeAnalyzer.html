@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="LazyUniverseSequenceIterator" href="pylimer_tools_cpp.LazyUniverseSequenceIterator.html" /><link rel="prev" title="DumpFileReader" href="pylimer_tools_cpp.DumpFileReader.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="OutputConfiguration" href="pylimer_tools_cpp.OutputConfiguration.html" /><link rel="prev" title="NonGaussianSpringForceEvaluator" href="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html" />
 
     <!-- Generated with Sphinx 7.3.7 and Furo 2024.05.06 -->
-        <title>ExitReason - PylimerTools documentation</title>
+        <title>NormalModeAnalyzer - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=387cc868" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
@@ -251,7 +251,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DataFileReader.html">DataFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DataFileWriter.html">DataFileWriter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.DumpFileReader.html">DumpFileReader</a></li>
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">ExitReason</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.ExitReason.html">ExitReason</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.LazyUniverseSequenceIterator.html">LazyUniverseSequenceIterator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.LinkSwappingMode.html">LinkSwappingMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MCUniverseGenerator.html">MCUniverseGenerator</a></li>
@@ -264,7 +264,7 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.MoleculeType.html">MoleculeType</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NeighbourList.html">NeighbourList</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">NonGaussianSpringForceEvaluator</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.NormalModeAnalyzer.html">NormalModeAnalyzer</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">NormalModeAnalyzer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.OutputConfiguration.html">OutputConfiguration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimpleSpringMEHPForceEvaluator.html">SimpleSpringMEHPForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.SimplifiedBalanceNetwork.html">SimplifiedBalanceNetwork</a></li>
@@ -301,7 +301,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/api/pylimer_tools_cpp.ExitReason.rst.txt" title="View this page">
+  <a class="muted-link" href="../_sources/api/pylimer_tools_cpp.NormalModeAnalyzer.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -321,90 +321,101 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="exitreason">
-<h1>ExitReason<a class="headerlink" href="#exitreason" title="Link to this heading">¶</a></h1>
+          <section id="normalmodeanalyzer">
+<h1>NormalModeAnalyzer<a class="headerlink" href="#normalmodeanalyzer" title="Link to this heading">¶</a></h1>
 <dl class="py class">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.ExitReason">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">ExitReason</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.ExitReason" title="pylimer_tools_cpp.ExitReason"><span class="pre">pylimer_tools_cpp.ExitReason</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.ExitReason" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeAnalyzer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">NormalModeAnalyzer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">spring_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spring_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
-<p>Members:</p>
-<p>UNSET</p>
-<p>MAX_STEPS</p>
-<p>F_TOLERANCE</p>
-<p>X_TOLERANCE</p>
-<p>FAILURE</p>
-<p>OTHER</p>
-<p class="rubric">Attributes Summary</p>
+<p>Initialize NormalModeAnalyzer</p>
+<p class="rubric">Methods Summary</p>
 <div class="table-wrapper autosummary longtable docutils container">
 <table class="autosummary longtable docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.FAILURE" title="pylimer_tools_cpp.ExitReason.FAILURE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">FAILURE</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus" title="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_loss_modulus</span></code></a>(self, omega)</p></td>
+<td><p>Evaluate loss modulus</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.F_TOLERANCE" title="pylimer_tools_cpp.ExitReason.F_TOLERANCE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">F_TOLERANCE</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus" title="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_storage_modulus</span></code></a>(self, omega)</p></td>
+<td><p>Evaluate storage modulus</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.MAX_STEPS" title="pylimer_tools_cpp.ExitReason.MAX_STEPS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">MAX_STEPS</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation" title="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_stress_autocorrelation</span></code></a>(self, t)</p></td>
+<td><p>Evaluate stress autocorrelation</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.OTHER" title="pylimer_tools_cpp.ExitReason.OTHER"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OTHER</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.find_all_eigenvalues" title="pylimer_tools_cpp.NormalModeAnalyzer.find_all_eigenvalues"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_all_eigenvalues</span></code></a>(self)</p></td>
+<td><p>Find all eigenvalues using a dense solver</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.UNSET" title="pylimer_tools_cpp.ExitReason.UNSET"><code class="xref py py-obj docutils literal notranslate"><span class="pre">UNSET</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.find_sparse_eigenvalues" title="pylimer_tools_cpp.NormalModeAnalyzer.find_sparse_eigenvalues"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_sparse_eigenvalues</span></code></a>(self, nr_of_eigenvalues)</p></td>
+<td><p>Find the <cite>k</cite> smallest eigenvalues using a sparse solver</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.X_TOLERANCE" title="pylimer_tools_cpp.ExitReason.X_TOLERANCE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">X_TOLERANCE</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvalues" title="pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvalues"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_eigenvalues</span></code></a>(self)</p></td>
+<td><p>Get eigenvalues</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.name" title="pylimer_tools_cpp.ExitReason.name"><code class="xref py py-obj docutils literal notranslate"><span class="pre">name</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvectors" title="pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvectors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_eigenvectors</span></code></a>(self)</p></td>
+<td><p>Get eigenvectors</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.value" title="pylimer_tools_cpp.ExitReason.value"><code class="xref py py-obj docutils literal notranslate"><span class="pre">value</span></code></a></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues" title="pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_eigenvalues</span></code></a>(self, arg0)</p></td>
+<td><p>Set eigenvalues</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors" title="pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_eigenvectors</span></code></a>(self, arg0)</p></td>
+<td><p>Set eigenvectors</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p class="rubric">Attributes Documentation</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.ExitReason.FAILURE">
-<span class="sig-name descname"><span class="pre">FAILURE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ExitReason.FAILURE:</span> <span class="pre">5&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.ExitReason.FAILURE" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<p class="rubric">Methods Documentation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus">
+<span class="sig-name descname"><span class="pre">evaluate_loss_modulus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus" title="Link to this definition">¶</a></dt>
+<dd><p>Evaluate loss modulus</p>
+</dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.ExitReason.F_TOLERANCE">
-<span class="sig-name descname"><span class="pre">F_TOLERANCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ExitReason.F_TOLERANCE:</span> <span class="pre">1&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.ExitReason.F_TOLERANCE" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus">
+<span class="sig-name descname"><span class="pre">evaluate_storage_modulus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus" title="Link to this definition">¶</a></dt>
+<dd><p>Evaluate storage modulus</p>
+</dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.ExitReason.MAX_STEPS">
-<span class="sig-name descname"><span class="pre">MAX_STEPS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ExitReason.MAX_STEPS:</span> <span class="pre">3&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.ExitReason.MAX_STEPS" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation">
+<span class="sig-name descname"><span class="pre">evaluate_stress_autocorrelation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">t</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation" title="Link to this definition">¶</a></dt>
+<dd><p>Evaluate stress autocorrelation</p>
+</dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.ExitReason.OTHER">
-<span class="sig-name descname"><span class="pre">OTHER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ExitReason.OTHER:</span> <span class="pre">7&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.ExitReason.OTHER" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeAnalyzer.find_all_eigenvalues">
+<span class="sig-name descname"><span class="pre">find_all_eigenvalues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer.find_all_eigenvalues" title="Link to this definition">¶</a></dt>
+<dd><p>Find all eigenvalues using a dense solver</p>
+</dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.ExitReason.UNSET">
-<span class="sig-name descname"><span class="pre">UNSET</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ExitReason.UNSET:</span> <span class="pre">0&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.ExitReason.UNSET" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeAnalyzer.find_sparse_eigenvalues">
+<span class="sig-name descname"><span class="pre">find_sparse_eigenvalues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">nr_of_eigenvalues</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer.find_sparse_eigenvalues" title="Link to this definition">¶</a></dt>
+<dd><p>Find the <cite>k</cite> smallest eigenvalues using a sparse solver</p>
+</dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.ExitReason.X_TOLERANCE">
-<span class="sig-name descname"><span class="pre">X_TOLERANCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;ExitReason.X_TOLERANCE:</span> <span class="pre">2&gt;</span></em><a class="headerlink" href="#pylimer_tools_cpp.ExitReason.X_TOLERANCE" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvalues">
+<span class="sig-name descname"><span class="pre">get_eigenvalues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvalues" title="Link to this definition">¶</a></dt>
+<dd><p>Get eigenvalues</p>
+</dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.ExitReason.name">
-<span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#pylimer_tools_cpp.ExitReason.name" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvectors">
+<span class="sig-name descname"><span class="pre">get_eigenvectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">n</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvectors" title="Link to this definition">¶</a></dt>
+<dd><p>Get eigenvectors</p>
+</dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.ExitReason.value">
-<span class="sig-name descname"><span class="pre">value</span></span><a class="headerlink" href="#pylimer_tools_cpp.ExitReason.value" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues">
+<span class="sig-name descname"><span class="pre">set_eigenvalues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues" title="Link to this definition">¶</a></dt>
+<dd><p>Set eigenvalues</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors">
+<span class="sig-name descname"><span class="pre">set_eigenvectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">n</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors" title="Link to this definition">¶</a></dt>
+<dd><p>Set eigenvectors</p>
+</dd></dl>
 
 </dd></dl>
 
@@ -415,23 +426,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="pylimer_tools_cpp.LazyUniverseSequenceIterator.html">
+          <a class="next-page" href="pylimer_tools_cpp.OutputConfiguration.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">LazyUniverseSequenceIterator</div>
+                <div class="title">OutputConfiguration</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="pylimer_tools_cpp.DumpFileReader.html">
+          <a class="prev-page" href="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">DumpFileReader</div>
+                <div class="title">NonGaussianSpringForceEvaluator</div>
                 
               </div>
             </a>
@@ -464,16 +475,17 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">ExitReason</a><ul>
-<li><a class="reference internal" href="#pylimer_tools_cpp.ExitReason"><code class="docutils literal notranslate"><span class="pre">ExitReason</span></code></a><ul>
-<li><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.FAILURE"><code class="docutils literal notranslate"><span class="pre">ExitReason.FAILURE</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.F_TOLERANCE"><code class="docutils literal notranslate"><span class="pre">ExitReason.F_TOLERANCE</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.MAX_STEPS"><code class="docutils literal notranslate"><span class="pre">ExitReason.MAX_STEPS</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.OTHER"><code class="docutils literal notranslate"><span class="pre">ExitReason.OTHER</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.UNSET"><code class="docutils literal notranslate"><span class="pre">ExitReason.UNSET</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.X_TOLERANCE"><code class="docutils literal notranslate"><span class="pre">ExitReason.X_TOLERANCE</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.name"><code class="docutils literal notranslate"><span class="pre">ExitReason.name</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.ExitReason.value"><code class="docutils literal notranslate"><span class="pre">ExitReason.value</span></code></a></li>
+<li><a class="reference internal" href="#">NormalModeAnalyzer</a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer"><code class="docutils literal notranslate"><span class="pre">NormalModeAnalyzer</span></code></a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus"><code class="docutils literal notranslate"><span class="pre">NormalModeAnalyzer.evaluate_loss_modulus()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus"><code class="docutils literal notranslate"><span class="pre">NormalModeAnalyzer.evaluate_storage_modulus()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation"><code class="docutils literal notranslate"><span class="pre">NormalModeAnalyzer.evaluate_stress_autocorrelation()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.find_all_eigenvalues"><code class="docutils literal notranslate"><span class="pre">NormalModeAnalyzer.find_all_eigenvalues()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.find_sparse_eigenvalues"><code class="docutils literal notranslate"><span class="pre">NormalModeAnalyzer.find_sparse_eigenvalues()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvalues"><code class="docutils literal notranslate"><span class="pre">NormalModeAnalyzer.get_eigenvalues()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvectors"><code class="docutils literal notranslate"><span class="pre">NormalModeAnalyzer.get_eigenvectors()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues"><code class="docutils literal notranslate"><span class="pre">NormalModeAnalyzer.set_eigenvalues()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors"><code class="docutils literal notranslate"><span class="pre">NormalModeAnalyzer.set_eigenvectors()</span></code></a></li>
 </ul>
 </li>
 </ul>

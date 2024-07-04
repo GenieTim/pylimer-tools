@@ -1,0 +1,6 @@
+do_random_walk
+==============
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autofunction:: do_random_walk

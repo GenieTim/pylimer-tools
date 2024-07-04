@@ -1,0 +1,33 @@
+NormalModeAnalyzer
+==================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: NormalModeAnalyzer
+   :show-inheritance:
+
+   .. rubric:: Methods Summary
+
+   .. autosummary::
+
+      ~NormalModeAnalyzer.evaluate_loss_modulus
+      ~NormalModeAnalyzer.evaluate_storage_modulus
+      ~NormalModeAnalyzer.evaluate_stress_autocorrelation
+      ~NormalModeAnalyzer.find_all_eigenvalues
+      ~NormalModeAnalyzer.find_sparse_eigenvalues
+      ~NormalModeAnalyzer.get_eigenvalues
+      ~NormalModeAnalyzer.get_eigenvectors
+      ~NormalModeAnalyzer.set_eigenvalues
+      ~NormalModeAnalyzer.set_eigenvectors
+
+   .. rubric:: Methods Documentation
+
+   .. automethod:: evaluate_loss_modulus
+   .. automethod:: evaluate_storage_modulus
+   .. automethod:: evaluate_stress_autocorrelation
+   .. automethod:: find_all_eigenvalues
+   .. automethod:: find_sparse_eigenvalues
+   .. automethod:: get_eigenvalues
+   .. automethod:: get_eigenvectors
+   .. automethod:: set_eigenvalues
+   .. automethod:: set_eigenvectors

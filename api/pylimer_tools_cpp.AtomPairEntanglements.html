@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Atom" href="pylimer_tools_cpp.Atom.html" /><link rel="prev" title="split_csv" href="pylimer_tools_cpp.split_csv.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="AtomStyle" href="pylimer_tools_cpp.AtomStyle.html" /><link rel="prev" title="Atom" href="pylimer_tools_cpp.Atom.html" />
 
     <!-- Generated with Sphinx 7.3.7 and Furo 2024.05.06 -->
-        <title>version_information - PylimerTools documentation</title>
+        <title>AtomPairEntanglements - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=387cc868" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
@@ -239,9 +239,9 @@
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.predict_gelation_point.html">predict_gelation_point</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements.html">randomly_sample_entanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.split_csv.html">split_csv</a></li>
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">version_information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.version_information.html">version_information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Atom.html">Atom</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AtomPairEntanglements.html">AtomPairEntanglements</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">AtomPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AtomStyle.html">AtomStyle</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AveFileReader.html">AveFileReader</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Box.html">Box</a></li>
@@ -301,7 +301,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/api/pylimer_tools_cpp.version_information.rst.txt" title="View this page">
+  <a class="muted-link" href="../_sources/api/pylimer_tools_cpp.AtomPairEntanglements.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -321,12 +321,39 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="version-information">
-<h1>version_information<a class="headerlink" href="#version-information" title="Link to this heading">¶</a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.version_information">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">version_information</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.version_information" title="Link to this definition">¶</a></dt>
-<dd><p>Returns  a string of the the current version, incl. git hash and date of compilation.</p>
+          <section id="atompairentanglements">
+<h1>AtomPairEntanglements<a class="headerlink" href="#atompairentanglements" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.AtomPairEntanglements">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">AtomPairEntanglements</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.AtomPairEntanglements" title="pylimer_tools_cpp.AtomPairEntanglements"><span class="pre">pylimer_tools_cpp.AtomPairEntanglements</span></a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools_cpp.AtomPairEntanglements" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pybind11_object</span></code></p>
+<p>Get an instance of this struct</p>
+<p class="rubric">Attributes Summary</p>
+<div class="table-wrapper autosummary longtable docutils container">
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.AtomPairEntanglements.pair_of_atom" title="pylimer_tools_cpp.AtomPairEntanglements.pair_of_atom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pair_of_atom</span></code></a></p></td>
+<td><p>An index in the pairs_of_atoms if the atom is part of a pair, -1 else.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.AtomPairEntanglements.pairs_of_atoms" title="pylimer_tools_cpp.AtomPairEntanglements.pairs_of_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pairs_of_atoms</span></code></a></p></td>
+<td><p>A list of pairs of atom ids that are close together and could be entanglements</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="rubric">Attributes Documentation</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.AtomPairEntanglements.pair_of_atom">
+<span class="sig-name descname"><span class="pre">pair_of_atom</span></span><a class="headerlink" href="#pylimer_tools_cpp.AtomPairEntanglements.pair_of_atom" title="Link to this definition">¶</a></dt>
+<dd><p>An index in the pairs_of_atoms if the atom is part of a pair, -1 else.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.AtomPairEntanglements.pairs_of_atoms">
+<span class="sig-name descname"><span class="pre">pairs_of_atoms</span></span><a class="headerlink" href="#pylimer_tools_cpp.AtomPairEntanglements.pairs_of_atoms" title="Link to this definition">¶</a></dt>
+<dd><p>A list of pairs of atom ids that are close together and could be entanglements</p>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -336,23 +363,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="pylimer_tools_cpp.Atom.html">
+          <a class="next-page" href="pylimer_tools_cpp.AtomStyle.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Atom</div>
+                <div class="title">AtomStyle</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="pylimer_tools_cpp.split_csv.html">
+          <a class="prev-page" href="pylimer_tools_cpp.Atom.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">split_csv</div>
+                <div class="title">Atom</div>
                 
               </div>
             </a>
@@ -385,8 +412,12 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">version_information</a><ul>
-<li><a class="reference internal" href="#pylimer_tools_cpp.version_information"><code class="docutils literal notranslate"><span class="pre">version_information()</span></code></a></li>
+<li><a class="reference internal" href="#">AtomPairEntanglements</a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.AtomPairEntanglements"><code class="docutils literal notranslate"><span class="pre">AtomPairEntanglements</span></code></a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.AtomPairEntanglements.pair_of_atom"><code class="docutils literal notranslate"><span class="pre">AtomPairEntanglements.pair_of_atom</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.AtomPairEntanglements.pairs_of_atoms"><code class="docutils literal notranslate"><span class="pre">AtomPairEntanglements.pairs_of_atoms</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>

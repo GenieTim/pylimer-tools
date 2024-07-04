@@ -1,0 +1,19 @@
+AtomPairEntanglements
+=====================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autoclass:: AtomPairEntanglements
+   :show-inheritance:
+
+   .. rubric:: Attributes Summary
+
+   .. autosummary::
+
+      ~AtomPairEntanglements.pair_of_atom
+      ~AtomPairEntanglements.pairs_of_atoms
+
+   .. rubric:: Attributes Documentation
+
+   .. autoattribute:: pair_of_atom
+   .. autoattribute:: pairs_of_atoms

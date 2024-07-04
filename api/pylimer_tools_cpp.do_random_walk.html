@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Atom" href="pylimer_tools_cpp.Atom.html" /><link rel="prev" title="split_csv" href="pylimer_tools_cpp.split_csv.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="do_random_walk_chain_from_to" href="pylimer_tools_cpp.do_random_walk_chain_from_to.html" /><link rel="prev" title="do_linear_walk_chain_from_to" href="pylimer_tools_cpp.do_linear_walk_chain_from_to.html" />
 
     <!-- Generated with Sphinx 7.3.7 and Furo 2024.05.06 -->
-        <title>version_information - PylimerTools documentation</title>
+        <title>do_random_walk - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=387cc868" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
@@ -233,13 +233,13 @@
 <li class="toctree-l2 current has-children"><a class="reference internal" href="../pylimer_tools_cpp.html">pylimer_tools_cpp package</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-3" name="toctree-checkbox-3" role="switch" type="checkbox"/><label for="toctree-checkbox-3"><div class="visually-hidden">Toggle navigation of pylimer_tools_cpp package</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.compute_stoichiometric_imbalance.html">compute_stoichiometric_imbalance</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.do_linear_walk_chain_from_to.html">do_linear_walk_chain_from_to</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.do_random_walk.html">do_random_walk</a></li>
+<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">do_random_walk</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.do_random_walk_chain_from_to.html">do_random_walk_chain_from_to</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.inverse_langevin.html">inverse_langevin</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.predict_gelation_point.html">predict_gelation_point</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.randomly_sample_entanglements.html">randomly_sample_entanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.split_csv.html">split_csv</a></li>
-<li class="toctree-l3 current current-page"><a class="current reference internal" href="#">version_information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.version_information.html">version_information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.Atom.html">Atom</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AtomPairEntanglements.html">AtomPairEntanglements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pylimer_tools_cpp.AtomStyle.html">AtomStyle</a></li>
@@ -301,7 +301,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/api/pylimer_tools_cpp.version_information.rst.txt" title="View this page">
+  <a class="muted-link" href="../_sources/api/pylimer_tools_cpp.do_random_walk.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -321,12 +321,12 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="version-information">
-<h1>version_information<a class="headerlink" href="#version-information" title="Link to this heading">¶</a></h1>
+          <section id="do-random-walk">
+<h1>do_random_walk<a class="headerlink" href="#do-random-walk" title="Link to this heading">¶</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.version_information">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">version_information</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.version_information" title="Link to this definition">¶</a></dt>
-<dd><p>Returns  a string of the the current version, incl. git hash and date of compilation.</p>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.do_random_walk">
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools_cpp.</span></span><span class="sig-name descname"><span class="pre">do_random_walk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chain_len</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bead_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.do_random_walk" title="Link to this definition">¶</a></dt>
+<dd><p>Do a random walk, return the coordinates of each point visited.</p>
 </dd></dl>
 
 </section>
@@ -336,23 +336,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="pylimer_tools_cpp.Atom.html">
+          <a class="next-page" href="pylimer_tools_cpp.do_random_walk_chain_from_to.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Atom</div>
+                <div class="title">do_random_walk_chain_from_to</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="pylimer_tools_cpp.split_csv.html">
+          <a class="prev-page" href="pylimer_tools_cpp.do_linear_walk_chain_from_to.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">split_csv</div>
+                <div class="title">do_linear_walk_chain_from_to</div>
                 
               </div>
             </a>
@@ -385,8 +385,8 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">version_information</a><ul>
-<li><a class="reference internal" href="#pylimer_tools_cpp.version_information"><code class="docutils literal notranslate"><span class="pre">version_information()</span></code></a></li>
+<li><a class="reference internal" href="#">do_random_walk</a><ul>
+<li><a class="reference internal" href="#pylimer_tools_cpp.do_random_walk"><code class="docutils literal notranslate"><span class="pre">do_random_walk()</span></code></a></li>
 </ul>
 </li>
 </ul>
