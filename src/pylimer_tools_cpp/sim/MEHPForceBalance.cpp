@@ -18,7 +18,7 @@
 #include <vector>
 
 namespace pylimer_tools {
-namespace calc {
+namespace sim {
   namespace mehp {
 #ifndef CLAMP_ONE_OVER_SPRINGPARTITION
 /**

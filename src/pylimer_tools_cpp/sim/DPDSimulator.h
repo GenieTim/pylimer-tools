@@ -6,8 +6,7 @@
 #include "../entities/Universe.h"
 #include "../utils/ExtraEigenTypes.h"
 #include "../utils/PerformanceTimer.h"
-#include "Correlator.h"
-#include "OutputSupportingSimulation.h"
+#include "../sim/OutputSupportingSimulation.h"
 #include <Eigen/Dense>
 #include <algorithm>
 #include <array>
@@ -28,7 +27,7 @@
 #endif
 
 namespace pylimer_tools {
-namespace calc {
+namespace sim {
 
   namespace dpd {
 
@@ -50,7 +49,7 @@ namespace calc {
       "Output",        "Shift",  "Relocation",  "Modify"
     };
 
-    class DPDSimulator : public pylimer_tools::calc::OutputSupportingSimulation
+    class DPDSimulator : public pylimer_tools::sim::OutputSupportingSimulation
     {
 
     private:
@@ -620,10 +619,10 @@ namespace calc {
 }
 }
 
-CEREAL_REGISTER_TYPE(pylimer_tools::calc::dpd::DPDSimulator);
+CEREAL_REGISTER_TYPE(pylimer_tools::sim::dpd::DPDSimulator);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(
-  pylimer_tools::calc::OutputSupportingSimulation,
-  pylimer_tools::calc::dpd::DPDSimulator);
-CEREAL_CLASS_VERSION(pylimer_tools::calc::dpd::DPDSimulator, 6);
+  pylimer_tools::sim::OutputSupportingSimulation,
+  pylimer_tools::sim::dpd::DPDSimulator);
+CEREAL_CLASS_VERSION(pylimer_tools::sim::dpd::DPDSimulator, 6);
 
 #endif

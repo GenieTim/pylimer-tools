@@ -52,13 +52,16 @@ add_subdirectory(src/pylimer_tools_cpp)
 add_dependencies(pylimer_tools igraph)
 add_dependencies(pylimer_tools nlopt)
 add_dependencies(pylimer_tools cerealLib)
+add_dependencies(pylimer_tools Spectra)
 
 pybind11_add_module(pylimer_tools_cpp MODULE 
   src/pylimer_tools_cpp/pybind11/readers.cpp
   src/pylimer_tools_cpp/pybind11/entities.cpp
   src/pylimer_tools_cpp/pybind11/writers.cpp
   src/pylimer_tools_cpp/pybind11/generators.cpp
+  src/pylimer_tools_cpp/pybind11/topology.cpp
   src/pylimer_tools_cpp/pybind11/calculations.cpp
+  src/pylimer_tools_cpp/pybind11/simulations.cpp
   src/pylimer_tools_cpp/pybind11/pylimer_tools_cpp.cpp
 )
 
@@ -66,8 +69,9 @@ pybind11_add_module(pylimer_tools_cpp MODULE
 include_directories(${igraph_INCLUDE_DIRS})
 include_directories(${nlopt_INCLUDE_DIRS})
 include_directories(${cereal_INCLUDE_DIRS})
+include_directories(${Spectra_INCLUDE_DIRS})
 
-message("pylimer_tools_cpp includes igraph from ${igraph_INCLUDE_DIRS}, nlopt from ${nlopt_INCLUDE_DIRS} and cereal from ${cereal_INCLUDE_DIRS}")
+message("pylimer_tools_cpp includes igraph from ${igraph_INCLUDE_DIRS}, nlopt from ${nlopt_INCLUDE_DIRS}, Spectra from ${Spectra_INCLUDE_DIRS} and cereal from ${cereal_INCLUDE_DIRS}")
 
 # link
 target_link_libraries(pylimer_tools_cpp 

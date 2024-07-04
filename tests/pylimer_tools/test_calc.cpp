@@ -1,4 +1,4 @@
-#include "../../src/pylimer_tools_cpp/calc/TopologyCalc.h"
+#include "../../src/pylimer_tools_cpp/topo/TopologyCalc.h"
 #include "../../src/pylimer_tools_cpp/entities/Box.h"
 #include <catch2/catch_test_macros.hpp>
 
@@ -24,7 +24,7 @@ TEST_CASE("Segment Intersection is found", "[TopologyCalc]")
 
     Eigen::Vector3d intersectionPoint;
 
-    REQUIRE(pylimer_tools::calc::segmentIntersectsTriangle(
+    REQUIRE(pylimer_tools::topo::segmentIntersectsTriangle(
       rayOrigin, rayTarget, vertex1, vertex2, vertex3, intersectionPoint));
   }
 
@@ -37,7 +37,7 @@ TEST_CASE("Segment Intersection is found", "[TopologyCalc]")
 
     Eigen::Vector3d intersectionPoint;
 
-    REQUIRE_FALSE(pylimer_tools::calc::segmentIntersectsTriangle(
+    REQUIRE_FALSE(pylimer_tools::topo::segmentIntersectsTriangle(
       rayOrigin, rayTarget, vertex1, vertex2, vertex3, intersectionPoint));
   }
 
@@ -50,7 +50,7 @@ TEST_CASE("Segment Intersection is found", "[TopologyCalc]")
 
     Eigen::Vector3d intersectionPoint;
 
-    REQUIRE_FALSE(pylimer_tools::calc::segmentIntersectsTriangle(
+    REQUIRE_FALSE(pylimer_tools::topo::segmentIntersectsTriangle(
       rayOrigin, rayTarget, vertex1, vertex2, vertex3, intersectionPoint));
   }
 

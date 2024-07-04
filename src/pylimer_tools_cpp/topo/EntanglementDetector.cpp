@@ -7,7 +7,7 @@
 #include <vector>
 
 namespace pylimer_tools {
-namespace calc {
+namespace topo {
 
   namespace entanglement_detection {
 

@@ -60,6 +60,7 @@ add_library(test_sources
 		pylimer_tools/test_generator.cpp 
 		pylimer_tools/test_molecule.cpp 
 		pylimer_tools/test_neighbourlist.cpp 
+		pylimer_tools/test_normal_mode_analysis.cpp
 		pylimer_tools/test_readers_writers.cpp 
 		pylimer_tools/test_universe.cpp 
 		pylimer_tools/test_universesequence.cpp 
@@ -85,6 +86,7 @@ endif()
 
 add_dependencies(test_sources pylimer_tools)
 include_directories(${igraph_INCLUDE_DIRS})
+include_directories(${Spectra_INCLUDE_DIRS})
 include_directories(${nlopt_INCLUDE_DIRS})
 include_directories(${cereal_INCLUDE_DIRS})
 include_directories(${EIGEN3_INCLUDE_DIRS})

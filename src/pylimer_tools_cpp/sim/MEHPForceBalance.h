@@ -5,10 +5,9 @@
 #include "../entities/Box.h"
 #include "../entities/NeighbourList.h"
 #include "../entities/Universe.h"
-#include "EntanglementDetector.h"
-#include "MEHPForceEvaluator.h"
-#include "MEHPUtilityStructures.h"
-#include "OutputSupportingSimulation.h"
+#include "../topo/EntanglementDetector.h"
+#include "../sim/MEHPUtilityStructures.h"
+#include "../sim/OutputSupportingSimulation.h"
 #include <Eigen/Dense>
 #include <algorithm>
 #include <array>
@@ -25,11 +24,11 @@
 #include <vector>
 
 namespace pylimer_tools {
-namespace calc {
+namespace sim {
   namespace mehp {
 
     class MEHPForceBalance
-      : public pylimer_tools::calc::OutputSupportingSimulation
+      : public pylimer_tools::sim::OutputSupportingSimulation
     {
 
     public:
@@ -71,7 +70,7 @@ namespace calc {
        */
       static MEHPForceBalance constructWithSlipLinks(
         const pylimer_tools::entities::Universe& universe,
-        pylimer_tools::calc::entanglement_detection::AtomPairEntanglements
+        pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
           entanglements,
         int crossLinkerType = 2,
         bool is2D = false)
@@ -354,8 +353,8 @@ namespace calc {
         bool is2D = false)
       {
         // sample the "entanglements"
-        pylimer_tools::calc::entanglement_detection::AtomPairEntanglements
-          entanglements = pylimer_tools::calc::entanglement_detection::
+        pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
+          entanglements = pylimer_tools::topo::entanglement_detection::
             randomlyFindEntanglements(universe,
                                       nrOfSliplinksToSample,
                                       cutoff,
@@ -407,7 +406,6 @@ namespace calc {
         const StructureSimplificationMode simplificationMode =
           StructureSimplificationMode::NO_SIMPLIFICATION,
         const double inactiveRemovalCutoff = 0.01,
-        const int outputFrequency = 50,
         bool doInnerIterations = false,
         LinkSwappingMode allowSlipLinksToPassEachOther =
           LinkSwappingMode::NO_SWAPPING,

@@ -4,7 +4,7 @@
 // #include <iostream>
 
 namespace pylimer_tools {
-namespace calc {
+namespace sim {
   namespace mehp {
     double langevin_inv(double x);
 

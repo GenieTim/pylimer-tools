@@ -35,6 +35,8 @@ add_dependencies(pylimer_tools nlopt)
 include_directories(${nlopt_INCLUDE_DIRS})
 add_dependencies(pylimer_tools cerealLib)
 include_directories(${cereal_INCLUDE_DIRS})
+add_dependencies(pylimer_tools Spectra)
+include_directories(${Spectra_INCLUDE_DIRS})
 
 target_link_libraries(pylimer_tools PUBLIC 
 	${igraph_LIBRARIES} 
@@ -54,7 +56,7 @@ else()
 	message(STATUS "Eigen include directories: ${EIGEN3_INCLUDE_DIRS}, libraries ${EIGEN3_LIBRARIES}")
 endif()
 
-message("pylimer_tools includes igraph from ${igraph_INCLUDE_DIRS}, nlopt from ${nlopt_INCLUDE_DIRS} and cereal from ${cereal_INCLUDE_DIRS}")
+message("pylimer_tools includes igraph from ${igraph_INCLUDE_DIRS}, nlopt from ${nlopt_INCLUDE_DIRS}, Spectra from ${Spectra_INCLUDE_DIRS} and cereal from ${cereal_INCLUDE_DIRS}")
 
 # optional additional dependencies
 IF (WIN32)
@@ -88,13 +90,16 @@ target_sources(pylimer_tools
 		${CMAKE_CURRENT_LIST_DIR}/io/DumpFileParser.cpp
 
 		${CMAKE_CURRENT_LIST_DIR}/calc/Correlator.cpp
-		${CMAKE_CURRENT_LIST_DIR}/calc/OutputSupportingSimulation.cpp
-		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceEvaluator.cpp
-		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceRelaxation.cpp
-		${CMAKE_CURRENT_LIST_DIR}/calc/EntanglementDetector.cpp
-		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance.cpp
-		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance2.cpp
-		${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.cpp
+		${CMAKE_CURRENT_LIST_DIR}/calc/NormalModeAnalyzer.cpp
+		
+		${CMAKE_CURRENT_LIST_DIR}/topo/EntanglementDetector.cpp
+
+		${CMAKE_CURRENT_LIST_DIR}/sim/OutputSupportingSimulation.cpp
+		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceEvaluator.cpp
+		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceRelaxation.cpp
+		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance.cpp
+		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance2.cpp
+		${CMAKE_CURRENT_LIST_DIR}/sim/DPDSimulator.cpp
 	PUBLIC
 		${CMAKE_CURRENT_LIST_DIR}/entities/Box.h
 		${CMAKE_CURRENT_LIST_DIR}/entities/Atom.h
@@ -114,34 +119,37 @@ target_sources(pylimer_tools
 		${CMAKE_CURRENT_LIST_DIR}/utils/VectorUtils.h
 
 		${CMAKE_CURRENT_LIST_DIR}/calc/Correlator.h
-		${CMAKE_CURRENT_LIST_DIR}/calc/OutputSupportingSimulation.h
 		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPanalysis.h
 		${CMAKE_CURRENT_LIST_DIR}/calc/MMTanalysis.h
-		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPUtilityStructures.h
-		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceEvaluator.h
-		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceRelaxation.h
-		${CMAKE_CURRENT_LIST_DIR}/calc/EntanglementDetector.h
-		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance.h
-		${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance2.h
-		${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.h
+		${CMAKE_CURRENT_LIST_DIR}/calc/NormalModeAnalyzer.h
+
+		${CMAKE_CURRENT_LIST_DIR}/topo/EntanglementDetector.h
+
+		${CMAKE_CURRENT_LIST_DIR}/sim/OutputSupportingSimulation.h
+		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPUtilityStructures.h
+		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceEvaluator.h
+		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceRelaxation.h
+		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance.h
+		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance2.h
+		${CMAKE_CURRENT_LIST_DIR}/sim/DPDSimulator.h
 )
-# ${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance2.cpp
-# ${CMAKE_CURRENT_LIST_DIR}/calc/MEHPForceBalance2.h
+# ${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance2.cpp
+# ${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance2.h
 
 # DEBUG whether vectorization works or not
 # if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 #   # using Clang
-# 	# set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -Rpass-missed -Rpass-analysis" )
-# 	set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize" )
+# 	# set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/sim/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -Rpass-missed -Rpass-analysis" )
+# 	set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/sim/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize" )
 # elseif (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
 #   # using GCC
-# 	set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -fopt-info-vec-missed" )
+# 	set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/sim/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -fopt-info-vec-missed" )
 # elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Intel")
 #   # using Intel C++
-# 	set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -qopt-report" )
+# 	set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/sim/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -qopt-report" )
 # elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 #   # using Visual Studio C++
-# 	set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/calc/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -Qvec-report:2" )
+# 	set_source_files_properties( ${CMAKE_CURRENT_LIST_DIR}/sim/DPDSimulator.cpp PROPERTIES COMPILE_FLAGS "-O3 -Qvec-report:2" )
 # endif()
 
 set_target_properties(pylimer_tools PROPERTIES VERSION ${PROJECT_VERSION})

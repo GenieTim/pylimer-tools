@@ -11,7 +11,7 @@
 #include <vector>
 
 namespace pylimer_tools {
-namespace calc {
+namespace sim {
   namespace mehp {
     enum StructureSimplificationMode
     {

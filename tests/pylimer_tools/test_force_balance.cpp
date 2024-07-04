@@ -1,6 +1,5 @@
-#include "../../src/pylimer_tools_cpp/calc/MEHPForceBalance.h"
-#include "../../src/pylimer_tools_cpp/calc/MEHPForceEvaluator.h"
-#include "../../src/pylimer_tools_cpp/calc/MEHPForceRelaxation.h"
+#include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance.h"
+#include "../../src/pylimer_tools_cpp/sim/MEHPForceRelaxation.h"
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include "../../src/pylimer_tools_cpp/utils/ExtraEigenTypes.h"
@@ -19,7 +18,7 @@
 
 namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
-namespace pcm = pylimer_tools::calc::mehp;
+namespace pcm = pylimer_tools::sim::mehp;
 
 double
 roundForOutput(double val, double precision = 5)
@@ -869,8 +868,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
         1e-7,
         -1.0,
         pcm::StructureSimplificationMode::ALL_TIM,
-        -1.0,
-        50,
+        0.01,
         false,
         pcm::LinkSwappingMode::ALL_MC));
       CHECK_NOTHROW(forceBalancer.runForceRelaxation(
@@ -878,8 +876,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
         1e-8,
         -1.0,
         pcm::StructureSimplificationMode::ALL_TIM,
-        -1.0,
-        50,
+        0.01,
         false,
         pcm::LinkSwappingMode::SLIPLINKS_ONLY));
       CHECK_NOTHROW(forceBalancer.runForceRelaxation(
@@ -887,8 +884,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
         1e-9,
         -1.0,
         pcm::StructureSimplificationMode::ALL_TIM,
-        -1.0,
-        50,
+        0.01,
         false,
         pcm::LinkSwappingMode::ALL));
     }
@@ -901,8 +897,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
         1e-7,
         -1.0,
         pcm::StructureSimplificationMode::ALL_TIM,
-        -1.0,
-        50,
+        0.01,
         false,
         pcm::LinkSwappingMode::ALL_MC));
       CHECK_NOTHROW(forceBalancer.runForceRelaxation(
@@ -910,8 +905,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
         1e-8,
         -1.0,
         pcm::StructureSimplificationMode::ALL_TIM,
-        -1.0,
-        50,
+        0.01,
         false,
         pcm::LinkSwappingMode::SLIPLINKS_ONLY));
       CHECK_NOTHROW(forceBalancer.runForceRelaxation(
@@ -919,8 +913,7 @@ TEST_CASE("MEHP Force Balance can run with swapping slip-links",
         1e-9,
         -1.0,
         pcm::StructureSimplificationMode::ALL_TIM,
-        -1.0,
-        50,
+        0.01,
         false,
         pcm::LinkSwappingMode::ALL));
     }
@@ -1503,8 +1496,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC "
       1e-8,
       initialResidual,
       pcm::StructureSimplificationMode::ALL_TIM,
-      -1.,
-      50,
+      0.01,
       false,
       pcm::LinkSwappingMode::NO_SWAPPING,
       10,
@@ -1515,8 +1507,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC "
       1e-8,
       initialResidual,
       pcm::StructureSimplificationMode::ALL_TIM,
-      -1.,
-      50,
+      0.01,
       false,
       pcm::LinkSwappingMode::NO_SWAPPING,
       10,
@@ -1542,7 +1533,6 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC "
       initialResidual,
       pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
       -1.,
-      50,
       false,
       pcm::LinkSwappingMode::ALL_MC,
       10,
@@ -1554,7 +1544,6 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC "
       initialResidual,
       pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
       -1.,
-      50,
       false,
       pcm::LinkSwappingMode::ALL_MC,
       10,
@@ -1630,8 +1619,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
       1e-8,
       initialResidual,
       pcm::StructureSimplificationMode::ALL_TIM,
-      -1.,
-      50,
+      0.01,
       false,
       pcm::LinkSwappingMode::NO_SWAPPING,
       10,
@@ -1642,8 +1630,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
       1e-8,
       initialResidual,
       pcm::StructureSimplificationMode::ALL_TIM,
-      -1.,
-      50,
+      0.01,
       false,
       pcm::LinkSwappingMode::NO_SWAPPING,
       10,
@@ -1662,8 +1649,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
       1e-8,
       initialResidual,
       pcm::StructureSimplificationMode::ALL_TIM,
-      -1.,
-      50,
+      0.01,
       false,
       pcm::LinkSwappingMode::ALL_MC,
       10,
@@ -1674,8 +1660,7 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
       1e-8,
       initialResidual,
       pcm::StructureSimplificationMode::ALL_TIM,
-      -1.,
-      50,
+      0.01,
       false,
       pcm::LinkSwappingMode::ALL_MC,
       10,
@@ -2388,6 +2373,44 @@ TEST_CASE("Conversion of structure is equal for both methods",
     //               forceBalancerOldConversion.getCurrentDisplacements(),
     //               forceBalancerOldConversion.getSpringPartitions());
   }
+}
+
+TEST_CASE("Force Balance can be run without slipping")
+{
+  std::cout << "Running test \"Force Balance can be run without slipping\""
+            << std::endl;
+
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+
+  std::string inputFile =
+    suspectedPath +
+    "crosslinked_p_0.99145_0.99145_melt_10000_a_3_5000_xlinks_v_1.V-fixed."
+    "structure.out-equilibration_do_crosslink.structure.out";
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+  std::cout << "Read file " << inputFile << std::endl;
+
+  pcm::MEHPForceBalance forceBalancer =
+    pcm::MEHPForceBalance::constructWithRandomSlipLinks(
+      universe, 1000, 6.0, 900, 3.0, "53467829");
+  forceBalancer.configAssumeBoxLargeEnough(false);
+
+  Eigen::VectorXd springPartitions = forceBalancer.getSpringPartitions();
+  forceBalancer.runForceRelaxation(
+    500,
+    1e-9,
+    -1,
+    pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+    0.01,
+    false,
+    pcm::LinkSwappingMode::NO_SWAPPING,
+    10,
+    1.0,
+    -1,
+    true);
+  CHECK(springPartitions.isApprox(forceBalancer.getSpringPartitions()));
 }
 
 TEST_CASE("Adding slip-links does not influence other springs",
