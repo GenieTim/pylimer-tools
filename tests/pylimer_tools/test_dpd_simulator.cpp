@@ -1,4 +1,4 @@
-#include "../../src/pylimer_tools_cpp/calc/DPDSimulator.h"
+#include "../../src/pylimer_tools_cpp/sim/DPDSimulator.h"
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include <catch2/catch_approx.hpp>
@@ -13,9 +13,9 @@
 #endif
 
 namespace pe = pylimer_tools::entities;
-namespace pc = pylimer_tools::calc;
+namespace ps = pylimer_tools::sim;
 namespace pu = pylimer_tools::utils;
-namespace pcd = pylimer_tools::calc::dpd;
+namespace pcd = pylimer_tools::sim::dpd;
 
 /**
  * @brief Auxiliary helper function: sets different output types
@@ -27,48 +27,48 @@ setupAllOutputs(pcd::DPDSimulator& simulator,
                 const std::string& averageFile,
                 const std::string& autocorrFile)
 {
-  std::vector<pc::ComputedDoubleValues> outputQuantities = {
-    pc::ComputedDoubleValues::TEMPERATURE, pc::ComputedDoubleValues::PRESSURE,
-    pc::ComputedDoubleValues::STRESS_XX,   pc::ComputedDoubleValues::STRESS_YY,
-    pc::ComputedDoubleValues::STRESS_ZZ,   pc::ComputedDoubleValues::MSD
+  std::vector<ps::ComputedDoubleValues> outputQuantities = {
+    ps::ComputedDoubleValues::TEMPERATURE, ps::ComputedDoubleValues::PRESSURE,
+    ps::ComputedDoubleValues::STRESS_XX,   ps::ComputedDoubleValues::STRESS_YY,
+    ps::ComputedDoubleValues::STRESS_ZZ,   ps::ComputedDoubleValues::MSD
   };
 
-  pc::OutputConfiguration config;
+  ps::OutputConfiguration config;
   config.filename = "";
   config.outputEvery = 1;
   config.doubleValues = outputQuantities;
-  config.intValues = { pc::ComputedIntValues::STEP };
+  config.intValues = { ps::ComputedIntValues::STEP };
 
-  std::vector<pc::OutputConfiguration> configs = { config };
+  std::vector<ps::OutputConfiguration> configs = { config };
   REQUIRE_NOTHROW(simulator.configStepOutput(configs));
 
-  std::vector<pc::ComputedDoubleValues> averageQuantities = {
-    pc::ComputedDoubleValues::TEMPERATURE, pc::ComputedDoubleValues::PRESSURE,
-    pc::ComputedDoubleValues::STRESS_XX,   pc::ComputedDoubleValues::STRESS_YY,
-    pc::ComputedDoubleValues::STRESS_ZZ,   pc::ComputedDoubleValues::MSD
+  std::vector<ps::ComputedDoubleValues> averageQuantities = {
+    ps::ComputedDoubleValues::TEMPERATURE, ps::ComputedDoubleValues::PRESSURE,
+    ps::ComputedDoubleValues::STRESS_XX,   ps::ComputedDoubleValues::STRESS_YY,
+    ps::ComputedDoubleValues::STRESS_ZZ,   ps::ComputedDoubleValues::MSD
   };
 
-  pc::OutputConfiguration avgconfig;
+  ps::OutputConfiguration avgconfig;
   avgconfig.outputEvery = 20;
   avgconfig.filename = averageFile;
   avgconfig.doubleValues = averageQuantities;
 
-  std::vector<pc::OutputConfiguration> avgconfigs = { avgconfig };
+  std::vector<ps::OutputConfiguration> avgconfigs = { avgconfig };
   REQUIRE_NOTHROW(simulator.configAverageOutput(avgconfigs));
 
-  std::vector<pc::ComputedDoubleValues> autocorrelationQuantities = {
-    pc::ComputedDoubleValues::STRESS_XX,  pc::ComputedDoubleValues::STRESS_YY,
-    pc::ComputedDoubleValues::STRESS_ZZ,  pc::ComputedDoubleValues::STRESS_XY,
-    pc::ComputedDoubleValues::STRESS_YZ,  pc::ComputedDoubleValues::STRESS_XZ,
-    pc::ComputedDoubleValues::STRESS_NXY, pc::ComputedDoubleValues::STRESS_NYZ,
-    pc::ComputedDoubleValues::STRESS_NXZ,
+  std::vector<ps::ComputedDoubleValues> autocorrelationQuantities = {
+    ps::ComputedDoubleValues::STRESS_XX,  ps::ComputedDoubleValues::STRESS_YY,
+    ps::ComputedDoubleValues::STRESS_ZZ,  ps::ComputedDoubleValues::STRESS_XY,
+    ps::ComputedDoubleValues::STRESS_YZ,  ps::ComputedDoubleValues::STRESS_XZ,
+    ps::ComputedDoubleValues::STRESS_NXY, ps::ComputedDoubleValues::STRESS_NYZ,
+    ps::ComputedDoubleValues::STRESS_NXZ,
   };
-  pc::OutputConfiguration autocorrconfig;
+  ps::OutputConfiguration autocorrconfig;
   autocorrconfig.outputEvery = 25;
   autocorrconfig.filename = autocorrFile;
   autocorrconfig.doubleValues = autocorrelationQuantities;
 
-  std::vector<pc::OutputConfiguration> autocorrconfigs = { autocorrconfig };
+  std::vector<ps::OutputConfiguration> autocorrconfigs = { autocorrconfig };
   REQUIRE_NOTHROW(simulator.configAutoCorrelatorOutput(autocorrconfigs));
 
   std::vector<size_t> atomIdsForMSD = { 1, 4, 6 };
@@ -304,23 +304,23 @@ TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator][long]")
     REQUIRE_NOTHROW(simulator.configNumStepsDPD(25));
     REQUIRE_NOTHROW(simulator.configNumStepsMC(25));
 
-    std::vector<pc::ComputedDoubleValues> outputQuantities = {
-      pc::ComputedDoubleValues::TEMPERATURE,
-      pc::ComputedDoubleValues::PRESSURE,
-      pc::ComputedDoubleValues::VOLUME,
-      pc::ComputedDoubleValues::STRESS_XX,
-      pc::ComputedDoubleValues::STRESS_YY,
-      pc::ComputedDoubleValues::STRESS_ZZ,
-      pc::ComputedDoubleValues::MSD
+    std::vector<ps::ComputedDoubleValues> outputQuantities = {
+      ps::ComputedDoubleValues::TEMPERATURE,
+      ps::ComputedDoubleValues::PRESSURE,
+      ps::ComputedDoubleValues::VOLUME,
+      ps::ComputedDoubleValues::STRESS_XX,
+      ps::ComputedDoubleValues::STRESS_YY,
+      ps::ComputedDoubleValues::STRESS_ZZ,
+      ps::ComputedDoubleValues::MSD
     };
 
-    pc::OutputConfiguration config;
+    ps::OutputConfiguration config;
     config.filename = "";
     config.outputEvery = 5;
     config.doubleValues = outputQuantities;
-    config.intValues = { pc::ComputedIntValues::STEP };
+    config.intValues = { ps::ComputedIntValues::STEP };
 
-    std::vector<pc::OutputConfiguration> configs = { config };
+    std::vector<ps::OutputConfiguration> configs = { config };
     REQUIRE_NOTHROW(simulator.configStepOutput(configs));
 
     std::unordered_map<int, int> numBondsPerType;
@@ -489,23 +489,23 @@ TEST_CASE("DPD can deform box", "[analysis][DPDSimulator][long]")
     pcd::DPDSimulator simulator =
       pcd::DPDSimulator(universe, 2, 9, false, "25th_seed");
 
-    std::vector<pc::ComputedDoubleValues> outputQuantities = {
-      pc::ComputedDoubleValues::TEMPERATURE,
-      pc::ComputedDoubleValues::PRESSURE,
-      pc::ComputedDoubleValues::VOLUME,
-      pc::ComputedDoubleValues::STRESS_XX,
-      pc::ComputedDoubleValues::STRESS_YY,
-      pc::ComputedDoubleValues::STRESS_ZZ,
-      pc::ComputedDoubleValues::MSD
+    std::vector<ps::ComputedDoubleValues> outputQuantities = {
+      ps::ComputedDoubleValues::TEMPERATURE,
+      ps::ComputedDoubleValues::PRESSURE,
+      ps::ComputedDoubleValues::VOLUME,
+      ps::ComputedDoubleValues::STRESS_XX,
+      ps::ComputedDoubleValues::STRESS_YY,
+      ps::ComputedDoubleValues::STRESS_ZZ,
+      ps::ComputedDoubleValues::MSD
     };
 
-    pc::OutputConfiguration config;
+    ps::OutputConfiguration config;
     config.filename = "";
     config.outputEvery = 5;
     config.doubleValues = outputQuantities;
-    config.intValues = { pc::ComputedIntValues::STEP };
+    config.intValues = { ps::ComputedIntValues::STEP };
 
-    std::vector<pc::OutputConfiguration> configs = { config };
+    std::vector<ps::OutputConfiguration> configs = { config };
     REQUIRE_NOTHROW(simulator.configStepOutput(configs));
 
     REQUIRE_NOTHROW(simulator.validateState());
@@ -618,20 +618,20 @@ TEST_CASE("For large systems the PBC method does not matter",
     simulator.createSlipSprings(static_cast<int>(0.1 * universe.getNrOfAtoms()),
                                 2);
 
-    std::vector<pc::ComputedDoubleValues> outputQuantities = {
-      pc::ComputedDoubleValues::TEMPERATURE,
-      pc::ComputedDoubleValues::PRESSURE,
-      pc::ComputedDoubleValues::MAX_B,
-      pc::ComputedDoubleValues::MEAN_B
+    std::vector<ps::ComputedDoubleValues> outputQuantities = {
+      ps::ComputedDoubleValues::TEMPERATURE,
+      ps::ComputedDoubleValues::PRESSURE,
+      ps::ComputedDoubleValues::MAX_B,
+      ps::ComputedDoubleValues::MEAN_B
     };
 
-    pc::OutputConfiguration config;
+    ps::OutputConfiguration config;
     config.filename = "";
     config.outputEvery = 1;
     config.doubleValues = outputQuantities;
-    config.intValues = { pc::ComputedIntValues::STEP };
+    config.intValues = { ps::ComputedIntValues::STEP };
 
-    std::vector<pc::OutputConfiguration> configs = { config };
+    std::vector<ps::OutputConfiguration> configs = { config };
     REQUIRE_NOTHROW(simulator.configStepOutput(configs));
 
 #ifdef OPENMP_FOUND

@@ -1,7 +1,7 @@
 #include "OutputSupportingSimulation.h"
 
 namespace pylimer_tools {
-namespace calc {
+namespace sim {
 
   /**
    * @brief Open the specified files, and write the headers

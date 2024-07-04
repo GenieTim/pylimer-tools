@@ -1,6 +1,6 @@
-#include "../../src/pylimer_tools_cpp/calc/MEHPForceBalance.h"
-#include "../../src/pylimer_tools_cpp/calc/MEHPForceEvaluator.h"
-#include "../../src/pylimer_tools_cpp/calc/MEHPForceRelaxation.h"
+#include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance.h"
+#include "../../src/pylimer_tools_cpp/sim/MEHPForceEvaluator.h"
+#include "../../src/pylimer_tools_cpp/sim/MEHPForceRelaxation.h"
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include <catch2/benchmark/catch_benchmark_all.hpp>
@@ -16,7 +16,7 @@
 
 namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
-namespace pcm = pylimer_tools::calc::mehp;
+namespace pcm = pylimer_tools::sim::mehp;
 
 TEST_CASE("Force Balance Benchmarks", "[analysis][MEHPForceBalance]")
 {

@@ -1,13 +1,12 @@
 #include "./DPDSimulator.h"
 #include "../utils/PerformanceTimer.h"
-#include "./Correlator.h"
 
 #include <fstream>
 #include <iostream>
 #include <random>
 
 namespace pylimer_tools {
-namespace calc {
+namespace sim {
   namespace dpd {
 
     DPDSimulator::DPDSimulator(const pylimer_tools::entities::Universe& u,

@@ -4,7 +4,7 @@
 #include <Eigen/Dense>
 
 namespace pylimer_tools {
-namespace calc {
+namespace topo {
 
   bool segmentIntersectsTriangle(
     const Eigen::Vector3d rayOrigin,

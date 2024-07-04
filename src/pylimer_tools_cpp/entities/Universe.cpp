@@ -1,5 +1,5 @@
 #include "Universe.h"
-#include "../calc/TopologyCalc.h"
+#include "../topo/TopologyCalc.h"
 #include "../utils/BoolUtils.h"
 #include "../utils/GraphUtils.h"
 #include "../utils/StringUtils.h"
@@ -2125,7 +2125,7 @@ namespace entities {
         Eigen::Vector3d rayTarget =
           this->getPositionVectorForVertex(vertexIndicesLoop2[directionIdx]);
         Eigen::Vector3d intersectionPoint;
-        if (pylimer_tools::calc::segmentIntersectsTriangle(
+        if (pylimer_tools::topo::segmentIntersectsTriangle(
               rayOrigin,
               rayTarget,
               vertex0,

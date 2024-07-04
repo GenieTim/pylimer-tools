@@ -6,7 +6,7 @@
 #include "../entities/NeighbourList.h"
 #include "../entities/Universe.h"
 #include "../utils/GraphUtils.h"
-#include "EntanglementDetector.h"
+#include "../topo/EntanglementDetector.h"
 #include "MEHPForceEvaluator.h"
 #include "MEHPUtilityStructures.h"
 #include "OutputSupportingSimulation.h"
@@ -31,7 +31,7 @@ extern "C"
 }
 
 namespace pylimer_tools {
-namespace calc {
+namespace sim {
   namespace mehp {
 #ifndef CLAMP_ONE_OVER_SPRINGPARTITION
 /**
@@ -52,7 +52,7 @@ namespace calc {
 #endif
 
     class MEHPForceBalance2
-      : public pylimer_tools::calc::OutputSupportingSimulation
+      : public pylimer_tools::sim::OutputSupportingSimulation
     {
 
     private:
@@ -227,8 +227,8 @@ namespace calc {
         igraph_cattribute_GAB_set(&fb.graph, "is_up_to_date", true);
 
         // sample the "entanglements"
-        pylimer_tools::calc::entanglement_detection::AtomPairEntanglements
-          entanglements = pylimer_tools::calc::entanglement_detection::
+        pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
+          entanglements = pylimer_tools::topo::entanglement_detection::
             randomlyFindEntanglements(universe,
                                       nrOfSliplinksToSample,
                                       cutoff,

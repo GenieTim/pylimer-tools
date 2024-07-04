@@ -1,5 +1,4 @@
-include(FetchContent)
-
+# load the Eigen library
 if (NOT DEFINED eigen_LOADED)
 	find_package(Eigen3 3.4 NO_MODULE) # 3.4
 	if(${Eigen3_FOUND}) # AND (${Eigen3_VERSION} VERSION_GREATER_EQUAL 3.4)

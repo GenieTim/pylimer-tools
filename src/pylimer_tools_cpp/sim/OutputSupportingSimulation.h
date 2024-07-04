@@ -4,7 +4,7 @@
 #include "../utils/CerealUtils.h"
 #include "../utils/VectorUtils.h"
 #include "../utils/utilityMacros.h"
-#include "Correlator.h"
+#include "../calc/Correlator.h"
 #include <Eigen/Dense>
 #include <algorithm>
 #include <array>
@@ -23,7 +23,7 @@
 #include <cereal/types/polymorphic.hpp>
 
 namespace pylimer_tools {
-namespace calc {
+namespace sim {
 
 #define NUM_COMPUTABLE_INT_VALUES 8
 
@@ -664,6 +664,6 @@ namespace calc {
   };
 }
 }
-CEREAL_CLASS_VERSION(pylimer_tools::calc::OutputSupportingSimulation, 2);
+CEREAL_CLASS_VERSION(pylimer_tools::sim::OutputSupportingSimulation, 2);
 
 #endif

@@ -62,6 +62,14 @@ init_pylimer_bound_generators(py::module_& m)
             Use this method to actually retrieve the generated structure.
             )pbdoc");
 
+  m.def("do_random_walk",
+        &doRandomWalkChain,
+        R"pbdoc(
+            Do a random walk, return the coordinates of each point visited.
+            )pbdoc",
+        py::arg("chain_len"),
+        py::arg("bead_distance") = 1.,
+        py::arg("seed") = "");
   m.def("do_random_walk_chain_from_to",
         &doRandomWalkChainFromTo,
         R"pbdoc(

@@ -14,6 +14,67 @@
 
 namespace pylimer_tools {
 namespace utils {
+
+  /**
+   * @brief Do a random walk of certain length from a certain starting point
+   *
+   * @param from the atom to start the random walk from
+   * @param chainLen the number of atoms to add in between from and to
+   */
+  std::unordered_map<std::string, std::vector<double>> doRandomWalkChain(
+    int chainLen,
+    double beadDistance = 1.0,
+    std::string seed = "")
+  {
+    std::mt19937 rng;
+    if (seed == "") {
+      std::random_device rd;
+      rng = std::mt19937(rd());
+    } else {
+      std::seed_seq seed2(seed.begin(), seed.end());
+      rng = std::mt19937(seed2);
+    }
+
+    std::uniform_real_distribution<double> angleDistribution =
+      std::uniform_real_distribution<double>(0, 2 * M_PI);
+
+    std::vector<double> xs;
+    xs.reserve(chainLen);
+    std::vector<double> ys;
+    ys.reserve(chainLen);
+    std::vector<double> zs;
+    zs.reserve(chainLen);
+
+    double lastX = 0.0;
+    double lastY = 0.0;
+    double lastZ = 0.0;
+
+    for (int i = 0; i < chainLen; ++i) {
+      double bondLenToUse = beadDistance;
+
+      double alpha = angleDistribution(rng);
+      double beta = angleDistribution(rng);
+
+      // coordinate system conversion: confirmation e.g. in
+      // https://math.stackexchange.com/a/1385150/738831 or
+      // https://en.wikipedia.org/wiki/Spherical_coordinate_system
+      xs.push_back(lastX + bondLenToUse * std::cos(beta) * std::sin(alpha));
+      lastX = xs[i];
+      ys.push_back(lastY + bondLenToUse * std::sin(beta) * std::sin(alpha));
+      lastY = ys[i];
+      zs.push_back(lastZ + bondLenToUse * std::cos(alpha));
+      lastZ = zs[i];
+      assert(!isnan(lastX) && !isnan(lastY) && !isnan(lastZ));
+    }
+
+    std::unordered_map<std::string, std::vector<double>> results;
+    results.reserve(3);
+    results.emplace("x", xs);
+    results.emplace("y", ys);
+    results.emplace("z", zs);
+    return results;
+  }
+
   /**
    * @brief Do a random walk of certain length to add a chain from one to
    * another atom

@@ -20,10 +20,10 @@
 #include <vector>
 
 namespace pylimer_tools {
-namespace calc {
+namespace sim {
   namespace mehp {
     class MEHPForceRelaxation
-      : public pylimer_tools::calc::OutputSupportingSimulation
+      : public pylimer_tools::sim::OutputSupportingSimulation
     {
 
     public:
