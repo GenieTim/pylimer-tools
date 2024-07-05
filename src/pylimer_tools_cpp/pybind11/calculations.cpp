@@ -35,7 +35,8 @@ init_pylimer_bound_calc(py::module_& m)
     .def("find_sparse_eigenvalues",
          &NormalModeAnalyzer::findSparseEigenvalues,
          "Find the `k` smallest eigenvalues using a sparse solver",
-         py::arg("nr_of_eigenvalues"))
+         py::arg("nr_of_eigenvalues"),
+         py::arg("compute_eigenvectors") = false)
     .def("find_all_eigenvalues",
          &NormalModeAnalyzer::computeAllEigenvalues,
          "Find all eigenvalues using a dense solver",
@@ -61,7 +62,15 @@ init_pylimer_bound_calc(py::module_& m)
     .def("evaluate_loss_modulus",
          &NormalModeAnalyzer::evaluateLossModulus,
          "Evaluate loss modulus",
-         py::arg("omega"));
+         py::arg("omega"))
+    .def(py::pickle(
+      [](const NormalModeAnalyzer& u) {
+        return py::make_tuple(pylimer_tools::utils::serializeToString(u));
+      },
+      [](py::tuple t) {
+        std::string in = t[0].cast<std::string>();
+        return NormalModeAnalyzer::fromString(in);
+      }));
 }
 
 #endif /* PYBIND_CALC_H */

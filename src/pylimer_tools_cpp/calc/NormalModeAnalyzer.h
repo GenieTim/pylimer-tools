@@ -1,8 +1,10 @@
 #ifndef NORMAL_MODE_ANALYZER_H
 #define NORMAL_MODE_ANALYZER_H
 
+#include "../utils/CerealUtils.h"
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
+#include <cereal/access.hpp>
 #include <vector>
 
 namespace pylimer_tools {
@@ -13,9 +15,10 @@ namespace calc {
     NormalModeAnalyzer(const std::vector<size_t> springFrom,
                        const std::vector<size_t> springTo);
 
-    void findSparseEigenvalues(size_t nrOfEigenvalues);
+    void findSparseEigenvalues(const size_t nrOfEigenvalues,
+                               const bool includeEigenvectors = false);
 
-    void computeAllEigenvalues(bool includeEigenvectors = false);
+    void computeAllEigenvalues(const bool includeEigenvectors = false);
 
     Eigen::VectorXd getEigenvalues() const;
     void setEigenvalues(Eigen::VectorXd e);
@@ -23,29 +26,48 @@ namespace calc {
     Eigen::MatrixXd getEigenvectors() const;
     void setEigenvectors(Eigen::MatrixXd e);
 
-    Eigen::ArrayXd evaluateStressAutocorrelation(const Eigen::ArrayXd &t) const;
+    Eigen::ArrayXd evaluateStressAutocorrelation(const Eigen::ArrayXd& t) const;
 
-    Eigen::ArrayXd evaluateStorageModulus(const Eigen::ArrayXd &omega) const;
+    Eigen::ArrayXd evaluateStorageModulus(const Eigen::ArrayXd& omega) const;
 
-    Eigen::ArrayXd evaluateLossModulus(const Eigen::ArrayXd &omega) const;
+    Eigen::ArrayXd evaluateLossModulus(const Eigen::ArrayXd& omega) const;
 
     size_t getNrOfSolubleClusters() const;
 
-  protected:
+    static NormalModeAnalyzer fromString(std::string in)
+    {
+      NormalModeAnalyzer n;
+      pylimer_tools::utils::deserializeFromString(n, in);
+      return n;
+    }
 
+  protected:
     void requireEigenvaluesComputation() const;
     void requireEigenvectorsComputation() const;
     size_t countSolubleClusters() const;
 
   private:
     Eigen::SparseMatrix<double> assembledConnectivityMatrix;
-
     // computation state
     bool isEigenvaluesComputed = false;
     bool isEigenvectorsComputed = false;
     size_t clusterCount = 0;
     Eigen::VectorXd eigenvalues;
     Eigen::MatrixXd eigenvectors;
+
+    // MARK: serialization
+    NormalModeAnalyzer() = default;
+    friend class cereal::access;
+
+    template<class Archive>
+    void serialize(Archive& ar)
+    {
+      ar(isEigenvaluesComputed,
+         isEigenvectorsComputed,
+         clusterCount,
+         eigenvalues,
+         eigenvectors);
+    }
   };
 }
 }
