@@ -157,7 +157,8 @@ namespace entities {
 
     throw std::runtime_error(
       "Cannot compute end-to-end vector for Molecule with " +
-      std::to_string(endNodes.size()) + " end(s).");
+      std::to_string(endNodes.size()) + " end(s) in molecule " +
+      this->getKey() + ".");
   }
 
   double Molecule::computeEndToEndDistanceWithDerivedImageFlags() const
@@ -416,6 +417,7 @@ namespace entities {
     }
     std::vector<pylimer_tools::entities::Atom> endsOfChain =
       this->getAtomsOfDegree(1);
+
     if (this->getType() == MoleculeType::PRIMARY_LOOP ||
         ((endsOfChain.size() == 1 || endsOfChain.size() == 0) &&
          this->getType() == MoleculeType::UNDEFINED)) {

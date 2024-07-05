@@ -369,6 +369,8 @@ namespace entities {
       return degree;
     }
 
+    std::vector<int> getVertexDegrees() const;
+
     /**
      * @brief compute the lengths of all bonds
      *
@@ -477,10 +479,13 @@ namespace entities {
     igraph_vs_t getVerticesWithDegreeSelector(int degree) const;
     std::vector<long int> getVerticesWithDegree(int degree) const;
     std::vector<long int> getVerticesWithDegree(
-      const std::vector<int>& ofDegrees) const;
+      std::function<bool(int)> selector) const;
     std::vector<long int> getVerticesWithDegree(
       const igraph_t* someGraph,
-      const std::vector<int>& ofDegrees) const;
+      std::function<bool(int)> selector) const;
+    std::vector<long int> getVerticesWithDegree(
+      const igraph_t* someGraph,
+      std::vector<int> degrees) const;
   };
 
 } // namespace entities

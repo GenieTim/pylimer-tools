@@ -52,12 +52,24 @@ TEST_CASE("Molecules work as intended", "[entity][Molecule]")
 
     // thankfully deterministic thanks to order of vertex ids
     std::vector<int> expectedLengths = { { 3, 2, 1, 2, 1, 2, 1 } };
+    std::vector<std::string> expectedKeys = { { "10000-20000-90000",
+                                                "30000-40000",
+                                                "50360",
+                                                "50000-60000",
+                                                "50908",
+                                                "70000-80000",
+                                                "74363" } };
     std::vector<double> expectedEndToEndDistances = {
       { 6.7651120738, 0.0324414569, 0.0, 0.0213056989, 0.0, 6.721720793, 0.0 }
     };
 
+    CHECK(molecules.size() == expectedLengths.size());
+    CHECK(molecules[0].getAtomsOfDegree(2).size() == 1);
+    CHECK(molecules[0].getAtomsOfDegree(1).size() == 2);
+
     int iteration = 0;
     for (pe::Molecule molecule : molecules) {
+      CHECK(molecule.getKey() == expectedKeys[iteration]);
       REQUIRE(molecule.getLength() == expectedLengths[iteration]);
       REQUIRE(molecule.getBox().getLx() ==
               Catch::Approx(32.182950030000001 * 2));
@@ -65,8 +77,8 @@ TEST_CASE("Molecules work as intended", "[entity][Molecule]")
               Catch::Approx(32.182950030000001 * 2));
       REQUIRE(molecule.getBox().getLz() ==
               Catch::Approx(32.182950030000001 * 2));
-      REQUIRE(molecule.computeEndToEndDistance() ==
-              Catch::Approx(expectedEndToEndDistances[iteration]));
+      CHECK(molecule.computeEndToEndDistance() ==
+            Catch::Approx(expectedEndToEndDistances[iteration]));
       ++iteration;
     }
 

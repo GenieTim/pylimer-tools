@@ -781,6 +781,9 @@ init_pylimer_bound_entities(py::module_& m)
             Get the atoms that have the specified number of bonds.
             )pbdoc",
          py::arg("functionality"))
+    .def("get_vertex_degrees", &Universe::getVertexDegrees, R"pbdoc(
+          Get the degree (functionality) of each vertex.
+     )pbdoc")
     .def("find_loops",
          &Universe::findLoopsOfAtoms,
          R"pbdoc(
@@ -832,12 +835,13 @@ init_pylimer_bound_entities(py::module_& m)
     .def("get_chains_with_crosslinker",
          &Universe::getChainsWithCrosslinker,
          R"pbdoc(
-            Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms, without omitting the cross-linkers.
+            Decompose the Universe into strands (molecules, which could be either chains, or even lonely atoms), without omitting the cross-linkers
+            (as in :func:`~pylimer_tools_cpp.Universe.getMolecules(crosslinker_type)`).
             In turn, e.g. for a tetrafunctional cross-linker, it will be 4 times in the resulting molecules.
             
             NOTE:
                Cross-linkers without bonds to non-cross-linkers are not returned 
-               (i.e., cross-linker-cross-linker bonds, or single cross-linkers, are not counted as strands).
+               (i.e., single cross-linkers, are not counted as strands).
            )pbdoc",
          py::arg("crosslinker_type"))
     .def("get_network_of_crosslinker",
@@ -889,8 +893,8 @@ init_pylimer_bound_entities(py::module_& m)
             
             NOTE:
                The integer values returned refer to the vertex ids, not the atom ids.
-               Use :func:`~pylimer_tools_cpp.Universe.getAtomIdByIdx` to translate them to atom ids, or
-               :func:`~pylimer_tools_cpp.Universe.getBonds` to have that done for you.
+               Use :func:`~pylimer_tools_cpp.Universe.get_atom_id_by_idx` to translate them to atom ids, or
+               :func:`~pylimer_tools_cpp.Universe.get_bonds` to have that done for you.
             )pbdoc")
     .def("get_bonds", &Universe::getBonds, R"pbdoc(
             Get all bonds. Returns a dict with three properties: 'bond_from', 'bond_to' and 'bond_type'.
@@ -903,7 +907,7 @@ init_pylimer_bound_entities(py::module_& m)
 
            NOTE:
                The integer values returned refer to the the atom ids, not the vertex ids.
-               Use :func:`~pylimer_tools_cpp.Universe.getIdxByAtomId` to translate them to vertex ids.
+               Use :func:`~pylimer_tools_cpp.Universe.get_idx_by_atom_id` to translate them to vertex ids.
            )pbdoc")
     .def("get_box", &Universe::getBox, R"pbdoc(
             Get the underlying bounding box object.

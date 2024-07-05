@@ -38,7 +38,8 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("nr_of_eigenvalues"))
     .def("find_all_eigenvalues",
          &NormalModeAnalyzer::computeAllEigenvalues,
-         "Find all eigenvalues using a dense solver")
+         "Find all eigenvalues using a dense solver",
+         py::arg("compute_eigenvectors") = false)
     .def(
       "get_eigenvalues", &NormalModeAnalyzer::getEigenvalues, "Get eigenvalues")
     .def(

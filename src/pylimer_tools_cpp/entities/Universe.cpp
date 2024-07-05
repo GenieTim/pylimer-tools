@@ -893,36 +893,44 @@ namespace entities {
     if (this->getNrOfAtoms() == 0) {
       return molecules;
     }
-    // make a copy to remove crossLinkers from
-    igraph_t graphWithoutCrosslinkers;
-    if (igraph_copy(&graphWithoutCrosslinkers, &this->graph)) {
+    std::vector<bool> vertexIsJunction =
+      pylimer_tools::utils::initializeWithValue(this->getNrOfAtoms(), false);
+    // make a copy to remove junctions from
+    igraph_t graphWithoutJunctions;
+    if (igraph_copy(&graphWithoutJunctions, &this->graph)) {
       throw std::runtime_error("Failed to copy graph.");
     }
-    // select vertices of cross-linker type
-    std::vector<long int> indicesToRemove =
-      this->getIndicesOfType(crossLinkerType);
+    // select vertices of junctions type
+    std::vector<int> vertexDegrees = this->getVertexDegrees();
+    std::vector<int> vertexTypes = this->getPropertyValues<int>("type");
+    std::vector<long int> indicesToRemove;
+    for (long int vIdx = 0; vIdx < this->getNrOfAtoms(); ++vIdx) {
+      if (vertexDegrees[vIdx] > 2 || vertexTypes[vIdx] == crossLinkerType) {
+        vertexIsJunction[vIdx] = true;
+        indicesToRemove.push_back(vIdx);
+      }
+    }
     std::sort(indicesToRemove.rbegin(), indicesToRemove.rend());
     if (indicesToRemove.size() > 0) {
       igraph_vs_t verticesToRemove =
         this->getVerticesByIndices(indicesToRemove);
 
       // remove elements of type
-      if (igraph_delete_vertices(&graphWithoutCrosslinkers, verticesToRemove)) {
-        throw std::runtime_error("Failed to delete cross-inks from graph.");
+      if (igraph_delete_vertices(&graphWithoutJunctions, verticesToRemove)) {
+        throw std::runtime_error("Failed to delete junctions from graph.");
       }
 
       igraph_vs_destroy(&verticesToRemove);
-      RUNTIME_EXP_IFN(
-        igraph_vcount(&graphWithoutCrosslinkers) ==
-          this->getNrOfAtoms() - indicesToRemove.size(),
-        "Expected all crosslinkers to be removed from the graph.");
+      RUNTIME_EXP_IFN(igraph_vcount(&graphWithoutJunctions) ==
+                        this->getNrOfAtoms() - indicesToRemove.size(),
+                      "Expected all junctions to be removed from the graph.");
     }
 
     // split the copy into the separate components
     igraph_graph_list_t components;
     igraph_graph_list_init(&components, 3);
     if (igraph_decompose(
-          &graphWithoutCrosslinkers, &components, IGRAPH_STRONG, -1, 0)) {
+          &graphWithoutJunctions, &components, IGRAPH_STRONG, -1, 0)) {
       throw std::runtime_error("Failed to decompose graph.");
     }
     size_t NComponents = igraph_graph_list_size(&components);
@@ -968,22 +976,20 @@ namespace entities {
             throw std::runtime_error("Failed to get neighbors in graph");
           }
 
-          // loop neighbors
+          // loop neighbors of this end node
           for (igraph_integer_t neighIdx = 0;
                neighIdx < igraph_vector_int_size(&neighbors);
                ++neighIdx) {
-            igraph_integer_t originalNeighbourId =
+            igraph_integer_t neighbourOriginalId =
               igraph_vector_int_get(&neighbors, neighIdx);
-            int originalNeighbourType = igraphRealToInt<int>(
-              igraph_cattribute_VAN(&graph, "type", originalNeighbourId));
 
-            if (originalNeighbourType == crossLinkerType) {
+            if (vertexIsJunction[neighbourOriginalId]) {
               // found a cross-linker neighbour
               long int originalNeighbourAtomId =
-                igraph_cattribute_VAN(&graph, "id", originalNeighbourId);
-              atomsToAdd.push_back(originalNeighbourId);
+                igraph_cattribute_VAN(&graph, "id", neighbourOriginalId);
+              atomsToAdd.push_back(neighbourOriginalId);
               bondsToAdd.push_back(
-                { { newEndNodeVertexId, originalNeighbourId } });
+                { { newEndNodeVertexId, neighbourOriginalId } });
             }
           }
 
@@ -1046,8 +1052,51 @@ namespace entities {
       molecules.push_back(
         Molecule(this->box, chain, molType, this->massPerType));
     }
+    // what was neglected so far: springs between junctions!
+    for (long int junctionIdx : indicesToRemove) {
+      std::vector<long int> connections =
+        this->getVertexIdxsConnectedTo(junctionIdx);
+      for (long int connectedVertexIdx : connections) {
+        if (vertexIsJunction[connectedVertexIdx]) {
+          // new Molecule from just these two junctions
+          igraph_t chain;
+          igraph_vector_int_t junctions;
+          igraph_vector_int_init(&junctions, 2);
+          igraph_vector_int_set(&junctions, 0, junctionIdx);
+          igraph_vector_int_set(&junctions, 1, connectedVertexIdx);
+          igraph_induced_subgraph(&this->graph,
+                                  &chain,
+                                  igraph_vss_vector(&junctions),
+                                  IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH);
+          // we can simplify the graph,
+          // since connected junctions will be listed twice anyway, and since a
+          // primary loop like that would be uncomfortable anyway for other
+          // applications
+          igraph_simplify(&chain, true, false, NULL);
+          MoleculeType molType = MoleculeType::UNDEFINED;
+          if (this->getVertexDegree(junctionIdx) == 1 &&
+              this->getVertexDegree(connectedVertexIdx) == 1) {
+            molType = MoleculeType::FREE_CHAIN;
+          } else if (this->getVertexDegree(junctionIdx) > 1 &&
+                     this->getVertexDegree(connectedVertexIdx) > 1) {
+            molType = MoleculeType::NETWORK_STRAND;
+          } else if (this->getVertexDegree(junctionIdx) > 1 ||
+                     this->getVertexDegree(connectedVertexIdx) > 1) {
+            molType = MoleculeType::DANGLING_CHAIN;
+          }
+          if (junctionIdx == connectedVertexIdx) {
+            molType = MoleculeType::PRIMARY_LOOP;
+          }
+          molecules.push_back(Molecule(
+            this->box, &chain, molType, this->massPerType));
+          igraph_vector_int_destroy(&junctions);
+          igraph_destroy(&chain);
+        }
+      }
+    }
+
     igraph_graph_list_destroy(&components);
-    igraph_destroy(&graphWithoutCrosslinkers);
+    igraph_destroy(&graphWithoutJunctions);
 
     return molecules;
   }

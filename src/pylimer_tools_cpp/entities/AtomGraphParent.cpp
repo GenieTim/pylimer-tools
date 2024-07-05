@@ -624,9 +624,29 @@ namespace entities {
     return results;
   }
 
+  std::vector<int> AtomGraphParent::getVertexDegrees() const
+  {
+    int graphSize = igraph_vcount(&this->graph);
+    igraph_vector_int_t degrees;
+    if (igraph_vector_int_init(&degrees, graphSize)) {
+      throw std::runtime_error("Failed to instantiate result vector.");
+    }
+    // complexity: O(|v|*d)
+    if (igraph_degree(
+          &this->graph, &degrees, igraph_vss_all(), IGRAPH_ALL, false)) {
+      throw std::runtime_error("Failed to determine degree of vertices");
+    }
+
+    std::vector<int> res;
+    pylimer_tools::utils::igraphVectorTToStdVector(&degrees, res);
+    igraph_vector_int_destroy(&degrees);
+
+    return res;
+  };
+
   std::vector<long int> AtomGraphParent::getVerticesWithDegree(
     const igraph_t* someGraph,
-    const std::vector<int>& ofDegrees) const
+    std::function<bool(int)> selector) const
   {
     int graphSize = igraph_vcount(someGraph);
     igraph_vector_int_t degrees;
@@ -646,13 +666,10 @@ namespace entities {
     igraph_vit_t vit;
     igraph_vit_create(someGraph, allVertexIds, &vit);
     while (!IGRAPH_VIT_END(vit)) {
-      long int vertexId = static_cast<long int>(IGRAPH_VIT_GET(vit));
+      igraph_integer_t vertexId = IGRAPH_VIT_GET(vit);
       int currentDegree = igraph_vector_int_get(&degrees, vertexId);
-      for (int degree : ofDegrees) {
-        if (currentDegree == degree) {
-          toSelect.push_back(vertexId);
-          break;
-        }
+      if (selector(currentDegree)) {
+        toSelect.push_back(static_cast<long int>(vertexId));
       }
       IGRAPH_VIT_NEXT(vit);
     }
@@ -664,15 +681,25 @@ namespace entities {
   }
 
   std::vector<long int> AtomGraphParent::getVerticesWithDegree(
-    const std::vector<int>& ofDegrees) const
+    const igraph_t* someGraph,
+    std::vector<int> degrees) const
   {
-    return this->getVerticesWithDegree(&this->graph, ofDegrees);
+    return this->getVerticesWithDegree(someGraph, [degrees](int currentDegree) {
+      return std::find(degrees.begin(), degrees.end(), currentDegree) !=
+             degrees.end();
+    });
+  }
+
+  std::vector<long int> AtomGraphParent::getVerticesWithDegree(
+    std::function<bool(int)> selector) const
+  {
+    return this->getVerticesWithDegree(&this->graph, selector);
   }
 
   std::vector<long int> AtomGraphParent::getVerticesWithDegree(int degree) const
   {
-    const std::vector<int> degrees = { degree };
-    return this->getVerticesWithDegree(degrees);
+    return this->getVerticesWithDegree(
+      [degree](int currentDegree) { return currentDegree == degree; });
   }
 
   igraph_vs_t AtomGraphParent::getVerticesWithDegreeSelector(int degree) const
