@@ -31,6 +31,12 @@ if (os.getenv('VCPKG_ROOT')):
 else:
     print("VCPKG_ROOT not set. Not using vcpk dependencies.")
 
+# check env to decide whether we should add high performance flags
+if (os.getenv('HIGH_PERFORMANCE')):
+    cmake_args.append("-DHIGH_PERFORMANCE=ON")
+else:
+    cmake_args.append("-DHIGH_PERFORMANCE=OFF")
+
 # delete vendor caches — this is useful if you compile
 # this project using CMake (e.g. for tests) as well as skbuild,
 # as the two build directories of vendor do not interact well.

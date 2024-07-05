@@ -14,6 +14,18 @@ if (NOT DEFINED CODE_COVERAGE)
 	option(CODE_COVERAGE "Collect coverage from test library" OFF)
 endif()
 
+if (NOT DEFINED HIGH_PERFORMANCE)
+	option(HIGH_PERFORMANCE "Add even more compiler flags to improve performance" OFF)
+endif()
+
+if (HIGH_PERFORMANCE)
+	if (MSVC)
+		add_compile_options(/03)
+	else()
+		add_compile_options(-O3 -march=native)
+	endif()
+endif()
+
 # TODO: remove
 # set(CMAKE_CXX_FLAGS "-pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wmissing-declarations -Wmissing-include-dirs -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-overflow=5 -Wswitch-default -Wundef -Wno-unused -g")
 
