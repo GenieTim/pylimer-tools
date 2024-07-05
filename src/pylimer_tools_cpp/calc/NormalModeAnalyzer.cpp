@@ -21,11 +21,12 @@ namespace calc {
     size_t maxIdx =
       std::max(*std::max_element(springFrom.begin(), springFrom.end()),
                *std::max_element(springTo.begin(), springTo.end()));
+    size_t nRows = maxIdx + 1;
     // assemble connectivity matrix
     std::vector<Eigen::Triplet<double>> triplets;
     triplets.reserve(springFrom.size() * 2);
 
-    Eigen::VectorXd diagonal = Eigen::VectorXd::Zero(maxIdx);
+    Eigen::VectorXd diagonal = Eigen::VectorXd::Zero(nRows);
     for (size_t i = 0; i < springFrom.size(); i++) {
       // triplets will be summed up -> we can use the same indices multiple
       // times
@@ -37,8 +38,8 @@ namespace calc {
       diagonal[springFrom[i]] += 1.0;
       diagonal[springTo[i]] += 1.0;
       // some sanity checks
-      assert(springFrom[i] <= maxIdx);
-      assert(springTo[i] <= maxIdx);
+      assert(springFrom[i] < nRows);
+      assert(springTo[i] < nRows);
     }
     // the summed up diagonal can be translated to triplets as well
     for (size_t i = 0; i < diagonal.size(); i++) {
@@ -49,7 +50,7 @@ namespace calc {
 
     // finally, translate into the sparse matrix format
     this->assembledConnectivityMatrix =
-      Eigen::SparseMatrix<double>(maxIdx, maxIdx);
+      Eigen::SparseMatrix<double>(nRows, nRows);
     this->assembledConnectivityMatrix.setFromTriplets(triplets.begin(),
                                                       triplets.end());
   };
