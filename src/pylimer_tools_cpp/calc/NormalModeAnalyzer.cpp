@@ -76,13 +76,15 @@ namespace calc {
   {
     Eigen::MatrixXd assembledConnectivityMatrixDense =
       Eigen::MatrixXd(this->assembledConnectivityMatrix);
-    Eigen::EigenSolver<Eigen::MatrixXd> solver =
-      Eigen::EigenSolver<Eigen::MatrixXd>(assembledConnectivityMatrixDense,
-                                          includeEigenvectors);
+    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver =
+      Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd>(
+        assembledConnectivityMatrixDense,
+        includeEigenvectors ? Eigen::DecompositionOptions::ComputeEigenvectors
+                            : Eigen::DecompositionOptions::EigenvaluesOnly);
 
-    this->setEigenvalues(solver.eigenvalues().real());
+    this->setEigenvalues(solver.eigenvalues());
     if (includeEigenvectors) {
-      this->setEigenvectors(solver.eigenvectors().real());
+      this->setEigenvectors(solver.eigenvectors());
     }
   }
 
