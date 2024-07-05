@@ -28,7 +28,7 @@ extern "C"
 
 namespace cereal {
 ////////////////////////////////////////////////////////////////
-// serialization of some randomness
+// MARK: randomness serialization
 template<class Archive>
 void
 save(Archive& archive,
@@ -66,7 +66,7 @@ load(Archive& archive, std::mt19937& mt)
 }
 
 ////////////////////////////////////////////////////////////////
-// serialization of Eigen objects
+// MARK: Eigen objects serialization of 
 
 // if we can store binary data
 template<class Archive, class Derived>
@@ -145,7 +145,7 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar, Eigen::PlainObjectBase<Derived>& m)
 }
 
 ////////////////////////////////////////////////////////////////
-// serialization of igraph objects
+// MARK: igraph objects serialization
 
 // a vector
 template<class Archive>
@@ -451,6 +451,8 @@ CEREAL_LOAD_FUNCTION_NAME(Archive& ar,
 } // namespace cereal
 CEREAL_CLASS_VERSION(igraph_t, 1);
 
+//////////////////////////////////////////////////////////////////////////////////
+// MARK: actual utils to serialize fast
 namespace pylimer_tools {
 namespace utils {
 

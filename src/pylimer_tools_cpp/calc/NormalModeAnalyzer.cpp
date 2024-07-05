@@ -55,7 +55,8 @@ namespace calc {
                                                       triplets.end());
   };
 
-  void NormalModeAnalyzer::findSparseEigenvalues(size_t nrOfEigenvalues)
+  void NormalModeAnalyzer::findSparseEigenvalues(const size_t nrOfEigenvalues,
+                                                 const bool includeEigenvectors)
   {
     Spectra::SparseGenMatProd<double> op =
       Spectra::SparseGenMatProd<double>(this->assembledConnectivityMatrix);
@@ -69,10 +70,13 @@ namespace calc {
     // Retrieve results
     if (eigs.info() == Spectra::CompInfo::Successful) {
       this->setEigenvalues(eigs.eigenvalues());
+      if (includeEigenvectors) {
+        this->setEigenvectors(eigs.eigenvectors());
+      }
     }
   };
 
-  void NormalModeAnalyzer::computeAllEigenvalues(bool includeEigenvectors)
+  void NormalModeAnalyzer::computeAllEigenvalues(const bool includeEigenvectors)
   {
     Eigen::MatrixXd assembledConnectivityMatrixDense =
       Eigen::MatrixXd(this->assembledConnectivityMatrix);
@@ -100,7 +104,7 @@ namespace calc {
     return this->eigenvalues;
   }
 
-  void NormalModeAnalyzer::setEigenvalues(Eigen::VectorXd eigenvalues)
+  void NormalModeAnalyzer::setEigenvalues(const Eigen::VectorXd eigenvalues)
   {
     this->eigenvalues = eigenvalues;
     this->isEigenvaluesComputed = true;
@@ -121,7 +125,7 @@ namespace calc {
     return this->eigenvectors;
   }
 
-  void NormalModeAnalyzer::setEigenvectors(Eigen::MatrixXd eigenvectors)
+  void NormalModeAnalyzer::setEigenvectors(const Eigen::MatrixXd eigenvectors)
   {
     this->eigenvectors = eigenvectors;
     this->isEigenvectorsComputed = true;
