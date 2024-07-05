@@ -71,16 +71,18 @@ namespace calc {
     }
   };
 
-  void NormalModeAnalyzer::computeAllEigenvalues()
+  void NormalModeAnalyzer::computeAllEigenvalues(bool includeEigenvectors)
   {
     Eigen::MatrixXd assembledConnectivityMatrixDense =
       Eigen::MatrixXd(this->assembledConnectivityMatrix);
     Eigen::EigenSolver<Eigen::MatrixXd> solver =
       Eigen::EigenSolver<Eigen::MatrixXd>(assembledConnectivityMatrixDense,
-                                          true);
+                                          includeEigenvectors);
 
     this->setEigenvalues(solver.eigenvalues().real());
-    this->setEigenvectors(solver.eigenvectors().real());
+    if (includeEigenvectors) {
+      this->setEigenvectors(solver.eigenvectors().real());
+    }
   }
 
   void NormalModeAnalyzer::requireEigenvaluesComputation() const

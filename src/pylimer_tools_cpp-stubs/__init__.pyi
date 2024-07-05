@@ -2104,6 +2104,14 @@ class NormalModeAnalyzer:
         """
         Get eigenvectors
         """
+    def set_eigenvalues(self, arg0: numpy.ndarray) -> None:
+        """
+        Set eigenvalues
+        """
+    def set_eigenvectors(self, arg0: numpy.ndarray) -> None:
+        """
+        Set eigenvectors
+        """
 class OutputConfiguration:
     double_values: list[ComputedDoubleValues]
     int_values: list[ComputedIntValues]
@@ -2566,12 +2574,12 @@ class Universe:
         """
     def get_chains_with_crosslinker(self, crosslinker_type: int) -> list[Molecule]:
         """
-                    Decompose the Universe into molecules, which could be either chains, networks, or even lonely atoms, without omitting the cross-linkers.
+                    Decompose the Universe into strands (molecules, which could be either chains, networks, or even lonely atoms, without omitting the cross-linkers.
                     In turn, e.g. for a tetrafunctional cross-linker, it will be 4 times in the resulting molecules.
                     
                     NOTE:
                        Cross-linkers without bonds to non-cross-linkers are not returned 
-                       (i.e., cross-linker-cross-linker bonds, or single cross-linkers, are not counted as strands).
+                       (i.e., single cross-linkers, are not counted as strands).
         """
     def get_clusters(self) -> list[Universe]:
         """
@@ -2637,6 +2645,10 @@ class Universe:
     def get_timestep(self) -> int:
         """
                     Query the timestep when this universe was captured.
+        """
+    def get_vertex_degrees(self) -> list[int]:
+        """
+                  Get the degree (functionality) of each vertex.
         """
     def get_vertex_idx_by_atom_id(self, atom_id: int) -> int:
         """

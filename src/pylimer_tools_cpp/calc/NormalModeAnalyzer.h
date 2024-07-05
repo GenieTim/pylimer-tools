@@ -15,7 +15,7 @@ namespace calc {
 
     void findSparseEigenvalues(size_t nrOfEigenvalues);
 
-    void computeAllEigenvalues();
+    void computeAllEigenvalues(bool includeEigenvectors = false);
 
     Eigen::VectorXd getEigenvalues() const;
     void setEigenvalues(Eigen::VectorXd e);

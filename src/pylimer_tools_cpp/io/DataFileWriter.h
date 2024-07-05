@@ -226,7 +226,7 @@ namespace utils {
         file << "\n";
       }
 
-      // write dihedarl angles
+      // write dihedral angles
       if (this->includeDihedralAngles &&
           this->universe.getNrOfDihedralAngles() > 0) {
         file << "Dihedrals\n\n";
@@ -389,28 +389,37 @@ namespace utils {
 
       // to support molecule idxs, we need to adjust the order of atoms output
       // first, we output the crossLinker beads
+      std::vector<bool> vertexHasBeenOutput =
+        pylimer_tools::utils::initializeWithValue(this->universe.getNrOfAtoms(),
+                                                  false);
       std::vector<pylimer_tools::entities::Atom> crossLinkers =
         this->universe.getAtomsOfType(this->crossLinkerType);
       for (const pylimer_tools::entities::Atom& crossLinker : crossLinkers) {
         nAtomsOutput += 1;
         this->writeAtom(file, crossLinker, 0, nAtomsOutput);
+        vertexHasBeenOutput[this->universe.getIdxByAtomId(
+          crossLinker.getId())] = true;
       }
 
       // then, we can output all others
       int nMoleculesOutput = 0;
-      std::vector<pylimer_tools::entities::Molecule> molecules =
-        this->universe.getMolecules(this->crossLinkerType);
-      for (pylimer_tools::entities::Molecule molecule : molecules) {
+      std::vector<pylimer_tools::entities::Molecule> chains =
+        this->universe.getChainsWithCrosslinker(this->crossLinkerType);
+      for (pylimer_tools::entities::Molecule chain : chains) {
         // image flag reset attempt might not be the best yet?
         std::vector<pylimer_tools::entities::Atom> atoms =
           (this->moleculeIdxSwappable || this->attemptImageReset)
-            ? molecule.getAtomsLinedUp(
+            ? chain.getAtomsLinedUp(
                 this->crossLinkerType, this->attemptImageReset, false)
-            : molecule.getAtoms();
+            : chain.getAtoms();
         nMoleculesOutput += 1;
 
         for (size_t i = 0; i < atoms.size(); ++i) {
           pylimer_tools::entities::Atom atom = atoms[i];
+          if (vertexHasBeenOutput[this->universe.getIdxByAtomId(
+                atom.getId())]) {
+            continue;
+          }
           nAtomsOutput += 1;
           int ip1 = i + 1;
           int swappableMoleculeIdx =
@@ -419,6 +428,8 @@ namespace utils {
                                                        : nMoleculesOutput;
 
           this->writeAtom(file, atom, moleculeIdx, nAtomsOutput);
+          vertexHasBeenOutput[this->universe.getIdxByAtomId(atom.getId())] =
+            true;
         }
       }
 
