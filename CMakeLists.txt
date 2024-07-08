@@ -19,27 +19,6 @@ include(${CMAKE_CURRENT_LIST_DIR}/vendor/myConfigureFile.cmake)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
-endif()
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
-
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
-string(REPLACE "-O2" "-O3" CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
-# set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} -O3")
-
-if(CMAKE_COMPILER_IS_GNUCXX)
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wmissing-declarations -Wmissing-include-dirs -Woverloaded-virtual -Wredundant-decls -Wstrict-overflow=5 -Wswitch-default -Wundef -Wno-unused")
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
-set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fPIC")
-set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} -fPIC")
-endif()
-
 include(${CMAKE_CURRENT_LIST_DIR}/vendor/CMakeLists.txt)
 
 # prepare python bindings
@@ -77,8 +56,6 @@ message("pylimer_tools_cpp includes igraph from ${igraph_INCLUDE_DIRS}, nlopt fr
 target_link_libraries(pylimer_tools_cpp 
   PUBLIC 
     pylimer_tools
-    ${igraph_LIBRARIES}
-    ${nlopt_LIBRARIES}
 )
 
 if(CMAKE_COMPILER_IS_GNUCXX)
@@ -86,17 +63,6 @@ target_link_libraries(pylimer_tools_cpp
   PUBLIC 
     stdc++fs
 )
-endif()
-
-# link Eigen libraries. Difficulty due to Windows GitHub Action, somehow.
-if (TARGET Eigen3::Eigen)
-	message(STATUS "Target Eigen3::Eigen found")
-	target_link_libraries(pylimer_tools PUBLIC Eigen3::Eigen)
-else()
-	include_directories(${EIGEN3_INCLUDE_DIRS})
-	include_directories(${EIGEN3_INCLUDE_DIRS}/eigen3)
-	target_link_libraries(pylimer_tools PUBLIC ${EIGEN3_LIBRARIES})
-	message(STATUS "Eigen include directories: ${EIGEN3_INCLUDE_DIRS}, libraries ${EIGEN3_LIBRARIES}")
 endif()
 
 # compile & install

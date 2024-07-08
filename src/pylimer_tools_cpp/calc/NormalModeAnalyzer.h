@@ -41,6 +41,8 @@ namespace calc {
       return n;
     }
 
+    size_t getMatrixSize() const { return assembledConnectivityMatrix.rows(); }
+
   protected:
     void requireEigenvaluesComputation() const;
     void requireEigenvectorsComputation() const;

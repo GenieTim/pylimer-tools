@@ -14,32 +14,10 @@ if (NOT DEFINED CODE_COVERAGE)
 	option(CODE_COVERAGE "Collect coverage from test library" OFF)
 endif()
 
-if (NOT DEFINED HIGH_PERFORMANCE)
-	option(HIGH_PERFORMANCE "Add even more compiler flags to improve performance" OFF)
-endif()
-
-if (HIGH_PERFORMANCE)
-	if (MSVC)
-		add_compile_options(/03)
-	else()
-		add_compile_options(-O3 -march=native)
-	endif()
-endif()
-
-# TODO: remove
-# set(CMAKE_CXX_FLAGS "-pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wmissing-declarations -Wmissing-include-dirs -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wshadow -Wsign-conversion -Wsign-promo -Wstrict-overflow=5 -Wswitch-default -Wundef -Wno-unused -g")
-
-# add libraries
-if (DEFINED ADDITIONAL_INCLUDES)
-	include_directories(ADDITIONAL_INCLUDES)
-endif()
-
-if (DEFINED ADDITIONAL_LIBS)
-	link_directories(ADDITIONAL_LIBS)
-endif()
-
 # add dependencies
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/CMakeLists.txt)
+
+include(${CMAKE_CURRENT_LIST_DIR}/../../vendor/myConfigureFile.cmake)
 
 add_dependencies(pylimer_tools igraph)
 include_directories(${igraph_INCLUDE_DIRS})
@@ -64,11 +42,15 @@ if (TARGET Eigen3::Eigen)
 else()
 	include_directories(${EIGEN3_INCLUDE_DIRS})
 	include_directories(${EIGEN3_INCLUDE_DIRS}/eigen3)
-	target_link_libraries(pylimer_tools PUBLIC ${EIGEN3_LIBRARIES})
+	target_link_libraries(pylimer_tools PUBLIC ${EIGEN3_LIBRARIES} ${BLAS_LIBRARIES})
 	message(STATUS "Eigen include directories: ${EIGEN3_INCLUDE_DIRS}, libraries ${EIGEN3_LIBRARIES}")
 endif()
 
-message("pylimer_tools includes igraph from ${igraph_INCLUDE_DIRS}, nlopt from ${nlopt_INCLUDE_DIRS}, Spectra from ${Spectra_INCLUDE_DIRS} and cereal from ${cereal_INCLUDE_DIRS}")
+if (LAPACKE_FOUND)
+	target_link_libraries(pylimer_tools PUBLIC ${LAPACKE_LIBRARIES})
+endif()
+
+message(STATUS "pylimer_tools includes igraph from ${igraph_INCLUDE_DIRS}, nlopt from ${nlopt_INCLUDE_DIRS}, Spectra from ${Spectra_INCLUDE_DIRS} and cereal from ${cereal_INCLUDE_DIRS}")
 
 # optional additional dependencies
 IF (WIN32)
@@ -167,14 +149,12 @@ target_sources(pylimer_tools
 set_target_properties(pylimer_tools PROPERTIES VERSION ${PROJECT_VERSION})
 
 
-include(${CMAKE_CURRENT_LIST_DIR}/../../vendor/myConfigureFile.cmake)
 
 if (CODE_COVERAGE)
 	set(ENABLE_COVERAGE ON)
 	if (CMAKE_BUILD_TYPE EQUAL "RELEASE")
 		message(WARNING "Using coverage reduces build type to debug from release")
 	endif()
-	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../vendor/cmake-modules")
 	include(CodeCoverage)
 	append_coverage_compiler_flags()
 else()

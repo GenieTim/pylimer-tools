@@ -141,7 +141,7 @@ namespace utils {
     }
 
     // read the rest of the file
-    while (!file.peek() != EOF) {
+    while (file.peek() != EOF) {
       this->skipLinesToContains(
         line, file, { "Bonds", "Angles", "Dihedrals", "Velocities" });
 

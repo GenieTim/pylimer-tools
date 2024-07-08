@@ -15,3 +15,19 @@ if (NOT DEFINED eigen_LOADED)
 
 	set(eigen_LOADED ON)
 endif()
+
+# include(${CMAKE_CURRENT_LIST_DIR}/FindLAPACKE.cmake)
+# include(${CMAKE_CURRENT_LIST_DIR}/FindLAPACKE.cmake)
+find_package(LAPACKE)
+# include(FindLAPACKLibs)
+
+# if (LAPACKLIBS_FOUND)
+if(LAPACKE_FOUND)
+	include_directories(${LAPACKE_INCLUDE_DIRS})
+	add_definitions(-DEIGEN_USE_LAPACKE)
+endif()
+
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+		set(BLA_VENDOR Intel10_64lp)
+    add_definitions(-DEIGEN_USE_MKL_ALL)
+endif()
