@@ -1,4 +1,4 @@
-# for some reason, my MacMini's Homebrew llvm clang does not get a set CMAK_{LANG}_COMPILER_ID
+# for some reason, my MacMini's Homebrew llvm clang does not get a set CMAKE_{LANG}_COMPILER_ID
 
 get_property(LANGUAGES GLOBAL PROPERTY ENABLED_LANGUAGES)
 foreach(LANG ${LANGUAGES})

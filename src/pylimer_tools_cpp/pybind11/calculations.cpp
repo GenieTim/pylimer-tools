@@ -32,6 +32,10 @@ init_pylimer_bound_calc(py::module_& m)
          "Initialize NormalModeAnalyzer",
          py::arg("spring_from"),
          py::arg("spring_to"))
+    .def("get_matrix_size",
+         &NormalModeAnalyzer::getMatrixSize,
+         "Get the size of the matrix (the maximum of eigenvalues that could be "
+         "queried)")
     .def("find_sparse_eigenvalues",
          &NormalModeAnalyzer::findSparseEigenvalues,
          "Find the `k` smallest eigenvalues using a sparse solver",
@@ -63,6 +67,9 @@ init_pylimer_bound_calc(py::module_& m)
          &NormalModeAnalyzer::evaluateLossModulus,
          "Evaluate loss modulus",
          py::arg("omega"))
+    .def("get_nr_of_soluble_clusters",
+         &NormalModeAnalyzer::getNrOfSolubleClusters,
+         "Get the number of soluble clusters (Eigenvalues = 0)")
     .def(py::pickle(
       [](const NormalModeAnalyzer& u) {
         return py::make_tuple(pylimer_tools::utils::serializeToString(u));

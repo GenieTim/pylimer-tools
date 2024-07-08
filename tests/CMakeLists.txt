@@ -180,7 +180,6 @@ catch_discover_tests(header_tests)
 # code coverage setup in the end
 if (CODE_COVERAGE)
 	set(ENABLE_COVERAGE ON)
-	list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../vendor/cmake-modules")
 	include(CodeCoverage)
 	append_coverage_compiler_flags()
 	setup_target_for_coverage_lcov(
