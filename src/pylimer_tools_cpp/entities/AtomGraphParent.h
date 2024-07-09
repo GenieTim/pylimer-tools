@@ -347,6 +347,15 @@ namespace entities {
     }
 
     /**
+     * @brief Get the Vertex And Edge Property Names
+     *
+     * @return std::pair<std::vector<std::string>, std::vector<std::string>>
+     * first the vertex property names, then the same for the edges
+     */
+    std::pair<std::vector<std::string>, std::vector<std::string>>
+    getVertexAndEdgePropertyNames() const;
+
+    /**
      * @brief Get all atoms with a certain number of bonds
      *
      * @param degree the number of bonds to search for
@@ -483,9 +492,8 @@ namespace entities {
     std::vector<long int> getVerticesWithDegree(
       const igraph_t* someGraph,
       std::function<bool(int)> selector) const;
-    std::vector<long int> getVerticesWithDegree(
-      const igraph_t* someGraph,
-      std::vector<int> degrees) const;
+    std::vector<long int> getVerticesWithDegree(const igraph_t* someGraph,
+                                                std::vector<int> degrees) const;
   };
 
 } // namespace entities
