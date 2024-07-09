@@ -1080,7 +1080,7 @@ namespace entities {
       igraph_attribute_combination_add(
         &comb, NULL, IGRAPH_ATTRIBUTE_COMBINE_MEAN, NULL);
       for (long int connectedVertexIdx : connections) {
-        if (vertexIsJunction[connectedVertexIdx]) {
+        if (connectedVertexIdx >= junctionIdx && vertexIsJunction[connectedVertexIdx]) {
           // new Molecule from just these two junctions
           igraph_t chain;
           igraph_vector_int_t junctions;
