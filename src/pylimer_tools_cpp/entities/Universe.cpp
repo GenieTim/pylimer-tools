@@ -926,6 +926,10 @@ namespace entities {
                       "Expected all junctions to be removed from the graph.");
     }
 
+    // load the properties that will need to be copied
+    std::pair<std::vector<std::string>, std::vector<std::string>>
+      vertexAndEdgeProperties = this->getVertexAndEdgePropertyNames();
+
     // split the copy into the separate components
     igraph_graph_list_t components;
     igraph_graph_list_init(&components, 3);
@@ -989,7 +993,7 @@ namespace entities {
                 igraph_cattribute_VAN(&graph, "id", neighbourOriginalId);
               atomsToAdd.push_back(neighbourOriginalId);
               bondsToAdd.push_back(
-                { { newEndNodeVertexId, neighbourOriginalId } });
+                { { originalEndNodeVertexId, newEndNodeVertexId, neighbourOriginalId,  } });
             }
           }
 
@@ -1020,17 +1024,29 @@ namespace entities {
 
           // including all attributes
           // TODO: include additional atom data
-          for (auto property :
-               { "id", "type", "x", "y", "z", "nx", "ny", "nz" }) {
+          for (std::string property : vertexAndEdgeProperties.first) {
             SETVAN(chain,
-                   property,
+                   property.c_str(),
                    newCrosslinkerVertexIdx,
-                   VAN(&graph, property, atomToAddOriginalId));
+                   VAN(&graph, property.c_str(), atomToAddOriginalId));
           }
         }
         // ...and bonds
         for (auto bond : bondsToAdd) {
-          igraph_add_edge(chain, bond[0], newAtomsMap[bond[1]]);
+          igraph_add_edge(chain, bond[1], newAtomsMap.at(bond[2]));
+          // also copy the bond attributes
+          std::vector<long int> oldEIds =
+            this->getEdgeIdsFromTo(bond[0], bond[2]);
+          RUNTIME_EXP_IFN(oldEIds.size() > 0,
+                          "Expected at least one edge between the same atoms.");
+          for (std::string property : vertexAndEdgeProperties.second) {
+            // TODO: think what to do if we have more than one edge between the
+            // same atoms
+            SETEAN(chain,
+                   property.c_str(),
+                   igraph_ecount(chain)-1,
+                   EAN(&graph, property.c_str(), oldEIds[0]));
+          }
         }
         igraph_vit_destroy(&endNodeVit);
       } // if molecule length
@@ -1056,6 +1072,13 @@ namespace entities {
     for (long int junctionIdx : indicesToRemove) {
       std::vector<long int> connections =
         this->getVertexIdxsConnectedTo(junctionIdx);
+      igraph_attribute_combination_t comb;
+      igraph_attribute_combination_init(&comb);
+      // how to combine two edges and their attributes
+      // currently, only the type attribute exists.
+      // let's take the mean.
+      igraph_attribute_combination_add(
+        &comb, NULL, IGRAPH_ATTRIBUTE_COMBINE_MEAN, NULL);
       for (long int connectedVertexIdx : connections) {
         if (vertexIsJunction[connectedVertexIdx]) {
           // new Molecule from just these two junctions
@@ -1072,7 +1095,8 @@ namespace entities {
           // since connected junctions will be listed twice anyway, and since a
           // primary loop like that would be uncomfortable anyway for other
           // applications
-          igraph_simplify(&chain, true, false, NULL);
+          igraph_simplify(
+            &chain, true /* multiple */, false /* loops */, &comb);
           MoleculeType molType = MoleculeType::UNDEFINED;
           if (this->getVertexDegree(junctionIdx) == 1 &&
               this->getVertexDegree(connectedVertexIdx) == 1) {
@@ -1087,12 +1111,13 @@ namespace entities {
           if (junctionIdx == connectedVertexIdx) {
             molType = MoleculeType::PRIMARY_LOOP;
           }
-          molecules.push_back(Molecule(
-            this->box, &chain, molType, this->massPerType));
+          molecules.push_back(
+            Molecule(this->box, &chain, molType, this->massPerType));
           igraph_vector_int_destroy(&junctions);
           igraph_destroy(&chain);
         }
       }
+      igraph_attribute_combination_destroy(&comb);
     }
 
     igraph_graph_list_destroy(&components);

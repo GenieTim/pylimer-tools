@@ -78,6 +78,7 @@ namespace calc {
 
   void NormalModeAnalyzer::computeAllEigenvalues(const bool includeEigenvectors)
   {
+    // #ifndef EIGEN_USE_LAPACKE
     Eigen::MatrixXd assembledConnectivityMatrixDense =
       Eigen::MatrixXd(this->assembledConnectivityMatrix);
     Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver =
@@ -90,6 +91,14 @@ namespace calc {
     if (includeEigenvectors) {
       this->setEigenvectors(solver.eigenvectors());
     }
+    // #else
+    // igraph_lapack_dsyevr()
+    // LAPACK_dsyevr(
+    //   includeEigenvectors ? 'V': 'N',
+    //   'A', assembledConnectivityMatrixDense.rows(),
+
+    // );
+    // #endif
   }
 
   void NormalModeAnalyzer::requireEigenvaluesComputation() const

@@ -394,6 +394,45 @@ namespace entities {
   }
 
   /**
+   * @brief Get the Vertex And Edge Property Names
+   *
+   * @return std::pair<std::vector<std::string>, std::vector<std::string>>
+   * first the vertex property names, then the same for the edges
+   */
+  std::pair<std::vector<std::string>, std::vector<std::string>>
+  AtomGraphParent::getVertexAndEdgePropertyNames() const
+  {
+    igraph_strvector_t gnames;
+    igraph_strvector_init(&gnames, 1);
+    igraph_vector_int_t gtypes;
+    igraph_vector_int_init(&gtypes, 1);
+    igraph_strvector_t vnames;
+    igraph_strvector_init(&vnames, 1);
+    igraph_vector_int_t vtypes;
+    igraph_vector_int_init(&vtypes, 1);
+    igraph_strvector_t enames;
+    igraph_strvector_init(&enames, 1);
+    igraph_vector_int_t etypes;
+    igraph_vector_int_init(&etypes, 1);
+    igraph_cattribute_list(
+      &this->graph, &gnames, &gtypes, &vnames, &vtypes, &enames, &etypes);
+
+    std::vector<std::string> vertexPropertyNames;
+    pylimer_tools::utils::igraphVectorTToStdVector(&vnames,
+                                                   vertexPropertyNames);
+    std::vector<std::string> edgePropertyNames;
+    pylimer_tools::utils::igraphVectorTToStdVector(&enames, edgePropertyNames);
+
+    igraph_strvector_destroy(&gnames);
+    igraph_strvector_destroy(&vnames);
+    igraph_strvector_destroy(&enames);
+    igraph_vector_int_destroy(&gtypes);
+    igraph_vector_int_destroy(&vtypes);
+    igraph_vector_int_destroy(&etypes);
+    return std::make_pair(vertexPropertyNames, edgePropertyNames);
+  };
+
+  /**
    * @brief Get all atoms with a certain number of bonds
    *
    * @param degree the number of bonds to search for
