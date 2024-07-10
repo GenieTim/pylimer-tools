@@ -156,7 +156,6 @@ namespace entities {
     }
   }
 
-  // other functions
   void Universe::addAtoms(const std::vector<long int>& newIds,
                           const std::vector<int>& newTypes,
                           const std::vector<double>& newX,
@@ -992,8 +991,11 @@ namespace entities {
               long int originalNeighbourAtomId =
                 igraph_cattribute_VAN(&graph, "id", neighbourOriginalId);
               atomsToAdd.push_back(neighbourOriginalId);
-              bondsToAdd.push_back(
-                { { originalEndNodeVertexId, newEndNodeVertexId, neighbourOriginalId,  } });
+              bondsToAdd.push_back({ {
+                originalEndNodeVertexId,
+                newEndNodeVertexId,
+                neighbourOriginalId,
+              } });
             }
           }
 
@@ -1009,27 +1011,26 @@ namespace entities {
 
         std::unordered_map<long int, long int> newAtomsMap;
         // actually add the atoms...
-        for (auto atomToAddOriginalId : atomsToAdd) {
+        for (auto atomToAddOriginalIdx : atomsToAdd) {
           igraph_add_vertices(chain, 1, nullptr);
           long int newCrosslinkerVertexIdx = igraph_vcount(chain) - 1;
-          newAtomsMap.insert_or_assign(atomToAddOriginalId,
+          newAtomsMap.insert_or_assign(atomToAddOriginalIdx,
                                        newCrosslinkerVertexIdx);
           // additional loop check
           long int originalNeighbourAtomId = igraphRealToInt<long int>(
-            igraph_cattribute_VAN(&graph, "id", atomToAddOriginalId));
+            igraph_cattribute_VAN(&graph, "id", atomToAddOriginalIdx));
           if (pylimer_tools::utils::graphHasVertexWithProperty(
                 chain, "id", originalNeighbourAtomId)) {
             isLoop = true;
           }
 
           // including all attributes
-          // TODO: include additional atom data
-          for (std::string property : vertexAndEdgeProperties.first) {
-            SETVAN(chain,
-                   property.c_str(),
-                   newCrosslinkerVertexIdx,
-                   VAN(&graph, property.c_str(), atomToAddOriginalId));
-          }
+          pylimer_tools::utils::copyVertexProperties(
+            &this->graph,
+            atomToAddOriginalIdx,
+            chain,
+            newCrosslinkerVertexIdx,
+            vertexAndEdgeProperties.first);
         }
         // ...and bonds
         for (auto bond : bondsToAdd) {
@@ -1039,14 +1040,12 @@ namespace entities {
             this->getEdgeIdsFromTo(bond[0], bond[2]);
           RUNTIME_EXP_IFN(oldEIds.size() > 0,
                           "Expected at least one edge between the same atoms.");
-          for (std::string property : vertexAndEdgeProperties.second) {
-            // TODO: think what to do if we have more than one edge between the
-            // same atoms
-            SETEAN(chain,
-                   property.c_str(),
-                   igraph_ecount(chain)-1,
-                   EAN(&graph, property.c_str(), oldEIds[0]));
-          }
+          pylimer_tools::utils::copyEdgeProperties(
+            &this->graph,
+            oldEIds[0],
+            chain,
+            igraph_ecount(chain) - 1,
+            vertexAndEdgeProperties.second);
         }
         igraph_vit_destroy(&endNodeVit);
       } // if molecule length
@@ -1072,6 +1071,7 @@ namespace entities {
     for (long int junctionIdx : indicesToRemove) {
       std::vector<long int> connections =
         this->getVertexIdxsConnectedTo(junctionIdx);
+      std::vector<long int> edgeIds = this->getIncidentEdgeIds(junctionIdx);
       igraph_attribute_combination_t comb;
       igraph_attribute_combination_init(&comb);
       // how to combine two edges and their attributes
@@ -1079,24 +1079,35 @@ namespace entities {
       // let's take the mean.
       igraph_attribute_combination_add(
         &comb, NULL, IGRAPH_ATTRIBUTE_COMBINE_MEAN, NULL);
-      for (long int connectedVertexIdx : connections) {
-        if (connectedVertexIdx >= junctionIdx && vertexIsJunction[connectedVertexIdx]) {
+      for (size_t i = 0; i < connections.size(); ++i) {
+        long int connectedVertexIdx = connections[i];
+        if (connectedVertexIdx >= junctionIdx &&
+            vertexIsJunction[connectedVertexIdx]) {
           // new Molecule from just these two junctions
+          // could also use igraph_induced_subgraph but performance is very bad
+          // for large structures, given how this is more or less O(1)
           igraph_t chain;
-          igraph_vector_int_t junctions;
-          igraph_vector_int_init(&junctions, 2);
-          igraph_vector_int_set(&junctions, 0, junctionIdx);
-          igraph_vector_int_set(&junctions, 1, connectedVertexIdx);
-          igraph_induced_subgraph(&this->graph,
-                                  &chain,
-                                  igraph_vss_vector(&junctions),
-                                  IGRAPH_SUBGRAPH_CREATE_FROM_SCRATCH);
-          // we can simplify the graph,
-          // since connected junctions will be listed twice anyway, and since a
-          // primary loop like that would be uncomfortable anyway for other
-          // applications
-          igraph_simplify(
-            &chain, true /* multiple */, false /* loops */, &comb);
+          igraph_empty(&chain, 2, IGRAPH_UNDIRECTED);
+          pylimer_tools::utils::copyVertexProperties(
+            &this->graph,
+            junctionIdx,
+            &chain,
+            0,
+            vertexAndEdgeProperties.first);
+          pylimer_tools::utils::copyVertexProperties(
+            &this->graph,
+            connectedVertexIdx,
+            &chain,
+            1,
+            vertexAndEdgeProperties.first);
+          igraph_add_edge(&chain, 0, 1);
+          pylimer_tools::utils::copyEdgeProperties(
+            &this->graph,
+            edgeIds[i],
+            &chain,
+            0,
+            vertexAndEdgeProperties.second);
+
           MoleculeType molType = MoleculeType::UNDEFINED;
           if (this->getVertexDegree(junctionIdx) == 1 &&
               this->getVertexDegree(connectedVertexIdx) == 1) {
@@ -1108,12 +1119,13 @@ namespace entities {
                      this->getVertexDegree(connectedVertexIdx) > 1) {
             molType = MoleculeType::DANGLING_CHAIN;
           }
-          if (junctionIdx == connectedVertexIdx) {
+          if ((junctionIdx == connectedVertexIdx) ||
+              (this->getEdgeIdsFromTo(junctionIdx, connectedVertexIdx).size() >
+               1)) {
             molType = MoleculeType::PRIMARY_LOOP;
           }
           molecules.push_back(
             Molecule(this->box, &chain, molType, this->massPerType));
-          igraph_vector_int_destroy(&junctions);
           igraph_destroy(&chain);
         }
       }

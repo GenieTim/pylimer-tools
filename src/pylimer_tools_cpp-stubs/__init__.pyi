@@ -2072,10 +2072,14 @@ class NonGaussianSpringForceEvaluator(MEHPForceEvaluator):
         Initialize this ForceEvaluator
         """
 class NormalModeAnalyzer:
+    def __getstate__(self) -> tuple:
+        ...
     def __init__(self, spring_from: list[int], spring_to: list[int]) -> None:
         """
         Initialize NormalModeAnalyzer
         """
+    def __setstate__(self, arg0: tuple) -> None:
+        ...
     def evaluate_loss_modulus(self, omega: numpy.ndarray) -> numpy.ndarray:
         """
         Evaluate loss modulus
@@ -2088,11 +2092,11 @@ class NormalModeAnalyzer:
         """
         Evaluate stress autocorrelation
         """
-    def find_all_eigenvalues(self) -> None:
+    def find_all_eigenvalues(self, compute_eigenvectors: bool = False) -> None:
         """
         Find all eigenvalues using a dense solver
         """
-    def find_sparse_eigenvalues(self, nr_of_eigenvalues: int) -> None:
+    def find_sparse_eigenvalues(self, nr_of_eigenvalues: int, compute_eigenvectors: bool = False) -> None:
         """
         Find the `k` smallest eigenvalues using a sparse solver
         """
@@ -2103,6 +2107,14 @@ class NormalModeAnalyzer:
     def get_eigenvectors(self) -> numpy.ndarray:
         """
         Get eigenvectors
+        """
+    def get_matrix_size(self) -> int:
+        """
+        Get the size of the matrix (the maximum of eigenvalues that could be queried)
+        """
+    def get_nr_of_soluble_clusters(self) -> int:
+        """
+        Get the number of soluble clusters (Eigenvalues = 0)
         """
     def set_eigenvalues(self, arg0: numpy.ndarray) -> None:
         """
@@ -2523,7 +2535,7 @@ class Universe:
         
                    NOTE:
                        The integer values returned refer to the the atom ids, not the vertex ids.
-                       Use :func:`~pylimer_tools_cpp.Universe.getIdxByAtomId` to translate them to vertex ids.
+                       Use :func:`~pylimer_tools_cpp.Universe.get_idx_by_atom_id` to translate them to vertex ids.
         """
     def get_atom(self, atom_id: int) -> Atom:
         """
@@ -2574,7 +2586,8 @@ class Universe:
         """
     def get_chains_with_crosslinker(self, crosslinker_type: int) -> list[Molecule]:
         """
-                    Decompose the Universe into strands (molecules, which could be either chains, networks, or even lonely atoms, without omitting the cross-linkers.
+                    Decompose the Universe into strands (molecules, which could be either chains, or even lonely atoms), without omitting the cross-linkers
+                    (as in :func:`~pylimer_tools_cpp.Universe.getMolecules(crosslinker_type)`).
                     In turn, e.g. for a tetrafunctional cross-linker, it will be 4 times in the resulting molecules.
                     
                     NOTE:
@@ -2587,6 +2600,10 @@ class Universe:
                   Returns a list of :obj:`~pylimer_tools_cpp.Universe`s.
                   Unconnected, free atoms/beads become their own :obj:`~pylimer_tools_cpp.Universe`.
         """
+    def get_edge_ids_from_to(self, vertex_id_from: int, vertex_id_to: int) -> list[int]:
+        """
+              Get the edge ids of the edges between two specific vertices
+        """
     def get_edges(self) -> dict[str, list[int]]:
         """
                     Get all edges. Returns a dict with three properties: 'edge_from', 'edge_to' and 'edge_type'.
@@ -2594,8 +2611,8 @@ class Universe:
                     
                     NOTE:
                        The integer values returned refer to the vertex ids, not the atom ids.
-                       Use :func:`~pylimer_tools_cpp.Universe.getAtomIdByIdx` to translate them to atom ids, or
-                       :func:`~pylimer_tools_cpp.Universe.getBonds` to have that done for you.
+                       Use :func:`~pylimer_tools_cpp.Universe.get_atom_id_by_idx` to translate them to atom ids, or
+                       :func:`~pylimer_tools_cpp.Universe.get_bonds` to have that done for you.
         """
     def get_masses(self) -> dict[int, float]:
         """
@@ -2632,15 +2649,15 @@ class Universe:
         """
     def get_nr_of_bonds_of_atom(self, arg0: int) -> int:
         """
-        Count the number of immediate neighbours of an atom, specified by its id.
+        Count the number of immediate neighbors of an atom, specified by its id.
         """
     def get_nr_of_bonds_of_vertex(self, arg0: int) -> int:
         """
-        Count the number of immediate neighbours of an atom, specified by its vertex id.
+        Count the number of immediate neighbors of an atom, specified by its vertex id.
         """
     def get_nr_of_dihedral_angles(self) -> int:
         """
-                    Query the number of dihedralangles that have been added to this universe.
+                    Query the number of dihedral angles that have been added to this universe.
         """
     def get_timestep(self) -> int:
         """

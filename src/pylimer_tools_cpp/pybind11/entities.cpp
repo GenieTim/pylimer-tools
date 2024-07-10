@@ -928,7 +928,7 @@ init_pylimer_bound_entities(py::module_& m)
             Query the number of angles that have been added to this universe.
             )pbdoc")
     .def("get_nr_of_dihedral_angles", &Universe::getNrOfDihedralAngles, R"pbdoc(
-            Query the number of dihedralangles that have been added to this universe.
+            Query the number of dihedral angles that have been added to this universe.
             )pbdoc")
     .def("get_timestep", &Universe::getTimestep, R"pbdoc(
             Query the timestep when this universe was captured.
@@ -936,11 +936,18 @@ init_pylimer_bound_entities(py::module_& m)
     .def(
       "get_nr_of_bonds_of_atom",
       &Universe::computeFunctionalityForAtom,
-      R"pbdoc(Count the number of immediate neighbours of an atom, specified by its id.)pbdoc")
+      R"pbdoc(Count the number of immediate neighbors of an atom, specified by its id.)pbdoc")
     .def(
       "get_nr_of_bonds_of_vertex",
       &Universe::computeFunctionalityForVertex,
-      R"pbdoc(Count the number of immediate neighbours of an atom, specified by its vertex id.)pbdoc")
+      R"pbdoc(Count the number of immediate neighbors of an atom, specified by its vertex id.)pbdoc")
+    .def("get_edge_ids_from", &Universe::getIncidentEdgeIds, R"pbdoc()pbdoc", py::arg("vertex_id"))
+    .def("get_edge_ids_from_to",
+         &Universe::getEdgeIdsFromTo,
+         R"pbdoc(
+      Get the edge ids of the edges between two specific vertices)pbdoc",
+         py::arg("vertex_id_from"),
+         py::arg("vertex_id_to"))
     // computations
     .def("compute_bond_lengths",
          &Universe::computeBondLengths,

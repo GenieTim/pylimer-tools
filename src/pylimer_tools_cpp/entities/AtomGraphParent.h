@@ -39,6 +39,8 @@ namespace entities {
     std::vector<long int> getEdgeIdsFromTo(const long int vertexId1,
                                            const long int vertexId2) const;
 
+    std::vector<long int> getIncidentEdgeIds(const long int vertexId) const;
+
     /**
      * @brief Get the vertex ids connected to a specified vertex Id
      *
