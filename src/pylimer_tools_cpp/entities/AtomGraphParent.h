@@ -201,6 +201,8 @@ namespace entities {
      */
     Atom getAtomByVertexIdx(const long int vertexIdx) const;
 
+    Eigen::Vector3d getXYZForVertex(const long int vertexIdx) const;
+
     /**
      * @brief Convert a list of vertex ids to a list of Atom instances
      *
@@ -387,7 +389,9 @@ namespace entities {
      *
      * @return std::vector<double>
      */
-    std::vector<double> computeBondLengths(const Box& box);
+    std::vector<double> computeBondLengths(const Box& box) const;
+
+    double computeMeanSquaredBondLength(const Box& box) const;
 
     /**
      * @brief Count the number of edges leading to/from one vertex

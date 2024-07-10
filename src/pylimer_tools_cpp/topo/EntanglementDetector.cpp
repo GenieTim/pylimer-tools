@@ -50,10 +50,10 @@ namespace topo {
                          "Expected a cutoff > 0.0, got " +
                            std::to_string(cutoff) + ".");
 
-      std::cout << "Randomly finding " << nrOfSliplinksToSample
-                << " entanglements within cutoff " << cutoff
-                << " and same strand cutoff " << sameStrandCutoff << "."
-                << std::endl;
+      // std::cout << "Randomly finding " << nrOfSliplinksToSample
+      //           << " entanglements within cutoff " << cutoff
+      //           << " and same strand cutoff " << sameStrandCutoff << "."
+      //           << std::endl;
 
       // initialise some stuff
       std::vector<std::pair<size_t, size_t>> pairsOfAtoms;
