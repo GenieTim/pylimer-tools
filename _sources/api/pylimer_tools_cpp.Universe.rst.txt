@@ -51,6 +51,8 @@ Universe
       ~Universe.get_box
       ~Universe.get_chains_with_crosslinker
       ~Universe.get_clusters
+      ~Universe.get_edge_ids_from
+      ~Universe.get_edge_ids_from_to
       ~Universe.get_edges
       ~Universe.get_masses
       ~Universe.get_molecules
@@ -125,6 +127,8 @@ Universe
    .. automethod:: get_box
    .. automethod:: get_chains_with_crosslinker
    .. automethod:: get_clusters
+   .. automethod:: get_edge_ids_from
+   .. automethod:: get_edge_ids_from_to
    .. automethod:: get_edges
    .. automethod:: get_masses
    .. automethod:: get_molecules
