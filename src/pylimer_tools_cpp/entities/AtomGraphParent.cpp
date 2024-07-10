@@ -252,6 +252,16 @@ namespace entities {
     return Atom(atomProperties);
   }
 
+  Eigen::Vector3d AtomGraphParent::getXYZForVertex(
+    const long int vertexIdx) const
+  {
+    Eigen::Vector3d coordinates;
+    coordinates << igraph_cattribute_VAN(&this->graph, "x", vertexIdx),
+      igraph_cattribute_VAN(&this->graph, "y", vertexIdx),
+      igraph_cattribute_VAN(&this->graph, "z", vertexIdx);
+    return coordinates;
+  };
+
   std::vector<Atom> AtomGraphParent::verticesToAtoms(
     const std::vector<long int>& vertexIds) const
   {
@@ -445,7 +455,7 @@ namespace entities {
    *
    * @return std::vector<double>
    */
-  std::vector<double> AtomGraphParent::computeBondLengths(const Box& box)
+  std::vector<double> AtomGraphParent::computeBondLengths(const Box& box) const
   {
     std::vector<double> lengths;
     lengths.reserve(this->getNrOfEdges());
@@ -461,19 +471,42 @@ namespace entities {
 
     while (!IGRAPH_EIT_END(bondIterator)) {
       long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
-      igraph_integer_t bondFrom;
-      igraph_integer_t bondTo;
-      igraph_edge(&this->graph, edgeId, &bondFrom, &bondTo);
-      // TODO: this is more intensive than needed
-      // check whether the compiler optimizes this or not
-      Atom atom1 = this->getAtomByVertexIdx(bondFrom);
-      Atom atom2 = this->getAtomByVertexIdx(bondTo);
-      lengths.push_back(atom1.distanceTo(atom2, box));
+      Eigen::Vector3d distance =
+        this->getXYZForVertex(IGRAPH_TO(&this->graph, edgeId)) -
+        this->getXYZForVertex(IGRAPH_FROM(&this->graph, edgeId));
+      box.handlePBC(distance);
+      lengths.push_back(distance.norm());
       IGRAPH_EIT_NEXT(bondIterator);
     }
 
     igraph_eit_destroy(&bondIterator);
     return lengths;
+  }
+
+  double AtomGraphParent::computeMeanSquaredBondLength(const Box& box) const
+  {
+    double result = 0.0;
+
+    // construct iterator
+    igraph_eit_t bondIterator;
+    if (igraph_eit_create(
+          &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &bondIterator)) {
+      throw std::runtime_error("Cannot create iterator to loop bonds");
+    }
+
+    while (!IGRAPH_EIT_END(bondIterator)) {
+      long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
+      Eigen::Vector3d distance =
+        this->getXYZForVertex(IGRAPH_TO(&this->graph, edgeId)) -
+        this->getXYZForVertex(IGRAPH_FROM(&this->graph, edgeId));
+      box.handlePBC(distance);
+      result += distance.squaredNorm() /
+                static_cast<double>(IGRAPH_EIT_SIZE(bondIterator));
+      IGRAPH_EIT_NEXT(bondIterator);
+    }
+
+    igraph_eit_destroy(&bondIterator);
+    return result;
   }
 
   /**

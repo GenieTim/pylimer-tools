@@ -181,9 +181,13 @@ namespace entities {
                                    const std::vector<long int>& bondTo);
     std::vector<double> computeDzs(const std::vector<long int>& bondFrom,
                                    const std::vector<long int>& bondTo);
-    std::vector<double> computeBondLengths()
+    std::vector<double> computeBondLengths() const
     {
       return AtomGraphParent::computeBondLengths(this->box);
+    };
+    double computeMeanSquaredBondLength() const
+    {
+      return AtomGraphParent::computeMeanSquaredBondLength(this->box);
     };
     double computeTemperature(const int dimensions = 3,
                               const double kb = 1.) const;

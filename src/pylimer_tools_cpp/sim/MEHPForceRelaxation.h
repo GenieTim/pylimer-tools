@@ -41,16 +41,16 @@ namespace sim {
           forceEvaluator = &this->springForceEvaluator;
         }
         this->crossLinkerType = crossLinkerType;
-        this->defaultR0Squared =
-          universe.computeMeanSquareEndToEndDistance(crossLinkerType);
-        this->defaultNrOfChains =
-          universe.getMolecules(this->crossLinkerType).size();
         // interpret network already to be able to give early results
         Network net;
         ConvertNetwork(&net,
                        crossLinkerType,
                        remove2functionalCrosslinkers,
                        removeDanglingChains);
+        // this->defaultR0Squared =
+        //   universe.computeMeanSquareEndToEndDistance(crossLinkerType);
+        this->defaultR0Squared = net.springsContourLength.mean() * universe.computeMeanSquaredBondLength();
+        this->defaultNrOfChains = net.springsContourLength.size();
         this->forceRelaxationNetwork = net;
         this->is2D = is2D;
         this->currentForces = Eigen::VectorXd::Zero(net.coordinates.size());
