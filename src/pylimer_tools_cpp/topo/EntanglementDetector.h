@@ -50,7 +50,8 @@ namespace topo {
       const size_t minimumNrOfSliplinks,
       const double sameStrandCutoff = 3,
       const std::string& seed = "",
-      int crossLinkerType = 2);
+      int crossLinkerType = 2,
+      bool ignoreCrosslinks = true);
 
   }
 

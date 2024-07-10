@@ -37,9 +37,10 @@ init_pylimer_bound_topo(py::module_& m)
         py::arg("nr_of_samples"),
         py::arg("cutoff"),
         py::arg("minimum_nr_of_samples") = 0,
-        py::arg("same_strand_cutoff") = 3,
+        py::arg("same_strand_cutoff") = 3.,
         py::arg("seed") = "",
-        py::arg("crosslinker_type") = 2);
+        py::arg("crosslinker_type") = 2,
+        py::arg("ignore_crosslinks") = true);
 }
 // }
 

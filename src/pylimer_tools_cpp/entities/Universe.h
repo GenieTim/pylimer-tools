@@ -68,6 +68,7 @@ namespace entities {
                   const std::vector<int>& nz,
                   const std::unordered_map<std::string, std::vector<double>>&
                     additionalData);
+    // void addAtoms(const std::vector<Atom>& atoms);
     void removeAtoms(const std::vector<long int>& ids);
     void replaceAtom(const long int id, const Atom& replacement);
     // bonds

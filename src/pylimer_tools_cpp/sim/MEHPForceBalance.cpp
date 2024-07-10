@@ -769,13 +769,10 @@ namespace sim {
         this->universe.getNrOfAtoms(), false);
       if (excludeCrosslinks) {
         // TODO: check whether it is faster to just only query the other ones
-        atomsForNeighbourList.erase(
-          std::remove_if(atomsForNeighbourList.begin(),
-                         atomsForNeighbourList.end(),
-                         [&](pylimer_tools::entities::Atom a) -> bool {
-                           return a.getType() == this->crossLinkerType;
-                         }),
-          atomsForNeighbourList.end());
+        std::erase_if(atomsForNeighbourList,
+                      [&](const pylimer_tools::entities::Atom& a) -> bool {
+                        return a.getType() == this->crossLinkerType;
+                      });
         for (size_t i = 0; i < this->universe.getNrOfAtoms(); ++i) {
           isMasked[i] = (this->universe.getAtomByVertexIdx(i).getType() ==
                          this->crossLinkerType);
@@ -3825,37 +3822,34 @@ namespace sim {
       if (respectLoops && net.loopsOfSliplink.size() > 0) {
         // filter out the target springs that may not be a target based on the
         // involved loops
-        possibleTargetSprings.erase(
-          std::remove_if(
-            possibleTargetSprings.begin(),
-            possibleTargetSprings.end(),
-            [&net, springIdx, involvedSlipLink](size_t springIdxToCheck) {
-              // we want to be able to distinguish all associated loops
-              // into being (a) the ones the slip-link is slipping on, or
-              // (b) the one the second, currently non-slipping part is
-              // associated with only the cases of (a) are allowed as possible
-              // target springs
-              bool allLoopsWithSpringIdxToCheckIncludespringIdx = false;
-              for (size_t loopIdx : net.loopsOfSliplink[involvedSlipLink]) {
-                bool loopContainsCheck = false;
-                bool loopContainsOriginal = false;
-                for (size_t lspringIdx : net.loops[loopIdx]) {
-                  if (lspringIdx == springIdxToCheck) {
-                    loopContainsCheck = true;
-                  }
-                  if (lspringIdx == springIdx) {
-                    loopContainsOriginal = true;
-                  }
+        std::erase_if(
+          possibleTargetSprings,
+          [&net, springIdx, involvedSlipLink](size_t springIdxToCheck) {
+            // we want to be able to distinguish all associated loops
+            // into being (a) the ones the slip-link is slipping on, or
+            // (b) the one the second, currently non-slipping part is
+            // associated with only the cases of (a) are allowed as possible
+            // target springs
+            bool allLoopsWithSpringIdxToCheckIncludespringIdx = false;
+            for (size_t loopIdx : net.loopsOfSliplink[involvedSlipLink]) {
+              bool loopContainsCheck = false;
+              bool loopContainsOriginal = false;
+              for (size_t lspringIdx : net.loops[loopIdx]) {
+                if (lspringIdx == springIdxToCheck) {
+                  loopContainsCheck = true;
                 }
-                if (loopContainsOriginal && !loopContainsCheck) {
-                  // YES, this is not allowed -> remove
-                  return true;
+                if (lspringIdx == springIdx) {
+                  loopContainsOriginal = true;
                 }
               }
-              // return allLoopsWithSpringIdxToCheckIncludespringIdx;
-              return false;
-            }),
-          possibleTargetSprings.end());
+              if (loopContainsOriginal && !loopContainsCheck) {
+                // YES, this is not allowed -> remove
+                return true;
+              }
+            }
+            // return allLoopsWithSpringIdxToCheckIncludespringIdx;
+            return false;
+          });
       }
       if (possibleTargetSprings.size() <= 1) {
         // e.g. in the case of many loops :P
