@@ -78,9 +78,9 @@ namespace calc {
 
   void NormalModeAnalyzer::computeAllEigenvalues(const bool includeEigenvectors)
   {
-    // #ifndef EIGEN_USE_LAPACKE
     Eigen::MatrixXd assembledConnectivityMatrixDense =
       Eigen::MatrixXd(this->assembledConnectivityMatrix);
+#ifndef EIGEN_USE_LAPACKE
     Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver =
       Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd>(
         assembledConnectivityMatrixDense,
@@ -91,14 +91,47 @@ namespace calc {
     if (includeEigenvectors) {
       this->setEigenvectors(solver.eigenvectors());
     }
-    // #else
-    // igraph_lapack_dsyevr()
-    // LAPACK_dsyevr(
-    //   includeEigenvectors ? 'V': 'N',
-    //   'A', assembledConnectivityMatrixDense.rows(),
+#else
+    // see also/alternative: igraph_lapack_dsyevr()
+    Eigen::VectorXd eigenvalues =
+      Eigen::VectorXd::Zero(this->assembledConnectivityMatrix.rows());
+    Eigen::MatrixXd eigenvectors =
+      includeEigenvectors
+        ? Eigen::MatrixXd::Zero(this->assembledConnectivityMatrix.rows(),
+                                this->assembledConnectivityMatrix.rows())
+        : Eigen::MatrixXd::Zero(3, 3);
+    int il = 0;
+    double abstol = 1e-10;
+    int M = 0;
 
-    // );
-    // #endif
+    Eigen::VectorXi support =
+      Eigen::VectorXi::Zero(this->assembledConnectivityMatrix.rows() * 2);
+
+    // query optimal workspace size
+    int info =
+      LAPACKE_dsyevr(assembledConnectivityMatrixDense.rows(), // matrix_order
+                     includeEigenvectors ? 'V' : 'N',         // JOBZ
+                     'A',                                     // RANGE
+                     'U',                                     // UPLO
+                     assembledConnectivityMatrixDense.rows(), // N
+                     assembledConnectivityMatrixDense.data(), // A
+                     assembledConnectivityMatrixDense.rows(), // LDA
+                     0,                                       // VL
+                     0,                                       // VU
+                     il,                                     // IL
+                     il,                                     // IU
+                     abstol,                                  // ABSTOL
+                     &M,                 // M, total number of eigenvalues found
+                     eigenvalues.data(), // W
+                     eigenvectors.data(), // Z
+                     eigenvectors.rows(), // LDZ
+                     support.data()       // ISUPPZ
+      );
+
+    RUNTIME_EXP_IFN(info == 0,
+                    "Error in LAPACK_dsyevr. Exit code " +
+                      std::to_string(info) + ".");
+#endif
   }
 
   void NormalModeAnalyzer::requireEigenvaluesComputation() const
