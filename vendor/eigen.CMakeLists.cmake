@@ -6,11 +6,11 @@ if (NOT DEFINED eigen_LOADED)
 	else()
 			include(FetchContent)
 			FetchContent_Declare(
-				eigen3 
+				Eigen3 
 				GIT_REPOSITORY https://gitlab.com/libeigen/eigen
 				GIT_TAG 3.4.0
 			)
-			FetchContent_MakeAvailable(eigen3)
+			FetchContent_MakeAvailable(Eigen3)
 	endif()
 
 	set(eigen_LOADED ON)
@@ -27,7 +27,7 @@ if(LAPACKE_FOUND)
 	add_definitions(-DEIGEN_USE_LAPACKE)
 endif()
 
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Intel")
+if(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
 		set(BLA_VENDOR Intel10_64lp)
     add_definitions(-DEIGEN_USE_MKL_ALL)
 endif()

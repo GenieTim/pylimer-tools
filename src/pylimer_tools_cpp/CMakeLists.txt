@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 cmake_policy(SET CMP0077 NEW)
 
 # set the project name
-project(pylimer_tools VERSION 1.0)
+project(pylimer_tools VERSION 1.0 LANGUAGES CXX)
 add_library(pylimer_tools pylimer_tools.cpp)
 
 # specify the C++ standard
@@ -41,7 +41,7 @@ if (TARGET Eigen3::Eigen)
 	target_link_libraries(pylimer_tools PUBLIC Eigen3::Eigen)
 else()
 	include_directories(${EIGEN3_INCLUDE_DIRS})
-	include_directories(${EIGEN3_INCLUDE_DIRS}/eigen3)
+	include_directories(${EIGEN3_INCLUDE_DIRS}/Eigen3)
 	target_link_libraries(pylimer_tools PUBLIC ${EIGEN3_LIBRARIES} ${BLAS_LIBRARIES})
 	message(STATUS "Eigen include directories: ${EIGEN3_INCLUDE_DIRS}, libraries ${EIGEN3_LIBRARIES}")
 endif()
