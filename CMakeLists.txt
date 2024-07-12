@@ -7,9 +7,9 @@ endif ()
 
 # start project
 if (NOT DEFINED VERSION_NR)
-project(pylimer_tools VERSION "0.2.4")
+project(pylimer_tools VERSION "0.2.4" LANGUAGES CXX)
 else()
-project(pylimer_tools VERSION ${VERSION_NR})
+project(pylimer_tools VERSION ${VERSION_NR} LANGUAGES CXX)
 endif()
 add_definitions( -DOVERALL_PROJECT_VERSION="${CMAKE_PROJECT_VERSION}")
 
