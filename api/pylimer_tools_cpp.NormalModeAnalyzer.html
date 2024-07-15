@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="OutputConfiguration" href="pylimer_tools_cpp.OutputConfiguration.html" /><link rel="prev" title="NonGaussianSpringForceEvaluator" href="pylimer_tools_cpp.NonGaussianSpringForceEvaluator.html" />
 
-    <!-- Generated with Sphinx 7.3.7 and Furo 2024.05.06 -->
+    <!-- Generated with Sphinx 7.4.0 and Furo 2024.05.06 -->
         <title>NormalModeAnalyzer - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=387cc868" />
@@ -333,10 +333,10 @@
 <table class="autosummary longtable docutils align-default">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus" title="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_loss_modulus</span></code></a>(self, omega)</p></td>
-<td><p>Evaluate loss modulus</p></td>
+<td><p>Evaluate the loss modulus <span class="math notranslate nohighlight">\(G''\)</span>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus" title="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_storage_modulus</span></code></a>(self, omega)</p></td>
-<td><p>Evaluate storage modulus</p></td>
+<td><p>Evaluate the storage modulus <span class="math notranslate nohighlight">\(G'\)</span>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation" title="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_stress_autocorrelation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">evaluate_stress_autocorrelation</span></code></a>(self, t)</p></td>
 <td><p>Evaluate stress autocorrelation</p></td>
@@ -348,7 +348,7 @@
 <td><p>Find the <cite>k</cite> smallest eigenvalues using a sparse solver</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvalues" title="pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvalues"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_eigenvalues</span></code></a>(self)</p></td>
-<td><p>Get eigenvalues</p></td>
+<td><p>Get the eigenvalues</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvectors" title="pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvectors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_eigenvectors</span></code></a>(self)</p></td>
 <td><p>Get eigenvectors</p></td>
@@ -359,11 +359,11 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_nr_of_soluble_clusters" title="pylimer_tools_cpp.NormalModeAnalyzer.get_nr_of_soluble_clusters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_soluble_clusters</span></code></a>(self)</p></td>
 <td><p>Get the number of soluble clusters (Eigenvalues = 0)</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues" title="pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_eigenvalues</span></code></a>(self, arg0)</p></td>
-<td><p>Set eigenvalues</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues" title="pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_eigenvalues</span></code></a>(self, eigenvalues)</p></td>
+<td><p>Set the eigenvalues, e.g. if you use an external solver.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors" title="pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_eigenvectors</span></code></a>(self, arg0)</p></td>
-<td><p>Set eigenvectors</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors" title="pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_eigenvectors</span></code></a>(self, eigenvectors)</p></td>
+<td><p>Set eigenvectors, e.g. if you use an external solver.</p></td>
 </tr>
 </tbody>
 </table>
@@ -372,13 +372,13 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus">
 <span class="sig-name descname"><span class="pre">evaluate_loss_modulus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_loss_modulus" title="Link to this definition">¶</a></dt>
-<dd><p>Evaluate loss modulus</p>
+<dd><p>Evaluate the loss modulus <span class="math notranslate nohighlight">\(G''\)</span>. Yet misses the conversion factor.</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus">
 <span class="sig-name descname"><span class="pre">evaluate_storage_modulus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer.evaluate_storage_modulus" title="Link to this definition">¶</a></dt>
-<dd><p>Evaluate storage modulus</p>
+<dd><p>Evaluate the storage modulus <span class="math notranslate nohighlight">\(G'\)</span>. Yet misses the conversion factor.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -402,7 +402,7 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvalues">
 <span class="sig-name descname"><span class="pre">get_eigenvalues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvalues" title="Link to this definition">¶</a></dt>
-<dd><p>Get eigenvalues</p>
+<dd><p>Get the eigenvalues</p>
 </dd></dl>
 
 <dl class="py method">
@@ -425,14 +425,14 @@
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues">
-<span class="sig-name descname"><span class="pre">set_eigenvalues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues" title="Link to this definition">¶</a></dt>
-<dd><p>Set eigenvalues</p>
+<span class="sig-name descname"><span class="pre">set_eigenvalues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">eigenvalues</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues" title="Link to this definition">¶</a></dt>
+<dd><p>Set the eigenvalues, e.g. if you use an external solver</p>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors">
-<span class="sig-name descname"><span class="pre">set_eigenvectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">arg0</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">n</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors" title="Link to this definition">¶</a></dt>
-<dd><p>Set eigenvectors</p>
+<span class="sig-name descname"><span class="pre">set_eigenvectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">eigenvectors</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">n</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors" title="Link to this definition">¶</a></dt>
+<dd><p>Set eigenvectors, e.g. if you use an external solver</p>
 </dd></dl>
 
 </dd></dl>
@@ -523,5 +523,7 @@
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/scripts/furo.js?v=4e2eecee"></script>
+    <script>window.MathJax = {"tex": {}, "extensions": ["jsMath2jax.js"], "jax": ["input/TeX"]}</script>
+    <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
     </body>
 </html>
