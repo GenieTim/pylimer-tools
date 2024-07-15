@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="UniverseSequence" href="pylimer_tools_cpp.UniverseSequence.html" /><link rel="prev" title="StructureSimplificationMode" href="pylimer_tools_cpp.StructureSimplificationMode.html" />
 
-    <!-- Generated with Sphinx 7.4.0 and Furo 2024.05.06 -->
+    <!-- Generated with Sphinx 7.4.3 and Furo 2024.05.06 -->
         <title>Universe - PylimerTools documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=387cc868" />
@@ -513,43 +513,46 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.hash_dihedral_angle_type" title="pylimer_tools_cpp.Universe.hash_dihedral_angle_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">hash_dihedral_angle_type</span></code></a>(self, angle_from, ...)</p></td>
 <td><p>Convert the four integers to one long number/hash.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.remove_all_angles" title="pylimer_tools_cpp.Universe.remove_all_angles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_all_angles</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.interpolate_edges" title="pylimer_tools_cpp.Universe.interpolate_edges"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpolate_edges</span></code></a>(self, crosslinker_type, ...)</p></td>
+<td><p>Get more or less edges than currently present, interpolating between junctions.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.remove_all_angles" title="pylimer_tools_cpp.Universe.remove_all_angles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_all_angles</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.remove_all_dihedral_angles" title="pylimer_tools_cpp.Universe.remove_all_dihedral_angles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_all_dihedral_angles</span></code></a>(self)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.remove_all_dihedral_angles" title="pylimer_tools_cpp.Universe.remove_all_dihedral_angles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_all_dihedral_angles</span></code></a>(self)</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.remove_atoms" title="pylimer_tools_cpp.Universe.remove_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_atoms</span></code></a>(self, atom_ids)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.remove_atoms" title="pylimer_tools_cpp.Universe.remove_atoms"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_atoms</span></code></a>(self, atom_ids)</p></td>
 <td><p>Remove atoms and all associated bonds by their atom ids.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.remove_bonds" title="pylimer_tools_cpp.Universe.remove_bonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_bonds</span></code></a>(self, bonds_from, bonds_to)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.remove_bonds" title="pylimer_tools_cpp.Universe.remove_bonds"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_bonds</span></code></a>(self, bonds_from, bonds_to)</p></td>
 <td><p>Remove bonds by their connected atom ids.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.remove_bonds_by_type" title="pylimer_tools_cpp.Universe.remove_bonds_by_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_bonds_by_type</span></code></a>(self, bond_type)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.remove_bonds_by_type" title="pylimer_tools_cpp.Universe.remove_bonds_by_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_bonds_by_type</span></code></a>(self, bond_type)</p></td>
 <td><p>Remove bonds with a specific type.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.replace_atom" title="pylimer_tools_cpp.Universe.replace_atom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">replace_atom</span></code></a>(self, atom_id, replacement_atom)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.replace_atom" title="pylimer_tools_cpp.Universe.replace_atom"><code class="xref py py-obj docutils literal notranslate"><span class="pre">replace_atom</span></code></a>(self, atom_id, replacement_atom)</p></td>
 <td><p>Replace the properties of an atom with the properties of another given atom.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.resample_velocities" title="pylimer_tools_cpp.Universe.resample_velocities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample_velocities</span></code></a>(self, mean, variance[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.resample_velocities" title="pylimer_tools_cpp.Universe.resample_velocities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resample_velocities</span></code></a>(self, mean, variance[, ...])</p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.set_box" title="pylimer_tools_cpp.Universe.set_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_box</span></code></a>(self, box[, rescale_atoms])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.set_box" title="pylimer_tools_cpp.Universe.set_box"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_box</span></code></a>(self, box[, rescale_atoms])</p></td>
 <td><p>Override the currently assigned box with the one specified.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.set_box_lengths" title="pylimer_tools_cpp.Universe.set_box_lengths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_box_lengths</span></code></a>(self, lx, ly, lz[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.set_box_lengths" title="pylimer_tools_cpp.Universe.set_box_lengths"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_box_lengths</span></code></a>(self, lx, ly, lz[, ...])</p></td>
 <td><p>Override the currently assigned box with one with the side lengths specified.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.set_masses" title="pylimer_tools_cpp.Universe.set_masses"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_masses</span></code></a>(self, massPerType)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.set_masses" title="pylimer_tools_cpp.Universe.set_masses"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_masses</span></code></a>(self, massPerType)</p></td>
 <td><p>Set the mass per type of atom.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.set_timestep" title="pylimer_tools_cpp.Universe.set_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_timestep</span></code></a>(self, timestep)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.set_timestep" title="pylimer_tools_cpp.Universe.set_timestep"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_timestep</span></code></a>(self, timestep)</p></td>
 <td><p>Set the time-step when this Universe was captured.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.set_vertex_property" title="pylimer_tools_cpp.Universe.set_vertex_property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_vertex_property</span></code></a>(self, vertex_id, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.set_vertex_property" title="pylimer_tools_cpp.Universe.set_vertex_property"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_vertex_property</span></code></a>(self, vertex_id, ...)</p></td>
 <td><p>Set a specific property for a specific vertex.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.simplify" title="pylimer_tools_cpp.Universe.simplify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simplify</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.Universe.simplify" title="pylimer_tools_cpp.Universe.simplify"><code class="xref py py-obj docutils literal notranslate"><span class="pre">simplify</span></code></a>(self)</p></td>
 <td><p>Remove self links and double bonds.</p></td>
 </tr>
 </tbody>
@@ -1033,6 +1036,12 @@ Used internally for duplicate detection.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.Universe.interpolate_edges">
+<span class="sig-name descname"><span class="pre">interpolate_edges</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interpolation_factor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Universe.interpolate_edges" title="Link to this definition">¶</a></dt>
+<dd><p>Get more or less edges than currently present, interpolating between junctions.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.Universe.remove_all_angles">
 <span class="sig-name descname"><span class="pre">remove_all_angles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.Universe</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.Universe.remove_all_angles" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1227,6 +1236,7 @@ Used internally for duplicate detection.</p>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Universe.has_infinite_strand"><code class="docutils literal notranslate"><span class="pre">Universe.has_infinite_strand()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Universe.hash_angle_type"><code class="docutils literal notranslate"><span class="pre">Universe.hash_angle_type()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Universe.hash_dihedral_angle_type"><code class="docutils literal notranslate"><span class="pre">Universe.hash_dihedral_angle_type()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.Universe.interpolate_edges"><code class="docutils literal notranslate"><span class="pre">Universe.interpolate_edges()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Universe.remove_all_angles"><code class="docutils literal notranslate"><span class="pre">Universe.remove_all_angles()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Universe.remove_all_dihedral_angles"><code class="docutils literal notranslate"><span class="pre">Universe.remove_all_dihedral_angles()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.Universe.remove_atoms"><code class="docutils literal notranslate"><span class="pre">Universe.remove_atoms()</span></code></a></li>

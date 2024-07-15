@@ -70,6 +70,7 @@ Universe
       ~Universe.has_infinite_strand
       ~Universe.hash_angle_type
       ~Universe.hash_dihedral_angle_type
+      ~Universe.interpolate_edges
       ~Universe.remove_all_angles
       ~Universe.remove_all_dihedral_angles
       ~Universe.remove_atoms
@@ -146,6 +147,7 @@ Universe
    .. automethod:: has_infinite_strand
    .. automethod:: hash_angle_type
    .. automethod:: hash_dihedral_angle_type
+   .. automethod:: interpolate_edges
    .. automethod:: remove_all_angles
    .. automethod:: remove_all_dihedral_angles
    .. automethod:: remove_atoms
