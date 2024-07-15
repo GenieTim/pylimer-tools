@@ -32,6 +32,18 @@ init_pylimer_bound_topo(py::module_& m)
         R"pbdoc(
     Randomly find pairs of atoms that are close together and could be
     entanglements
+
+    Arguments:
+    :param universe: The universe of atoms from which to sample entanglements from.
+    :param nr_of_samples: The number of pairs of atoms to randomly sample.
+    :param cutoff: The maximum distance between atoms for a pair to be considered a potential entanglement.
+    :param minimum_nr_of_samples: The minimum number of entanglements to be found.
+    :param same_strand_cutoff: The maximum distance between atoms on the same strand for a pair to be considered a potential entanglement.
+    :param seed: A seed for the random number generator.
+    :param crosslinker_type: The type of crosslinker to consider when finding entanglements. Used for the splitting into strands.
+    :param ignore_crosslinks: Whether to ignore crosslinks when finding entanglements. 
+      Careful: if you don't ignore them, the same-strand policy might not work correctly, 
+      since each cross-link should actually be associated with more than one strand.
   )pbdoc",
         py::arg("universe"),
         py::arg("nr_of_samples"),

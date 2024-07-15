@@ -45,27 +45,31 @@ init_pylimer_bound_calc(py::module_& m)
          &NormalModeAnalyzer::computeAllEigenvalues,
          "Find all eigenvalues using a dense solver",
          py::arg("compute_eigenvectors") = false)
-    .def(
-      "get_eigenvalues", &NormalModeAnalyzer::getEigenvalues, "Get eigenvalues")
-    .def(
-      "set_eigenvalues", &NormalModeAnalyzer::setEigenvalues, "Set eigenvalues")
+    .def("get_eigenvalues",
+         &NormalModeAnalyzer::getEigenvalues,
+         "Get the eigenvalues")
+    .def("set_eigenvalues",
+         &NormalModeAnalyzer::setEigenvalues,
+         "Set the eigenvalues, e.g. if you use an external solver",
+         py::arg("eigenvalues"))
     .def("get_eigenvectors",
          &NormalModeAnalyzer::getEigenvectors,
          "Get eigenvectors")
     .def("set_eigenvectors",
          &NormalModeAnalyzer::setEigenvectors,
-         "Set eigenvectors")
+         "Set eigenvectors, e.g. if you use an external solver",
+         py::arg("eigenvectors"))
     .def("evaluate_stress_autocorrelation",
          &NormalModeAnalyzer::evaluateStressAutocorrelation,
          "Evaluate stress autocorrelation",
          py::arg("t"))
     .def("evaluate_storage_modulus",
          &NormalModeAnalyzer::evaluateStorageModulus,
-         "Evaluate storage modulus",
+         "Evaluate the storage modulus :math:`G'`. Yet misses the conversion factor.",
          py::arg("omega"))
     .def("evaluate_loss_modulus",
          &NormalModeAnalyzer::evaluateLossModulus,
-         "Evaluate loss modulus",
+         "Evaluate the loss modulus :math:`G''`. Yet misses the conversion factor.",
          py::arg("omega"))
     .def("get_nr_of_soluble_clusters",
          &NormalModeAnalyzer::getNrOfSolubleClusters,
