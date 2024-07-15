@@ -1,10 +1,10 @@
 #ifndef OUTPUT_SUPPORTING_SIM_H
 #define OUTPUT_SUPPORTING_SIM_H
 
+#include "../calc/Correlator.h"
 #include "../utils/CerealUtils.h"
 #include "../utils/VectorUtils.h"
 #include "../utils/utilityMacros.h"
-#include "../calc/Correlator.h"
 #include <Eigen/Dense>
 #include <algorithm>
 #include <array>

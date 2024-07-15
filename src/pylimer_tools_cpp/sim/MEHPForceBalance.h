@@ -5,9 +5,9 @@
 #include "../entities/Box.h"
 #include "../entities/NeighbourList.h"
 #include "../entities/Universe.h"
-#include "../topo/EntanglementDetector.h"
 #include "../sim/MEHPUtilityStructures.h"
 #include "../sim/OutputSupportingSimulation.h"
+#include "../topo/EntanglementDetector.h"
 #include <Eigen/Dense>
 #include <algorithm>
 #include <array>

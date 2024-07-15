@@ -4,9 +4,9 @@
 #include "../entities/Atom.h"
 #include "../entities/EigenNeighbourList.h"
 #include "../entities/Universe.h"
+#include "../sim/OutputSupportingSimulation.h"
 #include "../utils/ExtraEigenTypes.h"
 #include "../utils/PerformanceTimer.h"
-#include "../sim/OutputSupportingSimulation.h"
 #include <Eigen/Dense>
 #include <algorithm>
 #include <array>

@@ -175,6 +175,9 @@ namespace entities {
     std::map<int, double> computeWeightFractions() const;
     double computeWeightFractionOfClustersAssociatedWith(
       std::vector<long int> atomIds) const;
+    std::vector<std::pair<size_t, size_t>> interpolateEdges(
+      int crossLinkerType,
+      double interpolationFactor) const;
     std::vector<double> computeDxs(const std::vector<long int>& bondFrom,
                                    const std::vector<long int>& bondTo);
     std::vector<double> computeDys(const std::vector<long int>& bondFrom,
@@ -191,9 +194,6 @@ namespace entities {
     };
     double computeTemperature(const int dimensions = 3,
                               const double kb = 1.) const;
-    Eigen::Vector3d getPositionVectorForVertex(const int vertexId) const;
-    Eigen::Vector3d getUnwrappedPositionVectorForVertex(
-      const int vertexId) const;
     std::vector<LoopIntersectionInfo> findLoopEntanglements(
       const std::vector<long int>& vertexIndicesLoop1,
       const std::vector<long int>& vertexIndicesLoop2,

@@ -2270,30 +2270,41 @@ namespace entities {
     return results;
   };
 
-  Eigen::Vector3d Universe::getPositionVectorForVertex(const int vertexId) const
+  std::vector<std::pair<size_t, size_t>> Universe::interpolateEdges(
+    int crossLinkerType,
+    double interpolationFactor) const
   {
-    Eigen::Vector3d vertex = Eigen::Vector3d::Zero();
-    vertex[0] = igraph_cattribute_VAN(&this->graph, "x", vertexId);
-    vertex[1] = igraph_cattribute_VAN(&this->graph, "y", vertexId);
-    vertex[2] = igraph_cattribute_VAN(&this->graph, "z", vertexId);
-    return vertex;
-  }
+    std::vector<long int> vertexIdToNewIdx =
+      pylimer_tools::utils::initializeWithValue<long int>(this->getNrOfAtoms(),
+                                                          -1);
+    size_t currentMaxIdx = 0;
+    std::vector<std::pair<size_t, size_t>> results;
+    std::vector<Molecule> chainsToInterpolate =
+      this->getChainsWithCrosslinker(crossLinkerType);
+    for (const auto& chain : chainsToInterpolate) {
+      std::vector<Atom> ends = chain.getChainEnds(crossLinkerType, true);
+      RUNTIME_EXP_IFN(ends.size() == 2, "Chain must have exactly two ends");
+      size_t end0 = this->getIdxByAtomId(ends[0].getId());
+      size_t end1 = this->getIdxByAtomId(ends[1].getId());
+      if (vertexIdToNewIdx[end0] == -1) {
+        vertexIdToNewIdx[end0] = currentMaxIdx;
+        currentMaxIdx += 1;
+      }
+      size_t previousId = vertexIdToNewIdx[end0];
+      size_t numExtraBonds = static_cast<size_t>(
+        (static_cast<double>(chain.getNrOfBonds()) * interpolationFactor));
+      for (size_t i = 1; i < numExtraBonds; ++i) {
+        results.push_back(std::make_pair(previousId, currentMaxIdx));
+        currentMaxIdx += 1;
+      }
+      if (vertexIdToNewIdx[end1] == -1) {
+        vertexIdToNewIdx[end1] = currentMaxIdx;
+        currentMaxIdx += 1;
+      }
+      results.push_back(std::make_pair(vertexIdToNewIdx[end1], previousId));
+    }
 
-  Eigen::Vector3d Universe::getUnwrappedPositionVectorForVertex(
-    const int vertexId) const
-  {
-
-    Eigen::Vector3d vertex = Eigen::Vector3d::Zero();
-    vertex[0] = igraph_cattribute_VAN(&this->graph, "x", vertexId);
-    vertex[1] = igraph_cattribute_VAN(&this->graph, "y", vertexId);
-    vertex[2] = igraph_cattribute_VAN(&this->graph, "z", vertexId);
-
-    Eigen::Array3d image = Eigen::Array3d::Zero();
-    image[0] = igraph_cattribute_VAN(&this->graph, "nx", vertexId);
-    image[1] = igraph_cattribute_VAN(&this->graph, "ny", vertexId);
-    image[2] = igraph_cattribute_VAN(&this->graph, "nz", vertexId);
-
-    return vertex + (this->getBox().getL() * image).matrix();
+    return results;
   }
 
   /**

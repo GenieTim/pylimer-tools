@@ -66,7 +66,7 @@ load(Archive& archive, std::mt19937& mt)
 }
 
 ////////////////////////////////////////////////////////////////
-// MARK: Eigen objects serialization of 
+// MARK: Eigen objects serialization of
 
 // if we can store binary data
 template<class Archive, class Derived>

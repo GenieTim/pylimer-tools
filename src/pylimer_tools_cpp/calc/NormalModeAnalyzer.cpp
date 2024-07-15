@@ -118,8 +118,8 @@ namespace calc {
                      assembledConnectivityMatrixDense.rows(), // LDA
                      0,                                       // VL
                      0,                                       // VU
-                     il,                                     // IL
-                     il,                                     // IU
+                     il,                                      // IL
+                     il,                                      // IU
                      abstol,                                  // ABSTOL
                      &M,                 // M, total number of eigenvalues found
                      eigenvalues.data(), // W
