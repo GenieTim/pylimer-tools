@@ -222,7 +222,6 @@ init_pylimer_bound_sim(py::module_& m)
     // .def_readonly("springIsActive", &mehp::Network::springIsActive)
     ;
 
-
   ////////////////////////////////////////////////////////////////
   // MARK: Force evaluators
   py::class_<mehp::MEHPForceEvaluator, mehp::PyMEHPForceEvaluator>(
@@ -322,7 +321,6 @@ init_pylimer_bound_sim(py::module_& m)
          py::arg("kappa") = 1.0,
          py::arg("N") = 1.0,
          py::arg("l") = 1.0);
-
 
   ////////////////////////////////////////////////////////////////
   // MARK: Force Relaxation
@@ -589,7 +587,6 @@ init_pylimer_bound_sim(py::module_& m)
           Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
      )pbdoc");
 
-
   ////////////////////////////////////////////////////////////////
   // MARK: Configuration Enums
   py::enum_<mehp::StructureSimplificationMode>(m, "StructureSimplificationMode")
@@ -609,7 +606,6 @@ init_pylimer_bound_sim(py::module_& m)
     .value("ALL_MC_CYCLE", mehp::LinkSwappingMode::ALL_MC_CYCLE)
     .value("ALL_MC_TRY", mehp::LinkSwappingMode::ALL_MC_TRY)
     .value("ALL_MC_TRY_CYCLE", mehp::LinkSwappingMode::ALL_MC_TRY_CYCLE);
-
 
   ////////////////////////////////////////////////////////////////
   // MARK: Force Balance

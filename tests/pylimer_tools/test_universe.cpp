@@ -2,6 +2,7 @@
 #include "../../src/pylimer_tools_cpp/entities/Box.h"
 #include "../../src/pylimer_tools_cpp/entities/Molecule.h"
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
+#include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include <algorithm>
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -39,42 +40,11 @@ getVectorWithOne(T val)
   return vec;
 }
 
-TEST_CASE("Universe can be used", "[entity][Universe]")
+TEST_CASE("Universe can be created", "[entity][Universe]")
 {
-  std::cout << "Running test \"Universe can be used\"" << std::endl;
-  REQUIRE(1 == 1);
+  std::cout << "Running test \"Universe can be created\"" << std::endl;
 
-  pe::Universe universe = pe::Universe(1.0, 1.0, 1.0);
-  REQUIRE(universe.getVolume() == 1.0);
-
-  SECTION("resizing smaller changes volume")
-  {
-    REQUIRE_THROWS(pe::Box(0.0, 1.0, 2.0));
-    universe.setBox(pe::Box(0.25, 1.0, 2.0));
-    REQUIRE(universe.getVolume() == 0.5);
-    // check empty stuff
-    REQUIRE(universe.getClusters().size() == 0);
-    REQUIRE(universe.getMolecules(2).size() == 0);
-    REQUIRE(universe.getChainsWithCrosslinker(2).size() == 0);
-    REQUIRE(universe.determineEffectiveFunctionalityPerType().size() == 0);
-    REQUIRE(universe.computeWeightFractions().size() == 0);
-    REQUIRE(universe.computeMeanBondLength() == 0.0);
-    REQUIRE(universe.computeBondLengths().size() == 0);
-    REQUIRE(universe.computeMeanEndToEndDistance(2) == 0.0);
-    REQUIRE(universe.computeMeanSquareEndToEndDistance(2) == 0.0);
-    REQUIRE(universe.computeEndToEndDistances(2).size() == 0);
-    REQUIRE(universe.findLoops(2).size() == 0);
-  }
-
-  SECTION("resizing bigger changes volume")
-  {
-    universe.setBoxLengths(1.0, 1.0, 1.0);
-    REQUIRE(universe.getVolume() == 1.0);
-    universe.setBox(pe::Box(2.0, 1.0, 2.0));
-    REQUIRE(universe.getVolume() == 4.0);
-    universe.setBox(pe::Box(-1.0, 1.0, 0.0, 1.0, 0.0, 2.0));
-    REQUIRE(universe.getVolume() == 4.0);
-  }
+  pe::Universe universe(1.0, 1.0, 1.0);
 
   SECTION("atoms can be added")
   {
@@ -208,6 +178,50 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       universe.addBonds(3, oneTwoThree, fourLongZeros, threeZeros));
     REQUIRE_THROWS(universe.computeDxs(threeLongZeros, fourLongZeros));
   }
+}
+
+TEST_CASE("Universe can be resized", "[entity][Universe]")
+{
+  std::cout << "Running test \"Universe can be resized\"" << std::endl;
+
+  pe::Universe universe = pe::Universe(1.0, 1.0, 1.0);
+  REQUIRE(universe.getVolume() == 1.0);
+
+  SECTION("resizing smaller changes volume")
+  {
+    REQUIRE_THROWS(pe::Box(0.0, 1.0, 2.0));
+    universe.setBox(pe::Box(0.25, 1.0, 2.0));
+    REQUIRE(universe.getVolume() == 0.5);
+    // check empty stuff
+    REQUIRE(universe.getClusters().size() == 0);
+    REQUIRE(universe.getMolecules(2).size() == 0);
+    REQUIRE(universe.getChainsWithCrosslinker(2).size() == 0);
+    REQUIRE(universe.determineEffectiveFunctionalityPerType().size() == 0);
+    REQUIRE(universe.computeWeightFractions().size() == 0);
+    REQUIRE(universe.computeMeanBondLength() == 0.0);
+    REQUIRE(universe.computeBondLengths().size() == 0);
+    REQUIRE(universe.computeMeanEndToEndDistance(2) == 0.0);
+    REQUIRE(universe.computeMeanSquareEndToEndDistance(2) == 0.0);
+    REQUIRE(universe.computeEndToEndDistances(2).size() == 0);
+    REQUIRE(universe.findLoops(2).size() == 0);
+  }
+
+  SECTION("resizing bigger changes volume")
+  {
+    universe.setBoxLengths(1.0, 1.0, 1.0);
+    REQUIRE(universe.getVolume() == 1.0);
+    universe.setBox(pe::Box(2.0, 1.0, 2.0));
+    REQUIRE(universe.getVolume() == 4.0);
+    universe.setBox(pe::Box(-1.0, 1.0, 0.0, 1.0, 0.0, 2.0));
+    REQUIRE(universe.getVolume() == 4.0);
+  }
+}
+
+TEST_CASE("Universe can be used", "[entity][Universe]")
+{
+  std::cout << "Running test \"Universe can be used\"" << std::endl;
+
+  pe::Universe universe = pe::Universe(1.0, 1.0, 1.0);
 
   SECTION("Loop Entanglements are detected")
   {
@@ -978,5 +992,29 @@ TEST_CASE("Coordinates work")
         CHECK(coordinates[i * 3 + dir] == i + 2);
       }
     }
+  }
+}
+
+TEST_CASE("Large universe can be used", "[Universe][entity]")
+{
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  REQUIRE(universeSeq.getLength() == 0);
+  std::string suspectedPath = "../pylimer_tools/fixtures/";
+  universeSeq.initializeFromDataSequence(
+    { { suspectedPath + "lammps_data_file.out" } });
+  REQUIRE(universeSeq.getLength() == 1);
+
+  pe::Universe universe = universeSeq.atIndex(0);
+
+  SECTION("Edges can be interpolated")
+  {
+    std::map<std::string, std::vector<long int>> edges = universe.getEdges();
+    std::vector<std::pair<size_t, size_t>> interpolatedEdges1 =
+      universe.interpolateEdges(2, 1);
+    CHECK(interpolatedEdges1.size() == edges["edge_from"].size());
+    std::vector<std::pair<size_t, size_t>> interpolatedEdges2 =
+      universe.interpolateEdges(2, 2.);
+    CHECK(interpolatedEdges2.size() ==
+          Catch::Approx(2. * edges["edge_from"].size()));
   }
 }

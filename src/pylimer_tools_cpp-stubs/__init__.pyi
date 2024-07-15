@@ -2082,11 +2082,11 @@ class NormalModeAnalyzer:
         ...
     def evaluate_loss_modulus(self, omega: numpy.ndarray) -> numpy.ndarray:
         """
-        Evaluate loss modulus
+        Evaluate the loss modulus :math:`G''`. Yet misses the conversion factor.
         """
     def evaluate_storage_modulus(self, omega: numpy.ndarray) -> numpy.ndarray:
         """
-        Evaluate storage modulus
+        Evaluate the storage modulus :math:`G'`. Yet misses the conversion factor.
         """
     def evaluate_stress_autocorrelation(self, t: numpy.ndarray) -> numpy.ndarray:
         """
@@ -2102,7 +2102,7 @@ class NormalModeAnalyzer:
         """
     def get_eigenvalues(self) -> numpy.ndarray:
         """
-        Get eigenvalues
+        Get the eigenvalues
         """
     def get_eigenvectors(self) -> numpy.ndarray:
         """
@@ -2116,13 +2116,13 @@ class NormalModeAnalyzer:
         """
         Get the number of soluble clusters (Eigenvalues = 0)
         """
-    def set_eigenvalues(self, arg0: numpy.ndarray) -> None:
+    def set_eigenvalues(self, eigenvalues: numpy.ndarray) -> None:
         """
-        Set eigenvalues
+        Set the eigenvalues, e.g. if you use an external solver
         """
-    def set_eigenvectors(self, arg0: numpy.ndarray) -> None:
+    def set_eigenvectors(self, eigenvectors: numpy.ndarray) -> None:
         """
-        Set eigenvectors
+        Set eigenvectors, e.g. if you use an external solver
         """
 class OutputConfiguration:
     double_values: list[ComputedDoubleValues]
@@ -2600,6 +2600,8 @@ class Universe:
                   Returns a list of :obj:`~pylimer_tools_cpp.Universe`s.
                   Unconnected, free atoms/beads become their own :obj:`~pylimer_tools_cpp.Universe`.
         """
+    def get_edge_ids_from(self, vertex_id: int) -> list[int]:
+        ...
     def get_edge_ids_from_to(self, vertex_id_from: int, vertex_id_to: int) -> list[int]:
         """
               Get the edge ids of the edges between two specific vertices
@@ -2692,6 +2694,10 @@ class Universe:
         """
                   Convert the four integers to one long number/hash.
                   Used internally for duplicate detection.
+        """
+    def interpolate_edges(self, crosslinker_type: int, interpolation_factor: float) -> list[tuple[int, int]]:
+        """
+                  Get more or less edges than currently present, interpolating between junctions.
         """
     def remove_all_angles(self) -> None:
         ...
@@ -2884,10 +2890,22 @@ def predict_gelation_point(arg0: float, arg1: int, arg2: int) -> float:
     """
     Predict the gelation point of a Universe
     """
-def randomly_sample_entanglements(universe: Universe, nr_of_samples: int, cutoff: float, minimum_nr_of_samples: int = 0, same_strand_cutoff: float = 3, seed: str = '', crosslinker_type: int = 2) -> AtomPairEntanglements:
+def randomly_sample_entanglements(universe: Universe, nr_of_samples: int, cutoff: float, minimum_nr_of_samples: int = 0, same_strand_cutoff: float = 3.0, seed: str = '', crosslinker_type: int = 2, ignore_crosslinks: bool = True) -> AtomPairEntanglements:
     """
         Randomly find pairs of atoms that are close together and could be
         entanglements
+    
+        Arguments:
+        :param universe: The universe of atoms from which to sample entanglements from.
+        :param nr_of_samples: The number of pairs of atoms to randomly sample.
+        :param cutoff: The maximum distance between atoms for a pair to be considered a potential entanglement.
+        :param minimum_nr_of_samples: The minimum number of entanglements to be found.
+        :param same_strand_cutoff: The maximum distance between atoms on the same strand for a pair to be considered a potential entanglement.
+        :param seed: A seed for the random number generator.
+        :param crosslinker_type: The type of crosslinker to consider when finding entanglements. Used for the splitting into strands.
+        :param ignore_crosslinks: Whether to ignore crosslinks when finding entanglements. 
+          Careful: if you don't ignore them, the same-strand policy might not work correctly, 
+          since each cross-link should actually be associated with more than one strand.
     """
 def split_csv(arg0: str, arg1: str) -> list[str]:
     """

@@ -252,15 +252,32 @@ namespace entities {
     return Atom(atomProperties);
   }
 
-  Eigen::Vector3d AtomGraphParent::getXYZForVertex(
-    const long int vertexIdx) const
+  Eigen::Vector3d AtomGraphParent::getPositionVectorForVertex(
+    const int vertexId) const
   {
-    Eigen::Vector3d coordinates;
-    coordinates << igraph_cattribute_VAN(&this->graph, "x", vertexIdx),
-      igraph_cattribute_VAN(&this->graph, "y", vertexIdx),
-      igraph_cattribute_VAN(&this->graph, "z", vertexIdx);
-    return coordinates;
-  };
+    Eigen::Vector3d vertex = Eigen::Vector3d::Zero();
+    vertex[0] = igraph_cattribute_VAN(&this->graph, "x", vertexId);
+    vertex[1] = igraph_cattribute_VAN(&this->graph, "y", vertexId);
+    vertex[2] = igraph_cattribute_VAN(&this->graph, "z", vertexId);
+    return vertex;
+  }
+
+  Eigen::Vector3d AtomGraphParent::getUnwrappedPositionVectorForVertex(
+    const int vertexId,
+    const pylimer_tools::entities::Box& box) const
+  {
+    Eigen::Vector3d vertex = Eigen::Vector3d::Zero();
+    vertex[0] = igraph_cattribute_VAN(&this->graph, "x", vertexId);
+    vertex[1] = igraph_cattribute_VAN(&this->graph, "y", vertexId);
+    vertex[2] = igraph_cattribute_VAN(&this->graph, "z", vertexId);
+
+    Eigen::Array3d image = Eigen::Array3d::Zero();
+    image[0] = igraph_cattribute_VAN(&this->graph, "nx", vertexId);
+    image[1] = igraph_cattribute_VAN(&this->graph, "ny", vertexId);
+    image[2] = igraph_cattribute_VAN(&this->graph, "nz", vertexId);
+
+    return vertex + (box.getL() * image).matrix();
+  }
 
   std::vector<Atom> AtomGraphParent::verticesToAtoms(
     const std::vector<long int>& vertexIds) const
@@ -472,8 +489,8 @@ namespace entities {
     while (!IGRAPH_EIT_END(bondIterator)) {
       long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
       Eigen::Vector3d distance =
-        this->getXYZForVertex(IGRAPH_TO(&this->graph, edgeId)) -
-        this->getXYZForVertex(IGRAPH_FROM(&this->graph, edgeId));
+        this->getPositionVectorForVertex(IGRAPH_TO(&this->graph, edgeId)) -
+        this->getPositionVectorForVertex(IGRAPH_FROM(&this->graph, edgeId));
       box.handlePBC(distance);
       lengths.push_back(distance.norm());
       IGRAPH_EIT_NEXT(bondIterator);
@@ -497,8 +514,8 @@ namespace entities {
     while (!IGRAPH_EIT_END(bondIterator)) {
       long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
       Eigen::Vector3d distance =
-        this->getXYZForVertex(IGRAPH_TO(&this->graph, edgeId)) -
-        this->getXYZForVertex(IGRAPH_FROM(&this->graph, edgeId));
+        this->getPositionVectorForVertex(IGRAPH_TO(&this->graph, edgeId)) -
+        this->getPositionVectorForVertex(IGRAPH_FROM(&this->graph, edgeId));
       box.handlePBC(distance);
       result += distance.squaredNorm() /
                 static_cast<double>(IGRAPH_EIT_SIZE(bondIterator));

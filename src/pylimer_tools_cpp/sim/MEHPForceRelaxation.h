@@ -49,7 +49,8 @@ namespace sim {
                        removeDanglingChains);
         // this->defaultR0Squared =
         //   universe.computeMeanSquareEndToEndDistance(crossLinkerType);
-        this->defaultR0Squared = net.springsContourLength.mean() * universe.computeMeanSquaredBondLength();
+        this->defaultR0Squared = net.springsContourLength.mean() *
+                                 universe.computeMeanSquaredBondLength();
         this->defaultNrOfChains = net.springsContourLength.size();
         this->forceRelaxationNetwork = net;
         this->is2D = is2D;
@@ -482,7 +483,8 @@ namespace sim {
           std::vector<pylimer_tools::entities::Atom> endAtoms =
             crossLinkerChains[i].getChainEnds(crossLinkerType, true);
           for (pylimer_tools::entities::Atom endAtom : endAtoms) {
-            long int endAtomVertexId = this->universe.getIdxByAtomId(endAtom.getId());
+            long int endAtomVertexId =
+              this->universe.getIdxByAtomId(endAtom.getId());
             if (endAtom.getType() != crossLinkerType &&
                 !vertexAdded[endAtomVertexId]) {
               springEndAtoms.push_back(endAtom);
