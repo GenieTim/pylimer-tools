@@ -8,6 +8,7 @@
 #include <regex>
 #include <sstream>
 #include <string>
+#include <utility>
 #include <vector>
 // #include <ranges>
 // #include <string_view>
@@ -24,6 +25,14 @@ to_string(Eigen::Vector3d input)
 {
   return std::to_string(input[0]) + ", " + std::to_string(input[1]) + ", " +
          std::to_string(input[2]);
+}
+
+template<typename T>
+static std::string
+to_string(std::pair<T, T> pair)
+{
+  return "(" + std::to_string(pair.first) + ", " + std::to_string(pair.second) +
+         ")";
 }
 } // namespace std
 

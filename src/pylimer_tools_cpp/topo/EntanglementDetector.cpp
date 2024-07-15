@@ -2,6 +2,7 @@
 #include "../entities/Molecule.h"
 #include "../entities/NeighbourList.h"
 #include "../entities/Universe.h"
+#include "../utils/StringUtils.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -24,6 +25,9 @@ namespace topo {
      * the same strand
      * @param seed the random seed
      * @param crossLinkerType the type of the cross-link atoms
+     * @param ignoreCrosslinks whether to ignore cross-link atoms when sampling.
+     * Careful: if you don't ignore them, the same-strand policy might not work
+     * correctly.
      * @return AtomPairEntanglements
      */
     AtomPairEntanglements randomlyFindEntanglements(
@@ -144,7 +148,14 @@ namespace topo {
           size_t atomVertexIdx2 = universe.getIdxByAtomId(a2.getId());
           RUNTIME_EXP_IFN(
             pairOfAtom[atomVertexIdx2] == -1,
-            "Expected not to be able to sample the same atom twice.");
+            "Expected not to be able to sample the same atom "
+            "twice. Sampled atom with vertex " +
+              std::to_string(atomVertexIdx2) + " and id " +
+              std::to_string(a2.getId()) + " again, already present in " +
+              std::to_string(pairOfAtom[atomVertexIdx2]) + " being " +
+              std::to_string(pairsOfAtoms[pairOfAtom[atomVertexIdx2]]) +
+              ". This time sampled with atom " + std::to_string(a1.getId()) +
+              ".");
           RUNTIME_EXP_IFN(
             (atomToStrand[a2.getId()] != atomToStrand[a1.getId()]) ||
               ((std::abs(static_cast<double>(atomIdxInStrand[a2.getId()] -
@@ -162,7 +173,8 @@ namespace topo {
           //           << atomToStrand[a1.getId()] << ") and " << a2.getId()
           //           << " (" << atomIdxInStrand[a2.getId()] << "th in "
           //           << atomToStrand[a2.getId()] << ") "
-          //           << " with distance " << a1.distanceTo(a2, universe.getBox())
+          //           << " with distance " << a1.distanceTo(a2,
+          //           universe.getBox())
           //           << std::endl;
           // if (atomToStrand[a2.getId()] == atomToStrand[a1.getId()]) {
           //   std::cout << "Same strand detected: distance is "
