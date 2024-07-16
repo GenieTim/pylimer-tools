@@ -2295,6 +2295,7 @@ namespace entities {
         (static_cast<double>(chain.getNrOfBonds()) * interpolationFactor));
       for (size_t i = 1; i < numExtraBonds; ++i) {
         results.push_back(std::make_pair(previousId, currentMaxIdx));
+        previousId = currentMaxIdx;
         currentMaxIdx += 1;
       }
       if (vertexIdToNewIdx[end1] == -1) {

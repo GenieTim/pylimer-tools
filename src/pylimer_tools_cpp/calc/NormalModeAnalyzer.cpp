@@ -149,6 +149,10 @@ namespace calc {
   void NormalModeAnalyzer::setEigenvalues(const Eigen::VectorXd eigenvalues)
   {
     this->eigenvalues = eigenvalues;
+    this
+      ->eigenvalues(this->eigenvalues.array() > -1e-14 &&
+                    this->eigenvalues.array() < 0)
+      .setZero();
     this->isEigenvaluesComputed = true;
     this->clusterCount = this->countSolubleClusters();
 
