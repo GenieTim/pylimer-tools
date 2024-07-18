@@ -17,6 +17,8 @@ namespace calc {
   {
     INVALIDARG_EXP_IFN(springFrom.size() == springTo.size(),
                        "springFrom and springTo must have the same size");
+    INVALIDARG_EXP_IFN(springFrom.size() > 0,
+                       "springFrom and springTo cannot be empty");
     // find maximum index = nr. of cols/rows in the connectivity matrix
     size_t maxIdx =
       std::max(*std::max_element(springFrom.begin(), springFrom.end()),
@@ -149,6 +151,10 @@ namespace calc {
   void NormalModeAnalyzer::setEigenvalues(const Eigen::VectorXd eigenvalues)
   {
     this->eigenvalues = eigenvalues;
+    this
+      ->eigenvalues(this->eigenvalues.array() > -1e-14 &&
+                    this->eigenvalues.array() < 0)
+      .setZero();
     this->isEigenvaluesComputed = true;
     this->clusterCount = this->countSolubleClusters();
 
@@ -189,8 +195,13 @@ namespace calc {
     const Eigen::ArrayXd& t) const
   {
     Eigen::ArrayXd result = Eigen::ArrayXd::Zero(t.size());
-    for (size_t i = 0; i < this->eigenvalues.size() - this->clusterCount; ++i) {
+    for (size_t i = 0; i < this->eigenvalues.size(); ++i) {
       result += (-2. * this->eigenvalues[i] * t).exp();
+      RUNTIME_EXP_IFN(result.allFinite(),
+                      "Stress autocorrelation is not fully finite anymore "
+                      "after adding Eigenvalue " +
+                        std::to_string(i) + ": " +
+                        std::to_string(this->eigenvalues[i]) + ".");
     }
     return result;
   };
@@ -199,9 +210,17 @@ namespace calc {
     const Eigen::ArrayXd& omega) const
   {
     Eigen::ArrayXd result = Eigen::ArrayXd::Zero(omega.size());
-    for (size_t i = 0; i < this->eigenvalues.size() - this->clusterCount; ++i) {
+    for (size_t i = 0; i < this->eigenvalues.size(); ++i) {
+      if (this->eigenvalues[i] == 0.0) {
+        continue;
+      }
       result += (omega / (2. * this->eigenvalues[i])).square() /
                 (1. + (omega / (2. * this->eigenvalues[i])).square());
+      RUNTIME_EXP_IFN(
+        result.allFinite(),
+        "Storage modulus is not fully finite anymore after adding Eigenvalue " +
+          std::to_string(i) + ": " + std::to_string(this->eigenvalues[i]) +
+          ".");
     }
     return result;
   };
@@ -210,9 +229,17 @@ namespace calc {
     const Eigen::ArrayXd& omega) const
   {
     Eigen::ArrayXd result = Eigen::ArrayXd::Zero(omega.size());
-    for (size_t i = 0; i < this->eigenvalues.size() - this->clusterCount; ++i) {
+    for (size_t i = 0; i < this->eigenvalues.size(); ++i) {
+      if (this->eigenvalues[i] == 0.0) {
+        continue;
+      }
       result += (omega / (2. * this->eigenvalues[i])) /
                 (1. + (omega / (2. * this->eigenvalues[i])).square());
+      RUNTIME_EXP_IFN(
+        result.allFinite(),
+        "Loss modulus is not fully finite anymore after adding Eigenvalue " +
+          std::to_string(i) + ": " + std::to_string(this->eigenvalues[i]) +
+          ".");
     }
     return result;
   };
