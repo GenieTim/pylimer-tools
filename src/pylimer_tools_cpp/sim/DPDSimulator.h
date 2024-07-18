@@ -11,9 +11,11 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#ifdef CEREALIZABLE
 #include <cereal/access.hpp>
 #include <cereal/types/base_class.hpp>
 #include <cereal/types/polymorphic.hpp>
+#endif
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -54,7 +56,10 @@ namespace sim {
 
     private:
       DPDSimulator() {}; // not exposed to users, only used by Cereal
+
+    #ifdef CEREALIZABLE
       friend class cereal::access;
+      #endif
 
       ////////////////////////////////////////////////////////////////
       // configuration
@@ -488,6 +493,8 @@ namespace sim {
 
       ////////////////////////////////////////////////////////////////
       // serialization
+
+    #ifdef CEREALIZABLE
       template<class Archive>
       void serialize(Archive& ar, std::uint32_t const version)
       {
@@ -585,6 +592,7 @@ namespace sim {
       {
         pylimer_tools::utils::serializeToFile<DPDSimulator>(*this, filename);
       };
+      #endif
 
     protected:
       void addSlipSprings(std::vector<size_t>& partnerA,

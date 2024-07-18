@@ -14,6 +14,13 @@ if (NOT DEFINED CODE_COVERAGE)
 	option(CODE_COVERAGE "Collect coverage from test library" OFF)
 endif()
 
+if (NOT DEFINED CEREALIZABLE)
+	option(CEREALIZABLE "Enable serialisation of various classes" ON)
+endif()
+if (CEREALIZABLE)
+	add_definitions(-DCEREALIZABLE)
+endif()
+
 # add dependencies
 include(${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/CMakeLists.txt)
 

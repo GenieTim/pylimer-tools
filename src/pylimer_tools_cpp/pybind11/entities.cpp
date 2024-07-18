@@ -118,6 +118,7 @@ init_pylimer_bound_entities(py::module_& m)
      )pbdoc",
          py::arg("potential_offset"),
          py::arg("abs_precision") = 1e-5)
+#ifdef CEREALIZABLE
     .def(py::pickle(
            [](const Box& b) { // __getstate__
              /* Return a tuple that fully encodes the state of the object */
@@ -149,6 +150,9 @@ init_pylimer_bound_entities(py::module_& m)
              return b;
            }),
          "Provides support for pickling.");
+#else
+    ;
+#endif
 
   py::class_<Atom>(m, "Atom", R"pbdoc(
        A single bead or atom
@@ -224,8 +228,7 @@ init_pylimer_bound_entities(py::module_& m)
          [](const Atom& a, const Box& box) {
            return a.getUnwrappedCoordinates(box);
          })
-    .def(pybind11::self == pybind11::self)
-    //     .def(pybind11::self != pybind11::self)
+#ifdef CEREALIZABLE
     .def(py::pickle(
            [](const Atom& b) { // __getstate__
                                // TODO: support extra data
@@ -256,7 +259,9 @@ init_pylimer_bound_entities(py::module_& m)
 
              return a;
            }),
-         "Provides support for pickling");
+         "Provides support for pickling")
+#endif
+    .def(pybind11::self == pybind11::self);
 
   py::class_<MoleculeIterator>(m, "MoleculeIterator", R"pbdoc(
        An iterator to iterate throught the atoms in :obj:`~pylimer_tools_cpp.Molecule`.
@@ -1100,6 +1105,7 @@ init_pylimer_bound_entities(py::module_& m)
          &Universe::simplify,
          "Remove self links and double bonds. This function is called "
          "automatically after adding bonds.")
+#ifdef CEREALIZABLE
     .def(py::pickle(
       [](const Universe& u) {
         return py::make_tuple(pylimer_tools::utils::serializeToString(u));
@@ -1110,6 +1116,7 @@ init_pylimer_bound_entities(py::module_& m)
         pylimer_tools::utils::deserializeFromString(u, in);
         return u;
       }))
+#endif
     .def("__copy__",
          [](const Universe& universe) { return Universe(universe); });
 
