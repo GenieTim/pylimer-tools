@@ -36,6 +36,9 @@ init_pylimer_bound_calc(py::module_& m)
          &NormalModeAnalyzer::getMatrixSize,
          "Get the size of the matrix (the maximum of eigenvalues that could be "
          "queried)")
+    .def("get_matrix",
+         &NormalModeAnalyzer::getAssembledConnectivityMatrix,
+         "Get the assembled connectivity matrix.")
     .def("find_sparse_eigenvalues",
          &NormalModeAnalyzer::findSparseEigenvalues,
          "Find the `k` smallest eigenvalues using a sparse solver",
@@ -84,10 +87,10 @@ init_pylimer_bound_calc(py::module_& m)
       [](py::tuple t) {
         std::string in = t[0].cast<std::string>();
         return NormalModeAnalyzer::fromString(in);
-      }))
+      }));
 #else
     ;
-#endif;
+#endif
 }
 
 #endif /* PYBIND_CALC_H */

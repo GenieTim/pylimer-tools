@@ -28,6 +28,8 @@ namespace calc {
     Eigen::MatrixXd getEigenvectors() const;
     void setEigenvectors(Eigen::MatrixXd e);
 
+    Eigen::SparseMatrix<double> getAssembledConnectivityMatrix() const;
+
     Eigen::ArrayXd evaluateStressAutocorrelation(const Eigen::ArrayXd& t) const;
 
     Eigen::ArrayXd evaluateStorageModulus(const Eigen::ArrayXd& omega) const;
