@@ -201,7 +201,24 @@ namespace entities {
      */
     Atom getAtomByVertexIdx(const long int vertexIdx) const;
 
-    Eigen::Vector3d getXYZForVertex(const long int vertexIdx) const;
+    /**
+     * @brief Get the (wrapped) position vector for a vertex (ignoring image
+     * flags)
+     *
+     * @param vertexId
+     * @return Eigen::Vector3d
+     */
+    Eigen::Vector3d getPositionVectorForVertex(const int vertexId) const;
+
+    /**
+     * @brief Get the unwrapped position vector for a vertex
+     *
+     * @param vertexId
+     * @return Eigen::Vector3d
+     */
+    Eigen::Vector3d getUnwrappedPositionVectorForVertex(
+      const int vertexId,
+      const pylimer_tools::entities::Box& box) const;
 
     /**
      * @brief Convert a list of vertex ids to a list of Atom instances
@@ -224,7 +241,7 @@ namespace entities {
     /**
      * @brief Count how often a certain value appears in the vertex properties
      *
-     * For example, to count the number of crosslinkers, one could use
+     * for example, to count the number of crosslinkers, one could use
      * this->countPropertyValue<int>("type", crossLinkerType)
      *
      * @tparam IN

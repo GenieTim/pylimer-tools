@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.15.0)
 
 cmake_policy(SET CMP0077 NEW)
 
-project(pylimer_tests VERSION "0.1.15" LANGUAGES CXX)
+project(pylimer_tests VERSION "0.1.15" LANGUAGES CXX C)
 
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 20)

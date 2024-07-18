@@ -65,11 +65,13 @@ init_pylimer_bound_calc(py::module_& m)
          py::arg("t"))
     .def("evaluate_storage_modulus",
          &NormalModeAnalyzer::evaluateStorageModulus,
-         "Evaluate the storage modulus :math:`G'`. Yet misses the conversion factor.",
+         "Evaluate the storage modulus :math:`G'`. Yet misses the conversion "
+         "factor.",
          py::arg("omega"))
     .def("evaluate_loss_modulus",
          &NormalModeAnalyzer::evaluateLossModulus,
-         "Evaluate the loss modulus :math:`G''`. Yet misses the conversion factor.",
+         "Evaluate the loss modulus :math:`G''`. Yet misses the conversion "
+         "factor.",
          py::arg("omega"))
     .def("get_nr_of_soluble_clusters",
          &NormalModeAnalyzer::getNrOfSolubleClusters,

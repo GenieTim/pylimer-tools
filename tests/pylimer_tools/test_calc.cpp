@@ -1,5 +1,5 @@
-#include "../../src/pylimer_tools_cpp/topo/TopologyCalc.h"
 #include "../../src/pylimer_tools_cpp/entities/Box.h"
+#include "../../src/pylimer_tools_cpp/topo/TopologyCalc.h"
 #include <catch2/catch_test_macros.hpp>
 
 #include <iostream>
