@@ -76,6 +76,7 @@ init_pylimer_bound_calc(py::module_& m)
     .def("get_nr_of_soluble_clusters",
          &NormalModeAnalyzer::getNrOfSolubleClusters,
          "Get the number of soluble clusters (Eigenvalues = 0)")
+#ifdef CEREALIZABLE
     .def(py::pickle(
       [](const NormalModeAnalyzer& u) {
         return py::make_tuple(pylimer_tools::utils::serializeToString(u));
@@ -83,7 +84,10 @@ init_pylimer_bound_calc(py::module_& m)
       [](py::tuple t) {
         std::string in = t[0].cast<std::string>();
         return NormalModeAnalyzer::fromString(in);
-      }));
+      }))
+#else
+    ;
+#endif;
 }
 
 #endif /* PYBIND_CALC_H */

@@ -4,7 +4,9 @@
 #include "../utils/CerealUtils.h"
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
+#ifdef CEREALIZABLE
 #include <cereal/access.hpp>
+#endif
 #include <vector>
 
 namespace pylimer_tools {
@@ -59,8 +61,8 @@ namespace calc {
 
     // MARK: serialization
     NormalModeAnalyzer() = default;
+    #ifdef CEREALIZABLE
     friend class cereal::access;
-
     template<class Archive>
     void serialize(Archive& ar)
     {
@@ -70,6 +72,8 @@ namespace calc {
          eigenvalues,
          eigenvectors);
     }
+    #endif
+
   };
 }
 }

@@ -206,6 +206,7 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator][long]")
   }
 };
 
+#ifdef CEREALIZABLE
 TEST_CASE("DPD Simulator Restart Files Work", "[analysis][DPDSimulator]")
 {
   std::cout << "Running test \"DPD Simulator Restart Files Work\"" << std::endl;
@@ -246,6 +247,7 @@ TEST_CASE("DPD Simulator Restart Files Work", "[analysis][DPDSimulator]")
     CHECK_NOTHROW(simulator.validateState());
 
     std::string restartFile = suspectedPath + "dpd_restart_file.bin";
+
     simulator.writeRestartFile(restartFile);
 
     CHECK_NOTHROW(simulator.validateState());
@@ -265,6 +267,7 @@ TEST_CASE("DPD Simulator Restart Files Work", "[analysis][DPDSimulator]")
     REQUIRE(std::filesystem::exists(restartFile));
   }
 }
+#endif
 
 TEST_CASE("DPD Simulator Can Cross-link", "[analysis][DPDSimulator][long]")
 {

@@ -26,6 +26,13 @@ add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/vendor/pybind11)
 
 message("Using toolchain file ${CMAKE_TOOLCHAIN_FILE}")
 
+if (NOT DEFINED CEREALIZABLE)
+	option(CEREALIZABLE "Enable serialisation of various classes" ON)
+endif()
+if (CEREALIZABLE)
+	add_definitions(-DCERALIZABLE)
+endif()
+
 # add sources & targets
 add_subdirectory(src/pylimer_tools_cpp)
 add_dependencies(pylimer_tools igraph)
