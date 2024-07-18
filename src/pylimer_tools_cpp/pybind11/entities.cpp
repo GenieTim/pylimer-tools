@@ -896,6 +896,13 @@ init_pylimer_bound_entities(py::module_& m)
                Use :func:`~pylimer_tools_cpp.Universe.get_atom_id_by_idx` to translate them to atom ids, or
                :func:`~pylimer_tools_cpp.Universe.get_bonds` to have that done for you.
             )pbdoc")
+    .def("interpolate_edges",
+         &Universe::interpolateEdges,
+         R"pbdoc(
+          Get more or less edges than currently present, interpolating between junctions.
+         )pbdoc",
+         py::arg("crosslinker_type"),
+         py::arg("interpolation_factor"))
     .def("get_bonds", &Universe::getBonds, R"pbdoc(
             Get all bonds. Returns a dict with three properties: 'bond_from', 'bond_to' and 'bond_type'.
             The order is not necessarily related to any structural characteristic.
@@ -941,7 +948,10 @@ init_pylimer_bound_entities(py::module_& m)
       "get_nr_of_bonds_of_vertex",
       &Universe::computeFunctionalityForVertex,
       R"pbdoc(Count the number of immediate neighbors of an atom, specified by its vertex id.)pbdoc")
-    .def("get_edge_ids_from", &Universe::getIncidentEdgeIds, R"pbdoc()pbdoc", py::arg("vertex_id"))
+    .def("get_edge_ids_from",
+         &Universe::getIncidentEdgeIds,
+         R"pbdoc()pbdoc",
+         py::arg("vertex_id"))
     .def("get_edge_ids_from_to",
          &Universe::getEdgeIdsFromTo,
          R"pbdoc(

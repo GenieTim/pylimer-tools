@@ -5,6 +5,8 @@ ROOT_DIR=$(pwd)
 
 cd "$ROOT_DIR/tests" || exit 2
 
+PATH="/usr/local/opt/llvm/bin:$PATH"
+
 # first, run cpp tests
 # rm -rf build; rm -rf vendor/igraph;
 mkdir -p build
