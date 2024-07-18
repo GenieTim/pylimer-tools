@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include <random>
+#include <unordered_set>
 
 namespace pylimer_tools {
 namespace sim {
