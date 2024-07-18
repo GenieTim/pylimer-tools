@@ -17,6 +17,7 @@ NormalModeAnalyzer
       ~NormalModeAnalyzer.find_sparse_eigenvalues
       ~NormalModeAnalyzer.get_eigenvalues
       ~NormalModeAnalyzer.get_eigenvectors
+      ~NormalModeAnalyzer.get_matrix
       ~NormalModeAnalyzer.get_matrix_size
       ~NormalModeAnalyzer.get_nr_of_soluble_clusters
       ~NormalModeAnalyzer.set_eigenvalues
@@ -31,6 +32,7 @@ NormalModeAnalyzer
    .. automethod:: find_sparse_eigenvalues
    .. automethod:: get_eigenvalues
    .. automethod:: get_eigenvectors
+   .. automethod:: get_matrix
    .. automethod:: get_matrix_size
    .. automethod:: get_nr_of_soluble_clusters
    .. automethod:: set_eigenvalues

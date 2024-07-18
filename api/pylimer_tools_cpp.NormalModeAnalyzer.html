@@ -340,16 +340,19 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvectors" title="pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvectors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_eigenvectors</span></code></a>(self)</p></td>
 <td><p>Get eigenvectors</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_matrix_size" title="pylimer_tools_cpp.NormalModeAnalyzer.get_matrix_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_matrix_size</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_matrix" title="pylimer_tools_cpp.NormalModeAnalyzer.get_matrix"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_matrix</span></code></a>(self)</p></td>
+<td><p>Get the assembled connectivity matrix.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_matrix_size" title="pylimer_tools_cpp.NormalModeAnalyzer.get_matrix_size"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_matrix_size</span></code></a>(self)</p></td>
 <td><p>Get the size of the matrix (the maximum of eigenvalues that could be queried)</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_nr_of_soluble_clusters" title="pylimer_tools_cpp.NormalModeAnalyzer.get_nr_of_soluble_clusters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_soluble_clusters</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_nr_of_soluble_clusters" title="pylimer_tools_cpp.NormalModeAnalyzer.get_nr_of_soluble_clusters"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_nr_of_soluble_clusters</span></code></a>(self)</p></td>
 <td><p>Get the number of soluble clusters (Eigenvalues = 0)</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues" title="pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_eigenvalues</span></code></a>(self, eigenvalues)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues" title="pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_eigenvalues</span></code></a>(self, eigenvalues)</p></td>
 <td><p>Set the eigenvalues, e.g. if you use an external solver.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors" title="pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_eigenvectors</span></code></a>(self, eigenvectors)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors" title="pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvectors"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_eigenvectors</span></code></a>(self, eigenvectors)</p></td>
 <td><p>Set eigenvectors, e.g. if you use an external solver.</p></td>
 </tr>
 </tbody>
@@ -396,6 +399,12 @@
 <dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvectors">
 <span class="sig-name descname"><span class="pre">get_eigenvectors</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">[</span></span><span class="pre">m</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">n</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvectors" title="Link to this definition">¶</a></dt>
 <dd><p>Get eigenvectors</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.NormalModeAnalyzer.get_matrix">
+<span class="sig-name descname"><span class="pre">get_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer" title="pylimer_tools_cpp.NormalModeAnalyzer"><span class="pre">pylimer_tools_cpp.NormalModeAnalyzer</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">scipy.sparse.csc_matrix</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.float64</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_matrix" title="Link to this definition">¶</a></dt>
+<dd><p>Get the assembled connectivity matrix.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -489,6 +498,7 @@
 <li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.find_sparse_eigenvalues"><code class="docutils literal notranslate"><span class="pre">NormalModeAnalyzer.find_sparse_eigenvalues()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvalues"><code class="docutils literal notranslate"><span class="pre">NormalModeAnalyzer.get_eigenvalues()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_eigenvectors"><code class="docutils literal notranslate"><span class="pre">NormalModeAnalyzer.get_eigenvectors()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_matrix"><code class="docutils literal notranslate"><span class="pre">NormalModeAnalyzer.get_matrix()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_matrix_size"><code class="docutils literal notranslate"><span class="pre">NormalModeAnalyzer.get_matrix_size()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.get_nr_of_soluble_clusters"><code class="docutils literal notranslate"><span class="pre">NormalModeAnalyzer.get_nr_of_soluble_clusters()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.NormalModeAnalyzer.set_eigenvalues"><code class="docutils literal notranslate"><span class="pre">NormalModeAnalyzer.set_eigenvalues()</span></code></a></li>
