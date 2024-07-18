@@ -36,12 +36,14 @@ namespace calc {
 
     size_t getNrOfSolubleClusters() const;
 
+#ifdef CEREALIZABLE
     static NormalModeAnalyzer fromString(std::string in)
     {
       NormalModeAnalyzer n;
       pylimer_tools::utils::deserializeFromString(n, in);
       return n;
     }
+#endif
 
     size_t getMatrixSize() const { return assembledConnectivityMatrix.rows(); }
 
@@ -61,7 +63,7 @@ namespace calc {
 
     // MARK: serialization
     NormalModeAnalyzer() = default;
-    #ifdef CEREALIZABLE
+#ifdef CEREALIZABLE
     friend class cereal::access;
     template<class Archive>
     void serialize(Archive& ar)
@@ -72,8 +74,7 @@ namespace calc {
          eigenvalues,
          eigenvectors);
     }
-    #endif
-
+#endif
   };
 }
 }

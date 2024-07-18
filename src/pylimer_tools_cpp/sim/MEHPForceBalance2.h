@@ -1766,10 +1766,12 @@ namespace sim {
       double getDisplacementResidualNorm(
         double oneOverSpringPartitionUpperLimit = 1.0) const;
 
+    #ifdef CEREALIZABLE
       void writeRestartFile(std::string& file) override
       {
         throw std::runtime_error("Restart not supported yet");
       }
+      #endif
 
       double getTimestep() override
       {
