@@ -1589,6 +1589,8 @@ init_pylimer_bound_sim(py::module_& m)
           Configure where to (incrementally) deform the box to during the next simulation run.
      )pbdoc",
          py::arg("target_box"))
+
+#ifdef CEREALIZABLE
     .def_static("read_restart_file",
                 &dpd::DPDSimulator::readRestartFile,
                 R"pbdoc(
@@ -1614,6 +1616,7 @@ init_pylimer_bound_sim(py::module_& m)
      )pbdoc",
          py::arg("file"),
          py::arg("output_every") = 50000)
+#endif
     .def("configAverageOutput",
          &dpd::DPDSimulator::configAverageOutput,
          R"pbdoc(
@@ -1730,6 +1733,7 @@ init_pylimer_bound_sim(py::module_& m)
     .def("get_slip_spring_bond_type", &dpd::DPDSimulator::getSlipSpringBondType)
     .def("get_shift_possibility_empty",
          &dpd::DPDSimulator::getShiftPossibilityEmpty)
+#ifdef CEREALIZABLE
     .def("write_restart_file",
          &dpd::DPDSimulator::writeRestartFile,
          R"pbdoc(
@@ -1740,6 +1744,7 @@ init_pylimer_bound_sim(py::module_& m)
                Can end in xml, json or anything else (-> binary).
      )pbdoc",
          py::arg("file"))
+#endif
     .def("validate_neighbour_list", &dpd::DPDSimulator::validateNeighbourlist)
     .def("validate_state", &dpd::DPDSimulator::validateState);
 }
