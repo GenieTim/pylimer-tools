@@ -191,6 +191,12 @@ namespace calc {
     return this->clusterCount;
   }
 
+  Eigen::SparseMatrix<double>
+  NormalModeAnalyzer::getAssembledConnectivityMatrix() const
+  {
+    return this->assembledConnectivityMatrix;
+  }
+
   Eigen::ArrayXd NormalModeAnalyzer::evaluateStressAutocorrelation(
     const Eigen::ArrayXd& t) const
   {
