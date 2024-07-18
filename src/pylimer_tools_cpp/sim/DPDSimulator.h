@@ -627,10 +627,12 @@ namespace sim {
 }
 }
 
+#ifdef CEREALIZABLE
 CEREAL_REGISTER_TYPE(pylimer_tools::sim::dpd::DPDSimulator);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(
   pylimer_tools::sim::OutputSupportingSimulation,
   pylimer_tools::sim::dpd::DPDSimulator);
 CEREAL_CLASS_VERSION(pylimer_tools::sim::dpd::DPDSimulator, 6);
+#endif
 
 #endif
