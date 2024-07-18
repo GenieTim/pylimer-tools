@@ -18,6 +18,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include <memory>
 
 #ifdef CEREALIZABLE
 #include <cereal/types/base_class.hpp>
