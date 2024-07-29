@@ -1,3 +1,4 @@
+#ifdef CEREALIZABLE
 #ifndef CEREAL_UTILS_H
 #define CEREAL_UTILS_H
 
@@ -509,4 +510,5 @@ namespace utils {
 }
 }
 
+#endif
 #endif

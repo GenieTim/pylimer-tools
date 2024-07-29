@@ -22,6 +22,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include <unordered_set>
 
 namespace pylimer_tools {
 namespace sim {
@@ -1826,10 +1827,12 @@ namespace sim {
         return results;
       }
 
+    #ifdef CEREALIZABLE
       void writeRestartFile(std::string& file) override
       {
         throw std::runtime_error("Restart not supported yet");
       }
+#endif
 
       double getTimestep() override
       {
