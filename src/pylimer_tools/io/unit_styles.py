@@ -157,8 +157,9 @@ class UnitStyleFactory(object):
                 'dipole': elementary_charge * ureg.sigma,
                 'electric_field': ureg.eps / (elementary_charge * ureg.sigma),
                 'density':
-                    polymer_data.M_k * ureg('g/mol') / (ureg.sigma**(dimension)) if accept_mol
-                    else (polymer_data.M_k / avogadro_constant) * ureg('g') / (ureg.sigma**(dimension)),
+                    (polymer_data.rho_bulk * ureg('g/(cm^3)')).to('g/(sigma^3)'),
+                    # polymer_data.M_k * ureg('g/mol') / (ureg.sigma**(dimension)) if accept_mol
+                    # else (polymer_data.M_k / avogadro_constant) * ureg('g') / (ureg.sigma**(dimension)),
                 'dt': 0.005 * ureg.tau,
                 'skin': 0.3 * ureg.sigma
             }, ureg)
