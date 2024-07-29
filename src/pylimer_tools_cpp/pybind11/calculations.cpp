@@ -36,6 +36,9 @@ init_pylimer_bound_calc(py::module_& m)
          &NormalModeAnalyzer::getMatrixSize,
          "Get the size of the matrix (the maximum of eigenvalues that could be "
          "queried)")
+    .def("get_matrix",
+         &NormalModeAnalyzer::getAssembledConnectivityMatrix,
+         "Get the assembled connectivity matrix.")
     .def("find_sparse_eigenvalues",
          &NormalModeAnalyzer::findSparseEigenvalues,
          "Find the `k` smallest eigenvalues using a sparse solver",
@@ -76,6 +79,7 @@ init_pylimer_bound_calc(py::module_& m)
     .def("get_nr_of_soluble_clusters",
          &NormalModeAnalyzer::getNrOfSolubleClusters,
          "Get the number of soluble clusters (Eigenvalues = 0)")
+#ifdef CEREALIZABLE
     .def(py::pickle(
       [](const NormalModeAnalyzer& u) {
         return py::make_tuple(pylimer_tools::utils::serializeToString(u));
@@ -84,6 +88,9 @@ init_pylimer_bound_calc(py::module_& m)
         std::string in = t[0].cast<std::string>();
         return NormalModeAnalyzer::fromString(in);
       }));
+#else
+    ;
+#endif
 }
 
 #endif /* PYBIND_CALC_H */

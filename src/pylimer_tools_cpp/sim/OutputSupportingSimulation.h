@@ -18,9 +18,12 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include <memory>
 
+#ifdef CEREALIZABLE
 #include <cereal/types/base_class.hpp>
 #include <cereal/types/polymorphic.hpp>
+#endif
 
 namespace pylimer_tools {
 namespace sim {
@@ -399,10 +402,12 @@ namespace sim {
       }
 
       // potentially write restart file
+#ifdef CEREALIZABLE
       if (this->outputRestartEvery > 0 &&
           currentStep % this->outputRestartEvery == 0) {
         this->writeRestartFile(this->restartOutputFile);
       }
+#endif
 
       if (currentStep % 50 == 0) {
         std::flush(std::cout);
@@ -527,7 +532,9 @@ namespace sim {
       this->outputBuffer.reserve(600);
     }
 
+#ifdef CEREALIZABLE
     virtual void writeRestartFile(std::string& filename) = 0;
+#endif
 
     void validateAndTruncateOutputFiles(
       const std::vector<OutputConfiguration>& vals) const
@@ -615,6 +622,7 @@ namespace sim {
       this->restartOutputFile = outputFile;
     }
 
+#ifdef CEREALIZABLE
     template<class Archive>
     void serialize(Archive& ar, std::uint32_t const version)
     {
@@ -645,6 +653,7 @@ namespace sim {
         msdOriginTimesteps,
         runningAverages);
     }
+#endif
 
     virtual double getTimestep() = 0;
     virtual double getCurrentTime(double currentStep) = 0;
@@ -664,6 +673,8 @@ namespace sim {
   };
 }
 }
-CEREAL_CLASS_VERSION(pylimer_tools::sim::OutputSupportingSimulation, 2);
 
+#ifdef CEREALIZABLE
+CEREAL_CLASS_VERSION(pylimer_tools::sim::OutputSupportingSimulation, 2);
+#endif
 #endif

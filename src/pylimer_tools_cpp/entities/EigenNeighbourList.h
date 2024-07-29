@@ -8,7 +8,6 @@ extern "C"
 #include "../utils/ExtraEigenTypes.h"
 #include "Box.h"
 #include <Eigen/Dense>
-#include <cereal/access.hpp>
 #include <iostream>
 #include <map>
 #include <set>

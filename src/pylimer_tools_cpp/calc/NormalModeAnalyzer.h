@@ -4,7 +4,9 @@
 #include "../utils/CerealUtils.h"
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
+#ifdef CEREALIZABLE
 #include <cereal/access.hpp>
+#endif
 #include <vector>
 
 namespace pylimer_tools {
@@ -26,6 +28,8 @@ namespace calc {
     Eigen::MatrixXd getEigenvectors() const;
     void setEigenvectors(Eigen::MatrixXd e);
 
+    Eigen::SparseMatrix<double> getAssembledConnectivityMatrix() const;
+
     Eigen::ArrayXd evaluateStressAutocorrelation(const Eigen::ArrayXd& t) const;
 
     Eigen::ArrayXd evaluateStorageModulus(const Eigen::ArrayXd& omega) const;
@@ -34,12 +38,14 @@ namespace calc {
 
     size_t getNrOfSolubleClusters() const;
 
+#ifdef CEREALIZABLE
     static NormalModeAnalyzer fromString(std::string in)
     {
       NormalModeAnalyzer n;
       pylimer_tools::utils::deserializeFromString(n, in);
       return n;
     }
+#endif
 
     size_t getMatrixSize() const { return assembledConnectivityMatrix.rows(); }
 
@@ -59,8 +65,8 @@ namespace calc {
 
     // MARK: serialization
     NormalModeAnalyzer() = default;
+#ifdef CEREALIZABLE
     friend class cereal::access;
-
     template<class Archive>
     void serialize(Archive& ar)
     {
@@ -70,6 +76,7 @@ namespace calc {
          eigenvalues,
          eigenvectors);
     }
+#endif
   };
 }
 }

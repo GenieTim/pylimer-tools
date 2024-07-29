@@ -10,10 +10,14 @@ extern "C"
 #include "AtomGraphParent.h"
 #include "Molecule.h"
 #include <Eigen/Dense>
+
+#ifdef CEREALIZABLE
 #include <cereal/types/base_class.hpp>
 #include <cereal/types/map.hpp>
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/types/unordered_map.hpp>
+#endif
+
 #include <map>
 #include <unordered_map>
 #include <vector>
@@ -214,6 +218,7 @@ namespace entities {
     double computePolydispersityIndex(int crossLinkerType) const;
     bool validate();
 
+#ifdef CEREALIZABLE
     template<class Archive>
     void serialize(Archive& archive)
     {
@@ -239,6 +244,7 @@ namespace entities {
               // type's properties
               massPerType);
     }
+#endif
 
   protected:
     // properties of the universe
@@ -280,8 +286,10 @@ namespace entities {
 } // namespace entities
 } // namespace pylimer_tools
 
+#ifdef CEREALIZABLE
 CEREAL_REGISTER_TYPE(pylimer_tools::entities::Universe);
 CEREAL_REGISTER_POLYMORPHIC_RELATION(pylimer_tools::entities::AtomGraphParent,
                                      pylimer_tools::entities::Universe);
+#endif
 
 #endif
