@@ -49,9 +49,11 @@ namespace sim {
                        removeDanglingChains);
         // this->defaultR0Squared =
         //   universe.computeMeanSquareEndToEndDistance(crossLinkerType);
-        this->defaultR0Squared = net.springsContourLength.mean() *
-                                 universe.computeMeanSquaredBondLength();
         this->defaultNrOfChains = net.springsContourLength.size();
+        if (this->defaultNrOfChains > 0) {
+          this->defaultR0Squared = net.springsContourLength.mean() *
+                                   universe.computeMeanSquaredBondLength();
+        }
         this->forceRelaxationNetwork = net;
         this->is2D = is2D;
         this->currentForces = Eigen::VectorXd::Zero(net.coordinates.size());
