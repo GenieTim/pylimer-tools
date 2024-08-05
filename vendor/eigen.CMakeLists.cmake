@@ -14,6 +14,7 @@ if (NOT DEFINED eigen_LOADED)
 	endif()
 
 	set(eigen_LOADED ON)
+	message(STATUS "Eigen include directories: ${EIGEN3_INCLUDE_DIRS}, libraries ${EIGEN3_LIBRARIES}")
 endif()
 
 # include(${CMAKE_CURRENT_LIST_DIR}/FindLAPACKE.cmake)
