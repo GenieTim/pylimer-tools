@@ -42,16 +42,7 @@ target_link_libraries(pylimer_tools PUBLIC
 
 # add_dependencies(pylimer_tools Eigen3::Eigen)
 
-# link Eigen libraries. Difficulty due to Windows GitHub Action, somehow.
-if (TARGET Eigen3::Eigen)
-	message(STATUS "Target Eigen3::Eigen found")
-	target_link_libraries(pylimer_tools PUBLIC Eigen3::Eigen)
-else()
-	include_directories(${EIGEN3_INCLUDE_DIRS})
-	include_directories(${EIGEN3_INCLUDE_DIRS}/Eigen3)
-	target_link_libraries(pylimer_tools PUBLIC ${EIGEN3_LIBRARIES} ${BLAS_LIBRARIES})
-	message(STATUS "Eigen include directories: ${EIGEN3_INCLUDE_DIRS}, libraries ${EIGEN3_LIBRARIES}")
-endif()
+target_link_libraries(pylimer_tools PUBLIC Eigen3::Eigen)
 
 if (LAPACKE_FOUND)
 	target_link_libraries(pylimer_tools PUBLIC ${LAPACKE_LIBRARIES})
