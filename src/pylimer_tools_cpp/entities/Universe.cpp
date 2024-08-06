@@ -995,7 +995,7 @@ namespace entities {
               bondsToAdd.push_back({ {
                 originalEndNodeVertexId,
                 newEndNodeVertexId,
-                neighbourOriginalId,
+                static_cast<long int>(neighbourOriginalId),
               } });
             }
           }

@@ -128,16 +128,7 @@ target_link_libraries(header_test_sources PUBLIC
 	${igraph_LIBRARIES}
 )
 
-# link Eigen libraries. Difficulty due to Windows GitHub Action, somehow.
-if (TARGET Eigen3::Eigen)
-	message(STATUS "Target Eigen3::Eigen found")
-	target_link_libraries(header_test_sources PUBLIC Eigen3::Eigen)
-else()
-	include_directories(${EIGEN3_INCLUDE_DIRS})
-	include_directories(${EIGEN3_INCLUDE_DIRS}/Eigen3)
-	target_link_libraries(header_test_sources PUBLIC ${EIGEN3_LIBRARIES})
-	message(STATUS "Eigen include directories: ${EIGEN3_INCLUDE_DIRS}, libraries ${EIGEN3_LIBRARIES}")
-endif()
+target_link_libraries(header_test_sources PUBLIC Eigen3::Eigen)
 
 # separate the header tests out, for the coverage generation
 add_executable(header_tests pylimer_tools/test_headers.cpp)
@@ -150,7 +141,6 @@ target_link_libraries(header_tests
 	Catch2::Catch2WithMain
 	header_test_sources
 	${igraph_LIBRARIES}
-	${EIGEN3_LIBRARIES}
 )
 
 if (LEAK_ANALYSIS)
