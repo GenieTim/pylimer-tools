@@ -9,7 +9,14 @@
     {
       "type": "shell",
       "label": "Compile Tests",
-      "command": "./bin/build-tests.sh"
+      "command": "./bin/build-tests.sh",
+      "options": {
+        "env": {
+          "DIABLE_COVERAGE": "1",
+          // "PATH": "/opt/homebrew/opt/llvm/bin:$PATH",
+          // "LDFLAGS": "-L/opt/homebrew/opt/llvm/lib/c++ -L/opt/homebrew/opt/llvm/lib -lunwind"
+        }
+      }
     }
   ]
 }

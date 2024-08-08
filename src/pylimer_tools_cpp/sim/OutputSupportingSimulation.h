@@ -14,11 +14,11 @@
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <memory>
 #include <numeric>
 #include <string>
 #include <tuple>
 #include <vector>
-#include <memory>
 
 #ifdef CEREALIZABLE
 #include <cereal/types/base_class.hpp>
@@ -218,28 +218,32 @@ namespace sim {
      *
      * @param current_step
      */
-    inline void handleOutput(const long int currentStep)
+    void handleOutput(const long int currentStep)
     {
       // "lazily" compute the values we need, others less lazily when they are
       // computationally inexpensive
       std::array<long int, NUM_COMPUTABLE_INT_VALUES> intvalues = {
         currentStep,
-        requiresEvaluation(NUM_SHIFT, currentStep) ? getNumShifts() : 0,
-        requiresEvaluation(NUM_RELOC, currentStep) ? getNumRelocations() : 0,
-        requiresEvaluation(NUM_ATOMS, currentStep)
-          ? static_cast<long int>(getNumAtoms())
+        this->requiresEvaluation(NUM_SHIFT, currentStep) ? this->getNumShifts()
+                                                         : 0,
+        this->requiresEvaluation(NUM_RELOC, currentStep)
+          ? this->getNumRelocations()
           : 0,
-        requiresEvaluation(NUM_EXTRA_ATOMS, currentStep)
-          ? static_cast<long int>(getNumExtraAtoms())
+        this->requiresEvaluation(NUM_ATOMS, currentStep)
+          ? static_cast<long int>(this->getNumAtoms())
           : 0,
-        requiresEvaluation(NUM_BONDS, currentStep)
-          ? static_cast<long int>(getNumBonds())
+        this->requiresEvaluation(NUM_EXTRA_ATOMS, currentStep)
+          ? static_cast<long int>(this->getNumExtraAtoms())
           : 0,
-        requiresEvaluation(NUM_EXTRA_BONDS, currentStep)
-          ? static_cast<long int>(getNumExtraBonds())
+        this->requiresEvaluation(NUM_BONDS, currentStep)
+          ? static_cast<long int>(this->getNumBonds())
           : 0,
-        requiresEvaluation(NUM_BONDS_TO_FORM, currentStep) ? getNumBondsToForm()
-                                                           : 0,
+        this->requiresEvaluation(NUM_EXTRA_BONDS, currentStep)
+          ? static_cast<long int>(this->getNumExtraBonds())
+          : 0,
+        this->requiresEvaluation(NUM_BONDS_TO_FORM, currentStep)
+          ? this->getNumBondsToForm()
+          : 0,
       };
 
       Eigen::Matrix3d stressTensor =
@@ -261,12 +265,15 @@ namespace sim {
         bondLengths = Eigen::Vector3d::Zero();
       }
 
+      // assemble all computed values into an easy-to-access array
       std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES> doublevalues = {
-        getTimestep(),
-        getCurrentTime(currentStep),
-        getVolume(),
+        this->getTimestep(),
+        this->getCurrentTime(currentStep),
+        this->getVolume(),
         pressure, // + kineticPressureTerm,
-        requiresEvaluation(TEMPERATURE, currentStep) ? getTemperature() : 0.,
+        this->requiresEvaluation(TEMPERATURE, currentStep)
+          ? this->getTemperature()
+          : 0.,
         stressTensor(0, 0),
         stressTensor(1, 1),
         stressTensor(2, 2),
@@ -276,8 +283,10 @@ namespace sim {
         stressTensor(0, 0) - stressTensor(1, 1),
         stressTensor(1, 1) - stressTensor(2, 2),
         stressTensor(0, 0) - stressTensor(2, 2),
-        requiresEvaluation(MEAN_B, currentStep) ? bondLengths.mean() : 0.0,
-        requiresEvaluation(MAX_B, currentStep) ? bondLengths.maxCoeff() : 0.0,
+        this->requiresEvaluation(MEAN_B, currentStep) ? bondLengths.mean()
+                                                      : 0.0,
+        this->requiresEvaluation(MAX_B, currentStep) ? bondLengths.maxCoeff()
+                                                     : 0.0,
         0.
       };
       int streamIdx = 0;

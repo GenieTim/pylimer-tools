@@ -192,6 +192,8 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator][long]")
     std::remove(averageFile.c_str());
     CHECK(std::filesystem::exists(autocorrFile));
     std::remove(autocorrFile.c_str());
+
+#ifdef CEREALIZABLE
     REQUIRE(std::filesystem::exists(restartFile));
 
     pcd::DPDSimulator sim2 = pcd::DPDSimulator::readRestartFile(restartFile);
@@ -203,6 +205,7 @@ TEST_CASE("DPD Simulator Works", "[analysis][DPDSimulator][long]")
     CHECK_NOTHROW(sim2.validateState());
     std::cout << "DPD ran from restart file, state validated." << std::endl;
     std::remove(restartFile.c_str());
+#endif
   }
 };
 
@@ -699,6 +702,7 @@ TEST_CASE("DPD Simulator's restart files are accurate",
     simulator.createSlipSprings(100, 2);
 
     std::string restartFile = "restartFile-for-accuracy-test.bin";
+#ifdef CEREALIZABLE
     simulator.writeRestartFile(restartFile);
 
     REQUIRE(std::filesystem::exists(restartFile));
@@ -706,6 +710,9 @@ TEST_CASE("DPD Simulator's restart files are accurate",
     pcd::DPDSimulator sim2 = pcd::DPDSimulator::readRestartFile(restartFile);
 
     std::remove(restartFile.c_str());
+#else
+    pcd::DPDSimulator sim2 = simulator;
+#endif
 
 #ifdef OPENMP_FOUND
     // we cannot have more than 1 thread, otherwise the random number generator
