@@ -92,7 +92,7 @@ namespace sim {
       Eigen::VectorXd currentVelocitiesPlus;
       Eigen::VectorXd currentVelocities;
       Eigen::VectorXd currentForces;
-      Eigen::Matrix3d currentStressTensor;
+      Eigen::Matrix3d currentStressTensor = Eigen::Matrix3d::Zero();
       double currentPressure = 0.;
 
       ////////////////////////////////////////////////////////////////

@@ -5076,11 +5076,10 @@ namespace sim {
                                    this->currentSpringPartitionsVec,
                                    oneOverSpringPartitionUpperLimit);
 
+      // convert the array to an Eigen matrix
       Eigen::Matrix3d convertedRes = Eigen::Matrix3d::Zero();
       for (size_t i = 0; i < 3; ++i) {
-        for (size_t j = 0; j < 3; ++j) {
-          convertedRes(i, j) = res[i][j];
-        }
+        convertedRes.row(i) = Eigen::Vector3d::Map(res[i].data(), 3);
       }
       return convertedRes;
     }
