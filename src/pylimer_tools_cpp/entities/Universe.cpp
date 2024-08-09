@@ -709,9 +709,9 @@ namespace entities {
    *
    * @param massPerType the weight per type
    */
-  void Universe::setMasses(const std::map<int, double>& massPerType)
+  void Universe::setMasses(const std::map<int, double>& newMassPerType)
   {
-    this->massPerType = massPerType;
+    this->massPerType = newMassPerType;
   }
 
   std::map<int, double> Universe::getMasses()

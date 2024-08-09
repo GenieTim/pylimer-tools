@@ -412,13 +412,13 @@ namespace utils {
 
   void DataFileParser::readBond(const std::string& line)
   {
-    size_t bondId, bondType, bondFrom, bondTo;
+    size_t bondId, bondType, newBondFrom, newBondTo;
     sscanf(
-      line.c_str(), "%zu %zu %zu %zu", &bondId, &bondType, &bondFrom, &bondTo);
+      line.c_str(), "%zu %zu %zu %zu", &bondId, &bondType, &newBondFrom, &newBondTo);
     this->bondIds.push_back(bondId);
     this->bondTypes.push_back(bondType);
-    this->bondFrom.push_back(bondFrom);
-    this->bondTo.push_back(bondTo);
+    this->bondFrom.push_back(newBondFrom);
+    this->bondTo.push_back(newBondTo);
   }
 
   void DataFileParser::readAngles(std::ifstream& file, std::string& line)

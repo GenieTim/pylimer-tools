@@ -7,14 +7,14 @@
 #include <map>
 #include <unordered_map>
 #include <vector>
-extern "C"
-{
-#include <igraph/igraph.h>
-}
 #include "ExtraEigenTypes.h"
 #include "utilityMacros.h"
 #include <Eigen/Dense>
 #include <cassert>
+extern "C"
+{
+#include <igraph/igraph.h>
+}
 
 namespace pylimer_tools {
 namespace utils {

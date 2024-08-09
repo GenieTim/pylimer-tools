@@ -57,9 +57,9 @@ namespace sim {
     private:
       DPDSimulator() {}; // not exposed to users, only used by Cereal
 
-    #ifdef CEREALIZABLE
+#ifdef CEREALIZABLE
       friend class cereal::access;
-      #endif
+#endif
 
       ////////////////////////////////////////////////////////////////
       // configuration
@@ -470,7 +470,11 @@ namespace sim {
         return bondLengths;
       }
 
-      Eigen::VectorXd getCoordinates() override { return this->coordinates; }
+      Eigen::VectorXd getCoordinates() override
+      {
+        assert(this->coordinates.size() == 3 * this->numAtoms);
+        return this->coordinates;
+      }
 
       double getTemperature() override
       {
@@ -494,7 +498,7 @@ namespace sim {
       ////////////////////////////////////////////////////////////////
       // serialization
 
-    #ifdef CEREALIZABLE
+#ifdef CEREALIZABLE
       template<class Archive>
       void serialize(Archive& ar, std::uint32_t const version)
       {
@@ -592,7 +596,7 @@ namespace sim {
       {
         pylimer_tools::utils::serializeToFile<DPDSimulator>(*this, filename);
       };
-      #endif
+#endif
 
     protected:
       void addSlipSprings(std::vector<size_t>& partnerA,

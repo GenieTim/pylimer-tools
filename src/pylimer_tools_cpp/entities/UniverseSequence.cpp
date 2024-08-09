@@ -37,12 +37,12 @@ namespace entities {
   };
 
   void UniverseSequence::initializeFromDataSequence(
-    const std::vector<std::string>& dataFiles)
+    const std::vector<std::string>& newDataFiles)
   {
     this->modeDataFiles = true;
     this->reset();
-    this->dataFiles = dataFiles;
-    this->length = dataFiles.size();
+    this->dataFiles = newDataFiles;
+    this->length = newDataFiles.size();
     this->universeCache.reserve(this->length);
   };
 
@@ -51,20 +51,20 @@ namespace entities {
     return this->atIndex(this->index++);
   }
 
-  Universe UniverseSequence::atIndex(size_t index)
+  Universe UniverseSequence::atIndex(size_t idx)
   {
-    if (index >= this->length) {
-      throw std::invalid_argument("Index (" + std::to_string(index) +
+    if (idx >= this->length) {
+      throw std::invalid_argument("Index (" + std::to_string(idx) +
                                   ") larger than nr. of universes (" +
                                   std::to_string(this->length) + ").");
     }
-    if (!pylimer_tools::utils::map_has_key(this->universeCache, index)) {
-      this->universeCache.emplace(index,
+    if (!pylimer_tools::utils::map_has_key(this->universeCache, idx)) {
+      this->universeCache.emplace(idx,
                                   this->modeDataFiles
-                                    ? this->readDataFileAtIndex(index)
-                                    : this->readDumpFileAtIndex(index));
+                                    ? this->readDataFileAtIndex(idx)
+                                    : this->readDumpFileAtIndex(idx));
     }
-    return this->universeCache.at(index);
+    return this->universeCache.at(idx);
   }
 
   void UniverseSequence::setDataFileAtomStyle(
@@ -75,32 +75,32 @@ namespace entities {
     this->dataFileAtomStyle = newDataFileAtomStyle;
   }
 
-  Universe UniverseSequence::readDataFileAtIndex(size_t index)
+  Universe UniverseSequence::readDataFileAtIndex(size_t idx)
   {
-    return this->readDataFile(this->dataFiles[index]);
+    return this->readDataFile(this->dataFiles[idx]);
   }
 
-  Universe UniverseSequence::readDumpFileAtIndex(size_t index)
+  Universe UniverseSequence::readDumpFileAtIndex(size_t idx)
   {
     // std::cout << "Reading dump file at idx " << index << std::endl;
-    this->dumpFileParser.readGroupByIdx(index);
+    this->dumpFileParser.readGroupByIdx(idx);
     Universe newUniverse = Universe(1.0, 1.0, 1.0);
     std::vector<long int> timeStepData =
-      this->dumpFileParser.getValuesForAt<long int>(index, "TIMESTEP", 0);
+      this->dumpFileParser.getValuesForAt<long int>(idx, "TIMESTEP", 0);
     if (timeStepData.size() == 0) {
       throw std::runtime_error(
-        "Universe with index " + std::to_string(index) +
+        "Universe with index " + std::to_string(idx) +
         " does not have enough data on its timestep. Is the file defect?");
     }
     newUniverse.setTimestep(timeStepData[0]);
     if (this->dumpFileParser.hasKey("BOX BOUNDS")) {
       std::vector<double> lo =
-        this->dumpFileParser.getValuesForAt<double>(index, "BOX BOUNDS", 0);
+        this->dumpFileParser.getValuesForAt<double>(idx, "BOX BOUNDS", 0);
       std::vector<double> hi =
-        this->dumpFileParser.getValuesForAt<double>(index, "BOX BOUNDS", 1);
+        this->dumpFileParser.getValuesForAt<double>(idx, "BOX BOUNDS", 1);
       if (lo.size() < 3 || hi.size() < 3) {
         throw std::runtime_error(
-          "Universe with index " + std::to_string(index) +
+          "Universe with index " + std::to_string(idx) +
           " does not have enough data on its box size, " +
           std::to_string(lo.size()) + " and " + std::to_string(hi.size()) +
           " instead of at least 3 each. Is the file defect?");
@@ -139,17 +139,17 @@ namespace entities {
 
     std::vector<double> positionsX =
       this->dumpFileParser.getValuesForAt<double>(
-        index, "ATOMS", "x" + positionSuffix);
+        idx, "ATOMS", "x" + positionSuffix);
     std::vector<double> positionsY =
       this->dumpFileParser.getValuesForAt<double>(
-        index, "ATOMS", "y" + positionSuffix);
+        idx, "ATOMS", "y" + positionSuffix);
     std::vector<double> positionsZ =
       this->dumpFileParser.getValuesForAt<double>(
-        index, "ATOMS", "z" + positionSuffix);
+        idx, "ATOMS", "z" + positionSuffix);
     if (positionsZ.size() != positionsY.size() ||
         positionsY.size() != positionsX.size()) {
       throw std::runtime_error(
-        "Atom coordinates for universe with index " + std::to_string(index) +
+        "Atom coordinates for universe with index " + std::to_string(idx) +
         " do not have the same size (" + std::to_string(positionsX.size()) +
         ", " + std::to_string(positionsY.size()) + ", " +
         std::to_string(positionsZ.size()) + "). Is the file defect?");
@@ -169,7 +169,7 @@ namespace entities {
     int nAtoms = 0;
     if (this->dumpFileParser.hasKey("NUMBER OF ATOMS")) {
       std::vector<int> nAtomVec =
-        this->dumpFileParser.getValuesForAt<int>(index, "NUMBER OF ATOMS", 0);
+        this->dumpFileParser.getValuesForAt<int>(idx, "NUMBER OF ATOMS", 0);
       if (nAtomVec.size() > 0) {
         nAtoms = nAtomVec[0];
       }
@@ -180,9 +180,9 @@ namespace entities {
 
     if (this->dumpFileParser.keyHasDirectionalColumn("ATOMS", "i", "") &&
         !isUnwrapped) {
-      nx = this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "ix");
-      ny = this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "iy");
-      nz = this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "iz");
+      nx = this->dumpFileParser.getValuesForAt<int>(idx, "ATOMS", "ix");
+      ny = this->dumpFileParser.getValuesForAt<int>(idx, "ATOMS", "iy");
+      nz = this->dumpFileParser.getValuesForAt<int>(idx, "ATOMS", "iz");
     } else {
       nx = pylimer_tools::utils::initializeWithValue(
         nAtoms, 0); // this->dataFileParser.getAtomNx();
@@ -197,7 +197,7 @@ namespace entities {
     bool hasAtomIds = false;
     if (this->dumpFileParser.keyHasColumn("ATOMS", "id")) {
       atomIds =
-        this->dumpFileParser.getValuesForAt<long int>(index, "ATOMS", "id");
+        this->dumpFileParser.getValuesForAt<long int>(idx, "ATOMS", "id");
       hasAtomIds = true;
     } else {
       atomIds.reserve(nAtoms);
@@ -211,7 +211,7 @@ namespace entities {
     atomTypes.reserve(nAtoms);
     if (this->dumpFileParser.keyHasColumn("ATOMS", "type")) {
       atomTypes =
-        this->dumpFileParser.getValuesForAt<int>(index, "ATOMS", "type");
+        this->dumpFileParser.getValuesForAt<int>(idx, "ATOMS", "type");
     } else {
       if (hasAtomIds) {
         // infer from data file
@@ -329,13 +329,13 @@ namespace entities {
     return results;
   }
 
-  void UniverseSequence::forgetAtIndex(size_t index)
+  void UniverseSequence::forgetAtIndex(size_t idx)
   {
     if (!this->modeDataFiles) {
-      this->dumpFileParser.forgetAt(index);
+      this->dumpFileParser.forgetAt(idx);
     }
-    if (pylimer_tools::utils::map_has_key(this->universeCache, index)) {
-      this->universeCache.erase(index);
+    if (pylimer_tools::utils::map_has_key(this->universeCache, idx)) {
+      this->universeCache.erase(idx);
     }
   }
 
