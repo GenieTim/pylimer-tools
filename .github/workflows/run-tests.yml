@@ -33,13 +33,13 @@ jobs:
             ./vendor/cereal
             ./vendor/cereal-skbuild
             ./tests/build
-          key: ${{ runner.os }}-py-3.11.2-${{ hashFiles('**/requirements.txt') }}
+          key: ${{ runner.os }}-py-3.12.4-${{ hashFiles('**/requirements.txt') }}
           restore-keys: |
-            ${{ runner.os }}-py-3.11.2-
+            ${{ runner.os }}-py-3.12.4-
 
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.12.2"
+          python-version: "3.12.4"
           cache: "pip"
 
       - name: Install Dependencies
