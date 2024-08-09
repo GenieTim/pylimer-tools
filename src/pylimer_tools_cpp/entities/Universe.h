@@ -105,7 +105,7 @@ namespace entities {
                            const std::vector<int>& types);
     void setMasses(const std::map<int, double>& massPerType);
     void setBox(const Box& box, bool rescaleAtomCoordinates = false);
-    void setTimestep(long int timestep) { this->timestep = timestep; };
+    void setTimestep(long int newTimestep) { this->timestep = newTimestep; };
     void initializeFromGraph(const igraph_t* ingraph);
     void removeAllAngles();
     void removeAllDihedralAngles();

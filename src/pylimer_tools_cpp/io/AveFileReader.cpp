@@ -135,12 +135,12 @@ namespace utils {
       return this->data;
     }
 
-    int numRows = this->getNrOfRows();
-    int numCols = this->getNrOfColumns();
+    int nRows = this->getNrOfRows();
+    int nCols = this->getNrOfColumns();
     std::vector<std::vector<double>> results =
-      pylimer_tools::utils::initializeWithValue(numCols, std::vector<double>());
-    for (size_t i = 0; i < numCols; ++i) {
-      results[i].reserve(numCols);
+      pylimer_tools::utils::initializeWithValue(nCols, std::vector<double>());
+    for (size_t i = 0; i < nCols; ++i) {
+      results[i].reserve(nCols);
     }
 
     std::ifstream file(this->filePath);
@@ -154,18 +154,18 @@ namespace utils {
                       "File ended before data was even reached");
     }
 
-    for (size_t i = 0; i < numRows; ++i) {
+    for (size_t i = 0; i < nRows; ++i) {
       if (!std::getline(file, line)) {
-        if (i + 1 < numRows) {
+        if (i + 1 < nRows) {
           throw std::runtime_error(
             "File ended before all rows could be read (reached row " +
-            std::to_string(i) + " of " + std::to_string(numRows) + ")");
+            std::to_string(i) + " of " + std::to_string(nRows) + ")");
         } else {
           break;
         }
       }
       std::stringstream ss(line);
-      for (size_t col = 0; col < numCols; ++col) {
+      for (size_t col = 0; col < nCols; ++col) {
         double val;
         if (ss >> val) {
           results[col].push_back(val);
@@ -193,27 +193,27 @@ namespace utils {
   {
     INVALIDARG_EXP_IFN(column < this->getNrOfColumns(), "Invalid column");
 
-    int numRows = this->getNrOfRows();
+    int nRows = this->getNrOfRows();
     // validate dts
     for (size_t i = 1; i < dts.size(); ++i) {
       INVALIDARG_EXP_IFN(dts[i - 1] < dts[i],
                          "Invalid dts: they need to be sequential.");
-      INVALIDARG_EXP_IFN(dts[i] < numRows - 1,
+      INVALIDARG_EXP_IFN(dts[i] < nRows - 1,
                          "Invalid dts: got requested " +
                            std::to_string(dts[i]) + ", but only got " +
-                           std::to_string(numRows) + " rows.");
+                           std::to_string(nRows) + " rows.");
     }
 
     this->getData();
     Eigen::ArrayXd colData = Eigen::Map<Eigen::ArrayXd, Eigen::Unaligned>(
       this->data[column].data(), this->data[column].size());
-    RUNTIME_EXP_IFN(colData.size() == numRows, "Invalid row sizes");
+    RUNTIME_EXP_IFN(colData.size() == nRows, "Invalid row sizes");
 
     std::vector<double> results;
     results.reserve(dts.size());
     for (size_t dt : dts) {
       results.push_back(
-        (colData.segment(0, numRows - dt) * colData.segment(dt, numRows - dt))
+        (colData.segment(0, nRows - dt) * colData.segment(dt, nRows - dt))
           .mean());
     }
 
@@ -237,15 +237,15 @@ namespace utils {
     INVALIDARG_EXP_IFN(column1 < this->getNrOfColumns(), "Invalid column");
     INVALIDARG_EXP_IFN(column2 < this->getNrOfColumns(), "Invalid column");
 
-    int numRows = this->getNrOfRows();
+    int nRows = this->getNrOfRows();
     // validate dts
     for (size_t i = 1; i < dts.size(); ++i) {
       INVALIDARG_EXP_IFN(dts[i - 1] < dts[i],
                          "Invalid dts: they need to be sequential.");
-      INVALIDARG_EXP_IFN(dts[i] < numRows - 1,
+      INVALIDARG_EXP_IFN(dts[i] < nRows - 1,
                          "Invalid dts: got requested " +
                            std::to_string(dts[i]) + ", but only got " +
-                           std::to_string(numRows) + " rows.");
+                           std::to_string(nRows) + " rows.");
     }
 
     Eigen::ArrayXd colData =
@@ -253,14 +253,13 @@ namespace utils {
         this->getData()[column1].data(), this->getData()[column1].size()) -
       Eigen::Map<Eigen::ArrayXd, Eigen::Unaligned>(
         this->getData()[column2].data(), this->getData()[column2].size());
-    RUNTIME_EXP_IFN(colData.size() == numRows, "Invalid row sizes");
+    RUNTIME_EXP_IFN(colData.size() == nRows, "Invalid row sizes");
 
     std::vector<double> results;
     results.reserve(dts.size());
     for (size_t dt : dts) {
       results.push_back(
-        (colData.segment(0, numRows - dt) * colData.segment(dt, numRows))
-          .mean());
+        (colData.segment(0, nRows - dt) * colData.segment(dt, nRows)).mean());
     }
 
     return results;

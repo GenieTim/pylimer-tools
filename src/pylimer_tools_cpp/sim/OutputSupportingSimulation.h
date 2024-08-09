@@ -123,32 +123,32 @@ namespace sim {
   protected:
     ////////////////////////////////////////////////////////////////
     // output configurations
-    std::vector<OutputConfiguration> outputConfigs;
-    std::vector<OutputConfiguration> outputAverageConfigs;
-    std::vector<OutputConfiguration> outputAutoCorrelationConfigs;
+    std::vector<OutputConfiguration> outputConfigs = {};
+    std::vector<OutputConfiguration> outputAverageConfigs = {};
+    std::vector<OutputConfiguration> outputAutoCorrelationConfigs = {};
     ////////////////////////////////////////////////////////////////
     // restart configurations
     int outputRestartEvery = 0;
-    std::string restartOutputFile;
+    std::string restartOutputFile = "";
     ////////////////////////////////////////////////////////////////
     // output speedups
     std::array<int, NUM_COMPUTABLE_DOUBLE_VALUES> doubleValueRequiredEvery;
     std::array<int, NUM_COMPUTABLE_INT_VALUES> intValueRequiredEvery;
     int requireStressTensorEvery = 0;
     int requireBondLenEvery = 0;
-    std::string outputBuffer;
+    std::string outputBuffer = "";
     bool doAverage = false;
     ////////////////////////////////////////////////////////////////
     // output streams
-    std::vector<std::shared_ptr<std::ostream>> outputStreams;
-    std::vector<int> outputFileStreams;
+    std::vector<std::shared_ptr<std::ostream>> outputStreams = {};
+    std::vector<int> outputFileStreams = {};
     ////////////////////////////////////////////////////////////////
     // computation state
-    std::vector<pylimer_tools::calc::Correlator> autocorrelators;
-    std::vector<Eigen::ArrayXi> msdMeasuredIndices;
-    std::vector<Eigen::VectorXd> msdOrigins;
-    std::vector<size_t> msdOriginTimesteps;
-    std::vector<double> runningAverages;
+    std::vector<pylimer_tools::calc::Correlator> autocorrelators = {};
+    std::vector<Eigen::ArrayXi> msdMeasuredIndices = {};
+    std::vector<Eigen::VectorXd> msdOrigins = {};
+    std::vector<size_t> msdOriginTimesteps = {};
+    std::vector<double> runningAverages = {};
 
     /**
      * @brief Open all files required for output
@@ -199,15 +199,15 @@ namespace sim {
                               const std::string& prefix = "",
                               int streamIdx = 0);
 
-    inline bool requiresEvaluation(const ComputedDoubleValues val,
-                                   const long int currentStep) const
+    inline bool requiresDEvaluation(const ComputedDoubleValues val,
+                                    const long int currentStep) const
     {
       return (this->doubleValueRequiredEvery[val] != 0) &&
              ((currentStep % this->doubleValueRequiredEvery[val]) == 0);
     }
 
-    inline bool requiresEvaluation(const ComputedIntValues val,
-                                   const long int currentStep) const
+    inline bool requiresIEvaluation(const ComputedIntValues val,
+                                    const long int currentStep) const
     {
       return (this->intValueRequiredEvery[val] != 0) &&
              ((currentStep % this->intValueRequiredEvery[val]) == 0);
@@ -224,24 +224,24 @@ namespace sim {
       // computationally inexpensive
       std::array<long int, NUM_COMPUTABLE_INT_VALUES> intvalues = {
         currentStep,
-        this->requiresEvaluation(NUM_SHIFT, currentStep) ? this->getNumShifts()
-                                                         : 0,
-        this->requiresEvaluation(NUM_RELOC, currentStep)
+        this->requiresIEvaluation(NUM_SHIFT, currentStep) ? this->getNumShifts()
+                                                          : 0,
+        this->requiresIEvaluation(NUM_RELOC, currentStep)
           ? this->getNumRelocations()
           : 0,
-        this->requiresEvaluation(NUM_ATOMS, currentStep)
+        this->requiresIEvaluation(NUM_ATOMS, currentStep)
           ? static_cast<long int>(this->getNumAtoms())
           : 0,
-        this->requiresEvaluation(NUM_EXTRA_ATOMS, currentStep)
+        this->requiresIEvaluation(NUM_EXTRA_ATOMS, currentStep)
           ? static_cast<long int>(this->getNumExtraAtoms())
           : 0,
-        this->requiresEvaluation(NUM_BONDS, currentStep)
+        this->requiresIEvaluation(NUM_BONDS, currentStep)
           ? static_cast<long int>(this->getNumBonds())
           : 0,
-        this->requiresEvaluation(NUM_EXTRA_BONDS, currentStep)
+        this->requiresIEvaluation(NUM_EXTRA_BONDS, currentStep)
           ? static_cast<long int>(this->getNumExtraBonds())
           : 0,
-        this->requiresEvaluation(NUM_BONDS_TO_FORM, currentStep)
+        this->requiresIEvaluation(NUM_BONDS_TO_FORM, currentStep)
           ? this->getNumBondsToForm()
           : 0,
       };
@@ -253,7 +253,7 @@ namespace sim {
           : Eigen::Matrix3d::Zero();
       double pressure = stressTensor.trace() / 3.;
       // double kineticPressureTerm =
-      //   requiresEvaluation(PRESSURE, currentStep)
+      //   requiresDEvaluation(PRESSURE, currentStep)
       //     ? ((getNumParticles() * this->getTemperature()) /
       //     this->getVolume()) : 0.0;
       Eigen::VectorXd bondLengths =
@@ -268,10 +268,12 @@ namespace sim {
       // assemble all computed values into an easy-to-access array
       std::array<double, NUM_COMPUTABLE_DOUBLE_VALUES> doublevalues = {
         this->getTimestep(),
-        this->getCurrentTime(currentStep),
-        this->getVolume(),
+        this->requiresDEvaluation(TIME, currentStep)
+          ? this->getCurrentTime(currentStep)
+          : 0.,
+        this->requiresDEvaluation(VOLUME, currentStep) ? this->getVolume() : 0.,
         pressure, // + kineticPressureTerm,
-        this->requiresEvaluation(TEMPERATURE, currentStep)
+        this->requiresDEvaluation(TEMPERATURE, currentStep)
           ? this->getTemperature()
           : 0.,
         stressTensor(0, 0),
@@ -283,10 +285,10 @@ namespace sim {
         stressTensor(0, 0) - stressTensor(1, 1),
         stressTensor(1, 1) - stressTensor(2, 2),
         stressTensor(0, 0) - stressTensor(2, 2),
-        this->requiresEvaluation(MEAN_B, currentStep) ? bondLengths.mean()
+        this->requiresDEvaluation(MEAN_B, currentStep) ? bondLengths.mean()
+                                                       : 0.0,
+        this->requiresDEvaluation(MAX_B, currentStep) ? bondLengths.maxCoeff()
                                                       : 0.0,
-        this->requiresEvaluation(MAX_B, currentStep) ? bondLengths.maxCoeff()
-                                                     : 0.0,
         0.
       };
       int streamIdx = 0;
@@ -320,7 +322,7 @@ namespace sim {
               switch (val) {
                 case ComputedDoubleValues::MSD:
                   // compute MSD
-                  for (msdIdx = 0; msdIdx < msdMeasuredIndices.size();
+                  for (msdIdx = 0; msdIdx < this->msdMeasuredIndices.size();
                        ++msdIdx) {
                     double result =
                       (this->msdOrigins[msdIdx] -
@@ -464,12 +466,21 @@ namespace sim {
         switch (val) {
           case ComputedDoubleValues::MSD:
             // compute MSD
-            for (size_t msdIdx = 0; msdIdx < msdMeasuredIndices.size();
+            for (size_t msdIdx = 0; msdIdx < this->msdMeasuredIndices.size();
                  ++msdIdx) {
+              assert(this->msdOrigins.size() > msdIdx);
+              assert(this->getCoordinates().size() >
+                     this->msdMeasuredIndices[msdIdx].maxCoeff());
+              assert(this->msdOrigins[msdIdx].size() ==
+                     this->msdMeasuredIndices[msdIdx].size());
+              Eigen::ArrayXi nIndices = this->msdMeasuredIndices[msdIdx];
+              assert(nIndices.size() > 0);
+              assert(nIndices.size() == this->msdOrigins[msdIdx].size());
+              Eigen::VectorXd relCoords = this->getCoordinates();
+              assert(nIndices.minCoeff() >= 0 &&
+                     nIndices.maxCoeff() < relCoords.size());
               double result =
-                (this->msdOrigins[msdIdx] -
-                 getCoordinates()(this->msdMeasuredIndices[msdIdx]))
-                  .squaredNorm() /
+                (this->msdOrigins[msdIdx] - relCoords(nIndices)).squaredNorm() /
                 (static_cast<double>(this->msdMeasuredIndices[msdIdx].size() /
                                      3.));
               outputBuffer += std::to_string(result) + "\t";

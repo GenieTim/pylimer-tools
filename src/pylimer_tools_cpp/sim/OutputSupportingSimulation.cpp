@@ -20,8 +20,8 @@ namespace sim {
                          " hints at an invalid state.");
     int numComputes = 0;
     this->outputStreams.reserve(streamIdx + configs.size());
-    std::string outputBuffer = "";
-    outputBuffer.reserve(80 * 20);
+    std::string thisFileOutputBuffer = "";
+    thisFileOutputBuffer.reserve(80 * 20);
     for (OutputConfiguration oc : configs) {
       if (oc.filename != "" && oc.filename != "stdio") {
         // always append, as the truncation happened already
@@ -34,20 +34,20 @@ namespace sim {
           std::shared_ptr<std::ostream>(&std::cout, [](void*) {}));
       }
 
-      outputBuffer = prefix;
+      thisFileOutputBuffer = prefix;
 
       for (ComputedIntValues val : oc.intValues) {
         switch (val) {
           default:
             numComputes += 1;
-            outputBuffer += ComputedIntValuesNames[val] + "\t";
+            thisFileOutputBuffer += ComputedIntValuesNames[val] + "\t";
         }
       }
       for (ComputedDoubleValues val : oc.doubleValues) {
         switch (val) {
           case ComputedDoubleValues::MSD:
             for (size_t i = 0; i < this->msdOrigins.size(); ++i) {
-              outputBuffer += "MSD" + std::to_string(i) + "_" +
+              thisFileOutputBuffer += "MSD" + std::to_string(i) + "_" +
                               std::to_string(this->msdOriginTimesteps[i]) +
                               "\t";
             }
@@ -55,17 +55,17 @@ namespace sim {
             break;
           default:
             numComputes += 1;
-            outputBuffer += ComputedDoubleValuesNames[val] + "\t";
+            thisFileOutputBuffer += ComputedDoubleValuesNames[val] + "\t";
         }
       }
 
-      if (!outputBuffer.empty()) {
-        outputBuffer.pop_back(); // remove trailing tab
+      if (!thisFileOutputBuffer.empty()) {
+        thisFileOutputBuffer.pop_back(); // remove trailing tab
       }
 
-      (*this->outputStreams[streamIdx]) << outputBuffer << std::endl;
+      (*this->outputStreams[streamIdx]) << thisFileOutputBuffer << std::endl;
       streamIdx += 1;
-      outputBuffer.clear();
+      thisFileOutputBuffer.clear();
     }
     return numComputes;
   };

@@ -95,9 +95,9 @@ namespace calc {
     }
 #else
     // see also/alternative: igraph_lapack_dsyevr()
-    Eigen::VectorXd eigenvalues =
+    Eigen::VectorXd eigenvaluesMemory =
       Eigen::VectorXd::Zero(this->assembledConnectivityMatrix.rows());
-    Eigen::MatrixXd eigenvectors =
+    Eigen::MatrixXd eigenvectorsMemory =
       includeEigenvectors
         ? Eigen::MatrixXd::Zero(this->assembledConnectivityMatrix.rows(),
                                 this->assembledConnectivityMatrix.rows())
@@ -133,6 +133,8 @@ namespace calc {
     RUNTIME_EXP_IFN(info == 0,
                     "Error in LAPACK_dsyevr. Exit code " +
                       std::to_string(info) + ".");
+    this->setEigenvalues(eigenvaluesMemory);
+    this->setEigenvectors(eigenvectorsMemory);
 #endif
   }
 
@@ -148,9 +150,9 @@ namespace calc {
     return this->eigenvalues;
   }
 
-  void NormalModeAnalyzer::setEigenvalues(const Eigen::VectorXd eigenvalues)
+  void NormalModeAnalyzer::setEigenvalues(const Eigen::VectorXd newEigenvalues)
   {
-    this->eigenvalues = eigenvalues;
+    this->eigenvalues = newEigenvalues;
     this
       ->eigenvalues(this->eigenvalues.array() > -1e-14 &&
                     this->eigenvalues.array() < 0)
@@ -173,9 +175,9 @@ namespace calc {
     return this->eigenvectors;
   }
 
-  void NormalModeAnalyzer::setEigenvectors(const Eigen::MatrixXd eigenvectors)
+  void NormalModeAnalyzer::setEigenvectors(const Eigen::MatrixXd newEigenvectors)
   {
-    this->eigenvectors = eigenvectors;
+    this->eigenvectors = newEigenvectors;
     this->isEigenvectorsComputed = true;
     // TODO: possibly validate matrix dimensions
   }

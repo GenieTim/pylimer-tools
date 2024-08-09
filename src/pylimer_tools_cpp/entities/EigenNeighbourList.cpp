@@ -27,23 +27,25 @@ namespace entities {
   }
 
   void EigenNeighbourList::initialize(const Eigen::VectorXd& coordinates,
-                                      const Box& box,
-                                      double cutoff,
-                                      double scalingFactor)
+                                      const Box& newBox,
+                                      double newCutoff,
+                                      double newScalingFactor)
   {
-    INVALIDARG_EXP_IFN(cutoff > 1e-3, "Cutoff must be larger than zero");
+    INVALIDARG_EXP_IFN(newCutoff > 1e-3, "Cutoff must be larger than zero");
     INVALIDARG_EXP_IFN(coordinates.size() % 3 == 0,
                        "Coordinates must be in three");
 
-    this->actualCutoff = cutoff / scalingFactor;
-    this->cutoff = cutoff;
-    this->scalingFactor = scalingFactor;
-    this->box = box;
+    this->actualCutoff = newCutoff / scalingFactor;
+    this->cutoff = newCutoff;
+    this->scalingFactor = newScalingFactor;
+    this->box = newBox;
 
     this->nrOfBuckets =
-      (box.getL().array() / this->actualCutoff).floor().cast<long int>();
+      (this->box.getL().array() / this->actualCutoff).floor().cast<long int>();
+    Eigen::Array3li ones = Eigen::Array3li::Ones();
+    this->nrOfBuckets = this->nrOfBuckets.max(ones);
 
-    this->bucketWidths = box.getL() / this->nrOfBuckets.cast<double>();
+    this->bucketWidths = this->box.getL() / this->nrOfBuckets.cast<double>();
 
     this->totalNrOfBuckets = this->nrOfBuckets.prod();
 
@@ -69,13 +71,15 @@ namespace entities {
 
     assert(this->neighbourBucketNeighboursDefaultCutoff.size() ==
            this->totalNrOfBuckets);
+    assert(this->neighbourBuckets.size() == this->totalNrOfBuckets);
     // std::cout << "Filling buckets" << std::endl;
 
     // fill neighbour buckets
     this->neighbourBucketSizes = Eigen::ArrayXi::Zero(this->totalNrOfBuckets);
     for (size_t i = 0; i < (coordinates.size() / 3); ++i) {
-      int bucketIndex = this->getBucketIndexForTriplet(
+      bucket_idx_t bucketIndex = this->getBucketIndexForTriplet(
         this->getBucketTripletForCoordinates(coordinates.segment(3 * i, 3)));
+      assert(bucketIndex >= 0 && bucketIndex < this->totalNrOfBuckets);
       this->neighbourBuckets[bucketIndex].push_back(i);
       this->neighbourBucketSizes[bucketIndex]++;
     }
@@ -264,12 +268,12 @@ namespace entities {
     Eigen::ArrayXi& result,
     const Eigen::VectorXd& coordinates,
     const int source,
-    const double cutoff) const
+    const double newCutoff) const
   {
     int numNeighbours = this->getIndicesCloseToCoordinates(
-      result, coordinates.segment(3 * source, 3), cutoff);
+      result, coordinates.segment(3 * source, 3), newCutoff);
     int actualNumNeighbours = 0;
-    const double cutoff2 = cutoff * cutoff;
+    const double cutoff2 = newCutoff * newCutoff;
     for (size_t i = 0; i < numNeighbours; ++i) {
       if (result[i] > source) {
         Eigen::Vector3d dist = coordinates.segment(3 * source, 3) -
@@ -473,10 +477,10 @@ namespace entities {
    */
   bucket_idx_t EigenNeighbourList::normalizeBucketIndex(
     long int bucketIndex,
-    size_t nrOfBuckets) const
+    size_t newNrOfBuckets) const
   {
-    bucketIndex %= static_cast<long int>(nrOfBuckets);
-    bucketIndex += nrOfBuckets * static_cast<long int>(bucketIndex < 0);
+    bucketIndex %= static_cast<long int>(newNrOfBuckets);
+    bucketIndex += newNrOfBuckets * static_cast<long int>(bucketIndex < 0);
     return static_cast<bucket_idx_t>(bucketIndex);
   }
 
