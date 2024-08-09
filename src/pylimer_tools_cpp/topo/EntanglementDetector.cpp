@@ -4,9 +4,9 @@
 #include "../entities/Universe.h"
 #include "../utils/StringUtils.h"
 #include <iostream>
+#include <random>
 #include <string>
 #include <vector>
-#include <random>
 
 namespace pylimer_tools {
 namespace topo {

@@ -175,7 +175,8 @@ namespace calc {
     return this->eigenvectors;
   }
 
-  void NormalModeAnalyzer::setEigenvectors(const Eigen::MatrixXd newEigenvectors)
+  void NormalModeAnalyzer::setEigenvectors(
+    const Eigen::MatrixXd newEigenvectors)
   {
     this->eigenvectors = newEigenvectors;
     this->isEigenvectorsComputed = true;

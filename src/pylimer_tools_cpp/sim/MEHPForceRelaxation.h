@@ -403,12 +403,12 @@ namespace sim {
         return this->dt * currentStep;
       }
 
-    #ifdef CEREALIZABLE
+#ifdef CEREALIZABLE
       void writeRestartFile(std::string& filename) override
       {
         throw std::runtime_error("No restarts allowed here, yet");
       }
-      #endif
+#endif
 
       int getNumShifts() override { return 0; }
       int getNumRelocations() override { return 0; }

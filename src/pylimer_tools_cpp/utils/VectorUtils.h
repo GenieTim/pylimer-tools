@@ -3,14 +3,14 @@
 
 #include <algorithm>
 // #include <iostream>
-#include <iterator>
-#include <map>
-#include <unordered_map>
-#include <vector>
 #include "ExtraEigenTypes.h"
 #include "utilityMacros.h"
 #include <Eigen/Dense>
 #include <cassert>
+#include <iterator>
+#include <map>
+#include <unordered_map>
+#include <vector>
 extern "C"
 {
 #include <igraph/igraph.h>

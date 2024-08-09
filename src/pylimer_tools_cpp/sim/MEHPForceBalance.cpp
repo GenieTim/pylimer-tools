@@ -15,8 +15,8 @@
 #include <string>
 #include <tuple>
 #include <unordered_map>
-#include <vector>
 #include <unordered_set>
+#include <vector>
 
 namespace pylimer_tools {
 namespace sim {

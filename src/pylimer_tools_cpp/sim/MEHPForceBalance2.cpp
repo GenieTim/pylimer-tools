@@ -14,8 +14,8 @@
 #include <nlopt.hpp>
 #include <string>
 #include <tuple>
-#include <vector>
 #include <unordered_set>
+#include <vector>
 
 namespace pylimer_tools {
 namespace sim {

@@ -413,8 +413,12 @@ namespace utils {
   void DataFileParser::readBond(const std::string& line)
   {
     size_t bondId, bondType, newBondFrom, newBondTo;
-    sscanf(
-      line.c_str(), "%zu %zu %zu %zu", &bondId, &bondType, &newBondFrom, &newBondTo);
+    sscanf(line.c_str(),
+           "%zu %zu %zu %zu",
+           &bondId,
+           &bondType,
+           &newBondFrom,
+           &newBondTo);
     this->bondIds.push_back(bondId);
     this->bondTypes.push_back(bondType);
     this->bondFrom.push_back(newBondFrom);

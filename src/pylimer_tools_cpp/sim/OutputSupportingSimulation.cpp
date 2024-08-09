@@ -1,6 +1,5 @@
 #include "OutputSupportingSimulation.h"
 
-
 namespace pylimer_tools {
 namespace sim {
 
@@ -47,9 +46,9 @@ namespace sim {
         switch (val) {
           case ComputedDoubleValues::MSD:
             for (size_t i = 0; i < this->msdOrigins.size(); ++i) {
-              thisFileOutputBuffer += "MSD" + std::to_string(i) + "_" +
-                              std::to_string(this->msdOriginTimesteps[i]) +
-                              "\t";
+              thisFileOutputBuffer +=
+                "MSD" + std::to_string(i) + "_" +
+                std::to_string(this->msdOriginTimesteps[i]) + "\t";
             }
             numComputes += this->msdOrigins.size();
             break;
