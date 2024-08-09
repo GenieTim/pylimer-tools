@@ -21,8 +21,8 @@
 #include <random>
 #include <string>
 #include <tuple>
-#include <vector>
 #include <unordered_set>
+#include <vector>
 
 namespace pylimer_tools {
 namespace sim {
@@ -1827,7 +1827,7 @@ namespace sim {
         return results;
       }
 
-    #ifdef CEREALIZABLE
+#ifdef CEREALIZABLE
       void writeRestartFile(std::string& file) override
       {
         throw std::runtime_error("Restart not supported yet");

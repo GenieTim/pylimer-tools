@@ -381,7 +381,7 @@ namespace entities {
       return newBox;
     }
 
-    #ifdef CEREALIZABLE
+#ifdef CEREALIZABLE
     /**
      * @brief Serialize this box using Cereal
      *
@@ -400,7 +400,7 @@ namespace entities {
          simpleShearMagnitude,
          shearDirection);
     }
-    #endif // CEREALIZABLE
+#endif // CEREALIZABLE
   };
 } // namespace entities
 } // namespace pylimer_tools
