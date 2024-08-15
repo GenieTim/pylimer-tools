@@ -84,7 +84,9 @@ namespace topo {
           crossLinkerChains[i].getAtomsLinedUp(crossLinkerType, true, true);
         for (size_t atomIdx = 0; atomIdx < atoms.size(); ++atomIdx) {
           pylimer_tools::entities::Atom atom = atoms[atomIdx];
-          if (atom.getType() != crossLinkerType || !ignoreCrosslinks) {
+          if (((atom.getType() != crossLinkerType) && (atomIdx != 0) &&
+               (atomIdx != (atoms.size() - 1))) ||
+              !ignoreCrosslinks) {
             atomsForNeighbourList.push_back(atom);
             atomToStrand.emplace(atom.getId(), i);
             atomIdxInStrand.emplace(atom.getId(), atomIdx);

@@ -361,7 +361,8 @@ namespace sim {
                                       minimumNrOfSliplinks,
                                       sameStrandCutoff,
                                       seed,
-                                      crossLinkerType);
+                                      crossLinkerType,
+                                      true);
 
         RUNTIME_EXP_IFN(
           entanglements.pairsOfAtoms.size() >= minimumNrOfSliplinks,
