@@ -215,21 +215,20 @@ namespace sim {
           if (pairsOfAtoms.size() > 0) {
             for (size_t i = 1; i < linedUpAtoms.size() - 1; i++) {
               pylimer_tools::entities::Atom a = linedUpAtoms[i];
-              if (pairOfAtom[universe.getIdxByAtomId(a.getId())] != -1) {
-                size_t thisLinkIdx =
-                  currentVertexId +
-                  pairOfAtom[universe.getIdxByAtomId(a.getId())];
+              long int pairIdx = pairOfAtom[universe.getIdxByAtomId(a.getId())];
+              if (pairIdx != -1) {
+                size_t thisLinkIdx = currentVertexId + pairIdx;
                 fb.initialConfig.linkIndicesOfSprings[springIdx].push_back(
                   thisLinkIdx);
                 fb.initialConfig.springIndicesOfLinks[thisLinkIdx].push_back(
                   springIdx);
                 // set the mean x,y,z of the two involved atoms
-                pylimer_tools::entities::Atom a1 = universe.getAtom(
-                  pairsOfAtoms[pairOfAtom[universe.getIdxByAtomId(a.getId())]]
-                    .first);
-                pylimer_tools::entities::Atom a2 = universe.getAtom(
-                  pairsOfAtoms[pairOfAtom[universe.getIdxByAtomId(a.getId())]]
-                    .second);
+                pylimer_tools::entities::Atom a1 =
+                  universe.getAtom(pairsOfAtoms[pairIdx].first);
+                pylimer_tools::entities::Atom a2 =
+                  universe.getAtom(pairsOfAtoms[pairIdx].second);
+                RUNTIME_EXP_IFN(pairOfAtom[universe.getIdxByAtomId(a1.getId())] == pairIdx, "Atom 1 does not follow required atom pair pattern");
+                RUNTIME_EXP_IFN(pairOfAtom[universe.getIdxByAtomId(a2.getId())] == pairIdx, "Atom 2 does not follow required atom pair pattern");
                 fb.setLinkPropertiesFromAtoms(
                   fb.initialConfig, thisLinkIdx, a1, a2, fb.sliplinkType);
 
