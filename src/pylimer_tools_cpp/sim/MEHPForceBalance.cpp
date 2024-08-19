@@ -5715,6 +5715,7 @@ namespace sim {
       /**
        * Test the validitiy of springs and their mapping
        */
+      Eigen::ArrayXi nrOfMentions = Eigen::ArrayXi::Zero(net.nrOfLinks);
       for (size_t i = 0; i < net.nrOfSprings; ++i) {
         RUNTIME_EXP_IFN(net.linkIndicesOfSprings[i].size() >= 2,
                         "Each spring requires at least two links, got " +
@@ -5763,6 +5764,7 @@ namespace sim {
         std::vector<size_t> links = net.linkIndicesOfSprings[i];
         for (size_t j = 0; j < links.size(); ++j) {
           size_t link_idx = links[j];
+          nrOfMentions[link_idx] += 1;
           RUNTIME_EXP_IFN(net.linkIsSliplink[link_idx] ==
                             ((j != 0) && (j != (links.size() - 1))),
                           "Cross-links must be first and last in a spring, "
@@ -5790,6 +5792,13 @@ namespace sim {
           APPROX_EQUAL(sum, 1.0, 1e-10),
           "Spring partitions of one spring must sum to one, got " +
             std::to_string(sum) + " for spring " + std::to_string(i) + ".");
+      }
+      for (size_t i = net.nrOfNodes; i < net.nrOfLinks; ++i) {
+        RUNTIME_EXP_IFN(nrOfMentions[i] == 2,
+                        "Expect each slip-link to be mentioned twice in the "
+                        "links-of-springs mapping, but " +
+                          std::to_string(i) + " was mentioned " +
+                          std::to_string(nrOfMentions[i]) + " times.");
       }
 
       /**

@@ -648,11 +648,11 @@ init_pylimer_bound_sim(py::module_& m)
                 py::arg("crosslinker_type") = 2,
                 py::arg("is_2d") = false)
     .def_property_readonly("network", &mehp::MEHPForceBalance::getNetwork)
-    //     .def("validateNetwork",
-    //          py::overload_cast<>(&mehp::MEHPForceBalance::validateNetwork),
-    //          R"pbdoc(
-    //            Validates the internal structures.
-    //      )pbdoc")
+//     .def("validate_network",
+//          py::overload_cast<>(&mehp::MEHPForceBalance::validateNetwork),
+//          R"pbdoc(
+//                Validates the internal structures.
+//          )pbdoc")
     .def(
       "run_force_relaxation",
       [](mehp::MEHPForceBalance& sim,
@@ -1199,12 +1199,11 @@ init_pylimer_bound_sim(py::module_& m)
            return mehp::MEHPForceBalance2(self);
          })
     .def_property_readonly("network", &mehp::MEHPForceBalance2::getNetwork)
-    //     .def("validateNetwork",
-    //          py::overload_cast<>(&mehp::MEHPForceBalance2::validateNetwork),
-    //          R"pbdoc(
-    //            Validates the internal structures.
-    //      )pbdoc")
-
+//     .def("validate_network",
+//          py::overload_cast<>(&mehp::MEHPForceBalance2::validateNetwork),
+//          R"pbdoc(
+//                Validates the internal structures.
+//          )pbdoc")
     .def(
       "run_force_relaxation",
       [](mehp::MEHPForceBalance2& sim,
