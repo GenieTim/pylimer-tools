@@ -1085,29 +1085,9 @@ namespace entities {
         if (connectedVertexIdx >= junctionIdx &&
             vertexIsJunction[connectedVertexIdx]) {
           // new Molecule from just these two junctions
-          // could also use igraph_induced_subgraph but performance is very bad
-          // for large structures, given how this is more or less O(1)
-          igraph_t chain;
-          igraph_empty(&chain, 2, IGRAPH_UNDIRECTED);
-          pylimer_tools::utils::copyVertexProperties(
-            &this->graph,
-            junctionIdx,
-            &chain,
-            0,
-            vertexAndEdgeProperties.first);
-          pylimer_tools::utils::copyVertexProperties(
-            &this->graph,
-            connectedVertexIdx,
-            &chain,
-            1,
-            vertexAndEdgeProperties.first);
-          igraph_add_edge(&chain, 0, 1);
-          pylimer_tools::utils::copyEdgeProperties(
-            &this->graph,
-            edgeIds[i],
-            &chain,
-            0,
-            vertexAndEdgeProperties.second);
+          size_t nAdditionalChains =
+            this->getEdgeIdsFromTo(junctionIdx, connectedVertexIdx).size();
+          assert(nAdditionalChains >= 1);
 
           MoleculeType molType = MoleculeType::UNDEFINED;
           if (this->getVertexDegree(junctionIdx) == 1 &&
@@ -1120,14 +1100,35 @@ namespace entities {
                      this->getVertexDegree(connectedVertexIdx) > 1) {
             molType = MoleculeType::DANGLING_CHAIN;
           }
-          if ((junctionIdx == connectedVertexIdx) ||
-              (this->getEdgeIdsFromTo(junctionIdx, connectedVertexIdx).size() >
-               1)) {
-            molType = MoleculeType::PRIMARY_LOOP;
+
+          for (size_t j = 0; j < nAdditionalChains; ++j) {
+            // could also use igraph_induced_subgraph, but performance is very
+            // bad for large structures, given how this is more or less O(1)
+            igraph_t chain;
+            igraph_empty(&chain, 2, IGRAPH_UNDIRECTED);
+            pylimer_tools::utils::copyVertexProperties(
+              &this->graph,
+              junctionIdx,
+              &chain,
+              0,
+              vertexAndEdgeProperties.first);
+            pylimer_tools::utils::copyVertexProperties(
+              &this->graph,
+              connectedVertexIdx,
+              &chain,
+              1,
+              vertexAndEdgeProperties.first);
+            igraph_add_edge(&chain, 0, 1);
+            pylimer_tools::utils::copyEdgeProperties(
+              &this->graph,
+              edgeIds[i],
+              &chain,
+              0,
+              vertexAndEdgeProperties.second);
+            molecules.push_back(
+              Molecule(this->box, &chain, molType, this->massPerType));
+            igraph_destroy(&chain);
           }
-          molecules.push_back(
-            Molecule(this->box, &chain, molType, this->massPerType));
-          igraph_destroy(&chain);
         }
       }
       igraph_attribute_combination_destroy(&comb);
@@ -2093,6 +2094,76 @@ namespace entities {
   };
 
   /**
+   * @brief Combine vertices along a bond, for a certain bond type.
+   *
+   * @param bondType
+   * @return Universe
+   */
+  Universe Universe::contractVerticesAlongBondType(const int bondType) const
+  {
+    Universe result = Universe(*this);
+
+    bool lastRoundDidRemove = true;
+
+    std::vector<std::string> edgeProperties =
+      this->getVertexAndEdgePropertyNames().second;
+
+    igraph_vector_int_t edgesToCopy;
+    igraph_vector_int_init(&edgesToCopy, 0);
+    while (lastRoundDidRemove) {
+      lastRoundDidRemove = false;
+      for (igraph_integer_t edgeIdx = igraph_ecount(&result.graph) - 1;
+           edgeIdx >= 0;
+           --edgeIdx) {
+        if (result.getEdgePropertyValue<int>("type", edgeIdx) == bondType) {
+          lastRoundDidRemove = true;
+          // merge the two vertices connected by this edge
+          igraph_integer_t vertex1OfEdge;
+          igraph_integer_t vertex2OfEdge;
+          igraph_edge(&result.graph, edgeIdx, &vertex1OfEdge, &vertex2OfEdge);
+          if (vertex1OfEdge == vertex2OfEdge) {
+            // no need to merge, the vertices are the same already
+            igraph_delete_edges(&result.graph, igraph_ess_1(edgeIdx));
+          } else {
+            igraph_incident(
+              &result.graph, &edgesToCopy, vertex1OfEdge, IGRAPH_ALL);
+            for (size_t i = 0; i < igraph_vector_int_size(&edgesToCopy); ++i) {
+              igraph_integer_t edgeToCopy = VECTOR(edgesToCopy)[i];
+              if (edgeToCopy != edgeIdx) {
+                igraph_add_edge(
+                  &result.graph,
+                  vertex2OfEdge,
+                  IGRAPH_OTHER(&result.graph, edgeToCopy, vertex1OfEdge));
+                // copy edge properties
+                pylimer_tools::utils::copyEdgeProperties(
+                  &result.graph,
+                  edgeToCopy,
+                  &result.graph,
+                  igraph_ecount(&result.graph) - 1,
+                  edgeProperties);
+                // -> this is the reason why we have the while loop, as it may
+                // result in edges (that are deleted afterwards) being new,
+                // having a higher index
+              }
+            }
+            igraph_delete_vertices(&result.graph, igraph_vss_1(vertex1OfEdge));
+            edgeIdx = std::min(edgeIdx, igraph_ecount(&result.graph) - 1);
+          }
+        }
+      }
+    }
+    igraph_vector_int_destroy(&edgesToCopy);
+
+    result.NAtoms = igraph_vcount(&result.graph);
+    result.NBonds = igraph_ecount(&result.graph);
+    result.resetAtomIdMapping();
+    result.removeAllAngles();
+    result.removeAllDihedralAngles();
+
+    return result;
+  }
+
+  /**
    * @brief Get the number of angles stored in this universe.
    *
    * @return const int
@@ -2678,6 +2749,16 @@ namespace entities {
     // computeTotalMass() is cancelled out or not
     return this->computeWeightAverageMolecularWeight(crossLinkerType) /
            this->computeNumberAverageMolecularWeight(crossLinkerType);
+  }
+
+  void Universe::resetAtomIdMapping()
+  {
+    this->atomIdToVertexIdx.clear();
+    std::vector<int> atomIds = this->getPropertyValues<int>("id");
+    assert(atomIds.size() == igraph_vcount(&this->graph));
+    for (igraph_integer_t i = 0; i < atomIds.size(); i++) {
+      this->atomIdToVertexIdx.emplace(atomIds[i], i);
+    }
   }
 
   /**
