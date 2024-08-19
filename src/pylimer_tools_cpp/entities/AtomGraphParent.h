@@ -368,6 +368,21 @@ namespace entities {
     }
 
     /**
+     * @brief Get the Property (attribute) of one vertex
+     *
+     * @tparam OUT
+     * @param propertyName
+     * @param vertexIdx
+     * @return OUT
+     */
+    template<typename OUT>
+    OUT getEdgePropertyValue(const char* propertyName,
+                         const long int vertexIdx) const
+    {
+      return igraph_cattribute_EAN(&this->graph, propertyName, vertexIdx);
+    }
+
+    /**
      * @brief Get the Vertex And Edge Property Names
      *
      * @return std::pair<std::vector<std::string>, std::vector<std::string>>

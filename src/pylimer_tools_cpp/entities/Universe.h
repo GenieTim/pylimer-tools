@@ -130,6 +130,7 @@ namespace entities {
     std::vector<Molecule> getChainsWithCrosslinker(
       const int crossLinkerType) const;
     Universe getNetworkOfCrosslinker(const int crossLinkerType) const;
+    Universe contractVerticesAlongBondType(const int bondType) const;
     // TODO: find & implement a better return type, e.g. std::vector<Molecule>
     std::vector<std::vector<long int>> findLoops(
       const int crossLinkerType,
@@ -254,7 +255,7 @@ namespace entities {
     Box box;
     // connectivity
     // igraph_t graph;
-    std::unordered_map<int, int> atomIdToVertexIdx;
+    std::unordered_map<int, igraph_integer_t> atomIdToVertexIdx;
     // extra info
     // TODO: might want to move the angle business to the parent?!?
     // angles (NOTE: only atom-ids, not vertex-idxs are used!)
@@ -282,6 +283,7 @@ namespace entities {
                                   const std::vector<long int>& bondTo,
                                   const std::string& direction,
                                   const double boxLimit) const;
+    void resetAtomIdMapping();
   };
 } // namespace entities
 } // namespace pylimer_tools

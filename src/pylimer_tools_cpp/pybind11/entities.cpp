@@ -860,6 +860,14 @@ init_pylimer_bound_entities(py::module_& m)
             Further use :func:`~pylimer_tools_cpp.Universe.simplify()` to remove primary loops.
           )pbdoc",
          py::arg("crosslinker_type"))
+    .def("contract_vertices_along_bond_type",
+         &Universe::contractVerticesAlongBondType,
+         R"pbdoc(
+          Merge vertices along a specific bond type.
+
+          May result in new self-loops; use :func:`~pylimer_tools_cpp.Universe.simplify()` to remove them.
+         )pbdoc",
+         py::arg("bond_type"))
     .def("get_atom_types",
          &Universe::getAtomTypes,
          R"pbdoc(

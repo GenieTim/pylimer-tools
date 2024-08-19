@@ -442,14 +442,16 @@ init_pylimer_bound_sim(py::module_& m)
           :math:`\Gamma = \langle\gamma_{\eta}\rangle`, with :math:`\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}`,
           which you can use as :math:`G_{\mathrm{ANT}} = \Gamma \nu k_B T`,
           where :math:`\eta` is the index of a particular strand, 
-          :math:`R_{0}^2` is the melt mean square end to end distance, in phantom systems :math:`$= N_{\eta}*b^2$`
+          :math:`R_{0}^2` is the melt mean square end to end distance, in phantom systems :math:`= N_{\eta} b^2$`,
           :math:`N_{\eta}` is the number of atoms in this strand :math:`\eta`, 
           :math:`b` its mean square bond length,
+          :math:`\nu` the volume fraction,
           :math:`T` the temperature and 
           :math:`k_B` Boltzmann's constant.
           
-          :param r0squared: The denominator in the equation of :math:`\Gamma`. If :math:`-1.0` (default), the network is used for determination (which is not accurate). For phantom systems, the correct value is :math:`Nb^2`.
-               For other systems, the value could be determined by `~pylimer_tools_cpp.Universe.computeMeanEndToEndDistance` on the melt system.
+          :param r0squared: The denominator in the equation of :math:`\Gamma`. If :math:`-1.0` (default), the network is used for determination (which is not accurate). 
+               For phantom systems, the correct value is :math:`Nb^2`.
+               For other systems, the value could be determined by :func:`~pylimer_tools_cpp.Universe.computeMeanEndToEndDistance` on the melt system.
           :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains. 
      )pbdoc",
          py::arg("r0_squared") = -1.0,
