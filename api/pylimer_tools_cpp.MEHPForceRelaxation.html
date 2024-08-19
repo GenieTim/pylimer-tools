@@ -524,16 +524,18 @@ this value is normalized by the number of springs rather than the number of chai
 <p><span class="math notranslate nohighlight">\(\Gamma = \langle\gamma_{\eta}\rangle\)</span>, with <span class="math notranslate nohighlight">\(\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}\)</span>,
 which you can use as <span class="math notranslate nohighlight">\(G_{\mathrm{ANT}} = \Gamma \nu k_B T\)</span>,
 where <span class="math notranslate nohighlight">\(\eta\)</span> is the index of a particular strand,
-<span class="math notranslate nohighlight">\(R_{0}^2\)</span> is the melt mean square end to end distance, in phantom systems <span class="math notranslate nohighlight">\($= N_{\eta}*b^2$\)</span>
+<span class="math notranslate nohighlight">\(R_{0}^2\)</span> is the melt mean square end to end distance, in phantom systems <span class="math notranslate nohighlight">\(= N_{\eta} b^2$\)</span>,
 <span class="math notranslate nohighlight">\(N_{\eta}\)</span> is the number of atoms in this strand <span class="math notranslate nohighlight">\(\eta\)</span>,
 <span class="math notranslate nohighlight">\(b\)</span> its mean square bond length,
+<span class="math notranslate nohighlight">\(\nu\)</span> the volume fraction,
 <span class="math notranslate nohighlight">\(T\)</span> the temperature and
 <span class="math notranslate nohighlight">\(k_B\)</span> Boltzmann’s constant.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>r0squared</strong> – The denominator in the equation of <span class="math notranslate nohighlight">\(\Gamma\)</span>. If <span class="math notranslate nohighlight">\(-1.0\)</span> (default), the network is used for determination (which is not accurate). For phantom systems, the correct value is <span class="math notranslate nohighlight">\(Nb^2\)</span>.
-For other systems, the value could be determined by <cite>~pylimer_tools_cpp.Universe.computeMeanEndToEndDistance</cite> on the melt system.</p></li>
+<li><p><strong>r0squared</strong> – The denominator in the equation of <span class="math notranslate nohighlight">\(\Gamma\)</span>. If <span class="math notranslate nohighlight">\(-1.0\)</span> (default), the network is used for determination (which is not accurate).
+For phantom systems, the correct value is <span class="math notranslate nohighlight">\(Nb^2\)</span>.
+For other systems, the value could be determined by <code class="xref py py-func docutils literal notranslate"><span class="pre">computeMeanEndToEndDistance()</span></code> on the melt system.</p></li>
 <li><p><strong>nrOfChains</strong> – the value to normalize the sum of square distances by. Usually (and default if <span class="math notranslate nohighlight">\(&lt; 0\)</span>) the nr of chains.</p></li>
 </ul>
 </dd>

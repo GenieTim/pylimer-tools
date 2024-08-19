@@ -29,6 +29,7 @@ Universe
       ~Universe.compute_total_mass
       ~Universe.compute_weight_average_molecular_weight
       ~Universe.compute_weight_fractions
+      ~Universe.contract_vertices_along_bond_type
       ~Universe.count_atom_types
       ~Universe.count_atoms_in_skin_distance
       ~Universe.detect_angles
@@ -106,6 +107,7 @@ Universe
    .. automethod:: compute_total_mass
    .. automethod:: compute_weight_average_molecular_weight
    .. automethod:: compute_weight_fractions
+   .. automethod:: contract_vertices_along_bond_type
    .. automethod:: count_atom_types
    .. automethod:: count_atoms_in_skin_distance
    .. automethod:: detect_angles
