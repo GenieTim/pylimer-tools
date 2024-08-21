@@ -21,7 +21,7 @@ Universe
       ~Universe.compute_dzs
       ~Universe.compute_end_to_end_distances
       ~Universe.compute_mean_end_to_end_distance
-      ~Universe.compute_mean_square_end_to_end_distance
+      ~Universe.compute_mean_squared_end_to_end_distance
       ~Universe.compute_mean_strand_length
       ~Universe.compute_number_average_molecular_weight
       ~Universe.compute_polydispersity_index
@@ -99,7 +99,7 @@ Universe
    .. automethod:: compute_dzs
    .. automethod:: compute_end_to_end_distances
    .. automethod:: compute_mean_end_to_end_distance
-   .. automethod:: compute_mean_square_end_to_end_distance
+   .. automethod:: compute_mean_squared_end_to_end_distance
    .. automethod:: compute_mean_strand_length
    .. automethod:: compute_number_average_molecular_weight
    .. automethod:: compute_polydispersity_index

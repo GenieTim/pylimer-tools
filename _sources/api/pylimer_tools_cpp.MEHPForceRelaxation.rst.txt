@@ -23,6 +23,7 @@ MEHPForceRelaxation
       ~MEHPForceRelaxation.get_exit_reason
       ~MEHPForceRelaxation.get_force
       ~MEHPForceRelaxation.get_gamma_factor
+      ~MEHPForceRelaxation.get_gamma_factors
       ~MEHPForceRelaxation.get_ids_of_active_nodes
       ~MEHPForceRelaxation.get_nr_of_active_nodes
       ~MEHPForceRelaxation.get_nr_of_active_springs
@@ -55,6 +56,7 @@ MEHPForceRelaxation
    .. automethod:: get_exit_reason
    .. automethod:: get_force
    .. automethod:: get_gamma_factor
+   .. automethod:: get_gamma_factors
    .. automethod:: get_ids_of_active_nodes
    .. automethod:: get_nr_of_active_nodes
    .. automethod:: get_nr_of_active_springs
