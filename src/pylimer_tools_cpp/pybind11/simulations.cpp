@@ -434,6 +434,13 @@ init_pylimer_bound_sim(py::module_& m)
          R"pbdoc(
           Returns the stress tensor at the current state of the simulation.
      )pbdoc")
+    .def("get_gamma_factors",
+         &mehp::MEHPForceRelaxation::getGammaFactors,
+         R"pbdoc(
+          Computes the gamma factor for each spring as part of the ANT/MEHP formulism.
+
+          See also :func:`~pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor` for the mean of these.
+         )pbdoc")
     .def("get_gamma_factor",
          &mehp::MEHPForceRelaxation::getGammaFactor,
          R"pbdoc(
@@ -648,11 +655,11 @@ init_pylimer_bound_sim(py::module_& m)
                 py::arg("crosslinker_type") = 2,
                 py::arg("is_2d") = false)
     .def_property_readonly("network", &mehp::MEHPForceBalance::getNetwork)
-//     .def("validate_network",
-//          py::overload_cast<>(&mehp::MEHPForceBalance::validateNetwork),
-//          R"pbdoc(
-//                Validates the internal structures.
-//          )pbdoc")
+    //     .def("validate_network",
+    //          py::overload_cast<>(&mehp::MEHPForceBalance::validateNetwork),
+    //          R"pbdoc(
+    //                Validates the internal structures.
+    //          )pbdoc")
     .def(
       "run_force_relaxation",
       [](mehp::MEHPForceBalance& sim,
@@ -1199,11 +1206,11 @@ init_pylimer_bound_sim(py::module_& m)
            return mehp::MEHPForceBalance2(self);
          })
     .def_property_readonly("network", &mehp::MEHPForceBalance2::getNetwork)
-//     .def("validate_network",
-//          py::overload_cast<>(&mehp::MEHPForceBalance2::validateNetwork),
-//          R"pbdoc(
-//                Validates the internal structures.
-//          )pbdoc")
+    //     .def("validate_network",
+    //          py::overload_cast<>(&mehp::MEHPForceBalance2::validateNetwork),
+    //          R"pbdoc(
+    //                Validates the internal structures.
+    //          )pbdoc")
     .def(
       "run_force_relaxation",
       [](mehp::MEHPForceBalance2& sim,

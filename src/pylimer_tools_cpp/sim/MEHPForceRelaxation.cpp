@@ -492,6 +492,24 @@ namespace sim {
       return this->evaluateGammaFactor(
         this->currentSpringDistances, r02, nrOfChains);
     }
+
+    /**
+     * @brief Get the Gamma Factors at the current step
+     *
+     * @param b2 the melt b^2 (to go to phantom's Nb^2 for <R_0^2>, using N as
+     * the contour length per spring)
+     * @return Eigen::VectorXd the gamma factors for each spring
+     */
+    Eigen::VectorXd MEHPForceRelaxation::getGammaFactors(double b2) const
+    {
+      if (b2 < 0) {
+        b2 = this->defaultR0Squared / this->forceRelaxationNetwork.springsContourLength.mean();
+      }
+
+      return this->evaluateGammaFactors(
+        this->currentSpringDistances,
+        this->forceRelaxationNetwork.springsContourLength * b2);
+    }
   }
 }
 }

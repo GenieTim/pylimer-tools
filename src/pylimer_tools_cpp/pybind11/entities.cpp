@@ -1063,31 +1063,40 @@ init_pylimer_bound_entities(py::module_& m)
           Compute the end-to-end distance of each strand in the network.
 
           NOTE:
-               Internally, this uses the :func:`~pylimer_tools_cpp.Molecule.computeEndToEndDistance`.
-               All its cautionary facts apply.
-     )pbdoc")
+               Internally, this uses either :func:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance` 
+               or :func:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance_with_derived_image_flags`, 
+               depending on `derive_image_flags`.
+               Invalid strands (where said function returns 0.0 or -1.0) are ignored.
+     )pbdoc",
+         py::arg("crosslinker_type"),
+         py::arg("derive_image_flags") = false)
     .def("compute_mean_end_to_end_distance",
          &Universe::computeMeanEndToEndDistance,
          R"pbdoc(
           Computes the mean of the end-to-end distances of each strand in the network.
 
           NOTE:
-               Internally, this uses the :func:`~pylimer_tools_cpp.Molecule.computeEndToEndDistance`.
-               All its cautionary facts apply.
+               Internally, this uses either :func:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance` 
+               or :func:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance_with_derived_image_flags`, 
+               depending on `derive_image_flags`.
                Invalid strands (where said function returns 0.0 or -1.0) are ignored.
-     )pbdoc")
-    .def("compute_mean_square_end_to_end_distance",
+     )pbdoc",
+         py::arg("crosslinker_type"),
+         py::arg("derive_image_flags") = false)
+    .def("compute_mean_squared_end_to_end_distance",
          &Universe::computeMeanSquareEndToEndDistance,
          R"pbdoc(
           Computes the mean square of the end-to-end distances of each strand in the network.
 
           NOTE:
-               Internally, this uses the :func:`~pylimer_tools_cpp.Molecule.computeEndToEndDistance`.
-               All its cautionary facts apply.
+               Internally, this uses either :func:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance` 
+               or :func:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance_with_derived_image_flags`, 
+               depending on `derive_image_flags`.
                Invalid strands (where said function returns 0.0 or -1.0) are ignored.
      )pbdoc",
          py::arg("crosslinker_type"),
-         py::arg("only_those_with_two_crosslinkers") = false)
+         py::arg("only_those_with_two_crosslinkers") = false,
+         py::arg("derive_image_flags") = false)
     .def("compute_dxs",
          &Universe::computeDxs,
          "Compute the dx distance for certain bonds (length in x direction).",

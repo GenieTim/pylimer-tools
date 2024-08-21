@@ -205,11 +205,14 @@ namespace entities {
       const std::vector<long int>& edgeIndicesLoop1,
       const std::vector<long int>& edgeIndicesLoop2) const;
     double getMeanStrandLength(int crossLinkerType);
-    std::vector<double> computeEndToEndDistances(int crossLinkerType);
-    double computeMeanEndToEndDistance(int crossLinkerType);
+    std::vector<double> computeEndToEndDistances(int crossLinkerType,
+                                                 bool implyImageFlags = false);
+    double computeMeanEndToEndDistance(int crossLinkerType,
+                                       bool implyImageFlags = false);
     double computeMeanSquareEndToEndDistance(
       int crossLinkerType,
-      bool onlyThoseWithTwoCrosslinkers = false);
+      bool onlyThoseWithTwoCrosslinkers = false,
+      bool implyImageFlags = false);
     double computeMeanBondLength();
     double computeTotalMass() const;
     double computeTotalMassWithMasses(
