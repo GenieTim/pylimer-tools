@@ -2549,7 +2549,8 @@ namespace entities {
    * @param crossLinkerType
    * @return double
    */
-  std::vector<double> Universe::computeEndToEndDistances(int crossLinkerType)
+  std::vector<double> Universe::computeEndToEndDistances(int crossLinkerType,
+                                                         bool implyImageFlags)
   {
     std::vector<Molecule> molecules =
       this->getChainsWithCrosslinker(crossLinkerType);
@@ -2560,7 +2561,11 @@ namespace entities {
       molecules.begin(),
       molecules.end(),
       std::back_inserter(distances),
-      [](Molecule molecule) { return molecule.computeEndToEndDistance(); });
+      [implyImageFlags](Molecule molecule) {
+        return implyImageFlags
+                 ? molecule.computeEndToEndDistanceWithDerivedImageFlags()
+                 : molecule.computeEndToEndDistance();
+      });
 
     return distances;
   }
@@ -2574,7 +2579,8 @@ namespace entities {
    * @param crossLinkerType
    * @return double
    */
-  double Universe::computeMeanEndToEndDistance(int crossLinkerType)
+  double Universe::computeMeanEndToEndDistance(int crossLinkerType,
+                                               bool implyImageFlags)
   {
     std::vector<Molecule> molecules =
       this->getChainsWithCrosslinker(crossLinkerType);
@@ -2583,7 +2589,9 @@ namespace entities {
     int validMolecules = 0;
 
     for (Molecule molecule : molecules) {
-      double dist = molecule.computeEndToEndDistance();
+      double dist = implyImageFlags
+                      ? molecule.computeEndToEndDistanceWithDerivedImageFlags()
+                      : molecule.computeEndToEndDistance();
       if (dist > 0.0) {
         meanEndToEndDistance += dist;
         validMolecules += 1;
@@ -2608,7 +2616,8 @@ namespace entities {
    */
   double Universe::computeMeanSquareEndToEndDistance(
     int crossLinkerType,
-    bool onlyThoseWithTwoCrosslinkers)
+    bool onlyThoseWithTwoCrosslinkers,
+    bool implyImageFlags)
   {
     std::vector<Molecule> molecules =
       this->getChainsWithCrosslinker(crossLinkerType);
@@ -2619,7 +2628,10 @@ namespace entities {
     for (Molecule molecule : molecules) {
       if (!onlyThoseWithTwoCrosslinkers ||
           molecule.getAtomsOfType(crossLinkerType).size() == 2) {
-        double dist = molecule.computeEndToEndDistance();
+        double dist =
+          implyImageFlags
+            ? molecule.computeEndToEndDistanceWithDerivedImageFlags()
+            : molecule.computeEndToEndDistance();
         if (dist > 0.0) {
           meanEndToEndDistance += dist * dist;
           validMolecules += 1;

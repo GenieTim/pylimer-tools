@@ -319,6 +319,13 @@ namespace sim {
        */
       double getGammaFactor(double r02 = -1.0, int nrOfChains = -1) const;
 
+      /**
+       * @brief Get all the gamma factors for each spring
+       *
+       * @return Eigen::VectorXd
+       */
+      Eigen::VectorXd getGammaFactors(double b2 = 1.) const;
+
       int getNrOfIterations() const { return this->nrOfStepsDone; }
 
       ExitReason getExitReason() const { return this->exitReason; }
@@ -665,6 +672,20 @@ namespace sim {
       {
         return springDistances.squaredNorm() /
                (static_cast<double>(nrOfChains) * r02);
+      }
+
+      Eigen::VectorXd evaluateGammaFactors(
+        const Eigen::VectorXd& springDistances,
+        const Eigen::VectorXd& r02) const
+      {
+        INVALIDARG_EXP_IFN(springDistances.size() == r02.size() * 3,
+                           "Invalid sizes.");
+        Eigen::VectorXd gammaFactors(springDistances.size() / 3);
+        for (size_t i = 0; i < springDistances.size() / 3; ++i) {
+          gammaFactors(i) =
+            springDistances.segment(3 * i, 3).squaredNorm() / (r02(i));
+        }
+        return gammaFactors;
       }
 
       /**
