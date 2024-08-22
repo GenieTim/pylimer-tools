@@ -439,8 +439,19 @@ init_pylimer_bound_sim(py::module_& m)
          R"pbdoc(
           Computes the gamma factor for each spring as part of the ANT/MEHP formulism.
 
+          :math:`\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}`, with (here) 
+          :math:`R_{0,\eta}^2 = N_\eta \cdot ` the parameter `b0_squared`.
+          You can obtain this parameter e.g. by doing melt simulations at different lengths, 
+          it's the slope you obtain.
+
+          :param b0_squared: Part of the denominator in the equation of :math:`\Gamma`. 
+               If :math:`-1.0` (default), the network is used for determination (which is not accurate), the system is assumed to be phantom. 
+               For real systems, the value could be determined by :func:`~pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance()` 
+               on the melt system, with subsequent division by the nr of bonds in the chain.
+          
           See also :func:`~pylimer_tools_cpp.MEHPForceRelaxation.get_gamma_factor` for the mean of these.
-         )pbdoc")
+         )pbdoc",
+         py::arg("b0_squared") = -1.0)
     .def("get_gamma_factor",
          &mehp::MEHPForceRelaxation::getGammaFactor,
          R"pbdoc(
@@ -456,12 +467,13 @@ init_pylimer_bound_sim(py::module_& m)
           :math:`T` the temperature and 
           :math:`k_B` Boltzmann's constant.
           
-          :param r0squared: The denominator in the equation of :math:`\Gamma`. If :math:`-1.0` (default), the network is used for determination (which is not accurate). 
-               For phantom systems, the correct value is :math:`Nb^2`.
-               For other systems, the value could be determined by :func:`~pylimer_tools_cpp.Universe.computeMeanEndToEndDistance` on the melt system.
-          :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains. 
+          :param b0_squared: Part of the denominator in the equation of :math:`\Gamma`. 
+               If :math:`-1.0` (default), the network is used for determination (which is not accurate), the system is assumed to be phantom. 
+               For real systems, the value could be determined by :func:`~pylimer_tools_cpp.Universe.compute_mean_squared_end_to_end_distance()` 
+               on the melt system, with subsequent division by the nr of bonds in the chain.
+          :param nr_of_chains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains. 
      )pbdoc",
-         py::arg("r0_squared") = -1.0,
+         py::arg("b0_squared") = -1.0,
          py::arg("nr_of_chains") = -1)
     .def("get_nr_of_nodes", &mehp::MEHPForceRelaxation::getNrOfNodes, R"pbdoc(
            Get the number of nodes considered in this simulation.

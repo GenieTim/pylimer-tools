@@ -227,8 +227,12 @@ namespace sim {
                   universe.getAtom(pairsOfAtoms[pairIdx].first);
                 pylimer_tools::entities::Atom a2 =
                   universe.getAtom(pairsOfAtoms[pairIdx].second);
-                RUNTIME_EXP_IFN(pairOfAtom[universe.getIdxByAtomId(a1.getId())] == pairIdx, "Atom 1 does not follow required atom pair pattern");
-                RUNTIME_EXP_IFN(pairOfAtom[universe.getIdxByAtomId(a2.getId())] == pairIdx, "Atom 2 does not follow required atom pair pattern");
+                RUNTIME_EXP_IFN(
+                  pairOfAtom[universe.getIdxByAtomId(a1.getId())] == pairIdx,
+                  "Atom 1 does not follow required atom pair pattern");
+                RUNTIME_EXP_IFN(
+                  pairOfAtom[universe.getIdxByAtomId(a2.getId())] == pairIdx,
+                  "Atom 2 does not follow required atom pair pattern");
                 fb.setLinkPropertiesFromAtoms(
                   fb.initialConfig, thisLinkIdx, a1, a2, fb.sliplinkType);
 
