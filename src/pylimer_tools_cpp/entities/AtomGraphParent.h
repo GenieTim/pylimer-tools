@@ -377,7 +377,7 @@ namespace entities {
      */
     template<typename OUT>
     OUT getEdgePropertyValue(const char* propertyName,
-                         const long int vertexIdx) const
+                             const long int vertexIdx) const
     {
       return igraph_cattribute_EAN(&this->graph, propertyName, vertexIdx);
     }
