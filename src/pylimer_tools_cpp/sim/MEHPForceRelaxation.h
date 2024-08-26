@@ -70,7 +70,8 @@ namespace sim {
         this->setForceEvaluator(forceEvaluator);
       };
 
-      static MEHPForceRelaxation constructFromString(std::string s) {
+      static MEHPForceRelaxation constructFromString(std::string s)
+      {
         MEHPForceRelaxation res;
         pylimer_tools::utils::deserializeFromString(res, s);
         return res;
