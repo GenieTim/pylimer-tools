@@ -20,6 +20,7 @@ DPDSimulator
       ~DPDSimulator.config_lambda
       ~DPDSimulator.config_num_steps_dpd
       ~DPDSimulator.config_num_steps_mc
+      ~DPDSimulator.config_restart_output
       ~DPDSimulator.config_shift_one_at_a_time
       ~DPDSimulator.config_shift_possibility_empty
       ~DPDSimulator.config_sigma
@@ -48,11 +49,13 @@ DPDSimulator
       ~DPDSimulator.get_timestep
       ~DPDSimulator.get_universe
       ~DPDSimulator.get_volume
+      ~DPDSimulator.read_restart_file
       ~DPDSimulator.refresh_current_state
       ~DPDSimulator.run_simulation
       ~DPDSimulator.start_measuring_msd_for_atoms
       ~DPDSimulator.validate_neighbour_list
       ~DPDSimulator.validate_state
+      ~DPDSimulator.write_restart_file
 
    .. rubric:: Methods Documentation
 
@@ -66,6 +69,7 @@ DPDSimulator
    .. automethod:: config_lambda
    .. automethod:: config_num_steps_dpd
    .. automethod:: config_num_steps_mc
+   .. automethod:: config_restart_output
    .. automethod:: config_shift_one_at_a_time
    .. automethod:: config_shift_possibility_empty
    .. automethod:: config_sigma
@@ -94,8 +98,10 @@ DPDSimulator
    .. automethod:: get_timestep
    .. automethod:: get_universe
    .. automethod:: get_volume
+   .. automethod:: read_restart_file
    .. automethod:: refresh_current_state
    .. automethod:: run_simulation
    .. automethod:: start_measuring_msd_for_atoms
    .. automethod:: validate_neighbour_list
    .. automethod:: validate_state
+   .. automethod:: write_restart_file
