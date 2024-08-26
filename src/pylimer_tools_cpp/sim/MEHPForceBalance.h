@@ -61,7 +61,8 @@ namespace sim {
         this->completeInitialization();
       };
 
-      static MEHPForceBalance constructFromString(std::string s) {
+      static MEHPForceBalance constructFromString(std::string s)
+      {
         MEHPForceBalance res;
         pylimer_tools::utils::deserializeFromString(res, s);
         return res;
