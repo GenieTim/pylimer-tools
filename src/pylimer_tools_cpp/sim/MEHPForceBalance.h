@@ -23,6 +23,11 @@
 #include <tuple>
 #include <unordered_set>
 #include <vector>
+#ifdef CEREALIZABLE
+#include <cereal/access.hpp>
+#include <cereal/types/base_class.hpp>
+#include <cereal/types/polymorphic.hpp>
+#endif
 
 namespace pylimer_tools {
 namespace sim {
@@ -55,6 +60,12 @@ namespace sim {
           Eigen::VectorXd::Zero(net.coordinates.size());
         this->completeInitialization();
       };
+
+      static MEHPForceBalance constructFromString(std::string s) {
+        MEHPForceBalance res;
+        pylimer_tools::utils::deserializeFromString(res, s);
+        return res;
+      }
 
       /**
        * @brief Instantiate this simulator with randomly chosen slip-links.
@@ -227,8 +238,12 @@ namespace sim {
                   universe.getAtom(pairsOfAtoms[pairIdx].first);
                 pylimer_tools::entities::Atom a2 =
                   universe.getAtom(pairsOfAtoms[pairIdx].second);
-                RUNTIME_EXP_IFN(pairOfAtom[universe.getIdxByAtomId(a1.getId())] == pairIdx, "Atom 1 does not follow required atom pair pattern");
-                RUNTIME_EXP_IFN(pairOfAtom[universe.getIdxByAtomId(a2.getId())] == pairIdx, "Atom 2 does not follow required atom pair pattern");
+                RUNTIME_EXP_IFN(
+                  pairOfAtom[universe.getIdxByAtomId(a1.getId())] == pairIdx,
+                  "Atom 1 does not follow required atom pair pattern");
+                RUNTIME_EXP_IFN(
+                  pairOfAtom[universe.getIdxByAtomId(a2.getId())] == pairIdx,
+                  "Atom 2 does not follow required atom pair pattern");
                 fb.setLinkPropertiesFromAtoms(
                   fb.initialConfig, thisLinkIdx, a1, a2, fb.sliplinkType);
 
@@ -2505,6 +2520,13 @@ namespace sim {
         const bool respectLoops = true) const;
 
     private:
+#ifdef CEREALIZABLE
+      MEHPForceBalance() {}; // not exposed to users, only used by Cereal
+
+      friend class cereal::access;
+#endif
+
+      // state
       pylimer_tools::entities::Universe universe;
       pylimer_tools::entities::Box box;
       bool is2D = false;
