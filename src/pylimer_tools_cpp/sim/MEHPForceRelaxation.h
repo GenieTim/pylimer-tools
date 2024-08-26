@@ -323,16 +323,19 @@ namespace sim {
       /**
        * @brief Get the Gamma Factor at the current step
        *
-       * @param r02 the melt <R_0^2>, for phantom = Nb^2
+       * @param b02 for the denominator, part of the melt <R_0^2> = b02 *
+       * nrOfBondsInSpring
        * @param nrOfChains the nr of chains to average over (can be different
        * from the nr of springs thanks to omitted free chains or primary loops)
        * @return double
        */
-      double getGammaFactor(double r02 = -1.0, int nrOfChains = -1) const;
+      double getGammaFactor(double b02 = -1.0, int nrOfChains = -1) const;
 
       /**
        * @brief Get all the gamma factors for each spring
        *
+       * @param b02 for the denominator, part of the melt <R_0^2> = b02 *
+       * nrOfBondsInSpring
        * @return Eigen::VectorXd
        */
       Eigen::VectorXd getGammaFactors(double b2 = 1.) const;
@@ -672,29 +675,33 @@ namespace sim {
        * @brief Compute the gamma factor from certain spring distances
        *
        * @param springDistances
-       * @param r02 the melt <R_0^2>, for phantom = Nb^2
+       * @param b02 for the denominator, part of the melt <R_0^2> = b02 *
+       * nrOfBondsInSpring
        * @param nrOfChains the nr of chains to average over (can be different
        * from the nr of springs thanks to omitted free chains or primary loops)
        * @return double
        */
       double evaluateGammaFactor(const Eigen::VectorXd& springDistances,
-                                 double r02,
+                                 double b02,
                                  int nrOfChains) const
       {
-        return springDistances.squaredNorm() /
-               (static_cast<double>(nrOfChains) * r02);
+        return this->evaluateGammaFactors(springDistances, b02).sum() /
+               static_cast<double>(nrOfChains);
       }
 
       Eigen::VectorXd evaluateGammaFactors(
         const Eigen::VectorXd& springDistances,
-        const Eigen::VectorXd& r02) const
+        const double b02) const
       {
-        INVALIDARG_EXP_IFN(springDistances.size() == r02.size() * 3,
-                           "Invalid sizes.");
+        INVALIDARG_EXP_IFN(
+          springDistances.size() ==
+            this->forceRelaxationNetwork.springsContourLength.size() * 3,
+          "Invalid sizes.");
         Eigen::VectorXd gammaFactors(springDistances.size() / 3);
         for (size_t i = 0; i < springDistances.size() / 3; ++i) {
           gammaFactors(i) =
-            springDistances.segment(3 * i, 3).squaredNorm() / (r02(i));
+            springDistances.segment(3 * i, 3).squaredNorm() /
+            (this->forceRelaxationNetwork.springsContourLength(i) * b02);
         }
         return gammaFactors;
       }

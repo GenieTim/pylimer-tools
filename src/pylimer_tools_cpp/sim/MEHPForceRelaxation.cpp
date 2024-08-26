@@ -475,22 +475,24 @@ namespace sim {
     /**
      * @brief Get the Gamma Factor at the current step
      *
-     * @param r02 the melt <R_0^2>, for phantom = Nb^2
+     * @param b02 for the denominator, part of the melt <R_0^2> = b02 *
+     * nrOfBondsInSpring
      * @param nrOfChains the nr of chains to average over (can be different
      * from the nr of springs thanks to omitted free chains or primary loops)
      * @return double
      */
-    double MEHPForceRelaxation::getGammaFactor(double r02, int nrOfChains) const
+    double MEHPForceRelaxation::getGammaFactor(double b02, int nrOfChains) const
     {
-      if (r02 < 0) {
-        r02 = this->defaultR0Squared;
+      if (b02 < 0) {
+        b02 = this->defaultR0Squared /
+              this->forceRelaxationNetwork.springsContourLength.mean();
       }
       if (nrOfChains < 1) {
         nrOfChains = this->defaultNrOfChains;
       }
 
       return this->evaluateGammaFactor(
-        this->currentSpringDistances, r02, nrOfChains);
+        this->currentSpringDistances, b02, nrOfChains);
     }
 
     /**
@@ -503,12 +505,11 @@ namespace sim {
     Eigen::VectorXd MEHPForceRelaxation::getGammaFactors(double b2) const
     {
       if (b2 < 0) {
-        b2 = this->defaultR0Squared / this->forceRelaxationNetwork.springsContourLength.mean();
+        b2 = this->defaultR0Squared /
+             this->forceRelaxationNetwork.springsContourLength.mean();
       }
 
-      return this->evaluateGammaFactors(
-        this->currentSpringDistances,
-        this->forceRelaxationNetwork.springsContourLength * b2);
+      return this->evaluateGammaFactors(this->currentSpringDistances, b2);
     }
   }
 }
