@@ -144,7 +144,8 @@ def compute_extent_of_reaction(
 
     # assuming strand has functionality 2
     max_formable_bonds = min(
-        num_strands * 2, num_crosslinkers * functionality_per_type[crosslinker_type]
+        num_strands * 2, num_crosslinkers *
+        functionality_per_type[crosslinker_type]
     )
 
     if max_formable_bonds == 0:
@@ -236,7 +237,8 @@ def compute_mean_end_to_end_vectors(
     return end_to_end_vectors
 
 
-def compute_end_to_end_vectors(network: Universe, crosslinker_type: int = 2) -> dict:
+def compute_end_to_end_vectors(
+        network: Universe, crosslinker_type: int = 2) -> dict:
     """
     Compute the end to end vectors between each pair of (indirectly) connected crosslinker
 
@@ -303,7 +305,8 @@ def compute_crosslinker_conversion(
         warnings.warn("Crosslinker functionality = 0 is problematic.")
         return 0.0
 
-    return compute_effective_crosslinker_functionality(network, crosslinker_type) / f
+    return compute_effective_crosslinker_functionality(
+        network, crosslinker_type) / f
 
 
 def compute_effective_crosslinker_functionality(
@@ -342,16 +345,17 @@ def compute_effective_crosslinker_functionalities(
         return []
     junctions = network.get_atoms_by_type(crosslinker_type)
     junction_ids = [v.get_id() for v in junctions]
-    junction_degrees = [network.get_nr_of_bonds_of_atom(id) for id in junction_ids]
+    junction_degrees = [
+        network.get_nr_of_bonds_of_atom(id) for id in junction_ids]
     return junction_degrees
 
 
 def compute_weight_fractions(network: Universe) -> dict:
     """
     Compute the weight fractions of each atom type in the network.
-    Kept for compatibility reasons; just call 
+    Kept for compatibility reasons; just call
     :func:`pylimer_tools_cpp.Universe.compute_weight_fractions()` instead.
-    
+
     Arguments:
       - network: the polymer network to do the computation for
 
@@ -362,7 +366,8 @@ def compute_weight_fractions(network: Universe) -> dict:
     return network.compute_weight_fractions()
 
 
-def measure_weight_fraction_of_backbone(network: Universe, crosslinker_type: int = 2):
+def measure_weight_fraction_of_backbone(
+        network: Universe, crosslinker_type: int = 2):
     """
     Compute the weight fraction of network backbone in infinite network
 
@@ -372,7 +377,7 @@ def measure_weight_fraction_of_backbone(network: Universe, crosslinker_type: int
 
     Returns:
       - weightFraction (float): 1 - weightDangling/weightTotal - weightSoluble/weightTotal,
-    
+
     See also:
       - :func:`pylimer_tools.structure_analysis.measure_weight_fraction_of_dangling_chains()`
       - :func:`pylimer_tools.structure_analysis.measure_weight_fraction_of_soluble_material()`
@@ -384,7 +389,8 @@ def measure_weight_fraction_of_backbone(network: Universe, crosslinker_type: int
         network, crosslinker_type
     )
 
-    weight_fraction_soluble = measure_weight_fraction_of_soluble_material(network)
+    weight_fraction_soluble = measure_weight_fraction_of_soluble_material(
+        network)
 
     return 1.0 - weight_fraction_dangling - weight_fraction_soluble
 
@@ -442,7 +448,7 @@ def measure_weight_fraction_of_soluble_material(
 ) -> float:
     """
     Compute the weight fraction of soluble material by counting.
-    Effectively, this method counts the weight of clusters 
+    Effectively, this method counts the weight of clusters
     that have a weight less than a certain fraction of the total weight.
 
     Arguments:
@@ -502,7 +508,8 @@ def measure_lower_bound_weight_fraction_of_soluble_material(
 
     def is_soluble_cluster(cluster):
         chains = cluster.get_chains_with_crosslinker(crosslinker_type)
-        if np.any([c.get_strand_type() == MoleculeType.PRIMARY_LOOP for c in chains]):
+        if np.any([c.get_strand_type() ==
+                  MoleculeType.PRIMARY_LOOP for c in chains]):
             return False
         loops = cluster.find_loops(crosslinker_type)
         return len(loops) == 0
@@ -517,7 +524,8 @@ def measure_lower_bound_weight_fraction_of_soluble_material(
             if w < abs_tol and is_soluble_cluster(fractions[i]):
                 soluble_weight += w
         else:
-            if w < rel_tol * weights.max() and is_soluble_cluster(fractions[i]):
+            if w < rel_tol * \
+                    weights.max() and is_soluble_cluster(fractions[i]):
                 soluble_weight += w
 
     return soluble_weight / total_weight

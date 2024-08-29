@@ -14,7 +14,7 @@ from pylimer_tools_cpp import MoleculeType, Universe
 This module is deprecated.
 Use :func:`pylimer_tools_cpp.MEHPForceBalance` or :func:`pylimer_tools_cpp.MEHPForceRelaxation` instead.
 
-In principle, it offers comparable functionality, but without the force minimization - the networks you pass 
+In principle, it offers comparable functionality, but without the force minimization - the networks you pass
 to these methods should be minimized first.
 """
 
