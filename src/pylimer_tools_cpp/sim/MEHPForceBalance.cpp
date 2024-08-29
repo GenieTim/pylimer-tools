@@ -220,7 +220,6 @@ namespace sim {
             maxDistanceMoved = distanceMoved;
             indexOfMaxDistanceMoved = link_idx;
           }
-          maxDistanceMoved = std::max(maxDistanceMoved, distanceMoved);
         }
 
         currentResidual = this->getDisplacementResidualNormFor(
@@ -4052,6 +4051,7 @@ namespace sim {
                net.springPartIndexB[globalSpringIndex] == linkIdx);
         if (net.springPartIndexA[globalSpringIndex] == linkIdx &&
             net.springPartIndexB[globalSpringIndex] == linkIdx) {
+          // skip primary loops
           continue;
         }
         Eigen::Vector3d partialDistance =

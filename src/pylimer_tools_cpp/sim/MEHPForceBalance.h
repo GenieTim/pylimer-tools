@@ -24,6 +24,7 @@
 #include <unordered_set>
 #include <vector>
 #ifdef CEREALIZABLE
+#include "../utils/CerealUtils.h"
 #include <cereal/access.hpp>
 #include <cereal/types/base_class.hpp>
 #include <cereal/types/polymorphic.hpp>
@@ -36,6 +37,36 @@ namespace sim {
     class MEHPForceBalance
       : public pylimer_tools::sim::OutputSupportingSimulation
     {
+    private:
+#ifdef CEREALIZABLE
+      MEHPForceBalance() {}; // not exposed to users, only used by Cereal
+
+      friend class cereal::access;
+#endif
+
+      // state
+      pylimer_tools::entities::Universe universe;
+      pylimer_tools::entities::Box box;
+      bool is2D = false;
+      bool assumeBoxLargeEnough = true;
+      double kappa = 1.0;
+      bool simulationHasRun = false;
+      int stepOutputFrequency = 0;
+      int defaultNrOfChains = 0;
+      double defaultBondLength = 0.0;
+      std::string stepOutputFile;
+      bool outputEndNodes = false;
+      std::string endNodesFile;
+      ForceBalanceNetwork initialConfig;
+      Eigen::VectorXd currentDisplacements;
+      Eigen::VectorXd currentSpringVectors;
+      Eigen::VectorXd currentPartialSpringVectors;
+      Eigen::VectorXd
+        currentSpringPartitionsVec; /* gives the parametrisation of N */
+      int crossLinkerType = 2;
+      int sliplinkType = 3;
+      int nrOfStepsDone = 0;
+      ExitReason exitReason = ExitReason::UNSET;
 
     public:
       MEHPForceBalance(const pylimer_tools::entities::Universe& u,
@@ -61,12 +92,14 @@ namespace sim {
         this->completeInitialization();
       };
 
+#ifdef CEREALIZABLE
       static MEHPForceBalance constructFromString(std::string s)
       {
-        MEHPForceBalance res;
+        MEHPForceBalance res = MEHPForceBalance();
         pylimer_tools::utils::deserializeFromString(res, s);
         return res;
       }
+#endif
 
       /**
        * @brief Instantiate this simulator with randomly chosen slip-links.
@@ -2519,37 +2552,6 @@ namespace sim {
         const size_t partialSpringIdx,
         const double oneOverSpringPartitionUpperLimit = 1.0,
         const bool respectLoops = true) const;
-
-    private:
-#ifdef CEREALIZABLE
-      MEHPForceBalance() {}; // not exposed to users, only used by Cereal
-
-      friend class cereal::access;
-#endif
-
-      // state
-      pylimer_tools::entities::Universe universe;
-      pylimer_tools::entities::Box box;
-      bool is2D = false;
-      bool assumeBoxLargeEnough = true;
-      double kappa = 1.0;
-      bool simulationHasRun = false;
-      int stepOutputFrequency = 0;
-      int defaultNrOfChains = 0;
-      double defaultBondLength = 0.0;
-      std::string stepOutputFile;
-      bool outputEndNodes = false;
-      std::string endNodesFile;
-      ForceBalanceNetwork initialConfig;
-      Eigen::VectorXd currentDisplacements;
-      Eigen::VectorXd currentSpringVectors;
-      Eigen::VectorXd currentPartialSpringVectors;
-      Eigen::VectorXd
-        currentSpringPartitionsVec; /* gives the parametrisation of N */
-      int crossLinkerType = 2;
-      int sliplinkType = 3;
-      int nrOfStepsDone = 0;
-      ExitReason exitReason = ExitReason::UNSET;
     };
   } // namespace mehp
 } // namespace calc
