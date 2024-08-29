@@ -19,6 +19,7 @@ if (NOT DEFINED CEREALIZABLE)
 endif()
 if (CEREALIZABLE)
 	add_definitions(-DCEREALIZABLE)
+	add_compile_definitions(CEREALIZABLE)
 endif()
 
 # add dependencies

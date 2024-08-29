@@ -18,6 +18,11 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#ifdef CEREALIZABLE
+#include <cereal/access.hpp>
+#include <cereal/types/base_class.hpp>
+#include <cereal/types/polymorphic.hpp>
+#endif
 
 namespace pylimer_tools {
 namespace sim {
@@ -64,6 +69,13 @@ namespace sim {
           this->evaluateSpringDistances(&net, is2D);
         this->setForceEvaluator(forceEvaluator);
       };
+
+      static MEHPForceRelaxation constructFromString(std::string s)
+      {
+        MEHPForceRelaxation res;
+        pylimer_tools::utils::deserializeFromString(res, s);
+        return res;
+      }
 
       /**
        * @brief Actually do run the simulation
@@ -901,6 +913,12 @@ namespace sim {
       }
 
     private:
+#ifdef CEREALIZABLE
+      MEHPForceRelaxation() {}; // not exposed to users, only used by Cereal
+
+      friend class cereal::access;
+#endif
+
       // state
       pylimer_tools::entities::Universe universe;
       MEHPForceEvaluator* forceEvaluator;

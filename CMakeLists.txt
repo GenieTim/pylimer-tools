@@ -5,6 +5,14 @@ if (POLICY CMP0025)
   cmake_policy(SET CMP0025 NEW)
 endif ()
 
+if (NOT DEFINED CEREALIZABLE)
+	option(CEREALIZABLE "Enable serialisation of various classes" ON)
+endif()
+if (CEREALIZABLE)
+	add_definitions(-DCERALIZABLE)
+	add_compile_definitions(CEREALIZABLE)
+endif()
+
 # start project
 if (NOT DEFINED VERSION_NR)
 project(pylimer_tools VERSION "0.2.4" LANGUAGES CXX)
@@ -25,13 +33,6 @@ include(${CMAKE_CURRENT_LIST_DIR}/vendor/CMakeLists.txt)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/vendor/pybind11)
 
 message("Using toolchain file ${CMAKE_TOOLCHAIN_FILE}")
-
-if (NOT DEFINED CEREALIZABLE)
-	option(CEREALIZABLE "Enable serialisation of various classes" ON)
-endif()
-if (CEREALIZABLE)
-	add_definitions(-DCERALIZABLE)
-endif()
 
 # add sources & targets
 add_subdirectory(src/pylimer_tools_cpp)

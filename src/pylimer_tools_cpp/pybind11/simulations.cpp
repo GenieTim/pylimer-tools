@@ -606,7 +606,18 @@ init_pylimer_bound_sim(py::module_& m)
          &mehp::MEHPForceRelaxation::getCrosslinkerVerse,
          R"pbdoc(
           Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
-     )pbdoc");
+     )pbdoc")
+#ifdef CEREALIZABLE
+    .def(py::pickle(
+      [](const mehp::MEHPForceRelaxation& u) {
+        return py::make_tuple(pylimer_tools::utils::serializeToString(u));
+      },
+      [](py::tuple t) {
+        std::string in = t[0].cast<std::string>();
+        return mehp::MEHPForceRelaxation::constructFromString(in);
+      }))
+#endif
+    ;
 
   ////////////////////////////////////////////////////////////////
   // MARK: Configuration Enums
@@ -1161,7 +1172,18 @@ init_pylimer_bound_sim(py::module_& m)
          &mehp::MEHPForceBalance::getCrosslinkerVerse,
          R"pbdoc(
           Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
-     )pbdoc");
+     )pbdoc")
+#ifdef CEREALIZABLE
+    .def(py::pickle(
+      [](const mehp::MEHPForceBalance& u) {
+        return py::make_tuple(pylimer_tools::utils::serializeToString(u));
+      },
+      [](py::tuple t) {
+        std::string in = t[0].cast<std::string>();
+        return mehp::MEHPForceBalance::constructFromString(in);
+      }))
+#endif
+    ;
 
   ////////////////////////////////////////////////////////////////
   // MARK: Force Balance 2
@@ -1609,7 +1631,6 @@ init_pylimer_bound_sim(py::module_& m)
           Configure where to (incrementally) deform the box to during the next simulation run.
      )pbdoc",
          py::arg("target_box"))
-
 #ifdef CEREALIZABLE
     .def_static("read_restart_file",
                 &dpd::DPDSimulator::readRestartFile,
