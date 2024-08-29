@@ -5755,7 +5755,7 @@ namespace sim {
                                          std::string(", ")) +
               ".");
         }
-        // the following is not guraranteed anymore with the removal of links
+        // the following is not guaranteed anymore with the removal of links
         // while running RUNTIME_EXP_IFN(
         //   net.linkIndicesOfSprings[i][0] <=
         //     net.linkIndicesOfSprings[i][net.linkIndicesOfSprings[i].size()
