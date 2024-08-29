@@ -91,7 +91,6 @@ target_sources(pylimer_tools
 		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceEvaluator.cpp
 		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceRelaxation.cpp
 		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance.cpp
-		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance2.cpp
 		${CMAKE_CURRENT_LIST_DIR}/sim/DPDSimulator.cpp
 	PUBLIC
 		${CMAKE_CURRENT_LIST_DIR}/entities/Box.h
@@ -123,7 +122,6 @@ target_sources(pylimer_tools
 		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceEvaluator.h
 		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceRelaxation.h
 		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance.h
-		${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance2.h
 		${CMAKE_CURRENT_LIST_DIR}/sim/DPDSimulator.h
 )
 # ${CMAKE_CURRENT_LIST_DIR}/sim/MEHPForceBalance2.cpp
@@ -146,8 +144,6 @@ target_sources(pylimer_tools
 # endif()
 
 set_target_properties(pylimer_tools PROPERTIES VERSION ${PROJECT_VERSION})
-
-
 
 if (CODE_COVERAGE)
 	set(ENABLE_COVERAGE ON)
