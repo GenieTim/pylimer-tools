@@ -243,7 +243,6 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.LinkSwappingMode.html">LinkSwappingMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.MCUniverseGenerator.html">MCUniverseGenerator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance.html">MEHPForceBalance</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance2.html">MEHPForceBalance2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceEvaluator.html">MEHPForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceRelaxation.html">MEHPForceRelaxation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.Molecule.html">Molecule</a></li>
@@ -1081,7 +1080,7 @@ See: <a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pyl
 
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.structure_analysis.compute_extent_of_reaction">
-<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.structure_analysis.</span></span><span class="sig-name descname"><span class="pre">compute_extent_of_reaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionality_per_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.structure_analysis.compute_extent_of_reaction" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.structure_analysis.</span></span><span class="sig-name descname"><span class="pre">compute_extent_of_reaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">crosslinker_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functionality_per_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.structure_analysis.compute_extent_of_reaction" title="Link to this definition">¶</a></dt>
 <dd><p>Compute the extent of polymerization reaction
 (nr. of formed bonds in reaction / max. nr. of bonds formable)
 .. note:</p>
@@ -1089,6 +1088,7 @@ See: <a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pyl
     <span class="n">this</span> <span class="n">will</span> <span class="ow">not</span> <span class="n">be</span> <span class="n">rounded</span><span class="o">/</span><span class="n">respected</span> <span class="ow">in</span> <span class="nb">any</span> <span class="n">way</span>
 <span class="o">-</span> <span class="k">if</span> <span class="n">the</span> <span class="n">system</span> <span class="n">contains</span> <span class="n">solvent</span> <span class="ow">or</span> <span class="n">other</span> <span class="n">molecules</span> <span class="n">that</span> <span class="n">should</span> <span class="ow">not</span> <span class="n">be</span> <span class="n">binding</span> <span class="n">to</span>
     <span class="n">cross</span><span class="o">-</span><span class="n">linkers</span><span class="p">,</span> <span class="n">make</span> <span class="n">sure</span> <span class="n">to</span> <span class="n">remove</span> <span class="n">them</span> <span class="n">before</span> <span class="n">calling</span> <span class="n">this</span> <span class="n">function</span>
+<span class="o">-</span> <span class="k">if</span> <span class="n">you</span> <span class="n">have</span> <span class="n">multiple</span> <span class="n">cross</span><span class="o">-</span><span class="n">linker</span> <span class="n">types</span><span class="p">,</span> <span class="n">be</span> <span class="n">sure</span> <span class="n">to</span> <span class="n">replace</span> <span class="n">them</span> <span class="n">by</span> <span class="n">one</span> <span class="nb">type</span> <span class="n">only</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
@@ -1206,7 +1206,9 @@ If <cite>None</cite>: will use max functionality per type.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.structure_analysis.compute_weight_fractions">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.structure_analysis.</span></span><span class="sig-name descname"><span class="pre">compute_weight_fractions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="headerlink" href="#pylimer_tools.calc.structure_analysis.compute_weight_fractions" title="Link to this definition">¶</a></dt>
-<dd><p>Compute the weight fractions of each atom type in the network.</p>
+<dd><p>Compute the weight fractions of each atom type in the network.
+Kept for compatibility reasons; just call
+<a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe.compute_weight_fractions" title="pylimer_tools_cpp.Universe.compute_weight_fractions"><code class="xref py py-func docutils literal notranslate"><span class="pre">pylimer_tools_cpp.Universe.compute_weight_fractions()</span></code></a> instead.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>network</strong> (<em>-</em>) – the polymer network to do the computation for</p>
@@ -1289,6 +1291,13 @@ This works as:</p>
 </p>
 </dd>
 </dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">pylimer_tools.structure_analysis.measure_weight_fraction_of_dangling_chains()</span></code></p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">pylimer_tools.structure_analysis.measure_weight_fraction_of_soluble_material()</span></code></p></li>
+</ul>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -1323,7 +1332,9 @@ There are other methods that incorporate more.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_soluble_material">
 <span class="sig-prename descclassname"><span class="pre">pylimer_tools.calc.structure_analysis.</span></span><span class="sig-name descname"><span class="pre">measure_weight_fraction_of_soluble_material</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">network</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="api/pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">Universe</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">rel_tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">abs_tol</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">float</span></span></span><a class="headerlink" href="#pylimer_tools.calc.structure_analysis.measure_weight_fraction_of_soluble_material" title="Link to this definition">¶</a></dt>
-<dd><p>Compute the weight fraction of soluble material by counting.</p>
+<dd><p>Compute the weight fraction of soluble material by counting.
+Effectively, this method counts the weight of clusters
+that have a weight less than a certain fraction of the total weight.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">

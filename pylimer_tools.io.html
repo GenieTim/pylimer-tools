@@ -243,7 +243,6 @@
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.LinkSwappingMode.html">LinkSwappingMode</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.MCUniverseGenerator.html">MCUniverseGenerator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance.html">MEHPForceBalance</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceBalance2.html">MEHPForceBalance2</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceEvaluator.html">MEHPForceEvaluator</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.MEHPForceRelaxation.html">MEHPForceRelaxation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/pylimer_tools_cpp.Molecule.html">Molecule</a></li>
@@ -576,6 +575,8 @@ but in SI units
 <span class="n">unit_style</span> <span class="o">=</span> <span class="n">unit_style_factory</span><span class="o">.</span><span class="n">get_unit_style</span><span class="p">(</span>
     <span class="s2">&quot;lj&quot;</span><span class="p">,</span> <span class="n">polymer</span><span class="o">=</span><span class="s2">&quot;pdms&quot;</span><span class="p">,</span> <span class="n">warning</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">accept_mol</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
+<span class="c1"># multiply with the following factor to convert LJ stress to SI units,</span>
+<span class="c1"># namely MPa in this example:</span>
 <span class="n">lj_stress_to_si_conversion_factor</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">*</span><span class="n">unit_style</span><span class="o">.</span><span class="n">pressure</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;MPa&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">magnitude</span>
 </pre></div>
 </div>
@@ -584,8 +585,8 @@ but in SI units
 <span class="sig-name descname"><span class="pre">get_base_unit_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">property</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.io.unit_styles.UnitStyle.get_base_unit_of" title="Link to this definition">¶</a></dt>
 <dd><p>Returns the conversion factor from the unit style to SI units.</p>
 <p>Example usage:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">units</span> <span class="o">=</span> <span class="n">getUnitStyle</span><span class="p">(</span><span class="s2">&quot;lj&quot;</span><span class="p">)</span>
-<span class="n">siMass</span> <span class="o">=</span> <span class="n">ljMass</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">get_base_unit_of</span><span class="p">(</span><span class="s2">&quot;mass&quot;</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">units</span> <span class="o">=</span> <span class="n">get_unit_style</span><span class="p">(</span><span class="s2">&quot;lj&quot;</span><span class="p">)</span>
+<span class="n">si_mass</span> <span class="o">=</span> <span class="n">lj_mass</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">get_base_unit_of</span><span class="p">(</span><span class="s2">&quot;mass&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
