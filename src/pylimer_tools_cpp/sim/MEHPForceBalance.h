@@ -684,14 +684,14 @@ namespace sim {
       {
         this->box.adjustCoordinatesTo(this->initialConfig.coordinates, newBox);
         this->box.adjustCoordinatesTo(this->currentDisplacements, newBox);
+        this->box.adjustCoordinatesTo(this->initialConfig.springPartBoxOffset,
+                                      newBox);
         this->box = newBox;
         this->universe.setBox(newBox, true);
-        this->initialConfig.L[0] = this->box.getLx();
-        this->initialConfig.L[1] = this->box.getLy();
-        this->initialConfig.L[2] = this->box.getLz();
-        this->initialConfig.boxHalfs[0] = 0.5 * this->initialConfig.L[0];
-        this->initialConfig.boxHalfs[1] = 0.5 * this->initialConfig.L[1];
-        this->initialConfig.boxHalfs[2] = 0.5 * this->initialConfig.L[2];
+        for (size_t i = 0; i < 3; ++i) {
+          this->initialConfig.L[i] = this->box.getL(i);
+          this->initialConfig.boxHalfs[i] = 0.5 * this->initialConfig.L[i];
+        }
       }
 
       /**
