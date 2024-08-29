@@ -19,6 +19,7 @@
 #include <tuple>
 #include <vector>
 #ifdef CEREALIZABLE
+#include "../utils/CerealUtils.h"
 #include <cereal/access.hpp>
 #include <cereal/types/base_class.hpp>
 #include <cereal/types/polymorphic.hpp>
@@ -30,6 +31,35 @@ namespace sim {
     class MEHPForceRelaxation
       : public pylimer_tools::sim::OutputSupportingSimulation
     {
+    private:
+#ifdef CEREALIZABLE
+      MEHPForceRelaxation() {}; // not exposed to users, only used by Cereal
+
+      friend class cereal::access;
+#endif
+
+      // state
+      pylimer_tools::entities::Universe universe;
+      MEHPForceEvaluator* forceEvaluator;
+      bool simulationHasRun = false;
+      bool simulationSuggestsRerun = false;
+      bool outputEndNodes = false;
+      ExitReason exitReason = ExitReason::UNSET;
+      int nrOfStepsDone = 0;
+      Network forceRelaxationNetwork;
+      Eigen::VectorXd currentSpringDistances;
+      Eigen::VectorXd currentVelocities;
+      Eigen::VectorXd currentVelocitiesPlus;
+      Eigen::VectorXd currentForces;
+      // config
+      SimpleSpringMEHPForceEvaluator
+        springForceEvaluator; // helper for memory time
+      bool is2D = false;
+      int defaultNrOfChains = 0;
+      double defaultR0Squared = 0.0;
+      double suggestRerunEps = 1e-3;
+      int crossLinkerType;
+      double dt = 1;
 
     public:
       MEHPForceRelaxation(const pylimer_tools::entities::Universe& u,
@@ -70,12 +100,14 @@ namespace sim {
         this->setForceEvaluator(forceEvaluator);
       };
 
+#ifdef CEREALIZABLE
       static MEHPForceRelaxation constructFromString(std::string s)
       {
-        MEHPForceRelaxation res;
+        MEHPForceRelaxation res = MEHPForceRelaxation();
         pylimer_tools::utils::deserializeFromString(res, s);
         return res;
       }
+#endif
 
       /**
        * @brief Actually do run the simulation
@@ -911,36 +943,6 @@ namespace sim {
         }
         return result;
       }
-
-    private:
-#ifdef CEREALIZABLE
-      MEHPForceRelaxation() {}; // not exposed to users, only used by Cereal
-
-      friend class cereal::access;
-#endif
-
-      // state
-      pylimer_tools::entities::Universe universe;
-      MEHPForceEvaluator* forceEvaluator;
-      bool simulationHasRun = false;
-      bool simulationSuggestsRerun = false;
-      bool outputEndNodes = false;
-      ExitReason exitReason = ExitReason::UNSET;
-      int nrOfStepsDone = 0;
-      Network forceRelaxationNetwork;
-      Eigen::VectorXd currentSpringDistances;
-      Eigen::VectorXd currentVelocities;
-      Eigen::VectorXd currentVelocitiesPlus;
-      Eigen::VectorXd currentForces;
-      // config
-      SimpleSpringMEHPForceEvaluator
-        springForceEvaluator; // helper for memory time
-      bool is2D = false;
-      int defaultNrOfChains = 0;
-      double defaultR0Squared = 0.0;
-      double suggestRerunEps = 1e-3;
-      int crossLinkerType;
-      double dt = 1;
     };
   } // namespace mehp
 } // namespace calc
