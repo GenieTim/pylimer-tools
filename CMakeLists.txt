@@ -58,6 +58,7 @@ include_directories(${nlopt_INCLUDE_DIRS})
 include_directories(${cereal_INCLUDE_DIRS})
 include_directories(${Spectra_INCLUDE_DIRS})
 
+OUTPUT_FLAGS(pylimer_tools_cpp)
 message("pylimer_tools_cpp includes igraph from ${igraph_INCLUDE_DIRS}, nlopt from ${nlopt_INCLUDE_DIRS}, Spectra from ${Spectra_INCLUDE_DIRS} and cereal from ${cereal_INCLUDE_DIRS}")
 
 # link

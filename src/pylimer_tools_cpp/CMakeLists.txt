@@ -169,6 +169,8 @@ if (LEAK_ANALYSIS)
 	)
 endif()
 
+OUTPUT_FLAGS(pylimer_tools)
+
 # add other needed packages
 # target_link_libraries(pylimer_tools 
 # 	PRIVATE

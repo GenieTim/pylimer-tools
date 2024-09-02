@@ -213,7 +213,7 @@ namespace calc {
                         std::to_string(this->eigenvalues[i]) + ".");
     }
     return result;
-  };
+  }
 
   Eigen::ArrayXd NormalModeAnalyzer::evaluateStorageModulus(
     const Eigen::ArrayXd& omega) const
@@ -232,7 +232,7 @@ namespace calc {
           ".");
     }
     return result;
-  };
+  }
 
   Eigen::ArrayXd NormalModeAnalyzer::evaluateLossModulus(
     const Eigen::ArrayXd& omega) const
@@ -251,6 +251,6 @@ namespace calc {
           ".");
     }
     return result;
-  };
+  }
 }
 }
