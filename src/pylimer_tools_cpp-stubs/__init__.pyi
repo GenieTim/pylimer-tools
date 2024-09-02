@@ -34,7 +34,6 @@ __all__ = [
     'LinkSwappingMode',
     'MCUniverseGenerator',
     'MEHPForceBalance',
-    'MEHPForceBalance2',
     'MEHPForceEvaluator',
     'MEHPForceRelaxation',
     'Molecule',
@@ -75,10 +74,18 @@ class Atom:
     def __eq__(self, arg0: Atom) -> bool:
         ...
 
+    def __getstate__(self) -> tuple:
+        ...
+
     def __init__(self, id: int, type: int, x: float, y: float,
                  z: float, nx: int, ny: int, nz: int) -> None:
         """
         Construct this atom
+        """
+
+    def __setstate__(self, arg0: tuple) -> None:
+        """
+        Provides support for pickling
         """
 
     def compute_vector_to(self, to_atom: Atom, pbc_box: Box) -> numpy.ndarray:
@@ -353,6 +360,10 @@ class Box:
               currently, only rectangular boxes are supported.
 
     """
+
+    def __getstate__(self) -> tuple:
+        ...
+
     @typing.overload
     def __init__(self, arg0: float, arg1: float, arg2: float) -> None:
         ...
@@ -361,6 +372,11 @@ class Box:
     def __init__(self, arg0: float, arg1: float, arg2: float,
                  arg3: float, arg4: float, arg5: float) -> None:
         ...
+
+    def __setstate__(self, arg0: tuple) -> None:
+        """
+        Provides support for pickling.
+        """
 
     def apply_pbc(self, distances: numpy.ndarray) -> numpy.ndarray:
         """
@@ -640,6 +656,11 @@ class DPDSimulator:
               with slip-springs as presented by Langeloth et al.
 
     """
+    @staticmethod
+    def read_restart_file(file: str) -> DPDSimulator:
+        """
+                  Read a restart file in order to continue a simulation.
+        """
 
     def __init__(self, universe: Universe, crosslinker_type: int = 2,
                  slipspring_bond_type: int = 9, is_2d: bool = False, seed: str = '') -> None:
@@ -722,6 +743,24 @@ class DPDSimulator:
     def config_num_steps_mc(self, arg0: int) -> None:
         """
                   Configure the number of steps to do in one MC sequence.
+        """
+
+    def config_restart_output(self, file: str,
+                              output_every: int = 50000) -> None:
+        """
+                  Set when to output a restart where.
+
+                  Note:
+                       The filename determines the type of serialization:
+                       .json, .xml are supported; other file endings will lead to binary serialization (fastest!).
+
+                  Caution:
+                       This method may not be backwards- nor forward-compatible.
+                       Use the same version of pylimer-tools if you want to be sure that things work.
+
+                  Arguments:
+                       - file: the file path to the restart file to write
+                       - outputEvery: how often to write the restart file
         """
 
     def config_shift_one_at_a_time(self, arg0: bool) -> None:
@@ -850,6 +889,15 @@ class DPDSimulator:
 
     def validate_state(self) -> None:
         ...
+
+    def write_restart_file(self, file: str) -> None:
+        """
+                  Explicitily force the writing of a restart file, now!
+
+                  Arguments:
+                  - file (str): the file path and name of the restart file to be written.
+                       Can end in xml, json or anything else (-> binary).
+        """
 
 
 class DataFileReader:
@@ -1344,6 +1392,9 @@ class MEHPForceBalance:
     def __copy__(self) -> MEHPForceBalance:
         ...
 
+    def __getstate__(self) -> tuple:
+        ...
+
     def __init__(self, universe: Universe, crosslinker_type: int = 2, is_2d: bool = False,
                  remove_2functional_crosslinkers: bool = False, remove_dangling_chains: bool = False) -> None:
         """
@@ -1356,6 +1407,9 @@ class MEHPForceBalance:
                   :param remove_2functionalCrosslinkers: whether to keep or remove the 2-functional crosslinkers when setting up the network
                   :param remove_dangling_chains: whether to keep or remove obviously dangling chains when setting up the network
         """
+
+    def __setstate__(self, arg0: tuple) -> None:
+        ...
 
     def add_sliplinks(self, strand_idx_1: list[int], strand_idx_2: list[int], x: list[float], y: list[float],
                       z: list[float], alpha_1: list[float], alpha_2: list[float], clamp_alpha: bool = False) -> None:
@@ -1724,266 +1778,6 @@ class MEHPForceBalance:
         ...
 
 
-class MEHPForceBalance2:
-    """
-
-        A small simulation tool for quickly minimizing the force between the cross-linker beads.
-
-    """
-    @staticmethod
-    def construct_with_random_sliplinks(universe: Universe, nr_of_sliplinks_to_sample: int, acceptable_cutoff: float = 1.2, minimum_nr_of_sliplinks: int = 0,
-                                        same_strand_cutoff: float = 2, seed: str = '', crosslinker_type: int = 2, is_2d: bool = False, kappa: float = 1.0) -> MEHPForceBalance2:
-        """
-                  Instantiate this simulator with randomly chosen slip-links.
-        """
-    @staticmethod
-    def construct_with_sliplinks(universe: Universe, strand_idx1: list[int], strand_idx2: list[int], x: list[float], y: list[float], z: list[float], alpha_1: list[float],
-                                 alpha_2: list[float], crosslinker_type: int = 2, is_2d: bool = False, kappa: float = 1.0, clamp_alpha: bool = False) -> MEHPForceBalance2:
-        """
-                  Instantiate this simulator with slip-links (specified by their positions, etc.).
-
-                  CAUTION:
-                       The box offset (i.e., the PBC) might not work as needed yet.
-        """
-    @staticmethod
-    def construct_without_sliplinks(universe: Universe, crosslinker_type: int = 2,
-                                    is_2d: bool = False, kappa: float = 1.0) -> MEHPForceBalance2:
-        """
-                  Instantiate this simulator without slip-links (fully phantom).
-
-                  The results should be compareable to the force relaxation code.
-        """
-
-    def __copy__(self) -> MEHPForceBalance2:
-        ...
-
-    def assume_box_large_enough(self, arg0: bool) -> None:
-        """
-                  Configure whether to run PBC on the bonds or not.
-
-                  If your bonds could get larger than half the box length, this must be kept false (default).
-                  Otherwise, you can set it to true and therewith get some securities.
-        """
-
-    def config_step_output(self, arg0: list[OutputConfiguration]) -> None:
-        """
-                  Set which values to log.
-
-                  Arguments:
-                       - values: a list of OutputConfiguration structs
-        """
-
-    def deform_to(self, new_box: Box) -> None:
-        ...
-
-    def evaluate_distance_between(
-            self, link_index_a: int, link_index_b: int, is_2d: bool = False) -> numpy.ndarray:
-        ...
-
-    def get_average_spring_length(self) -> float:
-        """
-                   Get the average length of the springs. Note that in contrast to :func:`~pylimer_tools_cpp.MEHPForceBalance2.getGammaFactor()`,
-                   this value is normalized by the number of springs rather than the number of chains.
-        """
-
-    def get_crosslinker_verse(self) -> Universe:
-        """
-                  Returns the universe [of cross-linkers] with the positions of the current state of the simulation.
-        """
-
-    def get_dangling_weight_fraction(self, tolerance: float = 0.01) -> float:
-        """
-                  Compute the weight fraction of non-active springs
-
-                  Caution: ignores atom masses.
-        """
-
-    def get_default_nr_of_chains(self) -> int:
-        """
-                  Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceBalance2.getGammaFactor()` for normalizing the distances.`.
-        """
-
-    def get_default_r_0_square(self) -> float:
-        """
-                   Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceBalance2.getGammaFactor()` for :math:`\\langle R_{0,\\eta}^2\\rangle`.
-        """
-
-    def get_displacement_residual_norm(
-            self, one_over_spring_partition_upper_limit: float = 1.0) -> float:
-        """
-                  Get the current link displacement residual norm.
-        """
-
-    def get_effective_functionality_of_atoms(
-            self, tolerance: float = 0.01) -> dict[int, int]:
-        """
-                  Returns the number of active springs connected to each atom, atomId used as index
-
-                  :param tolerance: springs under this length are considered inactive
-        """
-
-    def get_exit_reason(self) -> ExitReason:
-        """
-                   Returns the reason for termination of the simulation
-        """
-
-    def get_force_on(self, link_idx: int,
-                     one_over_spring_partition_upper_limit: float = 1.0) -> numpy.ndarray:
-        ...
-
-    def get_gamma_factor(self, r0squared: float = -1.0,
-                         nrOfChains: int = -1) -> float:
-        """
-                  Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
-
-                  :math:`\\Gamma = \\langle\\gamma_{\\eta}\\rangle`, with :math:`\\gamma_{\\eta} = \\frac{\\bar{r_{\\eta}}^2}{R_{0,\\eta}^2}`,
-                  which you can use as :math:`G_{\\mathrm{ANT}} = \\Gamma \\nu k_B T`,
-                  where :math:`\\eta` is the index of a particular strand,
-                  :math:`R_{0}^2` is the melt mean square end to end distance, in phantom systems :math:`$= N_{\\eta}*b^2$`
-                  :math:`N_{\\eta}` is the number of atoms in this strand :math:`\\eta`,
-                  :math:`b` its mean square bond length,
-                  :math:`T` the temperature and
-                  :math:`k_B` Boltzmann's constant.
-
-                  :param r0squared: The denominator in the equation of :math:`\\Gamma`. If :math:`-1.0` (default), the network is used for determination (which is not accurate). For phantom systems, the correct value is :math:`Nb^2`.
-                       For other systems, the value could be determined by `~pylimer_tools_cpp.Universe.computeMeanEndToEndDistance` on the melt system.
-                  :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains.
-        """
-
-    def get_ids_of_active_nodes(self, tolerance: float = 0.01, minimumNrOfActiveConnections: int = 2,
-                                maximumNrOfActiveConnections: int = -1, usePartial: bool = False) -> list[int]:
-        """
-                  Get the atom ids of the nodes that are considered active.
-
-                  :param tolerance: springs under this length are considered inactive. A node is active if it has > 2 active springs.
-                  :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
-                  :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
-                       Use a value < 0 to indicate that there is no maximum number of active connections.
-        """
-
-    def get_nr_of_active_nodes(self, tolerance: float = 0.01, minimumNrOfActiveConnections: int = 2,
-                               maximumNrOfActiveConnections: int = -1, usePartial: bool = False) -> int:
-        """
-                   Get the number of active nodes remaining after running the simulation.
-
-                  :param tolerance: springs under this length are considered inactive.
-                  :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
-                  :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
-                       Use a value < 0 to indicate that there is no maximum number of active connections.
-                  :param usePartial: Whether to use the partial spring distances rather than the total (set to true if you want primary loop contributors)
-        """
-
-    def get_nr_of_active_partial_springs(self, tolerance: float = 0.01) -> int:
-        """
-                   Get the number of active partial springs remaining after running the simulation.
-
-                  :param tolerance: springs under this length are considered inactive
-        """
-
-    def get_nr_of_active_springs(self, tolerance: float = 0.01) -> int:
-        """
-                   Get the number of active springs remaining after running the simulation.
-
-                  :param tolerance: springs under this length are considered inactive
-        """
-
-    def get_nr_of_atoms(self) -> int:
-        ...
-
-    def get_nr_of_bonds(self) -> int:
-        ...
-
-    def get_nr_of_extra_atoms(self) -> int:
-        ...
-
-    def get_nr_of_extra_bonds(self) -> int:
-        ...
-
-    def get_nr_of_iterations(self) -> int:
-        """
-                  Returns the number of iterations used for force relaxation.
-        """
-
-    def get_nr_of_nodes(self) -> int:
-        """
-                   Get the number of nodes considered in this simulation.
-        """
-
-    def get_nr_of_springs(self) -> int:
-        """
-                  Get the number of springs considered in this simulation.
-
-                  :param tolerance: springs under this length are considered inactive
-        """
-
-    def get_pressure(self) -> float:
-        """
-                  Returns the pressure at the current state of the simulation.
-        """
-
-    def get_soluble_weight_fraction(self, tolerance: float = 0.01) -> float:
-        """
-                  Compute the weight fraction of springs connected to active
-                  springs (any depth).
-
-                  Caution: ignores atom masses.
-        """
-
-    def get_spring_partitions(self) -> numpy.ndarray:
-        """
-                  Get the current spring partitions.
-        """
-
-    def get_springpartition_indices_of_sliplink(
-            self, link_idx: int) -> list[int]:
-        ...
-
-    def get_stress_tensor(
-            self, one_over_spring_partition_upper_limit: float = 1.0) -> numpy.ndarray:
-        """
-                  Returns the stress tensor at the current state of the simulation.
-        """
-
-    def get_stress_tensor_link_based(
-            self, one_over_spring_partition_upper_limit: float = 1.0) -> numpy.ndarray:
-        """
-                  Returns the stress tensor at the current state of the simulation.
-        """
-
-    def move_slip_links_to_their_best_branch(
-            self, arg0: float, arg1: int, arg2: bool) -> None:
-        ...
-
-    def run_force_relaxation(self, max_nr_of_steps: int = 250000, x_tolerance: float = 1e-12, initial_residual_norm: float = -1.0, simplification_mode: StructureSimplificationMode = ..., inactive_removal_cutoff: float = -1.0,
-                             do_inner_iterations: bool = False, allow_sliplinks_to_pass_each_other: LinkSwappingMode = ..., swapping_frequency: int = 10, one_over_spring_partition_upper_limit: float = 1.0, nr_of_crosslink_swaps_allowed_per_sliplink: int = -1) -> None:
-        """
-                  Run the simulation.
-                  Note that the final state of the minimization is persisted and reused if you use this method again.
-                  This is useful if you want to run a global optimization first and add a local one afterwards.
-                  As a consequence though, you cannot simply benchmark only this method; you must include the setup.
-
-                  :param damping: For certain run modes, a damping factor helps to improve performance.
-                  :param max_nr_of_steps: The maximum number of steps to do during the simulation.
-                  :param x_tolerance: The tolerance of the displacements as an exit condition.
-                  :param inner_max_nr_of_steps: The maximum number of steps to do per iteration during the slip-link displacements.
-                  :param inner_x_tolerance: The tolerance of the displacements of the slip-link as an inner exit condition.
-                  :param inner_alpha_tolerance: The tolerance of the contour-length when slipping the slip-link as an inner exit condition.
-        """
-
-    def set_spring_contour_lengths(self, arg0: numpy.ndarray) -> None:
-        """
-                  Set/overwrite the contour lengths.
-        """
-
-    def set_spring_partitions(self, arg0: numpy.ndarray) -> None:
-        """
-                  Set the current spring partitions.
-        """
-    @property
-    def network(self) -> SimplifiedBalanceNetwork:
-        ...
-
-
 class MEHPForceEvaluator:
     """
 
@@ -2016,6 +1810,9 @@ class MEHPForceRelaxation:
 
     """
 
+    def __getstate__(self) -> tuple:
+        ...
+
     def __init__(self, universe: Universe, crosslinker_type: int = 2, is_2d: bool = False, force_evaluator: MEHPForceEvaluator = None,
                  kappa: float = 1.0, remove_2functional_crosslinkers: bool = False, remove_dangling_chains: bool = False) -> None:
         """
@@ -2032,6 +1829,9 @@ class MEHPForceRelaxation:
                        :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getSolubleWeightFraction()` and
                        :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getDanglingWeightFraction()`
         """
+
+    def __setstate__(self, arg0: tuple) -> None:
+        ...
 
     def assume_box_large_enough(self, box_large_enough: bool = False) -> None:
         """
@@ -2671,10 +2471,16 @@ class NonGaussianSpringForceEvaluator(MEHPForceEvaluator):
 
 
 class NormalModeAnalyzer:
+    def __getstate__(self) -> tuple:
+        ...
+
     def __init__(self, spring_from: list[int], spring_to: list[int]) -> None:
         """
         Initialize NormalModeAnalyzer
         """
+
+    def __setstate__(self, arg0: tuple) -> None:
+        ...
 
     def evaluate_loss_modulus(self, omega: numpy.ndarray) -> numpy.ndarray:
         """
@@ -3034,10 +2840,16 @@ class Universe:
     def __copy__(self) -> Universe:
         ...
 
+    def __getstate__(self) -> tuple:
+        ...
+
     def __init__(self, Lx: float, Ly: float, Lz: float) -> None:
         """
         Instantiate this Universe (Collection of Molecules) providing the box lengths.
         """
+
+    def __setstate__(self, arg0: tuple) -> None:
+        ...
 
     def add_angles(self, angles_from: list[int], angles_via: list[int],
                    angles_to: list[int], angle_types: list[int]) -> None:
