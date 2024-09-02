@@ -21,6 +21,7 @@ This module provides access to various computations introduced in the Miller-Mac
 Caution:
     - not all systems are supported yet.
         In particular, for most methods, only A_f and B_2 is supported.
+        Also, the systems are mostly assumed to be end-linked and monodisperse.
 
 """
 

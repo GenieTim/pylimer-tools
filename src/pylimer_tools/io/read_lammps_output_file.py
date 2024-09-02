@@ -9,6 +9,17 @@ from pylimer_tools.io.extract_thermo_data import extract_thermo_params
 from pylimer_tools.utils.cache_utility import do_cache, load_cache
 from pylimer_tools_cpp import AtomStyle, Universe, UniverseSequence
 
+"""
+This module provides a few functions to read LAMMPS' output files, including
+
+- log files (thermo output)
+- dump files (focusing on the coordinates of atoms)
+- data files (the LAMMPS structure)
+- averaged data (from :code:`fix ave/time...` or :code:`fix ave/hist...`)
+- correlation data (from :code:`fix ave/correlate/...`)
+
+"""
+
 
 def read_log_file(
         filepath, lines_to_read_to_detect_header=500000) -> pd.DataFrame:

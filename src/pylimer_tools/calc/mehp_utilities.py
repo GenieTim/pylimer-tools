@@ -10,6 +10,14 @@ from pylimer_tools.calc.structure_analysis import \
     compute_mean_end_to_end_distances
 from pylimer_tools_cpp import MoleculeType, Universe
 
+"""
+This module is deprecated.
+Use :func:`pylimer_tools_cpp.MEHPForceBalance` or :func:`pylimer_tools_cpp.MEHPForceRelaxation` instead.
+
+In principle, it offers comparable functionality, but without the force minimization - the networks you pass
+to these methods should be minimized first.
+"""
+
 
 def predict_shear_modulus(networks: Iterable[Universe], temperature: float = 1, k_boltzmann: float = 1,
                           crosslinker_type: int = 2, total_mass=1) -> float:

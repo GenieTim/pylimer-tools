@@ -36,10 +36,6 @@ message("Using toolchain file ${CMAKE_TOOLCHAIN_FILE}")
 
 # add sources & targets
 add_subdirectory(src/pylimer_tools_cpp)
-add_dependencies(pylimer_tools igraph)
-add_dependencies(pylimer_tools nlopt)
-add_dependencies(pylimer_tools cerealLib)
-add_dependencies(pylimer_tools Spectra)
 
 pybind11_add_module(pylimer_tools_cpp MODULE 
   src/pylimer_tools_cpp/pybind11/readers.cpp
@@ -53,6 +49,7 @@ pybind11_add_module(pylimer_tools_cpp MODULE
 )
 
 # add other dependencies
+add_dependencies(pylimer_tools_cpp pylimer_tools)
 include_directories(${igraph_INCLUDE_DIRS})
 include_directories(${nlopt_INCLUDE_DIRS})
 include_directories(${cereal_INCLUDE_DIRS})
