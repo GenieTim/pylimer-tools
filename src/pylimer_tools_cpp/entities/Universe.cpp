@@ -2346,6 +2346,8 @@ namespace entities {
     int crossLinkerType,
     double interpolationFactor) const
   {
+    INVALIDARG_EXP_IFN(interpolationFactor >= 0.0,
+                       "Negative interpolation factor does not make sense");
     std::vector<long int> vertexIdToNewIdx =
       pylimer_tools::utils::initializeWithValue<long int>(this->getNrOfAtoms(),
                                                           -1);
@@ -2363,8 +2365,8 @@ namespace entities {
         currentMaxIdx += 1;
       }
       size_t previousId = vertexIdToNewIdx[end0];
-      size_t numExtraBonds = static_cast<size_t>(
-        (static_cast<double>(chain.getNrOfBonds()) * interpolationFactor));
+      size_t numExtraBonds = static_cast<size_t>(std::round(
+        static_cast<double>(chain.getNrOfBonds()) * interpolationFactor));
       for (size_t i = 1; i < numExtraBonds; ++i) {
         results.push_back(std::make_pair(previousId, currentMaxIdx));
         previousId = currentMaxIdx;
