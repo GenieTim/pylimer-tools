@@ -205,6 +205,9 @@ namespace calc {
   {
     Eigen::ArrayXd result = Eigen::ArrayXd::Zero(t.size());
     for (size_t i = 0; i < this->eigenvalues.size(); ++i) {
+      if (this->eigenvalues[i] == 0.0) {
+        continue;
+      }
       result += (-2. * this->eigenvalues[i] * t).exp();
       RUNTIME_EXP_IFN(result.allFinite(),
                       "Stress autocorrelation is not fully finite anymore "
