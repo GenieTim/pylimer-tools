@@ -1000,15 +1000,15 @@ namespace entities {
             }
           }
 
-          if (atomsToAdd.size() == 2 && atomsToAdd[0] == atomsToAdd[1]) {
-            isLoop = true;
-            // we only want to add it once -> remove
-            atomsToAdd.pop_back();
-          }
-
           IGRAPH_VIT_NEXT(endNodeVit);
           igraph_vector_int_destroy(&neighbors);
         } // loop end nodes
+
+        if (atomsToAdd.size() == 2 && atomsToAdd[0] == atomsToAdd[1]) {
+          isLoop = true;
+          // we only want to add it once -> remove
+          atomsToAdd.pop_back();
+        }
 
         std::unordered_map<long int, long int> newAtomsMap;
         // actually add the atoms...
@@ -1017,13 +1017,12 @@ namespace entities {
           long int newCrosslinkerVertexIdx = igraph_vcount(chain) - 1;
           newAtomsMap.insert_or_assign(atomToAddOriginalIdx,
                                        newCrosslinkerVertexIdx);
-          // additional loop check
+
+          // deprecated additional loop check
           long int originalNeighbourAtomId = igraphRealToInt<long int>(
             igraph_cattribute_VAN(&graph, "id", atomToAddOriginalIdx));
-          if (pylimer_tools::utils::graphHasVertexWithProperty(
-                chain, "id", originalNeighbourAtomId)) {
-            isLoop = true;
-          }
+          assert (!(originalNeighbourAtomId != 0 || pylimer_tools::utils::graphHasVertexWithProperty(
+                chain, "id", originalNeighbourAtomId)));
 
           // including all attributes
           pylimer_tools::utils::copyVertexProperties(

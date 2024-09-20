@@ -10,7 +10,7 @@
       "name": "Debug C++ Tests",
       "cwd": "${workspaceFolder}/tests/build",
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
-      "args": ["Adding slip-links does not influence other springs"],
+      "args": ["MEHP Force Balance Free chains collapse"],
       "env": {
         "MallocNanoZone": "0",
         "ASAN_OPTIONS": "detect_leaks=0",
@@ -26,7 +26,7 @@
       "name": "Debug Cpp Tests",
       "cwd": "${workspaceFolder}/tests/build",
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
-      "args": [
+      "args": ["MEHP Force Balance Free chains collapse"
       ],
       "environment": [
         {
