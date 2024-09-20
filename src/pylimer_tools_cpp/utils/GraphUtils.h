@@ -36,7 +36,7 @@ namespace utils {
                                          std::string propertyName,
                                          IN propertyValue)
   {
-    INVALIDARG_EXP_IFN(property != 0, "Check for default property value not supported.");
+    INVALIDARG_EXP_IFN(propertyValue != 0, "Check for default property value not supported.");
     igraph_vector_t results;
     igraph_vector_init(&results, 1);
     if (igraph_cattribute_VANV(
