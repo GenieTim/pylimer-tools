@@ -41,7 +41,7 @@ if command -v ninja; then
   ADDITIONALFLAGS=("${ADDITIONALFLAGS[@]}" "-GNinja")
   GENERATOR_BIN="ninja"
 fi
-cmake .. "${ADDITIONALFLAGS[@]}" || exit 1
+CXX=$CXXCOMPILER CC=$CCOMPILER cmake .. "${ADDITIONALFLAGS[@]}" || exit 1
 echo "======== Starting build ========"
 cmake --build . || exit 9
 echo "======== Tests built with $GENERATOR_BIN (" "${ADDITIONALFLAGS[@]}" ") ========"

@@ -1322,12 +1322,12 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
     yPositions.push_back(0.1 * static_cast<double>(i % 4 - i % 3) +
                          offset); // /!\ i needs to be int, not unsigned!
     zPositions.push_back(0.1 * static_cast<double>(i % 5 - i % 7) + offset); //
-    atomIds.push_back(i);
+    atomIds.push_back(i+1);
     atomTypes.push_back(i % nrOfBeadsPerChain == 0 ? 2 : 1);
     zeroInts.push_back(0);
     if (i > 0) {
-      bondFrom.push_back(i - 1);
-      bondTo.push_back(i);
+      bondFrom.push_back(i);
+      bondTo.push_back(i+1);
     }
   }
   universe.addAtoms(atomIds,
