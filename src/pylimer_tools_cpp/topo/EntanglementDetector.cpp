@@ -54,7 +54,7 @@ namespace topo {
                            std::to_string(minimumNrOfSliplinks) + ".");
       INVALIDARG_EXP_IFN(upperCutoff > 0.0,
                          "Expected a cutoff > 0.0, got " +
-                           std::to_string(cutoff) + ".");
+                           std::to_string(upperCutoff) + ".");
       INVALIDARG_EXP_IFN(
         lowerCutoff < upperCutoff,
         "Expected lower cut-off to be smaller than upper cut-off, got " +
