@@ -700,9 +700,8 @@ TEST_CASE("Force Relaxation free chains collapse",
           "[analysis][MEHPForceRelaxation][NonGaussianSpringForceEvaluator]["
           "SimpleSpringMEHPForceEvaluator]")
 {
-  std::cout
-    << "Running test \"Force Relaxation free chains collapse\""
-    << std::endl;
+  std::cout << "Running test \"Force Relaxation free chains collapse\""
+            << std::endl;
   size_t nrOfBeads = 30;
   size_t nrOfBeadsPerChain = 3;
   pe::Universe universe =

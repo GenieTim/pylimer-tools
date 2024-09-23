@@ -112,7 +112,7 @@ namespace topo {
       // std::cout << "Initial sampling rng seed: " << rng << std::endl;
       pylimer_tools::entities::NeighbourList neighbourList =
         pylimer_tools::entities::NeighbourList(
-          atomsForNeighbourList, universe.getBox(), cutoff);
+          atomsForNeighbourList, universe.getBox(), upperCutoff);
       size_t numLinksFoundInIteration = 1;
 
       // start iteration to sample "entanglements"
