@@ -1322,12 +1322,12 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
     yPositions.push_back(0.1 * static_cast<double>(i % 4 - i % 3) +
                          offset); // /!\ i needs to be int, not unsigned!
     zPositions.push_back(0.1 * static_cast<double>(i % 5 - i % 7) + offset); //
-    atomIds.push_back(i+1);
+    atomIds.push_back(i + 1);
     atomTypes.push_back(i % nrOfBeadsPerChain == 0 ? 2 : 1);
     zeroInts.push_back(0);
     if (i > 0) {
       bondFrom.push_back(i);
-      bondTo.push_back(i+1);
+      bondTo.push_back(i + 1);
     }
   }
   universe.addAtoms(atomIds,
@@ -1461,12 +1461,12 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC "
 
     pcm::MEHPForceBalance forceBalanceConventional =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-        universe, 250, 2.0, 100, 2.0, "a533d", 2, false);
+        universe, 250, 2.0, 0.0, 100, 2.0, "a533d", 2, false);
     forceBalanceConventional.configAssumeBoxLargeEnough(true);
 
     pcm::MEHPForceBalance forceBalanceNew =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-        universe, 250, 2.0, 100, 2.0, "a533d", 2, false);
+        universe, 250, 2.0, 0.0, 100, 2.0, "a533d", 2, false);
     forceBalanceNew.configAssumeBoxLargeEnough(false);
 
     CHECK(forceBalanceConventional.getStressTensor().isApprox(
@@ -1588,12 +1588,12 @@ TEST_CASE("MEHP Force Balance Gives Identical Results for Different PBC p = 1",
 
     pcm::MEHPForceBalance forceBalanceConventional =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-        universe, 25, 2.0, 20, 2.0, "a533d", 2, false);
+        universe, 25, 2.0, 0.0, 20, 2.0, "a533d", 2, false);
     forceBalanceConventional.configAssumeBoxLargeEnough(true);
 
     pcm::MEHPForceBalance forceBalanceNew =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-        universe, 25, 2.0, 20, 2.0, "a533d", 2, false);
+        universe, 25, 2.0, 0.0, 20, 2.0, "a533d", 2, false);
     forceBalanceNew.configAssumeBoxLargeEnough(false);
 
     CHECK(forceBalanceConventional.getStressTensor().isApprox(
@@ -1786,7 +1786,7 @@ TEST_CASE(
 
     pcm::MEHPForceBalance forceBalancer =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-        universe, 1000, 2.0, 100, 5, "my_seed_fb12");
+        universe, 1000, 2.0, 0.0, 100, 5, "my_seed_fb12");
     forceBalancer.configAssumeBoxLargeEnough(false);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
     double initialResidual = forceBalancer.getDisplacementResidualNorm();
@@ -2025,7 +2025,7 @@ TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
 
     pcm::MEHPForceBalance forceBalancerSmallNewSampling =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-        universe, 1000, 6.0, 900, 3.0, "53467829");
+        universe, 1000, 6.0, 0.0, 900, 3.0, "53467829");
     forceBalancerSmallNewSampling.configAssumeBoxLargeEnough(false);
 
     CHECK_THAT(forceBalancerSmallNewSampling.getNrOfPartialSprings(),
@@ -2156,7 +2156,7 @@ TEST_CASE("Random sampling example small", "[analysis][MEHPForceBalance]")
 
     pcm::MEHPForceBalance forceBalancer4 =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-        universe, 12, 6.0, 11, 3.0, "86573452", 2, true);
+        universe, 12, 6.0, 0.0, 11, 3.0, "86573452", 2, true);
     forceBalancer4.configAssumeBoxLargeEnough(false);
 
     CHECK_THAT(forceBalancer4.getPressure(),
@@ -2214,7 +2214,7 @@ TEST_CASE("Yet another sampling example", "[analysis][MEHPForceBalance]")
     // randomly sample slip-links
     pcm::MEHPForceBalance forceBalancerNewSampling =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-        universe, 1000, 6.0, 900, 3.0, "53467829");
+        universe, 1000, 6.0, 0.0, 900, 3.0, "53467829");
     forceBalancerNewSampling.configAssumeBoxLargeEnough(false);
 
     // extract these randomly sampled slip-links
@@ -2339,7 +2339,7 @@ TEST_CASE("Conversion of structure is equal for both methods",
     // randomly sample NO slip-links
     pcm::MEHPForceBalance forceBalancerNewConversion =
       pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-        universe, 0, 6.0, 0, 3.0, "");
+        universe, 0, 6.0, 0.0, 0, 3.0, "");
     forceBalancerNewConversion.configAssumeBoxLargeEnough(false);
 
     pcm::MEHPForceBalance forceBalancerOldConversion =
@@ -2394,7 +2394,7 @@ TEST_CASE("Force Balance can be run without slipping")
 
   pcm::MEHPForceBalance forceBalancer =
     pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-      universe, 1000, 6.0, 900, 3.0, "53467829");
+      universe, 1000, 6.0, 0.0, 900, 3.0, "53467829");
   forceBalancer.configAssumeBoxLargeEnough(false);
 
   Eigen::VectorXd springPartitions = forceBalancer.getSpringPartitions();
@@ -2453,12 +2453,12 @@ TEST_CASE("Adding slip-links does not influence other springs",
   // and the same for sampling method 2
   pcm::MEHPForceBalance forceBalancer2 =
     pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-      universe, 1000, 6.0, 900, 3.0, "53467829");
+      universe, 1000, 6.0, 0.0, 900, 3.0, "53467829");
   forceBalancer2.configAssumeBoxLargeEnough(false);
 
   pcm::MEHPForceBalance forceBalancer2Without =
     pcm::MEHPForceBalance::constructWithRandomSlipLinks(
-      universe, 0, 6.0, 0, 3.0, "53467829");
+      universe, 0, 6.0, 0.0, 0, 3.0, "53467829");
   forceBalancer2Without.configAssumeBoxLargeEnough(false);
 
   CHECK(forceBalancer2.getNrOfPartialSprings() >

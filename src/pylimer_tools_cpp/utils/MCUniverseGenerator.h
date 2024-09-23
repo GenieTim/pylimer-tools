@@ -6,6 +6,7 @@
 #include "../entities/Universe.h"
 #include "RandomWalker.h"
 #include "StringUtils.h"
+#include "VectorUtils.h"
 #include <algorithm>
 #include <filesystem>
 #include <fstream>

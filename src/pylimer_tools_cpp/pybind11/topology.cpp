@@ -36,7 +36,8 @@ init_pylimer_bound_topo(py::module_& m)
     Arguments:
     :param universe: The universe of atoms from which to sample entanglements from.
     :param nr_of_samples: The number of pairs of atoms to randomly sample.
-    :param cutoff: The maximum distance between atoms for a pair to be considered a potential entanglement.
+    :param upper_cutoff: The maximum distance between atoms for a pair to be considered a potential entanglement.
+    :param lower_cutoff: The minimum distance between atoms for a pair to be considered a potential entanglement.
     :param minimum_nr_of_samples: The minimum number of entanglements to be found.
     :param same_strand_cutoff: The maximum distance between atoms on the same strand for a pair to be considered a potential entanglement.
     :param seed: A seed for the random number generator.
@@ -47,7 +48,8 @@ init_pylimer_bound_topo(py::module_& m)
   )pbdoc",
         py::arg("universe"),
         py::arg("nr_of_samples"),
-        py::arg("cutoff"),
+        py::arg("upper_cutoff"),
+        py::arg("lower_cutoff") = 0,
         py::arg("minimum_nr_of_samples") = 0,
         py::arg("same_strand_cutoff") = 3.,
         py::arg("seed") = "",

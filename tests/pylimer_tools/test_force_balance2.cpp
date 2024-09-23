@@ -833,7 +833,7 @@ TEST_CASE(
     // TODO: using a seed does not seem to work properly?!?
     pcm::MEHPForceBalance2 forceBalancer =
       pcm::MEHPForceBalance2::constructWithRandomSlipLinks(
-        universe, 250, 2.0, 100, 2.0, "seed12", 2, false, 1.0);
+        universe, 250, 2.0, 0.0, 100, 2.0, "seed12", 2, false, 1.0);
     size_t nrOfAddedLinks = forceBalancer.getNumExtraAtoms();
     CHECK(nrOfAddedLinks >= 50);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
@@ -877,7 +877,7 @@ TEST_CASE("MEHP Force Balance 2 can run with swapping slip-links",
     std::cout << "Read file. " << std::endl;
     pcm::MEHPForceBalance2 forceBalancer =
       pcm::MEHPForceBalance2::constructWithRandomSlipLinks(
-        universe, 250, 2.0, 100, 2.0, "aiop129", 2, false, 1.0);
+        universe, 250, 2.0, 0.0, 100, 2.0, "aiop129", 2, false, 1.0);
     size_t nrOfAddedLinks = forceBalancer.getNumExtraAtoms();
     CHECK(nrOfAddedLinks >= 100);
     // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;
@@ -936,7 +936,7 @@ TEST_CASE("MEHP Force Balance 2 can randomly add and remove slip-links",
     std::cout << "Read file. " << std::endl;
     pcm::MEHPForceBalance2 forceBalancer =
       pcm::MEHPForceBalance2::constructWithRandomSlipLinks(
-        universe, 1000, 2.0, 100, 2.0, "seed1", 2, false, 1.0);
+        universe, 1000, 2.0, 0.0, 100, 2.0, "seed1", 2, false, 1.0);
     size_t nrOfAddedLinks = forceBalancer.getNumExtraAtoms();
     CHECK(nrOfAddedLinks >= 100);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
@@ -961,7 +961,7 @@ TEST_CASE("MEHP Force Balance 2 can randomly add and remove slip-links",
 
     ////////////////////////////////////////////////////////////////
     forceBalancer = pcm::MEHPForceBalance2::constructWithRandomSlipLinks(
-      universe, 1000, 2.0, 100, 2.0, "seed4", 2, true, 1.0);
+      universe, 1000, 2.0, 0.0, 100, 2.0, "seed4", 2, true, 1.0);
     nrOfAddedLinks = forceBalancer.getNumExtraAtoms();
     CHECK(nrOfAddedLinks >= 100);
     // std::cout << "Added " << nrOfAddedLinks << " slip-links" << std::endl;

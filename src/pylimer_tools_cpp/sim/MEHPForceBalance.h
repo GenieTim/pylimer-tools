@@ -394,9 +394,10 @@ namespace sim {
       static MEHPForceBalance constructWithRandomSlipLinks(
         const pylimer_tools::entities::Universe& universe,
         const size_t nrOfSliplinksToSample,
-        const double cutoff,
-        const size_t minimumNrOfSliplinks,
-        const double sameStrandCutoff,
+        const double upperCutoff,
+        const double lowerCutoff = 0.,
+        const size_t minimumNrOfSliplinks = 0,
+        const double sameStrandCutoff = 3,
         const std::string seed = "",
         int crossLinkerType = 2,
         bool is2D = false)
@@ -406,7 +407,8 @@ namespace sim {
           entanglements = pylimer_tools::topo::entanglement_detection::
             randomlyFindEntanglements(universe,
                                       nrOfSliplinksToSample,
-                                      cutoff,
+                                      upperCutoff,
+                                      lowerCutoff,
                                       minimumNrOfSliplinks,
                                       sameStrandCutoff,
                                       seed,
