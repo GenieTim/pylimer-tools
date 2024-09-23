@@ -34,7 +34,8 @@ namespace topo {
     AtomPairEntanglements randomlyFindEntanglements(
       const pylimer_tools::entities::Universe& universe,
       const size_t nrOfSliplinksToSample,
-      const double cutoff,
+      const double upperCutoff,
+      const double lowerCutoff,
       const size_t minimumNrOfSliplinks,
       const double sameStrandCutoff,
       const std::string& seed,
@@ -51,9 +52,14 @@ namespace topo {
                          "Maximum nr. should be larger than minimum, got " +
                            std::to_string(nrOfSliplinksToSample) + " and " +
                            std::to_string(minimumNrOfSliplinks) + ".");
-      INVALIDARG_EXP_IFN(cutoff > 0.0,
+      INVALIDARG_EXP_IFN(upperCutoff > 0.0,
                          "Expected a cutoff > 0.0, got " +
                            std::to_string(cutoff) + ".");
+      INVALIDARG_EXP_IFN(
+        lowerCutoff < upperCutoff,
+        "Expected lower cut-off to be smaller than upper cut-off, got " +
+          std::to_string(lowerCutoff) + " ≥ " + std::to_string(upperCutoff) +
+          ".");
 
       // std::cout << "Randomly finding " << nrOfSliplinksToSample
       //           << " entanglements within cutoff " << cutoff
@@ -123,7 +129,7 @@ namespace topo {
           }
           // then, find neighbouring atoms (but not from the same strand?!)
           std::vector<pylimer_tools::entities::Atom> neighbours =
-            neighbourList.getAtomsCloseTo(a1);
+            neighbourList.getAtomsCloseTo(a1, upperCutoff, lowerCutoff);
           neighbourList.removeAtom(a1, "After querying neighbours.");
           // filter the neighbours to include only those from other strands
           // NOTE: this skews the whole thing a bit
