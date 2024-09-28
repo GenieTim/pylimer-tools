@@ -72,7 +72,8 @@ namespace entities {
     const pylimer_tools::entities::Atom& atom,
     double upperCutoff,
     double lowerCutoff,
-    bool unwrapped)
+    bool unwrapped,
+    bool expectSelf)
   {
 
     if (lowerCutoff > upperCutoff) {
@@ -88,7 +89,7 @@ namespace entities {
 
     size_t indexBasis =
       this->getBucketIndexForTriplet(this->getBucketIndicesForAtom(atom));
-    bool foundSelf = false;
+    bool foundSelf = !expectSelf;
     for (size_t atomIndex : this->neighbourBuckets[indexBasis]) {
       if (this->atoms[atomIndex].getId() == atom.getId()) {
         foundSelf = true;
@@ -198,7 +199,7 @@ namespace entities {
   }
 
   std::tuple<size_t, size_t, size_t> NeighbourList::getBucketIndicesForAtom(
-    const pylimer_tools::entities::Atom& atom)
+    const pylimer_tools::entities::Atom& atom) const
   {
     return std::make_tuple(
       static_cast<size_t>(std::floor(atom.getX() / this->bucketWidthX)),
@@ -208,7 +209,7 @@ namespace entities {
 
   std::vector<size_t> NeighbourList::getCombinedBucketIndicesForAtom(
     const pylimer_tools::entities::Atom& atom,
-    double newCutoff)
+    double newCutoff) const
   {
     std::vector<size_t> result = std::vector<size_t>();
     std::tuple<long int, long int, long int> indexBasis =

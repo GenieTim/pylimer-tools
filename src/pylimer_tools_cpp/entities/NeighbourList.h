@@ -37,7 +37,8 @@ namespace entities {
       const pylimer_tools::entities::Atom& atom,
       double upperCutoff,
       double lowerCutoff = 0.0,
-      bool unwrapped = false);
+      bool unwrapped = false,
+      bool expectSelf = false);
 
     void removeAtom(const Atom& atom, const std::string debugHint = "");
 
@@ -48,11 +49,11 @@ namespace entities {
       std::tuple<long int, long int, long int> ind) const;
 
     std::tuple<size_t, size_t, size_t> getBucketIndicesForAtom(
-      const pylimer_tools::entities::Atom& atom);
+      const pylimer_tools::entities::Atom& atom) const;
 
     std::vector<size_t> getCombinedBucketIndicesForAtom(
       const pylimer_tools::entities::Atom& atom,
-      double newCutoff);
+      double newCutoff) const;
 
   private:
     double bucketWidthX;
