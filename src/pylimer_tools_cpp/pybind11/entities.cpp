@@ -551,7 +551,7 @@ init_pylimer_bound_entities(py::module_& m)
          py::arg("box"),
          py::arg("cutoff"))
     .def("get_atoms_close_to",
-         py::overload_cast<const Atom&, double, double, bool>(
+         py::overload_cast<const Atom&, double, double, bool, bool>(
            &NeighbourList::getAtomsCloseTo),
          R"pbdoc(
           List all atoms that are close to a given one. 
@@ -561,15 +561,14 @@ init_pylimer_bound_entities(py::module_& m)
           For performance reasons, it is recommended to initialize a 
           new NeighbourList if you require a different cutoff, depending on your use case.
 
-          You can use a negative value for the newCutoff to use the cutoff used for 
+          You can use a negative value for the upper_cutoff to use the cutoff used for 
           filling the neighbour list buckets.
-
-
          )pbdoc",
          py::arg("atom"),
          py::arg("upper_cutoff") = 1.0,
          py::arg("lower_cutoff") = 0.0,
-         py::arg("unwrapped") = true)
+         py::arg("unwrapped") = false,
+         py::arg("expect_self") = false)
     .def("remove_atom",
          &NeighbourList::removeAtom,
          R"pbdoc(
