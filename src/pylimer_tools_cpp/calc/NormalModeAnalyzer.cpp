@@ -83,6 +83,9 @@ namespace calc {
     Eigen::MatrixXd assembledConnectivityMatrixDense =
       Eigen::MatrixXd(this->assembledConnectivityMatrix);
 #ifndef EIGEN_USE_LAPACKE
+    std::cerr << "Eigen LAPACK is not available, using Eigen's "
+                 "SelfAdjointEigenSolver instead. Expect reduced performance."
+              << std::endl;
     Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver =
       Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd>(
         assembledConnectivityMatrixDense,
