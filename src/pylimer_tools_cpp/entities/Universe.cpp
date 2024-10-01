@@ -7,7 +7,7 @@
 #include "Box.h"
 #include "NeighbourList.h"
 
-#include "../utils/EigenDense.h"enDense.h"
+#include "../utils/EigenDense.h"
 
 extern "C"
 {
