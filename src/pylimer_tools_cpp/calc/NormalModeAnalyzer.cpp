@@ -9,6 +9,11 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
+#ifdef EIGEN_USE_LAPACKE
+#include <complex>
+#define lapack_complex_float std::complex<float>
+#define lapack_complex_double std::complex<double>
+#endif
 
 namespace pylimer_tools {
 namespace calc {
