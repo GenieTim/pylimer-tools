@@ -7,7 +7,7 @@
 #include "../sim/OutputSupportingSimulation.h"
 #include "../utils/ExtraEigenTypes.h"
 #include "../utils/PerformanceTimer.h"
-#include <Eigen/Dense>
+#include "../utils/EigenDense.h"enDense.h"
 #include <algorithm>
 #include <array>
 #include <cassert>

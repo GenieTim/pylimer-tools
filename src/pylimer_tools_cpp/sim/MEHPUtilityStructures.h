@@ -3,7 +3,7 @@
 
 #include "../utils/ExtraEigenTypes.h"
 #include "../utils/utilityMacros.h"
-#include <Eigen/Dense>
+#include "../utils/EigenDense.h"
 #include <map>
 #include <set>
 #include <unordered_map>

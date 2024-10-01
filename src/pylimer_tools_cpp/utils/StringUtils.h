@@ -1,7 +1,7 @@
 #ifndef STRING_UTIL_H
 #define STRING_UTIL_H
 
-#include <Eigen/Dense>
+#include "../utils/EigenDense.h"
 #include <algorithm>
 #include <cstring>
 #include <iostream>

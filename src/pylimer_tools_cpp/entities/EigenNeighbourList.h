@@ -7,7 +7,7 @@ extern "C"
 }
 #include "../utils/ExtraEigenTypes.h"
 #include "Box.h"
-#include <Eigen/Dense>
+#include "../utils/EigenDense.h"
 #include <iostream>
 #include <map>
 #include <set>

@@ -4,7 +4,7 @@
 #include "../utils/LammpsAtomStyle.h"
 #include "../utils/VectorUtils.h"
 #include "Universe.h"
-#include <Eigen/Dense>
+#include "../utils/EigenDense.h"
 #include <algorithm>
 #include <iostream>
 #include <string>

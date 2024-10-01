@@ -8,7 +8,7 @@ extern "C"
 #include "../utils/utilityMacros.h"
 #include "Box.h"
 #include "EigenNeighbourList.h"
-#include <Eigen/Dense>
+#include "../utils/EigenDense.h"
 #include <algorithm>
 #include <iostream>
 #include <map>

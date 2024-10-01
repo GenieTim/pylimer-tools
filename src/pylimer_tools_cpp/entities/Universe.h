@@ -9,7 +9,7 @@ extern "C"
 #include "Atom.h"
 #include "AtomGraphParent.h"
 #include "Molecule.h"
-#include <Eigen/Dense>
+#include "../utils/EigenDense.h"
 
 #ifdef CEREALIZABLE
 #include <cereal/types/base_class.hpp>

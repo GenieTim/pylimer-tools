@@ -6,7 +6,7 @@ extern "C"
 #include "../utils/StringUtils.h"
 #include "Atom.h"
 #include "AtomGraphParent.h"
-#include <Eigen/Dense>
+#include "../utils/EigenDense.h"
 #include <algorithm>
 #include <map>
 #include <unordered_map>
