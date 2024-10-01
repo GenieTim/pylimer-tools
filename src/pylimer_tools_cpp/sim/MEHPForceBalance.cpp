@@ -5,7 +5,7 @@
 #include "../utils/StringUtils.h"
 #include "../utils/VectorUtils.h"
 // #include "../utils/MemoryUtil.h"
-#include <Eigen/Dense>
+#include "../utils/EigenDense.h"enDense.h"enDense.h"enDense.h"
 #include <algorithm>
 #include <array>
 #include <cassert>

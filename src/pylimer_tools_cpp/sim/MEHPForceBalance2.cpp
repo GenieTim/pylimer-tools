@@ -3,7 +3,7 @@
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
 #include "../utils/VectorUtils.h"
-#include <Eigen/Dense>
+#include "../utils/EigenDense.h"enDense.h"enDense.h"
 #include <algorithm>
 #include <array>
 #include <cassert>

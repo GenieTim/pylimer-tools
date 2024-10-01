@@ -5,7 +5,7 @@
 // #include <iostream>
 #include "ExtraEigenTypes.h"
 #include "utilityMacros.h"
-#include <Eigen/Dense>
+#include "../utils/EigenDense.h"
 #include <cassert>
 #include <iterator>
 #include <map>

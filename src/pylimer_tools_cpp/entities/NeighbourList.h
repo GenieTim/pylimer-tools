@@ -8,7 +8,7 @@ extern "C"
 #include "../utils/VectorUtils.h"
 #include "Atom.h"
 #include "Box.h"
-#include <Eigen/Dense>
+#include "../utils/EigenDense.h"enDense.h"enDense.h"enDense.h"enDense.h"
 #include <map>
 #include <unordered_map>
 #include <vector>

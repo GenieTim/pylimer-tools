@@ -1,9 +1,9 @@
 #include "./NormalModeAnalyzer.h"
 
 #include "../utils/utilityMacros.h"
-#include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
 #include <Eigen/Sparse>
+#include "../utils/EigenDense.h"
 #include <Spectra/MatOp/SparseGenMatProd.h>
 #include <Spectra/SymEigsSolver.h>
 #include <algorithm>

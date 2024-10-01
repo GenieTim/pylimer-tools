@@ -30,6 +30,8 @@ find_package(LAPACKE)
 if(LAPACKE_FOUND)
 	include_directories(${LAPACKE_INCLUDE_DIRS})
 	add_definitions(-DEIGEN_USE_LAPACKE)
+	add_definitions(-DHAVE_LAPACK_CONFIG_H)
+	add_definitions(-DLAPACK_COMPLEX_CPP)
 endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Intel")

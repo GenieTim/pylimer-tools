@@ -6,7 +6,7 @@ extern "C"
 #include "Atom.h"
 #include "Box.h"
 #include "NeighbourList.h"
-#include <Eigen/Dense>
+#include "../utils/EigenDense.h"
 #include <cmath>
 #include <map>
 #include <unordered_map>
