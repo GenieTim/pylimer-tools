@@ -1,10 +1,10 @@
 
 #include "version_config.h"
+// Include complex for Lapacke, Eigen compat
+#include <pybind11/complex.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <string>
-// Include complex for Lapacke, Eigen compat
-#include <pybind11/complex.h>
 
 namespace py = pybind11;
 
