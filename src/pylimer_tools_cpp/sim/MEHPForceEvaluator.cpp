@@ -2,7 +2,7 @@
 #include "MEHPForceEvaluator.h"
 #include "MEHPForceRelaxation.h"
 #include "MEHPUtilityStructures.h"
-#include "../utils/EigenDense.h"enDense.h"
+#include "../utils/EigenDense.h"
 #include <algorithm>
 #include <array>
 #include <cassert>
