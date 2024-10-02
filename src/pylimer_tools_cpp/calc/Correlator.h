@@ -22,7 +22,7 @@ SOFTWARE.
 #ifndef CORRELATOR_H
 #define CORRELATOR_H
 
-#include "../utils/EigenDense.h"
+#include <Eigen/Dense>
 #include <stdio.h>
 
 namespace pylimer_tools {

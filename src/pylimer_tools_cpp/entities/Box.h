@@ -2,7 +2,7 @@
 #define BOX_H
 
 #include "../utils/utilityMacros.h"
-#include "../utils/EigenDense.h"
+#include <Eigen/Dense>
 #include <array>
 #include <cassert>
 #include <cmath>

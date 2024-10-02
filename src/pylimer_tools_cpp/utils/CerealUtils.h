@@ -11,7 +11,7 @@
 
 #include "./ExtraEigenTypes.h"
 #include "./VectorUtils.h"
-#include "../utils/EigenDense.h"
+#include <Eigen/Dense>
 #include <cereal/archives/binary.hpp>
 #include <cereal/archives/json.hpp>
 #include <cereal/archives/xml.hpp>

@@ -8,7 +8,7 @@
 #include "../sim/MEHPUtilityStructures.h"
 #include "../sim/OutputSupportingSimulation.h"
 #include "../topo/EntanglementDetector.h"
-#include "../utils/EigenDense.h"
+#include <Eigen/Dense>
 #include <algorithm>
 #include <array>
 #include <cassert>

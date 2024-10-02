@@ -7,7 +7,7 @@
 #include "MEHPForceEvaluator.h"
 #include "MEHPUtilityStructures.h"
 #include "OutputSupportingSimulation.h"
-#include "../utils/EigenDense.h"
+#include <Eigen/Dense>
 #include <algorithm>
 #include <array>
 #include <cassert>

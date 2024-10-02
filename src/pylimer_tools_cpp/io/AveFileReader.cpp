@@ -4,7 +4,7 @@
 #include "../utils/StringUtils.h"
 #include "../utils/VectorUtils.h"
 #include "../utils/utilityMacros.h"
-#include "../utils/EigenDense.h"
+#include <Eigen/Dense>
 #include <cstring>
 #include <filesystem>
 #include <fstream> // std::ifstream
