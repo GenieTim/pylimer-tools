@@ -1,7 +1,7 @@
 #ifndef EXTRA_EIGEN_TYPES_H
 #define EXTRA_EIGEN_TYPES_H
 
-#include "../utils/EigenDense.h"
+#include <Eigen/Dense>
 
 namespace Eigen {
 

@@ -5,7 +5,7 @@
 #include "../utils/CerealUtils.h"
 #include "../utils/VectorUtils.h"
 #include "../utils/utilityMacros.h"
-#include "../utils/EigenDense.h"
+#include <Eigen/Dense>
 #include <algorithm>
 #include <array>
 #include <cassert>

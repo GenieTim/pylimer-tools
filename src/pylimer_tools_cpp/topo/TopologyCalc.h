@@ -1,7 +1,7 @@
 #ifndef TOPOLOGY_CALC_H
 #define TOPOLOGY_CALC_H
 
-#include "../utils/EigenDense.h"
+#include <Eigen/Dense>
 
 namespace pylimer_tools {
 namespace topo {

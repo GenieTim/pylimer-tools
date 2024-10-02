@@ -1,9 +1,9 @@
 #include "./NormalModeAnalyzer.h"
 
 #include "../utils/utilityMacros.h"
+#include <Eigen/Dense>
 #include <Eigen/Eigenvalues>
 #include <Eigen/Sparse>
-#include "../utils/EigenDense.h"
 #include <Spectra/MatOp/SparseGenMatProd.h>
 #include <Spectra/SymEigsSolver.h>
 #include <algorithm>
@@ -118,25 +118,26 @@ namespace calc {
       Eigen::VectorXi::Zero(this->assembledConnectivityMatrix.rows() * 2);
 
     // query optimal workspace size
-    int info =
-      LAPACKE_dsyevr(assembledConnectivityMatrixDense.rows(), // matrix_order
-                     includeEigenvectors ? 'V' : 'N',         // JOBZ
-                     'A',                                     // RANGE
-                     'U',                                     // UPLO
-                     assembledConnectivityMatrixDense.rows(), // N
-                     assembledConnectivityMatrixDense.data(), // A
-                     assembledConnectivityMatrixDense.rows(), // LDA
-                     0,                                       // VL
-                     0,                                       // VU
-                     il,                                      // IL
-                     il,                                      // IU
-                     abstol,                                  // ABSTOL
-                     &M,                 // M, total number of eigenvalues found
-                     eigenvalues.data(), // W
-                     eigenvectors.data(), // Z
-                     eigenvectors.rows(), // LDZ
-                     support.data()       // ISUPPZ
-      );
+    int info = LAPACKE_dsyevr(Eigen::MatrixXd::IsRowMajor
+                                ? LAPACK_ROW_MAJOR
+                                : LAPACK_COL_MAJOR,            // matrix_order
+                              includeEigenvectors ? 'V' : 'N', // JOBZ
+                              'A',                             // RANGE
+                              'U',                             // UPLO
+                              assembledConnectivityMatrixDense.rows(), // N
+                              assembledConnectivityMatrixDense.data(), // A
+                              assembledConnectivityMatrixDense.rows(), // LDA
+                              0,                                       // VL
+                              0,                                       // VU
+                              il,                                      // IL
+                              il,                                      // IU
+                              abstol,                                  // ABSTOL
+                              &M, // M, total number of eigenvalues found
+                              eigenvalues.data(),  // W
+                              eigenvectors.data(), // Z
+                              eigenvectors.rows(), // LDZ
+                              support.data()       // ISUPPZ
+    );
 
     RUNTIME_EXP_IFN(info == 0,
                     "Error in LAPACK_dsyevr. Exit code " +

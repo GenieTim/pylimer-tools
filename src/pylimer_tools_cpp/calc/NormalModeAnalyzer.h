@@ -3,7 +3,7 @@
 
 #include "../utils/CerealUtils.h"
 #include <Eigen/Sparse>
-#include "../utils/EigenDense.h"
+#include <Eigen/Dense>
 #ifdef CEREALIZABLE
 #include <cereal/access.hpp>
 #endif

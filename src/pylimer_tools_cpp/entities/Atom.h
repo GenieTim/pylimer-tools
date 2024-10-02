@@ -2,7 +2,7 @@
 #define ATOM_H
 
 #include "Box.h"
-#include "../utils/EigenDense.h"
+#include <Eigen/Dense>
 #include <algorithm>
 #include <cassert>
 #include <cmath>
