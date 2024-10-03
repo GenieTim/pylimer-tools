@@ -15,6 +15,7 @@ Box
       ~Box.get_high_x
       ~Box.get_high_y
       ~Box.get_high_z
+      ~Box.get_l
       ~Box.get_low_x
       ~Box.get_low_y
       ~Box.get_low_z
@@ -32,6 +33,7 @@ Box
    .. automethod:: get_high_x
    .. automethod:: get_high_y
    .. automethod:: get_high_z
+   .. automethod:: get_l
    .. automethod:: get_low_x
    .. automethod:: get_low_y
    .. automethod:: get_low_z
