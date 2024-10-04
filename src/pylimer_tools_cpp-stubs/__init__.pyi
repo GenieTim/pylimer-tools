@@ -1851,7 +1851,7 @@ class NeighbourList:
         """
         Instantiates a new neighbour list
         """
-    def get_atoms_close_to(self, atom: Atom, upper_cutoff: float = 1.0, lower_cutoff: float = 0.0, unwrapped: bool = True) -> list[Atom]:
+    def get_atoms_close_to(self, atom: Atom, upper_cutoff: float = 1.0, lower_cutoff: float = 0.0, unwrapped: bool = False, expect_self: bool = False) -> list[Atom]:
         """
                   List all atoms that are close to a given one. 
         
@@ -1860,7 +1860,7 @@ class NeighbourList:
                   For performance reasons, it is recommended to initialize a 
                   new NeighbourList if you require a different cutoff, depending on your use case.
         
-                  You can use a negative value for the newCutoff to use the cutoff used for 
+                  You can use a negative value for the upper_cutoff to use the cutoff used for 
                   filling the neighbour list buckets.
         """
     def remove_atom(self, atom: Atom, debug_hint: str = '') -> None:

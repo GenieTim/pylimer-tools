@@ -975,6 +975,10 @@ init_pylimer_bound_entities(py::module_& m)
          &Universe::computeBondLengths,
          "Computes the length :math:`b` of each bond in the molecule, "
          "respecting periodic boundaries.")
+    .def("compute_angles",
+         &Universe::computeAngles,
+         "Computes the angle :math:`\\theta` of each angle in the molecule, "
+         "respecting periodic boundaries.")
     .def("detect_angles",
          &Universe::detectAngles,
          R"pbdoc(Returns just as 

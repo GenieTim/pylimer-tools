@@ -420,7 +420,14 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                          detectedAngles["angle_via"],
                          detectedAngles["angle_to"],
                          angleTypes);
+      CHECK(detectedAngles["angle_from"][0] == 7);
+      CHECK(detectedAngles["angle_to"][0] == 2);
+      CHECK(detectedAngles["angle_via"][0] == 1);
       REQUIRE(universe.getAngles()["angle_from"].size() == 8);
+
+      std::vector<double> angles = universe.computeAngles();
+      REQUIRE(angles.size() == 8);
+      CHECK(Catch::Approx(angles[0]) == 104.036);
     }
 
     SECTION("get dihedral angles returns")
