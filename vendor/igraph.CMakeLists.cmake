@@ -40,7 +40,7 @@ if (NOT DEFINED igraph_LOADED)
 					UPDATE_DISCONNECTED ON
 			)
 			# FetchContent_MakeAvailable(igraphLib)
-			add_library(igraph SHARED IMPORTED)
+			add_library(igraph::igraph SHARED IMPORTED)
 			add_dependencies(igraph::igraph igraphLib)
 			if (MSVC)
 				set(igraph_INCLUDE_DIRS "${igraph_PREFIX_PATH}/igraphLib-install/include" "${igraph_PREFIX_PATH}/src/igraphLib/msvc/include")
