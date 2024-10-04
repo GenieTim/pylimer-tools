@@ -349,6 +349,19 @@ TEST_CASE("Box can interpolate", "[entity][Box]")
   }
 }
 
+TEST_CASE("Box can compute bounding box", "[entity][Box]")
+{
+  std::cout << "Running test \"Box can compute bounding box\"" << std::endl;
+  pe::Box box = pe::Box(10., 10., 10.);
+  pe::Box boundingBox = box.computeBoundingBox();
+  CHECK(box == boundingBox);
+  box.applySimpleShear(0.1, 0);
+  boundingBox = box.computeBoundingBox();
+  CHECK(box.getLy() == boundingBox.getLy());
+  CHECK(box.getLz() == boundingBox.getLz());
+  CHECK(box.getLx() * 1.1 == Catch::Approx(boundingBox.getLx()));
+}
+
 TEST_CASE("Atoms persist state", "[entity][Atom]")
 {
   std::cout << "Running test \"Atoms persist state\"" << std::endl;
