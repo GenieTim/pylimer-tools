@@ -140,7 +140,7 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
     std::vector<int> angleTypes;
     angleTypes.reserve(angles["angle_from"].size());
     for (size_t i = 0; i < angles["angle_from"].size(); i++) {
-      angleTypes.push_back(1);
+      angleTypes.push_back(i % 4);
     }
     universe.addAngles(angles["angle_from"],
                        angles["angle_via"],
@@ -187,7 +187,26 @@ TEST_CASE("Writers can be used", "[utils][DataFileWriter][DataFileParser]")
     CHECK(universe.getNrOfDihedralAngles() ==
           readUniverse.getNrOfDihedralAngles());
 
-    std::filesystem::remove(fileToWrite);
+    auto newBonds = readUniverse.getBonds();
+    auto oldBonds = universe.getBonds();
+
+    for (size_t i = 0; i < newBonds.size(); i++) {
+      CHECK(newBonds["bond_type"][i] == oldBonds["bond_type"][i]);
+      CHECK(newBonds["bond_from"][i] == oldBonds["bond_from"][i]);
+      CHECK(newBonds["bond_to"][i] == oldBonds["bond_to"][i]);
+    }
+
+    auto newAngles = readUniverse.getAngles();
+    auto oldAngles = universe.getAngles();
+
+    for (size_t i = 0; i < newAngles.size(); i++) {
+      CHECK(newAngles["angle_type"][i] == oldAngles["angle_type"][i]);
+      CHECK(newAngles["angle_from"][i] == oldAngles["angle_from"][i]);
+      CHECK(newAngles["angle_via"][i] == oldAngles["angle_via"][i]);
+      CHECK(newAngles["angle_to"][i] == oldAngles["angle_to"][i]);
+    }
+
+    // std::filesystem::remove(fileToWrite);
   }
 }
 

@@ -380,9 +380,11 @@ namespace utils {
     }
     void writeAtoms(std::ofstream& file)
     {
-      file << "Atoms # "
-           << pylimer_tools::utils::getAtomStyleString(this->atomStyle)
-           << "\n\n";
+      file << "Atoms # ";
+      if (this->customAtomFormat.empty()) {
+        file << pylimer_tools::utils::getAtomStyleString(this->atomStyle);
+      }
+      file << "\n\n";
 
       this->oldNewAtomIdMap.reserve(this->universe.getNrOfAtoms());
       int nAtomsOutput = 0;
