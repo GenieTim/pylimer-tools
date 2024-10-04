@@ -75,6 +75,10 @@ init_pylimer_bound_entities(py::module_& m)
 
             :math:`V = L_x \cdot L_y \cdot L_z`
             )pbdoc")
+    .def(
+      "get_l", [](const Box& box) { return box.getL(); }, R"pbdoc(
+          Get the three lengths of the box in an array/list.
+      )pbdoc")
     .def("get_lx", &Box::getLx, R"pbdoc(
             Get the length of the box in x direction.
             )pbdoc")

@@ -109,8 +109,9 @@ namespace calc {
       includeEigenvectors
         ? Eigen::MatrixXd::Zero(this->assembledConnectivityMatrix.rows(),
                                 this->assembledConnectivityMatrix.rows())
-        : Eigen::MatrixXd::Zero(3, 3);
+        : Eigen::MatrixXd::Zero(this->assembledConnectivityMatrix.rows(), 3);
     int il = 0;
+    int iu = 0;
     double abstol = 1e-10;
     int M = 0;
 
@@ -130,13 +131,13 @@ namespace calc {
                               0,                                       // VL
                               0,                                       // VU
                               il,                                      // IL
-                              il,                                      // IU
+                              iu,                                      // IU
                               abstol,                                  // ABSTOL
                               &M, // M, total number of eigenvalues found
-                              eigenvalues.data(),  // W
-                              eigenvectors.data(), // Z
-                              eigenvectors.rows(), // LDZ
-                              support.data()       // ISUPPZ
+                              eigenvaluesMemory.data(),     // W
+                              eigenvectorsMemory.data(),    // Z
+                              eigenvectorsMemory.cols(), // LDZ
+                              support.data()                // ISUPPZ
     );
 
     RUNTIME_EXP_IFN(info == 0,
