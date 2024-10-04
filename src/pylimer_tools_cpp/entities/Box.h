@@ -137,6 +137,15 @@ namespace entities {
       this->recomputeBoxProperties();
     }
 
+    Box(const Box& other)
+    {
+      this->loCoords = other.loCoords;
+      this->hiCoords = other.hiCoords;
+      this->shearDirection = other.shearDirection;
+      this->simpleShearMagnitude = other.simpleShearMagnitude;
+      this->recomputeBoxProperties();
+    }
+
     inline bool operator==(const Box& rhs) const
     {
       const Box& lhs = *this;
@@ -179,6 +188,12 @@ namespace entities {
 
     double getShearMagnitude() const { return this->simpleShearMagnitude; }
     int getShearDirection() const { return this->shearDirection; }
+    bool isSheared() const
+    {
+      return this->getShearMagnitude() != 0 &&
+             (this->getShearDirection() >= 0 && this->getShearDirection() <= 2);
+      ;
+    }
 
     template<typename T>
     inline std::vector<T> minImageDistances(std::vector<T>& coords) const
@@ -293,14 +308,13 @@ namespace entities {
             newBox.getShearMagnitude() * coords[3 * i]; // z' = z + ɣ*x
         }
       }
-    }
+    };
 
     template<typename VectorType>
     inline void handlePBC(VectorType& distances) const
     {
-      const bool isSheared =
-        (this->getShearDirection() >= 0 && this->getShearDirection() <= 2);
-      if (isSheared) {
+      const bool sheared = this->isSheared();
+      if (sheared) {
         INVALIDARG_EXP_IFN(distances.size() % 3 == 0,
                            "Require distances to be a multiple of 3 to handle "
                            "PBC for sheared box.");
@@ -323,7 +337,7 @@ namespace entities {
       // actually do PBC
       this->minImageDistances(distances);
       // back to the physical space
-      if (isSheared) {
+      if (sheared) {
         // scaled coordinates in the initial cubic box
         for (int j = 0; j < distances.size() / 3; ++j) {
           if (this->getShearDirection() == 0) {
@@ -379,6 +393,24 @@ namespace entities {
                                         : this->getShearDirection());
 
       return newBox;
+    }
+
+    Box getBoundingBox() const
+    {
+      if (this->isSheared()) {
+        Eigen::Vector3d lowerCorner = this->getLowL();
+        this->handlePBC(lowerCorner);
+        Eigen::Vector3d upperCorner = this->getHighL();
+        this->handlePBC(upperCorner);
+
+        return Box(lowerCorner[0],
+                   upperCorner[0],
+                   lowerCorner[1],
+                   upperCorner[1],
+                   lowerCorner[2],
+                   upperCorner[2]);
+      }
+      return Box(*this);
     }
 
 #ifdef CEREALIZABLE
