@@ -12,6 +12,7 @@ Box
 
       ~Box.apply_pbc
       ~Box.apply_simple_shear
+      ~Box.get_bounding_box
       ~Box.get_high_x
       ~Box.get_high_y
       ~Box.get_high_z
@@ -30,6 +31,7 @@ Box
 
    .. automethod:: apply_pbc
    .. automethod:: apply_simple_shear
+   .. automethod:: get_bounding_box
    .. automethod:: get_high_x
    .. automethod:: get_high_y
    .. automethod:: get_high_z
