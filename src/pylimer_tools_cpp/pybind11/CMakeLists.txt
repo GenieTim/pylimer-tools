@@ -7,7 +7,7 @@ set_target_properties(pylimer_tools_bindings PROPERTIES LINKER_LANGUAGE CXX)
 include(${CMAKE_CURRENT_LIST_DIR}/../../../vendor/CMakeLists.txt)
 include(${CMAKE_CURRENT_LIST_DIR}/../../../vendor/myConfigureFile.cmake)
 
-add_dependencies(pylimer_tools_bindings igraphLib)
+add_dependencies(pylimer_tools_bindings igraph::igraph)
 include_directories(${igraph_INCLUDE_DIRS})
 target_link_libraries(pylimer_tools_bindings PUBLIC ${igraph_LIBRARIES})
 

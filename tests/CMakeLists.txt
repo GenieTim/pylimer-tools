@@ -127,7 +127,7 @@ add_library(header_test_sources
 		pylimer_tools/test_calc.cpp
 		pylimer_tools/test_vector_utils.cpp
 )
-add_dependencies(header_test_sources igraph)
+add_dependencies(header_test_sources igraph::igraph)
 add_dependencies(header_test_sources cerealLib)
 #add_dependencies(header_test_sources pylimer_tools)
 target_link_libraries(header_test_sources PUBLIC 
@@ -140,7 +140,7 @@ target_link_libraries(header_test_sources PUBLIC Eigen3::Eigen)
 # separate the header tests out, for the coverage generation
 add_executable(header_tests pylimer_tools/test_headers.cpp)
 
-add_dependencies(header_tests igraphLib)
+add_dependencies(header_tests igraph::igraph)
 add_dependencies(header_tests header_test_sources)
 
 target_link_libraries(header_tests 
