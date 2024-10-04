@@ -638,7 +638,11 @@ namespace entities {
                                  &typesVec)) {
         throw std::runtime_error("Failed to fetch type attribute");
       }
-      pylimer_tools::utils::igraphVectorTToStdVector(&typesVec, type);
+      assert(igraph_vector_size(&typesVec) == this->getNrOfEdges());
+      for (size_t i = 0; i < this->getNrOfEdges(); ++i) {
+        type.push_back(igraphRealToInt<long int>(
+          igraph_vector_get(&typesVec, i)));
+      }
       igraph_vector_destroy(&typesVec);
     } else {
       for (size_t i = 0; i < this->getNrOfEdges(); ++i) {

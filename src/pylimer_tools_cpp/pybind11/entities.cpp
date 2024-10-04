@@ -94,16 +94,10 @@ init_pylimer_bound_entities(py::module_& m)
             )pbdoc")
     .def("get_low_z", &Box::getLowZ)
     .def("get_high_z", &Box::getHighZ)
-    .def("get_offset",
-         &Box::getOffset,
-         R"pbdoc(
-     Compute the offset required to compensate for periodic boundary conditions.
-
-     Useful e.g. if you are using absolute coordinates for distances, but 
-     still need an infinite network, 
-     e.g., if the bonds need to be able to get longer than half the box.
-    )pbdoc",
-         py::arg("distances"))
+    .def("get_bounding_box", &Box::getBoundingBox, R"pbdoc(
+     Get an orthogonal box that encloses this box.
+     For non-sheared boxes, the resulting box is identical to the current box.
+    )pbdoc")
     .def(
       "apply_pbc",
       [](const Box& box, const Eigen::VectorXd& distances) {
@@ -115,6 +109,16 @@ init_pylimer_bound_entities(py::module_& m)
       Apply periodic boundary conditions (PBC): adjust the specified distances to fit into this box.
       )pbdoc",
       py::arg("distances"))
+    .def("get_offset",
+         &Box::getOffset,
+         R"pbdoc(
+     Compute the offset required to compensate for periodic boundary conditions.
+
+     Useful e.g. if you are using absolute coordinates for distances, but 
+     still need an infinite network, 
+     e.g., if the bonds need to be able to get longer than half the box.
+    )pbdoc",
+         py::arg("distances"))
     .def("is_valid_offset",
          &Box::isValidOffset,
          R"pbdoc(

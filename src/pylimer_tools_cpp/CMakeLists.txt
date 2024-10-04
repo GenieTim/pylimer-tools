@@ -27,7 +27,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/CMakeLists.txt)
 
 include(${CMAKE_CURRENT_LIST_DIR}/../../vendor/myConfigureFile.cmake)
 
-add_dependencies(pylimer_tools igraph)
+add_dependencies(pylimer_tools igraph::igraph)
 include_directories(${igraph_INCLUDE_DIRS})
 add_dependencies(pylimer_tools nlopt)
 include_directories(${nlopt_INCLUDE_DIRS})
