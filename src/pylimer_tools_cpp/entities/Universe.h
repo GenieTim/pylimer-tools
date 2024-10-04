@@ -124,6 +124,7 @@ namespace entities {
     std::vector<Atom> getAtoms() const;
     // std::map<std::st¨ring, std::vector<long int>> getBonds() const;
     std::map<std::string, std::vector<long int>> getAngles() const;
+    std::vector<double> computeAngles() const;
     std::map<std::string, std::vector<long int>> getDihedralAngles() const;
     std::vector<Universe> getClusters() const;
     std::vector<Molecule> getMolecules(const int atomTypeToOmit = -1) const;

@@ -1799,6 +1799,33 @@ namespace entities {
   }
 
   /**
+   * @brief Compute the magnitude of the angles stored in this universe
+   *
+   * @return std::vector<double>
+   */
+  std::vector<double> Universe::computeAngles() const
+  {
+    RUNTIME_EXP_IFN(all_equal<size_t>(4,
+                                      this->angleFrom.size(),
+                                      this->angleTo.size(),
+                                      this->angleVia.size(),
+                                      this->angleType.size()),
+                    "Angles' state is inconsistent.");
+    std::vector<double> results;
+    results.reserve(this->getNrOfAngles());
+    for (size_t i = 0; i < this->angleFrom.size(); ++i) {
+      Eigen::Vector3d vec1 =
+        this->getAtom(this->angleVia[i])
+          .vectorTo(this->getAtom(this->angleTo[i]), this->getBox());
+      Eigen::Vector3d vec2 =
+        this->getAtom(this->angleVia[i])
+          .vectorTo(this->getAtom(this->angleFrom[i]), this->getBox());
+      results.push_back(std::acos(vec1.dot(vec2)));
+    }
+    return results;
+  }
+
+  /**
    * @brief Get all dihedral angles stored in this universe
    *
    * @return std::map<std::string, std::vector<long int>>
