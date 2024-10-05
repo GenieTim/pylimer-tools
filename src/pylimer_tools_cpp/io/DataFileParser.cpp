@@ -1,5 +1,6 @@
 #include "DataFileParser.h"
 #include "../utils/StringUtils.h"
+#include "../utils/utilityMacros.h"
 #include <algorithm>
 #include <filesystem>
 #include <fstream> // std::ifstream
@@ -371,6 +372,10 @@ namespace utils {
                           &nx,
                           &ny,
                           &nz);
+
+    RUNTIME_EXP_IFN(resFound < 8,
+                    "Did not find enough data in line '" + line + "': only " +
+                      std::to_string(resFound) + ".");
 
     this->atomIds.push_back(atomId);
     this->moleculeIds.push_back(moleculeId);

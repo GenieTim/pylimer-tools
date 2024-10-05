@@ -640,8 +640,8 @@ namespace entities {
       }
       assert(igraph_vector_size(&typesVec) == this->getNrOfEdges());
       for (size_t i = 0; i < this->getNrOfEdges(); ++i) {
-        type.push_back(igraphRealToInt<long int>(
-          igraph_vector_get(&typesVec, i)));
+        type.push_back(
+          igraphRealToInt<long int>(igraph_vector_get(&typesVec, i)));
       }
       igraph_vector_destroy(&typesVec);
     } else {

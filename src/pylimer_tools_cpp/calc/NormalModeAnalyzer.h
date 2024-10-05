@@ -2,8 +2,8 @@
 #define NORMAL_MODE_ANALYZER_H
 
 #include "../utils/CerealUtils.h"
-#include <Eigen/Sparse>
 #include <Eigen/Dense>
+#include <Eigen/Sparse>
 #ifdef CEREALIZABLE
 #include <cereal/access.hpp>
 #endif
