@@ -134,10 +134,10 @@ namespace calc {
                               iu,                                      // IU
                               abstol,                                  // ABSTOL
                               &M, // M, total number of eigenvalues found
-                              eigenvaluesMemory.data(),     // W
-                              eigenvectorsMemory.data(),    // Z
+                              eigenvaluesMemory.data(),  // W
+                              eigenvectorsMemory.data(), // Z
                               eigenvectorsMemory.cols(), // LDZ
-                              support.data()                // ISUPPZ
+                              support.data()             // ISUPPZ
     );
 
     RUNTIME_EXP_IFN(info == 0,

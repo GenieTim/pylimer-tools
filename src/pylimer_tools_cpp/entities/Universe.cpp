@@ -1022,8 +1022,8 @@ namespace entities {
           long int originalNeighbourAtomId = igraphRealToInt<long int>(
             igraph_cattribute_VAN(&graph, "id", atomToAddOriginalIdx));
           assert(originalNeighbourAtomId == 0 ||
-                   !pylimer_tools::utils::graphHasVertexWithProperty<long int>(
-                     chain, "id", originalNeighbourAtomId));
+                 !pylimer_tools::utils::graphHasVertexWithProperty<long int>(
+                   chain, "id", originalNeighbourAtomId));
 
           // including all attributes
           pylimer_tools::utils::copyVertexProperties(
