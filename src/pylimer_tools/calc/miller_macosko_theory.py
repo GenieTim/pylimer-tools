@@ -652,7 +652,7 @@ def compute_modulus_decomposition(
             * 1e-6
             * 94.79281
         ) * unit_style.get_underlying_unit_registry()("MPa")
-        # -> MPa, melt entanglement modulus
+        # -> MPa, melt entanglement modulus of PDMS
 
     # affine
     g_anm = nu * unit_style.kB * temperature

@@ -483,6 +483,10 @@ namespace sim {
      */
     double MEHPForceRelaxation::getGammaFactor(double b02, int nrOfChains) const
     {
+      if (this->forceRelaxationNetwork.springsContourLength.size() == 0) {
+        return 0.0;
+      }
+
       if (b02 < 0) {
         b02 = this->defaultR0Squared /
               this->forceRelaxationNetwork.springsContourLength.mean();

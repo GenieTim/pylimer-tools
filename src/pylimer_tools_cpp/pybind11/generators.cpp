@@ -36,6 +36,7 @@ init_pylimer_bound_generators(py::module_& m)
             Add the cross-linkers.
             )pbdoc",
          py::arg("nr_of_crosslinkers"),
+         py::arg("crosslinker_functionality") = 4,
          py::arg("crosslinker_type") = 2)
     .def("add_solvent_chains",
          &MCUniverseGenerator::addSolventChains,
@@ -46,7 +47,7 @@ init_pylimer_bound_generators(py::module_& m)
          py::arg("solvent_chain_length"),
          py::arg("solvent_atom_type") = 3)
     .def("add_and_link_strands",
-         py::overload_cast<int, std::vector<int>, double, int, int>(
+         py::overload_cast<int, std::vector<int>, double, int>(
            &MCUniverseGenerator::addAndLinkStrands),
          R"pbdoc(
             Actually add strands, link them to the previously added cross-linkers.
@@ -54,7 +55,6 @@ init_pylimer_bound_generators(py::module_& m)
          py::arg("nr_of_strands"),
          py::arg("strand_lengths"),
          py::arg("crosslinker_conversion"),
-         py::arg("crosslinker_functionality"),
          py::arg("strand_atom_type") = 1)
     .def("get_universe", &MCUniverseGenerator::getUniverse, R"pbdoc(
             Fetch the current (or final) state of the universe.
