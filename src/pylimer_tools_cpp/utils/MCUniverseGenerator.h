@@ -82,22 +82,23 @@ namespace utils {
       return universe;
     };
 
-    void addCrosslinkers(int nrOfCrosslinkers, int crossLinkerAtomType = 2)
+    void addCrosslinkers(int nrOfCrosslinkers,
+                         int crosslinkerFunctionality = 4,
+                         int crossLinkerAtomType = 2)
     {
-      if (this->crossLinkerType != crossLinkerAtomType) {
-        if (this->crossLinkerType != 0) {
-          throw std::invalid_argument(
-            "Crosslinkers must all have the same type.");
-        }
-        this->crossLinkerType = crossLinkerAtomType;
-      }
+      int nCrosslinkerBefore = this->remainingCrossLinkerFunctionality.size();
+
       std::vector<size_t> newCrosslinkerIdxs =
         this->addAtomsWithType(nrOfCrosslinkers, crossLinkerAtomType);
-      this->crossLinkerIdxs.reserve(this->crossLinkerIdxs.size() +
-                                    newCrosslinkerIdxs.size());
       this->crossLinkerIdxs.insert(this->crossLinkerIdxs.end(),
                                    newCrosslinkerIdxs.begin(),
                                    newCrosslinkerIdxs.end());
+      this->remainingCrossLinkerFunctionality.reserve(nCrosslinkerBefore +
+                                                      nrOfCrosslinkers);
+      for (size_t i = 0; i < nrOfCrosslinkers; ++i) {
+        this->remainingCrossLinkerFunctionality.push_back(
+          crosslinkerFunctionality);
+      }
     };
 
     /**
@@ -129,22 +130,31 @@ namespace utils {
      *
      * @param nrOfStrands the nr. of Strands to add
      * @param beadsPerChains the nr. of beads per strand (excl. cross-linkers)
-     * @param crossLinkerConversion "p", the target conversion of the
+     * @param targetCrossLinkerConversion "p", the target conversion of the
      * cross-linkers
-     * @param crossLinkerFunctionality the functionality of the cross-linker
-     * beads to add
      * @param strandAtomType the type of the strand atoms
      */
     void addAndLinkStrands(int nrOfStrands,
                            std::vector<int> beadsPerChains,
-                           double crossLinkerConversion,
-                           int crossLinkerFunctionality = 4,
+                           double targetCrossLinkerConversion,
                            int strandAtomType = 1)
     {
       if (beadsPerChains.size() != nrOfStrands) {
-        throw std::invalid_argument("Nr of strands must be equal to the number "
-                                    "of chainLengths provided.");
+        throw std::invalid_argument(
+          "Nr of strands (" + std::to_string(nrOfStrands) +
+          ") must be equal to the number "
+          "of chainLengths (" +
+          std::to_string(beadsPerChains.size()) + ") provided.");
       }
+
+      INVALIDARG_EXP_IFN(
+        targetCrossLinkerConversion >= 0.0 &&
+          targetCrossLinkerConversion <= 1.0,
+        "Cross-linker conversion must be between 0 and 1, got " +
+          std::to_string(targetCrossLinkerConversion) + ".");
+
+      assert(this->crossLinkerIdxs.size() ==
+             this->remainingCrossLinkerFunctionality.size());
 
       // eager reserve of vectors
       // could be more elaborate, but with a certain probability,
@@ -161,8 +171,6 @@ namespace utils {
                                          nrOfStrands * beadsPerChains[0]);
       this->simplifiedUniverse.z.reserve(this->simplifiedUniverse.z.size() +
                                          nrOfStrands * beadsPerChains[0]);
-      this->simplifiedUniverse.x.reserve(this->simplifiedUniverse.x.size() +
-                                         nrOfStrands * beadsPerChains[0]);
       this->simplifiedUniverse.bondsFrom.reserve(
         this->simplifiedUniverse.bondsFrom.size() +
         nrOfStrands * beadsPerChains[0]);
@@ -171,112 +179,107 @@ namespace utils {
         nrOfStrands * beadsPerChains[0]);
 
       //
-      std::uniform_real_distribution<double> linkerProbabilityDist =
-        std::uniform_real_distribution<double>(0.0, 1.0);
-      std::vector<size_t> crossLinkers = this->crossLinkerIdxs;
-      std::vector<int> availableCrosslinkerSites =
-        initializeWithValue(crossLinkers.size(), crossLinkerFunctionality);
+      long int nCrosslinks = this->crossLinkerIdxs.size();
+      std::uniform_int_distribution<size_t> crosslinkerIdxIdxDist =
+        std::uniform_int_distribution<size_t>(0,
+                                              nCrosslinks - 1);
       int nrOfStrandsAdded = 0;
-      double conversionPerBond =
-        1.0 / (static_cast<double>(crossLinkerFunctionality) *
-               static_cast<double>(crossLinkers.size()));
-      double currentDegreeOfConversion = this->currentCrosslinkerConversion;
+      long int nrOfAvailableSites =
+        std::reduce(this->remainingCrossLinkerFunctionality.begin(),
+                    this->remainingCrossLinkerFunctionality.end(),
+                    0);
 
-      if (currentDegreeOfConversion != 0.0) {
-        throw std::runtime_error(
-          "Not implemented yet. Strands may only be linked once.");
+      double conversionPerBond = (1.0 - this->currentCrosslinkerConversion) /
+                                 (static_cast<double>(nrOfAvailableSites));
+
+      int potentialNewBonds = 2 * nrOfStrands;
+      if (this->currentCrosslinkerConversion +
+            potentialNewBonds * conversionPerBond <
+          targetCrossLinkerConversion) {
+        throw std::invalid_argument(
+          "A cross-linker conversion of " +
+          std::to_string(targetCrossLinkerConversion) +
+          " is not reachable with this nr of strands.");
       }
 
-      // process all cross-linkers
-      for (int i = 0; i < crossLinkers.size(); ++i) {
-        const int availableSitesForThisCrosslinker =
-          availableCrosslinkerSites[i];
-        // loop until this cross-linker is fully connected
-        for (int siteToHandle = availableSitesForThisCrosslinker;
-             siteToHandle > 0;
-             --siteToHandle) {
-          if (availableCrosslinkerSites[i] == 0) {
-            break;
-          }
-          if (currentDegreeOfConversion >= crossLinkerConversion) {
-            break;
-          }
-          // decide what type of site this is
-          bool isActiveSite =
-            linkerProbabilityDist(this->rng) <= crossLinkerConversion;
-          bool isDanglingStrand =
-            linkerProbabilityDist(this->rng) > crossLinkerConversion;
-          // problem: with only the above approach,
-          // the desired crossLinker conversion is only reached "probably".
-          // that is why we introduce a slightly more sophisticated distinction:
-          int remainingStrands = nrOfStrands - nrOfStrandsAdded;
-          if (remainingStrands * conversionPerBond * 2 <=
-              crossLinkerConversion) {
-            isActiveSite = true;
-            isDanglingStrand = false;
-          }
-          if (isActiveSite) {
-            int targetIdx = this->findAppropriateLink(
-              crossLinkers[i],
-              crossLinkers,
-              availableCrosslinkerSites,
-              std::sqrt((double)beadsPerChains[nrOfStrandsAdded]) *
-                this->beadDistance,
-              ((double)beadsPerChains[nrOfStrandsAdded]) * this->beadDistance);
-            if (targetIdx >= 0 && !isDanglingStrand) {
-              double dist =
-                this->distanceBetween(crossLinkers[i], crossLinkers[targetIdx]);
-              if (dist >= ((double)beadsPerChains[nrOfStrandsAdded]) *
-                            this->beadDistance) {
-                std::cout << "Got too far off link: " << targetIdx << " for "
-                          << i << " has dist " << dist << ""
-                          << "" << std::endl;
-              }
-            }
-            if (isDanglingStrand || targetIdx == -1 ||
-                (targetIdx == i && availableCrosslinkerSites[i] == 1)) {
-              // decision is: dangling
-              this->addRandomWalkChainFrom(crossLinkers[i],
-                                           beadsPerChains[nrOfStrandsAdded]);
-            } else {
-              // decision is: connected / network
-              // find close enough crossLinker to do the chain to
+      std::vector<size_t> availableStrandEnds;
+      availableStrandEnds.reserve(2 * nrOfStrands);
+      for (size_t i = 0; i < nrOfStrands; ++i) {
+        availableStrandEnds.push_back(i);
+        availableStrandEnds.push_back(i);
+      }
+      std::shuffle(
+        availableStrandEnds.begin(), availableStrandEnds.end(), this->rng);
 
-              this->addRandomWalkChainFromTo(crossLinkers[i],
-                                             crossLinkers[targetIdx],
-                                             beadsPerChains[nrOfStrandsAdded]);
-              currentDegreeOfConversion += conversionPerBond;
-            }
-            availableCrosslinkerSites[targetIdx] -= 1;
-            nrOfStrandsAdded += 1;
-            currentDegreeOfConversion += conversionPerBond;
+      std::vector<long int> strandEnd1 =
+        pylimer_tools::utils::initializeWithValue<long int>(nrOfStrands, -1);
+      std::vector<long int> strandEnd2 =
+        pylimer_tools::utils::initializeWithValue<long int>(nrOfStrands, -1);
 
-            if (nrOfStrandsAdded >= nrOfStrands &&
-                currentDegreeOfConversion < crossLinkerConversion &&
-                i + 1 < crossLinkers.size()) {
-              throw std::invalid_argument(
-                "Not enough strands to satisfy the "
-                "requested degree of convergence. Current degree: " +
-                std::to_string(currentDegreeOfConversion) + " with " +
-                std::to_string(nrOfStrandsAdded) + " strands added. ");
+      // link one strand at a time until we reach the target conversion
+      for (int sampleIdx = 0; sampleIdx < 2 * nrOfStrands; ++sampleIdx) {
+        if (this->currentCrosslinkerConversion >= targetCrossLinkerConversion) {
+          break;
+        }
+
+        size_t strandIdx = availableStrandEnds[sampleIdx];
+
+        if (strandEnd1[strandIdx] != -1) {
+          // we don't have free cross-link choice
+          assert(strandEnd2[strandIdx] == -1);
+
+          size_t partnerCrosslinker = this->findAppropriateLink(
+            strandEnd1[strandIdx],
+            beadsPerChains[strandIdx] *
+              (this->beadDistance * this->beadDistance),
+            -1. // beadsPerChains[strandIdx] * this->beadDistance
+          );
+
+          strandEnd2[strandIdx] = partnerCrosslinker;
+          this->remainingCrossLinkerFunctionality[partnerCrosslinker] -= 1;
+          this->currentCrosslinkerConversion += conversionPerBond;
+        } else {
+          // otherwise, randomly choose a free cross-link
+          long int crosslinkIdxIdx = crosslinkerIdxIdxDist(this->rng);
+          while (this->remainingCrossLinkerFunctionality[crosslinkIdxIdx] < 1) {
+            // find the next "available" cross-linker
+            // TODO: while in practice this is not a problem,
+            // in theory there are ways to optimize this for larger systems
+            crosslinkIdxIdx += 1;
+            if (crosslinkIdxIdx >= nCrosslinks) {
+              crosslinkIdxIdx = 0;
             }
           }
-          availableCrosslinkerSites[i] -= 1;
+          strandEnd1[strandIdx] = this->crossLinkerIdxs[crosslinkIdxIdx];
+          this->remainingCrossLinkerFunctionality[crosslinkIdxIdx] -= 1;
+          this->currentCrosslinkerConversion += conversionPerBond;
         }
       }
 
-      this->currentCrosslinkerConversion = currentDegreeOfConversion;
-
-      // process the remaining (free) chains
-      for (size_t i = nrOfStrandsAdded; i < nrOfStrands; ++i) {
-        this->addSolventChains(1, beadsPerChains[i], strandAtomType);
+      // now that we know which strands should be connected,
+      // we can do the connection
+      for (int strandIdx = 0; strandIdx < nrOfStrands; ++strandIdx) {
+        if (strandEnd1[strandIdx] == -1) {
+          assert(strandEnd2[strandIdx] == -1);
+          // free chain
+          this->addSolventChains(1, beadsPerChains[strandIdx], strandAtomType);
+        } else if (strandEnd2[strandIdx] == -1) {
+          // dangling strand
+          this->addRandomWalkChainFrom(
+            strandEnd1[strandIdx], beadsPerChains[strandIdx], strandAtomType);
+        } else {
+          assert(strandEnd1[strandIdx] != -1 && strandEnd2[strandIdx] != -1);
+          this->addRandomWalkChainFromTo(strandEnd1[strandIdx],
+                                         strandEnd2[strandIdx],
+                                         beadsPerChains[strandIdx],
+                                         strandAtomType);
+        }
       }
     };
 
     void addAndLinkStrands(int nrOfStrands,
                            int chainLength,
                            double crossLinkerConversion,
-                           int crossLinkerFunctionality = 4,
                            int strandAtomType = 1)
     {
       std::vector<int> chainLengths;
@@ -284,11 +287,8 @@ namespace utils {
       for (int i = 0; i < nrOfStrands; ++i) {
         chainLengths.push_back(chainLength);
       }
-      return this->addAndLinkStrands(nrOfStrands,
-                                     chainLengths,
-                                     crossLinkerConversion,
-                                     crossLinkerFunctionality,
-                                     strandAtomType);
+      return this->addAndLinkStrands(
+        nrOfStrands, chainLengths, crossLinkerConversion, strandAtomType);
     };
 
   private:
@@ -296,13 +296,14 @@ namespace utils {
     double currentCrosslinkerConversion = 0.0;
     int maximumAtomId = 1;
     std::mt19937 rng;
-    int crossLinkerType = 0;
     std::uniform_real_distribution<double> distX;
     std::uniform_real_distribution<double> distY;
     std::uniform_real_distribution<double> distZ;
     std::uniform_real_distribution<double> distSelect;
+
     SimplifiedUniverse simplifiedUniverse;
     std::vector<size_t> crossLinkerIdxs;
+    std::vector<int> remainingCrossLinkerFunctionality;
     pylimer_tools::entities::Box box;
 
     /**
@@ -631,42 +632,43 @@ namespace utils {
      * TODO: check probabilities to not only select the very best.
      *
      * @param from the Atom to start the distance from
-     * @param possiblePartners the Atoms that could be the target
-     * @param desiredDistance the distance to target if possible
+     * @param desiredR02 the distance to target if possible
      * @param maxDistance the maximum distance to accept random matches from
      * @return int the index in possiblePartners that matches best
      */
-    int findAppropriateLink(size_t from,
-                            std::vector<size_t> possiblePartners,
-                            std::vector<int> availablePartnerSites,
-                            const double desiredDistance,
-                            const double maxDistance)
+    size_t findAppropriateLink(size_t from,
+                               const double desiredR02,
+                               const double maxDistance)
     {
-      if (possiblePartners.size() == 0) {
-        throw std::invalid_argument("Cannot find a partner in none.");
-      }
-      // double bestDistance = std::numeric_limits<double>::max();
-      // int bestMatch = -1;
-      std::vector<int> suitableMatches;
-      for (int i = 0; i < possiblePartners.size(); ++i) {
-        if (availablePartnerSites[i] < 1) {
+      assert(this->crossLinkerIdxs.size() ==
+             this->remainingCrossLinkerFunctionality.size());
+
+      std::vector<size_t> suitableMatches;
+      std::vector<double> matchWeights;
+      double sumOfWeights = 0.0;
+      // TODO: use a neighbour list instead, maybe?
+      for (int i = 0; i < this->crossLinkerIdxs.size(); ++i) {
+        if (this->remainingCrossLinkerFunctionality[i] < 1) {
           continue;
         }
-        size_t partner = possiblePartners[i];
+        size_t partner = this->crossLinkerIdxs[i];
         double distBetween = this->distanceBetween(partner, from);
-        if (distBetween < maxDistance) {
-          suitableMatches.push_back(i);
-          // double currDist = std::fabs(distBetween - desiredDistance);
-          // if (currDist < bestDistance) {
-          //   bestDistance = currDist;
-          //   bestMatch = i;
-          // }
+        if (distBetween < maxDistance || maxDistance < 0.) {
+          suitableMatches.push_back(partner);
+          double thisWeight =
+            std::exp(-3. * (distBetween) * (distBetween) / (desiredR02));
+          matchWeights.push_back(thisWeight);
+          sumOfWeights += thisWeight;
         }
       }
 
-      std::uniform_int_distribution<int> idxDist(0, suitableMatches.size() - 1);
-      return suitableMatches.size() == 0 ? -1
-                                         : suitableMatches[idxDist(this->rng)];
+      if (suitableMatches.size() == 0) {
+        throw std::runtime_error("No suitable partner found.");
+      }
+
+      std::discrete_distribution<int> weightDist(matchWeights.begin(),
+                                                 matchWeights.end());
+      return suitableMatches[weightDist(this->rng)];
     }
 
     double distanceBetween(size_t i, size_t j)
