@@ -1161,10 +1161,12 @@ namespace sim {
        */
       double getGammaFactorUsingPartialSprings(
         double oneOverSpringPartitionUpperLimit = 1.,
-        double b = 0.96,
+        double b02 = 0.96,
         int nrOfChains = -1) const;
 
-      double getGammaFactor(double b = 0.96, int nrOfChains = -1) const;
+      double getGammaFactor(double b02 = 0.96, int nrOfChains = -1) const;
+
+      Eigen::VectorXd getGammaFactors(double b02) const;
 
       int getNrOfIterations() const { return this->nrOfStepsDone; }
 

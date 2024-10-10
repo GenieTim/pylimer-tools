@@ -5227,7 +5227,7 @@ namespace sim {
     /**
      * @brief Get the Gamma Factor at the current step
      *
-     * @param b the melt <b>: mean bond length; vgl. the required <R_0^2>,
+     * @param b02 the melt <b>^2: mean bond length; vgl. the required <R_0^2>,
      * computed as phantom = N<b>^2.
      * @param nrOfChains the nr of chains to average over (can be different
      * from the nr of springs thanks to omitted free chains or primary loops)
@@ -5235,11 +5235,11 @@ namespace sim {
      */
     double MEHPForceBalance::getGammaFactorUsingPartialSprings(
       double oneOverSpringPartitionUpperLimit,
-      double b,
+      double b02,
       int nrOfChains) const
     {
-      if (b < 0) {
-        b = this->defaultBondLength;
+      if (b02 < 0) {
+        b02 = this->defaultBondLength * this->defaultBondLength;
       }
       if (nrOfChains < 1) {
         nrOfChains = this->defaultNrOfChains;
@@ -5249,7 +5249,7 @@ namespace sim {
         this->assembleOneOverSpringPartition(this->initialConfig,
                                              this->currentSpringPartitionsVec,
                                              oneOverSpringPartitionUpperLimit) *
-        (1. / (b * b)); // compute the vector of
+        (1. / b02); // compute the vector of
       Eigen::VectorXd partialSpringVectors = this->evaluatePartialSpringVectors(
         this->initialConfig, this->currentDisplacements);
 
@@ -5262,16 +5262,16 @@ namespace sim {
     /**
      * @brief Get the Gamma Factor at the current step
      *
-     * @param b the melt <b>: mean bond length; vgl. the required <R_0^2>,
+     * @param b02 the melt <b>^2: mean bond length; vgl. the required <R_0^2>,
      * computed as phantom = N<b>^2.
      * @param nrOfChains the nr of chains to average over (can be different
      * from the nr of springs thanks to omitted free chains or primary loops)
      * @return double
      */
-    double MEHPForceBalance::getGammaFactor(double b, int nrOfChains) const
+    double MEHPForceBalance::getGammaFactor(double b02, int nrOfChains) const
     {
-      if (b < 0) {
-        b = this->defaultBondLength;
+      if (b02 < 0) {
+        b02 = this->defaultBondLength * this->defaultBondLength;
       }
       if (nrOfChains < 1) {
         nrOfChains = this->defaultNrOfChains;
@@ -5280,7 +5280,7 @@ namespace sim {
       Eigen::VectorXd springVectors = this->evaluateSpringVectors(
         this->initialConfig, this->currentDisplacements);
 
-      double commonDenominator = 1. / (b * b * nrOfChains);
+      double commonDenominator = 1. / (b02 * nrOfChains);
       double result = 0.;
 
       for (size_t i = 0; i < this->initialConfig.nrOfSprings; ++i) {
@@ -5290,6 +5290,19 @@ namespace sim {
       }
 
       return result;
+    }
+
+    Eigen::VectorXd MEHPForceBalance::getGammaFactors(double b02) const
+    {
+      Eigen::VectorXd springVectors = this->evaluateSpringVectors(
+        this->initialConfig, this->currentDisplacements);
+
+      Eigen::VectorXd gammaFactors(springVectors.size() / 3);
+      for (size_t i = 0; i < springVectors.size() / 3; ++i) {
+        gammaFactors(i) = springVectors.segment(3 * i, 3).squaredNorm() /
+                          (this->initialConfig.springsContourLength(i) * b02);
+      }
+      return gammaFactors;
     }
 
     /**

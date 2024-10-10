@@ -2,6 +2,7 @@
 #define RANDOM_WALKER_H
 
 #include "../entities/Box.h"
+#include <Eigen/Dense>
 #include <algorithm>
 #include <cassert>
 #include <iostream>
@@ -50,19 +51,17 @@ namespace utils {
     double lastZ = 0.0;
 
     for (int i = 0; i < chainLen; ++i) {
-      double bondLenToUse = beadDistance;
-
       double alpha = angleDistribution(rng);
       double beta = angleDistribution(rng);
 
       // coordinate system conversion: confirmation e.g. in
       // https://math.stackexchange.com/a/1385150/738831 or
       // https://en.wikipedia.org/wiki/Spherical_coordinate_system
-      xs.push_back(lastX + bondLenToUse * std::cos(beta) * std::sin(alpha));
+      xs.push_back(lastX + beadDistance * std::cos(beta) * std::sin(alpha));
       lastX = xs[i];
-      ys.push_back(lastY + bondLenToUse * std::sin(beta) * std::sin(alpha));
+      ys.push_back(lastY + beadDistance * std::sin(beta) * std::sin(alpha));
       lastY = ys[i];
-      zs.push_back(lastZ + bondLenToUse * std::cos(alpha));
+      zs.push_back(lastZ + beadDistance * std::cos(alpha));
       lastZ = zs[i];
       assert(!isnan(lastX) && !isnan(lastY) && !isnan(lastZ));
     }
@@ -110,89 +109,44 @@ namespace utils {
     std::vector<double> zs;
     zs.reserve(chainLen);
 
-    double lastX = from[0];
-    double lastY = from[1];
-    double lastZ = from[2];
+    Eigen::Vector3d fromVec(from[0], from[1], from[2]);
+    Eigen::Vector3d toVec(to[0], to[1], to[2]);
 
-    std::array<double, 3> dist = { to[0] - from[0],
-                                   to[1] - from[1],
-                                   to[2] - from[2] };
+    Eigen::Vector3d dist = toVec - fromVec;
+    box.handlePBC(dist);
 
-    std::array<double, 3> target = box.minImageDistances(dist);
-
-    for (int i = 0; i < chainLen; ++i) {
-      std::array<double, 3> ds_uncorrected = { target[0] - lastX,
-                                               target[1] - lastY,
-                                               target[2] - lastZ };
-      std::array<double, 3> ds = box.minImageDistances(ds);
-
-      // for primary loops, dx, dy & dz are zero, initially.
-      // therewith, alpha will be NaN
-      double remainingDistance =
-        std::sqrt(ds[0] * ds[0] + ds[1] * ds[1] + ds[2] * ds[2]);
-      // alpha = theta in Wikipedia
-      double idealAlpha =
-        std::acos(std::clamp(ds[2] / remainingDistance, -1.0, 1.0));
-      // beta = phi in Wikipedia
-      double idealBeta =
-        (ds[0] == 0.0) ? (M_PI * 0.5) : (std::atan2(ds[1], ds[0]));
-      double bondLenToUse = beadDistance;
-      double idealWeight = 0.0;
-      double bondsRemaining = ((chainLen - i) + 1);
-      if (((remainingDistance) / (bondsRemaining)) > beadDistance) {
-        // need to constrain, cannot use random alpha & beta
-        // TODO: find some a bit more sophisticated probability adjustment (or
-        // simply use constraints for probability)
-        idealWeight = 1.0;
-        bondLenToUse = remainingDistance / (bondsRemaining);
-        if (bondLenToUse > 2 * beadDistance) {
-          std::cout << "Using bond length: " << bondLenToUse << " for "
-                    << bondsRemaining << " remaining bonds between " << lastX
-                    << ", " << lastY << ", " << lastZ
-                    << " to target: " << target[0] << ", " << target[1] << ", "
-                    << target[2] << " with length " << remainingDistance
-                    << " at i = " << i << " of " << chainLen << std::endl;
-        }
-        // std::min(((double)i) / ((double)chainLen) +
-        //              (remainingDistance / (chainLen - i + 1)),
-        //          1.0);
-      }
-
-      double alpha =
-        (1.0 - idealWeight) * angleDistribution(rng) + idealWeight * idealAlpha;
-      // happens e.g. for primary loops
-      if (isnan(alpha)) {
-        // std::cout << "Got nan for alpha with idealAlpha = " << idealAlpha
-        //           << ", weight = " << idealWeight << ", dx = " << dx
-        //           << ", dy = " << dy << ", dz = " << dz << " at i = " << i
-        //           << std::endl;
-        alpha = isnan(idealAlpha) ? angleDistribution(rng) : idealAlpha;
-      };
-      double beta =
-        (1.0 - idealWeight) * angleDistribution(rng) + idealWeight * idealBeta;
-      if (isnan(beta)) {
-        // std::cout << "Got nan for beta with idealBeta = " << idealBeta
-        //           << ", weight = " << idealWeight << ", dx = " << dx
-        //           << ", dy = " << dy << ", dz = " << dz << " at i = " << i
-        //           << std::endl;
-
-        beta = isnan(idealBeta) ? angleDistribution(rng) : idealBeta;
-      }
-      // std::cout << "Using ideal weight " << idealWeight << " at " << i
-      //           << ", remaining d: " << remainingDistance << " with alpha "
-      //           << alpha << ", ideal " << idealAlpha << ", beta " << beta
-      //           <<
-      //           ", ideal " << idealBeta << std::endl;
+    double lastX = 0.;
+    double lastY = 0.;
+    double lastZ = 0.;
+    for (size_t i = 0; i < chainLen; ++i) {
+      double alpha = angleDistribution(rng);
+      double beta = angleDistribution(rng);
       // coordinate system conversion: confirmation e.g. in
       // https://math.stackexchange.com/a/1385150/738831 or
       // https://en.wikipedia.org/wiki/Spherical_coordinate_system
-      xs.push_back(lastX + bondLenToUse * std::cos(beta) * std::sin(alpha));
+      xs.push_back(lastX + beadDistance * std::cos(beta) * std::sin(alpha));
       lastX = xs[i];
-      ys.push_back(lastY + bondLenToUse * std::sin(beta) * std::sin(alpha));
+      ys.push_back(lastY + beadDistance * std::sin(beta) * std::sin(alpha));
       lastY = ys[i];
-      zs.push_back(lastZ + bondLenToUse * std::cos(alpha));
+      zs.push_back(lastZ + beadDistance * std::cos(alpha));
       lastZ = zs[i];
       assert(!isnan(lastX) && !isnan(lastY) && !isnan(lastZ));
+    }
+
+    assert(xs.size() == ys.size() && xs.size() == zs.size() &&
+           zs.size() == chainLen);
+    // at this point, it was a "normal" random walk,
+    // but now, we need to close the Brownian bridge
+    // note that the bond size gets a bit destroyed
+    // inspiration:
+    // https://medium.com/@christopher.tabori/bridging-the-gap-an-introduction-to-brownian-bridge-simulations-10655b0baf02
+    for (size_t i = 0; i < chainLen; ++i) {
+      double pathFraction =
+        static_cast<double>(i + 1) / static_cast<double>(chainLen + 1);
+      Eigen::Vector3d deterministicPosition = fromVec + dist * pathFraction;
+      xs[i] = xs[i] + deterministicPosition[0] - xs[chainLen] * pathFraction;
+      ys[i] = ys[i] + deterministicPosition[1] - ys[chainLen] * pathFraction;
+      zs[i] = zs[i] + deterministicPosition[2] - zs[chainLen] * pathFraction;
     }
 
     std::unordered_map<std::string, std::vector<double>> results;

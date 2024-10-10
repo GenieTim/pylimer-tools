@@ -85,12 +85,13 @@ namespace utils {
 
     void addCrosslinkers(int nrOfCrosslinkers,
                          int crosslinkerFunctionality = 4,
-                         int crossLinkerAtomType = 2)
+                         int crossLinkerAtomType = 2,
+                         bool whiteNoise = true)
     {
       int nCrosslinkerBefore = this->remainingCrossLinkerFunctionality.size();
 
-      std::vector<size_t> newCrosslinkerIdxs =
-        this->addAtomsWithType(nrOfCrosslinkers, crossLinkerAtomType);
+      std::vector<size_t> newCrosslinkerIdxs = this->addAtomsWithType(
+        nrOfCrosslinkers, crossLinkerAtomType, whiteNoise);
       this->crossLinkerIdxs.insert(this->crossLinkerIdxs.end(),
                                    newCrosslinkerIdxs.begin(),
                                    newCrosslinkerIdxs.end());
@@ -111,13 +112,14 @@ namespace utils {
      */
     void addSolventChains(int nrOfSolventChains,
                           int chainLength,
-                          int solventAtomType = 3)
+                          int solventAtomType = 3,
+                          bool whiteNoise = true)
     {
       // std::cout << "Adding " << nrOfSolventChains << " atoms for solvent
       // chains."
       //           << std::endl;
       std::vector<size_t> startAtoms =
-        this->addAtomsWithType(nrOfSolventChains, solventAtomType);
+        this->addAtomsWithType(nrOfSolventChains, solventAtomType, whiteNoise);
 
       for (size_t atomIdx : startAtoms) {
         // std::cout << "Adding solvent chain with length " << chainLength
@@ -398,62 +400,44 @@ namespace utils {
                                   int chainLen,
                                   int atomType = 1)
     {
-      double lastX = this->simplifiedUniverse.x[from];
-      double lastY = this->simplifiedUniverse.y[from];
-      double lastZ = this->simplifiedUniverse.z[from];
-
-      // support crossing of boundary conditions: find nearest image as target
-      // (accept image mismatches)
-      double targetX =
-        (this->box.getLx() < std::sqrt((double)chainLen) * this->beadDistance)
-          ? this->simplifiedUniverse.x[to]
-          : lastX + this->_getDeltaDistance(
-                      this->simplifiedUniverse.x[to], lastX, this->box.getLx());
-      double targetY =
-        (this->box.getLy() < std::sqrt((double)chainLen) * this->beadDistance)
-          ? this->simplifiedUniverse.y[to]
-          : lastY + this->_getDeltaDistance(
-                      this->simplifiedUniverse.y[to], lastY, this->box.getLy());
-      double targetZ =
-        (this->box.getLz() < std::sqrt((double)chainLen) * this->beadDistance)
-          ? this->simplifiedUniverse.z[to]
-          : lastZ + this->_getDeltaDistance(
-                      this->simplifiedUniverse.z[to], lastZ, this->box.getLz());
-
+      // determine the positions
       std::unordered_map<std::string, std::vector<double>> walk_results =
         pylimer_tools::utils::doRandomWalkChainFromTo(
           this->box,
           std::array<double, 3>{
-            lastX,
-            lastY,
-            lastZ,
+            this->simplifiedUniverse.x[from],
+            this->simplifiedUniverse.y[from],
+            this->simplifiedUniverse.z[from],
           },
-          std::array<double, 3>{ targetX, targetY, targetZ },
+          std::array<double, 3>{ this->simplifiedUniverse.x[to],
+                                 this->simplifiedUniverse.y[to],
+                                 this->simplifiedUniverse.z[to] },
           chainLen,
           this->beadDistance);
 
-      // assemeble and add these atoms
+      // assemble and add these atoms
       Positions positions;
       positions.x = walk_results["x"];
       positions.y = walk_results["y"];
       positions.z = walk_results["z"];
       std::vector<size_t> idxs =
         this->addAtomsWithType(chainLen, atomType, positions);
-      // initalize some bond specific
+      // initialise some bond specific
       std::vector<size_t> bondsFrom;
       std::vector<size_t> bondsTo;
-      bondsFrom.reserve(idxs.size());
-      bondsTo.reserve(idxs.size());
+      bondsFrom.reserve(idxs.size() + 2);
+      bondsTo.reserve(idxs.size() + 2);
+      // make the first bond from the starting bead given
+      bondsFrom.push_back(this->simplifiedUniverse.ids[from]);
       for (size_t idx : idxs) {
         bondsFrom.push_back(this->simplifiedUniverse.ids[idx]);
         bondsTo.push_back(this->simplifiedUniverse.ids[idx]);
       }
-      std::vector<int> bondTypes = initializeWithValue(chainLen, 1);
-      // make the first bond from the starting bead given
-      bondsFrom.insert(bondsFrom.begin(), this->simplifiedUniverse.ids[from]);
       // and the last bond further to the end of the chain
-      bondsTo.insert(bondsTo.end(), this->simplifiedUniverse.ids[to]);
-      // finally, actually add the bonds
+      bondsTo.push_back(this->simplifiedUniverse.ids[to]);
+
+      // prepare the bond types
+      std::vector<int> bondTypes = initializeWithValue(chainLen, 1);
       // finally, add the bonds
       this->simplifiedUniverse.bondsFrom.reserve(
         this->simplifiedUniverse.bondsFrom.size() + bondsFrom.size());
@@ -522,9 +506,12 @@ namespace utils {
      * @param atomType the type of the atoms to add
      * @return std::vector<size_t> the ids of the inserted atoms
      */
-    std::vector<size_t> addAtomsWithType(int nrOfAtomsToAdd, int atomType)
+    std::vector<size_t> addAtomsWithType(int nrOfAtomsToAdd,
+                                         int atomType,
+                                         bool whiteNoise = true)
     {
-      Positions randomPos = this->generateRandomPositions(nrOfAtomsToAdd);
+      Positions randomPos =
+        this->generateRandomPositions(nrOfAtomsToAdd, whiteNoise);
       return this->addAtomsWithType(nrOfAtomsToAdd, atomType, randomPos);
     }
 
@@ -534,12 +521,12 @@ namespace utils {
      * @param nSamples the number of positions to generate
      * @return Positions
      */
-    Positions generateRandomPositions(int nSamples)
+    Positions generateRandomPositions(int nSamples, bool whiteNoise = true)
     {
-      if (nSamples < 1000) {
-        return this->generateRandomBluePositions(nSamples);
-      } else {
+      if (whiteNoise) {
         return this->generateRandomWhitePositions(nSamples);
+      } else {
+        return this->generateRandomBluePositions(nSamples);
       }
     }
 
