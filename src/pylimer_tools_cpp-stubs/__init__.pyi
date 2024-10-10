@@ -998,9 +998,15 @@ class MCUniverseGenerator:
     """
     def __init__(self, lx: float, ly: float, lz: float) -> None:
         ...
-    def add_and_link_strands(self, nr_of_strands: int, strand_lengths: list[int], crosslinker_conversion: float, strand_atom_type: int = 1) -> None:
+    def add_and_link_strands(self, nr_of_strands: int, strand_lengths: list[int], crosslinker_conversion: float, strand_atom_type: int = 1, c_infinity: float = 1.0) -> None:
         """
                     Actually add strands, link them to the previously added cross-linkers.
+        
+                    :param nr_of_strands: Number of strands to add.
+                    :param strand_lengths: A list of integers representing the number of beads of each of the strands.
+                    :param crosslinker_conversion: Target conversion of cross-linkers (0: no connections to cross-links; 1: all cross-linkers fully connected).
+                    :param strand_atom_type: Type of atoms for the strands (default: 1).
+                    :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2`.
         """
     def add_crosslinkers(self, nr_of_crosslinkers: int, crosslinker_functionality: int = 4, crosslinker_type: int = 2) -> None:
         """
