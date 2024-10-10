@@ -34,10 +34,16 @@ init_pylimer_bound_generators(py::module_& m)
          &MCUniverseGenerator::addCrosslinkers,
          R"pbdoc(
             Add the cross-linkers.
+
+            :param nr_of_crosslinkers: Number of cross-linkers to add.
+            :param crosslinker_functionality: Functionality of the cross-linkers (default: 4).
+            :param crosslinker_type: Atom type of the cross-linkers (default: 2).
+            :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the cross-linkers (default: true).
             )pbdoc",
          py::arg("nr_of_crosslinkers"),
          py::arg("crosslinker_functionality") = 4,
-         py::arg("crosslinker_type") = 2)
+         py::arg("crosslinker_type") = 2,
+         py::arg("white_noise") = true)
     .def("add_solvent_chains",
          &MCUniverseGenerator::addSolventChains,
          R"pbdoc(
@@ -45,7 +51,8 @@ init_pylimer_bound_generators(py::module_& m)
             )pbdoc",
          py::arg("nr_of_solvent_chains"),
          py::arg("solvent_chain_length"),
-         py::arg("solvent_atom_type") = 3)
+         py::arg("solvent_atom_type") = 3,
+         py::arg("white_noise") = true)
     .def("add_and_link_strands",
          py::overload_cast<int, std::vector<int>, double, int, double>(
            &MCUniverseGenerator::addAndLinkStrands),
@@ -69,7 +76,6 @@ init_pylimer_bound_generators(py::module_& m)
             Use this method to actually retrieve the generated structure.
             )pbdoc");
 
-            
   m.def("do_random_walk",
         &doRandomWalkChain,
         R"pbdoc(

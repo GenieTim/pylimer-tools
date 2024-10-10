@@ -1006,11 +1006,17 @@ init_pylimer_bound_sim(py::module_& m)
           :math:`T` the temperature and 
           :math:`k_B` Boltzmann's constant.
           
-          :param b: the melt <b>: mean bond length; vgl. the required <R_0^2>, computed as phantom = N<b>^2.
+          :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\infinity b^2`.
           :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains. 
      )pbdoc",
-         py::arg("b_0") = -1.0,
+         py::arg("b02") = -1.0,
          py::arg("nr_of_chains") = -1)
+    .def("get_gamma_factors",
+         &mehp::MEHPForceBalance::getGammaFactors,
+         R"pbdoc(
+          Evaluates the gamma factor for each strand (i.e., the squared distance divided by the contour length multiplied by b02)
+     )pbdoc",
+         py::arg("b02"))
     .def("get_gamma_factor_using_partial_springs",
          &mehp::MEHPForceBalance::getGammaFactorUsingPartialSprings,
          R"pbdoc(
@@ -1025,11 +1031,11 @@ init_pylimer_bound_sim(py::module_& m)
           :math:`T` the temperature and 
           :math:`k_B` Boltzmann's constant.
           
-          :param b: the melt <b>: mean bond length; vgl. the required <R_0^2>, computed as phantom = N<b>^2.
+          :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\infinity b^2`.
           :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains. 
      )pbdoc",
          py::arg("one_over_spring_partition_upper_limit") = 1.,
-         py::arg("b_0") = -1.0,
+         py::arg("b02") = -1.0,
          py::arg("nr_of_chains") = -1)
     .def("get_nr_of_nodes", &mehp::MEHPForceBalance::getNrOfNodes, R"pbdoc(
            Get the number of nodes (crosslinkers) considered in this simulation.
