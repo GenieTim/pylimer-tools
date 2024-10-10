@@ -7,6 +7,7 @@
 #include "RandomWalker.h"
 #include "StringUtils.h"
 #include "VectorUtils.h"
+#include <Eigen/Dense>
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
@@ -137,7 +138,8 @@ namespace utils {
     void addAndLinkStrands(int nrOfStrands,
                            std::vector<int> beadsPerChains,
                            double targetCrossLinkerConversion,
-                           int strandAtomType = 1)
+                           int strandAtomType = 1,
+                           double cInfinity = 1.)
     {
       if (beadsPerChains.size() != nrOfStrands) {
         throw std::invalid_argument(
@@ -148,9 +150,10 @@ namespace utils {
       }
 
       INVALIDARG_EXP_IFN(
-        targetCrossLinkerConversion >= 0.0 &&
+        targetCrossLinkerConversion >= this->currentCrosslinkerConversion &&
           targetCrossLinkerConversion <= 1.0,
-        "Cross-linker conversion must be between 0 and 1, got " +
+        "Cross-linker conversion must be between " +
+          std::to_string(this->currentCrosslinkerConversion) + " and 1, got " +
           std::to_string(targetCrossLinkerConversion) + ".");
 
       assert(this->crossLinkerIdxs.size() ==
@@ -181,8 +184,7 @@ namespace utils {
       //
       long int nCrosslinks = this->crossLinkerIdxs.size();
       std::uniform_int_distribution<size_t> crosslinkerIdxIdxDist =
-        std::uniform_int_distribution<size_t>(0,
-                                              nCrosslinks - 1);
+        std::uniform_int_distribution<size_t>(0, nCrosslinks - 1);
       int nrOfStrandsAdded = 0;
       long int nrOfAvailableSites =
         std::reduce(this->remainingCrossLinkerFunctionality.begin(),
@@ -231,8 +233,10 @@ namespace utils {
           size_t partnerCrosslinker = this->findAppropriateLink(
             strandEnd1[strandIdx],
             beadsPerChains[strandIdx] *
-              (this->beadDistance * this->beadDistance),
-            -1. // beadsPerChains[strandIdx] * this->beadDistance
+              (this->beadDistance * this->beadDistance) * cInfinity,
+            targetCrossLinkerConversion > 0.95
+              ? -1.
+              : beadsPerChains[strandIdx] * this->beadDistance // -1. //
           );
 
           strandEnd2[strandIdx] = partnerCrosslinker;
@@ -268,6 +272,7 @@ namespace utils {
           this->addRandomWalkChainFrom(
             strandEnd1[strandIdx], beadsPerChains[strandIdx], strandAtomType);
         } else {
+          // connected strand
           assert(strandEnd1[strandIdx] != -1 && strandEnd2[strandIdx] != -1);
           this->addRandomWalkChainFromTo(strandEnd1[strandIdx],
                                          strandEnd2[strandIdx],
@@ -275,7 +280,7 @@ namespace utils {
                                          strandAtomType);
         }
       }
-    };
+    }
 
     void addAndLinkStrands(int nrOfStrands,
                            int chainLength,
@@ -575,7 +580,6 @@ namespace utils {
      */
     Positions generateRandomBluePositions(int nSamples)
     {
-
       std::vector<double> xs;
       std::vector<double> ys;
       std::vector<double> zs;
@@ -645,6 +649,7 @@ namespace utils {
 
       std::vector<size_t> suitableMatches;
       std::vector<double> matchWeights;
+      const double desiredR0 = std::sqrt(desiredR02);
       double sumOfWeights = 0.0;
       // TODO: use a neighbour list instead, maybe?
       for (int i = 0; i < this->crossLinkerIdxs.size(); ++i) {
@@ -652,11 +657,12 @@ namespace utils {
           continue;
         }
         size_t partner = this->crossLinkerIdxs[i];
-        double distBetween = this->distanceBetween(partner, from);
-        if (distBetween < maxDistance || maxDistance < 0.) {
+        Eigen::Vector3d dist = this->getVectorBetween(from, i);
+        if (dist.norm() < maxDistance || maxDistance < 0.) {
           suitableMatches.push_back(partner);
           double thisWeight =
-            std::exp(-3. * (distBetween) * (distBetween) / (desiredR02));
+            this->remainingCrossLinkerFunctionality[i] *
+            std::exp(-3. * dist.squaredNorm() / (2. * desiredR02));
           matchWeights.push_back(thisWeight);
           sumOfWeights += thisWeight;
         }
@@ -681,6 +687,16 @@ namespace utils {
                                this->simplifiedUniverse.z[j]);
     }
 
+    Eigen::Vector3d getVectorBetween(size_t i, size_t j)
+    {
+      Eigen::Vector3d diff;
+      diff << this->simplifiedUniverse.x[j] - this->simplifiedUniverse.x[i],
+        this->simplifiedUniverse.y[j] - this->simplifiedUniverse.y[i],
+        this->simplifiedUniverse.z[j] - this->simplifiedUniverse.z[i];
+      this->box.handlePBC(diff);
+      return diff;
+    }
+
     double getDistance(double x1,
                        double y1,
                        double z1,
@@ -688,10 +704,10 @@ namespace utils {
                        double y2,
                        double z2)
     {
-      double dx = this->_getDeltaDistance(x1, x2, this->box.getLx());
-      double dy = this->_getDeltaDistance(y1, y2, this->box.getLy());
-      double dz = this->_getDeltaDistance(z1, z2, this->box.getLz());
-      return std::sqrt(dx * dx + dy * dy + dz * dz);
+      Eigen::Vector3d diff;
+      diff << x2 - x1, y2 - y1, z2 - z1;
+      this->box.handlePBC(diff);
+      return diff.norm();
     }
 
     double _getDeltaDistance(double c1, double c2, double boxL) const

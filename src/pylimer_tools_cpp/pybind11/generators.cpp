@@ -47,21 +47,29 @@ init_pylimer_bound_generators(py::module_& m)
          py::arg("solvent_chain_length"),
          py::arg("solvent_atom_type") = 3)
     .def("add_and_link_strands",
-         py::overload_cast<int, std::vector<int>, double, int>(
+         py::overload_cast<int, std::vector<int>, double, int, double>(
            &MCUniverseGenerator::addAndLinkStrands),
          R"pbdoc(
             Actually add strands, link them to the previously added cross-linkers.
+
+            :param nr_of_strands: Number of strands to add.
+            :param strand_lengths: A list of integers representing the number of beads of each of the strands.
+            :param crosslinker_conversion: Target conversion of cross-linkers (0: no connections to cross-links; 1: all cross-linkers fully connected).
+            :param strand_atom_type: Type of atoms for the strands (default: 1).
+            :param c_infinity: As needed for the end-to-end distribution, given by :math:`\langle R^2\rangle_0 = C_{\infty} N b^2`.
             )pbdoc",
          py::arg("nr_of_strands"),
          py::arg("strand_lengths"),
          py::arg("crosslinker_conversion"),
-         py::arg("strand_atom_type") = 1)
+         py::arg("strand_atom_type") = 1,
+         py::arg("c_infinity") = 1.)
     .def("get_universe", &MCUniverseGenerator::getUniverse, R"pbdoc(
             Fetch the current (or final) state of the universe.
 
             Use this method to actually retrieve the generated structure.
             )pbdoc");
 
+            
   m.def("do_random_walk",
         &doRandomWalkChain,
         R"pbdoc(
