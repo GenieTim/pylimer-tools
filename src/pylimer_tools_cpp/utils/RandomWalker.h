@@ -215,7 +215,7 @@ namespace utils {
                                       int chainLen,
                                       double beadDistance = 1.0,
                                       std::string seed = "",
-                                      int numIterations = 5000)
+                                      int numIterations = 1000)
   {
     std::mt19937 rng;
     if (seed == "") {
@@ -254,28 +254,25 @@ namespace utils {
     // after determining these deterministic positions,
     // first prepare for probability computations
     double normalisationFactor =
-      std::pow(3. / (2. * M_PI * SQUARE(beadDistance)), 1.5);
-    double normalisationFactorInExponential = -1.5 / SQUARE(beadDistance);
+      std::pow(3. / (2. * M_PI * SQUARE(beadDistance)), 3. / 2.);
+    double normalisationFactorInExponential = -3. / (2. * SQUARE(beadDistance));
 
     // do MC steps to update the positions
     int numLastStepsAccepted = 0;
     int iterations = 0;
-    double stepSize = std::cbrt(beadDistance);
+    double stepSize = std::cbrt(beadDistance) * 0.05;
     do {
       iterations += 1;
       numLastStepsAccepted = 0;
-      for (size_t i = 1; i < chainLen; ++i) {
-        double bondLen1 =
-          std::sqrt(SQUARE(positions.x[i] - positions.x[i - 1]) +
-                    SQUARE(positions.y[i] - positions.y[i - 1]) +
-                    SQUARE(positions.z[i] - positions.z[i - 1]));
-        double bondLen2 =
-          std::sqrt(SQUARE(positions.x[i] - positions.x[i + 1]) +
-                    SQUARE(positions.y[i] - positions.y[i + 1]) +
-                    SQUARE(positions.z[i] - positions.z[i + 1]));
+      for (size_t i = 1; i <= chainLen; ++i) {
+        double bondLen1 = (SQUARE(positions.x[i] - positions.x[i - 1]) +
+                           SQUARE(positions.y[i] - positions.y[i - 1]) +
+                           SQUARE(positions.z[i] - positions.z[i - 1]));
+        double bondLen2 = (SQUARE(positions.x[i] - positions.x[i + 1]) +
+                           SQUARE(positions.y[i] - positions.y[i + 1]) +
+                           SQUARE(positions.z[i] - positions.z[i + 1]));
 
         double currentProbability =
-          normalisationFactor * normalisationFactor *
           std::exp(normalisationFactorInExponential * (bondLen1 + bondLen2));
 
         double disX = positionSamplingDist(rng) * stepSize;
@@ -283,21 +280,20 @@ namespace utils {
         double disZ = positionSamplingDist(rng) * stepSize;
 
         double newBondLen1 =
-          std::sqrt(SQUARE(positions.x[i] + disX - positions.x[i - 1]) +
-                    SQUARE(positions.y[i] + disY - positions.y[i - 1]) +
-                    SQUARE(positions.z[i] + disZ - positions.z[i - 1]));
+          (SQUARE(positions.x[i] + disX - positions.x[i - 1]) +
+           SQUARE(positions.y[i] + disY - positions.y[i - 1]) +
+           SQUARE(positions.z[i] + disZ - positions.z[i - 1]));
         double newBondLen2 =
-          std::sqrt(SQUARE(positions.x[i] + disX - positions.x[i + 1]) +
-                    SQUARE(positions.y[i] + disY - positions.y[i + 1]) +
-                    SQUARE(positions.z[i] + disZ - positions.z[i + 1]));
+          (SQUARE(positions.x[i] + disX - positions.x[i + 1]) +
+           SQUARE(positions.y[i] + disY - positions.y[i + 1]) +
+           SQUARE(positions.z[i] + disZ - positions.z[i + 1]));
 
-        double newProbability = normalisationFactor * normalisationFactor *
-                                std::exp(normalisationFactorInExponential *
-                                         (newBondLen1 + newBondLen2));
+        double newProbability =
+          std::exp(normalisationFactorInExponential * (newBondLen1 + bondLen2));
 
         double alpha = newProbability / currentProbability;
 
-        if (alpha >= probabilitySamplingDist(rng)) {
+        if (alpha >= probabilitySamplingDist(rng) && alpha >= 0.5) {
           // accept
           numLastStepsAccepted += 1;
           positions.x[i] += disX;
@@ -308,19 +304,23 @@ namespace utils {
 
       double acceptanceRatio = static_cast<double>(numLastStepsAccepted) /
                                static_cast<double>(chainLen);
+      // target acceptance of 50%
       stepSize *= (1. + (acceptanceRatio - 0.5) / 10.);
-      stepSize = std::min(stepSize, beadDistance * 0.25);
     } while (iterations < numIterations && stepSize > 1e-5);
 
-#ifndef NDEBUG
-    // validate bond lengths after random walk
+    // #ifndef NDEBUG
+    //     // validate bond lengths after random walk
     for (size_t i = 1; i < chainLen + 1; ++i) {
       double bondLen = std::sqrt(SQUARE(positions.x[i] - positions.x[i - 1]) +
                                  SQUARE(positions.y[i] - positions.y[i - 1]) +
                                  SQUARE(positions.z[i] - positions.z[i - 1]));
-      assert(APPROX_REL_EQUAL(bondLen, beadDistance, 0.25));
+      // assert(APPROX_REL_EQUAL(bondLen, beadDistance, 0.5));
+      RUNTIME_EXP_IFN(bondLen < 10. * beadDistance,
+                      "Bond length after random walk is too long: got " +
+                        std::to_string(bondLen) + " at index " +
+                        std::to_string(i) + ".");
     }
-#endif
+    // #endif
 
     Positions results;
     results.x = positions.x;

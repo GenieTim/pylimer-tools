@@ -155,26 +155,24 @@ namespace utils {
              this->remainingCrossLinkerFunctionality.size());
 
       // eager reserve of vectors
-      // could be more elaborate, but with a certain probability,
-      // this is better
+      size_t nNewBeads =
+        std::reduce(beadsPerChains.begin(), beadsPerChains.end(), 0);
       this->simplifiedUniverse.ids.reserve(this->simplifiedUniverse.ids.size() +
-                                           nrOfStrands * beadsPerChains[0]);
+                                           nNewBeads);
       this->simplifiedUniverse.types.reserve(
-        this->simplifiedUniverse.types.size() +
-        nrOfStrands * beadsPerChains[0]);
+        this->simplifiedUniverse.types.size() + nNewBeads);
 
       this->simplifiedUniverse.x.reserve(this->simplifiedUniverse.x.size() +
-                                         nrOfStrands * beadsPerChains[0]);
+                                         nNewBeads);
       this->simplifiedUniverse.y.reserve(this->simplifiedUniverse.y.size() +
-                                         nrOfStrands * beadsPerChains[0]);
+                                         nNewBeads);
       this->simplifiedUniverse.z.reserve(this->simplifiedUniverse.z.size() +
-                                         nrOfStrands * beadsPerChains[0]);
+                                         nNewBeads);
       this->simplifiedUniverse.bondsFrom.reserve(
-        this->simplifiedUniverse.bondsFrom.size() +
-        nrOfStrands * beadsPerChains[0]);
+        this->simplifiedUniverse.bondsFrom.size() + nNewBeads +
+        nrOfStrands * 2);
       this->simplifiedUniverse.bondsTo.reserve(
-        this->simplifiedUniverse.bondsTo.size() +
-        nrOfStrands * beadsPerChains[0]);
+        this->simplifiedUniverse.bondsTo.size() + nNewBeads + nrOfStrands * 2);
 
       //
       long int nCrosslinks = this->crossLinkerIdxs.size();
@@ -307,6 +305,18 @@ namespace utils {
     pylimer_tools::entities::Box box;
 
     /**
+     * @brief Get the Current random seed for reproducibility
+     *
+     * @return std::string
+     */
+    std::string getCurrentSeed()
+    {
+      std::ostringstream oss;
+      oss << this->rng;
+      return oss.str();
+    }
+
+    /**
      * @brief Do a random walk of certain length to add a chain
      *
      * @param from the starting Atom of the chain
@@ -317,6 +327,12 @@ namespace utils {
     {
       Positions positions = pylimer_tools::utils::doRandomWalkChain(
         chainLen, this->beadDistance, "");
+
+      for (size_t i = 0; i < chainLen; ++i) {
+        positions.x[i] += this->simplifiedUniverse.x[idxFrom];
+        positions.y[i] += this->simplifiedUniverse.y[idxFrom];
+        positions.z[i] += this->simplifiedUniverse.z[idxFrom];
+      }
 
       std::vector<size_t> idxs =
         this->addAtomsWithType(chainLen, atomType, positions);
@@ -382,35 +398,26 @@ namespace utils {
       assert(positions.z.size() == chainLen);
 
       // assemble and add these atoms
-      std::vector<size_t> idxs =
+      std::vector<size_t> newAtomIndices =
         this->addAtomsWithType(chainLen, atomType, positions);
-      // initialise some bond specific
-      std::vector<size_t> bondsFrom;
-      std::vector<size_t> bondsTo;
-      bondsFrom.reserve(idxs.size() + 2);
-      bondsTo.reserve(idxs.size() + 2);
+      assert(newAtomIndices.size() == chainLen);
+      // and same for bonds
+      this->simplifiedUniverse.bondsFrom.reserve(
+        this->simplifiedUniverse.bondsFrom.size() + chainLen + 2);
+      this->simplifiedUniverse.bondsTo.reserve(
+        this->simplifiedUniverse.bondsTo.size() + chainLen + 2);
       // make the first bond from the starting bead given
-      bondsFrom.push_back(this->simplifiedUniverse.ids[from]);
-      for (size_t idx : idxs) {
-        bondsFrom.push_back(this->simplifiedUniverse.ids[idx]);
-        bondsTo.push_back(this->simplifiedUniverse.ids[idx]);
+      this->simplifiedUniverse.bondsFrom.push_back(
+        this->simplifiedUniverse.ids[from]);
+      for (size_t idx : newAtomIndices) {
+        this->simplifiedUniverse.bondsFrom.push_back(
+          this->simplifiedUniverse.ids[idx]);
+        this->simplifiedUniverse.bondsTo.push_back(
+          this->simplifiedUniverse.ids[idx]);
       }
       // and the last bond further to the end of the chain
-      bondsTo.push_back(this->simplifiedUniverse.ids[to]);
-
-      // prepare the bond types
-      std::vector<int> bondTypes = initializeWithValue(chainLen, 1);
-      // finally, add the bonds
-      this->simplifiedUniverse.bondsFrom.reserve(
-        this->simplifiedUniverse.bondsFrom.size() + bondsFrom.size());
-      this->simplifiedUniverse.bondsFrom.insert(
-        this->simplifiedUniverse.bondsFrom.end(),
-        bondsFrom.begin(),
-        bondsFrom.end());
-      this->simplifiedUniverse.bondsTo.reserve(
-        this->simplifiedUniverse.bondsTo.size() + bondsTo.size());
-      this->simplifiedUniverse.bondsTo.insert(
-        this->simplifiedUniverse.bondsTo.end(), bondsTo.begin(), bondsTo.end());
+      this->simplifiedUniverse.bondsTo.push_back(
+        this->simplifiedUniverse.ids[to]);
     }
 
     /**
@@ -438,13 +445,14 @@ namespace utils {
 
       int baseId = this->maximumAtomId + 1;
       std::vector<size_t> indicesAdded;
+
+      int nAtomsBefore = this->simplifiedUniverse.ids.size();
       indicesAdded.reserve(nrOfAtomsToAdd);
-      size_t indexToStartWith = this->simplifiedUniverse.ids.size();
 
       for (size_t i = 0; i < nrOfAtomsToAdd; ++i) {
         this->simplifiedUniverse.ids.push_back(i + baseId);
         this->simplifiedUniverse.types.push_back(atomType);
-        indicesAdded.push_back(indexToStartWith + i);
+        indicesAdded.push_back(nAtomsBefore + i);
       }
 
       this->simplifiedUniverse.x.insert(this->simplifiedUniverse.x.end(),

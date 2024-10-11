@@ -76,7 +76,7 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
       pu::MCUniverseGenerator(10.0, 10.0, 10.0);
     generator2.setSeed(8804);
     generator2.setBeadDistance(0.964);
-    generator2.addCrosslinkers(100, 2);
+    generator2.addCrosslinkers(100, 4, 2);
     generator2.addSolventChains(100, 16, 3);
     generator2.addAndLinkStrands((4 / 2) * 100, 16, 0.8);
 
@@ -85,6 +85,16 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
     REQUIRE(universe.getNrOfAtoms() == universe2.getNrOfAtoms());
     REQUIRE(universe.getNrOfBonds() == universe2.getNrOfBonds());
     REQUIRE(universe.getAtom(3) == universe2.getAtom(3));
+
+    auto molecules = universe.getMolecules(2);
+    for (const auto& molecule : molecules) {
+      CHECK(molecule.getNrOfAtoms() == 16);
+    }
+
+    auto bondLengths = universe.getBondLengths();
+    for (const double bondLength : bondLengths) {
+      CHECK(bondLength > 0.0 && bondLength < 3.0);
+    }
   }
 
   SECTION("Errors are thrown")
