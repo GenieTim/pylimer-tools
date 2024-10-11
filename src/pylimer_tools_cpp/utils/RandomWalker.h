@@ -250,6 +250,8 @@ namespace utils {
       positions.y.push_back(deterministicPosition[1]);
       positions.z.push_back(deterministicPosition[2]);
     }
+    assert(positions.x[chainLen + 1] == fromVec[0] + dist[0]);
+    assert(positions.x[0] == fromVec[0]);
 
     // after determining these deterministic positions,
     // first prepare for probability computations
@@ -264,6 +266,7 @@ namespace utils {
     do {
       iterations += 1;
       numLastStepsAccepted = 0;
+      assert(positions.x.size() == chainLen + 2);
       for (size_t i = 1; i <= chainLen; ++i) {
         double bondLen1 = (SQUARE(positions.x[i] - positions.x[i - 1]) +
                            SQUARE(positions.y[i] - positions.y[i - 1]) +
@@ -293,7 +296,9 @@ namespace utils {
 
         double alpha = newProbability / currentProbability;
 
-        if (alpha >= probabilitySamplingDist(rng) && alpha >= 0.5) {
+        if ((alpha >= probabilitySamplingDist(rng)) &&
+            (newBondLen1 < 3. * beadDistance) &&
+            (newBondLen2 < 3. * beadDistance)) {
           // accept
           numLastStepsAccepted += 1;
           positions.x[i] += disX;
