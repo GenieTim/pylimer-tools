@@ -1,0 +1,6 @@
+do_random_walk_chain_from_to_mc
+===============================
+
+.. currentmodule:: pylimer_tools_cpp
+
+.. autofunction:: do_random_walk_chain_from_to_mc
