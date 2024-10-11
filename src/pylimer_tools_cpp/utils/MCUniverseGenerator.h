@@ -326,7 +326,7 @@ namespace utils {
     void addRandomWalkChainFrom(size_t idxFrom, int chainLen, int atomType = 1)
     {
       Positions positions = pylimer_tools::utils::doRandomWalkChain(
-        chainLen, this->beadDistance, "");
+        chainLen, this->beadDistance, this->rng);
 
       for (size_t i = 0; i < chainLen; ++i) {
         positions.x[i] += this->simplifiedUniverse.x[idxFrom];
@@ -391,7 +391,9 @@ namespace utils {
                                  this->simplifiedUniverse.y[to],
                                  this->simplifiedUniverse.z[to] },
           chainLen,
-          this->beadDistance);
+          this->beadDistance,
+          this->rng,
+          500);
 
       assert(positions.x.size() == chainLen);
       assert(positions.y.size() == chainLen);

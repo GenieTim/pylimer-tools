@@ -9,6 +9,7 @@
 #include <random>
 #include <unordered_map>
 #include <vector>
+#include <string>
 #ifndef M_PI
 #define M_PI 3.1415926535897932384626433
 #endif
@@ -30,18 +31,9 @@ namespace utils {
    * @param chainLen the number of atoms to add in between from and to
    */
   Positions doRandomWalkChain(int chainLen,
-                              double beadDistance = 1.0,
-                              std::string seed = "")
+                              double beadDistance,
+                              std::mt19937 rng)
   {
-    std::mt19937 rng;
-    if (seed == "") {
-      std::random_device rd;
-      rng = std::mt19937(rd());
-    } else {
-      std::seed_seq seed2(seed.begin(), seed.end());
-      rng = std::mt19937(seed2);
-    }
-
     std::uniform_real_distribution<double> angleDistribution =
       std::uniform_real_distribution<double>(0, 2 * M_PI);
 
@@ -88,6 +80,22 @@ namespace utils {
     return results;
   }
 
+  Positions doRandomWalkChain(int chainLen,
+                              double beadDistance = 1.0,
+                              std::string seed = "")
+  {
+    std::mt19937 rng;
+    if (seed == "") {
+      std::random_device rd;
+      rng = std::mt19937(rd());
+    } else {
+      std::seed_seq seed2(seed.begin(), seed.end());
+      rng = std::mt19937(seed2);
+    }
+
+    return doRandomWalkChain(chainLen, beadDistance, rng);
+  }
+
   /**
    * @brief Do a random walk of certain length to add a chain from one to
    * another atom
@@ -100,18 +108,9 @@ namespace utils {
                                     std::array<double, 3> from,
                                     std::array<double, 3> to,
                                     int chainLen,
-                                    double beadDistance = 1.0,
-                                    std::string seed = "")
+                                    double beadDistance,
+                                    std::mt19937 rng)
   {
-    std::mt19937 rng;
-    if (seed == "") {
-      std::random_device rd;
-      rng = std::mt19937(rd());
-    } else {
-      std::seed_seq seed2(seed.begin(), seed.end());
-      rng = std::mt19937(seed2);
-    }
-
     std::uniform_real_distribution<double> angleDistribution =
       std::uniform_real_distribution<double>(0, 2 * M_PI);
 
@@ -200,6 +199,23 @@ namespace utils {
     results.z = zs;
     return results;
   }
+  Positions doRandomWalkChainFromTo(const pylimer_tools::entities::Box& box,
+                                    std::array<double, 3> from,
+                                    std::array<double, 3> to,
+                                    int chainLen,
+                                    double beadDistance = 1.0,
+                                    std::string seed = "")
+  {
+    std::mt19937 rng;
+    if (seed == "") {
+      std::random_device rd;
+      rng = std::mt19937(rd());
+    } else {
+      std::seed_seq seed2(seed.begin(), seed.end());
+      rng = std::mt19937(seed2);
+    }
+    return doRandomWalkChainFromTo(box, from, to, chainLen, beadDistance, rng);
+  }
 
   /**
    * @brief Do a random walk of certain length to add a chain from one to
@@ -213,19 +229,10 @@ namespace utils {
                                       std::array<double, 3> from,
                                       std::array<double, 3> to,
                                       int chainLen,
-                                      double beadDistance = 1.0,
-                                      std::string seed = "",
-                                      int numIterations = 1000)
+                                      double beadDistance,
+                                      std::mt19937 rng,
+                                      int numIterations)
   {
-    std::mt19937 rng;
-    if (seed == "") {
-      std::random_device rd;
-      rng = std::mt19937(rd());
-    } else {
-      std::seed_seq seed2(seed.begin(), seed.end());
-      rng = std::mt19937(seed2);
-    }
-
     std::uniform_real_distribution<double> probabilitySamplingDist =
       std::uniform_real_distribution<double>(0., 1.);
     std::uniform_real_distribution<double> positionSamplingDist =
@@ -342,6 +349,26 @@ namespace utils {
 
     // finally, when we are happy, return results
     return results;
+  }
+
+  Positions doRandomWalkChainFromToMC(const pylimer_tools::entities::Box& box,
+                                      std::array<double, 3> from,
+                                      std::array<double, 3> to,
+                                      int chainLen,
+                                      double beadDistance = 1.0,
+                                      std::string seed = "",
+                                      int numIterations = 1000)
+  {
+    std::mt19937 rng;
+    if (seed == "") {
+      std::random_device rd;
+      rng = std::mt19937(rd());
+    } else {
+      std::seed_seq seed2(seed.begin(), seed.end());
+      rng = std::mt19937(seed2);
+    }
+    return doRandomWalkChainFromToMC(
+      box, from, to, chainLen, beadDistance, rng, numIterations);
   }
 
   /**
