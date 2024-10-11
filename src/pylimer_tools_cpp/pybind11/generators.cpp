@@ -1,11 +1,14 @@
 #ifndef PYBIND_GENERATORS_H
 #define PYBIND_GENERATORS_H
 
+#include "../entities/Box.h"
 #include "../utils/MCUniverseGenerator.h"
 #include "../utils/RandomWalker.h"
 
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <string>
+#include <vector>
 
 namespace py = pybind11;
 namespace pe = pylimer_tools::entities;
@@ -77,37 +80,50 @@ init_pylimer_bound_generators(py::module_& m)
             )pbdoc");
 
   m.def("do_random_walk",
-        &doRandomWalkChain,
+        py::overload_cast<int, double, std::string>(&doRandomWalkChain),
         R"pbdoc(
             Do a random walk, return the coordinates of each point visited.
             )pbdoc",
         py::arg("chain_len"),
         py::arg("bead_distance") = 1.,
         py::arg("seed") = "");
-  m.def("do_random_walk_chain_from_to_mc",
-        &doRandomWalkChainFromToMC,
-        R"pbdoc(
+  m.def(
+    "do_random_walk_chain_from_to_mc",
+    [](pe::Box& b,
+       std::array<double, 3> f,
+       std::array<double, 3> t,
+       int c,
+       double l,
+       std::string s,
+       int n) { return doRandomWalkChainFromToMC(b, f, t, c, l, s, n); },
+    R"pbdoc(
             Do a random walk from one point to another.
             Then, relax the points in between using a Metropolis-Monte Carlo simulation.
             )pbdoc",
-        py::arg("box"),
-        py::arg("from_coordinates"),
-        py::arg("to_coordinates"),
-        py::arg("chain_len"),
-        py::arg("bead_distance") = 1.,
-        py::arg("seed") = "",
-        py::arg("n_iterations") = 1000);
-  m.def("do_random_walk_chain_from_to",
-        &doRandomWalkChainFromTo,
-        R"pbdoc(
+    py::arg("box"),
+    py::arg("from_coordinates"),
+    py::arg("to_coordinates"),
+    py::arg("chain_len"),
+    py::arg("bead_distance") = 1.,
+    py::arg("seed") = "",
+    py::arg("n_iterations") = 1000);
+  m.def(
+    "do_random_walk_chain_from_to",
+    [](pe::Box& b,
+       std::array<double, 3> f,
+       std::array<double, 3> t,
+       int c,
+       double l,
+       std::string s) { return doRandomWalkChainFromTo(b, f, t, c, l, s); },
+    R"pbdoc(
             Do a random walk from one point to another.
             )pbdoc",
-        py::arg("box"),
-        py::arg("from_coordinates"),
-        py::arg("to_coordinates"),
-        py::arg("chain_len"),
-        py::arg("bead_distance") = 1.,
-        py::arg("seed") = "");
+    py::arg("box"),
+    py::arg("from_coordinates"),
+    py::arg("to_coordinates"),
+    py::arg("chain_len"),
+    py::arg("bead_distance") = 1.,
+    py::arg("seed") = "");
   m.def("do_linear_walk_chain_from_to",
         &doLinearWalkChainFromTo,
         R"pbdoc(
