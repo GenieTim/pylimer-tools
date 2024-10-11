@@ -363,18 +363,23 @@ namespace utils {
                                   int atomType = 1)
     {
       // determine the positions
-      Positions positions = pylimer_tools::utils::doRandomWalkChainFromTo(
-        this->box,
-        std::array<double, 3>{
-          this->simplifiedUniverse.x[from],
-          this->simplifiedUniverse.y[from],
-          this->simplifiedUniverse.z[from],
-        },
-        std::array<double, 3>{ this->simplifiedUniverse.x[to],
-                               this->simplifiedUniverse.y[to],
-                               this->simplifiedUniverse.z[to] },
-        chainLen,
-        this->beadDistance);
+      Positions positions = // pylimer_tools::utils::doRandomWalkChainFromTo(
+        pylimer_tools::utils::doRandomWalkChainFromToMC(
+          this->box,
+          std::array<double, 3>{
+            this->simplifiedUniverse.x[from],
+            this->simplifiedUniverse.y[from],
+            this->simplifiedUniverse.z[from],
+          },
+          std::array<double, 3>{ this->simplifiedUniverse.x[to],
+                                 this->simplifiedUniverse.y[to],
+                                 this->simplifiedUniverse.z[to] },
+          chainLen,
+          this->beadDistance);
+
+      assert(positions.x.size() == chainLen);
+      assert(positions.y.size() == chainLen);
+      assert(positions.z.size() == chainLen);
 
       // assemble and add these atoms
       std::vector<size_t> idxs =
