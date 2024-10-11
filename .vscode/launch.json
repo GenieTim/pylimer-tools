@@ -10,7 +10,7 @@
       "name": "Debug C++ Tests",
       "cwd": "${workspaceFolder}/tests/build",
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
-      "args": ["Particular slip-link examples"],
+      "args": ["Universe can be generated"],
       "env": {
         "MallocNanoZone": "0",
         "ASAN_OPTIONS": "detect_leaks=0",
@@ -26,8 +26,7 @@
       "name": "Debug Cpp Tests",
       "cwd": "${workspaceFolder}/tests/build",
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
-      "args": ["MEHP Force Balance Free chains collapse"
-      ],
+      "args": ["Universe can be generated"],
       "environment": [
         {
           "name": "MallocNanoZone",

@@ -25,13 +25,6 @@
 namespace pylimer_tools {
 namespace utils {
 
-  struct Positions
-  {
-    std::vector<double> x;
-    std::vector<double> y;
-    std::vector<double> z;
-  };
-
   struct SimplifiedUniverse
   {
     std::vector<long int> ids;
@@ -322,40 +315,9 @@ namespace utils {
      */
     void addRandomWalkChainFrom(size_t idxFrom, int chainLen, int atomType = 1)
     {
-      // std::cout << "Doing random walk from" << std::endl;
-      std::vector<double> xs;
-      xs.reserve(chainLen);
-      std::vector<double> ys;
-      ys.reserve(chainLen);
-      std::vector<double> zs;
-      zs.reserve(chainLen);
+      Positions positions = pylimer_tools::utils::doRandomWalkChain(
+        chainLen, this->beadDistance, "");
 
-      std::uniform_real_distribution<double> angleDistribution =
-        std::uniform_real_distribution<double>(0, 2 * M_PI);
-
-      double lastX = this->simplifiedUniverse.x[idxFrom];
-      double lastY = this->simplifiedUniverse.y[idxFrom];
-      double lastZ = this->simplifiedUniverse.z[idxFrom];
-
-      for (int i = 0; i < chainLen; ++i) {
-        const double alpha = angleDistribution(this->rng);
-        const double beta = angleDistribution(this->rng);
-        // coordinate system conversion: confirmation e.g. in
-        // https://math.stackexchange.com/a/1385150/738831
-        xs.push_back(lastX +
-                     this->beadDistance * std::cos(beta) * std::sin(alpha));
-        lastX = xs[i];
-        ys.push_back(lastY +
-                     this->beadDistance * std::cos(beta) * std::cos(alpha));
-        lastY = ys[i];
-        zs.push_back(lastZ + this->beadDistance * std::sin(beta));
-        lastZ = zs[i];
-      }
-
-      Positions positions;
-      positions.x = xs;
-      positions.y = ys;
-      positions.z = zs;
       std::vector<size_t> idxs =
         this->addAtomsWithType(chainLen, atomType, positions);
       // initalize some bond specific
@@ -401,25 +363,20 @@ namespace utils {
                                   int atomType = 1)
     {
       // determine the positions
-      std::unordered_map<std::string, std::vector<double>> walk_results =
-        pylimer_tools::utils::doRandomWalkChainFromTo(
-          this->box,
-          std::array<double, 3>{
-            this->simplifiedUniverse.x[from],
-            this->simplifiedUniverse.y[from],
-            this->simplifiedUniverse.z[from],
-          },
-          std::array<double, 3>{ this->simplifiedUniverse.x[to],
-                                 this->simplifiedUniverse.y[to],
-                                 this->simplifiedUniverse.z[to] },
-          chainLen,
-          this->beadDistance);
+      Positions positions = pylimer_tools::utils::doRandomWalkChainFromTo(
+        this->box,
+        std::array<double, 3>{
+          this->simplifiedUniverse.x[from],
+          this->simplifiedUniverse.y[from],
+          this->simplifiedUniverse.z[from],
+        },
+        std::array<double, 3>{ this->simplifiedUniverse.x[to],
+                               this->simplifiedUniverse.y[to],
+                               this->simplifiedUniverse.z[to] },
+        chainLen,
+        this->beadDistance);
 
       // assemble and add these atoms
-      Positions positions;
-      positions.x = walk_results["x"];
-      positions.y = walk_results["y"];
-      positions.z = walk_results["z"];
       std::vector<size_t> idxs =
         this->addAtomsWithType(chainLen, atomType, positions);
       // initialise some bond specific
@@ -695,19 +652,6 @@ namespace utils {
       diff << x2 - x1, y2 - y1, z2 - z1;
       this->box.handlePBC(diff);
       return diff.norm();
-    }
-
-    double _getDeltaDistance(double c1, double c2, double boxL) const
-    {
-      double delta = c1 - c2;
-      while (delta > 0.5 * boxL) {
-        delta -= boxL;
-      }
-      while (delta < -0.5 * boxL) {
-        delta += boxL;
-      }
-
-      return delta;
     }
   };
 } // namespace utils

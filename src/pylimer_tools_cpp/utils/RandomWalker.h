@@ -16,16 +16,22 @@
 namespace pylimer_tools {
 namespace utils {
 
+  struct Positions
+  {
+    std::vector<double> x;
+    std::vector<double> y;
+    std::vector<double> z;
+  };
+
   /**
    * @brief Do a random walk of certain length from a certain starting point
    *
    * @param from the atom to start the random walk from
    * @param chainLen the number of atoms to add in between from and to
    */
-  std::unordered_map<std::string, std::vector<double>> doRandomWalkChain(
-    int chainLen,
-    double beadDistance = 1.0,
-    std::string seed = "")
+  Positions doRandomWalkChain(int chainLen,
+                              double beadDistance = 1.0,
+                              std::string seed = "")
   {
     std::mt19937 rng;
     if (seed == "") {
@@ -58,19 +64,27 @@ namespace utils {
       // https://math.stackexchange.com/a/1385150/738831 or
       // https://en.wikipedia.org/wiki/Spherical_coordinate_system
       xs.push_back(lastX + beadDistance * std::cos(beta) * std::sin(alpha));
-      lastX = xs[i];
       ys.push_back(lastY + beadDistance * std::sin(beta) * std::sin(alpha));
-      lastY = ys[i];
       zs.push_back(lastZ + beadDistance * std::cos(alpha));
+
+#ifndef NDEBUG
+      assert(
+        APPROX_EQUAL(std::sqrt(SQUARE(xs[i] - lastX) + SQUARE(ys[i] - lastY) +
+                               SQUARE(zs[i] - lastZ)),
+                     beadDistance,
+                     1e-10));
+#endif
+
+      lastX = xs[i];
+      lastY = ys[i];
       lastZ = zs[i];
       assert(!isnan(lastX) && !isnan(lastY) && !isnan(lastZ));
     }
 
-    std::unordered_map<std::string, std::vector<double>> results;
-    results.reserve(3);
-    results.emplace("x", xs);
-    results.emplace("y", ys);
-    results.emplace("z", zs);
+    Positions results;
+    results.x = xs;
+    results.y = ys;
+    results.z = zs;
     return results;
   }
 
@@ -82,13 +96,12 @@ namespace utils {
    * @param to the atom to end the random walk at
    * @param chainLen the number of atoms to add in between from and to
    */
-  std::unordered_map<std::string, std::vector<double>> doRandomWalkChainFromTo(
-    const pylimer_tools::entities::Box& box,
-    std::array<double, 3> from,
-    std::array<double, 3> to,
-    int chainLen,
-    double beadDistance = 1.0,
-    std::string seed = "")
+  Positions doRandomWalkChainFromTo(const pylimer_tools::entities::Box& box,
+                                    std::array<double, 3> from,
+                                    std::array<double, 3> to,
+                                    int chainLen,
+                                    double beadDistance = 1.0,
+                                    std::string seed = "")
   {
     std::mt19937 rng;
     if (seed == "") {
@@ -118,18 +131,27 @@ namespace utils {
     double lastX = 0.;
     double lastY = 0.;
     double lastZ = 0.;
-    for (size_t i = 0; i < chainLen; ++i) {
+    for (size_t j = 0; j < chainLen; ++j) {
       double alpha = angleDistribution(rng);
       double beta = angleDistribution(rng);
       // coordinate system conversion: confirmation e.g. in
       // https://math.stackexchange.com/a/1385150/738831 or
       // https://en.wikipedia.org/wiki/Spherical_coordinate_system
       xs.push_back(lastX + beadDistance * std::cos(beta) * std::sin(alpha));
-      lastX = xs[i];
       ys.push_back(lastY + beadDistance * std::sin(beta) * std::sin(alpha));
-      lastY = ys[i];
       zs.push_back(lastZ + beadDistance * std::cos(alpha));
-      lastZ = zs[i];
+
+#ifndef NDEBUG
+      assert(
+        APPROX_EQUAL(std::sqrt(SQUARE(xs[j] - lastX) + SQUARE(ys[j] - lastY) +
+                               SQUARE(zs[j] - lastZ)),
+                     beadDistance,
+                     1e-8));
+#endif
+
+      lastX = xs[j];
+      lastY = ys[j];
+      lastZ = zs[j];
       assert(!isnan(lastX) && !isnan(lastY) && !isnan(lastZ));
     }
 
@@ -140,20 +162,45 @@ namespace utils {
     // note that the bond size gets a bit destroyed
     // inspiration:
     // https://medium.com/@christopher.tabori/bridging-the-gap-an-introduction-to-brownian-bridge-simulations-10655b0baf02
+    double bondLen = 0.;
     for (size_t i = 0; i < chainLen; ++i) {
       double pathFraction =
-        static_cast<double>(i + 1) / static_cast<double>(chainLen + 1);
+        static_cast<double>(i) / static_cast<double>(chainLen);
       Eigen::Vector3d deterministicPosition = fromVec + dist * pathFraction;
       xs[i] = xs[i] + deterministicPosition[0] - xs[chainLen] * pathFraction;
       ys[i] = ys[i] + deterministicPosition[1] - ys[chainLen] * pathFraction;
       zs[i] = zs[i] + deterministicPosition[2] - zs[chainLen] * pathFraction;
+
+#ifndef NDEBUG
+      if (i == 0) {
+        bondLen = std::sqrt(SQUARE(xs[i] - from[0]) + SQUARE(ys[i] - from[1]) +
+                            SQUARE(zs[i] - from[2]));
+        assert(APPROX_REL_EQUAL(
+          bondLen, beadDistance, 0.25));
+      } else {
+        assert(i > 0);
+        bondLen =
+          std::sqrt(SQUARE(xs[i] - xs[i - 1]) + SQUARE(ys[i] - ys[i - 1]) +
+                    SQUARE(zs[i] - zs[i - 1]));
+        assert(APPROX_REL_EQUAL(
+          bondLen, beadDistance, 0.25));
+      }
+#endif
     }
 
-    std::unordered_map<std::string, std::vector<double>> results;
-    results.reserve(3);
-    results.emplace("x", xs);
-    results.emplace("y", ys);
-    results.emplace("z", zs);
+#ifndef NDEBUG
+    size_t ni = chainLen - 1;
+    bondLen = std::sqrt(SQUARE(xs[ni] - from[0] + dist[0]) +
+                        SQUARE(ys[ni] - from[1] + dist[1]) +
+                        SQUARE(zs[ni] - from[2] + dist[2]));
+    assert(APPROX_REL_EQUAL(
+      bondLen, beadDistance, 0.25));
+#endif
+
+    Positions results;
+    results.x = xs;
+    results.y = ys;
+    results.z = zs;
     return results;
   }
 
@@ -165,11 +212,10 @@ namespace utils {
    * @param to the atom to end the random walk at
    * @param chainLen the number of atoms to add in between from and to
    */
-  std::unordered_map<std::string, std::vector<double>> doLinearWalkChainFromTo(
-    const pylimer_tools::entities::Box& box,
-    std::array<double, 3> from,
-    std::array<double, 3> to,
-    int chainLen)
+  Positions doLinearWalkChainFromTo(const pylimer_tools::entities::Box& box,
+                                    std::array<double, 3> from,
+                                    std::array<double, 3> to,
+                                    int chainLen)
   {
     std::array<double, 3> dist = { to[0] - from[0],
                                    to[1] - from[1],
@@ -198,11 +244,10 @@ namespace utils {
       zs.push_back(currentCoordsPbc[2]);
     }
 
-    std::unordered_map<std::string, std::vector<double>> results;
-    results.reserve(3);
-    results.emplace("x", xs);
-    results.emplace("y", ys);
-    results.emplace("z", zs);
+    Positions results;
+    results.x = xs;
+    results.y = ys;
+    results.z = zs;
     return results;
   }
 }

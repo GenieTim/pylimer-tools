@@ -6,6 +6,42 @@
 namespace pylimer_tools {
 namespace topo {
 
+  Eigen::Vector3d sampleIntersectionPoint(const Eigen::Vector3d origin1,
+                                          const double radius1,
+                                          const Eigen::Vector3d origin2,
+                                          const double radius2,
+                                          double theta = 0.0)
+  {
+    // after https://gamedev.stackexchange.com/a/75775
+    double d = (origin2 - origin1).norm();
+    if (d < 1e-10) {
+      return origin1;
+    }
+    if (d > radius1 + radius2) {
+      throw std::runtime_error("No intersection findable between the two spheres.");
+    }
+    double h = 0.5 + (radius1 * radius1 - radius2 * radius2) / (2 * d * d);
+    Eigen::Vector3d intersectionCenter = origin1 + h * (origin2 - origin1);
+    double intersectionRadius = sqrt(radius1 * radius1 - h * h * d * d);
+    Eigen::Vector3d intersectionNormal = (origin2 - origin1) / d;
+
+    // find non-parallel axis to the intersection normal
+    Eigen::Index minRow;
+    double minVal = intersectionNormal.cwiseAbs().minCoeff(&minRow);
+
+    Eigen::Vector3d nonParallelAxis = Eigen::Vector3d::Zero();
+    nonParallelAxis[minRow] = 1.0;
+
+    Eigen::Vector3d intersectionTangent =
+      nonParallelAxis.cross(intersectionNormal).normalized();
+    Eigen::Vector3d intersectionBinormal =
+      intersectionTangent.cross(intersectionNormal);
+
+    return intersectionCenter +
+           intersectionRadius * (intersectionTangent * std::cos(theta) +
+                                 intersectionBinormal * std::sin(theta));
+  }
+
   bool segmentIntersectsTriangle(
     const Eigen::Vector3d rayOrigin,
     const Eigen::Vector3d rayTarget,
