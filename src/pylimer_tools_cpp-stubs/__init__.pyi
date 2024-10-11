@@ -15,7 +15,7 @@ import numpy
 import pybind11_stubgen.typing_ext
 import scipy.sparse
 import typing
-__all__ = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'Box', 'ComputedDoubleValues', 'ComputedIntValues', 'DANGLING_CHAIN', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'ExitReason', 'FREE_CHAIN', 'LazyUniverseSequenceIterator', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NETWORK_STRAND', 'NeighbourList', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'OutputConfiguration', 'PRIMARY_LOOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StructureSimplificationMode', 'UNDEFINED', 'Universe', 'UniverseSequence', 'compute_stoichiometric_imbalance', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'inverse_langevin', 'predict_gelation_point', 'randomly_sample_entanglements', 'split_csv', 'version_information']
+__all__ = ['Atom', 'AtomPairEntanglements', 'AtomStyle', 'AveFileReader', 'Box', 'ComputedDoubleValues', 'ComputedIntValues', 'DANGLING_CHAIN', 'DPDSimulator', 'DataFileReader', 'DataFileWriter', 'DumpFileReader', 'ExitReason', 'FREE_CHAIN', 'LazyUniverseSequenceIterator', 'LinkSwappingMode', 'MCUniverseGenerator', 'MEHPForceBalance', 'MEHPForceEvaluator', 'MEHPForceRelaxation', 'Molecule', 'MoleculeIterator', 'MoleculeType', 'NETWORK_STRAND', 'NeighbourList', 'NonGaussianSpringForceEvaluator', 'NormalModeAnalyzer', 'OutputConfiguration', 'PRIMARY_LOOP', 'SimpleSpringMEHPForceEvaluator', 'SimplifiedBalanceNetwork', 'SimplifiedNetwork', 'StructureSimplificationMode', 'UNDEFINED', 'Universe', 'UniverseSequence', 'compute_stoichiometric_imbalance', 'do_linear_walk_chain_from_to', 'do_random_walk', 'do_random_walk_chain_from_to', 'do_random_walk_chain_from_to_mc', 'inverse_langevin', 'predict_gelation_point', 'randomly_sample_entanglements', 'split_csv', 'version_information']
 class Atom:
     """
     
@@ -1008,11 +1008,16 @@ class MCUniverseGenerator:
                     :param strand_atom_type: Type of atoms for the strands (default: 1).
                     :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2`.
         """
-    def add_crosslinkers(self, nr_of_crosslinkers: int, crosslinker_functionality: int = 4, crosslinker_type: int = 2) -> None:
+    def add_crosslinkers(self, nr_of_crosslinkers: int, crosslinker_functionality: int = 4, crosslinker_type: int = 2, white_noise: bool = True) -> None:
         """
                     Add the cross-linkers.
+        
+                    :param nr_of_crosslinkers: Number of cross-linkers to add.
+                    :param crosslinker_functionality: Functionality of the cross-linkers (default: 4).
+                    :param crosslinker_type: Atom type of the cross-linkers (default: 2).
+                    :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the cross-linkers (default: true).
         """
-    def add_solvent_chains(self, nr_of_solvent_chains: int, solvent_chain_length: int, solvent_atom_type: int = 3) -> None:
+    def add_solvent_chains(self, nr_of_solvent_chains: int, solvent_chain_length: int, solvent_atom_type: int = 3, white_noise: bool = True) -> None:
         """
                     Randomly distribute additional, free chains.
         """
@@ -1160,7 +1165,7 @@ class MEHPForceBalance:
         """
                   Evaluate the force on a particular (slip- or cross-) link.
         """
-    def get_gamma_factor(self, b_0: float = -1.0, nr_of_chains: int = -1) -> float:
+    def get_gamma_factor(self, b02: float = -1.0, nr_of_chains: int = -1) -> float:
         """
                   Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
         
@@ -1173,10 +1178,10 @@ class MEHPForceBalance:
                   :math:`T` the temperature and 
                   :math:`k_B` Boltzmann's constant.
                   
-                  :param b: the melt <b>: mean bond length; vgl. the required <R_0^2>, computed as phantom = N<b>^2.
+                  :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\\infinity b^2`.
                   :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains. 
         """
-    def get_gamma_factor_using_partial_springs(self, one_over_spring_partition_upper_limit: float = 1.0, b_0: float = -1.0, nr_of_chains: int = -1) -> float:
+    def get_gamma_factor_using_partial_springs(self, one_over_spring_partition_upper_limit: float = 1.0, b02: float = -1.0, nr_of_chains: int = -1) -> float:
         """
                   Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
         
@@ -1189,8 +1194,12 @@ class MEHPForceBalance:
                   :math:`T` the temperature and 
                   :math:`k_B` Boltzmann's constant.
                   
-                  :param b: the melt <b>: mean bond length; vgl. the required <R_0^2>, computed as phantom = N<b>^2.
+                  :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\\infinity b^2`.
                   :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains. 
+        """
+    def get_gamma_factors(self, b02: float) -> numpy.ndarray:
+        """
+                  Evaluates the gamma factor for each strand (i.e., the squared distance divided by the contour length multiplied by b02)
         """
     def get_ids_of_active_nodes(self, tolerance: float = 0.01, minimum_nr_of_active_connections: int = 2, maximum_nr_of_active_connections: int = -1, use_partial: bool = False) -> list[int]:
         """
@@ -2722,17 +2731,22 @@ def compute_stoichiometric_imbalance(arg0: Universe, arg1: int, arg2: int, arg3:
     """
     Compute stoichiometric imbalance
     """
-def do_linear_walk_chain_from_to(box: Box, from_coordinates: typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(3)], to_coordinates: typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(3)], chain_len: int) -> dict[str, list[float]]:
+def do_linear_walk_chain_from_to(box: Box, from_coordinates: typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(3)], to_coordinates: typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(3)], chain_len: int) -> ...:
     """
                 Get coordinates linearly interpolated from one point to another (both exclusive).
     """
-def do_random_walk(chain_len: int, bead_distance: float = 1.0, seed: str = '') -> dict[str, list[float]]:
+def do_random_walk(chain_len: int, bead_distance: float = 1.0, seed: str = '') -> ...:
     """
                 Do a random walk, return the coordinates of each point visited.
     """
-def do_random_walk_chain_from_to(box: Box, from_coordinates: typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(3)], to_coordinates: typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(3)], chain_len: int, bead_distance: float = 1.0, seed: str = '') -> dict[str, list[float]]:
+def do_random_walk_chain_from_to(box: Box, from_coordinates: typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(3)], to_coordinates: typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(3)], chain_len: int, bead_distance: float = 1.0, seed: str = '') -> ...:
     """
                 Do a random walk from one point to another.
+    """
+def do_random_walk_chain_from_to_mc(box: Box, from_coordinates: typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(3)], to_coordinates: typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(3)], chain_len: int, bead_distance: float = 1.0, seed: str = '', n_iterations: int = 1000) -> ...:
+    """
+                Do a random walk from one point to another.
+                Then, relax the points in between using a Metropolis-Monte Carlo simulation.
     """
 def inverse_langevin(x: float) -> float:
     """
