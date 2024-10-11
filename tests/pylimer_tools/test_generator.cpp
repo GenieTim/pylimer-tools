@@ -91,9 +91,10 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
       CHECK(molecule.getNrOfAtoms() == 16);
     }
 
-    auto bondLengths = universe.getBondLengths();
+    auto bondLengths = universe.computeBondLengths();
     for (const double bondLength : bondLengths) {
-      CHECK(bondLength > 0.0 && bondLength < 3.0);
+      CHECK(bondLength > 0.0);
+      CHECK(bondLength < 3.0);
     }
   }
 
