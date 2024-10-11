@@ -1,8 +1,34 @@
 #include "../../src/pylimer_tools_cpp/entities/Box.h"
 #include "../../src/pylimer_tools_cpp/topo/TopologyCalc.h"
+#include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 #include <iostream>
+
+TEST_CASE("Radius intersection is found", "[TopologyCalc]")
+{
+  std::cout << "Running test \"Radius intersection is found\"" << std::endl;
+  REQUIRE(1 == 2 - 1);
+  Eigen::Vector3d center;
+  center << 0.0, 0.0, -0.5;
+
+  Eigen::Vector3d queryPoint;
+  queryPoint << 0.0, 0.0, 0.5;
+
+  SECTION("Intersection is found")
+  {
+    Eigen::Vector3d intersectionPoint =
+      pylimer_tools::topo::sampleIntersectionPoint(
+        center, 1., queryPoint, 1.0, 0.0);
+    CHECK(intersectionPoint[2] == Catch::Approx(0.0));
+  }
+
+  SECTION("Intersection should not be found")
+  {
+    CHECK_THROWS(pylimer_tools::topo::sampleIntersectionPoint(
+      center, 0.1, queryPoint, 0.1, 0.0));
+  }
+}
 
 TEST_CASE("Segment Intersection is found", "[TopologyCalc]")
 {
