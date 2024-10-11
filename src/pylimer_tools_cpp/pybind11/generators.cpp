@@ -84,6 +84,19 @@ init_pylimer_bound_generators(py::module_& m)
         py::arg("chain_len"),
         py::arg("bead_distance") = 1.,
         py::arg("seed") = "");
+  m.def("do_random_walk_chain_from_to_mc",
+        &doRandomWalkChainFromToMC,
+        R"pbdoc(
+            Do a random walk from one point to another.
+            Then, relax the points in between using a Metropolis-Monte Carlo simulation.
+            )pbdoc",
+        py::arg("box"),
+        py::arg("from_coordinates"),
+        py::arg("to_coordinates"),
+        py::arg("chain_len"),
+        py::arg("bead_distance") = 1.,
+        py::arg("seed") = "",
+        py::arg("n_iterations") = 1000);
   m.def("do_random_walk_chain_from_to",
         &doRandomWalkChainFromTo,
         R"pbdoc(
