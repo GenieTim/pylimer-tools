@@ -56,7 +56,7 @@ TEST_CASE("Universe can be created", "[entity][Universe]")
                       { { 0, 0 } },
                       { { 0, 0 } },
                       { { 0, 0 } });
-    REQUIRE(universe.getNrOfAtoms() == 2);
+    CHECK(universe.getNrOfAtoms() == 2);
     universe.addAtoms({ { 3, 4 } },
                       { { 1, 1 } },
                       { { 0.0, 1.0 } },
@@ -65,68 +65,68 @@ TEST_CASE("Universe can be created", "[entity][Universe]")
                       { { 0, 0 } },
                       { { 0, 0 } },
                       { { 0, 0 } });
-    REQUIRE(universe.getNrOfAtoms() == 4);
+    CHECK(universe.getNrOfAtoms() == 4);
     CHECK(universe.getAtomsOfType(1).size() == 4);
     CHECK(universe.getNrOfBonds() == 0);
     REQUIRE_THROWS(universe.getIdxByAtomId(1000));
 
     SECTION("Atom coordinates can be rescaled")
     {
-      REQUIRE(universe.getVolume() == 1.0);
-      REQUIRE(universe.getAtom(0).getX() == 0.0);
-      REQUIRE(universe.getAtom(1).getX() == 1.0);
+      CHECK(universe.getVolume() == 1.0);
+      CHECK(universe.getAtom(0).getX() == 0.0);
+      CHECK(universe.getAtom(1).getX() == 1.0);
       universe.setBox(pe::Box(2.0, 2.0, 2.0), true);
-      REQUIRE(universe.getAtom(0).getX() == 0.0);
-      REQUIRE(universe.getAtom(0).getY() == 0.0);
-      REQUIRE(universe.getAtom(0).getZ() == 0.0);
-      REQUIRE(universe.getAtom(1).getX() == 2.0);
-      REQUIRE(universe.getAtom(1).getY() == 2.0);
-      REQUIRE(universe.getAtom(1).getZ() == 2.0);
+      CHECK(universe.getAtom(0).getX() == 0.0);
+      CHECK(universe.getAtom(0).getY() == 0.0);
+      CHECK(universe.getAtom(0).getZ() == 0.0);
+      CHECK(universe.getAtom(1).getX() == 2.0);
+      CHECK(universe.getAtom(1).getY() == 2.0);
+      CHECK(universe.getAtom(1).getZ() == 2.0);
       universe.setBox(pe::Box(1.0, 2.0, 1.0, 2.0, 1.0, 2.0), true);
-      REQUIRE(universe.getAtom(0).getX() == 1.0);
-      REQUIRE(universe.getAtom(0).getY() == 1.0);
-      REQUIRE(universe.getAtom(0).getZ() == 1.0);
-      REQUIRE(universe.getAtom(1).getX() == 2.0);
-      REQUIRE(universe.getAtom(1).getY() == 2.0);
-      REQUIRE(universe.getAtom(1).getZ() == 2.0);
+      CHECK(universe.getAtom(0).getX() == 1.0);
+      CHECK(universe.getAtom(0).getY() == 1.0);
+      CHECK(universe.getAtom(0).getZ() == 1.0);
+      CHECK(universe.getAtom(1).getX() == 2.0);
+      CHECK(universe.getAtom(1).getY() == 2.0);
+      CHECK(universe.getAtom(1).getZ() == 2.0);
     }
 
     SECTION("Atoms can be removed")
     {
       universe.addBonds({ { 0, 1, 3, 4 } }, { { 1, 3, 4, 0 } });
       pe::Universe universeCopy = pe::Universe(universe);
-      REQUIRE_NOTHROW(universeCopy.getAtom(3));
-      REQUIRE(universeCopy.getNrOfAtoms() == 4);
-      REQUIRE(universeCopy.getNrOfBonds() == 4);
+      CHECK_NOTHROW(universeCopy.getAtom(3));
+      CHECK(universeCopy.getNrOfAtoms() == 4);
+      CHECK(universeCopy.getNrOfBonds() == 4);
       universeCopy.removeAtoms({ { 1, 3 } });
-      REQUIRE(universeCopy.getAtom(4) == universe.getAtom(4));
-      REQUIRE_THROWS(universeCopy.getAtom(3));
-      REQUIRE(universeCopy.validate());
-      REQUIRE(universeCopy.getNrOfAtoms() == 2);
-      REQUIRE(universeCopy.getNrOfBonds() == 1);
+      CHECK(universeCopy.getAtom(4) == universe.getAtom(4));
+      CHECK_THROWS(universeCopy.getAtom(3));
+      CHECK(universeCopy.validate());
+      CHECK(universeCopy.getNrOfAtoms() == 2);
+      CHECK(universeCopy.getNrOfBonds() == 1);
     }
 
     SECTION("molecules are found")
     {
-      REQUIRE(universe.getNrOfAtoms() == 4);
-      REQUIRE(universe.getMolecules(2).size() == 4);
+      CHECK(universe.getNrOfAtoms() == 4);
+      CHECK(universe.getMolecules(2).size() == 4);
       // works twice: make sure there is no removal of anything happening
-      REQUIRE(universe.getMolecules(2).size() == 4);
+      CHECK(universe.getMolecules(2).size() == 4);
       universe.addBonds(2, { { 0, 3 } }, { { 3, 4 } });
-      REQUIRE(universe.getNrOfAtoms() == 4);
-      REQUIRE(universe.getNrOfBonds() == 2);
-      REQUIRE(universe.getMolecules(1).size() == 0);
+      CHECK(universe.getNrOfAtoms() == 4);
+      CHECK(universe.getNrOfBonds() == 2);
+      CHECK(universe.getMolecules(1).size() == 0);
       std::vector<pe::Molecule> molecules = universe.getMolecules(2);
-      REQUIRE(molecules.size() == 2);
+      CHECK(molecules.size() == 2);
       // works twice: make sure there is no removal of anything happening
-      REQUIRE(universe.getMolecules(2).size() == 2);
+      CHECK(universe.getMolecules(2).size() == 2);
     }
 
     SECTION("Special constructors work")
     {
       pe::Universe universe2 = universe;
-      REQUIRE(universe2.getNrOfAtoms() == 4);
-      REQUIRE(universe2.getMolecules(2).size() == 4);
+      CHECK(universe2.getNrOfAtoms() == 4);
+      CHECK(universe2.getMolecules(2).size() == 4);
     }
   }
 
@@ -276,6 +276,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
 
   SECTION("Molecules with crossLinkers are found")
   {
+    universe.setBox(pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0));
     /**
     # The system looks like this (in terms of bonds, not 3D placement):
     # 1-2-3-*6
@@ -387,7 +388,6 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
 
     SECTION("internal lengths are computed correctly")
     {
-      universe.setBoxLengths(10.0, 10.0, 10.0);
       REQUIRE(universe.computeMeanBondLength() == Catch::Approx(1.1452634834));
       auto chains = universe.getChainsWithCrosslinker(2);
       REQUIRE(chains.size() == 3);
@@ -420,14 +420,15 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                          detectedAngles["angle_via"],
                          detectedAngles["angle_to"],
                          angleTypes);
-      CHECK(detectedAngles["angle_from"][0] == 7);
-      CHECK(detectedAngles["angle_to"][0] == 2);
+      CHECK(detectedAngles["angle_from"][0] == 2);
+      CHECK(detectedAngles["angle_to"][0] == 7);
       CHECK(detectedAngles["angle_via"][0] == 1);
       REQUIRE(universe.getAngles()["angle_from"].size() == 8);
 
+      // angles can be computed correctly
       std::vector<double> angles = universe.computeAngles();
       REQUIRE(angles.size() == 8);
-      CHECK(Catch::Approx(angles[0]) == 104.036);
+      CHECK(Catch::Approx(angles[0]) == 1.815770741);
     }
 
     SECTION("get dihedral angles returns")
@@ -679,19 +680,17 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       REQUIRE(chains[2].getKey() == "7-8");
 
       auto endToEndDistances = universe.computeEndToEndDistances(2);
-      REQUIRE(endToEndDistances.size() == 3);
-      REQUIRE(endToEndDistances[0] == chains[0].computeEndToEndDistance());
-      REQUIRE(endToEndDistances[0] ==
-              Catch::Approx(sqrt(3.0 * 3.0 + 1.0 * 1.0)));
-      REQUIRE(endToEndDistances[1] == chains[1].computeEndToEndDistance());
-      REQUIRE(endToEndDistances[1] ==
-              Catch::Approx(sqrt(3.0 * 3.0 + 1.0 * 1.0)));
-      REQUIRE(endToEndDistances[2] == chains[2].computeEndToEndDistance());
-      REQUIRE(endToEndDistances[2] == 1.0);
-      REQUIRE(universe.computeMeanEndToEndDistance(2) ==
-              Catch::Approx((2.0 * sqrt(3.0 * 3.0 + 1.0 * 1.0) + 1.0) / 3.0));
-      REQUIRE(universe.computeMeanSquareEndToEndDistance(2) ==
-              Catch::Approx((2.0 * (3.0 * 3.0 + 1.0 * 1.0) + 1.0) / 3.0));
+      CHECK(endToEndDistances.size() == 3);
+      CHECK(endToEndDistances[0] == chains[0].computeEndToEndDistance());
+      CHECK(endToEndDistances[0] == Catch::Approx(sqrt(3.0 * 3.0 + 1.0 * 1.0)));
+      CHECK(endToEndDistances[1] == chains[1].computeEndToEndDistance());
+      CHECK(endToEndDistances[1] == Catch::Approx(sqrt(3.0 * 3.0 + 1.0 * 1.0)));
+      CHECK(endToEndDistances[2] == chains[2].computeEndToEndDistance());
+      CHECK(endToEndDistances[2] == 1.0);
+      CHECK(universe.computeMeanEndToEndDistance(2) ==
+            Catch::Approx((2.0 * sqrt(3.0 * 3.0 + 1.0 * 1.0) + 1.0) / 3.0));
+      CHECK(universe.computeMeanSquareEndToEndDistance(2) ==
+            Catch::Approx((2.0 * (3.0 * 3.0 + 1.0 * 1.0) + 1.0) / 3.0));
     }
   }
 
@@ -713,30 +712,31 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                       { { 1, 1, 1, 1, 1, 1 } }  // nz
     );
     universe.addBonds(4, { { 1, 2, 5, 6 } }, { { 2, 3, 6, 7 } });
-    REQUIRE(universe.getNrOfBonds() == 4);
-    REQUIRE(universe.getMolecules(2).size() == 2);
-    REQUIRE(universe.getChainsWithCrosslinker(2).size() == 2);
-    REQUIRE(
-      universe.computeFunctionalityForVertex(universe.getIdxByAtomId(1)) == 1);
-    REQUIRE(universe.computeFunctionalityForAtom(1) == 1);
-    REQUIRE(universe.getAtomsConnectedTo(universe.getIdxByAtomId(1)).size() ==
-            1);
+    CHECK(universe.getNrOfBonds() == 4);
+    CHECK(universe.getMolecules(2).size() == 2);
+    CHECK(universe.getChainsWithCrosslinker(2).size() == 3);
+    CHECK(universe.computeFunctionalityForVertex(universe.getIdxByAtomId(1)) ==
+          1);
+    CHECK(universe.computeFunctionalityForAtom(1) == 1);
+    CHECK(universe.getAtomsConnectedTo(universe.getIdxByAtomId(1)).size() == 1);
     auto chains = universe.getChainsWithCrosslinker(2);
-    REQUIRE(chains.size() == 2);
-    REQUIRE(chains[0].getNrOfAtoms() == 3);
-    REQUIRE(chains[0].getType() == pe::MoleculeType::FREE_CHAIN);
-    REQUIRE(chains[1].getNrOfAtoms() == 2);
-    REQUIRE(chains[1].getType() == pe::MoleculeType::DANGLING_CHAIN);
+    CHECK(chains.size() == 3);
+    CHECK(chains[0].getNrOfAtoms() == 3);
+    CHECK(chains[0].getType() == pe::MoleculeType::FREE_CHAIN);
+    CHECK(chains[1].getNrOfAtoms() == 2);
+    CHECK(chains[1].getType() == pe::MoleculeType::DANGLING_CHAIN);
+    CHECK(chains[2].getNrOfAtoms() == 2);
     // other checks
-    REQUIRE(chains[0].getKey() == "1-2-3");
-    REQUIRE(chains[1].getKey() == "5-6");
+    CHECK(chains[0].getKey() == "1-2-3");
+    CHECK(chains[1].getKey() == "5-6");
+    CHECK(chains[2].getKey() == "6-7");
     universe.setBoxLengths(3.0, 3.0, 3.0);
-    REQUIRE(universe.determineEffectiveFunctionalityPerType()[2] ==
-            (1. + 2.) / 2.);
-    REQUIRE(chains[0].computeEndToEndDistance() == 1.0);
-    REQUIRE(chains[1].computeEndToEndDistance() == 0.0);
-    REQUIRE(universe.computeMeanEndToEndDistance(2) == 1.0);
-    REQUIRE(universe.computeMeanSquareEndToEndDistance(2) == 1.0);
+    CHECK(universe.determineEffectiveFunctionalityPerType()[2] ==
+          (1. + 2.) / 2.);
+    CHECK(chains[0].computeEndToEndDistance() == 1.0);
+    CHECK(chains[1].computeEndToEndDistance() == 0.0);
+    CHECK(universe.computeMeanEndToEndDistance(2) == 1.0);
+    CHECK(universe.computeMeanSquareEndToEndDistance(2) == 1.0);
 
     SECTION("Primary loops too")
     {
@@ -759,11 +759,11 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                         { { 1, 1 } }  // nz
       );
       universe.addBonds(3, { { 7, 8, 9 } }, { { 8, 9, 7 } });
-      REQUIRE(universe.getNrOfBonds() == 7);
+      CHECK(universe.getNrOfBonds() == 7);
       auto newChains = universe.getChainsWithCrosslinker(2);
-      REQUIRE(newChains.size() == 3);
-      REQUIRE(newChains[2].getType() == pe::MoleculeType::PRIMARY_LOOP);
-      REQUIRE(newChains[2].getKey() == "7-8-9");
+      CHECK(newChains.size() == 4);
+      CHECK(newChains[2].getType() == pe::MoleculeType::PRIMARY_LOOP);
+      CHECK(newChains[2].getKey() == "7-8-9");
     }
   }
 
@@ -807,15 +807,15 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       }
       universe.setMasses(weights);
       // some asserts that everything has been correcly set by the test
-      REQUIRE(universe.getMolecules(-1).size() == 100);
-      REQUIRE(currentId == 100);
+      CHECK(universe.getMolecules(-1).size() == 100);
+      CHECK(currentId == 100);
       // then, do the calculation
-      REQUIRE(universe.computeTotalMass() == Catch::Approx(50000000));
-      REQUIRE(universe.computeNumberAverageMolecularWeight(-1) ==
-              Catch::Approx(500000));
-      REQUIRE(universe.computeWeightAverageMolecularWeight(-1) ==
-              Catch::Approx(531600));
-      REQUIRE(universe.computePolydispersityIndex(-1) == Catch::Approx(1.0632));
+      CHECK(universe.computeTotalMass() == Catch::Approx(50000000));
+      CHECK(universe.computeNumberAverageMolecularWeight(-1) ==
+            Catch::Approx(500000));
+      CHECK(universe.computeWeightAverageMolecularWeight(-1) ==
+            Catch::Approx(531600));
+      CHECK(universe.computePolydispersityIndex(-1) == Catch::Approx(1.0632));
     }
 
     SECTION("System to zero out")
@@ -848,7 +848,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                                getVectorWithOne<long int>(currentId - 1));
           }
         }
-        REQUIRE(universe2.computePolydispersityIndex(-1) == Catch::Approx(1.0));
+        CHECK(universe2.computePolydispersityIndex(-1) == Catch::Approx(1.0));
       }
       // add cross-linkers
       SECTION("With cross-linkers")
@@ -865,7 +865,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
                              oneZeroInt,
                              oneZeroInt);
         }
-        REQUIRE(universe2.computePolydispersityIndex(2) == Catch::Approx(1.0));
+        CHECK(universe2.computePolydispersityIndex(2) == Catch::Approx(1.0));
       }
     }
   }
@@ -874,14 +874,14 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
   {
     const pe::Box box = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
     universe.setBox(box);
-    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },     // id
-                      { { 2, 1, 1, 1, 2, 1, 1, 1 } },     // type
-                      { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // x
-                      { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // y
-                      { { 1, 2, 3, 4, 9, -10, -9, -8 } }, // z
-                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },     // nx
-                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },     // ny
-                      { { 0, 0, 0, 0, 1, 2, 2, 2 } }      // nz
+    universe.addAtoms({ { 1, 2, 3, 4, 5, 6, 7, 8 } },             // id
+                      { { 2, 1, 1, 1, 2, 1, 1, 1 } },             // type
+                      { { 1., 2., 3., 4., 9., -10., -9., -8. } }, // x
+                      { { 1., 2., 3., 4., 9., -10., -9., -8. } }, // y
+                      { { 1., 2., 3., 4., 9., -10., -9., -8. } }, // z
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },             // nx
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } },             // ny
+                      { { 0, 0, 0, 0, 1, 2, 2, 2 } }              // nz
     );
 
     std::vector<double> distances = { 0., 1., 2., 3. };
@@ -1005,11 +1005,11 @@ TEST_CASE("Coordinates work")
 TEST_CASE("Large universe can be used", "[Universe][entity]")
 {
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
-  REQUIRE(universeSeq.getLength() == 0);
+  CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
   universeSeq.initializeFromDataSequence(
     { { suspectedPath + "lammps_data_file.out" } });
-  REQUIRE(universeSeq.getLength() == 1);
+  CHECK(universeSeq.getLength() == 1);
 
   pe::Universe universe = universeSeq.atIndex(0);
 

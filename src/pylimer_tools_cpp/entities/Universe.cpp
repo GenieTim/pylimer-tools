@@ -692,11 +692,10 @@ namespace entities {
     for (size_t i = 1; i < distances.size(); ++i) {
       for (const Atom& a : atoms) {
         std::vector<Atom> closeAtoms = neighbourList.getAtomsCloseTo(
-          a, distances[i], distances[i - 1], unwrapped);
+          a, distances[i], distances[i - 1], unwrapped, true);
         // std::cout << closeAtoms.size() << " atoms close to " << a.getId()
         //           << " between " << distances[i] << " and " << distances[i -
-        //           1]
-        //           << std::endl;
+        //           1] << std::endl;
         result[i - 1] += closeAtoms.size();
       }
     }
@@ -1820,7 +1819,8 @@ namespace entities {
       Eigen::Vector3d vec2 =
         this->getAtom(this->angleVia[i])
           .vectorTo(this->getAtom(this->angleFrom[i]), this->getBox());
-      results.push_back(std::acos(vec1.dot(vec2)));
+      results.push_back(
+        std::acos(vec1.dot(vec2) / (vec1.norm() * vec2.norm())));
     }
     return results;
   }

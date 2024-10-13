@@ -16,5 +16,5 @@ TEST_CASE("NormalModeAnalyzer does not crash", "[analysis][NormalModeAnalyzer]")
   REQUIRE_THROWS(normalModeAnalyzer.getEigenvectors());
   REQUIRE_NOTHROW(normalModeAnalyzer.computeAllEigenvalues());
   Eigen::VectorXd eigenvalues = normalModeAnalyzer.getEigenvalues();
-  CHECK(eigenvalues.size() == 4);
+  CHECK(eigenvalues.size() == 5);
 }

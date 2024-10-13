@@ -227,6 +227,21 @@ TEST_CASE("Box can do PBC computations", "[entity][Box]")
   }
 }
 
+TEST_CASE("Atoms compute distances PBC correctly", "[entity][Atoms][Box]")
+{
+  // related to test "Universe can be used" > "Local Density Computation"
+  std::cout << "Running test \"Atoms compute distances PBC correctly\""
+            << std::endl;
+  pe::Box testBox = pe::Box(-10.0, 10.0, -10.0, 10.0, -10.0, 10.0);
+
+  pe::Atom atom1 = pe::Atom(1, 1, 9., 9., 9., 1, 1, 1);
+  pe::Atom atom2 = pe::Atom(1, 1, -10., -10., -10., 2, 2, 2);
+
+  double distance = atom1.distanceTo(atom2, testBox);
+  CHECK(distance < 2.0);
+  CHECK(distance > 1.0);
+}
+
 TEST_CASE("Box can adjust coordinates", "[entity][Box]")
 {
   std::cout << "Running test \"Box can adjust coordinates\"" << std::endl;

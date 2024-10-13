@@ -225,10 +225,10 @@ TEST_CASE("MEHP Force Relaxation does not collapse",
     CHECK(forceRelaxerNew.getNrOfActiveSprings() == 8);
     CHECK(forceRelaxerNew.getNrOfActiveNodes() == 4);
     CHECK(forceRelaxerNew.getAverageSpringLength() == Catch::Approx(5.0));
-    CHECK_THAT(forceRelaxerNew.getGammaFactor(),
-               Catch::Matchers::WithinAbs(1.0, 1e-2));
-    CHECK_THAT(forceRelaxerNew.getGammaFactors().mean(),
-               Catch::Matchers::WithinAbs(1.0, 1e-2));
+    CHECK_THAT(forceRelaxerNew.getGammaFactor(5.),
+               Catch::Matchers::WithinAbs(2.5, 1e-2));
+    CHECK_THAT(forceRelaxerNew.getGammaFactors(5.).mean(),
+               Catch::Matchers::WithinAbs(2.5, 1e-2));
   }
 };
 
@@ -780,8 +780,10 @@ TEST_CASE("Force Relaxation free chains collapse",
   //           << forceRelaxerLangevin.getForce() << ", "
   //           << forceRelaxerLangevin.getResidualNorm() << std::endl;
 
-  forceRelaxerLangevin.runForceRelaxation(
-    "LD_MMA", 500000, 1e-15, 1e-19); // "LD_SLSQP", "LD_MMA"
+  while (forceRelaxerLangevin.suggestsRerun()) {
+    forceRelaxerLangevin.runForceRelaxation(
+      "LD_MMA", 500000, 1e-15, 1e-19); // "LD_SLSQP", "LD_MMA"
+  }
   CHECK(forceRelaxerLangevin.getNrOfActiveSprings() == 0);
   // CHECK(forceRelaxerLangevin.getAverageSpringLength() == Catch::Approx(0.0));
   CHECK(forceRelaxerLangevin.getAverageSpringLength() >= 0.0);

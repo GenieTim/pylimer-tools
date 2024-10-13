@@ -35,7 +35,7 @@ namespace entities {
     INVALIDARG_EXP_IFN(coordinates.size() % 3 == 0,
                        "Coordinates must be in three");
 
-    this->actualCutoff = newCutoff / scalingFactor;
+    this->actualCutoff = newCutoff / newScalingFactor;
     this->cutoff = newCutoff;
     this->scalingFactor = newScalingFactor;
     this->box = newBox;
