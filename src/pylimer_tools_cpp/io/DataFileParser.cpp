@@ -373,7 +373,7 @@ namespace utils {
                           &ny,
                           &nz);
 
-    RUNTIME_EXP_IFN(resFound < 8,
+    RUNTIME_EXP_IFN(resFound >= 8,
                     "Did not find enough data in line '" + line + "': only " +
                       std::to_string(resFound) + ".");
 

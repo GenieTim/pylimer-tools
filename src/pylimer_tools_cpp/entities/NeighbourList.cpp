@@ -75,7 +75,6 @@ namespace entities {
     bool unwrapped,
     bool expectSelf)
   {
-
     if (lowerCutoff > upperCutoff) {
       throw std::invalid_argument("Expected upper cutoff > lower cutoff, got " +
                                   std::to_string(upperCutoff) + " and " +
@@ -202,9 +201,12 @@ namespace entities {
     const pylimer_tools::entities::Atom& atom) const
   {
     return std::make_tuple(
-      static_cast<size_t>(std::floor(atom.getX() / this->bucketWidthX)),
-      static_cast<size_t>(std::floor(atom.getY() / this->bucketWidthY)),
-      static_cast<size_t>(std::floor(atom.getZ() / this->bucketWidthZ)));
+      static_cast<size_t>(
+        std::floor(atom.getUnwrappedX(this->box) / this->bucketWidthX)),
+      static_cast<size_t>(
+        std::floor(atom.getUnwrappedY(this->box) / this->bucketWidthY)),
+      static_cast<size_t>(
+        std::floor(atom.getUnwrappedZ(this->box) / this->bucketWidthZ)));
   }
 
   std::vector<size_t> NeighbourList::getCombinedBucketIndicesForAtom(

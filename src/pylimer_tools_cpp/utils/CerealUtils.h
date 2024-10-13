@@ -205,7 +205,7 @@ CEREAL_SAVE_FUNCTION_NAME(Archive& ar, igraph_strvector_t const& vec)
 {
   size_type n = igraph_strvector_size(&vec);
   ar(make_size_tag(n));
-  for (igraph_integer_t i = 0; i < n; ++i) {
+  for (igraph_integer_t i = 0; i < static_cast<igraph_integer_t>(n); ++i) {
     std::string val = igraph_strvector_get(&vec, i);
     ar(val);
   }

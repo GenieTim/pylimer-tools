@@ -553,8 +553,8 @@ namespace sim {
                             pylimer_tools::entities::MoleculeType::UNDEFINED,
                           "Cross-linker chain's chain type could not be "
                           "detected. Cannot work like that.");
-          if (crossLinkerChains[i].getType() !=
-                pylimer_tools::entities::MoleculeType::FREE_CHAIN ||
+          if (crossLinkerChains[i].getType() ==
+                pylimer_tools::entities::MoleculeType::NETWORK_STRAND ||
               crossLinkerChains[i].getType() ==
                 pylimer_tools::entities::MoleculeType::PRIMARY_LOOP ||
               (!removeDanglingChains &&
@@ -611,6 +611,9 @@ namespace sim {
 
         // convert springs
         size_t spring_idx = 0;
+        // dangling end correction = nr of ends in dangling chains that are not
+        // cross-links (were counted before, but will not be actually added)
+        size_t danglingEndCorrection = 0;
         for (size_t i = 0; i < crossLinkerChains.size(); ++i) {
           std::vector<pylimer_tools::entities::Atom> xlinkersOfChain =
             crossLinkerChains[i].getAtomsOfType(crossLinkerType);
@@ -632,13 +635,20 @@ namespace sim {
             net->springsContourLength[spring_idx] =
               crossLinkerChains[i].getNrOfBonds();
           } else if (crossLinkerChains[i].getType() ==
-                       pylimer_tools::entities::MoleculeType::DANGLING_CHAIN &&
-                     !removeDanglingChains) {
-            // to keep dangling chains, we convert the trailing atom to a
-            // cross-link
-            net->springsContourLength[spring_idx] =
-              crossLinkerChains[i].getNrOfBonds();
-            addChain = true;
+                     pylimer_tools::entities::MoleculeType::DANGLING_CHAIN) {
+            if (removeDanglingChains) {
+              for (pylimer_tools::entities::Atom& danglingAtom : endsOfChain) {
+                if (danglingAtom.getType() != crossLinkerType) {
+                  danglingEndCorrection += 1;
+                }
+              }
+            } else {
+              // to keep dangling chains, we convert the trailing atom to a
+              // cross-link
+              net->springsContourLength[spring_idx] =
+                crossLinkerChains[i].getNrOfBonds();
+              addChain = true;
+            }
           }
 
           if (addChain) {
@@ -695,10 +705,9 @@ namespace sim {
         // check whether spring contour lengths are what we want them to be
         size_t numCrosslinkers = springEndAtoms.size();
         // this->universe.countPropertyValue<int>("type", crossLinkerType);
-        assert((net->springsContourLength.array() -
-                Eigen::ArrayXd::Ones(net->nrOfSprings))
-                   .sum() +
-                 omittedChainsAtoms + numCrosslinkers ==
+        size_t contourSum = net->springsContourLength.sum();
+        assert(contourSum - net->nrOfSprings + omittedChainsAtoms +
+                 numCrosslinkers - danglingEndCorrection ==
                this->universe.getNrOfAtoms());
 
         return true; // crossLinkerUniverse.getNrOfBonds() == net->nrOfSprings;

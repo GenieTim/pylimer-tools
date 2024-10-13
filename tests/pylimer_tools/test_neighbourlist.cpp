@@ -21,15 +21,15 @@ TEST_CASE("NeighbourList works as intended", "[entity][NeighbourList]")
 {
   std::cout << "Running test \"NeighbourList works as intended\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
-  REQUIRE(universeSeq.getLength() == 0);
+  CHECK(universeSeq.getLength() == 0);
   std::string suspectedPath = "../pylimer_tools/fixtures/";
-  REQUIRE(std::filesystem::exists(suspectedPath));
+  CHECK(std::filesystem::exists(suspectedPath));
 
   universeSeq.initializeFromDataSequence(
     { { suspectedPath + "lammps_data_file_small.out" } });
-  REQUIRE(universeSeq.getLength() == 1);
-  REQUIRE(universeSeq.atIndex(0).getNrOfAtoms() == 12);
-  REQUIRE(universeSeq.atIndex(0).getNrOfBonds() == 5);
+  CHECK(universeSeq.getLength() == 1);
+  CHECK(universeSeq.atIndex(0).getNrOfAtoms() == 12);
+  CHECK(universeSeq.atIndex(0).getNrOfBonds() == 5);
 
   pe::Universe universe = universeSeq.atIndex(0);
 
@@ -39,25 +39,25 @@ TEST_CASE("NeighbourList works as intended", "[entity][NeighbourList]")
   pe::Atom testAtom10000 = universe.getAtom(10000);
   std::vector<pe::Atom> neighbours =
     neighbourList.getAtomsCloseTo(testAtom10000, 0.000001);
-  REQUIRE(neighbours.size() == 0);
+  CHECK(neighbours.size() == 0);
 
   neighbours = neighbourList.getAtomsCloseTo(testAtom10000, 1.0, 0.9999);
-  REQUIRE(neighbours.size() == 0);
+  CHECK(neighbours.size() == 0);
 
   pe::Atom testAtom20000 = universe.getAtom(20000);
   neighbours = neighbourList.getAtomsCloseTo(testAtom20000);
-  REQUIRE(neighbours.size() > 0);
+  CHECK(neighbours.size() > 0);
 
-  REQUIRE_THROWS(neighbourList.getAtomsCloseTo(testAtom10000, 2.0, 3.0));
+  CHECK_THROWS(neighbourList.getAtomsCloseTo(testAtom10000, 2.0, 3.0, true));
 
   // remove
   neighbourList.removeAtom(testAtom10000);
   // make sure we cannot query the remove atom
-  REQUIRE_THROWS(neighbourList.getAtomsCloseTo(testAtom10000));
+  CHECK_THROWS(neighbourList.getAtomsCloseTo(testAtom10000));
   // nor find it in other neighbour lists
   std::vector<pe::Atom> neighbours2 =
     neighbourList.getAtomsCloseTo(testAtom20000);
-  REQUIRE(neighbours2.size() == neighbours.size() - 1);
+  CHECK(neighbours2.size() == neighbours.size() - 1);
 }
 
 TEST_CASE("Manually accurate NeighbourList", "[entity][NeighbourList]")
@@ -81,15 +81,15 @@ TEST_CASE("Manually accurate NeighbourList", "[entity][NeighbourList]")
 
   pe::Atom atom2 = universe.getAtom(2);
   std::vector<pe::Atom> neighbours = neighbourList.getAtomsCloseTo(atom2, 1.0);
-  REQUIRE(neighbours.size() == 0);
+  CHECK(neighbours.size() == 0);
   neighbours = neighbourList.getAtomsCloseTo(atom2, 2.0);
-  REQUIRE(neighbours.size() == 2);
+  CHECK(neighbours.size() == 2);
   neighbours = neighbourList.getAtomsCloseTo(atom2, 2.0, 1.8);
-  REQUIRE(neighbours.size() == 0);
+  CHECK(neighbours.size() == 0);
   pe::Atom atom3 = universe.getAtom(3);
   neighbourList.removeAtom(atom3);
   neighbours = neighbourList.getAtomsCloseTo(atom2, 2.0);
-  REQUIRE(neighbours.size() == 1);
+  CHECK(neighbours.size() == 1);
 }
 
 TEST_CASE("Random coordinates EigenNeighbourList",
@@ -180,7 +180,7 @@ TEST_CASE("Manually accurate EigenNeighbourList",
   CHECK(neighbours.size() == 4);
   // neighbours = neighbourList.getIndicesCloseToCoordinates(
   //   coordinates.segment(3 * universe.getIdxByAtomId(2), 3), 2.0, 1.8);
-  // REQUIRE(neighbours.size() == 0);
+  // CHECK(neighbours.size() == 0);
   neighbours = neighbourList.getIndicesCloseToCoordinates(
     coordinates.segment(3 * universe.getIdxByAtomId(1), 3), 2.0);
   CHECK(neighbours.size() == 3);
