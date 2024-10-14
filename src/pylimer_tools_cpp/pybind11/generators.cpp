@@ -5,8 +5,8 @@
 #include "../utils/MCUniverseGenerator.h"
 #include "../utils/RandomWalker.h"
 
-#include <pybind11/pybind11.h>
 #include <pybind11/eigen.h>
+#include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <string>
 #include <vector>
@@ -34,6 +34,11 @@ init_pylimer_bound_generators(py::module_& m)
          &MCUniverseGenerator::setBeadDistance,
          "Set the optimal distance between beads.",
          py::arg("distance"))
+    .def(
+      "config_nr_of_mc_steps",
+      &MCUniverseGenerator::configNrOfMCSteps,
+      "Set the number of Monte-Carlo steps during bond length equilibration.",
+      py::arg("n_steps") = 2000)
     .def("add_crosslinkers",
          &MCUniverseGenerator::addCrosslinkers,
          R"pbdoc(
