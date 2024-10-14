@@ -299,7 +299,8 @@ namespace utils {
       assert(positions.x.size() == chainLen + 2);
       // shuffle the stepping indices to ensure we don't always
       // end with the last bead having to adjust
-      // std::shuffle(steppingPosIndices.begin(), steppingPosIndices.end(), rng);
+      // std::shuffle(steppingPosIndices.begin(), steppingPosIndices.end(),
+      // rng);
       for (size_t i : steppingPosIndices) {
         double bondLen1 = (SQUARE(positions.x[i] - positions.x[i - 1]) +
                            SQUARE(positions.y[i] - positions.y[i - 1]) +
@@ -324,8 +325,8 @@ namespace utils {
            SQUARE(positions.y[i] + disY - positions.y[i + 1]) +
            SQUARE(positions.z[i] + disZ - positions.z[i + 1]));
 
-        double newProbability =
-          std::exp(normalisationFactorInExponential * (newBondLen1 + newBondLen2));
+        double newProbability = std::exp(normalisationFactorInExponential *
+                                         (newBondLen1 + newBondLen2));
 
         double alpha = newProbability / currentProbability;
 

@@ -18,7 +18,8 @@ namespace topo {
       return origin1;
     }
     if (d > radius1 + radius2) {
-      throw std::runtime_error("No intersection findable between the two spheres.");
+      throw std::runtime_error(
+        "No intersection findable between the two spheres.");
     }
     double h = 0.5 + (radius1 * radius1 - radius2 * radius2) / (2 * d * d);
     Eigen::Vector3d intersectionCenter = origin1 + h * (origin2 - origin1);

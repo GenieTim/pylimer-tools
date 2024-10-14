@@ -53,7 +53,8 @@ TEST_CASE("NeighbourList works as intended", "[entity][NeighbourList]")
   // remove
   neighbourList.removeAtom(testAtom10000);
   // make sure we cannot query the remove atom
-  CHECK_THROWS(neighbourList.getAtomsCloseTo(testAtom10000, 3.0, 0.0, false, true));
+  CHECK_THROWS(
+    neighbourList.getAtomsCloseTo(testAtom10000, 3.0, 0.0, false, true));
   // nor find it in other neighbour lists
   std::vector<pe::Atom> neighbours2 =
     neighbourList.getAtomsCloseTo(testAtom20000);
