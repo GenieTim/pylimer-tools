@@ -325,14 +325,15 @@ namespace utils {
      */
     void addRandomWalkChainFrom(size_t idxFrom, int chainLen, int atomType = 1)
     {
-      Positions positions = pylimer_tools::utils::doRandomWalkChain(
+      Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
         chainLen, this->beadDistance, this->rng);
 
-      for (size_t i = 0; i < chainLen; ++i) {
-        positions.x[i] += this->simplifiedUniverse.x[idxFrom];
-        positions.y[i] += this->simplifiedUniverse.y[idxFrom];
-        positions.z[i] += this->simplifiedUniverse.z[idxFrom];
-      }
+      Eigen::Vector3d from =
+        Eigen::Vector3d(this->simplifiedUniverse.x[idxFrom],
+                        this->simplifiedUniverse.y[idxFrom],
+                        this->simplifiedUniverse.z[idxFrom]);
+
+      positions += from.replicate(1, chainLen);
 
       std::vector<size_t> idxs =
         this->addAtomsWithType(chainLen, atomType, positions);
@@ -379,25 +380,22 @@ namespace utils {
                                   int atomType = 1)
     {
       // determine the positions
-      Positions positions = // pylimer_tools::utils::doRandomWalkChainFromTo(
+      Eigen::VectorXd
+        positions = // pylimer_tools::utils::doRandomWalkChainFromTo(
         pylimer_tools::utils::doRandomWalkChainFromToMC(
           this->box,
-          std::array<double, 3>{
-            this->simplifiedUniverse.x[from],
-            this->simplifiedUniverse.y[from],
-            this->simplifiedUniverse.z[from],
-          },
-          std::array<double, 3>{ this->simplifiedUniverse.x[to],
-                                 this->simplifiedUniverse.y[to],
-                                 this->simplifiedUniverse.z[to] },
+          Eigen::Vector3d(this->simplifiedUniverse.x[from],
+                          this->simplifiedUniverse.y[from],
+                          this->simplifiedUniverse.z[from]),
+          Eigen::Vector3d(this->simplifiedUniverse.x[to],
+                          this->simplifiedUniverse.y[to],
+                          this->simplifiedUniverse.z[to]),
           chainLen,
           this->beadDistance,
           this->rng,
           2000);
 
-      assert(positions.x.size() == chainLen);
-      assert(positions.y.size() == chainLen);
-      assert(positions.z.size() == chainLen);
+      assert(positions.size() == chainLen * 3);
 
       // assemble and add these atoms
       std::vector<size_t> newAtomIndices =
@@ -432,8 +430,10 @@ namespace utils {
      */
     std::vector<size_t> addAtomsWithType(int nrOfAtomsToAdd,
                                          int atomType,
-                                         Positions randomPos)
+                                         Eigen::VectorXd coordinates)
     {
+      INVALIDARG_EXP_IFN(coordinates.size() % 3 == 0,
+                         "Coordinates must have a size multiple of 3");
       this->simplifiedUniverse.ids.reserve(this->simplifiedUniverse.ids.size() +
                                            nrOfAtomsToAdd);
       this->simplifiedUniverse.types.reserve(
@@ -455,17 +455,11 @@ namespace utils {
         this->simplifiedUniverse.ids.push_back(i + baseId);
         this->simplifiedUniverse.types.push_back(atomType);
         indicesAdded.push_back(nAtomsBefore + i);
-      }
 
-      this->simplifiedUniverse.x.insert(this->simplifiedUniverse.x.end(),
-                                        randomPos.x.begin(),
-                                        randomPos.x.end());
-      this->simplifiedUniverse.y.insert(this->simplifiedUniverse.y.end(),
-                                        randomPos.y.begin(),
-                                        randomPos.y.end());
-      this->simplifiedUniverse.z.insert(this->simplifiedUniverse.z.end(),
-                                        randomPos.z.begin(),
-                                        randomPos.z.end());
+        this->simplifiedUniverse.x.push_back(coordinates(3 * i));
+        this->simplifiedUniverse.y.push_back(coordinates(3 * i + 1));
+        this->simplifiedUniverse.z.push_back(coordinates(3 * i + 2));
+      }
 
       this->maximumAtomId += nrOfAtomsToAdd + 1;
       return indicesAdded;
@@ -482,7 +476,7 @@ namespace utils {
                                          int atomType,
                                          bool whiteNoise = true)
     {
-      Positions randomPos =
+      Eigen::VectorXd randomPos =
         this->generateRandomPositions(nrOfAtomsToAdd, whiteNoise);
       return this->addAtomsWithType(nrOfAtomsToAdd, atomType, randomPos);
     }
@@ -493,7 +487,8 @@ namespace utils {
      * @param nSamples the number of positions to generate
      * @return Positions
      */
-    Positions generateRandomPositions(int nSamples, bool whiteNoise = true)
+    Eigen::VectorXd generateRandomPositions(int nSamples,
+                                            bool whiteNoise = true)
     {
       if (whiteNoise) {
         return this->generateRandomWhitePositions(nSamples);
@@ -508,27 +503,17 @@ namespace utils {
      * @param nSamples the number of positions to generate
      * @return Positions
      */
-    Positions generateRandomWhitePositions(int nSamples)
+    Eigen::VectorXd generateRandomWhitePositions(int nSamples)
     {
-      std::vector<double> xs;
-      std::vector<double> ys;
-      std::vector<double> zs;
+      Eigen::VectorXd coordinates = Eigen::VectorXd(3 * nSamples);
 
       for (size_t i = 0; i < nSamples; ++i) {
-        double x = this->distX(this->rng);
-        double y = this->distY(this->rng);
-        double z = this->distZ(this->rng);
-
-        xs.push_back(x);
-        ys.push_back(y);
-        zs.push_back(z);
+        coordinates(3 * i) = this->distX(this->rng);
+        coordinates(3 * i + 1) = this->distY(this->rng);
+        coordinates(3 * i + 2) = this->distZ(this->rng);
       }
 
-      Positions result;
-      result.x = xs;
-      result.y = ys;
-      result.z = zs;
-      return result;
+      return coordinates;
     }
 
     /**
@@ -537,11 +522,9 @@ namespace utils {
      * @param nSamples the number of positions to generate
      * @return Positions
      */
-    Positions generateRandomBluePositions(int nSamples)
+    Eigen::VectorXd generateRandomBluePositions(int nSamples)
     {
-      std::vector<double> xs;
-      std::vector<double> ys;
-      std::vector<double> zs;
+      Eigen::VectorXd coordinates = Eigen::VectorXd(3 * nSamples);
 
       // blue noise
       // inspiration:
@@ -561,8 +544,13 @@ namespace utils {
           double z = this->distZ(this->rng);
 
           double minDistance = std::numeric_limits<double>::max();
-          for (size_t k = 0; k < xs.size(); ++k) {
-            double dist = this->getDistance(x, y, z, xs[k], ys[k], zs[k]);
+          for (size_t k = 0; k < nSamples; ++k) {
+            double dist = this->getDistance(x,
+                                            y,
+                                            z,
+                                            coordinates(3 * k),
+                                            coordinates(3 * k + 1),
+                                            coordinates(3 * k + 2));
             if (dist < minDistance) {
               minDistance = dist;
             }
@@ -577,16 +565,12 @@ namespace utils {
           }
         }
 
-        xs.push_back(bestCandidateX);
-        ys.push_back(bestCandidateY);
-        zs.push_back(bestCandidateZ);
+        coordinates(3 * i) = bestCandidateX;
+        coordinates(3 * i + 1) = bestCandidateY;
+        coordinates(3 * i + 2) = bestCandidateZ;
       }
 
-      Positions result;
-      result.x = xs;
-      result.y = ys;
-      result.z = zs;
-      return result;
+      return coordinates;
     }
 
     /**
