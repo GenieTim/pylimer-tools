@@ -393,7 +393,7 @@ namespace utils {
           chainLen,
           this->beadDistance,
           this->rng,
-          500);
+          2000);
 
       assert(positions.x.size() == chainLen);
       assert(positions.y.size() == chainLen);

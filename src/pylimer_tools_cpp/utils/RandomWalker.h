@@ -6,10 +6,11 @@
 #include <algorithm>
 #include <cassert>
 #include <iostream>
+#include <numeric>
 #include <random>
+#include <string>
 #include <unordered_map>
 #include <vector>
-#include <string>
 #ifndef M_PI
 #define M_PI 3.1415926535897932384626433
 #endif
@@ -249,6 +250,11 @@ namespace utils {
     Eigen::Vector3d dist = toVec - fromVec;
     box.handlePBC(dist);
 
+#ifndef NDEBUG
+    double deterministicBondLen2 =
+      (dist / static_cast<double>(chainLen + 1)).squaredNorm();
+#endif
+
     for (size_t j = 0; j < chainLen + 2; ++j) {
       double pathFraction =
         static_cast<double>(j) / static_cast<double>(chainLen + 1);
@@ -256,6 +262,15 @@ namespace utils {
       positions.x.push_back(deterministicPosition[0]);
       positions.y.push_back(deterministicPosition[1]);
       positions.z.push_back(deterministicPosition[2]);
+#ifndef NDEBUG
+      if (j > 0) {
+        assert(APPROX_EQUAL((SQUARE(positions.x[j] - positions.x[j - 1]) +
+                             SQUARE(positions.y[j] - positions.y[j - 1]) +
+                             SQUARE(positions.z[j] - positions.z[j - 1])),
+                            deterministicBondLen2,
+                            1e-9));
+      }
+#endif
     }
     assert(positions.x[chainLen + 1] == fromVec[0] + dist[0]);
     assert(positions.x[0] == fromVec[0]);
@@ -270,11 +285,22 @@ namespace utils {
     int numLastStepsAccepted = 0;
     int iterations = 0;
     double stepSize = std::cbrt(beadDistance) * 0.05;
+
+    // the position indices we should actually modify
+    std::vector<size_t> steppingPosIndices(chainLen);
+    std::iota(steppingPosIndices.begin(), steppingPosIndices.end(), 1);
+    assert(steppingPosIndices.size() == chainLen);
+    assert(steppingPosIndices[0] == 1);
+    assert(steppingPosIndices[chainLen - 1] == chainLen);
+
     do {
       iterations += 1;
       numLastStepsAccepted = 0;
       assert(positions.x.size() == chainLen + 2);
-      for (size_t i = 1; i <= chainLen; ++i) {
+      // shuffle the stepping indices to ensure we don't always
+      // end with the last bead having to adjust
+      // std::shuffle(steppingPosIndices.begin(), steppingPosIndices.end(), rng);
+      for (size_t i : steppingPosIndices) {
         double bondLen1 = (SQUARE(positions.x[i] - positions.x[i - 1]) +
                            SQUARE(positions.y[i] - positions.y[i - 1]) +
                            SQUARE(positions.z[i] - positions.z[i - 1]));
@@ -299,13 +325,15 @@ namespace utils {
            SQUARE(positions.z[i] + disZ - positions.z[i + 1]));
 
         double newProbability =
-          std::exp(normalisationFactorInExponential * (newBondLen1 + bondLen2));
+          std::exp(normalisationFactorInExponential * (newBondLen1 + newBondLen2));
 
         double alpha = newProbability / currentProbability;
 
-        if ((alpha >= probabilitySamplingDist(rng)) &&
-            (newBondLen1 < 3. * beadDistance) &&
-            (newBondLen2 < 3. * beadDistance)) {
+        if ((alpha >= probabilitySamplingDist(
+                        rng)) //&&
+                              // (std::sqrt(newBondLen1) < 3. * beadDistance) &&
+                              // (std::sqrt(newBondLen2) < 3. * beadDistance)
+        ) {
           // accept
           numLastStepsAccepted += 1;
           positions.x[i] += disX;
@@ -320,7 +348,7 @@ namespace utils {
       stepSize *= (1. + (acceptanceRatio - 0.5) / 10.);
     } while (iterations < numIterations && stepSize > 1e-5);
 
-    // #ifndef NDEBUG
+#ifndef NDEBUG
     //     // validate bond lengths after random walk
     for (size_t i = 1; i < chainLen + 1; ++i) {
       double bondLen = std::sqrt(SQUARE(positions.x[i] - positions.x[i - 1]) +
@@ -332,7 +360,7 @@ namespace utils {
                         std::to_string(bondLen) + " at index " +
                         std::to_string(i) + ".");
     }
-    // #endif
+#endif
 
     Positions results;
     results.x = positions.x;
