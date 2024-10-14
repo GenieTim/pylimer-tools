@@ -13,6 +13,7 @@ MCUniverseGenerator
       ~MCUniverseGenerator.add_and_link_strands
       ~MCUniverseGenerator.add_crosslinkers
       ~MCUniverseGenerator.add_solvent_chains
+      ~MCUniverseGenerator.config_nr_of_mc_steps
       ~MCUniverseGenerator.get_universe
       ~MCUniverseGenerator.set_bead_distance
       ~MCUniverseGenerator.set_seed
@@ -22,6 +23,7 @@ MCUniverseGenerator
    .. automethod:: add_and_link_strands
    .. automethod:: add_crosslinkers
    .. automethod:: add_solvent_chains
+   .. automethod:: config_nr_of_mc_steps
    .. automethod:: get_universe
    .. automethod:: set_bead_distance
    .. automethod:: set_seed
