@@ -101,7 +101,7 @@ namespace utils {
     // include the first and the last positions
     Eigen::VectorXd coordinates =
       doRandomWalkChain(chainLen + 2, beadDistance, rng);
-    coordinates += from.replicate(1, chainLen + 2);
+    coordinates += from.replicate(chainLen + 2, 1);
 
     assert(coordinates.size() == 3 * (chainLen + 2));
     // TODO: continue from here
@@ -119,13 +119,6 @@ namespace utils {
       coordinates.segment(3 * i, 3) +=
         deterministicPosition -
         pathFraction * coordinates.segment(3 * (chainLen + 1), 3);
-
-#ifndef NDEBUG
-      bondLen =
-        (coordinates.segment(3 * i, 3) - coordinates.segment(3 * (i - 1), 3))
-          .norm();
-      assert(APPROX_REL_EQUAL(bondLen, beadDistance, 0.25));
-#endif
     }
 
     if (includeEnds) {

@@ -50,12 +50,17 @@ namespace utils {
       this->box = pylimer_tools::entities::Box(Lx, Ly, Lz);
     }
 
-    void setSeed(unsigned int seed) { this->rng.seed(seed); };
+    void setSeed(unsigned int seed) { this->rng.seed(seed); }
 
     void setBeadDistance(double newBeadDistance)
     {
       this->beadDistance = newBeadDistance;
-    };
+    }
+
+    void configNrOfMCSteps(size_t newNrOfMCSteps)
+    {
+      this->nMcSteps = newNrOfMCSteps;
+    }
 
     pylimer_tools::entities::Universe getUniverse()
     {
@@ -293,6 +298,7 @@ namespace utils {
     double beadDistance = 0.965;
     double currentCrosslinkerConversion = 0.0;
     int maximumAtomId = 1;
+    size_t nMcSteps = 2000;
     std::mt19937 rng;
     std::uniform_real_distribution<double> distX;
     std::uniform_real_distribution<double> distY;
@@ -328,12 +334,15 @@ namespace utils {
       Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
         chainLen, this->beadDistance, this->rng);
 
+      pylimer_tools::sim::equilibrateChainWithMC(
+        positions, this->beadDistance, this->rng, true, false, this->nMcSteps);
+
       Eigen::Vector3d from =
         Eigen::Vector3d(this->simplifiedUniverse.x[idxFrom],
                         this->simplifiedUniverse.y[idxFrom],
                         this->simplifiedUniverse.z[idxFrom]);
 
-      positions += from.replicate(1, chainLen);
+      positions += from.replicate(chainLen, 1);
 
       std::vector<size_t> idxs =
         this->addAtomsWithType(chainLen, atomType, positions);
@@ -393,7 +402,7 @@ namespace utils {
           chainLen,
           this->beadDistance,
           this->rng,
-          2000);
+          this->nMcSteps);
 
       assert(positions.size() == chainLen * 3);
 
