@@ -6,6 +6,7 @@
 #include "../utils/RandomWalker.h"
 
 #include <pybind11/pybind11.h>
+#include <pybind11/eigen.h>
 #include <pybind11/stl.h>
 #include <string>
 #include <vector>
@@ -90,8 +91,8 @@ init_pylimer_bound_generators(py::module_& m)
   m.def(
     "do_random_walk_chain_from_to_mc",
     [](pe::Box& b,
-       std::array<double, 3> f,
-       std::array<double, 3> t,
+       Eigen::Vector3d f,
+       Eigen::Vector3d t,
        int c,
        double l,
        std::string s,
@@ -110,8 +111,8 @@ init_pylimer_bound_generators(py::module_& m)
   m.def(
     "do_random_walk_chain_from_to",
     [](pe::Box& b,
-       std::array<double, 3> f,
-       std::array<double, 3> t,
+       Eigen::Vector3d f,
+       Eigen::Vector3d t,
        int c,
        double l,
        std::string s) { return doRandomWalkChainFromTo(b, f, t, c, l, s); },
@@ -128,11 +129,20 @@ init_pylimer_bound_generators(py::module_& m)
         &doLinearWalkChainFromTo,
         R"pbdoc(
             Get coordinates linearly interpolated from one point to another (both exclusive).
+
+            :param box: The box for doing PBC correction on the from/to.
+            :param from_coordinates: Coordinates of the start point.
+            :param to_coordinates: Coordinates of the end point.
+            :param chain_len: Number of coordinates to generate between the start and end-point.
+            :param include_ends: Whether to include the start and end points in the output (default: false). 
+               If yes, chain_len + 2 coordinates will be returned, 
+               where the first will be from_coordinates and the last will be to_coordinates.
             )pbdoc",
         py::arg("box"),
         py::arg("from_coordinates"),
         py::arg("to_coordinates"),
-        py::arg("chain_len"));
+        py::arg("chain_len"),
+        py::arg("include_ends") = false);
 }
 
 #endif
