@@ -4,6 +4,8 @@
 #include "../entities/Atom.h"
 #include "../entities/Box.h"
 #include "../entities/Universe.h"
+#include "../sim/MEHPForceRelaxation.h"
+#include "../sim/MEHPUtilityStructures.h"
 #include "RandomWalker.h"
 #include "StringUtils.h"
 #include "VectorUtils.h"
@@ -25,15 +27,17 @@
 namespace pylimer_tools {
 namespace utils {
 
-  struct SimplifiedUniverse
+  struct CrosslinkerUniverse
   {
-    std::vector<long int> ids;
-    std::vector<int> types;
-    std::vector<double> x;
-    std::vector<double> y;
-    std::vector<double> z;
-    std::vector<long int> bondsFrom;
-    std::vector<long int> bondsTo;
+    std::vector<int> xlinkTypes;
+    std::vector<double> xlinkX;
+    std::vector<double> xlinkY;
+    std::vector<double> xlinkZ;
+    std::vector<long int> strandFrom;
+    std::vector<long int> strandTo;
+    std::vector<int> beadsInStrand;
+    std::vector<int> strandBeadType;
+    std::vector<double> beadDistanceInStrand;
   };
 
   class MCUniverseGenerator
@@ -46,7 +50,6 @@ namespace utils {
       this->distX = std::uniform_real_distribution<double>(0.0, Lx);
       this->distY = std::uniform_real_distribution<double>(0.0, Ly);
       this->distZ = std::uniform_real_distribution<double>(0.0, Lz);
-      this->distSelect = std::uniform_real_distribution<double>(0.0, 1.0);
       this->box = pylimer_tools::entities::Box(Lx, Ly, Lz);
     }
 
@@ -62,25 +65,99 @@ namespace utils {
       this->nMcSteps = newNrOfMCSteps;
     }
 
+    /**
+     * @brief Get the Universe object after actually sampling strands' beads and
+     * their positions.
+     *
+     * @return pylimer_tools::entities::Universe
+     */
     pylimer_tools::entities::Universe getUniverse()
     {
       pylimer_tools::entities::Universe universe =
         pylimer_tools::entities::Universe(this->box);
-      int nrOfAtoms = this->simplifiedUniverse.ids.size();
+      size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
+      int nrOfAtoms =
+        nCrosslinks +
+        std::reduce(this->simplifiedUniverse.beadsInStrand.begin(),
+                    this->simplifiedUniverse.beadsInStrand.end(),
+                    0);
       std::vector<int> zeros = initializeWithValue(nrOfAtoms, 0);
-      universe.addAtoms(this->simplifiedUniverse.ids,
-                        this->simplifiedUniverse.types,
-                        this->simplifiedUniverse.x,
-                        this->simplifiedUniverse.y,
-                        this->simplifiedUniverse.z,
-                        zeros,
-                        zeros,
-                        zeros);
-      universe.addBonds(this->simplifiedUniverse.bondsFrom,
-                        this->simplifiedUniverse.bondsTo);
+      std::vector<double> xs = initializeWithValue(nrOfAtoms, 0.0);
+      std::vector<double> ys = initializeWithValue(nrOfAtoms, 0.0);
+      std::vector<double> zs = initializeWithValue(nrOfAtoms, 0.0);
+      std::vector<long int> ids = initializeWithValue<long int>(nrOfAtoms, 1);
+      std::vector<int> types = initializeWithValue(nrOfAtoms, 0);
+
+      std::vector<long int> bondsFrom = {};
+      std::vector<long int> bondsTo = {};
+
+      // Add the cross-linkers
+      for (size_t i = 0; i < nCrosslinks; ++i) {
+        ids[i] += i;
+        xs[i] = this->simplifiedUniverse.xlinkX[i];
+        ys[i] = this->simplifiedUniverse.xlinkY[i];
+        zs[i] = this->simplifiedUniverse.xlinkZ[i];
+        types[i] = this->simplifiedUniverse.xlinkTypes[i];
+      }
+
+      // Sample the strands
+      assert(this->simplifiedUniverse.strandFrom.size() ==
+             this->simplifiedUniverse.strandTo.size());
+      long int currentId = nCrosslinks + 1;
+      for (size_t strandI = 0;
+           strandI < this->simplifiedUniverse.strandFrom.size();
+           ++strandI) {
+        // sample the bead coordinates, depending on the type of strand
+        Eigen::VectorXd coordinates;
+        long int strandEnd1 = this->simplifiedUniverse.strandFrom[strandI];
+        long int strandEnd2 = this->simplifiedUniverse.strandTo[strandI];
+        int nBeadsInStrand = this->simplifiedUniverse.beadsInStrand[strandI];
+        assert(strandEnd1 >= 0);
+        if (strandEnd2 == -1) {
+          coordinates =
+            this->sampleDanglingChainCoordinates(strandEnd1, nBeadsInStrand);
+          bondsFrom.push_back(strandEnd1);
+          bondsTo.push_back(currentId);
+        } else {
+          assert(strandEnd1 != -1 && strandEnd2 != -1);
+          coordinates = this->sampleStrandCoordinates(
+            strandEnd1, strandEnd2, nBeadsInStrand);
+          bondsFrom.push_back(strandEnd1);
+          bondsTo.push_back(currentId);
+          bondsFrom.push_back(strandEnd2);
+          bondsTo.push_back(currentId + nBeadsInStrand - 1);
+        }
+
+        // actually add the new beads to our list of things to add
+        assert(coordinates.size() == 3 * nBeadsInStrand);
+        for (size_t i = 0; i < nBeadsInStrand; ++i) {
+          ids.push_back(currentId);
+          if (i > 0) {
+            bondsFrom.push_back(currentId - 1);
+            bondsTo.push_back(currentId);
+          }
+          types.push_back(this->simplifiedUniverse.strandBeadType[strandI]);
+          xs.push_back(coordinates(3 * i));
+          ys.push_back(coordinates(3 * i + 1));
+          zs.push_back(coordinates(3 * i + 2));
+          currentId += 1;
+        }
+      }
+
+      universe.addAtoms(ids, types, xs, ys, zs, zeros, zeros, zeros);
+      universe.addBonds(bondsFrom, bondsTo);
       return universe;
     };
 
+    /**
+     * @brief Add free atoms with a specified type and functionality for
+     * possible cross-linking later
+     *
+     * @param nrOfCrosslinkers
+     * @param crosslinkerFunctionality
+     * @param crossLinkerAtomType
+     * @param whiteNoise
+     */
     void addCrosslinkers(int nrOfCrosslinkers,
                          int crosslinkerFunctionality = 4,
                          int crossLinkerAtomType = 2,
@@ -102,7 +179,7 @@ namespace utils {
     };
 
     /**
-     * @brief Randomly distribute
+     * @brief Randomly distribute free "chains"
      *
      * @param nrOfSolventChains
      * @param chainLength
@@ -120,9 +197,10 @@ namespace utils {
         this->addAtomsWithType(nrOfSolventChains, solventAtomType, whiteNoise);
 
       for (size_t atomIdx : startAtoms) {
-        // std::cout << "Adding solvent chain with length " << chainLength
-        //           << std::endl;
-        this->addRandomWalkChainFrom(atomIdx, chainLength - 1, solventAtomType);
+        this->simplifiedUniverse.strandFrom.push_back(atomIdx);
+        this->simplifiedUniverse.strandTo.push_back(-1);
+        this->simplifiedUniverse.strandBeadType.push_back(solventAtomType);
+        this->simplifiedUniverse.beadsInStrand.push_back(chainLength - 1);
       }
     };
 
@@ -159,27 +237,7 @@ namespace utils {
       assert(this->crossLinkerIdxs.size() ==
              this->remainingCrossLinkerFunctionality.size());
 
-      // eager reserve of vectors
-      size_t nNewBeads =
-        std::reduce(beadsPerChains.begin(), beadsPerChains.end(), 0);
-      this->simplifiedUniverse.ids.reserve(this->simplifiedUniverse.ids.size() +
-                                           nNewBeads);
-      this->simplifiedUniverse.types.reserve(
-        this->simplifiedUniverse.types.size() + nNewBeads);
-
-      this->simplifiedUniverse.x.reserve(this->simplifiedUniverse.x.size() +
-                                         nNewBeads);
-      this->simplifiedUniverse.y.reserve(this->simplifiedUniverse.y.size() +
-                                         nNewBeads);
-      this->simplifiedUniverse.z.reserve(this->simplifiedUniverse.z.size() +
-                                         nNewBeads);
-      this->simplifiedUniverse.bondsFrom.reserve(
-        this->simplifiedUniverse.bondsFrom.size() + nNewBeads +
-        nrOfStrands * 2);
-      this->simplifiedUniverse.bondsTo.reserve(
-        this->simplifiedUniverse.bondsTo.size() + nNewBeads + nrOfStrands * 2);
-
-      //
+      // prepare sampling of partners
       long int nCrosslinks = this->crossLinkerIdxs.size();
       std::uniform_int_distribution<size_t> crosslinkerIdxIdxDist =
         std::uniform_int_distribution<size_t>(0, nCrosslinks - 1);
@@ -261,22 +319,11 @@ namespace utils {
       // now that we know which strands should be connected,
       // we can do the connection
       for (int strandIdx = 0; strandIdx < nrOfStrands; ++strandIdx) {
-        if (strandEnd1[strandIdx] == -1) {
-          assert(strandEnd2[strandIdx] == -1);
-          // free chain
-          this->addSolventChains(1, beadsPerChains[strandIdx], strandAtomType);
-        } else if (strandEnd2[strandIdx] == -1) {
-          // dangling strand
-          this->addRandomWalkChainFrom(
-            strandEnd1[strandIdx], beadsPerChains[strandIdx], strandAtomType);
-        } else {
-          // connected strand
-          assert(strandEnd1[strandIdx] != -1 && strandEnd2[strandIdx] != -1);
-          this->addRandomWalkChainFromTo(strandEnd1[strandIdx],
-                                         strandEnd2[strandIdx],
-                                         beadsPerChains[strandIdx],
-                                         strandAtomType);
-        }
+        this->simplifiedUniverse.strandFrom.push_back(strandEnd1[strandIdx]);
+        this->simplifiedUniverse.strandTo.push_back(strandEnd2[strandIdx]);
+        this->simplifiedUniverse.strandBeadType.push_back(strandAtomType);
+        this->simplifiedUniverse.beadsInStrand.push_back(
+          beadsPerChains[strandIdx]);
       }
     }
 
@@ -294,18 +341,118 @@ namespace utils {
         nrOfStrands, chainLengths, crossLinkerConversion, strandAtomType);
     };
 
+    /**
+     * @brief Run force relaxation to improve the statistics of the cross-linked
+     * strands
+     *
+     */
+    void relaxCrosslinks()
+    {
+      // first, convert to a useable structure for the force relaxation
+      pylimer_tools::sim::mehp::Network forceRelaxationNetwork;
+      forceRelaxationNetwork.L[0] = this->box.getLx();
+      forceRelaxationNetwork.L[1] = this->box.getLy();
+      forceRelaxationNetwork.L[2] = this->box.getLz();
+      forceRelaxationNetwork.vol = this->box.getVolume();
+
+      forceRelaxationNetwork.nrOfNodes = this->crossLinkerIdxs.size();
+      forceRelaxationNetwork.oldAtomIds =
+        Eigen::ArrayXi::Zero(forceRelaxationNetwork.nrOfNodes);
+      forceRelaxationNetwork.coordinates =
+        Eigen::VectorXd(forceRelaxationNetwork.nrOfNodes * 3);
+      size_t i = 0;
+      for (size_t crosslinkIdx : this->crossLinkerIdxs) {
+        forceRelaxationNetwork.coordinates(3 * i + 0) =
+          this->simplifiedUniverse.xlinkX[crosslinkIdx];
+        forceRelaxationNetwork.coordinates(3 * i + 1) =
+          this->simplifiedUniverse.xlinkY[crosslinkIdx];
+        forceRelaxationNetwork.coordinates(3 * i + 2) =
+          this->simplifiedUniverse.xlinkZ[crosslinkIdx];
+
+        forceRelaxationNetwork.springIndicesOfLinks.push_back({});
+
+        i += 1;
+      }
+
+      size_t nSpringEstimate = this->simplifiedUniverse.strandFrom.size();
+      forceRelaxationNetwork.springIndexA =
+        Eigen::ArrayXi::Zero(nSpringEstimate);
+      forceRelaxationNetwork.springIndexB =
+        Eigen::ArrayXi::Zero(nSpringEstimate);
+      forceRelaxationNetwork.springsContourLength =
+        Eigen::VectorXd::Zero(nSpringEstimate);
+      size_t nActualSprings = 0;
+      for (size_t springIdx = 0;
+           springIdx < this->simplifiedUniverse.strandFrom.size();
+           ++springIdx) {
+        if (this->simplifiedUniverse.strandTo[springIdx] != -1) {
+          long int from = this->simplifiedUniverse.strandFrom[springIdx];
+          long int to = this->simplifiedUniverse.strandTo[springIdx];
+          forceRelaxationNetwork.springIndexA(springIdx) = from;
+          forceRelaxationNetwork.springIndexB(springIdx) = to;
+          forceRelaxationNetwork.springIndicesOfLinks[from].push_back(
+            springIdx);
+          forceRelaxationNetwork.springIndicesOfLinks[to].push_back(springIdx);
+          forceRelaxationNetwork.springsContourLength(springIdx) =
+            this->simplifiedUniverse.beadsInStrand[springIdx] + 1;
+          nActualSprings += 1;
+        }
+      }
+      forceRelaxationNetwork.springIndexA.conservativeResize(nActualSprings);
+      forceRelaxationNetwork.springIndexB.conservativeResize(nActualSprings);
+      forceRelaxationNetwork.springsContourLength.conservativeResize(
+        nActualSprings);
+      forceRelaxationNetwork.springBoxOffset =
+        Eigen::VectorXd::Zero(3 * nActualSprings);
+      forceRelaxationNetwork.nrOfSprings = nActualSprings;
+
+      for (size_t i = 0; i < nActualSprings; ++i) {
+        for (size_t dir = 0; dir < 3; ++dir) {
+          forceRelaxationNetwork.springCoordinateIndexA(3 * i + dir) =
+            forceRelaxationNetwork.springIndexA(i) * 3 + dir;
+          forceRelaxationNetwork.springCoordinateIndexB(3 * i + dir) =
+            forceRelaxationNetwork.springIndexB(i) * 3 + dir;
+        }
+      }
+
+      forceRelaxationNetwork.meanSpringContourLength =
+        forceRelaxationNetwork.springsContourLength.mean();
+      forceRelaxationNetwork.assumeBoxLargeEnough = true;
+
+      // actually start force relaxation
+      pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
+        pylimer_tools::sim::mehp::MEHPForceRelaxation(forceRelaxationNetwork);
+      forceRelaxer.configAssumeBoxLargeEnough(true);
+
+      while (forceRelaxer.suggestsRerun()) {
+        forceRelaxer.runForceRelaxation();
+      }
+
+      // copy results
+      forceRelaxationNetwork = forceRelaxer.getNetwork();
+      RUNTIME_EXP_IFN(forceRelaxationNetwork.nrOfNodes ==
+                        this->crossLinkerIdxs.size(),
+                      "Expected force relaxation to preserve cross-links.");
+      for (size_t i = 0; i < forceRelaxationNetwork.nrOfNodes; ++i) {
+        this->simplifiedUniverse.xlinkX[this->crossLinkerIdxs[i]] =
+          forceRelaxationNetwork.coordinates(3 * i + 0);
+        this->simplifiedUniverse.xlinkY[this->crossLinkerIdxs[i]] =
+          forceRelaxationNetwork.coordinates(3 * i + 1);
+        this->simplifiedUniverse.xlinkZ[this->crossLinkerIdxs[i]] =
+          forceRelaxationNetwork.coordinates(3 * i + 2);
+      }
+    }
+
   private:
     double beadDistance = 0.965;
     double currentCrosslinkerConversion = 0.0;
-    int maximumAtomId = 1;
     size_t nMcSteps = 2000;
     std::mt19937 rng;
     std::uniform_real_distribution<double> distX;
     std::uniform_real_distribution<double> distY;
     std::uniform_real_distribution<double> distZ;
-    std::uniform_real_distribution<double> distSelect;
 
-    SimplifiedUniverse simplifiedUniverse;
+    CrosslinkerUniverse simplifiedUniverse;
     std::vector<size_t> crossLinkerIdxs;
     std::vector<int> remainingCrossLinkerFunctionality;
     pylimer_tools::entities::Box box;
@@ -329,7 +476,7 @@ namespace utils {
      * @param chainLen the number of additional atoms to add to the chain
      * @param atomType the atom type of the atoms in the chain
      */
-    void addRandomWalkChainFrom(size_t idxFrom, int chainLen, int atomType = 1)
+    Eigen::VectorXd sampleDanglingChainCoordinates(size_t idxFrom, int chainLen)
     {
       Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
         chainLen, this->beadDistance, this->rng);
@@ -338,40 +485,12 @@ namespace utils {
         positions, this->beadDistance, this->rng, true, false, this->nMcSteps);
 
       Eigen::Vector3d from =
-        Eigen::Vector3d(this->simplifiedUniverse.x[idxFrom],
-                        this->simplifiedUniverse.y[idxFrom],
-                        this->simplifiedUniverse.z[idxFrom]);
+        Eigen::Vector3d(this->simplifiedUniverse.xlinkX[idxFrom],
+                        this->simplifiedUniverse.xlinkY[idxFrom],
+                        this->simplifiedUniverse.xlinkZ[idxFrom]);
 
       positions += from.replicate(chainLen, 1);
-
-      std::vector<size_t> idxs =
-        this->addAtomsWithType(chainLen, atomType, positions);
-      // initalize some bond specific
-      std::vector<size_t> bondsFrom;
-      std::vector<size_t> bondsTo;
-      bondsFrom.reserve(idxs.size());
-      bondsTo.reserve(idxs.size());
-      for (size_t idx : idxs) {
-        bondsFrom.push_back(this->simplifiedUniverse.ids[idx]);
-        bondsTo.push_back(this->simplifiedUniverse.ids[idx]);
-      }
-      std::vector<int> bondTypes = initializeWithValue(chainLen, 1);
-      // make the first bond from the starting bead given
-      bondsFrom.insert(bondsFrom.begin(),
-                       this->simplifiedUniverse.ids[idxFrom]);
-      bondsFrom.pop_back();
-      // finally, add the bonds
-      this->simplifiedUniverse.bondsFrom.reserve(
-        this->simplifiedUniverse.bondsFrom.size() + bondsFrom.size());
-      this->simplifiedUniverse.bondsFrom.insert(
-        this->simplifiedUniverse.bondsFrom.end(),
-        bondsFrom.begin(),
-        bondsFrom.end());
-      this->simplifiedUniverse.bondsTo.reserve(
-        this->simplifiedUniverse.bondsTo.size() + bondsTo.size());
-      this->simplifiedUniverse.bondsTo.insert(
-        this->simplifiedUniverse.bondsTo.end(), bondsTo.begin(), bondsTo.end());
-      // std::cout << "Done random walk from" << std::endl;
+      return positions;
     }
 
     /**
@@ -381,24 +500,22 @@ namespace utils {
      * @param from the atom to start the random walk from
      * @param to the atom to end the random walk at
      * @param chainLen the number of atoms to add in between from and to
-     * @param atomType the type of the atoms to add
      */
-    void addRandomWalkChainFromTo(size_t from,
-                                  size_t to,
-                                  int chainLen,
-                                  int atomType = 1)
+    Eigen::VectorXd sampleStrandCoordinates(size_t from,
+                                            size_t to,
+                                            int chainLen)
     {
       // determine the positions
       Eigen::VectorXd
         positions = // pylimer_tools::utils::doRandomWalkChainFromTo(
         pylimer_tools::utils::doRandomWalkChainFromToMC(
           this->box,
-          Eigen::Vector3d(this->simplifiedUniverse.x[from],
-                          this->simplifiedUniverse.y[from],
-                          this->simplifiedUniverse.z[from]),
-          Eigen::Vector3d(this->simplifiedUniverse.x[to],
-                          this->simplifiedUniverse.y[to],
-                          this->simplifiedUniverse.z[to]),
+          Eigen::Vector3d(this->simplifiedUniverse.xlinkX[from],
+                          this->simplifiedUniverse.xlinkY[from],
+                          this->simplifiedUniverse.xlinkZ[from]),
+          Eigen::Vector3d(this->simplifiedUniverse.xlinkX[to],
+                          this->simplifiedUniverse.xlinkY[to],
+                          this->simplifiedUniverse.xlinkZ[to]),
           chainLen,
           this->beadDistance,
           this->rng,
@@ -406,27 +523,7 @@ namespace utils {
 
       assert(positions.size() == chainLen * 3);
 
-      // assemble and add these atoms
-      std::vector<size_t> newAtomIndices =
-        this->addAtomsWithType(chainLen, atomType, positions);
-      assert(newAtomIndices.size() == chainLen);
-      // and same for bonds
-      this->simplifiedUniverse.bondsFrom.reserve(
-        this->simplifiedUniverse.bondsFrom.size() + chainLen + 2);
-      this->simplifiedUniverse.bondsTo.reserve(
-        this->simplifiedUniverse.bondsTo.size() + chainLen + 2);
-      // make the first bond from the starting bead given
-      this->simplifiedUniverse.bondsFrom.push_back(
-        this->simplifiedUniverse.ids[from]);
-      for (size_t idx : newAtomIndices) {
-        this->simplifiedUniverse.bondsFrom.push_back(
-          this->simplifiedUniverse.ids[idx]);
-        this->simplifiedUniverse.bondsTo.push_back(
-          this->simplifiedUniverse.ids[idx]);
-      }
-      // and the last bond further to the end of the chain
-      this->simplifiedUniverse.bondsTo.push_back(
-        this->simplifiedUniverse.ids[to]);
+      return positions;
     }
 
     /**
@@ -443,34 +540,28 @@ namespace utils {
     {
       INVALIDARG_EXP_IFN(coordinates.size() % 3 == 0,
                          "Coordinates must have a size multiple of 3");
-      this->simplifiedUniverse.ids.reserve(this->simplifiedUniverse.ids.size() +
-                                           nrOfAtomsToAdd);
-      this->simplifiedUniverse.types.reserve(
-        this->simplifiedUniverse.types.size() + nrOfAtomsToAdd);
-      this->simplifiedUniverse.x.reserve(this->simplifiedUniverse.x.size() +
-                                         nrOfAtomsToAdd);
-      this->simplifiedUniverse.y.reserve(this->simplifiedUniverse.y.size() +
-                                         nrOfAtomsToAdd);
-      this->simplifiedUniverse.z.reserve(this->simplifiedUniverse.z.size() +
-                                         nrOfAtomsToAdd);
+      size_t currentNrOfJunctions = this->simplifiedUniverse.xlinkX.size();
+      this->simplifiedUniverse.xlinkTypes.reserve(currentNrOfJunctions +
+                                                  nrOfAtomsToAdd);
+      this->simplifiedUniverse.xlinkX.reserve(currentNrOfJunctions +
+                                              nrOfAtomsToAdd);
+      this->simplifiedUniverse.xlinkY.reserve(currentNrOfJunctions +
+                                              nrOfAtomsToAdd);
+      this->simplifiedUniverse.xlinkZ.reserve(currentNrOfJunctions +
+                                              nrOfAtomsToAdd);
 
-      int baseId = this->maximumAtomId + 1;
       std::vector<size_t> indicesAdded;
-
-      int nAtomsBefore = this->simplifiedUniverse.ids.size();
       indicesAdded.reserve(nrOfAtomsToAdd);
 
       for (size_t i = 0; i < nrOfAtomsToAdd; ++i) {
-        this->simplifiedUniverse.ids.push_back(i + baseId);
-        this->simplifiedUniverse.types.push_back(atomType);
-        indicesAdded.push_back(nAtomsBefore + i);
+        this->simplifiedUniverse.xlinkTypes.push_back(atomType);
+        indicesAdded.push_back(currentNrOfJunctions + i);
 
-        this->simplifiedUniverse.x.push_back(coordinates(3 * i));
-        this->simplifiedUniverse.y.push_back(coordinates(3 * i + 1));
-        this->simplifiedUniverse.z.push_back(coordinates(3 * i + 2));
+        this->simplifiedUniverse.xlinkX.push_back(coordinates(3 * i));
+        this->simplifiedUniverse.xlinkY.push_back(coordinates(3 * i + 1));
+        this->simplifiedUniverse.xlinkZ.push_back(coordinates(3 * i + 2));
       }
 
-      this->maximumAtomId += nrOfAtomsToAdd + 1;
       return indicesAdded;
     }
 
@@ -631,20 +722,23 @@ namespace utils {
 
     double distanceBetween(size_t i, size_t j)
     {
-      return this->getDistance(this->simplifiedUniverse.x[i],
-                               this->simplifiedUniverse.y[i],
-                               this->simplifiedUniverse.z[i],
-                               this->simplifiedUniverse.x[j],
-                               this->simplifiedUniverse.y[j],
-                               this->simplifiedUniverse.z[j]);
+      return this->getDistance(this->simplifiedUniverse.xlinkX[i],
+                               this->simplifiedUniverse.xlinkY[i],
+                               this->simplifiedUniverse.xlinkZ[i],
+                               this->simplifiedUniverse.xlinkX[j],
+                               this->simplifiedUniverse.xlinkY[j],
+                               this->simplifiedUniverse.xlinkZ[j]);
     }
 
     Eigen::Vector3d getVectorBetween(size_t i, size_t j)
     {
       Eigen::Vector3d diff;
-      diff << this->simplifiedUniverse.x[j] - this->simplifiedUniverse.x[i],
-        this->simplifiedUniverse.y[j] - this->simplifiedUniverse.y[i],
-        this->simplifiedUniverse.z[j] - this->simplifiedUniverse.z[i];
+      diff << (this->simplifiedUniverse.xlinkX[j] -
+               this->simplifiedUniverse.xlinkX[i]),
+        (this->simplifiedUniverse.xlinkY[j] -
+         this->simplifiedUniverse.xlinkY[i]),
+        (this->simplifiedUniverse.xlinkZ[j] -
+         this->simplifiedUniverse.xlinkZ[i]);
       this->box.handlePBC(diff);
       return diff;
     }

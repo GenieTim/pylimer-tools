@@ -58,7 +58,7 @@ namespace sim {
       int defaultNrOfChains = 0;
       double defaultR0Squared = 0.0;
       double suggestRerunEps = 1e-3;
-      int crossLinkerType;
+      int crossLinkerType = 2;
       double dt = 1;
 
     public:
@@ -91,14 +91,25 @@ namespace sim {
         }
         this->forceRelaxationNetwork = net;
         this->is2D = is2D;
-        this->currentForces = Eigen::VectorXd::Zero(net.coordinates.size());
-        this->currentVelocities = Eigen::VectorXd::Zero(net.coordinates.size());
-        this->currentVelocitiesPlus =
-          Eigen::VectorXd::Zero(net.coordinates.size());
-        this->currentSpringDistances =
-          this->evaluateSpringDistances(&net, is2D);
+        this->initializeDefaults();
         this->setForceEvaluator(forceEvaluator);
       };
+
+      MEHPForceRelaxation(const Network& net,
+                          bool is2D = false,
+                          MEHPForceEvaluator* forceEvaluator = nullptr,
+                          double kappa = 1.0)
+      {
+        this->forceRelaxationNetwork = net;
+
+        if (forceEvaluator == nullptr) {
+          this->springForceEvaluator = SimpleSpringMEHPForceEvaluator(kappa);
+          forceEvaluator = &this->springForceEvaluator;
+        }
+
+        this->initializeDefaults();
+        this->setForceEvaluator(forceEvaluator);
+      }
 
 #ifdef CEREALIZABLE
       static MEHPForceRelaxation constructFromString(std::string s)
@@ -951,6 +962,18 @@ namespace sim {
             tolerance;
         }
         return result;
+      }
+
+      void initializeDefaults()
+      {
+        this->currentForces =
+          Eigen::VectorXd::Zero(this->forceRelaxationNetwork.coordinates.size());
+        this->currentVelocities =
+          Eigen::VectorXd::Zero(this->forceRelaxationNetwork.coordinates.size());
+        this->currentVelocitiesPlus =
+          Eigen::VectorXd::Zero(this->forceRelaxationNetwork.coordinates.size());
+        this->currentSpringDistances =
+          this->evaluateSpringDistances(&this->forceRelaxationNetwork, this->is2D);
       }
     };
   } // namespace mehp

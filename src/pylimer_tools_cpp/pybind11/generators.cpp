@@ -79,10 +79,16 @@ init_pylimer_bound_generators(py::module_& m)
          py::arg("crosslinker_conversion"),
          py::arg("strand_atom_type") = 1,
          py::arg("c_infinity") = 1.)
+    .def("relax_crosslinks",
+         &MCUniverseGenerator::relaxCrosslinks,
+         R"pbdoc(
+         Run force relaxation with the cross-linkers and their strands,
+         to have the cross-links in their statistically most probable position.
+         )pbdoc")
     .def("get_universe", &MCUniverseGenerator::getUniverse, R"pbdoc(
             Fetch the current (or final) state of the universe.
 
-            Use this method to actually retrieve the generated structure.
+            Use this method to actually (MC) place beads between the cross-links and retrieve the generated structure.
             )pbdoc");
 
   m.def("do_random_walk",
