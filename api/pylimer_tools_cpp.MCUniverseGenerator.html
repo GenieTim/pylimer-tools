@@ -334,10 +334,13 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_universe" title="pylimer_tools_cpp.MCUniverseGenerator.get_universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_universe</span></code></a>(self)</p></td>
 <td><p>Fetch the current (or final) state of the universe.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_bead_distance</span></code></a>(self, distance)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks" title="pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">relax_crosslinks</span></code></a>(self)</p></td>
+<td><p>Run force relaxation with the cross-linkers and their strands, to have the cross-links in their statistically most probable position.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_bead_distance</span></code></a>(self, distance)</p></td>
 <td><p>Set the optimal distance between beads.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_seed" title="pylimer_tools_cpp.MCUniverseGenerator.set_seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_seed</span></code></a>(self, seed)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_seed" title="pylimer_tools_cpp.MCUniverseGenerator.set_seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_seed</span></code></a>(self, seed)</p></td>
 <td><p>Set the seed for the random generator.</p></td>
 </tr>
 </tbody>
@@ -393,7 +396,14 @@
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.get_universe">
 <span class="sig-name descname"><span class="pre">get_universe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.Universe</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_universe" title="Link to this definition">¶</a></dt>
 <dd><p>Fetch the current (or final) state of the universe.</p>
-<p>Use this method to actually retrieve the generated structure.</p>
+<p>Use this method to actually (MC) place beads between the cross-links and retrieve the generated structure.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks">
+<span class="sig-name descname"><span class="pre">relax_crosslinks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks" title="Link to this definition">¶</a></dt>
+<dd><p>Run force relaxation with the cross-linkers and their strands,
+to have the cross-links in their statistically most probable position.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -473,6 +483,7 @@
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.add_solvent_chains"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.add_solvent_chains()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.config_nr_of_mc_steps"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.config_nr_of_mc_steps()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_universe"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_universe()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.relax_crosslinks()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.set_bead_distance()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_seed"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.set_seed()</span></code></a></li>
 </ul>

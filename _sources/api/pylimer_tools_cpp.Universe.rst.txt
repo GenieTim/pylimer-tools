@@ -33,6 +33,7 @@ Universe
       ~Universe.contract_vertices_along_bond_type
       ~Universe.count_atom_types
       ~Universe.count_atoms_in_skin_distance
+      ~Universe.count_loop_lengths
       ~Universe.detect_angles
       ~Universe.detect_dihedral_angles
       ~Universe.determine_effective_functionality_per_type
@@ -112,6 +113,7 @@ Universe
    .. automethod:: contract_vertices_along_bond_type
    .. automethod:: count_atom_types
    .. automethod:: count_atoms_in_skin_distance
+   .. automethod:: count_loop_lengths
    .. automethod:: detect_angles
    .. automethod:: detect_dihedral_angles
    .. automethod:: determine_effective_functionality_per_type
