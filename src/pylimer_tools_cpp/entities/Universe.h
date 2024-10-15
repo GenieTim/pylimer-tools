@@ -138,6 +138,7 @@ namespace entities {
       const int maxLength = -1,
       bool skipSelfLoops = false,
       std::vector<std::vector<long int>>* edges = nullptr) const;
+    std::unordered_map<int, int> countLoopLengths(const int maxLength = -1) const;
     std::map<int, std::vector<std::vector<Atom>>> findLoopsOfAtoms(
       const int crossLinkerType,
       const int maxLength = -1,

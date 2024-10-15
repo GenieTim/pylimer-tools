@@ -1,6 +1,7 @@
 #include "Universe.h"
 #include "../topo/TopologyCalc.h"
 #include "../utils/BoolUtils.h"
+#include "../utils/Counter.h"
 #include "../utils/GraphUtils.h"
 #include "../utils/StringUtils.h"
 #include "../utils/VectorUtils.h"
@@ -26,6 +27,17 @@ extern "C"
 
 namespace pylimer_tools {
 namespace entities {
+
+  igraph_error_t count_found_cycle(const igraph_vector_int_t* vertices,
+                                   const igraph_vector_int_t* edges,
+                                   void* arg)
+  {
+    pylimer_tools::utils::Counter<int>* loopLengths =
+      (pylimer_tools::utils::Counter<int>*)arg;
+    loopLengths->increment(igraph_vector_int_size(vertices));
+    return IGRAPH_SUCCESS;
+  };
+
   Universe::Universe(const Box& box)
   {
     /* turn on attribute handling: TODO: move to some main() function  */
@@ -1146,7 +1158,8 @@ namespace entities {
    * @param maxLength
    * @param skipSelfLoops
    * @param edges
-   * @return std::vector<std::vector<long int>>
+   * @return std::vector<std::vector<long int>> the list of vertices in each
+   * loop
    */
   std::vector<std::vector<long int>> Universe::findLoops(
     const int crossLinkerType,
@@ -1157,117 +1170,75 @@ namespace entities {
     // NOTE: there are exponentially many paths between two vertices of a graph,
     // and you may run out of memory when using this function, if your graph is
     // lattice-like.
+
+    // TODO: shrink the graph by collapsing all 2-functional vertices?
+
+    igraph_vector_int_list_t v_results;
+    igraph_vector_int_list_init(&v_results, 0);
+    igraph_vector_int_list_t e_results;
+    igraph_vector_int_list_init(&e_results, 0);
+
+    igraph_simple_cycles_search_all(
+      &this->graph, &v_results, &e_results, maxLength);
+
     std::vector<std::vector<long int>> results;
 
-    std::vector<long int> startingCrosslinkers =
-      this->getIndicesOfType(crossLinkerType);
-    std::unordered_set<std::string> processedPathsKeys;
-
-    // note: this algorithm is not particularly efficient
-    // it is of the order of O(n*n!)
-    for (long int startingCrosslinkerVertexId : startingCrosslinkers) {
-      // ideally, we would only select the neighbouring *cross-linkers* here to
-      // reduce the overhead. but well: let's leave that to the user with
-      // #getNetworkOfCrosslinker
-      igraph_vector_int_t neighbours;
-      igraph_vector_int_init(&neighbours, 0);
-
-      if (igraph_neighbors(
-            &graph, &neighbours, startingCrosslinkerVertexId, IGRAPH_ALL)) {
-        throw std::runtime_error("Failed to get neighbours in graph");
-      }
-
-      // loop neighbours
-      igraph_vector_int_t paths;
-      igraph_vector_int_init(&paths, 0);
-      // for each neighbour, we search the simple paths
-      if (igraph_get_all_simple_paths(&this->graph,
-                                      &paths,
-                                      startingCrosslinkerVertexId,
-                                      igraph_vss_vector(&neighbours),
-                                      maxLength,
-                                      IGRAPH_ALL)) {
-        throw std::runtime_error("Failed to get simple paths in graph");
-      }
-
-      igraph_vector_int_destroy(&neighbours);
-      // translate the paths we found
+    for (igraph_integer_t listIdx = 0;
+         listIdx < igraph_vector_int_list_size(&v_results);
+         ++listIdx) {
       std::vector<long int> currentPath;
-      std::vector<long int> currentPathEdges;
-      int currentFunctionality = 0;
-      unsigned long long int currentPathXor = 0;
-      unsigned long long int currentPathSum = 0;
-      unsigned long long int currentPathProduct = 1;
-      size_t n = igraph_vector_int_size(&paths);
-      for (size_t i = 0; i < n; ++i) {
-        const long int currentVal = igraph_vector_int_get(&paths, i);
-        if (currentVal == -1) {
-          // skip self-loops and duplicates
-          // poor man's hash of three long ints
-          std::string currentPathKey = std::to_string(currentPathXor) + "/" +
-                                       std::to_string(currentPathSum) + "/" +
-                                       std::to_string(currentPathProduct);
-          if ((!skipSelfLoops || currentPath.size() > 3) &&
-              !pylimer_tools::utils::set_has_key(processedPathsKeys,
-                                                 currentPathKey)) {
-            results.push_back(currentPath);
-            if (edges != nullptr) {
-              // TODO: here, too, we should decide what we do if multile edges
-              // between the two vertices are found
-              currentPathEdges.push_back(this->getEdgeIdsFromTo(
-                currentPath[0], pylimer_tools::utils::last(currentPath))[0]);
-              RUNTIME_EXP_IFN(currentPath.size() == currentPathEdges.size(),
-                              "Every loop must consist of equal number of "
-                              "edges and vertices");
-              edges->push_back(currentPathEdges);
-            }
-            processedPathsKeys.insert(currentPathKey);
-          }
-          currentPath.clear();
-          currentPathEdges.clear();
-          currentFunctionality = 0;
-          currentPathXor = 0;
-          currentPathSum = 0;
-          currentPathProduct = 1;
-        } else {
-          // compute hash
-          currentPathXor = (currentPathXor xor currentVal);
-          currentPathSum += currentVal;
-          currentPathProduct *= currentVal;
-          // and remember the part of the path
-          if (currentPath.size() > 0 && edges != nullptr) {
-            // TODO: here, too, we should decide what we do if multile edges
-            // between the two vertices are found
-            currentPathEdges.push_back(this->getEdgeIdsFromTo(
-              currentPath[currentPath.size() - 1], currentVal)[0]);
-          }
-          currentPath.push_back(currentVal);
-        }
+      for (igraph_integer_t i = 0;
+           i < igraph_vector_int_size(
+                 igraph_vector_int_list_get_ptr(&v_results, listIdx));
+           ++i) {
+        currentPath.push_back(igraph_vector_int_get(
+          igraph_vector_int_list_get_ptr(&v_results, listIdx), i));
       }
-      igraph_vector_int_destroy(&paths);
+      results.push_back(currentPath);
+    }
 
-      // additional check for self-loops
-      std::string selfLoopPathKey =
-        std::to_string(0 xor startingCrosslinkerVertexId) + "/" +
-        std::to_string(startingCrosslinkerVertexId) + "/" +
-        std::to_string(startingCrosslinkerVertexId);
-      if (!skipSelfLoops && !pylimer_tools::utils::set_has_key(
-                              processedPathsKeys, selfLoopPathKey)) {
-        std::vector<long int> crossLinkersBonds =
-          this->getVertexIdxsConnectedTo(startingCrosslinkerVertexId);
-        if (std::find(crossLinkersBonds.begin(),
-                      crossLinkersBonds.end(),
-                      startingCrosslinkerVertexId) != crossLinkersBonds.end()) {
-
-          currentPath.clear();
-          currentPath.push_back(startingCrosslinkerVertexId);
-          results.push_back(currentPath);
-          currentPath.clear();
+    if (edges != nullptr) {
+      edges->clear();
+      for (igraph_integer_t listIdx = 0;
+           listIdx < igraph_vector_int_list_size(&e_results);
+           ++listIdx) {
+        std::vector<long int> currentPath;
+        for (igraph_integer_t i = 0;
+             i < igraph_vector_int_size(
+                   igraph_vector_int_list_get_ptr(&e_results, listIdx));
+             ++i) {
+          currentPath.push_back(igraph_vector_int_get(
+            igraph_vector_int_list_get_ptr(&e_results, listIdx), i));
         }
+        edges->push_back(currentPath);
       }
     }
 
+    igraph_vector_int_list_destroy(&v_results);
+    igraph_vector_int_list_destroy(&e_results);
+
     return results;
+  }
+
+  /**
+   * @brief Detect loops (cycles) in the graph and count how long they are
+   *
+   * @param maxLength
+   * @return std::map<int, int> the number of vertices per loop
+   */
+  std::unordered_map<int, int> Universe::countLoopLengths(const int maxLength) const
+  {
+    // NOTE: there are exponentially many paths between two vertices of a graph,
+    // and you may run out of memory when using this function, if your graph is
+    // lattice-like.
+
+    pylimer_tools::utils::Counter<int> loopLengths;
+
+    // TODO: shrink the graph by collapsing all 2-functional vertices?
+    igraph_simple_cycles_search_callback(
+      &this->graph, maxLength, &count_found_cycle, &loopLengths);
+
+    return loopLengths.asMap();
   }
 
   /**

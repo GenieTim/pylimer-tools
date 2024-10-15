@@ -796,6 +796,13 @@ init_pylimer_bound_entities(py::module_& m)
     .def("get_vertex_degrees", &Universe::getVertexDegrees, R"pbdoc(
           Get the degree (functionality) of each vertex.
      )pbdoc")
+    .def("count_loop_lengths",
+         &Universe::countLoopLengths,
+         R"pbdoc(
+          Find all loops (below a specific length) and count the number of atoms involved in them.
+          Returns the count, how many loops per length are found.
+         )pbdoc",
+         py::arg("max_length") = -1)
     .def("find_loops",
          &Universe::findLoopsOfAtoms,
          R"pbdoc(
@@ -805,7 +812,7 @@ init_pylimer_bound_entities(py::module_& m)
             CAUTION:
                There are exponentially many paths between two cross-linkers of a network,
                and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
-               You can use the maxLength parameter to restrict the algorithm to only search for loops up to a certain length.
+               You can use the `max_length` parameter to restrict the algorithm to only search for loops up to a certain length.
                Use a negative value to find all loops and paths.
             )pbdoc",
          py::arg("crosslinker_type"),
@@ -820,7 +827,7 @@ init_pylimer_bound_entities(py::module_& m)
             CAUTION:
                There are exponentially many paths between two cross-linkers of a network,
                and you may run out of memory when using this function, if your Universe/Network is lattice-like. 
-               You can use the maxLength parameter to restrict the algorithm to only search for loops up to a certain length.
+               You can use the `max_length` parameter to restrict the algorithm to only search for loops up to a certain length.
                Use a negative value to find all loops and paths.
             )pbdoc",
          py::arg("loop_start"),

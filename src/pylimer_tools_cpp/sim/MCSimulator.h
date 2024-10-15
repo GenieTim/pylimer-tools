@@ -40,39 +40,18 @@ namespace sim {
       iterations += 1;
       numLastStepsAccepted = 0;
 
-      if (!fixFirst) {
-        double bondLen2 =
-          (coordinates.segment(0, 3) - coordinates.segment(3, 3)).squaredNorm();
-
-        double currentProbability =
-          std::exp(normalisationFactorInExponential * bondLen2);
-
-        Eigen::Vector3d displacement =
-          stepSize * Eigen::Vector3d(displacementSamplingDist(rng),
-                                     displacementSamplingDist(rng),
-                                     displacementSamplingDist(rng));
-
-        double newBondLen2 =
-          (coordinates.segment(0, 3) + displacement - coordinates.segment(3, 3))
-            .squaredNorm();
-
-        double newProbability =
-          std::exp(normalisationFactorInExponential * newBondLen2);
-
-        if ((newProbability / currentProbability) >
-            probabilitySamplingDist(rng)) {
-          coordinates.segment(0, 3) += displacement;
-          numLastStepsAccepted += 1;
-        }
-      }
-
-      for (size_t i = 1; i < nBeads - 1; ++i) {
-        double bondLen21 =
-          (coordinates.segment(3 * i, 3) - coordinates.segment(3 * (i - 1), 3))
-            .squaredNorm();
-        double bondLen22 =
-          (coordinates.segment(3 * i, 3) - coordinates.segment(3 * (i + 1), 3))
-            .squaredNorm();
+      // TODO: improve performance by doing more than one bead at a time
+      for (size_t i = (fixFirst ? 1 : 0); i < (fixLast ? nBeads - 1 : nBeads);
+           ++i) {
+        double bondLen21 = i == 0 ? 0.
+                                  : (coordinates.segment(3 * i, 3) -
+                                     coordinates.segment(3 * (i - 1), 3))
+                                      .squaredNorm();
+        double bondLen22 = i == nBeads - 1
+                             ? 0.
+                             : (coordinates.segment(3 * i, 3) -
+                                coordinates.segment(3 * (i + 1), 3))
+                                 .squaredNorm();
 
         double currentProbability =
           std::exp(normalisationFactorInExponential * (bondLen21 + bondLen22));
@@ -82,12 +61,16 @@ namespace sim {
                                      displacementSamplingDist(rng),
                                      displacementSamplingDist(rng));
 
-        double newBondLen21 = (coordinates.segment(3 * i, 3) + displacement -
-                               coordinates.segment(3 * (i - 1), 3))
-                                .squaredNorm();
-        double newBondLen22 = (coordinates.segment(3 * i, 3) + displacement -
-                               coordinates.segment(3 * (i + 1), 3))
-                                .squaredNorm();
+        double newBondLen21 =
+          i == 0 ? 0.
+                 : (coordinates.segment(3 * i, 3) + displacement -
+                    coordinates.segment(3 * (i - 1), 3))
+                     .squaredNorm();
+        double newBondLen22 =
+          i == nBeads - 1 ? 0.
+                          : (coordinates.segment(3 * i, 3) + displacement -
+                             coordinates.segment(3 * (i + 1), 3))
+                              .squaredNorm();
 
         double newProbability = std::exp(normalisationFactorInExponential *
                                          (newBondLen21 + newBondLen22));
@@ -99,42 +82,15 @@ namespace sim {
         }
       }
 
-      if (!fixLast) {
-        double bondLen2 = (coordinates.segment(3 * (nBeads - 1), 3) -
-                           coordinates.segment(3 * (nBeads - 2), 3))
-                            .squaredNorm();
-
-        double currentProbability =
-          std::exp(normalisationFactorInExponential * bondLen2);
-
-        Eigen::Vector3d displacement =
-          stepSize * Eigen::Vector3d(displacementSamplingDist(rng),
-                                     displacementSamplingDist(rng),
-                                     displacementSamplingDist(rng));
-
-        double newBondLen2 =
-          (coordinates.segment(3 * (nBeads - 1), 3) + displacement -
-           coordinates.segment(3 * (nBeads - 2), 3))
-            .squaredNorm();
-
-        double newProbability =
-          std::exp(normalisationFactorInExponential * newBondLen2);
-
-        if ((newProbability / currentProbability) >
-            probabilitySamplingDist(rng)) {
-          coordinates.segment(3 * (nBeads - 1), 3) += displacement;
-          numLastStepsAccepted += 1;
-        }
-      }
-
       double acceptanceRatio = static_cast<double>(numLastStepsAccepted) /
                                static_cast<double>(nBeadsToMove);
-      // target acceptance of 50%
+      // dynamic step to target acceptance of 50%
       stepSize *= (1. + (acceptanceRatio - 0.5) / 10.);
     } while (iterations < nSteps && stepSize > 1e-5);
 
+#ifndef NDEBUG
     // validate bond lengths
-    for (size_t i = 1; i < coordinates.size() / 3; ++i) {
+    for (size_t i = 1; i < nBeads; ++i) {
       double bondLen =
         (coordinates.segment(3 * i, 3) - coordinates.segment(3 * (i - 1), 3))
           .norm();
@@ -143,6 +99,7 @@ namespace sim {
                         std::to_string(bondLen) + " at index " +
                         std::to_string(i) + ".");
     }
+#endif
   }
 
 }
