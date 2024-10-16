@@ -966,14 +966,14 @@ namespace sim {
 
       void initializeDefaults()
       {
-        this->currentForces =
-          Eigen::VectorXd::Zero(this->forceRelaxationNetwork.coordinates.size());
-        this->currentVelocities =
-          Eigen::VectorXd::Zero(this->forceRelaxationNetwork.coordinates.size());
-        this->currentVelocitiesPlus =
-          Eigen::VectorXd::Zero(this->forceRelaxationNetwork.coordinates.size());
-        this->currentSpringDistances =
-          this->evaluateSpringDistances(&this->forceRelaxationNetwork, this->is2D);
+        this->currentForces = Eigen::VectorXd::Zero(
+          this->forceRelaxationNetwork.coordinates.size());
+        this->currentVelocities = Eigen::VectorXd::Zero(
+          this->forceRelaxationNetwork.coordinates.size());
+        this->currentVelocitiesPlus = Eigen::VectorXd::Zero(
+          this->forceRelaxationNetwork.coordinates.size());
+        this->currentSpringDistances = this->evaluateSpringDistances(
+          &this->forceRelaxationNetwork, this->is2D);
       }
     };
   } // namespace mehp

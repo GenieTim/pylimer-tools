@@ -1226,7 +1226,8 @@ namespace entities {
    * @param maxLength
    * @return std::map<int, int> the number of vertices per loop
    */
-  std::unordered_map<int, int> Universe::countLoopLengths(const int maxLength) const
+  std::unordered_map<int, int> Universe::countLoopLengths(
+    const int maxLength) const
   {
     // NOTE: there are exponentially many paths between two vertices of a graph,
     // and you may run out of memory when using this function, if your graph is

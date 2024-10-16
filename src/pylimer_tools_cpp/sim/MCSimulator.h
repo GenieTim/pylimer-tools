@@ -32,9 +32,12 @@ namespace sim {
     std::iota(
       steppingPosIndices.begin(), steppingPosIndices.end(), fixFirst ? 1 : 0);
 
+    double meanSquaredBeadDistance = SQUARE(beadDistance);
+    // SQUARE((3. / 8.) * M_PI * this->beadDistance);
     double normalisationFactor =
-      std::pow(3. / (2. * M_PI * SQUARE(beadDistance)), 3. / 2.);
-    double normalisationFactorInExponential = -3. / (2. * SQUARE(beadDistance));
+      std::pow(3. / (2. * M_PI * meanSquaredBeadDistance), 3. / 2.);
+    double normalisationFactorInExponential =
+      -3. / (2. * meanSquaredBeadDistance);
 
     do {
       iterations += 1;
