@@ -82,28 +82,34 @@ namespace utils {
                     this->simplifiedUniverse.beadsInStrand.end(),
                     0);
       std::vector<int> zeros = initializeWithValue(nrOfAtoms, 0);
-      std::vector<double> xs = initializeWithValue(nrOfAtoms, 0.0);
-      std::vector<double> ys = initializeWithValue(nrOfAtoms, 0.0);
-      std::vector<double> zs = initializeWithValue(nrOfAtoms, 0.0);
-      std::vector<long int> ids = initializeWithValue<long int>(nrOfAtoms, 1);
-      std::vector<int> types = initializeWithValue(nrOfAtoms, 0);
+      std::vector<double> xs;
+      xs.reserve(nrOfAtoms);
+      std::vector<double> ys;
+      ys.reserve(nrOfAtoms);
+      std::vector<double> zs;
+      zs.reserve(nrOfAtoms);
+      std::vector<long int> ids;
+      ids.reserve(nrOfAtoms);
+      std::vector<int> types;
+      types.reserve(nrOfAtoms);
 
       std::vector<long int> bondsFrom = {};
       std::vector<long int> bondsTo = {};
 
       // Add the cross-linkers
+      long int currentId = 1;
       for (size_t i = 0; i < nCrosslinks; ++i) {
-        ids[i] += i;
-        xs[i] = this->simplifiedUniverse.xlinkX[i];
-        ys[i] = this->simplifiedUniverse.xlinkY[i];
-        zs[i] = this->simplifiedUniverse.xlinkZ[i];
-        types[i] = this->simplifiedUniverse.xlinkTypes[i];
+        ids.push_back(currentId);
+        xs.push_back(this->simplifiedUniverse.xlinkX[i]);
+        ys.push_back(this->simplifiedUniverse.xlinkY[i]);
+        zs.push_back(this->simplifiedUniverse.xlinkZ[i]);
+        types.push_back(this->simplifiedUniverse.xlinkTypes[i]);
+        currentId += 1;
       }
 
       // Sample the strands
       assert(this->simplifiedUniverse.strandFrom.size() ==
              this->simplifiedUniverse.strandTo.size());
-      long int currentId = nCrosslinks + 1;
       for (size_t strandI = 0;
            strandI < this->simplifiedUniverse.strandFrom.size();
            ++strandI) {
@@ -112,19 +118,25 @@ namespace utils {
         long int strandEnd1 = this->simplifiedUniverse.strandFrom[strandI];
         long int strandEnd2 = this->simplifiedUniverse.strandTo[strandI];
         int nBeadsInStrand = this->simplifiedUniverse.beadsInStrand[strandI];
-        assert(strandEnd1 >= 0);
-        if (strandEnd2 == -1) {
+        if (strandEnd1 < 0) {
+          RUNTIME_EXP_IFN(
+            strandEnd2 < 0,
+            "if first end is not associated, expected second to be as well");
+          coordinates = this->sampleFreeChainCoordinates(nBeadsInStrand);
+        } else if (strandEnd2 < 0) {
           coordinates =
             this->sampleDanglingChainCoordinates(strandEnd1, nBeadsInStrand);
-          bondsFrom.push_back(strandEnd1);
+          bondsFrom.push_back(strandEnd1 + 1);
           bondsTo.push_back(currentId);
         } else {
-          assert(strandEnd1 != -1 && strandEnd2 != -1);
+          RUNTIME_EXP_IFN(
+            strandEnd1 != -1 && strandEnd2 != -1,
+            "Expected both ends to have an associated cross-linker");
           coordinates = this->sampleStrandCoordinates(
             strandEnd1, strandEnd2, nBeadsInStrand);
-          bondsFrom.push_back(strandEnd1);
+          bondsFrom.push_back(strandEnd1 + 1);
           bondsTo.push_back(currentId);
-          bondsFrom.push_back(strandEnd2);
+          bondsFrom.push_back(strandEnd2 + 1);
           bondsTo.push_back(currentId + nBeadsInStrand - 1);
         }
 
@@ -190,14 +202,8 @@ namespace utils {
                           int solventAtomType = 3,
                           bool whiteNoise = true)
     {
-      // std::cout << "Adding " << nrOfSolventChains << " atoms for solvent
-      // chains."
-      //           << std::endl;
-      std::vector<size_t> startAtoms =
-        this->addAtomsWithType(nrOfSolventChains, solventAtomType, whiteNoise);
-
-      for (size_t atomIdx : startAtoms) {
-        this->simplifiedUniverse.strandFrom.push_back(atomIdx);
+      for (size_t i = 0; i < nrOfSolventChains; ++i) {
+        this->simplifiedUniverse.strandFrom.push_back(-1);
         this->simplifiedUniverse.strandTo.push_back(-1);
         this->simplifiedUniverse.strandBeadType.push_back(solventAtomType);
         this->simplifiedUniverse.beadsInStrand.push_back(chainLength - 1);
@@ -288,8 +294,7 @@ namespace utils {
 
           size_t partnerCrosslinker = this->findAppropriateLink(
             strandEnd1[strandIdx],
-            beadsPerChains[strandIdx] *
-              (this->beadDistance * this->beadDistance) * cInfinity,
+            beadsPerChains[strandIdx] * SQUARE(this->beadDistance) * cInfinity,
             targetCrossLinkerConversion > 0.95
               ? -1.
               : beadsPerChains[strandIdx] * this->beadDistance // -1. //
@@ -406,6 +411,10 @@ namespace utils {
         Eigen::VectorXd::Zero(3 * nActualSprings);
       forceRelaxationNetwork.nrOfSprings = nActualSprings;
 
+      forceRelaxationNetwork.springCoordinateIndexA =
+        Eigen::ArrayXi::Zero(3 * nActualSprings);
+      forceRelaxationNetwork.springCoordinateIndexB =
+        Eigen::ArrayXi::Zero(3 * nActualSprings);
       for (size_t i = 0; i < nActualSprings; ++i) {
         for (size_t dir = 0; dir < 3; ++dir) {
           forceRelaxationNetwork.springCoordinateIndexA(3 * i + dir) =
@@ -471,6 +480,29 @@ namespace utils {
 
     /**
      * @brief Do a random walk of certain length to add a chain
+     *
+     * @param from the starting Atom of the chain
+     * @param chainLen the number of additional atoms to add to the chain
+     * @param atomType the atom type of the atoms in the chain
+     */
+    Eigen::VectorXd sampleFreeChainCoordinates(int chainLen)
+    {
+      Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
+        chainLen, this->beadDistance, this->rng);
+
+      pylimer_tools::sim::equilibrateChainWithMC(
+        positions, this->beadDistance, this->rng, true, false, this->nMcSteps);
+
+      Eigen::Vector3d from = Eigen::Vector3d(
+        this->distX(this->rng), this->distY(this->rng), this->distZ(this->rng));
+
+      positions += from.replicate(chainLen, 1);
+      return positions;
+    }
+
+    /**
+     * @brief Do a random walk of certain length starting somewhere to add a
+     * chain
      *
      * @param from the starting Atom of the chain
      * @param chainLen the number of additional atoms to add to the chain

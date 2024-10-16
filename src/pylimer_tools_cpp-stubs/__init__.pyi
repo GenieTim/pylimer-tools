@@ -12,7 +12,6 @@
 """
 from __future__ import annotations
 import numpy
-import pybind11_stubgen.typing_ext
 import scipy.sparse
 import typing
 __all__ = [
@@ -1381,11 +1380,22 @@ class MCUniverseGenerator:
                     Randomly distribute additional, free chains.
         """
 
+    def config_nr_of_mc_steps(self, n_steps: int = 2000) -> None:
+        """
+        Set the number of Monte-Carlo steps during bond length equilibration.
+        """
+
     def get_universe(self) -> Universe:
         """
                     Fetch the current (or final) state of the universe.
 
-                    Use this method to actually retrieve the generated structure.
+                    Use this method to actually (MC) place beads between the cross-links and retrieve the generated structure.
+        """
+
+    def relax_crosslinks(self) -> None:
+        """
+                 Run force relaxation with the cross-linkers and their strands,
+                 to have the cross-links in their statistically most probable position.
         """
 
     def set_bead_distance(self, distance: float) -> None:
@@ -3051,6 +3061,12 @@ class Universe:
                        - unwrapped: whether to measure the distance in unwrapped coordinates or as PBC-corrected distance
         """
 
+    def count_loop_lengths(self, max_length: int = -1) -> dict[int, int]:
+        """
+                  Find all loops (below a specific length) and count the number of atoms involved in them.
+                  Returns the count, how many loops per length are found.
+        """
+
     def detect_angles(self) -> dict[str, list[int]]:
         """
         Returns just as
@@ -3092,7 +3108,7 @@ class Universe:
                     CAUTION:
                        There are exponentially many paths between two cross-linkers of a network,
                        and you may run out of memory when using this function, if your Universe/Network is lattice-like.
-                       You can use the maxLength parameter to restrict the algorithm to only search for loops up to a certain length.
+                       You can use the `max_length` parameter to restrict the algorithm to only search for loops up to a certain length.
                        Use a negative value to find all loops and paths.
         """
 
@@ -3105,7 +3121,7 @@ class Universe:
                     CAUTION:
                        There are exponentially many paths between two cross-linkers of a network,
                        and you may run out of memory when using this function, if your Universe/Network is lattice-like.
-                       You can use the maxLength parameter to restrict the algorithm to only search for loops up to a certain length.
+                       You can use the `max_length` parameter to restrict the algorithm to only search for loops up to a certain length.
                        Use a negative value to find all loops and paths.
         """
 
@@ -3535,29 +3551,37 @@ def compute_stoichiometric_imbalance(
     """
 
 
-def do_linear_walk_chain_from_to(box: Box, from_coordinates: typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(
-        3)], to_coordinates: typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(3)], chain_len: int) -> ...:
+def do_linear_walk_chain_from_to(box: Box, from_coordinates: numpy.ndarray,
+                                 to_coordinates: numpy.ndarray, chain_len: int, include_ends: bool = False) -> numpy.ndarray:
     """
                 Get coordinates linearly interpolated from one point to another (both exclusive).
+
+                :param box: The box for doing PBC correction on the from/to.
+                :param from_coordinates: Coordinates of the start point.
+                :param to_coordinates: Coordinates of the end point.
+                :param chain_len: Number of coordinates to generate between the start and end-point.
+                :param include_ends: Whether to include the start and end points in the output (default: false).
+                   If yes, chain_len + 2 coordinates will be returned,
+                   where the first will be from_coordinates and the last will be to_coordinates.
     """
 
 
 def do_random_walk(chain_len: int, bead_distance: float = 1.0,
-                   seed: str = '') -> ...:
+                   seed: str = '') -> numpy.ndarray:
     """
                 Do a random walk, return the coordinates of each point visited.
     """
 
 
-def do_random_walk_chain_from_to(box: Box, from_coordinates: typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(
-        3)], to_coordinates: typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(3)], chain_len: int, bead_distance: float = 1.0, seed: str = '') -> ...:
+def do_random_walk_chain_from_to(box: Box, from_coordinates: numpy.ndarray, to_coordinates: numpy.ndarray,
+                                 chain_len: int, bead_distance: float = 1.0, seed: str = '') -> numpy.ndarray:
     """
                 Do a random walk from one point to another.
     """
 
 
-def do_random_walk_chain_from_to_mc(box: Box, from_coordinates: typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(
-        3)], to_coordinates: typing.Annotated[list[float], pybind11_stubgen.typing_ext.FixedSize(3)], chain_len: int, bead_distance: float = 1.0, seed: str = '', n_iterations: int = 1000) -> ...:
+def do_random_walk_chain_from_to_mc(box: Box, from_coordinates: numpy.ndarray, to_coordinates: numpy.ndarray,
+                                    chain_len: int, bead_distance: float = 1.0, seed: str = '', n_iterations: int = 1000) -> numpy.ndarray:
     """
                 Do a random walk from one point to another.
                 Then, relax the points in between using a Metropolis-Monte Carlo simulation.
