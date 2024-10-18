@@ -92,12 +92,13 @@ init_pylimer_bound_generators(py::module_& m)
             )pbdoc");
 
   m.def("do_random_walk",
-        py::overload_cast<int, double, std::string>(&doRandomWalkChain),
+        py::overload_cast<int, double, double, std::string>(&doRandomWalkChain),
         R"pbdoc(
             Do a random walk, return the coordinates of each point visited.
             )pbdoc",
         py::arg("chain_len"),
         py::arg("bead_distance") = 1.,
+        py::arg("mean_squared_bead_distance") = 1.,
         py::arg("seed") = "");
   m.def(
     "do_random_walk_chain_from_to_mc",
@@ -106,8 +107,9 @@ init_pylimer_bound_generators(py::module_& m)
        Eigen::Vector3d t,
        int c,
        double l,
+       double l2,
        std::string s,
-       int n) { return doRandomWalkChainFromToMC(b, f, t, c, l, s, n); },
+       int n) { return doRandomWalkChainFromToMC(b, f, t, c, l, l2, s, n); },
     R"pbdoc(
             Do a random walk from one point to another.
             Then, relax the points in between using a Metropolis-Monte Carlo simulation.
@@ -117,6 +119,7 @@ init_pylimer_bound_generators(py::module_& m)
     py::arg("to_coordinates"),
     py::arg("chain_len"),
     py::arg("bead_distance") = 1.,
+    py::arg("mean_squared_bead_distance") = 1.,
     py::arg("seed") = "",
     py::arg("n_iterations") = 1000);
   m.def(
@@ -126,7 +129,8 @@ init_pylimer_bound_generators(py::module_& m)
        Eigen::Vector3d t,
        int c,
        double l,
-       std::string s) { return doRandomWalkChainFromTo(b, f, t, c, l, s); },
+       double l2,
+       std::string s) { return doRandomWalkChainFromTo(b, f, t, c, l, l2, s); },
     R"pbdoc(
             Do a random walk from one point to another.
             )pbdoc",
@@ -135,6 +139,7 @@ init_pylimer_bound_generators(py::module_& m)
     py::arg("to_coordinates"),
     py::arg("chain_len"),
     py::arg("bead_distance") = 1.,
+    py::arg("mean_squared_bead_distance") = 1.,
     py::arg("seed") = "");
   m.def("do_linear_walk_chain_from_to",
         &doLinearWalkChainFromTo,

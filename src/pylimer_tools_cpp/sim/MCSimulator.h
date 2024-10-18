@@ -8,7 +8,7 @@ namespace pylimer_tools {
 namespace sim {
 
   void equilibrateChainWithMC(Eigen::VectorXd& coordinates,
-                              double beadDistance,
+                              double meanSquaredBeadDistance,
                               std::mt19937 rng,
                               bool fixFirst = false,
                               bool fixLast = false,
@@ -18,7 +18,6 @@ namespace sim {
                        "Coordinates must have a multiple of 3 elements");
     int numLastStepsAccepted = 0;
     int iterations = 0;
-    double stepSize = beadDistance;
 
     std::uniform_real_distribution<double> probabilitySamplingDist =
       std::uniform_real_distribution<double>(0., 1.);
@@ -32,12 +31,11 @@ namespace sim {
     std::iota(
       steppingPosIndices.begin(), steppingPosIndices.end(), fixFirst ? 1 : 0);
 
-    double meanSquaredBeadDistance = SQUARE(beadDistance);
-    // SQUARE((3. / 8.) * M_PI * this->beadDistance);
     double normalisationFactor =
       std::pow(3. / (2. * M_PI * meanSquaredBeadDistance), 3. / 2.);
     double normalisationFactorInExponential =
       -3. / (2. * meanSquaredBeadDistance);
+    double stepSize = std::cbrt(meanSquaredBeadDistance) * 0.5;
 
     do {
       iterations += 1;
@@ -94,12 +92,12 @@ namespace sim {
 #ifndef NDEBUG
     // validate bond lengths
     for (size_t i = 1; i < nBeads; ++i) {
-      double bondLen =
+      double bondLen2 =
         (coordinates.segment(3 * i, 3) - coordinates.segment(3 * (i - 1), 3))
-          .norm();
-      RUNTIME_EXP_IFN(bondLen < 5. * beadDistance,
+          .squaredNorm();
+      RUNTIME_EXP_IFN(bondLen2 < 5. * meanSquaredBeadDistance,
                       "Invalid bond length after equilibration got " +
-                        std::to_string(bondLen) + " at index " +
+                        std::to_string(bondLen2) + " at index " +
                         std::to_string(i) + ".");
     }
 #endif

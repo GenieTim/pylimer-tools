@@ -26,30 +26,39 @@ namespace utils {
    */
   Eigen::VectorXd doRandomWalkChain(int chainLen,
                                     double beadDistance,
+                                    double meanSquaredBeadDistance,
                                     std::mt19937 rng)
   {
     std::uniform_real_distribution<double> angleDistribution =
       std::uniform_real_distribution<double>(0, 2 * M_PI);
+    std::normal_distribution<double> stepSizeDistribution =
+      std::normal_distribution<double>(
+        beadDistance,
+        std::sqrt(meanSquaredBeadDistance - SQUARE(beadDistance)));
 
     Eigen::VectorXd coordinates = Eigen::VectorXd(3 * chainLen);
 
     Eigen::Vector3d lastPosition = Eigen::Vector3d::Zero();
 
+    double stepSize = beadDistance;
+
     for (int i = 0; i < chainLen; ++i) {
       double alpha = angleDistribution(rng);
       double beta = angleDistribution(rng);
 
+      // TODO: adjust step size according to mean squared bead distance
+      stepSize = stepSizeDistribution(rng);
+
       // coordinate system conversion: confirmation e.g. in
       // https://math.stackexchange.com/a/1385150/738831 or
       // https://en.wikipedia.org/wiki/Spherical_coordinate_system
-      Eigen::Vector3d displacement(
-        beadDistance * std::cos(beta) * std::sin(alpha),
-        beadDistance * std::sin(beta) * std::sin(alpha),
-        beadDistance * std::cos(alpha));
+      Eigen::Vector3d displacement(stepSize * std::cos(beta) * std::sin(alpha),
+                                   stepSize * std::sin(beta) * std::sin(alpha),
+                                   stepSize * std::cos(alpha));
       coordinates.segment(3 * i, 3) = lastPosition + displacement;
 
 #ifndef NDEBUG
-      assert(APPROX_EQUAL(displacement.norm(), beadDistance, 1e-10));
+      assert(APPROX_EQUAL(displacement.norm(), stepSize, 1e-10));
 #endif
 
       lastPosition = coordinates.segment(3 * i, 3);
@@ -61,6 +70,7 @@ namespace utils {
 
   Eigen::VectorXd doRandomWalkChain(int chainLen,
                                     double beadDistance = 1.0,
+                                    double meanSquaredBeadDistance = 1.0,
                                     std::string seed = "")
   {
     std::mt19937 rng;
@@ -72,7 +82,7 @@ namespace utils {
       rng = std::mt19937(seed2);
     }
 
-    return doRandomWalkChain(chainLen, beadDistance, rng);
+    return doRandomWalkChain(chainLen, beadDistance, meanSquaredBeadDistance, rng);
   }
 
   /**
@@ -89,6 +99,7 @@ namespace utils {
     Eigen::Vector3d to,
     int chainLen,
     double beadDistance,
+    double meanSquaredBeadDistance,
     std::mt19937 rng,
     bool includeEnds = false)
   {
@@ -100,7 +111,7 @@ namespace utils {
 
     // include the first and the last positions
     Eigen::VectorXd coordinates =
-      doRandomWalkChain(chainLen + 2, beadDistance, rng);
+      doRandomWalkChain(chainLen + 2, beadDistance, meanSquaredBeadDistance, rng);
     coordinates += from.replicate(chainLen + 2, 1);
 
     assert(coordinates.size() == 3 * (chainLen + 2));
@@ -134,6 +145,7 @@ namespace utils {
     const Eigen::Vector3d to,
     int chainLen,
     double beadDistance = 1.0,
+    double meanSquaredBeadDistance = 1.0,
     std::string seed = "")
   {
     std::mt19937 rng;
@@ -144,7 +156,8 @@ namespace utils {
       std::seed_seq seed2(seed.begin(), seed.end());
       rng = std::mt19937(seed2);
     }
-    return doRandomWalkChainFromTo(box, from, to, chainLen, beadDistance, rng);
+    return doRandomWalkChainFromTo(
+      box, from, to, chainLen, beadDistance, meanSquaredBeadDistance, rng);
   }
 
   /**
@@ -161,16 +174,24 @@ namespace utils {
     const Eigen::Vector3d to,
     int chainLen,
     double beadDistance,
+    double meanSquaredBeadDistance,
     std::mt19937 rng,
     int numIterations)
   {
     // first, do a random walk already for initial guesses
     Eigen::VectorXd coordinates =
-      doRandomWalkChainFromTo(box, from, to, chainLen, beadDistance, rng, true);
+      doRandomWalkChainFromTo(box,
+                              from,
+                              to,
+                              chainLen,
+                              beadDistance,
+                              meanSquaredBeadDistance,
+                              rng,
+                              true);
 
     // then, do some MC steps to equilibrate the bond lengths
     pylimer_tools::sim::equilibrateChainWithMC(
-      coordinates, beadDistance, rng, true, true, numIterations);
+      coordinates, meanSquaredBeadDistance, rng, true, true, numIterations);
 
     // omit first and last positions
     return coordinates.segment(3, coordinates.size() - 6);
@@ -182,6 +203,7 @@ namespace utils {
     const Eigen::Vector3d to,
     int chainLen,
     double beadDistance = 1.0,
+    double meanSquaredBeadDistance = 1.0,
     std::string seed = "",
     int numIterations = 1000)
   {
@@ -193,8 +215,14 @@ namespace utils {
       std::seed_seq seed2(seed.begin(), seed.end());
       rng = std::mt19937(seed2);
     }
-    return doRandomWalkChainFromToMC(
-      box, from, to, chainLen, beadDistance, rng, numIterations);
+    return doRandomWalkChainFromToMC(box,
+                                     from,
+                                     to,
+                                     chainLen,
+                                     beadDistance,
+                                     meanSquaredBeadDistance,
+                                     rng,
+                                     numIterations);
   }
 
   /**
