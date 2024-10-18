@@ -51,6 +51,7 @@ namespace utils {
       this->distY = std::uniform_real_distribution<double>(0.0, Ly);
       this->distZ = std::uniform_real_distribution<double>(0.0, Lz);
       this->box = pylimer_tools::entities::Box(Lx, Ly, Lz);
+      this->setBeadDistance(0.965);
     }
 
     void setSeed(unsigned int seed) { this->rng.seed(seed); }
@@ -58,6 +59,7 @@ namespace utils {
     void setBeadDistance(double newBeadDistance)
     {
       this->beadDistance = newBeadDistance;
+      this->meanSquaredBeadDistance = SQUARE((3. / 8.) * M_PI * this->beadDistance);
     }
 
     void configNrOfMCSteps(size_t newNrOfMCSteps)
@@ -294,7 +296,7 @@ namespace utils {
 
           size_t partnerCrosslinker = this->findAppropriateLink(
             strandEnd1[strandIdx],
-            beadsPerChains[strandIdx] * SQUARE(this->beadDistance) * cInfinity,
+            beadsPerChains[strandIdx] * this->meanSquaredBeadDistance * cInfinity,
             targetCrossLinkerConversion > 0.95
               ? -1.
               : beadsPerChains[strandIdx] * this->beadDistance // -1. //
@@ -453,7 +455,8 @@ namespace utils {
     }
 
   private:
-    double beadDistance = 0.965;
+    double beadDistance;
+    double meanSquaredBeadDistance;
     double currentCrosslinkerConversion = 0.0;
     size_t nMcSteps = 2000;
     std::mt19937 rng;
@@ -488,10 +491,10 @@ namespace utils {
     Eigen::VectorXd sampleFreeChainCoordinates(int chainLen)
     {
       Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
-        chainLen, this->beadDistance, this->rng);
+        chainLen, this->beadDistance, this->meanSquaredBeadDistance, this->rng);
 
       pylimer_tools::sim::equilibrateChainWithMC(
-        positions, this->beadDistance, this->rng, true, false, this->nMcSteps);
+        positions, this->meanSquaredBeadDistance, this->rng, true, false, this->nMcSteps);
 
       Eigen::Vector3d from = Eigen::Vector3d(
         this->distX(this->rng), this->distY(this->rng), this->distZ(this->rng));
@@ -511,10 +514,10 @@ namespace utils {
     Eigen::VectorXd sampleDanglingChainCoordinates(size_t idxFrom, int chainLen)
     {
       Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
-        chainLen, this->beadDistance, this->rng);
+        chainLen, this->beadDistance, this->meanSquaredBeadDistance, this->rng);
 
       pylimer_tools::sim::equilibrateChainWithMC(
-        positions, this->beadDistance, this->rng, true, false, this->nMcSteps);
+        positions, this->meanSquaredBeadDistance, this->rng, true, false, this->nMcSteps);
 
       Eigen::Vector3d from =
         Eigen::Vector3d(this->simplifiedUniverse.xlinkX[idxFrom],
@@ -550,6 +553,7 @@ namespace utils {
                           this->simplifiedUniverse.xlinkZ[to]),
           chainLen,
           this->beadDistance,
+          this->meanSquaredBeadDistance,
           this->rng,
           this->nMcSteps);
 
