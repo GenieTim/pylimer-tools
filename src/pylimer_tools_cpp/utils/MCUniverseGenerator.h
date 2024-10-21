@@ -59,7 +59,7 @@ namespace utils {
     void setBeadDistance(double newBeadDistance)
     {
       this->beadDistance = newBeadDistance;
-      this->meanSquaredBeadDistance = SQUARE((3. / 8.) * M_PI * this->beadDistance);
+      this->meanSquaredBeadDistance = (3. / 8.) * M_PI * SQUARE(this->beadDistance);
     }
 
     void configNrOfMCSteps(size_t newNrOfMCSteps)
@@ -282,6 +282,8 @@ namespace utils {
       std::vector<long int> strandEnd2 =
         pylimer_tools::utils::initializeWithValue<long int>(nrOfStrands, -1);
 
+      const double timesNForR02 = this->meanSquaredBeadDistance * cInfinity;
+
       // link one strand at a time until we reach the target conversion
       for (int sampleIdx = 0; sampleIdx < 2 * nrOfStrands; ++sampleIdx) {
         if (this->currentCrosslinkerConversion >= targetCrossLinkerConversion) {
@@ -296,7 +298,7 @@ namespace utils {
 
           size_t partnerCrosslinker = this->findAppropriateLink(
             strandEnd1[strandIdx],
-            beadsPerChains[strandIdx] * this->meanSquaredBeadDistance * cInfinity,
+            beadsPerChains[strandIdx] * timesNForR02,
             targetCrossLinkerConversion > 0.95
               ? -1.
               : beadsPerChains[strandIdx] * this->beadDistance // -1. //
@@ -493,8 +495,12 @@ namespace utils {
       Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
         chainLen, this->beadDistance, this->meanSquaredBeadDistance, this->rng);
 
-      pylimer_tools::sim::equilibrateChainWithMC(
-        positions, this->meanSquaredBeadDistance, this->rng, true, false, this->nMcSteps);
+      pylimer_tools::sim::equilibrateChainWithMC(positions,
+                                                 this->meanSquaredBeadDistance,
+                                                 this->rng,
+                                                 true,
+                                                 false,
+                                                 this->nMcSteps);
 
       Eigen::Vector3d from = Eigen::Vector3d(
         this->distX(this->rng), this->distY(this->rng), this->distZ(this->rng));
@@ -516,8 +522,12 @@ namespace utils {
       Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
         chainLen, this->beadDistance, this->meanSquaredBeadDistance, this->rng);
 
-      pylimer_tools::sim::equilibrateChainWithMC(
-        positions, this->meanSquaredBeadDistance, this->rng, true, false, this->nMcSteps);
+      pylimer_tools::sim::equilibrateChainWithMC(positions,
+                                                 this->meanSquaredBeadDistance,
+                                                 this->rng,
+                                                 true,
+                                                 false,
+                                                 this->nMcSteps);
 
       Eigen::Vector3d from =
         Eigen::Vector3d(this->simplifiedUniverse.xlinkX[idxFrom],
