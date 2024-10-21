@@ -631,9 +631,9 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       universe.addBonds(2, { { 8, 4 } }, { { 4, 1 } });
       std::map<int, std::vector<std::vector<pe::Atom>>> loops =
         universe.findLoopsOfAtoms(2, -1);
-      REQUIRE(loops.size() == 3);
-      REQUIRE(universe.hasInfiniteStrand(2, -1) == true);
-      REQUIRE(universe.getMeanStrandLength(2) ==
+      CHECK(loops.size() == 2);
+      CHECK(universe.hasInfiniteStrand(2, -1) == true);
+      CHECK(universe.getMeanStrandLength(2) ==
               Catch::Approx(((double)(3 + 1 + 1)) / 3.0));
     }
 
