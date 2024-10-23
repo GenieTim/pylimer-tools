@@ -32,8 +32,25 @@ init_pylimer_bound_generators(py::module_& m)
          py::arg("seed"))
     .def("set_bead_distance",
          &MCUniverseGenerator::setBeadDistance,
-         "Set the optimal distance between beads.",
-         py::arg("distance"))
+         R"pbdoc(
+         Set the mean distance between beads when doing MC stepping.
+         Also used for the target cross-linker partner sampling.
+
+         NOTE: Mainly the mean squared bead distance is effectively used in the Monte-Carlo simulation.
+
+         :param distance: Mean distance between beads.
+         :param update_mean_squared: Whether to update the mean squared distance as well, deduced from the assumed gaussian distribution in 3D (default: true).
+         )pbdoc",
+         py::arg("distance"),
+         py::arg("update_mean_squared") = true)
+    .def("set_mean_squared_bead_distance",
+         &MCUniverseGenerator::setBeadDistance,
+         R"pbdoc(Set the mean squared distance between beads.
+         :param mean_squared_distance: Mean squared distance between beads.
+         :param update_mean: Whether to update the mean bead distance as well, deduced from the assumed gaussian distribution in 3D (default: true).
+         )pbdoc",
+         py::arg("mean_squared_distance"),
+         py::arg("update_mean") = true)
     .def(
       "config_nr_of_mc_steps",
       &MCUniverseGenerator::configNrOfMCSteps,
