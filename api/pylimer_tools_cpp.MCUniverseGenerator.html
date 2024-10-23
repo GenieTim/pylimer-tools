@@ -337,10 +337,13 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks" title="pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">relax_crosslinks</span></code></a>(self)</p></td>
 <td><p>Run force relaxation with the cross-linkers and their strands, to have the cross-links in their statistically most probable position.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_bead_distance</span></code></a>(self, distance)</p></td>
-<td><p>Set the optimal distance between beads.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_bead_distance</span></code></a>(self, distance[, ...])</p></td>
+<td><p>Set the mean distance between beads when doing MC stepping.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_seed" title="pylimer_tools_cpp.MCUniverseGenerator.set_seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_seed</span></code></a>(self, seed)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_mean_squared_bead_distance</span></code></a>(self, ...[, ...])</p></td>
+<td><p>Set the mean squared distance between beads.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_seed" title="pylimer_tools_cpp.MCUniverseGenerator.set_seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_seed</span></code></a>(self, seed)</p></td>
 <td><p>Set the seed for the random generator.</p></td>
 </tr>
 </tbody>
@@ -408,8 +411,34 @@ to have the cross-links in their statistically most probable position.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance">
-<span class="sig-name descname"><span class="pre">set_bead_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance" title="Link to this definition">¶</a></dt>
-<dd><p>Set the optimal distance between beads.</p>
+<span class="sig-name descname"><span class="pre">set_bead_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_mean_squared</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance" title="Link to this definition">¶</a></dt>
+<dd><p>Set the mean distance between beads when doing MC stepping.
+Also used for the target cross-linker partner sampling.</p>
+<p>NOTE: Mainly the mean squared bead distance is effectively used in the Monte-Carlo simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>distance</strong> – Mean distance between beads.</p></li>
+<li><p><strong>update_mean_squared</strong> – Whether to update the mean squared distance as well, deduced from the assumed gaussian distribution in 3D (default: true).</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance">
+<span class="sig-name descname"><span class="pre">set_mean_squared_bead_distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">mean_squared_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">update_mean</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance" title="Link to this definition">¶</a></dt>
+<dd><dl class="simple">
+<dt>Set the mean squared distance between beads.</dt><dd><dl class="field-list simple">
+<dt class="field-odd">param mean_squared_distance<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Mean squared distance between beads.</p>
+</dd>
+<dt class="field-even">param update_mean<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether to update the mean bead distance as well, deduced from the assumed gaussian distribution in 3D (default: true).</p>
+</dd>
+</dl>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -485,6 +514,7 @@ to have the cross-links in their statistically most probable position.</p>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_universe"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_universe()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.relax_crosslinks()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.set_bead_distance()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.set_mean_squared_bead_distance()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_seed"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.set_seed()</span></code></a></li>
 </ul>
 </li>

@@ -17,6 +17,7 @@ MCUniverseGenerator
       ~MCUniverseGenerator.get_universe
       ~MCUniverseGenerator.relax_crosslinks
       ~MCUniverseGenerator.set_bead_distance
+      ~MCUniverseGenerator.set_mean_squared_bead_distance
       ~MCUniverseGenerator.set_seed
 
    .. rubric:: Methods Documentation
@@ -28,4 +29,5 @@ MCUniverseGenerator
    .. automethod:: get_universe
    .. automethod:: relax_crosslinks
    .. automethod:: set_bead_distance
+   .. automethod:: set_mean_squared_bead_distance
    .. automethod:: set_seed
