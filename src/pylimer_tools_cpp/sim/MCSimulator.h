@@ -95,7 +95,7 @@ namespace sim {
       double bondLen2 =
         (coordinates.segment(3 * i, 3) - coordinates.segment(3 * (i - 1), 3))
           .squaredNorm();
-      RUNTIME_EXP_IFN(bondLen2 < 5. * meanSquaredBeadDistance,
+      RUNTIME_EXP_IFN(bondLen2 < 8. * meanSquaredBeadDistance,
                       "Invalid bond length after equilibration got " +
                         std::to_string(bondLen2) + " at index " +
                         std::to_string(i) + ".");

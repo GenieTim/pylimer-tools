@@ -58,7 +58,7 @@ namespace utils {
       coordinates.segment(3 * i, 3) = lastPosition + displacement;
 
 #ifndef NDEBUG
-      assert(APPROX_EQUAL(displacement.norm(), stepSize, 1e-10));
+      assert(APPROX_EQUAL(displacement.norm(), std::abs(stepSize), 1e-10));
 #endif
 
       lastPosition = coordinates.segment(3 * i, 3);

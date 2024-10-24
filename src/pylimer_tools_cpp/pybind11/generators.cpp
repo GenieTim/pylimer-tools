@@ -62,9 +62,9 @@ init_pylimer_bound_generators(py::module_& m)
          py::arg("solvent_chain_length"),
          py::arg("solvent_atom_type") = 3,
          py::arg("white_noise") = true)
-    .def("add_and_link_strands",
+    .def("add_and_link_strands_to_conversion",
          py::overload_cast<int, std::vector<int>, double, int, double>(
-           &MCUniverseGenerator::addAndLinkStrands),
+           &MCUniverseGenerator::addAndLinkStrandsToConversion),
          R"pbdoc(
             Actually add strands, link them to the previously added cross-linkers.
 
@@ -77,6 +77,23 @@ init_pylimer_bound_generators(py::module_& m)
          py::arg("nr_of_strands"),
          py::arg("strand_lengths"),
          py::arg("crosslinker_conversion"),
+         py::arg("strand_atom_type") = 1,
+         py::arg("c_infinity") = 1.)
+    .def("add_and_link_strands_to_soluble_fraction",
+         py::overload_cast<int, std::vector<int>, double, int, double>(
+           &MCUniverseGenerator::addAndLinkStrandsToSolubleFraction),
+         R"pbdoc(
+            Actually add strands, link them to the previously added cross-linkers.
+
+            :param nr_of_strands: Number of strands to add.
+            :param strand_lengths: A list of integers representing the number of beads of each of the strands.
+            :param soluble_fraction: Target soluble_fraction (0: no connections to cross-links; 1: all cross-linkers fully connected).
+            :param strand_atom_type: Type of atoms for the strands (default: 1).
+            :param c_infinity: As needed for the end-to-end distribution, given by :math:`\langle R^2\rangle_0 = C_{\infty} N b^2`.
+            )pbdoc",
+         py::arg("nr_of_strands"),
+         py::arg("strand_lengths"),
+         py::arg("soluble_fraction"),
          py::arg("strand_atom_type") = 1,
          py::arg("c_infinity") = 1.)
     .def("relax_crosslinks",
