@@ -27,10 +27,6 @@ namespace sim {
     size_t nBeads = coordinates.size() / 3;
     size_t nBeadsToMove = nBeads - (fixFirst ? 1 : 0) - (fixLast ? 1 : 0);
 
-    std::vector<size_t> steppingPosIndices(nBeadsToMove);
-    std::iota(
-      steppingPosIndices.begin(), steppingPosIndices.end(), fixFirst ? 1 : 0);
-
     double normalisationFactor =
       std::pow(3. / (2. * M_PI * meanSquaredBeadDistance), 3. / 2.);
     double normalisationFactorInExponential =
