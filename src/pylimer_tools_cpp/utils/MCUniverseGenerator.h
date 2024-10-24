@@ -58,11 +58,21 @@ namespace utils {
 
     void setSeed(unsigned int seed) { this->rng.seed(seed); }
 
-    void setBeadDistance(double newBeadDistance)
+    void setBeadDistance(double newBeadDistance, bool updateMeanSquared = true)
     {
       this->beadDistance = newBeadDistance;
-      this->meanSquaredBeadDistance =
-        (3. / 8.) * M_PI * SQUARE(this->beadDistance);
+      if (updateMeanSquared) {
+        this->meanSquaredBeadDistance =
+          (3. / 8.) * M_PI * SQUARE(this->beadDistance);
+      }
+    }
+
+    void setMeanSquaredBeadDistance(double newMeanSquaredBeadDistance, bool updateMean = true)
+    {
+      this->meanSquaredBeadDistance = newMeanSquaredBeadDistance;
+      if (updateMean) {
+        this->beadDistance = std::sqrt(this->meanSquaredBeadDistance / ((3. / 8.) * M_PI));
+      }
     }
 
     void configNrOfMCSteps(size_t newNrOfMCSteps)
