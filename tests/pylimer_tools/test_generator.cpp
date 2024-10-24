@@ -43,7 +43,7 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
   generator.setBeadDistance(0.964);
   generator.addCrosslinkers(100, 4, 2);
   generator.addSolventChains(100, 16, 3);
-  generator.addAndLinkStrands((4 / 2) * 100, 16, 0.8);
+  generator.addAndLinkStrandsToConversion((4 / 2) * 100, 16, 0.8);
 
   pe::Universe universe = generator.getUniverse();
   std::map<int, double> weights;
@@ -78,7 +78,7 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
     generator2.setBeadDistance(0.964);
     generator2.addCrosslinkers(100, 4, 2);
     generator2.addSolventChains(100, 16, 3);
-    generator2.addAndLinkStrands((4 / 2) * 100, 16, 0.8);
+    generator2.addAndLinkStrandsToConversion((4 / 2) * 100, 16, 0.8);
 
     pe::Universe universe2 = generator2.getUniverse();
 
@@ -87,6 +87,7 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
     REQUIRE(universe.getAtom(3) == universe2.getAtom(3));
 
     auto molecules = universe.getMolecules(2);
+    CHECK(molecules.size() == (4 / 2) * 100 + 100);
     for (const auto& molecule : molecules) {
       CHECK(molecule.getNrOfAtoms() == 16);
     }
@@ -101,9 +102,10 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
   SECTION("Errors are thrown")
   {
     // nr of strands and strand lengths must be same:
-    REQUIRE_THROWS(generator.addAndLinkStrands(3, { { 10, 100 } }, 0.1, 1));
+    REQUIRE_THROWS(
+      generator.addAndLinkStrandsToConversion(3, { { 10, 100 } }, 0.1, 1));
     // not enough strands to reach conversion:
-    REQUIRE_THROWS(generator.addAndLinkStrands(2, 10, 1.0, 1));
+    REQUIRE_THROWS(generator.addAndLinkStrandsToConversion(2, 10, 1.0, 1));
   }
 
   // SECTION("Universe can be written and read again") {
