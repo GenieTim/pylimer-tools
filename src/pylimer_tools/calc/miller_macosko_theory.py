@@ -6,12 +6,15 @@ import numpy as np
 import pint
 import scipy.special
 from scipy import optimize
+from pint import UnitRegistry
 
 from pylimer_tools.calc.structure_analysis import (
     compute_crosslinker_conversion,
     compute_effective_crosslinker_functionality,
-    compute_stoichiometric_imbalance, compute_weight_fractions,
-    measure_weight_fraction_of_soluble_material)
+    compute_stoichiometric_imbalance,
+    compute_weight_fractions,
+    measure_weight_fraction_of_soluble_material,
+)
 from pylimer_tools.io.unit_styles import UnitStyle
 from pylimer_tools_cpp import Universe
 
@@ -42,8 +45,7 @@ def predict_shear_modulus(**kwargs):
     ToDo:
       - Support more than one crosslinker type (as is supported by original formula)
     """
-    g_mmt_phantom, g_mmt_entanglement, _, _ = compute_modulus_decomposition(
-        **kwargs)
+    g_mmt_phantom, g_mmt_entanglement, _, _ = compute_modulus_decomposition(**kwargs)
     return g_mmt_phantom + g_mmt_entanglement
 
 
@@ -241,15 +243,14 @@ def compute_weight_fraction_of_backbone(
         w_sol = measure_weight_fraction_of_soluble_material(network)
 
     phi_el = 0
-    w_a = weight_fractions[crosslinker_type] / \
-        functionality_per_type[crosslinker_type]
+    w_a = weight_fractions[crosslinker_type] / functionality_per_type[crosslinker_type]
     w_xl = weight_fractions[crosslinker_type]
     w_x2 = 1 - w_xl
     assert w_a <= 1 and w_a >= 0
     assert w_xl <= 1 and w_xl >= 0
     assert w_x2 <= 1 and w_x2 >= 0
     assert w_sol <= 1 and w_sol >= 0
-    if (w_sol == 1):
+    if w_sol == 1:
         return 0
     if functionality_per_type[crosslinker_type] == 3:
         phi_el = (
@@ -356,8 +357,7 @@ def compute_weight_fraction_of_soluble_material_from_weight_fractions(
       - g: the functionality of the ordinary chains
     """
     alpha, _ = compute_miller_macosko_probabilities(r, p, f)
-    return w_f * (alpha**f) + w_g * \
-        ((r * p * (alpha ** (f - 1)) + 1 - r * p) ** g)
+    return w_f * (alpha**f) + w_g * ((r * p * (alpha ** (f - 1)) + 1 - r * p) ** g)
 
 
 def compute_weight_fractions_and_probabilities(
@@ -431,8 +431,7 @@ def compute_weight_fractions_and_probabilities(
                 "The p computed ({}) is outside the accepted range. ".format(p)
                 + "Falling back to effective cross-linker functionality."
             )
-            p = compute_effective_crosslinker_functionality(
-                network, crosslinker_type)
+            p = compute_effective_crosslinker_functionality(network, crosslinker_type)
     if p > 1 or p < 0:
         raise ValueError(
             "Detected p = {} for f = {}. Need p in (0, 1).".format(
@@ -541,13 +540,11 @@ def compute_miller_macosko_probabilities(r: float, p: float, f: int):
 def validate_r_and_p(r: float, p: float, f: int):
     if p < 0:
         raise ValueError(
-            "The cross-linker conversion `p` must be positive, got {}".format(
-                p)
+            "The cross-linker conversion `p` must be positive, got {}".format(p)
         )
     if r < 0:
         raise ValueError(
-            "The stoichiometric imbalance `r` must be positive, got {}".format(
-                r)
+            "The stoichiometric imbalance `r` must be positive, got {}".format(r)
         )
     if f < 2:
         raise ValueError(
@@ -571,7 +568,7 @@ def validate_r_and_p(r: float, p: float, f: int):
 
 def compute_modulus_decomposition(
     network: Universe,
-    unit_style: UnitStyle,
+    unit_style: Union[None, UnitStyle] = None,
     crosslinker_type: int = None,
     r: float = None,
     p: float = None,
@@ -611,6 +608,7 @@ def compute_modulus_decomposition(
         raise ValueError(
             "Either the network and crosslinker_type or the required variables must be specified"
         )
+    ureg = UnitRegistry()
     if r is None:
         r = compute_stoichiometric_imbalance(
             network,
@@ -626,8 +624,7 @@ def compute_modulus_decomposition(
                 "The p computed ({}) is outside the accepted range. ".format(p)
                 + "Falling back to effective cross-linker functionality."
             )
-            p = compute_effective_crosslinker_functionality(
-                network, crosslinker_type)
+            p = compute_effective_crosslinker_functionality(network, crosslinker_type)
     if f is None:
         if functionality_per_type is None:
             functionality_per_type = network.determine_functionality_per_type()
@@ -638,26 +635,30 @@ def compute_modulus_decomposition(
             )
         f = functionality_per_type[crosslinker_type]
     if nu is None:
+        if unit_style is None:
+            raise ValueError(
+                "Unit style must be specified to compute nu, since the units of volume are unknown otherwise."
+            )
         nu = len(network.get_molecules(crosslinker_type)) / (
             network.get_volume() * unit_style.get_base_unit_of("volume")
         )
     if temperature is None:
-        temperature = (273.15 + 25) * unit_style.get_underlying_unit_registry()(
-            "kelvin"
-        )
+        temperature = (273.15 + 25) * ureg.kelvin  # Temperature in Kelvin
     if g_e_1 is None:
         g_e_1 = (
             8.3145  # gas constant, J/(mol*K)
             * temperature.to("kelvin").magnitude  # Temperature in Kelvin
             * 1e-6
             * 94.79281
-        ) * unit_style.get_underlying_unit_registry()("MPa")
+        ) * ureg("MPa")
         # -> MPa, melt entanglement modulus of PDMS
 
+    # boltzmann constant
+    kb = 1.380649e-23 * ureg.joule / ureg.kelvin
     # affine
-    g_anm = nu * unit_style.kB * temperature
+    g_anm = nu * kb * temperature
     # phantom
-    g_pnm = (1 - 2 / f) * nu * unit_style.kB * temperature if f != 0 else 0.0
+    g_pnm = (1 - 2 / f) * nu * kb * temperature if f != 0 else 0.0
     # MMT:
     alpha, beta = compute_miller_macosko_probabilities(r, p, f)
     gamma_mmt_sum = 0.0
@@ -666,10 +667,9 @@ def compute_modulus_decomposition(
             f, m, alpha
         )
     gamma_mmt = (2 * r / f) * gamma_mmt_sum if f != 0 else 0.0
-    g_mmt_phantom = gamma_mmt * nu * unit_style.kB * temperature
+    g_mmt_phantom = gamma_mmt * nu * kb * temperature
     # fraction of elastically effective strands.
-    g_mmt_entanglement = g_e_1 * \
-        compute_trapping_factor(p=p, r=r, f=f, alpha=alpha)
+    g_mmt_entanglement = g_e_1 * compute_trapping_factor(p=p, r=r, f=f, alpha=alpha)
     # entanglement part. TODO : check adjustment with r (and where the 0.22 is
     # coming from? Fabian' s fit!)
     return g_mmt_phantom, g_mmt_entanglement, g_anm, g_pnm
@@ -684,7 +684,6 @@ def compute_extracted_modulus(
     xlink_concentration_0: pint.Quantity,
     alpha: Union[float, None] = None,
     temperature: pint.Quantity = None,
-    unit_style: Union[None, UnitStyle] = None,
 ):
     """
     Compute MMT's modulus, assuming the solvent is removed
@@ -698,12 +697,10 @@ def compute_extracted_modulus(
         - alpha: :math:`P(F_a^{out})`, optional
         - temperature: the temperatures; defaults to room temperature
         - w_sol: the soluble fraction (to be removed)
-        - unit_style: the units used, needed for temperature if not defined
     """
     if temperature is None:
-        temperature = (273.15 + 25) * unit_style.get_underlying_unit_registry()(
-            "kelvin"
-        )
+        ureg = UnitRegistry()
+        temperature = (273.15 + 25) * ureg.kelvin
     if alpha is None:
         alpha, _ = compute_miller_macosko_probabilities(r, p, f)
 
@@ -711,7 +708,6 @@ def compute_extracted_modulus(
         p=p,
         r=r,
         xlink_concentration_0=xlink_concentration_0,
-        unit_style=unit_style,
         f=f,
         alpha=alpha,
         temperature=temperature,
@@ -723,7 +719,6 @@ def compute_extracted_modulus(
         g_e_1=g_e_1,
         alpha=alpha,
         temperature=temperature,
-        unit_style=unit_style,
     )
     return junction_part + entanglement_part
 
@@ -735,7 +730,6 @@ def compute_entanglement_modulus(
     g_e_1: pint.Quantity,
     alpha: Union[float, None] = None,
     temperature: pint.Quantity = None,
-    unit_style: Union[None, UnitStyle] = None,
 ):
     """
     Compute MMT's entanglement contribution to the equilibrium shear modulus, given by
@@ -747,13 +741,11 @@ def compute_entanglement_modulus(
         - f: the functionality of the crosslinkers
         - g_e_1: the melt entanglement modulus :math:`G_e(1) = k_B T \\epsilon_e`
         - alpha: :math:`P(F_a^{out})`, optional
-        - temperature: the temperatures; defaults to room temperature
-        - unit_style: the units used, needed for temperature if not defined
+        - temperature: the temperatures; defaults to room temperature (25 °C)
     """
     if temperature is None:
-        temperature = (273.15 + 25) * unit_style.get_underlying_unit_registry()(
-            "kelvin"
-        )
+        ureg = UnitRegistry()
+        temperature = (273.15 + 25) * ureg.kelvin
     if alpha is None:
         alpha, _ = compute_miller_macosko_probabilities(r, p, f)
     return compute_trapping_factor(p=p, r=r, f=f, alpha=alpha) * g_e_1
@@ -763,7 +755,6 @@ def compute_junction_modulus(
     p: float,
     r: float,
     xlink_concentration_0: pint.Quantity,
-    unit_style: UnitStyle,
     f: Union[int, None] = None,
     alpha: Union[float, None] = None,
     temperature: pint.Quantity = None,
@@ -776,15 +767,13 @@ def compute_junction_modulus(
         - p: the cross-linker conversion
         - r: the stoichiometric imbalance
         - xlink_concentration_0: [A_f]_0, in 1/volume units
-        - unit_style: the units used, for example for k_B
         - f: the functionality of the crosslinkers
         - alpha: :math:`P(F_a^{out})`, optional
-        - temperature: the temperatures; defaults to room temperature
+        - temperature: the temperatures; defaults to room temperature (25 °C)
     """
+    ureg = UnitRegistry()
     if temperature is None:
-        temperature = (273.15 + 25) * unit_style.get_underlying_unit_registry()(
-            "kelvin"
-        )
+        temperature = (273.15 + 25) * ureg.kelvin
     if alpha is None:
         alpha, _ = compute_miller_macosko_probabilities(r, p, f)
     gamma_mmt_sum = 0.0
@@ -793,7 +782,8 @@ def compute_junction_modulus(
             f, m, alpha
         )
 
-    return unit_style.kB * temperature * xlink_concentration_0 * gamma_mmt_sum
+    kb = 1.380649e-23 * ureg.joule / ureg.kelvin
+    return kb * temperature * xlink_concentration_0 * gamma_mmt_sum
 
 
 def compute_trapping_factor(
@@ -827,12 +817,15 @@ def compute_trapping_factor(
     if p is None:
         _require_network(network, "p")
         p = compute_crosslinker_conversion(
-            network, crosslinker_type=crosslinker_type, f=f)
+            network, crosslinker_type=crosslinker_type, f=f
+        )
     if r is None:
         _require_network(network, "r")
-        r = compute_stoichiometric_imbalance(network, crosslinker_type=crosslinker_type, functionality_per_type={
-            crosslinker_type: f
-        })
+        r = compute_stoichiometric_imbalance(
+            network,
+            crosslinker_type=crosslinker_type,
+            functionality_per_type={crosslinker_type: f},
+        )
 
     if alpha is None or beta is None:
         alpha, beta = compute_miller_macosko_probabilities(r, p, f)
@@ -865,8 +858,7 @@ def compute_probability_that_monomer_is_effective(
     f = functionality_of_monomer
     m = expected_degree_of_effect
     alpha = p_f_a_out
-    return scipy.special.binom(
-        f, m) * (alpha ** (f - m)) * ((1.0 - alpha) ** m)
+    return scipy.special.binom(f, m) * (alpha ** (f - m)) * ((1.0 - alpha) ** m)
 
 
 def predict_gelation_point(r: float, f: int, g: int = 2) -> float:
@@ -911,8 +903,7 @@ def predict_p_from_w_sol(
         except ValueError:
             p_f_a_out = 1.0  # highest value -> this will not be the optimum
         return (
-            w_f * p_f_a_out**f + w_g *
-            (r * p * p_f_a_out ** (f - 1) + 1 - r * p) ** g
+            w_f * p_f_a_out**f + w_g * (r * p * p_f_a_out ** (f - 1) + 1 - r * p) ** g
         )
 
     res = optimize.minimize_scalar(
@@ -924,9 +915,10 @@ def predict_p_from_w_sol(
 
 
 def _require_network(network: Universe = None, instead_of: str = ""):
-    if (network is None):
-        if (instead_of == ""):
+    if network is None:
+        if instead_of == "":
             raise ValueError("A network is required")
         else:
             raise ValueError(
-                "If `{}` is not specified, a network is required".format(instead_of))
+                "If `{}` is not specified, a network is required".format(instead_of)
+            )

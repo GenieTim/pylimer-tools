@@ -67,11 +67,13 @@ namespace utils {
       }
     }
 
-    void setMeanSquaredBeadDistance(double newMeanSquaredBeadDistance, bool updateMean = true)
+    void setMeanSquaredBeadDistance(double newMeanSquaredBeadDistance,
+                                    bool updateMean = true)
     {
       this->meanSquaredBeadDistance = newMeanSquaredBeadDistance;
       if (updateMean) {
-        this->beadDistance = std::sqrt(this->meanSquaredBeadDistance / ((3. / 8.) * M_PI));
+        this->beadDistance =
+          std::sqrt(this->meanSquaredBeadDistance / ((3. / 8.) * M_PI));
       }
     }
 
@@ -162,7 +164,8 @@ namespace utils {
         }
 
         // actually add the new beads to our list of things to add
-        RUNTIME_EXP_IFN(coordinates.size() == 3 * nBeadsInStrand, "Inconsistent coordinate size");
+        RUNTIME_EXP_IFN(coordinates.size() == 3 * nBeadsInStrand,
+                        "Inconsistent coordinate size");
         for (size_t i = 0; i < nBeadsInStrand; ++i) {
           ids.push_back(currentId);
           if (i > 0) {
@@ -471,6 +474,15 @@ namespace utils {
           pylimer_tools::sim::mehp::Network frNet =
             gen.convertToForceRelaxationNetwork();
 
+          // this network only contains non-dangling and non-free chains
+          // need to compute compensation for that.
+          size_t nOmittedBeads = 0;
+          for (size_t i = 0; i < gen.simplifiedUniverse.strandFrom.size(); ++i) {
+            if (gen.simplifiedUniverse.strandTo[i] == -1) {
+              nOmittedBeads += gen.simplifiedUniverse.beadsInStrand[i];
+            }
+          }
+
           // actually start force relaxation
           pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
             pylimer_tools::sim::mehp::MEHPForceRelaxation(frNet);
@@ -545,6 +557,7 @@ namespace utils {
       forceRelaxationNetwork.springsContourLength =
         Eigen::VectorXd::Zero(nSpringEstimate);
       size_t nActualSprings = 0;
+      // we omit all dangling and free strands
       for (size_t springIdx = 0;
            springIdx < this->simplifiedUniverse.strandFrom.size();
            ++springIdx) {
