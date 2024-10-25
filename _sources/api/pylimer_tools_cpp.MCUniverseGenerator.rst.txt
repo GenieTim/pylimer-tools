@@ -15,6 +15,8 @@ MCUniverseGenerator
       ~MCUniverseGenerator.add_crosslinkers
       ~MCUniverseGenerator.add_solvent_chains
       ~MCUniverseGenerator.config_nr_of_mc_steps
+      ~MCUniverseGenerator.get_mean_bead_distance
+      ~MCUniverseGenerator.get_mean_squared_bead_distance
       ~MCUniverseGenerator.get_universe
       ~MCUniverseGenerator.relax_crosslinks
       ~MCUniverseGenerator.set_bead_distance
@@ -28,6 +30,8 @@ MCUniverseGenerator
    .. automethod:: add_crosslinkers
    .. automethod:: add_solvent_chains
    .. automethod:: config_nr_of_mc_steps
+   .. automethod:: get_mean_bead_distance
+   .. automethod:: get_mean_squared_bead_distance
    .. automethod:: get_universe
    .. automethod:: relax_crosslinks
    .. automethod:: set_bead_distance
