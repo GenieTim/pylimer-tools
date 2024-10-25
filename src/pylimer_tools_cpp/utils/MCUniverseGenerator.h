@@ -85,6 +85,7 @@ namespace utils {
       if (updateMean) {
         this->beadDistance =
           std::sqrt(this->meanSquaredBeadDistance / ((3. / 8.) * M_PI));
+        RUNTIME_EXP_IFN(this->beadDistance > 0, "Invalid mean bead distance");
       }
     }
 
@@ -406,11 +407,11 @@ namespace utils {
      * cross-linkers
      * @param strandAtomType the type of the strand atoms
      */
-    void addAndLinkStrandsToConversion(int nrOfStrands,
-                                       std::vector<int> beadsPerChains,
-                                       double targetCrossLinkerConversion,
-                                       int strandAtomType = 1,
-                                       double cInfinity = 1.)
+    void addAndLinkStrandsToConversion(const int nrOfStrands,
+                                       const std::vector<int> beadsPerChains,
+                                       const double targetCrossLinkerConversion,
+                                       const int strandAtomType = 1,
+                                       const double cInfinity = 1.)
     {
       INVALIDARG_EXP_IFN(
         targetCrossLinkerConversion >= this->currentCrosslinkerConversion &&
@@ -420,15 +421,16 @@ namespace utils {
           std::to_string(targetCrossLinkerConversion) + ".");
 
       // prepare sampling of partners
-      long int nrOfAvailableSites =
+      const long int nrOfAvailableSites =
         std::reduce(this->remainingCrossLinkerFunctionality.begin(),
                     this->remainingCrossLinkerFunctionality.end(),
                     0);
 
-      double conversionPerBond = (1.0 - this->currentCrosslinkerConversion) /
-                                 (static_cast<double>(nrOfAvailableSites));
+      const double conversionPerBond =
+        (1.0 - this->currentCrosslinkerConversion) /
+        (static_cast<double>(nrOfAvailableSites));
 
-      int potentialNewBonds = 2 * nrOfStrands;
+      const int potentialNewBonds = 2 * nrOfStrands;
       if (this->currentCrosslinkerConversion +
             potentialNewBonds * conversionPerBond <
           targetCrossLinkerConversion) {
@@ -457,7 +459,7 @@ namespace utils {
                                        int strandAtomType = 1,
                                        double cInfinity = 1.)
     {
-      std::vector<int> chainLengths =
+      const std::vector<int> chainLengths =
         pylimer_tools::utils::initializeWithValue<int>(nrOfStrands,
                                                        chainLength);
       return this->addAndLinkStrandsToConversion(nrOfStrands,
@@ -939,8 +941,8 @@ namespace utils {
 
       std::vector<size_t> suitableMatches;
       std::vector<double> matchWeights;
-      const double desiredR0 = std::sqrt(desiredR02);
       double sumOfWeights = 0.0;
+      const double normalisationFactorInExponential = -3. / (2. * desiredR02);
       // TODO: use a neighbour list instead, maybe?
       for (int i = 0; i < this->crossLinkerIdxs.size(); ++i) {
         if (this->remainingCrossLinkerFunctionality[i] < 1) {
@@ -952,7 +954,7 @@ namespace utils {
           suitableMatches.push_back(partner);
           double thisWeight =
             this->remainingCrossLinkerFunctionality[i] *
-            std::exp(-3. * dist.squaredNorm() / (2. * desiredR02));
+            std::exp(dist.squaredNorm() * normalisationFactorInExponential);
           matchWeights.push_back(thisWeight);
           sumOfWeights += thisWeight;
         }
