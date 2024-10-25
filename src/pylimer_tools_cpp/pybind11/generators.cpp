@@ -43,6 +43,9 @@ init_pylimer_bound_generators(py::module_& m)
          )pbdoc",
          py::arg("distance"),
          py::arg("update_mean_squared") = true)
+    .def("get_mean_bead_distance",
+         &MCUniverseGenerator::getConfiguredBeadDistance,
+         "Get the currently configured mean bead distance.")
     .def("set_mean_squared_bead_distance",
          &MCUniverseGenerator::setBeadDistance,
          R"pbdoc(Set the mean squared distance between beads.
@@ -51,6 +54,9 @@ init_pylimer_bound_generators(py::module_& m)
          )pbdoc",
          py::arg("mean_squared_distance"),
          py::arg("update_mean") = true)
+    .def("get_mean_squared_bead_distance",
+         &MCUniverseGenerator::getConfiguredMeanSquaredBeadDistance,
+         "Get the currently configured mean squared bead distance.")
     .def(
       "config_nr_of_mc_steps",
       &MCUniverseGenerator::configNrOfMCSteps,

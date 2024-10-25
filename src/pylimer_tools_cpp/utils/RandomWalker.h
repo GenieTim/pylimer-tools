@@ -82,7 +82,8 @@ namespace utils {
       rng = std::mt19937(seed2);
     }
 
-    return doRandomWalkChain(chainLen, beadDistance, meanSquaredBeadDistance, rng);
+    return doRandomWalkChain(
+      chainLen, beadDistance, meanSquaredBeadDistance, rng);
   }
 
   /**
@@ -110,8 +111,8 @@ namespace utils {
     box.handlePBC(dist);
 
     // include the first and the last positions
-    Eigen::VectorXd coordinates =
-      doRandomWalkChain(chainLen + 2, beadDistance, meanSquaredBeadDistance, rng);
+    Eigen::VectorXd coordinates = doRandomWalkChain(
+      chainLen + 2, beadDistance, meanSquaredBeadDistance, rng);
     coordinates += from.replicate(chainLen + 2, 1);
 
     assert(coordinates.size() == 3 * (chainLen + 2));

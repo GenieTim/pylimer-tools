@@ -634,7 +634,7 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
       CHECK(loops.size() == 2);
       CHECK(universe.hasInfiniteStrand(2, -1) == true);
       CHECK(universe.getMeanStrandLength(2) ==
-              Catch::Approx(((double)(3 + 1 + 1)) / 3.0));
+            Catch::Approx(((double)(3 + 1 + 1)) / 3.0));
     }
 
     SECTION("Reduction to Cross-linker-verse works")
