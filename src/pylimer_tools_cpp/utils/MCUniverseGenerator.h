@@ -60,6 +60,10 @@ namespace utils {
 
     void setBeadDistance(double newBeadDistance, bool updateMeanSquared = true)
     {
+      INVALIDARG_EXP_IFN(newBeadDistance > 0, "Invalid mean bead distance");
+      INVALIDARG_EXP_IFN(
+        !(std::isnan(newBeadDistance) || std::isinf(newBeadDistance)),
+        "Invalid mean bead distance");
       this->beadDistance = newBeadDistance;
       if (updateMeanSquared) {
         this->meanSquaredBeadDistance =
@@ -67,14 +71,26 @@ namespace utils {
       }
     }
 
+    double getConfiguredBeadDistance() const { return this->beadDistance; }
+
     void setMeanSquaredBeadDistance(double newMeanSquaredBeadDistance,
                                     bool updateMean = true)
     {
+      INVALIDARG_EXP_IFN(newMeanSquaredBeadDistance > 0,
+                         "Invalid mean squared bead distance");
+      INVALIDARG_EXP_IFN(!(std::isnan(newMeanSquaredBeadDistance) ||
+                           std::isinf(newMeanSquaredBeadDistance)),
+                         "Invalid mean squared bead distance");
       this->meanSquaredBeadDistance = newMeanSquaredBeadDistance;
       if (updateMean) {
         this->beadDistance =
           std::sqrt(this->meanSquaredBeadDistance / ((3. / 8.) * M_PI));
       }
+    }
+
+    double getConfiguredMeanSquaredBeadDistance() const
+    {
+      return this->meanSquaredBeadDistance;
     }
 
     void configNrOfMCSteps(size_t newNrOfMCSteps)
@@ -166,6 +182,9 @@ namespace utils {
         // actually add the new beads to our list of things to add
         RUNTIME_EXP_IFN(coordinates.size() == 3 * nBeadsInStrand,
                         "Inconsistent coordinate size");
+        RUNTIME_EXP_IFN(!coordinates.array().isNaN().any(),
+                        "Coordinates contain NaN in strand " +
+                          std::to_string(strandI + 1));
         for (size_t i = 0; i < nBeadsInStrand; ++i) {
           ids.push_back(currentId);
           if (i > 0) {
@@ -477,7 +496,8 @@ namespace utils {
           // this network only contains non-dangling and non-free chains
           // need to compute compensation for that.
           size_t nOmittedBeads = 0;
-          for (size_t i = 0; i < gen.simplifiedUniverse.strandFrom.size(); ++i) {
+          for (size_t i = 0; i < gen.simplifiedUniverse.strandFrom.size();
+               ++i) {
             if (gen.simplifiedUniverse.strandTo[i] == -1) {
               nOmittedBeads += gen.simplifiedUniverse.beadsInStrand[i];
             }

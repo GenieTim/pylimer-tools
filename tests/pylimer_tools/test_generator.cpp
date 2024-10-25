@@ -44,6 +44,7 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
   generator.addCrosslinkers(100, 4, 2);
   generator.addSolventChains(100, 16, 3);
   generator.addAndLinkStrandsToConversion((4 / 2) * 100, 16, 0.8);
+  generator.configNrOfMCSteps(100);
 
   pe::Universe universe = generator.getUniverse();
   std::map<int, double> weights;
@@ -76,6 +77,7 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
       pu::MCUniverseGenerator(10.0, 10.0, 10.0);
     generator2.setSeed(8804);
     generator2.setBeadDistance(0.964);
+    generator2.setMeanSquaredBeadDistance(0.964 * 0.964);
     generator2.addCrosslinkers(100, 4, 2);
     generator2.addSolventChains(100, 16, 3);
     generator2.addAndLinkStrandsToConversion((4 / 2) * 100, 16, 0.8);

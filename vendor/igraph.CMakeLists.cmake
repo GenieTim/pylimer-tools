@@ -35,7 +35,7 @@ if (NOT DEFINED igraph_LOADED)
 			ExternalProject_Add(
 					igraphLib
 					GIT_REPOSITORY https://github.com/GenieTim/igraph.git
-					GIT_TAG bb4911882f570e28b483d33620eca7bb7d4afdd1
+					GIT_TAG c35e12b50284dcd9486cb01cfffb788dd63163b8
 					PREFIX ${igraph_PREFIX_PATH}
 					INSTALL_DIR ${igraph_PREFIX_PATH}/igraphLib-install
 					CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${igraph_PREFIX_PATH}/igraphLib-install -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_LIBDIR=${igraph_PREFIX_PATH}/igraphLib-install/lib -DIGRAPH_GRAPHML_SUPPORT=OFF -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true
