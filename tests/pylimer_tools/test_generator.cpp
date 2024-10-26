@@ -6,6 +6,7 @@
 #include "../../src/pylimer_tools_cpp/io/DataFileWriter.h"
 #include "../../src/pylimer_tools_cpp/utils/MCUniverseGenerator.h"
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/catch_approx.hpp>
 #include <iostream>
 #include <map>
 #include <vector>
@@ -137,4 +138,32 @@ TEST_CASE("Large Universe can be generated", "[generator][MCUniverseGenerator]")
   pe::Universe universe = generator.getUniverse();
   REQUIRE(universe.getVolume() == 10.0 * 10.0 * 10.0);
   REQUIRE(universe.getAtomsOfType(2).size() == 1200);
+}
+
+TEST_CASE("MCUniverseGenerator knows about <b> vs. <b^2>", "[generator][MCUniverseGenerator]") {
+  std::cout << "Running test \"MCUniverseGenerator knows about <b> vs. <b^2>\"" << std::endl;
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(10.0, 10.0, 10.0);
+
+  generator.setBeadDistance(1.);
+  CHECK(generator.getConfiguredBeadDistance() == Catch::Approx(1.));
+  CHECK(generator.getConfiguredMeanSquaredBeadDistance() == Catch::Approx(
+    3. * M_PI / 8.
+  ));
+
+  generator.setMeanSquaredBeadDistance(1.0);
+  CHECK(generator.getConfiguredMeanSquaredBeadDistance() == Catch::Approx(1.));
+  CHECK(generator.getConfiguredBeadDistance() == Catch::Approx(
+    std::sqrt(8. / (3. * M_PI))
+  ));
+  
+  generator.setBeadDistance(0.5, false);
+  CHECK(generator.getConfiguredMeanSquaredBeadDistance() == Catch::Approx(1.));
+  CHECK(generator.getConfiguredBeadDistance() == Catch::Approx(0.5));
+
+  generator.setMeanSquaredBeadDistance(0.25, false);
+  CHECK(generator.getConfiguredMeanSquaredBeadDistance() == Catch::Approx(0.25));
+  CHECK(generator.getConfiguredBeadDistance() == Catch::Approx(0.5));
+
+  CHECK_THROWS(generator.setMeanSquaredBeadDistance(-1.));
+  CHECK_THROWS(generator.setBeadDistance(-1.));
 }

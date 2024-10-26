@@ -11,8 +11,10 @@ from scipy import optimize
 from pylimer_tools.calc.structure_analysis import (
     compute_crosslinker_conversion,
     compute_effective_crosslinker_functionality,
-    compute_stoichiometric_imbalance, compute_weight_fractions,
-    measure_weight_fraction_of_soluble_material)
+    compute_stoichiometric_imbalance,
+    compute_weight_fractions,
+    measure_weight_fraction_of_soluble_material,
+)
 from pylimer_tools.io.unit_styles import UnitStyle
 from pylimer_tools_cpp import Universe
 
@@ -566,7 +568,7 @@ def validate_r_and_p(r: float, p: float, f: int):
 
 def compute_modulus_decomposition(
     network: Universe,
-    ureg: pint.UnitRegistry,
+    ureg: pint.UnitRegistry = None,
     unit_style: Union[None, UnitStyle] = None,
     crosslinker_type: int = None,
     r: float = None,
@@ -601,6 +603,12 @@ def compute_modulus_decomposition(
       - g_anm: the ANM estimate of the modulus
       - g_pnm: the PNM estimate of the modulus
     """
+    if ureg is None:
+        if unit_style is None:
+            raise ValueError(
+                "Unit style or unit registry must be specified to compute modulus."
+            )
+        ureg = unit_style.get_underlying_unit_registry()
     if (crosslinker_type is None or network is None) and (
         r is None or f is None or p is None or nu is None
     ):
@@ -699,7 +707,9 @@ def compute_extracted_modulus(
     """
     if temperature is None:
         if ureg is None:
-            raise ValueError("Unit registry must be initialized, or temperature specified.")
+            raise ValueError(
+                "Unit registry must be initialized, or temperature specified."
+            )
         temperature = (273.15 + 25) * ureg.kelvin
     if alpha is None:
         alpha, _ = compute_miller_macosko_probabilities(r, p, f)
