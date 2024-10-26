@@ -303,8 +303,6 @@ namespace utils {
 
       // prepare sampling of partners
       long int nCrosslinks = this->crossLinkerIdxs.size();
-      std::uniform_int_distribution<size_t> crosslinkerIdxIdxDist =
-        std::uniform_int_distribution<size_t>(0, nCrosslinks - 1);
       int nrOfStrandsAdded = 0;
 
       long int nrOfAvailableSites =
@@ -320,6 +318,7 @@ namespace utils {
       std::vector<size_t> availableStrandEnds;
       availableStrandEnds.reserve(2 * nrOfStrands);
       for (size_t i = 0; i < nrOfStrands; ++i) {
+        // each strand is available with two ends
         availableStrandEnds.push_back(i + nStrandsBefore);
         availableStrandEnds.push_back(i + nStrandsBefore);
       }
@@ -367,7 +366,7 @@ namespace utils {
 
           size_t partnerCrosslinker = this->findAppropriateLink(
             this->simplifiedUniverse.strandFrom[strandIdx],
-            beadsPerChains[strandIdx] * timesNForR02,
+            static_cast<double>(beadsPerChains[strandIdx] + 1) * timesNForR02,
             -1. // beadsPerChains[strandIdx] * this->beadDistance
           );
 
@@ -949,11 +948,12 @@ namespace utils {
           continue;
         }
         size_t partner = this->crossLinkerIdxs[i];
-        Eigen::Vector3d dist = this->getVectorBetween(from, i);
+        Eigen::Vector3d dist =
+          this->getVectorBetween(from, this->crossLinkerIdxs[i]);
         if (dist.norm() < maxDistance || maxDistance < 0.) {
           suitableMatches.push_back(partner);
           double thisWeight =
-            this->remainingCrossLinkerFunctionality[i] *
+            static_cast<double>(this->remainingCrossLinkerFunctionality[i]) *
             std::exp(dist.squaredNorm() * normalisationFactorInExponential);
           matchWeights.push_back(thisWeight);
           sumOfWeights += thisWeight;
