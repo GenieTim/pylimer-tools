@@ -68,6 +68,7 @@ namespace utils {
       if (updateMeanSquared) {
         this->meanSquaredBeadDistance =
           (3. / 8.) * M_PI * SQUARE(this->beadDistance);
+        RUNTIME_EXP_IFN(this->meanSquaredBeadDistance > 0, "Invalid mean squared bead distance");
       }
     }
 
