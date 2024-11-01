@@ -62,6 +62,17 @@ init_pylimer_bound_generators(py::module_& m)
       &MCUniverseGenerator::configNrOfMCSteps,
       "Set the number of Monte-Carlo steps during bond length equilibration.",
       py::arg("n_steps") = 2000)
+    .def("config_primary_loop_probability",
+         &MCUniverseGenerator::configPrimaryLoopProbability,
+         R"pbdoc(
+         Configure an additional weight reduction for the primary loop formation.
+
+         Defaults to 1., which means the general :math:`P(\vec{R})` is used without any bias.
+         This results in more primary loops for shorter chains than for longer ones.
+
+         Set to 0. to disable the formation of primary loops.
+         )pbdoc",
+         py::arg("probability") = 1.0)
     .def("add_crosslinkers",
          &MCUniverseGenerator::addCrosslinkers,
          R"pbdoc(

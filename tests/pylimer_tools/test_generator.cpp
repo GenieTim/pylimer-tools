@@ -169,3 +169,32 @@ TEST_CASE("MCUniverseGenerator knows about <b> vs. <b^2>",
   CHECK_THROWS(generator.setMeanSquaredBeadDistance(-1.));
   CHECK_THROWS(generator.setBeadDistance(-1.));
 }
+
+TEST_CASE("MCUniverseGenerator can generate without primary loops",
+          "[generator][MCUniverseGenerator]")
+{
+  std::cout
+    << "Running test \"MCUniverseGenerator can generate without primary loops\""
+    << std::endl;
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(10.0, 10.0, 10.0);
+  generator.setSeed(8804);
+  generator.setBeadDistance(0.964);
+  generator.addCrosslinkers(100, 4, 2);
+  generator.configPrimaryLoopProbability(0.);
+  generator.addAndLinkStrandsToConversion(200, 10, 0.9, 1, 1.);
+
+  pe::Universe universe = generator.getUniverse();
+  CHECK(universe.getAtomsOfType(2).size() == 100);
+  CHECK(universe.getMolecules(2).size() == 200);
+
+  // verify that no primary loops are present
+  // method 1: detection of molecules
+  auto chains = universe.getChainsWithCrosslinker(2);
+  for (const auto& chain : chains) {
+    CHECK(chain.getType() != pe::MoleculeType::PRIMARY_LOOP);
+  }
+
+  // method 2: detection of loops
+  auto loops = universe.countLoopLengths(14);
+  CHECK(loops.size() == 0);
+}

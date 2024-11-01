@@ -74,7 +74,8 @@ def cli(files, crosslinker_type):
             )
         )
         click.echo(
-            "r = {}, p = {} ({}), D = {}".format(
+            "f = {}, r = {}, p = {} ({}), D = {}".format(
+                universe.determine_functionality_per_type()[crosslinker_type],
                 compute_stoichiometric_imbalance(universe, crosslinker_type),
                 compute_extent_of_reaction(universe, crosslinker_type),
                 # mehp.calculateEffectiveCrosslinkerFunctionality(
