@@ -10,6 +10,7 @@ MCUniverseGenerator
 
    .. autosummary::
 
+      ~MCUniverseGenerator.add_and_link_monofunctional_strands
       ~MCUniverseGenerator.add_and_link_strands_to_conversion
       ~MCUniverseGenerator.add_and_link_strands_to_soluble_fraction
       ~MCUniverseGenerator.add_crosslinkers
@@ -26,6 +27,7 @@ MCUniverseGenerator
 
    .. rubric:: Methods Documentation
 
+   .. automethod:: add_and_link_monofunctional_strands
    .. automethod:: add_and_link_strands_to_conversion
    .. automethod:: add_and_link_strands_to_soluble_fraction
    .. automethod:: add_crosslinkers
