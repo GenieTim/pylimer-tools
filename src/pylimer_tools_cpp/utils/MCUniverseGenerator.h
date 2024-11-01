@@ -68,7 +68,8 @@ namespace utils {
       if (updateMeanSquared) {
         this->meanSquaredBeadDistance =
           (3. / 8.) * M_PI * SQUARE(this->beadDistance);
-        RUNTIME_EXP_IFN(this->meanSquaredBeadDistance > 0, "Invalid mean squared bead distance");
+        RUNTIME_EXP_IFN(this->meanSquaredBeadDistance > 0,
+                        "Invalid mean squared bead distance");
       }
     }
 
@@ -98,6 +99,11 @@ namespace utils {
     void configNrOfMCSteps(size_t newNrOfMCSteps)
     {
       this->nMcSteps = newNrOfMCSteps;
+    }
+
+    void configPrimaryLoopProbability(double newPrimaryLoopProbability)
+    {
+      this->primaryLoopProbability = newPrimaryLoopProbability;
     }
 
     /**
@@ -663,6 +669,7 @@ namespace utils {
     double beadDistance;
     double meanSquaredBeadDistance;
     double currentCrosslinkerConversion = 0.0;
+    double primaryLoopProbability = 1.0;
     size_t nMcSteps = 2000;
     std::mt19937 rng;
     std::uniform_real_distribution<double> distX;
@@ -956,6 +963,9 @@ namespace utils {
           double thisWeight =
             static_cast<double>(this->remainingCrossLinkerFunctionality[i]) *
             std::exp(dist.squaredNorm() * normalisationFactorInExponential);
+          if (partner == from) {
+            thisWeight *= this->primaryLoopProbability;
+          }
           matchWeights.push_back(thisWeight);
           sumOfWeights += thisWeight;
         }
