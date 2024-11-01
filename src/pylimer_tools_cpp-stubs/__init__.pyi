@@ -1351,6 +1351,12 @@ class MCUniverseGenerator:
     def __init__(self, lx: float, ly: float, lz: float) -> None:
         ...
 
+    def add_and_link_monofunctional_strands(self, nr_of_monofunctional_strands: int,
+                                            monofunctional_strand_length: list[int], monofunctional_strand_atom_type: int = 4) -> None:
+        """
+                 Add multiple monofunctional strands with specified bead types, link them to cross-links.
+        """
+
     def add_and_link_strands_to_conversion(
             self, nr_of_strands: int, strand_lengths: list[int], crosslinker_conversion: float, strand_atom_type: int = 1, c_infinity: float = 1.0) -> None:
         """
@@ -1395,6 +1401,17 @@ class MCUniverseGenerator:
     def config_nr_of_mc_steps(self, n_steps: int = 2000) -> None:
         """
         Set the number of Monte-Carlo steps during bond length equilibration.
+        """
+
+    def config_primary_loop_probability(
+            self, probability: float = 1.0) -> None:
+        """
+                 Configure an additional weight reduction for the primary loop formation.
+
+                 Defaults to 1., which means the general :math:`P(\\vec{R})` is used without any bias.
+                 This results in more primary loops for shorter chains than for longer ones.
+
+                 Set to 0. to disable the formation of primary loops.
         """
 
     def get_mean_bead_distance(self) -> float:

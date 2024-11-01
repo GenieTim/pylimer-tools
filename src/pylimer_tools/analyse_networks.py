@@ -46,7 +46,8 @@ def cli(files, crosslinker_type):
         )
         molecules = universe.get_molecules(crosslinker_type)
         bond_lengths = universe.compute_bond_lengths()
-        non_none_bond_lengths = [bl for bl in bond_lengths if bl is not None and bl > 0]
+        non_none_bond_lengths = [
+            bl for bl in bond_lengths if bl is not None and bl > 0]
         click.echo(
             "Bond length b: <b> = {} u, (min: {}, max: {}, median: {}) u, <b^2> = {} u^2".format(
                 np.mean(non_none_bond_lengths),
@@ -70,7 +71,8 @@ def cli(files, crosslinker_type):
         )
         click.echo(
             "For {} molecules of mean length of {} atoms".format(
-                len(molecules), np.mean([m.get_nr_of_atoms() for m in molecules])
+                len(molecules), np.mean(
+                    [m.get_nr_of_atoms() for m in molecules])
             )
         )
         click.echo(

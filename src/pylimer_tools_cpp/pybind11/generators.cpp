@@ -96,6 +96,14 @@ init_pylimer_bound_generators(py::module_& m)
          py::arg("solvent_chain_length"),
          py::arg("solvent_atom_type") = 3,
          py::arg("white_noise") = true)
+    .def("add_and_link_monofunctional_strands",
+         &MCUniverseGenerator::addAndLinkMonofunctionalStrands,
+         R"pbdoc(
+         Add multiple monofunctional strands with specified bead types, link them to cross-links.
+         )pbdoc",
+         py::arg("nr_of_monofunctional_strands"),
+         py::arg("monofunctional_strand_length"),
+         py::arg("monofunctional_strand_atom_type") = 4)
     .def("add_and_link_strands_to_conversion",
          py::overload_cast<int, std::vector<int>, double, int, double>(
            &MCUniverseGenerator::addAndLinkStrandsToConversion),

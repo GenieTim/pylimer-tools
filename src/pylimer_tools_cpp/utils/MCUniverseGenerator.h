@@ -238,6 +238,10 @@ namespace utils {
                                    newCrosslinkerIdxs.end());
       this->remainingCrossLinkerFunctionality.reserve(nCrosslinkerBefore +
                                                       nrOfCrosslinkers);
+      this->originalNrOfAvailableCrosslinkSites +=
+        crosslinkerFunctionality * nrOfCrosslinkers;
+      this->nrOfAvailableCrosslinkSites +=
+        crosslinkerFunctionality * nrOfCrosslinkers;
       for (size_t i = 0; i < nrOfCrosslinkers; ++i) {
         this->remainingCrossLinkerFunctionality.push_back(
           crosslinkerFunctionality);
@@ -269,6 +273,63 @@ namespace utils {
     };
 
     /**
+     * @brief Add multiple monofunctional strands with specified bead types,
+     * link them to cross-links
+     *
+     * @param nrOfStrands
+     * @param beadsPerChains
+     * @param strandAtomType
+     */
+    void addAndLinkMonofunctionalStrands(int nrOfStrands,
+                                         std::vector<int> beadsPerChains,
+                                         int strandAtomType = 1)
+    {
+      INVALIDARG_EXP_IFN(beadsPerChains.size() == nrOfStrands,
+                         "Nr of strands (" + std::to_string(nrOfStrands) +
+                           ") must be equal to the number "
+                           "of chainLengths (" +
+                           std::to_string(beadsPerChains.size()) +
+                           ") provided.");
+
+      long int nCrosslinks = this->crossLinkerIdxs.size();
+      long int nrOfAvailableSites =
+        std::reduce(this->remainingCrossLinkerFunctionality.begin(),
+                    this->remainingCrossLinkerFunctionality.end(),
+                    0);
+
+      RUNTIME_EXP_IFN(nrOfStrands <= nrOfAvailableSites,
+                      "Not enough cross-link sites available to link all these "
+                      "monofunctional strands.");
+
+      std::vector<size_t> availableCrosslinkSites;
+      availableCrosslinkSites.reserve(nrOfAvailableSites);
+      for (size_t i = 0; i < nCrosslinks; ++i) {
+        for (long int s = 0; s < this->remainingCrossLinkerFunctionality[i];
+             ++s) {
+          availableCrosslinkSites.push_back(this->crossLinkerIdxs[i]);
+        }
+      }
+      std::shuffle(availableCrosslinkSites.begin(),
+                   availableCrosslinkSites.end(),
+                   this->rng);
+
+      for (size_t i = 0; i < nrOfStrands; ++i) {
+        this->simplifiedUniverse.strandBeadType.push_back(strandAtomType);
+        this->simplifiedUniverse.beadsInStrand.push_back(beadsPerChains[i]);
+        this->simplifiedUniverse.beadDistanceInStrand.push_back(
+          this->beadDistance);
+        this->simplifiedUniverse.meanSquaredBeadDistanceInStrand.push_back(
+          this->meanSquaredBeadDistance);
+        this->simplifiedUniverse.strandFrom.push_back(
+          availableCrosslinkSites[i]);
+        this->remainingCrossLinkerFunctionality[availableCrosslinkSites[i]] -=
+          1;
+        this->nrOfAvailableCrosslinkSites -= 1;
+        this->simplifiedUniverse.strandTo.push_back(-1);
+      }
+    }
+
+    /**
      * @brief Add strands, link them to the cross-links, stop when the callback
      * says so
      *
@@ -297,28 +358,17 @@ namespace utils {
           this->remainingCrossLinkerFunctionality.size(),
         "Invalid internal state, the remaining cross-linker functionalities "
         "are inconsistent with the indices of the cross-links.");
-
-      RUNTIME_EXP_IFN(
-        all_equal<size_t>(
-          5,
-          this->simplifiedUniverse.strandFrom.size(),
-          this->simplifiedUniverse.strandTo.size(),
-          this->simplifiedUniverse.beadsInStrand.size(),
-          this->simplifiedUniverse.beadDistanceInStrand.size(),
-          this->simplifiedUniverse.meanSquaredBeadDistanceInStrand.size()),
-        "Inconsistent sizes in simplified universe.");
+      this->validateInternalState();
 
       // prepare sampling of partners
       long int nCrosslinks = this->crossLinkerIdxs.size();
       int nrOfStrandsAdded = 0;
 
-      long int nrOfAvailableSites =
-        std::reduce(this->remainingCrossLinkerFunctionality.begin(),
-                    this->remainingCrossLinkerFunctionality.end(),
-                    0);
-
-      double conversionPerBond = (1.0 - this->currentCrosslinkerConversion) /
-                                 (static_cast<double>(nrOfAvailableSites));
+      double currentCrosslinkerConversion =
+        1. - (static_cast<double>(this->nrOfAvailableCrosslinkSites) /
+              static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
+      double conversionPerBond =
+        1. / (static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
 
       size_t nStrandsBefore = this->simplifiedUniverse.strandFrom.size();
 
@@ -333,7 +383,7 @@ namespace utils {
         availableStrandEnds.begin(), availableStrandEnds.end(), this->rng);
 
       std::vector<size_t> availableCrosslinkSites;
-      availableCrosslinkSites.reserve(nrOfAvailableSites);
+      availableCrosslinkSites.reserve(this->nrOfAvailableCrosslinkSites);
       for (size_t i = 0; i < nCrosslinks; ++i) {
         for (long int s = 0; s < this->remainingCrossLinkerFunctionality[i];
              ++s) {
@@ -379,7 +429,7 @@ namespace utils {
 
           this->simplifiedUniverse.strandTo[strandIdx] = partnerCrosslinker;
           this->remainingCrossLinkerFunctionality[partnerCrosslinker] -= 1;
-          this->currentCrosslinkerConversion += conversionPerBond;
+          this->nrOfAvailableCrosslinkSites -= 1;
         } else {
           // otherwise, randomly choose a free cross-link
           long int crosslinkIdxIdx = availableCrosslinkSites.back();
@@ -399,7 +449,7 @@ namespace utils {
           this->simplifiedUniverse.strandFrom[strandIdx] =
             this->crossLinkerIdxs[crosslinkIdxIdx];
           this->remainingCrossLinkerFunctionality[crosslinkIdxIdx] -= 1;
-          this->currentCrosslinkerConversion += conversionPerBond;
+          this->nrOfAvailableCrosslinkSites -= 1;
         }
       }
     }
@@ -419,26 +469,22 @@ namespace utils {
                                        const int strandAtomType = 1,
                                        const double cInfinity = 1.)
     {
+      const double conversionPerBond =
+        (1.0) /
+        (static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
+      const double currentCrosslinkerConversion =
+        1.0 - (static_cast<double>(this->nrOfAvailableCrosslinkSites) /
+               static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
+
       INVALIDARG_EXP_IFN(
-        targetCrossLinkerConversion >= this->currentCrosslinkerConversion &&
+        targetCrossLinkerConversion >= currentCrosslinkerConversion &&
           targetCrossLinkerConversion <= 1.0,
         "Cross-linker conversion must be between " +
-          std::to_string(this->currentCrosslinkerConversion) + " and 1, got " +
+          std::to_string(currentCrosslinkerConversion) + " and 1, got " +
           std::to_string(targetCrossLinkerConversion) + ".");
 
-      // prepare sampling of partners
-      const long int nrOfAvailableSites =
-        std::reduce(this->remainingCrossLinkerFunctionality.begin(),
-                    this->remainingCrossLinkerFunctionality.end(),
-                    0);
-
-      const double conversionPerBond =
-        (1.0 - this->currentCrosslinkerConversion) /
-        (static_cast<double>(nrOfAvailableSites));
-
       const int potentialNewBonds = 2 * nrOfStrands;
-      if (this->currentCrosslinkerConversion +
-            potentialNewBonds * conversionPerBond <
+      if (currentCrosslinkerConversion + potentialNewBonds * conversionPerBond <
           targetCrossLinkerConversion) {
         throw std::invalid_argument(
           "A cross-linker conversion of " +
@@ -446,14 +492,17 @@ namespace utils {
           " is not reachable with this nr of strands.");
       }
 
+      const long int targetNrOfAvailableCrosslinkSites = std::round(
+        (1.0 - targetCrossLinkerConversion) *
+        static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
       const double timesNForR02 = this->meanSquaredBeadDistance * cInfinity;
 
       this->addAndLinkStrandsCallback(
         nrOfStrands,
         beadsPerChains,
-        [targetCrossLinkerConversion](const MCUniverseGenerator& gen) {
-          return gen.currentCrosslinkerConversion >=
-                 targetCrossLinkerConversion;
+        [targetNrOfAvailableCrosslinkSites](const MCUniverseGenerator& gen) {
+          return gen.nrOfAvailableCrosslinkSites <=
+                 targetNrOfAvailableCrosslinkSites;
         },
         strandAtomType,
         cInfinity);
@@ -668,7 +717,6 @@ namespace utils {
   private:
     double beadDistance;
     double meanSquaredBeadDistance;
-    double currentCrosslinkerConversion = 0.0;
     double primaryLoopProbability = 1.0;
     size_t nMcSteps = 2000;
     std::mt19937 rng;
@@ -678,6 +726,8 @@ namespace utils {
 
     CrosslinkerUniverse simplifiedUniverse;
     std::vector<size_t> crossLinkerIdxs;
+    long int originalNrOfAvailableCrosslinkSites = 0;
+    long int nrOfAvailableCrosslinkSites = 0;
     std::vector<int> remainingCrossLinkerFunctionality;
     pylimer_tools::entities::Box box;
 
@@ -980,6 +1030,15 @@ namespace utils {
       return suitableMatches[weightDist(this->rng)];
     }
 
+    ///// Utility functions
+    /**
+     * @brief compute the distance between two cross-links, given by their
+     * indices
+     *
+     * @param i
+     * @param j
+     * @return double
+     */
     double distanceBetween(size_t i, size_t j)
     {
       return this->getDistance(this->simplifiedUniverse.xlinkX[i],
@@ -1014,6 +1073,28 @@ namespace utils {
       diff << x2 - x1, y2 - y1, z2 - z1;
       this->box.handlePBC(diff);
       return diff.norm();
+    }
+
+    void validateInternalState() const
+    {
+      RUNTIME_EXP_IFN(
+        all_equal<size_t>(
+          5,
+          this->simplifiedUniverse.strandFrom.size(),
+          this->simplifiedUniverse.strandTo.size(),
+          this->simplifiedUniverse.beadsInStrand.size(),
+          this->simplifiedUniverse.beadDistanceInStrand.size(),
+          this->simplifiedUniverse.meanSquaredBeadDistanceInStrand.size()),
+        "Inconsistent sizes in simplified universe.");
+
+      long int nCrosslinks = this->crossLinkerIdxs.size();
+      const long int nrOfAvailableSites =
+        std::reduce(this->remainingCrossLinkerFunctionality.begin(),
+                    this->remainingCrossLinkerFunctionality.end(),
+                    0);
+
+      RUNTIME_EXP_IFN(this->nrOfAvailableCrosslinkSites == nrOfAvailableSites,
+                      "Inconsistent nr of cross-link sites.");
     }
   };
 } // namespace utils
