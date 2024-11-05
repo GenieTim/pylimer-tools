@@ -198,3 +198,25 @@ TEST_CASE("MCUniverseGenerator can generate without primary loops",
   auto loops = universe.countLoopLengths(14);
   CHECK(loops.size() == 0);
 }
+
+TEST_CASE("Universe can cross-link up to w_sol",
+          "[generator][MCUniverseGenerator][long]")
+{
+  std::cout << "Running test \"Universe can cross-link up to w_sol\""
+            << std::endl;
+
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(10.0, 10.0, 10.0);
+  generator.setSeed(8804);
+  generator.setBeadDistance(0.964);
+  generator.addCrosslinkers(100, 4, 2);
+
+  generator.addAndLinkStrandsToSolubleFraction(200, 19, 0.9, 1, 1.);
+
+  pe::Universe universe = generator.getUniverse();
+  REQUIRE(universe.getVolume() == 10.0 * 10.0 * 10.0);
+  REQUIRE(universe.getAtomsOfType(2).size() == 100);
+  REQUIRE(universe.getAtomsOfType(1).size() == 200 * 19);
+
+  auto clusters = universe.getClusters();
+  CHECK(clusters.size() < 20);
+}

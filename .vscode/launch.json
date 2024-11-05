@@ -10,7 +10,7 @@
       "name": "Debug C++ Tests",
       "cwd": "${workspaceFolder}/tests/build",
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
-      "args": ["MCUniverseGenerator can generate without primary loops"],
+      "args": ["Universe can cross-link up to w_sol"],
       "env": {
         "MallocNanoZone": "0",
         "ASAN_OPTIONS": "detect_leaks=0",
@@ -26,7 +26,7 @@
       "name": "Debug Cpp Tests",
       "cwd": "${workspaceFolder}/tests/build",
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
-      "args": ["Universe can be used"],
+      "args": ["Universe can cross-link up to w_sol"],
       "environment": [
         {
           "name": "MallocNanoZone",

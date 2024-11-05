@@ -543,22 +543,19 @@ namespace utils {
                          "Soluble fraction must be between 0 and 1, got " +
                            std::to_string(targetSolubleFraction) + ".");
 
+      size_t nAtomsTotal =
+        std::reduce(beadsPerChains.begin(), beadsPerChains.end(), 0) +
+        std::reduce(this->simplifiedUniverse.beadsInStrand.begin(),
+                    this->simplifiedUniverse.beadsInStrand.end(),
+                    0) +
+        this->simplifiedUniverse.xlinkTypes.size();
+
       this->addAndLinkStrandsCallback(
         nrOfStrands,
         beadsPerChains,
-        [targetSolubleFraction](const MCUniverseGenerator& gen) {
+        [targetSolubleFraction, nAtomsTotal](const MCUniverseGenerator& gen) {
           pylimer_tools::sim::mehp::Network frNet =
             gen.convertToForceRelaxationNetwork();
-
-          // this network only contains non-dangling and non-free chains
-          // need to compute compensation for that.
-          size_t nOmittedBeads = 0;
-          for (size_t i = 0; i < gen.simplifiedUniverse.strandFrom.size();
-               ++i) {
-            if (gen.simplifiedUniverse.strandTo[i] == -1) {
-              nOmittedBeads += gen.simplifiedUniverse.beadsInStrand[i];
-            }
-          }
 
           // actually start force relaxation
           pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
@@ -566,12 +563,14 @@ namespace utils {
           forceRelaxer.configAssumeBoxLargeEnough(true);
 
           while (forceRelaxer.suggestsRerun()) {
-            forceRelaxer.runForceRelaxation();
+            forceRelaxer.runForceRelaxation("LD_MMA", 2500, 1e-9, 1e-7);
           }
 
           // finally, calculate the soluble fraction
-          return forceRelaxer.getSolubleWeightFraction() >=
-                 targetSolubleFraction;
+          double solubleFraction =
+            1. - forceRelaxer.countActiveClusteredAtoms() /
+                   static_cast<double>(nAtomsTotal);
+          return solubleFraction <= targetSolubleFraction;
         },
         strandAtomType,
         cInfinity);
@@ -612,6 +611,8 @@ namespace utils {
         Eigen::ArrayXi::Zero(forceRelaxationNetwork.nrOfNodes);
       forceRelaxationNetwork.coordinates =
         Eigen::VectorXd(forceRelaxationNetwork.nrOfNodes * 3);
+      forceRelaxationNetwork.springIndicesOfLinks.reserve(
+        this->crossLinkerIdxs.size());
       size_t i = 0;
       for (size_t crosslinkIdx : this->crossLinkerIdxs) {
         forceRelaxationNetwork.coordinates(3 * i + 0) =
@@ -621,7 +622,8 @@ namespace utils {
         forceRelaxationNetwork.coordinates(3 * i + 2) =
           this->simplifiedUniverse.xlinkZ[crosslinkIdx];
 
-        forceRelaxationNetwork.springIndicesOfLinks.push_back({});
+        std::vector<size_t> empty = {};
+        forceRelaxationNetwork.springIndicesOfLinks.push_back(empty);
 
         i += 1;
       }
@@ -633,24 +635,26 @@ namespace utils {
         Eigen::ArrayXi::Zero(nSpringEstimate);
       forceRelaxationNetwork.springsContourLength =
         Eigen::VectorXd::Zero(nSpringEstimate);
-      size_t nActualSprings = 0;
+      size_t newSpringIdx = 0;
       // we omit all dangling and free strands
       for (size_t springIdx = 0;
            springIdx < this->simplifiedUniverse.strandFrom.size();
            ++springIdx) {
         if (this->simplifiedUniverse.strandTo[springIdx] != -1) {
+          // TODO: get rid of this->crossLinkerIdxs
           long int from = this->simplifiedUniverse.strandFrom[springIdx];
           long int to = this->simplifiedUniverse.strandTo[springIdx];
-          forceRelaxationNetwork.springIndexA(springIdx) = from;
-          forceRelaxationNetwork.springIndexB(springIdx) = to;
+          forceRelaxationNetwork.springIndexA(newSpringIdx) = from;
+          forceRelaxationNetwork.springIndexB(newSpringIdx) = to;
           forceRelaxationNetwork.springIndicesOfLinks[from].push_back(
-            springIdx);
-          forceRelaxationNetwork.springIndicesOfLinks[to].push_back(springIdx);
-          forceRelaxationNetwork.springsContourLength(springIdx) =
+            newSpringIdx);
+          forceRelaxationNetwork.springIndicesOfLinks[to].push_back(newSpringIdx);
+          forceRelaxationNetwork.springsContourLength(newSpringIdx) =
             this->simplifiedUniverse.beadsInStrand[springIdx] + 1;
-          nActualSprings += 1;
+          newSpringIdx += 1;
         }
       }
+      const size_t nActualSprings = newSpringIdx;
       forceRelaxationNetwork.springIndexA.conservativeResize(nActualSprings);
       forceRelaxationNetwork.springIndexB.conservativeResize(nActualSprings);
       forceRelaxationNetwork.springsContourLength.conservativeResize(
@@ -673,7 +677,9 @@ namespace utils {
       }
 
       forceRelaxationNetwork.meanSpringContourLength =
-        forceRelaxationNetwork.springsContourLength.mean();
+        forceRelaxationNetwork.springsContourLength.size() > 0
+          ? forceRelaxationNetwork.springsContourLength.mean()
+          : 1.;
       forceRelaxationNetwork.assumeBoxLargeEnough = true;
 
       return forceRelaxationNetwork;

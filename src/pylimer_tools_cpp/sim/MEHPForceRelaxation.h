@@ -225,6 +225,20 @@ namespace sim {
       }
 
       /**
+       * @brief Count the number of atoms that are in any way connected to an
+       * active spring
+       *
+       * @param tolerance
+       * @return double
+       */
+      double countActiveClusteredAtoms(double tolerance = 0.1)
+      {
+        return this->countActiveClusteredAtoms(&this->forceRelaxationNetwork,
+                                               this->currentSpringDistances,
+                                               tolerance);
+      }
+
+      /**
        * @brief Get the Dangling Weight Fraction
        *
        * @param tolerance
@@ -878,23 +892,20 @@ namespace sim {
       }
 
       /**
-       * @brief Compute the weight fraction of springs connected to active
-       * springs (any depth)
+       * @brief Count the number of atoms that can be considered part of an
+       * active cluster, i.e., are somehow connected to an active spring
        *
        * @param net
        * @param springDistances
        * @param tolerance
        * @return double
        */
-      double computeSolubleWeightFraction(
-        Network* net,
-        const Eigen::VectorXd& springDistances,
-        const double tolerance = 0.1) const
+      double countActiveClusteredAtoms(Network* net,
+                                       const Eigen::VectorXd& springDistances,
+                                       const double tolerance = 0.1) const
       {
-        if (net->nrOfSprings * 3 != springDistances.size()) {
-          throw std::invalid_argument(
-            "Spring distances and network don't match");
-        }
+        INVALIDARG_EXP_IFN(net->nrOfSprings * 3 == springDistances.size(),
+                           "Spring distances and network don't match");
         if (net->nrOfSprings < 1) {
           return 1.;
         }
@@ -902,7 +913,7 @@ namespace sim {
         Eigen::ArrayXb activeSprings =
           this->findActiveSprings(springDistances, tolerance);
         if (activeSprings.count() == 0) {
-          return 1.;
+          return 0.;
         }
         // then, iteratively walk along the springs to mark those as "active"
         // that are connected to active springs
@@ -934,11 +945,30 @@ namespace sim {
           activeSprings.cast<double>() *
           (net->springsContourLength.array() -
            Eigen::ArrayXd::Ones(net->nrOfSprings));
+
+        return ((allActiveAtomsPerChains).matrix().sum() +
+                this->getNrOfActiveNodes());
+      }
+
+      /**
+       * @brief Compute the weight fraction of springs connected to active
+       * springs (any depth)
+       *
+       * @param net
+       * @param springDistances
+       * @param tolerance
+       * @return double
+       */
+      double computeSolubleWeightFraction(
+        Network* net,
+        const Eigen::VectorXd& springDistances,
+        const double tolerance = 0.1) const
+      {
+        double nActiveClusteredAtoms =
+          this->countActiveClusteredAtoms(net, springDistances, tolerance);
         // finally, normalise by the number of atoms.
         // NOTE: currently, the weight of the atoms is ignored
-        return 1. - ((allActiveAtomsPerChains).matrix().sum() +
-                     this->getNrOfActiveNodes()) /
-                      this->universe.getNrOfAtoms();
+        return 1. - nActiveClusteredAtoms / this->universe.getNrOfAtoms();
       }
 
       /**
