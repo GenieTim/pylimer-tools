@@ -1178,8 +1178,8 @@ namespace entities {
     igraph_vector_int_list_t e_results;
     igraph_vector_int_list_init(&e_results, 0);
 
-    igraph_simple_cycles_search_all(
-      &this->graph, &v_results, &e_results, maxLength);
+    igraph_simple_cycles(
+      &this->graph, &v_results, &e_results, IGRAPH_ALL, -1, maxLength);
 
     std::vector<std::vector<long int>> results;
 
@@ -1236,8 +1236,12 @@ namespace entities {
     pylimer_tools::utils::Counter<int> loopLengths;
 
     // TODO: shrink the graph by collapsing all 2-functional vertices?
-    igraph_simple_cycles_search_callback(
-      &this->graph, maxLength, &count_found_cycle, &loopLengths);
+    igraph_simple_cycles_callback(&this->graph,
+                                  IGRAPH_ALL,
+                                  -1,
+                                  maxLength,
+                                  &count_found_cycle,
+                                  &loopLengths);
 
     return loopLengths.asMap();
   }
