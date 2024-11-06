@@ -85,8 +85,22 @@ namespace calc {
 
   void NormalModeAnalyzer::computeAllEigenvalues(const bool includeEigenvectors)
   {
+    RUNTIME_EXP_IFN(this->assembledConnectivityMatrix.rows() ==
+                      this->assembledConnectivityMatrix.cols(),
+                    "Expected square matrix");
+
+    size_t nRows = this->assembledConnectivityMatrix.rows();
+    if (nRows == 0) {
+      return;
+    }
+
     Eigen::MatrixXd assembledConnectivityMatrixDense =
       Eigen::MatrixXd(this->assembledConnectivityMatrix);
+    RUNTIME_EXP_IFN(assembledConnectivityMatrixDense.rows() == nRows,
+                    "Expected square matrix also after conversion to dense.");
+    RUNTIME_EXP_IFN(assembledConnectivityMatrixDense.cols() == nRows,
+                    "Expected square matrix also after conversion to dense.");
+
 #ifndef EIGEN_USE_LAPACKE
     std::cerr << "Eigen LAPACK is not available, using Eigen's "
                  "SelfAdjointEigenSolver instead. Expect reduced performance."
@@ -103,31 +117,26 @@ namespace calc {
     }
 #else
     // see also/alternative: igraph_lapack_dsyevr()
-    Eigen::VectorXd eigenvaluesMemory =
-      Eigen::VectorXd::Zero(this->assembledConnectivityMatrix.rows());
-    Eigen::MatrixXd eigenvectorsMemory =
-      includeEigenvectors
-        ? Eigen::MatrixXd::Zero(this->assembledConnectivityMatrix.rows(),
-                                this->assembledConnectivityMatrix.rows())
-        : Eigen::MatrixXd::Zero(this->assembledConnectivityMatrix.rows(), 3);
+    Eigen::VectorXd eigenvaluesMemory = Eigen::VectorXd::Zero(nRows);
+    Eigen::MatrixXd eigenvectorsMemory = includeEigenvectors
+                                           ? Eigen::MatrixXd::Zero(nRows, nRows)
+                                           : Eigen::MatrixXd::Zero(nRows, 3);
     int il = 0;
     int iu = 0;
     double abstol = 1e-10;
     int M = 0;
 
-    Eigen::VectorXi support =
-      Eigen::VectorXi::Zero(this->assembledConnectivityMatrix.rows() * 2);
+    Eigen::VectorXi support = Eigen::VectorXi::Zero(nRows * 2);
 
-    // query optimal workspace size
     int info = LAPACKE_dsyevr(Eigen::MatrixXd::IsRowMajor
                                 ? LAPACK_ROW_MAJOR
                                 : LAPACK_COL_MAJOR,            // matrix_order
                               includeEigenvectors ? 'V' : 'N', // JOBZ
                               'A',                             // RANGE
                               'U',                             // UPLO
-                              assembledConnectivityMatrixDense.rows(), // N
+                              nRows,                           // N
                               assembledConnectivityMatrixDense.data(), // A
-                              assembledConnectivityMatrixDense.rows(), // LDA
+                              nRows,                                   // LDA
                               0,                                       // VL
                               0,                                       // VU
                               il,                                      // IL
