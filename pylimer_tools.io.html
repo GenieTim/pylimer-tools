@@ -562,85 +562,8 @@ to restore the original sections.</p>
 </dd></dl>
 
 </section>
-<section id="module-pylimer_tools.io.unit_styles">
-<span id="pylimer-tools-io-unit-styles-module"></span><h2>pylimer_tools.io.unit_styles module<a class="headerlink" href="#module-pylimer_tools.io.unit_styles" title="Link to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="pylimer_tools.io.unit_styles.UnitStyle">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.unit_styles.</span></span><span class="sig-name descname"><span class="pre">UnitStyle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit_configuration</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ureg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">UnitRegistry</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.io.unit_styles.UnitStyle" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>UnitStyle: a collection of units of a particular LAMMPS unit style,
-but in SI units
-(i.e.: use this to convert your LAMMPS output data to SI units).</p>
-<p>Example usage:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">unit_style_factory</span> <span class="o">=</span> <span class="n">UnitStyleFactory</span><span class="p">()</span>
-<span class="n">unit_style</span> <span class="o">=</span> <span class="n">unit_style_factory</span><span class="o">.</span><span class="n">get_unit_style</span><span class="p">(</span>
-    <span class="s2">&quot;lj&quot;</span><span class="p">,</span> <span class="n">polymer</span><span class="o">=</span><span class="s2">&quot;pdms&quot;</span><span class="p">,</span> <span class="n">warning</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">accept_mol</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="c1"># multiply with the following factor to convert LJ stress to SI units,</span>
-<span class="c1"># namely MPa in this example:</span>
-<span class="n">lj_stress_to_si_conversion_factor</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.</span><span class="o">*</span><span class="n">unit_style</span><span class="o">.</span><span class="n">pressure</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;MPa&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">magnitude</span>
-</pre></div>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools.io.unit_styles.UnitStyle.get_base_unit_of">
-<span class="sig-name descname"><span class="pre">get_base_unit_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">property</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.io.unit_styles.UnitStyle.get_base_unit_of" title="Link to this definition">¶</a></dt>
-<dd><p>Returns the conversion factor from the unit style to SI units.</p>
-<p>Example usage:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">units</span> <span class="o">=</span> <span class="n">get_unit_style</span><span class="p">(</span><span class="s2">&quot;lj&quot;</span><span class="p">)</span>
-<span class="n">si_mass</span> <span class="o">=</span> <span class="n">lj_mass</span> <span class="o">*</span> <span class="n">units</span><span class="o">.</span><span class="n">get_base_unit_of</span><span class="p">(</span><span class="s2">&quot;mass&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools.io.unit_styles.UnitStyle.get_underlying_unit_registry">
-<span class="sig-name descname"><span class="pre">get_underlying_unit_registry</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.io.unit_styles.UnitStyle.get_underlying_unit_registry" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-<dl class="py class">
-<dt class="sig sig-object py" id="pylimer_tools.io.unit_styles.UnitStyleFactory">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pylimer_tools.io.unit_styles.</span></span><span class="sig-name descname"><span class="pre">UnitStyleFactory</span></span><a class="headerlink" href="#pylimer_tools.io.unit_styles.UnitStyleFactory" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>This is a factory to get multiple instances of different
-<code class="xref py py-obj docutils literal notranslate"><span class="pre">UnitStyle</span></code>
-using the same UnitRegistry, such that they are compatible.</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_registry">
-<span class="sig-name descname"><span class="pre">get_unit_registry</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_registry" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_style">
-<span class="sig-name descname"><span class="pre">get_unit_style</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#pylimer_tools.io.unit_styles.UnitStyle" title="pylimer_tools.io.unit_styles.UnitStyle"><span class="pre">UnitStyle</span></a></span></span><a class="headerlink" href="#pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_style" title="Link to this definition">¶</a></dt>
-<dd><p>Get a UnitStyle instance corresponding to the unit system requested.</p>
-<div class="admonition seealso">
-<p class="admonition-title">See also</p>
-<ul class="simple">
-<li><p><a class="reference external" href="https://docs.lammps.org/units.html">https://docs.lammps.org/units.html</a></p></li>
-</ul>
-</div>
-<div class="admonition caution">
-<p class="admonition-title">Caution</p>
-<ul class="simple">
-<li><p>Please check the source code of this function to see
-whether the units you need are correctly implemented</p></li>
-</ul>
-</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>unit_type</strong> (<em>-</em>) – The unit type, e.g. “lj”, “nano”, “real”, “si”, …</p></li>
-<li><p><strong>dimension</strong> (<em>-</em>) – The dimension of the box</p></li>
-<li><p><strong>kwargs</strong> (<em>-</em>) – additional arguments required force certain unit styles (e.g. style “lj” requiring “polymer”)</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
+<section id="pylimer-tools-io-unit-styles-module">
+<h2>pylimer_tools.io.unit_styles module<a class="headerlink" href="#pylimer-tools-io-unit-styles-module" title="Link to this heading">¶</a></h2>
 </section>
 <section id="module-pylimer_tools.io">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pylimer_tools.io" title="Link to this heading">¶</a></h2>
@@ -725,19 +648,7 @@ whether the units you need are correctly implemented</p></li>
 <li><a class="reference internal" href="#pylimer_tools.io.read_lammps_output_file.read_sectioned_averages_file"><code class="docutils literal notranslate"><span class="pre">read_sectioned_averages_file()</span></code></a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-pylimer_tools.io.unit_styles">pylimer_tools.io.unit_styles module</a><ul>
-<li><a class="reference internal" href="#pylimer_tools.io.unit_styles.UnitStyle"><code class="docutils literal notranslate"><span class="pre">UnitStyle</span></code></a><ul>
-<li><a class="reference internal" href="#pylimer_tools.io.unit_styles.UnitStyle.get_base_unit_of"><code class="docutils literal notranslate"><span class="pre">UnitStyle.get_base_unit_of()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools.io.unit_styles.UnitStyle.get_underlying_unit_registry"><code class="docutils literal notranslate"><span class="pre">UnitStyle.get_underlying_unit_registry()</span></code></a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#pylimer_tools.io.unit_styles.UnitStyleFactory"><code class="docutils literal notranslate"><span class="pre">UnitStyleFactory</span></code></a><ul>
-<li><a class="reference internal" href="#pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_registry"><code class="docutils literal notranslate"><span class="pre">UnitStyleFactory.get_unit_registry()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools.io.unit_styles.UnitStyleFactory.get_unit_style"><code class="docutils literal notranslate"><span class="pre">UnitStyleFactory.get_unit_style()</span></code></a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li><a class="reference internal" href="#pylimer-tools-io-unit-styles-module">pylimer_tools.io.unit_styles module</a></li>
 <li><a class="reference internal" href="#module-pylimer_tools.io">Module contents</a></li>
 </ul>
 </li>

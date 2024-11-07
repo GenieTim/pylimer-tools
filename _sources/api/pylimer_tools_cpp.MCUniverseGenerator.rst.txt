@@ -10,16 +10,17 @@ MCUniverseGenerator
 
    .. autosummary::
 
-      ~MCUniverseGenerator.add_and_link_monofunctional_strands
-      ~MCUniverseGenerator.add_and_link_strands_to_conversion
-      ~MCUniverseGenerator.add_and_link_strands_to_soluble_fraction
       ~MCUniverseGenerator.add_crosslinkers
+      ~MCUniverseGenerator.add_monofunctional_strands
       ~MCUniverseGenerator.add_solvent_chains
+      ~MCUniverseGenerator.add_strands
       ~MCUniverseGenerator.config_nr_of_mc_steps
       ~MCUniverseGenerator.config_primary_loop_probability
       ~MCUniverseGenerator.get_mean_bead_distance
       ~MCUniverseGenerator.get_mean_squared_bead_distance
       ~MCUniverseGenerator.get_universe
+      ~MCUniverseGenerator.link_strands_to_conversion
+      ~MCUniverseGenerator.link_strands_to_soluble_fraction
       ~MCUniverseGenerator.relax_crosslinks
       ~MCUniverseGenerator.set_bead_distance
       ~MCUniverseGenerator.set_mean_squared_bead_distance
@@ -27,16 +28,17 @@ MCUniverseGenerator
 
    .. rubric:: Methods Documentation
 
-   .. automethod:: add_and_link_monofunctional_strands
-   .. automethod:: add_and_link_strands_to_conversion
-   .. automethod:: add_and_link_strands_to_soluble_fraction
    .. automethod:: add_crosslinkers
+   .. automethod:: add_monofunctional_strands
    .. automethod:: add_solvent_chains
+   .. automethod:: add_strands
    .. automethod:: config_nr_of_mc_steps
    .. automethod:: config_primary_loop_probability
    .. automethod:: get_mean_bead_distance
    .. automethod:: get_mean_squared_bead_distance
    .. automethod:: get_universe
+   .. automethod:: link_strands_to_conversion
+   .. automethod:: link_strands_to_soluble_fraction
    .. automethod:: relax_crosslinks
    .. automethod:: set_bead_distance
    .. automethod:: set_mean_squared_bead_distance
