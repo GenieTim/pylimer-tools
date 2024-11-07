@@ -1000,8 +1000,8 @@ namespace utils {
                        partner);
               if (this->simplifiedUniverse.strandFrom[partnersSubStrand] ==
                     from ||
-                  this->simplifiedUniverse.strandFrom[partnersSubStrand] ==
-                    to) {
+                  this->simplifiedUniverse.strandTo[partnersSubStrand] ==
+                    from) {
                 thisWeight *= this->secondaryLoopProbability;
               }
             }
