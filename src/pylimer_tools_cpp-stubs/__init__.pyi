@@ -1351,36 +1351,6 @@ class MCUniverseGenerator:
     def __init__(self, lx: float, ly: float, lz: float) -> None:
         ...
 
-    def add_and_link_monofunctional_strands(self, nr_of_monofunctional_strands: int,
-                                            monofunctional_strand_length: list[int], monofunctional_strand_atom_type: int = 4) -> None:
-        """
-                 Add multiple monofunctional strands with specified bead types, link them to cross-links.
-        """
-
-    def add_and_link_strands_to_conversion(
-            self, nr_of_strands: int, strand_lengths: list[int], crosslinker_conversion: float, strand_atom_type: int = 1, c_infinity: float = 1.0) -> None:
-        """
-                    Actually add strands, link them to the previously added cross-linkers.
-
-                    :param nr_of_strands: Number of strands to add.
-                    :param strand_lengths: A list of integers representing the number of beads of each of the strands.
-                    :param crosslinker_conversion: Target conversion of cross-linkers (0: no connections to cross-links; 1: all cross-linkers fully connected).
-                    :param strand_atom_type: Type of atoms for the strands (default: 1).
-                    :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2`.
-        """
-
-    def add_and_link_strands_to_soluble_fraction(
-            self, nr_of_strands: int, strand_lengths: list[int], soluble_fraction: float, strand_atom_type: int = 1, c_infinity: float = 1.0) -> None:
-        """
-                    Actually add strands, link them to the previously added cross-linkers.
-
-                    :param nr_of_strands: Number of strands to add.
-                    :param strand_lengths: A list of integers representing the number of beads of each of the strands.
-                    :param soluble_fraction: Target soluble_fraction (0: no connections to cross-links; 1: all cross-linkers fully connected).
-                    :param strand_atom_type: Type of atoms for the strands (default: 1).
-                    :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2`.
-        """
-
     def add_crosslinkers(self, nr_of_crosslinkers: int, crosslinker_functionality: int = 4,
                          crosslinker_type: int = 2, white_noise: bool = True) -> None:
         """
@@ -1392,10 +1362,26 @@ class MCUniverseGenerator:
                     :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the cross-linkers (default: true).
         """
 
+    def add_monofunctional_strands(self, nr_of_monofunctional_strands: int,
+                                   monofunctional_strand_length: list[int], monofunctional_strand_atom_type: int = 4) -> None:
+        """
+                 Add multiple monofunctional strands with specified bead types.
+        """
+
     def add_solvent_chains(self, nr_of_solvent_chains: int, solvent_chain_length: int,
                            solvent_atom_type: int = 3, white_noise: bool = True) -> None:
         """
                     Randomly distribute additional, free chains.
+        """
+
+    def add_strands(self, nr_of_strands: int,
+                    strand_lengths: list[int], strand_atom_type: int = 1) -> None:
+        """
+                    Add strands.
+
+                    :param nr_of_strands: Number of strands to add.
+                    :param strand_lengths: A list of integers representing the number of beads of each of the strands.
+                    :param strand_atom_type: Type of atoms for the strands (default: 1).
         """
 
     def config_nr_of_mc_steps(self, n_steps: int = 2000) -> None:
@@ -1429,6 +1415,26 @@ class MCUniverseGenerator:
                     Fetch the current (or final) state of the universe.
 
                     Use this method to actually (MC) place beads between the cross-links and retrieve the generated structure.
+        """
+
+    def link_strands_to_conversion(
+            self, crosslinker_conversion: float, c_infinity: float = 1.0) -> None:
+        """
+                    Actually link the previously added strands to the previously added cross-linkers,
+                    until a certain cross-link conversion is reached.
+
+                    :param crosslinker_conversion: Target conversion of cross-linkers (0: no connections to cross-links; 1: all cross-linkers fully connected).
+                    :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2`.
+        """
+
+    def link_strands_to_soluble_fraction(
+            self, soluble_fraction: float, c_infinity: float = 1.0) -> None:
+        """
+                    Actually link the previously added strands to the previously added cross-linkers,
+                    until a certain soluble fraction is reached.
+
+                    :param soluble_fraction: Target soluble_fraction (0: no connections to cross-links; 1: all cross-linkers fully connected).
+                    :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2`.
         """
 
     def relax_crosslinks(self) -> None:

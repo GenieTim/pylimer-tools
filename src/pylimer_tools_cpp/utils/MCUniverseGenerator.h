@@ -361,20 +361,19 @@ namespace utils {
       double conversionPerBond =
         1. / (static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
 
-      size_t nStrandsBefore = this->simplifiedUniverse.strandFrom.size();
-
-      std::vector<size_t> availableStrandEnds;
       size_t nrOfStrands = this->simplifiedUniverse.strandFrom.size();
+      std::vector<size_t> availableStrandEnds;
       availableStrandEnds.reserve(2 * nrOfStrands);
       for (size_t i = 0; i < nrOfStrands; ++i) {
         // each strand is available with two ends, assuming they are unconnected
         if (this->simplifiedUniverse.strandFrom[i] == UNCONNECTED) {
-          availableStrandEnds.push_back(i + nStrandsBefore);
+          availableStrandEnds.push_back(i);
         }
         if (this->simplifiedUniverse.strandTo[i] == UNCONNECTED) {
-          availableStrandEnds.push_back(i + nStrandsBefore);
+          availableStrandEnds.push_back(i);
         }
       }
+      availableStrandEnds.shrink_to_fit();
       std::shuffle(
         availableStrandEnds.begin(), availableStrandEnds.end(), this->rng);
 
@@ -393,18 +392,27 @@ namespace utils {
       const double timesNForR02 = this->meanSquaredBeadDistance * cInfinity;
 
       // link one strand at a time until we reach the target conversion
-      for (int sampleIdx = 0; sampleIdx < 2 * nrOfStrands; ++sampleIdx) {
+      for (int sampleIdx = 0; sampleIdx < availableStrandEnds.size();
+           ++sampleIdx) {
         if (stopLinking(*this)) {
           break;
         }
 
         size_t strandIdx = availableStrandEnds[sampleIdx];
+        RUNTIME_EXP_IFN(
+          this->simplifiedUniverse.strandTo[strandIdx] < 0,
+          "Expected second strand end to be free, got " +
+            std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
+            " for strand " + std::to_string(strandIdx) + ".");
 
-        if (this->simplifiedUniverse.strandFrom[strandIdx] != UNCONNECTED) {
+        if (this->simplifiedUniverse.strandFrom[strandIdx] >= 0) {
+          RUNTIME_EXP_IFN(
+            this->simplifiedUniverse.strandTo[strandIdx] == UNCONNECTED,
+            "Expected second strand end to be free, got " +
+              std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
+              " for strand " + std::to_string(strandIdx) + ".");
           // we don't have free cross-link choice
-          RUNTIME_EXP_IFN(this->simplifiedUniverse.strandTo[strandIdx] < 0,
-                          "Expected second strand end to be free");
-
+          // find one that follows the desired end-to-end distribution
           size_t partnerCrosslinker = this->findAppropriateLink(
             this->simplifiedUniverse.strandFrom[strandIdx],
             static_cast<double>(
