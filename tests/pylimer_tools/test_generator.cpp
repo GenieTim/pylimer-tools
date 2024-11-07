@@ -44,7 +44,8 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
   generator.setBeadDistance(0.964);
   generator.addCrosslinkers(100, 4, 2);
   generator.addSolventChains(100, 16, 3);
-  generator.addAndLinkStrandsToConversion((4 / 2) * 100, 16, 0.8);
+  generator.addStrands((4 / 2) * 100, 16);
+  generator.linkStrandsToConversion(0.8);
   generator.configNrOfMCSteps(100);
 
   pe::Universe universe = generator.getUniverse();
@@ -81,7 +82,8 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
     generator2.setMeanSquaredBeadDistance(0.964 * 0.964);
     generator2.addCrosslinkers(100, 4, 2);
     generator2.addSolventChains(100, 16, 3);
-    generator2.addAndLinkStrandsToConversion((4 / 2) * 100, 16, 0.8);
+    generator2.addStrands((4 / 2) * 100, 16);
+    generator2.linkStrandsToConversion(0.8);
 
     pe::Universe universe2 = generator2.getUniverse();
 
@@ -105,10 +107,10 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
   SECTION("Errors are thrown")
   {
     // nr of strands and strand lengths must be same:
-    REQUIRE_THROWS(
-      generator.addAndLinkStrandsToConversion(3, { { 10, 100 } }, 0.1, 1));
+    REQUIRE_THROWS(generator.addStrands(3, { { 10, 100 } }, 1));
     // not enough strands to reach conversion:
-    REQUIRE_THROWS(generator.addAndLinkStrandsToConversion(2, 10, 1.0, 1));
+    generator.addStrands(2, 10, 1);
+    REQUIRE_THROWS(generator.linkStrandsToConversion(1.0));
   }
 
   // SECTION("Universe can be written and read again") {
@@ -181,7 +183,8 @@ TEST_CASE("MCUniverseGenerator can generate without primary loops",
   generator.setBeadDistance(0.964);
   generator.addCrosslinkers(100, 4, 2);
   generator.configPrimaryLoopProbability(0.);
-  generator.addAndLinkStrandsToConversion(200, 10, 0.9, 1, 1.);
+  generator.addStrands(200, 10, 1);
+  generator.linkStrandsToConversion(0.9, 1.);
 
   pe::Universe universe = generator.getUniverse();
   CHECK(universe.getAtomsOfType(2).size() == 100);
@@ -210,7 +213,8 @@ TEST_CASE("Universe can cross-link up to w_sol",
   generator.setBeadDistance(0.964);
   generator.addCrosslinkers(100, 4, 2);
 
-  generator.addAndLinkStrandsToSolubleFraction(200, 19, 0.9, 1, 1.);
+  generator.addStrands(200, 19, 1);
+  generator.linkStrandsToSolubleFraction(0.9, 1.);
 
   pe::Universe universe = generator.getUniverse();
   REQUIRE(universe.getVolume() == 10.0 * 10.0 * 10.0);
