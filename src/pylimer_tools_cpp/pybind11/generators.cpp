@@ -96,47 +96,50 @@ init_pylimer_bound_generators(py::module_& m)
          py::arg("solvent_chain_length"),
          py::arg("solvent_atom_type") = 3,
          py::arg("white_noise") = true)
-    .def("add_and_link_monofunctional_strands",
-         &MCUniverseGenerator::addAndLinkMonofunctionalStrands,
+    .def("add_monofunctional_strands",
+         py::overload_cast<int, std::vector<int>, int>(
+           &MCUniverseGenerator::addMonofunctionalStrands),
          R"pbdoc(
-         Add multiple monofunctional strands with specified bead types, link them to cross-links.
+         Add multiple monofunctional strands with specified bead types.
          )pbdoc",
          py::arg("nr_of_monofunctional_strands"),
          py::arg("monofunctional_strand_length"),
          py::arg("monofunctional_strand_atom_type") = 4)
-    .def("add_and_link_strands_to_conversion",
-         py::overload_cast<int, std::vector<int>, double, int, double>(
-           &MCUniverseGenerator::addAndLinkStrandsToConversion),
+    .def("add_strands",
+         py::overload_cast<int, std::vector<int>, int>(
+           &MCUniverseGenerator::addStrands),
          R"pbdoc(
-            Actually add strands, link them to the previously added cross-linkers.
+            Add strands.
 
             :param nr_of_strands: Number of strands to add.
             :param strand_lengths: A list of integers representing the number of beads of each of the strands.
+            :param strand_atom_type: Type of atoms for the strands (default: 1).
+            )pbdoc",
+         py::arg("nr_of_strands"),
+         py::arg("strand_lengths"),
+         py::arg("strand_atom_type") = 1)
+    .def("link_strands_to_conversion",
+         &MCUniverseGenerator::linkStrandsToConversion,
+         R"pbdoc(
+            Actually link the previously added strands to the previously added cross-linkers,
+            until a certain cross-link conversion is reached.
+
             :param crosslinker_conversion: Target conversion of cross-linkers (0: no connections to cross-links; 1: all cross-linkers fully connected).
-            :param strand_atom_type: Type of atoms for the strands (default: 1).
             :param c_infinity: As needed for the end-to-end distribution, given by :math:`\langle R^2\rangle_0 = C_{\infty} N b^2`.
             )pbdoc",
-         py::arg("nr_of_strands"),
-         py::arg("strand_lengths"),
          py::arg("crosslinker_conversion"),
-         py::arg("strand_atom_type") = 1,
          py::arg("c_infinity") = 1.)
-    .def("add_and_link_strands_to_soluble_fraction",
-         py::overload_cast<int, std::vector<int>, double, int, double>(
-           &MCUniverseGenerator::addAndLinkStrandsToSolubleFraction),
+    .def("link_strands_to_soluble_fraction",
+         py::overload_cast<double, double>(
+           &MCUniverseGenerator::linkStrandsToSolubleFraction),
          R"pbdoc(
-            Actually add strands, link them to the previously added cross-linkers.
+            Actually link the previously added strands to the previously added cross-linkers,
+            until a certain soluble fraction is reached.
 
-            :param nr_of_strands: Number of strands to add.
-            :param strand_lengths: A list of integers representing the number of beads of each of the strands.
             :param soluble_fraction: Target soluble_fraction (0: no connections to cross-links; 1: all cross-linkers fully connected).
-            :param strand_atom_type: Type of atoms for the strands (default: 1).
             :param c_infinity: As needed for the end-to-end distribution, given by :math:`\langle R^2\rangle_0 = C_{\infty} N b^2`.
             )pbdoc",
-         py::arg("nr_of_strands"),
-         py::arg("strand_lengths"),
          py::arg("soluble_fraction"),
-         py::arg("strand_atom_type") = 1,
          py::arg("c_infinity") = 1.)
     .def("relax_crosslinks",
          &MCUniverseGenerator::relaxCrosslinks,

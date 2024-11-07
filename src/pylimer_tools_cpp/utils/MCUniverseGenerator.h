@@ -28,6 +28,9 @@
 namespace pylimer_tools {
 namespace utils {
 
+#define UNCONNECTED -1
+#define EMPTY_BACKGROUND -2
+
   struct CrosslinkerUniverse
   {
     std::vector<int> xlinkTypes;
@@ -231,11 +234,7 @@ namespace utils {
     {
       int nCrosslinkerBefore = this->remainingCrossLinkerFunctionality.size();
 
-      std::vector<size_t> newCrosslinkerIdxs = this->addAtomsWithType(
-        nrOfCrosslinkers, crossLinkerAtomType, whiteNoise);
-      this->crossLinkerIdxs.insert(this->crossLinkerIdxs.end(),
-                                   newCrosslinkerIdxs.begin(),
-                                   newCrosslinkerIdxs.end());
+      this->addAtomsWithType(nrOfCrosslinkers, crossLinkerAtomType, whiteNoise);
       this->remainingCrossLinkerFunctionality.reserve(nCrosslinkerBefore +
                                                       nrOfCrosslinkers);
       this->originalNrOfAvailableCrosslinkSites +=
@@ -261,8 +260,8 @@ namespace utils {
                           bool whiteNoise = true)
     {
       for (size_t i = 0; i < nrOfSolventChains; ++i) {
-        this->simplifiedUniverse.strandFrom.push_back(-1);
-        this->simplifiedUniverse.strandTo.push_back(-1);
+        this->simplifiedUniverse.strandFrom.push_back(EMPTY_BACKGROUND);
+        this->simplifiedUniverse.strandTo.push_back(EMPTY_BACKGROUND);
         this->simplifiedUniverse.strandBeadType.push_back(solventAtomType);
         this->simplifiedUniverse.beadsInStrand.push_back(chainLength);
         this->simplifiedUniverse.beadDistanceInStrand.push_back(
@@ -280,9 +279,9 @@ namespace utils {
      * @param beadsPerChains
      * @param strandAtomType
      */
-    void addAndLinkMonofunctionalStrands(int nrOfStrands,
-                                         std::vector<int> beadsPerChains,
-                                         int strandAtomType = 1)
+    void addMonofunctionalStrands(int nrOfStrands,
+                                  std::vector<int> beadsPerChains,
+                                  int strandAtomType = 1)
     {
       INVALIDARG_EXP_IFN(beadsPerChains.size() == nrOfStrands,
                          "Nr of strands (" + std::to_string(nrOfStrands) +
@@ -290,28 +289,6 @@ namespace utils {
                            "of chainLengths (" +
                            std::to_string(beadsPerChains.size()) +
                            ") provided.");
-
-      long int nCrosslinks = this->crossLinkerIdxs.size();
-      long int nrOfAvailableSites =
-        std::reduce(this->remainingCrossLinkerFunctionality.begin(),
-                    this->remainingCrossLinkerFunctionality.end(),
-                    0);
-
-      RUNTIME_EXP_IFN(nrOfStrands <= nrOfAvailableSites,
-                      "Not enough cross-link sites available to link all these "
-                      "monofunctional strands.");
-
-      std::vector<size_t> availableCrosslinkSites;
-      availableCrosslinkSites.reserve(nrOfAvailableSites);
-      for (size_t i = 0; i < nCrosslinks; ++i) {
-        for (long int s = 0; s < this->remainingCrossLinkerFunctionality[i];
-             ++s) {
-          availableCrosslinkSites.push_back(this->crossLinkerIdxs[i]);
-        }
-      }
-      std::shuffle(availableCrosslinkSites.begin(),
-                   availableCrosslinkSites.end(),
-                   this->rng);
 
       for (size_t i = 0; i < nrOfStrands; ++i) {
         this->simplifiedUniverse.strandBeadType.push_back(strandAtomType);
@@ -320,48 +297,62 @@ namespace utils {
           this->beadDistance);
         this->simplifiedUniverse.meanSquaredBeadDistanceInStrand.push_back(
           this->meanSquaredBeadDistance);
-        this->simplifiedUniverse.strandFrom.push_back(
-          availableCrosslinkSites[i]);
-        this->remainingCrossLinkerFunctionality[availableCrosslinkSites[i]] -=
-          1;
-        this->nrOfAvailableCrosslinkSites -= 1;
-        this->simplifiedUniverse.strandTo.push_back(-1);
+        this->simplifiedUniverse.strandFrom.push_back(UNCONNECTED);
+        this->simplifiedUniverse.strandTo.push_back(EMPTY_BACKGROUND);
       }
     }
+
+    void addMonofunctionalStrands(int nrOfStrands,
+                                  int chainLength,
+                                  int strandAtomType = 1)
+    {
+      const std::vector<int> chainLengths =
+        pylimer_tools::utils::initializeWithValue<int>(nrOfStrands,
+                                                       chainLength);
+      return this->addMonofunctionalStrands(
+        nrOfStrands, chainLengths, strandAtomType);
+    }
+
+    void addStrands(const int nrOfStrands,
+                    const std::vector<int> beadsPerChains,
+                    const int strandAtomType = 1)
+    {
+      for (size_t strandIdx = 0; strandIdx < nrOfStrands; ++strandIdx) {
+        this->simplifiedUniverse.strandBeadType.push_back(strandAtomType);
+        this->simplifiedUniverse.beadsInStrand.push_back(
+          beadsPerChains[strandIdx]);
+        this->simplifiedUniverse.beadDistanceInStrand.push_back(
+          this->beadDistance);
+        this->simplifiedUniverse.meanSquaredBeadDistanceInStrand.push_back(
+          this->meanSquaredBeadDistance);
+        this->simplifiedUniverse.strandFrom.push_back(UNCONNECTED);
+        this->simplifiedUniverse.strandTo.push_back(UNCONNECTED);
+      }
+    }
+
+    void addStrands(int nrOfStrands, int chainLength, int strandAtomType = 1)
+    {
+      const std::vector<int> chainLengths =
+        pylimer_tools::utils::initializeWithValue<int>(nrOfStrands,
+                                                       chainLength);
+      return this->addStrands(nrOfStrands, chainLengths, strandAtomType);
+    };
 
     /**
      * @brief Add strands, link them to the cross-links, stop when the callback
      * says so
      *
-     * @param nrOfStrands the number of strands to add
-     * @param beadsPerChains the number of beads per strand `N`
      * @param stopLinking a callback to indicated whether to stop linking
-     * @param strandAtomType the type of the atoms in the strands
      * @param cInfinity `C_\infty` for `<R_ee^2>_0` from `N` and `<b^2>`
      */
-    void addAndLinkStrandsCallback(
-      int nrOfStrands,
-      std::vector<int> beadsPerChains,
+    void linkStrandsCallback(
       std::function<bool(const MCUniverseGenerator&)> stopLinking,
-      int strandAtomType = 1,
       double cInfinity = 1.)
     {
-      INVALIDARG_EXP_IFN(beadsPerChains.size() == nrOfStrands,
-                         "Nr of strands (" + std::to_string(nrOfStrands) +
-                           ") must be equal to the number "
-                           "of chainLengths (" +
-                           std::to_string(beadsPerChains.size()) +
-                           ") provided.");
-
-      RUNTIME_EXP_IFN(
-        this->crossLinkerIdxs.size() ==
-          this->remainingCrossLinkerFunctionality.size(),
-        "Invalid internal state, the remaining cross-linker functionalities "
-        "are inconsistent with the indices of the cross-links.");
       this->validateInternalState();
 
       // prepare sampling of partners
-      long int nCrosslinks = this->crossLinkerIdxs.size();
+      long int nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
       int nrOfStrandsAdded = 0;
 
       double currentCrosslinkerConversion =
@@ -373,11 +364,16 @@ namespace utils {
       size_t nStrandsBefore = this->simplifiedUniverse.strandFrom.size();
 
       std::vector<size_t> availableStrandEnds;
+      size_t nrOfStrands = this->simplifiedUniverse.strandFrom.size();
       availableStrandEnds.reserve(2 * nrOfStrands);
       for (size_t i = 0; i < nrOfStrands; ++i) {
-        // each strand is available with two ends
-        availableStrandEnds.push_back(i + nStrandsBefore);
-        availableStrandEnds.push_back(i + nStrandsBefore);
+        // each strand is available with two ends, assuming they are unconnected
+        if (this->simplifiedUniverse.strandFrom[i] == UNCONNECTED) {
+          availableStrandEnds.push_back(i + nStrandsBefore);
+        }
+        if (this->simplifiedUniverse.strandTo[i] == UNCONNECTED) {
+          availableStrandEnds.push_back(i + nStrandsBefore);
+        }
       }
       std::shuffle(
         availableStrandEnds.begin(), availableStrandEnds.end(), this->rng);
@@ -394,18 +390,6 @@ namespace utils {
                    availableCrosslinkSites.end(),
                    this->rng);
 
-      for (size_t strandIdx = 0; strandIdx < nrOfStrands; ++strandIdx) {
-        this->simplifiedUniverse.strandBeadType.push_back(strandAtomType);
-        this->simplifiedUniverse.beadsInStrand.push_back(
-          beadsPerChains[strandIdx]);
-        this->simplifiedUniverse.beadDistanceInStrand.push_back(
-          this->beadDistance);
-        this->simplifiedUniverse.meanSquaredBeadDistanceInStrand.push_back(
-          this->meanSquaredBeadDistance);
-        this->simplifiedUniverse.strandFrom.push_back(-1);
-        this->simplifiedUniverse.strandTo.push_back(-1);
-      }
-
       const double timesNForR02 = this->meanSquaredBeadDistance * cInfinity;
 
       // link one strand at a time until we reach the target conversion
@@ -416,14 +400,16 @@ namespace utils {
 
         size_t strandIdx = availableStrandEnds[sampleIdx];
 
-        if (this->simplifiedUniverse.strandFrom[strandIdx] != -1) {
+        if (this->simplifiedUniverse.strandFrom[strandIdx] != UNCONNECTED) {
           // we don't have free cross-link choice
-          RUNTIME_EXP_IFN(this->simplifiedUniverse.strandTo[strandIdx] == -1,
+          RUNTIME_EXP_IFN(this->simplifiedUniverse.strandTo[strandIdx] < 0,
                           "Expected second strand end to be free");
 
           size_t partnerCrosslinker = this->findAppropriateLink(
             this->simplifiedUniverse.strandFrom[strandIdx],
-            static_cast<double>(beadsPerChains[strandIdx] + 1) * timesNForR02,
+            static_cast<double>(
+              this->simplifiedUniverse.beadsInStrand[strandIdx] + 1) *
+              timesNForR02,
             -1. // beadsPerChains[strandIdx] * this->beadDistance
           );
 
@@ -446,8 +432,7 @@ namespace utils {
             break;
           }
 
-          this->simplifiedUniverse.strandFrom[strandIdx] =
-            this->crossLinkerIdxs[crosslinkIdxIdx];
+          this->simplifiedUniverse.strandFrom[strandIdx] = crosslinkIdxIdx;
           this->remainingCrossLinkerFunctionality[crosslinkIdxIdx] -= 1;
           this->nrOfAvailableCrosslinkSites -= 1;
         }
@@ -457,17 +442,12 @@ namespace utils {
     /**
      * @brief Add strands in between the cross-linkers, link them as appropriate
      *
-     * @param nrOfStrands the nr. of Strands to add
-     * @param beadsPerChains the nr. of beads per strand (excl. cross-linkers)
      * @param targetCrossLinkerConversion "p", the target conversion of the
      * cross-linkers
-     * @param strandAtomType the type of the strand atoms
+     * @param cInfinity `C_\infty` for `<R_ee^2>_0` from `N` and `<b^2>`
      */
-    void addAndLinkStrandsToConversion(const int nrOfStrands,
-                                       const std::vector<int> beadsPerChains,
-                                       const double targetCrossLinkerConversion,
-                                       const int strandAtomType = 1,
-                                       const double cInfinity = 1.)
+    void linkStrandsToConversion(const double targetCrossLinkerConversion,
+                                 const double cInfinity = 1.)
     {
       const double conversionPerBond =
         (1.0) /
@@ -483,7 +463,15 @@ namespace utils {
           std::to_string(currentCrosslinkerConversion) + " and 1, got " +
           std::to_string(targetCrossLinkerConversion) + ".");
 
-      const int potentialNewBonds = 2 * nrOfStrands;
+      long int potentialNewBonds = 0;
+      for (size_t i = 0; i < this->simplifiedUniverse.strandFrom.size(); ++i) {
+        if (this->simplifiedUniverse.strandFrom[i] == UNCONNECTED) {
+          potentialNewBonds += 1;
+        }
+        if (this->simplifiedUniverse.strandTo[i] == UNCONNECTED) {
+          potentialNewBonds += 1;
+        }
+      }
       if (currentCrosslinkerConversion + potentialNewBonds * conversionPerBond <
           targetCrossLinkerConversion) {
         throw std::invalid_argument(
@@ -497,46 +485,22 @@ namespace utils {
         static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
       const double timesNForR02 = this->meanSquaredBeadDistance * cInfinity;
 
-      this->addAndLinkStrandsCallback(
-        nrOfStrands,
-        beadsPerChains,
+      this->linkStrandsCallback(
         [targetNrOfAvailableCrosslinkSites](const MCUniverseGenerator& gen) {
           return gen.nrOfAvailableCrosslinkSites <=
                  targetNrOfAvailableCrosslinkSites;
         },
-        strandAtomType,
         cInfinity);
     }
-
-    void addAndLinkStrandsToConversion(int nrOfStrands,
-                                       int chainLength,
-                                       double crossLinkerConversion,
-                                       int strandAtomType = 1,
-                                       double cInfinity = 1.)
-    {
-      const std::vector<int> chainLengths =
-        pylimer_tools::utils::initializeWithValue<int>(nrOfStrands,
-                                                       chainLength);
-      return this->addAndLinkStrandsToConversion(nrOfStrands,
-                                                 chainLengths,
-                                                 crossLinkerConversion,
-                                                 strandAtomType,
-                                                 cInfinity);
-    };
 
     /**
      * @brief Add strands in between the cross-linkers, link them as appropriate
      *
-     * @param nrOfStrands the nr. of Strands to add
-     * @param beadsPerChains the nr. of beads per strand (excl. cross-linkers)
      * @param targetSolubleFraction "w_sol", the target soluble fraction
-     * @param strandAtomType the type of the strand atoms
+     * @param cInfinity `C_\infty` for `<R_ee^2>_0` from `N` and `<b^2>`
      */
-    void addAndLinkStrandsToSolubleFraction(int nrOfStrands,
-                                            std::vector<int> beadsPerChains,
-                                            double targetSolubleFraction,
-                                            int strandAtomType = 1,
-                                            double cInfinity = 1.)
+    void linkStrandsToSolubleFraction(double targetSolubleFraction,
+                                      double cInfinity = 1.)
     {
       INVALIDARG_EXP_IFN(targetSolubleFraction >= 0. &&
                            targetSolubleFraction <= 1.,
@@ -544,15 +508,12 @@ namespace utils {
                            std::to_string(targetSolubleFraction) + ".");
 
       size_t nAtomsTotal =
-        std::reduce(beadsPerChains.begin(), beadsPerChains.end(), 0) +
         std::reduce(this->simplifiedUniverse.beadsInStrand.begin(),
                     this->simplifiedUniverse.beadsInStrand.end(),
                     0) +
         this->simplifiedUniverse.xlinkTypes.size();
 
-      this->addAndLinkStrandsCallback(
-        nrOfStrands,
-        beadsPerChains,
+      this->linkStrandsCallback(
         [targetSolubleFraction, nAtomsTotal](const MCUniverseGenerator& gen) {
           pylimer_tools::sim::mehp::Network frNet =
             gen.convertToForceRelaxationNetwork();
@@ -572,24 +533,7 @@ namespace utils {
                    static_cast<double>(nAtomsTotal);
           return solubleFraction <= targetSolubleFraction;
         },
-        strandAtomType,
         cInfinity);
-    }
-
-    void addAndLinkStrandsToSolubleFraction(int nrOfStrands,
-                                            int chainLength,
-                                            double targetSolubleFraction,
-                                            int strandAtomType = 1,
-                                            double cInfinity = 1.)
-    {
-      std::vector<int> chainLengths =
-        pylimer_tools::utils::initializeWithValue<int>(nrOfStrands,
-                                                       chainLength);
-      return this->addAndLinkStrandsToSolubleFraction(nrOfStrands,
-                                                      chainLengths,
-                                                      targetSolubleFraction,
-                                                      strandAtomType,
-                                                      cInfinity);
     }
 
     /**
@@ -606,15 +550,16 @@ namespace utils {
       forceRelaxationNetwork.L[2] = this->box.getLz();
       forceRelaxationNetwork.vol = this->box.getVolume();
 
-      forceRelaxationNetwork.nrOfNodes = this->crossLinkerIdxs.size();
+      const size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
+      forceRelaxationNetwork.nrOfNodes = nCrosslinks;
       forceRelaxationNetwork.oldAtomIds =
         Eigen::ArrayXi::Zero(forceRelaxationNetwork.nrOfNodes);
       forceRelaxationNetwork.coordinates =
         Eigen::VectorXd(forceRelaxationNetwork.nrOfNodes * 3);
-      forceRelaxationNetwork.springIndicesOfLinks.reserve(
-        this->crossLinkerIdxs.size());
+      forceRelaxationNetwork.springIndicesOfLinks.reserve(nCrosslinks);
       size_t i = 0;
-      for (size_t crosslinkIdx : this->crossLinkerIdxs) {
+      for (size_t crosslinkIdx = 0; crosslinkIdx < nCrosslinks;
+           ++crosslinkIdx) {
         forceRelaxationNetwork.coordinates(3 * i + 0) =
           this->simplifiedUniverse.xlinkX[crosslinkIdx];
         forceRelaxationNetwork.coordinates(3 * i + 1) =
@@ -640,15 +585,15 @@ namespace utils {
       for (size_t springIdx = 0;
            springIdx < this->simplifiedUniverse.strandFrom.size();
            ++springIdx) {
-        if (this->simplifiedUniverse.strandTo[springIdx] != -1) {
-          // TODO: get rid of this->crossLinkerIdxs
+        if (this->simplifiedUniverse.strandTo[springIdx] >= 0) {
           long int from = this->simplifiedUniverse.strandFrom[springIdx];
           long int to = this->simplifiedUniverse.strandTo[springIdx];
           forceRelaxationNetwork.springIndexA(newSpringIdx) = from;
           forceRelaxationNetwork.springIndexB(newSpringIdx) = to;
           forceRelaxationNetwork.springIndicesOfLinks[from].push_back(
             newSpringIdx);
-          forceRelaxationNetwork.springIndicesOfLinks[to].push_back(newSpringIdx);
+          forceRelaxationNetwork.springIndicesOfLinks[to].push_back(
+            newSpringIdx);
           forceRelaxationNetwork.springsContourLength(newSpringIdx) =
             this->simplifiedUniverse.beadsInStrand[springIdx] + 1;
           newSpringIdx += 1;
@@ -707,15 +652,15 @@ namespace utils {
 
       // copy results
       forceRelaxationNetwork = forceRelaxer.getNetwork();
-      RUNTIME_EXP_IFN(forceRelaxationNetwork.nrOfNodes ==
-                        this->crossLinkerIdxs.size(),
+      size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
+      RUNTIME_EXP_IFN(forceRelaxationNetwork.nrOfNodes == nCrosslinks,
                       "Expected force relaxation to preserve cross-links.");
       for (size_t i = 0; i < forceRelaxationNetwork.nrOfNodes; ++i) {
-        this->simplifiedUniverse.xlinkX[this->crossLinkerIdxs[i]] =
+        this->simplifiedUniverse.xlinkX[i] =
           forceRelaxationNetwork.coordinates(3 * i + 0);
-        this->simplifiedUniverse.xlinkY[this->crossLinkerIdxs[i]] =
+        this->simplifiedUniverse.xlinkY[i] =
           forceRelaxationNetwork.coordinates(3 * i + 1);
-        this->simplifiedUniverse.xlinkZ[this->crossLinkerIdxs[i]] =
+        this->simplifiedUniverse.xlinkZ[i] =
           forceRelaxationNetwork.coordinates(3 * i + 2);
       }
     }
@@ -731,7 +676,6 @@ namespace utils {
     std::uniform_real_distribution<double> distZ;
 
     CrosslinkerUniverse simplifiedUniverse;
-    std::vector<size_t> crossLinkerIdxs;
     long int originalNrOfAvailableCrosslinkSites = 0;
     long int nrOfAvailableCrosslinkSites = 0;
     std::vector<int> remainingCrossLinkerFunctionality;
@@ -999,21 +943,21 @@ namespace utils {
                                const double desiredR02,
                                const double maxDistance)
     {
-      assert(this->crossLinkerIdxs.size() ==
+      assert(this->simplifiedUniverse.xlinkTypes.size() ==
              this->remainingCrossLinkerFunctionality.size());
 
       std::vector<size_t> suitableMatches;
       std::vector<double> matchWeights;
       double sumOfWeights = 0.0;
       const double normalisationFactorInExponential = -3. / (2. * desiredR02);
+      size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
       // TODO: use a neighbour list instead, maybe?
-      for (int i = 0; i < this->crossLinkerIdxs.size(); ++i) {
+      for (int i = 0; i < nCrosslinks; ++i) {
         if (this->remainingCrossLinkerFunctionality[i] < 1) {
           continue;
         }
-        size_t partner = this->crossLinkerIdxs[i];
-        Eigen::Vector3d dist =
-          this->getVectorBetween(from, this->crossLinkerIdxs[i]);
+        size_t partner = i;
+        Eigen::Vector3d dist = this->getVectorBetween(from, i);
         if (dist.norm() < maxDistance || maxDistance < 0.) {
           suitableMatches.push_back(partner);
           double thisWeight =
@@ -1092,8 +1036,16 @@ namespace utils {
           this->simplifiedUniverse.beadDistanceInStrand.size(),
           this->simplifiedUniverse.meanSquaredBeadDistanceInStrand.size()),
         "Inconsistent sizes in simplified universe.");
+      RUNTIME_EXP_IFN(
+        all_equal<size_t>(5,
+                          this->simplifiedUniverse.xlinkTypes.size(),
+                          this->simplifiedUniverse.xlinkX.size(),
+                          this->simplifiedUniverse.xlinkY.size(),
+                          this->simplifiedUniverse.xlinkZ.size(),
+                          this->remainingCrossLinkerFunctionality.size()),
+        "Inconsistent sizes in simplified universe.");
 
-      long int nCrosslinks = this->crossLinkerIdxs.size();
+      long int nCrosslinks = this->simplifiedUniverse.xlinkX.size();
       const long int nrOfAvailableSites =
         std::reduce(this->remainingCrossLinkerFunctionality.begin(),
                     this->remainingCrossLinkerFunctionality.end(),
