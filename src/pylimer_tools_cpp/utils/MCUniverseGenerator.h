@@ -34,6 +34,8 @@ namespace utils {
     std::vector<double> xlinkX;
     std::vector<double> xlinkY;
     std::vector<double> xlinkZ;
+    std::vector<std::vector<long int>> strandsOfXlink;
+
     std::vector<long int> strandFrom;
     std::vector<long int> strandTo;
     std::vector<int> beadsInStrand;
@@ -104,6 +106,11 @@ namespace utils {
     void configPrimaryLoopProbability(double newPrimaryLoopProbability)
     {
       this->primaryLoopProbability = newPrimaryLoopProbability;
+    }
+
+    void configSecondaryLoopProbability(double newSecondaryLoopProbability)
+    {
+      this->secondaryLoopProbability = newSecondaryLoopProbability;
     }
 
     /**
@@ -231,8 +238,8 @@ namespace utils {
     {
       int nCrosslinkerBefore = this->remainingCrossLinkerFunctionality.size();
 
-      std::vector<size_t> newCrosslinkerIdxs = this->addAtomsWithType(
-        nrOfCrosslinkers, crossLinkerAtomType, whiteNoise);
+      std::vector<size_t> newCrosslinkerIdxs =
+        this->addXlinkAtoms(nrOfCrosslinkers, crossLinkerAtomType, whiteNoise);
       this->crossLinkerIdxs.insert(this->crossLinkerIdxs.end(),
                                    newCrosslinkerIdxs.begin(),
                                    newCrosslinkerIdxs.end());
@@ -429,6 +436,8 @@ namespace utils {
 
           this->simplifiedUniverse.strandTo[strandIdx] = partnerCrosslinker;
           this->remainingCrossLinkerFunctionality[partnerCrosslinker] -= 1;
+          this->simplifiedUniverse.strandsOfXlink[partnerCrosslinker].push_back(
+            strandIdx);
           this->nrOfAvailableCrosslinkSites -= 1;
         } else {
           // otherwise, randomly choose a free cross-link
@@ -449,6 +458,8 @@ namespace utils {
           this->simplifiedUniverse.strandFrom[strandIdx] =
             this->crossLinkerIdxs[crosslinkIdxIdx];
           this->remainingCrossLinkerFunctionality[crosslinkIdxIdx] -= 1;
+          this->simplifiedUniverse.strandsOfXlink[crosslinkIdxIdx].push_back(
+            strandIdx);
           this->nrOfAvailableCrosslinkSites -= 1;
         }
       }
@@ -648,7 +659,8 @@ namespace utils {
           forceRelaxationNetwork.springIndexB(newSpringIdx) = to;
           forceRelaxationNetwork.springIndicesOfLinks[from].push_back(
             newSpringIdx);
-          forceRelaxationNetwork.springIndicesOfLinks[to].push_back(newSpringIdx);
+          forceRelaxationNetwork.springIndicesOfLinks[to].push_back(
+            newSpringIdx);
           forceRelaxationNetwork.springsContourLength(newSpringIdx) =
             this->simplifiedUniverse.beadsInStrand[springIdx] + 1;
           newSpringIdx += 1;
@@ -724,6 +736,7 @@ namespace utils {
     double beadDistance;
     double meanSquaredBeadDistance;
     double primaryLoopProbability = 1.0;
+    double secondaryLoopProbability = 1.0;
     size_t nMcSteps = 2000;
     std::mt19937 rng;
     std::uniform_real_distribution<double> distX;
@@ -846,9 +859,9 @@ namespace utils {
      * @param atomType the type of the atoms to add
      * @return std::vector<size_t> the ids of the inserted atoms
      */
-    std::vector<size_t> addAtomsWithType(int nrOfAtomsToAdd,
-                                         int atomType,
-                                         Eigen::VectorXd coordinates)
+    std::vector<size_t> addXlinkAtoms(int nrOfAtomsToAdd,
+                                      int atomType,
+                                      Eigen::VectorXd coordinates)
     {
       INVALIDARG_EXP_IFN(coordinates.size() % 3 == 0,
                          "Coordinates must have a size multiple of 3");
@@ -872,6 +885,8 @@ namespace utils {
         this->simplifiedUniverse.xlinkX.push_back(coordinates(3 * i));
         this->simplifiedUniverse.xlinkY.push_back(coordinates(3 * i + 1));
         this->simplifiedUniverse.xlinkZ.push_back(coordinates(3 * i + 2));
+
+        this->simplifiedUniverse.strandsOfXlink.push_back({});
       }
 
       return indicesAdded;
@@ -884,13 +899,13 @@ namespace utils {
      * @param atomType the type of the atoms to add
      * @return std::vector<size_t> the ids of the inserted atoms
      */
-    std::vector<size_t> addAtomsWithType(int nrOfAtomsToAdd,
-                                         int atomType,
-                                         bool whiteNoise = true)
+    std::vector<size_t> addXlinkAtoms(int nrOfAtomsToAdd,
+                                      int atomType,
+                                      bool whiteNoise = true)
     {
       Eigen::VectorXd randomPos =
         this->generateRandomPositions(nrOfAtomsToAdd, whiteNoise);
-      return this->addAtomsWithType(nrOfAtomsToAdd, atomType, randomPos);
+      return this->addXlinkAtoms(nrOfAtomsToAdd, atomType, randomPos);
     }
 
     /**
@@ -1022,6 +1037,23 @@ namespace utils {
           if (partner == from) {
             thisWeight *= this->primaryLoopProbability;
           }
+          if (this->secondaryLoopProbability != 1.) {
+            // check whether this cross-link would lead to a secondary loop
+            // => apply weight for every other already existing back-link
+            for (size_t partnersSubStrand :
+                 this->simplifiedUniverse.strandsOfXlink[partner]) {
+              assert(this->simplifiedUniverse.strandFrom[partnersSubStrand] ==
+                       partner ||
+                     this->simplifiedUniverse.strandTo[partnersSubStrand] ==
+                       partner);
+              if (this->simplifiedUniverse.strandFrom[partnersSubStrand] ==
+                    from ||
+                  this->simplifiedUniverse.strandFrom[partnersSubStrand] ==
+                    to) {
+                thisWeight *= this->secondaryLoopProbability;
+              }
+            }
+          }
           matchWeights.push_back(thisWeight);
           sumOfWeights += thisWeight;
         }
@@ -1101,6 +1133,16 @@ namespace utils {
 
       RUNTIME_EXP_IFN(this->nrOfAvailableCrosslinkSites == nrOfAvailableSites,
                       "Inconsistent nr of cross-link sites.");
+
+      for (size_t xlinkIdx = 0; xlinkIdx < nCrosslinks; ++xlinkIdx) {
+        for (long int subStrandIdx :
+             this->simplifiedUniverse.strandsOfXlink[xlinkIdx]) {
+          RUNTIME_EXP_IFN(
+            this->simplifiedUniverse.strandFrom[subStrandIdx] == xlinkIdx ||
+              this->simplifiedUniverse.strandTo[subStrandIdx] == xlinkIdx,
+            "Inconsistent links int list of cross-links <> strands.");
+        }
+      }
     }
   };
 } // namespace utils
