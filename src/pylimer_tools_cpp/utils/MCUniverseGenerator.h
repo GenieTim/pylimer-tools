@@ -116,13 +116,15 @@ namespace utils {
 
     void configPrimaryLoopProbability(double newPrimaryLoopProbability)
     {
-      INVALIDARG_EXP_IFN(newPrimaryLoopProbability >= 0, "Invalid primary loop formation probability");
+      INVALIDARG_EXP_IFN(newPrimaryLoopProbability >= 0,
+                         "Invalid primary loop formation probability");
       this->primaryLoopProbability = newPrimaryLoopProbability;
     }
 
     void configSecondaryLoopProbability(double newSecondaryLoopProbability)
     {
-      INVALIDARG_EXP_IFN(newSecondaryLoopProbability >= 0, "Invalid secondary loop formation probability");
+      INVALIDARG_EXP_IFN(newSecondaryLoopProbability >= 0,
+                         "Invalid secondary loop formation probability");
       this->secondaryLoopProbability = newSecondaryLoopProbability;
     }
 
@@ -364,7 +366,7 @@ namespace utils {
      * @param cInfinity `C_\infty` for `<R_ee^2>_0` from `N` and `<b^2>`
      */
     void linkStrandsCallback(
-      std::function<BackTrackStatus(const MCUniverseGenerator&)>
+      std::function<BackTrackStatus(const MCUniverseGenerator&, size_t)>
         linkingController,
       double cInfinity = 1.)
     {
@@ -413,9 +415,10 @@ namespace utils {
       const double timesNForR02 = this->meanSquaredBeadDistance * cInfinity;
 
       // link one strand at a time until we reach the target conversion
-      for (int sampleIdx = 0; sampleIdx < availableStrandEnds.size();
+      for (size_t sampleIdx = 0; sampleIdx < availableStrandEnds.size();
            ++sampleIdx) {
-        BackTrackStatus status = linkingController(*this);
+        BackTrackStatus status =
+          linkingController(*this, availableStrandEnds.size() - sampleIdx);
         if (status == BackTrackStatus::STOP) {
           break;
         } else if (status == BackTrackStatus::TRACK_FORWARD) {
@@ -552,7 +555,8 @@ namespace utils {
       const double timesNForR02 = this->meanSquaredBeadDistance * cInfinity;
 
       this->linkStrandsCallback(
-        [targetNrOfAvailableCrosslinkSites](const MCUniverseGenerator& gen) {
+        [targetNrOfAvailableCrosslinkSites](const MCUniverseGenerator& gen,
+                                            size_t nStrandsRemaining) {
           if (gen.nrOfAvailableCrosslinkSites <=
               targetNrOfAvailableCrosslinkSites) {
             return BackTrackStatus::STOP;
@@ -593,9 +597,14 @@ namespace utils {
          &status,
          &nSteps,
          &lastStep,
-         &currentStep](const MCUniverseGenerator& gen) {
+         &currentStep](const MCUniverseGenerator& gen,
+                       size_t nStrandsRemaining) {
           currentStep += 1;
-          if (currentStep < lastStep + nSteps) {
+          // make large step without force relaxation
+          if ((currentStep < lastStep + nSteps) &&
+              // but only if the last strand will not be reached with this large
+              // step
+              (nStrandsRemaining > 2)) {
             return status;
           }
 
