@@ -17,6 +17,7 @@
 #include <iostream>
 #include <map>
 #include <math.h>/* isnan, sqrt */
+#include <stack>
 #include <string>
 #include <vector>
 #ifndef M_PI
@@ -30,6 +31,13 @@ namespace utils {
 
 #define UNCONNECTED -1
 #define EMPTY_BACKGROUND -2
+
+  enum BackTrackStatus
+  {
+    STOP,
+    TRACK_FORWARD,
+    TRACK_BACKWARD,
+  };
 
   struct CrosslinkerUniverse
   {
@@ -244,7 +252,7 @@ namespace utils {
       int nCrosslinkerBefore = this->remainingCrossLinkerFunctionality.size();
 
       this->addXlinkAtoms(nrOfCrosslinkers, crossLinkerAtomType, whiteNoise);
-        
+
       this->remainingCrossLinkerFunctionality.reserve(nCrosslinkerBefore +
                                                       nrOfCrosslinkers);
       this->originalNrOfAvailableCrosslinkSites +=
@@ -356,7 +364,8 @@ namespace utils {
      * @param cInfinity `C_\infty` for `<R_ee^2>_0` from `N` and `<b^2>`
      */
     void linkStrandsCallback(
-      std::function<bool(const MCUniverseGenerator&)> stopLinking,
+      std::function<BackTrackStatus(const MCUniverseGenerator&)>
+        linkingController,
       double cInfinity = 1.)
     {
       this->validateInternalState();
@@ -399,66 +408,101 @@ namespace utils {
                    availableCrosslinkSites.end(),
                    this->rng);
 
+      std::stack<size_t> removedCrosslinkSites;
+      // removedCrosslinkSites.reserve(availableCrosslinkSites.size());
       const double timesNForR02 = this->meanSquaredBeadDistance * cInfinity;
 
       // link one strand at a time until we reach the target conversion
       for (int sampleIdx = 0; sampleIdx < availableStrandEnds.size();
            ++sampleIdx) {
-        if (stopLinking(*this)) {
+        BackTrackStatus status = linkingController(*this);
+        if (status == BackTrackStatus::STOP) {
           break;
-        }
-
-        size_t strandIdx = availableStrandEnds[sampleIdx];
-        RUNTIME_EXP_IFN(
-          this->simplifiedUniverse.strandTo[strandIdx] < 0,
-          "Expected second strand end to be free, got " +
-            std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
-            " for strand " + std::to_string(strandIdx) + ".");
-
-        if (this->simplifiedUniverse.strandFrom[strandIdx] >= 0) {
+        } else if (status == BackTrackStatus::TRACK_FORWARD) {
+          size_t strandIdx = availableStrandEnds[sampleIdx];
           RUNTIME_EXP_IFN(
-            this->simplifiedUniverse.strandTo[strandIdx] == UNCONNECTED,
+            this->simplifiedUniverse.strandTo[strandIdx] < 0,
             "Expected second strand end to be free, got " +
               std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
               " for strand " + std::to_string(strandIdx) + ".");
-          // we don't have free cross-link choice
-          // find one that follows the desired end-to-end distribution
-          size_t partnerCrosslinker = this->findAppropriateLink(
-            this->simplifiedUniverse.strandFrom[strandIdx],
-            static_cast<double>(
-              this->simplifiedUniverse.beadsInStrand[strandIdx] + 1) *
-              timesNForR02,
-            -1. // beadsPerChains[strandIdx] * this->beadDistance
-          );
 
-          this->simplifiedUniverse.strandTo[strandIdx] = partnerCrosslinker;
-          this->remainingCrossLinkerFunctionality[partnerCrosslinker] -= 1;
-          this->simplifiedUniverse.strandsOfXlink[partnerCrosslinker].push_back(
-            strandIdx);
-          this->nrOfAvailableCrosslinkSites -= 1;
+          if (this->simplifiedUniverse.strandFrom[strandIdx] >= 0) {
+            RUNTIME_EXP_IFN(
+              this->simplifiedUniverse.strandTo[strandIdx] == UNCONNECTED,
+              "Expected second strand end to be free, got " +
+                std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
+                " for strand " + std::to_string(strandIdx) + ".");
+            // we don't have free cross-link choice
+            // find one that follows the desired end-to-end distribution
+            size_t partnerCrosslinker = this->findAppropriateLink(
+              this->simplifiedUniverse.strandFrom[strandIdx],
+              static_cast<double>(
+                this->simplifiedUniverse.beadsInStrand[strandIdx] + 1) *
+                timesNForR02,
+              -1. // beadsPerChains[strandIdx] * this->beadDistance
+            );
+
+            this->simplifiedUniverse.strandTo[strandIdx] = partnerCrosslinker;
+            this->remainingCrossLinkerFunctionality[partnerCrosslinker] -= 1;
+            this->simplifiedUniverse.strandsOfXlink[partnerCrosslinker]
+              .push_back(strandIdx);
+            this->nrOfAvailableCrosslinkSites -= 1;
+          } else {
+            // otherwise, randomly choose a free cross-link
+            long int crosslinkIdxIdx;
+            do {
+              // find the next "available" cross-linker
+              crosslinkIdxIdx = availableCrosslinkSites.back();
+              removedCrosslinkSites.push(crosslinkIdxIdx);
+              availableCrosslinkSites.pop_back();
+            } while (this->remainingCrossLinkerFunctionality[crosslinkIdxIdx] <
+                       1 &&
+                     availableCrosslinkSites.size() > 0);
+
+            if (availableCrosslinkSites.size() == 0) {
+              std::cerr << "No more cross-link sites available." << std::endl;
+              break;
+            }
+
+            this->simplifiedUniverse.strandFrom[strandIdx] = crosslinkIdxIdx;
+            this->remainingCrossLinkerFunctionality[crosslinkIdxIdx] -= 1;
+            this->simplifiedUniverse.strandsOfXlink[crosslinkIdxIdx].push_back(
+              strandIdx);
+            this->nrOfAvailableCrosslinkSites -= 1;
+          }
         } else {
-          // otherwise, randomly choose a free cross-link
-          long int crosslinkIdxIdx = availableCrosslinkSites.back();
-          availableCrosslinkSites.pop_back();
-          while (this->remainingCrossLinkerFunctionality[crosslinkIdxIdx] < 1 &&
-                 availableCrosslinkSites.size() > 0) {
-            // find the next "available" cross-linker
-            crosslinkIdxIdx = availableCrosslinkSites.back();
-            availableCrosslinkSites.pop_back();
+          assert(status == BackTrackStatus::TRACK_BACKWARD);
+          // track backward -> reset the last link done
+          sampleIdx -= 1;
+          long int strandIdx = availableStrandEnds[sampleIdx];
+          // this strand has been assigned a partner last step, add it again
+          long int linkedXlink = -1;
+          if (this->simplifiedUniverse.strandTo[strandIdx] >= 0) {
+            linkedXlink = this->simplifiedUniverse.strandTo[strandIdx];
+            this->simplifiedUniverse.strandTo[strandIdx] = UNCONNECTED;
+          } else {
+            linkedXlink = this->simplifiedUniverse.strandFrom[strandIdx];
+            this->simplifiedUniverse.strandFrom[strandIdx] = UNCONNECTED;
+            size_t lastRemoved;
+            // need to re-fill the available cross-link sites for the
+            // first strand end
+            do {
+              lastRemoved = removedCrosslinkSites.top();
+              removedCrosslinkSites.pop();
+              availableCrosslinkSites.push_back(lastRemoved);
+            } while (lastRemoved != linkedXlink);
           }
 
-          if (availableCrosslinkSites.size() == 0) {
-            std::cerr << "No more cross-link sites available." << std::endl;
-            break;
-          }
+          this->remainingCrossLinkerFunctionality[linkedXlink] += 1;
+          this->simplifiedUniverse.strandsOfXlink[linkedXlink].pop_back();
+          this->nrOfAvailableCrosslinkSites += 1;
 
-          this->simplifiedUniverse.strandFrom[strandIdx] = crosslinkIdxIdx;
-          this->remainingCrossLinkerFunctionality[crosslinkIdxIdx] -= 1;
-          this->simplifiedUniverse.strandsOfXlink[crosslinkIdxIdx].push_back(
-            strandIdx);
-          this->nrOfAvailableCrosslinkSites -= 1;
+          // one step back more, since the iteration will iterate anyway
+          sampleIdx -= 1;
         }
       }
+
+      this->validateInternalState();
     }
 
     /**
@@ -509,8 +553,11 @@ namespace utils {
 
       this->linkStrandsCallback(
         [targetNrOfAvailableCrosslinkSites](const MCUniverseGenerator& gen) {
-          return gen.nrOfAvailableCrosslinkSites <=
-                 targetNrOfAvailableCrosslinkSites;
+          if (gen.nrOfAvailableCrosslinkSites <=
+              targetNrOfAvailableCrosslinkSites) {
+            return BackTrackStatus::STOP;
+          };
+          return BackTrackStatus::TRACK_FORWARD;
         },
         cInfinity);
     }
@@ -535,8 +582,24 @@ namespace utils {
                     0) +
         this->simplifiedUniverse.xlinkTypes.size();
 
+      BackTrackStatus status = BackTrackStatus::TRACK_FORWARD;
+      int nSteps = this->simplifiedUniverse.xlinkTypes.size();
+      int lastStep = 0;
+      int currentStep = 0;
+
       this->linkStrandsCallback(
-        [targetSolubleFraction, nAtomsTotal](const MCUniverseGenerator& gen) {
+        [targetSolubleFraction,
+         nAtomsTotal,
+         &status,
+         &nSteps,
+         &lastStep,
+         &currentStep](const MCUniverseGenerator& gen) {
+          currentStep += 1;
+          if (currentStep < lastStep + nSteps) {
+            return status;
+          }
+
+          lastStep = currentStep;
           pylimer_tools::sim::mehp::Network frNet =
             gen.convertToForceRelaxationNetwork();
 
@@ -546,14 +609,29 @@ namespace utils {
           forceRelaxer.configAssumeBoxLargeEnough(true);
 
           while (forceRelaxer.suggestsRerun()) {
-            forceRelaxer.runForceRelaxation("LD_MMA", 2500, 1e-9, 1e-7);
+            forceRelaxer.runForceRelaxation("LD_MMA", 5000, 1e-9, 1e-7);
           }
 
           // finally, calculate the soluble fraction
           double solubleFraction =
             1. - forceRelaxer.countActiveClusteredAtoms() /
                    static_cast<double>(nAtomsTotal);
-          return solubleFraction <= targetSolubleFraction;
+          if (solubleFraction > targetSolubleFraction) {
+            if (status == BackTrackStatus::TRACK_BACKWARD) {
+              nSteps /= 4;
+            }
+            status = BackTrackStatus::TRACK_FORWARD;
+            return status;
+          } else if (solubleFraction == targetSolubleFraction) {
+            return BackTrackStatus::STOP;
+          } else {
+            if (nSteps == 1) {
+              return BackTrackStatus::STOP;
+            }
+            status = BackTrackStatus::TRACK_BACKWARD;
+            nSteps /= 2;
+            return BackTrackStatus::TRACK_BACKWARD;
+          };
         },
         cInfinity);
     }
