@@ -907,7 +907,7 @@ namespace sim {
         INVALIDARG_EXP_IFN(net->nrOfSprings * 3 == springDistances.size(),
                            "Spring distances and network don't match");
         if (net->nrOfSprings < 1) {
-          return 1.;
+          return 0.;
         }
         // find all active springs
         Eigen::ArrayXb activeSprings =

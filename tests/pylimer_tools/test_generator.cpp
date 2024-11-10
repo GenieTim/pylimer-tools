@@ -214,7 +214,7 @@ TEST_CASE("Universe can cross-link up to w_sol",
   generator.addCrosslinkers(100, 4, 2);
 
   generator.addStrands(200, 19, 1);
-  generator.linkStrandsToSolubleFraction(0.9, 1.);
+  generator.linkStrandsToSolubleFraction(0.1, 1.);
 
   pe::Universe universe = generator.getUniverse();
   REQUIRE(universe.getVolume() == 10.0 * 10.0 * 10.0);
