@@ -108,11 +108,13 @@ namespace utils {
 
     void configPrimaryLoopProbability(double newPrimaryLoopProbability)
     {
+      INVALIDARG_EXP_IFN(newPrimaryLoopProbability >= 0, "Invalid primary loop formation probability");
       this->primaryLoopProbability = newPrimaryLoopProbability;
     }
 
     void configSecondaryLoopProbability(double newSecondaryLoopProbability)
     {
+      INVALIDARG_EXP_IFN(newSecondaryLoopProbability >= 0, "Invalid secondary loop formation probability");
       this->secondaryLoopProbability = newSecondaryLoopProbability;
     }
 
