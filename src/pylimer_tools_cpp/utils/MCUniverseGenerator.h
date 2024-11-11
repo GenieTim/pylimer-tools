@@ -600,11 +600,11 @@ namespace utils {
          &currentStep](const MCUniverseGenerator& gen,
                        size_t nStrandsRemaining) {
           currentStep += 1;
-          nSteps =
-            std::max<long int>(std::min<long int>(nSteps,
-                              static_cast<long int>(
-                                gen.simplifiedUniverse.xlinkTypes.size())),
-                     (long int)1);
+          nSteps = std::max<long int>(
+            std::min<long int>(
+              nSteps,
+              static_cast<long int>(gen.simplifiedUniverse.xlinkTypes.size())),
+            (long int)1);
           // make large step without force relaxation
           if ((currentStep < lastStep + nSteps) &&
               // but only if the last strand will not be reached with this large
@@ -668,26 +668,43 @@ namespace utils {
       forceRelaxationNetwork.vol = this->box.getVolume();
 
       const size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
-      forceRelaxationNetwork.nrOfNodes = nCrosslinks;
+      size_t nDanglingEnds = 0;
+      std::vector<size_t> danglingEndPartners = {};
+      for (size_t i = 0; i < this->simplifiedUniverse.strandFrom.size(); ++i) {
+        if (this->simplifiedUniverse.strandFrom[i] >= 0 &&
+            this->simplifiedUniverse.strandTo[i] < 0) {
+          nDanglingEnds += 1;
+          danglingEndPartners.push_back(this->simplifiedUniverse.strandFrom[i]);
+        }
+      }
+      forceRelaxationNetwork.nrOfNodes = nCrosslinks + nDanglingEnds;
       forceRelaxationNetwork.oldAtomIds =
         Eigen::ArrayXi::Zero(forceRelaxationNetwork.nrOfNodes);
       forceRelaxationNetwork.coordinates =
         Eigen::VectorXd(forceRelaxationNetwork.nrOfNodes * 3);
       forceRelaxationNetwork.springIndicesOfLinks.reserve(nCrosslinks);
-      size_t i = 0;
       for (size_t crosslinkIdx = 0; crosslinkIdx < nCrosslinks;
            ++crosslinkIdx) {
-        forceRelaxationNetwork.coordinates(3 * i + 0) =
+        forceRelaxationNetwork.coordinates(3 * crosslinkIdx + 0) =
           this->simplifiedUniverse.xlinkX[crosslinkIdx];
-        forceRelaxationNetwork.coordinates(3 * i + 1) =
+        forceRelaxationNetwork.coordinates(3 * crosslinkIdx + 1) =
           this->simplifiedUniverse.xlinkY[crosslinkIdx];
-        forceRelaxationNetwork.coordinates(3 * i + 2) =
+        forceRelaxationNetwork.coordinates(3 * crosslinkIdx + 2) =
           this->simplifiedUniverse.xlinkZ[crosslinkIdx];
-
+      }
+      for (size_t danglingEndIdx = 0; danglingEndIdx < nDanglingEnds;
+           ++danglingEndIdx) {
+        size_t nodeIdx = nCrosslinks + danglingEndIdx;
+        forceRelaxationNetwork.coordinates(3 * nodeIdx + 0) =
+          this->simplifiedUniverse.xlinkX[danglingEndPartners[danglingEndIdx]];
+        forceRelaxationNetwork.coordinates(3 * nodeIdx + 1) =
+          this->simplifiedUniverse.xlinkY[danglingEndPartners[danglingEndIdx]];
+        forceRelaxationNetwork.coordinates(3 * nodeIdx + 2) =
+          this->simplifiedUniverse.xlinkZ[danglingEndPartners[danglingEndIdx]];
+      }
+      for (size_t i = 0; i < forceRelaxationNetwork.nrOfNodes; ++i) {
         std::vector<size_t> empty = {};
         forceRelaxationNetwork.springIndicesOfLinks.push_back(empty);
-
-        i += 1;
       }
 
       size_t nSpringEstimate = this->simplifiedUniverse.strandFrom.size();
@@ -698,13 +715,18 @@ namespace utils {
       forceRelaxationNetwork.springsContourLength =
         Eigen::VectorXd::Zero(nSpringEstimate);
       size_t newSpringIdx = 0;
+      size_t handledDanglingIdx = 0;
       // we omit all dangling and free strands
       for (size_t springIdx = 0;
            springIdx < this->simplifiedUniverse.strandFrom.size();
            ++springIdx) {
-        if (this->simplifiedUniverse.strandTo[springIdx] >= 0) {
-          long int from = this->simplifiedUniverse.strandFrom[springIdx];
-          long int to = this->simplifiedUniverse.strandTo[springIdx];
+        long int from = this->simplifiedUniverse.strandFrom[springIdx];
+        long int to = this->simplifiedUniverse.strandTo[springIdx];
+        if (from >= 0) {
+          if (to < 0) {
+            to = nCrosslinks + handledDanglingIdx;
+            handledDanglingIdx += 1;
+          }
           forceRelaxationNetwork.springIndexA(newSpringIdx) = from;
           forceRelaxationNetwork.springIndexB(newSpringIdx) = to;
           forceRelaxationNetwork.springIndicesOfLinks[from].push_back(
@@ -716,6 +738,7 @@ namespace utils {
           newSpringIdx += 1;
         }
       }
+      assert(handledDanglingIdx == nDanglingEnds);
       const size_t nActualSprings = newSpringIdx;
       forceRelaxationNetwork.springIndexA.conservativeResize(nActualSprings);
       forceRelaxationNetwork.springIndexB.conservativeResize(nActualSprings);

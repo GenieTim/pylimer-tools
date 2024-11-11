@@ -4,6 +4,7 @@
 #include "../../src/pylimer_tools_cpp/entities/Universe.h"
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include "../../src/pylimer_tools_cpp/io/DataFileWriter.h"
+#include "../../src/pylimer_tools_cpp/sim/MEHPForceRelaxation.h"
 #include "../../src/pylimer_tools_cpp/utils/MCUniverseGenerator.h"
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
@@ -203,7 +204,7 @@ TEST_CASE("MCUniverseGenerator can generate without primary loops",
 }
 
 TEST_CASE("Universe can cross-link up to w_sol",
-          "[generator][MCUniverseGenerator][long]")
+          "[generator][MCUniverseGenerator]")
 {
   std::cout << "Running test \"Universe can cross-link up to w_sol\""
             << std::endl;
@@ -223,4 +224,43 @@ TEST_CASE("Universe can cross-link up to w_sol",
 
   auto clusters = universe.getClusters();
   CHECK(clusters.size() < 20);
+}
+
+TEST_CASE("MCUniverseGenerator uses correct force relaxation network",
+          "[generator][MCUniverseGenerator][long]")
+{
+  std::cout << "Running test \"MCUniverseGenerator uses correct force "
+               "relaxation network\""
+            << std::endl;
+
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(20.0, 20.0, 20.0);
+  generator.setSeed(8804);
+  generator.setBeadDistance(0.75);
+  generator.addCrosslinkers(400, 4, 2);
+
+  generator.addStrands(800, 10, 1);
+  generator.linkStrandsToConversion(0.95, 1.);
+
+  pe::Universe universe = generator.getUniverse();
+
+  pylimer_tools::sim::mehp::MEHPForceRelaxation relaxer =
+    pylimer_tools::sim::mehp::MEHPForceRelaxation(
+      universe, 2, false, nullptr, 1.0, false, true);
+  relaxer.configAssumeBoxLargeEnough(true);
+
+  pylimer_tools::sim::mehp::MEHPForceRelaxation relaxerFromGenerator =
+    pylimer_tools::sim::mehp::MEHPForceRelaxation(
+      generator.convertToForceRelaxationNetwork());
+  relaxerFromGenerator.configAssumeBoxLargeEnough(true);
+
+  CHECK(relaxer.countActiveClusteredAtoms() ==
+        Catch::Approx(relaxerFromGenerator.countActiveClusteredAtoms()));
+  CHECK(relaxer.getNrOfNodes() == relaxerFromGenerator.getNrOfNodes());
+
+  relaxer.runForceRelaxation();
+  relaxerFromGenerator.runForceRelaxation();
+
+  CHECK(relaxer.getNrOfNodes() == relaxerFromGenerator.getNrOfNodes());
+  CHECK(relaxer.countActiveClusteredAtoms() ==
+        Catch::Approx(relaxerFromGenerator.countActiveClusteredAtoms()));
 }
