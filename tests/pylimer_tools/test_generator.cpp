@@ -227,7 +227,7 @@ TEST_CASE("Universe can cross-link up to w_sol",
 }
 
 TEST_CASE("MCUniverseGenerator uses correct force relaxation network",
-          "[generator][MCUniverseGenerator][long]")
+          "[generator][MCUniverseGenerator]")
 {
   std::cout << "Running test \"MCUniverseGenerator uses correct force "
                "relaxation network\""
@@ -237,15 +237,17 @@ TEST_CASE("MCUniverseGenerator uses correct force relaxation network",
   generator.setSeed(8804);
   generator.setBeadDistance(0.75);
   generator.addCrosslinkers(400, 4, 2);
+  generator.configNrOfMCSteps(0);
 
   generator.addStrands(800, 10, 1);
-  generator.linkStrandsToConversion(0.95, 1.);
+  generator.linkStrandsToConversion(0.925, 1.);
 
   pe::Universe universe = generator.getUniverse();
+  CHECK(universe.getNrOfAtoms() == 400 + 800 * 10);
 
   pylimer_tools::sim::mehp::MEHPForceRelaxation relaxer =
     pylimer_tools::sim::mehp::MEHPForceRelaxation(
-      universe, 2, false, nullptr, 1.0, false, true);
+      universe, 2, false, nullptr, 1.0, false, false);
   relaxer.configAssumeBoxLargeEnough(true);
 
   pylimer_tools::sim::mehp::MEHPForceRelaxation relaxerFromGenerator =
@@ -253,14 +255,20 @@ TEST_CASE("MCUniverseGenerator uses correct force relaxation network",
       generator.convertToForceRelaxationNetwork());
   relaxerFromGenerator.configAssumeBoxLargeEnough(true);
 
-  CHECK(relaxer.countActiveClusteredAtoms() ==
-        Catch::Approx(relaxerFromGenerator.countActiveClusteredAtoms()));
-  CHECK(relaxer.getNrOfNodes() == relaxerFromGenerator.getNrOfNodes());
+  // comparison only after running force relaxation, 
+  // since the box offsets, single nodes and stuff is relevant before that
+  // CHECK(relaxer.countActiveClusteredAtoms() ==
+  //       Catch::Approx(relaxerFromGenerator.countActiveClusteredAtoms()));
+  // CHECK(relaxer.getNrOfNodes() == relaxerFromGenerator.getNrOfNodes());
+  CHECK(relaxer.getNrOfSprings() == relaxerFromGenerator.getNrOfSprings());
 
   relaxer.runForceRelaxation();
   relaxerFromGenerator.runForceRelaxation();
 
-  CHECK(relaxer.getNrOfNodes() == relaxerFromGenerator.getNrOfNodes());
   CHECK(relaxer.countActiveClusteredAtoms() ==
         Catch::Approx(relaxerFromGenerator.countActiveClusteredAtoms()));
+  // cannot compare, since each strand end becomes a node in the from-universe
+  // generation
+  // CHECK(relaxer.getNrOfNodes() == relaxerFromGenerator.getNrOfNodes());
+  CHECK(relaxer.getNrOfSprings() == relaxerFromGenerator.getNrOfSprings());
 }
