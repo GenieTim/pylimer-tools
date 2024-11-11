@@ -587,9 +587,9 @@ namespace utils {
         this->simplifiedUniverse.xlinkTypes.size();
 
       BackTrackStatus status = BackTrackStatus::TRACK_FORWARD;
-      int nSteps = this->simplifiedUniverse.xlinkTypes.size();
-      int lastStep = 0;
-      int currentStep = 0;
+      long int nSteps = this->simplifiedUniverse.xlinkTypes.size();
+      long int lastStep = 0;
+      long int currentStep = 0;
 
       this->linkStrandsCallback(
         [targetSolubleFraction,
@@ -600,6 +600,11 @@ namespace utils {
          &currentStep](const MCUniverseGenerator& gen,
                        size_t nStrandsRemaining) {
           currentStep += 1;
+          nSteps =
+            std::max<long int>(std::min<long int>(nSteps,
+                              static_cast<long int>(
+                                gen.simplifiedUniverse.xlinkTypes.size())),
+                     (long int)1);
           // make large step without force relaxation
           if ((currentStep < lastStep + nSteps) &&
               // but only if the last strand will not be reached with this large
@@ -618,13 +623,16 @@ namespace utils {
           forceRelaxer.configAssumeBoxLargeEnough(true);
 
           while (forceRelaxer.suggestsRerun()) {
-            forceRelaxer.runForceRelaxation("LD_MMA", 5000, 1e-9, 1e-7);
+            forceRelaxer.runForceRelaxation("LD_MMA", 5000, 1e-12, 1e-9);
           }
 
           // finally, calculate the soluble fraction
           double solubleFraction =
             1. - forceRelaxer.countActiveClusteredAtoms() /
                    static_cast<double>(nAtomsTotal);
+          std::cout << "Got w_sol = " << solubleFraction << " at step "
+                    << currentStep << " (+" << nSteps << ") with "
+                    << nStrandsRemaining << " strands remaining." << std::endl;
           if (solubleFraction > targetSolubleFraction) {
             if (status == BackTrackStatus::TRACK_BACKWARD) {
               nSteps /= 4;

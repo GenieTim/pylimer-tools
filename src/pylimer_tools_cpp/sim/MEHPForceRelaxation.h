@@ -200,7 +200,7 @@ namespace sim {
        * considered inactive
        * @return int
        */
-      int getNrOfActiveNodes(double tolerance = 0.1,
+      int getNrOfActiveNodes(double tolerance = 0.05,
                              int minimumNrOfActiveConnections = 2,
                              int maximumNrOfActiveConnections = -1) const
       {
@@ -217,7 +217,7 @@ namespace sim {
        * @param tolerance
        * @return double
        */
-      double getSolubleWeightFraction(double tolerance = 0.1)
+      double getSolubleWeightFraction(double tolerance = 0.05)
       {
         return this->computeSolubleWeightFraction(&this->forceRelaxationNetwork,
                                                   this->currentSpringDistances,
@@ -231,7 +231,7 @@ namespace sim {
        * @param tolerance
        * @return double
        */
-      double countActiveClusteredAtoms(double tolerance = 0.1)
+      double countActiveClusteredAtoms(double tolerance = 0.05)
       {
         return this->countActiveClusteredAtoms(&this->forceRelaxationNetwork,
                                                this->currentSpringDistances,
@@ -244,7 +244,7 @@ namespace sim {
        * @param tolerance
        * @return double
        */
-      double getDanglingWeightFraction(double tolerance = 0.1)
+      double getDanglingWeightFraction(double tolerance = 0.05)
       {
         return this->computeDanglingWeightFraction(
           &this->forceRelaxationNetwork,
@@ -259,7 +259,7 @@ namespace sim {
        * @return std::vector<pylimer_tools::entities::Molecule>
        */
       std::vector<pylimer_tools::entities::Molecule> getActiveChains(
-        double tolerance = 0.1) const
+        double tolerance = 0.05) const
       {
         std::vector<pylimer_tools::entities::Molecule> crossLinkerChains =
           this->universe.getChainsWithCrosslinker(crossLinkerType);
@@ -287,7 +287,7 @@ namespace sim {
        * @return std::unordered_map<long int, int>
        */
       std::unordered_map<long int, int> getEffectiveFunctionalityOfAtoms(
-        double tolerance = 0.1) const;
+        double tolerance = 0.05) const;
 
       /**
        * @brief Get the Ids Of active Nodes
@@ -299,7 +299,7 @@ namespace sim {
        * @return std::vector<long int> the atom ids
        */
       std::vector<long int> getIdsOfActiveNodes(
-        double tolerance = 0.1,
+        double tolerance = 0.05,
         int minimumNrOfActiveConnections = 2,
         int maximumNrOfActiveConnections = -1) const;
 
@@ -311,7 +311,7 @@ namespace sim {
        * @return Eigen::VectorXi
        */
       Eigen::VectorXi getNrOfActiveSpringsConnected(
-        double tolerance = 0.1) const;
+        double tolerance = 0.05) const;
 
       Eigen::VectorXd getCurrentSpringDistances() const
       {
@@ -845,7 +845,7 @@ namespace sim {
        * @return int
        */
       int countNrOfActiveSprings(const Eigen::VectorXd& springDistances,
-                                 const double tolerance = 0.1) const
+                                 const double tolerance = 0.05) const
       {
         return (this->findActiveSprings(springDistances, tolerance) == true)
           .count();
@@ -862,7 +862,7 @@ namespace sim {
       double computeDanglingWeightFraction(
         Network* net,
         const Eigen::VectorXd& springDistances,
-        const double tolerance = 0.1) const
+        const double tolerance = 0.05) const
       {
         if (net->nrOfSprings * 3 != springDistances.size()) {
           throw std::invalid_argument(
@@ -902,7 +902,7 @@ namespace sim {
        */
       double countActiveClusteredAtoms(Network* net,
                                        const Eigen::VectorXd& springDistances,
-                                       const double tolerance = 0.1) const
+                                       const double tolerance = 0.05) const
       {
         INVALIDARG_EXP_IFN(net->nrOfSprings * 3 == springDistances.size(),
                            "Spring distances and network don't match");
@@ -918,6 +918,7 @@ namespace sim {
         // then, iteratively walk along the springs to mark those as "active"
         // that are connected to active springs
         bool hadChanged = true;
+        Eigen::ArrayXb nodeIsActive = Eigen::ArrayXb::Zero(net->nrOfNodes);
         while (hadChanged) {
           Eigen::ArrayXb oldActiveSprings = activeSprings;
           for (size_t i = 0; i < net->nrOfNodes; ++i) {
@@ -929,6 +930,7 @@ namespace sim {
               }
             }
 
+            nodeIsActive(i) = anyActive;
             if (anyActive) {
               for (size_t spring_idx : net->springIndicesOfLinks[i]) {
                 activeSprings[spring_idx] = true;
@@ -945,9 +947,9 @@ namespace sim {
           activeSprings.cast<double>() *
           (net->springsContourLength.array() -
            Eigen::ArrayXd::Ones(net->nrOfSprings));
+        double activeNodes = nodeIsActive.count();
 
-        return ((allActiveAtomsPerChains).matrix().sum() +
-                this->getNrOfActiveNodes());
+        return ((allActiveAtomsPerChains).matrix().sum() + activeNodes);
       }
 
       /**
@@ -962,7 +964,7 @@ namespace sim {
       double computeSolubleWeightFraction(
         Network* net,
         const Eigen::VectorXd& springDistances,
-        const double tolerance = 0.1) const
+        const double tolerance = 0.05) const
       {
         double nActiveClusteredAtoms =
           this->countActiveClusteredAtoms(net, springDistances, tolerance);
@@ -980,7 +982,7 @@ namespace sim {
        * @return Eigen::ArrayXb
        */
       Eigen::ArrayXb findActiveSprings(const Eigen::VectorXd& springDistances,
-                                       const double tolerance = 0.1) const
+                                       const double tolerance = 0.05) const
       {
         Eigen::ArrayXb result =
           Eigen::ArrayXb::Constant(springDistances.size() / 3, false);
