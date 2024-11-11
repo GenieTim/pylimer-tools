@@ -695,6 +695,7 @@ namespace utils {
       for (size_t danglingEndIdx = 0; danglingEndIdx < nDanglingEnds;
            ++danglingEndIdx) {
         size_t nodeIdx = nCrosslinks + danglingEndIdx;
+        // collapse dangling ends already to connected cross-link
         forceRelaxationNetwork.coordinates(3 * nodeIdx + 0) =
           this->simplifiedUniverse.xlinkX[danglingEndPartners[danglingEndIdx]];
         forceRelaxationNetwork.coordinates(3 * nodeIdx + 1) =
@@ -716,7 +717,7 @@ namespace utils {
         Eigen::VectorXd::Zero(nSpringEstimate);
       size_t newSpringIdx = 0;
       size_t handledDanglingIdx = 0;
-      // we omit all dangling and free strands
+      // we omit all free strands
       for (size_t springIdx = 0;
            springIdx < this->simplifiedUniverse.strandFrom.size();
            ++springIdx) {
@@ -726,6 +727,11 @@ namespace utils {
           if (to < 0) {
             to = nCrosslinks + handledDanglingIdx;
             handledDanglingIdx += 1;
+            forceRelaxationNetwork.springsContourLength(newSpringIdx) =
+              this->simplifiedUniverse.beadsInStrand[springIdx];
+          } else {
+            forceRelaxationNetwork.springsContourLength(newSpringIdx) =
+              this->simplifiedUniverse.beadsInStrand[springIdx] + 1;
           }
           forceRelaxationNetwork.springIndexA(newSpringIdx) = from;
           forceRelaxationNetwork.springIndexB(newSpringIdx) = to;
@@ -733,8 +739,6 @@ namespace utils {
             newSpringIdx);
           forceRelaxationNetwork.springIndicesOfLinks[to].push_back(
             newSpringIdx);
-          forceRelaxationNetwork.springsContourLength(newSpringIdx) =
-            this->simplifiedUniverse.beadsInStrand[springIdx] + 1;
           newSpringIdx += 1;
         }
       }
