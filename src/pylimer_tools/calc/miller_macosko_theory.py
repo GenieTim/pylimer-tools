@@ -5,7 +5,6 @@ from typing import Union
 import numpy as np
 import pint
 import scipy.special
-from pint import UnitRegistry
 from scipy import optimize
 
 from pylimer_tools.calc.structure_analysis import (
