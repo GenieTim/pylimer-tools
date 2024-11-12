@@ -23,6 +23,7 @@ MCUniverseGenerator
       ~MCUniverseGenerator.link_strands_to_conversion
       ~MCUniverseGenerator.link_strands_to_soluble_fraction
       ~MCUniverseGenerator.relax_crosslinks
+      ~MCUniverseGenerator.remove_soluble_fraction
       ~MCUniverseGenerator.set_bead_distance
       ~MCUniverseGenerator.set_mean_squared_bead_distance
       ~MCUniverseGenerator.set_seed
@@ -42,6 +43,7 @@ MCUniverseGenerator
    .. automethod:: link_strands_to_conversion
    .. automethod:: link_strands_to_soluble_fraction
    .. automethod:: relax_crosslinks
+   .. automethod:: remove_soluble_fraction
    .. automethod:: set_bead_distance
    .. automethod:: set_mean_squared_bead_distance
    .. automethod:: set_seed
