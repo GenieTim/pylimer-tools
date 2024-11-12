@@ -125,11 +125,11 @@ namespace calc {
     lapack_int il = 0;
     lapack_int iu = 0;
     double abstol = 1e-10;
-    int M = 0;
+    lapack_int M = 0;
     lapack_int size = static_cast<lapack_int>(nRows);
 
-    Eigen::Vector<lapack_int, Dynamic, 1> support =
-      Eigen::Vector<lapack_int, Dynamic, 1>::Zero(nRows * 2);
+    Eigen::Vector<lapack_int, Eigen::Dynamic> support =
+      Eigen::Vector<lapack_int, Eigen::Dynamic>::Zero(nRows * 2);
 
     int info = LAPACKE_dsyevr(Eigen::MatrixXd::IsRowMajor
                                 ? LAPACK_ROW_MAJOR
