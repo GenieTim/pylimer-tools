@@ -121,12 +121,15 @@ namespace calc {
     Eigen::MatrixXd eigenvectorsMemory = includeEigenvectors
                                            ? Eigen::MatrixXd::Zero(nRows, nRows)
                                            : Eigen::MatrixXd::Zero(nRows, 3);
-    int il = 0;
-    int iu = 0;
+    lapack_int ldz = static_cast<lapack_int>(eigenvectorsMemory.cols());
+    lapack_int il = 0;
+    lapack_int iu = 0;
     double abstol = 1e-10;
     int M = 0;
+    lapack_int size = static_cast<lapack_int>(nRows);
 
-    Eigen::VectorXi support = Eigen::VectorXi::Zero(nRows * 2);
+    Eigen::Vector<lapack_int, Dynamic, 1> support =
+      Eigen::Vector<lapack_int, Dynamic, 1>::Zero(nRows * 2);
 
     int info = LAPACKE_dsyevr(Eigen::MatrixXd::IsRowMajor
                                 ? LAPACK_ROW_MAJOR
@@ -134,9 +137,9 @@ namespace calc {
                               includeEigenvectors ? 'V' : 'N', // JOBZ
                               'A',                             // RANGE
                               'U',                             // UPLO
-                              nRows,                           // N
+                              size,                            // N
                               assembledConnectivityMatrixDense.data(), // A
-                              nRows,                                   // LDA
+                              size,                                    // LDA
                               0,                                       // VL
                               0,                                       // VU
                               il,                                      // IL
@@ -145,7 +148,7 @@ namespace calc {
                               &M, // M, total number of eigenvalues found
                               eigenvaluesMemory.data(),  // W
                               eigenvectorsMemory.data(), // Z
-                              eigenvectorsMemory.cols(), // LDZ
+                              ldz,                       // LDZ
                               support.data()             // ISUPPZ
     );
 
