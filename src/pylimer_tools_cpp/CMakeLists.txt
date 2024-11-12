@@ -46,6 +46,7 @@ target_link_libraries(pylimer_tools PUBLIC
 target_link_libraries(pylimer_tools PUBLIC Eigen3::Eigen)
 
 if (LAPACKE_FOUND)
+	include_directories(${LAPACKE_LIBRARY_DIRS})
 	target_link_libraries(pylimer_tools PUBLIC ${LAPACKE_LIBRARIES})
 endif()
 

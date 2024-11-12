@@ -22,7 +22,7 @@ if (NOT DEFINED eigen_LOADED)
 endif()
 
 # include(${CMAKE_CURRENT_LIST_DIR}/FindLAPACKE.cmake)
-# include(${CMAKE_CURRENT_LIST_DIR}/FindLAPACKE.cmake)
+# include(${CMAKE_CURRENT_LIST_DIR}/FindLAPACKEXT.cmake)
 find_package(LAPACKE)
 # include(FindLAPACKLibs)
 
@@ -33,6 +33,7 @@ if(LAPACKE_FOUND)
 	add_definitions(-DEIGEN_USE_LAPACKE)
 	add_definitions(-DHAVE_LAPACK_CONFIG_H)
 	add_definitions(-DLAPACK_COMPLEX_CPP)
+	message(STATUS "Found lapacke, include dirs ${LAPACKE_INCLUDE_DIRS}, libraries ${LAPACKE_LIBRARIES}")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
