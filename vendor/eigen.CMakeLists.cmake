@@ -33,7 +33,7 @@ if(LAPACKE_FOUND)
 	add_definitions(-DEIGEN_USE_LAPACKE)
 	add_definitions(-DHAVE_LAPACK_CONFIG_H)
 	add_definitions(-DLAPACK_COMPLEX_CPP)
-	add_definitions(-DLAPACK_ILP64)
+	# add_definitions(-DLAPACK_ILP64) # not supported by Eigen, unfortunately
 	add_definitions(-DLAPACK_DISABLE_NAN_CHECK)
 	message(STATUS "Found lapacke, include dirs ${LAPACKE_INCLUDE_DIRS}, libraries ${LAPACKE_LIBRARIES}")
 endif()
