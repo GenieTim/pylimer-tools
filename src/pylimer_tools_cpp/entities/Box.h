@@ -399,9 +399,10 @@ namespace entities {
     {
       if (this->isSheared()) {
         Eigen::Vector3d lowerCorner = this->getLowL();
-        this->handlePBC(lowerCorner);
+        // this->handlePBC(lowerCorner);
         Eigen::Vector3d upperCorner = this->getHighL();
-        this->handlePBC(upperCorner);
+        upperCorner[this->getShearDirection()] *=
+          (1. + this->getShearMagnitude());
 
         return Box(lowerCorner[0],
                    upperCorner[0],
