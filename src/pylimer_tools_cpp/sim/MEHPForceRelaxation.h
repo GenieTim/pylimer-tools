@@ -8,13 +8,13 @@
 #include "MEHPUtilityStructures.h"
 #include "OutputSupportingSimulation.h"
 #include <Eigen/Dense>
-#include <nlopt.hpp>
 #include <algorithm>
 #include <array>
 #include <cassert>
 #include <iomanip>
 #include <iostream>
 #include <map>
+#include <nlopt.hpp>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -919,7 +919,7 @@ namespace sim {
         const double tolerance = 0.05) const
       {
         INVALIDARG_EXP_IFN(springDistances.size() == net->nrOfSprings * 3,
-                            "Invalid sizes.");
+                           "Invalid sizes.");
 
         // find all active springs
         Eigen::ArrayXb activeSprings =
