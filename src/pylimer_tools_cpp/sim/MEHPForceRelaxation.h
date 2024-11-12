@@ -8,15 +8,16 @@
 #include "MEHPUtilityStructures.h"
 #include "OutputSupportingSimulation.h"
 #include <Eigen/Dense>
+#include <nlopt.hpp>
 #include <algorithm>
 #include <array>
 #include <cassert>
 #include <iomanip>
 #include <iostream>
 #include <map>
-#include <nlopt.hpp>
 #include <string>
 #include <tuple>
+#include <utility>
 #include <vector>
 #ifdef CEREALIZABLE
 #include "../utils/CerealUtils.h"
@@ -236,6 +237,21 @@ namespace sim {
         return this->countActiveClusteredAtoms(&this->forceRelaxationNetwork,
                                                this->currentSpringDistances,
                                                tolerance);
+      }
+
+      /**
+       * @brief Determine whether a node and spring, respectively, are in any
+       * way connected to an active spring
+       *
+       * @param tolerance
+       * @return std::pair<Eigen::ArrayXb, Eigen::ArrayXb>
+       */
+      std::pair<Eigen::ArrayXb, Eigen::ArrayXb> findClusteredToActive(
+        double tolerance = 0.05) const
+      {
+        return this->findClusteredToActive(&this->forceRelaxationNetwork,
+                                           this->currentSpringDistances,
+                                           tolerance);
       }
 
       /**
@@ -591,8 +607,7 @@ namespace sim {
           } else {
             // assert(endAtoms.size() == 0); // can also be
             omittedChainsAtoms +=
-              (crossLinkerChains[i].getNrOfAtoms() -
-               endAtoms.size());
+              (crossLinkerChains[i].getNrOfAtoms() - endAtoms.size());
             omittedChainsBonds += crossLinkerChains[i].getNrOfBonds();
           }
         }
@@ -889,29 +904,27 @@ namespace sim {
       }
 
       /**
-       * @brief Count the number of atoms that can be considered part of an
-       * active cluster, i.e., are somehow connected to an active spring
+       * @brief Find whether springs and nodes are in any way connected to an
+       * active spring
        *
-       * @param net
-       * @param springDistances
-       * @param tolerance
-       * @return double
+       * @param net the network that includes the connectivity
+       * @param springDistances the distances used to assert whether the springs
+       * is active or not
+       * @param tolerance the tolerance for considering springs as active
+       * @return std::pair<Eigen::ArrayXb, Eigen::ArrayXb>
        */
-      double countActiveClusteredAtoms(Network* net,
-                                       const Eigen::VectorXd& springDistances,
-                                       const double tolerance = 0.05) const
+      std::pair<Eigen::ArrayXb, Eigen::ArrayXb> findClusteredToActive(
+        const Network* net,
+        const Eigen::VectorXd& springDistances,
+        const double tolerance = 0.05) const
       {
-        INVALIDARG_EXP_IFN(net->nrOfSprings * 3 == springDistances.size(),
-                           "Spring distances and network don't match");
-        if (net->nrOfSprings < 1) {
-          return 0.;
-        }
+        INVALIDARG_EXP_IFN(springDistances.size() == net->nrOfSprings * 3,
+                            "Invalid sizes.");
+
         // find all active springs
         Eigen::ArrayXb activeSprings =
           this->findActiveSprings(springDistances, tolerance);
-        if (activeSprings.count() == 0) {
-          return 0.;
-        }
+
         // then, iteratively walk along the springs to mark those as "active"
         // that are connected to active springs
         bool hadChanged = true;
@@ -936,6 +949,37 @@ namespace sim {
           }
           hadChanged = (oldActiveSprings.count() != activeSprings.count());
         }
+
+        return std::make_pair(activeSprings, nodeIsActive);
+      }
+
+      /**
+       * @brief Count the number of atoms that can be considered part of an
+       * active cluster, i.e., are somehow connected to an active spring
+       *
+       * @param net
+       * @param springDistances
+       * @param tolerance
+       * @return double
+       */
+      double countActiveClusteredAtoms(Network* net,
+                                       const Eigen::VectorXd& springDistances,
+                                       const double tolerance = 0.05) const
+      {
+        INVALIDARG_EXP_IFN(net->nrOfSprings * 3 == springDistances.size(),
+                           "Spring distances and network don't match");
+        if (net->nrOfSprings < 1) {
+          return 0.;
+        }
+
+        std::pair<Eigen::ArrayXb, Eigen::ArrayXb> clusteredToActive =
+          this->findClusteredToActive(net, springDistances, tolerance);
+        // find all active springs
+        Eigen::ArrayXb activeSprings = clusteredToActive.first;
+        assert(activeSprings.size() == net->nrOfSprings);
+
+        Eigen::ArrayXb nodeIsActive = clusteredToActive.second;
+        assert(nodeIsActive.size() == net->nrOfNodes);
 
         // as of now, the springsContourLength is equal to the number of bonds
         // from cross-link to cross-link. therefore, the number of atoms of each

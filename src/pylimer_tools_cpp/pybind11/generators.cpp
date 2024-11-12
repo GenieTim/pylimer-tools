@@ -152,6 +152,12 @@ init_pylimer_bound_generators(py::module_& m)
             )pbdoc",
          py::arg("soluble_fraction"),
          py::arg("c_infinity") = 1.)
+    .def("remove_soluble_fraction",
+         &MCUniverseGenerator::removeSolubleFraction,
+         R"pbdoc(
+            Remove soluble fraction (as determined by phantom force relaxation) of the strands and cross-links.
+            )pbdoc",
+         py::arg("rescale_box") = true)
     .def("relax_crosslinks",
          &MCUniverseGenerator::relaxCrosslinks,
          R"pbdoc(

@@ -654,6 +654,192 @@ namespace utils {
     }
 
     /**
+     * @brief Remove a strand from the current state
+     *
+     * @param strandIdx
+     */
+    void removeStrand(size_t strandIdx)
+    {
+      INVALIDARG_EXP_IFN(strandIdx < this->simplifiedUniverse.strandFrom.size(),
+                         "Strand to be removed is out of range.");
+
+      if (this->simplifiedUniverse.strandFrom[strandIdx] >= 0) {
+        // remove this strand from the cross-linker
+        size_t xlink = this->simplifiedUniverse.strandFrom[strandIdx];
+        pylimer_tools::utils::removeIfContained<long int>(
+          this->simplifiedUniverse.strandsOfXlink[xlink], strandIdx);
+        this->remainingCrossLinkerFunctionality[xlink] += 1;
+        this->nrOfAvailableCrosslinkSites += 1;
+      }
+      if (this->simplifiedUniverse.strandTo[strandIdx] >= 0) {
+        // remove this strand from the cross-linker
+        size_t xlink = this->simplifiedUniverse.strandTo[strandIdx];
+        pylimer_tools::utils::removeIfContained<long int>(
+          this->simplifiedUniverse.strandsOfXlink[xlink], strandIdx);
+        this->remainingCrossLinkerFunctionality[xlink] += 1;
+        this->nrOfAvailableCrosslinkSites += 1;
+      }
+
+      this->simplifiedUniverse.strandFrom.erase(
+        this->simplifiedUniverse.strandFrom.begin() + strandIdx);
+      this->simplifiedUniverse.strandTo.erase(
+        this->simplifiedUniverse.strandTo.begin() + strandIdx);
+      this->simplifiedUniverse.beadsInStrand.erase(
+        this->simplifiedUniverse.beadsInStrand.begin() + strandIdx);
+      this->simplifiedUniverse.strandBeadType.erase(
+        this->simplifiedUniverse.strandBeadType.begin() + strandIdx);
+      this->simplifiedUniverse.beadDistanceInStrand.erase(
+        this->simplifiedUniverse.beadDistanceInStrand.begin() + strandIdx);
+      this->simplifiedUniverse.meanSquaredBeadDistanceInStrand.erase(
+        this->simplifiedUniverse.meanSquaredBeadDistanceInStrand.begin() +
+        strandIdx);
+
+      // renumber the link from cross-links to strands
+      for (size_t i = 0; i < this->simplifiedUniverse.xlinkTypes.size(); ++i) {
+        for (size_t j = 0;
+             j < this->simplifiedUniverse.strandsOfXlink[i].size();
+             ++j) {
+          assert(this->simplifiedUniverse.strandsOfXlink[i][j] != strandIdx);
+          if (this->simplifiedUniverse.strandsOfXlink[i][j] > strandIdx) {
+            this->simplifiedUniverse.strandsOfXlink[i][j] -= 1;
+          }
+        }
+      }
+    }
+
+    /**
+     * @brief Remove a cross-link from the current state
+     *
+     * @param crosslinkIdx
+     */
+    void removeCrosslink(size_t crosslinkIdx)
+    {
+      INVALIDARG_EXP_IFN(crosslinkIdx <
+                           this->simplifiedUniverse.xlinkTypes.size(),
+                         "Crosslink to be removed is out of range.");
+
+      // re-connect the strands to account for the removed cross-link
+      for (size_t i = 0; i < this->simplifiedUniverse.strandFrom.size(); ++i) {
+        INVALIDARG_EXP_IFN(
+          this->simplifiedUniverse.strandFrom[i] != crosslinkIdx &&
+            this->simplifiedUniverse.strandTo[i] != crosslinkIdx,
+          "The to-be removed cross-link is still connected.");
+        if (this->simplifiedUniverse.strandFrom[i] > crosslinkIdx) {
+          this->simplifiedUniverse.strandFrom[i] -= 1;
+        }
+        if (this->simplifiedUniverse.strandTo[i] > crosslinkIdx) {
+          this->simplifiedUniverse.strandTo[i] -= 1;
+        }
+      }
+
+      // adjust sum of available crosslink sites
+      size_t remainingFunctionality =
+        this->remainingCrossLinkerFunctionality[crosslinkIdx];
+      size_t originalFunctionality =
+        remainingFunctionality +
+        this->simplifiedUniverse.strandsOfXlink[crosslinkIdx].size();
+      this->nrOfAvailableCrosslinkSites -= remainingFunctionality;
+      this->originalNrOfAvailableCrosslinkSites -= originalFunctionality;
+
+      this->simplifiedUniverse.xlinkTypes.erase(
+        this->simplifiedUniverse.xlinkTypes.begin() + crosslinkIdx);
+      this->simplifiedUniverse.xlinkX.erase(
+        this->simplifiedUniverse.xlinkX.begin() + crosslinkIdx);
+      this->simplifiedUniverse.xlinkY.erase(
+        this->simplifiedUniverse.xlinkY.begin() + crosslinkIdx);
+      this->simplifiedUniverse.xlinkZ.erase(
+        this->simplifiedUniverse.xlinkZ.begin() + crosslinkIdx);
+      this->simplifiedUniverse.strandsOfXlink.erase(
+        this->simplifiedUniverse.strandsOfXlink.begin() + crosslinkIdx);
+
+      this->remainingCrossLinkerFunctionality.erase(
+        this->remainingCrossLinkerFunctionality.begin() + crosslinkIdx);
+    }
+
+    /**
+     * @brief Remove soluble parts from the current state
+     *
+     * @param rescale whether to rescale the box and coordinates, keeping the
+     * density constant
+     */
+    void removeSolubleFraction(bool rescale = true)
+    {
+      size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
+      size_t nAtomsTotal =
+        std::reduce(this->simplifiedUniverse.beadsInStrand.begin(),
+                    this->simplifiedUniverse.beadsInStrand.end(),
+                    0) +
+        nCrosslinks;
+
+      // first, remove already the strands that we know will not be relevant
+      for (long int i = this->simplifiedUniverse.strandFrom.size() - 1; i >= 0;
+           --i) {
+        if (this->simplifiedUniverse.strandFrom[i] < 0 &&
+            this->simplifiedUniverse.strandTo[i] < 0) {
+          this->removeStrand(i);
+        }
+      }
+
+      pylimer_tools::sim::mehp::Network forceRelaxationNetwork =
+        this->convertToForceRelaxationNetwork();
+      pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
+        pylimer_tools::sim::mehp::MEHPForceRelaxation(forceRelaxationNetwork);
+
+      while (forceRelaxer.suggestsRerun()) {
+        forceRelaxer.runForceRelaxation("LD_MMA", 5000, 1e-12, 1e-9);
+      }
+
+      auto activeComponents = forceRelaxer.findClusteredToActive();
+      Eigen::ArrayXb activeSprings = activeComponents.first;
+      Eigen::ArrayXb activeNodes = activeComponents.second;
+
+      RUNTIME_EXP_IFN(activeNodes.count() > 0,
+                      "No active nodes found during force relaxation.");
+
+      // now that we know which springs and nodes are soluble,
+      // we can remove them
+      RUNTIME_EXP_IFN(activeSprings.size() ==
+                        this->simplifiedUniverse.strandFrom.size(),
+                      "Number of springs does not match the number of strands. "
+                      "Therefore, the mapping would be incorrect.");
+
+      for (long int i = activeSprings.size() - 1; i >= 0; --i) {
+        if (!activeSprings[i]) {
+          this->removeStrand(i);
+        }
+      }
+      // then, remove the w_sol cross-links
+      for (long int i = this->simplifiedUniverse.xlinkTypes.size() - 1; i >= 0;
+           --i) {
+        assert(forceRelaxationNetwork.oldAtomIds(i) == i);
+        if (!activeNodes[i]) {
+          this->removeCrosslink(i);
+        }
+      }
+
+      // finally, rescale the box if requested
+      if (rescale) {
+        size_t newNrOfAtoms =
+          std::reduce(this->simplifiedUniverse.beadsInStrand.begin(),
+                      this->simplifiedUniverse.beadsInStrand.end(),
+                      0) +
+          this->simplifiedUniverse.xlinkTypes.size();
+        double scalingFactor = std::cbrt(static_cast<double>(newNrOfAtoms) /
+                                         static_cast<double>(nAtomsTotal));
+        this->box =
+          pylimer_tools::entities::Box(scalingFactor * this->box.getLx(),
+                                       scalingFactor * this->box.getLy(),
+                                       scalingFactor * this->box.getLz());
+        for (size_t i = 0; i < this->simplifiedUniverse.xlinkTypes.size();
+             ++i) {
+          this->simplifiedUniverse.xlinkX[i] *= scalingFactor;
+          this->simplifiedUniverse.xlinkY[i] *= scalingFactor;
+          this->simplifiedUniverse.xlinkZ[i] *= scalingFactor;
+        }
+      }
+    }
+
+    /**
      * @brief Convert the current simplified universe into a force relaxation
      * network
      *
@@ -691,6 +877,7 @@ namespace utils {
           this->simplifiedUniverse.xlinkY[crosslinkIdx];
         forceRelaxationNetwork.coordinates(3 * crosslinkIdx + 2) =
           this->simplifiedUniverse.xlinkZ[crosslinkIdx];
+        forceRelaxationNetwork.oldAtomIds(crosslinkIdx) = crosslinkIdx;
       }
       for (size_t danglingEndIdx = 0; danglingEndIdx < nDanglingEnds;
            ++danglingEndIdx) {
