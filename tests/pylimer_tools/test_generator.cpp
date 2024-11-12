@@ -226,6 +226,54 @@ TEST_CASE("Universe can cross-link up to w_sol",
   CHECK(clusters.size() < 20);
 }
 
+TEST_CASE("MCUniverseGenerator can remove w_sol",
+          "[generator][MCUniverseGenerator]")
+{
+  std::cout << "Running test \"MCUniverseGenerator can remove w_sol\""
+            << std::endl;
+
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(20.0, 20.0, 20.0);
+  generator.setSeed(8804);
+  generator.setBeadDistance(0.75);
+  generator.addCrosslinkers(400, 4, 2);
+  generator.configNrOfMCSteps(0);
+
+  generator.addStrands(800, 10, 1);
+  generator.linkStrandsToConversion(0.85, 1.);
+
+  pe::Universe universeBeforeRemoval = generator.getUniverse();
+  CHECK(universeBeforeRemoval.getAtomsOfType(2).size() == 400);
+  CHECK(universeBeforeRemoval.getAtomsOfType(1).size() == 800 * 10);
+
+  SECTION("Without rescaling")
+  {
+    generator.removeSolubleFraction(false);
+
+    pe::Universe universeAfterRemoval = generator.getUniverse();
+    CHECK(universeAfterRemoval.getVolume() ==
+          universeBeforeRemoval.getVolume());
+
+    CHECK(universeAfterRemoval.getAtomsOfType(2).size() < 400);
+    CHECK(universeAfterRemoval.getAtomsOfType(1).size() < 800 * 10);
+  }
+
+  SECTION("With rescaling")
+  {
+    generator.removeSolubleFraction(true);
+
+    pe::Universe universeAfterRemoval = generator.getUniverse();
+    CHECK(universeAfterRemoval.getVolume() < universeBeforeRemoval.getVolume());
+    double densityAfter =
+      universeAfterRemoval.getNrOfAtoms() / universeAfterRemoval.getVolume();
+    double densityBefore =
+      universeBeforeRemoval.getNrOfAtoms() / universeBeforeRemoval.getVolume();
+    CHECK(densityAfter == Catch::Approx(densityBefore));
+
+    CHECK(universeAfterRemoval.getAtomsOfType(2).size() < 400);
+    CHECK(universeAfterRemoval.getAtomsOfType(1).size() < 800 * 10);
+  }
+}
+
 TEST_CASE("MCUniverseGenerator uses correct force relaxation network",
           "[generator][MCUniverseGenerator]")
 {
@@ -255,7 +303,7 @@ TEST_CASE("MCUniverseGenerator uses correct force relaxation network",
       generator.convertToForceRelaxationNetwork());
   relaxerFromGenerator.configAssumeBoxLargeEnough(true);
 
-  // comparison only after running force relaxation, 
+  // comparison only after running force relaxation,
   // since the box offsets, single nodes and stuff is relevant before that
   // CHECK(relaxer.countActiveClusteredAtoms() ==
   //       Catch::Approx(relaxerFromGenerator.countActiveClusteredAtoms()));

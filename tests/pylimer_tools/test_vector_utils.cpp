@@ -161,6 +161,17 @@ TEST_CASE("Vector Rows can be removed", "[Eigen]")
     CHECK(testVec.size() == 11 - 2 - 2);
     CHECK(testVec[4] == 7);
   }
+
+  SECTION("std::vector")
+  {
+    std::vector<int> testVec = { 1, 124, 12, 42, 41, 132, 12, 123, 5, 12, 412 };
+    CHECK(pu::contains(testVec, 1));
+    CHECK(pu::contains(testVec, 12));
+    CHECK(!pu::contains(testVec, -1));
+    CHECK_NOTHROW(pu::removeIfContained(testVec, -1));
+    CHECK_NOTHROW(pu::removeIfContained(testVec, 12));
+    CHECK(!pu::contains(testVec, 12));
+  }
 }
 
 TEST_CASE("Elements can be found and conditionally added", "[VectorUtils]")
