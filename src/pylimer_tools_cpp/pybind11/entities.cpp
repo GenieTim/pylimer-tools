@@ -42,12 +42,15 @@ struct MoleculeIterator
 void
 init_pylimer_bound_entities(py::module_& m)
 {
-  py::class_<Box>(m, "Box", R"pbdoc(
+  py::class_<Box>(m,
+                  "Box",
+                  R"pbdoc(
         The box that the simulation is run in.
 
         NOTE: 
           currently, only rectangular boxes are supported.
-        )pbdoc")
+        )pbdoc",
+                  py::module_local())
     .def(py::init<const double, const double, const double>())
     .def(py::init<const double,
                   const double,
@@ -162,9 +165,12 @@ init_pylimer_bound_entities(py::module_& m)
     ;
 #endif
 
-  py::class_<Atom>(m, "Atom", R"pbdoc(
+  py::class_<Atom>(m,
+                   "Atom",
+                   R"pbdoc(
        A single bead or atom
-  )pbdoc")
+  )pbdoc",
+                   py::module_local())
     .def(py::init<const long int,
                   const int,
                   const double,
@@ -271,9 +277,12 @@ init_pylimer_bound_entities(py::module_& m)
 #endif
     .def(pybind11::self == pybind11::self);
 
-  py::class_<MoleculeIterator>(m, "MoleculeIterator", R"pbdoc(
+  py::class_<MoleculeIterator>(m,
+                               "MoleculeIterator",
+                               R"pbdoc(
        An iterator to iterate throught the atoms in :obj:`~pylimer_tools_cpp.Molecule`.
-  )pbdoc")
+  )pbdoc",
+                               py::module_local())
     .def("__iter__",
          [](MoleculeIterator& it) -> MoleculeIterator& { return it; })
     .def("__next__", &MoleculeIterator::next);
@@ -297,9 +306,12 @@ init_pylimer_bound_entities(py::module_& m)
       )pbdoc")
     .export_values();
 
-  py::class_<Molecule>(m, "Molecule", R"pbdoc(
+  py::class_<Molecule>(m,
+                       "Molecule",
+                       R"pbdoc(
        An (ideally) connected series of atoms/beads.
-  )pbdoc")
+  )pbdoc",
+                       py::module_local())
     .def(py::init<Box&, igraph_t*, MoleculeType, std::map<int, double>>())
     // getters
     .def("get_nr_of_bonds",
@@ -550,7 +562,8 @@ init_pylimer_bound_entities(py::module_& m)
   py::class_<NeighbourList>(
     m,
     "NeighbourList",
-    "Gives access to somewhat fast queries on the neighbourhood of atoms")
+    "Gives access to somewhat fast queries on the neighbourhood of atoms",
+    py::module_local())
     .def(py::init<const std::vector<pylimer_tools::entities::Atom>&,
                   const pylimer_tools::entities::Box&,
                   double>(),
@@ -590,7 +603,8 @@ init_pylimer_bound_entities(py::module_& m)
   py::class_<Universe>(
     m,
     "Universe",
-    "Represents a full Polymer Network structure, a collection of molecules.")
+    "Represents a full Polymer Network structure, a collection of molecules.",
+    py::module_local())
     .def(py::init<const double, const double, const double>(),
          "Instantiate this Universe (Collection of Molecules) providing the "
          "box lengths.",
@@ -1179,16 +1193,20 @@ init_pylimer_bound_entities(py::module_& m)
     size_t index = 0; // the index to access
   };
 
-  py::class_<LazyUniverseSequenceIterator>(
-    m, "LazyUniverseSequenceIterator", R"pbdoc(
+  py::class_<LazyUniverseSequenceIterator>(m,
+                                           "LazyUniverseSequenceIterator",
+                                           R"pbdoc(
        An iterator to iterate throught the universes in :obj:`~pylimer_tools_cpp.UniverseSequence`.
-  )pbdoc")
+  )pbdoc",
+                                           py::module_local())
     .def("__iter__",
          [](const LazyUniverseSequenceIterator& it)
            -> const LazyUniverseSequenceIterator& { return it; })
     .def("__next__", &LazyUniverseSequenceIterator::next);
 
-  py::class_<UniverseSequence>(m, "UniverseSequence", R"pbdoc(
+  py::class_<UniverseSequence>(m,
+                               "UniverseSequence",
+                               R"pbdoc(
      This class represents a sequence of Universes, with the Universe's data
      only being read on request. Dump files are read at once in order
      to know how many timesteps/universes are available in total 
@@ -1198,7 +1216,8 @@ init_pylimer_bound_entities(py::module_& m)
      Use Python's iterator to have this UniverseSequence only ever retain one universe in memory.
      Alternatively, use :func:`~pylimer_tools_cpp.UniverseSequence.forgetAtIndex`
      to have the UniverseSequence forget about already read universes.
-     )pbdoc")
+     )pbdoc",
+                               py::module_local())
     .def(py::init<>())
     .def("initialize_from_dump_file",
          &UniverseSequence::initializeFromDumpFile,
