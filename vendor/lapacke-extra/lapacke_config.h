@@ -46,7 +46,7 @@ extern "C" {
 
 #ifndef lapack_int
 #if defined(LAPACK_ILP64)
-#define lapack_int        long
+#define lapack_int        long int
 #else
 #define lapack_int        int
 #endif

@@ -16,6 +16,8 @@ VERSION = "0.2.4"
 cmake_args = ["-DCMAKE_BUILD_TYPE=RelWithDebInfo",
               "-Dvendor_suffix=-skbuild-{}".format(platform.system())]
 # cmake_args = ["-Digraph_DEBUG=ON", "-DCMAKE_FIND_DEBUG_MODE=ON"]
+if os.environ.get("CMAKE_ARGS"):
+    cmake_args.extend(os.environ.get("CMAKE_ARGS").split())
 
 if (os.getenv('VCPKG_ROOT')):
     toolchain_file = os.path.join(

@@ -635,7 +635,7 @@ namespace utils {
                     << nStrandsRemaining << " strands remaining." << std::endl;
           if (solubleFraction > targetSolubleFraction) {
             if (status == BackTrackStatus::TRACK_BACKWARD) {
-              nSteps /= 4;
+              nSteps /= 2;
             }
             status = BackTrackStatus::TRACK_FORWARD;
             return status;
