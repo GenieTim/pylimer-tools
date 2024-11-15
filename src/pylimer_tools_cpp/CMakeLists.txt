@@ -70,6 +70,8 @@ else()
 	endif()
 endif()
 
+set_property(TARGET pylimer_tools PROPERTY POSITION_INDEPENDENT_CODE ON)
+
 target_sources(pylimer_tools
 	PRIVATE
 		${CMAKE_CURRENT_LIST_DIR}/entities/AtomGraphParent.cpp
