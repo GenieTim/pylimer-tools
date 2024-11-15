@@ -27,6 +27,43 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/../../vendor/CMakeLists.txt)
 
 include(${CMAKE_CURRENT_LIST_DIR}/../../vendor/myConfigureFile.cmake)
 
+# Check if we need to add -lstdc++fs or -lc++fs or nothing
+if(DEFINED CMAKE_CXX_STANDARD AND CMAKE_CXX_STANDARD LESS 17)
+  set(STD_FS_NO_LIB_NEEDED TRUE)
+elseif(MSVC)
+  set(STD_FS_NO_LIB_NEEDED TRUE)
+else()
+  file(
+    WRITE ${CMAKE_CURRENT_BINARY_DIR}/main.cpp
+    "#include <filesystem>\nint main(int argc, char ** argv) {\n  std::filesystem::path p(argv[0]);\n  return p.string().length();\n}"
+  )
+  try_compile(
+    STD_FS_NO_LIB_NEEDED ${CMAKE_CURRENT_BINARY_DIR}
+    SOURCES ${CMAKE_CURRENT_BINARY_DIR}/main.cpp
+    COMPILE_DEFINITIONS -std=c++17)
+  try_compile(
+    STD_FS_NEEDS_STDCXXFS ${CMAKE_CURRENT_BINARY_DIR}
+    SOURCES ${CMAKE_CURRENT_BINARY_DIR}/main.cpp
+    COMPILE_DEFINITIONS -std=c++17
+    LINK_LIBRARIES stdc++fs)
+  try_compile(
+    STD_FS_NEEDS_CXXFS ${CMAKE_CURRENT_BINARY_DIR}
+    SOURCES ${CMAKE_CURRENT_BINARY_DIR}/main.cpp
+    COMPILE_DEFINITIONS -std=c++17
+    LINK_LIBRARIES c++fs)
+endif()
+
+if(${STD_FS_NEEDS_STDCXXFS})
+  set(STD_FS_LIB stdc++fs)
+elseif(${STD_FS_NEEDS_CXXFS})
+  set(STD_FS_LIB c++fs)
+elseif(${STD_FS_NO_LIB_NEEDED})
+  set(STD_FS_LIB "")
+else()
+  message(WARNING "Unknown C++17 compiler - not passing -lstdc++fs")
+  set(STD_FS_LIB "")
+endif()
+
 add_dependencies(pylimer_tools igraph::igraph)
 include_directories(${igraph_INCLUDE_DIRS})
 add_dependencies(pylimer_tools nlopt)
@@ -40,6 +77,7 @@ target_link_libraries(pylimer_tools PUBLIC
 	${igraph_LIBRARIES} 
 	${nlopt_LIBRARIES}
 )
+target_link_libraries(pylimer_tools PRIVATE ${STD_FS_LIB})
 
 # add_dependencies(pylimer_tools Eigen3::Eigen)
 
