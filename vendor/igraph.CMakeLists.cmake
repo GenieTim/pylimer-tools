@@ -26,6 +26,10 @@ if (NOT DEFINED igraph_LOADED)
 			endif()
 
 			set(igraph_PREFIX_PATH "${CMAKE_CURRENT_LIST_DIR}/igraph${vendor_suffix}")
+			set(igraph_EXTRA_CMAKE_ARGS "")
+			if (DEFINED ENV{BISON_EXECUTABLE})
+				set(igraph_EXTRA_CMAKE_ARGS "-DBISON_EXECUTABLE=$ENV{BISON_EXECUTABLE}")
+			endif()
 
 			ExternalProject_Add(
 					igraphLib
@@ -33,7 +37,7 @@ if (NOT DEFINED igraph_LOADED)
 					GIT_TAG 635b432eff0a89580ac9bb98068d2fbc8ef374f2 # 0.10.15
 					PREFIX ${igraph_PREFIX_PATH}
 					INSTALL_DIR ${igraph_PREFIX_PATH}/igraphLib-install
-					CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${igraph_PREFIX_PATH}/igraphLib-install -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_LIBDIR=${igraph_PREFIX_PATH}/igraphLib-install/lib -DIGRAPH_GRAPHML_SUPPORT=OFF -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true
+					CMAKE_ARGS ${igraph_EXTRA_CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=${igraph_PREFIX_PATH}/igraphLib-install -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_LIBDIR=${igraph_PREFIX_PATH}/igraphLib-install/lib -DIGRAPH_GRAPHML_SUPPORT=OFF -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true
 					BUILD_COMMAND ${CMAKE_COMMAND} --build ${igraph_PREFIX_PATH}/src/igraphLib-build --config Release
 					BUILD_BYPRODUCTS ${igraph_PREFIX_PATH}/igraphLib-install/lib/${LIBRARY_PREFIX}igraph${LIBRARY_SUFFIX}
 					UPDATE_DISCONNECTED ON
