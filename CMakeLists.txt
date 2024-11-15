@@ -64,11 +64,11 @@ target_link_libraries(pylimer_tools_cpp
     pylimer_tools
 )
 
-if(CMAKE_COMPILER_IS_GNUCXX)
-target_link_libraries(pylimer_tools_cpp 
-  PUBLIC 
-    stdc++fs
-)
+if(CMAKE_CXX_COMPILER_ID IN_LIST "Intel;GNU")
+  target_link_libraries(pylimer_tools_cpp 
+    PUBLIC 
+      stdc++fs
+  )
 endif()
 
 # compile & install
