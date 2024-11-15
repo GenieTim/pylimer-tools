@@ -112,7 +112,7 @@ init_pylimer_bound_sim(py::module_& m)
     .value("NUM_EXTRA_BONDS", ComputedIntValues::NUM_EXTRA_BONDS)
     .value("NUM_BONDS_TO_FORM", ComputedIntValues::NUM_BONDS_TO_FORM);
 
-  py::class_<OutputConfiguration>(m, "OutputConfiguration")
+  py::class_<OutputConfiguration>(m, "OutputConfiguration", py::module_local())
     .def(py::init<>(), "Get an instance of this struct")
     .def_readwrite("int_values", &OutputConfiguration::intValues)
     .def_readwrite("double_values", &OutputConfiguration::doubleValues)

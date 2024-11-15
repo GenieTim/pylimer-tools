@@ -14,7 +14,7 @@ using namespace pylimer_tools::utils;
 void
 init_pylimer_bound_writers(py::module_& m)
 {
-  py::class_<DataFileWriter>(m, "DataFileWriter")
+  py::class_<DataFileWriter>(m, "DataFileWriter", py::module_local())
     .def(py::init<pe::Universe>(), py::arg("universe"), R"pbdoc(
            Initialize the writer with the universe to write.
       )pbdoc")
