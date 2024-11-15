@@ -64,6 +64,7 @@ else()
   set(STD_FS_LIB "")
 endif()
 
+# register dependencies
 add_dependencies(pylimer_tools igraph::igraph)
 include_directories(${igraph_INCLUDE_DIRS})
 add_dependencies(pylimer_tools nlopt)
