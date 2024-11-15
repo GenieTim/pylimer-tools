@@ -28,12 +28,9 @@ endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wmissing-declarations -Wmissing-include-dirs -Woverloaded-virtual -Wredundant-decls -Wstrict-overflow=5 -Wswitch-default -Wundef -Wno-unused")
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC")
-set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} -fPIC")
-set(CMAKE_LINK_FLAGS "${CMAKE_LINK_FLAGS} -fPIC")
 endif()
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 function(OUTPUT_FLAGS target_name)
 get_target_property(COMPILE_DEFS ${target_name} COMPILE_DEFINITIONS)
