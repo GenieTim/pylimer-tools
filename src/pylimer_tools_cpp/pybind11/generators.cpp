@@ -200,7 +200,7 @@ init_pylimer_bound_generators(py::module_& m)
     py::arg("bead_distance") = 1.,
     py::arg("mean_squared_bead_distance") = 1.,
     py::arg("seed") = "",
-    py::arg("n_iterations") = 1000);
+    py::arg("n_iterations") = 10000);
   m.def(
     "do_random_walk_chain_from_to",
     [](pe::Box& b,

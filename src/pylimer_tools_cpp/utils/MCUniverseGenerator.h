@@ -1037,12 +1037,15 @@ namespace utils {
       Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
         chainLen, this->beadDistance, this->meanSquaredBeadDistance, this->rng);
 
-      pylimer_tools::sim::equilibrateChainWithMC(positions,
-                                                 this->meanSquaredBeadDistance,
-                                                 this->rng,
-                                                 true,
-                                                 false,
-                                                 this->nMcSteps);
+      if (this->nMcSteps > 0) {
+        pylimer_tools::sim::equilibrateChainWithMC(
+          positions,
+          this->meanSquaredBeadDistance,
+          this->rng,
+          true,
+          false,
+          this->nMcSteps);
+      }
 
       Eigen::Vector3d from = Eigen::Vector3d(
         this->distX(this->rng), this->distY(this->rng), this->distZ(this->rng));
@@ -1055,21 +1058,23 @@ namespace utils {
      * @brief Do a random walk of certain length starting somewhere to add a
      * chain
      *
-     * @param from the starting Atom of the chain
+     * @param idxFrom the starting cross-link of the dangling chain
      * @param chainLen the number of additional atoms to add to the chain
-     * @param atomType the atom type of the atoms in the chain
      */
     Eigen::VectorXd sampleDanglingChainCoordinates(size_t idxFrom, int chainLen)
     {
       Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
         chainLen, this->beadDistance, this->meanSquaredBeadDistance, this->rng);
 
-      pylimer_tools::sim::equilibrateChainWithMC(positions,
-                                                 this->meanSquaredBeadDistance,
-                                                 this->rng,
-                                                 true,
-                                                 false,
-                                                 this->nMcSteps);
+      if (this->nMcSteps > 0) {
+        pylimer_tools::sim::equilibrateChainWithMC(
+          positions,
+          this->meanSquaredBeadDistance,
+          this->rng,
+          true,
+          false,
+          this->nMcSteps);
+      }
 
       Eigen::Vector3d from =
         Eigen::Vector3d(this->simplifiedUniverse.xlinkX[idxFrom],
@@ -1093,25 +1098,35 @@ namespace utils {
                                             int chainLen)
     {
       // determine the positions
-      Eigen::VectorXd
-        positions = // pylimer_tools::utils::doRandomWalkChainFromTo(
-        pylimer_tools::utils::doRandomWalkChainFromToMC(
-          this->box,
-          Eigen::Vector3d(this->simplifiedUniverse.xlinkX[from],
-                          this->simplifiedUniverse.xlinkY[from],
-                          this->simplifiedUniverse.xlinkZ[from]),
-          Eigen::Vector3d(this->simplifiedUniverse.xlinkX[to],
-                          this->simplifiedUniverse.xlinkY[to],
-                          this->simplifiedUniverse.xlinkZ[to]),
-          chainLen,
-          this->beadDistance,
+      Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChainFromTo(
+        this->box,
+        Eigen::Vector3d(this->simplifiedUniverse.xlinkX[from],
+                        this->simplifiedUniverse.xlinkY[from],
+                        this->simplifiedUniverse.xlinkZ[from]),
+        Eigen::Vector3d(this->simplifiedUniverse.xlinkX[to],
+                        this->simplifiedUniverse.xlinkY[to],
+                        this->simplifiedUniverse.xlinkZ[to]),
+        chainLen,
+        this->beadDistance,
+        this->meanSquaredBeadDistance,
+        this->rng,
+        true);
+
+      if (this->nMcSteps > 0) {
+        pylimer_tools::sim::equilibrateChainWithMC(
+          positions,
           this->meanSquaredBeadDistance,
           this->rng,
+          true,
+          true,
           this->nMcSteps);
+      }
 
-      assert(positions.size() == chainLen * 3);
+      assert(positions.size() == (chainLen + 2) * 3);
 
-      return positions;
+      // omit first and last, which were required
+      // for the MC stepping
+      return positions.segment(3, positions.size() - 6);
     }
 
     /**
