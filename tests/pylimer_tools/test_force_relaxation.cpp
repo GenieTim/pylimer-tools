@@ -747,9 +747,13 @@ TEST_CASE("Force Relaxation free chains collapse",
   universe.addBonds(bondFrom, bondTo);
   REQUIRE(universe.getNrOfAtoms() == nrOfBeads);
   REQUIRE(universe.getNrOfBonds() == nrOfBeads - 1);
-  // add a primary loop to check that it collapses
-  universe.addBonds({ 0, static_cast<long>(nrOfBeadsPerChain) },
-                    { static_cast<long>(nrOfBeadsPerChain), 0 });
+  // add a primary and secondary loop to check that it collapses
+  universe.addBonds({ 0, 0 }, { static_cast<long>(nrOfBeadsPerChain), 0 });
+
+  CHECK(universe.getChainsWithCrosslinker(2).size() == 12);
+  CHECK(universe.getVertexDegree(
+    universe.getIdxByAtomId(static_cast<long>(nrOfBeadsPerChain))) == 3);
+  CHECK(universe.getVertexDegree(0) == 4);
 
   // now, check for every force evaluator, that the maximum entropy is when all
   // these beads overlap first, the gaussian spring one
@@ -757,6 +761,9 @@ TEST_CASE("Force Relaxation free chains collapse",
     pcm::SimpleSpringMEHPForceEvaluator();
   pcm::MEHPForceRelaxation forceRelaxerSimpleSpring =
     pcm::MEHPForceRelaxation(universe, 2, false, &simpleSpringForceEvaluator);
+
+  CHECK(forceRelaxerSimpleSpring.getNrOfSprings() == 12);
+
   REQUIRE_NOTHROW(forceRelaxerSimpleSpring.runForceRelaxation());
   REQUIRE(forceRelaxerSimpleSpring.getNrOfIterations() > 0);
   CHECK(forceRelaxerSimpleSpring.getNrOfActiveSprings() == 0);
