@@ -1155,7 +1155,7 @@ init_pylimer_bound_entities(py::module_& m)
          "Remove self links and double bonds. This function is called "
          "automatically after adding bonds.")
     // operators
-    .def(pybind11::self == pybind11::self)
+    //     .def(pybind11::self == pybind11::self)
     .def(
       "__getitem__",
       [](const Universe& u, size_t index) {
