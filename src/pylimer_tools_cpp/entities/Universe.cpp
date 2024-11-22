@@ -1084,6 +1084,7 @@ namespace entities {
       std::vector<long int> connections =
         this->getVertexIdxsConnectedTo(junctionIdx);
       std::vector<long int> edgeIds = this->getIncidentEdgeIds(junctionIdx);
+      assert(connections.size() == edgeIds.size());
       igraph_attribute_combination_t comb;
       igraph_attribute_combination_init(&comb);
       // how to combine two edges and their attributes
@@ -1091,15 +1092,15 @@ namespace entities {
       // let's take the mean.
       igraph_attribute_combination_add(
         &comb, NULL, IGRAPH_ATTRIBUTE_COMBINE_MEAN, NULL);
+      bool hasPrimary = false;
       for (size_t i = 0; i < connections.size(); ++i) {
         long int connectedVertexIdx = connections[i];
-        if (connectedVertexIdx >= junctionIdx &&
+        if (connectedVertexIdx == junctionIdx) {
+          hasPrimary = true;
+        }
+        if (connectedVertexIdx > junctionIdx &&
             vertexIsJunction[connectedVertexIdx]) {
           // new Molecule from just these two junctions
-          size_t nAdditionalChains =
-            this->getEdgeIdsFromTo(junctionIdx, connectedVertexIdx).size();
-          assert(nAdditionalChains >= 1);
-
           MoleculeType molType = MoleculeType::UNDEFINED;
           if (this->getVertexDegree(junctionIdx) == 1 &&
               this->getVertexDegree(connectedVertexIdx) == 1) {
@@ -1112,36 +1113,70 @@ namespace entities {
             molType = MoleculeType::DANGLING_CHAIN;
           }
 
-          for (size_t j = 0; j < nAdditionalChains; ++j) {
-            // could also use igraph_induced_subgraph, but performance is very
-            // bad for large structures, given how this is more or less O(1)
-            igraph_t chain;
-            igraph_empty(&chain, 2, IGRAPH_UNDIRECTED);
-            pylimer_tools::utils::copyVertexProperties(
-              &this->graph,
-              junctionIdx,
-              &chain,
-              0,
-              vertexAndEdgeProperties.first);
-            pylimer_tools::utils::copyVertexProperties(
-              &this->graph,
-              connectedVertexIdx,
-              &chain,
-              1,
-              vertexAndEdgeProperties.first);
-            igraph_add_edge(&chain, 0, 1);
-            pylimer_tools::utils::copyEdgeProperties(
-              &this->graph,
-              edgeIds[i],
-              &chain,
-              0,
-              vertexAndEdgeProperties.second);
-            molecules.push_back(
-              Molecule(this->box, &chain, molType, this->massPerType));
-            igraph_destroy(&chain);
-          }
+          // could also use igraph_induced_subgraph, but performance is very
+          // bad for large structures, given how this is more or less O(1)
+          igraph_t chain;
+          igraph_empty(&chain, 2, IGRAPH_UNDIRECTED);
+          pylimer_tools::utils::copyVertexProperties(
+            &this->graph,
+            junctionIdx,
+            &chain,
+            0,
+            vertexAndEdgeProperties.first);
+          pylimer_tools::utils::copyVertexProperties(
+            &this->graph,
+            connectedVertexIdx,
+            &chain,
+            1,
+            vertexAndEdgeProperties.first);
+          igraph_add_edge(&chain, 0, 1);
+          pylimer_tools::utils::copyEdgeProperties(
+            &this->graph,
+            edgeIds[i],
+            &chain,
+            0,
+            vertexAndEdgeProperties.second);
+          molecules.push_back(
+            Molecule(this->box, &chain, molType, this->massPerType));
+          igraph_destroy(&chain);
         }
       }
+
+      if (hasPrimary) {
+        // new Molecule from just these two junctions
+        std::vector<long int> primaryLoopEdgeIdsVec =
+          this->getEdgeIdsFromTo(junctionIdx, junctionIdx);
+        std::set<long int> primaryLoopEdgeIds(primaryLoopEdgeIdsVec.begin(),
+                                              primaryLoopEdgeIdsVec.end());
+        size_t nAdditionalChains = primaryLoopEdgeIds.size();
+        assert(nAdditionalChains >= 1);
+
+        MoleculeType molType = MoleculeType::PRIMARY_LOOP;
+
+        for (long int edgeId : primaryLoopEdgeIds) {
+          // could also use igraph_induced_subgraph, but performance is very
+          // bad for large structures, given how this is more or less O(1)
+          igraph_t chain;
+          igraph_empty(&chain, 1, IGRAPH_UNDIRECTED);
+          pylimer_tools::utils::copyVertexProperties(
+            &this->graph,
+            junctionIdx,
+            &chain,
+            0,
+            vertexAndEdgeProperties.first);
+          igraph_add_edge(&chain, 0, 0);
+          pylimer_tools::utils::copyEdgeProperties(
+            &this->graph,
+            edgeId,
+            &chain,
+            0,
+            vertexAndEdgeProperties.second);
+          molecules.push_back(
+            Molecule(this->box, &chain, molType, this->massPerType));
+          igraph_destroy(&chain);
+        }
+      }
+
       igraph_attribute_combination_destroy(&comb);
     }
 
