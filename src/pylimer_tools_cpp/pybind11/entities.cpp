@@ -1154,6 +1154,25 @@ init_pylimer_bound_entities(py::module_& m)
          &Universe::simplify,
          "Remove self links and double bonds. This function is called "
          "automatically after adding bonds.")
+    // operators
+    .def(pybind11::self == pybind11::self)
+    .def(
+      "__getitem__",
+      [](const Universe& u, size_t index) {
+        if (index > u.getNrOfAtoms()) {
+          throw py::index_error();
+        }
+        return u.getAtom(u.getAtomIdByIdx(index));
+      },
+      R"pbdoc(
+       Access an atom by its vertex index.
+  )pbdoc")
+    .def("__contains__", &Universe::containsAtom, R"pbdoc(
+          Check whether a particular atom is contained in this universe.
+     )pbdoc")
+    .def("__len__", &Universe::getNrOfAtoms, R"pbdoc(
+       Get the number of atoms in this universe.
+  )pbdoc")
 #ifdef CEREALIZABLE
     .def(py::pickle(
       [](const Universe& u) {
