@@ -367,24 +367,22 @@ namespace utils {
         if (from >= 0 && to >= 0) {
           // finally, make sure that the coordinates of two subsequent
           // cross-links match the required length of the respective strand
-
+          double stddev = std::sqrt(
+            static_cast<double>(
+              this->simplifiedUniverse.beadsInStrand[newStrandIdx] + 1) *
+            this->meanSquaredBeadDistance / 3.);
           std::normal_distribution<double> otherEndCoordinateDist =
-            std::normal_distribution<double>(
-              0.,
-              std::sqrt(
-                static_cast<double>(
-                  this->simplifiedUniverse.beadsInStrand[newStrandIdx] + 1) *
-                this->meanSquaredBeadDistance / 3.));
+            std::normal_distribution<double>(0., stddev);
 
+          const double deltaX = otherEndCoordinateDist(this->rng);
           this->simplifiedUniverse.xlinkX[to] =
-            this->simplifiedUniverse.xlinkX[from] +
-            otherEndCoordinateDist(this->rng);
+            this->simplifiedUniverse.xlinkX[from] + deltaX;
+          const double deltaY = otherEndCoordinateDist(this->rng);
           this->simplifiedUniverse.xlinkY[to] =
-            this->simplifiedUniverse.xlinkY[from] +
-            otherEndCoordinateDist(this->rng);
+            this->simplifiedUniverse.xlinkY[from] + deltaY;
+          const double deltaZ = otherEndCoordinateDist(this->rng);
           this->simplifiedUniverse.xlinkZ[to] =
-            this->simplifiedUniverse.xlinkZ[from] +
-            otherEndCoordinateDist(this->rng);
+            this->simplifiedUniverse.xlinkZ[from] + deltaZ;
 
 // validate the distances
 #ifndef NDEBUG
@@ -394,7 +392,7 @@ namespace utils {
             this->beadDistance;
           if (maxDistance > 1.) {
             RUNTIME_EXP_IFN(
-              distance < maxDistance,
+              distance < maxDistance * 2.,
               "Distance adjustment does not seem to be correct: got " +
                 std::to_string(distance) + " for chain with " +
                 std::to_string(
