@@ -11,7 +11,9 @@ MCUniverseGenerator
    .. autosummary::
 
       ~MCUniverseGenerator.add_crosslinkers
+      ~MCUniverseGenerator.add_end_functionalized_strands
       ~MCUniverseGenerator.add_monofunctional_strands
+      ~MCUniverseGenerator.add_randomly_functionalized_strands
       ~MCUniverseGenerator.add_solvent_chains
       ~MCUniverseGenerator.add_strands
       ~MCUniverseGenerator.config_nr_of_mc_steps
@@ -31,7 +33,9 @@ MCUniverseGenerator
    .. rubric:: Methods Documentation
 
    .. automethod:: add_crosslinkers
+   .. automethod:: add_end_functionalized_strands
    .. automethod:: add_monofunctional_strands
+   .. automethod:: add_randomly_functionalized_strands
    .. automethod:: add_solvent_chains
    .. automethod:: add_strands
    .. automethod:: config_nr_of_mc_steps
