@@ -371,9 +371,10 @@ namespace utils {
           std::normal_distribution<double> otherEndCoordinateDist =
             std::normal_distribution<double>(
               0.,
-              static_cast<double>(
-                this->simplifiedUniverse.beadsInStrand[newStrandIdx] + 1) *
-                std::sqrt(this->meanSquaredBeadDistance));
+              std::sqrt(
+                static_cast<double>(
+                  this->simplifiedUniverse.beadsInStrand[newStrandIdx] + 1) *
+                this->meanSquaredBeadDistance));
 
           this->simplifiedUniverse.xlinkX[to] =
             this->simplifiedUniverse.xlinkX[from] +
@@ -384,6 +385,13 @@ namespace utils {
           this->simplifiedUniverse.xlinkZ[to] =
             this->simplifiedUniverse.xlinkZ[from] +
             otherEndCoordinateDist(this->rng);
+
+          // validate the distances
+          double distance = this->distanceBetween(from, to);
+          RUNTIME_EXP_IFN(
+            distance < this->simplifiedUniverse.beadsInStrand[newStrandIdx] *
+                         this->beadDistance,
+            "Distance adjustment does not seem to be correct.");
         }
       }
 
@@ -422,8 +430,8 @@ namespace utils {
         std::normal_distribution<double> otherEndCoordinateDist =
           std::normal_distribution<double>(
             0.,
-            static_cast<double>(beadsPerStrand[i] + 1) *
-              std::sqrt(this->meanSquaredBeadDistance));
+            std::sqrt(static_cast<double>(beadsPerStrand[i] + 1) *
+                      this->meanSquaredBeadDistance));
 
         for (size_t dir = 0; dir < 3; ++dir) {
           firstLinkCoordinates(2 * 3 * i + dir) =
