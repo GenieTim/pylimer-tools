@@ -1,5 +1,6 @@
 {
   "C_Cpp.errorSquiggles": "enabled",
+  // "C_Cpp.loggingLevel": "Debug",
   "c-cpp-flylint.cppcheck.extraArgs": ["--quiet"],
   "files.associations": {
     "*.rdfa": "html",
@@ -172,6 +173,7 @@
     "crossLinker",
     "crosslinkers",
     "crossLinkers",
+    "functionalized",
     "igraph",
     "lammps",
     "LAMMPS",

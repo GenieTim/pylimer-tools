@@ -1362,10 +1362,37 @@ class MCUniverseGenerator:
                     :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the cross-linkers (default: true).
         """
 
+    def add_end_functionalized_strands(
+            self, nr_of_strands: int, strand_length: list[int], crosslinker_functionality: int = 4, crosslinker_type: int = 2, strand_atom_type: int = 1, white_noise: bool = True) -> None:
+        """
+                    Add strands with cross-linkers at the ends.
+
+                    :param nr_of_strands: Number of strands to add.
+                    :param strand_length: Length of each strand.
+                    :param crosslinker_functionality: Functionality of the cross-linkers (default: 4).
+                    :param crosslinker_type: Atom type of the cross-linkers (default: 2).
+                    :param strand_atom_type: Atom type of the beads that are not at the ends (default: 1).
+                    :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the cross-linkers (default: true).
+        """
+
     def add_monofunctional_strands(self, nr_of_monofunctional_strands: int,
                                    monofunctional_strand_length: list[int], monofunctional_strand_atom_type: int = 4) -> None:
         """
                  Add multiple monofunctional strands with specified bead types.
+        """
+
+    def add_randomly_functionalized_strands(self, nr_of_strands: int, strand_length: list[int], functionalization_proportion: float,
+                                            crosslinker_functionality: int = 4, crosslinker_type: int = 2, strand_atom_type: int = 1, white_noise: bool = True) -> None:
+        """
+                  Add strands with randomly distributed cross-linkers in between.
+
+                  :param nr_of_strands: Number of strands to add.
+                  :param strand_length: Length of each strand.
+                  :param functionalization_proportion: Proportion of beads that are made cross-link.
+                  :param crosslinker_functionality: Functionality of the cross-linkers (default: 4).
+                  :param crosslinker_type: Atom type of the cross-linkers (default: 2).
+                  :param strand_atom_type: Atom type of the beads that stay (default: 1).
+                  :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the cross-linkers (default: true).
         """
 
     def add_solvent_chains(self, nr_of_solvent_chains: int, solvent_chain_length: int,
@@ -3657,7 +3684,7 @@ def do_random_walk_chain_from_to(box: Box, from_coordinates: numpy.ndarray, to_c
 
 
 def do_random_walk_chain_from_to_mc(box: Box, from_coordinates: numpy.ndarray, to_coordinates: numpy.ndarray, chain_len: int,
-                                    bead_distance: float = 1.0, mean_squared_bead_distance: float = 1.0, seed: str = '', n_iterations: int = 1000) -> numpy.ndarray:
+                                    bead_distance: float = 1.0, mean_squared_bead_distance: float = 1.0, seed: str = '', n_iterations: int = 10000) -> numpy.ndarray:
     """
                 Do a random walk from one point to another.
                 Then, relax the points in between using a Metropolis-Monte Carlo simulation.

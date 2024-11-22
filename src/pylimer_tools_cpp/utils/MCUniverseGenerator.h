@@ -268,6 +268,201 @@ namespace utils {
     };
 
     /**
+     * @brief Add strands which contain cross-links at random positions
+     *
+     * @param nrOfStrands
+     * @param beadsPerStrand
+     * @param functionalizationProbability the probability of each bead being a
+     * cross-link
+     * @param crosslinkerFunctionality the functionality of the cross-linkers,
+     * excl. connections to the strand
+     * @param crosslinkerAtomType
+     * @param strandAtomType
+     * @param whiteNoise
+     */
+    void addRandomlyFunctionalizedStrands(int nrOfStrands,
+                                          std::vector<int> beadsPerStrand,
+                                          double functionalizationProbability,
+                                          int crosslinkerFunctionality = 4,
+                                          int crosslinkerAtomType = 2,
+                                          int strandAtomType = 2,
+                                          bool whiteNoise = true)
+    {
+      INVALIDARG_EXP_IFN(nrOfStrands > 0, "");
+      INVALIDARG_EXP_IFN(
+        functionalizationProbability >= 0. &&
+          functionalizationProbability <= 1.,
+        "Functionalisation probability must be between 0 and 1.");
+      INVALIDARG_EXP_IFN(crosslinkerFunctionality >= 1,
+                         "Cross-linker functionality must be at least 1. Use "
+                         "normal chains instead for lower functionalities.");
+      this->validateInternalState();
+
+      size_t nCrosslinksBefore = this->remainingCrossLinkerFunctionality.size();
+      size_t nStrandsBefore = this->simplifiedUniverse.strandFrom.size();
+
+      std::uniform_real_distribution<double> randomDist(0., 1.);
+      size_t nCrosslinks = 0;
+      size_t nEffectiveStrands = 0;
+
+      for (size_t strandI = 0; strandI < nrOfStrands; ++strandI) {
+        std::vector<int> partialStrandLengths;
+        std::vector<size_t> crosslinkIndicesInStrand;
+        long int lastSampledBead = -1;
+        for (long int i = 0; i < beadsPerStrand[strandI]; ++i) {
+          if (randomDist(this->rng) < functionalizationProbability) {
+            // yes, we want to replace this bead `i` with a cross-link
+            size_t currentSpringIdx = nStrandsBefore + nEffectiveStrands;
+            long int remainingLength =
+              i - (lastSampledBead >= 0 ? (lastSampledBead + 1) : 0);
+            if (i > 0) {
+              this->addStrands(1, remainingLength, strandAtomType);
+              nEffectiveStrands += 1;
+              this->linkStrandToCrosslink(
+                currentSpringIdx, nCrosslinksBefore + nCrosslinks, true);
+            }
+
+            if (lastSampledBead > 0) {
+              this->linkStrandToCrosslink(
+                currentSpringIdx - 1, nCrosslinksBefore + nCrosslinks, true);
+            }
+
+            nCrosslinks += 1;
+            lastSampledBead = i;
+          }
+        }
+
+        if (lastSampledBead < beadsPerStrand[strandI] - 1) {
+          // add dangling spring
+          size_t currentSpringIdx = nStrandsBefore + nEffectiveStrands;
+
+          long int remainingLength =
+            beadsPerStrand[strandI] -
+            (lastSampledBead >= 0 ? (lastSampledBead + 1) : 0);
+          this->addStrands(1, remainingLength, strandAtomType);
+          nEffectiveStrands += 1;
+          if (lastSampledBead > 0) {
+            this->linkStrandToCrosslink(
+              currentSpringIdx, nCrosslinksBefore + nCrosslinks, true);
+          }
+        }
+      }
+
+      // then, add the cross-link atoms
+      this->addCrosslinkers(
+        nCrosslinks, crosslinkerFunctionality, crosslinkerAtomType, whiteNoise);
+
+      for (size_t newStrandIdx = nStrandsBefore;
+           newStrandIdx < nStrandsBefore + nEffectiveStrands;
+           ++newStrandIdx) {
+        long int from = this->simplifiedUniverse.strandFrom[newStrandIdx];
+        long int to = this->simplifiedUniverse.strandTo[newStrandIdx];
+        if (from >= 0) {
+          this->simplifiedUniverse.strandsOfXlink[from].push_back(newStrandIdx);
+        }
+        if (to >= 0) {
+          this->simplifiedUniverse.strandsOfXlink[to].push_back(newStrandIdx);
+        }
+
+        if (from >= 0 && to >= 0) {
+          // finally, make sure that the coordinates of two subsequent
+          // cross-links match the required length of the respective strand
+
+          std::normal_distribution<double> otherEndCoordinateDist =
+            std::normal_distribution<double>(
+              0.,
+              static_cast<double>(
+                this->simplifiedUniverse.beadsInStrand[newStrandIdx] + 1) *
+                std::sqrt(this->meanSquaredBeadDistance));
+
+          this->simplifiedUniverse.xlinkX[to] =
+            this->simplifiedUniverse.xlinkX[from] +
+            otherEndCoordinateDist(this->rng);
+          this->simplifiedUniverse.xlinkY[to] =
+            this->simplifiedUniverse.xlinkY[from] +
+            otherEndCoordinateDist(this->rng);
+          this->simplifiedUniverse.xlinkZ[to] =
+            this->simplifiedUniverse.xlinkZ[from] +
+            otherEndCoordinateDist(this->rng);
+        }
+      }
+
+      this->validateInternalState();
+    }
+
+    /**
+     * @brief add strands with cross-links as ends
+     *
+     * @param nrOfCrosslinkStrands
+     * @param crosslinkerFunctionality incl. the connection to the strand
+     * @param crosslinkerAtomType
+     * @param beadsPerStrand excl. cross-links
+     * @param strandAtomType
+     * @param whiteNoise
+     */
+    void addCrosslinkStrands(int nrOfCrosslinkStrands,
+                             std::vector<int> beadsPerStrand,
+                             int crosslinkerFunctionality = 4,
+                             int crosslinkerAtomType = 2,
+                             int strandAtomType = 2,
+                             bool whiteNoise = true)
+    {
+      INVALIDARG_EXP_IFN(nrOfCrosslinkStrands > 0, "");
+      INVALIDARG_EXP_IFN(crosslinkerFunctionality >= 2,
+                         "Cross-linker functionality must be at least 2. Use "
+                         "solvent chains instead for lower functionalities.");
+      this->validateInternalState();
+
+      Eigen::VectorXd firstLinkCoordinates =
+        this->generateRandomPositions(nrOfCrosslinkStrands);
+      assert(firstLinkCoordinates.size() == 3 * nrOfCrosslinkStrands);
+      firstLinkCoordinates.conservativeResize(2 * 3 * nrOfCrosslinkStrands);
+
+      for (size_t i = 0; i < nrOfCrosslinkStrands; ++i) {
+        std::normal_distribution<double> otherEndCoordinateDist =
+          std::normal_distribution<double>(
+            0.,
+            static_cast<double>(beadsPerStrand[i] + 1) *
+              std::sqrt(this->meanSquaredBeadDistance));
+
+        for (size_t dir = 0; dir < 3; ++dir) {
+          firstLinkCoordinates(2 * 3 * i + dir) =
+            firstLinkCoordinates(3 * i + dir) +
+            otherEndCoordinateDist(this->rng);
+        }
+      }
+
+      size_t nCrosslinksBefore = this->remainingCrossLinkerFunctionality.size();
+
+      this->addXlinkAtoms(
+        2 * nrOfCrosslinkStrands, crosslinkerAtomType, firstLinkCoordinates);
+
+      size_t nStrandsBefore = this->simplifiedUniverse.strandFrom.size();
+
+      this->addStrands(nrOfCrosslinkStrands, beadsPerStrand, strandAtomType);
+
+      this->originalNrOfAvailableCrosslinkSites +=
+        crosslinkerFunctionality * nrOfCrosslinkStrands * 2;
+      this->nrOfAvailableCrosslinkSites +=
+        (crosslinkerFunctionality - 1) * nrOfCrosslinkStrands * 2;
+
+      for (size_t i = 0; i < nrOfCrosslinkStrands; ++i) {
+        // actually link these strands
+        this->simplifiedUniverse.strandFrom[nStrandsBefore + i] =
+          nCrosslinksBefore + i;
+        this->simplifiedUniverse.strandTo[nStrandsBefore + i] =
+          nCrosslinksBefore + i + nrOfCrosslinkStrands;
+        // remember remaining cross-link functionality
+        this->remainingCrossLinkerFunctionality.push_back(
+          crosslinkerFunctionality - 1);
+        this->remainingCrossLinkerFunctionality.push_back(
+          crosslinkerFunctionality - 1);
+      }
+
+      this->validateInternalState();
+    }
+
+    /**
      * @brief Randomly distribute free "chains"
      *
      * @param nrOfSolventChains
@@ -337,6 +532,10 @@ namespace utils {
                     const std::vector<int> beadsPerChains,
                     const int strandAtomType = 1)
     {
+      INVALIDARG_EXP_IFN(
+        beadsPerChains.size() == nrOfStrands,
+        "Inconsistent nr of strands and nr of beads per strand given.");
+
       for (size_t strandIdx = 0; strandIdx < nrOfStrands; ++strandIdx) {
         this->simplifiedUniverse.strandBeadType.push_back(strandAtomType);
         this->simplifiedUniverse.beadsInStrand.push_back(
@@ -1130,6 +1329,36 @@ namespace utils {
     }
 
     /**
+     * @brief Tell a strand how it is connected to a cross-link.
+     * Automatically decides whether it is `from` or `to`
+     *
+     * @param strandIdx
+     * @param crosslinkIdx
+     * @param ignoreInexistent whether to throw an error if the crosslink does
+     * not exist yet, or not
+     */
+    void linkStrandToCrosslink(size_t strandIdx,
+                               size_t crosslinkIdx,
+                               bool ignoreInexistent = false)
+    {
+      INVALIDARG_EXP_IFN(strandIdx < this->simplifiedUniverse.strandFrom.size(),
+                         "The strand index is out of bounds.");
+      INVALIDARG_EXP_IFN(this->simplifiedUniverse.strandFrom[strandIdx] < 0 ||
+                           this->simplifiedUniverse.strandTo[strandIdx] < 0,
+                         "Require one end to be free to be connected to");
+      if (!ignoreInexistent) {
+        INVALIDARG_EXP_IFN(
+          crosslinkIdx < this->simplifiedUniverse.strandFrom.size(), "");
+      }
+
+      if (this->simplifiedUniverse.strandFrom[strandIdx] < 0) {
+        this->simplifiedUniverse.strandFrom[strandIdx] = crosslinkIdx;
+      } else {
+        this->simplifiedUniverse.strandTo[strandIdx] = crosslinkIdx;
+      }
+    };
+
+    /**
      * @brief Add atoms (incl. type, id etc.) with given positions to the
      * universe
      *
@@ -1143,6 +1372,8 @@ namespace utils {
     {
       INVALIDARG_EXP_IFN(coordinates.size() % 3 == 0,
                          "Coordinates must have a size multiple of 3");
+      INVALIDARG_EXP_IFN(coordinates.size() / 3 == nrOfAtomsToAdd,
+                         "Coordinates must match the promised number of atoms");
       size_t currentNrOfJunctions = this->simplifiedUniverse.xlinkX.size();
       this->simplifiedUniverse.xlinkTypes.reserve(currentNrOfJunctions +
                                                   nrOfAtomsToAdd);
@@ -1428,6 +1659,12 @@ namespace utils {
               this->simplifiedUniverse.strandTo[subStrandIdx] == xlinkIdx,
             "Inconsistent links int list of cross-links <> strands.");
         }
+      }
+      for (size_t strandIdx;
+           strandIdx < this->simplifiedUniverse.strandFrom.size();
+           ++strandIdx) {
+        RUNTIME_EXP_IFN(this->simplifiedUniverse.beadsInStrand[strandIdx] >= 0,
+                        "Expected a positive number of beads per strand.");
       }
     }
   };
