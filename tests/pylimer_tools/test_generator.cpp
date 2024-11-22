@@ -8,6 +8,7 @@
 #include "../../src/pylimer_tools_cpp/utils/MCUniverseGenerator.h"
 #include <catch2/catch_approx.hpp>
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 #include <iostream>
 #include <map>
 #include <vector>
@@ -319,4 +320,74 @@ TEST_CASE("MCUniverseGenerator uses correct force relaxation network",
   // generation
   // CHECK(relaxer.getNrOfNodes() == relaxerFromGenerator.getNrOfNodes());
   CHECK(relaxer.getNrOfSprings() == relaxerFromGenerator.getNrOfSprings());
+}
+
+TEST_CASE("MUniverseGenerator can generate with cross-link chains",
+          "[generator][MCUniverseGenerator]")
+{
+  std::cout
+    << "Running test \"MUniverseGenerator can generate with cross-link chains\""
+    << std::endl;
+
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(20.0, 20.0, 20.0);
+  generator.setSeed(8804);
+  generator.setBeadDistance(0.75);
+  generator.configNrOfMCSteps(0);
+
+  generator.addCrosslinkStrands(
+    10, { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 }, 2, 2, 1);
+
+  pe::Universe universe = generator.getUniverse();
+  CHECK(universe.getAtomsOfType(2).size() == 2 * 10);
+  CHECK(universe.getAtomsOfType(1).size() == 10 * 10);
+
+  std::vector<pe::Molecule> chains = universe.getChainsWithCrosslinker(2);
+  CHECK(chains.size() == 10);
+  for (auto chain : chains) {
+    CHECK(chain.getNrOfAtoms() == 12);
+  }
+}
+
+TEST_CASE(
+  "MCUniverseGenerator can generate with randomly functionalized chains",
+  "[generator][MCUniverseGenerator]")
+{
+  std::cout << "Running test \"MCUniverseGenerator can generate with randomly "
+               "functionalized chains\""
+            << std::endl;
+
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(20.0, 20.0, 20.0);
+  generator.setSeed(8804);
+  generator.setBeadDistance(0.75);
+  generator.configNrOfMCSteps(0);
+
+  SECTION("Without functionalization")
+  {
+    generator.addRandomlyFunctionalizedStrands(
+      10, { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 }, 0., 2, 1, true);
+
+    pe::Universe universe = generator.getUniverse();
+    CHECK(universe.getAtomsOfType(2).size() == 0);
+    CHECK(universe.getAtomsOfType(1).size() == 10 * 10);
+
+    std::vector<pe::Molecule> chains = universe.getChainsWithCrosslinker(2);
+    CHECK(chains.size() == 10);
+    for (auto chain : chains) {
+      CHECK(chain.getNrOfAtoms() == 10);
+    }
+  }
+
+  SECTION("With functionalization")
+  {
+    std::vector<int> chainLengths = pu::initializeWithValue(1000, 100);
+    generator.addRandomlyFunctionalizedStrands(
+      1000, chainLengths, 0.2, 3, 2, 1, true);
+
+    pe::Universe universe = generator.getUniverse();
+    double nCrosslinks = static_cast<double>(universe.getAtomsOfType(2).size());
+    CHECK_THAT(nCrosslinks, Catch::Matchers::WithinRel(1000 * 100 * 0.2, 0.01));
+    CHECK(universe.getNrOfAtoms() == 1000 * 100);
+    std::vector<pe::Molecule> chains = universe.getChainsWithCrosslinker(2);
+    CHECK(chains.size() > 5000);
+  }
 }

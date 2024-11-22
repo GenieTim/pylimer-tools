@@ -15,7 +15,8 @@ using namespace pylimer_tools::topo::entanglement_detection;
 void
 init_pylimer_bound_topo(py::module_& m)
 {
-  py::class_<AtomPairEntanglements>(m, "AtomPairEntanglements", py::module_local())
+  py::class_<AtomPairEntanglements>(
+    m, "AtomPairEntanglements", py::module_local())
     .def(py::init<>(), "Get an instance of this struct")
     .def_readwrite(
       "pairs_of_atoms", &AtomPairEntanglements::pairsOfAtoms, R"pbdoc(

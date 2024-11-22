@@ -27,7 +27,8 @@ if (HIGH_PERFORMANCE)
 endif()
 
 if(CMAKE_COMPILER_IS_GNUCXX)
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall -Wextra -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wmissing-declarations -Wmissing-include-dirs -Woverloaded-virtual -Wredundant-decls -Wstrict-overflow=5 -Wswitch-default -Wundef -Wno-unused")
+#  -Wall -Wextra -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Woverloaded-virtual  -Wno-unused
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wredundant-decls -Wstrict-overflow=5 -Wmissing-declarations -Wmissing-include-dirs -Wswitch-default -Wundef -Weffc++")
 endif()
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)

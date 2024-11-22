@@ -98,6 +98,44 @@ init_pylimer_bound_generators(py::module_& m)
          py::arg("crosslinker_functionality") = 4,
          py::arg("crosslinker_type") = 2,
          py::arg("white_noise") = true)
+    .def("add_randomly_functionalized_strands",
+         &MCUniverseGenerator::addRandomlyFunctionalizedStrands,
+         R"pbdoc(
+          Add strands with randomly distributed cross-linkers in between.
+
+          :param nr_of_strands: Number of strands to add.
+          :param strand_length: Length of each strand.
+          :param functionalization_proportion: Proportion of beads that are made cross-link.
+          :param crosslinker_functionality: Functionality of the cross-linkers (default: 4).
+          :param crosslinker_type: Atom type of the cross-linkers (default: 2).
+          :param strand_atom_type: Atom type of the beads that stay (default: 1).
+          :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the cross-linkers (default: true).     
+     )pbdoc",
+         py::arg("nr_of_strands"),
+         py::arg("strand_length"),
+         py::arg("functionalization_proportion"),
+         py::arg("crosslinker_functionality") = 4,
+         py::arg("crosslinker_type") = 2,
+         py::arg("strand_atom_type") = 1,
+         py::arg("white_noise") = true)
+    .def("add_end_functionalized_strands",
+         &MCUniverseGenerator::addCrosslinkStrands,
+         R"pbdoc(
+            Add strands with cross-linkers at the ends.
+
+            :param nr_of_strands: Number of strands to add.
+            :param strand_length: Length of each strand.
+            :param crosslinker_functionality: Functionality of the cross-linkers (default: 4).
+            :param crosslinker_type: Atom type of the cross-linkers (default: 2).
+            :param strand_atom_type: Atom type of the beads that are not at the ends (default: 1).
+            :param white_noise: Whether to use white noise (true) or blue noise (false) for the positions of the cross-linkers (default: true).
+            )pbdoc",
+         py::arg("nr_of_strands"),
+         py::arg("strand_length"),
+         py::arg("crosslinker_functionality") = 4,
+         py::arg("crosslinker_type") = 2,
+         py::arg("strand_atom_type") = 1,
+         py::arg("white_noise") = true)
     .def("add_solvent_chains",
          &MCUniverseGenerator::addSolventChains,
          R"pbdoc(
