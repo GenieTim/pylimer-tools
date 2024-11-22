@@ -1,61 +1,56 @@
 {
-  "configurations": [
-    {
-      "name": "Mac",
-      "includePath": [
-        "${workspaceFolder}/src/**",
-        "${workspaceFolder}/tests/build/_deps/catch2-src/src/**",
-        "${workspaceFolder}/vendor/nlopt/nloptLib-install/include",
-        "${workspaceFolder}/vendor/igraph/igraphLib-install/include",
-        "/usr/local/include/eigen3/",
-        "/opt/homebrew/Cellar/eigen/3.4.0_1/include",
-        "/usr/local/include",
-        "/usr/local/var/vcpkg/installed/x64-osx/include/python3.9/",
-        "${workspaceFolder}/tests/build/_deps/catch2-build/generated-includes",
-        "${workspaceFolder}/tests/build/_deps/spectra-src/include",
-        "${workspaceFolder}/vendor/pybind11/include",
-        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1",
-        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
-        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include",
-        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
-        "${workspaceFolder}/tests/build/_deps/eigen3-src",
-        "/opt/homebrew/Cellar/eigen/3.4.0_1/include/eigen3"
-      ],
-      "defines": [],
-      "compilerPath": "/opt/homebrew/opt/llvm/bin/clang++",
-      "intelliSenseMode": "${default}",
-      "cStandard": "c17",
-      "cppStandard": "c++20",
-      "configurationProvider": "ms-vscode.cmake-tools"
-    },
-    {
-      "name": "Linux",
-      "includePath": [
-        "${workspaceFolder}/src/**",
-        "${workspaceFolder}/tests/build/_deps/catch2-src/src/**",
-        "${workspaceFolder}/vendor/nlopt/nloptLib-install/include",
-        "${workspaceFolder}/vendor/igraph/igraphLib-install/include",
-        "/usr/local/include/eigen3/",
-        "/opt/homebrew/Cellar/eigen/3.4.0_1/include",
-        "/usr/local/include",
-        "/usr/local/var/vcpkg/installed/x64-osx/include/python3.9/",
-        "${workspaceFolder}/tests/build/_deps/catch2-build/generated-includes",
-        "${workspaceFolder}/tests/build/_deps/spectra-src/include",
-        "${workspaceFolder}/vendor/pybind11/include",
-        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1",
-        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
-        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include",
-        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
-        "${workspaceFolder}/tests/build/_deps/eigen3-src",
-        "/opt/homebrew/Cellar/eigen/3.4.0_1/include/eigen3"
-      ],
-      "defines": [],
-      "compilerPath": "/usr/bin/gcc",
-      "intelliSenseMode": "${default}",
-      "cStandard": "c17",
-      "cppStandard": "c++20",
-      "configurationProvider": "ms-vscode.cmake-tools"
-    }
-  ],
-  "version": 4
+    "configurations": [
+        {
+            "name": "Mac",
+            "includePath": [
+                "${workspaceFolder}/src/**",
+                "${workspaceFolder}/vendor/nlopt/nloptLib-install/include",
+                "${workspaceFolder}/vendor/igraph/igraphLib-install/include",
+                "/usr/local/include/eigen3/",
+                "/opt/homebrew/Cellar/eigen/3.4.0_1/include",
+                "${workspaceFolder}/tests/build/_deps/catch2-build/generated-includes",
+                "${workspaceFolder}/tests/build/_deps/spectra-src/include",
+                "${workspaceFolder}/vendor/pybind11/include",
+                "${workspaceFolder}/tests/build/_deps/eigen3-src",
+                "/opt/homebrew/Cellar/eigen/3.4.0_1/include/eigen3",
+                "/usr/local/include",
+                "${workspaceFolder}/tests/build/_deps/catch2-src/src"
+            ],
+            "defines": [],
+            "compilerPath": "/opt/homebrew/opt/llvm/bin/clang++",
+            "intelliSenseMode": "${default}",
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "configurationProvider": "ms-vscode.cmake-tools"
+        },
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/src/**",
+                "${workspaceFolder}/tests/build/_deps/catch2-src/src/**",
+                "${workspaceFolder}/vendor/nlopt/nloptLib-install/include",
+                "${workspaceFolder}/vendor/igraph/igraphLib-install/include",
+                "/usr/local/include/eigen3/",
+                "/opt/homebrew/Cellar/eigen/3.4.0_1/include",
+                "/usr/local/include",
+                "/usr/local/var/vcpkg/installed/x64-osx/include/python3.9/",
+                "${workspaceFolder}/tests/build/_deps/catch2-build/generated-includes",
+                "${workspaceFolder}/tests/build/_deps/spectra-src/include",
+                "${workspaceFolder}/vendor/pybind11/include",
+                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/c++/v1",
+                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
+                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/16/include",
+                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
+                "${workspaceFolder}/tests/build/_deps/eigen3-src",
+                "/opt/homebrew/Cellar/eigen/3.4.0_1/include/eigen3"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "intelliSenseMode": "${default}",
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "configurationProvider": "ms-vscode.cmake-tools"
+        }
+    ],
+    "version": 4
 }
