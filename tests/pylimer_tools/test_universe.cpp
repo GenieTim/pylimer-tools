@@ -895,6 +895,68 @@ TEST_CASE("Universe can be used", "[entity][Universe]")
   }
 }
 
+TEST_CASE("Universe can be decomposed", "[Universe][entity]")
+{
+  std::cout << "Running test \"Universe can be decomposed\"" << std::endl;
+  size_t nrOfBeads = 30;
+  size_t nrOfBeadsPerChain = 3;
+  pe::Universe universe =
+    pe::Universe(nrOfBeads * 10.0, nrOfBeads * 10.0, nrOfBeads * 10.0);
+  std::vector<double> xPositions, yPositions, zPositions;
+  std::vector<int> atomTypes, zeroInts;
+  std::vector<long int> atomIds;
+  std::vector<long int> bondFrom, bondTo;
+  double offset = 10.0;
+  for (int i = 0; i < nrOfBeads; ++i) {
+    xPositions.push_back(i * 1.0 + offset);
+    yPositions.push_back(0.1 * static_cast<double>(i % 4 - i % 3) +
+                         offset); // /!\ i needs to be int, not unsigned!
+    zPositions.push_back(0.1 * static_cast<double>(i % 5 - i % 7) + offset); //
+    atomIds.push_back(i);
+    atomTypes.push_back(i % nrOfBeadsPerChain == 0 ? 2 : 1);
+    zeroInts.push_back(0);
+    if (i > 0) {
+      bondFrom.push_back(i - 1);
+      bondTo.push_back(i);
+    }
+  }
+  universe.addAtoms(atomIds,
+                    atomTypes,
+                    xPositions,
+                    yPositions,
+                    zPositions,
+                    zeroInts,
+                    zeroInts,
+                    zeroInts);
+  universe.addBonds(bondFrom, bondTo);
+  REQUIRE(universe.getNrOfAtoms() == nrOfBeads);
+  REQUIRE(universe.getNrOfBonds() == nrOfBeads - 1);
+  //
+
+  CHECK(universe.getChainsWithCrosslinker(2).size() == 10);
+
+  SECTION("Also with secondary loop")
+  {
+    // add a secondary loop to check that it is returned as well
+    universe.addBonds({ 0 }, { static_cast<long>(nrOfBeadsPerChain) });
+    CHECK(universe.getChainsWithCrosslinker(2).size() == 11);
+  }
+
+  SECTION("Also with primary loop")
+  {
+    // add a primary loop to check that it is returned as well
+    universe.addBonds({ 0 }, { 0 });
+    CHECK(universe.getChainsWithCrosslinker(2).size() == 11);
+  }
+
+  SECTION("Also with more loops")
+  {
+    // add a primary loop to check that it is returned as well
+    universe.addBonds({ 0, 0 }, { static_cast<long>(nrOfBeadsPerChain), 0 });
+    CHECK(universe.getChainsWithCrosslinker(2).size() == 12);
+  }
+}
+
 TEST_CASE("Coordinates work")
 {
   pe::Universe universe = pe::Universe(10.0, 10.0, 10.0);
