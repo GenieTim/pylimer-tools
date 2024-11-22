@@ -1719,6 +1719,19 @@ namespace entities {
   }
 
   /**
+   * @brief Check whether the given atom is present in this universe
+   *
+   * @param atom
+   * @return true
+   * @return false
+   */
+  bool Universe::containsAtom(const Atom& atom) const
+  {
+    return this->containsAtomWithId(atom.getId()) &&
+           (this->getAtom(atom.getId()) == atom);
+  }
+
+  /**
    * @brief Get an atom by its id
    *
    * @param atomId
