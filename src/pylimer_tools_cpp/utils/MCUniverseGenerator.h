@@ -374,7 +374,7 @@ namespace utils {
               std::sqrt(
                 static_cast<double>(
                   this->simplifiedUniverse.beadsInStrand[newStrandIdx] + 1) *
-                this->meanSquaredBeadDistance));
+                this->meanSquaredBeadDistance / 3.));
 
           this->simplifiedUniverse.xlinkX[to] =
             this->simplifiedUniverse.xlinkX[from] +
@@ -386,12 +386,23 @@ namespace utils {
             this->simplifiedUniverse.xlinkZ[from] +
             otherEndCoordinateDist(this->rng);
 
-          // validate the distances
+// validate the distances
+#ifndef NDEBUG
           double distance = this->distanceBetween(from, to);
-          RUNTIME_EXP_IFN(
-            distance < this->simplifiedUniverse.beadsInStrand[newStrandIdx] *
-                         this->beadDistance,
-            "Distance adjustment does not seem to be correct.");
+          double maxDistance =
+            (this->simplifiedUniverse.beadsInStrand[newStrandIdx] + 1) *
+            this->beadDistance;
+          if (maxDistance > 1.) {
+            RUNTIME_EXP_IFN(
+              distance < maxDistance,
+              "Distance adjustment does not seem to be correct: got " +
+                std::to_string(distance) + " for chain with " +
+                std::to_string(
+                  this->simplifiedUniverse.beadsInStrand[newStrandIdx]) +
+                " beads and " + std::to_string(this->beadDistance) +
+                " distance.");
+          }
+#endif
         }
       }
 
@@ -431,7 +442,7 @@ namespace utils {
           std::normal_distribution<double>(
             0.,
             std::sqrt(static_cast<double>(beadsPerStrand[i] + 1) *
-                      this->meanSquaredBeadDistance));
+                      this->meanSquaredBeadDistance / 3.));
 
         for (size_t dir = 0; dir < 3; ++dir) {
           firstLinkCoordinates(2 * 3 * i + dir) =
