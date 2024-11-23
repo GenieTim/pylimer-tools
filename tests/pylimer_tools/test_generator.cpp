@@ -112,7 +112,7 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
     REQUIRE_THROWS(generator.addStrands(3, { { 10, 100 } }, 1));
     // not enough strands to reach conversion:
     generator.addStrands(2, 10, 1);
-    REQUIRE_THROWS(generator.linkStrandsToConversion(1.0));
+    REQUIRE_THROWS(generator.linkStrandsToConversion(2.0));
   }
 
   // SECTION("Universe can be written and read again") {
