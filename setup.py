@@ -143,11 +143,12 @@ class CMakeBuild(build_ext):
                     import ninja
 
                     ninja_executable_path = Path(ninja.BIN_DIR) / "ninja"
+                    subprocess.run([ninja_executable_path, "--version"], check=True)
                     cmake_args += [
                         "-GNinja",
                         f"-DCMAKE_MAKE_PROGRAM:FILEPATH={ninja_executable_path}",
                     ]
-                except ImportError:
+                except (ImportError, subprocess.CalledProcessError):
                     pass
 
         else:
