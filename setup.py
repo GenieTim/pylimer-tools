@@ -148,7 +148,7 @@ class CMakeBuild(build_ext):
                         "-GNinja",
                         f"-DCMAKE_MAKE_PROGRAM:FILEPATH={ninja_executable_path}",
                     ]
-                except (ImportError, subprocess.CalledProcessError):
+                except (ImportError, subprocess.CalledProcessError, PermissionError):
                     pass
 
         else:
