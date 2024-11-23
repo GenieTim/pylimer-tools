@@ -136,6 +136,10 @@ namespace utils {
      */
     pylimer_tools::entities::Universe getUniverse()
     {
+#ifndef NDEBUG
+      this->validateInternalState();
+#endif
+
       pylimer_tools::entities::Universe universe =
         pylimer_tools::entities::Universe(this->box);
       size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
@@ -188,11 +192,17 @@ namespace utils {
         long int strandEnd2 = this->simplifiedUniverse.strandTo[strandI];
         int nBeadsInStrand = this->simplifiedUniverse.beadsInStrand[strandI];
         if (strandEnd1 < 0) {
+          if (nBeadsInStrand < 1) {
+            continue;
+          }
           RUNTIME_EXP_IFN(
             strandEnd2 < 0,
             "if first end is not associated, expected second to be as well");
           coordinates = this->sampleFreeChainCoordinates(nBeadsInStrand);
         } else if (strandEnd2 < 0) {
+          if (nBeadsInStrand < 1) {
+            continue;
+          }
           coordinates =
             this->sampleDanglingChainCoordinates(strandEnd1, nBeadsInStrand);
           bondsFrom.push_back(strandEnd1 + 1);
@@ -343,7 +353,7 @@ namespace utils {
           nEffectiveStrands += 1;
           if (lastSampledBead > 0) {
             this->linkStrandToCrosslink(
-              currentSpringIdx, nCrosslinksBefore + nCrosslinks, true);
+              currentSpringIdx, nCrosslinksBefore + nCrosslinks - 1, true);
           }
         }
       }
@@ -357,6 +367,8 @@ namespace utils {
            ++newStrandIdx) {
         long int from = this->simplifiedUniverse.strandFrom[newStrandIdx];
         long int to = this->simplifiedUniverse.strandTo[newStrandIdx];
+        assert(from < static_cast<long int>(nCrosslinksBefore + nCrosslinks));
+        assert(to < static_cast<long int>(nCrosslinksBefore + nCrosslinks));
         if (from >= 0) {
           this->simplifiedUniverse.strandsOfXlink[from].push_back(newStrandIdx);
         }
@@ -404,7 +416,9 @@ namespace utils {
         }
       }
 
+#ifndef NDEBUG
       this->validateInternalState();
+#endif
     }
 
     /**
@@ -1279,6 +1293,8 @@ namespace utils {
      */
     Eigen::VectorXd sampleDanglingChainCoordinates(size_t idxFrom, int chainLen)
     {
+      INVALIDARG_EXP_IFN(idxFrom < this->simplifiedUniverse.xlinkTypes.size(),
+                         "Invalid index for dangling chain start");
       Eigen::VectorXd positions = pylimer_tools::utils::doRandomWalkChain(
         chainLen, this->beadDistance, this->meanSquaredBeadDistance, this->rng);
 
@@ -1677,11 +1693,17 @@ namespace utils {
             "Inconsistent links int list of cross-links <> strands.");
         }
       }
-      for (size_t strandIdx;
+      for (size_t strandIdx = 0;
            strandIdx < this->simplifiedUniverse.strandFrom.size();
            ++strandIdx) {
         RUNTIME_EXP_IFN(this->simplifiedUniverse.beadsInStrand[strandIdx] >= 0,
                         "Expected a positive number of beads per strand.");
+        RUNTIME_EXP_IFN(
+          this->simplifiedUniverse.strandFrom[strandIdx] < nCrosslinks,
+          "Expected a valid cross-link index as a strand origin.");
+        RUNTIME_EXP_IFN(
+          this->simplifiedUniverse.strandTo[strandIdx] < nCrosslinks,
+          "Expected a valid cross-link index as a strand destination.");
       }
     }
   };
