@@ -645,10 +645,10 @@ namespace utils {
       const double timesNForR02 = this->meanSquaredBeadDistance * cInfinity;
 
       // link one strand at a time until we reach the target conversion
-      for (size_t sampleIdx = 0; sampleIdx < availableStrandEnds.size();
-           ++sampleIdx) {
-        BackTrackStatus status =
-          linkingController(*this, availableStrandEnds.size() - sampleIdx);
+      size_t maxStep =
+        std::min(availableStrandEnds.size(), availableCrosslinkSites.size());
+      for (size_t sampleIdx = 0; sampleIdx < maxStep; ++sampleIdx) {
+        BackTrackStatus status = linkingController(*this, maxStep - sampleIdx);
         if (status == BackTrackStatus::STOP) {
           break;
         } else if (status == BackTrackStatus::TRACK_FORWARD) {
@@ -810,11 +810,7 @@ namespace utils {
                          "Soluble fraction must be between 0 and 1, got " +
                            std::to_string(targetSolubleFraction) + ".");
 
-      size_t nAtomsTotal =
-        std::reduce(this->simplifiedUniverse.beadsInStrand.begin(),
-                    this->simplifiedUniverse.beadsInStrand.end(),
-                    0) +
-        this->simplifiedUniverse.xlinkTypes.size();
+      size_t nAtomsTotal = this->getCurrentNrOfAtoms();
 
       BackTrackStatus status = BackTrackStatus::TRACK_FORWARD;
       long int nSteps = this->simplifiedUniverse.xlinkTypes.size();
@@ -1224,6 +1220,21 @@ namespace utils {
         this->simplifiedUniverse.xlinkZ[i] =
           forceRelaxationNetwork.coordinates(3 * i + 2);
       }
+    }
+
+    /**
+     * @brief Count how many atoms are currently in the system
+     *
+     * @return size_t
+     */
+    size_t getCurrentNrOfAtoms()
+    {
+      size_t nAtomsTotal =
+        std::reduce(this->simplifiedUniverse.beadsInStrand.begin(),
+                    this->simplifiedUniverse.beadsInStrand.end(),
+                    0) +
+        this->simplifiedUniverse.xlinkTypes.size();
+      return nAtomsTotal;
     }
 
   private:

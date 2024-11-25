@@ -19,6 +19,7 @@ extern "C"
 
 namespace pe = pylimer_tools::entities;
 namespace pu = pylimer_tools::utils;
+namespace pc = pylimer_tools::calc;
 
 TEST_CASE("Certain configurations do not lead to memory corruption",
           "[generator][MCUniverseGenerator]")
@@ -225,6 +226,17 @@ TEST_CASE("Universe can cross-link up to w_sol",
 
   auto clusters = universe.getClusters();
   CHECK(clusters.size() < 20);
+
+  pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
+    pylimer_tools::sim::mehp::MEHPForceRelaxation(universe);
+
+  while (forceRelaxer.suggestsRerun()) {
+    forceRelaxer.runForceRelaxation();
+  }
+
+  CHECK_THAT(
+    0.1,
+    Catch::Matchers::WithinAbs(0.05, forceRelaxer.getSolubleWeightFraction()));
 }
 
 TEST_CASE("MCUniverseGenerator can remove w_sol",
@@ -293,6 +305,7 @@ TEST_CASE("MCUniverseGenerator uses correct force relaxation network",
 
   pe::Universe universe = generator.getUniverse();
   CHECK(universe.getNrOfAtoms() == 400 + 800 * 10);
+  CHECK(generator.getCurrentNrOfAtoms() == universe.getNrOfAtoms());
 
   pylimer_tools::sim::mehp::MEHPForceRelaxation relaxer =
     pylimer_tools::sim::mehp::MEHPForceRelaxation(
@@ -338,6 +351,7 @@ TEST_CASE("MUniverseGenerator can generate with cross-link chains",
     10, { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 }, 2, 2, 1);
 
   pe::Universe universe = generator.getUniverse();
+  CHECK(generator.getCurrentNrOfAtoms() == universe.getNrOfAtoms());
   CHECK(universe.getAtomsOfType(2).size() == 2 * 10);
   CHECK(universe.getAtomsOfType(1).size() == 10 * 10);
 
@@ -390,4 +404,62 @@ TEST_CASE(
     std::vector<pe::Molecule> chains = universe.getChainsWithCrosslinker(2);
     CHECK(chains.size() > 5000);
   }
+}
+
+TEST_CASE(
+  "Universe generator with randomly functionalized chains reach correct w_sol",
+  "[generator][MCUniverseGenerator][long]")
+{
+  std::cout << "Running test \"Universe generator with randomly functionalized "
+               "chains reach correct w_sol\""
+            << std::endl;
+
+  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(20.0, 20.0, 20.0);
+  generator.setSeed(8804);
+  generator.setBeadDistance(0.75);
+  generator.configNrOfMCSteps(0);
+
+  std::vector<int> chainLengths = pu::initializeWithValue(600, 100);
+  generator.addRandomlyFunctionalizedStrands(
+    600, chainLengths, 0.05, 1, 2, 1, true);
+  generator.addStrands(1000, 100, 3);
+  generator.addMonofunctionalStrands(1000, 100, 4);
+
+  generator.linkStrandsToSolubleFraction(0.31);
+
+  pe::Universe universe = generator.getUniverse();
+
+  CHECK(generator.getCurrentNrOfAtoms() == universe.getNrOfAtoms());
+
+  CHECK(universe.getAtomsOfType(3).size() == 100 * 1000);
+  CHECK(universe.getAtomsOfType(4).size() == 100 * 1000);
+
+  pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
+    pylimer_tools::sim::mehp::MEHPForceRelaxation(universe);
+
+  while (forceRelaxer.suggestsRerun()) {
+    forceRelaxer.runForceRelaxation();
+  }
+
+  CHECK_THAT(
+    0.31,
+    Catch::Matchers::WithinAbs(0.05, forceRelaxer.getSolubleWeightFraction()));
+
+  // then, check that soluble fraction is removed correctly
+  generator.removeSolubleFraction(true);
+  pe::Universe universe2 = generator.getUniverse();
+
+  CHECK(universe2.getNrOfAtoms() < universe.getNrOfAtoms());
+  CHECK(generator.getCurrentNrOfAtoms() == universe2.getNrOfAtoms());
+
+  pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer2 =
+    pylimer_tools::sim::mehp::MEHPForceRelaxation(universe2);
+
+  while (forceRelaxer2.suggestsRerun()) {
+    forceRelaxer2.runForceRelaxation();
+  }
+
+  CHECK_THAT(
+    0.,
+    Catch::Matchers::WithinAbs(0.05, forceRelaxer2.getSolubleWeightFraction()));
 }
