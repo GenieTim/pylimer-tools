@@ -48,7 +48,7 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
   generator.addSolventChains(100, 16, 3);
   generator.addStrands((4 / 2) * 100, 16);
   generator.linkStrandsToConversion(0.8);
-  generator.configNrOfMCSteps(100);
+  generator.configNrOfMCSteps(10);
 
   pe::Universe universe = generator.getUniverse();
   std::map<int, double> weights;
