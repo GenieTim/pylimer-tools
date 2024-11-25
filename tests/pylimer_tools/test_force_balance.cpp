@@ -1376,7 +1376,7 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
 }
 
 TEST_CASE("MEHP Force Balance Fully active chains are fully active",
-          "[analysis][MEHPForceBalance]")
+          "[analysis][MEHPForceBalance][long]")
 {
   std::cout << "Running test \"MEHP Force Balance Fully active chains are "
                "fully active\""
@@ -1956,7 +1956,7 @@ TEST_CASE("Particular MEHP Force Balance Example",
   }
 }
 
-TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance]")
+TEST_CASE("Random sampling example", "[analysis][MEHPForceBalance][long]")
 {
   std::cout << "Running test \"Random sampling example\"" << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
@@ -2375,7 +2375,8 @@ TEST_CASE("Conversion of structure is equal for both methods",
   }
 }
 
-TEST_CASE("Force Balance can be run without slipping")
+TEST_CASE("Force Balance can be run without slipping",
+          "[analysis][MEHPForceBalance][long]")
 {
   std::cout << "Running test \"Force Balance can be run without slipping\""
             << std::endl;
@@ -2414,7 +2415,7 @@ TEST_CASE("Force Balance can be run without slipping")
 }
 
 TEST_CASE("Adding slip-links does not influence other springs",
-          "[analysis][MEHPForceBalance]")
+          "[analysis][MEHPForceBalance][long]")
 {
   std::cout
     << "Running test \"Adding slip-links does not influence other springs\""
