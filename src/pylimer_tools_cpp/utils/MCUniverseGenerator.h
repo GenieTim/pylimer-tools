@@ -336,9 +336,9 @@ namespace utils {
                 currentSpringIdx, nCrosslinksBefore + nCrosslinks, true);
             }
 
-            if (lastSampledBead > 0) {
+            if (lastSampledBead >= 0) {
               this->linkStrandToCrosslink(
-                currentSpringIdx - 1, nCrosslinksBefore + nCrosslinks, true);
+                currentSpringIdx, nCrosslinksBefore + nCrosslinks - 1, true);
             }
 
             nCrosslinks += 1;
@@ -350,6 +350,7 @@ namespace utils {
           // add dangling spring
           // possibly, this is the full spring if no cross-link was sampled
           size_t currentSpringIdx = nStrandsBefore + nEffectiveStrands;
+          assert(this->simplifiedUniverse.strandTo.size() == currentSpringIdx);
 
           long int remainingLength =
             beadsPerStrand[strandI] -
@@ -358,11 +359,12 @@ namespace utils {
                           strandAtomType,
                           lastSampledBead < 0 ? EMPTY_BACKGROUND : UNCONNECTED,
                           EMPTY_BACKGROUND);
-          nEffectiveStrands += 1;
-          if (lastSampledBead > 0) {
+          if (lastSampledBead >= 0) {
             this->linkStrandToCrosslink(
               currentSpringIdx, nCrosslinksBefore + nCrosslinks - 1, true);
           }
+
+          nEffectiveStrands += 1;
         }
       }
 
