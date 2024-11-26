@@ -436,7 +436,8 @@ TEST_CASE(
   CHECK(universe.getAtomsOfType(4).size() == 57 * 586);
 
   pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
-    pylimer_tools::sim::mehp::MEHPForceRelaxation(universe, 2, false, nullptr, 1.0, false, false);
+    pylimer_tools::sim::mehp::MEHPForceRelaxation(
+      universe, 2, false, nullptr, 1.0, false, false);
   forceRelaxer.configAssumeBoxLargeEnough(true);
 
   pylimer_tools::sim::mehp::MEHPForceRelaxation relaxerFromGenerator =
@@ -452,15 +453,18 @@ TEST_CASE(
   CHECK(forceRelaxer.getNrOfSprings() == relaxerFromGenerator.getNrOfSprings());
 
   while (forceRelaxer.suggestsRerun()) {
-    forceRelaxer.runForceRelaxation();
+    forceRelaxer.runForceRelaxation("LD_MMA", 5000, 1e-11, 1e-8);
   }
   while (relaxerFromGenerator.suggestsRerun()) {
-    relaxerFromGenerator.runForceRelaxation();
+    relaxerFromGenerator.runForceRelaxation("LD_MMA", 5000, 1e-11, 1e-8);
   }
 
   CHECK_THAT(
     0.31,
     Catch::Matchers::WithinAbs(0.05, forceRelaxer.getSolubleWeightFraction()));
+  CHECK_THAT(
+    0.31,
+    Catch::Matchers::WithinAbs(0.05, relaxerFromGenerator.getSolubleWeightFraction()));
 
   CHECK(forceRelaxer.countActiveClusteredAtoms() ==
         Catch::Approx(relaxerFromGenerator.countActiveClusteredAtoms()));

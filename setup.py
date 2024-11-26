@@ -165,28 +165,38 @@ class CMakeBuild(build_ext):
             # Users can override the generator with CMAKE_GENERATOR in CMake
             # 3.15+.
             if not cmake_generator or cmake_generator == "Ninja":
-                try:
-                    import ninja
+                # import ninja
+                # ninja_executable_path = Path(ninja.BIN_DIR) / "ninja"
+                import shutil
+                ninja_executable_path = shutil.which("ninja")
 
-                    ninja_executable_path = Path(ninja.BIN_DIR) / "ninja"
-                    print(
-                        "Checking whether ninja can be run at {}".format(
-                            ninja_executable_path
+                if ninja_executable_path:
+                    try:
+                        print(
+                            "Checking whether ninja can be run at {}".format(
+                                ninja_executable_path
+                            )
                         )
-                    )
-                    subprocess.run(
-                        [ninja_executable_path, "--version"],
-                        check=True,
-                        timeout=5.0,
-                        cwd=build_temp,
-                    )
-                    cmake_args += [
-                        "-GNinja",
-                        f"-DCMAKE_MAKE_PROGRAM:FILEPATH={ninja_executable_path}",
-                    ]
-                except (ImportError, subprocess.CalledProcessError, PermissionError, subprocess.TimeoutExpired):
-                    warnings.warn("Ninja check did not pass, using default generator.")
-                    pass
+                        subprocess.run(
+                            [ninja_executable_path, "--version"],
+                            check=True,
+                            timeout=5.0,
+                            cwd=build_temp,
+                        )
+                        cmake_args += [
+                            "-GNinja",
+                            f"-DCMAKE_MAKE_PROGRAM:FILEPATH={ninja_executable_path}",
+                        ]
+                    except (
+                        ImportError,
+                        subprocess.CalledProcessError,
+                        PermissionError,
+                        subprocess.TimeoutExpired,
+                    ):
+                        warnings.warn(
+                            "Ninja check did not pass, using default generator."
+                        )
+                        pass
 
         else:
             # Single config generators are handled "normally"
