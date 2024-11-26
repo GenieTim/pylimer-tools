@@ -436,16 +436,34 @@ TEST_CASE(
   CHECK(universe.getAtomsOfType(4).size() == 57 * 586);
 
   pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
-    pylimer_tools::sim::mehp::MEHPForceRelaxation(universe);
+    pylimer_tools::sim::mehp::MEHPForceRelaxation(universe, 2, false, nullptr, 1.0, false, false);
   forceRelaxer.configAssumeBoxLargeEnough(true);
+
+  pylimer_tools::sim::mehp::MEHPForceRelaxation relaxerFromGenerator =
+    pylimer_tools::sim::mehp::MEHPForceRelaxation(
+      generator.convertToForceRelaxationNetwork());
+  relaxerFromGenerator.configAssumeBoxLargeEnough(true);
+
+  // comparison only after running force relaxation,
+  // since the box offsets, single nodes and stuff is relevant before that
+  // CHECK(relaxer.countActiveClusteredAtoms() ==
+  //       Catch::Approx(relaxerFromGenerator.countActiveClusteredAtoms()));
+  // CHECK(forceRelaxer.getNrOfNodes() == relaxerFromGenerator.getNrOfNodes());
+  CHECK(forceRelaxer.getNrOfSprings() == relaxerFromGenerator.getNrOfSprings());
 
   while (forceRelaxer.suggestsRerun()) {
     forceRelaxer.runForceRelaxation();
+  }
+  while (relaxerFromGenerator.suggestsRerun()) {
+    relaxerFromGenerator.runForceRelaxation();
   }
 
   CHECK_THAT(
     0.31,
     Catch::Matchers::WithinAbs(0.05, forceRelaxer.getSolubleWeightFraction()));
+
+  CHECK(forceRelaxer.countActiveClusteredAtoms() ==
+        Catch::Approx(relaxerFromGenerator.countActiveClusteredAtoms()));
 
   // then, check that soluble fraction is removed correctly
   generator.removeSolubleFraction(true);
