@@ -57,6 +57,9 @@ init_pylimer_bound_generators(py::module_& m)
     .def("get_mean_squared_bead_distance",
          &MCUniverseGenerator::getConfiguredMeanSquaredBeadDistance,
          "Get the currently configured mean squared bead distance.")
+    .def("get_nr_of_atoms",
+         &MCUniverseGenerator::getCurrentNrOfAtoms,
+         "Get the current number of atoms that the universe would have.")
     .def(
       "config_nr_of_mc_steps",
       &MCUniverseGenerator::configNrOfMCSteps,
@@ -105,7 +108,7 @@ init_pylimer_bound_generators(py::module_& m)
 
           :param nr_of_strands: Number of strands to add.
           :param strand_length: Length of each strand.
-          :param functionalization_proportion: Proportion of beads that are made cross-link.
+          :param functionalization_probability: Proportion of beads that are made cross-link.
           :param crosslinker_functionality: Functionality of the cross-linkers (default: 4).
           :param crosslinker_type: Atom type of the cross-linkers (default: 2).
           :param strand_atom_type: Atom type of the beads that stay (default: 1).
@@ -113,7 +116,7 @@ init_pylimer_bound_generators(py::module_& m)
      )pbdoc",
          py::arg("nr_of_strands"),
          py::arg("strand_length"),
-         py::arg("functionalization_proportion"),
+         py::arg("functionalization_probability"),
          py::arg("crosslinker_functionality") = 4,
          py::arg("crosslinker_type") = 2,
          py::arg("strand_atom_type") = 1,

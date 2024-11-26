@@ -218,7 +218,7 @@ namespace sim {
        * @param tolerance
        * @return double
        */
-      double getSolubleWeightFraction(double tolerance = 0.05)
+      double getSolubleWeightFraction(const double tolerance = 0.05)
       {
         return this->computeSolubleWeightFraction(&this->forceRelaxationNetwork,
                                                   this->currentSpringDistances,

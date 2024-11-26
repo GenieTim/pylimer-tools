@@ -511,12 +511,19 @@ init_pylimer_bound_sim(py::module_& m)
          py::arg("minimum_nr_of_active_connections") = 2,
          py::arg("maximum_nr_of_active_connections") = -1)
     .def("get_nr_of_active_springs",
-         &mehp::MEHPForceRelaxation::getNrOfActiveSprings,
+         py::overload_cast<const double>(&mehp::MEHPForceRelaxation::getNrOfActiveSprings),
          R"pbdoc(
            Get the number of active springs remaining after running the simulation.
 
           :param tolerance: springs under this length are considered inactive
      )pbdoc",
+         py::arg("tolerance") = 5e-2)
+    .def("count_active_clustered_atoms",
+         &mehp::MEHPForceRelaxation::countActiveClusteredAtoms,
+         R"pbdoc(
+          Counts the active clustered atoms in the system.
+
+          :param tolerance: springs under this length are considered inactive.)pbdoc",
          py::arg("tolerance") = 5e-2)
     .def("get_soluble_weight_fraction",
          &mehp::MEHPForceRelaxation::getSolubleWeightFraction,
