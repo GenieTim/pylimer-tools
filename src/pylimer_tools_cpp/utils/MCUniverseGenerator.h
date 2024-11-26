@@ -192,17 +192,15 @@ namespace utils {
         long int strandEnd2 = this->simplifiedUniverse.strandTo[strandI];
         int nBeadsInStrand = this->simplifiedUniverse.beadsInStrand[strandI];
         if (strandEnd1 < 0) {
-          if (nBeadsInStrand < 1) {
-            continue;
-          }
           RUNTIME_EXP_IFN(
             strandEnd2 < 0,
             "if first end is not associated, expected second to be as well");
+          RUNTIME_EXP_IFN(nBeadsInStrand >= 1,
+                          "Cannot generate free chain with 0 beads");
           coordinates = this->sampleFreeChainCoordinates(nBeadsInStrand);
         } else if (strandEnd2 < 0) {
-          if (nBeadsInStrand < 1) {
-            continue;
-          }
+          RUNTIME_EXP_IFN(nBeadsInStrand >= 1,
+                          "Cannot generate dangling chain with 0 beads");
           coordinates =
             this->sampleDanglingChainCoordinates(strandEnd1, nBeadsInStrand);
           bondsFrom.push_back(strandEnd1 + 1);
@@ -211,31 +209,42 @@ namespace utils {
           RUNTIME_EXP_IFN(
             strandEnd1 != -1 && strandEnd2 != -1,
             "Expected both ends to have an associated cross-linker");
-          coordinates = this->sampleStrandCoordinates(
-            strandEnd1, strandEnd2, nBeadsInStrand);
-          bondsFrom.push_back(strandEnd1 + 1);
-          bondsTo.push_back(currentId);
-          bondsFrom.push_back(strandEnd2 + 1);
-          bondsTo.push_back(currentId + nBeadsInStrand - 1);
+
+          if (nBeadsInStrand > 0) {
+            coordinates = this->sampleStrandCoordinates(
+              strandEnd1, strandEnd2, nBeadsInStrand);
+            bondsFrom.push_back(strandEnd1 + 1);
+            bondsTo.push_back(currentId);
+            bondsFrom.push_back(strandEnd2 + 1);
+            bondsTo.push_back(currentId + nBeadsInStrand - 1);
+          } else {
+            RUNTIME_EXP_IFN(nBeadsInStrand == 0,
+                            "Cannot generate chain with " +
+                              std::to_string(nBeadsInStrand) + " beads");
+            bondsFrom.push_back(strandEnd1 + 1);
+            bondsTo.push_back(strandEnd2 + 1);
+          }
         }
 
         // actually add the new beads to our list of things to add
-        RUNTIME_EXP_IFN(coordinates.size() == 3 * nBeadsInStrand,
-                        "Inconsistent coordinate size");
-        RUNTIME_EXP_IFN(!coordinates.array().isNaN().any(),
-                        "Coordinates contain NaN in strand " +
-                          std::to_string(strandI + 1));
-        for (size_t i = 0; i < nBeadsInStrand; ++i) {
-          ids.push_back(currentId);
-          if (i > 0) {
-            bondsFrom.push_back(currentId - 1);
-            bondsTo.push_back(currentId);
+        if (nBeadsInStrand > 0) {
+          RUNTIME_EXP_IFN(coordinates.size() == 3 * nBeadsInStrand,
+                          "Inconsistent coordinate size");
+          RUNTIME_EXP_IFN(!coordinates.array().isNaN().any(),
+                          "Coordinates contain NaN in strand " +
+                            std::to_string(strandI + 1));
+          for (size_t i = 0; i < nBeadsInStrand; ++i) {
+            ids.push_back(currentId);
+            if (i > 0) {
+              bondsFrom.push_back(currentId - 1);
+              bondsTo.push_back(currentId);
+            }
+            types.push_back(this->simplifiedUniverse.strandBeadType[strandI]);
+            xs.push_back(coordinates(3 * i));
+            ys.push_back(coordinates(3 * i + 1));
+            zs.push_back(coordinates(3 * i + 2));
+            currentId += 1;
           }
-          types.push_back(this->simplifiedUniverse.strandBeadType[strandI]);
-          xs.push_back(coordinates(3 * i));
-          ys.push_back(coordinates(3 * i + 1));
-          zs.push_back(coordinates(3 * i + 2));
-          currentId += 1;
         }
       }
 
@@ -851,7 +860,7 @@ namespace utils {
       size_t nAtomsTotal = this->getCurrentNrOfAtoms();
 
       BackTrackStatus status = BackTrackStatus::TRACK_FORWARD;
-      long int nSteps = this->simplifiedUniverse.xlinkTypes.size();
+      long int nSteps = 0;
       long int lastStep = 0;
       long int currentStep = 0;
 
@@ -863,12 +872,13 @@ namespace utils {
          &lastStep,
          &currentStep](const MCUniverseGenerator& gen,
                        size_t nStrandsRemaining) {
+          if (currentStep == 0) {
+            // go all in, we want to jump to end to know when to stop
+            nSteps = nStrandsRemaining - 1;
+          }
           currentStep += 1;
           nSteps = std::max<long int>(
-            std::min<long int>(
-              nSteps,
-              static_cast<long int>(gen.simplifiedUniverse.xlinkTypes.size())),
-            (long int)1);
+            std::min<long int>(nSteps, nStrandsRemaining - 1), (long int)1);
           // make large step without force relaxation
           if ((currentStep < lastStep + nSteps) &&
               // but only if the last strand will not be reached with this large
@@ -887,7 +897,7 @@ namespace utils {
           forceRelaxer.configAssumeBoxLargeEnough(true);
 
           while (forceRelaxer.suggestsRerun()) {
-            forceRelaxer.runForceRelaxation("LD_MMA", 5000, 1e-12, 1e-9);
+            forceRelaxer.runForceRelaxation("LD_MMA", 5000, 1e-11, 1e-8);
           }
 
           // finally, calculate the soluble fraction
@@ -898,9 +908,7 @@ namespace utils {
                     << currentStep << " (+" << nSteps << ") with "
                     << nStrandsRemaining << " strands remaining." << std::endl;
           if (solubleFraction > targetSolubleFraction) {
-            if (status == BackTrackStatus::TRACK_BACKWARD) {
-              nSteps /= 2;
-            }
+            nSteps /= 2;
             status = BackTrackStatus::TRACK_FORWARD;
             return status;
           } else if (solubleFraction == targetSolubleFraction) {
@@ -1176,6 +1184,7 @@ namespace utils {
         long int to = this->simplifiedUniverse.strandTo[springIdx];
         if (from >= 0) {
           if (to < 0) {
+            // dangling strand
             to = nCrosslinks + handledDanglingIdx;
             handledDanglingIdx += 1;
             forceRelaxationNetwork.springsContourLength(newSpringIdx) =
@@ -1191,6 +1200,8 @@ namespace utils {
           forceRelaxationNetwork.springIndicesOfLinks[to].push_back(
             newSpringIdx);
           newSpringIdx += 1;
+        } else {
+          assert(to < 0);
         }
       }
       assert(handledDanglingIdx == nDanglingEnds);
@@ -1757,6 +1768,13 @@ namespace utils {
         RUNTIME_EXP_IFN(
           this->simplifiedUniverse.strandTo[strandIdx] < nCrosslinks,
           "Expected a valid cross-link index as a strand destination.");
+
+        if (this->simplifiedUniverse.beadsInStrand[strandIdx] == 0) {
+          RUNTIME_EXP_IFN(this->simplifiedUniverse.strandFrom[strandIdx] >= 0 &&
+                            this->simplifiedUniverse.strandTo[strandIdx] >= 0,
+                          "Expected a valid cross-link index as a strand "
+                          "origin and destination for empty length strands.");
+        }
       }
     }
   };
