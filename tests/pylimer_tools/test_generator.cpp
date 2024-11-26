@@ -432,8 +432,8 @@ TEST_CASE(
 
   CHECK(generator.getCurrentNrOfAtoms() == universe.getNrOfAtoms());
 
-  CHECK(universe.getAtomsOfType(3).size() == 100 * 1000);
-  CHECK(universe.getAtomsOfType(4).size() == 100 * 1000);
+  CHECK(universe.getAtomsOfType(3).size() == 107 * 2121);
+  CHECK(universe.getAtomsOfType(4).size() == 57 * 5858);
 
   pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
     pylimer_tools::sim::mehp::MEHPForceRelaxation(universe);
