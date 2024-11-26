@@ -143,11 +143,7 @@ namespace utils {
       pylimer_tools::entities::Universe universe =
         pylimer_tools::entities::Universe(this->box);
       size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
-      int nrOfAtoms =
-        nCrosslinks +
-        std::reduce(this->simplifiedUniverse.beadsInStrand.begin(),
-                    this->simplifiedUniverse.beadsInStrand.end(),
-                    0);
+      long int nrOfAtoms = this->getCurrentNrOfAtoms();
       std::vector<int> zeros = initializeWithValue(nrOfAtoms, 0);
       std::vector<double> xs;
       xs.reserve(nrOfAtoms);
@@ -220,7 +216,7 @@ namespace utils {
           } else {
             RUNTIME_EXP_IFN(nBeadsInStrand == 0,
                             "Cannot generate chain with " +
-                              std::to_string(nBeadsInStrand) + " beads");
+                              std::to_string(nBeadsInStrand) + " beads.");
             bondsFrom.push_back(strandEnd1 + 1);
             bondsTo.push_back(strandEnd2 + 1);
           }
@@ -248,6 +244,8 @@ namespace utils {
         }
       }
 
+      assert(xs.size() == ys.size() && xs.size() == zs.size() &&
+             xs.size() == ids.size() && types.size() == nrOfAtoms);
       this->beadDistance = prevBeadDistance;
       this->meanSquaredBeadDistance = prevMeanSquaredBeadDistance;
 
@@ -270,6 +268,9 @@ namespace utils {
                          int crossLinkerAtomType = 2,
                          bool whiteNoise = true)
     {
+#ifndef NDEBUG
+      this->validateInternalState();
+#endif
       int nCrosslinkerBefore = this->remainingCrossLinkerFunctionality.size();
 
       this->addXlinkAtoms(nrOfCrosslinkers, crossLinkerAtomType, whiteNoise);
@@ -315,7 +316,9 @@ namespace utils {
       INVALIDARG_EXP_IFN(crosslinkerFunctionality >= 1,
                          "Cross-linker functionality must be at least 1. Use "
                          "normal chains instead for lower functionalities.");
+#ifndef NDEBUG
       this->validateInternalState();
+#endif
 
       size_t nCrosslinksBefore = this->remainingCrossLinkerFunctionality.size();
       size_t nStrandsBefore = this->simplifiedUniverse.strandFrom.size();
@@ -435,9 +438,7 @@ namespace utils {
         }
       }
 
-#ifndef NDEBUG
       this->validateInternalState();
-#endif
     }
 
     /**
@@ -461,7 +462,9 @@ namespace utils {
       INVALIDARG_EXP_IFN(crosslinkerFunctionality >= 2,
                          "Cross-linker functionality must be at least 2. Use "
                          "solvent chains instead for lower functionalities.");
+#ifndef NDEBUG
       this->validateInternalState();
+#endif
 
       Eigen::VectorXd firstLinkCoordinates =
         this->generateRandomPositions(nrOfCrosslinkStrands);
@@ -565,6 +568,10 @@ namespace utils {
         this->simplifiedUniverse.strandFrom.push_back(UNCONNECTED);
         this->simplifiedUniverse.strandTo.push_back(EMPTY_BACKGROUND);
       }
+
+#ifndef NDEBUG
+      this->validateInternalState();
+#endif
     }
 
     /**
@@ -647,7 +654,9 @@ namespace utils {
         linkingController,
       double cInfinity = 1.)
     {
+#ifndef NDEBUG
       this->validateInternalState();
+#endif
 
       // prepare sampling of partners
       long int nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
