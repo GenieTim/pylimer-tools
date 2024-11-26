@@ -326,7 +326,11 @@ namespace utils {
             long int remainingLength =
               i - (lastSampledBead >= 0 ? (lastSampledBead + 1) : 0);
             if (i > 0) {
-              this->addStrands(1, remainingLength, strandAtomType);
+              this->addStrand(remainingLength,
+                              strandAtomType,
+                              UNCONNECTED,
+                              lastSampledBead < 0 ? EMPTY_BACKGROUND
+                                                  : UNCONNECTED);
               nEffectiveStrands += 1;
               this->linkStrandToCrosslink(
                 currentSpringIdx, nCrosslinksBefore + nCrosslinks, true);
@@ -344,12 +348,16 @@ namespace utils {
 
         if (lastSampledBead < beadsPerStrand[strandI] - 1) {
           // add dangling spring
+          // possibly, this is the full spring if no cross-link was sampled
           size_t currentSpringIdx = nStrandsBefore + nEffectiveStrands;
 
           long int remainingLength =
             beadsPerStrand[strandI] -
             (lastSampledBead >= 0 ? (lastSampledBead + 1) : 0);
-          this->addStrands(1, remainingLength, strandAtomType);
+          this->addStrand(remainingLength,
+                          strandAtomType,
+                          lastSampledBead < 0 ? EMPTY_BACKGROUND : UNCONNECTED,
+                          EMPTY_BACKGROUND);
           nEffectiveStrands += 1;
           if (lastSampledBead > 0) {
             this->linkStrandToCrosslink(
@@ -548,6 +556,13 @@ namespace utils {
       }
     }
 
+    /**
+     * @brief Add strands which only connect on one end to cross-links
+     *
+     * @param nrOfStrands
+     * @param chainLength
+     * @param strandAtomType
+     */
     void addMonofunctionalStrands(int nrOfStrands,
                                   int chainLength,
                                   int strandAtomType = 1)
@@ -559,6 +574,35 @@ namespace utils {
         nrOfStrands, chainLengths, strandAtomType);
     }
 
+    /**
+     * @brief Register one strand with specified info
+     *
+     * @param beadsOfChain the nr of beads in the strand
+     * @param strandAtomType the atom type of the beads in the strand
+     * @param connectionFrom the `strandFrom` property of the strand
+     * @param connectionTo the `strandTo` property of the strand
+     */
+    void addStrand(const int beadsOfChain,
+                   const int strandAtomType = 1,
+                   const long int connectionFrom = UNCONNECTED,
+                   const long int connectionTo = UNCONNECTED)
+    {
+      INVALIDARG_EXP_IFN(beadsOfChain >= 0,
+                         "Beads per chain must be positive.");
+      INVALIDARG_EXP_IFN(
+        connectionFrom < 0 && connectionTo < 0,
+        "Only unconnected or dangling strands can be added with this method.");
+
+      this->simplifiedUniverse.strandBeadType.push_back(strandAtomType);
+      this->simplifiedUniverse.beadsInStrand.push_back(beadsOfChain);
+      this->simplifiedUniverse.beadDistanceInStrand.push_back(
+        this->beadDistance);
+      this->simplifiedUniverse.meanSquaredBeadDistanceInStrand.push_back(
+        this->meanSquaredBeadDistance);
+      this->simplifiedUniverse.strandFrom.push_back(connectionFrom);
+      this->simplifiedUniverse.strandTo.push_back(connectionTo);
+    }
+
     void addStrands(const int nrOfStrands,
                     const std::vector<int> beadsPerChains,
                     const int strandAtomType = 1)
@@ -568,15 +612,7 @@ namespace utils {
         "Inconsistent nr of strands and nr of beads per strand given.");
 
       for (size_t strandIdx = 0; strandIdx < nrOfStrands; ++strandIdx) {
-        this->simplifiedUniverse.strandBeadType.push_back(strandAtomType);
-        this->simplifiedUniverse.beadsInStrand.push_back(
-          beadsPerChains[strandIdx]);
-        this->simplifiedUniverse.beadDistanceInStrand.push_back(
-          this->beadDistance);
-        this->simplifiedUniverse.meanSquaredBeadDistanceInStrand.push_back(
-          this->meanSquaredBeadDistance);
-        this->simplifiedUniverse.strandFrom.push_back(UNCONNECTED);
-        this->simplifiedUniverse.strandTo.push_back(UNCONNECTED);
+        this->addStrand(beadsPerChains[strandIdx], strandAtomType);
       }
     }
 
@@ -1387,17 +1423,21 @@ namespace utils {
     {
       INVALIDARG_EXP_IFN(strandIdx < this->simplifiedUniverse.strandFrom.size(),
                          "The strand index is out of bounds.");
-      INVALIDARG_EXP_IFN(this->simplifiedUniverse.strandFrom[strandIdx] < 0 ||
-                           this->simplifiedUniverse.strandTo[strandIdx] < 0,
-                         "Require one end to be free to be connected to");
+      INVALIDARG_EXP_IFN(
+        this->simplifiedUniverse.strandFrom[strandIdx] == UNCONNECTED ||
+          this->simplifiedUniverse.strandTo[strandIdx] == UNCONNECTED,
+        "Require one end to be free to be connected to");
       if (!ignoreInexistent) {
         INVALIDARG_EXP_IFN(
           crosslinkIdx < this->simplifiedUniverse.strandFrom.size(), "");
       }
 
-      if (this->simplifiedUniverse.strandFrom[strandIdx] < 0) {
+      if (this->simplifiedUniverse.strandFrom[strandIdx] == UNCONNECTED) {
         this->simplifiedUniverse.strandFrom[strandIdx] = crosslinkIdx;
       } else {
+        INVALIDARG_EXP_IFN(
+          this->simplifiedUniverse.strandFrom[strandIdx] >= 0,
+          "Strands are required to have the first end be connected first.");
         this->simplifiedUniverse.strandTo[strandIdx] = crosslinkIdx;
       }
     };
