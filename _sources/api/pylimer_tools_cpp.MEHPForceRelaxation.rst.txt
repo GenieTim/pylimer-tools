@@ -13,6 +13,7 @@ MEHPForceRelaxation
       ~MEHPForceRelaxation.assume_box_large_enough
       ~MEHPForceRelaxation.config_rerun_epsilon
       ~MEHPForceRelaxation.config_step_output
+      ~MEHPForceRelaxation.count_active_clustered_atoms
       ~MEHPForceRelaxation.get_active_chains
       ~MEHPForceRelaxation.get_average_spring_length
       ~MEHPForceRelaxation.get_crosslinker_universe
@@ -46,6 +47,7 @@ MEHPForceRelaxation
    .. automethod:: assume_box_large_enough
    .. automethod:: config_rerun_epsilon
    .. automethod:: config_step_output
+   .. automethod:: count_active_clustered_atoms
    .. automethod:: get_active_chains
    .. automethod:: get_average_spring_length
    .. automethod:: get_crosslinker_universe
