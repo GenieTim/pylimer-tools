@@ -415,16 +415,16 @@ TEST_CASE(
             << std::endl;
 
   pu::MCUniverseGenerator generator =
-    pu::MCUniverseGenerator(76.21419, 76.21419, 76.21419);
+    pu::MCUniverseGenerator(35.375493, 35.375493, 35.375493);
   generator.setSeed(8804);
   generator.setMeanSquaredBeadDistance(1.107008);
   generator.configNrOfMCSteps(0);
 
-  std::vector<int> chainLengths = pu::initializeWithValue(2020, 210);
+  std::vector<int> chainLengths = pu::initializeWithValue(202, 210);
   generator.addRandomlyFunctionalizedStrands(
-    2020, chainLengths, 0.023809523, 1, 2, 1, true);
-  generator.addStrands(2121, 107, 3);
-  generator.addMonofunctionalStrands(5858, 57, 4);
+    202, chainLengths, 0.023809523, 1, 2, 1, true);
+  generator.addStrands(212, 107, 3);
+  generator.addMonofunctionalStrands(586, 57, 4);
 
   generator.linkStrandsToSolubleFraction(0.31);
 
@@ -432,11 +432,12 @@ TEST_CASE(
 
   CHECK(generator.getCurrentNrOfAtoms() == universe.getNrOfAtoms());
 
-  CHECK(universe.getAtomsOfType(3).size() == 107 * 2121);
-  CHECK(universe.getAtomsOfType(4).size() == 57 * 5858);
+  CHECK(universe.getAtomsOfType(3).size() == 107 * 212);
+  CHECK(universe.getAtomsOfType(4).size() == 57 * 586);
 
   pylimer_tools::sim::mehp::MEHPForceRelaxation forceRelaxer =
     pylimer_tools::sim::mehp::MEHPForceRelaxation(universe);
+  forceRelaxer.configAssumeBoxLargeEnough(true);
 
   while (forceRelaxer.suggestsRerun()) {
     forceRelaxer.runForceRelaxation();

@@ -130,7 +130,7 @@ namespace sim {
        * @param ftol
        */
       void runForceRelaxation(const char* algorithm = "LD_MMA",
-                              long int maxNrOfSteps = 50000, // default: 10000
+                              long int maxNrOfSteps = 250000, // default: 10000
                               double xtol = 1e-12,
                               double ftol = 1e-9);
 
@@ -1011,7 +1011,8 @@ namespace sim {
           this->countActiveClusteredAtoms(net, springDistances, tolerance);
         // finally, normalise by the number of atoms.
         // NOTE: currently, the weight of the atoms is ignored
-        return 1. - nActiveClusteredAtoms / this->universe.getNrOfAtoms();
+        return 1. - (nActiveClusteredAtoms /
+                     (static_cast<double>(this->universe.getNrOfAtoms())));
       }
 
       /**
