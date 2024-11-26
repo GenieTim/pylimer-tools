@@ -414,16 +414,17 @@ TEST_CASE(
                "chains reach correct w_sol\""
             << std::endl;
 
-  pu::MCUniverseGenerator generator = pu::MCUniverseGenerator(20.0, 20.0, 20.0);
+  pu::MCUniverseGenerator generator =
+    pu::MCUniverseGenerator(76.21419, 76.21419, 76.21419);
   generator.setSeed(8804);
-  generator.setBeadDistance(0.75);
+  generator.setMeanSquaredBeadDistance(1.107008);
   generator.configNrOfMCSteps(0);
 
-  std::vector<int> chainLengths = pu::initializeWithValue(600, 100);
+  std::vector<int> chainLengths = pu::initializeWithValue(2020, 210);
   generator.addRandomlyFunctionalizedStrands(
-    600, chainLengths, 0.05, 1, 2, 1, true);
-  generator.addStrands(1000, 100, 3);
-  generator.addMonofunctionalStrands(1000, 100, 4);
+    2020, chainLengths, 0.023809523, 1, 2, 1, true);
+  generator.addStrands(2121, 107, 3);
+  generator.addMonofunctionalStrands(5858, 57, 4);
 
   generator.linkStrandsToSolubleFraction(0.31);
 

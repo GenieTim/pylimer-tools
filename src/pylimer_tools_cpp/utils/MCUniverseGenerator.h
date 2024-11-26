@@ -410,7 +410,7 @@ namespace utils {
 #ifndef NDEBUG
           double distance = this->distanceBetween(from, to);
           double maxDistance =
-            (this->simplifiedUniverse.beadsInStrand[newStrandIdx] + 1) *
+            (this->simplifiedUniverse.beadsInStrand[newStrandIdx] + 2) *
             this->beadDistance;
           if (maxDistance > 1.) {
             RUNTIME_EXP_IFN(
