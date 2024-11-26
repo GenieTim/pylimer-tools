@@ -511,7 +511,7 @@ init_pylimer_bound_sim(py::module_& m)
          py::arg("minimum_nr_of_active_connections") = 2,
          py::arg("maximum_nr_of_active_connections") = -1)
     .def("get_nr_of_active_springs",
-         py::overload_cast<const double>(&mehp::MEHPForceRelaxation::getNrOfActiveSprings),
+         &mehp::MEHPForceRelaxation::getNrOfActiveSprings,
          R"pbdoc(
            Get the number of active springs remaining after running the simulation.
 
@@ -519,7 +519,8 @@ init_pylimer_bound_sim(py::module_& m)
      )pbdoc",
          py::arg("tolerance") = 5e-2)
     .def("count_active_clustered_atoms",
-         &mehp::MEHPForceRelaxation::countActiveClusteredAtoms,
+         py::overload_cast<const double>(
+           &mehp::MEHPForceRelaxation::countActiveClusteredAtoms),
          R"pbdoc(
           Counts the active clustered atoms in the system.
 

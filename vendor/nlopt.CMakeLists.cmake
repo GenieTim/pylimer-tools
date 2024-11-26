@@ -23,7 +23,7 @@ if (NOT DEFINED nlopt_LOADED)
 		ExternalProject_Add(
 				nloptLib
 				GIT_REPOSITORY https://github.com/stevengj/nlopt
-				GIT_TAG e2cbe93ae39feaae088eee75ad64ae602ac44781 # 2.9.0
+				GIT_TAG 11cff2c773b4b98821915a72179f4667c307ce6d # 2.9.1
 				PREFIX ${nlopt_PREFIX_PATH}
 				INSTALL_DIR ${nlopt_PREFIX_PATH}/nloptLib-install
 				CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${nlopt_PREFIX_PATH}/nloptLib-install -DINSTALL_LIBDIR=${nlopt_PREFIX_PATH}/nloptLib-install/lib -DCMAKE_INSTALL_LIBDIR=${nlopt_PREFIX_PATH}/nloptLib-install/lib -DNLOPT_GUILE=OFF -DNLOPT_OCTAVE=OFF -DNLOPT_MATLAB=OFF -DNLOPT_SWIG=OFF -DNLOPT_PYTHON=OFF -DBUILD_SHARED_LIBS=OFF
