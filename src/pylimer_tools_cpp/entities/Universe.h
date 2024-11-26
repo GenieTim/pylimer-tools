@@ -119,7 +119,7 @@ namespace entities {
     void simplify();
 
     // getters
-    bool containsAtom(const Atom &atom) const;
+    bool containsAtom(const Atom& atom) const;
     bool containsAtomWithId(const int atomId) const;
     Atom getAtom(const int atomId) const;
     std::vector<Atom> getAtoms() const;

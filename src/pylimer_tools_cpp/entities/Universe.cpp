@@ -1166,11 +1166,7 @@ namespace entities {
             vertexAndEdgeProperties.first);
           igraph_add_edge(&chain, 0, 0);
           pylimer_tools::utils::copyEdgeProperties(
-            &this->graph,
-            edgeId,
-            &chain,
-            0,
-            vertexAndEdgeProperties.second);
+            &this->graph, edgeId, &chain, 0, vertexAndEdgeProperties.second);
           molecules.push_back(
             Molecule(this->box, &chain, molType, this->massPerType));
           igraph_destroy(&chain);

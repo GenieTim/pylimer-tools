@@ -752,7 +752,7 @@ TEST_CASE("Force Relaxation free chains collapse",
 
   CHECK(universe.getChainsWithCrosslinker(2).size() == 12);
   CHECK(universe.getVertexDegree(
-    universe.getIdxByAtomId(static_cast<long>(nrOfBeadsPerChain))) == 3);
+          universe.getIdxByAtomId(static_cast<long>(nrOfBeadsPerChain))) == 3);
   CHECK(universe.getVertexDegree(0) == 4);
 
   // now, check for every force evaluator, that the maximum entropy is when all
