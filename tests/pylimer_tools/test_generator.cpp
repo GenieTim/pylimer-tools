@@ -306,6 +306,7 @@ TEST_CASE("MCUniverseGenerator uses correct force relaxation network",
   pe::Universe universe = generator.getUniverse();
   CHECK(universe.getNrOfAtoms() == 400 + 800 * 10);
   CHECK(generator.getCurrentNrOfAtoms() == universe.getNrOfAtoms());
+  CHECK(generator.getCurrentNrOfBonds() == universe.getNrOfBonds());
 
   pylimer_tools::sim::mehp::MEHPForceRelaxation relaxer =
     pylimer_tools::sim::mehp::MEHPForceRelaxation(
@@ -352,6 +353,7 @@ TEST_CASE("MUniverseGenerator can generate with cross-link chains",
 
   pe::Universe universe = generator.getUniverse();
   CHECK(generator.getCurrentNrOfAtoms() == universe.getNrOfAtoms());
+  CHECK(generator.getCurrentNrOfBonds() == universe.getNrOfBonds());
   CHECK(universe.getAtomsOfType(2).size() == 2 * 10);
   CHECK(universe.getAtomsOfType(1).size() == 10 * 10);
 
@@ -431,6 +433,7 @@ TEST_CASE(
   pe::Universe universe = generator.getUniverse();
 
   CHECK(generator.getCurrentNrOfAtoms() == universe.getNrOfAtoms());
+  CHECK(generator.getCurrentNrOfBonds() == universe.getNrOfBonds());
 
   CHECK(universe.getAtomsOfType(3).size() == 107 * 212);
   CHECK(universe.getAtomsOfType(4).size() == 57 * 586);

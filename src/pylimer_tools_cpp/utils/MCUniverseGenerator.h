@@ -1295,6 +1295,33 @@ namespace utils {
       return nAtomsTotal;
     }
 
+    /**
+     * @brief Count how many bonds are currently in the system
+     *
+     * @return size_t
+     */
+    size_t getCurrentNrOfBonds()
+    {
+      size_t nBondsTotal = 0;
+      for (size_t strandIdx = 0;
+           strandIdx < this->simplifiedUniverse.strandFrom.size();
+           ++strandIdx) {
+        size_t nBeads = this->simplifiedUniverse.beadsInStrand[strandIdx];
+        long int from = this->simplifiedUniverse.strandFrom[strandIdx];
+        long int to = this->simplifiedUniverse.strandTo[strandIdx];
+        if (nBeads > 0) {
+          nBondsTotal += nBeads - 1;
+          if (to >= 0) {
+            nBondsTotal += 1;
+          }
+        }
+        if (from >= 0) {
+          nBondsTotal += 1;
+        }
+      }
+      return nBondsTotal;
+    }
+
   private:
     double beadDistance;
     double meanSquaredBeadDistance;
