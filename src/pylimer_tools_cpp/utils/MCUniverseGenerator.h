@@ -268,9 +268,6 @@ namespace utils {
                          int crossLinkerAtomType = 2,
                          bool whiteNoise = true)
     {
-#ifndef NDEBUG
-      this->validateInternalState();
-#endif
       int nCrosslinkerBefore = this->remainingCrossLinkerFunctionality.size();
 
       this->addXlinkAtoms(nrOfCrosslinkers, crossLinkerAtomType, whiteNoise);
@@ -285,6 +282,9 @@ namespace utils {
         this->remainingCrossLinkerFunctionality.push_back(
           crosslinkerFunctionality);
       }
+#ifndef NDEBUG
+      this->validateInternalState();
+#endif
     };
 
     /**
