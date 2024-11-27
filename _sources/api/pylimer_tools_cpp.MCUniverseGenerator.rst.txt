@@ -22,6 +22,7 @@ MCUniverseGenerator
       ~MCUniverseGenerator.get_mean_bead_distance
       ~MCUniverseGenerator.get_mean_squared_bead_distance
       ~MCUniverseGenerator.get_nr_of_atoms
+      ~MCUniverseGenerator.get_nr_of_bonds
       ~MCUniverseGenerator.get_universe
       ~MCUniverseGenerator.link_strands_to_conversion
       ~MCUniverseGenerator.link_strands_to_soluble_fraction
@@ -45,6 +46,7 @@ MCUniverseGenerator
    .. automethod:: get_mean_bead_distance
    .. automethod:: get_mean_squared_bead_distance
    .. automethod:: get_nr_of_atoms
+   .. automethod:: get_nr_of_bonds
    .. automethod:: get_universe
    .. automethod:: link_strands_to_conversion
    .. automethod:: link_strands_to_soluble_fraction
