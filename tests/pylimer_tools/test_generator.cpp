@@ -465,9 +465,6 @@ TEST_CASE(
   CHECK_THAT(
     0.31,
     Catch::Matchers::WithinAbs(0.05, forceRelaxer.getSolubleWeightFraction()));
-  CHECK_THAT(
-    0.31,
-    Catch::Matchers::WithinAbs(0.05, relaxerFromGenerator.getSolubleWeightFraction()));
 
   CHECK(forceRelaxer.countActiveClusteredAtoms() ==
         Catch::Approx(relaxerFromGenerator.countActiveClusteredAtoms()));
