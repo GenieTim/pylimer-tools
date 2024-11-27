@@ -742,7 +742,7 @@ namespace utils {
             // otherwise, randomly choose a free cross-link
             long int crosslinkIdxIdx;
             do {
-              // find the next "available" cross-linker
+              // find the next "available" cross-link
               crosslinkIdxIdx = availableCrosslinkSites.back();
               removedCrosslinkSites.push(crosslinkIdxIdx);
               availableCrosslinkSites.pop_back();
@@ -755,6 +755,7 @@ namespace utils {
               break;
             }
 
+            // link to this cross-link
             this->simplifiedUniverse.strandFrom[strandIdx] = crosslinkIdxIdx;
             this->remainingCrossLinkerFunctionality[crosslinkIdxIdx] -= 1;
             this->simplifiedUniverse.strandsOfXlink[crosslinkIdxIdx].push_back(
@@ -919,7 +920,9 @@ namespace utils {
                     << currentStep << " (+" << nSteps << ") with "
                     << nStrandsRemaining << " strands remaining." << std::endl;
           if (solubleFraction > targetSolubleFraction) {
-            nSteps /= 2;
+            if (currentStep > 1) {
+              nSteps /= 2;
+            }
             status = BackTrackStatus::TRACK_FORWARD;
             return status;
           } else if (solubleFraction == targetSolubleFraction) {
