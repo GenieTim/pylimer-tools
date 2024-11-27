@@ -59,7 +59,10 @@ init_pylimer_bound_generators(py::module_& m)
          "Get the currently configured mean squared bead distance.")
     .def("get_nr_of_atoms",
          &MCUniverseGenerator::getCurrentNrOfAtoms,
-         "Get the current number of atoms that the universe would have.")
+         "Get the current number of atoms that the universe would/will have.")
+    .def("get_nr_of_bonds",
+         &MCUniverseGenerator::getCurrentNrOfBonds,
+         "Get the current number of bonds that the universe would/will have.")
     .def(
       "config_nr_of_mc_steps",
       &MCUniverseGenerator::configNrOfMCSteps,
