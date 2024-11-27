@@ -650,7 +650,7 @@ namespace utils {
      * @param cInfinity `C_\infty` for `<R_ee^2>_0` from `N` and `<b^2>`
      */
     void linkStrandsCallback(
-      std::function<BackTrackStatus(const MCUniverseGenerator&, size_t)>
+      std::function<BackTrackStatus(const MCUniverseGenerator&, long int)>
         linkingController,
       double cInfinity = 1.)
     {
@@ -704,7 +704,9 @@ namespace utils {
       size_t maxStep =
         std::min(availableStrandEnds.size(), availableCrosslinkSites.size());
       for (size_t sampleIdx = 0; sampleIdx < maxStep; ++sampleIdx) {
-        BackTrackStatus status = linkingController(*this, maxStep - sampleIdx);
+        BackTrackStatus status = linkingController(
+          *this,
+          static_cast<long int>(maxStep) - static_cast<long int>(sampleIdx));
         if (status == BackTrackStatus::STOP) {
           break;
         } else if (status == BackTrackStatus::TRACK_FORWARD) {
@@ -842,7 +844,7 @@ namespace utils {
 
       this->linkStrandsCallback(
         [targetNrOfAvailableCrosslinkSites](const MCUniverseGenerator& gen,
-                                            size_t nStrandsRemaining) {
+                                            long int nStrandsRemaining) {
           if (gen.nrOfAvailableCrosslinkSites <=
               targetNrOfAvailableCrosslinkSites) {
             return BackTrackStatus::STOP;
@@ -880,7 +882,7 @@ namespace utils {
          &nSteps,
          &lastStep,
          &currentStep](const MCUniverseGenerator& gen,
-                       size_t nStrandsRemaining) {
+                       long int nStrandsRemaining) {
           if (currentStep == 0) {
             // go all in, we want to jump to end to know when to stop
             nSteps = nStrandsRemaining - 1;

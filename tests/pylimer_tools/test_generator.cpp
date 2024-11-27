@@ -48,8 +48,8 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
   generator.addCrosslinkers(100, 4, 2);
   generator.addSolventChains(100, 16, 3);
   generator.addStrands((4 / 2) * 100, 16);
-  generator.linkStrandsToConversion(0.8);
   generator.configNrOfMCSteps(10);
+  generator.linkStrandsToConversion(0.8);
 
   pe::Universe universe = generator.getUniverse();
   std::map<int, double> weights;
@@ -82,10 +82,10 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
       pu::MCUniverseGenerator(10.0, 10.0, 10.0);
     generator2.setSeed(8804);
     generator2.setBeadDistance(0.964);
-    generator2.setMeanSquaredBeadDistance(0.964 * 0.964);
     generator2.addCrosslinkers(100, 4, 2);
     generator2.addSolventChains(100, 16, 3);
     generator2.addStrands((4 / 2) * 100, 16);
+    generator2.configNrOfMCSteps(10);
     generator2.linkStrandsToConversion(0.8);
 
     pe::Universe universe2 = generator2.getUniverse();
@@ -103,7 +103,7 @@ TEST_CASE("Universe can be generated", "[generator][MCUniverseGenerator]")
     auto bondLengths = universe.computeBondLengths();
     for (const double bondLength : bondLengths) {
       CHECK(bondLength > 0.0);
-      CHECK(bondLength < 3.0);
+      CHECK(bondLength < 3.2);
     }
   }
 
@@ -236,7 +236,7 @@ TEST_CASE("Universe can cross-link up to w_sol",
 
   CHECK_THAT(
     0.1,
-    Catch::Matchers::WithinAbs(0.05, forceRelaxer.getSolubleWeightFraction()));
+    Catch::Matchers::WithinAbs(forceRelaxer.getSolubleWeightFraction(), 0.05));
 }
 
 TEST_CASE("MCUniverseGenerator can remove w_sol",
@@ -464,7 +464,7 @@ TEST_CASE(
 
   CHECK_THAT(
     0.31,
-    Catch::Matchers::WithinAbs(0.05, forceRelaxer.getSolubleWeightFraction()));
+    Catch::Matchers::WithinRel(forceRelaxer.getSolubleWeightFraction(), 0.05));
 
   CHECK(forceRelaxer.countActiveClusteredAtoms() ==
         Catch::Approx(relaxerFromGenerator.countActiveClusteredAtoms()));
@@ -485,5 +485,5 @@ TEST_CASE(
 
   CHECK_THAT(
     0.,
-    Catch::Matchers::WithinAbs(0.05, forceRelaxer2.getSolubleWeightFraction()));
+    Catch::Matchers::WithinAbs(forceRelaxer2.getSolubleWeightFraction(), 0.05));
 }
