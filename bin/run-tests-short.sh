@@ -21,8 +21,9 @@ if command -v ninja; then
 fi
 
 echo "======== Starting tests ========"
-# MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp ./pylimer_tests "[MEHPForceBalance]" || exit 5 # -s --durations yes
-MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp time ./pylimer_tests --skip-benchmarks --durations yes "~[long]" || exit 6 #  -s --durations yes
+# MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp 
+time ./pylimer_tests --skip-benchmarks --durations yes "~[long]" || exit 6 #  -s
+echo "===== Starting header tests ====="
 MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp time ./header_tests --skip-benchmarks --durations yes "~[long]" || exit 8
 
 ls ./*
