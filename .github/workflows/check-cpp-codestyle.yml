@@ -1,4 +1,4 @@
-name: clang-format Check
+name: C/C++ Code Style Check
 
 on: [push, pull_request]
 
@@ -6,18 +6,25 @@ jobs:
   formatting-check:
     name: Formatting Check
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        path:
-          - "src"
-          - "tests"
+    # strategy:
+    #   matrix:
+    #     path:
+    #       - "src"
+    #       - "tests"
     steps:
       - name: Check out source repository
         uses: actions/checkout@v4
 
-      - name: Run clang-format style check on C/C++ code
-        uses: jidicula/clang-format-action@v4.13.0
-        with:
-          clang-format-version: "18"
-          check-path: ${{ matrix.path }}
-          fallback-style: "Mozilla" # optional
+      - run: sudo apt-get install astyle bison flex lcov libeigen3-dev
+
+      - run: astyle --project=.astylerc --recursive '*.cpp' '*.c' '*.h'
+
+      # If anything changed, this will fail and show the needed changes
+      - run: git diff --exit-code
+
+      # - name: Run clang-format style check on C/C++ code
+      #   uses: jidicula/clang-format-action@v4.13.0
+      #   with:
+      #     clang-format-version: "18"
+      #     check-path: ${{ matrix.path }}
+      #     fallback-style: "Mozilla" # optional
