@@ -14,10 +14,12 @@ jobs:
     steps:
       - name: Check out source repository
         uses: actions/checkout@v4
+        with:
+          submodules: "recursive"
 
       - run: sudo apt-get install astyle bison flex lcov libeigen3-dev
 
-      - run: astyle --project=.astylerc --recursive '*.cpp' '*.c' '*.h'
+      - run: astyle --project=.astylerc --recursive '*.cpp' '*.h'
 
       # If anything changed, this will fail and show the needed changes
       - run: git diff --exit-code
