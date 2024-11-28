@@ -15,11 +15,11 @@ using namespace pylimer_tools::topo::entanglement_detection;
 void
 init_pylimer_bound_topo(py::module_& m)
 {
-  py::class_<AtomPairEntanglements>(
-    m, "AtomPairEntanglements", py::module_local())
+    py::class_<AtomPairEntanglements>(
+        m, "AtomPairEntanglements", py::module_local())
     .def(py::init<>(), "Get an instance of this struct")
     .def_readwrite(
-      "pairs_of_atoms", &AtomPairEntanglements::pairsOfAtoms, R"pbdoc(
+        "pairs_of_atoms", &AtomPairEntanglements::pairsOfAtoms, R"pbdoc(
       A list of pairs of atom ids that are close together and could be entanglements
     )pbdoc")
     .def_readwrite("pair_of_atom",
@@ -28,9 +28,9 @@ init_pylimer_bound_topo(py::module_& m)
       An index in the pairs_of_atoms if the atom is part of a pair, -1 else.
     )pbdoc");
 
-  m.def("randomly_sample_entanglements",
-        &randomlyFindEntanglements,
-        R"pbdoc(
+    m.def("randomly_sample_entanglements",
+          &randomlyFindEntanglements,
+          R"pbdoc(
     Randomly find pairs of atoms that are close together and could be
     entanglements
 
@@ -47,15 +47,15 @@ init_pylimer_bound_topo(py::module_& m)
       Careful: if you don't ignore them, the same-strand policy might not work correctly, 
       since each cross-link should actually be associated with more than one strand.
   )pbdoc",
-        py::arg("universe"),
-        py::arg("nr_of_samples"),
-        py::arg("upper_cutoff"),
-        py::arg("lower_cutoff") = 0,
-        py::arg("minimum_nr_of_samples") = 0,
-        py::arg("same_strand_cutoff") = 3.,
-        py::arg("seed") = "",
-        py::arg("crosslinker_type") = 2,
-        py::arg("ignore_crosslinks") = true);
+          py::arg("universe"),
+          py::arg("nr_of_samples"),
+          py::arg("upper_cutoff"),
+          py::arg("lower_cutoff") = 0,
+          py::arg("minimum_nr_of_samples") = 0,
+          py::arg("same_strand_cutoff") = 3.,
+          py::arg("seed") = "",
+          py::arg("crosslinker_type") = 2,
+          py::arg("ignore_crosslinks") = true);
 }
 // }
 

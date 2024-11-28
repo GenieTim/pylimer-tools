@@ -14,150 +14,150 @@ extern "C"
 
 namespace pylimer_tools {
 namespace entities {
-  AtomGraphParent::AtomGraphParent() {}
-  // rule of three:
-  // 1. destructor (to destroy the graph)
-  AtomGraphParent::~AtomGraphParent()
-  {
+AtomGraphParent::AtomGraphParent() {}
+// rule of three:
+// 1. destructor (to destroy the graph)
+AtomGraphParent::~AtomGraphParent()
+{
     // in addition to basic fields being deleted, we need to clean up the
     // graph
     igraph_destroy(&this->graph);
-  }
-  // 2. copy constructor
-  // AtomGraphParent(const AtomGraphParent &src) {
-  //   igraph_copy(&this->graph, &src.graph);
-  // };
-  // 3. copy assignment operator
-  // virtual AtomGraphParent &operator=(AtomGraphParent src) {
-  //   std::swap(this->graph, src.graph);
-  //   return *this;
-  // };
+}
+// 2. copy constructor
+// AtomGraphParent(const AtomGraphParent &src) {
+//   igraph_copy(&this->graph, &src.graph);
+// };
+// 3. copy assignment operator
+// virtual AtomGraphParent &operator=(AtomGraphParent src) {
+//   std::swap(this->graph, src.graph);
+//   return *this;
+// };
 
-  /**
-   * @brief Get the vertex ids connected to a specified vertex Id
-   *
-   * @param vertexIdx the index of the vertex in the graph for which to get
-   * the connected atoms
-   * @return std::vector<long int>
-   */
-  std::vector<long int> AtomGraphParent::getVertexIdxsConnectedTo(
+/**
+ * @brief Get the vertex ids connected to a specified vertex Id
+ *
+ * @param vertexIdx the index of the vertex in the graph for which to get
+ * the connected atoms
+ * @return std::vector<long int>
+ */
+std::vector<long int> AtomGraphParent::getVertexIdxsConnectedTo(
     const long int vertexIdx) const
-  {
+{
     std::vector<long int> incidentEdges = this->getIncidentEdgeIds(vertexIdx);
     std::vector<long int> results;
     results.reserve(incidentEdges.size());
     for (long int edgeId : incidentEdges) {
-      igraph_integer_t vertex1OfEdge;
-      igraph_integer_t vertex2OfEdge;
-      igraph_edge(&this->graph, edgeId, &vertex1OfEdge, &vertex2OfEdge);
+        igraph_integer_t vertex1OfEdge;
+        igraph_integer_t vertex2OfEdge;
+        igraph_edge(&this->graph, edgeId, &vertex1OfEdge, &vertex2OfEdge);
 
-      if (vertex1OfEdge == vertexIdx) {
-        results.push_back(vertex2OfEdge);
-      } else {
-        assert(vertex2OfEdge == vertexIdx);
-        results.push_back(vertex1OfEdge);
-      }
+        if (vertex1OfEdge == vertexIdx) {
+            results.push_back(vertex2OfEdge);
+        } else {
+            assert(vertex2OfEdge == vertexIdx);
+            results.push_back(vertex1OfEdge);
+        }
     }
 
     return results;
-  };
+};
 
-  /**
-   * @brief Get the Atoms Connected To an Atom
-   *
-   * @param atom the atom for which to get the atoms connected to it
-   * @return std::vector<Atom>
-   */
-  std::vector<Atom> AtomGraphParent::getConnectedAtoms(const Atom& atom) const
-  {
+/**
+ * @brief Get the Atoms Connected To an Atom
+ *
+ * @param atom the atom for which to get the atoms connected to it
+ * @return std::vector<Atom>
+ */
+std::vector<Atom> AtomGraphParent::getConnectedAtoms(const Atom& atom) const
+{
     return this->getAtomsConnectedTo(this->getIdxByAtomId(atom.getId()));
-  };
+};
 
-  /**
-   * @brief Get the Atoms Connected To an Atom specified by its vertex Id
-   *
-   * @param vertexIdx the index of the vertex in the graph for which to get
-   * the connected atoms
-   * @return std::vector<Atom>
-   */
-  std::vector<Atom> AtomGraphParent::getAtomsConnectedTo(
+/**
+ * @brief Get the Atoms Connected To an Atom specified by its vertex Id
+ *
+ * @param vertexIdx the index of the vertex in the graph for which to get
+ * the connected atoms
+ * @return std::vector<Atom>
+ */
+std::vector<Atom> AtomGraphParent::getAtomsConnectedTo(
     const long int vertexIdx) const
-  {
+{
     std::vector<Atom> results;
     std::vector<long int> vertexIds = this->getVertexIdxsConnectedTo(vertexIdx);
     results.reserve(vertexIds.size());
     std::transform(vertexIds.begin(),
                    vertexIds.end(),
                    std::back_inserter(results),
-                   [this](long int vertexId) -> Atom {
-                     return this->getAtomByVertexIdx(vertexId);
-                   });
+    [this](long int vertexId) -> Atom {
+        return this->getAtomByVertexIdx(vertexId);
+    });
     return results;
-  };
+};
 
-  /**
-   * @brief Get the shortest sequence of atoms between two vertices
-   *
-   * @param vertexIdxFrom
-   * @param vertexIdxTo
-   * @return std::vector<Atom>
-   */
-  std::vector<Atom> AtomGraphParent::getShortestPath(
+/**
+ * @brief Get the shortest sequence of atoms between two vertices
+ *
+ * @param vertexIdxFrom
+ * @param vertexIdxTo
+ * @return std::vector<Atom>
+ */
+std::vector<Atom> AtomGraphParent::getShortestPath(
     const long int vertexIdxFrom,
     const long int vertexIdxTo) const
-  {
+{
     std::vector<Atom> result;
 
     igraph_vector_int_t vertices;
     igraph_vector_int_init(&vertices, 0);
 
     igraph_get_shortest_path(
-      &this->graph, &vertices, nullptr, vertexIdxFrom, vertexIdxTo, IGRAPH_ALL);
+        &this->graph, &vertices, nullptr, vertexIdxFrom, vertexIdxTo, IGRAPH_ALL);
 
     result.reserve(igraph_vector_int_size(&vertices));
     for (size_t i = 0; i < igraph_vector_int_size(&vertices); i++) {
-      result.push_back(
-        this->getAtomByVertexIdx(igraph_vector_int_get(&vertices, i)));
+        result.push_back(
+            this->getAtomByVertexIdx(igraph_vector_int_get(&vertices, i)));
     }
 
     igraph_vector_int_destroy(&vertices);
     return result;
-  };
+};
 
-  /**
-   * @brief Get the edge ids of the edges between two vertices
-   *
-   * Main useage: check whether two vertices are connected twice
-   *
-   * @param vertexId1 id of the first vertex
-   * @param vertexId2 id of the second vertex
-   * @return std::vector<long int> the edge ids
-   */
-  std::vector<long int> AtomGraphParent::getEdgeIdsFromTo(
+/**
+ * @brief Get the edge ids of the edges between two vertices
+ *
+ * Main useage: check whether two vertices are connected twice
+ *
+ * @param vertexId1 id of the first vertex
+ * @param vertexId2 id of the second vertex
+ * @return std::vector<long int> the edge ids
+ */
+std::vector<long int> AtomGraphParent::getEdgeIdsFromTo(
     const long int vertexId1,
     const long int vertexId2) const
-  {
+{
     std::vector<long int> incidentEdges = this->getIncidentEdgeIds(vertexId1);
     std::vector<long int> results;
     results.reserve(incidentEdges.size());
 
     for (const long int edgeId : incidentEdges) {
-      igraph_integer_t vertex1OfEdge;
-      igraph_integer_t vertex2OfEdge;
-      igraph_edge(&this->graph, edgeId, &vertex1OfEdge, &vertex2OfEdge);
+        igraph_integer_t vertex1OfEdge;
+        igraph_integer_t vertex2OfEdge;
+        igraph_edge(&this->graph, edgeId, &vertex1OfEdge, &vertex2OfEdge);
 
-      if ((vertex1OfEdge == vertexId1 && vertex2OfEdge == vertexId2) ||
-          (vertex1OfEdge == vertexId2 && vertex2OfEdge == vertexId1)) {
-        results.push_back(edgeId);
-      }
+        if ((vertex1OfEdge == vertexId1 && vertex2OfEdge == vertexId2) ||
+        (vertex1OfEdge == vertexId2 && vertex2OfEdge == vertexId1)) {
+            results.push_back(edgeId);
+        }
     }
 
     return results;
-  }
+}
 
-  std::vector<long int> AtomGraphParent::getIncidentEdgeIds(
+std::vector<long int> AtomGraphParent::getIncidentEdgeIds(
     const long int vertexId) const
-  {
+{
     igraph_es_t edgeSelector;
     igraph_es_incident(&edgeSelector, vertexId, IGRAPH_ALL);
     igraph_eit_t iterator;
@@ -165,44 +165,44 @@ namespace entities {
     std::vector<long int> results;
     results.reserve(IGRAPH_EIT_SIZE(iterator));
     while (!IGRAPH_EIT_END(iterator)) {
-      long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(iterator));
-      results.push_back(edgeId);
-      IGRAPH_EIT_NEXT(iterator);
+        long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(iterator));
+        results.push_back(edgeId);
+        IGRAPH_EIT_NEXT(iterator);
     }
     igraph_eit_destroy(&iterator);
     igraph_es_destroy(&edgeSelector);
 
     return results;
-  };
+};
 
-  /**
-   * @brief Get the number Of Atoms
-   *
-   * @return int
-   */
-  int AtomGraphParent::getNrOfVertices() const
-  {
+/**
+ * @brief Get the number Of Atoms
+ *
+ * @return int
+ */
+int AtomGraphParent::getNrOfVertices() const
+{
     return igraph_vcount(&this->graph);
-  }
+}
 
-  /**
-   * @brief Get the Nr Of Bonds
-   *
-   * @return int
-   */
-  int AtomGraphParent::getNrOfEdges() const
-  {
+/**
+ * @brief Get the Nr Of Bonds
+ *
+ * @return int
+ */
+int AtomGraphParent::getNrOfEdges() const
+{
     return igraph_ecount(&this->graph);
-  }
+}
 
-  /**
-   * @brief Get all atoms of a certain type
-   *
-   * @param atomType the type to query for
-   * @return std::vector<Atom>
-   */
-  std::vector<Atom> AtomGraphParent::getAtomsOfType(const int atomType) const
-  {
+/**
+ * @brief Get all atoms of a certain type
+ *
+ * @param atomType the type to query for
+ * @return std::vector<Atom>
+ */
+std::vector<Atom> AtomGraphParent::getAtomsOfType(const int atomType) const
+{
     std::vector<Atom> results;
     const std::vector<int> types = this->getPropertyValues<int>("type");
     size_t nrOfTypes = types.size();
@@ -213,59 +213,59 @@ namespace entities {
     // omp_out.insert(omp_out.end(), omp_in.begin(), omp_in.end())) #pragma
     // omp parallel for reduction(merge: results)
     for (size_t i = 0; i < nrOfTypes; ++i) {
-      if (types[i] == atomType) {
-        results.push_back(this->getAtomByVertexIdx(i));
-      }
+        if (types[i] == atomType) {
+            results.push_back(this->getAtomByVertexIdx(i));
+        }
     }
 
     return results;
-  };
+};
 
-  /**
-   * @brief Get an atom by its vertex id
-   *
-   * @param vertexIdx the id of the vertex on the graph
-   * @return Atom
-   */
-  Atom AtomGraphParent::getAtomByVertexIdx(const long int vertexIdx) const
-  {
+/**
+ * @brief Get an atom by its vertex id
+ *
+ * @param vertexIdx the id of the vertex on the graph
+ * @return Atom
+ */
+Atom AtomGraphParent::getAtomByVertexIdx(const long int vertexIdx) const
+{
     if (vertexIdx > this->getNrOfVertices()) {
-      throw std::invalid_argument("Atom with this vertex id (" +
-                                  std::to_string(vertexIdx) +
-                                  ") does not exist");
+        throw std::invalid_argument("Atom with this vertex id (" +
+                                    std::to_string(vertexIdx) +
+                                    ") does not exist");
     }
 
     igraph_strvector_t vnames;
     igraph_strvector_init(&vnames, 1);
     igraph_cattribute_list(
-      &this->graph, nullptr, nullptr, &vnames, nullptr, nullptr, nullptr);
+        &this->graph, nullptr, nullptr, &vnames, nullptr, nullptr, nullptr);
 
     // fetch all atom properties
     std::unordered_map<std::string, double> atomProperties;
     for (size_t i = 0; i < igraph_strvector_size(&vnames); ++i) {
-      atomProperties[igraph_strvector_get(&vnames, i)] = igraph_cattribute_VAN(
-        &this->graph, igraph_strvector_get(&vnames, i), vertexIdx);
+        atomProperties[igraph_strvector_get(&vnames, i)] = igraph_cattribute_VAN(
+                &this->graph, igraph_strvector_get(&vnames, i), vertexIdx);
     }
 
     igraph_strvector_destroy(&vnames);
 
     return Atom(atomProperties);
-  }
+}
 
-  Eigen::Vector3d AtomGraphParent::getPositionVectorForVertex(
+Eigen::Vector3d AtomGraphParent::getPositionVectorForVertex(
     const int vertexId) const
-  {
+{
     Eigen::Vector3d vertex = Eigen::Vector3d::Zero();
     vertex[0] = igraph_cattribute_VAN(&this->graph, "x", vertexId);
     vertex[1] = igraph_cattribute_VAN(&this->graph, "y", vertexId);
     vertex[2] = igraph_cattribute_VAN(&this->graph, "z", vertexId);
     return vertex;
-  }
+}
 
-  Eigen::Vector3d AtomGraphParent::getUnwrappedPositionVectorForVertex(
+Eigen::Vector3d AtomGraphParent::getUnwrappedPositionVectorForVertex(
     const int vertexId,
     const pylimer_tools::entities::Box& box) const
-  {
+{
     Eigen::Vector3d vertex = Eigen::Vector3d::Zero();
     vertex[0] = igraph_cattribute_VAN(&this->graph, "x", vertexId);
     vertex[1] = igraph_cattribute_VAN(&this->graph, "y", vertexId);
@@ -277,45 +277,47 @@ namespace entities {
     image[2] = igraph_cattribute_VAN(&this->graph, "nz", vertexId);
 
     return vertex + (box.getL() * image).matrix();
-  }
+}
 
-  std::vector<Atom> AtomGraphParent::verticesToAtoms(
+std::vector<Atom> AtomGraphParent::verticesToAtoms(
     const std::vector<long int>& vertexIds) const
-  {
+{
     std::vector<Atom> results;
     results.reserve(vertexIds.size());
     std::transform(
-      vertexIds.begin(),
-      vertexIds.end(),
-      std::back_inserter(results),
-      [&](long int vertexId) { return this->getAtomByVertexIdx(vertexId); });
+        vertexIds.begin(),
+        vertexIds.end(),
+        std::back_inserter(results),
+    [&](long int vertexId) {
+        return this->getAtomByVertexIdx(vertexId);
+    });
     return results;
-  };
+};
 
-  /**
-   * @brief Check whether a vertex property exists
-   *
-   * @param propertyName the property to check
-   * @return true if the attribute has been set at any point in time
-   * @return false or not
-   */
-  bool AtomGraphParent::vertexPropertyExists(const char* propertyName) const
-  {
+/**
+ * @brief Check whether a vertex property exists
+ *
+ * @param propertyName the property to check
+ * @return true if the attribute has been set at any point in time
+ * @return false or not
+ */
+bool AtomGraphParent::vertexPropertyExists(const char* propertyName) const
+{
     return igraph_cattribute_has_attr(
-      &this->graph, IGRAPH_ATTRIBUTE_VERTEX, propertyName);
-  };
+               &this->graph, IGRAPH_ATTRIBUTE_VERTEX, propertyName);
+};
 
-  /**
-   * @brief Get the unwrapped coordinates for a given set of vertices
-   *
-   * @param selector
-   * @param box
-   * @return Eigen::VectorXd
-   */
-  Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
+/**
+ * @brief Get the unwrapped coordinates for a given set of vertices
+ *
+ * @param selector
+ * @param box
+ * @return Eigen::VectorXd
+ */
+Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
     const igraph_vs_t selector,
     const pylimer_tools::entities::Box& box) const
-  {
+{
     igraph_vector_t xvalues;
     igraph_vector_init(&xvalues, 0);
     igraph_vector_t yvalues;
@@ -330,33 +332,33 @@ namespace entities {
     igraph_vector_init(&nzvalues, 0);
 
     if (igraph_cattribute_VANV(&this->graph, "x", selector, &xvalues)) {
-      throw std::runtime_error("Failed to query property x of graph.");
+        throw std::runtime_error("Failed to query property x of graph.");
     }
     if (igraph_cattribute_VANV(&this->graph, "y", selector, &yvalues)) {
-      throw std::runtime_error("Failed to query property y of graph.");
+        throw std::runtime_error("Failed to query property y of graph.");
     }
     if (igraph_cattribute_VANV(&this->graph, "z", selector, &zvalues)) {
-      throw std::runtime_error("Failed to query property z of graph.");
+        throw std::runtime_error("Failed to query property z of graph.");
     }
     if (igraph_cattribute_VANV(&this->graph, "nx", selector, &nxvalues)) {
-      throw std::runtime_error("Failed to query property nx of graph.");
+        throw std::runtime_error("Failed to query property nx of graph.");
     }
     if (igraph_cattribute_VANV(&this->graph, "ny", selector, &nyvalues)) {
-      throw std::runtime_error("Failed to query property ny of graph.");
+        throw std::runtime_error("Failed to query property ny of graph.");
     }
     if (igraph_cattribute_VANV(&this->graph, "nz", selector, &nzvalues)) {
-      throw std::runtime_error("Failed to query property nz of graph.");
+        throw std::runtime_error("Failed to query property nz of graph.");
     }
 
     const size_t size = igraph_vector_size(&xvalues);
     Eigen::VectorXd results = Eigen::VectorXd::Zero(size * 3);
     for (size_t i = 0; i < size; i++) {
-      results[3 * i] = igraph_vector_get(&xvalues, i) +
-                       (box.getLx() * igraph_vector_get(&nxvalues, i));
-      results[3 * i + 1] = igraph_vector_get(&yvalues, i) +
-                           (box.getLy() * igraph_vector_get(&nyvalues, i));
-      results[3 * i + 2] = igraph_vector_get(&zvalues, i) +
-                           (box.getLz() * igraph_vector_get(&nzvalues, i));
+        results[3 * i] = igraph_vector_get(&xvalues, i) +
+                         (box.getLx() * igraph_vector_get(&nxvalues, i));
+        results[3 * i + 1] = igraph_vector_get(&yvalues, i) +
+                             (box.getLy() * igraph_vector_get(&nyvalues, i));
+        results[3 * i + 2] = igraph_vector_get(&zvalues, i) +
+                             (box.getLz() * igraph_vector_get(&nzvalues, i));
     }
 
     igraph_vector_destroy(&xvalues);
@@ -367,45 +369,44 @@ namespace entities {
     igraph_vector_destroy(&nzvalues);
 
     return results;
-  }
+}
 
-  Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
+Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
     const pylimer_tools::entities::Box& box) const
-  {
+{
     return this->getUnwrappedVertexCoordinates(igraph_vss_all(), box);
-  }
+}
 
-  Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
+Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
     igraph_vector_int_t& vertices,
     const pylimer_tools::entities::Box& box) const
-  {
+{
     return this->getUnwrappedVertexCoordinates(igraph_vss_vector(&vertices),
-                                               box);
-  }
+            box);
+}
 
-  Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
+Eigen::VectorXd AtomGraphParent::getUnwrappedVertexCoordinates(
     std::vector<long int>& vertices,
     const pylimer_tools::entities::Box& box) const
-  {
+{
     igraph_vector_int_t vertices_v;
     igraph_vector_int_init(&vertices_v, vertices.size());
     pylimer_tools::utils::StdVectorToIgraphVectorT(vertices, &vertices_v);
     Eigen::VectorXd result =
-      this->getUnwrappedVertexCoordinates(vertices_v, box);
+        this->getUnwrappedVertexCoordinates(vertices_v, box);
     igraph_vector_int_destroy(&vertices_v);
     assert(result.size() == vertices.size() * 3);
     return result;
-  }
+}
 
-  /**
-   * @brief Get the Vertex And Edge Property Names
-   *
-   * @return std::pair<std::vector<std::string>, std::vector<std::string>>
-   * first the vertex property names, then the same for the edges
-   */
-  std::pair<std::vector<std::string>, std::vector<std::string>>
-  AtomGraphParent::getVertexAndEdgePropertyNames() const
-  {
+/**
+ * @brief Get the Vertex And Edge Property Names
+ *
+ * @return std::pair<std::vector<std::string>, std::vector<std::string>>
+ * first the vertex property names, then the same for the edges
+ */
+std::pair<std::vector<std::string>, std::vector<std::string>>
+AtomGraphParent::getVertexAndEdgePropertyNames() const {
     igraph_strvector_t gnames;
     igraph_strvector_init(&gnames, 1);
     igraph_vector_int_t gtypes;
@@ -419,11 +420,11 @@ namespace entities {
     igraph_vector_int_t etypes;
     igraph_vector_int_init(&etypes, 1);
     igraph_cattribute_list(
-      &this->graph, &gnames, &gtypes, &vnames, &vtypes, &enames, &etypes);
+        &this->graph, &gnames, &gtypes, &vnames, &vtypes, &enames, &etypes);
 
     std::vector<std::string> vertexPropertyNames;
     pylimer_tools::utils::igraphVectorTToStdVector(&vnames,
-                                                   vertexPropertyNames);
+            vertexPropertyNames);
     std::vector<std::string> edgePropertyNames;
     pylimer_tools::utils::igraphVectorTToStdVector(&enames, edgePropertyNames);
 
@@ -434,181 +435,181 @@ namespace entities {
     igraph_vector_int_destroy(&vtypes);
     igraph_vector_int_destroy(&etypes);
     return std::make_pair(vertexPropertyNames, edgePropertyNames);
-  };
+};
 
-  /**
-   * @brief Get all atoms with a certain number of bonds
-   *
-   * @param degree the number of bonds to search for
-   * @return std::vector<Atom>
-   */
-  std::vector<Atom> AtomGraphParent::getAtomsOfDegree(const int degree) const
-  {
+/**
+ * @brief Get all atoms with a certain number of bonds
+ *
+ * @param degree the number of bonds to search for
+ * @return std::vector<Atom>
+ */
+std::vector<Atom> AtomGraphParent::getAtomsOfDegree(const int degree) const
+{
     std::vector<long int> endNodeIndices = this->getVerticesWithDegree(degree);
     igraph_vector_int_t endNodeSelectorVector;
     igraph_vector_int_init(&endNodeSelectorVector, endNodeIndices.size());
     pylimer_tools::utils::StdVectorToIgraphVectorT(endNodeIndices,
-                                                   &endNodeSelectorVector);
+            &endNodeSelectorVector);
     igraph_vit_t vit;
     igraph_vit_create(
-      &this->graph, igraph_vss_vector(&endNodeSelectorVector), &vit);
+        &this->graph, igraph_vss_vector(&endNodeSelectorVector), &vit);
 
     std::vector<Atom> results;
     results.reserve(IGRAPH_VIT_SIZE(vit));
     while (!IGRAPH_VIT_END(vit)) {
-      long int vertexId1 = static_cast<long int>(IGRAPH_VIT_GET(vit));
-      Atom atom = this->getAtomByVertexIdx(vertexId1);
-      results.push_back(atom);
-      IGRAPH_VIT_NEXT(vit);
+        long int vertexId1 = static_cast<long int>(IGRAPH_VIT_GET(vit));
+        Atom atom = this->getAtomByVertexIdx(vertexId1);
+        results.push_back(atom);
+        IGRAPH_VIT_NEXT(vit);
     }
 
     igraph_vector_int_destroy(&endNodeSelectorVector);
     igraph_vit_destroy(&vit);
     return results;
-  }
+}
 
-  /**
-   * @brief compute the lengths of all bonds
-   *
-   * @return std::vector<double>
-   */
-  std::vector<double> AtomGraphParent::computeBondLengths(const Box& box) const
-  {
+/**
+ * @brief compute the lengths of all bonds
+ *
+ * @return std::vector<double>
+ */
+std::vector<double> AtomGraphParent::computeBondLengths(const Box& box) const
+{
     std::vector<double> lengths;
     lengths.reserve(this->getNrOfEdges());
     if (this->getNrOfEdges() == 0) {
-      return lengths;
+        return lengths;
     }
     // construct iterator
     igraph_eit_t bondIterator;
     if (igraph_eit_create(
-          &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &bondIterator)) {
-      throw std::runtime_error("Cannot create iterator to loop bonds");
+                &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &bondIterator)) {
+        throw std::runtime_error("Cannot create iterator to loop bonds");
     }
 
     while (!IGRAPH_EIT_END(bondIterator)) {
-      long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
-      Eigen::Vector3d distance =
-        this->getPositionVectorForVertex(IGRAPH_TO(&this->graph, edgeId)) -
-        this->getPositionVectorForVertex(IGRAPH_FROM(&this->graph, edgeId));
-      box.handlePBC(distance);
-      lengths.push_back(distance.norm());
-      IGRAPH_EIT_NEXT(bondIterator);
+        long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
+        Eigen::Vector3d distance =
+            this->getPositionVectorForVertex(IGRAPH_TO(&this->graph, edgeId)) -
+            this->getPositionVectorForVertex(IGRAPH_FROM(&this->graph, edgeId));
+        box.handlePBC(distance);
+        lengths.push_back(distance.norm());
+        IGRAPH_EIT_NEXT(bondIterator);
     }
 
     igraph_eit_destroy(&bondIterator);
     return lengths;
-  }
+}
 
-  double AtomGraphParent::computeMeanSquaredBondLength(const Box& box) const
-  {
+double AtomGraphParent::computeMeanSquaredBondLength(const Box& box) const
+{
     double result = 0.0;
 
     // construct iterator
     igraph_eit_t bondIterator;
     if (igraph_eit_create(
-          &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &bondIterator)) {
-      throw std::runtime_error("Cannot create iterator to loop bonds");
+                &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &bondIterator)) {
+        throw std::runtime_error("Cannot create iterator to loop bonds");
     }
 
     while (!IGRAPH_EIT_END(bondIterator)) {
-      long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
-      Eigen::Vector3d distance =
-        this->getPositionVectorForVertex(IGRAPH_TO(&this->graph, edgeId)) -
-        this->getPositionVectorForVertex(IGRAPH_FROM(&this->graph, edgeId));
-      box.handlePBC(distance);
-      result += distance.squaredNorm() /
-                static_cast<double>(IGRAPH_EIT_SIZE(bondIterator));
-      IGRAPH_EIT_NEXT(bondIterator);
+        long int edgeId = static_cast<long int>(IGRAPH_EIT_GET(bondIterator));
+        Eigen::Vector3d distance =
+            this->getPositionVectorForVertex(IGRAPH_TO(&this->graph, edgeId)) -
+            this->getPositionVectorForVertex(IGRAPH_FROM(&this->graph, edgeId));
+        box.handlePBC(distance);
+        result += distance.squaredNorm() /
+                  static_cast<double>(IGRAPH_EIT_SIZE(bondIterator));
+        IGRAPH_EIT_NEXT(bondIterator);
     }
 
     igraph_eit_destroy(&bondIterator);
     return result;
-  }
+}
 
-  /**
-   * @brief Count the number of edges leading to/from one vertex
-   *
-   * @param vertexId
-   * @return int
-   */
-  int AtomGraphParent::computeFunctionalityForVertex(const long int vertexId)
-  {
+/**
+ * @brief Count the number of edges leading to/from one vertex
+ *
+ * @param vertexId
+ * @return int
+ */
+int AtomGraphParent::computeFunctionalityForVertex(const long int vertexId)
+{
     igraph_integer_t degree;
     if (igraph_degree_1(&this->graph, &degree, vertexId, IGRAPH_ALL, false)) {
-      throw std::runtime_error("Failed to determine degree of vertex");
+        throw std::runtime_error("Failed to determine degree of vertex");
     }
     return degree;
-  }
+}
 
-  int AtomGraphParent::computeFunctionalityForAtom(const long int atomId)
-  {
+int AtomGraphParent::computeFunctionalityForAtom(const long int atomId)
+{
     return this->computeFunctionalityForVertex(this->getIdxByAtomId(atomId));
-  }
+}
 
-  /**
-   * @brief convert the atom types involved in one angle into one long number
-   *
-   */
-  long AtomGraphParent::hashAngleType(int typeFrom,
-                                      int typeVia,
-                                      int typeTo) const
-  {
+/**
+ * @brief convert the atom types involved in one angle into one long number
+ *
+ */
+long AtomGraphParent::hashAngleType(int typeFrom,
+                                    int typeVia,
+                                    int typeTo) const
+{
     if (typeFrom < 0 || typeTo < 0 || typeVia < 0) {
-      throw std::invalid_argument(
-        "AtomGraphParent::hashAngleType requires positve types");
+        throw std::invalid_argument(
+            "AtomGraphParent::hashAngleType requires positve types");
     }
     if (typeFrom > 1000 || typeTo > 1000 || typeVia > 1000) {
-      throw std::invalid_argument(
-        "AtomGraphParent::hashAngleType requires types < 1000");
+        throw std::invalid_argument(
+            "AtomGraphParent::hashAngleType requires types < 1000");
     }
     if (typeFrom < typeTo) {
-      std::swap(typeFrom, typeTo);
+        std::swap(typeFrom, typeTo);
     }
     long hash = (typeFrom << 20) | (typeVia << 10) | typeTo;
     return hash;
     // unhashing: typeFrom = hash >> 20; typeVia = (hash >> 10) & 0x3ff; typeTo
     // = (hash & 0x3ff);
-  };
+};
 
-  /**
-   * @brief convert the atom types involved in one angle into one long number
-   *
-   */
-  long AtomGraphParent::hashDihedralAngleType(int typeFrom,
-                                              int typeVia1,
-                                              int typeVia2,
-                                              int typeTo) const
-  {
+/**
+ * @brief convert the atom types involved in one angle into one long number
+ *
+ */
+long AtomGraphParent::hashDihedralAngleType(int typeFrom,
+        int typeVia1,
+        int typeVia2,
+        int typeTo) const
+{
     if (typeFrom < 0 || typeTo < 0 || typeVia1 < 0 || typeVia2 < 0) {
-      throw std::invalid_argument(
-        "AtomGraphParent::hashAngleType requires positve types");
+        throw std::invalid_argument(
+            "AtomGraphParent::hashAngleType requires positve types");
     }
     if (typeFrom > 1000 || typeTo > 1000 || typeVia1 > 1000 ||
-        typeVia2 > 1000) {
-      throw std::invalid_argument(
-        "AtomGraphParent::hashAngleType requires types < 1000");
+            typeVia2 > 1000) {
+        throw std::invalid_argument(
+            "AtomGraphParent::hashAngleType requires types < 1000");
     }
     if (typeFrom < typeTo) {
-      std::swap(typeFrom, typeTo);
-      std::swap(typeVia1, typeVia2);
+        std::swap(typeFrom, typeTo);
+        std::swap(typeVia1, typeVia2);
     }
     long hash = (typeFrom << 30) | (typeVia1 << 20) | (typeVia2 << 10) | typeTo;
     return hash;
-  };
+};
 
-  /**
-   * @brief Get all edges associated with this graph
-   *
-   * @return std::map<std::string, std::vector<long int>>
-   */
-  std::map<std::string, std::vector<long int>> AtomGraphParent::getEdges() const
-  {
+/**
+ * @brief Get all edges associated with this graph
+ *
+ * @return std::map<std::string, std::vector<long int>>
+ */
+std::map<std::string, std::vector<long int>> AtomGraphParent::getEdges() const {
     igraph_vector_int_t allEdges;
     igraph_vector_int_init(&allEdges, this->getNrOfEdges());
     if (igraph_edges(
-          &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &allEdges)) {
-      throw std::runtime_error("Failed to get all edges");
+                &this->graph, igraph_ess_all(IGRAPH_EDGEORDER_ID), &allEdges))
+    {
+        throw std::runtime_error("Failed to get all edges");
     }
 
     std::vector<long int> from;
@@ -618,36 +619,39 @@ namespace entities {
     std::vector<long int> type;
     type.reserve(this->getNrOfEdges());
 
-    for (long int i = 0; i < igraph_vector_int_size(&allEdges); i++) {
-      if (i % 2 == 0) {
-        from.push_back(igraph_vector_int_get(&allEdges, i));
-      } else {
-        to.push_back(igraph_vector_int_get(&allEdges, i));
-      }
+    for (long int i = 0; i < igraph_vector_int_size(&allEdges); i++)
+    {
+        if (i % 2 == 0) {
+            from.push_back(igraph_vector_int_get(&allEdges, i));
+        } else {
+            to.push_back(igraph_vector_int_get(&allEdges, i));
+        }
     }
 
     igraph_vector_int_destroy(&allEdges);
 
     if (igraph_cattribute_has_attr(
-          &this->graph, IGRAPH_ATTRIBUTE_EDGE, "type")) {
-      igraph_vector_t typesVec;
-      igraph_vector_init(&typesVec, 0);
-      if (igraph_cattribute_EANV(&this->graph,
-                                 "type",
-                                 igraph_ess_all(IGRAPH_EDGEORDER_ID),
-                                 &typesVec)) {
-        throw std::runtime_error("Failed to fetch type attribute");
-      }
-      assert(igraph_vector_size(&typesVec) == this->getNrOfEdges());
-      for (size_t i = 0; i < this->getNrOfEdges(); ++i) {
-        type.push_back(
-          igraphRealToInt<long int>(igraph_vector_get(&typesVec, i)));
-      }
-      igraph_vector_destroy(&typesVec);
-    } else {
-      for (size_t i = 0; i < this->getNrOfEdges(); ++i) {
-        type.push_back(-1); // TODO: find a nice default
-      }
+                &this->graph, IGRAPH_ATTRIBUTE_EDGE, "type"))
+    {
+        igraph_vector_t typesVec;
+        igraph_vector_init(&typesVec, 0);
+        if (igraph_cattribute_EANV(&this->graph,
+                                   "type",
+                                   igraph_ess_all(IGRAPH_EDGEORDER_ID),
+                                   &typesVec)) {
+            throw std::runtime_error("Failed to fetch type attribute");
+        }
+        assert(igraph_vector_size(&typesVec) == this->getNrOfEdges());
+        for (size_t i = 0; i < this->getNrOfEdges(); ++i) {
+            type.push_back(
+                igraphRealToInt<long int>(igraph_vector_get(&typesVec, i)));
+        }
+        igraph_vector_destroy(&typesVec);
+    } else
+    {
+        for (size_t i = 0; i < this->getNrOfEdges(); ++i) {
+            type.push_back(-1); // TODO: find a nice default
+        }
     }
 
     std::map<std::string, std::vector<long int>> results;
@@ -656,17 +660,17 @@ namespace entities {
     results.insert_or_assign("edge_type", type);
 
     return results;
-  };
+};
 
-  /**
-   * @brief Get all bonds (edges) associated with this graph
-   *
-   * @return std::map<std::string, std::vector<long int>>
-   */
-  std::map<std::string, std::vector<long int>> AtomGraphParent::getBonds() const
-  {
+/**
+ * @brief Get all bonds (edges) associated with this graph
+ *
+ * @return std::map<std::string, std::vector<long int>>
+ */
+std::map<std::string, std::vector<long int>> AtomGraphParent::getBonds() const
+{
     std::map<std::string, std::vector<long int>> vertexResults =
-      this->getEdges();
+        this->getEdges();
 
     std::vector<long int> newFrom;
     std::vector<long int> newTo;
@@ -679,8 +683,8 @@ namespace entities {
     assert(oldTo.size() == this->getNrOfEdges());
 
     for (size_t i = 0; i < this->getNrOfEdges(); ++i) {
-      newFrom.push_back(this->getAtomIdByIdx(oldFrom[i]));
-      newTo.push_back(this->getAtomIdByIdx(oldTo[i]));
+        newFrom.push_back(this->getAtomIdByIdx(oldFrom[i]));
+        newTo.push_back(this->getAtomIdByIdx(oldTo[i]));
     }
 
     assert(newFrom.size() == this->getNrOfEdges());
@@ -692,19 +696,19 @@ namespace entities {
     results.insert_or_assign("bond_type", vertexResults.at("edge_type"));
 
     return results;
-  }
+}
 
-  std::vector<int> AtomGraphParent::getVertexDegrees() const
-  {
+std::vector<int> AtomGraphParent::getVertexDegrees() const
+{
     int graphSize = igraph_vcount(&this->graph);
     igraph_vector_int_t degrees;
     if (igraph_vector_int_init(&degrees, graphSize)) {
-      throw std::runtime_error("Failed to instantiate result vector.");
+        throw std::runtime_error("Failed to instantiate result vector.");
     }
     // complexity: O(|v|*d)
     if (igraph_degree(
-          &this->graph, &degrees, igraph_vss_all(), IGRAPH_ALL, false)) {
-      throw std::runtime_error("Failed to determine degree of vertices");
+                &this->graph, &degrees, igraph_vss_all(), IGRAPH_ALL, false)) {
+        throw std::runtime_error("Failed to determine degree of vertices");
     }
 
     std::vector<int> res;
@@ -712,22 +716,22 @@ namespace entities {
     igraph_vector_int_destroy(&degrees);
 
     return res;
-  };
+};
 
-  std::vector<long int> AtomGraphParent::getVerticesWithDegree(
+std::vector<long int> AtomGraphParent::getVerticesWithDegree(
     const igraph_t* someGraph,
     std::function<bool(int)> selector) const
-  {
+{
     int graphSize = igraph_vcount(someGraph);
     igraph_vector_int_t degrees;
     if (igraph_vector_int_init(&degrees, graphSize)) {
-      throw std::runtime_error("Failed to instantiate result vector.");
+        throw std::runtime_error("Failed to instantiate result vector.");
     }
     igraph_vs_t allVertexIds;
     igraph_vs_all(&allVertexIds);
     // complexity: O(|v|*d)
     if (igraph_degree(someGraph, &degrees, allVertexIds, IGRAPH_ALL, false)) {
-      throw std::runtime_error("Failed to determine degree of vertices");
+        throw std::runtime_error("Failed to determine degree of vertices");
     }
 
     // NOTE: this is to omit the assumption, that the returned degree is
@@ -736,44 +740,46 @@ namespace entities {
     igraph_vit_t vit;
     igraph_vit_create(someGraph, allVertexIds, &vit);
     while (!IGRAPH_VIT_END(vit)) {
-      igraph_integer_t vertexId = IGRAPH_VIT_GET(vit);
-      int currentDegree = igraph_vector_int_get(&degrees, vertexId);
-      if (selector(currentDegree)) {
-        toSelect.push_back(static_cast<long int>(vertexId));
-      }
-      IGRAPH_VIT_NEXT(vit);
+        igraph_integer_t vertexId = IGRAPH_VIT_GET(vit);
+        int currentDegree = igraph_vector_int_get(&degrees, vertexId);
+        if (selector(currentDegree)) {
+            toSelect.push_back(static_cast<long int>(vertexId));
+        }
+        IGRAPH_VIT_NEXT(vit);
     }
     igraph_vector_int_destroy(&degrees);
     igraph_vit_destroy(&vit);
     igraph_vs_destroy(&allVertexIds);
 
     return toSelect;
-  }
+}
 
-  std::vector<long int> AtomGraphParent::getVerticesWithDegree(
+std::vector<long int> AtomGraphParent::getVerticesWithDegree(
     const igraph_t* someGraph,
     std::vector<int> degrees) const
-  {
+{
     return this->getVerticesWithDegree(someGraph, [degrees](int currentDegree) {
-      return std::find(degrees.begin(), degrees.end(), currentDegree) !=
-             degrees.end();
+        return std::find(degrees.begin(), degrees.end(), currentDegree) !=
+                   degrees.end();
     });
-  }
+}
 
-  std::vector<long int> AtomGraphParent::getVerticesWithDegree(
+std::vector<long int> AtomGraphParent::getVerticesWithDegree(
     std::function<bool(int)> selector) const
-  {
+{
     return this->getVerticesWithDegree(&this->graph, selector);
-  }
+}
 
-  std::vector<long int> AtomGraphParent::getVerticesWithDegree(int degree) const
-  {
+std::vector<long int> AtomGraphParent::getVerticesWithDegree(int degree) const
+{
     return this->getVerticesWithDegree(
-      [degree](int currentDegree) { return currentDegree == degree; });
-  }
+    [degree](int currentDegree) {
+        return currentDegree == degree;
+    });
+}
 
-  igraph_vs_t AtomGraphParent::getVerticesWithDegreeSelector(int degree) const
-  {
+igraph_vs_t AtomGraphParent::getVerticesWithDegreeSelector(int degree) const
+{
     // NOTE: this is to omit the assumption, that the returned degree is
     // sequential for vertex 0, ..., |V|
     std::vector<long int> toSelect = this->getVerticesWithDegree(degree);
@@ -787,13 +793,13 @@ namespace entities {
     // igraph_vector_int_destroy(&toSelectVec);
 
     return result;
-  }
+}
 
-  void AtomGraphParent::writeGraphToFile(const std::string& filename) const
-  {
+void AtomGraphParent::writeGraphToFile(const std::string& filename) const
+{
     FILE* fp = fopen(filename.c_str(), "w");
     igraph_write_graph_gml(&this->graph, fp, 0, NULL, "PylimerTools");
     fclose(fp);
-  };
+};
 } // namespace entities
 } // namespace pylimer_tools

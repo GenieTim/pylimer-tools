@@ -18,16 +18,16 @@ using namespace pylimer_tools::calc;
 void
 init_pylimer_bound_calc(py::module_& m)
 {
-  m.def("predict_gelation_point",
-        &mmt::predictGelationPoint,
-        "Predict the gelation point of a Universe");
-  // m.def("computeExtentOfReaction", &mmt::computeExtentOfReaction, "Compute
-  // extent of reaction");
-  m.def("compute_stoichiometric_imbalance",
-        &mmt::computeStoichiometricInbalance,
-        "Compute stoichiometric imbalance");
+    m.def("predict_gelation_point",
+          &mmt::predictGelationPoint,
+          "Predict the gelation point of a Universe");
+    // m.def("computeExtentOfReaction", &mmt::computeExtentOfReaction, "Compute
+    // extent of reaction");
+    m.def("compute_stoichiometric_imbalance",
+          &mmt::computeStoichiometricInbalance,
+          "Compute stoichiometric imbalance");
 
-  py::class_<NormalModeAnalyzer>(m, "NormalModeAnalyzer", py::module_local())
+    py::class_<NormalModeAnalyzer>(m, "NormalModeAnalyzer", py::module_local())
     .def(py::init<const std::vector<size_t>, const std::vector<size_t>>(),
          "Initialize NormalModeAnalyzer",
          py::arg("spring_from"),
@@ -81,13 +81,13 @@ init_pylimer_bound_calc(py::module_& m)
          "Get the number of soluble clusters (Eigenvalues = 0)")
 #ifdef CEREALIZABLE
     .def(py::pickle(
-      [](const NormalModeAnalyzer& u) {
+    [](const NormalModeAnalyzer& u) {
         return py::make_tuple(pylimer_tools::utils::serializeToString(u));
-      },
-      [](py::tuple t) {
+    },
+    [](py::tuple t) {
         std::string in = t[0].cast<std::string>();
         return NormalModeAnalyzer::fromString(in);
-      }));
+    }));
 #else
     ;
 #endif

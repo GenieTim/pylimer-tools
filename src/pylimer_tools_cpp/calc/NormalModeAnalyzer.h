@@ -11,9 +11,9 @@
 
 namespace pylimer_tools {
 namespace calc {
-  class NormalModeAnalyzer
-  {
-  public:
+class NormalModeAnalyzer
+{
+public:
     NormalModeAnalyzer(const std::vector<size_t> springFrom,
                        const std::vector<size_t> springTo);
 
@@ -41,20 +41,23 @@ namespace calc {
 #ifdef CEREALIZABLE
     static NormalModeAnalyzer fromString(std::string in)
     {
-      NormalModeAnalyzer n;
-      pylimer_tools::utils::deserializeFromString(n, in);
-      return n;
+        NormalModeAnalyzer n;
+        pylimer_tools::utils::deserializeFromString(n, in);
+        return n;
     }
 #endif
 
-    size_t getMatrixSize() const { return assembledConnectivityMatrix.rows(); }
+    size_t getMatrixSize() const
+    {
+        return assembledConnectivityMatrix.rows();
+    }
 
-  protected:
+protected:
     void requireEigenvaluesComputation() const;
     void requireEigenvectorsComputation() const;
     size_t countSolubleClusters() const;
 
-  private:
+private:
     Eigen::SparseMatrix<double> assembledConnectivityMatrix;
     // computation state
     bool isEigenvaluesComputed = false;
@@ -70,14 +73,14 @@ namespace calc {
     template<class Archive>
     void serialize(Archive& ar)
     {
-      ar(isEigenvaluesComputed,
-         isEigenvectorsComputed,
-         clusterCount,
-         eigenvalues,
-         eigenvectors);
+        ar(isEigenvaluesComputed,
+           isEigenvectorsComputed,
+           clusterCount,
+           eigenvalues,
+           eigenvectors);
     }
 #endif
-  };
+};
 }
 }
 

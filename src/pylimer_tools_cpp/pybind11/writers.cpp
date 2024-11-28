@@ -14,7 +14,7 @@ using namespace pylimer_tools::utils;
 void
 init_pylimer_bound_writers(py::module_& m)
 {
-  py::class_<DataFileWriter>(m, "DataFileWriter", py::module_local())
+    py::class_<DataFileWriter>(m, "DataFileWriter", py::module_local())
     .def(py::init<pe::Universe>(), py::arg("universe"), R"pbdoc(
            Initialize the writer with the universe to write.
       )pbdoc")
@@ -100,7 +100,7 @@ init_pylimer_bound_writers(py::module_& m)
           so that the file can be read correctly again.
       )pbdoc",
          py::arg("atom_format") =
-           "\t$atomId\t$moleculeId\t$atomType\t$x\t$y\t$z\t$nx\t$ny\t$nz")
+             "\t$atomId\t$moleculeId\t$atomType\t$x\t$y\t$z\t$nx\t$ny\t$nz")
     .def("config_crosslinker_type",
          &DataFileWriter::configCrosslinkerType,
          R"pbdoc(

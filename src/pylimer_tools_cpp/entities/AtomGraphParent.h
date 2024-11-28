@@ -18,10 +18,10 @@ extern "C"
 
 namespace pylimer_tools {
 namespace entities {
-  // abstract
-  class AtomGraphParent
-  {
-  public:
+// abstract
+class AtomGraphParent
+{
+public:
     AtomGraphParent();
     // rule of three:
     // 1. destructor (to destroy the graph)
@@ -49,7 +49,7 @@ namespace entities {
      * @return std::vector<long int>
      */
     std::vector<long int> getVertexIdxsConnectedTo(
-      const long int vertexIdx) const;
+        const long int vertexIdx) const;
 
     /**
      * @brief Get the Atoms Connected To an Atom
@@ -112,31 +112,31 @@ namespace entities {
      */
     template<typename vertex_idx_type>
     unsigned long long hashVertexIndicesOrderRelevant(int r,
-                                                      int count,
-                                                      ...) const
+            int count,
+            ...) const
     {
-      unsigned long long hash = 0;
-      int numVerticesTotal = this->getNrOfVertices() + 1;
-      // bits used: log(pow(numVerticesTotal, count))/log(2)
-      // -> possible overflow?!?
-      if (std::log(std::pow(r, count)) / std::log(2) >=
-          sizeof(unsigned long long) * CHAR_BIT) {
-        throw std::invalid_argument(
-          "With this r and count, the hash will overflow.");
-      }
+        unsigned long long hash = 0;
+        int numVerticesTotal = this->getNrOfVertices() + 1;
+        // bits used: log(pow(numVerticesTotal, count))/log(2)
+        // -> possible overflow?!?
+        if (std::log(std::pow(r, count)) / std::log(2) >=
+                    sizeof(unsigned long long) * CHAR_BIT) {
+            throw std::invalid_argument(
+                "With this r and count, the hash will overflow.");
+        }
 
-      va_list args;
-      va_start(args, count);
+        va_list args;
+        va_start(args, count);
 
-      for (int i = 0; i < count; i++) {
-        const vertex_idx_type nextVertexIdx = va_arg(args, vertex_idx_type);
-        hash *= numVerticesTotal;
-        hash += nextVertexIdx;
-      }
+        for (int i = 0; i < count; i++) {
+            const vertex_idx_type nextVertexIdx = va_arg(args, vertex_idx_type);
+            hash *= numVerticesTotal;
+            hash += nextVertexIdx;
+        }
 
-      va_end(args);
+        va_end(args);
 
-      return hash;
+        return hash;
     }
 
     /**
@@ -150,23 +150,23 @@ namespace entities {
     template<typename vertex_idx_type>
     unsigned long long hashVertexIndicesOrderIrrelevant(int count, ...) const
     {
-      unsigned long long hash_product = 1;
-      unsigned long long hash_sum = 0;
-      unsigned int hash_xor = 0;
+        unsigned long long hash_product = 1;
+        unsigned long long hash_sum = 0;
+        unsigned int hash_xor = 0;
 
-      va_list args;
-      va_start(args, count);
+        va_list args;
+        va_start(args, count);
 
-      for (int i = 0; i < count; i++) {
-        const vertex_idx_type nextVertexIdx = va_arg(args, vertex_idx_type);
-        hash_product *= nextVertexIdx;
-        hash_sum += nextVertexIdx;
-        hash_xor ^= nextVertexIdx;
-      }
+        for (int i = 0; i < count; i++) {
+            const vertex_idx_type nextVertexIdx = va_arg(args, vertex_idx_type);
+            hash_product *= nextVertexIdx;
+            hash_sum += nextVertexIdx;
+            hash_xor ^= nextVertexIdx;
+        }
 
-      va_end(args);
+        va_end(args);
 
-      return hash_product + hash_sum + ((unsigned long long)hash_xor << 32);
+        return hash_product + hash_sum + ((unsigned long long)hash_xor << 32);
     }
 
     /**
@@ -217,8 +217,8 @@ namespace entities {
      * @return Eigen::Vector3d
      */
     Eigen::Vector3d getUnwrappedPositionVectorForVertex(
-      const int vertexId,
-      const pylimer_tools::entities::Box& box) const;
+        const int vertexId,
+        const pylimer_tools::entities::Box& box) const;
 
     /**
      * @brief Convert a list of vertex ids to a list of Atom instances
@@ -227,7 +227,7 @@ namespace entities {
      * @return std::vector<Atom>
      */
     std::vector<Atom> verticesToAtoms(
-      const std::vector<long int>& vertexIds) const;
+        const std::vector<long int>& vertexIds) const;
 
     /**
      * @brief Check whether a vertex property exists
@@ -252,12 +252,12 @@ namespace entities {
     template<typename IN>
     int countPropertyValue(const char* propertyName, IN targetValue) const
     {
-      std::vector<IN> values = this->getPropertyValues<IN>(propertyName);
-      int result = 0;
-      for (IN value : values) {
-        result += (value == targetValue);
-      }
-      return result;
+        std::vector<IN> values = this->getPropertyValues<IN>(propertyName);
+        int result = 0;
+        for (IN value : values) {
+            result += (value == targetValue);
+        }
+        return result;
     }
 
     /**
@@ -270,19 +270,19 @@ namespace entities {
     template<typename OUT>
     std::vector<OUT> getPropertyValues(const char* propertyName) const
     {
-      std::vector<OUT> results;
-      if (this->getNrOfVertices() == 0) {
+        std::vector<OUT> results;
+        if (this->getNrOfVertices() == 0) {
+            return results;
+        }
+        igraph_vector_t allValues;
+        igraph_vector_init(&allValues, this->getNrOfVertices());
+        if (igraph_cattribute_VANV(
+                    &this->graph, propertyName, igraph_vss_all(), &allValues)) {
+            throw std::runtime_error("Failed to query properties of graph.");
+        }
+        pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
+        igraph_vector_destroy(&allValues);
         return results;
-      }
-      igraph_vector_t allValues;
-      igraph_vector_init(&allValues, this->getNrOfVertices());
-      if (igraph_cattribute_VANV(
-            &this->graph, propertyName, igraph_vss_all(), &allValues)) {
-        throw std::runtime_error("Failed to query properties of graph.");
-      }
-      pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
-      igraph_vector_destroy(&allValues);
-      return results;
     }
 
     template<typename IN>
@@ -290,10 +290,10 @@ namespace entities {
                           const char* propertyName,
                           IN value)
     {
-      if (igraph_cattribute_VAN_set(
-            &this->graph, propertyName, vertexId, value)) {
-        throw std::runtime_error("Failed to set property value");
-      }
+        if (igraph_cattribute_VAN_set(
+                    &this->graph, propertyName, vertexId, value)) {
+            throw std::runtime_error("Failed to set property value");
+        }
     }
 
     /**
@@ -306,28 +306,28 @@ namespace entities {
      */
     template<typename OUT>
     std::vector<OUT> getPropertyValues(
-      const char* propertyName,
-      const std::vector<long int>& vertices) const
+        const char* propertyName,
+        const std::vector<long int>& vertices) const
     {
-      std::vector<OUT> results;
-      if (vertices.size() == 0) {
+        std::vector<OUT> results;
+        if (vertices.size() == 0) {
+            return results;
+        }
+        igraph_vector_t allValues;
+        igraph_vector_init(&allValues, vertices.size());
+        igraph_vector_int_t vertexIdxs;
+        igraph_vector_int_init(&vertexIdxs, vertices.size());
+        pylimer_tools::utils::StdVectorToIgraphVectorT(vertices, &vertexIdxs);
+        if (igraph_cattribute_VANV(&this->graph,
+                                   propertyName,
+                                   igraph_vss_vector(&vertexIdxs),
+                                   &allValues)) {
+            throw std::runtime_error("Failed to query properties of graph.");
+        }
+        pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
+        igraph_vector_destroy(&allValues);
+        igraph_vector_int_destroy(&vertexIdxs);
         return results;
-      }
-      igraph_vector_t allValues;
-      igraph_vector_init(&allValues, vertices.size());
-      igraph_vector_int_t vertexIdxs;
-      igraph_vector_int_init(&vertexIdxs, vertices.size());
-      pylimer_tools::utils::StdVectorToIgraphVectorT(vertices, &vertexIdxs);
-      if (igraph_cattribute_VANV(&this->graph,
-                                 propertyName,
-                                 igraph_vss_vector(&vertexIdxs),
-                                 &allValues)) {
-        throw std::runtime_error("Failed to query properties of graph.");
-      }
-      pylimer_tools::utils::igraphVectorTToStdVector(&allValues, results);
-      igraph_vector_destroy(&allValues);
-      igraph_vector_int_destroy(&vertexIdxs);
-      return results;
     }
 
     /**
@@ -338,19 +338,19 @@ namespace entities {
      * @return Eigen::VectorXd
      */
     Eigen::VectorXd getUnwrappedVertexCoordinates(
-      const igraph_vs_t selector,
-      const pylimer_tools::entities::Box& box) const;
+        const igraph_vs_t selector,
+        const pylimer_tools::entities::Box& box) const;
 
     Eigen::VectorXd getUnwrappedVertexCoordinates(
-      const pylimer_tools::entities::Box& box) const;
+        const pylimer_tools::entities::Box& box) const;
 
     Eigen::VectorXd getUnwrappedVertexCoordinates(
-      igraph_vector_int_t& vertices,
-      const pylimer_tools::entities::Box& box) const;
+        igraph_vector_int_t& vertices,
+        const pylimer_tools::entities::Box& box) const;
 
     Eigen::VectorXd getUnwrappedVertexCoordinates(
-      std::vector<long int>& vertices,
-      const pylimer_tools::entities::Box& box) const;
+        std::vector<long int>& vertices,
+        const pylimer_tools::entities::Box& box) const;
 
     /**
      * @brief Get the Property (attribute) of one vertex
@@ -364,7 +364,7 @@ namespace entities {
     OUT getPropertyValue(const char* propertyName,
                          const long int vertexIdx) const
     {
-      return igraph_cattribute_VAN(&this->graph, propertyName, vertexIdx);
+        return igraph_cattribute_VAN(&this->graph, propertyName, vertexIdx);
     }
 
     /**
@@ -379,7 +379,7 @@ namespace entities {
     OUT getEdgePropertyValue(const char* propertyName,
                              const long int vertexIdx) const
     {
-      return igraph_cattribute_EAN(&this->graph, propertyName, vertexIdx);
+        return igraph_cattribute_EAN(&this->graph, propertyName, vertexIdx);
     }
 
     /**
@@ -409,9 +409,9 @@ namespace entities {
     igraph_integer_t getVertexDegree(const igraph_integer_t vertexId,
                                      const bool loops = true) const
     {
-      igraph_integer_t degree;
-      igraph_degree_1(&this->graph, &degree, vertexId, IGRAPH_ALL, loops);
-      return degree;
+        igraph_integer_t degree;
+        igraph_degree_1(&this->graph, &degree, vertexId, IGRAPH_ALL, loops);
+        return degree;
     }
 
     std::vector<int> getVertexDegrees() const;
@@ -462,55 +462,55 @@ namespace entities {
      */
     template<typename OutVectorType>
     OutVectorType getAssumedVertexCoordinates(
-      OutVectorType& results,
-      const Box& box,
-      const std::vector<long int>& vertexIds) const
+        OutVectorType& results,
+        const Box& box,
+        const std::vector<long int>& vertexIds) const
     {
-      if (vertexIds.size() * 3 != results.size()) {
-        throw std::invalid_argument(
-          "The results must have size 3*the number of atoms to query.");
-      }
+        if (vertexIds.size() * 3 != results.size()) {
+            throw std::invalid_argument(
+                "The results must have size 3*the number of atoms to query.");
+        }
 
-      igraph_vector_int_t vertex_ids;
-      igraph_vector_int_init(&vertex_ids, 0);
-      pylimer_tools::utils::StdVectorToIgraphVectorT(vertexIds, &vertex_ids);
+        igraph_vector_int_t vertex_ids;
+        igraph_vector_int_init(&vertex_ids, 0);
+        pylimer_tools::utils::StdVectorToIgraphVectorT(vertexIds, &vertex_ids);
 
-      Eigen::VectorXd coordinates =
-        this->getUnwrappedVertexCoordinates(vertex_ids, box);
+        Eigen::VectorXd coordinates =
+            this->getUnwrappedVertexCoordinates(vertex_ids, box);
 
-      igraph_vector_int_destroy(&vertex_ids);
+        igraph_vector_int_destroy(&vertex_ids);
 
-      // take the distances
-      Eigen::VectorXd distances =
-        coordinates.segment(3, coordinates.size() - 3) -
-        coordinates.segment(0, coordinates.size() - 3);
+        // take the distances
+        Eigen::VectorXd distances =
+            coordinates.segment(3, coordinates.size() - 3) -
+            coordinates.segment(0, coordinates.size() - 3);
 
-      // adjust them for the box
-      box.handlePBC(distances);
+        // adjust them for the box
+        box.handlePBC(distances);
 
-      // and now:
-      Eigen::Vector3d lastCoords = coordinates.segment(0, 3);
-      // put them into the box already
-      box.handlePBC(lastCoords);
-      results[0] = lastCoords[0];
-      results[1] = lastCoords[1];
-      results[2] = lastCoords[2];
-      for (int i = 0; i < distances.size(); i += 3) {
-        // TODO: rather than relying on the vertex ids to be subsequently
-        // connected, it would be nice if we could support graph-like structures
-        // as well (check if igraph_is_tree, then, start with root and do e.g.
-        // recursively)
+        // and now:
+        Eigen::Vector3d lastCoords = coordinates.segment(0, 3);
+        // put them into the box already
+        box.handlePBC(lastCoords);
+        results[0] = lastCoords[0];
+        results[1] = lastCoords[1];
+        results[2] = lastCoords[2];
+        for (int i = 0; i < distances.size(); i += 3) {
+            // TODO: rather than relying on the vertex ids to be subsequently
+            // connected, it would be nice if we could support graph-like structures
+            // as well (check if igraph_is_tree, then, start with root and do e.g.
+            // recursively)
 
-        // for each next atom, we can use the shortest distance to the previous
-        // in order to compensate/ignore the image flags while still enabling
-        // larger end-to-end distances than the box size
-        lastCoords += distances.segment(i, 3);
-        results[i + 3] = lastCoords[0];
-        results[i + 4] = lastCoords[1];
-        results[i + 5] = lastCoords[2];
-      }
+            // for each next atom, we can use the shortest distance to the previous
+            // in order to compensate/ignore the image flags while still enabling
+            // larger end-to-end distances than the box size
+            lastCoords += distances.segment(i, 3);
+            results[i + 3] = lastCoords[0];
+            results[i + 4] = lastCoords[1];
+            results[i + 5] = lastCoords[2];
+        }
 
-      return results;
+        return results;
     }
 
     void writeGraphToFile(const std::string& filename) const;
@@ -518,21 +518,21 @@ namespace entities {
     template<class Archive>
     void serialize(Archive& ar)
     {
-      ar(graph);
+        ar(graph);
     }
 
-  protected:
+protected:
     igraph_t graph;
     igraph_vs_t getVerticesWithDegreeSelector(int degree) const;
     std::vector<long int> getVerticesWithDegree(int degree) const;
     std::vector<long int> getVerticesWithDegree(
-      std::function<bool(int)> selector) const;
+        std::function<bool(int)> selector) const;
     std::vector<long int> getVerticesWithDegree(
-      const igraph_t* someGraph,
-      std::function<bool(int)> selector) const;
+        const igraph_t* someGraph,
+        std::function<bool(int)> selector) const;
     std::vector<long int> getVerticesWithDegree(const igraph_t* someGraph,
-                                                std::vector<int> degrees) const;
-  };
+            std::vector<int> degrees) const;
+};
 
 } // namespace entities
 } // namespace pylimer_tools

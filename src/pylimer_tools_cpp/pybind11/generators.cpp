@@ -19,7 +19,7 @@ void
 init_pylimer_bound_generators(py::module_& m)
 {
 
-  py::class_<MCUniverseGenerator>(m, "MCUniverseGenerator", R"pbdoc(
+    py::class_<MCUniverseGenerator>(m, "MCUniverseGenerator", R"pbdoc(
        A :obj:`pylimer_tools_cpp.Universe` generator using a Monte-Carlo procedure.
   )pbdoc")
     .def(py::init<const double, const double, const double>(),
@@ -64,10 +64,10 @@ init_pylimer_bound_generators(py::module_& m)
          &MCUniverseGenerator::getCurrentNrOfBonds,
          "Get the current number of bonds that the universe would/will have.")
     .def(
-      "config_nr_of_mc_steps",
-      &MCUniverseGenerator::configNrOfMCSteps,
-      "Set the number of Monte-Carlo steps during bond length equilibration.",
-      py::arg("n_steps") = 2000)
+        "config_nr_of_mc_steps",
+        &MCUniverseGenerator::configNrOfMCSteps,
+        "Set the number of Monte-Carlo steps during bond length equilibration.",
+        py::arg("n_steps") = 2000)
     .def("config_primary_loop_probability",
          &MCUniverseGenerator::configPrimaryLoopProbability,
          R"pbdoc(
@@ -153,7 +153,7 @@ init_pylimer_bound_generators(py::module_& m)
          py::arg("white_noise") = true)
     .def("add_monofunctional_strands",
          py::overload_cast<int, std::vector<int>, int>(
-           &MCUniverseGenerator::addMonofunctionalStrands),
+             &MCUniverseGenerator::addMonofunctionalStrands),
          R"pbdoc(
          Add multiple monofunctional strands with specified bead types.
          )pbdoc",
@@ -162,7 +162,7 @@ init_pylimer_bound_generators(py::module_& m)
          py::arg("monofunctional_strand_atom_type") = 4)
     .def("add_strands",
          py::overload_cast<int, std::vector<int>, int>(
-           &MCUniverseGenerator::addStrands),
+             &MCUniverseGenerator::addStrands),
          R"pbdoc(
             Add strands.
 
@@ -186,7 +186,7 @@ init_pylimer_bound_generators(py::module_& m)
          py::arg("c_infinity") = 1.)
     .def("link_strands_to_soluble_fraction",
          py::overload_cast<double, double>(
-           &MCUniverseGenerator::linkStrandsToSolubleFraction),
+             &MCUniverseGenerator::linkStrandsToSolubleFraction),
          R"pbdoc(
             Actually link the previously added strands to the previously added cross-linkers,
             until a certain soluble fraction is reached.
@@ -214,25 +214,27 @@ init_pylimer_bound_generators(py::module_& m)
             Use this method to actually (MC) place beads between the cross-links and retrieve the generated structure.
             )pbdoc");
 
-  m.def("do_random_walk",
-        py::overload_cast<int, double, double, std::string>(&doRandomWalkChain),
-        R"pbdoc(
+    m.def("do_random_walk",
+          py::overload_cast<int, double, double, std::string>(&doRandomWalkChain),
+          R"pbdoc(
             Do a random walk, return the coordinates of each point visited.
             )pbdoc",
-        py::arg("chain_len"),
-        py::arg("bead_distance") = 1.,
-        py::arg("mean_squared_bead_distance") = 1.,
-        py::arg("seed") = "");
-  m.def(
-    "do_random_walk_chain_from_to_mc",
-    [](pe::Box& b,
-       Eigen::Vector3d f,
-       Eigen::Vector3d t,
-       int c,
-       double l,
-       double l2,
-       std::string s,
-       int n) { return doRandomWalkChainFromToMC(b, f, t, c, l, l2, s, n); },
+          py::arg("chain_len"),
+          py::arg("bead_distance") = 1.,
+          py::arg("mean_squared_bead_distance") = 1.,
+          py::arg("seed") = "");
+    m.def(
+        "do_random_walk_chain_from_to_mc",
+        [](pe::Box& b,
+           Eigen::Vector3d f,
+           Eigen::Vector3d t,
+           int c,
+           double l,
+           double l2,
+           std::string s,
+    int n) {
+        return doRandomWalkChainFromToMC(b, f, t, c, l, l2, s, n);
+    },
     R"pbdoc(
             Do a random walk from one point to another.
             Then, relax the points in between using a Metropolis-Monte Carlo simulation.
@@ -245,15 +247,17 @@ init_pylimer_bound_generators(py::module_& m)
     py::arg("mean_squared_bead_distance") = 1.,
     py::arg("seed") = "",
     py::arg("n_iterations") = 10000);
-  m.def(
-    "do_random_walk_chain_from_to",
-    [](pe::Box& b,
-       Eigen::Vector3d f,
-       Eigen::Vector3d t,
-       int c,
-       double l,
-       double l2,
-       std::string s) { return doRandomWalkChainFromTo(b, f, t, c, l, l2, s); },
+    m.def(
+        "do_random_walk_chain_from_to",
+        [](pe::Box& b,
+           Eigen::Vector3d f,
+           Eigen::Vector3d t,
+           int c,
+           double l,
+           double l2,
+    std::string s) {
+        return doRandomWalkChainFromTo(b, f, t, c, l, l2, s);
+    },
     R"pbdoc(
             Do a random walk from one point to another.
             )pbdoc",
@@ -264,9 +268,9 @@ init_pylimer_bound_generators(py::module_& m)
     py::arg("bead_distance") = 1.,
     py::arg("mean_squared_bead_distance") = 1.,
     py::arg("seed") = "");
-  m.def("do_linear_walk_chain_from_to",
-        &doLinearWalkChainFromTo,
-        R"pbdoc(
+    m.def("do_linear_walk_chain_from_to",
+          &doLinearWalkChainFromTo,
+          R"pbdoc(
             Get coordinates linearly interpolated from one point to another (both exclusive).
 
             :param box: The box for doing PBC correction on the from/to.
@@ -277,11 +281,11 @@ init_pylimer_bound_generators(py::module_& m)
                If yes, chain_len + 2 coordinates will be returned, 
                where the first will be from_coordinates and the last will be to_coordinates.
             )pbdoc",
-        py::arg("box"),
-        py::arg("from_coordinates"),
-        py::arg("to_coordinates"),
-        py::arg("chain_len"),
-        py::arg("include_ends") = false);
+          py::arg("box"),
+          py::arg("from_coordinates"),
+          py::arg("to_coordinates"),
+          py::arg("chain_len"),
+          py::arg("include_ends") = false);
 }
 
 #endif
