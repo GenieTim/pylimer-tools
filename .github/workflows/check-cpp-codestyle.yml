@@ -19,6 +19,8 @@ jobs:
 
       - run: sudo apt-get install astyle bison flex lcov libeigen3-dev
 
+      - run: astyle --version
+
       - run: astyle --project=.astylerc --recursive '*.cpp' '*.h'
 
       # If anything changed, this will fail and show the needed changes
