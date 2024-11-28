@@ -9,12 +9,12 @@
 
 namespace pylimer_tools {
 namespace utils {
-  std::vector<std::string> splitCSV(const std::string filePath,
-                                    const std::string delimiter)
-  {
+std::vector<std::string> splitCSV(const std::string filePath,
+                                  const std::string delimiter)
+{
     if (!std::filesystem::exists(filePath)) {
-      throw std::invalid_argument("File to read (" + filePath +
-                                  ") does not exist.");
+        throw std::invalid_argument("File to read (" + filePath +
+        ") does not exist.");
     }
 
     std::vector<std::string> results;
@@ -24,8 +24,8 @@ namespace utils {
     file.open(filePath);
 
     if (!file.is_open()) {
-      throw std::invalid_argument("File to read (" + filePath +
-                                  "): failed to open.");
+        throw std::invalid_argument("File to read (" + filePath +
+                                    "): failed to open.");
     }
 
     std::ofstream outputFile;
@@ -37,39 +37,39 @@ namespace utils {
     tokenzierResults.reserve(16);
 
     while (std::getline(file, line)) {
-      // omit comment
-      shortenedLine = pylimer_tools::utils::rstrip(line, "#");
-      shortenedLine = pylimer_tools::utils::trim(shortenedLine);
-      int newLength =
-        pylimer_tools::utils::split(tokenzierResults, shortenedLine, delimiter);
-      if (newLength != previousLen || tokenzierResults[0] == "Step") {
-        // todo: also check for headers with same length?!?
-        previousLen = newLength;
-        outputFile.close();
-        currentTempFile = std::tmpnam(nullptr);
-        // let's not care about the first one
-        results.push_back(currentTempFile);
-        outputFile.open(currentTempFile);
-      }
-      outputFile << shortenedLine << "\n";
+        // omit comment
+        shortenedLine = pylimer_tools::utils::rstrip(line, "#");
+        shortenedLine = pylimer_tools::utils::trim(shortenedLine);
+        int newLength =
+            pylimer_tools::utils::split(tokenzierResults, shortenedLine, delimiter);
+        if (newLength != previousLen || tokenzierResults[0] == "Step") {
+            // todo: also check for headers with same length?!?
+            previousLen = newLength;
+            outputFile.close();
+            currentTempFile = std::tmpnam(nullptr);
+            // let's not care about the first one
+            results.push_back(currentTempFile);
+            outputFile.open(currentTempFile);
+        }
+        outputFile << shortenedLine << "\n";
     }
 
     outputFile.close();
 
     return results;
-  }
+}
 
-  std::string mergeCSVFiles(const std::vector<std::string> files)
-  {
+std::string mergeCSVFiles(const std::vector<std::string> files)
+{
     std::set<std::string> columns;
     for (std::string file : files) {
-      std::ifstream inFile;
-      inFile.open(file);
-      std::string line;
-      std::getline(inFile, line);
-      pylimer_tools::utils::CsvTokenizer tokenizer(line);
+        std::ifstream inFile;
+        inFile.open(file);
+        std::string line;
+        std::getline(inFile, line);
+        pylimer_tools::utils::CsvTokenizer tokenizer(line);
     }
     return "";
-  }
+}
 }
 }

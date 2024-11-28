@@ -27,16 +27,16 @@ SOFTWARE.
 
 namespace pylimer_tools {
 namespace calc {
-  typedef Eigen::Matrix<unsigned long int, Eigen::Dynamic, Eigen::Dynamic>
-    MatrixXuli;
-  typedef Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> VectorXui;
+typedef Eigen::Matrix<unsigned long int, Eigen::Dynamic, Eigen::Dynamic>
+MatrixXuli;
+typedef Eigen::Matrix<unsigned int, Eigen::Dynamic, 1> VectorXui;
 
-  ////////////////////////////////////////////////////
-  /// Standard Scalar Correlator f(tau)=<A(t)A(t+tau)>
-  class Correlator
-  {
+////////////////////////////////////////////////////
+/// Standard Scalar Correlator f(tau)=<A(t)A(t+tau)>
+class Correlator
+{
 
-  protected:
+protected:
     /** Where the coming values are stored */
     Eigen::MatrixXd shift;
     /** Array containing the actual calculated correlation function */
@@ -70,7 +70,7 @@ namespace calc {
     /** Maximum correlator attained during simulation */
     unsigned int kmax;
 
-  public:
+public:
     /** Points per correlator */
     unsigned int p;
     /** Number of points over which to average; RECOMMENDED: p mod m = 0 */
@@ -102,27 +102,27 @@ namespace calc {
     template<class Archive>
     void serialize(Archive& ar)
     {
-      ar(
-        // private...
-        shift,
-        correlation,
-        ncorrelation,
-        accumulator,
-        naccumulator,
-        insertindex,
-        numcorrelators,
-        dmin,
-        length,
-        kmax,
-        // ...and public members
-        p,
-        m,
-        t,
-        f,
-        npcorr,
-        accval);
+        ar(
+            // private...
+            shift,
+            correlation,
+            ncorrelation,
+            accumulator,
+            naccumulator,
+            insertindex,
+            numcorrelators,
+            dmin,
+            length,
+            kmax,
+            // ...and public members
+            p,
+            m,
+            t,
+            f,
+            npcorr,
+            accval);
     }
-  };
+};
 
 }
 }

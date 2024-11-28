@@ -20,70 +20,69 @@ namespace pylimer_tools::sim::mehp {
 class PyMEHPForceEvaluator : public MEHPForceEvaluator
 {
 public:
-  using MEHPForceEvaluator::getNetwork;
+    using MEHPForceEvaluator::getNetwork;
 
-  /* Trampoline */
-  virtual double evaluateStressContribution(double springDistances[3],
-                                            size_t i,
-                                            size_t j,
-                                            size_t springIndex) const override
-  {
-    PYBIND11_OVERRIDE_PURE(
-      double,                     /* Return type */
-      MEHPForceEvaluator,         /* Parent class */
-      evaluateStressContribution, /* Name of function in C++ */
-      springDistances,
-      i,
-      j,
-      springIndex /* Arguments */
-    );
-  }
-
-  typedef std::pair<double, std::vector<double>> returntype;
-  /* Trampoline */
-  virtual returntype evaluateForceAndGradient(
-    const size_t n,
-    const Eigen::VectorXd& springDistances,
-    bool requiresGradient) const
-  {
-    PYBIND11_OVERRIDE_PURE(
-      returntype,               /* Return type */
-      MEHPForceEvaluator,       /* Parent class */
-      evaluateForceSetGradient, /* Name of function in C++ (must match Python
-                                   name) */
-      n,
-      springDistances,
-      requiresGradient /* Argument(s) */
-    );
-  }
-
-  // actually overriding function, but simplifying for python possibilities
-  double evaluateForceSetGradient(const size_t n,
-                                  const Eigen::VectorXd& springDistances,
-                                  double* grad) const override
-  {
-    std::pair<double, std::vector<double>> trampolineResult =
-      this->evaluateForceAndGradient(n, springDistances, grad != nullptr);
-    if (grad != nullptr) {
-      assert(trampolineResult.second.size() == n);
-      for (size_t i = 0; i < n; ++i) {
-        grad[i] = trampolineResult.second[i];
-      }
+    /* Trampoline */
+    virtual double evaluateStressContribution(double springDistances[3],
+            size_t i,
+            size_t j,
+            size_t springIndex) const override
+    {
+        PYBIND11_OVERRIDE_PURE(
+            double,                     /* Return type */
+            MEHPForceEvaluator,         /* Parent class */
+            evaluateStressContribution, /* Name of function in C++ */
+            springDistances,
+            i,
+            j,
+            springIndex /* Arguments */
+        );
     }
-    return trampolineResult.first;
-  }
 
-  void prepareForEvaluations() override {};
+    typedef std::pair<double, std::vector<double>> returntype;
+    /* Trampoline */
+    virtual returntype evaluateForceAndGradient(
+        const size_t n,
+        const Eigen::VectorXd& springDistances,
+        bool requiresGradient) const {
+        PYBIND11_OVERRIDE_PURE(
+            returntype,               /* Return type */
+            MEHPForceEvaluator,       /* Parent class */
+            evaluateForceSetGradient, /* Name of function in C++ (must match Python
+                                   name) */
+            n,
+            springDistances,
+            requiresGradient /* Argument(s) */
+        );
+    }
+
+    // actually overriding function, but simplifying for python possibilities
+    double evaluateForceSetGradient(const size_t n,
+                                    const Eigen::VectorXd& springDistances,
+                                    double* grad) const override {
+        std::pair<double, std::vector<double>> trampolineResult =
+        this->evaluateForceAndGradient(n, springDistances, grad != nullptr);
+        if (grad != nullptr)
+        {
+            assert(trampolineResult.second.size() == n);
+            for (size_t i = 0; i < n; ++i) {
+                grad[i] = trampolineResult.second[i];
+            }
+        }
+        return trampolineResult.first;
+    }
+
+    void prepareForEvaluations() override {};
 };
 }
 
 void
 init_pylimer_bound_sim(py::module_& m)
 {
-  ////////////////////////////////////////////////////////////////
-  // MARK: Output Quantities
+    ////////////////////////////////////////////////////////////////
+    // MARK: Output Quantities
 
-  py::enum_<ComputedDoubleValues>(m, "ComputedDoubleValues")
+    py::enum_<ComputedDoubleValues>(m, "ComputedDoubleValues")
     .value("TIMESTEP", ComputedDoubleValues::TIMESTEP)
     .value("TIME", ComputedDoubleValues::TIME)
     .value("VOLUME", ComputedDoubleValues::VOLUME)
@@ -102,7 +101,7 @@ init_pylimer_bound_sim(py::module_& m)
     .value("MAX_B", ComputedDoubleValues::MAX_B)
     .value("MSD", ComputedDoubleValues::MSD);
 
-  py::enum_<ComputedIntValues>(m, "ComputedIntValues")
+    py::enum_<ComputedIntValues>(m, "ComputedIntValues")
     .value("STEP", ComputedIntValues::STEP)
     .value("NUM_SHIFT", ComputedIntValues::NUM_SHIFT)
     .value("NUM_RELOC", ComputedIntValues::NUM_RELOC)
@@ -112,7 +111,7 @@ init_pylimer_bound_sim(py::module_& m)
     .value("NUM_EXTRA_BONDS", ComputedIntValues::NUM_EXTRA_BONDS)
     .value("NUM_BONDS_TO_FORM", ComputedIntValues::NUM_BONDS_TO_FORM);
 
-  py::class_<OutputConfiguration>(m, "OutputConfiguration", py::module_local())
+    py::class_<OutputConfiguration>(m, "OutputConfiguration", py::module_local())
     .def(py::init<>(), "Get an instance of this struct")
     .def_readwrite("int_values", &OutputConfiguration::intValues)
     .def_readwrite("double_values", &OutputConfiguration::doubleValues)
@@ -130,13 +129,13 @@ init_pylimer_bound_sim(py::module_& m)
      For averages, this value also says how many values will be averaged.
      )pbdoc");
 
-  /**
-   * ////////////////////////////////////////////////////////////////
-   * MEHP
-   * ////////////////////////////////////////////////////////////////
-   */
+    /**
+     * ////////////////////////////////////////////////////////////////
+     * MEHP
+     * ////////////////////////////////////////////////////////////////
+     */
 
-  py::enum_<mehp::ExitReason>(m, "ExitReason")
+    py::enum_<mehp::ExitReason>(m, "ExitReason")
     .value("UNSET", mehp::ExitReason::UNSET)
     .value("MAX_STEPS", mehp::ExitReason::MAX_STEPS)
     .value("F_TOLERANCE", mehp::ExitReason::F_TOLERANCE)
@@ -144,18 +143,18 @@ init_pylimer_bound_sim(py::module_& m)
     .value("FAILURE", mehp::ExitReason::FAILURE)
     .value("OTHER", mehp::ExitReason::OTHER);
 
-  m.def("inverse_langevin",
-        &mehp::langevin_inv,
-        R"pbdoc(
+    m.def("inverse_langevin",
+          &mehp::langevin_inv,
+          R"pbdoc(
      A somewhat accurate (for :math:`x \in (-1, 1)`) implementation of the inverse Langevin.
 
      Source: https://scicomp.stackexchange.com/a/30251
   )pbdoc",
-        py::arg("x"));
+          py::arg("x"));
 
-  ////////////////////////////////////////////////////////////////
-  // MARK: Network structures
-  py::class_<mehp::Network>(m, "SimplifiedNetwork", R"pbdoc(
+    ////////////////////////////////////////////////////////////////
+    // MARK: Network structures
+    py::class_<mehp::Network>(m, "SimplifiedNetwork", R"pbdoc(
      A more efficient structure of the network for use in MEHP.
      Consists usually only of the crosslinkers.
  )pbdoc")
@@ -176,7 +175,7 @@ init_pylimer_bound_sim(py::module_& m)
     // .def_readonly("springIsActive", &mehp::Network::springIsActive)
     ;
 
-  py::class_<mehp::ForceBalanceNetwork>(m, "SimplifiedBalanceNetwork", R"pbdoc(
+    py::class_<mehp::ForceBalanceNetwork>(m, "SimplifiedBalanceNetwork", R"pbdoc(
      A more efficient structure of the network for use in MEHP force balance.
      Consists usually only of the cross- and slip-links.
  )pbdoc")
@@ -221,10 +220,10 @@ init_pylimer_bound_sim(py::module_& m)
     // .def_readonly("springIsActive", &mehp::Network::springIsActive)
     ;
 
-  ////////////////////////////////////////////////////////////////
-  // MARK: Force evaluators
-  py::class_<mehp::MEHPForceEvaluator, mehp::PyMEHPForceEvaluator>(
-    m, "MEHPForceEvaluator", R"pbdoc(
+    ////////////////////////////////////////////////////////////////
+    // MARK: Force evaluators
+    py::class_<mehp::MEHPForceEvaluator, mehp::PyMEHPForceEvaluator>(
+        m, "MEHPForceEvaluator", R"pbdoc(
      The base interface to change the way the force is evaluated during a MEHP run.
     )pbdoc")
     .def(py::init<>())
@@ -252,40 +251,40 @@ init_pylimer_bound_sim(py::module_& m)
          py::arg("j"),
          py::arg("spring_index"));
 
-  //   py::class_<mehp::PyMEHPForceEvaluator, mehp::MEHPForceEvaluator>(
-  //     m, "CustomMEHPForceEvaluator", R"pbdoc(
-  //      The Python access to implement a custom force to be evaluated during a
-  //      MEHP run.
-  //     )pbdoc")
-  //     .def(py::init<>())
-  //     .def("evaluateForceAndGradient",
-  //          &mehp::PyMEHPForceEvaluator::evaluateForceAndGradient,
-  //          R"pbdoc(
-  //      One of the two functions to override, the other being
-  //      :func:`~pylimer_tools_cpp.MEHPForceEvaluator.evaluateStressContribution`.
+    //   py::class_<mehp::PyMEHPForceEvaluator, mehp::MEHPForceEvaluator>(
+    //     m, "CustomMEHPForceEvaluator", R"pbdoc(
+    //      The Python access to implement a custom force to be evaluated during a
+    //      MEHP run.
+    //     )pbdoc")
+    //     .def(py::init<>())
+    //     .def("evaluateForceAndGradient",
+    //          &mehp::PyMEHPForceEvaluator::evaluateForceAndGradient,
+    //          R"pbdoc(
+    //      One of the two functions to override, the other being
+    //      :func:`~pylimer_tools_cpp.MEHPForceEvaluator.evaluateStressContribution`.
 
-  //      :param n: the dimensionality of the problem (the nr. of spring
-  //      coordinates) :param springDistances: the sequential (x, y, z) spring
-  //      distances :param displacements: the displacements from the original
-  //      coordinates
-  //           (accessible by
-  //           :func:`~pylimer_tools_cpp.CustomMEHPForceEvaluator.getNetwork().coordinates`)
-  //      :param gradientNeeded: whether the gradient should be computed and
-  //      returned
+    //      :param n: the dimensionality of the problem (the nr. of spring
+    //      coordinates) :param springDistances: the sequential (x, y, z) spring
+    //      distances :param displacements: the displacements from the original
+    //      coordinates
+    //           (accessible by
+    //           :func:`~pylimer_tools_cpp.CustomMEHPForceEvaluator.getNetwork().coordinates`)
+    //      :param gradientNeeded: whether the gradient should be computed and
+    //      returned
 
-  //      Returns:
-  //           - force: the result of the force computation.
-  //           - gradient: the result of the gradient computation.
-  //                Only needed if the parameter `gradientNeeded` is true,
-  //                otherwise an empty list is sufficient.
-  //     )pbdoc",
-  //          py::arg("n"),
-  //          py::arg("springDistances"),
-  //          py::arg("displacements"),
-  //          py::arg("gradientNeeded"));
+    //      Returns:
+    //           - force: the result of the force computation.
+    //           - gradient: the result of the gradient computation.
+    //                Only needed if the parameter `gradientNeeded` is true,
+    //                otherwise an empty list is sufficient.
+    //     )pbdoc",
+    //          py::arg("n"),
+    //          py::arg("springDistances"),
+    //          py::arg("displacements"),
+    //          py::arg("gradientNeeded"));
 
-  py::class_<mehp::SimpleSpringMEHPForceEvaluator, mehp::MEHPForceEvaluator>(
-    m, "SimpleSpringMEHPForceEvaluator", R"pbdoc(
+    py::class_<mehp::SimpleSpringMEHPForceEvaluator, mehp::MEHPForceEvaluator>(
+        m, "SimpleSpringMEHPForceEvaluator", R"pbdoc(
      This is equal to a spring evaluator for Gaussian chains.
 
      The force for a certain spring is given by:
@@ -298,8 +297,8 @@ init_pylimer_bound_sim(py::module_& m)
     )pbdoc")
     .def(py::init<double>(), py::arg("kappa") = 1.0);
 
-  py::class_<mehp::NonGaussianSpringForceEvaluator, mehp::MEHPForceEvaluator>(
-    m, "NonGaussianSpringForceEvaluator", R"pbdoc(
+    py::class_<mehp::NonGaussianSpringForceEvaluator, mehp::MEHPForceEvaluator>(
+        m, "NonGaussianSpringForceEvaluator", R"pbdoc(
      This is equal to a spring evaluator for Langevin chains.
 
      The force for a certain spring is given by:
@@ -316,23 +315,23 @@ init_pylimer_bound_sim(py::module_& m)
      :param l: The  the length of a spring in the chain
     )pbdoc")
     .def(py::init<double, double, double>(),
-         "Initialize this ForceEvaluator",
+    "Initialize this ForceEvaluator",
          py::arg("kappa") = 1.0,
          py::arg("N") = 1.0,
          py::arg("l") = 1.0);
 
-  ////////////////////////////////////////////////////////////////
-  // MARK: Force Relaxation
-  py::class_<mehp::MEHPForceRelaxation>(m, "MEHPForceRelaxation", R"pbdoc(
+    ////////////////////////////////////////////////////////////////
+    // MARK: Force Relaxation
+    py::class_<mehp::MEHPForceRelaxation>(m, "MEHPForceRelaxation", R"pbdoc(
     A small simulation tool for quickly minimizing the force between the cross-linker beads.
      )pbdoc")
     .def(py::init<pe::Universe,
-                  int,
-                  bool,
-                  mehp::MEHPForceEvaluator*,
-                  double,
-                  bool,
-                  bool>(),
+         int,
+         bool,
+         mehp::MEHPForceEvaluator*,
+         double,
+         bool,
+         bool>(),
          R"pbdoc(
           Instantiate the simulator for a certain universe.
 
@@ -520,7 +519,7 @@ init_pylimer_bound_sim(py::module_& m)
          py::arg("tolerance") = 5e-2)
     .def("count_active_clustered_atoms",
          py::overload_cast<const double>(
-           &mehp::MEHPForceRelaxation::countActiveClusteredAtoms),
+             &mehp::MEHPForceRelaxation::countActiveClusteredAtoms),
          R"pbdoc(
           Counts the active clustered atoms in the system.
 
@@ -616,19 +615,19 @@ init_pylimer_bound_sim(py::module_& m)
      )pbdoc")
 #ifdef CEREALIZABLE
     .def(py::pickle(
-      [](const mehp::MEHPForceRelaxation& u) {
+    [](const mehp::MEHPForceRelaxation& u) {
         return py::make_tuple(pylimer_tools::utils::serializeToString(u));
-      },
-      [](py::tuple t) {
+    },
+    [](py::tuple t) {
         std::string in = t[0].cast<std::string>();
         return mehp::MEHPForceRelaxation::constructFromString(in);
-      }))
+    }))
 #endif
     ;
 
-  ////////////////////////////////////////////////////////////////
-  // MARK: Configuration Enums
-  py::enum_<mehp::StructureSimplificationMode>(m, "StructureSimplificationMode")
+    ////////////////////////////////////////////////////////////////
+    // MARK: Configuration Enums
+    py::enum_<mehp::StructureSimplificationMode>(m, "StructureSimplificationMode")
     .value("NO_SIMPLIFICATION",
            mehp::StructureSimplificationMode::NO_SIMPLIFICATION)
     .value("X2F_ONLY", mehp::StructureSimplificationMode::X2F_ONLY)
@@ -636,7 +635,7 @@ init_pylimer_bound_sim(py::module_& m)
     .value("ALL_TIM", mehp::StructureSimplificationMode::ALL_TIM)
     .value("ALL_ANDREI", mehp::StructureSimplificationMode::ALL_ANDREI);
 
-  py::enum_<mehp::LinkSwappingMode>(m, "LinkSwappingMode")
+    py::enum_<mehp::LinkSwappingMode>(m, "LinkSwappingMode")
     .value("NO_SWAPPING", mehp::LinkSwappingMode::NO_SWAPPING)
     .value("SLIPLINKS_ONLY", mehp::LinkSwappingMode::SLIPLINKS_ONLY)
     .value("ALL", mehp::LinkSwappingMode::ALL)
@@ -646,9 +645,9 @@ init_pylimer_bound_sim(py::module_& m)
     .value("ALL_MC_TRY", mehp::LinkSwappingMode::ALL_MC_TRY)
     .value("ALL_MC_TRY_CYCLE", mehp::LinkSwappingMode::ALL_MC_TRY_CYCLE);
 
-  ////////////////////////////////////////////////////////////////
-  // MARK: Force Balance
-  py::class_<mehp::MEHPForceBalance>(m, "MEHPForceBalance", R"pbdoc(
+    ////////////////////////////////////////////////////////////////
+    // MARK: Force Balance
+    py::class_<mehp::MEHPForceBalance>(m, "MEHPForceBalance", R"pbdoc(
     A small simulation tool for quickly minimizing the force between the cross-linker beads.
      )pbdoc")
     .def(py::init<pe::Universe, int, bool, bool, bool>(),
@@ -668,9 +667,9 @@ init_pylimer_bound_sim(py::module_& m)
          py::arg("remove_2functional_crosslinkers") = false,
          py::arg("remove_dangling_chains") = false)
     .def("__copy__",
-         [](const mehp::MEHPForceBalance& self) {
-           return mehp::MEHPForceBalance(self);
-         })
+    [](const mehp::MEHPForceBalance& self) {
+        return mehp::MEHPForceBalance(self);
+    })
     .def_static("construct_with_random_sliplinks",
                 &mehp::MEHPForceBalance::constructWithRandomSlipLinks,
                 R"pbdoc(
@@ -692,35 +691,39 @@ init_pylimer_bound_sim(py::module_& m)
     //                Validates the internal structures.
     //          )pbdoc")
     .def(
-      "run_force_relaxation",
-      [](mehp::MEHPForceBalance& sim,
-         long int maxNrOfSteps, // default: 10000
-         double xtol,
-         const double initialResidualToUse,
-         const mehp::StructureSimplificationMode simplificationMode,
-         const double inactiveRemovalCutoff,
-         bool doInnerIterations,
-         const mehp::LinkSwappingMode allowSlipLinksToPassEachOther,
-         const int swappingFrequency,
-         const double oneOverSpringPartitionUpperLimit,
-         const int nrOfCrosslinkSwapsAllowedPerSliplink,
-         const bool disableSlipping) {
+        "run_force_relaxation",
+        [](mehp::MEHPForceBalance& sim,
+           long int maxNrOfSteps, // default: 10000
+           double xtol,
+           const double initialResidualToUse,
+           const mehp::StructureSimplificationMode simplificationMode,
+           const double inactiveRemovalCutoff,
+           bool doInnerIterations,
+           const mehp::LinkSwappingMode allowSlipLinksToPassEachOther,
+           const int swappingFrequency,
+           const double oneOverSpringPartitionUpperLimit,
+           const int nrOfCrosslinkSwapsAllowedPerSliplink,
+    const bool disableSlipping) {
         return sim.runForceRelaxation(
-          maxNrOfSteps,
-          xtol,
-          initialResidualToUse,
-          simplificationMode,
-          inactiveRemovalCutoff,
-          doInnerIterations,
-          allowSlipLinksToPassEachOther,
-          swappingFrequency,
-          oneOverSpringPartitionUpperLimit,
-          nrOfCrosslinkSwapsAllowedPerSliplink,
-          disableSlipping,
-          []() { return PyErr_CheckSignals() != 0; },
-          []() { throw py::error_already_set(); });
-      },
-      R"pbdoc(
+                   maxNrOfSteps,
+                   xtol,
+                   initialResidualToUse,
+                   simplificationMode,
+                   inactiveRemovalCutoff,
+                   doInnerIterations,
+                   allowSlipLinksToPassEachOther,
+                   swappingFrequency,
+                   oneOverSpringPartitionUpperLimit,
+                   nrOfCrosslinkSwapsAllowedPerSliplink,
+                   disableSlipping,
+        []() {
+            return PyErr_CheckSignals() != 0;
+        },
+        []() {
+            throw py::error_already_set();
+        });
+    },
+    R"pbdoc(
           Run the simulation.
           Note that the final state of the minimization is persisted and reused if you use this method again.
           This is useful if you want to run a global optimization first and add a local one afterwards.
@@ -738,19 +741,19 @@ init_pylimer_bound_sim(py::module_& m)
           :param nr_of_crosslink_swaps_allowed_per_sliplink: Use to steer whether slip-links can cross cross-links when swapping is enabled.
           :param disable_slipping: Whether slip-links should be prohibited from slipping.
           )pbdoc",
-      py::arg("max_nr_of_steps") = 250000,
-      py::arg("x_tolerance") = 1e-12,
-      py::arg("initial_residual_norm") = -1.0,
-      py::arg("simplification_mode") =
+    py::arg("max_nr_of_steps") = 250000,
+    py::arg("x_tolerance") = 1e-12,
+    py::arg("initial_residual_norm") = -1.0,
+    py::arg("simplification_mode") =
         mehp::StructureSimplificationMode::NO_SIMPLIFICATION,
-      py::arg("inactive_removal_cutoff") = 0.01,
-      py::arg("do_inner_iterations") = false,
-      py::arg("allow_sliplinks_to_pass_each_other") =
-        mehp::LinkSwappingMode::NO_SWAPPING,
-      py::arg("swapping_frequency") = 10,
-      py::arg("one_over_spring_partition_upper_limit") = 1.0,
-      py::arg("nr_of_crosslink_swaps_allowed_per_sliplink") = -1,
-      py::arg("disable_slipping") = false)
+        py::arg("inactive_removal_cutoff") = 0.01,
+        py::arg("do_inner_iterations") = false,
+        py::arg("allow_sliplinks_to_pass_each_other") =
+            mehp::LinkSwappingMode::NO_SWAPPING,
+        py::arg("swapping_frequency") = 10,
+        py::arg("one_over_spring_partition_upper_limit") = 1.0,
+        py::arg("nr_of_crosslink_swaps_allowed_per_sliplink") = -1,
+        py::arg("disable_slipping") = false)
     .def("deform_to",
          &mehp::MEHPForceBalance::deformTo,
          R"pbdoc(
@@ -790,30 +793,34 @@ init_pylimer_bound_sim(py::module_& m)
     .def("move_sliplinks_to_their_best_branch",
          &mehp::MEHPForceBalance::moveSlipLinksToTheirBestBranch)
     .def(
-      "get_force_on",
-      [](mehp::MEHPForceBalance& sim,
-         const size_t linkIdx,
-         const double oneOver) { return sim.getForceOn(linkIdx, oneOver); },
-      R"pbdoc(
+        "get_force_on",
+        [](mehp::MEHPForceBalance& sim,
+           const size_t linkIdx,
+    const double oneOver) {
+        return sim.getForceOn(linkIdx, oneOver);
+    },
+    R"pbdoc(
           Evaluate the force on a particular (slip- or cross-) link.
       )pbdoc",
-      py::arg("link_idx"),
-      py::arg("one_over_spring_partition_upper_limit") = 1.0)
+    py::arg("link_idx"),
+    py::arg("one_over_spring_partition_upper_limit") = 1.0)
     .def("get_force_magnitude_vector",
          &mehp::MEHPForceBalance::getForceMagnitudeVector,
          R"pbdoc(
           Evaluate the norm of the force on each (slip- or cross-) link.
      )pbdoc")
     .def(
-      "get_stress_on",
-      [](mehp::MEHPForceBalance& sim,
-         const size_t linkIdx,
-         const double oneOver) { return sim.getStressOn(linkIdx, oneOver); },
-      R"pbdoc(
+        "get_stress_on",
+        [](mehp::MEHPForceBalance& sim,
+           const size_t linkIdx,
+    const double oneOver) {
+        return sim.getStressOn(linkIdx, oneOver);
+    },
+    R"pbdoc(
           Evaluate the stress on a particular (slip- or cross-) link.
       )pbdoc",
-      py::arg("link_idx"),
-      py::arg("one_over_spring_partition_upper_limit") = 1.0)
+    py::arg("link_idx"),
+    py::arg("one_over_spring_partition_upper_limit") = 1.0)
     .def("inspect_displacement_to_mean_position_update",
          &mehp::MEHPForceBalance::inspectDisplacementToMeanPositionUpdate,
          R"pbdoc(
@@ -852,46 +859,46 @@ init_pylimer_bound_sim(py::module_& m)
          py::arg("network"),
          py::arg("link_idx"))
     .def(
-      "evaluate_partial_spring_distance",
-      [](const mehp::MEHPForceBalance& sim,
-         const mehp::ForceBalanceNetwork& net,
-         const Eigen::VectorXd& u,
-         const size_t springIdx) {
+        "evaluate_partial_spring_distance",
+        [](const mehp::MEHPForceBalance& sim,
+           const mehp::ForceBalanceNetwork& net,
+           const Eigen::VectorXd& u,
+    const size_t springIdx) {
         return sim.evaluatePartialSpringDistance(net, u, springIdx);
-      },
-      R"pbdoc()pbdoc",
-      py::arg("network"),
-      py::arg("displacements"),
-      py::arg("spring_idx"))
+    },
+    R"pbdoc()pbdoc",
+    py::arg("network"),
+    py::arg("displacements"),
+    py::arg("spring_idx"))
     .def(
-      "evaluate_partial_spring_distance_from",
-      [](const mehp::MEHPForceBalance& sim,
-         const mehp::ForceBalanceNetwork& net,
-         const Eigen::VectorXd& u,
-         const size_t springIdx,
-         const size_t linkIdx) {
+        "evaluate_partial_spring_distance_from",
+        [](const mehp::MEHPForceBalance& sim,
+           const mehp::ForceBalanceNetwork& net,
+           const Eigen::VectorXd& u,
+           const size_t springIdx,
+    const size_t linkIdx) {
         return sim.evaluatePartialSpringDistanceFrom(
-          net, u, springIdx, linkIdx);
-      },
-      R"pbdoc()pbdoc",
-      py::arg("network"),
-      py::arg("displacements"),
-      py::arg("spring_idx"),
-      py::arg("link_idx"))
+                   net, u, springIdx, linkIdx);
+    },
+    R"pbdoc()pbdoc",
+    py::arg("network"),
+    py::arg("displacements"),
+    py::arg("spring_idx"),
+    py::arg("link_idx"))
     .def(
-      "evaluate_partial_spring_distance_to",
-      [](const mehp::MEHPForceBalance& sim,
-         const mehp::ForceBalanceNetwork& net,
-         const Eigen::VectorXd& u,
-         const size_t springIdx,
-         const size_t linkIdx) {
+        "evaluate_partial_spring_distance_to",
+        [](const mehp::MEHPForceBalance& sim,
+           const mehp::ForceBalanceNetwork& net,
+           const Eigen::VectorXd& u,
+           const size_t springIdx,
+    const size_t linkIdx) {
         return sim.evaluatePartialSpringDistanceTo(net, u, springIdx, linkIdx);
-      },
-      R"pbdoc()pbdoc",
-      py::arg("network"),
-      py::arg("displacements"),
-      py::arg("spring_idx"),
-      py::arg("link_idx"))
+    },
+    R"pbdoc()pbdoc",
+    py::arg("network"),
+    py::arg("displacements"),
+    py::arg("spring_idx"),
+    py::arg("link_idx"))
     // .def("getForceEvaluator", &mehp::MEHPForceBalance::getForceEvaluator,
     // R"pbdoc(
     //      Query the currently used force evaluator.
@@ -942,13 +949,13 @@ init_pylimer_bound_sim(py::module_& m)
          py::arg("tolerance") = 5e-2)
     .def("add_sliplinks",
          py::overload_cast<const std::vector<size_t>&,
-                           const std::vector<size_t>&,
-                           const std::vector<double>&,
-                           const std::vector<double>&,
-                           const std::vector<double>&,
-                           const std::vector<double>&,
-                           const std::vector<double>&,
-                           const bool>(&mehp::MEHPForceBalance::addSlipLinks),
+         const std::vector<size_t>&,
+         const std::vector<double>&,
+         const std::vector<double>&,
+         const std::vector<double>&,
+         const std::vector<double>&,
+         const std::vector<double>&,
+         const bool>(&mehp::MEHPForceBalance::addSlipLinks),
          R"pbdoc(
           Add new slip-links
      )pbdoc",
@@ -981,18 +988,18 @@ init_pylimer_bound_sim(py::module_& m)
          )pbdoc",
          py::arg("maxLoopLength") = -1)
     .def(
-      "get_stress_tensor",
-      [](mehp::MEHPForceBalance& fb, const double oneOver = 1.) {
+        "get_stress_tensor",
+    [](mehp::MEHPForceBalance& fb, const double oneOver = 1.) {
         return fb.getStressTensor(oneOver);
-      },
-      R"pbdoc(
+    },
+    R"pbdoc(
           Returns the stress tensor at the current state of the simulation.
 
           The units are in :math:`[\text{units of }\kappa]/[\text{distance units}]`,
           where the units of :math:`\kappa` should be :math:`[\text{force}]/[\text{distance units}]^2`.
           Make sure to multiply by :math:`\kappa` or configure it appropriately.
      )pbdoc",
-      py::arg("one_over_spring_partition_upper_limit") = 1.)
+    py::arg("one_over_spring_partition_upper_limit") = 1.)
     .def("get_stress_tensor_link_based",
          &mehp::MEHPForceBalance::getStressTensorLinkBased,
          R"pbdoc(
@@ -1189,32 +1196,32 @@ init_pylimer_bound_sim(py::module_& m)
      )pbdoc")
 #ifdef CEREALIZABLE
     .def(py::pickle(
-      [](const mehp::MEHPForceBalance& u) {
+    [](const mehp::MEHPForceBalance& u) {
         return py::make_tuple(pylimer_tools::utils::serializeToString(u));
-      },
-      [](py::tuple t) {
+    },
+    [](py::tuple t) {
         std::string in = t[0].cast<std::string>();
         return mehp::MEHPForceBalance::constructFromString(in);
-      }))
+    }))
 #endif
     ;
-  /**
-   * DPD Simulations
-   */
+    /**
+     * DPD Simulations
+     */
 
-  ////////////////////////////////////////////////////////////////
-  // MARK: DPD Simulator
-  py::class_<dpd::DPDSimulator>(m,
-                                "DPDSimulator",
-                                R"pbdoc(
+    ////////////////////////////////////////////////////////////////
+    // MARK: DPD Simulator
+    py::class_<dpd::DPDSimulator>(m,
+                                  "DPDSimulator",
+                                  R"pbdoc(
           A quick-and-dirty implementation of the DPD simulation
           with slip-springs as presented by Langeloth et al.
      )pbdoc")
     .def(py::init<const pe::Universe,
-                  const int,
-                  const int,
-                  const bool,
-                  const std::string>(),
+         const int,
+         const int,
+         const bool,
+         const std::string>(),
          "Get an instance of this class",
          py::arg("universe"),
          py::arg("crosslinker_type") = 2,
@@ -1230,18 +1237,22 @@ init_pylimer_bound_sim(py::module_& m)
     //          py::arg("dt") = 0.06,
     //          py::arg("with_MC") = false)
     .def(
-      "run_simulation",
-      [](dpd::DPDSimulator& sim, int nSteps, double dt, bool withMC) {
+        "run_simulation",
+    [](dpd::DPDSimulator& sim, int nSteps, double dt, bool withMC) {
         sim.configTimeStep(dt);
         return sim.runSimulation(
-          nSteps,
-          withMC,
-          []() { return PyErr_CheckSignals() != 0; },
-          []() { throw py::error_already_set(); });
-      },
-      py::arg("n_steps"),
-      py::arg("dt") = 0.06,
-      py::arg("with_MC") = false)
+                   nSteps,
+                   withMC,
+        []() {
+            return PyErr_CheckSignals() != 0;
+        },
+        []() {
+            throw py::error_already_set();
+        });
+    },
+    py::arg("n_steps"),
+    py::arg("dt") = 0.06,
+    py::arg("with_MC") = false)
     .def("assume_box_large_enough",
          &dpd::DPDSimulator::configAssumeBoxLargeEnough,
          R"pbdoc(
@@ -1419,7 +1430,7 @@ init_pylimer_bound_sim(py::module_& m)
     )pbdoc",
          py::arg("with_slipsprings") = true)
     .def(
-      "refresh_current_state", &dpd::DPDSimulator::refreshCurrentState, R"pbdoc(
+        "refresh_current_state", &dpd::DPDSimulator::refreshCurrentState, R"pbdoc(
           After re-configuring the force-field parameters, 
           this method should be called to update the current stress tensor etc.
      )pbdoc")

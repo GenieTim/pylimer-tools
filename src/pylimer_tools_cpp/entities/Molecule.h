@@ -17,18 +17,18 @@ extern "C"
 namespace pylimer_tools {
 namespace entities {
 
-  enum MoleculeType
-  {
+enum MoleculeType
+{
     UNDEFINED,
     NETWORK_STRAND,
     PRIMARY_LOOP,
     DANGLING_CHAIN,
     FREE_CHAIN
-  };
+};
 
-  class Molecule : public AtomGraphParent
-  {
-  public:
+class Molecule : public AtomGraphParent
+{
+public:
     Molecule(const Box& parent,
              const igraph_t* graph,
              const MoleculeType type,
@@ -54,14 +54,14 @@ namespace entities {
                                       bool assumedCoordinates = false,
                                       bool closeLoop = false) const;
     std::vector<long int> getVerticesLinedUp(int crossLinkerType = 2,
-                                             bool closeLoop = false) const;
+            bool closeLoop = false) const;
     int getNrOfAtoms() const;
     int getNrOfBonds() const;
     const Box& getBox() const;
     std::string getKey() const;
     std::vector<int> getAtomTypes()
     {
-      return this->getPropertyValues<int>("type");
+        return this->getPropertyValues<int>("type");
     }
     long int getAtomIdByIdx(const int vertexId) const override;
     long int getIdxByAtomId(const int atomId) const override;
@@ -123,10 +123,10 @@ namespace entities {
     // operators
     Atom operator[](size_t index) const
     {
-      return this->getAtomByVertexIdx(index);
+        return this->getAtomByVertexIdx(index);
     }
 
-  private:
+private:
     Box parent;
     MoleculeType typeOfThisMolecule;
     int size;
@@ -135,7 +135,7 @@ namespace entities {
     std::unordered_map<long int, long int> atomIdToVertexIdx;
 
     void initializeFromGraph(const igraph_t* ingraph);
-  };
+};
 } // namespace entities
 } // namespace pylimer_tools
 
