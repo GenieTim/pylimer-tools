@@ -19,29 +19,32 @@
 
 namespace pylimer_tools {
 namespace utils {
-// types
-typedef std::map<std::string, std::vector<pylimer_tools::utils::CsvTokenizer>>
-data_item_t;
+  // types
+  typedef std::map<std::string, std::vector<pylimer_tools::utils::CsvTokenizer>>
+    data_item_t;
 
-enum ReadableDumpFileSections : uint32_t {
+  enum ReadableDumpFileSections : uint32_t
+  {
     TIMESTEP = (1 << 0),
     BOX = (1 << 1),
     ATOM = (1 << 2),
     EXTRA_ATOM = (1 << 3)
-};
+  };
 
-MAKE_FLAGS_ENUM(ReadableDumpFileSections, uint32_t);
+  MAKE_FLAGS_ENUM(ReadableDumpFileSections, uint32_t);
 
-struct ReadDumpFileSections {
+  struct ReadDumpFileSections
+  {
     std::vector<long int> timesteps;
     std::vector<pylimer_tools::entities::Box> boxes;
     std::vector<std::vector<pylimer_tools::entities::Atom>> atoms;
     std::vector<std::unordered_map<std::string, std::vector<double>>>
-    extraAtomsData;
-};
+      extraAtomsData;
+  };
 
-class DumpFileParser {
-public:
+  class DumpFileParser
+  {
+  public:
     DumpFileParser() {};
     DumpFileParser(const std::string filePath);
 
@@ -69,16 +72,16 @@ public:
                                     const size_t column);
     // the next two methods are specializations for easier py binding
     std::vector<std::string> getStringValuesForAt(const size_t index,
-            const std::string headerKey,
-            const std::string column)
+                                                  const std::string headerKey,
+                                                  const std::string column)
     {
-        return this->getValuesForAt<std::string>(index, headerKey, column);
+      return this->getValuesForAt<std::string>(index, headerKey, column);
     };
     std::vector<double> getNumericValuesForAt(const size_t index,
-            const std::string headerKey,
-            const std::string column)
+                                              const std::string headerKey,
+                                              const std::string column)
     {
-        return this->getValuesForAt<double>(index, headerKey, column);
+      return this->getValuesForAt<double>(index, headerKey, column);
     };
     size_t getLength();
     bool hasKey(std::string headerKey);
@@ -93,22 +96,22 @@ public:
     std::vector<pylimer_tools::entities::Box> readBoxes();
     std::vector<std::vector<pylimer_tools::entities::Atom>> readAtoms();
     ReadDumpFileSections readDumpFileSections(
-        ReadableDumpFileSections sectionsToRead);
+      ReadableDumpFileSections sectionsToRead);
 
-private:
+  private:
     std::string cleanHeader(std::string header);
     void rewind();
 
     template<typename OUT>
     inline std::vector<OUT> parseTypesInLine(std::string line)
     {
-        std::vector<OUT> resultnumbers;
-        pylimer_tools::utils::CsvTokenizer tokenizer(line);
-        resultnumbers.reserve(tokenizer.getLength());
-        for (size_t i = 0; i < tokenizer.getLength(); ++i) {
-            resultnumbers.push_back(tokenizer.get<OUT>(i));
-        }
-        return resultnumbers;
+      std::vector<OUT> resultnumbers;
+      pylimer_tools::utils::CsvTokenizer tokenizer(line);
+      resultnumbers.reserve(tokenizer.getLength());
+      for (size_t i = 0; i < tokenizer.getLength(); ++i) {
+        resultnumbers.push_back(tokenizer.get<OUT>(i));
+      }
+      return resultnumbers;
     }
 
     //// data
@@ -120,37 +123,37 @@ private:
     std::unordered_map<size_t, data_item_t> data;
     std::map<std::string, std::vector<std::string>> headerColMap;
     std::map<size_t, std::streampos> groupPosMap;
-};
+  };
 
-template<typename OUT>
-std::vector<OUT> DumpFileParser::getValuesForAt(const size_t index,
-        const std::string headerKey,
-        const std::string& column)
-{
+  template<typename OUT>
+  std::vector<OUT> DumpFileParser::getValuesForAt(const size_t index,
+                                                  const std::string headerKey,
+                                                  const std::string& column)
+  {
     // detect index of column
     size_t colIdx = 0;
     if (this->headerColMap.at(headerKey).size() > 1) {
-        const auto colItIdx = std::find(this->headerColMap.at(headerKey).begin(),
-                                        this->headerColMap.at(headerKey).end(),
-                                        column);
-        if (this->headerColMap.at(headerKey).end() == colItIdx) {
-            throw std::invalid_argument(
-                "Column '" + column + "' not found for header '" + headerKey + "'");
-        }
-        colIdx = colItIdx - this->headerColMap.at(headerKey).begin();
+      const auto colItIdx = std::find(this->headerColMap.at(headerKey).begin(),
+                                      this->headerColMap.at(headerKey).end(),
+                                      column);
+      if (this->headerColMap.at(headerKey).end() == colItIdx) {
+        throw std::invalid_argument(
+          "Column '" + column + "' not found for header '" + headerKey + "'");
+      }
+      colIdx = colItIdx - this->headerColMap.at(headerKey).begin();
     }
     return this->getValuesForAt<OUT>(index, headerKey, colIdx);
-}
+  }
 
-template<typename OUT>
-std::vector<OUT> DumpFileParser::getValuesForAt(const size_t index,
-        const std::string headerKey,
-        const size_t colIdx)
-{
+  template<typename OUT>
+  std::vector<OUT> DumpFileParser::getValuesForAt(const size_t index,
+                                                  const std::string headerKey,
+                                                  const size_t colIdx)
+  {
     if (!pylimer_tools::utils::map_has_key(this->data, index)) {
-        // std::cout << "Could not find index " << index << "in data yet" <<
-        // std::endl;
-        this->readGroupByIdx(index);
+      // std::cout << "Could not find index " << index << "in data yet" <<
+      // std::endl;
+      this->readGroupByIdx(index);
     }
     // std::cout << "Requested values for index " << index << ", key " <<
     // headerKey << " and column " << colIdx << std::endl;
@@ -158,19 +161,19 @@ std::vector<OUT> DumpFileParser::getValuesForAt(const size_t index,
     data_item_t dataItem = this->data.at(index);
     //
     if (!pylimer_tools::utils::map_has_key(dataItem, headerKey)) {
-        throw std::invalid_argument(headerKey + " is not a key in dataItem.");
+      throw std::invalid_argument(headerKey + " is not a key in dataItem.");
     }
     std::vector<pylimer_tools::utils::CsvTokenizer> relevantData =
-        dataItem.at(headerKey);
+      dataItem.at(headerKey);
     std::vector<OUT> results;
     results.reserve(relevantData.size());
 
     for (const pylimer_tools::utils::CsvTokenizer& lineTok : relevantData) {
-        results.push_back(lineTok.get<OUT>(colIdx));
+      results.push_back(lineTok.get<OUT>(colIdx));
     }
 
     return results;
-}
+  }
 } // namespace utils
 } // namespace pylimer_tools
 

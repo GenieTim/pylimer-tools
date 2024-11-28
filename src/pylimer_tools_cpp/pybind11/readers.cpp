@@ -35,7 +35,7 @@ void
 init_pylimer_bound_readers(py::module_& m)
 {
 
-    py::class_<AveFileReader>(m, "AveFileReader", R"pbdoc(
+  py::class_<AveFileReader>(m, "AveFileReader", R"pbdoc(
           Alternative implementation of the data file reader implemented in 
           :func:`pylimer_tools.read_lammps_output_file.read_averages_file`.
 
@@ -68,7 +68,7 @@ init_pylimer_bound_readers(py::module_& m)
          py::arg("column_index2"),
          py::arg("delta_indices"));
 
-    py::enum_<AtomStyle>(m, "AtomStyle")
+  py::enum_<AtomStyle>(m, "AtomStyle")
     .value("NONE", AtomStyle::NONE)
     .value("ANGLE", AtomStyle::ANGLE)
     .value("ATOMIC", AtomStyle::ATOMIC)
@@ -97,7 +97,7 @@ init_pylimer_bound_readers(py::module_& m)
     .value("WAVEPACKET", AtomStyle::WAVEPACKET)
     .value("HYBRID", AtomStyle::HYBRID);
 
-    py::class_<DumpFileParser>(m, "DumpFileReader", R"pbdoc(
+  py::class_<DumpFileParser>(m, "DumpFileReader", R"pbdoc(
        A reader for LAMMPS's `dump` files.
   )pbdoc")
     .def(py::init<const std::string>(), py::arg("path_of_file_to_read"))
@@ -134,7 +134,7 @@ init_pylimer_bound_readers(py::module_& m)
          py::arg("dirPraefix") = "",
          py::arg("dirSuffix") = "");
 
-    py::class_<DataFileParser>(m, "DataFileReader", R"pbdoc(
+  py::class_<DataFileParser>(m, "DataFileReader", R"pbdoc(
        A reader for LAMMPS's `write_data` files.
   )pbdoc")
     .def(py::init<>())
@@ -180,9 +180,9 @@ init_pylimer_bound_readers(py::module_& m)
     .def("get_low_z", &DataFileParser::getLowZ)
     .def("get_high_z", &DataFileParser::getHighZ);
 
-    m.def("split_csv",
-          &splitCSV,
-          "Read a file containing a number of CSVs. Returns them split up.");
+  m.def("split_csv",
+        &splitCSV,
+        "Read a file containing a number of CSVs. Returns them split up.");
 }
 
 #endif
