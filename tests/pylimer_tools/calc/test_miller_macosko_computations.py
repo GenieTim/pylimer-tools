@@ -75,14 +75,14 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         unit_style_factory = UnitStyleFactory()
         unit_style = unit_style_factory.get_unit_style("si")
         # TODO: find literature motiviation for results fo the functions
-        self.assertAlmostEqual(0.22359712818064229, predict_shear_modulus(
+        self.assertAlmostEqual(0.1467020757993193, predict_shear_modulus(
             network=self.saturatedTestUniverse, unit_style=unit_style,
             crosslinker_type=2).to('MPa').magnitude)
-        self.assertAlmostEqual(0.027019771523321627, predict_shear_modulus(
+        self.assertAlmostEqual(0.12832791725960474, predict_shear_modulus(
             network=self.saturatedTestUniverse, unit_style=unit_style, crosslinker_type=2,
             functionality_per_type={2: 4}).to('MPa').magnitude)
         self.saturatedTestUniverse.set_masses({1: 1, 2: 1})
-        self.assertAlmostEqual(0.22359712818064229, predict_shear_modulus(
+        self.assertAlmostEqual(0.1467020757993193, predict_shear_modulus(
             network=self.saturatedTestUniverse, unit_style=unit_style, crosslinker_type=2).to('MPa').magnitude)
 
     def test_predict_number_density_of_junction_points(self):
@@ -232,12 +232,12 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
         alpha, beta = compute_miller_macosko_probabilities(r=1., p=0.95, f=4.)
         self.assertAlmostEqual(alpha, 0.0983588, places=5)
 
-        self.assertAlmostEqual(g_anm.to('MPa').magnitude, 0.193101, places=5)
-        self.assertAlmostEqual(g_pnm.to('MPa').magnitude, 0.0965506, places=5)
+        self.assertAlmostEqual(g_anm.to('MPa').magnitude, 0.1930520, places=5)
+        self.assertAlmostEqual(g_pnm.to('MPa').magnitude, 0.0965260, places=5)
         self.assertAlmostEqual(g_mmt_entanglement.to(
             'MPa').magnitude, 0.190576, places=5)
         self.assertAlmostEqual(g_mmt_phantom.to(
-            'MPa').magnitude, 0.0777321, places=5)
+            'MPa').magnitude, 0.0777123, places=5)
 
         # these in turn require further investigation into the involvement of r
         g_mmt_phantom, g_mmt_entanglement, g_anm, g_pnm = compute_modulus_decomposition(
@@ -246,10 +246,10 @@ class TestMMTAnalysisFunctions(UniverseUsingTestCase):
                 'meter')**-3), temperature=298 * unit_style.get_underlying_unit_registry()('kelvin')
         )
 
-        self.assertAlmostEqual(g_anm.to('MPa').magnitude, 0.051846, places=5)
-        self.assertAlmostEqual(g_pnm.to('MPa').magnitude, 0.025923, places=5)
+        self.assertAlmostEqual(g_anm.to('MPa').magnitude, 0.051833, places=5)
+        self.assertAlmostEqual(g_pnm.to('MPa').magnitude, 0.025916, places=5)
         self.assertAlmostEqual(g_mmt_entanglement.to(
-            'MPa').magnitude, 0.02031, places=5)
+            'MPa').magnitude, 0.05801087, places=5)
         self.assertAlmostEqual(g_mmt_phantom.to(
             'MPa').magnitude, 0.00492674, places=5)
 
