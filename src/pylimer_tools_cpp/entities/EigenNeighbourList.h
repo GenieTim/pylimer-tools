@@ -20,17 +20,17 @@ extern "C"
 namespace pylimer_tools {
 namespace entities {
 
-typedef long int bucket_idx_t;
-typedef long int coordinate_idx_t;
+  typedef long int bucket_idx_t;
+  typedef long int coordinate_idx_t;
 
-/**
- * @brief An implementation of a neighbour list using binning, using Eigen for
- * performance
- *
- */
-class EigenNeighbourList
-{
-public:
+  /**
+   * @brief An implementation of a neighbour list using binning, using Eigen for
+   * performance
+   *
+   */
+  class EigenNeighbourList
+  {
+  public:
     EigenNeighbourList() {}
     EigenNeighbourList(const Eigen::VectorXd& coordinates,
                        const Box& box,
@@ -62,7 +62,7 @@ public:
      * @return Eigen::ArrayXi
      */
     Eigen::ArrayXi getIndicesCloseToCoordinates(Eigen::Vector3d coordinates,
-            double newCutoff = -1.) const;
+                                                double newCutoff = -1.) const;
 
     long int getNumBinnedCoordinates() const;
 
@@ -101,25 +101,25 @@ public:
     Eigen::Vector3d getCentralCoordinatesOfBucket(int bucketIndex) const;
 
     std::vector<bucket_idx_t> getCombinedBucketIndicesForCoordinates(
-        const Eigen::Vector3d& coordinates,
-        double newCutoff,
-        bool sort = false) const;
+      const Eigen::Vector3d& coordinates,
+      double newCutoff,
+      bool sort = false) const;
 
     template<class Archive>
     void serialize(Archive& ar)
     {
-        ar(bucketWidths,
-           nrOfBuckets,
-           totalNrOfBuckets,
-           cutoff,
-           scalingFactor,
-           box,
-           neighbourBuckets,
-           neighbourBucketNeighboursDefaultCutoff,
-           neighbourBucketSizes);
+      ar(bucketWidths,
+         nrOfBuckets,
+         totalNrOfBuckets,
+         cutoff,
+         scalingFactor,
+         box,
+         neighbourBuckets,
+         neighbourBucketNeighboursDefaultCutoff,
+         neighbourBucketSizes);
     }
 
-protected:
+  protected:
     /**
      * @brief Do "PBC" with a bucket index in one direction
      *
@@ -137,9 +137,9 @@ protected:
     bucket_idx_t getBucketIndexForTriplet(Eigen::Array3li ind) const;
 
     Eigen::Array3li getBucketTripletForCoordinates(
-        const Eigen::Vector3d& coordinates) const;
+      const Eigen::Vector3d& coordinates) const;
 
-private:
+  private:
     Eigen::Array3d bucketWidths;
     Eigen::Array3li nrOfBuckets;
 
@@ -153,9 +153,9 @@ private:
 
     std::vector<std::vector<coordinate_idx_t>> neighbourBuckets;
     std::vector<std::vector<bucket_idx_t>>
-    neighbourBucketNeighboursDefaultCutoff;
+      neighbourBucketNeighboursDefaultCutoff;
     Eigen::VectorXi neighbourBucketSizes;
-};
+  };
 };
 };
 

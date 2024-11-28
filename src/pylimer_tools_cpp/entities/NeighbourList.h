@@ -19,43 +19,43 @@ extern "C"
 namespace pylimer_tools {
 namespace entities {
 
-/**
- * @brief A simple neighbour list implementation using binning
- *
- */
-class NeighbourList
-{
-public:
+  /**
+   * @brief A simple neighbour list implementation using binning
+   *
+   */
+  class NeighbourList
+  {
+  public:
     NeighbourList(const std::vector<Atom>& atoms,
                   const Box& box,
                   double cutoff);
 
     std::vector<pylimer_tools::entities::Atom> getAtomsCloseTo(
-        const pylimer_tools::entities::Atom& atom);
+      const pylimer_tools::entities::Atom& atom);
 
     std::vector<pylimer_tools::entities::Atom> getAtomsCloseTo(
-        const pylimer_tools::entities::Atom& atom,
-        double upperCutoff,
-        double lowerCutoff = 0.0,
-        bool unwrapped = false,
-        bool expectSelf = false);
+      const pylimer_tools::entities::Atom& atom,
+      double upperCutoff,
+      double lowerCutoff = 0.0,
+      bool unwrapped = false,
+      bool expectSelf = false);
 
     void removeAtom(const Atom& atom, const std::string debugHint = "");
 
-protected:
+  protected:
     size_t normalizeBucketIndex(long int bucketIndex, size_t nrOfBuckets) const;
 
     size_t getBucketIndexForTriplet(
-        std::tuple<long int, long int, long int> ind) const;
+      std::tuple<long int, long int, long int> ind) const;
 
     std::tuple<size_t, size_t, size_t> getBucketIndicesForAtom(
-        const pylimer_tools::entities::Atom& atom) const;
+      const pylimer_tools::entities::Atom& atom) const;
 
     std::vector<size_t> getCombinedBucketIndicesForAtom(
-        const pylimer_tools::entities::Atom& atom,
-        double newCutoff) const;
+      const pylimer_tools::entities::Atom& atom,
+      double newCutoff) const;
 
-private:
+  private:
     double bucketWidthX;
     double bucketWidthY;
     double bucketWidthZ;
@@ -73,7 +73,7 @@ private:
 
     std::vector<pylimer_tools::entities::Atom> atoms;
     std::unordered_map<size_t, size_t> idToAtomIdx;
-};
+  };
 };
 }
 

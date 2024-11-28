@@ -7,11 +7,11 @@
 namespace pylimer_tools {
 namespace utils {
 
-class AveFileReader
-{
-public:
+  class AveFileReader
+  {
+  public:
     AveFileReader(const std::string& file)
-        : filePath(file) {};
+      : filePath(file) {};
 
     std::vector<std::string> getColumnNames();
     int getNrOfRows();
@@ -21,11 +21,11 @@ public:
     std::vector<double> autocorrelateColumn(int column,
                                             const std::vector<size_t>& dts);
     std::vector<double> autocorrelateColumnDifference(
-        int column1,
-        int column2,
-        const std::vector<size_t>& dts);
+      int column1,
+      int column2,
+      const std::vector<size_t>& dts);
 
-private:
+  private:
     std::string filePath;
     // "cache"
     int numRows = -1;
@@ -34,7 +34,7 @@ private:
     std::vector<std::vector<double>> data;
 
     int getNrOfHeaderRows();
-};
+  };
 
 }
 }

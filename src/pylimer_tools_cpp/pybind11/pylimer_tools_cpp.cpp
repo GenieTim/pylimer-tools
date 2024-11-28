@@ -24,7 +24,7 @@ init_pylimer_bound_writers(py::module_&);
 
 PYBIND11_MODULE(pylimer_tools_cpp, m)
 {
-    m.doc() = R"pbdoc(
+  m.doc() = R"pbdoc(
     PylimerTools Cpp
     -----------------
 
@@ -35,22 +35,22 @@ PYBIND11_MODULE(pylimer_tools_cpp, m)
 
     )pbdoc";
 
-    init_pylimer_bound_readers(m);
-    init_pylimer_bound_entities(m);
-    init_pylimer_bound_writers(m);
-    init_pylimer_bound_generators(m);
-    init_pylimer_bound_topo(m);
-    init_pylimer_bound_sim(m);
-    init_pylimer_bound_calc(m);
+  init_pylimer_bound_readers(m);
+  init_pylimer_bound_entities(m);
+  init_pylimer_bound_writers(m);
+  init_pylimer_bound_generators(m);
+  init_pylimer_bound_topo(m);
+  init_pylimer_bound_sim(m);
+  init_pylimer_bound_calc(m);
 
-    m.def(
-        "version_information",
+  m.def(
+    "version_information",
     []() {
-        return "pylimer_tools, version " + std::string(__PROJECT_VERSION__) +
-               "(" + std::string(__LIB_VERSION__) + "), compiled " +
-               std::string(__DATE__) + " " + std::string(__TIME__) + " from " +
-               std::string(__GIT_BRANCH__) + " (" + std::string(__GIT_HASH__) +
-               ").";
+      return "pylimer_tools, version " + std::string(__PROJECT_VERSION__) +
+             "(" + std::string(__LIB_VERSION__) + "), compiled " +
+             std::string(__DATE__) + " " + std::string(__TIME__) + " from " +
+             std::string(__GIT_BRANCH__) + " (" + std::string(__GIT_HASH__) +
+             ").";
     },
     R"pbdoc(
     Returns  a string of the the current version, incl. git hash and date of compilation.

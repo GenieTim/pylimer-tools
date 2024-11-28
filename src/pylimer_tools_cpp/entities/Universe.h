@@ -25,18 +25,18 @@ extern "C"
 namespace pylimer_tools {
 namespace entities {
 
-struct LoopIntersectionInfo
-{
+  struct LoopIntersectionInfo
+  {
     std::vector<Atom> involvedAtoms;
     long int edge1;
     long int edge2;
     Eigen::Vector3d intersectionPoint;
     double direction;
-};
+  };
 
-class Universe : public AtomGraphParent
-{
-public:
+  class Universe : public AtomGraphParent
+  {
+  public:
     Universe(const double Lx = 1., const double Ly = 1., const double Lz = 1.);
     Universe(const Box& box);
 
@@ -71,7 +71,7 @@ public:
                   const std::vector<int>& ny,
                   const std::vector<int>& nz,
                   const std::unordered_map<std::string, std::vector<double>>&
-                  additionalData);
+                    additionalData);
     // void addAtoms(const std::vector<Atom>& atoms);
     void removeAtoms(const std::vector<long int>& ids);
     void replaceAtom(const long int id, const Atom& replacement);
@@ -105,10 +105,7 @@ public:
                            const std::vector<int>& types);
     void setMasses(const std::map<int, double>& massPerType);
     void setBox(const Box& box, bool rescaleAtomCoordinates = false);
-    void setTimestep(long int newTimestep)
-    {
-        this->timestep = newTimestep;
-    };
+    void setTimestep(long int newTimestep) { this->timestep = newTimestep; };
     void initializeFromGraph(const igraph_t* ingraph);
     void removeAllAngles();
     void removeAllDihedralAngles();
@@ -133,35 +130,35 @@ public:
     std::vector<Universe> getClusters() const;
     std::vector<Molecule> getMolecules(const int atomTypeToOmit = -1) const;
     std::vector<Molecule> getChainsWithCrosslinker(
-        const int crossLinkerType) const;
+      const int crossLinkerType) const;
     Universe getNetworkOfCrosslinker(const int crossLinkerType) const;
     Universe contractVerticesAlongBondType(const int bondType) const;
     // TODO: find & implement a better return type, e.g. std::vector<Molecule>
     std::vector<std::vector<long int>> findLoops(
-        const int crossLinkerType,
-        const int maxLength = -1,
-        bool skipSelfLoops = false,
-        std::vector<std::vector<long int>>* edges = nullptr) const;
+      const int crossLinkerType,
+      const int maxLength = -1,
+      bool skipSelfLoops = false,
+      std::vector<std::vector<long int>>* edges = nullptr) const;
     std::unordered_map<int, int> countLoopLengths(
-        const int maxLength = -1) const;
+      const int maxLength = -1) const;
     std::map<int, std::vector<std::vector<Atom>>> findLoopsOfAtoms(
-        const int crossLinkerType,
-        const int maxLength = -1,
-        bool skipSelfLoops = false) const;
+      const int crossLinkerType,
+      const int maxLength = -1,
+      bool skipSelfLoops = false) const;
     std::vector<Atom> findMinimalOrderLoopFrom(
-        const long int loopStart,
-        const long int loopStep1,
-        const int maxLength = -1,
-        bool skipSelfLoops = false) const;
+      const long int loopStart,
+      const long int loopStep1,
+      const int maxLength = -1,
+      bool skipSelfLoops = false) const;
     bool hasInfiniteStrand(const int crossLinkerType,
                            const int maxLength = -1) const;
     std::vector<int> getAtomTypes() const
     {
-        return this->getPropertyValues<int>("type");
+      return this->getPropertyValues<int>("type");
     }
     std::map<int, int> countAtomTypes() const;
     std::vector<size_t> countAtomsInSkinDistance(std::vector<double> distances,
-            bool unwrapped = false) const;
+                                                 bool unwrapped = false) const;
     template<typename IN>
     long int findVertexIdForProperty(const char* propertyName,
                                      IN propertyValue) const;
@@ -172,18 +169,12 @@ public:
     size_t getNrOfAngles() const;
     size_t getNrOfDihedralAngles() const;
     std::map<int, double> getMasses();
-    long int getTimestep()
-    {
-        return this->timestep;
-    };
+    long int getTimestep() { return this->timestep; };
     long int getAtomIdByIdx(const int vertexId) const override;
     long int getIdxByAtomId(const int atomId) const override;
 
     // operators
-    Atom operator[](size_t index) const
-    {
-        return this->getAtom(index);
-    }
+    Atom operator[](size_t index) const { return this->getAtom(index); }
 
     // computations
     std::map<std::string, std::vector<long int>> detectAngles() const;
@@ -192,10 +183,10 @@ public:
     std::map<int, double> determineEffectiveFunctionalityPerType() const;
     std::map<int, double> computeWeightFractions() const;
     double computeWeightFractionOfClustersAssociatedWith(
-        std::vector<long int> atomIds) const;
+      std::vector<long int> atomIds) const;
     std::vector<std::pair<size_t, size_t>> interpolateEdges(
-        int crossLinkerType,
-        double interpolationFactor) const;
+      int crossLinkerType,
+      double interpolationFactor) const;
     std::vector<double> computeDxs(const std::vector<long int>& bondFrom,
                                    const std::vector<long int>& bondTo);
     std::vector<double> computeDys(const std::vector<long int>& bondFrom,
@@ -204,32 +195,32 @@ public:
                                    const std::vector<long int>& bondTo);
     std::vector<double> computeBondLengths() const
     {
-        return AtomGraphParent::computeBondLengths(this->box);
+      return AtomGraphParent::computeBondLengths(this->box);
     };
     double computeMeanSquaredBondLength() const
     {
-        return AtomGraphParent::computeMeanSquaredBondLength(this->box);
+      return AtomGraphParent::computeMeanSquaredBondLength(this->box);
     };
     double computeTemperature(const int dimensions = 3,
                               const double kb = 1.) const;
     std::vector<LoopIntersectionInfo> findLoopEntanglements(
-        const std::vector<long int>& vertexIndicesLoop1,
-        const std::vector<long int>& vertexIndicesLoop2,
-        const std::vector<long int>& edgeIndicesLoop1,
-        const std::vector<long int>& edgeIndicesLoop2) const;
+      const std::vector<long int>& vertexIndicesLoop1,
+      const std::vector<long int>& vertexIndicesLoop2,
+      const std::vector<long int>& edgeIndicesLoop1,
+      const std::vector<long int>& edgeIndicesLoop2) const;
     double getMeanStrandLength(int crossLinkerType);
     std::vector<double> computeEndToEndDistances(int crossLinkerType,
-            bool implyImageFlags = false);
+                                                 bool implyImageFlags = false);
     double computeMeanEndToEndDistance(int crossLinkerType,
                                        bool implyImageFlags = false);
     double computeMeanSquareEndToEndDistance(
-        int crossLinkerType,
-        bool onlyThoseWithTwoCrosslinkers = false,
-        bool implyImageFlags = false);
+      int crossLinkerType,
+      bool onlyThoseWithTwoCrosslinkers = false,
+      bool implyImageFlags = false);
     double computeMeanBondLength();
     double computeTotalMass() const;
     double computeTotalMassWithMasses(
-        std::map<int, double> massPerTypeToUse) const;
+      std::map<int, double> massPerTypeToUse) const;
     double computeWeightAverageMolecularWeight(int crossLinkerType) const;
     double computeNumberAverageMolecularWeight(int crossLinkerType) const;
     double computePolydispersityIndex(int crossLinkerType) const;
@@ -239,31 +230,31 @@ public:
     template<class Archive>
     void serialize(Archive& archive)
     {
-        archive(cereal::virtual_base_class<AtomGraphParent>(this),
-                // properties
-                timestep,
-                NAtoms,
-                NBonds,
-                box,
-                // connectivity
-                atomIdToVertexIdx,
-                // angles etc.
-                angleFrom,
-                angleTo,
-                angleVia,
-                angleType,
-                // dihedral angles etc.
-                dihedralAngleFrom,
-                dihedralAngleTo,
-                dihedralAngleVia1,
-                dihedralAngleVia2,
-                dihedralAngleType,
-                // type's properties
-                massPerType);
+      archive(cereal::virtual_base_class<AtomGraphParent>(this),
+              // properties
+              timestep,
+              NAtoms,
+              NBonds,
+              box,
+              // connectivity
+              atomIdToVertexIdx,
+              // angles etc.
+              angleFrom,
+              angleTo,
+              angleVia,
+              angleType,
+              // dihedral angles etc.
+              dihedralAngleFrom,
+              dihedralAngleTo,
+              dihedralAngleVia1,
+              dihedralAngleVia2,
+              dihedralAngleType,
+              // type's properties
+              massPerType);
     }
 #endif
 
-protected:
+  protected:
     // properties of the universe
     long int timestep;
     size_t NAtoms = 0;
@@ -288,7 +279,7 @@ protected:
 
     // type's properties
     std::map<int, double>
-    massPerType; // a dictionary with key: type, and value: weight per atom
+      massPerType; // a dictionary with key: type, and value: weight per atom
     // of this atom type.
 
     // internal functions
@@ -300,7 +291,7 @@ protected:
                                   const std::string& direction,
                                   const double boxLimit) const;
     void resetAtomIdMapping();
-};
+  };
 } // namespace entities
 } // namespace pylimer_tools
 

@@ -8,19 +8,19 @@
 
 TEST_CASE("TESTS ARE RUN", "[general]")
 {
-    std::cout << "Running test \"TESTS ARE RUN\"" << std::endl;
-    REQUIRE(1 == 2 - 1);
+  std::cout << "Running test \"TESTS ARE RUN\"" << std::endl;
+  REQUIRE(1 == 2 - 1);
 }
 
 TEST_CASE("std::map behaves as expected", "[general]")
 {
-    std::cout << "Running test \"std::map behaves as expected\"" << std::endl;
-    std::unordered_map<size_t, size_t> testMap;
-    std::vector<size_t> zeros = { 0, 0, 0, 0, 0 };
-    CHECK(testMap.emplace(0, 100).second == true);
-    for (size_t i = 0; i < zeros.size(); ++i) {
-        CHECK(testMap.emplace(zeros[i], i).second == false);
-    }
-    std::cout << "Finished running test \"std::map behaves as expected\""
-              << std::endl;
+  std::cout << "Running test \"std::map behaves as expected\"" << std::endl;
+  std::unordered_map<size_t, size_t> testMap;
+  std::vector<size_t> zeros = { 0, 0, 0, 0, 0 };
+  CHECK(testMap.emplace(0, 100).second == true);
+  for (size_t i = 0; i < zeros.size(); ++i) {
+    CHECK(testMap.emplace(zeros[i], i).second == false);
+  }
+  std::cout << "Finished running test \"std::map behaves as expected\""
+            << std::endl;
 }
