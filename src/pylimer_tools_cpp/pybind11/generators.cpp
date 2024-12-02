@@ -173,6 +173,17 @@ init_pylimer_bound_generators(py::module_& m)
          py::arg("nr_of_strands"),
          py::arg("strand_lengths"),
          py::arg("strand_atom_type") = 1)
+    .def("link_strand",
+         &MCUniverseGenerator::linkStrand,
+         R"pbdoc(
+          Link one particular strand to another.
+          This strand will have one bond made, to an appropriate cross-linker, as chosen by the parameters associated with the strand.
+
+          :param strand_idx: Index of the strand to be linked.
+          :param c_infinity: As needed for the end-to-end distribution, given by :math:`\langle R^2\rangle_0 = C_{\infty} N b^2`.
+)pbdoc",
+         py::arg("strand_idx"),
+         py::arg("c_infinity") = 1.)
     .def("link_strands_to_conversion",
          &MCUniverseGenerator::linkStrandsToConversion,
          R"pbdoc(
