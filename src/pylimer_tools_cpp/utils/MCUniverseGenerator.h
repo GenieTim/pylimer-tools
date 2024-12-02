@@ -883,8 +883,8 @@ namespace utils {
                static_cast<double>(this->originalNrOfAvailableCrosslinkSites));
 
       INVALIDARG_EXP_IFN(
-        targetCrossLinkerConversion >= currentCrosslinkerConversion &&
-          targetCrossLinkerConversion <= 1.0,
+        APPROX_WITHIN(
+          targetCrossLinkerConversion, currentCrosslinkerConversion, 1., 1e-6),
         "Cross-linker conversion must be between " +
           std::to_string(currentCrosslinkerConversion) + " and 1, got " +
           std::to_string(targetCrossLinkerConversion) + ".");
@@ -932,8 +932,7 @@ namespace utils {
     void linkStrandsToSolubleFraction(double targetSolubleFraction,
                                       double cInfinity = 1.)
     {
-      INVALIDARG_EXP_IFN(targetSolubleFraction >= 0. &&
-                           targetSolubleFraction <= 1.,
+      INVALIDARG_EXP_IFN(APPROX_WITHIN(targetSolubleFraction, 0., 1., 1e-8),
                          "Soluble fraction must be between 0 and 1, got " +
                            std::to_string(targetSolubleFraction) + ".");
 
