@@ -24,6 +24,7 @@ MCUniverseGenerator
       ~MCUniverseGenerator.get_nr_of_atoms
       ~MCUniverseGenerator.get_nr_of_bonds
       ~MCUniverseGenerator.get_universe
+      ~MCUniverseGenerator.link_strand
       ~MCUniverseGenerator.link_strands_to_conversion
       ~MCUniverseGenerator.link_strands_to_soluble_fraction
       ~MCUniverseGenerator.relax_crosslinks
@@ -48,6 +49,7 @@ MCUniverseGenerator
    .. automethod:: get_nr_of_atoms
    .. automethod:: get_nr_of_bonds
    .. automethod:: get_universe
+   .. automethod:: link_strand
    .. automethod:: link_strands_to_conversion
    .. automethod:: link_strands_to_soluble_fraction
    .. automethod:: relax_crosslinks

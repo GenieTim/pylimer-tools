@@ -361,25 +361,28 @@
 <tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_universe" title="pylimer_tools_cpp.MCUniverseGenerator.get_universe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_universe</span></code></a>(self)</p></td>
 <td><p>Fetch the current (or final) state of the universe.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion" title="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strands_to_conversion</span></code></a>(self, ...[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strand" title="pylimer_tools_cpp.MCUniverseGenerator.link_strand"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strand</span></code></a>(self, strand_idx[, c_infinity])</p></td>
+<td><p>Link one particular strand to another.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion" title="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strands_to_conversion</span></code></a>(self, ...[, ...])</p></td>
 <td><p>Actually link the previously added strands to the previously added cross-linkers, until a certain cross-link conversion is reached.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_soluble_fraction" title="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_soluble_fraction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strands_to_soluble_fraction</span></code></a>(self, ...)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_soluble_fraction" title="pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_soluble_fraction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">link_strands_to_soluble_fraction</span></code></a>(self, ...)</p></td>
 <td><p>Actually link the previously added strands to the previously added cross-linkers, until a certain soluble fraction is reached.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks" title="pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">relax_crosslinks</span></code></a>(self)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks" title="pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks"><code class="xref py py-obj docutils literal notranslate"><span class="pre">relax_crosslinks</span></code></a>(self)</p></td>
 <td><p>Run force relaxation with the cross-linkers and their strands, to have the cross-links in their statistically most probable position.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.remove_soluble_fraction" title="pylimer_tools_cpp.MCUniverseGenerator.remove_soluble_fraction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_soluble_fraction</span></code></a>(self[, rescale_box])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.remove_soluble_fraction" title="pylimer_tools_cpp.MCUniverseGenerator.remove_soluble_fraction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">remove_soluble_fraction</span></code></a>(self[, rescale_box])</p></td>
 <td><p>Remove soluble fraction (as determined by phantom force relaxation) of the strands and cross-links.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_bead_distance</span></code></a>(self, distance[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.set_bead_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_bead_distance</span></code></a>(self, distance[, ...])</p></td>
 <td><p>Set the mean distance between beads when doing MC stepping.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_mean_squared_bead_distance</span></code></a>(self, ...[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance" title="pylimer_tools_cpp.MCUniverseGenerator.set_mean_squared_bead_distance"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_mean_squared_bead_distance</span></code></a>(self, ...[, ...])</p></td>
 <td><p>Set the mean squared distance between beads.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_seed" title="pylimer_tools_cpp.MCUniverseGenerator.set_seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_seed</span></code></a>(self, seed)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.set_seed" title="pylimer_tools_cpp.MCUniverseGenerator.set_seed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_seed</span></code></a>(self, seed)</p></td>
 <td><p>Set the seed for the random generator.</p></td>
 </tr>
 </tbody>
@@ -519,6 +522,21 @@ This results in more secondary loops for shorter chains than for longer ones.</p
 <span class="sig-name descname"><span class="pre">get_universe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="pylimer_tools_cpp.Universe.html#pylimer_tools_cpp.Universe" title="pylimer_tools_cpp.Universe"><span class="pre">pylimer_tools_cpp.Universe</span></a></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.get_universe" title="Link to this definition">¶</a></dt>
 <dd><p>Fetch the current (or final) state of the universe.</p>
 <p>Use this method to actually (MC) place beads between the cross-links and retrieve the generated structure.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MCUniverseGenerator.link_strand">
+<span class="sig-name descname"><span class="pre">link_strand</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator" title="pylimer_tools_cpp.MCUniverseGenerator"><span class="pre">pylimer_tools_cpp.MCUniverseGenerator</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">strand_idx</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_infinity</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strand" title="Link to this definition">¶</a></dt>
+<dd><p>Link one particular strand to another.
+This strand will have one bond made, to an appropriate cross-linker, as chosen by the parameters associated with the strand.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>strand_idx</strong> – Index of the strand to be linked.</p></li>
+<li><p><strong>c_infinity</strong> – As needed for the end-to-end distribution, given by <span class="math notranslate nohighlight">\(\langle R^2\rangle_0 = C_{\infty} N b^2\)</span>.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -676,6 +694,7 @@ Also used for the target cross-linker partner sampling.</p>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_atoms"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_nr_of_atoms()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_nr_of_bonds"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_nr_of_bonds()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.get_universe"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.get_universe()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strand"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.link_strand()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_conversion"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.link_strands_to_conversion()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.link_strands_to_soluble_fraction"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.link_strands_to_soluble_fraction()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MCUniverseGenerator.relax_crosslinks"><code class="docutils literal notranslate"><span class="pre">MCUniverseGenerator.relax_crosslinks()</span></code></a></li>
