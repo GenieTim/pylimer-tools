@@ -39,7 +39,7 @@ if command -v npx; then
 fi
 
 # then, build/install project for Python
-python -m pip install --verbose . || exit 3
+python -m pip install --verbose -e . || exit 3
 
 cd "$ROOT_DIR" || exit 4
 
@@ -47,8 +47,8 @@ cd "$ROOT_DIR" || exit 4
 python -m coverage run -m unittest discover -v || exit 7
 
 # generate coverage report
-python -m coverage report --include="src/**/*.py"
-python -m coverage xml --include="src/**/*.py"
+python -m coverage report
+python -m coverage xml
 # python -m coverage html --include="pylimer_tools/**/*.py" -d ../coverage.html
 
 exit 0

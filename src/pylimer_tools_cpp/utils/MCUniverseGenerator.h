@@ -640,7 +640,72 @@ namespace utils {
         pylimer_tools::utils::initializeWithValue<int>(nrOfStrands,
                                                        chainLength);
       return this->addStrands(nrOfStrands, chainLengths, strandAtomType);
-    };
+    }
+
+    /**
+     * @brief Link one strand end of one strand to a cross-link
+     *
+     * @param strandIdx
+     */
+    void linkStrand(const size_t strandIdx, const double cInfinity = 1.)
+    {
+      // validation
+      INVALIDARG_EXP_IFN(
+        this->simplifiedUniverse.strandTo[strandIdx] < 0,
+        "Expected second strand end of strand " + std::to_string(strandIdx) +
+          " to be free, got " +
+          std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
+          " for strand " + std::to_string(strandIdx) + ".");
+      INVALIDARG_EXP_IFN(strandIdx >= 0 &&
+                           strandIdx <
+                             this->simplifiedUniverse.strandFrom.size(),
+                         "Strand index out of range.");
+      RUNTIME_EXP_IFN(this->nrOfAvailableCrosslinkSites > 0,
+                      "No available cross-link sites left.");
+
+      // actual linking
+      if (this->simplifiedUniverse.strandFrom[strandIdx] >= 0) {
+        INVALIDARG_EXP_IFN(
+          this->simplifiedUniverse.strandTo[strandIdx] == UNCONNECTED,
+          "Expected second strand end of strand " + std::to_string(strandIdx) +
+            " to be free, got " +
+            std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
+            " for strand " + std::to_string(strandIdx) + ".");
+          const double timesNForR02 =
+            this->simplifiedUniverse
+              .meanSquaredBeadDistanceInStrand[strandIdx] *
+            cInfinity;
+        // we don't have free cross-link choice
+        // find one that follows the desired end-to-end distribution
+        size_t partnerCrosslinker = this->findAppropriateLink(
+          this->simplifiedUniverse.strandFrom[strandIdx],
+          static_cast<double>(
+            this->simplifiedUniverse.beadsInStrand[strandIdx] + 1) *
+            timesNForR02,
+          -1. // beadsPerChains[strandIdx] * this->beadDistance
+        );
+
+        this->simplifiedUniverse.strandTo[strandIdx] = partnerCrosslinker;
+        this->remainingCrossLinkerFunctionality[partnerCrosslinker] -= 1;
+        this->simplifiedUniverse.strandsOfXlink[partnerCrosslinker].push_back(
+          strandIdx);
+        this->nrOfAvailableCrosslinkSites -= 1;
+      } else {
+        // sample random cross-link site
+        std::discrete_distribution<long int> xlinkIdxDist(
+          this->remainingCrossLinkerFunctionality.begin(),
+          this->remainingCrossLinkerFunctionality.end());
+
+        long int matchingCrosslink = xlinkIdxDist(this->rng);
+
+        // link to this cross-link
+        this->simplifiedUniverse.strandFrom[strandIdx] = matchingCrosslink;
+        this->remainingCrossLinkerFunctionality[matchingCrosslink] -= 1;
+        this->simplifiedUniverse.strandsOfXlink[matchingCrosslink].push_back(
+          strandIdx);
+        this->nrOfAvailableCrosslinkSites -= 1;
+      }
+    }
 
     /**
      * @brief Add strands, link them to the cross-links, stop when the callback
@@ -698,7 +763,6 @@ namespace utils {
 
       std::stack<size_t> removedCrosslinkSites;
       // removedCrosslinkSites.reserve(availableCrosslinkSites.size());
-      const double timesNForR02 = this->meanSquaredBeadDistance * cInfinity;
 
       // link one strand at a time until we reach the target conversion
       size_t maxStep =
@@ -711,6 +775,10 @@ namespace utils {
           break;
         } else if (status == BackTrackStatus::TRACK_FORWARD) {
           size_t strandIdx = availableStrandEnds[sampleIdx];
+          const double timesNForR02 =
+            this->simplifiedUniverse
+              .meanSquaredBeadDistanceInStrand[strandIdx] *
+            cInfinity;
           RUNTIME_EXP_IFN(
             this->simplifiedUniverse.strandTo[strandIdx] < 0,
             "Expected second strand end to be free, got " +
@@ -1710,8 +1778,8 @@ namespace utils {
         throw std::runtime_error("No suitable partner found.");
       }
 
-      std::discrete_distribution<int> weightDist(matchWeights.begin(),
-                                                 matchWeights.end());
+      std::discrete_distribution<long int> weightDist(matchWeights.begin(),
+                                                      matchWeights.end());
       return suitableMatches[weightDist(this->rng)];
     }
 
