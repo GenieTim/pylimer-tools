@@ -1272,9 +1272,10 @@ namespace utils {
       // copy results
       forceRelaxationNetwork = forceRelaxer.getNetwork();
       size_t nCrosslinks = this->simplifiedUniverse.xlinkTypes.size();
-      RUNTIME_EXP_IFN(forceRelaxationNetwork.nrOfNodes == nCrosslinks,
+      // dangling strands lead to higher nr of nodes
+      RUNTIME_EXP_IFN(forceRelaxationNetwork.nrOfNodes >= nCrosslinks,
                       "Expected force relaxation to preserve cross-links.");
-      for (size_t i = 0; i < forceRelaxationNetwork.nrOfNodes; ++i) {
+      for (size_t i = 0; i < nCrosslinks; ++i) {
         this->simplifiedUniverse.xlinkX[i] =
           forceRelaxationNetwork.coordinates(3 * i + 0);
         this->simplifiedUniverse.xlinkY[i] =
