@@ -650,16 +650,16 @@ namespace utils {
     void linkStrand(const size_t strandIdx, const double cInfinity = 1.)
     {
       // validation
+      INVALIDARG_EXP_IFN(strandIdx >= 0 &&
+                           strandIdx <
+                             this->simplifiedUniverse.strandFrom.size(),
+                         "Strand index out of range.");
       INVALIDARG_EXP_IFN(
         this->simplifiedUniverse.strandTo[strandIdx] < 0,
         "Expected second strand end of strand " + std::to_string(strandIdx) +
           " to be free, got " +
           std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
           " for strand " + std::to_string(strandIdx) + ".");
-      INVALIDARG_EXP_IFN(strandIdx >= 0 &&
-                           strandIdx <
-                             this->simplifiedUniverse.strandFrom.size(),
-                         "Strand index out of range.");
       RUNTIME_EXP_IFN(this->nrOfAvailableCrosslinkSites > 0,
                       "No available cross-link sites left.");
 
@@ -671,10 +671,9 @@ namespace utils {
             " to be free, got " +
             std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
             " for strand " + std::to_string(strandIdx) + ".");
-          const double timesNForR02 =
-            this->simplifiedUniverse
-              .meanSquaredBeadDistanceInStrand[strandIdx] *
-            cInfinity;
+        const double timesNForR02 =
+          this->simplifiedUniverse.meanSquaredBeadDistanceInStrand[strandIdx] *
+          cInfinity;
         // we don't have free cross-link choice
         // find one that follows the desired end-to-end distribution
         size_t partnerCrosslinker = this->findAppropriateLink(
