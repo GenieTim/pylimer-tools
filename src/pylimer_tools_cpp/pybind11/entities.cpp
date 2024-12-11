@@ -1118,7 +1118,7 @@ init_pylimer_bound_entities(py::module_& m)
     .def("compute_mean_squared_end_to_end_distance",
          &Universe::computeMeanSquareEndToEndDistance,
          R"pbdoc(
-          Computes the mean square of the end-to-end distances of each strand in the network.
+          Computes the mean square of the end-to-end distances of each strand (incl. cross-links) in the network.
 
           NOTE:
                Internally, this uses either :func:`~pylimer_tools_cpp.Molecule.compute_end_to_end_distance` 
