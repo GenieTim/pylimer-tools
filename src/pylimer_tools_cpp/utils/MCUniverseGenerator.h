@@ -952,11 +952,10 @@ namespace utils {
                        long int nStrandsRemaining) {
           if (currentStep == 0) {
             // go all in, we want to jump to end to know when to stop
-            nSteps = nStrandsRemaining - 1;
+            nSteps = nStrandsRemaining;
           }
           currentStep += 1;
-          nSteps = std::max<long int>(
-            std::min<long int>(nSteps, nStrandsRemaining - 1), (long int)1);
+          nSteps = std::max<long int>(nSteps, (long int)1);
           // make large step without force relaxation
           if ((currentStep < lastStep + nSteps) &&
               // but only if the last strand will not be reached with this large
@@ -986,9 +985,7 @@ namespace utils {
                     << currentStep << " (+" << nSteps << ") with "
                     << nStrandsRemaining << " strands remaining." << std::endl;
           if (solubleFraction > targetSolubleFraction) {
-            if (currentStep > 1) {
-              nSteps /= 2;
-            }
+            nSteps /= 2;
             status = BackTrackStatus::TRACK_FORWARD;
             return status;
           } else if (solubleFraction == targetSolubleFraction) {
