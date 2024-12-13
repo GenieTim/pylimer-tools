@@ -675,16 +675,16 @@ namespace utils {
     void linkStrand(const size_t strandIdx, const double cInfinity = 1.)
     {
       // validation
+      INVALIDARG_EXP_IFN(strandIdx >= 0 &&
+                           strandIdx <
+                             this->simplifiedUniverse.strandFrom.size(),
+                         "Strand index out of range.");
       INVALIDARG_EXP_IFN(
         this->simplifiedUniverse.strandTo[strandIdx] < 0,
         "Expected second strand end of strand " + std::to_string(strandIdx) +
           " to be free, got " +
           std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
           " for strand " + std::to_string(strandIdx) + ".");
-      INVALIDARG_EXP_IFN(strandIdx >= 0 &&
-                           strandIdx <
-                             this->simplifiedUniverse.strandFrom.size(),
-                         "Strand index out of range.");
       RUNTIME_EXP_IFN(this->nrOfAvailableCrosslinkSites > 0,
                       "No available cross-link sites left.");
 
@@ -977,11 +977,10 @@ namespace utils {
                        long int nStrandsRemaining) {
           if (currentStep == 0) {
             // go all in, we want to jump to end to know when to stop
-            nSteps = nStrandsRemaining - 1;
+            nSteps = nStrandsRemaining;
           }
           currentStep += 1;
-          nSteps = std::max<long int>(
-            std::min<long int>(nSteps, nStrandsRemaining - 1), (long int)1);
+          nSteps = std::max<long int>(nSteps, (long int)1);
           // make large step without force relaxation
           if ((currentStep < lastStep + nSteps) &&
               // but only if the last strand will not be reached with this large
@@ -1011,9 +1010,7 @@ namespace utils {
                     << currentStep << " (+" << nSteps << ") with "
                     << nStrandsRemaining << " strands remaining." << std::endl;
           if (solubleFraction > targetSolubleFraction) {
-            if (currentStep > 1) {
-              nSteps /= 2;
-            }
+            nSteps /= 2;
             status = BackTrackStatus::TRACK_FORWARD;
             return status;
           } else if (solubleFraction == targetSolubleFraction) {
