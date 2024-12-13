@@ -105,7 +105,7 @@ init_pylimer_bound_generators(py::module_& m)
     .def("add_crosslinkers",
          &MCUniverseGenerator::addCrosslinkers,
          R"pbdoc(
-            Add the cross-linkers.
+            Add cross-linkers at random positions.
 
             :param nr_of_crosslinkers: Number of cross-linkers to add.
             :param crosslinker_functionality: Functionality of the cross-linkers (default: 4).
