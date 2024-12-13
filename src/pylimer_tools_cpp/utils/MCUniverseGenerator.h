@@ -267,12 +267,14 @@ namespace utils {
                            int crosslinkerFunctionality = 4,
                            int crossLinkerAtomType = 2)
     {
-      INVALIDARG_EXP_IFN(coordinates % 3 == 0,
+      INVALIDARG_EXP_IFN(coordinates.size() % 3 == 0,
                          "Length of coordinates must be a multiple of 3");
       INVALIDARG_EXP_IFN(crosslinkerFunctionality >= 0,
                          "Expecting positive cross-linker functionality, got " +
                            std::to_string(crosslinkerFunctionality) + ".");
       int nCrosslinkerBefore = this->remainingCrossLinkerFunctionality.size();
+
+      size_t nrOfCrosslinkers = coordinates.size() / 3;
 
       this->addXlinkAtoms(nrOfCrosslinkers, crossLinkerAtomType, coordinates);
 
