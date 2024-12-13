@@ -263,14 +263,18 @@ namespace utils {
      * @param crossLinkerAtomType
      * @param whiteNoise
      */
-    void addCrosslinkers(int nrOfCrosslinkers,
-                         int crosslinkerFunctionality = 4,
-                         int crossLinkerAtomType = 2,
-                         bool whiteNoise = true)
+    void addCrosslinkersAt(Eigen::VectorXd coordinates,
+                           int crosslinkerFunctionality = 4,
+                           int crossLinkerAtomType = 2)
     {
+      INVALIDARG_EXP_IFN(coordinates % 3 == 0,
+                         "Length of coordinates must be a multiple of 3");
+      INVALIDARG_EXP_IFN(crosslinkerFunctionality >= 0,
+                         "Expecting positive cross-linker functionality, got " +
+                           std::to_string(crosslinkerFunctionality) + ".");
       int nCrosslinkerBefore = this->remainingCrossLinkerFunctionality.size();
 
-      this->addXlinkAtoms(nrOfCrosslinkers, crossLinkerAtomType, whiteNoise);
+      this->addXlinkAtoms(nrOfCrosslinkers, crossLinkerAtomType, coordinates);
 
       this->remainingCrossLinkerFunctionality.reserve(nCrosslinkerBefore +
                                                       nrOfCrosslinkers);
@@ -285,6 +289,27 @@ namespace utils {
 #ifndef NDEBUG
       this->validateInternalState();
 #endif
+    };
+
+    /**
+     * @brief Add free atoms with a specified type and functionality for
+     * possible cross-linking later
+     *
+     * @param nrOfCrosslinkers
+     * @param crosslinkerFunctionality
+     * @param crossLinkerAtomType
+     * @param whiteNoise
+     */
+    void addCrosslinkers(int nrOfCrosslinkers,
+                         int crosslinkerFunctionality = 4,
+                         int crossLinkerAtomType = 2,
+                         bool whiteNoise = true)
+    {
+      Eigen::VectorXd randomPos =
+        this->generateRandomPositions(nrOfCrosslinkers, whiteNoise);
+
+      this->addCrosslinkersAt(
+        randomPos, crosslinkerFunctionality, crossLinkerAtomType);
     };
 
     /**
@@ -671,10 +696,9 @@ namespace utils {
             " to be free, got " +
             std::to_string(this->simplifiedUniverse.strandTo[strandIdx]) +
             " for strand " + std::to_string(strandIdx) + ".");
-          const double timesNForR02 =
-            this->simplifiedUniverse
-              .meanSquaredBeadDistanceInStrand[strandIdx] *
-            cInfinity;
+        const double timesNForR02 =
+          this->simplifiedUniverse.meanSquaredBeadDistanceInStrand[strandIdx] *
+          cInfinity;
         // we don't have free cross-link choice
         // find one that follows the desired end-to-end distribution
         size_t partnerCrosslinker = this->findAppropriateLink(
@@ -1222,6 +1246,7 @@ namespace utils {
       forceRelaxationNetwork.coordinates =
         Eigen::VectorXd(forceRelaxationNetwork.nrOfNodes * 3);
       forceRelaxationNetwork.springIndicesOfLinks.reserve(nCrosslinks);
+      // cross-links first, in order to keep consistent numbering
       for (size_t crosslinkIdx = 0; crosslinkIdx < nCrosslinks;
            ++crosslinkIdx) {
         forceRelaxationNetwork.coordinates(3 * crosslinkIdx + 0) =

@@ -90,6 +90,18 @@ init_pylimer_bound_generators(py::module_& m)
          Set to 0. to disable the formation of secondary loops.
          )pbdoc",
          py::arg("probability") = 1.0)
+    .def("add_crosslinkers_at",
+         &MCUniverseGenerator::addCrosslinkersAt,
+         R"pbdoc(
+          Add cross-linkers at specific coordinates.
+
+          :param coordinates: Coordinates of the cross-linkers.
+          :param crosslinker_functionality: Functionality of the cross-linkers (default: 4).
+          :param crosslinker_type: Atom type of the cross-linkers (default: 2).
+         )pbdoc",
+         py::arg("coordinates"),
+         py::arg("crosslinker_functionality") = 4,
+         py::arg("crosslinker_type") = 2)
     .def("add_crosslinkers",
          &MCUniverseGenerator::addCrosslinkers,
          R"pbdoc(
