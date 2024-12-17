@@ -11,6 +11,7 @@ MCUniverseGenerator
    .. autosummary::
 
       ~MCUniverseGenerator.add_crosslinkers
+      ~MCUniverseGenerator.add_crosslinkers_at
       ~MCUniverseGenerator.add_end_functionalized_strands
       ~MCUniverseGenerator.add_monofunctional_strands
       ~MCUniverseGenerator.add_randomly_functionalized_strands
@@ -25,6 +26,7 @@ MCUniverseGenerator
       ~MCUniverseGenerator.get_nr_of_bonds
       ~MCUniverseGenerator.get_universe
       ~MCUniverseGenerator.link_strand
+      ~MCUniverseGenerator.link_strand_to
       ~MCUniverseGenerator.link_strands_to_conversion
       ~MCUniverseGenerator.link_strands_to_soluble_fraction
       ~MCUniverseGenerator.relax_crosslinks
@@ -32,10 +34,12 @@ MCUniverseGenerator
       ~MCUniverseGenerator.set_bead_distance
       ~MCUniverseGenerator.set_mean_squared_bead_distance
       ~MCUniverseGenerator.set_seed
+      ~MCUniverseGenerator.validate
 
    .. rubric:: Methods Documentation
 
    .. automethod:: add_crosslinkers
+   .. automethod:: add_crosslinkers_at
    .. automethod:: add_end_functionalized_strands
    .. automethod:: add_monofunctional_strands
    .. automethod:: add_randomly_functionalized_strands
@@ -50,6 +54,7 @@ MCUniverseGenerator
    .. automethod:: get_nr_of_bonds
    .. automethod:: get_universe
    .. automethod:: link_strand
+   .. automethod:: link_strand_to
    .. automethod:: link_strands_to_conversion
    .. automethod:: link_strands_to_soluble_fraction
    .. automethod:: relax_crosslinks
@@ -57,3 +62,4 @@ MCUniverseGenerator
    .. automethod:: set_bead_distance
    .. automethod:: set_mean_squared_bead_distance
    .. automethod:: set_seed
+   .. automethod:: validate
