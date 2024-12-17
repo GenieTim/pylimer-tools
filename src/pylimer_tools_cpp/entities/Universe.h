@@ -75,6 +75,7 @@ namespace entities {
     // void addAtoms(const std::vector<Atom>& atoms);
     void removeAtoms(const std::vector<long int>& ids);
     void replaceAtom(const long int id, const Atom& replacement);
+    void replaceAtomType(const long int id, const int newType);
     // bonds
     void addBonds(const std::vector<long int>& from,
                   const std::vector<long int>& to);

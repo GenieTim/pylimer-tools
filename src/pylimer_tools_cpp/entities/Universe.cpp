@@ -315,6 +315,12 @@ namespace entities {
     }
   }
 
+  void Universe::replaceAtomType(const long int id, const int newType)
+  {
+    const long int vertexIdx = this->getIdxByAtomId(id);
+    igraph_cattribute_VAN_set(&this->graph, "type", vertexIdx, newType);
+  }
+
   void Universe::resampleVelocities(double mean,
                                     double variance,
                                     std::string seed,
