@@ -80,6 +80,7 @@ Universe
       ~Universe.remove_bonds
       ~Universe.remove_bonds_by_type
       ~Universe.replace_atom
+      ~Universe.replace_atom_type
       ~Universe.resample_velocities
       ~Universe.set_box
       ~Universe.set_box_lengths
@@ -160,6 +161,7 @@ Universe
    .. automethod:: remove_bonds
    .. automethod:: remove_bonds_by_type
    .. automethod:: replace_atom
+   .. automethod:: replace_atom_type
    .. automethod:: resample_velocities
    .. automethod:: set_box
    .. automethod:: set_box_lengths
