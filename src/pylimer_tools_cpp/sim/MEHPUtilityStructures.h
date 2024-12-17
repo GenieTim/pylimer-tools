@@ -128,6 +128,7 @@ namespace sim {
       Eigen::ArrayXi springCoordinateIndexA;
       Eigen::ArrayXi springCoordinateIndexB;
       Eigen::ArrayXi oldAtomIds;
+      Eigen::ArrayXi oldAtomTypes;
       std::vector<size_t> springToMoleculeIds; // maps
       Eigen::ArrayXb springIsActive;
       Eigen::ArrayXi springIndexA;
