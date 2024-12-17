@@ -2580,9 +2580,17 @@ namespace sim {
                    net, springsToMerge[1], crosslinkIdx)] ==
                  this->entanglementAtomType)) {
               this->removeSpring(
-                net, displacements, springPartitions, springsToMerge[0]);
-              this->removeSpring(
-                net, displacements, springPartitions, springsToMerge[1]);
+                net,
+                displacements,
+                springPartitions,
+                std::max(springsToMerge[0], springsToMerge[1]));
+              if (springsToMerge[0] != = springsToMerge[1]) {
+                this->removeSpring(
+                  net,
+                  displacements,
+                  springPartitions,
+                  std::min(springsToMerge[0], springsToMerge[1]));
+              }
               this->removeLink(net, displacements, crosslinkIdx);
               numRemoved += 1;
             }
