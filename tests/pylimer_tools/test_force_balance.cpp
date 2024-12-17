@@ -1292,10 +1292,8 @@ TEST_CASE("MEHP Force Balance runs with non-network",
 }
 
 TEST_CASE("MEHP Force Balance Free chains collapse",
-          "[analysis][MEHPForceBalance][NonGaussianSpringForceEvaluator]["
-          "SimpleSpringMEHPForceEvaluator]")
+          "[analysis][MEHPForceBalance]")
 {
-  // TODO: implement the NonGaussianSpringForceEvaluator
   size_t nrOfBeads = 30;
   size_t nrOfBeadsPerChain = 3;
   pe::Universe universe =
@@ -1371,6 +1369,101 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
     CHECK(forceBalancer.getNrOfActiveSprings() == 0);
     CHECK(forceBalancer.getAverageSpringLength() >= 0.0);
     CHECK(forceBalancer.getAverageSpringLength() <= 3e-6);
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
+  }
+}
+
+TEST_CASE("MEHP Force Balance Entanglement Beads Are Removed",
+          "[analysis][MEHPForceBalance]")
+{
+  // construct one long chain
+  size_t nrOfBeads = 30;
+  size_t nrOfBeadsPerChain = 3;
+  pe::Universe universe =
+    pe::Universe(nrOfBeads * 10.0, nrOfBeads * 10.0, nrOfBeads * 10.0);
+  std::vector<double> xPositions;
+  xPositions.reserve(nrOfBeads);
+  std::vector<double> yPositions;
+  yPositions.reserve(nrOfBeads);
+  std::vector<double> zPositions;
+  zPositions.reserve(nrOfBeads);
+  std::vector<long int> atomIds;
+  atomIds.reserve(nrOfBeads);
+  std::vector<int> atomTypes;
+  atomTypes.reserve(nrOfBeads);
+  std::vector<int> zeroInts;
+  zeroInts.reserve(nrOfBeads);
+  std::vector<long int> bondFrom;
+  bondFrom.reserve(nrOfBeads - 1);
+  std::vector<long int> bondTo;
+  bondTo.reserve(nrOfBeads - 1);
+  double offset = 10.0;
+  for (int i = 0; i < nrOfBeads; ++i) {
+    xPositions.push_back(i * 1.0 + offset);
+    yPositions.push_back(0.1 * static_cast<double>(i % 4 - i % 3) +
+                         offset); // /!\ i needs to be int, not unsigned!
+    zPositions.push_back(0.1 * static_cast<double>(i % 5 - i % 7) + offset); //
+    atomIds.push_back(i + 1);
+    atomTypes.push_back(i % nrOfBeadsPerChain == 0 ? 2 : 1);
+    zeroInts.push_back(0);
+    if (i > 0) {
+      bondFrom.push_back(i);
+      bondTo.push_back(i + 1);
+    }
+  }
+  // the entanglement beads
+  atomTypes[13] = 3;
+  atomTypes[17] = 3;
+  bondFrom.push_back(13);
+  bondTo.push_back(17);
+  // actually construct the universe
+  universe.addAtoms(atomIds,
+                    atomTypes,
+                    xPositions,
+                    yPositions,
+                    zPositions,
+                    zeroInts,
+                    zeroInts,
+                    zeroInts);
+  universe.addBonds(bondFrom, bondTo);
+  CHECK(universe.getNrOfAtoms() == nrOfBeads);
+  CHECK(universe.getNrOfBonds() == bondTo.size());
+
+  // start with the MEHPForceBalance
+  pcm::MEHPForceBalance forceBalancer =
+    pcm::MEHPForceBalance(universe, 2, false);
+  CHECK(forceBalancer.getNrOfSprings() ==
+        forceBalancer.getNrOfPartialSprings());
+  CHECK(forceBalancer.getNrOfSprings() == nrOfBeads / nrOfBeadsPerChain + 2);
+  forceBalancer.configEntanglementAtomType(3);
+  forceBalancer.configSimplificationFrequency(3);
+  double initialResidual = forceBalancer.getDisplacementResidualNorm();
+
+  SECTION("Large enough box")
+  {
+    forceBalancer.configAssumeBoxLargeEnough(true);
+    CHECK_NOTHROW(forceBalancer.runForceRelaxation(
+      50000,
+      1e-18,
+      initialResidual,
+      pcm::StructureSimplificationMode::ALL_TIM));
+    CHECK(forceBalancer.getNrOfIterations() > 0);
+    CHECK(forceBalancer.getNrOfActiveSprings() == 0);
+    CHECK(forceBalancer.getNrOfSprings() == 0);
+    CHECK_NOTHROW(forceBalancer.validateNetwork());
+  }
+
+  SECTION("Not large enough box")
+  {
+    forceBalancer.configAssumeBoxLargeEnough(false);
+    CHECK_NOTHROW(forceBalancer.runForceRelaxation(
+      50000,
+      1e-18,
+      initialResidual,
+      pcm::StructureSimplificationMode::ALL_TIM));
+    CHECK(forceBalancer.getNrOfIterations() > 0);
+    CHECK(forceBalancer.getNrOfActiveSprings() == 0);
+    CHECK(forceBalancer.getNrOfSprings() == 0);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
   }
 }

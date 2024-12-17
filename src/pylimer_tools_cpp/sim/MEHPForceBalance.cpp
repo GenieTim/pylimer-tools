@@ -236,56 +236,58 @@ namespace sim {
         // }
         previousResidual = currentResidual;
         iterationsDone += 1;
-        nRemoved = 0;
-        if (iterationsDone % 10 == 0) {
-          if (simplificationMode ==
-                StructureSimplificationMode::INACTIVE_ONLY ||
-              simplificationMode == StructureSimplificationMode::ALL_TIM) {
-            // std::cout << "Removing inactive crosslinkers" << std::endl;
-            // default tolerance: 0.25*atom's cube length
-            nRemoved +=
-              this->removeInactiveCrosslinks(this->initialConfig,
-                                             this->currentDisplacements,
-                                             this->currentSpringPartitionsVec,
-                                             inactiveRemovalCutoff);
-            this->initialConfig.meanSpringContourLength =
-              this->initialConfig.springsContourLength.size() > 0
-                ? this->initialConfig.springsContourLength.mean()
-                : 0.;
-          }
-          if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
-              simplificationMode == StructureSimplificationMode::ALL_TIM) {
-            // std::cout << "Removing 2-f crosslinkers" << std::endl;
-            nRemoved += this->removeTwofunctionalCrosslinks(
-              this->initialConfig,
-              this->currentDisplacements,
-              this->currentSpringPartitionsVec);
-            this->initialConfig.meanSpringContourLength =
-              this->initialConfig.springsContourLength.size() > 0
-                ? this->initialConfig.springsContourLength.mean()
-                : 0.;
-          }
-          if (simplificationMode == StructureSimplificationMode::ALL_ANDREI) {
-            // std::cout << "Removing crosslinkers and springs, Andrei's way"
-            //           << std::endl;
-            nRemoved +=
-              this->doRemovalAndreisWay(this->initialConfig,
-                                        this->currentDisplacements,
-                                        this->currentSpringPartitionsVec,
-                                        inactiveRemovalCutoff);
-          }
-          // cleanup some things
-          if (simplificationMode !=
-              StructureSimplificationMode::NO_SIMPLIFICATION) {
-            this->cleanupPrimaryLoopsInStructure(this->initialConfig);
-            this->validateNetwork(this->initialConfig,
-                                  this->currentDisplacements,
-                                  this->currentSpringPartitionsVec);
-            oneOverSpringPartitions = this->assembleOneOverSpringPartition(
-              this->initialConfig,
-              this->currentSpringPartitionsVec,
-              oneOverSpringPartitionUpperLimit);
-          }
+        if (iterationsDone % this->simplificationFrequency == 0) {
+          do {
+            nRemoved = 0;
+            if (simplificationMode ==
+                  StructureSimplificationMode::INACTIVE_ONLY ||
+                simplificationMode == StructureSimplificationMode::ALL_TIM) {
+              // std::cout << "Removing inactive crosslinkers" << std::endl;
+              // default tolerance: 0.25*atom's cube length
+              nRemoved +=
+                this->removeInactiveCrosslinks(this->initialConfig,
+                                               this->currentDisplacements,
+                                               this->currentSpringPartitionsVec,
+                                               inactiveRemovalCutoff);
+              this->initialConfig.meanSpringContourLength =
+                this->initialConfig.springsContourLength.size() > 0
+                  ? this->initialConfig.springsContourLength.mean()
+                  : 0.;
+            }
+            if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
+                simplificationMode == StructureSimplificationMode::ALL_TIM) {
+              // std::cout << "Removing 2-f crosslinkers" << std::endl;
+              nRemoved += this->removeTwofunctionalCrosslinks(
+                this->initialConfig,
+                this->currentDisplacements,
+                this->currentSpringPartitionsVec);
+              this->initialConfig.meanSpringContourLength =
+                this->initialConfig.springsContourLength.size() > 0
+                  ? this->initialConfig.springsContourLength.mean()
+                  : 0.;
+            }
+            if (simplificationMode == StructureSimplificationMode::ALL_ANDREI) {
+              // std::cout << "Removing crosslinkers and springs, Andrei's way"
+              //           << std::endl;
+              nRemoved +=
+                this->doRemovalAndreisWay(this->initialConfig,
+                                          this->currentDisplacements,
+                                          this->currentSpringPartitionsVec,
+                                          inactiveRemovalCutoff);
+            }
+            // cleanup some things
+            if (simplificationMode !=
+                StructureSimplificationMode::NO_SIMPLIFICATION) {
+              this->cleanupPrimaryLoopsInStructure(this->initialConfig);
+              this->validateNetwork(this->initialConfig,
+                                    this->currentDisplacements,
+                                    this->currentSpringPartitionsVec);
+              oneOverSpringPartitions = this->assembleOneOverSpringPartition(
+                this->initialConfig,
+                this->currentSpringPartitionsVec,
+                oneOverSpringPartitionUpperLimit);
+            }
+          } while (nRemoved > 0);
         }
         this->handleOutput(iterationsDone);
 
@@ -374,7 +376,8 @@ namespace sim {
       //   const double contourLengthFraction = springPartitions[i];
       //   const double N =
       //     net.springsContourLength[net.partialToFullSpringIndex[i]];
-      //   double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+      //   double oneOverContourLengthFraction =
+      //   CLAMP_ONE_OVER_SPRINGPARTITION(
       //     net.partialSpringIsPartial[i],
       //     ((contourLengthFraction > 0.) ? 1.0 / (N * contourLengthFraction)
       //                                   : 0.),
@@ -504,7 +507,8 @@ namespace sim {
     }
 
     /**
-     * @brief Assemble all indices of partial springs for a particular slip-link
+     * @brief Assemble all indices of partial springs for a particular
+     * slip-link
      *
      * @param linkIdx
      * @return void
@@ -619,7 +623,8 @@ namespace sim {
         assert(net.springIndicesOfLinks.size() > crosslinkIdx);
         if (net.springIndicesOfLinks[crosslinkIdx].size() == 0 // f = 0
         ) {
-          // std::cout << "Removing f = 0 x-link " << crosslinkIdx << std::endl;
+          // std::cout << "Removing f = 0 x-link " << crosslinkIdx <<
+          // std::endl;
           this->removeLink(net, displacements, crosslinkIdx);
 #ifndef NDEBUG
           this->validateNetwork(net, displacements, springPartitions);
@@ -635,8 +640,8 @@ namespace sim {
               net.linkIndicesOfSprings[net.springIndicesOfLinks[crosslinkIdx]
                                                                [0]]) ==
               crosslinkIdx))) {
-          // std::cout << "Removing f = 1 x-link " << crosslinkIdx << std::endl;
-          // need to first remove the spring
+          // std::cout << "Removing f = 1 x-link " << crosslinkIdx <<
+          // std::endl; need to first remove the spring
           this->removeSpring(net,
                              displacements,
                              springPartitions,
@@ -737,11 +742,11 @@ namespace sim {
                 true;
               atomToStrand.emplace(atom.getId(), springId);
               atomIdxInStrand.emplace(atom.getId(), atomIdx);
-              RUNTIME_EXP_IFN(
-                this->initialConfig.oldAtomIdToSpringIndex.at(atom.getId()) ==
-                  springId,
-                "The spring numbering seems incorrect. Placing slip-links will "
-                "lead to inappropriate placement.");
+              RUNTIME_EXP_IFN(this->initialConfig.oldAtomIdToSpringIndex.at(
+                                atom.getId()) == springId,
+                              "The spring numbering seems incorrect. Placing "
+                              "slip-links will "
+                              "lead to inappropriate placement.");
             }
           }
           RUNTIME_EXP_IFN(this->initialConfig.springToMoleculeIds[springId] ==
@@ -903,7 +908,8 @@ namespace sim {
           continue;
         }
         // take the mean and their index etc. to add as slip-link
-        // std::cout << "OMerging atoms " << a1.getId() << " and " << a2.getId()
+        // std::cout << "OMerging atoms " << a1.getId() << " and " <<
+        // a2.getId()
         // << " with distance " << a1.distanceTo(a2, universe.getBox()) <<
         // std::endl;
         Eigen::Vector3d meanPositions = a1.meanPositionWith(a2, box);
@@ -951,9 +957,11 @@ namespace sim {
      */
     size_t MEHPForceBalance::addSliplinksBasedOnCycles(const int maxLoopLength)
     {
-      // std::cout << "Detecting slip-links based on cycles. Base memory useage:
+      // std::cout << "Detecting slip-links based on cycles. Base memory
+      // useage:
       // "
-      //           << getCurrentRSS() << ", peak " << getPeakRSS() << std::endl;
+      //           << getCurrentRSS() << ", peak " << getPeakRSS() <<
+      //           std::endl;
       std::vector<std::vector<long int>> loopEdges;
       std::vector<std::vector<long int>> loops = this->universe.findLoops(
         this->crossLinkerType, maxLoopLength, false, &loopEdges);
@@ -1034,7 +1042,8 @@ namespace sim {
                                            reducedLoop.end());
         reducedLoops.push_back(reducedLoopVec);
       }
-      // std::cout << "After finding loops, memory useage: " << getCurrentRSS()
+      // std::cout << "After finding loops, memory useage: " <<
+      // getCurrentRSS()
       //           << ", peak " << getPeakRSS() << std::endl;
 
       // fetch some data to later estimate alpha & beta
@@ -1059,7 +1068,8 @@ namespace sim {
       }
 
       // std::cout << "After mapping chains again, memory useage: "
-      //           << getCurrentRSS() << ", peak " << getPeakRSS() << std::endl;
+      //           << getCurrentRSS() << ", peak " << getPeakRSS() <<
+      //           std::endl;
 
       // the resulting vectors to fill
       std::unordered_map<long int, long int> intersectionsOfEdges;
@@ -1090,11 +1100,12 @@ namespace sim {
         const std::array<double, 3> loop_i_min = loopMinCoords[i];
         const std::array<double, 3> loop_i_max = loopMaxCoords[i];
 
-        // TODO: instead of the N^2 loop, might want to try some filter at least
-        // also, we ignore all self-entanglements of one loop with itself.
+        // TODO: instead of the N^2 loop, might want to try some filter at
+        // least also, we ignore all self-entanglements of one loop with
+        // itself.
         for (size_t j = i + 1; j < loops.size(); ++j) {
-          // first check if the loops have any overlap in 3D, otherwise, we can
-          // skip them anyway.
+          // first check if the loops have any overlap in 3D, otherwise, we
+          // can skip them anyway.
 
           std::array<double, 3> loop_j_min = loopMinCoords[j];
           std::array<double, 3> loop_j_max = loopMaxCoords[j];
@@ -1474,8 +1485,8 @@ namespace sim {
             pylimer_tools::utils::join(
               springsOfLink.begin(), springsOfLink.end(), std::string(", ")) +
             ").");
-        // RUNTIME_EXP_IFN(springsOfLink.size() % 2 == 0, "Expected link to have
-        // an even number of components, got " +
+        // RUNTIME_EXP_IFN(springsOfLink.size() % 2 == 0, "Expected link to
+        // have an even number of components, got " +
         // std::to_string(springsOfLink.size()) + ".");
         if (involvedPartialSprings.size() > 0) {
           RUNTIME_EXP_IFN(
@@ -1563,6 +1574,7 @@ namespace sim {
         net.nrOfNodes -= 1;
         net.oldAtomIdToSpringIndex.erase(net.oldAtomIds[linkIdx]);
         pylimer_tools::utils::removeRow(net.oldAtomIds, linkIdx);
+        pylimer_tools::utils::removeRow(net.oldAtomTypes, linkIdx);
       } else {
         pylimer_tools::utils::removeRow(net.nrOfCrosslinkSwapsEndured,
                                         linkIdx - net.nrOfNodes);
@@ -2227,7 +2239,8 @@ namespace sim {
           1. / newTotalForNormalization;
       }
 
-      // std::cout << "Removed springs around " << linkToReduce << " with spring
+      // std::cout << "Removed springs around " << linkToReduce << " with
+      // spring
       // "
       //           << removedSpringIdx << " and partial "
       //           << removedPartialSpringIdx << ", keeping " << keptSpringIdx
@@ -2535,6 +2548,8 @@ namespace sim {
      * @brief Replace the two springs traversing a two-functional crosslinkers
      * with a single spring
      *
+     * Also handles entanglement beads
+     *
      * @param net
      * @param displacements
      * @param springPartitions
@@ -2551,6 +2566,27 @@ namespace sim {
           std::vector<size_t> springsToMerge =
             net.springIndicesOfLinks[crosslinkIdx];
           assert(springsToMerge.size() == 2);
+
+          // special case: this is an entanglement bead
+          if (net.oldAtomTypes[crosslinkIdx] == this->entanglementAtomType) {
+            // this happens if either of the three springs is inactive.
+            // if it's the entanglement spring that has been removed, we don't
+            // care and proceed with the merge. however, if that's not the
+            // case, we should remove this link as well as the two springs
+            if ((net.oldAtomTypes[this->getOtherEnd(
+                   net, springsToMerge[0], crosslinkIdx)] ==
+                 this->entanglementAtomType) ||
+                (net.oldAtomTypes[this->getOtherEnd(
+                   net, springsToMerge[1], crosslinkIdx)] ==
+                 this->entanglementAtomType)) {
+              this->removeSpring(
+                net, displacements, springPartitions, springsToMerge[0]);
+              this->removeSpring(
+                net, displacements, springPartitions, springsToMerge[1]);
+              this->removeLink(net, displacements, crosslinkIdx);
+              numRemoved += 1;
+            }
+          }
 
           // check that it's not a primary loop in any way:
           if (springsToMerge[0] != springsToMerge[1] &&
@@ -2579,7 +2615,8 @@ namespace sim {
             // std::cout << "Removing link " << crosslinkIdx << std::endl;
             this->removeLink(net, displacements, crosslinkIdx);
 
-            // std::cout << "Removed cross-link " << crosslinkIdx << std::endl;
+            // std::cout << "Removed cross-link " << crosslinkIdx <<
+            // std::endl;
 
 #ifndef NDEBUG
             this->validateNetwork(net, displacements, springPartitions);
@@ -2596,7 +2633,8 @@ namespace sim {
     }
 
     /**
-     * @brief Updates the partition/parametrisation of a spring around one link
+     * @brief Updates the partition/parametrisation of a spring around one
+     * link
      *
      */
     double MEHPForceBalance::updateSpringPartition(
@@ -2610,7 +2648,8 @@ namespace sim {
       bool allowSlipLinksToPassEachOther) const
     {
       // std::cout << "Updating spring partition " << linkIdx << " of "
-      //           << net.nrOfNodes << " / " << net.nrOfLinks << " with limit "
+      //           << net.nrOfNodes << " / " << net.nrOfLinks << " with limit
+      //           "
       //           << oneOverSpringPartitionUpperLimit << std::endl;
 
       INVALIDARG_EXP_IFN(linkIdx < net.springIndicesOfLinks.size(),
@@ -2835,7 +2874,8 @@ namespace sim {
     }
 
     /**
-     * @brief Loop all slip-links and move them if appropriate to other springs
+     * @brief Loop all slip-links and move them if appropriate to other
+     * springs
      *
      * @param net
      * @param u
@@ -3180,8 +3220,8 @@ namespace sim {
       size_t crosslinkIdx = net.linkIsSliplink[partnerA] ? partnerB : partnerA;
       size_t slipLinkIdx = net.linkIsSliplink[partnerB] ? partnerB : partnerA;
       // compute the residual
-      // TODO: check if this is dangerous due to the differences being hidden in
-      // the truncated digits
+      // TODO: check if this is dangerous due to the differences being hidden
+      // in the truncated digits
       std::vector<size_t> relevantNeighboursA =
         this->getNeighbourLinkIndices(net, partnerA);
       std::vector<size_t> relevantNeighboursB =
@@ -3384,8 +3424,8 @@ namespace sim {
       }
       size_t fullSpringIdx = net.partialToFullSpringIndex[partialSpringIdx];
       // compute the residual
-      // TODO: check if this is dangerous due to the differences being hidden in
-      // the truncated digits
+      // TODO: check if this is dangerous due to the differences being hidden
+      // in the truncated digits
       std::vector<size_t> relevantNeighboursA =
         this->getNeighbourLinkIndices(net, partnerA);
       std::vector<size_t> relevantNeighboursB =
@@ -4057,7 +4097,8 @@ namespace sim {
         Eigen::Vector3d partialDistance =
           this->evaluatePartialSpringDistanceFrom(
             net, u, globalSpringIndex, linkIdx);
-        // std::cout << "Partial distance of " << globalSpringIndex << " from "
+        // std::cout << "Partial distance of " << globalSpringIndex << " from
+        // "
         //           << linkIdx << " to "
         //           << this->getOtherSpringIndex(net, globalSpringIndex,
         //           linkIdx)
@@ -4190,8 +4231,8 @@ namespace sim {
         debugNrSpringsVisited[globalSpringIndex] += 1;
 
         // also account for primary loops.
-        // they may have non-zero length thanks to assuming the box is not large
-        // enough...
+        // they may have non-zero length thanks to assuming the box is not
+        // large enough...
         if (net.springPartIndexA[globalSpringIndex] ==
             net.springPartIndexB[globalSpringIndex]) {
           stress +=
@@ -4407,8 +4448,8 @@ namespace sim {
      * FORCE BALANCE DATA ACCESS
      */
     /**
-     * @brief Convert the current network back into a universe, consisting only
-     * of crosslinkers
+     * @brief Convert the current network back into a universe, consisting
+     * only of crosslinkers
      */
     pylimer_tools::entities::Universe MEHPForceBalance::getCrosslinkerVerse()
       const
@@ -4438,9 +4479,7 @@ namespace sim {
         ids.push_back(this->initialConfig.oldAtomIds[i]);
         // override type, since the types may be different from
         // crossLinkerType if converted with dangling chains
-        types[i] = this->universe.getPropertyValue<int>(
-          "type",
-          this->universe.getIdxByAtomId(this->initialConfig.oldAtomIds[i]));
+        types[i] = this->initialConfig.oldAtomTypes[i];
       }
       xlinkUniverse.addAtoms(ids, types, x, y, z, zeros, zeros, zeros);
       std::vector<long int> bondFrom;
@@ -5409,6 +5448,7 @@ namespace sim {
       net.coordinates = Eigen::VectorXd::Zero(3 * net.nrOfLinks);
       net.nrOfCrosslinkSwapsEndured = Eigen::ArrayXi::Zero(0);
       net.oldAtomIds = Eigen::ArrayXi::Zero(net.nrOfLinks);
+      net.oldAtomTypes = Eigen::ArrayXi::Zero(net.nrOfLinks);
       net.linkIsSliplink = Eigen::ArrayXb::Constant(net.nrOfLinks, false);
       net.springIndicesOfLinks.reserve(net.nrOfLinks);
       for (size_t i = 0; i < net.nrOfLinks; ++i) {
@@ -5441,6 +5481,7 @@ namespace sim {
             this->universe.getAtomByVertexIdx(i);
           atomIdToNode[atom.getId()] = linkIdx;
           net.oldAtomIds[linkIdx] = atom.getId();
+          net.oldAtomTypes[linkIdx] = atom.getType();
           Eigen::Vector3d coords = atom.getCoordinates();
           this->universe.getBox().handlePBC(coords);
           net.coordinates.segment(3 * linkIdx, 3) = coords;
@@ -5611,6 +5652,8 @@ namespace sim {
         "Nr of nodes plus nr of slp-links should give the total nr of links");
       RUNTIME_EXP_IFN(net.oldAtomIds.size() == net.nrOfNodes,
                       "Invalid size of old atom ids");
+      RUNTIME_EXP_IFN(net.oldAtomTypes.size() == net.nrOfNodes,
+                      "Invalid size of old atom types");
       RUNTIME_EXP_IFN(net.springCoordinateIndexA.size() == net.nrOfSprings * 3,
                       "Invalid size of springCoordinateIndexA");
       RUNTIME_EXP_IFN(net.springCoordinateIndexB.size() == net.nrOfSprings * 3,

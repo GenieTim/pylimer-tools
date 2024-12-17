@@ -52,7 +52,9 @@ namespace sim {
       double kappa = 1.0;
       bool simulationHasRun = false;
       int stepOutputFrequency = 0;
+      int simplificationFrequency = 10;
       int defaultNrOfChains = 0;
+      int entanglementAtomType = -1;
       double defaultBondLength = 0.0;
       std::string stepOutputFile;
       bool outputEndNodes = false;
@@ -169,6 +171,7 @@ namespace sim {
         fb.initialConfig.nrOfNodes = currentVertexId;
         fb.initialConfig.nrOfLinks = currentVertexId + pairsOfAtoms.size();
         fb.initialConfig.oldAtomIds.resize(fb.initialConfig.nrOfNodes);
+        fb.initialConfig.oldAtomTypes.resize(fb.initialConfig.nrOfNodes);
         fb.currentDisplacements.resize(3 * fb.initialConfig.nrOfLinks);
         fb.currentDisplacements.setZero();
         fb.initialConfig.coordinates.conservativeResize(
@@ -886,6 +889,16 @@ namespace sim {
       }
 
       void configSpringConstant(double kappa = 1.0) { this->kappa = kappa; }
+
+      void configEntanglementAtomType(int newEntanglementAtomType = -1)
+      {
+        this->entanglementAtomType = newEntanglementAtomType;
+      }
+
+      void configSimplificationFrequency(int newRemovalFrequency = 10)
+      {
+        this->simplificationFrequency = newRemovalFrequency;
+      }
 
       /**
        * @brief Get the Nr Of Active Nodes
@@ -2173,6 +2186,7 @@ namespace sim {
         net.linkIsSliplink[linkIdx] = atomType != this->crossLinkerType;
         if (!net.linkIsSliplink[linkIdx]) {
           net.oldAtomIds[linkIdx] = atom.getId();
+          net.oldAtomTypes[linkIdx] = atom.getType();
         }
       }
 
