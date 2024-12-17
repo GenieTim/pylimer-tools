@@ -1150,6 +1150,14 @@ class MCUniverseGenerator:
                   :param strand_idx: Index of the strand to be linked.
                   :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2`.
         """
+    def link_strand_to(self, strand_idx: int, link_idx: int) -> None:
+        """
+                  Link a strand to a specific cross-linker.
+                  This assumes that you keep track of the order in which you added 
+        
+                  :param strand_idx: Index of the strand to be linked.
+                  :param link_idx: Index of the cross-linker to be linked.
+        """
     def link_strands_to_conversion(self, crosslinker_conversion: float, c_infinity: float = 1.0) -> None:
         """
                     Actually link the previously added strands to the previously added cross-linkers,
@@ -1194,6 +1202,12 @@ class MCUniverseGenerator:
     def set_seed(self, seed: int) -> None:
         """
         Set the seed for the random generator.
+        """
+    def validate(self) -> None:
+        """
+                 Check whether the internal state of the generator is valid.
+                 Throws errors if not. 
+                 Should in principle always be valid when called from Python; if not, there is a bug in the code.
         """
 class MEHPForceBalance:
     """

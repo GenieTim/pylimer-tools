@@ -643,10 +643,11 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
         double nb2Correction = 1.;
         // (forceBalancer2.getDefaultR0Square() / (expectedNb2));
         double gammaCorrectionFactor = nrOfChainCorrection * nb2Correction;
-        CHECK(forceBalancer2.getGammaFactor() //* nrOfChainCorrection * 1.
-              // forceBalancer2.getDefaultR0Square()
-              == Catch::Approx(
-                   42.6132)); // as from conversion-less Mathematica script
+        CHECK(
+          forceBalancer2.getGammaFactor() //* nrOfChainCorrection * 1.
+                                          // forceBalancer2.getDefaultR0Square()
+          ==
+          Catch::Approx(42.6132)); // as from conversion-less Mathematica script
         CHECK(forceBalancer2.getGammaFactor() * kb *
                 T * // gammaCorrectionFactor *
                 nu ==

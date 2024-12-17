@@ -24,6 +24,7 @@
 #define M_PI 3.1415926535897932384626433
 #endif
 
+#include "utilityMacros.h"
 #include <random>
 
 namespace pylimer_tools {
@@ -1419,6 +1420,74 @@ namespace utils {
       return nBondsTotal;
     }
 
+    /**
+     * @brief Check if the internal state of the universe is consistent
+     *
+     */
+    void validateInternalState() const
+    {
+      RUNTIME_EXP_IFN(
+        all_equal<size_t>(
+          5,
+          this->simplifiedUniverse.strandFrom.size(),
+          this->simplifiedUniverse.strandTo.size(),
+          this->simplifiedUniverse.beadsInStrand.size(),
+          this->simplifiedUniverse.beadDistanceInStrand.size(),
+          this->simplifiedUniverse.meanSquaredBeadDistanceInStrand.size()),
+        "Inconsistent sizes in simplified universe.");
+      RUNTIME_EXP_IFN(
+        all_equal<size_t>(5,
+                          this->simplifiedUniverse.xlinkTypes.size(),
+                          this->simplifiedUniverse.xlinkX.size(),
+                          this->simplifiedUniverse.xlinkY.size(),
+                          this->simplifiedUniverse.xlinkZ.size(),
+                          this->remainingCrossLinkerFunctionality.size()),
+        "Inconsistent sizes in simplified universe.");
+
+      long int nCrosslinks = this->simplifiedUniverse.xlinkX.size();
+      const long int nrOfAvailableSites =
+        std::reduce(this->remainingCrossLinkerFunctionality.begin(),
+                    this->remainingCrossLinkerFunctionality.end(),
+                    0);
+
+      RUNTIME_EXP_IFN(this->nrOfAvailableCrosslinkSites == nrOfAvailableSites,
+                      "Inconsistent nr of cross-link sites.");
+
+      for (size_t xlinkIdx = 0; xlinkIdx < nCrosslinks; ++xlinkIdx) {
+        for (long int subStrandIdx :
+             this->simplifiedUniverse.strandsOfXlink[xlinkIdx]) {
+          RUNTIME_EXP_IFN(
+            this->simplifiedUniverse.strandFrom[subStrandIdx] == xlinkIdx ||
+              this->simplifiedUniverse.strandTo[subStrandIdx] == xlinkIdx,
+            "Inconsistent links int list of cross-links <> strands.");
+        }
+      }
+      for (size_t strandIdx = 0;
+           strandIdx < this->simplifiedUniverse.strandFrom.size();
+           ++strandIdx) {
+        RUNTIME_EXP_IFN(this->simplifiedUniverse.beadsInStrand[strandIdx] >= 0,
+                        "Expected a positive number of beads per strand.");
+        RUNTIME_EXP_IFN(
+          this->simplifiedUniverse.strandFrom[strandIdx] < nCrosslinks,
+          "Expected a valid cross-link index as a strand origin.");
+        RUNTIME_EXP_IFN(
+          this->simplifiedUniverse.strandTo[strandIdx] < nCrosslinks,
+          "Expected a valid cross-link index as a strand destination.");
+
+        if (this->simplifiedUniverse.beadsInStrand[strandIdx] == 0) {
+          RUNTIME_EXP_IFN(this->simplifiedUniverse.strandFrom[strandIdx] >= 0 &&
+                            this->simplifiedUniverse.strandTo[strandIdx] >= 0,
+                          "Expected a valid cross-link index as a strand "
+                          "origin and destination for empty length strands.");
+        }
+      }
+    }
+
+    void linkStrandTo(size_t strandIdx, size_t crosslinkIdx)
+    {
+      return this->linkStrandToCrosslink(strandIdx, crosslinkIdx, false);
+    }
+
   private:
     double beadDistance;
     double meanSquaredBeadDistance;
@@ -1567,15 +1636,29 @@ namespace utils {
                                size_t crosslinkIdx,
                                bool ignoreInexistent = false)
     {
-      INVALIDARG_EXP_IFN(strandIdx < this->simplifiedUniverse.strandFrom.size(),
-                         "The strand index is out of bounds.");
+      INVALIDARG_EXP_IFN(
+        strandIdx < this->simplifiedUniverse.strandFrom.size(),
+        "The strand index " + std::to_string(strandIdx) +
+          " is out of bounds, only " +
+          std::to_string(this->simplifiedUniverse.strandFrom.size()) +
+          " strands have been registered.");
       INVALIDARG_EXP_IFN(
         this->simplifiedUniverse.strandFrom[strandIdx] == UNCONNECTED ||
           this->simplifiedUniverse.strandTo[strandIdx] == UNCONNECTED,
         "Require one end to be free to be connected to");
       if (!ignoreInexistent) {
+        INVALIDARG_EXP_IFN(crosslinkIdx <
+                             this->simplifiedUniverse.strandFrom.size(),
+                           "The chosen crosslink " +
+                             std::to_string(crosslinkIdx) + " does not exist.");
         INVALIDARG_EXP_IFN(
-          crosslinkIdx < this->simplifiedUniverse.strandFrom.size(), "");
+          this->remainingCrossLinkerFunctionality[crosslinkIdx] > 0,
+          "The crosslink " + std::to_string(crosslinkIdx) +
+            " is already fully linked.");
+        this->remainingCrossLinkerFunctionality[crosslinkIdx] -= 1;
+        this->nrOfAvailableCrosslinkSites -= 1;
+        this->simplifiedUniverse.strandsOfXlink[crosslinkIdx].push_back(
+          strandIdx);
       }
 
       if (this->simplifiedUniverse.strandFrom[strandIdx] == UNCONNECTED) {
@@ -1850,65 +1933,6 @@ namespace utils {
       diff << x2 - x1, y2 - y1, z2 - z1;
       this->box.handlePBC(diff);
       return diff.norm();
-    }
-
-    void validateInternalState() const
-    {
-      RUNTIME_EXP_IFN(
-        all_equal<size_t>(
-          5,
-          this->simplifiedUniverse.strandFrom.size(),
-          this->simplifiedUniverse.strandTo.size(),
-          this->simplifiedUniverse.beadsInStrand.size(),
-          this->simplifiedUniverse.beadDistanceInStrand.size(),
-          this->simplifiedUniverse.meanSquaredBeadDistanceInStrand.size()),
-        "Inconsistent sizes in simplified universe.");
-      RUNTIME_EXP_IFN(
-        all_equal<size_t>(5,
-                          this->simplifiedUniverse.xlinkTypes.size(),
-                          this->simplifiedUniverse.xlinkX.size(),
-                          this->simplifiedUniverse.xlinkY.size(),
-                          this->simplifiedUniverse.xlinkZ.size(),
-                          this->remainingCrossLinkerFunctionality.size()),
-        "Inconsistent sizes in simplified universe.");
-
-      long int nCrosslinks = this->simplifiedUniverse.xlinkX.size();
-      const long int nrOfAvailableSites =
-        std::reduce(this->remainingCrossLinkerFunctionality.begin(),
-                    this->remainingCrossLinkerFunctionality.end(),
-                    0);
-
-      RUNTIME_EXP_IFN(this->nrOfAvailableCrosslinkSites == nrOfAvailableSites,
-                      "Inconsistent nr of cross-link sites.");
-
-      for (size_t xlinkIdx = 0; xlinkIdx < nCrosslinks; ++xlinkIdx) {
-        for (long int subStrandIdx :
-             this->simplifiedUniverse.strandsOfXlink[xlinkIdx]) {
-          RUNTIME_EXP_IFN(
-            this->simplifiedUniverse.strandFrom[subStrandIdx] == xlinkIdx ||
-              this->simplifiedUniverse.strandTo[subStrandIdx] == xlinkIdx,
-            "Inconsistent links int list of cross-links <> strands.");
-        }
-      }
-      for (size_t strandIdx = 0;
-           strandIdx < this->simplifiedUniverse.strandFrom.size();
-           ++strandIdx) {
-        RUNTIME_EXP_IFN(this->simplifiedUniverse.beadsInStrand[strandIdx] >= 0,
-                        "Expected a positive number of beads per strand.");
-        RUNTIME_EXP_IFN(
-          this->simplifiedUniverse.strandFrom[strandIdx] < nCrosslinks,
-          "Expected a valid cross-link index as a strand origin.");
-        RUNTIME_EXP_IFN(
-          this->simplifiedUniverse.strandTo[strandIdx] < nCrosslinks,
-          "Expected a valid cross-link index as a strand destination.");
-
-        if (this->simplifiedUniverse.beadsInStrand[strandIdx] == 0) {
-          RUNTIME_EXP_IFN(this->simplifiedUniverse.strandFrom[strandIdx] >= 0 &&
-                            this->simplifiedUniverse.strandTo[strandIdx] >= 0,
-                          "Expected a valid cross-link index as a strand "
-                          "origin and destination for empty length strands.");
-        }
-      }
     }
   };
 } // namespace utils

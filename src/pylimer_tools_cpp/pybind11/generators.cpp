@@ -177,6 +177,8 @@ init_pylimer_bound_generators(py::module_& m)
            &MCUniverseGenerator::addStrands),
          R"pbdoc(
             Add strands.
+            Adds them unconnected at first.
+            To link them to cross-linkers, use some of the :code:`link_strand_` methods.
 
             :param nr_of_strands: Number of strands to add.
             :param strand_lengths: A list of integers representing the number of beads of each of the strands.
@@ -188,14 +190,26 @@ init_pylimer_bound_generators(py::module_& m)
     .def("link_strand",
          &MCUniverseGenerator::linkStrand,
          R"pbdoc(
-          Link one particular strand to another.
-          This strand will have one bond made, to an appropriate cross-linker, as chosen by the parameters associated with the strand.
+          Link one particular strand to a cross-linker.
+          This strand will have one bond made, to an appropriate cross-linker, 
+          as chosen by the parameters associated with the strand.
 
           :param strand_idx: Index of the strand to be linked.
           :param c_infinity: As needed for the end-to-end distribution, given by :math:`\langle R^2\rangle_0 = C_{\infty} N b^2`.
 )pbdoc",
          py::arg("strand_idx"),
          py::arg("c_infinity") = 1.)
+    .def("link_strand_to",
+         &MCUniverseGenerator::linkStrandTo,
+         R"pbdoc(
+          Link a strand to a specific cross-linker.
+          This assumes that you keep track of the order in which you added the cross-linkers and strands.
+
+          :param strand_idx: Index of the strand to be linked.
+          :param link_idx: Index of the cross-linker to be linked.
+      )pbdoc",
+         py::arg("strand_idx"),
+         py::arg("link_idx"))
     .def("link_strands_to_conversion",
          &MCUniverseGenerator::linkStrandsToConversion,
          R"pbdoc(
@@ -230,6 +244,11 @@ init_pylimer_bound_generators(py::module_& m)
          R"pbdoc(
          Run force relaxation with the cross-linkers and their strands,
          to have the cross-links in their statistically most probable position.
+         )pbdoc")
+    .def("validate", &MCUniverseGenerator::validateInternalState, R"pbdoc(
+         Check whether the internal state of the generator is valid.
+         Throws errors if not. 
+         Should in principle always be valid when called from Python; if not, there is a bug in the code.
          )pbdoc")
     .def("get_universe", &MCUniverseGenerator::getUniverse, R"pbdoc(
             Fetch the current (or final) state of the universe.
