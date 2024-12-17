@@ -2584,7 +2584,7 @@ namespace sim {
                 displacements,
                 springPartitions,
                 std::max(springsToMerge[0], springsToMerge[1]));
-              if (springsToMerge[0] != = springsToMerge[1]) {
+              if (springsToMerge[0] != springsToMerge[1]) {
                 this->removeSpring(
                   net,
                   displacements,
