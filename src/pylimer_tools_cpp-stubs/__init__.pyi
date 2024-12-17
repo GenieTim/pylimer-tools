@@ -1093,6 +1093,8 @@ class MCUniverseGenerator:
     def add_strands(self, nr_of_strands: int, strand_lengths: list[int], strand_atom_type: int = 1) -> None:
         """
                     Add strands.
+                    Adds them unconnected at first.
+                    To link them to cross-linkers, use some of the :code:`link_strand_` methods.
         
                     :param nr_of_strands: Number of strands to add.
                     :param strand_lengths: A list of integers representing the number of beads of each of the strands.
@@ -1144,8 +1146,9 @@ class MCUniverseGenerator:
         """
     def link_strand(self, strand_idx: int, c_infinity: float = 1.0) -> None:
         """
-                  Link one particular strand to another.
-                  This strand will have one bond made, to an appropriate cross-linker, as chosen by the parameters associated with the strand.
+                  Link one particular strand to a cross-linker.
+                  This strand will have one bond made, to an appropriate cross-linker, 
+                  as chosen by the parameters associated with the strand.
         
                   :param strand_idx: Index of the strand to be linked.
                   :param c_infinity: As needed for the end-to-end distribution, given by :math:`\\langle R^2\\rangle_0 = C_{\\infty} N b^2`.
@@ -1153,7 +1156,7 @@ class MCUniverseGenerator:
     def link_strand_to(self, strand_idx: int, link_idx: int) -> None:
         """
                   Link a strand to a specific cross-linker.
-                  This assumes that you keep track of the order in which you added 
+                  This assumes that you keep track of the order in which you added the cross-linkers and strands.
         
                   :param strand_idx: Index of the strand to be linked.
                   :param link_idx: Index of the cross-linker to be linked.
@@ -1258,9 +1261,24 @@ class MEHPForceBalance:
                   If your bonds could get larger than half the box length, this must be kept false (default).
                   Otherwise, you can set it to true and therewith get some securities.
         """
+    def config_entanglement_atom_type(self, type: int = -1) -> None:
+        """
+                 To have certain cross-links behave as entanglements in the removal process,
+                 you can specify the (cross-link) atom type here.
+        
+                 I.e., say you want to model some entanglements as non-slipping,
+                 or even as additional bonds between two strand beads resulting in f = 3 beads, for example,
+                 you can call this method to have the "StructureSimplificationMode" also removing these atoms,
+                 if they have a functionality of 2 or less.
+        """
     def config_mean_bond_length(self, b: float = 1.0) -> None:
         """
              Configure the :math:`b` used e.g. for the topological Gamma-factor.
+        """
+    def config_simplification_frequency(self, frequency: int = 10) -> None:
+        """
+                 Config every how many steps to simplify the structure.
+                 Default: 10.
         """
     def config_spring_constant(self, kappa: float = 1.0) -> None:
         ...
@@ -2823,6 +2841,10 @@ class Universe:
     def replace_atom(self, atom_id: int, replacement_atom: Atom) -> None:
         """
                   Replace the properties of an atom with the properties of another given atom.
+        """
+    def replace_atom_type(self, atom_id: int, new_type: int) -> None:
+        """
+                  Replace the type of an atom with another type.
         """
     def resample_velocities(self, mean: float, variance: float, seed: str = '', is_2d: bool = False) -> None:
         ...

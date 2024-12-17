@@ -643,6 +643,13 @@ init_pylimer_bound_entities(py::module_& m)
           )pbdoc",
          py::arg("atom_id"),
          py::arg("replacement_atom"))
+    .def("replace_atom_type",
+         &Universe::replaceAtomType,
+         R"pbdoc(
+          Replace the type of an atom with another type.
+          )pbdoc",
+         py::arg("atom_id"),
+         py::arg("new_type"))
     .def("resample_velocities",
          &Universe::resampleVelocities,
          R"pbdoc()pbdoc",
