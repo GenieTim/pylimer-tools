@@ -1,7 +1,7 @@
 #ifndef UTILITY_MACROS_H
 #define UTILITY_MACROS_H
 
-// #include <iostream>
+#include <iostream>
 
 // to string, without macro expansion
 #define STRINGINFY(s) #s
@@ -12,14 +12,14 @@
 // for any optimisation
 #define INVALIDARG_EXP_IFN(condition, message)                                 \
   if (!(condition)) {                                                          \
-  //std::cerr << "Argument error: " << message << std::endl;                    \
+    std::cerr << "Argument error: " << message << std::endl;                   \
     throw std::invalid_argument(                                               \
       std::string(message) + std::string("\nFailed condition: " #condition));  \
   }
 
 #define RUNTIME_EXP_IFN(condition, message)                                    \
   if (!(condition)) {                                                          \
-  //std::cerr << "Runtime error: " << message << std::endl;                    \
+    std::cerr << "Runtime error: " << message << std::endl;                    \
     throw std::runtime_error(std::string(message) +                            \
                              std::string("\nFailed condition: " #condition));  \
   }
