@@ -719,7 +719,7 @@ namespace entities {
     }
 
     return result;
-  };
+  }
 
   /**
    * @brief Set the masses of the atoms in this universe
@@ -729,6 +729,11 @@ namespace entities {
   void Universe::setMasses(const std::map<int, double>& newMassPerType)
   {
     this->massPerType = newMassPerType;
+  }
+
+  void Universe::setMassForType(const int atomType, const double mass)
+  {
+    this->massPerType[atomType] = mass;
   }
 
   std::map<int, double> Universe::getMasses()

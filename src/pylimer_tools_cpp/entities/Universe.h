@@ -105,6 +105,7 @@ namespace entities {
                            const std::vector<long int>& to,
                            const std::vector<int>& types);
     void setMasses(const std::map<int, double>& massPerType);
+    void setMassForType(const int atomType, const double mass);
     void setBox(const Box& box, bool rescaleAtomCoordinates = false);
     void setTimestep(long int newTimestep) { this->timestep = newTimestep; };
     void initializeFromGraph(const igraph_t* ingraph);

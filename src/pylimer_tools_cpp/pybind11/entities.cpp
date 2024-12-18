@@ -749,7 +749,12 @@ init_pylimer_bound_entities(py::module_& m)
     .def("set_masses",
          &Universe::setMasses,
          "Set the mass per type of atom.",
-         py::arg("massPerType"))
+         py::arg("mass_per_type"))
+    .def("set_mass",
+         &Universe::setMassForType,
+         "Set the mass for a specific atom type.",
+         py::arg("atom_type"),
+         py::arg("mass"))
     .def("set_timestep",
          &Universe::setTimestep,
          "Set the time-step when this Universe was captured.",
