@@ -84,6 +84,7 @@ Universe
       ~Universe.resample_velocities
       ~Universe.set_box
       ~Universe.set_box_lengths
+      ~Universe.set_mass
       ~Universe.set_masses
       ~Universe.set_timestep
       ~Universe.set_vertex_property
@@ -165,6 +166,7 @@ Universe
    .. automethod:: resample_velocities
    .. automethod:: set_box
    .. automethod:: set_box_lengths
+   .. automethod:: set_mass
    .. automethod:: set_masses
    .. automethod:: set_timestep
    .. automethod:: set_vertex_property
