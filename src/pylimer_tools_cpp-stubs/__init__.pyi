@@ -3680,7 +3680,12 @@ class Universe:
                   Override the currently assigned box with one with the side lengths specified.
         """
 
-    def set_masses(self, massPerType: dict[int, float]) -> None:
+    def set_mass(self, atom_type: int, mass: float) -> None:
+        """
+        Set the mass for a specific atom type.
+        """
+
+    def set_masses(self, mass_per_type: dict[int, float]) -> None:
         """
         Set the mass per type of atom.
         """
