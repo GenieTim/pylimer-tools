@@ -2593,6 +2593,7 @@ namespace sim {
               }
               this->removeLink(net, displacements, crosslinkIdx);
               numRemoved += 1;
+              continue;
             }
           }
 
