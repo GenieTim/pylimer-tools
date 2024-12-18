@@ -608,7 +608,7 @@ namespace sim {
         }
         if (!isActive) {
           // remove this spring
-          // std::cout << "Removing spring " << springIdx << std::endl;
+          // std::cout << "Removing inactive spring " << springIdx << std::endl;
           this->removeSpring(net, displacements, springPartitions, springIdx);
 #ifndef NDEBUG
           this->validateNetwork(net, displacements, springPartitions);
@@ -623,8 +623,7 @@ namespace sim {
         assert(net.springIndicesOfLinks.size() > crosslinkIdx);
         if (net.springIndicesOfLinks[crosslinkIdx].size() == 0 // f = 0
         ) {
-          // std::cout << "Removing f = 0 x-link " << crosslinkIdx <<
-          // std::endl;
+          // std::cout << "Removing f = 0 x-link " << crosslinkIdx << std::endl;
           this->removeLink(net, displacements, crosslinkIdx);
 #ifndef NDEBUG
           this->validateNetwork(net, displacements, springPartitions);
@@ -640,8 +639,8 @@ namespace sim {
               net.linkIndicesOfSprings[net.springIndicesOfLinks[crosslinkIdx]
                                                                [0]]) ==
               crosslinkIdx))) {
-          // std::cout << "Removing f = 1 x-link " << crosslinkIdx <<
-          // std::endl; need to first remove the spring
+          // std::cout << "Removing f = 1 x-link " << crosslinkIdx << std::endl;
+          // need to first remove the spring
           this->removeSpring(net,
                              displacements,
                              springPartitions,
@@ -2569,16 +2568,21 @@ namespace sim {
 
           // special case: this is an entanglement bead
           if (net.oldAtomTypes[crosslinkIdx] == this->entanglementAtomType) {
-            // this happens if either of the three springs is inactive.
-            // if it's the entanglement spring that has been removed, we don't
-            // care and proceed with the merge. however, if that's not the
-            // case, we should remove this link as well as the two springs
+            // this happens if either of the three springs was inactive and has
+            // been removed. If it's the entanglement spring that has been
+            // removed, we don't care and proceed with the merge as for other
+            // twofunctional cross-links. However, if that's not the case, we
+            // should remove this entanglement link as well as the two springs
+            // The check for the contour length is to prevent issues that exist
+            // when there are multiple entanglements on the same strand.
             if ((net.oldAtomTypes[this->getOtherEnd(
                    net, springsToMerge[0], crosslinkIdx)] ==
-                 this->entanglementAtomType) ||
+                   this->entanglementAtomType &&
+                 net.springsContourLength[springsToMerge[0]] == 1.) ||
                 (net.oldAtomTypes[this->getOtherEnd(
                    net, springsToMerge[1], crosslinkIdx)] ==
-                 this->entanglementAtomType)) {
+                   this->entanglementAtomType &&
+                 net.springsContourLength[springsToMerge[1]] == 1.)) {
               this->removeSpring(
                 net,
                 displacements,
@@ -2592,8 +2596,16 @@ namespace sim {
                   std::min(springsToMerge[0], springsToMerge[1]));
               }
               this->removeLink(net, displacements, crosslinkIdx);
+              // std::cout << "f = 2 Entanglement bead found, removed link "
+              //           << crosslinkIdx << " after removing springs "
+              //           << springsToMerge[0] << " and " << springsToMerge[1]
+              //           << std::endl;
               numRemoved += 1;
               continue;
+            } else {
+              // std::cout << "Entanglement bead found, but not connected to "
+              //              "other entanglement bead"
+              //           << std::endl;
             }
           }
 
@@ -2610,7 +2622,8 @@ namespace sim {
                      net.linkIndicesOfSprings[springsToMerge[1]]) ==
                      crosslinkIdx))) {
             // std::cout << "Merging springs " << springsToMerge[0] << " and "
-            //           << springsToMerge[1] << std::endl;
+            //           << springsToMerge[1] << " around " << crosslinkIdx
+            //           << std::endl;
             // let's remove this
             // TODO: this is inefficient shit, so much data being moved
             this->mergeSprings(net,
@@ -2624,8 +2637,7 @@ namespace sim {
             // std::cout << "Removing link " << crosslinkIdx << std::endl;
             this->removeLink(net, displacements, crosslinkIdx);
 
-            // std::cout << "Removed cross-link " << crosslinkIdx <<
-            // std::endl;
+            // std::cout << "Removed cross-link " << crosslinkIdx << std::endl;
 
 #ifndef NDEBUG
             this->validateNetwork(net, displacements, springPartitions);
@@ -3992,12 +4004,12 @@ namespace sim {
       const size_t unaffectedEnd2 =
         net.springPartIndexB[otherPartialOfLinkIdx2];
 
-      std::cout << "Swapping link " << linkIdx1 << " and " << linkIdx2
-                << " on partial spring " << partialSpringIdx
-                << ". Newly linked partial springs: " << otherPartialOfLinkIdx1
-                << " (" << unaffectedEnd1 << ") "
-                << " and " << otherPartialOfLinkIdx2 << " (" << unaffectedEnd2
-                << ") " << std::endl;
+      // std::cout << "Swapping link " << linkIdx1 << " and " << linkIdx2
+      //           << " on partial spring " << partialSpringIdx
+      //           << ". Newly linked partial springs: " << otherPartialOfLinkIdx1
+      //           << " (" << unaffectedEnd1 << ") "
+      //           << " and " << otherPartialOfLinkIdx2 << " (" << unaffectedEnd2
+      //           << ") " << std::endl;
 
       Eigen::VectorXd u = Eigen::VectorXd::Zero(net.coordinates.size());
       Eigen::Vector3d distanceBefore =
@@ -5985,6 +5997,38 @@ namespace sim {
           for (size_t i : loop) {
             RUNTIME_EXP_IFN(i >= net.nrOfSprings,
                             "Loop's spring index out of range.");
+          }
+        }
+      }
+
+      /**
+       * Validate additional entanglement-atom specific data that might not
+       * apply
+       */
+      for (size_t linkIdx = 0; linkIdx < net.nrOfNodes; ++linkIdx) {
+        if (net.oldAtomTypes[linkIdx] == this->entanglementAtomType) {
+          RUNTIME_EXP_IFN(net.springIndicesOfLinks[linkIdx].size() <= 3,
+                          "Expect each entanglement atom to have up to three "
+                          "springs maximum.");
+          size_t nEntanglementPartners = 0;
+          size_t nShortEntanglementPartners = 0;
+          for (size_t springIdx : net.springIndicesOfLinks[linkIdx]) {
+            size_t partnerIdx = this->getOtherEnd(net, springIdx, linkIdx);
+            if (partnerIdx <= net.nrOfNodes &&
+                net.oldAtomTypes[partnerIdx] == this->entanglementAtomType) {
+              nEntanglementPartners += 1;
+              nShortEntanglementPartners +=
+                static_cast<int>(net.springsContourLength[springIdx] == 1.);
+            }
+          }
+          if (net.springIndicesOfLinks[linkIdx].size() == 3) {
+            RUNTIME_EXP_IFN(nShortEntanglementPartners >= 1,
+                            "Each entanglement atom must have at least one "
+                            "entanglement partner. Got " +
+                              std::to_string(nShortEntanglementPartners) +
+                              " out of " +
+                              std::to_string(nEntanglementPartners) +
+                              " for link + " + std::to_string(linkIdx) + ".");
           }
         }
       }
