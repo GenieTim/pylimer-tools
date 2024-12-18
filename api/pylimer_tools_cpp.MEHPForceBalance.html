@@ -351,8 +351,8 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.config_assume_box_large_enough" title="pylimer_tools_cpp.MEHPForceBalance.config_assume_box_large_enough"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_assume_box_large_enough</span></code></a>(self[, ...])</p></td>
 <td><p>Configure whether to run PBC on the bonds or not.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.config_entanglement_atom_type" title="pylimer_tools_cpp.MEHPForceBalance.config_entanglement_atom_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_entanglement_atom_type</span></code></a>(self[, type])</p></td>
-<td><p>To have certain cross-links behave as entanglements in the removal process, you can specify the (cross-link) atom type here.</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.config_entanglement_type" title="pylimer_tools_cpp.MEHPForceBalance.config_entanglement_type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_entanglement_type</span></code></a>(self[, type])</p></td>
+<td><p>To have certain cross-links behave as entanglements in the removal process, you can specify the here a type, that you have used in the universe to specify: - the type of entanglement atoms (expected with functionality f = 3), - and the entanglement-bonds between the entanglement atoms.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.config_mean_bond_length" title="pylimer_tools_cpp.MEHPForceBalance.config_mean_bond_length"><code class="xref py py-obj docutils literal notranslate"><span class="pre">config_mean_bond_length</span></code></a>(self[, b])</p></td>
 <td><p>Configure the <span class="math notranslate nohighlight">\(b\)</span> used e.g. for the topological Gamma-factor.</p></td>
@@ -560,14 +560,16 @@ Otherwise, you can set it to true and therewith get some securities.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance.config_entanglement_atom_type">
-<span class="sig-name descname"><span class="pre">config_entanglement_atom_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.MEHPForceBalance"><span class="pre">pylimer_tools_cpp.MEHPForceBalance</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance.config_entanglement_atom_type" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pylimer_tools_cpp.MEHPForceBalance.config_entanglement_type">
+<span class="sig-name descname"><span class="pre">config_entanglement_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance" title="pylimer_tools_cpp.MEHPForceBalance"><span class="pre">pylimer_tools_cpp.MEHPForceBalance</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#pylimer_tools_cpp.MEHPForceBalance.config_entanglement_type" title="Link to this definition">¶</a></dt>
 <dd><p>To have certain cross-links behave as entanglements in the removal process,
-you can specify the (cross-link) atom type here.</p>
+you can specify the here a type, that you have used in the universe to specify:
+- the type of entanglement atoms (expected with functionality f = 3),
+- and the entanglement-bonds between the entanglement atoms.</p>
 <p>I.e., say you want to model some entanglements as non-slipping,
-or even as additional bonds between two strand beads resulting in f = 3 beads, for example,
-you can call this method to have the “StructureSimplificationMode” also removing these atoms,
-if they have a functionality of 2 or less.</p>
+bonds between two strand beads resulting in f = 3 beads, for example,
+you can call this method to have the “StructureSimplificationMode” also remove these atoms,
+if they have a functionality of 2 or less while still being connected to its partner bead.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1078,7 +1080,7 @@ As a consequence though, you cannot simply benchmark only this method; you must 
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.add_sliplinks"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.add_sliplinks()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.add_sliplinks_based_on_cycles"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.add_sliplinks_based_on_cycles()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.config_assume_box_large_enough"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.config_assume_box_large_enough()</span></code></a></li>
-<li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.config_entanglement_atom_type"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.config_entanglement_atom_type()</span></code></a></li>
+<li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.config_entanglement_type"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.config_entanglement_type()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.config_mean_bond_length"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.config_mean_bond_length()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.config_simplification_frequency"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.config_simplification_frequency()</span></code></a></li>
 <li><a class="reference internal" href="#pylimer_tools_cpp.MEHPForceBalance.config_spring_constant"><code class="docutils literal notranslate"><span class="pre">MEHPForceBalance.config_spring_constant()</span></code></a></li>

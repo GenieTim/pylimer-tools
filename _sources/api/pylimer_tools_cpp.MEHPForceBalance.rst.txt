@@ -19,7 +19,7 @@ MEHPForceBalance
       ~MEHPForceBalance.add_sliplinks
       ~MEHPForceBalance.add_sliplinks_based_on_cycles
       ~MEHPForceBalance.config_assume_box_large_enough
-      ~MEHPForceBalance.config_entanglement_atom_type
+      ~MEHPForceBalance.config_entanglement_type
       ~MEHPForceBalance.config_mean_bond_length
       ~MEHPForceBalance.config_simplification_frequency
       ~MEHPForceBalance.config_spring_constant
@@ -87,7 +87,7 @@ MEHPForceBalance
    .. automethod:: add_sliplinks
    .. automethod:: add_sliplinks_based_on_cycles
    .. automethod:: config_assume_box_large_enough
-   .. automethod:: config_entanglement_atom_type
+   .. automethod:: config_entanglement_type
    .. automethod:: config_mean_bond_length
    .. automethod:: config_simplification_frequency
    .. automethod:: config_spring_constant
