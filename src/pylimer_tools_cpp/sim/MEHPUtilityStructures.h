@@ -95,7 +95,9 @@ namespace sim {
       bool isUpToDate = true;
       // coordinates & connectivity
       Eigen::VectorXd coordinates;
-      Eigen::VectorXd springsContourLength;  /* the N for each spring */
+      Eigen::VectorXd springsContourLength; /* the N for each spring */
+      Eigen::ArrayXi springsType; // gives each spring a type. Needed for
+                                  // entanglements modelled as springs
       ArrayXArrayXi springIndicesOfLinks;    // maps link -> springs
       ArrayXArrayXi linkIndicesOfSprings;    // maps spring -> links
       Eigen::ArrayXb partialSpringIsPartial; // indicates whether a spring

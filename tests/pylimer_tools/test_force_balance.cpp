@@ -1381,22 +1381,16 @@ TEST_CASE("MEHP Force Balance Entanglement Beads Are Removed",
   size_t nrOfBeadsPerChain = 3;
   pe::Universe universe =
     pe::Universe(nrOfBeads * 10.0, nrOfBeads * 10.0, nrOfBeads * 10.0);
+  // compiler smart enough to reserve, can save some code
   std::vector<double> xPositions;
-  xPositions.reserve(nrOfBeads);
   std::vector<double> yPositions;
-  yPositions.reserve(nrOfBeads);
   std::vector<double> zPositions;
-  zPositions.reserve(nrOfBeads);
   std::vector<long int> atomIds;
-  atomIds.reserve(nrOfBeads);
   std::vector<int> atomTypes;
-  atomTypes.reserve(nrOfBeads);
   std::vector<int> zeroInts;
-  zeroInts.reserve(nrOfBeads);
   std::vector<long int> bondFrom;
-  bondFrom.reserve(nrOfBeads - 1);
   std::vector<long int> bondTo;
-  bondTo.reserve(nrOfBeads - 1);
+  std::vector<int> bondTypes;
   double offset = 10.0;
   for (int i = 0; i < nrOfBeads; ++i) {
     xPositions.push_back(i * 1.0 + offset);
@@ -1409,13 +1403,17 @@ TEST_CASE("MEHP Force Balance Entanglement Beads Are Removed",
     if (i > 0) {
       bondFrom.push_back(i);
       bondTo.push_back(i + 1);
+      bondTypes.push_back(1);
     }
   }
   // the entanglement beads
+  CHECK(atomTypes[13] == 1);
+  CHECK(atomTypes[17] == 1);
   atomTypes[13] = 3;
   atomTypes[17] = 3;
-  bondFrom.push_back(13);
-  bondTo.push_back(17);
+  bondFrom.push_back(13+1);
+  bondTo.push_back(17+1);
+  bondTypes.push_back(3);
   // actually construct the universe
   universe.addAtoms(atomIds,
                     atomTypes,
@@ -1425,7 +1423,7 @@ TEST_CASE("MEHP Force Balance Entanglement Beads Are Removed",
                     zeroInts,
                     zeroInts,
                     zeroInts);
-  universe.addBonds(bondFrom, bondTo);
+  universe.addBonds(bondFrom, bondTo, bondTypes);
   CHECK(universe.getNrOfAtoms() == nrOfBeads);
   CHECK(universe.getNrOfBonds() == bondTo.size());
 
@@ -1434,8 +1432,8 @@ TEST_CASE("MEHP Force Balance Entanglement Beads Are Removed",
     pcm::MEHPForceBalance(universe, 2, false);
   CHECK(forceBalancer.getNrOfSprings() ==
         forceBalancer.getNrOfPartialSprings());
-  CHECK(forceBalancer.getNrOfSprings() == nrOfBeads / nrOfBeadsPerChain + 2);
-  forceBalancer.configEntanglementAtomType(3);
+  CHECK(forceBalancer.getNrOfSprings() == nrOfBeads / nrOfBeadsPerChain + 3);
+  forceBalancer.configEntanglementType(3);
   forceBalancer.configSimplificationFrequency(3);
   double initialResidual = forceBalancer.getDisplacementResidualNorm();
 
