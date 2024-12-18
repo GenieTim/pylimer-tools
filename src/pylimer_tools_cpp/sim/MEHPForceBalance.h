@@ -54,7 +54,7 @@ namespace sim {
       int stepOutputFrequency = 0;
       int simplificationFrequency = 10;
       int defaultNrOfChains = 0;
-      int entanglementType = -1;
+      int entanglementType = -999;
       double defaultBondLength = 0.0;
       std::string stepOutputFile;
       bool outputEndNodes = false;
