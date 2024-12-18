@@ -45,6 +45,10 @@
 
 #define XOR(value1, value2) !(value1) != !(value2)
 
+#define MEAN(vec)                                                              \
+  (std::accumulate((vec).begin(), (vec).end(), 0) /                            \
+   (static_cast<double>((vec).size())))
+
 // enum as flags
 #define MAKE_FLAGS_ENUM(TEnum, TUnder)                                         \
   constexpr TEnum operator~(TEnum a)                                           \

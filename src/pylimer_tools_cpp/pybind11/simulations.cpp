@@ -784,16 +784,18 @@ init_pylimer_bound_sim(py::module_& m)
          &mehp::MEHPForceBalance::configSpringConstant,
          R"pbdoc()pbdoc",
          py::arg("kappa") = 1.0)
-    .def("config_entanglement_atom_type",
-         &mehp::MEHPForceBalance::configEntanglementAtomType,
+    .def("config_entanglement_type",
+         &mehp::MEHPForceBalance::configEntanglementType,
          R"pbdoc(
          To have certain cross-links behave as entanglements in the removal process,
-         you can specify the (cross-link) atom type here.
+         you can specify the here a type, that you have used in the universe to specify:
+         - the type of entanglement atoms (expected with functionality f = 3),
+         - and the entanglement-bonds between the entanglement atoms.
 
          I.e., say you want to model some entanglements as non-slipping,
-         or even as additional bonds between two strand beads resulting in f = 3 beads, for example,
-         you can call this method to have the "StructureSimplificationMode" also removing these atoms,
-         if they have a functionality of 2 or less.
+         bonds between two strand beads resulting in f = 3 beads, for example,
+         you can call this method to have the "StructureSimplificationMode" also remove these atoms,
+         if they have a functionality of 2 or less while still being connected to its partner bead.
          )pbdoc",
          py::arg("type") = -1)
     .def("config_simplification_frequency",

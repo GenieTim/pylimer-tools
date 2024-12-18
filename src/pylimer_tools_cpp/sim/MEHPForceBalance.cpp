@@ -57,6 +57,7 @@ namespace sim {
       const std::function<bool()>& shouldInterrupt,
       const std::function<void()>& cleanupInterrupt)
     {
+      this->validateNetwork();
       // INVALIDARG_EXP_IFN(
       //   shouldRemoveInactiveCrosslinks == false &&
       //     remove2functionalCrosslinkers == true,
@@ -238,6 +239,9 @@ namespace sim {
         iterationsDone += 1;
         if (iterationsDone % this->simplificationFrequency == 0) {
           do {
+#ifndef NDEBUG
+            this->validateNetwork();
+#endif
             nRemoved = 0;
             if (simplificationMode ==
                   StructureSimplificationMode::INACTIVE_ONLY ||
@@ -1348,6 +1352,7 @@ namespace sim {
       net.linkIndicesOfSprings.erase(net.linkIndicesOfSprings.begin() +
                                      springIdx);
       pylimer_tools::utils::removeRow(net.springsContourLength, springIdx);
+      pylimer_tools::utils::removeRow(net.springsType, springIdx);
       pylimer_tools::utils::removeRow(net.springIndexA, springIdx);
       pylimer_tools::utils::removeRows(
         net.springCoordinateIndexA, springIdx * 3, 3);
@@ -1860,6 +1865,12 @@ namespace sim {
                          "The link to reduce must be a cross-link");
       INVALIDARG_EXP_IFN(keptSpringIdx != removedSpringIdx,
                          "Cannot replace one spring with the same one.");
+      INVALIDARG_EXP_IFN(net.springsType[keptSpringIdx] !=
+                           this->entanglementType,
+                         "Should not merge entanglement springs.");
+      INVALIDARG_EXP_IFN(net.springsType[removedSpringIdx] !=
+                           this->entanglementType,
+                         "Should not merge entanglement springs.");
 
       size_t fullSpringIdx = net.partialToFullSpringIndex[keptSpringIdx];
       // handle links
@@ -2217,6 +2228,7 @@ namespace sim {
         net.springsContourLength[removedSpringIdx];
       pylimer_tools::utils::removeRow(net.springsContourLength,
                                       removedSpringIdx);
+      pylimer_tools::utils::removeRow(net.springsType, removedSpringIdx);
       RUNTIME_EXP_IFN(net.springsContourLength.size() == net.nrOfSprings, "");
       // and spring partitions
       springPartitions[remainingPartialSpringIdx] +=
@@ -2567,7 +2579,7 @@ namespace sim {
           assert(springsToMerge.size() == 2);
 
           // special case: this is an entanglement bead
-          if (net.oldAtomTypes[crosslinkIdx] == this->entanglementAtomType) {
+          if (net.oldAtomTypes[crosslinkIdx] == this->entanglementType) {
             // this happens if either of the three springs was inactive and has
             // been removed. If it's the entanglement spring that has been
             // removed, we don't care and proceed with the merge as for other
@@ -2577,12 +2589,14 @@ namespace sim {
             // when there are multiple entanglements on the same strand.
             if ((net.oldAtomTypes[this->getOtherEnd(
                    net, springsToMerge[0], crosslinkIdx)] ==
-                   this->entanglementAtomType &&
-                 net.springsContourLength[springsToMerge[0]] == 1.) ||
+                   this->entanglementType &&
+                 net.springsType[springsToMerge[0]] ==
+                   this->entanglementType) ||
                 (net.oldAtomTypes[this->getOtherEnd(
                    net, springsToMerge[1], crosslinkIdx)] ==
-                   this->entanglementAtomType &&
-                 net.springsContourLength[springsToMerge[1]] == 1.)) {
+                   this->entanglementType &&
+                 net.springsType[springsToMerge[1]] ==
+                   this->entanglementType)) {
               this->removeSpring(
                 net,
                 displacements,
@@ -4006,9 +4020,11 @@ namespace sim {
 
       // std::cout << "Swapping link " << linkIdx1 << " and " << linkIdx2
       //           << " on partial spring " << partialSpringIdx
-      //           << ". Newly linked partial springs: " << otherPartialOfLinkIdx1
+      //           << ". Newly linked partial springs: " <<
+      //           otherPartialOfLinkIdx1
       //           << " (" << unaffectedEnd1 << ") "
-      //           << " and " << otherPartialOfLinkIdx2 << " (" << unaffectedEnd2
+      //           << " and " << otherPartialOfLinkIdx2 << " (" <<
+      //           unaffectedEnd2
       //           << ") " << std::endl;
 
       Eigen::VectorXd u = Eigen::VectorXd::Zero(net.coordinates.size());
@@ -5488,6 +5504,7 @@ namespace sim {
       net.springPartBoxOffset = Eigen::VectorXd::Zero(3 * net.nrOfSprings);
       net.springIsActive = Eigen::ArrayXb::Constant(net.nrOfSprings, false);
       net.springsContourLength = Eigen::VectorXd::Zero(net.nrOfSprings);
+      net.springsType = Eigen::ArrayXi::Zero(net.nrOfSprings);
       net.oldAtomIdToSpringIndex.reserve(this->universe.getNrOfAtoms());
       net.springToMoleculeIds.reserve(nrOfSprings);
       net.partialSpringIsPartial =
@@ -5552,6 +5569,8 @@ namespace sim {
             crossLinkerChains[i].getNrOfAtoms() - 1;
           addChain = true;
         }
+        auto bondTypes = crossLinkerChains[i].getBonds()["bond_type"];
+        net.springsType[spring_idx] = MEAN(bondTypes);
         assert(addChain);
 
         if (addChain) {
@@ -5653,6 +5672,10 @@ namespace sim {
                         std::to_string(net.springsContourLength.size()) +
                         " for " + std::to_string(net.nrOfSprings) +
                         " springs.");
+      RUNTIME_EXP_IFN(net.springsType.size() == net.nrOfSprings,
+                      "Invalid size of springs types, got " +
+                        std::to_string(net.springsType.size()) + " for " +
+                        std::to_string(net.nrOfSprings) + " springs.");
       RUNTIME_EXP_IFN(net.springIndicesOfLinks.size() == net.nrOfLinks,
                       "Invalid size of spring indices of links, got " +
                         std::to_string(net.linkIndicesOfSprings.size()) +
@@ -6006,7 +6029,7 @@ namespace sim {
        * apply
        */
       for (size_t linkIdx = 0; linkIdx < net.nrOfNodes; ++linkIdx) {
-        if (net.oldAtomTypes[linkIdx] == this->entanglementAtomType) {
+        if (net.oldAtomTypes[linkIdx] == this->entanglementType) {
           RUNTIME_EXP_IFN(net.springIndicesOfLinks[linkIdx].size() <= 3,
                           "Expect each entanglement atom to have up to three "
                           "springs maximum.");
@@ -6015,21 +6038,36 @@ namespace sim {
           for (size_t springIdx : net.springIndicesOfLinks[linkIdx]) {
             size_t partnerIdx = this->getOtherEnd(net, springIdx, linkIdx);
             if (partnerIdx <= net.nrOfNodes &&
-                net.oldAtomTypes[partnerIdx] == this->entanglementAtomType) {
+                net.oldAtomTypes[partnerIdx] == this->entanglementType) {
               nEntanglementPartners += 1;
-              nShortEntanglementPartners +=
-                static_cast<int>(net.springsContourLength[springIdx] == 1.);
+              nShortEntanglementPartners += static_cast<int>(
+                net.springsType[springIdx] == this->entanglementType);
             }
           }
           if (net.springIndicesOfLinks[linkIdx].size() == 3) {
-            RUNTIME_EXP_IFN(nShortEntanglementPartners >= 1,
-                            "Each entanglement atom must have at least one "
+            RUNTIME_EXP_IFN(nShortEntanglementPartners == 1,
+                            "Each entanglement atom must have exactly one "
                             "entanglement partner. Got " +
                               std::to_string(nShortEntanglementPartners) +
                               " out of " +
                               std::to_string(nEntanglementPartners) +
                               " for link + " + std::to_string(linkIdx) + ".");
           }
+        }
+      }
+      for (size_t springIdx = 0; springIdx < net.nrOfSprings; ++springIdx) {
+        if (net.springsType[springIdx] == this->entanglementType) {
+          RUNTIME_EXP_IFN(
+            net.oldAtomTypes[net.springIndexA[springIdx]] ==
+                this->entanglementType &&
+              net.oldAtomTypes[net.springIndexB[springIdx]] ==
+                this->entanglementType,
+            "Expect each entanglement spring to connect two entanglement "
+            "atoms. Got " +
+              std::to_string(net.oldAtomTypes[net.springIndexA[springIdx]]) +
+              " and " +
+              std::to_string(net.oldAtomTypes[net.springIndexB[springIdx]]) +
+              " for spring " + std::to_string(springIdx) + ".");
         }
       }
 

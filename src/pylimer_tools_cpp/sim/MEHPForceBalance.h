@@ -54,7 +54,7 @@ namespace sim {
       int stepOutputFrequency = 0;
       int simplificationFrequency = 10;
       int defaultNrOfChains = 0;
-      int entanglementAtomType = -1;
+      int entanglementType = -1;
       double defaultBondLength = 0.0;
       std::string stepOutputFile;
       bool outputEndNodes = false;
@@ -196,6 +196,7 @@ namespace sim {
         fb.initialConfig.springIsActive.conservativeResize(numUseableChains);
         fb.initialConfig.springsContourLength.conservativeResize(
           numUseableChains);
+        fb.initialConfig.springsType.conservativeResize(numUseableChains);
         fb.initialConfig.linkIndicesOfSprings =
           pylimer_tools::utils::initializeWithValue(numUseableChains,
                                                     std::vector<size_t>());
@@ -333,6 +334,8 @@ namespace sim {
           }
           fb.initialConfig.springsContourLength[springIdx] =
             chain.getNrOfBonds();
+          auto bondTypes = chain.getBonds()["bond_type"];
+          fb.initialConfig.springsType[springIdx] = MEAN(bondTypes);
 
 #ifndef NDEBUG
           Eigen::Vector3d overallDistanceNow = Eigen::Vector3d::Zero();
@@ -890,9 +893,9 @@ namespace sim {
 
       void configSpringConstant(double kappa = 1.0) { this->kappa = kappa; }
 
-      void configEntanglementAtomType(int newEntanglementAtomType = -1)
+      void configEntanglementType(int newEntanglementType = -1)
       {
-        this->entanglementAtomType = newEntanglementAtomType;
+        this->entanglementType = newEntanglementType;
       }
 
       void configSimplificationFrequency(int newRemovalFrequency = 10)
