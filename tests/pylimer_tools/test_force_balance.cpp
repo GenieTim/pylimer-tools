@@ -2,6 +2,7 @@
 #include "../../src/pylimer_tools_cpp/entities/UniverseSequence.h"
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceBalance.h"
 #include "../../src/pylimer_tools_cpp/sim/MEHPForceRelaxation.h"
+#include "../../src/pylimer_tools_cpp/topo/EntanglementDetector.h"
 #include "../../src/pylimer_tools_cpp/utils/ExtraEigenTypes.h"
 #include <catch2/benchmark/catch_benchmark_all.hpp>
 #include <catch2/catch_approx.hpp>
@@ -1411,8 +1412,8 @@ TEST_CASE("MEHP Force Balance Entanglement Beads Are Removed",
   CHECK(atomTypes[17] == 1);
   atomTypes[13] = 3;
   atomTypes[17] = 3;
-  bondFrom.push_back(13+1);
-  bondTo.push_back(17+1);
+  bondFrom.push_back(13 + 1);
+  bondTo.push_back(17 + 1);
   bondTypes.push_back(3);
   // actually construct the universe
   universe.addAtoms(atomIds,
@@ -2562,4 +2563,106 @@ TEST_CASE("Adding slip-links does not influence other springs",
           .isApprox(forceBalancer2Without.evaluateSpringVectors(
             forceBalancer2Without.getNetwork(),
             forceBalancer2Without.getCurrentDisplacements())));
+}
+
+TEST_CASE(
+  "MEHP Force Balance Entanglement Links are just like Entanglement Springs",
+  "[analysis][MEHPForceBalance][long]")
+{
+  std::cout << "Running test \"MEHP Force Balance Entanglement Links are just "
+               "like Entanglement Springs\""
+            << std::endl;
+  pe::UniverseSequence universeSeq = pe::UniverseSequence();
+  CHECK(universeSeq.getLength() == 0);
+  std::string suspectedPath = "../pylimer_tools/fixtures/structure/";
+
+  // a structure with lots of dangling things that can and will be entangled,
+  // yet the entanglements removed
+  std::string inputFile =
+    suspectedPath + "mc_own-si_pdms_crosslinked_melt_215_a_51_r_0.549_wsol_0."
+                    "638_f_4_v_2.structure.out";
+
+  std::cout << "Reading file " << inputFile << std::endl;
+  universeSeq.initializeFromDataSequence({ { inputFile } });
+  pe::Universe universe = universeSeq.atIndex(0);
+  auto masses = universe.getMasses();
+  std::cout << "Read file " << inputFile << std::endl;
+
+  // sample entanglements
+  pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
+    entanglements =
+      pylimer_tools::topo::entanglement_detection::randomlyFindEntanglements(
+        universe, 200, 4., 0., 190, 0, "testseed123", 2, true);
+
+  // clone the universe and add entanglements as springs
+  pe::Universe universeEntangled = pe::Universe(universe);
+  std::vector<long int> bondFrom;
+  std::vector<long int> bondTo;
+  std::vector<int> bondType;
+  for (const std::pair<size_t, size_t>& entanglement :
+       entanglements.pairsOfAtoms) {
+    bondFrom.push_back(entanglement.first);
+    bondTo.push_back(entanglement.second);
+    bondType.push_back(3);
+    CHECK(universeEntangled.getAtom(entanglement.first).getType() == 1);
+    CHECK(universeEntangled.getAtom(entanglement.second).getType() == 1);
+    universeEntangled.replaceAtomType(entanglement.first, 3);
+    universeEntangled.replaceAtomType(entanglement.second, 3);
+  }
+  universeEntangled.addBonds(bondFrom, bondTo, bondType);
+  REQUIRE(universeEntangled.getNrOfBonds() ==
+          entanglements.pairsOfAtoms.size() + universe.getNrOfBonds());
+  masses[3] = 1.0;
+  universeEntangled.setMasses(masses);
+
+  // initialize the two force balance
+  pcm::MEHPForceBalance forceBalancerEntanglementSprings =
+    pcm::MEHPForceBalance(universeEntangled, 2, false, false, false);
+  forceBalancerEntanglementSprings.configEntanglementType(3);
+
+  pcm::MEHPForceBalance forceBalancerEntanglementLinks =
+    pcm::MEHPForceBalance::constructWithSlipLinks(
+      universe, entanglements, 2, false);
+
+  CHECK(forceBalancerEntanglementSprings.getNrOfSprings() >
+        forceBalancerEntanglementLinks.getNrOfSprings());
+  CHECK(forceBalancerEntanglementLinks.getNrOfSprings() == 215);
+
+  // need to disable slipping to test entanglement links
+  forceBalancerEntanglementLinks.runForceRelaxation(
+    5000,
+    1e-15,
+    -1,
+    pcm::StructureSimplificationMode::ALL_TIM,
+    1e-3,
+    false,
+    pcm::LinkSwappingMode::NO_SWAPPING,
+    10,
+    1.0,
+    -1,
+    true);
+  forceBalancerEntanglementSprings.runForceRelaxation(
+    5000,
+    1e-15,
+    -1,
+    pcm::StructureSimplificationMode::ALL_TIM,
+    1e-3,
+    false,
+    pcm::LinkSwappingMode::NO_SWAPPING,
+    10,
+    1.0,
+    -1,
+    true);
+
+  CHECK(forceBalancerEntanglementSprings.getNrOfSprings() >
+        forceBalancerEntanglementLinks.getNrOfSprings());
+
+  CHECK_THAT(
+    forceBalancerEntanglementSprings.getSolubleWeightFraction(),
+    Catch::Matchers::WithinRel(
+      forceBalancerEntanglementLinks.getSolubleWeightFraction(), 0.01));
+  CHECK_THAT(
+    forceBalancerEntanglementSprings.getDanglingWeightFraction(),
+    Catch::Matchers::WithinRel(
+      forceBalancerEntanglementLinks.getDanglingWeightFraction(), 0.01));
 }

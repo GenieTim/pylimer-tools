@@ -742,7 +742,7 @@ init_pylimer_bound_sim(py::module_& m)
       py::arg("initial_residual_norm") = -1.0,
       py::arg("simplification_mode") =
         mehp::StructureSimplificationMode::NO_SIMPLIFICATION,
-      py::arg("inactive_removal_cutoff") = 0.01,
+      py::arg("inactive_removal_cutoff") = 1e-3,
       py::arg("do_inner_iterations") = false,
       py::arg("allow_sliplinks_to_pass_each_other") =
         mehp::LinkSwappingMode::NO_SWAPPING,
