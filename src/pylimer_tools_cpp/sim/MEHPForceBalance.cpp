@@ -593,8 +593,22 @@ namespace sim {
       // first, we remove all inactive springs
       for (long int springIdx = net.nrOfSprings - 1; springIdx >= 0;
            --springIdx) {
+        if (springIdx >= net.nrOfSprings) {
+          continue;
+        }
+        if (net.springsType[springIdx] == this->entanglementType) {
+          // let's not remove entanglement springs
+          continue;
+        }
+        if (net.oldAtomTypes[net.springIndexA[springIdx]] ==
+              this->entanglementType &&
+            net.oldAtomTypes[net.springIndexB[springIdx]] ==
+              this->entanglementType) {
+          // this is a quasi-partial spring, will be handled differently
+          continue;
+        }
         std::vector<size_t> involvedPartialSprings =
-          net.localToGlobalSpringIndex[springIdx];
+          this->getAllPartialSpringIndicesAlong(net, springIdx);
         bool isActive = false;
         for (size_t partialSpringIdx : involvedPartialSprings) {
           RUNTIME_EXP_IFN(
@@ -613,7 +627,12 @@ namespace sim {
         if (!isActive) {
           // remove this spring
           // std::cout << "Removing inactive spring " << springIdx << std::endl;
-          this->removeSpring(net, displacements, springPartitions, springIdx);
+          std::vector<size_t> springsToRemove =
+            this->getAllFullSpringIndicesAlong(net, springIdx);
+          for (size_t springIdxToDelete : springsToRemove) {
+            this->removeSpring(
+              net, displacements, springPartitions, springIdxToDelete);
+          }
 #ifndef NDEBUG
           this->validateNetwork(net, displacements, springPartitions);
 #endif
@@ -5446,8 +5465,9 @@ namespace sim {
           RUNTIME_EXP_IFN(endAtoms.size() == 2,
                           "Expected a dangling chain to have two ends, got " +
                             std::to_string(endAtoms.size()) + ".");
-          assert(XOR(endAtoms[0].getType() == crossLinkerType,
-                     endAtoms[1].getType() == crossLinkerType));
+          // cannot assert this without entanglement types being set
+          // assert(XOR((endAtoms[0].getType() == crossLinkerType),
+          //            endAtoms[1].getType() == crossLinkerType));
 
           useChain[i] = true;
           nrOfSprings += 1;

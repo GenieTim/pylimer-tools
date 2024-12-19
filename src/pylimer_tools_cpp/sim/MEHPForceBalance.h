@@ -463,7 +463,7 @@ namespace sim {
         const double initialResidualToUse = -1.0,
         const StructureSimplificationMode simplificationMode =
           StructureSimplificationMode::NO_SIMPLIFICATION,
-        const double inactiveRemovalCutoff = 0.01,
+        const double inactiveRemovalCutoff = 1e-3,
         bool doInnerIterations = false,
         LinkSwappingMode allowSlipLinksToPassEachOther =
           LinkSwappingMode::NO_SWAPPING,
@@ -936,6 +936,19 @@ namespace sim {
       }
 
       /**
+       * @brief Count the number of atoms that are in any way connected to an
+       * active spring
+       *
+       * @param tolerance
+       * @return double
+       */
+      double countActiveClusteredAtoms(double tolerance = 0.05)
+      {
+        return this->countActiveClusteredAtoms(
+          &this->initialConfig, this->currentSpringVectors, tolerance);
+      }
+
+      /**
        * @brief Get the Dangling Weight Fraction
        *
        * @param tolerance
@@ -978,13 +991,13 @@ namespace sim {
             "Spring distances and network don't match");
         }
         if (net->nrOfSprings < 1) {
-          return 1.;
+          return 0.;
         }
         // find all active springs
         Eigen::ArrayXb activeSprings =
           this->findActiveSprings(springDistances, tolerance);
         if (activeSprings.count() == 0) {
-          return 1.;
+          return 0.;
         }
         // as of now, the springsContourLength is equal to the number of bonds
         // from cross-link to cross-link. therefore, the number of atoms of each
@@ -994,10 +1007,103 @@ namespace sim {
           (net->springsContourLength.array() -
            Eigen::ArrayXd::Ones(net->nrOfSprings));
         // finally, normalise by the number of atoms.
-        // NOTE: currently, the weight of the atoms is ignored
-        return 1. - ((allActiveAtomsPerChains).matrix().sum() +
-                     this->getNrOfActiveNodes()) /
-                      this->universe.getNrOfAtoms();
+        // TODO: currently, the weight of the atoms is ignored
+        return 1. -
+               (((allActiveAtomsPerChains).matrix().sum() +
+                 this->getNrOfActiveNodes()) /
+                this->universe.getNrOfAtoms()) -
+               this->computeSolubleWeightFraction(
+                 net, springDistances, tolerance);
+      }
+
+      /**
+       * @brief Find whether springs and nodes are in any way connected to an
+       * active spring
+       *
+       * @param net the network that includes the connectivity
+       * @param springDistances the distances used to assert whether the springs
+       * is active or not
+       * @param tolerance the tolerance for considering springs as active
+       * @return std::pair<Eigen::ArrayXb, Eigen::ArrayXb>
+       */
+      std::pair<Eigen::ArrayXb, Eigen::ArrayXb> findClusteredToActive(
+        const ForceBalanceNetwork* net,
+        const Eigen::VectorXd& springDistances,
+        const double tolerance = 0.05) const
+      {
+        INVALIDARG_EXP_IFN(springDistances.size() == net->nrOfSprings * 3,
+                           "Invalid sizes.");
+
+        // find all active springs
+        Eigen::ArrayXb activeSprings =
+          this->findActiveSprings(springDistances, tolerance);
+
+        // then, iteratively walk along the springs to mark those as "active"
+        // that are connected to active springs
+        bool hadChanged = true;
+        Eigen::ArrayXb nodeIsActive = Eigen::ArrayXb::Zero(net->nrOfNodes);
+        while (hadChanged) {
+          Eigen::ArrayXb oldActiveSprings = activeSprings;
+          for (size_t i = 0; i < net->nrOfNodes; ++i) {
+            bool anyActive = false;
+            for (size_t spring_idx : net->springIndicesOfLinks[i]) {
+              if (activeSprings[spring_idx]) {
+                anyActive = true;
+                break;
+              }
+            }
+
+            nodeIsActive(i) = anyActive;
+            if (anyActive) {
+              for (size_t spring_idx : net->springIndicesOfLinks[i]) {
+                activeSprings[spring_idx] = true;
+              }
+            }
+          }
+          hadChanged = (oldActiveSprings.count() != activeSprings.count());
+        }
+
+        return std::make_pair(activeSprings, nodeIsActive);
+      }
+
+      /**
+       * @brief Count the number of atoms that can be considered part of an
+       * active cluster, i.e., are somehow connected to an active spring
+       *
+       * @param net
+       * @param springDistances
+       * @param tolerance
+       * @return double
+       */
+      double countActiveClusteredAtoms(ForceBalanceNetwork* net,
+                                       const Eigen::VectorXd& springDistances,
+                                       const double tolerance = 0.05) const
+      {
+        INVALIDARG_EXP_IFN(net->nrOfSprings * 3 == springDistances.size(),
+                           "Spring distances and network don't match");
+        if (net->nrOfSprings < 1) {
+          return 0.;
+        }
+
+        std::pair<Eigen::ArrayXb, Eigen::ArrayXb> clusteredToActive =
+          this->findClusteredToActive(net, springDistances, tolerance);
+        // find all active springs
+        Eigen::ArrayXb activeSprings = clusteredToActive.first;
+        assert(activeSprings.size() == net->nrOfSprings);
+
+        Eigen::ArrayXb nodeIsActive = clusteredToActive.second;
+        assert(nodeIsActive.size() == net->nrOfNodes);
+
+        // as of now, the springsContourLength is equal to the number of bonds
+        // from cross-link to cross-link. therefore, the number of atoms of each
+        // of these springs is one less
+        Eigen::ArrayXd allActiveAtomsPerChains =
+          activeSprings.cast<double>() *
+          (net->springsContourLength.array() -
+           Eigen::ArrayXd::Ones(net->nrOfSprings));
+        double activeNodes = nodeIsActive.count();
+
+        return ((allActiveAtomsPerChains).matrix().sum() + activeNodes);
       }
 
       /**
@@ -1021,13 +1127,12 @@ namespace sim {
         if (net->nrOfSprings < 1) {
           return 1.;
         }
-        std::vector<long int> activeCrosslinkIds =
-          this->getIdsOfActiveNodes(tolerance, 2, -1);
-        double activeClusterWeightFraction =
-          this->universe.computeWeightFractionOfClustersAssociatedWith(
-            activeCrosslinkIds);
-
-        return 1. - activeClusterWeightFraction;
+        double nActiveClusteredAtoms =
+          this->countActiveClusteredAtoms(net, springDistances, tolerance);
+        // finally, normalise by the number of atoms.
+        // NOTE: currently, the weight of the atoms is ignored
+        return 1. - (nActiveClusteredAtoms /
+                     (static_cast<double>(this->universe.getNrOfAtoms())));
       }
 
       /**
@@ -2408,6 +2513,135 @@ namespace sim {
       {
         return (net.springPartIndexA[partialSpringIdx] ==
                 net.springPartIndexB[partialSpringIdx]);
+      }
+
+      /**
+       * @brief Check whether a spring is connected to an entanglement bead.
+       * Possible to ignore a specific entanglement bead, e.g. to check
+       * directionality.
+       *
+       * @param net
+       * @param springIdx
+       * @param ignoring
+       * @return true
+       * @return false
+       */
+      bool springInvolvesEntanglementBead(const ForceBalanceNetwork& net,
+                                          size_t springIdx,
+                                          long int ignoring = -1) const
+      {
+        INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
+                           "Spring index out of range.");
+        return (net.oldAtomTypes[net.springIndexA[springIdx]] ==
+                  this->entanglementType &&
+                net.springIndexA[springIdx] != ignoring) ||
+               (net.oldAtomTypes[net.springIndexB[springIdx]] ==
+                  this->entanglementType &&
+                net.springIndexB[springIdx] != ignoring);
+      }
+
+      size_t getInvolvedEntanglementBeadIndex(const ForceBalanceNetwork& net,
+                                              const size_t springIdx,
+                                              long int ignoring = -1) const
+      {
+        INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
+                           "Spring index out of range.");
+        if (net.oldAtomTypes[net.springIndexA[springIdx]] ==
+              this->entanglementType &&
+            net.springIndexA[springIdx] != ignoring) {
+          return net.springIndexA[springIdx];
+        }
+        if (net.oldAtomTypes[net.springIndexB[springIdx]] ==
+              this->entanglementType &&
+            net.springIndexB[springIdx] != ignoring) {
+          return net.springIndexB[springIdx];
+        }
+        throw std::runtime_error("Did not find involved entanglement bead.");
+      }
+
+      /**
+       * @brief Get the partial spring indices of all involved springs
+       * from one cross-link to another cross-link, jumping all entanglement
+       * beads.
+       *
+       * @return std::vector<size_t>
+       */
+      std::vector<size_t> getAllPartialSpringIndicesAlong(
+        const ForceBalanceNetwork& net,
+        const size_t springIdx) const
+      {
+        INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
+                           "Spring index out of range.");
+
+        std::vector<size_t> fullSpringIndices =
+          this->getAllFullSpringIndicesAlong(net, springIdx);
+        std::vector<size_t> result;
+        for (size_t springIdx : fullSpringIndices) {
+          for (size_t partialSpringIdx :
+               net.localToGlobalSpringIndex[springIdx]) {
+            result.push_back(partialSpringIdx);
+          }
+        }
+
+        return result;
+      }
+
+      /**
+       * @brief Get the full spring indices of all involved springs
+       * from one cross-link to another cross-link, jumping all entanglement
+       * beads.
+       *
+       * @return std::vector<size_t>
+       */
+      std::vector<size_t> getAllFullSpringIndicesAlong(
+        const ForceBalanceNetwork& net,
+        const size_t springIdx) const
+      {
+        INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
+                           "Spring index out of range.");
+        INVALIDARG_EXP_IFN(net.springsType[springIdx] != this->entanglementType,
+                           "Cannot follow entanglement springs");
+        INVALIDARG_EXP_IFN(
+          net.oldAtomTypes[net.springIndexA[springIdx]] !=
+              this->entanglementType ||
+            net.oldAtomTypes[net.springIndexB[springIdx]] !=
+              this->entanglementType,
+          "Cannot follow springs consisting of entanglement beads");
+
+        std::vector<size_t> result = { springIdx };
+        size_t currentSpringIdx = springIdx;
+        long int previousEntanglementLinkIdx = -1;
+        while (this->springInvolvesEntanglementBead(
+          net, currentSpringIdx, previousEntanglementLinkIdx)) {
+          size_t entanglementLinkIdx = this->getInvolvedEntanglementBeadIndex(
+            net, currentSpringIdx, previousEntanglementLinkIdx);
+          RUNTIME_EXP_IFN(net.oldAtomTypes[entanglementLinkIdx] ==
+                            this->entanglementType,
+                          "Did not find involved entanglement bead.");
+          // cannot assert, since this method might be called in a loop
+          // assert(net.springIndicesOfLinks[entanglementLinkIdx].size() == 3);
+          long int nextSpringIdx = -1;
+          for (size_t involvedSpringIdx :
+               net.springIndicesOfLinks[entanglementLinkIdx]) {
+            if (net.springsType[involvedSpringIdx] == this->entanglementType) {
+              continue;
+            }
+            if (involvedSpringIdx == currentSpringIdx) {
+              continue;
+            }
+            nextSpringIdx = involvedSpringIdx;
+          }
+          RUNTIME_EXP_IFN(nextSpringIdx != currentSpringIdx,
+                          "Did not find continuation spring.");
+          // RUNTIME_EXP_IFN(nextSpringIdx >= 0, "Spring index not found.");
+          if (nextSpringIdx < 0) {
+            break;
+          }
+          currentSpringIdx = nextSpringIdx;
+          result.push_back(currentSpringIdx);
+          previousEntanglementLinkIdx = entanglementLinkIdx;
+        }
+        return result;
       }
 
       double getDenominatorOfPartialSpring(
