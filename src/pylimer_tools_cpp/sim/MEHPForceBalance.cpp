@@ -619,14 +619,20 @@ namespace sim {
           // assert(net.coordinates.size() == displacements.size());
           Eigen::Vector3d distance = this->evaluatePartialSpringDistance(
             net, displacements, partialSpringIdx);
-          if (distance.squaredNorm() > tolerance) {
+          if (!this->distanceIsWithinTolerance(
+                distance,
+                tolerance,
+                net.springsContourLength
+                  [net.partialToFullSpringIndex[partialSpringIdx]],
+                springPartitions[partialSpringIdx])) {
             isActive = true;
             break;
           }
         }
         if (!isActive) {
           // remove this spring
-          // std::cout << "Removing inactive spring " << springIdx << std::endl;
+          // std::cout << "Removing inactive spring " << springIdx <<
+          // std::endl;
           std::vector<size_t> springsToRemove =
             this->getAllFullSpringIndicesAlong(net, springIdx);
           for (size_t springIdxToDelete : springsToRemove) {
@@ -646,7 +652,8 @@ namespace sim {
         assert(net.springIndicesOfLinks.size() > crosslinkIdx);
         if (net.springIndicesOfLinks[crosslinkIdx].size() == 0 // f = 0
         ) {
-          // std::cout << "Removing f = 0 x-link " << crosslinkIdx << std::endl;
+          // std::cout << "Removing f = 0 x-link " << crosslinkIdx <<
+          // std::endl;
           this->removeLink(net, displacements, crosslinkIdx);
 #ifndef NDEBUG
           this->validateNetwork(net, displacements, springPartitions);
@@ -662,8 +669,8 @@ namespace sim {
               net.linkIndicesOfSprings[net.springIndicesOfLinks[crosslinkIdx]
                                                                [0]]) ==
               crosslinkIdx))) {
-          // std::cout << "Removing f = 1 x-link " << crosslinkIdx << std::endl;
-          // need to first remove the spring
+          // std::cout << "Removing f = 1 x-link " << crosslinkIdx <<
+          // std::endl; need to first remove the spring
           this->removeSpring(net,
                              displacements,
                              springPartitions,
@@ -2380,7 +2387,10 @@ namespace sim {
           (net.coordinates.segment(3 * net.springIndexB[springIdx], 3) +
            displacements.segment(3 * net.springIndexB[springIdx], 3));
         this->box.handlePBC(distance);
-        if (distance.squaredNorm() < tolerance &&
+        if (this->distanceIsWithinTolerance(distance,
+                                            tolerance,
+                                            net.springsContourLength[springIdx],
+                                            springPartitions[springIdx]) &&
             net.linkIndicesOfSprings[springIdx].size() <= 2) {
           // remove
           this->removeSpring(net, displacements, springPartitions, springIdx);
@@ -2599,13 +2609,13 @@ namespace sim {
 
           // special case: this is an entanglement bead
           if (net.oldAtomTypes[crosslinkIdx] == this->entanglementType) {
-            // this happens if either of the three springs was inactive and has
-            // been removed. If it's the entanglement spring that has been
+            // this happens if either of the three springs was inactive and
+            // has been removed. If it's the entanglement spring that has been
             // removed, we don't care and proceed with the merge as for other
             // twofunctional cross-links. However, if that's not the case, we
             // should remove this entanglement link as well as the two springs
-            // The check for the contour length is to prevent issues that exist
-            // when there are multiple entanglements on the same strand.
+            // The check for the contour length is to prevent issues that
+            // exist when there are multiple entanglements on the same strand.
             if ((net.oldAtomTypes[this->getOtherEnd(
                    net, springsToMerge[0], crosslinkIdx)] ==
                    this->entanglementType &&
@@ -2631,7 +2641,8 @@ namespace sim {
               this->removeLink(net, displacements, crosslinkIdx);
               // std::cout << "f = 2 Entanglement bead found, removed link "
               //           << crosslinkIdx << " after removing springs "
-              //           << springsToMerge[0] << " and " << springsToMerge[1]
+              //           << springsToMerge[0] << " and " <<
+              //           springsToMerge[1]
               //           << std::endl;
               numRemoved += 1;
               continue;
@@ -2670,7 +2681,8 @@ namespace sim {
             // std::cout << "Removing link " << crosslinkIdx << std::endl;
             this->removeLink(net, displacements, crosslinkIdx);
 
-            // std::cout << "Removed cross-link " << crosslinkIdx << std::endl;
+            // std::cout << "Removed cross-link " << crosslinkIdx <<
+            // std::endl;
 
 #ifndef NDEBUG
             this->validateNetwork(net, displacements, springPartitions);
@@ -5268,7 +5280,7 @@ namespace sim {
       Eigen::VectorXi nrOfActiveSpringsConnected =
         Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
       Eigen::ArrayXb springIsActive =
-        this->findActiveSprings(this->currentSpringVectors, tolerance);
+        this->findActiveSprings(this->currentSpringVectors, this->initialConfig.springsContourLength, tolerance);
       for (size_t i = 0; i < this->initialConfig.nrOfSprings; i++) {
         if (springIsActive[i] == true) { /* active spring */
           int a = this->initialConfig.springIndexA[i];
@@ -5292,8 +5304,15 @@ namespace sim {
     {
       Eigen::VectorXi nrOfActivePartialSpringsConnected =
         Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
+      Eigen::VectorXd weightingFactors =
+        Eigen::VectorXd::Ones(this->initialConfig.nrOfPartialSprings);
+      for (size_t i = 0; i < this->initialConfig.nrOfPartialSprings; ++i) {
+        weightingFactors[i] *=
+          this->initialConfig.springsContourLength
+            [this->initialConfig.partialToFullSpringIndex[i]] * this->currentSpringPartitionsVec[i];
+      }
       Eigen::ArrayXb springIsActive =
-        this->findActiveSprings(this->currentPartialSpringVectors, tolerance);
+        this->findActiveSprings(this->currentPartialSpringVectors, weightingFactors, tolerance);
       RUNTIME_EXP_IFN(
         springIsActive.size() == this->initialConfig.nrOfPartialSprings,
         "Expect findActiveSprings to return an "
