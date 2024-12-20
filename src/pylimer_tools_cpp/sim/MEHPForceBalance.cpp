@@ -633,12 +633,9 @@ namespace sim {
           // remove this spring
           // std::cout << "Removing inactive spring " << springIdx <<
           // std::endl;
-          std::vector<size_t> springsToRemove =
-            this->getAllFullSpringIndicesAlong(net, springIdx);
-          for (size_t springIdxToDelete : springsToRemove) {
-            this->removeSpring(
-              net, displacements, springPartitions, springIdxToDelete);
-          }
+          this->removeSpringFollowingEntanglementLinks(
+            net, displacements, springPartitions, springIdx);
+
 #ifndef NDEBUG
           this->validateNetwork(net, displacements, springPartitions);
 #endif
@@ -668,16 +665,31 @@ namespace sim {
             pylimer_tools::utils::last(
               net.linkIndicesOfSprings[net.springIndicesOfLinks[crosslinkIdx]
                                                                [0]]) ==
-              crosslinkIdx))) {
+              crosslinkIdx)) &&
+          net.oldAtomTypes[crosslinkIdx] != this->entanglementType) {
           // std::cout << "Removing f = 1 x-link " << crosslinkIdx <<
           // std::endl; need to first remove the spring
-          this->removeSpring(net,
-                             displacements,
-                             springPartitions,
-                             net.springIndicesOfLinks[crosslinkIdx][0]);
-          numRemoved += 1;
-          // to then remove the link
-          this->removeLink(net, displacements, crosslinkIdx);
+          std::vector<size_t> entanglementLinksRemoved =
+            this->getEntanglementLinkIndicesAlong(
+              net, net.springIndicesOfLinks[crosslinkIdx][0]);
+          this->removeSpringFollowingEntanglementLinks(
+            net,
+            displacements,
+            springPartitions,
+            net.springIndicesOfLinks[crosslinkIdx][0]);
+          size_t newCrosslinkIdx = crosslinkIdx;
+          for (size_t linkIdx : entanglementLinksRemoved) {
+            assert(linkIdx != crosslinkIdx);
+            if (linkIdx < crosslinkIdx) {
+              newCrosslinkIdx -= 1;
+            }
+          }
+          // to then remove the cross-link
+          this->removeLink(net, displacements, newCrosslinkIdx);
+          crosslinkIdx = std::min<long int>(crosslinkIdx, net.nrOfNodes - 1);
+          // => we should ever only have 2-functional entanglement links that
+          // could be merged after this.
+
 #ifndef NDEBUG
           this->validateNetwork(net, displacements, springPartitions);
 #endif
@@ -1580,6 +1592,49 @@ namespace sim {
         }
       }
     }
+
+    /**
+     * @brief Remove a spring, but also all springs that are connected to it
+     * and are connected via entanglement links.
+     *
+     * @param net
+     * @param displacements
+     * @param springPartitions
+     * @param springIdx
+     */
+    void MEHPForceBalance::removeSpringFollowingEntanglementLinks(
+      ForceBalanceNetwork& net,
+      Eigen::VectorXd& displacements,
+      Eigen::VectorXd& springPartitions,
+      const size_t springIdx) const
+    {
+      std::vector<size_t> springsToRemove =
+        this->getAllFullSpringIndicesAlong(net, springIdx);
+      std::vector<size_t> linksToRemove =
+        this->getEntanglementLinkIndicesAlong(net, springIdx);
+      std::sort(
+        springsToRemove.begin(), springsToRemove.end(), std::greater<>());
+      for (size_t springIdxToDelete : springsToRemove) {
+        this->removeSpring(
+          net, displacements, springPartitions, springIdxToDelete);
+      }
+      std::sort(linksToRemove.begin(), linksToRemove.end(), std::greater<>());
+      for (size_t linkIdxToDelete : linksToRemove) {
+        assert(net.springIndicesOfLinks[linkIdxToDelete].size() <= 1);
+        assert(net.oldAtomTypes[linkIdxToDelete] == this->entanglementType);
+        if (net.springIndicesOfLinks[linkIdxToDelete].size() == 1) {
+          assert(
+            net.springsType[net.springIndicesOfLinks[linkIdxToDelete][0]] ==
+            this->entanglementType);
+
+          this->removeSpring(net,
+                             displacements,
+                             springPartitions,
+                             net.springIndicesOfLinks[linkIdxToDelete][0]);
+        }
+        this->removeLink(net, displacements, linkIdxToDelete);
+      }
+    };
 
     /**
      * @brief remove a link from the network
@@ -5259,7 +5314,8 @@ namespace sim {
       for (size_t i = 0; i < this->initialConfig.nrOfNodes; i++) {
         if (nrOfActiveSpringsConnected[i] >= minimumNrOfActiveConnections &&
             (maximumNrOfActiveConnections < 0 ||
-             maximumNrOfActiveConnections >= nrOfActiveSpringsConnected[i])) {
+             maximumNrOfActiveConnections >= nrOfActiveSpringsConnected[i]) &&
+            (this->initialConfig.oldAtomTypes[i] != this->entanglementType)) {
           results.push_back(this->initialConfig.oldAtomIds[i]);
         }
       }
@@ -5280,7 +5336,9 @@ namespace sim {
       Eigen::VectorXi nrOfActiveSpringsConnected =
         Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
       Eigen::ArrayXb springIsActive =
-        this->findActiveSprings(this->currentSpringVectors, this->initialConfig.springsContourLength, tolerance);
+        this->findActiveSprings(this->currentSpringVectors,
+                                this->initialConfig.springsContourLength,
+                                tolerance);
       for (size_t i = 0; i < this->initialConfig.nrOfSprings; i++) {
         if (springIsActive[i] == true) { /* active spring */
           int a = this->initialConfig.springIndexA[i];
@@ -5309,10 +5367,11 @@ namespace sim {
       for (size_t i = 0; i < this->initialConfig.nrOfPartialSprings; ++i) {
         weightingFactors[i] *=
           this->initialConfig.springsContourLength
-            [this->initialConfig.partialToFullSpringIndex[i]] * this->currentSpringPartitionsVec[i];
+            [this->initialConfig.partialToFullSpringIndex[i]] *
+          this->currentSpringPartitionsVec[i];
       }
-      Eigen::ArrayXb springIsActive =
-        this->findActiveSprings(this->currentPartialSpringVectors, weightingFactors, tolerance);
+      Eigen::ArrayXb springIsActive = this->findActiveSprings(
+        this->currentPartialSpringVectors, weightingFactors, tolerance);
       RUNTIME_EXP_IFN(
         springIsActive.size() == this->initialConfig.nrOfPartialSprings,
         "Expect findActiveSprings to return an "

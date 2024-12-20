@@ -898,10 +898,12 @@ namespace sim {
            Eigen::ArrayXd::Ones(net->nrOfSprings));
         // finally, normalise by the number of atoms.
         // TODO: currently, the weight of the atoms is ignored
-        return 1. - (((allActiveAtomsPerChains).matrix().sum() +
-                     this->getNrOfActiveNodes()) /
-                      this->universe.getNrOfAtoms())
-                      - this->computeSolubleWeightFraction(net, springDistances, tolerance);
+        return 1. -
+               (((allActiveAtomsPerChains).matrix().sum() +
+                 this->getNrOfActiveNodes()) /
+                this->universe.getNrOfAtoms()) -
+               this->computeSolubleWeightFraction(
+                 net, springDistances, tolerance);
       }
 
       /**

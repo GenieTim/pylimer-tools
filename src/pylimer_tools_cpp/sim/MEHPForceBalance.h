@@ -614,6 +614,21 @@ namespace sim {
                         const size_t springIdx) const;
 
       /**
+       * @brief Remove a spring, but also all springs that are connected to it
+       * and are connected via entanglement links.
+       *
+       * @param net
+       * @param displacements
+       * @param springPartitions
+       * @param springIdx
+       */
+      void removeSpringFollowingEntanglementLinks(
+        ForceBalanceNetwork& net,
+        Eigen::VectorXd& displacements,
+        Eigen::VectorXd& springPartitions,
+        const size_t springIdx) const;
+
+      /**
        * @brief Remove a certain link from the structures
        *
        * @param net
@@ -2222,6 +2237,15 @@ namespace sim {
         }
         return result;
       }
+
+      /**
+       * @brief Iterate all spring distances, mark active ones (length >
+       * tolerance * contour length * -fraction)
+       *
+       * @param springDistances
+       * @param tolerance
+       * @return Eigen::ArrayXb
+       */
       Eigen::ArrayXb findActiveSprings(
         const Eigen::VectorXd& springDistances,
         const Eigen::VectorXd& springPartTimesContour,
@@ -2330,8 +2354,8 @@ namespace sim {
                                      int contourLength = 1,
                                      double contourLengthFraction = 1.) const
       {
-        return dist.squaredNorm() <= tolerance * contourLengthFraction *
-                                       static_cast<double>(contourLength);
+        return dist.squaredNorm() <= (tolerance * contourLengthFraction *
+                                      static_cast<double>(contourLength));
       }
 
       /**
@@ -2654,7 +2678,7 @@ namespace sim {
           RUNTIME_EXP_IFN(net.oldAtomTypes[entanglementLinkIdx] ==
                             this->entanglementType,
                           "Did not find involved entanglement bead.");
-          // cannot assert, since this method might be called in a loop
+          // cannot assert, since this method might be called in a cleanup loop
           // assert(net.springIndicesOfLinks[entanglementLinkIdx].size() == 3);
           long int nextSpringIdx = -1;
           for (size_t involvedSpringIdx :
@@ -2669,12 +2693,64 @@ namespace sim {
           }
           RUNTIME_EXP_IFN(nextSpringIdx != currentSpringIdx,
                           "Did not find continuation spring.");
-          // RUNTIME_EXP_IFN(nextSpringIdx >= 0, "Spring index not found.");
-          if (nextSpringIdx < 0) {
-            break;
-          }
+          RUNTIME_EXP_IFN(nextSpringIdx >= 0, "Spring index not found.");
           currentSpringIdx = nextSpringIdx;
           result.push_back(currentSpringIdx);
+          previousEntanglementLinkIdx = entanglementLinkIdx;
+        }
+        return result;
+      }
+
+      /**
+       * @brief Get the indices of all involved entanglement beads
+       * from one cross-link to another cross-link, jumping all entanglement
+       * beads.
+       *
+       * @return std::vector<size_t>
+       */
+      std::vector<size_t> getEntanglementLinkIndicesAlong(
+        const ForceBalanceNetwork& net,
+        const size_t springIdx) const
+      {
+        INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
+                           "Spring index out of range.");
+        INVALIDARG_EXP_IFN(net.springsType[springIdx] != this->entanglementType,
+                           "Cannot follow entanglement springs");
+        INVALIDARG_EXP_IFN(
+          net.oldAtomTypes[net.springIndexA[springIdx]] !=
+              this->entanglementType ||
+            net.oldAtomTypes[net.springIndexB[springIdx]] !=
+              this->entanglementType,
+          "Cannot follow springs consisting of entanglement beads");
+
+        std::vector<size_t> result = {};
+        size_t currentSpringIdx = springIdx;
+        long int previousEntanglementLinkIdx = -1;
+        while (this->springInvolvesEntanglementBead(
+          net, currentSpringIdx, previousEntanglementLinkIdx)) {
+          size_t entanglementLinkIdx = this->getInvolvedEntanglementBeadIndex(
+            net, currentSpringIdx, previousEntanglementLinkIdx);
+          RUNTIME_EXP_IFN(net.oldAtomTypes[entanglementLinkIdx] ==
+                            this->entanglementType,
+                          "Did not find involved entanglement bead.");
+          // cannot assert, since this method might be called in a cleanup loop
+          // assert(net.springIndicesOfLinks[entanglementLinkIdx].size() == 3);
+          long int nextSpringIdx = -1;
+          for (size_t involvedSpringIdx :
+               net.springIndicesOfLinks[entanglementLinkIdx]) {
+            if (net.springsType[involvedSpringIdx] == this->entanglementType) {
+              continue;
+            }
+            if (involvedSpringIdx == currentSpringIdx) {
+              continue;
+            }
+            nextSpringIdx = involvedSpringIdx;
+          }
+          RUNTIME_EXP_IFN(nextSpringIdx != currentSpringIdx,
+                          "Did not find continuation spring.");
+          RUNTIME_EXP_IFN(nextSpringIdx >= 0, "Spring index not found.");
+          currentSpringIdx = nextSpringIdx;
+          result.push_back(entanglementLinkIdx);
           previousEntanglementLinkIdx = entanglementLinkIdx;
         }
         return result;

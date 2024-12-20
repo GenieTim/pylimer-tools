@@ -493,7 +493,7 @@ init_pylimer_bound_sim(py::module_& m)
           :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
                Use a value < 0 to indicate that there is no maximum number of active connections.
      )pbdoc",
-         py::arg("tolerance") = 5e-2,
+         py::arg("tolerance") = 1e-3,
          py::arg("minimum_nr_of_active_connections") = 2,
          py::arg("maximum_nr_of_active_connections") = -1)
     .def("get_nr_of_active_nodes",
@@ -506,7 +506,7 @@ init_pylimer_bound_sim(py::module_& m)
           :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
                Use a value < 0 to indicate that there is no maximum number of active connections.
      )pbdoc",
-         py::arg("tolerance") = 5e-2,
+         py::arg("tolerance") = 1e-3,
          py::arg("minimum_nr_of_active_connections") = 2,
          py::arg("maximum_nr_of_active_connections") = -1)
     .def("get_nr_of_active_springs",
@@ -516,7 +516,7 @@ init_pylimer_bound_sim(py::module_& m)
 
           :param tolerance: springs under this length are considered inactive
      )pbdoc",
-         py::arg("tolerance") = 5e-2)
+         py::arg("tolerance") = 1e-3)
     .def("count_active_clustered_atoms",
          py::overload_cast<const double>(
            &mehp::MEHPForceRelaxation::countActiveClusteredAtoms),
@@ -524,7 +524,7 @@ init_pylimer_bound_sim(py::module_& m)
           Counts the active clustered atoms in the system.
 
           :param tolerance: springs under this length are considered inactive.)pbdoc",
-         py::arg("tolerance") = 5e-2)
+         py::arg("tolerance") = 1e-3)
     .def("get_soluble_weight_fraction",
          &mehp::MEHPForceRelaxation::getSolubleWeightFraction,
          R"pbdoc(
@@ -533,7 +533,7 @@ init_pylimer_bound_sim(py::module_& m)
           
           Caution: ignores atom masses.
      )pbdoc",
-         py::arg("tolerance") = 5e-2)
+         py::arg("tolerance") = 1e-3)
     .def("get_dangling_weight_fraction",
          &mehp::MEHPForceRelaxation::getDanglingWeightFraction,
          R"pbdoc(
@@ -541,13 +541,13 @@ init_pylimer_bound_sim(py::module_& m)
 
           Caution: ignores atom masses.
      )pbdoc",
-         py::arg("tolerance") = 5e-2)
+         py::arg("tolerance") = 1e-3)
     .def("get_active_chains",
          &mehp::MEHPForceRelaxation::getActiveChains,
          R"pbdoc(
           Get the cross-linker chains that are active.
      )pbdoc",
-         py::arg("tolerance") = 5e-2)
+         py::arg("tolerance") = 1e-3)
     .def("get_effective_functionality_of_atoms",
          &mehp::MEHPForceRelaxation::getEffectiveFunctionalityOfAtoms,
          R"pbdoc(
@@ -555,7 +555,7 @@ init_pylimer_bound_sim(py::module_& m)
 
           :param tolerance: springs under this length are considered inactive
      )pbdoc",
-         py::arg("tolerance") = 5e-2)
+         py::arg("tolerance") = 1e-3)
     .def("get_spring_lengths",
          &mehp::MEHPForceRelaxation::getSpringLengths,
          R"pbdoc(
@@ -951,7 +951,7 @@ init_pylimer_bound_sim(py::module_& m)
           
           Caution: ignores atom masses.
      )pbdoc",
-         py::arg("tolerance") = 5e-2)
+         py::arg("tolerance") = 1e-3)
     .def("get_dangling_weight_fraction",
          &mehp::MEHPForceBalance::getDanglingWeightFraction,
          R"pbdoc(
@@ -959,7 +959,7 @@ init_pylimer_bound_sim(py::module_& m)
 
           Caution: ignores atom masses.
      )pbdoc",
-         py::arg("tolerance") = 5e-2)
+         py::arg("tolerance") = 1e-3)
     .def("add_sliplinks",
          py::overload_cast<const std::vector<size_t>&,
                            const std::vector<size_t>&,
@@ -1117,7 +1117,7 @@ init_pylimer_bound_sim(py::module_& m)
            - :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
                Use a value < 0 to indicate that there is no maximum number of active connections.
      )pbdoc",
-         py::arg("tolerance") = 5e-2,
+         py::arg("tolerance") = 1e-3,
          py::arg("minimum_nr_of_active_connections") = 2,
          py::arg("maximum_nr_of_active_connections") = -1,
          py::arg("use_partial") = false)
@@ -1132,7 +1132,7 @@ init_pylimer_bound_sim(py::module_& m)
                Use a value < 0 to indicate that there is no maximum number of active connections.
           :param usePartial: Whether to use the partial spring distances rather than the total (set to true if you want primary loop contributors)
      )pbdoc",
-         py::arg("tolerance") = 5e-2,
+         py::arg("tolerance") = 1e-3,
          py::arg("minimumNrOfActiveConnections") = 2,
          py::arg("maximumNrOfActiveConnections") = -1,
          py::arg("usePartial") = false)
@@ -1143,7 +1143,7 @@ init_pylimer_bound_sim(py::module_& m)
 
           :param tolerance: springs under this length are considered inactive
      )pbdoc",
-         py::arg("tolerance") = 5e-2)
+         py::arg("tolerance") = 1e-3)
     .def("get_nr_of_active_partial_springs",
          &mehp::MEHPForceBalance::getNrOfActivePartialSprings,
          R"pbdoc(
@@ -1151,7 +1151,7 @@ init_pylimer_bound_sim(py::module_& m)
 
           :param tolerance: springs under this length are considered inactive
      )pbdoc",
-         py::arg("tolerance") = 5e-2)
+         py::arg("tolerance") = 1e-3)
     .def("get_current_partial_spring_vectors",
          &mehp::MEHPForceBalance::getCurrentPartialSpringDistances,
          R"pbdoc(
@@ -1176,7 +1176,7 @@ init_pylimer_bound_sim(py::module_& m)
 
           :param tolerance: springs under this length are considered inactive
      )pbdoc",
-         py::arg("tolerance") = 5e-2)
+         py::arg("tolerance") = 1e-3)
     .def("get_average_spring_length",
          &mehp::MEHPForceBalance::getAverageSpringLength,
          R"pbdoc(
