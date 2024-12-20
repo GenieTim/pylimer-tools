@@ -1026,7 +1026,7 @@ namespace sim {
         return 1. -
                (((allActiveAtomsPerChains).matrix().sum() +
                  this->getNrOfActiveNodes(tolerance)) /
-                this->universe.getNrOfAtoms()) -
+                (static_cast<double>(this->universe.getNrOfAtoms()))) -
                this->computeSolubleWeightFraction(
                  net, springDistances, tolerance);
       }
@@ -1039,7 +1039,8 @@ namespace sim {
        * @param springDistances the distances used to assert whether the springs
        * is active or not
        * @param tolerance the tolerance for considering springs as active
-       * @return std::pair<Eigen::ArrayXb, Eigen::ArrayXb>
+       * @return std::pair<Eigen::ArrayXb, Eigen::ArrayXb> indices of springs
+       * (first) and links (second) connected in any way to active springs
        */
       std::pair<Eigen::ArrayXb, Eigen::ArrayXb> findClusteredToActive(
         const ForceBalanceNetwork* net,
@@ -1050,35 +1051,34 @@ namespace sim {
                            "Invalid sizes.");
 
         // find all active springs
-        Eigen::ArrayXb activeSprings = this->findActiveSprings(
+        Eigen::ArrayXb springIsActive = this->findActiveSprings(
           springDistances, net->springsContourLength, tolerance);
 
         // then, iteratively walk along the springs to mark those as "active"
         // that are connected to active springs
         bool hadChanged = true;
-        Eigen::ArrayXb nodeIsActive = Eigen::ArrayXb::Zero(net->nrOfNodes);
+        Eigen::ArrayXb nodeIsActive =
+          Eigen::ArrayXb::Constant(net->nrOfNodes, false);
         while (hadChanged) {
-          Eigen::ArrayXb oldActiveSprings = activeSprings;
+          hadChanged = false;
           for (size_t i = 0; i < net->nrOfNodes; ++i) {
-            bool anyActive = false;
-            for (size_t spring_idx : net->springIndicesOfLinks[i]) {
-              if (activeSprings[spring_idx]) {
-                anyActive = true;
+            if (nodeIsActive(i)) {
+              continue;
+            }
+            for (size_t springIdx : net->springIndicesOfLinks[i]) {
+              if (springIsActive[springIdx]) {
+                hadChanged = true;
+                nodeIsActive(i) = true;
+                for (size_t innerSpringIdx : net->springIndicesOfLinks[i]) {
+                  springIsActive[innerSpringIdx] = true;
+                }
                 break;
               }
             }
-
-            nodeIsActive(i) = anyActive;
-            if (anyActive) {
-              for (size_t spring_idx : net->springIndicesOfLinks[i]) {
-                activeSprings[spring_idx] = true;
-              }
-            }
           }
-          hadChanged = (oldActiveSprings.count() != activeSprings.count());
         }
 
-        return std::make_pair(activeSprings, nodeIsActive);
+        return std::make_pair(springIsActive, nodeIsActive);
       }
 
       /**

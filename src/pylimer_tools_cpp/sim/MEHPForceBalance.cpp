@@ -6128,9 +6128,12 @@ namespace sim {
        */
       for (size_t linkIdx = 0; linkIdx < net.nrOfNodes; ++linkIdx) {
         if (net.oldAtomTypes[linkIdx] == this->entanglementType) {
-          RUNTIME_EXP_IFN(net.springIndicesOfLinks[linkIdx].size() <= 3,
-                          "Expect each entanglement atom to have up to three "
-                          "springs maximum.");
+          RUNTIME_EXP_IFN(
+            net.springIndicesOfLinks[linkIdx].size() <= 3,
+            "Expect each entanglement atom to have up to three "
+            "springs maximum, got " +
+              std::to_string(net.springIndicesOfLinks[linkIdx].size()) +
+              " for link " + std::to_string(linkIdx) + ".");
           size_t nEntanglementPartners = 0;
           size_t nShortEntanglementPartners = 0;
           for (size_t springIdx : net.springIndicesOfLinks[linkIdx]) {
@@ -6150,11 +6153,24 @@ namespace sim {
                               " out of " +
                               std::to_string(nEntanglementPartners) +
                               " for link + " + std::to_string(linkIdx) + ".");
+          } else {
+            RUNTIME_EXP_IFN(
+              net.springIndicesOfLinks[linkIdx].size() == 2,
+              "Expect each entanglement atom without "
+              "entanglement partner to be twofunctional link, got "
+              "functionality " +
+                std::to_string(net.springIndicesOfLinks[linkIdx].size()) +
+                " for link " + std::to_string(linkIdx) + ".");
           }
         }
       }
       for (size_t springIdx = 0; springIdx < net.nrOfSprings; ++springIdx) {
         if (net.springsType[springIdx] == this->entanglementType) {
+          RUNTIME_EXP_IFN(
+            net.springsContourLength[springIdx] == 1,
+            "Entanglement springs must have contour length 1. Got " +
+              std::to_string(net.springsContourLength[springIdx]) +
+              " for spring " + std::to_string(springIdx) + ".");
           RUNTIME_EXP_IFN(
             net.oldAtomTypes[net.springIndexA[springIdx]] ==
                 this->entanglementType &&
