@@ -77,6 +77,7 @@ MEHPForceBalance
       ~MEHPForceBalance.set_spring_contour_lengths
       ~MEHPForceBalance.set_spring_partitions
       ~MEHPForceBalance.swap_sliplinks_incl_xlinks
+      ~MEHPForceBalance.validate_network
 
    .. rubric:: Attributes Documentation
 
@@ -145,3 +146,4 @@ MEHPForceBalance
    .. automethod:: set_spring_contour_lengths
    .. automethod:: set_spring_partitions
    .. automethod:: swap_sliplinks_incl_xlinks
+   .. automethod:: validate_network
