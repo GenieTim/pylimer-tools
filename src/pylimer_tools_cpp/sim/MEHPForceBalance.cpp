@@ -594,6 +594,7 @@ namespace sim {
       for (long int springIdx = net.nrOfSprings - 1; springIdx >= 0;
            --springIdx) {
         if (springIdx >= net.nrOfSprings) {
+          springIdx = net.nrOfSprings - 1;
           continue;
         }
         if (net.springsType[springIdx] == this->entanglementType) {
@@ -609,6 +610,7 @@ namespace sim {
         }
         std::vector<size_t> involvedPartialSprings =
           this->getAllPartialSpringIndicesAlong(net, springIdx);
+        assert(involvedPartialSprings.size() > 0);
         bool isActive = false;
         for (size_t partialSpringIdx : involvedPartialSprings) {
           RUNTIME_EXP_IFN(
@@ -619,12 +621,12 @@ namespace sim {
           // assert(net.coordinates.size() == displacements.size());
           Eigen::Vector3d distance = this->evaluatePartialSpringDistance(
             net, displacements, partialSpringIdx);
+          double contourLength =
+            net.springsContourLength
+              [net.partialToFullSpringIndex[partialSpringIdx]];
+          double partition = springPartitions[partialSpringIdx];
           if (!this->distanceIsWithinTolerance(
-                distance,
-                tolerance,
-                net.springsContourLength
-                  [net.partialToFullSpringIndex[partialSpringIdx]],
-                springPartitions[partialSpringIdx])) {
+                distance, tolerance, contourLength, partition)) {
             isActive = true;
             break;
           }
@@ -1612,6 +1614,7 @@ namespace sim {
         this->getAllFullSpringIndicesAlong(net, springIdx);
       std::vector<size_t> linksToRemove =
         this->getEntanglementLinkIndicesAlong(net, springIdx);
+      assert(springsToRemove.size() > 0);
       std::sort(
         springsToRemove.begin(), springsToRemove.end(), std::greater<>());
       for (size_t springIdxToDelete : springsToRemove) {

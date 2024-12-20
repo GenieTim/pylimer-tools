@@ -2351,11 +2351,12 @@ namespace sim {
 
       bool distanceIsWithinTolerance(const Eigen::Vector3d& dist,
                                      double tolerance = 1e-3,
-                                     int contourLength = 1,
+                                     double contourLength = 1.,
                                      double contourLengthFraction = 1.) const
       {
-        return dist.squaredNorm() <= (tolerance * contourLengthFraction *
-                                      static_cast<double>(contourLength));
+        return dist.squaredNorm() <=
+               (tolerance *
+                std::max(contourLengthFraction * contourLength, 1.));
       }
 
       /**

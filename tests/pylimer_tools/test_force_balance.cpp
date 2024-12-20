@@ -823,6 +823,7 @@ TEST_CASE(
     // remove all springs...
     numRemoved = forceBalancer.removeInactiveCrosslinks(
       net, displacements, partitions, 1e5);
+    CHECK(net.nrOfSprings == 0);
     CHECK(numRemoved == nrOfSpringsBefore);
   }
 }
@@ -2683,6 +2684,6 @@ TEST_CASE(
   CHECK_THAT(forceBalancerEntanglementSprings.getStressTensor().trace(),
              Catch::Matchers::WithinRel(
                forceBalancerEntanglementLinks.getStressTensor().trace(), 0.1));
-  CHECK(forceBalancerEntanglementSprings.getStressTensor().trace()
-        < forceBalancerEntanglementLinks.getStressTensor().trace());
+  CHECK(forceBalancerEntanglementSprings.getStressTensor().trace() <
+        forceBalancerEntanglementLinks.getStressTensor().trace());
 }
