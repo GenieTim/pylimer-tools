@@ -25,7 +25,7 @@
       "name": "Debug C++ Tests",
       "cwd": "${workspaceFolder}/tests/build",
       "program": "${workspaceFolder}/tests/build/pylimer_tests",
-      "args": ["MEHP Force Balance can randomly add slip-links ignoring crosslinkers"],
+      "args": ["MEHP Force Balance Entanglement Links are just like Entanglement Springs"],
       "env": {
         "MallocNanoZone": "0",
         "ASAN_OPTIONS": "detect_leaks=0",

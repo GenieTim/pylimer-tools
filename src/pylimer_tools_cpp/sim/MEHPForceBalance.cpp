@@ -6163,7 +6163,8 @@ namespace sim {
               "entanglement partner to be twofunctional link, got "
               "functionality " +
                 std::to_string(net.springIndicesOfLinks[linkIdx].size()) +
-                " for link " + std::to_string(linkIdx) + ".");
+                " for link " + std::to_string(linkIdx) + " (originally " +
+                std::to_string(net.oldAtomIds[linkIdx]) + ").");
           }
         }
       }
