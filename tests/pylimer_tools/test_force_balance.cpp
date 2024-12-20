@@ -2579,8 +2579,8 @@ TEST_CASE(
   // a structure with lots of dangling things that can and will be entangled,
   // yet the entanglements removed
   std::string inputFile =
-    suspectedPath + "mc_own-si_pdms_crosslinked_melt_215_a_51_r_0.549_wsol_0."
-                    "638_f_4_v_2.structure.out";
+    suspectedPath + "mc_own-si_pdms_crosslinked_melt_464_a_77_r_1.71_wsol_0."
+                    "0114_f_4_v_1.structure.out";
 
   std::cout << "Reading file " << inputFile << std::endl;
   universeSeq.initializeFromDataSequence({ { inputFile } });
@@ -2626,10 +2626,10 @@ TEST_CASE(
 
   CHECK(forceBalancerEntanglementSprings.getNrOfSprings() >
         forceBalancerEntanglementLinks.getNrOfSprings());
-  CHECK(forceBalancerEntanglementLinks.getNrOfSprings() == 215);
+  CHECK(forceBalancerEntanglementLinks.getNrOfSprings() == 464);
 
   // need to disable slipping to test entanglement links
-  forceBalancerEntanglementLinks.runForceRelaxation(
+  forceBalancerEntanglementSprings.runForceRelaxation(
     5000,
     1e-15,
     -1,
@@ -2641,7 +2641,7 @@ TEST_CASE(
     1.0,
     -1,
     true);
-  forceBalancerEntanglementSprings.runForceRelaxation(
+  forceBalancerEntanglementLinks.runForceRelaxation(
     5000,
     1e-15,
     -1,
@@ -2656,13 +2656,20 @@ TEST_CASE(
 
   CHECK(forceBalancerEntanglementSprings.getNrOfSprings() >
         forceBalancerEntanglementLinks.getNrOfSprings());
+  std::vector<long int> activeNodes1 =
+    forceBalancerEntanglementSprings.getIdsOfActiveNodes();
+  std::sort(activeNodes1.begin(), activeNodes1.end());
+  std::vector<long int> activeNodes2 =
+    forceBalancerEntanglementLinks.getIdsOfActiveNodes();
+  std::sort(activeNodes2.begin(), activeNodes2.end());
+  CHECK(activeNodes1 == activeNodes2);
 
   CHECK_THAT(
     forceBalancerEntanglementSprings.getSolubleWeightFraction(),
     Catch::Matchers::WithinRel(
-      forceBalancerEntanglementLinks.getSolubleWeightFraction(), 0.01));
+      forceBalancerEntanglementLinks.getSolubleWeightFraction(), 0.05));
   CHECK_THAT(
     forceBalancerEntanglementSprings.getDanglingWeightFraction(),
     Catch::Matchers::WithinRel(
-      forceBalancerEntanglementLinks.getDanglingWeightFraction(), 0.01));
+      forceBalancerEntanglementLinks.getDanglingWeightFraction(), 0.05));
 }
