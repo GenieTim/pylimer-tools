@@ -583,11 +583,6 @@ init_pylimer_bound_sim(py::module_& m)
          R"pbdoc(
            Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()` for :math:`\langle R_{0,\eta}^2\rangle`.
      )pbdoc")
-    .def("get_default_nr_of_chains",
-         &mehp::MEHPForceRelaxation::getDefaultNrOfChains,
-         R"pbdoc(
-          Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceRelaxation.getGammaFactor()` for normalizing the distances.`.
-     )pbdoc")
     .def("get_nr_of_iterations",
          &mehp::MEHPForceRelaxation::getNrOfIterations,
          R"pbdoc(
@@ -1041,7 +1036,7 @@ init_pylimer_bound_sim(py::module_& m)
           :math:`k_B` Boltzmann's constant.
           
           :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\infinity b^2`.
-          :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains. 
+          :param nr_of_chains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of springs. 
      )pbdoc",
          py::arg("b02") = -1.0,
          py::arg("nr_of_chains") = -1)
@@ -1066,7 +1061,7 @@ init_pylimer_bound_sim(py::module_& m)
           :math:`k_B` Boltzmann's constant.
           
           :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\infinity b^2`.
-          :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of chains. 
+          :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of springs. 
      )pbdoc",
          py::arg("one_over_spring_partition_upper_limit") = 1.,
          py::arg("b02") = -1.0,
@@ -1194,11 +1189,6 @@ init_pylimer_bound_sim(py::module_& m)
          R"pbdoc(
            Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()` for 
            :math:`b` in :math:`\langle R_{0,\eta}^2 = N_{\eta} b^2\rangle`.
-     )pbdoc")
-    .def("get_default_nr_of_chains",
-         &mehp::MEHPForceBalance::getDefaultNrOfChains,
-         R"pbdoc(
-          Returns the value effectively used in :func:`~pylimer_tools_cpp.MEHPForceBalance.getGammaFactor()` for normalizing the distances.`.
      )pbdoc")
     .def("get_nr_of_iterations",
          &mehp::MEHPForceBalance::getNrOfIterations,

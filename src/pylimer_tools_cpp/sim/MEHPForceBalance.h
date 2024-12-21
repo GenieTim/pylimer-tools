@@ -53,7 +53,6 @@ namespace sim {
       bool simulationHasRun = false;
       int stepOutputFrequency = 0;
       int simplificationFrequency = 10;
-      int defaultNrOfChains = 0;
       int entanglementType = -999;
       double defaultBondLength = 0.0;
       std::string stepOutputFile;
@@ -442,8 +441,6 @@ namespace sim {
         this->currentPartialSpringVectors = this->evaluatePartialSpringVectors(
           this->initialConfig, this->currentDisplacements);
         this->defaultBondLength = universe.computeMeanBondLength();
-        this->defaultNrOfChains =
-          universe.getMolecules(this->crossLinkerType).size();
         this->validateNetwork();
       }
 
@@ -837,8 +834,6 @@ namespace sim {
        * @return pylimer_tools::entities::Universe
        */
       pylimer_tools::entities::Universe getCrosslinkerVerse() const;
-
-      int getDefaultNrOfChains() const { return this->defaultNrOfChains; }
 
       double getDefaultMeanBondLength() const
       {
@@ -2593,6 +2588,12 @@ namespace sim {
       {
         INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
                            "Spring index out of range.");
+        if (net.springIndexB[springIdx] == net.springIndexA[springIdx]) {
+          // "primary loop" e.g. if entanglement is with the same strand
+          // cannot use ignore in this case
+          return net.oldAtomTypes[net.springIndexB[springIdx]] ==
+                 this->entanglementType;
+        }
         return (net.oldAtomTypes[net.springIndexA[springIdx]] ==
                   this->entanglementType &&
                 net.springIndexA[springIdx] != ignoring) ||
@@ -2607,6 +2608,14 @@ namespace sim {
       {
         INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
                            "Spring index out of range.");
+        if (net.springIndexB[springIdx] == net.springIndexA[springIdx]) {
+          // "primary loop" e.g. if entanglement is with the same strand
+          // cannot use ignore in this case
+          if (net.oldAtomTypes[net.springIndexA[springIdx]] ==
+              this->entanglementType) {
+            return net.springIndexA[springIdx];
+          }
+        }
         if (net.oldAtomTypes[net.springIndexA[springIdx]] ==
               this->entanglementType &&
             net.springIndexA[springIdx] != ignoring) {
@@ -2680,7 +2689,8 @@ namespace sim {
                             this->entanglementType,
                           "Did not find involved entanglement bead.");
           // cannot assert, since this method might be called in a cleanup loop
-          // assert(net.springIndicesOfLinks[entanglementLinkIdx].size() == 3);
+          assert(net.springIndicesOfLinks[entanglementLinkIdx].size() == 3 ||
+                 net.springIndicesOfLinks[entanglementLinkIdx].size() == 2);
           long int nextSpringIdx = -1;
           for (size_t involvedSpringIdx :
                net.springIndicesOfLinks[entanglementLinkIdx]) {
@@ -2735,7 +2745,8 @@ namespace sim {
                             this->entanglementType,
                           "Did not find involved entanglement bead.");
           // cannot assert, since this method might be called in a cleanup loop
-          // assert(net.springIndicesOfLinks[entanglementLinkIdx].size() == 3);
+          assert(net.springIndicesOfLinks[entanglementLinkIdx].size() == 3 ||
+                 net.springIndicesOfLinks[entanglementLinkIdx].size() == 2);
           long int nextSpringIdx = -1;
           for (size_t involvedSpringIdx :
                net.springIndicesOfLinks[entanglementLinkIdx]) {

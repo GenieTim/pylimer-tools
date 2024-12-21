@@ -638,12 +638,10 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
           forceBalancer2.getPressure() * conversionFactor /
             (sigmaToM * sigmaToM * sigmaToM) ==
           Catch::Approx(61172.8878)); // shear modulus from the pressure, MPa
-        double nrOfChainCorrection =
-          (forceBalancer2.getDefaultNrOfChains() / nrOfChains);
         double expectedNb2 = slope * Nb * beadMass;
         double nb2Correction = 1.;
         // (forceBalancer2.getDefaultR0Square() / (expectedNb2));
-        double gammaCorrectionFactor = nrOfChainCorrection * nb2Correction;
+        double gammaCorrectionFactor = nb2Correction;
         CHECK(
           forceBalancer2.getGammaFactor() //* nrOfChainCorrection * 1.
                                           // forceBalancer2.getDefaultR0Square()
@@ -1847,7 +1845,6 @@ TEST_CASE("MEHP Force Balance does not collapse",
     CHECK(forceBalanceNew.getAverageSpringLength() == Catch::Approx(5.0));
     // forceBalanceNew.setSpringContourLengths(
     //   Eigen::VectorXd::Constant(forceBalanceNew.getNrOfSprings(), 5.));
-    CHECK(forceBalanceNew.getDefaultNrOfChains() == 8);
     // TODO: check this again
     CHECK_THAT(forceBalanceNew.getGammaFactor(1., 100),
                Catch::Matchers::WithinAbs(1.0, 1e-2));
@@ -2593,7 +2590,7 @@ TEST_CASE(
   pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
     entanglements =
       pylimer_tools::topo::entanglement_detection::randomlyFindEntanglements(
-        universe, 200, 4., 0., 190, 0, "seed_for_test_27", 2, true);
+        universe, 4368, 4., 0., 190, 0, "lkdvyjh3r9ldh", 2, true);
 
   // clone the universe and add entanglements as springs
   pe::Universe universeEntangled = pe::Universe(universe);
@@ -2628,9 +2625,6 @@ TEST_CASE(
   CHECK(forceBalancerEntanglementSprings.getNrOfSprings() >
         forceBalancerEntanglementLinks.getNrOfSprings());
   CHECK(forceBalancerEntanglementLinks.getNrOfSprings() == 464);
-  CHECK(forceBalancerEntanglementLinks.getDefaultNrOfChains() == 464);
-  // CHECK(forceBalancerEntanglementSprings.getDefaultNrOfChains() ==
-  //       forceBalancerEntanglementLinks.getDefaultNrOfChains());
 
   // need to disable slipping to test entanglement links
   forceBalancerEntanglementSprings.runForceRelaxation(

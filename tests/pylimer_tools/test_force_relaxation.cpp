@@ -322,13 +322,11 @@ TEST_CASE(
               (sigmaToM * sigmaToM * sigmaToM) ==
             Catch::Approx(
               61308.0398526509)); // shear modulus from the pressure, MPa
-      double nrOfChainCorrection =
-        (forceRelaxer2.getDefaultNrOfChains() / nrOfChains);
       double expectedNb2 = slope * Nb * beadMass;
       double nb2Correction =
         (forceRelaxer2.getDefaultR0Square() / (expectedNb2));
-      double gammaCorrectionFactor = nrOfChainCorrection * nb2Correction;
-      CHECK(forceRelaxer2.getGammaFactor() * nrOfChainCorrection *
+      double gammaCorrectionFactor = nb2Correction;
+      CHECK(forceRelaxer2.getGammaFactor() *
               forceRelaxer2.getDefaultR0Square() ==
             Catch::Approx(
               42.6130241132)); // as from conversion-less Mathematica script
@@ -543,13 +541,11 @@ TEST_CASE(
               (sigmaToM * sigmaToM * sigmaToM * 79.) ==
             Catch::Approx(
               62085.0438157862)); // shear modulus from the pressure, MPa
-      double nrOfChainCorrection =
-        (forceRelaxer2.getDefaultNrOfChains() / nrOfChains);
       double expectedNb2 = slope * Nb * beadMass;
       double nb2Correction =
         (forceRelaxer2.getDefaultR0Square() / (expectedNb2));
-      double gammaCorrectionFactor = nrOfChainCorrection * nb2Correction;
-      CHECK(forceRelaxer2.getGammaFactor() * nrOfChainCorrection *
+      double gammaCorrectionFactor = nb2Correction;
+      CHECK(forceRelaxer2.getGammaFactor() *
               forceRelaxer2.getDefaultR0Square() ==
             Catch::Approx(42.6136781099));
       CHECK(forceRelaxer2.getGammaFactor() * gammaCorrectionFactor * kb * T *

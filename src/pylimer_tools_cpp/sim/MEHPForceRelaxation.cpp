@@ -491,7 +491,7 @@ namespace sim {
               this->forceRelaxationNetwork.springsContourLength.mean();
       }
       if (nrOfChains < 1) {
-        nrOfChains = this->defaultNrOfChains;
+        nrOfChains = this->currentSpringDistances.size() / 3;
       }
 
       return this->evaluateGammaFactor(
