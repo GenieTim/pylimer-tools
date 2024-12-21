@@ -36,7 +36,6 @@ MEHPForceBalance
       ~MEHPForceBalance.get_current_spring_vectors
       ~MEHPForceBalance.get_dangling_weight_fraction
       ~MEHPForceBalance.get_default_mean_bond_length
-      ~MEHPForceBalance.get_default_nr_of_chains
       ~MEHPForceBalance.get_displacement_residual_norm
       ~MEHPForceBalance.get_displacements
       ~MEHPForceBalance.get_effective_functionality_of_atoms
@@ -105,7 +104,6 @@ MEHPForceBalance
    .. automethod:: get_current_spring_vectors
    .. automethod:: get_dangling_weight_fraction
    .. automethod:: get_default_mean_bond_length
-   .. automethod:: get_default_nr_of_chains
    .. automethod:: get_displacement_residual_norm
    .. automethod:: get_displacements
    .. automethod:: get_effective_functionality_of_atoms
