@@ -18,6 +18,10 @@
 #include <unordered_set>
 #include <vector>
 
+#ifndef NDEBUG
+// #define LOUD_DEBUG
+#endif
+
 namespace pylimer_tools {
 namespace sim {
   namespace mehp {
@@ -632,9 +636,11 @@ namespace sim {
           }
         }
         if (!isActive) {
-          // remove this spring
-          // std::cout << "Removing inactive spring " << springIdx <<
-          // std::endl;
+// remove this spring
+#ifdef LOUD_DEBUG
+          std::cout << "Removing inactive spring " << springIdx
+                    << " with all dependencies" << std::endl;
+#endif
           this->removeSpringFollowingEntanglementLinks(
             net, displacements, springPartitions, springIdx);
 
@@ -651,8 +657,10 @@ namespace sim {
         assert(net.springIndicesOfLinks.size() > crosslinkIdx);
         if (net.springIndicesOfLinks[crosslinkIdx].size() == 0 // f = 0
         ) {
-          // std::cout << "Removing f = 0 x-link " << crosslinkIdx <<
-          // std::endl;
+#ifdef LOUD_DEBUG
+          std::cout << "Removing f = 0 x-link " << crosslinkIdx << std::endl;
+#endif
+
           this->removeLink(net, displacements, crosslinkIdx);
 #ifndef NDEBUG
           this->validateNetwork(net, displacements, springPartitions);
@@ -668,17 +676,22 @@ namespace sim {
               net.linkIndicesOfSprings[net.springIndicesOfLinks[crosslinkIdx]
                                                                [0]]) ==
               crosslinkIdx)) &&
-          net.oldAtomTypes[crosslinkIdx] != this->entanglementType) {
-          // std::cout << "Removing f = 1 x-link " << crosslinkIdx <<
-          // std::endl; need to first remove the spring
+          (net.oldAtomTypes[crosslinkIdx] != this->entanglementType)) {
+#ifdef LOUD_DEBUG
+          std::cout << "Removing f = 1 x-link " << crosslinkIdx << std::endl;
+#endif
           std::vector<size_t> entanglementLinksRemoved =
             this->getEntanglementLinkIndicesAlong(
               net, net.springIndicesOfLinks[crosslinkIdx][0]);
+          // need to first remove the spring
+          const long int previousId = net.oldAtomIds[crosslinkIdx];
           this->removeSpringFollowingEntanglementLinks(
             net,
             displacements,
             springPartitions,
             net.springIndicesOfLinks[crosslinkIdx][0]);
+          // this also removed some intermediate entanglement links
+          // -> crossLinkIdx is now at a different index
           size_t newCrosslinkIdx = crosslinkIdx;
           for (size_t linkIdx : entanglementLinksRemoved) {
             assert(linkIdx != crosslinkIdx);
@@ -686,8 +699,13 @@ namespace sim {
               newCrosslinkIdx -= 1;
             }
           }
+          assert(net.oldAtomIds[newCrosslinkIdx] == previousId);
           // to then remove the cross-link
           this->removeLink(net, displacements, newCrosslinkIdx);
+#ifdef LOUD_DEBUG
+          std::cout << "Effectively removed f = 1 x-link " << newCrosslinkIdx
+                    << std::endl;
+#endif
           crosslinkIdx = std::min<long int>(crosslinkIdx, net.nrOfNodes - 1);
           // => we should ever only have 2-functional entanglement links that
           // could be merged after this.
@@ -1314,7 +1332,9 @@ namespace sim {
                                         Eigen::VectorXd& springPartitions,
                                         const size_t springIdx) const
     {
-      // std::cout << "Starting to remove spring " << springIdx << std::endl;
+#ifdef LOUD_DEBUG
+      std::cout << "Starting to remove spring " << springIdx << std::endl;
+#endif
       INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
                          "Can only remove springs, not partial springs.");
       Eigen::VectorXd allTotalSpringDistancesBefore =
@@ -1567,10 +1587,14 @@ namespace sim {
         assert(net.springIndicesOfLinks[slipLinkIdx].empty());
 
         // then, actually remove the slip-link
-        // std::cout << "Removing link " << slipLinkIdx << std::endl;
+#ifdef LOUD_DEBUG
+        std::cout << "Removing slip-link " << slipLinkIdx << std::endl;
+#endif
         this->removeLink(net, displacements, slipLinkIdx);
       }
-      // std::cout << "Removed spring " << springIdx << std::endl;
+#ifdef LOUD_DEBUG
+      std::cout << "Removed spring " << springIdx << std::endl;
+#endif
 
       Eigen::VectorXd allTotalSpringDistancesAfter =
         this->evaluateSpringLengths(net, displacements, this->is2D);
@@ -1618,6 +1642,7 @@ namespace sim {
       std::sort(
         springsToRemove.begin(), springsToRemove.end(), std::greater<>());
       for (size_t springIdxToDelete : springsToRemove) {
+        assert(net.springsType[springIdxToDelete] != this->entanglementType);
         this->removeSpring(
           net, displacements, springPartitions, springIdxToDelete);
       }
@@ -1653,7 +1678,11 @@ namespace sim {
                                       const size_t linkIdx) const
     {
       INVALIDARG_EXP_IFN(net.springIndicesOfLinks[linkIdx].size() == 0,
-                         "Please remove the springs before removing the link.");
+                         "The springs have to be removed or re-linked before "
+                         "removing the link.");
+#ifdef LOUD_DEBUG
+      std::cout << "Removing link " << linkIdx << std::endl;
+#endif
 
       pylimer_tools::utils::removeRows(net.coordinates, linkIdx * 3, 3);
       pylimer_tools::utils::removeRows(displacements, linkIdx * 3, 3);
@@ -1775,6 +1804,12 @@ namespace sim {
           std::to_string(net.springPartIndexB[removedPartialSpringIdx]) +
           "in removed spring, instead of " + std::to_string(linkToReduce) +
           ".");
+#ifdef LOUD_DEBUG
+      std::cout << "Merging partial springs " << removedPartialSpringIdx
+                << " and " << keptPartialSpringIdx << " around " << linkToReduce
+                << std::endl;
+#endif
+
       Eigen::Vector3d distanceBefore =
         this->evaluatePartialSpringDistance(
           net, u, removedPartialSpringIdx, this->is2D, false) +
@@ -2697,17 +2732,21 @@ namespace sim {
                   std::min(springsToMerge[0], springsToMerge[1]));
               }
               this->removeLink(net, displacements, crosslinkIdx);
-              // std::cout << "f = 2 Entanglement bead found, removed link "
-              //           << crosslinkIdx << " after removing springs "
-              //           << springsToMerge[0] << " and " <<
-              //           springsToMerge[1]
-              //           << std::endl;
+
+#ifdef LOUD_DEBUG
+              std::cout << "f = 2 Entanglement bead found, removed link "
+                        << crosslinkIdx << " after removing springs "
+                        << springsToMerge[0] << " and " << springsToMerge[1]
+                        << std::endl;
+#endif
               numRemoved += 1;
               continue;
             } else {
-              // std::cout << "Entanglement bead found, but not connected to "
-              //              "other entanglement bead"
-              //           << std::endl;
+#ifdef LOUD_DEBUG
+              std::cout << "Entanglement bead found, but not connected to "
+                           "other entanglement bead"
+                        << std::endl;
+#endif
             }
           }
 
@@ -2726,6 +2765,7 @@ namespace sim {
             // std::cout << "Merging springs " << springsToMerge[0] << " and "
             //           << springsToMerge[1] << " around " << crosslinkIdx
             //           << std::endl;
+
             // let's remove this
             // TODO: this is inefficient shit, so much data being moved
             this->mergeSprings(net,
@@ -2739,8 +2779,7 @@ namespace sim {
             // std::cout << "Removing link " << crosslinkIdx << std::endl;
             this->removeLink(net, displacements, crosslinkIdx);
 
-            // std::cout << "Removed cross-link " << crosslinkIdx <<
-            // std::endl;
+            // std::cout << "Removed cross-link " << crosslinkIdx << std::endl;
 
 #ifndef NDEBUG
             this->validateNetwork(net, displacements, springPartitions);
@@ -2757,16 +2796,16 @@ namespace sim {
     }
 
     /**
-     * @brief Updates the partition/parametrisation of a spring around one
+     * @brief Updates the partition/parametrization of a spring around one
      * link
      *
      */
     double MEHPForceBalance::updateSpringPartition(
       const ForceBalanceNetwork& net,
       const Eigen::VectorXd& u,
-      Eigen::VectorXd& springPartitions, /* gives the parametrisation of N */
+      Eigen::VectorXd& springPartitions, /* gives the parametrization of N */
       Eigen::VectorXd&
-        oneOverSpringPartitions, /* gives the parametrisation of N */
+        oneOverSpringPartitions, /* gives the parametrization of N */
       const size_t linkIdx,
       double oneOverSpringPartitionUpperLimit,
       bool allowSlipLinksToPassEachOther) const
@@ -5415,9 +5454,6 @@ namespace sim {
       if (b02 < 0) {
         b02 = this->defaultBondLength * this->defaultBondLength;
       }
-      if (nrOfChains < 1) {
-        nrOfChains = this->defaultNrOfChains;
-      }
 
       Eigen::VectorXd oneOverSpringPart =
         this->assembleOneOverSpringPartition(this->initialConfig,
@@ -5426,6 +5462,9 @@ namespace sim {
         (1. / b02); // compute the vector of
       Eigen::VectorXd partialSpringVectors = this->evaluatePartialSpringVectors(
         this->initialConfig, this->currentDisplacements);
+      if (nrOfChains < 1) {
+        nrOfChains = partialSpringVectors.size() / 3;
+      }
 
       return ((oneOverSpringPart.array() * partialSpringVectors.array())
                 .matrix()
@@ -5447,14 +5486,15 @@ namespace sim {
       if (b02 < 0) {
         b02 = this->defaultBondLength * this->defaultBondLength;
       }
-      if (nrOfChains < 1) {
-        nrOfChains = this->defaultNrOfChains;
-      }
 
       Eigen::VectorXd springVectors = this->evaluateSpringVectors(
         this->initialConfig, this->currentDisplacements);
 
-      double commonDenominator = 1. / (b02 * nrOfChains);
+      if (nrOfChains < 1) {
+        nrOfChains = springVectors.size() / 3;
+      }
+
+      double commonDenominator = 1. / (b02 * static_cast<double>(nrOfChains));
       double result = 0.;
 
       for (size_t i = 0; i < this->initialConfig.nrOfSprings; ++i) {

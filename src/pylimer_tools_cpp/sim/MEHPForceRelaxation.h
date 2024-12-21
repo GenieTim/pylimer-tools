@@ -148,8 +148,6 @@ namespace sim {
        */
       pylimer_tools::entities::Universe getCrosslinkerVerse() const;
 
-      int getDefaultNrOfChains() const { return this->defaultNrOfChains; }
-
       double getDefaultR0Square() const { return this->defaultR0Squared; }
 
       double getVolume() override { return this->forceRelaxationNetwork.vol; }
