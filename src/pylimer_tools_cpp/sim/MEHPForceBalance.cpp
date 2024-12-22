@@ -19,7 +19,7 @@
 #include <vector>
 
 #ifndef NDEBUG
-// #define LOUD_DEBUG
+// #define DEBUG_REMOVAL
 #endif
 
 namespace pylimer_tools {
@@ -250,8 +250,9 @@ namespace sim {
             if (simplificationMode ==
                   StructureSimplificationMode::INACTIVE_ONLY ||
                 simplificationMode == StructureSimplificationMode::ALL_TIM) {
-              // std::cout << "Removing inactive crosslinkers" << std::endl;
-              // default tolerance: 0.25*atom's cube length
+#ifdef DEBUG_REMOVAL
+              std::cout << "Removing inactive crosslinkers" << std::endl;
+#endif
               nRemoved +=
                 this->removeInactiveCrosslinks(this->initialConfig,
                                                this->currentDisplacements,
@@ -264,7 +265,9 @@ namespace sim {
             }
             if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
                 simplificationMode == StructureSimplificationMode::ALL_TIM) {
-              // std::cout << "Removing 2-f crosslinkers" << std::endl;
+#ifdef DEBUG_REMOVAL
+              std::cout << "Removing 2-f crosslinkers" << std::endl;
+#endif
               nRemoved += this->removeTwofunctionalCrosslinks(
                 this->initialConfig,
                 this->currentDisplacements,
@@ -275,8 +278,10 @@ namespace sim {
                   : 0.;
             }
             if (simplificationMode == StructureSimplificationMode::ALL_ANDREI) {
-              // std::cout << "Removing crosslinkers and springs, Andrei's way"
-              //           << std::endl;
+#ifdef DEBUG_REMOVAL
+              std::cout << "Removing crosslinkers and springs, Andrei's way"
+                        << std::endl;
+#endif
               nRemoved +=
                 this->doRemovalAndreisWay(this->initialConfig,
                                           this->currentDisplacements,
@@ -286,7 +291,6 @@ namespace sim {
             // cleanup some things
             if (simplificationMode !=
                 StructureSimplificationMode::NO_SIMPLIFICATION) {
-              this->cleanupPrimaryLoopsInStructure(this->initialConfig);
               this->validateNetwork(this->initialConfig,
                                     this->currentDisplacements,
                                     this->currentSpringPartitionsVec);
@@ -559,22 +563,66 @@ namespace sim {
     }
 
     /**
-     * @brief Remove double listed springs from crosslinkers
+     * @brief Remove double listed springs from cross-linkers
      *
      * @param net
      */
-    void MEHPForceBalance::cleanupPrimaryLoopsInStructure(
-      ForceBalanceNetwork& net)
+    void MEHPForceBalance::removeDuplicateListedSpringsFromLinks(
+      ForceBalanceNetwork& net) const
     {
       for (size_t linkIdx = 0; linkIdx < net.nrOfLinks; ++linkIdx) {
-        // remove duplicate mentions of the same spring index
-        std::sort(net.springIndicesOfLinks[linkIdx].begin(),
-                  net.springIndicesOfLinks[linkIdx].end());
-        auto last = std::unique(net.springIndicesOfLinks[linkIdx].begin(),
-                                net.springIndicesOfLinks[linkIdx].end());
+        this->removeDuplicateListedSpringsFromLink(net, linkIdx);
+      }
+
+#ifndef NDEBUG
+      this->validateNetwork();
+#endif
+    }
+
+    void MEHPForceBalance::removeDuplicateListedSpringsFromLink(
+      ForceBalanceNetwork& net,
+      size_t linkIdx,
+      bool allowOnEntanglement) const
+    {
+      // remove duplicate mentions of the same spring index
+      std::sort(net.springIndicesOfLinks[linkIdx].begin(),
+                net.springIndicesOfLinks[linkIdx].end());
+      auto last = std::unique(net.springIndicesOfLinks[linkIdx].begin(),
+                              net.springIndicesOfLinks[linkIdx].end());
+      if (last != net.springIndicesOfLinks[linkIdx].end()) {
+#ifdef DEBUG_REMOVAL
+        std::cout << "Removed duplicate spring indices from link " << linkIdx
+                  << std::endl;
+#endif
+        RUNTIME_EXP_IFN(
+          net.oldAtomIds[linkIdx] != this->entanglementType ||
+            allowOnEntanglement,
+          "Require entanglement beads to not form primary loops.");
         net.springIndicesOfLinks[linkIdx].erase(
           last, net.springIndicesOfLinks[linkIdx].end());
       }
+    }
+
+    size_t MEHPForceBalance::removePrimaryLoops(
+      ForceBalanceNetwork& net,
+      Eigen::VectorXd& displacements,
+      Eigen::VectorXd& springPartitions) const
+    {
+      size_t numRemoved = 0;
+      for (long int springIdx = net.nrOfSprings - 1; springIdx >= 0;
+           --springIdx) {
+        if (net.springIndexA[springIdx] == net.springIndexB[springIdx] &&
+            net.localToGlobalSpringIndex[springIdx].size() == 1 &&
+            net.springsType[springIdx] != this->entanglementType) {
+          this->removeSpringFollowingEntanglementLinks(
+            net, displacements, springPartitions, springIdx);
+          springIdx = std::min<long int>(springIdx, net.nrOfSprings - 1);
+        }
+      }
+
+#ifndef NDEBUG
+      this->validateNetwork();
+#endif
     }
 
     /**
@@ -593,6 +641,7 @@ namespace sim {
       double tolerance) const
     {
       size_t numRemoved = 0;
+      //        this->removePrimaryLoops(net, displacements, springPartitions);
       // this->validateNetwork(net, displacements, springPartitions);
       // first, we remove all inactive springs
       for (long int springIdx = net.nrOfSprings - 1; springIdx >= 0;
@@ -637,7 +686,7 @@ namespace sim {
         }
         if (!isActive) {
 // remove this spring
-#ifdef LOUD_DEBUG
+#ifdef DEBUG_REMOVAL
           std::cout << "Removing inactive spring " << springIdx
                     << " with all dependencies" << std::endl;
 #endif
@@ -657,7 +706,7 @@ namespace sim {
         assert(net.springIndicesOfLinks.size() > crosslinkIdx);
         if (net.springIndicesOfLinks[crosslinkIdx].size() == 0 // f = 0
         ) {
-#ifdef LOUD_DEBUG
+#ifdef DEBUG_REMOVAL
           std::cout << "Removing f = 0 x-link " << crosslinkIdx << std::endl;
 #endif
 
@@ -675,9 +724,9 @@ namespace sim {
             pylimer_tools::utils::last(
               net.linkIndicesOfSprings[net.springIndicesOfLinks[crosslinkIdx]
                                                                [0]]) ==
-              crosslinkIdx)) &&
-          (net.oldAtomTypes[crosslinkIdx] != this->entanglementType)) {
-#ifdef LOUD_DEBUG
+              crosslinkIdx))) {
+          assert(net.oldAtomTypes[crosslinkIdx] != this->entanglementType);
+#ifdef DEBUG_REMOVAL
           std::cout << "Removing f = 1 x-link " << crosslinkIdx << std::endl;
 #endif
           std::vector<size_t> entanglementLinksRemoved =
@@ -700,9 +749,11 @@ namespace sim {
             }
           }
           assert(net.oldAtomIds[newCrosslinkIdx] == previousId);
+          assert(net.oldAtomTypes[newCrosslinkIdx] != this->entanglementType);
+          assert(net.springIndicesOfLinks[newCrosslinkIdx].size() == 0);
           // to then remove the cross-link
           this->removeLink(net, displacements, newCrosslinkIdx);
-#ifdef LOUD_DEBUG
+#ifdef DEBUG_REMOVAL
           std::cout << "Effectively removed f = 1 x-link " << newCrosslinkIdx
                     << std::endl;
 #endif
@@ -1332,7 +1383,7 @@ namespace sim {
                                         Eigen::VectorXd& springPartitions,
                                         const size_t springIdx) const
     {
-#ifdef LOUD_DEBUG
+#ifdef DEBUG_REMOVAL
       std::cout << "Starting to remove spring " << springIdx << std::endl;
 #endif
       INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
@@ -1587,12 +1638,12 @@ namespace sim {
         assert(net.springIndicesOfLinks[slipLinkIdx].empty());
 
         // then, actually remove the slip-link
-#ifdef LOUD_DEBUG
+#ifdef DEBUG_REMOVAL
         std::cout << "Removing slip-link " << slipLinkIdx << std::endl;
 #endif
         this->removeLink(net, displacements, slipLinkIdx);
       }
-#ifdef LOUD_DEBUG
+#ifdef DEBUG_REMOVAL
       std::cout << "Removed spring " << springIdx << std::endl;
 #endif
 
@@ -1654,6 +1705,11 @@ namespace sim {
           assert(
             net.springsType[net.springIndicesOfLinks[linkIdxToDelete][0]] ==
             this->entanglementType);
+#ifdef DEBUG_REMOVAL
+          std::cout << "Removing additional spring between entanglement links "
+                    << net.springIndicesOfLinks[linkIdxToDelete][0]
+                    << std::endl;
+#endif
 
           this->removeSpring(net,
                              displacements,
@@ -1680,7 +1736,7 @@ namespace sim {
       INVALIDARG_EXP_IFN(net.springIndicesOfLinks[linkIdx].size() == 0,
                          "The springs have to be removed or re-linked before "
                          "removing the link.");
-#ifdef LOUD_DEBUG
+#ifdef DEBUG_REMOVAL
       std::cout << "Removing link " << linkIdx << std::endl;
 #endif
 
@@ -1804,7 +1860,7 @@ namespace sim {
           std::to_string(net.springPartIndexB[removedPartialSpringIdx]) +
           "in removed spring, instead of " + std::to_string(linkToReduce) +
           ".");
-#ifdef LOUD_DEBUG
+#ifdef DEBUG_REMOVAL
       std::cout << "Merging partial springs " << removedPartialSpringIdx
                 << " and " << keptPartialSpringIdx << " around " << linkToReduce
                 << std::endl;
@@ -1888,6 +1944,7 @@ namespace sim {
           found += 1;
         }
       }
+      this->removeDuplicateListedSpringsFromLink(net, linkToReduce);
       assert(found >= 1 && removed == 1);
       found = 0;
       for (int j = net.localToGlobalSpringIndex[fullSpringIdx].size() - 1;
@@ -1990,6 +2047,20 @@ namespace sim {
       INVALIDARG_EXP_IFN(net.springsType[removedSpringIdx] !=
                            this->entanglementType,
                          "Should not merge entanglement springs.");
+#ifndef NDEBUG
+      if (net.oldAtomTypes[linkToReduce] != this->entanglementType) {
+        std::vector<size_t> fullSprings1 =
+          this->getAllFullSpringIndicesAlong(net, removedSpringIdx);
+        std::vector<size_t> fullSprings2 =
+          this->getAllFullSpringIndicesAlong(net, keptSpringIdx);
+        std::sort(fullSprings1.begin(), fullSprings1.end());
+        std::sort(fullSprings2.begin(), fullSprings2.end());
+        INVALIDARG_EXP_IFN(
+          !pylimer_tools::utils::equal(fullSprings1, fullSprings2),
+          "Cannot merge such that a primary loop made of "
+          "entanglements results.");
+      }
+#endif
 
       size_t fullSpringIdx = net.partialToFullSpringIndex[keptSpringIdx];
       // handle links
@@ -2202,6 +2273,8 @@ namespace sim {
             net.springIndicesOfLinks[linkOfRemovedSpring][i] = keptSpringIdx;
           }
         }
+        this->removeDuplicateListedSpringsFromLink(
+          net, linkOfRemovedSpring, linkOfRemovedSpring == linkToReduce);
       }
 
       for (int i = net.springIndicesOfLinks[linkToReduce].size() - 1; i >= 0;
@@ -2212,6 +2285,8 @@ namespace sim {
             net.springIndicesOfLinks[linkToReduce].begin() + i);
         }
       }
+      this->removeDuplicateListedSpringsFromLink(net, linkToReduce);
+
       net.linkIndicesOfSprings.erase(net.linkIndicesOfSprings.begin() +
                                      removedSpringIdx);
       // partial springs
@@ -2303,7 +2378,8 @@ namespace sim {
       for (size_t i = 0; i < net.springIndicesOfLinks.size(); ++i) {
         for (size_t j = 0; j < net.springIndicesOfLinks[i].size(); ++j) {
           RUNTIME_EXP_IFN(net.springIndicesOfLinks[i][j] != removedSpringIdx,
-                          "");
+                          "Removed spring found in spring indices of link " +
+                            std::to_string(i) + ". Must not happen.");
           if (net.springIndicesOfLinks[i][j] > removedSpringIdx) {
             net.springIndicesOfLinks[i][j] -= 1;
           }
@@ -2698,58 +2774,34 @@ namespace sim {
         if (net.springIndicesOfLinks[crosslinkIdx].size() == 2) {
           std::vector<size_t> springsToMerge =
             net.springIndicesOfLinks[crosslinkIdx];
-          assert(springsToMerge.size() == 2);
 
           // special case: this is an entanglement bead
           if (net.oldAtomTypes[crosslinkIdx] == this->entanglementType) {
-            // this happens if either of the three springs was inactive and
-            // has been removed. If it's the entanglement spring that has been
-            // removed, we don't care and proceed with the merge as for other
-            // twofunctional cross-links. However, if that's not the case, we
-            // should remove this entanglement link as well as the two springs
-            // The check for the contour length is to prevent issues that
-            // exist when there are multiple entanglements on the same strand.
-            if ((net.oldAtomTypes[this->getOtherEnd(
-                   net, springsToMerge[0], crosslinkIdx)] ==
-                   this->entanglementType &&
-                 net.springsType[springsToMerge[0]] ==
-                   this->entanglementType) ||
-                (net.oldAtomTypes[this->getOtherEnd(
-                   net, springsToMerge[1], crosslinkIdx)] ==
-                   this->entanglementType &&
-                 net.springsType[springsToMerge[1]] ==
-                   this->entanglementType)) {
-              this->removeSpring(
-                net,
-                displacements,
-                springPartitions,
-                std::max(springsToMerge[0], springsToMerge[1]));
-              if (springsToMerge[0] != springsToMerge[1]) {
-                this->removeSpring(
-                  net,
-                  displacements,
-                  springPartitions,
-                  std::min(springsToMerge[0], springsToMerge[1]));
-              }
-              this->removeLink(net, displacements, crosslinkIdx);
+            RUNTIME_EXP_IFN(
+              net.springsType[springsToMerge[0]] != this->entanglementType &&
+                net.springsType[springsToMerge[1]] != this->entanglementType,
+              "Got two-functional entanglement bead, expect it to be unlinked "
+              "from its other entanglement bead.");
+          } else {
+            // two checks for two types of primary loops for the two types of
+            // entanglements we could have this is the first
+            std::vector<size_t> entanglementsAlong1 =
+              this->getEntanglementLinkIndicesAlong(net, springsToMerge[0]);
+            std::vector<size_t> entanglementsAlong2 =
+              this->getEntanglementLinkIndicesAlong(net, springsToMerge[1]);
 
-#ifdef LOUD_DEBUG
-              std::cout << "f = 2 Entanglement bead found, removed link "
-                        << crosslinkIdx << " after removing springs "
-                        << springsToMerge[0] << " and " << springsToMerge[1]
-                        << std::endl;
-#endif
-              numRemoved += 1;
+            std::sort(entanglementsAlong1.begin(), entanglementsAlong1.end());
+            std::sort(entanglementsAlong2.begin(), entanglementsAlong2.end());
+            // if equal, we don't merge, as that would result in a primary loop
+            // with only entanglements
+            if (entanglementsAlong1 == entanglementsAlong2) {
               continue;
-            } else {
-#ifdef LOUD_DEBUG
-              std::cout << "Entanglement bead found, but not connected to "
-                           "other entanglement bead"
-                        << std::endl;
-#endif
             }
           }
 
+          assert(springsToMerge.size() == 2);
+
+          // second primary loop check for slip-link entanglements
           // check that it's not a primary loop in any way:
           if (springsToMerge[0] != springsToMerge[1] &&
               (XOR(net.linkIndicesOfSprings[springsToMerge[0]][0] ==
@@ -2762,9 +2814,11 @@ namespace sim {
                    pylimer_tools::utils::last(
                      net.linkIndicesOfSprings[springsToMerge[1]]) ==
                      crosslinkIdx))) {
-            // std::cout << "Merging springs " << springsToMerge[0] << " and "
-            //           << springsToMerge[1] << " around " << crosslinkIdx
-            //           << std::endl;
+#ifdef DEBUG_REMOVAL
+            std::cout << "Merging springs " << springsToMerge[0] << " and "
+                      << springsToMerge[1] << " around " << crosslinkIdx
+                      << std::endl;
+#endif
 
             // let's remove this
             // TODO: this is inefficient shit, so much data being moved
@@ -5922,6 +5976,16 @@ namespace sim {
           "Expected slip-links to come sequentially after crosslinkers.");
         std::vector<size_t> thisLinksSprings =
           net.springIndicesOfLinks[link_idx];
+        std::sort(thisLinksSprings.begin(), thisLinksSprings.end());
+        auto last =
+          std::unique(thisLinksSprings.begin(), thisLinksSprings.end());
+        RUNTIME_EXP_IFN(last == thisLinksSprings.end(),
+                        "Expect each link to only have one back-link to the "
+                        "springs, found back-links " +
+                          pylimer_tools::utils::join(thisLinksSprings.begin(),
+                                                     thisLinksSprings.end(),
+                                                     std::string("_")) +
+                          " for link " + std::to_string(link_idx) + ".");
         for (size_t spring_idx : thisLinksSprings) {
           std::vector<size_t> thisSpringsLinks =
             net.linkIndicesOfSprings[spring_idx];
@@ -6205,6 +6269,9 @@ namespace sim {
                 std::to_string(net.springIndicesOfLinks[linkIdx].size()) +
                 " for link " + std::to_string(linkIdx) + " (originally " +
                 std::to_string(net.oldAtomIds[linkIdx]) + ").");
+            RUNTIME_EXP_IFN(nShortEntanglementPartners == 0,
+                            "2-functional entanglement atoms are only allowed "
+                            "if the entanglement springs has been removed.")
           }
         }
       }
