@@ -249,8 +249,8 @@ namespace sim {
                                        fb.crossLinkerType);
           fb.initialConfig.linkIndicesOfSprings[springIdx].push_back(
             previousLinkIdx);
-          fb.initialConfig.springIndicesOfLinks[previousLinkIdx].push_back(
-            springIdx);
+          pylimer_tools::utils::addIfNotContained(
+            fb.initialConfig.springIndicesOfLinks[previousLinkIdx], springIdx);
           pylimer_tools::entities::Atom lastAtom =
             pylimer_tools::utils::last(linedUpAtoms);
           size_t lastLinkIdx =
@@ -268,7 +268,8 @@ namespace sim {
                 size_t thisLinkIdx = currentVertexId + pairIdx;
                 fb.initialConfig.linkIndicesOfSprings[springIdx].push_back(
                   thisLinkIdx);
-                fb.initialConfig.springIndicesOfLinks[thisLinkIdx].push_back(
+                pylimer_tools::utils::addIfNotContained(
+                  fb.initialConfig.springIndicesOfLinks[thisLinkIdx],
                   springIdx);
                 // set the mean x,y,z of the two involved atoms
                 pylimer_tools::entities::Atom a1 =
@@ -311,8 +312,8 @@ namespace sim {
             fb.initialConfig, partialSpringIdx, previousLinkIdx, lastLinkIdx);
           fb.initialConfig.linkIndicesOfSprings[springIdx].push_back(
             lastLinkIdx);
-          fb.initialConfig.springIndicesOfLinks[lastLinkIdx].push_back(
-            springIdx);
+          pylimer_tools::utils::addIfNotContained(
+            fb.initialConfig.springIndicesOfLinks[lastLinkIdx], springIdx);
           fb.setPartialSpringPropertiesBasedOnChain(
             fb.initialConfig,
             fb.currentSpringPartitionsVec,
@@ -596,7 +597,16 @@ namespace sim {
        *
        * @param net
        */
-      void cleanupPrimaryLoopsInStructure(ForceBalanceNetwork& net);
+      void removeDuplicateListedSpringsFromLinks(
+        ForceBalanceNetwork& net) const;
+
+      void removeDuplicateListedSpringsFromLink(ForceBalanceNetwork& net,
+                                                size_t linkIdx,
+                                                bool allowOnEntanglement = false) const;
+
+      size_t removePrimaryLoops(ForceBalanceNetwork& net,
+                                Eigen::VectorXd& displacements,
+                                Eigen::VectorXd& springPartitions) const;
 
       /**
        * @brief Remove a spring (and all its parts, incl. slip-links) from the
@@ -2588,10 +2598,10 @@ namespace sim {
       {
         INVALIDARG_EXP_IFN(springIdx < net.nrOfSprings,
                            "Spring index out of range.");
-        if (net.springIndexB[springIdx] == net.springIndexA[springIdx]) {
+        if (net.springIndexA[springIdx] == net.springIndexB[springIdx]) {
           // "primary loop" e.g. if entanglement is with the same strand
           // cannot use ignore in this case
-          return net.oldAtomTypes[net.springIndexB[springIdx]] ==
+          return net.oldAtomTypes[net.springIndexA[springIdx]] ==
                  this->entanglementType;
         }
         return (net.oldAtomTypes[net.springIndexA[springIdx]] ==
@@ -2705,10 +2715,19 @@ namespace sim {
           RUNTIME_EXP_IFN(nextSpringIdx != currentSpringIdx,
                           "Did not find continuation spring.");
           RUNTIME_EXP_IFN(nextSpringIdx >= 0, "Spring index not found.");
+          assert(net.springsType[nextSpringIdx] != this->entanglementType);
           currentSpringIdx = nextSpringIdx;
           result.push_back(currentSpringIdx);
           previousEntanglementLinkIdx = entanglementLinkIdx;
         }
+        assert((net.oldAtomTypes[net.springIndexA[result[0]]] !=
+                  this->entanglementType ||
+                net.oldAtomTypes[net.springIndexB[result[0]]] !=
+                  this->entanglementType) &&
+               (net.oldAtomTypes[net.springIndexA[result.back()]] !=
+                  this->entanglementType ||
+                net.oldAtomTypes[net.springIndexB[result.back()]] !=
+                  this->entanglementType));
         return result;
       }
 
