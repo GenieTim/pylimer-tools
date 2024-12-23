@@ -957,7 +957,7 @@ TEST_CASE(
     CHECK(numRemoved > 0);
 
     // run a while to get inactive links
-    forceBalancer.runForceRelaxation(100);
+    forceBalancer.runForceRelaxation(250);
     net = forceBalancer.getNetwork();
     displacements = forceBalancer.getCurrentDisplacements();
     partitions = forceBalancer.getSpringPartitions();
