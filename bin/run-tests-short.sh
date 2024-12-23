@@ -22,8 +22,15 @@ fi
 
 echo "======== Starting tests ========"
 MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp time ./pylimer_tests --skip-benchmarks --durations yes "~[long]" &> short-tests-output.txt
+echo "======== Tests output ========"
+cat short-tests-output.txt
+echo "======== /Tests output ========"
+if grep -q "FAILED:" short-tests-output.txt; then
+  echo "!!!!! TESTS FAILED !!!!!"
+  exit 5
+fi
 echo "===== Starting header tests ====="
-MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp time ./header_tests --skip-benchmarks --durations yes "~[long]" >> short-tests-output.txt 2>&1
+MallocNanoZone=0 ASAN_OPTIONS=detect_leaks=1:detect_container_overflow=0:strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1 LSAN_OPTIONS=suppressions=$ROOT_DIR/tests/lsan.supp time ./header_tests --skip-benchmarks --durations yes "~[long]" &> short-tests-output.txt
 # exit if short-tests-output.txt contains the phrase "FAILED:"
 echo "======== Tests output ========"
 cat short-tests-output.txt

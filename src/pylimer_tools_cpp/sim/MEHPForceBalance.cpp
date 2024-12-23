@@ -595,7 +595,8 @@ namespace sim {
                   << std::endl;
 #endif
         RUNTIME_EXP_IFN(
-          net.oldAtomIds[linkIdx] != this->entanglementType ||
+          linkIdx > net.nrOfNodes ||
+            (net.oldAtomTypes[linkIdx] != this->entanglementType) ||
             allowOnEntanglement,
           "Require entanglement beads to not form primary loops.");
         net.springIndicesOfLinks[linkIdx].erase(
@@ -2056,7 +2057,7 @@ namespace sim {
         std::sort(fullSprings1.begin(), fullSprings1.end());
         std::sort(fullSprings2.begin(), fullSprings2.end());
         INVALIDARG_EXP_IFN(
-          !pylimer_tools::utils::equal(fullSprings1, fullSprings2),
+          !(pylimer_tools::utils::equal(fullSprings1, fullSprings2)),
           "Cannot merge such that a primary loop made of "
           "entanglements results.");
       }
@@ -2794,7 +2795,8 @@ namespace sim {
             std::sort(entanglementsAlong2.begin(), entanglementsAlong2.end());
             // if equal, we don't merge, as that would result in a primary loop
             // with only entanglements
-            if (entanglementsAlong1 == entanglementsAlong2) {
+            if (entanglementsAlong1 == entanglementsAlong2 &&
+                entanglementsAlong1.size() > 0) {
               continue;
             }
           }

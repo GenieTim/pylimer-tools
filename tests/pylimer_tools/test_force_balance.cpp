@@ -808,6 +808,7 @@ TEST_CASE(
     pcm::ForceBalanceNetwork net = forceBalancer.getNetwork();
     Eigen::VectorXd displacements = forceBalancer.getCurrentDisplacements();
     Eigen::VectorXd partitions = forceBalancer.getSpringPartitions();
+    CHECK(net.nrOfSprings > 0);
     size_t numRemoved = forceBalancer.removeTwofunctionalCrosslinks(
       net, displacements, partitions);
     CHECK_NOTHROW(
