@@ -19,7 +19,7 @@
 #include <vector>
 
 #ifndef NDEBUG
-// #define DEBUG_REMOVAL
+#define DEBUG_REMOVAL
 #endif
 
 namespace pylimer_tools {
@@ -712,6 +712,7 @@ namespace sim {
 #endif
 
           this->removeLink(net, displacements, crosslinkIdx);
+          numRemoved += 1;
 #ifndef NDEBUG
           this->validateNetwork(net, displacements, springPartitions);
 #endif
@@ -752,6 +753,7 @@ namespace sim {
           assert(net.oldAtomIds[newCrosslinkIdx] == previousId);
           assert(net.oldAtomTypes[newCrosslinkIdx] != this->entanglementType);
           assert(net.springIndicesOfLinks[newCrosslinkIdx].size() == 0);
+          numRemoved += 1;
           // to then remove the cross-link
           this->removeLink(net, displacements, newCrosslinkIdx);
 #ifdef DEBUG_REMOVAL
