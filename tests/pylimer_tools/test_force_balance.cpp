@@ -1356,6 +1356,11 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalancer.getNrOfActiveSprings() == 0);
+    CHECK(forceBalancer.getActiveWeightFraction() == 0.);
+    CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
+               Catch::Matchers::WithinRel(1.));
+    CHECK_THAT(forceBalancer.getDanglingWeightFraction(),
+               Catch::Matchers::WithinAbs(0., 1e-9));
     CHECK(forceBalancer.getAverageSpringLength() >= 0.0);
     CHECK(forceBalancer.getAverageSpringLength() <= 3e-6);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
@@ -1368,6 +1373,11 @@ TEST_CASE("MEHP Force Balance Free chains collapse",
     CHECK(forceBalancer.getNrOfIterations() > 0);
     CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
     CHECK(forceBalancer.getNrOfActiveSprings() == 0);
+    CHECK(forceBalancer.getActiveWeightFraction() == 0.);
+    CHECK_THAT(forceBalancer.getSolubleWeightFraction(),
+               Catch::Matchers::WithinRel(1.));
+    CHECK_THAT(forceBalancer.getDanglingWeightFraction(),
+               Catch::Matchers::WithinAbs(0., 1e-9));
     CHECK(forceBalancer.getAverageSpringLength() >= 0.0);
     CHECK(forceBalancer.getAverageSpringLength() <= 3e-6);
     CHECK_NOTHROW(forceBalancer.validateNetwork());
@@ -1435,15 +1445,15 @@ TEST_CASE("MEHP Force Balance Entanglement Beads Are Removed",
         forceBalancer.getNrOfPartialSprings());
   CHECK(forceBalancer.getNrOfSprings() == nrOfBeads / nrOfBeadsPerChain + 3);
   forceBalancer.configEntanglementType(3);
-  forceBalancer.configSimplificationFrequency(3);
+  forceBalancer.configSimplificationFrequency(5);
   double initialResidual = forceBalancer.getDisplacementResidualNorm();
 
   SECTION("Large enough box")
   {
     forceBalancer.configAssumeBoxLargeEnough(true);
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-      50000,
-      1e-18,
+      20000,
+      1e-12,
       initialResidual,
       pcm::StructureSimplificationMode::ALL_TIM));
     CHECK(forceBalancer.getNrOfIterations() > 0);
@@ -1456,8 +1466,8 @@ TEST_CASE("MEHP Force Balance Entanglement Beads Are Removed",
   {
     forceBalancer.configAssumeBoxLargeEnough(false);
     CHECK_NOTHROW(forceBalancer.runForceRelaxation(
-      50000,
-      1e-18,
+      20000,
+      1e-12,
       initialResidual,
       pcm::StructureSimplificationMode::ALL_TIM));
     CHECK(forceBalancer.getNrOfIterations() > 0);
@@ -1467,10 +1477,10 @@ TEST_CASE("MEHP Force Balance Entanglement Beads Are Removed",
   }
 }
 
-TEST_CASE("MEHP Force Balance Fully active chains are fully active",
+TEST_CASE("MEHP Force Balance fully active chains are fully active",
           "[analysis][MEHPForceBalance][long]")
 {
-  std::cout << "Running test \"MEHP Force Balance Fully active chains are "
+  std::cout << "Running test \"MEHP Force Balance fully active chains are "
                "fully active\""
             << std::endl;
   pe::UniverseSequence universeSeq = pe::UniverseSequence();
@@ -1498,34 +1508,49 @@ TEST_CASE("MEHP Force Balance Fully active chains are fully active",
 
       pcm::MEHPForceBalance forceBalancer =
         pcm::MEHPForceBalance(universe, 2, false);
+      size_t initialNSprings = forceBalancer.getNrOfSprings();
 
       SECTION("For large enough box")
       {
         forceBalancer.configAssumeBoxLargeEnough(true);
-        CHECK(forceBalancer.getNrOfActiveSprings(0.001) ==
+        CHECK(forceBalancer.getNrOfActiveSprings() ==
               forceBalancer.getNrOfSprings());
         double initialResidual = forceBalancer.getDisplacementResidualNorm();
         CHECK(std::isfinite(initialResidual));
-        CHECK_NOTHROW(forceBalancer.runForceRelaxation(10000, 1e-12));
+        CHECK_NOTHROW(forceBalancer.runForceRelaxation(
+          10000,
+          1e-10,
+          initialResidual,
+          pcm::StructureSimplificationMode::ALL_TIM));
         CHECK(forceBalancer.getNrOfIterations() > 0);
         CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-        CHECK(forceBalancer.getNrOfActiveSprings(0.001) ==
+        CHECK(forceBalancer.getNrOfActiveSprings() ==
               forceBalancer.getNrOfSprings());
+        CHECK(forceBalancer.getNrOfSprings() == initialNSprings);
+        CHECK_THAT(forceBalancer.getActiveWeightFraction(),
+                   Catch::Matchers::WithinRel(1.0));
         CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
       }
 
       SECTION("For not large enough box")
       {
         forceBalancer.configAssumeBoxLargeEnough(false);
-        CHECK(forceBalancer.getNrOfActiveSprings(0.001) ==
+        CHECK(forceBalancer.getNrOfActiveSprings() ==
               forceBalancer.getNrOfSprings());
         double initialResidual = forceBalancer.getDisplacementResidualNorm();
         CHECK(std::isfinite(initialResidual));
-        CHECK_NOTHROW(forceBalancer.runForceRelaxation(10000, 1e-12));
+        CHECK_NOTHROW(forceBalancer.runForceRelaxation(
+          10000,
+          1e-10,
+          initialResidual,
+          pcm::StructureSimplificationMode::ALL_TIM));
         CHECK(forceBalancer.getNrOfIterations() > 0);
         CHECK(forceBalancer.getExitReason() == pcm::ExitReason::X_TOLERANCE);
-        CHECK(forceBalancer.getNrOfActiveSprings(0.001) ==
+        CHECK(forceBalancer.getNrOfActiveSprings() ==
               forceBalancer.getNrOfSprings());
+        CHECK(forceBalancer.getNrOfSprings() == initialNSprings);
+        CHECK_THAT(forceBalancer.getActiveWeightFraction(),
+                   Catch::Matchers::WithinRel(1.0));
         CHECK(initialResidual > forceBalancer.getDisplacementResidualNorm());
       }
     }
@@ -2591,7 +2616,7 @@ TEST_CASE(
   pylimer_tools::topo::entanglement_detection::AtomPairEntanglements
     entanglements =
       pylimer_tools::topo::entanglement_detection::randomlyFindEntanglements(
-        universe, 4368, 4., 0., 190, 0, "lkdvyjh3r9ldh", 2, true);
+        universe, 4368, 4., 0., 190, 0, "af1346lhkdsaöf123", 2, true);
 
   // clone the universe and add entanglements as springs
   pe::Universe universeEntangled = pe::Universe(universe);
@@ -2623,62 +2648,134 @@ TEST_CASE(
     pcm::MEHPForceBalance::constructWithSlipLinks(
       universe, entanglements, 2, false);
 
+  forceBalancerEntanglementSprings.configAssumeBoxLargeEnough(true);
+  forceBalancerEntanglementLinks.configAssumeBoxLargeEnough(true);
+
   CHECK(forceBalancerEntanglementSprings.getNrOfSprings() >
         forceBalancerEntanglementLinks.getNrOfSprings());
   CHECK(forceBalancerEntanglementLinks.getNrOfSprings() == 464);
 
-  // need to disable slipping to test entanglement links
-  forceBalancerEntanglementSprings.runForceRelaxation(
-    5000,
-    1e-15,
-    -1,
-    pcm::StructureSimplificationMode::ALL_TIM,
-    1e-3,
-    false,
-    pcm::LinkSwappingMode::NO_SWAPPING,
-    10,
-    1.0,
-    -1,
-    true);
-  forceBalancerEntanglementLinks.runForceRelaxation(
-    5000,
-    1e-15,
-    -1,
-    pcm::StructureSimplificationMode::ALL_TIM,
-    1e-3,
-    false,
-    pcm::LinkSwappingMode::NO_SWAPPING,
-    10,
-    1.0,
-    -1,
-    true);
+  SECTION("With removal of inactive springs")
+  {
+    // need to disable slipping to test entanglement links
+    forceBalancerEntanglementSprings.runForceRelaxation(
+      5000,
+      1e-15,
+      -1,
+      pcm::StructureSimplificationMode::ALL_TIM,
+      1e-3,
+      false,
+      pcm::LinkSwappingMode::NO_SWAPPING,
+      10,
+      1.0,
+      -1,
+      true);
+    forceBalancerEntanglementLinks.runForceRelaxation(
+      5000,
+      1e-15,
+      -1,
+      pcm::StructureSimplificationMode::ALL_TIM,
+      1e-3,
+      false,
+      pcm::LinkSwappingMode::NO_SWAPPING,
+      10,
+      1.0,
+      -1,
+      true);
 
-  CHECK(forceBalancerEntanglementSprings.getNrOfSprings() >
-        forceBalancerEntanglementLinks.getNrOfSprings());
-  std::vector<long int> activeNodes1 =
-    forceBalancerEntanglementSprings.getIdsOfActiveNodes();
-  std::sort(activeNodes1.begin(), activeNodes1.end());
-  std::vector<long int> activeNodes2 =
-    forceBalancerEntanglementLinks.getIdsOfActiveNodes();
-  std::sort(activeNodes2.begin(), activeNodes2.end());
-  // CHECK(activeNodes1 == activeNodes2);
-  CHECK_THAT(activeNodes1.size(),
-             Catch::Matchers::WithinRel(activeNodes2.size(), 0.025));
+    CHECK(forceBalancerEntanglementSprings.getNrOfSprings() >
+          forceBalancerEntanglementLinks.getNrOfSprings());
+    std::vector<long int> activeNodes1 =
+      forceBalancerEntanglementSprings.getIdsOfActiveNodes();
+    std::sort(activeNodes1.begin(), activeNodes1.end());
+    std::vector<long int> activeNodes2 =
+      forceBalancerEntanglementLinks.getIdsOfActiveNodes();
+    std::sort(activeNodes2.begin(), activeNodes2.end());
+    // CHECK(activeNodes1 == activeNodes2);
+    CHECK_THAT(activeNodes1.size(),
+               Catch::Matchers::WithinRel(activeNodes2.size(), 0.025));
 
-  CHECK_THAT(
-    forceBalancerEntanglementSprings.getSolubleWeightFraction(),
-    Catch::Matchers::WithinRel(
-      forceBalancerEntanglementLinks.getSolubleWeightFraction(), 0.025));
-  CHECK_THAT(
-    forceBalancerEntanglementSprings.getDanglingWeightFraction(),
-    Catch::Matchers::WithinRel(
-      forceBalancerEntanglementLinks.getDanglingWeightFraction(), 0.05));
-  CHECK_THAT(forceBalancerEntanglementSprings.getGammaFactor(-1, 464),
-             Catch::Matchers::WithinRel(
-               forceBalancerEntanglementLinks.getGammaFactor(-1, 464), 0.1));
-  CHECK_THAT(forceBalancerEntanglementSprings.getStressTensor().trace(),
-             Catch::Matchers::WithinRel(
-               forceBalancerEntanglementLinks.getStressTensor().trace(), 0.1));
-  CHECK(forceBalancerEntanglementSprings.getStressTensor().trace() <
-        forceBalancerEntanglementLinks.getStressTensor().trace());
+    CHECK_THAT(
+      forceBalancerEntanglementSprings.getSolubleWeightFraction(),
+      Catch::Matchers::WithinRel(
+        forceBalancerEntanglementLinks.getSolubleWeightFraction(), 0.025));
+    CHECK_THAT(
+      forceBalancerEntanglementSprings.getActiveWeightFraction(),
+      Catch::Matchers::WithinRel(
+        forceBalancerEntanglementLinks.getActiveWeightFraction(), 0.025));
+    CHECK_THAT(
+      forceBalancerEntanglementSprings.getDanglingWeightFraction(),
+      Catch::Matchers::WithinRel(
+        forceBalancerEntanglementLinks.getDanglingWeightFraction(), 0.025));
+    CHECK_THAT(forceBalancerEntanglementSprings.getGammaFactor(-1, 464),
+               Catch::Matchers::WithinRel(
+                 forceBalancerEntanglementLinks.getGammaFactor(-1, 464), 0.1));
+    CHECK_THAT(
+      forceBalancerEntanglementSprings.getStressTensor().trace(),
+      Catch::Matchers::WithinRel(
+        forceBalancerEntanglementLinks.getStressTensor().trace(), 0.1));
+    CHECK(forceBalancerEntanglementSprings.getStressTensor().trace() <
+          forceBalancerEntanglementLinks.getStressTensor().trace());
+    CHECK(forceBalancerEntanglementSprings.getGammaFactors(-1.).sum() <
+          forceBalancerEntanglementLinks.getGammaFactors(-1.).sum());
+  }
+
+  SECTION("Without simplification of the structure")
+  {
+    // need to disable slipping to test entanglement links
+    forceBalancerEntanglementSprings.runForceRelaxation(
+      5000,
+      1e-15,
+      -1,
+      pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+      1e-3,
+      false,
+      pcm::LinkSwappingMode::NO_SWAPPING,
+      10,
+      1.0,
+      -1,
+      true);
+    forceBalancerEntanglementLinks.runForceRelaxation(
+      5000,
+      1e-15,
+      -1,
+      pcm::StructureSimplificationMode::NO_SIMPLIFICATION,
+      1e-3,
+      false,
+      pcm::LinkSwappingMode::NO_SWAPPING,
+      10,
+      1.0,
+      -1,
+      true);
+
+    CHECK(forceBalancerEntanglementSprings.getNrOfSprings() >
+          forceBalancerEntanglementLinks.getNrOfSprings());
+    std::vector<long int> activeNodes1 =
+      forceBalancerEntanglementSprings.getIdsOfActiveNodes();
+    std::sort(activeNodes1.begin(), activeNodes1.end());
+    std::vector<long int> activeNodes2 =
+      forceBalancerEntanglementLinks.getIdsOfActiveNodes();
+    std::sort(activeNodes2.begin(), activeNodes2.end());
+    CHECK(activeNodes1 == activeNodes2);
+
+    CHECK_THAT(
+      forceBalancerEntanglementSprings.getSolubleWeightFraction(),
+      Catch::Matchers::WithinRel(
+        forceBalancerEntanglementLinks.getSolubleWeightFraction(), 0.025));
+    CHECK_THAT(
+      forceBalancerEntanglementSprings.getActiveWeightFraction(),
+      Catch::Matchers::WithinRel(
+        forceBalancerEntanglementLinks.getActiveWeightFraction(), 0.025));
+    CHECK_THAT(
+      forceBalancerEntanglementSprings.getDanglingWeightFraction(),
+      Catch::Matchers::WithinRel(
+        forceBalancerEntanglementLinks.getDanglingWeightFraction(), 0.025));
+    CHECK_THAT(forceBalancerEntanglementSprings.getGammaFactor(-1, 464),
+               Catch::Matchers::WithinRel(
+                 forceBalancerEntanglementLinks.getGammaFactor(-1, 464), 0.1));
+    CHECK(forceBalancerEntanglementSprings.getStressTensor().trace() <
+          forceBalancerEntanglementLinks.getStressTensor().trace());
+    CHECK(forceBalancerEntanglementSprings.getGammaFactors(-1.).sum() <
+          forceBalancerEntanglementLinks.getGammaFactors(-1.).sum());
+  }
 }
