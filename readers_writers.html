@@ -7,7 +7,7 @@
 
     <!-- Generated with Sphinx 8.1.3 and Furo 2024.08.06 -->
         <title>Readers &amp; Writers - PylimerTools documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=a746c00c" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/graphviz.css?v=4ae1632d" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
@@ -336,9 +336,9 @@ allowing for conversions from one numbering scheme to another.</p>
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h2>
 <p>Converting a system of polymer chains to have the “molecule index” in the LAMMPS file
 set in such a way that a <cite>fix bond/swap</cite> would not change the distribution of chain lengths:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">pylimer_tools_cpp</span> <span class="kn">import</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">UniverseSequence</span><span class="p">,</span> <span class="n">DataFileWriter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pylimer_tools_cpp</span><span class="w"> </span><span class="kn">import</span> <span class="n">Universe</span><span class="p">,</span> <span class="n">UniverseSequence</span><span class="p">,</span> <span class="n">DataFileWriter</span>
 
 <span class="c1"># TODO: change the following parameters to your liking</span>
 <span class="n">fileToRead</span> <span class="o">=</span> <span class="s2">&quot;yourLammpsDataFileToConvert.structure.out&quot;</span>
@@ -392,7 +392,7 @@ set in such a way that a <cite>fix bond/swap</cite> would not change the distrib
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2021-2024, Tim Bernhard
+                Copyright &#169; 2021-2025, Tim Bernhard
             </div>
             Made with 
             <a href="https://github.com/pradyunsg/furo">Furo</a>
