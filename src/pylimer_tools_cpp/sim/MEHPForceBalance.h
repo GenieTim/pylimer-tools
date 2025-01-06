@@ -600,9 +600,10 @@ namespace sim {
       void removeDuplicateListedSpringsFromLinks(
         ForceBalanceNetwork& net) const;
 
-      void removeDuplicateListedSpringsFromLink(ForceBalanceNetwork& net,
-                                                size_t linkIdx,
-                                                bool allowOnEntanglement = false) const;
+      void removeDuplicateListedSpringsFromLink(
+        ForceBalanceNetwork& net,
+        size_t linkIdx,
+        bool allowOnEntanglement = false) const;
 
       size_t removePrimaryLoops(ForceBalanceNetwork& net,
                                 Eigen::VectorXd& displacements,
@@ -956,19 +957,6 @@ namespace sim {
       }
 
       /**
-       * @brief Count the number of atoms that are in any way connected to an
-       * active spring
-       *
-       * @param tolerance
-       * @return double
-       */
-      double countActiveClusteredAtoms(double tolerance = 0.05)
-      {
-        return this->countActiveClusteredAtoms(
-          &this->initialConfig, this->currentSpringVectors, tolerance);
-      }
-
-      /**
        * @brief Get the Dangling Weight Fraction
        *
        * @param tolerance
@@ -980,6 +968,31 @@ namespace sim {
           &this->initialConfig, this->currentSpringVectors, tolerance);
       }
 
+      /**
+       * @brief Get the Weight Fraction of Active Springs (atoms)
+       *
+       * @param tolerance
+       * @return double
+       */
+      double getActiveWeightFraction(double tolerance = 1e-3)
+      {
+        return this->computeActiveWeightFraction(
+          &this->initialConfig, this->currentSpringVectors, tolerance);
+      }
+
+
+      /**
+       * @brief Count the number of atoms that are in any way connected to an
+       * active spring
+       *
+       * @param tolerance
+       * @return double
+       */
+      double countActiveClusteredAtoms(double tolerance = 1e-3)
+      {
+        return this->countActiveClusteredAtoms(
+          &this->initialConfig, this->currentSpringVectors, tolerance);
+      }
       /**
        * @brief Get the Effective Functionality Of each node
        *
@@ -996,6 +1009,9 @@ namespace sim {
       /**
        * @brief Compute the weight fraction of non-active springs
        *
+       * We go the full route via active and soluble in order to compensate for
+       * removed springs and atoms
+       *
        * @param net
        * @param springDistances
        * @param tolerance
@@ -1005,6 +1021,42 @@ namespace sim {
         ForceBalanceNetwork* net,
         const Eigen::VectorXd& springDistances,
         const double tolerance = 1e-3) const
+      {
+        double activeWeightFraction =
+          this->computeActiveWeightFraction(net, springDistances, tolerance);
+        RUNTIME_EXP_IFN(
+          APPROX_WITHIN(activeWeightFraction, 0., 1., 1e-6),
+          "Expect active weight fraction to be between 0 and 1, got " +
+            std::to_string(activeWeightFraction) + ".");
+        double solubleWeightFraction =
+          this->computeSolubleWeightFraction(net, springDistances, tolerance);
+        RUNTIME_EXP_IFN(
+          APPROX_WITHIN(solubleWeightFraction, 0., 1., 1e-6),
+          "Expect soluble weight fraction to be between 0 and 1, got " +
+            std::to_string(solubleWeightFraction) + ".");
+        RUNTIME_EXP_IFN(
+          APPROX_WITHIN(
+            activeWeightFraction + solubleWeightFraction, 0., 1., 1e-6),
+          "Expect active and soluble weight fraction to add up to maximum 1, "
+          "got " +
+            std::to_string(activeWeightFraction + solubleWeightFraction) + ".");
+
+        // finally, normalise by the number of atoms.
+        // TODO: currently, the weight of the atoms is ignored
+        return 1. - activeWeightFraction - solubleWeightFraction;
+      }
+
+      /**
+       * @brief Compute the weight fraction of active springs
+       *
+       * @param net
+       * @param springDistances
+       * @param tolerance
+       * @return double
+       */
+      double computeActiveWeightFraction(ForceBalanceNetwork* net,
+                                         const Eigen::VectorXd& springDistances,
+                                         const double tolerance = 1e-3) const
       {
         if (net->nrOfSprings * 3 != springDistances.size()) {
           throw std::invalid_argument(
@@ -1026,14 +1078,12 @@ namespace sim {
           activeSprings.cast<double>() *
           (net->springsContourLength.array() -
            Eigen::ArrayXd::Ones(net->nrOfSprings));
-        // finally, normalise by the number of atoms.
+
         // TODO: currently, the weight of the atoms is ignored
-        return 1. -
-               (((allActiveAtomsPerChains).matrix().sum() +
-                 this->getNrOfActiveNodes(tolerance)) /
-                (static_cast<double>(this->universe.getNrOfAtoms()))) -
-               this->computeSolubleWeightFraction(
-                 net, springDistances, tolerance);
+        // normalise by the number of atoms
+        return (allActiveAtomsPerChains.matrix().sum() +
+                this->getNrOfActiveNodes(tolerance)) /
+               (static_cast<double>(this->universe.getNrOfAtoms()));
       }
 
       /**
@@ -1050,7 +1100,7 @@ namespace sim {
       std::pair<Eigen::ArrayXb, Eigen::ArrayXb> findClusteredToActive(
         const ForceBalanceNetwork* net,
         const Eigen::VectorXd& springDistances,
-        const double tolerance = 0.05) const
+        const double tolerance = 1e-3) const
       {
         INVALIDARG_EXP_IFN(springDistances.size() == net->nrOfSprings * 3,
                            "Invalid sizes.");
@@ -1097,7 +1147,7 @@ namespace sim {
        */
       double countActiveClusteredAtoms(ForceBalanceNetwork* net,
                                        const Eigen::VectorXd& springDistances,
-                                       const double tolerance = 0.05) const
+                                       const double tolerance = 1e-3) const
       {
         INVALIDARG_EXP_IFN(net->nrOfSprings * 3 == springDistances.size(),
                            "Spring distances and network don't match");

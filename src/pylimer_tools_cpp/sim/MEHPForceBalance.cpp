@@ -251,7 +251,7 @@ namespace sim {
                   StructureSimplificationMode::INACTIVE_ONLY ||
                 simplificationMode == StructureSimplificationMode::ALL_TIM) {
 #ifdef DEBUG_REMOVAL
-              std::cout << "Removing inactive crosslinkers" << std::endl;
+              std::cout << "Checking and possibly removing inactive cross-links" << std::endl;
 #endif
               nRemoved +=
                 this->removeInactiveCrosslinks(this->initialConfig,
@@ -266,7 +266,7 @@ namespace sim {
             if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
                 simplificationMode == StructureSimplificationMode::ALL_TIM) {
 #ifdef DEBUG_REMOVAL
-              std::cout << "Removing 2-f crosslinkers" << std::endl;
+              std::cout << "Checking and possibly removing cross-links with f = 2" << std::endl;
 #endif
               nRemoved += this->removeTwofunctionalCrosslinks(
                 this->initialConfig,
@@ -279,7 +279,7 @@ namespace sim {
             }
             if (simplificationMode == StructureSimplificationMode::ALL_ANDREI) {
 #ifdef DEBUG_REMOVAL
-              std::cout << "Removing crosslinkers and springs, Andrei's way"
+              std::cout << "Checking and possibly removing cross-links and springs, Andrei's way"
                         << std::endl;
 #endif
               nRemoved +=
