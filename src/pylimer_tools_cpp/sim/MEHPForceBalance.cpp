@@ -5540,7 +5540,8 @@ namespace sim {
       Eigen::VectorXd gammaFactors(springVectors.size() / 3);
       const double commonDenominator = 1. / b02;
       for (size_t i = 0; i < springVectors.size() / 3; ++i) {
-        double N = this->initialConfig.springsContourLength(i);
+        double N = this->initialConfig.springsContourLength
+                     [this->initialConfig.partialToFullSpringIndex[i]];
         double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
           this->initialConfig.partialSpringIsPartial[i],
           1.0 / (N * this->currentSpringPartitionsVec(i)),
@@ -6012,6 +6013,10 @@ namespace sim {
                         "Each spring requires at least two links, got " +
                           std::to_string(net.linkIndicesOfSprings[i].size()) +
                           " at i = " + std::to_string(i) + ".");
+        RUNTIME_EXP_IFN(net.springsContourLength[i] > 0,
+                        "Unexpected spring contour length, got " +
+                          std::to_string(net.springsContourLength[i]) +
+                          " for spring " + std::to_string(i) + ".");
         RUNTIME_EXP_IFN(
           net.localToGlobalSpringIndex[i].size() ==
             net.linkIndicesOfSprings[i].size() - 1,
