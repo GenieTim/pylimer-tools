@@ -638,21 +638,23 @@ TEST_CASE("MEHP Force Balance runs", "[analysis][MEHPForceBalance][long]")
           forceBalancer2.getPressure() * conversionFactor /
             (sigmaToM * sigmaToM * sigmaToM) ==
           Catch::Approx(61172.8878)); // shear modulus from the pressure, MPa
-        double expectedNb2 = slope * Nb * beadMass;
-        double nb2Correction = 1.;
+        double b02 = slope * beadMass;
         // (forceBalancer2.getDefaultR0Square() / (expectedNb2));
-        double gammaCorrectionFactor = nb2Correction;
-        CHECK(
-          forceBalancer2.getGammaFactor() //* nrOfChainCorrection * 1.
-                                          // forceBalancer2.getDefaultR0Square()
-          ==
-          Catch::Approx(42.6132)); // as from conversion-less Mathematica script
-        CHECK(forceBalancer2.getGammaFactor() * kb *
-                T * // gammaCorrectionFactor *
-                nu ==
-              Catch::Approx(61308.3)); // ANT shear modulus, Pa
-        CHECK(forceBalancer2.getGammaFactor() * gammaCorrectionFactor ==
-              Catch::Approx(0.319446)); // "correct" gamma factor
+        CHECK(forceBalancer2.getGammaFactor(1.) ==
+              Catch::Approx(forceBalancer2.getGammaFactors(1.).mean()));
+        CHECK(forceBalancer2.getGammaFactor(b02) ==
+              Catch::Approx(forceBalancer2.getGammaFactors(b02).mean()));
+        CHECK_THAT(
+          forceBalancer2.getGammaFactor(b02) * kb * T * nu,
+          Catch::Matchers::WithinRel(61308.3, 0.03)); // ANT shear modulus, Pa
+        CHECK_THAT(forceBalancer2.getGammaFactor(b02),
+                   Catch::Matchers::WithinRel(
+                     forceBalancer2.getGammaFactor(b02, nrOfChains), 0.03));
+        CHECK_THAT(
+          forceBalancer2.getGammaFactor(b02, nrOfChains),
+          Catch::Matchers::WithinRel(
+            0.319446, 0.03)); // "correct" gamma factor, see Mathematica script
+                              // conversion-less Mathematica script: 42.6132
         CHECK(forceBalancer2.getExitReason() == pcm::ExitReason::X_TOLERANCE);
         // TODO: find better, more accurate tests here
         CHECK(forceBalancer2.getNrOfActiveNodes() > 1);
@@ -2651,9 +2653,19 @@ TEST_CASE(
   forceBalancerEntanglementSprings.configAssumeBoxLargeEnough(true);
   forceBalancerEntanglementLinks.configAssumeBoxLargeEnough(true);
 
-  CHECK(forceBalancerEntanglementSprings.getNrOfSprings() >
-        forceBalancerEntanglementLinks.getNrOfSprings());
-  CHECK(forceBalancerEntanglementLinks.getNrOfSprings() == 464);
+  REQUIRE(forceBalancerEntanglementSprings.getNrOfSprings() >
+          forceBalancerEntanglementLinks.getNrOfSprings());
+  REQUIRE(forceBalancerEntanglementLinks.getNrOfSprings() == 464);
+  REQUIRE(forceBalancerEntanglementSprings.getNrOfActiveSprings() >
+          forceBalancerEntanglementLinks.getNrOfActiveSprings());
+
+  std::vector<long int> activeNodes0_1 =
+    forceBalancerEntanglementSprings.getIdsOfActiveNodes();
+  std::sort(activeNodes0_1.begin(), activeNodes0_1.end());
+  std::vector<long int> activeNodes0_2 =
+    forceBalancerEntanglementLinks.getIdsOfActiveNodes();
+  std::sort(activeNodes0_2.begin(), activeNodes0_2.end());
+  REQUIRE(activeNodes0_1 == activeNodes0_2);
 
   SECTION("With removal of inactive springs")
   {
@@ -2691,25 +2703,20 @@ TEST_CASE(
     std::vector<long int> activeNodes2 =
       forceBalancerEntanglementLinks.getIdsOfActiveNodes();
     std::sort(activeNodes2.begin(), activeNodes2.end());
-    // CHECK(activeNodes1 == activeNodes2);
-    CHECK_THAT(activeNodes1.size(),
-               Catch::Matchers::WithinRel(activeNodes2.size(), 0.025));
+    CHECK(activeNodes1 == activeNodes2);
 
     CHECK_THAT(
       forceBalancerEntanglementSprings.getSolubleWeightFraction(),
-      Catch::Matchers::WithinRel(
-        forceBalancerEntanglementLinks.getSolubleWeightFraction(), 0.025));
+      Catch::Matchers::WithinAbs(
+        forceBalancerEntanglementLinks.getSolubleWeightFraction(), 0.0025));
     CHECK_THAT(
       forceBalancerEntanglementSprings.getActiveWeightFraction(),
-      Catch::Matchers::WithinRel(
-        forceBalancerEntanglementLinks.getActiveWeightFraction(), 0.025));
+      Catch::Matchers::WithinAbs(
+        forceBalancerEntanglementLinks.getActiveWeightFraction(), 0.0025));
     CHECK_THAT(
       forceBalancerEntanglementSprings.getDanglingWeightFraction(),
-      Catch::Matchers::WithinRel(
-        forceBalancerEntanglementLinks.getDanglingWeightFraction(), 0.025));
-    CHECK_THAT(forceBalancerEntanglementSprings.getGammaFactor(-1, 464),
-               Catch::Matchers::WithinRel(
-                 forceBalancerEntanglementLinks.getGammaFactor(-1, 464), 0.1));
+      Catch::Matchers::WithinAbs(
+        forceBalancerEntanglementLinks.getDanglingWeightFraction(), 0.0025));
     CHECK_THAT(
       forceBalancerEntanglementSprings.getStressTensor().trace(),
       Catch::Matchers::WithinRel(
@@ -2760,19 +2767,16 @@ TEST_CASE(
 
     CHECK_THAT(
       forceBalancerEntanglementSprings.getSolubleWeightFraction(),
-      Catch::Matchers::WithinRel(
-        forceBalancerEntanglementLinks.getSolubleWeightFraction(), 0.025));
+      Catch::Matchers::WithinAbs(
+        forceBalancerEntanglementLinks.getSolubleWeightFraction(), 0.0025));
     CHECK_THAT(
       forceBalancerEntanglementSprings.getActiveWeightFraction(),
-      Catch::Matchers::WithinRel(
-        forceBalancerEntanglementLinks.getActiveWeightFraction(), 0.025));
+      Catch::Matchers::WithinAbs(
+        forceBalancerEntanglementLinks.getActiveWeightFraction(), 0.0025));
     CHECK_THAT(
       forceBalancerEntanglementSprings.getDanglingWeightFraction(),
-      Catch::Matchers::WithinRel(
-        forceBalancerEntanglementLinks.getDanglingWeightFraction(), 0.025));
-    CHECK_THAT(forceBalancerEntanglementSprings.getGammaFactor(-1, 464),
-               Catch::Matchers::WithinRel(
-                 forceBalancerEntanglementLinks.getGammaFactor(-1, 464), 0.1));
+      Catch::Matchers::WithinAbs(
+        forceBalancerEntanglementLinks.getDanglingWeightFraction(), 0.0025));
     CHECK(forceBalancerEntanglementSprings.getStressTensor().trace() <
           forceBalancerEntanglementLinks.getStressTensor().trace());
     CHECK(forceBalancerEntanglementSprings.getGammaFactors(-1.).sum() <

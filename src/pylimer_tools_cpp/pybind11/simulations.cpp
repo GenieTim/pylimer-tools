@@ -488,10 +488,8 @@ init_pylimer_bound_sim(py::module_& m)
          R"pbdoc(
           Get the atom ids of the nodes that are considered active.
 
-          :param tolerance: springs under this length are considered inactive. A node is active if it has > 2 active springs.
-          :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
-          :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
-               Use a value < 0 to indicate that there is no maximum number of active connections.
+          Arguments:
+           - :param tolerance: springs under this length are considered inactive. A node is active if it has > 2 active springs.
      )pbdoc",
          py::arg("tolerance") = 1e-3,
          py::arg("minimum_nr_of_active_connections") = 2,
@@ -505,10 +503,11 @@ init_pylimer_bound_sim(py::module_& m)
           :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
           :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
                Use a value < 0 to indicate that there is no maximum number of active connections.
+          :param usePartial: Whether to use the partial spring distances rather than the total (set to true if you want primary loop contributors)
      )pbdoc",
          py::arg("tolerance") = 1e-3,
-         py::arg("minimum_nr_of_active_connections") = 2,
-         py::arg("maximum_nr_of_active_connections") = -1)
+         py::arg("minimumNrOfActiveConnections") = 2,
+         py::arg("maximumNrOfActiveConnections") = -1)
     .def("get_nr_of_active_springs",
          &mehp::MEHPForceRelaxation::getNrOfActiveSprings,
          R"pbdoc(
@@ -1046,26 +1045,6 @@ init_pylimer_bound_sim(py::module_& m)
           Evaluates the gamma factor for each strand (i.e., the squared distance divided by the contour length multiplied by b02)
      )pbdoc",
          py::arg("b02"))
-    .def("get_gamma_factor_using_partial_springs",
-         &mehp::MEHPForceBalance::getGammaFactorUsingPartialSprings,
-         R"pbdoc(
-          Computes the gamma factor as part of the ANT/MEHP formulism, i.e.:
-
-          :math:`\Gamma = \langle\gamma_{\eta}\rangle`, with :math:`\gamma_{\eta} = \frac{\bar{r_{\eta}}^2}{R_{0,\eta}^2}`,
-          which you can use as :math:`G_{\mathrm{ANT}} = \Gamma \nu k_B T`,
-          where :math:`\eta` is the index of a particular strand, 
-          :math:`R_{0}^2` is the melt mean square end to end distance, in phantom systems :math:`$= N_{\eta}*b^2$`
-          :math:`N_{\eta}` is the number of atoms in this strand :math:`\eta`, 
-          :math:`b` its mean square bond length,
-          :math:`T` the temperature and 
-          :math:`k_B` Boltzmann's constant.
-          
-          :param b02: the melt :math:`<b>_0^2`: mean bond length squared; vgl. the required <R_0^2>, computed as phantom = N<b>^2; otherwise, it's the slope in a <R_0^2> vs. N plot, also sometimes labelled :math:`C_\infinity b^2`.
-          :param nrOfChains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of springs. 
-     )pbdoc",
-         py::arg("one_over_spring_partition_upper_limit") = 1.,
-         py::arg("b02") = -1.0,
-         py::arg("nr_of_chains") = -1)
     .def("get_nr_of_nodes", &mehp::MEHPForceBalance::getNrOfNodes, R"pbdoc(
            Get the number of nodes (crosslinkers) considered in this simulation.
      )pbdoc")
@@ -1111,32 +1090,20 @@ init_pylimer_bound_sim(py::module_& m)
          &mehp::MEHPForceBalance::getIdsOfActiveNodes,
          R"pbdoc(
           Get the atom ids of the nodes that are considered active.
+          Only cross-link ids are returned (not e.g. entanglement links).
 
-          Arguments:
-           - :param tolerance: springs under this length are considered inactive. A node is active if it has > 2 active springs.
-           - :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
-           - :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
-               Use a value < 0 to indicate that there is no maximum number of active connections.
+          :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
      )pbdoc",
-         py::arg("tolerance") = 1e-3,
-         py::arg("minimum_nr_of_active_connections") = 2,
-         py::arg("maximum_nr_of_active_connections") = -1,
-         py::arg("use_partial") = false)
+         py::arg("tolerance") = 1e-3)
     .def("get_nr_of_active_nodes",
          &mehp::MEHPForceBalance::getNrOfActiveNodes,
          R"pbdoc(
-           Get the number of active nodes remaining after running the simulation.
+          Get the number of active nodes (incl. entanglement nodes [atoms with type = entanglementType, present in the universe when creating this simulator], 
+          excl. entanglement links [the slip-links created internally when e.g. constructing the simulator with random slip-links]).
 
-          :param tolerance: springs under this length are considered inactive.
-          :param minimumNrOfActiveConnections:  A node is active if it has equal or more than this number of active springs.
-          :param maximumNrOfActiveConnections:  A node is active if it has equal or less than this number of active springs.
-               Use a value < 0 to indicate that there is no maximum number of active connections.
-          :param usePartial: Whether to use the partial spring distances rather than the total (set to true if you want primary loop contributors)
+          :param tolerance: springs under this length are considered inactive. A node is active if it has > 1 active springs.
      )pbdoc",
-         py::arg("tolerance") = 1e-3,
-         py::arg("minimumNrOfActiveConnections") = 2,
-         py::arg("maximumNrOfActiveConnections") = -1,
-         py::arg("usePartial") = false)
+         py::arg("tolerance") = 1e-3)
     .def("get_nr_of_active_springs",
          &mehp::MEHPForceBalance::getNrOfActiveSprings,
          R"pbdoc(

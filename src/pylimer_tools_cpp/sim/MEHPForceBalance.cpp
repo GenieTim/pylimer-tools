@@ -251,7 +251,8 @@ namespace sim {
                   StructureSimplificationMode::INACTIVE_ONLY ||
                 simplificationMode == StructureSimplificationMode::ALL_TIM) {
 #ifdef DEBUG_REMOVAL
-              std::cout << "Checking and possibly removing inactive cross-links" << std::endl;
+              std::cout << "Checking and possibly removing inactive cross-links"
+                        << std::endl;
 #endif
               nRemoved +=
                 this->removeInactiveCrosslinks(this->initialConfig,
@@ -266,7 +267,9 @@ namespace sim {
             if (simplificationMode == StructureSimplificationMode::X2F_ONLY ||
                 simplificationMode == StructureSimplificationMode::ALL_TIM) {
 #ifdef DEBUG_REMOVAL
-              std::cout << "Checking and possibly removing cross-links with f = 2" << std::endl;
+              std::cout
+                << "Checking and possibly removing cross-links with f = 2"
+                << std::endl;
 #endif
               nRemoved += this->removeTwofunctionalCrosslinks(
                 this->initialConfig,
@@ -279,7 +282,8 @@ namespace sim {
             }
             if (simplificationMode == StructureSimplificationMode::ALL_ANDREI) {
 #ifdef DEBUG_REMOVAL
-              std::cout << "Checking and possibly removing cross-links and springs, Andrei's way"
+              std::cout << "Checking and possibly removing cross-links and "
+                           "springs, Andrei's way"
                         << std::endl;
 #endif
               nRemoved +=
@@ -5391,32 +5395,36 @@ namespace sim {
     }
 
     /**
-     * @brief Get the Ids Of active Nodes
+     * @brief Get the atom ids of the active cross-links (not entanglement
+     * beads/links)
      *
      * @param tolerance the tolerance: springs under a certain length are
      * considered inactive
-     * @param minimumNrOfActiveConnections the number of active springs
-     * required for this node to qualify as active
      * @return std::vector<long int> the atom ids
      */
     std::vector<long int> MEHPForceBalance::getIdsOfActiveNodes(
-      double tolerance,
-      int minimumNrOfActiveConnections,
-      int maximumNrOfActiveConnections,
-      bool usePartial) const
+      double tolerance) const
     {
       std::vector<long int> results;
       results.reserve(this->initialConfig.nrOfNodes);
 
-      Eigen::VectorXi nrOfActiveSpringsConnected =
-        usePartial ? this->getNrOfActiveSpringsConnected(tolerance)
-                   : this->getNrOfActivePartialSpringsConnected(tolerance);
+      // find all active springs
+      Eigen::ArrayXb springIsActive =
+        this->findActiveSprings(&this->initialConfig,
+                                this->currentDisplacements,
+                                this->currentSpringPartitionsVec,
+                                tolerance);
+
       for (size_t i = 0; i < this->initialConfig.nrOfNodes; i++) {
-        if (nrOfActiveSpringsConnected[i] >= minimumNrOfActiveConnections &&
-            (maximumNrOfActiveConnections < 0 ||
-             maximumNrOfActiveConnections >= nrOfActiveSpringsConnected[i]) &&
-            (this->initialConfig.oldAtomTypes[i] != this->entanglementType)) {
-          results.push_back(this->initialConfig.oldAtomIds[i]);
+        if (this->initialConfig.oldAtomTypes[i] != this->entanglementType) {
+          std::vector<size_t> springIndices =
+            this->getInvolvedFullSpringIndices(this->initialConfig, i);
+          for (const size_t springIndex : springIndices) {
+            if (springIsActive[springIndex]) {
+              results.push_back(this->initialConfig.oldAtomIds[i]);
+              break;
+            }
+          }
         }
       }
 
@@ -5435,12 +5443,9 @@ namespace sim {
     {
       Eigen::VectorXi nrOfActiveSpringsConnected =
         Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
-      Eigen::ArrayXb springIsActive =
-        this->findActiveSprings(this->currentSpringVectors,
-                                this->initialConfig.springsContourLength,
-                                tolerance);
+      Eigen::ArrayXb springIsActive = this->findActiveSprings(tolerance);
       for (size_t i = 0; i < this->initialConfig.nrOfSprings; i++) {
-        if (springIsActive[i] == true) { /* active spring */
+        if (springIsActive[i]) { /* active spring */
           int a = this->initialConfig.springIndexA[i];
           int b = this->initialConfig.springIndexB[i];
           ++(nrOfActiveSpringsConnected[a]);
@@ -5462,27 +5467,20 @@ namespace sim {
     {
       Eigen::VectorXi nrOfActivePartialSpringsConnected =
         Eigen::VectorXi::Zero(this->initialConfig.nrOfNodes);
-      Eigen::VectorXd weightingFactors =
-        Eigen::VectorXd::Ones(this->initialConfig.nrOfPartialSprings);
+      Eigen::ArrayXb partialSpringIsActive =
+        this->findActivePartialSprings(tolerance);
+      // translate this to the nodes
       for (size_t i = 0; i < this->initialConfig.nrOfPartialSprings; ++i) {
-        weightingFactors[i] *=
-          this->initialConfig.springsContourLength
-            [this->initialConfig.partialToFullSpringIndex[i]] *
-          this->currentSpringPartitionsVec[i];
-      }
-      Eigen::ArrayXb springIsActive = this->findActiveSprings(
-        this->currentPartialSpringVectors, weightingFactors, tolerance);
-      RUNTIME_EXP_IFN(
-        springIsActive.size() == this->initialConfig.nrOfPartialSprings,
-        "Expect findActiveSprings to return an "
-        "appropriately sized result. Got only " +
-          std::to_string(springIsActive.size()) + " entries for " +
-          std::to_string(this->initialConfig.nrOfPartialSprings) +
-          " partial springs.");
-      for (size_t i = 0; i < this->initialConfig.nrOfPartialSprings; ++i) {
-        if (springIsActive[i] == true) { /* active spring */
-          int a = this->initialConfig.springPartIndexA[i];
-          int b = this->initialConfig.springPartIndexB[i];
+        if (partialSpringIsActive[i]) {
+          /* active spring */
+          // size_t a =
+          //   this->initialConfig
+          //     .springIndexA[this->initialConfig.partialToFullSpringIndex[i]];
+          // size_t b =
+          //   this->initialConfig
+          //     .springIndexB[this->initialConfig.partialToFullSpringIndex[i]];
+          size_t a = this->initialConfig.springPartIndexA[i];
+          size_t b = this->initialConfig.springPartIndexB[i];
           if (!this->initialConfig.linkIsSliplink[a]) {
             ++(nrOfActivePartialSpringsConnected[a]);
           }
@@ -5498,43 +5496,8 @@ namespace sim {
     /**
      * @brief Get the Gamma Factor at the current step
      *
-     * @param b02 the melt <b>^2: mean bond length; vgl. the required <R_0^2>,
-     * computed as phantom = N<b>^2.
-     * @param nrOfChains the nr of chains to average over (can be different
-     * from the nr of springs thanks to omitted free chains or primary loops)
-     * @return double
-     */
-    double MEHPForceBalance::getGammaFactorUsingPartialSprings(
-      double oneOverSpringPartitionUpperLimit,
-      double b02,
-      int nrOfChains) const
-    {
-      if (b02 < 0) {
-        b02 = this->defaultBondLength * this->defaultBondLength;
-      }
-
-      Eigen::VectorXd oneOverSpringPart =
-        this->assembleOneOverSpringPartition(this->initialConfig,
-                                             this->currentSpringPartitionsVec,
-                                             oneOverSpringPartitionUpperLimit) *
-        (1. / b02); // compute the vector of
-      Eigen::VectorXd partialSpringVectors = this->evaluatePartialSpringVectors(
-        this->initialConfig, this->currentDisplacements);
-      if (nrOfChains < 1) {
-        nrOfChains = partialSpringVectors.size() / 3;
-      }
-
-      return ((oneOverSpringPart.array() * partialSpringVectors.array())
-                .matrix()
-                .squaredNorm()) /
-             nrOfChains;
-    }
-
-    /**
-     * @brief Get the Gamma Factor at the current step
-     *
-     * @param b02 the melt <b>^2: mean bond length; vgl. the required <R_0^2>,
-     * computed as phantom = N<b>^2.
+     * @param b02 the melt <b^2>: mean bond length; vgl. the required <R_0^2>,
+     * computed as phantom = N<b^2>.
      * @param nrOfChains the nr of chains to average over (can be different
      * from the nr of springs thanks to omitted free chains or primary loops)
      * @return double
@@ -5545,34 +5508,35 @@ namespace sim {
         b02 = this->defaultBondLength * this->defaultBondLength;
       }
 
-      Eigen::VectorXd springVectors = this->evaluateSpringVectors(
-        this->initialConfig, this->currentDisplacements);
+      Eigen::VectorXd gammaFactors = this->getGammaFactors(b02);
 
       if (nrOfChains < 1) {
-        nrOfChains = springVectors.size() / 3;
+        return gammaFactors.mean();
+      } else {
+        return gammaFactors.sum() / static_cast<double>(nrOfChains);
       }
-
-      double commonDenominator = 1. / (b02 * static_cast<double>(nrOfChains));
-      double result = 0.;
-
-      for (size_t i = 0; i < this->initialConfig.nrOfSprings; ++i) {
-        result += springVectors.segment(3 * i, 3).squaredNorm() *
-                  commonDenominator /
-                  (this->initialConfig.springsContourLength[i]);
-      }
-
-      return result;
     }
 
+    /**
+     * @brief Get the per-spring Gamma factors
+     *
+     * @param b02 the melt <b^2>: mean bond length; vgl. the required <R_0^2>,
+     * computed as phantom = N<b^2>.
+     * @return Eigen::VectorXd
+     */
     Eigen::VectorXd MEHPForceBalance::getGammaFactors(double b02) const
     {
-      Eigen::VectorXd springVectors = this->evaluateSpringVectors(
+      Eigen::VectorXd springVectors = this->evaluatePartialSpringVectors(
         this->initialConfig, this->currentDisplacements);
+      RUNTIME_EXP_IFN(this->currentSpringPartitionsVec.size() * 3 ==
+                        springVectors.size(),
+                      "Unexpected dimensions in springVectors.");
 
       Eigen::VectorXd gammaFactors(springVectors.size() / 3);
       for (size_t i = 0; i < springVectors.size() / 3; ++i) {
         gammaFactors(i) = springVectors.segment(3 * i, 3).squaredNorm() /
-                          (this->initialConfig.springsContourLength(i) * b02);
+                          (this->initialConfig.springsContourLength(i) * b02 *
+                           this->currentSpringPartitionsVec(i));
       }
       return gammaFactors;
     }
