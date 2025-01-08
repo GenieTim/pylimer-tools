@@ -925,23 +925,16 @@ namespace sim {
       }
 
       /**
-       * @brief Get the Nr Of Active Nodes
+       * @brief Get the number of active nodes (incl. entanglement nodes, excl.
+       * entanglement links)
        *
        * @param tolerance  the tolerance: springs under a certain length are
        * considered inactive
        * @return int
        */
-      int getNrOfActiveNodes(double tolerance = 1e-3,
-                             int minimumNrOfActiveConnections = 2,
-                             int maximumNrOfActiveConnections = -1,
-                             bool usePartial = false) const
+      int getNrOfActiveNodes(double tolerance = 1e-3) const
       {
-        return this
-          ->getIdsOfActiveNodes(tolerance,
-                                minimumNrOfActiveConnections,
-                                maximumNrOfActiveConnections,
-                                usePartial)
-          .size();
+        return this->findActiveNodes(tolerance).count();
       }
 
       /**
@@ -953,7 +946,10 @@ namespace sim {
       double getSolubleWeightFraction(double tolerance = 1e-3)
       {
         return this->computeSolubleWeightFraction(
-          &this->initialConfig, this->currentSpringVectors, tolerance);
+          &this->initialConfig,
+          this->currentDisplacements,
+          this->currentSpringPartitionsVec,
+          tolerance);
       }
 
       /**
@@ -965,7 +961,10 @@ namespace sim {
       double getDanglingWeightFraction(double tolerance = 1e-3)
       {
         return this->computeDanglingWeightFraction(
-          &this->initialConfig, this->currentSpringVectors, tolerance);
+          &this->initialConfig,
+          this->currentDisplacements,
+          this->currentSpringPartitionsVec,
+          tolerance);
       }
 
       /**
@@ -977,9 +976,11 @@ namespace sim {
       double getActiveWeightFraction(double tolerance = 1e-3)
       {
         return this->computeActiveWeightFraction(
-          &this->initialConfig, this->currentSpringVectors, tolerance);
+          &this->initialConfig,
+          this->currentDisplacements,
+          this->currentSpringPartitionsVec,
+          tolerance);
       }
-
 
       /**
        * @brief Count the number of atoms that are in any way connected to an
@@ -990,8 +991,10 @@ namespace sim {
        */
       double countActiveClusteredAtoms(double tolerance = 1e-3)
       {
-        return this->countActiveClusteredAtoms(
-          &this->initialConfig, this->currentSpringVectors, tolerance);
+        return this->countActiveClusteredAtoms(&this->initialConfig,
+                                               this->currentDisplacements,
+                                               this->currentSpringPartitionsVec,
+                                               tolerance);
       }
       /**
        * @brief Get the Effective Functionality Of each node
@@ -1013,23 +1016,23 @@ namespace sim {
        * removed springs and atoms
        *
        * @param net
-       * @param springDistances
        * @param tolerance
        * @return double
        */
       double computeDanglingWeightFraction(
         ForceBalanceNetwork* net,
-        const Eigen::VectorXd& springDistances,
+        const Eigen::VectorXd& u,
+        const Eigen::VectorXd& springPartitions,
         const double tolerance = 1e-3) const
       {
-        double activeWeightFraction =
-          this->computeActiveWeightFraction(net, springDistances, tolerance);
+        double activeWeightFraction = this->computeActiveWeightFraction(
+          net, u, springPartitions, tolerance);
         RUNTIME_EXP_IFN(
           APPROX_WITHIN(activeWeightFraction, 0., 1., 1e-6),
           "Expect active weight fraction to be between 0 and 1, got " +
             std::to_string(activeWeightFraction) + ".");
-        double solubleWeightFraction =
-          this->computeSolubleWeightFraction(net, springDistances, tolerance);
+        double solubleWeightFraction = this->computeSolubleWeightFraction(
+          net, u, springPartitions, tolerance);
         RUNTIME_EXP_IFN(
           APPROX_WITHIN(solubleWeightFraction, 0., 1., 1e-6),
           "Expect soluble weight fraction to be between 0 and 1, got " +
@@ -1050,24 +1053,25 @@ namespace sim {
        * @brief Compute the weight fraction of active springs
        *
        * @param net
-       * @param springDistances
        * @param tolerance
        * @return double
        */
-      double computeActiveWeightFraction(ForceBalanceNetwork* net,
-                                         const Eigen::VectorXd& springDistances,
-                                         const double tolerance = 1e-3) const
+      double computeActiveWeightFraction(
+        ForceBalanceNetwork* net,
+        const Eigen::VectorXd& u,
+        const Eigen::VectorXd& springPartitions,
+        const double tolerance = 1e-3) const
       {
-        if (net->nrOfSprings * 3 != springDistances.size()) {
-          throw std::invalid_argument(
-            "Spring distances and network don't match");
-        }
+        INVALIDARG_EXP_IFN(net->nrOfPartialSprings == springPartitions.size(),
+                           "Spring partitions and network don't match");
+        INVALIDARG_EXP_IFN(net->nrOfLinks * 3 == u.size(),
+                           "Link displacements and network don't match");
         if (net->nrOfSprings < 1) {
           return 0.;
         }
         // find all active springs
-        Eigen::ArrayXb activeSprings = this->findActiveSprings(
-          springDistances, net->springsContourLength, tolerance);
+        Eigen::ArrayXb activeSprings =
+          this->findActiveSprings(net, u, springPartitions, tolerance);
         if (activeSprings.count() == 0) {
           return 0.;
         }
@@ -1099,15 +1103,17 @@ namespace sim {
        */
       std::pair<Eigen::ArrayXb, Eigen::ArrayXb> findClusteredToActive(
         const ForceBalanceNetwork* net,
-        const Eigen::VectorXd& springDistances,
+        const Eigen::VectorXd& u,
+        const Eigen::VectorXd& springPartitions,
         const double tolerance = 1e-3) const
       {
-        INVALIDARG_EXP_IFN(springDistances.size() == net->nrOfSprings * 3,
+        INVALIDARG_EXP_IFN(springPartitions.size() == net->nrOfPartialSprings,
                            "Invalid sizes.");
+        INVALIDARG_EXP_IFN(u.size() == net->nrOfLinks * 3, "Invalid sizes.");
 
         // find all active springs
-        Eigen::ArrayXb springIsActive = this->findActiveSprings(
-          springDistances, net->springsContourLength, tolerance);
+        Eigen::ArrayXb springIsActive =
+          this->findActiveSprings(net, u, springPartitions, tolerance);
 
         // then, iteratively walk along the springs to mark those as "active"
         // that are connected to active springs
@@ -1141,22 +1147,24 @@ namespace sim {
        * active cluster, i.e., are somehow connected to an active spring
        *
        * @param net
-       * @param springDistances
        * @param tolerance
        * @return double
        */
       double countActiveClusteredAtoms(ForceBalanceNetwork* net,
-                                       const Eigen::VectorXd& springDistances,
+                                       const Eigen::VectorXd& u,
+                                       const Eigen::VectorXd& springPartitions,
                                        const double tolerance = 1e-3) const
       {
-        INVALIDARG_EXP_IFN(net->nrOfSprings * 3 == springDistances.size(),
-                           "Spring distances and network don't match");
+        INVALIDARG_EXP_IFN(net->nrOfPartialSprings == springPartitions.size(),
+                           "Spring partitions and network don't match");
+        INVALIDARG_EXP_IFN(net->nrOfLinks * 3 == u.size(),
+                           "Link displacements and network don't match");
         if (net->nrOfSprings < 1) {
           return 0.;
         }
 
         std::pair<Eigen::ArrayXb, Eigen::ArrayXb> clusteredToActive =
-          this->findClusteredToActive(net, springDistances, tolerance);
+          this->findClusteredToActive(net, u, springPartitions, tolerance);
         // find all active springs
         Eigen::ArrayXb activeSprings = clusteredToActive.first;
         assert(activeSprings.size() == net->nrOfSprings);
@@ -1187,18 +1195,19 @@ namespace sim {
        */
       double computeSolubleWeightFraction(
         ForceBalanceNetwork* net,
-        const Eigen::VectorXd& springDistances,
+        const Eigen::VectorXd& u,
+        const Eigen::VectorXd& springPartitions,
         const double tolerance = 1e-3) const
       {
-        if (net->nrOfSprings * 3 != springDistances.size()) {
-          throw std::invalid_argument(
-            "Spring distances and network don't match");
-        }
+        INVALIDARG_EXP_IFN(net->nrOfPartialSprings == springPartitions.size(),
+                           "Spring partitions and network don't match");
+        INVALIDARG_EXP_IFN(net->nrOfLinks * 3 == u.size(),
+                           "Link displacements and network don't match");
         if (net->nrOfSprings < 1) {
           return 1.;
         }
         double nActiveClusteredAtoms =
-          this->countActiveClusteredAtoms(net, springDistances, tolerance);
+          this->countActiveClusteredAtoms(net, u, springPartitions, tolerance);
         // finally, normalise by the number of atoms.
         // NOTE: currently, the weight of the atoms is ignored
         return 1. - (nActiveClusteredAtoms /
@@ -1210,15 +1219,9 @@ namespace sim {
        *
        * @param tolerance the tolerance: springs under a certain length are
        * considered inactive
-       * @param minimumNrOfActiveConnections the number of active springs
-       * required for this node to qualify as active
        * @return std::vector<long int> the atom ids
        */
-      std::vector<long int> getIdsOfActiveNodes(
-        double tolerance = 1e-3,
-        int minimumNrOfActiveConnections = 2,
-        int maximumNrOfActiveConnections = -1,
-        bool usePartial = false) const;
+      std::vector<long int> getIdsOfActiveNodes(double tolerance = 1e-3) const;
 
       Eigen::VectorXd getCurrentSpringDistances() const
       {
@@ -1298,8 +1301,7 @@ namespace sim {
        */
       int getNrOfActiveSprings(double tolerance = 1e-3) const
       {
-        return this->countNrOfActiveSprings(this->currentSpringVectors,
-                                            tolerance);
+        return this->countNrOfActiveSprings(tolerance);
       }
 
       /**
@@ -1311,8 +1313,7 @@ namespace sim {
        */
       int getNrOfActivePartialSprings(double tolerance = 1e-3) const
       {
-        return this->countNrOfActiveSprings(this->currentPartialSpringVectors,
-                                            tolerance);
+        return this->countNrOfActivePartialSprings(tolerance);
       }
 
       /**
@@ -1344,17 +1345,12 @@ namespace sim {
       /**
        * @brief Get the Gamma Factor at the current step
        *
-       * @param b the melt <b>: mean bond length; vgl. the required <R_0^2>,
-       * computed as phantom = N<b>^2.
+       * @param b02 the melt <b^2>: mean bond length; vgl. the required <R_0^2>,
+       * computed as phantom = N<b^2>.
        * @param nrOfChains the nr of chains to average over (can be different
        * from the nr of springs thanks to omitted free chains or primary loops)
        * @return double
        */
-      double getGammaFactorUsingPartialSprings(
-        double oneOverSpringPartitionUpperLimit = 1.,
-        double b02 = 0.96,
-        int nrOfChains = -1) const;
-
       double getGammaFactor(double b02 = 0.96, int nrOfChains = -1) const;
 
       Eigen::VectorXd getGammaFactors(double b02) const;
@@ -2123,6 +2119,49 @@ namespace sim {
         return this->initialConfig.nrOfNodes;
       }
 
+      void debugAtomVicinity(const size_t atomId)
+      {
+        long int atomIdx = -1;
+        for (size_t i = 0; i < this->initialConfig.oldAtomIds.size(); ++i) {
+          if (this->initialConfig.oldAtomIds[i] == atomId) {
+            atomIdx = i;
+            break;
+          }
+        }
+        RUNTIME_EXP_IFN(atomIdx >= 0, "Atom not found.");
+        std::cout << "Atom " << atomIdx << " (" << atomId << ")"
+                  << " connectivity:" << std::endl;
+        for (long int parentSpringIdx :
+             this->initialConfig.springIndicesOfLinks[atomIdx]) {
+          std::vector<size_t> allSpringIndices =
+            this->getAllFullSpringIndicesAlong(this->initialConfig,
+                                               parentSpringIdx);
+          std::string prefix = "";
+          for (size_t springIdx : allSpringIndices) {
+            prefix += "\t";
+            std::cout << prefix << "Spring " << springIdx << " (";
+            std::cout << this->initialConfig.springPartIndexA[springIdx]
+                      << " ⟷ "
+                      << this->initialConfig.springPartIndexB[springIdx];
+            std::cout
+              << ") with distance "
+              << this->currentSpringVectors.segment(springIdx * 3, 3).norm()
+              << std::endl;
+            std::cout << prefix << "\t";
+
+            for (long int linkIdx :
+                 this->initialConfig.linkIndicesOfSprings[springIdx]) {
+              std::cout << linkIdx << " ";
+              if (linkIdx < this->initialConfig.nrOfNodes) {
+                std::cout << "(" << this->initialConfig.oldAtomIds[linkIdx]
+                          << ") ";
+              }
+            }
+            std::cout << std::endl;
+          }
+        }
+      }
+
     protected:
       /**
        * @brief Convert the universe to a network
@@ -2254,71 +2293,114 @@ namespace sim {
       /**
        * @brief Count how many of the springs are active (length > tolerance)
        *
-       * @param springDistances
        * @param tolerance
        * @return int
        */
-      int countNrOfActiveSprings(const Eigen::VectorXd& springDistances,
+      int countNrOfActiveSprings(const ForceBalanceNetwork* net,
+                                 const Eigen::VectorXd& u,
+                                 const Eigen::VectorXd& springPartitions,
                                  const double tolerance = 1e-3) const
       {
-        return (this->findActiveSprings(springDistances, tolerance) == true)
+        return (this->findActiveSprings(net, u, springPartitions, tolerance))
           .count();
       }
-      int countNrOfActiveSprings(const Eigen::VectorXd& springDistances,
-                                 const Eigen::VectorXd& springPartTimesContour,
-                                 const double tolerance = 1e-3) const
+      int countNrOfActiveSprings(const double tolerance = 1e-3) const
       {
-        return (this->findActiveSprings(
-                  springDistances, springPartTimesContour, tolerance) == true)
-          .count();
+        return (this->findActiveSprings(tolerance) == true).count();
+      }
+
+      int countNrOfActivePartialSprings(const double tolerance = 1e-3) const
+      {
+        return (this->findActivePartialSprings(tolerance) == true).count();
       }
 
       /**
-       * @brief Iterate all spring distances, mark active ones (length >
-       * tolerance)
+       * @brief Determine for each spring whether the spring contains at least
+       * one partial spring that is considered active (tolerance criterion)
        *
-       * @param springDistances
+       * @param net
+       * @param u
+       * @param springPartitions
        * @param tolerance
        * @return Eigen::ArrayXb
        */
-      Eigen::ArrayXb findActiveSprings(const Eigen::VectorXd& springDistances,
+      Eigen::ArrayXb findActiveSprings(const ForceBalanceNetwork* net,
+                                       const Eigen::VectorXd& u,
+                                       const Eigen::VectorXd& springPartitions,
                                        const double tolerance = 1e-3) const
       {
+        Eigen::VectorXd partialSpringVectors =
+          this->evaluatePartialSpringVectors(
+            *net, u, this->is2D, this->assumeBoxLargeEnough);
         Eigen::ArrayXb result =
-          Eigen::ArrayXb::Constant(springDistances.size() / 3, false);
-        for (size_t i = 0; i < springDistances.size() / 3; ++i) {
-          result[i] =
-            springDistances.segment(3 * i, 3).squaredNorm() > tolerance;
+          Eigen::ArrayXb::Constant(net->nrOfSprings, false);
+
+        for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
+          result[net->partialToFullSpringIndex[i]] =
+            result[net->partialToFullSpringIndex[i]] ||
+            !this->distanceIsWithinTolerance(
+              partialSpringVectors.segment(3 * i, 3),
+              tolerance,
+              net->springsContourLength[net->partialToFullSpringIndex[i]],
+              springPartitions[i]);
         }
+
         return result;
       }
 
-      /**
-       * @brief Iterate all spring distances, mark active ones (length >
-       * tolerance * contour length * -fraction)
-       *
-       * @param springDistances
-       * @param tolerance
-       * @return Eigen::ArrayXb
-       */
-      Eigen::ArrayXb findActiveSprings(
-        const Eigen::VectorXd& springDistances,
-        const Eigen::VectorXd& springPartTimesContour,
+      Eigen::ArrayXb findActiveSprings(const double tolerance = 1e-3) const
+      {
+        return this->findActiveSprings(&this->initialConfig,
+                                       this->currentDisplacements,
+                                       this->currentSpringPartitionsVec,
+                                       tolerance);
+      }
+
+      Eigen::ArrayXb findActiveNodes(const double tolerance = 1e-3) const
+      {
+        Eigen::ArrayXb activeSprings = this->findActiveSprings(tolerance);
+        assert(activeSprings.size() == this->initialConfig.nrOfSprings);
+
+        Eigen::ArrayXb activeNodes =
+          Eigen::ArrayXb::Constant(this->initialConfig.nrOfNodes, false);
+        for (size_t i = 0; i < activeSprings.size(); ++i) {
+          if (activeSprings[i]) {
+            activeNodes[this->initialConfig.springIndexA[i]] = true;
+            activeNodes[this->initialConfig.springIndexB[i]] = true;
+          }
+        }
+        return activeNodes;
+      }
+
+      Eigen::ArrayXb findActivePartialSprings(
+        const ForceBalanceNetwork* net,
+        const Eigen::VectorXd& u,
+        const Eigen::VectorXd& springPartitions,
         const double tolerance = 1e-3) const
       {
-        INVALIDARG_EXP_IFN(
-          3 * springPartTimesContour.size() == springDistances.size(),
-          "Incompatible spring partitions and spring distances sizes");
+        Eigen::VectorXd partialSpringVectors =
+          this->evaluatePartialSpringVectors(
+            *net, u, this->is2D, this->assumeBoxLargeEnough);
         Eigen::ArrayXb result =
-          Eigen::ArrayXb::Constant(springDistances.size() / 3, false);
-        for (size_t i = 0; i < springDistances.size() / 3; ++i) {
-          result[i] =
-            !this->distanceIsWithinTolerance(springDistances.segment(3 * i, 3),
-                                             tolerance,
-                                             1,
-                                             springPartTimesContour[i]);
+          Eigen::ArrayXb::Constant(net->nrOfPartialSprings, false);
+
+        for (size_t i = 0; i < net->nrOfPartialSprings; ++i) {
+          result[i] = !this->distanceIsWithinTolerance(
+            partialSpringVectors.segment(3 * i, 3),
+            tolerance,
+            net->springsContourLength[net->partialToFullSpringIndex[i]],
+            springPartitions[i]);
         }
+
         return result;
+      }
+      Eigen::ArrayXb findActivePartialSprings(
+        const double tolerance = 1e-3) const
+      {
+        return this->findActivePartialSprings(&this->initialConfig,
+                                              this->currentDisplacements,
+                                              this->currentSpringPartitionsVec,
+                                              tolerance);
       }
 
       /**
@@ -2404,6 +2486,17 @@ namespace sim {
         }
       }
 
+      /**
+       * @brief Decide whether a distance is within a given tolerance. This is
+       * *the* distance criterion for determining whether a spring is active.
+       *
+       * @param dist
+       * @param tolerance
+       * @param contourLength
+       * @param contourLengthFraction
+       * @return true
+       * @return false
+       */
       bool distanceIsWithinTolerance(const Eigen::Vector3d& dist,
                                      double tolerance = 1e-3,
                                      double contourLength = 1.,
@@ -2710,6 +2803,35 @@ namespace sim {
           for (size_t partialSpringIdx :
                net.localToGlobalSpringIndex[springIdx]) {
             result.push_back(partialSpringIdx);
+          }
+        }
+
+        return result;
+      }
+
+      /**
+       * @brief Get all "full" spring indices (jumping entanglements) of a
+       * particular cross-link.
+       *
+       * @param net
+       * @param nodeIdx
+       * @return std::vector<size_t>
+       */
+      std::vector<size_t> getInvolvedFullSpringIndices(
+        const ForceBalanceNetwork& net,
+        const size_t nodeIdx) const
+      {
+        INVALIDARG_EXP_IFN(!net.linkIsSliplink[nodeIdx],
+                           "Link must be cross-link.");
+        INVALIDARG_EXP_IFN(net.oldAtomTypes[nodeIdx] != this->entanglementType,
+                           "Link must be cross-link.");
+
+        std::vector<size_t> result;
+        for (size_t springIdx : net.springIndicesOfLinks[nodeIdx]) {
+          std::vector<size_t> subSprings =
+            this->getAllFullSpringIndicesAlong(net, springIdx);
+          for (size_t subSpringIdx : subSprings) {
+            result.push_back(subSpringIdx);
           }
         }
 
