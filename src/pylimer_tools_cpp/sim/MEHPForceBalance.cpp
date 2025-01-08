@@ -5502,7 +5502,10 @@ namespace sim {
      * from the nr of springs thanks to omitted free chains or primary loops)
      * @return double
      */
-    double MEHPForceBalance::getGammaFactor(double b02, int nrOfChains) const
+    double MEHPForceBalance::getGammaFactor(
+      double b02,
+      int nrOfChains,
+      double oneOverSpringPartitionUpperLimit) const
     {
       if (b02 < 0) {
         b02 = this->defaultBondLength * this->defaultBondLength;
@@ -5518,13 +5521,15 @@ namespace sim {
     }
 
     /**
-     * @brief Get the per-spring Gamma factors
+     * @brief Get the per-(partial)-spring gamma factors
      *
      * @param b02 the melt <b^2>: mean bond length; vgl. the required <R_0^2>,
      * computed as phantom = N<b^2>.
      * @return Eigen::VectorXd
      */
-    Eigen::VectorXd MEHPForceBalance::getGammaFactors(double b02) const
+    Eigen::VectorXd MEHPForceBalance::getGammaFactors(
+      double b02,
+      double oneOverSpringPartitionUpperLimit) const
     {
       Eigen::VectorXd springVectors = this->evaluatePartialSpringVectors(
         this->initialConfig, this->currentDisplacements);
@@ -5533,10 +5538,25 @@ namespace sim {
                       "Unexpected dimensions in springVectors.");
 
       Eigen::VectorXd gammaFactors(springVectors.size() / 3);
+      const double commonDenominator = 1. / b02;
       for (size_t i = 0; i < springVectors.size() / 3; ++i) {
-        gammaFactors(i) = springVectors.segment(3 * i, 3).squaredNorm() /
-                          (this->initialConfig.springsContourLength(i) * b02 *
-                           this->currentSpringPartitionsVec(i));
+        double N = this->initialConfig.springsContourLength(i);
+        double oneOverContourLengthFraction = CLAMP_ONE_OVER_SPRINGPARTITION(
+          this->initialConfig.partialSpringIsPartial[i],
+          1.0 / (N * this->currentSpringPartitionsVec(i)),
+          N,
+          oneOverSpringPartitionUpperLimit);
+        gammaFactors[i] = springVectors.segment(3 * i, 3).squaredNorm() *
+                          commonDenominator * oneOverContourLengthFraction;
+        RUNTIME_EXP_IFN(
+          std::isfinite(gammaFactors[i]),
+          "Non-finite gamma factor for partial spring " + std::to_string(i) +
+            ", computed from N = " + std::to_string(N) +
+            ", oneOverSpringPartitionUpperLimit = " +
+            std::to_string(oneOverSpringPartitionUpperLimit) +
+            " and squared distance = " +
+            std::to_string(springVectors.segment(3 * i, 3).squaredNorm()) +
+            ".");
       }
       return gammaFactors;
     }

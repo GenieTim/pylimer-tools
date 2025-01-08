@@ -1343,7 +1343,7 @@ namespace sim {
       }
 
       /**
-       * @brief Get the Gamma Factor at the current step
+       * @brief Get the gamma factor at the current step
        *
        * @param b02 the melt <b^2>: mean bond length; vgl. the required <R_0^2>,
        * computed as phantom = N<b^2>.
@@ -1351,10 +1351,22 @@ namespace sim {
        * from the nr of springs thanks to omitted free chains or primary loops)
        * @return double
        */
-      double getGammaFactor(double b02 = 0.96, int nrOfChains = -1) const;
+      double getGammaFactor(double b02 = 0.96, int nrOfChains = -1, double oneOverSpringPartitionUpperLimit = 1.) const;
 
-      Eigen::VectorXd getGammaFactors(double b02) const;
+      /**
+       * @brief Get the per-(partial)-spring gamma factors
+       *
+       * @param b02 the melt <b^2>: mean bond length; vgl. the required <R_0^2>,
+       * computed as phantom = N<b^2>.
+       * @return Eigen::VectorXd
+       */
+      Eigen::VectorXd getGammaFactors(double b02, double oneOverSpringPartitionUpperLimit = 1.) const;
 
+      /**
+       * @brief Get the number of force balance iterations done so far
+       *
+       * @return int
+       */
       int getNrOfIterations() const { return this->nrOfStepsDone; }
 
       ExitReason getExitReason() const { return this->exitReason; }
