@@ -1038,13 +1038,15 @@ init_pylimer_bound_sim(py::module_& m)
           :param nr_of_chains: the value to normalize the sum of square distances by. Usually (and default if :math:`< 0`) the nr of springs. 
      )pbdoc",
          py::arg("b02") = -1.0,
-         py::arg("nr_of_chains") = -1)
+         py::arg("nr_of_chains") = -1,
+         py::arg("one_over_spring_partition_upper_limit") = 1.)
     .def("get_gamma_factors",
          &mehp::MEHPForceBalance::getGammaFactors,
          R"pbdoc(
           Evaluates the gamma factor for each strand (i.e., the squared distance divided by the contour length multiplied by b02)
      )pbdoc",
-         py::arg("b02"))
+         py::arg("b02"),
+         py::arg("one_over_spring_partition_upper_limit") = 1.)
     .def("get_nr_of_nodes", &mehp::MEHPForceBalance::getNrOfNodes, R"pbdoc(
            Get the number of nodes (crosslinkers) considered in this simulation.
      )pbdoc")
