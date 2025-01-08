@@ -43,7 +43,6 @@ MEHPForceBalance
       ~MEHPForceBalance.get_force_magnitude_vector
       ~MEHPForceBalance.get_force_on
       ~MEHPForceBalance.get_gamma_factor
-      ~MEHPForceBalance.get_gamma_factor_using_partial_springs
       ~MEHPForceBalance.get_gamma_factors
       ~MEHPForceBalance.get_ids_of_active_nodes
       ~MEHPForceBalance.get_neighbour_link_indices
@@ -111,7 +110,6 @@ MEHPForceBalance
    .. automethod:: get_force_magnitude_vector
    .. automethod:: get_force_on
    .. automethod:: get_gamma_factor
-   .. automethod:: get_gamma_factor_using_partial_springs
    .. automethod:: get_gamma_factors
    .. automethod:: get_ids_of_active_nodes
    .. automethod:: get_neighbour_link_indices
