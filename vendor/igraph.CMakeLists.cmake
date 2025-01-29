@@ -9,12 +9,12 @@ endif()
 if (NOT DEFINED igraph_LOADED)
 	find_package(igraph "0.10.15...<1.1.0")
 
-	if (${igraph_FOUND} AND TARGET igraph::igraph)
-		message("Found igraph library")
-		set(igraph_LIBRARIES igraph::igraph)
-		get_target_property(l_igraph_INCLUDE_DIRS igraph::igraph INTERFACE_INCLUDE_DIRECTORIES)
-		set(igraph_INCLUDE_DIRS "${l_igraph_INCLUDE_DIRS}")
-	else()
+	# if (${igraph_FOUND} AND TARGET igraph::igraph)
+	# 	message("Found igraph library")
+	# 	set(igraph_LIBRARIES igraph::igraph)
+	# 	get_target_property(l_igraph_INCLUDE_DIRS igraph::igraph INTERFACE_INCLUDE_DIRECTORIES)
+	# 	set(igraph_INCLUDE_DIRS "${l_igraph_INCLUDE_DIRS}")
+	# else()
 		if (NOT TARGET igraphLib)
 
 			if(WIN32)
@@ -33,8 +33,8 @@ if (NOT DEFINED igraph_LOADED)
 
 			ExternalProject_Add(
 					igraphLib
-					GIT_REPOSITORY https://github.com/igraph/igraph.git
-					GIT_TAG 635b432eff0a89580ac9bb98068d2fbc8ef374f2 # 0.10.15
+					GIT_REPOSITORY https://github.com/GenieTim/igraph.git # https://github.com/igraph/igraph.git
+					GIT_TAG f4d4ddada0a8767b0f04963d9c522e76e1a79f9c # 635b432eff0a89580ac9bb98068d2fbc8ef374f2 # 0.10.15
 					PREFIX ${igraph_PREFIX_PATH}
 					INSTALL_DIR ${igraph_PREFIX_PATH}/igraphLib-install
 					CMAKE_ARGS ${igraph_EXTRA_CMAKE_ARGS} -DCMAKE_INSTALL_PREFIX=${igraph_PREFIX_PATH}/igraphLib-install -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_LIBDIR=${igraph_PREFIX_PATH}/igraphLib-install/lib -DIGRAPH_GRAPHML_SUPPORT=OFF -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=true
@@ -60,7 +60,7 @@ if (NOT DEFINED igraph_LOADED)
 			set_target_properties(igraph::igraph PROPERTIES IMPORTED_LOCATION ${igraph_LIBRARIES})
 			set(igraph_LOADED ON)
 		endif()
-	endif()
+	# endif()
 endif()
 
 # find_package(igraph REQUIRED)
